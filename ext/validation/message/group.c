@@ -232,7 +232,9 @@ static void phalcon_validation_message_group_write_dimension(zval *object, zval 
 	PHALCON_VERIFY_CLASS_EX(value, phalcon_validation_message_ce, spl_ce_BadMethodCallException, 0);
 
 	messages = phalcon_fetch_nproperty_this(object, SL("_messages"), PH_NOISY TSRMLS_CC);
-	separate = phalcon_maybe_separate_zval(&messages);
+
+	SEPARATE_ZVAL(messages);
+
 	if (Z_TYPE_P(messages) != IS_ARRAY) {
 		zval_dtor(messages);
 		array_init_size(messages, 1);
@@ -287,7 +289,8 @@ static void phalcon_validation_message_group_unset_dimension(zval *object, zval 
 	}
 
 	messages = phalcon_fetch_nproperty_this(object, SL("_messages"), PH_NOISY TSRMLS_CC);
-	separate = phalcon_maybe_separate_zval(&messages);
+
+	SEPARATE_ZVAL(messages);
 
 	if (Z_TYPE_P(messages) != IS_ARRAY) {
 		zval_dtor(messages);

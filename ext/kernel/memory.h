@@ -322,20 +322,4 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		} \
 	}
 
-static inline int phalcon_maybe_separate_zval(zval** z)
-{
-	if (Z_REFCOUNT_PP(z) > 1 && !Z_ISREF_PP(z)) {
-		zval *new_zv;
-
-		ALLOC_ZVAL(new_zv);
-		INIT_PZVAL_COPY(new_zv, *z);
-		*z = new_zv;
-		zval_copy_ctor(new_zv);
-
-		return 1;
-	}
-
-	return 0;
-}
-
 #endif /* PHALCON_KERNEL_MEMORY_H */

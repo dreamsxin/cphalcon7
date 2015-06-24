@@ -721,13 +721,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, setTrackingKey)
 	phalcon_fetch_params_ex(1, 0, &key);
 
 	options   = phalcon_fetch_nproperty_this(getThis(), SL("_options"), PH_NOISY TSRMLS_CC);
-	separated = phalcon_maybe_separate_zval(&options);
+
+	SEPARATE_ZVAL(options);
+
 	phalcon_array_update_string(&options, SL("statsKey"), *key, PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_options"), options TSRMLS_CC);
 
-	if (separated) {
-		Z_DELREF_P(options);
-		phalcon_update_property_this(getThis(), SL("_options"), options TSRMLS_CC);
-	}
-
-	RETURN_ZVAL(getThis(), 1, 0);
+	RETURN_THISW();
 }

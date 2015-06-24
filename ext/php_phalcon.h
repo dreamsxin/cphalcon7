@@ -160,6 +160,11 @@ extern int nusphere_dbg_present;
 	#define PHP_FE_END { NULL, NULL, NULL, 0, 0 }
 #endif
 
+#ifndef ALLOC_ZVAL
+#	define ALLOC_ZVAL(z)	\
+		(z) = (zval *) emalloc(sizeof(zval))
+#endif
+
 #ifndef INIT_PZVAL_COPY
 #	define INIT_PZVAL_COPY(z, v) \
 		ZVAL_COPY_VALUE(z, v); \

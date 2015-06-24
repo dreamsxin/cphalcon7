@@ -22,88 +22,52 @@
 #include "kernel/backtrace.h"
 
 #include <main/php_main.h>
-#include <Zend/zend_exceptions.h>
-
-#ifndef ENFORCE_SAFE_MODE
-#define ENFORCE_SAFE_MODE    0
-#endif
+#include <Zend/zend_hash.h>
 
 /**
  * Do an internal require to a plain php file taking care of the value returned by the file
  */
-int phalcon_require_ret(zval **return_value_ptr, const char *require_path TSRMLS_DC)
+int phalcon_require_ret(zval *return_value, const char *require_path TSRMLS_DC)
 {
 	zend_file_handle file_handle;
-	int ret, use_ret;
-	zend_op_array *new_op_array;
+	zend_op_array *op_array;
+	char realpath[MAXPATHLEN];
 
-#ifndef PHALCON_RELEASE
-	if (return_value_ptr && *return_value_ptr) {
-		fprintf(stderr, "%s: *return_value_ptr is expected to be NULL", __func__);
-		phalcon_print_backtrace();
-		abort();
+	if (!VCWD_REALPATH(require_path, realpath)) {
+		return 0;
 	}
-#endif
 
-	if (!require_path) {
-		/* @TODO, throw an exception here */
-		return FAILURE;
-	}	
-
-	use_ret = !!return_value_ptr;
-
-#if PHP_VERSION_ID < 50400
-	file_handle.filename = (char *)require_path;
-#else
 	file_handle.filename = require_path;
-#endif
 	file_handle.free_filename = 0;
 	file_handle.type = ZEND_HANDLE_FILENAME;
 	file_handle.opened_path = NULL;
 	file_handle.handle.fp = NULL;
-	new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE TSRMLS_CC);
-	if (new_op_array) {
-		if (file_handle.handle.stream.handle) {
-			int dummy = 1;
 
-			if (!file_handle.opened_path) {
-				file_handle.opened_path = estrdup(require_path);
-			}
+	op_array = zend_compile_file(&file_handle, ZEND_INCLUDE);
 
-			zend_hash_add(&EG(included_files), file_handle.opened_path, strlen(file_handle.opened_path) + 1, (void *)&dummy, sizeof(int), NULL);
-			zend_destroy_file_handle(&file_handle TSRMLS_CC);
-		}
-		zval **original_return_value = EG(return_value_ptr_ptr);
-		zend_op_array *original_active_op_array = EG(active_op_array);
-		zend_op **original_opline_ptr           = EG(opline_ptr);
+	if (op_array && file_handle.handle.stream.handle) {
+	    zval dummy;
+	    ZVAL_NULL(&dummy);
 
-		EG(return_value_ptr_ptr) = return_value_ptr;
-		EG(active_op_array)      = new_op_array;
-
-		zend_execute(new_op_array TSRMLS_CC);
-		zend_exception_restore(TSRMLS_C);
-		destroy_op_array(new_op_array TSRMLS_CC);
-		efree(new_op_array);
-
-		if (EG(exception)) {
-			assert(!return_value_ptr || !*return_value_ptr);
-			ret = FAILURE;
-		} else {
-			ret = SUCCESS;
+		if (!file_handle.opened_path) {
+			file_handle.opened_path = zend_string_init(require_path, strlen(len)+1, 0);
 		}
 
-		if (!use_ret) {
-			if (EG(return_value_ptr_ptr)) {
-				phalcon_ptr_dtor(EG(return_value_ptr_ptr));
-			}
-		}
+		zend_hash_add(&EG(included_files), file_handle.opened_path, &dummy);
+	}
+	zend_destroy_file_handle(&file_handle);
 
-		EG(return_value_ptr_ptr) = original_return_value;
-		EG(active_op_array) = original_active_op_array;
-		EG(opline_ptr) = original_opline_ptr;
-		return ret;
-	} else {
-		zend_destroy_file_handle(&file_handle TSRMLS_CC);
+	if (op_array) {
+        ZVAL_UNDEF(&return_value);
+		zend_execute(op_array, &return_value);
+
+		destroy_op_array(op_array);
+		efree(op_array);
+        if (!EG(exception)) {
+            zval_ptr_dtor(&return_value);
+        }
+
+	    return SUCCESS;
 	}
 
 	return FAILURE;

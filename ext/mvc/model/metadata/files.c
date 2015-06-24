@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 
 	zval **key, *meta_data_dir, *virtual_key;
-	zval *path, *data = NULL;
+	zval *path, data;
 
 	phalcon_fetch_params_ex(1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 	
 	if (phalcon_file_exists(path TSRMLS_CC) == SUCCESS) {
 		RETURN_MM_ON_FAILURE(phalcon_require_ret(&data, Z_STRVAL_P(path) TSRMLS_CC));
-		RETVAL_ZVAL(data, 1, 1);
+		RETVAL_ZVAL(&data, 1, 1);
 	}
 	
 	PHALCON_MM_RESTORE();

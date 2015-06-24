@@ -460,7 +460,7 @@ static int phalcon_registry_compare_objects(zval *object1, zval *object2 TSRMLS_
 /**
  * @brief <tt>Serializable::serialize()</tt>
  */
-static int phalcon_registry_serialize(zval *object, unsigned char **buffer, zend_uint *buf_len, zend_serialize_data *data TSRMLS_DC)
+static int phalcon_registry_serialize(zval *object, unsigned char **buffer, uint32_t *buf_len, zend_serialize_data *data TSRMLS_DC)
 {
 	phalcon_registry_object *obj = phalcon_registry_get_object(object TSRMLS_CC);
 	smart_str buf = { NULL, 0, 0 };
@@ -482,7 +482,7 @@ static int phalcon_registry_serialize(zval *object, unsigned char **buffer, zend
 /**
  * @brief <tt>Serializable::unserialize()</tt>
  */
-static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, const unsigned char *buf, zend_uint buf_len, zend_unserialize_data *data TSRMLS_DC)
+static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, const unsigned char *buf, uint32_t buf_len, zend_unserialize_data *data TSRMLS_DC)
 {
 	phalcon_registry_object *obj;
 	php_unserialize_data_t var_hash;

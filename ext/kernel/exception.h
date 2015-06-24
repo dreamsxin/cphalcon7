@@ -50,11 +50,11 @@
 
 /** Throw Exceptions */
 void phalcon_throw_exception(zval *object TSRMLS_DC) PHALCON_ATTR_NONNULL;
-void phalcon_throw_exception_debug(zval *object, const char *file, zend_uint line TSRMLS_DC);
+void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line TSRMLS_DC);
 void phalcon_throw_exception_string(zend_class_entry *ce, const char *message TSRMLS_DC) PHALCON_ATTR_NONNULL;
-void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *message, zend_uint message_len, const char *file, zend_uint line TSRMLS_DC);
+void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *message, uint32_t message_len, const char *file, uint32_t line TSRMLS_DC);
 void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message TSRMLS_DC) PHALCON_ATTR_NONNULL;
-void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, const char *file, zend_uint line TSRMLS_DC);
+void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, const char *file, uint32_t line TSRMLS_DC);
 void phalcon_throw_exception_format(zend_class_entry *ce TSRMLS_DC, const char *format, ...);
 
 #endif /* PHALCON_KERNEL_EXCEPTION_H */

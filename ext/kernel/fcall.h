@@ -40,7 +40,7 @@ typedef enum _phalcon_call_type {
 
 typedef struct _phalcon_fcall_cache_entry {
 	zend_function *f;
-	zend_uint times;
+	uint32_t times;
 } phalcon_fcall_cache_entry;
 
 #else

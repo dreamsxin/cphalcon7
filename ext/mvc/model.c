@@ -2960,11 +2960,8 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 		}
 		else {
 			int dup;
-#if PHP_VERSION_ID >= 50400
-			const
-#endif
-			char *name = "";
-			zend_uint name_len = 0;
+			const char *name = "";
+			uint32_t name_len = 0;
 
 			dup = zend_get_object_classname(validator, &name, &name_len TSRMLS_CC);
 			zend_throw_exception_ex(spl_ce_LogicException, 0 TSRMLS_CC, "Validator '%s' returned false but did not call appendMessage()", name);

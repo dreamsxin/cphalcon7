@@ -395,7 +395,7 @@ int phalcon_memnstr_str(const zval *haystack, char *needle, unsigned int needle_
 	return 0;
 }
 
-int phalcon_same_name(const char *key, const char *name, zend_uint name_len)
+int phalcon_same_name(const char *key, const char *name, uint32_t name_len)
 {
 	char *lcname = zend_str_tolower_dup(name, name_len);
 	int ret = memcmp(lcname, key, name_len) == 0;

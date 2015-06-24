@@ -38,7 +38,7 @@ void phalcon_throw_exception(zval *object TSRMLS_DC){
 /**
  * Throws a zval object as exception
  */
-void phalcon_throw_exception_debug(zval *object, const char *file, zend_uint line TSRMLS_DC){
+void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line TSRMLS_DC){
 
 	zend_class_entry *default_exception_ce;
 	zval *curline = NULL, *object_copy = NULL;
@@ -79,7 +79,7 @@ void phalcon_throw_exception_string(zend_class_entry *ce, const char *message TS
 /**
  * Throws an exception with a single string parameter + debug info
  */
-void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *message, zend_uint message_len, const char *file, zend_uint line TSRMLS_DC) {
+void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *message, uint32_t message_len, const char *file, uint32_t line TSRMLS_DC) {
 
 	zval *object, *msg;
 	zend_class_entry *default_exception_ce;
@@ -120,7 +120,7 @@ void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message TSRMLS_DC)
 /**
  * Throws an exception with a single zval parameter
  */
-void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, const char *file, zend_uint line TSRMLS_DC){
+void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, const char *file, uint32_t line TSRMLS_DC){
 
 	zval *object;
 	zend_class_entry *default_exception_ce;

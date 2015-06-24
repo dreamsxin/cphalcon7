@@ -28,7 +28,7 @@
 /** Fast char position */
 int phalcon_memnstr(const zval *haystack, const zval *needle);
 int phalcon_memnstr_str(const zval *haystack, char *needle, unsigned int needle_length);
-int phalcon_same_name(const char *key, const char *name, zend_uint name_len);
+int phalcon_same_name(const char *key, const char *name, uint32_t name_len);
 
 void phalcon_strtr(zval *return_value, zval *str, zval *str_from, zval *str_to TSRMLS_DC);
 void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs TSRMLS_DC);

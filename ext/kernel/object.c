@@ -34,7 +34,7 @@
 /**
  * Reads class constant from string name and returns its value
  */
-int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, const char *constant_name, zend_uint constant_length TSRMLS_DC) {
+int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, const char *constant_name, uint32_t constant_length TSRMLS_DC) {
 
 	zval **result_ptr;
 
@@ -50,7 +50,7 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 /*
  * Multiple array-offset update
  */
-int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, zend_uint property_length, zval *value TSRMLS_DC, const char *types, int types_length, int types_count, ...) {
+int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value TSRMLS_DC, const char *types, int types_length, int types_count, ...) {
 
 	int i, l, ll; char *s;
 	va_list ap;
@@ -202,7 +202,7 @@ void phalcon_get_class_ns(zval *result, const zval *object, int lower TSRMLS_DC)
 
 	int found = 0;
 	zend_class_entry *ce;
-	zend_uint i, class_length;
+	uint32_t i, class_length;
 	const char *cursor, *class_name;
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
@@ -262,7 +262,7 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower TSRMLS_DC)
 
 	zend_class_entry *ce;
 	int found = 0;
-	zend_uint i, j, class_length;
+	uint32_t i, j, class_length;
 	const char *cursor, *class_name;
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
@@ -516,7 +516,7 @@ zend_class_entry* phalcon_fetch_static_class(TSRMLS_D) {
 /**
  * Checks if a class exist
  */
-int phalcon_class_exists(const char *class_name, zend_uint class_len, int autoload TSRMLS_DC) {
+int phalcon_class_exists(const char *class_name, uint32_t class_len, int autoload TSRMLS_DC) {
 
 	zend_class_entry **ce;
 
@@ -658,7 +658,7 @@ int phalcon_is_instance_of(zval *object, const char *class_name, unsigned int cl
 int phalcon_zval_is_traversable(zval *object TSRMLS_DC) {
 
 	zend_class_entry *ce;
-	zend_uint i;
+	uint32_t i;
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		ce = Z_OBJCE_P(object);
@@ -683,7 +683,7 @@ int phalcon_zval_is_traversable(zval *object TSRMLS_DC) {
 /**
  * Checks if property exists on object
  */
-int phalcon_isset_property_quick(zval *object, const char *property_name, zend_uint property_length, ulong hash TSRMLS_DC)
+int phalcon_isset_property_quick(zval *object, const char *property_name, uint32_t property_length, ulong hash TSRMLS_DC)
 {
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		if (likely(phalcon_hash_quick_exists(&Z_OBJCE_P(object)->properties_info, property_name, property_length, hash))) {
@@ -700,7 +700,7 @@ int phalcon_isset_property_quick(zval *object, const char *property_name, zend_u
  * Lookup exact class where a property is defined (precomputed key)
  *
  */
-static inline zend_class_entry *phalcon_lookup_class_ce_quick(zend_class_entry *ce, const char *property_name, zend_uint property_length, ulong hash TSRMLS_DC) {
+static inline zend_class_entry *phalcon_lookup_class_ce_quick(zend_class_entry *ce, const char *property_name, uint32_t property_length, ulong hash TSRMLS_DC) {
 
 	zend_class_entry *original_ce = ce;
 
@@ -717,7 +717,7 @@ static inline zend_class_entry *phalcon_lookup_class_ce_quick(zend_class_entry *
  * Lookup exact class where a property is defined
  *
  */
-static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, const char *property_name, zend_uint property_length TSRMLS_DC) {
+static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length TSRMLS_DC) {
 
 	return phalcon_lookup_class_ce_quick(ce, property_name, property_length, zend_inline_hash_func(property_name, property_length + 1) TSRMLS_CC);
 }
@@ -725,7 +725,7 @@ static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, co
 /**
  * Reads a property from an object
  */
-int phalcon_read_property(zval **result, zval *object, const char *property_name, zend_uint property_length, int silent TSRMLS_DC) {
+int phalcon_read_property(zval **result, zval *object, const char *property_name, uint32_t property_length, int silent TSRMLS_DC) {
 
 	zval *property;
 	zend_class_entry *ce, *old_scope;
@@ -750,12 +750,8 @@ int phalcon_read_property(zval **result, zval *object, const char *property_name
 	EG(scope) = ce;
 
 	if (!Z_OBJ_HT_P(object)->read_property) {
-#if PHP_VERSION_ID < 50400
-		char *class_name;
-#else
 		const char *class_name;
-#endif
-		zend_uint class_name_len;
+		uint32_t class_name_len;
 
 		zend_get_object_classname(object, &class_name, &class_name_len TSRMLS_CC);
 		zend_error(E_CORE_ERROR, "Property %s of class %s cannot be read", property_name, class_name);
@@ -784,7 +780,7 @@ int phalcon_read_property(zval **result, zval *object, const char *property_name
 	return SUCCESS;
 }
 
-zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name, zend_uint property_length, ulong key, int silent TSRMLS_DC) {
+zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name, uint32_t property_length, ulong key, int silent TSRMLS_DC) {
 
 	zval **zv = NULL;
 	zend_object *zobj;
@@ -863,7 +859,7 @@ zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name,
 /**
  * Returns an object's member
  */
-int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, zval *object, const char *property_name, zend_uint property_length, ulong key TSRMLS_DC) {
+int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, zval *object, const char *property_name, uint32_t property_length, ulong key TSRMLS_DC) {
 
 	zval **zv;
 	zend_object *zobj;
@@ -980,7 +976,7 @@ int phalcon_read_property_zval(zval **result, zval *object, const zval *property
 /**
  * Checks whether obj is an object and updates property with long value
  */
-int phalcon_update_property_long(zval *object, const char *property_name, zend_uint property_length, long value TSRMLS_DC) {
+int phalcon_update_property_long(zval *object, const char *property_name, uint32_t property_length, long value TSRMLS_DC) {
 
 	zval *v;
 
@@ -993,7 +989,7 @@ int phalcon_update_property_long(zval *object, const char *property_name, zend_u
 /**
  * Checks whether obj is an object and updates property with string value
  */
-int phalcon_update_property_string(zval *object, const char *property_name, zend_uint property_length, const char *str, zend_uint str_length TSRMLS_DC)
+int phalcon_update_property_string(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length TSRMLS_DC)
 {
 	zval *value;
 
@@ -1006,7 +1002,7 @@ int phalcon_update_property_string(zval *object, const char *property_name, zend
 /**
  * Checks whether obj is an object and updates property with bool value
  */
-int phalcon_update_property_bool(zval *object, const char *property_name, zend_uint property_length, int value TSRMLS_DC) {
+int phalcon_update_property_bool(zval *object, const char *property_name, uint32_t property_length, int value TSRMLS_DC) {
 
 	zval *v = value ? PHALCON_GLOBAL(z_true) : PHALCON_GLOBAL(z_false);
 	return phalcon_update_property_zval(object, property_name, property_length, v TSRMLS_CC);
@@ -1015,7 +1011,7 @@ int phalcon_update_property_bool(zval *object, const char *property_name, zend_u
 /**
  * Checks whether obj is an object and updates property with null value
  */
-int phalcon_update_property_null(zval *object, const char *property_name, zend_uint property_length TSRMLS_DC) {
+int phalcon_update_property_null(zval *object, const char *property_name, uint32_t property_length TSRMLS_DC) {
 
 	zval *v = PHALCON_GLOBAL(z_null);
 	return phalcon_update_property_zval(object, property_name, property_length, v TSRMLS_CC);
@@ -1024,7 +1020,7 @@ int phalcon_update_property_null(zval *object, const char *property_name, zend_u
 /**
  * Checks whether obj is an object and updates property with another zval
  */
-int phalcon_update_property_zval(zval *object, const char *property_name, zend_uint property_length, zval *value TSRMLS_DC){
+int phalcon_update_property_zval(zval *object, const char *property_name, uint32_t property_length, zval *value TSRMLS_DC){
 
 	zend_class_entry *ce, *old_scope;
 	zval *property;
@@ -1048,7 +1044,7 @@ int phalcon_update_property_zval(zval *object, const char *property_name, zend_u
 #else
 		const char *class_name;
 #endif
-		zend_uint class_name_len;
+		uint32_t class_name_len;
 
 		zend_get_object_classname(object, &class_name, &class_name_len TSRMLS_CC);
 		zend_error(E_CORE_ERROR, "Property %s of class %s cannot be updated", property_name, class_name);
@@ -1079,7 +1075,7 @@ int phalcon_update_property_zval(zval *object, const char *property_name, zend_u
  * Updates properties on this_ptr (quick)
  * Variables must be defined in the class definition. This function ignores magic methods or dynamic properties
  */
-int phalcon_update_property_this_quick(zval *object, const char *property_name, zend_uint property_length, zval *value, ulong key TSRMLS_DC){
+int phalcon_update_property_this_quick(zval *object, const char *property_name, uint32_t property_length, zval *value, ulong key TSRMLS_DC){
 
 	zend_class_entry *ce, *old_scope;
 
@@ -1206,7 +1202,7 @@ int phalcon_update_property_zval_zval(zval *object, const zval *property, zval *
 /**
  * Updates an array property
  */
-int phalcon_update_property_array(zval *object, const char *property, zend_uint property_length, const zval *index, zval *value TSRMLS_DC) {
+int phalcon_update_property_array(zval *object, const char *property, uint32_t property_length, const zval *index, zval *value TSRMLS_DC) {
 
 	zval *tmp;
 	int separated = 0;
@@ -1269,7 +1265,7 @@ int phalcon_update_property_array(zval *object, const char *property, zend_uint 
 /**
  * Multiple array-offset update
  */
-int phalcon_update_property_array_multi(zval *object, const char *property, zend_uint property_length, zval *value TSRMLS_DC, const char *types, int types_length, int types_count, ...) {
+int phalcon_update_property_array_multi(zval *object, const char *property, uint32_t property_length, zval *value TSRMLS_DC, const char *types, int types_length, int types_count, ...) {
 	va_list ap;
 	zval *tmp_arr;
 	int separated = 0;
@@ -1326,7 +1322,7 @@ int phalcon_update_property_array_multi(zval *object, const char *property, zend
 /**
  * Updates an array property using a string index
  */
-int phalcon_update_property_array_string(zval *object, const char *property, zend_uint property_length, const char *index, zend_uint index_length, zval *value TSRMLS_DC) {
+int phalcon_update_property_array_string(zval *object, const char *property, uint32_t property_length, const char *index, uint32_t index_length, zval *value TSRMLS_DC) {
 
 	zval *tmp;
 	int separated = 0;
@@ -1384,7 +1380,7 @@ int phalcon_update_property_array_string(zval *object, const char *property, zen
 /**
  * Appends a zval value to an array property
  */
-int phalcon_update_property_array_append(zval *object, const char *property, zend_uint property_length, zval *value TSRMLS_DC) {
+int phalcon_update_property_array_append(zval *object, const char *property, uint32_t property_length, zval *value TSRMLS_DC) {
 
 	zval *tmp;
 	int separated = 0;
@@ -1438,7 +1434,7 @@ int phalcon_update_property_array_append(zval *object, const char *property, zen
 	return SUCCESS;
 }
 
-int phalcon_update_property_array_merge(zval *object, const char *property, zend_uint property_length, zval *values TSRMLS_DC) {
+int phalcon_update_property_array_merge(zval *object, const char *property, uint32_t property_length, zval *values TSRMLS_DC) {
 
 	zval *tmp;
 	int separated = 0;
@@ -1490,7 +1486,7 @@ int phalcon_update_property_array_merge(zval *object, const char *property, zend
 /**
  * Appends every element of an array at the end of the array property
  */
-int phalcon_update_property_array_merge_append(zval *object, const char *property, zend_uint property_length, zval *values TSRMLS_DC) {
+int phalcon_update_property_array_merge_append(zval *object, const char *property, uint32_t property_length, zval *values TSRMLS_DC) {
 
 	zval *tmp;
 	int separated = 0;
@@ -1542,7 +1538,7 @@ int phalcon_update_property_array_merge_append(zval *object, const char *propert
 /**
  * Intializes an object property with an empty array
  */
-int phalcon_update_property_empty_array(zval *object, const char *property_name, zend_uint property_length TSRMLS_DC) {
+int phalcon_update_property_empty_array(zval *object, const char *property_name, uint32_t property_length TSRMLS_DC) {
 
 	zval *empty_array;
 
@@ -1555,7 +1551,7 @@ int phalcon_update_property_empty_array(zval *object, const char *property_name,
 /**
  * Unsets an index in an array property
  */
-int phalcon_unset_property_array(zval *object, const char *property, zend_uint property_length, const zval *index TSRMLS_DC) {
+int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index TSRMLS_DC) {
 
 	zval *tmp;
 	int separated = 0;
@@ -1607,7 +1603,7 @@ int phalcon_method_exists(const zval *object, const zval *method_name TSRMLS_DC)
  * @param method_name
  * @param method_length strlen(method_name)+1
  */
-int phalcon_method_exists_ex(const zval *object, const char *method_name, zend_uint method_len TSRMLS_DC)
+int phalcon_method_exists_ex(const zval *object, const char *method_name, uint32_t method_len TSRMLS_DC)
 {
 #ifdef __GNUC__
 	if (__builtin_constant_p(method_name) && __builtin_constant_p(method_len)) {
@@ -1621,7 +1617,7 @@ int phalcon_method_exists_ex(const zval *object, const char *method_name, zend_u
 /**
  * Check if method exists on certain object using explicit char param
  */
-int phalcon_method_quick_exists_ex(const zval *object, const char *method_name, zend_uint method_len, ulong hash TSRMLS_DC){
+int phalcon_method_quick_exists_ex(const zval *object, const char *method_name, uint32_t method_len, ulong hash TSRMLS_DC){
 
 	zend_class_entry *ce;
 
@@ -1661,7 +1657,7 @@ int phalcon_method_exists_ce(const zend_class_entry *ce, const zval *method_name
  * @param method_name
  * @param method_length strlen(method_name)+1
  */
-int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_name, zend_uint method_len TSRMLS_DC)
+int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_name, uint32_t method_len TSRMLS_DC)
 {
 #ifdef __GNUC__
 	if (__builtin_constant_p(method_name) && __builtin_constant_p(method_len)) {
@@ -1675,7 +1671,7 @@ int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_n
 /**
  * Check if method exists on certain object using explicit char param
  */
-int phalcon_method_quick_exists_ce_ex(const zend_class_entry *ce, const char *method_name, zend_uint method_len, ulong hash TSRMLS_DC){
+int phalcon_method_quick_exists_ce_ex(const zend_class_entry *ce, const char *method_name, uint32_t method_len, ulong hash TSRMLS_DC){
 
 	return (ce && phalcon_hash_quick_exists(&ce->function_table, method_name, method_len, hash)) ? SUCCESS : FAILURE;
 }
@@ -1683,7 +1679,7 @@ int phalcon_method_quick_exists_ce_ex(const zend_class_entry *ce, const char *me
 /**
  * Query a static property value from a zend_class_entry
  */
-int phalcon_read_static_property(zval **result, const char *class_name, zend_uint class_length, const char *property_name, zend_uint property_length TSRMLS_DC){
+int phalcon_read_static_property(zval **result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length TSRMLS_DC){
 	zend_class_entry **ce;
 	if (zend_lookup_class(class_name, class_length, &ce TSRMLS_CC) == SUCCESS) {
 		return phalcon_read_static_property_ce(result, *ce, property_name, property_length TSRMLS_CC);
@@ -1692,7 +1688,7 @@ int phalcon_read_static_property(zval **result, const char *class_name, zend_uin
 	return FAILURE;
 }
 
-int phalcon_read_class_property(zval **result, int type, const char *property, zend_uint len TSRMLS_DC) {
+int phalcon_read_class_property(zval **result, int type, const char *property, uint32_t len TSRMLS_DC) {
 	zend_class_entry *ce;
 
 	type |= (ZEND_FETCH_CLASS_SILENT | ZEND_FETCH_CLASS_NO_AUTOLOAD);
@@ -1795,7 +1791,7 @@ int phalcon_create_instance_params(zval *return_value, const zval *class_name, z
 /**
  * Creates a closure
  */
-int phalcon_create_closure_ex(zval *return_value, zval *this_ptr, zend_class_entry *ce, const char *method_name, zend_uint method_length TSRMLS_DC) {
+int phalcon_create_closure_ex(zval *return_value, zval *this_ptr, zend_class_entry *ce, const char *method_name, uint32_t method_length TSRMLS_DC) {
 
 	zend_function *function_ptr;
 
@@ -1815,7 +1811,7 @@ int phalcon_create_closure_ex(zval *return_value, zval *this_ptr, zend_class_ent
 /**
  * Increments an object property
  */
-int phalcon_property_incr(zval *object, const char *property_name, zend_uint property_length TSRMLS_DC){
+int phalcon_property_incr(zval *object, const char *property_name, uint32_t property_length TSRMLS_DC){
 
 	zval *tmp = NULL;
 	zend_class_entry *ce;
@@ -1863,7 +1859,7 @@ int phalcon_property_incr(zval *object, const char *property_name, zend_uint pro
 /**
  * Decrements an object property
  */
-int phalcon_property_decr(zval *object, const char *property_name, zend_uint property_length TSRMLS_DC){
+int phalcon_property_decr(zval *object, const char *property_name, uint32_t property_length TSRMLS_DC){
 
 	zval *tmp = NULL;
 	zend_class_entry *ce;
@@ -1931,7 +1927,7 @@ void object_properties_init(zend_object *object, zend_class_entry *class_type)
 /**
  * Checks if property access on object
  */
-int phalcon_check_property_access_quick(zval *object, const char *property_name, zend_uint property_length, ulong hash, int access TSRMLS_DC)
+int phalcon_check_property_access_quick(zval *object, const char *property_name, uint32_t property_length, ulong hash, int access TSRMLS_DC)
 {
 	zend_class_entry *ce;
 	zend_property_info *property_info;

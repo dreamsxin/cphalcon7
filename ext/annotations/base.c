@@ -98,7 +98,7 @@ static void phannot_scanner_error_msg(phannot_parser_status *parser_status, char
 /**
  * Receives the comment tokenizes and parses it
  */
-int phannot_parse_annotations(zval *result, const char *comment, zend_uint comment_len, const char *file_path, zend_uint line TSRMLS_DC){
+int phannot_parse_annotations(zval *result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line TSRMLS_DC){
 
 	char *error_msg = NULL;
 
@@ -122,7 +122,7 @@ int phannot_parse_annotations(zval *result, const char *comment, zend_uint comme
 /**
  * Remove comment separators from a docblock
  */
-static void phannot_remove_comment_separators(char **ret, zend_uint *ret_len, const char *comment, zend_uint length, zend_uint *start_lines)
+static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, const char *comment, uint32_t length, uint32_t *start_lines)
 {
 	int start_mode = 1, j, i, open_parentheses;
 	smart_str processed_str = {0};
@@ -215,16 +215,16 @@ static void phannot_remove_comment_separators(char **ret, zend_uint *ret_len, co
 /**
  * Parses a comment returning an intermediate array representation
  */
-int phannot_internal_parse_annotations(zval **result, const char *comment, zend_uint comment_len, const char *file_path, zend_uint line, char **error_msg TSRMLS_DC)
+int phannot_internal_parse_annotations(zval **result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line, char **error_msg TSRMLS_DC)
 {
 	phannot_scanner_state *state;
 	phannot_scanner_token token;
-	zend_uint start_lines;
+	uint32_t start_lines;
 	int scanner_status, status = SUCCESS;
 	phannot_parser_status *parser_status = NULL;
 	void* phannot_parser;
 	char *processed_comment;
-	zend_uint processed_comment_len;
+	uint32_t processed_comment_len;
 
 	*error_msg = NULL;
 

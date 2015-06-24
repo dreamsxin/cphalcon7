@@ -213,7 +213,7 @@ void phalcon_convert_to_object(zval *op) {
 /**
  * Cast variables converting they to other types
  */
-void phalcon_cast(zval *result, zval *var, zend_uint type){
+void phalcon_cast(zval *result, zval *var, uint32_t type){
 
 	ZVAL_ZVAL(result, var, 1, 0);
 

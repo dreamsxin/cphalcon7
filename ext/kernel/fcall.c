@@ -341,7 +341,7 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 /**
  * Calls a function/method in the PHP userland
  */
-int phalcon_call_user_function(zval **object_pp, zend_class_entry *obj_ce, phalcon_call_type type, zval *function_name, zval **retval_ptr_ptr, zend_uint param_count, zval *params[] TSRMLS_DC)
+int phalcon_call_user_function(zval **object_pp, zend_class_entry *obj_ce, phalcon_call_type type, zval *function_name, zval **retval_ptr_ptr, uint32_t param_count, zval *params[] TSRMLS_DC)
 {
 	zval ***params_ptr, ***params_array = NULL;
 	zval **static_params_array[10];
@@ -371,7 +371,7 @@ int phalcon_call_user_function(zval **object_pp, zend_class_entry *obj_ce, phalc
 	}
 
 	if (param_count) {
-		zend_uint i;
+		uint32_t i;
 
 		if (UNEXPECTED(param_count > 10)) {
 			params_array = (zval***)emalloc(param_count * sizeof(zval**));
@@ -724,7 +724,7 @@ void phalcon_throw_exception_internal(zval *exception TSRMLS_DC)
 
 int phalcon_call_function(zend_fcall_info *fci, zend_fcall_info_cache *fci_cache TSRMLS_DC) {
 
-	zend_uint i;
+	uint32_t i;
 	zval **original_return_value;
 	HashTable *calling_symbol_table;
 	zend_op_array *original_op_array;
@@ -1536,7 +1536,7 @@ static zend_bool phalcon_is_callable_ex(zval *callable, zval *object_ptr, uint c
 
 int phalcon_call_function(zend_fcall_info *fci, zend_fcall_info_cache *fci_cache TSRMLS_DC)
 {
-	zend_uint i;
+	uint32_t i;
 	zval **original_return_value;
 	HashTable *calling_symbol_table;
 	zend_op_array *original_op_array;
@@ -1548,7 +1548,7 @@ int phalcon_call_function(zend_fcall_info *fci, zend_fcall_info_cache *fci_cache
 	zval *current_this;
 	zend_execute_data execute_data;
 	zend_fcall_info_cache fci_cache_local;
-	zend_uint fn_flags;
+	uint32_t fn_flags;
 
 	*fci->retval_ptr_ptr = NULL;
 

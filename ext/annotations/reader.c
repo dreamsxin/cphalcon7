@@ -72,7 +72,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	zval *class_annotations, *annotations_properties, *annotations_methods;
 	zend_class_entry *class_ce;
 	const char *file;
-	zend_uint line;
+	uint32_t line;
 
 	phalcon_fetch_params(0, 1, 0, &class_name);
 
@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	/* Class info */
 	{
 		const char *cmt;
-		zend_uint cmt_len;
+		uint32_t cmt_len;
 
 		if (phalcon_get_class_doc_comment(class_ce, &cmt, &cmt_len)) {
 			line = phalcon_get_class_startline(class_ce);
@@ -134,7 +134,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 				zend_hash_move_forward_ex(props, &hp)
 			) {
 				const char *cmt;
-				zend_uint cmt_len;
+				uint32_t cmt_len;
 
 				if (phalcon_get_property_doc_comment(property, &cmt, &cmt_len)) {
 					zval *property_annotations;
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 				zend_hash_move_forward_ex(methods, &hp)
 			) {
 				const char *cmt;
-				zend_uint cmt_len;
+				uint32_t cmt_len;
 
 				if (phalcon_get_function_doc_comment(method, &cmt, &cmt_len)) {
 					zval *method_annotations;

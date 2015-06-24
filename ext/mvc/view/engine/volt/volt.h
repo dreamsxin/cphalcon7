@@ -34,7 +34,7 @@ typedef struct _phvolt_parser_status {
 	zval *ret;
 	phvolt_scanner_state *scanner_state;
 	int status;
-	zend_uint syntax_error_len;
+	uint32_t syntax_error_len;
 	char *syntax_error;
 	phvolt_scanner_token *token;
 } phvolt_parser_status;

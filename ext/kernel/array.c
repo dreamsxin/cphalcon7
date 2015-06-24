@@ -39,7 +39,7 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 	h = Z_ARRVAL_P(arr);
 	switch (Z_TYPE_P(index)) {
 		case IS_NULL:
-			result = phalcon_hash_find(h, SS(""), (void**)&val);
+			result = (val = zend_hash_str_find(h, SS(""))) != NULL;
 			break;
 
 		case IS_DOUBLE:
@@ -69,13 +69,13 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 	return 0;
 }
 
-int phalcon_array_isset_quick_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length, ulong key) {
+int phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index) {
 
-	zval **zv;
+	zval *zv;
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-		if (phalcon_hash_quick_find(Z_ARRVAL_P(arr), index, index_length, key, (void**) &zv) == SUCCESS) {
-			*fetched = *zv;
+		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
+			*fetched = zv;
 			return 1;
 		}
 	}
@@ -108,7 +108,7 @@ int ZEND_FASTCALL phalcon_array_isset(const zval *arr, const zval *index) {
 	h = Z_ARRVAL_P(arr);
 	switch (Z_TYPE_P(index)) {
 		case IS_NULL:
-			return phalcon_hash_exists(h, SS(""));
+			return zend_hash_str_exists(h, SS(""));
 
 		case IS_DOUBLE:
 			return zend_hash_index_exists(h, (ulong)Z_DVAL_P(index));
@@ -358,7 +358,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		ht = Z_ARRVAL_P(arr);
 		switch (Z_TYPE_P(index)) {
 			case IS_NULL:
-				result = phalcon_hash_find(ht, SS(""), (void**) &zv);
+				result = (zv = zend_hash_str_find(ht, SS(""))) != NULL;
 				sidx   = "";
 				break;
 
@@ -400,30 +400,6 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 			} else {
 				zend_error(E_NOTICE, "Undefined index: %s", sidx);
 			}
-		}
-	}
-
-	ALLOC_INIT_ZVAL(*return_value);
-	return FAILURE;
-}
-
-int phalcon_array_fetch_quick_string(zval **return_value, const zval *arr, const char *index, uint index_length, ulong key, int flags){
-
-	zval **zv;
-
-	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-		if (phalcon_hash_quick_find(Z_ARRVAL_P(arr), index, index_length, key, (void**) &zv) == SUCCESS) {
-			*return_value = *zv;
-			Z_ADDREF_PP(return_value);
-			return SUCCESS;
-		}
-
-		if ((flags & PH_NOISY) == PH_NOISY) {
-			zend_error(E_NOTICE, "Undefined index: %s", index);
-		}
-	} else {
-		if ((flags & PH_NOISY) == PH_NOISY) {
-			zend_error(E_NOTICE, "Cannot use a scalar value as an array");
 		}
 	}
 

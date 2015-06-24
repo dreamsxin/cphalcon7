@@ -42,20 +42,6 @@
 int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index) PHALCON_ATTR_NONNULL;
 
 /**
- * @brief Fetches @a index if it exists from the array @a arr using the precomputed key @a key
- * @param[out] fetched <code>&$arr[$index]</code>; @a fetched is modified only when the function returns 1
- * @param arr Array
- * @param index Index
- * @param index_length <code>strlen(index)+1</code>
- * @param key Precomputed hash of @a index
- * @return isset($arr[$index])
- * @retval 0 Not exists, @a arr is not an array or @a index is of not supported type
- * @retval 1 Exists
- * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
- */
-int phalcon_array_isset_quick_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length, ulong key) PHALCON_ATTR_NONNULL;
-
-/**
  * @brief Fetches @a index if it exists from the array @a arr
  * @param[out] fetched <code>&$arr[$index]</code>; @a fetched is modified only when the function returns 1
  * @param arr Array
@@ -77,18 +63,8 @@ int phalcon_array_isset_long_fetch(zval **fetched, const zval *arr, ulong index)
  * @retval 0 Not exists, @a arr is not an array or @a index is of not supported type
  * @retval 1 Exists
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
- * @see phalcon_array_isset_quick_string_fetch
  */
-PHALCON_ATTR_NONNULL static inline int phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length)
-{
-#ifdef __GNUC__
-	if (__builtin_constant_p(index) && __builtin_constant_p(index_length)) {
-		return phalcon_array_isset_quick_string_fetch(fetched, arr, index, index_length, zend_inline_hash_func(index, index_length));
-	}
-#endif
-
-	return phalcon_array_isset_quick_string_fetch(fetched, arr, index, index_length, zend_hash_func(index, index_length));
-}
+PHALCON_ATTR_NONNULL static inline int phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length);
 
 
 /**

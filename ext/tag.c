@@ -357,7 +357,7 @@ static zend_bool phalcon_tag_attribute_filter(HashTable *ht, void *pData, zend_h
 PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes TSRMLS_DC)
 {
 	zval *escaper, *escaped = NULL, *attrs;
-	zval **value;
+	zval *value;
 	HashPosition hp;
 	uint i;
 
@@ -394,8 +394,8 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes T
 	array_init_size(attrs, zend_hash_num_elements(Z_ARRVAL_P(attributes)));
 
 	for (i=0; i<sizeof(order)/sizeof(order[0]); ++i) {
-		if (phalcon_hash_find(Z_ARRVAL_P(attributes), order[i].str, order[i].size, (void**)&value) == SUCCESS) {
-			Z_ADDREF_PP(value);
+		if ((value = zend_hash_str_find(Z_ARRVAL_P(attributes), order[i].str, order[i].size)) != NULL) {
+			Z_ADDREF_P(value);
 			add_assoc_zval_ex(attrs, order[i].str, order[i].size, *value);
 		}
 	}

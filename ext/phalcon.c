@@ -642,7 +642,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 #if 0
 	{
 		zend_module_entry *entry;
-		if (zend_hash_find(&module_registry, ZEND_STRS("mbstring"), (void**)&entry) == SUCCESS) {
+		if ((entry = zend_hash_str_find_ptr(&module_registry, ZEND_STRS("mbstring"))) == SUCCESS) {
 #ifdef ZTS
 			mbstring_globals_id = *(entry->globals_id_ptr);
 #else

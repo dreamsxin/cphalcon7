@@ -95,14 +95,14 @@ static PHP_FUNCTION(phalcon_di_method_handler)
 
 static union _zend_function* phalcon_di_get_method(zval **object_ptr, char *method, int method_len ZLK_DC TSRMLS_DC)
 {
+	zend_function *fbc;
 	char *lc_method_name   = emalloc(method_len + 1);
 	phalcon_di_object *obj = phalcon_di_get_object(*object_ptr TSRMLS_CC);
-	zend_function fbc;
 
 	zend_str_tolower_copy(lc_method_name, method, method_len);
 
 	if (
-		   zend_hash_find(&obj->obj.ce->function_table, lc_method_name, method_len+1, (void **)&fbc) == FAILURE
+		(fbc = zend_hash_str_find_ptr(&obj->obj.ce->function_table, lc_method_name, method_len+1)) == NULL
 		&& method_len > 3
 		&& (!memcmp(lc_method_name, "get", 3) || !memcmp(lc_method_name, "set", 3))
 	) {
@@ -115,20 +115,14 @@ static union _zend_function* phalcon_di_get_method(zval **object_ptr, char *meth
 		f->scope         = obj->obj.ce;
 		f->fn_flags      = ZEND_ACC_CALL_VIA_HANDLER;
 		f->function_name = method;
-#if PHP_VERSION_ID < 50400
-		f->module        = obj->obj.ce->module;
-		f->pass_rest_by_reference = 0;
-		f->return_reference = ZEND_RETURN_VALUE;
-#else
 		f->module        = (ZEND_INTERNAL_CLASS == obj->obj.ce->type) ? obj->obj.ce->info.internal.module : 0;
-#endif
 
 		efree(lc_method_name);
 		return (union _zend_function*)f;
 	}
 
 	efree(lc_method_name);
-	return std_object_handlers.get_method(object_ptr, method, method_len ZLK_CC TSRMLS_CC);
+	return fbc;
 }
 
 static int phalcon_di_call_method_internal(zval *return_value, zval **return_value_ptr, zval *this_ptr, const char *method, zval *param TSRMLS_DC)

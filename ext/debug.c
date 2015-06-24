@@ -825,7 +825,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		/** 
 		 * Check if the function exists
 		 */
-		if (phalcon_fetch_function(&func, Z_STRVAL_P(function_name), Z_STRLEN_P(function_name) TSRMLS_CC) == SUCCESS) {
+		if ((func = phalcon_fetch_function(Z_STR_P(function_name) TSRMLS_CC)) != NULL) {
 
 			/** 
 			 * Internal functions links to the PHP documentation

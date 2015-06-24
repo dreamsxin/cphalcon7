@@ -89,7 +89,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Apc){
 		phalcon_cache_backend_is_old_apcu = zend_hash_exists(&module_registry, SS("apcu"));
 		if (phalcon_cache_backend_is_old_apcu) {
 			zend_constant *c;
-			if (zend_hash_find(EG(zend_constants), SS("APCU_APC_FULL_BC"), (void**)&c) == SUCCESS) {
+			if ((c = zend_hash_str_find_ptr(EG(zend_constants), SS("APCU_APC_FULL_BC"))) != NULL) {
 				phalcon_cache_backend_is_old_apcu = !zend_is_true(&c->value);
 			}
 		}

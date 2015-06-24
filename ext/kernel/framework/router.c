@@ -25,7 +25,7 @@
 
 zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigned long *position, char *cursor, char *marker){
 
-	zval **zv, **tmp;
+	zval *zv, *tmp;
 	int result = FAILURE;
 	unsigned int length = 0, variable_length, ch, j;
 	char *item = NULL, *cursor_var, *variable = NULL;
@@ -70,19 +70,19 @@ zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigne
 					length = variable_length;
 				}
 				if (zend_hash_exists(Z_ARRVAL_P(replacements), item, length + 1)) {
-					if ((result = zend_hash_find(Z_ARRVAL_P(replacements), item, length + 1, (void**) &zv)) == SUCCESS) {
+					if ((zv = zend_hash_str_find(Z_ARRVAL_P(replacements), item, length + 1)) != NULL) {
 						efree(item);
 						(*position)++;
-						return *zv;
+						return zv;
 					}
 				}
 			} else {
-				if ((result = zend_hash_index_find(Z_ARRVAL_P(paths), *position, (void**) &zv)) == SUCCESS) {
-					if (Z_TYPE_PP(zv) == IS_STRING) {
-						if (zend_hash_exists(Z_ARRVAL_P(replacements), Z_STRVAL_PP(zv), Z_STRLEN_PP(zv) + 1)) {
-							if ((result = zend_hash_find(Z_ARRVAL_P(replacements), Z_STRVAL_PP(zv), Z_STRLEN_PP(zv) + 1, (void**) &tmp)) == SUCCESS) {
+				if ((zv = zend_hash_index_find(Z_ARRVAL_P(paths), *position)) != NULL) {
+					if (Z_TYPE_P(zv) == IS_STRING) {
+						if (zend_hash_exists(Z_ARRVAL_P(replacements), Z_STR_P(zv))) {
+							if ((tmp = zend_hash_find(Z_ARRVAL_P(replacements), Z_STR_P(zv)) == SUCCESS) {
 								(*position)++;
-								return *tmp;
+								return tmp;
 							}
 						}
 					}

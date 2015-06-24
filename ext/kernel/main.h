@@ -82,9 +82,14 @@ PHALCON_ATTR_NONNULL static inline int phalcon_function_exists_ex(const char *fu
 	return phalcon_function_quick_exists_ex(function_name, function_len, zend_hash_func(function_name, function_len) TSRMLS_CC);
 }
 
-PHALCON_ATTR_NONNULL static inline int phalcon_fetch_function(zend_function **function, const char *function_name, unsigned int function_len TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function_str(const char *function_name, unsigned int function_len TSRMLS_DC)
 {
-	return zend_hash_find(EG(function_table), function_name, function_len+1, (void**)function);
+	return zend_hash_str_find_ptr(EG(function_table), function_name, function_len+1);
+}
+
+PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function(zend_string *function_name TSRMLS_DC)
+{
+	return zend_hash_find_ptr(EG(function_table), function_name);
 }
 
 /* Count */

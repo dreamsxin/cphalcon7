@@ -201,16 +201,6 @@
 #include "image/adapter/imagick.h"
 #include "image/exception.h"
 
-#include "amf.h"
-#include "amf/header.h"
-#include "amf/message.h"
-#include "amf/packet.h"
-#include "amf/deserializer.h"
-#include "amf/serializer.h"
-#include "amf/exception.h"
-#include "mvc/amf.h"
-#include "mvc/amf/exception.h"
-
 #include "kernel.h"
 
 #include "loader.h"
@@ -421,7 +411,6 @@
 #include "chart/captcha.h"
 #include "chart/exception.h"
 
-#include "scws.h"
 #include "async.h"
 
 #include "version.h"

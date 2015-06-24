@@ -1799,7 +1799,7 @@ int phalcon_create_closure_ex(zval *return_value, zval *this_ptr, zend_class_ent
 
 	zend_function *function_ptr;
 
-	if (zend_hash_find(&ce->function_table, method_name, method_length, (void**) &function_ptr) == FAILURE) {
+	if ((function_ptr = zend_hash_str_find_ptr(&ce->function_table, method_name, method_length)) == NULL) {
 		ZVAL_NULL(return_value);
 		return FAILURE;
 	}
@@ -1938,7 +1938,7 @@ int phalcon_check_property_access_quick(zval *object, const char *property_name,
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		ce = Z_OBJCE_P(object);
-		if (zend_hash_find(&ce->properties_info, property_name, property_length, (void**) &property_info) == SUCCESS) {
+		if ((property_info = zend_hash_str_find_ptr(&ce->properties_info, property_name, property_length)) == NULL) {
 			return (property_info->flags & access) == access;
 		}
 	}

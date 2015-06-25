@@ -419,7 +419,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			 */
 			PHALCON_CALL_METHOD(NULL, module_object, "registerautoloaders", dependency_injector);
 			PHALCON_CALL_METHOD(NULL, module_object, "registerservices", dependency_injector);
-		} else if (Z_TYPE_P(module) == IS_OBJECT && instanceof_function(Z_OBJCE_P(module), zend_ce_closure TSRMLS_CC)) {
+		} else if (Z_TYPE_P(module) == IS_OBJECT && instanceof_function(Z_OBJCE_P(module), zend_ce_closure)) {
 			/* A module definition object, can be a Closure instance */
 			PHALCON_INIT_VAR(module_params);
 			array_init_size(module_params, 1);
@@ -511,7 +511,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		PHALCON_INIT_VAR(returned_response);
 
 		/* Check if the returned object is already a response */
-		if (Z_TYPE_P(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(possible_response), phalcon_http_responseinterface_ce, 1 TSRMLS_CC)) {
+		if (Z_TYPE_P(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(possible_response), phalcon_http_responseinterface_ce, 1)) {
 			PHALCON_CPY_WRT(response, possible_response);
 			ZVAL_TRUE(returned_response);
 		} else {
@@ -561,7 +561,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 					PHALCON_CALL_METHOD(&params, dispatcher, "getparams");
 
 					/* Automatic render based on the latest controller executed */
-					if (Z_TYPE_P(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(possible_response), phalcon_mvc_view_modelinterface_ce, 1 TSRMLS_CC)) {
+					if (Z_TYPE_P(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(possible_response), phalcon_mvc_view_modelinterface_ce, 1)) {
 						PHALCON_CALL_METHOD(NULL, view, "render", controller_name, action_name, params, namespace_name, possible_response);
 					} else {
 						if (Z_TYPE_P(possible_response) == IS_ARRAY) {

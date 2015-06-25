@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 			PHALCON_OBS_VAR(generator);
 			phalcon_array_fetch_string(&generator, options, SL("generator"), PH_NOISY);
 			if (Z_TYPE_P(generator) == IS_OBJECT) {
-				if (instanceof_function(Z_OBJCE_P(generator), zend_ce_closure TSRMLS_CC)) {
+				if (instanceof_function(Z_OBJCE_P(generator), zend_ce_closure)) {
 					PHALCON_INIT_NVAR(timestamp);/**/
 					PHALCON_CALL_USER_FUNC(timestamp, generator);
 				}

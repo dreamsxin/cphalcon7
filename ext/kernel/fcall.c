@@ -65,12 +65,11 @@ int phalcon_cleanup_fcache(void *pDest TSRMLS_DC, int num_args, va_list args, ze
 {
 	phalcon_fcall_cache_entry **entry = (phalcon_fcall_cache_entry**)pDest;
 	zend_class_entry *scope;
-	uint len = hash_key->nKeyLength;
 
 	assert(hash_key->key != NULL);
 	assert(hash_key->key->len > 2 * sizeof(zend_class_entry**));
 
-	memcpy(&scope, &hash_key->key->val[len - 2 * sizeof(zend_class_entry**)], sizeof(zend_class_entry*));
+	memcpy(&scope, &hash_key->key->val[hash_key->key->len - 2 * sizeof(zend_class_entry**)], sizeof(zend_class_entry*));
 
 #ifndef PHALCON_RELEASE
 	if ((*entry)->f->type != ZEND_INTERNAL_FUNCTION || (scope && scope->type != ZEND_INTERNAL_CLASS)) {
@@ -166,8 +165,8 @@ static ulong phalcon_make_fcall_key(char **result, size_t *length, const zend_cl
 		    calling_scope
 		 && obj_ce
 		 && calling_scope != obj_ce
-		 && !instanceof_function(obj_ce, calling_scope TSRMLS_CC)
-		 && !instanceof_function(calling_scope, obj_ce TSRMLS_CC)
+		 && !instanceof_function(obj_ce, calling_scope)
+		 && !instanceof_function(calling_scope, obj_ce)
 	) {
 		calling_scope = NULL;
 	}
@@ -283,7 +282,7 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 			fcic->calling_scope    = EG(scope);
 			fcic->object_ptr       = NULL;
 
-			if (scope && EG(This) && instanceof_function(Z_OBJCE_P(EG(This)), scope TSRMLS_CC) && instanceof_function(scope, fcic->calling_scope TSRMLS_CC)) {
+			if (scope && EG(This) && instanceof_function(Z_OBJCE_P(EG(This)), scope TSRMLS_CC) && instanceof_function(scope, fcic->calling_scope)) {
 				fcic->object_ptr   = EG(This);
 				fcic->called_scope = Z_OBJCE_P(fcic->object_ptr);
 			}
@@ -301,7 +300,7 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 			if (fci->object_ptr) {
 				fcic->called_scope = Z_OBJCE_P(fci->object_ptr);
 			}
-			else if (EG(scope) && !(EG(called_scope) && instanceof_function(EG(called_scope), EG(scope) TSRMLS_CC))) {
+			else if (EG(scope) && !(EG(called_scope) && instanceof_function(EG(called_scope), EG(scope)))) {
 				fcic->called_scope = EG(scope);
 			}
 			else {
@@ -1083,8 +1082,8 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 
 		fcc->calling_scope = *pce;
 		if (scope && !fcc->object_ptr && EG(This) &&
-			instanceof_function(Z_OBJCE_P(EG(This)), scope TSRMLS_CC) &&
-			instanceof_function(scope, fcc->calling_scope TSRMLS_CC)) {
+			instanceof_function(Z_OBJCE_P(EG(This)), scope) &&
+			instanceof_function(scope, fcc->calling_scope)) {
 			fcc->object_ptr = EG(This);
 			fcc->called_scope = Z_OBJCE_P(fcc->object_ptr);
 		} else {
@@ -1163,7 +1162,7 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 		EG(scope) = last_scope;
 
 		ftable = &fcc->calling_scope->function_table;
-		if (ce_org && !instanceof_function(ce_org, fcc->calling_scope TSRMLS_CC)) {
+		if (ce_org && !instanceof_function(ce_org, fcc->calling_scope)) {
 			if (error) phalcon_spprintf(error, 0, "class '%s' is not a subclass of '%s'", ce_org->name, fcc->calling_scope->name);
 			return 0;
 		}
@@ -1195,7 +1194,7 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 		retval = 1;
 		if ((fcc->function_handler->op_array.fn_flags & ZEND_ACC_CHANGED) &&
 			!strict_class && EG(scope) &&
-			instanceof_function(fcc->function_handler->common.scope, EG(scope) TSRMLS_CC)) {
+			instanceof_function(fcc->function_handler->common.scope, EG(scope))) {
 			zend_function *priv_fbc;
 
 			if ((priv_fbc = zend_hash_str_find(&EG(scope)->function_table, lmname, mlen+1)) != NULL
@@ -1223,7 +1222,7 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 				if (fcc->function_handler) {
 					if (strict_class &&
 						(!fcc->function_handler->common.scope ||
-						 !instanceof_function(ce_org, fcc->function_handler->common.scope TSRMLS_CC))) {
+						 !instanceof_function(ce_org, fcc->function_handler->common.scope))) {
 						if ((fcc->function_handler->common.fn_flags & ZEND_ACC_CALL_VIA_HANDLER) != 0) {
 							if (fcc->function_handler->type != ZEND_OVERLOADED_FUNCTION) {
 								efree((char*)fcc->function_handler->common.function_name);
@@ -1246,8 +1245,7 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 				retval = 1;
 				call_via_handler = (fcc->function_handler->common.fn_flags & ZEND_ACC_CALL_VIA_HANDLER) != 0;
 				if (call_via_handler && !fcc->object_ptr && EG(This) &&
-					Z_OBJ_HT_P(EG(This))->get_class_entry &&
-					instanceof_function(Z_OBJCE_P(EG(This)), fcc->calling_scope TSRMLS_CC)) {
+					instanceof_function(Z_OBJCE_P(EG(This)), fcc->calling_scope)) {
 					fcc->object_ptr = EG(This);
 				}
 			}
@@ -1277,7 +1275,7 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 				if ((check_flags & IS_CALLABLE_CHECK_IS_STATIC) != 0) {
 					retval = 0;
 				}
-				if (EG(This) && instanceof_function(Z_OBJCE_P(EG(This)), fcc->calling_scope TSRMLS_CC)) {
+				if (EG(This) && instanceof_function(Z_OBJCE_P(EG(This)), fcc->calling_scope)) {
 					fcc->object_ptr = EG(This);
 					if (error) {
 						phalcon_spprintf(error, 0, "non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb, Z_OBJCE_P(EG(This))->name);

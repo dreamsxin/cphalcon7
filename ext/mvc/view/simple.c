@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 					/** 
 					 * Engine can be a closure
 					 */
-					if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure TSRMLS_CC)) {
+					if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
 						PHALCON_INIT_NVAR(engine_object);/**/
 						PHALCON_CALL_USER_FUNC_ARRAY(engine_object, engine_service, arguments);
 					} else {

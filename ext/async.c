@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Async, call){
 
 	phalcon_fetch_params(1, 1, 1, &callable, &arguments);
 
-	if (Z_TYPE_P(callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(callable), zend_ce_closure TSRMLS_CC)) {
+	if (Z_TYPE_P(callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(callable), zend_ce_closure)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Callable must be an closure object");
 		RETURN_MM();
 	}

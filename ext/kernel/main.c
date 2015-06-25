@@ -99,7 +99,7 @@ zval* phalcon_get_global(const char *global, unsigned int global_length TSRMLS_D
 
 	zend_bool jit_initialization = PG(auto_globals_jit);
 	if (jit_initialization) {
-		zend_is_auto_global_str(global, global_length - 1 TSRMLS_CC);
+		zend_is_auto_global_str((char *)global, global_length - 1);
 	}
 
 	if (&EG(symbol_table)) {
@@ -131,7 +131,7 @@ long int phalcon_fast_count_int(zval *value TSRMLS_DC) {
 			}
 		}
 
-		if (Z_OBJ_HT_P(value)->get_class_entry && instanceof_function_ex(Z_OBJCE_P(value), spl_ce_Countable, 1 TSRMLS_CC)) {
+		if (instanceof_function_ex(Z_OBJCE_P(value), spl_ce_Countable, 1)) {
 			zval *retval    = NULL;
 			long int result = 0;
 
@@ -166,10 +166,7 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 	}
 
 	if (Z_TYPE_P(value) == IS_OBJECT) {
-
-		#ifdef HAVE_SPL
 		zval *retval = NULL;
-		#endif
 
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			ZVAL_LONG(result, 1);
@@ -178,8 +175,7 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 			}
 		}
 
-		#ifdef HAVE_SPL
-		if (Z_OBJ_HT_P(value)->get_class_entry && instanceof_function(Z_OBJCE_P(value), spl_ce_Countable TSRMLS_CC)) {
+		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
 			zend_call_method_with_0_params(&value, NULL, NULL, "count", &retval);
 			if (retval) {
 				convert_to_long_ex(&retval);
@@ -188,7 +184,6 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 			}
 			return;
 		}
-		#endif
 
 		ZVAL_LONG(result, 0);
 		return;
@@ -214,18 +209,14 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 	}
 
 	if (Z_TYPE_P(value) == IS_OBJECT) {
-
-		#ifdef HAVE_SPL
 		zval *retval = NULL;
-		#endif
 
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			Z_OBJ_HT(*value)->count_elements(value, &count TSRMLS_CC);
 			return (int) count > 0;
 		}
 
-		#ifdef HAVE_SPL
-		if (Z_OBJ_HT_P(value)->get_class_entry && instanceof_function(Z_OBJCE_P(value), spl_ce_Countable TSRMLS_CC)) {
+		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
 			zend_call_method_with_0_params(&value, NULL, NULL, "count", &retval);
 			if (retval) {
 				convert_to_long_ex(&retval);
@@ -235,7 +226,6 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 			}
 			return 0;
 		}
-		#endif
 
 		return 0;
 	}

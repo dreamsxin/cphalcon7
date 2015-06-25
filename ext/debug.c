@@ -1360,7 +1360,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 		if (
 			phalcon_array_isset_string_fetch(&e, context, SS("e")) && 
 			Z_TYPE_P(e) == IS_OBJECT && 
-			instanceof_function_ex(Z_OBJCE_P(e), zend_exception_get_default(TSRMLS_C), 1 TSRMLS_CC)
+			instanceof_function_ex(Z_OBJCE_P(e), zend_exception_get_default(TSRMLS_C), 1)
 		) {
 			PHALCON_CPY_WRT(previous, e);
 		} else {

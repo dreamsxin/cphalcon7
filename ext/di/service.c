@@ -411,7 +411,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 	else if (likely(Z_TYPE_P(definition) == IS_OBJECT)) {
 		/* Object definitions can be a Closure or an already resolved instance */
 		found = 1;
-		if (instanceof_function_ex(Z_OBJCE_P(definition), zend_ce_closure, 0 TSRMLS_CC)) {
+		if (instanceof_function_ex(Z_OBJCE_P(definition), zend_ce_closure, 0)) {
 			PHALCON_INIT_VAR(instance);
 			if (Z_TYPE_P(parameters) == IS_ARRAY) {
 				PHALCON_CALL_USER_FUNC_ARRAY(instance, definition, parameters);

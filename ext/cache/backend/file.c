@@ -386,9 +386,9 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 	PHALCON_CALL_METHOD(NULL, iterator, "__construct", cache_dir);
 
 	/* DirectoryIterator implements Iterator */
-	assert(instanceof_function_ex(spl_ce_DirectoryIterator, zend_ce_iterator, 1 TSRMLS_CC));
+	assert(instanceof_function_ex(spl_ce_DirectoryIterator, zend_ce_iterator, 1));
 
-	it = spl_ce_DirectoryIterator->get_iterator(spl_ce_DirectoryIterator, iterator, 0 TSRMLS_CC);
+	it = spl_ce_DirectoryIterator->get_iterator(spl_ce_DirectoryIterator, iterator, 0);
 
 	/* DirectoryIterator is an iterator */
 	assert(it != NULL);
@@ -725,13 +725,13 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 
 	PHALCON_INIT_VAR(iterator);
 	object_init_ex(iterator, spl_ce_DirectoryIterator);
-	assert(phalcon_has_constructor(iterator TSRMLS_CC));
+	assert(phalcon_has_constructor(iterator));
 	PHALCON_CALL_METHOD(NULL, iterator, "__construct", cache_dir);
 
 	/* DirectoryIterator implements Iterator */
-	assert(instanceof_function_ex(spl_ce_DirectoryIterator, zend_ce_iterator, 1 TSRMLS_CC));
+	assert(instanceof_function_ex(spl_ce_DirectoryIterator, zend_ce_iterator, 1));
 
-	it = spl_ce_DirectoryIterator->get_iterator(spl_ce_DirectoryIterator, iterator, 0 TSRMLS_CC);
+	it = spl_ce_DirectoryIterator->get_iterator(spl_ce_DirectoryIterator, iterator, 0);
 
 	/* DirectoryIterator is an iterator */
 	assert(it != NULL);

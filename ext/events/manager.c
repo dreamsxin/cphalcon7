@@ -427,8 +427,8 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 		if (Z_TYPE_P(queue) == IS_OBJECT) {
 			zend_class_entry *ce = Z_OBJCE_P(queue);
 			if (
-				   !instanceof_function_ex(ce, phalcon_events_event_ce, 0 TSRMLS_CC)
-				&& !instanceof_function_ex(ce, spl_ce_SplPriorityQueue, 0 TSRMLS_CC)
+				   !instanceof_function_ex(ce, phalcon_events_event_ce, 0)
+				&& !instanceof_function_ex(ce, spl_ce_SplPriorityQueue, 0)
 			) {
 				zend_throw_exception_ex(phalcon_events_exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", ce->name);
 				return;
@@ -514,7 +514,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				/**
 				 * Check if the event is a weak reference.
 				 */
-				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), *weakref_ce TSRMLS_CC)) {
+				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), *weakref_ce)) {
 					/**
 					 * Checks whether the object referenced still exists.
 					 */
@@ -538,7 +538,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				 * Check if the event is a closure
 				 */
 				assert(Z_TYPE_P(handler) == IS_OBJECT);
-				if (instanceof_function(Z_OBJCE_P(handler), zend_ce_closure TSRMLS_CC)) {
+				if (instanceof_function(Z_OBJCE_P(handler), zend_ce_closure)) {
 
 					/** 
 					 * Create the closure arguments
@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				/**
 				  * Check if the event is a weak reference.
 				  */
-				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), *weakref_ce TSRMLS_CC)) {
+				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), *weakref_ce)) {
 					/**
 					 * Checks whether the object referenced still exists.
 					 */
@@ -649,7 +649,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				 * Check if the event is a closure
 				 */
 				assert(Z_TYPE_P(handler) == IS_OBJECT);
-				if (instanceof_function(Z_OBJCE_P(handler), zend_ce_closure TSRMLS_CC)) {
+				if (instanceof_function(Z_OBJCE_P(handler), zend_ce_closure)) {
 
 					/** 
 					 * Create the closure arguments

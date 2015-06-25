@@ -4235,7 +4235,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			PHALCON_GET_HKEY(wildcard, ah5, hp5);
 			PHALCON_GET_HVALUE(value);
 
-			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce TSRMLS_CC)) {
+			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				PHALCON_INIT_NVAR(string_wildcard);
 				PHALCON_CONCAT_SV(string_wildcard, ":", wildcard);
 
@@ -5029,7 +5029,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				PHALCON_GET_HKEY(wildcard2, ah1, hp1);
 				PHALCON_GET_HVALUE(raw_value);
 
-				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce TSRMLS_CC)) {
+				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce)) {
 					PHALCON_INIT_NVAR(string_wildcard);
 					PHALCON_CONCAT_SV(string_wildcard, ":", wildcard2);
 
@@ -5197,7 +5197,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 				PHALCON_GET_HKEY(wildcard, ah0, hp0);
 				PHALCON_GET_HVALUE(raw_value);
 
-				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce TSRMLS_CC)) {
+				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce)) {
 					PHALCON_INIT_NVAR(string_wildcard);
 					PHALCON_CONCAT_SV(string_wildcard, ":", wildcard);
 

@@ -1091,7 +1091,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 	PHALCON_OBS_VAR(transaction);
 	phalcon_read_property_this(&transaction, this_ptr, SL("_transaction"), PH_NOISY TSRMLS_CC);
 	if (Z_TYPE_P(transaction) == IS_OBJECT) {
-		if (instanceof_function_ex(Z_OBJCE_P(transaction), phalcon_db_adapterinterface_ce, 1 TSRMLS_CC)) {
+		if (instanceof_function_ex(Z_OBJCE_P(transaction), phalcon_db_adapterinterface_ce, 1)) {
 			RETURN_CCTOR(transaction);
 		}
 
@@ -1148,7 +1148,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 	phalcon_read_property_this(&transaction, this_ptr, SL("_transaction"), PH_NOISY TSRMLS_CC);
 
 	if (Z_TYPE_P(transaction) == IS_OBJECT) {
-		if (instanceof_function_ex(Z_OBJCE_P(transaction), phalcon_db_adapterinterface_ce, 1 TSRMLS_CC)) {
+		if (instanceof_function_ex(Z_OBJCE_P(transaction), phalcon_db_adapterinterface_ce, 1)) {
 			RETURN_CCTOR(transaction);
 		}
 
@@ -2088,7 +2088,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 
 			PHALCON_INIT_NVAR(pk_condition);
 
-			if (Z_TYPE_P(v) == IS_OBJECT && instanceof_function(Z_OBJCE_P(v), phalcon_db_rawvalue_ce TSRMLS_CC)) {
+			if (Z_TYPE_P(v) == IS_OBJECT && instanceof_function(Z_OBJCE_P(v), phalcon_db_rawvalue_ce)) {
 				PHALCON_CONCAT_VSV(pk_condition, escaped_field, " = ", v);
 				phalcon_update_property_long(this_ptr, SL("_seenRawvalues"), 1 TSRMLS_CC);
 			}
@@ -3818,7 +3818,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 					error = PHALCON_GLOBAL(z_true);
 				}
-			} else if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce TSRMLS_CC)) {
+			} else if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				if (phalcon_array_isset(data_type_numeric, field)) {
 					if (!phalcon_is_numeric(value)) {
 						PHALCON_INIT_NVAR(message);
@@ -4172,7 +4172,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 					if (Z_TYPE_P(value) != IS_NULL || !phalcon_fast_in_array(field, not_null TSRMLS_CC) || !phalcon_array_isset(default_values, field)) {
 
 						if (PHALCON_GLOBAL(orm).enable_auto_convert) {
-							if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce TSRMLS_CC)) {
+							if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 								PHALCON_OBS_NVAR(field_type);
 								phalcon_array_fetch(&field_type, data_types, field, PH_NOISY);
 
@@ -4450,7 +4450,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 				phalcon_read_property_zval(&value, this_ptr, attribute_field, PH_NOISY TSRMLS_CC);
 
 				if (PHALCON_GLOBAL(orm).enable_auto_convert) {
-					if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce TSRMLS_CC)) {
+					if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 						PHALCON_OBS_NVAR(field_type);
 						phalcon_array_fetch(&field_type, data_types, field, PH_NOISY);
 
@@ -4470,7 +4470,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 				/**
 				 * When dynamic update is not used we pass every field to the update
 				 */
-				if (!i_use_dynamic_update || (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce TSRMLS_CC))) {
+				if (!i_use_dynamic_update || (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce))) {
 					phalcon_array_append(&fields, field, PH_SEPARATE);
 					phalcon_array_append(&values, convert_value, PH_SEPARATE);
 
@@ -7180,9 +7180,9 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 					PHALCON_INIT_NVAR(model_name);
 					phalcon_get_class(model_name, value, 0 TSRMLS_CC);
 
-					if (instanceof_function_ex(Z_OBJCE_P(value), phalcon_mvc_model_resultsetinterface_ce, 1 TSRMLS_CC)) {
+					if (instanceof_function_ex(Z_OBJCE_P(value), phalcon_mvc_model_resultsetinterface_ce, 1)) {
 						phalcon_update_property_array(this_ptr, SL("_relatedResult"), lower_property, value TSRMLS_CC);
-					} else if (!instanceof_function_ex(Z_OBJCE_P(value), phalcon_mvc_modelinterface_ce, 1 TSRMLS_CC)
+					} else if (!instanceof_function_ex(Z_OBJCE_P(value), phalcon_mvc_modelinterface_ce, 1)
 						|| !PHALCON_IS_EQUAL(referenced_model_name, model_name)) {
 						PHALCON_INIT_NVAR(exception_message);
 						PHALCON_CONCAT_SVSVS(exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
@@ -7227,13 +7227,13 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 						PHALCON_INIT_NVAR(model_name);
 						phalcon_get_class(model_name, item, 0 TSRMLS_CC);
 
-						if (instanceof_function_ex(Z_OBJCE_P(item), phalcon_mvc_model_resultsetinterface_ce, 1 TSRMLS_CC)) {
+						if (instanceof_function_ex(Z_OBJCE_P(item), phalcon_mvc_model_resultsetinterface_ce, 1)) {
 							phalcon_update_property_array(this_ptr, SL("_relatedResult"), lower_property, item TSRMLS_CC);
 							zend_hash_move_forward_ex(ah0, &hp0);
 							continue;
 						}
 
-						if (!instanceof_function_ex(Z_OBJCE_P(item), phalcon_mvc_modelinterface_ce, 1 TSRMLS_CC)
+						if (!instanceof_function_ex(Z_OBJCE_P(item), phalcon_mvc_modelinterface_ce, 1)
 							|| !PHALCON_IS_EQUAL(referenced_model_name, model_name)) {
 							PHALCON_INIT_NVAR(exception_message);
 							PHALCON_CONCAT_SVSVS(exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
@@ -7367,9 +7367,9 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 			/**
 			 * For belongs-to relations we store the object in the related bag
 			 */
-			if (instanceof_function_ex(Z_OBJCE_P(result), phalcon_mvc_modelinterface_ce, 1 TSRMLS_CC)) {
+			if (instanceof_function_ex(Z_OBJCE_P(result), phalcon_mvc_modelinterface_ce, 1)) {
 				phalcon_update_property_array(this_ptr, SL("_related"), lower_property, result TSRMLS_CC);
-			} else if (instanceof_function_ex(Z_OBJCE_P(result), phalcon_mvc_model_resultsetinterface_ce, 1 TSRMLS_CC)) {
+			} else if (instanceof_function_ex(Z_OBJCE_P(result), phalcon_mvc_model_resultsetinterface_ce, 1)) {
 				phalcon_update_property_array(this_ptr, SL("_relatedResult"), lower_property, result TSRMLS_CC);
 			}
 		}

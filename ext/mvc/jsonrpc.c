@@ -416,7 +416,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 				 */
 				PHALCON_CALL_METHOD(NULL, module_object, "registerautoloaders", dependency_injector);
 				PHALCON_CALL_METHOD(NULL, module_object, "registerservices", dependency_injector);
-			} else if (Z_TYPE_P(module) == IS_OBJECT && instanceof_function(Z_OBJCE_P(module), zend_ce_closure TSRMLS_CC)) {
+			} else if (Z_TYPE_P(module) == IS_OBJECT && instanceof_function(Z_OBJCE_P(module), zend_ce_closure)) {
 				/* A module definition object, can be a Closure instance */
 				PHALCON_INIT_VAR(module_params);
 				array_init_size(module_params, 1);

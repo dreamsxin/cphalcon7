@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
 
 	PHALCON_ENSURE_IS_STRING(&name);
 
-	if (Z_TYPE_P(method_callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(method_callable), zend_ce_closure TSRMLS_CC)) {
+	if (Z_TYPE_P(method_callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(method_callable), zend_ce_closure)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Method must be an closure object");
 		return;
 	}

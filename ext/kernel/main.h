@@ -383,12 +383,12 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
 		} \
 		return; \
 	} else { \
-		if (!instanceof_function_ex(Z_OBJCE_P(instance), interface_ce, 1 TSRMLS_CC)) { \
+		if (!instanceof_function_ex(Z_OBJCE_P(instance), interface_ce, 1)) { \
 			if (Z_TYPE_P(instance) != IS_OBJECT) { \
-				zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name, zend_zval_type_name(instance)); \
+				zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name, zend_zval_type_name(instance)); \
 			} \
 			else { \
-				zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name, Z_OBJCE_P(instance)->name); \
+				zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name, Z_OBJCE_P(instance)->name); \
 			} \
 			if (restore_stack) { \
 				PHALCON_MM_RESTORE(); \
@@ -398,12 +398,12 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
 	}
 
 #define PHALCON_VERIFY_INTERFACE_OR_NULL_EX(pzv, interface_ce, exception_ce, restore_stack) \
-	if (Z_TYPE_P(pzv) != IS_NULL && (Z_TYPE_P(pzv) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(pzv), interface_ce, 1 TSRMLS_CC))) { \
+	if (Z_TYPE_P(pzv) != IS_NULL && (Z_TYPE_P(pzv) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(pzv), interface_ce, 1))) { \
 		if (Z_TYPE_P(pzv) != IS_OBJECT) { \
-			zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object implementing %s or NULL, %s given", interface_ce->name, zend_zval_type_name(pzv)); \
+			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s or NULL, %s given", interface_ce->name, zend_zval_type_name(pzv)); \
 		} \
 		else { \
-			zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object implementing %s or NULL, object of type %s given", interface_ce->name, Z_OBJCE_P(pzv)->name); \
+			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s or NULL, object of type %s given", interface_ce->name, Z_OBJCE_P(pzv)->name); \
 		} \
 		if (restore_stack) { \
 			PHALCON_MM_RESTORE(); \
@@ -412,12 +412,12 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
 	}
 
 #define PHALCON_VERIFY_CLASS_EX(instance, class_ce, exception_ce, restore_stack) \
-	if (Z_TYPE_P(instance) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(instance), class_ce, 0 TSRMLS_CC)) { \
+	if (Z_TYPE_P(instance) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(instance), class_ce, 0)) { \
 		if (Z_TYPE_P(instance) != IS_OBJECT) { \
-			zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object of type %s, %s given", class_ce->name, zend_zval_type_name(instance)); \
+			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", class_ce->name, zend_zval_type_name(instance)); \
 		} \
 		else { \
-			zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object of type %s, object of type %s given", class_ce->name, Z_OBJCE_P(instance)->name); \
+			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, object of type %s given", class_ce->name, Z_OBJCE_P(instance)->name); \
 		} \
 		if (restore_stack) { \
 			PHALCON_MM_RESTORE(); \
@@ -426,12 +426,12 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
 	}
 
 #define PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, exception_ce, restore_stack) \
-	if (Z_TYPE_P(pzv) != IS_NULL && (Z_TYPE_P(pzv) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(pzv), class_ce, 0 TSRMLS_CC))) { \
+	if (Z_TYPE_P(pzv) != IS_NULL && (Z_TYPE_P(pzv) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(pzv), class_ce, 0))) { \
 		if (Z_TYPE_P(pzv) != IS_OBJECT) { \
-			zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object of type %s, %s given", class_ce->name, zend_zval_type_name(pzv)); \
+			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", class_ce->name, zend_zval_type_name(pzv)); \
 		} \
 		else { \
-			zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object of type %s, object of type %s given", class_ce->name, Z_OBJCE_P(pzv)->name); \
+			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, object of type %s given", class_ce->name, Z_OBJCE_P(pzv)->name); \
 		} \
 		if (restore_stack) { \
 			PHALCON_MM_RESTORE(); \

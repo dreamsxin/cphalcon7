@@ -572,28 +572,28 @@ int phalcon_interface_exists(const zval *class_name, int autoload TSRMLS_DC) {
 /**
  * Clones an object from obj to destination
  */
-int phalcon_clone(zval *destination, zval *obj TSRMLS_DC) {
+int phalcon_clone(zval *destination, zval *obj) {
 
 	int status = SUCCESS;
 	zend_class_entry *ce;
 	zend_object_clone_obj_t clone_call;
 
 	if (Z_TYPE_P(obj) != IS_OBJECT) {
-		php_error_docref(NULL TSRMLS_CC, E_ERROR, "__clone method called on non-object");
+		php_error_docref(NULL, E_ERROR, "__clone method called on non-object");
 		status = FAILURE;
 	} else {
 		ce = Z_OBJCE_P(obj);
 		clone_call =  Z_OBJ_HT_P(obj)->clone_obj;
 		if (!clone_call) {
 			if (ce) {
-				php_error_docref(NULL TSRMLS_CC, E_ERROR, "Trying to clone an uncloneable object of class %s", ce->name);
+				php_error_docref(NULL, E_ERROR, "Trying to clone an uncloneable object of class %s", ce->name);
 			} else {
-				php_error_docref(NULL TSRMLS_CC, E_ERROR, "Trying to clone an uncloneable object");
+				php_error_docref(NULL, E_ERROR, "Trying to clone an uncloneable object");
 			}
 			status = FAILURE;
 		} else {
 			if (!EG(exception)) {
-				Z_OBJVAL_P(destination) = clone_call(obj TSRMLS_CC);
+				Z_OBJVAL_P(destination) = clone_call(obj);
 				Z_TYPE_P(destination) = IS_OBJECT;
 				Z_SET_REFCOUNT_P(destination, 1);
 				Z_UNSET_ISREF_P(destination);
@@ -608,7 +608,7 @@ int phalcon_clone(zval *destination, zval *obj TSRMLS_DC) {
 	return status;
 }
 
-int phalcon_instance_of(zval *result, const zval *object, const zend_class_entry *ce TSRMLS_DC) {
+int phalcon_instance_of(zval *result, const zval *object, const zend_class_entry *ce) {
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "instanceof expects an object instance");
@@ -616,18 +616,18 @@ int phalcon_instance_of(zval *result, const zval *object, const zend_class_entry
 		return FAILURE;
 	}
 
-	ZVAL_BOOL(result, instanceof_function(Z_OBJCE_P(object), ce TSRMLS_CC));
+	ZVAL_BOOL(result, instanceof_function(Z_OBJCE_P(object), ce));
 	return SUCCESS;
 }
 
-int phalcon_instance_of_ev(const zval *object, const zend_class_entry *ce TSRMLS_DC) {
+int phalcon_instance_of_ev(const zval *object, const zend_class_entry *ce) {
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "instanceof expects an object instance");
 		return 0;
 	}
 
-	return instanceof_function(Z_OBJCE_P(object), ce TSRMLS_CC);
+	return instanceof_function(Z_OBJCE_P(object), ce);
 }
 
 /**
@@ -646,9 +646,9 @@ int phalcon_is_instance_of(zval *object, const char *class_name, unsigned int cl
 			}
 		}
 
-		temp_ce = zend_fetch_class(class_name, class_length, ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+		temp_ce = zend_fetch_class(zend_string_init(class_name, class_length, 0), ZEND_FETCH_CLASS_DEFAULT);
 		if (temp_ce) {
-			return instanceof_function(ce, temp_ce TSRMLS_CC);
+			return instanceof_function(ce, temp_ce);
 		}
 	}
 

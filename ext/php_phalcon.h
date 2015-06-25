@@ -169,6 +169,10 @@ extern int nusphere_dbg_present;
 	ZVAL_UNDEF(zp);
 #endif
 
+#ifndef Z_TYPE_PP
+#	define Z_TYPE_PP(pz) Z_TYPE_P(*(pz))
+#endif
+
 #ifndef INIT_PZVAL_COPY
 #	define INIT_PZVAL_COPY(z, v) \
 		ZVAL_COPY_VALUE(z, v);   \

@@ -626,7 +626,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 	if (zend_is_true(has)) {
 		PHALCON_CALL_METHOD(&view, dependency_injector, "get", service_name);
-		if (Z_TYPE_P(view) == IS_OBJECT && instanceof_function(Z_OBJCE_P(view), phalcon_mvc_viewinterface_ce TSRMLS_CC)) {
+		if (Z_TYPE_P(view) == IS_OBJECT && instanceof_function(Z_OBJCE_P(view), phalcon_mvc_viewinterface_ce)) {
 			PHALCON_CALL_METHOD(NULL, view, "disable");
 		}
 	}

@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Arr, is_array){
 		RETURN_TRUE;
 	}
 
-	 RETURN_BOOL(Z_TYPE_P(value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(value), zend_ce_traversable, 1 TSRMLS_CC));
+	 RETURN_BOOL(Z_TYPE_P(value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(value), zend_ce_traversable, 1));
 }
 
 /**

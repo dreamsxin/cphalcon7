@@ -391,9 +391,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	}
 
 	/* APCIterator implements Iterator */
-	assert(instanceof_function_ex(apciterator_ce, zend_ce_iterator, 1 TSRMLS_CC));
+	assert(instanceof_function_ex(apciterator_ce, zend_ce_iterator, 1));
 
-	it = apciterator_ce->get_iterator(apciterator_ce, iterator, 0 TSRMLS_CC);
+	it = apciterator_ce->get_iterator(apciterator_ce, iterator, 0);
 
 	/* APCIterator is an iterator */
 	assert(it != NULL);
@@ -512,9 +512,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 	}
 
 	/* APCIterator implements Iterator */
-	assert(instanceof_function_ex(apciterator_ce, zend_ce_iterator, 1 TSRMLS_CC));
+	assert(instanceof_function_ex(apciterator_ce, zend_ce_iterator, 1));
 
-	it = apciterator_ce->get_iterator(apciterator_ce, iterator, 0 TSRMLS_CC);
+	it = apciterator_ce->get_iterator(apciterator_ce, iterator, 0);
 
 	/* APCIterator is an iterator */
 	assert(it != NULL);

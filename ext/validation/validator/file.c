@@ -330,10 +330,10 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 	if (Z_TYPE_P(value) == IS_STRING) {
 		PHALCON_INIT_NVAR(file);
 		object_init_ex(file, spl_ce_SplFileInfo);
-		if (phalcon_has_constructor(file TSRMLS_CC)) {
+		if (phalcon_has_constructor(file)) {
 			PHALCON_CALL_METHOD(NULL, file, "__construct", value);
 		}
-	} else if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(value), spl_ce_SplFileInfo, 0 TSRMLS_CC)) {
+	} else if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(value), spl_ce_SplFileInfo, 0)) {
 		PHALCON_CPY_WRT(file, value);
 	}
 

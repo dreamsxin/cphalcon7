@@ -231,7 +231,7 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	}
 
 	/* Pass the DI itself if the instance implements Phalcon\DI\InjectionAwareInterface */
-	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1 TSRMLS_CC)) {
+	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1)) {
 		zval *params[] = { this_ptr };
 		if (FAILURE == phalcon_call_method(NULL, *retval, "setdi", 1, params TSRMLS_CC)) {
 			phalcon_ptr_dtor(retval);
@@ -877,7 +877,7 @@ PHP_METHOD(Phalcon_DI, get){
 	}
 
 	/* Pass the DI itself if the instance implements Phalcon\DI\InjectionAwareInterface */
-	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1 TSRMLS_CC)) {
+	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1)) {
 		PHALCON_CALL_METHOD(NULL, return_value, "setdi", this_ptr);
 	}
 

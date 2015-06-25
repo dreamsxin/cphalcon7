@@ -815,7 +815,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 				PHALCON_GET_HVALUE(before);
 
 				if (Z_TYPE_P(before) == IS_OBJECT) {
-					int is_middleware = instanceof_function_ex(Z_OBJCE_P(before), phalcon_mvc_micro_middlewareinterface_ce, 1 TSRMLS_CC);
+					int is_middleware = instanceof_function_ex(Z_OBJCE_P(before), phalcon_mvc_micro_middlewareinterface_ce, 1);
 
 					if (is_middleware) {
 
@@ -904,7 +904,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 				PHALCON_GET_HVALUE(after);
 
 				if (Z_TYPE_P(after) == IS_OBJECT) {
-					int is_middleware = instanceof_function_ex(Z_OBJCE_P(after), phalcon_mvc_micro_middlewareinterface_ce, 1 TSRMLS_CC);
+					int is_middleware = instanceof_function_ex(Z_OBJCE_P(after), phalcon_mvc_micro_middlewareinterface_ce, 1);
 					if (is_middleware) {
 
 						/** 
@@ -1007,7 +1007,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			 * Try to execute middleware as plugins
 			 */
 			if (Z_TYPE_P(finish) == IS_OBJECT) {
-				int is_middleware = instanceof_function_ex(Z_OBJCE_P(finish), phalcon_mvc_micro_middlewareinterface_ce, 1 TSRMLS_CC);
+				int is_middleware = instanceof_function_ex(Z_OBJCE_P(finish), phalcon_mvc_micro_middlewareinterface_ce, 1);
 				if (is_middleware) {
 
 					/** 
@@ -1072,7 +1072,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	 * Check if the returned object is already a response
 	 */
 	if (Z_TYPE_P(returned_value) == IS_OBJECT) {
-		int returned_response = instanceof_function_ex(Z_OBJCE_P(returned_value), phalcon_http_responseinterface_ce, 1 TSRMLS_CC);
+		int returned_response = instanceof_function_ex(Z_OBJCE_P(returned_value), phalcon_http_responseinterface_ce, 1);
 
 		if (returned_response) {
 			PHALCON_CALL_METHOD(&returned_response_sent, returned_value, "issent");
@@ -1293,7 +1293,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, _throwException){
 	PHALCON_INIT_VAR(status);
 	PHALCON_CALL_USER_FUNC_ARRAY(status, handler, arguments);
 
-	if (Z_TYPE_P(status) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(status), phalcon_http_responseinterface_ce, 1 TSRMLS_CC)) {
+	if (Z_TYPE_P(status) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(status), phalcon_http_responseinterface_ce, 1)) {
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_micro_exception_ce, message);
 		return;
 	} else {

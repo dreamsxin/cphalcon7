@@ -969,7 +969,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 					/** 
 					 * Engine can be a closure
 					 */
-					if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure TSRMLS_CC)) {
+					if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
 						PHALCON_INIT_NVAR(engine_object); /**/
 						PHALCON_CALL_USER_FUNC_ARRAY(engine_object, engine_service, arguments);
 					} else {
@@ -1426,7 +1426,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 	if (!view_model) {
 		view_model = PHALCON_GLOBAL(z_null);
-	} else if (Z_TYPE_P(view_model) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(view_model), phalcon_mvc_view_modelinterface_ce, 1 TSRMLS_CC)) {
+	} else if (Z_TYPE_P(view_model) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(view_model), phalcon_mvc_view_modelinterface_ce, 1)) {
 		use_model = 1;
 	}
 

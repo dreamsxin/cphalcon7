@@ -21,6 +21,7 @@
 #include <ext/spl/spl_exceptions.h>
 #include <Zend/zend_exceptions.h>
 #include <Zend/zend_interfaces.h>
+#include <Zend/zend_inheritance.h>
 
 #include "kernel/main.h"
 #include "kernel/fcall.h"
@@ -98,15 +99,7 @@ zval* phalcon_get_global(const char *global, unsigned int global_length TSRMLS_D
 
 	zend_bool jit_initialization = PG(auto_globals_jit);
 	if (jit_initialization) {
-#if defined(__GNUC__) && PHP_VERSION_ID >= 50400
-		if (__builtin_constant_p(global) && __builtin_constant_p(global_length)) {
-			zend_is_auto_global_quick(global, global_length - 1, zend_inline_hash_func(global, global_length) TSRMLS_CC);
-		}
-		else
-#endif
-		{
-			zend_is_auto_global(global, global_length - 1 TSRMLS_CC);
-		}
+		zend_is_auto_global_str(global, global_length - 1 TSRMLS_CC);
 	}
 
 	if (&EG(symbol_table)) {

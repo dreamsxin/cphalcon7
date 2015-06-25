@@ -96,7 +96,7 @@ int phalcon_vdump(zval *uservar TSRMLS_DC){
             fprintf(phalcon_log, "Double: %f\n", Z_DVAL_P(uservar));
             break;
         case IS_STRING:
-			fprintf(phalcon_log, "String: %s(%d) at %p, refcount=%d\n", Z_STRVAL_P(uservar), Z_STRLEN_P(uservar), uservar, Z_REFCOUNT_P(uservar));
+			fprintf(phalcon_log, "String: %s(%zu) at %p, refcount=%d\n", Z_STRVAL_P(uservar), Z_STRLEN_P(uservar), uservar, Z_REFCOUNT_P(uservar));
             break;
         case IS_RESOURCE:
             fprintf(phalcon_log, "Resource\n");

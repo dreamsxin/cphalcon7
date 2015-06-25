@@ -1204,8 +1204,8 @@ static int phalcon_router_call_convert(void *pDest TSRMLS_DC, int num_args, va_l
 	assert(num_args == 1);
 
 	route = va_arg(args, zval*);
-	if (hash_key->nKeyLength) {
-		ZVAL_STRINGL(&key, hash_key->arKey, hash_key->nKeyLength-1, 0);
+	if (hash_key->key->len) {
+		ZVAL_NEW_STR(&key, hash_key->key);
 	}
 	else {
 		ZVAL_LONG(&key, hash_key->h);

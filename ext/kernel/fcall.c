@@ -67,21 +67,10 @@ int phalcon_cleanup_fcache(void *pDest TSRMLS_DC, int num_args, va_list args, ze
 	zend_class_entry *scope;
 	uint len = hash_key->nKeyLength;
 
-	assert(hash_key->arKey != NULL);
-	assert(hash_key->nKeyLength > 2 * sizeof(zend_class_entry**));
+	assert(hash_key->key != NULL);
+	assert(hash_key->key->len > 2 * sizeof(zend_class_entry**));
 
-	memcpy(&scope, &hash_key->arKey[len - 2 * sizeof(zend_class_entry**)], sizeof(zend_class_entry*));
-
-/*
-#ifndef PHALCON_RELEASE
-	{
-		zend_class_entry *cls;
-		memcpy(&cls, &hash_key->arKey[len - sizeof(zend_class_entry**)], sizeof(zend_class_entry*));
-
-		fprintf(stderr, "func: %s, cls: %s, scope: %s [%u]\n", (*entry)->f->common.function_name, (cls ? cls->name : "N/A"), (scope ? scope->name : "N/A"), (uint)(*entry)->times);
-	}
-#endif
-*/
+	memcpy(&scope, &hash_key->key->val[len - 2 * sizeof(zend_class_entry**)], sizeof(zend_class_entry*));
 
 #ifndef PHALCON_RELEASE
 	if ((*entry)->f->type != ZEND_INTERNAL_FUNCTION || (scope && scope->type != ZEND_INTERNAL_CLASS)) {
@@ -93,15 +82,9 @@ int phalcon_cleanup_fcache(void *pDest TSRMLS_DC, int num_args, va_list args, ze
 	}
 #endif
 
-#if PHP_VERSION_ID >= 50400
 	if (scope && scope->type == ZEND_INTERNAL_CLASS && scope->info.internal.module->type != MODULE_PERSISTENT) {
 		return ZEND_HASH_APPLY_REMOVE;
 	}
-#else
-	if (scope && scope->type == ZEND_INTERNAL_CLASS && scope->module->type != MODULE_PERSISTENT) {
-		return ZEND_HASH_APPLY_REMOVE;
-	}
-#endif
 
 	return ZEND_HASH_APPLY_KEEP;
 }

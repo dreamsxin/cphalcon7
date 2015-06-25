@@ -351,7 +351,7 @@ static void phalcon_tag_get_escaper(zval **return_value_ptr, zval *params TSRMLS
 static zend_bool phalcon_tag_attribute_filter(HashTable *ht, void *pData, zend_hash_key *hash_key, void *pParam)
 {
 	zval **z = (zval**)pData;
-	return hash_key->arKey && hash_key->nKeyLength && Z_TYPE_PP(z) != IS_ARRAY;
+	return hash_key->key && hash_key->key->len && Z_TYPE_PP(z) != IS_ARRAY;
 }
 
 PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes TSRMLS_DC)

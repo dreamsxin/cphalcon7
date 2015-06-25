@@ -400,8 +400,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 	PHALCON_CALL_METHOD(&pathname, file, "getpathname");
 
 	if (Z_TYPE_P(mimes) == IS_ARRAY) {
-		PHALCON_INIT_VAR(constant);
-		if (!zend_get_constant(SL("FILEINFO_MIME_TYPE"), constant TSRMLS_CC)) {
+		if ((constant = zend_get_constant_str(SL("FILEINFO_MIME_TYPE"))) == NULL) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Undefined constant `FILEINFO_MIME_TYPE`");
 			return;
 		}

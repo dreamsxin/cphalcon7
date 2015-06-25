@@ -115,8 +115,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 	PHALCON_CALL_FUNCTION(&json, "json_decode", value, assoc);
 
 	if (Z_TYPE_P(json) == IS_NULL) {
-		PHALCON_INIT_VAR(constant);
-		if (zend_get_constant(SL("JSON_ERROR_NONE"), constant TSRMLS_CC)) {
+		if ((constant = zend_get_constant_str(SL("JSON_ERROR_NONE"))) != NULL) {
 			PHALCON_INIT_NVAR(ret);
 			PHALCON_CALL_FUNCTION(&ret, "json_last_error");
 

@@ -222,8 +222,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, _connect){
 			zval option = phalcon_get_current_key_w(Z_ARRVAL_P(client), &hp);
 
 			if (Z_TYPE(option) == IS_STRING) {
-				PHALCON_INIT_NVAR(res);
-				if (zend_get_constant(Z_STRVAL(option), Z_STRLEN(option), res TSRMLS_CC)) {
+				if ((res = zend_get_constant(Z_STR(option))) != NULL) {
 					PHALCON_CALL_METHOD(NULL, memcache, "setoption", res, *hd);
 				}
 			} else {

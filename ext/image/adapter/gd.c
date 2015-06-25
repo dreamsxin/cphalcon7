@@ -140,8 +140,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 		return;
 	}
 
-	PHALCON_INIT_VAR(gd_version);
-	if (!zend_get_constant(SL("GD_VERSION"), gd_version TSRMLS_CC)) {
+	if ((gd_version = zend_get_constant_str(SL("GD_VERSION"))) == NULL) {
 		PHALCON_CALL_FUNCTION(&gd_info, "gd_info");
 
 		if (phalcon_array_isset_string_fetch(&gd_version, gd_info, SS("GD Version"))) {
@@ -648,13 +647,12 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _flip) {
 		phalcon_update_property_this(this_ptr, SL("_image"), flipped_image TSRMLS_CC);
 	}
 	else {
-		PHALCON_INIT_VAR(mode);
 		if (Z_LVAL_P(direction) == PHALCON_IMAGE_HORIZONTAL) {
-			if (!zend_get_constant(SL("IMG_FLIP_HORIZONTAL"), mode TSRMLS_CC)) {
+			if ((mode = zend_get_constant_str(SL("IMG_FLIP_HORIZONTAL"))) == NULL) {
 				RETURN_MM();
 			}
 		} else {
-			if (!zend_get_constant(SL("IMG_FLIP_VERTICAL"), mode TSRMLS_CC)) {
+			if ((mode = zend_get_constant_str(SL("IMG_FLIP_VERTICAL"))) == NULL) {
 				RETURN_MM();
 			}
 		}
@@ -779,8 +777,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _reflection) {
 	image_width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY TSRMLS_CC);
 	image_height = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY TSRMLS_CC);
 
-	PHALCON_INIT_VAR(filtertype);
-	if (!zend_get_constant(SL("IMG_FILTER_COLORIZE"), filtertype TSRMLS_CC)) {
+	if ((filtertype = zend_get_constant_str(SL("IMG_FILTER_COLORIZE"))) == NULL) {
 		RETURN_MM();
 	}
 
@@ -913,8 +910,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _watermark) {
 
 		PHALCON_CALL_FUNCTION(&color, "imagecolorallocatealpha", overlay, tmp, tmp, tmp, op);
 
-		PHALCON_INIT_VAR(effect);
-		if (!zend_get_constant(SL("IMG_EFFECT_OVERLAY"), effect TSRMLS_CC)) {
+		if ((effect = zend_get_constant_str(SL("IMG_EFFECT_OVERLAY"))) == NULL) {
 			RETURN_MM();
 		}
 
@@ -1276,8 +1272,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _blur){
 
 	image = phalcon_fetch_nproperty_this(this_ptr, SL("_image"), PH_NOISY TSRMLS_CC);
 
-	PHALCON_INIT_VAR(constant);
-	if (!zend_get_constant(SL("IMG_FILTER_GAUSSIAN_BLUR"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("IMG_FILTER_GAUSSIAN_BLUR"))) == NULL) {
 		RETURN_MM();
 	}
 
@@ -1366,8 +1361,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
 
 	phalcon_fetch_params(1, 2, 0, &file, &quality);
 
-	PHALCON_INIT_VAR(constant);
-	if (!zend_get_constant(SL("PATHINFO_EXTENSION"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("PATHINFO_EXTENSION"))) == NULL) {
 		RETURN_MM();
 	}
 

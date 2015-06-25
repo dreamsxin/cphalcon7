@@ -148,8 +148,7 @@ PHP_METHOD(Phalcon_Async, call){
 
 	PHALCON_CALL_FUNCTION(NULL, "msg_send", seg, pid, result);
 
-	PHALCON_INIT_VAR(sig);
-	if (zend_get_constant(SL("SIGKILL"), sig TSRMLS_CC)) {
+	if ((sig = zend_get_constant_str(SL("SIGKILL"))) != NULL ) {
 		PHALCON_CALL_FUNCTION(NULL, "posix_kill", pid, sig);
 	}
 

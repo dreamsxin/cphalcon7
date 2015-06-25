@@ -94,33 +94,27 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 	PHALCON_INIT_VAR(options);
 	array_init(options);
 
-	PHALCON_INIT_VAR(constant);
-	if (zend_get_constant(SL("CURLOPT_RETURNTRANSFER"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_RETURNTRANSFER"))) != NULL) {
 		phalcon_array_update_zval_bool(&options, constant, 1, 0);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_AUTOREFERER"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_AUTOREFERER"))) != NULL) {
 		phalcon_array_update_zval_bool(&options, constant, 1, 0);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_FOLLOWLOCATION"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_FOLLOWLOCATION"))) != NULL) {
 		phalcon_array_update_zval_bool(&options, constant, 1, 0);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_MAXREDIRS"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_MAXREDIRS"))) != NULL) {
 		phalcon_array_update_zval_long(&options, constant, 20, 0);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_HEADER"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_HEADER"))) != NULL) {
 		phalcon_array_update_zval_bool(&options, constant, 1, 0);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_USERAGENT"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_USERAGENT"))) != NULL) {
 		phalcon_array_update_zval_string(&options, constant, SL("Phalcon HTTP Client(Curl)"), PH_COPY);
 	}
 
@@ -136,7 +130,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	zval *uri = NULL, *url = NULL, *method, *useragent, *data, *type, *files, *timeout, *curl, *username, *password, *authtype;
 	zval *file = NULL, *body, *uniqid = NULL, *boundary, *key = NULL, *value = NULL;
 	zval *path_parts = NULL, *filename, *basename, *filedata = NULL;
-	zval *constant, *header, *headers = NULL;
+	zval *constant, *constant1, *header, *headers = NULL;
 	zval *content = NULL, *errorno = NULL, *error = NULL, *headersize = NULL, *httpcode = NULL, *headerstr, *bodystr, *response, *tmp = NULL;
 	zend_class_entry *curlfile_ce;
 	HashTable *ah0, *ah1;
@@ -166,23 +160,19 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 	PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, url);
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_CONNECTTIMEOUT"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_CONNECTTIMEOUT"))) != NULL) {
 		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, timeout);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_TIMEOUT"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_TIMEOUT"))) != NULL) {
 		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, timeout);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (PHALCON_IS_NOT_EMPTY(method) && zend_get_constant(SL("CURLOPT_CUSTOMREQUEST"), constant TSRMLS_CC)) {
+	if (PHALCON_IS_NOT_EMPTY(method) && (constant = zend_get_constant_str(SL("CURLOPT_CUSTOMREQUEST"))) != NULL) {
 		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, method);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_USERAGENT"), constant TSRMLS_CC) && PHALCON_IS_NOT_EMPTY(useragent)) {
+	if (PHALCON_IS_NOT_EMPTY(useragent) && (constant = zend_get_constant_str(SL("CURLOPT_USERAGENT"))) != NULL) {
 		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, useragent);
 	}
 
@@ -190,39 +180,30 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 	if (PHALCON_IS_NOT_EMPTY(username)) {
 		if (PHALCON_IS_STRING(authtype, "any")) {
-			PHALCON_INIT_NVAR(constant);
-			PHALCON_INIT_NVAR(tmp);
-			if (zend_get_constant(SL("CURLOPT_HTTPAUTH"), constant TSRMLS_CC) && zend_get_constant(SL("CURLAUTH_ANY"), tmp TSRMLS_CC)) {
-				PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, tmp);
+			if ((constant = zend_get_constant_str(SL("CURLOPT_HTTPAUTH"))) != NULL && (constant1 = zend_get_constant_str(SL("CURLAUTH_ANY"))) != NULL) {
+				PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, constant1);
 
-				PHALCON_INIT_NVAR(constant);
-				if (zend_get_constant(SL("CURLOPT_USERPWD"), constant TSRMLS_CC)) {
+				if ((constant = zend_get_constant_str(SL("CURLOPT_USERPWD"))) != NULL) {
 					PHALCON_INIT_NVAR(tmp);
 					PHALCON_CONCAT_VSV(tmp, username, ":", password);
 					PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, tmp);
 				}
 			}
 		} else if (PHALCON_IS_STRING(authtype, "basic")) {
-			PHALCON_INIT_NVAR(constant);
-			PHALCON_INIT_NVAR(tmp);
-			if (zend_get_constant(SL("CURLOPT_HTTPAUTH"), constant TSRMLS_CC) && zend_get_constant(SL("CURLAUTH_BASIC"), tmp TSRMLS_CC)) {
-				PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, tmp);
+			if ((constant = zend_get_constant_str(SL("CURLOPT_HTTPAUTH"))) != NULL && (constant1 = zend_get_constant_str(SL("CURLAUTH_BASIC"))) != NULL) {
+				PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, constant1);
 
-				PHALCON_INIT_NVAR(constant);
-				if (zend_get_constant(SL("CURLOPT_USERPWD"), constant TSRMLS_CC)) {
+				if ((constant = zend_get_constant_str(SL("CURLOPT_USERPWD"))) != NULL) {
 					PHALCON_INIT_NVAR(tmp);
 					PHALCON_CONCAT_VSV(tmp, username, ":", password);
 					PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, tmp);
 				}
 			}
 		} else if (PHALCON_IS_STRING(authtype, "digest")) {
-			PHALCON_INIT_NVAR(constant);
-			PHALCON_INIT_NVAR(tmp);
-			if (zend_get_constant(SL("CURLOPT_HTTPAUTH"), constant TSRMLS_CC) && zend_get_constant(SL("CURLAUTH_DIGEST"), tmp TSRMLS_CC)) {
-				PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, tmp);
+			if ((constant = zend_get_constant_str(SL("CURLOPT_HTTPAUTH"))) != NULL && (constant1 = zend_get_constant_str(SL("CURLAUTH_DIGEST"))) != NULL) {
+				PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, constant1);
 
-				PHALCON_INIT_NVAR(constant);
-				if (zend_get_constant(SL("CURLOPT_USERPWD"), constant TSRMLS_CC)) {
+				if ((constant = zend_get_constant_str(SL("CURLOPT_USERPWD"))) != NULL) {
 					PHALCON_INIT_NVAR(tmp);
 					PHALCON_CONCAT_VSV(tmp, username, ":", password);
 					PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, tmp);
@@ -231,8 +212,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		}
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLOPT_SAFE_UPLOAD"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_SAFE_UPLOAD"))) != NULL) {
 		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, PHALCON_GLOBAL(z_true));
 	}
 
@@ -247,10 +227,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 		PHALCON_CALL_METHOD(NULL, header, "set", key, type);
 
-		PHALCON_INIT_NVAR(constant);
-		zend_get_constant(SL("CURLOPT_POSTFIELDS"), constant TSRMLS_CC);
-
-		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, data);
+		if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
+			PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, data);
+		}
 	} else if (phalcon_class_exists(SL("CURLFile"), 0 TSRMLS_CC)) {
 		if (Z_TYPE_P(data) != IS_ARRAY) {
 			PHALCON_INIT_NVAR(data);
@@ -276,10 +255,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 			}
 		}
 
-		PHALCON_INIT_NVAR(constant);
-		zend_get_constant(SL("CURLOPT_POSTFIELDS"), constant TSRMLS_CC);
-
-		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, data);
+		if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
+			PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, data);
+		}
 	} else {
 		PHALCON_CALL_FUNCTION(&uniqid, "uniqid");
 
@@ -344,15 +322,13 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 			PHALCON_CALL_METHOD(&headers, header, "build");
 
-			PHALCON_INIT_NVAR(constant);
-			zend_get_constant(SL("CURLOPT_POSTFIELDS"), constant TSRMLS_CC);
+			if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
+				PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, body);
+			}
 
-			PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, body);
-
-			PHALCON_INIT_NVAR(constant);
-			zend_get_constant(SL("CURLOPT_HTTPHEADER"), constant TSRMLS_CC);
-
-			PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, headers);
+			if ((constant = zend_get_constant_str(SL("CURLOPT_HTTPHEADER"))) != NULL) {
+				PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, headers);
+			}
 		}
 	}
 
@@ -370,14 +346,12 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	object_init_ex(response, phalcon_http_client_response_ce);
 	PHALCON_CALL_METHOD(NULL, response, "__construct");
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLINFO_HTTP_CODE"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLINFO_HTTP_CODE"))) != NULL) {
 		PHALCON_CALL_FUNCTION(&httpcode, "curl_getinfo", curl, constant);
 		PHALCON_CALL_METHOD(NULL, response, "setstatuscode", httpcode);
 	}
 
-	PHALCON_INIT_NVAR(constant);
-	if (zend_get_constant(SL("CURLINFO_HEADER_SIZE"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("CURLINFO_HEADER_SIZE"))) != NULL) {
 		PHALCON_CALL_FUNCTION(&headersize, "curl_getinfo", curl, constant);
 
 		PHALCON_INIT_VAR(headerstr);

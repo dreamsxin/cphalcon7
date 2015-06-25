@@ -219,11 +219,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, check){
 		return;
 	}
 
-	MAKE_STD_ZVAL(version);
-	if (!zend_get_constant_ex(SL("imagick::IMAGICK_EXTNUM"), version, NULL, ZEND_FETCH_CLASS_SILENT TSRMLS_CC)) {
+	if ((version = zend_get_constant_ex(SSL("imagick::IMAGICK_EXTNUM"), NULL, ZEND_FETCH_CLASS_SILENT)) == NULL) {
 		zend_update_static_property_long(phalcon_image_adapter_imagick_ce, SL("_version"), 0 TSRMLS_CC);
-	}
-	else {
+	} else {
 		zend_update_static_property_long(phalcon_image_adapter_imagick_ce, SL("_version"), phalcon_get_intval(version) TSRMLS_CC);
 	}
 
@@ -1390,8 +1388,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
-	PHALCON_INIT_VAR(constant);
-	if (!zend_get_constant(SL("PATHINFO_EXTENSION"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("PATHINFO_EXTENSION"))) == NULL) {
 		RETURN_MM();
 	}
 

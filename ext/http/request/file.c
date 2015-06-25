@@ -144,8 +144,7 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 			phalcon_array_fetch_string(&name, file, SL("name"), PH_NOISY);
 			phalcon_update_property_this(this_ptr, SL("_name"), name TSRMLS_CC);
 
-			PHALCON_INIT_VAR(constant);
-			if (zend_get_constant(SL("PATHINFO_EXTENSION"), constant TSRMLS_CC)) {
+			if ((constant = zend_get_constant_str(SL("PATHINFO_EXTENSION"))) != NULL) {
 				PHALCON_CALL_FUNCTION(&extension, "pathinfo", name, constant);
 				phalcon_update_property_this(this_ptr, SL("_extension"), extension TSRMLS_CC);
 			}
@@ -247,8 +246,7 @@ PHP_METHOD(Phalcon_Http_Request_File, getRealType){
 		RETURN_CTOR(mime);
 	}
 
-	PHALCON_INIT_VAR(constant);
-	if (!zend_get_constant(SL("FILEINFO_MIME_TYPE"), constant TSRMLS_CC)) {
+	if ((constant = zend_get_constant_str(SL("FILEINFO_MIME_TYPE"))) == NULL) {
 		RETURN_MM_NULL();
 	}
 

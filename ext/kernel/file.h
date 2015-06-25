@@ -22,12 +22,12 @@
 
 #include "php_phalcon.h"
 
-int phalcon_file_exists(zval *filename TSRMLS_DC);
+int phalcon_file_exists(zval *filename);
 int phalcon_compare_mtime(zval *filename1, zval *filename2 TSRMLS_DC);
 void phalcon_fix_path(zval **return_value, zval *path, zval *directory_separator TSRMLS_DC);
 void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_separator TSRMLS_DC);
 void phalcon_unique_path_key(zval *return_value, zval *path TSRMLS_DC);
-void phalcon_realpath(zval *return_value, zval *filename TSRMLS_DC);
+void phalcon_file_realpath(zval *return_value, zval *filename);
 void phalcon_file_get_contents(zval *return_value, zval *filename TSRMLS_DC);
 void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data TSRMLS_DC);
 void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *class_name, zval *virtual_separator, zval *separator TSRMLS_DC);

@@ -131,9 +131,9 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, annotations_dir, virtual_key, ".php");
 	
-	if (phalcon_file_exists(path TSRMLS_CC) == SUCCESS) {
+	if (phalcon_file_exists(path) == SUCCESS) {
 		zval *tmp = NULL;
-		RETURN_MM_ON_FAILURE(phalcon_require_ret(&tmp, Z_STRVAL_P(path) TSRMLS_CC));
+		RETURN_MM_ON_FAILURE(phalcon_require_ret(&tmp, Z_STRVAL_P(path)));
 		RETVAL_ZVAL(tmp, 1, 1);
 	}
 	

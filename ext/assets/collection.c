@@ -691,8 +691,8 @@ PHP_METHOD(Phalcon_Assets_Collection, getRealTargetPath){
 	/** 
 	 * Get the real template path, the target path can optionally don't exist
 	 */
-	if (phalcon_file_exists(complete_path TSRMLS_CC) == SUCCESS) {
-		phalcon_realpath(return_value, complete_path TSRMLS_CC);
+	if (phalcon_file_exists(complete_path) == SUCCESS) {
+		phalcon_file_realpath(return_value, complete_path);
 		RETURN_MM();
 	}
 	

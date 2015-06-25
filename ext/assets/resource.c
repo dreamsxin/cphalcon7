@@ -455,7 +455,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 		/** 
 		 * Check first if the file is readable
 		 */
-		if (phalcon_file_exists(complete_path TSRMLS_CC) == FAILURE) {
+		if (phalcon_file_exists(complete_path) == FAILURE) {
 			PHALCON_INIT_VAR(exception_message);
 			PHALCON_CONCAT_SVS(exception_message, "Resource's content for \"", complete_path, "\" cannot be loaded");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
@@ -531,7 +531,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
 		/** 
 		 * Get the real template path
 		 */
-		phalcon_realpath(return_value, complete_path TSRMLS_CC);
+		phalcon_file_realpath(return_value, complete_path);
 		RETURN_MM();
 	}
 	
@@ -576,8 +576,8 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 		/** 
 		 * Get the real template path, the target path can optionally don't exist
 		 */
-		if (phalcon_file_exists(complete_path TSRMLS_CC) == SUCCESS) {
-			phalcon_realpath(return_value, complete_path TSRMLS_CC);
+		if (phalcon_file_exists(complete_path) == SUCCESS) {
+			phalcon_file_realpath(return_value, complete_path);
 			RETURN_MM();
 		}
 	

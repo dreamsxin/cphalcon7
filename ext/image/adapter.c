@@ -1090,7 +1090,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 		PHALCON_CALL_FUNCTION(&ret, "pathinfo", file, constant);
 
 		PHALCON_INIT_VAR(dir);
-		phalcon_realpath(dir, ret TSRMLS_CC);
+		phalcon_file_realpath(dir, ret);
 		convert_to_string(dir);
 
 		PHALCON_INIT_NVAR(ret);

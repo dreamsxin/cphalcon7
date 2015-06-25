@@ -212,9 +212,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 	
 	phalcon_update_property_this(this_ptr, SL("_file"), file TSRMLS_CC);
 
-	if (phalcon_file_exists(file TSRMLS_CC) != FAILURE) {
+	if (phalcon_file_exists(file) != FAILURE) {
 		PHALCON_INIT_VAR(realpath);
-		phalcon_realpath(realpath, file TSRMLS_CC);
+		phalcon_file_realpath(realpath, file);
 		if (unlikely(Z_TYPE_P(realpath) != IS_STRING)) {
 			convert_to_string(realpath);
 		}

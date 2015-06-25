@@ -265,9 +265,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
 		PHALCON_CALL_METHOD(NULL, im, "__construct");
 	}
 
-	if (phalcon_file_exists(*file TSRMLS_CC) != FAILURE) {
+	if (phalcon_file_exists(*file) != FAILURE) {
 		PHALCON_INIT_VAR(realpath);
-		phalcon_realpath(realpath, *file TSRMLS_CC);
+		phalcon_file_realpath(realpath, *file);
 		phalcon_update_property_this(this_ptr, SL("_realpath"), realpath TSRMLS_CC);
 
 		PHALCON_CALL_METHOD(NULL, im, "readImage", realpath);

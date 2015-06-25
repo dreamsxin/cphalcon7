@@ -743,7 +743,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
 					return;
 				}
-				if (phalcon_file_exists(target_path TSRMLS_CC) == SUCCESS) {
+				if (phalcon_file_exists(target_path) == SUCCESS) {
 					if (phalcon_compare_mtime(target_path, source_path TSRMLS_CC)) {
 						PHALCON_INIT_NVAR(filter_needed);
 						ZVAL_TRUE(filter_needed);

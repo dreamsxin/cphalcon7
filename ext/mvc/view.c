@@ -1203,7 +1203,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			PHALCON_INIT_NVAR(view_engine_path);
 			PHALCON_CONCAT_VV(view_engine_path, path, extension);
 
-			if (phalcon_file_exists(view_engine_path TSRMLS_CC) == SUCCESS) {
+			if (phalcon_file_exists(view_engine_path) == SUCCESS) {
 
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_INIT_NVAR(debug_message);
@@ -1369,7 +1369,7 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 		zval ext = phalcon_get_current_key_w(Z_ARRVAL_P(engines), &pos);
 
 		PHALCON_CONCAT_VVVV(path, base_dir, view_dir, *view, &ext);
-		exists = (SUCCESS == phalcon_file_exists(path TSRMLS_CC));
+		exists = (SUCCESS == phalcon_file_exists(path));
 		zval_dtor(path);
 	}
 

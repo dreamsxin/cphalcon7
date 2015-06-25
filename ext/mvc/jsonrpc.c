@@ -400,7 +400,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 					phalcon_array_fetch_string(&path, module, SL("path"), PH_NOISY);
 					convert_to_string_ex(&path);
 					if (Z_TYPE_P(class_name) != IS_STRING || phalcon_class_exists(Z_STR_P(class_name), 0) == NULL) {
-						if (phalcon_file_exists(path TSRMLS_CC) == SUCCESS) {
+						if (phalcon_file_exists(path) == SUCCESS) {
 							RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path) TSRMLS_CC));
 						} else {
 							zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module definition path '%s' does not exist", Z_STRVAL_P(path));

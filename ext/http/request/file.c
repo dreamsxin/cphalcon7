@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 	phalcon_fetch_params(1, 1, 1, &file, &key);
 	
 	if (Z_TYPE_P(file) != IS_ARRAY) {
-		if (phalcon_file_exists(file TSRMLS_CC) == FAILURE) {
+		if (phalcon_file_exists(file) == FAILURE) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "Phalcon\\Http\\Request\\File requires a valid uploaded file");
 			return;
 		}

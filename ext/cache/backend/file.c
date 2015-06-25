@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 	PHALCON_INIT_VAR(cache_file);
 	PHALCON_CONCAT_VV(cache_file, cache_dir, prefixed_key);
 
-	if (phalcon_file_exists(cache_file TSRMLS_CC) == SUCCESS) {
+	if (phalcon_file_exists(cache_file) == SUCCESS) {
 
 		zval *frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
 
@@ -344,7 +344,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, delete){
 	PHALCON_INIT_VAR(cache_file);
 	PHALCON_CONCAT_VV(cache_file, cache_dir, prefixed_key);
 
-	if (phalcon_file_exists(cache_file TSRMLS_CC) == SUCCESS) {
+	if (phalcon_file_exists(cache_file) == SUCCESS) {
 		phalcon_unlink(return_value, cache_file TSRMLS_CC);
 		RETURN_MM();
 	}
@@ -459,7 +459,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 		PHALCON_INIT_VAR(cache_file);
 		PHALCON_CONCAT_VV(cache_file, cache_dir, last_key);
 
-		if (phalcon_file_exists(cache_file TSRMLS_CC) == SUCCESS) {
+		if (phalcon_file_exists(cache_file) == SUCCESS) {
 			long int mtime, ttl;
 
 			frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
@@ -528,7 +528,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 	PHALCON_CONCAT_VV(cache_file, cache_dir, prefixed_key);
 	assert(Z_TYPE_P(cache_file) == IS_STRING);
 
-	if (phalcon_file_exists(cache_file TSRMLS_CC) == SUCCESS) {
+	if (phalcon_file_exists(cache_file) == SUCCESS) {
 
 		zval *frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
 		/**
@@ -635,7 +635,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 	PHALCON_CONCAT_VV(cache_file, cache_dir, prefixed_key);
 	assert(Z_TYPE_P(cache_file) == IS_STRING);
 
-	if (phalcon_file_exists(cache_file TSRMLS_CC) == SUCCESS) {
+	if (phalcon_file_exists(cache_file) == SUCCESS) {
 
 		zval *frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
 		/**

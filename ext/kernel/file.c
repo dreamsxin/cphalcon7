@@ -47,21 +47,21 @@
  * Checks if a file exist
  *
  */
-int phalcon_file_exists(zval *filename TSRMLS_DC){
+int phalcon_file_exists(zval *filename){
 
-	zval return_value;
+	zval exists_flag;
 
 	if (Z_TYPE_P(filename) != IS_STRING) {
 		return FAILURE;
 	}
 
-	php_stat(Z_STRVAL_P(filename), (php_stat_len) Z_STRLEN_P(filename), FS_EXISTS, &return_value TSRMLS_CC);
+	php_stat(Z_STRVAL_P(filename), (php_stat_len) Z_STRLEN_P(filename), FS_EXISTS, &exists_flag);
 
-	if (PHALCON_IS_FALSE((&return_value))) {
+	if (PHALCON_IS_FALSE((&exists_flag))) {
 		return FAILURE;
 	}
 
-	if (PHALCON_IS_EMPTY((&return_value))) {
+	if (PHALCON_IS_EMPTY((&exists_flag))) {
 		return FAILURE;
 	}
 
@@ -213,7 +213,7 @@ void phalcon_unique_path_key(zval *return_value, zval *path TSRMLS_DC) {
  * Returns the realpath of a zval filename
  *
  */
-void phalcon_realpath(zval *return_value, zval *filename TSRMLS_DC) {
+void phalcon_realpath(zval *return_value, zval *filename) {
 
 	char resolved_path_buff[MAXPATHLEN];
 

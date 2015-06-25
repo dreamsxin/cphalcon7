@@ -556,7 +556,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 			/** 
 			 * This is probably a good path, let's check if the file exist
 			 */
-			if (phalcon_file_exists(file_path TSRMLS_CC) == SUCCESS) {
+			if (phalcon_file_exists(file_path) == SUCCESS) {
 
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_INIT_NVAR(debug_message);

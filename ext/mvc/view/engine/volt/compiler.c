@@ -3530,7 +3530,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 	/** 
 	 * Check if the template exists
 	 */
-	if (phalcon_file_exists(path TSRMLS_CC) == FAILURE) {
+	if (phalcon_file_exists(path) == FAILURE) {
 		PHALCON_INIT_VAR(exception_message);
 		PHALCON_CONCAT_SVS(exception_message, "Template file ", path, " does not exist");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
@@ -3724,7 +3724,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 		 */
 		if (PHALCON_IS_NOT_EMPTY(compiled_path)) {
 			PHALCON_INIT_VAR(real_template_path);
-			phalcon_realpath(real_template_path, template_path TSRMLS_CC);
+			phalcon_file_realpath(real_template_path, template_path);
 
 			/** 
 			 * Create the virtual path replacing the directory separator by the compiled
@@ -3787,7 +3787,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 	} else {
 		if (PHALCON_IS_TRUE(stat)) {
 
-			if (phalcon_file_exists(compiled_template_path TSRMLS_CC) == SUCCESS) {
+			if (phalcon_file_exists(compiled_template_path) == SUCCESS) {
 
 				/** 
 				 * Compare modification timestamps to check if the file needs to be recompiled
@@ -3831,7 +3831,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 			/** 
 			 * Stat is off but the compiled file doesn't exist
 			 */
-			if (phalcon_file_exists(real_compiled_path TSRMLS_CC) == FAILURE) {
+			if (phalcon_file_exists(real_compiled_path) == FAILURE) {
 				PHALCON_INIT_NVAR(exception_message);
 				PHALCON_CONCAT_SVS(exception_message, "Compiled template file ", real_compiled_path, " does not exist");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);

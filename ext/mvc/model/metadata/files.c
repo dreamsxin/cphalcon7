@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, meta_data_dir, virtual_key, ".php");
 	
-	if (phalcon_file_exists(path TSRMLS_CC) == SUCCESS) {
+	if (phalcon_file_exists(path) == SUCCESS) {
 		RETURN_MM_ON_FAILURE(phalcon_require_ret(&data, Z_STRVAL_P(path) TSRMLS_CC));
 		RETVAL_ZVAL(&data, 1, 1);
 	}

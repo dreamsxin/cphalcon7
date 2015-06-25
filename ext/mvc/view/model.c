@@ -713,7 +713,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 			PHALCON_INIT_NVAR(view_engine_path);
 			PHALCON_CONCAT_VVV(view_engine_path, path, views_dir_path, extension);
 
-			if (phalcon_file_exists(view_engine_path TSRMLS_CC) == SUCCESS) {
+			if (phalcon_file_exists(view_engine_path) == SUCCESS) {
 
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_INIT_NVAR(debug_message);

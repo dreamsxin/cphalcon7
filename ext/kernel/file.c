@@ -388,7 +388,8 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data TS
 		case IS_NULL:
 		case IS_LONG:
 		case IS_DOUBLE:
-		case IS_BOOL:
+		case IS_TRUE:
+		case IS_FALSE:
 		case IS_CONSTANT:
 			zend_make_printable_zval(data, &copy, &use_copy);
 			if (use_copy) {

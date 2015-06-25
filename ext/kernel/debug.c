@@ -84,8 +84,10 @@ int phalcon_vdump(zval *uservar TSRMLS_DC){
         case IS_NULL:
             fprintf(phalcon_log, "NULL \n");
             break;
-        case IS_BOOL:
-            fprintf(phalcon_log, "Boolean: %s\n", Z_LVAL_P(uservar) ? "TRUE" : "FALSE");
+        case IS_TRUE:
+            fprintf(phalcon_log, "Boolean: %s\n", "TRUE");
+        case IS_FALSE:
+            fprintf(phalcon_log, "Boolean: %s\n", "FALSE");
             break;
         case IS_LONG:
             fprintf(phalcon_log, "Long: %ld at %p, refcount=%d\n", Z_LVAL_P(uservar), uservar, Z_REFCOUNT_P(uservar));

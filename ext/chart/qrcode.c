@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	}
 	
 	if (casesensitive) {
-		if (Z_TYPE_P(casesensitive) != IS_BOOL) {
+		if (!PHALCON_IS_BOOL(casesensitive)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "casesensitive parameter must be bool");
 			return;
 		}

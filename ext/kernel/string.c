@@ -159,10 +159,11 @@ void phalcon_append_printable_zval(smart_str *implstr, zval **tmp TSRMLS_DC) {
 			smart_str_append_long(implstr, Z_LVAL_PP(tmp));
 			break;
 
-		case IS_BOOL:
-			if (Z_LVAL_PP(tmp) == 1) {
-				smart_str_appendl(implstr, "1", sizeof("1") - 1);
-			}
+		case IS_TRUE:
+			smart_str_appendl(implstr, "1", sizeof("1") - 1);
+			break;
+
+		case IS_FALSE:
 			break;
 
 		case IS_NULL:
@@ -1398,7 +1399,7 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned 
 	uint str_len = (uint)(Z_STRLEN_P(str));
 	if (Z_TYPE_P(str) != IS_STRING) {
 
-		if (Z_TYPE_P(str) == IS_NULL || Z_TYPE_P(str) == IS_BOOL) {
+		if (Z_TYPE_P(str) == IS_NULL || PHALCON_IS_BOOL(str)) {
 			RETURN_FALSE;
 		}
 

@@ -62,12 +62,10 @@ int phalcon_compare_strict_string(zval *op1, const char *op2, int op2_length){
 			return !zend_binary_strcmp(Z_STRVAL_P(op1), Z_STRLEN_P(op1), op2, op2_length);
 		case IS_NULL:
 			return !zend_binary_strcmp("", 0, op2, op2_length);
-		case IS_BOOL:
-			if (!Z_BVAL_P(op1)) {
-				return !zend_binary_strcmp("0", strlen("0"), op2, op2_length);
-			} else {
-				return !zend_binary_strcmp("1", strlen("1"), op2, op2_length);
-			}
+		case IS_TRUE:
+			return !zend_binary_strcmp("1", strlen("1"), op2, op2_length);
+		case IS_FALSE:
+			return !zend_binary_strcmp("0", strlen("0"), op2, op2_length);
 	}
 
 	return 0;
@@ -87,12 +85,10 @@ int phalcon_compare_strict_long(zval *op1, long op2 TSRMLS_DC){
 			return Z_LVAL_P(op1) == (double) op2;
 		case IS_NULL:
 			return 0 == op2;
-		case IS_BOOL:
-			if (Z_BVAL_P(op1)) {
-				return 0 == op2;
-			} else {
-				return 1 == op2;
-			}
+		case IS_TRUE:
+			return 1 == op2;
+		case IS_FALSE:
+			return 0 == op2;
 		default:
 			{
 				zval result, op2_tmp;
@@ -120,12 +116,10 @@ int phalcon_compare_strict_double(zval *op1, double op2 TSRMLS_DC) {
 			return Z_DVAL_P(op1) == op2;
 		case IS_NULL:
 			return 0 == op2;
-		case IS_BOOL:
-			if (Z_BVAL_P(op1)) {
-				return 1 == op2;
-			} else {
-				return 0 == op2;
-			}
+		case IS_TRUE:
+			return 1 == op2;
+		case IS_FALSE:
+			return 0 == op2;
 		default:
 			{
 				zval result, op2_tmp;
@@ -153,18 +147,14 @@ int phalcon_compare_strict_bool(zval *op1, zend_bool op2 TSRMLS_DC) {
 			return (Z_DVAL_P(op1) ? 1 : 0) == op2;
 		case IS_NULL:
 			return 0 == op2;
-		case IS_BOOL:
-			if (Z_BVAL_P(op1)) {
-				return 1 == op2;
-			} else {
-				return 0 == op2;
-			}
+		case IS_TRUE:
+			return 1 == op2;
 		default:
 			{
 				zval result, op2_tmp;
 				ZVAL_BOOL(&op2_tmp, op2);
 				is_equal_function(&result, op1, &op2_tmp TSRMLS_CC);
-				bool_result = Z_BVAL(result);
+				bool_result = Z_TYPE_P(result) == IS_TRUE ? 1 : 0;
 				return bool_result;
 			}
 	}
@@ -187,11 +177,15 @@ int phalcon_add_function_ex(zval *result, zval *op1, zval *op2 TSRMLS_DC){
 void phalcon_negate(zval *z TSRMLS_DC) {
 	while (1) {
 		switch (Z_TYPE_P(z)) {
-			case IS_LONG:
-			case IS_BOOL:
-				ZVAL_LONG(z, -Z_LVAL_P(z));
+			case IS_TRUE:
+				ZVAL_LONG(z, -1);
 				return;
 
+			case IS_FALSE:
+				ZVAL_LONG(z, 0);
+				return;
+
+			case IS_LONG:
 			case IS_DOUBLE:
 				ZVAL_DOUBLE(z, -Z_DVAL_P(z));
 				return;
@@ -249,17 +243,17 @@ long phalcon_get_intval_ex(const zval *op) {
             return zend_hash_num_elements(Z_ARRVAL_P(op)) ? 1 : 0;
             break;
 
-#if PHP_VERSION_ID > 50400
 	    case IS_CALLABLE:
-#endif
 	    case IS_RESOURCE:
 	    case IS_OBJECT:
 	        return 1;
 
 		case IS_LONG:
 			return Z_LVAL_P(op);
-		case IS_BOOL:
-			return Z_BVAL_P(op);
+		case IS_TRUE:
+			return 1;
+		case IS_FALSE:
+			return 0;
 		case IS_DOUBLE:
 			return (long) Z_DVAL_P(op);
 		case IS_STRING: {
@@ -291,16 +285,16 @@ double phalcon_get_doubleval_ex(const zval *op) {
         case IS_ARRAY:
             return zend_hash_num_elements(Z_ARRVAL_P(op)) ? (double) 1 : 0;
             break;
-#if PHP_VERSION_ID > 50400
 	    case IS_CALLABLE:
-#endif
 	    case IS_RESOURCE:
 	    case IS_OBJECT:
 	        return (double) 1;
 		case IS_LONG:
 			return (double) Z_LVAL_P(op);
-		case IS_BOOL:
-			return (double) Z_BVAL_P(op);
+		case IS_TRUE:
+			return (double) 1;
+		case IS_FALSE:
+			return (double) 0;
 		case IS_DOUBLE:
 			return Z_DVAL_P(op);
 		case IS_STRING: {
@@ -336,16 +330,16 @@ zend_bool phalcon_get_boolval_ex(const zval *op) {
         case IS_ARRAY:
             return zend_hash_num_elements(Z_ARRVAL_P(op)) ? (zend_bool) 1 : 0;
             break;
-#if PHP_VERSION_ID > 50400
 	    case IS_CALLABLE:
-#endif
 	    case IS_RESOURCE:
 	    case IS_OBJECT:
 	        return (zend_bool) 1;
 		case IS_LONG:
 			return (Z_LVAL_P(op) ? (zend_bool) 1 : 0);
-		case IS_BOOL:
-			return Z_BVAL_P(op);
+		case IS_TRUE:
+			return (zend_bool) 1;
+		case IS_FALSE:
+			return (zend_bool) 0;
 		case IS_DOUBLE:
 			return (Z_DVAL_P(op) ? (zend_bool) 1 : 0);
 		case IS_STRING:
@@ -375,7 +369,9 @@ int phalcon_is_numeric_ex(const zval *op) {
 	switch (Z_TYPE_P(op)) {
 		case IS_LONG:
 			return 1;
-		case IS_BOOL:
+		case IS_TRUE:
+			return 1;
+		case IS_FALSE:
 			return 0;
 		case IS_DOUBLE:
 			return 1;
@@ -396,12 +392,7 @@ int phalcon_is_numeric_ex(const zval *op) {
 int phalcon_is_equal(zval *op1, zval *op2 TSRMLS_DC) {
 	zval result;
 
-	#if PHP_VERSION_ID < 50400
-	is_equal_function(&result, op1, op2 TSRMLS_CC);
-	return Z_BVAL(result);
-	#else
 	return fast_equal_function(&result, op1, op2 TSRMLS_CC);
-	#endif
 }
 
 /**

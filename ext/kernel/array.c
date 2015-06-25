@@ -46,8 +46,15 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 			result = zend_hash_index_find(h, (ulong)Z_DVAL_P(index), (void**)&val);
 			break;
 
+		case IS_TRUE:
+			result = zend_hash_index_find(h, 1, (void**)&val);
+			break;
+
+		case IS_FALSE:
+			result = zend_hash_index_find(h, 0, (void**)&val);
+			break;
+
 		case IS_LONG:
-		case IS_BOOL:
 		case IS_RESOURCE:
 			result = zend_hash_index_find(h, Z_LVAL_P(index), (void**)&val);
 			break;
@@ -113,7 +120,12 @@ int ZEND_FASTCALL phalcon_array_isset(const zval *arr, const zval *index) {
 		case IS_DOUBLE:
 			return zend_hash_index_exists(h, (ulong)Z_DVAL_P(index));
 
-		case IS_BOOL:
+		case IS_TRUE:
+			return zend_hash_index_exists(h, 1);
+
+		case IS_FALSE:
+			return zend_hash_index_exists(h, 0);
+
 		case IS_LONG:
 		case IS_RESOURCE:
 			return zend_hash_index_exists(h, Z_LVAL_P(index));
@@ -166,8 +178,13 @@ int ZEND_FASTCALL phalcon_array_unset(zval **arr, const zval *index, int flags) 
 		case IS_DOUBLE:
 			return (zend_hash_index_del(ht, (ulong)Z_DVAL_P(index)) == SUCCESS);
 
+		case IS_TRUE:
+			return (zend_hash_index_del(ht, 1) == SUCCESS);
+
+		case IS_FALSE:
+			return (zend_hash_index_del(ht, 0) == SUCCESS);
+
 		case IS_LONG:
-		case IS_BOOL:
 		case IS_RESOURCE:
 			return (zend_hash_index_del(ht, Z_LVAL_P(index)) == SUCCESS);
 
@@ -269,8 +286,15 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 			status = zend_hash_index_update(ht, (ulong)Z_DVAL_P(index), (void*)&value, sizeof(zval*), NULL);
 			break;
 
+		case IS_TRUE:
+			status = zend_hash_index_update(ht, 1, (void*)&value, sizeof(zval*), NULL);
+			break;
+
+		case IS_FALSE:
+			status = zend_hash_index_update(ht, 0, (void*)&value, sizeof(zval*), NULL);
+			break;
+
 		case IS_LONG:
-		case IS_BOOL:
 		case IS_RESOURCE:
 			status = zend_hash_index_update(ht, Z_LVAL_P(index), (void*)&value, sizeof(zval*), NULL);
 			break;
@@ -367,11 +391,17 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 				result = zend_hash_index_find(ht, uidx, (void**) &zv);
 				break;
 
+			case IS_TRUE:
+				result = zend_hash_index_find(ht, 1, (void**) &zv);
+				break;
+
+			case IS_FALSE:
+				result = zend_hash_index_find(ht, 0, (void**) &zv);
+				break;
+
 			case IS_LONG:
-			case IS_BOOL:
 			case IS_RESOURCE:
-				uidx   = Z_LVAL_P(index);
-				result = zend_hash_index_find(ht, uidx, (void**) &zv);
+				result = zend_hash_index_find(ht, Z_LVAL_P(index), (void**) &zv);
 				break;
 
 			case IS_STRING:

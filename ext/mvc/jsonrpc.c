@@ -233,7 +233,7 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
 			return FAILURE;
 		}
 
-		return (Z_TYPE_P(status) == IS_BOOL && !Z_BVAL_P(status)) ? FAILURE : SUCCESS;
+		return zend_is_true(status) ? SUCCESS : FAILURE;
 	}
 
 	return SUCCESS;

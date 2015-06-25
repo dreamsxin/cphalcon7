@@ -424,12 +424,12 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 		convert_to_long(*h);
 	}
 
-	if (ofs_x && Z_TYPE_PP(ofs_x) != IS_NULL && Z_TYPE_PP(ofs_x) != IS_BOOL && Z_TYPE_PP(ofs_x) != IS_LONG) {
+	if (ofs_x && Z_TYPE_PP(ofs_x) != IS_NULL && !PHALCON_IS_BOOL(ofs_x) && Z_TYPE_PP(ofs_x) != IS_LONG) {
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_x);
 		convert_to_long(*ofs_x);
 	}
 		
-	if (ofs_y && Z_TYPE_PP(ofs_y) != IS_NULL && Z_TYPE_PP(ofs_y) != IS_BOOL && Z_TYPE_PP(ofs_x) != IS_LONG) {
+	if (ofs_y && Z_TYPE_PP(ofs_y) != IS_NULL && !PHALCON_IS_BOOL(ofs_y) && Z_TYPE_PP(ofs_x) != IS_LONG) {
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_y);
 		convert_to_long(*ofs_y);
 	}
@@ -449,7 +449,7 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 
 	if (!ofs_x) {
 		tmp_offset_x = (int)(((tmp_image_width - tmp_width) / 2) + 0.5);
-	} else if (Z_TYPE_PP(ofs_x) == IS_BOOL && PHALCON_IS_TRUE(*ofs_x)) {
+	} else if (PHALCON_IS_TRUE(*ofs_x)) {
 		tmp_offset_x = tmp_image_width - tmp_width;
 	} else if (Z_TYPE_PP(ofs_x) == IS_LONG) {
 		if (Z_LVAL_PP(ofs_x) < 0) {
@@ -463,7 +463,7 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 
 	if (!ofs_y) {
 		tmp_offset_y = (int)(((tmp_image_height - tmp_height) / 2) + 0.5);
-	} else if (Z_TYPE_PP(ofs_x) == IS_BOOL && PHALCON_IS_TRUE(*ofs_y)) {
+	} else if (PHALCON_IS_TRUE(*ofs_y)) {
 		tmp_offset_y = tmp_image_height - tmp_height;
 	} else if (Z_TYPE_PP(ofs_y) == IS_LONG) {
 		if (Z_LVAL_PP(ofs_y) < 0) {

@@ -537,7 +537,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 		/** 
 		 * Boolean variables are represented as 'true'/'false'
 		 */
-		if (Z_TYPE_P(variable) == IS_BOOL) {
+		if (PHALCON_IS_BOOL(variable)) {
 			if (zend_is_true(variable)) {
 				RETURN_MM_STRING("true", 1);
 			} else {

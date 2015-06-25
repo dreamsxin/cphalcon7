@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addCss){
 		attributes = PHALCON_GLOBAL(z_null);
 	}
 	
-	if (Z_TYPE_P(local) == IS_BOOL) {
+	if (PHALCON_IS_BOOL(local)) {
 		collection_local = local;
 	} else {
 		collection_local = phalcon_fetch_nproperty_this(this_ptr, SL("_local"), PH_NOISY TSRMLS_CC);
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
 		attributes = PHALCON_GLOBAL(z_null);
 	}
 	
-	if (Z_TYPE_P(local) == IS_BOOL) {
+	if (PHALCON_IS_BOOL(local)) {
 		collection_local = local;
 	} else {
 		collection_local = phalcon_fetch_nproperty_this(this_ptr, SL("_local"), PH_NOISY TSRMLS_CC);

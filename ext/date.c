@@ -505,7 +505,7 @@ PHP_METHOD(Phalcon_Date, days){
 	if (!year) {
 		PHALCON_INIT_VAR(year);
 		ZVAL_FALSE(year);
-	} else if (Z_TYPE_P(year) == IS_BOOL && !zend_is_true(year)) {
+	} else if (PHALCON_IS_FALSE(year)) {
 		PHALCON_SEPARATE_PARAM(year);
 
 		PHALCON_INIT_VAR(tmp);
@@ -636,7 +636,7 @@ PHP_METHOD(Phalcon_Date, years){
 
 	phalcon_fetch_params(1, 0, 2, &start, &end);
 
-	if (!start || (Z_TYPE_P(start) == IS_BOOL && !zend_is_true(start))) {
+	if (!start || PHALCON_IS_FALSE(start)) {
 		if (start) {
 			PHALCON_SEPARATE_PARAM(start);
 		}
@@ -651,7 +651,7 @@ PHP_METHOD(Phalcon_Date, years){
 		s = phalcon_get_intval(start);
 	}
 
-	if (!end || (Z_TYPE_P(end) == IS_BOOL && !zend_is_true(end))) {
+	if (!end || PHALCON_IS_FALSE(end)) {
 		if (end) {
 			PHALCON_SEPARATE_PARAM(end);
 		}
@@ -1097,7 +1097,7 @@ PHP_METHOD(Phalcon_Date, unix2dos){
 	phalcon_fetch_params(1, 0, 1, &timestamp);
 
 	
-	if (!timestamp || (Z_TYPE_P(timestamp) == IS_BOOL && !zend_is_true(timestamp))) {
+	if (!timestamp || PHALCON_IS_FALSE(timestamp)) {
 		PHALCON_CALL_FUNCTION(&day, "getdate");
 	} else {
 		PHALCON_CALL_FUNCTION(&day, "getdate", timestamp);

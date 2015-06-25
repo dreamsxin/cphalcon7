@@ -104,9 +104,14 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
 		case IS_STRING:
 			return zend_symtable_update(ht, Z_STRVAL_P(key), Z_STRLEN_P(key)+1, (void**)&value, sizeof(zval*), NULL);
 
+		case IS_TRUE:
+			return zend_hash_index_update(ht, 1, (void*)&value, sizeof(zval*), NULL);
+
+		case IS_FALSE:
+			return zend_hash_index_update(ht, 0, (void*)&value, sizeof(zval*), NULL);
+
 		case IS_RESOURCE:
 		case IS_DOUBLE:
-		case IS_BOOL:
 		case IS_LONG:
 			return zend_hash_index_update(ht, ((Z_TYPE_P(key) == IS_DOUBLE) ? (ulong)Z_DVAL_P(key) : (ulong)Z_LVAL_P(key)), (void*)&value, sizeof(zval*), NULL);
 
@@ -142,8 +147,17 @@ zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
 			/* no break */
 		case IS_LONG:
 		case IS_DOUBLE:
-		case IS_BOOL: {
-			ulong index = (Z_TYPE_P(key) == IS_DOUBLE) ? ((long int)Z_DVAL_P(key)) : Z_LVAL_P(key);
+		case IS_TRUE:
+		case IS_FALSE: {
+			ulong index = 0;
+			if ((Z_TYPE_P(key) == IS_TRUE)) {
+				index = 1;
+			} else if ((Z_TYPE_P(key) == IS_FALSE)) {
+				index = 0;
+			} else {
+				index = (Z_TYPE_P(key) == IS_DOUBLE) ? ((long int)Z_DVAL_P(key)) : Z_LVAL_P(key);
+			}
+
 			if (FAILURE == zend_hash_index_find(ht, index, (void**)&ret)) {
 				switch (type) {
 					case BP_VAR_R:
@@ -215,9 +229,14 @@ zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
 int phalcon_hash_unset(HashTable *ht, const zval *key)
 {
 	switch (Z_TYPE_P(key)) {
+		case IS_TRUE:
+			return (zend_hash_index_del(ht, 1) == SUCCESS);
+
+		case IS_FALSE:
+			return (zend_hash_index_del(ht, 0) == SUCCESS);
+
 		case IS_LONG:
 		case IS_DOUBLE:
-		case IS_BOOL:
 		case IS_RESOURCE:
 			return (zend_hash_index_del(ht, (Z_TYPE_P(key) == IS_DOUBLE) ? ((long int)Z_DVAL_P(key)) : Z_LVAL_P(key)) == SUCCESS);
 
@@ -257,7 +276,14 @@ zval** phalcon_hash_fast_get(HashTable *ht, int type, const zend_literal* key)
 		case IS_LONG:
 		case IS_DOUBLE:
 		case IS_BOOL: {
-			ulong index = (Z_TYPE(key->constant) == IS_DOUBLE) ? ((long int)Z_DVAL(key->constant)) : Z_LVAL(key->constant);
+			ulong index = 0;
+			if (Z_TYPE(key->constant) == IS_TRUE) {
+				index = 1;
+			} else if (Z_TYPE(key->constant) == IS_FALSE) {
+				index = 0;
+			} else {
+				index = (Z_TYPE(key->constant) == IS_DOUBLE) ? ((long int)Z_DVAL(key->constant)) : Z_LVAL(key->constant);
+			}
 			if (FAILURE == zend_hash_index_find(ht, index, (void**)&ret)) {
 				switch (type) {
 					case BP_VAR_R:
@@ -350,9 +376,14 @@ int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zend_l
 
 			return zend_hash_quick_update(ht, Z_STRVAL(key->constant), Z_STRLEN(key->constant)+1, key->hash_value, (void**)&value, sizeof(zval*), NULL);
 
+		case IS_TRUE:
+			return zend_hash_index_update(ht, 1, (void*)&value, sizeof(zval*), NULL);
+
+		case IS_FALSE:
+			return zend_hash_index_update(ht, 0, (void*)&value, sizeof(zval*), NULL);
+
 		case IS_RESOURCE:
 		case IS_DOUBLE:
-		case IS_BOOL:
 		case IS_LONG:
 			return zend_hash_index_update(ht, ((Z_TYPE(key->constant) == IS_DOUBLE) ? (ulong)Z_DVAL(key->constant) : (ulong)Z_LVAL(key->constant)), (void*)&value, sizeof(zval*), NULL);
 
@@ -371,9 +402,14 @@ int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zend_l
 int phalcon_hash_fast_unset(HashTable *ht, const zend_literal *key)
 {
 	switch (Z_TYPE(key->constant)) {
+		case IS_TRUE:
+			return (zend_hash_index_del(ht, 1) == SUCCESS);
+
+		case IS_FALSE:
+			return (zend_hash_index_del(ht, 0) == SUCCESS);
+
 		case IS_LONG:
 		case IS_DOUBLE:
-		case IS_BOOL:
 		case IS_RESOURCE:
 			return (zend_hash_index_del(ht, (Z_TYPE(key->constant) == IS_DOUBLE) ? ((ulong)Z_DVAL(key->constant)) : (ulong)Z_LVAL(key->constant)) == SUCCESS);
 

@@ -132,66 +132,6 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
   Z_TYPE_P(z) = Z_TYPE_P(v);
 #endif
 
-#if PHP_VERSION_ID < 50600
-/**
- * Return zval checking if it's needed to ctor
- */
-#define RETURN_CCTOR(var) { \
-		*(return_value) = *(var); \
-		if (Z_TYPE_P(var) > IS_BOOL) { \
-			phalcon_copy_ctor(return_value, var); \
-		} \
-		INIT_PZVAL(return_value) \
-	} \
-	PHALCON_MM_RESTORE(); \
-	return;
-
-/**
- * Return zval checking if it's needed to ctor, without restoring the memory stack
- */
-#define RETURN_CCTORW(var) { \
-		*(return_value) = *(var); \
-		if (Z_TYPE_P(var) > IS_BOOL) { \
-			phalcon_copy_ctor(return_value, var); \
-		} \
-		INIT_PZVAL(return_value) \
-	} \
-	return;
-
-/**
- * Return zval with always ctor
- */
-#define RETURN_CTOR(var) { \
-		RETVAL_ZVAL(var, 1, 0); \
-	} \
-	PHALCON_MM_RESTORE(); \
-	return;
-
-/**
- * Return zval with always ctor, without restoring the memory stack
- */
-#define RETURN_CTORW(var) { \
-		RETVAL_ZVAL(var, 1, 0); \
-	} \
-	return;
-
-/**
- * Return this pointer
- */
-#define RETURN_THIS() { \
-		RETVAL_ZVAL(this_ptr, 1, 0); \
-	} \
-	PHALCON_MM_RESTORE(); \
-	return;
-
-/**
- * Return zval with always ctor, without restoring the memory stack
- */
-#define RETURN_THISW() \
-	RETURN_ZVAL(this_ptr, 1, 0);
-
-#else
-
 /** Return zval checking if it's needed to ctor */
 #define RETURN_CCTOR(var) { \
 		RETVAL_ZVAL_FAST(var); \
@@ -228,8 +168,6 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
 /** Return zval with always ctor, without restoring the memory stack */
 #define RETURN_THISW() \
 	RETURN_ZVAL_FAST(this_ptr);
-
-#endif
 
 /**
  * Returns variables without ctor

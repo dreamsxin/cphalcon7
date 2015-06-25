@@ -611,7 +611,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
 
 		PHALCON_SCONCAT(return_value, output);
-	} else if (Z_TYPE_P(variable) == IS_BOOL) {
+	} else if (PHALCON_IS_BOOL(variable)) {
 		PHALCON_INIT_NVAR(str);
 		ZVAL_STRING(str, "<b style=':style'>Boolean</b> (<span style=':style'>:var</span>)", 1);
 

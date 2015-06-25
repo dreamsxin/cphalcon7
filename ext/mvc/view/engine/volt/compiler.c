@@ -3648,7 +3648,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 
 			PHALCON_OBS_NVAR(compile_always);
 			phalcon_array_fetch_string(&compile_always, options, SL("compileAlways"), PH_NOISY);
-			if (Z_TYPE_P(compile_always) != IS_BOOL) {
+			if (!PHALCON_IS_BOOL(compile_always)) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "compileAlways must be a bool value");
 				return;
 			}

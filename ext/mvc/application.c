@@ -289,7 +289,7 @@ static int phalcon_mvc_application_fire_event(zval *mgr, const char *event, zval
 			return FAILURE;
 		}
 
-		return (Z_TYPE_P(status) == IS_BOOL && !Z_BVAL_P(status)) ? FAILURE : SUCCESS;
+		return zend_is_true(status) ? SUCCESS : FAILURE;
 	}
 
 	return SUCCESS;
@@ -521,7 +521,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);
 
-			if (Z_TYPE_P(possible_response) == IS_BOOL && !zend_is_true(possible_response)) {
+			if (PHALCON_IS_FALSE(possible_response)) {
 				RETURN_CCTOR(response);
 			}
 

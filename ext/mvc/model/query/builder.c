@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, distinct){
 
 	phalcon_fetch_params_ex(1, 0, &distinct);
 
-	if (Z_TYPE_PP(distinct) != IS_NULL && Z_TYPE_PP(distinct) != IS_BOOL) {
+	if (Z_TYPE_PP(distinct) != IS_NULL && !PHALCON_IS_BOOL(*distinct)) {
 		PHALCON_ENSURE_IS_BOOL(distinct);
 	}
 
@@ -1466,7 +1466,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	PHALCON_INIT_VAR(phql);
 
 	distinct = phalcon_fetch_nproperty_this(this_ptr, SL("_distinct"), PH_NOISY TSRMLS_CC);
-	if (Z_TYPE_P(distinct) == IS_BOOL) {
+	if (PHALCON_IS_BOOL(distinct)) {
 		if (Z_BVAL_P(distinct)) {
 			ZVAL_STRING(phql, "SELECT DISTINCT ", 1);
 		}

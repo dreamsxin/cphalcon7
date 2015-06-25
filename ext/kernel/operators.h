@@ -31,12 +31,12 @@
 #define PHALCON_IS_DOUBLE_IDENTICAL(op1, op2) (Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) == op2)
 #define PHALCON_IS_STRING_IDENTICAL(op1, op2) (Z_TYPE_P(op1) == IS_STRING && phalcon_compare_strict_string(op1, op2, strlen(op2)))
 /** strict boolean comparison */
-#define PHALCON_IS_FALSE(var)       (Z_TYPE_P(var) == IS_BOOL && !Z_BVAL_P(var))
-#define PHALCON_IS_TRUE(var)        (Z_TYPE_P(var) == IS_BOOL && Z_BVAL_P(var))
+#define PHALCON_IS_FALSE(var)       (Z_TYPE_P(var) == IS_FALSE)
+#define PHALCON_IS_TRUE(var)        (Z_TYPE_P(var) == IS_TRUE)
 
-#define PHALCON_IS_NOT_FALSE(var)   (Z_TYPE_P(var) != IS_BOOL || (Z_TYPE_P(var) == IS_BOOL && Z_BVAL_P(var)))
-#define PHALCON_IS_NOT_TRUE(var)    (Z_TYPE_P(var) != IS_BOOL || (Z_TYPE_P(var) == IS_BOOL && !Z_BVAL_P(var)))
-#define PHALCON_IS_BOOL(op1, op2)   ((Z_TYPE_P(op1) == IS_BOOL && Z_BVAL_P(op1) == op2) || phalcon_compare_strict_bool(op1, op2 TSRMLS_CC))
+#define PHALCON_IS_NOT_FALSE(var)   (Z_TYPE_P(var) != IS_FALSE)
+#define PHALCON_IS_NOT_TRUE(var)    (Z_TYPE_P(var) != IS_TRUE)
+#define PHALCON_IS_BOOL(var)        (Z_TYPE_P(var) == IS_FALSE || Z_TYPE_P(var) == IS_TRUE)
 
 /** SQL null empty **/
 #define PHALCON_IS_EMPTY(var)       (Z_TYPE_P(var) == IS_NULL || (Z_TYPE_P(var) == IS_STRING && !Z_STRLEN_P(var)))
@@ -114,7 +114,7 @@ zend_bool phalcon_get_boolval_ex(const zval *op);
 #define phalcon_get_numberval(z) (Z_TYPE_P(z) == IS_LONG ? Z_LVAL_P(z) : phalcon_get_doubleval(z))
 #define phalcon_get_intval(z) (Z_TYPE_P(z) == IS_LONG ? Z_LVAL_P(z) : phalcon_get_intval_ex(z))
 #define phalcon_get_doubleval(z) (Z_TYPE_P(z) == IS_DOUBLE ? Z_DVAL_P(z) : phalcon_get_doubleval_ex(z))
-#define phalcon_get_boolval(z) (Z_TYPE_P(z) == IS_BOOL ? Z_BVAL_P(z) : phalcon_get_boolval_ex(z))int phalcon_is_numeric_ex(const zval *op);
+#define phalcon_get_boolval(z) (zend_is_true(z) ? 1 : 0);
 
 int phalcon_is_numeric_ex(const zval *op);
 

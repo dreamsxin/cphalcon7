@@ -5192,7 +5192,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 			object_init_ex(exception, phalcon_mvc_model_validationfailed_ce);
 			PHALCON_CALL_METHOD(NULL, exception, "__construct", this_ptr, error_messages);
 
-			phalcon_throw_exception(exception TSRMLS_CC);
+			phalcon_throw_exception(exception);
 			RETURN_MM();
 		}
 

@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 		object_init_ex(exception, phalcon_mvc_dispatcher_exception_ce);
 		PHALCON_CALL_METHOD(NULL, exception, "__construct", exception_message, exception_code);
 
-		phalcon_throw_exception(exception TSRMLS_CC);
+		phalcon_throw_exception(exception);
 		RETURN_MM();
 	}
 
@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	/**
 	 * Throw the exception if it wasn't handled
 	 */
-	phalcon_throw_exception(exception TSRMLS_CC);
+	phalcon_throw_exception(exception);
 	RETURN_MM();
 }
 

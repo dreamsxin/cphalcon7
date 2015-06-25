@@ -921,7 +921,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			}
 			else {
 				/* Exception was not handled, rethrow it */
-				phalcon_throw_exception(exception TSRMLS_CC);
+				phalcon_throw_exception(exception);
 				RETURN_MM();
 			}
 		} else {

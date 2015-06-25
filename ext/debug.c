@@ -1377,7 +1377,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 
 	PHALCON_CALL_METHOD(NULL, exception, "__construct", message, PHALCON_GLOBAL(z_zero), severity, file, line, previous);
 
-	zend_throw_exception_object(exception TSRMLS_CC);
+	zend_throw_exception_object(exception);
 
 	RETURN_MM_TRUE;
 }
@@ -1410,7 +1410,7 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
 
 		PHALCON_CALL_METHOD(NULL, exception, "__construct", message, PHALCON_GLOBAL(z_zero), type, file, line);
 
-		zend_throw_exception_object(exception TSRMLS_CC);
+		zend_throw_exception_object(exception);
 	}
 
 	RETURN_MM_TRUE;

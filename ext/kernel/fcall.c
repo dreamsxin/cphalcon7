@@ -522,7 +522,7 @@ int phalcon_call_zval_func_aparams(zval **return_value_ptr, zval *func_name, uin
 	status = phalcon_call_user_function(NULL, NULL, phalcon_fcall_function, func_name, rvp, param_count, params TSRMLS_CC);
 
 	if (status == FAILURE && !EG(exception)) {
-		phalcon_throw_exception_format(spl_ce_RuntimeException TSRMLS_CC, "Call to undefined function %s()", Z_TYPE_P(func_name) ? Z_STRVAL_P(func_name) : "undefined");
+		phalcon_throw_exception_format(spl_ce_RuntimeException, "Call to undefined function %s()", Z_TYPE_P(func_name) ? Z_STRVAL_P(func_name) : "undefined");
 		if (return_value_ptr) {
 			*return_value_ptr = NULL;
 		}
@@ -558,7 +558,7 @@ int phalcon_call_class_method_aparams(zval **return_value_ptr, zend_class_entry 
 
 	if (object) {
 		if (Z_TYPE_P(object) != IS_OBJECT) {
-			phalcon_throw_exception_format(spl_ce_RuntimeException TSRMLS_CC, "Trying to call method %s on a non-object", method_name);
+			phalcon_throw_exception_format(spl_ce_RuntimeException, "Trying to call method %s on a non-object", method_name);
 			if (return_value_ptr) {
 				*return_value_ptr = NULL;
 			}
@@ -672,11 +672,11 @@ int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *p
 /**
  * Latest version of zend_throw_exception_internal
  */
-void phalcon_throw_exception_internal(zval *exception TSRMLS_DC)
+void phalcon_throw_exception_internal(zval *exception)
 {
 	if (exception != NULL) {
 		zval *previous = EG(exception);
-		zend_exception_set_previous(exception, EG(exception) TSRMLS_CC);
+		zend_exception_set_previous(exception, EG(exception));
 		EG(exception) = exception;
 		if (previous) {
 			return;
@@ -685,13 +685,13 @@ void phalcon_throw_exception_internal(zval *exception TSRMLS_DC)
 
 	if (!EG(current_execute_data)) {
 		if (EG(exception)) {
-			zend_exception_error(EG(exception), E_ERROR TSRMLS_CC);
+			zend_exception_error(EG(exception), E_ERROR);
 		}
 		zend_error(E_ERROR, "Exception thrown without a stack frame");
 	}
 
 	if (zend_throw_exception_hook) {
-		zend_throw_exception_hook(exception TSRMLS_CC);
+		zend_throw_exception_hook(exception);
 	}
 
 	if (EG(current_execute_data)->opline == NULL ||
@@ -986,7 +986,7 @@ int phalcon_call_function(zend_fcall_info *fci, zend_fcall_info_cache *fci_cache
 	EG(current_execute_data) = EX(prev_execute_data);
 
 	if (EG(exception)) {
-		phalcon_throw_exception_internal(NULL TSRMLS_CC);
+		phalcon_throw_exception_internal(NULL);
 	}
 	return SUCCESS;
 }
@@ -998,11 +998,11 @@ int phalcon_call_function(zend_fcall_info *fci, zend_fcall_info_cache *fci_cache
 /**
  * Latest version of zend_throw_exception_internal
  */
-static void phalcon_throw_exception_internal(zval *exception TSRMLS_DC)
+static void phalcon_throw_exception_internal(zval *exception)
 {
 	if (exception != NULL) {
 		zval *previous = EG(exception);
-		zend_exception_set_previous(exception, EG(exception) TSRMLS_CC);
+		zend_exception_set_previous(exception, EG(exception));
 		EG(exception) = exception;
 		if (previous) {
 			return;
@@ -1011,13 +1011,13 @@ static void phalcon_throw_exception_internal(zval *exception TSRMLS_DC)
 
 	if (!EG(current_execute_data)) {
 		if (EG(exception)) {
-			zend_exception_error(EG(exception), E_ERROR TSRMLS_CC);
+			zend_exception_error(EG(exception), E_ERROR);
 		}
 		zend_error(E_ERROR, "Exception thrown without a stack frame");
 	}
 
 	if (zend_throw_exception_hook) {
-		zend_throw_exception_hook(exception TSRMLS_CC);
+		zend_throw_exception_hook(exception);
 	}
 
 	if (EG(current_execute_data)->opline == NULL ||
@@ -1776,7 +1776,7 @@ int phalcon_call_function(zend_fcall_info *fci, zend_fcall_info_cache *fci_cache
 	EG(current_execute_data) = EX(prev_execute_data);
 
 	if (EG(exception)) {
-		phalcon_throw_exception_internal(NULL TSRMLS_CC);
+		phalcon_throw_exception_internal(NULL);
 	}
 	return SUCCESS;
 }

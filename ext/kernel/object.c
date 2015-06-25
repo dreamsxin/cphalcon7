@@ -1677,7 +1677,7 @@ int phalcon_create_instance(zval *return_value, const zval *class_name TSRMLS_DC
 	zend_class_entry *ce;
 
 	if (unlikely(Z_TYPE_P(class_name) != IS_STRING)) {
-		phalcon_throw_exception_string(phalcon_exception_ce, "Invalid class name" TSRMLS_CC);
+		phalcon_throw_exception_string(phalcon_exception_ce, "Invalid class name");
 		return FAILURE;
 	}
 
@@ -1697,7 +1697,7 @@ int phalcon_create_instance_params(zval *return_value, const zval *class_name, z
 	zend_class_entry *ce;
 
 	if (unlikely(Z_TYPE_P(class_name) != IS_STRING)) {
-		phalcon_throw_exception_string(phalcon_exception_ce, "Invalid class name" TSRMLS_CC);
+		phalcon_throw_exception_string(phalcon_exception_ce, "Invalid class name");
 		return FAILURE;
 	}
 

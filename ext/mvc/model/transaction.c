@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 		object_init_ex(i0, phalcon_mvc_model_transaction_failed_ce);
 		PHALCON_CALL_METHOD(NULL, i0, "__construct", rollback_message, rollback_record);
 	
-		phalcon_throw_exception(i0 TSRMLS_CC);
+		phalcon_throw_exception(i0);
 		RETURN_MM();
 	}
 	

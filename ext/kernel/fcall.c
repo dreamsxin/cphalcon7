@@ -1128,7 +1128,7 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 		}
 		/* Check if function with given name exists.
 		 * This may be a compound name that includes namespace name */
-		if (zend_hash_find(EG(function_table), lmname, mlen+1, (void**)&fcc->function_handler) == SUCCESS) {
+		if ((fcc->function_handler = zend_hash_str_find(EG(function_table), lmname, mlen+1)) != NULL) {
 			efree(lmname);
 			return 1;
 		}
@@ -1191,14 +1191,14 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 		if (fcc->function_handler) {
 			retval = 1;
 		}
-	} else if (zend_hash_find(ftable, lmname, mlen+1, (void**)&fcc->function_handler) == SUCCESS) {
+	} else if ((fcc->function_handler = zend_hash_str_find(ftable, lmname, mlen+1)) != NULL) {
 		retval = 1;
 		if ((fcc->function_handler->op_array.fn_flags & ZEND_ACC_CHANGED) &&
 			!strict_class && EG(scope) &&
 			instanceof_function(fcc->function_handler->common.scope, EG(scope) TSRMLS_CC)) {
 			zend_function *priv_fbc;
 
-			if (zend_hash_find(&EG(scope)->function_table, lmname, mlen+1, (void **) &priv_fbc)==SUCCESS
+			if ((priv_fbc = zend_hash_str_find(&EG(scope)->function_table, lmname, mlen+1)) != NULL
 				&& priv_fbc->common.fn_flags & ZEND_ACC_PRIVATE
 				&& priv_fbc->common.scope == EG(scope)) {
 				fcc->function_handler = priv_fbc;

@@ -612,7 +612,7 @@ static PHP_METHOD(Phalcon_Registry, __unset)
  */
 static PHP_METHOD(Phalcon_Registry, __call)
 {
-	zval **name, **arguments, **callback;
+	zval **name, **arguments, *callback;
 	phalcon_registry_object *obj;
 
 	phalcon_fetch_params_ex(2, 0, &name, &arguments);
@@ -620,8 +620,8 @@ static PHP_METHOD(Phalcon_Registry, __call)
 
 	obj = phalcon_registry_get_object(getThis() TSRMLS_CC);
 
-	if (zend_hash_find(Z_ARRVAL_P(obj->properties), Z_STRVAL_PP(name), Z_STRLEN_PP(name)+1, (void**)&callback) == SUCCESS) {
-		RETURN_ON_FAILURE(phalcon_call_user_func_array(return_value, *callback, *arguments TSRMLS_CC));
+	if ((callback = zend_hash_str_find(Z_ARRVAL_P(obj->properties), Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1)) != NULL) {
+		RETURN_ON_FAILURE(phalcon_call_user_func_array(return_value, callback, *arguments TSRMLS_CC));
 	}
 	else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_PP(name));

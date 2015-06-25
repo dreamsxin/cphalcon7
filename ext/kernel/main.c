@@ -103,10 +103,10 @@ zval* phalcon_get_global(const char *global, unsigned int global_length TSRMLS_D
 	}
 
 	if (&EG(symbol_table)) {
-		zval **gv;
-		if (zend_hash_find(&EG(symbol_table), global, global_length, (void **) &gv) == SUCCESS) {
-			if (gv && *gv && Z_TYPE_PP(gv) == IS_ARRAY) {
-				return *gv;
+		zval *gv;
+		if ((gv = zend_hash_str_find(&EG(symbol_table), global, global_length)) != NULL) {
+			if (gv && Z_TYPE_P(gv) == IS_ARRAY) {
+				return gv;
 			}
 		}
 	}

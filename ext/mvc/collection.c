@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 		 */
 		PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", this_ptr);
 		if (zend_is_true(use_implicit_ids)) {
-			ce0 = zend_fetch_class(SL("MongoId"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+			ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 			PHALCON_INIT_VAR(mongo_id);
 			object_init_ex(mongo_id, ce0);
 			if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
@@ -419,7 +419,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 			 */
 			PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", this_ptr);
 			if (zend_is_true(use_implicit_ids)) {
-				ce0 = zend_fetch_class(SL("MongoId"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+				ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 				PHALCON_INIT_NVAR(mongo_id);
 				object_init_ex(mongo_id, ce0);
 				if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
@@ -1956,7 +1956,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findById){
 		 */
 		PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", collection);
 		if (zend_is_true(use_implicit_ids)) {
-			ce1 = zend_fetch_class(SL("MongoId"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+			ce1 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 			PHALCON_INIT_VAR(mongo_id);
 			object_init_ex(mongo_id, ce1);
 			if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
@@ -2041,7 +2041,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 			 */
 			PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", collection);
 			if (zend_is_true(use_implicit_ids)) {
-				ce1 = zend_fetch_class(SL("MongoId"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+				ce1 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 				PHALCON_INIT_VAR(mongo_id);
 				object_init_ex(mongo_id, ce1);
 				if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
@@ -2920,7 +2920,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 	PHALCON_CALL_SELF(&collection_manager, "getcollectionmanager");
 	PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", this_ptr);
 
-	ce0 = zend_fetch_class(SL("MongoId"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+	ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 
 	phalcon_is_iterable(conditions, &ah0, &hp0, 0, 0);
 

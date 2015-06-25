@@ -373,7 +373,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 	PHALCON_MM_GROW();
 
-	ce0 = zend_fetch_class(SL("DOMDocument"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+	ce0 = zend_fetch_class(SSL("DOMDocument"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_INIT_VAR(document);
 	object_init_ex(document, ce0);

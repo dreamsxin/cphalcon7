@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 				return;
 			}
 	
-			ce0 = zend_fetch_class(SL("MongoClient"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+			ce0 = zend_fetch_class(SSL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
 	
 			PHALCON_INIT_VAR(mongo);
 			object_init_ex(mongo, ce0);
@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 	if (prefix && zend_is_true(prefix)) {
 		PHALCON_INIT_VAR(pattern);
 		PHALCON_CONCAT_SVS(pattern, "/^", prefix, "/");
-		ce0 = zend_fetch_class(SL("MongoRegex"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+		ce0 = zend_fetch_class(SSL("MongoRegex"), ZEND_FETCH_CLASS_AUTO);
 	
 		PHALCON_INIT_VAR(regex);
 		object_init_ex(regex, ce0);

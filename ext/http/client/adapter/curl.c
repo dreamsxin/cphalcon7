@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 				PHALCON_GET_HVALUE(file);
 
 				if (PHALCON_IS_NOT_EMPTY(file)) {
-					curlfile_ce = zend_fetch_class(SL("CURLFile"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+					curlfile_ce = zend_fetch_class(SSL("CURLFile"), ZEND_FETCH_CLASS_AUTO);
 
 					PHALCON_INIT_NVAR(tmp);
 					object_init_ex(tmp, curlfile_ce);

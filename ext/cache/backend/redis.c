@@ -178,7 +178,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 	PHALCON_MM_GROW();
 
 	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
-	ce0 = zend_fetch_class(SL("Redis"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+	ce0 = zend_fetch_class(SSL("Redis"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_INIT_VAR(redis);
 	object_init_ex(redis, ce0);

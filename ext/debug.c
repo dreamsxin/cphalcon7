@@ -772,7 +772,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		PHALCON_OBS_VAR(class_name);
 		phalcon_array_fetch_string(&class_name, trace, SL("class"), PH_NOISY);
 
-		class_ce = zend_fetch_class(Z_STRVAL_P(class_name), Z_STRLEN_P(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
+		class_ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT);
 
 		if (!class_ce) {
 			/* Unable to load the class, should never happen */

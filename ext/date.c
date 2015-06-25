@@ -204,8 +204,8 @@ PHP_METHOD(Phalcon_Date, offset){
 
 	phalcon_fetch_params(1, 1, 2, &remote, &local, &now);
 
-	ce0 = zend_fetch_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
-	ce1 = zend_fetch_class(SL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+	ce0 = zend_fetch_class(SSL("DateTime"), ZEND_FETCH_CLASS_AUTO);
+	ce1 = zend_fetch_class(SSL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
 
 	if (!local) {
 		PHALCON_CALL_FUNCTION(&local, "date_default_timezone_get");
@@ -1203,8 +1203,8 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 
 	phalcon_fetch_params(1, 0, 3, &datetime_str, &timestamp_format, &timezone);
 
-	ce0 = zend_fetch_class(SL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
-	ce1 = zend_fetch_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+	ce0 = zend_fetch_class(SSL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
+	ce1 = zend_fetch_class(SSL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
 	if (!datetime_str) {
 		PHALCON_INIT_VAR(datetime_str);

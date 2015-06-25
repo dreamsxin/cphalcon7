@@ -494,23 +494,23 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 zend_class_entry *phalcon_fetch_class(const zval *class_name TSRMLS_DC) {
 
 	if (Z_TYPE_P(class_name) == IS_STRING) {
-		return zend_fetch_class(Z_STRVAL_P(class_name), Z_STRLEN_P(class_name), ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+		return zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_DEFAULT);
 	}
 
 	php_error_docref(NULL TSRMLS_CC, E_WARNING, "class name must be a string");
-	return zend_fetch_class("stdclass", strlen("stdclass"), ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+	return zend_fetch_class(SSL("stdclass"), ZEND_FETCH_CLASS_DEFAULT);
 }
 
 zend_class_entry* phalcon_fetch_self_class(TSRMLS_D) {
-	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_SELF TSRMLS_CC);
+	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_SELF);
 }
 
 zend_class_entry* phalcon_fetch_parent_class(TSRMLS_D) {
-	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_PARENT TSRMLS_CC);
+	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_PARENT);
 }
 
 zend_class_entry* phalcon_fetch_static_class(TSRMLS_D) {
-	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_STATIC TSRMLS_CC);
+	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_STATIC);
 }
 
 /**
@@ -1551,7 +1551,7 @@ int phalcon_method_exists_ex(const zval *object, const char *method_name, uint32
 	if (likely(Z_TYPE_P(object) == IS_OBJECT)) {
 		ce = Z_OBJCE_P(object);
 	} else if (Z_TYPE_P(object) == IS_STRING) {
-		ce = zend_fetch_class(Z_STRVAL_P(object), Z_STRLEN_P(object), ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+		ce = zend_fetch_class(Z_STR_P(object), ZEND_FETCH_CLASS_DEFAULT);
 	} else {
 		return FAILURE;
 	}
@@ -1607,7 +1607,7 @@ int phalcon_read_class_property(zval **result, int type, const char *property, u
 
 	type |= (ZEND_FETCH_CLASS_SILENT | ZEND_FETCH_CLASS_NO_AUTOLOAD);
 	type &= ZEND_FETCH_CLASS_MASK;
-	ce    = zend_fetch_class(NULL, 0, type TSRMLS_CC);
+	ce    = zend_fetch_class(NULL, 0, type);
 
 	if (likely(ce != NULL)) {
 		return phalcon_read_static_property_ce(result, ce, property, len TSRMLS_CC);
@@ -1674,7 +1674,7 @@ int phalcon_create_instance(zval *return_value, const zval *class_name TSRMLS_DC
 		return FAILURE;
 	}
 
-	ce = zend_fetch_class(Z_STRVAL_P(class_name), Z_STRLEN_P(class_name), ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+	ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_DEFAULT);
 	if (!ce) {
 		return FAILURE;
 	}
@@ -1694,7 +1694,7 @@ int phalcon_create_instance_params(zval *return_value, const zval *class_name, z
 		return FAILURE;
 	}
 
-	ce = zend_fetch_class(Z_STRVAL_P(class_name), Z_STRLEN_P(class_name), ZEND_FETCH_CLASS_DEFAULT TSRMLS_CC);
+	ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_DEFAULT);
 	if (!ce) {
 		return FAILURE;
 	}

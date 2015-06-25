@@ -423,7 +423,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 	}
 
 	if (phalcon_class_exists(SL("imagick"), 0 TSRMLS_CC)) {
-		imagick_ce = zend_fetch_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+		imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
 		PHALCON_INIT_VAR(image);
 		object_init_ex(image, imagick_ce);

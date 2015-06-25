@@ -132,8 +132,8 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 		font_size  = phalcon_fetch_nproperty_this(this_ptr, SL("_fontSize"), PH_NOISY TSRMLS_CC);
 	}
 
-	imagick_ce = zend_fetch_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
-	draw_ce = zend_fetch_class(SL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
+	draw_ce = zend_fetch_class(SSL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_INIT_VAR(imagick);
 	object_init_ex(imagick, imagick_ce);
@@ -279,8 +279,8 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	imagick = phalcon_fetch_nproperty_this(this_ptr, SL("_imagick"), PH_NOISY TSRMLS_CC);
 	draw = phalcon_fetch_nproperty_this(this_ptr, SL("_draw"), PH_NOISY TSRMLS_CC);
 
-	imagick_ce = zend_fetch_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
-	imagickpixel_ce = zend_fetch_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO TSRMLS_CC);
+	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
+	imagickpixel_ce = zend_fetch_class(SSL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_INIT_VAR(imagickpixel);
 	object_init_ex(imagickpixel, imagickpixel_ce);

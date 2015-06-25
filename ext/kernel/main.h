@@ -49,6 +49,8 @@
 #define SS(str)   ZEND_STRS(str)
 #define ISL(str)  (phalcon_interned_##str), (sizeof(#str)-1)
 #define ISS(str)  (phalcon_interned_##str), (sizeof(#str))
+#define SSL(str)   zend_string_init(SL(str), 0)
+#define SSS(str)   zend_string_init(SS(str), 0)
 
 /* str_erealloc is PHP 5.6 only */
 #ifndef str_erealloc

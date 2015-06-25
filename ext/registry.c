@@ -215,23 +215,6 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
 	return result;
 }
 
-
-#if PHP_VERSION_ID < 50500
-
-/**
- * @brief Create pointer to the property of the object, for future direct r/w access
- * @param object Object
- * @param member Property
- * @return Pointer to @a member
- */
-static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, void **cache_slot)
-{
-	phalcon_registry_object *obj = phalcon_registry_get_object(object);
-	return phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, BP_VAR_W);
-}
-
-#else
-
 /**
  * @brief Create pointer to the property @a member of @a object, for future direct r/w access (<tt>&__get()</tt>)
  * @param object Object
@@ -240,17 +223,12 @@ static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, 
  * @param key Literal key
  * @return Pointer to @a member
  */
-static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, int type, const zend_literal* key TSRMLS_DC)
+static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
 {
 	phalcon_registry_object *obj = phalcon_registry_get_object(object TSRMLS_CC);
-	if (key) {
-		return phalcon_hash_fast_get(Z_ARRVAL_P(obj->properties), type, key);
-	}
 
 	return phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, type);
 }
-
-#endif
 
 /**
  * @brief Fetch property @a member from @a object, read-only (<tt>__get()</tt>)

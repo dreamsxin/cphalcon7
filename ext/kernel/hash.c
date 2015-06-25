@@ -249,7 +249,6 @@ int phalcon_hash_unset(HashTable *ht, const zval *key)
 	}
 }
 
-#if PHP_VERSION_ID >= 50400
 /**
  * @brief Returns the entry @a ht identified by @a key (<tt>key->constant</tt>)
  * @param[in] ht Hash table
@@ -265,7 +264,7 @@ int phalcon_hash_unset(HashTable *ht, const zval *key)
  * @note The implementation is suitable for @c read_property, @c get_property_ptr_ptr and @c read_dimension object handlers
  * @warning If @a type is @c BP_VAR_W or @c BP_VAR_RW and the key was not found, it is added to @a ht and its value is set to @c IS_NULL
  */
-zval** phalcon_hash_fast_get(HashTable *ht, int type, const zend_literal* key)
+zval** phalcon_hash_fast_get(HashTable *ht, int type, const zval *key)
 {
 	zval **ret = NULL;
 
@@ -362,7 +361,7 @@ zval** phalcon_hash_fast_get(HashTable *ht, int type, const zend_literal* key)
  * @note If <tt>key->constant</tt> is @c IS_NULL, @a value is appended to @a ht
  * @throw E_WARNING if @a key type is not supported
  */
-int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zend_literal *key)
+int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zval *key)
 {
 	if (Z_TYPE(key->constant) == IS_NULL) {
 		return zend_hash_next_index_insert(ht, (void**)&value, sizeof(zval*), NULL);
@@ -399,7 +398,7 @@ int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zend_l
  * @param key
  * @return
  */
-int phalcon_hash_fast_unset(HashTable *ht, const zend_literal *key)
+int phalcon_hash_fast_unset(HashTable *ht, const zval *key)
 {
 	switch (Z_TYPE(key->constant)) {
 		case IS_TRUE:
@@ -425,5 +424,3 @@ int phalcon_hash_fast_unset(HashTable *ht, const zend_literal *key)
 			return 0;
 	}
 }
-
-#endif

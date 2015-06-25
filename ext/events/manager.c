@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
 	PHALCON_VERIFY_CLASS_EX(event, phalcon_events_event_ce, phalcon_events_exception_ce, 0);
 
-	weakref_ce = zend_lookup_class_ex(SL("WeakRef"), 0));
+	weakref_ce = zend_lookup_class_ex(zend_string_init(SL("WeakRef"), 0), NULL, 0));
 
 	PHALCON_MM_GROW();
 

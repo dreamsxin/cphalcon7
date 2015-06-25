@@ -1033,7 +1033,7 @@ static void phalcon_throw_exception_internal(zval *exception TSRMLS_DC)
 static int phalcon_is_callable_check_class(const char *name, int name_len, zend_fcall_info_cache *fcc, int *strict_class, char **error TSRMLS_DC) /* {{{ */
 {
 	int ret = 0;
-	zend_class_entry **pce;
+	zend_class_entry *pce;
 	char *lcname = zend_str_tolower_dup(name, name_len);
 
 	*strict_class = 0;
@@ -1077,10 +1077,10 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 			*strict_class = 1;
 			ret = 1;
 		}
-	} else if (zend_lookup_class_ex(name, name_len, NULL, 1, &pce TSRMLS_CC) == SUCCESS) {
+	} else if ((pce = zend_lookup_class(zend_string_init(name, name_len, 0))) != NULL) {
 		zend_class_entry *scope = EG(active_op_array) ? EG(active_op_array)->scope : NULL;
 
-		fcc->calling_scope = *pce;
+		fcc->calling_scope = pce;
 		if (scope && !fcc->object_ptr && EG(This) &&
 			instanceof_function(Z_OBJCE_P(EG(This)), scope) &&
 			instanceof_function(scope, fcc->calling_scope)) {

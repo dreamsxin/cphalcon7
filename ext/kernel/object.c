@@ -418,15 +418,15 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access TSRMLS
 void phalcon_get_class_methods(zval *return_value, zval *object, int check_access TSRMLS_DC) {
 
 	zval *method_name;
-	zend_class_entry *ce = NULL, **pce;
+	zend_class_entry *ce = NULL, *pce;
 	HashPosition pos;
 	zend_function *mptr;
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		ce = Z_OBJCE_P(object);
 	} else if (Z_TYPE_P(object) == IS_STRING) {
-		if (zend_lookup_class(Z_STRVAL_P(object), Z_STRLEN_P(object), &pce TSRMLS_CC) == SUCCESS) {
-			ce = *pce;
+		if ((pce = zend_lookup_class(Z_STR_P(object))) != NULL) {
+			ce = pce;
 		}
 	}
 
@@ -518,14 +518,10 @@ zend_class_entry* phalcon_fetch_static_class(TSRMLS_D) {
  */
 int phalcon_class_exists(const char *class_name, uint32_t class_len, int autoload TSRMLS_DC) {
 
-	zend_class_entry **ce;
+	zend_class_entry *ce;
 
-	if (zend_lookup_class(class_name, class_len, &ce TSRMLS_CC) == SUCCESS) {
-#if PHP_VERSION_ID < 50400
-		return (((*ce)->ce_flags & ZEND_ACC_INTERFACE) == 0);
-#else
-		return ((*ce)->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0;
-#endif
+	if ((ce = zend_lookup_class(zend_string_init(class_name, class_len, 0))) != NULL) {
+		return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0;
 	}
 
 	return 0;
@@ -533,16 +529,12 @@ int phalcon_class_exists(const char *class_name, uint32_t class_len, int autoloa
 
 int phalcon_class_exists_ex(zend_class_entry **zce, const zval *class_name, int autoload TSRMLS_DC) {
 
-	zend_class_entry **ce;
+	zend_class_entry *ce;
 
 	if (Z_TYPE_P(class_name) == IS_STRING) {
-		if (zend_lookup_class(Z_STRVAL_P(class_name), Z_STRLEN_P(class_name), &ce TSRMLS_CC) == SUCCESS) {
-			*zce = *ce;
-#if PHP_VERSION_ID < 50400
-			return (((*ce)->ce_flags & ZEND_ACC_INTERFACE) == 0);
-#else
+		if ((ce = zend_lookup_class(Z_STR_P(class_name))) != NULL) {
+			*zce = ce;
 			return ((*ce)->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0;
-#endif
 		}
 		return 0;
 	}
@@ -556,11 +548,11 @@ int phalcon_class_exists_ex(zend_class_entry **zce, const zval *class_name, int 
  */
 int phalcon_interface_exists(const zval *class_name, int autoload TSRMLS_DC) {
 
-	zend_class_entry **ce;
+	zend_class_entry *ce;
 
 	if (Z_TYPE_P(class_name) == IS_STRING) {
-		if (zend_lookup_class(Z_STRVAL_P(class_name), Z_STRLEN_P(class_name), &ce TSRMLS_CC) == SUCCESS) {
-			return (((*ce)->ce_flags & ZEND_ACC_INTERFACE) > 0);
+		if ((ce = zend_lookup_class(Z_STR_P(class_name))) != NULL) {
+			return ((ce->ce_flags & ZEND_ACC_INTERFACE) > 0);
 		}
 		return 0;
 	}
@@ -1602,9 +1594,9 @@ int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_n
  * Query a static property value from a zend_class_entry
  */
 int phalcon_read_static_property(zval **result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length TSRMLS_DC){
-	zend_class_entry **ce;
-	if (zend_lookup_class(class_name, class_length, &ce TSRMLS_CC) == SUCCESS) {
-		return phalcon_read_static_property_ce(result, *ce, property_name, property_length TSRMLS_CC);
+	zend_class_entry *ce;
+	if ((ce = zend_lookup_class(zend_string_init(class_name, class_length, 0))) != NULL) {
+		return phalcon_read_static_property_ce(result, ce, property_name, property_length TSRMLS_CC);
 	}
 
 	return FAILURE;

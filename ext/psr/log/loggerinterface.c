@@ -20,6 +20,6 @@ PHALCON_INIT_CLASS(Psr_Log_LoggerInterface)
 	zend_class_entry ce;
 	INIT_CLASS_ENTRY(ce, "Psr\\Log\\LoggerInterface", fe_psr_log_loggerinterface);
 
-	psr_log_loggerinterface_ce = zend_register_internal_interface(&ce TSRMLS_CC);
+	psr_log_loggerinterface_ce = zend_register_internal_interface(&ce);
 	return (EXPECTED(psr_log_loggerinterface_ce != NULL)) ? SUCCESS : FAILURE;
 }

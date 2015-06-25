@@ -42,17 +42,17 @@ zend_class_entry *phalcon_translate_adapter_gettext_ce;
 
 static zend_object_handlers phalcon_translate_adapter_gettext_object_handlers;
 
-static zval* phalcon_translate_adapter_gettext_read_dimension(zval *object, zval *offset, int type TSRMLS_DC)
+static zval* phalcon_translate_adapter_gettext_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
 	zval *translation = NULL, *params[1];
 	uint32_t result;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type TSRMLS_CC);
+		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
 	}
 
 	params[0] = offset;
-	result = phalcon_call_func_aparams(&translation, SL("gettext"), 1, params TSRMLS_CC);
+	result = phalcon_call_func_aparams(&translation, SL("gettext"), 1, params);
 
 	if (result) {
 		MAKE_STD_ZVAL(translation);

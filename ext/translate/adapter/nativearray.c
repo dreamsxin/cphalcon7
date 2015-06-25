@@ -42,15 +42,15 @@ zend_class_entry *phalcon_translate_adapter_nativearray_ce;
 
 static zend_object_handlers phalcon_translate_adapter_nativearray_object_handlers;
 
-static zval* phalcon_translate_adapter_nativearray_read_dimension(zval *object, zval *offset, int type TSRMLS_DC)
+static zval* phalcon_translate_adapter_nativearray_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
 	zval *translate, *translation;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type TSRMLS_CC);
+		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
 	}
 
-	translate = phalcon_fetch_nproperty_this(object, SL("_translate"), PH_NOISY TSRMLS_CC);
+	translate = phalcon_fetch_nproperty_this(object, SL("_translate"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&translation, translate, offset)) {
 		return translation;
 	}

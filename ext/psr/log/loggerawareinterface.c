@@ -32,6 +32,6 @@ PHALCON_INIT_CLASS(Psr_Log_LoggerAwareInterface)
 	zend_class_entry ce;
 	INIT_CLASS_ENTRY(ce, "Psr\\Log\\LoggerAwareInterface", fe_psr_log_loggerawareinterface);
 
-	psr_log_loggerawareinterface_ce = zend_register_internal_interface(&ce TSRMLS_CC);
+	psr_log_loggerawareinterface_ce = zend_register_internal_interface(&ce);
 	return (EXPECTED(psr_log_loggerawareinterface_ce != NULL)) ? SUCCESS : FAILURE;
 }

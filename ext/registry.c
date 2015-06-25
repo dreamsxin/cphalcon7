@@ -147,7 +147,7 @@ static PHP_FUNCTION(phalcon_registry_method_handler)
 	efree(((zend_internal_function*)EG(current_execute_data)->function_state.function));
 }
 
-static union _zend_function* phalcon_registry_get_method(zval **object_ptr, char *method, int method_len ZLK_DC TSRMLS_DC)
+static union _zend_function* phalcon_registry_get_method(zval **object_ptr, zend_string *method, const zval *key)
 {
 	zend_function *fbc;
 	char *lc_method_name         = emalloc(method_len + 1);
@@ -224,9 +224,9 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
  * @param member Property
  * @return Pointer to @a member
  */
-static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member ZLK_DC TSRMLS_DC)
+static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, void **cache_slot)
 {
-	phalcon_registry_object *obj = phalcon_registry_get_object(object TSRMLS_CC);
+	phalcon_registry_object *obj = phalcon_registry_get_object(object);
 	return phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, BP_VAR_W);
 }
 
@@ -260,20 +260,12 @@ static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, 
  * @param key Literal key
  * @return <tt>$object->$member</tt>
  */
-static zval* phalcon_registry_read_property(zval *object, zval *member, int type ZLK_DC TSRMLS_DC)
+static zval* phalcon_registry_read_property(zval *object, zval *member, int type, void **cache_slot, zval *rv)
 {
 	zval **result;
 	phalcon_registry_object *obj = phalcon_registry_get_object(object TSRMLS_CC);
 
-#if PHP_VERSION_ID >= 50400
-	if (key) {
-		result = phalcon_hash_fast_get(Z_ARRVAL_P(obj->properties), type, key);
-	}
-	else
-#endif
-	{
-		result = phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, type);
-	}
+	result = phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, type);
 
 	return result ? *result : NULL;
 }
@@ -286,20 +278,13 @@ static zval* phalcon_registry_read_property(zval *object, zval *member, int type
  * @param type Access type
  * @param key Literal key
  */
-static void phalcon_registry_write_property(zval *object, zval *member, zval *value ZLK_DC TSRMLS_DC)
+static void phalcon_registry_write_property(zval *object, zval *member, zval *value, void **cache_slot)
 {
-	phalcon_registry_object *obj = phalcon_registry_get_object(object TSRMLS_CC);
+	phalcon_registry_object *obj = phalcon_registry_get_object(object);
 
 	Z_ADDREF_P(value);
-#if PHP_VERSION_ID >= 50400
-	if (key) {
-		phalcon_hash_quick_update_or_insert(Z_ARRVAL_P(obj->properties), value, key);
-	}
-	else
-#endif
-	{
-		phalcon_hash_update_or_insert(Z_ARRVAL_P(obj->properties), member, value);
-	}
+
+	phalcon_hash_update_or_insert(Z_ARRVAL_P(obj->properties), member, value);
 }
 
 /**
@@ -308,19 +293,11 @@ static void phalcon_registry_write_property(zval *object, zval *member, zval *va
  * @param member Property
  * @param key Literal key
  */
-static void phalcon_registry_unset_property(zval *object, zval *member ZLK_DC TSRMLS_DC)
+static void phalcon_registry_unset_property(zval *object, zval *member, void **cache_slot)
 {
 	phalcon_registry_object *obj = phalcon_registry_get_object(object TSRMLS_CC);
 
-#if PHP_VERSION_ID >= 50400
-	if (key) {
-		phalcon_hash_fast_unset(Z_ARRVAL_P(obj->properties), key);
-	}
-	else
-#endif
-	{
-		phalcon_hash_unset(Z_ARRVAL_P(obj->properties), member);
-	}
+	phalcon_hash_fast_unset(Z_ARRVAL_P(obj->properties), key);
 }
 
 /**
@@ -331,20 +308,12 @@ static void phalcon_registry_unset_property(zval *object, zval *member ZLK_DC TS
  * @param key Literal key
  * @return Whether the property exists
  */
-static int phalcon_registry_has_property(zval *object, zval *member, int has_set_exists ZLK_DC TSRMLS_DC)
+static int phalcon_registry_has_property(zval *object, zval *member, int has_set_exists, void **cache_slot)
 {
 	phalcon_registry_object *obj = phalcon_registry_get_object(object TSRMLS_CC);
 	zval **tmp;
 
-#if PHP_VERSION_ID >= 50400
-	if (key) {
-		tmp = phalcon_hash_fast_get(Z_ARRVAL_P(obj->properties), BP_VAR_NA, key);
-	}
-	else
-#endif
-	{
-		tmp = phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, BP_VAR_NA);
-	}
+	tmp = phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, BP_VAR_NA);
 
 	if (!tmp) {
 		return 0;
@@ -364,7 +333,7 @@ static int phalcon_registry_has_property(zval *object, zval *member, int has_set
 /**
  * @brief Fetch dimension @a offset from @a object, read-only
  */
-static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int type TSRMLS_DC)
+static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
 	zval **ret;
 	phalcon_registry_object *obj;
@@ -399,22 +368,22 @@ static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int typ
 /**
  * @brief Set dimension @a offset of @a object
  */
-static void phalcon_registry_write_dimension(zval *object, zval *offset, zval *value TSRMLS_DC)
+static void phalcon_registry_write_dimension(zval *object, zval *offset, zval *value)
 {
-	phalcon_registry_write_property(object, offset, value ZLK_NULL_CC TSRMLS_CC);
+	phalcon_registry_write_property(object, offset, value, NULL);
 }
 
 /**
  * @brief Check if a dimension @a offset of the @a object exists
  */
-static int phalcon_registry_has_dimension(zval *object, zval *offset, int check_empty TSRMLS_DC)
+static int phalcon_registry_has_dimension(zval *object, zval *offset, int check_empty)
 {
-	return phalcon_registry_has_property(object, offset, check_empty ZLK_NULL_CC TSRMLS_CC);
+	return phalcon_registry_has_property(object, offset, check_empty, NULL);
 }
 
-static void phalcon_registry_unset_dimension(zval *object, zval *offset TSRMLS_DC)
+static void phalcon_registry_unset_dimension(zval *object, zval *offset)
 {
-	phalcon_registry_unset_property(object, offset ZLK_NULL_CC TSRMLS_CC);
+	phalcon_registry_unset_property(object, offset, NULL);
 }
 
 /**
@@ -635,7 +604,7 @@ static PHP_METHOD(Phalcon_Registry, __set)
 	zval **property, **value;
 
 	phalcon_fetch_params_ex(2, 0, &property, &value);
-	phalcon_registry_write_property(getThis(), *property, *value ZLK_NULL_CC TSRMLS_CC);
+	phalcon_registry_write_property(getThis(), *property, *value, NULL);
 }
 
 /**
@@ -646,7 +615,7 @@ static PHP_METHOD(Phalcon_Registry, __isset)
 	zval **property;
 
 	phalcon_fetch_params_ex(1, 0, &property);
-	phalcon_registry_has_property(getThis(), *property, 0 ZLK_NULL_CC TSRMLS_CC);
+	phalcon_registry_has_property(getThis(), *property, 0, NULL);
 }
 
 /**
@@ -657,7 +626,7 @@ static PHP_METHOD(Phalcon_Registry, __unset)
 	zval **property;
 
 	phalcon_fetch_params_ex(1, 0, &property);
-	phalcon_registry_unset_property(getThis(), *property ZLK_NULL_CC TSRMLS_CC);
+	phalcon_registry_unset_property(getThis(), *property, NULL);
 }
 
 /**
@@ -721,7 +690,7 @@ static PHP_METHOD(Phalcon_Registry, offsetSet)
 	zval **offset, **value;
 
 	phalcon_fetch_params_ex(2, 0, &offset, &value);
-	phalcon_registry_write_dimension(getThis(), *offset, *value TSRMLS_CC);
+	phalcon_registry_write_dimension(getThis(), *offset, *value);
 }
 
 /**

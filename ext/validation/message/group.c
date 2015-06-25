@@ -198,12 +198,12 @@ static zend_object_iterator* phalcon_validation_message_group_get_iterator(zend_
 	return result;
 }
 
-static zval* phalcon_validation_message_group_read_dimension(zval *object, zval *offset, int type TSRMLS_DC)
+static zval* phalcon_validation_message_group_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
 	zval *messages;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type TSRMLS_CC);
+		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
 	}
 
 	if (UNEXPECTED(!offset)) {
@@ -219,13 +219,13 @@ static zval* phalcon_validation_message_group_read_dimension(zval *object, zval 
 	return NULL;
 }
 
-static void phalcon_validation_message_group_write_dimension(zval *object, zval *offset, zval *value TSRMLS_DC)
+static void phalcon_validation_message_group_write_dimension(zval *object, zval *offset, zval *value)
 {
 	zval *messages;
 	int separate;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->write_dimension(object, offset, value TSRMLS_CC);
+		zend_get_std_object_handlers()->write_dimension(object, offset, value);
 		return;
 	}
 
@@ -244,19 +244,19 @@ static void phalcon_validation_message_group_write_dimension(zval *object, zval 
 	phalcon_hash_update_or_insert(Z_ARRVAL_P(messages), offset, value);
 	if (separate) {
 		Z_DELREF_P(messages);
-		phalcon_update_property_this(object, SL("_messages"), messages TSRMLS_CC);
+		phalcon_update_property_this(object, SL("_messages"), messages);
 	}
 }
 
-static int phalcon_validation_message_group_has_dimension(zval *object, zval *offset, int check_empty TSRMLS_DC)
+static int phalcon_validation_message_group_has_dimension(zval *object, zval *offset, int check_empty)
 {
 	zval *messages;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty TSRMLS_CC);
+		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty);
 	}
 
-	messages = phalcon_fetch_nproperty_this(object, SL("_messages"), PH_NOISY TSRMLS_CC);
+	messages = phalcon_fetch_nproperty_this(object, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_ARRAY) {
 		zval **tmp = phalcon_hash_get(Z_ARRVAL_P(messages), offset, BP_VAR_NA);
 
@@ -278,17 +278,17 @@ static int phalcon_validation_message_group_has_dimension(zval *object, zval *of
 	return 0;
 }
 
-static void phalcon_validation_message_group_unset_dimension(zval *object, zval *offset TSRMLS_DC)
+static void phalcon_validation_message_group_unset_dimension(zval *object, zval *offset)
 {
 	zval *messages;
 	int separate;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->unset_dimension(object, offset TSRMLS_CC);
+		zend_get_std_object_handlers()->unset_dimension(object, offset);
 		return;
 	}
 
-	messages = phalcon_fetch_nproperty_this(object, SL("_messages"), PH_NOISY TSRMLS_CC);
+	messages = phalcon_fetch_nproperty_this(object, SL("_messages"), PH_NOISY);
 
 	SEPARATE_ZVAL(messages);
 
@@ -302,7 +302,7 @@ static void phalcon_validation_message_group_unset_dimension(zval *object, zval 
 
 	if (separate) {
 		Z_DELREF_P(messages);
-		phalcon_update_property_this(object, SL("_messages"), messages TSRMLS_CC);
+		phalcon_update_property_this(object, SL("_messages"), messages);
 	}
 }
 
@@ -411,7 +411,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, offsetSet){
 	zval **index, **message;
 
 	phalcon_fetch_params_ex(2, 0, &index, &message);
-	phalcon_validation_message_group_write_dimension(getThis(), *index, *message TSRMLS_CC);
+	phalcon_validation_message_group_write_dimension(getThis(), *index, *message);
 }
 
 /**

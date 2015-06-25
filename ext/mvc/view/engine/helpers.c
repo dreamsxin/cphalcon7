@@ -26,5 +26,5 @@ zend_bool phalcon_mvc_view_engine_php_symtable_merger(HashTable *ht, void *pData
 	TSRMLS_FETCH_FROM_CTX(pParam);
 #endif
 
-	return hash_key->arKey && hash_key->nKeyLength && !zend_hash_quick_exists(CG(auto_globals), hash_key->arKey, hash_key->nKeyLength, hash_key->h);
+	return hash_key->arKey && hash_key->nKeyLength && !zend_hash_str_exists(CG(auto_globals), hash_key->arKey, hash_key->nKeyLength);
 }

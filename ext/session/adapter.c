@@ -187,72 +187,57 @@ static void phalcon_session_adapter_unset_property_internal(zval *object, zval *
 	}
 }
 
-#if PHP_VERSION_ID < 50500
-
-static zval** phalcon_session_adapter_get_property_ptr_ptr(zval *object, zval *member ZLK_DC TSRMLS_DC)
+static zval** phalcon_session_adapter_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
 {
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->get_property_ptr_ptr(object, member ZLK_CC TSRMLS_CC);
+		return zend_get_std_object_handlers()->get_property_ptr_ptr(object, member, type, cache_slot);
 	}
 
-	return phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, BP_VAR_W TSRMLS_CC);
+	return phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, type);
 }
 
-#else
-
-static zval** phalcon_session_adapter_get_property_ptr_ptr(zval *object, zval *member, int type ZLK_DC TSRMLS_DC)
+static int phalcon_session_adapter_has_property(zval *object, zval *member, int has_set_exists, void **cache_slot)
 {
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->get_property_ptr_ptr(object, member, type ZLK_CC TSRMLS_CC);
+		return zend_get_std_object_handlers()->has_property(object, member, has_set_exists, cache_slot);
 	}
 
-	return phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, type TSRMLS_CC);
+	return phalcon_session_adapter_has_property_internal(object, member, has_set_exists);
 }
 
-#endif
-
-static int phalcon_session_adapter_has_property(zval *object, zval *member, int has_set_exists ZLK_DC TSRMLS_DC)
+static void phalcon_session_adapter_write_property(zval *object, zval *member, zval *value, void **cache_slot)
 {
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_property(object, member, has_set_exists ZLK_CC TSRMLS_CC);
-	}
-
-	return phalcon_session_adapter_has_property_internal(object, member, has_set_exists TSRMLS_CC);
-}
-
-static void phalcon_session_adapter_write_property(zval *object, zval *member, zval *value ZLK_DC TSRMLS_DC)
-{
-	if (!is_phalcon_class(Z_OBJCE_P(object)) || phalcon_isset_property_zval(object, member TSRMLS_CC)) {
-		zend_get_std_object_handlers()->write_property(object, member, value ZLK_CC TSRMLS_CC);
+	if (!is_phalcon_class(Z_OBJCE_P(object)) || phalcon_isset_property_zval(object, member)) {
+		zend_get_std_object_handlers()->write_property(object, member, value, cache_slot);
 	}
 	else {
-		phalcon_session_adapter_write_property_internal(object, member, value TSRMLS_CC);
+		phalcon_session_adapter_write_property_internal(object, member, value);
 	}
 }
 
-static void phalcon_session_adapter_unset_property(zval *object, zval *member ZLK_DC TSRMLS_DC)
+static void phalcon_session_adapter_unset_property(zval *object, zval *member, void **cache_slot)
 {
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->unset_property(object, member ZLK_CC TSRMLS_CC);
+		zend_get_std_object_handlers()->unset_property(object, member, cache_slot);
 	}
 	else {
 		phalcon_session_adapter_unset_property_internal(object, member TSRMLS_CC);
 	}
 }
 
-static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, int type TSRMLS_DC)
+static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
 	zval **ret;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type TSRMLS_CC);
+		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
 	}
 
 	if (UNEXPECTED(!offset)) {
 		return EG(uninitialized_zval_ptr);
 	}
 
-	ret = phalcon_session_adapter_get_property_ptr_ptr_internal(object, offset, type TSRMLS_CC);
+	ret = phalcon_session_adapter_get_property_ptr_ptr_internal(object, offset, type);
 
 	/* For write context we need to return a reference */
 	if ((type == BP_VAR_W || type == BP_VAR_RW || type == BP_VAR_UNSET) && !Z_ISREF_PP(ret)) {
@@ -274,10 +259,10 @@ static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, 
 	return *ret;
 }
 
-static void phalcon_session_adapter_write_dimension(zval *object, zval *offset, zval *value TSRMLS_DC)
+static void phalcon_session_adapter_write_dimension(zval *object, zval *offset, zval *value)
 {
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->write_dimension(object, offset, value TSRMLS_CC);
+		zend_get_std_object_handlers()->write_dimension(object, offset, value);
 		return;
 	}
 
@@ -285,18 +270,18 @@ static void phalcon_session_adapter_write_dimension(zval *object, zval *offset, 
 		offset = PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_session_adapter_write_property_internal(object, offset, value TSRMLS_CC);
+	phalcon_session_adapter_write_property_internal(object, offset, value);
 }
 
-static int phalcon_session_adapter_has_dimension(zval *object, zval *member, int check_empty TSRMLS_DC)
+static int phalcon_session_adapter_has_dimension(zval *object, zval *member, int check_empty)
 {
 	zval **tmp;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_dimension(object, member, check_empty TSRMLS_CC);
+		return zend_get_std_object_handlers()->has_dimension(object, member, check_empty);
 	}
 
-	tmp = phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, BP_VAR_NA TSRMLS_CC);
+	tmp = phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, BP_VAR_NA);
 
 	if (!tmp) {
 		return 0;
@@ -313,14 +298,14 @@ static int phalcon_session_adapter_has_dimension(zval *object, zval *member, int
 	return 1;
 }
 
-static void phalcon_session_adapter_unset_dimension(zval *object, zval *offset TSRMLS_DC)
+static void phalcon_session_adapter_unset_dimension(zval *object, zval *offset)
 {
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->unset_dimension(object, offset TSRMLS_CC);
+		zend_get_std_object_handlers()->unset_dimension(object, offset);
 		return;
 	}
 
-	phalcon_session_adapter_unset_property_internal(object, offset TSRMLS_CC);
+	phalcon_session_adapter_unset_property_internal(object, offset);
 }
 
 static int phalcon_session_adapter_count_elements(zval *object, long *count TSRMLS_DC)

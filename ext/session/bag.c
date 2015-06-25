@@ -200,17 +200,8 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 
 	name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY TSRMLS_CC);
 
-	/*if (!nusphere_dbg_present) {
-#if PHP_VERSION_ID < 50500
-		data = Z_OBJ_HANDLER_P(session, get_property_ptr_ptr)(session, name ZLK_NULL_CC TSRMLS_CC);
-#else
-		data = Z_OBJ_HANDLER_P(session, get_property_ptr_ptr)(session, name, BP_VAR_W ZLK_NULL_CC TSRMLS_CC);
-#endif
-	}
-	else {*/
-		PHALCON_CALL_METHOD(&tmp, session, "__get", name);
-		data = &tmp;
-	//}
+	PHALCON_CALL_METHOD(&tmp, session, "__get", name);
+	data = &tmp;
 
 	if (Z_TYPE_PP(data) != IS_ARRAY) {
 		zval *empty_array;
@@ -242,12 +233,7 @@ PHP_METHOD(Phalcon_Session_Bag, destroy){
 	name    = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY TSRMLS_CC);
 	session = phalcon_fetch_nproperty_this(this_ptr, SL("_session"), PH_NOISY TSRMLS_CC);
 
-	/*if (!nusphere_dbg_present) {
-		Z_OBJ_HANDLER_P(session, unset_property)(session, name ZLK_NULL_CC TSRMLS_CC);
-	}
-	else {*/
-		PHALCON_CALL_METHODW(NULL, session, "__unset", name);
-	//}
+	PHALCON_CALL_METHODW(NULL, session, "__unset", name);
 }
 
 /**
@@ -274,12 +260,7 @@ PHP_METHOD(Phalcon_Session_Bag, set){
 	data    = phalcon_fetch_nproperty_this(this_ptr, SL("_data"), PH_NOISY TSRMLS_CC);
 	session = phalcon_fetch_nproperty_this(this_ptr, SL("_session"), PH_NOISY TSRMLS_CC);
 
-	/*if (!nusphere_dbg_present) {
-		Z_OBJ_HANDLER_P(session, write_property)(session, name, data ZLK_NULL_CC TSRMLS_CC);
-	}
-	else {*/
-		PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
-	//}
+	PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
 }
 
 /**
@@ -367,12 +348,8 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 		name    = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY TSRMLS_CC);
 		data    = phalcon_fetch_nproperty_this(this_ptr, SL("_data"), PH_NOISY TSRMLS_CC);
 		session = phalcon_fetch_nproperty_this(this_ptr, SL("_session"), PH_NOISY TSRMLS_CC);
-		/*if (!nusphere_dbg_present) {
-			Z_OBJ_HANDLER_P(session, write_property)(session, name, data ZLK_NULL_CC TSRMLS_CC);
-		}
-		else {*/
-			PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
-		//}
+
+		PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
 	}
 
 	Z_ADDREF_PP(return_value_ptr);
@@ -441,12 +418,7 @@ PHP_METHOD(Phalcon_Session_Bag, remove){
 		name    = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY TSRMLS_CC);
 		session = phalcon_fetch_nproperty_this(this_ptr, SL("_session"), PH_NOISY TSRMLS_CC);
 
-		/*if (!nusphere_dbg_present) {
-			Z_OBJ_HANDLER_P(session, write_property)(session, name, data ZLK_NULL_CC TSRMLS_CC);
-		}
-		else {*/
-			PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
-		//}
+		PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
 
 		RETURN_TRUE;
 	}

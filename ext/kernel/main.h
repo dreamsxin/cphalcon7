@@ -57,30 +57,13 @@
 
 /* Startup functions */
 void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals TSRMLS_DC);
-zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_ce, zend_class_entry *parent_ce TSRMLS_DC);
+zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_ce, zend_class_entry *parent_ce);
 
 /* Globals functions */
 zval* phalcon_get_global(const char *global, unsigned int global_length TSRMLS_DC);
 
 int phalcon_is_callable(zval *var TSRMLS_DC);
-int phalcon_function_quick_exists_ex(const char *func_name, unsigned int func_len, unsigned long key TSRMLS_DC);
-
-/**
- * Check if a function exists using explicit char param
- *
- * @param function_name
- * @param function_len strlen(function_name)+1
- */
-PHALCON_ATTR_NONNULL static inline int phalcon_function_exists_ex(const char *function_name, unsigned int function_len TSRMLS_DC)
-{
-#ifdef __GNUC__
-	if (__builtin_constant_p(function_name) && __builtin_constant_p(function_len)) {
-		return phalcon_function_quick_exists_ex(function_name, function_len, zend_inline_hash_func(function_name, function_len) TSRMLS_CC);
-	}
-#endif
-
-	return phalcon_function_quick_exists_ex(function_name, function_len, zend_hash_func(function_name, function_len) TSRMLS_CC);
-}
+int phalcon_function_exists_ex(const char *func_name, unsigned int func_len TSRMLS_DC);
 
 PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function_str(const char *function_name, unsigned int function_len TSRMLS_DC)
 {
@@ -332,7 +315,7 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
 		zend_class_entry ce; \
 		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #classname, methods); \
-		phalcon_ ##name## _ce = zend_register_internal_interface(&ce TSRMLS_CC); \
+		phalcon_ ##name## _ce = zend_register_internal_interface(&ce); \
 	}
 
 #define PHALCON_REGISTER_INTERFACE_EX(ns, classname, lcname, parent_ce, methods) \
@@ -340,7 +323,7 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
 		zend_class_entry ce; \
 		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #classname, methods); \
-		phalcon_ ##lcname## _ce = phalcon_register_internal_interface_ex(&ce, parent_ce TSRMLS_CC); \
+		phalcon_ ##lcname## _ce = phalcon_register_internal_interface_ex(&ce, parent_ce); \
 		if (!phalcon_ ##lcname## _ce) { \
 			fprintf(stderr, "Can't register interface %s with parent %s\n", ZEND_NS_NAME(#ns, #classname), (parent_ce ? parent_ce->name : "(null)")); \
 			return FAILURE; \

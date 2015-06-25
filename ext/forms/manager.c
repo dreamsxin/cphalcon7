@@ -73,7 +73,7 @@ static const zend_function_entry phalcon_forms_manager_method_entry[] = {
 
 static zend_object_handlers phalcon_forms_manager_object_handlers;
 
-static zval* phalcon_forms_manager_read_dimension(zval *object, zval *offset, int type TSRMLS_DC)
+static zval* phalcon_forms_manager_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
 	zval *forms, **res, tmp;
 

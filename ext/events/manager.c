@@ -419,7 +419,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 	HashTable *ah0;
 	HashPosition hp0;
 	zval **hd;
-	zend_class_entry **weakref_ce;
+	zend_class_entry *weakref_ce;
 
 	phalcon_fetch_params(0, 2, 0, &queue, &event);
 
@@ -442,9 +442,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
 	PHALCON_VERIFY_CLASS_EX(event, phalcon_events_event_ce, phalcon_events_exception_ce, 0);
 
-	if (FAILURE == zend_lookup_class_ex(SL("WeakRef") ZLK_NULL_CC, 0, &weakref_ce TSRMLS_CC)) {
-		weakref_ce = NULL;
-	}
+	weakref_ce = zend_lookup_class_ex(SL("WeakRef"), 0));
 
 	PHALCON_MM_GROW();
 

@@ -93,18 +93,15 @@ static PHP_FUNCTION(phalcon_di_method_handler)
 	efree(((zend_internal_function*)EG(current_execute_data)->function_state.function));
 }
 
-static union _zend_function* phalcon_di_get_method(zval **object_ptr, char *method, int method_len ZLK_DC TSRMLS_DC)
+static union _zend_function* phalcon_di_get_method(zval **object_ptr, zend_string *method, const zval *key)
 {
 	zend_function *fbc;
-	char *lc_method_name   = emalloc(method_len + 1);
 	phalcon_di_object *obj = phalcon_di_get_object(*object_ptr TSRMLS_CC);
 
-	zend_str_tolower_copy(lc_method_name, method, method_len);
-
 	if (
-		(fbc = zend_hash_str_find_ptr(&obj->obj.ce->function_table, lc_method_name, method_len+1)) == NULL
-		&& method_len > 3
-		&& (!memcmp(lc_method_name, "get", 3) || !memcmp(lc_method_name, "set", 3))
+		(fbc = zend_hash_find_ptr(&obj->obj.ce->function_table, method)) == NULL
+		&& method->len > 3
+		&& (!memcmp(method->val, "get", 3) || !memcmp(method->val, "set", 3))
 	) {
 		zend_internal_function *f = emalloc(sizeof(zend_internal_function));
 
@@ -252,13 +249,13 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	return *retval;
 }
 
-static zval* phalcon_di_read_dimension(zval *object, zval *offset, int type TSRMLS_DC)
+static zval* phalcon_di_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
 	phalcon_di_object *obj = phalcon_di_get_object(object TSRMLS_CC);
 	zval tmp, *ret;
 
 	if (!is_phalcon_class(obj->obj.ce)) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type TSRMLS_CC);
+		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
 	}
 
 	if (UNEXPECTED(Z_TYPE_P(offset) != IS_STRING)) {
@@ -267,7 +264,7 @@ static zval* phalcon_di_read_dimension(zval *object, zval *offset, int type TSRM
 		offset = &tmp;
 	}
 
-	ret = phalcon_di_read_dimension_internal(object, obj, offset, PHALCON_GLOBAL(z_null) TSRMLS_CC);
+	ret = phalcon_di_read_dimension_internal(object, obj, offset, PHALCON_GLOBAL(z_null));
 
 	if (UNEXPECTED(offset == &tmp)) {
 		phalcon_dtor(&tmp);
@@ -306,7 +303,7 @@ static int phalcon_di_has_dimension(zval *object, zval *offset, int check_empty 
 	return phalcon_di_has_dimension_internal(obj, offset, check_empty);
 }
 
-static zval* phalcon_di_write_dimension_internal(phalcon_di_object *obj, zval *offset, zval *value TSRMLS_DC)
+static zval* phalcon_di_write_dimension_internal(phalcon_di_object *obj, zval *offset, zval *value)
 {
 	zval *retval;
 	zval *params[] = { offset, value, PHALCON_GLOBAL(z_true) };
@@ -315,7 +312,7 @@ static zval* phalcon_di_write_dimension_internal(phalcon_di_object *obj, zval *o
 
 	MAKE_STD_ZVAL(retval);
 	object_init_ex(retval, phalcon_di_service_ce);
-	if (FAILURE == phalcon_call_method(NULL, retval, "__construct", 3, params TSRMLS_CC)) {
+	if (FAILURE == phalcon_call_method(NULL, retval, "__construct", 3, params)) {
 		return NULL;
 	}
 
@@ -323,13 +320,13 @@ static zval* phalcon_di_write_dimension_internal(phalcon_di_object *obj, zval *o
 	return retval;
 }
 
-static void phalcon_di_write_dimension(zval *object, zval *offset, zval *value TSRMLS_DC)
+static void phalcon_di_write_dimension(zval *object, zval *offset, zval *value)
 {
-	phalcon_di_object *obj = phalcon_di_get_object(object TSRMLS_CC);
+	phalcon_di_object *obj = phalcon_di_get_object(object);
 	zval tmp;
 
 	if (!is_phalcon_class(obj->obj.ce)) {
-		zend_get_std_object_handlers()->write_dimension(object, offset, value TSRMLS_CC);
+		zend_get_std_object_handlers()->write_dimension(object, offset, value);
 		return;
 	}
 
@@ -339,7 +336,7 @@ static void phalcon_di_write_dimension(zval *object, zval *offset, zval *value T
 		offset = &tmp;
 	}
 
-	phalcon_di_write_dimension_internal(obj, offset, value TSRMLS_CC);
+	phalcon_di_write_dimension_internal(obj, offset, value);
 
 	if (UNEXPECTED(offset == &tmp)) {
 		phalcon_dtor(&tmp);
@@ -677,8 +674,8 @@ PHP_METHOD(Phalcon_DI, setShared){
 	phalcon_fetch_params_ex(2, 0, &name, &definition);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	obj    = phalcon_di_get_object(getThis() TSRMLS_CC);
-	retval = phalcon_di_write_dimension_internal(obj, *name, *definition TSRMLS_CC);
+	obj    = phalcon_di_get_object(getThis());
+	retval = phalcon_di_write_dimension_internal(obj, *name, *definition);
 	RETURN_ZVAL(retval, 1, 0);
 }
 
@@ -922,7 +919,7 @@ PHP_METHOD(Phalcon_DI, getShared){
 
 	obj = phalcon_di_get_object(getThis() TSRMLS_CC);
 	
-	retval = phalcon_di_read_dimension_internal(getThis(), obj, *name, *parameters TSRMLS_CC);
+	retval = phalcon_di_read_dimension_internal(getThis(), obj, *name, *parameters);
 	if (retval) {
 		RETURN_ZVAL(retval, 1, 0);
 	}

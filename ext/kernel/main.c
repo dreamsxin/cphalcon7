@@ -63,19 +63,14 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals TSRMLS_DC) {
 	phalcon_globals->orm.enable_auto_convert = 1;
 
 	/* Security options */
-	phalcon_globals->security.crypt_std_des_supported  = zend_hash_quick_exists(constants, SS("CRYPT_STD_DES"),  zend_inline_hash_func(SS("CRYPT_STD_DES")));
-	phalcon_globals->security.crypt_ext_des_supported  = zend_hash_quick_exists(constants, SS("CRYPT_EXT_DES"),  zend_inline_hash_func(SS("CRYPT_EXT_DES")));
-	phalcon_globals->security.crypt_md5_supported      = zend_hash_quick_exists(constants, SS("CRYPT_MD5"),      zend_inline_hash_func(SS("CRYPT_MD5")));
-	phalcon_globals->security.crypt_blowfish_supported = zend_hash_quick_exists(constants, SS("CRYPT_BLOWFISH"), zend_inline_hash_func(SS("CRYPT_BLOWFISH")));
-	phalcon_globals->security.crypt_sha256_supported   = zend_hash_quick_exists(constants, SS("CRYPT_SHA256"),   zend_inline_hash_func(SS("CRYPT_SHA256")));
-	phalcon_globals->security.crypt_sha512_supported   = zend_hash_quick_exists(constants, SS("CRYPT_SHA512"),   zend_inline_hash_func(SS("CRYPT_SHA512")));
+	phalcon_globals->security.crypt_std_des_supported  = zend_hash_str_exists(constants, SS("CRYPT_STD_DES"));
+	phalcon_globals->security.crypt_ext_des_supported  = zend_hash_str_exists(constants, SS("CRYPT_EXT_DES"));
+	phalcon_globals->security.crypt_md5_supported      = zend_hash_str_exists(constants, SS("CRYPT_MD5"));
+	phalcon_globals->security.crypt_blowfish_supported = zend_hash_str_exists(constants, SS("CRYPT_BLOWFISH"));
+	phalcon_globals->security.crypt_sha256_supported   = zend_hash_str_exists(constants, SS("CRYPT_SHA256"));
+	phalcon_globals->security.crypt_sha512_supported   = zend_hash_str_exists(constants, SS("CRYPT_SHA512"));
 
-	if (PHP_VERSION_ID >= 50307) {
-		phalcon_globals->security.crypt_blowfish_y_supported = phalcon_globals->security.crypt_blowfish_supported;
-	}
-	else {
-		phalcon_globals->security.crypt_blowfish_y_supported = 0;
-	}
+	phalcon_globals->security.crypt_blowfish_y_supported = phalcon_globals->security.crypt_blowfish_supported;
 
 	/* DB options */
 	phalcon_globals->db.escape_identifiers = 1;
@@ -84,13 +79,13 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals TSRMLS_DC) {
 /**
  * Initializes internal interface with extends
  */
-zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_ce, zend_class_entry *parent_ce TSRMLS_DC) {
+zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_ce, zend_class_entry *parent_ce) {
 
 	zend_class_entry *ce;
 
-	ce = zend_register_internal_interface(orig_ce TSRMLS_CC);
+	ce = zend_register_internal_interface(orig_ce);
 	if (parent_ce) {
-		zend_do_inheritance(ce, parent_ce TSRMLS_CC);
+		zend_do_inheritance(ce, parent_ce);
 	}
 
 	return ce;
@@ -262,9 +257,9 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 /**
  * Check if a function exists using explicit char param (using precomputed hash key)
  */
-int phalcon_function_quick_exists_ex(const char *method_name, unsigned int method_len, unsigned long key TSRMLS_DC) {
+int phalcon_function_exists_ex(const char *method_name, unsigned int method_len TSRMLS_DC) {
 
-	return (zend_hash_quick_exists(CG(function_table), method_name, method_len, key)) ? SUCCESS : FAILURE;
+	return (zend_hash_str_exists(CG(function_table), method_name, method_len)) ? SUCCESS : FAILURE;
 }
 
 /**

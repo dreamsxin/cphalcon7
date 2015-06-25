@@ -99,29 +99,7 @@ int ZEND_FASTCALL phalcon_array_isset_long(const zval *arr, ulong index) PHALCON
  * @retval 0 Not exists or @a arr is not an array
  * @retval 1 Exists
  */
-int ZEND_FASTCALL phalcon_array_isset_quick_string(const zval *arr, const char *index, uint index_length, ulong key) PHALCON_ATTR_NONNULL;
-
-/**
- * @brief Checks whether string @a index exists in array @a arr
- * @param arr Array
- * @param index Index
- * @param index_length <tt>strlen(index)+1</tt>
- * @return isset($arr[$index])
- * @retval 0 Not exists, @a arr is not an array
- * @retval 1 Exists
- * @note The function is a wrapper around phalcon_array_isset_quick_string()
- * @see phalcon_array_isset_quick_string()
- */
-PHALCON_ATTR_NONNULL static inline int phalcon_array_isset_string(const zval *arr, const char *index, uint index_length)
-{
-#ifdef __GNUC__
-	if (__builtin_constant_p(index) && __builtin_constant_p(index_length)) {
-		return phalcon_array_isset_quick_string(arr, index, index_length, zend_inline_hash_func(index, index_length));
-	}
-#endif
-
-	return phalcon_array_isset_quick_string(arr, index, index_length, zend_hash_func(index, index_length));
-}
+int ZEND_FASTCALL phalcon_array_isset_string(const zval *arr, const char *index, uint index_length) PHALCON_ATTR_NONNULL;
 
 /**
  * @brief Unsets @a index from array @a arr

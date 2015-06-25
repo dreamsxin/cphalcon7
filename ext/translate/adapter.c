@@ -58,41 +58,41 @@ static const zend_function_entry phalcon_translate_adapter_method_entry[] = {
 
 PHALCON_STATIC zend_object_handlers phalcon_translate_adapter_object_handlers;
 
-static zval* phalcon_translate_adapter_read_dimension(zval *object, zval *offset, int type TSRMLS_DC)
+static zval* phalcon_translate_adapter_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
 	zval *ret = NULL;
 	int status;
 	zval *params[] = { offset, PHALCON_GLOBAL(z_null) };
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type TSRMLS_CC);
+		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
 	}
 
-	status = phalcon_call_method(&ret, object, "query", 2, params TSRMLS_CC);
+	status = phalcon_call_method(&ret, object, "query", 2, params);
 	return UNEXPECTED(status == FAILURE) ? NULL : ret;
 }
 
-static void phalcon_translate_adapter_write_dimension(zval *object, zval *offset, zval *value TSRMLS_DC)
+static void phalcon_translate_adapter_write_dimension(zval *object, zval *offset, zval *value)
 {
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->write_dimension(object, offset, value TSRMLS_CC);
+		zend_get_std_object_handlers()->write_dimension(object, offset, value);
 		return;
 	}
 
-	zend_throw_exception_ex(phalcon_translate_exception_ce, 0 TSRMLS_CC, "'%s' is an immutable ArrayAccess object", "Phalcon\\Translate\\Adapter");
+	zend_throw_exception_ex(phalcon_translate_exception_ce, 0, "'%s' is an immutable ArrayAccess object", "Phalcon\\Translate\\Adapter");
 }
 
-static int phalcon_translate_adapter_has_dimension(zval *object, zval *offset, int check_empty TSRMLS_DC)
+static int phalcon_translate_adapter_has_dimension(zval *object, zval *offset, int check_empty)
 {
 	zval *exists = NULL;
 	int retval;
 	zval *params[] = { offset };
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty TSRMLS_CC);
+		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty);
 	}
 
-	if (FAILURE == phalcon_call_method(&exists, object, "exists", 1, params TSRMLS_CC)) {
+	if (FAILURE == phalcon_call_method(&exists, object, "exists", 1, params)) {
 		return 0;
 	}
 
@@ -101,10 +101,10 @@ static int phalcon_translate_adapter_has_dimension(zval *object, zval *offset, i
 	return retval;
 }
 
-static void phalcon_translate_adapter_unset_dimension(zval *object, zval *offset TSRMLS_DC)
+static void phalcon_translate_adapter_unset_dimension(zval *object, zval *offset)
 {
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->unset_dimension(object, offset TSRMLS_CC);
+		zend_get_std_object_handlers()->unset_dimension(object, offset);
 		return;
 	}
 

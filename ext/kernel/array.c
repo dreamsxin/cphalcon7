@@ -139,10 +139,10 @@ int ZEND_FASTCALL phalcon_array_isset(const zval *arr, const zval *index) {
 	}
 }
 
-int ZEND_FASTCALL phalcon_array_isset_quick_string(const zval *arr, const char *index, uint index_length, ulong key) {
+int ZEND_FASTCALL phalcon_array_isset_string(const zval *arr, const char *index, uint index_length) {
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-		return zend_hash_quick_exists(Z_ARRVAL_P(arr), index, index_length, key);
+		return zend_hash_str_exists(Z_ARRVAL_P(arr), index, index_length);
 	}
 
 	return 0;

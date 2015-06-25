@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 					 * Calls to Zend internal functions will have "file" index not set.
 					 * We remove these entries from the array.
 					 */
-					if (!found && !zend_hash_quick_exists(Z_ARRVAL_PP(ppzval), SS("file"), zend_inline_hash_func(SS("file")))) {
+					if (!found && !zend_hash_str_exists(Z_ARRVAL_PP(ppzval), SS("file"))) {
 						zend_hash_index_del(ht, idx);
 					}
 					else {

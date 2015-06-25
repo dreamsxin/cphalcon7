@@ -237,16 +237,6 @@ extern int nusphere_dbg_present;
 #	define __func__ __FUNCTION__
 #endif
 
-#if PHP_VERSION_ID > 50399
-#	define ZLK_DC , const struct _zend_literal* key
-#	define ZLK_CC , key
-#	define ZLK_NULL_CC , NULL
-#else
-#	define ZLK_DC
-#	define ZLK_CC
-#	define ZLK_NULL_CC
-#endif
-
 #define PHALCON_STATIC
 
 /* This is a temporary fix until config.w32 is updated */

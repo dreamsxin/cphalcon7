@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Image, factory){
 		height = PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_class_exists(SL("imagick"), 0 TSRMLS_CC)) {
+	if (phalcon_class_str_exists(SL("imagick"), 0) != NULL) {
 		object_init_ex(return_value, phalcon_image_adapter_imagick_ce);
 		PHALCON_CALL_METHOD(NULL, return_value, "__construct", file, width, height);
 	} else {

@@ -687,7 +687,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 * DI doesn't have a service with that name, try to load it using an autoloader
 			 */
 			assert(Z_TYPE_P(handler_class) == IS_STRING);
-			has = phalcon_class_exists(Z_STRVAL_P(handler_class), Z_STRLEN_P(handler_class), 1 TSRMLS_CC) ? 1 : 0;
+			has = (phalcon_class_exists(Z_STR_P(handler_class), 1) != NULL) ? 1 : 0;
 		} else {
 			has = zend_is_true(has_service) ? 1 : 0;
 		}

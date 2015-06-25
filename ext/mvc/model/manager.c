@@ -536,7 +536,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	/** 
 	 * Load it using an autoloader
 	 */
-	if (phalcon_class_exists_ex(&ce0, *model_name, 1 TSRMLS_CC)) {
+	if ((ce0 = phalcon_class_exists(*model_name, 1)) != NULL) {
 		dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
 
 		object_init_ex(return_value, ce0);

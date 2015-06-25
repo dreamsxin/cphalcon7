@@ -23,9 +23,10 @@
 #include "php_phalcon.h"
 
 /** Class Retrieving/Checking */
-int phalcon_class_exists(const char *class_name, uint32_t class_len, int autoload TSRMLS_DC) PHALCON_ATTR_NONNULL;
+zend_class_entry *phalcon_class_exists(const zval *class_name, int autoload) PHALCON_ATTR_NONNULL;
+zend_class_entry *phalcon_class_exists_ex(const zval *class_name, int autoload) PHALCON_ATTR_NONNULL;
+zend_class_entry *phalcon_class_str_exists(const char *class_name, uint32_t class_len, int autoload) PHALCON_ATTR_NONNULL;
 int phalcon_interface_exists(const zval *interface_name, int autoload TSRMLS_DC) PHALCON_ATTR_NONNULL;
-int phalcon_class_exists_ex(zend_class_entry **zce, const zval *class_name, int autoload TSRMLS_DC) PHALCON_ATTR_NONNULL;
 void phalcon_get_class(zval *result, const zval *object, int lower TSRMLS_DC) PHALCON_ATTR_NONNULL;
 void phalcon_get_class_ns(zval *result, const zval *object, int lower TSRMLS_DC) PHALCON_ATTR_NONNULL;
 void phalcon_get_ns_class(zval *result, const zval *object, int lower TSRMLS_DC) PHALCON_ATTR_NONNULL;

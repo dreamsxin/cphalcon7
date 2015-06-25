@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 
 	phalcon_fetch_params(1, 0, 5, &word, &font, &font_size, &width, &height);
 
-	if (!phalcon_class_exists(SL("imagick"), 0 TSRMLS_CC)) {
+	if (phalcon_class_str_exists(SL("imagick"), 0) == NULL) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Imagick is not installed, or the extension is not loaded");
 		return;
 	}

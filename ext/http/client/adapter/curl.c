@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
 			PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, data);
 		}
-	} else if (phalcon_class_exists(SL("CURLFile"), 0 TSRMLS_CC)) {
+	} else if (phalcon_class_str_exists(SL("CURLFile"), 0) != NULL) {
 		if (Z_TYPE_P(data) != IS_ARRAY) {
 			PHALCON_INIT_NVAR(data);
 			array_init(data);

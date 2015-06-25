@@ -216,7 +216,7 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	}
 	else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
-		if (phalcon_class_exists_ex(&ce, offset, 1 TSRMLS_CC)) {
+		if ((ce = phalcon_class_exists_ex(offset, 1)) != NULL) {
 			MAKE_STD_ZVAL(*retval);
 			if (FAILURE == phalcon_create_instance_params_ce(*retval, ce, parameters TSRMLS_CC)) {
 				return NULL;
@@ -865,7 +865,7 @@ PHP_METHOD(Phalcon_DI, get){
 	}
 	else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
-		if (phalcon_class_exists_ex(&ce, name, 1 TSRMLS_CC)) {
+		if ((ce = phalcon_class_exists_ex(name, 1)) ! = NULL) {
 			if (FAILURE == phalcon_create_instance_params_ce(return_value, ce, parameters TSRMLS_CC)) {
 				RETURN_MM();
 			}

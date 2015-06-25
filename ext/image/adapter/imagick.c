@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, check){
 
 	zval *version;
 
-	if (!phalcon_class_exists(SL("imagick"), 0 TSRMLS_CC)) {
+	if (phalcon_class_str_exists(SL("imagick"), 0) == NULL) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Imagick is not installed, or the extension is not loaded");
 		return;
 	}

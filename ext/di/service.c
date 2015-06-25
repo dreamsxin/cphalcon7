@@ -397,7 +397,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 	found      = 0;
 	if (Z_TYPE_P(definition) == IS_STRING) {
 		/* String definitions can be class names without implicit parameters */
-		if (phalcon_class_exists(Z_STRVAL_P(definition), Z_STRLEN_P(definition), 1 TSRMLS_CC)) {
+		if (phalcon_class_exists(Z_STR_P(definition), 1) != NULL) {
 			found = 1;
 			if (Z_TYPE_P(parameters) == IS_ARRAY) {
 				PHALCON_INIT_VAR(instance);

@@ -516,30 +516,37 @@ zend_class_entry* phalcon_fetch_static_class(TSRMLS_D) {
 /**
  * Checks if a class exist
  */
-int phalcon_class_exists(const char *class_name, uint32_t class_len, int autoload TSRMLS_DC) {
+zend_class_entry *phalcon_class_exists(const zval *class_name, uint32_t class_len, int autoload) {
 
 	zend_class_entry *ce;
 
-	if ((ce = zend_lookup_class(zend_string_init(class_name, class_len, 0))) != NULL) {
-		return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0;
+	if ((ce = zend_lookup_class_ex(Z_STR_P(class_name), NULL, autoload) != NULL) {
+		return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0 ? ce : NULL;
 	}
 
 	return 0;
 }
 
-int phalcon_class_exists_ex(zend_class_entry **zce, const zval *class_name, int autoload TSRMLS_DC) {
+zend_class_entry *phalcon_class_exists_ex(const zval *class_name, int autoload TSRMLS_DC) {
 
 	zend_class_entry *ce;
 
 	if (Z_TYPE_P(class_name) == IS_STRING) {
-		if ((ce = zend_lookup_class(Z_STR_P(class_name))) != NULL) {
-			*zce = ce;
-			return ((*ce)->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0;
-		}
-		return 0;
+		return phalcon_class_exists(class_name, autoload);
 	}
 
 	php_error_docref(NULL TSRMLS_CC, E_WARNING, "class name must be a string");
+	return 0;
+}
+
+zend_class_entry *phalcon_class_str_exists(const char *class_name, uint32_t class_len, int autoload) {
+
+	zend_class_entry *ce;
+
+	if ((ce = zend_lookup_class_ex(zend_string_init(class_name, class_len, 0), NULL, autoload)) != NULL) {
+		return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0 ? ce : NULL;
+	}
+
 	return 0;
 }
 

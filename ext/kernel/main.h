@@ -371,13 +371,13 @@ int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...);
 
 #define phalcon_fetch_params_ex(required_params, optional_params, ...) \
 	if (phalcon_fetch_parameters_ex(0 TSRMLS_CC, required_params, optional_params, __VA_ARGS__) == FAILURE) { \
-		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Wrong number of parameters"); \
+		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Wrong number of parameters"); \
 		return; \
 	}
 
 #define PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce, restore_stack) \
 	if (Z_TYPE_P(instance) != IS_OBJECT) { \
-		zend_throw_exception_ex(exception_ce, 0 TSRMLS_CC, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name, zend_zval_type_name(instance)); \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name, zend_zval_type_name(instance)); \
 		if (restore_stack) { \
 			PHALCON_MM_RESTORE(); \
 		} \

@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	 * Check if the file had errors
 	 */
 	if (Z_TYPE_P(ini_config) != IS_ARRAY) {
-		zend_throw_exception_ex(phalcon_config_exception_ce, 0 TSRMLS_CC, "Configuration file '%s' cannot be read", Z_STRVAL_P(config_dir_path));
+		zend_throw_exception_ex(phalcon_config_exception_ce, 0, "Configuration file '%s' cannot be read", Z_STRVAL_P(config_dir_path));
 		PHALCON_MM_RESTORE();
 		return;
 	}

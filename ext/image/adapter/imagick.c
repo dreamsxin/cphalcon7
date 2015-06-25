@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
 
 		phalcon_update_property_this(this_ptr, SL("_mime"), mime TSRMLS_CC);
 	} else {
-		zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Failed to create image from file '%s'", Z_STRVAL_PP(file));
+		zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Failed to create image from file '%s'", Z_STRVAL_PP(file));
 		RETURN_MM();
 	}
 
@@ -1417,7 +1417,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 		} else if (strcmp(ext, "png") == 0) {
 			ZVAL_LONG(type, 3);
 		} else {
-			zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Installed ImageMagick does not support '%s' images", Z_STRVAL_P(extension));
+			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Installed ImageMagick does not support '%s' images", Z_STRVAL_P(extension));
 			RETURN_MM();
 		}
 

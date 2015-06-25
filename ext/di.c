@@ -162,7 +162,7 @@ static int phalcon_di_call_method_internal(zval *return_value, zval **return_val
 	}
 
 	if (FAILURE == retval) {
-		zend_throw_exception_ex(phalcon_di_exception_ce, 0 TSRMLS_CC, "Call to undefined method or service '%s'", method);
+		zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Call to undefined method or service '%s'", method);
 	}
 
 	efree(lc_method_name);
@@ -225,7 +225,7 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 			/* *retval has refcount = 1 here, it will be used in zend_symtable_update() */
 		}
 		else {
-			zend_throw_exception_ex(phalcon_di_exception_ce, 0 TSRMLS_CC, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(offset));
+			zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(offset));
 			return NULL;
 		}
 	}
@@ -791,7 +791,7 @@ PHP_METHOD(Phalcon_DI, getRaw){
 		return;
 	}
 
-	zend_throw_exception_ex(phalcon_di_exception_ce, 0 TSRMLS_CC, "Service '%s' was not found in the dependency injection container", Z_STRVAL_PP(name));
+	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_PP(name));
 }
 
 /**
@@ -813,7 +813,7 @@ PHP_METHOD(Phalcon_DI, getService){
 		RETURN_ZVAL(*service, 1, 0);
 	}
 
-	zend_throw_exception_ex(phalcon_di_exception_ce, 0 TSRMLS_CC, "Service '%s' was not found in the dependency injection container", Z_STRVAL_PP(name));
+	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_PP(name));
 }
 
 /**
@@ -871,7 +871,7 @@ PHP_METHOD(Phalcon_DI, get){
 			}
 		}
 		else {
-			zend_throw_exception_ex(phalcon_di_exception_ce, 0 TSRMLS_CC, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));
+			zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));
 			RETURN_MM();
 		}
 	}

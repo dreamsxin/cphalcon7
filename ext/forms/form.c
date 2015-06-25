@@ -308,7 +308,7 @@ static zend_object_iterator* phalcon_forms_form_get_iterator(zend_class_entry *c
 	zend_object_iterator *result;
 
 	if (by_ref) {
-		zend_throw_exception_ex(phalcon_validation_exception_ce, 0 TSRMLS_CC, "Cannot iterate Phalcon\\Froms\\Form by reference");
+		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Cannot iterate Phalcon\\Froms\\Form by reference");
 		return NULL;
 	}
 
@@ -534,7 +534,7 @@ PHP_METHOD(Phalcon_Forms_Form, setEntity){
 	phalcon_fetch_params(0, 1, 0, &entity);
 
 	if (Z_TYPE_P(entity) != IS_NULL && Z_TYPE_P(entity) != IS_OBJECT) {
-		zend_throw_exception_ex(phalcon_forms_exception_ce, 0 TSRMLS_CC, "'%s' must be an object or NULL", "entity");
+		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "'%s' must be an object or NULL", "entity");
 		return;
 	}
 
@@ -1032,7 +1032,7 @@ PHP_METHOD(Phalcon_Forms_Form, render){
 
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
 	if (!phalcon_array_isset_fetch(&element, elements, *name)) {
-		zend_throw_exception_ex(phalcon_forms_exception_ce, 0 TSRMLS_CC, "Element with ID=%s is not a part of the form", Z_STRVAL_P(*name));
+		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(*name));
 		return;
 	}
 
@@ -1054,7 +1054,7 @@ PHP_METHOD(Phalcon_Forms_Form, get){
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
 	if (!phalcon_array_isset_fetch(&element, elements, *name)) {
 		PHALCON_ENSURE_IS_STRING(name);
-		zend_throw_exception_ex(phalcon_forms_exception_ce, 0 TSRMLS_CC, "Element with ID=%s is not a part of the form", Z_STRVAL_P(*name));
+		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(*name));
 		return;
 	}
 
@@ -1080,7 +1080,7 @@ PHP_METHOD(Phalcon_Forms_Form, label){
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
 	if (!phalcon_array_isset_fetch(&element, elements, *name)) {
 		PHALCON_ENSURE_IS_STRING(name);
-		zend_throw_exception_ex(phalcon_forms_exception_ce, 0 TSRMLS_CC, "Element with ID=%s is not a part of the form", Z_STRVAL_P(*name));
+		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(*name));
 		return;
 	}
 
@@ -1102,7 +1102,7 @@ PHP_METHOD(Phalcon_Forms_Form, getLabel){
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
 	if (!phalcon_array_isset_fetch(&element, elements, *name)) {
 		PHALCON_ENSURE_IS_STRING(name);
-		zend_throw_exception_ex(phalcon_forms_exception_ce, 0 TSRMLS_CC, "Element with ID=%s is not a part of the form", Z_STRVAL_P(*name));
+		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(*name));
 		return;
 	}
 

@@ -276,10 +276,10 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 			default:
 				if (mime) {
 					assert(Z_TYPE_P(mime) == IS_STRING);
-					zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Installed GD does not support '%s' images", Z_STRVAL_P(mime));
+					zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Installed GD does not support '%s' images", Z_STRVAL_P(mime));
 				}
 				else {
-					zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Installed GD does not support such images");
+					zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Installed GD does not support such images");
 				}
 
 				RETURN_MM();
@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
 		if (Z_TYPE_P(image) != IS_RESOURCE) {
 			assert(Z_TYPE_P(realpath) == IS_STRING);
-			zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Failed to create image from file '%s'", Z_STRVAL_P(realpath));
+			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Failed to create image from file '%s'", Z_STRVAL_P(realpath));
 			RETURN_MM();
 		}
 
@@ -451,7 +451,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _resize) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _liquidRescale){
 
-	zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "The GD does not support liquidRescale");
+	zend_throw_exception_ex(phalcon_image_exception_ce, 0, "The GD does not support liquidRescale");
 }
 
 /**
@@ -1402,7 +1402,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
 
 		func_name = "imagepng";
 	} else {
-		zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Installed GD does not support '%s' images", Z_STRVAL_P(extension));
+		zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Installed GD does not support '%s' images", Z_STRVAL_P(extension));
 		RETURN_MM();
 	}
 
@@ -1473,7 +1473,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 
 		func_name = "imagepng";
 	} else {
-		zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Installed GD does not support '%s' images", Z_STRVAL_P(extension));
+		zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Installed GD does not support '%s' images", Z_STRVAL_P(extension));
 		RETURN_MM();
 	}
 	

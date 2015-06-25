@@ -300,6 +300,6 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, __wakeup) {
 	PHALCON_VERIFY_CLASS_EX(queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
 
 	if (Z_TYPE_P(id) != IS_STRING) {
-		zend_throw_exception_ex(phalcon_exception_ce, 0 TSRMLS_CC, "Unexpected inconsistency in %s - possible break-in attempt!", "Phalcon\\Queue\\Beanstalk\\Job::__wakeup()");
+		zend_throw_exception_ex(phalcon_exception_ce, 0, "Unexpected inconsistency in %s - possible break-in attempt!", "Phalcon\\Queue\\Beanstalk\\Job::__wakeup()");
 	}
 }

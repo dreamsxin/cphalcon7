@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 	 */
 	PHALCON_CALL_FUNCTION(&handler, "fopen", *name, mode);
 	if (Z_TYPE_P(handler) != IS_RESOURCE) {
-		zend_throw_exception_ex(exception, 0 TSRMLS_CC, "Cannot open log file '%s'", Z_STRVAL_PP(name));
+		zend_throw_exception_ex(exception, 0, "Cannot open log file '%s'", Z_STRVAL_PP(name));
 	}
 	else {
 		phalcon_update_property_this(this_ptr, SL("_path"), *name TSRMLS_CC);

@@ -73,7 +73,7 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
  */
 void phalcon_throw_exception_string(zend_class_entry *ce, const char *message TSRMLS_DC){
 
-	zend_throw_exception_ex(ce, 0 TSRMLS_CC, "%s", message);
+	zend_throw_exception_ex(ce, 0, "%s", message);
 }
 
 /**

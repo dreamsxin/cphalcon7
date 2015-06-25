@@ -108,7 +108,7 @@ static void phalcon_translate_adapter_unset_dimension(zval *object, zval *offset
 		return;
 	}
 
-	zend_throw_exception_ex(phalcon_translate_exception_ce, 0 TSRMLS_CC, "'%s' is an immutable ArrayAccess object", "Phalcon\\Translate\\Adapter");
+	zend_throw_exception_ex(phalcon_translate_exception_ce, 0, "'%s' is an immutable ArrayAccess object", "Phalcon\\Translate\\Adapter");
 }
 
 
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, _){
  */
 PHP_METHOD(Phalcon_Translate_Adapter, offsetSet){
 
-	zend_throw_exception_ex(phalcon_translate_exception_ce, 0 TSRMLS_CC, "'%s' is an immutable ArrayAccess object", "Phalcon\\Translate\\Adapter");
+	zend_throw_exception_ex(phalcon_translate_exception_ce, 0, "'%s' is an immutable ArrayAccess object", "Phalcon\\Translate\\Adapter");
 }
 
 /**
@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetExists){
  */
 PHP_METHOD(Phalcon_Translate_Adapter, offsetUnset){
 
-	zend_throw_exception_ex(phalcon_translate_exception_ce, 0 TSRMLS_CC, "'%s' is an immutable ArrayAccess object", "Phalcon\\Translate\\Adapter");
+	zend_throw_exception_ex(phalcon_translate_exception_ce, 0, "'%s' is an immutable ArrayAccess object", "Phalcon\\Translate\\Adapter");
 }
 
 /**

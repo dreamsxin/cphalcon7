@@ -370,7 +370,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			phalcon_read_property_this(&modules, this_ptr, SL("_modules"), PH_NOISY TSRMLS_CC);
 			if (!phalcon_array_isset_fetch(&module, modules, module_name)) {
 				convert_to_string(module_name);
-				zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0 TSRMLS_CC, "Module %s is not registered in the jsonrpc container", Z_STRVAL_P(module_name));
+				zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module %s is not registered in the jsonrpc container", Z_STRVAL_P(module_name));
 				RETURN_MM();
 			}
 		
@@ -403,7 +403,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 						if (phalcon_file_exists(path TSRMLS_CC) == SUCCESS) {
 							RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path) TSRMLS_CC));
 						} else {
-							zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0 TSRMLS_CC, "Module definition path '%s' does not exist", Z_STRVAL_P(path));
+							zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module definition path '%s' does not exist", Z_STRVAL_P(path));
 							RETURN_MM();
 						}
 					}

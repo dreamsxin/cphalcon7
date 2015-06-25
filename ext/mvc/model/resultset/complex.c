@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 				 * Assign the instance according to the hydration type
 				 */
 				if (unlikely(!attribute)) {
-					zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0 TSRMLS_CC, "Unexpected inconsistency: attribute is NULL");
+					zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0, "Unexpected inconsistency: attribute is NULL");
 					RETURN_MM();
 				}
 

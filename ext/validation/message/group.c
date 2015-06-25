@@ -185,7 +185,7 @@ static zend_object_iterator* phalcon_validation_message_group_get_iterator(zend_
 	zend_object_iterator *result;
 
 	if (by_ref) {
-		zend_throw_exception_ex(phalcon_validation_exception_ce, 0 TSRMLS_CC, "Cannot iterate Phalcon\\Validation\\Message\\Group by reference");
+		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Cannot iterate Phalcon\\Validation\\Message\\Group by reference");
 		return NULL;
 	}
 
@@ -710,6 +710,6 @@ PHP_METHOD(Phalcon_Validation_Message_Group, __set_state){
 		PHALCON_CALL_METHODW(NULL, return_value, "__construct", messages);
 	}
 	else {
-		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Invalid arguments passed to %s", "Phalcon\\Mvc\\Model\\Message\\Group::__set_state()");
+		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Invalid arguments passed to %s", "Phalcon\\Mvc\\Model\\Message\\Group::__set_state()");
 	}
 }

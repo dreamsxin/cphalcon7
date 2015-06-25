@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 		efree(hostname);
 
 		if (!stream) {
-			zend_throw_exception_ex(phalcon_exception_ce, err TSRMLS_CC, "Unable to connect to Beanstalk server at %s:%ld (%s)", Z_STRVAL_P(host), Z_LVAL_P(port), (errstr == NULL ? "Unknown error" : errstr));
+			zend_throw_exception_ex(phalcon_exception_ce, err, "Unable to connect to Beanstalk server at %s:%ld (%s)", Z_STRVAL_P(host), Z_LVAL_P(port), (errstr == NULL ? "Unknown error" : errstr));
 		}
 
 		if (errstr) {
@@ -839,6 +839,6 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 	}
 
 	if (fail) {
-		zend_throw_exception_ex(phalcon_exception_ce, 0 TSRMLS_CC, "Invalid serialization data");
+		zend_throw_exception_ex(phalcon_exception_ce, 0, "Invalid serialization data");
 	}
 }

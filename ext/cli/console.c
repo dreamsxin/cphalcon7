@@ -269,9 +269,9 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			convert_to_string_ex(&path);
 
 			if (phalcon_file_exists(path TSRMLS_CC) == SUCCESS) {
-				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path) TSRMLS_CC));
+				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path)));
 			} else {
-				zend_throw_exception_ex(phalcon_cli_console_exception_ce, 0 TSRMLS_CC, "Modules definition path '%s' does not exist", Z_STRVAL_P(path));
+				zend_throw_exception_ex(phalcon_cli_console_exception_ce, 0, "Modules definition path '%s' does not exist", Z_STRVAL_P(path));
 				PHALCON_MM_RESTORE();
 				return;
 			}

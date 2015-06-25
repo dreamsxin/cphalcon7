@@ -2964,7 +2964,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 			uint32_t name_len = 0;
 
 			dup = zend_get_object_classname(validator, &name, &name_len TSRMLS_CC);
-			zend_throw_exception_ex(spl_ce_LogicException, 0 TSRMLS_CC, "Validator '%s' returned false but did not call appendMessage()", name);
+			zend_throw_exception_ex(spl_ce_LogicException, 0, "Validator '%s' returned false but did not call appendMessage()", name);
 			if (!dup) {
 				efree((char*)name);
 			}

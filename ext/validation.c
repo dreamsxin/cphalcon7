@@ -680,7 +680,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
 	phalcon_fetch_params(0, 1, 0, &labels);
 
 	if (Z_TYPE_P(labels) != IS_ARRAY) {
-		zend_throw_exception_ex(phalcon_validation_exception_ce, 0 TSRMLS_CC, "Labels must be an array");
+		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Labels must be an array");
 		return;
 	}
 	phalcon_update_property_this(this_ptr, SL("_labels"), labels TSRMLS_CC);
@@ -701,7 +701,7 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 	phalcon_fetch_params(1, 1, 0, &field_param);
 
 	if (Z_TYPE_P(field_param) != IS_STRING && Z_TYPE_P(field_param) != IS_NULL) {
-		zend_throw_exception_ex(phalcon_validation_exception_ce, 0 TSRMLS_CC, "Parameter 'field' must be a string");
+		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Parameter 'field' must be a string");
 		RETURN_MM_NULL();
 	}
 

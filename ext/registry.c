@@ -204,7 +204,7 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
 		result = phalcon_call_user_func_array_noex(return_value, callback, params TSRMLS_CC);
 	} else {
 		result = FAILURE;
-		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Call to undefined method Phalcon\\Registry::%s", method);
+		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", method);
 	}
 
 	if (params) {
@@ -450,7 +450,7 @@ static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, con
 		}
 	}
 	else {
-		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Bad parameters passed to Phalcon\\Registry::unserialize()");
+		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Bad parameters passed to Phalcon\\Registry::unserialize()");
 	}
 
 	phalcon_dtor(pzv);
@@ -624,7 +624,7 @@ static PHP_METHOD(Phalcon_Registry, __call)
 		RETURN_ON_FAILURE(phalcon_call_user_func_array(return_value, callback, *arguments TSRMLS_CC));
 	}
 	else {
-		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_PP(name));
+		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_PP(name));
 	}
 }
 
@@ -796,7 +796,7 @@ static PHP_METHOD(Phalcon_Registry, unserialize)
 	obj = phalcon_registry_get_object(getThis() TSRMLS_CC);
 
 	if (zend_hash_num_elements(Z_ARRVAL_P(obj->properties))) {
-		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Cannot call unserialize() on an already constructed object");
+		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Cannot call unserialize() on an already constructed object");
 		return;
 	}
 
@@ -810,7 +810,7 @@ static PHP_METHOD(Phalcon_Registry, unserialize)
 		}
 	}
 	else {
-		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0 TSRMLS_CC, "Bad parameters passed to Phalcon\\Registry::unserialize()");
+		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Bad parameters passed to Phalcon\\Registry::unserialize()");
 	}
 
 	phalcon_dtor(pzv);

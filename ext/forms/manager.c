@@ -101,7 +101,7 @@ static zval* phalcon_forms_manager_read_dimension(zval *object, zval *offset, in
 			offset = &tmp;
 		}
 
-		zend_throw_exception_ex(phalcon_forms_exception_ce, 0 TSRMLS_CC, "There is no form with name='%s'", Z_STRVAL_P(offset));
+		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "There is no form with name='%s'", Z_STRVAL_P(offset));
 
 		if (UNEXPECTED(offset == &tmp)) {
 			zval_dtor(&tmp);
@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Forms_Manager, get){
 	
 	forms = phalcon_fetch_nproperty_this(this_ptr, SL("_forms"), PH_NOISY TSRMLS_CC);
 	if (!phalcon_array_isset_fetch(&form, forms, *name)) {
-		zend_throw_exception_ex(phalcon_forms_exception_ce, 0 TSRMLS_CC, "There is no form with name='%s'", Z_STRVAL_PP(name));
+		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "There is no form with name='%s'", Z_STRVAL_PP(name));
 		return;
 	}
 	

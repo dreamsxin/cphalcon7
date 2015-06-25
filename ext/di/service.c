@@ -439,14 +439,10 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 
 	/* If the service can't be built, we must throw an exception */
 	if (!found) {
-		zend_throw_exception_ex(phalcon_di_exception_ce, 0 TSRMLS_CC, "Service '%s' cannot be resolved", obj->name);
+		zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' cannot be resolved", obj->name);
 		PHALCON_MM_RESTORE();
 		return;
 	}
-
-	//if (Z_TYPE_P(instance) != IS_OBJECT) {
-	//	php_error_docref0(NULL TSRMLS_CC, E_DEPRECATED, "Usage of Phalcon\\DI to store non-objects is deprecated, please use Phalcon\\Registry instead");
-	//}
 
 	/* Update the shared instance if the service is shared */
 	if (obj->shared) {

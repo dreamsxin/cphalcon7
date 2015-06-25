@@ -1270,11 +1270,11 @@ int phannot_parse_annotations(zval *result, const char *comment, uint32_t commen
 
 	if (phannot_internal_parse_annotations(&result, comment, comment_len, file_path, line, &error_msg TSRMLS_CC) == FAILURE) {
 		if (likely(error_msg != NULL)) {
-			zend_throw_exception_ex(phalcon_annotations_exception_ce, 0 TSRMLS_CC, "%s", error_msg);
+			zend_throw_exception_ex(phalcon_annotations_exception_ce, 0, "%s", error_msg);
 			efree(error_msg);
 		}
 		else {
-			zend_throw_exception_ex(phalcon_annotations_exception_ce, 0 TSRMLS_CC, "Error parsing annotation");
+			zend_throw_exception_ex(phalcon_annotations_exception_ce, 0, "Error parsing annotation");
 		}
 
 		return FAILURE;

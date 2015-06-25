@@ -1079,12 +1079,11 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 	if (zend_is_true(ret)) {
 		PHALCON_CALL_FUNCTION(&ret, "is_writable", file);
 		if (!zend_is_true(ret)) {
-			zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "File must be writable: '%s'", Z_STRVAL_P(file));
+			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "File must be writable: '%s'", Z_STRVAL_P(file));
 			RETURN_MM();
 		}
 	} else {
-		PHALCON_INIT_VAR(constant);
-		if (!zend_get_constant(SL("PATHINFO_DIRNAME"), constant TSRMLS_CC)) {
+		if ((constant = zend_get_constant_str(SL("PATHINFO_DIRNAME")) == NULL) {
 			RETURN_MM();
 		}
 
@@ -1098,13 +1097,13 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 		phalcon_is_dir(ret, dir TSRMLS_CC);
 
 		if (!zend_is_true(ret)) {
-			zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Directory must be writable: '%s'", Z_STRVAL_P(dir));
+			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Directory must be writable: '%s'", Z_STRVAL_P(dir));
 			RETURN_MM();
 		}
 
 		PHALCON_CALL_FUNCTION(&ret, "is_writable", dir);
 		if (!zend_is_true(ret)) {
-			zend_throw_exception_ex(phalcon_image_exception_ce, 0 TSRMLS_CC, "Directory must be writable: '%s'", Z_STRVAL_P(dir));
+			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Directory must be writable: '%s'", Z_STRVAL_P(dir));
 			RETURN_MM();
 		}
 	}

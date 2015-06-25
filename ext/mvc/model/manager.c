@@ -540,7 +540,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 		dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
 
 		object_init_ex(return_value, ce0);
-		if (phalcon_has_constructor(return_value TSRMLS_CC)) {
+		if (phalcon_has_constructor(return_value)) {
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", dependency_injector, this_ptr);
 		}
 		RETURN_MM();
@@ -549,7 +549,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	/** 
 	 * The model doesn't exist throw an exception
 	 */
-	zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0 TSRMLS_CC, "Model '%s' could not be loaded", Z_STRVAL_PP(model_name));
+	zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0, "Model '%s' could not be loaded", Z_STRVAL_PP(model_name));
 	PHALCON_MM_RESTORE();
 }
 

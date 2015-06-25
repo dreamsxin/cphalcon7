@@ -438,7 +438,7 @@ PHP_METHOD(Phalcon_Security, hash)
 			ZVAL_LONG(n_bytes, 22);
 			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
-				zend_throw_exception_ex(phalcon_security_exception_ce, 0 TSRMLS_CC, "Unable to get random bytes for the salt");
+				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
 			}
 
@@ -461,7 +461,7 @@ PHP_METHOD(Phalcon_Security, hash)
 			ZVAL_LONG(n_bytes, 2);
 			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
-				zend_throw_exception_ex(phalcon_security_exception_ce, 0 TSRMLS_CC, "Unable to get random bytes for the salt");
+				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
 			}
 
@@ -490,7 +490,7 @@ PHP_METHOD(Phalcon_Security, hash)
 			ZVAL_LONG(n_bytes, 4);
 			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
-				zend_throw_exception_ex(phalcon_security_exception_ce, 0 TSRMLS_CC, "Unable to get random bytes for the salt");
+				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
 			}
 
@@ -506,7 +506,7 @@ PHP_METHOD(Phalcon_Security, hash)
 			ZVAL_LONG(n_bytes, 12);
 			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
-				zend_throw_exception_ex(phalcon_security_exception_ce, 0 TSRMLS_CC, "Unable to get random bytes for the salt");
+				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
 			}
 
@@ -533,7 +533,7 @@ PHP_METHOD(Phalcon_Security, hash)
 			ZVAL_LONG(n_bytes, 16);
 			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
-				zend_throw_exception_ex(phalcon_security_exception_ce, 0 TSRMLS_CC, "Unable to get random bytes for the salt");
+				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
 			}
 
@@ -909,7 +909,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 	PHALCON_ENSURE_IS_STRING(salt);
 
 	if (Z_STRLEN_PP(salt) > INT_MAX - 4) {
-		zend_throw_exception_ex(phalcon_security_exception_ce, 0 TSRMLS_CC, "Salt is too long: %d", Z_STRLEN_PP(salt));
+		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_PP(salt));
 		return;
 	}
 
@@ -1034,7 +1034,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	PHALCON_ENSURE_IS_STRING(salt);
 
 	if (Z_STRLEN_PP(salt) > INT_MAX - 4) {
-		zend_throw_exception_ex(phalcon_security_exception_ce, 0 TSRMLS_CC, "Salt is too long: %d", Z_STRLEN_PP(salt));
+		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_PP(salt));
 		return;
 	}
 
@@ -1070,7 +1070,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 		int k;
 
 		if (!ops) {
-			zend_throw_exception_ex(phalcon_security_exception_ce, 0 TSRMLS_CC, "Unknown hashing algorithm: %s", s_hash);
+			zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unknown hashing algorithm: %s", s_hash);
 			return;
 		}
 

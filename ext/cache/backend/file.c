@@ -573,7 +573,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 			PHALCON_INIT_VAR(cached_content);
 			phalcon_file_get_contents(cached_content, cache_file TSRMLS_CC);
 			if (PHALCON_IS_FALSE(cached_content)) {
-				zend_throw_exception_ex(phalcon_cache_exception_ce, 0 TSRMLS_CC, "Failed to open cache file %s", Z_STRVAL_P(cache_file));
+				zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Failed to open cache file %s", Z_STRVAL_P(cache_file));
 				RETURN_MM();
 			}
 
@@ -680,7 +680,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 			PHALCON_INIT_VAR(cached_content);
 			phalcon_file_get_contents(cached_content, cache_file TSRMLS_CC);
 			if (PHALCON_IS_FALSE(cached_content)) {
-				zend_throw_exception_ex(phalcon_cache_exception_ce, 0 TSRMLS_CC, "Failed to open cache file %s", Z_STRVAL_P(cache_file));
+				zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Failed to open cache file %s", Z_STRVAL_P(cache_file));
 				RETURN_MM();
 			}
 

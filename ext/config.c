@@ -646,7 +646,7 @@ PHP_METHOD(Phalcon_Config, merge){
 	phalcon_fetch_params(0, 1, 0, &config);
 	
 	if (Z_TYPE_P(config) != IS_OBJECT && Z_TYPE_P(config) != IS_ARRAY) {
-		zend_throw_exception_ex(phalcon_config_exception_ce, 0 TSRMLS_CC, "Configuration must be an object or array");
+		zend_throw_exception_ex(phalcon_config_exception_ce, 0, "Configuration must be an object or array");
 		return;
 	}
 

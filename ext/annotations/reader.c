@@ -83,7 +83,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 
 	class_ce = zend_fetch_class(Z_STRVAL_P(class_name), Z_STRLEN_P(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
 	if (!class_ce) {
-		zend_throw_exception_ex(phalcon_annotations_exception_ce, 0 TSRMLS_CC, "Class %s does not exist", Z_STRVAL_P(class_name));
+		zend_throw_exception_ex(phalcon_annotations_exception_ce, 0, "Class %s does not exist", Z_STRVAL_P(class_name));
 		return;
 	}
 

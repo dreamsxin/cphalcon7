@@ -424,12 +424,12 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 		convert_to_long(*h);
 	}
 
-	if (ofs_x && Z_TYPE_PP(ofs_x) != IS_NULL && !PHALCON_IS_BOOL(ofs_x) && Z_TYPE_PP(ofs_x) != IS_LONG) {
+	if (ofs_x && Z_TYPE_PP(ofs_x) != IS_NULL && !PHALCON_IS_BOOL(*ofs_x) && Z_TYPE_PP(ofs_x) != IS_LONG) {
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_x);
 		convert_to_long(*ofs_x);
 	}
 		
-	if (ofs_y && Z_TYPE_PP(ofs_y) != IS_NULL && !PHALCON_IS_BOOL(ofs_y) && Z_TYPE_PP(ofs_x) != IS_LONG) {
+	if (ofs_y && Z_TYPE_PP(ofs_y) != IS_NULL && !PHALCON_IS_BOOL(*ofs_y) && Z_TYPE_PP(ofs_x) != IS_LONG) {
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_y);
 		convert_to_long(*ofs_y);
 	}

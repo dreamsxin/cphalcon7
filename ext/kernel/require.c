@@ -50,7 +50,7 @@ int phalcon_require_ret(zval *return_value, const char *require_path TSRMLS_DC)
 	    ZVAL_NULL(&dummy);
 
 		if (!file_handle.opened_path) {
-			file_handle.opened_path = zend_string_init(require_path, strlen(len)+1, 0);
+			file_handle.opened_path = zend_string_init(require_path, strlen(require_path)+1, 0);
 		}
 
 		zend_hash_add(&EG(included_files), file_handle.opened_path, &dummy);
@@ -58,13 +58,13 @@ int phalcon_require_ret(zval *return_value, const char *require_path TSRMLS_DC)
 	zend_destroy_file_handle(&file_handle);
 
 	if (op_array) {
-        ZVAL_UNDEF(&return_value);
-		zend_execute(op_array, &return_value);
+        ZVAL_UNDEF(return_value);
+		zend_execute(op_array, return_value);
 
 		destroy_op_array(op_array);
 		efree(op_array);
         if (!EG(exception)) {
-            zval_ptr_dtor(&return_value);
+            zval_ptr_dtor(return_value);
         }
 
 	    return SUCCESS;

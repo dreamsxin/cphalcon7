@@ -305,7 +305,7 @@ PHALCON_ATTR_WARN_UNUSED_RESULT static inline int phalcon_return_call_function(z
 	}
 
 	if (!return_value_ptr) {
-		COPY_PZVAL_TO_ZVAL(*return_value, rv);
+		ZVAL_DUP(return_value, rv);
 	}
 
 	return SUCCESS;
@@ -341,7 +341,7 @@ PHALCON_ATTR_WARN_UNUSED_RESULT static inline int phalcon_return_call_zval_funct
 	}
 
 	if (!return_value_ptr) {
-		COPY_PZVAL_TO_ZVAL(*return_value, rv);
+		ZVAL_DUP(return_value, rv);
 	}
 
 	return SUCCESS;
@@ -370,7 +370,7 @@ PHALCON_ATTR_WARN_UNUSED_RESULT static inline int phalcon_return_call_class_meth
 	}
 
 	if (!return_value_ptr) {
-		COPY_PZVAL_TO_ZVAL(*return_value, rv);
+		ZVAL_DUP(return_value, rv);
 	}
 
 	return SUCCESS;

@@ -107,7 +107,7 @@ void phalcon_value_dtor(zval *zvalue ZEND_FILE_LINE_DC);
 static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 {
 	if (pzval) {
-		zval_ptr_dtor(&pzval);
+		zval_ptr_dtor(pzval);
 	}
 }
 

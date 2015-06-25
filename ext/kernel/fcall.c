@@ -670,7 +670,7 @@ int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *p
 		fci.retval_ptr_ptr = &retval_ptr;
 
 		if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && fci.retval_ptr_ptr && *fci.retval_ptr_ptr) {
-			COPY_PZVAL_TO_ZVAL(*return_value, *fci.retval_ptr_ptr);
+			ZVAL_DUP(return_value, *fci.retval_ptr_ptr);
 		}
 
 		if (fci.params) {

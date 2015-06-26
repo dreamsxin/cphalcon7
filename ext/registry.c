@@ -103,12 +103,12 @@ PHALCON_ATTR_NONNULL static inline phalcon_registry_object* phalcon_registry_get
  * @param v Registry object
  * @see phalcon_registry_object
  */
-static void phalcon_registry_dtor(void *v TSRMLS_DC)
+static void phalcon_registry_dtor(void *v)
 {
 	phalcon_registry_object *obj = v;
 
 	phalcon_ptr_dtor(&obj->properties);
-	zend_object_std_dtor(&obj->obj TSRMLS_CC);
+	zend_object_std_dtor(&obj->obj);
 	efree(obj);
 }
 
@@ -118,10 +118,9 @@ static void phalcon_registry_dtor(void *v TSRMLS_DC)
  * @brief ce Phalcon\Registry class entry
  * @return Zend Object Value corresponding to the newly constructed object
  */
-static zend_object_value phalcon_registry_ctor(zend_class_entry* ce TSRMLS_DC)
+static zend_object *phalcon_registry_ctor(zend_class_entry* ce)
 {
 	phalcon_registry_object *obj = ecalloc(1, sizeof(phalcon_registry_object));
-	zend_object_value retval;
 
 	zend_object_std_init(&obj->obj, ce TSRMLS_CC);
 	object_properties_init(&obj->obj, ce);
@@ -130,15 +129,10 @@ static zend_object_value phalcon_registry_ctor(zend_class_entry* ce TSRMLS_DC)
 	array_init(obj->properties);
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(obj->properties), &obj->pos);
 
-	retval.handle = zend_objects_store_put(
-		obj,
-		(zend_objects_store_dtor_t)zend_objects_destroy_object,
-		phalcon_registry_dtor,
-		NULL TSRMLS_CC
-	);
+	phalcon_registry_object_handlers.offset = XtOffsetof(phalcon_registry_object, obj);
+    phalcon_registry_object_handlers.free_obj = phalcon_registry_dtor;
 
-	retval.handlers = &phalcon_registry_object_handlers;
-	return retval;
+	return &obj->obj;
 }
 
 static PHP_FUNCTION(phalcon_registry_method_handler)

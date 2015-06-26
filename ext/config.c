@@ -363,23 +363,22 @@ static int phalcon_config_compare_objects(zval *object1, zval *object2 TSRMLS_DC
 /**
  * @brief Frees all memory associated with @c phalcon_config_object
  */
-static void phalcon_config_object_dtor(void* v TSRMLS_DC)
+static void phalcon_config_object_dtor(void* v)
 {
 	phalcon_config_object* obj = v;
 
 	zend_hash_destroy(obj->props);
 	FREE_HASHTABLE(obj->props);
-	zend_object_std_dtor(&(obj->obj) TSRMLS_CC);
+	zend_object_std_dtor(&(obj->obj));
 	efree(obj);
 }
 
 /**
  * @brief Constructs @c phalcon_config_object
  */
-static zend_object_value phalcon_config_object_ctor(zend_class_entry* ce TSRMLS_DC)
+static zend_object *phalcon_config_object_ctor(zend_class_entry* ce)
 {
 	phalcon_config_object *obj = ecalloc(1, sizeof(phalcon_config_object));
-	zend_object_value retval;
 
 	zend_object_std_init(&obj->obj, ce TSRMLS_CC);
 	object_properties_init(&obj->obj, ce);
@@ -387,17 +386,10 @@ static zend_object_value phalcon_config_object_ctor(zend_class_entry* ce TSRMLS_
 	ALLOC_HASHTABLE(obj->props);
 	zend_hash_init(obj->props, 0, NULL, ZVAL_PTR_DTOR, 0);
 
-	retval.handle = zend_objects_store_put(
-		obj,
-		(zend_objects_store_dtor_t)zend_objects_destroy_object,
-		phalcon_config_object_dtor,
-		NULL
-		TSRMLS_CC
-	);
+	phalcon_config_object_handlers.offset = XtOffsetof(phalcon_config_object, obj);
+    phalcon_config_object_handlers.free_obj = phalcon_config_object_dtor;
 
-	retval.handlers = &phalcon_config_object_handlers;
-
-	return retval;
+	return &obj->obj;
 }
 
 static zend_object_value phalcon_config_clone_obj(zval *object TSRMLS_DC)

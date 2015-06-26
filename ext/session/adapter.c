@@ -332,7 +332,7 @@ static int phalcon_session_adapter_count_elements(zval *object, long *count TSRM
 	return res;
 }
 
-static zend_object_value phalcon_session_adapter_object_ctor(zend_class_entry *ce TSRMLS_DC)
+static zend_object *phalcon_session_adapter_object_ctor(zend_class_entry *ce)
 {
 	zend_object *obj = emalloc(sizeof(zend_object));
 	zend_object_value retval;
@@ -340,16 +340,10 @@ static zend_object_value phalcon_session_adapter_object_ctor(zend_class_entry *c
 	zend_object_std_init(obj, ce TSRMLS_CC);
 	object_properties_init(obj, ce);
 
-	retval.handlers = &phalcon_session_adapter_object_handlers;
-	retval.handle   = zend_objects_store_put(
-		obj,
-		(zend_objects_store_dtor_t)zend_objects_destroy_object,
-		(zend_objects_free_object_storage_t)zend_objects_free_object_storage,
-		NULL
-		TSRMLS_CC
-	);
+	phalcon_session_adapter_object_handlers.offset = 0;
+    phalcon_session_adapter_object_handlers.free_obj = zend_objects_free_object_storage;
 
-	return retval;
+	return obj;
 }
 
 static zend_object_iterator* phalcon_session_adapter_get_iterator(zend_class_entry *ce, zval *object, int by_ref TSRMLS_DC)

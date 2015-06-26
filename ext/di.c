@@ -397,7 +397,7 @@ static HashTable* phalcon_di_get_properties(zval* object TSRMLS_DC)
 	return props;
 }
 
-static void phalcon_di_dtor(void *v TSRMLS_DC)
+static void phalcon_di_dtor(void *v)
 {
 	phalcon_di_object *obj = v;
 
@@ -406,14 +406,13 @@ static void phalcon_di_dtor(void *v TSRMLS_DC)
 	FREE_HASHTABLE(obj->services);
 	FREE_HASHTABLE(obj->shared);
 
-	zend_object_std_dtor(&obj->obj TSRMLS_CC);
+	zend_object_std_dtor(&obj->obj);
 	efree(obj);
 }
 
-static zend_object_value phalcon_di_ctor(zend_class_entry* ce TSRMLS_DC)
+static zend_object *phalcon_di_ctor(zend_class_entry* ce)
 {
 	phalcon_di_object *obj = ecalloc(1, sizeof(phalcon_di_object));
-	zend_object_value retval;
 
 	zend_object_std_init(&obj->obj, ce TSRMLS_CC);
 	object_properties_init(&obj->obj, ce);
@@ -423,15 +422,10 @@ static zend_object_value phalcon_di_ctor(zend_class_entry* ce TSRMLS_DC)
 	zend_hash_init(obj->services, 32, NULL, ZVAL_PTR_DTOR, 0);
 	zend_hash_init(obj->shared, 8, NULL, ZVAL_PTR_DTOR, 0);
 
-	retval.handle = zend_objects_store_put(
-		obj,
-		(zend_objects_store_dtor_t)zend_objects_destroy_object,
-		phalcon_di_dtor,
-		NULL TSRMLS_CC
-	);
+	phalcon_di_object_handlers.offset = XtOffsetof(phalcon_di_object, obj);
+    phalcon_di_object_handlers.free_obj = phalcon_di_dtor;
 
-	retval.handlers = &phalcon_di_object_handlers;
-	return retval;
+	return &obj->obj;
 }
 
 static zend_object_value phalcon_di_clone_obj(zval *zobject TSRMLS_DC)

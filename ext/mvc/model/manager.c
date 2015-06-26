@@ -507,7 +507,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	initialized = phalcon_fetch_nproperty_this(this_ptr, SL("_initialized"), PH_NOISY TSRMLS_CC);
 
 	PHALCON_INIT_VAR(lowercased);
-	ZVAL_STRINGL(lowercased, zend_str_tolower_dup(Z_STRVAL_PP(model_name), Z_STRLEN_PP(model_name)), Z_STRLEN_PP(model_name), 0);
+	ZVAL_STRINGL(lowercased, zend_str_tolower_dup(Z_STRVAL_P(*model_name), Z_STRLEN_P(*model_name)), Z_STRLEN_P(*model_name), 0);
 
 	/** 
 	 * Check if a model with the same is already loaded
@@ -549,7 +549,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	/** 
 	 * The model doesn't exist throw an exception
 	 */
-	zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0, "Model '%s' could not be loaded", Z_STRVAL_PP(model_name));
+	zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0, "Model '%s' could not be loaded", Z_STRVAL_P(*model_name));
 	PHALCON_MM_RESTORE();
 }
 

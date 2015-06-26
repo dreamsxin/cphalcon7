@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getTypeString) {
 	phalcon_fetch_params(0, 1, 0, &type);
 	PHALCON_ENSURE_IS_LONG(type);
 
-	itype = Z_LVAL_PP(type);
+	itype = Z_LVAL_P(*type);
 	if (itype > 0 && itype < 10) {
 		RETURN_STRING(lut[itype], 1);
 	}
@@ -231,13 +231,13 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 				zend_hash_get_current_key_ex(ht, &key, &key_len, &idx, 0, &pos);
 				zend_hash_move_forward_ex(ht, &pos);
 
-				if (Z_TYPE_PP(ppzval) == IS_ARRAY) {
+				if (Z_TYPE_P(*ppzval) == IS_ARRAY) {
 					/*
 					 * Here we need to skip the latest calls into Phalcon's core.
 					 * Calls to Zend internal functions will have "file" index not set.
 					 * We remove these entries from the array.
 					 */
-					if (!found && !zend_hash_str_exists(Z_ARRVAL_PP(ppzval), SS("file"))) {
+					if (!found && !zend_hash_str_exists(Z_ARRVAL_P(*ppzval), SS("file"))) {
 						zend_hash_index_del(ht, idx);
 					}
 					else {
@@ -246,8 +246,8 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 						 * too much information; this is not suitable to send
 						 * in the HTTP headers
 						 */
-						zend_hash_quick_del(Z_ARRVAL_PP(ppzval), "args", sizeof("args"), zend_inline_hash_func(SS("args")));
-						zend_hash_quick_del(Z_ARRVAL_PP(ppzval), "object", sizeof("object"), zend_inline_hash_func(SS("object")));
+						zend_hash_quick_del(Z_ARRVAL_P(*ppzval), "args", sizeof("args"), zend_inline_hash_func(SS("args")));
+						zend_hash_quick_del(Z_ARRVAL_P(*ppzval), "object", sizeof("object"), zend_inline_hash_func(SS("object")));
 						found = 1;
 					}
 				}
@@ -289,19 +289,19 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	if (i_show_backtrace && Z_TYPE_P(backtrace) == IS_ARRAY) {
 		zval **ppzval;
 
-		if (likely(SUCCESS == zend_hash_index_find(Z_ARRVAL_P(backtrace), 0, (void**)&ppzval)) && likely(Z_TYPE_PP(ppzval) == IS_ARRAY)) {
+		if (likely(SUCCESS == zend_hash_index_find(Z_ARRVAL_P(backtrace), 0, (void**)&ppzval)) && likely(Z_TYPE_P(*ppzval) == IS_ARRAY)) {
 			zval **file = NULL, **line = NULL;
 
-			zend_hash_quick_find(Z_ARRVAL_PP(ppzval), SS("file"), zend_inline_hash_func(SS("file")), (void**)&file);
-			zend_hash_quick_find(Z_ARRVAL_PP(ppzval), SS("line"), zend_inline_hash_func(SS("line")), (void**)&line);
+			zend_hash_quick_find(Z_ARRVAL_P(*ppzval), SS("file"), zend_inline_hash_func(SS("file")), (void**)&file);
+			zend_hash_quick_find(Z_ARRVAL_P(*ppzval), SS("line"), zend_inline_hash_func(SS("line")), (void**)&line);
 
 			if (likely(file != NULL)) {
-				Z_ADDREF_PP(file);
+				Z_ADDREF_P(*file);
 				add_assoc_zval_ex(meta, SS("File"), *file);
 			}
 
 			if (likely(line != NULL)) {
-				Z_ADDREF_PP(line);
+				Z_ADDREF_P(*line);
 				add_assoc_zval_ex(meta, SS("Line"), *line);
 			}
 		}

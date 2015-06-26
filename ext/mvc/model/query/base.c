@@ -205,7 +205,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 	phalcon_orm_get_prepared_ast(result, unique_id TSRMLS_CC);
 
-	if (Z_TYPE_PP(result) == IS_ARRAY) {
+	if (Z_TYPE_P(*result) == IS_ARRAY) {
 		zval_ptr_dtor(&unique_id);
 		return SUCCESS;
 	}

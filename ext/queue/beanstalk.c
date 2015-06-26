@@ -691,7 +691,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 			RETURN_MM_FALSE;
 		}
 
-		total_length = Z_LVAL_PP(length) + 2;
+		total_length = Z_LVAL_P(*length) + 2;
 
 		buf = ecalloc(1, total_length + 1);
 		len = php_stream_read(stream, buf, total_length);

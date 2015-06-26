@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	/**
 	 * We use a default DI if the user doesn't define one
 	 */
-	if (!dependency_injector || Z_TYPE_PP(dependency_injector) != IS_OBJECT) {
+	if (!dependency_injector || Z_TYPE_P(*dependency_injector) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault");
 	}
 	else {
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	/**
 	 * Inject the manager service from the DI
 	 */
-	if (!collection_manager || Z_TYPE_PP(collection_manager) != IS_OBJECT) {
+	if (!collection_manager || Z_TYPE_P(*collection_manager) != IS_OBJECT) {
 		PHALCON_ALLOC_GHOST_ZVAL(service_name);
 		ZVAL_STRING(service_name, "collectionManager", 1);
 
@@ -1413,8 +1413,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(lower);
-	tmp = zend_str_tolower_dup(Z_STRVAL_PP(event_name), Z_STRLEN_PP(event_name));
-	ZVAL_STRINGL(lower, tmp, Z_STRLEN_PP(event_name), 0);
+	tmp = zend_str_tolower_dup(Z_STRVAL_P(*event_name), Z_STRLEN_P(*event_name));
+	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(*event_name), 0);
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -1450,8 +1450,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(lower);
-	tmp = zend_str_tolower_dup(Z_STRVAL_PP(event_name), Z_STRLEN_PP(event_name));
-	ZVAL_STRINGL(lower, tmp, Z_STRLEN_PP(event_name), 0);
+	tmp = zend_str_tolower_dup(Z_STRVAL_P(*event_name), Z_STRLEN_P(*event_name));
+	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(*event_name), 0);
 
 	/**
 	 * Check if there is a method with the same name of the event

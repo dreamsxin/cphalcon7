@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 	meta_data_dir = phalcon_fetch_nproperty_this(this_ptr, SL("_metaDataDir"), PH_NOISY TSRMLS_CC);
 	
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_PP(key), Z_STRLEN_PP(key), '_' TSRMLS_CC);
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_' TSRMLS_CC);
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, meta_data_dir, virtual_key, ".php");
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 	meta_data_dir = phalcon_fetch_nproperty_this(this_ptr, SL("_metaDataDir"), PH_NOISY TSRMLS_CC);
 	
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_PP(key), Z_STRLEN_PP(key), '_' TSRMLS_CC);
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_' TSRMLS_CC);
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, meta_data_dir, virtual_key, ".php");

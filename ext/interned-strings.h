@@ -121,27 +121,14 @@ extern const char *phalcon_interned_view;
 
 void phalcon_init_interned_strings(TSRMLS_D);
 
-#if PHP_VERSION_ID < 50400
-
-static inline const char* zend_new_interned_string(const char *arKey, int nKeyLength, int free_src TSRMLS_DC)
-{
-	return arKey;
-}
-
-#define PHALCON_ZVAL_MAYBE_INTERNED_STRING(pz, string)  ZVAL_STRING(pz, string, 1);
-
-#else
-
 #define PHALCON_ZVAL_MAYBE_INTERNED_STRING(pz, string)            \
 	do {                                                          \
-		if (IS_INTERNED(string)) {                                \
+		if (STR_IS_INTERNED(string)) {                            \
 			ZVAL_STRINGL(pz, string, INTERNED_LEN(string)-1, 0);  \
 		}                                                         \
 		else {                                                    \
 			ZVAL_STRING(pz, string, 1);                           \
 		}                                                         \
 	} while (0)
-
-#endif /* PHP_VERSION_ID < 50400 */
 
 #endif /* PHALCON_INTERNED_STRINGS_H */

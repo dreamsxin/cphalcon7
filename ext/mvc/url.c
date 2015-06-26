@@ -426,7 +426,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 	else {
 		PHALCON_ENSURE_IS_STRING(uri);
 
-		if (strstr(Z_STRVAL_PP(uri), "://")) {
+		if (strstr(Z_STRVAL_P(*uri), "://")) {
 			PHALCON_INIT_VAR(matched);
 			PHALCON_INIT_VAR(pattern);
 			ZVAL_STRING(pattern, "/^[^:\\/?#]++:/", 1);

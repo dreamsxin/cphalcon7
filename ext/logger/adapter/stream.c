@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 	 */
 	PHALCON_CALL_FUNCTION(&stream, "fopen", *name, mode);
 	if (Z_TYPE_P(stream) != IS_RESOURCE) {
-		zend_throw_exception_ex(exception, 0, "Cannot open stream '%s'", Z_STRVAL_PP(name));
+		zend_throw_exception_ex(exception, 0, "Cannot open stream '%s'", Z_STRVAL_P(*name));
 	}
 	else {
 		phalcon_update_property_this(this_ptr, SL("_stream"), stream TSRMLS_CC);

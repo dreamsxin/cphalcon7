@@ -397,8 +397,8 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_VERIFY_CLASS_OR_NULL(pzv, class_ce)           PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, spl_ce_LogicException, 1)
 
 #define phalcon_convert_to_explicit_type_mm_ex(ppzv, str_type) \
-	if (Z_TYPE_PP(ppzv) != str_type) { \
-		if (!Z_ISREF_PP(ppzv)) { \
+	if (Z_TYPE_P(*ppzv) != str_type) { \
+		if (!Z_ISREF_P(*ppzv)) { \
 			PHALCON_SEPARATE(*ppzv); \
 		} \
 		convert_to_explicit_type(*ppzv, str_type); \

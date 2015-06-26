@@ -23,14 +23,14 @@
 #include "php_phalcon.h"
 #include "kernel/main.h"
 
-#define Z_REFCOUNT_PP(ppz)		Z_REFCOUNT_P(*(ppz))
-#define Z_SET_REFCOUNT_PP(ppz, rc)	Z_SET_REFCOUNT_P(*(ppz), rc)
-#define Z_ADDREF_PP(ppz)		Z_ADDREF_P(*(ppz))
-#define Z_DELREF_PP(ppz)		Z_DELREF_P(*(ppz))
-#define Z_ISREF_PP(ppz)			Z_ISREF_P(*(ppz))
-#define Z_SET_ISREF_PP(ppz)		Z_SET_ISREF_P(*(ppz))
-#define Z_UNSET_ISREF_PP(ppz)		Z_UNSET_ISREF_P(*(ppz))
-#define Z_SET_ISREF_TO_PP(ppz, isref)	Z_SET_ISREF_TO_P(*(ppz), isref)
+#define Z_REFCOUNT_P(*ppz)		Z_REFCOUNT_P(*(ppz))
+#define Z_SET_REFCOUNT_P(*ppz, rc)	Z_SET_REFCOUNT_P(*(ppz), rc)
+#define Z_ADDREF_P(*ppz)		Z_ADDREF_P(*(ppz))
+#define Z_DELREF_P(*ppz)		Z_DELREF_P(*(ppz))
+#define Z_ISREF_P(*ppz)			Z_ISREF_P(*(ppz))
+#define Z_SET_ISREF_P(*ppz)		Z_SET_ISREF_P(*(ppz))
+#define Z_UNSET_ISREF_P(*ppz)		Z_UNSET_ISREF_P(*(ppz))
+#define Z_SET_ISREF_TO_P(*ppz, isref)	Z_SET_ISREF_TO_P(*(ppz), isref)
 
 void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr TSRMLS_DC);
 void phalcon_deinitialize_memory(TSRMLS_D);

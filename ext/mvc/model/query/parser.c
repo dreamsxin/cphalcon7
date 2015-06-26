@@ -345,7 +345,7 @@ static zval *phql_ret_zval_list(zval *list_left, zval *right_list)
 			zend_hash_get_current_data_ex(list, (void**)&item, &pos) != FAILURE;
 			zend_hash_move_forward_ex(list, &pos)
 		) {
-			Z_ADDREF_PP(item);
+			Z_ADDREF_P(*item);
 			add_next_index_zval(ret, *item);
 		}
 
@@ -3164,7 +3164,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 	phalcon_orm_get_prepared_ast(result, unique_id TSRMLS_CC);
 
-	if (Z_TYPE_PP(result) == IS_ARRAY) {
+	if (Z_TYPE_P(*result) == IS_ARRAY) {
 		zval_ptr_dtor(&unique_id);
 		return SUCCESS;
 	}

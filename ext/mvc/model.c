@@ -513,7 +513,7 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
 		zend_hash_get_current_data_ex(Z_ARRVAL_P(messages), (void**)&message, &hp) == SUCCESS;
 		zend_hash_move_forward_ex(Z_ARRVAL_P(messages), &hp)
 	) {
-		if (Z_TYPE_PP(message) == IS_OBJECT) {
+		if (Z_TYPE_P(*message) == IS_OBJECT) {
 			zval *params[] = { target };
 			if (FAILURE == phalcon_call_method(NULL, *message, "setmodel", 1, params TSRMLS_CC)) {
 				break;

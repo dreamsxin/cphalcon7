@@ -92,7 +92,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_read_property_this_quick(zval **r
 	zval *tmp = phalcon_fetch_property_this_quick(object, property_name, property_length, key, silent TSRMLS_CC);
 	if (EXPECTED(tmp != NULL)) {
 		*result = tmp;
-		Z_ADDREF_PP(result);
+		Z_ADDREF_P(*result);
 		return SUCCESS;
 	}
 
@@ -215,7 +215,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_read_static_property_ce(zval **re
 {
 	*result = phalcon_fetch_static_property_ce(ce, property, len TSRMLS_CC);
 	if (*result) {
-		Z_ADDREF_PP(result);
+		Z_ADDREF_P(*result);
 		return SUCCESS;
 	}
 

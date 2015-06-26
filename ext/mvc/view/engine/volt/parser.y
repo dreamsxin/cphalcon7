@@ -462,7 +462,7 @@ static zval *phvolt_ret_zval_list(zval *list_left, zval *right_list)
 					break;
 				}
 
-				Z_ADDREF_PP(item);
+				Z_ADDREF_P(*item);
 				add_next_index_zval(ret, *item);
 
 			}

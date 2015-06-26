@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 	 * Paths must be normalized before be used as keys
 	 */
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_PP(key), Z_STRLEN_PP(key), '_' TSRMLS_CC);
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_' TSRMLS_CC);
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, annotations_dir, virtual_key, ".php");
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	 * Paths must be normalized before be used as keys
 	 */
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_PP(key), Z_STRLEN_PP(key), '_' TSRMLS_CC);
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_' TSRMLS_CC);
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, annotations_dir, virtual_key, ".php");

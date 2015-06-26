@@ -401,7 +401,7 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access TSRMLS
 				if (!check_access || zend_check_property_access(zobj, key, key_len-1 TSRMLS_CC) == SUCCESS) {
 					zend_unmangle_property_name(key, key_len-1, &class_name, &prop_name);
 					/* Not separating references */
-					Z_ADDREF_PP(value);
+					Z_ADDREF_P(*value);
 					add_assoc_zval_ex(result, prop_name, strlen(prop_name)+1, *value);
 				}
 			}
@@ -756,7 +756,7 @@ int phalcon_read_property(zval **result, zval *object, const char *property_name
 	*result = Z_OBJ_HT_P(object)->read_property(object, property, silent ? BP_VAR_IS : BP_VAR_R, 0 TSRMLS_CC);
 #endif
 
-	Z_ADDREF_PP(result);
+	Z_ADDREF_P(*result);
 
 	if (Z_REFCOUNT_P(property) > 1) {
 		ZVAL_STRINGL(property, property_name, property_length, 1);
@@ -888,7 +888,7 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 
 				if (return_value_ptr) {
 					phalcon_ptr_dtor(return_value_ptr);
-					Z_ADDREF_PP(zv);
+					Z_ADDREF_P(*zv);
 					*return_value_ptr = *zv;
 				}
 				else {
@@ -1067,7 +1067,7 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 						zval garbage = **variable_ptr; /* old value should be destroyed */
 
 						/* To check: can't *variable_ptr be some system variable like error_zval here? */
-						Z_TYPE_PP(variable_ptr) = Z_TYPE_P(value);
+						Z_TYPE_P(*variable_ptr) = Z_TYPE_P(value);
 						(*variable_ptr)->value = value->value;
 						if (Z_REFCOUNT_P(value) > 0) {
 							zval_copy_ctor(*variable_ptr);

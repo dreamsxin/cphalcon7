@@ -86,14 +86,14 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	/** 
 	 * Create the variables in local symbol table
 	 */
-	if (Z_TYPE_PP(params) == IS_ARRAY) {
+	if (Z_TYPE_P(*params) == IS_ARRAY) {
 		if (!EG(active_symbol_table)) {
 			zend_rebuild_symbol_table(TSRMLS_C);
 		}
 
 		zend_hash_merge_ex(
 			EG(active_symbol_table),
-			Z_ARRVAL_PP(params),
+			Z_ARRVAL_P(*params),
 			(copy_ctor_func_t)zval_add_ref,
 			sizeof(zval*),
 			phalcon_mvc_view_engine_php_symtable_merger
@@ -108,7 +108,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	/** 
 	 * Require the file
 	 */
-	if (phalcon_require(Z_STRVAL_PP(path) TSRMLS_CC) == FAILURE) {
+	if (phalcon_require(Z_STRVAL_P(*path) TSRMLS_CC) == FAILURE) {
 		RETURN_FALSE;
 	}
 

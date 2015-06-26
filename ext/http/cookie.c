@@ -179,14 +179,14 @@ PHP_METHOD(Phalcon_Http_Cookie, __construct){
 
 	phalcon_update_property_this(this_ptr, SL("_name"), *name TSRMLS_CC);
 
-	if (value && Z_TYPE_PP(value) != IS_NULL) {
+	if (value && Z_TYPE_P(*value) != IS_NULL) {
 		phalcon_update_property_this(this_ptr, SL("_value"), *value TSRMLS_CC);
 		phalcon_update_property_bool(this_ptr, SL("_readed"), 1 TSRMLS_CC);
 	}
 
 	phalcon_update_property_this(this_ptr, SL("_expire"), *expire TSRMLS_CC);
 
-	if (path && Z_TYPE_PP(path) != IS_NULL) {
+	if (path && Z_TYPE_P(*path) != IS_NULL) {
 		phalcon_update_property_this(this_ptr, SL("_path"), *path TSRMLS_CC);
 	}
 	else {
@@ -196,15 +196,15 @@ PHP_METHOD(Phalcon_Http_Cookie, __construct){
 		phalcon_update_property_this(this_ptr, SL("_path"), path TSRMLS_CC);
 	}
 
-	if (secure && Z_TYPE_PP(secure) != IS_NULL) {
+	if (secure && Z_TYPE_P(*secure) != IS_NULL) {
 		phalcon_update_property_this(this_ptr, SL("_secure"), *secure TSRMLS_CC);
 	}
 
-	if (domain && Z_TYPE_PP(domain) != IS_NULL) {
+	if (domain && Z_TYPE_P(*domain) != IS_NULL) {
 		phalcon_update_property_this(this_ptr, SL("_domain"), *domain TSRMLS_CC);
 	}
 
-	if (http_only && Z_TYPE_PP(http_only) != IS_NULL) {
+	if (http_only && Z_TYPE_P(*http_only) != IS_NULL) {
 		phalcon_update_property_this(this_ptr, SL("_httpOnly"), *http_only TSRMLS_CC);
 	}
 }

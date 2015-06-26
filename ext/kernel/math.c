@@ -77,16 +77,16 @@ void phalcon_round(zval *return_value, zval *op1, zval *op2, zval *op3 TSRMLS_DC
 		mode = phalcon_get_intval_ex(op3);
 	}
 
-	switch (Z_TYPE_PP(&op1)) {
+	switch (Z_TYPE_P(*&op1)) {
 		case IS_LONG:
 			/* Simple case - long that doesn't need to be rounded. */
 			if (places >= 0) {
-				RETURN_DOUBLE((double) Z_LVAL_PP(&op1));
+				RETURN_DOUBLE((double) Z_LVAL_P(*&op1));
 			}
 			/* break omitted intentionally */
 
 		case IS_DOUBLE:
-			return_val = (Z_TYPE_PP(&op1) == IS_LONG) ? (double)Z_LVAL_PP(&op1) : Z_DVAL_PP(&op1);
+			return_val = (Z_TYPE_P(*&op1) == IS_LONG) ? (double)Z_LVAL_P(*&op1) : Z_DVAL_P(*&op1);
 			return_val = _php_math_round(return_val, places, mode);
 			RETURN_DOUBLE(return_val);
 			break;

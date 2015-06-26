@@ -227,5 +227,5 @@ PHP_METHOD(Phalcon_Annotations_Reader, parseDocBlock)
 	PHALCON_ENSURE_IS_STRING(file);
 	PHALCON_ENSURE_IS_LONG(line);
 
-	RETURN_ON_FAILURE(phannot_parse_annotations(return_value, Z_STRVAL_PP(doc_block), Z_STRLEN_PP(doc_block), Z_STRVAL_PP(file), Z_LVAL_PP(line) TSRMLS_CC));
+	RETURN_ON_FAILURE(phannot_parse_annotations(return_value, Z_STRVAL_P(*doc_block), Z_STRLEN_P(*doc_block), Z_STRVAL_P(*file), Z_LVAL_P(*line) TSRMLS_CC));
 }

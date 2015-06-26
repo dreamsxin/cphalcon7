@@ -205,7 +205,7 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 		}
 
 		/* *retval has refcount = 1 here, it will be used in zend_symtable_update() */
-		ce = (Z_TYPE_PP(retval) == IS_OBJECT) ? Z_OBJCE_PP(retval) : NULL;
+		ce = (Z_TYPE_P(*retval) == IS_OBJECT) ? Z_OBJCE_P(*retval) : NULL;
 	}
 	else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
@@ -235,7 +235,7 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	/**
 	 * Save the instance in the first level shared
 	 */
-	assert(Z_REFCOUNT_PP(retval) == 1);
+	assert(Z_REFCOUNT_P(*retval) == 1);
 	zend_symtable_update(obj->shared, Z_STRVAL_P(offset), Z_STRLEN_P(offset)+1, (void*)retval, sizeof(zval*), NULL);
 	obj->fresh = 1;
 
@@ -275,7 +275,7 @@ static int phalcon_di_has_dimension_internal(phalcon_di_object *obj, zval *offse
 	}
 
 	if (0 == check_empty) {
-		return Z_TYPE_PP(tmp) != IS_NULL;
+		return Z_TYPE_P(*tmp) != IS_NULL;
 	}
 
 	if (1 == check_empty) {
@@ -639,7 +639,7 @@ PHP_METHOD(Phalcon_DI, set) {
 
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
 
-	zend_hash_update(obj->services, Z_STRVAL_PP(name), Z_STRLEN_PP(name)+1, &service, sizeof(zval*), NULL);
+	zend_hash_update(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1, &service, sizeof(zval*), NULL);
 	RETURN_ZVAL(service, 1, 0);
 }
 
@@ -699,7 +699,7 @@ PHP_METHOD(Phalcon_DI, attempt){
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	if (!zend_symtable_exists(obj->services, Z_STRVAL_PP(name), Z_STRLEN_PP(name)+1)) {
+	if (!zend_symtable_exists(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1)) {
 		PHALCON_MM_GROW();
 
 		if (!shared) {
@@ -710,7 +710,7 @@ PHP_METHOD(Phalcon_DI, attempt){
 		PHALCON_CALL_METHOD(NULL, return_value, "__construct", *name, *definition, *shared);
 	
 		Z_ADDREF_P(return_value);
-		zend_hash_update(obj->services, Z_STRVAL_PP(name), Z_STRLEN_PP(name)+1, &return_value, sizeof(zval*), NULL);
+		zend_hash_update(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1, &return_value, sizeof(zval*), NULL);
 
 		PHALCON_MM_RESTORE();
 	}
@@ -739,7 +739,7 @@ PHP_METHOD(Phalcon_DI, setService)
 
 		PHALCON_CALL_METHODW(&name, *raw_definition, "getname");
 
-		Z_ADDREF_PP(raw_definition);
+		Z_ADDREF_P(*raw_definition);
 		zend_hash_update(obj->services, Z_STRVAL_P(name), Z_STRLEN_P(name)+1, (void*)raw_definition, sizeof(zval*), NULL);
 		phalcon_ptr_dtor(&name);
 	}
@@ -748,8 +748,8 @@ PHP_METHOD(Phalcon_DI, setService)
 		PHALCON_ENSURE_IS_STRING(name);
 		PHALCON_VERIFY_INTERFACE_EX(*raw_definition, phalcon_di_serviceinterface_ce, phalcon_di_exception_ce, 0);
 
-		Z_ADDREF_PP(raw_definition);
-		zend_hash_update(obj->services, Z_STRVAL_PP(name), Z_STRLEN_PP(name)+1, (void*)raw_definition, sizeof(zval*), NULL);
+		Z_ADDREF_P(*raw_definition);
+		zend_hash_update(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1, (void*)raw_definition, sizeof(zval*), NULL);
 	}
 
 	RETURN_ZVAL(*raw_definition, 1, 0);
@@ -770,12 +770,12 @@ PHP_METHOD(Phalcon_DI, getRaw){
 	PHALCON_ENSURE_IS_STRING(name);
 
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	if (SUCCESS == zend_symtable_find(obj->services, Z_STRVAL_PP(name), Z_STRLEN_PP(name)+1, (void**)&service)) {
+	if (SUCCESS == zend_symtable_find(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1, (void**)&service)) {
 		PHALCON_RETURN_CALL_METHODW(*service, "getdefinition");
 		return;
 	}
 
-	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_PP(name));
+	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(*name));
 }
 
 /**
@@ -793,11 +793,11 @@ PHP_METHOD(Phalcon_DI, getService){
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	if (SUCCESS == zend_symtable_find(obj->services, Z_STRVAL_PP(name), Z_STRLEN_PP(name)+1, (void**)&service)) {
+	if (SUCCESS == zend_symtable_find(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1, (void**)&service)) {
 		RETURN_ZVAL(*service, 1, 0);
 	}
 
-	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_PP(name));
+	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(*name));
 }
 
 /**
@@ -926,7 +926,7 @@ PHP_METHOD(Phalcon_DI, has){
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	RETURN_BOOL(zend_symtable_exists(obj->services, Z_STRVAL_PP(name), Z_STRLEN_PP(name)+1));
+	RETURN_BOOL(zend_symtable_exists(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1));
 }
 
 /**
@@ -1015,7 +1015,7 @@ PHP_METHOD(Phalcon_DI, __call){
 		arguments = &PHALCON_GLOBAL(z_null);
 	}
 	
-	phalcon_di_call_method_internal(return_value, return_value_ptr, getThis(), Z_STRVAL_PP(method), *arguments TSRMLS_CC);
+	phalcon_di_call_method_internal(return_value, return_value_ptr, getThis(), Z_STRVAL_P(*method), *arguments TSRMLS_CC);
 }
 
 /**

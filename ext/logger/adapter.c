@@ -157,11 +157,11 @@ PHP_METHOD(Phalcon_Logger_Adapter, setLogLevel){
 	zval **level, *lvl;
 
 	phalcon_fetch_params(0, 1, 0, &level);
-	if (Z_TYPE_PP(level) == IS_STRING) {
+	if (Z_TYPE_P(*level) == IS_STRING) {
 		PHALCON_ALLOC_GHOST_ZVAL(lvl);
 		ZVAL_LONG(lvl, phalcon_logger_adapter_string_level_to_int(*level));
 	}
-	else if (Z_TYPE_PP(level) != IS_LONG) {
+	else if (Z_TYPE_P(*level) != IS_LONG) {
 		PHALCON_ENSURE_IS_LONG(level);
 		lvl = *level;
 	}
@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 		message = type;
 		type    = NULL;
 	}
-	else if (Z_TYPE_PP(message) == IS_LONG && Z_TYPE_PP(type) == IS_STRING) {
+	else if (Z_TYPE_P(*message) == IS_LONG && Z_TYPE_P(*type) == IS_STRING) {
 		zval **tmp = message;
 		message    = type;
 		type       = tmp;
@@ -465,12 +465,12 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 	if (!type) {
 		i_level = PHALCON_LOGGER_DEBUG;
 	}
-	else if (Z_TYPE_PP(type) == IS_STRING) {
+	else if (Z_TYPE_P(*type) == IS_STRING) {
 		i_level = phalcon_logger_adapter_string_level_to_int(*type);
 	}
 	else {
 		PHALCON_ENSURE_IS_LONG(type);
-		i_level = Z_LVAL_PP(type);
+		i_level = Z_LVAL_P(*type);
 	}
 
 	log_level = phalcon_fetch_nproperty_this(this_ptr, SL("_logLevel"), PH_NOISY TSRMLS_CC);

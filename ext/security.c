@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Security, setRandomBytes){
 
 	PHALCON_ENSURE_IS_LONG(random_bytes);
 
-	if (Z_LVAL_PP(random_bytes) < 16) {
+	if (Z_LVAL_P(*random_bytes) < 16) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "At least 16 bytes are needed to produce a correct salt");
 		return;
 	}
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 	phalcon_fetch_params(0, 0, 2, &number_bytes, &b64);
 	if (number_bytes) {
 		PHALCON_ENSURE_IS_LONG(number_bytes);
-		i_bytes = Z_LVAL_PP(number_bytes);
+		i_bytes = Z_LVAL_P(*number_bytes);
 	}
 	else {
 		zval *n = phalcon_fetch_nproperty_this(this_ptr, SL("_numberBytes"), PH_NOISY TSRMLS_CC);
@@ -368,12 +368,12 @@ PHP_METHOD(Phalcon_Security, hash)
 	phalcon_fetch_params(0, 1, 1, &password, &work_factor);
 	PHALCON_ENSURE_IS_STRING(password);
 
-	if (!work_factor || Z_TYPE_PP(work_factor) == IS_NULL) {
+	if (!work_factor || Z_TYPE_P(*work_factor) == IS_NULL) {
 		tmp         = phalcon_fetch_nproperty_this(this_ptr, SL("_workFactor"), PH_NOISY TSRMLS_CC);
 		work_factor = &tmp;
 	}
 
-	i_factor = (Z_TYPE_PP(work_factor) == IS_LONG) ? Z_LVAL_PP(work_factor) : phalcon_get_intval(*work_factor);
+	i_factor = (Z_TYPE_P(*work_factor) == IS_LONG) ? Z_LVAL_P(*work_factor) : phalcon_get_intval(*work_factor);
 
 	default_hash = phalcon_fetch_nproperty_this(getThis(), SL("_defaultHash"), PH_NOISY TSRMLS_CC);
 	i_hash       = (Z_TYPE_P(default_hash) == IS_LONG) ? Z_LVAL_P(default_hash) : phalcon_get_intval(default_hash);
@@ -587,7 +587,7 @@ PHP_METHOD(Phalcon_Security, checkHash){
 
 	if (max_pass_length) {
 		PHALCON_ENSURE_IS_LONG(max_pass_length);
-		if (Z_LVAL_PP(max_pass_length) > 0 && Z_STRLEN_PP(password) > Z_LVAL_PP(max_pass_length)) {
+		if (Z_LVAL_P(*max_pass_length) > 0 && Z_STRLEN_P(*password) > Z_LVAL_P(*max_pass_length)) {
 			RETURN_FALSE;
 		}
 	}
@@ -600,10 +600,10 @@ PHP_METHOD(Phalcon_Security, checkHash){
 		convert_to_string(hash);
 	}
 
-	if (Z_STRLEN_P(hash) == Z_STRLEN_PP(password_hash)) {
+	if (Z_STRLEN_P(hash) == Z_STRLEN_P(*password_hash)) {
 		int n    = Z_STRLEN_P(hash);
 		char *h1 = Z_STRVAL_P(hash);
-		char *h2 = Z_STRVAL_PP(password_hash);
+		char *h2 = Z_STRVAL_P(*password_hash);
 
 		while (n) {
 			check |= ((unsigned int)*h1) ^ ((unsigned int)*h2);
@@ -908,16 +908,16 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(salt);
 
-	if (Z_STRLEN_PP(salt) > INT_MAX - 4) {
-		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_PP(salt));
+	if (Z_STRLEN_P(*salt) > INT_MAX - 4) {
+		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_P(*salt));
 		return;
 	}
 
-	s_hash = (!hash || Z_TYPE_PP(hash) != IS_STRING) ? "sha512" : Z_STRVAL_PP(hash);
+	s_hash = (!hash || Z_TYPE_P(*hash) != IS_STRING) ? "sha512" : Z_STRVAL_P(*hash);
 
 	if (iterations) {
 		PHALCON_ENSURE_IS_LONG(iterations);
-		i_iterations = Z_LVAL_PP(iterations);
+		i_iterations = Z_LVAL_P(*iterations);
 	}
 
 	if (i_iterations <= 0) {
@@ -926,7 +926,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 
 	if (size) {
 		PHALCON_ENSURE_IS_LONG(size);
-		i_size = Z_LVAL_PP(size);
+		i_size = Z_LVAL_P(*size);
 	}
 
 	if (i_size < 0) {
@@ -936,7 +936,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 	{
 		zval *algo, *tmp = NULL, *K1 = NULL, *K2 = NULL, *computed_salt, *result;
 		int i_hash_len, block_count, i, j, k;
-		int salt_len = Z_STRLEN_PP(salt);
+		int salt_len = Z_STRLEN_P(*salt);
 		char *s;
 		div_t d;
 
@@ -958,7 +958,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		PHALCON_INIT_VAR(computed_salt);
 		s = safe_emalloc(salt_len, 1, 5);
 		s[salt_len + 4] = 0;
-		memcpy(s, Z_STRVAL_PP(salt), salt_len);
+		memcpy(s, Z_STRVAL_P(*salt), salt_len);
 		ZVAL_STRINGL(computed_salt, s, salt_len + 4, 0);
 
 		PHALCON_INIT_VAR(result);
@@ -1033,16 +1033,16 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(salt);
 
-	if (Z_STRLEN_PP(salt) > INT_MAX - 4) {
-		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_PP(salt));
+	if (Z_STRLEN_P(*salt) > INT_MAX - 4) {
+		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_P(*salt));
 		return;
 	}
 
-	s_hash = (!hash || Z_TYPE_PP(hash) != IS_STRING) ? "sha512" : Z_STRVAL_PP(hash);
+	s_hash = (!hash || Z_TYPE_P(*hash) != IS_STRING) ? "sha512" : Z_STRVAL_P(*hash);
 
 	if (iterations) {
 		PHALCON_ENSURE_IS_LONG(iterations);
-		i_iterations = Z_LVAL_PP(iterations);
+		i_iterations = Z_LVAL_P(*iterations);
 	}
 
 	if (i_iterations <= 0) {
@@ -1051,7 +1051,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 
 	if (size) {
 		PHALCON_ENSURE_IS_LONG(size);
-		i_size = Z_LVAL_PP(size);
+		i_size = Z_LVAL_P(*size);
 	}
 
 	if (i_size < 0) {
@@ -1061,12 +1061,12 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 
 #if defined(PHALCON_USE_PHP_HASH)
 	{
-		const php_hash_ops *ops = php_hash_fetch_ops(s_hash, hash ? (size_t)(Z_STRLEN_PP(hash)) : strlen(s_hash));
+		const php_hash_ops *ops = php_hash_fetch_ops(s_hash, hash ? (size_t)(Z_STRLEN_P(*hash)) : strlen(s_hash));
 		void *context;
 		unsigned char *K1, *K2, *digest, *temp, *result, *computed_salt;
 		long int i, j, loops, digest_length;
-		int salt_len = Z_STRLEN_PP(salt);
-		int pass_len = Z_STRLEN_PP(password);
+		int salt_len = Z_STRLEN_P(*salt);
+		int pass_len = Z_STRLEN_P(*password);
 		int k;
 
 		if (!ops) {
@@ -1086,11 +1086,11 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 		memset(K1, 0, ops->block_size);
 		if (pass_len > ops->block_size) {
 			ops->hash_init(context);
-			ops->hash_update(context, (unsigned char*)Z_STRVAL_PP(password), pass_len);
+			ops->hash_update(context, (unsigned char*)Z_STRVAL_P(*password), pass_len);
 			ops->hash_final(K1, context);
 		}
 		else {
-			memcpy(K1, Z_STRVAL_PP(password), pass_len);
+			memcpy(K1, Z_STRVAL_P(*password), pass_len);
 		}
 
 		for (i = 0; i < ops->block_size; ++i) {
@@ -1103,7 +1103,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 
 		result        = safe_emalloc(loops, ops->digest_size, 1);
 		computed_salt = safe_emalloc(salt_len, 1, 4);
-		memcpy(computed_salt, Z_STRVAL_PP(salt), salt_len);
+		memcpy(computed_salt, Z_STRVAL_P(*salt), salt_len);
 
 		for (i = 1; i <= loops; ++i) {
 			computed_salt[salt_len+0] = (unsigned char)(i >> 24);

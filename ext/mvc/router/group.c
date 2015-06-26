@@ -392,9 +392,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	 */
 	PHALCON_INIT_VAR(prefix_pattern);
 	{
-		const char *s_pattern = Z_STRVAL_PP(pattern); /* NUL-terminated */
+		const char *s_pattern = Z_STRVAL_P(*pattern); /* NUL-terminated */
 		const char *s_prefix  = Z_STRVAL_P(prefix);   /* NUL-terminated */
-		int pattern_len       = Z_STRLEN_PP(pattern);
+		int pattern_len       = Z_STRLEN_P(*pattern);
 		int prefix_len        = Z_STRLEN_P(prefix);
 		if (prefix_len && *s_pattern == '/' && s_prefix[prefix_len-1] == '/') {
 			char *new_pattern = safe_emalloc(prefix_len - 1 /* slash */ + 1 /* \0 */, 1, pattern_len);
@@ -412,7 +412,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	/**
 	 * Check if the paths need to be merged with current paths
 	 */
-	if (Z_TYPE_P(default_paths) == IS_ARRAY && Z_TYPE_PP(paths) == IS_ARRAY) {
+	if (Z_TYPE_P(default_paths) == IS_ARRAY && Z_TYPE_P(*paths) == IS_ARRAY) {
 		/**
 		 * Merge the paths with the default paths
 		 */

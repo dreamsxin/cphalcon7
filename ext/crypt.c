@@ -740,13 +740,13 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 	}
 
 	if (safe && zend_is_true(*safe)) {
-		char *tmp = estrndup(Z_STRVAL_PP(text), Z_STRLEN_PP(text));
-		php_strtr(tmp, Z_STRLEN_PP(text), "-_", "+/", 2);
-		decoded = (char*)php_base64_decode((unsigned char*)tmp, Z_STRLEN_PP(text), &decoded_len);
+		char *tmp = estrndup(Z_STRVAL_P(*text), Z_STRLEN_P(*text));
+		php_strtr(tmp, Z_STRLEN_P(*text), "-_", "+/", 2);
+		decoded = (char*)php_base64_decode((unsigned char*)tmp, Z_STRLEN_P(*text), &decoded_len);
 		efree(tmp);
 	}
 	else {
-		decoded = (char*)php_base64_decode((unsigned char*)(Z_STRVAL_PP(text)), Z_STRLEN_PP(text), &decoded_len);
+		decoded = (char*)php_base64_decode((unsigned char*)(Z_STRVAL_P(*text)), Z_STRLEN_P(*text), &decoded_len);
 	}
 
 	if (!decoded) {

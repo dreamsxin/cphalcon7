@@ -184,10 +184,10 @@ static ulong phalcon_make_fcall_key(char **result, size_t *length, const zend_cl
 		if (
 			    zend_hash_num_elements(Z_ARRVAL_P(function_name)) == 2
 			 && zend_hash_index_find(Z_ARRVAL_P(function_name), 1, (void**)&method) == SUCCESS
-			 && Z_TYPE_PP(method) == IS_STRING
+			 && Z_TYPE_P(*method) == IS_STRING
 		) {
-			l   = (size_t)(Z_STRLEN_PP(method)) + 1;
-			c   = Z_STRVAL_PP(method);
+			l   = (size_t)(Z_STRLEN_P(*method)) + 1;
+			c   = Z_STRVAL_P(*method);
 			len = 2 * ppzce_size + l;
 			buf = emalloc(len);
 
@@ -373,7 +373,7 @@ int phalcon_call_user_function(zval **object_pp, zend_class_entry *obj_ce, phalc
 	if (type != phalcon_fcall_function && !object_pp) {
 		object_pp = this_ptr ? &this_ptr : NULL;
 		if (!obj_ce && object_pp) {
-			obj_ce = Z_OBJCE_PP(object_pp);
+			obj_ce = Z_OBJCE_P(*object_pp);
 		}
 	}
 
@@ -381,7 +381,7 @@ int phalcon_call_user_function(zval **object_pp, zend_class_entry *obj_ce, phalc
 		EG(scope) = obj_ce;
 	}
 
-	fcall_key_hash = phalcon_make_fcall_key(&fcall_key, &fcall_key_len, (object_pp ? Z_OBJCE_PP(object_pp) : obj_ce), type, function_name TSRMLS_CC);
+	fcall_key_hash = phalcon_make_fcall_key(&fcall_key, &fcall_key_len, (object_pp ? Z_OBJCE_P(*object_pp) : obj_ce), type, function_name TSRMLS_CC);
 
 	fci.size           = sizeof(fci);
 	fci.function_table = obj_ce ? &obj_ce->function_table : EG(function_table);
@@ -539,9 +539,9 @@ int phalcon_call_class_method_aparams(zval **return_value_ptr, zend_class_entry 
 	}
 	array_init_size(&fn, 2);
 	switch (type) {
-		case phalcon_fcall_parent: add_next_index_stringl(&fn, ISL(parent), !IS_INTERNED(phalcon_interned_parent)); break;
-		case phalcon_fcall_self:   assert(!ce); add_next_index_stringl(&fn, ISL(self), !IS_INTERNED(phalcon_interned_self)); break;
-		case phalcon_fcall_static: assert(!ce); add_next_index_stringl(&fn, ISL(static), !IS_INTERNED(phalcon_interned_static)); break;
+		case phalcon_fcall_parent: add_next_index_stringl(&fn, ISL(parent), !STR_IS_INTERNED(phalcon_interned_parent)); break;
+		case phalcon_fcall_self:   assert(!ce); add_next_index_stringl(&fn, ISL(self), !STR_IS_INTERNED(phalcon_interned_self)); break;
+		case phalcon_fcall_static: assert(!ce); add_next_index_stringl(&fn, ISL(static), !STR_IS_INTERNED(phalcon_interned_static)); break;
 
 		case phalcon_fcall_ce:
 			assert(ce != NULL);
@@ -1044,51 +1044,51 @@ static zend_bool phalcon_is_callable_ex(zval *callable, zval *object_ptr, uint c
 					zend_hash_index_find(Z_ARRVAL_P(callable), 1, (void **) &method);
 				}
 				if (obj && method &&
-					(Z_TYPE_PP(obj) == IS_OBJECT ||
-					Z_TYPE_PP(obj) == IS_STRING) &&
-					Z_TYPE_PP(method) == IS_STRING) {
+					(Z_TYPE_P(*obj) == IS_OBJECT ||
+					Z_TYPE_P(*obj) == IS_STRING) &&
+					Z_TYPE_P(*method) == IS_STRING) {
 
-					if (Z_TYPE_PP(obj) == IS_STRING) {
+					if (Z_TYPE_P(*obj) == IS_STRING) {
 						if (callable_name) {
 							char *ptr;
 
-							*callable_name_len = Z_STRLEN_PP(obj) + Z_STRLEN_PP(method) + sizeof("::") - 1;
+							*callable_name_len = Z_STRLEN_P(*obj) + Z_STRLEN_P(*method) + sizeof("::") - 1;
 							ptr = *callable_name = emalloc(*callable_name_len + 1);
-							memcpy(ptr, Z_STRVAL_PP(obj), Z_STRLEN_PP(obj));
-							ptr += Z_STRLEN_PP(obj);
+							memcpy(ptr, Z_STRVAL_P(*obj), Z_STRLEN_P(*obj));
+							ptr += Z_STRLEN_P(*obj);
 							memcpy(ptr, "::", sizeof("::") - 1);
 							ptr += sizeof("::") - 1;
-							memcpy(ptr, Z_STRVAL_PP(method), Z_STRLEN_PP(method) + 1);
+							memcpy(ptr, Z_STRVAL_P(*method), Z_STRLEN_P(*method) + 1);
 						}
 
 						if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) {
 							return 1;
 						}
 
-						if (!phalcon_is_callable_check_class(Z_STRVAL_PP(obj), Z_STRLEN_PP(obj), fcc, &strict_class, error TSRMLS_CC)) {
+						if (!phalcon_is_callable_check_class(Z_STRVAL_P(*obj), Z_STRLEN_P(*obj), fcc, &strict_class, error TSRMLS_CC)) {
 							return 0;
 						}
 
 					} else {
 						if (!EG(objects_store).object_buckets ||
-							!EG(objects_store).object_buckets[Z_OBJ_HANDLE_PP(obj)].valid) {
+							!EG(objects_store).object_buckets[Z_OBJ_HANDLE_P(*obj)].valid) {
 							return 0;
 						}
 
-						fcc->calling_scope = Z_OBJCE_PP(obj); /* TBFixed: what if it's overloaded? */
+						fcc->calling_scope = Z_OBJCE_P(*obj); /* TBFixed: what if it's overloaded? */
 
 						fcc->object_ptr = *obj;
 
 						if (callable_name) {
 							char *ptr;
 
-							*callable_name_len = fcc->calling_scope->name->len + Z_STRLEN_PP(method) + sizeof("::") - 1;
+							*callable_name_len = fcc->calling_scope->name->len + Z_STRLEN_P(*method) + sizeof("::") - 1;
 							ptr = *callable_name = emalloc(*callable_name_len + 1);
 							memcpy(ptr, fcc->calling_scope->name->val, fcc->calling_scope->name->len);
 							ptr += fcc->calling_scope->name->len;
 							memcpy(ptr, "::", sizeof("::") - 1);
 							ptr += sizeof("::") - 1;
-							memcpy(ptr, Z_STRVAL_PP(method), Z_STRLEN_PP(method) + 1);
+							memcpy(ptr, Z_STRVAL_P(*method), Z_STRLEN_P(*method) + 1);
 						}
 
 						if (check_flags & IS_CALLABLE_CHECK_SYNTAX_ONLY) {
@@ -1113,7 +1113,7 @@ static zend_bool phalcon_is_callable_ex(zval *callable, zval *object_ptr, uint c
 
 				} else {
 					if (zend_hash_num_elements(Z_ARRVAL_P(callable)) == 2) {
-						if (!obj || (Z_TYPE_PP(obj) != IS_STRING && Z_TYPE_PP(obj) != IS_OBJECT)) {
+						if (!obj || (Z_TYPE_P(*obj) != IS_STRING && Z_TYPE_P(*obj) != IS_OBJECT)) {
 							if (error) phalcon_spprintf(error, 0, "first array member is not a valid class name or object");
 						} else {
 							if (error) phalcon_spprintf(error, 0, "second array member is not a valid method");

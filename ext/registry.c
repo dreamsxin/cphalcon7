@@ -184,7 +184,7 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
 		array_init_size(params, argc);
 
 		for (i=0; i<argc; ++i) {
-			Z_ADDREF_PP(args[i]);
+			Z_ADDREF_P(*args[i]);
 			add_next_index_zval(params, *(args[i]));
 		}
 	}
@@ -287,7 +287,7 @@ static int phalcon_registry_has_property(zval *object, zval *member, int has_set
 	}
 
 	if (0 == has_set_exists) {
-		return Z_TYPE_PP(tmp) != IS_NULL;
+		return Z_TYPE_P(*tmp) != IS_NULL;
 	}
 
 	if (1 == has_set_exists) {
@@ -313,8 +313,8 @@ static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int typ
 	ret = phalcon_hash_get(Z_ARRVAL_P(obj->properties), offset, type);
 
 	/* For write context we need to return a reference */
-	if ((type == BP_VAR_W || type == BP_VAR_RW || type == BP_VAR_UNSET) && !Z_ISREF_PP(ret)) {
-		if (Z_REFCOUNT_PP(ret) > 1) {
+	if ((type == BP_VAR_W || type == BP_VAR_RW || type == BP_VAR_UNSET) && !Z_ISREF_P(*ret)) {
+		if (Z_REFCOUNT_P(*ret) > 1) {
 			zval *newval;
 
 			MAKE_STD_ZVAL(newval);
@@ -322,11 +322,11 @@ static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int typ
 			zval_copy_ctor(newval);
 			Z_SET_REFCOUNT_P(newval, 1);
 
-			Z_DELREF_PP(ret);
+			Z_DELREF_P(*ret);
 			*ret = newval;
 		}
 
-		Z_SET_ISREF_PP(ret);
+		Z_SET_ISREF_P(*ret);
 	}
 
 	return *ret;
@@ -548,8 +548,8 @@ static PHP_METHOD(Phalcon_Registry, __get)
 
 	phalcon_ptr_dtor(return_value_ptr);
 	*return_value_ptr = *result;
-	Z_ADDREF_PP(return_value_ptr);
-	Z_SET_ISREF_PP(return_value_ptr);
+	Z_ADDREF_P(*return_value_ptr);
+	Z_SET_ISREF_P(*return_value_ptr);
 }
 
 /**
@@ -602,7 +602,7 @@ static PHP_METHOD(Phalcon_Registry, __call)
 		RETURN_ON_FAILURE(phalcon_call_user_func_array(return_value, callback, *arguments TSRMLS_CC));
 	}
 	else {
-		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_PP(name));
+		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_P(*name));
 	}
 }
 
@@ -683,8 +683,8 @@ static PHP_METHOD(Phalcon_Registry, current)
 		if (return_value_ptr) {
 			phalcon_ptr_dtor(return_value_ptr);
 			*return_value_ptr = *data;
-			Z_ADDREF_PP(data);
-			Z_SET_ISREF_PP(data);
+			Z_ADDREF_P(*data);
+			Z_SET_ISREF_P(*data);
 			return;
 		}
 
@@ -778,8 +778,8 @@ static PHP_METHOD(Phalcon_Registry, unserialize)
 		return;
 	}
 
-	buf = (unsigned char*)(Z_STRVAL_PP(str));
-	max = buf + Z_STRLEN_PP(str);
+	buf = (unsigned char*)(Z_STRVAL_P(*str));
+	max = buf + Z_STRLEN_P(*str);
 
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
 	if (php_var_unserialize(&pzv, &buf, max, &var_hash TSRMLS_CC) && Z_TYPE(zv) == IS_ARRAY) {

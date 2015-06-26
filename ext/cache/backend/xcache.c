@@ -419,7 +419,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, increment){
 	
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
-	if (!value || Z_TYPE_PP(value) == IS_NULL) {
+	if (!value || Z_TYPE_P(*value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
 	}
 	else {
@@ -428,7 +428,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, increment){
 
 	PHALCON_MM_GROW();
 	
-	if (Z_TYPE_PP(key_name) == IS_NULL) {
+	if (Z_TYPE_P(*key_name) == IS_NULL) {
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);
 	} else {
 		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
@@ -467,7 +467,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, decrement){
 	
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
-	if (!value || Z_TYPE_PP(value) == IS_NULL) {
+	if (!value || Z_TYPE_P(*value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
 	}
 	else {
@@ -476,7 +476,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, decrement){
 
 	PHALCON_MM_GROW();
 	
-	if (Z_TYPE_PP(key_name) == IS_NULL) {
+	if (Z_TYPE_P(*key_name) == IS_NULL) {
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);
 	} else {
 		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);

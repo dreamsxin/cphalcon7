@@ -377,7 +377,7 @@ static zval *phql_ret_zval_list(zval *list_left, zval *right_list)
 			zend_hash_get_current_data_ex(list, (void**)&item, &pos) != FAILURE;
 			zend_hash_move_forward_ex(list, &pos)
 		) {
-			Z_ADDREF_PP(item);
+			Z_ADDREF_P(*item);
 			add_next_index_zval(ret, *item);
 		}
 

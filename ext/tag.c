@@ -351,7 +351,7 @@ static void phalcon_tag_get_escaper(zval **return_value_ptr, zval *params TSRMLS
 static zend_bool phalcon_tag_attribute_filter(HashTable *ht, void *pData, zend_hash_key *hash_key, void *pParam)
 {
 	zval **z = (zval**)pData;
-	return hash_key->key && hash_key->key->len && Z_TYPE_PP(z) != IS_ARRAY;
+	return hash_key->key && hash_key->key->len && Z_TYPE_P(*z) != IS_ARRAY;
 }
 
 PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes TSRMLS_DC)
@@ -413,7 +413,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes T
 			zend_hash_move_forward_ex(Z_ARRVAL_P(attrs), &hp)
 		) {
 			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(attrs), &hp);
-			if (Z_TYPE_P(&key) == IS_STRING && Z_TYPE_PP(value) != IS_NULL) {
+			if (Z_TYPE_P(&key) == IS_STRING && Z_TYPE_P(*value) != IS_NULL) {
 				PHALCON_CALL_METHOD(&escaped, escaper, "escapehtmlattr", *value);
 				PHALCON_SCONCAT_SVSVS(code, " ", &key, "=\"", escaped, "\"");
 			}
@@ -426,7 +426,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes T
 			zend_hash_move_forward_ex(Z_ARRVAL_P(attrs), &hp)
 		) {
 			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(attrs), &hp);
-			if (Z_TYPE_P(&key) == IS_STRING && Z_TYPE_PP(value) != IS_NULL) {
+			if (Z_TYPE_P(&key) == IS_STRING && Z_TYPE_P(*value) != IS_NULL) {
 				PHALCON_SCONCAT_SVSVS(code, " ", &key, "=\"", *value, "\"");
 			}
 		}

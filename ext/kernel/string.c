@@ -150,13 +150,13 @@ void phalcon_append_printable_zval(smart_str *implstr, zval **tmp TSRMLS_DC) {
 	zval tmp_val;
 	unsigned int str_len;
 
-	switch (Z_TYPE_PP(tmp)) {
+	switch (Z_TYPE_P(*tmp)) {
 		case IS_STRING:
-			smart_str_appendl(implstr, Z_STRVAL_PP(tmp), Z_STRLEN_PP(tmp));
+			smart_str_appendl(implstr, Z_STRVAL_P(*tmp), Z_STRLEN_P(*tmp));
 			break;
 
 		case IS_LONG:
-			smart_str_append_long(implstr, Z_LVAL_PP(tmp));
+			smart_str_append_long(implstr, Z_LVAL_P(*tmp));
 			break;
 
 		case IS_TRUE:
@@ -171,7 +171,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval **tmp TSRMLS_DC) {
 
 		case IS_DOUBLE: {
 			char *stmp;
-			str_len = spprintf(&stmp, 0, "%.*G", (int) EG(precision), Z_DVAL_PP(tmp));
+			str_len = spprintf(&stmp, 0, "%.*G", (int) EG(precision), Z_DVAL_P(*tmp));
 			smart_str_appendl(implstr, stmp, str_len);
 			efree(stmp);
 		}
@@ -605,19 +605,19 @@ static PATNREPL *php_strtr_array_prepare_repls(int slen, HashTable *pats, zend_l
 				continue;
 			}
 
-			if (Z_TYPE_PP(entry) != IS_STRING) {
+			if (Z_TYPE_P(*entry) != IS_STRING) {
 				tzv = *entry;
 				zval_addref_p(tzv);
 				SEPARATE_ZVAL(&tzv);
 				convert_to_string(tzv);
 				entry = &tzv;
-				zend_llist_add_element(*allocs, &Z_STRVAL_PP(entry));
+				zend_llist_add_element(*allocs, &Z_STRVAL_P(*entry));
 			}
 
 			S(&patterns[i].pat) = string_key;
 			L(&patterns[i].pat) = string_key_len;
-			S(&patterns[i].repl) = Z_STRVAL_PP(entry);
-			L(&patterns[i].repl) = Z_STRLEN_PP(entry);
+			S(&patterns[i].repl) = Z_STRVAL_P(*entry);
+			L(&patterns[i].repl) = Z_STRLEN_P(*entry);
 			i++;
 
 			if (tzv) {
@@ -1445,15 +1445,15 @@ void phalcon_append_printable_array(smart_str *implstr, zval *value TSRMLS_DC) {
 			/**
 			 * We don't serialize objects
 			 */
-			if (Z_TYPE_PP(tmp) == IS_OBJECT) {
+			if (Z_TYPE_P(*tmp) == IS_OBJECT) {
 				smart_str_appendc(implstr, 'O');
 				{
 					char stmp[MAX_LENGTH_OF_LONG + 1];
-					str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJVAL_PP(tmp).handle);
+					str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJVAL_P(*tmp).handle);
 					smart_str_appendl(implstr, stmp, str_len);
 				}
 			} else {
-				if (Z_TYPE_PP(tmp) == IS_ARRAY) {
+				if (Z_TYPE_P(*tmp) == IS_ARRAY) {
 					phalcon_append_printable_array(implstr, *tmp TSRMLS_CC);
 				} else {
 					phalcon_append_printable_zval(implstr, tmp TSRMLS_CC);
@@ -1972,9 +1972,9 @@ void phalcon_addslashes(zval *return_value, zval *str TSRMLS_DC)
 void phalcon_add_trailing_slash(zval** v)
 {
 	PHALCON_ENSURE_IS_STRING(v);
-	if (Z_STRLEN_PP(v)) {
-		int len = Z_STRLEN_PP(v);
-		char *c = Z_STRVAL_PP(v);
+	if (Z_STRLEN_P(*v)) {
+		int len = Z_STRLEN_P(*v);
+		char *c = Z_STRVAL_P(*v);
 
 #ifdef PHP_WIN32
 		if (c[len - 1] != '/' && c[len - 1] != '\\')
@@ -1983,15 +1983,15 @@ void phalcon_add_trailing_slash(zval** v)
 #endif
 		{            
 			SEPARATE_ZVAL(v);
-			c = Z_STRVAL_PP(v);
+			c = Z_STRVAL_P(*v);
 
-			if (!IS_INTERNED(c)) {
+			if (!STR_IS_INTERNED(c)) {
 				c = erealloc(c, len+2);
 			}
 			else {
 				c = emalloc(len + 2);
 				if (c != NULL) {
-					memcpy(c, Z_STRVAL_PP(v), Z_STRLEN_PP(v));
+					memcpy(c, Z_STRVAL_P(*v), Z_STRLEN_P(*v));
 				}
 			}
 

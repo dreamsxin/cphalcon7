@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 		return;
 	}
 
-	if (unlikely(Z_TYPE_PP(parameter) != IS_ARRAY)) {
+	if (unlikely(Z_TYPE_P(*parameter) != IS_ARRAY)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_di_exception_ce, "The parameter must be an array");
 		return;
 	}

@@ -254,7 +254,7 @@ static int phalcon_validation_message_group_has_dimension(zval *object, zval *of
 		}
 
 		if (0 == check_empty) {
-			return Z_TYPE_PP(tmp) != IS_NULL;
+			return Z_TYPE_P(*tmp) != IS_NULL;
 		}
 
 		if (1 == check_empty) {

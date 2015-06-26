@@ -71,7 +71,7 @@ PHP_METHOD(Phalcon_Logger_Formatter, getTypeString){
 	phalcon_fetch_params(0, 1, 0, &type);
 	PHALCON_ENSURE_IS_LONG(type);
 	
-	itype = Z_LVAL_PP(type);
+	itype = Z_LVAL_P(*type);
 	if (itype >= 0 && itype < 10) {
 		RETURN_STRING(lut[itype], 1);
 	}
@@ -92,8 +92,8 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 
 	phalcon_fetch_params(0, 2, 0, &message, &context);
 
-	if (Z_TYPE_PP(context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_PP(context)) > 0) {
-		HashTable *ht = Z_ARRVAL_PP(context);
+	if (Z_TYPE_P(*context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(*context)) > 0) {
+		HashTable *ht = Z_ARRVAL_P(*context);
 		HashPosition hp;
 		zval *replace, **val;
 
@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 				continue;
 			}
 
-			Z_ADDREF_PP(val);
+			Z_ADDREF_P(*val);
 			zend_hash_add(Z_ARRVAL_P(replace), idx, str_length, (void*)val, sizeof(zval*), NULL);
 			efree(idx);
 		}

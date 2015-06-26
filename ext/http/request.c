@@ -1057,8 +1057,8 @@ static const char* phalcon_http_request_getmethod_helper(TSRMLS_D)
 		_SERVER = phalcon_get_global(SS("_SERVER") TSRMLS_CC);
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA);
-			if (value && Z_TYPE_PP(value) == IS_STRING) {
-				return Z_STRVAL_PP(value);
+			if (value && Z_TYPE_P(*value) == IS_STRING) {
+				return Z_STRVAL_P(*value);
 			}
 		}
 
@@ -1097,7 +1097,7 @@ PHP_METHOD(Phalcon_Http_Request, getURI){
 
 	_SERVER = phalcon_get_global(SS("_SERVER") TSRMLS_CC);
 	value = (Z_TYPE_P(_SERVER) == IS_ARRAY) ? phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA) : NULL;
-	if (value && Z_TYPE_PP(value) == IS_STRING) {
+	if (value && Z_TYPE_P(*value) == IS_STRING) {
 		RETURN_ZVAL(*value, 1, 0);
 	}
 
@@ -1349,12 +1349,12 @@ static int phalcon_http_request_hasfiles_helper(zval *arr, int only_successful)
 		zend_hash_get_current_data_ex(Z_ARRVAL_P(arr), (void**) &value, &hp) == SUCCESS;
 		zend_hash_move_forward_ex(Z_ARRVAL_P(arr), &hp)
 	) {
-		if (Z_TYPE_PP(value) < IS_ARRAY) {
+		if (Z_TYPE_P(*value) < IS_ARRAY) {
 			if (!zend_is_true(*value) || !only_successful) {
 				++nfiles;
 			}
 		}
-		else if (Z_TYPE_PP(value) == IS_ARRAY) {
+		else if (Z_TYPE_P(*value) == IS_ARRAY) {
 			nfiles += phalcon_http_request_hasfiles_helper(*value, only_successful);
 		}
 	}
@@ -1439,13 +1439,13 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 				smart_str_append_long(prefix, Z_LVAL(index));
 			}
 
-			if (Z_TYPE_PP(derror) < IS_ARRAY) {
+			if (Z_TYPE_P(*derror) < IS_ARRAY) {
 				if (!zend_is_true(*derror) || !only_successful) {
-					Z_ADDREF_PP(dname);
-					Z_ADDREF_PP(dtype);
-					Z_ADDREF_PP(dtmp);
-					Z_ADDREF_PP(derror);
-					Z_ADDREF_PP(dsize);
+					Z_ADDREF_P(*dname);
+					Z_ADDREF_P(*dtype);
+					Z_ADDREF_P(*dtmp);
+					Z_ADDREF_P(*derror);
+					Z_ADDREF_P(*dsize);
 
 					MAKE_STD_ZVAL(arr);
 					array_init_size(arr, 5);
@@ -1478,7 +1478,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 					}
 				}
 			}
-			else if (Z_TYPE_PP(derror) == IS_ARRAY) {
+			else if (Z_TYPE_P(*derror) == IS_ARRAY) {
 				smart_str_appendc(prefix, '.');
 				phalcon_http_request_getuploadedfiles_helper(return_value, *dname, *dtype, *dtmp, *derror, *dsize, only_successful, prefix TSRMLS_CC);
 				prefix->len = prefix_len;
@@ -1897,15 +1897,15 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
 			ZVAL_STRING(&key, "PHP_AUTH_USER", 0);
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA);
-			if (value && Z_TYPE_PP(value) == IS_STRING) {
-				auth_user = Z_STRVAL_PP(value);
+			if (value && Z_TYPE_P(*value) == IS_STRING) {
+				auth_user = Z_STRVAL_P(*value);
 			}
 
 			ZVAL_STRING(&key, "PHP_AUTH_PW", 0);
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA);
-			if (value && Z_TYPE_PP(value) == IS_STRING) {
-				auth_password = Z_STRVAL_PP(value);
+			if (value && Z_TYPE_P(*value) == IS_STRING) {
+				auth_password = Z_STRVAL_P(*value);
 			}
 		}
 	}
@@ -1947,8 +1947,8 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 			ZVAL_STRING(&key, "PHP_AUTH_DIGEST", 0);
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA);
-			if (value && Z_TYPE_PP(value) == IS_STRING) {
-				auth_digest = Z_STRVAL_PP(value);
+			if (value && Z_TYPE_P(*value) == IS_STRING) {
+				auth_digest = Z_STRVAL_P(*value);
 			}
 		}
 	}

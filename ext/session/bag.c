@@ -203,7 +203,7 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 	PHALCON_CALL_METHOD(&tmp, session, "__get", name);
 	data = &tmp;
 
-	if (Z_TYPE_PP(data) != IS_ARRAY) {
+	if (Z_TYPE_P(*data) != IS_ARRAY) {
 		zval *empty_array;
 		PHALCON_ALLOC_GHOST_ZVAL(empty_array);
 		array_init(empty_array);
@@ -352,8 +352,8 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 		PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
 	}
 
-	Z_ADDREF_PP(return_value_ptr);
-	Z_SET_ISREF_PP(return_value_ptr);
+	Z_ADDREF_P(*return_value_ptr);
+	Z_SET_ISREF_P(*return_value_ptr);
 }
 
 

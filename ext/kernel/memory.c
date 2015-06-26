@@ -234,7 +234,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g TSRMLS_D
 		/* Check for non freed hash key zvals, mark as null to avoid string freeing */
 		for (i = 0; i < active_memory->hash_pointer; ++i) {
 			assert(active_memory->hash_addresses[i] != NULL && *(active_memory->hash_addresses[i]) != NULL);
-			if (Z_REFCOUNT_PP(active_memory->hash_addresses[i]) <= 1) {
+			if (Z_REFCOUNT_P(*active_memory->hash_addresses[i]) <= 1) {
 				ZVAL_NULL(*active_memory->hash_addresses[i]);
 			} else {
 				zval_copy_ctor(*active_memory->hash_addresses[i]);
@@ -246,25 +246,25 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g TSRMLS_D
 			if (active_memory->addresses[i] != NULL && *(active_memory->addresses[i]) != NULL) {
 				zval **var = active_memory->addresses[i];
 #if PHP_VERSION_ID < 50400
-				if (Z_TYPE_PP(var) > IS_CONSTANT_ARRAY) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *var, Z_TYPE_PP(var), active_memory->func);
+				if (Z_TYPE_P(*var) > IS_CONSTANT_ARRAY) {
+					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
 				}
 #else
-				if (Z_TYPE_PP(var) > IS_CALLABLE) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *var, Z_TYPE_PP(var), active_memory->func);
+				if (Z_TYPE_P(*var) > IS_CALLABLE) {
+					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
 				}
 #endif
 
-				if (Z_REFCOUNT_PP(var) == 0) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has 0 references, type=%d [%s]\n", __func__, (int)i, *var, Z_TYPE_PP(var), active_memory->func);
+				if (Z_REFCOUNT_P(*var) == 0) {
+					fprintf(stderr, "%s: observed variable #%d (%p) has 0 references, type=%d [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
 				}
-				else if (Z_REFCOUNT_PP(var) >= 1000000) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has too many references (%u), type=%d  [%s]\n", __func__, (int)i, *var, Z_REFCOUNT_PP(var), Z_TYPE_PP(var), active_memory->func);
+				else if (Z_REFCOUNT_P(*var) >= 1000000) {
+					fprintf(stderr, "%s: observed variable #%d (%p) has too many references (%u), type=%d  [%s]\n", __func__, (int)i, *var, Z_REFCOUNT_P(*var), Z_TYPE_P(*var), active_memory->func);
 				}
 #if 0
 				/* Skip this check, PDO does return variables with is_ref = 1 and refcount = 1*/
-				else if (Z_REFCOUNT_PP(var) == 1 && Z_ISREF_PP(var)) {
-					fprintf(stderr, "%s: observed variable #%d (%p) is a reference with reference count = 1, type=%d  [%s]\n", __func__, (int)i, *var, Z_TYPE_PP(var), active_memory->func);
+				else if (Z_REFCOUNT_P(*var) == 1 && Z_ISREF_P(*var)) {
+					fprintf(stderr, "%s: observed variable #%d (%p) is a reference with reference count = 1, type=%d  [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
 				}
 #endif
 			}
@@ -275,14 +275,14 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g TSRMLS_D
 		for (i = 0; i < active_memory->pointer; ++i) {
 			ptr = active_memory->addresses[i];
 			if (EXPECTED(ptr != NULL && *(ptr) != NULL)) {
-				if (Z_REFCOUNT_PP(ptr) == 1) {
-					if (!Z_ISREF_PP(ptr) || Z_TYPE_PP(ptr) == IS_OBJECT) {
+				if (Z_REFCOUNT_P(*ptr) == 1) {
+					if (!Z_ISREF_P(*ptr) || Z_TYPE_P(*ptr) == IS_OBJECT) {
 						zval_ptr_dtor(ptr);
 					} else {
 						efree(*ptr);
 					}
 				} else {
-					Z_DELREF_PP(ptr);
+					Z_DELREF_P(*ptr);
 				}
 			}
 		}
@@ -350,24 +350,24 @@ void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory TSRMLS_DC)
 	if (active_memory->hash_pointer) {
 		for (i = 0; i < active_memory->hash_pointer; ++i) {
 			assert(active_memory->hash_addresses[i] != NULL && *(active_memory->hash_addresses[i]) != NULL);
-			fprintf(stderr, "Hash ptr %lu (%p => %p), type=%u, refcnt=%u\n", (ulong)i, active_memory->hash_addresses[i], *active_memory->hash_addresses[i], Z_TYPE_PP(active_memory->hash_addresses[i]), Z_REFCOUNT_PP(active_memory->hash_addresses[i]));
+			fprintf(stderr, "Hash ptr %lu (%p => %p), type=%u, refcnt=%u\n", (ulong)i, active_memory->hash_addresses[i], *active_memory->hash_addresses[i], Z_TYPE_P(*active_memory->hash_addresses[i]), Z_REFCOUNT_P(*active_memory->hash_addresses[i]));
 		}
 	}
 
 	for (i = 0; i < active_memory->pointer; ++i) {
 		if (EXPECTED(active_memory->addresses[i] != NULL && *(active_memory->addresses[i]) != NULL)) {
 			zval **var = active_memory->addresses[i];
-			fprintf(stderr, "Obs var %lu (%p => %p), type=%u, refcnt=%u; ", (ulong)i, var, *var, Z_TYPE_PP(var), Z_REFCOUNT_PP(var));
-			switch (Z_TYPE_PP(var)) {
+			fprintf(stderr, "Obs var %lu (%p => %p), type=%u, refcnt=%u; ", (ulong)i, var, *var, Z_TYPE_P(*var), Z_REFCOUNT_P(*var));
+			switch (Z_TYPE_P(*var)) {
 				case IS_NULL:     fprintf(stderr, "value=NULL\n"); break;
-				case IS_LONG:     fprintf(stderr, "value=%ld\n", Z_LVAL_PP(var)); break;
-				case IS_DOUBLE:   fprintf(stderr, "value=%E\n", Z_DVAL_PP(var)); break;
+				case IS_LONG:     fprintf(stderr, "value=%ld\n", Z_LVAL_P(*var)); break;
+				case IS_DOUBLE:   fprintf(stderr, "value=%E\n", Z_DVAL_P(*var)); break;
 				case IS_TRUE:     fprintf(stderr, "value=(bool)1\n"); break;
 				case IS_FALSE:    fprintf(stderr, "value=(bool)0\n"); break;
-				case IS_ARRAY:    fprintf(stderr, "value=array(%p), %d elements\n", Z_ARRVAL_PP(var), zend_hash_num_elements(Z_ARRVAL_PP(var))); break;
-				case IS_OBJECT:   fprintf(stderr, "value=object(%u), %s\n", Z_OBJ_HANDLE_PP(var), Z_OBJCE_PP(var)->name->val); break;
-				case IS_STRING:   fprintf(stderr, "value=%*s (%p)\n", Z_STRLEN_PP(var), Z_STRVAL_PP(var), Z_STRVAL_PP(var)); break;
-				case IS_RESOURCE: fprintf(stderr, "value=(resource)%ld\n", Z_LVAL_PP(var)); break;
+				case IS_ARRAY:    fprintf(stderr, "value=array(%p), %d elements\n", Z_ARRVAL_P(*var), zend_hash_num_elements(Z_ARRVAL_P(*var))); break;
+				case IS_OBJECT:   fprintf(stderr, "value=object(%u), %s\n", Z_OBJ_HANDLE_P(*var), Z_OBJCE_P(*var)->name->val); break;
+				case IS_STRING:   fprintf(stderr, "value=%*s (%p)\n", Z_STRLEN_P(*var), Z_STRVAL_P(*var), Z_STRVAL_P(*var)); break;
+				case IS_RESOURCE: fprintf(stderr, "value=(resource)%ld\n", Z_LVAL_P(*var)); break;
 				default:          fprintf(stderr, "\n"); break;
 			}
 		}
@@ -829,14 +829,14 @@ static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)
  */
 void ZEND_FASTCALL phalcon_ptr_dtor(zval **var)
 {
-	if (!Z_ISREF_PP(var) || Z_TYPE_PP(var) == IS_OBJECT) {
+	if (!Z_ISREF_P(*var) || Z_TYPE_P(*var) == IS_OBJECT) {
 		zval_ptr_dtor(var);
 	} else {
-		if (Z_REFCOUNT_PP(var) == 0) {
+		if (Z_REFCOUNT_P(*var) == 0) {
 			efree(*var);
 		} else {
-			Z_DELREF_PP(var);
-			if (Z_REFCOUNT_PP(var) == 0) {
+			Z_DELREF_P(*var);
+			if (Z_REFCOUNT_P(*var) == 0) {
 				efree(*var);
 			}
 		}

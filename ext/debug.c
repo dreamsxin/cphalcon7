@@ -700,13 +700,13 @@ PHP_METHOD(Phalcon_Debug, getFileLink) {
 	PHALCON_ENSURE_IS_STRING(file);
 	PHALCON_ENSURE_IS_STRING(line);
 
-	if (Z_TYPE_PP(format) == IS_STRING) {
+	if (Z_TYPE_P(*format) == IS_STRING) {
 		char *tmp, *link;
 		int tmp_len, link_len;
 		zval z_link = zval_used_for_init;
 
-		tmp  = php_str_to_str_ex(Z_STRVAL_PP(format), Z_STRLEN_PP(format), SL("%f"), Z_STRVAL_PP(file), Z_STRLEN_PP(file), &tmp_len, 1, NULL);
-		link = php_str_to_str_ex(tmp, tmp_len, SL("%l"), Z_STRVAL_PP(line), Z_STRLEN_PP(line), &link_len, 1, NULL);
+		tmp  = php_str_to_str_ex(Z_STRVAL_P(*format), Z_STRLEN_P(*format), SL("%f"), Z_STRVAL_P(*file), Z_STRLEN_P(*file), &tmp_len, 1, NULL);
+		link = php_str_to_str_ex(tmp, tmp_len, SL("%l"), Z_STRVAL_P(*line), Z_STRLEN_P(*line), &link_len, 1, NULL);
 
 		ZVAL_STRINGL(&z_link, link, link_len, 0);
 

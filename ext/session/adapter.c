@@ -146,7 +146,7 @@ static int phalcon_session_adapter_has_property_internal(zval *object, zval *mem
 	}
 
 	if (0 == has_set_exists) {
-		return Z_TYPE_PP(tmp) != IS_NULL;
+		return Z_TYPE_P(*tmp) != IS_NULL;
 	}
 
 	if (1 == has_set_exists) {
@@ -240,8 +240,8 @@ static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, 
 	ret = phalcon_session_adapter_get_property_ptr_ptr_internal(object, offset, type);
 
 	/* For write context we need to return a reference */
-	if ((type == BP_VAR_W || type == BP_VAR_RW || type == BP_VAR_UNSET) && !Z_ISREF_PP(ret)) {
-		if (Z_REFCOUNT_PP(ret) > 1) {
+	if ((type == BP_VAR_W || type == BP_VAR_RW || type == BP_VAR_UNSET) && !Z_ISREF_P(*ret)) {
+		if (Z_REFCOUNT_P(*ret) > 1) {
 			zval *newval;
 
 			MAKE_STD_ZVAL(newval);
@@ -249,11 +249,11 @@ static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, 
 			zval_copy_ctor(newval);
 			Z_SET_REFCOUNT_P(newval, 1);
 
-			Z_DELREF_PP(ret);
+			Z_DELREF_P(*ret);
 			*ret = newval;
 		}
 
-		Z_SET_ISREF_PP(ret);
+		Z_SET_ISREF_P(*ret);
 	}
 
 	return *ret;
@@ -288,7 +288,7 @@ static int phalcon_session_adapter_has_dimension(zval *object, zval *member, int
 	}
 
 	if (0 == check_empty) {
-		return Z_TYPE_PP(tmp) != IS_NULL;
+		return Z_TYPE_P(*tmp) != IS_NULL;
 	}
 
 	if (1 == check_empty) {
@@ -724,8 +724,8 @@ PHP_METHOD(Phalcon_Session_Adapter, __get)
 
 	zval_ptr_dtor(return_value_ptr);
 	*return_value_ptr = *retval;
-	Z_ADDREF_PP(return_value_ptr);
-	Z_SET_ISREF_PP(return_value_ptr);
+	Z_ADDREF_P(*return_value_ptr);
+	Z_SET_ISREF_P(*return_value_ptr);
 }
 
 PHP_METHOD(Phalcon_Session_Adapter, count)

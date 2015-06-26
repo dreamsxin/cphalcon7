@@ -246,7 +246,7 @@ static int phalcon_config_has_internal(phalcon_config_object *object, zval *key,
 	}
 
 	if (0 == check_empty) {
-		return Z_TYPE_PP(tmp) != IS_NULL;
+		return Z_TYPE_P(*tmp) != IS_NULL;
 	}
 
 	if (1 == check_empty) {
@@ -462,7 +462,7 @@ PHALCON_ATTR_WARN_UNUSED_RESULT static int phalcon_config_toarray_internal(zval 
 	if (likely(obj->obj.ce == phalcon_config_ce)) {
 		zval *tmp;
 		array_init_size(*return_value_ptr, zend_hash_num_elements(obj->props));
-		zend_hash_copy(Z_ARRVAL_PP(return_value_ptr), obj->props, (copy_ctor_func_t)zval_add_ref, (void*)&tmp, sizeof(zval*));
+		zend_hash_copy(Z_ARRVAL_P(*return_value_ptr), obj->props, (copy_ctor_func_t)zval_add_ref, (void*)&tmp, sizeof(zval*));
 		return SUCCESS;
 	}
 
@@ -659,7 +659,7 @@ PHP_METHOD(Phalcon_Config, merge){
 		 * The key is already defined in the object, we have to merge it
 		 */
 		if (active_value) {
-			if ((Z_TYPE_PP(hd)  == IS_OBJECT || Z_TYPE_PP(hd) == IS_ARRAY) && Z_TYPE_P(active_value) == IS_OBJECT) {
+			if ((Z_TYPE_P(*hd)  == IS_OBJECT || Z_TYPE_P(*hd) == IS_ARRAY) && Z_TYPE_P(active_value) == IS_OBJECT) {
 				if (phalcon_method_exists_ex(active_value, SS("merge") TSRMLS_CC) == SUCCESS) { /* Path AAA in the test */
 					zval *params[] = { *hd };
 					if (FAILURE == phalcon_call_method(NULL, active_value, "merge", 1, params TSRMLS_CC)) {
@@ -722,7 +722,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 		) {
 			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(return_value), &hp);
 
-			if (Z_TYPE_PP(value) == IS_OBJECT && phalcon_method_exists_ex(*value, SS("toarray") TSRMLS_CC) == SUCCESS) {
+			if (Z_TYPE_P(*value) == IS_OBJECT && phalcon_method_exists_ex(*value, SS("toarray") TSRMLS_CC) == SUCCESS) {
 				zval *array_value = NULL;
 				if (FAILURE == phalcon_call_method(&array_value, *value, "toarray", 0, NULL TSRMLS_CC)) {
 					break;

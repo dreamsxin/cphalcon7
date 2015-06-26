@@ -132,13 +132,13 @@ long int phalcon_fast_count_int(zval *value TSRMLS_DC) {
 		}
 
 		if (instanceof_function_ex(Z_OBJCE_P(value), spl_ce_Countable, 1)) {
-			zval *retval    = NULL;
+			zval retval;
 			long int result = 0;
 
-			zend_call_method_with_0_params(&value, Z_OBJCE_P(value), NULL, "count", &retval);
-			if (retval) {
+			zend_call_method_with_0_params(value, Z_OBJCE_P(value), NULL, "count", &retval);
+			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
-				result = Z_LVAL_P(retval);
+				result = Z_LVAL(retval);
 				phalcon_ptr_dtor(&retval);
 			}
 
@@ -166,7 +166,7 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 	}
 
 	if (Z_TYPE_P(value) == IS_OBJECT) {
-		zval *retval = NULL;
+		zval retval;
 
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			ZVAL_LONG(result, 1);
@@ -176,10 +176,10 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 		}
 
 		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
-			zend_call_method_with_0_params(&value, NULL, NULL, "count", &retval);
-			if (retval) {
+			zend_call_method_with_0_params(value, NULL, NULL, "count", &retval);
+			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
-				ZVAL_LONG(result, Z_LVAL_P(retval));
+				ZVAL_LONG(result, Z_LVAL(retval));
 				phalcon_ptr_dtor(&retval);
 			}
 			return;
@@ -209,7 +209,7 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 	}
 
 	if (Z_TYPE_P(value) == IS_OBJECT) {
-		zval *retval = NULL;
+		zval retval;
 
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			Z_OBJ_HT(*value)->count_elements(value, &count TSRMLS_CC);
@@ -217,10 +217,10 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 		}
 
 		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
-			zend_call_method_with_0_params(&value, NULL, NULL, "count", &retval);
-			if (retval) {
+			zend_call_method_with_0_params(value, NULL, NULL, "count", &retval);
+			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
-				count = Z_LVAL_P(retval);
+				count = Z_LVAL(retval);
 				phalcon_ptr_dtor(&retval);
 				return (int) count > 0;
 			}

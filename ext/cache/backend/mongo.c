@@ -444,7 +444,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 	
 	PHALCON_INIT_VAR(fields);
 	array_init_size(fields, 1);
-	add_next_index_stringl(fields, SL("key"), 1);
+	add_next_index_stringl(fields, SL("key"));
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 2);

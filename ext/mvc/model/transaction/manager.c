@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, get){
 			PHALCON_INIT_NVAR(rollback_pendent);
 			array_init_size(rollback_pendent, 2);
 			phalcon_array_append(&rollback_pendent, this_ptr, PH_SEPARATE);
-			add_next_index_stringl(rollback_pendent, SL("rollbackPendent"), 1);
+			add_next_index_stringl(rollback_pendent, SL("rollbackPendent"));
 			PHALCON_CALL_FUNCTION(NULL, "register_shutdown_function", rollback_pendent);
 		}
 	

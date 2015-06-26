@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 				zend_hash_move_forward_ex(Z_ARRVAL_P(data), &pos)
 			) {
 				if (type == HASH_KEY_IS_STRING && str_index_len > (uint)(Z_STRLEN_P(prefix)) && !memcmp(Z_STRVAL_P(prefix), str_index, str_index_len-1)) {
-					add_next_index_stringl(return_value, str_index, str_index_len - 1, 1);
+					add_next_index_stringl(return_value, str_index, str_index_len - 1);
 				}
 				else if (unlikely(type == HASH_KEY_IS_LONG)) {
 					char buf[8 * sizeof(ulong) + 2];

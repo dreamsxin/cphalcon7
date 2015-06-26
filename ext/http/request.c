@@ -1919,8 +1919,8 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
 	}
 
 	array_init_size(return_value, 2);
-	add_assoc_stringl_ex(return_value, SS("username"), auth_user, strlen(auth_user), 1);
-	add_assoc_stringl_ex(return_value, SS("password"), auth_password, strlen(auth_password), 1);
+	add_assoc_stringl_ex(return_value, SS("username"), auth_user, strlen(auth_user));
+	add_assoc_stringl_ex(return_value, SS("password"), auth_password, strlen(auth_password));
 }
 
 /**

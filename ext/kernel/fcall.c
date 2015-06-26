@@ -539,9 +539,9 @@ int phalcon_call_class_method_aparams(zval **return_value_ptr, zend_class_entry 
 	}
 	array_init_size(&fn, 2);
 	switch (type) {
-		case phalcon_fcall_parent: add_next_index_stringl(&fn, ISL(parent), !STR_IS_INTERNED(phalcon_interned_parent)); break;
-		case phalcon_fcall_self:   assert(!ce); add_next_index_stringl(&fn, ISL(self), !STR_IS_INTERNED(phalcon_interned_self)); break;
-		case phalcon_fcall_static: assert(!ce); add_next_index_stringl(&fn, ISL(static), !STR_IS_INTERNED(phalcon_interned_static)); break;
+		case phalcon_fcall_parent: add_next_index_stringl(&fn, ISL(parent)); break;
+		case phalcon_fcall_self:   assert(!ce); add_next_index_stringl(&fn, ISL(self)); break;
+		case phalcon_fcall_static: assert(!ce); add_next_index_stringl(&fn, ISL(static)); break;
 
 		case phalcon_fcall_ce:
 			assert(ce != NULL);
@@ -556,7 +556,7 @@ int phalcon_call_class_method_aparams(zval **return_value_ptr, zend_class_entry 
 			break;
 	}
 
-	add_next_index_stringl(&fn, method_name, method_len, 1);
+	add_next_index_stringl(&fn, method_name, method_len);
 
 	status = phalcon_call_user_function(object ? &object : NULL, ce, type, &fn, rvp, param_count, params TSRMLS_CC);
 

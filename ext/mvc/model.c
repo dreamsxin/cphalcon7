@@ -6792,7 +6792,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getRelated){
 	PHALCON_INIT_VAR(call_object);
 	array_init_size(call_object, 2);
 	phalcon_array_append(&call_object, manager, PH_SEPARATE);
-	add_next_index_stringl(call_object, SL("getRelationRecords"), 1);
+	add_next_index_stringl(call_object, SL("getRelationRecords"));
 
 	PHALCON_INIT_VAR(model_args);
 	array_init_size(model_args, 4);
@@ -6875,7 +6875,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _getRelatedRecords){
 		PHALCON_INIT_VAR(call_object);
 		array_init_size(call_object, 2);
 		phalcon_array_append(&call_object, manager, PH_SEPARATE);
-		add_next_index_stringl(call_object, SL("getRelationRecords"), 1);
+		add_next_index_stringl(call_object, SL("getRelationRecords"));
 		PHALCON_CALL_USER_FUNC_ARRAY(return_value, call_object, call_args);
 		RETURN_MM();
 	}
@@ -7352,7 +7352,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 		PHALCON_INIT_VAR(call_object);
 		array_init_size(call_object, 2);
 		phalcon_array_append(&call_object, manager, 0);
-		add_next_index_stringl(call_object, SL("getRelationRecords"), 1);
+		add_next_index_stringl(call_object, SL("getRelationRecords"));
 
 		/**
 		 * Get the related records

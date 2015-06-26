@@ -1043,8 +1043,8 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 
 	PHALCON_INIT_VAR(callback);
 	array_init_size(callback, 2);
-	add_next_index_stringl(callback, SL("Phalcon\\Tag"), 1);
-	add_next_index_stringl(callback, SL("stylesheetLink"), 1);
+	add_next_index_stringl(callback, SL("Phalcon\\Tag"));
+	add_next_index_stringl(callback, SL("stylesheetLink"));
 
 	PHALCON_INIT_VAR(type);
 	ZVAL_STRING(type, "css", 1);
@@ -1084,8 +1084,8 @@ PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 
 	PHALCON_INIT_VAR(callback);
 	array_init_size(callback, 2);
-	add_next_index_stringl(callback, SL("Phalcon\\Tag"), 1);
-	add_next_index_stringl(callback, SL("javascriptInclude"), 1);
+	add_next_index_stringl(callback, SL("Phalcon\\Tag"));
+	add_next_index_stringl(callback, SL("javascriptInclude"));
 
 	PHALCON_INIT_VAR(type);
 	ZVAL_STRING(type, "js", 1);

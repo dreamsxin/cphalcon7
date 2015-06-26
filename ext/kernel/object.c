@@ -390,7 +390,7 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access TSRMLS
 			return;
 		}
 
-		zobj = zend_objects_get_address(object TSRMLS_CC);
+		zobj = Z_OBJ_P(object);
 
 		array_init(result);
 
@@ -787,7 +787,7 @@ zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name,
 		old_scope = EG(scope);
 		EG(scope) = ce;
 
-		zobj = zend_objects_get_address(object TSRMLS_CC);
+		zobj = Z_OBJ_P(object);
 
 		if ((property_info = zend_hash_str_find_ptr(&ce->properties_info, property_name, property_length + 1)) != NULL) {
 			int flag;
@@ -853,7 +853,7 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 		old_scope = EG(scope);
 		EG(scope) = ce;
 
-		zobj = zend_objects_get_address(object TSRMLS_CC);
+		zobj = Z_OBJ_P(object);
 
 		if (phalcon_hash_quick_find(&ce->properties_info, property_name, property_length + 1, key, (void **) &property_info) == SUCCESS) {
 

@@ -231,7 +231,7 @@ static zval *phql_ret_limit_clause(zval *L, zval *O)
 	return ret;
 }
 
-static zval *phql_ret_forupdate_clause()
+static zval *phql_ret_for_update_clause()
 {
 	zval *ret;
 
@@ -603,7 +603,7 @@ query_language(R) ::= delete_statement(D) . {
 
 %destructor select_statement { zval_ptr_dtor(&$$); }
 
-select_statement(R) ::= select_clause(S) where_clause(W) group_clause(G) having_clause(H) order_clause(O) select_limit_clause(L) forupdate_clause(F) . {
+select_statement(R) ::= select_clause(S) where_clause(W) group_clause(G) having_clause(H) order_clause(O) select_limit_clause(L) for_update_clause(F) . {
 	R = phql_ret_select_statement(S, W, O, G, H, L, F);
 }
 
@@ -955,7 +955,17 @@ having_clause(R) ::= . {
 	R = NULL;
 }
 
-%destructor select_limit_clause { phalcon_safe_zval_ptr_dtor($$); }
+%destructor for_update_clause { phalcon_safe_zval_ptr_dtor($$); }
+
+for_update_clause(R) ::= FOR UPDATE . {
+	R = phql_ret_for_update_clause();
+}
+
+for_update_clause(R) ::= . {
+	R = NULL;
+}
+
+%destructor select_limit_clause { zephir_safe_zval_ptr_dtor($$); }
 
 select_limit_clause(R) ::= LIMIT integer_or_placeholder(I) . {
 	R = phql_ret_limit_clause(I, NULL);
@@ -983,18 +993,12 @@ limit_clause(R) ::= . {
 	R = NULL;
 }
 
-%destructor forupdate_clause { phalcon_safe_zval_ptr_dtor($$); }
-
-forupdate_clause(R) ::= FOR UPDATE . {
-	R = phql_ret_forupdate_clause();
-}
-
-forupdate_clause(R) ::= . {
-	R = NULL;
-}
-
 integer_or_placeholder(R) ::= INTEGER(I) . {
 	R = phql_ret_literal_zval(PHQL_T_INTEGER, I);
+}
+
+integer_or_placeholder(R) ::= HINTEGER(I) . {
+	R = phql_ret_literal_zval(PHQL_T_HINTEGER, I);
 }
 
 integer_or_placeholder(R) ::= NPLACEHOLDER(P) . {
@@ -1253,6 +1257,10 @@ expr(R) ::= INTEGER(I) . {
 	R = phql_ret_literal_zval(PHQL_T_INTEGER, I);
 }
 
+expr(R) ::= HINTEGER(I) . {
+	R = phql_ret_literal_zval(PHQL_T_HINTEGER, I);
+}
+
 expr(R) ::= STRING(S) . {
 	R = phql_ret_literal_zval(PHQL_T_STRING, S);
 }
@@ -1273,20 +1281,19 @@ expr(R) ::= FALSE . {
 	R = phql_ret_literal_zval(PHQL_T_FALSE, NULL);
 }
 
+/* ?0 */
 expr(R) ::= NPLACEHOLDER(P) . {
 	R = phql_ret_placeholder_zval(PHQL_T_NPLACEHOLDER, P);
 }
 
+/* :placeholder: */
 expr(R) ::= SPLACEHOLDER(P) . {
 	R = phql_ret_placeholder_zval(PHQL_T_SPLACEHOLDER, P);
 }
 
-expr(R) ::= NTPLACEHOLDER(P) . {
-	R = phql_ret_placeholder_zval(PHQL_T_NTPLACEHOLDER, P);
-}
-
-expr(R) ::= STPLACEHOLDER(P) . {
-	R = phql_ret_placeholder_zval(PHQL_T_STPLACEHOLDER, P);
+/* {placeholder} */
+expr(R) ::= BPLACEHOLDER(P) . {
+	R = phql_ret_placeholder_zval(PHQL_T_BPLACEHOLDER, P);
 }
 
 %destructor qualified_name { zval_ptr_dtor(&$$); }

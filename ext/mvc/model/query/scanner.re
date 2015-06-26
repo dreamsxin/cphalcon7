@@ -37,6 +37,15 @@ int phql_get_token(phql_scanner_state *s, phql_scanner_token *token) {
 		re2c:indent:top = 2;
 		re2c:yyfill:enable = 0;
 
+		HINTEGER = [0][x]([0-9A-Za-z]+);
+		HINTEGER {
+			token->opcode = PHQL_T_HINTEGER;
+			token->value = estrndup(q, YYCURSOR - q);
+			token->len = YYCURSOR - q;
+			q = YYCURSOR;
+			return 0;
+		}
+
 		INTEGER = [0-9]+;
 		INTEGER {
 			token->opcode = PHQL_T_INTEGER;
@@ -67,6 +76,15 @@ int phql_get_token(phql_scanner_state *s, phql_scanner_token *token) {
 		SPLACEHOLDER = ":"[a-zA-Z0-9\_\-]+":";
 		SPLACEHOLDER {
 			token->opcode = PHQL_T_SPLACEHOLDER;
+			token->value = estrndup(q, YYCURSOR - q - 1);
+			token->len = YYCURSOR - q - 1;
+			q = YYCURSOR;
+			return 0;
+		}
+
+		BPLACEHOLDER = "{"[a-zA-Z0-9\_\-\:]+"}";
+		BPLACEHOLDER {
+			token->opcode = PHQL_T_BPLACEHOLDER;
 			token->value = estrndup(q, YYCURSOR - q - 1);
 			token->len = YYCURSOR - q - 1;
 			q = YYCURSOR;

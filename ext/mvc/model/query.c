@@ -113,8 +113,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getSingleResult);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setType);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getType);
+PHP_METHOD(Phalcon_Mvc_Model_Query, getBindParam);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setBindParams);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getBindParams);
+PHP_METHOD(Phalcon_Mvc_Model_Query, setBindType);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setIntermediate);
@@ -147,8 +149,17 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_settype, 0, 0, 1)
 	ZEND_ARG_INFO(0, type)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_getbindparam, 0, 0, 1)
+	ZEND_ARG_INFO(0, name)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setbindparams, 0, 0, 1)
 	ZEND_ARG_INFO(0, bindParams)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setbindtype, 0, 0, 2)
+	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_INFO(0, type)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setbindtypes, 0, 0, 1)
@@ -197,8 +208,10 @@ static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, getSingleResult, arginfo_phalcon_mvc_model_query_getsingleresult, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setType, arginfo_phalcon_mvc_model_query_settype, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getType, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, getBindParam, arginfo_phalcon_mvc_model_query_getbindparam, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setBindParams, arginfo_phalcon_mvc_model_query_setbindparams, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getBindParams, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, setBindType, arginfo_phalcon_mvc_model_query_setbindtype, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setBindTypes, arginfo_phalcon_mvc_model_query_setbindtypes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getBindTypes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setIntermediate, arginfo_phalcon_mvc_model_query_setintermediate, ZEND_ACC_PUBLIC)
@@ -840,6 +853,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 	zval *expr, *quoting = NULL, *temp_not_quoting;
 	zval *left = NULL, *right = NULL, *expr_type;
 	zval *expr_value = NULL, *value = NULL, *escaped_value = NULL;
+	zval *value_parts = NULL,  *value_name = NULL, *value_type = NULL, *value_param = NULL;
 	zval *placeholder = NULL, *exception_message;
 	zval *list_items, *expr_list_item = NULL;
 	zval *expr_item = NULL;
@@ -1055,6 +1069,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				phalcon_array_update_string(&return_value, ISL(value), value, PH_COPY);
 				break;
 
+			case PHQL_T_HINTEGER:
+				PHALCON_OBS_VAR(value);
+				phalcon_array_fetch_string(&value, expr, SL("value"), PH_NOISY);
+
+				array_init_size(return_value, 2);
+				add_assoc_stringl_ex(return_value, ISS(type), SL("literal"), 1);
+				phalcon_array_update_string(&return_value, ISL(value), value, PH_COPY);
+				break;
+
 			case PHQL_T_RAW_QUALIFIED:
 				PHALCON_OBS_VAR(value);
 				phalcon_array_fetch_string(&value, expr, SL("name"), PH_NOISY);
@@ -1135,38 +1158,95 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				phalcon_array_update_string(&return_value, ISL(value), placeholder, PH_COPY);
 				break;
 
-			case PHQL_T_NTPLACEHOLDER: {
+			case PHQL_T_BPLACEHOLDER:
+			{
 				zval question_mark, colon;
 
 				PHALCON_OBS_VAR(value);
 				phalcon_array_fetch_string(&value, expr, SL("value"), PH_NOISY);
 
-				INIT_ZVAL(question_mark);
-				INIT_ZVAL(colon);
+				if (phalcon_memnstr_str(value, SL(":"))) {
+					PHALCON_INIT_NVAR(value_parts);
+					phalcon_fast_explode_str(value_parts, SL(":"), value);
 
-				ZVAL_STRING(&question_mark, "?", 0);
-				ZVAL_STRING(&colon, ":", 0);
+					PHALCON_OBS_NVAR(value_name);
+					phalcon_array_fetch_long(&value_name, value_parts, 0, PH_NOISY);
 
-				PHALCON_INIT_VAR(placeholder);
-				phalcon_fast_str_replace(placeholder, &question_mark, &colon, value);
+					PHALCON_OBS_NVAR(value_type);
+					phalcon_array_fetch_long(&value_type, value_parts, 1, PH_NOISY);
 
-				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISS(type), SL("placeholder"), 1);
-				phalcon_array_update_string(&return_value, ISL(value), placeholder, PH_COPY);
+					PHALCON_INIT_NVAR(placeholder);
+					PHALCON_CONCAT_SV(placeholder, ":", value_name);
+
+					array_init(return_value);
+					add_assoc_stringl_ex(return_value, ISS(type), SL("placeholder"), 1);
+					phalcon_array_update_string(&return_value, ISL(value), placeholder, PH_COPY);
+
+					if (phalcon_comparestr_str(value_type, SL("str"))) {
+						PHALCON_INIT_NVAR(value_type);
+						ZVAL_LONG(value_type, PHALCON_DB_COLUMN_BIND_PARAM_STR);
+
+						PHALCON_CALL_METHOD(NULL, this_ptr, "setbindtype", value_name, value_type);
+					} else if (phalcon_comparestr_str(value_type, SL("int"))) {
+						PHALCON_INIT_NVAR(value_type);
+						ZVAL_LONG(value_type, PHALCON_DB_COLUMN_BIND_PARAM_INT);
+
+						PHALCON_CALL_METHOD(NULL, this_ptr, "setbindtype", value_name, value_type);
+					} else if (phalcon_comparestr_str(value_type, SL("double"))) {
+						PHALCON_INIT_NVAR(value_type);
+						ZVAL_LONG(value_type, PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL);
+
+						PHALCON_CALL_METHOD(NULL, this_ptr, "setbindtype", value_name, value_type);
+					} else if (phalcon_comparestr_str(value_type, SL("bool"))) {
+						PHALCON_INIT_NVAR(value_type);
+						ZVAL_LONG(value_type, PHALCON_DB_COLUMN_BIND_PARAM_BOOL);
+
+						PHALCON_CALL_METHOD(NULL, this_ptr, "setbindtype", value_name, value_type);
+					} else if (phalcon_comparestr_str(value_type, SL("blob"))) {
+						PHALCON_INIT_NVAR(value_type);
+						ZVAL_LONG(value_type, PHALCON_DB_COLUMN_BIND_PARAM_BLOD);
+
+						PHALCON_CALL_METHOD(NULL, this_ptr, "setbindtype", value_name, value_type);
+					} else if (phalcon_comparestr_str(value_type, SL("null"))) {
+						PHALCON_INIT_NVAR(value_type);
+						ZVAL_LONG(value_type, PHALCON_DB_COLUMN_BIND_PARAM_NULL);
+
+						PHALCON_CALL_METHOD(NULL, this_ptr, "setbindtype", value_name, value_type);
+					} else if (
+						phalcon_comparestr_str(value_type, SL("array")) || 
+						phalcon_comparestr_str(value_type, SL("array-str")) || 
+						phalcon_comparestr_str(value_type, SL("array-int"))
+					) {
+						PHALCON_CALL_METHOD(&value_param, this_ptr, "getbindparam", value_name);
+
+						if (Z_TYPE_P(value_param) != IS_ARRAY) {
+							PHALCON_THROW_EXCEPTION_FORMAT(phalcon_mvc_model_exception_ce, "Bind type requires an array in placeholder: %s", Z_STRVAL_P(value_name));
+							return;
+						}
+						value_times = phalcon_fast_count_int(value_param)
+						if (value_times < 1) {
+							PHALCON_THROW_EXCEPTION_FORMAT(phalcon_mvc_model_exception_ce, "At least one value must be bound in placeholder: %s", Z_STRVAL_P(value_name));
+							return;
+						}
+						
+						phalcon_array_update_string_long(&return_value, SL("times"), value_times, PH_COPY);
+					} else {
+						PHALCON_THROW_EXCEPTION_FORMAT(phalcon_mvc_model_exception_ce, "Unknown bind type: %s", Z_STRVAL_P(value_type));
+						return;
+					}
+				} else {
+					PHALCON_OBS_NVAR(value);
+					phalcon_array_fetch_string(&value, expr, SL("value"), PH_NOISY);
+
+					PHALCON_INIT_NVAR(placeholder);
+					PHALCON_CONCAT_SV(placeholder, ":", value);
+
+					array_init_size(return_value, 2);
+					add_assoc_stringl_ex(return_value, ISS(type), SL("placeholder"), 1);
+					phalcon_array_update_string(&return_value, ISL(value), placeholder, PH_COPY);
+				}
 				break;
 			}
-
-			case PHQL_T_STPLACEHOLDER:
-				PHALCON_OBS_NVAR(value);
-				phalcon_array_fetch_string(&value, expr, SL("value"), PH_NOISY);
-
-				PHALCON_INIT_NVAR(placeholder);
-				PHALCON_CONCAT_SV(placeholder, ":", value);
-
-				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISS(type), SL("placeholder"), 1);
-				phalcon_array_update_string(&return_value, ISL(value), placeholder, PH_COPY);
-				break;
 
 			case PHQL_T_NULL:
 				array_init_size(return_value, 2);
@@ -1264,14 +1344,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				assert(0);
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Unexpected PHQL_T_DISTINCT - this should not happen");
 				return;
-			/*
-				assert(right != NULL);
-				array_init_size(return_value, 3);
-				add_assoc_stringl_ex(return_value, ISS(type), SL("unary-op"), 1);
-				add_assoc_stringl_ex(return_value, ISS(op), SL("DISTINCT "), 1);
-				phalcon_array_update_string(&return_value, ISL(right), right, PH_COPY);
-				break;
-			*/
 
 			case PHQL_T_BETWEEN:
 				assert(left != NULL && right != NULL);
@@ -4570,6 +4642,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 				case PHQL_T_NPLACEHOLDER:
 				case PHQL_T_SPLACEHOLDER:
+				case PHQL_T_BPLACEHOLDER:
 					if (Z_TYPE_P(bind_params) != IS_ARRAY) { 
 						PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Bound parameter cannot be replaced because placeholders is not an array");
 						return;
@@ -4915,6 +4988,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 				case PHQL_T_NPLACEHOLDER:
 				case PHQL_T_SPLACEHOLDER:
+				case PHQL_T_BPLACEHOLDER:
 					if (Z_TYPE_P(bind_params) != IS_ARRAY) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Bound parameter cannot be replaced because placeholders is not an array");
 						return;
@@ -5542,6 +5616,31 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getType){
 }
 
 /**
+ * Get bind parameter
+ *
+ * @param string $name
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, getBindParam){
+
+	zval *name, *params, *param;
+
+	phalcon_fetch_params(0, 1, 0, &name);
+
+	phalcon_update_property_array(this_ptr, SL("_bindParams"), name, handler TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY TSRMLS_CC);
+
+	/** 
+	 * Check if the qualified name is a column alias
+	 */
+	if (phalcon_array_isset_fetch(&param, params, name)) {
+		RETURN_CTORW(param);
+	}
+
+	RETURN_NULL();
+}
+
+/**
  * Set default bind parameters
  *
  * @param array $bindParams
@@ -5574,7 +5673,25 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getBindParams){
 }
 
 /**
- * Set default bind parameters
+ * Set bind type
+ *
+ * @param string $name
+ * @param int $type
+ * @return Phalcon\Mvc\Model\Query
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, setBindType){
+
+	zval *name, *type;
+
+	phalcon_fetch_params(0, 2, 0, &name, &type);
+
+	phalcon_update_property_array(this_ptr, SL("_bindTypes"), name, handler TSRMLS_CC);
+
+	RETURN_THISW();
+}
+
+/**
+ * Set default bind types
  *
  * @param array $bindTypes
  * @return Phalcon\Mvc\Model\Query

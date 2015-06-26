@@ -264,6 +264,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 
 	zval *expression, *escape_char = NULL, *quoting = NULL, *type, *name = NULL, *escaped_name = NULL;
 	zval *quoting_value, *domain, *escaped_domain = NULL, *value = NULL, *expression_value = NULL, *operator = NULL;
+	zval *times, *placeholders = NULL, *placeholder = NULL, *index = NULL;
 	zval *left = NULL, *expression_left = NULL, *right = NULL, *expression_right = NULL;
 	zval *expression_group;
 	zval *sql_items, *items, *item = NULL, *item_expression = NULL;
@@ -271,6 +272,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	HashTable *ah0;
 	HashPosition hp0;
 	zval **hd;
+	int t, i;
 
 	PHALCON_MM_GROW();
 
@@ -417,6 +419,27 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	if (PHALCON_IS_STRING(type, "placeholder")) {
 		PHALCON_OBS_NVAR(value);
 		phalcon_array_fetch_string(&value, expression, SL("value"), PH_NOISY);
+
+		if (phalcon_array_isset_string_fetch(&times, expression, SS("times"))) {
+			PHALCON_INI_NVAR(placeholders);
+			array_init(placeholders);
+
+			t = phalcon_get_intval(times);
+			i = 0;
+			while (i++ < t) {
+				PHALCON_INI_NVAR(index);
+				ZVAL_LONG(index, t);
+
+				PHALCON_INI_NVAR(placeholder);
+				PHALCON_CONCAT_VV(value, t);
+				
+				phalcon_array_append(&placeholders, placeholder, PH_COPY);
+			}
+
+			PHALCON_INIT_NVAR(value);
+			phalcon_fast_join_str(value, SL(", "), placeholders TSRMLS_CC);
+		}
+		
 		RETURN_CTOR(value);
 	}
 

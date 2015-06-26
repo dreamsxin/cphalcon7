@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 3, &width, &height, &zmaster);
+	phalcon_fetch_params(0, 1, 0, 3, &width, &height, &zmaster);
 
 	if (!zmaster) {
 		master = PHALCON_IMAGE_AUTO;
@@ -860,7 +860,7 @@ PHP_METHOD(Phalcon_Image_Adapter, mask){
 
 	zval *mask;
 
-	phalcon_fetch_params(0, 1, 0, &mask);
+	phalcon_fetch_params(0, 0, 1, 0, &mask);
 	PHALCON_CALL_METHODW(NULL, this_ptr, "_mask", mask);
 	RETURN_THISW();
 }
@@ -883,7 +883,7 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &color, &opacity);
+	phalcon_fetch_params(0, 1, 1, 1, &color, &opacity);
 
 	if (Z_TYPE_P(color) != IS_STRING) {
 		PHALCON_SEPARATE_PARAM(color);
@@ -976,7 +976,7 @@ PHP_METHOD(Phalcon_Image_Adapter, blur){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &radius);
+	phalcon_fetch_params(0, 1, 0, 1, &radius);
 
 	if (!radius) {
 		PHALCON_INIT_VAR(radius);
@@ -1125,7 +1125,7 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &ext, &quality);
+	phalcon_fetch_params(0, 1, 0, 2, &ext, &quality);
 
 	if (!ext) {
 		format = phalcon_fetch_nproperty_this(this_ptr, SL("_format"), PH_NOISY TSRMLS_CC);

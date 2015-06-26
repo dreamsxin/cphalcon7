@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setValue){
 
 	zval *value;
 
-	phalcon_fetch_params(0, 1, 0, &value);
+	phalcon_fetch_params(0, 0, 1, 0, &value);
 
 	phalcon_update_property_this(this_ptr, SL("_value"), value TSRMLS_CC);
 	phalcon_update_property_bool(this_ptr, SL("_readed"), 1 TSRMLS_CC);
@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &filters, &default_value);
+	phalcon_fetch_params(0, 1, 0, 2, &filters, &default_value);
 
 	if (!filters) {
 		filters = PHALCON_GLOBAL(z_null);
@@ -613,7 +613,7 @@ PHP_METHOD(Phalcon_Http_Cookie, useEncryption){
 
 	zval *use_encryption;
 
-	phalcon_fetch_params(0, 1, 0, &use_encryption);
+	phalcon_fetch_params(0, 0, 1, 0, &use_encryption);
 
 	phalcon_update_property_this(this_ptr, SL("_useEncryption"), use_encryption TSRMLS_CC);
 	RETURN_THISW();
@@ -642,7 +642,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setExpiration){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &expire);
+	phalcon_fetch_params(0, 1, 1, 0, &expire);
 
 	PHALCON_OBS_VAR(restored);
 	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY TSRMLS_CC);
@@ -690,7 +690,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setPath){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &path);
+	phalcon_fetch_params(0, 1, 1, 0, &path);
 
 	PHALCON_OBS_VAR(restored);
 	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY TSRMLS_CC);
@@ -738,7 +738,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setDomain){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &domain);
+	phalcon_fetch_params(0, 1, 1, 0, &domain);
 
 	PHALCON_OBS_VAR(restored);
 	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY TSRMLS_CC);
@@ -786,7 +786,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setSecure){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &secure);
+	phalcon_fetch_params(0, 1, 1, 0, &secure);
 
 	PHALCON_OBS_VAR(restored);
 	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY TSRMLS_CC);
@@ -834,7 +834,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setHttpOnly){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &http_only);
+	phalcon_fetch_params(0, 1, 1, 0, &http_only);
 
 	PHALCON_OBS_VAR(restored);
 	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY TSRMLS_CC);

@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Flash, __construct){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &css_classes);
+	phalcon_fetch_params(0, 1, 0, 1, &css_classes);
 	
 	if (!css_classes) {
 		PHALCON_INIT_VAR(css_classes);
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Flash, setImplicitFlush){
 
 	zval *implicit_flush;
 
-	phalcon_fetch_params(0, 1, 0, &implicit_flush);
+	phalcon_fetch_params(0, 0, 1, 0, &implicit_flush);
 	
 	phalcon_update_property_this(this_ptr, SL("_implicitFlush"), implicit_flush TSRMLS_CC);
 	RETURN_THISW();
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Flash, setAutomaticHtml){
 
 	zval *automatic_html;
 
-	phalcon_fetch_params(0, 1, 0, &automatic_html);
+	phalcon_fetch_params(0, 0, 1, 0, &automatic_html);
 	
 	phalcon_update_property_this(this_ptr, SL("_automaticHtml"), automatic_html TSRMLS_CC);
 	RETURN_THISW();
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 
 	zval *css_classes;
 
-	phalcon_fetch_params(0, 1, 0, &css_classes);
+	phalcon_fetch_params(0, 0, 1, 0, &css_classes);
 	
 	if (Z_TYPE_P(css_classes) == IS_ARRAY) { 
 		phalcon_update_property_this(this_ptr, SL("_cssClasses"), css_classes TSRMLS_CC);
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &type, &message);
+	phalcon_fetch_params(0, 1, 2, 0, &type, &message);
 
 	automatic_html      = phalcon_fetch_nproperty_this(this_ptr, SL("_automaticHtml"), PH_NOISY TSRMLS_CC);
 	flag_automatic_html = zend_is_true(automatic_html);

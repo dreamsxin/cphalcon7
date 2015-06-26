@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &frontend, &options);
+	phalcon_fetch_params(0, 1, 1, 1, &frontend, &options);
 
 	if (!options) {
 		PHALCON_INIT_VAR(options);
@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, get){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 1, 1, &key_name, &lifetime);
 	
 	redis = phalcon_fetch_nproperty_this(this_ptr, SL("_redis"), PH_NOISY TSRMLS_CC);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
@@ -278,7 +278,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
+	phalcon_fetch_params(0, 1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, delete){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &key_name);
+	phalcon_fetch_params(0, 1, 1, 0, &key_name);
 	
 	redis = phalcon_fetch_nproperty_this(this_ptr, SL("_redis"), PH_NOISY TSRMLS_CC);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, queryKeys){
 	zval *prefix = NULL, *redis, *options, *special_key;
 	zval *keys = NULL, *real_key = NULL;
 
-	phalcon_fetch_params(0, 0, 1, &prefix);
+	phalcon_fetch_params(0, 0, 0, 1, &prefix);
 
 	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
 	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, exists){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 0, 2, &key_name, &lifetime);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);
@@ -537,7 +537,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, increment){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &key_name, &value);
+	phalcon_fetch_params(0, 1, 0, 2, &key_name, &value);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);
@@ -582,7 +582,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, decrement){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &key_name, &value);
+	phalcon_fetch_params(0, 1, 0, 2, &key_name, &value);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);

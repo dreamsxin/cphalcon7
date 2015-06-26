@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, __construct){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &name, &options, &attributes);
+	phalcon_fetch_params(0, 1, 1, 2, &name, &options, &attributes);
 
 	if (!options) {
 		options = PHALCON_GLOBAL(z_null);
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, setOptions){
 
 	zval *options;
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_fetch_params(0, 0, 1, 0, &options);
 	
 	phalcon_update_property_this(this_ptr, SL("_optionsValues"), options TSRMLS_CC);
 	RETURN_THISW();
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &attributes);
+	phalcon_fetch_params(0, 1, 0, 1, &attributes);
 	
 	if (!attributes) {
 		attributes = PHALCON_GLOBAL(z_null);

@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, setOptions){
 
 	zval *options, *compiler;
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_fetch_params(0, 0, 1, 0, &options);
 	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Options parameter must be an array");
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, length){
 
 	zval *item;
 
-	phalcon_fetch_params(0, 1, 0, &item);
+	phalcon_fetch_params(0, 0, 1, 0, &item);
 	
 	if (Z_TYPE_P(item) == IS_OBJECT || Z_TYPE_P(item) == IS_ARRAY) {
 		phalcon_fast_count(return_value, item TSRMLS_CC);
@@ -304,7 +304,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, isIncluded){
 
 	zval *needle, *haystack;
 
-	phalcon_fetch_params(0, 2, 0, &needle, &haystack);
+	phalcon_fetch_params(0, 0, 2, 0, &needle, &haystack);
 	
 	if (Z_TYPE_P(haystack) == IS_ARRAY) { 
 		RETURN_BOOL(phalcon_fast_in_array(needle, haystack TSRMLS_CC));
@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 3, 0, &text, &from, &to);
+	phalcon_fetch_params(0, 1, 3, 0, &text, &from, &to);
 	
 	/** 
 	 * Try to use utf8_encode if conversion is 'latin1' to 'utf8'
@@ -394,7 +394,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 1, &value, &start, &end);
+	phalcon_fetch_params(0, 1, 2, 1, &value, &start, &end);
 	
 	if (!end) {
 		end = PHALCON_GLOBAL(z_null);
@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, sort){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &value);
+	phalcon_fetch_params(0, 1, 1, 0, &value);
 	PHALCON_SEPARATE_PARAM(value);
 	
 	Z_SET_ISREF_P(value);

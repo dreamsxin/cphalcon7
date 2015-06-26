@@ -290,12 +290,15 @@ int phalcon_is_iterable_ex(zval *arr, HashTable **arr_hash, HashPosition *hash_p
 /**
  * Parses method parameters with minimum overhead
  */
-int phalcon_fetch_parameters(int num_args TSRMLS_DC, int required_args, int optional_args, ...)
+int phalcon_fetch_parameters(int num_args, int required_args, int optional_args, ...)
 {
 	va_list va;
-	int arg_count = (int) (zend_uintptr_t) *(zend_vm_stack_top(TSRMLS_C) - 1);
-	zval **arg, **p;
+	zval **arg, *param;
+	int arg_count;
 	int i, use_args_num;
+
+	param = ZEND_CALL_ARG(EG(current_execute_data), 1);
+	arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 
 	if (num_args < required_args) {
 		phalcon_throw_exception_string(spl_ce_BadMethodCallException, "Wrong number of parameters");
@@ -318,13 +321,9 @@ int phalcon_fetch_parameters(int num_args TSRMLS_DC, int required_args, int opti
 
 	i = 0;
 	while (num_args-- > 0) {
-
-		arg = (zval **) (zend_vm_stack_top(TSRMLS_C) - 1 - (arg_count - i));
-
-		p = va_arg(va, zval **);
-		*p = *arg;
-
-		i++;
+		arg = va_arg(va, zval **);
+		*arg = param;
+		param++;
 	}
 
 	va_end(va);
@@ -332,35 +331,6 @@ int phalcon_fetch_parameters(int num_args TSRMLS_DC, int required_args, int opti
 	return SUCCESS;
 }
 
-int phalcon_fetch_parameters_ex(int dummy TSRMLS_DC, int n_req, int n_opt, ...)
-{
-	void **p;
-	int arg_count, param_count;
-	va_list ptr;
-
-	p           = zend_vm_stack_top(TSRMLS_C) - 1;
-	arg_count   = (int)(zend_uintptr_t)*p;
-	param_count = n_req + n_opt;
-
-	if (param_count < arg_count || n_req > arg_count) {
-		phalcon_throw_exception_string(spl_ce_BadMethodCallException, "Wrong number of parameters");
-		return FAILURE;
-	}
-
-	va_start(ptr, n_opt);
-	while (arg_count > 0) {
-		zval ***param = va_arg(ptr, zval ***);
-		*param = (zval**)p - arg_count;
-		--arg_count;
-	}
-
-	va_end(ptr);
-	return SUCCESS;
-}
-
-#if PHP_VERSION_ID >= 50600
-
-#if ZEND_MODULE_API_NO >= 20141001
 void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table)
 {
 	if (EG(symtable_cache_ptr) >= EG(symtable_cache_limit)) {
@@ -370,17 +340,3 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table)
 		*(++EG(symtable_cache_ptr)) = symbol_table;
 	}
 }
-#else
-void phalcon_clean_and_cache_symbol_table(HashTable *symbol_table TSRMLS_DC)
-{
-	if (EG(symtable_cache_ptr) >= EG(symtable_cache_limit)) {
-		zend_hash_destroy(symbol_table);
-		FREE_HASHTABLE(symbol_table);
-	} else {
-		zend_hash_clean(symbol_table);
-		*(++EG(symtable_cache_ptr)) = symbol_table;
-	}
-}
-#endif
-
-#endif

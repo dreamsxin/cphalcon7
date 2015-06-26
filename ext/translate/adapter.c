@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, _){
 
 	zval *translate_key, *placeholders = NULL;
 
-	phalcon_fetch_params(0, 1, 1, &translate_key, &placeholders);
+	phalcon_fetch_params(0, 0, 1, 1, &translate_key, &placeholders);
 
 	if (!placeholders) {
 		placeholders = PHALCON_GLOBAL(z_null);

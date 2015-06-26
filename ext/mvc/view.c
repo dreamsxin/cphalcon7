@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Mvc_View, __construct){
 
 	zval *options = NULL;
 
-	phalcon_fetch_params(0, 0, 1, &options);
+	phalcon_fetch_params(0, 0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
@@ -423,7 +423,7 @@ PHP_METHOD(Phalcon_Mvc_View, setBasePath){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &base_path);
+	phalcon_fetch_params(0, 1, 1, 0, &base_path);
 
 	if (Z_TYPE_P(base_path) == IS_ARRAY) {
 		PHALCON_INIT_VAR(base_paths);
@@ -496,7 +496,7 @@ PHP_METHOD(Phalcon_Mvc_View, setRenderLevel){
 
 	zval *level;
 
-	phalcon_fetch_params(0, 1, 0, &level);
+	phalcon_fetch_params(0, 0, 1, 0, &level);
 
 	phalcon_update_property_this(this_ptr, SL("_renderLevel"), level TSRMLS_CC);
 	RETURN_THISW();
@@ -517,7 +517,7 @@ PHP_METHOD(Phalcon_Mvc_View, disableLevel){
 
 	zval *level;
 
-	phalcon_fetch_params(0, 1, 0, &level);
+	phalcon_fetch_params(0, 0, 1, 0, &level);
 
 	if (Z_TYPE_P(level) == IS_ARRAY) { 
 		phalcon_update_property_this(this_ptr, SL("_disabledLevels"), level TSRMLS_CC);
@@ -553,7 +553,7 @@ PHP_METHOD(Phalcon_Mvc_View, setMainView){
 
 	zval *view_path;
 
-	phalcon_fetch_params(0, 1, 0, &view_path);
+	phalcon_fetch_params(0, 0, 1, 0, &view_path);
 
 	phalcon_update_property_this(this_ptr, SL("_mainView"), view_path TSRMLS_CC);
 	RETURN_THISW();
@@ -584,7 +584,7 @@ PHP_METHOD(Phalcon_Mvc_View, setLayout){
 
 	zval *layout;
 
-	phalcon_fetch_params(0, 1, 0, &layout);
+	phalcon_fetch_params(0, 0, 1, 0, &layout);
 
 	phalcon_update_property_this(this_ptr, SL("_layout"), layout TSRMLS_CC);
 	RETURN_THISW();
@@ -613,7 +613,7 @@ PHP_METHOD(Phalcon_Mvc_View, setTemplateBefore){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &template_before);
+	phalcon_fetch_params(0, 1, 1, 0, &template_before);
 
 	if (Z_TYPE_P(template_before) != IS_ARRAY) { 
 		PHALCON_INIT_VAR(array_template);
@@ -651,7 +651,7 @@ PHP_METHOD(Phalcon_Mvc_View, setTemplateAfter){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &template_after);
+	phalcon_fetch_params(0, 1, 1, 0, &template_after);
 
 	if (Z_TYPE_P(template_after) != IS_ARRAY) { 
 		PHALCON_INIT_VAR(array_template);
@@ -692,7 +692,7 @@ PHP_METHOD(Phalcon_Mvc_View, setParamToView){
 
 	zval *key, *value;
 
-	phalcon_fetch_params(0, 2, 0, &key, &value);
+	phalcon_fetch_params(0, 0, 2, 0, &key, &value);
 
 	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value TSRMLS_CC);
 	RETURN_THISW();
@@ -715,7 +715,7 @@ PHP_METHOD(Phalcon_Mvc_View, setVars){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &params, &merge);
+	phalcon_fetch_params(0, 1, 1, 1, &params, &merge);
 
 	if (!merge) {
 		merge = PHALCON_GLOBAL(z_true);
@@ -759,7 +759,7 @@ PHP_METHOD(Phalcon_Mvc_View, setVar){
 
 	zval *key, *value;
 
-	phalcon_fetch_params(0, 2, 0, &key, &value);
+	phalcon_fetch_params(0, 0, 2, 0, &key, &value);
 
 	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value TSRMLS_CC);
 	RETURN_THISW();
@@ -775,7 +775,7 @@ PHP_METHOD(Phalcon_Mvc_View, getVar){
 
 	zval *key, *params, *value;
 
-	phalcon_fetch_params(0, 1, 0, &key);
+	phalcon_fetch_params(0, 0, 1, 0, &key);
 
 	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
@@ -806,7 +806,7 @@ PHP_METHOD(Phalcon_Mvc_View, setControllerName){
 
 	zval *controller_name;
 
-	phalcon_fetch_params(0, 1, 0, &controller_name);
+	phalcon_fetch_params(0, 0, 1, 0, &controller_name);
 
 	phalcon_update_property_this(this_ptr, SL("_controllerName"), controller_name TSRMLS_CC);
 	RETURN_THISW();
@@ -833,7 +833,7 @@ PHP_METHOD(Phalcon_Mvc_View, setActionName){
 
 	zval *action_name;
 
-	phalcon_fetch_params(0, 1, 0, &action_name);
+	phalcon_fetch_params(0, 0, 1, 0, &action_name);
 
 	phalcon_update_property_this(this_ptr, SL("_actionName"), action_name TSRMLS_CC);
 	RETURN_THISW();
@@ -860,7 +860,7 @@ PHP_METHOD(Phalcon_Mvc_View, setParams){
 
 	zval *params;
 
-	phalcon_fetch_params(0, 1, 0, &params);
+	phalcon_fetch_params(0, 0, 1, 0, &params);
 
 	phalcon_update_property_this(this_ptr, SL("_params"), params TSRMLS_CC);
 	RETURN_THISW();
@@ -881,7 +881,7 @@ PHP_METHOD(Phalcon_Mvc_View, setNamespaceName){
 
 	zval *namespace_name;
 
-	phalcon_fetch_params(0, 1, 0, &namespace_name);
+	phalcon_fetch_params(0, 0, 1, 0, &namespace_name);
 
 	phalcon_update_property_this(this_ptr, SL("_namespaceName"), namespace_name TSRMLS_CC);
 	RETURN_THISW();
@@ -1029,7 +1029,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 4, 1, &engines, &view_path, &silence, &must_clean, &absolute_path);
+	phalcon_fetch_params(0, 1, 4, 1, &engines, &view_path, &silence, &must_clean, &absolute_path);
 
 	if (absolute_path == NULL) {
 		absolute_path = PHALCON_GLOBAL(z_false);
@@ -1306,7 +1306,7 @@ PHP_METHOD(Phalcon_Mvc_View, registerEngines){
 
 	zval *engines;
 
-	phalcon_fetch_params(0, 1, 0, &engines);
+	phalcon_fetch_params(0, 0, 1, 0, &engines);
 
 	if (Z_TYPE_P(engines) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Engines to register must be an array");
@@ -1414,7 +1414,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 3, &controller_name, &action_name, &params, &namespace_name, &view_model);
+	phalcon_fetch_params(0, 1, 2, 3, &controller_name, &action_name, &params, &namespace_name, &view_model);
 
 	if (!params) {
 		params = PHALCON_GLOBAL(z_null);
@@ -1805,7 +1805,7 @@ PHP_METHOD(Phalcon_Mvc_View, pick){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &render_view);
+	phalcon_fetch_params(0, 1, 1, 0, &render_view);
 
 	if (Z_TYPE_P(render_view) == IS_ARRAY) { 
 		PHALCON_CPY_WRT(pick_view, render_view);
@@ -1855,7 +1855,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &partial_path, &params, &autorender);
+	phalcon_fetch_params(0, 1, 1, 2, &partial_path, &params, &autorender);
 
 	if (!params) {
 		params = PHALCON_GLOBAL(z_null);
@@ -1956,7 +1956,7 @@ PHP_METHOD(Phalcon_Mvc_View, getRender){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 2, &controller_name, &action_name, &params, &config_callback);
+	phalcon_fetch_params(0, 1, 2, 2, &controller_name, &action_name, &params, &config_callback);
 
 	if (!params) {
 		PHALCON_INIT_VAR(params);
@@ -2146,7 +2146,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &options);
+	phalcon_fetch_params(0, 1, 0, 1, &options);
 
 	if (!options) {
 		options = PHALCON_GLOBAL(z_true);
@@ -2235,7 +2235,7 @@ PHP_METHOD(Phalcon_Mvc_View, setContent){
 
 	zval *content;
 
-	phalcon_fetch_params(0, 1, 0, &content);
+	phalcon_fetch_params(0, 0, 1, 0, &content);
 
 	if (Z_TYPE_P(content) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Content must be a string");
@@ -2339,7 +2339,7 @@ PHP_METHOD(Phalcon_Mvc_View, __set){
 
 	zval *key, *value;
 
-	phalcon_fetch_params(0, 2, 0, &key, &value);
+	phalcon_fetch_params(0, 0, 2, 0, &key, &value);
 
 	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value TSRMLS_CC);
 
@@ -2359,7 +2359,7 @@ PHP_METHOD(Phalcon_Mvc_View, __get){
 
 	zval *key, *params, *value;
 
-	phalcon_fetch_params(0, 1, 0, &key);
+	phalcon_fetch_params(0, 0, 1, 0, &key);
 
 	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
@@ -2383,7 +2383,7 @@ PHP_METHOD(Phalcon_Mvc_View, __isset){
 
 	zval *key, *params;
 
-	phalcon_fetch_params(0, 1, 0, &key);
+	phalcon_fetch_params(0, 0, 1, 0, &key);
 
 	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
 	if (phalcon_array_isset(params, key)) {
@@ -2470,7 +2470,7 @@ PHP_METHOD(Phalcon_Mvc_View, getConverter) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 1, 0, &name);
 
 	PHALCON_OBS_VAR(converters);
 	phalcon_read_property_this(&converters, this_ptr, SL("_converters"), PH_NOISY TSRMLS_CC);

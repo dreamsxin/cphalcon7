@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 4, 0, &message, &type, &time, &context);
+	phalcon_fetch_params(0, 1, 4, 0, &message, &type, &time, &context);
 	
 	stream = phalcon_fetch_nproperty_this(this_ptr, SL("_stream"), PH_NOISY TSRMLS_CC);
 	if (Z_TYPE_P(stream) != IS_RESOURCE) {

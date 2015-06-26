@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessage){
 
 	zval *message;
 
-	phalcon_fetch_params(0, 1, 0, &message);
+	phalcon_fetch_params(0, 0, 1, 0, &message);
 
 	PHALCON_VERIFY_INTERFACE_EX(message, phalcon_validation_messageinterface_ce, phalcon_validation_exception_ce, 0);
 	phalcon_update_property_array_append(this_ptr, SL("_messages"), message TSRMLS_CC);
@@ -487,7 +487,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &messages);
+	phalcon_fetch_params(0, 1, 1, 0, &messages);
 	
 	if (Z_TYPE_P(messages) != IS_ARRAY) { 
 		if (Z_TYPE_P(messages) != IS_OBJECT) {
@@ -564,7 +564,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &field_name);
+	phalcon_fetch_params(0, 1, 1, 0, &field_name);
 	
 	PHALCON_INIT_VAR(filtered);
 	array_init(filtered);

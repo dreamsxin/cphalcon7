@@ -79,7 +79,7 @@ PHP_METHOD(Phalcon_Config_Adapter, __construct){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &file_path, &absolute_path);
+	phalcon_fetch_params(0, 1, 0, 2, &file_path, &absolute_path);
 
 	if (absolute_path == NULL) {
 		absolute_path = PHALCON_GLOBAL(z_false);
@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &file_path, &absolute_path);
+	phalcon_fetch_params(0, 1, 0, 2, &file_path, &absolute_path);
 
 	instances = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_instances") TSRMLS_CC);
 	if (!phalcon_array_isset_fetch(&instance, instances, file_path)) {
@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Config_Adapter, load){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &file_path, &absolute_path);
+	phalcon_fetch_params(0, 1, 0, 2, &file_path, &absolute_path);
 
 	PHALCON_INIT_VAR(class_name);
 	phalcon_get_called_class(class_name  TSRMLS_CC);

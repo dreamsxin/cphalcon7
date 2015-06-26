@@ -94,7 +94,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &method, &arguments);
+	phalcon_fetch_params(0, 1, 2, 0, &method, &arguments);
 	
 	PHALCON_OBS_VAR(handler);
 	phalcon_read_property_this(&handler, this_ptr, SL("_handler"), PH_NOISY TSRMLS_CC);

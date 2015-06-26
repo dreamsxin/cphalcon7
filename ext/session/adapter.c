@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 
 	zval *options = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL, *http_only = NULL;
 
-	phalcon_fetch_params(0, 0, 6, &options, &expire, &path, &secure, &domain, &http_only);
+	phalcon_fetch_params(0, 0, 0, 6, &options, &expire, &path, &secure, &domain, &http_only);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(NULL, this_ptr, "setoptions", options);
@@ -518,7 +518,7 @@ PHP_METHOD(Phalcon_Session_Adapter, setOptions){
 
 	zval *options, *unique_id;
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_fetch_params(0, 0, 1, 0, &options);
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_string_fetch(&unique_id, options, SS("uniqueId"))) {
@@ -552,7 +552,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 	zval *index, *default_value = NULL, *remove = NULL, *unique_id, *key, *_SESSION;
 	zval *value;
 
-	phalcon_fetch_params(0, 1, 2, &index, &default_value, &remove);
+	phalcon_fetch_params(0, 0, 1, 2, &index, &default_value, &remove);
 	if (!default_value) {
 		default_value = PHALCON_GLOBAL(z_null);
 	}
@@ -599,7 +599,7 @@ PHP_METHOD(Phalcon_Session_Adapter, set){
 
 	zval *index, *value;
 
-	phalcon_fetch_params(0, 2, 0, &index, &value);
+	phalcon_fetch_params(0, 0, 2, 0, &index, &value);
 	phalcon_session_adapter_write_property_internal(getThis(), index, value TSRMLS_CC);
 }
 
@@ -621,7 +621,7 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &data);
+	phalcon_fetch_params(0, 1, 1, 0, &data);
 
 	if (Z_TYPE_P(data) == IS_ARRAY) { 
 		phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
@@ -653,7 +653,7 @@ PHP_METHOD(Phalcon_Session_Adapter, has){
 
 	zval *index;
 
-	phalcon_fetch_params(0, 1, 0, &index);
+	phalcon_fetch_params(0, 0, 1, 0, &index);
 	RETURN_BOOL(phalcon_session_adapter_has_property_internal(getThis(), index, 2 TSRMLS_CC));
 }
 
@@ -670,7 +670,7 @@ PHP_METHOD(Phalcon_Session_Adapter, remove){
 
 	zval *index;
 
-	phalcon_fetch_params(0, 1, 0, &index);
+	phalcon_fetch_params(0, 0, 1, 0, &index);
 	phalcon_session_adapter_unset_property_internal(getThis(), index TSRMLS_CC);
 }
 
@@ -765,7 +765,7 @@ PHP_METHOD(Phalcon_Session_Adapter, setId){
 
 	zval *sid;
 
-	phalcon_fetch_params(0, 1, 0, &sid);
+	phalcon_fetch_params(0, 0, 1, 0, &sid);
 
 	RETURN_ON_FAILURE(phalcon_set_session_id(sid TSRMLS_CC));
 }

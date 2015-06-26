@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_Validation_Validator, __construct){
 
 	zval *options = NULL;
 
-	phalcon_fetch_params(0, 0, 1, &options);
+	phalcon_fetch_params(0, 0, 0, 1, &options);
 	
 	if (!options) {
 		options = PHALCON_GLOBAL(z_null);
@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Validation_Validator, isSetOption){
 
 	zval *key, *options;
 
-	phalcon_fetch_params(0, 1, 0, &key);
+	phalcon_fetch_params(0, 0, 1, 0, &key);
 	
 	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
 	RETURN_BOOL(phalcon_array_isset(options, key));
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Validation_Validator, setOption){
 
 	zval *key, *value;
 
-	phalcon_fetch_params(0, 2, 0, &key, &value);
+	phalcon_fetch_params(0, 0, 2, 0, &key, &value);
 	
 	phalcon_update_property_array(this_ptr, SL("_options"), key, value TSRMLS_CC);
 	

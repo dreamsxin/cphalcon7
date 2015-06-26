@@ -172,14 +172,12 @@ static int phalcon_di_call_method_internal(zval *return_value, zval **return_val
 static int phalcon_di_call_method(const char *method, INTERNAL_FUNCTION_PARAMETERS)
 {
 	zval **param;
+	int num_args = ZEND_NUM_ARGS();
 
-	if (!ZEND_NUM_ARGS()) {
+	if (!num_args) {
 		param = &PHALCON_GLOBAL(z_null);
-	}
-	else {
-		if (phalcon_fetch_parameters_ex(0 TSRMLS_CC, 1, 0, &param) == FAILURE) {
-			return FAILURE;
-		}
+	} else if (phalcon_fetch_parameters(num_args, 1, 0, &param) == FAILURE) {
+		return FAILURE;
 	}
 
 	return phalcon_di_call_method_internal(return_value, return_value_ptr, getThis(), method, *param TSRMLS_CC);
@@ -609,7 +607,7 @@ PHP_METHOD(Phalcon_DI, setEventsManager){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &events_manager);
+	phalcon_fetch_params(0, 1, 1, 0, &events_manager);
 
 	PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 
@@ -831,7 +829,7 @@ PHP_METHOD(Phalcon_DI, get){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &name, &parameters);
+	phalcon_fetch_params(0, 1, 1, 1, &name, &parameters);
 	PHALCON_ENSURE_IS_STRING(&name);
 	
 	if (!parameters) {
@@ -1043,7 +1041,7 @@ PHP_METHOD(Phalcon_DI, setDefault){
 
 	zval *dependency_injector;
 
-	phalcon_fetch_params(0, 1, 0, &dependency_injector);
+	phalcon_fetch_params(0, 0, 1, 0, &dependency_injector);
 	
 	phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), dependency_injector TSRMLS_CC);
 	

@@ -32,7 +32,6 @@
 
 #include "interned-strings.h"
 
-#if PHP_VERSION_ID >= 50500
 static const unsigned char tolower_map[256] = {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F,
@@ -51,7 +50,6 @@ static const unsigned char tolower_map[256] = {
 	0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,
 	0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
-#endif
 
 #ifndef PHALCON_RELEASE
 void phalcon_fcall_cache_dtor(void *pData)
@@ -242,7 +240,7 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 			if (EG(scope) && EG(scope)->parent) {
 				fcic->calling_scope = EG(scope)->parent;
 				fcic->called_scope  = EG(called_scope);
-				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : EG(This);
+				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : this_ptr;
 				fcic->initialized   = 1;
 			}
 
@@ -252,7 +250,7 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 			if (EG(scope)) {
 				fcic->calling_scope = EG(scope);
 				fcic->called_scope  = EG(called_scope);
-				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : EG(This);
+				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : this_ptr;
 				fcic->initialized   = 1;
 			}
 
@@ -262,7 +260,7 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 			if (EG(called_scope)) {
 				fcic->calling_scope = EG(called_scope);
 				fcic->called_scope  = EG(called_scope);
-				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : EG(This);
+				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : this_ptr;
 				fcic->initialized   = 1;
 			}
 
@@ -282,8 +280,8 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 			fcic->calling_scope    = EG(scope);
 			fcic->object_ptr       = NULL;
 
-			if (scope && EG(This) && instanceof_function(Z_OBJCE_P(EG(This)), scope TSRMLS_CC) && instanceof_function(scope, fcic->calling_scope)) {
-				fcic->object_ptr   = EG(This);
+			if (scope && this_ptr && instanceof_function(Z_OBJCE_P(this_ptr), scope TSRMLS_CC) && instanceof_function(scope, fcic->calling_scope)) {
+				fcic->object_ptr   = this_ptr;
 				fcic->called_scope = Z_OBJCE_P(fcic->object_ptr);
 			}
 			else {
@@ -373,7 +371,7 @@ int phalcon_call_user_function(zval **object_pp, zend_class_entry *obj_ce, phalc
 	}
 
 	if (type != phalcon_fcall_function && !object_pp) {
-		object_pp = EG(This) ? &EG(This) : NULL;
+		object_pp = this_ptr ? &this_ptr : NULL;
 		if (!obj_ce && object_pp) {
 			obj_ce = Z_OBJCE_PP(object_pp);
 		}
@@ -411,33 +409,7 @@ int phalcon_call_user_function(zval **object_pp, zend_class_entry *obj_ce, phalc
 	fcic.initialized = 0;
 	status = PHALCON_ZEND_CALL_FUNCTION_WRAPPER(&fci, /*&fcic*/NULL TSRMLS_CC);
 
-/*
-	if (fcic.initialized && cache_entry) {
-		if (fcic.called_scope != clone.called_scope) {
-			fprintf(stderr, "real called_scope: %s (%p)\n", fcic.called_scope->name, fcic.called_scope);
-			fprintf(stderr, "my   called_scope: %s (%p)\n", clone.called_scope->name, clone.called_scope);
-			fprintf(stderr, "type: %d\n", (int)type);
-		}
 
-		if (fcic.calling_scope != clone.calling_scope) {
-			fprintf(stderr, "real calling_scope: %s (%p)\n", fcic.calling_scope->name, fcic.calling_scope);
-			fprintf(stderr, "my   calling_scope: %s (%p)\n", clone.calling_scope->name, clone.calling_scope);
-			fprintf(stderr, "type: %d\n", (int)type);
-		}
-
-		if (fcic.object_ptr != clone.object_ptr) {
-			fprintf(stderr, "real object_ptr: %s (%p)\n", (fcic.object_ptr ? Z_OBJCE_P(fcic.object_ptr)->name : ""), fcic.object_ptr);
-			fprintf(stderr, "my   object_ptr: %s (%p)\n", (clone.object_ptr ? Z_OBJCE_P(clone.object_ptr)->name : ""), clone.object_ptr);
-			fprintf(stderr, "type: %d\n", (int)type);
-		}
-
-		if (fcic.function_handler != clone.function_handler) {
-			fprintf(stderr, "real handler: %p (%s::%s)\n", fcic.function_handler, (fcic.function_handler->common.scope ? fcic.function_handler->common.scope->name : ""), fcic.function_handler->common.function_name);
-			fprintf(stderr, "my   handler: %p (%s::%s)\n", clone.function_handler, (clone.function_handler->common.scope ? clone.function_handler->common.scope->name : ""), clone.function_handler->common.function_name);
-			fprintf(stderr, "type: %d\n", (int)type);
-		}
-	}
-*/
 	EG(scope) = old_scope;
 
 	if (EXPECTED(status != FAILURE) && fcall_key && !cache_entry && fcic.initialized) {
@@ -667,334 +639,6 @@ int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *p
 	return status;
 }
 
-#if PHP_VERSION_ID <= 50309
-
-/**
- * Latest version of zend_throw_exception_internal
- */
-void phalcon_throw_exception_internal(zval *exception)
-{
-	if (exception != NULL) {
-		zval *previous = EG(exception);
-		zend_exception_set_previous(exception, EG(exception));
-		EG(exception) = exception;
-		if (previous) {
-			return;
-		}
-	}
-
-	if (!EG(current_execute_data)) {
-		if (EG(exception)) {
-			zend_exception_error(EG(exception), E_ERROR);
-		}
-		zend_error(E_ERROR, "Exception thrown without a stack frame");
-	}
-
-	if (zend_throw_exception_hook) {
-		zend_throw_exception_hook(exception);
-	}
-
-	if (EG(current_execute_data)->opline == NULL ||
-		(EG(current_execute_data)->opline + 1)->opcode == ZEND_HANDLE_EXCEPTION) {
-		/* no need to rethrow the exception */
-		return;
-	}
-
-	EG(opline_before_exception) = EG(current_execute_data)->opline;
-	EG(current_execute_data)->opline = EG(exception_op);
-}
-
-int phalcon_call_function(zend_fcall_info *fci, zend_fcall_info_cache *fci_cache TSRMLS_DC) {
-
-	uint32_t i;
-	zval **original_return_value;
-	HashTable *calling_symbol_table;
-	zend_op_array *original_op_array;
-	zend_op **original_opline_ptr;
-	zend_class_entry *current_scope;
-	zend_class_entry *current_called_scope;
-	zend_class_entry *calling_scope = NULL;
-	zend_class_entry *called_scope = NULL;
-	zval *current_this;
-	zend_execute_data execute_data;
-
-	*fci->retval_ptr_ptr = NULL;
-
-	if (!EG(active)) {
-		return FAILURE; /* executor is already inactive */
-	}
-
-	if (EG(exception)) {
-		return FAILURE; /* we would result in an instable executor otherwise */
-	}
-
-	switch (fci->size) {
-		case sizeof(zend_fcall_info):
-			break; /* nothing to do currently */
-		default:
-			zend_error(E_ERROR, "Corrupted fcall_info provided to phalcon_call_function()");
-			break;
-	}
-
-	/* Initialize execute_data */
-	if (EG(current_execute_data)) {
-		execute_data = *EG(current_execute_data);
-		EX(op_array) = NULL;
-		EX(opline) = NULL;
-		EX(object) = NULL;
-	} else {
-		/* This only happens when we're called outside any execute()'s
-		 * It shouldn't be strictly necessary to NULL execute_data out,
-		 * but it may make bugs easier to spot
-		 */
-		memset(&execute_data, 0, sizeof(zend_execute_data));
-	}
-
-	if (!fci_cache || !fci_cache->initialized) {
-
-		zend_fcall_info_cache fci_cache_local;
-		char *callable_name;
-		char *error = NULL;
-
-		if (!fci_cache) {
-			fci_cache = &fci_cache_local;
-		}
-
-		if (!zend_is_callable_ex(fci->function_name, fci->object_ptr, IS_CALLABLE_CHECK_SILENT, &callable_name, NULL, fci_cache, &error TSRMLS_CC)) {
-			if (error) {
-				zend_error(E_WARNING, "Invalid callback %s, %s", callable_name, error);
-				efree(error);
-			}
-			if (callable_name) {
-				efree(callable_name);
-			}
-			return FAILURE;
-		} else {
-			if (error) {
-				/* Capitalize the first latter of the error message */
-				if (error[0] >= 'a' && error[0] <= 'z') {
-					error[0] += ('A' - 'a');
-				}
-				zend_error(E_STRICT, "%s", error);
-				efree(error);
-			}
-		}
-		efree(callable_name);
-	}
-
-	EX(function_state).function = fci_cache->function_handler;
-	calling_scope = fci_cache->calling_scope;
-	called_scope = fci_cache->called_scope;
-	fci->object_ptr = fci_cache->object_ptr;
-	EX(object) = fci->object_ptr;
-	if (fci->object_ptr && Z_TYPE_P(fci->object_ptr) == IS_OBJECT &&
-		(!EG(objects_store).object_buckets || !EG(objects_store).object_buckets[Z_OBJ_HANDLE_P(fci->object_ptr)].valid)) {
-		return FAILURE;
-	}
-
-	if (EX(function_state).function->common.fn_flags & ZEND_ACC_ABSTRACT) {
-		zend_error_noreturn(E_ERROR, "Cannot call abstract method %s::%s()", EX(function_state).function->common.scope->name, EX(function_state).function->common.function_name);
-		return FAILURE;
-	}
-
-	ZEND_VM_STACK_GROW_IF_NEEDED(fci->param_count + 1);
-
-	for (i = 0; i < fci->param_count; i++) {
-		zval *param;
-
-		if (EX(function_state).function->type == ZEND_INTERNAL_FUNCTION
-			&& (EX(function_state).function->common.fn_flags & ZEND_ACC_CALL_VIA_HANDLER) == 0
-			&& !ARG_SHOULD_BE_SENT_BY_REF(EX(function_state).function, i + 1)
-			&& PZVAL_IS_REF(*fci->params[i])) {
-			ALLOC_ZVAL(param);
-			*param = **(fci->params[i]);
-			INIT_PZVAL(param);
-			zval_copy_ctor(param);
-		} else if (ARG_SHOULD_BE_SENT_BY_REF(EX(function_state).function, i + 1)
-			&& !PZVAL_IS_REF(*fci->params[i])) {
-
-			if (Z_REFCOUNT_PP(fci->params[i]) > 1) {
-				zval *new_zval;
-
-				if (fci->no_separation &&
-					!ARG_MAY_BE_SENT_BY_REF(EX(function_state).function, i + 1)) {
-					if (i || UNEXPECTED(ZEND_VM_STACK_ELEMETS(EG(argument_stack)) == EG(argument_stack)->top)) {
-						/* hack to clean up the stack */
-						zend_vm_stack_push_nocheck((void *) (zend_uintptr_t)i TSRMLS_CC);
-						#if PHP_VERSION_ID <= 50500
-						zend_vm_stack_clear_multiple(TSRMLS_C);
-						#else
-						zend_vm_stack_clear_multiple(0 TSRMLS_C);
-						#endif
-					}
-
-					zend_error(E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given",
-						i+1,
-						EX(function_state).function->common.scope ? EX(function_state).function->common.scope->name : "",
-						EX(function_state).function->common.scope ? "::" : "",
-						EX(function_state).function->common.function_name);
-					return FAILURE;
-				}
-
-				ALLOC_ZVAL(new_zval);
-				*new_zval = **fci->params[i];
-				zval_copy_ctor(new_zval);
-				Z_SET_REFCOUNT_P(new_zval, 1);
-				Z_DELREF_PP(fci->params[i]);
-				*fci->params[i] = new_zval;
-			}
-			Z_ADDREF_PP(fci->params[i]);
-			Z_SET_ISREF_PP(fci->params[i]);
-			param = *fci->params[i];
-		} else if (*fci->params[i] != &EG(uninitialized_zval)) {
-			Z_ADDREF_PP(fci->params[i]);
-			param = *fci->params[i];
-		} else {
-			ALLOC_ZVAL(param);
-			*param = **(fci->params[i]);
-			INIT_PZVAL(param);
-		}
-		zend_vm_stack_push_nocheck(param TSRMLS_CC);
-	}
-
-	EX(function_state).arguments = zend_vm_stack_top(TSRMLS_C);
-	zend_vm_stack_push_nocheck((void*)(zend_uintptr_t)fci->param_count TSRMLS_CC);
-
-	current_scope = EG(scope);
-	EG(scope) = calling_scope;
-
-	current_this = EG(This);
-
-	current_called_scope = EG(called_scope);
-	if (called_scope) {
-		EG(called_scope) = called_scope;
-	} else {
-		if (EX(function_state).function->type != ZEND_INTERNAL_FUNCTION) {
-			EG(called_scope) = NULL;
-		}
-	}
-
-	if (fci->object_ptr) {
-		if ((EX(function_state).function->common.fn_flags & ZEND_ACC_STATIC)) {
-			EG(This) = NULL;
-		} else {
-			EG(This) = fci->object_ptr;
-
-			if (!PZVAL_IS_REF(EG(This))) {
-				Z_ADDREF_P(EG(This)); /* For $this pointer */
-			} else {
-				zval *this_ptr;
-
-				ALLOC_ZVAL(this_ptr);
-				*this_ptr = *EG(This);
-				INIT_PZVAL(this_ptr);
-				zval_copy_ctor(this_ptr);
-				EG(This) = this_ptr;
-			}
-		}
-	} else {
-		EG(This) = NULL;
-	}
-
-	EX(prev_execute_data) = EG(current_execute_data);
-	EG(current_execute_data) = &execute_data;
-
-	if (EX(function_state).function->type == ZEND_USER_FUNCTION) {
-		calling_symbol_table = EG(active_symbol_table);
-		EG(scope) = EX(function_state).function->common.scope;
-		if (fci->symbol_table) {
-			EG(active_symbol_table) = fci->symbol_table;
-		} else {
-			EG(active_symbol_table) = NULL;
-		}
-
-		original_return_value = EG(return_value_ptr_ptr);
-		original_op_array = EG(active_op_array);
-		EG(return_value_ptr_ptr) = fci->retval_ptr_ptr;
-		EG(active_op_array) = (zend_op_array *) EX(function_state).function;
-		original_opline_ptr = EG(opline_ptr);
-		zend_execute(EG(active_op_array) TSRMLS_CC);
-		if (!fci->symbol_table && EG(active_symbol_table)) {
-			if (EG(symtable_cache_ptr)>=EG(symtable_cache_limit)) {
-				zend_hash_destroy(EG(active_symbol_table));
-				FREE_HASHTABLE(EG(active_symbol_table));
-			} else {
-				/* clean before putting into the cache, since clean
-				   could call dtors, which could use cached hash */
-				zend_hash_clean(EG(active_symbol_table));
-				*(++EG(symtable_cache_ptr)) = EG(active_symbol_table);
-			}
-		}
-		EG(active_symbol_table) = calling_symbol_table;
-		EG(active_op_array) = original_op_array;
-		EG(return_value_ptr_ptr)=original_return_value;
-		EG(opline_ptr) = original_opline_ptr;
-	} else if (EX(function_state).function->type == ZEND_INTERNAL_FUNCTION) {
-		int call_via_handler = (EX(function_state).function->common.fn_flags & ZEND_ACC_CALL_VIA_HANDLER) != 0;
-		ALLOC_INIT_ZVAL(*fci->retval_ptr_ptr);
-		if (EX(function_state).function->common.scope) {
-			EG(scope) = EX(function_state).function->common.scope;
-		}
-		((zend_internal_function *) EX(function_state).function)->handler(fci->param_count, *fci->retval_ptr_ptr, fci->retval_ptr_ptr, fci->object_ptr, 1 TSRMLS_CC);
-		/*  We shouldn't fix bad extensions here,
-			because it can break proper ones (Bug #34045)
-		if (!EX(function_state).function->common.return_reference)
-		{
-			INIT_PZVAL(*fci->retval_ptr_ptr);
-		}*/
-		if (EG(exception) && fci->retval_ptr_ptr) {
-			phalcon_ptr_dtor(fci->retval_ptr_ptr);
-			*fci->retval_ptr_ptr = NULL;
-		}
-
-		if (call_via_handler) {
-			/* We must re-initialize function again */
-			fci_cache->initialized = 0;
-		}
-	} else {
-		ALLOC_INIT_ZVAL(*fci->retval_ptr_ptr);
-
-		if (fci->object_ptr) {
-			Z_OBJ_HT_P(fci->object_ptr)->call_method(EX(function_state).function->common.function_name, fci->param_count, *fci->retval_ptr_ptr, fci->retval_ptr_ptr, fci->object_ptr, 1 TSRMLS_CC);
-		} else {
-			zend_error_noreturn(E_ERROR, "Cannot call overloaded function for non-object");
-			return FAILURE;
-		}
-
-		if (EX(function_state).function->type == ZEND_OVERLOADED_FUNCTION_TEMPORARY) {
-			efree(EX(function_state).function->common.function_name);
-		}
-		efree(EX(function_state).function);
-
-		if (EG(exception) && fci->retval_ptr_ptr) {
-			phalcon_ptr_dtor(fci->retval_ptr_ptr);
-			*fci->retval_ptr_ptr = NULL;
-		}
-	}
-	#if PHP_VERSION_ID <= 50500
-	zend_vm_stack_clear_multiple(TSRMLS_C);
-	#else
-	zend_vm_stack_clear_multiple(0 TSRMLS_C);
-	#endif
-
-	if (EG(This)) {
-		phalcon_ptr_dtor(&EG(This));
-	}
-	EG(called_scope) = current_called_scope;
-	EG(scope) = current_scope;
-	EG(This) = current_this;
-	EG(current_execute_data) = EX(prev_execute_data);
-
-	if (EG(exception)) {
-		phalcon_throw_exception_internal(NULL);
-	}
-	return SUCCESS;
-}
-
-#endif
-
-#if PHP_VERSION_ID >= 50600
-
 /**
  * Latest version of zend_throw_exception_internal
  */
@@ -1045,7 +689,7 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 			fcc->called_scope = EG(called_scope);
 			fcc->calling_scope = EG(scope);
 			if (!fcc->object_ptr) {
-				fcc->object_ptr = EG(This);
+				fcc->object_ptr = this_ptr;
 			}
 			ret = 1;
 		}
@@ -1059,7 +703,7 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 			fcc->called_scope = EG(called_scope);
 			fcc->calling_scope = EG(scope)->parent;
 			if (!fcc->object_ptr) {
-				fcc->object_ptr = EG(This);
+				fcc->object_ptr = this_ptr;
 			}
 			*strict_class = 1;
 			ret = 1;
@@ -1072,7 +716,7 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 			fcc->called_scope = EG(called_scope);
 			fcc->calling_scope = EG(called_scope);
 			if (!fcc->object_ptr) {
-				fcc->object_ptr = EG(This);
+				fcc->object_ptr = this_ptr;
 			}
 			*strict_class = 1;
 			ret = 1;
@@ -1081,10 +725,10 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 		zend_class_entry *scope = EG(active_op_array) ? EG(active_op_array)->scope : NULL;
 
 		fcc->calling_scope = pce;
-		if (scope && !fcc->object_ptr && EG(This) &&
-			instanceof_function(Z_OBJCE_P(EG(This)), scope) &&
+		if (scope && !fcc->object_ptr && this_ptr &&
+			instanceof_function(Z_OBJCE_P(this_ptr), scope) &&
 			instanceof_function(scope, fcc->calling_scope)) {
-			fcc->object_ptr = EG(This);
+			fcc->object_ptr = this_ptr;
 			fcc->called_scope = Z_OBJCE_P(fcc->object_ptr);
 		} else {
 			fcc->called_scope = fcc->object_ptr ? Z_OBJCE_P(fcc->object_ptr) : fcc->calling_scope;
@@ -1244,9 +888,9 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 			if (fcc->function_handler) {
 				retval = 1;
 				call_via_handler = (fcc->function_handler->common.fn_flags & ZEND_ACC_CALL_VIA_HANDLER) != 0;
-				if (call_via_handler && !fcc->object_ptr && EG(This) &&
-					instanceof_function(Z_OBJCE_P(EG(This)), fcc->calling_scope)) {
-					fcc->object_ptr = EG(This);
+				if (call_via_handler && !fcc->object_ptr && this_ptr &&
+					instanceof_function(Z_OBJCE_P(this_ptr), fcc->calling_scope)) {
+					fcc->object_ptr = this_ptr;
 				}
 			}
 		}
@@ -1275,15 +919,15 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 				if ((check_flags & IS_CALLABLE_CHECK_IS_STATIC) != 0) {
 					retval = 0;
 				}
-				if (EG(This) && instanceof_function(Z_OBJCE_P(EG(This)), fcc->calling_scope)) {
-					fcc->object_ptr = EG(This);
+				if (this_ptr && instanceof_function(Z_OBJCE_P(this_ptr), fcc->calling_scope)) {
+					fcc->object_ptr = this_ptr;
 					if (error) {
-						phalcon_spprintf(error, 0, "non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb, Z_OBJCE_P(EG(This))->name);
+						phalcon_spprintf(error, 0, "non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb, Z_OBJCE_P(this_ptr)->name);
 						if (severity == E_ERROR) {
 							retval = 0;
 						}
 					} else if (retval) {
-						zend_error(severity, "Non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb, Z_OBJCE_P(EG(This))->name);
+						zend_error(severity, "Non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb, Z_OBJCE_P(this_ptr)->name);
 					}
 				} else {
 					if (error) {
@@ -1514,274 +1158,6 @@ static zend_bool phalcon_is_callable_ex(zval *callable, zval *object_ptr, uint c
 			return 0;
 	}
 }
-
-int phalcon_call_function(zend_fcall_info *fci, zend_fcall_info_cache *fci_cache TSRMLS_DC)
-{
-	uint32_t i;
-	zval **original_return_value;
-	HashTable *calling_symbol_table;
-	zend_op_array *original_op_array;
-	zend_op **original_opline_ptr;
-	zend_class_entry *current_scope;
-	zend_class_entry *current_called_scope;
-	zend_class_entry *calling_scope = NULL;
-	zend_class_entry *called_scope = NULL;
-	zval *current_this;
-	zend_execute_data execute_data;
-	zend_fcall_info_cache fci_cache_local;
-	uint32_t fn_flags;
-
-	*fci->retval_ptr_ptr = NULL;
-
-	if (!EG(active)) {
-		return FAILURE; /* executor is already inactive */
-	}
-
-	if (EG(exception)) {
-		return FAILURE; /* we would result in an instable executor otherwise */
-	}
-
-	/* Initialize execute_data */
-	if (EG(current_execute_data)) {
-		execute_data = *EG(current_execute_data);
-		EX(op_array) = NULL;
-		EX(opline) = NULL;
-		EX(object) = NULL;
-	} else {
-		/* This only happens when we're called outside any execute()'s
-		 * It shouldn't be strictly necessary to NULL execute_data out,
-		 * but it may make bugs easier to spot
-		 */
-		memset(&execute_data, 0, sizeof(zend_execute_data));
-	}
-
-	if (!fci_cache || !fci_cache->initialized) {
-		char *callable_name;
-		char *error = NULL;
-
-		if (!fci_cache) {
-			fci_cache = &fci_cache_local;
-		}
-	
-		if (!phalcon_is_callable_ex(fci->function_name, fci->object_ptr, IS_CALLABLE_CHECK_SILENT, &callable_name, NULL, fci_cache, &error TSRMLS_CC)) {
-			if (error) {
-				zend_error(E_WARNING, "Invalid callback %s, %s", callable_name, error);
-				efree(error);
-			}
-			if (callable_name) {
-				efree(callable_name);
-			}
-			return FAILURE;
-		} else {
-			if (error) {
-				zend_error(E_STRICT, "%s", error);
-				efree(error);
-			}
-		}
-		efree(callable_name);
-	}
-
-	EX(function_state).function = fci_cache->function_handler;
-	calling_scope = fci_cache->calling_scope;
-	called_scope = fci_cache->called_scope;
-	fci->object_ptr = fci_cache->object_ptr;
-	EX(object) = fci->object_ptr;
-
-	if (fci->object_ptr && Z_TYPE_P(fci->object_ptr) == IS_OBJECT &&
-		(!EG(objects_store).object_buckets || !EG(objects_store).object_buckets[Z_OBJ_HANDLE_P(fci->object_ptr)].valid)) {
-		return FAILURE;
-	}
-
-	fn_flags = EX(function_state).function->common.fn_flags;
-	if (fn_flags & (ZEND_ACC_ABSTRACT|ZEND_ACC_DEPRECATED)) {
-		if (fn_flags & ZEND_ACC_ABSTRACT) {
-			zend_error_noreturn(E_ERROR, "Cannot call abstract method %s::%s()", EX(function_state).function->common.scope->name, EX(function_state).function->common.function_name);
-		}
-		if (fn_flags & ZEND_ACC_DEPRECATED) {
-			zend_error(E_DEPRECATED, "Function %s%s%s() is deprecated",
-				EX(function_state).function->common.scope ? EX(function_state).function->common.scope->name : "",
-				EX(function_state).function->common.scope ? "::" : "",
-				EX(function_state).function->common.function_name);
-		}
-	}
-
-	ZEND_VM_STACK_GROW_IF_NEEDED(fci->param_count + 1);
-
-	for (i = 0; i < fci->param_count; i++) {
-		zval *param;
-
-		if (ARG_SHOULD_BE_SENT_BY_REF(EX(function_state).function, i + 1)) {
-			if (!PZVAL_IS_REF(*fci->params[i]) && Z_REFCOUNT_PP(fci->params[i]) > 1) {
-				zval *new_zval;
-
-				if (fci->no_separation &&
-					!ARG_MAY_BE_SENT_BY_REF(EX(function_state).function, i + 1)) {
-					if (i || UNEXPECTED(ZEND_VM_STACK_ELEMETS(EG(argument_stack)) == (EG(argument_stack)->top))) {
-						/* hack to clean up the stack */
-						zend_vm_stack_push((void *) (zend_uintptr_t)i TSRMLS_CC);
-						zend_vm_stack_clear_multiple(0 TSRMLS_CC);
-					}
-
-					zend_error(E_WARNING, "Parameter %d to %s%s%s() expected to be a reference, value given",
-						i+1,
-						EX(function_state).function->common.scope ? EX(function_state).function->common.scope->name : "",
-						EX(function_state).function->common.scope ? "::" : "",
-						EX(function_state).function->common.function_name);
-					return FAILURE;
-				}
-
-				ALLOC_ZVAL(new_zval);
-				*new_zval = **fci->params[i];
-				zval_copy_ctor(new_zval);
-				Z_SET_REFCOUNT_P(new_zval, 1);
-				Z_DELREF_PP(fci->params[i]);
-				*fci->params[i] = new_zval;
-			}
-			Z_ADDREF_PP(fci->params[i]);
-			Z_SET_ISREF_PP(fci->params[i]);
-			param = *fci->params[i];
-		} else if (PZVAL_IS_REF(*fci->params[i]) &&
-				   /* don't separate references for __call */
-				   (EX(function_state).function->common.fn_flags & ZEND_ACC_CALL_VIA_HANDLER) == 0 ) {
-			ALLOC_ZVAL(param);
-			*param = **(fci->params[i]);
-			INIT_PZVAL(param);
-			zval_copy_ctor(param);
-		} else if (*fci->params[i] != &EG(uninitialized_zval)) {
-			Z_ADDREF_PP(fci->params[i]);
-			param = *fci->params[i];
-		} else {
-			ALLOC_ZVAL(param);
-			*param = **(fci->params[i]);
-			INIT_PZVAL(param);
-		}
-		zend_vm_stack_push(param TSRMLS_CC);
-	}
-
-	EX(function_state).arguments = zend_vm_stack_top(TSRMLS_C);
-	zend_vm_stack_push((void*)(zend_uintptr_t)fci->param_count TSRMLS_CC);
-
-	current_scope = EG(scope);
-	EG(scope) = calling_scope;
-
-	current_this = EG(This);
-
-	current_called_scope = EG(called_scope);
-	if (called_scope) {
-		EG(called_scope) = called_scope;
-	} else if (EX(function_state).function->type != ZEND_INTERNAL_FUNCTION) {
-		EG(called_scope) = NULL;
-	}
-
-	if (fci->object_ptr) {
-		if ((EX(function_state).function->common.fn_flags & ZEND_ACC_STATIC)) {
-			EG(This) = NULL;
-		} else {
-			EG(This) = fci->object_ptr;
-
-			if (!PZVAL_IS_REF(EG(This))) {
-				Z_ADDREF_P(EG(This)); /* For $this pointer */
-			} else {
-				zval *this_ptr;
-
-				ALLOC_ZVAL(this_ptr);
-				*this_ptr = *EG(This);
-				INIT_PZVAL(this_ptr);
-				zval_copy_ctor(this_ptr);
-				EG(This) = this_ptr;
-			}
-		}
-	} else {
-		EG(This) = NULL;
-	}
-
-	EX(prev_execute_data) = EG(current_execute_data);
-	EG(current_execute_data) = &execute_data;
-
-	if (EX(function_state).function->type == ZEND_USER_FUNCTION) {
-
-		calling_symbol_table = EG(active_symbol_table);
-		EG(scope) = EX(function_state).function->common.scope;
-		if (fci->symbol_table) {
-			EG(active_symbol_table) = fci->symbol_table;
-		} else {
-			EG(active_symbol_table) = NULL;
-		}
-
-		original_return_value = EG(return_value_ptr_ptr);
-		original_op_array = EG(active_op_array);
-		EG(return_value_ptr_ptr) = fci->retval_ptr_ptr;
-		EG(active_op_array) = (zend_op_array *) EX(function_state).function;
-		original_opline_ptr = EG(opline_ptr);
-
-		zend_execute(EG(active_op_array) TSRMLS_CC);
-
-		if (!fci->symbol_table && EG(active_symbol_table)) {
-			phalcon_clean_and_cache_symbol_table(EG(active_symbol_table) TSRMLS_CC);
-		}
-		EG(active_symbol_table) = calling_symbol_table;
-		EG(active_op_array) = original_op_array;
-		EG(return_value_ptr_ptr)=original_return_value;
-		EG(opline_ptr) = original_opline_ptr;
-	} else if (EX(function_state).function->type == ZEND_INTERNAL_FUNCTION) {
-		int call_via_handler = (EX(function_state).function->common.fn_flags & ZEND_ACC_CALL_VIA_HANDLER) != 0;
-		ALLOC_INIT_ZVAL(*fci->retval_ptr_ptr);
-		if (EX(function_state).function->common.scope) {
-			EG(scope) = EX(function_state).function->common.scope;
-		}
-		if (EXPECTED(zend_execute_internal == NULL)) {
-			/* saves one function call if zend_execute_internal is not used */
-			EX(function_state).function->internal_function.handler(fci->param_count, *fci->retval_ptr_ptr, fci->retval_ptr_ptr, fci->object_ptr, 1 TSRMLS_CC);
-		} else {
-			zend_execute_internal(&execute_data, fci, 1 TSRMLS_CC);
-		}
-
-		if (EG(exception) && fci->retval_ptr_ptr) {
-			phalcon_ptr_dtor(fci->retval_ptr_ptr);
-			*fci->retval_ptr_ptr = NULL;
-		}
-
-		if (call_via_handler) {
-			/* We must re-initialize function again */
-			fci_cache->initialized = 0;
-		}
-	} else { /* ZEND_OVERLOADED_FUNCTION */
-		ALLOC_INIT_ZVAL(*fci->retval_ptr_ptr);
-
-		/* Not sure what should be done here if it's a static method */
-		if (fci->object_ptr) {
-			Z_OBJ_HT_P(fci->object_ptr)->call_method(EX(function_state).function->common.function_name, fci->param_count, *fci->retval_ptr_ptr, fci->retval_ptr_ptr, fci->object_ptr, 1 TSRMLS_CC);
-		} else {
-			zend_error_noreturn(E_ERROR, "Cannot call overloaded function for non-object");
-		}
-
-		if (EX(function_state).function->type == ZEND_OVERLOADED_FUNCTION_TEMPORARY) {
-			efree((char*)EX(function_state).function->common.function_name);
-		}
-		efree(EX(function_state).function);
-
-		if (EG(exception) && fci->retval_ptr_ptr) {
-			phalcon_ptr_dtor(fci->retval_ptr_ptr);
-			*fci->retval_ptr_ptr = NULL;
-		}
-	}
-	zend_vm_stack_clear_multiple(0 TSRMLS_CC);
-
-	if (EG(This)) {
-		phalcon_ptr_dtor(&EG(This));
-	}
-	EG(called_scope) = current_called_scope;
-	EG(scope) = current_scope;
-	EG(This) = current_this;
-	EG(current_execute_data) = EX(prev_execute_data);
-
-	if (EG(exception)) {
-		phalcon_throw_exception_internal(NULL);
-	}
-	return SUCCESS;
-}
-
-#endif
 
 void phalcon_eval_php(zval *str, zval *retval_ptr, char *context TSRMLS_DC)
 {

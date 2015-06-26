@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, get){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 1, 1, &key_name, &lifetime);
 	
 	frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
 	prefix   = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
+	phalcon_fetch_params(0, 1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);
@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, delete){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &key_name);
+	phalcon_fetch_params(0, 1, 1, 0, &key_name);
 	
 	prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
 	
@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &prefix);
+	phalcon_fetch_params(0, 1, 0, 1, &prefix);
 	
 	PHALCON_INIT_VAR(prefix_pattern);
 	if (!prefix) {
@@ -450,7 +450,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, exists){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 0, 2, &key_name, &lifetime);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);

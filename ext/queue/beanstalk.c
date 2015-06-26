@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &options);
+	phalcon_fetch_params(0, 1, 0, 1, &options);
 
 	if (!options) {
 		options = PHALCON_GLOBAL(z_null);
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &data, &options);
+	phalcon_fetch_params(0, 1, 1, 1, &data, &options);
 
 	if (!options) {
 		options = PHALCON_GLOBAL(z_null);
@@ -321,7 +321,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, reserve){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &timeout);
+	phalcon_fetch_params(0, 1, 0, 1, &timeout);
 
 	if (!timeout) {
 		timeout = PHALCON_GLOBAL(z_null);
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, choose){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &tube);
+	phalcon_fetch_params(0, 1, 1, 0, &tube);
 
 	PHALCON_INIT_VAR(command);
 	PHALCON_CONCAT_SV(command, "use ", tube);
@@ -413,7 +413,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, watch){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &tube);
+	phalcon_fetch_params(0, 1, 1, 0, &tube);
 
 	PHALCON_INIT_VAR(command);
 	PHALCON_CONCAT_SV(command, "watch ", tube);
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, statsTube){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &tube);
+	phalcon_fetch_params(0, 1, 1, 0, &tube);
 
 	PHALCON_INIT_VAR(command);
 	PHALCON_CONCAT_SV(command, "stats-tube ", tube);
@@ -755,7 +755,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, write){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &data);
+	phalcon_fetch_params(0, 1, 1, 0, &data);
 
 	PHALCON_OBS_VAR(connection);
 	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);

@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 0, 2, &params, &dependency_injector);
+	phalcon_fetch_params(0, 0, 0, 2, &params, &dependency_injector);
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
 		/** 
@@ -450,7 +450,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, columns){
 
 	zval *columns;
 
-	phalcon_fetch_params(0, 1, 0, &columns);
+	phalcon_fetch_params(0, 0, 1, 0, &columns);
 
 	phalcon_update_property_this(this_ptr, SL("_columns"), columns TSRMLS_CC);
 	RETURN_THISW();
@@ -482,7 +482,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, from){
 
 	zval *models;
 
-	phalcon_fetch_params(0, 1, 0, &models);
+	phalcon_fetch_params(0, 0, 1, 0, &models);
 
 	phalcon_update_property_this(this_ptr, SL("_models"), models TSRMLS_CC);
 	RETURN_THISW();
@@ -505,7 +505,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, addFrom){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &model, &alias);
+	phalcon_fetch_params(0, 1, 1, 1, &model, &alias);
 
 	if (!alias) {
 		alias = PHALCON_GLOBAL(z_null);
@@ -573,7 +573,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, join){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 3, &model, &conditions, &alias, &type);
+	phalcon_fetch_params(0, 1, 1, 3, &model, &conditions, &alias, &type);
 
 	if (!conditions) {
 		conditions = PHALCON_GLOBAL(z_null);
@@ -617,7 +617,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, innerJoin){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &model, &conditions, &alias);
+	phalcon_fetch_params(0, 1, 1, 2, &model, &conditions, &alias);
 
 	if (!conditions) {
 		conditions = PHALCON_GLOBAL(z_null);
@@ -658,7 +658,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, leftJoin){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &model, &conditions, &alias);
+	phalcon_fetch_params(0, 1, 1, 2, &model, &conditions, &alias);
 
 	if (!conditions) {
 		conditions = PHALCON_GLOBAL(z_null);
@@ -699,7 +699,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, rightJoin){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &model, &conditions, &alias);
+	phalcon_fetch_params(0, 1, 1, 2, &model, &conditions, &alias);
 
 	if (!conditions) {
 		conditions = PHALCON_GLOBAL(z_null);
@@ -741,7 +741,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, where){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &conditions, &bind_params, &bind_types);
+	phalcon_fetch_params(0, 1, 1, 2, &conditions, &bind_params, &bind_types);
 
 	if (!bind_params) {
 		bind_params = PHALCON_GLOBAL(z_null);
@@ -784,7 +784,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, andWhere){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &conditions, &bind_params, &bind_types);
+	phalcon_fetch_params(0, 1, 1, 2, &conditions, &bind_params, &bind_types);
 
 	if (!bind_params) {
 		bind_params = PHALCON_GLOBAL(z_null);
@@ -867,7 +867,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, orWhere){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &conditions, &bind_params, &bind_types);
+	phalcon_fetch_params(0, 1, 1, 2, &conditions, &bind_params, &bind_types);
 
 	if (!bind_params) {
 		bind_params = PHALCON_GLOBAL(z_null);
@@ -949,7 +949,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, betweenWhere){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 3, 1, &expr, &minimum, &maximum, &use_orwhere);
+	phalcon_fetch_params(0, 1, 3, 1, &expr, &minimum, &maximum, &use_orwhere);
 
 	if (!use_orwhere) {
 		use_orwhere = PHALCON_GLOBAL(z_false);
@@ -1021,7 +1021,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, notBetweenWhere){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 3, 1, &expr, &minimum, &maximum, &use_orwhere);
+	phalcon_fetch_params(0, 1, 3, 1, &expr, &minimum, &maximum, &use_orwhere);
 
 	if (!use_orwhere) {
 		use_orwhere = PHALCON_GLOBAL(z_false);
@@ -1095,7 +1095,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, inWhere){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 1, &expr, &values, &use_orwhere);
+	phalcon_fetch_params(0, 1, 2, 1, &expr, &values, &use_orwhere);
 
 	if (!use_orwhere) {
 		use_orwhere = PHALCON_GLOBAL(z_false);
@@ -1182,7 +1182,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, notInWhere){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 1, &expr, &values, &use_orwhere);
+	phalcon_fetch_params(0, 1, 2, 1, &expr, &values, &use_orwhere);
 
 	if (!use_orwhere) {
 		use_orwhere = PHALCON_GLOBAL(z_false);
@@ -1271,7 +1271,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, orderBy){
 
 	zval *order_by;
 
-	phalcon_fetch_params(0, 1, 0, &order_by);
+	phalcon_fetch_params(0, 0, 1, 0, &order_by);
 
 	phalcon_update_property_this(this_ptr, SL("_order"), order_by TSRMLS_CC);
 	RETURN_THISW();
@@ -1302,7 +1302,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, having){
 
 	zval *having;
 
-	phalcon_fetch_params(0, 1, 0, &having);
+	phalcon_fetch_params(0, 0, 1, 0, &having);
 
 	phalcon_update_property_this(this_ptr, SL("_having"), having TSRMLS_CC);
 	RETURN_THISW();
@@ -1335,7 +1335,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, limit){
 
 	zval *limit, *offset = NULL;
 
-	phalcon_fetch_params(0, 1, 1, &limit, &offset);
+	phalcon_fetch_params(0, 0, 1, 1, &limit, &offset);
 
 	phalcon_update_property_this(this_ptr, SL("_limit"), limit TSRMLS_CC);
 
@@ -1372,7 +1372,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, offset){
 
 	zval *offset;
 
-	phalcon_fetch_params(0, 1, 0, &offset);
+	phalcon_fetch_params(0, 0, 1, 0, &offset);
 
 	phalcon_update_property_this(this_ptr, SL("_offset"), offset TSRMLS_CC);
 	RETURN_THISW();
@@ -1403,7 +1403,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, groupBy){
 
 	zval *group;
 
-	phalcon_fetch_params(0, 1, 0, &group);
+	phalcon_fetch_params(0, 0, 1, 0, &group);
 
 	phalcon_update_property_this(this_ptr, SL("_group"), group TSRMLS_CC);
 	RETURN_THISW();

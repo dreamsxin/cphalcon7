@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 	zval *config, *builder, *limit, *page;
 	long int i_limit;
 
-	phalcon_fetch_params(0, 1, 0, &config);
+	phalcon_fetch_params(0, 0, 1, 0, &config);
 
 	if (!phalcon_array_isset_string_fetch(&builder, config, SS("builder"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'builder' is required");
@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setQueryBuilder){
 
 	zval *query_builder;
 
-	phalcon_fetch_params(0, 1, 0, &query_builder);
+	phalcon_fetch_params(0, 0, 1, 0, &query_builder);
 	PHALCON_VERIFY_INTERFACE_EX(query_builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
 
 	phalcon_update_property_this(this_ptr, SL("_builder"), query_builder TSRMLS_CC);

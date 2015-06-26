@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Session_Bag, set){
 
 	zval *property, *value, *session, *name, *data;
 
-	phalcon_fetch_params(0, 2, 0, &property, &value);
+	phalcon_fetch_params(0, 0, 2, 0, &property, &value);
 
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(this_ptr TSRMLS_CC));
 
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Session_Bag, get){
 	zval *property, *default_value = NULL;
 	zval *data, *value;
 
-	phalcon_fetch_params(0, 1, 1, &property, &default_value);
+	phalcon_fetch_params(0, 0, 1, 1, &property, &default_value);
 
 	if (!default_value) {
 		default_value = PHALCON_GLOBAL(z_null);
@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 
 	assert(return_value_ptr != NULL);
 
-	phalcon_fetch_params(0, 1, 0, &property);
+	phalcon_fetch_params(0, 0, 1, 0, &property);
 
 	/* Check first if the bag is initialized */
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(this_ptr TSRMLS_CC));
@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Session_Bag, has){
 
 	zval *property, *data;
 
-	phalcon_fetch_params(0, 1, 0, &property);
+	phalcon_fetch_params(0, 0, 1, 0, &property);
 
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(this_ptr TSRMLS_CC));
 
@@ -406,7 +406,7 @@ PHP_METHOD(Phalcon_Session_Bag, remove){
 
 	zval *property, *data = NULL, *name, *session;
 
-	phalcon_fetch_params(0, 1, 0, &property);
+	phalcon_fetch_params(0, 0, 1, 0, &property);
 
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(this_ptr TSRMLS_CC));
 

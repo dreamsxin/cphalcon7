@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, setFormatter){
 	zval *formatter;
 	zend_class_entry *exception = PHALCON_GLOBAL(register_psr3_classes) ? psr_log_invalidargumentexception_ce : phalcon_logger_exception_ce;
 
-	phalcon_fetch_params(0, 1, 0, &formatter);
+	phalcon_fetch_params(0, 0, 1, 0, &formatter);
 	PHALCON_VERIFY_INTERFACE_EX(formatter, phalcon_logger_formatterinterface_ce, exception, 0);
 
 	phalcon_update_property_this(this_ptr, SL("_formatter"), formatter TSRMLS_CC);

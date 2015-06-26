@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 1, &value, &filters, &norecursive);
+	phalcon_fetch_params(0, 1, 2, 1, &value, &filters, &norecursive);
 
 	if (!norecursive) {
 		norecursive = PHALCON_GLOBAL(z_false);
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &value, &filter);
+	phalcon_fetch_params(0, 1, 2, 0, &value, &filter);
 	
 	PHALCON_OBS_VAR(filters);
 	phalcon_read_property_this(&filters, this_ptr, SL("_filters"), PH_NOISY TSRMLS_CC);

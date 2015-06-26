@@ -384,7 +384,7 @@ PHP_METHOD(Phalcon_Forms_Form, __construct){
 
 	Z_OBJ_HT_P(getThis()) = &phalcon_forms_form_object_handlers;
 
-	phalcon_fetch_params(0, 0, 2, &entity, &user_options);
+	phalcon_fetch_params(0, 0, 0, 2, &entity, &user_options);
 
 	if (!entity) {
 		entity = PHALCON_GLOBAL(z_null);
@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Forms_Form, setAction){
 
 	zval *action;
 
-	phalcon_fetch_params(0, 1, 0, &action);
+	phalcon_fetch_params(0, 0, 1, 0, &action);
 
 	phalcon_update_property_this(this_ptr, SL("_action"), action TSRMLS_CC);
 	RETURN_THISW();
@@ -458,7 +458,7 @@ PHP_METHOD(Phalcon_Forms_Form, setUserOption){
 
 	zval *option, *value;
 
-	phalcon_fetch_params(0, 2, 0, &option, &value);
+	phalcon_fetch_params(0, 0, 2, 0, &option, &value);
 
 	phalcon_update_property_array(this_ptr, SL("_options"), option, value TSRMLS_CC);
 	RETURN_THISW();
@@ -475,7 +475,7 @@ PHP_METHOD(Phalcon_Forms_Form, getUserOption){
 
 	zval *option, *default_value = NULL, *options, *value;
 
-	phalcon_fetch_params(0, 1, 1, &option, &default_value);
+	phalcon_fetch_params(0, 0, 1, 1, &option, &default_value);
 
 	if (!default_value) {
 		default_value = PHALCON_GLOBAL(z_null);
@@ -499,7 +499,7 @@ PHP_METHOD(Phalcon_Forms_Form, setUserOptions){
 
 	zval *options;
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_fetch_params(0, 0, 1, 0, &options);
 
 	if (Z_TYPE_P(options) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_forms_exception_ce, "Parameter 'options' must be an array");
@@ -531,7 +531,7 @@ PHP_METHOD(Phalcon_Forms_Form, setEntity){
 
 	zval *entity;
 
-	phalcon_fetch_params(0, 1, 0, &entity);
+	phalcon_fetch_params(0, 0, 1, 0, &entity);
 
 	if (Z_TYPE_P(entity) != IS_NULL && Z_TYPE_P(entity) != IS_OBJECT) {
 		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "'%s' must be an object or NULL", "entity");
@@ -584,7 +584,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &data, &entity, &whitelist);
+	phalcon_fetch_params(0, 1, 1, 2, &data, &entity, &whitelist);
 
 	if (!entity) {
 		entity = PHALCON_GLOBAL(z_null);
@@ -714,7 +714,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &data, &entity);
+	phalcon_fetch_params(0, 1, 0, 2, &data, &entity);
 
 	if (!data) {
 		data = PHALCON_GLOBAL(z_null);
@@ -935,7 +935,7 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &element, &pos, &type);
+	phalcon_fetch_params(0, 1, 1, 2, &element, &pos, &type);
 
 	PHALCON_VERIFY_INTERFACE_EX(element, phalcon_forms_elementinterface_ce, phalcon_forms_exception_ce, 1);
 
@@ -1129,7 +1129,7 @@ PHP_METHOD(Phalcon_Forms_Form, getValue){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &name, &flag);
+	phalcon_fetch_params(0, 1, 1, 1, &name, &flag);
 
 	if (!flag) {
 		PHALCON_INIT_VAR(flag);
@@ -1154,7 +1154,7 @@ PHP_METHOD(Phalcon_Forms_Form, getValues){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 2, &name, &flag);
+	phalcon_fetch_params(0, 1, 0, 2, &name, &flag);
 
 	if (!name) {
 		name = PHALCON_GLOBAL(z_null);
@@ -1254,7 +1254,7 @@ PHP_METHOD(Phalcon_Forms_Form, remove){
 
 	zval *name, *elements;
 
-	phalcon_fetch_params(0, 1, 0, &name);
+	phalcon_fetch_params(0, 0, 1, 0, &name);
 
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
 
@@ -1285,7 +1285,7 @@ PHP_METHOD(Phalcon_Forms_Form, clear){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &fields);
+	phalcon_fetch_params(0, 1, 0, 1, &fields);
 
 	if (!fields) {
 		fields = PHALCON_GLOBAL(z_null);
@@ -1428,7 +1428,7 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessage){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &filed, &message);
+	phalcon_fetch_params(0, 1, 2, 0, &filed, &message);
 	
 	current_messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);	
 	if (Z_TYPE_P(current_messages) != IS_ARRAY) {
@@ -1468,7 +1468,7 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &filed, &messages);
+	phalcon_fetch_params(0, 1, 2, 0, &filed, &messages);
 	
 	current_messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);	
 	if (Z_TYPE_P(current_messages) != IS_ARRAY) {

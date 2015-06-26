@@ -563,7 +563,7 @@ static PHP_METHOD(Phalcon_Registry, __get)
 
 	assert(return_value_ptr != NULL);
 
-	phalcon_fetch_params_ex(1, 0, &property);
+	phalcon_fetch_params(0, 1, 0, &property);
 
 	obj    = phalcon_registry_get_object(getThis() TSRMLS_CC);
 	result = phalcon_hash_get(Z_ARRVAL_P(obj->properties), *property, BP_VAR_W);

@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	uint i;
 	Bucket *p;
 
-	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
+	phalcon_fetch_params(0, 0, 4, 0, &message, &type, &timestamp, &context);
 
 	/*
 	 * We intentionally do not use Phalcon's MM for better performance.

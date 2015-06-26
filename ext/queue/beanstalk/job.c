@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, release){
 	zval *priority = NULL, *delay = NULL;
 	zval *id, *command, *queue, *response = NULL, *status;
 
-	phalcon_fetch_params(0, 0, 2, &priority, &delay);
+	phalcon_fetch_params(0, 0, 0, 2, &priority, &delay);
 
 	PHALCON_MM_GROW();
 
@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, bury){
 	zval *priority = NULL;
 	zval *id, *command, *queue, *response = NULL, *status;
 
-	phalcon_fetch_params(0, 0, 1, &priority);
+	phalcon_fetch_params(0, 0, 0, 1, &priority);
 
 	PHALCON_MM_GROW();
 

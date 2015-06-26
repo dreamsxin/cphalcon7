@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	zval *config, *db, *sql, *total_sql, *bind, *limit, *page;
 	long int i_limit;
 
-	phalcon_fetch_params(0, 1, 0, &config);
+	phalcon_fetch_params(0, 0, 1, 0, &config);
 	
 	if (!phalcon_array_isset_string_fetch(&db, config, SS("db"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'db' is required");
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setDb){
 
 	zval *db;
 
-	phalcon_fetch_params(0, 1, 0, &db);
+	phalcon_fetch_params(0, 0, 1, 0, &db);
 	PHALCON_VERIFY_INTERFACE_EX(db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
 
 	phalcon_update_property_this(this_ptr, SL("_db"), db TSRMLS_CC);

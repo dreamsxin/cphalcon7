@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
 
 	zval *options = NULL, *meta_data_dir, *empty_array;
 
-	phalcon_fetch_params(0, 0, 1, &options);
+	phalcon_fetch_params(0, 0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_string_fetch(&meta_data_dir, options, SS("metaDataDir"))) {

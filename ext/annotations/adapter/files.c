@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 
 	zval **key, *annotations_dir, *virtual_key, *path;
 
-	phalcon_fetch_params_ex(1, 0, &key);
+	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
 	PHALCON_MM_GROW();
@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	zval *status;
 	smart_str exp = { NULL, 0, 0 };
 
-	phalcon_fetch_params_ex(2, 0, &key, &data);
+	phalcon_fetch_params(0, 2, 0, &key, &data);
 	PHALCON_ENSURE_IS_STRING(key);
 
 	PHALCON_MM_GROW();

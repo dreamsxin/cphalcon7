@@ -771,72 +771,36 @@ PHP_METHOD(Phalcon_Http_Request, getRawBody){
 
 	zval *raw;
 
-#if PHP_VERSION_ID < 50600
-	if (SG(request_info).raw_post_data) {
-		RETURN_STRINGL(SG(request_info).raw_post_data, SG(request_info).raw_post_data_length, 1);
-	}
-#endif
-
 	raw = phalcon_fetch_nproperty_this(getThis(), SL("_rawBody"), PH_NOISY TSRMLS_CC);
 	if (Z_TYPE_P(raw) == IS_STRING) {
 		RETURN_ZVAL(raw, 1, 0);
 	}
 
-#if PHP_VERSION_ID < 50600
-	if (sapi_module.read_post) {
-		int read_bytes;
-		char *buf          = emalloc(8192);
-		smart_str raw_data = { NULL, 0, 0 };
+	zval *zcontext = NULL;
+	php_stream_context *context = php_stream_context_from_zval(zcontext, 0);
+	php_stream *stream = php_stream_open_wrapper_ex("php://input", "rb", REPORT_ERRORS, NULL, context);
+	long int maxlen    = PHP_STREAM_COPY_ALL;
+	char *content;
+	int len;
 
-		while ((read_bytes = sapi_module.read_post(buf, 8192 TSRMLS_CC)) > 0) {
-			smart_str_appendl(&raw_data, buf, read_bytes);
-			SG(read_post_bytes) += read_bytes;
-		}
+	if (!stream) {
+		RETURN_FALSE;
+	}
 
-		efree(buf);
-		if (raw_data.c) {
-			smart_str_0(&raw_data);
-			RETVAL_STRINGL(raw_data.c, raw_data.len, 0);
-		}
-		else {
-			RETVAL_EMPTY_STRING();
-		}
-
+	len = php_stream_copy_to_mem(stream, &content, maxlen, 0);
+	if (len > 0) {
+		RETVAL_STRINGL(content, len, 0);
 		phalcon_update_property_this(getThis(), SL("_rawBody"), return_value TSRMLS_CC);
-		return;
+	}
+	else if (!len) {
+		RETVAL_EMPTY_STRING();
+		phalcon_update_property_this(getThis(), SL("_rawBody"), return_value TSRMLS_CC);
+	}
+	else {
+		RETVAL_FALSE;
 	}
 
-	RETURN_EMPTY_STRING();
-#else
-
-	{
-		zval *zcontext = NULL;
-		php_stream_context *context = php_stream_context_from_zval(zcontext, 0);
-		php_stream *stream = php_stream_open_wrapper_ex("php://input", "rb", REPORT_ERRORS, NULL, context);
-		long int maxlen    = PHP_STREAM_COPY_ALL;
-		char *content;
-		int len;
-
-		if (!stream) {
-			RETURN_FALSE;
-		}
-
-		len = php_stream_copy_to_mem(stream, &content, maxlen, 0);
-		if (len > 0) {
-			RETVAL_STRINGL(content, len, 0);
-			phalcon_update_property_this(getThis(), SL("_rawBody"), return_value TSRMLS_CC);
-		}
-		else if (!len) {
-			RETVAL_EMPTY_STRING();
-			phalcon_update_property_this(getThis(), SL("_rawBody"), return_value TSRMLS_CC);
-		}
-		else {
-			RETVAL_FALSE;
-		}
-
-		php_stream_close(stream);
-	}
-#endif
+	php_stream_close(stream);
 }
 
 /**

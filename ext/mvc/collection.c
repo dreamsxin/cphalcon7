@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	zval *di = NULL, *mm = NULL;
 	zval *service_name;
 
-	phalcon_fetch_params_ex(0, 2, &dependency_injector, &collection_manager);
+	phalcon_fetch_params(0, 0, 2, &dependency_injector, &collection_manager);
 
 	PHALCON_MM_GROW();
 
@@ -1407,7 +1407,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	zval *lower;
 	char *tmp;
 
-	phalcon_fetch_params_ex(1, 0, &event_name);
+	phalcon_fetch_params(0, 1, 0, &event_name);
 	PHALCON_ENSURE_IS_STRING(event_name);
 
 	PHALCON_MM_GROW();
@@ -1444,7 +1444,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	zval *lower;
 	char *tmp;
 
-	phalcon_fetch_params_ex(1, 0, &event_name);
+	phalcon_fetch_params(0, 1, 0, &event_name);
 	PHALCON_ENSURE_IS_STRING(event_name);
 
 	PHALCON_MM_GROW();

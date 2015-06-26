@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Session_Bag, __construct){
 
 	zval **name;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 	phalcon_update_property_this(this_ptr, SL("_name"), *name TSRMLS_CC);
 }

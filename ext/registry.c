@@ -489,7 +489,6 @@ static void phalcon_registry_iterator_get_current_data(zend_object_iterator *it,
 	}
 }
 
-#if ZEND_MODULE_API_NO >= 20121212
 /**
  * @brief Get current key from the iterator @a it into @ key (<tt>Iterator::key()</tt>)
  */
@@ -499,16 +498,6 @@ static void phalcon_registry_iterator_get_current_key(zend_object_iterator *it, 
 
 	zend_hash_get_current_key_zval_ex(Z_ARRVAL_P(obj->properties), key, &obj->pos);
 }
-#else
-/**
- * @brief Get current key from the iterator @a it into @ key (<tt>Iterator::key()</tt>)
- */
-static int phalcon_registry_iterator_get_current_key(zend_object_iterator *it, char **str_key, uint *str_key_len, ulong *int_key TSRMLS_DC)
-{
-	phalcon_registry_object *obj = phalcon_registry_get_object((zval*)it->data TSRMLS_CC);
-	return zend_hash_get_current_key_ex(Z_ARRVAL_P(obj->properties), str_key, str_key_len, int_key, 1, &obj->pos);
-}
-#endif
 
 /**
  * @brief Adavance the iterator @a it forward (<tt>Iterator::next()</tt>)
@@ -581,7 +570,7 @@ static PHP_METHOD(Phalcon_Registry, __set)
 {
 	zval **property, **value;
 
-	phalcon_fetch_params_ex(2, 0, &property, &value);
+	phalcon_fetch_params(0, 2, 0, &property, &value);
 	phalcon_registry_write_property(getThis(), *property, *value, NULL);
 }
 
@@ -592,7 +581,7 @@ static PHP_METHOD(Phalcon_Registry, __isset)
 {
 	zval **property;
 
-	phalcon_fetch_params_ex(1, 0, &property);
+	phalcon_fetch_params(0, 1, 0, &property);
 	phalcon_registry_has_property(getThis(), *property, 0, NULL);
 }
 
@@ -603,7 +592,7 @@ static PHP_METHOD(Phalcon_Registry, __unset)
 {
 	zval **property;
 
-	phalcon_fetch_params_ex(1, 0, &property);
+	phalcon_fetch_params(0, 1, 0, &property);
 	phalcon_registry_unset_property(getThis(), *property, NULL);
 }
 
@@ -615,7 +604,7 @@ static PHP_METHOD(Phalcon_Registry, __call)
 	zval **name, **arguments, *callback;
 	phalcon_registry_object *obj;
 
-	phalcon_fetch_params_ex(2, 0, &name, &arguments);
+	phalcon_fetch_params(0, 2, 0, &name, &arguments);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	obj = phalcon_registry_get_object(getThis() TSRMLS_CC);
@@ -651,7 +640,7 @@ static PHP_METHOD(Phalcon_Registry, offsetGet)
 		zval **offset, **result;
 		phalcon_registry_object *obj;
 
-		phalcon_fetch_params_ex(1, 0, &offset);
+		phalcon_fetch_params(0, 1, 0, &offset);
 
 		obj    = phalcon_registry_get_object(getThis() TSRMLS_CC);
 		result = phalcon_hash_get(Z_ARRVAL_P(obj->properties), *offset, BP_VAR_R);
@@ -667,7 +656,7 @@ static PHP_METHOD(Phalcon_Registry, offsetSet)
 {
 	zval **offset, **value;
 
-	phalcon_fetch_params_ex(2, 0, &offset, &value);
+	phalcon_fetch_params(0, 2, 0, &offset, &value);
 	phalcon_registry_write_dimension(getThis(), *offset, *value);
 }
 
@@ -678,7 +667,7 @@ static PHP_METHOD(Phalcon_Registry, offsetUnset)
 {
 	zval **offset;
 
-	phalcon_fetch_params_ex(1, 0, &offset);
+	phalcon_fetch_params(0, 1, 0, &offset);
 	phalcon_registry_unset_dimension(getThis(), *offset TSRMLS_CC);
 }
 
@@ -689,7 +678,7 @@ static PHP_METHOD(Phalcon_Registry, offsetExists)
 {
 	zval **offset;
 
-	phalcon_fetch_params_ex(1, 0, &offset);
+	phalcon_fetch_params(0, 1, 0, &offset);
 	phalcon_registry_has_dimension(getThis(), *offset, 0 TSRMLS_CC);
 }
 
@@ -790,7 +779,7 @@ static PHP_METHOD(Phalcon_Registry, unserialize)
 	zval zv = zval_used_for_init, *pzv = &zv;
 	const unsigned char *buf, *max;
 
-	phalcon_fetch_params_ex(1, 0, &str);
+	phalcon_fetch_params(0, 1, 0, &str);
 	PHALCON_ENSURE_IS_STRING(str);
 
 	obj = phalcon_registry_get_object(getThis() TSRMLS_CC);

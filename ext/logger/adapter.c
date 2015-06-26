@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, setLogLevel){
 
 	zval **level, *lvl;
 
-	phalcon_fetch_params_ex(1, 0, &level);
+	phalcon_fetch_params(0, 1, 0, &level);
 	if (Z_TYPE_PP(level) == IS_STRING) {
 		PHALCON_ALLOC_GHOST_ZVAL(lvl);
 		ZVAL_LONG(lvl, phalcon_logger_adapter_string_level_to_int(*level));
@@ -305,7 +305,7 @@ static void phalcon_logger_adapter_log_helper(INTERNAL_FUNCTION_PARAMETERS, int 
 {
 	zval **message, **context = NULL, *type;
 
-	phalcon_fetch_params_ex(1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 	PHALCON_ENSURE_IS_STRING(message);
 
 	PHALCON_ALLOC_GHOST_ZVAL(type);
@@ -429,7 +429,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 	zval *queue_item, *log_level, *level;
 	int i_level;
 
-	phalcon_fetch_params_ex(1, 2, &type, &message, &context);
+	phalcon_fetch_params(0, 1, 2, &type, &message, &context);
 
 	/*
 	 * Backwards compatibility.

@@ -182,7 +182,7 @@ int phalcon_mb_detect_encoding(char *str, size_t str_len, char *encoding, int st
 		ret = mbfl_identify_encoding2(&string, MBSTR_G(current_detect_order_list_size), MBSTR_G(current_detect_order_list), f_strict);
 	}
 	if (ret) {
-		*res = (char*)ret->name;
+		*res = (char*)ret->name->val;
 	}
 	else {
 		*res = NULL;

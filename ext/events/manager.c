@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				   !instanceof_function_ex(ce, phalcon_events_event_ce, 0)
 				&& !instanceof_function_ex(ce, spl_ce_SplPriorityQueue, 0)
 			) {
-				zend_throw_exception_ex(phalcon_events_exception_ce, 0, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", ce->name);
+				zend_throw_exception_ex(phalcon_events_exception_ce, 0, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", ce->name->val);
 				return;
 			}
 		}

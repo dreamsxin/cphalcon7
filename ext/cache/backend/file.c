@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 	long int now, ttl, mtime, diff;
 	int expired;
 
-	phalcon_fetch_params_ex(1, 1, &key_name, &value);
+	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 	if (!value || Z_TYPE_PP(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
 	}
@@ -611,7 +611,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 	long int now, ttl, mtime, diff;
 	int expired;
 
-	phalcon_fetch_params_ex(1, 1, &key_name, &value);
+	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 	if (!value || Z_TYPE_PP(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
 	}

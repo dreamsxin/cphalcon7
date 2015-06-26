@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 	if (Z_TYPE_P(class_name) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(class_name);
 		PHALCON_INIT_VAR(real_class_name);
-		ZVAL_STRINGL(real_class_name, ce->name, ce->name_length, !IS_INTERNED(ce->name));
+		ZVAL_NEW_STR(real_class_name, ce->name);
 	} else {
 		PHALCON_CPY_WRT(real_class_name, class_name);
 	}

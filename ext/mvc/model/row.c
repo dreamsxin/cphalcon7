@@ -96,7 +96,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, setDirtyState){
 
 	zval **dirty_state;
 
-	phalcon_fetch_params_ex(1, 0, &dirty_state);
+	phalcon_fetch_params(0, 1, 0, &dirty_state);
 
 	RETURN_FALSE;
 }

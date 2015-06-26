@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Security, setRandomBytes){
 
 	zval **random_bytes;
 
-	phalcon_fetch_params_ex(1, 0, &random_bytes);
+	phalcon_fetch_params(0, 1, 0, &random_bytes);
 
 	PHALCON_ENSURE_IS_LONG(random_bytes);
 
@@ -236,7 +236,7 @@ PHP_METHOD(Phalcon_Security, setWorkFactor){
 
 	zval **work_factor;
 
-	phalcon_fetch_params_ex(1, 0, &work_factor);
+	phalcon_fetch_params(0, 1, 0, &work_factor);
 
 	PHALCON_ENSURE_IS_LONG(work_factor);
 	phalcon_update_property_this(this_ptr, SL("_workFactor"), *work_factor TSRMLS_CC);
@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 	int i_bytes, encode;
 	char *result = NULL;
 
-	phalcon_fetch_params_ex(0, 2, &number_bytes, &b64);
+	phalcon_fetch_params(0, 0, 2, &number_bytes, &b64);
 	if (number_bytes) {
 		PHALCON_ENSURE_IS_LONG(number_bytes);
 		i_bytes = Z_LVAL_PP(number_bytes);
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Security, hash)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params_ex(1, 1, &password, &work_factor);
+	phalcon_fetch_params(0, 1, 1, &password, &work_factor);
 	PHALCON_ENSURE_IS_STRING(password);
 
 	if (!work_factor || Z_TYPE_PP(work_factor) == IS_NULL) {
@@ -580,7 +580,7 @@ PHP_METHOD(Phalcon_Security, checkHash){
 	zval *params[2];
 	int check = 0;
 
-	phalcon_fetch_params_ex(2, 1, &password, &password_hash, &max_pass_length);
+	phalcon_fetch_params(0, 2, 1, &password, &password_hash, &max_pass_length);
 
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(password_hash);
@@ -884,7 +884,7 @@ PHP_METHOD(Phalcon_Security, computeHmac)
 {
 	zval **data, **key, **algo, **raw = NULL;
 
-	phalcon_fetch_params_ex(3, 1, &data, &key, &algo, &raw);
+	phalcon_fetch_params(0, 3, 1, &data, &key, &algo, &raw);
 
 	if (!raw) {
 		raw = &(PHALCON_GLOBAL(z_false));
@@ -903,7 +903,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 	char* s_hash;
 	int i_iterations = 0, i_size = 0;
 
-	phalcon_fetch_params_ex(2, 3, &password, &salt, &hash, &iterations, &size);
+	phalcon_fetch_params(0, 2, 3, &password, &salt, &hash, &iterations, &size);
 
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(salt);
@@ -1028,7 +1028,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	char* s_hash;
 	int i_iterations = 0, i_size = 0;
 
-	phalcon_fetch_params_ex(2, 3, &password, &salt, &hash, &iterations, &size);
+	phalcon_fetch_params(0, 2, 3, &password, &salt, &hash, &iterations, &size);
 
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(salt);
@@ -1196,7 +1196,7 @@ PHP_METHOD(Phalcon_Security, setDefaultHash)
 {
 	zval **default_hash;
 
-	phalcon_fetch_params_ex(1, 0, &default_hash);
+	phalcon_fetch_params(0, 1, 0, &default_hash);
 	PHALCON_ENSURE_IS_LONG(default_hash);
 
 	phalcon_update_property_this(getThis(), SL("_defaultHash"), *default_hash TSRMLS_CC);

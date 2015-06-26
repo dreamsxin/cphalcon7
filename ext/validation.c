@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Validation, add){
 
 	zval **attribute, **validator, *scope;
 
-	phalcon_fetch_params_ex(2, 0, &attribute, &validator);
+	phalcon_fetch_params(0, 2, 0, &attribute, &validator);
 
 	PHALCON_ENSURE_IS_STRING(attribute);
 	PHALCON_VERIFY_INTERFACE_EX(*validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce, 0);

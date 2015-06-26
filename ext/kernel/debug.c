@@ -105,7 +105,7 @@ int phalcon_vdump(zval *uservar TSRMLS_DC){
             fprintf(phalcon_log, "Array at %p, refcount=%d\n", uservar, Z_REFCOUNT_P(uservar));
             break;
         case IS_OBJECT:
-            fprintf(phalcon_log, "Object <%s> at %p\n", Z_OBJCE_P(uservar)->name, uservar);
+            fprintf(phalcon_log, "Object <%s> at %p\n", Z_OBJCE_P(uservar)->name->val, uservar);
             break;
         default:
             fprintf(phalcon_log, "Unknown\n");
@@ -118,8 +118,8 @@ int phalcon_dump_ce(zend_class_entry *ce TSRMLS_DC){
 	if(ce){
 		snprintf(message, 120, "- ClassType => %d", ce->type);
 		phalcon_step_over(message);
-		if(ce->name){
-			snprintf(message, 120, "- ClassName => %s", ce->name);
+		if(ce->name->val){
+			snprintf(message, 120, "- ClassName => %s", ce->name->val);
 			phalcon_step_over(message);
 		} else {
 			phalcon_step_over("- ClassName => NULL");
@@ -178,7 +178,7 @@ int phalcon_debug_method_call(zval *obj, char *method_name TSRMLS_DC){
 		phalcon_error_space();
 	}
 	if(Z_TYPE_P(obj)==IS_OBJECT){
-		fprintf(phalcon_log, "Calling method %s::%s on Object at %p\n", Z_OBJCE_P(obj)->name, method_name, obj);
+		fprintf(phalcon_log, "Calling method %s::%s on Object at %p\n", Z_OBJCE_P(obj)->name->val, method_name, obj);
 	} else {
 		fprintf(phalcon_log, "Calling method %s on non object :(\n", method_name);
 	}

@@ -318,7 +318,7 @@ PHP_METHOD(Phalcon_Mvc_View, setViewsDir){
 
 	zval **views_dir;
 
-	phalcon_fetch_params_ex(1, 0, &views_dir);
+	phalcon_fetch_params(0, 1, 0, &views_dir);
 	phalcon_add_trailing_slash(views_dir);
 	phalcon_update_property_this(this_ptr, SL("_viewsDir"), *views_dir TSRMLS_CC);
 
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Mvc_View, setLayoutsDir){
 	zval **layouts_dir, **absolute_path = NULL;
 	int absolute = 0;
 
-	phalcon_fetch_params_ex(1, 1, &layouts_dir, &absolute_path);
+	phalcon_fetch_params(0, 1, 1, &layouts_dir, &absolute_path);
 	phalcon_add_trailing_slash(layouts_dir);
 	absolute = absolute_path ? zend_is_true(*absolute_path) : 0;
 	phalcon_update_property_this(this_ptr, SL("_layoutsDir"), *layouts_dir TSRMLS_CC);
@@ -385,7 +385,7 @@ PHP_METHOD(Phalcon_Mvc_View, setPartialsDir){
 	zval **partials_dir, **absolute_path = NULL;
 	int absolute = 0;
 
-	phalcon_fetch_params_ex(1, 1, &partials_dir, &absolute_path);
+	phalcon_fetch_params(0, 1, 1, &partials_dir, &absolute_path);
 	phalcon_add_trailing_slash(partials_dir);
 	absolute = absolute_path ? zend_is_true(*absolute_path) : 0;
 	phalcon_update_property_this(this_ptr, SL("_partialsDir"), *partials_dir TSRMLS_CC);
@@ -1344,7 +1344,7 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 	zval *path;
 	int exists = 0;
 
-	phalcon_fetch_params_ex(1, 0, &view);
+	phalcon_fetch_params(0, 1, 0, &view);
 	PHALCON_ENSURE_IS_STRING(view);
 
 	base_dir = phalcon_fetch_nproperty_this(getThis(), SL("_basePath"), PH_NOISY TSRMLS_CC);
@@ -1354,7 +1354,7 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 	if (Z_TYPE_P(engines) != IS_ARRAY) {
 		MAKE_STD_ZVAL(engines);
 		array_init_size(engines, 1);
-		add_assoc_stringl_ex(engines, SS(".phtml"), (char*)phalcon_mvc_view_engine_php_ce->name, phalcon_mvc_view_engine_php_ce->name_length, !IS_INTERNED(phalcon_mvc_view_engine_php_ce->name));
+		add_assoc_stringl_ex(engines, SS(".phtml"), (char*)phalcon_mvc_view_engine_php_ce->name->val, phalcon_mvc_view_engine_php_ce->name->len);
 		phalcon_update_property_this(getThis(), SL("_registeredEngines"), engines TSRMLS_CC);
 		assert(Z_REFCOUNT_P(engines) > 1);
 		zval_ptr_dtor(&engines);
@@ -2448,7 +2448,7 @@ PHP_METHOD(Phalcon_Mvc_View, setConverter){
 
 	zval **name, **converter;
 
-	phalcon_fetch_params_ex(2, 0, &name, &converter);	
+	phalcon_fetch_params(0, 2, 0, &name, &converter);	
 
 	if (!phalcon_is_callable(*converter TSRMLS_CC)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "The paramter `converter` is not callable");

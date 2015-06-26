@@ -492,7 +492,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, addFunction){
 
 	zval **name, **definition;
 
-	phalcon_fetch_params_ex(2, 0, &name, &definition);
+	phalcon_fetch_params(0, 2, 0, &name, &definition);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	phalcon_update_property_array(this_ptr, SL("_functions"), *name, *definition TSRMLS_CC);
@@ -521,7 +521,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, addFilter){
 
 	zval **name, **definition;
 
-	phalcon_fetch_params_ex(2, 0, &name, &definition);
+	phalcon_fetch_params(0, 2, 0, &name, &definition);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	phalcon_update_property_array(this_ptr, SL("_filters"), *name, *definition TSRMLS_CC);

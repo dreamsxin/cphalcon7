@@ -190,7 +190,7 @@ static void phalcon_flash_message_helper(INTERNAL_FUNCTION_PARAMETERS, const cha
 {
 	zval **msg, *type;
 
-	phalcon_fetch_params_ex(1, 0, &msg);
+	phalcon_fetch_params(0, 1, 0, &msg);
 
 	PHALCON_ALLOC_GHOST_ZVAL(type);
 	ZVAL_STRING(type, stype, 1);

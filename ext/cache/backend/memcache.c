@@ -718,7 +718,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, setTrackingKey)
 	zval **key, *options;
 	int separated;
 
-	phalcon_fetch_params_ex(1, 0, &key);
+	phalcon_fetch_params(0, 1, 0, &key);
 
 	options   = phalcon_fetch_nproperty_this(getThis(), SL("_options"), PH_NOISY TSRMLS_CC);
 

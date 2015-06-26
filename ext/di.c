@@ -639,7 +639,7 @@ PHP_METHOD(Phalcon_DI, set) {
 	zval **name, **definition, **shared = NULL, *service;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(2, 1, &name, &definition, &shared);
+	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	if (!shared) {
@@ -669,7 +669,7 @@ PHP_METHOD(Phalcon_DI, setShared){
 	zval **name, **definition, *retval;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(2, 0, &name, &definition);
+	phalcon_fetch_params(0, 2, 0, &name, &definition);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	obj    = phalcon_di_get_object(getThis());
@@ -687,7 +687,7 @@ PHP_METHOD(Phalcon_DI, remove){
 	zval **name;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = phalcon_di_get_object(getThis() TSRMLS_CC);
@@ -709,7 +709,7 @@ PHP_METHOD(Phalcon_DI, attempt){
 	zval **name, **definition, **shared = NULL;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(2, 1, &name, &definition, &shared);
+	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = phalcon_di_get_object(getThis() TSRMLS_CC);
@@ -742,7 +742,7 @@ PHP_METHOD(Phalcon_DI, setService)
 	zval **name_or_def, **raw_definition = NULL;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(1, 1, &name_or_def, &raw_definition);
+	phalcon_fetch_params(0, 1, 1, &name_or_def, &raw_definition);
 
 	obj = phalcon_di_get_object(getThis() TSRMLS_CC);
 
@@ -780,7 +780,7 @@ PHP_METHOD(Phalcon_DI, getRaw){
 	zval **name, **service;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	obj = phalcon_di_get_object(getThis() TSRMLS_CC);
@@ -803,7 +803,7 @@ PHP_METHOD(Phalcon_DI, getService){
 	zval **name, **service;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = phalcon_di_get_object(getThis() TSRMLS_CC);
@@ -909,7 +909,7 @@ PHP_METHOD(Phalcon_DI, getShared){
 	zval *retval;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(1, 1, &name, &parameters);
+	phalcon_fetch_params(0, 1, 1, &name, &parameters);
 	PHALCON_ENSURE_IS_STRING(name);
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -936,7 +936,7 @@ PHP_METHOD(Phalcon_DI, has){
 	zval **name;
 	phalcon_di_object *obj;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = phalcon_di_get_object(getThis() TSRMLS_CC);
@@ -1022,7 +1022,7 @@ PHP_METHOD(Phalcon_DI, __call){
 
 	zval **method, **arguments = NULL;
 
-	phalcon_fetch_params_ex(1, 1, &method, &arguments);
+	phalcon_fetch_params(0, 1, 1, &method, &arguments);
 	PHALCON_ENSURE_IS_STRING(method);
 
 	if (!arguments) {

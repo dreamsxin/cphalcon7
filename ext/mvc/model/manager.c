@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	zval *lowercased, *model, *dependency_injector;
 	zend_class_entry *ce0;
 
-	phalcon_fetch_params_ex(1, 1, &model_name, &new_instance);
+	phalcon_fetch_params(0, 1, 1, &model_name, &new_instance);
 
 	PHALCON_MM_GROW();
 	PHALCON_ENSURE_IS_STRING(model_name);
@@ -2962,7 +2962,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 	PHALCON_OBS_VAR(dependency_injector);
 	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (1)");
 		return;
 	}
 
@@ -3017,7 +3017,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 	PHALCON_OBS_VAR(dependency_injector);
 	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (2)");
 		return;
 	}
 

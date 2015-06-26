@@ -70,7 +70,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	zval *view;
 	int clean;
 
-	phalcon_fetch_params_ex(2, 1, &path, &params, &must_clean);
+	phalcon_fetch_params(0, 2, 1, &path, &params, &must_clean);
 	PHALCON_ENSURE_IS_STRING(path);
 	
 	if (!must_clean) {

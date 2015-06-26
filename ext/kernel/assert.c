@@ -35,9 +35,9 @@ int phalcon_assert_class(zval *object, char *class_name TSRMLS_DC) {
 			fprintf(phalcon_log, "AssertClass: [Failed] Value is not an object\n");
 			return FAILURE;
 		} else {
-			if (strcmp(Z_OBJCE_P(object)->name, class_name)) {
+			if (strcmp(Z_OBJCE_P(object)->name->val, class_name)) {
 				phalcon_error_space();
-				fprintf(phalcon_log, "AssertClass: [Failed] Object is not class %s, is %s\n", class_name, Z_OBJCE_P(object)->name);
+				fprintf(phalcon_log, "AssertClass: [Failed] Object is not class %s, is %s\n", class_name, Z_OBJCE_P(object)->name->val);
 				return FAILURE;
 			}
 		}

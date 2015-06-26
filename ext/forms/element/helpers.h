@@ -30,7 +30,7 @@ static inline void phalcon_forms_element_render_helper(const char *method, int u
 	zval **attributes = NULL, *widget_attributes = NULL, *uc;
 	zval *params[1];
 
-	phalcon_fetch_params_ex(0, 1, &attributes);
+	phalcon_fetch_params(0, 0, 1, &attributes);
 
 	if (!attributes) {
 		attributes = &PHALCON_GLOBAL(z_null);

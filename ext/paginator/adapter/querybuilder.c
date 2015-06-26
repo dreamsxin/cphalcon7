@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setCurrentPage){
 
 	zval **current_page;
 
-	phalcon_fetch_params_ex(1, 0, &current_page);
+	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
 
 	phalcon_update_property_this(this_ptr, SL("_page"), *current_page TSRMLS_CC);
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setLimit){
 
 	zval **current_limit;
 
-	phalcon_fetch_params_ex(1, 0, &current_limit);
+	phalcon_fetch_params(0, 1, 0, &current_limit);
 	PHALCON_ENSURE_IS_LONG(current_limit);
 
 	phalcon_update_property_this(this_ptr, SL("_limitRows"), *current_limit TSRMLS_CC);

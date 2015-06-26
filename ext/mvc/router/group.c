@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	zval **pattern, **paths = NULL, **http_methods = NULL, *prefix, *prefix_pattern;
 	zval *default_paths, *merged_paths = NULL;
 
-	phalcon_fetch_params_ex(1, 2, &pattern, &paths, &http_methods);
+	phalcon_fetch_params(0, 1, 2, &pattern, &paths, &http_methods);
 	PHALCON_ENSURE_IS_STRING(pattern);
 
 	PHALCON_MM_GROW();
@@ -589,7 +589,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, convert){
 
 	zval **name, **converter;
 
-	phalcon_fetch_params_ex(2, 0, &name, &converter);
+	phalcon_fetch_params(0, 2, 0, &name, &converter);
 
 	phalcon_update_property_array(this_ptr, SL("_converters"), *name, *converter TSRMLS_CC);
 	RETURN_THISW();
@@ -615,7 +615,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setName){
 
 	zval **name;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_update_property_this(this_ptr, SL("_name"), *name TSRMLS_CC);
 	RETURN_THISW();

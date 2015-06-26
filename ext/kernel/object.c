@@ -39,7 +39,7 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 	zval *result;
 
 	if ((result = zend_hash_str_find(&ce->constants_table, constant_name, constant_length)) == NULL) {
-		php_error_docref(NULL TSRMLS_CC, E_ERROR, "Undefined class constant '%s::%s'", ce->name, constant_name);
+		php_error_docref(NULL TSRMLS_CC, E_ERROR, "Undefined class constant '%s::%s'", ce->name->val, constant_name);
 		return FAILURE;
 	}
 
@@ -183,7 +183,7 @@ void phalcon_get_class(zval *result, const zval *object, int lower TSRMLS_DC) {
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(object);
-		ZVAL_STRINGL(result, ce->name, ce->name_length, !IS_INTERNED(ce->name) || lower);
+		ZVAL_NEW_STR(result, ce->name);
 
 		if (lower) {
 			zend_str_tolower(Z_STRVAL_P(result), Z_STRLEN_P(result));
@@ -215,8 +215,8 @@ void phalcon_get_class_ns(zval *result, const zval *object, int lower TSRMLS_DC)
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		ce = Z_OBJCE_P(object);
-		class_name = ce->name;
-		class_length = ce->name_length;
+		class_name = ce->name->val;
+		class_length = ce->name->len;
 	} else {
 		class_name = Z_STRVAL_P(object);
 		class_length = Z_STRLEN_P(object);
@@ -275,8 +275,8 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower TSRMLS_DC)
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		ce = Z_OBJCE_P(object);
-		class_name = ce->name;
-		class_length = ce->name_length;
+		class_name = ce->name->val;
+		class_length = ce->name->len;
 	} else {
 		class_name = Z_STRVAL_P(object);
 		class_length = Z_STRLEN_P(object);
@@ -327,9 +327,9 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower TSRMLS_DC)
  */
 void phalcon_get_called_class(zval *return_value TSRMLS_DC)
 {
-	zend_class_entry *called_scope = EG(called_scope);
+	zend_class_entry *called_scope = EX(called_scope);
 	if (called_scope) {
-		RETURN_STRINGL(called_scope->name, called_scope->name_length, !IS_INTERNED(called_scope->name));
+		RETURN_NEW_STR(called_scope->name);
 	}
 
 	if (!EG(scope))  {
@@ -346,7 +346,7 @@ void phalcon_get_parent_class(zval *result, const zval *object, int lower TSRMLS
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(object);
 		if (ce && ce->parent) {
-			ZVAL_STRINGL(result, ce->parent->name, ce->parent->name_length, !IS_INTERNED(ce->name) || lower);
+			ZVAL_NEW_STR(result, ce->parent->name);
 
 			if (lower) {
 				zend_str_tolower(Z_STRVAL_P(result), Z_STRLEN_P(result));
@@ -585,7 +585,7 @@ int phalcon_clone(zval *destination, zval *obj) {
 		clone_call =  Z_OBJ_HT_P(obj)->clone_obj;
 		if (!clone_call) {
 			if (ce) {
-				php_error_docref(NULL, E_ERROR, "Trying to clone an uncloneable object of class %s", ce->name);
+				php_error_docref(NULL, E_ERROR, "Trying to clone an uncloneable object of class %s", ce->name->val);
 			} else {
 				php_error_docref(NULL, E_ERROR, "Trying to clone an uncloneable object");
 			}
@@ -639,8 +639,8 @@ int phalcon_is_instance_of(zval *object, const char *class_name, unsigned int cl
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 
 		ce = Z_OBJCE_P(object);
-		if (ce->name_length == class_length) {
-			if (!zend_binary_strcasecmp(ce->name, ce->name_length, class_name, class_length)) {
+		if (ce->name->len == class_length) {
+			if (!zend_binary_strcasecmp(ce->name->val, ce->name->len, class_name, class_length)) {
 				return 1;
 			}
 		}
@@ -801,7 +801,7 @@ zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name,
 				}
 			} else if (UNEXPECTED(!zobj->properties)) {
 				flag = 1;
-			} else if (UNEXPECTED((zv = zend_hash_str_find(zobj->properties, property_info->name, property_info->name_length+1) == NULL)) {
+			} else if (UNEXPECTED((zv = zend_hash_str_find(zobj->properties, property_info->name->val, property_info->name->len+1) == NULL)) {
 				flag = 2;
 			} else {
 				flag = 0;
@@ -809,7 +809,7 @@ zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name,
 
 			if (unlikely(flag) && zobj->properties) {
 				if (
-					(flag == 2 || (zv = zend_hash_str_find(zobj->properties, property_info->name, property_info->name_length+1)) == NULL)
+					(flag == 2 || (zv = zend_hash_str_find(zobj->properties, property_info->name->val, property_info->name->len+1)) == NULL)
 					&& zv
 				) {
 					flag = 0;
@@ -857,26 +857,6 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 
 		if (phalcon_hash_quick_find(&ce->properties_info, property_name, property_length + 1, key, (void **) &property_info) == SUCCESS) {
 
-			#if PHP_VERSION_ID < 50400
-
-			if (phalcon_hash_quick_find(zobj->properties, property_info->name, property_info->name_length+1, property_info->h, (void **) &zv) == SUCCESS) {
-
-				EG(scope) = old_scope;
-
-				if (return_value_ptr) {
-					phalcon_ptr_dtor(return_value_ptr);
-					Z_ADDREF_PP(zv);
-					*return_value_ptr = *zv;
-				}
-				else {
-					ZVAL_ZVAL(return_value, *zv, 1, 0);
-				}
-
-				return SUCCESS;
-			}
-
-			#else
-
 			int flag;
 			if (EXPECTED((property_info->flags & ZEND_ACC_STATIC) == 0) && property_info->offset >= 0) {
 				if (zobj->properties) {
@@ -888,7 +868,7 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 				}
 			} else if (UNEXPECTED(!zobj->properties)) {
 				flag = 1;
-			} else if (UNEXPECTED(phalcon_hash_quick_find(zobj->properties, property_info->name, property_info->name_length+1, property_info->h, (void **) &zv) == FAILURE)) {
+			} else if (UNEXPECTED(phalcon_hash_quick_find(zobj->properties, property_info->name->val, property_info->name->len+1, property_info->h, (void **) &zv) == FAILURE)) {
 				flag = 2;
 			} else {
 				flag = 0;
@@ -896,7 +876,7 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 
 			if (unlikely(flag) && zobj->properties) {
 				if (
-					(flag == 2 || phalcon_hash_quick_find(zobj->properties, property_info->name, property_info->name_length+1, property_info->h, (void **) &zv) == FAILURE)
+					(flag == 2 || phalcon_hash_quick_find(zobj->properties, property_info->name->val, property_info->name->len+1, property_info->h, (void **) &zv) == FAILURE)
 					&& zv && *zv
 				) {
 					flag = 0;
@@ -917,9 +897,6 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 
 				return SUCCESS;
 			}
-
-			#endif
-
 		}
 
 		EG(scope) = old_scope;
@@ -1074,13 +1051,13 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 		zval **variable_ptr;
 		zend_property_info *property_info;
 
-		zobj = zend_objects_get_address(object TSRMLS_CC);
+		zobj = Z_OBJ_P(object);
 
 		if (phalcon_hash_quick_find(&ce->properties_info, property_name, property_length + 1, key, (void **) &property_info) == SUCCESS) {
 			assert(property_info != NULL);
 
 			/** This is as zend_std_write_property, but we're not interesed in validate properties visibility */
-			if (property_info->offset >= 0 ? (zobj->properties ? ((variable_ptr = (zval**) zobj->properties_table[property_info->offset]) != NULL) : (*(variable_ptr = &zobj->properties_table[property_info->offset]) != NULL)) : (EXPECTED(zobj->properties != NULL) && EXPECTED(phalcon_hash_quick_find(zobj->properties, property_info->name, property_info->name_length + 1, property_info->h, (void **) &variable_ptr) == SUCCESS))) {
+			if (property_info->offset >= 0 ? (zobj->properties ? ((variable_ptr = (zval**) zobj->properties_table[property_info->offset]) != NULL) : (*(variable_ptr = &zobj->properties_table[property_info->offset]) != NULL)) : (EXPECTED(zobj->properties != NULL) && EXPECTED(phalcon_hash_quick_find(zobj->properties, property_info->name->val, property_info->name->len + 1, property_info->h, (void **) &variable_ptr) == SUCCESS))) {
 
 				if (EXPECTED(*variable_ptr != value)) {
 

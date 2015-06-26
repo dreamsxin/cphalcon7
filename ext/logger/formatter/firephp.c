@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, setShowBacktrace) {
 
 	zval **show;
 
-	phalcon_fetch_params_ex(1, 0, &show);
+	phalcon_fetch_params(0, 1, 0, &show);
 
 	PHALCON_ENSURE_IS_BOOL(show);
 	phalcon_update_property_this(getThis(), SL("_showBacktrace"), *show TSRMLS_CC);
@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, enableLabels) {
 
 	zval **enable;
 
-	phalcon_fetch_params_ex(1, 0, &enable);
+	phalcon_fetch_params(0, 1, 0, &enable);
 
 	PHALCON_ENSURE_IS_BOOL(enable);
 	phalcon_update_property_this(getThis(), SL("_enableLabels"), *enable TSRMLS_CC);
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getTypeString) {
 	zval **type;
 	int itype;
 
-	phalcon_fetch_params_ex(1, 0, &type);
+	phalcon_fetch_params(0, 1, 0, &type);
 	PHALCON_ENSURE_IS_LONG(type);
 
 	itype = Z_LVAL_PP(type);

@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Crypt, setMode){
 
 	zval **mode;
 
-	phalcon_fetch_params_ex(1, 0, &mode);
+	phalcon_fetch_params(0, 1, 0, &mode);
 	PHALCON_ENSURE_IS_STRING(mode);
 
 	phalcon_update_property_this(this_ptr, SL("_mode"), *mode TSRMLS_CC);
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Crypt, setKey){
 
 	zval **key;
 
-	phalcon_fetch_params_ex(1, 0, &key);
+	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
 	phalcon_update_property_this(this_ptr, SL("_key"), *key TSRMLS_CC);
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Crypt, setPadding) {
 
 	zval **scheme;
 
-	phalcon_fetch_params_ex(1, 0, &scheme);
+	phalcon_fetch_params(0, 1, 0, &scheme);
 	PHALCON_ENSURE_IS_LONG(scheme);
 
 	phalcon_update_property_this(this_ptr, SL("_padding"), *scheme TSRMLS_CC);
@@ -732,7 +732,7 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 	char *decoded;
 	int decoded_len;
 
-	phalcon_fetch_params_ex(1, 2, &text, &key, &safe);
+	phalcon_fetch_params(0, 1, 2, &text, &key, &safe);
 
 	PHALCON_ENSURE_IS_STRING(text);
 	if (!key) {

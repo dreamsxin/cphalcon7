@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Filter, add){
 
 	zval **name, **handler;
 
-	phalcon_fetch_params_ex(2, 0, &name, &handler);
+	phalcon_fetch_params(0, 2, 0, &name, &handler);
 
 	PHALCON_ENSURE_IS_STRING(name);
 	

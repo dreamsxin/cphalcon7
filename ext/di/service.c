@@ -106,8 +106,8 @@ static void phalcon_di_service_dtor(void *v TSRMLS_DC)
 {
 	phalcon_di_service_object *obj = v;
 
-	if (obj->name && !IS_INTERNED(obj->name)) {
-		efree((char*)obj->name);
+	if (obj->name) {
+		zend_string_free(obj->name);
 	}
 
 	if (obj->definition) {
@@ -155,8 +155,7 @@ static zend_object_value phalcon_di_service_clone_obj(zval *zobject TSRMLS_DC)
 	zend_objects_clone_members(&new_object->obj, new_obj_val, &old_object->obj, handle TSRMLS_CC);
 
 	if (old_object->name) {
-		new_object->name     = estrndup(old_object->name, old_object->name_len);
-		new_object->name_len = old_object->name_len;
+		new_object->name = zend_string_dup(old_object->name, 0);
 	}
 
 	if (old_object->definition) {
@@ -178,7 +177,7 @@ static HashTable* phalcon_di_service_get_debug_info(zval *object, int *is_temp T
 	phalcon_di_service_object *obj = phalcon_di_service_get_object(object TSRMLS_CC);
 	HashTable *props = Z_OBJPROP_P(object);
 	HashTable *ht;
-	zval *tmp;
+	zval tmp;
 
 	*is_temp = 1;
 
@@ -186,43 +185,34 @@ static HashTable* phalcon_di_service_get_debug_info(zval *object, int *is_temp T
 	zend_hash_init(ht, zend_hash_num_elements(props) + 5, NULL, ZVAL_PTR_DTOR, 0);
 	zend_hash_copy(ht, props, (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
 
-	MAKE_STD_ZVAL(tmp);
 	if (obj->name) {
-		ZVAL_STRINGL(tmp, obj->name, obj->name_len, !IS_INTERNED(obj->name));
-	}
-	else {
-		ZVAL_EMPTY_STRING(tmp);
+		ZVAL_NEW_STRINGL(&tmp, obj->name);
+	} else {
+		ZVAL_EMPTY_STRING(&tmp);
 	}
 
-	zend_hash_quick_update(ht, "_name", sizeof("_name"), zend_inline_hash_func(SS("_name")), (void*)&tmp, sizeof(zval*), NULL);
+	zend_hash_str_update(ht, SL("_name"), &tmp);
 
 	if (obj->definition) {
-		Z_ADDREF_P(obj->definition);
-		tmp = obj->definition;
-	}
-	else {
-		ALLOC_INIT_ZVAL(tmp);
+		ZVAL_ZVAL(&tmp, obj->definition);
+	} else {
+		ZVAL_NULL(&tmp);
 	}
 
-	zend_hash_quick_update(ht, "_definition", sizeof("_definition"), zend_inline_hash_func(SS("_definition")), (void*)&tmp, sizeof(zval*), NULL);
+	zend_hash_str_update(ht, SL("_definition"), &tmp);
 
 	if (obj->shared_instance) {
-		Z_ADDREF_P(obj->shared_instance);
-		tmp = obj->shared_instance;
+		ZVAL_ZVAL(&tmp, obj->shared_instance);
+	} else {
+		ZVAL_FALSE(&tmp);
 	}
-	else {
-		ALLOC_INIT_ZVAL(tmp);
-	}
+	zend_hash_str_update(ht, SL("_sharedInstance"), &tmp);
 
-	zend_hash_quick_update(ht, "_sharedInstance", sizeof("_sharedInstance"), zend_inline_hash_func(SS("_sharedInstance")), (void*)&tmp, sizeof(zval*), NULL);
+	ZVAL_BOOL(&tmp, obj->resolved);
+	zend_hash_str_update(ht, SL("_resolved"), &tmp);
 
-	MAKE_STD_ZVAL(tmp);
-	ZVAL_BOOL(tmp, obj->resolved);
-	zend_hash_quick_update(ht, "_resolved", sizeof("_resolved"), zend_inline_hash_func(SS("_resolved")), (void*)&tmp, sizeof(zval*), NULL);
-
-	MAKE_STD_ZVAL(tmp);
-	ZVAL_BOOL(tmp, obj->shared);
-	zend_hash_quick_update(ht, "_shared", sizeof("_shared"), zend_inline_hash_func(SS("_shared")), (void*)&tmp, sizeof(zval*), NULL);
+	ZVAL_BOOL(&tmp, obj->shared);
+	zend_hash_str_update(ht, SL("_shared"), &tmp);
 
 	return ht;
 }
@@ -256,21 +246,17 @@ PHP_METHOD(Phalcon_DI_Service, __construct){
 
 	zval **name, **definition, **shared = NULL;
 	phalcon_di_service_object *obj;
-	char *sname;
+	zend_string *sname;
 
-	phalcon_fetch_params_ex(2, 1, &name, &definition, &shared);
+	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
 
 	PHALCON_ENSURE_IS_STRING(name);
-	Z_ADDREF_PP(definition);
+	Z_ADDREF_P(*definition);
 
-	//sname = (char*)zend_new_interned_string(Z_STRVAL_PP(name), Z_STRLEN_PP(name), 0 TSRMLS_CC);
-	//if (!IS_INTERNED(sname)) {
-		sname = estrndup(Z_STRVAL_PP(name), Z_STRLEN_PP(name));
-	//}
+	sname = zend_string_dup(Z_STR_P(*name), 0);
 
 	obj                  = phalcon_di_service_get_object(getThis() TSRMLS_CC);
 	obj->name            = sname;
-	obj->name_len        = Z_STRLEN_PP(name);
 	obj->definition      = *definition;
 	obj->shared          = shared ? zend_is_true(*shared) : 0;
 	obj->shared_instance = NULL;
@@ -285,7 +271,7 @@ PHP_METHOD(Phalcon_DI_Service, __construct){
 PHP_METHOD(Phalcon_DI_Service, getName)
 {
 	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
-	RETURN_STRINGL(obj->name, obj->name_len, !IS_INTERNED(obj->name));
+	RETURN_NEW_STR(obj->name);
 }
 
 /**
@@ -467,7 +453,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 	zval **position, **parameter, *definition, *arguments = NULL;
 	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
 
-	phalcon_fetch_params_ex(2, 0, &position, &parameter);
+	phalcon_fetch_params(0, 2, 0, &position, &parameter);
 	PHALCON_ENSURE_IS_LONG(position);
 
 	definition = obj->definition;
@@ -505,7 +491,7 @@ PHP_METHOD(Phalcon_DI_Service, getParameter){
 	zval **position, *definition, *arguments, *parameter;
 	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
 
-	phalcon_fetch_params_ex(1, 0, &position);
+	phalcon_fetch_params(0, 1, 0, &position);
 	PHALCON_ENSURE_IS_LONG(position);
 
 	definition = obj->definition;

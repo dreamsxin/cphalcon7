@@ -139,7 +139,7 @@ long int phalcon_fast_count_int(zval *value TSRMLS_DC) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				result = Z_LVAL(retval);
-				phalcon_ptr_dtor(&retval);
+				phalcon_dtor(&retval);
 			}
 
 			return result;
@@ -180,7 +180,7 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				ZVAL_LONG(result, Z_LVAL(retval));
-				phalcon_ptr_dtor(&retval);
+				phalcon_dtor(&retval);
 			}
 			return;
 		}
@@ -221,7 +221,7 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				count = Z_LVAL(retval);
-				phalcon_ptr_dtor(&retval);
+				phalcon_dtor(&retval);
 				return (int) count > 0;
 			}
 			return 0;
@@ -253,7 +253,7 @@ int phalcon_is_callable(zval *var TSRMLS_DC) {
 	char *error = NULL;
 	zend_bool retval;
 
-	retval = zend_is_callable_ex(var, NULL, 0, NULL, NULL, NULL, &error TSRMLS_CC);
+	retval = zend_is_callable_ex(var, NULL, 0, NULL, NULL, &error);
 	if (error) {
 		efree(error);
 	}

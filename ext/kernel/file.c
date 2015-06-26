@@ -138,7 +138,7 @@ void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_
 
 	if (Z_TYPE_P(path) != IS_STRING || Z_TYPE_P(virtual_separator) != IS_STRING) {
 		if (Z_TYPE_P(path) == IS_STRING) {
-			RETURN_STRINGL(Z_STRVAL_P(path), Z_STRLEN_P(path), 1);
+			RETURN_NEW_STR(Z_STR_P(path));
 		} else {
 			RETURN_EMPTY_STRING();
 		}

@@ -479,7 +479,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 						if (Z_TYPE_P(v) == IS_OBJECT) {
 							zend_class_entry *ce = Z_OBJCE_P(v);
 							PHALCON_INIT_NVAR(class_name);
-							ZVAL_STRINGL(class_name, ce->name, ce->name_length, !IS_INTERNED(ce->name));
+							ZVAL_NEW_STR(class_name, ce->name);
 
 							PHALCON_INIT_NVAR(var_dump);
 							PHALCON_CONCAT_SVSVS(var_dump, "[", k, "] =&gt; Object(", class_name, ")");
@@ -567,7 +567,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 		const zend_class_entry *ce = Z_OBJCE_P(variable);
 
 		PHALCON_INIT_VAR(class_name);
-		ZVAL_STRINGL(class_name, ce->name, ce->name_length, !IS_INTERNED(ce->name));
+		ZVAL_NEW_STR(class_name, ce->name);
 
 		/** 
 		 * Try to check for a 'dump' method, this surely produces a better printable
@@ -695,7 +695,7 @@ PHP_METHOD(Phalcon_Debug, getFileLink) {
 
 	zval **file, **line, **format;
 
-	phalcon_fetch_params_ex(3, 0, &file, &line, &format);
+	phalcon_fetch_params(0, 3, 0, &file, &line, &format);
 
 	PHALCON_ENSURE_IS_STRING(file);
 	PHALCON_ENSURE_IS_STRING(line);
@@ -1105,7 +1105,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
 	PHALCON_INIT_VAR(class_name);
 	ce = Z_OBJCE_P(exception);
-	ZVAL_STRINGL(class_name, ce->name, ce->name_length, !IS_INTERNED(ce->name));
+	ZVAL_NEW_STR(class_name, ce->name);
 
 	PHALCON_CALL_METHOD(&message, exception, "getmessage");
 
@@ -1438,7 +1438,7 @@ PHP_METHOD(Phalcon_Debug, setCharset) {
 
 	zval **charset;
 
-	phalcon_fetch_params_ex(1, 0, &charset);
+	phalcon_fetch_params(0, 1, 0, &charset);
 	PHALCON_ENSURE_IS_STRING(charset);
 
 	phalcon_update_static_property_ce(phalcon_debug_ce, SL("_charset"), *charset TSRMLS_CC);
@@ -1466,7 +1466,7 @@ PHP_METHOD(Phalcon_Debug, setLinesBeforeContext) {
 
 	zval **lines;
 
-	phalcon_fetch_params_ex(1, 0, &lines);
+	phalcon_fetch_params(0, 1, 0, &lines);
 	PHALCON_ENSURE_IS_LONG(lines);
 
 	phalcon_update_property_this(getThis(), SL("_beforeContext"), *lines TSRMLS_CC);
@@ -1494,7 +1494,7 @@ PHP_METHOD(Phalcon_Debug, setLinesAfterContext) {
 
 	zval **lines;
 
-	phalcon_fetch_params_ex(1, 0, &lines);
+	phalcon_fetch_params(0, 1, 0, &lines);
 	PHALCON_ENSURE_IS_LONG(lines);
 
 	phalcon_update_property_this(getThis(), SL("_afterContext"), *lines TSRMLS_CC);

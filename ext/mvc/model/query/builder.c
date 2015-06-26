@@ -415,7 +415,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, distinct){
 
 	zval **distinct;
 
-	phalcon_fetch_params_ex(1, 0, &distinct);
+	phalcon_fetch_params(0, 1, 0, &distinct);
 
 	if (Z_TYPE_PP(distinct) != IS_NULL && !PHALCON_IS_BOOL(*distinct)) {
 		PHALCON_ENSURE_IS_BOOL(distinct);

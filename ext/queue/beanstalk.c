@@ -658,7 +658,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params_ex(0, 1, &length);
+	phalcon_fetch_params(0, 0, 1, &length);
 
 	if (!length) {
 		length = &PHALCON_GLOBAL(z_zero);

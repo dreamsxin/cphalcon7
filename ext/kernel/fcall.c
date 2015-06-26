@@ -153,7 +153,7 @@ static ulong phalcon_make_fcall_key(char **result, size_t *length, const zend_cl
 		}
 	}
 	else if (type == phalcon_fcall_static) {
-		calling_scope = EG(called_scope);
+		calling_scope = EX(called_scope);
 		if (UNEXPECTED(!calling_scope)) {
 			return 0;
 		}
@@ -239,7 +239,7 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 		case phalcon_fcall_parent:
 			if (EG(scope) && EG(scope)->parent) {
 				fcic->calling_scope = EG(scope)->parent;
-				fcic->called_scope  = EG(called_scope);
+				fcic->called_scope  = EX(called_scope);
 				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : this_ptr;
 				fcic->initialized   = 1;
 			}
@@ -249,7 +249,7 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 		case phalcon_fcall_self:
 			if (EG(scope)) {
 				fcic->calling_scope = EG(scope);
-				fcic->called_scope  = EG(called_scope);
+				fcic->called_scope  = EX(called_scope);
 				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : this_ptr;
 				fcic->initialized   = 1;
 			}
@@ -257,9 +257,9 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 			break;
 
 		case phalcon_fcall_static:
-			if (EG(called_scope)) {
-				fcic->calling_scope = EG(called_scope);
-				fcic->called_scope  = EG(called_scope);
+			if (EX(called_scope)) {
+				fcic->calling_scope = EX(called_scope);
+				fcic->called_scope  = EX(called_scope);
 				fcic->object_ptr    = fci->object_ptr ? fci->object_ptr : this_ptr;
 				fcic->initialized   = 1;
 			}
@@ -298,11 +298,11 @@ PHALCON_ATTR_NONNULL static void phalcon_fcall_populate_fci_cache(zend_fcall_inf
 			if (fci->object_ptr) {
 				fcic->called_scope = Z_OBJCE_P(fci->object_ptr);
 			}
-			else if (EG(scope) && !(EG(called_scope) && instanceof_function(EG(called_scope), EG(scope)))) {
+			else if (EG(scope) && !(EX(called_scope) && instanceof_function(EX(called_scope), EG(scope)))) {
 				fcic->called_scope = EG(scope);
 			}
 			else {
-				fcic->called_scope = EG(called_scope);
+				fcic->called_scope = EX(called_scope);
 			}
 
 			break;
@@ -545,7 +545,7 @@ int phalcon_call_class_method_aparams(zval **return_value_ptr, zend_class_entry 
 
 		case phalcon_fcall_ce:
 			assert(ce != NULL);
-			add_next_index_stringl(&fn, ce->name, ce->name_length, !IS_INTERNED(ce->name));
+			add_next_index_stringl(&fn, ce->name->, ce->name->len);
 			break;
 
 		case phalcon_fcall_method:
@@ -565,8 +565,8 @@ int phalcon_call_class_method_aparams(zval **return_value_ptr, zend_class_entry 
 			case phalcon_fcall_parent: zend_error(E_ERROR, "Call to undefined function parent::%s()", method_name); break;
 			case phalcon_fcall_self:   zend_error(E_ERROR, "Call to undefined function self::%s()", method_name); break;
 			case phalcon_fcall_static: zend_error(E_ERROR, "Call to undefined function static::%s()", method_name); break;
-			case phalcon_fcall_ce:     zend_error(E_ERROR, "Call to undefined function %s::%s()", ce->name, method_name); break;
-			case phalcon_fcall_method: zend_error(E_ERROR, "Call to undefined function %s::%s()", Z_OBJCE_P(object)->name, method_name); break;
+			case phalcon_fcall_ce:     zend_error(E_ERROR, "Call to undefined function %s::%s()", ce->name->val, method_name); break;
+			case phalcon_fcall_method: zend_error(E_ERROR, "Call to undefined function %s::%s()", Z_OBJCE_P(object)->name->val, method_name); break;
 			default:                   zend_error(E_ERROR, "Call to undefined function ?::%s()", method_name);
 		}
 	}
@@ -686,7 +686,7 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 		if (!EG(scope)) {
 			if (error) *error = estrdup("cannot access self:: when no class scope is active");
 		} else {
-			fcc->called_scope = EG(called_scope);
+			fcc->called_scope = EX(called_scope);
 			fcc->calling_scope = EG(scope);
 			if (!fcc->object_ptr) {
 				fcc->object_ptr = this_ptr;
@@ -700,7 +700,7 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 		} else if (!EG(scope)->parent) {
 			if (error) *error = estrdup("cannot access parent:: when current class scope has no parent");
 		} else {
-			fcc->called_scope = EG(called_scope);
+			fcc->called_scope = EX(called_scope);
 			fcc->calling_scope = EG(scope)->parent;
 			if (!fcc->object_ptr) {
 				fcc->object_ptr = this_ptr;
@@ -710,11 +710,11 @@ static int phalcon_is_callable_check_class(const char *name, int name_len, zend_
 		}
 	} else if (name_len == sizeof("static") - 1 &&
 			   !memcmp(lcname, "static", sizeof("static") - 1)) {
-		if (!EG(called_scope)) {
+		if (!EX(called_scope)) {
 			if (error) *error = estrdup("cannot access static:: when no class scope is active");
 		} else {
-			fcc->called_scope = EG(called_scope);
-			fcc->calling_scope = EG(called_scope);
+			fcc->called_scope = EX(called_scope);
+			fcc->calling_scope = EX(called_scope);
 			if (!fcc->object_ptr) {
 				fcc->object_ptr = this_ptr;
 			}
@@ -807,7 +807,7 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 
 		ftable = &fcc->calling_scope->function_table;
 		if (ce_org && !instanceof_function(ce_org, fcc->calling_scope)) {
-			if (error) phalcon_spprintf(error, 0, "class '%s' is not a subclass of '%s'", ce_org->name, fcc->calling_scope->name);
+			if (error) phalcon_spprintf(error, 0, "class '%s' is not a subclass of '%s'", ce_org->name->val, fcc->calling_scope->name->val);
 			return 0;
 		}
 		mname = Z_STRVAL_P(callable) + clen + 2;
@@ -900,10 +900,10 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 		if (fcc->calling_scope && !call_via_handler) {
 			if (!fcc->object_ptr && (fcc->function_handler->common.fn_flags & ZEND_ACC_ABSTRACT)) {
 				if (error) {
-					phalcon_spprintf(error, 0, "cannot call abstract method %s::%s()", fcc->calling_scope->name, fcc->function_handler->common.function_name);
+					phalcon_spprintf(error, 0, "cannot call abstract method %s::%s()", fcc->calling_scope->name->val, fcc->function_handler->common.function_name->val);
 					retval = 0;
 				} else {
-					zend_error(E_ERROR, "Cannot call abstract method %s::%s()", fcc->calling_scope->name, fcc->function_handler->common.function_name);
+					zend_error(E_ERROR, "Cannot call abstract method %s::%s()", fcc->calling_scope->name->val, fcc->function_handler->common.function_name->val);
 				}
 			} else if (!fcc->object_ptr && !(fcc->function_handler->common.fn_flags & ZEND_ACC_STATIC)) {
 				int severity;
@@ -922,28 +922,28 @@ static int phalcon_is_callable_check_func(int check_flags, zval *callable, zend_
 				if (this_ptr && instanceof_function(Z_OBJCE_P(this_ptr), fcc->calling_scope)) {
 					fcc->object_ptr = this_ptr;
 					if (error) {
-						phalcon_spprintf(error, 0, "non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb, Z_OBJCE_P(this_ptr)->name);
+						phalcon_spprintf(error, 0, "non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name->val, fcc->function_handler->common.function_name->val, verb, Z_OBJCE_P(this_ptr)->name->val);
 						if (severity == E_ERROR) {
 							retval = 0;
 						}
 					} else if (retval) {
-						zend_error(severity, "Non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb, Z_OBJCE_P(this_ptr)->name);
+						zend_error(severity, "Non-static method %s::%s() %s be called statically, assuming $this from compatible context %s", fcc->calling_scope->name->val, fcc->function_handler->common.function_name->val, verb, Z_OBJCE_P(this_ptr)->name->val);
 					}
 				} else {
 					if (error) {
-						phalcon_spprintf(error, 0, "non-static method %s::%s() %s be called statically", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb);
+						phalcon_spprintf(error, 0, "non-static method %s::%s() %s be called statically", fcc->calling_scope->name->val, fcc->function_handler->common.function_name->val, verb);
 						if (severity == E_ERROR) {
 							retval = 0;
 						}
 					} else if (retval) {
-						zend_error(severity, "Non-static method %s::%s() %s be called statically", fcc->calling_scope->name, fcc->function_handler->common.function_name, verb);
+						zend_error(severity, "Non-static method %s::%s() %s be called statically", fcc->calling_scope->name->val, fcc->function_handler->common.function_name->val, verb);
 					}
 				}
 			}
 		}
 	} else if (error && !(check_flags & IS_CALLABLE_CHECK_SILENT)) {
 		if (fcc->calling_scope) {
-			if (error) phalcon_spprintf(error, 0, "class '%s' does not have a method '%s'", fcc->calling_scope->name, mname);
+			if (error) phalcon_spprintf(error, 0, "class '%s' does not have a method '%s'", fcc->calling_scope->name->val, mname);
 		} else {
 			if (error) phalcon_spprintf(error, 0, "function '%s' does not exist", mname);
 		}
@@ -1002,10 +1002,10 @@ static zend_bool phalcon_is_callable_ex(zval *callable, zval *object_ptr, uint c
 				if (callable_name) {
 					char *ptr;
 
-					*callable_name_len = fcc->calling_scope->name_length + Z_STRLEN_P(callable) + sizeof("::") - 1;
+					*callable_name_len = fcc->calling_scope->name->len + Z_STRLEN_P(callable) + sizeof("::") - 1;
 					ptr = *callable_name = emalloc(*callable_name_len + 1);
-					memcpy(ptr, fcc->calling_scope->name, fcc->calling_scope->name_length);
-					ptr += fcc->calling_scope->name_length;
+					memcpy(ptr, fcc->calling_scope->name->val, fcc->calling_scope->name->len);
+					ptr += fcc->calling_scope->name->len;
 					memcpy(ptr, "::", sizeof("::") - 1);
 					ptr += sizeof("::") - 1;
 					memcpy(ptr, Z_STRVAL_P(callable), Z_STRLEN_P(callable) + 1);
@@ -1082,10 +1082,10 @@ static zend_bool phalcon_is_callable_ex(zval *callable, zval *object_ptr, uint c
 						if (callable_name) {
 							char *ptr;
 
-							*callable_name_len = fcc->calling_scope->name_length + Z_STRLEN_PP(method) + sizeof("::") - 1;
+							*callable_name_len = fcc->calling_scope->name->len + Z_STRLEN_PP(method) + sizeof("::") - 1;
 							ptr = *callable_name = emalloc(*callable_name_len + 1);
-							memcpy(ptr, fcc->calling_scope->name, fcc->calling_scope->name_length);
-							ptr += fcc->calling_scope->name_length;
+							memcpy(ptr, fcc->calling_scope->name->val, fcc->calling_scope->name->len);
+							ptr += fcc->calling_scope->name->len;
 							memcpy(ptr, "::", sizeof("::") - 1);
 							ptr += sizeof("::") - 1;
 							memcpy(ptr, Z_STRVAL_PP(method), Z_STRLEN_PP(method) + 1);
@@ -1135,10 +1135,10 @@ static zend_bool phalcon_is_callable_ex(zval *callable, zval *object_ptr, uint c
 				if (callable_name) {
 					zend_class_entry *ce = Z_OBJCE_P(callable); /* TBFixed: what if it's overloaded? */
 
-					*callable_name_len = ce->name_length + sizeof("::__invoke") - 1;
+					*callable_name_len = ce->name->len + sizeof("::__invoke") - 1;
 					*callable_name = emalloc(*callable_name_len + 1);
-					memcpy(*callable_name, ce->name, ce->name_length);
-					memcpy((*callable_name) + ce->name_length, "::__invoke", sizeof("::__invoke"));
+					memcpy(*callable_name, ce->name->val, ce->name->len);
+					memcpy((*callable_name) + ce->name->len, "::__invoke", sizeof("::__invoke"));
 				}
 				return 1;
 			}

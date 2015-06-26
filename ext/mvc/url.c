@@ -416,7 +416,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 	zval **uri = NULL, **args = NULL, *static_base_uri, *base_uri = NULL;
 	zval *matched, *pattern, *query_string;
 
-	phalcon_fetch_params_ex(0, 2, &uri, &args);
+	phalcon_fetch_params(0, 0, 2, &uri, &args);
 
 	PHALCON_MM_GROW();
 

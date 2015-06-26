@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_Image_Adapter, liquidRescale){
 
 	zval **width, **height, **delta_x = NULL, **rigidity = NULL;
 
-	phalcon_fetch_params_ex(2, 2, &width, &height, &delta_x, &rigidity);
+	phalcon_fetch_params(0, 2, 2, &width, &height, &delta_x, &rigidity);
 
 	PHALCON_ENSURE_IS_LONG(width);
 	PHALCON_ENSURE_IS_LONG(height);
@@ -404,7 +404,7 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 	zval *width, *height, *offset_x, *offset_y;
 	long tmp_max_width, tmp_max_height, tmp_width, tmp_height, tmp_image_width, tmp_image_height, tmp_offset_x, tmp_offset_y;
 
-	phalcon_fetch_params_ex(2, 2, &w, &h, &ofs_x, &ofs_y);
+	phalcon_fetch_params(0, 2, 2, &w, &h, &ofs_x, &ofs_y);
 
 	PHALCON_ENSURE_IS_LONG(w);
 	PHALCON_ENSURE_IS_LONG(h);
@@ -512,7 +512,7 @@ PHP_METHOD(Phalcon_Image_Adapter, rotate){
 	zval **degrees, *d;
 	long tmp_degrees;
 
-	phalcon_fetch_params_ex(1, 0, &degrees);
+	phalcon_fetch_params(0, 1, 0, &degrees);
 
 	PHALCON_ENSURE_IS_LONG(degrees);
 
@@ -548,7 +548,7 @@ PHP_METHOD(Phalcon_Image_Adapter, flip){
 
 	zval **direction, *dir;
 
-	phalcon_fetch_params_ex(1, 0, &direction);
+	phalcon_fetch_params(0, 1, 0, &direction);
 	PHALCON_ENSURE_IS_LONG(direction);
 
 	PHALCON_MM_GROW();
@@ -571,7 +571,7 @@ PHP_METHOD(Phalcon_Image_Adapter, sharpen){
 
 	zval **amount;
 
-	phalcon_fetch_params_ex(1, 0, &amount);
+	phalcon_fetch_params(0, 1, 0, &amount);
 
 	PHALCON_MM_GROW();
 
@@ -607,7 +607,7 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
 	zval *image_height, *height = NULL, *opacity = NULL;
 	long tmp_image_height;
 
-	phalcon_fetch_params_ex(0, 3, &h, &op, &fade_in);
+	phalcon_fetch_params(0, 0, 3, &h, &op, &fade_in);
 
 	PHALCON_MM_GROW();
 
@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Image_Adapter, watermark){
 	zval *image_width, *image_height, *watermark_width, *watermark_height;
 	long tmp_image_width, tmp_image_height, tmp_watermark_width, tmp_watermark_height, tmp_offset_x, tmp_offset_y;
 
-	phalcon_fetch_params_ex(1, 3, &watermark, &ofs_x, &ofs_y, &op);
+	phalcon_fetch_params(0, 1, 3, &watermark, &ofs_x, &ofs_y, &op);
 	PHALCON_VERIFY_INTERFACE_EX(*watermark, phalcon_image_adapterinterface_ce, phalcon_image_exception_ce, 0);
 
 	PHALCON_MM_GROW();
@@ -751,7 +751,7 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 	char *c;
 	zval tmp;
 
-	phalcon_fetch_params_ex(1, 6, &text, &ofs_x, &ofs_y, &op, &fontcolor, &fontsize, &fontfile);
+	phalcon_fetch_params(0, 1, 6, &text, &ofs_x, &ofs_y, &op, &fontcolor, &fontsize, &fontfile);
 
 	PHALCON_MM_GROW();
 
@@ -1014,7 +1014,7 @@ PHP_METHOD(Phalcon_Image_Adapter, pixelate){
 
 	zval **amount = NULL, *amt;
 
-	phalcon_fetch_params_ex(0, 1, &amount);
+	phalcon_fetch_params(0, 0, 1, &amount);
 
 	PHALCON_MM_GROW();
 
@@ -1049,7 +1049,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 	zval *file, *quality;
 	zval *ret = NULL, *dir, *constant;
 
-	phalcon_fetch_params_ex(0, 2, &fname, &q);
+	phalcon_fetch_params(0, 0, 2, &fname, &q);
 
 	PHALCON_MM_GROW();
 

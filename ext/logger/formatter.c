@@ -68,7 +68,7 @@ PHP_METHOD(Phalcon_Logger_Formatter, getTypeString){
 	zval **type;
 	int itype;
 
-	phalcon_fetch_params_ex(1, 0, &type);
+	phalcon_fetch_params(0, 1, 0, &type);
 	PHALCON_ENSURE_IS_LONG(type);
 	
 	itype = Z_LVAL_PP(type);
@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 {
 	zval **message, **context;
 
-	phalcon_fetch_params_ex(2, 0, &message, &context);
+	phalcon_fetch_params(0, 2, 0, &message, &context);
 
 	if (Z_TYPE_PP(context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_PP(context)) > 0) {
 		HashTable *ht = Z_ARRVAL_PP(context);

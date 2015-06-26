@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 	zval **name, **options = NULL, *mode = NULL, *handler = NULL;
 	zend_class_entry *exception = PHALCON_GLOBAL(register_psr3_classes) ? psr_log_invalidargumentexception_ce : phalcon_logger_exception_ce;
 
-	phalcon_fetch_params_ex(1, 1, &name, &options);
+	phalcon_fetch_params(0, 1, 1, &name, &options);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	PHALCON_MM_GROW();

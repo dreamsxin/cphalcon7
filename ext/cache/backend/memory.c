@@ -321,7 +321,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 	zval **key_name, **value = NULL, *last_key, *data;
 	zval *cached_content;
 
-	phalcon_fetch_params_ex(1, 1, &key_name, &value);
+	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
 	if (!value || Z_TYPE_PP(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, decrement){
 	zval **key_name, **value = NULL, *last_key, *data;
 	zval *cached_content;
 
-	phalcon_fetch_params_ex(1, 1, &key_name, &value);
+	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
 	if (!value || Z_TYPE_PP(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);

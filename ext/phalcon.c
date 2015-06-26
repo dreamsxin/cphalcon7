@@ -601,11 +601,7 @@ static ZEND_MODULE_POST_ZEND_DEACTIVATE_D(phalcon)
 }
 */
 
-static
-#if ZEND_MODULE_API_NO > 20060613
-const
-#endif
-zend_module_dep phalcon_deps[] = {
+static const zend_module_dep phalcon_deps[] = {
 	ZEND_MOD_REQUIRED("spl")
 	ZEND_MOD_REQUIRED("date")
 #if PHALCON_USE_PHP_JSON

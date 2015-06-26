@@ -725,7 +725,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __get)
 
 	assert(return_value_ptr != NULL);
 
-	phalcon_fetch_params_ex(1, 0, &property);
+	phalcon_fetch_params(0, 1, 0, &property);
 	retval = phalcon_session_adapter_get_property_ptr_ptr_internal(getThis(), *property, BP_VAR_W TSRMLS_CC);
 
 	zval_ptr_dtor(return_value_ptr);

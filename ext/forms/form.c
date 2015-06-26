@@ -250,7 +250,6 @@ static void phalcon_forms_form_get_current_data(zend_object_iterator *it, zval *
 	*data = phalcon_hash_get(Z_ARRVAL_P(elements), position, BP_VAR_NA);
 }
 
-#if ZEND_MODULE_API_NO >= 20121212
 static void phalcon_forms_form_get_current_key(zend_object_iterator *it, zval *key TSRMLS_DC)
 {
 	zval *position;
@@ -258,16 +257,6 @@ static void phalcon_forms_form_get_current_key(zend_object_iterator *it, zval *k
 	position = phalcon_fetch_nproperty_this((zval*)it->data, SL("_position"), PH_NOISY TSRMLS_CC);
 	ZVAL_ZVAL(key, position, 1, 0);
 }
-#else
-static int phalcon_forms_form_get_current_key(zend_object_iterator *it, char **str_key, uint *str_key_len, ulong *int_key TSRMLS_DC)
-{
-	zval *position;
-
-	position = phalcon_fetch_nproperty_this((zval*)it->data, SL("_position"), PH_NOISY TSRMLS_CC);
-	*int_key = (IS_LONG == Z_TYPE_P(position)) ? Z_LVAL_P(position) : phalcon_get_intval(position);
-	return HASH_KEY_IS_LONG;
-}
-#endif
 
 static void phalcon_forms_form_move_forward(zend_object_iterator *it TSRMLS_DC)
 {
@@ -853,7 +842,7 @@ PHP_METHOD(Phalcon_Forms_Form, getMessages){
 
 	zval **by_item_name = NULL, *messages;
 
-	phalcon_fetch_params_ex(0, 1, &by_item_name);
+	phalcon_fetch_params(0, 0, 1, &by_item_name);
 
 	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);
 	if (by_item_name && zend_is_true(*by_item_name)) {
@@ -893,7 +882,7 @@ PHP_METHOD(Phalcon_Forms_Form, getMessagesFor){
 
 	zval **name, *messages, *element_messages;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);
 	if (phalcon_array_isset_fetch(&element_messages, messages, *name)) {
@@ -913,7 +902,7 @@ PHP_METHOD(Phalcon_Forms_Form, hasMessagesFor){
 
 	zval **name, *messages;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);
 	RETURN_BOOL(phalcon_array_isset(messages, *name));
@@ -1023,7 +1012,7 @@ PHP_METHOD(Phalcon_Forms_Form, render){
 
 	zval **name, **attributes = NULL, *elements, *element;
 
-	phalcon_fetch_params_ex(1, 1, &name, &attributes);
+	phalcon_fetch_params(0, 1, 1, &name, &attributes);
 
 	PHALCON_ENSURE_IS_STRING(name);
 	if (!attributes) {
@@ -1049,7 +1038,7 @@ PHP_METHOD(Phalcon_Forms_Form, get){
 
 	zval **name, *elements, *element;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
 	if (!phalcon_array_isset_fetch(&element, elements, *name)) {
@@ -1071,7 +1060,7 @@ PHP_METHOD(Phalcon_Forms_Form, label){
 
 	zval **name, **attributes = NULL, *elements, *element;
 
-	phalcon_fetch_params_ex(1, 1, &name, &attributes);
+	phalcon_fetch_params(0, 1, 1, &name, &attributes);
 
 	if (!attributes) {
 		attributes = &PHALCON_GLOBAL(z_null);
@@ -1097,7 +1086,7 @@ PHP_METHOD(Phalcon_Forms_Form, getLabel){
 
 	zval **name, *elements, *element, *label = NULL;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
 	if (!phalcon_array_isset_fetch(&element, elements, *name)) {
@@ -1238,7 +1227,7 @@ PHP_METHOD(Phalcon_Forms_Form, has){
 
 	zval **name, *elements;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
 	RETURN_BOOL(phalcon_array_isset(elements, *name));
@@ -1371,20 +1360,7 @@ PHP_METHOD(Phalcon_Forms_Form, key){
 
 	zend_object_iterator it;
 	it.data = getThis();
-#if ZEND_MODULE_API_NO >= 20121212
 	phalcon_forms_form_iterator_funcs.get_current_key(&it, return_value TSRMLS_CC);
-#else
-	{
-		char *str_key;
-		uint str_key_len;
-		ulong int_key;
-		if (HASH_KEY_IS_STRING == phalcon_forms_form_iterator_funcs.get_current_key(&it, &str_key, &str_key_len, &int_key TSRMLS_CC)) {
-			RETURN_STRINGL(str_key, str_key_len-1, 1);
-		}
-
-		RETURN_LONG(int_key);
-	}
-#endif
 }
 
 /**

@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
 	zval *checked, *realpath, *format = NULL, *type = NULL, *mime, *im, *ret = NULL, *mode, *imagickpixel, *color;
 	zend_class_entry *imagick_ce, *ce1;
 
-	phalcon_fetch_params_ex(1, 2, &file, &w, &h);
+	phalcon_fetch_params(0, 1, 2, &file, &w, &h);
 
 	PHALCON_ENSURE_IS_STRING(file);
 
@@ -533,7 +533,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _flip) {
 	zval *im, *next = NULL;
 	char *method;
 
-	phalcon_fetch_params_ex(1, 0, &direction);
+	phalcon_fetch_params(0, 1, 0, &direction);
 	PHALCON_ENSURE_IS_LONG(direction);
 
 	PHALCON_MM_GROW();
@@ -879,7 +879,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _text) {
 	zend_class_entry *imagick_ce, *imagick_draw_ce, *imagick_pixel_ce;
 	int x, y;
 
-	phalcon_fetch_params_ex(9, 0, &text, &ofs_x, &ofs_y, &opacity, &r, &g, &b, &size, &fontfile);
+	phalcon_fetch_params(0, 9, 0, &text, &ofs_x, &ofs_y, &opacity, &r, &g, &b, &size, &fontfile);
 
 	PHALCON_MM_GROW();
 
@@ -1334,7 +1334,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _pixelate){
 	zval *im, *width, *height, *tmp_width, *tmp_height, *next = NULL;
 	int w, h;
 
-	phalcon_fetch_params_ex(1, 0, &amount);
+	phalcon_fetch_params(0, 1, 0, &amount);
 	PHALCON_ENSURE_IS_LONG(amount);
 
 	if (Z_LVAL_PP(amount) < 2) {
@@ -1630,7 +1630,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, setResourceLimit)
 	zval *im;
 	zend_class_entry *imagick_ce;
 
-	phalcon_fetch_params_ex(2, 0, &resource, &limit);
+	phalcon_fetch_params(0, 2, 0, &resource, &limit);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 	if (EXPECTED(imagick_ce != NULL)) {

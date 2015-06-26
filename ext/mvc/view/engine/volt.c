@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 	zval *view;
 	int clean;
 
-	phalcon_fetch_params_ex(2, 1, &template_path, &params, &must_clean);
+	phalcon_fetch_params(0, 2, 1, &template_path, &params, &must_clean);
 	PHALCON_ENSURE_IS_STRING(template_path);
 	
 	if (!must_clean) {

@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Validation_Validator, getOption){
 	zval **key;
 	zval *tmp = NULL;
 
-	phalcon_fetch_params_ex(1, 0, &key);
+	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 	phalcon_validation_validator_getoption_helper(phalcon_validation_validator_ce, &tmp, getThis(), Z_STRVAL_PP(key) TSRMLS_CC);
 	RETURN_ZVAL(tmp, 1, 1);

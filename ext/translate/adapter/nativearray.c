@@ -202,6 +202,6 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, exists){
 
 	zval **index;
 
-	phalcon_fetch_params_ex(1, 0, &index);
+	phalcon_fetch_params(0, 1, 0, &index);
 	RETURN_BOOL(phalcon_translate_adapter_nativearray_has_dimension(getThis(), *index, 0 TSRMLS_CC));
 }

@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 
 	zval **option, *values, *tmp;
 
-	phalcon_fetch_params_ex(1, 0, &option);
+	phalcon_fetch_params(0, 1, 0, &option);
 	PHALCON_ENSURE_IS_ARRAY(option);
 
 	values = phalcon_fetch_nproperty_this(getThis(), SL("_optionsValues"), PH_NOISY TSRMLS_CC);

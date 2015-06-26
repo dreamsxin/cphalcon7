@@ -73,7 +73,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
 
 	zval **definition;
 
-	phalcon_fetch_params_ex(1, 0, &definition);
+	phalcon_fetch_params(0, 1, 0, &definition);
 	PHALCON_ENSURE_IS_STRING(definition);
 	
 	phalcon_update_property_this(this_ptr, SL("_definition"), *definition TSRMLS_CC);

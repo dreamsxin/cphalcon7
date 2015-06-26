@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Http_Cookie, __construct){
 	zval **name, **value = NULL, **expire = NULL, **path = NULL, **secure = NULL, **domain = NULL;
 	zval **http_only = NULL;
 
-	phalcon_fetch_params_ex(1, 6, &name, &value, &expire, &path, &secure, &domain, &http_only);
+	phalcon_fetch_params(0, 1, 6, &name, &value, &expire, &path, &secure, &domain, &http_only);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (!expire) {

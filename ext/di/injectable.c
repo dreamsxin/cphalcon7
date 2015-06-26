@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
 
 	zval **dependency_injector;
 
-	phalcon_fetch_params_ex(1, 0, &dependency_injector);
+	phalcon_fetch_params(0, 1, 0, &dependency_injector);
 	
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(*dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
 	phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), *dependency_injector TSRMLS_CC);
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	zval **property_name, *dependency_injector = NULL;
 	zval *has_service = NULL, *service = NULL, *class_name, *arguments, *result = NULL;
 
-	phalcon_fetch_params_ex(1, 0, &property_name);
+	phalcon_fetch_params(0, 1, 0, &property_name);
 	PHALCON_ENSURE_IS_STRING(property_name);
 
 	PHALCON_MM_GROW();
@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	 * Accessing the persistent property will create a session bag in any class
 	 */
 	if (Z_STRLEN_PP(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_PP(property_name), "persistent", sizeof("persistent")-1)) {
-		const char *cn = Z_OBJCE_P(getThis())->name;
+		const char *cn = Z_OBJCE_P(getThis())->name->val;
 
 		MAKE_STD_ZVAL(class_name);
 		PHALCON_ZVAL_MAYBE_INTERNED_STRING(class_name, cn);
@@ -335,6 +335,6 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	/**
 	 * A notice is shown if the property is not defined or is not a valid service
 	 */
-	php_error_docref(NULL TSRMLS_CC, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name, Z_STRVAL_PP(property_name));
+	php_error_docref(NULL TSRMLS_CC, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name->val, Z_STRVAL_PP(property_name));
 	RETURN_MM_NULL();
 }

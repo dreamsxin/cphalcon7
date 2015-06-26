@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetExists){
 	zval **translate_key;
 	int exists;
 
-	phalcon_fetch_params_ex(1, 0, &translate_key);
+	phalcon_fetch_params(0, 1, 0, &translate_key);
 	exists = phalcon_translate_adapter_has_dimension(getThis(), *translate_key, 1 TSRMLS_CC);
 	RETURN_BOOL(exists);
 }
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetGet){
 
 	zval **translate_key, *res;
 
-	phalcon_fetch_params_ex(1, 0, &translate_key);
+	phalcon_fetch_params(0, 1, 0, &translate_key);
 	res = phalcon_translate_adapter_read_dimension(getThis(), *translate_key, BP_VAR_R TSRMLS_CC);
 	RETURN_ZVAL(res, 1, 0);
 }

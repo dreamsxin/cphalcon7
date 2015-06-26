@@ -365,7 +365,7 @@ void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory TSRMLS_DC)
 				case IS_TRUE:     fprintf(stderr, "value=(bool)1\n"); break;
 				case IS_FALSE:    fprintf(stderr, "value=(bool)0\n"); break;
 				case IS_ARRAY:    fprintf(stderr, "value=array(%p), %d elements\n", Z_ARRVAL_PP(var), zend_hash_num_elements(Z_ARRVAL_PP(var))); break;
-				case IS_OBJECT:   fprintf(stderr, "value=object(%u), %s\n", Z_OBJ_HANDLE_PP(var), Z_OBJCE_PP(var)->name); break;
+				case IS_OBJECT:   fprintf(stderr, "value=object(%u), %s\n", Z_OBJ_HANDLE_PP(var), Z_OBJCE_PP(var)->name->val); break;
 				case IS_STRING:   fprintf(stderr, "value=%*s (%p)\n", Z_STRLEN_PP(var), Z_STRVAL_PP(var), Z_STRVAL_PP(var)); break;
 				case IS_RESOURCE: fprintf(stderr, "value=(resource)%ld\n", Z_LVAL_PP(var)); break;
 				default:          fprintf(stderr, "\n"); break;

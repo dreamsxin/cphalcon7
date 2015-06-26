@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Forms_Manager, get){
 
 	zval **name, *forms, *form;
 
-	phalcon_fetch_params_ex(1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	forms = phalcon_fetch_nproperty_this(this_ptr, SL("_forms"), PH_NOISY TSRMLS_CC);
@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Forms_Manager, set){
 
 	zval **name, **form;
 
-	phalcon_fetch_params_ex(2, 0, &name, &form);
+	phalcon_fetch_params(0, 2, 0, &name, &form);
 	PHALCON_ENSURE_IS_STRING(name);
 	PHALCON_VERIFY_CLASS_EX(*form, phalcon_forms_form_ce, phalcon_forms_exception_ce, 0);
 	

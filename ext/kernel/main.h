@@ -52,11 +52,6 @@
 #define SSL(str)   zend_string_init(SL(str), 0)
 #define SSS(str)   zend_string_init(SS(str), 0)
 
-/* str_erealloc is PHP 5.6 only */
-#ifndef str_erealloc
-#define str_erealloc erealloc
-#endif
-
 /* Startup functions */
 void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals TSRMLS_DC);
 zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_ce, zend_class_entry *parent_ce);
@@ -87,17 +82,9 @@ int phalcon_is_iterable_ex(zval *arr, HashTable **arr_hash, HashPosition *hash_p
 
 static inline int is_phalcon_class(const zend_class_entry *ce)
 {
-#if PHP_VERSION_ID >= 50400
 	return
 			ce->type == ZEND_INTERNAL_CLASS
-		 && ce->info.internal.module->module_number == phalcon_module_entry.module_number
-	;
-#else
-	return
-			ce->type == ZEND_INTERNAL_CLASS
-		 && ce->module->module_number == phalcon_module_entry.module_number
-	;
-#endif
+		 && ce->info.internal.module->module_number == phalcon_module_entry.module_number;
 }
 
 /* Fetch Parameters */
@@ -229,11 +216,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define RETURN_EMPTY_ARRAY() array_init(return_value); return;
 #define RETURN_MM_EMPTY_ARRAY() PHALCON_MM_RESTORE(); RETURN_EMPTY_ARRAY();
 
-#ifndef IS_INTERNED
-#define IS_INTERNED(key) 0
-#define INTERNED_HASH(key) 0
-#endif
-
 /** Get the current hash key without copying the hash key */
 #define PHALCON_GET_HKEY(var, hash, hash_position) \
 	do { \
@@ -242,38 +224,11 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 	} while (0)
 
 /** Get current hash key copying the iterator if needed */
-
-#if PHP_VERSION_ID < 50500
-
-#define PHALCON_GET_IKEY(var, it) \
-	do { \
-		int key_type; uint str_key_len; \
-		ulong int_key; \
-		char *str_key; \
-		\
-		PHALCON_INIT_NVAR(var); \
-		key_type = it->funcs->get_current_key(it, &str_key, &str_key_len, &int_key TSRMLS_CC); \
-		if (key_type == HASH_KEY_IS_STRING) { \
-			ZVAL_STRINGL(var, str_key, str_key_len - 1, 1); \
-			efree(str_key); \
-		} else { \
-			if (key_type == HASH_KEY_IS_LONG) { \
-				ZVAL_LONG(var, int_key); \
-			} else { \
-				ZVAL_NULL(var); \
-			} \
-		} \
-	} while (0)
-
-#else
-
 #define PHALCON_GET_IKEY(var, it) \
 	do { \
 		PHALCON_INIT_NVAR(var); \
 		it->funcs->get_current_key(it, var TSRMLS_CC); \
 	} while (0)
-
-#endif
 
 /** Check if an array is iterable or not */
 #define phalcon_is_iterable(var, array_hash, hash_pointer, duplicate, reverse) \
@@ -335,7 +290,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_DOC_METHOD(class_name, method)
 
 /** Low overhead parse/fetch parameters */
-
+#ifndef PHALCON_RELEASE
 
 #define phalcon_fetch_params(memory_grow, required_params, optional_params, ...) \
 	if (memory_grow) { \
@@ -368,6 +323,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 		} \
 		RETURN_NULL(); \
 	}
+
 #endif
 
 #define PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce, restore_stack) \
@@ -458,5 +414,11 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table);
 
 #define PHALCON_CHECK_POINTER(v) if (!v) fprintf(stderr, "%s:%d\n", __PRETTY_FUNCTION__, __LINE__)
 #define PHALCON_DEBUG_POINTER() fprintf(stderr, "%s:%d\n", __PRETTY_FUNCTION__, __LINE__)
+
+#define PHALCON_GET_OBJECT_FROM_OBJ(object, object_struct) \
+	((object_struct *) ((char *) (object) - XtOffsetOf(object_struct, obj)))
+
+#define PHALCON_GET_OBJECT_FROM_ZVAL(zv, object_struct) \
+	PHALCON_GET_OBJECT_FROM_OBJ(Z_OBJ_P(zv), object_struct)
 
 #endif /* PHALCON_KERNEL_MAIN_H */

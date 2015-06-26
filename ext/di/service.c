@@ -97,11 +97,6 @@ static const zend_function_entry phalcon_di_service_method_entry[] = {
 	PHP_FE_END
 };
 
-static inline phalcon_di_service_object* phalcon_di_service_get_object(zval *obj TSRMLS_DC)
-{
-	return (phalcon_di_service_object*)zend_objects_get_address(obj TSRMLS_CC);
-}
-
 static void phalcon_di_service_dtor(void *v)
 {
 	phalcon_di_service_object *obj = v;
@@ -131,21 +126,18 @@ static zend_object *phalcon_di_service_ctor(zend_class_entry* ce)
 
 	phalcon_di_service_object_handlers.offset = XtOffsetof(phalcon_di_service_object, obj);
     phalcon_di_service_object_handlers.free_obj = phalcon_di_service_dtor;
-	return retval;
+	return &obj->obj;
 }
 
-static zend_object *phalcon_di_service_clone_obj(zval *zobject TSRMLS_DC)
+static zend_object *phalcon_di_service_clone_obj(zval *zobject)
 {
-	zend_object *new_obj_val;
 	phalcon_di_service_object *old_object;
 	phalcon_di_service_object *new_object;
-	zend_object_handle handle = Z_OBJ_HANDLE_P(zobject);
 
-	old_object  = phalcon_di_service_get_object(zobject TSRMLS_CC);
-	new_obj_val = phalcon_di_service_ctor(Z_OBJCE_P(zobject) TSRMLS_CC);
-	new_object  = zend_object_store_get_object_by_handle(new_obj_val.handle TSRMLS_CC);
+	old_object  = PHALCON_GET_OBJECT_FROM_ZVAL(zobject, phalcon_di_service_object);
+	new_object = PHALCON_GET_OBJECT_FROM_OBJ(phalcon_di_service_ctor(Z_OBJCE_P(zobject)), phalcon_di_service_object);
 
-	zend_objects_clone_members(&new_object->obj, new_obj_val, &old_object->obj, handle TSRMLS_CC);
+	zend_objects_clone_members(&new_object->obj, &old_object->obj);
 
 	if (old_object->name) {
 		new_object->name = zend_string_dup(old_object->name, 0);
@@ -162,12 +154,12 @@ static zend_object *phalcon_di_service_clone_obj(zval *zobject TSRMLS_DC)
 	new_object->resolved = old_object->resolved;
 	new_object->shared   = old_object->shared;
 
-	return new_obj_val;
+	return &new_object->obj;
 }
 
 static HashTable* phalcon_di_service_get_debug_info(zval *object, int *is_temp TSRMLS_DC)
 {
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(object TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_di_service_object);
 	HashTable *props = Z_OBJPROP_P(object);
 	HashTable *ht;
 	zval tmp;
@@ -248,7 +240,7 @@ PHP_METHOD(Phalcon_DI_Service, __construct){
 
 	sname = zend_string_dup(Z_STR_P(*name), 0);
 
-	obj                  = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	obj                  = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 	obj->name            = sname;
 	obj->definition      = *definition;
 	obj->shared          = shared ? zend_is_true(*shared) : 0;
@@ -263,7 +255,7 @@ PHP_METHOD(Phalcon_DI_Service, __construct){
  */
 PHP_METHOD(Phalcon_DI_Service, getName)
 {
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 	RETURN_NEW_STR(obj->name);
 }
 
@@ -275,7 +267,7 @@ PHP_METHOD(Phalcon_DI_Service, getName)
 PHP_METHOD(Phalcon_DI_Service, setShared)
 {
 	zval *shared;
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
 	phalcon_fetch_params(0, 0, 1, 0, &shared);
 	obj->shared = zend_is_true(shared);
@@ -288,7 +280,7 @@ PHP_METHOD(Phalcon_DI_Service, setShared)
  */
 PHP_METHOD(Phalcon_DI_Service, isShared)
 {
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 	RETURN_BOOL(obj->shared);
 }
 
@@ -300,7 +292,7 @@ PHP_METHOD(Phalcon_DI_Service, isShared)
 PHP_METHOD(Phalcon_DI_Service, setSharedInstance)
 {
 	zval *shared_instance;
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
 	phalcon_fetch_params(0, 0, 1, 0, &shared_instance);
 
@@ -319,7 +311,7 @@ PHP_METHOD(Phalcon_DI_Service, setSharedInstance)
 PHP_METHOD(Phalcon_DI_Service, setDefinition)
 {
 	zval *definition;
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
 	phalcon_fetch_params(0, 0, 1, 0, &definition);
 
@@ -337,7 +329,7 @@ PHP_METHOD(Phalcon_DI_Service, setDefinition)
  */
 PHP_METHOD(Phalcon_DI_Service, getDefinition)
 {
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 	RETURN_ZVAL(obj->definition, 1, 0);
 }
 
@@ -353,7 +345,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 	zval *parameters = NULL, *dependency_injector = NULL;
 	zval *instance = NULL, *definition, *builder;
 	int found;
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
 	phalcon_fetch_params(0, 0, 0, 2, &parameters, &dependency_injector);
 
@@ -444,7 +436,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 PHP_METHOD(Phalcon_DI_Service, setParameter){
 
 	zval **position, **parameter, *definition, *arguments = NULL;
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
 	phalcon_fetch_params(0, 2, 0, &position, &parameter);
 	PHALCON_ENSURE_IS_LONG(position);
@@ -482,7 +474,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 PHP_METHOD(Phalcon_DI_Service, getParameter){
 
 	zval **position, *definition, *arguments, *parameter;
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	PHALCON_ENSURE_IS_LONG(position);
@@ -511,7 +503,7 @@ PHP_METHOD(Phalcon_DI_Service, getParameter){
  */
 PHP_METHOD(Phalcon_DI_Service, isResolved)
 {
-	phalcon_di_service_object *obj = phalcon_di_service_get_object(getThis() TSRMLS_CC);
+	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 	RETURN_BOOL(obj->resolved);
 }
 

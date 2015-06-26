@@ -183,7 +183,7 @@ extern int nusphere_dbg_present;
 #endif
 
 #ifndef Z_TYPE_PP
-#	define Z_TYPE_P(*pz) Z_TYPE_P(*(pz))
+#	define Z_TYPE_PP(pz) Z_TYPE_P(*(pz))
 #endif
 
 #ifndef INIT_PZVAL_COPY
@@ -199,10 +199,18 @@ extern int nusphere_dbg_present;
 		Z_TYPE_P(z) = Z_TYPE_P(v);
 #endif
 
+#define Z_REFCOUNT_PP(ppz)		Z_REFCOUNT_P(*(ppz))
+#define Z_SET_REFCOUNT_PP(ppz, rc)	Z_SET_REFCOUNT_P(*(ppz), rc)
+#define Z_ADDREF_PP(ppz)		Z_ADDREF_P(*(ppz))
+#define Z_DELREF_PP(ppz)		Z_DELREF_P(*(ppz))
+#define Z_ISREF_PP(ppz)			Z_ISREF_P(*(ppz))
+#define Z_SET_ISREF_PP(ppz)		Z_SET_ISREF_P(*(ppz))
+#define Z_UNSET_ISREF_PP(ppz)		Z_UNSET_ISREF_P(*(ppz))
+#define Z_SET_ISREF_TO_PP(ppz, isref)	Z_SET_ISREF_TO_P(*(ppz), isref)
+
 #ifndef HASH_KEY_NON_EXISTENT
 #	define HASH_KEY_NON_EXISTENT    HASH_KEY_NON_EXISTANT
 #endif
-
 
 #define PHALCON_INIT_CLASS(name) \
 	int phalcon_ ##name## _init(int module_number TSRMLS_DC)

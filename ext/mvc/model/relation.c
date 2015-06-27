@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isForeignKey){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(options);
-	phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY);
 	if (Z_TYPE_P(options) == IS_ARRAY) { 
 		if (phalcon_array_isset_string(options, SS("foreignKey"))) {
 			RETURN_MM_TRUE;

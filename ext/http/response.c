@@ -749,7 +749,7 @@ PHP_METHOD(Phalcon_Http_Response, appendContent){
 	phalcon_fetch_params(1, 1, 0, &content);
 
 	PHALCON_OBS_VAR(_content);
-	phalcon_read_property_this(&_content, this_ptr, SL("_content"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&_content, this_ptr, SL("_content"), PH_NOISY);
 	PHALCON_INIT_VAR(temp_content);
 	concat_function(temp_content, _content, content TSRMLS_CC);
 	phalcon_update_property_this(this_ptr, SL("_content"), temp_content TSRMLS_CC);

@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 	phalcon_fetch_params(1, 4, 0, &message, &type, &timestamp, &context);
 	
 	PHALCON_OBS_VAR(format);
-	phalcon_read_property_this(&format, this_ptr, SL("_format"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&format, this_ptr, SL("_format"), PH_NOISY);
 	
 	/** 
 	 * Check if the format has the %date% placeholder

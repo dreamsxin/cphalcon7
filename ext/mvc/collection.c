@@ -412,7 +412,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 			mongo_id = id;
 		} else {
 			PHALCON_OBS_VAR(collection_manager);
-			phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY);
 
 			/**
 			 * Check if the collection use implicit ids
@@ -693,7 +693,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(connection);
-	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) != IS_OBJECT) {
 		collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
 
@@ -1384,7 +1384,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, validationHasFailed){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(error_messages);
-	phalcon_read_property_this(&error_messages, this_ptr, SL("_errorMessages"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&error_messages, this_ptr, SL("_errorMessages"), PH_NOISY);
 	if (Z_TYPE_P(error_messages) == IS_ARRAY) {
 		if (phalcon_fast_count_ev(error_messages TSRMLS_CC)) {
 			RETURN_MM_TRUE;
@@ -1427,7 +1427,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	 * Send a notification to the events manager
 	 */
 	PHALCON_OBS_VAR(collection_manager);
-	phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(collection_manager, "notifyevent", *event_name, this_ptr);
 	RETURN_MM();
 }
@@ -1467,7 +1467,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	 * Send a notification to the events manager
 	 */
 	PHALCON_OBS_VAR(collection_manager);
-	phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&status, collection_manager, "notifyevent", *event_name, this_ptr);
 	if (PHALCON_IS_FALSE(status)) {
@@ -1493,7 +1493,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _cancelOperation){
 	if (!zend_is_true(disable_events)) {
 
 		PHALCON_OBS_VAR(operation_made);
-		phalcon_read_property_this(&operation_made, this_ptr, SL("_operationMade"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&operation_made, this_ptr, SL("_operationMade"), PH_NOISY);
 		if (PHALCON_IS_LONG(operation_made, 3)) {
 			PHALCON_INIT_VAR(event_name);
 			ZVAL_STRING(event_name, "notDeleted", 1);

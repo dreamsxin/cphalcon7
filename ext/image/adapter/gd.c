@@ -963,13 +963,13 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _text) {
 	PHALCON_SEPARATE_PARAM(opacity);
 
 	PHALCON_OBS_VAR(image);
-	phalcon_read_property_this(&image, this_ptr, SL("_image"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&image, this_ptr, SL("_image"), PH_NOISY);
 
 	PHALCON_OBS_VAR(image_width);
-	phalcon_read_property_this(&image_width, this_ptr, SL("_width"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&image_width, this_ptr, SL("_width"), PH_NOISY);
 
 	PHALCON_OBS_VAR(image_height);
-	phalcon_read_property_this(&image_height, this_ptr, SL("_height"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&image_height, this_ptr, SL("_height"), PH_NOISY);
 	
 	w = phalcon_get_intval(image_width);
 	h = phalcon_get_intval(image_height);

@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 	rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
 	if (Z_TYPE_P(rows) == IS_NULL) {
 		PHALCON_OBS_VAR(cursor);
-		phalcon_read_property_this(&cursor, this_ptr, SL("_cursor"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&cursor, this_ptr, SL("_cursor"), PH_NOISY);
 		if (Z_TYPE_P(cursor) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(NULL, cursor, "next");
 			PHALCON_CALL_METHOD(&row, cursor, "current");
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 	}
 
 	PHALCON_OBS_VAR(collection);
-	phalcon_read_property_this(&collection, this_ptr, SL("_collection"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&collection, this_ptr, SL("_collection"), PH_NOISY);
 
 	PHALCON_CALL_CE_STATIC(&active_row, phalcon_mvc_collection_ce, "cloneresult", collection, row);
 
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, serialize){
 	PHALCON_CALL_METHOD(&records, this_ptr, "toarray", rename_columns);
 	
 	PHALCON_OBS_VAR(collection);
-	phalcon_read_property_this(&collection, this_ptr, SL("_collection"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&collection, this_ptr, SL("_collection"), PH_NOISY);
 
 	PHALCON_INIT_VAR(data);
 	array_init_size(data, 3);
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, count){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(count);
-	phalcon_read_property_this(&count, this_ptr, SL("_count"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&count, this_ptr, SL("_count"), PH_NOISY);
 
 	if (Z_TYPE_P(count) == IS_NULL) {
 
@@ -457,7 +457,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, count){
 		rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
 		if (Z_TYPE_P(rows) == IS_NULL) {
 			PHALCON_OBS_VAR(cursor);
-			phalcon_read_property_this(&cursor, this_ptr, SL("_cursor"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&cursor, this_ptr, SL("_cursor"), PH_NOISY);
 			if (Z_TYPE_P(cursor) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&number_rows, cursor, "count", PHALCON_GLOBAL(z_true));
 
@@ -512,7 +512,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetGet){
 		 * Check if the last record returned is the current requested
 		 */
 		PHALCON_OBS_VAR(pointer);
-		phalcon_read_property_this(&pointer, this_ptr, SL("_pointer"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&pointer, this_ptr, SL("_pointer"), PH_NOISY);
 		if (PHALCON_IS_EQUAL(pointer, index)) {
 			PHALCON_RETURN_CALL_METHOD(this_ptr, "current");
 			RETURN_MM();
@@ -585,7 +585,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, getFirst){
 	 * Check if the last record returned is the current requested
 	 */
 	PHALCON_OBS_VAR(pointer);
-	phalcon_read_property_this(&pointer, this_ptr, SL("_pointer"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&pointer, this_ptr, SL("_pointer"), PH_NOISY);
 	if (PHALCON_IS_LONG(pointer, 0)) {
 		PHALCON_RETURN_CALL_METHOD(this_ptr, "current");
 		RETURN_MM();

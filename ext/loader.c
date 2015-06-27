@@ -497,7 +497,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	phalcon_fetch_params(1, 3, 1, &class_name, &directory, &extensions, &ds);
 
 	PHALCON_OBS_VAR(events_manager);
-	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
 
 	if (Z_TYPE_P(directory) != IS_ARRAY) {
 		if (Z_TYPE_P(directory) != IS_STRING) {
@@ -622,7 +622,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	phalcon_fetch_params(1, 1, 0, &class_name);
 
 	PHALCON_OBS_VAR(events_manager);
-	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_VAR(event_name);
 		ZVAL_STRING(event_name, "loader:beforeCheckClass", 1);
@@ -633,7 +633,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	 * First we check for static paths for classes
 	 */
 	PHALCON_OBS_VAR(classes);
-	phalcon_read_property_this(&classes, this_ptr, SL("_classes"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&classes, this_ptr, SL("_classes"), PH_NOISY);
 	if (Z_TYPE_P(classes) == IS_ARRAY) { 
 		if (phalcon_array_isset(classes, class_name)) {
 
@@ -656,7 +656,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 
 	if (found == NULL || !zend_is_true(found)) {
 		PHALCON_OBS_VAR(extensions);
-		phalcon_read_property_this(&extensions, this_ptr, SL("_extensions"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&extensions, this_ptr, SL("_extensions"), PH_NOISY);
 
 		PHALCON_INIT_VAR(ds);
 		ZVAL_STRING(ds, slash, 1);
@@ -671,7 +671,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		 * Checking in namespaces
 		 */
 		PHALCON_OBS_VAR(namespaces);
-		phalcon_read_property_this(&namespaces, this_ptr, SL("_namespaces"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&namespaces, this_ptr, SL("_namespaces"), PH_NOISY);
 		if (Z_TYPE_P(namespaces) == IS_ARRAY) { 
 
 			phalcon_is_iterable(namespaces, &ah0, &hp0, 0, 0);
@@ -717,7 +717,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		 * Checking in prefixes
 		 */
 		PHALCON_OBS_VAR(prefixes);
-		phalcon_read_property_this(&prefixes, this_ptr, SL("_prefixes"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&prefixes, this_ptr, SL("_prefixes"), PH_NOISY);
 		if (Z_TYPE_P(prefixes) == IS_ARRAY) { 
 
 			phalcon_is_iterable(prefixes, &ah1, &hp1, 0, 0);
@@ -769,7 +769,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		 * Checking in directories
 		 */
 		PHALCON_OBS_VAR(directories);
-		phalcon_read_property_this(&directories, this_ptr, SL("_directories"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&directories, this_ptr, SL("_directories"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&found, this_ptr, "findfile", ns_class_name, directories, extensions, ds);
 	}

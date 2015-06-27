@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 
 	if (zend_is_true(merge)) {
 		PHALCON_OBS_VAR(view_params);
-		phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY);
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
 			phalcon_fast_array_merge(merged_params, &view_params, &params TSRMLS_CC);
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
 
 	if (zend_is_true(isappend)) {		
 		PHALCON_OBS_VAR(view_params);
-		phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY);
 
 		if (Z_TYPE_P(view_params) == IS_ARRAY && phalcon_array_isset(view_params, key)) { 
 			PHALCON_OBS_VAR(var);
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getVar){
 	}
 
 	PHALCON_OBS_VAR(view_params);
-	phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY);
 
 	if (Z_TYPE_P(view_params) == IS_ARRAY && phalcon_array_isset(view_params, key)) { 
 		PHALCON_OBS_VAR(var);
@@ -381,7 +381,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 		array_init(return_value);
 
 		PHALCON_OBS_VAR(childs);
-		phalcon_read_property_this(&childs, this_ptr, SL("_childs"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&childs, this_ptr, SL("_childs"), PH_NOISY);
 
 		if (Z_TYPE_P(childs) != IS_ARRAY) {
 			RETURN_MM_EMPTY_ARRAY();
@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, hasChild){
 	phalcon_fetch_params(1, 0, 1, &capture_to);
 
 	PHALCON_OBS_VAR(childs);
-	phalcon_read_property_this(&childs, this_ptr, SL("_childs"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&childs, this_ptr, SL("_childs"), PH_NOISY);
 
 	if (Z_TYPE_P(childs) != IS_ARRAY) {
 		RETURN_MM_FALSE;
@@ -540,7 +540,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, isAppend){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(append);
-	phalcon_read_property_this(&append, this_ptr, SL("_append"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&append, this_ptr, SL("_append"), PH_NOISY);
 
 	if (zend_is_true(append)) {
 		RETURN_MM_TRUE;
@@ -634,7 +634,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	phalcon_ob_start(TSRMLS_C);
 
 	PHALCON_OBS_VAR(view);
-	phalcon_read_property_this(&view, this_ptr, SL("_view"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&view, this_ptr, SL("_view"), PH_NOISY);
 
 	if (Z_TYPE_P(view) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");

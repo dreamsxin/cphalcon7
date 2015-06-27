@@ -699,7 +699,7 @@ int phalcon_isset_property(zval *object, const char *property_name, uint32_t pro
  * Lookup exact class where a property is defined
  *
  */
-static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length TSRMLS_DC) {
+static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length) {
 
 	zend_class_entry *original_ce = ce;
 
@@ -733,7 +733,7 @@ int phalcon_read_property(zval **result, zval *object, const char *property_name
 
 	ce = Z_OBJCE_P(object);
 	if (ce->parent) {
-		ce = phalcon_lookup_class_ce(ce, property_name, property_length TSRMLS_CC);
+		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
 	old_scope = EG(scope);
@@ -770,7 +770,7 @@ int phalcon_read_property(zval **result, zval *object, const char *property_name
 	return SUCCESS;
 }
 
-zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name, uint32_t property_length, ulong key, int silent TSRMLS_DC) {
+zval* phalcon_fetch_property_this(zval *object, const char *property_name, uint32_t property_length, int silent) {
 
 	zval *zv = NULL;
 	zend_object *zobj;
@@ -781,7 +781,7 @@ zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name,
 
 		ce = Z_OBJCE_P(object);
 		if (ce->parent) {
-			ce = phalcon_lookup_class_ce(ce, property_name, property_length TSRMLS_CC);
+			ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 		}
 
 		old_scope = EG(scope);
@@ -793,7 +793,7 @@ zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name,
 			int flag;
 			if (EXPECTED((property_info->flags & ZEND_ACC_STATIC) == 0) && property_info->offset >= 0) {
 				if (zobj->properties) {
-					zv   = (zval**) zobj->properties_table[property_info->offset];
+					zv   = (zval*) &zobj->properties_table[property_info->offset];
 					flag = (zv == NULL) ? 1 : 0;
 				} else {
 					zv   = &zobj->properties_table[property_info->offset];
@@ -824,10 +824,8 @@ zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name,
 
 		EG(scope) = old_scope;
 
-	} else {
-		if (silent == PH_NOISY) {
-			php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Trying to get property of non-object");
-		}
+	} else if (silent == PH_NOISY) {
+		php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Trying to get property of non-object");
 	}
 
 	return NULL;
@@ -836,7 +834,7 @@ zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name,
 /**
  * Returns an object's member
  */
-int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, zval *object, const char *property_name, uint32_t property_length, ulong key TSRMLS_DC) {
+int phalcon_return_property_quick(zval *return_value, zval *object, const char *property_name, uint32_t property_length) {
 
 	zval **zv;
 	zend_object *zobj;
@@ -847,7 +845,7 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 
 		ce = Z_OBJCE_P(object);
 		if (ce->parent) {
-			ce = phalcon_lookup_class_ce(ce, property_name, property_length TSRMLS_CC);
+			ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 		}
 
 		old_scope = EG(scope);
@@ -855,7 +853,7 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 
 		zobj = Z_OBJ_P(object);
 
-		if (phalcon_hash_quick_find(&ce->properties_info, property_name, property_length + 1, key, (void **) &property_info) == SUCCESS) {
+		if ((property_info = zend_hash_str_find_ptr(&ce->properties_info, property_name, property_length + 1)) != NULL) {
 
 			int flag;
 			if (EXPECTED((property_info->flags & ZEND_ACC_STATIC) == 0) && property_info->offset >= 0) {
@@ -980,7 +978,7 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 
 	ce = Z_OBJCE_P(object);
 	if (ce->parent) {
-		ce = phalcon_lookup_class_ce(ce, property_name, property_length TSRMLS_CC);
+		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
 	EG(scope) = ce;
@@ -1033,7 +1031,7 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 
 	ce = Z_OBJCE_P(object);
 	if (ce->parent) {
-		ce = phalcon_lookup_class_ce(ce, property_name, property_length TSRMLS_CC);
+		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
 	old_scope = EG(scope);
@@ -1715,7 +1713,7 @@ int phalcon_property_incr(zval *object, const char *property_name, uint32_t prop
 
 	ce = Z_OBJCE_P(object);
 	if (ce->parent) {
-		ce = phalcon_lookup_class_ce(ce, property_name, property_length TSRMLS_CC);
+		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
 	phalcon_read_property(&tmp, object, property_name, property_length, 0 TSRMLS_CC);
@@ -1763,7 +1761,7 @@ int phalcon_property_decr(zval *object, const char *property_name, uint32_t prop
 
 	ce = Z_OBJCE_P(object);
 	if (ce->parent) {
-		ce = phalcon_lookup_class_ce(ce, property_name, property_length TSRMLS_CC);
+		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
 	phalcon_read_property(&tmp, object, property_name, property_length, 0 TSRMLS_CC);

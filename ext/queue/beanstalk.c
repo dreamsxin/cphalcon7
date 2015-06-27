@@ -668,7 +668,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 	}
 
 	PHALCON_OBS_VAR(connection);
-	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) != IS_RESOURCE) {
 		PHALCON_CALL_METHOD(&connection, this_ptr, "connect");
 		if (Z_TYPE_P(connection) != IS_RESOURCE) {
@@ -758,7 +758,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, write){
 	phalcon_fetch_params(0, 1, 1, 0, &data);
 
 	PHALCON_OBS_VAR(connection);
-	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) != IS_RESOURCE) {
 		PHALCON_CALL_METHOD(&connection, this_ptr, "connect");
 		if (Z_TYPE_P(connection) != IS_RESOURCE) {

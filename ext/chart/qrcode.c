@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		phalcon_update_property_this(this_ptr, SL("_version"), version TSRMLS_CC);
 	} else {
 		PHALCON_OBS_VAR(version);
-		phalcon_read_property_this(&version, this_ptr, SL("_version"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&version, this_ptr, SL("_version"), PH_NOISY);
 	}
 	
 	if (level) {
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		phalcon_update_property_this(this_ptr, SL("_level"), level TSRMLS_CC);
 	} else {
 		PHALCON_OBS_VAR(level);
-		phalcon_read_property_this(&level, this_ptr, SL("_level"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&level, this_ptr, SL("_level"), PH_NOISY);
 	}
 	
 	if (mode) {
@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		phalcon_update_property_this(this_ptr, SL("_mode"), mode TSRMLS_CC);
 	} else {
 		PHALCON_OBS_NVAR(mode);
-		phalcon_read_property_this(&mode, this_ptr, SL("_mode"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&mode, this_ptr, SL("_mode"), PH_NOISY);
 	}
 	
 	if (casesensitive) {
@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		phalcon_update_property_this(this_ptr, SL("_casesensitive"), casesensitive TSRMLS_CC);
 	} else {
 		PHALCON_OBS_NVAR(casesensitive);
-		phalcon_read_property_this(&casesensitive, this_ptr, SL("_casesensitive"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&casesensitive, this_ptr, SL("_casesensitive"), PH_NOISY);
 	}
 
 	php_qrcode *qr = NULL;
@@ -382,7 +382,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 	}
 
 	PHALCON_OBS_VAR(zid);
-	phalcon_read_property_this(&zid, this_ptr, SL("_qr"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&zid, this_ptr, SL("_qr"), PH_NOISY);
 
 	if (Z_TYPE_P(zid) == IS_NULL) {
 		RETURN_MM_FALSE;
@@ -589,7 +589,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 	fn = Z_STRVAL_P(filename);
 
 	PHALCON_OBS_VAR(zid);
-	phalcon_read_property_this(&zid, this_ptr, SL("_qr"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&zid, this_ptr, SL("_qr"), PH_NOISY);
 
 	if (Z_TYPE_P(zid) == IS_NULL) {
 		RETURN_MM_FALSE;

@@ -97,10 +97,10 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 	phalcon_fetch_params(0, 1, 2, 0, &method, &arguments);
 	
 	PHALCON_OBS_VAR(handler);
-	phalcon_read_property_this(&handler, this_ptr, SL("_handler"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&handler, this_ptr, SL("_handler"), PH_NOISY);
 	if (Z_TYPE_P(handler) != IS_OBJECT) {
 		PHALCON_OBS_VAR(definition);
-		phalcon_read_property_this(&definition, this_ptr, SL("_definition"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&definition, this_ptr, SL("_definition"), PH_NOISY);
 		ce0 = phalcon_fetch_class(definition TSRMLS_CC);
 	
 		PHALCON_INIT_NVAR(handler);

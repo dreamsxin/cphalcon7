@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, write){
 	PHALCON_CONCAT_SVV(xc_key, "$PMM$", prefix, key);
 	
 	PHALCON_OBS_VAR(ttl);
-	phalcon_read_property_this(&ttl, this_ptr, SL("_ttl"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&ttl, this_ptr, SL("_ttl"), PH_NOISY);
 	PHALCON_CALL_FUNCTION(NULL, "xcache_set", xc_key, data, ttl);
 	
 	PHALCON_MM_RESTORE();

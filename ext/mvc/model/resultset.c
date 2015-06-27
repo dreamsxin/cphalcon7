@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(count);
-	phalcon_read_property_this(&count, this_ptr, SL("_count"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&count, this_ptr, SL("_count"), PH_NOISY);
 
 	/** 
 	 * We only calculate the row number is it wasn't calculated before
@@ -337,14 +337,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 		ZVAL_LONG(count, 0);
 
 		PHALCON_OBS_VAR(type);
-		phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY);
 		if (zend_is_true(type)) {
 
 			/** 
 			 * Here, the resultset act as a result that is fetched one by one
 			 */
 			PHALCON_OBS_VAR(result);
-			phalcon_read_property_this(&result, this_ptr, SL("_result"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&result, this_ptr, SL("_result"), PH_NOISY);
 			if (PHALCON_IS_NOT_FALSE(result)) {
 				PHALCON_CALL_METHOD(&number_rows, result, "numrows");
 
@@ -356,11 +356,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 			 * Here, the resultset act as an array
 			 */
 			PHALCON_OBS_VAR(rows);
-			phalcon_read_property_this(&rows, this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&rows, this_ptr, SL("_rows"), PH_NOISY);
 			if (Z_TYPE_P(rows) == IS_NULL) {
 
 				PHALCON_OBS_NVAR(result);
-				phalcon_read_property_this(&result, this_ptr, SL("_result"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property_this(&result, this_ptr, SL("_result"), PH_NOISY);
 				if (Z_TYPE_P(result) == IS_OBJECT) {
 					PHALCON_CALL_METHOD(&rows, result, "fetchall");
 					phalcon_update_property_this(this_ptr, SL("_rows"), rows TSRMLS_CC);
@@ -415,7 +415,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetGet){
 		 * Check if the last record returned is the current requested
 		 */
 		PHALCON_OBS_VAR(pointer);
-		phalcon_read_property_this(&pointer, this_ptr, SL("_pointer"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&pointer, this_ptr, SL("_pointer"), PH_NOISY);
 		if (PHALCON_IS_EQUAL(pointer, index)) {
 			PHALCON_RETURN_CALL_METHOD(this_ptr, "current");
 			RETURN_MM();
@@ -499,7 +499,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, getFirst){
 	 * Check if the last record returned is the current requested
 	 */
 	PHALCON_OBS_VAR(pointer);
-	phalcon_read_property_this(&pointer, this_ptr, SL("_pointer"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&pointer, this_ptr, SL("_pointer"), PH_NOISY);
 	if (PHALCON_IS_LONG(pointer, 0)) {
 		PHALCON_RETURN_CALL_METHOD(this_ptr, "current");
 		RETURN_MM();

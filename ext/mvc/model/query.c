@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(manager);
-	phalcon_read_property_this(&manager, this_ptr, SL("_modelsManager"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&manager, this_ptr, SL("_modelsManager"), PH_NOISY);
 	if (Z_TYPE_P(manager) == IS_OBJECT) {
 		PHALCON_CPY_WRT(service, manager);
 	} else {
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 		 * Check if the DI is valid
 		 */
 		PHALCON_OBS_VAR(dependency_injector);
-		phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 			return;
@@ -350,7 +350,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(meta_data);
-	phalcon_read_property_this(&meta_data, this_ptr, SL("_modelsMetaData"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&meta_data, this_ptr, SL("_modelsMetaData"), PH_NOISY);
 	if (Z_TYPE_P(meta_data) == IS_OBJECT) {
 		PHALCON_CPY_WRT(service, meta_data);
 	} else {
@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 		 * Check if the DI is valid
 		 */
 		PHALCON_OBS_VAR(dependency_injector);
-		phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 			return;
@@ -541,7 +541,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		ZVAL_FALSE(has_model);
 
 		PHALCON_OBS_VAR(models_instances);
-		phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 
 		phalcon_is_iterable(models_instances, &ah0, &hp0, 0, 0);
 
@@ -587,7 +587,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		 * Check if the _models property is correctly prepared
 		 */
 		PHALCON_OBS_VAR(models);
-		phalcon_read_property_this(&models, this_ptr, SL("_models"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&models, this_ptr, SL("_models"), PH_NOISY);
 		if (Z_TYPE_P(models) != IS_ARRAY) { 
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The models list was not loaded correctly");
 			return;
@@ -2215,22 +2215,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	phalcon_fetch_params(1, 1, 0, &select);
 
 	PHALCON_OBS_VAR(models);
-	phalcon_read_property_this(&models, this_ptr, SL("_models"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models, this_ptr, SL("_models"), PH_NOISY);
 
 	PHALCON_OBS_VAR(sql_aliases);
-	phalcon_read_property_this(&sql_aliases, this_ptr, SL("_sqlAliases"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&sql_aliases, this_ptr, SL("_sqlAliases"), PH_NOISY);
 
 	PHALCON_OBS_VAR(sql_aliases_models);
-	phalcon_read_property_this(&sql_aliases_models, this_ptr, SL("_sqlAliasesModels"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&sql_aliases_models, this_ptr, SL("_sqlAliasesModels"), PH_NOISY);
 
 	PHALCON_OBS_VAR(sql_models_aliases);
-	phalcon_read_property_this(&sql_models_aliases, this_ptr, SL("_sqlModelsAliases"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&sql_models_aliases, this_ptr, SL("_sqlModelsAliases"), PH_NOISY);
 
 	PHALCON_OBS_VAR(sql_aliases_models_instances);
-	phalcon_read_property_this(&sql_aliases_models_instances, this_ptr, SL("_sqlAliasesModelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&sql_aliases_models_instances, this_ptr, SL("_sqlAliasesModelsInstances"), PH_NOISY);
 
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	PHALCON_CPY_WRT(from_models, models);
 
 	PHALCON_INIT_VAR(sql_joins);
@@ -3175,7 +3175,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(ast);
-	phalcon_read_property_this(&ast, this_ptr, SL("_ast"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&ast, this_ptr, SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_string(ast, SS("qualifiedName"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted INSERT AST");
 		return;
@@ -3302,7 +3302,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 			PHALCON_CALL_METHOD(&has_attribute, meta_data, "hasattribute", model, name);
 			if (!zend_is_true(has_attribute)) {
 				PHALCON_OBS_NVAR(phql);
-				phalcon_read_property_this(&phql, this_ptr, SL("_phql"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property_this(&phql, this_ptr, SL("_phql"), PH_NOISY);
 
 				PHALCON_INIT_NVAR(exception_message);
 				PHALCON_CONCAT_SVSVS(exception_message, "The model '", model_name, "' doesn't have the attribute '", name, "'");
@@ -3356,7 +3356,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(ast);
-	phalcon_read_property_this(&ast, this_ptr, SL("_ast"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&ast, this_ptr, SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_string(ast, SS("update"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted UPDATE AST");
 		return;
@@ -3586,7 +3586,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(ast);
-	phalcon_read_property_this(&ast, this_ptr, SL("_ast"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&ast, this_ptr, SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_string(ast, SS("delete"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted DELETE AST");
 		return;
@@ -4006,7 +4006,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	 * Models instances is an array if the SELECT was prepared with parse
 	 */
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (Z_TYPE_P(models_instances) != IS_ARRAY) { 
 		PHALCON_INIT_NVAR(models_instances);
 		array_init(models_instances);
@@ -4381,13 +4381,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	}
 
 	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 
 	/** 
 	 * Choose a resultset type
 	 */
 	PHALCON_OBS_VAR(cache);
-	phalcon_read_property_this(&cache, this_ptr, SL("_cache"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&cache, this_ptr, SL("_cache"), PH_NOISY);
 	if (!is_complex) {
 
 		/** 
@@ -4511,7 +4511,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
 
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (phalcon_array_isset(models_instances, model_name)) {
 		PHALCON_OBS_VAR(model);
 		phalcon_array_fetch(&model, models_instances, model_name, PH_NOISY);
@@ -4833,7 +4833,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 	ZVAL_LONG(type_select, 309);
 
 	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 
 	/** 
 	 * We create another Phalcon\Mvc\Model\Query to get the related records
@@ -4910,7 +4910,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (phalcon_array_isset(models_instances, model_name)) {
 		PHALCON_OBS_VAR(model);
 		phalcon_array_fetch(&model, models_instances, model_name, PH_NOISY);
@@ -5179,7 +5179,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (phalcon_array_isset(models_instances, model_name)) {
 		PHALCON_OBS_VAR(model);
 		phalcon_array_fetch(&model, models_instances, model_name, PH_NOISY);
@@ -5352,7 +5352,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	cache_options_is_not_null = (Z_TYPE_P(cache_options) != IS_NULL); /* to keep scan-build happy */
 
 	PHALCON_OBS_VAR(unique_row);
-	phalcon_read_property_this(&unique_row, this_ptr, SL("_uniqueRow"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&unique_row, this_ptr, SL("_uniqueRow"), PH_NOISY);
 
 	/** 
 	 * The statement is parsed from its PHQL string or a previously processed IR
@@ -5360,7 +5360,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	PHALCON_CALL_METHOD(&intermediate, this_ptr, "parse");
 
 	PHALCON_OBS_VAR(type);
-	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY);
 
 	if (phalcon_get_intval(type) == PHQL_T_SELECT) {
 		if (cache_options_is_not_null) {
@@ -5386,7 +5386,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			}
 
 			PHALCON_OBS_VAR(dependency_injector);
-			phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 
 			PHALCON_CALL_METHOD(&cache, dependency_injector, "getshared", cache_service);
 			if (Z_TYPE_P(cache) != IS_OBJECT) {
@@ -5444,7 +5444,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	 * Check for default bind parameters and merge them with the passed ones
 	 */
 	PHALCON_OBS_VAR(default_bind_params);
-	phalcon_read_property_this(&default_bind_params, this_ptr, SL("_bindParams"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&default_bind_params, this_ptr, SL("_bindParams"), PH_NOISY);
 	if (Z_TYPE_P(default_bind_params) == IS_ARRAY) { 
 		if (Z_TYPE_P(bind_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
@@ -5482,7 +5482,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	 * Check for default bind types and merge them with the passed ones
 	 */
 	PHALCON_OBS_VAR(default_bind_types);
-	phalcon_read_property_this(&default_bind_types, this_ptr, SL("_bindTypes"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&default_bind_types, this_ptr, SL("_bindTypes"), PH_NOISY);
 	if (Z_TYPE_P(default_bind_types) == IS_ARRAY) { 
 		if (Z_TYPE_P(bind_types) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_types);
@@ -5782,12 +5782,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 	PHALCON_CALL_METHOD(&intermediate, this_ptr, "parse");
 
 	PHALCON_OBS_VAR(type);
-	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY);
 
 	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
 
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (Z_TYPE_P(models_instances) != IS_ARRAY) { 
 		PHALCON_INIT_NVAR(models_instances);
 		array_init(models_instances);
@@ -5892,7 +5892,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getSql){
 	PHALCON_CALL_METHOD(&intermediate, this_ptr, "parse");
 
 	PHALCON_OBS_VAR(type);
-	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY);
 
 	switch (phalcon_get_intval(type)) {
 
@@ -5958,7 +5958,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
 	 * Models instances is an array if the SELECT was prepared with parse
 	 */
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (Z_TYPE_P(models_instances) != IS_ARRAY) { 
 		PHALCON_INIT_NVAR(models_instances);
 		array_init(models_instances);
@@ -6171,7 +6171,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlInsert){
 	 * Models instances is an array if the SELECT was prepared with parse
 	 */
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (Z_TYPE_P(models_instances) != IS_ARRAY) { 
 		PHALCON_INIT_NVAR(models_instances);
 		array_init(models_instances);
@@ -6300,7 +6300,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlUpdate){
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (phalcon_array_isset(models_instances, model_name)) {
 		PHALCON_OBS_VAR(model);
 		phalcon_array_fetch(&model, models_instances, model_name, PH_NOISY);
@@ -6347,7 +6347,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlDelete){
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
 	PHALCON_OBS_VAR(models_instances);
-	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&models_instances, this_ptr, SL("_modelsInstances"), PH_NOISY);
 	if (phalcon_array_isset(models_instances, model_name)) {
 		PHALCON_OBS_VAR(model);
 		phalcon_array_fetch(&model, models_instances, model_name, PH_NOISY);

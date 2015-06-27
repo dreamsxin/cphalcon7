@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 	if (!phalcon_array_isset(events, event_type)) {
 
 		PHALCON_OBS_VAR(enable_priorities);
-		phalcon_read_property_this(&enable_priorities, this_ptr, SL("_enablePriorities"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&enable_priorities, this_ptr, SL("_enablePriorities"), PH_NOISY);
 		if (zend_is_true(enable_priorities)) {
 			/** 
 			 * Create a SplPriorityQueue to store the events with priorities
@@ -389,7 +389,7 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
 	}
 
 	PHALCON_OBS_VAR(events);
-	phalcon_read_property_this(&events, this_ptr, SL("_events"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&events, this_ptr, SL("_events"), PH_NOISY);
 	if (Z_TYPE_P(type) == IS_NULL) {
 		PHALCON_INIT_NVAR(events);
 	} else {
@@ -478,7 +478,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 	 * Responses need to be traced?
 	 */
 	PHALCON_OBS_VAR(collect);
-	phalcon_read_property_this(&collect, this_ptr, SL("_collect"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&collect, this_ptr, SL("_collect"), PH_NOISY);
 	if (Z_TYPE_P(queue) == IS_OBJECT) {
 
 		/** 

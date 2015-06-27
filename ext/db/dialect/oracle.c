@@ -706,7 +706,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getSqlTable){
 	
 	if (Z_TYPE_P(escape_char) == IS_NULL) {
 		PHALCON_OBS_NVAR(escape_char);
-		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
 	}
 	if (Z_TYPE_P(table) == IS_ARRAY) { 
 	
@@ -854,7 +854,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_OBS_VAR(escape_char);
-		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
 	} else {
 		PHALCON_INIT_NVAR(escape_char);
 	}

@@ -432,10 +432,10 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 	}
 	
 	PHALCON_OBS_VAR(source_path);
-	phalcon_read_property_this(&source_path, this_ptr, SL("_sourcePath"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&source_path, this_ptr, SL("_sourcePath"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(source_path)) {
 		PHALCON_OBS_NVAR(source_path);
-		phalcon_read_property_this(&source_path, this_ptr, SL("_path"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&source_path, this_ptr, SL("_path"), PH_NOISY);
 	}
 	
 	/** 
@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 	PHALCON_CONCAT_VV(complete_path, base_path, source_path);
 	
 	PHALCON_OBS_VAR(local);
-	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY);
 	
 	/** 
 	 * Local resources are loaded from the local disk
@@ -513,14 +513,14 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
 	}
 	
 	PHALCON_OBS_VAR(source_path);
-	phalcon_read_property_this(&source_path, this_ptr, SL("_sourcePath"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&source_path, this_ptr, SL("_sourcePath"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(source_path)) {
 		PHALCON_OBS_NVAR(source_path);
-		phalcon_read_property_this(&source_path, this_ptr, SL("_path"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&source_path, this_ptr, SL("_path"), PH_NOISY);
 	}
 	
 	PHALCON_OBS_VAR(local);
-	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY);
 	if (zend_is_true(local)) {
 		/** 
 		 * A base path for resources can be set in the assets manager
@@ -557,14 +557,14 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 	}
 	
 	PHALCON_OBS_VAR(target_path);
-	phalcon_read_property_this(&target_path, this_ptr, SL("_targetPath"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&target_path, this_ptr, SL("_targetPath"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(target_path)) {
 		PHALCON_OBS_NVAR(target_path);
-		phalcon_read_property_this(&target_path, this_ptr, SL("_path"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&target_path, this_ptr, SL("_path"), PH_NOISY);
 	}
 	
 	PHALCON_OBS_VAR(local);
-	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY);
 	if (zend_is_true(local)) {
 	
 		/** 

@@ -180,7 +180,7 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				ZVAL_LONG(result, Z_LVAL(retval));
-				phalcon_dtor(&retval);
+				phalcon_dtor(retval);
 			}
 			return;
 		}

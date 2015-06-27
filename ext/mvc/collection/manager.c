@@ -202,7 +202,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 	phalcon_get_class(class_name, model, 1 TSRMLS_CC);
 	
 	PHALCON_OBS_VAR(initialized);
-	phalcon_read_property_this(&initialized, this_ptr, SL("_initialized"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&initialized, this_ptr, SL("_initialized"), PH_NOISY);
 	
 	/** 
 	 * Models are just initialized once per request
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		 * If an EventsManager is available we pass to it every initialized model
 		 */
 		PHALCON_OBS_VAR(events_manager);
-		phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 			PHALCON_INIT_VAR(event_name);
 			ZVAL_STRING(event_name, "collectionManager:afterInitialize", 1);
@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 	 * All collections use by default are using implicit object ids
 	 */
 	PHALCON_OBS_VAR(implicit_objects_ids);
-	phalcon_read_property_this(&implicit_objects_ids, this_ptr, SL("_implicitObjectsIds"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&implicit_objects_ids, this_ptr, SL("_implicitObjectsIds"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&implicit, implicit_objects_ids, entity_name)) {
 		RETURN_CTOR(implicit);
 	}
@@ -406,7 +406,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 	 * All collections use by default are using implicit object ids
 	 */
 	PHALCON_OBS_VAR(strict_modes);
-	phalcon_read_property_this(&strict_modes, this_ptr, SL("_strictModes"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&strict_modes, this_ptr, SL("_strictModes"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&strict_mode, strict_modes, entity_name)) {
 		RETURN_CTOR(strict_mode);
 	}
@@ -438,7 +438,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 	ZVAL_STRING(service, "mongo", 1);
 	
 	PHALCON_OBS_VAR(connection_services);
-	phalcon_read_property_this(&connection_services, this_ptr, SL("_connectionServices"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&connection_services, this_ptr, SL("_connectionServices"), PH_NOISY);
 	if (Z_TYPE_P(connection_services) == IS_ARRAY) { 
 	
 		PHALCON_INIT_VAR(entity_name);
@@ -454,7 +454,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 	}
 	
 	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
@@ -496,7 +496,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 	 * Dispatch events to the global events manager
 	 */
 	PHALCON_OBS_VAR(events_manager);
-	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 	
 		PHALCON_INIT_VAR(fire_event_name);
@@ -512,7 +512,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 	 * A model can has a specific events manager for it
 	 */
 	PHALCON_OBS_VAR(custom_events_manager);
-	phalcon_read_property_this(&custom_events_manager, this_ptr, SL("_customEventsManager"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&custom_events_manager, this_ptr, SL("_customEventsManager"), PH_NOISY);
 	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
 	
 		PHALCON_INIT_VAR(entity_name);
@@ -586,7 +586,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 	phalcon_get_class(entity_name, collection, 1 TSRMLS_CC);
 
 	PHALCON_OBS_VAR(sources);
-	phalcon_read_property_this(&sources, this_ptr, SL("_sources"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&sources, this_ptr, SL("_sources"), PH_NOISY);
 	if (Z_TYPE_P(sources) == IS_ARRAY) { 
 		if (phalcon_array_isset(sources, entity_name)) {
 			PHALCON_OBS_VAR(source);
@@ -659,7 +659,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 	phalcon_get_class(entity_name, collection, 1 TSRMLS_CC);
 
 	PHALCON_OBS_VAR(column_maps);
-	phalcon_read_property_this(&column_maps, this_ptr, SL("_columnMaps"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&column_maps, this_ptr, SL("_columnMaps"), PH_NOISY);
 	if (Z_TYPE_P(column_maps) == IS_ARRAY) { 
 		if (phalcon_array_isset(column_maps, entity_name)) {
 			PHALCON_OBS_VAR(column_map);

@@ -214,11 +214,11 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 			if (Z_TYPE_P(filters) != IS_NULL) {
 
 				PHALCON_OBS_VAR(filter);
-				phalcon_read_property_this(&filter, this_ptr, SL("_filter"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property_this(&filter, this_ptr, SL("_filter"), PH_NOISY);
 				if (Z_TYPE_P(filter) != IS_OBJECT) {
 
 					PHALCON_OBS_VAR(dependency_injector);
-					phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+					phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 					if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
 						return;
@@ -251,10 +251,10 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 		RETURN_CTOR(default_value);
 	} else if (Z_TYPE_P(filters) != IS_NULL) {
 		PHALCON_OBS_VAR(filter);
-		phalcon_read_property_this(&filter, this_ptr, SL("_filter"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&filter, this_ptr, SL("_filter"), PH_NOISY);
 		if (Z_TYPE_P(filter) != IS_OBJECT) {
 			PHALCON_OBS_VAR(dependency_injector);
-			phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 			if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
 				return;
@@ -440,7 +440,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut){
 	}
 	else {
 		PHALCON_OBS_VAR(put);
-		phalcon_read_property_this(&put, this_ptr, SL("_put"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&put, this_ptr, SL("_put"), PH_NOISY);
 		if (Z_TYPE_P(put) != IS_ARRAY) {
 			PHALCON_CALL_METHOD(&raw, this_ptr, "getrawbody");
 
@@ -591,7 +591,7 @@ PHP_METHOD(Phalcon_Http_Request, hasPut){
 	}
 	else {
 		PHALCON_OBS_VAR(put);
-		phalcon_read_property_this(&put, this_ptr, SL("_put"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&put, this_ptr, SL("_put"), PH_NOISY);
 		if (Z_TYPE_P(put) != IS_ARRAY) {
 			PHALCON_CALL_METHOD(&raw, this_ptr, "getrawbody");
 

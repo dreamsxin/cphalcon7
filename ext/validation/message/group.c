@@ -559,7 +559,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 	array_init(filtered);
 	
 	PHALCON_OBS_VAR(messages);
-	phalcon_read_property_this(&messages, this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&messages, this_ptr, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_ARRAY) { 
 	
 		/** 

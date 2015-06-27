@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	phalcon_fetch_params(0, 1, 2, 0, &value, &filter);
 	
 	PHALCON_OBS_VAR(filters);
-	phalcon_read_property_this(&filters, this_ptr, SL("_filters"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&filters, this_ptr, SL("_filters"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&filter_object, filters, filter) && (Z_TYPE_P(filter_object) == IS_OBJECT || phalcon_is_callable(filter_object))) {
 	
 		/** 
@@ -446,10 +446,10 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	
 	if (PHALCON_IS_STRING(filter, "xssclean")) {
 		PHALCON_OBS_VAR(allow_tags);
-		phalcon_read_property_this(&allow_tags, this_ptr, SL("_allowTags"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&allow_tags, this_ptr, SL("_allowTags"), PH_NOISY);
 
 		PHALCON_OBS_VAR(allow_attributes);
-		phalcon_read_property_this(&allow_attributes, this_ptr, SL("_allowAttributes"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&allow_attributes, this_ptr, SL("_allowAttributes"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(filtered);
 		phalcon_xss_clean(filtered, value, allow_tags, allow_attributes TSRMLS_CC);

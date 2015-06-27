@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Forms_Element, addFilter){
 	phalcon_fetch_params(1, 1, 0, &filter);
 	
 	PHALCON_OBS_VAR(filters);
-	phalcon_read_property_this(&filters, this_ptr, SL("_filters"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&filters, this_ptr, SL("_filters"), PH_NOISY);
 	if (Z_TYPE_P(filters) == IS_ARRAY) { 
 		phalcon_update_property_array_append(this_ptr, SL("_filters"), filter TSRMLS_CC);
 	} else {
@@ -754,7 +754,7 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 	 */
 	if (Z_TYPE_P(value) == IS_NULL) {
 		PHALCON_OBS_NVAR(value);
-		phalcon_read_property_this(&value, this_ptr, SL("_value"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&value, this_ptr, SL("_value"), PH_NOISY);
 	}
 	
 	RETURN_CCTOR(value);
@@ -846,7 +846,7 @@ PHP_METHOD(Phalcon_Forms_Element, appendMessage){
 	phalcon_fetch_params(1, 1, 0, &message);
 	
 	PHALCON_OBS_VAR(messages);
-	phalcon_read_property_this(&messages, this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&messages, this_ptr, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) != IS_OBJECT) {
 		PHALCON_INIT_NVAR(messages);
 		object_init_ex(messages, phalcon_validation_message_group_ce);

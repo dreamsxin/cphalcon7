@@ -594,10 +594,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 	}
 
 	PHALCON_OBS_VAR(frontend);
-	phalcon_read_property_this(&frontend, this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&frontend, this_ptr, SL("_frontend"), PH_NOISY);
 	
 	PHALCON_OBS_VAR(prefix);
-	phalcon_read_property_this(&prefix, this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&prefix, this_ptr, SL("_prefix"), PH_NOISY);
 
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
@@ -616,7 +616,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 	ZVAL_LONG(timestamp, (long) time(NULL));
 
 	PHALCON_OBS_NVAR(lifetime);
-	phalcon_read_property_this(&lifetime, this_ptr, SL("_lastLifetime"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&lifetime, this_ptr, SL("_lastLifetime"), PH_NOISY);
 	if (Z_TYPE_P(lifetime) == IS_NULL) {
 		PHALCON_CALL_METHOD(&ttl, frontend, "getlifetime");
 	} else {
@@ -702,10 +702,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 	}
 
 	PHALCON_OBS_VAR(frontend);
-	phalcon_read_property_this(&frontend, this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&frontend, this_ptr, SL("_frontend"), PH_NOISY);
 	
 	PHALCON_OBS_VAR(prefix);
-	phalcon_read_property_this(&prefix, this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&prefix, this_ptr, SL("_prefix"), PH_NOISY);
 
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
@@ -724,7 +724,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 	ZVAL_LONG(timestamp, (long) time(NULL));
 
 	PHALCON_OBS_NVAR(lifetime);
-	phalcon_read_property_this(&lifetime, this_ptr, SL("_lastLifetime"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&lifetime, this_ptr, SL("_lastLifetime"), PH_NOISY);
 	if (Z_TYPE_P(lifetime) == IS_NULL) {
 		PHALCON_CALL_METHOD(&ttl, frontend, "getlifetime");
 	} else {

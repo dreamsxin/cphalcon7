@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Debug, getCssSources){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(uri);
-	phalcon_read_property_this(&uri, this_ptr, SL("_uri"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&uri, this_ptr, SL("_uri"), PH_NOISY);
 
 	PHALCON_INIT_VAR(sources);
 	PHALCON_CONCAT_SVS(sources, "<link href=\"", uri, "jquery/jquery-ui.css\" type=\"text/css\" rel=\"stylesheet\" />");
@@ -680,7 +680,7 @@ PHP_METHOD(Phalcon_Debug, getJsSources){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(uri);
-	phalcon_read_property_this(&uri, this_ptr, SL("_uri"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&uri, this_ptr, SL("_uri"), PH_NOISY);
 
 	PHALCON_INIT_VAR(sources);
 	PHALCON_CONCAT_SVS(sources, "<script type=\"text/javascript\" src=\"", uri, "jquery/jquery.js\"></script>");
@@ -911,7 +911,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		PHALCON_SCONCAT_SVSVS(html, "<br/><div class=\"error-file\">", formatted_file, " (", line, ")</div>");
 
 		PHALCON_OBS_VAR(show_files);
-		phalcon_read_property_this(&show_files, this_ptr, SL("_showFiles"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&show_files, this_ptr, SL("_showFiles"), PH_NOISY);
 
 		/** 
 		 * The developer can change if the files must be opened or not
@@ -927,7 +927,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			phalcon_fast_count(number_lines, lines TSRMLS_CC);
 
 			PHALCON_OBS_VAR(show_file_fragment);
-			phalcon_read_property_this(&show_file_fragment, this_ptr, SL("_showFileFragment"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&show_file_fragment, this_ptr, SL("_showFileFragment"), PH_NOISY);
 
 			/** 
 			 * File fragments just show a piece of the file where the exception is located
@@ -1153,14 +1153,14 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	phalcon_concat_self_str(&html, SL("</div>") TSRMLS_CC);
 
 	PHALCON_OBS_VAR(show_back_trace);
-	phalcon_read_property_this(&show_back_trace, this_ptr, SL("_showBackTrace"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&show_back_trace, this_ptr, SL("_showBackTrace"), PH_NOISY);
 
 	/** 
 	 * Check if the developer wants to show the backtrace or not
 	 */
 	if (zend_is_true(show_back_trace)) {
 		PHALCON_OBS_VAR(data_vars);
-		phalcon_read_property_this(&data_vars, this_ptr, SL("_data"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&data_vars, this_ptr, SL("_data"), PH_NOISY);
 
 		/** 
 		 * Create the tabs in the page

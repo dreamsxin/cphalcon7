@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Mvc_Url, setBaseUri){
 	phalcon_update_property_this(this_ptr, SL("_baseUri"), base_uri TSRMLS_CC);
 
 	PHALCON_OBS_VAR(static_base_uri);
-	phalcon_read_property_this(&static_base_uri, this_ptr, SL("_staticBaseUri"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&static_base_uri, this_ptr, SL("_staticBaseUri"), PH_NOISY);
 	if (Z_TYPE_P(static_base_uri) == IS_NULL) {
 		phalcon_update_property_this(this_ptr, SL("_staticBaseUri"), base_uri TSRMLS_CC);
 	}
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(base_uri);
-	phalcon_read_property_this(&base_uri, this_ptr, SL("_baseUri"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&base_uri, this_ptr, SL("_baseUri"), PH_NOISY);
 	if (Z_TYPE_P(base_uri) == IS_NULL) {
 
 		PHALCON_INIT_VAR(slash);
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStaticBaseUri){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(static_base_uri);
-	phalcon_read_property_this(&static_base_uri, this_ptr, SL("_staticBaseUri"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&static_base_uri, this_ptr, SL("_staticBaseUri"), PH_NOISY);
 	if (Z_TYPE_P(static_base_uri) != IS_NULL) {
 		RETURN_CCTOR(static_base_uri);
 	}

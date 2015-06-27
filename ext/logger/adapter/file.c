@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(formatter);
-	phalcon_read_property_this(&formatter, this_ptr, SL("_formatter"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&formatter, this_ptr, SL("_formatter"), PH_NOISY);
 	if (Z_TYPE_P(formatter) != IS_OBJECT) {
 		PHALCON_INIT_NVAR(formatter);
 		object_init_ex(formatter, phalcon_logger_formatter_line_ce);
@@ -223,14 +223,14 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(path);
-	phalcon_read_property_this(&path, this_ptr, SL("_path"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&path, this_ptr, SL("_path"), PH_NOISY);
 	if (Z_TYPE_P(path) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(exception, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 		return;
 	}
 
 	PHALCON_OBS_VAR(options);
-	phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_string(options, SS("mode"))) {
 		PHALCON_OBS_VAR(mode);
 		phalcon_array_fetch_string(&mode, options, SL("mode"), PH_NOISY);

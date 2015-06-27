@@ -467,7 +467,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	phalcon_fetch_params(0, 1, 1, 1, &source, &key);
 
 	PHALCON_OBS_VAR(handler);
-	phalcon_read_property_this(&handler, this_ptr, SL("_beforeEncrypt"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&handler, this_ptr, SL("_beforeEncrypt"), PH_NOISY);
 
 	if (phalcon_is_callable(handler)) {
 		PHALCON_SEPARATE_PARAM(source);
@@ -552,7 +552,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	PHALCON_CONCAT_VV(return_value, iv, encrypt);
 
 	PHALCON_OBS_NVAR(handler);
-	phalcon_read_property_this(&handler, this_ptr, SL("_afterEncrypt"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&handler, this_ptr, SL("_afterEncrypt"), PH_NOISY);
 
 	if (phalcon_is_callable(handler)) {
 		PHALCON_INIT_NVAR(arguments);
@@ -596,7 +596,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	}
 
 	PHALCON_OBS_VAR(handler);
-	phalcon_read_property_this(&handler, this_ptr, SL("_beforeDecrypt"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&handler, this_ptr, SL("_beforeDecrypt"), PH_NOISY);
 
 	if (phalcon_is_callable(handler)) {
 		PHALCON_SEPARATE_PARAM(text);
@@ -670,7 +670,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	phalcon_crypt_unpad_text(return_value, decrypted, mode, Z_LVAL_P(block_size), Z_LVAL_P(padding_type) TSRMLS_CC);
 
 	PHALCON_OBS_NVAR(handler);
-	phalcon_read_property_this(&handler, this_ptr, SL("_afterDecrypt"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&handler, this_ptr, SL("_afterDecrypt"), PH_NOISY);
 
 	if (phalcon_is_callable(handler)) {
 		PHALCON_INIT_NVAR(arguments);

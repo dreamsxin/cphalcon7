@@ -286,11 +286,11 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(row_count);
-	phalcon_read_property_this(&row_count, this_ptr, SL("_rowCount"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&row_count, this_ptr, SL("_rowCount"), PH_NOISY);
 	if (PHALCON_IS_FALSE(row_count)) {
 	
 		PHALCON_OBS_VAR(connection);
-		phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY);
 	
 		PHALCON_CALL_METHOD(&type, connection, "gettype");
 	
@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		 */
 		if (PHALCON_IS_STRING(type, "mysql") || PHALCON_IS_STRING(type, "pgsql")) {
 			PHALCON_OBS_VAR(pdo_statement);
-			phalcon_read_property_this(&pdo_statement, this_ptr, SL("_pdoStatement"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&pdo_statement, this_ptr, SL("_pdoStatement"), PH_NOISY);
 	
 			PHALCON_CALL_METHOD(&row_count, pdo_statement, "rowcount");
 		}
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 			 * arbitrary number of rows, so we need to perform an extra count to know that
 			 */
 			PHALCON_OBS_VAR(sql_statement);
-			phalcon_read_property_this(&sql_statement, this_ptr, SL("_sqlStatement"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&sql_statement, this_ptr, SL("_sqlStatement"), PH_NOISY);
 	
 			/** 
 			 * If the sql_statement starts with SELECT COUNT(*) we don't make the count
@@ -322,10 +322,10 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 			if (!phalcon_start_with_str(sql_statement, SL("SELECT COUNT(*) "))) {
 	
 				PHALCON_OBS_VAR(bind_params);
-				phalcon_read_property_this(&bind_params, this_ptr, SL("_bindParams"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property_this(&bind_params, this_ptr, SL("_bindParams"), PH_NOISY);
 	
 				PHALCON_OBS_VAR(bind_types);
-				phalcon_read_property_this(&bind_types, this_ptr, SL("_bindTypes"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property_this(&bind_types, this_ptr, SL("_bindTypes"), PH_NOISY);
 	
 				PHALCON_INIT_VAR(matches);
 	

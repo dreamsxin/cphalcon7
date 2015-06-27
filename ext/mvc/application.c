@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 		phalcon_update_property_this(this_ptr, SL("_modules"), modules TSRMLS_CC);
 	} else {
 		PHALCON_OBS_VAR(registered_modules);
-		phalcon_read_property_this(&registered_modules, this_ptr, SL("_modules"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&registered_modules, this_ptr, SL("_modules"), PH_NOISY);
 		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_modules);
 			phalcon_fast_array_merge(merged_modules, &registered_modules, &modules TSRMLS_CC);
@@ -355,7 +355,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/* If the router doesn't return a valid module we use the default module */
 	if (!zend_is_true(module_name)) {
 		PHALCON_OBS_NVAR(module_name);
-		phalcon_read_property_this(&module_name, this_ptr, SL("_defaultModule"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&module_name, this_ptr, SL("_defaultModule"), PH_NOISY);
 	}
 
 	/** 
@@ -370,7 +370,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		 * Check if the module passed by the router is registered in the modules container
 		 */
 		PHALCON_OBS_VAR(modules);
-		phalcon_read_property_this(&modules, this_ptr, SL("_modules"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&modules, this_ptr, SL("_modules"), PH_NOISY);
 		if (!phalcon_array_isset_fetch(&module, modules, module_name)) {
 			convert_to_string(module_name);
 			zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module %s is not registered in the application container", Z_STRVAL_P(module_name));

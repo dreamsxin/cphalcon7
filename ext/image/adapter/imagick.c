@@ -785,10 +785,10 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _watermark) {
 	ce0 = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_OBS_VAR(im);
-	phalcon_read_property_this(&im, this_ptr, SL("_image"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&im, this_ptr, SL("_image"), PH_NOISY);
 
 	PHALCON_OBS_VAR(type);
-	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY);
 
 	PHALCON_INIT_VAR(watermark);
 	object_init_ex(watermark, ce0);
@@ -920,7 +920,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _text) {
 	}
 
 	PHALCON_OBS_VAR(im);
-	phalcon_read_property_this(&im, this_ptr, SL("_image"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&im, this_ptr, SL("_image"), PH_NOISY);
 
 	PHALCON_INIT_VAR(draw);
 	object_init_ex(draw, imagick_draw_ce);
@@ -1393,7 +1393,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 	}
 
 	PHALCON_OBS_VAR(im);
-	phalcon_read_property_this(&im, this_ptr, SL("_image"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&im, this_ptr, SL("_image"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTION(&ret, "pathinfo", file, constant);
 
@@ -1499,11 +1499,11 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _render) {
 		ZVAL_LONG(type, 3);
 	} else {
 		PHALCON_OBS_VAR(type);
-		phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY);
 	}
 
 	PHALCON_OBS_VAR(im);
-	phalcon_read_property_this(&im, this_ptr, SL("_image"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&im, this_ptr, SL("_image"), PH_NOISY);
 
 	if (zend_is_true(type)) {
 		PHALCON_CALL_METHOD(NULL, im, "setformat", format);

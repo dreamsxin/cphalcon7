@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	}
 
 	PHALCON_OBS_VAR(methods);
-	phalcon_read_property_this(&methods, this_ptr, SL("_methods"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&methods, this_ptr, SL("_methods"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&method, methods, method_name)) {
 			PHALCON_CALL_USER_FUNC_ARRAY(return_value, method, arguments);
 			RETURN_MM();

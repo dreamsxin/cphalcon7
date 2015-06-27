@@ -78,7 +78,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_isset_property_zval(zval *object,
 }
 
 /** Reading properties */
-zval* phalcon_fetch_property_this_quick(zval *object, const char *property_name, uint32_t property_length, ulong key, int silent TSRMLS_DC);
+zval* phalcon_fetch_property_this(zval *object, const char *property_name, uint32_t property_length, int silent);
 int phalcon_read_property(zval **result, zval *object, const char *property_name, uint32_t property_length, int silent TSRMLS_DC);
 int phalcon_read_property_zval(zval **result, zval *object, const zval *property, int silent TSRMLS_DC);
 int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, zval *object, const char *property_name, uint32_t property_length, ulong key TSRMLS_DC);
@@ -87,9 +87,9 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
  * Reads a property from this_ptr (with pre-calculated key)
  * Variables must be defined in the class definition. This function ignores magic methods or dynamic properties
  */
-PHALCON_ATTR_NONNULL static inline int phalcon_read_property_this_quick(zval **result, zval *object, const char *property_name, uint32_t property_length, ulong key, int silent TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline int phalcon_read_property_this(zval **result, zval *object, const char *property_name, uint32_t property_length, int silent)
 {
-	zval *tmp = phalcon_fetch_property_this_quick(object, property_name, property_length, key, silent TSRMLS_CC);
+	zval *tmp = phalcon_fetch_property_this(object, property_name, property_length, silent);
 	if (EXPECTED(tmp != NULL)) {
 		*result = tmp;
 		Z_ADDREF_P(*result);
@@ -100,59 +100,15 @@ PHALCON_ATTR_NONNULL static inline int phalcon_read_property_this_quick(zval **r
 	return FAILURE;
 }
 
-/**
- * Reads a property from this_ptr
- * Variables must be defined in the class definition. This function ignores magic methods or dynamic properties
- */
-PHALCON_ATTR_NONNULL static inline int phalcon_read_property_this(zval **result, zval *object, const char *property_name, uint32_t property_length, int silent TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this(zval *object, const char *property_name, uint32_t property_length, int silent)
 {
-#ifdef __GNUC__
-	if (__builtin_constant_p(property_name) && __builtin_constant_p(property_length)) {
-		return phalcon_read_property_this_quick(result, object, property_name, property_length, zend_inline_hash_func(property_name, property_length + 1), silent TSRMLS_CC);
-	}
-#endif
-
-	return phalcon_read_property_this_quick(result, object, property_name, property_length, zend_hash_func(property_name, property_length + 1), silent TSRMLS_CC);
+	zval *result = phalcon_fetch_property_this(object, property_name, property_length, silent);
+	return result ? result : EG(uninitialized_zval);
 }
 
-PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this_quick(zval *object, const char *property_name, uint32_t property_length, ulong key, int silent TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this_zval(zval *object, const zval *property, int silent)
 {
-#ifdef __GNUC__
-	if (__builtin_constant_p(property_name) && __builtin_constant_p(property_length)) {
-		zval *result = phalcon_fetch_property_this_quick(object, property_name, property_length, zend_inline_hash_func(property_name, property_length + 1), silent TSRMLS_CC);
-		return result ? result : EG(uninitialized_zval_ptr);
-	}
-#endif
-
-	zval *result = phalcon_fetch_property_this_quick(object, property_name, property_length, zend_hash_func(property_name, property_length + 1), silent TSRMLS_CC);
-	return result ? result : EG(uninitialized_zval_ptr);
-}
-
-PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this(zval *object, const char *property_name, uint32_t property_length, int silent TSRMLS_DC)
-{
-#ifdef __GNUC__
-	if (__builtin_constant_p(property_name) && __builtin_constant_p(property_length)) {
-		return phalcon_fetch_nproperty_this_quick(object, property_name, property_length, zend_inline_hash_func(property_name, property_length + 1), silent TSRMLS_CC);
-	}
-#endif
-
-	return phalcon_fetch_nproperty_this_quick(object, property_name, property_length, zend_hash_func(property_name, property_length + 1), silent TSRMLS_CC);
-}
-
-PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this_zval(zval *object, const zval *property, int silent TSRMLS_DC)
-{
-	return phalcon_fetch_nproperty_this_quick(object, Z_STRVAL_P(property), Z_STRLEN_P(property), zend_hash_func(Z_STRVAL_P(property), Z_STRLEN_P(property) + 1), silent TSRMLS_CC);
-}
-
-PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_property_this(zval *object, const char *property_name, uint32_t property_length, int silent TSRMLS_DC)
-{
-#ifdef __GNUC__
-	if (__builtin_constant_p(property_name) && __builtin_constant_p(property_length)) {
-		return phalcon_fetch_property_this_quick(object, property_name, property_length, zend_inline_hash_func(property_name, property_length + 1), silent TSRMLS_CC);
-	}
-#endif
-
-	return phalcon_fetch_property_this_quick(object, property_name, property_length, zend_hash_func(property_name, property_length + 1), silent TSRMLS_CC);
+	return phalcon_fetch_nproperty_this(object, Z_STRVAL_P(property), Z_STRLEN_P(property), Z_STRLEN_P(property) + 1), silent);
 }
 
 /**

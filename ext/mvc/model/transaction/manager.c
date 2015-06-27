@@ -261,11 +261,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, get){
 	}
 	
 	PHALCON_OBS_VAR(initialized);
-	phalcon_read_property_this(&initialized, this_ptr, SL("_initialized"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&initialized, this_ptr, SL("_initialized"), PH_NOISY);
 	if (zend_is_true(initialized)) {
 	
 		PHALCON_OBS_VAR(rollback_pendent);
-		phalcon_read_property_this(&rollback_pendent, this_ptr, SL("_rollbackPendent"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&rollback_pendent, this_ptr, SL("_rollbackPendent"), PH_NOISY);
 		if (zend_is_true(rollback_pendent)) {
 			PHALCON_INIT_NVAR(rollback_pendent);
 			array_init_size(rollback_pendent, 2);
@@ -305,18 +305,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 	}
 	
 	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_transaction_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 	
 	PHALCON_OBS_VAR(number);
-	phalcon_read_property_this(&number, this_ptr, SL("_number"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&number, this_ptr, SL("_number"), PH_NOISY);
 	if (zend_is_true(number)) {
 	
 		PHALCON_OBS_VAR(transactions);
-		phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
 		if (Z_TYPE_P(transactions) == IS_ARRAY) { 
 	
 			phalcon_is_iterable(transactions, &ah0, &hp0, 0, 1);
@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 	}
 	
 	PHALCON_OBS_VAR(service);
-	phalcon_read_property_this(&service, this_ptr, SL("_service"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&service, this_ptr, SL("_service"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(transaction);
 	object_init_ex(transaction, phalcon_mvc_model_transaction_ce);
@@ -380,7 +380,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, commit){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(transactions);
-	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
 	if (Z_TYPE_P(transactions) == IS_ARRAY) { 
 	
 		phalcon_is_iterable(transactions, &ah0, &hp0, 0, 0);
@@ -426,7 +426,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, rollback){
 	}
 	
 	PHALCON_OBS_VAR(transactions);
-	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
 	if (Z_TYPE_P(transactions) == IS_ARRAY) { 
 	
 		phalcon_is_iterable(transactions, &ah0, &hp0, 0, 0);
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, _collectTransaction){
 	phalcon_fetch_params(1, 1, 0, &transaction);
 	
 	PHALCON_OBS_VAR(transactions);
-	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
 	if (phalcon_fast_count_ev(transactions TSRMLS_CC)) {
 	
 		PHALCON_INIT_VAR(new_transactions);
@@ -548,7 +548,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, collectTransactions){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(transactions);
-	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
 	if (phalcon_fast_count_ev(transactions TSRMLS_CC)) {
 	
 		phalcon_is_iterable(transactions, &ah0, &hp0, 0, 0);

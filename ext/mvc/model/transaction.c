@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 		}
 	
 		PHALCON_OBS_NVAR(rollback_record);
-		phalcon_read_property_this(&rollback_record, this_ptr, SL("_rollbackRecord"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&rollback_record, this_ptr, SL("_rollbackRecord"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(i0);
 		object_init_ex(i0, phalcon_mvc_model_transaction_failed_ce);
@@ -288,7 +288,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(rollback_on_abort);
-	phalcon_read_property_this(&rollback_on_abort, this_ptr, SL("_rollbackOnAbort"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&rollback_on_abort, this_ptr, SL("_rollbackOnAbort"), PH_NOISY);
 	if (zend_is_true(rollback_on_abort)) {
 	
 		if (PG(connection_status) & PHP_CONNECTION_ABORTED) {
@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 	}
 	
 	PHALCON_OBS_VAR(connection);
-	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY);
 	
 	RETURN_CCTOR(connection);
 }

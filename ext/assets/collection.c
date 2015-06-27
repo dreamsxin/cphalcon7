@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Assets_Collection, count){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(resources);
-	phalcon_read_property_this(&resources, this_ptr, SL("_resources"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&resources, this_ptr, SL("_resources"), PH_NOISY);
 	phalcon_fast_count(return_value, resources TSRMLS_CC);
 	RETURN_MM();
 }
@@ -408,10 +408,10 @@ PHP_METHOD(Phalcon_Assets_Collection, valid){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(position);
-	phalcon_read_property_this(&position, this_ptr, SL("_position"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&position, this_ptr, SL("_position"), PH_NOISY);
 	
 	PHALCON_OBS_VAR(resources);
-	phalcon_read_property_this(&resources, this_ptr, SL("_resources"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&resources, this_ptr, SL("_resources"), PH_NOISY);
 	if (phalcon_array_isset(resources, position)) {
 		RETURN_MM_TRUE;
 	}
@@ -680,7 +680,7 @@ PHP_METHOD(Phalcon_Assets_Collection, getRealTargetPath){
 	}
 	
 	PHALCON_OBS_VAR(target_path);
-	phalcon_read_property_this(&target_path, this_ptr, SL("_targetPath"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&target_path, this_ptr, SL("_targetPath"), PH_NOISY);
 	
 	/** 
 	 * A base path for resources can be set in the assets manager

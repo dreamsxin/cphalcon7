@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	config      = phalcon_fetch_nproperty_this(this_ptr, SL("_config"), PH_NOISY TSRMLS_CC);
 	
 	PHALCON_OBS_VAR(page_number);
-	phalcon_read_property_this(&page_number, this_ptr, SL("_page"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&page_number, this_ptr, SL("_page"), PH_NOISY);
 
 	i_show = (Z_TYPE_P(show) == IS_LONG) ? Z_LVAL_P(show) : phalcon_get_intval(show);
 

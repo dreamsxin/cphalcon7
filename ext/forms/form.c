@@ -594,7 +594,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 	PHALCON_CALL_METHOD(NULL, this_ptr, "setentity", entity);
 
 	PHALCON_OBS_VAR(elements);
-	phalcon_read_property_this(&elements, this_ptr, SL("_elements"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&elements, this_ptr, SL("_elements"), PH_NOISY);
 	if (Z_TYPE_P(elements) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_forms_exception_ce, "There are no elements in the form");
 		return;

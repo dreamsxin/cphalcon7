@@ -867,7 +867,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 * Check if the params is an array
 		 */
 		PHALCON_OBS_NVAR(params);
-		phalcon_read_property_this(&params, this_ptr, SL("_params"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&params, this_ptr, SL("_params"), PH_NOISY);
 		if (Z_TYPE_P(params) != IS_ARRAY) {
 
 			PHALCON_INIT_NVAR(exception_code);

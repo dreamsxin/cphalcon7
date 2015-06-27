@@ -567,7 +567,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getUniquePrefix){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(prefix);
-	phalcon_read_property_this(&prefix, this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&prefix, this_ptr, SL("_prefix"), PH_NOISY);
 
 	/** 
 	 * If the unique prefix is not set we use a hash using the modified Berstein
@@ -902,7 +902,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		if (phalcon_method_exists(class_name, method TSRMLS_CC) == SUCCESS) {
 
 			PHALCON_OBS_VAR(array_helpers);
-			phalcon_read_property_this(&array_helpers, this_ptr, SL("_arrayHelpers"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&array_helpers, this_ptr, SL("_arrayHelpers"), PH_NOISY);
 			if (Z_TYPE_P(array_helpers) != IS_ARRAY) { 
 				PHALCON_INIT_NVAR(array_helpers);
 				array_init_size(array_helpers, 17);
@@ -2079,7 +2079,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 	PHALCON_CALL_METHOD(&prefix, this_ptr, "getuniqueprefix");
 
 	PHALCON_OBS_VAR(level);
-	phalcon_read_property_this(&level, this_ptr, SL("_foreachLevel"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&level, this_ptr, SL("_foreachLevel"), PH_NOISY);
 
 	/** 
 	 * prefix_level is used to prefix every temporal variable
@@ -2142,7 +2142,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 	PHALCON_CALL_METHOD(&code, this_ptr, "_statementlist", block_statements, extends_mode);
 
 	PHALCON_OBS_VAR(loop_context);
-	phalcon_read_property_this(&loop_context, this_ptr, SL("_loopPointers"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&loop_context, this_ptr, SL("_loopPointers"), PH_NOISY);
 
 	/** 
 	 * Generate the loop context for the 'foreach'
@@ -2243,17 +2243,17 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForElse){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(level);
-	phalcon_read_property_this(&level, this_ptr, SL("_foreachLevel"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&level, this_ptr, SL("_foreachLevel"), PH_NOISY);
 
 	PHALCON_OBS_VAR(for_else_pointers);
-	phalcon_read_property_this(&for_else_pointers, this_ptr, SL("_forElsePointers"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&for_else_pointers, this_ptr, SL("_forElsePointers"), PH_NOISY);
 	if (phalcon_array_isset(for_else_pointers, level)) {
 
 		PHALCON_OBS_VAR(prefix);
 		phalcon_array_fetch(&prefix, for_else_pointers, level, PH_NOISY);
 
 		PHALCON_OBS_VAR(loop_context);
-		phalcon_read_property_this(&loop_context, this_ptr, SL("_loopPointers"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&loop_context, this_ptr, SL("_loopPointers"), PH_NOISY);
 		if (phalcon_array_isset(loop_context, level)) {
 			PHALCON_INIT_VAR(compilation);
 			PHALCON_CONCAT_SVSVS(compilation, "<?php $", prefix, "incr++; } if (!$", prefix, "iterated) { ?>");
@@ -2585,7 +2585,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 			phalcon_array_fetch_string(&path, path_expr, SL("value"), PH_NOISY);
 
 			PHALCON_OBS_VAR(view);
-			phalcon_read_property_this(&view, this_ptr, SL("_view"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&view, this_ptr, SL("_view"), PH_NOISY);
 			if (Z_TYPE_P(view) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&views_dir, view, "getviewsdir");
 
@@ -2837,7 +2837,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileAutoEscape){
 	 * 'autoescape' mode
 	 */
 	PHALCON_OBS_VAR(old_autoescape);
-	phalcon_read_property_this(&old_autoescape, this_ptr, SL("_autoescape"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&old_autoescape, this_ptr, SL("_autoescape"), PH_NOISY);
 
 	PHALCON_OBS_VAR(autoescape);
 	phalcon_array_fetch_string(&autoescape, statement, SL("enable"), PH_NOISY);
@@ -2885,7 +2885,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileMacro){
 	phalcon_array_fetch_string(&name, statement, SL("name"), PH_NOISY);
 
 	PHALCON_OBS_VAR(macros);
-	phalcon_read_property_this(&macros, this_ptr, SL("_macros"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&macros, this_ptr, SL("_macros"), PH_NOISY);
 
 	/** 
 	 * Check if the macro is already defined
@@ -3011,7 +3011,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 	 * Increase the statement recursion level in extends mode
 	 */
 	PHALCON_OBS_VAR(extended);
-	phalcon_read_property_this(&extended, this_ptr, SL("_extended"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&extended, this_ptr, SL("_extended"), PH_NOISY);
 
 	PHALCON_INIT_VAR(block_mode);
 	ZVAL_BOOL(block_mode, zend_is_true(extended) || zend_is_true(extends_mode));
@@ -3024,7 +3024,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 	PHALCON_INIT_VAR(compilation);
 
 	PHALCON_OBS_VAR(extensions);
-	phalcon_read_property_this(&extensions, this_ptr, SL("_extensions"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&extensions, this_ptr, SL("_extensions"), PH_NOISY);
 
 	phalcon_is_iterable(statements, &ah0, &hp0, 0, 0);
 
@@ -3136,7 +3136,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 				}
 
 				PHALCON_OBS_NVAR(blocks);
-				phalcon_read_property_this(&blocks, this_ptr, SL("_blocks"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property_this(&blocks, this_ptr, SL("_blocks"), PH_NOISY);
 				if (zend_is_true(block_mode)) {
 					if (Z_TYPE_P(blocks) != IS_ARRAY) { 
 						PHALCON_INIT_NVAR(blocks);
@@ -3174,7 +3174,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 				phalcon_array_fetch_string(&path, statement, SL("path"), PH_NOISY);
 
 				PHALCON_OBS_NVAR(view);
-				phalcon_read_property_this(&view, this_ptr, SL("_view"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property_this(&view, this_ptr, SL("_view"), PH_NOISY);
 				if (Z_TYPE_P(view) == IS_OBJECT) {
 					PHALCON_CALL_METHOD(&views_dir, view, "getviewsdir");
 
@@ -3304,7 +3304,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 	if (PHALCON_IS_TRUE(block_mode)) {
 
 		PHALCON_OBS_VAR(level);
-		phalcon_read_property_this(&level, this_ptr, SL("_blockLevel"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&level, this_ptr, SL("_blockLevel"), PH_NOISY);
 		if (PHALCON_IS_LONG(level, 1)) {
 
 			if (Z_TYPE_P(compilation) != IS_NULL) {
@@ -3346,7 +3346,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 	}
 
 	PHALCON_OBS_VAR(current_path);
-	phalcon_read_property_this(&current_path, this_ptr, SL("_currentPath"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&current_path, this_ptr, SL("_currentPath"), PH_NOISY);
 
 	PHALCON_INIT_VAR(intermediate);
 	if (phvolt_parse_view(intermediate, view_code, current_path TSRMLS_CC) == FAILURE) {
@@ -3363,7 +3363,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 		 * Check if the template is extending another
 		 */
 		PHALCON_OBS_VAR(extended);
-		phalcon_read_property_this(&extended, this_ptr, SL("_extended"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&extended, this_ptr, SL("_extended"), PH_NOISY);
 		if (PHALCON_IS_TRUE(extended)) {
 
 			/** 
@@ -3377,10 +3377,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 			}
 
 			PHALCON_OBS_VAR(blocks);
-			phalcon_read_property_this(&blocks, this_ptr, SL("_blocks"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&blocks, this_ptr, SL("_blocks"), PH_NOISY);
 
 			PHALCON_OBS_VAR(extended_blocks);
-			phalcon_read_property_this(&extended_blocks, this_ptr, SL("_extendedBlocks"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&extended_blocks, this_ptr, SL("_extendedBlocks"), PH_NOISY);
 
 			phalcon_is_iterable(extended_blocks, &ah0, &hp0, 0, 0);
 
@@ -3450,7 +3450,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 			 * In extends mode we return the template blocks instead of the compilation
 			 */
 			PHALCON_OBS_NVAR(blocks);
-			phalcon_read_property_this(&blocks, this_ptr, SL("_blocks"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property_this(&blocks, this_ptr, SL("_blocks"), PH_NOISY);
 			RETURN_CCTOR(blocks);
 		}
 
@@ -3638,7 +3638,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 	PHALCON_CPY_WRT(compilation, PHALCON_GLOBAL(z_null));
 
 	PHALCON_OBS_VAR(options);
-	phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY);
 	if (Z_TYPE_P(options) == IS_ARRAY) { 
 
 		/** 

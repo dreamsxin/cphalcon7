@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Db_Index, getType){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(type);
-	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY);
 
 	if (Z_TYPE_P(type) == IS_STRING) {
 		RETVAL_ZVAL(type, 1, 0);

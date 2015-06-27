@@ -1055,7 +1055,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 
 	if (!fname) {
 		PHALCON_OBS_VAR(file);
-		phalcon_read_property_this(&file, this_ptr, SL("_realpath"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&file, this_ptr, SL("_realpath"), PH_NOISY);
 		convert_to_string_ex(&file);
 	}
 	else {

@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 	phalcon_fetch_params(1, 1, 0, &formatter);
 	
 	PHALCON_OBS_VAR(loggers);
-	phalcon_read_property_this(&loggers, this_ptr, SL("_loggers"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&loggers, this_ptr, SL("_loggers"), PH_NOISY);
 	if (Z_TYPE_P(loggers) == IS_ARRAY) { 
 	
 		phalcon_is_iterable(loggers, &ah0, &hp0, 0, 0);
@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, log){
 	}
 
 	PHALCON_OBS_VAR(loggers);
-	phalcon_read_property_this(&loggers, this_ptr, SL("_loggers"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&loggers, this_ptr, SL("_loggers"), PH_NOISY);
 	if (Z_TYPE_P(loggers) == IS_ARRAY) { 
 	
 		phalcon_is_iterable(loggers, &ah0, &hp0, 0, 0);

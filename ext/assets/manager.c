@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 	phalcon_fetch_params(1, 2, 0, &type, &resource);
 
 	PHALCON_OBS_VAR(collections);
-	phalcon_read_property_this(&collections, this_ptr, SL("_collections"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&collections, this_ptr, SL("_collections"), PH_NOISY);
 	if (phalcon_array_isset(collections, type)) {
 		PHALCON_OBS_VAR(collection);
 		phalcon_array_fetch(&collection, collections, type, PH_NOISY);
@@ -540,7 +540,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	PHALCON_INIT_VAR(output);
 
 	PHALCON_OBS_VAR(use_implicit_output);
-	phalcon_read_property_this(&use_implicit_output, this_ptr, SL("_implicitOutput"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property_this(&use_implicit_output, this_ptr, SL("_implicitOutput"), PH_NOISY);
 
 	/** 
 	 * Get the resources as an array
@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		PHALCON_INIT_VAR(target_base_path);
 
 		PHALCON_OBS_VAR(options);
-		phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY);
 
 		/** 
 		 * Check for global options in the assets manager

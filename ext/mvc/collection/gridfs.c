@@ -343,10 +343,10 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 
 	if (zend_is_true(filename)) {
 		PHALCON_OBS_VAR(old_sha1);
-		phalcon_read_property_this(&old_sha1, this_ptr, SL("sha1"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&old_sha1, this_ptr, SL("sha1"), PH_NOISY);
 
 		PHALCON_OBS_VAR(old_md5);
-		phalcon_read_property_this(&old_md5, this_ptr, SL("md5"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property_this(&old_md5, this_ptr, SL("md5"), PH_NOISY);
 
 		PHALCON_CALL_FUNCTION(&sha1, "sha1_file", filename);
 		PHALCON_CALL_FUNCTION(&md5, "md5_file", filename);

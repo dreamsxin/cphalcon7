@@ -893,7 +893,7 @@ PHP_METHOD(Phalcon_Forms_Element, __toString)
 
 			zend_clear_exception();
 			zend_error(E_ERROR, "%s", Z_STRVAL_P(m));
-			zval_ptr_dtor(&m);
+			phalcon_ptr_dtor(m);
 		}
 	}
 }

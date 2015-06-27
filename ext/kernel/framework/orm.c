@@ -76,7 +76,7 @@ void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast TSRMLS_DC)
 			MAKE_STD_ZVAL(copy_ast); 	
 			array_init(copy_ast);
 
-			zend_hash_copy(Z_ARRVAL_P(copy_ast), Z_ARRVAL_P(prepared_ast), (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+			zend_hash_copy(Z_ARRVAL_P(copy_ast), Z_ARRVAL_P(prepared_ast), (copy_ctor_func_t)zval_add_ref);
 
 			zend_hash_index_update(
 				phalcon_globals_ptr->orm.ast_cache,

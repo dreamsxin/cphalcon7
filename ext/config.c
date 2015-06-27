@@ -319,7 +319,7 @@ static HashTable* phalcon_config_get_properties(zval* object TSRMLS_DC)
 
 	if (!GC_G(gc_active)) {
 		phalcon_config_object* obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_config_object);
-		zend_hash_copy(props, obj->props, (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+		zend_hash_copy(props, obj->props, (copy_ctor_func_t)zval_add_ref);
 	}
 
 	return props;
@@ -460,9 +460,8 @@ PHALCON_ATTR_WARN_UNUSED_RESULT static int phalcon_config_toarray_internal(zval 
 
 	assert(!EG(exception));
 	if (likely(obj->obj.ce == phalcon_config_ce)) {
-		zval *tmp;
 		array_init_size(*return_value_ptr, zend_hash_num_elements(obj->props));
-		zend_hash_copy(Z_ARRVAL_P(*return_value_ptr), obj->props, (copy_ctor_func_t)zval_add_ref, (void*)&tmp, sizeof(zval*));
+		zend_hash_copy(Z_ARRVAL_P(*return_value_ptr), obj->props, (copy_ctor_func_t)zval_add_ref);
 		return SUCCESS;
 	}
 
@@ -702,14 +701,14 @@ PHP_METHOD(Phalcon_Config, merge){
  */
 PHP_METHOD(Phalcon_Config, toArray){
 
-	zval *recursive = NULL, *tmp;
+	zval *recursive = NULL;
 	phalcon_config_object *obj;
 
 	phalcon_fetch_params(0, 0, 1, &recursive);
 
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_config_object);
 	array_init_size(return_value, zend_hash_num_elements(obj->props));
-	zend_hash_copy(Z_ARRVAL_P(return_value), obj->props, (copy_ctor_func_t)zval_add_ref, (void*)&tmp, sizeof(zval*));
+	zend_hash_copy(Z_ARRVAL_P(return_value), obj->props, (copy_ctor_func_t)zval_add_ref);
 
 	if (!recursive || zend_is_true(recursive)) {
 		zval **value;
@@ -749,7 +748,7 @@ PHP_METHOD(Phalcon_Config, __wakeup)
 
 	obj   = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_config_object);
 	props = zend_std_get_properties(getThis() TSRMLS_CC);
-	zend_hash_copy(obj->props, props, (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+	zend_hash_copy(obj->props, props, (copy_ctor_func_t)zval_add_ref);
 }
 
 /**

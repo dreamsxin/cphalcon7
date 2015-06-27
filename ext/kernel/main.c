@@ -273,7 +273,7 @@ int phalcon_is_iterable_ex(zval *arr, HashTable **arr_hash, HashPosition *hash_p
 	if (duplicate) {
 		ALLOC_HASHTABLE(*arr_hash);
 		zend_hash_init(*arr_hash, 0, NULL, NULL, 0);
-		zend_hash_copy(*arr_hash, Z_ARRVAL_P(arr), NULL, NULL, sizeof(zval*));
+		zend_hash_copy(*arr_hash, Z_ARRVAL_P(arr), NULL);
 	} else {
 		*arr_hash = Z_ARRVAL_P(arr);
 	}

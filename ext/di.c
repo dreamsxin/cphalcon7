@@ -376,12 +376,12 @@ static HashTable* phalcon_di_get_properties(zval* object TSRMLS_DC)
 
 		MAKE_STD_ZVAL(zv);
 		array_init_size(zv, zend_hash_num_elements(obj->services));
-		zend_hash_copy(Z_ARRVAL_P(zv), obj->services, (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+		zend_hash_copy(Z_ARRVAL_P(zv), obj->services, (copy_ctor_func_t)zval_add_ref);
 		zend_hash_quick_update(props, "_services", sizeof("_services"), zend_inline_hash_func(SS("_sharedInstances")), (void*)&zv, sizeof(zval*), NULL);
 
 		MAKE_STD_ZVAL(zv);
 		array_init_size(zv, zend_hash_num_elements(obj->shared));
-		zend_hash_copy(Z_ARRVAL_P(zv), obj->shared, (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+		zend_hash_copy(Z_ARRVAL_P(zv), obj->shared, (copy_ctor_func_t)zval_add_ref);
 		zend_hash_quick_update(props, "_sharedInstances", sizeof("_sharedInstances"), zend_inline_hash_func(SS("_sharedInstances")), (void*)&zv, sizeof(zval*), NULL);
 
 		MAKE_STD_ZVAL(zv);
@@ -454,7 +454,7 @@ void phalcon_di_set_service(zval *this_ptr, zval *name, zval *service, int flags
 void phalcon_di_set_services(zval *this_ptr, zval *services TSRMLS_DC)
 {
 	phalcon_di_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(this_ptr, phalcon_di_object);
-	zend_hash_copy(obj->services, Z_ARRVAL_P(services), (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+	zend_hash_copy(obj->services, Z_ARRVAL_P(services), (copy_ctor_func_t)zval_add_ref);
 }
 
 PHP_METHOD(Phalcon_DI, __construct);
@@ -951,7 +951,7 @@ PHP_METHOD(Phalcon_DI, getServices){
 	phalcon_di_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
 
 	array_init_size(return_value, zend_hash_num_elements(obj->services));
-	zend_hash_copy(Z_ARRVAL_P(return_value), obj->services, (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+	zend_hash_copy(Z_ARRVAL_P(return_value), obj->services, (copy_ctor_func_t)zval_add_ref);
 }
 
 /**

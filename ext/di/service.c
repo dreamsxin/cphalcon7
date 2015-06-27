@@ -168,7 +168,7 @@ static HashTable* phalcon_di_service_get_debug_info(zval *object, int *is_temp T
 
 	ALLOC_HASHTABLE(ht);
 	zend_hash_init(ht, zend_hash_num_elements(props) + 5, NULL, ZVAL_PTR_DTOR, 0);
-	zend_hash_copy(ht, props, (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+	zend_hash_copy(ht, props, (copy_ctor_func_t)zval_add_ref);
 
 	if (obj->name) {
 		ZVAL_NEW_STRINGL(&tmp, obj->name);

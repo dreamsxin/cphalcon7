@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
 	}
 
 	array_init_size(return_value, zend_hash_num_elements(properties));
-	zend_hash_copy(Z_ARRVAL_P(return_value), properties, (copy_ctor_func_t)zval_add_ref, NULL, sizeof(zval*));
+	zend_hash_copy(Z_ARRVAL_P(return_value), properties, (copy_ctor_func_t)zval_add_ref);
 }
 
 /**

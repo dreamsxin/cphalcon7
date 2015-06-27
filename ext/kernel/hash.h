@@ -42,7 +42,7 @@ static inline zval *phalcon_get_current_key_w(HashTable *ht, HashPosition *pos)
 	return key;
 }
 
-int phalcon_has_numeric_keys(const zval *data);
+/** int phalcon_has_numeric_keys(const zval *data); */
 int phalcon_hash_update_or_insert(HashTable *ht, const zval *offset, zval *value);
 
 zval** phalcon_hash_fast_get(HashTable *ht, int type, const zval *key) PHALCON_ATTR_NONNULL;

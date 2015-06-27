@@ -449,7 +449,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 			/* Do not display old-style inherited constructors */
 			if (zend_hash_get_current_key_ex(&ce->function_table, &key, &key_len, &num_index, 0, &pos) != HASH_KEY_IS_STRING) {
 				ZVAL_NEW_STR(&method_name, mptr->common.function_name);
-				zend_hash_next_index_insert(return_value->value.ht, &method_name, sizeof(zval *), NULL);
+				zend_hash_next_index_insert(return_value->value.ht, &method_name);
 			} else if ((mptr->common.fn_flags & ZEND_ACC_CTOR) == 0 ||
 			    mptr->common.scope == ce ||
 			    zend_binary_strcasecmp(key, key_len-1, mptr->common.function_name, len) == 0) {
@@ -459,10 +459,10 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 			    	(len != key_len - 1 ||
 			    	 !phalcon_same_name(key, mptr->common.function_name, len))) {
 					ZVAL_STRINGL(&method_name, (char*)zend_find_alias_name(mptr->common.scope, key, key_len - 1), key_len - 1);
-					zend_hash_next_index_insert(return_value->value.ht, &method_name, sizeof(zval *), NULL);
+					zend_hash_next_index_insert(return_value->value.ht, &method_name);
 				} else {
 					ZVAL_NEW_STR(&method_name, mptr->common.function_name);
-					zend_hash_next_index_insert(return_value->value.ht, &method_name, sizeof(zval *), NULL);
+					zend_hash_next_index_insert(return_value->value.ht, &method_name);
 				}
 			}
 		}
@@ -1061,7 +1061,7 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 		} else if (Z_TYPE_P(index) == IS_LONG) {
 			zend_hash_index_update(Z_ARRVAL_P(tmp), Z_LVAL_P(index), &value, sizeof(zval *), NULL);
 		} else if (Z_TYPE_P(index) == IS_NULL) {
-			zend_hash_next_index_insert(Z_ARRVAL_P(tmp), (void**)&value, sizeof(zval*), NULL);
+			zend_hash_next_index_insert(Z_ARRVAL_P(tmp), (void**)&value);
 		}
 
 		if (separated) {

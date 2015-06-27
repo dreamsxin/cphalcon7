@@ -29,7 +29,7 @@
 int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index) {
 
 	HashTable *h;
-	zval **val;
+	zval *val;
 	int result;
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
@@ -43,24 +43,24 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 			break;
 
 		case IS_DOUBLE:
-			result = zend_hash_index_find(h, (ulong)Z_DVAL_P(index), (void**)&val);
+			result = (val = zend_hash_index_find(h, (ulong)Z_DVAL_P(index))) != NULL;
 			break;
 
 		case IS_TRUE:
-			result = zend_hash_index_find(h, 1, (void**)&val);
+			result = (val = zend_hash_index_find(h, 1)) != NULL;
 			break;
 
 		case IS_FALSE:
-			result = zend_hash_index_find(h, 0, (void**)&val);
+			result = (val = zend_hash_index_find(h, 0)) != NULL;
 			break;
 
 		case IS_LONG:
 		case IS_RESOURCE:
-			result = zend_hash_index_find(h, Z_LVAL_P(index), (void**)&val);
+			result = (val = zend_hash_index_find(h, Z_LVAL_P(index))) != NULL;
 			break;
 
 		case IS_STRING:
-			result = zend_symtable_find(h, (Z_STRLEN_P(index) ? Z_STRVAL_P(index) : ""), Z_STRLEN_P(index)+1, (void**)&val);
+			result = (val = zend_symtable_find(h, Z_STR_P(index))) != NULL;
 			break;
 
 		default:
@@ -69,14 +69,14 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 	}
 
 	if (result == SUCCESS) {
-		*fetched = *val;
+		*fetched = val;
 		return 1;
 	}
 
 	return 0;
 }
 
-int phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index) {
+int phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length) {
 
 	zval *zv;
 
@@ -855,7 +855,7 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 
 		/* Update output hash depending on key type */
 		if (p->key->len == 0) {
-			zend_hash_next_index_insert(out_hash, &entry, sizeof(zval *), NULL);
+			zend_hash_next_index_insert(out_hash, &entry);
 		} else {
 			zend_hash_update(out_hash, p->key, &entry);
 		}
@@ -867,7 +867,7 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 			entry = *((zval **)p->pData);
 			Z_ADDREF_P(entry);
 			if (p->key->len == 0) {
-				zend_hash_next_index_insert(*removed, &entry, sizeof(zval *), NULL);
+				zend_hash_next_index_insert(*removed, &entry);
 			} else {
 				zend_hash_update(*removed, p->key, &entry);
 			}
@@ -882,7 +882,7 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 		for (i = 0; i < list_count; i++) {
 			entry = *list[i];
 			Z_ADDREF_P(entry);
-			zend_hash_next_index_insert(out_hash, &entry, sizeof(zval *), NULL);
+			zend_hash_next_index_insert(out_hash, &entry);
 		}
 	}
 
@@ -891,7 +891,7 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 		entry = *((zval **)p->pData);
 		Z_ADDREF_P(entry);
 		if (p->key->len == 0) {
-			zend_hash_next_index_insert(out_hash, &entry, sizeof(zval *), NULL);
+			zend_hash_next_index_insert(out_hash, &entry);
 		} else {
 			zend_hash_update(out_hash, p->key, &entry);
 		}
@@ -930,12 +930,12 @@ void phalcon_array_keys(zval *return_value, zval *arr)
 			switch (zend_hash_get_current_key_ex(Z_ARRVAL_P(arr), &skey, &skey_len, &nkey, 1, &pos)) {
 				case HASH_KEY_IS_STRING:
 					ZVAL_STRINGL(new_val, skey, skey_len - 1);
-					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &new_val, sizeof(zval*), NULL);
+					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &new_val);
 					break;
 
 				case HASH_KEY_IS_LONG:
 					ZVAL_LONG(new_val, nkey);
-					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &new_val, sizeof(zval*), NULL);
+					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &new_val);
 					break;
 			}
 
@@ -957,7 +957,7 @@ void phalcon_array_values(zval *return_value, zval *arr)
 			zend_hash_move_forward_ex(Z_ARRVAL_P(arr), &pos)
 		) {
 			Z_ADDREF_P(*entry);
-			zend_hash_next_index_insert(Z_ARRVAL_P(return_value), entry, sizeof(zval*), NULL);
+			zend_hash_next_index_insert(Z_ARRVAL_P(return_value), entry);
 		}
 	}
 }

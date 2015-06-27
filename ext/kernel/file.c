@@ -414,7 +414,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data TS
 	php_stream_close(stream);
 
 	if (use_copy) {
-		phalcon_dtor(data);
+		phalcon_ptr_dtor(data);
 	}
 
 	if (numbytes < 0) {

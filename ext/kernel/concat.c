@@ -1890,11 +1890,11 @@ void phalcon_concat_self(zval **left, zval *right TSRMLS_DC){
 	Z_TYPE_P(*left) = IS_STRING;
 
 	if (use_copy_left) {
-		phalcon_dtor(&left_copy);
+		phalcon_dtor(left_copy);
 	}
 
 	if (use_copy_right) {
-		phalcon_dtor(&right_copy);
+		phalcon_dtor(right_copy);
 	}
 }
 
@@ -1936,7 +1936,7 @@ void phalcon_concat_self_str(zval **left, const char *right, int right_length TS
 	Z_TYPE_P(*left) = IS_STRING;
 
 	if (use_copy) {
-		phalcon_dtor(&left_copy);
+		phalcon_dtor(left_copy);
 	}
 }
 
@@ -1985,7 +1985,7 @@ void phalcon_concat_self_long(zval **left, const long right TSRMLS_DC) {
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&left_copy);
+		phalcon_dtor(left_copy);
 	}
 }
 
@@ -2022,6 +2022,6 @@ void phalcon_concat_self_char(zval **left, unsigned char right TSRMLS_DC) {
 	Z_TYPE_P(*left) = IS_STRING;
 
 	if (use_copy) {
-		phalcon_dtor(&left_copy);
+		phalcon_dtor(left_copy);
 	}
 }

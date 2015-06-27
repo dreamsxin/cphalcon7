@@ -406,9 +406,9 @@ static int phalcon_registry_serialize(zval *object, unsigned char **buffer, uint
 	php_var_serialize(&buf, &obj->properties, &var_hash TSRMLS_CC);
 	PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
-	if (buf.c) {
-		*buffer  = (unsigned char*)buf.c;
-		*buf_len = buf.len;
+	if (buf.s) {
+		*buffer  = (unsigned char*)buf.s->val;
+		*buf_len = buf.s->val->len;
 		return SUCCESS;
 	}
 
@@ -741,8 +741,8 @@ static PHP_METHOD(Phalcon_Registry, serialize)
 	php_var_serialize(&buf, &obj->properties, &var_hash TSRMLS_CC);
 	PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
-	if (buf.c) {
-		RETURN_STRINGL(buf.c, buf.len, 0);
+	if (buf.s) {
+		RETURN_NEW_STR(buf.s);
 	}
 }
 

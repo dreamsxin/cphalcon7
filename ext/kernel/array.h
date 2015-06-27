@@ -234,10 +234,9 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_bool(zval **arr, zval *index, int value, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_BOOL(zvalue, value);
+	ZVAL_BOOL(&zvalue, value);
 
 	return phalcon_array_update_zval(arr, index, zvalue, flags & PH_SEPARATE);
 }
@@ -258,10 +257,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_bool(zval **arr
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_long(zval **arr, zval *index, long value, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_LONG(zvalue, value);
+	ZVAL_LONG(&zvalue, value);
 
 	return phalcon_array_update_zval(arr, index, zvalue, flags & PH_SEPARATE);
 }
@@ -283,10 +281,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_long(zval **arr
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_string(zval **arr, zval *index, char *value, uint value_length, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_STRINGL(zvalue, value, value_length, 1);
+	ZVAL_STRINGL(&zvalue, value, value_length, 1);
 
 	return phalcon_array_update_zval(arr, index, zvalue, flags & PH_SEPARATE);
 }
@@ -359,10 +356,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string(zval **arr, c
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_bool(zval **arr, const char *index, uint index_length, int value, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_BOOL(zvalue, value);
+	ZVAL_BOOL(&zvalue, value);
 
 	return phalcon_array_update_string(arr, index, index_length, zvalue, flags & PH_SEPARATE);
 }
@@ -384,10 +380,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_bool(zval **a
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_long(zval **arr, const char *index, uint index_length, long value, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_LONG(zvalue, value);
+	ZVAL_LONG(&zvalue, value);
 
 	return phalcon_array_update_string(arr, index, index_length, zvalue, flags & PH_SEPARATE);
 }
@@ -409,10 +404,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_long(zval **a
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_double(zval **arr, const char *index, uint index_length, double value, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_DOUBLE(zvalue, value);
+	ZVAL_DOUBLE(&zvalue, value);
 
 	return phalcon_array_update_string(arr, index, index_length, zvalue, flags & PH_SEPARATE);
 }
@@ -435,10 +429,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_double(zval *
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_string(zval **arr, const char *index, uint index_length, char *value, uint value_length, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_STRINGL(zvalue, value, value_length, 1);
+	ZVAL_STRINGL(&zvalue, value, value_length, 1);
 
 	return phalcon_array_update_string(arr, index, index_length, zvalue, flags & PH_SEPARATE);
 }
@@ -478,10 +471,9 @@ int phalcon_array_update_long(zval **arr, ulong index, zval *value, int flags) P
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_long_string(zval **arr, ulong index, char *value, uint value_length, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_STRINGL(zvalue, value, value_length, 1);
+	ZVAL_STRINGL(&zvalue, value, value_length, 1);
 
 	return phalcon_array_update_long(arr, index, zvalue, flags & PH_SEPARATE);
 }
@@ -502,10 +494,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_long_string(zval **a
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_long_long(zval **arr, ulong index, long value, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_LONG(zvalue, value);
+	ZVAL_LONG(&zvalue, value);
 
 	return phalcon_array_update_long(arr, index, zvalue, flags & PH_SEPARATE);
 }
@@ -526,10 +517,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_long_long(zval **arr
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_array_update_long_bool(zval **arr, ulong index, int value, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
 
-	MAKE_STD_ZVAL(zvalue);
-	ZVAL_BOOL(zvalue, value);
+	ZVAL_BOOL(&zvalue, value);
 
 	return phalcon_array_update_long(arr, index, zvalue, flags & PH_SEPARATE);
 }

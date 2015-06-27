@@ -236,9 +236,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_update_static_property_ce(zend_cl
  */
 PHALCON_ATTR_NONNULL static inline int phalcon_update_static_property(const char *class_name, uint32_t class_length, const char *name, uint32_t name_length, zval *value TSRMLS_DC)
 {
-	zend_class_entry **ce;
-	if (zend_lookup_class(class_name, class_length, &ce TSRMLS_CC) == SUCCESS) {
-		return phalcon_update_static_property_ce(*ce, name, name_length, value TSRMLS_CC);
+	zend_class_entry *ce;
+	if ((ce = zend_lookup_class(zend_string_init(class_name, class_length, 0))) != NULL) {
+		return phalcon_update_static_property_ce(ce, name, name_length, value TSRMLS_CC);
 	}
 
 	return FAILURE;
@@ -252,10 +252,6 @@ int phalcon_create_instance_params(zval *return_value, const zval *class_name, z
 
 /** Create closures */
 int phalcon_create_closure_ex(zval *return_value, zval *this_ptr, zend_class_entry *ce, const char *method_name, uint32_t method_length TSRMLS_DC);
-
-#if PHP_VERSION_ID < 50400
-void object_properties_init(zend_object *object, zend_class_entry *class_type);
-#endif
 
 /** Checks if property access on object */
 int phalcon_check_property_access_quick(zval *object, const char *property_name, uint32_t property_length, ulong hash, int access TSRMLS_DC) PHALCON_ATTR_NONNULL;

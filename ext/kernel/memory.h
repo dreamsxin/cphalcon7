@@ -105,7 +105,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 /* Memory macros */
 #define PHALCON_ALLOC_GHOST_ZVAL(z)                   \
 	do {                                              \
-		MAKE_STD_ZVAL(z);                             \
+		ALLOC_ZVAL(z);                                \
 		Z_SET_REFCOUNT_P(z, 0);                       \
 	} while (0)
 		

@@ -251,41 +251,6 @@ int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *p
 	return status;
 }
 
-/**
- * Latest version of zend_throw_exception_internal
- */
-static void phalcon_throw_exception_internal(zval *exception)
-{
-	if (exception != NULL) {
-		zend_object *previous = EG(exception);
-		zend_exception_set_previous(Z_OBJ_P(exception), EG(exception));
-		EG(exception) = Z_OBJ_P(exception);
-		if (previous) {
-			return;
-		}
-	}
-
-	if (!EG(current_execute_data)) {
-		if (EG(exception)) {
-			zend_exception_error(EG(exception), E_ERROR);
-		}
-		zend_error(E_ERROR, "Exception thrown without a stack frame");
-	}
-
-	if (zend_throw_exception_hook) {
-		zend_throw_exception_hook(exception);
-	}
-
-	if (EG(current_execute_data)->opline == NULL ||
-		(EG(current_execute_data)->opline + 1)->opcode == ZEND_HANDLE_EXCEPTION) {
-		/* no need to rethrow the exception */
-		return;
-	}
-
-	EG(opline_before_exception) = EG(current_execute_data)->opline;
-	EG(current_execute_data)->opline = EG(exception_op);
-}
-
 void phalcon_eval_php(zval *str, zval *retval_ptr, char *context TSRMLS_DC)
 {
     zend_eval_string_ex(Z_STRVAL_P(str), retval_ptr, context, 1 TSRMLS_CC);

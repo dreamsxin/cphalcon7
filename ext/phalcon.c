@@ -607,7 +607,7 @@ static const zend_module_dep phalcon_deps[] = {
 
 zend_module_entry phalcon_module_entry = {
 	STANDARD_MODULE_HEADER_EX,
-	ini_entries,
+	NULL,
 	phalcon_deps,
 	PHP_PHALCON_EXTNAME,
 	NULL,

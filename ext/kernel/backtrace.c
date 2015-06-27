@@ -39,9 +39,7 @@ void phalcon_print_backtrace(void)
 	int stack_size       = backtrace(backtrace_buf, sizeof(backtrace_buf) / sizeof(void*));
 	char **stack_symbols = backtrace_symbols(backtrace_buf, stack_size);
 	char buf[50];
-	smart_str s;
-
-	s.c = NULL;
+	smart_str s = {0};
 
 	for (i = 0; i < stack_size; ++i) {
 		snprintf(buf, sizeof(buf), "#%d  %p [", i, backtrace_buf[i]);
@@ -52,7 +50,7 @@ void phalcon_print_backtrace(void)
 
 	smart_str_0(&s);
 
-	fprintf(stderr, "%s\n", s.c);
+	fprintf(stderr, "%s\n", s.s->val);
 	smart_str_free(&s);
 }
 

@@ -139,7 +139,7 @@ long int phalcon_fast_count_int(zval *value TSRMLS_DC) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				result = Z_LVAL(retval);
-				phalcon_dtor(&retval);
+				phalcon_dtor(retval);
 			}
 
 			return result;
@@ -221,7 +221,7 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				count = Z_LVAL(retval);
-				phalcon_dtor(&retval);
+				phalcon_dtor(retval);
 				return (int) count > 0;
 			}
 			return 0;

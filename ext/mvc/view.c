@@ -901,7 +901,7 @@ PHP_METHOD(Phalcon_Mvc_View, getNamespaceName){
 PHP_METHOD(Phalcon_Mvc_View, start){
 
 	phalcon_update_property_null(this_ptr, SL("_content"));
-	phalcon_ob_start(TSRMLS_C);
+	phalcon_ob_start();
 	RETURN_THISW();
 }
 
@@ -1144,7 +1144,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		/** 
 		 * We start the cache using the key set
 		 */
-		phalcon_ob_clean(TSRMLS_C);
+		phalcon_ob_clean();
 		PHALCON_CALL_METHOD(&cached_view, cache, "start", key, lifetime);
 		if (Z_TYPE_P(cached_view) != IS_NULL) {
 			phalcon_update_property_this(this_ptr, SL("_content"), cached_view);
@@ -1162,7 +1162,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		/** 
 		 * We start the cache using the key set
 		 */
-		phalcon_ob_clean(TSRMLS_C);
+		phalcon_ob_clean();
 		PHALCON_CALL_METHOD(&cached_view, cache, "start", key, lifetime);
 		if (Z_TYPE_P(cached_view) != IS_NULL) {
 			phalcon_update_property_this(this_ptr, SL("_content"), cached_view);
@@ -1595,7 +1595,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/** 
 	 * Create a virtual symbol table
 	 */
-	phalcon_create_symbol_table(TSRMLS_C);
+	phalcon_create_symbol_table();
 
 	/** 
 	 * Call beforeRender if there is an events manager
@@ -1891,7 +1891,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 		/** 
 		 * Create a virtual symbol table
 		 */
-		phalcon_create_symbol_table(TSRMLS_C);
+		phalcon_create_symbol_table();
 
 	}
 
@@ -1930,7 +1930,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 
 	if (!PHALCON_IS_TRUE(autorender)) {
 		phalcon_ob_get_contents(return_value);
-		phalcon_ob_clean(TSRMLS_C);
+		phalcon_ob_clean();
 	}
 
 	PHALCON_MM_RESTORE();
@@ -2013,7 +2013,7 @@ PHP_METHOD(Phalcon_Mvc_View, getRender){
 	/** 
 	 * Stop the output buffering
 	 */
-	phalcon_ob_end_clean(TSRMLS_C);
+	phalcon_ob_end_clean();
 
 	/** 
 	 * Get the processed content
@@ -2030,7 +2030,7 @@ PHP_METHOD(Phalcon_Mvc_View, getRender){
  */
 PHP_METHOD(Phalcon_Mvc_View, finish){
 
-	phalcon_ob_end_clean(TSRMLS_C);
+	phalcon_ob_end_clean();
 	RETURN_THISW();
 }
 

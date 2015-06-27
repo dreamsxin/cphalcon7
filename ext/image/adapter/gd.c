@@ -1329,7 +1329,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 	
 	image = phalcon_fetch_nproperty_this(this_ptr, SL("_image"), PH_NOISY);
 
-	phalcon_ob_start(TSRMLS_C);
+	phalcon_ob_start();
 
 	if (Z_TYPE_P(q) == IS_LONG) {
 		PHALCON_CALL_FUNCTION(&ret, func_name, image, file, q);
@@ -1338,7 +1338,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 	}
 
 	phalcon_ob_get_contents(return_value);
-	phalcon_ob_end_clean(TSRMLS_C);
+	phalcon_ob_end_clean();
 
 	if (zend_is_true(ret)) {
 		phalcon_update_property_this(this_ptr, SL("_type"), type);

@@ -109,7 +109,7 @@ void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr)
 	phalcon_globals_ptr->initialized = 1;
 }
 
-void phalcon_deinitialize_memory(TSRMLS_D)
+void phalcon_deinitialize_memory()
 {
 	size_t i;
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
@@ -120,10 +120,10 @@ void phalcon_deinitialize_memory(TSRMLS_D)
 	}
 
 	if (phalcon_globals_ptr->start_memory != NULL) {
-		phalcon_clean_restore_stack(TSRMLS_C);
+		phalcon_clean_restore_stack();
 	}
 
-	phalcon_orm_destroy_cache(TSRMLS_C);
+	phalcon_orm_destroy_cache();
 
 #ifndef PHALCON_RELEASE
 	assert(phalcon_globals_ptr->start_memory != NULL);
@@ -352,7 +352,7 @@ void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory)
 	fprintf(stderr, "End of the dump of the memory frame %p\n", active_memory);
 }
 
-void phalcon_dump_current_frame(TSRMLS_D)
+void phalcon_dump_current_frame()
 {
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 
@@ -365,7 +365,7 @@ void phalcon_dump_current_frame(TSRMLS_D)
 	phalcon_dump_memory_frame(phalcon_globals_ptr->active_memory);
 }
 
-void phalcon_dump_all_frames(TSRMLS_D)
+void phalcon_dump_all_frames()
 {
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 	phalcon_memory_entry *active_memory       = phalcon_globals_ptr->active_memory;
@@ -422,7 +422,7 @@ void ZEND_FASTCALL phalcon_memory_grow_stack(const char *func)
 /**
  * Adds a memory frame in the current executed method
  */
-void ZEND_FASTCALL ZEND_FASTCALL phalcon_memory_grow_stack(TSRMLS_D)
+void ZEND_FASTCALL ZEND_FASTCALL phalcon_memory_grow_stack()
 {
 	zend_phalcon_globals *g = PHALCON_VGLOBAL;
 	if (g->start_memory == NULL) {
@@ -434,7 +434,7 @@ void ZEND_FASTCALL ZEND_FASTCALL phalcon_memory_grow_stack(TSRMLS_D)
 /**
  * Finishes the current memory stack by releasing allocated memory
  */
-int ZEND_FASTCALL phalcon_memory_restore_stack(TSRMLS_D)
+int ZEND_FASTCALL phalcon_memory_restore_stack()
 {
 	phalcon_memory_restore_stack_common(PHALCON_VGLOBAL);
 	return SUCCESS;
@@ -648,7 +648,7 @@ void phalcon_memory_remove(zval **var) {
 /**
  * Cleans the phalcon memory stack recursivery
  */
-int ZEND_FASTCALL phalcon_clean_restore_stack(TSRMLS_D) {
+int ZEND_FASTCALL phalcon_clean_restore_stack() {
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 
@@ -673,7 +673,7 @@ void ZEND_FASTCALL phalcon_copy_ctor(zval *destination, zval *origin) {
 /**
  * Creates virtual symbol tables dynamically
  */
-void phalcon_create_symbol_table(TSRMLS_D) {
+void phalcon_create_symbol_table() {
 
 	phalcon_symbol_table *entry;
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
@@ -701,7 +701,7 @@ void phalcon_create_symbol_table(TSRMLS_D) {
 /**
  * Restores all the virtual symbol tables
  */
-void phalcon_clean_symbol_tables(TSRMLS_D) {
+void phalcon_clean_symbol_tables() {
 
 	/*unsigned int i;
 
@@ -720,13 +720,13 @@ void phalcon_clean_symbol_tables(TSRMLS_D) {
 int phalcon_set_symbol(zval *key_name, zval *value) {
 
 	if (!EG(active_symbol_table)) {
-		zend_rebuild_symbol_table(TSRMLS_C);
+		zend_rebuild_symbol_table();
 	}
 
 	if (EG(active_symbol_table)) {
 		if (Z_TYPE_P(key_name) == IS_STRING) {
 			Z_ADDREF_P(value);
-			zend_hash_update(EG(active_symbol_table), Z_STRVAL_P(key_name), Z_STRLEN_P(key_name) + 1, &value, sizeof(zval *), NULL);
+			zend_hash_update(EG(active_symbol_table), Z_STR_P(key_name), &value);
 			if (EG(exception)) {
 				return FAILURE;
 			}
@@ -742,12 +742,12 @@ int phalcon_set_symbol(zval *key_name, zval *value) {
 int phalcon_set_symbol_str(char *key_name, unsigned int key_length, zval *value) {
 
 	if (!EG(active_symbol_table)) {
-		zend_rebuild_symbol_table(TSRMLS_C);
+		zend_rebuild_symbol_table();
 	}
 
 	if (&EG(symbol_table)) {
 		Z_ADDREF_P(value);
-		zend_hash_update(&EG(symbol_table), key_name, key_length, &value, sizeof(zval *), NULL);
+		zend_hash_str_update(&EG(symbol_table), key_name, key_length, &value);
 		if (EG(exception)) {
 			return FAILURE;
 		}

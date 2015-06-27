@@ -490,14 +490,14 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 	efree(palette);
 	fseek (fp, 0, SEEK_SET);
 
-	phalcon_ob_start(TSRMLS_C);
+	phalcon_ob_start();
 
 	while ((b = fread (buf, 1, sizeof(buf), fp)) > 0) {
 		php_write(buf, b);
 	}
 
 	phalcon_ob_get_contents(return_value);
-	phalcon_ob_end_clean(TSRMLS_C);
+	phalcon_ob_end_clean();
 
 	fclose (fp);
 	VCWD_UNLINK((const char *)path);

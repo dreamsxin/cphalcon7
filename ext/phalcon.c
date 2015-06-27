@@ -458,7 +458,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 
 static PHP_MSHUTDOWN_FUNCTION(phalcon){
 
-	phalcon_deinitialize_memory(TSRMLS_C);
+	phalcon_deinitialize_memory();
 
 	assert(PHALCON_GLOBAL(orm).ast_cache == NULL);
 
@@ -472,7 +472,7 @@ static PHP_RINIT_FUNCTION(phalcon){
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 
 	php_phalcon_init_globals(phalcon_globals_ptr);
-	phalcon_init_interned_strings(TSRMLS_C);
+	phalcon_init_interned_strings();
 
 	phalcon_initialize_memory(phalcon_globals_ptr);
 
@@ -480,7 +480,7 @@ static PHP_RINIT_FUNCTION(phalcon){
 }
 
 static PHP_RSHUTDOWN_FUNCTION(phalcon){
-	phalcon_deinitialize_memory(TSRMLS_C);
+	phalcon_deinitialize_memory();
 	return SUCCESS;
 }
 
@@ -502,7 +502,7 @@ static PHP_GINIT_FUNCTION(phalcon)
 
 static PHP_GSHUTDOWN_FUNCTION(phalcon)
 {
-	phalcon_deinitialize_memory(TSRMLS_C);
+	phalcon_deinitialize_memory();
 }
 
 /*

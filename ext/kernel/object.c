@@ -246,7 +246,7 @@ void phalcon_get_class_ns(zval *result, const zval *object, int lower) {
 		Z_STRVAL_P(result)[Z_STRLEN_P(result)] = 0;
 		Z_TYPE_P(result) = IS_STRING;
 	} else {
-		ZVAL_STRINGL(result, class_name, class_length, 1);
+		ZVAL_STRINGL(result, class_name, class_length);
 	}
 
 	if (lower) {
@@ -448,7 +448,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 
 			/* Do not display old-style inherited constructors */
 			if (zend_hash_get_current_key_ex(&ce->function_table, &key, &key_len, &num_index, 0, &pos) != HASH_KEY_IS_STRING) {
-				ZVAL_STRINGL(&method_name, mptr->common.function_name, len);
+				ZVAL_NEW_STR(&method_name, mptr->common.function_name);
 				zend_hash_next_index_insert(return_value->value.ht, &method_name, sizeof(zval *), NULL);
 			} else if ((mptr->common.fn_flags & ZEND_ACC_CTOR) == 0 ||
 			    mptr->common.scope == ce ||
@@ -461,7 +461,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 					ZVAL_STRINGL(&method_name, (char*)zend_find_alias_name(mptr->common.scope, key, key_len - 1), key_len - 1);
 					zend_hash_next_index_insert(return_value->value.ht, &method_name, sizeof(zval *), NULL);
 				} else {
-					ZVAL_STRINGL(&method_name, mptr->common.function_name, len);
+					ZVAL_NEW_STR(&method_name, mptr->common.function_name);
 					zend_hash_next_index_insert(return_value->value.ht, &method_name, sizeof(zval *), NULL);
 				}
 			}
@@ -483,15 +483,15 @@ zend_class_entry *phalcon_fetch_class(const zval *class_name) {
 	return zend_fetch_class(SSL("stdclass"), ZEND_FETCH_CLASS_DEFAULT);
 }
 
-zend_class_entry* phalcon_fetch_self_class(TSRMLS_D) {
+zend_class_entry* phalcon_fetch_self_class() {
 	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_SELF);
 }
 
-zend_class_entry* phalcon_fetch_parent_class(TSRMLS_D) {
+zend_class_entry* phalcon_fetch_parent_class() {
 	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_PARENT);
 }
 
-zend_class_entry* phalcon_fetch_static_class(TSRMLS_D) {
+zend_class_entry* phalcon_fetch_static_class() {
 	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_STATIC);
 }
 
@@ -730,14 +730,14 @@ int phalcon_read_property(zval **result, zval *object, const char *property_name
 	}
 
 	PHALCON_ALLOC_GHOST_ZVAL(property);
-	ZVAL_STRINGL(property, property_name, property_length, 0);
+	ZVAL_STRINGL(property, property_name, property_length);
 
 	*result = Z_OBJ_HT_P(object)->read_property(object, property, silent ? BP_VAR_IS : BP_VAR_R, 0);
 
 	Z_ADDREF_P(*result);
 
 	if (Z_REFCOUNT_P(property) > 1) {
-		ZVAL_STRINGL(property, property_name, property_length, 1);
+		ZVAL_STRINGL(property, property_name, property_length);
 	} else {
 		ZVAL_NULL(property);
 	}
@@ -848,7 +848,7 @@ int phalcon_update_property_string(zval *object, const char *property_name, uint
 	zval *value;
 
 	PHALCON_INIT_ZVAL_NREF(value);
-	ZVAL_STRINGL(value, str, str_length, 1);
+	ZVAL_STRINGL(value, str, str_length);
 
 	return phalcon_update_property_zval(object, property_name, property_length, value);
 }
@@ -959,7 +959,7 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 						} else {
 							efree(value);
 						}
-						phalcon_dtor(&garbage);
+						phalcon_dtor(garbage);
 
 					} else {
 						zval *garbage = *variable_ptr;
@@ -1176,7 +1176,7 @@ int phalcon_update_property_array_string(zval *object, const char *property, uin
 
 		Z_ADDREF_P(value);
 
-		zend_hash_update(Z_ARRVAL_P(tmp), index, index_length, &value, sizeof(zval *), NULL);
+		zend_hash_str_update(Z_ARRVAL_P(tmp), index, index_length, &value);
 
 		if (separated) {
 			phalcon_update_property_zval(object, property, property_length, tmp);

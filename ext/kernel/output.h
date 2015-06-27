@@ -22,12 +22,12 @@
 
 #include "php_phalcon.h"
 
-void phalcon_ob_start(TSRMLS_D);
+void phalcon_ob_start();
 void phalcon_ob_get_contents(zval *result);
-int phalcon_ob_end_flush(TSRMLS_D);
-int phalcon_ob_end_clean(TSRMLS_D);
-int phalcon_ob_flush(TSRMLS_D);
-int phalcon_ob_clean(TSRMLS_D);
-int phalcon_ob_get_level(TSRMLS_D);
+int phalcon_ob_end_flush();
+int phalcon_ob_end_clean();
+int phalcon_ob_flush();
+int phalcon_ob_clean();
+int phalcon_ob_get_level();
 
 #endif /* PHALCON_KERNEL_OUTPUT_H */

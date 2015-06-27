@@ -587,9 +587,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 	/** 
 	 * Create a virtual symbol table
 	 */
-	phalcon_create_symbol_table(TSRMLS_C);
+	phalcon_create_symbol_table();
 
-	phalcon_ob_start(TSRMLS_C);
+	phalcon_ob_start();
 
 	PHALCON_OBS_VAR(view_params);
 	phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY);
@@ -630,7 +630,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 		}
 	}
 
-	phalcon_ob_end_clean(TSRMLS_C);
+	phalcon_ob_end_clean();
 
 	PHALCON_OBS_NVAR(content);
 	phalcon_read_property_this(&content, this_ptr, SL("_content"), PH_NOISY);
@@ -669,7 +669,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 	/** 
 	 * Start ouput buffering
 	 */
-	phalcon_ob_start(TSRMLS_C);
+	phalcon_ob_start();
 
 	/** 
 	 * If the developer pass an array of variables we create a new virtual symbol table
@@ -692,7 +692,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 		/** 
 		 * Create a virtual symbol table
 		 */
-		phalcon_create_symbol_table(TSRMLS_C);
+		phalcon_create_symbol_table();
 
 	} else {
 		PHALCON_CPY_WRT(merged_params, params);
@@ -713,7 +713,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 		phalcon_update_property_this(this_ptr, SL("_viewParams"), view_params);
 	}
 
-	phalcon_ob_end_clean(TSRMLS_C);
+	phalcon_ob_end_clean();
 
 	content = phalcon_fetch_nproperty_this(this_ptr, SL("_content"), PH_NOISY);
 

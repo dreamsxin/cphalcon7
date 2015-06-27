@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	smart_str_0(&exp);
 	
 	PHALCON_INIT_VAR(php_export);
-	ZVAL_STRINGL(php_export, exp.c, exp.len, 0);
+	ZVAL_STRINGL(php_export, exp.c, exp.len);
 	
 	PHALCON_INIT_VAR(status);
 	phalcon_file_put_contents(status, path, php_export);

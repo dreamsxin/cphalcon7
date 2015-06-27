@@ -507,7 +507,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	initialized = phalcon_fetch_nproperty_this(this_ptr, SL("_initialized"), PH_NOISY);
 
 	PHALCON_INIT_VAR(lowercased);
-	ZVAL_STRINGL(lowercased, zend_str_tolower_dup(Z_STRVAL_P(*model_name), Z_STRLEN_P(*model_name)), Z_STRLEN_P(*model_name), 0);
+	ZVAL_STRINGL(lowercased, zend_str_tolower_dup(Z_STRVAL_P(*model_name), Z_STRLEN_P(*model_name)), Z_STRLEN_P(*model_name));
 
 	/** 
 	 * Check if a model with the same is already loaded
@@ -3118,5 +3118,5 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getNamespaceAliases){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, __destruct){
 
-	phalcon_orm_destroy_cache(TSRMLS_C);
+	phalcon_orm_destroy_cache();
 }

@@ -138,7 +138,7 @@ static int phalcon_di_call_method_internal(zval *return_value, zval **return_val
 			zval *params[2];
 
 			PHALCON_ALLOC_GHOST_ZVAL(svc);
-			ZVAL_STRINGL(svc, service, method_len - 3, 0);
+			ZVAL_STRINGL(svc, service, method_len - 3);
 
 			params[0] = svc;
 			params[1] = param;
@@ -260,7 +260,7 @@ static zval* phalcon_di_read_dimension(zval *object, zval *offset, int type, zva
 	ret = phalcon_di_read_dimension_internal(object, obj, offset, PHALCON_GLOBAL(z_null));
 
 	if (UNEXPECTED(offset == &tmp)) {
-		phalcon_dtor(&tmp);
+		phalcon_dtor(tmp);
 	}
 
 	return ret;
@@ -309,7 +309,7 @@ static zval* phalcon_di_write_dimension_internal(phalcon_di_object *obj, zval *o
 		return NULL;
 	}
 
-	zend_hash_update(obj->services, Z_STRVAL_P(offset), Z_STRLEN_P(offset)+1, &retval, sizeof(zval*), NULL);
+	zend_hash_update(obj->services, Z_STR_P(offset), &retval);
 	return retval;
 }
 
@@ -332,7 +332,7 @@ static void phalcon_di_write_dimension(zval *object, zval *offset, zval *value)
 	phalcon_di_write_dimension_internal(obj, offset, value);
 
 	if (UNEXPECTED(offset == &tmp)) {
-		phalcon_dtor(&tmp);
+		phalcon_dtor(tmp);
 	}
 }
 
@@ -361,7 +361,7 @@ static void phalcon_di_unset_dimension(zval *object, zval *offset)
 	phalcon_di_unset_dimension_internal(obj, offset);
 
 	if (UNEXPECTED(offset == &tmp)) {
-		phalcon_dtor(&tmp);
+		phalcon_dtor(tmp);
 	}
 }
 
@@ -448,7 +448,7 @@ void phalcon_di_set_service(zval *this_ptr, zval *name, zval *service, int flags
 	}
 
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(this_ptr, phalcon_di_object);
-	zend_hash_update(obj->services, Z_STRVAL_P(name), Z_STRLEN_P(name)+1, &service, sizeof(zval*), NULL);
+	zend_hash_update(obj->services, Z_STR_P(name), &service);
 }
 
 void phalcon_di_set_services(zval *this_ptr, zval *services)

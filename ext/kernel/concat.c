@@ -67,7 +67,7 @@ void phalcon_concat_sv(zval **result, const char *op1, uint32_t op1_len, zval *o
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -115,7 +115,7 @@ void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -175,7 +175,7 @@ void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval 
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -236,7 +236,7 @@ void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -309,7 +309,7 @@ void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zva
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -383,7 +383,7 @@ void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zv
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -471,7 +471,7 @@ void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, 
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -543,7 +543,7 @@ void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -602,7 +602,7 @@ void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -662,7 +662,7 @@ void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval 
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -709,7 +709,7 @@ void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_l
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -768,7 +768,7 @@ void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -828,7 +828,7 @@ void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -900,7 +900,7 @@ void phalcon_concat_vsvsv(zval **result, zval *op1, const char *op2, uint32_t op
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -973,7 +973,7 @@ void phalcon_concat_vsvsvs(zval **result, zval *op1, const char *op2, uint32_t o
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1058,7 +1058,7 @@ void phalcon_concat_vsvsvsv(zval **result, zval *op1, const char *op2, uint32_t 
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1129,7 +1129,7 @@ void phalcon_concat_vsvv(zval **result, zval *op1, const char *op2, uint32_t op2
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1212,7 +1212,7 @@ void phalcon_concat_vsvvv(zval **result, zval *op1, const char *op2, uint32_t op
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1270,7 +1270,7 @@ void phalcon_concat_vv(zval **result, zval *op1, zval *op2, int self_var){
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1329,7 +1329,7 @@ void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, ui
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1400,7 +1400,7 @@ void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, u
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1470,7 +1470,7 @@ void phalcon_concat_vvv(zval **result, zval *op1, zval *op2, zval *op3, int self
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1553,7 +1553,7 @@ void phalcon_concat_vvvsv(zval **result, zval *op1, zval *op2, zval *op3, const 
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1635,7 +1635,7 @@ void phalcon_concat_vvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *o
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1742,7 +1742,7 @@ void phalcon_concat_vvvvsvv(zval **result, zval *op1, zval *op2, zval *op3, zval
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1836,7 +1836,7 @@ void phalcon_concat_vvvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *
 	}
 
 	if (use_copy) {
-		phalcon_dtor(&result_copy);
+		phalcon_dtor(result_copy);
 	}
 
 }
@@ -1866,7 +1866,7 @@ void phalcon_concat_self(zval **left, zval *right){
 		Z_TYPE_P(*left) = IS_STRING;
 
 		if (use_copy_right) {
-			phalcon_dtor(&right_copy);
+			phalcon_dtor(right_copy);
 		}
 
 		return;

@@ -700,7 +700,7 @@ PHP_METHOD(Phalcon_Debug, getFileLink) {
 		tmp  = php_str_to_str_ex(Z_STRVAL_P(*format), Z_STRLEN_P(*format), SL("%f"), Z_STRVAL_P(*file), Z_STRLEN_P(*file), &tmp_len, 1, NULL);
 		link = php_str_to_str_ex(tmp, tmp_len, SL("%l"), Z_STRVAL_P(*line), Z_STRLEN_P(*line), &link_len, 1, NULL);
 
-		ZVAL_STRINGL(&z_link, link, link_len, 0);
+		ZVAL_STRINGL(&z_link, link, link_len);
 
 		efree(tmp);
 		PHALCON_CONCAT_SVSVS(return_value, "<a href=\"", &z_link, "\">", *file, "</a>");
@@ -1071,13 +1071,13 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(0, 1, 1, 0, &exception);
-	PHALCON_VERIFY_CLASS_EX(exception, zend_exception_get_default(TSRMLS_C), phalcon_exception_ce, 1);
+	PHALCON_VERIFY_CLASS_EX(exception, zend_exception_get_default(), phalcon_exception_ce, 1);
 
 	/** 
 	 * Cancel the output buffer if active
 	 */
-	if (phalcon_ob_get_level(TSRMLS_C) > 0) {
-		phalcon_ob_end_clean(TSRMLS_C);
+	if (phalcon_ob_get_level() > 0) {
+		phalcon_ob_end_clean();
 	}
 
 	is_active = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_isActive"));
@@ -1352,7 +1352,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 		if (
 			phalcon_array_isset_string_fetch(&e, context, SS("e")) && 
 			Z_TYPE_P(e) == IS_OBJECT && 
-			instanceof_function_ex(Z_OBJCE_P(e), zend_exception_get_default(TSRMLS_C), 1)
+			instanceof_function_ex(Z_OBJCE_P(e), zend_exception_get_default(), 1)
 		) {
 			PHALCON_CPY_WRT(previous, e);
 		} else {
@@ -1362,7 +1362,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 		previous = PHALCON_GLOBAL(z_null);
 	}
 
-	default_exception_ce = zend_get_error_exception(TSRMLS_C);
+	default_exception_ce = zend_get_error_exception();
 
 	ALLOC_INIT_ZVAL(exception);
 	object_init_ex(exception, default_exception_ce);
@@ -1395,7 +1395,7 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
 		phalcon_array_isset_string_fetch(&line, error, SS("line"))
 		
 	) {
-		default_exception_ce = zend_get_error_exception(TSRMLS_C);
+		default_exception_ce = zend_get_error_exception();
 
 		ALLOC_INIT_ZVAL(exception);
 		object_init_ex(exception, default_exception_ce);

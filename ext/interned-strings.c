@@ -119,7 +119,7 @@ const char *phalcon_interned_assets					= NULL;
 const char *phalcon_interned_rows					= NULL;
 const char *phalcon_interned_view					= NULL;
 
-PHALCON_STATIC void phalcon_init_interned_strings(TSRMLS_D)
+PHALCON_STATIC void phalcon_init_interned_strings()
 {
 	phalcon_interned_DELETE						= zend_new_interned_string(ZEND_STRS("DELETE"), 0);
 	phalcon_interned_GET						= zend_new_interned_string(ZEND_STRS("GET"), 0);

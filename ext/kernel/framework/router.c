@@ -135,7 +135,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 	}
 
 	if (!zend_hash_num_elements(Z_ARRVAL_P(paths))) {
-		ZVAL_STRINGL(return_value, Z_STRVAL_P(pattern)+i, Z_STRLEN_P(pattern)-i, 1);
+		ZVAL_STRINGL(return_value, Z_STRVAL_P(pattern)+i, Z_STRLEN_P(pattern)-i);
 		return;
 	}
 
@@ -373,13 +373,13 @@ void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches){
 											} else {
 												smart_str_appendl(&route_str, regexp, regexp_length);
 											}
-											zend_hash_update(Z_ARRVAL_P(matches), variable, variable_length + 1, &tmp, sizeof(zval *), NULL);
+											zend_hash_str_update(Z_ARRVAL_P(matches), variable, variable_length + 1, &tmp);
 										}
 										efree(regexp);
 										efree(variable);
 									} else {
 										smart_str_appendl(&route_str, "([^/]*)", strlen("([^/]*)"));
-										zend_hash_update(Z_ARRVAL_P(matches), item, length + 1, &tmp, sizeof(zval *), NULL);
+										zend_hash_str_update(Z_ARRVAL_P(matches), item, length + 1, &tmp);
 									}
 								}
 							} else {

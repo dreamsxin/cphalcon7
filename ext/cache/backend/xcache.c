@@ -537,7 +537,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
 
 			PHALCON_INIT_NVAR(real_key);
-			ZVAL_STRINGL(real_key, Z_STRVAL(key), Z_STRLEN(key), 1);
+			ZVAL_NEW_STR(real_key, Z_STR(key));
 	
 			PHALCON_CALL_FUNCTION(NULL, "xcache_unset", real_key);
 		}

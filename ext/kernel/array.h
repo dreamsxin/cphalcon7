@@ -193,7 +193,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_append_string(zval **arr, c
 	zval *zvalue;
 
 	PHALCON_ALLOC_GHOST_ZVAL(zvalue);
-	ZVAL_STRINGL(zvalue, value, value_length, 1);
+	ZVAL_STRINGL(zvalue, value, value_length);
 
 	return phalcon_array_append(arr, zvalue, separate);
 }
@@ -238,7 +238,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_bool(zval **arr
 
 	ZVAL_BOOL(&zvalue, value);
 
-	return phalcon_array_update_zval(arr, index, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_zval(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -261,7 +261,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_long(zval **arr
 
 	ZVAL_LONG(&zvalue, value);
 
-	return phalcon_array_update_zval(arr, index, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_zval(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -283,9 +283,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_string(zval **a
 {
 	zval zvalue;
 
-	ZVAL_STRINGL(&zvalue, value, value_length, 1);
+	ZVAL_STRINGL(&zvalue, value, value_length);
 
-	return phalcon_array_update_zval(arr, index, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_zval(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -360,7 +360,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_bool(zval **a
 
 	ZVAL_BOOL(&zvalue, value);
 
-	return phalcon_array_update_string(arr, index, index_length, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_string(arr, index, index_length, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -384,7 +384,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_long(zval **a
 
 	ZVAL_LONG(&zvalue, value);
 
-	return phalcon_array_update_string(arr, index, index_length, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_string(arr, index, index_length, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -408,7 +408,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_double(zval *
 
 	ZVAL_DOUBLE(&zvalue, value);
 
-	return phalcon_array_update_string(arr, index, index_length, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_string(arr, index, index_length, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -431,9 +431,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_string(zval *
 {
 	zval zvalue;
 
-	ZVAL_STRINGL(&zvalue, value, value_length, 1);
+	ZVAL_STRINGL(&zvalue, value, value_length);
 
-	return phalcon_array_update_string(arr, index, index_length, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_string(arr, index, index_length, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -473,9 +473,9 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_long_string(zval **a
 {
 	zval zvalue;
 
-	ZVAL_STRINGL(&zvalue, value, value_length, 1);
+	ZVAL_STRINGL(&zvalue, value, value_length);
 
-	return phalcon_array_update_long(arr, index, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_long(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -498,7 +498,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_long_long(zval **arr
 
 	ZVAL_LONG(&zvalue, value);
 
-	return phalcon_array_update_long(arr, index, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_long(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
 /**
@@ -521,7 +521,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_long_bool(zval **arr
 
 	ZVAL_BOOL(&zvalue, value);
 
-	return phalcon_array_update_long(arr, index, zvalue, flags & PH_SEPARATE);
+	return phalcon_array_update_long(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
 /**

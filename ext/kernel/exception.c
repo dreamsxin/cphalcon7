@@ -88,7 +88,7 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
 	object_init_ex(object, ce);
 
 	ALLOC_INIT_ZVAL(msg);
-	ZVAL_STRINGL(msg, message, message_len, 1);
+	ZVAL_STRINGL(msg, message, message_len);
 
 	PHALCON_CALL_METHODW(NULL, object, "__construct", NULL, msg);
 
@@ -157,7 +157,7 @@ void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ..
 	va_end(args);
 
 	ALLOC_INIT_ZVAL(msg);
-	ZVAL_STRINGL(msg, buffer, len, 0);
+	ZVAL_STRINGL(msg, buffer, len);
 
 	PHALCON_CALL_METHODW(NULL, object, "__construct", NULL, msg);
 

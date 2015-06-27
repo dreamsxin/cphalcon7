@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Http_Cookie, __construct){
 	else {
 		zval *path;
 		PHALCON_ALLOC_GHOST_ZVAL(path);
-		ZVAL_STRINGL(path, "/", 1, 1);
+		ZVAL_STRINGL(path, "/", 1);
 		phalcon_update_property_this(this_ptr, SL("_path"), path);
 	}
 

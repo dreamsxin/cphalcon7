@@ -1044,7 +1044,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 	RETURN_MM_FALSE;
 }
 
-static const char* phalcon_http_request_getmethod_helper(TSRMLS_D)
+static const char* phalcon_http_request_getmethod_helper()
 {
 	zval **value;
 	const char *method = SG(request_info).request_method;
@@ -1075,7 +1075,7 @@ static const char* phalcon_http_request_getmethod_helper(TSRMLS_D)
  */
 PHP_METHOD(Phalcon_Http_Request, getMethod){
 
-	const char *method = phalcon_http_request_getmethod_helper(TSRMLS_C);
+	const char *method = phalcon_http_request_getmethod_helper();
 	if (method) {
 		RETURN_STRING(method, !IS_INTERNED(method));
 	}
@@ -1171,7 +1171,7 @@ PHP_METHOD(Phalcon_Http_Request, isPost){
 	zval *post, *method = NULL;
 
 	if (Z_OBJCE_P(getThis()) == phalcon_http_request_ce) {
-		const char *method = phalcon_http_request_getmethod_helper(TSRMLS_C);
+		const char *method = phalcon_http_request_getmethod_helper();
 		RETURN_BOOL(!strcmp(method, "POST"));
 	}
 
@@ -1196,7 +1196,7 @@ PHP_METHOD(Phalcon_Http_Request, isGet){
 	zval *get, *method = NULL;
 
 	if (Z_OBJCE_P(getThis()) == phalcon_http_request_ce) {
-		const char *method = phalcon_http_request_getmethod_helper(TSRMLS_C);
+		const char *method = phalcon_http_request_getmethod_helper();
 		RETURN_BOOL(!strcmp(method, "GET"));
 	}
 
@@ -1221,7 +1221,7 @@ PHP_METHOD(Phalcon_Http_Request, isPut){
 	zval *put, *method = NULL;
 
 	if (Z_OBJCE_P(getThis()) == phalcon_http_request_ce) {
-		const char *method = phalcon_http_request_getmethod_helper(TSRMLS_C);
+		const char *method = phalcon_http_request_getmethod_helper();
 		RETURN_BOOL(!strcmp(method, "PUT"));
 	}
 
@@ -1246,7 +1246,7 @@ PHP_METHOD(Phalcon_Http_Request, isPatch){
 	zval *patch, *method = NULL;
 
 	if (Z_OBJCE_P(getThis()) == phalcon_http_request_ce) {
-		const char *method = phalcon_http_request_getmethod_helper(TSRMLS_C);
+		const char *method = phalcon_http_request_getmethod_helper();
 		RETURN_BOOL(!strcmp(method, "PATCH"));
 	}
 
@@ -1271,7 +1271,7 @@ PHP_METHOD(Phalcon_Http_Request, isHead){
 	zval *head, *method = NULL;
 
 	if (Z_OBJCE_P(getThis()) == phalcon_http_request_ce) {
-		const char *method = phalcon_http_request_getmethod_helper(TSRMLS_C);
+		const char *method = phalcon_http_request_getmethod_helper();
 		RETURN_BOOL(!strcmp(method, "HEAD"));
 	}
 
@@ -1296,7 +1296,7 @@ PHP_METHOD(Phalcon_Http_Request, isDelete){
 	zval *delete, *method = NULL;
 
 	if (Z_OBJCE_P(getThis()) == phalcon_http_request_ce) {
-		const char *method = phalcon_http_request_getmethod_helper(TSRMLS_C);
+		const char *method = phalcon_http_request_getmethod_helper();
 		RETURN_BOOL(!strcmp(method, "DELETE"));
 	}
 
@@ -1321,7 +1321,7 @@ PHP_METHOD(Phalcon_Http_Request, isOptions){
 	zval *options, *method = NULL;
 
 	if (Z_OBJCE_P(getThis()) == phalcon_http_request_ce) {
-		const char *method = phalcon_http_request_getmethod_helper(TSRMLS_C);
+		const char *method = phalcon_http_request_getmethod_helper();
 		RETURN_BOOL(!strcmp(method, "OPTIONS"));
 	}
 
@@ -1456,7 +1456,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 					add_assoc_zval_ex(arr, SS("size"),     *dsize);
 
 					PHALCON_ALLOC_GHOST_ZVAL(key);
-					ZVAL_STRINGL(key, prefix->c, prefix->len, 1);
+					ZVAL_STRINGL(key, prefix->c, prefix->len);
 					prefix->len = prefix_len;
 
 					PHALCON_ALLOC_GHOST_ZVAL(file);
@@ -1542,7 +1542,7 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 					object_init_ex(request_file, phalcon_http_request_file_ce);
 
 					PHALCON_INIT_NVAR(key);
-					ZVAL_STRINGL(key, Z_STRVAL_P(index), Z_STRLEN_P(index), 1);
+					ZVAL_STRINGL(key, Z_STRVAL_P(index), Z_STRLEN_P(index));
 
 					PHALCON_CALL_METHOD(NULL, request_file, "__construct", value, key);
 
@@ -1614,7 +1614,7 @@ PHP_METHOD(Phalcon_Http_Request, getHeaders){
 			zval *header;
 
 			PHALCON_ALLOC_GHOST_ZVAL(header);
-			ZVAL_STRINGL(header, Z_STRVAL(key) + 5, Z_STRLEN(key) - 5, 1);
+			ZVAL_STRINGL(header, Z_STRVAL(key) + 5, Z_STRLEN(key) - 5);
 			phalcon_array_update_zval(&return_value, header, *hd, PH_COPY);
 		}
 	}

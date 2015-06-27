@@ -414,7 +414,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 	phalcon_array_update_string(&conditions, SL("key"), prefixed_key, PH_COPY);
 	PHALCON_CALL_METHOD(NULL, collection, "remove", conditions);
 
-	if ((php_rand(TSRMLS_C) % 100) == 0) {
+	if ((php_rand() % 100) == 0) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "gc");
 	}
 
@@ -791,7 +791,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, flush){
 	PHALCON_CALL_METHOD(&collection, this_ptr, "_getcollection");
 	PHALCON_CALL_METHOD(NULL, collection, "remove");
 
-	if ((php_rand(TSRMLS_C) % 100) == 0) {
+	if ((php_rand() % 100) == 0) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "gc");
 	}
 

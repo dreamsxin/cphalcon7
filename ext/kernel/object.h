@@ -21,6 +21,7 @@
 #define PHALCON_KERNEL_OBJECT_H
 
 #include "php_phalcon.h"
+#include "kernel/main.h"
 
 /** Class Retrieving/Checking */
 zend_class_entry *phalcon_class_exists(const zval *class_name, int autoload) PHALCON_ATTR_NONNULL;
@@ -35,9 +36,9 @@ void phalcon_get_parent_class(zval *result, const zval *object, int lower) PHALC
 void phalcon_get_object_vars(zval *result, zval *object, int check_access) PHALCON_ATTR_NONNULL;
 void phalcon_get_class_methods(zval *result, zval *object, int check_access) PHALCON_ATTR_NONNULL;
 zend_class_entry* phalcon_fetch_class(const zval *class_name) PHALCON_ATTR_NONNULL;
-zend_class_entry* phalcon_fetch_self_class(TSRMLS_D);
-zend_class_entry* phalcon_fetch_parent_class(TSRMLS_D);
-zend_class_entry* phalcon_fetch_static_class(TSRMLS_D);
+zend_class_entry* phalcon_fetch_self_class();
+zend_class_entry* phalcon_fetch_parent_class();
+zend_class_entry* phalcon_fetch_static_class();
 
 #define PHALCON_GET_CLASS_CONSTANT(return_value, ce, const_name) \
 	do { \
@@ -107,7 +108,7 @@ PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this(zval *obje
 
 PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this_zval(zval *object, const zval *property, int silent)
 {
-	return phalcon_fetch_nproperty_this(object, Z_STRVAL_P(property), Z_STRLEN_P(property), Z_STRLEN_P(property) + 1), silent);
+	return phalcon_fetch_nproperty_this(object, Z_STRVAL_P(property), Z_STRLEN_P(property), silent);
 }
 
 /**

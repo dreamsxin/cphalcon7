@@ -17,7 +17,7 @@
   +------------------------------------------------------------------------+
 */
 
-void phalcon_orm_destroy_cache(TSRMLS_D);
+void phalcon_orm_destroy_cache();
 void phalcon_orm_get_prepared_ast(zval **return_value, zval *unique_id);
 void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast);
 void phalcon_orm_singlequotes(zval *return_value, zval *str);

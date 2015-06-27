@@ -284,7 +284,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY);
 
 		PHALCON_INIT_VAR(prefixed_key);
-		ZVAL_STRINGL(prefixed_key, Z_STRVAL_P(last_key)+5, Z_STRLEN_P(last_key)-5, 1);
+		ZVAL_STRINGL(prefixed_key, Z_STRVAL_P(last_key)+5, Z_STRLEN_P(last_key)-5);
 	} else {
 		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
 
@@ -472,7 +472,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, queryKeys){
 	
 			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(*value, prefix, NULL)) {
 				PHALCON_INIT_NVAR(real_key);
-				ZVAL_STRINGL(real_key, Z_STRVAL_P(*value), Z_STRLEN_P(*value), 1);
+				ZVAL_NEW_STR(real_key, Z_STR_P(*value));
 				phalcon_array_append(&return_value, real_key, 0);
 			}
 		}
@@ -656,7 +656,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 			zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos)
 		) {
 			PHALCON_INIT_NVAR(real_key);
-			ZVAL_STRINGL(real_key, Z_STRVAL_P(*value), Z_STRLEN_P(*value), 1);
+			ZVAL_NEW_STR(real_key, Z_STR_P(*value));
 
 			PHALCON_INIT_NVAR(last_key);
 			PHALCON_CONCAT_SV(last_key, "_PHCR", real_key);

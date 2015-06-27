@@ -551,7 +551,7 @@ PHP_METHOD(Phalcon_Security, hash)
 	}
 
 	PHALCON_ALLOC_GHOST_ZVAL(z_salt);
-	ZVAL_STRINGL(z_salt, salt, salt_len, 0);
+	ZVAL_STRINGL(z_salt, salt, salt_len);
 
 	PHALCON_RETURN_CALL_FUNCTION("crypt", *password, z_salt);
 	if (return_value_ptr) {
@@ -959,7 +959,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		s = safe_emalloc(salt_len, 1, 5);
 		s[salt_len + 4] = 0;
 		memcpy(s, Z_STRVAL_P(*salt), salt_len);
-		ZVAL_STRINGL(computed_salt, s, salt_len + 4, 0);
+		ZVAL_STRINGL(computed_salt, s, salt_len + 4);
 
 		PHALCON_INIT_VAR(result);
 

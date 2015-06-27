@@ -400,7 +400,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 			char *new_pattern = safe_emalloc(prefix_len - 1 /* slash */ + 1 /* \0 */, 1, pattern_len);
 			memcpy(new_pattern, s_prefix, prefix_len - 1);
 			memcpy(new_pattern + prefix_len - 1, s_pattern, pattern_len + 1);
-			ZVAL_STRINGL(prefix_pattern, new_pattern, prefix_len + pattern_len - 1, 0);
+			ZVAL_STRINGL(prefix_pattern, new_pattern, prefix_len + pattern_len - 1);
 		}
 		else {
 			PHALCON_CONCAT_VV(prefix_pattern, prefix, *pattern);

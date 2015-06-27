@@ -94,7 +94,7 @@ void phalcon_var_export_ex(zval *return_value, zval **var) {
 
     php_var_export_ex(var, 1, &buf);
     smart_str_0(&buf);
-    ZVAL_STRINGL(return_value, buf.c, buf.len, 0);
+    ZVAL_STRINGL(return_value, buf.c, buf.len);
 }
 
 /**

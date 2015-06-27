@@ -80,7 +80,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	clean = PHALCON_IS_TRUE(*must_clean);
 
 	if (clean) {
-		phalcon_ob_clean(TSRMLS_C);
+		phalcon_ob_clean();
 	}
 	
 	/** 
@@ -88,7 +88,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	 */
 	if (Z_TYPE_P(*params) == IS_ARRAY) {
 		if (!EG(active_symbol_table)) {
-			zend_rebuild_symbol_table(TSRMLS_C);
+			zend_rebuild_symbol_table();
 		}
 
 		zend_hash_merge_ex(
@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 			sizeof(zval*),
 			phalcon_mvc_view_engine_php_symtable_merger
 #ifdef ZTS
-			TSRMLS_CC
+			C
 #else
 			, NULL
 #endif

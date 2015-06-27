@@ -26,12 +26,12 @@
 #include "kernel/main.h"
 #include "kernel/fcall.h"
 
-int phalcon_session_start(TSRMLS_D)
+int phalcon_session_start()
 {
 	return phalcon_call_func_aparams(NULL, SL("session_start"), 0, NULL);
 }
 
-int phalcon_session_destroy(TSRMLS_D)
+int phalcon_session_destroy()
 {
 	return phalcon_call_func_aparams(NULL, SL("session_destroy"), 0, NULL);
 }
@@ -47,7 +47,7 @@ int phalcon_set_session_id(zval *sid)
 	return phalcon_call_func_aparams(NULL, SL("session_id"), 1, params);
 }
 
-int phalcon_session_write_close(TSRMLS_D)
+int phalcon_session_write_close()
 {
 	return phalcon_call_func_aparams(NULL, SL("session_write_close"), 0, NULL);
 }

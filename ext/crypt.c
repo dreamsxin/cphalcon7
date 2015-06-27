@@ -755,7 +755,7 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 
 	PHALCON_MM_GROW();
 	PHALCON_ALLOC_GHOST_ZVAL(decrypt_text);
-	ZVAL_STRINGL(decrypt_text, decoded, decoded_len, 0);
+	ZVAL_STRINGL(decrypt_text, decoded, decoded_len);
 	PHALCON_RETURN_CALL_METHOD(this_ptr, "decrypt", decrypt_text, *key);
 	RETURN_MM();
 }

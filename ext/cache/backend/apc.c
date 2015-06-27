@@ -404,7 +404,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 
 		it->funcs->get_current_key(it, itkey);
 		if (likely(Z_TYPE_P(itkey) == IS_STRING)) {
-			ZVAL_STRINGL(key, Z_STRVAL_P(itkey) + 5, Z_STRLEN_P(itkey) - 5, 1);
+			ZVAL_STRINGL(key, Z_STRVAL_P(itkey) + 5, Z_STRLEN_P(itkey) - 5);
 			phalcon_array_append(&return_value, key, PH_COPY);
 		}
 
@@ -506,7 +506,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 		PHALCON_INIT_NVAR(itkey);
 		it->funcs->get_current_key(it, itkey);
 		if (likely(Z_TYPE_P(itkey) == IS_STRING)) {
-			ZVAL_STRINGL(key, Z_STRVAL_P(itkey), Z_STRLEN_P(itkey), 1);
+			ZVAL_NEW_STR(key, Z_STR_P(itkey));
 			if (FAILURE == phalcon_call_func_aparams(NULL, SL("apc_delete"), 1, params)) {
 				break;
 			}

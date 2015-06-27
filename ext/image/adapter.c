@@ -793,7 +793,7 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 			phalcon_substr(color, *fontcolor, 1, 0);
 		}
 		else {
-			ZVAL_STRINGL(color, Z_STRVAL_P(*fontcolor), Z_STRLEN_P(*fontcolor), 1);
+			ZVAL_NEW_STR(color, Z_STR_P(*fontcolor));
 		}
 	}
 
@@ -832,7 +832,7 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 	INIT_ZVAL(tmp);
 
 	Z_TYPE(tmp) = IS_STRING;
-	ZVAL_STRINGL(&tmp, Z_STRVAL_P(color), 2, 0);
+	ZVAL_NEW_STR(&tmp, Z_STR_P(color));
 
 	PHALCON_INIT_VAR(r);
 	_php_math_basetozval(&tmp, 16, r);
@@ -928,7 +928,7 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
 	INIT_ZVAL(tmp);
 
 	Z_TYPE(tmp) = IS_STRING;
-	ZVAL_STRINGL(&tmp, Z_STRVAL_P(tmp_color), 2, 0);
+	ZVAL_NEW_STR(&tmp, Z_STR_P(tmp_color));
 
 	PHALCON_INIT_NVAR(r);
 	_php_math_basetozval(&tmp, 16, r);

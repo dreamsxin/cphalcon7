@@ -1414,7 +1414,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 
 	PHALCON_INIT_VAR(lower);
 	tmp = zend_str_tolower_dup(Z_STRVAL_P(*event_name), Z_STRLEN_P(*event_name));
-	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(*event_name), 0);
+	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(*event_name));
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -1451,7 +1451,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 
 	PHALCON_INIT_VAR(lower);
 	tmp = zend_str_tolower_dup(Z_STRVAL_P(*event_name), Z_STRLEN_P(*event_name));
-	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(*event_name), 0);
+	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(*event_name));
 
 	/**
 	 * Check if there is a method with the same name of the event

@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, isBuffering){
 PHP_METHOD(Phalcon_Cache_Frontend_Output, start){
 
 	phalcon_update_property_bool(this_ptr, SL("_buffering"), 1);
-	phalcon_ob_start(TSRMLS_C);
+	phalcon_ob_start();
 }
 
 /**
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, stop){
 
 	buffering = phalcon_fetch_nproperty_this(this_ptr, SL("_buffering"), PH_NOISY);
 	if (zend_is_true(buffering)) {
-		phalcon_ob_end_clean(TSRMLS_C);
+		phalcon_ob_end_clean();
 	}
 	
 	phalcon_update_property_bool(this_ptr, SL("_buffering"), 0);

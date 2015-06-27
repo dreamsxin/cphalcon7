@@ -21,62 +21,21 @@
 #include "kernel/memory.h"
 
 /**
- * Assigns the current value in a hash traversing to a zval
- */
-void phalcon_get_current_key(zval **key, const HashTable *hash_table, HashPosition *hash_position)
-{
-	Bucket *p;
-
-	p = hash_position ? (*hash_position) : hash_table->pInternalPointer;
-
-	if (p) {
-		if (p->nKeyLength) {
-			ZVAL_STRINGL(*key, (char *) p->arKey, p->nKeyLength - 1, 0);
-		} else {
-			ZVAL_LONG(*key, p->h);
-		}
-	}
-
-}
-
-zval phalcon_get_current_key_w(const HashTable *hash_table, HashPosition *hash_position)
-{
-	Bucket *p;
-	zval result;
-
-	INIT_ZVAL(result);
-	p = hash_position ? (*hash_position) : hash_table->pInternalPointer;
-
-	if (p) {
-		if (p->nKeyLength) {
-			ZVAL_STRINGL(&result, (char *) p->arKey, p->nKeyLength - 1, 0);
-		} else {
-			ZVAL_LONG(&result, p->h);
-		}
-	}
-
-	return result;
-}
-
-/**
  * Traverses the hash checking if at least one of the keys is numeric
  */
 int phalcon_has_numeric_keys(const zval *data)
 {
-	HashTable *ht;
+	zend_long idx;
+	zend_string *key;
+	zval *val;
+	int first;
 
 	if (Z_TYPE_P(data) == IS_ARRAY) {
-
-		ht = Z_ARRVAL_P(data);
-
-		ht->pInternalPointer = ht->pListHead;
-		while (ht->pInternalPointer) {
-			if (!ht->pInternalPointer->nKeyLength) {
+		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(data), idx, key) {
+			if (!key) {
 				return 1;
 			}
-			ht->pInternalPointer = ht->pInternalPointer->pListNext;
-		}
-
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	return 0;

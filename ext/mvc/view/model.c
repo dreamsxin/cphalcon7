@@ -631,7 +631,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		}
 	}
 
-	phalcon_ob_start(TSRMLS_C);
+	phalcon_ob_start();
 
 	PHALCON_OBS_VAR(view);
 	phalcon_read_property_this(&view, this_ptr, SL("_view"), PH_NOISY);
@@ -784,7 +784,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	PHALCON_INIT_VAR(contents);
 	phalcon_ob_get_contents(contents);
 
-	phalcon_ob_end_clean(TSRMLS_C);
+	phalcon_ob_end_clean();
 
 	RETURN_CTOR(contents);
 }

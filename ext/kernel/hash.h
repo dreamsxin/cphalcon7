@@ -23,8 +23,25 @@
 #include "php_phalcon.h"
 #include <Zend/zend.h>
 
-void phalcon_get_current_key(zval **key, const HashTable *hash_table, HashPosition *hash_position);
-zval phalcon_get_current_key_w(const HashTable *hash_table, HashPosition *hash_position);
+#define phalcon_get_current_data_w(ht, pos) zend_hash_get_current_data_ex(ht, pos);
+
+static inline void phalcon_get_current_key(zval **key, HashTable *ht, HashPosition *pos)
+{
+	zval tmp;
+	zend_hash_get_current_key_zval_ex(ht, &tmp, pos);
+	ZVAL_COPY_VALUE(*key, &tmp);
+}
+
+static inline zval *phalcon_get_current_key_w(HashTable *ht, HashPosition *pos)
+{
+	zval *key, tmp;
+	zend_hash_get_current_key_zval_ex(ht, &tmp, pos);
+
+	ALLOC_INIT_ZVAL(key);
+	ZVAL_COPY_VALUE(key, &tmp);
+	return key;
+}
+
 int phalcon_has_numeric_keys(const zval *data);
 int phalcon_hash_update_or_insert(HashTable *ht, const zval *offset, zval *value);
 

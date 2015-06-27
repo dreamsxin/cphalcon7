@@ -686,10 +686,11 @@ static PHP_METHOD(Phalcon_Registry, current)
  */
 static PHP_METHOD(Phalcon_Registry, key)
 {
+	zval key;
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_registry_object);
-	zval key   = phalcon_get_current_key_w(Z_ARRVAL_P(obj->properties), &obj->pos);
-	zval *pkey = &key;
-	RETURN_ZVAL(pkey, 1, 0);
+	phalcon_get_current_key(&key, Z_ARRVAL_P(obj->properties), &obj->pos);
+
+	RETURN_ZVAL(&key, 1, 0);
 }
 
 /**

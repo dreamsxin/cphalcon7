@@ -1011,7 +1011,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			}
 			if (zend_is_true(str_params)) {
 				zval slash;
-				ZVAL_STRINGL(&slash, "/", 1, 0);
+				ZVAL_STRINGL(&slash, "/", 1);
 
 				PHALCON_INIT_NVAR(params);
 				phalcon_fast_explode(params, &slash, str_params);

@@ -652,7 +652,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			}
 		} else if (phalcon_start_with_str(handler_name, SL("\\"))) {
 			PHALCON_INIT_NVAR(camelized_class);
-			ZVAL_STRINGL(camelized_class, Z_STRVAL_P(handler_name)+1, Z_STRLEN_P(handler_name)-1, 1);
+			ZVAL_STRINGL(camelized_class, Z_STRVAL_P(handler_name)+1, Z_STRLEN_P(handler_name)-1);
 		} else {
 			camelized_class = handler_name;
 		}
@@ -1195,7 +1195,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 		phalcon_camelize(camelized_class, handler_name);
 	} else if (phalcon_start_with_str(handler_name, SL("\\"))) {
 		PHALCON_INIT_VAR(camelized_class);
-		ZVAL_STRINGL(camelized_class, Z_STRVAL_P(handler_name)+1, Z_STRLEN_P(handler_name)-1, 1);
+		ZVAL_STRINGL(camelized_class, Z_STRVAL_P(handler_name)+1, Z_STRLEN_P(handler_name)-1);
 	} else {
 		camelized_class = handler_name;
 	}

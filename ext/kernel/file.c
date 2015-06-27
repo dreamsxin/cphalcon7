@@ -186,7 +186,7 @@ void phalcon_prepare_virtual_path_ex(zval *return_value, const char *path, size_
 		}
 	}
 
-	ZVAL_STRINGL(return_value, copy, path_len, 0);
+	ZVAL_STRINGL(return_value, copy, path_len);
 }
 
 /**
@@ -486,7 +486,7 @@ void phalcon_basename(zval *return_value, zval *path)
 		size_t ret_len;
 
 		php_basename(Z_STRVAL_P(path), Z_STRLEN_P(path), NULL, 0, &ret, &ret_len);
-		ZVAL_STRINGL(return_value, ret, (int)ret_len, 0);
+		ZVAL_STRINGL(return_value, ret, (int)ret_len);
 	}
 	else {
 		ZVAL_FALSE(return_value);

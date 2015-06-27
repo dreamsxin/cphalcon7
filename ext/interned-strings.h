@@ -119,12 +119,12 @@ extern const char *phalcon_interned_transactionManager;
 extern const char *phalcon_interned_assets;
 extern const char *phalcon_interned_view;
 
-void phalcon_init_interned_strings(TSRMLS_D);
+void phalcon_init_interned_strings();
 
 #define PHALCON_ZVAL_MAYBE_INTERNED_STRING(pz, string)            \
 	do {                                                          \
 		if (STR_IS_INTERNED(string)) {                            \
-			ZVAL_STRINGL(pz, string, INTERNED_LEN(string)-1, 0);  \
+			ZVAL_STRINGL(pz, string, INTERNED_LEN(string)-1);     \
 		}                                                         \
 		else {                                                    \
 			ZVAL_STRING(pz, string, 1);                           \

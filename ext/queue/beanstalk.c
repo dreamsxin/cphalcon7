@@ -696,7 +696,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		buf = ecalloc(1, total_length + 1);
 		len = php_stream_read(stream, buf, total_length);
 
-		ZVAL_STRINGL(return_value, buf, len, 0);
+		ZVAL_STRINGL(return_value, buf, len);
 
 		PHALCON_INIT_VAR(meta);
 		array_init_size(meta, 4);
@@ -721,7 +721,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 				buf = erealloc(buf, line_len + 1);
 			}
 
-			ZVAL_STRINGL(return_value, buf, line_len, 0);
+			ZVAL_STRINGL(return_value, buf, line_len);
 		}
 		else {
 			efree(buf);

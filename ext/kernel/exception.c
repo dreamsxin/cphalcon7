@@ -100,7 +100,7 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
 
 	zend_throw_exception_object(object);
 
-	phalcon_ptr_dtor(&msg);
+	phalcon_ptr_dtor(msg);
 }
 
 /**
@@ -163,5 +163,5 @@ void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ..
 
 	zend_throw_exception_object(object);
 
-	phalcon_ptr_dtor(&msg);
+	phalcon_ptr_dtor(msg);
 }

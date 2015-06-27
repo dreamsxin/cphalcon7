@@ -227,7 +227,7 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1)) {
 		zval *params[] = { this_ptr };
 		if (FAILURE == phalcon_call_method(NULL, *retval, "setdi", 1, params TSRMLS_CC)) {
-			phalcon_ptr_dtor(retval);
+			phalcon_ptr_dtor(*retval);
 			return NULL;
 		}
 	}
@@ -741,7 +741,7 @@ PHP_METHOD(Phalcon_DI, setService)
 
 		Z_ADDREF_P(*raw_definition);
 		zend_hash_update(obj->services, Z_STRVAL_P(name), Z_STRLEN_P(name)+1, (void*)raw_definition, sizeof(zval*), NULL);
-		phalcon_ptr_dtor(&name);
+		phalcon_ptr_dtor(name);
 	}
 	else {
 		zval **name = name_or_def;

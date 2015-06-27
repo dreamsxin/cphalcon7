@@ -764,7 +764,7 @@ int phalcon_read_property(zval **result, zval *object, const char *property_name
 		ZVAL_NULL(property);
 	}
 
-	phalcon_ptr_dtor(&property);
+	phalcon_ptr_dtor(property);
 
 	EG(scope) = old_scope;
 	return SUCCESS;
@@ -886,14 +886,7 @@ int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, z
 			if (likely(!flag)) {
 				EG(scope) = old_scope;
 
-				if (return_value_ptr) {
-					phalcon_ptr_dtor(return_value_ptr);
-					Z_ADDREF_P(*zv);
-					*return_value_ptr = *zv;
-				}
-				else {
-					ZVAL_ZVAL(return_value, *zv, 1, 0);
-				}
+				ZVAL_ZVAL(return_value, *zv, 1, 0);
 
 				return SUCCESS;
 			}
@@ -1019,7 +1012,7 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 		ZVAL_NULL(property);
 	}
 
-	phalcon_ptr_dtor(&property);
+	phalcon_ptr_dtor(property);
 
 	EG(scope) = old_scope;
 	return SUCCESS;
@@ -1085,7 +1078,7 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 							SEPARATE_ZVAL(&value);
 						}
 						*variable_ptr = value;
-						phalcon_ptr_dtor(&garbage);
+						phalcon_ptr_dtor(garbage);
 					}
 				}
 

@@ -317,13 +317,13 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		PHALCON_CALL_FUNCTIONW(&tmp, "openssl_random_pseudo_bytes", n);
 
 		if (Z_TYPE_P(tmp) != IS_STRING || Z_STRLEN_P(tmp) < i_bytes) {
-			phalcon_ptr_dtor(&tmp);
+			phalcon_ptr_dtor(tmp);
 			RETURN_FALSE;
 		}
 
 		result = Z_STRVAL_P(tmp);
 		ZVAL_NULL(tmp);
-		phalcon_ptr_dtor(&tmp);
+		phalcon_ptr_dtor(tmp);
 	}
 
 	result[i_bytes] = 0;
@@ -612,11 +612,11 @@ PHP_METHOD(Phalcon_Security, checkHash){
 			--n;
 		}
 
-		phalcon_ptr_dtor(&hash);
+		phalcon_ptr_dtor(hash);
 		RETURN_BOOL(check == 0);
 	}
 
-	phalcon_ptr_dtor(&hash);
+	phalcon_ptr_dtor(hash);
 	RETURN_FALSE;
 }
 
@@ -1076,9 +1076,9 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 		}
 	}
 
-	phalcon_ptr_dtor(&algo);
-	phalcon_ptr_dtor(&iter);
-	phalcon_ptr_dtor(&len);
+	phalcon_ptr_dtor(algo);
+	phalcon_ptr_dtor(iter);
+	phalcon_ptr_dtor(len);
 }
 
 /**

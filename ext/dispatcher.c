@@ -905,11 +905,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
 		/* Check if an exception has ocurred */
 		if (EG(exception)) {
+			zval e;
+			ZVAL_OBJ(&e, EG(exception));
+
 			/* Copy the exception to rethrow it later if needed */
-			PHALCON_CPY_WRT(exception, EG(exception));
+			PHALCON_CPY_WRT(exception, &e);
 
 			/* Clear the exception  */
-			zend_clear_exception(TSRMLS_C);
+			zend_clear_exception();
 
 			/* Try to handle the exception */
 			PHALCON_CALL_METHOD(&status, this_ptr, "_handleexception", exception);
@@ -1347,14 +1350,10 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 	Z_UNSET_ISREF_P(data);
 
 	if (EG(exception)) {
-		zval *exception = EG(exception);
-		Z_ADDREF_P(exception);
+		zval exception;
+		ZVAL_OBJ(&exception, EG(exception));
 
-		zend_clear_exception(TSRMLS_C);
-
-		assert(Z_REFCOUNT_P(exception) == 1);
-		/* exception will be destroyed automatically after return from _handleexception */
-		Z_DELREF_P(exception);
+		zend_clear_exception();
 
 		/* Shortcut, save one method call */
 		PHALCON_INIT_NVAR(event_name);

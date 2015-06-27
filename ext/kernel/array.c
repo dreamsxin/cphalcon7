@@ -779,8 +779,8 @@ void phalcon_array_merge_recursive_n(zval **a1, zval *a2)
 			phalcon_array_fetch(&tmp1, *a1, &key, PH_NOISY);
 			phalcon_array_fetch(&tmp2, a2, &key, PH_NOISY);
 			phalcon_array_merge_recursive_n(&tmp1, tmp2);
-			phalcon_ptr_dtor(&tmp1);
-			phalcon_ptr_dtor(&tmp2);
+			phalcon_ptr_dtor(tmp1);
+			phalcon_ptr_dtor(tmp2);
 		}
 	}
 }
@@ -806,8 +806,8 @@ void phalcon_array_merge_recursive_n2(zval **a1, zval *a2)
 			phalcon_array_fetch(&tmp1, *a1, &key, PH_NOISY);
 			phalcon_array_fetch(&tmp2, a2, &key, PH_NOISY);
 			phalcon_array_merge_recursive_n2(&tmp1, tmp2);
-			phalcon_ptr_dtor(&tmp1);
-			phalcon_ptr_dtor(&tmp2);
+			phalcon_ptr_dtor(tmp1);
+			phalcon_ptr_dtor(tmp2);
 		}
 	}
 }

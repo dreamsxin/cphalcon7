@@ -102,7 +102,7 @@ static void phalcon_registry_dtor(void *v)
 {
 	phalcon_registry_object *obj = v;
 
-	phalcon_ptr_dtor(&obj->properties);
+	phalcon_ptr_dtor(obj->properties);
 	zend_object_std_dtor(&obj->obj);
 	efree(obj);
 }
@@ -197,7 +197,7 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
 	}
 
 	if (params) {
-		phalcon_ptr_dtor(&params);
+		phalcon_ptr_dtor(params);
 		efree(args);
 	}
 
@@ -453,7 +453,7 @@ static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, con
  */
 static void phalcon_registry_iterator_dtor(zend_object_iterator *it TSRMLS_DC)
 {
-	phalcon_ptr_dtor((zval**)&it->data);
+	phalcon_ptr_dtor((zval*)it->data);
 	efree(it);
 }
 
@@ -546,10 +546,7 @@ static PHP_METHOD(Phalcon_Registry, __get)
 	obj    = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_registry_object);
 	result = phalcon_hash_get(Z_ARRVAL_P(obj->properties), *property, BP_VAR_W);
 
-	phalcon_ptr_dtor(return_value_ptr);
-	*return_value_ptr = *result;
-	Z_ADDREF_P(*return_value_ptr);
-	Z_SET_ISREF_P(*return_value_ptr);
+	RETURN_ZVAL(*result, 1, 0);
 }
 
 /**
@@ -680,14 +677,6 @@ static PHP_METHOD(Phalcon_Registry, current)
 	zval **data;
 
 	if (SUCCESS == zend_hash_get_current_data_ex(Z_ARRVAL_P(obj->properties), (void**)&data, &obj->pos)) {
-		if (return_value_ptr) {
-			phalcon_ptr_dtor(return_value_ptr);
-			*return_value_ptr = *data;
-			Z_ADDREF_P(*data);
-			Z_SET_ISREF_P(*data);
-			return;
-		}
-
 		RETURN_ZVAL(*data, 1, 0);
 	}
 }

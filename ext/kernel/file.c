@@ -122,7 +122,7 @@ void phalcon_fix_path(zval **return_value, zval *path, zval *directory_separator
 		}
 	}
 
-	phalcon_ptr_dtor(return_value);
+	phalcon_ptr_dtor(*return_value);
 	*return_value = path;
 	Z_ADDREF_P(path);
 }

@@ -138,12 +138,12 @@ void phalcon_deinitialize_memory(TSRMLS_D)
 	phalcon_globals_ptr->start_memory = NULL;
 
 	for (i = 0; i < 2; i++) {
-		phalcon_ptr_dtor(&phalcon_globals_ptr->z_null);
-		phalcon_ptr_dtor(&phalcon_globals_ptr->z_false);
-		phalcon_ptr_dtor(&phalcon_globals_ptr->z_true);
-		phalcon_ptr_dtor(&phalcon_globals_ptr->z_zero);
-		phalcon_ptr_dtor(&phalcon_globals_ptr->z_one);
-		phalcon_ptr_dtor(&phalcon_globals_ptr->z_two);
+		phalcon_ptr_dtor(phalcon_globals_ptr->z_null);
+		phalcon_ptr_dtor(phalcon_globals_ptr->z_false);
+		phalcon_ptr_dtor(phalcon_globals_ptr->z_true);
+		phalcon_ptr_dtor(phalcon_globals_ptr->z_zero);
+		phalcon_ptr_dtor(phalcon_globals_ptr->z_one);
+		phalcon_ptr_dtor(phalcon_globals_ptr->z_two);
 	}
 
 	phalcon_globals_ptr->initialized = 0;
@@ -775,9 +775,6 @@ static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)
 			CHECK_ZVAL_STRING_REL(zvalue);
 			STR_FREE_REL(zvalue->value.str.val);
 			break;
-#if PHP_VERSION_ID < 50600
-		case IS_CONSTANT_ARRAY:
-#endif
 		case IS_ARRAY:  {
 				TSRMLS_FETCH();
 				if (zvalue->value.ht && (zvalue->value.ht != &EG(symbol_table))) {
@@ -814,17 +811,17 @@ static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)
 /**
  * Releases memory for an allocated zval
  */
-void ZEND_FASTCALL phalcon_ptr_dtor(zval **var)
+void ZEND_FASTCALL phalcon_ptr_dtor(zval *var)
 {
-	if (!Z_ISREF_P(*var) || Z_TYPE_P(*var) == IS_OBJECT) {
+	if (!Z_ISREF_P(var) || Z_TYPE_P(var) == IS_OBJECT) {
 		zval_ptr_dtor(var);
 	} else {
-		if (Z_REFCOUNT_P(*var) == 0) {
-			efree(*var);
+		if (Z_REFCOUNT_P(var) == 0) {
+			efree(var);
 		} else {
-			Z_DELREF_P(*var);
-			if (Z_REFCOUNT_P(*var) == 0) {
-				efree(*var);
+			Z_DELREF_P(var);
+			if (Z_REFCOUNT_P(var) == 0) {
+				efree(var);
 			}
 		}
 	}
@@ -833,17 +830,17 @@ void ZEND_FASTCALL phalcon_ptr_dtor(zval **var)
 /**
  * Releases memory for an allocated zval
  */
-void ZEND_FASTCALL phalcon_dtor(zval *var)
+void ZEND_FASTCALL phalcon_dtor(zval var)
 {
 	if (!Z_ISREF_P(var)) {
 		zval_dtor(var);
 	}
 }
 
-void phalcon_value_dtor(zval *zvalue ZEND_FILE_LINE_DC)
+void phalcon_value_dtor(zval *var ZEND_FILE_LINE_DC)
 {
-	if (zvalue->type <= IS_TRUE) {
+	if (Z_TYPE_P(var) <= IS_TRUE) {
 		return;
 	}
-	phalcon_dtor_func(zvalue ZEND_FILE_LINE_RELAY_CC);
+	phalcon_dtor_func(var ZEND_FILE_LINE_RELAY_CC);
 }

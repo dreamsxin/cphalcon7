@@ -72,7 +72,7 @@ int phalcon_call_user_function(zval *object, zend_class_entry *ce, phalcon_call_
 	HashTable *function_table;
 
 	if (type != phalcon_fcall_function && !object) {
-		object = getThis();
+		object = &EG(current_execute_data)->This;
 	}
 
 	if (!ce && object) {
@@ -97,10 +97,10 @@ int phalcon_call_func_aparams(zval *retval_ptr, const char *func_name, uint func
 	}
 #endif
 
-	ZVAL_STRINGL(&func, func_name, func_length, 0);
+	ZVAL_STRINGL(&func, func_name, func_length);
 
 	if ((status = phalcon_call_user_function(NULL, NULL, phalcon_fcall_function, &func, retval_ptr, param_count, params)) == FAILURE) {
-		phalcon_ptr_dtor(retval_ptr);
+		zval_ptr_dtor(retval_ptr);
 		if (!EG(exception)) {
 			zend_error(E_ERROR, "Call to undefined function %s()", func_name);
 		}
@@ -125,7 +125,7 @@ int phalcon_call_zval_func_aparams(zval *retval_ptr, zval *func, uint param_coun
 	}
 #endif
 
-	if ((status = phalcon_call_user_function(NULL, NULL, phalcon_fcall_function, &func, retval_ptr, param_count, params)) == FAILURE) {
+	if ((status = phalcon_call_user_function(NULL, NULL, phalcon_fcall_function, func, retval_ptr, param_count, params)) == FAILURE) {
 		phalcon_ptr_dtor(retval_ptr);
 		if (!EG(exception)) {
 			phalcon_throw_exception_format(spl_ce_RuntimeException, "Call to undefined function %s()", Z_TYPE_P(func) ? Z_STRVAL_P(func) : "undefined");
@@ -175,7 +175,7 @@ int phalcon_call_class_method_aparams(zval *retval_ptr, zval *object, zend_class
 			break;
 	}
 
-	add_next_index_stringl(&fn, method_name, method_len);
+	add_next_index_stringl(&func, method_name, method_len);
 
 	if ((status = phalcon_call_user_function(object ? object : NULL, ce, type, &func, retval_ptr, param_count, params)) == FAILURE) {
 		phalcon_ptr_dtor(retval_ptr);
@@ -203,7 +203,7 @@ int phalcon_call_class_method_aparams(zval *retval_ptr, zval *object, zend_class
  */
 int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *params TSRMLS_DC){
 
-	zval *retval_ptr = NULL;
+	zval retval;
 	zend_fcall_info fci;
 	zend_fcall_info_cache fci_cache;
 	char *is_callable_error = NULL;
@@ -232,11 +232,11 @@ int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *p
 
 	if (status == SUCCESS) {
 
-		zend_fcall_info_args(&fci, params TSRMLS_CC);
-		fci.retval_ptr_ptr = &retval_ptr;
+		zend_fcall_info_args(&fci, params);
+		fci.retval = &retval;
 
-		if (zend_call_function(&fci, &fci_cache TSRMLS_CC) == SUCCESS && fci.retval_ptr_ptr && *fci.retval_ptr_ptr) {
-			ZVAL_DUP(return_value, *fci.retval_ptr_ptr);
+		if (zend_call_function(&fci, &fci_cache) == SUCCESS && fci.retval) {
+			ZVAL_DUP(return_value, fci.retval);
 		}
 
 		if (fci.params) {
@@ -257,9 +257,9 @@ int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *p
 static void phalcon_throw_exception_internal(zval *exception)
 {
 	if (exception != NULL) {
-		zval *previous = EG(exception);
-		zend_exception_set_previous(exception, EG(exception));
-		EG(exception) = exception;
+		zend_object *previous = EG(exception);
+		zend_exception_set_previous(Z_OBJ_P(exception), EG(exception));
+		EG(exception) = Z_OBJ_P(exception);
 		if (previous) {
 			return;
 		}

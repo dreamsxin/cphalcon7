@@ -634,7 +634,7 @@ PHP_METHOD(Phalcon_Config, merge){
 	if (Z_TYPE_P(config) == IS_OBJECT) {
 		ALLOC_INIT_ZVAL(array_config);
 		if (FAILURE == phalcon_config_toarray_internal(&array_config, config TSRMLS_CC)) {
-			phalcon_ptr_dtor(&array_config);
+			phalcon_ptr_dtor(array_config);
 			return;
 		}
 	}
@@ -682,7 +682,7 @@ PHP_METHOD(Phalcon_Config, merge){
 		zend_hash_move_forward_ex(ah0, &hp0);
 	}
 
-	phalcon_ptr_dtor(&array_config);
+	phalcon_ptr_dtor(array_config);
 
 	RETURN_THISW();
 }

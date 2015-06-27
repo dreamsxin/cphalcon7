@@ -1667,7 +1667,7 @@ int phalcon_json_encode(zval *return_value, zval *v, int opts TSRMLS_DC)
 	params[1] = zopts;
 	result = phalcon_call_func_aparams(return_value, ZEND_STRL("json_encode"), 2, params);
 
-	phalcon_ptr_dtor(&zopts);
+	phalcon_ptr_dtor(zopts);
 	return result;
 }
 

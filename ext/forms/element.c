@@ -880,16 +880,18 @@ PHP_METHOD(Phalcon_Forms_Element, clear)
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
 	if (FAILURE == phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "render", 0, NULL TSRMLS_CC)) {
-		if (EG(exception)) {
-			zval *e = EG(exception);
-			zval *m = zend_read_property(Z_OBJCE_P(e), e, SL("message"), 1 TSRMLS_CC);
+		if (EG(exception)) {			
+			zval e;
+			ZVAL_OBJ(&e, EG(exception));
+
+			zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1 TSRMLS_CC);
 
 			Z_ADDREF_P(m);
 			if (Z_TYPE_P(m) != IS_STRING) {
 				convert_to_string_ex(&m);
 			}
 
-			zend_clear_exception(TSRMLS_C);
+			zend_clear_exception();
 			zend_error(E_ERROR, "%s", Z_STRVAL_P(m));
 			zval_ptr_dtor(&m);
 		}

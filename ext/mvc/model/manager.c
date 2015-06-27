@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, isInitialized){
 
 	phalcon_fetch_params(0, 0, 1, 0, &model_name);
 
-	initialized = phalcon_fetch_nproperty_this(this_ptr, SL("_initialized"), PH_NOISY TSRMLS_CC);
+	initialized = phalcon_fetch_nproperty_this(this_ptr, SL("_initialized"), PH_NOISY);
 
 	ALLOC_INIT_ZVAL(lowercased);
 	phalcon_fast_strtolower(lowercased, model_name);
@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 		new_instance = &PHALCON_GLOBAL(z_false);
 	}
 
-	initialized = phalcon_fetch_nproperty_this(this_ptr, SL("_initialized"), PH_NOISY TSRMLS_CC);
+	initialized = phalcon_fetch_nproperty_this(this_ptr, SL("_initialized"), PH_NOISY);
 
 	PHALCON_INIT_VAR(lowercased);
 	ZVAL_STRINGL(lowercased, zend_str_tolower_dup(Z_STRVAL_P(*model_name), Z_STRLEN_P(*model_name)), Z_STRLEN_P(*model_name), 0);
@@ -514,7 +514,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	 */
 	if (phalcon_array_isset_fetch(&model, initialized, lowercased)) {
 		if (zend_is_true(*new_instance)) {
-			dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+			dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 
 			if (Z_TYPE_P(model) != IS_OBJECT) {
 				/* This shouls never happen but better safe than sorry */
@@ -537,7 +537,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	 * Load it using an autoloader
 	 */
 	if ((ce0 = phalcon_class_exists(*model_name, 1)) != NULL) {
-		dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+		dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 
 		object_init_ex(return_value, ce0);
 		if (phalcon_has_constructor(return_value)) {
@@ -940,7 +940,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	/** 
 	 * Dispatch events to the global events manager
 	 */
-	behaviors = phalcon_fetch_nproperty_this(this_ptr, SL("_behaviors"), PH_NOISY TSRMLS_CC);
+	behaviors = phalcon_fetch_nproperty_this(this_ptr, SL("_behaviors"), PH_NOISY);
 	if (Z_TYPE_P(behaviors) == IS_ARRAY) { 
 
 		PHALCON_INIT_VAR(entity_name);
@@ -970,7 +970,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	/** 
 	 * Dispatch events to the global events manager
 	 */
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 
 		PHALCON_INIT_VAR(fire_event_name);
@@ -985,7 +985,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	/** 
 	 * A model can has a specific events manager for it
 	 */
-	custom_events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_customEventsManager"), PH_NOISY TSRMLS_CC);
+	custom_events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_customEventsManager"), PH_NOISY);
 	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
 
 		PHALCON_INIT_NVAR(entity_name);

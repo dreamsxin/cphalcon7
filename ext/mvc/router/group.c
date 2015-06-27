@@ -407,7 +407,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 		}
 	}
 
-	default_paths = phalcon_fetch_nproperty_this(this_ptr, SL("_paths"), PH_NOISY TSRMLS_CC);
+	default_paths = phalcon_fetch_nproperty_this(this_ptr, SL("_paths"), PH_NOISY);
 
 	/**
 	 * Check if the paths need to be merged with current paths

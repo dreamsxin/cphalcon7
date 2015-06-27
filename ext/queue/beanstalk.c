@@ -173,14 +173,14 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 
 	zval *connection = NULL, *parameters, *host, *port;
 
-	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) == IS_RESOURCE) {
 		PHALCON_MM_GROW();
 		PHALCON_CALL_METHOD(NULL, this_ptr, "disconnect");
 		PHALCON_MM_RESTORE();
 	}
 
-	parameters = phalcon_fetch_nproperty_this(this_ptr, SL("_parameters"), PH_NOISY TSRMLS_CC);
+	parameters = phalcon_fetch_nproperty_this(this_ptr, SL("_parameters"), PH_NOISY);
 
 	if (!phalcon_array_isset_string_fetch(&host, parameters, SS("host")) || !phalcon_array_isset_string_fetch(&port, parameters, SS("port"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_exception_ce, "Unexpected inconsistency in options");
@@ -788,7 +788,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, disconnect){
 	zval *connection;
 	php_stream *stream;
 
-	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) != IS_RESOURCE) {
 		RETURN_FALSE;
 	}
@@ -823,7 +823,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 
 	zend_update_property_null(phalcon_queue_beanstalk_ce, getThis(), SL("_connection") TSRMLS_CC);
 
-	params = phalcon_fetch_nproperty_this(this_ptr, SL("_parameters"), PH_NOISY TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_parameters"), PH_NOISY);
 	if (
 			Z_TYPE_P(params) != IS_ARRAY
 		 || !phalcon_array_isset_string_fetch(&host, params, SS("host"))

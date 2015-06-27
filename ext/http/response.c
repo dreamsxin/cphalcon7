@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Http_Response, getHeaders){
 
 	zval *headers;
 
-	headers = phalcon_fetch_nproperty_this(this_ptr, SL("_headers"), PH_NOISY TSRMLS_CC);
+	headers = phalcon_fetch_nproperty_this(this_ptr, SL("_headers"), PH_NOISY);
 	if (Z_TYPE_P(headers) == IS_NULL) {
 		/** 
 		 * A Phalcon\Http\Response\Headers bag is temporary used to manage the headers
@@ -787,7 +787,7 @@ PHP_METHOD(Phalcon_Http_Response, sendHeaders){
 
 	zval *headers;
 
-	headers = phalcon_fetch_nproperty_this(this_ptr, SL("_headers"), PH_NOISY TSRMLS_CC);
+	headers = phalcon_fetch_nproperty_this(this_ptr, SL("_headers"), PH_NOISY);
 	if (Z_TYPE_P(headers) == IS_OBJECT) {
 		PHALCON_MM_GROW();
 		PHALCON_CALL_METHOD(NULL, headers, "send");
@@ -806,7 +806,7 @@ PHP_METHOD(Phalcon_Http_Response, sendCookies){
 
 	zval *cookies;
 
-	cookies = phalcon_fetch_nproperty_this(this_ptr, SL("_cookies"), PH_NOISY TSRMLS_CC);
+	cookies = phalcon_fetch_nproperty_this(this_ptr, SL("_cookies"), PH_NOISY);
 	if (Z_TYPE_P(cookies) == IS_OBJECT) {
 		PHALCON_MM_GROW();
 		PHALCON_CALL_METHOD(NULL, cookies, "send");
@@ -827,26 +827,26 @@ PHP_METHOD(Phalcon_Http_Response, send){
 
 	PHALCON_MM_GROW();
 
-	sent = phalcon_fetch_nproperty_this(this_ptr, SL("_sent"), PH_NOISY TSRMLS_CC);
+	sent = phalcon_fetch_nproperty_this(this_ptr, SL("_sent"), PH_NOISY);
 	if (PHALCON_IS_FALSE(sent)) {
 		/* Send headers */
-		headers = phalcon_fetch_nproperty_this(this_ptr, SL("_headers"), PH_NOISY TSRMLS_CC);
+		headers = phalcon_fetch_nproperty_this(this_ptr, SL("_headers"), PH_NOISY);
 		if (Z_TYPE_P(headers) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(NULL, headers, "send");
 		}
 
-		cookies = phalcon_fetch_nproperty_this(this_ptr, SL("_cookies"), PH_NOISY TSRMLS_CC);
+		cookies = phalcon_fetch_nproperty_this(this_ptr, SL("_cookies"), PH_NOISY);
 		if (Z_TYPE_P(cookies) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(NULL, cookies, "send");
 		}
 
 		/* Output the response body */
-		content = phalcon_fetch_nproperty_this(this_ptr, SL("_content"), PH_NOISY TSRMLS_CC);
+		content = phalcon_fetch_nproperty_this(this_ptr, SL("_content"), PH_NOISY);
 		if (Z_TYPE_P(content) != IS_NULL) {
 			zend_print_zval(content, 0);
 		}
 		else {
-			file = phalcon_fetch_nproperty_this(this_ptr, SL("_file"), PH_NOISY TSRMLS_CC);
+			file = phalcon_fetch_nproperty_this(this_ptr, SL("_file"), PH_NOISY);
 
 			if (Z_TYPE_P(file) == IS_STRING && Z_STRLEN_P(file)) {
 				php_stream *stream;

@@ -234,7 +234,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 	zval *transaction, *queue, *message_str = NULL;
 	zval *type = NULL, *time = NULL, *context = NULL;
 
-	transaction = phalcon_fetch_nproperty_this(this_ptr, SL("_transaction"), PH_NOISY TSRMLS_CC);
+	transaction = phalcon_fetch_nproperty_this(this_ptr, SL("_transaction"), PH_NOISY);
 	if (!zend_is_true(transaction)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "There is no active transaction");
 		return;
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 	phalcon_update_property_bool(this_ptr, SL("_transaction"), 0 TSRMLS_CC);
 	
 	/* Check if the queue has something to log */
-	queue = phalcon_fetch_nproperty_this(this_ptr, SL("_queue"), PH_NOISY TSRMLS_CC);
+	queue = phalcon_fetch_nproperty_this(this_ptr, SL("_queue"), PH_NOISY);
 	if (Z_TYPE_P(queue) == IS_ARRAY) { 
 		HashPosition hp;
 		zval **message;
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 
 	zval *transaction, *queue;
 
-	transaction = phalcon_fetch_nproperty_this(this_ptr, SL("_transaction"), PH_NOISY TSRMLS_CC);
+	transaction = phalcon_fetch_nproperty_this(this_ptr, SL("_transaction"), PH_NOISY);
 	if (!zend_is_true(transaction)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "There is no active transaction");
 		return;
@@ -473,7 +473,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 		i_level = Z_LVAL_P(*type);
 	}
 
-	log_level = phalcon_fetch_nproperty_this(this_ptr, SL("_logLevel"), PH_NOISY TSRMLS_CC);
+	log_level = phalcon_fetch_nproperty_this(this_ptr, SL("_logLevel"), PH_NOISY);
 
 	/* Only log the message if this is allowed by the current log level */
 	if (phalcon_get_intval(log_level) >= i_level) {
@@ -485,7 +485,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 		PHALCON_INIT_VAR(level);
 		ZVAL_LONG(level, i_level);
 
-		transaction = phalcon_fetch_nproperty_this(this_ptr, SL("_transaction"), PH_NOISY TSRMLS_CC);
+		transaction = phalcon_fetch_nproperty_this(this_ptr, SL("_transaction"), PH_NOISY);
 		if (zend_is_true(transaction)) {
 			PHALCON_INIT_VAR(queue_item);
 			object_init_ex(queue_item, phalcon_logger_item_ce);

@@ -2943,7 +2943,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 
 		if (Z_TYPE_P(messages) == IS_ARRAY) {
 			PHALCON_INIT_VAR(new_errors);
-			errors = phalcon_fetch_nproperty_this(this_ptr, SL("_errorMessages"), PH_NOISY TSRMLS_CC);
+			errors = phalcon_fetch_nproperty_this(this_ptr, SL("_errorMessages"), PH_NOISY);
 			if (Z_TYPE_P(errors) == IS_ARRAY) {
 				phalcon_fast_array_merge(new_errors, &errors, &messages TSRMLS_CC);
 				phalcon_update_property_this(this_ptr, SL("_errorMessages"), new_errors TSRMLS_CC);
@@ -3003,7 +3003,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validationHasFailed){
 
 	zval *error_messages;
 
-	error_messages = phalcon_fetch_nproperty_this(this_ptr, SL("_errorMessages"), PH_NOISY TSRMLS_CC);
+	error_messages = phalcon_fetch_nproperty_this(this_ptr, SL("_errorMessages"), PH_NOISY);
 	if (Z_TYPE_P(error_messages) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(error_messages))) {
 		RETURN_TRUE;
 	}
@@ -6247,7 +6247,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasManyToMany){
 
 	phalcon_fetch_params(1, 6, 1, &fields, &intermediate_model, &intermediate_fields, &intermediate_referenced_fields, &reference_model, &referenced_fields, &options);
 
-	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_modelsManager"), PH_NOISY TSRMLS_CC);
+	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_modelsManager"), PH_NOISY);
 
 	PHALCON_RETURN_CALL_METHOD(manager, "addhasmanytomany", this_ptr, fields, intermediate_model, intermediate_fields, intermediate_referenced_fields, reference_model, referenced_fields, options ? options : PHALCON_GLOBAL(z_null));
 	RETURN_MM();
@@ -8079,7 +8079,7 @@ PHP_METHOD(Phalcon_Mvc_Model, isRecord){
 	zval *dirty_state;
 	int d;
 
-	dirty_state = phalcon_fetch_nproperty_this(this_ptr, SL("_dirtyState"), PH_NOISY TSRMLS_CC);
+	dirty_state = phalcon_fetch_nproperty_this(this_ptr, SL("_dirtyState"), PH_NOISY);
 	d = phalcon_get_intval(dirty_state);
 
 	if (d == PHALCON_MODEL_DIRTY_STATE_PERSISTEN) {
@@ -8099,7 +8099,7 @@ PHP_METHOD(Phalcon_Mvc_Model, isNewRecord){
 	zval *dirty_state;
 	int d;
 
-	dirty_state = phalcon_fetch_nproperty_this(this_ptr, SL("_dirtyState"), PH_NOISY TSRMLS_CC);
+	dirty_state = phalcon_fetch_nproperty_this(this_ptr, SL("_dirtyState"), PH_NOISY);
 	d = phalcon_get_intval(dirty_state);
 
 	if (d == PHALCON_MODEL_DIRTY_STATE_TRANSIENT) {
@@ -8119,7 +8119,7 @@ PHP_METHOD(Phalcon_Mvc_Model, isDeletedRecord){
 	zval *dirty_state;
 	int d;
 
-	dirty_state = phalcon_fetch_nproperty_this(this_ptr, SL("_dirtyState"), PH_NOISY TSRMLS_CC);
+	dirty_state = phalcon_fetch_nproperty_this(this_ptr, SL("_dirtyState"), PH_NOISY);
 	d = phalcon_get_intval(dirty_state);
 
 	if (d == PHALCON_MODEL_DIRTY_STATE_DETACHED) {

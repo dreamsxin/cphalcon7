@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Loader, registerNamespaces){
 	}
 	if (merge && zend_is_true(merge)) {
 
-		current_namespaces = phalcon_fetch_nproperty_this(this_ptr, SL("_namespaces"), PH_NOISY TSRMLS_CC);
+		current_namespaces = phalcon_fetch_nproperty_this(this_ptr, SL("_namespaces"), PH_NOISY);
 		if (Z_TYPE_P(current_namespaces) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_namespaces);
 			phalcon_fast_array_merge(merged_namespaces, &current_namespaces, &namespaces TSRMLS_CC);
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Loader, registerPrefixes){
 	}
 
 	if (merge && zend_is_true(merge)) {
-		current_prefixes = phalcon_fetch_nproperty_this(this_ptr, SL("_prefixes"), PH_NOISY TSRMLS_CC);
+		current_prefixes = phalcon_fetch_nproperty_this(this_ptr, SL("_prefixes"), PH_NOISY);
 		if (Z_TYPE_P(current_prefixes) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_prefixes);
 			phalcon_fast_array_merge(merged_prefixes, &current_prefixes, &prefixes TSRMLS_CC);
@@ -350,7 +350,7 @@ PHP_METHOD(Phalcon_Loader, registerDirs){
 	}
 
 	if (merge && zend_is_true(merge)) {
-		current_directories = phalcon_fetch_nproperty_this(this_ptr, SL("_directories"), PH_NOISY TSRMLS_CC);
+		current_directories = phalcon_fetch_nproperty_this(this_ptr, SL("_directories"), PH_NOISY);
 		if (Z_TYPE_P(current_directories) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_directories);
 			phalcon_fast_array_merge(merged_directories, &current_directories, &directories TSRMLS_CC);
@@ -398,7 +398,7 @@ PHP_METHOD(Phalcon_Loader, registerClasses){
 	}
 
 	if (merge && zend_is_true(merge)) {
-		current_classes = phalcon_fetch_nproperty_this(this_ptr, SL("_classes"), PH_NOISY TSRMLS_CC);
+		current_classes = phalcon_fetch_nproperty_this(this_ptr, SL("_classes"), PH_NOISY);
 		if (Z_TYPE_P(current_classes) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_classes);
 			phalcon_fast_array_merge(merged_classes, &current_classes, &classes TSRMLS_CC);
@@ -436,7 +436,7 @@ PHP_METHOD(Phalcon_Loader, register){
 
 	PHALCON_MM_GROW();
 
-	registered = phalcon_fetch_nproperty_this(this_ptr, SL("_registered"), PH_NOISY TSRMLS_CC);
+	registered = phalcon_fetch_nproperty_this(this_ptr, SL("_registered"), PH_NOISY);
 	if (PHALCON_IS_FALSE(registered)) {
 		PHALCON_INIT_VAR(autoloader);
 		array_init_size(autoloader, 2);
@@ -460,7 +460,7 @@ PHP_METHOD(Phalcon_Loader, unregister){
 
 	PHALCON_MM_GROW();
 
-	registered = phalcon_fetch_nproperty_this(this_ptr, SL("_registered"), PH_NOISY TSRMLS_CC);
+	registered = phalcon_fetch_nproperty_this(this_ptr, SL("_registered"), PH_NOISY);
 	if (PHALCON_IS_TRUE(registered)) {
 		PHALCON_INIT_VAR(autoloader);
 		array_init_size(autoloader, 2);

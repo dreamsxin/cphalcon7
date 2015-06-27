@@ -322,13 +322,13 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		uri = PHALCON_GLOBAL(z_null);
 	}
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) != IS_OBJECT) {
 		events_manager = NULL;
 	}
@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/** 
 	 * Check whether use implicit views or not
 	 */
-	implicit_view = phalcon_fetch_nproperty_this(this_ptr, SL("_implicitView"), PH_NOISY TSRMLS_CC);
+	implicit_view = phalcon_fetch_nproperty_this(this_ptr, SL("_implicitView"), PH_NOISY);
 
 	/*
 	 * The safe way is to use a flag because it *might* be possible to alter the value

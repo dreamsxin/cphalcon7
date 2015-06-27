@@ -879,7 +879,7 @@ PHP_METHOD(Phalcon_Http_Cookie, __toString){
 
 	zval *value;
 
-	value = phalcon_fetch_nproperty_this(this_ptr, SL("_value"), PH_NOISY TSRMLS_CC);
+	value = phalcon_fetch_nproperty_this(this_ptr, SL("_value"), PH_NOISY);
 	if (Z_TYPE_P(value) == IS_NULL) {
 		if (FAILURE == phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "getvalue", 0, NULL TSRMLS_CC)) {
 			if (EG(exception)) {

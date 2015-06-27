@@ -296,7 +296,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, numberArguments){
 
 	zval *arguments;
 
-	arguments = phalcon_fetch_nproperty_this(this_ptr, SL("_arguments"), PH_NOISY TSRMLS_CC);
+	arguments = phalcon_fetch_nproperty_this(this_ptr, SL("_arguments"), PH_NOISY);
 	phalcon_fast_count(return_value, arguments TSRMLS_CC);
 }
 
@@ -311,7 +311,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getArgument){
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	
-	arguments = phalcon_fetch_nproperty_this(this_ptr, SL("_arguments"), PH_NOISY TSRMLS_CC);
+	arguments = phalcon_fetch_nproperty_this(this_ptr, SL("_arguments"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&tmp, arguments, position)) {
 		RETURN_ZVAL(tmp, 1, 0);
 	}
@@ -328,7 +328,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, hasArgument){
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	
-	arguments = phalcon_fetch_nproperty_this(this_ptr, SL("_arguments"), PH_NOISY TSRMLS_CC);
+	arguments = phalcon_fetch_nproperty_this(this_ptr, SL("_arguments"), PH_NOISY);
 	RETURN_BOOL(phalcon_array_isset(arguments, position));
 }
 

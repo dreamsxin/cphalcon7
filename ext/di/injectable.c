@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
  */
 PHP_METHOD(Phalcon_DI_Injectable, getDI)
 {
-	zval *dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	zval *dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_RETURN_CALL_CE_STATICW(phalcon_di_ce, "getdefault");
 		return;
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		dependency_injector = NULL;
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");

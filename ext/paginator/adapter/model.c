@@ -124,8 +124,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	z_one  = PHALCON_GLOBAL(z_one);
 	z_zero = PHALCON_GLOBAL(z_zero);
 	
-	show        = phalcon_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY TSRMLS_CC);
-	config      = phalcon_fetch_nproperty_this(this_ptr, SL("_config"), PH_NOISY TSRMLS_CC);
+	show        = phalcon_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY);
+	config      = phalcon_fetch_nproperty_this(this_ptr, SL("_config"), PH_NOISY);
 	
 	PHALCON_OBS_VAR(page_number);
 	phalcon_read_property_this(&page_number, this_ptr, SL("_page"), PH_NOISY);

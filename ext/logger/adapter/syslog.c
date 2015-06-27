@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, close){
 
 	zval *opened;
 
-	opened = phalcon_fetch_nproperty_this(this_ptr, SL("_opened"), PH_NOISY TSRMLS_CC);
+	opened = phalcon_fetch_nproperty_this(this_ptr, SL("_opened"), PH_NOISY);
 	if (zend_is_true(opened)) {
 		PHALCON_CALL_FUNCTIONW(NULL, "closelog");
 	}

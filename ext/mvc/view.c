@@ -777,7 +777,7 @@ PHP_METHOD(Phalcon_Mvc_View, getVar){
 
 	phalcon_fetch_params(0, 0, 1, 0, &key);
 
-	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -1347,9 +1347,9 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 	phalcon_fetch_params(0, 1, 0, &view);
 	PHALCON_ENSURE_IS_STRING(view);
 
-	base_dir = phalcon_fetch_nproperty_this(getThis(), SL("_basePath"), PH_NOISY TSRMLS_CC);
-	view_dir = phalcon_fetch_nproperty_this(getThis(), SL("_viewsDir"), PH_NOISY TSRMLS_CC);
-	engines  = phalcon_fetch_nproperty_this(getThis(), SL("_registeredEngines"), PH_NOISY TSRMLS_CC);
+	base_dir = phalcon_fetch_nproperty_this(getThis(), SL("_basePath"), PH_NOISY);
+	view_dir = phalcon_fetch_nproperty_this(getThis(), SL("_viewsDir"), PH_NOISY);
+	engines  = phalcon_fetch_nproperty_this(getThis(), SL("_registeredEngines"), PH_NOISY);
 
 	if (Z_TYPE_P(engines) != IS_ARRAY) {
 		MAKE_STD_ZVAL(engines);
@@ -2096,7 +2096,7 @@ PHP_METHOD(Phalcon_Mvc_View, isCaching){
 
 	z_zero = PHALCON_GLOBAL(z_zero);
 
-	cache_level = phalcon_fetch_nproperty_this(this_ptr, SL("_cacheLevel"), PH_NOISY TSRMLS_CC);
+	cache_level = phalcon_fetch_nproperty_this(this_ptr, SL("_cacheLevel"), PH_NOISY);
 	is_smaller_function(return_value, z_zero, cache_level TSRMLS_CC);
 }
 
@@ -2361,7 +2361,7 @@ PHP_METHOD(Phalcon_Mvc_View, __get){
 
 	phalcon_fetch_params(0, 0, 1, 0, &key);
 
-	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -2385,7 +2385,7 @@ PHP_METHOD(Phalcon_Mvc_View, __isset){
 
 	phalcon_fetch_params(0, 0, 1, 0, &key);
 
-	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset(params, key)) {
 		RETURN_TRUE;
 	}

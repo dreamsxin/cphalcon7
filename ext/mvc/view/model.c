@@ -817,7 +817,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __get){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -837,7 +837,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __isset){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset(params, key)) {
 		RETURN_TRUE;
 	}

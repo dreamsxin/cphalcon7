@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
 
 	phalcon_fetch_params(0, 1, 4, 0, &message, &type, &time, &context);
 	
-	stream = phalcon_fetch_nproperty_this(this_ptr, SL("_stream"), PH_NOISY TSRMLS_CC);
+	stream = phalcon_fetch_nproperty_this(this_ptr, SL("_stream"), PH_NOISY);
 	if (Z_TYPE_P(stream) != IS_RESOURCE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
@@ -183,6 +183,6 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, close)
 {
-	zval *stream = phalcon_fetch_nproperty_this(this_ptr, SL("_stream"), PH_NOISY TSRMLS_CC);
+	zval *stream = phalcon_fetch_nproperty_this(this_ptr, SL("_stream"), PH_NOISY);
 	PHALCON_RETURN_CALL_FUNCTIONW("fclose", stream);
 }

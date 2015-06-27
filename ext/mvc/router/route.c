@@ -947,11 +947,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaults){
 	zval *namespace_name, *module_name;
 	zval *controller_name, *action_name, *params;
 
-	namespace_name  = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultNamespace"), PH_NOISY TSRMLS_CC);
-	module_name     = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultModule"), PH_NOISY TSRMLS_CC);
-	controller_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultController"), PH_NOISY TSRMLS_CC);
-	action_name     = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultAction"), PH_NOISY TSRMLS_CC);
-	params          = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultParams"), PH_NOISY TSRMLS_CC);
+	namespace_name  = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultNamespace"), PH_NOISY);
+	module_name     = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultModule"), PH_NOISY);
+	controller_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultController"), PH_NOISY);
+	action_name     = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultAction"), PH_NOISY);
+	params          = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultParams"), PH_NOISY);
 
 	array_init_size(return_value, 5);
 

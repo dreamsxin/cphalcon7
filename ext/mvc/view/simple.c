@@ -715,7 +715,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 
 	phalcon_ob_end_clean(TSRMLS_C);
 
-	content = phalcon_fetch_nproperty_this(this_ptr, SL("_content"), PH_NOISY TSRMLS_CC);
+	content = phalcon_fetch_nproperty_this(this_ptr, SL("_content"), PH_NOISY);
 
 	/** 
 	 * Content is output to the parent view
@@ -1048,7 +1048,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, __get){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
 		RETURN_ZVAL(value, 1, 0);
 	}

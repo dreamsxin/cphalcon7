@@ -261,13 +261,13 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 	PHALCON_MM_GROW();
 	
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 	
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) != IS_OBJECT) {
 		events_manager = NULL;
 	}

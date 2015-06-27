@@ -195,8 +195,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 	
-	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY TSRMLS_CC);
-	redis = phalcon_fetch_nproperty_this(this_ptr, SL("_redis"), PH_NOISY TSRMLS_CC);
+	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY);
+	redis = phalcon_fetch_nproperty_this(this_ptr, SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(redis, "get", key, lifetime);
@@ -221,8 +221,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, write){
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
 	
-	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY TSRMLS_CC);
-	redis = phalcon_fetch_nproperty_this(this_ptr, SL("_redis"), PH_NOISY TSRMLS_CC);
+	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY);
+	redis = phalcon_fetch_nproperty_this(this_ptr, SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, redis, "save", key, data, lifetime);	
@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, reset)
 
 	PHALCON_MM_GROW();
 
-	redis = phalcon_fetch_nproperty_this(this_ptr, SL("_redis"), PH_NOISY TSRMLS_CC);
+	redis = phalcon_fetch_nproperty_this(this_ptr, SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, redis, "flush");	

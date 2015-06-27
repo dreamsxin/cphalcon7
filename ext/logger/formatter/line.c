@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 	 * Check if the format has the %date% placeholder
 	 */
 	if (phalcon_memnstr_str(format, SL("%date%"))) {
-		date_format = phalcon_fetch_nproperty_this(this_ptr, SL("_dateFormat"), PH_NOISY TSRMLS_CC);
+		date_format = phalcon_fetch_nproperty_this(this_ptr, SL("_dateFormat"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(date);
 		phalcon_date(date, date_format, timestamp TSRMLS_CC);

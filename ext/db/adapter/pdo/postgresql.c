@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	phalcon_fetch_params(1, 1, 1, &table, &schema);
 	
 	if (!schema || !zend_is_true(schema)) {
-		schema = phalcon_fetch_nproperty_this(this_ptr, SL("_schema"), PH_NOISY TSRMLS_CC);
+		schema = phalcon_fetch_nproperty_this(this_ptr, SL("_schema"), PH_NOISY);
 	}
 	
 	PHALCON_INIT_VAR(columns);

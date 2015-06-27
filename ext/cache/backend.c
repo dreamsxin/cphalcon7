@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	if (Z_TYPE_P(return_value) == IS_NULL) {
 		fresh = PHALCON_GLOBAL(z_true);
 	
-		frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
+		frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, frontend, "start");
 	} else {
 		fresh = PHALCON_GLOBAL(z_false);
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Cache_Backend, stop){
 	
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
 		PHALCON_MM_GROW();
-		frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
+		frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, frontend, "stop");
 		PHALCON_MM_RESTORE();
 	}

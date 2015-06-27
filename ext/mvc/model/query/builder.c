@@ -1443,14 +1443,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		dependency_injector = NULL;
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
 	}
 
-	models = phalcon_fetch_nproperty_this(this_ptr, SL("_models"), PH_NOISY TSRMLS_CC);
+	models = phalcon_fetch_nproperty_this(this_ptr, SL("_models"), PH_NOISY);
 	if (Z_TYPE_P(models) == IS_ARRAY) { 
 		if (!phalcon_fast_count_ev(models TSRMLS_CC)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
@@ -1465,7 +1465,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	PHALCON_INIT_VAR(phql);
 
-	distinct = phalcon_fetch_nproperty_this(this_ptr, SL("_distinct"), PH_NOISY TSRMLS_CC);
+	distinct = phalcon_fetch_nproperty_this(this_ptr, SL("_distinct"), PH_NOISY);
 	if (PHALCON_IS_BOOL(distinct)) {
 		if (Z_BVAL_P(distinct)) {
 			ZVAL_STRING(phql, "SELECT DISTINCT ", 1);
@@ -1766,7 +1766,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	/** 
 	 * Process limit parameters
 	 */
-	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY TSRMLS_CC);
+	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) { 
 			zval *offset;
@@ -1783,7 +1783,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 			PHALCON_SCONCAT_SV(phql, " LIMIT ", limit);
 
-			offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY TSRMLS_CC);
+			offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY);
 			if (Z_TYPE_P(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SV(phql, " OFFSET ", offset);
 			}
@@ -1793,7 +1793,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	/** 
 	 * Process FOR UPDATE clause
 	 */
-	for_update = phalcon_fetch_nproperty_this(this_ptr, SL("_forUpdate"), PH_NOISY TSRMLS_CC);
+	for_update = phalcon_fetch_nproperty_this(this_ptr, SL("_forUpdate"), PH_NOISY);
 	if (zend_is_true(for_update)) {
 		phalcon_concat_self_str(&phql, SL(" FOR UPDATE") TSRMLS_CC);
 	}
@@ -1817,10 +1817,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 	 */
 	PHALCON_CALL_METHOD(&phql, this_ptr, "getphql");
 
-	bind_params = phalcon_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY TSRMLS_CC);
-	bind_types = phalcon_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY TSRMLS_CC);
+	bind_params = phalcon_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY);
+	bind_types = phalcon_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY);
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 
 	PHALCON_INIT_VAR(service_name);
 	ZVAL_STRING(service_name, "modelsQuery", 1);
@@ -1883,14 +1883,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 	phalcon_read_property_this(&conditions, this_ptr, SL("_conditions"), PH_NOISY);
 
 	if (phalcon_is_numeric(conditions)) {
-		dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+		dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 			dependency_injector = NULL;
 			PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 			phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
 		}
 
-		models = phalcon_fetch_nproperty_this(this_ptr, SL("_models"), PH_NOISY TSRMLS_CC);
+		models = phalcon_fetch_nproperty_this(this_ptr, SL("_models"), PH_NOISY);
 		if (Z_TYPE_P(models) == IS_ARRAY) { 
 			if (!phalcon_fast_count_ev(models TSRMLS_CC)) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");

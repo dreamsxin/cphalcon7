@@ -255,13 +255,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
 	PHALCON_MM_GROW();
 
-	db = phalcon_fetch_nproperty_this(this_ptr, SL("_db"), PH_NOISY TSRMLS_CC);
-	sql = phalcon_fetch_nproperty_this(this_ptr, SL("_sql"), PH_NOISY TSRMLS_CC);
-	total_sql = phalcon_fetch_nproperty_this(this_ptr, SL("_total_sql"), PH_NOISY TSRMLS_CC);
-	bind = phalcon_fetch_nproperty_this(this_ptr, SL("_bind"), PH_NOISY TSRMLS_CC);
+	db = phalcon_fetch_nproperty_this(this_ptr, SL("_db"), PH_NOISY);
+	sql = phalcon_fetch_nproperty_this(this_ptr, SL("_sql"), PH_NOISY);
+	total_sql = phalcon_fetch_nproperty_this(this_ptr, SL("_total_sql"), PH_NOISY);
+	bind = phalcon_fetch_nproperty_this(this_ptr, SL("_bind"), PH_NOISY);
 
-	limit         = phalcon_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY TSRMLS_CC);
-	number_page   = phalcon_fetch_nproperty_this(this_ptr, SL("_page"), PH_NOISY TSRMLS_CC);
+	limit         = phalcon_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY);
+	number_page   = phalcon_fetch_nproperty_this(this_ptr, SL("_page"), PH_NOISY);
 	i_limit       = phalcon_get_intval(limit);
 	i_number_page = phalcon_get_intval(number_page);
 

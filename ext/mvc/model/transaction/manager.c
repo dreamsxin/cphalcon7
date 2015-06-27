@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, has){
 
 	z_zero = PHALCON_GLOBAL(z_zero);
 	
-	number = phalcon_fetch_nproperty_this(this_ptr, SL("_number"), PH_NOISY TSRMLS_CC);
+	number = phalcon_fetch_nproperty_this(this_ptr, SL("_number"), PH_NOISY);
 	is_smaller_function(return_value, z_zero, number TSRMLS_CC);
 }
 

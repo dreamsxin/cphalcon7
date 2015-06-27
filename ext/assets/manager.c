@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
 		return;
 	}
 
-	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY TSRMLS_CC);
+	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&collection, collections, id)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "The collection does not exist in the manager");
 		return;
@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
 
 	zval *collections, *collection;
 
-	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY TSRMLS_CC);
+	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY);
 
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
@@ -470,7 +470,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getJs){
 
 	zval *collections, *collection;
 
-	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY TSRMLS_CC);
+	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY);
 
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY TSRMLS_CC);
+	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&collection, collections, name)) {
 		RETURN_ZVAL(collection, 1, 0);
 	}

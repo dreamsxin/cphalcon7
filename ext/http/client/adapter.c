@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setHeader){
 
 	phalcon_fetch_params(0, 2, 0, &name, &value);
 
-	header = phalcon_fetch_nproperty_this(this_ptr, SL("_header"), PH_NOISY TSRMLS_CC);
+	header = phalcon_fetch_nproperty_this(this_ptr, SL("_header"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(NULL, header, "set", name, value);
 
@@ -203,7 +203,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setHeaders){
 
 	phalcon_fetch_params(0, 1, 0, &headers);
 
-	header = phalcon_fetch_nproperty_this(this_ptr, SL("_header"), PH_NOISY TSRMLS_CC);
+	header = phalcon_fetch_nproperty_this(this_ptr, SL("_header"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(NULL, header, "setMultiple", headers);
 
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getPath){
 
 	zval *base_uri;
 
-	base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_base_uri"), PH_NOISY TSRMLS_CC);
+	base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_base_uri"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&return_value, base_uri, "getpath");
 }
@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUri){
 
 	phalcon_fetch_params(0, 1, 0, &uri);
 
-	base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_base_uri"), PH_NOISY TSRMLS_CC);
+	base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_base_uri"), PH_NOISY);
 
 	if (Z_TYPE_P(base_uri) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, base_uri, "extend", uri);
@@ -473,11 +473,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getUri){
 
 	zval *base_uri;
 
-	base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_base_uri"), PH_NOISY TSRMLS_CC);
+	base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_base_uri"), PH_NOISY);
 
 	if (Z_TYPE_P(base_uri) != IS_OBJECT) {
 		PHALCON_CALL_SELFW(NULL, "setbaseuri");
-		base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_base_uri"), PH_NOISY TSRMLS_CC);
+		base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_base_uri"), PH_NOISY);
 	}
 
 	RETURN_CTORW(base_uri);

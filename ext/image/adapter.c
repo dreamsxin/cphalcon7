@@ -251,8 +251,8 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 			PHALCON_INIT_VAR(height);
 		}
 
-		image_width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY TSRMLS_CC);
-		image_height = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY TSRMLS_CC);
+		image_width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY);
+		image_height = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
 
 		tmp_image_width  = phalcon_get_intval(image_width);
 		tmp_image_height = phalcon_get_intval(image_height);
@@ -411,8 +411,8 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 
 	PHALCON_MM_GROW();
 
-	image_width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY TSRMLS_CC);
-	image_height = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY TSRMLS_CC);
+	image_width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY);
+	image_height = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
 
 	SEPARATE_ZVAL_IF_NOT_REF(w);
 	if (Z_TYPE_P(*w) != IS_LONG) {
@@ -611,7 +611,7 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
 
 	PHALCON_MM_GROW();
 
-	image_height     = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY TSRMLS_CC);
+	image_height     = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
 	tmp_image_height = phalcon_get_intval(image_height);
 
 	if (!h || Z_TYPE_P(*h) != IS_LONG || Z_LVAL_P(*h) > tmp_image_height) {
@@ -668,10 +668,10 @@ PHP_METHOD(Phalcon_Image_Adapter, watermark){
 
 	PHALCON_MM_GROW();
 
-	image_width      = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY TSRMLS_CC);
-	image_height     = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY TSRMLS_CC);
-	watermark_width  = phalcon_fetch_nproperty_this(*watermark, SL("_width"), PH_NOISY TSRMLS_CC);
-	watermark_height = phalcon_fetch_nproperty_this(*watermark, SL("_height"), PH_NOISY TSRMLS_CC);
+	image_width      = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY);
+	image_height     = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
+	watermark_width  = phalcon_fetch_nproperty_this(*watermark, SL("_width"), PH_NOISY);
+	watermark_height = phalcon_fetch_nproperty_this(*watermark, SL("_height"), PH_NOISY);
 
 	tmp_image_width      = phalcon_get_intval(image_width);
 	tmp_image_height     = phalcon_get_intval(image_height);
@@ -1128,7 +1128,7 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 	phalcon_fetch_params(0, 1, 0, 2, &ext, &quality);
 
 	if (!ext) {
-		format = phalcon_fetch_nproperty_this(this_ptr, SL("_format"), PH_NOISY TSRMLS_CC);
+		format = phalcon_fetch_nproperty_this(this_ptr, SL("_format"), PH_NOISY);
 
 		if (PHALCON_IS_EMPTY(format)) {
 			PHALCON_INIT_VAR(ext);

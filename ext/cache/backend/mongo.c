@@ -163,12 +163,12 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 
 	PHALCON_MM_GROW();
 
-	mongo_collection = phalcon_fetch_nproperty_this(this_ptr, SL("_collection"), PH_NOISY TSRMLS_CC);
+	mongo_collection = phalcon_fetch_nproperty_this(this_ptr, SL("_collection"), PH_NOISY);
 	if (Z_TYPE_P(mongo_collection) != IS_OBJECT) {
 		zval *options, *mongo;
 		zval *server = NULL, *database = NULL, *collection = NULL;
 
-		options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+		options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
 	
 		/** 
 		 * If mongo is defined a valid Mongo object must be passed
@@ -244,8 +244,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
 	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
 	
-	frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
-	prefix   = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
+	frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY);
+	prefix   = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
@@ -301,9 +301,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 	phalcon_fetch_params(1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);
+		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY);
 	} else {
-		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
+		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(last_key);
 		PHALCON_CONCAT_VV(last_key, prefix, key_name);
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 		return;
 	}
 	
-	frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY TSRMLS_CC);
+	frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY);
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, frontend, "getcontent");
 	} else {
@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 	}
 
 	if (!lifetime || Z_TYPE_P(lifetime) == IS_NULL) {
-		zval *tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_lastLifetime"), PH_NOISY TSRMLS_CC);
+		zval *tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_lastLifetime"), PH_NOISY);
 
 		if (Z_TYPE_P(tmp) == IS_NULL) {
 			PHALCON_CALL_METHOD(&ttl, frontend, "getlifetime");
@@ -402,7 +402,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 
 	phalcon_fetch_params(1, 1, 0, &key_name);
 	
-	prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
+	prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
@@ -506,9 +506,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 	phalcon_fetch_params(1, 0, 2, &key_name, &lifetime);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY TSRMLS_CC);
+		last_key = phalcon_fetch_nproperty_this(this_ptr, SL("_lastKey"), PH_NOISY);
 	} else {
-		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY TSRMLS_CC);
+		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(last_key);
 		PHALCON_CONCAT_VV(last_key, prefix, key_name);

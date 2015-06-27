@@ -497,7 +497,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
-		encrypt_key = phalcon_fetch_nproperty_this(this_ptr, SL("_key"), PH_NOISY TSRMLS_CC);
+		encrypt_key = phalcon_fetch_nproperty_this(this_ptr, SL("_key"), PH_NOISY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(encrypt_key, key);
 		if (Z_TYPE_P(encrypt_key) != IS_STRING) {
@@ -510,8 +510,8 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		return;
 	}
 
-	cipher = phalcon_fetch_nproperty_this(this_ptr, SL("_cipher"), PH_NOISY TSRMLS_CC);
-	mode   = phalcon_fetch_nproperty_this(this_ptr, SL("_mode"), PH_NOISY TSRMLS_CC);
+	cipher = phalcon_fetch_nproperty_this(this_ptr, SL("_cipher"), PH_NOISY);
+	mode   = phalcon_fetch_nproperty_this(this_ptr, SL("_mode"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTION(&iv_size, "mcrypt_get_iv_size", cipher, mode);
 	if (unlikely(Z_TYPE_P(iv_size) != IS_LONG)) {
@@ -536,7 +536,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		convert_to_long(block_size);
 	}
 
-	padding_type = phalcon_fetch_nproperty_this(this_ptr, SL("_padding"), PH_NOISY TSRMLS_CC);
+	padding_type = phalcon_fetch_nproperty_this(this_ptr, SL("_padding"), PH_NOISY);
 
 	assert(Z_TYPE_P(padding_type) == IS_LONG);
 	assert(Z_TYPE_P(block_size) == IS_LONG);
@@ -612,7 +612,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
-		decrypt_key = phalcon_fetch_nproperty_this(this_ptr, SL("_key"), PH_NOISY TSRMLS_CC);
+		decrypt_key = phalcon_fetch_nproperty_this(this_ptr, SL("_key"), PH_NOISY);
 	} else {
 		decrypt_key = key;
 	}
@@ -622,8 +622,8 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		return;
 	}
 
-	cipher = phalcon_fetch_nproperty_this(this_ptr, SL("_cipher"), PH_NOISY TSRMLS_CC);
-	mode   = phalcon_fetch_nproperty_this(this_ptr, SL("_mode"), PH_NOISY TSRMLS_CC);
+	cipher = phalcon_fetch_nproperty_this(this_ptr, SL("_cipher"), PH_NOISY);
+	mode   = phalcon_fetch_nproperty_this(this_ptr, SL("_mode"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTION(&iv_size, "mcrypt_get_iv_size", cipher, mode);
 	if (unlikely(Z_TYPE_P(iv_size) != IS_LONG)) {
@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		convert_to_long(block_size);
 	}
 
-	padding_type = phalcon_fetch_nproperty_this(this_ptr, SL("_padding"), PH_NOISY TSRMLS_CC);
+	padding_type = phalcon_fetch_nproperty_this(this_ptr, SL("_padding"), PH_NOISY);
 
 	assert(Z_TYPE_P(padding_type) == IS_LONG);
 	assert(Z_TYPE_P(block_size) == IS_LONG);

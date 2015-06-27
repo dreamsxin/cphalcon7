@@ -822,7 +822,7 @@ PHP_METHOD(Phalcon_DI, get){
 		parameters = PHALCON_GLOBAL(z_null);
 	}
 
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_NVAR(event_name);
 		ZVAL_STRING(event_name, "di:beforeServiceResolve", 1);

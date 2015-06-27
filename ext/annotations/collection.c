@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, count){
 
 	zval *annotations;
 
-	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_annotations"), PH_NOISY TSRMLS_CC);
+	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		RETURN_LONG(zend_hash_num_elements(Z_ARRVAL_P(annotations)));
 	}
@@ -187,8 +187,8 @@ PHP_METHOD(Phalcon_Annotations_Collection, current){
 
 	zval *position, *annotations, *annotation;
 
-	position    = phalcon_fetch_nproperty_this(this_ptr, SL("_position"), PH_NOISY TSRMLS_CC);
-	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_annotations"), PH_NOISY TSRMLS_CC);
+	position    = phalcon_fetch_nproperty_this(this_ptr, SL("_position"), PH_NOISY);
+	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_annotations"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&annotation, annotations, position)) {
 		RETURN_ZVAL(annotation, 1, 0);
 	}

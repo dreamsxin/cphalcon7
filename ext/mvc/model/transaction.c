@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, begin){
 
 	zval *connection;
 
-	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(connection, "begin");
 }
 
@@ -205,12 +205,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, commit){
 
 	zval *manager, *connection;
 
-	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_manager"), PH_NOISY TSRMLS_CC);
+	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_manager"), PH_NOISY);
 	if (Z_TYPE_P(manager) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, manager, "notifycommit", getThis());
 	}
 	
-	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(connection, "commit");
 }
 
@@ -244,12 +244,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 		PHALCON_SEPARATE_PARAM(rollback_record);
 	}
 	
-	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_manager"), PH_NOISY TSRMLS_CC);
+	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_manager"), PH_NOISY);
 	if (Z_TYPE_P(manager) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, manager, "notifyrollback", getThis());
 	}
 	
-	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY);
 	
 	PHALCON_CALL_METHOD(&success, connection, "rollback");
 	if (zend_is_true(success)) {
@@ -343,7 +343,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, isManaged){
 
 	zval *manager;
 
-	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_manager"), PH_NOISY TSRMLS_CC);
+	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_manager"), PH_NOISY);
 	boolean_not_function(return_value, manager TSRMLS_CC);
 }
 
@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, isValid){
 
 	zval *connection;
 
-	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY TSRMLS_CC);
+	connection = phalcon_fetch_nproperty_this(this_ptr, SL("_connection"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(connection, "isundertransaction");
 }
 

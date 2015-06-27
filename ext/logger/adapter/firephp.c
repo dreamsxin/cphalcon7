@@ -81,7 +81,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, getFormatter){
 
 	zval *formatter;
 
-	formatter = phalcon_fetch_nproperty_this(this_ptr, SL("_formatter"), PH_NOISY TSRMLS_CC);
+	formatter = phalcon_fetch_nproperty_this(this_ptr, SL("_formatter"), PH_NOISY);
 	if (Z_TYPE_P(formatter) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_logger_formatter_firephp_ce);
 		phalcon_update_property_this(this_ptr, SL("_formatter"), return_value TSRMLS_CC);

@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, execute){
 
 	PHALCON_MM_GROW();
 
-	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY TSRMLS_CC);
+	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(pdo_statement, "execute");
 	PHALCON_MM_RESTORE();
 }
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetch){
 
 	PHALCON_MM_GROW();
 
-	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY TSRMLS_CC);
+	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(pdo_statement, "fetch");
 	RETURN_MM();
 }
@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchArray){
 
 	PHALCON_MM_GROW();
 
-	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY TSRMLS_CC);
+	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(pdo_statement, "fetch");
 	RETURN_MM();
 }
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
 		ctor_args = PHALCON_GLOBAL(z_null);
 	}
 
-	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY TSRMLS_CC);
+	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY);
 	if (Z_TYPE_P(fetch_mode) != IS_NULL) {
 		if (Z_TYPE_P(fetch_argument) != IS_NULL) {
 			if (Z_TYPE_P(ctor_args) != IS_NULL) {
@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, nextRowset){
 
 	PHALCON_MM_GROW();
 
-	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY TSRMLS_CC);
+	pdo_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_pdoStatement"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(pdo_statement, "nextrowset");
 
 	RETURN_MM();

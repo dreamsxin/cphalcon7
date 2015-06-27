@@ -154,7 +154,7 @@ int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval
 {
 	if (is_phalcon_class(ce)) {
 		zval *msg;
-		zval *messages = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultMessages"), PH_NOISY TSRMLS_CC);
+		zval *messages = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultMessages"), PH_NOISY);
 
 		MAKE_STD_ZVAL(*return_value_ptr);
 		if (phalcon_array_isset_string_fetch(&msg, messages, type, strlen(type)+1)) {
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 		entity = PHALCON_GLOBAL(z_null);
 	}
 	
-	validators = phalcon_fetch_nproperty_this(this_ptr, SL("_validators"), PH_NOISY TSRMLS_CC);
+	validators = phalcon_fetch_nproperty_this(this_ptr, SL("_validators"), PH_NOISY);
 	if (Z_TYPE_P(validators) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no validators to validate");
 		return;
@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Validation, getFilters){
 
 	phalcon_fetch_params(0, 0, 0, 1, &attribute);
 	
-	filters = phalcon_fetch_nproperty_this(this_ptr, SL("_filters"), PH_NOISY TSRMLS_CC);
+	filters = phalcon_fetch_nproperty_this(this_ptr, SL("_filters"), PH_NOISY);
 	if (attribute && Z_TYPE_P(attribute) == IS_STRING) {
 		if (phalcon_array_isset_fetch(&attribute_filters, filters, attribute)) {
 			RETURN_ZVAL(attribute_filters, 1, 0);
@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Validation, appendMessage){
 
 	phalcon_fetch_params(0, 1, 1, 0, &message);
 	
-	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);
+	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, messages, "appendmessage", message);
 	}
@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 
 	phalcon_fetch_params(0, 0, 1, 0, &type);
 
-	messages = phalcon_fetch_nproperty_this(getThis(), SL("_defaultMessages"), PH_NOISY TSRMLS_CC);
+	messages = phalcon_fetch_nproperty_this(getThis(), SL("_defaultMessages"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&msg, messages, type)) {
 		RETURN_ZVAL(msg, 1, 0);
 	}
@@ -712,7 +712,7 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 		ZVAL_EMPTY_STRING(field);
 	}
 
-	labels = phalcon_fetch_nproperty_this(getThis(), SL("_labels"), PH_NOISY TSRMLS_CC);
+	labels = phalcon_fetch_nproperty_this(getThis(), SL("_labels"), PH_NOISY);
 	if (Z_TYPE_P(labels) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&value, labels, field)) {
 			RETURN_CTOR(value);

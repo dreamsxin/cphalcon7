@@ -77,7 +77,7 @@ int phalcon_validation_validator_getoption_helper(const zend_class_entry *ce, zv
 
 	if (is_phalcon_class(ce)) {
 		zval *value;
-		zval *options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+		zval *options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
 
 		MAKE_STD_ZVAL(*result);
 		if (phalcon_array_isset_string_fetch(&value, options, option, strlen(option)+1)) {
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Validation_Validator, isSetOption){
 
 	phalcon_fetch_params(0, 0, 1, 0, &key);
 	
-	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
 	RETURN_BOOL(phalcon_array_isset(options, key));
 }
 

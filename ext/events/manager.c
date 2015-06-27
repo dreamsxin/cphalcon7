@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		PHALCON_CALL_METHOD(NULL, listener, "__construct", handler, priority, event_type);
 	}
 
-	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY TSRMLS_CC);
+	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY);
 	if (Z_TYPE_P(events) != IS_ARRAY) {
 		PHALCON_INIT_VAR(events);
 		array_init(events);
@@ -308,7 +308,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 		return;
 	}
 
-	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY TSRMLS_CC);
+	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY);
 	if (Z_TYPE_P(events) != IS_ARRAY) {
 		RETURN_MM_FALSE;
 	}
@@ -761,7 +761,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 		return;
 	}
 
-	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY TSRMLS_CC);
+	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY);
 	if (Z_TYPE_P(events) != IS_ARRAY) { 
 		RETURN_MM_NULL();
 	}
@@ -790,7 +790,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	/** 
 	 * Should responses be traced?
 	 */
-	collect = phalcon_fetch_nproperty_this(this_ptr, SL("_collect"), PH_NOISY TSRMLS_CC);
+	collect = phalcon_fetch_nproperty_this(this_ptr, SL("_collect"), PH_NOISY);
 	if (zend_is_true(collect)) {
 		phalcon_update_property_null(this_ptr, SL("_responses") TSRMLS_CC);
 	}
@@ -852,7 +852,7 @@ PHP_METHOD(Phalcon_Events_Manager, hasListeners){
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
-	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY TSRMLS_CC);
+	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY);
 	if (phalcon_array_isset(events, type)) {
 		RETURN_TRUE;
 	}
@@ -883,7 +883,7 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 		full = PHALCON_GLOBAL(z_false);
 	}
 
-	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY TSRMLS_CC);
+	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY);
 	if (Z_TYPE_P(events) != IS_ARRAY) {
 		RETURN_MM_EMPTY_ARRAY();
 	}
@@ -951,6 +951,6 @@ PHP_METHOD(Phalcon_Events_Manager, getEvents){
 
 	zval *events;
 
-	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY TSRMLS_CC);
+	events = phalcon_fetch_nproperty_this(this_ptr, SL("_events"), PH_NOISY);
 	phalcon_array_keys(return_value, events TSRMLS_CC);
 }

@@ -492,8 +492,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 	}
 	
 	if (is_route) {
-		zval *action_suffix = phalcon_fetch_nproperty_this(this_ptr, SL("_actionSuffix"), PH_NOISY TSRMLS_CC);
-		zval *route_prefix  = phalcon_fetch_nproperty_this(this_ptr, SL("_routePrefix"), PH_NOISY TSRMLS_CC);
+		zval *action_suffix = phalcon_fetch_nproperty_this(this_ptr, SL("_actionSuffix"), PH_NOISY);
+		zval *route_prefix  = phalcon_fetch_nproperty_this(this_ptr, SL("_routePrefix"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(empty_str);
 		ZVAL_EMPTY_STRING(empty_str);

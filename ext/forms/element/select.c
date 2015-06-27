@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 	phalcon_fetch_params(0, 1, 0, &option);
 	PHALCON_ENSURE_IS_ARRAY(option);
 
-	values = phalcon_fetch_nproperty_this(getThis(), SL("_optionsValues"), PH_NOISY TSRMLS_CC);
+	values = phalcon_fetch_nproperty_this(getThis(), SL("_optionsValues"), PH_NOISY);
 	
 	ALLOC_ZVAL(tmp);
 	if (Z_TYPE_P(values) != IS_ARRAY) {
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 		attributes = PHALCON_GLOBAL(z_null);
 	}
 	
-	options = phalcon_fetch_nproperty_this(this_ptr, SL("_optionsValues"), PH_NOISY TSRMLS_CC);
+	options = phalcon_fetch_nproperty_this(this_ptr, SL("_optionsValues"), PH_NOISY);
 	
 	/** 
 	 * Merged passed attributes with previously defined ones

@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 
 	PHALCON_MM_GROW();
 
-	rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
+	rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY);
 	if (Z_TYPE_P(rows) == IS_NULL) {
 		PHALCON_OBS_VAR(cursor);
 		phalcon_read_property_this(&cursor, this_ptr, SL("_cursor"), PH_NOISY);
@@ -360,11 +360,11 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
 
 	z_zero = PHALCON_GLOBAL(z_zero);
 
-	rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
+	rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY);
 	if (Z_TYPE_P(rows) == IS_NULL) {
-		cursor = phalcon_fetch_nproperty_this(this_ptr, SL("_cursor"), PH_NOISY TSRMLS_CC);
+		cursor = phalcon_fetch_nproperty_this(this_ptr, SL("_cursor"), PH_NOISY);
 		if (Z_TYPE_P(cursor) == IS_OBJECT) {
-			active_row = phalcon_fetch_nproperty_this(this_ptr, SL("_activeRow"), PH_NOISY TSRMLS_CC);
+			active_row = phalcon_fetch_nproperty_this(this_ptr, SL("_activeRow"), PH_NOISY);
 			if (Z_TYPE_P(active_row) != IS_NULL) {
 				
 				PHALCON_CALL_METHOD(NULL, cursor, "reset");
@@ -407,7 +407,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
 	is_not_equal_function(is_different, pointer, position TSRMLS_CC);
 	if (PHALCON_IS_TRUE(is_different)) {
 		phalcon_update_property_zval(this_ptr, SL("_pointer"), position TSRMLS_CC);
-		rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
+		rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY);
 		if (Z_TYPE_P(rows) == IS_NULL) {
 			PHALCON_OBS_VAR(cursor);
 			phalcon_read_property(&cursor, this_ptr, SL("_cursor"), PH_NOISY TSRMLS_CC);
@@ -454,7 +454,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, count){
 		PHALCON_INIT_NVAR(count);
 		ZVAL_LONG(count, 0);
 
-		rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
+		rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY);
 		if (Z_TYPE_P(rows) == IS_NULL) {
 			PHALCON_OBS_VAR(cursor);
 			phalcon_read_property_this(&cursor, this_ptr, SL("_cursor"), PH_NOISY);

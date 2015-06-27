@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 	}
 
 	if (Z_TYPE_P(id) != IS_OBJECT) {
-		collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+		collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 		/**
 		 * Check if the collection use implicit ids
@@ -464,7 +464,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setEventsManager){
 
 	phalcon_fetch_params(0, 0, 1, 0, &events_manager);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHODW(NULL, collection_manager, "setcustomeventsmanager", this_ptr, events_manager);
 }
 
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getEventsManager){
 
 	zval *collection_manager;
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(collection_manager, "getcustomeventsmanager", this_ptr);
 }
 
@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setColumnMap){
 
 	phalcon_fetch_params(0, 0, 1, 0, &column_map);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHODW(NULL, collection_manager, "setcolumnmap", this_ptr, column_map);
 
 	RETURN_THISW();
@@ -519,7 +519,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getColumnMap){
 
 	zval *collection_manager;
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(collection_manager, "getcolumnmap", this_ptr);
 }
 
@@ -592,7 +592,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, useImplicitObjectIds){
 
 	phalcon_fetch_params(0, 1, 1, 0, &use_implicit_object_ids);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, collection_manager, "useimplicitobjectids", this_ptr, use_implicit_object_ids);
 
 	PHALCON_MM_RESTORE();
@@ -611,7 +611,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setStrictMode){
 
 	phalcon_fetch_params(0, 1, 1, 0, &strict_mode);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, collection_manager, "setstrictmode", this_ptr, strict_mode);
 
 	PHALCON_MM_RESTORE();
@@ -629,7 +629,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setSource){
 
 	phalcon_fetch_params(0, 0, 1, 0, &source);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHODW(NULL, collection_manager, "setsource", this_ptr, source);
 
 	RETURN_THISW();
@@ -644,7 +644,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getSource){
 
 	zval *collection_manager;
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 	PHALCON_RETURN_CALL_METHODW(collection_manager, "getsource", this_ptr);
 }
@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setConnectionService){
 
 	phalcon_fetch_params(0, 1, 1, 0, &connection_service);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, collection_manager, "setconnectionservice", this_ptr, connection_service);
 	RETURN_THIS();
 }
@@ -677,7 +677,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnectionService){
 
 	zval *collection_manager;
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(collection_manager, "getconnectionservice", this_ptr);
 }
 
@@ -695,7 +695,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
 	PHALCON_OBS_VAR(connection);
 	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) != IS_OBJECT) {
-		collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY TSRMLS_CC);
+		collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&connection, collection_manager, "getconnection", this_ptr);
 		phalcon_update_property_this(this_ptr, SL("_connection"), connection TSRMLS_CC);
@@ -1647,7 +1647,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	zval *params[2];
 	zval func;
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;

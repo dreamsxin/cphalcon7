@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Forms_Element, addValidators){
 	}
 
 	if (zend_is_true(merge)) {
-		current_validators = phalcon_fetch_nproperty_this(this_ptr, SL("_validators"), PH_NOISY TSRMLS_CC);
+		current_validators = phalcon_fetch_nproperty_this(this_ptr, SL("_validators"), PH_NOISY);
 		if (Z_TYPE_P(current_validators) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_validators);
 			phalcon_fast_array_merge(merged_validators, &current_validators, &validators TSRMLS_CC);
@@ -375,7 +375,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 		use_checked = PHALCON_GLOBAL(z_false);
 	}
 	
-	name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY TSRMLS_CC);
+	name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY);
 	
 	/** 
 	 * Create an array of parameters
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	/** 
 	 * Merge passed parameters with default ones
 	 */
-	default_attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY TSRMLS_CC);
+	default_attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY);
 	if (Z_TYPE_P(default_attributes) == IS_ARRAY) { 
 		PHALCON_INIT_VAR(merged_attributes);
 		phalcon_fast_array_merge(merged_attributes, &default_attributes, &widget_attributes TSRMLS_CC);
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Forms_Element, getAttribute){
 		default_value = PHALCON_GLOBAL(z_null);
 	}
 	
-	attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY TSRMLS_CC);
+	attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, attributes, attribute)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -509,7 +509,7 @@ PHP_METHOD(Phalcon_Forms_Element, getAttributes){
 
 	zval *attributes;
 
-	attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY TSRMLS_CC);
+	attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY);
 	if (Z_TYPE_P(attributes) != IS_ARRAY) { 
 		array_init(return_value);
 		return;
@@ -552,7 +552,7 @@ PHP_METHOD(Phalcon_Forms_Element, getUserOption){
 		default_value = PHALCON_GLOBAL(z_null);
 	}
 	
-	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, options, option)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -636,13 +636,13 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 
 	phalcon_fetch_params(1, 0, 1, &attributes);
 
-	label = phalcon_fetch_nproperty_this(this_ptr, SL("_label"), PH_NOISY TSRMLS_CC);
+	label = phalcon_fetch_nproperty_this(this_ptr, SL("_label"), PH_NOISY);
 	
 	/** 
 	 * Check if there is an 'id' attribute defined
 	 */
 	if (!attributes || !phalcon_array_isset_string_fetch(&name, attributes, SS("id"))) {
-		name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY TSRMLS_CC);
+		name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY);
 	}
 
 	PHALCON_INIT_VAR(escaped);
@@ -723,12 +723,12 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 
 	PHALCON_MM_GROW();
 
-	name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY TSRMLS_CC);
+	name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY);
 	
 	/** 
 	 * Get the related form
 	 */
-	form = phalcon_fetch_nproperty_this(this_ptr, SL("_form"), PH_NOISY TSRMLS_CC);
+	form = phalcon_fetch_nproperty_this(this_ptr, SL("_form"), PH_NOISY);
 	if (Z_TYPE_P(form) == IS_OBJECT) {
 	
 		/** 
@@ -775,7 +775,7 @@ PHP_METHOD(Phalcon_Forms_Element, getMessages){
 	/** 
 	 * Get the related form
 	 */
-	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);
+	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_OBJECT) {
 		RETURN_CTOR(messages);
 	}
@@ -800,7 +800,7 @@ PHP_METHOD(Phalcon_Forms_Element, hasMessages){
 	/** 
 	 * Get the related form
 	 */
-	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY TSRMLS_CC);
+	messages = phalcon_fetch_nproperty_this(this_ptr, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_OBJECT) {
 		if (phalcon_fast_count_ev(messages TSRMLS_CC)) {
 			RETURN_TRUE;
@@ -867,7 +867,7 @@ PHP_METHOD(Phalcon_Forms_Element, appendMessage){
  */
 PHP_METHOD(Phalcon_Forms_Element, clear)
 {
-	zval *name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY TSRMLS_CC);
+	zval *name = phalcon_fetch_nproperty_this(this_ptr, SL("_name"), PH_NOISY);
 	PHALCON_CALL_CE_STATICW(NULL, phalcon_tag_ce, "setdefault", name, PHALCON_GLOBAL(z_null));
 	RETURN_THISW();
 }

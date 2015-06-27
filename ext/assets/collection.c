@@ -242,13 +242,13 @@ PHP_METHOD(Phalcon_Assets_Collection, addCss){
 	if (PHALCON_IS_BOOL(local)) {
 		collection_local = local;
 	} else {
-		collection_local = phalcon_fetch_nproperty_this(this_ptr, SL("_local"), PH_NOISY TSRMLS_CC);
+		collection_local = phalcon_fetch_nproperty_this(this_ptr, SL("_local"), PH_NOISY);
 	}
 
 	if (Z_TYPE_P(attributes) == IS_ARRAY) { 
 		collection_attributes = attributes;
 	} else {
-		collection_attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY TSRMLS_CC);
+		collection_attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY);
 	}
 	
 	PHALCON_INIT_VAR(resource);
@@ -293,13 +293,13 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
 	if (PHALCON_IS_BOOL(local)) {
 		collection_local = local;
 	} else {
-		collection_local = phalcon_fetch_nproperty_this(this_ptr, SL("_local"), PH_NOISY TSRMLS_CC);
+		collection_local = phalcon_fetch_nproperty_this(this_ptr, SL("_local"), PH_NOISY);
 	}
 
 	if (Z_TYPE_P(attributes) == IS_ARRAY) { 
 		collection_attributes = attributes;
 	} else {
-		collection_attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY TSRMLS_CC);
+		collection_attributes = phalcon_fetch_nproperty_this(this_ptr, SL("_attributes"), PH_NOISY);
 	}
 	
 	PHALCON_INIT_VAR(resource);
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Assets_Collection, getResources){
 
 	zval *resources;
 
-	resources = phalcon_fetch_nproperty_this(this_ptr, SL("_resources"), PH_NOISY TSRMLS_CC);
+	resources = phalcon_fetch_nproperty_this(this_ptr, SL("_resources"), PH_NOISY);
 	if (Z_TYPE_P(resources) != IS_ARRAY) { 
 		array_init(return_value);
 		return;
@@ -365,8 +365,8 @@ PHP_METHOD(Phalcon_Assets_Collection, current){
 
 	zval *position, *resources, *resource;
 
-	position  = phalcon_fetch_nproperty_this(this_ptr, SL("_position"), PH_NOISY TSRMLS_CC);
-	resources = phalcon_fetch_nproperty_this(this_ptr, SL("_resources"), PH_NOISY TSRMLS_CC);
+	position  = phalcon_fetch_nproperty_this(this_ptr, SL("_position"), PH_NOISY);
+	resources = phalcon_fetch_nproperty_this(this_ptr, SL("_resources"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&resource, resources, position)) {
 		RETURN_ZVAL(resource, 1, 0);
 	}

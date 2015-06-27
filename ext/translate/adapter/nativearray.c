@@ -66,7 +66,7 @@ static int phalcon_translate_adapter_nativearray_has_dimension(zval *object, zva
 		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty TSRMLS_CC);
 	}
 
-	translate = phalcon_fetch_nproperty_this(object, SL("_translate"), PH_NOISY TSRMLS_CC);
+	translate = phalcon_fetch_nproperty_this(object, SL("_translate"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&translation, translate, offset)) {
 		return 0;
 	}
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 		placeholders = PHALCON_GLOBAL(z_null);
 	}
 	
-	translate = phalcon_fetch_nproperty_this(this_ptr, SL("_translate"), PH_NOISY TSRMLS_CC);
+	translate = phalcon_fetch_nproperty_this(this_ptr, SL("_translate"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&translation, translate, index)) {
 		translation = index;
 	}

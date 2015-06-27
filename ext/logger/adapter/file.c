@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, logInternal){
 
 	phalcon_fetch_params(0, 1, 4, 0, &message, &type, &time, &context);
 	
-	file_handler = phalcon_fetch_nproperty_this(this_ptr, SL("_fileHandler"), PH_NOISY TSRMLS_CC);
+	file_handler = phalcon_fetch_nproperty_this(this_ptr, SL("_fileHandler"), PH_NOISY);
 	if (Z_TYPE_P(file_handler) != IS_RESOURCE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, close){
 
 	PHALCON_MM_GROW();
 
-	file_handler = phalcon_fetch_nproperty_this(this_ptr, SL("_fileHandler"), PH_NOISY TSRMLS_CC);
+	file_handler = phalcon_fetch_nproperty_this(this_ptr, SL("_fileHandler"), PH_NOISY);
 	PHALCON_RETURN_CALL_FUNCTION("fclose", file_handler);
 	RETURN_MM();
 }

@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
 	phalcon_fetch_params(0, 1, 4, 0, &model, &key, &table, &schema);
 	
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 
 	PHALCON_INIT_VAR(strategy);
 	
@@ -335,7 +335,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
 
 	zval *strategy;
 
-	strategy = phalcon_fetch_nproperty_this(this_ptr, SL("_strategy"), PH_NOISY TSRMLS_CC);
+	strategy = phalcon_fetch_nproperty_this(this_ptr, SL("_strategy"), PH_NOISY);
 	if (Z_TYPE_P(strategy) == IS_NULL) {
 		PHALCON_ALLOC_GHOST_ZVAL(strategy);
 		object_init_ex(strategy, phalcon_mvc_model_metadata_strategy_introspection_ce);

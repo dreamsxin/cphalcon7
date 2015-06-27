@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, getContent)
 {
-	zval *view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY TSRMLS_CC);
+	zval *view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(view, "getcontent");
 }
 
@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, partial){
 		params = PHALCON_GLOBAL(z_null);
 	}
 	
-	view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY TSRMLS_CC);
+	view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(view, "partial", partial_path, params);
 }
 
@@ -202,7 +202,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 			RETURN_MM();
 	}
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "A dependency injection object is required to access internal services");
 		return;

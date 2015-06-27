@@ -937,7 +937,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/** 
 				 * Take lines back to the current exception's line
 				 */
-				before_context = phalcon_fetch_nproperty_this(getThis(), SL("_beforeContext"), PH_NOISY TSRMLS_CC);
+				before_context = phalcon_fetch_nproperty_this(getThis(), SL("_beforeContext"), PH_NOISY);
 
 				PHALCON_INIT_VAR(before_line);
 				phalcon_sub_function(before_line, line, before_context);
@@ -954,7 +954,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/** 
 				 * Take lines after the current exception's line
 				 */
-				after_context = phalcon_fetch_nproperty_this(getThis(), SL("_afterContext"), PH_NOISY TSRMLS_CC);
+				after_context = phalcon_fetch_nproperty_this(getThis(), SL("_afterContext"), PH_NOISY);
 
 				PHALCON_INIT_VAR(after_line);
 				phalcon_add_function(after_line, line, after_context);

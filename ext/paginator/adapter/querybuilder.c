@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	PHALCON_MM_GROW();
 
-	original_builder = phalcon_fetch_nproperty_this(this_ptr, SL("_builder"), PH_NOISY TSRMLS_CC);
+	original_builder = phalcon_fetch_nproperty_this(this_ptr, SL("_builder"), PH_NOISY);
 
 	/* Make a copy of the original builder to leave it as it is */
 	PHALCON_INIT_VAR(builder);
@@ -270,8 +270,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		RETURN_MM();
 	}
 
-	limit         = phalcon_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY TSRMLS_CC);
-	number_page   = phalcon_fetch_nproperty_this(this_ptr, SL("_page"), PH_NOISY TSRMLS_CC);
+	limit         = phalcon_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY);
+	number_page   = phalcon_fetch_nproperty_this(this_ptr, SL("_page"), PH_NOISY);
 	i_limit       = phalcon_get_intval(limit);
 	i_number_page = phalcon_get_intval(number_page);
 

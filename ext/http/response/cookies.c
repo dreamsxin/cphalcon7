@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, has){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	cookies = phalcon_fetch_nproperty_this(this_ptr, SL("_cookies"), PH_NOISY TSRMLS_CC);
+	cookies = phalcon_fetch_nproperty_this(this_ptr, SL("_cookies"), PH_NOISY);
 
 	/* Check the internal bag */
 	if (phalcon_array_isset(cookies, name)) {

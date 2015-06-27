@@ -108,7 +108,7 @@ static zval** phalcon_session_adapter_get_property_ptr_ptr_internal(zval *object
 	zval *unique_id, *_SESSION, key = zval_used_for_init, *pkey = &key;
 	zval **value;
 
-	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY TSRMLS_CC);
+	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
 
 	_SESSION = phalcon_get_global(SS("_SESSION") TSRMLS_CC);
 	if (Z_TYPE_P(_SESSION) != IS_ARRAY) {
@@ -130,7 +130,7 @@ static int phalcon_session_adapter_has_property_internal(zval *object, zval *mem
 	zval *unique_id, *_SESSION, **tmp;
 	zval key = zval_used_for_init, *pkey = &key;
 
-	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY TSRMLS_CC);
+	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
 
 	_SESSION = phalcon_get_global(SS("_SESSION") TSRMLS_CC);
 	if (Z_TYPE_P(_SESSION) != IS_ARRAY) {
@@ -161,7 +161,7 @@ static void phalcon_session_adapter_write_property_internal(zval *object, zval *
 	zval *unique_id, *_SESSION;
 	zval key = zval_used_for_init, *pkey = &key;
 
-	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY TSRMLS_CC);
+	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
 
 	_SESSION = phalcon_get_global(SS("_SESSION") TSRMLS_CC);
 	if (Z_TYPE_P(_SESSION) == IS_ARRAY) {
@@ -177,7 +177,7 @@ static void phalcon_session_adapter_unset_property_internal(zval *object, zval *
 	zval *unique_id, *_SESSION;
 	zval key = zval_used_for_init, *pkey = &key;
 
-	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY TSRMLS_CC);
+	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
 
 	_SESSION = phalcon_get_global(SS("_SESSION") TSRMLS_CC);
 	if (Z_TYPE_P(_SESSION) == IS_ARRAY) {
@@ -447,23 +447,23 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 
 	if (expire || path || secure || domain || http_only || http_only) {
 		if (!expire) {
-			expire = phalcon_fetch_nproperty_this(getThis(), SL("_expire"), PH_NOISY TSRMLS_CC);
+			expire = phalcon_fetch_nproperty_this(getThis(), SL("_expire"), PH_NOISY);
 		}
 
 		if (!path) {
-			path = phalcon_fetch_nproperty_this(getThis(), SL("_path"), PH_NOISY TSRMLS_CC);
+			path = phalcon_fetch_nproperty_this(getThis(), SL("_path"), PH_NOISY);
 		}
 
 		if (!secure) {
-			secure = phalcon_fetch_nproperty_this(getThis(), SL("_secure"), PH_NOISY TSRMLS_CC);
+			secure = phalcon_fetch_nproperty_this(getThis(), SL("_secure"), PH_NOISY);
 		}
 
 		if (!domain) {
-			domain = phalcon_fetch_nproperty_this(getThis(), SL("_domain"), PH_NOISY TSRMLS_CC);
+			domain = phalcon_fetch_nproperty_this(getThis(), SL("_domain"), PH_NOISY);
 		}
 
 		if (!http_only) {
-			http_only = phalcon_fetch_nproperty_this(getThis(), SL("_httpOnly"), PH_NOISY TSRMLS_CC);
+			http_only = phalcon_fetch_nproperty_this(getThis(), SL("_httpOnly"), PH_NOISY);
 		}
 
 		PHALCON_CALL_FUNCTIONW(NULL, "session_set_cookie_params", expire, path, secure, domain, http_only);
@@ -474,7 +474,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __destruct) {
 
 	zval *started;
 
-	started = phalcon_fetch_nproperty_this(getThis(), SL("_started"), PH_NOISY TSRMLS_CC);
+	started = phalcon_fetch_nproperty_this(getThis(), SL("_started"), PH_NOISY);
 	if (zend_is_true(started)) {
 		RETURN_ON_FAILURE(phalcon_session_write_close(TSRMLS_C));
 		phalcon_update_property_bool(this_ptr, SL("_started"), 0 TSRMLS_CC);
@@ -561,7 +561,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 		RETURN_ZVAL(default_value, 1, 0);
 	}
 
-	unique_id = phalcon_fetch_nproperty_this(this_ptr, SL("_uniqueId"), PH_NOISY TSRMLS_CC);
+	unique_id = phalcon_fetch_nproperty_this(this_ptr, SL("_uniqueId"), PH_NOISY);
 
 	PHALCON_MM_GROW();
 	PHALCON_INIT_VAR(key);

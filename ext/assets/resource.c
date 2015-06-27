@@ -486,9 +486,9 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetUri){
 
 	zval *target_uri;
 
-	target_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_targetUri"), PH_NOISY TSRMLS_CC);
+	target_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_targetUri"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(target_uri)) {
-		target_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_path"), PH_NOISY TSRMLS_CC);
+		target_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_path"), PH_NOISY);
 	}
 	
 	RETURN_ZVAL(target_uri, 1, 0);

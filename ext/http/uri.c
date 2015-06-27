@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Http_Uri, __get){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY TSRMLS_CC);
+	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY);
 
 	if (!phalcon_array_isset_fetch(&value, parts, key)) {
 		 RETURN_NULL();
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Http_Uri, __isset){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY TSRMLS_CC);
+	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY);
 
 	RETURN_BOOL(phalcon_array_isset(parts, key));
 }
@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Http_Uri, getPath){
 
 	zval *parts, *value;
 
-	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY TSRMLS_CC);
+	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY);
 
 	if (!phalcon_array_isset_string_fetch(&value, parts, SS("path"))) {
 		 RETURN_NULL();
@@ -284,7 +284,7 @@ PHP_METHOD(Phalcon_Http_Uri, build){
 
 	PHALCON_MM_GROW();
 
-	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY TSRMLS_CC);
+	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY);
 
 	PHALCON_INIT_VAR(uri);
 

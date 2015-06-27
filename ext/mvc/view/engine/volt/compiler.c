@@ -362,7 +362,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getOption){
 
 	phalcon_fetch_params(0, 0, 1, 0, &option);
 
-	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY TSRMLS_CC);
+	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, options, option)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -401,7 +401,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, fireExtensionEvent){
 		arguments = PHALCON_GLOBAL(z_null);
 	}
 
-	extensions = phalcon_fetch_nproperty_this(this_ptr, SL("_extensions"), PH_NOISY TSRMLS_CC);
+	extensions = phalcon_fetch_nproperty_this(this_ptr, SL("_extensions"), PH_NOISY);
 	if (Z_TYPE_P(extensions) == IS_ARRAY) { 
 		zval **extension;
 		HashTable *h = Z_ARRVAL_P(extensions);
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getUniquePrefix){
 	 * algotithm
 	 */
 	if (!zend_is_true(prefix)) {
-		zval *current_path = phalcon_fetch_nproperty_this(this_ptr, SL("_currentPath"), PH_NOISY TSRMLS_CC);
+		zval *current_path = phalcon_fetch_nproperty_this(this_ptr, SL("_currentPath"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(prefix);
 		phalcon_unique_path_key(prefix, current_path TSRMLS_CC);
@@ -640,7 +640,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, attributeReader){
 		 * Check if the variable is the loop context
 		 */
 		if (PHALCON_IS_STRING(variable, "loop")) {
-			zval *level = phalcon_fetch_nproperty_this(this_ptr, SL("_foreachLevel"), PH_NOISY TSRMLS_CC);
+			zval *level = phalcon_fetch_nproperty_this(this_ptr, SL("_foreachLevel"), PH_NOISY);
 
 			PHALCON_CALL_METHOD(&prefix, this_ptr, "getuniqueprefix");
 			PHALCON_SCONCAT_SVVS(expr_code, "$", prefix, level, "loop");
@@ -649,7 +649,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, attributeReader){
 			/** 
 			 * Services registered in the dependency injector container are availables always
 			 */
-			zval *dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+			zval *dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 			if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 
 				PHALCON_CALL_METHOD(&is_service, dependency_injector, "has", variable);
@@ -752,7 +752,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		/** 
 		 * Check if any of the registered extensions provide compilation for this function
 		 */
-		extensions = phalcon_fetch_nproperty_this(this_ptr, SL("_extensions"), PH_NOISY TSRMLS_CC);
+		extensions = phalcon_fetch_nproperty_this(this_ptr, SL("_extensions"), PH_NOISY);
 		if (Z_TYPE_P(extensions) == IS_ARRAY) { 
 			zval *fire_arguments;
 
@@ -774,7 +774,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		/** 
 		 * Check if it's a user defined function
 		 */
-		functions = phalcon_fetch_nproperty_this(this_ptr, SL("_functions"), PH_NOISY TSRMLS_CC);
+		functions = phalcon_fetch_nproperty_this(this_ptr, SL("_functions"), PH_NOISY);
 		if (Z_TYPE_P(functions) == IS_ARRAY) { 
 			zval *definition;
 
@@ -816,7 +816,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 			}
 		}
 
-		macros = phalcon_fetch_nproperty_this(this_ptr, SL("_macros"), PH_NOISY TSRMLS_CC);
+		macros = phalcon_fetch_nproperty_this(this_ptr, SL("_macros"), PH_NOISY);
 
 		/** 
 		 * Check if the function name is a macro
@@ -845,11 +845,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		 * This function embeds the parent block in the current block
 		 */
 		if (PHALCON_IS_STRING(name, "super")) {
-			zval *extended_blocks = phalcon_fetch_nproperty_this(this_ptr, SL("_extendedBlocks"), PH_NOISY TSRMLS_CC);
+			zval *extended_blocks = phalcon_fetch_nproperty_this(this_ptr, SL("_extendedBlocks"), PH_NOISY);
 			if (Z_TYPE_P(extended_blocks) == IS_ARRAY) { 
-				zval *current_block = phalcon_fetch_nproperty_this(this_ptr, SL("_currentBlock"), PH_NOISY TSRMLS_CC);
+				zval *current_block = phalcon_fetch_nproperty_this(this_ptr, SL("_currentBlock"), PH_NOISY);
 				if (phalcon_array_isset(extended_blocks, current_block)) {
-					zval *expr_level = phalcon_fetch_nproperty_this(this_ptr, SL("_exprLevel"), PH_NOISY TSRMLS_CC);
+					zval *expr_level = phalcon_fetch_nproperty_this(this_ptr, SL("_exprLevel"), PH_NOISY);
 
 					PHALCON_OBS_VAR(block);
 					phalcon_array_fetch(&block, extended_blocks, current_block, PH_NOISY);
@@ -1251,7 +1251,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	/** 
 	 * Check if any of the registered extensions provide compilation for this filter
 	 */
-	extensions = phalcon_fetch_nproperty_this(this_ptr, SL("_extensions"), PH_NOISY TSRMLS_CC);
+	extensions = phalcon_fetch_nproperty_this(this_ptr, SL("_extensions"), PH_NOISY);
 	if (Z_TYPE_P(extensions) == IS_ARRAY) { 
 
 		PHALCON_INIT_VAR(event);
@@ -1272,7 +1272,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	/** 
 	 * Check if it's a user defined filter
 	 */
-	filters = phalcon_fetch_nproperty_this(this_ptr, SL("_filters"), PH_NOISY TSRMLS_CC);
+	filters = phalcon_fetch_nproperty_this(this_ptr, SL("_filters"), PH_NOISY);
 	if (Z_TYPE_P(filters) == IS_ARRAY) { 
 		zval *definition;
 
@@ -1607,7 +1607,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 	 * Check if any of the registered extensions provide compilation for this
 	 * expression
 	 */
-	extensions = phalcon_fetch_nproperty_this(this_ptr, SL("_extensions"), PH_NOISY TSRMLS_CC);
+	extensions = phalcon_fetch_nproperty_this(this_ptr, SL("_extensions"), PH_NOISY);
 
 	while (1) {
 
@@ -2521,7 +2521,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileEcho){
 	/** 
 	 * Echo statement
 	 */
-	autoescape = phalcon_fetch_nproperty_this(this_ptr, SL("_autoescape"), PH_NOISY TSRMLS_CC);
+	autoescape = phalcon_fetch_nproperty_this(this_ptr, SL("_autoescape"), PH_NOISY);
 	if (zend_is_true(autoescape)) {
 		PHALCON_SCONCAT_SVS(compilation, "<?php echo $this->escaper->escapeHtml(", expr_code, "); ?>");
 	} else {

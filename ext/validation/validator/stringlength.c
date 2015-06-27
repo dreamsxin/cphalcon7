@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 	PHALCON_CALL_SELF(&valid, "valid", value, minimum, maximum);
 
 	if (PHALCON_IS_FALSE(valid)) {
-		type = phalcon_fetch_nproperty_this(this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+		type = phalcon_fetch_nproperty_this(this_ptr, SL("_type"), PH_NOISY);
 
 		PHALCON_OBS_VAR(label);
 		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), phalcon_interned_label TSRMLS_CC));

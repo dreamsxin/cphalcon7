@@ -1300,37 +1300,37 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, getParams) {
 	PHALCON_INIT_VAR(params);
 	array_init(params);
 
-	conditions = phalcon_fetch_nproperty_this(this_ptr, SL("_conditions"), PH_NOISY TSRMLS_CC);
+	conditions = phalcon_fetch_nproperty_this(this_ptr, SL("_conditions"), PH_NOISY);
 	if (Z_TYPE_P(conditions) != IS_NULL) {
 		phalcon_array_update_string(&params, SL("conditions"), conditions, PH_COPY);
 	}
 
-	bind_params = phalcon_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY TSRMLS_CC);
+	bind_params = phalcon_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY);
 	if (Z_TYPE_P(bind_params) != IS_NULL) {
 		phalcon_array_update_string(&params, SL("bind"), bind_params, PH_COPY);
 	}
 
-	bind_types = phalcon_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY TSRMLS_CC);
+	bind_types = phalcon_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY);
 	if (Z_TYPE_P(bind_types) != IS_NULL) {
 		phalcon_array_update_string(&params, SL("bindTypes"), bind_types, PH_COPY);
 	}
 
-	order = phalcon_fetch_nproperty_this(this_ptr, SL("_order"), PH_NOISY TSRMLS_CC);
+	order = phalcon_fetch_nproperty_this(this_ptr, SL("_order"), PH_NOISY);
 	if (Z_TYPE_P(order) != IS_NULL) {
 		phalcon_array_update_string(&params, SL("order"), order, PH_COPY);
 	}
 
-	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY TSRMLS_CC);
+	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
 		phalcon_array_update_string(&params, SL("limit"), limit, PH_COPY);
 	}
 
-	offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY TSRMLS_CC);
+	offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY);
 	if (Z_TYPE_P(offset) != IS_NULL) {
 		phalcon_array_update_string(&params, SL("offset"), offset, PH_COPY);
 	}
 
-	cache = phalcon_fetch_nproperty_this(this_ptr, SL("_cacheOptions"), PH_NOISY TSRMLS_CC);
+	cache = phalcon_fetch_nproperty_this(this_ptr, SL("_cacheOptions"), PH_NOISY);
 	if (Z_TYPE_P(cache) != IS_NULL) {
 		phalcon_array_update_string(&params, SL("cache"), cache, PH_COPY);
 	}
@@ -1513,7 +1513,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 		use_rawsql = PHALCON_GLOBAL(z_false);
 	}
 
-	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY TSRMLS_CC);
+	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY);
 	if (Z_TYPE_P(model) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Model name must be string");
 		return;
@@ -1521,9 +1521,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 
 	PHALCON_CALL_SELF(&phql, "getphql");
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
-	cache_options = phalcon_fetch_nproperty_this(this_ptr, SL("_cacheOptions"), PH_NOISY TSRMLS_CC);
-	unique_row = phalcon_fetch_nproperty_this(this_ptr, SL("_uniqueRow"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	cache_options = phalcon_fetch_nproperty_this(this_ptr, SL("_cacheOptions"), PH_NOISY);
+	unique_row = phalcon_fetch_nproperty_this(this_ptr, SL("_uniqueRow"), PH_NOISY);
 	
 
 	PHALCON_INIT_VAR(query);
@@ -1537,8 +1537,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 		PHALCON_CALL_METHOD(NULL, query, "setuniquerow", unique_row);
 	}
 
-	bind_params = phalcon_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY TSRMLS_CC);
-	bind_types = phalcon_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY TSRMLS_CC);
+	bind_params = phalcon_fetch_nproperty_this(this_ptr, SL("_bindParams"), PH_NOISY);
+	bind_types = phalcon_fetch_nproperty_this(this_ptr, SL("_bindTypes"), PH_NOISY);
 
 	if (Z_TYPE_P(bind_params) == IS_ARRAY && Z_TYPE_P(bind_types) == IS_ARRAY) {
 		PHALCON_CALL_METHOD(NULL, query, "execute", bind_params, bind_types, use_rawsql);
@@ -1719,14 +1719,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		dependency_injector = NULL;
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
 	}
 
-	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY TSRMLS_CC);
+	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY);
 	if (!zend_is_true(model)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
 		return;
@@ -2037,7 +2037,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	/** 
 	 * Process limit parameters
 	 */
-	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY TSRMLS_CC);
+	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
 			zval *offset;
@@ -2054,7 +2054,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
 			PHALCON_SCONCAT_SV(phql, " LIMIT ", limit);
 
-			offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY TSRMLS_CC);
+			offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY);
 			if (Z_TYPE_P(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SV(phql, " OFFSET ", offset);
 			}
@@ -2064,7 +2064,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	/** 
 	 * Process FOR UPDATE clause
 	 */
-	for_update = phalcon_fetch_nproperty_this(this_ptr, SL("_forUpdate"), PH_NOISY TSRMLS_CC);
+	for_update = phalcon_fetch_nproperty_this(this_ptr, SL("_forUpdate"), PH_NOISY);
 	if (zend_is_true(for_update)) {
 		phalcon_concat_self_str(&phql, SL(" FOR UPDATE") TSRMLS_CC);
 	}
@@ -2089,7 +2089,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 
 	PHALCON_MM_GROW();
 
-	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY TSRMLS_CC);
+	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY);
 	if (!zend_is_true(model)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
 		return;
@@ -2211,14 +2211,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		dependency_injector = NULL;
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
 	}
 
-	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY TSRMLS_CC);
+	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY);
 	if (!zend_is_true(model)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
 		return;
@@ -2386,7 +2386,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	/**
 	 * Process limit parameters
 	 */
-	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY TSRMLS_CC);
+	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
 			PHALCON_OBS_VAR(number);
@@ -2399,7 +2399,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 		} else {
 			PHALCON_SCONCAT_SV(phql, " LIMIT ", limit);
 
-			offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY TSRMLS_CC);
+			offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY);
 			if (Z_TYPE_P(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SV(phql, " OFFSET ", offset);
 			}
@@ -2430,14 +2430,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		dependency_injector = NULL;
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
 	}
 
-	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY TSRMLS_CC);
+	model = phalcon_fetch_nproperty_this(this_ptr, SL("_model"), PH_NOISY);
 	if (!zend_is_true(model)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
 		return;
@@ -2573,7 +2573,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	/**
 	 * Process limit parameters
 	 */
-	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY TSRMLS_CC);
+	limit = phalcon_fetch_nproperty_this(this_ptr, SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
 			PHALCON_OBS_VAR(number);
@@ -2586,7 +2586,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 		} else {
 			PHALCON_SCONCAT_SV(phql, " LIMIT ", limit);
 
-			offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY TSRMLS_CC);
+			offset = phalcon_fetch_nproperty_this(this_ptr, SL("_offset"), PH_NOISY);
 			if (Z_TYPE_P(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SV(phql, " OFFSET ", offset);
 			}

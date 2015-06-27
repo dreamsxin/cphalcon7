@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Logger_Item, getTime){
 
 PHP_METHOD(Phalcon_Logger_Item, getContext) {
 
-	zval *context = phalcon_fetch_nproperty_this(getThis(), SL("_context"), PH_NOISY TSRMLS_CC);
+	zval *context = phalcon_fetch_nproperty_this(getThis(), SL("_context"), PH_NOISY);
 
 	if (Z_TYPE_P(context) == IS_ARRAY) {
 		RETURN_ZVAL(context, 1, 0);

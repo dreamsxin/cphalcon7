@@ -771,7 +771,7 @@ PHP_METHOD(Phalcon_Http_Request, getRawBody){
 
 	zval *raw;
 
-	raw = phalcon_fetch_nproperty_this(getThis(), SL("_rawBody"), PH_NOISY TSRMLS_CC);
+	raw = phalcon_fetch_nproperty_this(getThis(), SL("_rawBody"), PH_NOISY);
 	if (Z_TYPE_P(raw) == IS_STRING) {
 		RETURN_ZVAL(raw, 1, 0);
 	}

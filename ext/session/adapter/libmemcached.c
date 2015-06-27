@@ -258,8 +258,8 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, read){
 
 	phalcon_fetch_params(1, 1, 0, &sid);
 
-	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY TSRMLS_CC);
-	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY TSRMLS_CC);
+	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY);
+	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(libmemcached, "get", sid, lifetime);
@@ -284,8 +284,8 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, write){
 
 	phalcon_fetch_params(1, 2, 0, &sid, &data);
 
-	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY TSRMLS_CC);
-	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY TSRMLS_CC);
+	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY);
+	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, libmemcached, "save", sid, data, lifetime);	
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, destroy){
 		PHALCON_CALL_SELF(&sid, "getid");
 	}
 
-	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY TSRMLS_CC);
+	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(libmemcached, "delete", sid);

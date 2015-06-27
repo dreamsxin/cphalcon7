@@ -187,16 +187,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 
 	z_zero = PHALCON_GLOBAL(z_zero);
 
-	type = phalcon_fetch_nproperty_this(this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+	type = phalcon_fetch_nproperty_this(this_ptr, SL("_type"), PH_NOISY);
 	if (zend_is_true(type)) {
 
 		/** 
 		 * Here, the resultset act as a result that is fetched one by one
 		 */
-		zval *result = phalcon_fetch_nproperty_this(this_ptr, SL("_result"), PH_NOISY TSRMLS_CC);
+		zval *result = phalcon_fetch_nproperty_this(this_ptr, SL("_result"), PH_NOISY);
 		if (PHALCON_IS_NOT_FALSE(result)) {
 
-			zval *active_row = phalcon_fetch_nproperty_this(this_ptr, SL("_activeRow"), PH_NOISY TSRMLS_CC);
+			zval *active_row = phalcon_fetch_nproperty_this(this_ptr, SL("_activeRow"), PH_NOISY);
 			if (Z_TYPE_P(active_row) != IS_NULL) {
 				PHALCON_MM_GROW();
 				PHALCON_CALL_METHOD(NULL, result, "dataseek", z_zero);
@@ -207,10 +207,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 		/** 
 		 * Here, the resultset act as an array
 		 */
-		rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
+		rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY);
 		if (Z_TYPE_P(rows) == IS_NULL) {
 
-			zval *result = phalcon_fetch_nproperty_this(this_ptr, SL("_result"), PH_NOISY TSRMLS_CC);
+			zval *result = phalcon_fetch_nproperty_this(this_ptr, SL("_result"), PH_NOISY);
 			if (Z_TYPE_P(result) == IS_OBJECT) {
 				zval *r = NULL;
 				PHALCON_CALL_METHODW(&r, result, "fetchall");

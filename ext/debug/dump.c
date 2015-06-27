@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Debug_Dump, getStyle){
 
 	phalcon_fetch_params(1, 1, 0, &type);
 
-	styles  = phalcon_fetch_nproperty_this(this_ptr, SL("_styles"), PH_NOISY TSRMLS_CC);
+	styles  = phalcon_fetch_nproperty_this(this_ptr, SL("_styles"), PH_NOISY);
 
 	if (phalcon_array_isset(styles, type)) {
 		PHALCON_OBS_VAR(style);
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 		return;
 	}
 
-	default_styles  = phalcon_fetch_nproperty_this(this_ptr, SL("_styles"), PH_NOISY TSRMLS_CC);
+	default_styles  = phalcon_fetch_nproperty_this(this_ptr, SL("_styles"), PH_NOISY);
 
 	PHALCON_INIT_VAR(new_styles);
 	phalcon_fast_array_merge(new_styles, &default_styles, &styles TSRMLS_CC);
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT_STR(return_value, " (\n");
 
-		objects  = phalcon_fetch_nproperty_this(this_ptr, SL("_objects"), PH_NOISY TSRMLS_CC);
+		objects  = phalcon_fetch_nproperty_this(this_ptr, SL("_objects"), PH_NOISY);
 
 		if (phalcon_fast_in_array(variable, objects TSRMLS_CC)) {
 			
@@ -402,7 +402,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		phalcon_update_property_array_append(this_ptr, SL("_objects"), variable TSRMLS_CC);
 
-		detailed  = phalcon_fetch_nproperty_this(this_ptr, SL("_detailed"), PH_NOISY TSRMLS_CC);
+		detailed  = phalcon_fetch_nproperty_this(this_ptr, SL("_detailed"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(properties);
 		phalcon_get_object_vars(properties, variable, !zend_is_true(detailed) TSRMLS_CC);

@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, prepare){
 
 	phalcon_update_property_this(this_ptr, SL("_sqlStatement"), sql_statement TSRMLS_CC);
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(pdo, "prepare", sql_statement);
 	RETURN_MM();
 }
@@ -448,10 +448,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 		zend_hash_move_forward_ex(ah0, &hp0);
 	}
 
-	profiler = phalcon_fetch_nproperty_this(this_ptr, SL("_profiler"), PH_NOISY TSRMLS_CC);
+	profiler = phalcon_fetch_nproperty_this(this_ptr, SL("_profiler"), PH_NOISY);
 
 	if (Z_TYPE_P(profiler) == IS_OBJECT) {
-		sql_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_sqlStatement"), PH_NOISY TSRMLS_CC);
+		sql_statement = phalcon_fetch_nproperty_this(this_ptr, SL("_sqlStatement"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, profiler, "startprofile", sql_statement, placeholders, data_types);
 
 		PHALCON_CALL_METHOD(NULL, statement, "execute");
@@ -497,7 +497,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		bind_types = PHALCON_GLOBAL(z_null);
 	}
 
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 	/** 
 	 * Execute the beforeQuery event if a EventsManager is available
@@ -523,8 +523,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 			PHALCON_CPY_WRT(statement, new_statement);
 		}
 	} else {
-		pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
-		profiler = phalcon_fetch_nproperty_this(this_ptr, SL("_profiler"), PH_NOISY TSRMLS_CC);
+		pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
+		profiler = phalcon_fetch_nproperty_this(this_ptr, SL("_profiler"), PH_NOISY);
 		if (Z_TYPE_P(profiler) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(NULL, profiler, "startprofile", sql_statement, bind_params, bind_types);
 			PHALCON_CALL_METHOD(&statement, pdo, "query", sql_statement);
@@ -589,7 +589,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	/** 
 	 * Execute the beforeQuery event if a EventsManager is available
 	 */
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 
 		PHALCON_INIT_VAR(event_name);
@@ -615,8 +615,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 			ZVAL_LONG(affected_rows, 0);
 		}
 	} else {
-		pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
-		profiler = phalcon_fetch_nproperty_this(this_ptr, SL("_profiler"), PH_NOISY TSRMLS_CC);
+		pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
+		profiler = phalcon_fetch_nproperty_this(this_ptr, SL("_profiler"), PH_NOISY);
 		if (Z_TYPE_P(profiler) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(NULL, profiler, "startprofile", sql_statement);
 			PHALCON_CALL_METHOD(&affected_rows, pdo, "exec", sql_statement);
@@ -667,7 +667,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, close){
 
 	zval *pdo;
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	if (likely(Z_TYPE_P(pdo) == IS_OBJECT)) {
 		phalcon_update_property_this(this_ptr, SL("_pdo"), PHALCON_GLOBAL(z_null) TSRMLS_CC);
 		RETURN_TRUE;
@@ -727,7 +727,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, escapeString){
 
 	phalcon_fetch_params(1, 1, 0, &str);
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(pdo, "quote", str);
 	RETURN_MM();
 }
@@ -858,7 +858,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, lastInsertId){
 		sequence_name = PHALCON_GLOBAL(z_null);
 	}
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	if (Z_TYPE_P(pdo) != IS_OBJECT) {
 		RETURN_MM_FALSE;
 	}
@@ -886,7 +886,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 		nesting = PHALCON_GLOBAL(z_true);
 	}
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	if (Z_TYPE_P(pdo) != IS_OBJECT) {
 		RETURN_MM_FALSE;
 	}
@@ -899,10 +899,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 	/** 
 	 * Check the transaction nesting level
 	 */
-	transaction_level = phalcon_fetch_nproperty_this(this_ptr, SL("_transactionLevel"), PH_NOISY TSRMLS_CC);
+	transaction_level = phalcon_fetch_nproperty_this(this_ptr, SL("_transactionLevel"), PH_NOISY);
 	if (PHALCON_IS_LONG(transaction_level, 1)) {
 
-		events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+		events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 		/** 
 		 * Notify the events manager about the started transaction
@@ -921,7 +921,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 		if (zend_is_true(nesting)) {
 			PHALCON_CALL_METHOD(&ntw_savepoint, this_ptr, "isnestedtransactionswithsavepoints");
 			if (zend_is_true(ntw_savepoint)) {
-				events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+				events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(&savepoint_name, this_ptr, "getnestedtransactionsavepointname");
 
@@ -962,7 +962,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 		nesting = PHALCON_GLOBAL(z_true);
 	}
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	if (Z_TYPE_P(pdo) != IS_OBJECT) {
 		RETURN_MM_FALSE;
 	}
@@ -970,14 +970,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 	/** 
 	 * Check the transaction nesting level
 	 */
-	transaction_level = phalcon_fetch_nproperty_this(this_ptr, SL("_transactionLevel"), PH_NOISY TSRMLS_CC);
+	transaction_level = phalcon_fetch_nproperty_this(this_ptr, SL("_transactionLevel"), PH_NOISY);
 	if (!zend_is_true(transaction_level)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "There is no active transaction");
 		return;
 	}
 
 	if (PHALCON_IS_LONG(transaction_level, 1)) {
-		events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+		events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 		/** 
 		 * Notify the events manager about the rollbacked transaction
@@ -1001,7 +1001,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 			PHALCON_CALL_METHOD(&ntw_savepoint, this_ptr, "isnestedtransactionswithsavepoints");
 			if (zend_is_true(ntw_savepoint)) {
 
-				events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+				events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(&savepoint_name, this_ptr, "getnestedtransactionsavepointname");
 
@@ -1053,7 +1053,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 		nesting = PHALCON_GLOBAL(z_true);
 	}
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	if (Z_TYPE_P(pdo) != IS_OBJECT) {
 		RETURN_MM_FALSE;
 	}
@@ -1061,14 +1061,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 	/** 
 	 * Check the transaction nesting level
 	 */
-	transaction_level = phalcon_fetch_nproperty_this(this_ptr, SL("_transactionLevel"), PH_NOISY TSRMLS_CC);
+	transaction_level = phalcon_fetch_nproperty_this(this_ptr, SL("_transactionLevel"), PH_NOISY);
 	if (!zend_is_true(transaction_level)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "There is no active transaction");
 		return;
 	}
 
 	if (PHALCON_IS_LONG(transaction_level, 1)) {
-		events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+		events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 		/** 
 		 * Notify the events manager about the commited transaction
@@ -1095,7 +1095,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 			 */
 			PHALCON_CALL_METHOD(&ntw_savepoint, this_ptr, "isnestedtransactionswithsavepoints");
 			if (zend_is_true(ntw_savepoint)) {
-				events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY TSRMLS_CC);
+				events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(&savepoint_name, this_ptr, "getnestedtransactionsavepointname");
 
@@ -1155,7 +1155,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, isUnderTransaction){
 
 	PHALCON_MM_GROW();
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	if (likely(Z_TYPE_P(pdo) == IS_OBJECT)) {
 		PHALCON_RETURN_CALL_METHOD(pdo, "intransaction");
 		RETURN_MM();
@@ -1173,7 +1173,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, getInternalHandler){
 
 	zval *pdo;
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	RETURN_ZVAL(pdo, 1, 0);
 }
 
@@ -1186,6 +1186,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, getErrorInfo){
 
 	zval *pdo;
 
-	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY TSRMLS_CC);
+	pdo = phalcon_fetch_nproperty_this(this_ptr, SL("_pdo"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(pdo, "errorinfo");
 }

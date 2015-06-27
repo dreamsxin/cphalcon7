@@ -425,12 +425,12 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 
 	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
 
-	params = phalcon_fetch_nproperty_this(this_ptr, SL("_params"), PH_NOISY TSRMLS_CC);
+	params = phalcon_fetch_nproperty_this(this_ptr, SL("_params"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&param_value, params, param)) {
 
 		if (filters && Z_TYPE_P(filters) != IS_NULL) {
 			PHALCON_MM_GROW();
-			dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY TSRMLS_CC);
+			dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 			if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 				PHALCON_INIT_VAR(exception_code);
 				ZVAL_LONG(exception_code, PHALCON_EXCEPTION_NO_DI);
@@ -469,8 +469,8 @@ PHP_METHOD(Phalcon_Dispatcher, getActiveMethod){
 
 	zval *suffix, *action_name;
 
-	suffix      = phalcon_fetch_nproperty_this(this_ptr, SL("_actionSuffix"), PH_NOISY TSRMLS_CC);
-	action_name = phalcon_fetch_nproperty_this(this_ptr, SL("_actionName"), PH_NOISY TSRMLS_CC);
+	suffix      = phalcon_fetch_nproperty_this(this_ptr, SL("_actionSuffix"), PH_NOISY);
+	action_name = phalcon_fetch_nproperty_this(this_ptr, SL("_actionName"), PH_NOISY);
 
 	PHALCON_CONCAT_VV(return_value, action_name, suffix);
 }
@@ -557,8 +557,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		RETURN_MM_FALSE;
 	}
 
-	handler_suffix = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerSuffix"), PH_NOISY TSRMLS_CC);
-	action_suffix  = phalcon_fetch_nproperty_this(this_ptr, SL("_actionSuffix"), PH_NOISY TSRMLS_CC);
+	handler_suffix = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerSuffix"), PH_NOISY);
+	action_suffix  = phalcon_fetch_nproperty_this(this_ptr, SL("_actionSuffix"), PH_NOISY);
 
 	/**
 	 * Do at least one dispatch
@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Loop until finished is false
 		 */
-		tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+		tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 		if (zend_is_true(tmp)) {
 			break;
 		}
@@ -595,27 +595,27 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * If the current namespace is null we used the set in this_ptr::_defaultNamespace
 		 */
-		namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_namespaceName"), PH_NOISY TSRMLS_CC);
+		namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_namespaceName"), PH_NOISY);
 		if (!zend_is_true(namespace_name)) {
-			namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultNamespace"), PH_NOISY TSRMLS_CC);
+			namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultNamespace"), PH_NOISY);
 			phalcon_update_property_this(this_ptr, SL("_namespaceName"), namespace_name TSRMLS_CC);
 		}
 
 		/**
 		 * If the handler is null we use the set in this_ptr::_defaultHandler
 		 */
-		handler_name = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerName"), PH_NOISY TSRMLS_CC);
+		handler_name = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerName"), PH_NOISY);
 		if (!zend_is_true(handler_name)) {
-			handler_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultHandler"), PH_NOISY TSRMLS_CC);
+			handler_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultHandler"), PH_NOISY);
 			phalcon_update_property_this(this_ptr, SL("_handlerName"), handler_name TSRMLS_CC);
 		}
 
 		/**
 		 * If the action is null we use the set in this_ptr::_defaultAction
 		 */
-		action_name = phalcon_fetch_nproperty_this(this_ptr, SL("_actionName"), PH_NOISY TSRMLS_CC);
+		action_name = phalcon_fetch_nproperty_this(this_ptr, SL("_actionName"), PH_NOISY);
 		if (!zend_is_true(action_name)) {
-			action_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultAction"), PH_NOISY TSRMLS_CC);
+			action_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultAction"), PH_NOISY);
 			phalcon_update_property_this(this_ptr, SL("_actionName"), action_name TSRMLS_CC);
 		}
 
@@ -633,7 +633,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/**
 			 * Check if the user made a forward in the listener
 			 */
-			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 			if (PHALCON_IS_FALSE(tmp)) {
 				continue;
 			}
@@ -643,7 +643,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 * We don't camelize the classes if they are in namespaces
 		 */
 		if (!phalcon_memnstr_str(handler_name, SL("\\"))) {
-			camelize = phalcon_fetch_nproperty_this(this_ptr, SL("_camelizeController"), PH_NOISY TSRMLS_CC);
+			camelize = phalcon_fetch_nproperty_this(this_ptr, SL("_camelizeController"), PH_NOISY);
 			if (!zend_is_true(camelize)) {
 				PHALCON_CPY_WRT(camelized_class, handler_name);
 			} else {	
@@ -662,7 +662,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 */
 		PHALCON_INIT_NVAR(handler_class);
 		if (zend_is_true(namespace_name)) {			
-			camelize = phalcon_fetch_nproperty_this(this_ptr, SL("_camelizeNamespace"), PH_NOISY TSRMLS_CC);
+			camelize = phalcon_fetch_nproperty_this(this_ptr, SL("_camelizeNamespace"), PH_NOISY);
 			if (!zend_is_true(camelize)) {
 				PHALCON_CPY_WRT(camelized_namespace, namespace_name);
 			} else {
@@ -708,7 +708,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				/**
 				 * Check if the user made a forward in the listener
 				 */
-				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 				if (PHALCON_IS_FALSE(tmp)) {
 					continue;
 				}
@@ -732,7 +732,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			PHALCON_CALL_METHOD(&status, this_ptr, "_throwdispatchexception", exception_message, exception_code);
 			if (PHALCON_IS_FALSE(status)) {
 
-				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 				if (PHALCON_IS_FALSE(tmp)) {
 					continue;
 				}
@@ -769,7 +769,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					continue;
 				}
 
-				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 				if (PHALCON_IS_FALSE(tmp)) {
 					continue;
 				}
@@ -787,7 +787,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			PHALCON_CALL_METHOD(&status, this_ptr, "_throwdispatchexception", exception_message, exception_code);
 			if (PHALCON_IS_FALSE(status)) {
 
-				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 				if (PHALCON_IS_FALSE(tmp)) {
 					continue;
 				}
@@ -810,7 +810,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/**
 			 * Check if the user made a forward in the listener
 			 */
-			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 			if (PHALCON_IS_FALSE(tmp)) {
 				continue;
 			}
@@ -828,7 +828,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/**
 			 * Check if the user made a forward in the listener
 			 */
-			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 			if (PHALCON_IS_FALSE(tmp)) {
 				continue;
 			}
@@ -856,7 +856,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				/**
 				 * Check if the user made a forward in the listener
 				 */
-				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 				if (PHALCON_IS_FALSE(tmp)) {
 					continue;
 				}
@@ -882,7 +882,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			PHALCON_CALL_METHOD(&status, this_ptr, "_throwdispatchexception", exception_message, exception_code);
 			if (PHALCON_IS_FALSE(status)) {
 
-				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 				if (PHALCON_IS_FALSE(tmp)) {
 					continue;
 				}
@@ -917,7 +917,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/* Try to handle the exception */
 			PHALCON_CALL_METHOD(&status, this_ptr, "_handleexception", exception);
 			if (PHALCON_IS_FALSE(status)) {
-				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+				tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 				if (PHALCON_IS_FALSE(tmp)) {
 					continue;
 				}
@@ -945,7 +945,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				continue;
 			}
 
-			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 			if (PHALCON_IS_FALSE(tmp)) {
 				continue;
 			}
@@ -967,7 +967,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				continue;
 			}
 
-			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY TSRMLS_CC);
+			tmp = phalcon_fetch_nproperty_this(this_ptr, SL("_finished"), PH_NOISY);
 			if (PHALCON_IS_FALSE(tmp)) {
 				continue;
 			}
@@ -1090,16 +1090,16 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 		RETURN_MM_NULL();
 	}
 
-	previous_namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_namespaceName"), PH_NOISY TSRMLS_CC);
+	previous_namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_namespaceName"), PH_NOISY);
 	phalcon_update_property_this(this_ptr, SL("_previousNamespaceName"), previous_namespace_name TSRMLS_CC);
 
-	previous_controller_name = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerName"), PH_NOISY TSRMLS_CC);
+	previous_controller_name = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerName"), PH_NOISY);
 	phalcon_update_property_this(this_ptr, SL("_previousHandlerName"), previous_controller_name TSRMLS_CC);
 
-	previous_action_name = phalcon_fetch_nproperty_this(this_ptr, SL("_actionName"), PH_NOISY TSRMLS_CC);
+	previous_action_name = phalcon_fetch_nproperty_this(this_ptr, SL("_actionName"), PH_NOISY);
 	phalcon_update_property_this(this_ptr, SL("_previousActionName"), previous_action_name TSRMLS_CC);
 
-	previous_params = phalcon_fetch_nproperty_this(this_ptr, SL("_params"), PH_NOISY TSRMLS_CC);
+	previous_params = phalcon_fetch_nproperty_this(this_ptr, SL("_params"), PH_NOISY);
 	phalcon_update_property_this(this_ptr, SL("_previousParams"), previous_params TSRMLS_CC);
 
 	/**
@@ -1167,23 +1167,23 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	/**
 	 * The handler suffix
 	 */
-	handler_suffix = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerSuffix"), PH_NOISY TSRMLS_CC);
+	handler_suffix = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerSuffix"), PH_NOISY);
 
 	/**
 	 * If the current namespace is null we used the set in this_ptr::_defaultNamespace
 	 */
-	namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_namespaceName"), PH_NOISY TSRMLS_CC);
+	namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_namespaceName"), PH_NOISY);
 	if (!zend_is_true(namespace_name)) {
-		namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultNamespace"), PH_NOISY TSRMLS_CC);
+		namespace_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultNamespace"), PH_NOISY);
 		phalcon_update_property_this(this_ptr, SL("_namespaceName"), namespace_name TSRMLS_CC);
 	}
 
 	/**
 	 * If the handler is null we use the set in this_ptr::_defaultHandler
 	 */
-	handler_name = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerName"), PH_NOISY TSRMLS_CC);
+	handler_name = phalcon_fetch_nproperty_this(this_ptr, SL("_handlerName"), PH_NOISY);
 	if (!zend_is_true(handler_name)) {
-		handler_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultHandler"), PH_NOISY TSRMLS_CC);
+		handler_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultHandler"), PH_NOISY);
 		phalcon_update_property_this(this_ptr, SL("_handlerName"), handler_name TSRMLS_CC);
 	}
 
@@ -1204,7 +1204,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	 * Create the complete controller class name prepending the namespace
 	 */
 	if (zend_is_true(namespace_name)) {
-		camelize = phalcon_fetch_nproperty_this(this_ptr, SL("_camelizeNamespace"), PH_NOISY TSRMLS_CC);
+		camelize = phalcon_fetch_nproperty_this(this_ptr, SL("_camelizeNamespace"), PH_NOISY);
 		if (!zend_is_true(camelize)) {
 			PHALCON_CPY_WRT(camelized_namespace, namespace_name);
 		} else {
@@ -1307,7 +1307,7 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 		exception_code = PHALCON_GLOBAL(z_zero);
 	}
 
-	error_handlers = phalcon_fetch_nproperty_this(this_ptr, SL("_errorHandlers"), PH_NOISY TSRMLS_CC);
+	error_handlers = phalcon_fetch_nproperty_this(this_ptr, SL("_errorHandlers"), PH_NOISY);
 
 	if (Z_TYPE_P(error_handlers) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&error_handler, error_handlers, exception_code)) {

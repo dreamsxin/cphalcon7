@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, setOptions){
 		return;
 	}
 
-	compiler = phalcon_fetch_nproperty_this(this_ptr, SL("_compiler"), PH_NOISY TSRMLS_CC);
+	compiler = phalcon_fetch_nproperty_this(this_ptr, SL("_compiler"), PH_NOISY);
 
 	if (Z_TYPE_P(compiler) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, compiler, "setoptions", options);
@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 		PHALCON_INIT_VAR(contents);
 		phalcon_ob_get_contents(contents TSRMLS_CC);
 	
-		view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY TSRMLS_CC);
+		view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, view, "setcontent", contents);
 	}
 	

@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
 
 	phalcon_fetch_params(1, 1, 0, &model);
 	
-	custom_events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_customEventsManager"), PH_NOISY TSRMLS_CC);
+	custom_events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_customEventsManager"), PH_NOISY);
 	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
 	
 		PHALCON_INIT_VAR(class_name);
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isInitialized){
 
 	phalcon_fetch_params(0, 1, 0, &model_name);
 	
-	initialized = phalcon_fetch_nproperty_this(this_ptr, SL("_initialized"), PH_NOISY TSRMLS_CC);
+	initialized = phalcon_fetch_nproperty_this(this_ptr, SL("_initialized"), PH_NOISY);
 	
 	ALLOC_INIT_ZVAL(lowercased);
 	phalcon_fast_strtolower(lowercased, model_name);

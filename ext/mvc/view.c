@@ -1461,7 +1461,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
 
-	if (phalcon_is_callable(converter TSRMLS_CC)) {
+	if (phalcon_is_callable(converter)) {
 		PHALCON_INIT_NVAR(parameters);
 		array_init_size(parameters, 1);
 		phalcon_array_append(&parameters, controller_name, 0);
@@ -1476,7 +1476,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
 
-	if (phalcon_is_callable(converter TSRMLS_CC)) {
+	if (phalcon_is_callable(converter)) {
 		PHALCON_INIT_NVAR(parameters);
 		array_init_size(parameters, 1);
 		phalcon_array_append(&parameters, action_name, 0);
@@ -1491,7 +1491,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
 
-	if (phalcon_is_callable(converter TSRMLS_CC)) {
+	if (phalcon_is_callable(converter)) {
 		PHALCON_INIT_NVAR(parameters);
 		array_init_size(parameters, 1);
 		phalcon_array_append(&parameters, namespace_name, 0);
@@ -2450,7 +2450,7 @@ PHP_METHOD(Phalcon_Mvc_View, setConverter){
 
 	phalcon_fetch_params(0, 2, 0, &name, &converter);	
 
-	if (!phalcon_is_callable(*converter TSRMLS_CC)) {
+	if (!phalcon_is_callable(*converter)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "The paramter `converter` is not callable");
 		return;
 	}

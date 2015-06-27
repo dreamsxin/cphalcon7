@@ -791,7 +791,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				/**
 				 * Check first if the callback is callable
 				 */
-				if (!phalcon_is_callable(before_match TSRMLS_CC)) {
+				if (!phalcon_is_callable(before_match)) {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Before-Match callback is not callable in matched route");
 					return;
 				}

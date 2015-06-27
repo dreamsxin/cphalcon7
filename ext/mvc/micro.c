@@ -840,7 +840,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 						continue;
 					}
 				}
-				if (!phalcon_is_callable(before TSRMLS_CC)) {
+				if (!phalcon_is_callable(before)) {
 					PHALCON_INIT_NVAR(error_message);
 					ZVAL_STRING(error_message, "The before handler is not callable", 1);
 
@@ -928,7 +928,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 						continue;
 					}
 				}
-				if (!phalcon_is_callable(after TSRMLS_CC)) {
+				if (!phalcon_is_callable(after)) {
 					PHALCON_INIT_NVAR(error_message);
 					ZVAL_STRING(error_message, "One of the 'after' handlers is not callable", 1);
 
@@ -959,7 +959,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 * Check if a notfoundhandler is defined and it's callable
 		 */
 		not_found_handler = phalcon_fetch_nproperty_this(this_ptr, SL("_notFoundHandler"), PH_NOISY TSRMLS_CC);
-		if (!phalcon_is_callable(not_found_handler TSRMLS_CC)) {
+		if (!phalcon_is_callable(not_found_handler)) {
 			PHALCON_INIT_NVAR(error_message);
 			ZVAL_STRING(error_message, "The Not-Found handler is not callable or is not defined", 1);
 
@@ -1031,7 +1031,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 					continue;
 				}
 			}
-			if (!phalcon_is_callable(finish TSRMLS_CC)) {
+			if (!phalcon_is_callable(finish)) {
 				PHALCON_INIT_NVAR(error_message);
 				ZVAL_STRING(error_message, "One of finish handlers is not callable", 1);
 
@@ -1277,7 +1277,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, _throwException){
 
 	handler = phalcon_fetch_nproperty_this(this_ptr, SL("_errorHandler"), PH_NOISY TSRMLS_CC);
 
-	if (!phalcon_is_callable(handler TSRMLS_CC)) {
+	if (!phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_micro_exception_ce, message);
 		return;
 	}

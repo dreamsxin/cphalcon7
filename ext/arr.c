@@ -1159,7 +1159,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 		filters = PHALCON_GLOBAL(z_null);
 	}
 
-	if (Z_TYPE_P(filters) != IS_NULL && !phalcon_is_callable(filters TSRMLS_CC)) {
+	if (Z_TYPE_P(filters) != IS_NULL && !phalcon_is_callable(filters)) {
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
 		PHALCON_INIT_VAR(service);

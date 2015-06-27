@@ -248,7 +248,7 @@ int phalcon_function_exists_ex(const char *method_name, unsigned int method_len 
 /**
  * Checks if a zval is callable
  */
-int phalcon_is_callable(zval *var TSRMLS_DC) {
+int phalcon_is_callable(zval *var) {
 
 	char *error = NULL;
 	zend_bool retval;

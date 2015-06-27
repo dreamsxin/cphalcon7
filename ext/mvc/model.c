@@ -2854,7 +2854,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 		PHALCON_OBS_VAR(handler);
 		phalcon_array_fetch_string(&handler, validator, SL("validator"), PH_NOISY);
 
-		if (!phalcon_is_callable(handler TSRMLS_CC)) {
+		if (!phalcon_is_callable(handler)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Validator must be an callable");
 			return;
 		}

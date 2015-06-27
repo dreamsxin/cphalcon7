@@ -1023,7 +1023,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setUrlGenerator){
 
 	phalcon_fetch_params(0, 1, 0, &generator);
 
-	if (!phalcon_is_callable(generator TSRMLS_CC) && !instanceof_function(Z_OBJCE_P(generator), zend_ce_closure)) {
+	if (!phalcon_is_callable(generator) && !instanceof_function(Z_OBJCE_P(generator), zend_ce_closure)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "generator must be an array");
 		return;
 	}

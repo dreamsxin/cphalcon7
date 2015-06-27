@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 		 */
 		PHALCON_CALL_METHOD(&generator, route, "geturlgenerator");
 
-		if (phalcon_is_callable(generator TSRMLS_CC) ||
+		if (phalcon_is_callable(generator) ||
 			(Z_TYPE_P(generator) == IS_OBJECT && instanceof_function(Z_OBJCE_P(generator), zend_ce_closure))) {
 			PHALCON_INIT_VAR(arguments);
 			array_init_size(arguments, 3);

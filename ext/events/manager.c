@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		return;
 	}
 
-	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler TSRMLS_CC)) {
+	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event handler must be an object or callable");
 		return;
 	}
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 
 	phalcon_fetch_params(1, 2, 0, &type, &handler);
 
-	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler TSRMLS_CC)) {
+	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event handler must be an object or callable");
 		return;
 	}

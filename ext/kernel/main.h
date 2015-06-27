@@ -59,7 +59,7 @@ zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_
 /* Globals functions */
 zval* phalcon_get_global(const char *global, unsigned int global_length TSRMLS_DC);
 
-int phalcon_is_callable(zval *var TSRMLS_DC);
+int phalcon_is_callable(zval *var);
 int phalcon_function_exists_ex(const char *func_name, unsigned int func_len TSRMLS_DC);
 
 PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function_str(const char *function_name, unsigned int function_len TSRMLS_DC)

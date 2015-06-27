@@ -469,7 +469,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	PHALCON_OBS_VAR(handler);
 	phalcon_read_property_this(&handler, this_ptr, SL("_beforeEncrypt"), PH_NOISY TSRMLS_CC);
 
-	if (phalcon_is_callable(handler TSRMLS_CC)) {
+	if (phalcon_is_callable(handler)) {
 		PHALCON_SEPARATE_PARAM(source);
 
 		PHALCON_INIT_NVAR(arguments);
@@ -554,7 +554,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	PHALCON_OBS_NVAR(handler);
 	phalcon_read_property_this(&handler, this_ptr, SL("_afterEncrypt"), PH_NOISY TSRMLS_CC);
 
-	if (phalcon_is_callable(handler TSRMLS_CC)) {
+	if (phalcon_is_callable(handler)) {
 		PHALCON_INIT_NVAR(arguments);
 		array_init_size(arguments, 1);
 		phalcon_array_append(&arguments, return_value, 0);
@@ -598,7 +598,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	PHALCON_OBS_VAR(handler);
 	phalcon_read_property_this(&handler, this_ptr, SL("_beforeDecrypt"), PH_NOISY TSRMLS_CC);
 
-	if (phalcon_is_callable(handler TSRMLS_CC)) {
+	if (phalcon_is_callable(handler)) {
 		PHALCON_SEPARATE_PARAM(text);
 
 		PHALCON_INIT_NVAR(arguments);
@@ -672,7 +672,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	PHALCON_OBS_NVAR(handler);
 	phalcon_read_property_this(&handler, this_ptr, SL("_afterDecrypt"), PH_NOISY TSRMLS_CC);
 
-	if (phalcon_is_callable(handler TSRMLS_CC)) {
+	if (phalcon_is_callable(handler)) {
 		PHALCON_INIT_NVAR(arguments);
 		array_init_size(arguments, 1);
 		phalcon_array_append(&arguments, return_value, 0);
@@ -793,7 +793,7 @@ PHP_METHOD(Phalcon_Crypt, beforeEncrypt){
 
 	phalcon_fetch_params(0, 1, 1, 0, &handler);
 	
-	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler TSRMLS_CC)) {
+	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
@@ -815,7 +815,7 @@ PHP_METHOD(Phalcon_Crypt, afterEncrypt){
 
 	phalcon_fetch_params(0, 1, 1, 0, &handler);
 	
-	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler TSRMLS_CC)) {
+	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
@@ -837,7 +837,7 @@ PHP_METHOD(Phalcon_Crypt, beforeDecrypt){
 
 	phalcon_fetch_params(0, 1, 1, 0, &handler);
 	
-	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler TSRMLS_CC)) {
+	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
@@ -859,7 +859,7 @@ PHP_METHOD(Phalcon_Crypt, afterDecrypt){
 
 	phalcon_fetch_params(0, 1, 1, 0, &handler);
 	
-	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler TSRMLS_CC)) {
+	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}

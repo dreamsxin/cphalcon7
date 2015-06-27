@@ -183,6 +183,12 @@ extern int nusphere_dbg_present;
 #	define Z_TYPE_PP(pz) Z_TYPE_P(*(pz))
 #endif
 
+#ifndef INIT_PZVAL
+#	define INIT_PZVAL(z)         \
+		Z_SET_REFCOUNT_P(z, 1);  \
+		Z_UNSET_ISREF_P(z);
+#endif
+
 #ifndef INIT_PZVAL_COPY
 #	define INIT_PZVAL_COPY(z, v) \
 		ZVAL_COPY_VALUE(z, v);   \

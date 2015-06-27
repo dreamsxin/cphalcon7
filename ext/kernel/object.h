@@ -81,7 +81,6 @@ PHALCON_ATTR_NONNULL static inline int phalcon_isset_property_zval(zval *object,
 zval* phalcon_fetch_property_this(zval *object, const char *property_name, uint32_t property_length, int silent);
 int phalcon_read_property(zval **result, zval *object, const char *property_name, uint32_t property_length, int silent TSRMLS_DC);
 int phalcon_read_property_zval(zval **result, zval *object, const zval *property, int silent TSRMLS_DC);
-int phalcon_return_property_quick(zval *return_value, zval **return_value_ptr, zval *object, const char *property_name, uint32_t property_length, ulong key TSRMLS_DC);
 
 /**
  * Reads a property from this_ptr (with pre-calculated key)
@@ -103,7 +102,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_read_property_this(zval **result,
 PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this(zval *object, const char *property_name, uint32_t property_length, int silent)
 {
 	zval *result = phalcon_fetch_property_this(object, property_name, property_length, silent);
-	return result ? result : EG(uninitialized_zval);
+	return result ? result : &EG(uninitialized_zval);
 }
 
 PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this_zval(zval *object, const zval *property, int silent)
@@ -114,15 +113,16 @@ PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this_zval(zval 
 /**
  * Returns an object's member
  */
-PHALCON_ATTR_NONNULL3(1,3,4) static inline int phalcon_return_property(zval *return_value, zval **return_value_ptr, zval *object, const char *property_name, uint32_t property_length TSRMLS_DC)
+PHALCON_ATTR_NONNULL3(1,2,3)
+static inline int phalcon_return_property(zval *return_value, zval *object, const char *property_name, uint32_t property_length)
 {
-#ifdef __GNUC__
-	if (__builtin_constant_p(property_name) && __builtin_constant_p(property_length)) {
-		return phalcon_return_property_quick(return_value, return_value_ptr, object, property_name, property_length, zend_inline_hash_func(property_name, property_length + 1) TSRMLS_CC);
+	zval *tmp = phalcon_fetch_nproperty_this(object, property_name, property_length, PH_NOISY);
+	if (tmp) {
+		ZVAL_ZVAL(return_value, tmp, 1, 0);
+	} else {
+		ZVAL_NULL(return_value);
 	}
-#endif
-
-	return phalcon_return_property_quick(return_value, return_value_ptr, object, property_name, property_length, zend_hash_func(property_name, property_length + 1) TSRMLS_CC);
+	return FAILURE;
 }
 
 
@@ -210,45 +210,33 @@ int phalcon_create_instance_params(zval *return_value, const zval *class_name, z
 int phalcon_create_closure_ex(zval *return_value, zval *this_ptr, zend_class_entry *ce, const char *method_name, uint32_t method_length TSRMLS_DC);
 
 /** Checks if property access on object */
-int phalcon_check_property_access_quick(zval *object, const char *property_name, uint32_t property_length, ulong hash, int access TSRMLS_DC) PHALCON_ATTR_NONNULL;
+int phalcon_check_property_access(zval *object, const char *property_name, uint32_t property_length, int access) PHALCON_ATTR_NONNULL;
 
-PHALCON_ATTR_NONNULL static inline int phalcon_check_property_access(zval *object, const char *property_name, uint32_t property_length, int access TSRMLS_DC)
-{
-#ifdef __GNUC__
-	if (__builtin_constant_p(property_name) && __builtin_constant_p(property_length)) {
-		return phalcon_check_property_access_quick(object, property_name, property_length, zend_inline_hash_func(property_name, property_length), access TSRMLS_CC);
-	}
-#endif
-
-	return phalcon_check_property_access_quick(object, property_name, property_length, zend_hash_func(property_name, property_length), access TSRMLS_CC);
-}
-
-PHALCON_ATTR_NONNULL static inline int phalcon_check_property_access_zval(zval *object, const zval *property, int access TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline int phalcon_check_property_access_zval(zval *object, const zval *property, int access)
 {
 	if (Z_TYPE_P(property) == IS_STRING) {
-		ulong hash = zend_hash_func(Z_STRVAL_P(property), Z_STRLEN_P(property) + 1);
-		return phalcon_check_property_access_quick(object, Z_STRVAL_P(property), Z_STRLEN_P(property) + 1, hash, access TSRMLS_CC);
+		return phalcon_check_property_access(object, Z_STRVAL_P(property), Z_STRLEN_P(property) + 1, access);
 	}
 
 	return 0;
 }
 
 #define PHALCON_PROPERTY_IS_PUBLIC(object, property) \
-	 phalcon_check_property_access(object, property, strlen(property), ZEND_ACC_PUBLIC TSRMLS_CC)
+	 phalcon_check_property_access(object, property, strlen(property), ZEND_ACC_PUBLIC)
 
 #define PHALCON_PROPERTY_IS_PROTECTED(object, property) \
-	 phalcon_check_property_access(object, property, strlen(property), ZEND_ACC_PROTECTED TSRMLS_CC)
+	 phalcon_check_property_access(object, property, strlen(property), ZEND_ACC_PROTECTED)
 
 #define PHALCON_PROPERTY_IS_PRIVATE(object, property) \
-	 phalcon_check_property_access(object, property, strlen(property), ZEND_ACC_PRIVATE TSRMLS_CC)
+	 phalcon_check_property_access(object, property, strlen(property), ZEND_ACC_PRIVATE)
 
 #define PHALCON_PROPERTY_IS_PUBLIC_ZVAL(object, property) \
-	 phalcon_check_property_access_zval(object, property, ZEND_ACC_PUBLIC TSRMLS_CC)
+	 phalcon_check_property_access_zval(object, property, ZEND_ACC_PUBLIC)
 
 #define PHALCON_PROPERTY_IS_PROTECTED_ZVAL(object, property) \
-	 phalcon_check_property_access_zval(object, property, ZEND_ACC_PROTECTED TSRMLS_CC)
+	 phalcon_check_property_access_zval(object, property, ZEND_ACC_PROTECTED)
 
 #define PHALCON_PROPERTY_IS_PRIVATE_ZVAL(object, property) \
-	 phalcon_check_property_access_zval(object, property, ZEND_ACC_PRIVATE TSRMLS_CC)
+	 phalcon_check_property_access_zval(object, property, ZEND_ACC_PRIVATE)
 
 #endif /* PHALCON_KERNEL_OBJECT_H */

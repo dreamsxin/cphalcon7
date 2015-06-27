@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
 		RETURN_MEMBER(this_ptr, "_handlerName");
 	}
 
-	phalcon_return_property_quick(return_value, NULL, getThis(), SL("_handlerName"), zend_inline_hash_func(SS("_handlerName")) TSRMLS_CC);
+	phalcon_return_property(return_value, getThis(), SL("_handlerName"));
 	if (likely(Z_TYPE_P(return_value) == IS_STRING) && Z_STRLEN_P(return_value) > 1) {
 		if (Z_STRVAL_P(return_value)[0] == '\\') {
 			char *c = Z_STRVAL_P(return_value);

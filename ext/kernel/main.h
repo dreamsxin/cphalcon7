@@ -154,28 +154,14 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
  * Returns a zval in an object member
  */
 #define RETURN_MEMBER(object, member_name) \
-	phalcon_return_property_quick(return_value, NULL, object, SL(member_name), zend_inline_hash_func(SS(member_name)) TSRMLS_CC); \
+	phalcon_return_property(return_value, object, SL(member_name)); \
 	return;
 
 /**
  * Returns a zval in an object member
  */
 #define RETURN_MM_MEMBER(object, member_name) \
-	phalcon_return_property_quick(return_value, NULL, object, SL(member_name), zend_inline_hash_func(SS(member_name)) TSRMLS_CC); \
-	RETURN_MM();
-
-/**
- * Returns a zval in an object member (quick)
- */
-#define RETURN_MEMBER_QUICK(object, member_name, key) \
-	phalcon_return_property_quick(return_value, NULL, object, SL(member_name), key TSRMLS_CC); \
-	return;
-
-/**
- * Returns a zval in an object member (quick)
- */
-#define RETURN_MM_MEMBER_QUICK(object, member_name, key) \
-	phalcon_return_property_quick(return_value, NULL, object, SL(member_name), key TSRMLS_CC); \
+	phalcon_return_property(return_value, object, SL(member_name)); \
 	RETURN_MM();
 
 #define RETURN_ON_FAILURE(what) \

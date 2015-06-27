@@ -34,19 +34,19 @@ static void psr_log_abstractlogger_log_helper(INTERNAL_FUNCTION_PARAMETERS, cons
 	zend_fcall_info_cache fcic;
 	zend_class_entry *ce;
 
-	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z|z", &message, &context)) {
+	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "z|z", &message, &context)) {
 		RETURN_NULL();
 	}
 
 	ce = Z_OBJCE_P(getThis());
 
 	if (!context) {
-		MAKE_STD_ZVAL(context);
+		PHALCON_ALLOC_GHOST_ZVAL(context);
 		array_init(context);
 		Z_SET_REFCOUNT_P(context, 0);
 	}
 
-	MAKE_STD_ZVAL(level);
+	PHALCON_ALLOC_GHOST_ZVAL(level);
 	ZVAL_STRING(level, lvl, 1);
 	Z_SET_REFCOUNT_P(level, 0);
 
@@ -70,7 +70,7 @@ static void psr_log_abstractlogger_log_helper(INTERNAL_FUNCTION_PARAMETERS, cons
 		ZVAL_STRING(&function_name, "log", 0);
 	}
 
-	zend_call_function(&fci, &fcic TSRMLS_CC);
+	zend_call_function(&fci, &fcic);
 
 	if (retval) {
 		zval_ptr_dtor(&retval);
@@ -134,9 +134,9 @@ PHALCON_INIT_CLASS(Psr_Log_AbstractLogger)
 	zend_class_entry ce;
 	INIT_CLASS_ENTRY(ce, "Psr\\Log\\AbstractLogger", fe_psr_log_abstractlogger);
 
-	psr_log_abstractlogger_ce = zend_register_internal_class(&ce TSRMLS_CC);
+	psr_log_abstractlogger_ce = zend_register_internal_class(&ce);
 	if (EXPECTED(psr_log_abstractlogger_ce != NULL)) {
-		zend_class_implements(psr_log_abstractlogger_ce TSRMLS_CC, 1, psr_log_loggerinterface_ce);
+		zend_class_implements(psr_log_abstractlogger_ce, 1, psr_log_loggerinterface_ce);
 		return SUCCESS;
 	}
 

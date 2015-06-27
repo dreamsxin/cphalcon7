@@ -100,9 +100,9 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Mysql){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Db\\Dialect, Mysql, db_dialect_mysql, phalcon_db_dialect_ce, phalcon_db_dialect_mysql_method_entry, 0);
 
-	zend_declare_property_string(phalcon_db_dialect_mysql_ce, SL("_escapeChar"), "`", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_db_dialect_mysql_ce, SL("_escapeChar"), "`", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_db_dialect_mysql_ce TSRMLS_CC, 1, phalcon_db_dialectinterface_ce);
+	zend_class_implements(phalcon_db_dialect_mysql_ce, 1, phalcon_db_dialectinterface_ce);
 
 	return SUCCESS;
 }
@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 	
 			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 			if (zend_is_true(is_unsigned)) {
-				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED") TSRMLS_CC);
+				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 			}
 	
 			break;
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 	
 			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 			if (zend_is_true(is_unsigned)) {
-				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED") TSRMLS_CC);
+				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 			}
 	
 			break;
@@ -183,13 +183,13 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				if (zend_is_true(scale)) {
 					PHALCON_SCONCAT_SVS(column_sql, ",", scale, ")");
 				} else {
-					phalcon_concat_self_str(&column_sql, SL(")") TSRMLS_CC);
+					phalcon_concat_self_str(&column_sql, SL(")"));
 				}
 			}
 	
 			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 			if (zend_is_true(is_unsigned)) {
-				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED") TSRMLS_CC);
+				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 			}
 	
 			break;
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addColumn){
 	
 	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
 	if (zend_is_true(is_not_null)) {
-		phalcon_concat_self_str(&sql, SL(" NOT NULL") TSRMLS_CC);
+		phalcon_concat_self_str(&sql, SL(" NOT NULL"));
 	}
 	
 	PHALCON_CALL_METHOD(&is_autoincrement, column, "isautoincrement");
@@ -251,12 +251,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addColumn){
 	 * This is why we explicitly create PRIMARY KEY here, otherwise ALTER TABLE will fail.
 	 */
 	if (zend_is_true(is_autoincrement)) {
-		phalcon_concat_self_str(&sql, SL(" PRIMARY KEY AUTO_INCREMENT") TSRMLS_CC);
+		phalcon_concat_self_str(&sql, SL(" PRIMARY KEY AUTO_INCREMENT"));
 	}
 
 	PHALCON_CALL_METHOD(&is_first, column, "isfirst");
 	if (zend_is_true(is_first)) {
-		phalcon_concat_self_str(&sql, SL(" FIRST") TSRMLS_CC);
+		phalcon_concat_self_str(&sql, SL(" FIRST"));
 	} else {
 		PHALCON_CALL_METHOD(&after_position, column, "getafterposition");
 		if (zend_is_true(after_position)) {
@@ -301,12 +301,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, modifyColumn){
 	
 	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
 	if (zend_is_true(is_not_null)) {
-		phalcon_concat_self_str(&sql, SL(" NOT NULL") TSRMLS_CC);
+		phalcon_concat_self_str(&sql, SL(" NOT NULL"));
 	}
 	
 	PHALCON_CALL_METHOD(&is_autoincrement, column, "isautoincrement");
 	if (zend_is_true(is_autoincrement)) {
-		phalcon_concat_self_str(&sql, SL(" AUTO_INCREMENT") TSRMLS_CC);
+		phalcon_concat_self_str(&sql, SL(" AUTO_INCREMENT"));
 	}
 
 	RETURN_CTOR(sql);
@@ -634,9 +634,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 			}
 		}
 	
-		if (phalcon_fast_count_ev(table_options TSRMLS_CC)) {
+		if (phalcon_fast_count_ev(table_options)) {
 			PHALCON_INIT_VAR(sql_table_options);
-			phalcon_fast_join_str(sql_table_options, SL(" "), table_options TSRMLS_CC);
+			phalcon_fast_join_str(sql_table_options, SL(" "), table_options);
 			RETURN_CTOR(sql_table_options);
 		}
 	}
@@ -724,7 +724,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 		 */
 		PHALCON_CALL_METHOD(&attribute, column, "isnotnull");
 		if (zend_is_true(attribute)) {
-			phalcon_concat_self_str(&column_line, SL(" NOT NULL") TSRMLS_CC);
+			phalcon_concat_self_str(&column_line, SL(" NOT NULL"));
 		}
 	
 		/** 
@@ -732,7 +732,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 		 */
 		PHALCON_CALL_METHOD(&attribute, column, "isautoincrement");
 		if (zend_is_true(attribute)) {
-			phalcon_concat_self_str(&column_line, SL(" AUTO_INCREMENT") TSRMLS_CC);
+			phalcon_concat_self_str(&column_line, SL(" AUTO_INCREMENT"));
 		}
 	
 		/** 
@@ -740,7 +740,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 		 */
 		PHALCON_CALL_METHOD(&attribute, column, "isprimary");
 		if (zend_is_true(attribute)) {
-			phalcon_concat_self_str(&column_line, SL(" PRIMARY KEY") TSRMLS_CC);
+			phalcon_concat_self_str(&column_line, SL(" PRIMARY KEY"));
 		}
 	
 		phalcon_array_append(&create_lines, column_line, PH_SEPARATE);
@@ -820,7 +820,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	}
 	
 	PHALCON_INIT_VAR(joined_lines);
-	phalcon_fast_join_str(joined_lines, SL(",\n\t"), create_lines TSRMLS_CC);
+	phalcon_fast_join_str(joined_lines, SL(",\n\t"), create_lines);
 	PHALCON_SCONCAT_VS(sql, joined_lines, "\n)");
 	if (phalcon_array_isset_string(definition, SS("options"))) {
 		PHALCON_CALL_METHOD(&options, this_ptr, "_gettableoptions", definition);

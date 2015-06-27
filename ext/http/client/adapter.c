@@ -91,26 +91,26 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Adapter){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Http\\Client, Adapter, http_client_adapter, phalcon_http_client_adapter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_header"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_base_uri"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_http_client_adapter_ce, SL("_method"), "GET", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_useragent"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_username"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_password"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_authtype"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_digest"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_entity_body"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_data"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_files"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_http_client_adapter_ce, SL("_timeout"), 30, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_header"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_base_uri"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_http_client_adapter_ce, SL("_method"), "GET", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_useragent"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_username"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_password"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_authtype"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_digest"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_entity_body"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_data"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_type"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_client_adapter_ce, SL("_files"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_http_client_adapter_ce, SL("_timeout"), 30, ZEND_ACC_PROTECTED);
 
-	zend_declare_class_constant_stringl(phalcon_http_client_adapter_ce, SL("VERSION"), SL("0.0.1") TSRMLS_CC);
-	zend_declare_class_constant_stringl(phalcon_http_client_adapter_ce, SL("AUTH_TYPE_ANY"), SL("any") TSRMLS_CC);
-	zend_declare_class_constant_stringl(phalcon_http_client_adapter_ce, SL("AUTH_TYPE_BASIC"), SL("basic") TSRMLS_CC);
-	zend_declare_class_constant_stringl(phalcon_http_client_adapter_ce, SL("AUTH_TYPE_DIGEST"), SL("digest") TSRMLS_CC);
+	zend_declare_class_constant_stringl(phalcon_http_client_adapter_ce, SL("VERSION"), SL("0.0.1"));
+	zend_declare_class_constant_stringl(phalcon_http_client_adapter_ce, SL("AUTH_TYPE_ANY"), SL("any"));
+	zend_declare_class_constant_stringl(phalcon_http_client_adapter_ce, SL("AUTH_TYPE_BASIC"), SL("basic"));
+	zend_declare_class_constant_stringl(phalcon_http_client_adapter_ce, SL("AUTH_TYPE_DIGEST"), SL("digest"));
 
-	zend_class_implements(phalcon_http_client_adapter_ce TSRMLS_CC, 1, phalcon_http_client_adapterinterface_ce);
+	zend_class_implements(phalcon_http_client_adapter_ce, 1, phalcon_http_client_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUserAgent){
 
 	phalcon_fetch_params(0, 1, 0, &useragent);
 
-	phalcon_update_property_this(this_ptr, SL("_useragent"), useragent TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_useragent"), useragent);
 
 	RETURN_THISW();
 }
@@ -150,22 +150,22 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 
 	phalcon_fetch_params(1, 2, 3, &username, &password, &authtype, &digest, &entity_body);
 
-	phalcon_update_property_this(this_ptr, SL("_username"), username TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_password"), password TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_username"), username);
+	phalcon_update_property_this(this_ptr, SL("_password"), password);
 
 	if (!authtype) {
 		PHALCON_INIT_NVAR(authtype);
 		ZVAL_STRING(authtype, "any", 1);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_authtype"), authtype TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_authtype"), authtype);
 
 	if (digest && Z_TYPE_P(digest) == IS_ARRAY) {
-		phalcon_update_property_this(this_ptr, SL("_digest"), digest TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_digest"), digest);
 	}
 
 	if (entity_body) {
-		phalcon_update_property_this(this_ptr, SL("_entity_body"), entity_body TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_entity_body"), entity_body);
 	}
 
 	RETURN_THIS();
@@ -228,11 +228,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setData){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_data"), data TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_data"), data);
 
 	if (type) {
 		convert_to_string(type);
-		phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_type"), type);
 	}
 
 	RETURN_THISW();
@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFile){
 		PHALCON_CPY_WRT(files, file);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_files"), files TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_files"), files);
 
 	zend_error_noreturn(E_DEPRECATED, "Method Phalcon\\Http\\Client\\Adapter::setFile is deprecated, please use Phalcon\\Http\\Client\\Adapter::setFiles instead");
 
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFiles){
 		PHALCON_CPY_WRT(arr, files);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_files"), arr TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_files"), arr);
 
 	RETURN_THIS();
 }
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, get){
 		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("GET") TSRMLS_CC);
+	phalcon_update_property_string(this_ptr, SL("_method"), SL("GET"));
 	
 	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
 }
@@ -357,7 +357,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, head){
 		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("HEAD") TSRMLS_CC);
+	phalcon_update_property_string(this_ptr, SL("_method"), SL("HEAD"));
 
 	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
 }
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, post){
 		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("POST") TSRMLS_CC);
+	phalcon_update_property_string(this_ptr, SL("_method"), SL("POST"));
 
 	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
 }
@@ -409,7 +409,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, put){
 		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("PUT") TSRMLS_CC);
+	phalcon_update_property_string(this_ptr, SL("_method"), SL("PUT"));
 
 	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
 }
@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, delete){
 		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("DELETE") TSRMLS_CC);
+	phalcon_update_property_string(this_ptr, SL("_method"), SL("DELETE"));
 
 	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
 }
@@ -456,7 +456,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUri){
 
 	if (Z_TYPE_P(base_uri) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, base_uri, "extend", uri);
-		phalcon_update_property_this(this_ptr, SL("_base_uri"), base_uri TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_base_uri"), base_uri);
 	} else {
 		PHALCON_CALL_SELFW(NULL, "setbaseuri", uri);
 	}
@@ -505,7 +505,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setBaseUri){
 	object_init_ex(base_uri, phalcon_http_uri_ce);
 	PHALCON_CALL_METHOD(NULL, base_uri, "__construct", uri);
 
-	phalcon_update_property_this(this_ptr, SL("_base_uri"), base_uri TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_base_uri"), base_uri);
 
 	RETURN_THIS();
 }
@@ -522,7 +522,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setMethod){
 
 	phalcon_fetch_params(0, 1, 0, &method);
 
-	phalcon_update_property_this(this_ptr, SL("_method"), method TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_method"), method);
 
 	RETURN_THISW();
 }
@@ -539,7 +539,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setTimeOut){
 
 	phalcon_fetch_params(0, 1, 0, &time);
 
-	phalcon_update_property_this(this_ptr, SL("_timeout"), time TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_timeout"), time);
 
 	RETURN_THISW();
 }

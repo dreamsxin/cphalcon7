@@ -98,9 +98,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_JsonRpc){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, JsonRpc, mvc_jsonrpc, phalcon_di_injectable_ce, phalcon_mvc_jsonrpc_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_jsonrpc_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_jsonrpc_ce, SL("_modules"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_jsonrpc_ce, SL("_moduleObject"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_jsonrpc_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_jsonrpc_ce, SL("_modules"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_jsonrpc_ce, SL("_moduleObject"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
 	
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_jsonrpc_exception_ce, 0);
-		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector);
 	}
 }
 
@@ -159,18 +159,18 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 		return;
 	}
 	if (PHALCON_IS_FALSE(merge)) {
-		phalcon_update_property_this(this_ptr, SL("_modules"), modules TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_modules"), modules);
 	} else {
 		PHALCON_OBS_VAR(registered_modules);
 		phalcon_read_property_this(&registered_modules, this_ptr, SL("_modules"), PH_NOISY);
 		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_modules);
-			phalcon_fast_array_merge(merged_modules, &registered_modules, &modules TSRMLS_CC);
+			phalcon_fast_array_merge(merged_modules, &registered_modules, &modules);
 		} else {
 			PHALCON_CPY_WRT(merged_modules, modules);
 		}
 	
-		phalcon_update_property_this(this_ptr, SL("_modules"), merged_modules TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_modules"), merged_modules);
 	}
 	
 	RETURN_THIS();
@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &default_module);
 	
-	phalcon_update_property_this(this_ptr, SL("_defaultModule"), default_module TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_defaultModule"), default_module);
 	RETURN_THISW();
 }
 
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, getDefaultModule){
 	RETURN_MEMBER(this_ptr, "_defaultModule");
 }
 
-static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *this_ptr, zval *params TSRMLS_DC)
+static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *this_ptr, zval *params)
 {
 	if (mgr) {
 		zval *event_name;
@@ -229,7 +229,7 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
 		p[1] = this_ptr;
 		p[2] = params;
 
-		if (FAILURE == phalcon_call_method(&status, mgr, "fire", params_cnt, p TSRMLS_CC)) {
+		if (FAILURE == phalcon_call_method(&status, mgr, "fire", params_cnt, p)) {
 			return FAILURE;
 		}
 
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	}
 
 	/* Call boot event, this allows the developer to perform initialization actions */
-	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:boot", getThis(), NULL TSRMLS_CC)) {
+	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:boot", getThis(), NULL)) {
 		RETURN_MM_FALSE;
 	}
 
@@ -359,7 +359,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		 * Process the module definition
 		 */
 		if (zend_is_true(module_name)) {
-			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeStartModule", getThis(), module_name TSRMLS_CC)) {
+			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeStartModule", getThis(), module_name)) {
 				RETURN_MM_FALSE;
 			}
 
@@ -401,7 +401,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 					convert_to_string_ex(&path);
 					if (Z_TYPE_P(class_name) != IS_STRING || phalcon_class_exists(Z_STR_P(class_name), 0) == NULL) {
 						if (phalcon_file_exists(path) == SUCCESS) {
-							RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path) TSRMLS_CC));
+							RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path)));
 						} else {
 							zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module definition path '%s' does not exist", Z_STRVAL_P(path));
 							RETURN_MM();
@@ -435,8 +435,8 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 					module_object = PHALCON_GLOBAL(z_null);
 				}
 
-				phalcon_update_property_this(this_ptr, SL("_moduleObject"), module_object TSRMLS_CC);
-				if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterStartModule", getThis(), module_name TSRMLS_CC)) {
+				phalcon_update_property_this(this_ptr, SL("_moduleObject"), module_object);
+				if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterStartModule", getThis(), module_name)) {
 					RETURN_MM_FALSE;
 				}
 			}
@@ -464,7 +464,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		PHALCON_CALL_METHOD(NULL, dispatcher, "setparams", jsonrpc_params);
 		
 		/* Calling beforeHandleRequest */
-		RETURN_MM_ON_FAILURE(phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeHandleRequest", getThis(), dispatcher TSRMLS_CC));
+		RETURN_MM_ON_FAILURE(phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeHandleRequest", getThis(), dispatcher));
 		
 		/* The dispatcher must return an object */
 		PHALCON_CALL_METHOD(&controller, dispatcher, "dispatch");
@@ -476,7 +476,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	}
 		
 	/* Calling afterHandleRequest */
-	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterHandleRequest", getThis(), controller TSRMLS_CC) && EG(exception)) {
+	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterHandleRequest", getThis(), controller) && EG(exception)) {
 		RETURN_MM();
 	}
 	
@@ -500,7 +500,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	
 
 	/* Calling beforeSendResponse */
-	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeSendResponse", getThis(), response TSRMLS_CC) && EG(exception)) {
+	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeSendResponse", getThis(), response) && EG(exception)) {
 		RETURN_MM();
 	}
 	

@@ -4,8 +4,6 @@
 
 zend_class_entry *psr_log_loggertrait_ce;
 
-#if PHP_VERSION_ID >= 50400
-
 static const zend_function_entry fe_psr_log_loggertrait[] = {
 	PHP_ME_MAPPING(emergency, Psr_Log_Emergency, arginfo_psr_log_loggerinterface_logspecialized, ZEND_ACC_PUBLIC)
 	PHP_ME_MAPPING(alert, Psr_Log_Alert, arginfo_psr_log_loggerinterface_logspecialized, ZEND_ACC_PUBLIC)
@@ -24,7 +22,7 @@ PHALCON_INIT_CLASS(Psr_Log_LoggerTrait)
 	zend_class_entry ce;
 	INIT_CLASS_ENTRY(ce, "Psr\\Log\\LoggerTrait", fe_psr_log_loggertrait);
 
-	psr_log_loggertrait_ce = zend_register_internal_class(&ce TSRMLS_CC);
+	psr_log_loggertrait_ce = zend_register_internal_class(&ce);
 	if (EXPECTED(psr_log_loggertrait_ce != NULL)) {
 		psr_log_loggertrait_ce->ce_flags |= ZEND_ACC_TRAIT;
 		return SUCCESS;
@@ -32,13 +30,3 @@ PHALCON_INIT_CLASS(Psr_Log_LoggerTrait)
 
 	return FAILURE;
 }
-
-#else
-
-PHALCON_INIT_CLASS(Psr_Log_LoggerTrait)
-{
-	psr_log_loggertrait_ce = NULL;
-	return SUCCESS;
-}
-
-#endif

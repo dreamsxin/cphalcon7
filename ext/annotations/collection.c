@@ -101,10 +101,10 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Collection){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Annotations, Collection, annotations_collection, phalcon_annotations_collection_method_entry, 0);
 
-	zend_declare_property_long(phalcon_annotations_collection_ce, SL("_position"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_annotations_collection_ce, SL("_annotations"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_long(phalcon_annotations_collection_ce, SL("_position"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_annotations_collection_ce, SL("_annotations"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_annotations_collection_ce TSRMLS_CC, 2, zend_ce_iterator, spl_ce_Countable);
+	zend_class_implements(phalcon_annotations_collection_ce, 2, zend_ce_iterator, spl_ce_Countable);
 
 	return SUCCESS;
 }
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 		phalcon_array_append(&annotations, annotation, 0);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_annotations"), annotations TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_annotations"), annotations);
 	PHALCON_MM_RESTORE();
 }
 
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, count){
 PHP_METHOD(Phalcon_Annotations_Collection, rewind){
 
 
-	phalcon_update_property_long(this_ptr, SL("_position"), 0 TSRMLS_CC);
+	phalcon_update_property_long(this_ptr, SL("_position"), 0);
 	
 }
 
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, key){
 PHP_METHOD(Phalcon_Annotations_Collection, next){
 
 
-	phalcon_property_incr(this_ptr, SL("_position") TSRMLS_CC);
+	phalcon_property_incr(this_ptr, SL("_position"));
 	
 }
 

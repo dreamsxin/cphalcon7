@@ -117,10 +117,10 @@ static zend_object *phalcon_registry_ctor(zend_class_entry* ce)
 {
 	phalcon_registry_object *obj = ecalloc(1, sizeof(phalcon_registry_object));
 
-	zend_object_std_init(&obj->obj, ce TSRMLS_CC);
+	zend_object_std_init(&obj->obj, ce);
 	object_properties_init(&obj->obj, ce);
 
-	MAKE_STD_ZVAL(obj->properties);
+	PHALCON_ALLOC_GHOST_ZVAL(obj->properties);
 	array_init(obj->properties);
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(obj->properties), &obj->pos);
 
@@ -176,11 +176,11 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
 	else {
 		int i;
 
-		if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "+", &args, &argc)) {
+		if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "+", &args, &argc)) {
 			return FAILURE;
 		}
 
-		MAKE_STD_ZVAL(params);
+		PHALCON_ALLOC_GHOST_ZVAL(params);
 		array_init_size(params, argc);
 
 		for (i=0; i<argc; ++i) {
@@ -190,7 +190,7 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
 	}
 
 	if ((callback = zend_hash_str_find(Z_ARRVAL_P(obj->properties), method, strlen(method)+1)) != NULL) {
-		result = phalcon_call_user_func_array_noex(return_value, callback, params TSRMLS_CC);
+		result = phalcon_call_user_func_array_noex(return_value, callback, params);
 	} else {
 		result = FAILURE;
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", method);
@@ -317,7 +317,7 @@ static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int typ
 		if (Z_REFCOUNT_P(*ret) > 1) {
 			zval *newval;
 
-			MAKE_STD_ZVAL(newval);
+			PHALCON_ALLOC_GHOST_ZVAL(newval);
 			*newval = **ret;
 			zval_copy_ctor(newval);
 			Z_SET_REFCOUNT_P(newval, 1);
@@ -356,7 +356,7 @@ static void phalcon_registry_unset_dimension(zval *object, zval *offset)
 /**
  * @brief Updates @a count to hold the number of elements present and returns @c SUCCESS.
  */
-static int phalcon_registry_count_elements(zval *object, long int *count TSRMLS_DC)
+static int phalcon_registry_count_elements(zval *object, long int *count)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
 	*count = zend_hash_num_elements(Z_ARRVAL_P(obj->properties));
@@ -366,13 +366,13 @@ static int phalcon_registry_count_elements(zval *object, long int *count TSRMLS_
 /**
  * @brief Get hash of the properties of @a object, as hash of zval's
  */
-static HashTable* phalcon_registry_get_properties(zval *object TSRMLS_DC)
+static HashTable* phalcon_registry_get_properties(zval *object)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
 	return Z_ARRVAL_P(obj->properties);
 }
 
-static int phalcon_registry_compare_objects(zval *object1, zval *object2 TSRMLS_DC)
+static int phalcon_registry_compare_objects(zval *object1, zval *object2)
 {
 	phalcon_registry_object *zobj1, *zobj2;
 	zval result;
@@ -388,7 +388,7 @@ static int phalcon_registry_compare_objects(zval *object1, zval *object2 TSRMLS_
 		return 0;
 	}
 
-	zend_compare_symbol_tables(&result, Z_ARRVAL_P(zobj1->properties), Z_ARRVAL_P(zobj2->properties) TSRMLS_CC);
+	zend_compare_symbol_tables(&result, Z_ARRVAL_P(zobj1->properties), Z_ARRVAL_P(zobj2->properties));
 	assert(Z_TYPE_P(&result) == IS_LONG);
 	return Z_LVAL_P(&result);
 }
@@ -396,14 +396,14 @@ static int phalcon_registry_compare_objects(zval *object1, zval *object2 TSRMLS_
 /**
  * @brief <tt>Serializable::serialize()</tt>
  */
-static int phalcon_registry_serialize(zval *object, unsigned char **buffer, uint32_t *buf_len, zend_serialize_data *data TSRMLS_DC)
+static int phalcon_registry_serialize(zval *object, unsigned char **buffer, uint32_t *buf_len, zend_serialize_data *data)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
 	smart_str buf = { NULL, 0, 0 };
 	php_serialize_data_t var_hash;
 
 	PHP_VAR_SERIALIZE_INIT(var_hash);
-	php_var_serialize(&buf, &obj->properties, &var_hash TSRMLS_CC);
+	php_var_serialize(&buf, &obj->properties, &var_hash);
 	PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
 	if (buf.s) {
@@ -418,7 +418,7 @@ static int phalcon_registry_serialize(zval *object, unsigned char **buffer, uint
 /**
  * @brief <tt>Serializable::unserialize()</tt>
  */
-static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, const unsigned char *buf, uint32_t buf_len, zend_unserialize_data *data TSRMLS_DC)
+static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, const unsigned char *buf, uint32_t buf_len, zend_unserialize_data *data)
 {
 	phalcon_registry_object *obj;
 	php_unserialize_data_t var_hash;
@@ -432,7 +432,7 @@ static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, con
 	max = buf + buf_len;
 
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
-	retval = (php_var_unserialize(&pzv, &buf, max, &var_hash TSRMLS_CC) && Z_TYPE(zv) == IS_ARRAY) ? SUCCESS : FAILURE;
+	retval = (php_var_unserialize(&pzv, &buf, max, &var_hash) && Z_TYPE(zv) == IS_ARRAY) ? SUCCESS : FAILURE;
 	if (SUCCESS == retval) {
 		if (zend_hash_num_elements(Z_ARRVAL(zv)) != 0) {
 			zend_hash_copy(Z_ARRVAL_P(obj->properties), Z_ARRVAL(zv), (copy_ctor_func_t)zval_add_ref);
@@ -451,7 +451,7 @@ static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, con
 /**
  * @brief Iterator destructor
  */
-static void phalcon_registry_iterator_dtor(zend_object_iterator *it TSRMLS_DC)
+static void phalcon_registry_iterator_dtor(zend_object_iterator *it)
 {
 	phalcon_ptr_dtor((zval*)it->data);
 	efree(it);
@@ -460,7 +460,7 @@ static void phalcon_registry_iterator_dtor(zend_object_iterator *it TSRMLS_DC)
 /**
  * @brief Checks whether the iterator @a it is valid (<tt>Iterator::valid()</tt>)
  */
-static int phalcon_registry_iterator_valid(zend_object_iterator *it TSRMLS_DC)
+static int phalcon_registry_iterator_valid(zend_object_iterator *it)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
 	return obj->pos != NULL ? SUCCESS : FAILURE;
@@ -469,7 +469,7 @@ static int phalcon_registry_iterator_valid(zend_object_iterator *it TSRMLS_DC)
 /**
  * @brief Get current data from the iterator @a it into @ data (<tt>Iterator::current()</tt>)
  */
-static void phalcon_registry_iterator_get_current_data(zend_object_iterator *it, zval ***data TSRMLS_DC)
+static void phalcon_registry_iterator_get_current_data(zend_object_iterator *it, zval ***data)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
 
@@ -481,7 +481,7 @@ static void phalcon_registry_iterator_get_current_data(zend_object_iterator *it,
 /**
  * @brief Get current key from the iterator @a it into @ key (<tt>Iterator::key()</tt>)
  */
-static void phalcon_registry_iterator_get_current_key(zend_object_iterator *it, zval *key TSRMLS_DC)
+static void phalcon_registry_iterator_get_current_key(zend_object_iterator *it, zval *key)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
 
@@ -491,7 +491,7 @@ static void phalcon_registry_iterator_get_current_key(zend_object_iterator *it, 
 /**
  * @brief Adavance the iterator @a it forward (<tt>Iterator::next()</tt>)
  */
-static void phalcon_registry_iterator_move_forward(zend_object_iterator *it TSRMLS_DC)
+static void phalcon_registry_iterator_move_forward(zend_object_iterator *it)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
 	zend_hash_move_forward_ex(Z_ARRVAL_P(obj->properties), &obj->pos);
@@ -500,7 +500,7 @@ static void phalcon_registry_iterator_move_forward(zend_object_iterator *it TSRM
 /**
  * @brief Rewind the iterator @a it (<tt>Iterator::rewind()</tt>)
  */
-static void phalcon_registry_iterator_rewind(zend_object_iterator *it TSRMLS_DC)
+static void phalcon_registry_iterator_rewind(zend_object_iterator *it)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(obj->properties), &obj->pos);
@@ -519,7 +519,7 @@ static zend_object_iterator_funcs phalcon_registry_iterator_funcs = {
 /**
  * @brief Iterator constructor
  */
-static zend_object_iterator* phalcon_registry_get_iterator(zend_class_entry *ce, zval *object, int by_ref TSRMLS_DC)
+static zend_object_iterator* phalcon_registry_get_iterator(zend_class_entry *ce, zval *object, int by_ref)
 {
 	zend_object_iterator *result;
 
@@ -596,7 +596,7 @@ static PHP_METHOD(Phalcon_Registry, __call)
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_registry_object);
 
 	if ((callback = zend_hash_str_find(Z_ARRVAL_P(obj->properties), Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1)) != NULL) {
-		RETURN_ON_FAILURE(phalcon_call_user_func_array(return_value, callback, *arguments TSRMLS_CC));
+		RETURN_ON_FAILURE(phalcon_call_user_func_array(return_value, callback, *arguments));
 	}
 	else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_P(*name));
@@ -610,7 +610,7 @@ static PHP_METHOD(Phalcon_Registry, count)
 {
 	long int result;
 
-	phalcon_registry_count_elements(getThis(), &result TSRMLS_CC);
+	phalcon_registry_count_elements(getThis(), &result);
 	RETURN_LONG(result);
 }
 
@@ -654,7 +654,7 @@ static PHP_METHOD(Phalcon_Registry, offsetUnset)
 	zval **offset;
 
 	phalcon_fetch_params(0, 1, 0, &offset);
-	phalcon_registry_unset_dimension(getThis(), *offset TSRMLS_CC);
+	phalcon_registry_unset_dimension(getThis(), *offset);
 }
 
 /**
@@ -665,7 +665,7 @@ static PHP_METHOD(Phalcon_Registry, offsetExists)
 	zval **offset;
 
 	phalcon_fetch_params(0, 1, 0, &offset);
-	phalcon_registry_has_dimension(getThis(), *offset, 0 TSRMLS_CC);
+	phalcon_registry_has_dimension(getThis(), *offset, 0);
 }
 
 /**
@@ -738,7 +738,7 @@ static PHP_METHOD(Phalcon_Registry, serialize)
 	php_serialize_data_t var_hash;
 
 	PHP_VAR_SERIALIZE_INIT(var_hash);
-	php_var_serialize(&buf, &obj->properties, &var_hash TSRMLS_CC);
+	php_var_serialize(&buf, &obj->properties, &var_hash);
 	PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
 	if (buf.s) {
@@ -771,7 +771,7 @@ static PHP_METHOD(Phalcon_Registry, unserialize)
 	max = buf + Z_STRLEN_P(*str);
 
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
-	if (php_var_unserialize(&pzv, &buf, max, &var_hash TSRMLS_CC) && Z_TYPE(zv) == IS_ARRAY) {
+	if (php_var_unserialize(&pzv, &buf, max, &var_hash) && Z_TYPE(zv) == IS_ARRAY) {
 		if (zend_hash_num_elements(Z_ARRVAL(zv)) != 0) {
 			zend_hash_copy(Z_ARRVAL_P(obj->properties), Z_ARRVAL(zv), (copy_ctor_func_t) zval_add_ref);
 		}
@@ -845,7 +845,7 @@ PHALCON_INIT_CLASS(Phalcon_Registry)
 	jsonserializable_ce = zend_hash_str_find_ptr(CG(class_table), ZEND_STRS("jsonserializable"));
 
 	zend_class_implements(
-		phalcon_registry_ce TSRMLS_CC,
+		phalcon_registry_ce,
 		(jsonserializable_ce ? 5 : 4),
 		zend_ce_arrayaccess,
 		zend_ce_iterator,

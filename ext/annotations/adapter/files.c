@@ -80,9 +80,9 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Files){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Annotations\\Adapter, Files, annotations_adapter_files, phalcon_annotations_adapter_ce, phalcon_annotations_adapter_files_method_entry, 0);
 
-	zend_declare_property_string(phalcon_annotations_adapter_files_ce, SL("_annotationsDir"), "./", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_annotations_adapter_files_ce, SL("_annotationsDir"), "./", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_annotations_adapter_files_ce TSRMLS_CC, 1, phalcon_annotations_adapterinterface_ce);
+	zend_class_implements(phalcon_annotations_adapter_files_ce, 1, phalcon_annotations_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, __construct){
 	
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_string_fetch(&annotations_dir, options, SS("annotationsDir"))) {
-			phalcon_update_property_this(this_ptr, SL("_annotationsDir"), annotations_dir TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_annotationsDir"), annotations_dir);
 		}
 	}
 }
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 	 * Paths must be normalized before be used as keys
 	 */
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_' TSRMLS_CC);
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, annotations_dir, virtual_key, ".php");
@@ -164,13 +164,13 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	 * Paths must be normalized before be used as keys
 	 */
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_' TSRMLS_CC);
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, annotations_dir, virtual_key, ".php");
 	
 	smart_str_appends(&exp, "<?php return ");
-	php_var_export_ex(data, 0, &exp TSRMLS_CC);
+	php_var_export_ex(data, 0, &exp);
 	smart_str_appendc(&exp, ';');
 	smart_str_0(&exp);
 	
@@ -178,7 +178,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	ZVAL_STRINGL(php_export, exp.c, exp.len, 0);
 	
 	PHALCON_INIT_VAR(status);
-	phalcon_file_put_contents(status, path, php_export TSRMLS_CC);
+	phalcon_file_put_contents(status, path, php_export);
 	if (PHALCON_IS_FALSE(status)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Annotations directory cannot be written");
 		return;

@@ -177,20 +177,20 @@ PHALCON_INIT_CLASS(Phalcon_Security){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon, Security, security, phalcon_di_injectable_ce, phalcon_security_method_entry, 0);
 
-	zend_declare_property_long(phalcon_security_ce, SL("_workFactor"), 8, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_security_ce, SL("_numberBytes"), 16, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_security_ce, SL("_csrf"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_security_ce, SL("_defaultHash"), PHALCON_SECURITY_CRYPT_DEFAULT, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_long(phalcon_security_ce, SL("_workFactor"), 8, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_security_ce, SL("_numberBytes"), 16, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_security_ce, SL("_csrf"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_security_ce, SL("_defaultHash"), PHALCON_SECURITY_CRYPT_DEFAULT, ZEND_ACC_PROTECTED);
 
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_DEFAULT"),    PHALCON_SECURITY_CRYPT_DEFAULT    TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_STD_DES"),    PHALCON_SECURITY_CRYPT_STD_DES    TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_EXT_DES"),    PHALCON_SECURITY_CRYPT_EXT_DES    TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_MD5"),        PHALCON_SECURITY_CRYPT_MD5        TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH"),   PHALCON_SECURITY_CRYPT_BLOWFISH   TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH_X"), PHALCON_SECURITY_CRYPT_BLOWFISH_X TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH_Y"), PHALCON_SECURITY_CRYPT_BLOWFISH_Y TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_SHA256"),     PHALCON_SECURITY_CRYPT_SHA256     TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_SHA512"),     PHALCON_SECURITY_CRYPT_SHA512     TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_DEFAULT"),    PHALCON_SECURITY_CRYPT_DEFAULT   );
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_STD_DES"),    PHALCON_SECURITY_CRYPT_STD_DES   );
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_EXT_DES"),    PHALCON_SECURITY_CRYPT_EXT_DES   );
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_MD5"),        PHALCON_SECURITY_CRYPT_MD5       );
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH"),   PHALCON_SECURITY_CRYPT_BLOWFISH  );
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH_X"), PHALCON_SECURITY_CRYPT_BLOWFISH_X);
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH_Y"), PHALCON_SECURITY_CRYPT_BLOWFISH_Y);
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_SHA256"),     PHALCON_SECURITY_CRYPT_SHA256    );
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_SHA512"),     PHALCON_SECURITY_CRYPT_SHA512    );
 
 	return SUCCESS;
 }
@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Security, setRandomBytes){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_numberBytes"), *random_bytes TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_numberBytes"), *random_bytes);
 }
 
 /**
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Security, setWorkFactor){
 	phalcon_fetch_params(0, 1, 0, &work_factor);
 
 	PHALCON_ENSURE_IS_LONG(work_factor);
-	phalcon_update_property_this(this_ptr, SL("_workFactor"), *work_factor TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_workFactor"), *work_factor);
 }
 
 /**
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		}
 	}
 #else
-	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes") TSRMLS_CC) == FAILURE) {
+	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes")) == FAILURE) {
 		ssize_t read_bytes = 0;
 		int fd = open("/dev/urandom", O_RDONLY);
 		if (EXPECTED(fd >= 0)) {
@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 		ZVAL_LONG(number_bytes, 12);
 	}
 
-	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes") TSRMLS_CC) == FAILURE) {
+	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Openssl extension must be loaded");
 		return;
 	}
@@ -713,7 +713,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 		ZVAL_LONG(number_bytes, 12);
 	}
 
-	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes") TSRMLS_CC) == FAILURE) {
+	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Openssl extension must be loaded");
 		return;
 	}
@@ -806,7 +806,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	/**
 	 * The value is the same?
 	 */
-	is_equal_function(return_value, token, session_token TSRMLS_CC);
+	is_equal_function(return_value, token, session_token);
 
 	RETURN_MM();
 }
@@ -997,7 +997,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 				}
 			}
 
-			phalcon_concat_self(&result, K2 TSRMLS_CC);
+			phalcon_concat_self(&result, K2);
 		}
 
 		if (i_size == i_hash_len) {
@@ -1060,13 +1060,13 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 
 	zval *algo, *iter, *len;
 
-	MAKE_STD_ZVAL(algo);
+	PHALCON_ALLOC_GHOST_ZVAL(algo);
 	ZVAL_STRING(algo, s_hash, 1);
 
-	MAKE_STD_ZVAL(iter);
+	PHALCON_ALLOC_GHOST_ZVAL(iter);
 	ZVAL_LONG(iter, i_iterations);
 
-	MAKE_STD_ZVAL(len);
+	PHALCON_ALLOC_GHOST_ZVAL(len);
 	ZVAL_LONG(len, i_size);
 
 	{
@@ -1091,7 +1091,7 @@ PHP_METHOD(Phalcon_Security, setDefaultHash)
 	phalcon_fetch_params(0, 1, 0, &default_hash);
 	PHALCON_ENSURE_IS_LONG(default_hash);
 
-	phalcon_update_property_this(getThis(), SL("_defaultHash"), *default_hash TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_defaultHash"), *default_hash);
 }
 
 /**

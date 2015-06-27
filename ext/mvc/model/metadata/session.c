@@ -68,9 +68,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Session){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Session, mvc_model_metadata_session, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_session_method_entry, 0);
 
-	zend_declare_property_string(phalcon_mvc_model_metadata_session_ce, SL("_prefix"), "", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_mvc_model_metadata_session_ce, SL("_prefix"), "", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_metadata_session_ce TSRMLS_CC, 1, phalcon_mvc_model_metadatainterface_ce);
+	zend_class_implements(phalcon_mvc_model_metadata_session_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
 	return SUCCESS;
 }
@@ -88,13 +88,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct){
 	
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
-			phalcon_update_property_this(this_ptr, SL("_prefix"), prefix TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_prefix"), prefix);
 		}
 	}
 	
 	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
 	array_init(empty_array);
-	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array);
 }
 
 /**
@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 	
-	session = phalcon_get_global(SS("_SESSION") TSRMLS_CC);
+	session = phalcon_get_global(SS("_SESSION"));
 	
 	prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
 	
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, write){
 	
 	PHALCON_INIT_VAR(prefix_key);
 	PHALCON_CONCAT_SV(prefix_key, "$PMM$", prefix);
-	_SESSION = phalcon_get_global(SS("_SESSION") TSRMLS_CC);
+	_SESSION = phalcon_get_global(SS("_SESSION"));
 	phalcon_array_update_multi_2(&_SESSION, prefix_key, key, data, 0);
 	
 	PHALCON_MM_RESTORE();
@@ -162,8 +162,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, reset)
 	zval prefix_key = zval_used_for_init, *pprefix = &prefix_key, *_SESSION;
 	zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
 
-	phalcon_concat_sv(&pprefix, SL("$PMM$"), prefix, 0 TSRMLS_CC);
-	_SESSION = phalcon_get_global(SS("_SESSION") TSRMLS_CC);
+	phalcon_concat_sv(&pprefix, SL("$PMM$"), prefix, 0);
+	_SESSION = phalcon_get_global(SS("_SESSION"));
 	phalcon_array_unset(&_SESSION, &prefix_key, 0);
 	zval_dtor(&prefix_key);
 

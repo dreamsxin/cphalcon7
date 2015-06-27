@@ -61,8 +61,8 @@ PHALCON_ATTR_NONNULL static inline void phalcon_escape_htmlattr(zval *return_val
 	phalcon_escape_multi(return_value, param, ZEND_STRL("&#x"), ';', 1);
 }
 
-void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style, const zval *charset TSRMLS_DC) PHALCON_ATTR_NONNULL;
+void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style, const zval *charset) PHALCON_ATTR_NONNULL;
 
-void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes TSRMLS_DC) PHALCON_ATTR_NONNULL;
+void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes) PHALCON_ATTR_NONNULL;
 
 #endif /* PHALCON_KERNEL_FILTER_H */

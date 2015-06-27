@@ -38,8 +38,8 @@
 #define PH_SILENT 1024
 #define PH_READONLY 4096
 
-#define PH_NOISY_CC PH_NOISY TSRMLS_CC
-#define PH_SILENT_CC PH_SILENT TSRMLS_CC
+#define PH_NOISY_CC PH_NOISY
+#define PH_SILENT_CC PH_SILENT
 
 #define PH_SEPARATE 256
 #define PH_COPY 1024
@@ -53,29 +53,29 @@
 #define SSS(str)   zend_string_init(SS(str), 0)
 
 /* Startup functions */
-void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals TSRMLS_DC);
+void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals);
 zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_ce, zend_class_entry *parent_ce);
 
 /* Globals functions */
-zval* phalcon_get_global(const char *global, unsigned int global_length TSRMLS_DC);
+zval* phalcon_get_global(const char *global, unsigned int global_length);
 
 int phalcon_is_callable(zval *var);
-int phalcon_function_exists_ex(const char *func_name, unsigned int func_len TSRMLS_DC);
+int phalcon_function_exists_ex(const char *func_name, unsigned int func_len);
 
-PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function_str(const char *function_name, unsigned int function_len TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function_str(const char *function_name, unsigned int function_len)
 {
 	return zend_hash_str_find_ptr(EG(function_table), function_name, function_len+1);
 }
 
-PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function(zend_string *function_name TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function(zend_string *function_name)
 {
 	return zend_hash_find_ptr(EG(function_table), function_name);
 }
 
 /* Count */
-long int phalcon_fast_count_int(zval *value TSRMLS_DC);
-void phalcon_fast_count(zval *result, zval *array TSRMLS_DC);
-int phalcon_fast_count_ev(zval *array TSRMLS_DC);
+long int phalcon_fast_count_int(zval *value);
+void phalcon_fast_count(zval *result, zval *array);
+int phalcon_fast_count_ev(zval *array);
 
 /* Utils functions */
 int phalcon_is_iterable_ex(zval *arr, HashTable **arr_hash, HashPosition *hash_position, int duplicate, int reverse);
@@ -206,14 +206,14 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_GET_HKEY(var, hash, hash_position) \
 	do { \
 		PHALCON_INIT_NVAR_PNULL(var); \
-		phalcon_get_current_key(&var, hash, &hash_position TSRMLS_CC); \
+		phalcon_get_current_key(&var, hash, &hash_position); \
 	} while (0)
 
 /** Get current hash key copying the iterator if needed */
 #define PHALCON_GET_IKEY(var, it) \
 	do { \
 		PHALCON_INIT_NVAR(var); \
-		it->funcs->get_current_key(it, var TSRMLS_CC); \
+		it->funcs->get_current_key(it, var); \
 	} while (0)
 
 /** Check if an array is iterable or not */
@@ -235,7 +235,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 		zend_class_entry ce; \
 		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
-		phalcon_ ##name## _ce = zend_register_internal_class(&ce TSRMLS_CC); \
+		phalcon_ ##name## _ce = zend_register_internal_class(&ce); \
 		phalcon_ ##name## _ce->ce_flags |= flags;  \
 	}
 
@@ -244,7 +244,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 		zend_class_entry ce; \
 		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
-		phalcon_ ##lcname## _ce = zend_register_internal_class_ex(&ce, parent_ce, NULL TSRMLS_CC); \
+		phalcon_ ##lcname## _ce = zend_register_internal_class_ex(&ce, parent_ce, NULL); \
 		if (!phalcon_ ##lcname## _ce) { \
 			fprintf(stderr, "Phalcon Error: Class to extend '%s' was not found when registering class '%s'\n", (parent_ce ? parent_ce->name->val : "(null)"), ZEND_NS_NAME(#ns, #class_name)); \
 			return FAILURE; \

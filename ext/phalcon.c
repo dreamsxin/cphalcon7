@@ -23,10 +23,6 @@
 #include <ext/standard/info.h>
 #include <Zend/zend_extensions.h>
 
-#if PHP_VERSION_ID < 50500
-#include <locale.h>
-#endif
-
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
@@ -71,22 +67,6 @@ PHP_INI_END()
 
 static PHP_MINIT_FUNCTION(phalcon)
 {
-#if PHP_VERSION_ID < 50500
-	char* old_lc_all = setlocale(LC_ALL, NULL);
-	if (old_lc_all) {
-		size_t len = strlen(old_lc_all);
-		char *tmp  = calloc(len+1, 1);
-		if (UNEXPECTED(!tmp)) {
-			return FAILURE;
-		}
-
-		memcpy(tmp, old_lc_all, len);
-		old_lc_all = tmp;
-	}
-
-	setlocale(LC_ALL, "C");
-#endif
-
 	REGISTER_INI_ENTRIES();
 
 	nusphere_dbg_present = (zend_get_extension("DBG") != NULL);
@@ -491,10 +471,10 @@ static PHP_RINIT_FUNCTION(phalcon){
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 
-	php_phalcon_init_globals(phalcon_globals_ptr TSRMLS_CC);
+	php_phalcon_init_globals(phalcon_globals_ptr);
 	phalcon_init_interned_strings(TSRMLS_C);
 
-	phalcon_initialize_memory(phalcon_globals_ptr TSRMLS_CC);
+	phalcon_initialize_memory(phalcon_globals_ptr);
 
 	return SUCCESS;
 }
@@ -517,7 +497,7 @@ static PHP_MINFO_FUNCTION(phalcon)
 
 static PHP_GINIT_FUNCTION(phalcon)
 {
-	php_phalcon_init_globals(phalcon_globals TSRMLS_CC);
+	php_phalcon_init_globals(phalcon_globals);
 }
 
 static PHP_GSHUTDOWN_FUNCTION(phalcon)
@@ -532,7 +512,7 @@ static ZEND_MODULE_POST_ZEND_DEACTIVATE_D(phalcon)
 
 #ifndef PHALCON_RELEASE
 	if (!CG(unclean_shutdown)) {
-		phalcon_verify_permanent_zvals(1 TSRMLS_CC);
+		phalcon_verify_permanent_zvals(1);
 	}
 #endif
 

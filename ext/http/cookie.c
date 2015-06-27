@@ -139,17 +139,17 @@ PHALCON_INIT_CLASS(Phalcon_Http_Cookie){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Http, Cookie, http_cookie, phalcon_di_injectable_ce, phalcon_http_cookie_method_entry, 0);
 
-	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_readed"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_restored"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_useEncryption"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_cookie_ce, SL("_filter"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_cookie_ce, SL("_name"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_cookie_ce, SL("_value"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_cookie_ce, SL("_expire"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_http_cookie_ce, SL("_path"), "/", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_cookie_ce, SL("_domain"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_cookie_ce, SL("_secure"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_httpOnly"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_readed"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_restored"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_useEncryption"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_cookie_ce, SL("_filter"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_cookie_ce, SL("_name"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_cookie_ce, SL("_value"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_cookie_ce, SL("_expire"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_http_cookie_ce, SL("_path"), "/", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_cookie_ce, SL("_domain"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_cookie_ce, SL("_secure"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_httpOnly"), 1, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -177,35 +177,35 @@ PHP_METHOD(Phalcon_Http_Cookie, __construct){
 		expire = &PHALCON_GLOBAL(z_zero);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_name"), *name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_name"), *name);
 
 	if (value && Z_TYPE_P(*value) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_value"), *value TSRMLS_CC);
-		phalcon_update_property_bool(this_ptr, SL("_readed"), 1 TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_value"), *value);
+		phalcon_update_property_bool(this_ptr, SL("_readed"), 1);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_expire"), *expire TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_expire"), *expire);
 
 	if (path && Z_TYPE_P(*path) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_path"), *path TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_path"), *path);
 	}
 	else {
 		zval *path;
 		PHALCON_ALLOC_GHOST_ZVAL(path);
 		ZVAL_STRINGL(path, "/", 1, 1);
-		phalcon_update_property_this(this_ptr, SL("_path"), path TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_path"), path);
 	}
 
 	if (secure && Z_TYPE_P(*secure) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_secure"), *secure TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_secure"), *secure);
 	}
 
 	if (domain && Z_TYPE_P(*domain) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_domain"), *domain TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_domain"), *domain);
 	}
 
 	if (http_only && Z_TYPE_P(*http_only) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_httpOnly"), *http_only TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_httpOnly"), *http_only);
 	}
 }
 
@@ -221,8 +221,8 @@ PHP_METHOD(Phalcon_Http_Cookie, setValue){
 
 	phalcon_fetch_params(0, 0, 1, 0, &value);
 
-	phalcon_update_property_this(this_ptr, SL("_value"), value TSRMLS_CC);
-	phalcon_update_property_bool(this_ptr, SL("_readed"), 1 TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_value"), value);
+	phalcon_update_property_bool(this_ptr, SL("_readed"), 1);
 	RETURN_THISW();
 }
 
@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 		PHALCON_OBS_VAR(name);
 		phalcon_read_property_this(&name, this_ptr, SL("_name"), PH_NOISY);
 
-		_COOKIE = phalcon_get_global(SS("_COOKIE") TSRMLS_CC);
+		_COOKIE = phalcon_get_global(SS("_COOKIE"));
 		if (phalcon_array_isset_fetch(&value, _COOKIE, name)) {
 
 			PHALCON_OBS_VAR(encryption);
@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 			/** 
 			 * Update the decrypted value
 			 */
-			phalcon_update_property_this(this_ptr, SL("_value"), decrypted_value TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_value"), decrypted_value);
 			if (Z_TYPE_P(filters) != IS_NULL) {
 
 				PHALCON_OBS_VAR(filter);
@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 
 					PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 					PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
-					phalcon_update_property_this(this_ptr, SL("_filter"), filter TSRMLS_CC);
+					phalcon_update_property_this(this_ptr, SL("_filter"), filter);
 				}
 
 				PHALCON_RETURN_CALL_METHOD(filter, "sanitize", decrypted_value, filters);
@@ -407,7 +407,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 			/**
 			 * The definition is stored in session
 			 */
-			if (phalcon_fast_count_ev(definition TSRMLS_CC)) {
+			if (phalcon_fast_count_ev(definition)) {
 				PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 
 				if (Z_TYPE_P(session) != IS_NULL) {
@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 		Z_STRVAL_P(domain), Z_STRLEN_P(domain),
 		Z_LVAL_P(secure),
 		1,
-		Z_LVAL_P(http_only) TSRMLS_CC
+		Z_LVAL_P(http_only)
 	);
 
 	RETURN_THIS();
@@ -507,35 +507,35 @@ PHP_METHOD(Phalcon_Http_Cookie, restore){
 				if (phalcon_array_isset_string(definition, SS("expire"))) {
 					PHALCON_OBS_VAR(expire);
 					phalcon_array_fetch_string(&expire, definition, SL("expire"), PH_NOISY);
-					phalcon_update_property_this(this_ptr, SL("_expire"), expire TSRMLS_CC);
+					phalcon_update_property_this(this_ptr, SL("_expire"), expire);
 				}
 				if (phalcon_array_isset_string(definition, SS("domain"))) {
 					PHALCON_OBS_VAR(domain);
 					phalcon_array_fetch_string(&domain, definition, SL("domain"), PH_NOISY);
-					phalcon_update_property_this(this_ptr, SL("_domain"), domain TSRMLS_CC);
+					phalcon_update_property_this(this_ptr, SL("_domain"), domain);
 				}
 
 				if (phalcon_array_isset_string(definition, SS("path"))) {
 					PHALCON_OBS_VAR(path);
 					phalcon_array_fetch_string(&path, definition, SL("path"), PH_NOISY);
-					phalcon_update_property_this(this_ptr, SL("_path"), path TSRMLS_CC);
+					phalcon_update_property_this(this_ptr, SL("_path"), path);
 				}
 
 				if (phalcon_array_isset_string(definition, SS("secure"))) {
 					PHALCON_OBS_VAR(secure);
 					phalcon_array_fetch_string(&secure, definition, SL("secure"), PH_NOISY);
-					phalcon_update_property_this(this_ptr, SL("_secure"), secure TSRMLS_CC);
+					phalcon_update_property_this(this_ptr, SL("_secure"), secure);
 				}
 
 				if (phalcon_array_isset_string(definition, SS("httpOnly"))) {
 					PHALCON_OBS_VAR(http_only);
 					phalcon_array_fetch_string(&http_only, definition, SL("httpOnly"), PH_NOISY);
-					phalcon_update_property_this(this_ptr, SL("_httpOnly"), http_only TSRMLS_CC);
+					phalcon_update_property_this(this_ptr, SL("_httpOnly"), http_only);
 				}
 			}
 		}
 
-		phalcon_update_property_bool(this_ptr, SL("_restored"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_restored"), 1);
 	}
 
 	RETURN_THIS();
@@ -581,7 +581,7 @@ PHP_METHOD(Phalcon_Http_Cookie, delete){
 		PHALCON_CALL_METHOD(NULL, session, "remove", key);
 	}
 
-	phalcon_update_property_null(this_ptr, SL("_value") TSRMLS_CC);
+	phalcon_update_property_null(this_ptr, SL("_value"));
 
 	convert_to_string_ex(&name);
 	convert_to_string_ex(&path);
@@ -597,7 +597,7 @@ PHP_METHOD(Phalcon_Http_Cookie, delete){
 		Z_STRVAL_P(domain), Z_STRLEN_P(domain),
 		Z_LVAL_P(secure),
 		1,
-		Z_LVAL_P(http_only) TSRMLS_CC
+		Z_LVAL_P(http_only)
 	);
 
 	PHALCON_MM_RESTORE();
@@ -615,7 +615,7 @@ PHP_METHOD(Phalcon_Http_Cookie, useEncryption){
 
 	phalcon_fetch_params(0, 0, 1, 0, &use_encryption);
 
-	phalcon_update_property_this(this_ptr, SL("_useEncryption"), use_encryption TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_useEncryption"), use_encryption);
 	RETURN_THISW();
 }
 
@@ -650,7 +650,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setExpiration){
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_expire"), expire TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_expire"), expire);
 
 	RETURN_THIS();
 }
@@ -698,7 +698,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setPath){
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_path"), path TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_path"), path);
 
 	RETURN_THIS();
 }
@@ -746,7 +746,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setDomain){
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_domain"), domain TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_domain"), domain);
 
 	RETURN_THIS();
 }
@@ -794,7 +794,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setSecure){
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_secure"), secure TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_secure"), secure);
 
 	RETURN_THIS();
 }
@@ -842,7 +842,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setHttpOnly){
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_httpOnly"), http_only TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_httpOnly"), http_only);
 
 	RETURN_THIS();
 }
@@ -881,11 +881,11 @@ PHP_METHOD(Phalcon_Http_Cookie, __toString){
 
 	value = phalcon_fetch_nproperty_this(this_ptr, SL("_value"), PH_NOISY);
 	if (Z_TYPE_P(value) == IS_NULL) {
-		if (FAILURE == phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "getvalue", 0, NULL TSRMLS_CC)) {
+		if (FAILURE == phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "getvalue", 0, NULL)) {
 			if (EG(exception)) {
 				zval e;
 				ZVAL_OBJ(&e, EG(exception));
-				zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1 TSRMLS_CC);
+				zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1);
 
 				Z_ADDREF_P(m);
 				if (Z_TYPE_P(m) != IS_STRING) {

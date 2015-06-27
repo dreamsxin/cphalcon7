@@ -150,9 +150,9 @@ PHALCON_INIT_CLASS(Phalcon_Assets_Manager){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Assets, Manager, assets_manager, phalcon_assets_manager_method_entry, 0);
 
-	zend_declare_property_null(phalcon_assets_manager_ce, SL("_options"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_assets_manager_ce, SL("_collections"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_assets_manager_ce, SL("_implicitOutput"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_assets_manager_ce, SL("_options"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_manager_ce, SL("_collections"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_assets_manager_ce, SL("_implicitOutput"), 1, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Assets_Manager, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_options"), options);
 	}
 }
 
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Assets_Manager, setOptions){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Options must be an array");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_options"), options);
 
 	RETURN_THISW();
 }
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Assets_Manager, useImplicitOutput){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_output);
 
-	phalcon_update_property_this(this_ptr, SL("_implicitOutput"), implicit_output TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_implicitOutput"), implicit_output);
 	RETURN_THISW();
 }
 
@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 	} else {
 		PHALCON_INIT_NVAR(collection);
 		object_init_ex(collection, phalcon_assets_collection_ce);
-		phalcon_update_property_array(this_ptr, SL("_collections"), type, collection TSRMLS_CC);
+		phalcon_update_property_array(this_ptr, SL("_collections"), type, collection);
 	}
 
 	/** 
@@ -404,7 +404,7 @@ PHP_METHOD(Phalcon_Assets_Manager, set){
 		return;
 	}
 
-	phalcon_update_property_array(this_ptr, SL("_collections"), id, collection TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_collections"), id, collection);
 
 	RETURN_THISW();
 }
@@ -501,7 +501,7 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
 	}
 
 	object_init_ex(return_value, phalcon_assets_collection_ce);
-	phalcon_update_property_array(this_ptr, SL("_collections"), name, return_value TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_collections"), name, return_value);
 }
 
 /**
@@ -650,7 +650,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			}
 
 			PHALCON_INIT_VAR(is_directory);
-			phalcon_is_dir(is_directory, complete_target_path TSRMLS_CC);
+			phalcon_is_dir(is_directory, complete_target_path);
 
 			/** 
 			 * The targetpath needs to be a valid file
@@ -744,7 +744,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 					return;
 				}
 				if (phalcon_file_exists(target_path) == SUCCESS) {
-					if (phalcon_compare_mtime(target_path, source_path TSRMLS_CC)) {
+					if (phalcon_compare_mtime(target_path, source_path)) {
 						PHALCON_INIT_NVAR(filter_needed);
 						ZVAL_TRUE(filter_needed);
 					}
@@ -800,7 +800,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (zend_is_true(use_implicit_output)) {
 				zend_print_zval(html, 0);
 			} else {
-				phalcon_concat_self(&output, html TSRMLS_CC);
+				phalcon_concat_self(&output, html);
 			}
 
 			zend_hash_move_forward_ex(ah0, &hp0);
@@ -876,7 +876,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 					if (Z_TYPE_P(filtered_joined_content) == IS_NULL) {
 						PHALCON_CPY_WRT(filtered_joined_content, content);
 					} else {
-						phalcon_concat_self(&filtered_joined_content, content TSRMLS_CC);
+						phalcon_concat_self(&filtered_joined_content, content);
 					}
 				} else {
 					PHALCON_CPY_WRT(filtered_content, content);
@@ -888,7 +888,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				 * Write the file using file-put-contents. This respects the openbase-dir also
 				 * writes to streams
 				 */
-				phalcon_file_put_contents(NULL, target_path, filtered_content TSRMLS_CC);
+				phalcon_file_put_contents(NULL, target_path, filtered_content);
 			}
 		}
 
@@ -944,7 +944,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (zend_is_true(use_implicit_output)) {
 				zend_print_zval(html, 0);
 			} else {
-				phalcon_concat_self(&output, html TSRMLS_CC);
+				phalcon_concat_self(&output, html);
 			}
 		}
 
@@ -958,7 +958,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 * Write the file using file_put_contents. This respects the openbase-dir also
 			 * writes to streams
 			 */
-			phalcon_file_put_contents(NULL, complete_target_path, filtered_joined_content TSRMLS_CC);
+			phalcon_file_put_contents(NULL, complete_target_path, filtered_joined_content);
 
 			/** 
 			 * Generate the HTML using the original path in the resource
@@ -1005,7 +1005,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (zend_is_true(use_implicit_output)) {
 				zend_print_zval(html, 0);
 			} else {
-				phalcon_concat_self(&output, html TSRMLS_CC);
+				phalcon_concat_self(&output, html);
 			}
 		}
 	}

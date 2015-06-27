@@ -55,7 +55,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction_Failed){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Transaction, Failed, mvc_model_transaction_failed, phalcon_mvc_model_transaction_exception_ce, phalcon_mvc_model_transaction_failed_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_transaction_failed_ce, SL("_record"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_transaction_failed_ce, SL("_record"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -74,7 +74,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Failed, __construct){
 
 	phalcon_fetch_params(1, 2, 0, &message, &record);
 
-	phalcon_update_property_this(this_ptr, SL("_record"), record TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_record"), record);
 	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_transaction_failed_ce, this_ptr, "__construct", message);
 
 	PHALCON_MM_RESTORE();

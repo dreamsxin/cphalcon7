@@ -80,10 +80,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Mongo){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Mongo, mvc_model_metadata_mongo, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_mongo_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_metadata_mongo_ce, SL("_lifetime"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_metadata_mongo_ce, SL("_mongo"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_metadata_mongo_ce, SL("_lifetime"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_metadata_mongo_ce, SL("_mongo"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_metadata_mongo_ce TSRMLS_CC, 1, phalcon_mvc_model_metadatainterface_ce);
+	zend_class_implements(phalcon_mvc_model_metadata_mongo_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
 	return SUCCESS;
 }
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
 
 	if (!phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
 		PHALCON_INIT_VAR(prefix);
@@ -155,9 +155,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	PHALCON_CALL_METHOD(NULL, mongo, "__construct", frontend_data, options);
 
-	phalcon_update_property_this(this_ptr, SL("_mongo"), mongo TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_mongo"), mongo);
 	
-	phalcon_update_property_empty_array(this_ptr, SL("_metaData") TSRMLS_CC);
+	phalcon_update_property_empty_array(this_ptr, SL("_metaData"));
 
 	PHALCON_MM_RESTORE();
 }

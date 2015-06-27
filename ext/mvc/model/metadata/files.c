@@ -74,9 +74,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Files){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Files, mvc_model_metadata_files, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_files_method_entry, 0);
 
-	zend_declare_property_string(phalcon_mvc_model_metadata_files_ce, SL("_metaDataDir"), "./", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_mvc_model_metadata_files_ce, SL("_metaDataDir"), "./", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_metadata_files_ce TSRMLS_CC, 1, phalcon_mvc_model_metadatainterface_ce);
+	zend_class_implements(phalcon_mvc_model_metadata_files_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
 	return SUCCESS;
 }
@@ -94,13 +94,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_string_fetch(&meta_data_dir, options, SS("metaDataDir"))) {
-			phalcon_update_property_this(this_ptr, SL("_metaDataDir"), meta_data_dir TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_metaDataDir"), meta_data_dir);
 		}
 	}
 	
 	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
 	array_init(empty_array);
-	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array);
 }
 
 /**
@@ -122,13 +122,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 	meta_data_dir = phalcon_fetch_nproperty_this(this_ptr, SL("_metaDataDir"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_' TSRMLS_CC);
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, meta_data_dir, virtual_key, ".php");
 	
 	if (phalcon_file_exists(path) == SUCCESS) {
-		RETURN_MM_ON_FAILURE(phalcon_require_ret(&data, Z_STRVAL_P(path) TSRMLS_CC));
+		RETURN_MM_ON_FAILURE(phalcon_require_ret(&data, Z_STRVAL_P(path)));
 		RETVAL_ZVAL(&data, 1, 1);
 	}
 	
@@ -154,13 +154,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 	meta_data_dir = phalcon_fetch_nproperty_this(this_ptr, SL("_metaDataDir"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_' TSRMLS_CC);
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, meta_data_dir, virtual_key, ".php");
 	
 	smart_str_appends(&exp, "<?php return ");
-	php_var_export_ex(data, 0, &exp TSRMLS_CC);
+	php_var_export_ex(data, 0, &exp);
 	smart_str_appendc(&exp, ';');
 	smart_str_0(&exp);
 	
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 	ZVAL_STRINGL(php_export, exp.c, exp.len, 0);
 
 	PHALCON_INIT_VAR(status);
-	phalcon_file_put_contents(status, path, php_export TSRMLS_CC);
+	phalcon_file_put_contents(status, path, php_export);
 	if (PHALCON_IS_FALSE(status)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Meta-Data directory cannot be written");
 		return;
@@ -193,32 +193,18 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 	object_init_ex(iterator, spl_ce_GlobIterator);
 	PHALCON_CALL_METHOD(NULL, iterator, "__construct", pattern);
 
-	it = spl_ce_GlobIterator->get_iterator(spl_ce_GlobIterator, iterator, 0 TSRMLS_CC);
-	it->funcs->rewind(it TSRMLS_CC);
-	while (SUCCESS == it->funcs->valid(it TSRMLS_CC) && !EG(exception)) {
+	it = spl_ce_GlobIterator->get_iterator(spl_ce_GlobIterator, iterator, 0);
+	it->funcs->rewind(it);
+	while (SUCCESS == it->funcs->valid(it) && !EG(exception)) {
 		zval dummy;
-#if PHP_VERSION_ID < 50500
-		char *str_key;
-		uint str_key_len;
-		ulong int_key;
-
-		int key_type = it->funcs->get_current_key(it, &str_key, &str_key_len, &int_key TSRMLS_CC);
-		if (likely(key_type == HASH_KEY_IS_STRING)) {
-			PHALCON_INIT_NVAR(itkey);
-			/* Note that str_key_len includes the trailing zero */
-			ZVAL_STRINGL(itkey, str_key, str_key_len-1, 1);
-			phalcon_unlink(&dummy, itkey TSRMLS_CC);
-		}
-#else
 		PHALCON_INIT_NVAR(itkey);
-		it->funcs->get_current_key(it, itkey TSRMLS_CC);
-		phalcon_unlink(&dummy, itkey TSRMLS_CC);
-#endif
+		it->funcs->get_current_key(it, itkey);
+		phalcon_unlink(&dummy, itkey);
 
-		it->funcs->move_forward(it TSRMLS_CC);
+		it->funcs->move_forward(it);
 	}
 
-	it->funcs->dtor(it TSRMLS_CC);
+	it->funcs->dtor(it);
 
 	if (!EG(exception)) {
 		PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_files_ce, getThis(), "reset");

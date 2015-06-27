@@ -25,7 +25,7 @@
 #include "kernel/operators.h"
 #include "kernel/string.h"
 
-void phalcon_concat_sv(zval **result, const char *op1, uint32_t op1_len, zval *op2, int self_var TSRMLS_DC){
+void phalcon_concat_sv(zval **result, const char *op1, uint32_t op1_len, zval *op2, int self_var){
 
 	zval result_copy, op2_copy;
 	int use_copy = 0, use_copy2 = 0;
@@ -72,7 +72,7 @@ void phalcon_concat_sv(zval **result, const char *op1, uint32_t op1_len, zval *o
 
 }
 
-void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, int self_var TSRMLS_DC){
+void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, int self_var){
 
 	zval result_copy, op2_copy;
 	int use_copy = 0, use_copy2 = 0;
@@ -120,7 +120,7 @@ void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *
 
 }
 
-void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var TSRMLS_DC){
+void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var){
 
 	zval result_copy, op2_copy, op4_copy;
 	int use_copy = 0, use_copy2 = 0, use_copy4 = 0;
@@ -180,7 +180,7 @@ void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval 
 
 }
 
-void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, int self_var TSRMLS_DC){
+void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, int self_var){
 
 	zval result_copy, op2_copy, op4_copy;
 	int use_copy = 0, use_copy2 = 0, use_copy4 = 0;
@@ -241,7 +241,7 @@ void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval
 
 }
 
-void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, int self_var TSRMLS_DC){
+void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, int self_var){
 
 	zval result_copy, op2_copy, op4_copy, op6_copy;
 	int use_copy = 0, use_copy2 = 0, use_copy4 = 0, use_copy6 = 0;
@@ -314,7 +314,7 @@ void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zva
 
 }
 
-void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, int self_var TSRMLS_DC){
+void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, int self_var){
 
 	zval result_copy, op2_copy, op4_copy, op6_copy;
 	int use_copy = 0, use_copy2 = 0, use_copy4 = 0, use_copy6 = 0;
@@ -388,7 +388,7 @@ void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zv
 
 }
 
-void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, zval *op8, const char *op9, uint32_t op9_len, int self_var TSRMLS_DC){
+void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, zval *op8, const char *op9, uint32_t op9_len, int self_var){
 
 	zval result_copy, op2_copy, op4_copy, op6_copy, op8_copy;
 	int use_copy = 0, use_copy2 = 0, use_copy4 = 0, use_copy6 = 0, use_copy8 = 0;
@@ -476,7 +476,7 @@ void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, 
 
 }
 
-void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, zval *op5, int self_var TSRMLS_DC){
+void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, zval *op5, int self_var){
 
 	zval result_copy, op2_copy, op4_copy, op5_copy;
 	int use_copy = 0, use_copy2 = 0, use_copy4 = 0, use_copy5 = 0;
@@ -548,7 +548,7 @@ void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval
 
 }
 
-void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, int self_var TSRMLS_DC){
+void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, int self_var){
 
 	zval result_copy, op2_copy, op3_copy;
 	int use_copy = 0, use_copy2 = 0, use_copy3 = 0;
@@ -607,7 +607,7 @@ void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *
 
 }
 
-void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, const char *op4, uint32_t op4_len, int self_var TSRMLS_DC){
+void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, const char *op4, uint32_t op4_len, int self_var){
 
 	zval result_copy, op2_copy, op3_copy;
 	int use_copy = 0, use_copy2 = 0, use_copy3 = 0;
@@ -667,7 +667,7 @@ void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval 
 
 }
 
-void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_len, int self_var TSRMLS_DC){
+void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_len, int self_var){
 
 	zval result_copy, op1_copy;
 	int use_copy = 0, use_copy1 = 0;
@@ -714,7 +714,7 @@ void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_l
 
 }
 
-void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, int self_var TSRMLS_DC){
+void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, int self_var){
 
 	zval result_copy, op1_copy, op3_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy3 = 0;
@@ -773,7 +773,7 @@ void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_
 
 }
 
-void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, int self_var TSRMLS_DC){
+void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, int self_var){
 
 	zval result_copy, op1_copy, op3_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy3 = 0;
@@ -833,7 +833,7 @@ void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2
 
 }
 
-void phalcon_concat_vsvsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var TSRMLS_DC){
+void phalcon_concat_vsvsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var){
 
 	zval result_copy, op1_copy, op3_copy, op5_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy3 = 0, use_copy5 = 0;
@@ -905,7 +905,7 @@ void phalcon_concat_vsvsv(zval **result, zval *op1, const char *op2, uint32_t op
 
 }
 
-void phalcon_concat_vsvsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, const char *op6, uint32_t op6_len, int self_var TSRMLS_DC){
+void phalcon_concat_vsvsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, const char *op6, uint32_t op6_len, int self_var){
 
 	zval result_copy, op1_copy, op3_copy, op5_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy3 = 0, use_copy5 = 0;
@@ -978,7 +978,7 @@ void phalcon_concat_vsvsvs(zval **result, zval *op1, const char *op2, uint32_t o
 
 }
 
-void phalcon_concat_vsvsvsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, const char *op6, uint32_t op6_len, zval *op7, int self_var TSRMLS_DC){
+void phalcon_concat_vsvsvsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, const char *op6, uint32_t op6_len, zval *op7, int self_var){
 
 	zval result_copy, op1_copy, op3_copy, op5_copy, op7_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy3 = 0, use_copy5 = 0, use_copy7 = 0;
@@ -1063,7 +1063,7 @@ void phalcon_concat_vsvsvsv(zval **result, zval *op1, const char *op2, uint32_t 
 
 }
 
-void phalcon_concat_vsvv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, zval *op4, int self_var TSRMLS_DC){
+void phalcon_concat_vsvv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, zval *op4, int self_var){
 
 	zval result_copy, op1_copy, op3_copy, op4_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy3 = 0, use_copy4 = 0;
@@ -1134,7 +1134,7 @@ void phalcon_concat_vsvv(zval **result, zval *op1, const char *op2, uint32_t op2
 
 }
 
-void phalcon_concat_vsvvv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, zval *op4, zval *op5, int self_var TSRMLS_DC){
+void phalcon_concat_vsvvv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, zval *op4, zval *op5, int self_var){
 
 	zval result_copy, op1_copy, op3_copy, op4_copy, op5_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy3 = 0, use_copy4 = 0, use_copy5 = 0;
@@ -1217,7 +1217,7 @@ void phalcon_concat_vsvvv(zval **result, zval *op1, const char *op2, uint32_t op
 
 }
 
-void phalcon_concat_vv(zval **result, zval *op1, zval *op2, int self_var TSRMLS_DC){
+void phalcon_concat_vv(zval **result, zval *op1, zval *op2, int self_var){
 
 	zval result_copy, op1_copy, op2_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy2 = 0;
@@ -1275,7 +1275,7 @@ void phalcon_concat_vv(zval **result, zval *op1, zval *op2, int self_var TSRMLS_
 
 }
 
-void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, int self_var TSRMLS_DC){
+void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, int self_var){
 
 	zval result_copy, op1_copy, op2_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy2 = 0;
@@ -1334,7 +1334,7 @@ void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, ui
 
 }
 
-void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var TSRMLS_DC){
+void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var){
 
 	zval result_copy, op1_copy, op2_copy, op4_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy2 = 0, use_copy4 = 0;
@@ -1405,7 +1405,7 @@ void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, u
 
 }
 
-void phalcon_concat_vvv(zval **result, zval *op1, zval *op2, zval *op3, int self_var TSRMLS_DC){
+void phalcon_concat_vvv(zval **result, zval *op1, zval *op2, zval *op3, int self_var){
 
 	zval result_copy, op1_copy, op2_copy, op3_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy2 = 0, use_copy3 = 0;
@@ -1475,7 +1475,7 @@ void phalcon_concat_vvv(zval **result, zval *op1, zval *op2, zval *op3, int self
 
 }
 
-void phalcon_concat_vvvsv(zval **result, zval *op1, zval *op2, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var TSRMLS_DC){
+void phalcon_concat_vvvsv(zval **result, zval *op1, zval *op2, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var){
 
 	zval result_copy, op1_copy, op2_copy, op3_copy, op5_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy2 = 0, use_copy3 = 0, use_copy5 = 0;
@@ -1558,7 +1558,7 @@ void phalcon_concat_vvvsv(zval **result, zval *op1, zval *op2, zval *op3, const 
 
 }
 
-void phalcon_concat_vvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, int self_var TSRMLS_DC){
+void phalcon_concat_vvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, int self_var){
 
 	zval result_copy, op1_copy, op2_copy, op3_copy, op4_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy2 = 0, use_copy3 = 0, use_copy4 = 0;
@@ -1640,7 +1640,7 @@ void phalcon_concat_vvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *o
 
 }
 
-void phalcon_concat_vvvvsvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, const char *op5, uint32_t op5_len, zval *op6, zval *op7, int self_var TSRMLS_DC){
+void phalcon_concat_vvvvsvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, const char *op5, uint32_t op5_len, zval *op6, zval *op7, int self_var){
 
 	zval result_copy, op1_copy, op2_copy, op3_copy, op4_copy, op6_copy, op7_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy2 = 0, use_copy3 = 0, use_copy4 = 0, use_copy6 = 0, use_copy7 = 0;
@@ -1747,7 +1747,7 @@ void phalcon_concat_vvvvsvv(zval **result, zval *op1, zval *op2, zval *op3, zval
 
 }
 
-void phalcon_concat_vvvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, zval *op5, int self_var TSRMLS_DC){
+void phalcon_concat_vvvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, zval *op5, int self_var){
 
 	zval result_copy, op1_copy, op2_copy, op3_copy, op4_copy, op5_copy;
 	int use_copy = 0, use_copy1 = 0, use_copy2 = 0, use_copy3 = 0, use_copy4 = 0, use_copy5 = 0;
@@ -1844,7 +1844,7 @@ void phalcon_concat_vvvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *
 /**
  * Appends the content of the right operator to the left operator
  */
-void phalcon_concat_self(zval **left, zval *right TSRMLS_DC){
+void phalcon_concat_self(zval **left, zval *right){
 
 	zval left_copy, right_copy;
 	uint length;
@@ -1901,7 +1901,7 @@ void phalcon_concat_self(zval **left, zval *right TSRMLS_DC){
 /**
  * Appends the content of the right operator to the left operator
  */
-void phalcon_concat_self_str(zval **left, const char *right, int right_length TSRMLS_DC){
+void phalcon_concat_self_str(zval **left, const char *right, int right_length){
 
 	zval left_copy;
 	uint length;
@@ -1943,7 +1943,7 @@ void phalcon_concat_self_str(zval **left, const char *right, int right_length TS
 /**
 * Appends the content of the right operator to the left operator
  */
-void phalcon_concat_self_long(zval **left, const long right TSRMLS_DC) {
+void phalcon_concat_self_long(zval **left, const long right) {
 
 	zval left_copy;
 	uint length;
@@ -1992,7 +1992,7 @@ void phalcon_concat_self_long(zval **left, const long right TSRMLS_DC) {
 /**
  * Appends the content of the right operator to the left operator
  */
-void phalcon_concat_self_char(zval **left, unsigned char right TSRMLS_DC) {
+void phalcon_concat_self_char(zval **left, unsigned char right) {
 
 	zval left_copy;
 	int use_copy = 0;

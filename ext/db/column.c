@@ -107,43 +107,43 @@ PHALCON_INIT_CLASS(Phalcon_Db_Column){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Db, Column, db_column, phalcon_db_column_method_entry, 0);
 
-	zend_declare_property_null(phalcon_db_column_ce, SL("_columnName"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_column_ce, SL("_schemaName"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_column_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_db_column_ce, SL("_isNumeric"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_column_ce, SL("_size"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_column_ce, SL("_bytes"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_db_column_ce, SL("_scale"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_db_column_ce, SL("_unsigned"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_db_column_ce, SL("_notNull"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_db_column_ce, SL("_primary"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_db_column_ce, SL("_autoIncrement"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_db_column_ce, SL("_first"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_column_ce, SL("_after"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_db_column_ce, SL("_bindType"), 2, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_column_ce, SL("_default"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_columnName"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_schemaName"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_type"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_db_column_ce, SL("_isNumeric"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_size"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_bytes"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_db_column_ce, SL("_scale"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_db_column_ce, SL("_unsigned"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_db_column_ce, SL("_notNull"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_db_column_ce, SL("_primary"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_db_column_ce, SL("_autoIncrement"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_db_column_ce, SL("_first"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_after"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_db_column_ce, SL("_bindType"), 2, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_default"), ZEND_ACC_PROTECTED);
 
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_INTEGER"), PHALCON_DB_COLUMN_TYPE_INTEGER TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DATE"), PHALCON_DB_COLUMN_TYPE_DATE TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_VARCHAR"), PHALCON_DB_COLUMN_TYPE_VARCHAR TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DECIMAL"), PHALCON_DB_COLUMN_TYPE_DECIMAL TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DATETIME"), PHALCON_DB_COLUMN_TYPE_DATETIME TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_CHAR"), PHALCON_DB_COLUMN_TYPE_CHAR TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_TEXT"), PHALCON_DB_COLUMN_TYPE_TEXT TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_FLOAT"), PHALCON_DB_COLUMN_TYPE_FLOAT TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_BOOLEAN"), PHALCON_DB_COLUMN_TYPE_BOOLEAN TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DOUBLE"), PHALCON_DB_COLUMN_TYPE_DOUBLE TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_JSON"), PHALCON_DB_COLUMN_TYPE_JSON TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_ARRAY"), PHALCON_DB_COLUMN_TYPE_ARRAY TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_OTHER"), PHALCON_DB_COLUMN_TYPE_OTHER TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_NULL"), PHALCON_DB_COLUMN_BIND_PARAM_NULL TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_INT"), PHALCON_DB_COLUMN_BIND_PARAM_INT TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_STR"), PHALCON_DB_COLUMN_BIND_PARAM_STR TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_BOOL"), PHALCON_DB_COLUMN_BIND_PARAM_BOOL TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_DECIMAL"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_SKIP"), PHALCON_DB_COLUMN_BIND_SKIP TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_INTEGER"), PHALCON_DB_COLUMN_TYPE_INTEGER);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DATE"), PHALCON_DB_COLUMN_TYPE_DATE);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_VARCHAR"), PHALCON_DB_COLUMN_TYPE_VARCHAR);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DECIMAL"), PHALCON_DB_COLUMN_TYPE_DECIMAL);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DATETIME"), PHALCON_DB_COLUMN_TYPE_DATETIME);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_CHAR"), PHALCON_DB_COLUMN_TYPE_CHAR);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_TEXT"), PHALCON_DB_COLUMN_TYPE_TEXT);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_FLOAT"), PHALCON_DB_COLUMN_TYPE_FLOAT);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_BOOLEAN"), PHALCON_DB_COLUMN_TYPE_BOOLEAN);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DOUBLE"), PHALCON_DB_COLUMN_TYPE_DOUBLE);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_JSON"), PHALCON_DB_COLUMN_TYPE_JSON);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_ARRAY"), PHALCON_DB_COLUMN_TYPE_ARRAY);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_OTHER"), PHALCON_DB_COLUMN_TYPE_OTHER);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_NULL"), PHALCON_DB_COLUMN_BIND_PARAM_NULL);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_INT"), PHALCON_DB_COLUMN_BIND_PARAM_INT);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_STR"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_BOOL"), PHALCON_DB_COLUMN_BIND_PARAM_BOOL);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_DECIMAL"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_SKIP"), PHALCON_DB_COLUMN_BIND_SKIP);
 
-	zend_class_implements(phalcon_db_column_ce TSRMLS_CC, 1, phalcon_db_columninterface_ce);
+	zend_class_implements(phalcon_db_column_ce, 1, phalcon_db_columninterface_ce);
 
 	return SUCCESS;
 }
@@ -162,13 +162,13 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &column_name, &definition);
 	
-	phalcon_update_property_this(this_ptr, SL("_columnName"), column_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_columnName"), column_name);
 	
 	/** 
 	 * Get the column type, one of the TYPE_* constants
 	 */
 	if (phalcon_array_isset_string_fetch(&type, definition, SS("type"))) {
-		phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_type"), type);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column type is required");
 		return;
@@ -178,23 +178,23 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 * Check if the field is nullable
 	 */
 	if (phalcon_array_isset_string_fetch(&not_null, definition, SS("notNull"))) {
-		phalcon_update_property_this(this_ptr, SL("_notNull"), not_null TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_notNull"), not_null);
 	}
 	
 	/** 
 	 * Check if the field is primary key
 	 */
 	if (phalcon_array_isset_string_fetch(&primary, definition, SS("primary"))) {
-		phalcon_update_property_this(this_ptr, SL("_primary"), primary TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_primary"), primary);
 	}
 
 	if (phalcon_array_isset_string_fetch(&size, definition, SS("size"))) {
-		phalcon_update_property_this(this_ptr, SL("_size"), size TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("_bytes"), size TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_size"), size);
+		phalcon_update_property_this(this_ptr, SL("_bytes"), size);
 	}
 
 	if (phalcon_array_isset_string_fetch(&bytes, definition, SS("bytes"))) {
-		phalcon_update_property_this(this_ptr, SL("_bytes"), bytes TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_bytes"), bytes);
 	}
 
 	/** 
@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 		int is_numeric = (i_type == 3 || i_type == 7 || i_type == 9);
 	
 		if (is_numeric) {
-			phalcon_update_property_this(this_ptr, SL("_scale"), scale TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_scale"), scale);
 		}
 	}
 	
@@ -213,14 +213,14 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 * Check if the field is unsigned (only MySQL)
 	 */
 	if (phalcon_array_isset_string_fetch(&dunsigned, definition, SS("unsigned"))) {
-		phalcon_update_property_this(this_ptr, SL("_unsigned"), dunsigned TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_unsigned"), dunsigned);
 	}
 	
 	/** 
 	 * Check if the field is numeric
 	 */
 	if (phalcon_array_isset_string_fetch(&is_numeric, definition, SS("isNumeric"))) {
-		phalcon_update_property_this(this_ptr, SL("_isNumeric"), is_numeric TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_isNumeric"), is_numeric);
 	}
 	
 	/** 
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 */
 	if (phalcon_array_isset_string_fetch(&auto_increment, definition, SS("autoIncrement"))) {
 		if (PHALCON_IS_LONG(type, 0)) {
-			phalcon_update_property_this(this_ptr, SL("_autoIncrement"), auto_increment TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_autoIncrement"), auto_increment);
 		} else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column type cannot be auto-increment");
 			return;
@@ -239,28 +239,28 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 * Check if the field is placed at the first position of the table
 	 */
 	if (phalcon_array_isset_string_fetch(&first, definition, SS("first"))) {
-		phalcon_update_property_this(this_ptr, SL("_first"), first TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_first"), first);
 	}
 	
 	/** 
 	 * Name of the column which is placed before the current field
 	 */
 	if (phalcon_array_isset_string_fetch(&after, definition, SS("after"))) {
-		phalcon_update_property_this(this_ptr, SL("_after"), after TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_after"), after);
 	}
 	
 	/** 
 	 * The bind type to cast the field when passing it to PDO
 	 */
 	if (phalcon_array_isset_string_fetch(&bind_type, definition, SS("bindType"))) {
-		phalcon_update_property_this(this_ptr, SL("_bindType"), bind_type TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_bindType"), bind_type);
 	}
 	
 	/** 
 	 * Default values
 	 */
 	if (phalcon_array_isset_string_fetch(&default_value, definition, SS("default"))) {
-		phalcon_update_property_this(this_ptr, SL("_default"), default_value TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_default"), default_value);
 	}
 }
 

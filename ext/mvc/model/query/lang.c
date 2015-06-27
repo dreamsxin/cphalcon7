@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Lang, parsePHQL){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "PHQL statement must be string");
 		return;
 	}
-	if (phql_parse_phql(return_value, phql TSRMLS_CC) == FAILURE) {
+	if (phql_parse_phql(return_value, phql) == FAILURE) {
 		RETURN_MM();
 	}
 	RETURN_MM();

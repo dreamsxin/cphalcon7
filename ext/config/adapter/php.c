@@ -81,7 +81,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Php){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Config\\Adapter, Php, config_adapter_php, phalcon_config_adapter_ce, phalcon_config_adapter_php_method_entry, 0);
 
-	zend_class_implements(phalcon_config_adapter_php_ce TSRMLS_CC, 1, phalcon_config_adapterinterface_ce);
+	zend_class_implements(phalcon_config_adapter_php_ce, 1, phalcon_config_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -107,21 +107,21 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 	if (zend_is_true(absolute_path)) {
 		PHALCON_CPY_WRT(config_dir_path, file_path);
 	} else {
-		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath") TSRMLS_CC);
+		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
 		PHALCON_INIT_VAR(config_dir_path);
 		PHALCON_CONCAT_VV(config_dir_path, base_path, file_path);
 	}
 
 	PHALCON_OBS_VAR(config);
-	if (phalcon_require_ret(&config, Z_STRVAL_P(config_dir_path) TSRMLS_CC) == FAILURE) {
+	if (phalcon_require_ret(&config, Z_STRVAL_P(config_dir_path)) == FAILURE) {
 		zend_throw_exception_ex(phalcon_config_exception_ce, 0, "Configuration file '%s' cannot be read", Z_STRVAL_P(config_dir_path));
 		PHALCON_MM_RESTORE();
 		return;
 	}
 
 	if (Z_TYPE_P(config) == IS_ARRAY) {
-		phalcon_config_construct_internal(getThis(), config TSRMLS_CC);
+		phalcon_config_construct_internal(getThis(), config);
 	}
 
 	RETURN_THIS();

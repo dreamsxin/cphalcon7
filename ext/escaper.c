@@ -88,11 +88,11 @@ PHALCON_INIT_CLASS(Phalcon_Escaper){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Escaper, escaper, phalcon_escaper_method_entry, 0);
 
-	zend_declare_property_string(phalcon_escaper_ce, SL("_encoding"), "utf-8", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_escaper_ce, SL("_htmlEscapeMap"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_escaper_ce, SL("_htmlQuoteType"), 3, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_escaper_ce, SL("_encoding"), "utf-8", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_escaper_ce, SL("_htmlEscapeMap"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_escaper_ce, SL("_htmlQuoteType"), 3, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_escaper_ce TSRMLS_CC, 1, phalcon_escaperinterface_ce);
+	zend_class_implements(phalcon_escaper_ce, 1, phalcon_escaperinterface_ce);
 
 	return SUCCESS;
 }
@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Escaper, setEncoding){
 
 	phalcon_fetch_params(0, 1, 0, &encoding);
 	PHALCON_ENSURE_IS_STRING(encoding);
-	phalcon_update_property_this(this_ptr, SL("_encoding"), *encoding TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_encoding"), *encoding);
 }
 
 /**
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Escaper, setHtmlQuoteType){
 
 	phalcon_fetch_params(0, 1, 0, &quote_type);
 	PHALCON_ENSURE_IS_LONG(quote_type);
-	phalcon_update_property_this(this_ptr, SL("_htmlQuoteType"), *quote_type TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_htmlQuoteType"), *quote_type);
 }
 
 /**
@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	/**
 	 * We require mbstring extension here
 	 */
-	if (phalcon_function_exists_ex(SS("mb_detect_encoding") TSRMLS_CC) == FAILURE) {
+	if (phalcon_function_exists_ex(SS("mb_detect_encoding")) == FAILURE) {
 		RETURN_MM_NULL();
 	}
 
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Escaper, normalizeEncoding){
 	/**
 	 * mbstring is required here
 	 */
-	if (phalcon_function_exists_ex(SS("mb_convert_encoding") TSRMLS_CC) == FAILURE) {
+	if (phalcon_function_exists_ex(SS("mb_convert_encoding")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_escaper_exception_ce, "Extension 'mbstring' is required");
 		return;
 	}
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Escaper, escapeHtml){
 		html_quote_type = phalcon_fetch_nproperty_this(this_ptr, SL("_htmlQuoteType"), PH_NOISY);
 		encoding        = phalcon_fetch_nproperty_this(this_ptr, SL("_encoding"), PH_NOISY);
 
-		phalcon_htmlspecialchars(return_value, text, html_quote_type, encoding TSRMLS_CC);
+		phalcon_htmlspecialchars(return_value, text, html_quote_type, encoding);
 		return;
 	}
 
@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_Escaper, escapeHtmlAttr){
 
 		encoding = phalcon_fetch_nproperty_this(this_ptr, SL("_encoding"), PH_NOISY);
 
-		phalcon_htmlspecialchars(return_value, attribute, &quoting, encoding TSRMLS_CC);
+		phalcon_htmlspecialchars(return_value, attribute, &quoting, encoding);
 		return;
 	}
 

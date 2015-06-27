@@ -74,10 +74,10 @@ PHALCON_INIT_CLASS(Phalcon_DI_Injectable){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\DI, Injectable, di_injectable, phalcon_di_injectable_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_di_injectable_ce, SL("_dependencyInjector"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_di_injectable_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_di_injectable_ce, SL("_dependencyInjector"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_di_injectable_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_di_injectable_ce TSRMLS_CC, 2, phalcon_di_injectionawareinterface_ce, phalcon_events_eventsawareinterface_ce);
+	zend_class_implements(phalcon_di_injectable_ce, 2, phalcon_di_injectionawareinterface_ce, phalcon_events_eventsawareinterface_ce);
 
 	return SUCCESS;
 }
@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
 	phalcon_fetch_params(0, 1, 0, &dependency_injector);
 	
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(*dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
-	phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), *dependency_injector TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), *dependency_injector);
 
 	RETURN_THISW();
 }
@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setEventsManager)
 	phalcon_fetch_params(0, 0, 1, 0, &events_manager);
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 	
-	phalcon_update_property_this(this_ptr, SL("_eventsManager"), events_manager TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_eventsManager"), events_manager);
 
 	RETURN_THISW();
 }
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
-	if (phalcon_method_exists(this_ptr, name TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists(this_ptr, name) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, Z_STRVAL_P(name), data);
 	}
 
@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
-	if (phalcon_method_exists(this_ptr, name TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists(this_ptr, name) == SUCCESS) {
 		PHALCON_CALL_METHOD(&status, this_ptr, Z_STRVAL_P(name), data);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
@@ -300,14 +300,14 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	PHALCON_CALL_METHOD(&has_service, dependency_injector, "has", *property_name);
 	if (zend_is_true(has_service)) {
 		PHALCON_CALL_METHOD(&result, dependency_injector, "getshared", *property_name);
-		phalcon_update_property_zval(this_ptr, Z_STRVAL_P(*property_name), Z_STRLEN_P(*property_name), result TSRMLS_CC);
+		phalcon_update_property_zval(this_ptr, Z_STRVAL_P(*property_name), Z_STRLEN_P(*property_name), result);
 		RETURN_CTOR(result);
 	}
 
 	assert(Z_TYPE_P(*property_name) == IS_STRING);
 
 	if (Z_STRLEN_P(*property_name) == sizeof("di")-1 && !memcmp(Z_STRVAL_P(*property_name), "di", sizeof("di")-1)) {
-		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("di"), dependency_injector TSRMLS_CC);
+		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("di"), dependency_injector);
 		RETURN_CTOR(dependency_injector);
 	}
 
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	if (Z_STRLEN_P(*property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(*property_name), "persistent", sizeof("persistent")-1)) {
 		const char *cn = Z_OBJCE_P(getThis())->name->val;
 
-		MAKE_STD_ZVAL(class_name);
+		PHALCON_ALLOC_GHOST_ZVAL(class_name);
 		PHALCON_ZVAL_MAYBE_INTERNED_STRING(class_name, cn);
 
 		PHALCON_INIT_VAR(arguments);
@@ -328,13 +328,13 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 		ZVAL_STRING(service, "sessionBag", 1);
 
 		PHALCON_CALL_METHOD(&result, dependency_injector, "get", service, arguments);
-		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), result TSRMLS_CC);
+		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), result);
 		RETURN_CTOR(result);
 	}
 
 	/**
 	 * A notice is shown if the property is not defined or is not a valid service
 	 */
-	php_error_docref(NULL TSRMLS_CC, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name->val, Z_STRVAL_P(*property_name));
+	php_error_docref(NULL, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name->val, Z_STRVAL_P(*property_name));
 	RETURN_MM_NULL();
 }

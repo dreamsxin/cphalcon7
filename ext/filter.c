@@ -74,11 +74,11 @@ PHALCON_INIT_CLASS(Phalcon_Filter){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Filter, filter, phalcon_filter_method_entry, 0);
 
-	zend_declare_property_null(phalcon_filter_ce, SL("_filters"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_filter_ce, SL("_allowTags"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_filter_ce, SL("_allowAttributes"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_filter_ce, SL("_filters"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_filter_ce, SL("_allowTags"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_filter_ce, SL("_allowAttributes"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_filter_ce TSRMLS_CC, 1, phalcon_filterinterface_ce);
+	zend_class_implements(phalcon_filter_ce, 1, phalcon_filterinterface_ce);
 
 	return SUCCESS;
 }
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Filter, __construct){
 	phalcon_array_append_string(&allow_tags, SL("th"), 0);
 	phalcon_array_append_string(&allow_tags, SL("td"), 0);
 
-	phalcon_update_property_this(this_ptr, SL("_allowTags"), allow_tags TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_allowTags"), allow_tags);
 
 	PHALCON_INIT_VAR(allow_attributes);
 	array_init(allow_attributes);
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Filter, __construct){
 	phalcon_array_append_string(&allow_attributes, SL("target"), 0);
 	phalcon_array_append_string(&allow_attributes, SL("align"), 0);
 
-	phalcon_update_property_this(this_ptr, SL("_allowAttributes"), allow_attributes TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_allowAttributes"), allow_attributes);
 
 	PHALCON_MM_RESTORE();
 }
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Filter, add){
 		return;
 	}
 	
-	phalcon_update_property_array(this_ptr, SL("_filters"), *name, *handler TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_filters"), *name, *handler);
 	RETURN_THISW();
 }
 
@@ -406,7 +406,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	
 	if (PHALCON_IS_STRING(filter, "trim")) {
 		PHALCON_INIT_NVAR(filtered);
-		phalcon_fast_trim(filtered, value, NULL, PHALCON_TRIM_BOTH TSRMLS_CC);
+		phalcon_fast_trim(filtered, value, NULL, PHALCON_TRIM_BOTH);
 		goto ph_end_0;
 	}
 	
@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 	
 	if (PHALCON_IS_STRING(filter, "lower")) {
-		if (phalcon_function_exists_ex(SS("mb_strtolower") TSRMLS_CC) == SUCCESS) {
+		if (phalcon_function_exists_ex(SS("mb_strtolower")) == SUCCESS) {
 			/** 
 			 * 'lower' checks for the mbstring extension to make a correct lowercase
 			 * transformation
@@ -431,7 +431,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 	
 	if (PHALCON_IS_STRING(filter, "upper")) {
-		if (phalcon_function_exists_ex(SS("mb_strtoupper") TSRMLS_CC) == SUCCESS) {
+		if (phalcon_function_exists_ex(SS("mb_strtoupper")) == SUCCESS) {
 			/** 
 			 * 'upper' checks for the mbstring extension to make a correct lowercase
 			 * transformation
@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		phalcon_read_property_this(&allow_attributes, this_ptr, SL("_allowAttributes"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(filtered);
-		phalcon_xss_clean(filtered, value, allow_tags, allow_attributes TSRMLS_CC);
+		phalcon_xss_clean(filtered, value, allow_tags, allow_attributes);
 		goto ph_end_0;
 	}
 	

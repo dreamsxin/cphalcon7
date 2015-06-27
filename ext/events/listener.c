@@ -77,9 +77,9 @@ PHALCON_INIT_CLASS(Phalcon_Events_Listener){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Events, Listener, events_listener, phalcon_events_listener_method_entry, 0);
 
-	zend_declare_property_null(phalcon_events_listener_ce, SL("_listener"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_events_listener_ce, SL("_priority"), 100, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_events_listener_ce, SL("_event"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_events_listener_ce, SL("_listener"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_events_listener_ce, SL("_priority"), 100, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_events_listener_ce, SL("_event"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -97,15 +97,15 @@ PHP_METHOD(Phalcon_Events_Listener, __construct){
 	phalcon_fetch_params(0, 0, 3, &listener, &priority, &event);
 
 	if (listener) {
-		phalcon_update_property_this(this_ptr, SL("_listener"), listener TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_listener"), listener);
 	}
 
 	if (priority) {
-		phalcon_update_property_this(this_ptr, SL("_priority"), priority TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_priority"), priority);
 	}
 
 	if (event) {
-		phalcon_update_property_this(this_ptr, SL("_event"), event TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_event"), event);
 	}
 }
 
@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Events_Listener, setListener){
 
 	phalcon_fetch_params(0, 1, 0, &listener);
 
-	phalcon_update_property_this(this_ptr, SL("_listener"), listener TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_listener"), listener);
 
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Events_Listener, setPriority){
 
 	phalcon_fetch_params(0, 1, 0, &priority);
 
-	phalcon_update_property_this(this_ptr, SL("_priority"), priority TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_priority"), priority);
 
 }
 
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Events_Listener, setEvent){
 
 	phalcon_fetch_params(0, 1, 0, &event);
 
-	phalcon_update_property_this(this_ptr, SL("_event"), event TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_event"), event);
 
 }
 

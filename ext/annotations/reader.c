@@ -55,7 +55,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Reader){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Annotations, Reader, annotations_reader, phalcon_annotations_reader_method_entry, 0);
 
-	zend_class_implements(phalcon_annotations_reader_ce TSRMLS_CC, 1, phalcon_annotations_readerinterface_ce);
+	zend_class_implements(phalcon_annotations_reader_ce, 1, phalcon_annotations_readerinterface_ce);
 
 	return SUCCESS;
 }
@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 			line = phalcon_get_class_startline(class_ce);
 
 			PHALCON_INIT_VAR(class_annotations);
-			RETURN_MM_ON_FAILURE(phannot_parse_annotations(class_annotations, cmt, cmt_len, file, line TSRMLS_CC));
+			RETURN_MM_ON_FAILURE(phannot_parse_annotations(class_annotations, cmt, cmt_len, file, line));
 
 			if (Z_TYPE_P(class_annotations) == IS_ARRAY) {
 				phalcon_array_update_string(&annotations, SL("class"), class_annotations, PH_COPY);
@@ -139,8 +139,8 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 				if (phalcon_get_property_doc_comment(property, &cmt, &cmt_len)) {
 					zval *property_annotations;
 
-					MAKE_STD_ZVAL(property_annotations);
-					if (FAILURE == phannot_parse_annotations(property_annotations, cmt, cmt_len, file, 0 TSRMLS_CC)) {
+					PHALCON_ALLOC_GHOST_ZVAL(property_annotations);
+					if (FAILURE == phannot_parse_annotations(property_annotations, cmt, cmt_len, file, 0)) {
 						zval_ptr_dtor(&property_annotations);
 						RETURN_MM();
 					}
@@ -185,8 +185,8 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 
 					line = phalcon_get_function_startline(method);
 
-					MAKE_STD_ZVAL(method_annotations);
-					if (FAILURE == phannot_parse_annotations(method_annotations, cmt, cmt_len, file, line TSRMLS_CC)) {
+					PHALCON_ALLOC_GHOST_ZVAL(method_annotations);
+					if (FAILURE == phannot_parse_annotations(method_annotations, cmt, cmt_len, file, line)) {
 						zval_ptr_dtor(&method_annotations);
 						RETURN_MM();
 					}
@@ -227,5 +227,5 @@ PHP_METHOD(Phalcon_Annotations_Reader, parseDocBlock)
 	PHALCON_ENSURE_IS_STRING(file);
 	PHALCON_ENSURE_IS_LONG(line);
 
-	RETURN_ON_FAILURE(phannot_parse_annotations(return_value, Z_STRVAL_P(*doc_block), Z_STRLEN_P(*doc_block), Z_STRVAL_P(*file), Z_LVAL_P(*line) TSRMLS_CC));
+	RETURN_ON_FAILURE(phannot_parse_annotations(return_value, Z_STRVAL_P(*doc_block), Z_STRLEN_P(*doc_block), Z_STRVAL_P(*file), Z_LVAL_P(*line)));
 }

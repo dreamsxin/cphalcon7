@@ -60,11 +60,11 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Model){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Paginator\\Adapter, Model, paginator_adapter_model, phalcon_paginator_adapter_model_method_entry, 0);
 
-	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_limitRows"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_config"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_page"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_limitRows"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_config"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_page"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_paginator_adapter_model_ce TSRMLS_CC, 1, phalcon_paginator_adapterinterface_ce);
+	zend_class_implements(phalcon_paginator_adapter_model_ce, 1, phalcon_paginator_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -80,13 +80,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 	
-	phalcon_update_property_this(this_ptr, SL("_config"), config TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_config"), config);
 	if (phalcon_array_isset_string_fetch(&limit, config, SS("limit"))) {
-		phalcon_update_property_this(this_ptr, SL("_limitRows"), limit TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_limitRows"), limit);
 	}
 	
 	if (phalcon_array_isset_string_fetch(&page, config, SS("page"))) {
-		phalcon_update_property_this(this_ptr, SL("_page"), page TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_page"), page);
 	}
 }
 
@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, setCurrentPage){
 
 	phalcon_fetch_params(0, 1, 0, &page);
 	
-	phalcon_update_property_this(this_ptr, SL("_page"), page TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_page"), page);
 	RETURN_THISW();
 }
 
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	}
 	
 	PHALCON_INIT_VAR(rowcount);
-	phalcon_fast_count(rowcount, items TSRMLS_CC);
+	phalcon_fast_count(rowcount, items);
 
 	PHALCON_INIT_VAR(page);
 	object_init(page);
@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	phalcon_sub_function(last_show_page, page_number, z_one);
 	
 	PHALCON_INIT_VAR(start);
-	mul_function(start, show, last_show_page TSRMLS_CC);
+	mul_function(start, show, last_show_page);
 	
 	PHALCON_INIT_VAR(possible_pages);
 	phalcon_div_function(possible_pages, rowcount, show);
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		}
 	}
 	
-	phalcon_update_property_zval(page, SL("items"), page_items TSRMLS_CC);
+	phalcon_update_property_zval(page, SL("items"), page_items);
 	
 	PHALCON_INIT_VAR(maximum_pages);
 	phalcon_add_function(maximum_pages, start, show);
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		PHALCON_CPY_WRT(next, total_pages);
 	}
 	
-	phalcon_update_property_zval(page, SL("next"), next TSRMLS_CC);
+	phalcon_update_property_zval(page, SL("next"), next);
 	if (PHALCON_GT(page_number, z_one)) {
 		PHALCON_INIT_VAR(before);
 		phalcon_sub_function(before, page_number, z_one);
@@ -228,12 +228,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		PHALCON_CPY_WRT_CTOR(before, z_one);
 	}
 	
-	phalcon_update_property_zval(page, SL("first"), z_one TSRMLS_CC);
-	phalcon_update_property_zval(page, SL("before"), before TSRMLS_CC);
-	phalcon_update_property_zval(page, SL("current"), page_number TSRMLS_CC);
+	phalcon_update_property_zval(page, SL("first"), z_one);
+	phalcon_update_property_zval(page, SL("before"), before);
+	phalcon_update_property_zval(page, SL("current"), page_number);
 	
 	PHALCON_INIT_VAR(remainder);
-	mod_function(remainder, rowcount, show TSRMLS_CC);
+	mod_function(remainder, rowcount, show);
 	
 	PHALCON_INIT_NVAR(possible_pages);
 	phalcon_div_function(possible_pages, rowcount, show);
@@ -247,9 +247,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		PHALCON_CPY_WRT(pages_total, possible_pages);
 	}
 	
-	phalcon_update_property_zval(page, SL("last"), pages_total TSRMLS_CC);
-	phalcon_update_property_zval(page, SL("total_pages"), pages_total TSRMLS_CC);
-	phalcon_update_property_zval(page, SL("total_items"), rowcount TSRMLS_CC);
+	phalcon_update_property_zval(page, SL("last"), pages_total);
+	phalcon_update_property_zval(page, SL("total_pages"), pages_total);
+	phalcon_update_property_zval(page, SL("total_items"), rowcount);
 	
 	RETURN_CTOR(page);
 }

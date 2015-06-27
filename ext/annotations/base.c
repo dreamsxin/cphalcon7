@@ -80,7 +80,7 @@ static void phannot_parse_with_token(void* phannot_parser, int opcode, int parse
 /**
  * Creates an error message when it's triggered by the scanner
  */
-static void phannot_scanner_error_msg(phannot_parser_status *parser_status, char **error_msg TSRMLS_DC){
+static void phannot_scanner_error_msg(phannot_parser_status *parser_status, char **error_msg){
 
 	phannot_scanner_state *state = parser_status->scanner_state;
 
@@ -98,13 +98,13 @@ static void phannot_scanner_error_msg(phannot_parser_status *parser_status, char
 /**
  * Receives the comment tokenizes and parses it
  */
-int phannot_parse_annotations(zval *result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line TSRMLS_DC){
+int phannot_parse_annotations(zval *result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line){
 
 	char *error_msg = NULL;
 
 	ZVAL_NULL(result);
 
-	if (phannot_internal_parse_annotations(&result, comment, comment_len, file_path, line, &error_msg TSRMLS_CC) == FAILURE) {
+	if (phannot_internal_parse_annotations(&result, comment, comment_len, file_path, line, &error_msg) == FAILURE) {
 		if (likely(error_msg != NULL)) {
 			zend_throw_exception_ex(phalcon_annotations_exception_ce, 0, "%s", error_msg);
 			efree(error_msg);
@@ -215,7 +215,7 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, con
 /**
  * Parses a comment returning an intermediate array representation
  */
-int phannot_internal_parse_annotations(zval **result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line, char **error_msg TSRMLS_DC)
+int phannot_internal_parse_annotations(zval **result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line, char **error_msg)
 {
 	phannot_scanner_state *state;
 	phannot_scanner_token token;
@@ -389,7 +389,7 @@ int phannot_internal_parse_annotations(zval **result, const char *comment, uint3
 			case PHANNOT_SCANNER_RETCODE_ERR:
 			case PHANNOT_SCANNER_RETCODE_IMPOSSIBLE:
 				if (!*error_msg) {
-					phannot_scanner_error_msg(parser_status, error_msg TSRMLS_CC);
+					phannot_scanner_error_msg(parser_status, error_msg);
 				}
 				status = FAILURE;
 				break;

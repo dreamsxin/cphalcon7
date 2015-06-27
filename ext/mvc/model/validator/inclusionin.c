@@ -74,7 +74,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Inclusionin){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Validator, Inclusionin, mvc_model_validator_inclusionin, phalcon_mvc_model_validator_ce, phalcon_mvc_model_validator_inclusionin_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_validator_inclusionin_ce TSRMLS_CC, 1, phalcon_mvc_model_validatorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_validator_inclusionin_ce, 1, phalcon_mvc_model_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	/** 
 	 * Check if the value is contained in the array
 	 */
-	if (!phalcon_fast_in_array(value, domain TSRMLS_CC)) {
+	if (!phalcon_fast_in_array(value, domain)) {
 	
 		/** 
 		 * Check if the developer has defined a custom message
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 		PHALCON_CALL_METHOD(&message, this_ptr, "getoption", option);
 		if (!zend_is_true(message)) {
 			PHALCON_INIT_VAR(joined_domain);
-			phalcon_fast_join_str(joined_domain, SL(", "), domain TSRMLS_CC);
+			phalcon_fast_join_str(joined_domain, SL(", "), domain);
 	
 			PHALCON_INIT_NVAR(message);
 			PHALCON_CONCAT_SVSV(message, "Value of field '", field, "' must be part of list: ", joined_domain);

@@ -109,16 +109,16 @@ PHALCON_INIT_CLASS(Phalcon_CLI_Router){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Router, cli_router, phalcon_di_injectable_ce, phalcon_cli_router_method_entry, 0);
 
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_namespace"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_module"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_task"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_action"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_params"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultNamespace"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultTask"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_namespace"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_module"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_task"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_action"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_params"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultNamespace"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultTask"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_router_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -128,8 +128,8 @@ PHALCON_INIT_CLASS(Phalcon_CLI_Router){
  */
 PHP_METHOD(Phalcon_CLI_Router, __construct){
 
-	phalcon_update_property_empty_array(this_ptr, SL("_params") TSRMLS_CC);
-	phalcon_update_property_empty_array(this_ptr, SL("_defaultParams") TSRMLS_CC);
+	phalcon_update_property_empty_array(this_ptr, SL("_params"));
+	phalcon_update_property_empty_array(this_ptr, SL("_defaultParams"));
 }
 
 /**
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &module_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultModule"), module_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_defaultModule"), module_name);
 
 }
 
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultNamespace){
 
 	phalcon_fetch_params(0, 1, 0, &namespace_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultNamespace"), namespace_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_defaultNamespace"), namespace_name);
 
 }
 
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultTask){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultTask"), task_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_defaultTask"), task_name);
 
 }
 
@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultAction){
 
 	phalcon_fetch_params(0, 1, 0, &action_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultAction"), action_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_defaultAction"), action_name);
 
 }
 
@@ -261,11 +261,11 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 		phalcon_array_unset_string(&arguments, SS("action"), PH_SEPARATE);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_module"), module_name TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_namespace"), namespace_name TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_task"), task_name TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_action"), action_name TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_params"), arguments TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_module"), module_name);
+	phalcon_update_property_this(this_ptr, SL("_namespace"), namespace_name);
+	phalcon_update_property_this(this_ptr, SL("_task"), task_name);
+	phalcon_update_property_this(this_ptr, SL("_action"), action_name);
+	phalcon_update_property_this(this_ptr, SL("_params"), arguments);
 
 	PHALCON_MM_RESTORE();
 }

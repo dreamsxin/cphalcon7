@@ -24,17 +24,12 @@
 
 #include "php_phalcon.h"
 
-double phalcon_floor(zval *op1 TSRMLS_DC);
-double phalcon_ceil(zval *op1 TSRMLS_DC);
-void phalcon_round(zval *return_value, zval *op1, zval *op2, zval *op3 TSRMLS_DC);
-void phalcon_pow(zval *return_value, zval *op1, zval *op2 TSRMLS_DC);
-long phalcon_mt_rand(long min, long max TSRMLS_DC);
+double phalcon_floor(zval *op1);
+double phalcon_ceil(zval *op1);
+void phalcon_round(zval *return_value, zval *op1, zval *op2, zval *op3);
+void phalcon_pow(zval *return_value, zval *op1, zval *op2);
+long phalcon_mt_rand(long min, long max);
 
-#if PHP_VERSION_ID < 50600
-void phalcon_pow_function_ex(zval *return_value, zval *zbase, zval *zexp TSRMLS_DC);
-#define phalcon_pow_function(result, op1, op2) phalcon_pow_function_ex(result, op1, op2 TSRMLS_CC)
-#else
-#define phalcon_pow_function(result, op1, op2) pow_function(result, op1, op2 TSRMLS_CC)
-#endif
+#define phalcon_pow_function(result, op1, op2) pow_function(result, op1, op2)
 
 #endif

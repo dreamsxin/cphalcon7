@@ -85,9 +85,9 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Annotation){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Annotations, Annotation, annotations_annotation, phalcon_annotations_annotation_method_entry, 0);
 
-	zend_declare_property_null(phalcon_annotations_annotation_ce, SL("_name"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_annotations_annotation_ce, SL("_arguments"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_annotations_annotation_ce, SL("_exprArguments"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_annotations_annotation_ce, SL("_name"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_annotations_annotation_ce, SL("_arguments"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_annotations_annotation_ce, SL("_exprArguments"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	
 	PHALCON_OBS_VAR(name);
 	phalcon_array_fetch_string(&name, reflection_data, SL("name"), PH_NOISY);
-	phalcon_update_property_this(this_ptr, SL("_name"), name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_name"), name);
 	
 	/** 
 	 * Process annotation arguments
@@ -146,8 +146,8 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 			zend_hash_move_forward_ex(ah0, &hp0);
 		}
 	
-		phalcon_update_property_this(this_ptr, SL("_arguments"), arguments TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("_exprArguments"), expr_arguments TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_arguments"), arguments);
+		phalcon_update_property_this(this_ptr, SL("_exprArguments"), expr_arguments);
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, numberArguments){
 	zval *arguments;
 
 	arguments = phalcon_fetch_nproperty_this(this_ptr, SL("_arguments"), PH_NOISY);
-	phalcon_fast_count(return_value, arguments TSRMLS_CC);
+	phalcon_fast_count(return_value, arguments);
 }
 
 /**

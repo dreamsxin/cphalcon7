@@ -28,7 +28,7 @@ static zval *phql_ret_literal_zval(int type, phql_parser_token *T)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, phalcon_interned_type, type);
 	if (T) {
@@ -43,7 +43,7 @@ static zval *phql_ret_placeholder_zval(int type, phql_parser_token *T)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, phalcon_interned_type, type);
 	add_assoc_stringl(ret, phalcon_interned_value, T->token, T->token_len, 0);
@@ -56,7 +56,7 @@ static zval *phql_ret_qualified_name(phql_parser_token *A, phql_parser_token *B,
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, phalcon_interned_type, PHQL_T_QUALIFIED);
@@ -81,7 +81,7 @@ static zval *phql_ret_raw_qualified_name(phql_parser_token *A, phql_parser_token
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, phalcon_interned_type, PHQL_T_RAW_QUALIFIED);
@@ -101,7 +101,7 @@ static zval *phql_ret_select_statement(zval *S, zval *W, zval *O, zval *G, zval 
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, phalcon_interned_type, PHQL_T_SELECT);
@@ -133,7 +133,7 @@ static zval *phql_ret_select_clause(zval *distinct, zval *columns, zval *tables,
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 4);
 
 	if (distinct) {
@@ -153,7 +153,7 @@ static zval *phql_ret_distinct_all(int distinct)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	ZVAL_LONG(ret, distinct);
 
 	return ret;
@@ -163,7 +163,7 @@ static zval *phql_ret_distinct(void)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	ZVAL_TRUE(ret);
 
 	return ret;
@@ -173,7 +173,7 @@ static zval *phql_ret_order_item(zval *column, int sort){
 
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init(ret);
 	add_assoc_zval(ret, phalcon_interned_column, column);
 	if (sort != 0 ) {
@@ -187,7 +187,7 @@ static zval *phql_ret_limit_clause(zval *L, zval *O)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 
 	add_assoc_zval(ret, phalcon_interned_number, L);
@@ -203,7 +203,7 @@ static zval *phql_ret_for_update_clause()
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	ZVAL_TRUE(ret);
 
 	return ret;
@@ -213,7 +213,7 @@ static zval *phql_ret_insert_statement(zval *Q, zval *F, zval *V)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 4);
 
 	add_assoc_long(ret, phalcon_interned_type, PHQL_T_INSERT);
@@ -230,17 +230,17 @@ static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 {
 	zval *key1, *key2, *rows, *values;
 
-	MAKE_STD_ZVAL(key1);
+	PHALCON_ALLOC_GHOST_ZVAL(key1);
 	ZVAL_STRING(key1, phalcon_interned_rows, 1);
 
-	MAKE_STD_ZVAL(rows);
+	PHALCON_ALLOC_GHOST_ZVAL(rows);
 	if (!phalcon_array_isset_fetch(&rows, ret, key1)) {
 		array_init_size(rows, 1);		
 
-		MAKE_STD_ZVAL(key2);
+		PHALCON_ALLOC_GHOST_ZVAL(key2);
 		ZVAL_STRING(key2, phalcon_interned_values, 1);
 
-		MAKE_STD_ZVAL(values);
+		PHALCON_ALLOC_GHOST_ZVAL(values);
 		if (phalcon_array_isset_fetch(&values, ret, key2)) {
 			Z_ADDREF_P(values);
 			add_next_index_zval(rows, values);	
@@ -258,7 +258,7 @@ static zval *phql_ret_update_statement(zval *U, zval *W, zval *L)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, phalcon_interned_type, PHQL_T_UPDATE);
@@ -277,7 +277,7 @@ static zval *phql_ret_update_clause(zval *tables, zval *values)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, phalcon_interned_tables, tables);
 	add_assoc_zval(ret, phalcon_interned_values, values);
@@ -289,7 +289,7 @@ static zval *phql_ret_update_item(zval *column, zval *expr)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, phalcon_interned_column, column);
 	add_assoc_zval(ret, phalcon_interned_expr, expr);
@@ -301,7 +301,7 @@ static zval *phql_ret_delete_statement(zval *D, zval *W, zval *L)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, phalcon_interned_type, PHQL_T_DELETE);
@@ -320,7 +320,7 @@ static zval *phql_ret_delete_clause(zval *tables)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 1);
 	add_assoc_zval(ret, phalcon_interned_tables, tables);
 
@@ -332,7 +332,7 @@ static zval *phql_ret_zval_list(zval *list_left, zval *right_list)
 	zval *ret;
 	HashTable *list;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init(ret);
 
 	list = Z_ARRVAL_P(list_left);
@@ -365,7 +365,7 @@ static zval *phql_ret_column_item(int type, zval *column, phql_parser_token *ide
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 4);
 	add_assoc_long(ret, phalcon_interned_type, type);
 	if (column) {
@@ -387,7 +387,7 @@ static zval *phql_ret_assoc_name(zval *qualified_name, phql_parser_token *alias)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, phalcon_interned_qualifiedName, qualified_name);
 	if (alias) {
@@ -402,7 +402,7 @@ static zval *phql_ret_join_type(int type)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	ZVAL_LONG(ret, type);
 
 	return ret;
@@ -412,7 +412,7 @@ static zval *phql_ret_join_item(zval *type, zval *qualified, zval *alias, zval *
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 4);
 	add_assoc_zval(ret, phalcon_interned_type, type);
 
@@ -435,7 +435,7 @@ static zval *phql_ret_expr(int type, zval *left, zval *right)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, phalcon_interned_type, type);
 	if (left) {
@@ -452,7 +452,7 @@ static zval *phql_ret_func_call(phql_parser_token *name, zval *arguments, zval *
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 4);
 	add_assoc_long(ret, phalcon_interned_type, PHQL_T_FCALL);
 	add_assoc_stringl(ret, phalcon_interned_name, name->token, name->token_len, 0);
@@ -3087,13 +3087,13 @@ static void phql_parse_with_token(void* phql_parser, int opcode, int parsercode,
 /**
  * Creates an error message when it's triggered by the scanner
  */
-static void phql_scanner_error_msg(phql_parser_status *parser_status, zval **error_msg TSRMLS_DC){
+static void phql_scanner_error_msg(phql_parser_status *parser_status, zval **error_msg){
 
 	char *error = NULL, *error_part;
 	unsigned int length;
 	phql_scanner_state *state = parser_status->scanner_state;
 
-	MAKE_STD_ZVAL(*error_msg);
+	PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 	if (state->start) {
 		length = 64 + state->start_length + parser_status->phql_length;
 		error = emalloc(sizeof(char) * length);
@@ -3118,13 +3118,13 @@ static void phql_scanner_error_msg(phql_parser_status *parser_status, zval **err
 /**
  * Executes the internal PHQL parser/tokenizer
  */
-int phql_parse_phql(zval *result, zval *phql TSRMLS_DC) {
+int phql_parse_phql(zval *result, zval *phql) {
 
 	zval *error_msg = NULL;
 
 	ZVAL_NULL(result);
 
-	if (phql_internal_parse_phql(&result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg TSRMLS_CC) == FAILURE) {
+	if (phql_internal_parse_phql(&result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg) == FAILURE) {
 		if (likely(error_msg != NULL)) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, Z_STRVAL_P(error_msg));
 			zval_ptr_dtor(&error_msg);
@@ -3142,7 +3142,7 @@ int phql_parse_phql(zval *result, zval *phql TSRMLS_DC) {
 /**
  * Executes a PHQL parser/tokenizer
  */
-int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length, zval **error_msg TSRMLS_DC) {
+int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length, zval **error_msg) {
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 	phql_parser_status *parser_status = NULL;
@@ -3154,15 +3154,15 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	zval *unique_id;
 
 	if (!phql) {
-		MAKE_STD_ZVAL(*error_msg);
+		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 		ZVAL_STRING(*error_msg, "PHQL statement cannot be NULL", 1);
 		return FAILURE;
 	}
 
-	MAKE_STD_ZVAL(unique_id);
+	PHALCON_ALLOC_GHOST_ZVAL(unique_id);
 	ZVAL_LONG(unique_id, zend_inline_hash_func(phql, phql_length + 1));
 
-	phalcon_orm_get_prepared_ast(result, unique_id TSRMLS_CC);
+	phalcon_orm_get_prepared_ast(result, unique_id);
 
 	if (Z_TYPE_P(*result) == IS_ARRAY) {
 		zval_ptr_dtor(&unique_id);
@@ -3171,7 +3171,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 	phql_parser = phql_Alloc(phql_wrapper_alloc);
 	if (unlikely(!phql_parser)) {
-		MAKE_STD_ZVAL(*error_msg);
+		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 		ZVAL_STRING(*error_msg, "Memory allocation error", 1);
 		return FAILURE;
 	}
@@ -3311,7 +3311,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_INTEGER, PHQL_INTEGER, &token, parser_status);
 				} else {
-					MAKE_STD_ZVAL(*error_msg);
+					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -3320,7 +3320,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_DOUBLE, PHQL_DOUBLE, &token, parser_status);
 				} else {
-					MAKE_STD_ZVAL(*error_msg);
+					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -3329,7 +3329,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_STRING, PHQL_STRING, &token, parser_status);
 				} else {
-					MAKE_STD_ZVAL(*error_msg);
+					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -3338,7 +3338,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_(phql_parser, PHQL_TRUE, NULL, parser_status);
 				} else {
-					MAKE_STD_ZVAL(*error_msg);
+					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -3347,7 +3347,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_(phql_parser, PHQL_FALSE, NULL, parser_status);
 				} else {
-					MAKE_STD_ZVAL(*error_msg);
+					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -3501,7 +3501,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				error = emalloc(error_length);
 				snprintf(error, error_length, "Scanner: Unknown opcode %c", token.opcode);
 				error[error_length - 1] = '\0';
-				MAKE_STD_ZVAL(*error_msg);
+				PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 				ZVAL_STRING(*error_msg, error, 1);
 				efree(error);
 				break;
@@ -3521,7 +3521,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 			case PHQL_SCANNER_RETCODE_IMPOSSIBLE:
 				if (!*error_msg) {
 					if (!*error_msg) {
-						phql_scanner_error_msg(parser_status, error_msg TSRMLS_CC);
+						phql_scanner_error_msg(parser_status, error_msg);
 					}
 				}
 				status = FAILURE;
@@ -3538,7 +3538,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 		status = FAILURE;
 		if (parser_status->syntax_error) {
 			if (!*error_msg) {
-				MAKE_STD_ZVAL(*error_msg);
+				PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
 				ZVAL_STRING(*error_msg, parser_status->syntax_error, 1);
 			}
 			efree(parser_status->syntax_error);
@@ -3567,7 +3567,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				/**
 				 * Store the parsed definition in the cache
 				 */
-				phalcon_orm_set_prepared_ast(unique_id, *result TSRMLS_CC);
+				phalcon_orm_set_prepared_ast(unique_id, *result);
 
 			} else {
 				efree(parser_status->ret);

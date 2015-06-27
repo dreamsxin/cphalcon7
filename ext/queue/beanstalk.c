@@ -121,8 +121,8 @@ PHALCON_INIT_CLASS(Phalcon_Queue_Beanstalk){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Queue, Beanstalk, queue_beanstalk, phalcon_queue_beanstalk_method_entry, 0);
 
-	zend_declare_property_null(phalcon_queue_beanstalk_ce, SL("_connection"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_queue_beanstalk_ce, SL("_parameters"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_queue_beanstalk_ce, SL("_connection"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_queue_beanstalk_ce, SL("_parameters"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 		convert_to_long(tmp);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_parameters"), parameters TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_parameters"), parameters);
 	PHALCON_MM_RESTORE();
 }
 
@@ -221,9 +221,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 		tv.tv_usec = 0;
 		php_stream_set_option(stream, PHP_STREAM_OPTION_READ_TIMEOUT, 0, &tv);
 
-		MAKE_STD_ZVAL(connection);
+		PHALCON_ALLOC_GHOST_ZVAL(connection);
 		php_stream_to_zval(stream, connection);
-		phalcon_update_property_this(this_ptr, SL("_connection"), connection TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_connection"), connection);
 		RETVAL_ZVAL(connection, 1, 1);
 	}
 }
@@ -271,7 +271,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	 * Data is automatically serialized before be sent to the server
 	 */
 	PHALCON_INIT_VAR(serialized);
-	phalcon_serialize(serialized, &data TSRMLS_CC);
+	phalcon_serialize(serialized, &data);
 
 	if (Z_TYPE_P(serialized) == IS_STRING) {
 		PHALCON_INIT_VAR(serialized_length);
@@ -357,7 +357,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, reserve){
 		PHALCON_CALL_METHOD(&serialized_body, this_ptr, "read", length);
 
 		PHALCON_INIT_VAR(body);
-		phalcon_unserialize(body, serialized_body TSRMLS_CC);
+		phalcon_unserialize(body, serialized_body);
 
 		/** 
 		 * Create a beanstalk job abstraction
@@ -489,7 +489,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, statsTube){
 	RETURN_MM_FALSE;
 }
 
-static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_ptr, zval *response TSRMLS_DC)
+static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_ptr, zval *response)
 {
 	zval *job_id, *length, *serialized = NULL, *body;
 
@@ -503,8 +503,8 @@ static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_p
 
 	PHALCON_CALL_METHODW(&serialized, this_ptr, "read", length);
 
-	MAKE_STD_ZVAL(body);
-	phalcon_unserialize(body, serialized TSRMLS_CC);
+	PHALCON_ALLOC_GHOST_ZVAL(body);
+	phalcon_unserialize(body, serialized);
 	phalcon_ptr_dtor(serialized);
 	if (Z_REFCOUNT_P(body) >= 1) {
 		Z_DELREF_P(body);
@@ -533,7 +533,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekReady){
 	PHALCON_OBS_VAR(status);
 	phalcon_array_fetch_long(&status, response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(status, "FOUND")) {
-		phalcon_queue_beanstalk_peek_common(return_value, getThis(), response TSRMLS_CC);
+		phalcon_queue_beanstalk_peek_common(return_value, getThis(), response);
 		RETURN_MM();
 	}
 
@@ -559,7 +559,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekDelayed){
 	PHALCON_OBS_VAR(status);
 	phalcon_array_fetch_long(&status, response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(status, "FOUND")) {
-		phalcon_queue_beanstalk_peek_common(return_value, getThis(), response TSRMLS_CC);
+		phalcon_queue_beanstalk_peek_common(return_value, getThis(), response);
 		RETURN_MM();
 	}
 
@@ -585,7 +585,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekBuried){
 	PHALCON_OBS_VAR(status);
 	phalcon_array_fetch_long(&status, response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(status, "FOUND")) {
-		phalcon_queue_beanstalk_peek_common(return_value, getThis(), response TSRMLS_CC);
+		phalcon_queue_beanstalk_peek_common(return_value, getThis(), response);
 		RETURN_MM();
 	}
 
@@ -821,7 +821,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 	zval *params, *host, *port;
 	int fail;
 
-	zend_update_property_null(phalcon_queue_beanstalk_ce, getThis(), SL("_connection") TSRMLS_CC);
+	zend_update_property_null(phalcon_queue_beanstalk_ce, getThis(), SL("_connection"));
 
 	params = phalcon_fetch_nproperty_this(this_ptr, SL("_parameters"), PH_NOISY);
 	if (

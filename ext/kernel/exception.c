@@ -59,8 +59,8 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 		PHALCON_CALL_METHOD(&curline, object, "getline", NULL);
 		if (PHALCON_IS_LONG(curline, 0)) {
 			default_exception_ce = zend_exception_get_default();
-			zend_update_property_string(default_exception_ce, object, "file", sizeof("file")-1, file TSRMLS_CC);
-			zend_update_property_long(default_exception_ce, object, "line", sizeof("line")-1, line TSRMLS_CC);
+			zend_update_property_string(default_exception_ce, object, "file", sizeof("file")-1, file);
+			zend_update_property_long(default_exception_ce, object, "line", sizeof("line")-1, line);
 		}
 	}
 
@@ -94,8 +94,8 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
 
 	if (line > 0) {
 		default_exception_ce = zend_exception_get_default();
-		zend_update_property_string(default_exception_ce, object, "file", sizeof("file")-1, file TSRMLS_CC);
-		zend_update_property_long(default_exception_ce, object, "line", sizeof("line")-1, line TSRMLS_CC);
+		zend_update_property_string(default_exception_ce, object, "file", sizeof("file")-1, file);
+		zend_update_property_long(default_exception_ce, object, "line", sizeof("line")-1, line);
 	}
 
 	zend_throw_exception_object(object);
@@ -110,7 +110,7 @@ void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message){
 
 	zval *object;
 
-	MAKE_STD_ZVAL(object);
+	PHALCON_ALLOC_GHOST_ZVAL(object);
 	object_init_ex(object, ce);
 
 	PHALCON_CALL_METHODW(NULL, object, "__construct", message);
@@ -132,8 +132,8 @@ void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, con
 
 	if (line > 0) {
 		default_exception_ce = zend_exception_get_default();
-		zend_update_property_string(default_exception_ce, object, "file", sizeof("file")-1, file TSRMLS_CC);
-		zend_update_property_long(default_exception_ce, object, "line", sizeof("line")-1, line TSRMLS_CC);
+		zend_update_property_string(default_exception_ce, object, "file", sizeof("file")-1, file);
+		zend_update_property_long(default_exception_ce, object, "line", sizeof("line")-1, line);
 	}
 
 	zend_throw_exception_object(object);

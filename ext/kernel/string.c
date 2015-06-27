@@ -131,7 +131,7 @@ void phalcon_strtolower_inplace(zval *s) {
 /**
  * Fast call to php join  function
  */
-void phalcon_fast_join(zval *result, zval *glue, zval *pieces TSRMLS_DC){
+void phalcon_fast_join(zval *result, zval *glue, zval *pieces){
 
 	if (Z_TYPE_P(glue) != IS_STRING || Z_TYPE_P(pieces) != IS_ARRAY) {
 		ZVAL_NULL(result);
@@ -139,13 +139,13 @@ void phalcon_fast_join(zval *result, zval *glue, zval *pieces TSRMLS_DC){
 		return;
 	}
 
-	php_implode(glue, pieces, result TSRMLS_CC);
+	php_implode(glue, pieces, result);
 }
 
 /**
  * Appends to a smart_str a printable version of a zval
  */
-void phalcon_append_printable_zval(smart_str *implstr, zval **tmp TSRMLS_DC) {
+void phalcon_append_printable_zval(smart_str *implstr, zval **tmp) {
 
 	zval tmp_val;
 	unsigned int str_len;
@@ -203,7 +203,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval **tmp TSRMLS_DC) {
  * This function is an adaption of the php_implode function
  *
  */
-void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_length, zval *pieces TSRMLS_DC){
+void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_length, zval *pieces){
 
 	zval         **tmp;
 	HashTable      *arr;
@@ -212,7 +212,7 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 	unsigned int   numelems, i = 0;
 
 	if (Z_TYPE_P(pieces) != IS_ARRAY) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for fast_join()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for fast_join()");
 		RETURN_EMPTY_STRING();
 	}
 
@@ -226,7 +226,7 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 	zend_hash_internal_pointer_reset_ex(arr, &pos);
 
 	while (zend_hash_get_current_data_ex(arr, (void **) &tmp, &pos) == SUCCESS) {
-		phalcon_append_printable_zval(&implstr, tmp TSRMLS_CC);
+		phalcon_append_printable_zval(&implstr, tmp);
 		if (++i != numelems) {
 			smart_str_appendl(&implstr, glue, glue_length);
 		}
@@ -788,7 +788,7 @@ static void php_strtr_array(zval *return_value, char *str, int slen, HashTable *
 }
 /* }}} */
 
-void phalcon_strtr(zval *return_value, zval *str, zval *str_from, zval *str_to TSRMLS_DC) {
+void phalcon_strtr(zval *return_value, zval *str, zval *str_from, zval *str_to) {
 
 	if (Z_TYPE_P(str) != IS_STRING|| Z_TYPE_P(str_from) != IS_STRING|| Z_TYPE_P(str_to) != IS_STRING) {
 		zend_error(E_WARNING, "Invalid arguments supplied for strtr()");
@@ -805,7 +805,7 @@ void phalcon_strtr(zval *return_value, zval *str, zval *str_from, zval *str_to T
 			  Z_STRLEN_P(str_to)));
 }
 
-void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs TSRMLS_DC) {
+void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs) {
 
 	if (Z_TYPE_P(str) != IS_STRING|| Z_TYPE_P(replace_pairs) != IS_ARRAY) {
 		zend_error(E_WARNING, "Invalid arguments supplied for strtr()");
@@ -817,7 +817,7 @@ void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs TSRM
 	php_strtr_array(return_value, Z_STRVAL_P(str), Z_STRLEN_P(str), HASH_OF(replace_pairs));
 }
 
-void phalcon_strtr_str(zval *return_value, zval *str, char *str_from, unsigned int str_from_length, char *str_to, unsigned int str_to_length TSRMLS_DC) {
+void phalcon_strtr_str(zval *return_value, zval *str, char *str_from, unsigned int str_from_length, char *str_to, unsigned int str_to_length) {
 
 	if (Z_TYPE_P(str) != IS_STRING) {
 		zend_error(E_WARNING, "Invalid arguments supplied for strtr()");
@@ -839,10 +839,7 @@ void phalcon_strtr_str(zval *return_value, zval *str, char *str_from, unsigned i
  */
 void phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle) {
 
-#if PHP_VERSION_ID >= 50600
-	const
-#endif
-	char *found = NULL;
+	const char *found = NULL;
 
 	if (unlikely(Z_TYPE_P(haystack) != IS_STRING || Z_TYPE_P(needle) != IS_STRING)) {
 		ZVAL_NULL(return_value);
@@ -871,10 +868,7 @@ void phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *n
  */
 void phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *needle, unsigned int needle_length) {
 
-#if PHP_VERSION_ID >= 50600
-	const
-#endif
-	char *found = NULL;
+	const char *found = NULL;
 
 	if (unlikely(Z_TYPE_P(haystack) != IS_STRING)) {
 		ZVAL_NULL(return_value);
@@ -897,10 +891,7 @@ void phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *nee
  */
 void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, unsigned int needle_length) {
 
-#if PHP_VERSION_ID >= 50600
-	const
-#endif
-	char *found = NULL;
+	const char *found = NULL;
 	char *needle_dup, *haystack_dup;
 
 	if (unlikely(Z_TYPE_P(haystack) != IS_STRING)) {
@@ -1004,7 +995,7 @@ void phalcon_fast_str_replace(zval *return_value, zval *search, zval *replace, z
 /**
  * Fast call to PHP trim() function
  */
-void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where TSRMLS_DC) {
+void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where) {
 
 	zval copy;
 	int use_copy = 0;
@@ -1021,9 +1012,9 @@ void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where 
 	}
 
 	if (charlist) {
-		php_trim(Z_STRVAL_P(str), Z_STRLEN_P(str), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), return_value, where TSRMLS_CC);
+		php_trim(Z_STRVAL_P(str), Z_STRLEN_P(str), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), return_value, where);
 	} else {
-		php_trim(Z_STRVAL_P(str), Z_STRLEN_P(str), NULL, 0, return_value, where TSRMLS_CC);
+		php_trim(Z_STRVAL_P(str), Z_STRLEN_P(str), NULL, 0, return_value, where);
 	}
 
 	if (use_copy) {
@@ -1252,7 +1243,7 @@ int phalcon_comparestr_str(const zval *str, char *compared, unsigned int compare
 /**
  *
  */
-void phalcon_random_string(zval *return_value, const zval *type, const zval *length TSRMLS_DC) {
+void phalcon_random_string(zval *return_value, const zval *type, const zval *length) {
 
 	long i, rand_type, ch;
 	smart_str random_str = {0};
@@ -1271,7 +1262,7 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 
 	/** Generate seed */
 	if (!BG(mt_rand_is_seeded)) {
-		php_mt_srand(GENERATE_SEED() TSRMLS_CC);
+		php_mt_srand(GENERATE_SEED());
 	}
 
 	for (i = 0; i < Z_LVAL_P(length); i++) {
@@ -1426,7 +1417,7 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned 
 	RETURN_STRINGL(Z_STRVAL_P(str) + from, (int)length, 1);
 }
 
-void phalcon_append_printable_array(smart_str *implstr, zval *value TSRMLS_DC) {
+void phalcon_append_printable_array(smart_str *implstr, zval *value) {
 
 	zval         **tmp;
 	HashTable      *arr;
@@ -1454,9 +1445,9 @@ void phalcon_append_printable_array(smart_str *implstr, zval *value TSRMLS_DC) {
 				}
 			} else {
 				if (Z_TYPE_P(*tmp) == IS_ARRAY) {
-					phalcon_append_printable_array(implstr, *tmp TSRMLS_CC);
+					phalcon_append_printable_array(implstr, *tmp);
 				} else {
-					phalcon_append_printable_zval(implstr, tmp TSRMLS_CC);
+					phalcon_append_printable_zval(implstr, tmp);
 				}
 			}
 
@@ -1474,7 +1465,7 @@ void phalcon_append_printable_array(smart_str *implstr, zval *value TSRMLS_DC) {
 /**
  * Creates a unique key to be used as index in a hash
  */
-void phalcon_unique_key(zval *return_value, zval *prefix, zval *value TSRMLS_DC) {
+void phalcon_unique_key(zval *return_value, zval *prefix, zval *value) {
 
 	smart_str implstr = {0};
 
@@ -1483,9 +1474,9 @@ void phalcon_unique_key(zval *return_value, zval *prefix, zval *value TSRMLS_DC)
 	}
 
 	if (Z_TYPE_P(value) == IS_ARRAY) {
-		phalcon_append_printable_array(&implstr, value TSRMLS_CC);
+		phalcon_append_printable_array(&implstr, value);
 	} else {
-		phalcon_append_printable_zval(&implstr, &value TSRMLS_CC);
+		phalcon_append_printable_zval(&implstr, &value);
 	}
 
 	smart_str_0(&implstr);
@@ -1502,7 +1493,7 @@ void phalcon_unique_key(zval *return_value, zval *prefix, zval *value TSRMLS_DC)
 /**
  * Returns the PHP_EOL (if the passed parameter is TRUE)
  */
-zval *phalcon_eol(int eol TSRMLS_DC) {
+zval *phalcon_eol(int eol) {
 
 	zval *local_eol;
 
@@ -1605,7 +1596,7 @@ void phalcon_md5(zval *return_value, zval *str) {
 	ZVAL_STRINGL(return_value, hexdigest, 32, 1);
 }
 
-void phalcon_crc32(zval *return_value, zval *str TSRMLS_DC) {
+void phalcon_crc32(zval *return_value, zval *str) {
 
 	zval copy;
 	int use_copy = 0;
@@ -1636,7 +1627,7 @@ void phalcon_crc32(zval *return_value, zval *str TSRMLS_DC) {
 	RETVAL_LONG(crc ^ 0xFFFFFFFF);
 }
 
-int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches TSRMLS_DC)
+int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches)
 {
 	zval *params[] = { regex, subject, matches };
 	int result;
@@ -1654,13 +1645,13 @@ int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *mat
 	return result;
 }
 
-int phalcon_json_encode(zval *return_value, zval *v, int opts TSRMLS_DC)
+int phalcon_json_encode(zval *return_value, zval *v, int opts)
 {
 	zval *zopts;
 	zval *params[2];
 	int result;
 
-	MAKE_STD_ZVAL(zopts);
+	PHALCON_ALLOC_GHOST_ZVAL(zopts);
 	ZVAL_LONG(zopts, opts);
 
 	params[0] = v;
@@ -1671,7 +1662,7 @@ int phalcon_json_encode(zval *return_value, zval *v, int opts TSRMLS_DC)
 	return result;
 }
 
-int phalcon_json_decode(zval *return_value, zval *v, zend_bool assoc TSRMLS_DC)
+int phalcon_json_decode(zval *return_value, zval *v, zend_bool assoc)
 {
 	zval *zassoc = assoc ? PHALCON_GLOBAL(z_true) : PHALCON_GLOBAL(z_false);
 	zval *params[] = { v, zassoc };
@@ -1733,13 +1724,13 @@ void phalcon_ucfirst(zval *return_value, zval *s)
 	}
 }
 
-int phalcon_http_build_query(zval *return_value, zval *params, char *sep TSRMLS_DC)
+int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 {
 	if (Z_TYPE_P(params) == IS_ARRAY || Z_TYPE_P(params) == IS_OBJECT) {
 		smart_str formstr = { NULL, 0, 0 };
 		int res;
 
-		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738 TSRMLS_CC);
+		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
 
 		if (res == SUCCESS) {
 			if (!formstr.c) {
@@ -1763,16 +1754,12 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep TSRMLS_
 	return FAILURE;
 }
 
-void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, zval *charset TSRMLS_DC)
+void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, zval *charset)
 {
 	zval copy;
 	char *escaped, *cs;
 	int qs, use_copy = 0;
-#if PHP_VERSION_ID < 50400
-	int escaped_len;
-#else
 	size_t escaped_len;
-#endif
 
 	if (unlikely(Z_TYPE_P(string) != IS_STRING)) {
 		zend_make_printable_zval(string, &copy, &use_copy);
@@ -1784,7 +1771,7 @@ void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, z
 	cs = (charset && Z_TYPE_P(charset) == IS_STRING) ? Z_STRVAL_P(charset) : NULL;
 	qs = (quoting && Z_TYPE_P(quoting) == IS_LONG)   ? Z_LVAL_P(quoting)   : ENT_COMPAT;
 
-	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), &escaped_len, 0, qs, cs, 1 TSRMLS_CC);
+	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), &escaped_len, 0, qs, cs, 1);
 	ZVAL_STRINGL(return_value, escaped, escaped_len, 0);
 
 	if (unlikely(use_copy)) {
@@ -1792,16 +1779,12 @@ void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, z
 	}
 }
 
-void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval *charset TSRMLS_DC)
+void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval *charset)
 {
 	zval copy;
 	char *escaped, *cs;
 	int qs, use_copy = 0;
-#if PHP_VERSION_ID < 50400
-	int escaped_len;
-#else
 	size_t escaped_len;
-#endif
 
 	if (unlikely(Z_TYPE_P(string) != IS_STRING)) {
 		zend_make_printable_zval(string, &copy, &use_copy);
@@ -1813,7 +1796,7 @@ void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval 
 	cs = (charset && Z_TYPE_P(charset) == IS_STRING) ? Z_STRVAL_P(charset) : NULL;
 	qs = (quoting && Z_TYPE_P(quoting) == IS_LONG)   ? Z_LVAL_P(quoting)   : ENT_COMPAT;
 
-	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), &escaped_len, 1, qs, cs, 1 TSRMLS_CC);
+	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), &escaped_len, 1, qs, cs, 1);
 	ZVAL_STRINGL(return_value, escaped, escaped_len, 0);
 
 	if (unlikely(use_copy)) {
@@ -1836,7 +1819,7 @@ void phalcon_strval(zval *return_value, zval *v)
 	}
 }
 
-void phalcon_date(zval *return_value, zval *format, zval *timestamp TSRMLS_DC)
+void phalcon_date(zval *return_value, zval *format, zval *timestamp)
 {
 	long int ts;
 	zval copy;
@@ -1852,7 +1835,7 @@ void phalcon_date(zval *return_value, zval *format, zval *timestamp TSRMLS_DC)
 
 	ts = (timestamp) ? phalcon_get_intval(timestamp) : time(NULL);
 
-	formatted = php_format_date(Z_STRVAL_P(format), Z_STRLEN_P(format), ts, 1 TSRMLS_CC);
+	formatted = php_format_date(Z_STRVAL_P(format), Z_STRLEN_P(format), ts, 1);
 	ZVAL_STRING(return_value, formatted, 0);
 
 	if (unlikely(use_copy)) {
@@ -1860,7 +1843,7 @@ void phalcon_date(zval *return_value, zval *format, zval *timestamp TSRMLS_DC)
 	}
 }
 
-void phalcon_addslashes(zval *return_value, zval *str TSRMLS_DC)
+void phalcon_addslashes(zval *return_value, zval *str)
 {
 	zval copy;
 	int use_copy = 0;
@@ -1872,7 +1855,7 @@ void phalcon_addslashes(zval *return_value, zval *str TSRMLS_DC)
 		}
 	}
 
-	ZVAL_STRING(return_value, php_addslashes(Z_STRVAL_P(str), Z_STRLEN_P(str), &Z_STRLEN_P(return_value), 0 TSRMLS_CC), 0);
+	ZVAL_STRING(return_value, php_addslashes(Z_STRVAL_P(str), Z_STRLEN_P(str), &Z_STRLEN_P(return_value), 0), 0);
 
 	if (unlikely(use_copy)) {
 		phalcon_dtor(&copy);
@@ -1915,7 +1898,7 @@ void phalcon_add_trailing_slash(zval** v)
 	}
 }
 
-void phalcon_stripslashes(zval *return_value, zval *str TSRMLS_DC)
+void phalcon_stripslashes(zval *return_value, zval *str)
 {
 	zval copy;
 	int use_copy = 0;
@@ -1928,14 +1911,14 @@ void phalcon_stripslashes(zval *return_value, zval *str TSRMLS_DC)
 	}
 
 	ZVAL_STRINGL(return_value, Z_STRVAL_P(str), Z_STRLEN_P(str), 1);
-	php_stripslashes(Z_STRVAL_P(return_value), &Z_STRLEN_P(return_value) TSRMLS_CC);
+	php_stripslashes(Z_STRVAL_P(return_value), &Z_STRLEN_P(return_value));
 
 	if (unlikely(use_copy)) {
 		phalcon_dtor(&copy);
 	}
 }
 
-void phalcon_stripcslashes(zval *return_value, zval *str TSRMLS_DC)
+void phalcon_stripcslashes(zval *return_value, zval *str)
 {
 
 	zval copy;
@@ -1955,12 +1938,3 @@ void phalcon_stripcslashes(zval *return_value, zval *str TSRMLS_DC)
 		phalcon_dtor(&copy);
 	}
 }
-
-#if PHP_VERSION_ID < 50400
-
-const char* zend_new_interned_string(const char *arKey, int nKeyLength, int free_src TSRMLS_DC)
-{
-	return arKey;
-}
-
-#endif

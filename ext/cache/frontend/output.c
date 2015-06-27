@@ -106,10 +106,10 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Frontend_Output){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Cache\\Frontend, Output, cache_frontend_output, phalcon_cache_frontend_output_method_entry, 0);
 
-	zend_declare_property_bool(phalcon_cache_frontend_output_ce, SL("_buffering"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cache_frontend_output_ce, SL("_frontendOptions"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_bool(phalcon_cache_frontend_output_ce, SL("_buffering"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_frontend_output_ce, SL("_frontendOptions"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_cache_frontend_output_ce TSRMLS_CC, 1, phalcon_cache_frontendinterface_ce);
+	zend_class_implements(phalcon_cache_frontend_output_ce, 1, phalcon_cache_frontendinterface_ce);
 
 	return SUCCESS;
 }
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, __construct){
 	phalcon_fetch_params(0, 0, 1, &frontend_options);
 	
 	if (frontend_options) {
-		phalcon_update_property_this(this_ptr, SL("_frontendOptions"), frontend_options TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_frontendOptions"), frontend_options);
 	}
 }
 
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, isBuffering){
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Output, start){
 
-	phalcon_update_property_bool(this_ptr, SL("_buffering"), 1 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_buffering"), 1);
 	phalcon_ob_start(TSRMLS_C);
 }
 
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, getContent){
 
 	buffering = phalcon_fetch_nproperty_this(this_ptr, SL("_buffering"), PH_NOISY);
 	if (zend_is_true(buffering)) {
-		phalcon_ob_get_contents(return_value TSRMLS_CC);
+		phalcon_ob_get_contents(return_value);
 	}
 }
 
@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, stop){
 		phalcon_ob_end_clean(TSRMLS_C);
 	}
 	
-	phalcon_update_property_bool(this_ptr, SL("_buffering"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_buffering"), 0);
 }
 
 /**

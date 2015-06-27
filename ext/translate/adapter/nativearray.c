@@ -58,12 +58,12 @@ static zval* phalcon_translate_adapter_nativearray_read_dimension(zval *object, 
 	return offset;
 }
 
-static int phalcon_translate_adapter_nativearray_has_dimension(zval *object, zval *offset, int check_empty TSRMLS_DC)
+static int phalcon_translate_adapter_nativearray_has_dimension(zval *object, zval *offset, int check_empty)
 {
 	zval *translate, *translation;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty TSRMLS_CC);
+		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty);
 	}
 
 	translate = phalcon_fetch_nproperty_this(object, SL("_translate"), PH_NOISY);
@@ -96,9 +96,9 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_NativeArray){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Translate\\Adapter, NativeArray, translate_adapter_nativearray, phalcon_translate_adapter_ce, phalcon_translate_adapter_nativearray_method_entry, 0);
 
-	zend_declare_property_null(phalcon_translate_adapter_nativearray_ce, SL("_translate"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_translate_adapter_nativearray_ce, SL("_translate"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_translate_adapter_nativearray_ce TSRMLS_CC, 1, phalcon_translate_adapterinterface_ce);
+	zend_class_implements(phalcon_translate_adapter_nativearray_ce, 1, phalcon_translate_adapterinterface_ce);
 
 	phalcon_translate_adapter_nativearray_object_handlers                = phalcon_translate_adapter_object_handlers;
 	phalcon_translate_adapter_nativearray_object_handlers.read_dimension = phalcon_translate_adapter_nativearray_read_dimension;
@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_translate"), data TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_translate"), data);
 
 	Z_OBJ_HT_P(getThis()) = &phalcon_translate_adapter_nativearray_object_handlers;
 }
@@ -203,5 +203,5 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, exists){
 	zval **index;
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	RETURN_BOOL(phalcon_translate_adapter_nativearray_has_dimension(getThis(), *index, 0 TSRMLS_CC));
+	RETURN_BOOL(phalcon_translate_adapter_nativearray_has_dimension(getThis(), *index, 0));
 }

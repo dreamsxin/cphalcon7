@@ -127,24 +127,24 @@ PHALCON_INIT_CLASS(Phalcon_Crypt){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Crypt, crypt, phalcon_crypt_method_entry, 0);
 
-	zend_declare_property_null(phalcon_crypt_ce, SL("_key"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_crypt_ce, SL("_mode"), "cbc", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_crypt_ce, SL("_cipher"), "rijndael-256", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_crypt_ce, SL("_padding"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);	
-	zend_declare_property_null(phalcon_crypt_ce, SL("_beforeEncrypt"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_crypt_ce, SL("_afterEncrypt"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_crypt_ce, SL("_beforeDecrypt"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_crypt_ce, SL("_afterDecrypt"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_crypt_ce, SL("_key"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_crypt_ce, SL("_mode"), "cbc", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_crypt_ce, SL("_cipher"), "rijndael-256", ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_crypt_ce, SL("_padding"), 0, ZEND_ACC_PROTECTED);	
+	zend_declare_property_null(phalcon_crypt_ce, SL("_beforeEncrypt"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_crypt_ce, SL("_afterEncrypt"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_crypt_ce, SL("_beforeDecrypt"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_crypt_ce, SL("_afterDecrypt"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_crypt_ce TSRMLS_CC, 1, phalcon_cryptinterface_ce);
+	zend_class_implements(phalcon_crypt_ce, 1, phalcon_cryptinterface_ce);
 
-	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_DEFAULT"),        PHALCON_CRYPT_PADDING_DEFAULT        TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ANSI_X_923"),     PHALCON_CRYPT_PADDING_ANSI_X_923     TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_PKCS7"),          PHALCON_CRYPT_PADDING_PKCS7          TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ISO_10126"),      PHALCON_CRYPT_PADDING_ISO_10126      TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ISO_IEC_7816_4"), PHALCON_CRYPT_PADDING_ISO_IEC_7816_4 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ZERO"),           PHALCON_CRYPT_PADDING_ZERO           TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_SPACE"),          PHALCON_CRYPT_PADDING_SPACE          TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_DEFAULT"),        PHALCON_CRYPT_PADDING_DEFAULT       );
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ANSI_X_923"),     PHALCON_CRYPT_PADDING_ANSI_X_923    );
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_PKCS7"),          PHALCON_CRYPT_PADDING_PKCS7         );
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ISO_10126"),      PHALCON_CRYPT_PADDING_ISO_10126     );
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ISO_IEC_7816_4"), PHALCON_CRYPT_PADDING_ISO_IEC_7816_4);
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ZERO"),           PHALCON_CRYPT_PADDING_ZERO          );
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_SPACE"),          PHALCON_CRYPT_PADDING_SPACE         );
 
 	return SUCCESS;
 }
@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Crypt, setCipher){
 
 	phalcon_fetch_params(0, 0, 1, 0, &cipher);
 
-	phalcon_update_property_this(this_ptr, SL("_cipher"), cipher TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_cipher"), cipher);
 	RETURN_THISW();
 }
 
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Crypt, setMode){
 	phalcon_fetch_params(0, 1, 0, &mode);
 	PHALCON_ENSURE_IS_STRING(mode);
 
-	phalcon_update_property_this(this_ptr, SL("_mode"), *mode TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_mode"), *mode);
 	RETURN_THISW();
 }
 
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Crypt, setKey){
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	phalcon_update_property_this(this_ptr, SL("_key"), *key TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_key"), *key);
 	RETURN_THISW();
 }
 
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Crypt, setPadding) {
 	phalcon_fetch_params(0, 1, 0, &scheme);
 	PHALCON_ENSURE_IS_LONG(scheme);
 
-	phalcon_update_property_this(this_ptr, SL("_padding"), *scheme TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_padding"), *scheme);
 	RETURN_THISW();
 }
 
@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Crypt, getPadding) {
  * @param padding_type Padding scheme
  * @see http://www.di-mgt.com.au/cryptopad.html
  */
-static void phalcon_crypt_pad_text(zval *return_value, zval *text, zval *mode, uint block_size, int padding_type TSRMLS_DC)
+static void phalcon_crypt_pad_text(zval *return_value, zval *text, zval *mode, uint block_size, int padding_type)
 {
 	uint padding_size, i;
 	char padding[256];
@@ -331,7 +331,7 @@ static void phalcon_crypt_pad_text(zval *return_value, zval *text, zval *mode, u
 	}
 	else {
 		assert(padding_size <= block_size);
-		phalcon_concat_vs(&return_value, text, padding, padding_size, 0 TSRMLS_CC);
+		phalcon_concat_vs(&return_value, text, padding, padding_size, 0);
 	}
 }
 
@@ -344,7 +344,7 @@ static void phalcon_crypt_pad_text(zval *return_value, zval *text, zval *mode, u
  * @param padding_type Padding scheme
  * @note If the function detects that the text was not padded, it will return it unmodified
  */
-static void phalcon_crypt_unpad_text(zval *return_value, zval *text, zval *mode, uint block_size, int padding_type TSRMLS_DC)
+static void phalcon_crypt_unpad_text(zval *return_value, zval *text, zval *mode, uint block_size, int padding_type)
 {
 	uint padding_size;
 	char padding[256];
@@ -491,7 +491,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		text = source;
 	}
 
-	if (phalcon_function_exists_ex(SS("mcrypt_get_iv_size") TSRMLS_CC) == FAILURE) {
+	if (phalcon_function_exists_ex(SS("mcrypt_get_iv_size")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "mcrypt extension is required");
 		return;
 	}
@@ -544,7 +544,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	assert(Z_TYPE_P(text) == IS_STRING);
 
 	PHALCON_INIT_VAR(padded);
-	phalcon_crypt_pad_text(padded, text, mode, Z_LVAL_P(block_size), Z_LVAL_P(padding_type) TSRMLS_CC);
+	phalcon_crypt_pad_text(padded, text, mode, Z_LVAL_P(block_size), Z_LVAL_P(padding_type));
 	assert(Z_TYPE_P(padded) == IS_STRING);
 
 	PHALCON_CALL_FUNCTION(&encrypt, "mcrypt_encrypt", cipher, encrypt_key, padded, mode, iv);
@@ -590,7 +590,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 	phalcon_fetch_params(0, 1, 1, 1, &text, &key);
 
-	if (phalcon_function_exists_ex(SS("mcrypt_get_iv_size") TSRMLS_CC) == FAILURE) {
+	if (phalcon_function_exists_ex(SS("mcrypt_get_iv_size")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "mcrypt extension is required");
 		return;
 	}
@@ -667,7 +667,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	assert(Z_TYPE_P(mode) == IS_STRING);
 	assert(Z_TYPE_P(decrypted) == IS_STRING);
 
-	phalcon_crypt_unpad_text(return_value, decrypted, mode, Z_LVAL_P(block_size), Z_LVAL_P(padding_type) TSRMLS_CC);
+	phalcon_crypt_unpad_text(return_value, decrypted, mode, Z_LVAL_P(block_size), Z_LVAL_P(padding_type));
 
 	PHALCON_OBS_NVAR(handler);
 	phalcon_read_property_this(&handler, this_ptr, SL("_afterDecrypt"), PH_NOISY);
@@ -798,7 +798,7 @@ PHP_METHOD(Phalcon_Crypt, beforeEncrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_beforeEncrypt"), handler TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_beforeEncrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -820,7 +820,7 @@ PHP_METHOD(Phalcon_Crypt, afterEncrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_afterEncrypt"), handler TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_afterEncrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -842,7 +842,7 @@ PHP_METHOD(Phalcon_Crypt, beforeDecrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_beforeDecrypt"), handler TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_beforeDecrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -864,6 +864,6 @@ PHP_METHOD(Phalcon_Crypt, afterDecrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_afterDecrypt"), handler TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_afterDecrypt"), handler);
 	RETURN_THIS();
 }

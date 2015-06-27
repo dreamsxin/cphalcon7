@@ -31,7 +31,7 @@
 /**
  * Initialize globals on each request or each thread started
  */
-void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals TSRMLS_DC) {
+void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 
 	HashTable *constants = EG(zend_constants);
 
@@ -95,7 +95,7 @@ zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_
 /**
  * Gets the global zval into PG macro
  */
-zval* phalcon_get_global(const char *global, unsigned int global_length TSRMLS_DC) {
+zval* phalcon_get_global(const char *global, unsigned int global_length) {
 
 	zend_bool jit_initialization = PG(auto_globals_jit);
 	if (jit_initialization) {
@@ -117,7 +117,7 @@ zval* phalcon_get_global(const char *global, unsigned int global_length TSRMLS_D
 /**
  * Makes fast count on implicit array types
  */
-long int phalcon_fast_count_int(zval *value TSRMLS_DC) {
+long int phalcon_fast_count_int(zval *value) {
 
 	if (Z_TYPE_P(value) == IS_ARRAY) {
 		return zend_hash_num_elements(Z_ARRVAL_P(value));
@@ -126,7 +126,7 @@ long int phalcon_fast_count_int(zval *value TSRMLS_DC) {
 	if (Z_TYPE_P(value) == IS_OBJECT) {
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			long int result;
-			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &result TSRMLS_CC)) {
+			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &result)) {
 				return result;
 			}
 		}
@@ -158,7 +158,7 @@ long int phalcon_fast_count_int(zval *value TSRMLS_DC) {
 /**
  * Makes fast count on implicit array types
  */
-void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
+void phalcon_fast_count(zval *result, zval *value) {
 
 	if (Z_TYPE_P(value) == IS_ARRAY) {
 		ZVAL_LONG(result, zend_hash_num_elements(Z_ARRVAL_P(value)));
@@ -170,7 +170,7 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			ZVAL_LONG(result, 1);
-			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &Z_LVAL_P(result) TSRMLS_CC)) {
+			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &Z_LVAL_P(result))) {
 				return;
 			}
 		}
@@ -200,7 +200,7 @@ void phalcon_fast_count(zval *result, zval *value TSRMLS_DC) {
 /**
  * Makes fast count on implicit array types without creating a return zval value
  */
-int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
+int phalcon_fast_count_ev(zval *value) {
 
 	long count = 0;
 
@@ -212,7 +212,7 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 		zval retval;
 
 		if (Z_OBJ_HT_P(value)->count_elements) {
-			Z_OBJ_HT(*value)->count_elements(value, &count TSRMLS_CC);
+			Z_OBJ_HT(*value)->count_elements(value, &count);
 			return (int) count > 0;
 		}
 
@@ -240,7 +240,7 @@ int phalcon_fast_count_ev(zval *value TSRMLS_DC) {
 /**
  * Check if a function exists using explicit char param (using precomputed hash key)
  */
-int phalcon_function_exists_ex(const char *method_name, unsigned int method_len TSRMLS_DC) {
+int phalcon_function_exists_ex(const char *method_name, unsigned int method_len) {
 
 	return (zend_hash_str_exists(CG(function_table), method_name, method_len)) ? SUCCESS : FAILURE;
 }

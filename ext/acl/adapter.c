@@ -57,14 +57,14 @@ PHALCON_INIT_CLASS(Phalcon_Acl_Adapter){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Acl, Adapter, acl_adapter, phalcon_acl_adapter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_acl_adapter_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_acl_adapter_ce, SL("_defaultAccess"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_acl_adapter_ce, SL("_accessGranted"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_acl_adapter_ce, SL("_activeRole"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_acl_adapter_ce, SL("_activeResource"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_acl_adapter_ce, SL("_activeAccess"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_acl_adapter_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_acl_adapter_ce, SL("_defaultAccess"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_acl_adapter_ce, SL("_accessGranted"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_acl_adapter_ce, SL("_activeRole"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_acl_adapter_ce, SL("_activeResource"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_acl_adapter_ce, SL("_activeAccess"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_acl_adapter_ce TSRMLS_CC, 2, phalcon_events_eventsawareinterface_ce, phalcon_acl_adapterinterface_ce);
+	zend_class_implements(phalcon_acl_adapter_ce, 2, phalcon_events_eventsawareinterface_ce, phalcon_acl_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -80,7 +80,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, setEventsManager){
 
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 	
-	phalcon_update_property_this(this_ptr, SL("_eventsManager"), events_manager TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_eventsManager"), events_manager);
 	
 }
 
@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, setDefaultAction){
 
 	phalcon_fetch_params(0, 1, 0, &default_access);
 	
-	phalcon_update_property_this(this_ptr, SL("_defaultAccess"), default_access TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_defaultAccess"), default_access);
 	
 }
 

@@ -56,7 +56,7 @@ PHALCON_INIT_CLASS(Phalcon_Assets_Filters_Jsmin){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Assets\\Filters, Jsmin, assets_filters_jsmin, phalcon_assets_filters_jsmin_method_entry, 0);
 
-	zend_class_implements(phalcon_assets_filters_jsmin_ce TSRMLS_CC, 1, phalcon_assets_filterinterface_ce);
+	zend_class_implements(phalcon_assets_filters_jsmin_ce, 1, phalcon_assets_filterinterface_ce);
 	return SUCCESS;
 }
 
@@ -72,7 +72,7 @@ PHP_METHOD(Phalcon_Assets_Filters_Jsmin, filter){
 
 	phalcon_fetch_params(0, 1, 0, &content);
 	
-	if (phalcon_jsmin(return_value, content TSRMLS_CC) == FAILURE) {
+	if (phalcon_jsmin(return_value, content) == FAILURE) {
 		return;
 	}
 }

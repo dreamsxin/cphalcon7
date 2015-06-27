@@ -113,9 +113,9 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Oracle){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Db\\Dialect, Oracle, db_dialect_oracle, phalcon_db_dialect_ce, phalcon_db_dialect_oracle_method_entry, 0);
 
-	zend_declare_property_string(phalcon_db_dialect_oracle_ce, SL("_escapeChar"), "", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_db_dialect_oracle_ce, SL("_escapeChar"), "", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_db_dialect_oracle_ce TSRMLS_CC, 1, phalcon_db_dialectinterface_ce);
+	zend_class_implements(phalcon_db_dialect_oracle_ce, 1, phalcon_db_dialectinterface_ce);
 
 	return SUCCESS;
 }
@@ -787,7 +787,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, limit){
 
 	PHALCON_MM_GROW();
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "zz", &sql_query, &number) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "zz", &sql_query, &number) == FAILURE) {
 		RETURN_MM_NULL();
 	}
 
@@ -832,7 +832,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	HashPosition hp0, hp1, hp2, hp3, hp4, hp5;
 	zval **hd;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &definition) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &definition) == FAILURE) {
 		RETURN_NULL();
 	}
 
@@ -938,7 +938,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		}
 
 		PHALCON_INIT_VAR(columns_sql);
-		phalcon_fast_join_str(columns_sql, SL(", "), selected_columns TSRMLS_CC);
+		phalcon_fast_join_str(columns_sql, SL(", "), selected_columns);
 	} else {
 		PHALCON_CPY_WRT(columns_sql, columns);
 	}
@@ -966,7 +966,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		}
 
 		PHALCON_INIT_VAR(tables_sql);
-		phalcon_fast_join_str(tables_sql, SL(", "), selected_tables TSRMLS_CC);
+		phalcon_fast_join_str(tables_sql, SL(", "), selected_tables);
 	} else {
 		PHALCON_CPY_WRT(tables_sql, tables);
 	}
@@ -1023,7 +1023,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 
 				PHALCON_OBS_NVAR(join_conditions_array);
 				phalcon_array_fetch_string(&join_conditions_array, join, SL("conditions"), PH_NOISY);
-				if (phalcon_fast_count_ev(join_conditions_array TSRMLS_CC)) {
+				if (phalcon_fast_count_ev(join_conditions_array)) {
 
 					PHALCON_INIT_NVAR(join_expressions);
 					array_init(join_expressions);
@@ -1041,12 +1041,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 					}
 
 					PHALCON_INIT_NVAR(join_conditions);
-					phalcon_fast_join_str(join_conditions, SL(" AND "), join_expressions TSRMLS_CC);
+					phalcon_fast_join_str(join_conditions, SL(" AND "), join_expressions);
 					PHALCON_SCONCAT_SV(sql_join, " ON ", join_conditions);
 				}
 			}
 
-			phalcon_concat_self(&sql, sql_join TSRMLS_CC);
+			phalcon_concat_self(&sql, sql_join);
 
 			zend_hash_move_forward_ex(ah2, &hp2);
 		}
@@ -1092,11 +1092,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		}
 
 		PHALCON_INIT_VAR(group_sql);
-		phalcon_fast_join_str(group_sql, SL(", "), group_items TSRMLS_CC);
+		phalcon_fast_join_str(group_sql, SL(", "), group_items);
 
 		PHALCON_INIT_VAR(group_clause);
 		PHALCON_CONCAT_SV(group_clause, " GROUP BY ", group_sql);
-		phalcon_concat_self(&sql, group_clause TSRMLS_CC);
+		phalcon_concat_self(&sql, group_clause);
 	}
 
 	/**
@@ -1151,7 +1151,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		}
 
 		PHALCON_INIT_VAR(order_sql);
-		phalcon_fast_join_str(order_sql, SL(", "), order_items TSRMLS_CC);
+		phalcon_fast_join_str(order_sql, SL(", "), order_items);
 		PHALCON_SCONCAT_SV(sql, " ORDER BY ", order_sql);
 	}
 

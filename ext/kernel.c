@@ -64,7 +64,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey){
 	unsigned int nKeyLength;
 	register ulong hash = 5381;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arKey, &nKeyLength) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arKey, &nKeyLength) == FAILURE) {
 		RETURN_NULL();
 	}
 
@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey32){
 	unsigned int nKeyLength;
 	ulong hash;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arKey, &nKeyLength) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arKey, &nKeyLength) == FAILURE) {
 		RETURN_NULL();
 	}
 
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey64){
 	unsigned int nKeyLength;
 	register unsigned long long hash = 5381;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &arKey, &nKeyLength) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arKey, &nKeyLength) == FAILURE) {
 		RETURN_NULL();
 	}
 

@@ -55,7 +55,7 @@ typedef struct _jsmin_parser {
 	unsigned char theY;
 } jsmin_parser;
 
-static void jsmin_error(jsmin_parser *parser, const char* s, int s_length TSRMLS_DC)
+static void jsmin_error(jsmin_parser *parser, const char* s, int s_length)
 {
 	parser->error = s;
 }
@@ -116,7 +116,7 @@ static unsigned char jsmin_get(jsmin_parser *parser) {
 		if a '/' is followed by a '/' or '*'.
 */
 
-static int jsmin_next(jsmin_parser *parser TSRMLS_DC) {
+static int jsmin_next(jsmin_parser *parser) {
 	unsigned char c = jsmin_get(parser);
 	if  (c == '/') {
 		switch (jsmin_peek(parser)) {
@@ -139,7 +139,7 @@ static int jsmin_next(jsmin_parser *parser TSRMLS_DC) {
 						}
 						break;
 					case '\0':
-						jsmin_error(parser, SL("Unterminated comment.") TSRMLS_CC);
+						jsmin_error(parser, SL("Unterminated comment."));
 						return FAILURE;
 				}
 			}
@@ -159,7 +159,7 @@ static int jsmin_next(jsmin_parser *parser TSRMLS_DC) {
    action recognizes a regular expression if it is preceded by ( or , or =.
 */
 
-static int jsmin_action(jsmin_parser *parser, unsigned char d TSRMLS_DC) {
+static int jsmin_action(jsmin_parser *parser, unsigned char d) {
 	switch (d) {
 		case JSMIN_ACTION_OUTPUT_NEXT:
 			smart_str_appendc(parser->minified, parser->theA);
@@ -186,7 +186,7 @@ static int jsmin_action(jsmin_parser *parser, unsigned char d TSRMLS_DC) {
 						parser->theA = jsmin_get(parser);
 					}
 					if (parser->theA == '\0') {
-						jsmin_error(parser, SL("Unterminated string literal.") TSRMLS_CC);
+						jsmin_error(parser, SL("Unterminated string literal."));
 						return FAILURE;
 					}
 				}
@@ -194,7 +194,7 @@ static int jsmin_action(jsmin_parser *parser, unsigned char d TSRMLS_DC) {
 			}
 			/* no break */
 		case JSMIN_ACTION_NEXT:
-			parser->theB = jsmin_next(parser TSRMLS_CC);
+			parser->theB = jsmin_next(parser);
 			if (parser->error != NULL) {
 				return FAILURE;
 			}
@@ -223,7 +223,7 @@ static int jsmin_action(jsmin_parser *parser, unsigned char d TSRMLS_DC) {
 								parser->theA = jsmin_get(parser);
 							}
 							if (parser->theA == '\0') {
-								jsmin_error(parser, SL("Unterminated set in Regular Expression literal.") TSRMLS_CC);
+								jsmin_error(parser, SL("Unterminated set in Regular Expression literal."));
 								return FAILURE;
 							}
 						}
@@ -232,7 +232,7 @@ static int jsmin_action(jsmin_parser *parser, unsigned char d TSRMLS_DC) {
 							switch (jsmin_peek(parser)) {
 								case '/':
 								case '*':
-									jsmin_error(parser, SL("Unterminated set in Regular Expression literal.") TSRMLS_CC);
+									jsmin_error(parser, SL("Unterminated set in Regular Expression literal."));
 									return FAILURE;
 							}
 							break;
@@ -244,12 +244,12 @@ static int jsmin_action(jsmin_parser *parser, unsigned char d TSRMLS_DC) {
 						}
 					}
 					if (parser->theA == '\0') {
-						jsmin_error(parser, SL("Unterminated Regular Expression literal.") TSRMLS_CC);
+						jsmin_error(parser, SL("Unterminated Regular Expression literal."));
 						return FAILURE;
 					}
 					smart_str_appendc(parser->minified, parser->theA);
 				}
-				parser->theB = jsmin_next(parser TSRMLS_CC);
+				parser->theB = jsmin_next(parser);
 				if (parser->error != NULL) {
 					return FAILURE;
 				}
@@ -266,7 +266,7 @@ static int jsmin_action(jsmin_parser *parser, unsigned char d TSRMLS_DC) {
 		Most spaces and linefeeds will be removed.
 */
 
-static int phalcon_jsmin_internal(zval *return_value, zval *script, const char **error TSRMLS_DC) {
+static int phalcon_jsmin_internal(zval *return_value, zval *script, const char **error) {
 
 	jsmin_parser parser;
 	smart_str minified = {0};
@@ -281,7 +281,7 @@ static int phalcon_jsmin_internal(zval *return_value, zval *script, const char *
 	parser.inside_string = 0;
 	parser.minified = &minified;
 
-	if (jsmin_action(&parser, JSMIN_ACTION_NEXT TSRMLS_CC) == FAILURE) {
+	if (jsmin_action(&parser, JSMIN_ACTION_NEXT) == FAILURE) {
 		*error = parser.error;
 		return FAILURE;
 	}
@@ -292,7 +292,7 @@ static int phalcon_jsmin_internal(zval *return_value, zval *script, const char *
 		}
 		switch (parser.theA) {
 			case ' ':
-				if (jsmin_action(&parser, jsmin_isAlphanum(parser.theB) ? JSMIN_ACTION_OUTPUT_NEXT : JSMIN_ACTION_NEXT_DELETE TSRMLS_CC)) {
+				if (jsmin_action(&parser, jsmin_isAlphanum(parser.theB) ? JSMIN_ACTION_OUTPUT_NEXT : JSMIN_ACTION_NEXT_DELETE)) {
 					status = FAILURE;
 					break;
 				}
@@ -306,19 +306,19 @@ static int phalcon_jsmin_internal(zval *return_value, zval *script, const char *
 					case '-':
 					case '!':
 					case '~':
-						if (jsmin_action(&parser, JSMIN_ACTION_OUTPUT_NEXT TSRMLS_CC) == FAILURE) {
+						if (jsmin_action(&parser, JSMIN_ACTION_OUTPUT_NEXT) == FAILURE) {
 							status = FAILURE;
 							break;
 						}
 						break;
 					case ' ':
-						if (jsmin_action(&parser, JSMIN_ACTION_NEXT TSRMLS_CC) == FAILURE) {
+						if (jsmin_action(&parser, JSMIN_ACTION_NEXT) == FAILURE) {
 							status = FAILURE;
 							break;
 						}
 						break;
 					default:
-						if (jsmin_action(&parser, jsmin_isAlphanum(parser.theB) ? JSMIN_ACTION_OUTPUT_NEXT : JSMIN_ACTION_NEXT_DELETE TSRMLS_CC) == FAILURE) {
+						if (jsmin_action(&parser, jsmin_isAlphanum(parser.theB) ? JSMIN_ACTION_OUTPUT_NEXT : JSMIN_ACTION_NEXT_DELETE) == FAILURE) {
 							status = FAILURE;
 							break;
 						}
@@ -327,7 +327,7 @@ static int phalcon_jsmin_internal(zval *return_value, zval *script, const char *
 			default:
 				switch (parser.theB) {
 					case ' ':
-						if (jsmin_action(&parser, jsmin_isAlphanum(parser.theA) ? JSMIN_ACTION_OUTPUT_NEXT : JSMIN_ACTION_NEXT TSRMLS_CC) == FAILURE) {
+						if (jsmin_action(&parser, jsmin_isAlphanum(parser.theA) ? JSMIN_ACTION_OUTPUT_NEXT : JSMIN_ACTION_NEXT) == FAILURE) {
 							status = FAILURE;
 							break;
 						}
@@ -342,20 +342,20 @@ static int phalcon_jsmin_internal(zval *return_value, zval *script, const char *
 							case '"':
 							case '\'':
 							case '`':
-								if (jsmin_action(&parser, JSMIN_ACTION_OUTPUT_NEXT TSRMLS_CC) == FAILURE) {
+								if (jsmin_action(&parser, JSMIN_ACTION_OUTPUT_NEXT) == FAILURE) {
 									status = FAILURE;
 									break;
 								}
 								break;
 							default:
-								if (jsmin_action(&parser, jsmin_isAlphanum(parser.theA) ? JSMIN_ACTION_OUTPUT_NEXT : JSMIN_ACTION_NEXT TSRMLS_CC) == FAILURE) {
+								if (jsmin_action(&parser, jsmin_isAlphanum(parser.theA) ? JSMIN_ACTION_OUTPUT_NEXT : JSMIN_ACTION_NEXT) == FAILURE) {
 									status = FAILURE;
 									break;
 								}
 							}
 							break;
 					default:
-						if (jsmin_action(&parser, JSMIN_ACTION_OUTPUT_NEXT TSRMLS_CC) == FAILURE) {
+						if (jsmin_action(&parser, JSMIN_ACTION_OUTPUT_NEXT) == FAILURE) {
 							status = FAILURE;
 							break;
 						}
@@ -381,7 +381,7 @@ static int phalcon_jsmin_internal(zval *return_value, zval *script, const char *
 	return SUCCESS;
 }
 
-int phalcon_jsmin(zval *return_value, zval *script TSRMLS_DC) {
+int phalcon_jsmin(zval *return_value, zval *script) {
 
 	const char *error = NULL;
 
@@ -392,7 +392,7 @@ int phalcon_jsmin(zval *return_value, zval *script TSRMLS_DC) {
 		return FAILURE;
 	}
 
-	if (phalcon_jsmin_internal(return_value, script, &error TSRMLS_CC) == FAILURE){
+	if (phalcon_jsmin_internal(return_value, script, &error) == FAILURE){
 		if (error) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, error);
 		} else {

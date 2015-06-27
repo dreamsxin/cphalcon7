@@ -93,10 +93,10 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Annotations, Adapter, annotations_adapter, phalcon_annotations_adapter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_annotations_adapter_ce, SL("_reader"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_annotations_adapter_ce, SL("_annotations"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_annotations_adapter_ce, SL("_reader"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_annotations_adapter_ce, SL("_annotations"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_annotations_adapter_ce TSRMLS_CC, 1, phalcon_annotations_adapterinterface_ce);
+	zend_class_implements(phalcon_annotations_adapter_ce, 1, phalcon_annotations_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, setReader){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "Invalid annotations reader");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_reader"), reader TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_reader"), reader);
 	
 }
 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getReader){
 	reader = phalcon_fetch_nproperty_this(this_ptr, SL("_reader"), PH_NOISY);
 	if (Z_TYPE_P(reader) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_annotations_reader_ce);
-		phalcon_update_property_this(this_ptr, SL("_reader"), return_value TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_reader"), return_value);
 		return;
 	}
 	
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 			object_init_ex(class_annotations, phalcon_annotations_reflection_ce);
 			PHALCON_CALL_METHOD(NULL, class_annotations, "__construct", parsed_annotations);
 	
-			phalcon_update_property_array(this_ptr, SL("_annotations"), real_class_name, class_annotations TSRMLS_CC);
+			phalcon_update_property_array(this_ptr, SL("_annotations"), real_class_name, class_annotations);
 			PHALCON_CALL_METHOD(NULL, this_ptr, "write", real_class_name, class_annotations);
 		}
 	}

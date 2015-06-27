@@ -94,7 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Xcache){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, Xcache, cache_backend_xcache, phalcon_cache_backend_ce, phalcon_cache_backend_xcache_method_entry, 0);
 
-	zend_class_implements(phalcon_cache_backend_xcache_ce TSRMLS_CC, 1, phalcon_cache_backendinterface_ce);
+	zend_class_implements(phalcon_cache_backend_xcache_ce, 1, phalcon_cache_backendinterface_ce);
 
 	return SUCCESS;
 }
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, get){
 	
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_SVV(prefixed_key, "_PHCX", prefix, key_name);
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key);
 	
 	PHALCON_CALL_FUNCTION(&cached_content, "xcache_get", prefixed_key);
 	if (Z_TYPE_P(cached_content) == IS_NULL) {
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 		zend_print_zval(cached_content, 0);
 	}
 	
-	phalcon_update_property_bool(this_ptr, SL("_started"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_started"), 0);
 	
 	if (zend_is_true(success)) {
 	
@@ -442,11 +442,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, increment){
 		return;
 	}
 
-	if (phalcon_function_exists_ex(SS("xcache_inc") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("xcache_inc")) == SUCCESS) {
 		PHALCON_RETURN_CALL_FUNCTION("xcache_inc", last_key, *value);
 	} else {
 		PHALCON_CALL_FUNCTION(&origVal, "xcache_get", last_key);
-		add_function(return_value, origVal, *value TSRMLS_CC);
+		add_function(return_value, origVal, *value);
 		PHALCON_CALL_METHOD(NULL, this_ptr, "save", *key_name, return_value);
 	}
 
@@ -490,7 +490,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, decrement){
 		return;
 	}
 
-	if (phalcon_function_exists_ex(SS("xcache_inc") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("xcache_inc")) == SUCCESS) {
 		PHALCON_RETURN_CALL_FUNCTION("xcache_inc", last_key, *value);
 	} else {
 		PHALCON_CALL_FUNCTION(&origVal, "xcache_get", last_key);

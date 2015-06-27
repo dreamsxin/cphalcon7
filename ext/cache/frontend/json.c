@@ -73,7 +73,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Frontend_Json){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Frontend, Json, cache_frontend_json, phalcon_cache_frontend_data_ce, phalcon_cache_frontend_json_method_entry, 0);
 
-	zend_class_implements(phalcon_cache_frontend_json_ce TSRMLS_CC, 1, phalcon_cache_frontendinterface_ce);
+	zend_class_implements(phalcon_cache_frontend_json_ce, 1, phalcon_cache_frontendinterface_ce);
 
 	return SUCCESS;
 }
@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Json, beforeStore){
 	zval *data;
 
 	phalcon_fetch_params(0, 1, 0, &data);
-	RETURN_ON_FAILURE(phalcon_json_encode(return_value, data, 0 TSRMLS_CC));
+	RETURN_ON_FAILURE(phalcon_json_encode(return_value, data, 0));
 }
 
 /**
@@ -103,5 +103,5 @@ PHP_METHOD(Phalcon_Cache_Frontend_Json, afterRetrieve){
 	zval *data;
 
 	phalcon_fetch_params(0, 1, 0, &data);
-	RETURN_ON_FAILURE(phalcon_json_decode(return_value, data, 0 TSRMLS_CC));
+	RETURN_ON_FAILURE(phalcon_json_decode(return_value, data, 0));
 }

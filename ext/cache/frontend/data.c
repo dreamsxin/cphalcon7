@@ -99,9 +99,9 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Frontend_Data){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Cache\\Frontend, Data, cache_frontend_data, phalcon_cache_frontend_data_method_entry, 0);
 
-	zend_declare_property_null(phalcon_cache_frontend_data_ce, SL("_frontendOptions"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_cache_frontend_data_ce, SL("_frontendOptions"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_cache_frontend_data_ce TSRMLS_CC, 1, phalcon_cache_frontendinterface_ce);
+	zend_class_implements(phalcon_cache_frontend_data_ce, 1, phalcon_cache_frontendinterface_ce);
 
 	return SUCCESS;
 }
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, __construct){
 	phalcon_fetch_params(0, 0, 1, &frontend_options);
 	
 	if (frontend_options) {
-		phalcon_update_property_this(this_ptr, SL("_frontendOptions"), frontend_options TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_frontendOptions"), frontend_options);
 	}
 }
 
@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, beforeStore){
 	zval *data;
 
 	phalcon_fetch_params(0, 1, 0, &data);
-	phalcon_serialize(return_value, &data TSRMLS_CC);
+	phalcon_serialize(return_value, &data);
 }
 
 /**
@@ -205,5 +205,5 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, afterRetrieve){
 	zval *data;
 
 	phalcon_fetch_params(0, 1, 0, &data);
-	phalcon_unserialize(return_value, data TSRMLS_CC);
+	phalcon_unserialize(return_value, data);
 }

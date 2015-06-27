@@ -102,10 +102,10 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Memcache){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Session\\Adapter, Memcache, session_adapter_memcache, phalcon_session_adapter_ce, phalcon_session_adapter_memcache_method_entry, 0);
 
-	zend_declare_property_null(phalcon_session_adapter_memcache_ce, SL("_lifetime"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_session_adapter_memcache_ce, SL("_memcache"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_session_adapter_memcache_ce, SL("_lifetime"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_session_adapter_memcache_ce, SL("_memcache"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_session_adapter_memcache_ce TSRMLS_CC, 1, phalcon_session_adapterinterface_ce);
+	zend_class_implements(phalcon_session_adapter_memcache_ce, 1, phalcon_session_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
 
 	if (!phalcon_array_isset_string_fetch(&persistent, options, SS("persistent"))) {
 		PHALCON_INIT_VAR(persistent);
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 
 	PHALCON_CALL_METHOD(NULL, memcache, "__construct", frontend_data, option);
 
-	phalcon_update_property_this(this_ptr, SL("_memcache"), memcache TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_memcache"), memcache);
 
 	/* open callback */
 	PHALCON_INIT_VAR(callable_open);

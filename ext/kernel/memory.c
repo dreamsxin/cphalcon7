@@ -43,7 +43,7 @@
  * Not all methods must grow/restore the phalcon_memory_entry.
  */
 
-void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr TSRMLS_DC)
+void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr)
 {
 	phalcon_memory_entry *start;
 	size_t i;
@@ -195,7 +195,7 @@ static phalcon_memory_entry* phalcon_memory_grow_stack_common(zend_phalcon_globa
 	return g->active_memory;
 }
 
-static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g TSRMLS_DC)
+static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 {
 	size_t i;
 	phalcon_memory_entry *prev, *active_memory;
@@ -232,15 +232,10 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g TSRMLS_D
 		for (i = 0; i < active_memory->pointer; ++i) {
 			if (active_memory->addresses[i] != NULL && *(active_memory->addresses[i]) != NULL) {
 				zval **var = active_memory->addresses[i];
-#if PHP_VERSION_ID < 50400
-				if (Z_TYPE_P(*var) > IS_CONSTANT_ARRAY) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
-				}
-#else
+
 				if (Z_TYPE_P(*var) > IS_CALLABLE) {
 					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
 				}
-#endif
 
 				if (Z_REFCOUNT_P(*var) == 0) {
 					fprintf(stderr, "%s: observed variable #%d (%p) has 0 references, type=%d [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
@@ -248,12 +243,6 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g TSRMLS_D
 				else if (Z_REFCOUNT_P(*var) >= 1000000) {
 					fprintf(stderr, "%s: observed variable #%d (%p) has too many references (%u), type=%d  [%s]\n", __func__, (int)i, *var, Z_REFCOUNT_P(*var), Z_TYPE_P(*var), active_memory->func);
 				}
-#if 0
-				/* Skip this check, PDO does return variables with is_ref = 1 and refcount = 1*/
-				else if (Z_REFCOUNT_P(*var) == 1 && Z_ISREF_P(*var)) {
-					fprintf(stderr, "%s: observed variable #%d (%p) is a reference with reference count = 1, type=%d  [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
-				}
-#endif
 			}
 		}
 #endif
@@ -326,7 +315,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g TSRMLS_D
 
 #ifndef PHALCON_RELEASE
 
-void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory TSRMLS_DC)
+void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory)
 {
 	size_t i;
 
@@ -373,7 +362,7 @@ void phalcon_dump_current_frame(TSRMLS_D)
 		return;
 	}
 
-	phalcon_dump_memory_frame(phalcon_globals_ptr->active_memory TSRMLS_CC);
+	phalcon_dump_memory_frame(phalcon_globals_ptr->active_memory);
 }
 
 void phalcon_dump_all_frames(TSRMLS_D)
@@ -383,7 +372,7 @@ void phalcon_dump_all_frames(TSRMLS_D)
 
 	fprintf(stderr, "*** DUMP START ***\n");
 	while (active_memory != NULL) {
-		phalcon_dump_memory_frame(active_memory TSRMLS_CC);
+		phalcon_dump_memory_frame(active_memory);
 		active_memory = active_memory->prev;
 	}
 
@@ -393,7 +382,7 @@ void phalcon_dump_all_frames(TSRMLS_D)
 /**
  * Finishes the current memory stack by releasing allocated memory
  */
-int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func TSRMLS_DC)
+int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func)
 {
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 
@@ -410,19 +399,19 @@ int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func TSRMLS_DC)
 		phalcon_print_backtrace();
 	}
 
-	phalcon_memory_restore_stack_common(phalcon_globals_ptr TSRMLS_CC);
+	phalcon_memory_restore_stack_common(phalcon_globals_ptr);
 	return SUCCESS;
 }
 
 /**
  * Adds a memory frame in the current executed method
  */
-void ZEND_FASTCALL phalcon_memory_grow_stack(const char *func TSRMLS_DC)
+void ZEND_FASTCALL phalcon_memory_grow_stack(const char *func)
 {
 	phalcon_memory_entry *entry;
 	zend_phalcon_globals *g = PHALCON_VGLOBAL;
 	if (g->start_memory == NULL) {
-		phalcon_initialize_memory(g TSRMLS_CC);
+		phalcon_initialize_memory(g);
 	}
 	entry = phalcon_memory_grow_stack_common(g);
 	entry->func = func;
@@ -437,7 +426,7 @@ void ZEND_FASTCALL ZEND_FASTCALL phalcon_memory_grow_stack(TSRMLS_D)
 {
 	zend_phalcon_globals *g = PHALCON_VGLOBAL;
 	if (g->start_memory == NULL) {
-		phalcon_initialize_memory(g TSRMLS_CC);
+		phalcon_initialize_memory(g);
 	}
 	phalcon_memory_grow_stack_common(g);
 }
@@ -447,7 +436,7 @@ void ZEND_FASTCALL ZEND_FASTCALL phalcon_memory_grow_stack(TSRMLS_D)
  */
 int ZEND_FASTCALL phalcon_memory_restore_stack(TSRMLS_D)
 {
-	phalcon_memory_restore_stack_common(PHALCON_VGLOBAL TSRMLS_CC);
+	phalcon_memory_restore_stack_common(PHALCON_VGLOBAL);
 	return SUCCESS;
 }
 #endif
@@ -551,7 +540,7 @@ static void phalcon_verify_frame(const phalcon_memory_entry *frame, const char *
 /**
  * Observes a memory pointer to release its memory at the end of the request
  */
-void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func TSRMLS_DC)
+void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func)
 {
 	zend_phalcon_globals *g     = PHALCON_VGLOBAL;
 	phalcon_memory_entry *frame = g->active_memory;
@@ -565,7 +554,7 @@ void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func TSRMLS_DC
 /**
  * Observes a variable and allocates memory for it
  */
-void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func TSRMLS_DC)
+void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func)
 {
 	zend_phalcon_globals *g     = PHALCON_VGLOBAL;
 	phalcon_memory_entry *frame = g->active_memory;
@@ -580,7 +569,7 @@ void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func TSRMLS_DC)
  * Observes a variable and allocates memory for it
  * Marks hash key zvals to be nulled before freeing
  */
-void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var, const char *func TSRMLS_DC)
+void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var, const char *func)
 {
 	zend_phalcon_globals *g     = PHALCON_VGLOBAL;
 	phalcon_memory_entry *frame = g->active_memory;
@@ -603,7 +592,7 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var, const char *func TSRML
 /**
  * Observes a memory pointer to release its memory at the end of the request
  */
-void ZEND_FASTCALL phalcon_memory_observe(zval **var TSRMLS_DC)
+void ZEND_FASTCALL phalcon_memory_observe(zval **var)
 {
 	zend_phalcon_globals *g = PHALCON_VGLOBAL;
 	phalcon_do_memory_observe(var, g);
@@ -613,7 +602,7 @@ void ZEND_FASTCALL phalcon_memory_observe(zval **var TSRMLS_DC)
 /**
  * Observes a variable and allocates memory for it
  */
-void ZEND_FASTCALL phalcon_memory_alloc(zval **var TSRMLS_DC)
+void ZEND_FASTCALL phalcon_memory_alloc(zval **var)
 {
 	zend_phalcon_globals *g = PHALCON_VGLOBAL;
 	phalcon_do_memory_observe(var, g);
@@ -624,7 +613,7 @@ void ZEND_FASTCALL phalcon_memory_alloc(zval **var TSRMLS_DC)
  * Observes a variable and allocates memory for it
  * Marks hash key zvals to be nulled before freeing
  */
-void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var TSRMLS_DC)
+void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var)
 {
 	zend_phalcon_globals *g = PHALCON_VGLOBAL;
 	phalcon_memory_entry *active_memory = g->active_memory;
@@ -651,7 +640,7 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var TSRMLS_DC)
 /**
  * Removes a memory pointer from the active memory pool
  */
-void phalcon_memory_remove(zval **var TSRMLS_DC) {
+void phalcon_memory_remove(zval **var) {
 	zval_ptr_dtor(var);
 	*var = NULL;
 }
@@ -664,7 +653,7 @@ int ZEND_FASTCALL phalcon_clean_restore_stack(TSRMLS_D) {
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 
 	while (phalcon_globals_ptr->active_memory != NULL) {
-		phalcon_memory_restore_stack_common(phalcon_globals_ptr TSRMLS_CC);
+		phalcon_memory_restore_stack_common(phalcon_globals_ptr);
 	}
 
 	return SUCCESS;
@@ -728,7 +717,7 @@ void phalcon_clean_symbol_tables(TSRMLS_D) {
 /**
  * Exports symbols to the active symbol table
  */
-int phalcon_set_symbol(zval *key_name, zval *value TSRMLS_DC) {
+int phalcon_set_symbol(zval *key_name, zval *value) {
 
 	if (!EG(active_symbol_table)) {
 		zend_rebuild_symbol_table(TSRMLS_C);
@@ -750,7 +739,7 @@ int phalcon_set_symbol(zval *key_name, zval *value TSRMLS_DC) {
 /**
  * Exports a string symbol to the active symbol table
  */
-int phalcon_set_symbol_str(char *key_name, unsigned int key_length, zval *value TSRMLS_DC) {
+int phalcon_set_symbol_str(char *key_name, unsigned int key_length, zval *value) {
 
 	if (!EG(active_symbol_table)) {
 		zend_rebuild_symbol_table(TSRMLS_C);
@@ -788,7 +777,7 @@ static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)
 		case IS_OBJECT:
 			{
 				TSRMLS_FETCH();
-				Z_OBJ_HT_P(zvalue)->del_ref(zvalue TSRMLS_CC);
+				Z_OBJ_HT_P(zvalue)->del_ref(zvalue);
 			}
 			break;
 		case IS_RESOURCE:

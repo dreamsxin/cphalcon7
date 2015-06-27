@@ -94,11 +94,11 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Dispatcher){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Dispatcher, mvc_dispatcher, phalcon_dispatcher_ce, phalcon_mvc_dispatcher_method_entry, 0);
 
-	zend_declare_property_string(phalcon_mvc_dispatcher_ce, SL("_handlerSuffix"), "Controller", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_dispatcher_ce, SL("_defaultHandler"), "index", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_dispatcher_ce, SL("_defaultAction"), "index", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_mvc_dispatcher_ce, SL("_handlerSuffix"), "Controller", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_dispatcher_ce, SL("_defaultHandler"), "index", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_dispatcher_ce, SL("_defaultAction"), "index", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_dispatcher_ce TSRMLS_CC, 2, phalcon_dispatcherinterface_ce, phalcon_mvc_dispatcherinterface_ce);
+	zend_class_implements(phalcon_mvc_dispatcher_ce, 2, phalcon_dispatcherinterface_ce, phalcon_mvc_dispatcherinterface_ce);
 
 	return SUCCESS;
 }
@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &controller_suffix);
 
-	phalcon_update_property_this(this_ptr, SL("_handlerSuffix"), controller_suffix TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_handlerSuffix"), controller_suffix);
 
 }
 
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setDefaultController){
 
 	phalcon_fetch_params(0, 1, 0, &controller_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultHandler"), controller_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_defaultHandler"), controller_name);
 
 }
 
@@ -146,15 +146,15 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 
 	if (is_exact && zend_is_true(is_exact)) {
 		zval *name;
-		MAKE_STD_ZVAL(name);
+		PHALCON_ALLOC_GHOST_ZVAL(name);
 		PHALCON_CONCAT_SV(name, "\\", controller_name);
-		phalcon_update_property_this(this_ptr, SL("_handlerName"), name TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_handlerName"), name);
 		zval_ptr_dtor(&name);
-		phalcon_update_property_this(this_ptr, SL("_isExactHandler"), PHALCON_GLOBAL(z_true) TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_isExactHandler"), PHALCON_GLOBAL(z_true));
 	}
 	else {
-		phalcon_update_property_this(this_ptr, SL("_handlerName"), controller_name TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("_isExactHandler"), PHALCON_GLOBAL(z_false) TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_handlerName"), controller_name);
+		phalcon_update_property_this(this_ptr, SL("_isExactHandler"), PHALCON_GLOBAL(z_false));
 	}
 }
 

@@ -81,25 +81,25 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Relation){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model, Relation, mvc_model_relation, phalcon_mvc_model_relation_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_referencedModel"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_fields"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_referencedFields"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_intermediateModel"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_intermediateFields"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_intermediateReferencedFields"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_options"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_type"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_referencedModel"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_fields"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_referencedFields"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_intermediateModel"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_intermediateFields"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_intermediateReferencedFields"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_relation_ce, SL("_options"), ZEND_ACC_PROTECTED);
 
-	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("BELONGS_TO"), 0 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("HAS_ONE"), 1 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("HAS_MANY"), 2 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("HAS_ONE_THROUGH"), 3 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("HAS_MANY_THROUGH"), 4 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("NO_ACTION"), 0 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("ACTION_RESTRICT"), 1 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("ACTION_CASCADE"), 2 TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("BELONGS_TO"), 0);
+	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("HAS_ONE"), 1);
+	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("HAS_MANY"), 2);
+	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("HAS_ONE_THROUGH"), 3);
+	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("HAS_MANY_THROUGH"), 4);
+	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("NO_ACTION"), 0);
+	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("ACTION_RESTRICT"), 1);
+	zend_declare_class_constant_long(phalcon_mvc_model_relation_ce, SL("ACTION_CASCADE"), 2);
 
-	zend_class_implements(phalcon_mvc_model_relation_ce TSRMLS_CC, 1, phalcon_mvc_model_relationinterface_ce);
+	zend_class_implements(phalcon_mvc_model_relation_ce, 1, phalcon_mvc_model_relationinterface_ce);
 
 	return SUCCESS;
 }
@@ -124,11 +124,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, __construct){
 		options = PHALCON_GLOBAL(z_null);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_referencedModel"), referenced_model TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_fields"), fields TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_referencedFields"), referenced_fields TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_type"), type);
+	phalcon_update_property_this(this_ptr, SL("_referencedModel"), referenced_model);
+	phalcon_update_property_this(this_ptr, SL("_fields"), fields);
+	phalcon_update_property_this(this_ptr, SL("_referencedFields"), referenced_fields);
+	phalcon_update_property_this(this_ptr, SL("_options"), options);
 }
 
 /**
@@ -145,9 +145,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, setIntermediateRelation){
 
 	phalcon_fetch_params(0, 3, 0, &intermediate_fields, &intermediate_model, &intermediate_referenced_fields);
 	
-	phalcon_update_property_this(this_ptr, SL("_intermediateFields"), intermediate_fields TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_intermediateModel"), intermediate_model TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_intermediateReferencedFields"), intermediate_referenced_fields TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_intermediateFields"), intermediate_fields);
+	phalcon_update_property_this(this_ptr, SL("_intermediateModel"), intermediate_model);
+	phalcon_update_property_this(this_ptr, SL("_intermediateReferencedFields"), intermediate_referenced_fields);
 	
 }
 

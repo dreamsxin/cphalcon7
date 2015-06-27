@@ -125,7 +125,7 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter){
 	phalcon_translate_adapter_object_handlers.has_dimension   = phalcon_translate_adapter_has_dimension;
 	phalcon_translate_adapter_object_handlers.unset_dimension = phalcon_translate_adapter_unset_dimension;
 
-	zend_class_implements(phalcon_translate_adapter_ce TSRMLS_CC, 2, zend_ce_arrayaccess, phalcon_translate_adapterinterface_ce);
+	zend_class_implements(phalcon_translate_adapter_ce, 2, zend_ce_arrayaccess, phalcon_translate_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetExists){
 	int exists;
 
 	phalcon_fetch_params(0, 1, 0, &translate_key);
-	exists = phalcon_translate_adapter_has_dimension(getThis(), *translate_key, 1 TSRMLS_CC);
+	exists = phalcon_translate_adapter_has_dimension(getThis(), *translate_key, 1);
 	RETURN_BOOL(exists);
 }
 
@@ -205,6 +205,6 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetGet){
 	zval **translate_key, *res;
 
 	phalcon_fetch_params(0, 1, 0, &translate_key);
-	res = phalcon_translate_adapter_read_dimension(getThis(), *translate_key, BP_VAR_R TSRMLS_CC);
+	res = phalcon_translate_adapter_read_dimension(getThis(), *translate_key, BP_VAR_R);
 	RETURN_ZVAL(res, 1, 0);
 }

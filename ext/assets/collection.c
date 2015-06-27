@@ -171,19 +171,19 @@ PHALCON_INIT_CLASS(Phalcon_Assets_Collection){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Assets, Collection, assets_collection, phalcon_assets_collection_method_entry, 0);
 
-	zend_declare_property_null(phalcon_assets_collection_ce, SL("_prefix"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_assets_collection_ce, SL("_local"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_assets_collection_ce, SL("_resources"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_assets_collection_ce, SL("_position"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_assets_collection_ce, SL("_filters"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_assets_collection_ce, SL("_attributes"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_assets_collection_ce, SL("_join"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_assets_collection_ce, SL("_targetUri"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_assets_collection_ce, SL("_targetPath"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_assets_collection_ce, SL("_sourcePath"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_assets_collection_ce, SL("_targetLocal"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_assets_collection_ce, SL("_prefix"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_assets_collection_ce, SL("_local"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_collection_ce, SL("_resources"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_collection_ce, SL("_position"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_collection_ce, SL("_filters"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_collection_ce, SL("_attributes"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_assets_collection_ce, SL("_join"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_collection_ce, SL("_targetUri"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_collection_ce, SL("_targetPath"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_collection_ce, SL("_sourcePath"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_assets_collection_ce, SL("_targetLocal"), 1, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_assets_collection_ce TSRMLS_CC, 2, spl_ce_Countable, zend_ce_iterator);
+	zend_class_implements(phalcon_assets_collection_ce, 2, spl_ce_Countable, zend_ce_iterator);
 
 	return SUCCESS;
 }
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Assets_Collection, add){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Resource must be an object");
 		return;
 	}
-	phalcon_update_property_array_append(this_ptr, SL("_resources"), resource TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_resources"), resource);
 	
 	RETURN_THISW();
 }
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addCss){
 	object_init_ex(resource, phalcon_assets_resource_css_ce);
 	PHALCON_CALL_METHOD(NULL, resource, "__construct", path, collection_local, filter, collection_attributes);
 	
-	phalcon_update_property_array_append(this_ptr, SL("_resources"), resource TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_resources"), resource);
 	
 	RETURN_THIS();
 }
@@ -306,7 +306,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
 	object_init_ex(resource, phalcon_assets_resource_js_ce);
 	PHALCON_CALL_METHOD(NULL, resource, "__construct", path, collection_local, filter, collection_attributes);
 	
-	phalcon_update_property_array_append(this_ptr, SL("_resources"), resource TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_resources"), resource);
 	
 	RETURN_THIS();
 }
@@ -342,7 +342,7 @@ PHP_METHOD(Phalcon_Assets_Collection, count){
 
 	PHALCON_OBS_VAR(resources);
 	phalcon_read_property_this(&resources, this_ptr, SL("_resources"), PH_NOISY);
-	phalcon_fast_count(return_value, resources TSRMLS_CC);
+	phalcon_fast_count(return_value, resources);
 	RETURN_MM();
 }
 
@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_Assets_Collection, count){
 PHP_METHOD(Phalcon_Assets_Collection, rewind){
 
 
-	phalcon_update_property_long(this_ptr, SL("_position"), 0 TSRMLS_CC);
+	phalcon_update_property_long(this_ptr, SL("_position"), 0);
 	
 }
 
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Assets_Collection, key){
 PHP_METHOD(Phalcon_Assets_Collection, next){
 
 
-	phalcon_property_incr(this_ptr, SL("_position") TSRMLS_CC);
+	phalcon_property_incr(this_ptr, SL("_position"));
 	
 }
 
@@ -431,7 +431,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setTargetPath){
 
 	phalcon_fetch_params(0, 1, 0, &target_path);
 	
-	phalcon_update_property_this(this_ptr, SL("_targetPath"), target_path TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_targetPath"), target_path);
 	RETURN_THISW();
 }
 
@@ -458,7 +458,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setSourcePath){
 
 	phalcon_fetch_params(0, 1, 0, &source_path);
 	
-	phalcon_update_property_this(this_ptr, SL("_sourcePath"), source_path TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_sourcePath"), source_path);
 	RETURN_THISW();
 }
 
@@ -485,7 +485,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setTargetUri){
 
 	phalcon_fetch_params(0, 1, 0, &target_uri);
 	
-	phalcon_update_property_this(this_ptr, SL("_targetUri"), target_uri TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_targetUri"), target_uri);
 	RETURN_THISW();
 }
 
@@ -512,7 +512,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setPrefix){
 
 	phalcon_fetch_params(0, 1, 0, &prefix);
 	
-	phalcon_update_property_this(this_ptr, SL("_prefix"), prefix TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_prefix"), prefix);
 	RETURN_THISW();
 }
 
@@ -539,7 +539,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setLocal){
 
 	phalcon_fetch_params(0, 1, 0, &local);
 	
-	phalcon_update_property_this(this_ptr, SL("_local"), local TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_local"), local);
 	RETURN_THISW();
 }
 
@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setAttributes){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Attributes must be an array");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_attributes"), attributes TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_attributes"), attributes);
 	
 	RETURN_THISW();
 }
@@ -598,7 +598,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addFilter){
 
 	phalcon_fetch_params(0, 1, 0, &filter);
 	
-	phalcon_update_property_array_append(this_ptr, SL("_filters"), filter TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_filters"), filter);
 	RETURN_THISW();
 }
 
@@ -618,7 +618,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setFilters){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Filters must be an array of filters");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_filters"), filters TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_filters"), filters);
 	
 	RETURN_THISW();
 }
@@ -646,7 +646,7 @@ PHP_METHOD(Phalcon_Assets_Collection, join){
 
 	phalcon_fetch_params(0, 1, 0, &join);
 	
-	phalcon_update_property_this(this_ptr, SL("_join"), join TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_join"), join);
 	RETURN_THISW();
 }
 
@@ -711,7 +711,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setTargetLocal){
 
 	phalcon_fetch_params(0, 1, 0, &target_local);
 	
-	phalcon_update_property_this(this_ptr, SL("_targetLocal"), target_local TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_targetLocal"), target_local);
 	RETURN_THISW();
 }
 

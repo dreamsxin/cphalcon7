@@ -82,10 +82,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Libmemcached){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Libmemcached, mvc_model_metadata_libmemcached, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_libmemcached_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_metadata_libmemcached_ce, SL("_lifetime"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_metadata_libmemcached_ce, SL("_libmemcached"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_metadata_libmemcached_ce, SL("_lifetime"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_metadata_libmemcached_ce, SL("_libmemcached"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_metadata_libmemcached_ce TSRMLS_CC, 1, phalcon_mvc_model_metadatainterface_ce);
+	zend_class_implements(phalcon_mvc_model_metadata_libmemcached_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
 	return SUCCESS;
 }
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
 
 	if (!phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
 		PHALCON_INIT_VAR(prefix);
@@ -158,9 +158,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 
 	PHALCON_CALL_METHOD(NULL, libmemcached, "__construct", frontend_data, option);
 
-	phalcon_update_property_this(this_ptr, SL("_libmemcached"), libmemcached TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_libmemcached"), libmemcached);
 	
-	phalcon_update_property_empty_array(this_ptr, SL("_metaData") TSRMLS_CC);
+	phalcon_update_property_empty_array(this_ptr, SL("_metaData"));
 
 	PHALCON_MM_RESTORE();
 }

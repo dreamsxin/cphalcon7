@@ -69,9 +69,9 @@ PHALCON_INIT_CLASS(Phalcon_Http_Response_Headers){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Http\\Response, Headers, http_response_headers, phalcon_http_response_headers_method_entry, 0);
 
-	zend_declare_property_null(phalcon_http_response_headers_ce, SL("_headers"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_http_response_headers_ce, SL("_headers"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_http_response_headers_ce TSRMLS_CC, 1, phalcon_http_response_headersinterface_ce);
+	zend_class_implements(phalcon_http_response_headers_ce, 1, phalcon_http_response_headersinterface_ce);
 
 	return SUCCESS;
 }
@@ -88,7 +88,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, set){
 
 	phalcon_fetch_params(0, 2, 0, &name, &value);
 	
-	phalcon_update_property_array(this_ptr, SL("_headers"), name, value TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_headers"), name, value);
 	
 }
 
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, setRaw){
 
 	phalcon_fetch_params(0, 1, 0, &header);
 	
-	phalcon_update_property_array(this_ptr, SL("_headers"), header, PHALCON_GLOBAL(z_null) TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_headers"), header, PHALCON_GLOBAL(z_null));
 }
 
 /**
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, remove){
 
 	phalcon_array_unset(&headers, header_index, 0);
 
-	phalcon_update_property_this(this_ptr, SL("_headers"), headers TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_headers"), headers);
 }
 
 /**
@@ -173,28 +173,28 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 			if (PHALCON_IS_NOT_EMPTY(*value)) {
 				zval *http_header;
 				
-				MAKE_STD_ZVAL(http_header);
+				PHALCON_ALLOC_GHOST_ZVAL(http_header);
 				PHALCON_CONCAT_VSV(http_header, &header, ": ", *value);
 				ctr.line     = Z_STRVAL_P(http_header);
 				ctr.line_len = Z_STRLEN_P(http_header);
-				sapi_header_op(SAPI_HEADER_REPLACE, &ctr TSRMLS_CC);
+				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
 				zval_ptr_dtor(&http_header);
 			}
 			else if (Z_TYPE(header) == IS_STRING) {
 				ctr.line     = Z_STRVAL(header);
 				ctr.line_len = Z_STRLEN(header);
-				sapi_header_op(SAPI_HEADER_REPLACE, &ctr TSRMLS_CC);
+				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
 			}
 			else {
 				zval *tmp, *pheader = &header;
 
-				MAKE_STD_ZVAL(tmp);
+				PHALCON_ALLOC_GHOST_ZVAL(tmp);
 				ZVAL_ZVAL(tmp, pheader, 1, 0);
 				convert_to_string(tmp);
 
 				ctr.line     = Z_STRVAL_P(tmp);
 				ctr.line_len = Z_STRLEN_P(tmp);
-				sapi_header_op(SAPI_HEADER_REPLACE, &ctr TSRMLS_CC);
+				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
 
 				zval_ptr_dtor(&tmp);
 			}
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, reset){
 
 	PHALCON_INIT_VAR(empty_array);
 	array_init(empty_array);
-	phalcon_update_property_this(this_ptr, SL("_headers"), empty_array TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_headers"), empty_array);
 	
 	PHALCON_MM_RESTORE();
 }

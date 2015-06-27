@@ -55,7 +55,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Behavior_Timestampable){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Behavior, Timestampable, mvc_model_behavior_timestampable, phalcon_mvc_model_behavior_ce, phalcon_mvc_model_behavior_timestampable_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_behavior_timestampable_ce TSRMLS_CC, 1, phalcon_mvc_model_behaviorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_behavior_timestampable_ce, 1, phalcon_mvc_model_behaviorinterface_ce);
 
 	return SUCCESS;
 }
@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 			PHALCON_OBS_VAR(format);
 			phalcon_array_fetch_string(&format, options, SL("format"), PH_NOISY);
 	
-			phalcon_date(timestamp, format, NULL TSRMLS_CC);
+			phalcon_date(timestamp, format, NULL);
 		} else if (phalcon_array_isset_string(options, SS("generator"))) {
 			/**
 			 * A generator is a closure that produce the correct timestamp value

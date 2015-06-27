@@ -666,12 +666,12 @@ void phalcon_array_get_current(zval *return_value, zval *array) PHALCON_ATTR_NON
 /**
  * Fast in_array() function
  */
-int phalcon_fast_in_array(zval *needle, zval *haystack TSRMLS_DC) PHALCON_ATTR_NONNULL;
+int phalcon_fast_in_array(zval *needle, zval *haystack) PHALCON_ATTR_NONNULL;
 
 /**
  * Fast array merge
  */
-void phalcon_fast_array_merge(zval *return_value, zval **array1, zval **array2 TSRMLS_DC) PHALCON_ATTR_NONNULL;
+void phalcon_fast_array_merge(zval *return_value, zval **array1, zval **array2) PHALCON_ATTR_NONNULL;
 
 /**
  * @brief Merge @a a1 and @a a2 recursively preserving all keys
@@ -687,9 +687,9 @@ void phalcon_array_merge_recursive_n2(zval **a1, zval *a2) PHALCON_ATTR_NONNULL;
 
 /**
  * Port php_splice function from PHP 5.5 because it did`nt work in php 5.6 beta 1
- * Latest param TSRMLS_DC like in php 5.6
+ * Latest param like in php 5.6
  */
-HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval ***list, int list_count, HashTable **removed TSRMLS_DC);
+HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval ***list, int list_count, HashTable **removed);
 
 /**
  * @brief array_unshift($arr, $arg)
@@ -697,14 +697,14 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
  * @param arg
  * @note Reference count of @c arg will be incremented
  */
-void phalcon_array_unshift(zval *arr, zval *arg TSRMLS_DC) PHALCON_ATTR_NONNULL;
+void phalcon_array_unshift(zval *arr, zval *arg) PHALCON_ATTR_NONNULL;
 
 /**
  * @brief <tt>$return_value = array_keys($arr)</tt>
  * @param return_value
  * @param arr
  */
-void phalcon_array_keys(zval *return_value, zval *arr TSRMLS_DC) PHALCON_ATTR_NONNULL;
+void phalcon_array_keys(zval *return_value, zval *arr) PHALCON_ATTR_NONNULL;
 
 /**
  * @brief <tt>$return_value = array_values($arr)</tt>
@@ -719,11 +719,11 @@ void phalcon_array_values(zval *return_value, zval *arr) PHALCON_ATTR_NONNULL;
  * @param key
  * @return Whether @a key exists in @ arr
  */
-int phalcon_array_key_exists(zval *arr, zval *key TSRMLS_DC) PHALCON_ATTR_NONNULL;
+int phalcon_array_key_exists(zval *arr, zval *key) PHALCON_ATTR_NONNULL;
 
 int phalcon_array_is_associative(zval *arr);
 
-void phalcon_array_update_multi_ex(zval **arr, zval *value, const char *types, int types_length, int types_count, va_list ap TSRMLS_DC);
-int phalcon_array_update_multi(zval **arr, zval *value TSRMLS_DC, const char *types, int types_length, int types_count, ...);
+void phalcon_array_update_multi_ex(zval **arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
+int phalcon_array_update_multi(zval **arr, zval *value, const char *types, int types_length, int types_count, ...);
 
 #endif /* PHALCON_KERNEL_ARRAY_H */

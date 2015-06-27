@@ -201,7 +201,7 @@ int phalcon_call_class_method_aparams(zval *retval_ptr, zval *object, zend_class
  * Replaces call_user_func_array avoiding function lookup
  * This function does not return FAILURE if an exception has ocurred
  */
-int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *params TSRMLS_DC){
+int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *params){
 
 	zval retval;
 	zend_fcall_info fci;
@@ -211,11 +211,11 @@ int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *p
 
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
 		ZVAL_NULL(return_value);
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array_noex()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array_noex()");
 		return FAILURE;
 	}
 
-	if (zend_fcall_info_init(handler, 0, &fci, &fci_cache, NULL, &is_callable_error TSRMLS_CC) == SUCCESS) {
+	if (zend_fcall_info_init(handler, 0, &fci, &fci_cache, NULL, &is_callable_error) == SUCCESS) {
 		if (is_callable_error) {
 			zend_error(E_STRICT, "%s", is_callable_error);
 			efree(is_callable_error);
@@ -251,7 +251,7 @@ int phalcon_call_user_func_array_noex(zval *return_value, zval *handler, zval *p
 	return status;
 }
 
-void phalcon_eval_php(zval *str, zval *retval_ptr, char *context TSRMLS_DC)
+void phalcon_eval_php(zval *str, zval *retval_ptr, char *context)
 {
-    zend_eval_string_ex(Z_STRVAL_P(str), retval_ptr, context, 1 TSRMLS_CC);
+    zend_eval_string_ex(Z_STRVAL_P(str), retval_ptr, context, 1);
 }

@@ -74,10 +74,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Status){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model\\Query, Status, mvc_model_query_status, phalcon_mvc_model_query_status_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_query_status_ce, SL("_success"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_query_status_ce, SL("_model"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_query_status_ce, SL("_success"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_status_ce, SL("_model"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_query_status_ce TSRMLS_CC, 1, phalcon_mvc_model_query_statusinterface_ce);
+	zend_class_implements(phalcon_mvc_model_query_status_ce, 1, phalcon_mvc_model_query_statusinterface_ce);
 
 	return SUCCESS;
 }
@@ -94,8 +94,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &success, &model);
 	
-	phalcon_update_property_this(this_ptr, SL("_success"), success TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_model"), model TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_success"), success);
+	phalcon_update_property_this(this_ptr, SL("_model"), model);
 	
 }
 

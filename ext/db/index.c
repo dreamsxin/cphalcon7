@@ -66,11 +66,11 @@ PHALCON_INIT_CLASS(Phalcon_Db_Index){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Db, Index, db_index, phalcon_db_index_method_entry, 0);
 
-	zend_declare_property_null(phalcon_db_index_ce, SL("_indexName"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_index_ce, SL("_columns"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_index_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_db_index_ce, SL("_indexName"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_index_ce, SL("_columns"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_index_ce, SL("_type"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_db_index_ce TSRMLS_CC, 1, phalcon_db_indexinterface_ce);
+	zend_class_implements(phalcon_db_index_ce, 1, phalcon_db_indexinterface_ce);
 
 	return SUCCESS;
 }
@@ -95,9 +95,9 @@ PHP_METHOD(Phalcon_Db_Index, __construct){
 		type = PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_indexName"), index_name TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_columns"), columns TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_indexName"), index_name);
+	phalcon_update_property_this(this_ptr, SL("_columns"), columns);
+	phalcon_update_property_this(this_ptr, SL("_type"), type);
 
 	PHALCON_MM_RESTORE();
 }

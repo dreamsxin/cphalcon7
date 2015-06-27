@@ -52,7 +52,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Php){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\View\\Engine, Php, mvc_view_engine_php, phalcon_mvc_view_engine_ce, phalcon_mvc_view_engine_php_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_view_engine_php_ce TSRMLS_CC, 1, phalcon_mvc_view_engineinterface_ce);
+	zend_class_implements(phalcon_mvc_view_engine_php_ce, 1, phalcon_mvc_view_engineinterface_ce);
 
 	return SUCCESS;
 }
@@ -108,13 +108,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	/** 
 	 * Require the file
 	 */
-	if (phalcon_require(Z_STRVAL_P(*path) TSRMLS_CC) == FAILURE) {
+	if (phalcon_require(Z_STRVAL_P(*path)) == FAILURE) {
 		RETURN_FALSE;
 	}
 
 	if (clean) {
 		PHALCON_ALLOC_GHOST_ZVAL(contents);
-		phalcon_ob_get_contents(contents TSRMLS_CC);
+		phalcon_ob_get_contents(contents);
 	
 		view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHODW(NULL, view, "setcontent", contents);

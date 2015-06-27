@@ -94,7 +94,7 @@ static char cssmin_back_peek(cssmin_parser *parser){
 /* machine
 
 */
-static int phalcon_cssmin_machine(cssmin_parser *parser, unsigned char c TSRMLS_DC){
+static int phalcon_cssmin_machine(cssmin_parser *parser, unsigned char c){
 
 	unsigned char p;
 
@@ -233,7 +233,7 @@ static int phalcon_cssmin_machine(cssmin_parser *parser, unsigned char c TSRMLS_
 	return c;
 }
 
-static int phalcon_cssmin_internal(zval *return_value, zval *style, const char **error TSRMLS_DC) {
+static int phalcon_cssmin_internal(zval *return_value, zval *style, const char **error) {
 
 	int i;
 	unsigned char c;
@@ -250,7 +250,7 @@ static int phalcon_cssmin_internal(zval *return_value, zval *style, const char *
 
 	for (i = 0; i < Z_STRLEN_P(style); i++) {
 		parser.style_pointer = i + 1;
-		c = phalcon_cssmin_machine(&parser, Z_STRVAL_P(style)[i] TSRMLS_CC);
+		c = phalcon_cssmin_machine(&parser, Z_STRVAL_P(style)[i]);
 		if (c != 0) {
 			smart_str_appendc(parser.minified, c);
 		}
@@ -275,7 +275,7 @@ static int phalcon_cssmin_internal(zval *return_value, zval *style, const char *
 	removes last semicolon from last property
 */
 
-int phalcon_cssmin(zval *return_value, zval *style TSRMLS_DC) {
+int phalcon_cssmin(zval *return_value, zval *style) {
 
 	const char *error = NULL;
 
@@ -286,7 +286,7 @@ int phalcon_cssmin(zval *return_value, zval *style TSRMLS_DC) {
 		return FAILURE;
 	}
 
-	if (phalcon_cssmin_internal(return_value, style, &error TSRMLS_CC) == FAILURE) {
+	if (phalcon_cssmin_internal(return_value, style, &error) == FAILURE) {
 		if (error) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, error);
 		} else {

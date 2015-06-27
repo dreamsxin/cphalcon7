@@ -19,11 +19,7 @@ PHALCON_ATTR_NONNULL static inline const char* phalcon_get_class_doc_comment(con
 PHALCON_ATTR_NONNULL static inline const char* phalcon_get_class_filename(const zend_class_entry *ce)
 {
 	if (ce->type == ZEND_USER_CLASS) {
-#if PHP_VERSION_ID >= 50400
 		return ce->info.user.filename;
-#else
-		return ce->filename;
-#endif
 	}
 
 	return NULL;

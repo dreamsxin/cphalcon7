@@ -93,9 +93,9 @@ PHALCON_INIT_CLASS(Phalcon_Db_Profiler){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Db, Profiler, db_profiler, phalcon_db_profiler_method_entry, 0);
 
-	zend_declare_property_null(phalcon_db_profiler_ce, SL("_allProfiles"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_profiler_ce, SL("_activeProfile"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_db_profiler_ce, SL("_totalSeconds"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_db_profiler_ce, SL("_allProfiles"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_profiler_ce, SL("_activeProfile"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_db_profiler_ce, SL("_totalSeconds"), 0, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -132,11 +132,11 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 	PHALCON_CALL_FUNCTION(&time, "microtime", PHALCON_GLOBAL(z_true));
 	PHALCON_CALL_METHOD(NULL, active_profile, "setinitialtime", time);
 
-	if (phalcon_method_exists_ex(this_ptr, SS("beforestartprofile") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(this_ptr, SS("beforestartprofile")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "beforestartprofile", active_profile);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_activeProfile"), active_profile TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_activeProfile"), active_profile);
 	
 	RETURN_THIS();
 }
@@ -167,9 +167,9 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 	
 	PHALCON_INIT_VAR(new_total_seconds);
 	phalcon_add_function(new_total_seconds, total_seconds, difference);
-	phalcon_update_property_this(this_ptr, SL("_totalSeconds"), new_total_seconds TSRMLS_CC);
-	phalcon_update_property_array_append(this_ptr, SL("_allProfiles"), active_profile TSRMLS_CC);
-	if (phalcon_method_exists_ex(this_ptr, SS("afterendprofile") TSRMLS_CC) == SUCCESS) {
+	phalcon_update_property_this(this_ptr, SL("_totalSeconds"), new_total_seconds);
+	phalcon_update_property_array_append(this_ptr, SL("_allProfiles"), active_profile);
+	if (phalcon_method_exists_ex(this_ptr, SS("afterendprofile")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "afterendprofile", active_profile);
 	}
 	
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Db_Profiler, getNumberTotalStatements){
 	zval *all_profiles;
 
 	all_profiles = phalcon_fetch_nproperty_this(this_ptr, SL("_allProfiles"), PH_NOISY);
-	phalcon_fast_count(return_value, all_profiles TSRMLS_CC);
+	phalcon_fast_count(return_value, all_profiles);
 }
 
 /**
@@ -220,9 +220,9 @@ PHP_METHOD(Phalcon_Db_Profiler, reset){
 
 	zval *empty_arr;
 
-	MAKE_STD_ZVAL(empty_arr);
+	PHALCON_ALLOC_GHOST_ZVAL(empty_arr);
 	array_init(empty_arr);
-	phalcon_update_property_this(this_ptr, SL("_allProfiles"), empty_arr TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_allProfiles"), empty_arr);
 	zval_ptr_dtor(&empty_arr);
 	RETURN_THISW();
 }

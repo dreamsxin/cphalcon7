@@ -119,11 +119,11 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Router_Annotations){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Router, Annotations, mvc_router_annotations, phalcon_mvc_router_ce, phalcon_mvc_router_annotations_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_router_annotations_ce, SL("_handlers"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_router_annotations_ce, SL("_processed"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_router_annotations_ce, SL("_controllerSuffix"), "Controller", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_router_annotations_ce, SL("_actionSuffix"), "Action", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_annotations_ce, SL("_routePrefix"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_router_annotations_ce, SL("_handlers"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_router_annotations_ce, SL("_processed"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_router_annotations_ce, SL("_controllerSuffix"), "Controller", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_router_annotations_ce, SL("_actionSuffix"), "Action", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_annotations_ce, SL("_routePrefix"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -157,8 +157,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addResource){
 	array_init_size(scope, 2);
 	phalcon_array_append(&scope, prefix, 0);
 	phalcon_array_append(&scope, handler, 0);
-	phalcon_update_property_array_append(this_ptr, SL("_handlers"), scope TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_processed"), PHALCON_GLOBAL(z_false) TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_handlers"), scope);
+	phalcon_update_property_this(this_ptr, SL("_processed"), PHALCON_GLOBAL(z_false));
 	
 	RETURN_THIS();
 }
@@ -192,15 +192,15 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addModuleResource){
 		return;
 	}
 	
-	MAKE_STD_ZVAL(scope);
+	PHALCON_ALLOC_GHOST_ZVAL(scope);
 	array_init_size(scope, 3);
 	phalcon_array_append(&scope, prefix, 0);
 	phalcon_array_append(&scope, handler, 0);
 	phalcon_array_append(&scope, module, 0);
-	phalcon_update_property_array_append(this_ptr, SL("_handlers"), scope TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_handlers"), scope);
 	zval_ptr_dtor(&scope);
 
-	phalcon_update_property_this(this_ptr, SL("_processed"), PHALCON_GLOBAL(z_false) TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_processed"), PHALCON_GLOBAL(z_false));
 	
 	RETURN_THISW();
 }
@@ -300,20 +300,20 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 						 * Extract the real class name from the namespaced class
 						 */
 						PHALCON_INIT_NVAR(controller_name);
-						phalcon_get_class_ns(controller_name, handler, 0 TSRMLS_CC);
+						phalcon_get_class_ns(controller_name, handler, 0);
 	
 						/** 
 						 * Extract the namespace from the namespaced class
 						 */
 						PHALCON_INIT_NVAR(namespace_name);
-						phalcon_get_ns_class(namespace_name, handler, 0 TSRMLS_CC);
+						phalcon_get_ns_class(namespace_name, handler, 0);
 					} else {
 						PHALCON_CPY_WRT(controller_name, handler);
 	
 						PHALCON_INIT_NVAR(namespace_name);
 					}
 	
-					phalcon_update_property_null(this_ptr, SL("_routePrefix") TSRMLS_CC);
+					phalcon_update_property_null(this_ptr, SL("_routePrefix"));
 	
 					/** 
 					 * Check if the scope has a module associated
@@ -399,7 +399,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 	
 		}
 	
-		phalcon_update_property_bool(this_ptr, SL("_processed"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_processed"), 1);
 	}
 	
 	/** 
@@ -433,7 +433,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processControllerAnnotation){
 		position = PHALCON_GLOBAL(z_zero);
 	
 		PHALCON_CALL_METHOD(&value, annotation, "getargument", position);
-		phalcon_update_property_this(this_ptr, SL("_routePrefix"), value TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_routePrefix"), value);
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -640,7 +640,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, setControllerSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &controller_suffix);
 	
-	phalcon_update_property_this(this_ptr, SL("_controllerSuffix"), controller_suffix TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_controllerSuffix"), controller_suffix);
 	
 }
 
@@ -655,7 +655,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, setActionSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &action_suffix);
 	
-	phalcon_update_property_this(this_ptr, SL("_actionSuffix"), action_suffix TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_actionSuffix"), action_suffix);
 	
 }
 

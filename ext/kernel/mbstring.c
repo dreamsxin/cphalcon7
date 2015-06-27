@@ -38,9 +38,9 @@ zend_mbstring_globals *mbstring_globals;
 #define PHP_UNICODE_CASE_LOWER    1
 #define PHP_UNICODE_CASE_TITLE    2
 
-extern char *php_unicode_convert_case(int case_mode, const char *srcstr, size_t srclen, size_t *retlen, const char *src_encoding TSRMLS_DC);
+extern char *php_unicode_convert_case(int case_mode, const char *srcstr, size_t srclen, size_t *retlen, const char *src_encoding);
 
-int phalcon_mb_strlen(char *str, uint len, int *ret_len TSRMLS_DC)
+int phalcon_mb_strlen(char *str, uint len, int *ret_len)
 {
 	mbfl_string string;
 
@@ -53,12 +53,12 @@ int phalcon_mb_strlen(char *str, uint len, int *ret_len TSRMLS_DC)
 	return SUCCESS;
 }
 
-int phalcon_mb_strtolower(char *str, uint len, char **ret, int *ret_len TSRMLS_DC)
+int phalcon_mb_strtolower(char *str, uint len, char **ret, int *ret_len)
 {
 	const char *from_encoding = MBSTR_G(current_internal_encoding)->mime_name;
 	char *newstr;
 
-	newstr = php_unicode_convert_case(PHP_UNICODE_CASE_LOWER, str, (size_t)len, (size_t*)&ret_len, from_encoding TSRMLS_CC);
+	newstr = php_unicode_convert_case(PHP_UNICODE_CASE_LOWER, str, (size_t)len, (size_t*)&ret_len, from_encoding);
 	if (newstr) {
 		*ret = newstr;
 		return SUCCESS;
@@ -67,12 +67,12 @@ int phalcon_mb_strtolower(char *str, uint len, char **ret, int *ret_len TSRMLS_D
 	return FAILURE;
 }
 
-int phalcon_mb_strtoupper(char *str, uint len, char **ret, int *ret_len TSRMLS_DC)
+int phalcon_mb_strtoupper(char *str, uint len, char **ret, int *ret_len)
 {
 	const char *from_encoding = MBSTR_G(current_internal_encoding)->mime_name;
 	char *newstr;
 
-	newstr = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, str, (size_t)len, (size_t*)&ret_len, from_encoding TSRMLS_CC);
+	newstr = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, str, (size_t)len, (size_t*)&ret_len, from_encoding);
 	if (newstr) {
 		*ret = newstr;
 		return SUCCESS;
@@ -81,7 +81,7 @@ int phalcon_mb_strtoupper(char *str, uint len, char **ret, int *ret_len TSRMLS_D
 	return FAILURE;
 }
 
-int phalcon_mb_strpos(char *haystack, size_t haystack_len, char *needle, size_t needle_len, int offset, int *ret TSRMLS_DC)
+int phalcon_mb_strpos(char *haystack, size_t haystack_len, char *needle, size_t needle_len, int offset, int *ret)
 {
 	mbfl_string h, n;
 
@@ -116,7 +116,7 @@ int phalcon_mb_strpos(char *haystack, size_t haystack_len, char *needle, size_t 
 	return SUCCESS;
 }
 
-int phalcon_mb_substr(char *str, size_t str_len, int from, int len, char **res, int *res_len TSRMLS_DC)
+int phalcon_mb_substr(char *str, size_t str_len, int from, int len, char **res, int *res_len)
 {
 	mbfl_string string, result, *ret;
 	int mblen;
@@ -162,7 +162,7 @@ int phalcon_mb_substr(char *str, size_t str_len, int from, int len, char **res, 
 	return SUCCESS;
 }
 
-int phalcon_mb_detect_encoding(char *str, size_t str_len, char *encoding, int strict, char **res TSRMLS_DC)
+int phalcon_mb_detect_encoding(char *str, size_t str_len, char *encoding, int strict, char **res)
 {
 	mbfl_string string;
 	const mbfl_encoding *enc;
@@ -191,7 +191,7 @@ int phalcon_mb_detect_encoding(char *str, size_t str_len, char *encoding, int st
 	return SUCCESS;
 }
 
-int phalcon_mb_convert_encoding(const char *str, size_t str_len, const char *efrom, const char *eto, char **res, size_t *res_len TSRMLS_DC)
+int phalcon_mb_convert_encoding(const char *str, size_t str_len, const char *efrom, const char *eto, char **res, size_t *res_len)
 {
 	*res = php_mb_convert_encoding(str, str_len, eto, efrom, res_len);
 }

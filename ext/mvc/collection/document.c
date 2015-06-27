@@ -83,7 +83,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_Document){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Collection, Document, mvc_collection_document, phalcon_mvc_collection_document_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_collection_document_ce TSRMLS_CC, 1, zend_ce_arrayaccess);
+	zend_class_implements(phalcon_mvc_collection_document_ce, 1, zend_ce_arrayaccess);
 
 	return SUCCESS;
 }
@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, offsetExists){
 
 	phalcon_fetch_params(0, 1, 0, &index);
 	
-	if (phalcon_isset_property_zval(this_ptr, index TSRMLS_CC)) {
+	if (phalcon_isset_property_zval(this_ptr, index)) {
 		RETURN_TRUE;
 	}
 	RETURN_FALSE;
@@ -120,9 +120,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, offsetGet){
 
 	phalcon_fetch_params(1, 1, 0, &index);
 	
-	if (phalcon_isset_property_zval(this_ptr, index TSRMLS_CC)) {
+	if (phalcon_isset_property_zval(this_ptr, index)) {
 		PHALCON_OBS_VAR(value);
-		phalcon_read_property_zval(&value, this_ptr, index, PH_NOISY TSRMLS_CC);
+		phalcon_read_property_zval(&value, this_ptr, index, PH_NOISY);
 		RETURN_CTOR(value);
 	}
 	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "The index does not exist in the row");
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, offsetSet){
 
 	phalcon_fetch_params(0, 2, 0, &index, &value);
 	
-	phalcon_update_property_zval_zval(this_ptr, index, value TSRMLS_CC);
+	phalcon_update_property_zval_zval(this_ptr, index, value);
 	
 }
 
@@ -178,9 +178,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, readAttribute){
 
 	phalcon_fetch_params(1, 1, 0, &attribute);
 	
-	if (phalcon_isset_property_zval(this_ptr, attribute TSRMLS_CC)) {
+	if (phalcon_isset_property_zval(this_ptr, attribute)) {
 		PHALCON_OBS_VAR(attribute_value);
-		phalcon_read_property_zval(&attribute_value, this_ptr, attribute, PH_NOISY TSRMLS_CC);
+		phalcon_read_property_zval(&attribute_value, this_ptr, attribute, PH_NOISY);
 		RETURN_CTOR(attribute_value);
 	}
 	RETURN_MM_NULL();
@@ -202,6 +202,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, writeAttribute){
 
 	phalcon_fetch_params(0, 2, 0, &attribute, &value);
 	
-	phalcon_update_property_zval_zval(this_ptr, attribute, value TSRMLS_CC);
+	phalcon_update_property_zval_zval(this_ptr, attribute, value);
 	
 }

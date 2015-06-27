@@ -72,7 +72,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Url){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Validator, Url, mvc_model_validator_url, phalcon_mvc_model_validator_ce, phalcon_mvc_model_validator_url_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_validator_url_ce TSRMLS_CC, 1, phalcon_mvc_model_validatorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_validator_url_ce, 1, phalcon_mvc_model_validatorinterface_ce);
 
 	return SUCCESS;
 }

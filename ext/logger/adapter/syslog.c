@@ -72,9 +72,9 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_Syslog){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Logger\\Adapter, Syslog, logger_adapter_syslog, phalcon_logger_adapter_ce, phalcon_logger_adapter_syslog_method_entry, 0);
 
-	zend_declare_property_bool(phalcon_logger_adapter_syslog_ce, SL("_opened"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_bool(phalcon_logger_adapter_syslog_ce, SL("_opened"), 0, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_logger_adapter_syslog_ce TSRMLS_CC, 1, phalcon_logger_adapterinterface_ce);
+	zend_class_implements(phalcon_logger_adapter_syslog_ce, 1, phalcon_logger_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 		}
 	
 		PHALCON_CALL_FUNCTION(NULL, "openlog", name, option, facility);
-		phalcon_update_property_bool(this_ptr, SL("_opened"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_opened"), 1);
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
 	if (Z_TYPE_P(formatter) != IS_OBJECT) {
 		PHALCON_INIT_NVAR(formatter);
 		object_init_ex(formatter, phalcon_logger_formatter_syslog_ce);
-		phalcon_update_property_this(this_ptr, SL("_formatter"), formatter TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_formatter"), formatter);
 	}
 	
 	RETURN_CTOR(formatter);

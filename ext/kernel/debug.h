@@ -40,13 +40,13 @@ typedef struct _phalcon_debug_entry {
 int phalcon_start_debug();
 int phalcon_stop_debug();
 
-int phalcon_print_r(zval *userval TSRMLS_DC);
-int phalcon_debug_print_r(zval *message TSRMLS_DC);
-int phalcon_vdump(zval *uservar TSRMLS_DC);
-int phalcon_debug_assign(char *name, zval *value TSRMLS_DC);
-int phalcon_vpdump(const zval **uservar TSRMLS_DC);
-int phalcon_dump_ce(zend_class_entry *ce TSRMLS_DC);
-int phalcon_class_debug(zval *val TSRMLS_DC);
+int phalcon_print_r(zval *userval);
+int phalcon_debug_print_r(zval *message);
+int phalcon_vdump(zval *uservar);
+int phalcon_debug_assign(char *name, zval *value);
+int phalcon_vpdump(const zval **uservar);
+int phalcon_dump_ce(zend_class_entry *ce);
+int phalcon_class_debug(zval *val);
 
 int phalcon_debug_backtrace_internal();
 int phalcon_debug_str(char *what, char *message);
@@ -64,9 +64,9 @@ int phalcon_step_out_zval(zval *message);
 int phalcon_step_into_entry(char *class_name, char *method_name, int lineno);
 int phalcon_step_out_entry();
 
-int phalcon_debug_method_call(zval *obj, char *method_name TSRMLS_DC);
-int phalcon_debug_vdump(char *preffix, zval *value TSRMLS_DC);
-int phalcon_debug_param(zval *param TSRMLS_DC);
+int phalcon_debug_method_call(zval *obj, char *method_name);
+int phalcon_debug_vdump(char *preffix, zval *value);
+int phalcon_debug_param(zval *param);
 
 int phalcon_error_space();
 int phalcon_debug_space();

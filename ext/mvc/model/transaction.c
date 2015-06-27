@@ -111,15 +111,15 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model, Transaction, mvc_model_transaction, phalcon_mvc_model_transaction_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_connection"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_model_transaction_ce, SL("_activeTransaction"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_model_transaction_ce, SL("_isNewTransaction"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_model_transaction_ce, SL("_rollbackOnAbort"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_manager"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_messages"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_rollbackRecord"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_connection"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_model_transaction_ce, SL("_activeTransaction"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_model_transaction_ce, SL("_isNewTransaction"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_model_transaction_ce, SL("_rollbackOnAbort"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_manager"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_messages"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_rollbackRecord"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_transaction_ce TSRMLS_CC, 1, phalcon_mvc_model_transactioninterface_ce);
+	zend_class_implements(phalcon_mvc_model_transaction_ce, 1, phalcon_mvc_model_transactioninterface_ce);
 
 	return SUCCESS;
 }
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	}
 	
 	PHALCON_CALL_METHOD(&connection, dependency_injector, "get", service);
-	phalcon_update_property_this(this_ptr, SL("_connection"), connection TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_connection"), connection);
 	if (zend_is_true(auto_begin)) {
 		PHALCON_CALL_METHOD(NULL, connection, "begin");
 	}
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setTransactionManager){
 	phalcon_fetch_params(0, 1, 0, &manager);
 	PHALCON_VERIFY_INTERFACE_EX(manager, phalcon_mvc_model_transaction_managerinterface_ce, phalcon_mvc_model_transaction_exception_ce, 0);
 
-	phalcon_update_property_this(this_ptr, SL("_manager"), manager TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_manager"), manager);
 }
 
 /**
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 			ZVAL_STRING(rollback_message, "Transaction aborted", 1);
 		}
 		if (Z_TYPE_P(rollback_record) == IS_OBJECT) {
-			phalcon_update_property_this(this_ptr, SL("_rollbackRecord"), rollback_record TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_rollbackRecord"), rollback_record);
 		}
 	
 		PHALCON_OBS_NVAR(rollback_record);
@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setIsNewTransaction){
 
 	phalcon_fetch_params(0, 1, 0, &is_new);
 	
-	phalcon_update_property_this(this_ptr, SL("_isNewTransaction"), is_new TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_isNewTransaction"), is_new);
 	
 }
 
@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setRollbackOnAbort){
 
 	phalcon_fetch_params(0, 1, 0, &rollback_on_abort);
 	
-	phalcon_update_property_this(this_ptr, SL("_rollbackOnAbort"), rollback_on_abort TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_rollbackOnAbort"), rollback_on_abort);
 	
 }
 
@@ -344,7 +344,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, isManaged){
 	zval *manager;
 
 	manager = phalcon_fetch_nproperty_this(this_ptr, SL("_manager"), PH_NOISY);
-	boolean_not_function(return_value, manager TSRMLS_CC);
+	boolean_not_function(return_value, manager);
 }
 
 /**
@@ -382,6 +382,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setRollbackedRecord){
 
 	phalcon_fetch_params(0, 1, 0, &record);
 	
-	phalcon_update_property_this(this_ptr, SL("_rollbackRecord"), record TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_rollbackRecord"), record);
 	
 }

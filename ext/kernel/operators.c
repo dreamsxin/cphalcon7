@@ -74,7 +74,7 @@ int phalcon_compare_strict_string(zval *op1, const char *op2, int op2_length){
 /**
  * Natural compare with long operandus on right
  */
-int phalcon_compare_strict_long(zval *op1, long op2 TSRMLS_DC){
+int phalcon_compare_strict_long(zval *op1, long op2){
 
 	int bool_result;
 
@@ -93,7 +93,7 @@ int phalcon_compare_strict_long(zval *op1, long op2 TSRMLS_DC){
 			{
 				zval result, op2_tmp;
 				ZVAL_LONG(&op2_tmp, op2);
-				is_equal_function(&result, op1, &op2_tmp TSRMLS_CC);
+				is_equal_function(&result, op1, &op2_tmp);
 				bool_result = Z_BVAL(result);
 				return bool_result;
 			}
@@ -105,7 +105,7 @@ int phalcon_compare_strict_long(zval *op1, long op2 TSRMLS_DC){
 /**
 * Natural compare with double operandus on right
  */
-int phalcon_compare_strict_double(zval *op1, double op2 TSRMLS_DC) {
+int phalcon_compare_strict_double(zval *op1, double op2) {
 
 	int bool_result;
 
@@ -124,7 +124,7 @@ int phalcon_compare_strict_double(zval *op1, double op2 TSRMLS_DC) {
 			{
 				zval result, op2_tmp;
 				ZVAL_DOUBLE(&op2_tmp, op2);
-				is_equal_function(&result, op1, &op2_tmp TSRMLS_CC);
+				is_equal_function(&result, op1, &op2_tmp);
 				bool_result = Z_BVAL(result);
 				return bool_result;
 			}
@@ -136,7 +136,7 @@ int phalcon_compare_strict_double(zval *op1, double op2 TSRMLS_DC) {
 /**
  * Natural compare with bool operandus on right
  */
-int phalcon_compare_strict_bool(zval *op1, zend_bool op2 TSRMLS_DC) {
+int phalcon_compare_strict_bool(zval *op1, zend_bool op2) {
 
 	int bool_result;
 
@@ -153,7 +153,7 @@ int phalcon_compare_strict_bool(zval *op1, zend_bool op2 TSRMLS_DC) {
 			{
 				zval result, op2_tmp;
 				ZVAL_BOOL(&op2_tmp, op2);
-				is_equal_function(&result, op1, &op2_tmp TSRMLS_CC);
+				is_equal_function(&result, op1, &op2_tmp);
 				bool_result = Z_TYPE_P(result) == IS_TRUE ? 1 : 0;
 				return bool_result;
 			}
@@ -164,17 +164,17 @@ int phalcon_compare_strict_bool(zval *op1, zend_bool op2 TSRMLS_DC) {
 /**
  * Do add function keeping ref_count and is_ref
  */
-int phalcon_add_function_ex(zval *result, zval *op1, zval *op2 TSRMLS_DC){
+int phalcon_add_function_ex(zval *result, zval *op1, zval *op2){
 	int status;
 	int ref_count = Z_REFCOUNT_P(result);
 	int is_ref = Z_ISREF_P(result);
-	status = add_function(result, op1, op2 TSRMLS_CC);
+	status = add_function(result, op1, op2);
 	Z_SET_REFCOUNT_P(result, ref_count);
 	Z_SET_ISREF_TO_P(result, is_ref);
 	return status;
 }
 
-void phalcon_negate(zval *z TSRMLS_DC) {
+void phalcon_negate(zval *z) {
 	while (1) {
 		switch (Z_TYPE_P(z)) {
 			case IS_TRUE:
@@ -195,7 +195,7 @@ void phalcon_negate(zval *z TSRMLS_DC) {
 				return;
 
 			default:
-				convert_scalar_to_number(z TSRMLS_CC);
+				convert_scalar_to_number(z);
 				assert(Z_TYPE_P(z) == IS_LONG || Z_TYPE_P(z) == IS_DOUBLE);
 		}
 	}
@@ -389,26 +389,26 @@ int phalcon_is_numeric_ex(const zval *op) {
 /**
  * Check if two zvals are equal
  */
-int phalcon_is_equal(zval *op1, zval *op2 TSRMLS_DC) {
+int phalcon_is_equal(zval *op1, zval *op2) {
 	zval result;
 
-	return fast_equal_function(&result, op1, op2 TSRMLS_CC);
+	return fast_equal_function(&result, op1, op2);
 }
 
 /**
  * Check if a zval is equal than a long value
  */
-int phalcon_is_equal_long(zval *op1, long op2 TSRMLS_DC) {
+int phalcon_is_equal_long(zval *op1, long op2) {
 	zval result, op2_zval;
 	ZVAL_LONG(&op2_zval, op2);
-	is_equal_function(&result, op1, &op2_zval TSRMLS_CC);
+	is_equal_function(&result, op1, &op2_zval);
 	return Z_BVAL(result);
 }
 
 /**
  * Check if two object are equal
  */
-int phalcon_is_equal_object(zval *obj1, zval *obj2 TSRMLS_DC) {
+int phalcon_is_equal_object(zval *obj1, zval *obj2) {
 	char md5str[33];
 	char md5str2[33];
 
@@ -416,8 +416,8 @@ int phalcon_is_equal_object(zval *obj1, zval *obj2 TSRMLS_DC) {
 		return 0;
 	}
 
-	php_spl_object_hash(obj1, md5str TSRMLS_CC);
-	php_spl_object_hash(obj2, md5str2 TSRMLS_CC);
+	php_spl_object_hash(obj1, md5str);
+	php_spl_object_hash(obj2, md5str2);
 
 	return strcmp(md5str, md5str2) == 0;
 }
@@ -425,93 +425,93 @@ int phalcon_is_equal_object(zval *obj1, zval *obj2 TSRMLS_DC) {
 /**
  * Check if a zval is less than other
  */
-int phalcon_less(zval *op1, zval *op2 TSRMLS_DC) {
+int phalcon_less(zval *op1, zval *op2) {
 	zval result;
-	is_smaller_function(&result, op1, op2 TSRMLS_CC);
+	is_smaller_function(&result, op1, op2);
 	return Z_BVAL(result);
 }
 
 /**
  * Check if a zval is less/equal than other
  */
-int phalcon_less_equal(zval *op1, zval *op2 TSRMLS_DC) {
+int phalcon_less_equal(zval *op1, zval *op2) {
 	zval result;
-	is_smaller_or_equal_function(&result, op1, op2 TSRMLS_CC);
+	is_smaller_or_equal_function(&result, op1, op2);
 	return Z_BVAL(result);
 }
 
 /**
  * Check if a zval is less than a long value
  */
-int phalcon_less_long(zval *op1, long op2 TSRMLS_DC) {
+int phalcon_less_long(zval *op1, long op2) {
 	zval result, op2_zval;
 	ZVAL_LONG(&op2_zval, op2);
-	is_smaller_function(&result, op1, &op2_zval TSRMLS_CC);
+	is_smaller_function(&result, op1, &op2_zval);
 	return Z_BVAL(result);
 }
 
-int phalcon_less_equal_long(zval *op1, long op2 TSRMLS_DC) {
+int phalcon_less_equal_long(zval *op1, long op2) {
 	zval result, op2_zval;
 	ZVAL_LONG(&op2_zval, op2);
-	is_smaller_or_equal_function(&result, op1, &op2_zval TSRMLS_CC);
+	is_smaller_or_equal_function(&result, op1, &op2_zval);
 	return Z_BVAL(result);
 }
 
 /**
  * Check if a zval is greater than other
  */
-int phalcon_greater(zval *op1, zval *op2 TSRMLS_DC) {
+int phalcon_greater(zval *op1, zval *op2) {
 	zval result;
-	is_smaller_or_equal_function(&result, op1, op2 TSRMLS_CC);
+	is_smaller_or_equal_function(&result, op1, op2);
 	return !Z_BVAL(result);
 }
 
 /**
  * Check if a zval is greater than a long value
  */
-int phalcon_greater_long(zval *op1, long op2 TSRMLS_DC) {
+int phalcon_greater_long(zval *op1, long op2) {
 	zval result, op2_zval;
 	ZVAL_LONG(&op2_zval, op2);
-	is_smaller_or_equal_function(&result, op1, &op2_zval TSRMLS_CC);
+	is_smaller_or_equal_function(&result, op1, &op2_zval);
 	return !Z_BVAL(result);
 }
 
 /**
  * Check if a zval is greater/equal than other
  */
-int phalcon_greater_equal(zval *op1, zval *op2 TSRMLS_DC) {
+int phalcon_greater_equal(zval *op1, zval *op2) {
 	zval result;
-	is_smaller_function(&result, op1, op2 TSRMLS_CC);
+	is_smaller_function(&result, op1, op2);
 	return !Z_BVAL(result);
 }
 
 /**
  * Check for greater/equal
  */
-int phalcon_greater_equal_long(zval *op1, long op2 TSRMLS_DC) {
+int phalcon_greater_equal_long(zval *op1, long op2) {
 	zval result, op2_zval;
 	ZVAL_LONG(&op2_zval, op2);
-	is_smaller_function(&result, op1, &op2_zval TSRMLS_CC);
+	is_smaller_function(&result, op1, &op2_zval);
 	return !Z_BVAL(result);
 }
 
 /**
  * Check if two zvals are identical
  */
-int phalcon_is_identical(zval *op1, zval *op2 TSRMLS_DC) {
+int phalcon_is_identical(zval *op1, zval *op2) {
 	zval result;
-	is_identical_function(&result, op1, op2 TSRMLS_CC);
+	is_identical_function(&result, op1, op2);
 	return Z_BVAL(result);
 }
 
 /**
  * Do bitwise_and function keeping ref_count and is_ref
  */
-int phalcon_bitwise_and_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
+int phalcon_bitwise_and_function(zval *result, zval *op1, zval *op2){
 	int status;
 	int ref_count = Z_REFCOUNT_P(result);
 	int is_ref = Z_ISREF_P(result);
-	status = bitwise_and_function(result, op1, op2 TSRMLS_CC);
+	status = bitwise_and_function(result, op1, op2);
 	Z_SET_REFCOUNT_P(result, ref_count);
 	Z_SET_ISREF_TO_P(result, is_ref);
 	return status;
@@ -520,11 +520,11 @@ int phalcon_bitwise_and_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
 /**
  * Do bitwise_or function keeping ref_count and is_ref
  */
-int phalcon_bitwise_or_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
+int phalcon_bitwise_or_function(zval *result, zval *op1, zval *op2){
 	int status;
 	int ref_count = Z_REFCOUNT_P(result);
 	int is_ref = Z_ISREF_P(result);
-	status = bitwise_or_function(result, op1, op2 TSRMLS_CC);
+	status = bitwise_or_function(result, op1, op2);
 	Z_SET_REFCOUNT_P(result, ref_count);
 	Z_SET_ISREF_TO_P(result, is_ref);
 	return status;
@@ -533,11 +533,11 @@ int phalcon_bitwise_or_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
 /**
  * Do bitwise_xor function keeping ref_count and is_ref
  */
-int phalcon_bitwise_xor_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
+int phalcon_bitwise_xor_function(zval *result, zval *op1, zval *op2){
 	int status;
 	int ref_count = Z_REFCOUNT_P(result);
 	int is_ref = Z_ISREF_P(result);
-	status = bitwise_xor_function(result, op1, op2 TSRMLS_CC);
+	status = bitwise_xor_function(result, op1, op2);
 	Z_SET_REFCOUNT_P(result, ref_count);
 	Z_SET_ISREF_TO_P(result, is_ref);
 	return status;
@@ -546,11 +546,11 @@ int phalcon_bitwise_xor_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
 /**
  * Do shiftleft function keeping ref_count and is_ref
  */
-int phalcon_shift_left_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
+int phalcon_shift_left_function(zval *result, zval *op1, zval *op2){
 	int status;
 	int ref_count = Z_REFCOUNT_P(result);
 	int is_ref = Z_ISREF_P(result);
-	status = shift_left_function(result, op1, op2 TSRMLS_CC);
+	status = shift_left_function(result, op1, op2);
 	Z_SET_REFCOUNT_P(result, ref_count);
 	Z_SET_ISREF_TO_P(result, is_ref);
 	return status;
@@ -559,11 +559,11 @@ int phalcon_shift_left_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
 /**
  * Do shiftright function keeping ref_count and is_ref
  */
-int phalcon_shift_right_function(zval *result, zval *op1, zval *op2 TSRMLS_DC){
+int phalcon_shift_right_function(zval *result, zval *op1, zval *op2){
 	int status;
 	int ref_count = Z_REFCOUNT_P(result);
 	int is_ref = Z_ISREF_P(result);
-	status = shift_right_function(result, op1, op2 TSRMLS_CC);
+	status = shift_right_function(result, op1, op2);
 	Z_SET_REFCOUNT_P(result, ref_count);
 	Z_SET_ISREF_TO_P(result, is_ref);
 	return status;

@@ -137,13 +137,13 @@ PHALCON_INIT_CLASS(Phalcon_Http_Response){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Http, Response, http_response, phalcon_di_injectable_ce, phalcon_http_response_method_entry, 0);
 
-	zend_declare_property_bool(phalcon_http_response_ce, SL("_sent"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_response_ce, SL("_content"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_response_ce, SL("_headers"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_response_ce, SL("_cookies"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_http_response_ce, SL("_file"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_bool(phalcon_http_response_ce, SL("_sent"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_response_ce, SL("_content"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_response_ce, SL("_headers"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_response_ce, SL("_cookies"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_response_ce, SL("_file"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_http_response_ce TSRMLS_CC, 1, phalcon_http_responseinterface_ce);
+	zend_class_implements(phalcon_http_response_ce, 1, phalcon_http_responseinterface_ce);
 
 	return SUCCESS;
 }
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Http_Response, __construct){
 	}
 
 	if (content && Z_TYPE_P(content) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_content"), content TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_content"), content);
 	}
 
 	if (code && Z_TYPE_P(code) != IS_NULL) {
@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode){
 	PHALCON_INIT_VAR(status_header);
 	ZVAL_STRING(status_header, "Status", 1);
 	PHALCON_CALL_METHOD(NULL, headers, "set", status_header, status_value);
-	phalcon_update_property_this(this_ptr, SL("_headers"), headers TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_headers"), headers);
 	RETURN_THIS();
 }
 
@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Http_Response, setHeaders){
 
 	phalcon_fetch_params(0, 1, 0, &headers);
 
-	phalcon_update_property_this(this_ptr, SL("_headers"), headers TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_headers"), headers);
 	RETURN_THISW();
 }
 
@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Http_Response, getHeaders){
 		 * before sending them to the client
 		 */
 		object_init_ex(return_value, phalcon_http_response_headers_ce);
-		phalcon_update_property_this(this_ptr, SL("_headers"), return_value TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_headers"), return_value);
 		return;
 	}
 
@@ -296,7 +296,7 @@ PHP_METHOD(Phalcon_Http_Response, setCookies){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_http_response_exception_ce, "The cookies bag is not valid");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_cookies"), cookies TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_cookies"), cookies);
 
 	RETURN_THISW();
 }
@@ -401,7 +401,7 @@ PHP_METHOD(Phalcon_Http_Response, setExpires){
 	PHALCON_CALL_METHOD(&headers, this_ptr, "getheaders");
 
 	PHALCON_INIT_VAR(date);
-	if (phalcon_clone(date, datetime TSRMLS_CC) == FAILURE) {
+	if (phalcon_clone(date, datetime) == FAILURE) {
 		RETURN_MM();
 	}
 
@@ -596,7 +596,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 		PHALCON_INIT_VAR(matched);
 		PHALCON_INIT_VAR(pattern);
 		ZVAL_STRING(pattern, "/^[^:\\/?#]++:/", 1);
-		RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, pattern, location, NULL TSRMLS_CC));
+		RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, pattern, location, NULL));
 		if (zend_is_true(matched)) {
 			header = location;
 		}
@@ -671,7 +671,7 @@ PHP_METHOD(Phalcon_Http_Response, setContent){
 
 	phalcon_fetch_params(0, 1, 0, &content);
 
-	phalcon_update_property_this(this_ptr, SL("_content"), content TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_content"), content);
 	RETURN_THISW();
 }
 
@@ -701,8 +701,8 @@ PHP_METHOD(Phalcon_Http_Response, setJsonContent){
 	}
 
 	PHALCON_INIT_VAR(json_content);
-	RETURN_MM_ON_FAILURE(phalcon_json_encode(json_content, content, options TSRMLS_CC));
-	phalcon_update_property_this(this_ptr, SL("_content"), json_content TSRMLS_CC);
+	RETURN_MM_ON_FAILURE(phalcon_json_encode(json_content, content, options));
+	phalcon_update_property_this(this_ptr, SL("_content"), json_content);
 	RETURN_THIS();
 }
 
@@ -729,7 +729,7 @@ PHP_METHOD(Phalcon_Http_Response, setBsonContent){
 	PHALCON_CALL_METHOD(NULL, this_ptr, "setContentType", content_type);
 
 	PHALCON_CALL_FUNCTION(&bson_content, "bson_encode", content);
-	phalcon_update_property_this(this_ptr, SL("_content"), bson_content TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_content"), bson_content);
 	RETURN_THIS();
 }
 
@@ -751,8 +751,8 @@ PHP_METHOD(Phalcon_Http_Response, appendContent){
 	PHALCON_OBS_VAR(_content);
 	phalcon_read_property_this(&_content, this_ptr, SL("_content"), PH_NOISY);
 	PHALCON_INIT_VAR(temp_content);
-	concat_function(temp_content, _content, content TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_content"), temp_content TSRMLS_CC);
+	concat_function(temp_content, _content, content);
+	phalcon_update_property_this(this_ptr, SL("_content"), temp_content);
 	RETURN_THIS();
 }
 
@@ -859,7 +859,7 @@ PHP_METHOD(Phalcon_Http_Response, send){
 			}
 		}
 
-		phalcon_update_property_bool(this_ptr, SL("_sent"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_sent"), 1);
 
 		RETURN_THIS();
 	}
@@ -894,7 +894,7 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 
 	if (Z_TYPE_P(attachment_name) != IS_STRING) {
 		PHALCON_INIT_VAR(base_path);
-		phalcon_basename(base_path, file_path TSRMLS_CC);
+		phalcon_basename(base_path, file_path);
 	} else {
 		PHALCON_CPY_WRT(base_path, attachment_name);
 	}
@@ -914,7 +914,7 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 		ZVAL_STRING(content_transfer, "Content-Transfer-Encoding: binary", 1);
 		PHALCON_CALL_METHOD(NULL, headers, "setraw", content_transfer);
 	}
-	phalcon_update_property_this(this_ptr, SL("_file"), file_path TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_file"), file_path);
 
 	RETURN_THIS();
 }

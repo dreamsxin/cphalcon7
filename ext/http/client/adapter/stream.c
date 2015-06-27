@@ -70,9 +70,9 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Adapter_Stream){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Http\\Client\\Adapter, Stream, http_client_adapter_stream, phalcon_http_client_adapter_ce,  phalcon_http_client_adapter_stream_method_entry, 0);
 
-	zend_declare_property_null(phalcon_http_client_adapter_stream_ce, SL("_stream"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_http_client_adapter_stream_ce, SL("_stream"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_http_client_adapter_stream_ce TSRMLS_CC, 1, phalcon_http_client_adapterinterface_ce);
+	zend_class_implements(phalcon_http_client_adapter_stream_ce, 1, phalcon_http_client_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 	if (method) {
 		PHALCON_INIT_VAR(upper_method);
 		phalcon_fast_strtoupper(upper_method, method);
-		phalcon_update_property_this(this_ptr, SL("_method"), upper_method TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_method"), upper_method);
 	}
 
 	PHALCON_INIT_VAR(header);
@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	PHALCON_CALL_METHOD(NULL, header, "set", option, value);
 
-	phalcon_update_property_this(this_ptr, SL("_header"), header TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_header"), header);
 
 	PHALCON_INIT_NVAR(option);
 	ZVAL_STRING(option, "follow_location", 1);
@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, value);
 
-	phalcon_update_property_this(this_ptr, SL("_stream"), stream TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_stream"), stream);
 
 	PHALCON_MM_RESTORE();
 }

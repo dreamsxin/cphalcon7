@@ -59,7 +59,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_RawValue){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Db, RawValue, db_rawvalue, phalcon_db_rawvalue_method_entry, 0);
 
-	zend_declare_property_null(phalcon_db_rawvalue_ce, SL("_value"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_db_rawvalue_ce, SL("_value"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -75,7 +75,7 @@ PHP_METHOD(Phalcon_Db_RawValue, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 	
-	phalcon_update_property_this(this_ptr, SL("_value"), value TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_value"), value);
 	
 }
 

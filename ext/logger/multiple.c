@@ -78,8 +78,8 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Multiple){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Logger, Multiple, logger_multiple, phalcon_logger_multiple_method_entry, 0);
 
-	zend_declare_property_null(phalcon_logger_multiple_ce, SL("_loggers"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_logger_multiple_ce, SL("_formatter"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_logger_multiple_ce, SL("_loggers"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_logger_multiple_ce, SL("_formatter"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, push){
 	phalcon_fetch_params(0, 1, 0, &logger);
 	
 	PHALCON_VERIFY_INTERFACE_EX(logger, phalcon_logger_adapterinterface_ce, exception, 0)
-	phalcon_update_property_array_append(this_ptr, SL("_loggers"), logger TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_loggers"), logger);
 }
 
 /**
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 	
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_formatter"), formatter TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_formatter"), formatter);
 	
 	PHALCON_MM_RESTORE();
 }

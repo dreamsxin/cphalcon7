@@ -170,16 +170,16 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Simple){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\View, Simple, mvc_view_simple, phalcon_di_injectable_ce, phalcon_mvc_view_simple_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_options"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_viewsDir"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_partialsDir"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_viewParams"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_view_simple_ce, SL("_engines"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_registeredEngines"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_activeRenderPath"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_content"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_view_simple_ce, SL("_cache"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_cacheOptions"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_options"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_viewsDir"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_partialsDir"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_viewParams"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_view_simple_ce, SL("_engines"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_registeredEngines"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_activeRenderPath"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_content"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_view_simple_ce, SL("_cache"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_simple_ce, SL("_cacheOptions"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_options"), options);
 	}
 }
 
@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setViewsDir){
 
 	phalcon_fetch_params(0, 1, 0, &views_dir);
 
-	phalcon_update_property_this(this_ptr, SL("_viewsDir"), views_dir TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_viewsDir"), views_dir);
 
 }
 
@@ -249,7 +249,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, registerEngines){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Engines to register must be an array");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_registeredEngines"), engines TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_registeredEngines"), engines);
 
 }
 
@@ -360,7 +360,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_engines"), engines TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_engines"), engines);
 	} else {
 		PHALCON_OBS_NVAR(engines);
 		phalcon_read_property_this(&engines, this_ptr, SL("_engines"), PH_NOISY);
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	PHALCON_OBS_VAR(events_manager);
 	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		phalcon_update_property_this(this_ptr, SL("_activeRenderPath"), path TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_activeRenderPath"), path);
 	}
 
 	/** 
@@ -412,7 +412,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_INIT_NVAR(debug_message);
 		PHALCON_CONCAT_SV(debug_message, "Render Simple View: ", path);
-		phalcon_debug_print_r(debug_message TSRMLS_CC);
+		phalcon_debug_print_r(debug_message);
 	}
 
 	PHALCON_INIT_VAR(not_exists);
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_INIT_NVAR(debug_message);
 				PHALCON_CONCAT_SV(debug_message, "--Found: ", view_engine_path);
-				phalcon_debug_print_r(debug_message TSRMLS_CC);
+				phalcon_debug_print_r(debug_message);
 			}
 
 			/** 
@@ -482,7 +482,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 		} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			PHALCON_INIT_NVAR(debug_message);
 			PHALCON_CONCAT_SV(debug_message, "--Not Found: ", view_engine_path);
-			phalcon_debug_print_r(debug_message TSRMLS_CC);
+			phalcon_debug_print_r(debug_message);
 		}
 
 		zend_hash_move_forward_ex(ah0, &hp0);
@@ -578,7 +578,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			 */
 			PHALCON_CALL_METHOD(&content, cache, "start", key, lifetime);
 			if (Z_TYPE_P(content) != IS_NULL) {
-				phalcon_update_property_this(this_ptr, SL("_content"), content TSRMLS_CC);
+				phalcon_update_property_this(this_ptr, SL("_content"), content);
 				RETURN_CTOR(content);
 			}
 		}
@@ -600,7 +600,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 	if (Z_TYPE_P(params) == IS_ARRAY) { 
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
-			phalcon_fast_array_merge(merged_params, &view_params, &params TSRMLS_CC);
+			phalcon_fast_array_merge(merged_params, &view_params, &params);
 		} else {
 			PHALCON_CPY_WRT(merged_params, params);
 		}
@@ -684,7 +684,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 		 */
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
-			phalcon_fast_array_merge(merged_params, &view_params, &params TSRMLS_CC);
+			phalcon_fast_array_merge(merged_params, &view_params, &params);
 		} else {
 			PHALCON_CPY_WRT(merged_params, params);
 		}
@@ -710,7 +710,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 		/** 
 		 * Restore the original view params
 		 */
-		phalcon_update_property_this(this_ptr, SL("_viewParams"), view_params TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_viewParams"), view_params);
 	}
 
 	phalcon_ob_end_clean(TSRMLS_C);
@@ -737,7 +737,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setCacheOptions){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	phalcon_update_property_this(this_ptr, SL("_cacheOptions"), options TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_cacheOptions"), options);
 	RETURN_THISW();
 }
 
@@ -816,7 +816,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, getCache){
 	if (zend_is_true(cache)) {
 		if (Z_TYPE_P(cache) != IS_OBJECT) {
 			PHALCON_CALL_METHOD(&cache, this_ptr, "_createcache");
-			phalcon_update_property_this(this_ptr, SL("_cache"), cache TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_cache"), cache);
 		}
 	}
 
@@ -844,13 +844,13 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, cache){
 	}
 
 	if (Z_TYPE_P(options) == IS_ARRAY) { 
-		phalcon_update_property_this(this_ptr, SL("_cache"), PHALCON_GLOBAL(z_true) TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("_cacheOptions"), options TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_cache"), PHALCON_GLOBAL(z_true));
+		phalcon_update_property_this(this_ptr, SL("_cacheOptions"), options);
 	} else {
 		if (zend_is_true(options)) {
-			phalcon_update_property_this(this_ptr, SL("_cache"), PHALCON_GLOBAL(z_true) TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_cache"), PHALCON_GLOBAL(z_true));
 		} else {
-			phalcon_update_property_this(this_ptr, SL("_cache"), PHALCON_GLOBAL(z_false) TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_cache"), PHALCON_GLOBAL(z_false));
 		}
 	}
 
@@ -874,7 +874,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setParamToView){
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
 
-	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value);
 	RETURN_THISW();
 }
 
@@ -911,14 +911,14 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setVars){
 		phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY);
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
-			phalcon_fast_array_merge(merged_params, &view_params, &params TSRMLS_CC);
+			phalcon_fast_array_merge(merged_params, &view_params, &params);
 		} else {
 			PHALCON_CPY_WRT(merged_params, params);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_viewParams"), merged_params TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_viewParams"), merged_params);
 	} else {
-		phalcon_update_property_this(this_ptr, SL("_viewParams"), params TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_viewParams"), params);
 	}
 
 	RETURN_THIS();
@@ -941,7 +941,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setVar){
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
 
-	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value);
 	RETURN_THISW();
 }
 
@@ -985,7 +985,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setContent){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Content must be a string");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_content"), content TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_content"), content);
 
 	RETURN_THISW();
 }
@@ -1028,7 +1028,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, __set){
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
 
-	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value);
 
 }
 

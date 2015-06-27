@@ -55,20 +55,20 @@ static zval* phalcon_translate_adapter_gettext_read_dimension(zval *object, zval
 	result = phalcon_call_func_aparams(&translation, SL("gettext"), 1, params);
 
 	if (result) {
-		MAKE_STD_ZVAL(translation);
+		PHALCON_ALLOC_GHOST_ZVAL(translation);
 		ZVAL_NULL(translation)
 	}
 
 	return translation;
 }
 
-static int phalcon_translate_adapter_gettext_has_dimension(zval *object, zval *offset, int check_empty TSRMLS_DC)
+static int phalcon_translate_adapter_gettext_has_dimension(zval *object, zval *offset, int check_empty)
 {
 	zval translation, *params[1];
 	uint32_t result;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty TSRMLS_CC);
+		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty);
 	}
 
 	params[0] = offset;
@@ -103,11 +103,11 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_Gettext){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Translate\\Adapter, Gettext, translate_adapter_gettext, phalcon_translate_adapter_ce, phalcon_translate_adapter_gettext_method_entry, 0);
 
-	zend_declare_property_null(phalcon_translate_adapter_gettext_ce, SL("_locale"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_translate_adapter_gettext_ce, SL("_defaultDomain"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_translate_adapter_gettext_ce, SL("_directory"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_translate_adapter_gettext_ce, SL("_locale"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_translate_adapter_gettext_ce, SL("_defaultDomain"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_translate_adapter_gettext_ce, SL("_directory"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_translate_adapter_gettext_ce TSRMLS_CC, 1, phalcon_translate_adapterinterface_ce);
+	zend_class_implements(phalcon_translate_adapter_gettext_ce, 1, phalcon_translate_adapterinterface_ce);
 
 	phalcon_translate_adapter_gettext_object_handlers                = phalcon_translate_adapter_object_handlers;
 	phalcon_translate_adapter_gettext_object_handlers.read_dimension = phalcon_translate_adapter_gettext_read_dimension;
@@ -153,9 +153,9 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 		RETURN_MM();
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_locale"), locale TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_defaultDomain"), default_domain TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_directory"), directory TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_locale"), locale);
+	phalcon_update_property_this(this_ptr, SL("_defaultDomain"), default_domain);
+	phalcon_update_property_this(this_ptr, SL("_directory"), directory);
 
 	PHALCON_INIT_VAR(setting);
 	PHALCON_CONCAT_SV(setting, "LC_ALL=", locale);

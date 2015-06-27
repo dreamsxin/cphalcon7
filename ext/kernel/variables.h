@@ -22,12 +22,12 @@
 
 #include "php_phalcon.h"
 
-void phalcon_serialize(zval *return_value, zval **var  TSRMLS_DC);
-void phalcon_unserialize(zval *return_value, zval *var TSRMLS_DC);
+void phalcon_serialize(zval *return_value, zval **var );
+void phalcon_unserialize(zval *return_value, zval *var);
 
-void phalcon_var_export(zval **var TSRMLS_DC);
-void phalcon_var_export_ex(zval *return_value, zval **var TSRMLS_DC);
+void phalcon_var_export(zval **var);
+void phalcon_var_export_ex(zval *return_value, zval **var);
 
-void phalcon_var_dump(zval **var TSRMLS_DC);
+void phalcon_var_dump(zval **var);
 
 #endif

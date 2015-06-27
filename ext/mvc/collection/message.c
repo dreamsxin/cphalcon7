@@ -111,13 +111,13 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_Message){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Collection, Message, mvc_collection_message, phalcon_mvc_collection_message_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_collection_message_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_message_ce, SL("_message"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_message_ce, SL("_field"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_message_ce, SL("_collection"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_mvc_collection_message_ce, SL("_code"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_collection_message_ce, SL("_type"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_message_ce, SL("_message"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_message_ce, SL("_field"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_message_ce, SL("_collection"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_collection_message_ce, SL("_code"), 0, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_collection_message_ce TSRMLS_CC, 1, phalcon_mvc_collection_messageinterface_ce);
+	zend_class_implements(phalcon_mvc_collection_message_ce, 1, phalcon_mvc_collection_messageinterface_ce);
 
 	return SUCCESS;
 }
@@ -152,13 +152,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, __construct){
 		code = PHALCON_GLOBAL(z_zero);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_message"), message TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_field"), field TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_message"), message);
+	phalcon_update_property_this(this_ptr, SL("_field"), field);
+	phalcon_update_property_this(this_ptr, SL("_type"), type);
 	if (Z_TYPE_P(collection) == IS_OBJECT) {
-		phalcon_update_property_this(this_ptr, SL("_collection"), collection TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_collection"), collection);
 	}
-	phalcon_update_property_this(this_ptr, SL("_code"), code TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_code"), code);
 }
 
 /**
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, setType){
 
 	phalcon_fetch_params(0, 1, 0, &type);
 	
-	phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_type"), type);
 	RETURN_THISW();
 }
 
@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, setCode){
 
 	phalcon_fetch_params(0, 1, 0, &code);
 
-	phalcon_update_property_this(this_ptr, SL("_code"), code TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_code"), code);
 	RETURN_THISW();
 }
 
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, setMessage){
 
 	phalcon_fetch_params(0, 1, 0, &message);
 	
-	phalcon_update_property_this(this_ptr, SL("_message"), message TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_message"), message);
 	RETURN_THISW();
 }
 
@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, setField){
 
 	phalcon_fetch_params(0, 1, 0, &field);
 	
-	phalcon_update_property_this(this_ptr, SL("_field"), field TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_field"), field);
 	RETURN_THISW();
 }
 
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, setCollection){
 
 	phalcon_fetch_params(0, 1, 0, &collection);
 	
-	phalcon_update_property_this(this_ptr, SL("_collection"), collection TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_collection"), collection);
 	RETURN_THISW();
 }
 

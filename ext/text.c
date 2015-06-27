@@ -123,11 +123,11 @@ PHALCON_INIT_CLASS(Phalcon_Text){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Text, text, phalcon_text_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_ALNUM"),   PHALCON_TEXT_RANDOM_ALNUM   TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_ALPHA"),   PHALCON_TEXT_RANDOM_ALPHA   TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_HEXDEC"),  PHALCON_TEXT_RANDOM_HEXDEC  TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_NUMERIC"), PHALCON_TEXT_RANDOM_NUMERIC TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_NOZERO"),  PHALCON_TEXT_RANDOM_NOZERO  TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_ALNUM"),   PHALCON_TEXT_RANDOM_ALNUM  );
+	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_ALPHA"),   PHALCON_TEXT_RANDOM_ALPHA  );
+	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_HEXDEC"),  PHALCON_TEXT_RANDOM_HEXDEC );
+	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_NUMERIC"), PHALCON_TEXT_RANDOM_NUMERIC);
+	zend_declare_class_constant_long(phalcon_text_ce, SL("RANDOM_NOZERO"),  PHALCON_TEXT_RANDOM_NOZERO );
 
 	return SUCCESS;
 }
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Text, random){
 		ZVAL_LONG(length, 8);
 	}
 	
-	phalcon_random_string(return_value, type, length TSRMLS_CC);
+	phalcon_random_string(return_value, type, length);
 	RETURN_MM();
 }
 
@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_Text, lower){
 	 * 'lower' checks for the mbstring extension to make a correct lowercase
 	 * transformation
 	 */
-	if (phalcon_function_exists_ex(SS("mb_strtolower") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("mb_strtolower")) == SUCCESS) {
 		PHALCON_MM_GROW();
 		PHALCON_RETURN_CALL_FUNCTION("mb_strtolower", str);
 		RETURN_MM();
@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_Text, upper){
 	 * 'upper' checks for the mbstring extension to make a correct lowercase
 	 * transformation
 	 */
-	if (phalcon_function_exists_ex(SS("mb_strtoupper") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("mb_strtoupper")) == SUCCESS) {
 		PHALCON_MM_GROW();
 		PHALCON_RETURN_CALL_FUNCTION("mb_strtoupper", str);
 		RETURN_MM();
@@ -525,10 +525,10 @@ PHP_METHOD(Phalcon_Text, concat){
 			PHALCON_GET_HVALUE(c);
 
 			PHALCON_INIT_NVAR(b_trimmed);
-			phalcon_fast_trim(b_trimmed, b, separator, PHALCON_TRIM_RIGHT TSRMLS_CC);
+			phalcon_fast_trim(b_trimmed, b, separator, PHALCON_TRIM_RIGHT);
 
 			PHALCON_INIT_NVAR(c_trimmed);
-			phalcon_fast_trim(c_trimmed, c, separator, PHALCON_TRIM_LEFT TSRMLS_CC);
+			phalcon_fast_trim(c_trimmed, c, separator, PHALCON_TRIM_LEFT);
 
 			PHALCON_INIT_NVAR(tmp);
 			PHALCON_CONCAT_VVV(tmp, b_trimmed, separator, c_trimmed)
@@ -540,10 +540,10 @@ PHP_METHOD(Phalcon_Text, concat){
 	}
 
 	PHALCON_INIT_NVAR(a_trimmed);
-	phalcon_fast_trim(a_trimmed, a, separator, PHALCON_TRIM_RIGHT TSRMLS_CC);
+	phalcon_fast_trim(a_trimmed, a, separator, PHALCON_TRIM_RIGHT);
 
 	PHALCON_INIT_NVAR(b_trimmed);
-	phalcon_fast_trim(b_trimmed, b, separator, PHALCON_TRIM_LEFT TSRMLS_CC);
+	phalcon_fast_trim(b_trimmed, b, separator, PHALCON_TRIM_LEFT);
 
 	PHALCON_INIT_NVAR(tmp);
 	PHALCON_CONCAT_VVV(tmp, a_trimmed, separator, b_trimmed)

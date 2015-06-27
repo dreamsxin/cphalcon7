@@ -72,8 +72,8 @@ PHALCON_INIT_CLASS(Phalcon_Acl){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Acl, acl, NULL, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_class_constant_long(phalcon_acl_ce, SL("ALLOW"), PHALCON_ACL_ALLOW TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_acl_ce, SL("DENY"), PHALCON_ACL_DENY TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_acl_ce, SL("ALLOW"), PHALCON_ACL_ALLOW);
+	zend_declare_class_constant_long(phalcon_acl_ce, SL("DENY"), PHALCON_ACL_DENY);
 
 	return SUCCESS;
 }

@@ -23,7 +23,7 @@
 /**
  * Assigns the current value in a hash traversing to a zval
  */
-void phalcon_get_current_key(zval **key, const HashTable *hash_table, HashPosition *hash_position TSRMLS_DC)
+void phalcon_get_current_key(zval **key, const HashTable *hash_table, HashPosition *hash_position)
 {
 	Bucket *p;
 

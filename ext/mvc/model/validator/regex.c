@@ -75,7 +75,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Regex){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Validator, Regex, mvc_model_validator_regex, phalcon_mvc_model_validator_ce, phalcon_mvc_model_validator_regex_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_validator_regex_ce TSRMLS_CC, 1, phalcon_mvc_model_validatorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_validator_regex_ce, 1, phalcon_mvc_model_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -161,13 +161,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 	 * Check if the value matches using preg_match
 	 */
 	PHALCON_INIT_VAR(match_pattern);
-	RETURN_MM_ON_FAILURE(phalcon_preg_match(match_pattern, pattern, value, matches TSRMLS_CC));
+	RETURN_MM_ON_FAILURE(phalcon_preg_match(match_pattern, pattern, value, matches));
 	
 	if (zend_is_true(match_pattern)) {
 		PHALCON_OBS_VAR(match_zero);
 		phalcon_array_fetch_long(&match_zero, matches, 0, PH_NOISY);
 	
-		is_not_equal_function(failed, match_zero, value TSRMLS_CC);
+		is_not_equal_function(failed, match_zero, value);
 	} else {
 		PHALCON_INIT_NVAR(failed);
 		ZVAL_BOOL(failed, 1);

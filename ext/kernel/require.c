@@ -27,7 +27,7 @@
 /**
  * Do an internal require to a plain php file taking care of the value returned by the file
  */
-int phalcon_require_ret(zval *return_value, const char *require_path TSRMLS_DC)
+int phalcon_require_ret(zval *return_value, const char *require_path)
 {
 	zend_file_handle file_handle;
 	zend_op_array *op_array;

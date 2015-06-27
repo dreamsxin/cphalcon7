@@ -117,7 +117,7 @@ static union _zend_function* phalcon_di_get_method(zval **object_ptr, zend_strin
 	return fbc;
 }
 
-static int phalcon_di_call_method_internal(zval *return_value, zval **return_value_ptr, zval *this_ptr, const char *method, zval *param TSRMLS_DC)
+static int phalcon_di_call_method_internal(zval *return_value, zval **return_value_ptr, zval *this_ptr, const char *method, zval *param)
 {
 	phalcon_di_object *obj;
 	int method_len       = strlen(method);
@@ -144,10 +144,10 @@ static int phalcon_di_call_method_internal(zval *return_value, zval **return_val
 			params[1] = param;
 
 			if (lc_method_name[0] == 'g') {
-				retval = phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "get", 2, params TSRMLS_CC);
+				retval = phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "get", 2, params);
 			}
 			else {
-				retval = phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "set", 2, params TSRMLS_CC);
+				retval = phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "set", 2, params);
 			}
 
 			if (EG(exception)) {
@@ -175,10 +175,10 @@ static int phalcon_di_call_method(const char *method, INTERNAL_FUNCTION_PARAMETE
 		return FAILURE;
 	}
 
-	return phalcon_di_call_method_internal(return_value, return_value_ptr, getThis(), method, *param TSRMLS_CC);
+	return phalcon_di_call_method_internal(return_value, return_value_ptr, getThis(), method, *param);
 }
 
-static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_object *obj, zval *offset, zval *parameters TSRMLS_DC)
+static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_object *obj, zval *offset, zval *parameters)
 {
 	zval *tmp = NULL;
 	zval **retval = &tmp, **service;
@@ -200,7 +200,7 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 		zval *params[] = { parameters, this_ptr };
 
 		/* The service is registered in the DI */
-		if (FAILURE == phalcon_call_method(retval, *service, "resolve", 2, params TSRMLS_CC)) {
+		if (FAILURE == phalcon_call_method(retval, *service, "resolve", 2, params)) {
 			return NULL;
 		}
 
@@ -210,8 +210,8 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
 		if ((ce = phalcon_class_exists_ex(offset, 1)) != NULL) {
-			MAKE_STD_ZVAL(*retval);
-			if (FAILURE == phalcon_create_instance_params_ce(*retval, ce, parameters TSRMLS_CC)) {
+			PHALCON_ALLOC_GHOST_ZVAL(*retval);
+			if (FAILURE == phalcon_create_instance_params_ce(*retval, ce, parameters)) {
 				return NULL;
 			}
 
@@ -226,7 +226,7 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	/* Pass the DI itself if the instance implements Phalcon\DI\InjectionAwareInterface */
 	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1)) {
 		zval *params[] = { this_ptr };
-		if (FAILURE == phalcon_call_method(NULL, *retval, "setdi", 1, params TSRMLS_CC)) {
+		if (FAILURE == phalcon_call_method(NULL, *retval, "setdi", 1, params)) {
 			phalcon_ptr_dtor(*retval);
 			return NULL;
 		}
@@ -285,12 +285,12 @@ static int phalcon_di_has_dimension_internal(phalcon_di_object *obj, zval *offse
 	return 1;
 }
 
-static int phalcon_di_has_dimension(zval *object, zval *offset, int check_empty TSRMLS_DC)
+static int phalcon_di_has_dimension(zval *object, zval *offset, int check_empty)
 {
 	phalcon_di_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_di_object);
 
 	if (!is_phalcon_class(obj->obj.ce)) {
-		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty TSRMLS_CC);
+		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty);
 	}
 
 	return phalcon_di_has_dimension_internal(obj, offset, check_empty);
@@ -303,7 +303,7 @@ static zval* phalcon_di_write_dimension_internal(phalcon_di_object *obj, zval *o
 
 	assert(Z_TYPE_P(offset) == IS_STRING);
 
-	MAKE_STD_ZVAL(retval);
+	PHALCON_ALLOC_GHOST_ZVAL(retval);
 	object_init_ex(retval, phalcon_di_service_ce);
 	if (FAILURE == phalcon_call_method(NULL, retval, "__construct", 3, params)) {
 		return NULL;
@@ -342,13 +342,13 @@ static inline void phalcon_di_unset_dimension_internal(phalcon_di_object *obj, z
 	zend_symtable_del(obj->services, Z_STRVAL_P(offset), Z_STRLEN_P(offset)+1);
 }
 
-static void phalcon_di_unset_dimension(zval *object, zval *offset TSRMLS_DC)
+static void phalcon_di_unset_dimension(zval *object, zval *offset)
 {
 	phalcon_di_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_di_object);
 	zval tmp;
 
 	if (!is_phalcon_class(obj->obj.ce)) {
-		zend_get_std_object_handlers()->unset_dimension(object, offset TSRMLS_CC);
+		zend_get_std_object_handlers()->unset_dimension(object, offset);
 		return;
 	}
 
@@ -365,26 +365,26 @@ static void phalcon_di_unset_dimension(zval *object, zval *offset TSRMLS_DC)
 	}
 }
 
-static HashTable* phalcon_di_get_properties(zval* object TSRMLS_DC)
+static HashTable* phalcon_di_get_properties(zval* object)
 {
 	zval *zv;
-	HashTable* props = zend_std_get_properties(object TSRMLS_CC);
+	HashTable* props = zend_std_get_properties(object);
 	phalcon_di_object *obj;
 
 	if (!GC_G(gc_active) && !props->nApplyCount) {
 		obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_di_object);
 
-		MAKE_STD_ZVAL(zv);
+		PHALCON_ALLOC_GHOST_ZVAL(zv);
 		array_init_size(zv, zend_hash_num_elements(obj->services));
 		zend_hash_copy(Z_ARRVAL_P(zv), obj->services, (copy_ctor_func_t)zval_add_ref);
 		zend_hash_quick_update(props, "_services", sizeof("_services"), zend_inline_hash_func(SS("_sharedInstances")), (void*)&zv, sizeof(zval*), NULL);
 
-		MAKE_STD_ZVAL(zv);
+		PHALCON_ALLOC_GHOST_ZVAL(zv);
 		array_init_size(zv, zend_hash_num_elements(obj->shared));
 		zend_hash_copy(Z_ARRVAL_P(zv), obj->shared, (copy_ctor_func_t)zval_add_ref);
 		zend_hash_quick_update(props, "_sharedInstances", sizeof("_sharedInstances"), zend_inline_hash_func(SS("_sharedInstances")), (void*)&zv, sizeof(zval*), NULL);
 
-		MAKE_STD_ZVAL(zv);
+		PHALCON_ALLOC_GHOST_ZVAL(zv);
 		ZVAL_BOOL(zv, obj->fresh);
 		zend_hash_quick_update(props, "_freshInstance", sizeof("_freshInstance"), zend_inline_hash_func(SS("_freshInstance")), (void*)&zv, sizeof(zval*), NULL);
 	}
@@ -409,7 +409,7 @@ static zend_object *phalcon_di_ctor(zend_class_entry* ce)
 {
 	phalcon_di_object *obj = ecalloc(1, sizeof(phalcon_di_object));
 
-	zend_object_std_init(&obj->obj, ce TSRMLS_CC);
+	zend_object_std_init(&obj->obj, ce);
 	object_properties_init(&obj->obj, ce);
 
 	ALLOC_HASHTABLE(obj->services);
@@ -423,7 +423,7 @@ static zend_object *phalcon_di_ctor(zend_class_entry* ce)
 	return &obj->obj;
 }
 
-static zend_object *zend_object_value phalcon_di_clone_obj(zval *zobject TSRMLS_DC)
+static zend_object *zend_object_value phalcon_di_clone_obj(zval *zobject)
 {
 	phalcon_di_object *old_object;
 	phalcon_di_object *new_object;
@@ -440,7 +440,7 @@ static zend_object *zend_object_value phalcon_di_clone_obj(zval *zobject TSRMLS_
 	return &new_object->obj;
 }
 
-void phalcon_di_set_service(zval *this_ptr, zval *name, zval *service, int flags TSRMLS_DC)
+void phalcon_di_set_service(zval *this_ptr, zval *name, zval *service, int flags)
 {
 	phalcon_di_object *obj;
 	if (flags & PH_COPY) {
@@ -451,7 +451,7 @@ void phalcon_di_set_service(zval *this_ptr, zval *name, zval *service, int flags
 	zend_hash_update(obj->services, Z_STRVAL_P(name), Z_STRLEN_P(name)+1, &service, sizeof(zval*), NULL);
 }
 
-void phalcon_di_set_services(zval *this_ptr, zval *services TSRMLS_DC)
+void phalcon_di_set_services(zval *this_ptr, zval *services)
 {
 	phalcon_di_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(this_ptr, phalcon_di_object);
 	zend_hash_copy(obj->services, Z_ARRVAL_P(services), (copy_ctor_func_t)zval_add_ref);
@@ -544,9 +544,9 @@ PHALCON_INIT_CLASS(Phalcon_DI){
 
 	PHALCON_REGISTER_CLASS(Phalcon, DI, di, phalcon_di_method_entry, 0);
 
-	zend_declare_property_null(phalcon_di_ce, SL("_default"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_null(phalcon_di_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_class_implements(phalcon_di_ce TSRMLS_CC, 1, phalcon_diinterface_ce);
+	zend_declare_property_null(phalcon_di_ce, SL("_default"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_null(phalcon_di_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
+	zend_class_implements(phalcon_di_ce, 1, phalcon_diinterface_ce);
 
 	phalcon_di_ce->create_object = phalcon_di_ctor;
 	phalcon_di_ce->serialize     = zend_class_serialize_deny;
@@ -576,9 +576,9 @@ PHP_METHOD(Phalcon_DI, __construct){
 
 	zval *default_di;
 
-	default_di = phalcon_fetch_static_property_ce(phalcon_di_ce, SL("_default") TSRMLS_CC);
+	default_di = phalcon_fetch_static_property_ce(phalcon_di_ce, SL("_default"));
 	if (Z_TYPE_P(default_di) == IS_NULL) {
-		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), this_ptr TSRMLS_CC);
+		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), this_ptr);
 	}
 }
 
@@ -597,7 +597,7 @@ PHP_METHOD(Phalcon_DI, setEventsManager){
 
 	PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 
-	phalcon_update_property_this(this_ptr, SL("_eventsManager"), events_manager TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_eventsManager"), events_manager);
 
 	PHALCON_MM_RESTORE();
 }
@@ -632,7 +632,7 @@ PHP_METHOD(Phalcon_DI, set) {
 		shared = &PHALCON_GLOBAL(z_false);
 	}
 
-	MAKE_STD_ZVAL(service);
+	PHALCON_ALLOC_GHOST_ZVAL(service);
 	object_init_ex(service, phalcon_di_service_ce);
 	/* Won't throw exceptions */
 	PHALCON_CALL_METHODW(NULL, service, "__construct", *name, *definition, *shared);
@@ -850,7 +850,7 @@ PHP_METHOD(Phalcon_DI, get){
 	else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
 		if ((ce = phalcon_class_exists_ex(name, 1)) ! = NULL) {
-			if (FAILURE == phalcon_create_instance_params_ce(return_value, ce, parameters TSRMLS_CC)) {
+			if (FAILURE == phalcon_create_instance_params_ce(return_value, ce, parameters)) {
 				RETURN_MM();
 			}
 		}
@@ -1015,7 +1015,7 @@ PHP_METHOD(Phalcon_DI, __call){
 		arguments = &PHALCON_GLOBAL(z_null);
 	}
 	
-	phalcon_di_call_method_internal(return_value, return_value_ptr, getThis(), Z_STRVAL_P(*method), *arguments TSRMLS_CC);
+	phalcon_di_call_method_internal(return_value, return_value_ptr, getThis(), Z_STRVAL_P(*method), *arguments);
 }
 
 /**
@@ -1029,7 +1029,7 @@ PHP_METHOD(Phalcon_DI, setDefault){
 
 	phalcon_fetch_params(0, 0, 1, 0, &dependency_injector);
 	
-	phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), dependency_injector TSRMLS_CC);
+	phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), dependency_injector);
 	
 }
 
@@ -1042,7 +1042,7 @@ PHP_METHOD(Phalcon_DI, getDefault){
 
 	zval *default_di;
 
-	default_di = phalcon_fetch_static_property_ce(phalcon_di_ce, SL("_default") TSRMLS_CC);
+	default_di = phalcon_fetch_static_property_ce(phalcon_di_ce, SL("_default"));
 	RETURN_CTORW(default_di);
 }
 
@@ -1051,7 +1051,7 @@ PHP_METHOD(Phalcon_DI, getDefault){
  */
 PHP_METHOD(Phalcon_DI, reset){
 
-	zend_update_static_property_null(phalcon_di_ce, SL("_default") TSRMLS_CC);
+	zend_update_static_property_null(phalcon_di_ce, SL("_default"));
 }
 
 PHP_METHOD(Phalcon_DI, __clone) {

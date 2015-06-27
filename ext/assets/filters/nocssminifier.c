@@ -25,7 +25,7 @@
 #include "assets/exception.h"
 #include "kernel/exception.h"
 
-int phalcon_cssmin(zval *return_value, zval *style TSRMLS_DC) {
+int phalcon_cssmin(zval *return_value, zval *style) {
 
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Non-free csssminifier not available");
 	return FAILURE;

@@ -103,9 +103,9 @@ PHALCON_INIT_CLASS(Phalcon_Debug_Dump){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Debug, Dump, debug_dump, phalcon_debug_dump_method_entry, 0);
 
-	zend_declare_property_bool(phalcon_debug_dump_ce, SL("_detailed"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_debug_dump_ce, SL("_styles"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_debug_dump_ce, SL("_objects"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_bool(phalcon_debug_dump_ce, SL("_detailed"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_debug_dump_ce, SL("_styles"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_debug_dump_ce, SL("_objects"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -139,17 +139,17 @@ PHP_METHOD(Phalcon_Debug_Dump, __construct){
 	phalcon_array_update_string_string(&default_styles, SL("res"), SL("color:lime"), 0);
 	phalcon_array_update_string_string(&default_styles, SL("str"), SL("color:teal"), 0);
 
-	phalcon_update_property_this(this_ptr, SL("_styles"), default_styles TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_styles"), default_styles);
 
 	if (styles && Z_TYPE_P(styles) != IS_NULL) {
 		PHALCON_CALL_SELF(NULL, "setstyles", styles);
 	}
 
 	if (detailed && zend_is_true(detailed)) {
-		phalcon_update_property_bool(this_ptr, SL("_detailed"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_detailed"), 1);
 	}
 
-	phalcon_update_property_empty_array(this_ptr, SL("_objects") TSRMLS_CC);
+	phalcon_update_property_empty_array(this_ptr, SL("_objects"));
 
 	PHALCON_MM_RESTORE();
 }
@@ -224,9 +224,9 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 	default_styles  = phalcon_fetch_nproperty_this(this_ptr, SL("_styles"), PH_NOISY);
 
 	PHALCON_INIT_VAR(new_styles);
-	phalcon_fast_array_merge(new_styles, &default_styles, &styles TSRMLS_CC);
+	phalcon_fast_array_merge(new_styles, &default_styles, &styles);
 
-	phalcon_update_property_this(this_ptr, SL("_styles"), new_styles TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_styles"), new_styles);
 
 	RETURN_THIS();
 }
@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_CALL_SELF(&style, "getstyle", type);
 
 		PHALCON_INIT_NVAR(count);
-		ZVAL_LONG(count, phalcon_fast_count_int(variable TSRMLS_CC));
+		ZVAL_LONG(count, phalcon_fast_count_int(variable));
 
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
@@ -279,9 +279,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":count"), count, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
-		phalcon_concat_self(&return_value, output TSRMLS_CC);
+		phalcon_concat_self(&return_value, output);
 
 		phalcon_is_iterable(variable, &ah0, &hp0, 0, 0);
 
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
 
-			phalcon_concat_self(&return_value, tmp TSRMLS_CC);
+			phalcon_concat_self(&return_value, tmp);
 
 			PHALCON_INIT_NVAR(str);
 			ZVAL_STRING(str, "[<span style=':style'>:key</span>] => ", 1);
@@ -309,9 +309,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			phalcon_array_update_string(&replace_pairs, SL(":key"), key, PH_COPY);
 
 			PHALCON_INIT_NVAR(output);
-			phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+			phalcon_strtr_array(output, str, replace_pairs);
 
-			phalcon_concat_self(&return_value, output TSRMLS_CC);
+			phalcon_concat_self(&return_value, output);
 
 			if (PHALCON_IS_LONG(tab, 1) && !PHALCON_IS_EMPTY(name) && !phalcon_is_numeric(key) && PHALCON_IS_IDENTICAL(name, key)) {
 				zend_hash_move_forward_ex(ah0, &hp0);
@@ -344,7 +344,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_CALL_SELF(&style, "getstyle", type);
 
 		PHALCON_INIT_NVAR(class_name);
-		phalcon_get_class(class_name, variable, 0 TSRMLS_CC);
+		phalcon_get_class(class_name, variable, 0);
 
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
@@ -353,12 +353,12 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":class"), class_name, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 
 		PHALCON_INIT_NVAR(class_name);
-		phalcon_get_parent_class(class_name, variable, 0 TSRMLS_CC);
+		phalcon_get_parent_class(class_name, variable, 0);
 
 		if (zend_is_true(class_name)) {
 			PHALCON_INIT_NVAR(str);
@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			phalcon_array_update_string(&replace_pairs, SL(":parent"), class_name, PH_COPY);
 
 			PHALCON_INIT_NVAR(output);
-			phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+			phalcon_strtr_array(output, str, replace_pairs);
 
 			PHALCON_SCONCAT(return_value, output);
 		}
@@ -385,7 +385,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		objects  = phalcon_fetch_nproperty_this(this_ptr, SL("_objects"), PH_NOISY);
 
-		if (phalcon_fast_in_array(variable, objects TSRMLS_CC)) {
+		if (phalcon_fast_in_array(variable, objects)) {
 			
 			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
 			PHALCON_SCONCAT_VS(return_value, tmp, "[already listed]\n");
@@ -400,12 +400,12 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			RETURN_MM();
 		}
 
-		phalcon_update_property_array_append(this_ptr, SL("_objects"), variable TSRMLS_CC);
+		phalcon_update_property_array_append(this_ptr, SL("_objects"), variable);
 
 		detailed  = phalcon_fetch_nproperty_this(this_ptr, SL("_detailed"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(properties);
-		phalcon_get_object_vars(properties, variable, !zend_is_true(detailed) TSRMLS_CC);
+		phalcon_get_object_vars(properties, variable, !zend_is_true(detailed));
 
 		phalcon_is_iterable(properties, &ah0, &hp0, 0, 0);
 
@@ -441,7 +441,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			}
 
 			PHALCON_INIT_NVAR(output);
-			phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+			phalcon_strtr_array(output, str, replace_pairs);
 
 			PHALCON_SCONCAT(return_value, output);
 
@@ -456,7 +456,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_INIT_NVAR(methods);
 
-		phalcon_get_class_methods(methods, variable, !zend_is_true(detailed) TSRMLS_CC);
+		phalcon_get_class_methods(methods, variable, !zend_is_true(detailed));
 
 		PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
 
@@ -471,10 +471,10 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_CALL_SELF(&style, "getstyle", type);
 
 		PHALCON_INIT_NVAR(class_name);
-		phalcon_get_class(class_name, variable, 0 TSRMLS_CC);
+		phalcon_get_class(class_name, variable, 0);
 
 		PHALCON_INIT_NVAR(count);
-		ZVAL_LONG(count, phalcon_fast_count_int(methods TSRMLS_CC));
+		ZVAL_LONG(count, phalcon_fast_count_int(methods));
 
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
@@ -484,7 +484,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":count"), count, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 
@@ -516,7 +516,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			phalcon_array_update_string(&replace_pairs, SL(":method"), method, PH_COPY);
 
 			PHALCON_INIT_NVAR(output);
-			phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+			phalcon_strtr_array(output, str, replace_pairs);
 
 			PHALCON_SCONCAT(return_value, output);
 
@@ -549,7 +549,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 	} else if (Z_TYPE_P(variable) == IS_DOUBLE) {
@@ -568,7 +568,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 	} else if (phalcon_is_numeric_ex(variable)) {
@@ -588,7 +588,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 	} else if (Z_TYPE_P(variable) == IS_STRING) {
@@ -608,7 +608,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 	} else if (PHALCON_IS_BOOL(variable)) {
@@ -631,7 +631,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		}
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 	} else if (Z_TYPE_P(variable) == IS_NULL) {
@@ -649,7 +649,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 	} else {
@@ -668,7 +668,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_INIT_NVAR(output);
-		phalcon_strtr_array(output, str, replace_pairs TSRMLS_CC);
+		phalcon_strtr_array(output, str, replace_pairs);
 
 		PHALCON_SCONCAT(return_value, output);
 	}
@@ -710,7 +710,7 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
 	phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_SEPARATE);
 	phalcon_array_update_string(&replace_pairs, SL(":output"), output, PH_SEPARATE);
 
-	phalcon_strtr_array(return_value, str, replace_pairs TSRMLS_CC);
+	phalcon_strtr_array(return_value, str, replace_pairs);
 
 	RETURN_MM();
 }

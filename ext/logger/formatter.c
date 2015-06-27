@@ -47,7 +47,7 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Logger, Formatter, logger_formatter, phalcon_logger_formatter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_class_implements(phalcon_logger_formatter_ce TSRMLS_CC, 1, phalcon_logger_formatterinterface_ce);
+	zend_class_implements(phalcon_logger_formatter_ce, 1, phalcon_logger_formatterinterface_ce);
 
 	return SUCCESS;
 }

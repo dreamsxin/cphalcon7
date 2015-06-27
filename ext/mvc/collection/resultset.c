@@ -133,15 +133,15 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_Resultset){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Collection, Resultset, mvc_collection_resultset, phalcon_mvc_collection_resultset_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_collection"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_cursor"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_mvc_collection_resultset_ce, SL("_pointer"), -1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_count"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_activeRow"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_rows"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_collection"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_cursor"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_collection_resultset_ce, SL("_pointer"), -1, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_count"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_activeRow"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_rows"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_resultset_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_collection_resultset_ce TSRMLS_CC, 5, zend_ce_iterator, spl_ce_SeekableIterator, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_serializable);
+	zend_class_implements(phalcon_mvc_collection_resultset_ce, 5, zend_ce_iterator, spl_ce_SeekableIterator, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_serializable);
 
 	return SUCCESS;
 }
@@ -161,15 +161,15 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
 
 	phalcon_fetch_params(1, 2, 0, &collection, &cursor);
 
-	phalcon_update_property_this(this_ptr, SL("_collection"), collection TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_cursor"), cursor TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_collection"), collection);
+	phalcon_update_property_this(this_ptr, SL("_cursor"), cursor);
 	if (Z_TYPE_P(cursor) != IS_OBJECT) {
 		RETURN_MM_NULL();
 	}
 
 	PHALCON_CALL_METHOD(&row_count, cursor, "count", PHALCON_GLOBAL(z_true));
 
-	phalcon_update_property_this(this_ptr, SL("_count"), row_count TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_count"), row_count);
 
 	PHALCON_MM_RESTORE();
 }
@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 	}
 
 	if (Z_TYPE_P(row) != IS_ARRAY) { 
-		phalcon_update_property_bool(this_ptr, SL("_activeRow"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_activeRow"), 0);
 		RETURN_MM_FALSE;
 	}
 
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 
 	PHALCON_CALL_CE_STATIC(&active_row, phalcon_mvc_collection_ce, "cloneresult", collection, row);
 
-	phalcon_update_property_this(this_ptr, SL("_activeRow"), active_row TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_activeRow"), active_row);
 	RETURN_MM_TRUE;
 }
 
@@ -286,12 +286,12 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, serialize){
 	array_init_size(data, 3);
 	phalcon_array_update_string(&data, SL("collection"), collection, PH_COPY);
 	phalcon_array_update_string(&data, SL("rows"), records, PH_COPY);
-	phalcon_update_property_bool(this_ptr, SL("_activeRow"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_activeRow"), 0);
 	
 	/** 
 	 * Serialize the cache using the serialize function
 	 */
-	phalcon_serialize(return_value, &data TSRMLS_CC);
+	phalcon_serialize(return_value, &data);
 	RETURN_MM();
 }
 
@@ -309,7 +309,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, unserialize){
 	phalcon_fetch_params(1, 1, 0, &data);
 	
 	PHALCON_INIT_VAR(resultset);
-	phalcon_unserialize(resultset, data TSRMLS_CC);
+	phalcon_unserialize(resultset, data);
 	if (Z_TYPE_P(resultset) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Invalid serialization data");
 		return;
@@ -317,11 +317,11 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, unserialize){
 	
 	PHALCON_OBS_VAR(collection);
 	phalcon_array_fetch_string(&collection, resultset, SL("collection"), PH_NOISY);
-	phalcon_update_property_this(this_ptr, SL("_collection"), collection TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_collection"), collection);
 	
 	PHALCON_OBS_VAR(rows);
 	phalcon_array_fetch_string(&rows, resultset, SL("rows"), PH_NOISY);
-	phalcon_update_property_this(this_ptr, SL("_rows"), rows TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_rows"), rows);
 
 	PHALCON_MM_RESTORE();
 }
@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, unserialize){
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, next){
 
 
-	phalcon_property_incr(this_ptr, SL("_pointer") TSRMLS_CC);
+	phalcon_property_incr(this_ptr, SL("_pointer"));
 
 }
 
@@ -374,7 +374,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(rows), NULL);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_pointer"), z_zero TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_pointer"), z_zero);
 
 	PHALCON_MM_RESTORE();
 }
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
 	HashTable *ah0;
 	long i;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &position) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &position) == FAILURE) {
 		RETURN_NULL();
 	}
 
@@ -401,16 +401,16 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
 	convert_to_long(position);
 
 	PHALCON_OBS_VAR(pointer);
-	phalcon_read_property(&pointer, this_ptr, SL("_pointer"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property(&pointer, this_ptr, SL("_pointer"), PH_NOISY);
 
 	PHALCON_INIT_VAR(is_different);
-	is_not_equal_function(is_different, pointer, position TSRMLS_CC);
+	is_not_equal_function(is_different, pointer, position);
 	if (PHALCON_IS_TRUE(is_different)) {
-		phalcon_update_property_zval(this_ptr, SL("_pointer"), position TSRMLS_CC);
+		phalcon_update_property_zval(this_ptr, SL("_pointer"), position);
 		rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY);
 		if (Z_TYPE_P(rows) == IS_NULL) {
 			PHALCON_OBS_VAR(cursor);
-			phalcon_read_property(&cursor, this_ptr, SL("_cursor"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property(&cursor, this_ptr, SL("_cursor"), PH_NOISY);
 			if (Z_TYPE_P(cursor) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(NULL, cursor, "skip", position);
 			}
@@ -466,10 +466,10 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, count){
 			}
 		} else {
 			PHALCON_INIT_NVAR(count);
-			phalcon_fast_count(count, rows TSRMLS_CC);
+			phalcon_fast_count(count, rows);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_count"), count TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_count"), count);
 	}
 
 	RETURN_CCTOR(count);
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetExists){
 	phalcon_fetch_params(0, 1, 0, &index);
 
 	PHALCON_CALL_METHODW(&count, this_ptr, "count");
-	is_smaller_function(return_value, index, count TSRMLS_CC);
+	is_smaller_function(return_value, index, count);
 	zval_ptr_dtor(&count);
 }
 
@@ -692,7 +692,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 			/** 
 			 * We only can delete resultsets whose every element is a complete object
 			 */
-			if (phalcon_method_exists_ex(record, SS("getwriteconnection") TSRMLS_CC) == FAILURE) {
+			if (phalcon_method_exists_ex(record, SS("getwriteconnection")) == FAILURE) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "The returned record is not valid");
 				return;
 			}
@@ -729,7 +729,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 			 * Get the messages from the record that produce the error
 			 */
 			PHALCON_CALL_METHOD(&messages, record, "getmessages");
-			phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages);
 
 			/** 
 			 * Rollback the transaction
@@ -852,7 +852,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 			/** 
 			 * We only can update resultsets whose every element is a complete object
 			 */
-			if (phalcon_method_exists_ex(record, SS("getwriteconnection") TSRMLS_CC) == FAILURE) {
+			if (phalcon_method_exists_ex(record, SS("getwriteconnection")) == FAILURE) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "The returned record is not valid");
 				return;
 			}
@@ -889,7 +889,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 			 * Get the messages from the record that produce the error
 			 */
 			PHALCON_CALL_METHOD(&messages, record, "getmessages");
-			phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages);
 
 			/** 
 			 * Rollback the transaction

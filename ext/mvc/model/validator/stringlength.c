@@ -78,7 +78,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_StringLength){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Validator, StringLength, mvc_model_validator_stringlength, phalcon_mvc_model_validator_ce, phalcon_mvc_model_validator_stringlength_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_validator_stringlength_ce TSRMLS_CC, 1, phalcon_mvc_model_validatorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_validator_stringlength_ce, 1, phalcon_mvc_model_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 	/** 
 	 * Check if mbstring is available to calculate the correct length
 	 */
-	if (phalcon_function_exists_ex(SS("mb_strlen") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("mb_strlen")) == SUCCESS) {
 		PHALCON_CALL_FUNCTION(&length, "mb_strlen", value);
 	} else {
 		PHALCON_INIT_VAR(length);
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 	
 		PHALCON_CALL_METHOD(&maximum, this_ptr, "getoption", option);
 	
-		is_smaller_function(invalid_maximum, maximum, length TSRMLS_CC);
+		is_smaller_function(invalid_maximum, maximum, length);
 		if (PHALCON_IS_TRUE(invalid_maximum)) {
 	
 			/** 
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 	
 		PHALCON_CALL_METHOD(&minimum, this_ptr, "getoption", option);
 	
-		is_smaller_function(invalid_minimum, length, minimum TSRMLS_CC);
+		is_smaller_function(invalid_minimum, length, minimum);
 		if (PHALCON_IS_TRUE(invalid_minimum)) {
 	
 			/** 

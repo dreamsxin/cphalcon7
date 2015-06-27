@@ -56,17 +56,17 @@ int phalcon_stop_debug(){
 /**
  * Executes a print_r on an interal zval
  */
-int phalcon_print_r(zval *userval TSRMLS_DC){
-	zend_print_zval_r(userval, 0 TSRMLS_CC);
+int phalcon_print_r(zval *userval){
+	zend_print_zval_r(userval, 0);
 	return SUCCESS;
 }
 
 /**
  * Executes a print_r on an interal zval
  */
-int phalcon_debug_print_r(zval *message TSRMLS_DC){
+int phalcon_debug_print_r(zval *message){
 	zend_printf("[DEBUG] ");
-	zend_print_zval_r(message, 0 TSRMLS_CC);
+	zend_print_zval_r(message, 0);
 	zend_printf("<br>\r\n");
 	return SUCCESS;
 }
@@ -74,7 +74,7 @@ int phalcon_debug_print_r(zval *message TSRMLS_DC){
 /**
  * Internal fast zval dump
  */
-int phalcon_vdump(zval *uservar TSRMLS_DC){
+int phalcon_vdump(zval *uservar){
 	phalcon_start_debug();
     if(!uservar){
 		fprintf(phalcon_log, "Null pointer\n");
@@ -113,7 +113,7 @@ int phalcon_vdump(zval *uservar TSRMLS_DC){
     return SUCCESS;
 }
 
-int phalcon_dump_ce(zend_class_entry *ce TSRMLS_DC){
+int phalcon_dump_ce(zend_class_entry *ce){
 	char *message = emalloc(sizeof(char *) * 120);
 	if(ce){
 		snprintf(message, 120, "- ClassType => %d", ce->type);
@@ -130,7 +130,7 @@ int phalcon_dump_ce(zend_class_entry *ce TSRMLS_DC){
 	return SUCCESS;
 }
 
-int phalcon_class_debug(zval *val TSRMLS_DC){
+int phalcon_class_debug(zval *val){
 	char *message = emalloc(sizeof(char *) * 120);
 	zend_class_entry *ce;
 	if (val) {
@@ -138,7 +138,7 @@ int phalcon_class_debug(zval *val TSRMLS_DC){
 		if(ce){
 			snprintf(message, 120, "- MemoryAddress => %p", val);
 			phalcon_step_over(message);
-			phalcon_dump_ce(ce TSRMLS_CC);
+			phalcon_dump_ce(ce);
 		} else {
 			phalcon_step_over("- No class entry :(");
 		}
@@ -171,7 +171,7 @@ int phalcon_debug_screen(char *message){
 	return SUCCESS;
 }
 
-int phalcon_debug_method_call(zval *obj, char *method_name TSRMLS_DC){
+int phalcon_debug_method_call(zval *obj, char *method_name){
 	if(Z_TYPE_P(obj)==IS_OBJECT){
 		phalcon_debug_space();
 	} else {
@@ -203,24 +203,24 @@ int phalcon_debug_space(){
 	return SUCCESS;
 }
 
-int phalcon_debug_param(zval *param TSRMLS_DC){
+int phalcon_debug_param(zval *param){
 	phalcon_debug_space();
 	fprintf(phalcon_log, "Push method Param > ");
-	phalcon_vdump(param TSRMLS_CC);
+	phalcon_vdump(param);
 	return SUCCESS;
 }
 
-int phalcon_debug_vdump(char *preffix, zval *value TSRMLS_DC){
+int phalcon_debug_vdump(char *preffix, zval *value){
 	phalcon_debug_space();
 	fprintf(phalcon_log, "%s", preffix);
-	phalcon_vdump(value TSRMLS_CC);
+	phalcon_vdump(value);
 	return SUCCESS;
 }
 
-int phalcon_debug_assign(char *name, zval *value TSRMLS_DC){
+int phalcon_debug_assign(char *name, zval *value){
 	phalcon_debug_space();
 	fprintf(phalcon_log, "Assign on %s with ", name);
-	phalcon_vdump(value TSRMLS_CC);
+	phalcon_vdump(value);
 	return SUCCESS;
 }
 

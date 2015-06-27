@@ -71,22 +71,22 @@ int phalcon_file_exists(zval *filename){
 /**
  * Compares two file paths returning 1 if the first mtime is greater or equal than the second
  */
-int phalcon_compare_mtime(zval *filename1, zval *filename2 TSRMLS_DC){
+int phalcon_compare_mtime(zval *filename1, zval *filename2){
 
 	php_stream_statbuf statbuffer1, statbuffer2;
 
 	if (Z_TYPE_P(filename1) != IS_STRING || Z_TYPE_P(filename2) != IS_STRING) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for compare_mtime()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for compare_mtime()");
 		return 0;
 	}
 
 	if (php_stream_stat_path_ex(Z_STRVAL_P(filename1), 0, &statbuffer1, NULL)) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "mstat failed for %s", Z_STRVAL_P(filename1));
+		php_error_docref(NULL, E_WARNING, "mstat failed for %s", Z_STRVAL_P(filename1));
 		return 0;
 	}
 
 	if (php_stream_stat_path_ex(Z_STRVAL_P(filename2), 0, &statbuffer2, NULL)) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "mstat failed for %s", Z_STRVAL_P(filename2));
+		php_error_docref(NULL, E_WARNING, "mstat failed for %s", Z_STRVAL_P(filename2));
 		return 0;
 	}
 
@@ -96,20 +96,20 @@ int phalcon_compare_mtime(zval *filename1, zval *filename2 TSRMLS_DC){
 /**
  * Executes the filemtime function without function lookup
  */
-void phalcon_fast_filemtime(zval *return_value, zval *filename TSRMLS_DC){
+void phalcon_fast_filemtime(zval *return_value, zval *filename){
 
 	if (Z_TYPE_P(filename) != IS_STRING) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for fast_filemtime()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for fast_filemtime()");
 		return;
 	}
 
-	php_stat(Z_STRVAL_P(filename), (php_stat_len) Z_STRLEN_P(filename), FS_MTIME, return_value TSRMLS_CC);
+	php_stat(Z_STRVAL_P(filename), (php_stat_len) Z_STRLEN_P(filename), FS_MTIME, return_value);
 }
 
 /**
  * Adds a trailing directory separator if the path doesn't have it
  */
-void phalcon_fix_path(zval **return_value, zval *path, zval *directory_separator TSRMLS_DC) {
+void phalcon_fix_path(zval **return_value, zval *path, zval *directory_separator) {
 
 	if (Z_TYPE_P(path) != IS_STRING || Z_TYPE_P(directory_separator) != IS_STRING) {
 		return;
@@ -130,7 +130,7 @@ void phalcon_fix_path(zval **return_value, zval *path, zval *directory_separator
 /**
  * Replaces directory separators by the virtual separator
  */
-void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_separator TSRMLS_DC) {
+void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_separator) {
 
 	int i;
 	unsigned char ch;
@@ -170,7 +170,7 @@ void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_
 /**
  * Faster version of phalcon_prepare_virtual_path()
  */
-void phalcon_prepare_virtual_path_ex(zval *return_value, const char *path, size_t path_len, char virtual_separator TSRMLS_DC)
+void phalcon_prepare_virtual_path_ex(zval *return_value, const char *path, size_t path_len, char virtual_separator)
 {
 	char *copy = ecalloc(path_len+1, 1);
 	size_t i;
@@ -192,7 +192,7 @@ void phalcon_prepare_virtual_path_ex(zval *return_value, const char *path, size_
 /**
  * Generates a unique id for a path
  */
-void phalcon_unique_path_key(zval *return_value, zval *path TSRMLS_DC) {
+void phalcon_unique_path_key(zval *return_value, zval *path) {
 
 	unsigned long h;
 	char *strKey;
@@ -235,7 +235,7 @@ void phalcon_realpath(zval *return_value, zval *filename) {
 /**
  * Removes the prefix from a class name, removes malicious characters, replace namespace separator by directory separator
  */
-void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *class_name, zval *virtual_separator, zval *separator TSRMLS_DC) {
+void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *class_name, zval *virtual_separator, zval *separator) {
 
 	int i, length;
 	unsigned char ch;
@@ -318,7 +318,7 @@ void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *
 
 }
 
-void phalcon_file_get_contents(zval *return_value, zval *filename TSRMLS_DC)
+void phalcon_file_get_contents(zval *return_value, zval *filename)
 {
 
 	char *contents;
@@ -329,7 +329,7 @@ void phalcon_file_get_contents(zval *return_value, zval *filename TSRMLS_DC)
 	php_stream_context *context = NULL;
 
 	if (Z_TYPE_P(filename) != IS_STRING) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_file_get_contents()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for phalcon_file_get_contents()");
 		RETVAL_FALSE;
 		return;
 	}
@@ -357,7 +357,7 @@ void phalcon_file_get_contents(zval *return_value, zval *filename TSRMLS_DC)
 /**
  * Writes a zval to a stream
  */
-void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data TSRMLS_DC)
+void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 {
 	php_stream *stream;
 	int numbytes = 0, use_copy = 0;
@@ -366,7 +366,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data TS
 	php_stream_context *context = NULL;
 
 	if (Z_TYPE_P(filename) != IS_STRING) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_file_put_contents()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for phalcon_file_put_contents()");
 		if (return_value) {
 			RETVAL_FALSE;
 		}
@@ -401,7 +401,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data TS
 			if (Z_STRLEN_P(data)) {
 				numbytes = php_stream_write(stream, Z_STRVAL_P(data), Z_STRLEN_P(data));
 				if (numbytes != Z_STRLEN_P(data)) {
-					php_error_docref(NULL TSRMLS_CC, E_WARNING, "Only %d of %d bytes written, possibly out of free disk space", numbytes, Z_STRLEN_P(data));
+					php_error_docref(NULL, E_WARNING, "Only %d of %d bytes written, possibly out of free disk space", numbytes, Z_STRLEN_P(data));
 					numbytes = -1;
 				}
 			}
@@ -431,17 +431,17 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data TS
 	return;
 }
 
-void phalcon_is_dir(zval *return_value, zval *path TSRMLS_DC)
+void phalcon_is_dir(zval *return_value, zval *path)
 {
 	if (likely(Z_TYPE_P(path) == IS_STRING)) {
-		php_stat(Z_STRVAL_P(path), (php_stat_len)(Z_STRLEN_P(path)), FS_IS_DIR, return_value TSRMLS_CC);
+		php_stat(Z_STRVAL_P(path), (php_stat_len)(Z_STRLEN_P(path)), FS_IS_DIR, return_value);
 	}
 	else {
 		ZVAL_FALSE(return_value);
 	}
 }
 
-void phalcon_unlink(zval *return_value, zval *path TSRMLS_DC)
+void phalcon_unlink(zval *return_value, zval *path)
 {
 	if (likely(Z_TYPE_P(path) == IS_STRING)) {
 		php_stream_context *context;
@@ -454,14 +454,14 @@ void phalcon_unlink(zval *return_value, zval *path TSRMLS_DC)
 		}
 
 		context = php_stream_context_from_zval(zctx, 0);
-		wrapper = php_stream_locate_url_wrapper(Z_STRVAL_P(path), NULL, 0 TSRMLS_CC);
+		wrapper = php_stream_locate_url_wrapper(Z_STRVAL_P(path), NULL, 0);
 
 		if (!wrapper || !wrapper->wops || !wrapper->wops->unlink) {
 			ZVAL_FALSE(return_value);
 			return;
 		}
 
-		ZVAL_BOOL(return_value, wrapper->wops->unlink(wrapper, Z_STRVAL_P(path), REPORT_ERRORS, context TSRMLS_CC));
+		ZVAL_BOOL(return_value, wrapper->wops->unlink(wrapper, Z_STRVAL_P(path), REPORT_ERRORS, context));
 		return;
 	}
 
@@ -469,23 +469,23 @@ void phalcon_unlink(zval *return_value, zval *path TSRMLS_DC)
 	return;
 }
 
-void phalcon_filemtime(zval *return_value, zval *path TSRMLS_DC)
+void phalcon_filemtime(zval *return_value, zval *path)
 {
 	if (likely(Z_TYPE_P(path) == IS_STRING)) {
-		php_stat(Z_STRVAL_P(path), (php_stat_len)(Z_STRLEN_P(path)), FS_MTIME, return_value TSRMLS_CC);
+		php_stat(Z_STRVAL_P(path), (php_stat_len)(Z_STRLEN_P(path)), FS_MTIME, return_value);
 	}
 	else {
 		ZVAL_FALSE(return_value);
 	}
 }
 
-void phalcon_basename(zval *return_value, zval *path TSRMLS_DC)
+void phalcon_basename(zval *return_value, zval *path)
 {
 	if (likely(Z_TYPE_P(path) == IS_STRING)) {
 		char *ret;
 		size_t ret_len;
 
-		php_basename(Z_STRVAL_P(path), Z_STRLEN_P(path), NULL, 0, &ret, &ret_len TSRMLS_CC);
+		php_basename(Z_STRVAL_P(path), Z_STRLEN_P(path), NULL, 0, &ret, &ret_len);
 		ZVAL_STRINGL(return_value, ret, (int)ret_len, 0);
 	}
 	else {
@@ -493,14 +493,14 @@ void phalcon_basename(zval *return_value, zval *path TSRMLS_DC)
 	}
 }
 
-void phalcon_fwrite(zval *return_value, zval *stream_zval, zval *data TSRMLS_DC)
+void phalcon_fwrite(zval *return_value, zval *stream_zval, zval *data)
 {
 
 	int num_bytes;
 	php_stream *stream;
 
 	if (Z_TYPE_P(stream_zval) != IS_RESOURCE) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_fwrite()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for phalcon_fwrite()");
 		if (return_value) {
 			RETVAL_FALSE;
 		} else {
@@ -510,7 +510,7 @@ void phalcon_fwrite(zval *return_value, zval *stream_zval, zval *data TSRMLS_DC)
 
 	if (Z_TYPE_P(data) != IS_STRING) {
 		/* @todo convert data to string */
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_fwrite()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for phalcon_fwrite()");
 		if (return_value) {
 			RETVAL_FALSE;
 		} else {
@@ -534,13 +534,13 @@ void phalcon_fwrite(zval *return_value, zval *stream_zval, zval *data TSRMLS_DC)
 	}
 }
 
-int phalcon_feof(zval *stream_zval TSRMLS_DC)
+int phalcon_feof(zval *stream_zval)
 {
 
 	php_stream *stream;
 
 	if (Z_TYPE_P(stream_zval) != IS_RESOURCE) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_feof()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for phalcon_feof()");
 		return 0;
 	}
 
@@ -552,12 +552,12 @@ int phalcon_feof(zval *stream_zval TSRMLS_DC)
 	return php_stream_eof(stream);
 }
 
-int phalcon_fclose(zval *stream_zval TSRMLS_DC)
+int phalcon_fclose(zval *stream_zval)
 {
 	php_stream *stream;
 
 	if (Z_TYPE_P(stream_zval) != IS_RESOURCE) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_fwrite()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for phalcon_fwrite()");
 		return 0;
 	}
 
@@ -567,7 +567,7 @@ int phalcon_fclose(zval *stream_zval TSRMLS_DC)
 	}
 
 	if ((stream->flags & PHP_STREAM_FLAG_NO_FCLOSE) != 0) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "%d is not a valid stream resource", stream->rsrc_id);
+		php_error_docref(NULL, E_WARNING, "%d is not a valid stream resource", stream->rsrc_id);
 		return 0;
 	}
 

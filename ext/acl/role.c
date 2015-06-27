@@ -62,10 +62,10 @@ PHALCON_INIT_CLASS(Phalcon_Acl_Role){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Acl, Role, acl_role, phalcon_acl_role_method_entry, 0);
 
-	zend_declare_property_null(phalcon_acl_role_ce, SL("_name"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_acl_role_ce, SL("_description"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_acl_role_ce, SL("_name"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_acl_role_ce, SL("_description"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_acl_role_ce TSRMLS_CC, 1, phalcon_acl_roleinterface_ce);
+	zend_class_implements(phalcon_acl_role_ce, 1, phalcon_acl_roleinterface_ce);
 
 	return SUCCESS;
 }
@@ -87,9 +87,9 @@ PHP_METHOD(Phalcon_Acl_Role, __construct){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_name"), name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_name"), name);
 	if (description && Z_TYPE_P(description) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_description"), description TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_description"), description);
 	}
 }
 

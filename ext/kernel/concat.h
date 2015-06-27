@@ -23,173 +23,173 @@
 #include "php_phalcon.h"
 
 #define PHALCON_SCONCAT(result, op1) \
-	 phalcon_concat_self(&result, op1 TSRMLS_CC);
+	 phalcon_concat_self(&result, op1);
 #define PHALCON_SCONCAT_STR(result, op1) \
-	 phalcon_concat_self_str(&result, op1, sizeof(op1)-1 TSRMLS_CC);
+	 phalcon_concat_self_str(&result, op1, sizeof(op1)-1);
 
 #define PHALCON_CONCAT_SV(result, op1, op2) \
-	 phalcon_concat_sv(&result, op1, sizeof(op1)-1, op2, 0 TSRMLS_CC);
+	 phalcon_concat_sv(&result, op1, sizeof(op1)-1, op2, 0);
 #define PHALCON_SCONCAT_SV(result, op1, op2) \
-	 phalcon_concat_sv(&result, op1, sizeof(op1)-1, op2, 1 TSRMLS_CC);
+	 phalcon_concat_sv(&result, op1, sizeof(op1)-1, op2, 1);
 
 #define PHALCON_CONCAT_SVS(result, op1, op2, op3) \
-	 phalcon_concat_svs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, 0 TSRMLS_CC);
+	 phalcon_concat_svs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, 0);
 #define PHALCON_SCONCAT_SVS(result, op1, op2, op3) \
-	 phalcon_concat_svs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, 1 TSRMLS_CC);
+	 phalcon_concat_svs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, 1);
 
 #define PHALCON_CONCAT_SVSV(result, op1, op2, op3, op4) \
-	 phalcon_concat_svsv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, 0 TSRMLS_CC);
+	 phalcon_concat_svsv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, 0);
 #define PHALCON_SCONCAT_SVSV(result, op1, op2, op3, op4) \
-	 phalcon_concat_svsv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, 1 TSRMLS_CC);
+	 phalcon_concat_svsv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, 1);
 
 #define PHALCON_CONCAT_SVSVS(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_svsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, 0 TSRMLS_CC);
+	 phalcon_concat_svsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, 0);
 #define PHALCON_SCONCAT_SVSVS(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_svsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, 1 TSRMLS_CC);
+	 phalcon_concat_svsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, 1);
 
 #define PHALCON_CONCAT_SVSVSV(result, op1, op2, op3, op4, op5, op6) \
-	 phalcon_concat_svsvsv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, 0 TSRMLS_CC);
+	 phalcon_concat_svsvsv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, 0);
 #define PHALCON_SCONCAT_SVSVSV(result, op1, op2, op3, op4, op5, op6) \
-	 phalcon_concat_svsvsv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, 1 TSRMLS_CC);
+	 phalcon_concat_svsvsv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, 1);
 
 #define PHALCON_CONCAT_SVSVSVS(result, op1, op2, op3, op4, op5, op6, op7) \
-	 phalcon_concat_svsvsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, op7, sizeof(op7)-1, 0 TSRMLS_CC);
+	 phalcon_concat_svsvsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, op7, sizeof(op7)-1, 0);
 #define PHALCON_SCONCAT_SVSVSVS(result, op1, op2, op3, op4, op5, op6, op7) \
-	 phalcon_concat_svsvsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, op7, sizeof(op7)-1, 1 TSRMLS_CC);
+	 phalcon_concat_svsvsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, op7, sizeof(op7)-1, 1);
 
 #define PHALCON_CONCAT_SVSVSVSVS(result, op1, op2, op3, op4, op5, op6, op7, op8, op9) \
-	 phalcon_concat_svsvsvsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, op7, sizeof(op7)-1, op8, op9, sizeof(op9)-1, 0 TSRMLS_CC);
+	 phalcon_concat_svsvsvsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, op7, sizeof(op7)-1, op8, op9, sizeof(op9)-1, 0);
 
 #define PHALCON_SCONCAT_SVSVSVSVS(result, op1, op2, op3, op4, op5, op6, op7, op8, op9) \
-	 phalcon_concat_svsvsvsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, op7, sizeof(op7)-1, op8, op9, sizeof(op9)-1, 1 TSRMLS_CC);
+	 phalcon_concat_svsvsvsvs(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, sizeof(op5)-1, op6, op7, sizeof(op7)-1, op8, op9, sizeof(op9)-1, 1);
 
 #define PHALCON_CONCAT_SVSVV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_svsvv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, 0 TSRMLS_CC);
+	 phalcon_concat_svsvv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, 0);
 #define PHALCON_SCONCAT_SVSVV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_svsvv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, 1 TSRMLS_CC);
+	 phalcon_concat_svsvv(&result, op1, sizeof(op1)-1, op2, op3, sizeof(op3)-1, op4, op5, 1);
 
 #define PHALCON_CONCAT_SVV(result, op1, op2, op3) \
-	 phalcon_concat_svv(&result, op1, sizeof(op1)-1, op2, op3, 0 TSRMLS_CC);
+	 phalcon_concat_svv(&result, op1, sizeof(op1)-1, op2, op3, 0);
 #define PHALCON_SCONCAT_SVV(result, op1, op2, op3) \
-	 phalcon_concat_svv(&result, op1, sizeof(op1)-1, op2, op3, 1 TSRMLS_CC);
+	 phalcon_concat_svv(&result, op1, sizeof(op1)-1, op2, op3, 1);
 
 #define PHALCON_CONCAT_SVVS(result, op1, op2, op3, op4) \
-	 phalcon_concat_svvs(&result, op1, sizeof(op1)-1, op2, op3, op4, sizeof(op4)-1, 0 TSRMLS_CC);
+	 phalcon_concat_svvs(&result, op1, sizeof(op1)-1, op2, op3, op4, sizeof(op4)-1, 0);
 #define PHALCON_SCONCAT_SVVS(result, op1, op2, op3, op4) \
-	 phalcon_concat_svvs(&result, op1, sizeof(op1)-1, op2, op3, op4, sizeof(op4)-1, 1 TSRMLS_CC);
+	 phalcon_concat_svvs(&result, op1, sizeof(op1)-1, op2, op3, op4, sizeof(op4)-1, 1);
 
 #define PHALCON_CONCAT_VS(result, op1, op2) \
-	 phalcon_concat_vs(&result, op1, op2, sizeof(op2)-1, 0 TSRMLS_CC);
+	 phalcon_concat_vs(&result, op1, op2, sizeof(op2)-1, 0);
 #define PHALCON_SCONCAT_VS(result, op1, op2) \
-	 phalcon_concat_vs(&result, op1, op2, sizeof(op2)-1, 1 TSRMLS_CC);
+	 phalcon_concat_vs(&result, op1, op2, sizeof(op2)-1, 1);
 
 #define PHALCON_CONCAT_VSV(result, op1, op2, op3) \
-	 phalcon_concat_vsv(&result, op1, op2, sizeof(op2)-1, op3, 0 TSRMLS_CC);
+	 phalcon_concat_vsv(&result, op1, op2, sizeof(op2)-1, op3, 0);
 #define PHALCON_SCONCAT_VSV(result, op1, op2, op3) \
-	 phalcon_concat_vsv(&result, op1, op2, sizeof(op2)-1, op3, 1 TSRMLS_CC);
+	 phalcon_concat_vsv(&result, op1, op2, sizeof(op2)-1, op3, 1);
 
 #define PHALCON_CONCAT_VSVS(result, op1, op2, op3, op4) \
-	 phalcon_concat_vsvs(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, 0 TSRMLS_CC);
+	 phalcon_concat_vsvs(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, 0);
 #define PHALCON_SCONCAT_VSVS(result, op1, op2, op3, op4) \
-	 phalcon_concat_vsvs(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, 1 TSRMLS_CC);
+	 phalcon_concat_vsvs(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, 1);
 
 #define PHALCON_CONCAT_VSVSV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_vsvsv(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, 0 TSRMLS_CC);
+	 phalcon_concat_vsvsv(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, 0);
 #define PHALCON_SCONCAT_VSVSV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_vsvsv(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, 1 TSRMLS_CC);
+	 phalcon_concat_vsvsv(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, 1);
 
 #define PHALCON_CONCAT_VSVSVS(result, op1, op2, op3, op4, op5, op6) \
-	 phalcon_concat_vsvsvs(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, op6, sizeof(op6)-1, 0 TSRMLS_CC);
+	 phalcon_concat_vsvsvs(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, op6, sizeof(op6)-1, 0);
 #define PHALCON_SCONCAT_VSVSVS(result, op1, op2, op3, op4, op5, op6) \
-	 phalcon_concat_vsvsvs(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, op6, sizeof(op6)-1, 1 TSRMLS_CC);
+	 phalcon_concat_vsvsvs(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, op6, sizeof(op6)-1, 1);
 
 #define PHALCON_CONCAT_VSVSVSV(result, op1, op2, op3, op4, op5, op6, op7) \
-	 phalcon_concat_vsvsvsv(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, op6, sizeof(op6)-1, op7, 0 TSRMLS_CC);
+	 phalcon_concat_vsvsvsv(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, op6, sizeof(op6)-1, op7, 0);
 #define PHALCON_SCONCAT_VSVSVSV(result, op1, op2, op3, op4, op5, op6, op7) \
-	 phalcon_concat_vsvsvsv(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, op6, sizeof(op6)-1, op7, 1 TSRMLS_CC);
+	 phalcon_concat_vsvsvsv(&result, op1, op2, sizeof(op2)-1, op3, op4, sizeof(op4)-1, op5, op6, sizeof(op6)-1, op7, 1);
 
 #define PHALCON_CONCAT_VSVV(result, op1, op2, op3, op4) \
-	 phalcon_concat_vsvv(&result, op1, op2, sizeof(op2)-1, op3, op4, 0 TSRMLS_CC);
+	 phalcon_concat_vsvv(&result, op1, op2, sizeof(op2)-1, op3, op4, 0);
 #define PHALCON_SCONCAT_VSVV(result, op1, op2, op3, op4) \
-	 phalcon_concat_vsvv(&result, op1, op2, sizeof(op2)-1, op3, op4, 1 TSRMLS_CC);
+	 phalcon_concat_vsvv(&result, op1, op2, sizeof(op2)-1, op3, op4, 1);
 
 #define PHALCON_CONCAT_VSVVV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_vsvvv(&result, op1, op2, sizeof(op2)-1, op3, op4, op5, 0 TSRMLS_CC);
+	 phalcon_concat_vsvvv(&result, op1, op2, sizeof(op2)-1, op3, op4, op5, 0);
 #define PHALCON_SCONCAT_VSVVV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_vsvvv(&result, op1, op2, sizeof(op2)-1, op3, op4, op5, 1 TSRMLS_CC);
+	 phalcon_concat_vsvvv(&result, op1, op2, sizeof(op2)-1, op3, op4, op5, 1);
 
 #define PHALCON_CONCAT_VV(result, op1, op2) \
-	 phalcon_concat_vv(&result, op1, op2, 0 TSRMLS_CC);
+	 phalcon_concat_vv(&result, op1, op2, 0);
 #define PHALCON_SCONCAT_VV(result, op1, op2) \
-	 phalcon_concat_vv(&result, op1, op2, 1 TSRMLS_CC);
+	 phalcon_concat_vv(&result, op1, op2, 1);
 
 #define PHALCON_CONCAT_VVS(result, op1, op2, op3) \
-	 phalcon_concat_vvs(&result, op1, op2, op3, sizeof(op3)-1, 0 TSRMLS_CC);
+	 phalcon_concat_vvs(&result, op1, op2, op3, sizeof(op3)-1, 0);
 #define PHALCON_SCONCAT_VVS(result, op1, op2, op3) \
-	 phalcon_concat_vvs(&result, op1, op2, op3, sizeof(op3)-1, 1 TSRMLS_CC);
+	 phalcon_concat_vvs(&result, op1, op2, op3, sizeof(op3)-1, 1);
 
 #define PHALCON_CONCAT_VVSV(result, op1, op2, op3, op4) \
-	 phalcon_concat_vvsv(&result, op1, op2, op3, sizeof(op3)-1, op4, 0 TSRMLS_CC);
+	 phalcon_concat_vvsv(&result, op1, op2, op3, sizeof(op3)-1, op4, 0);
 #define PHALCON_SCONCAT_VVSV(result, op1, op2, op3, op4) \
-	 phalcon_concat_vvsv(&result, op1, op2, op3, sizeof(op3)-1, op4, 1 TSRMLS_CC);
+	 phalcon_concat_vvsv(&result, op1, op2, op3, sizeof(op3)-1, op4, 1);
 
 #define PHALCON_CONCAT_VVV(result, op1, op2, op3) \
-	 phalcon_concat_vvv(&result, op1, op2, op3, 0 TSRMLS_CC);
+	 phalcon_concat_vvv(&result, op1, op2, op3, 0);
 #define PHALCON_SCONCAT_VVV(result, op1, op2, op3) \
-	 phalcon_concat_vvv(&result, op1, op2, op3, 1 TSRMLS_CC);
+	 phalcon_concat_vvv(&result, op1, op2, op3, 1);
 
 #define PHALCON_CONCAT_VVVSV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_vvvsv(&result, op1, op2, op3, op4, sizeof(op4)-1, op5, 0 TSRMLS_CC);
+	 phalcon_concat_vvvsv(&result, op1, op2, op3, op4, sizeof(op4)-1, op5, 0);
 #define PHALCON_SCONCAT_VVVSV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_vvvsv(&result, op1, op2, op3, op4, sizeof(op4)-1, op5, 1 TSRMLS_CC);
+	 phalcon_concat_vvvsv(&result, op1, op2, op3, op4, sizeof(op4)-1, op5, 1);
 
 #define PHALCON_CONCAT_VVVV(result, op1, op2, op3, op4) \
-	 phalcon_concat_vvvv(&result, op1, op2, op3, op4, 0 TSRMLS_CC);
+	 phalcon_concat_vvvv(&result, op1, op2, op3, op4, 0);
 #define PHALCON_SCONCAT_VVVV(result, op1, op2, op3, op4) \
-	 phalcon_concat_vvvv(&result, op1, op2, op3, op4, 1 TSRMLS_CC);
+	 phalcon_concat_vvvv(&result, op1, op2, op3, op4, 1);
 
 #define PHALCON_CONCAT_VVVVSVV(result, op1, op2, op3, op4, op5, op6, op7) \
-	 phalcon_concat_vvvvsvv(&result, op1, op2, op3, op4, op5, sizeof(op5)-1, op6, op7, 0 TSRMLS_CC);
+	 phalcon_concat_vvvvsvv(&result, op1, op2, op3, op4, op5, sizeof(op5)-1, op6, op7, 0);
 #define PHALCON_SCONCAT_VVVVSVV(result, op1, op2, op3, op4, op5, op6, op7) \
-	 phalcon_concat_vvvvsvv(&result, op1, op2, op3, op4, op5, sizeof(op5)-1, op6, op7, 1 TSRMLS_CC);
+	 phalcon_concat_vvvvsvv(&result, op1, op2, op3, op4, op5, sizeof(op5)-1, op6, op7, 1);
 
 #define PHALCON_CONCAT_VVVVV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_vvvvv(&result, op1, op2, op3, op4, op5, 0 TSRMLS_CC);
+	 phalcon_concat_vvvvv(&result, op1, op2, op3, op4, op5, 0);
 #define PHALCON_SCONCAT_VVVVV(result, op1, op2, op3, op4, op5) \
-	 phalcon_concat_vvvvv(&result, op1, op2, op3, op4, op5, 1 TSRMLS_CC);
+	 phalcon_concat_vvvvv(&result, op1, op2, op3, op4, op5, 1);
 
 
-void phalcon_concat_sv(zval **result, const char *op1, uint32_t op1_len, zval *op2, int self_var TSRMLS_DC);
-void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, int self_var TSRMLS_DC);
-void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var TSRMLS_DC);
-void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, int self_var TSRMLS_DC);
-void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, int self_var TSRMLS_DC);
-void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, int self_var TSRMLS_DC);
-void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, zval *op8, const char *op9, uint32_t op9_len, int self_var TSRMLS_DC);
+void phalcon_concat_sv(zval **result, const char *op1, uint32_t op1_len, zval *op2, int self_var);
+void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, int self_var);
+void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var);
+void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, int self_var);
+void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, int self_var);
+void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, int self_var);
+void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, zval *op8, const char *op9, uint32_t op9_len, int self_var);
 
-void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, zval *op5, int self_var TSRMLS_DC);
-void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, int self_var TSRMLS_DC);
-void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, const char *op4, uint32_t op4_len, int self_var TSRMLS_DC);
-void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_len, int self_var TSRMLS_DC);
-void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, int self_var TSRMLS_DC);
-void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, int self_var TSRMLS_DC);
-void phalcon_concat_vsvsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var TSRMLS_DC);
-void phalcon_concat_vsvsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, const char *op6, uint32_t op6_len, int self_var TSRMLS_DC);
-void phalcon_concat_vsvsvsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, const char *op6, uint32_t op6_len, zval *op7, int self_var TSRMLS_DC);
-void phalcon_concat_vsvv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, zval *op4, int self_var TSRMLS_DC);
-void phalcon_concat_vsvvv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, zval *op4, zval *op5, int self_var TSRMLS_DC);
-void phalcon_concat_vv(zval **result, zval *op1, zval *op2, int self_var TSRMLS_DC);
-void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, int self_var TSRMLS_DC);
-void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var TSRMLS_DC);
-void phalcon_concat_vvv(zval **result, zval *op1, zval *op2, zval *op3, int self_var TSRMLS_DC);
-void phalcon_concat_vvvsv(zval **result, zval *op1, zval *op2, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var TSRMLS_DC);
-void phalcon_concat_vvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, int self_var TSRMLS_DC);
-void phalcon_concat_vvvvsvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, const char *op5, uint32_t op5_len, zval *op6, zval *op7, int self_var TSRMLS_DC);
-void phalcon_concat_vvvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, zval *op5, int self_var TSRMLS_DC);
+void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, zval *op5, int self_var);
+void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, int self_var);
+void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, const char *op4, uint32_t op4_len, int self_var);
+void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_len, int self_var);
+void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, int self_var);
+void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, int self_var);
+void phalcon_concat_vsvsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var);
+void phalcon_concat_vsvsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, const char *op6, uint32_t op6_len, int self_var);
+void phalcon_concat_vsvsvsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, zval *op5, const char *op6, uint32_t op6_len, zval *op7, int self_var);
+void phalcon_concat_vsvv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, zval *op4, int self_var);
+void phalcon_concat_vsvvv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, zval *op4, zval *op5, int self_var);
+void phalcon_concat_vv(zval **result, zval *op1, zval *op2, int self_var);
+void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, int self_var);
+void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var);
+void phalcon_concat_vvv(zval **result, zval *op1, zval *op2, zval *op3, int self_var);
+void phalcon_concat_vvvsv(zval **result, zval *op1, zval *op2, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var);
+void phalcon_concat_vvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, int self_var);
+void phalcon_concat_vvvvsvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, const char *op5, uint32_t op5_len, zval *op6, zval *op7, int self_var);
+void phalcon_concat_vvvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *op4, zval *op5, int self_var);
 
-void phalcon_concat_self(zval **left, zval *right TSRMLS_DC);
-void phalcon_concat_self_str(zval **left, const char *right, int right_length TSRMLS_DC);
+void phalcon_concat_self(zval **left, zval *right);
+void phalcon_concat_self_str(zval **left, const char *right, int right_length);
 
-void phalcon_concat_self_long(zval **left, const long right TSRMLS_DC);
-void phalcon_concat_self_char(zval **left, unsigned char right TSRMLS_DC);
+void phalcon_concat_self_long(zval **left, const long right);
+void phalcon_concat_self_char(zval **left, unsigned char right);
 #endif /* PHALCON_KERNEL_CONCAT_H */

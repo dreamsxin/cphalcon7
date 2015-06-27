@@ -60,7 +60,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Strategy_Annotations){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model\\MetaData\\Strategy, Annotations, mvc_model_metadata_strategy_annotations, phalcon_mvc_model_metadata_strategy_annotations_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_metadata_strategy_annotations_ce, SL("_columnMap"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_metadata_strategy_annotations_ce, SL("_columnMap"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	PHALCON_CALL_METHOD(&annotations, dependency_injector, "get", service);
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 0 TSRMLS_CC);
+	phalcon_get_class(class_name, model, 0);
 
 	PHALCON_CALL_METHOD(&reflection, annotations, "get", class_name);
 	if (Z_TYPE_P(reflection) != IS_OBJECT) {
@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	 */
 	PHALCON_CALL_METHOD(&properties_annotations, reflection, "getpropertiesannotations");
 
-	if (!zend_is_true(properties_annotations) || !phalcon_fast_count_ev(properties_annotations TSRMLS_CC)) {
+	if (!zend_is_true(properties_annotations) || !phalcon_fast_count_ev(properties_annotations)) {
 		PHALCON_INIT_NVAR(exception_message);
 		PHALCON_CONCAT_SV(exception_message, "No properties with annotations were found in class ", class_name);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	PHALCON_CALL_METHOD(&annotations, dependency_injector, "get", service);
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 0 TSRMLS_CC);
+	phalcon_get_class(class_name, model, 0);
 
 	PHALCON_CALL_METHOD(&reflection, annotations, "get", class_name);
 	if (Z_TYPE_P(reflection) != IS_OBJECT) {
@@ -397,7 +397,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	 * Get the properties defined in 
 	 */
 	PHALCON_CALL_METHOD(&properties_annotations, reflection, "getpropertiesannotations");
-	if (!phalcon_fast_count_ev(properties_annotations TSRMLS_CC)) {
+	if (!phalcon_fast_count_ev(properties_annotations)) {
 		PHALCON_INIT_NVAR(exception_message);
 		PHALCON_CONCAT_SV(exception_message, "No properties with annotations were found in class ", class_name);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);

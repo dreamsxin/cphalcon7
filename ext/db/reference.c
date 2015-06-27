@@ -80,14 +80,14 @@ PHALCON_INIT_CLASS(Phalcon_Db_Reference){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Db, Reference, db_reference, phalcon_db_reference_method_entry, 0);
 
-	zend_declare_property_null(phalcon_db_reference_ce, SL("_schemaName"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_reference_ce, SL("_referencedSchema"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_reference_ce, SL("_referenceName"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_reference_ce, SL("_referencedTable"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_reference_ce, SL("_columns"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_reference_ce, SL("_referencedColumns"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_db_reference_ce, SL("_schemaName"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_reference_ce, SL("_referencedSchema"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_reference_ce, SL("_referenceName"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_reference_ce, SL("_referencedTable"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_reference_ce, SL("_columns"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_reference_ce, SL("_referencedColumns"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_db_reference_ce TSRMLS_CC, 1, phalcon_db_referenceinterface_ce);
+	zend_class_implements(phalcon_db_reference_ce, 1, phalcon_db_referenceinterface_ce);
 
 	return SUCCESS;
 }
@@ -107,38 +107,38 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &reference_name, &definition);
 	
-	phalcon_update_property_this(this_ptr, SL("_referenceName"), reference_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_referenceName"), reference_name);
 	if (phalcon_array_isset_string_fetch(&referenced_table, definition, SS("referencedTable"))) {
-		phalcon_update_property_this(this_ptr, SL("_referencedTable"), referenced_table TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_referencedTable"), referenced_table);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Referenced table is required");
 		return;
 	}
 	
 	if (phalcon_array_isset_string_fetch(&columns, definition, SS("columns"))) {
-		phalcon_update_property_this(this_ptr, SL("_columns"), columns TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_columns"), columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Foreign key columns are required");
 		return;
 	}
 	
 	if (phalcon_array_isset_string_fetch(&referenced_columns, definition, SS("referencedColumns"))) {
-		phalcon_update_property_this(this_ptr, SL("_referencedColumns"), referenced_columns TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_referencedColumns"), referenced_columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Referenced columns of the foreign key are required");
 		return;
 	}
 	
 	if (phalcon_array_isset_string_fetch(&schema, definition, SS("schema"))) {
-		phalcon_update_property_this(this_ptr, SL("_schemaName"), schema TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_schemaName"), schema);
 	}
 	
 	if (phalcon_array_isset_string_fetch(&referenced_schema, definition, SS("referencedSchema"))) {
-		phalcon_update_property_this(this_ptr, SL("_referencedSchema"), referenced_schema TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_referencedSchema"), referenced_schema);
 	}
 	
-	number_columns            = phalcon_fast_count_int(columns TSRMLS_CC);
-	number_referenced_columns = phalcon_fast_count_int(referenced_columns TSRMLS_CC);
+	number_columns            = phalcon_fast_count_int(columns);
+	number_referenced_columns = phalcon_fast_count_int(referenced_columns);
 	
 	if (number_columns != number_referenced_columns) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Number of columns is not equal to the number of referenced columns");

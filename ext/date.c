@@ -166,19 +166,19 @@ PHALCON_INIT_CLASS(Phalcon_Date){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Date, date, phalcon_date_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_class_constant_long(phalcon_date_ce, SL("YEAR"),   PHALCON_DATE_YEAR TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_date_ce, SL("MONTH"),  PHALCON_DATE_MONTH TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_date_ce, SL("WEEK"),   PHALCON_DATE_WEEK TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_date_ce, SL("DAY"),    PHALCON_DATE_DAY TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_date_ce, SL("HOUR"),   PHALCON_DATE_HOUR TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_date_ce, SL("MINUTE"), PHALCON_DATE_MINUTE TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_date_ce, SL("YEAR"),   PHALCON_DATE_YEAR);
+	zend_declare_class_constant_long(phalcon_date_ce, SL("MONTH"),  PHALCON_DATE_MONTH);
+	zend_declare_class_constant_long(phalcon_date_ce, SL("WEEK"),   PHALCON_DATE_WEEK);
+	zend_declare_class_constant_long(phalcon_date_ce, SL("DAY"),    PHALCON_DATE_DAY);
+	zend_declare_class_constant_long(phalcon_date_ce, SL("HOUR"),   PHALCON_DATE_HOUR);
+	zend_declare_class_constant_long(phalcon_date_ce, SL("MINUTE"), PHALCON_DATE_MINUTE);
 
-	zend_declare_class_constant_stringl(phalcon_date_ce, SL("MONTHS_LONG"),  SL(PHALCON_DATE_MONTHS_LONG) TSRMLS_CC);
-	zend_declare_class_constant_stringl(phalcon_date_ce, SL("MONTHS_SHORT"), SL(PHALCON_DATE_MONTHS_SHORT) TSRMLS_CC);
+	zend_declare_class_constant_stringl(phalcon_date_ce, SL("MONTHS_LONG"),  SL(PHALCON_DATE_MONTHS_LONG));
+	zend_declare_class_constant_stringl(phalcon_date_ce, SL("MONTHS_SHORT"), SL(PHALCON_DATE_MONTHS_SHORT));
 
-	zend_declare_property_string(phalcon_date_ce, SL("timestamp_format"), "Y-m-d H:i:s", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_null(phalcon_date_ce, SL("timezone"), ZEND_ACC_PUBLIC|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_null(phalcon_date_ce, SL("_months"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
+	zend_declare_property_string(phalcon_date_ce, SL("timestamp_format"), "Y-m-d H:i:s", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_null(phalcon_date_ce, SL("timezone"), ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_null(phalcon_date_ce, SL("_months"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	return SUCCESS;
 }
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Date, offset){
 		PHALCON_SEPARATE_PARAM(now);
 
 		PHALCON_INIT_VAR(format);
-		phalcon_get_class_constant(format, ce0, SS("RFC2822") TSRMLS_CC);
+		phalcon_get_class_constant(format, ce0, SS("RFC2822"));
 
 		PHALCON_CALL_FUNCTION(&tmp, "date", format, now);
 
@@ -226,25 +226,25 @@ PHP_METHOD(Phalcon_Date, offset){
 
 	PHALCON_INIT_VAR(zone_remote);
 	object_init_ex(zone_remote, ce1);
-	if (phalcon_has_constructor(zone_remote TSRMLS_CC)) {
+	if (phalcon_has_constructor(zone_remote)) {
 		PHALCON_CALL_METHOD(NULL, zone_remote, "__construct", remote);
 	}
 
 	PHALCON_INIT_VAR(zone_local);
 	object_init_ex(zone_local, ce1);
-	if (phalcon_has_constructor(zone_local TSRMLS_CC)) {
+	if (phalcon_has_constructor(zone_local)) {
 		PHALCON_CALL_METHOD(NULL, zone_local, "__construct", local);
 	}
 
 	PHALCON_INIT_VAR(time_remote);
 	object_init_ex(time_remote, ce0);
-	if (phalcon_has_constructor(time_remote TSRMLS_CC)) {
+	if (phalcon_has_constructor(time_remote)) {
 		PHALCON_CALL_METHOD(NULL, time_remote, "__construct", now, zone_remote);
 	}
 
 	PHALCON_INIT_VAR(time_local);
 	object_init_ex(time_local, ce0);
-	if (phalcon_has_constructor(time_local TSRMLS_CC)) {
+	if (phalcon_has_constructor(time_local)) {
 		PHALCON_CALL_METHOD(NULL, time_local, "__construct", now, zone_local);
 	}
 
@@ -500,7 +500,7 @@ PHP_METHOD(Phalcon_Date, days){
 	phalcon_fetch_params(1, 1, 1, &month, &year);
 
 	PHALCON_OBS_VAR(months);
-	phalcon_read_static_property_ce(&months, phalcon_date_ce, SL("_months") TSRMLS_CC);
+	phalcon_read_static_property_ce(&months, phalcon_date_ce, SL("_months"));
 
 	if (!year) {
 		PHALCON_INIT_VAR(year);
@@ -554,7 +554,7 @@ PHP_METHOD(Phalcon_Date, days){
 
 	phalcon_array_update_long_long_multi_2(&months, y, m, tmp, PH_COPY | PH_SEPARATE);
 
-	phalcon_update_static_property_ce(phalcon_date_ce, SL("_months"), months TSRMLS_CC);
+	phalcon_update_static_property_ce(phalcon_date_ce, SL("_months"), months);
 
 	RETURN_CCTOR(tmp);
 }
@@ -706,7 +706,7 @@ PHP_METHOD(Phalcon_Date, span){
 		PHALCON_SEPARATE_PARAM(output);
 
 		PHALCON_INIT_VAR(tmp);
-		phalcon_fast_trim(tmp, output, NULL, PHALCON_TRIM_BOTH TSRMLS_CC);
+		phalcon_fast_trim(tmp, output, NULL, PHALCON_TRIM_BOTH);
 
 		PHALCON_INIT_VAR(lowercased_output);
 		phalcon_fast_strtolower(lowercased_output, tmp);
@@ -725,7 +725,7 @@ PHP_METHOD(Phalcon_Date, span){
 	ZVAL_LONG(tmp1, 0);
 
 	PHALCON_INIT_VAR(count_output);
-	phalcon_fast_count(count_output, output TSRMLS_CC);
+	phalcon_fast_count(count_output, output);
 
 	PHALCON_CALL_FUNCTION(&tmp, "array_fill", tmp1, count_output, tmp1);
 
@@ -824,7 +824,7 @@ PHP_METHOD(Phalcon_Date, span2){
 		PHALCON_SEPARATE_PARAM(output);
 
 		PHALCON_INIT_VAR(tmp);
-		phalcon_fast_trim(tmp, output, NULL, PHALCON_TRIM_BOTH TSRMLS_CC);
+		phalcon_fast_trim(tmp, output, NULL, PHALCON_TRIM_BOTH);
 
 		PHALCON_INIT_VAR(lowercased_output);
 		phalcon_fast_strtolower(lowercased_output, tmp);
@@ -844,7 +844,7 @@ PHP_METHOD(Phalcon_Date, span2){
 	ZVAL_LONG(tmp1, 0);
 
 	PHALCON_INIT_VAR(count_output);
-	phalcon_fast_count(count_output, output TSRMLS_CC);
+	phalcon_fast_count(count_output, output);
 
 	PHALCON_OBS_NVAR(tmp);
 	PHALCON_CALL_FUNCTION(&tmp, "array_fill", tmp1, count_output, tmp1);
@@ -1213,22 +1213,22 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 
 	if (!timestamp_format) {
 		PHALCON_OBS_VAR(timestamp_format);
-		phalcon_read_static_property_ce(&timestamp_format, phalcon_date_ce, SL("timestamp_format") TSRMLS_CC);
+		phalcon_read_static_property_ce(&timestamp_format, phalcon_date_ce, SL("timestamp_format"));
 	} else if (Z_TYPE_P(timestamp_format) == IS_NULL) {
 		PHALCON_SEPARATE_PARAM(timestamp_format);
 
 		PHALCON_OBS_NVAR(timestamp_format);
-		phalcon_read_static_property_ce(&timestamp_format, phalcon_date_ce, SL("timestamp_format") TSRMLS_CC);
+		phalcon_read_static_property_ce(&timestamp_format, phalcon_date_ce, SL("timestamp_format"));
 	}
 
 	if (!timezone) {
 		PHALCON_OBS_VAR(timezone);
-		phalcon_read_static_property_ce(&timezone, phalcon_date_ce, SL("timezone") TSRMLS_CC);
+		phalcon_read_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"));
 	} else if (Z_TYPE_P(timezone) == IS_NULL) {
 		PHALCON_SEPARATE_PARAM(timezone);
 
 		PHALCON_OBS_NVAR(timezone);
-		phalcon_read_static_property_ce(&timezone, phalcon_date_ce, SL("timezone") TSRMLS_CC);
+		phalcon_read_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"));
 	} else {
 		PHALCON_SEPARATE_PARAM(timezone);
 	}
@@ -1239,13 +1239,13 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 
 	PHALCON_INIT_VAR(tz);
 	object_init_ex(tz, ce0);
-	if (phalcon_has_constructor(tz TSRMLS_CC)) {
+	if (phalcon_has_constructor(tz)) {
 		PHALCON_CALL_METHOD(NULL, tz, "__construct", timezone);
 	}
 
 	PHALCON_INIT_VAR(dt);
 	object_init_ex(dt, ce1);
-	if (phalcon_has_constructor(dt TSRMLS_CC)) {
+	if (phalcon_has_constructor(dt)) {
 		PHALCON_CALL_METHOD(NULL, dt, "__construct", datetime_str, tz);
 	}
 
@@ -1289,7 +1289,7 @@ PHP_METHOD(Phalcon_Date, valid){
 	PHALCON_CALL_FUNCTION(&time, "strtotime", date);
 	PHALCON_CALL_FUNCTION(&format_date, "date", format, time);
 
-	if (phalcon_is_equal(date, format_date TSRMLS_CC)) {
+	if (phalcon_is_equal(date, format_date)) {
 		RETURN_MM_TRUE;
 	} else {
 		RETURN_MM_FALSE;

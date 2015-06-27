@@ -85,11 +85,11 @@ PHALCON_INIT_CLASS(Phalcon_Db_Profiler_Item){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Db\\Profiler, Item, db_profiler_item, phalcon_db_profiler_item_method_entry, 0);
 
-	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_sqlStatement"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_sqlVariables"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_sqlBindTypes"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_initialTime"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_finalTime"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_sqlStatement"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_sqlVariables"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_sqlBindTypes"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_initialTime"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_profiler_item_ce, SL("_finalTime"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLStatement){
 
 	phalcon_fetch_params(0, 1, 0, &sql_statement);
 	
-	phalcon_update_property_this(this_ptr, SL("_sqlStatement"), sql_statement TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_sqlStatement"), sql_statement);
 	
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLVariables){
 
 	phalcon_fetch_params(0, 1, 0, &sql_variables);
 	
-	phalcon_update_property_this(this_ptr, SL("_sqlVariables"), sql_variables TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_sqlVariables"), sql_variables);
 	
 }
 
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLBindTypes){
 
 	phalcon_fetch_params(0, 1, 0, &sql_bindtypes);
 
-	phalcon_update_property_this(this_ptr, SL("_sqlBindTypes"), sql_bindtypes TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_sqlBindTypes"), sql_bindtypes);
 
 }
 
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setInitialTime){
 
 	phalcon_fetch_params(0, 1, 0, &initial_time);
 	
-	phalcon_update_property_this(this_ptr, SL("_initialTime"), initial_time TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_initialTime"), initial_time);
 	
 }
 
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setFinalTime){
 
 	phalcon_fetch_params(0, 1, 0, &final_time);
 	
-	phalcon_update_property_this(this_ptr, SL("_finalTime"), final_time TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_finalTime"), final_time);
 	
 }
 

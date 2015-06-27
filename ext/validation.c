@@ -138,25 +138,25 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon, Validation, validation, phalcon_di_injectable_ce, phalcon_validation_method_entry, 0);
 
-	zend_declare_property_null(phalcon_validation_ce, SL("_data"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_ce, SL("_entity"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_ce, SL("_validators"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_ce, SL("_filters"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_ce, SL("_messages"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_ce, SL("_values"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_ce, SL("_defaultMessages"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_ce, SL("_labels"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_validation_ce, SL("_data"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_entity"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_validators"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_filters"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_messages"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_values"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_defaultMessages"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_labels"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
 
-int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval **return_value_ptr, zval *this_ptr, const char *type TSRMLS_DC)
+int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval **return_value_ptr, zval *this_ptr, const char *type)
 {
 	if (is_phalcon_class(ce)) {
 		zval *msg;
 		zval *messages = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultMessages"), PH_NOISY);
 
-		MAKE_STD_ZVAL(*return_value_ptr);
+		PHALCON_ALLOC_GHOST_ZVAL(*return_value_ptr);
 		if (phalcon_array_isset_string_fetch(&msg, messages, type, strlen(type)+1)) {
 			ZVAL_ZVAL(*return_value_ptr, msg, 1, 0);
 		}
@@ -176,7 +176,7 @@ int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval
 		params[0] = t;
 
 		ALLOC_INIT_ZVAL(*return_value_ptr);
-		return phalcon_return_call_method(*return_value_ptr, NULL, this_ptr, "getdefaultmessage", 1, params TSRMLS_CC);
+		return phalcon_return_call_method(*return_value_ptr, NULL, this_ptr, "getdefaultmessage", 1, params);
 	}
 }
 
@@ -200,13 +200,13 @@ PHP_METHOD(Phalcon_Validation, __construct){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Validators must be an array");
 			return;
 		}
-		phalcon_update_property_this(this_ptr, SL("_validators"), validators TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_validators"), validators);
 	}
 	
 	PHALCON_CALL_METHODW(NULL, getThis(), "setdefaultmessages");
 
 	/* Check for an 'initialize' method */
-	if (phalcon_method_exists_ex(this_ptr, SS("initialize") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(this_ptr, SS("initialize")) == SUCCESS) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "initialize");
 	}
 }
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	/** 
 	 * Clear pre-calculated values
 	 */
-	phalcon_update_property_null(this_ptr, SL("_values") TSRMLS_CC);
+	phalcon_update_property_null(this_ptr, SL("_values"));
 	
 	/** 
 	 * Implicitly creates a Phalcon\Validation\Message\Group object
@@ -260,16 +260,16 @@ PHP_METHOD(Phalcon_Validation, validate){
 	/** 
 	 * Validation classes can implement the 'beforeValidation' callback
 	 */
-	if (phalcon_method_exists_ex(this_ptr, SS("beforevalidation") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(this_ptr, SS("beforevalidation")) == SUCCESS) {
 		PHALCON_CALL_METHOD(&status, this_ptr, "beforevalidation", data, entity, messages);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_CCTOR(status);
 		}
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_messages"), messages TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_messages"), messages);
 	if (Z_TYPE_P(data) == IS_ARRAY || Z_TYPE_P(data) == IS_OBJECT) {
-		phalcon_update_property_this(this_ptr, SL("_data"), data TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_data"), data);
 	}
 	
 	phalcon_is_iterable(validators, &ah0, &hp0, 0, 0);
@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 		 */
 		if (PHALCON_IS_FALSE(status)) {
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(must_cancel);
-			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(Z_OBJCE_P(validator), &must_cancel, validator, "cancelOnFail" TSRMLS_CC));
+			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(Z_OBJCE_P(validator), &must_cancel, validator, "cancelOnFail"));
 
 			if (zend_is_true(must_cancel)) {
 				break;
@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	 */
 	PHALCON_OBS_NVAR(messages);
 	phalcon_read_property_this(&messages, this_ptr, SL("_messages"), PH_NOISY);
-	if (phalcon_method_exists_ex(this_ptr, SS("aftervalidation") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(this_ptr, SS("aftervalidation")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "aftervalidation", data, entity, messages);
 	}
 	
@@ -342,7 +342,7 @@ PHP_METHOD(Phalcon_Validation, add){
 	array_init_size(scope, 2);
 	phalcon_array_append(&scope, *attribute, 0);
 	phalcon_array_append(&scope, *validator, 0);
-	phalcon_update_property_array_append(this_ptr, SL("_validators"), scope TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_validators"), scope);
 	
 	RETURN_THISW();
 }
@@ -360,7 +360,7 @@ PHP_METHOD(Phalcon_Validation, setFilters){
 
 	phalcon_fetch_params(0, 0, 2, 0, &attribute, &filters);
 	
-	phalcon_update_property_array(this_ptr, SL("_filters"), attribute, filters TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_filters"), attribute, filters);
 	RETURN_THISW();
 }
 
@@ -467,8 +467,8 @@ PHP_METHOD(Phalcon_Validation, bind){
 		}
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_entity"), entity TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_data"), data TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_entity"), entity);
+	phalcon_update_property_this(this_ptr, SL("_data"), data);
 	
 	RETURN_THISW();
 }
@@ -500,13 +500,13 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		PHALCON_INIT_VAR(method);
 		PHALCON_CONCAT_SV(method, "get", attribute);
 		zend_str_tolower(Z_STRVAL_P(method), Z_STRLEN_P(method));
-		if (phalcon_method_exists_ex(entity, Z_STRVAL_P(method), Z_STRLEN_P(method)+1 TSRMLS_CC) == SUCCESS) {
+		if (phalcon_method_exists_ex(entity, Z_STRVAL_P(method), Z_STRLEN_P(method)+1) == SUCCESS) {
 			PHALCON_CALL_METHOD(&value, entity, Z_STRVAL_P(method));
-		} else if (phalcon_method_exists_ex(entity, SS("readattribute") TSRMLS_CC) == SUCCESS) {
+		} else if (phalcon_method_exists_ex(entity, SS("readattribute")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&value, entity, "readattribute", attribute);
-		} else if (phalcon_isset_property_zval(entity, attribute TSRMLS_CC)) {
+		} else if (phalcon_isset_property_zval(entity, attribute)) {
 			PHALCON_OBS_VAR(value);
-			phalcon_read_property_zval(&value, entity, attribute, PH_NOISY TSRMLS_CC);
+			phalcon_read_property_zval(&value, entity, attribute, PH_NOISY);
 		} else {
 			PHALCON_INIT_VAR(value);
 		}
@@ -543,7 +543,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		}
 	} else {
 		if (Z_TYPE_P(data) == IS_OBJECT) {
-			if (phalcon_isset_property_zval(data, attribute TSRMLS_CC)) {
+			if (phalcon_isset_property_zval(data, attribute)) {
 				PHALCON_OBS_NVAR(value);
 				phalcon_read_property_zval(&value, data, attribute, PH_NOISY);
 			}
@@ -590,7 +590,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		/** 
 		 * Cache the calculated value
 		 */
-		phalcon_update_property_array(this_ptr, SL("_values"), attribute, value TSRMLS_CC);
+		phalcon_update_property_array(this_ptr, SL("_values"), attribute, value);
 	
 		RETURN_CCTOR(value);
 	}
@@ -643,12 +643,12 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 	add_assoc_stringl_ex(default_messages, SS("Url"),               SL("Field :field must be a url"));
 
 	if (!messages || Z_TYPE_P(messages) == IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_defaultMessages"), default_messages TSRMLS_CC);
+		phalcon_update_property_this(getThis(), SL("_defaultMessages"), default_messages);
 	}
 	else {
 		PHALCON_INIT_VAR(m);
-		phalcon_fast_array_merge(m, &default_messages, &messages TSRMLS_CC);
-		phalcon_update_property_this(getThis(), SL("_defaultMessages"), m TSRMLS_CC);
+		phalcon_fast_array_merge(m, &default_messages, &messages);
+		phalcon_update_property_this(getThis(), SL("_defaultMessages"), m);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -683,7 +683,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
 		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Labels must be an array");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_labels"), labels TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_labels"), labels);
 }
 
 /**

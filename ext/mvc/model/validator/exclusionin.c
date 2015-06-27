@@ -74,7 +74,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Exclusionin){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Validator, Exclusionin, mvc_model_validator_exclusionin, phalcon_mvc_model_validator_ce, phalcon_mvc_model_validator_exclusionin_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_validator_exclusionin_ce TSRMLS_CC, 1, phalcon_mvc_model_validatorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_validator_exclusionin_ce, 1, phalcon_mvc_model_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 	 * We check if the value contained in the array using "in_array" from the PHP
 	 * userland
 	 */
-	if (phalcon_fast_in_array(value, domain TSRMLS_CC)) {
+	if (phalcon_fast_in_array(value, domain)) {
 	
 		/** 
 		 * Check if the developer has defined a custom message
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 		PHALCON_CALL_METHOD(&message, this_ptr, "getoption", option);
 		if (!zend_is_true(message)) {
 			PHALCON_INIT_VAR(joined_domain);
-			phalcon_fast_join_str(joined_domain, SL(", "), domain TSRMLS_CC);
+			phalcon_fast_join_str(joined_domain, SL(", "), domain);
 	
 			PHALCON_INIT_NVAR(message);
 			PHALCON_CONCAT_SVSV(message, "Value of field '", field_name, "' must not be part of list: ", joined_domain);

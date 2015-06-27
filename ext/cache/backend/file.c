@@ -103,7 +103,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_File){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, File, cache_backend_file, phalcon_cache_backend_ce, phalcon_cache_backend_file_method_entry, 0);
 
-	zend_class_implements(phalcon_cache_backend_file_ce TSRMLS_CC, 1, phalcon_cache_backendinterface_ce);
+	zend_class_implements(phalcon_cache_backend_file_ce, 1, phalcon_cache_backendinterface_ce);
 
 	return SUCCESS;
 }
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key);
 
 	if (unlikely(!phalcon_array_isset_string_fetch(&cache_dir, options, SS("cacheDir")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 		}
 
 		PHALCON_INIT_VAR(modified_time);
-		phalcon_filemtime(modified_time, cache_file TSRMLS_CC);
+		phalcon_filemtime(modified_time, cache_file);
 		if (unlikely(Z_TYPE_P(modified_time) != IS_LONG)) {
 			convert_to_long(modified_time);
 		}
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 			 * Use file-get-contents to control that the openbase_dir can't be skipped
 			 */
 			PHALCON_INIT_VAR(cached_content);
-			phalcon_file_get_contents(cached_content, cache_file TSRMLS_CC);
+			phalcon_file_get_contents(cached_content, cache_file);
 			if (PHALCON_IS_FALSE(cached_content)) {
 				PHALCON_INIT_VAR(exception_message);
 				PHALCON_CONCAT_SVS(exception_message, "Cache file ", cache_file, " could not be opened");
@@ -292,9 +292,9 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 	 */
 	PHALCON_INIT_VAR(status);
 	if (!phalcon_is_numeric(cached_content)) {
-		phalcon_file_put_contents(status, cache_file, prepared_content TSRMLS_CC);
+		phalcon_file_put_contents(status, cache_file, prepared_content);
 	} else {
-		phalcon_file_put_contents(status, cache_file, cached_content TSRMLS_CC);
+		phalcon_file_put_contents(status, cache_file, cached_content);
 	}
 	if (PHALCON_IS_FALSE(status)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory is not writable");
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 		zend_print_zval(cached_content, 0);
 	}
 
-	phalcon_update_property_bool(this_ptr, SL("_started"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_started"), 0);
 
 	PHALCON_MM_RESTORE();
 }
@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, delete){
 	PHALCON_CONCAT_VV(cache_file, cache_dir, prefixed_key);
 
 	if (phalcon_file_exists(cache_file) == SUCCESS) {
-		phalcon_unlink(return_value, cache_file TSRMLS_CC);
+		phalcon_unlink(return_value, cache_file);
 		RETURN_MM();
 	}
 
@@ -382,7 +382,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 	 */
 	PHALCON_INIT_VAR(iterator);
 	object_init_ex(iterator, spl_ce_DirectoryIterator);
-	assert(phalcon_has_constructor(iterator TSRMLS_CC));
+	assert(phalcon_has_constructor(iterator));
 	PHALCON_CALL_METHOD(NULL, iterator, "__construct", cache_dir);
 
 	/* DirectoryIterator implements Iterator */
@@ -396,18 +396,18 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 	/* DirectoryIterator has rewind() method */
 	assert(it->funcs->rewind != NULL);
 
-	it->funcs->rewind(it TSRMLS_CC);
-	while (it->funcs->valid(it TSRMLS_CC) == SUCCESS && !EG(exception)) {
-		it->funcs->get_current_data(it, &item TSRMLS_CC);
+	it->funcs->rewind(it);
+	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
+		it->funcs->get_current_data(it, &item);
 
 		PHALCON_OBSERVE_OR_NULLIFY_VAR(is_directory);
-		if (FAILURE == phalcon_call_method(&is_directory, *item, "isdir", 0, NULL TSRMLS_CC)) {
+		if (FAILURE == phalcon_call_method(&is_directory, *item, "isdir", 0, NULL)) {
 			break;
 		}
 
 		if (!EG(exception) && PHALCON_IS_FALSE(is_directory)) {
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(key);
-			if (FAILURE == phalcon_call_method(&key, *item, "getfilename", 0, NULL TSRMLS_CC)) {
+			if (FAILURE == phalcon_call_method(&key, *item, "getfilename", 0, NULL)) {
 				break;
 			}
 
@@ -416,10 +416,10 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 			}
 		}
 
-		it->funcs->move_forward(it TSRMLS_CC);
+		it->funcs->move_forward(it);
 	}
 
-	it->funcs->dtor(it TSRMLS_CC);
+	it->funcs->dtor(it);
 
 	PHALCON_MM_RESTORE();
 }
@@ -476,7 +476,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 			}
 
 			PHALCON_INIT_VAR(modified_time);
-			phalcon_filemtime(modified_time, cache_file TSRMLS_CC);
+			phalcon_filemtime(modified_time, cache_file);
 			mtime = likely(Z_TYPE_P(modified_time) == IS_LONG) ? Z_LVAL_P(modified_time) : phalcon_get_intval(modified_time);
 
 			if (mtime + ttl > (long int)time(NULL)) {
@@ -519,7 +519,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, *key_name);
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key);
 
 	PHALCON_OBS_VAR(cache_dir);
 	phalcon_array_fetch_string(&cache_dir, options, SL("cacheDir"), PH_NOISY);
@@ -553,7 +553,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 		}
 
 		PHALCON_INIT_VAR(modified_time);
-		phalcon_filemtime(modified_time, cache_file TSRMLS_CC);
+		phalcon_filemtime(modified_time, cache_file);
 		if (unlikely(Z_TYPE_P(modified_time) != IS_LONG)) {
 			convert_to_long(modified_time);
 		}
@@ -571,16 +571,16 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 			 * Use file-get-contents to control that the openbase_dir can't be skipped
 			 */
 			PHALCON_INIT_VAR(cached_content);
-			phalcon_file_get_contents(cached_content, cache_file TSRMLS_CC);
+			phalcon_file_get_contents(cached_content, cache_file);
 			if (PHALCON_IS_FALSE(cached_content)) {
 				zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Failed to open cache file %s", Z_STRVAL_P(cache_file));
 				RETURN_MM();
 			}
 
-			add_function(return_value, *value, cached_content TSRMLS_CC);
+			add_function(return_value, *value, cached_content);
 
 			PHALCON_INIT_VAR(status);
-			phalcon_file_put_contents(status, cache_file, return_value TSRMLS_CC);
+			phalcon_file_put_contents(status, cache_file, return_value);
 
 			if (PHALCON_IS_FALSE(status)) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory can't be written");
@@ -626,7 +626,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, *key_name);
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key);
 
 	PHALCON_OBS_VAR(cache_dir);
 	phalcon_array_fetch_string(&cache_dir, options, SL("cacheDir"), PH_NOISY);
@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 		}
 
 		PHALCON_INIT_VAR(modified_time);
-		phalcon_filemtime(modified_time, cache_file TSRMLS_CC);
+		phalcon_filemtime(modified_time, cache_file);
 		if (unlikely(Z_TYPE_P(modified_time) != IS_LONG)) {
 			convert_to_long(modified_time);
 		}
@@ -678,7 +678,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 			 * Use file-get-contents to control that the openbase_dir can't be skipped
 			 */
 			PHALCON_INIT_VAR(cached_content);
-			phalcon_file_get_contents(cached_content, cache_file TSRMLS_CC);
+			phalcon_file_get_contents(cached_content, cache_file);
 			if (PHALCON_IS_FALSE(cached_content)) {
 				zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Failed to open cache file %s", Z_STRVAL_P(cache_file));
 				RETURN_MM();
@@ -687,7 +687,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 			phalcon_sub_function(return_value, cached_content, *value);
 
 			PHALCON_INIT_VAR(status);
-			phalcon_file_put_contents(status, cache_file, return_value TSRMLS_CC);
+			phalcon_file_put_contents(status, cache_file, return_value);
 
 			if (PHALCON_IS_FALSE(status)) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory can't be written");
@@ -739,35 +739,35 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 	/* DirectoryIterator has rewind() method */
 	assert(it->funcs->rewind != NULL);
 
-	it->funcs->rewind(it TSRMLS_CC);
-	while (it->funcs->valid(it TSRMLS_CC) == SUCCESS && !EG(exception)) {
-		it->funcs->get_current_data(it, &item TSRMLS_CC);
+	it->funcs->rewind(it);
+	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
+		it->funcs->get_current_data(it, &item);
 
 		PHALCON_OBSERVE_OR_NULLIFY_VAR(is_file);
-		if (FAILURE == phalcon_call_method(&is_file, *item, "isfile", 0, NULL TSRMLS_CC)) {
+		if (FAILURE == phalcon_call_method(&is_file, *item, "isfile", 0, NULL)) {
 			break;
 		}
 
 		if (PHALCON_IS_TRUE(is_file)) {
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(key);
-			if (FAILURE == phalcon_call_method(&key, *item, "getfilename", 0, NULL TSRMLS_CC)) {
+			if (FAILURE == phalcon_call_method(&key, *item, "getfilename", 0, NULL)) {
 				break;
 			}
 
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(cache_file);
-			if (FAILURE == phalcon_call_method(&cache_file, *item, "getpathname", 0, NULL TSRMLS_CC)) {
+			if (FAILURE == phalcon_call_method(&cache_file, *item, "getpathname", 0, NULL)) {
 				break;
 			}
 
 			if (PHALCON_IS_EMPTY(prefix) || phalcon_start_with(key, prefix, NULL)) {
-				phalcon_unlink(return_value, cache_file TSRMLS_CC);
+				phalcon_unlink(return_value, cache_file);
 			}
 		}
 
-		it->funcs->move_forward(it TSRMLS_CC);
+		it->funcs->move_forward(it);
 	}
 
-	it->funcs->dtor(it TSRMLS_CC);
+	it->funcs->dtor(it);
 
 	RETURN_MM_TRUE;
 }

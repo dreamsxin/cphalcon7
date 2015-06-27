@@ -257,7 +257,7 @@ typedef zend_function phalcon_fcall_cache_entry;
 
 #define PHALCON_CALL_USER_FUNC_ARRAY_NOEX(return_value, handler, params) \
 	do { \
-		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array_noex(return_value, handler, params TSRMLS_CC)); \
+		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array_noex(return_value, handler, params)); \
 	} while (0)
 
 int phalcon_call_func_aparams(zval *return_value, const char *func_name, uint func_length, uint param_count, zval *params) PHALCON_ATTR_WARN_UNUSED_RESULT;
@@ -352,11 +352,11 @@ int phalcon_has_constructor_ce(const zend_class_entry *ce) PHALCON_ATTR_PURE PHA
  * @retval 0 @a object is not an object or does not have a constructor
  * @retval 1 @a object has a constructor
  */
-PHALCON_ATTR_WARN_UNUSED_RESULT PHALCON_ATTR_NONNULL static inline int phalcon_has_constructor(const zval *object TSRMLS_DC)
+PHALCON_ATTR_WARN_UNUSED_RESULT PHALCON_ATTR_NONNULL static inline int phalcon_has_constructor(const zval *object)
 {
 	return Z_TYPE_P(object) == IS_OBJECT ? phalcon_has_constructor_ce(Z_OBJCE_P(object)) : 0;
 }
 
-void phalcon_eval_php(zval *str, zval *retval_ptr, char *context TSRMLS_DC);
+void phalcon_eval_php(zval *str, zval *retval_ptr, char *context);
 
 #endif /* PHALCON_KERNEL_FCALL_H */

@@ -28,7 +28,7 @@
 
 #ifndef PHALCON_RELEASE
 
-int phalcon_assert_class(zval *object, char *class_name TSRMLS_DC) {
+int phalcon_assert_class(zval *object, char *class_name) {
 	if (object) {
 		if (Z_TYPE_P(object) != IS_OBJECT) {
 			phalcon_error_space();

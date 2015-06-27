@@ -241,19 +241,19 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Collection, mvc_collection, phalcon_di_injectable_ce, phalcon_mvc_collection_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_collection_ce, SL("_collectionManager"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_mvc_collection_ce, SL("_operationMade"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_ce, SL("_connection"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_ce, SL("_reserved"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_collection_ce, SL("_disableEvents"), 0, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_collection_ce, SL("_collectionManager"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_collection_ce, SL("_operationMade"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_ce, SL("_connection"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_ce, SL("_reserved"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_bool(phalcon_mvc_collection_ce, SL("_disableEvents"), 0, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
-	zend_declare_class_constant_long(phalcon_mvc_collection_ce, SL("OP_NONE"), 0 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_collection_ce, SL("OP_CREATE"), 1 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_collection_ce, SL("OP_UPDATE"), 2 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_collection_ce, SL("OP_DELETE"), 3 TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_mvc_collection_ce, SL("OP_NONE"), 0);
+	zend_declare_class_constant_long(phalcon_mvc_collection_ce, SL("OP_CREATE"), 1);
+	zend_declare_class_constant_long(phalcon_mvc_collection_ce, SL("OP_UPDATE"), 2);
+	zend_declare_class_constant_long(phalcon_mvc_collection_ce, SL("OP_DELETE"), 3);
 
-	zend_class_implements(phalcon_mvc_collection_ce TSRMLS_CC, 2, phalcon_mvc_collectioninterface_ce, zend_ce_serializable);
+	zend_class_implements(phalcon_mvc_collection_ce, 2, phalcon_mvc_collectioninterface_ce, zend_ce_serializable);
 
 	return SUCCESS;
 }
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 
 	PHALCON_VERIFY_INTERFACE_EX(di, phalcon_diinterface_ce, phalcon_mvc_collection_exception_ce, 1);
 
-	phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), di TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), di);
 
 	/**
 	 * Inject the manager service from the DI
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	/**
 	 * Update the collection-manager
 	 */
-	phalcon_update_property_this(this_ptr, SL("_collectionManager"), mm TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_collectionManager"), mm);
 
 	/**
 	 * The manager always initializes the object
@@ -321,7 +321,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	 * This allows the developer to execute initialization stuff every time an instance
 	 * is created
 	 */
-	if (phalcon_method_exists_ex(this_ptr, SS("onconstruct") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(this_ptr, SS("onconstruct")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "onconstruct");
 	}
 
@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 			ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 			PHALCON_INIT_VAR(mongo_id);
 			object_init_ex(mongo_id, ce0);
-			if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
+			if (phalcon_has_constructor(mongo_id)) {
 				PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", id);
 			}
 		} else {
@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 		mongo_id = id;
 	}
 
-	phalcon_update_property_zval_zval(this_ptr, id_name, mongo_id TSRMLS_CC);
+	phalcon_update_property_zval_zval(this_ptr, id_name, mongo_id);
 	PHALCON_MM_RESTORE();
 }
 
@@ -404,10 +404,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 		}
 	}
 
-	if (phalcon_isset_property_zval(this_ptr, id_name TSRMLS_CC)) {
+	if (phalcon_isset_property_zval(this_ptr, id_name)) {
 
 		PHALCON_OBS_VAR(id);
-		phalcon_read_property_zval(&id, this_ptr, id_name, PH_NOISY TSRMLS_CC);
+		phalcon_read_property_zval(&id, this_ptr, id_name, PH_NOISY);
 		if (Z_TYPE_P(id) == IS_OBJECT) {
 			mongo_id = id;
 		} else {
@@ -422,10 +422,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 				ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 				PHALCON_INIT_NVAR(mongo_id);
 				object_init_ex(mongo_id, ce0);
-				if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
+				if (phalcon_has_constructor(mongo_id)) {
 					PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", id);
 				}
-				phalcon_update_property_zval_zval(this_ptr, id_name, mongo_id TSRMLS_CC);
+				phalcon_update_property_zval_zval(this_ptr, id_name, mongo_id);
 			} else {
 				mongo_id = id;
 			}
@@ -562,7 +562,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getReservedAttributes){
 
 	zval *reserved;
 
-	reserved = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_reserved") TSRMLS_CC);
+	reserved = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_reserved"));
 	if (Z_TYPE_P(reserved) == IS_NULL) {
 		zval *dummy = PHALCON_GLOBAL(z_true);
 
@@ -572,7 +572,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getReservedAttributes){
 		Z_ADDREF_P(dummy); add_assoc_zval_ex(return_value, SS("_operationMade"), dummy);
 		Z_ADDREF_P(dummy); add_assoc_zval_ex(return_value, SS("_errorMessages"), dummy);
 
-		phalcon_update_static_property_ce(phalcon_mvc_collection_ce, SL("_reserved"), return_value TSRMLS_CC);
+		phalcon_update_static_property_ce(phalcon_mvc_collection_ce, SL("_reserved"), return_value);
 		return;
 	}
 
@@ -698,7 +698,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
 		collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&connection, collection_manager, "getconnection", this_ptr);
-		phalcon_update_property_this(this_ptr, SL("_connection"), connection TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_connection"), connection);
 	}
 
 	RETURN_CTOR(connection);
@@ -754,7 +754,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 		 * Only string keys in the data are valid
 		 */
 		if (Z_TYPE_P(white_list) == IS_ARRAY) {
-			if (!phalcon_fast_in_array(key, white_list TSRMLS_CC)) {
+			if (!phalcon_fast_in_array(key, white_list)) {
 				zend_hash_move_forward_ex(ah0, &hp0);
 				continue;
 			}
@@ -767,7 +767,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 			if (phalcon_array_isset(column_map, key)) {
 				PHALCON_OBS_NVAR(attribute);
 				phalcon_array_fetch(&attribute, column_map, key, PH_NOISY);
-				phalcon_update_property_zval_zval(this_ptr, attribute, value TSRMLS_CC);
+				phalcon_update_property_zval_zval(this_ptr, attribute, value);
 			} else {
 				PHALCON_INIT_NVAR(exception_message);
 				PHALCON_CONCAT_SVS(exception_message, "Column \"", key, "\" doesn't make part of the column map");
@@ -775,7 +775,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 				return;
 			}
 		} else {
-			phalcon_update_property_zval_zval(this_ptr, key, value TSRMLS_CC);
+			phalcon_update_property_zval_zval(this_ptr, key, value);
 		}
 	
 		zend_hash_move_forward_ex(ah0, &hp0);
@@ -803,9 +803,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, readAttribute){
 
 	phalcon_fetch_params(0, 1, 1, 0, &attribute);
 
-	if (phalcon_isset_property_zval(this_ptr, attribute TSRMLS_CC)) {
+	if (phalcon_isset_property_zval(this_ptr, attribute)) {
 		PHALCON_OBS_VAR(attribute_value);
-		phalcon_read_property_zval(&attribute_value, this_ptr, attribute, PH_NOISY TSRMLS_CC);
+		phalcon_read_property_zval(&attribute_value, this_ptr, attribute, PH_NOISY);
 		RETURN_CTOR(attribute_value);
 	}
 	RETURN_MM_NULL();
@@ -827,7 +827,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, writeAttribute){
 
 	phalcon_fetch_params(0, 0, 2, 0, &attribute, &value);
 
-	phalcon_update_property_zval_zval(this_ptr, attribute, value TSRMLS_CC);
+	phalcon_update_property_zval_zval(this_ptr, attribute, value);
 
 }
 
@@ -860,7 +860,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, cloneResult){
 	}
 
 	PHALCON_INIT_VAR(cloned_collection);
-	if (phalcon_clone(cloned_collection, collection TSRMLS_CC) == FAILURE) {
+	if (phalcon_clone(cloned_collection, collection) == FAILURE) {
 		RETURN_MM();
 	}
 
@@ -889,7 +889,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, cloneResult){
 		zend_hash_move_forward_ex(ah0, &hp0);
 	}
 
-	if (phalcon_method_exists_ex(cloned_collection, SS("afterfetch") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(cloned_collection, SS("afterfetch")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, cloned_collection, "afterfetch");
 	}
 
@@ -1125,7 +1125,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getGroupResultset){
 		/**
 		 * Only 'count' is supported
 		 */
-		phalcon_fast_count(return_value, documents_cursor TSRMLS_CC);
+		phalcon_fast_count(return_value, documents_cursor);
 		RETURN_MM();
 	}
 
@@ -1342,7 +1342,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, validate){
 
 			PHALCON_GET_HVALUE(message);
 
-			phalcon_update_property_array_append(this_ptr, SL("_errorMessages"), message TSRMLS_CC);
+			phalcon_update_property_array_append(this_ptr, SL("_errorMessages"), message);
 
 			zend_hash_move_forward_ex(ah0, &hp0);
 		}
@@ -1386,7 +1386,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, validationHasFailed){
 	PHALCON_OBS_VAR(error_messages);
 	phalcon_read_property_this(&error_messages, this_ptr, SL("_errorMessages"), PH_NOISY);
 	if (Z_TYPE_P(error_messages) == IS_ARRAY) {
-		if (phalcon_fast_count_ev(error_messages TSRMLS_CC)) {
+		if (phalcon_fast_count_ev(error_messages)) {
 			RETURN_MM_TRUE;
 		}
 	}
@@ -1419,7 +1419,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
-	if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(lower), Z_STRLEN_P(lower)+1  TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(lower), Z_STRLEN_P(lower)+1 ) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, Z_STRVAL_P(lower));
 	}
 
@@ -1456,7 +1456,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
-	if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(lower), Z_STRLEN_P(lower)+1  TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(lower), Z_STRLEN_P(lower)+1 ) == SUCCESS) {
 		PHALCON_CALL_METHOD(&status, this_ptr, Z_STRVAL_P(lower));
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
@@ -1535,7 +1535,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _exists){
 		PHALCON_CALL_METHOD(&document_count, collection, "count", parameters);
 
 		z_zero = PHALCON_GLOBAL(z_zero);
-		is_smaller_function(return_value, z_zero, document_count TSRMLS_CC);
+		is_smaller_function(return_value, z_zero, document_count);
 
 		RETURN_MM();
 	}
@@ -1616,9 +1616,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, appendMessage){
 		object_init_ex(collection_message, phalcon_mvc_collection_message_ce);
 		PHALCON_CALL_METHOD(NULL, collection_message, "__construct", message, field, type, code);
 
-		phalcon_update_property_array_append(this_ptr, SL("_errorMessages"), collection_message TSRMLS_CC);
+		phalcon_update_property_array_append(this_ptr, SL("_errorMessages"), collection_message);
 	} else {
-		phalcon_update_property_array_append(this_ptr, SL("_errorMessages"), message TSRMLS_CC);
+		phalcon_update_property_array_append(this_ptr, SL("_errorMessages"), message);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -1699,7 +1699,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 				continue;
 			}
 
-			if (Z_TYPE_P(white_list) == IS_ARRAY && !phalcon_fast_in_array(attribute, white_list TSRMLS_CC)) {
+			if (Z_TYPE_P(white_list) == IS_ARRAY && !phalcon_fast_in_array(attribute, white_list)) {
 				zend_hash_move_forward_ex(ah0, &hp0);
 				continue;
 			}
@@ -1712,29 +1712,29 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 					PHALCON_INIT_NVAR(possible_setter);
 					PHALCON_CONCAT_SV(possible_setter, "set", attribute_field);
 					zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
-					if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1 TSRMLS_CC) == SUCCESS) {
+					if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
 						PHALCON_CALL_METHOD(NULL, this_ptr, Z_STRVAL_P(possible_setter), new_value);
 					} else {
-						phalcon_update_property_zval_zval(this_ptr, attribute_field, new_value TSRMLS_CC);
+						phalcon_update_property_zval_zval(this_ptr, attribute_field, new_value);
 					}
-				} else if (phalcon_fast_in_array(attribute, column_map TSRMLS_CC)) {
+				} else if (phalcon_fast_in_array(attribute, column_map)) {
 					PHALCON_INIT_NVAR(possible_setter);
 					PHALCON_CONCAT_SV(possible_setter, "set", attribute);
 					zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
-					if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1 TSRMLS_CC) == SUCCESS) {
+					if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
 						PHALCON_CALL_METHOD(NULL, this_ptr, Z_STRVAL_P(possible_setter), new_value);
 					} else {
-						phalcon_update_property_zval_zval(this_ptr, attribute, new_value TSRMLS_CC);
+						phalcon_update_property_zval_zval(this_ptr, attribute, new_value);
 					}
 				}
 			} else if (Z_TYPE_P(attributes) == IS_ARRAY && phalcon_array_isset(attributes, attribute)) {
 				PHALCON_INIT_NVAR(possible_setter);
 				PHALCON_CONCAT_SV(possible_setter, "set", attribute);
 				zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
-				if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1 TSRMLS_CC) == SUCCESS) {
+				if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
 					PHALCON_CALL_METHOD(NULL, this_ptr, Z_STRVAL_P(possible_setter), new_value);
 				} else {
-					phalcon_update_property_zval_zval(this_ptr, attribute, new_value TSRMLS_CC);
+					phalcon_update_property_zval_zval(this_ptr, attribute, new_value);
 				}
 			}
 
@@ -1765,7 +1765,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		PHALCON_INIT_NVAR(mode);
 
 		ZVAL_BOOL(mode, (PHALCON_IS_FALSE(exists) ? 1 : 0));
-		phalcon_update_property_long(this_ptr, SL("_operationMade"), (PHALCON_IS_FALSE(exists) ? 1 : 2) TSRMLS_CC);
+		phalcon_update_property_long(this_ptr, SL("_operationMade"), (PHALCON_IS_FALSE(exists) ? 1 : 2));
 	} else {		
 		PHALCON_CALL_METHOD(&exists, this_ptr, "_exists", collection);
 		if (PHALCON_IS_FALSE(mode)) {
@@ -1783,7 +1783,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 				PHALCON_INIT_VAR(messages);
 				array_init_size(messages, 1);
 				phalcon_array_append(&messages, collection_message, PH_SEPARATE);
-				phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages TSRMLS_CC);
+				phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages);
 				RETURN_MM_FALSE;
 			}
 		} else {
@@ -1801,12 +1801,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 				PHALCON_INIT_VAR(messages);
 				array_init_size(messages, 1);
 				phalcon_array_append(&messages, collection_message, PH_SEPARATE);
-				phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages TSRMLS_CC);
+				phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages);
 				RETURN_MM_FALSE;
 			}
 		}
 
-		phalcon_update_property_long(this_ptr, SL("_operationMade"), (!PHALCON_IS_FALSE(mode) ? 1 : 2) TSRMLS_CC);
+		phalcon_update_property_long(this_ptr, SL("_operationMade"), (!PHALCON_IS_FALSE(mode) ? 1 : 2));
 	}
 
 	PHALCON_INIT_VAR(empty_array);
@@ -1815,9 +1815,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	/**
 	 * The messages added to the validator are reset here
 	 */
-	phalcon_update_property_this(this_ptr, SL("_errorMessages"), empty_array TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_errorMessages"), empty_array);
 
-	disable_events = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents") TSRMLS_CC);
+	disable_events = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
 
 	/**
 	 * Execute the preSave hook
@@ -1852,9 +1852,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 				PHALCON_CPY_WRT(attribute_field, attribute);
 			}
 
-			if (phalcon_isset_property_zval(this_ptr, attribute_field TSRMLS_CC)) {
+			if (phalcon_isset_property_zval(this_ptr, attribute_field)) {
 				PHALCON_OBS_NVAR(value);
-				phalcon_read_property_zval(&value, this_ptr, attribute_field, PH_NOISY TSRMLS_CC);
+				phalcon_read_property_zval(&value, this_ptr, attribute_field, PH_NOISY);
 
 				phalcon_array_update_zval(&data, attribute, value, PH_COPY);
 			}
@@ -1885,7 +1885,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	/**
 	 * Save the document
 	 */
-	call_user_function(NULL, &collection, &func, status, 2, params TSRMLS_CC);
+	call_user_function(NULL, &collection, &func, status, 2, params);
 
 	if (EG(exception)) {
 		RETURN_MM();
@@ -1908,7 +1908,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 					}
 				}
 
-				phalcon_update_property_zval_zval(this_ptr, attribute_field, id TSRMLS_CC);
+				phalcon_update_property_zval_zval(this_ptr, attribute_field, id);
 			}
 		}
 	}
@@ -1940,12 +1940,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, findById){
 	if (Z_TYPE_P(id) != IS_OBJECT) {
 
 		PHALCON_INIT_VAR(class_name);
-		phalcon_get_called_class(class_name  TSRMLS_CC);
-		ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+		phalcon_get_called_class(class_name );
+		ce0 = phalcon_fetch_class(class_name);
 
 		PHALCON_INIT_VAR(collection);
 		object_init_ex(collection, ce0);
-		if (phalcon_has_constructor(collection TSRMLS_CC)) {
+		if (phalcon_has_constructor(collection)) {
 			PHALCON_CALL_METHOD(NULL, collection, "__construct");
 		}
 
@@ -1959,7 +1959,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findById){
 			ce1 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 			PHALCON_INIT_VAR(mongo_id);
 			object_init_ex(mongo_id, ce1);
-			if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
+			if (phalcon_has_constructor(mongo_id)) {
 				PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", id);
 			}
 		} else {
@@ -2023,12 +2023,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	phalcon_get_called_class(class_name );
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 
@@ -2044,7 +2044,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 				ce1 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 				PHALCON_INIT_VAR(mongo_id);
 				object_init_ex(mongo_id, ce1);
-				if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
+				if (phalcon_has_constructor(mongo_id)) {
 					PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", parameters);
 				}
 			} else {
@@ -2132,12 +2132,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, find){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	phalcon_get_called_class(class_name );
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 
@@ -2179,12 +2179,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, count){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	phalcon_get_called_class(class_name );
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 
@@ -2217,12 +2217,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, aggregate){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	phalcon_get_called_class(class_name );
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 
@@ -2273,12 +2273,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	phalcon_get_called_class(class_name );
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 
@@ -2423,7 +2423,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 		return;
 	}
 
-	disable_events = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents") TSRMLS_CC);
+	disable_events = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
 	if (!zend_is_true(disable_events)) {
 
 		PHALCON_INIT_VAR(event_name);
@@ -2575,9 +2575,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 			PHALCON_CPY_WRT(attribute_field, attribute);
 		}
 
-		if (phalcon_isset_property_zval(this_ptr, attribute_field TSRMLS_CC)) {
+		if (phalcon_isset_property_zval(this_ptr, attribute_field)) {
 			PHALCON_OBS_NVAR(value);
-			phalcon_read_property_zval(&value, this_ptr, attribute_field, PH_NOISY TSRMLS_CC);
+			phalcon_read_property_zval(&value, this_ptr, attribute_field, PH_NOISY);
 
 			if (zend_is_true(allow_empty)) {
 				phalcon_array_update_zval(&data, attribute_field, value, PH_COPY);
@@ -2608,7 +2608,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, serialize){
 	/**
 	 * Use the standard serialize function to serialize the array data
 	 */
-	phalcon_serialize(return_value, &data TSRMLS_CC);
+	phalcon_serialize(return_value, &data);
 	RETURN_MM();
 }
 
@@ -2632,7 +2632,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 	if (Z_TYPE_P(data) == IS_STRING) {
 
 		PHALCON_INIT_VAR(attributes);
-		phalcon_unserialize(attributes, data TSRMLS_CC);
+		phalcon_unserialize(attributes, data);
 		if (Z_TYPE_P(attributes) == IS_ARRAY) {
 
 			/**
@@ -2648,7 +2648,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 			/**
 			 * Update the dependency injector
 			 */
-			phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector);
 
 			/**
 			 * Gets the default collectionManager service
@@ -2667,7 +2667,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 			/**
 			 * Update the collection manager
 			 */
-			phalcon_update_property_this(this_ptr, SL("_collectionManager"), manager TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_collectionManager"), manager);
 
 			/**
 			 * Update the objects attributes
@@ -2679,7 +2679,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 				PHALCON_GET_HKEY(key, ah0, hp0);
 				PHALCON_GET_HVALUE(value);
 
-				phalcon_update_property_zval_zval(this_ptr, key, value TSRMLS_CC);
+				phalcon_update_property_zval_zval(this_ptr, key, value);
 
 				zend_hash_move_forward_ex(ah0, &hp0);
 			}
@@ -2720,12 +2720,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, execute){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	phalcon_get_called_class(class_name );
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 
@@ -2750,7 +2750,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 
 	phalcon_fetch_params(0, 1, 1, 1, &field, &value);
 
-	if (!phalcon_isset_property_zval(this_ptr, field TSRMLS_CC)) {
+	if (!phalcon_isset_property_zval(this_ptr, field)) {
 		RETURN_MM_FALSE;
 	}
 
@@ -2837,7 +2837,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 			PHALCON_GET_HKEY(filed, ah0, hp0);
 			PHALCON_GET_HVALUE(value);
 
-			phalcon_update_property_zval_zval(this_ptr, filed, value TSRMLS_CC);
+			phalcon_update_property_zval_zval(this_ptr, filed, value);
 
 			zend_hash_move_forward_ex(ah0, &hp0);
 		}
@@ -2857,12 +2857,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, drop){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	phalcon_get_called_class(class_name );
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 
@@ -2954,7 +2954,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 				if (zend_is_true(use_implicit_ids)) {
 					PHALCON_INIT_NVAR(mongo_id);
 					object_init_ex(mongo_id, ce0);
-					if (phalcon_has_constructor(mongo_id TSRMLS_CC)) {
+					if (phalcon_has_constructor(mongo_id)) {
 						PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", value2);
 					}
 					phalcon_array_update_zval(&conditions, column, mongo_id, PH_COPY);
@@ -2993,15 +2993,15 @@ PHP_METHOD(Phalcon_Mvc_Collection, __set){
 
 		PHALCON_CALL_FUNCTION(&method_exists, "method_exists", class_name, possible_setter);
 		if (!zend_is_true(method_exists)) {
-			if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1 TSRMLS_CC) == SUCCESS) {
+			if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
 				PHALCON_CALL_METHOD(NULL, this_ptr, Z_STRVAL_P(possible_setter), value);
 				RETURN_CTOR(value);
 			}
 		}
 
-		if (phalcon_isset_property_zval(this_ptr, property TSRMLS_CC)) {
+		if (phalcon_isset_property_zval(this_ptr, property)) {
 			PHALCON_INIT_NVAR(class_name);
-			phalcon_get_class(class_name, this_ptr, 0 TSRMLS_CC);
+			phalcon_get_class(class_name, this_ptr, 0);
 
 			if (PHALCON_PROPERTY_IS_PRIVATE_ZVAL(this_ptr, property)) {
 				zend_error(E_ERROR, "Cannot access private property %s::%s", Z_STRVAL_P(class_name), Z_STRVAL_P(property));
@@ -3015,7 +3015,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __set){
 		}
 	}
 
-	phalcon_update_property_zval_zval(this_ptr, property, value TSRMLS_CC);
+	phalcon_update_property_zval_zval(this_ptr, property, value);
 
 	RETURN_CTOR(value);
 }
@@ -3044,13 +3044,13 @@ PHP_METHOD(Phalcon_Mvc_Collection, __get){
 
 		PHALCON_CALL_FUNCTION(&method_exists, "method_exists", class_name, possible_getter);
 		if (!zend_is_true(method_exists)) {
-			if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_getter), Z_STRLEN_P(possible_getter)+1 TSRMLS_CC) == SUCCESS) {
+			if (phalcon_method_exists_ex(this_ptr, Z_STRVAL_P(possible_getter), Z_STRLEN_P(possible_getter)+1) == SUCCESS) {
 				PHALCON_CALL_METHOD(&return_value, this_ptr, Z_STRVAL_P(possible_getter));
 				RETURN_MM();
 			}
 		}
 
-		if (phalcon_isset_property_zval(this_ptr, property TSRMLS_CC)) {
+		if (phalcon_isset_property_zval(this_ptr, property)) {
 			RETURN_MM_NULL();
 		}
 	}
@@ -3112,7 +3112,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
+	phalcon_get_called_class(class_name );
 
 	if (!type) {
 		PHALCON_INIT_VAR(exception_message);
@@ -3128,23 +3128,23 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 		return;
 	}
 
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 
-	if (!phalcon_isset_property_zval(collection, extra_method TSRMLS_CC)) {
+	if (!phalcon_isset_property_zval(collection, extra_method)) {
 		PHALCON_INIT_NVAR(extra_method_first);
 		phalcon_lcfirst(extra_method_first, extra_method);
-		if (phalcon_isset_property_zval(collection, extra_method_first TSRMLS_CC)) {
+		if (phalcon_isset_property_zval(collection, extra_method_first)) {
 			PHALCON_CPY_WRT(field, extra_method_first);
 		} else {
 			PHALCON_INIT_NVAR(field);
 			phalcon_uncamelize(field, extra_method);
-			if (!phalcon_isset_property_zval(collection, field TSRMLS_CC)) {
+			if (!phalcon_isset_property_zval(collection, field)) {
 				PHALCON_INIT_NVAR(exception_message);
 				PHALCON_CONCAT_SVS(exception_message, "Cannot resolve attribute \"", extra_method, "' in the collection");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, exception_message);

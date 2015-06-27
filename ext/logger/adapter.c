@@ -85,26 +85,23 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Logger, Adapter, logger_adapter, phalcon_logger_adapter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_bool(phalcon_logger_adapter_ce, SL("_transaction"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_logger_adapter_ce, SL("_queue"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_logger_adapter_ce, SL("_formatter"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_logger_adapter_ce, SL("_logLevel"), PHALCON_LOGGER_SPECIAL, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_bool(phalcon_logger_adapter_ce, SL("_transaction"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_logger_adapter_ce, SL("_queue"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_logger_adapter_ce, SL("_formatter"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_logger_adapter_ce, SL("_logLevel"), PHALCON_LOGGER_SPECIAL, ZEND_ACC_PROTECTED);
 
 	/* Prior to PHP 5.3.9, a class could not implement two interfaces
 	 * that specified a method with the same name, since it would cause
 	 * ambiguity. More recent versions of PHP allow this as long as
 	 * the duplicate methods have the same signature.
 	 */
-#if PHP_VERSION_ID >= 50309
 	if (PHALCON_GLOBAL(register_psr3_classes)) {
-		zend_class_implements(phalcon_logger_adapter_ce TSRMLS_CC, 2, phalcon_logger_adapterinterface_ce, psr_log_loggerinterface_ce);
+		zend_class_implements(phalcon_logger_adapter_ce, 2, phalcon_logger_adapterinterface_ce, psr_log_loggerinterface_ce);
 	}
 	else {
-		zend_class_implements(phalcon_logger_adapter_ce TSRMLS_CC, 1, phalcon_logger_adapterinterface_ce);
+		zend_class_implements(phalcon_logger_adapter_ce, 1, phalcon_logger_adapterinterface_ce);
 	}
-#else
-	zend_class_implements(phalcon_logger_adapter_ce TSRMLS_CC, 1, phalcon_logger_adapterinterface_ce);
-#endif
+
 	return SUCCESS;
 }
 
@@ -141,7 +138,7 @@ static int phalcon_logger_adapter_string_level_to_int(const zval *level)
 
 	{
 		TSRMLS_FETCH();
-		php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Unrecognized log level '%s'", s);
+		php_error_docref(NULL, E_NOTICE, "Unrecognized log level '%s'", s);
 		return PHALCON_LOGGER_CUSTOM;
 	}
 }
@@ -169,7 +166,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, setLogLevel){
 		lvl = *level;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_logLevel"), lvl TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_logLevel"), lvl);
 	RETURN_THISW();
 }
 
@@ -198,7 +195,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, setFormatter){
 	phalcon_fetch_params(0, 0, 1, 0, &formatter);
 	PHALCON_VERIFY_INTERFACE_EX(formatter, phalcon_logger_formatterinterface_ce, exception, 0);
 
-	phalcon_update_property_this(this_ptr, SL("_formatter"), formatter TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_formatter"), formatter);
 	RETURN_THISW();
 }
 
@@ -220,7 +217,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, isTransaction){
 PHP_METHOD(Phalcon_Logger_Adapter, begin){
 
 
-	phalcon_update_property_bool(this_ptr, SL("_transaction"), 1 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_transaction"), 1);
 	RETURN_THISW();
 }
 
@@ -240,7 +237,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 		return;
 	}
 	
-	phalcon_update_property_bool(this_ptr, SL("_transaction"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_transaction"), 0);
 	
 	/* Check if the queue has something to log */
 	queue = phalcon_fetch_nproperty_this(this_ptr, SL("_queue"), PH_NOISY);
@@ -268,7 +265,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 		else {
 			PHALCON_ALLOC_GHOST_ZVAL(queue);
 			array_init(queue);
-			phalcon_update_property_this(getThis(), SL("_queue"), queue TSRMLS_CC);
+			phalcon_update_property_this(getThis(), SL("_queue"), queue);
 		}
 
 		PHALCON_MM_RESTORE();
@@ -292,11 +289,11 @@ PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 		return;
 	}
 	
-	phalcon_update_property_bool(this_ptr, SL("_transaction"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_transaction"), 0);
 	
 	PHALCON_ALLOC_GHOST_ZVAL(queue);
 	array_init_size(queue, 0);
-	phalcon_update_property_this(this_ptr, SL("_queue"), queue TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_queue"), queue);
 	
 	RETURN_THISW();
 }
@@ -491,7 +488,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 			object_init_ex(queue_item, phalcon_logger_item_ce);
 			PHALCON_CALL_METHOD(NULL, queue_item, "__construct", *message, level, timestamp, *context);
 
-			phalcon_update_property_array_append(this_ptr, SL("_queue"), queue_item TSRMLS_CC);
+			phalcon_update_property_array_append(this_ptr, SL("_queue"), queue_item);
 		}
 		else {
 			PHALCON_CALL_METHOD(NULL, this_ptr, "loginternal", *message, level, timestamp, *context);

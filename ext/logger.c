@@ -44,17 +44,17 @@ PHALCON_INIT_CLASS(Phalcon_Logger){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Logger, logger, NULL, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("SPECIAL"),   PHALCON_LOGGER_SPECIAL   TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("CUSTOM"),    PHALCON_LOGGER_CUSTOM    TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("DEBUG"),     PHALCON_LOGGER_DEBUG     TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("INFO"),      PHALCON_LOGGER_INFO      TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("NOTICE"),    PHALCON_LOGGER_NOTICE    TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("WARNING"),   PHALCON_LOGGER_WARNING   TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("ERROR"),     PHALCON_LOGGER_ERROR     TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("ALERT"),     PHALCON_LOGGER_ALERT     TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("CRITICAL"),  PHALCON_LOGGER_CRITICAL  TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("EMERGENCE"), PHALCON_LOGGER_EMERGENCY TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_logger_ce, SL("EMERGENCY"), PHALCON_LOGGER_EMERGENCY TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("SPECIAL"),   PHALCON_LOGGER_SPECIAL  );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("CUSTOM"),    PHALCON_LOGGER_CUSTOM   );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("DEBUG"),     PHALCON_LOGGER_DEBUG    );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("INFO"),      PHALCON_LOGGER_INFO     );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("NOTICE"),    PHALCON_LOGGER_NOTICE   );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("WARNING"),   PHALCON_LOGGER_WARNING  );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("ERROR"),     PHALCON_LOGGER_ERROR    );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("ALERT"),     PHALCON_LOGGER_ALERT    );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("CRITICAL"),  PHALCON_LOGGER_CRITICAL );
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("EMERGENCE"), PHALCON_LOGGER_EMERGENCY);
+	zend_declare_class_constant_long(phalcon_logger_ce, SL("EMERGENCY"), PHALCON_LOGGER_EMERGENCY);
 
 	return SUCCESS;
 }

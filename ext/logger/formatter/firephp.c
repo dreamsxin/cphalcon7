@@ -75,10 +75,10 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter_Firephp){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Logger\\Formatter, Firephp, logger_formatter_firephp, phalcon_logger_formatter_ce, phalcon_logger_formatter_firephp_method_entry, 0);
 
-	zend_declare_property_bool(phalcon_logger_formatter_firephp_ce, SL("_showBacktrace"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_logger_formatter_firephp_ce, SL("_enableLabels"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_bool(phalcon_logger_formatter_firephp_ce, SL("_showBacktrace"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_logger_formatter_firephp_ce, SL("_enableLabels"), 1, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_logger_formatter_firephp_ce TSRMLS_CC, 1, phalcon_logger_formatterinterface_ce);
+	zend_class_implements(phalcon_logger_formatter_firephp_ce, 1, phalcon_logger_formatterinterface_ce);
 
 	return SUCCESS;
 }
@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, setShowBacktrace) {
 	phalcon_fetch_params(0, 1, 0, &show);
 
 	PHALCON_ENSURE_IS_BOOL(show);
-	phalcon_update_property_this(getThis(), SL("_showBacktrace"), *show TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_showBacktrace"), *show);
 }
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, enableLabels) {
@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, enableLabels) {
 	phalcon_fetch_params(0, 1, 0, &enable);
 
 	PHALCON_ENSURE_IS_BOOL(enable);
-	phalcon_update_property_this(getThis(), SL("_enableLabels"), *enable TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_enableLabels"), *enable);
 }
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, labelsEnabled) {
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
 	{
 		zval *params[] = { type };
-		if (FAILURE == phalcon_call_method(&type_str, this_ptr, "gettypestring", 1, params TSRMLS_CC)) {
+		if (FAILURE == phalcon_call_method(&type_str, this_ptr, "gettypestring", 1, params)) {
 			zval_ptr_dtor(&interpolated);
 			return;
 		}
@@ -199,13 +199,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	if (i_show_backtrace) {
 		ALLOC_INIT_ZVAL(backtrace);
 
-#if PHP_VERSION_ID < 50306
-		zend_fetch_debug_backtrace(backtrace, 1, 0 TSRMLS_CC);
-#elif PHP_VERSION_ID < 50400
-		zend_fetch_debug_backtrace(backtrace, 1, DEBUG_BACKTRACE_IGNORE_ARGS TSRMLS_CC);
-#else
-		zend_fetch_debug_backtrace(backtrace, 1, DEBUG_BACKTRACE_IGNORE_ARGS, 0 TSRMLS_CC);
-#endif
+		zend_fetch_debug_backtrace(backtrace, 1, DEBUG_BACKTRACE_IGNORE_ARGS, 0);
 
 		if (Z_TYPE_P(backtrace) == IS_ARRAY) {
 			HashPosition pos;
@@ -279,10 +273,10 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 *     array('backtrace' => array(backtrace goes here)
 	 * )
 	 */
-	MAKE_STD_ZVAL(payload);
+	PHALCON_ALLOC_GHOST_ZVAL(payload);
 	array_init_size(payload, 2);
 
-	MAKE_STD_ZVAL(meta);
+	PHALCON_ALLOC_GHOST_ZVAL(meta);
 	array_init_size(meta, 4);
 	add_assoc_zval_ex(meta, SS("Type"), type_str);
 
@@ -315,11 +309,11 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 		body = interpolated;
 	}
 	else if (i_enable_labels && !i_show_backtrace) {
-		MAKE_STD_ZVAL(body);
+		PHALCON_ALLOC_GHOST_ZVAL(body);
 		ZVAL_EMPTY_STRING(body);
 	}
 	else {
-		MAKE_STD_ZVAL(body);
+		PHALCON_ALLOC_GHOST_ZVAL(body);
 		array_init_size(body, 2);
 
 		if (i_show_backtrace) {
@@ -336,7 +330,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
 	/* Convert everything to JSON */
 	ALLOC_INIT_ZVAL(encoded);
-	if (FAILURE == phalcon_json_encode(encoded, payload, 0 TSRMLS_CC)) {
+	if (FAILURE == phalcon_json_encode(encoded, payload, 0)) {
 		zval_ptr_dtor(&payload);
 		zval_ptr_dtor(&encoded);
 		return;

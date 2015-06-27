@@ -133,24 +133,24 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model, Resultset, mvc_model_resultset, phalcon_mvc_model_resultset_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_long(phalcon_mvc_model_resultset_ce, SL("_type"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_result"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_cache"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_model_resultset_ce, SL("_isFresh"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_mvc_model_resultset_ce, SL("_pointer"), -1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_count"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_activeRow"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_rows"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_mvc_model_resultset_ce, SL("_hydrateMode"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_long(phalcon_mvc_model_resultset_ce, SL("_type"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_result"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_cache"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_model_resultset_ce, SL("_isFresh"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_model_resultset_ce, SL("_pointer"), -1, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_count"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_activeRow"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_rows"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_model_resultset_ce, SL("_hydrateMode"), 0, ZEND_ACC_PROTECTED);
 
-	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("TYPE_RESULT_FULL"),    PHALCON_MVC_MODEL_RESULTSET_TYPE_FULL TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("TYPE_RESULT_PARTIAL"), PHALCON_MVC_MODEL_RESULTSET_TYPE_PARTIAL TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("HYDRATE_RECORDS"), 0 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("HYDRATE_OBJECTS"), 2 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("HYDRATE_ARRAYS"), 1 TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("TYPE_RESULT_FULL"),    PHALCON_MVC_MODEL_RESULTSET_TYPE_FULL);
+	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("TYPE_RESULT_PARTIAL"), PHALCON_MVC_MODEL_RESULTSET_TYPE_PARTIAL);
+	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("HYDRATE_RECORDS"), 0);
+	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("HYDRATE_OBJECTS"), 2);
+	zend_declare_class_constant_long(phalcon_mvc_model_resultset_ce, SL("HYDRATE_ARRAYS"), 1);
 
-	zend_class_implements(phalcon_mvc_model_resultset_ce TSRMLS_CC, 6, phalcon_mvc_model_resultsetinterface_ce, zend_ce_iterator, spl_ce_SeekableIterator, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_serializable);
+	zend_class_implements(phalcon_mvc_model_resultset_ce, 6, phalcon_mvc_model_resultsetinterface_ce, zend_ce_iterator, spl_ce_SeekableIterator, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_serializable);
 
 	return SUCCESS;
 }
@@ -162,7 +162,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset){
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, next){
 
 
-	phalcon_property_incr(this_ptr, SL("_pointer") TSRMLS_CC);
+	phalcon_property_incr(this_ptr, SL("_pointer"));
 
 }
 
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 					zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(r), NULL);
 				}
 
-				phalcon_update_property_this(this_ptr, SL("_rows"), r TSRMLS_CC);
+				phalcon_update_property_this(this_ptr, SL("_rows"), r);
 				zval_ptr_dtor(&r);
 			}
 		}
@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 		}
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_pointer"), z_zero TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_pointer"), z_zero);
 }
 
 /**
@@ -242,31 +242,31 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 	zval *pointer, *is_different;
 	HashTable *ah0;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "z", &position) == FAILURE) {
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &position) == FAILURE) {
 		RETURN_NULL();
 	}
 
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(pointer);
-	phalcon_read_property(&pointer, this_ptr, SL("_pointer"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property(&pointer, this_ptr, SL("_pointer"), PH_NOISY);
 
 	/**
 	 * We only seek the records if the current position is diferent than the passed one
 	 */
 	PHALCON_INIT_VAR(is_different);
-	is_not_equal_function(is_different, pointer, position TSRMLS_CC);
+	is_not_equal_function(is_different, pointer, position);
 	if (PHALCON_IS_TRUE(is_different)) {
 
 		PHALCON_OBS_VAR(type);
-		phalcon_read_property(&type, this_ptr, SL("_type"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property(&type, this_ptr, SL("_type"), PH_NOISY);
 		if (zend_is_true(type)) {
 
 			/**
 			 * Here, the resultset is fetched one by one because is large
 			 */
 			PHALCON_OBS_VAR(result);
-			phalcon_read_property(&result, this_ptr, SL("_result"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property(&result, this_ptr, SL("_result"), PH_NOISY);
 			PHALCON_CALL_METHOD(NULL, result, "dataseek", position);
 
 		} else {
@@ -275,17 +275,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 			 * Here, the resultset is a small array
 			 */
 			PHALCON_OBS_VAR(rows);
-			phalcon_read_property(&rows, this_ptr, SL("_rows"), PH_NOISY TSRMLS_CC);
+			phalcon_read_property(&rows, this_ptr, SL("_rows"), PH_NOISY);
 
 			/**
 			 * We need to fetch the records because rows is null
 			 */
 			if (Z_TYPE_P(rows) == IS_NULL) {
 				PHALCON_OBS_VAR(result);
-				phalcon_read_property(&result, this_ptr, SL("_result"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property(&result, this_ptr, SL("_result"), PH_NOISY);
 				if (PHALCON_IS_NOT_FALSE(result)) {
 					PHALCON_CALL_METHOD(&rows, result, "fetchall");
-					phalcon_update_property_zval(this_ptr, SL("_rows"), rows TSRMLS_CC);
+					phalcon_update_property_zval(this_ptr, SL("_rows"), rows);
 				}
 			}
 
@@ -308,7 +308,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 				}
 			}
 
-			phalcon_update_property_zval(this_ptr, SL("_pointer"), position TSRMLS_CC);
+			phalcon_update_property_zval(this_ptr, SL("_pointer"), position);
 		}
 	}
 
@@ -363,15 +363,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 				phalcon_read_property_this(&result, this_ptr, SL("_result"), PH_NOISY);
 				if (Z_TYPE_P(result) == IS_OBJECT) {
 					PHALCON_CALL_METHOD(&rows, result, "fetchall");
-					phalcon_update_property_this(this_ptr, SL("_rows"), rows TSRMLS_CC);
+					phalcon_update_property_this(this_ptr, SL("_rows"), rows);
 				}
 			}
 
 			PHALCON_INIT_NVAR(count);
-			phalcon_fast_count(count, rows TSRMLS_CC);
+			phalcon_fast_count(count, rows);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_count"), count TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_count"), count);
 	}
 
 	RETURN_CCTOR(count);
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetExists){
 	phalcon_fetch_params(0, 1, 0, &index);
 
 	PHALCON_CALL_METHODW(&count, this_ptr, "count");
-	is_smaller_function(return_value, index, count TSRMLS_CC);
+	is_smaller_function(return_value, index, count);
 	zval_ptr_dtor(&count);
 }
 
@@ -559,7 +559,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, setIsFresh){
 
 	phalcon_fetch_params(0, 1, 0, &is_fresh);
 
-	phalcon_update_property_this(this_ptr, SL("_isFresh"), is_fresh TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_isFresh"), is_fresh);
 	RETURN_THISW();
 }
 
@@ -586,7 +586,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, setHydrateMode){
 
 	phalcon_fetch_params(0, 1, 0, &hydrate_mode);
 
-	phalcon_update_property_this(this_ptr, SL("_hydrateMode"), hydrate_mode TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_hydrateMode"), hydrate_mode);
 	RETURN_THISW();
 }
 
@@ -671,7 +671,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 			/** 
 			 * We only can delete resultsets whose every element is a complete object
 			 */
-			if (phalcon_method_exists_ex(record, SS("getwriteconnection") TSRMLS_CC) == FAILURE) {
+			if (phalcon_method_exists_ex(record, SS("getwriteconnection")) == FAILURE) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The returned record is not valid");
 				return;
 			}
@@ -708,7 +708,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 			 * Get the messages from the record that produce the error
 			 */
 			PHALCON_CALL_METHOD(&messages, record, "getmessages");
-			phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages);
 
 			/** 
 			 * Rollback the transaction
@@ -831,7 +831,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			/** 
 			 * We only can update resultsets whose every element is a complete object
 			 */
-			if (phalcon_method_exists_ex(record, SS("getwriteconnection") TSRMLS_CC) == FAILURE) {
+			if (phalcon_method_exists_ex(record, SS("getwriteconnection")) == FAILURE) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The returned record is not valid");
 				return;
 			}
@@ -868,7 +868,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			 * Get the messages from the record that produce the error
 			 */
 			PHALCON_CALL_METHOD(&messages, record, "getmessages");
-			phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages);
 
 			/** 
 			 * Rollback the transaction

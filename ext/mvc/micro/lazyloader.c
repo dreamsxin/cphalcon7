@@ -58,8 +58,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Micro_LazyLoader){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Micro, LazyLoader, mvc_micro_lazyloader, phalcon_mvc_micro_lazyloader_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_micro_lazyloader_ce, SL("_handler"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_micro_lazyloader_ce, SL("_definition"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_micro_lazyloader_ce, SL("_handler"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_micro_lazyloader_ce, SL("_definition"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -76,7 +76,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
 	phalcon_fetch_params(0, 1, 0, &definition);
 	PHALCON_ENSURE_IS_STRING(definition);
 	
-	phalcon_update_property_this(this_ptr, SL("_definition"), *definition TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_definition"), *definition);
 }
 
 /**
@@ -101,14 +101,14 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 	if (Z_TYPE_P(handler) != IS_OBJECT) {
 		PHALCON_OBS_VAR(definition);
 		phalcon_read_property_this(&definition, this_ptr, SL("_definition"), PH_NOISY);
-		ce0 = phalcon_fetch_class(definition TSRMLS_CC);
+		ce0 = phalcon_fetch_class(definition);
 	
 		PHALCON_INIT_NVAR(handler);
 		object_init_ex(handler, ce0);
-		if (phalcon_has_constructor(handler TSRMLS_CC)) {
+		if (phalcon_has_constructor(handler)) {
 			PHALCON_CALL_METHOD(NULL, handler, "__construct");
 		}
-		phalcon_update_property_this(this_ptr, SL("_handler"), handler TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_handler"), handler);
 	}
 	
 	PHALCON_INIT_VAR(call_handler);

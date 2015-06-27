@@ -23,8 +23,8 @@
 #include "php_phalcon.h"
 
 /** Strict comparing */
-#define PHALCON_IS_LONG(op1, op2)   ((Z_TYPE_P(op1) == IS_LONG && Z_LVAL_P(op1) == op2) || phalcon_compare_strict_long(op1, op2 TSRMLS_CC))
-#define PHALCON_IS_DOUBLE(op1, op2) ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) == op2) || phalcon_compare_strict_double(op1, op2 TSRMLS_CC))
+#define PHALCON_IS_LONG(op1, op2)   ((Z_TYPE_P(op1) == IS_LONG && Z_LVAL_P(op1) == op2) || phalcon_compare_strict_long(op1, op2))
+#define PHALCON_IS_DOUBLE(op1, op2) ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) == op2) || phalcon_compare_strict_double(op1, op2))
 #define PHALCON_IS_STRING(op1, op2) phalcon_compare_strict_string(op1, op2, strlen(op2))
 
 #define PHALCON_IS_LONG_IDENTICAL(op1, op2)   (Z_TYPE_P(op1) == IS_LONG && Z_LVAL_P(op1) == op2)
@@ -47,63 +47,50 @@
 #define PHALCON_IS_NOT_SCALAR(var)  (Z_TYPE_P(var) == IS_NULL || Z_TYPE_P(var) == IS_ARRAY || Z_TYPE_P(var) == IS_OBJECT || Z_TYPE_P(var) == IS_RESOURCE)
 
 /** Equals/Identical */
-#define PHALCON_IS_EQUAL(op1, op2)      phalcon_is_equal(op1, op2 TSRMLS_CC)
-#define PHALCON_IS_IDENTICAL(op1, op2)  phalcon_is_identical(op1, op2 TSRMLS_CC)
+#define PHALCON_IS_EQUAL(op1, op2)      phalcon_is_equal(op1, op2)
+#define PHALCON_IS_IDENTICAL(op1, op2)  phalcon_is_identical(op1, op2)
 
 /** Greater/Smaller equals */
-#define PHALCON_LE(op1, op2)       phalcon_less_equal(op1, op2 TSRMLS_CC)
-#define PHALCON_LE_LONG(op1, op2)  phalcon_less_equal_long(op1, op2 TSRMLS_CC)
-#define PHALCON_LE_DOUBLE(op1, op2)  ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) <= op2) || phalcon_less_equal_double(op1, op2 TSRMLS_CC))
-#define PHALCON_GE(op1, op2)       phalcon_greater_equal(op1, op2 TSRMLS_CC)
-#define PHALCON_GE_LONG(op1, op2)  phalcon_greater_equal_long(op1, op2 TSRMLS_CC)
-#define PHALCON_LT(op1, op2)       phalcon_less(op1, op2 TSRMLS_CC)
-#define PHALCON_LT_LONG(op1, op2)  phalcon_less_long(op1, op2 TSRMLS_CC)
-#define PHALCON_LT_DOUBLE(op1, op2)  ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) < op2) || phalcon_less_double(op1, op2 TSRMLS_CC))
-#define PHALCON_GT(op1, op2)       phalcon_greater(op1, op2 TSRMLS_CC)
-#define PHALCON_GT_LONG(op1, op2)  phalcon_greater_long(op1, op2 TSRMLS_CC)
-#define PHALCON_GT_DOUBLE(op1, op2)  ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) > op2) || phalcon_greater_double(op1, op2 TSRMLS_CC))
+#define PHALCON_LE(op1, op2)       phalcon_less_equal(op1, op2)
+#define PHALCON_LE_LONG(op1, op2)  phalcon_less_equal_long(op1, op2)
+#define PHALCON_LE_DOUBLE(op1, op2)  ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) <= op2) || phalcon_less_equal_double(op1, op2))
+#define PHALCON_GE(op1, op2)       phalcon_greater_equal(op1, op2)
+#define PHALCON_GE_LONG(op1, op2)  phalcon_greater_equal_long(op1, op2)
+#define PHALCON_LT(op1, op2)       phalcon_less(op1, op2)
+#define PHALCON_LT_LONG(op1, op2)  phalcon_less_long(op1, op2)
+#define PHALCON_LT_DOUBLE(op1, op2)  ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) < op2) || phalcon_less_double(op1, op2))
+#define PHALCON_GT(op1, op2)       phalcon_greater(op1, op2)
+#define PHALCON_GT_LONG(op1, op2)  phalcon_greater_long(op1, op2)
+#define PHALCON_GT_DOUBLE(op1, op2)  ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) > op2) || phalcon_greater_double(op1, op2))
 
 #define PHALCON_STRING_OFFSET(op1, index) ((index >= 0 && index < Z_STRLEN_P(op1)) ? Z_STRVAL_P(op1)[index] : '\0')
-#if PHP_VERSION_ID < 50400
-#define phalcon_increment(var) increment_function(var)
-#else
-#define phalcon_increment(var) fast_increment_function(var)
-#endif
 
-#if PHP_VERSION_ID < 50400
-#define phalcon_decrement(var) decrement_function(var)
-#else
+#define phalcon_increment(var) fast_increment_function(var)
 #define phalcon_decrement(var) fast_decrement_function(var)
-#endif
 
 void phalcon_make_printable_zval(zval *expr, zval *expr_copy, int *use_copy);
-#if PHP_VERSION_ID < 50400
-#define phalcon_sub_function(result, left, right) sub_function(result, left, right TSRMLS_CC)
-#define phalcon_add_function(result, left, right) phalcon_add_function_ex(result, left, right TSRMLS_CC)
-#define phalcon_div_function(result, left, right) div_function(result, left, right TSRMLS_CC)
-#else
-#define phalcon_sub_function(result, left, right) fast_sub_function(result, left, right TSRMLS_CC)
-#define phalcon_add_function(result, left, right) fast_add_function(result, left, right TSRMLS_CC)
-#define phalcon_div_function(result, left, right) fast_div_function(result, left, right TSRMLS_CC)
-#endif
+
+#define phalcon_sub_function(result, left, right) fast_sub_function(result, left, right)
+#define phalcon_add_function(result, left, right) fast_add_function(result, left, right)
+#define phalcon_div_function(result, left, right) fast_div_function(result, left, right)
 
 /** Operator functions */
-int phalcon_add_function_ex(zval *result, zval *op1, zval *op2 TSRMLS_DC);
+int phalcon_add_function_ex(zval *result, zval *op1, zval *op2);
 int phalcon_and_function(zval *result, zval *left, zval *right);
-void phalcon_negate(zval *z TSRMLS_DC);
+void phalcon_negate(zval *z);
 
 /** Bitwise functions */
-int phalcon_bitwise_and_function(zval *result, zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_bitwise_or_function(zval *result, zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_bitwise_xor_function(zval *result, zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_shift_left_function(zval *result, zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_shift_right_function(zval *result, zval *op1, zval *op2 TSRMLS_DC);
+int phalcon_bitwise_and_function(zval *result, zval *op1, zval *op2);
+int phalcon_bitwise_or_function(zval *result, zval *op1, zval *op2);
+int phalcon_bitwise_xor_function(zval *result, zval *op1, zval *op2);
+int phalcon_shift_left_function(zval *result, zval *op1, zval *op2);
+int phalcon_shift_right_function(zval *result, zval *op1, zval *op2);
 
 /** Strict comparing */
 int phalcon_compare_strict_string(zval *op1, const char *op2, int op2_length);
-int phalcon_compare_strict_long(zval *op1, long op2 TSRMLS_DC);
-int phalcon_compare_strict_double(zval *op1, double op2 TSRMLS_DC);
-int phalcon_compare_strict_bool(zval *op1, zend_bool op2 TSRMLS_DC);
+int phalcon_compare_strict_long(zval *op1, long op2);
+int phalcon_compare_strict_double(zval *op1, double op2);
+int phalcon_compare_strict_bool(zval *op1, zend_bool op2);
 
 void phalcon_cast(zval *result, zval *var, uint32_t type);
 void phalcon_convert_to_object(zval *op);
@@ -120,21 +107,21 @@ int phalcon_is_numeric_ex(const zval *op);
 
 #define phalcon_is_numeric(value) (Z_TYPE_P(value) == IS_LONG || Z_TYPE_P(value) == IS_DOUBLE || phalcon_is_numeric_ex(value))
 
-int phalcon_is_equal(zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_is_identical(zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_is_equal_long(zval *op1, long op2 TSRMLS_DC);
-int phalcon_is_equal_object(zval *obj1, zval *obj2 TSRMLS_DC);
+int phalcon_is_equal(zval *op1, zval *op2);
+int phalcon_is_identical(zval *op1, zval *op2);
+int phalcon_is_equal_long(zval *op1, long op2);
+int phalcon_is_equal_object(zval *obj1, zval *obj2);
 
-int phalcon_less(zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_less_long(zval *op1, long op2 TSRMLS_DC);
+int phalcon_less(zval *op1, zval *op2);
+int phalcon_less_long(zval *op1, long op2);
 
-int phalcon_greater(zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_greater_long(zval *op1, long op2 TSRMLS_DC);
+int phalcon_greater(zval *op1, zval *op2);
+int phalcon_greater_long(zval *op1, long op2);
 
-int phalcon_less_equal(zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_less_equal_long(zval *op1, long op2 TSRMLS_DC);
+int phalcon_less_equal(zval *op1, zval *op2);
+int phalcon_less_equal_long(zval *op1, long op2);
 
-int phalcon_greater_equal(zval *op1, zval *op2 TSRMLS_DC);
-int phalcon_greater_equal_long(zval *op1, long op2 TSRMLS_DC);
+int phalcon_greater_equal(zval *op1, zval *op2);
+int phalcon_greater_equal_long(zval *op1, long op2);
 
 #endif /* PHALCON_KERNEL_OPERATORS_H */

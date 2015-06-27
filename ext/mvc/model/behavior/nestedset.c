@@ -257,16 +257,16 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Behavior_NestedSet){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Behavior, NestedSet, mvc_model_behavior_nestedset, phalcon_mvc_model_behavior_ce, phalcon_mvc_model_behavior_nestedset_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_behavior_nestedset_ce, SL("_owner"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_mvc_model_behavior_nestedset_ce, SL("_hasManyRoots"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_rootAttribute"), "root", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_leftAttribute"), "lft", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_rightAttribute"), "rgt", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_levelAttribute"), "lvl", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_primaryKey"), "id", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_model_behavior_nestedset_ce, SL("_ignoreEvent"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_behavior_nestedset_ce, SL("_owner"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_model_behavior_nestedset_ce, SL("_hasManyRoots"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_rootAttribute"), "root", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_leftAttribute"), "lft", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_rightAttribute"), "rgt", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_levelAttribute"), "lvl", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_model_behavior_nestedset_ce, SL("_primaryKey"), "id", ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_model_behavior_nestedset_ce, SL("_ignoreEvent"), 0, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_behavior_nestedset_ce TSRMLS_CC, 1, phalcon_mvc_model_behaviorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_behavior_nestedset_ce, 1, phalcon_mvc_model_behaviorinterface_ce);
 
 	return SUCCESS;
 }
@@ -284,42 +284,42 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, __construct){
 			PHALCON_OBS_NVAR(option);
 			phalcon_array_fetch_string(&option, options, SL("hasManyRoots"), PH_NOISY);
 
-			phalcon_update_property_this(this_ptr, SL("_hasManyRoots"), option TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_hasManyRoots"), option);
 		}
 
 		if (phalcon_array_isset_string(options, SS("rootAttribute"))) {
 			PHALCON_OBS_NVAR(option);
 			phalcon_array_fetch_string(&option, options, SL("rootAttribute"), PH_NOISY);
 
-			phalcon_update_property_this(this_ptr, SL("_rootAttribute"), option TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_rootAttribute"), option);
 		}
 
 		if (phalcon_array_isset_string(options, SS("leftAttribute"))) {
 			PHALCON_OBS_NVAR(option);
 			phalcon_array_fetch_string(&option, options, SL("leftAttribute"), PH_NOISY);
 
-			phalcon_update_property_this(this_ptr, SL("_leftAttribute"), option TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_leftAttribute"), option);
 		}
 
 		if (phalcon_array_isset_string(options, SS("rightAttribute"))) {
 			PHALCON_OBS_NVAR(option);
 			phalcon_array_fetch_string(&option, options, SL("rightAttribute"), PH_NOISY);
 
-			phalcon_update_property_this(this_ptr, SL("_rightAttribute"), option TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_rightAttribute"), option);
 		}
 
 		if (phalcon_array_isset_string(options, SS("levelAttribute"))) {
 			PHALCON_OBS_NVAR(option);
 			phalcon_array_fetch_string(&option, options, SL("levelAttribute"), PH_NOISY);
 
-			phalcon_update_property_this(this_ptr, SL("_levelAttribute"), option TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_levelAttribute"), option);
 		}
 
 		if (phalcon_array_isset_string(options, SS("primaryKey"))) {
 			PHALCON_OBS_NVAR(option);
 			phalcon_array_fetch_string(&option, options, SL("primaryKey"), PH_NOISY);
 
-			phalcon_update_property_this(this_ptr, SL("_primaryKey"), option TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_primaryKey"), option);
 		}
 	}
 
@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, missingMethod){
 		convert_to_string(method);
 	}
 
-	if (phalcon_method_exists(this_ptr, method TSRMLS_CC) == FAILURE) {
+	if (phalcon_method_exists(this_ptr, method) == FAILURE) {
 		RETURN_MM_NULL();
 	}
 
@@ -393,7 +393,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, setOwner){
 
 	PHALCON_VERIFY_INTERFACE(owner, phalcon_mvc_modelinterface_ce);
 
-	phalcon_update_property_this(this_ptr, SL("_owner"), owner TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_owner"), owner);
 
 	PHALCON_MM_RESTORE();
 }
@@ -420,7 +420,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, getLeftAttribute){
 	left_attribute = phalcon_fetch_nproperty_this(this_ptr, SL("_leftAttribute"), PH_NOISY);
 
 	PHALCON_OBS_VAR(left);
-	phalcon_read_property_zval(&left, model, left_attribute, PH_NOISY TSRMLS_CC);
+	phalcon_read_property_zval(&left, model, left_attribute, PH_NOISY);
 
 	RETURN_CTOR(left);
 }
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, getRightAttribute){
 	right_attribute = phalcon_fetch_nproperty_this(this_ptr, SL("_rightAttribute"), PH_NOISY);
 
 	PHALCON_OBS_VAR(right);
-	phalcon_read_property_zval(&right, model, right_attribute, PH_NOISY TSRMLS_CC);
+	phalcon_read_property_zval(&right, model, right_attribute, PH_NOISY);
 
 	RETURN_CTOR(right);
 }
@@ -464,7 +464,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, getLevelAttribute){
 	level_attribute = phalcon_fetch_nproperty_this(this_ptr, SL("_levelAttribute"), PH_NOISY);
 
 	PHALCON_OBS_VAR(level);
-	phalcon_read_property_zval(&level, model, level_attribute, PH_NOISY TSRMLS_CC);
+	phalcon_read_property_zval(&level, model, level_attribute, PH_NOISY);
 
 	RETURN_CTOR(level);
 }
@@ -486,7 +486,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, getRootAttribute){
 	root_attribute = phalcon_fetch_nproperty_this(this_ptr, SL("_rootAttribute"), PH_NOISY);
 
 	PHALCON_OBS_VAR(root);
-	phalcon_read_property_zval(&root, model, root_attribute, PH_NOISY TSRMLS_CC);
+	phalcon_read_property_zval(&root, model, root_attribute, PH_NOISY);
 
 	RETURN_CTOR(root);
 }
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, getPrimaryKey){
 	primary_key = phalcon_fetch_nproperty_this(this_ptr, SL("_primaryKey"), PH_NOISY);
 
 	PHALCON_OBS_VAR(primary_key_value);
-	phalcon_read_property_zval(&primary_key_value, model, primary_key, PH_NOISY TSRMLS_CC);
+	phalcon_read_property_zval(&primary_key_value, model, primary_key, PH_NOISY);
 
 	RETURN_CTOR(primary_key_value);
 }
@@ -520,9 +520,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, setHasManyRoots){
 	phalcon_fetch_params(0, 1, 0, &manyroots);
 
 	if (zend_is_true(manyroots)) {
-		phalcon_update_property_bool(this_ptr, SL("_hasManyRoots"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_hasManyRoots"), 1);
 	} else {
-		phalcon_update_property_bool(this_ptr, SL("_hasManyRoots"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_hasManyRoots"), 0);
 	}
 }
 
@@ -593,7 +593,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, isRoot){
 
 	PHALCON_CALL_SELFW(&left, "getleftattribute");
 
-	if (phalcon_is_equal_long(left, 1 TSRMLS_CC)) {
+	if (phalcon_is_equal_long(left, 1)) {
 		RETURN_TRUE;
 	}
 
@@ -1289,7 +1289,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 	PHALCON_SCONCAT_VSVS(condition, right_attribute, "<=", right, " AND ");
 	PHALCON_SCONCAT_VSV(condition, root_attribute, "=", root);
 
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 	PHALCON_CALL_METHOD(&childs, owner, "find", condition);
 
@@ -1314,13 +1314,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 		PHALCON_CALL_METHOD(&ret, child, "update", values);
 		if (!zend_is_true(ret)) {
 			PHALCON_CALL_METHOD(NULL, connection, "rollback");
-			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 			RETURN_MM_FALSE;
 		}
 		zend_hash_move_forward_ex(ah0, &hp0);
 	}
 
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 
 	PHALCON_INIT_VAR(tmp1);
 	ZVAL_LONG(tmp1, phalcon_get_intval(right) + 1);
@@ -1367,11 +1367,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, saveNode){
 
 	owner = phalcon_fetch_nproperty_this(this_ptr, SL("_owner"), PH_NOISY);
 
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 	PHALCON_RETURN_CALL_METHOD(owner, "update", attributes, white_list);
 
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 
 	RETURN_MM();
 }
@@ -1413,14 +1413,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
 	PHALCON_CALL_SELF(&is_leaf, "isleaf");
 
 	if (zend_is_true(is_leaf)) {
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 		PHALCON_CALL_METHOD(&ret, owner, "delete");
 		if (!zend_is_true(is_leaf)) {
 			PHALCON_CALL_METHOD(NULL, connection, "rollback");
-			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 			RETURN_MM_FALSE;
 		}
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 	} else {
 		left_attribute = phalcon_fetch_nproperty_this(this_ptr, SL("_leftAttribute"), PH_NOISY);
 		right_attribute = phalcon_fetch_nproperty_this(this_ptr, SL("_rightAttribute"), PH_NOISY);
@@ -1440,7 +1440,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
 			PHALCON_SCONCAT_VSV(condition, root_attribute, "=", root);
 		}
 
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
 		
@@ -1457,14 +1457,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
 			PHALCON_CALL_METHOD(&ret, child, "delete");
 			if (!zend_is_true(ret)) {
 				PHALCON_CALL_METHOD(NULL, connection, "rollback");
-				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 				RETURN_MM_FALSE;
 			}
 
 			PHALCON_CALL_METHOD(NULL, childs, "next");
 		}
 
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 	}
 
 	if (!left || !right) {
@@ -1582,7 +1582,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 	has_many_roots = phalcon_fetch_nproperty_this(this_ptr, SL("_hasManyRoots"), PH_NOISY);
 
 	if (zend_is_true(has_many_roots) && !PHALCON_IS_EQUAL(root, root2)) {
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 		PHALCON_INIT_NVAR(condition);
 		PHALCON_CONCAT_VSVS(condition, left_attribute, ">=", key, " AND ");
@@ -1613,7 +1613,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
 				PHALCON_CALL_METHOD(NULL, connection, "rollback");
-				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 				RETURN_MM_FALSE;
 			}
 
@@ -1649,7 +1649,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
 				PHALCON_CALL_METHOD(NULL, connection, "rollback");
-				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 				RETURN_MM_FALSE;
 			}
 
@@ -1691,14 +1691,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
 				PHALCON_CALL_METHOD(NULL, connection, "rollback");
-				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 				RETURN_MM_FALSE;
 			}
 
 			PHALCON_CALL_METHOD(NULL, childs, "next");
 		}
 
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 
 		PHALCON_INIT_NVAR(tmp1);
 		ZVAL_LONG(tmp1, phalcon_get_intval(right) + 1);
@@ -1723,7 +1723,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_SCONCAT_SVSV(condition, " AND ", root_attribute, "=", root);
 		}
 		
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
 
@@ -1747,7 +1747,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
 				PHALCON_CALL_METHOD(NULL, connection, "rollback");
-				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 				RETURN_MM_FALSE;
 			}
 
@@ -1787,7 +1787,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
 				PHALCON_CALL_METHOD(NULL, connection, "rollback");
-				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 				RETURN_MM_FALSE;
 			}
 
@@ -1827,14 +1827,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
 				PHALCON_CALL_METHOD(NULL, connection, "rollback");
-				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+				phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 				RETURN_MM_FALSE;
 			}
 
 			PHALCON_CALL_METHOD(NULL, childs, "next");
 		}
 
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 
 		PHALCON_INIT_NVAR(tmp1);
 		ZVAL_LONG(tmp1, phalcon_get_intval(right) + 1);
@@ -1891,7 +1891,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
 
 	PHALCON_CALL_METHOD(&childs, owner, "find", condition);
 
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 	PHALCON_CALL_METHOD(NULL, childs, "rewind");
 
@@ -1916,7 +1916,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
 		PHALCON_CALL_METHOD(&ret, child, "update", values);
 		if (!zend_is_true(ret)) {
 			PHALCON_CALL_METHOD(NULL, connection, "rollback");
-			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 			RETURN_MM_FALSE;
 		}
 
@@ -1955,14 +1955,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
 		PHALCON_CALL_METHOD(&ret, child, "update", values);
 		if (!zend_is_true(ret)) {
 			PHALCON_CALL_METHOD(NULL, connection, "rollback");
-			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 			RETURN_MM_FALSE;
 		}
 
 		PHALCON_CALL_METHOD(NULL, childs, "next");
 	}
 
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 	PHALCON_CALL_METHOD(NULL, connection, "commit");
 
@@ -2031,32 +2031,32 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, addNode){
 	level_attribute = phalcon_fetch_nproperty_this(this_ptr, SL("_levelAttribute"), PH_NOISY);
 
 	PHALCON_CALL_SELF(&root2, "getrootattribute", target);
-	phalcon_update_property_zval_zval(owner, root_attribute, root2 TSRMLS_CC);
+	phalcon_update_property_zval_zval(owner, root_attribute, root2);
 
 	PHALCON_CALL_SELF(&ret, "shiftleftright", key, PHALCON_GLOBAL(z_two));
 	if (!zend_is_true(ret)) {
 		RETURN_MM_FALSE;
 	}
 
-	phalcon_update_property_zval_zval(owner, left_attribute, key TSRMLS_CC);
+	phalcon_update_property_zval_zval(owner, left_attribute, key);
 
 	PHALCON_INIT_NVAR(tmp);
 	ZVAL_LONG(tmp, phalcon_get_intval(key) + 1);
 
-	phalcon_update_property_zval_zval(owner, right_attribute, tmp TSRMLS_CC);
+	phalcon_update_property_zval_zval(owner, right_attribute, tmp);
 
 	PHALCON_CALL_SELF(&level2, "getlevelattribute", target);
 
 	PHALCON_INIT_NVAR(tmp);
 	ZVAL_LONG(tmp, phalcon_get_intval(level2) + phalcon_get_intval(level_up));
 
-	phalcon_update_property_zval_zval(owner, level_attribute, tmp TSRMLS_CC);
+	phalcon_update_property_zval_zval(owner, level_attribute, tmp);
 	
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 	PHALCON_CALL_METHOD(&ret, owner, "create", attributes);
 	
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 
 	RETURN_CTOR(ret);
 }
@@ -2086,43 +2086,43 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, makeRoot){
 	root_attribute = phalcon_fetch_nproperty_this(this_ptr, SL("_rootAttribute"), PH_NOISY);
 	has_many_roots = phalcon_fetch_nproperty_this(this_ptr, SL("_hasManyRoots"), PH_NOISY);
 
-	phalcon_update_property_zval_long(owner, left_attribute, 1 TSRMLS_CC);
-	phalcon_update_property_zval_long(owner, right_attribute, 2 TSRMLS_CC);
-	phalcon_update_property_zval_long(owner, level_attribute, 1 TSRMLS_CC);
+	phalcon_update_property_zval_long(owner, left_attribute, 1);
+	phalcon_update_property_zval_long(owner, right_attribute, 2);
+	phalcon_update_property_zval_long(owner, level_attribute, 1);
 
 	PHALCON_CALL_METHOD(&connection, owner, "getwriteconnection");
 
 	if (!zend_is_true(has_many_roots)) {
 		PHALCON_CALL_SELF(&ret, "roots");
-		if (phalcon_fast_count_ev(ret TSRMLS_CC)) {
+		if (phalcon_fast_count_ev(ret)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Cannot create more than one root in single root mode");
 			return;
 		}
 	}
 
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 1);
 
 	PHALCON_CALL_METHOD(NULL, connection, "begin");
 
 	PHALCON_CALL_METHOD(&ret, owner, "create", attributes, white_list);
 	if (!zend_is_true(ret)) {
 		PHALCON_CALL_METHOD(NULL, connection, "rollback");
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 		RETURN_MM_FALSE;
 	}
 
 	PHALCON_CALL_SELF(&primary_key, "getprimarykey", owner);
 
-	phalcon_update_property_zval_zval(owner, root_attribute, primary_key TSRMLS_CC);
+	phalcon_update_property_zval_zval(owner, root_attribute, primary_key);
 
 	PHALCON_CALL_METHOD(&ret, owner, "save");
 	if (!zend_is_true(ret)) {
 		PHALCON_CALL_METHOD(NULL, connection, "rollback");
-		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 		RETURN_MM_FALSE;
 	}
 
-	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 
 	PHALCON_CALL_METHOD(NULL, connection, "commit");
 

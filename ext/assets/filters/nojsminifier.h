@@ -22,6 +22,6 @@
 
 #include <Zend/zend.h>
 
-int phalcon_jsmin(zval *return_value, zval *script TSRMLS_DC);
+int phalcon_jsmin(zval *return_value, zval *script);
 
 #endif /* PHALCON_ASSETS_FILTERS_JSMINIFIER_H */

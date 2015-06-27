@@ -44,7 +44,7 @@ PHALCON_INIT_CLASS(Phalcon_Forms_Element_Radio) {
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Forms\\Element, Radio, forms_element_radio, phalcon_forms_element_ce, phalcon_forms_element_radio_method_entry, 0);
 
-	zend_class_implements(phalcon_forms_element_radio_ce TSRMLS_CC, 1, phalcon_forms_elementinterface_ce);
+	zend_class_implements(phalcon_forms_element_radio_ce, 1, phalcon_forms_elementinterface_ce);
 
 	return SUCCESS;
 }

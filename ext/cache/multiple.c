@@ -133,7 +133,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Multiple){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Cache, Multiple, cache_multiple, phalcon_cache_multiple_method_entry, 0);
 
-	zend_declare_property_null(phalcon_cache_multiple_ce, SL("_backends"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_cache_multiple_ce, SL("_backends"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, __construct){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backends must be an array");
 			return;
 		}
-		phalcon_update_property_this(this_ptr, SL("_backends"), backends TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_backends"), backends);
 	}
 }
 
@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, push){
 	phalcon_fetch_params(0, 1, 0, &backend);
 	
 	PHALCON_VERIFY_INTERFACE_EX(backend, phalcon_cache_backendinterface_ce, phalcon_cache_exception_ce, 0)
-	phalcon_update_property_array_append(this_ptr, SL("_backends"), backend TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_backends"), backend);
 	RETURN_THISW();
 }
 

@@ -83,8 +83,8 @@ PHALCON_INIT_CLASS(Phalcon_CLI_Console){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Console, cli_console, phalcon_di_injectable_ce, phalcon_cli_console_method_entry, 0);
 
-	zend_declare_property_null(phalcon_cli_console_ce, SL("_modules"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cli_console_ce, SL("_moduleObject"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_cli_console_ce, SL("_modules"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_console_ce, SL("_moduleObject"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_CLI_Console, __construct){
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector);
 	}
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_CLI_Console, registerModules){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_console_exception_ce, "Modules must be an Array");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_modules"), modules TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_modules"), modules);
 
 }
 
@@ -166,8 +166,8 @@ PHP_METHOD(Phalcon_CLI_Console, addModules){
 	phalcon_read_property_this(&original_modules, this_ptr, SL("_modules"), PH_NOISY);
 
 	PHALCON_INIT_VAR(register_modules);
-	phalcon_fast_array_merge(register_modules, &modules, &original_modules TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_modules"), register_modules TSRMLS_CC);
+	phalcon_fast_array_merge(register_modules, &modules, &original_modules);
+	phalcon_update_property_this(this_ptr, SL("_modules"), register_modules);
 
 	PHALCON_MM_RESTORE();
 }
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		PHALCON_CALL_METHOD(NULL, module_object, "registerautoloaders");
 		PHALCON_CALL_METHOD(NULL, module_object, "registerservices", dependency_injector);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-			phalcon_update_property_this(this_ptr, SL("_moduleObject"), module_object TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_moduleObject"), module_object);
 
 			PHALCON_INIT_NVAR(event_name);
 			ZVAL_STRING(event_name, "console:afterStartModule", 1);

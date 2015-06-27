@@ -26,13 +26,13 @@
 /**
  * Serializes php variables without using the PHP userland
  */
-void phalcon_serialize(zval *return_value, zval **var TSRMLS_DC) {
+void phalcon_serialize(zval *return_value, zval **var) {
 
 	php_serialize_data_t var_hash;
 	smart_str buf = {0};
 
 	PHP_VAR_SERIALIZE_INIT(var_hash);
-	php_var_serialize(&buf, var, &var_hash TSRMLS_CC);
+	php_var_serialize(&buf, var, &var_hash);
 	PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
 	if (EG(exception)) {
@@ -50,7 +50,7 @@ void phalcon_serialize(zval *return_value, zval **var TSRMLS_DC) {
 /**
  * Unserializes php variables without using the PHP userland
  */
-void phalcon_unserialize(zval *return_value, zval *var TSRMLS_DC) {
+void phalcon_unserialize(zval *return_value, zval *var) {
 
 	const unsigned char *p;
 	php_unserialize_data_t var_hash;
@@ -65,12 +65,12 @@ void phalcon_unserialize(zval *return_value, zval *var TSRMLS_DC) {
 
 	p = (const unsigned char*) Z_STRVAL_P(var);
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
-	if (!php_var_unserialize(&return_value, &p, p + Z_STRLEN_P(var), &var_hash TSRMLS_CC)) {
+	if (!php_var_unserialize(&return_value, &p, p + Z_STRLEN_P(var), &var_hash)) {
 		PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 		phalcon_dtor(return_value);
 		ZVAL_NULL(return_value);
 		if (!EG(exception)) {
-			php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Error at offset %ld of %d bytes", (long)((char*)p - Z_STRVAL_P(var)), Z_STRLEN_P(var));
+			php_error_docref(NULL, E_NOTICE, "Error at offset %ld of %d bytes", (long)((char*)p - Z_STRVAL_P(var)), Z_STRLEN_P(var));
 		}
 		RETURN_FALSE;
 	}
@@ -81,18 +81,18 @@ void phalcon_unserialize(zval *return_value, zval *var TSRMLS_DC) {
 /**
  * var_export outputs php variables without using the PHP userland
  */
-void phalcon_var_export(zval **var TSRMLS_DC) {
-    php_var_export(var, 1 TSRMLS_CC);
+void phalcon_var_export(zval **var) {
+    php_var_export(var, 1);
 }
 
 /**
  * var_export returns php variables without using the PHP userland
  */
-void phalcon_var_export_ex(zval *return_value, zval **var TSRMLS_DC) {
+void phalcon_var_export_ex(zval *return_value, zval **var) {
 
     smart_str buf = { NULL, 0, 0 };
 
-    php_var_export_ex(var, 1, &buf TSRMLS_CC);
+    php_var_export_ex(var, 1, &buf);
     smart_str_0(&buf);
     ZVAL_STRINGL(return_value, buf.c, buf.len, 0);
 }
@@ -100,6 +100,6 @@ void phalcon_var_export_ex(zval *return_value, zval **var TSRMLS_DC) {
 /**
  * var_dump outputs php variables without using the PHP userland
  */
-void phalcon_var_dump(zval **var TSRMLS_DC) {
-    php_var_dump(var, 1 TSRMLS_CC);
+void phalcon_var_dump(zval **var) {
+    php_var_dump(var, 1);
 }

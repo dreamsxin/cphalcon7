@@ -119,15 +119,15 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Model){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\View, Model, mvc_view_model, phalcon_mvc_view_model_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_viewParams"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_mvc_view_model_ce, SL("_captureTo"), "content", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_template"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_childs"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_terminal"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_append"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_view"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_viewParams"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_view_model_ce, SL("_captureTo"), "content", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_template"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_childs"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_terminal"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_append"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_model_ce, SL("_view"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_view_model_ce TSRMLS_CC, 1, phalcon_mvc_view_modelinterface_ce);
+	zend_class_implements(phalcon_mvc_view_model_ce, 1, phalcon_mvc_view_modelinterface_ce);
 
 	return SUCCESS;
 }
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setTemplate){
 
 	phalcon_fetch_params(0, 1, 0, &template);
 
-	phalcon_update_property_this(this_ptr, SL("_template"), template TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_template"), template);
 
 	RETURN_THISW();
 }
@@ -212,14 +212,14 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 		phalcon_read_property_this(&view_params, this_ptr, SL("_viewParams"), PH_NOISY);
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
-			phalcon_fast_array_merge(merged_params, &view_params, &params TSRMLS_CC);
+			phalcon_fast_array_merge(merged_params, &view_params, &params);
 		} else {
 			PHALCON_CPY_WRT(merged_params, params);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_viewParams"), merged_params TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_viewParams"), merged_params);
 	} else {
-		phalcon_update_property_this(this_ptr, SL("_viewParams"), params TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_viewParams"), params);
 	}
 
 	RETURN_THIS();
@@ -271,7 +271,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
 		PHALCON_CPY_WRT(var_append, value);
 	}
 
-	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, var_append TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, var_append);
 
 	RETURN_THIS();
 }
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, addChild){
 		PHALCON_CALL_METHOD(NULL, child, "setappend", append);
 	}
 
-	phalcon_update_property_array_append(this_ptr, SL("_childs"), child TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_childs"), child);
 
 	RETURN_THIS();
 }
@@ -431,7 +431,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, hasChild){
 		RETURN_MM_FALSE;
 	}
 
-	if (!phalcon_fast_count_ev(childs TSRMLS_CC)) {
+	if (!phalcon_fast_count_ev(childs)) {
 		RETURN_MM_FALSE;
 	}
 
@@ -469,7 +469,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setCaptureTo){
 
 	phalcon_fetch_params(0, 1, 0, &capture);
 
-	phalcon_update_property_this(this_ptr, SL("_captureTo"), capture TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_captureTo"), capture);
 
 	RETURN_THISW();
 }
@@ -496,7 +496,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setTerminal){
 
 	phalcon_fetch_params(0, 1, 0, &terminate);
 
-	phalcon_update_property_this(this_ptr, SL("_terminate"), terminate TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_terminate"), terminate);
 
 	RETURN_THISW();
 }
@@ -523,7 +523,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setAppend){
 
 	phalcon_fetch_params(0, 1, 0, &append);
 
-	phalcon_update_property_this(this_ptr, SL("_append"), append TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_append"), append);
 
 	RETURN_THISW();
 }
@@ -561,7 +561,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setView){
 
 	phalcon_fetch_params(0, 1, 0, &view);
 
-	phalcon_update_property_this(this_ptr, SL("_view"), view TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_view"), view);
 
 	RETURN_THISW();
 }
@@ -601,7 +601,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 	PHALCON_CALL_SELF(&childs, "getchild");
 
-	if (Z_TYPE_P(childs) == IS_ARRAY && phalcon_fast_count_ev(childs TSRMLS_CC)) {
+	if (Z_TYPE_P(childs) == IS_ARRAY && phalcon_fast_count_ev(childs)) {
 		phalcon_is_iterable(childs, &ah0, &hp0, 0, 0);
 
 		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
@@ -683,11 +683,11 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_INIT_NVAR(debug_message);
 		PHALCON_CONCAT_SV(debug_message, "Render Model View: ", template);
-		phalcon_debug_print_r(debug_message TSRMLS_CC);
+		phalcon_debug_print_r(debug_message);
 	}
 
 	PHALCON_INIT_VAR(new_vars);
-	phalcon_fast_array_merge(new_vars, &vars, &child_contents TSRMLS_CC);
+	phalcon_fast_array_merge(new_vars, &vars, &child_contents);
 
 	PHALCON_INIT_VAR(views_dir_path);
 	PHALCON_CONCAT_VV(views_dir_path, views_dir, template);
@@ -718,7 +718,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_INIT_NVAR(debug_message);
 					PHALCON_CONCAT_SV(debug_message, "--Found: ", view_engine_path);
-					phalcon_debug_print_r(debug_message TSRMLS_CC);
+					phalcon_debug_print_r(debug_message);
 				}
 
 				/** 
@@ -753,7 +753,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_INIT_NVAR(debug_message);
 				PHALCON_CONCAT_SV(debug_message, "--Not Found: ", view_engine_path);
-				phalcon_debug_print_r(debug_message TSRMLS_CC);
+				phalcon_debug_print_r(debug_message);
 			}
 
 			zend_hash_move_forward_ex(ah2, &hp2);
@@ -782,7 +782,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	}
 
 	PHALCON_INIT_VAR(contents);
-	phalcon_ob_get_contents(contents TSRMLS_CC);
+	phalcon_ob_get_contents(contents);
 
 	phalcon_ob_end_clean(TSRMLS_C);
 
@@ -801,7 +801,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __set){
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
 
-	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value);
 
 }
 

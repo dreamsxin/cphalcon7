@@ -72,9 +72,9 @@ PHALCON_INIT_CLASS(Phalcon_Queue_Beanstalk_Job){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Queue\\Beanstalk, Job, queue_beanstalk_job, phalcon_queue_beanstalk_job_method_entry, 0);
 
-	zend_declare_property_null(phalcon_queue_beanstalk_job_ce, SL("_queue"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_queue_beanstalk_job_ce, SL("_id"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_queue_beanstalk_job_ce, SL("_body"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_queue_beanstalk_job_ce, SL("_queue"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_queue_beanstalk_job_ce, SL("_id"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_queue_beanstalk_job_ce, SL("_body"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -94,9 +94,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, __construct){
 	PHALCON_VERIFY_CLASS_EX(*queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
 	PHALCON_ENSURE_IS_STRING(id);
 
-	phalcon_update_property_this(this_ptr, SL("_queue"), *queue TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_id"),    *id    TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_body"),  *body  TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_queue"), *queue);
+	phalcon_update_property_this(this_ptr, SL("_id"),    *id   );
+	phalcon_update_property_this(this_ptr, SL("_body"),  *body );
 }
 
 /**

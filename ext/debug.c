@@ -165,17 +165,17 @@ PHALCON_INIT_CLASS(Phalcon_Debug){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Debug, debug, phalcon_debug_method_entry, 0);
 
-	zend_declare_property_string(phalcon_debug_ce, SL("_uri"), "//d2yyr506dy8ck0.cloudfront.net/debug/1.2.0/", ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_string(phalcon_debug_ce, SL("_theme"), "default", ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_bool(phalcon_debug_ce, SL("_hideDocumentRoot"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_debug_ce, SL("_showBackTrace"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_debug_ce, SL("_showFiles"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_debug_ce, SL("_showFileFragment"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_debug_ce, SL("_data"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_debug_ce, SL("_isActive"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_string(phalcon_debug_ce, SL("_charset"), "utf-8", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_long(phalcon_debug_ce, SL("_beforeContext"), 7, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_debug_ce, SL("_afterContext"), 5, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_debug_ce, SL("_uri"), "//d2yyr506dy8ck0.cloudfront.net/debug/1.2.0/", ZEND_ACC_PUBLIC);
+	zend_declare_property_string(phalcon_debug_ce, SL("_theme"), "default", ZEND_ACC_PUBLIC);
+	zend_declare_property_bool(phalcon_debug_ce, SL("_hideDocumentRoot"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_debug_ce, SL("_showBackTrace"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_debug_ce, SL("_showFiles"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_debug_ce, SL("_showFileFragment"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_debug_ce, SL("_data"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_debug_ce, SL("_isActive"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_debug_ce, SL("_charset"), "utf-8", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_long(phalcon_debug_ce, SL("_beforeContext"), 7, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_debug_ce, SL("_afterContext"), 5, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Debug, setUri){
 
 	phalcon_fetch_params(0, 0, 1, 0, &uri);
 
-	phalcon_update_property_this(this_ptr, SL("_uri"), uri TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_uri"), uri);
 	RETURN_THISW();
 }
 
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Debug, setShowBackTrace){
 
 	phalcon_fetch_params(0, 0, 1, 0, &show_back_trace);
 
-	phalcon_update_property_this(this_ptr, SL("_showBackTrace"), show_back_trace TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_showBackTrace"), show_back_trace);
 	RETURN_THISW();
 }
 
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Debug, setShowFiles){
 
 	phalcon_fetch_params(0, 0, 1, 0, &show_files);
 
-	phalcon_update_property_this(this_ptr, SL("_showFiles"), show_files TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_showFiles"), show_files);
 	RETURN_THISW();
 }
 
@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Debug, setShowFileFragment){
 
 	phalcon_fetch_params(0, 0, 1, 0, &show_file_fragment);
 
-	phalcon_update_property_this(this_ptr, SL("_showFileFragment"), show_file_fragment TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_showFileFragment"), show_file_fragment);
 	RETURN_THISW();
 }
 
@@ -321,7 +321,7 @@ PHP_METHOD(Phalcon_Debug, listenLowSeverity){
  */
 PHP_METHOD(Phalcon_Debug, halt){
 
-	zend_throw_exception(NULL, "Halted request", 0 TSRMLS_CC);
+	zend_throw_exception(NULL, "Halted request", 0);
 }
 
 /**
@@ -347,22 +347,14 @@ PHP_METHOD(Phalcon_Debug, debugVar){
 	ZVAL_LONG(ztime, (long) time(NULL));
 
 	PHALCON_INIT_VAR(backtrace);
-#if PHP_VERSION_ID < 50400
-#ifdef DEBUG_BACKTRACE_PROVIDE_OBJECT
-	zend_fetch_debug_backtrace(backtrace, 0, DEBUG_BACKTRACE_PROVIDE_OBJECT TSRMLS_CC);
-#else
-	zend_fetch_debug_backtrace(backtrace, 0, 1 TSRMLS_CC);
-#endif
-#else
-	zend_fetch_debug_backtrace(backtrace, 0, DEBUG_BACKTRACE_PROVIDE_OBJECT, 0 TSRMLS_CC);
-#endif
+	zend_fetch_debug_backtrace(backtrace, 0, DEBUG_BACKTRACE_PROVIDE_OBJECT, 0);
 
 	PHALCON_INIT_VAR(data);
 	array_init_size(data, 3);
 	phalcon_array_append(&data, var, PH_SEPARATE);
 	phalcon_array_append(&data, backtrace, PH_SEPARATE);
 	phalcon_array_append(&data, ztime, PH_SEPARATE);
-	phalcon_update_property_array_append(this_ptr, SL("_data"), data TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_data"), data);
 	RETURN_THIS();
 }
 
@@ -374,7 +366,7 @@ PHP_METHOD(Phalcon_Debug, debugVar){
 PHP_METHOD(Phalcon_Debug, clearVars){
 
 
-	phalcon_update_property_null(this_ptr, SL("_data") TSRMLS_CC);
+	phalcon_update_property_null(this_ptr, SL("_data"));
 	RETURN_THISW();
 }
 
@@ -394,7 +386,7 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 		zval line_break;
 		zval escaped_line_break;
 
-		charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset") TSRMLS_CC);
+		charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset"));
 
 		INIT_ZVAL(line_break);
 		ZVAL_STRING(&line_break, "\n", 0);
@@ -404,7 +396,7 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 
 		ALLOC_INIT_ZVAL(replaced_value);
 		phalcon_fast_str_replace(replaced_value, &line_break, &escaped_line_break, value);
-		phalcon_htmlentities(return_value, replaced_value, NULL, charset TSRMLS_CC);
+		phalcon_htmlentities(return_value, replaced_value, NULL, charset);
 		phalcon_ptr_dtor(replaced_value);
 		return;
 	}
@@ -437,7 +429,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 	}
 
 	PHALCON_INIT_VAR(number_arguments);
-	phalcon_fast_count(number_arguments, argument TSRMLS_CC);
+	phalcon_fast_count(number_arguments, argument);
 	if (PHALCON_LT_LONG(n, 3)) {
 		if (PHALCON_GT_LONG(number_arguments, 0)) {
 			if (PHALCON_LT_LONG(number_arguments, 10)) {
@@ -505,7 +497,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 				}
 
 				PHALCON_INIT_VAR(joined_dump);
-				phalcon_fast_join_str(joined_dump, SL(", "), dump TSRMLS_CC);
+				phalcon_fast_join_str(joined_dump, SL(", "), dump);
 
 				RETURN_CTOR(joined_dump);
 			}
@@ -573,7 +565,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 		 * Try to check for a 'dump' method, this surely produces a better printable
 		 * representation
 		 */
-		if (phalcon_method_exists_ex(variable, SS("dump") TSRMLS_CC) == SUCCESS) {
+		if (phalcon_method_exists_ex(variable, SS("dump")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&dumped_object, variable, "dump");
 
 			/** 
@@ -805,7 +797,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		 */
 		PHALCON_OBS_VAR(type);
 		phalcon_array_fetch_string(&type, trace, SL("type"), PH_NOISY);
-		phalcon_concat_self(&html, type TSRMLS_CC);
+		phalcon_concat_self(&html, type);
 	}
 
 	/** 
@@ -825,7 +817,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		/** 
 		 * Check if the function exists
 		 */
-		if ((func = phalcon_fetch_function(Z_STR_P(function_name) TSRMLS_CC)) != NULL) {
+		if ((func = phalcon_fetch_function(Z_STR_P(function_name))) != NULL) {
 
 			/** 
 			 * Internal functions links to the PHP documentation
@@ -852,7 +844,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 		PHALCON_OBS_VAR(trace_args);
 		phalcon_array_fetch_string(&trace_args, trace, SL("args"), PH_NOISY);
-		if (phalcon_fast_count_ev(trace_args TSRMLS_CC)) {
+		if (phalcon_fast_count_ev(trace_args)) {
 
 			PHALCON_INIT_VAR(arguments);
 			array_init(arguments);
@@ -883,10 +875,10 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			 * Join all the arguments
 			 */
 			PHALCON_INIT_VAR(joined_arguments);
-			phalcon_fast_join_str(joined_arguments, SL(", "), arguments TSRMLS_CC);
+			phalcon_fast_join_str(joined_arguments, SL(", "), arguments);
 			PHALCON_SCONCAT_SVS(html, "(", joined_arguments, ")");
 		} else {
-			phalcon_concat_self_str(&html, SL("()") TSRMLS_CC);
+			phalcon_concat_self_str(&html, SL("()"));
 		}
 	}
 
@@ -924,7 +916,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			PHALCON_CALL_FUNCTION(&lines, "file", file);
 
 			PHALCON_INIT_VAR(number_lines);
-			phalcon_fast_count(number_lines, lines TSRMLS_CC);
+			phalcon_fast_count(number_lines, lines);
 
 			PHALCON_OBS_VAR(show_file_fragment);
 			phalcon_read_property_this(&show_file_fragment, this_ptr, SL("_showFileFragment"), PH_NOISY);
@@ -978,7 +970,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			PHALCON_INIT_VAR(comment_pattern);
 			ZVAL_STRING(comment_pattern, "#\\*\\/$#", 1);
 
-			charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset") TSRMLS_CC);
+			charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset"));
 
 			PHALCON_INIT_VAR(tab);
 			ZVAL_STRING(tab, "\t", 1);
@@ -1008,11 +1000,11 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 					if (PHALCON_IS_EQUAL(i, first_line)) {
 
 						PHALCON_INIT_NVAR(trimmed);
-						phalcon_fast_trim(trimmed, current_line, NULL, PHALCON_TRIM_RIGHT TSRMLS_CC);
+						phalcon_fast_trim(trimmed, current_line, NULL, PHALCON_TRIM_RIGHT);
 
 						PHALCON_INIT_NVAR(is_comment);
 
-						RETURN_MM_ON_FAILURE(phalcon_preg_match(is_comment, comment_pattern, current_line, NULL TSRMLS_CC));
+						RETURN_MM_ON_FAILURE(phalcon_preg_match(is_comment, comment_pattern, current_line, NULL));
 
 						if (zend_is_true(is_comment)) {
 							PHALCON_INIT_NVAR(spaced_current_line);
@@ -1027,27 +1019,27 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 * the html zebra properly
 				 */
 				if (PHALCON_IS_STRING(current_line, "\n")) {
-					phalcon_concat_self_str(&html, SL("&nbsp;\n") TSRMLS_CC);
+					phalcon_concat_self_str(&html, SL("&nbsp;\n"));
 				} else {
 					if (PHALCON_IS_STRING(current_line, "\r\n")) {
-						phalcon_concat_self_str(&html, SL("&nbsp;\n") TSRMLS_CC);
+						phalcon_concat_self_str(&html, SL("&nbsp;\n"));
 					} else {
 						PHALCON_INIT_NVAR(spaced_current_line);
 						phalcon_fast_str_replace(spaced_current_line, tab, two_spaces, current_line);
 
 						PHALCON_INIT_NVAR(escaped_line);
-						phalcon_htmlentities(escaped_line, spaced_current_line, NULL, charset TSRMLS_CC);
-						phalcon_concat_self(&html, escaped_line TSRMLS_CC);
+						phalcon_htmlentities(escaped_line, spaced_current_line, NULL, charset);
+						phalcon_concat_self(&html, escaped_line);
 					}
 				}
 
 				phalcon_increment(i);
 			}
-			phalcon_concat_self_str(&html, SL("</pre>") TSRMLS_CC);
+			phalcon_concat_self_str(&html, SL("</pre>"));
 		}
 	}
 
-	phalcon_concat_self_str(&html, SL("</td></tr>") TSRMLS_CC);
+	phalcon_concat_self_str(&html, SL("</td></tr>"));
 
 	RETURN_CTOR(html);
 }
@@ -1088,7 +1080,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_ob_end_clean(TSRMLS_C);
 	}
 
-	is_active = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_isActive") TSRMLS_CC);
+	is_active = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_isActive"));
 
 	/** 
 	 * Avoid that multiple exceptions being showed
@@ -1101,7 +1093,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	/** 
 	 * Globally block the debug component to avoid other exceptions must be shown
 	 */
-	zend_update_static_property_bool(phalcon_debug_ce, SL("_isActive"), 1 TSRMLS_CC);
+	zend_update_static_property_bool(phalcon_debug_ce, SL("_isActive"), 1);
 
 	PHALCON_INIT_VAR(class_name);
 	ce = Z_OBJCE_P(exception);
@@ -1130,7 +1122,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	 * Get the version link
 	 */
 	PHALCON_CALL_METHOD(&version, this_ptr, "getversion");
-	phalcon_concat_self(&html, version TSRMLS_CC);
+	phalcon_concat_self(&html, version);
 
 	PHALCON_CALL_METHOD(&file, exception, "getfile");
 	PHALCON_CALL_METHOD(&line, exception, "getline");
@@ -1147,10 +1139,10 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	/** 
 	 * Main exception info
 	 */
-	phalcon_concat_self_str(&html, SL("<div align=\"center\"><div class=\"error-main\">") TSRMLS_CC);
+	phalcon_concat_self_str(&html, SL("<div align=\"center\"><div class=\"error-main\">"));
 	PHALCON_SCONCAT_SVSVS(html, "<h1>", class_name, ": ", escaped_message, "</h1>");
 	PHALCON_SCONCAT_SVSVS(html, "<span class=\"error-file\">", formatted_file, " (", line, ")</span>");
-	phalcon_concat_self_str(&html, SL("</div>") TSRMLS_CC);
+	phalcon_concat_self_str(&html, SL("</div>"));
 
 	PHALCON_OBS_VAR(show_back_trace);
 	phalcon_read_property_this(&show_back_trace, this_ptr, SL("_showBackTrace"), PH_NOISY);
@@ -1165,22 +1157,22 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		/** 
 		 * Create the tabs in the page
 		 */
-		phalcon_concat_self_str(&html, SL("<div class=\"error-info\"><div id=\"tabs\"><ul>") TSRMLS_CC);
-		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-1\">Backtrace</a></li>") TSRMLS_CC);
-		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-2\">Request</a></li>") TSRMLS_CC);
-		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-3\">Server</a></li>") TSRMLS_CC);
-		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-4\">Included Files</a></li>") TSRMLS_CC);
-		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-5\">Memory</a></li>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("<div class=\"error-info\"><div id=\"tabs\"><ul>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-1\">Backtrace</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-2\">Request</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-3\">Server</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-4\">Included Files</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-5\">Memory</a></li>"));
 		if (Z_TYPE_P(data_vars) == IS_ARRAY) { 
-			phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-6\">Variables</a></li>") TSRMLS_CC);
+			phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-6\">Variables</a></li>"));
 		}
 
-		phalcon_concat_self_str(&html, SL("</ul>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("</ul>"));
 
 		/** 
 		 * Print backtrace
 		 */
-		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-1\"><table cellspacing=\"0\" align=\"center\" width=\"100%\">") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-1\"><table cellspacing=\"0\" align=\"center\" width=\"100%\">"));
 
 		PHALCON_CALL_METHOD(&trace, exception, "gettrace");
 
@@ -1195,19 +1187,19 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 			 * Every line in the trace is rendered using 'showTraceItem'
 			 */
 			PHALCON_CALL_METHOD(&html_item, this_ptr, "showtraceitem", n, trace_item, &z_link_format);
-			phalcon_concat_self(&html, html_item TSRMLS_CC);
+			phalcon_concat_self(&html, html_item);
 
 			zend_hash_move_forward_ex(ah0, &hp0);
 		}
 
-		phalcon_concat_self_str(&html, SL("</table></div>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Print _REQUEST superglobal
 		 */
-		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-2\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">") TSRMLS_CC);
-		phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>") TSRMLS_CC);
-		_REQUEST = phalcon_get_global(SS("_REQUEST") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-2\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+		phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>"));
+		_REQUEST = phalcon_get_global(SS("_REQUEST"));
 
 		if (Z_TYPE_P(_REQUEST) == IS_ARRAY) {
 			phalcon_is_iterable(_REQUEST, &ah1, &hp1, 0, 0);
@@ -1226,14 +1218,14 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 			}
 		}
 
-		phalcon_concat_self_str(&html, SL("</table></div>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Print _SERVER superglobal
 		 */
-		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-3\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">") TSRMLS_CC);
-		phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>") TSRMLS_CC);
-		_SERVER = phalcon_get_global(SS("_SERVER") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-3\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+		phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>"));
+		_SERVER = phalcon_get_global(SS("_SERVER"));
 
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			phalcon_is_iterable(_SERVER, &ah2, &hp2, 0, 0);
@@ -1250,14 +1242,14 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 			}
 		}
 
-		phalcon_concat_self_str(&html, SL("</table></div>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Show included files
 		 */
 		PHALCON_CALL_FUNCTION(&files, "get_included_files");
-		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-4\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">") TSRMLS_CC);
-		phalcon_concat_self_str(&html, SL("<tr><th>#</th><th>Path</th></tr>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-4\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+		phalcon_concat_self_str(&html, SL("<tr><th>#</th><th>Path</th></tr>"));
 
 		phalcon_is_iterable(files, &ah3, &hp3, 0, 0);
 
@@ -1271,23 +1263,23 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 			zend_hash_move_forward_ex(ah3, &hp3);
 		}
 
-		phalcon_concat_self_str(&html, SL("</table></div>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Memory usage
 		 */
 		PHALCON_INIT_VAR(memory);
-		ZVAL_LONG(memory, zend_memory_usage(1 TSRMLS_CC));
-		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-5\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">") TSRMLS_CC);
+		ZVAL_LONG(memory, zend_memory_usage(1));
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-5\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
 		PHALCON_SCONCAT_SVS(html, "<tr><th colspan=\"2\">Memory</th></tr><tr><td>Usage</td><td>", memory, "</td></tr>");
-		phalcon_concat_self_str(&html, SL("</table></div>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Print extra variables passed to the component
 		 */
 		if (Z_TYPE_P(data_vars) == IS_ARRAY) { 
-			phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-6\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">") TSRMLS_CC);
-			phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>") TSRMLS_CC);
+			phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-6\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+			phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>"));
 
 			phalcon_is_iterable(data_vars, &ah4, &hp4, 0, 0);
 
@@ -1305,10 +1297,10 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 				zend_hash_move_forward_ex(ah4, &hp4);
 			}
 
-			phalcon_concat_self_str(&html, SL("</table></div>") TSRMLS_CC);
+			phalcon_concat_self_str(&html, SL("</table></div>"));
 		}
 
-		phalcon_concat_self_str(&html, SL("</div>") TSRMLS_CC);
+		phalcon_concat_self_str(&html, SL("</div>"));
 	}
 
 	/** 
@@ -1325,7 +1317,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	/** 
 	 * Unlock the exception renderer
 	 */
-	zend_update_static_property_bool(phalcon_debug_ce, SL("_isActive"), 0 TSRMLS_CC);
+	zend_update_static_property_bool(phalcon_debug_ce, SL("_isActive"), 0);
 	RETURN_MM_TRUE;
 }
 
@@ -1423,7 +1415,7 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
  * @return string
  */
 PHP_METHOD(Phalcon_Debug, getCharset) {
-	zval *charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset") TSRMLS_CC);
+	zval *charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset"));
 	RETURN_ZVAL(charset, 1, 0);
 }
 
@@ -1441,7 +1433,7 @@ PHP_METHOD(Phalcon_Debug, setCharset) {
 	phalcon_fetch_params(0, 1, 0, &charset);
 	PHALCON_ENSURE_IS_STRING(charset);
 
-	phalcon_update_static_property_ce(phalcon_debug_ce, SL("_charset"), *charset TSRMLS_CC);
+	phalcon_update_static_property_ce(phalcon_debug_ce, SL("_charset"), *charset);
 	RETURN_THISW();
 }
 
@@ -1469,7 +1461,7 @@ PHP_METHOD(Phalcon_Debug, setLinesBeforeContext) {
 	phalcon_fetch_params(0, 1, 0, &lines);
 	PHALCON_ENSURE_IS_LONG(lines);
 
-	phalcon_update_property_this(getThis(), SL("_beforeContext"), *lines TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_beforeContext"), *lines);
 	RETURN_THISW();
 }
 
@@ -1497,7 +1489,7 @@ PHP_METHOD(Phalcon_Debug, setLinesAfterContext) {
 	phalcon_fetch_params(0, 1, 0, &lines);
 	PHALCON_ENSURE_IS_LONG(lines);
 
-	phalcon_update_property_this(getThis(), SL("_afterContext"), *lines TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_afterContext"), *lines);
 	RETURN_THISW();
 }
 

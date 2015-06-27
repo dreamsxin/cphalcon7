@@ -62,15 +62,15 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Validation, Validator, validation_validator, phalcon_validation_validator_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_validation_validator_ce, SL("_options"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_validator_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_validation_validator_ce, SL("_options"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_validator_ce, SL("_type"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_validation_validator_ce TSRMLS_CC, 1, phalcon_validation_validatorinterface_ce);
+	zend_class_implements(phalcon_validation_validator_ce, 1, phalcon_validation_validatorinterface_ce);
 
 	return SUCCESS;
 }
 
-int phalcon_validation_validator_getoption_helper(const zend_class_entry *ce, zval **result, zval *this_ptr, const char *option TSRMLS_DC)
+int phalcon_validation_validator_getoption_helper(const zend_class_entry *ce, zval **result, zval *this_ptr, const char *option)
 {
 	zval *opt;
 	zval *params[1];
@@ -79,7 +79,7 @@ int phalcon_validation_validator_getoption_helper(const zend_class_entry *ce, zv
 		zval *value;
 		zval *options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
 
-		MAKE_STD_ZVAL(*result);
+		PHALCON_ALLOC_GHOST_ZVAL(*result);
 		if (phalcon_array_isset_string_fetch(&value, options, option, strlen(option)+1)) {
 			ZVAL_ZVAL(*result, value, 1, 0);
 		}
@@ -95,7 +95,7 @@ int phalcon_validation_validator_getoption_helper(const zend_class_entry *ce, zv
 	params[0] = opt;
 
 	ALLOC_INIT_ZVAL(*result);
-	return phalcon_return_call_method(*result, NULL, this_ptr, "getoption", 1, params TSRMLS_CC);
+	return phalcon_return_call_method(*result, NULL, this_ptr, "getoption", 1, params);
 }
 
 /**
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Validation_Validator, __construct){
 			return;
 		}
 	} else {
-		phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_options"), options);
 	}
 }
 
@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Validation_Validator, getOption){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
-	phalcon_validation_validator_getoption_helper(phalcon_validation_validator_ce, &tmp, getThis(), Z_STRVAL_P(*key) TSRMLS_CC);
+	phalcon_validation_validator_getoption_helper(phalcon_validation_validator_ce, &tmp, getThis(), Z_STRVAL_P(*key));
 	RETURN_ZVAL(tmp, 1, 1);
 }
 
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Validation_Validator, setOption){
 
 	phalcon_fetch_params(0, 0, 2, 0, &key, &value);
 	
-	phalcon_update_property_array(this_ptr, SL("_options"), key, value TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_options"), key, value);
 	
 }
 

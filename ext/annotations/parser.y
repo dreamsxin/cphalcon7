@@ -46,7 +46,7 @@ static zval *phannot_ret_literal_zval(int type, phannot_parser_token *T)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, phalcon_interned_type, type);
 	if (T) {
@@ -61,7 +61,7 @@ static zval *phannot_ret_array(zval *items)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, phalcon_interned_type, PHANNOT_T_ARRAY);
 
@@ -78,7 +78,7 @@ static zval *phannot_ret_zval_list(zval *list_left, zval *right_list)
 	HashPosition pos;
 	HashTable *list;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init(ret);
 
 	if (list_left) {
@@ -113,7 +113,7 @@ static zval *phannot_ret_named_item(phannot_parser_token *name, zval *expr)
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, phalcon_interned_expr, expr);
 	if (name != NULL) {
@@ -128,7 +128,7 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 {
 	zval *ret;
 
-	MAKE_STD_ZVAL(ret);
+	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 5);
 
 	add_assoc_long(ret, phalcon_interned_type, PHANNOT_T_ANNOTATION);

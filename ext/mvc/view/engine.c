@@ -72,10 +72,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\View, Engine, mvc_view_engine, phalcon_di_injectable_ce, phalcon_mvc_view_engine_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_view"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_methods"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_view"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_methods"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_view_engine_ce TSRMLS_CC, 1, phalcon_mvc_view_engineinterface_ce);
+	zend_class_implements(phalcon_mvc_view_engine_ce, 1, phalcon_mvc_view_engineinterface_ce);
 
 	return SUCCESS;
 }
@@ -96,8 +96,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 		dependency_injector = PHALCON_GLOBAL(z_null);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_view"), view TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_view"), view);
+	phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector);
 }
 
 /**
@@ -166,11 +166,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, this_ptr, 0 TSRMLS_CC);
+	phalcon_get_class(class_name, this_ptr, 0);
 
 	PHALCON_CALL_CE_STATIC(&method, zend_ce_closure, "bind", method_callable, this_ptr, class_name);
 
-	phalcon_update_property_array(this_ptr, SL("_methods"), name, method TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_methods"), name, method);
 	RETURN_THIS();
 }
 
@@ -234,7 +234,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		return;
 	}
 
-	if (!phalcon_method_exists(service, method_name TSRMLS_CC) == FAILURE) {
+	if (!phalcon_method_exists(service, method_name) == FAILURE) {
 		PHALCON_INIT_NVAR(exception_message);
 		PHALCON_CONCAT_SVS(exception_message, "The method \"", method_name, "\" doesn't exist on view");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);

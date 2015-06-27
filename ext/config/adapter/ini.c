@@ -73,7 +73,7 @@ static const zend_function_entry phalcon_config_adapter_ini_method_entry[] = {
 	PHP_FE_END
 };
 
-static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *section, zval *directive, zval *value TSRMLS_DC)
+static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *section, zval *directive, zval *value)
 {
 	zval *t1, *t2;
 	zval **temp1 = &t1, **temp2 = &t2, *index = NULL;
@@ -123,7 +123,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Ini){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Config\\Adapter, Ini, config_adapter_ini, phalcon_config_adapter_ce, phalcon_config_adapter_ini_method_entry, 0);
 
-	zend_class_implements(phalcon_config_adapter_ini_ce TSRMLS_CC, 1, phalcon_config_adapterinterface_ce);
+	zend_class_implements(phalcon_config_adapter_ini_ce, 1, phalcon_config_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	if (zend_is_true(absolute_path)) {
 		PHALCON_CPY_WRT(config_dir_path, file_path);
 	} else {
-		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath") TSRMLS_CC);
+		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
 		PHALCON_INIT_VAR(config_dir_path);
 		PHALCON_CONCAT_VV(config_dir_path, base_path, file_path);
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 				if (Z_TYPE_P(key) == IS_STRING && memchr(Z_STRVAL_P(key), '.', Z_STRLEN_P(key))) {
 					PHALCON_INIT_NVAR(directive_parts);
 					phalcon_fast_explode_str(directive_parts, SL("."), key);
-					phalcon_config_adapter_ini_update_zval_directive(&config, section, directive_parts, value TSRMLS_CC);
+					phalcon_config_adapter_ini_update_zval_directive(&config, section, directive_parts, value);
 				} else {
 					phalcon_array_update_multi_2(&config, section, key, value, 0);
 				}
@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	}
 
 	if (Z_TYPE_P(config) == IS_ARRAY) {
-		phalcon_config_construct_internal(getThis(), config TSRMLS_CC);
+		phalcon_config_construct_internal(getThis(), config);
 	}
 
 	RETURN_THIS();

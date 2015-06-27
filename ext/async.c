@@ -64,13 +64,13 @@ PHALCON_INIT_CLASS(Phalcon_Async){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Async, async, phalcon_async_method_entry, 0);
 
-	zend_declare_property_long(phalcon_async_ce, SL("_num"), 0, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_string(phalcon_async_ce, SL("_filename"), __FILE__, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_string(phalcon_async_ce, SL("_proj"), "a", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
+	zend_declare_property_long(phalcon_async_ce, SL("_num"), 0, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_async_ce, SL("_filename"), __FILE__, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_async_ce, SL("_proj"), "a", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
-	zend_declare_class_constant_long(phalcon_async_ce, SL("NOWAIT"),		PHALCON_ASYNC_NOWAIT TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_async_ce, SL("MSG_NOERROR"),	PHALCON_ASYNC_MSG_NOERROR TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_async_ce, SL("MSG_EXCEPT"),	PHALCON_ASYNC_MSG_EXCEPT TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_async_ce, SL("NOWAIT"),		PHALCON_ASYNC_NOWAIT);
+	zend_declare_class_constant_long(phalcon_async_ce, SL("MSG_NOERROR"),	PHALCON_ASYNC_MSG_NOERROR);
+	zend_declare_class_constant_long(phalcon_async_ce, SL("MSG_EXCEPT"),	PHALCON_ASYNC_MSG_EXCEPT);
 
 	return SUCCESS;
 }
@@ -122,20 +122,20 @@ PHP_METHOD(Phalcon_Async, call){
 
 	if (PHALCON_GT_LONG(pid, 0)) {
 		PHALCON_OBS_VAR(child_num);
-		phalcon_read_static_property_ce(&child_num, phalcon_async_ce, SL("_num") TSRMLS_CC);
+		phalcon_read_static_property_ce(&child_num, phalcon_async_ce, SL("_num"));
 
 		phalcon_increment(child_num);
 
-		phalcon_update_static_property_ce(phalcon_async_ce, SL("_num"), child_num TSRMLS_CC);
+		phalcon_update_static_property_ce(phalcon_async_ce, SL("_num"), child_num);
 
 		RETURN_CTOR(pid);
 	}
 
 	PHALCON_OBS_VAR(filename);
-	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename") TSRMLS_CC);
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 
 	PHALCON_OBS_VAR(proj);
-	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj") TSRMLS_CC);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", filename, proj);
 
@@ -195,10 +195,10 @@ PHP_METHOD(Phalcon_Async, recv){
 	}
 
 	PHALCON_OBS_VAR(filename);
-	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename") TSRMLS_CC);
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 
 	PHALCON_OBS_VAR(proj);
-	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj") TSRMLS_CC);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", filename, proj);
 
@@ -250,15 +250,15 @@ PHP_METHOD(Phalcon_Async, recvAll){
 	}
 
 	PHALCON_OBS_VAR(num);
-	phalcon_read_static_property_ce(&num, phalcon_async_ce, SL("_num") TSRMLS_CC);
+	phalcon_read_static_property_ce(&num, phalcon_async_ce, SL("_num"));
 
 	i = phalcon_get_intval(num);
 
 	PHALCON_OBS_VAR(filename);
-	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename") TSRMLS_CC);
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 
 	PHALCON_OBS_VAR(proj);
-	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj") TSRMLS_CC);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", filename, proj);
 
@@ -305,10 +305,10 @@ PHP_METHOD(Phalcon_Async, count){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(filename);
-	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename") TSRMLS_CC);
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 
 	PHALCON_OBS_VAR(proj);
-	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj") TSRMLS_CC);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", filename, proj);
 
@@ -339,10 +339,10 @@ PHP_METHOD(Phalcon_Async, clear){
 	PHALCON_MM_GROW();
 
 	PHALCON_OBS_VAR(filename);
-	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename") TSRMLS_CC);
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 
 	PHALCON_OBS_VAR(proj);
-	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj") TSRMLS_CC);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", filename, proj);
 

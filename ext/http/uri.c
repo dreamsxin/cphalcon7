@@ -126,7 +126,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Uri){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Http, Uri, http_uri, phalcon_http_uri_method_entry, 0);
 
-	zend_declare_property_null(phalcon_http_uri_ce, SL("_parts"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_http_uri_ce, SL("_parts"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Http_Uri, __construct){
 	phalcon_fetch_params(1, 0, 1, &uri);
 
 	if (!uri || PHALCON_IS_EMPTY(uri)) {
-		phalcon_update_property_empty_array(this_ptr, SL("_parts") TSRMLS_CC);
+		phalcon_update_property_empty_array(this_ptr, SL("_parts"));
 	} else if (Z_TYPE_P(uri) == IS_STRING) {
 		PHALCON_CALL_FUNCTION(&parts, "parse_url", uri);
 		if (phalcon_array_isset_string_fetch(&query, parts, SS("query"))) {
@@ -156,14 +156,14 @@ PHP_METHOD(Phalcon_Http_Uri, __construct){
 			phalcon_array_update_string(&parts, SL("query"), params, PH_COPY);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_parts"), parts TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_parts"), parts);
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
-		phalcon_update_property_this(this_ptr, SL("_parts"), uri TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_parts"), uri);
 	} else if (Z_TYPE_P(uri) == IS_OBJECT && Z_OBJCE_P(uri) == phalcon_http_uri_ce) {
-		phalcon_read_property(&parts, uri, SL("_parts"), PH_NOISY TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("_parts"), parts TSRMLS_CC);
+		phalcon_read_property(&parts, uri, SL("_parts"), PH_NOISY);
+		phalcon_update_property_this(this_ptr, SL("_parts"), parts);
 	} else {
-		phalcon_update_property_empty_array(this_ptr, SL("_parts") TSRMLS_CC);
+		phalcon_update_property_empty_array(this_ptr, SL("_parts"));
 	}
 
 	PHALCON_MM_RESTORE();
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Http_Uri, __unset){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_unset_property_array(this_ptr, SL("_parts"), key TSRMLS_CC);
+	phalcon_unset_property_array(this_ptr, SL("_parts"), key);
 }
 
 /**
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Http_Uri, __set){
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
 
-	phalcon_update_property_array(this_ptr, SL("_parts"), key, value TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_parts"), key, value);
 }
 
 /**
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Http_Uri, build){
 
 	if (phalcon_array_isset_string_fetch(&query, parts, SS("query")) && PHALCON_IS_NOT_EMPTY(query)) {
 		PHALCON_INIT_NVAR(tmp);
-		phalcon_http_build_query(tmp, query, "&" TSRMLS_CC);
+		phalcon_http_build_query(tmp, query, "&");
 		PHALCON_SCONCAT_SV(uri, "?", tmp);
 	}
 
@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_Http_Uri, extend){
 
 	phalcon_array_merge_recursive_n(&parts, parts2);
 
-	phalcon_update_property_this(this_ptr, SL("_parts"), parts TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_parts"), parts);
 
 	RETURN_THIS();
 }

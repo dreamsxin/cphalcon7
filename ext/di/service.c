@@ -121,7 +121,7 @@ static zend_object *phalcon_di_service_ctor(zend_class_entry* ce)
 {
 	phalcon_di_service_object *obj = ecalloc(1, sizeof(phalcon_di_service_object));
 
-	zend_object_std_init(&obj->obj, ce TSRMLS_CC);
+	zend_object_std_init(&obj->obj, ce);
 	object_properties_init(&obj->obj, ce);
 
 	phalcon_di_service_object_handlers.offset = XtOffsetof(phalcon_di_service_object, obj);
@@ -157,7 +157,7 @@ static zend_object *phalcon_di_service_clone_obj(zval *zobject)
 	return &new_object->obj;
 }
 
-static HashTable* phalcon_di_service_get_debug_info(zval *object, int *is_temp TSRMLS_DC)
+static HashTable* phalcon_di_service_get_debug_info(zval *object, int *is_temp)
 {
 	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_di_service_object);
 	HashTable *props = Z_OBJPROP_P(object);
@@ -215,7 +215,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_Service){
 	phalcon_di_service_object_handlers.clone_obj      = phalcon_di_service_clone_obj;
 	phalcon_di_service_object_handlers.get_debug_info = phalcon_di_service_get_debug_info;
 
-	zend_class_implements(phalcon_di_service_ce TSRMLS_CC, 1, phalcon_di_serviceinterface_ce);
+	zend_class_implements(phalcon_di_service_ce, 1, phalcon_di_serviceinterface_ce);
 
 	return SUCCESS;
 }
@@ -372,10 +372,10 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 			found = 1;
 			if (Z_TYPE_P(parameters) == IS_ARRAY) {
 				PHALCON_INIT_VAR(instance);
-				RETURN_MM_ON_FAILURE(phalcon_create_instance_params(instance, definition, parameters TSRMLS_CC));
+				RETURN_MM_ON_FAILURE(phalcon_create_instance_params(instance, definition, parameters));
 			} else {
 				PHALCON_INIT_VAR(instance);
-				RETURN_MM_ON_FAILURE(phalcon_create_instance(instance, definition TSRMLS_CC));
+				RETURN_MM_ON_FAILURE(phalcon_create_instance(instance, definition));
 			}
 		}
 	}
@@ -456,7 +456,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 	if (phalcon_array_isset_string_fetch(&arguments, definition, SS("arguments"))) {
 		phalcon_array_update_zval(&arguments, *position, *parameter, PH_COPY);
 	} else {
-		MAKE_STD_ZVAL(arguments);
+		PHALCON_ALLOC_GHOST_ZVAL(arguments);
 		array_init_size(arguments, 1);
 		phalcon_array_update_zval(&arguments, *position, *parameter, PH_COPY);
 		phalcon_array_update_string(&definition, SL("arguments"), arguments, 0);

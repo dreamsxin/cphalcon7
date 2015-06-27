@@ -22,20 +22,20 @@
 
 #include "php_phalcon.h"
 
-int phalcon_require_ret(zval *return_value, const char *require_path TSRMLS_DC) PHALCON_ATTR_NONNULL1(2);
+int phalcon_require_ret(zval *return_value, const char *require_path) PHALCON_ATTR_NONNULL1(2);
 
-PHALCON_ATTR_NONNULL static inline int phalcon_require(const char *require_path TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline int phalcon_require(const char *require_path)
 {
-	return phalcon_require_ret(NULL, require_path TSRMLS_CC);
+	return phalcon_require_ret(NULL, require_path);
 }
 
-PHALCON_ATTR_NONNULL static inline int phalcon_require_zval(const zval *require_path TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline int phalcon_require_zval(const zval *require_path)
 {
-    return phalcon_require_ret(NULL, Z_TYPE_P(require_path) == IS_STRING ? Z_STRVAL_P(require_path) : "" TSRMLS_CC);
+    return phalcon_require_ret(NULL, Z_TYPE_P(require_path) == IS_STRING ? Z_STRVAL_P(require_path) : "");
 }
 
-PHALCON_ATTR_NONNULL static inline int phalcon_require_zval_ret(zval *return_value, const zval *require_path TSRMLS_DC)
+PHALCON_ATTR_NONNULL static inline int phalcon_require_zval_ret(zval *return_value, const zval *require_path)
 {
-    return phalcon_require_ret(return_value, Z_TYPE_P(require_path) == IS_STRING ? Z_STRVAL_P(require_path) : "" TSRMLS_CC);
+    return phalcon_require_ret(return_value, Z_TYPE_P(require_path) == IS_STRING ? Z_STRVAL_P(require_path) : "");
 }
 #endif /* PHALCON_KERNEL_REQUIRE_H */

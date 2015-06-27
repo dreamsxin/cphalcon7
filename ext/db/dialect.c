@@ -120,10 +120,10 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Db, Dialect, db_dialect, phalcon_db_dialect_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_db_dialect_ce, SL("_escapeChar"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_dialect_ce, SL("_customFunctions"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_db_dialect_ce, SL("_escapeChar"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_dialect_ce, SL("_customFunctions"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_db_dialect_ce TSRMLS_CC, 1, phalcon_db_dialectinterface_ce);
+	zend_class_implements(phalcon_db_dialect_ce, 1, phalcon_db_dialectinterface_ce);
 
 	return SUCCESS;
 }
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getColumnList){
 		zend_hash_move_forward_ex(ah0, &hp0);
 	}
 
-	phalcon_fast_join_str(return_value, SL(", "), str_list TSRMLS_CC);
+	phalcon_fast_join_str(return_value, SL(", "), str_list);
 	RETURN_MM();
 }
 
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 			}
 
 			PHALCON_INIT_NVAR(value);
-			phalcon_fast_join_str(value, SL(", "), placeholders TSRMLS_CC);
+			phalcon_fast_join_str(value, SL(", "), placeholders);
 		}
 		
 		RETURN_CTOR(value);
@@ -489,7 +489,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		}
 
 		PHALCON_INIT_VAR(list_expression);
-		phalcon_fast_join_str(list_expression, SL(", "), sql_items TSRMLS_CC);
+		phalcon_fast_join_str(list_expression, SL(", "), sql_items);
 		PHALCON_CONCAT_SVS(return_value, "(", list_expression, ")");
 
 		RETURN_MM();
@@ -692,7 +692,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 		}
 
 		PHALCON_INIT_VAR(arguments_joined);
-		phalcon_fast_join_str(arguments_joined, SL(", "), sql_arguments TSRMLS_CC);
+		phalcon_fast_join_str(arguments_joined, SL(", "), sql_arguments);
 		if (phalcon_array_isset_string(expression, SS("distinct"))) {
 			PHALCON_CONCAT_VSVS(return_value, name, "(DISTINCT ", arguments_joined, ")");
 		}
@@ -927,7 +927,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		}
 
 		PHALCON_INIT_VAR(columns_sql);
-		phalcon_fast_join_str(columns_sql, SL(", "), selected_columns TSRMLS_CC);
+		phalcon_fast_join_str(columns_sql, SL(", "), selected_columns);
 	} else {
 		PHALCON_CPY_WRT(columns_sql, columns);
 	}
@@ -955,7 +955,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		}
 
 		PHALCON_INIT_VAR(tables_sql);
-		phalcon_fast_join_str(tables_sql, SL(", "), selected_tables TSRMLS_CC);
+		phalcon_fast_join_str(tables_sql, SL(", "), selected_tables);
 	} else {
 		PHALCON_CPY_WRT(tables_sql, tables);
 	}
@@ -1012,7 +1012,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 				PHALCON_OBS_NVAR(join_conditions_array);
 				phalcon_array_fetch_string(&join_conditions_array, join, SL("conditions"), PH_NOISY);
-				if (phalcon_fast_count_ev(join_conditions_array TSRMLS_CC)) {
+				if (phalcon_fast_count_ev(join_conditions_array)) {
 
 					PHALCON_INIT_NVAR(join_expressions);
 					array_init(join_expressions);
@@ -1030,12 +1030,12 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 					}
 
 					PHALCON_INIT_NVAR(join_conditions);
-					phalcon_fast_join_str(join_conditions, SL(" AND "), join_expressions TSRMLS_CC);
+					phalcon_fast_join_str(join_conditions, SL(" AND "), join_expressions);
 					PHALCON_SCONCAT_SVS(sql_join, " ON ", join_conditions, " ");
 				}
 			}
 
-			phalcon_concat_self(&sql, sql_join TSRMLS_CC);
+			phalcon_concat_self(&sql, sql_join);
 
 			zend_hash_move_forward_ex(ah2, &hp2);
 		}
@@ -1072,11 +1072,11 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		}
 
 		PHALCON_INIT_VAR(group_sql);
-		phalcon_fast_join_str(group_sql, SL(", "), group_items TSRMLS_CC);
+		phalcon_fast_join_str(group_sql, SL(", "), group_items);
 
 		PHALCON_INIT_VAR(group_clause);
 		PHALCON_CONCAT_SV(group_clause, " GROUP BY ", group_sql);
-		phalcon_concat_self(&sql, group_clause TSRMLS_CC);
+		phalcon_concat_self(&sql, group_clause);
 	}
 
 	/* Check for a HAVING clause */
@@ -1120,7 +1120,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		}
 
 		PHALCON_INIT_VAR(order_sql);
-		phalcon_fast_join_str(order_sql, SL(", "), order_items TSRMLS_CC);
+		phalcon_fast_join_str(order_sql, SL(", "), order_items);
 		PHALCON_SCONCAT_SV(sql, " ORDER BY ", order_sql);
 	}
 
@@ -1208,7 +1208,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 	/**
 	 * A valid array with more than one element is required
 	 */
-	if (!phalcon_fast_count_ev(values TSRMLS_CC)) {
+	if (!phalcon_fast_count_ev(values)) {
 		PHALCON_INIT_VAR(exception_message);
 		PHALCON_CONCAT_SVS(exception_message, "Unable to insert into ", table, " without data");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, exception_message);
@@ -1223,7 +1223,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 	 * Build the final SQL INSERT statement
 	 */
 	PHALCON_INIT_VAR(joined_values);
-	phalcon_fast_join_str(joined_values, SL(", "), values TSRMLS_CC);
+	phalcon_fast_join_str(joined_values, SL(", "), values);
 	if (Z_TYPE_P(fields) == IS_ARRAY) { 
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 
@@ -1248,7 +1248,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 		}
 
 		PHALCON_INIT_VAR(joined_fields);
-		phalcon_fast_join_str(joined_fields, SL(", "), escaped_fields TSRMLS_CC);
+		phalcon_fast_join_str(joined_fields, SL(", "), escaped_fields);
 
 		PHALCON_INIT_VAR(insert_sql);
 		PHALCON_CONCAT_SVSVSVS(insert_sql, "INSERT INTO ", escaped_table, " (", joined_fields, ") VALUES (", joined_values, ")");
@@ -1334,7 +1334,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	PHALCON_INIT_VAR(tables_sql);
-	phalcon_fast_join_str(tables_sql, SL(", "), updated_tables TSRMLS_CC);
+	phalcon_fast_join_str(tables_sql, SL(", "), updated_tables);
 
 	PHALCON_INIT_VAR(sql);
 	PHALCON_SCONCAT_SV(sql, "UPDATE ", tables_sql);
@@ -1373,7 +1373,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	PHALCON_INIT_VAR(columns_sql);
-	phalcon_fast_join_str(columns_sql, SL(", "), updated_fields TSRMLS_CC);
+	phalcon_fast_join_str(columns_sql, SL(", "), updated_fields);
 
 	PHALCON_SCONCAT_SV(sql, " SET ", columns_sql);
 
@@ -1423,7 +1423,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 		}
 
 		PHALCON_INIT_VAR(order_sql);
-		phalcon_fast_join_str(order_sql, SL(", "), order_items TSRMLS_CC);
+		phalcon_fast_join_str(order_sql, SL(", "), order_items);
 		PHALCON_SCONCAT_SV(sql, " ORDER BY ", order_sql);
 	}
 
@@ -1512,7 +1512,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	}
 
 	PHALCON_INIT_VAR(tables_sql);
-	phalcon_fast_join_str(tables_sql, SL(", "), updated_tables TSRMLS_CC);
+	phalcon_fast_join_str(tables_sql, SL(", "), updated_tables);
 
 	PHALCON_INIT_VAR(sql);
 	PHALCON_SCONCAT_SV(sql, "DELETE FROM ", tables_sql);
@@ -1563,7 +1563,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 		}
 
 		PHALCON_INIT_VAR(order_sql);
-		phalcon_fast_join_str(order_sql, SL(", "), order_items TSRMLS_CC);
+		phalcon_fast_join_str(order_sql, SL(", "), order_items);
 		PHALCON_SCONCAT_SV(sql, " ORDER BY ", order_sql);
 	}
 
@@ -1675,7 +1675,7 @@ PHP_METHOD(Phalcon_Db_Dialect, registerCustomFunction){
 
 	phalcon_fetch_params(0, 2, 0, &name, &custom_function);
 
-	phalcon_update_property_array(this_ptr, SL("_customFunctions"), name, custom_function TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_customFunctions"), name, custom_function);
 
 	RETURN_THISW();
 }

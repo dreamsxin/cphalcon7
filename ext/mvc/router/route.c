@@ -154,26 +154,26 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Router_Route){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Router, Route, mvc_router_route, phalcon_mvc_router_route_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_pattern"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_compiledPattern"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_paths"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_methods"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_hostname"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_converters"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_id"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_name"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_beforeMatch"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_group"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_mvc_router_route_ce, SL("_uniqueId"), 0, ZEND_ACC_STATIC|ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultNamespace"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultController"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_urlGenerator"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_mvc_router_route_ce, SL("_caseSensitive"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_pattern"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_compiledPattern"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_paths"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_methods"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_hostname"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_converters"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_id"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_name"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_beforeMatch"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_group"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_router_route_ce, SL("_uniqueId"), 0, ZEND_ACC_STATIC|ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultNamespace"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultController"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_urlGenerator"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_router_route_ce, SL("_caseSensitive"), 0, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_router_route_ce TSRMLS_CC, 1, phalcon_mvc_router_routeinterface_ce);
+	zend_class_implements(phalcon_mvc_router_route_ce, 1, phalcon_mvc_router_routeinterface_ce);
 
 	return SUCCESS;
 }
@@ -215,12 +215,12 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	/** 
 	 * Update the HTTP method constraints
 	 */
-	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods);
 
 	/** 
 	 * Get the unique Id from the static member _uniqueId
 	 */
-	unique_id = phalcon_fetch_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId") TSRMLS_CC);
+	unique_id = phalcon_fetch_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId"));
 	if (Z_REFCOUNT_P(unique_id) > 1) {
 		PHALCON_INIT_VAR(unique_id);
 		separate = 1;
@@ -231,12 +231,12 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	}
 
 	PHALCON_CPY_WRT_CTOR(route_id, unique_id); /* route_id is now separated from unique_id */
-	phalcon_update_property_this(this_ptr, SL("_id"), route_id TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_id"), route_id);
 
 	/* increment_function() will increment the value of the static property as well */
 	increment_function(unique_id);
 	if (separate) {
-		phalcon_update_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId"), unique_id TSRMLS_CC);
+		phalcon_update_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId"), unique_id);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -422,7 +422,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, via){
 
 	phalcon_fetch_params(0, 1, 0, &http_methods);
 
-	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods);
 	RETURN_THISW();
 }
 
@@ -468,7 +468,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 			phalcon_fast_explode_str(parts, SL("::"), paths);
 
 			PHALCON_INIT_VAR(number_parts);
-			phalcon_fast_count(number_parts, parts TSRMLS_CC);
+			phalcon_fast_count(number_parts, parts);
 
 			/** 
 			 * Create the array paths dynamically
@@ -526,13 +526,13 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 					 * Extract the real class name from the namespaced class
 					 */
 					PHALCON_INIT_VAR(real_class_name);
-					phalcon_get_class_ns(real_class_name, controller_name, 0 TSRMLS_CC);
+					phalcon_get_class_ns(real_class_name, controller_name, 0);
 
 					/** 
 					 * Extract the namespace from the namespaced class
 					 */
 					PHALCON_INIT_VAR(namespace_name);
-					phalcon_get_ns_class(namespace_name, controller_name, 0 TSRMLS_CC);
+					phalcon_get_ns_class(namespace_name, controller_name, 0);
 
 					/** 
 					 * Update the namespace
@@ -610,17 +610,17 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	/** 
 	 * Update the original pattern
 	 */
-	phalcon_update_property_this(this_ptr, SL("_pattern"), pattern TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_pattern"), pattern);
 
 	/** 
 	 * Update the compiled pattern
 	 */
-	phalcon_update_property_this(this_ptr, SL("_compiledPattern"), compiled_pattern TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_compiledPattern"), compiled_pattern);
 
 	/** 
 	 * Update the route's paths
 	 */
-	phalcon_update_property_this(this_ptr, SL("_paths"), route_paths TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_paths"), route_paths);
 
 	PHALCON_MM_RESTORE();
 }
@@ -654,7 +654,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setName){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_update_property_this(this_ptr, SL("_name"), name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_name"), name);
 	RETURN_THISW();
 }
 
@@ -672,7 +672,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, beforeMatch){
 
 	phalcon_fetch_params(0, 1, 0, &callback);
 
-	phalcon_update_property_this(this_ptr, SL("_beforeMatch"), callback TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_beforeMatch"), callback);
 	RETURN_THISW();
 }
 
@@ -782,7 +782,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHttpMethods){
 
 	phalcon_fetch_params(0, 1, 0, &http_methods);
 
-	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods);
 	RETURN_THISW();
 }
 
@@ -813,7 +813,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHostname){
 
 	phalcon_fetch_params(0, 1, 0, &hostname);
 
-	phalcon_update_property_this(this_ptr, SL("_hostname"), hostname TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_hostname"), hostname);
 	RETURN_THISW();
 }
 
@@ -841,7 +841,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setGroup) {
 	phalcon_fetch_params(0, 1, 0, &group);
 	PHALCON_VERIFY_CLASS_EX(group, phalcon_mvc_router_group_ce, phalcon_mvc_router_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_group"), group TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_group"), group);
 	RETURN_THISW();
 }
 
@@ -868,7 +868,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, convert){
 
 	phalcon_fetch_params(0, 2, 0, &name, &converter);
 
-	phalcon_update_property_array(this_ptr, SL("_converters"), name, converter TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_converters"), name, converter);
 	RETURN_THISW();
 }
 
@@ -888,7 +888,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getConverters){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, reset){
 
-	zend_update_static_property_long(phalcon_mvc_router_route_ce, SL("_uniqueId"), 0 TSRMLS_CC);
+	zend_update_static_property_long(phalcon_mvc_router_route_ce, SL("_uniqueId"), 0);
 }
 
 /**
@@ -911,27 +911,27 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 
 	/* Set the default namespace */
 	if (phalcon_array_isset_string_fetch(&namespace_name, defaults, SS("namespace"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultNamespace"), namespace_name TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_defaultNamespace"), namespace_name);
 	}
 
 	/* Set the default module */
 	if (phalcon_array_isset_string_fetch(&module_name, defaults, SS("module"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultModule"), module_name TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_defaultModule"), module_name);
 	}
 
 	/* Set the default controller */
 	if (phalcon_array_isset_string_fetch(&controller_name, defaults, SS("controller"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultController"), controller_name TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_defaultController"), controller_name);
 	}
 
 	/* Set the default action */
 	if (phalcon_array_isset_string_fetch(&action_name, defaults, SS("action"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultAction"), action_name TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_defaultAction"), action_name);
 	}
 
 	/* Set default parameters */
 	if (phalcon_array_isset_string_fetch(&params, defaults, SS("params"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultParams"), params TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_defaultParams"), params);
 	}
 
 	RETURN_THISW();
@@ -1028,7 +1028,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setUrlGenerator){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_urlGenerator"), generator TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_urlGenerator"), generator);
 
 	RETURN_THISW();
 }
@@ -1054,7 +1054,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setCaseSensitive){
 
 	phalcon_fetch_params(0, 1, 0, &case_sensitive);
 
-	phalcon_update_property_bool(this_ptr, SL("_caseSensitive"), zend_is_true(case_sensitive) TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_caseSensitive"), zend_is_true(case_sensitive));
 
 	RETURN_THISW();
 }

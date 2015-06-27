@@ -329,14 +329,9 @@ void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_ch
 /**
  * Escapes HTML replacing special chars by entities
  */
-void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style, const zval *charset TSRMLS_DC) {
+void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style, const zval *charset) {
 
-#if PHP_VERSION_ID < 50400
-	int length;
-#else
 	size_t length;
-#endif
-
 	char *escaped;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
@@ -345,16 +340,16 @@ void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style,
 	}
 
 	if (Z_TYPE_P(quote_style) != IS_LONG) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid quote_style supplied for phalcon_escape_html()");
+		php_error_docref(NULL, E_WARNING, "Invalid quote_style supplied for phalcon_escape_html()");
 		RETURN_ZVAL(str, 1, 0);
 	}
 
 	if (Z_TYPE_P(charset) != IS_STRING) {
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid charset supplied for phalcon_escape_html()");
+		php_error_docref(NULL, E_WARNING, "Invalid charset supplied for phalcon_escape_html()");
 		RETURN_ZVAL(str, 1, 0);
 	}
 
-	escaped = php_escape_html_entities((unsigned char*) Z_STRVAL_P(str), Z_STRLEN_P(str), &length, 0, Z_LVAL_P(quote_style), Z_STRVAL_P(charset) TSRMLS_CC);
+	escaped = php_escape_html_entities((unsigned char*) Z_STRVAL_P(str), Z_STRLEN_P(str), &length, 0, Z_LVAL_P(quote_style), Z_STRVAL_P(charset));
 
 	RETURN_STRINGL(escaped, length, 0);
 }
@@ -362,7 +357,7 @@ void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style,
 /**
  * Prevernt cross-site scripting (XSS) attacks
  */
-void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes TSRMLS_DC){
+void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes){
 
 	zval *document, *ret = NULL, *tmp = NULL, *elements = NULL, *element = NULL;
 	zval *element_name = NULL, *element_attrs = NULL;
@@ -379,15 +374,15 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 	object_init_ex(document, ce0);
 	PHALCON_CALL_METHOD(NULL, document, "__construct");
 
-	phalcon_update_property_bool(document, SL("strictErrorChecking"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(document, SL("strictErrorChecking"), 0);
 
-	if (phalcon_function_exists_ex(SS("libxml_use_internal_errors") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("libxml_use_internal_errors")) == SUCCESS) {
 		PHALCON_CALL_FUNCTION(NULL, "libxml_use_internal_errors", PHALCON_GLOBAL(z_true));
 	}
 
 	PHALCON_CALL_METHOD(&ret, document, "loadhtml", str);
 
-	if (phalcon_function_exists_ex(SS("libxml_clear_errors") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("libxml_clear_errors")) == SUCCESS) {
 		PHALCON_CALL_FUNCTION(NULL, "libxml_clear_errors");
 	}
 
@@ -404,7 +399,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 	ZVAL_STRING(regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i", 1);
 
 	PHALCON_OBS_NVAR(tmp);
-	phalcon_read_property(&tmp, elements, SL("length"), PH_NOISY TSRMLS_CC);
+	phalcon_read_property(&tmp, elements, SL("length"), PH_NOISY);
 
 	element_length = Z_LVAL_P(tmp);
 
@@ -415,17 +410,17 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		PHALCON_CALL_METHOD(&element, elements, "item", tmp);
 
 		PHALCON_OBS_NVAR(element_name);
-		phalcon_read_property(&element_name, element, SL("nodeName"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property(&element_name, element, SL("nodeName"), PH_NOISY);
 
-		if (Z_TYPE_P(allow_tags) == IS_ARRAY && !phalcon_fast_in_array(element_name, allow_tags TSRMLS_CC)) {
+		if (Z_TYPE_P(allow_tags) == IS_ARRAY && !phalcon_fast_in_array(element_name, allow_tags)) {
 			continue;
 		}
 
 		PHALCON_OBS_NVAR(element_attrs);
-		phalcon_read_property(&element_attrs, element, SL("attributes"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property(&element_attrs, element, SL("attributes"), PH_NOISY);
 
 		PHALCON_OBS_NVAR(tmp);
-		phalcon_read_property(&tmp, element_attrs, SL("length"), PH_NOISY TSRMLS_CC);
+		phalcon_read_property(&tmp, element_attrs, SL("length"), PH_NOISY);
 
 		element_attrs_length = Z_LVAL_P(tmp);
 
@@ -436,19 +431,19 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 			PHALCON_CALL_METHOD(&element_attr, element_attrs, "item", tmp);
 
 			PHALCON_OBS_NVAR(element_attr_name);
-			phalcon_read_property(&element_attr_name, element_attr, SL("nodeName"), PH_NOISY TSRMLS_CC);
-			if (Z_TYPE_P(allow_attributes) == IS_ARRAY && !phalcon_fast_in_array(element_attr_name, allow_attributes TSRMLS_CC)) {
+			phalcon_read_property(&element_attr_name, element_attr, SL("nodeName"), PH_NOISY);
+			if (Z_TYPE_P(allow_attributes) == IS_ARRAY && !phalcon_fast_in_array(element_attr_name, allow_attributes)) {
 				PHALCON_CALL_METHOD(NULL, element, "removeattributenode", element_attr);
 			} else if (phalcon_memnstr_str(element_attr_name, SL("style"))) {
 				PHALCON_OBS_NVAR(element_attr_value);
-				phalcon_read_property(&element_attr_value, element_attr, SL("nodeValue"), PH_NOISY TSRMLS_CC);
+				phalcon_read_property(&element_attr_value, element_attr, SL("nodeValue"), PH_NOISY);
 
 				PHALCON_INIT_NVAR(matched);
-				RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, regexp, element_attr_value, NULL TSRMLS_CC));
+				RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, regexp, element_attr_value, NULL));
 
 				if (zend_is_true(matched)) {
 					PHALCON_OBS_NVAR(element_attr_parent);
-					phalcon_read_property(&element_attr_parent, element_attr, SL("parentNode"), PH_NOISY TSRMLS_CC);
+					phalcon_read_property(&element_attr_parent, element_attr, SL("parentNode"), PH_NOISY);
 
 					PHALCON_CALL_METHOD(NULL, element, "removeattributenode", element_attr);
 				}
@@ -457,7 +452,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 	}
 
 	PHALCON_INIT_NVAR(tmp);
-	phalcon_fast_join_str(tmp, SL("><"), allow_tags TSRMLS_CC);
+	phalcon_fast_join_str(tmp, SL("><"), allow_tags);
 
 	PHALCON_INIT_VAR(joined_tags);
 	PHALCON_CONCAT_SVS(joined_tags, "<", tmp, ">");

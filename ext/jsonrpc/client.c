@@ -72,8 +72,8 @@ PHALCON_INIT_CLASS(Phalcon_JsonRpc_Client){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\JsonRpc, Client, jsonrpc_client, phalcon_jsonrpc_client_method_entry, 0);
 
-	zend_declare_property_null(phalcon_jsonrpc_client_ce, SL("_httpclient"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_jsonrpc_client_ce, SL("_id"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_jsonrpc_client_ce, SL("_httpclient"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_jsonrpc_client_ce, SL("_id"), 0, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -88,7 +88,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, __construct){
 
 	PHALCON_VERIFY_INTERFACE_EX(httpclient, phalcon_http_client_adapterinterface_ce, phalcon_jsonrpc_client_exception_ce, 1);
 
-	phalcon_update_property_this(this_ptr, SL("_httpclient"), httpclient TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_httpclient"), httpclient);
 
 	PHALCON_MM_RESTORE();
 }
@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call){
 	i = Z_LVAL_P(id) + 1;
 	ZVAL_LONG(id, i);
 
-	phalcon_update_property_this(this_ptr, SL("_id"), id TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_id"), id);
 
 	PHALCON_INIT_VAR(jsonrpc_message);
 	array_init(jsonrpc_message);

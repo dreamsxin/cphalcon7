@@ -77,11 +77,11 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_File){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Logger\\Adapter, File, logger_adapter_file, phalcon_logger_adapter_ce, phalcon_logger_adapter_file_method_entry, 0);
 
-	zend_declare_property_null(phalcon_logger_adapter_file_ce, SL("_fileHandler"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_logger_adapter_file_ce, SL("_path"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_logger_adapter_file_ce, SL("_options"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_logger_adapter_file_ce, SL("_fileHandler"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_logger_adapter_file_ce, SL("_path"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_logger_adapter_file_ce, SL("_options"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_logger_adapter_file_ce TSRMLS_CC, 1, phalcon_logger_adapterinterface_ce);
+	zend_class_implements(phalcon_logger_adapter_file_ce, 1, phalcon_logger_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -124,9 +124,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 		zend_throw_exception_ex(exception, 0, "Cannot open log file '%s'", Z_STRVAL_P(*name));
 	}
 	else {
-		phalcon_update_property_this(this_ptr, SL("_path"), *name TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("_options"), *options TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("_fileHandler"), handler TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_path"), *name);
+		phalcon_update_property_this(this_ptr, SL("_options"), *options);
+		phalcon_update_property_this(this_ptr, SL("_fileHandler"), handler);
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
 		object_init_ex(formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHOD(NULL, formatter, "__construct");
 	
-		phalcon_update_property_this(this_ptr, SL("_formatter"), formatter TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_formatter"), formatter);
 	}
 	
 	RETURN_CTOR(formatter);
@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 	 * Re-open the file handler if the logger was serialized
 	 */
 	PHALCON_CALL_FUNCTION(&file_handler, "fopen", path, mode);
-	phalcon_update_property_this(this_ptr, SL("_fileHandler"), file_handler TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_fileHandler"), file_handler);
 
 	PHALCON_MM_RESTORE();
 }

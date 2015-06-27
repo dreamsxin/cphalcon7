@@ -119,16 +119,16 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_Manager){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Collection, Manager, mvc_collection_manager, phalcon_di_injectable_ce, phalcon_mvc_collection_manager_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_initialized"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_lastInitialized"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_customEventsManager"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_connectionServices"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_implicitObjectsIds"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_strictModes"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_sources"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_columnMaps"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_initialized"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_lastInitialized"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_customEventsManager"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_connectionServices"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_implicitObjectsIds"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_strictModes"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_sources"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_collection_manager_ce, SL("_columnMaps"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_collection_manager_ce TSRMLS_CC, 1, phalcon_mvc_collection_managerinterface_ce);
+	zend_class_implements(phalcon_mvc_collection_manager_ce, 1, phalcon_mvc_collection_managerinterface_ce);
 
 	return SUCCESS;
 }
@@ -150,8 +150,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setCustomEventsManager){
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_mvc_collection_exception_ce, 1);
 	
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 1 TSRMLS_CC);
-	phalcon_update_property_array(this_ptr, SL("_customEventsManager"), class_name, events_manager TSRMLS_CC);
+	phalcon_get_class(class_name, model, 1);
+	phalcon_update_property_array(this_ptr, SL("_customEventsManager"), class_name, events_manager);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
 	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
 	
 		PHALCON_INIT_VAR(class_name);
-		phalcon_get_class(class_name, model, 1 TSRMLS_CC);
+		phalcon_get_class(class_name, model, 1);
 		if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, class_name)) {
 			RETURN_CTOR(events_manager);
 		}
@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 	phalcon_fetch_params(1, 1, 0, &model);
 	
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 1 TSRMLS_CC);
+	phalcon_get_class(class_name, model, 1);
 	
 	PHALCON_OBS_VAR(initialized);
 	phalcon_read_property_this(&initialized, this_ptr, SL("_initialized"), PH_NOISY);
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		/** 
 		 * Call the 'initialize' method if it's implemented
 		 */
-		if (phalcon_method_exists_ex(model, SS("initialize") TSRMLS_CC) == SUCCESS) {
+		if (phalcon_method_exists_ex(model, SS("initialize")) == SUCCESS) {
 			PHALCON_CALL_METHOD(NULL, model, "initialize");
 		}
 	
@@ -227,8 +227,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 			PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr);
 		}
 	
-		phalcon_update_property_array(this_ptr, SL("_initialized"), class_name, model TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("_lastInitialized"), model TSRMLS_CC);
+		phalcon_update_property_array(this_ptr, SL("_initialized"), class_name, model);
+		phalcon_update_property_this(this_ptr, SL("_lastInitialized"), model);
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -286,8 +286,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setConnectionService){
 	}
 	
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1 TSRMLS_CC);
-	phalcon_update_property_array(this_ptr, SL("_connectionServices"), entity_name, connection_service TSRMLS_CC);
+	phalcon_get_class(entity_name, model, 1);
+	phalcon_update_property_array(this_ptr, SL("_connectionServices"), entity_name, connection_service);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -312,8 +312,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, useImplicitObjectIds){
 	}
 	
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1 TSRMLS_CC);
-	phalcon_update_property_array(this_ptr, SL("_implicitObjectsIds"), entity_name, use_implicit_object_ids TSRMLS_CC);
+	phalcon_get_class(entity_name, model, 1);
+	phalcon_update_property_array(this_ptr, SL("_implicitObjectsIds"), entity_name, use_implicit_object_ids);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -339,7 +339,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 	}
 	
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1 TSRMLS_CC);
+	phalcon_get_class(entity_name, model, 1);
 	
 	/** 
 	 * All collections use by default are using implicit object ids
@@ -373,8 +373,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setStrictMode){
 	}
 
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1 TSRMLS_CC);
-	phalcon_update_property_array(this_ptr, SL("_strictModes"), entity_name, strict_mode TSRMLS_CC);
+	phalcon_get_class(entity_name, collection, 1);
+	phalcon_update_property_array(this_ptr, SL("_strictModes"), entity_name, strict_mode);
 
 	PHALCON_MM_RESTORE();
 }
@@ -400,7 +400,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 	}
 
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1 TSRMLS_CC);
+	phalcon_get_class(entity_name, collection, 1);
 
 	/** 
 	 * All collections use by default are using implicit object ids
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 	if (Z_TYPE_P(connection_services) == IS_ARRAY) { 
 	
 		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1 TSRMLS_CC);
+		phalcon_get_class(entity_name, model, 1);
 	
 		/** 
 		 * Check if the model has a custom connection service
@@ -516,7 +516,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
 	
 		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1 TSRMLS_CC);
+		phalcon_get_class(entity_name, model, 1);
 		if (phalcon_array_isset(custom_events_manager, entity_name)) {
 	
 			PHALCON_INIT_NVAR(fire_event_name);
@@ -557,8 +557,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setSource){
 	}
 
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1 TSRMLS_CC);
-	phalcon_update_property_array(this_ptr, SL("_sources"), entity_name, source TSRMLS_CC);
+	phalcon_get_class(entity_name, collection, 1);
+	phalcon_update_property_array(this_ptr, SL("_sources"), entity_name, source);
 
 	PHALCON_MM_RESTORE();
 }
@@ -583,7 +583,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 	}
 
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1 TSRMLS_CC);
+	phalcon_get_class(entity_name, collection, 1);
 
 	PHALCON_OBS_VAR(sources);
 	phalcon_read_property_this(&sources, this_ptr, SL("_sources"), PH_NOISY);
@@ -596,11 +596,11 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 	}
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class_ns(class_name, collection, 0 TSRMLS_CC);
+	phalcon_get_class_ns(class_name, collection, 0);
 
 	PHALCON_INIT_NVAR(source);
 	phalcon_uncamelize(source, class_name);
-	phalcon_update_property_array(this_ptr, SL("_sources"), entity_name, source TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_sources"), entity_name, source);
 
 	RETURN_CTOR(source);
 }
@@ -630,8 +630,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setColumnMap){
 	}
 
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1 TSRMLS_CC);
-	phalcon_update_property_array(this_ptr, SL("_columnMaps"), entity_name, column_map TSRMLS_CC);
+	phalcon_get_class(entity_name, collection, 1);
+	phalcon_update_property_array(this_ptr, SL("_columnMaps"), entity_name, column_map);
 
 	PHALCON_MM_RESTORE();
 }
@@ -656,7 +656,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 	}
 
 	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1 TSRMLS_CC);
+	phalcon_get_class(entity_name, collection, 1);
 
 	PHALCON_OBS_VAR(column_maps);
 	phalcon_read_property_this(&column_maps, this_ptr, SL("_columnMaps"), PH_NOISY);

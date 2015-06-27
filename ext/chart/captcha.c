@@ -95,13 +95,13 @@ PHALCON_INIT_CLASS(Phalcon_Chart_Captcha){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Chart, Captcha, chart_captcha, phalcon_chart_captcha_method_entry, 0);
 
-	zend_declare_property_null(phalcon_chart_captcha_ce, SL("_imagick"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_chart_captcha_ce, SL("_draw"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_chart_captcha_ce, SL("_word"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_chart_captcha_ce, SL("_font"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_captcha_ce, SL("_fontSize"), 40, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_captcha_ce, SL("_width"), 150, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_captcha_ce, SL("_height"), 50, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_chart_captcha_ce, SL("_imagick"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_chart_captcha_ce, SL("_draw"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_chart_captcha_ce, SL("_word"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_chart_captcha_ce, SL("_font"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_chart_captcha_ce, SL("_fontSize"), 40, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_chart_captcha_ce, SL("_width"), 150, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_chart_captcha_ce, SL("_height"), 50, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -137,19 +137,19 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 
 	PHALCON_INIT_VAR(imagick);
 	object_init_ex(imagick, imagick_ce);
-	if (phalcon_has_constructor(imagick TSRMLS_CC)) {
+	if (phalcon_has_constructor(imagick)) {
 		PHALCON_CALL_METHOD(NULL, imagick, "__construct");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_imagick"), imagick TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_imagick"), imagick);
 
 	PHALCON_INIT_VAR(draw);
 	object_init_ex(draw, draw_ce);
-	if (phalcon_has_constructor(draw TSRMLS_CC)) {
+	if (phalcon_has_constructor(draw)) {
 		PHALCON_CALL_METHOD(NULL, draw, "__construct");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_draw"), draw TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_draw"), draw);
 
 	if (font && Z_TYPE_P(font) != IS_NULL) {
 		PHALCON_CALL_METHOD(NULL, draw, "setfont", font);
@@ -158,11 +158,11 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 	PHALCON_CALL_METHOD(NULL, draw, "setfontsize", font_size);
 
 	if (width && Z_TYPE_P(width) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_width"), width TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_width"), width);
 	}
 
 	if (height && Z_TYPE_P(height) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_height"), height TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_height"), height);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFont){
 
 	PHALCON_CALL_METHODW(NULL, draw, "setfont", font);
 	
-	phalcon_update_property_this(this_ptr, SL("_font"), font TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_font"), font);
 	RETURN_THISW();
 }
 
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
 
 	PHALCON_CALL_METHODW(NULL, draw, "setfontsize", font_size);
 	
-	phalcon_update_property_this(this_ptr, SL("_fontSize"), font_size TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_fontSize"), font_size);
 	RETURN_THISW();
 }
 
@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (!word) {
 		word  = phalcon_fetch_nproperty_this(this_ptr, SL("_word"), PH_NOISY);
 	} else {
-		phalcon_update_property_this(this_ptr, SL("_word"), word TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_word"), word);
 	}
 
 	if (!offset_x) {
@@ -267,13 +267,13 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (!width) {
 		width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY);
 	} else {
-		phalcon_update_property_this(this_ptr, SL("_width"), width TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_width"), width);
 	}
 
 	if (!height) {
 		height  = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
 	} else {
-		phalcon_update_property_this(this_ptr, SL("_height"), height TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_height"), height);
 	}
 
 	imagick = phalcon_fetch_nproperty_this(this_ptr, SL("_imagick"), PH_NOISY);
@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	PHALCON_CALL_METHOD(NULL, imagick, "newimage", width,  height, imagickpixel);
 
 	PHALCON_INIT_VAR(gravity);
-	phalcon_get_class_constant(gravity, imagick_ce, SS("GRAVITY_CENTER") TSRMLS_CC);
+	phalcon_get_class_constant(gravity, imagick_ce, SS("GRAVITY_CENTER"));
 
 	PHALCON_CALL_METHOD(NULL, draw, "setgravity", gravity);
 	PHALCON_CALL_METHOD(NULL, imagick, "annotateimage", draw, offset_x, offset_y, PHALCON_GLOBAL(z_zero), word);

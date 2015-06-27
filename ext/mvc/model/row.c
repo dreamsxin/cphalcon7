@@ -82,7 +82,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Row){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model, Row, mvc_model_row, phalcon_mvc_model_row_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_row_ce TSRMLS_CC, 3, zend_ce_arrayaccess, spl_ce_Countable, phalcon_mvc_model_resultinterface_ce);
+	zend_class_implements(phalcon_mvc_model_row_ce, 3, zend_ce_arrayaccess, spl_ce_Countable, phalcon_mvc_model_resultinterface_ce);
 
 	return SUCCESS;
 }
@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetExists){
 
 	phalcon_fetch_params(0, 0, 1, 0, &index);
 	
-	if (phalcon_isset_property_zval(this_ptr, index TSRMLS_CC)) {
+	if (phalcon_isset_property_zval(this_ptr, index)) {
 		RETURN_TRUE;
 	}
 	RETURN_FALSE;
@@ -133,9 +133,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetGet){
 
 	phalcon_fetch_params(0, 1, 1, 0, &index);
 	
-	if (phalcon_isset_property_zval(this_ptr, index TSRMLS_CC)) {
+	if (phalcon_isset_property_zval(this_ptr, index)) {
 		PHALCON_OBS_VAR(value);
-		phalcon_read_property_zval(&value, this_ptr, index, PH_NOISY TSRMLS_CC);
+		phalcon_read_property_zval(&value, this_ptr, index, PH_NOISY);
 		RETURN_CTOR(value);
 	}
 
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetSet){
 
 	phalcon_fetch_params(0, 0, 2, 0, &index, &value);
 	
-	phalcon_update_property_zval_zval(this_ptr, index, value TSRMLS_CC);
+	phalcon_update_property_zval_zval(this_ptr, index, value);
 }
 
 /**
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
 
 	HashTable *properties;
 
-	properties = Z_OBJ_HT_P(this_ptr)->get_properties(this_ptr TSRMLS_CC);
+	properties = Z_OBJ_HT_P(this_ptr)->get_properties(this_ptr);
 
 	if (!properties) {
 		RETURN_FALSE;
@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Row, count){
 	HashTable *properties;
-	properties = Z_OBJ_HT_P(this_ptr)->get_properties(this_ptr TSRMLS_CC);	
+	properties = Z_OBJ_HT_P(this_ptr)->get_properties(this_ptr);	
 	if (properties) {
 		RETURN_LONG(zend_hash_num_elements(properties));
 	}

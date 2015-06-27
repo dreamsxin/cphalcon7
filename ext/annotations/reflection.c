@@ -82,10 +82,10 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Reflection){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Annotations, Reflection, annotations_reflection, phalcon_annotations_reflection_method_entry, 0);
 
-	zend_declare_property_null(phalcon_annotations_reflection_ce, SL("_reflectionData"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_annotations_reflection_ce, SL("_classAnnotations"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_annotations_reflection_ce, SL("_methodAnnotations"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_annotations_reflection_ce, SL("_propertyAnnotations"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_annotations_reflection_ce, SL("_reflectionData"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_annotations_reflection_ce, SL("_classAnnotations"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_annotations_reflection_ce, SL("_methodAnnotations"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_annotations_reflection_ce, SL("_propertyAnnotations"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __construct){
 	phalcon_fetch_params(0, 0, 1, &reflection_data);
 	
 	if (reflection_data && Z_TYPE_P(reflection_data) == IS_ARRAY) {
-		phalcon_update_property_this(this_ptr, SL("_reflectionData"), reflection_data TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_reflectionData"), reflection_data);
 	}
 }
 
@@ -125,11 +125,11 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 			object_init_ex(return_value, phalcon_annotations_collection_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", reflection_class);
 	
-			phalcon_update_property_this(this_ptr, SL("_classAnnotations"), return_value TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_classAnnotations"), return_value);
 			RETURN_MM();
 		}
 	
-		phalcon_update_property_this(this_ptr, SL("_classAnnotations"), PHALCON_GLOBAL(z_false) TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_classAnnotations"), PHALCON_GLOBAL(z_false));
 		RETURN_MM_FALSE;
 	}
 	
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 	
 		reflection_data = phalcon_fetch_nproperty_this(this_ptr, SL("_reflectionData"), PH_NOISY);
 		if (phalcon_array_isset_string_fetch(&reflection_methods, reflection_data, SS("methods"))) {
-			if (phalcon_fast_count_ev(reflection_methods TSRMLS_CC)) {
+			if (phalcon_fast_count_ev(reflection_methods)) {
 	
 				array_init(return_value);
 	
@@ -177,13 +177,13 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 					zend_hash_move_forward_ex(ah0, &hp0);
 				}
 	
-				phalcon_update_property_this(this_ptr, SL("_methodAnnotations"), return_value TSRMLS_CC);
+				phalcon_update_property_this(this_ptr, SL("_methodAnnotations"), return_value);
 	
 				RETURN_MM();
 			}
 		}
 	
-		phalcon_update_property_bool(this_ptr, SL("_methodAnnotations"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_methodAnnotations"), 0);
 		RETURN_MM_FALSE;
 	}
 	
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 		reflection_data = phalcon_fetch_nproperty_this(this_ptr, SL("_reflectionData"), PH_NOISY);
 		if (phalcon_array_isset_string_fetch(&reflection_properties, reflection_data, SS("properties"))) {
 
-			if (phalcon_fast_count_ev(reflection_properties TSRMLS_CC)) {
+			if (phalcon_fast_count_ev(reflection_properties)) {
 
 				array_init(return_value);
 
@@ -232,13 +232,13 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 					zend_hash_move_forward_ex(ah0, &hp0);
 				}
 
-				phalcon_update_property_this(this_ptr, SL("_propertyAnnotations"), return_value TSRMLS_CC);
+				phalcon_update_property_this(this_ptr, SL("_propertyAnnotations"), return_value);
 	
 				RETURN_MM();
 			}
 		}
 
-		phalcon_update_property_bool(this_ptr, SL("_propertyAnnotations"), 0 TSRMLS_CC);
+		phalcon_update_property_bool(this_ptr, SL("_propertyAnnotations"), 0);
 		RETURN_MM_FALSE;
 	}
 

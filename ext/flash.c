@@ -95,9 +95,9 @@ PHALCON_INIT_CLASS(Phalcon_Flash){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon, Flash, flash, phalcon_di_injectable_ce, phalcon_flash_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_flash_ce, SL("_cssClasses"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_flash_ce, SL("_implicitFlush"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_flash_ce, SL("_automaticHtml"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_flash_ce, SL("_cssClasses"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_flash_ce, SL("_implicitFlush"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_flash_ce, SL("_automaticHtml"), 1, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Flash, __construct){
 		add_assoc_stringl_ex(css_classes, SS("success"), SL("successMessage"));
 		add_assoc_stringl_ex(css_classes, SS("warning"), SL("warningMessage"));
 	}
-	phalcon_update_property_this(this_ptr, SL("_cssClasses"), css_classes TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_cssClasses"), css_classes);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Flash, setImplicitFlush){
 
 	phalcon_fetch_params(0, 0, 1, 0, &implicit_flush);
 	
-	phalcon_update_property_this(this_ptr, SL("_implicitFlush"), implicit_flush TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_implicitFlush"), implicit_flush);
 	RETURN_THISW();
 }
 
@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Flash, setAutomaticHtml){
 
 	phalcon_fetch_params(0, 0, 1, 0, &automatic_html);
 	
-	phalcon_update_property_this(this_ptr, SL("_automaticHtml"), automatic_html TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_automaticHtml"), automatic_html);
 	RETURN_THISW();
 }
 
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 	phalcon_fetch_params(0, 0, 1, 0, &css_classes);
 	
 	if (Z_TYPE_P(css_classes) == IS_ARRAY) { 
-		phalcon_update_property_this(this_ptr, SL("_cssClasses"), css_classes TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_cssClasses"), css_classes);
 		RETURN_THISW();
 	}
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_flash_exception_ce, "CSS classes must be an Array");
@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		if (phalcon_array_isset_fetch(&type_classes, classes, type)) {
 			if (Z_TYPE_P(type_classes) == IS_ARRAY) {
 				PHALCON_INIT_VAR(joined_classes);
-				phalcon_fast_join_str(joined_classes, SL(" "), type_classes TSRMLS_CC);
+				phalcon_fast_join_str(joined_classes, SL(" "), type_classes);
 
 				PHALCON_CONCAT_SVS(css_classes, " class=\"", joined_classes, "\"");
 			} else {
@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 			if (flag_implicit_flush) {
 				zend_print_zval(html_message, 0);
 			} else {
-				phalcon_concat_self(&content, html_message TSRMLS_CC);
+				phalcon_concat_self(&content, html_message);
 			}
 
 			zend_hash_move_forward_ex(ah0, &hp0);

@@ -63,7 +63,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Url){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Validation\\Validator, Url, validation_validator_url, phalcon_validation_validator_ce, phalcon_validation_validator_url_method_entry, 0);
 
-	zend_class_implements(phalcon_validation_validator_url_ce TSRMLS_CC, 1, phalcon_validation_validatorinterface_ce);
+	zend_class_implements(phalcon_validation_validator_url_ce, 1, phalcon_validation_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
 	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 	
 	PHALCON_OBS_VAR(allow_empty);
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &allow_empty, getThis(), phalcon_interned_allowEmpty TSRMLS_CC));
+	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &allow_empty, getThis(), phalcon_interned_allowEmpty));
 	if (zend_is_true(allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
 		RETURN_MM_TRUE;
 	}
@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
 
 	if (PHALCON_IS_FALSE(valid)) {
 		PHALCON_OBS_VAR(label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), phalcon_interned_label TSRMLS_CC));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), phalcon_interned_label));
 		if (!zend_is_true(label)) {
 			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(label)) {
@@ -112,21 +112,21 @@ PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
 		Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 
 		PHALCON_OBS_VAR(message_str);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), phalcon_interned_message TSRMLS_CC));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), phalcon_interned_message));
 		if (!zend_is_true(message_str)) {
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(message_str);
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), &message_str, validator, "Url" TSRMLS_CC));
+			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), &message_str, validator, "Url"));
 		}
 	
 		PHALCON_OBS_VAR(code);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), phalcon_interned_code TSRMLS_CC));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), phalcon_interned_code));
 		if (Z_TYPE_P(code) == IS_NULL) {
 			ZVAL_LONG(code, 0);
 		}
 
 		PHALCON_CALL_FUNCTION(&prepared, "strtr", message_str, pairs);
 
-		message = phalcon_validation_message_construct_helper(prepared, attribute, "Url", code TSRMLS_CC);
+		message = phalcon_validation_message_construct_helper(prepared, attribute, "Url", code);
 		Z_DELREF_P(message);
 	
 		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);

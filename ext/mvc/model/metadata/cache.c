@@ -76,10 +76,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Cache){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Cache, mvc_model_metadata_cache, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_cache_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_metadata_cache_ce, SL("_lifetime"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_metadata_cache_ce, SL("_cache"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_metadata_cache_ce, SL("_lifetime"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_metadata_cache_ce, SL("_cache"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_metadata_cache_ce TSRMLS_CC, 1, phalcon_mvc_model_metadatainterface_ce);
+	zend_class_implements(phalcon_mvc_model_metadata_cache_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
 	return SUCCESS;
 }
@@ -112,16 +112,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 		ZVAL_STRING(service, "cache", 1);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_cache"), service TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_cache"), service);
 
 	if (!phalcon_array_isset_string_fetch(&lifetime, options, SS("lifetime"))) {
 		PHALCON_INIT_VAR(lifetime);
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
 
-	phalcon_update_property_empty_array(this_ptr, SL("_metaData") TSRMLS_CC);
+	phalcon_update_property_empty_array(this_ptr, SL("_metaData"));
 
 	PHALCON_MM_RESTORE();
 }
@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 
 		PHALCON_CALL_METHOD(&tmp, dependency_injector, "getshared", cache);
 
-		phalcon_update_property_this(this_ptr, SL("_cache"), tmp TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_cache"), tmp);
 
 		RETURN_CTOR(tmp);
 	}

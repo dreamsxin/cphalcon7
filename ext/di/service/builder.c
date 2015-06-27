@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 		 * Build the instance overriding the definition constructor parameters
 		 */
 		PHALCON_INIT_VAR(instance);
-		if (phalcon_create_instance_params(instance, class_name, parameters TSRMLS_CC) == FAILURE) {
+		if (phalcon_create_instance_params(instance, class_name, parameters) == FAILURE) {
 			RETURN_MM();
 		}
 	} else {
@@ -296,12 +296,12 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 * Create the instance based on the parameters
 			 */
 			PHALCON_INIT_NVAR(instance);
-			if (phalcon_create_instance_params(instance, class_name, build_arguments TSRMLS_CC) == FAILURE) {
+			if (phalcon_create_instance_params(instance, class_name, build_arguments) == FAILURE) {
 				RETURN_MM();
 			}
 		} else {
 			PHALCON_INIT_NVAR(instance);
-			if (phalcon_create_instance(instance, class_name TSRMLS_CC) == FAILURE) {
+			if (phalcon_create_instance(instance, class_name) == FAILURE) {
 				RETURN_MM();
 			}
 		}
@@ -374,7 +374,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 					return;
 				}
 	
-				if (phalcon_fast_count_ev(arguments TSRMLS_CC)) {
+				if (phalcon_fast_count_ev(arguments)) {
 					/** 
 					 * Resolve the constructor parameters
 					 */
@@ -475,7 +475,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			/** 
 			 * Update the public property
 			 */
-			phalcon_update_property_zval_zval(instance, property_name, value TSRMLS_CC);
+			phalcon_update_property_zval_zval(instance, property_name, value);
 	
 			zend_hash_move_forward_ex(ah1, &hp1);
 		}

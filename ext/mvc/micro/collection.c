@@ -92,12 +92,12 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Micro_Collection){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Micro, Collection, mvc_micro_collection, phalcon_mvc_micro_collection_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_micro_collection_ce, SL("_prefix"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_micro_collection_ce, SL("_lazy"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_micro_collection_ce, SL("_handler"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_micro_collection_ce, SL("_handlers"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_micro_collection_ce, SL("_prefix"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_micro_collection_ce, SL("_lazy"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_micro_collection_ce, SL("_handler"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_micro_collection_ce, SL("_handlers"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_micro_collection_ce TSRMLS_CC, 1, phalcon_mvc_micro_collectioninterface_ce);
+	zend_class_implements(phalcon_mvc_micro_collection_ce, 1, phalcon_mvc_micro_collectioninterface_ce);
 
 	return SUCCESS;
 }
@@ -110,12 +110,12 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Micro_Collection){
  * @param mixed $handler
  * @param string $name
  */
-void phalcon_mvc_collection_addmap(zval *this_ptr, const char *method, zval *route_pattern, zval *handler, zval *name TSRMLS_DC)
+void phalcon_mvc_collection_addmap(zval *this_ptr, const char *method, zval *route_pattern, zval *handler, zval *name)
 {
 	zval *handler_definition;
 	zval *z_method;
 
-	MAKE_STD_ZVAL(z_method);
+	PHALCON_ALLOC_GHOST_ZVAL(z_method);
 	if (method) {
 		PHALCON_ZVAL_MAYBE_INTERNED_STRING(z_method, method);
 	}
@@ -139,7 +139,7 @@ void phalcon_mvc_collection_addmap(zval *this_ptr, const char *method, zval *rou
 		add_next_index_null(handler_definition);
 	}
 
-	phalcon_update_property_array_append(this_ptr, SL("_handlers"), handler_definition TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_handlers"), handler_definition);
 }
 
 /**
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setPrefix){
 
 	phalcon_fetch_params(0, 1, 0, &prefix);
 	
-	phalcon_update_property_this(this_ptr, SL("_prefix"), prefix TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_prefix"), prefix);
 	RETURN_THISW();
 }
 
@@ -197,8 +197,8 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setHandler){
 		lazy = PHALCON_GLOBAL(z_false);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_handler"), handler TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_lazy"), lazy TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_handler"), handler);
+	phalcon_update_property_this(this_ptr, SL("_lazy"), lazy);
 	RETURN_THISW();
 }
 
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setLazy){
 
 	phalcon_fetch_params(0, 1, 0, &lazy);
 	
-	phalcon_update_property_this(this_ptr, SL("_lazy"), lazy TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lazy"), lazy);
 	RETURN_THISW();
 }
 
@@ -254,7 +254,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, map){
 
 	phalcon_fetch_params(0, 2, 1, &route_pattern, &handler, &name);
 	
-	phalcon_mvc_collection_addmap(getThis(), NULL, route_pattern, handler, name TSRMLS_CC);
+	phalcon_mvc_collection_addmap(getThis(), NULL, route_pattern, handler, name);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, get){
 
 	phalcon_fetch_params(0, 2, 1, &route_pattern, &handler, &name);
 	
-	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_GET, route_pattern, handler, name TSRMLS_CC);
+	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_GET, route_pattern, handler, name);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, post){
 
 	phalcon_fetch_params(0, 2, 0, &route_pattern, &handler, &name);
 	
-	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_POST, route_pattern, handler, name TSRMLS_CC);
+	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_POST, route_pattern, handler, name);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -308,7 +308,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, put){
 
 	phalcon_fetch_params(0, 2, 0, &route_pattern, &handler, &name);
 	
-	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_PUT, route_pattern, handler, name TSRMLS_CC);
+	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_PUT, route_pattern, handler, name);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, patch){
 
 	phalcon_fetch_params(0, 2, 0, &route_pattern, &handler, &name);
 	
-	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_PATCH, route_pattern, handler, name TSRMLS_CC);
+	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_PATCH, route_pattern, handler, name);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -344,7 +344,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, head){
 
 	phalcon_fetch_params(0, 2, 0, &route_pattern, &handler, &name);
 	
-	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_HEAD, route_pattern, handler, name TSRMLS_CC);
+	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_HEAD, route_pattern, handler, name);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -362,7 +362,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, delete){
 
 	phalcon_fetch_params(0, 2, 0, &route_pattern, &handler, &name);
 	
-	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_DELETE, route_pattern, handler, name TSRMLS_CC);
+	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_DELETE, route_pattern, handler, name);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -380,6 +380,6 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, options){
 
 	phalcon_fetch_params(0, 2, 0, &route_pattern, &handler, &name);
 	
-	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_OPTIONS, route_pattern, handler, name TSRMLS_CC);
+	phalcon_mvc_collection_addmap(getThis(), phalcon_interned_OPTIONS, route_pattern, handler, name);
 	RETURN_ZVAL(getThis(), 1, 0);
 }

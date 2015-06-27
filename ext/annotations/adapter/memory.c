@@ -60,9 +60,9 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Memory){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Annotations\\Adapter, Memory, annotations_adapter_memory, phalcon_annotations_adapter_ce, phalcon_annotations_adapter_memory_method_entry, 0);
 
-	zend_declare_property_null(phalcon_annotations_adapter_memory_ce, SL("_data"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_annotations_adapter_memory_ce, SL("_data"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_annotations_adapter_memory_ce TSRMLS_CC, 1, phalcon_annotations_adapterinterface_ce);
+	zend_class_implements(phalcon_annotations_adapter_memory_ce, 1, phalcon_annotations_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -104,8 +104,8 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, write){
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 	
-	MAKE_STD_ZVAL(lowercased_key);
+	PHALCON_ALLOC_GHOST_ZVAL(lowercased_key);
 	phalcon_fast_strtolower(lowercased_key, key);
-	phalcon_update_property_array(this_ptr, SL("_data"), lowercased_key, data TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_data"), lowercased_key, data);
 	zval_ptr_dtor(&lowercased_key);
 }

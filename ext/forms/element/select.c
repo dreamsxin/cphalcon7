@@ -70,9 +70,9 @@ PHALCON_INIT_CLASS(Phalcon_Forms_Element_Select){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Forms\\Element, Select, forms_element_select, phalcon_forms_element_ce, phalcon_forms_element_select_method_entry, 0);
 
-	zend_declare_property_null(phalcon_forms_element_select_ce, SL("_optionsValues"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_forms_element_select_ce, SL("_optionsValues"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_forms_element_select_ce TSRMLS_CC, 1, phalcon_forms_elementinterface_ce);
+	zend_class_implements(phalcon_forms_element_select_ce, 1, phalcon_forms_elementinterface_ce);
 
 	return SUCCESS;
 }
@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, __construct){
 		attributes = PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_optionsValues"), options TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_optionsValues"), options);
 
 	PHALCON_CALL_PARENT(NULL, phalcon_forms_element_select_ce, this_ptr, "__construct", name, attributes);
 
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, setOptions){
 
 	phalcon_fetch_params(0, 0, 1, 0, &options);
 	
-	phalcon_update_property_this(this_ptr, SL("_optionsValues"), options TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_optionsValues"), options);
 	RETURN_THISW();
 }
 
@@ -154,11 +154,11 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 		MAKE_COPY_ZVAL(option, tmp);
 	}
 	else {
-		add_function(tmp, *option, values TSRMLS_CC);
+		add_function(tmp, *option, values);
 	}
 
 	Z_SET_REFCOUNT_P(tmp, 0);
-	phalcon_update_property_this(getThis(), SL("_optionsValues"), tmp TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_optionsValues"), tmp);
 	RETURN_THISW();
 }
 

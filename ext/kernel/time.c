@@ -44,7 +44,7 @@ void phalcon_time(zval *return_value)
 	RETURN_LONG(time(NULL));
 }
 
-void phalcon_microtime(zval *return_value, zval *get_as_float TSRMLS_DC)
+void phalcon_microtime(zval *return_value, zval *get_as_float)
 {
 	struct timeval tp = {0};
 	char ret[100];

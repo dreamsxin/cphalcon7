@@ -27,7 +27,7 @@
 #include <php.h>
 #include <Zend/zend.h>
 
-extern int phalcon_assert_class(zval *object, char *class_name TSRMLS_DC);
+extern int phalcon_assert_class(zval *object, char *class_name);
 
 #endif
 #endif /* PHALCON_KERNEL_ASSERT_H */

@@ -120,7 +120,7 @@ PHALCON_INIT_CLASS(Phalcon_Forms_Manager){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Forms, Manager, forms_manager, phalcon_forms_manager_method_entry, 0);
 
-	zend_declare_property_null(phalcon_forms_manager_ce, SL("_forms"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_forms_manager_ce, SL("_forms"), ZEND_ACC_PROTECTED);
 
 	phalcon_forms_manager_object_handlers                = *zend_get_std_object_handlers();
 	phalcon_forms_manager_object_handlers.read_dimension = phalcon_forms_manager_read_dimension;
@@ -134,7 +134,7 @@ PHP_METHOD(Phalcon_Forms_Manager, __construct)
 
 	PHALCON_ALLOC_GHOST_ZVAL(z);
 	array_init(z);
-	phalcon_update_property_this(getThis(), SL("_forms"), z TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_forms"), z);
 
 	Z_OBJ_HT_P(getThis()) = &phalcon_forms_manager_object_handlers;
 }
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Forms_Manager, create){
 	object_init_ex(form, phalcon_forms_form_ce);
 	PHALCON_CALL_METHOD(NULL, form, "__construct", entity);
 	
-	phalcon_update_property_array(this_ptr, SL("_forms"), name, form TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_forms"), name, form);
 	
 	RETURN_CTOR(form);
 }
@@ -229,6 +229,6 @@ PHP_METHOD(Phalcon_Forms_Manager, set){
 	PHALCON_ENSURE_IS_STRING(name);
 	PHALCON_VERIFY_CLASS_EX(*form, phalcon_forms_form_ce, phalcon_forms_exception_ce, 0);
 	
-	phalcon_update_property_array(this_ptr, SL("_forms"), *name, *form TSRMLS_CC);
+	phalcon_update_property_array(this_ptr, SL("_forms"), *name, *form);
 	RETURN_THISW();
 }

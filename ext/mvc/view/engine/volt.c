@@ -102,10 +102,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Volt){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\View\\Engine, Volt, mvc_view_engine_volt, phalcon_mvc_view_engine_ce, phalcon_mvc_view_engine_volt_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_view_engine_volt_ce, SL("_options"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_view_engine_volt_ce, SL("_compiler"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_view_engine_volt_ce, SL("_options"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_engine_volt_ce, SL("_compiler"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_view_engine_volt_ce TSRMLS_CC, 1, phalcon_mvc_view_engineinterface_ce);
+	zend_class_implements(phalcon_mvc_view_engine_volt_ce, 1, phalcon_mvc_view_engineinterface_ce);
 
 	return SUCCESS;
 }
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, setOptions){
 		PHALCON_CALL_METHODW(NULL, compiler, "setoptions", options);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_options"), options);
 	
 }
 
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getCompiler){
 			PHALCON_CALL_METHOD(NULL, compiler, "setoptions", options);
 		}
 	
-		phalcon_update_property_this(this_ptr, SL("_compiler"), compiler TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_compiler"), compiler);
 	}
 	
 	RETURN_CCTOR(compiler);
@@ -255,14 +255,14 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 	}
 	
 	convert_to_string(compiled_template_path);
-	if (phalcon_require(Z_STRVAL_P(compiled_template_path) TSRMLS_CC) == FAILURE) {
+	if (phalcon_require(Z_STRVAL_P(compiled_template_path)) == FAILURE) {
 		RETVAL_FALSE;
 		RETURN_MM();
 	}
 
 	if (clean) {
 		PHALCON_INIT_VAR(contents);
-		phalcon_ob_get_contents(contents TSRMLS_CC);
+		phalcon_ob_get_contents(contents);
 	
 		view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, view, "setcontent", contents);
@@ -285,8 +285,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, length){
 	phalcon_fetch_params(0, 0, 1, 0, &item);
 	
 	if (Z_TYPE_P(item) == IS_OBJECT || Z_TYPE_P(item) == IS_ARRAY) {
-		phalcon_fast_count(return_value, item TSRMLS_CC);
-	} else if (phalcon_function_exists_ex(SS("mb_strlen") TSRMLS_CC) == SUCCESS) {
+		phalcon_fast_count(return_value, item);
+	} else if (phalcon_function_exists_ex(SS("mb_strlen")) == SUCCESS) {
 		PHALCON_RETURN_CALL_FUNCTIONW("mb_strlen", item);
 	} else {
 		phalcon_fast_strlen(return_value, item);
@@ -307,11 +307,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, isIncluded){
 	phalcon_fetch_params(0, 0, 2, 0, &needle, &haystack);
 	
 	if (Z_TYPE_P(haystack) == IS_ARRAY) { 
-		RETURN_BOOL(phalcon_fast_in_array(needle, haystack TSRMLS_CC));
+		RETURN_BOOL(phalcon_fast_in_array(needle, haystack));
 	}
 
 	if (Z_TYPE_P(haystack) == IS_STRING) {
-		if (phalcon_function_exists_ex(SS("mb_strpos") TSRMLS_CC) == SUCCESS) {
+		if (phalcon_function_exists_ex(SS("mb_strpos")) == SUCCESS) {
 			PHALCON_RETURN_CALL_FUNCTIONW("mb_strpos", haystack, needle);
 			return;
 		}
@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
 	/** 
 	 * Fallback to mb_convert_encoding
 	 */
-	if (phalcon_function_exists_ex(SS("mb_convert_encoding") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("mb_convert_encoding")) == SUCCESS) {
 		PHALCON_RETURN_CALL_FUNCTION("mb_convert_encoding", text, from, to);
 		RETURN_MM();
 	}
@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
 	/** 
 	 * Fallback to iconv
 	 */
-	if (phalcon_function_exists_ex(SS("iconv") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("iconv")) == SUCCESS) {
 		PHALCON_RETURN_CALL_FUNCTION("iconv", from, to, text);
 		RETURN_MM();
 	}
@@ -409,7 +409,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 		array_init(slice);
 		if (Z_TYPE_P(end) == IS_NULL) {
 			PHALCON_INIT_VAR(length);
-			phalcon_fast_count(length, value TSRMLS_CC);
+			phalcon_fast_count(length, value);
 		} else {
 			PHALCON_CPY_WRT(length, end);
 		}
@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 	/** 
 	 * Use mb_substr if available
 	 */
-	if (phalcon_function_exists_ex(SS("mb_substr") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_function_exists_ex(SS("mb_substr")) == SUCCESS) {
 		if (Z_TYPE_P(length) != IS_NULL) {
 			PHALCON_RETURN_CALL_FUNCTION("mb_substr", value, start, length);
 			RETURN_MM();

@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	phalcon_fetch_params(1, 2, 0, &model, &dependency_injector);
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 0 TSRMLS_CC);
+	phalcon_get_class(class_name, model, 0);
 
 	PHALCON_CALL_METHOD(&schema, model, "getschema");
 	PHALCON_CALL_METHOD(&table, model, "getsource");
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	 * Try to describe the table
 	 */
 	PHALCON_CALL_METHOD(&columns, read_connection, "describecolumns", table, schema);
-	if (!phalcon_fast_count_ev(columns TSRMLS_CC)) {
+	if (!phalcon_fast_count_ev(columns)) {
 		if (zend_is_true(schema)) {
 			PHALCON_INIT_NVAR(complete_table);
 			PHALCON_CONCAT_VSV(complete_table, schema, "\".\"", table);
@@ -318,7 +318,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 	/** 
 	 * Check for a columnMap() method on the model
 	 */
-	if (phalcon_method_exists_ex(model, SS("columnmap") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(model, SS("columnmap")) == SUCCESS) {
 	
 		PHALCON_CALL_METHOD(&ordered_column_map, model, "columnmap");
 		if (Z_TYPE_P(ordered_column_map) != IS_ARRAY) { 

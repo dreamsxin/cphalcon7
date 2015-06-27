@@ -55,7 +55,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Memory){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Memory, mvc_model_metadata_memory, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_memory_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_metadata_memory_ce TSRMLS_CC, 1, phalcon_mvc_model_metadatainterface_ce);
+	zend_class_implements(phalcon_mvc_model_metadata_memory_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
 	return SUCCESS;
 }
@@ -77,7 +77,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memory, __construct){
 	
 	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
 	array_init(empty_array);
-	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array);
 }
 
 /**

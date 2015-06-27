@@ -74,10 +74,10 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter_Line){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Logger\\Formatter, Line, logger_formatter_line, phalcon_logger_formatter_ce, phalcon_logger_formatter_line_method_entry, 0);
 
-	zend_declare_property_string(phalcon_logger_formatter_line_ce, SL("_dateFormat"), "D, d M y H:i:s O", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_logger_formatter_line_ce, SL("_format"), "[%date%][%type%] %message%", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_logger_formatter_line_ce, SL("_dateFormat"), "D, d M y H:i:s O", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_logger_formatter_line_ce, SL("_format"), "[%date%][%type%] %message%", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_logger_formatter_line_ce TSRMLS_CC, 1, phalcon_logger_formatterinterface_ce);
+	zend_class_implements(phalcon_logger_formatter_line_ce, 1, phalcon_logger_formatterinterface_ce);
 
 	return SUCCESS;
 }
@@ -95,11 +95,11 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, __construct){
 	phalcon_fetch_params(0, 0, 2, &format, &date_format);
 	
 	if (format && Z_TYPE_P(format) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_format"), format TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_format"), format);
 	}
 
 	if (date_format && Z_TYPE_P(date_format) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_dateFormat"), date_format TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_dateFormat"), date_format);
 	}
 }
 
@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, setFormat){
 
 	phalcon_fetch_params(0, 1, 0, &format);
 	
-	phalcon_update_property_this(this_ptr, SL("_format"), format TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_format"), format);
 	
 }
 
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, setDateFormat){
 
 	phalcon_fetch_params(0, 1, 0, &date);
 	
-	phalcon_update_property_this(this_ptr, SL("_dateFormat"), date TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_dateFormat"), date);
 	
 }
 
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 		date_format = phalcon_fetch_nproperty_this(this_ptr, SL("_dateFormat"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(date);
-		phalcon_date(date, date_format, timestamp TSRMLS_CC);
+		phalcon_date(date, date_format, timestamp);
 	
 		PHALCON_INIT_VAR(date_wildcard);
 		ZVAL_STRING(date_wildcard, "%date%", 1);

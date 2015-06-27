@@ -68,7 +68,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Yaml){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Config\\Adapter, Yaml, config_adapter_yaml, phalcon_config_adapter_ce, phalcon_config_adapter_yaml_method_entry, 0);
 
-	zend_class_implements(phalcon_config_adapter_yaml_ce TSRMLS_CC, 1, phalcon_config_adapterinterface_ce);
+	zend_class_implements(phalcon_config_adapter_yaml_ce, 1, phalcon_config_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -94,7 +94,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 	if (zend_is_true(absolute_path)) {
 		PHALCON_CPY_WRT(config_dir_path, file_path);
 	} else {
-		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath") TSRMLS_CC);
+		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
 		PHALCON_INIT_VAR(config_dir_path);
 		PHALCON_CONCAT_VV(config_dir_path, base_path, file_path);
@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 	PHALCON_CALL_FUNCTION(&array, "yaml_parse_file", config_dir_path);
 
 	if (Z_TYPE_P(array) == IS_ARRAY) {
-		phalcon_config_construct_internal(getThis(), array TSRMLS_CC);
+		phalcon_config_construct_internal(getThis(), array);
 	}
 
 	RETURN_THIS();

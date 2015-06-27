@@ -111,9 +111,9 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Memcache)
 {
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, Memcache, cache_backend_memcache, phalcon_cache_backend_ce, phalcon_cache_backend_memcache_method_entry, 0);
 
-	zend_declare_property_null(phalcon_cache_backend_memcache_ce, SL("_memcache"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_cache_backend_memcache_ce, SL("_memcache"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_cache_backend_memcache_ce TSRMLS_CC, 1, phalcon_cache_backendinterface_ce);
+	zend_class_implements(phalcon_cache_backend_memcache_ce, 1, phalcon_cache_backendinterface_ce);
 
 	return SUCCESS;
 }
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, _connect)
 
 	PHALCON_INIT_VAR(memcache);
 	object_init_ex(memcache, ce0);
-	if (phalcon_has_constructor(memcache TSRMLS_CC)) {
+	if (phalcon_has_constructor(memcache)) {
 		PHALCON_CALL_METHOD(NULL, memcache, "__construct");
 	}
 	
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, _connect)
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_memcache"), memcache TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_memcache"), memcache);
 	RETURN_CTOR(memcache);
 }
 
@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, get){
 	
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key);
 	
 	PHALCON_CALL_METHOD(&cached_content, memcache, "get", prefixed_key);
 	if (PHALCON_IS_FALSE(cached_content)) {
@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, save){
 		zend_print_zval(cached_content, 0);
 	}
 	
-	phalcon_update_property_bool(this_ptr, SL("_started"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_started"), 0);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -725,7 +725,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, setTrackingKey)
 	SEPARATE_ZVAL(options);
 
 	phalcon_array_update_string(&options, SL("statsKey"), *key, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_options"), options TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();
 }

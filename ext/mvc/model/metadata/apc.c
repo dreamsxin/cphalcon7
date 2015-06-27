@@ -71,10 +71,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Apc){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Apc, mvc_model_metadata_apc, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_apc_method_entry, 0);
 
-	zend_declare_property_string(phalcon_mvc_model_metadata_apc_ce, SL("_prefix"), "", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_mvc_model_metadata_apc_ce, SL("_ttl"), 172800, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_mvc_model_metadata_apc_ce, SL("_prefix"), "", ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_model_metadata_apc_ce, SL("_ttl"), 172800, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_metadata_apc_ce TSRMLS_CC, 1, phalcon_mvc_model_metadatainterface_ce);
+	zend_class_implements(phalcon_mvc_model_metadata_apc_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
 	return SUCCESS;
 }
@@ -94,17 +94,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, __construct){
 		zval *prefix, *ttl;
 
 		if (phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
-			phalcon_update_property_this(this_ptr, SL("_prefix"), prefix TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_prefix"), prefix);
 		}
 
 		if (phalcon_array_isset_string_fetch(&ttl, options, SS("lifetime"))) {
-			phalcon_update_property_this(this_ptr, SL("_ttl"), ttl TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_ttl"), ttl);
 		}
 	}
 	
 	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
 	array_init(empty_array);
-	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array);
 }
 
 /**
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset)
 			zval key = phalcon_get_current_key_w(ht, &hp);
 
 			PHALCON_INIT_NVAR(real_key);
-			phalcon_concat_svsv(&real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0 TSRMLS_CC);
+			phalcon_concat_svsv(&real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0);
 			PHALCON_CALL_FUNCTION(NULL, "apc_delete", real_key);
 		}
 	}

@@ -73,15 +73,15 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Cache, Backend, cache_backend, phalcon_cache_backend_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_cache_backend_ce, SL("_frontend"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cache_backend_ce, SL("_options"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_cache_backend_ce, SL("_prefix"), "", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_cache_backend_ce, SL("_lastKey"), "", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cache_backend_ce, SL("_lastLifetime"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_cache_backend_ce, SL("_fresh"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_bool(phalcon_cache_backend_ce, SL("_started"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_cache_backend_ce, SL("_frontend"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_backend_ce, SL("_options"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_cache_backend_ce, SL("_prefix"), "", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_cache_backend_ce, SL("_lastKey"), "", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_backend_ce, SL("_lastLifetime"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_cache_backend_ce, SL("_fresh"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_cache_backend_ce, SL("_started"), 0, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_cache_backend_ce TSRMLS_CC, 1, phalcon_cache_backendinterface_ce);
+	zend_class_implements(phalcon_cache_backend_ce, 1, phalcon_cache_backendinterface_ce);
 
 	return SUCCESS;
 }
@@ -105,13 +105,13 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 		 * A common option is the prefix
 		 */
 		if (phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
-			phalcon_update_property_this(this_ptr, SL("_prefix"), prefix TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_prefix"), prefix);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_options"), options);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_frontend"), frontend TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_frontend"), frontend);
 }
 
 /**
@@ -151,14 +151,14 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 		fresh = PHALCON_GLOBAL(z_false);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_fresh"), fresh TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_started"), PHALCON_GLOBAL(z_true) TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_fresh"), fresh);
+	phalcon_update_property_this(this_ptr, SL("_started"), PHALCON_GLOBAL(z_true));
 	
 	/** 
 	 * Update the last lifetime to be used in save()
 	 */
 	if (Z_TYPE_P(lifetime) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_lastLifetime"), lifetime TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_lastLifetime"), lifetime);
 	}
 
 	RETURN_MM();
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Cache_Backend, stop){
 		PHALCON_MM_RESTORE();
 	}
 
-	phalcon_update_property_bool(this_ptr, SL("_started"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_started"), 0);
 }
 
 /**
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Cache_Backend, setLastKey){
 
 	phalcon_fetch_params(0, 1, 0, &last_key);
 	
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), last_key TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lastKey"), last_key);
 	
 }
 

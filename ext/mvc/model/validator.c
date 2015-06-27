@@ -62,10 +62,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model, Validator, mvc_model_validator, phalcon_mvc_model_validator_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_mvc_model_validator_ce, SL("_options"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_validator_ce, SL("_messages"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_validator_ce, SL("_options"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_validator_ce, SL("_messages"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_validator_ce TSRMLS_CC, 1, phalcon_mvc_model_validatorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_validator_ce, 1, phalcon_mvc_model_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, __construct){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "$options argument must be an Array");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_options"), options TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_options"), options);
 	
 }
 
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 		int len;
 
 		PHALCON_INIT_VAR(t);
-		phalcon_get_class(t, this_ptr, 0 TSRMLS_CC);
+		phalcon_get_class(t, this_ptr, 0);
 
 		assert(Z_TYPE_P(t) == IS_STRING);
 
@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 	object_init_ex(model_message, phalcon_mvc_model_message_ce);
 	PHALCON_CALL_METHOD(NULL, model_message, "__construct", message, field, t, code);
 	
-	phalcon_update_property_array_append(this_ptr, SL("_messages"), model_message TSRMLS_CC);
+	phalcon_update_property_array_append(this_ptr, SL("_messages"), model_message);
 	
 	PHALCON_MM_RESTORE();
 }

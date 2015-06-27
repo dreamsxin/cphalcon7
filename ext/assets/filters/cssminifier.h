@@ -29,6 +29,6 @@ SOFTWARE.
 
 #include <Zend/zend.h>
 
-int phalcon_cssmin(zval *return_value, zval *style TSRMLS_DC);
+int phalcon_cssmin(zval *return_value, zval *style);
 
 #endif /* PHALCON_ASSETS_FILTERS_CSSMINIFIER_H */

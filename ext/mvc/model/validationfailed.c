@@ -58,8 +58,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_ValidationFailed){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model, ValidationFailed, mvc_model_validationfailed, phalcon_mvc_model_exception_ce, phalcon_mvc_model_validationfailed_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_validationfailed_ce, SL("_model"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_validationfailed_ce, SL("_messages"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_validationfailed_ce, SL("_model"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_validationfailed_ce, SL("_messages"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -79,7 +79,7 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 
 	phalcon_fetch_params(1, 2, 0, &model, &validation_messages);
 	
-	if (phalcon_fast_count_ev(validation_messages TSRMLS_CC)) {
+	if (phalcon_fast_count_ev(validation_messages)) {
 		/** 
 		 * Get the first message in the array
 		 */
@@ -95,8 +95,8 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 		ZVAL_STRING(message_str, "Validation failed", 1);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_model"), model TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_messages"), validation_messages TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_model"), model);
+	phalcon_update_property_this(this_ptr, SL("_messages"), validation_messages);
 
 	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_validationfailed_ce, this_ptr, "__construct", message_str);
 

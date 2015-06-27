@@ -77,10 +77,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset_Complex){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Resultset, Complex, mvc_model_resultset_complex, phalcon_mvc_model_resultset_ce, phalcon_mvc_model_resultset_complex_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_resultset_complex_ce, SL("_sourceModel"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_model_resultset_complex_ce, SL("_columnTypes"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_model_resultset_complex_ce, SL("_sourceModel"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_resultset_complex_ce, SL("_columnTypes"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_resultset_complex_ce TSRMLS_CC, 1, phalcon_mvc_model_resultsetinterface_ce);
+	zend_class_implements(phalcon_mvc_model_resultset_complex_ce, 1, phalcon_mvc_model_resultsetinterface_ce);
 
 	return SUCCESS;
 }
@@ -112,27 +112,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
 	/** 
 	 * Column types, tell the resultset how to build the result
 	 */
-	phalcon_update_property_this(this_ptr, SL("_columnTypes"), columns_types TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_columnTypes"), columns_types);
 
 	/** 
 	 * Valid resultsets are Phalcon\Db\ResultInterface instances
 	 * FIXME: or Phalcon\Db\Result\Pdo?
 	 */
-	phalcon_update_property_this(this_ptr, SL("_result"), result TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_result"), result);
 
 	/** 
 	 * Update the related cache if any
 	 */
 	if (Z_TYPE_P(cache) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_cache"), cache TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_cache"), cache);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_sourceModel"), source_model TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_sourceModel"), source_model);
 
 	/** 
 	 * Resultsets type 1 are traversed one-by-one
 	 */
-	phalcon_update_property_long(this_ptr, SL("_type"), PHALCON_MVC_MODEL_RESULTSET_TYPE_PARTIAL TSRMLS_CC);
+	phalcon_update_property_long(this_ptr, SL("_type"), PHALCON_MVC_MODEL_RESULTSET_TYPE_PARTIAL);
 
 	/** 
 	 * If the database result is an object, change it to fetch assoc
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							 * Get the base instance
 							 */
 							if (!phalcon_array_isset_string_fetch(&instance, column, SS("instance"))) {
-								php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Undefined index: instance");
+								php_error_docref(NULL, E_NOTICE, "Undefined index: instance");
 								instance = PHALCON_GLOBAL(z_null);
 							}
 
@@ -397,7 +397,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 						break;
 
 					default:
-						phalcon_update_property_zval_zval(active_row, attribute, value TSRMLS_CC);
+						phalcon_update_property_zval_zval(active_row, attribute, value);
 						break;
 
 				}
@@ -408,12 +408,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			/** 
 			 * Store the generated row in this_ptr->activeRow to be retrieved by 'current'
 			 */
-			phalcon_update_property_this(this_ptr, SL("_activeRow"), active_row TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_activeRow"), active_row);
 		} else {
 			/** 
 			 * The row is already built so we just assign it to the activeRow
 			 */
-			phalcon_update_property_this(this_ptr, SL("_activeRow"), row TSRMLS_CC);
+			phalcon_update_property_this(this_ptr, SL("_activeRow"), row);
 		}
 		RETURN_MM_TRUE;
 	}
@@ -421,7 +421,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 	/** 
 	 * There are no results to retrieve so we update this_ptr->activeRow as false
 	 */
-	phalcon_update_property_bool(this_ptr, SL("_activeRow"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_activeRow"), 0);
 	RETURN_MM_FALSE;
 }
 
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, toArray){
 		}
 
 		PHALCON_CALL_METHOD(&current, this_ptr, "current");
-		if (Z_TYPE_P(current) == IS_OBJECT && phalcon_method_exists_ex(current, SS("toarray") TSRMLS_CC) == SUCCESS) {
+		if (Z_TYPE_P(current) == IS_OBJECT && phalcon_method_exists_ex(current, SS("toarray")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&arr, current, "toarray");
 			phalcon_array_append(&return_value, arr, 0);
 		} else {
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 	phalcon_array_update_string(&data, SL("hydrateMode"), hydrate_mode, PH_COPY);
 
 	PHALCON_INIT_VAR(serialized);
-	phalcon_serialize(serialized, &data TSRMLS_CC);
+	phalcon_serialize(serialized, &data);
 
 	/** 
 	 * Avoid return bad serialized data
@@ -514,10 +514,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, unserialize){
 
 	phalcon_fetch_params(1, 1, 0, &data);
 
-	phalcon_update_property_long(this_ptr, SL("_type"), 0 TSRMLS_CC);
+	phalcon_update_property_long(this_ptr, SL("_type"), 0);
 
 	PHALCON_INIT_VAR(resultset);
-	phalcon_unserialize(resultset, data TSRMLS_CC);
+	phalcon_unserialize(resultset, data);
 	if (Z_TYPE_P(resultset) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid serialization data");
 		return;
@@ -525,19 +525,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, unserialize){
 
 	PHALCON_OBS_VAR(rows);
 	phalcon_array_fetch_string(&rows, resultset, SL("rows"), PH_NOISY);
-	phalcon_update_property_this(this_ptr, SL("_rows"), rows TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_rows"), rows);
 
 	PHALCON_OBS_VAR(cache);
 	phalcon_array_fetch_string(&cache, resultset, SL("cache"), PH_NOISY);
-	phalcon_update_property_this(this_ptr, SL("_cache"), cache TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_cache"), cache);
 
 	PHALCON_OBS_VAR(column_types);
 	phalcon_array_fetch_string(&column_types, resultset, SL("columnTypes"), PH_NOISY);
-	phalcon_update_property_this(this_ptr, SL("_columnTypes"), column_types TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_columnTypes"), column_types);
 
 	PHALCON_OBS_VAR(hydrate_mode);
 	phalcon_array_fetch_string(&hydrate_mode, resultset, SL("hydrateMode"), PH_NOISY);
-	phalcon_update_property_this(this_ptr, SL("_hydrateMode"), hydrate_mode TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_hydrateMode"), hydrate_mode);
 
 	PHALCON_MM_RESTORE();
 }

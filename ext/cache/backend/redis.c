@@ -112,10 +112,10 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Redis)
 {
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, Redis, cache_backend_redis, phalcon_cache_backend_ce, phalcon_cache_backend_redis_method_entry, 0);
 
-	zend_declare_property_null(phalcon_cache_backend_redis_ce, SL("_redis"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_cache_backend_redis_ce, SL("_auth"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_cache_backend_redis_ce, SL("_redis"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_backend_redis_ce, SL("_auth"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_cache_backend_redis_ce TSRMLS_CC, 1, phalcon_cache_backendinterface_ce);
+	zend_class_implements(phalcon_cache_backend_redis_ce, 1, phalcon_cache_backendinterface_ce);
 
 	return SUCCESS;
 }
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 
 	PHALCON_INIT_VAR(redis);
 	object_init_ex(redis, ce0);
-	if (phalcon_has_constructor(redis TSRMLS_CC)) {
+	if (phalcon_has_constructor(redis)) {
 		PHALCON_CALL_METHOD(NULL, redis, "__construct");
 	}
 	
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 		}
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_redis"), redis TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_redis"), redis);
 	RETURN_CTOR(redis);
 }
 
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, get){
 	
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_SVV(prefixed_key, "_PHCR", prefix, key_name);
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key);
 	
 	PHALCON_CALL_METHOD(&cached_content, redis, "get", prefixed_key);
 	if (PHALCON_IS_FALSE(cached_content)) {
@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 		zend_print_zval(cached_content, 0);
 	}
 	
-	phalcon_update_property_bool(this_ptr, SL("_started"), 0 TSRMLS_CC);
+	phalcon_update_property_bool(this_ptr, SL("_started"), 0);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -695,7 +695,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, setTrackingKey)
 	SEPARATE_ZVAL(options);
 
 	phalcon_array_update_string(&options, SL("statsKey"), *key, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_options"), options TSRMLS_CC);
+	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();
 }

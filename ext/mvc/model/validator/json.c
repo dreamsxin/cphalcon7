@@ -74,7 +74,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Json){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Validator, Json, mvc_model_validator_json, phalcon_mvc_model_validator_ce, phalcon_mvc_model_validator_json_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_validator_json_ce TSRMLS_CC, 1, phalcon_mvc_model_validatorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_validator_json_ce, 1, phalcon_mvc_model_validatorinterface_ce);
 
 	return SUCCESS;
 }

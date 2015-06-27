@@ -31,7 +31,7 @@
 /**
  * Returns an iterator from the object
  */
-zend_object_iterator *phalcon_get_iterator(zval *iterator TSRMLS_DC) {
+zend_object_iterator *phalcon_get_iterator(zval *iterator) {
 
 	zend_class_entry *ce;
 	zend_object_iterator *it;
@@ -41,7 +41,7 @@ zend_object_iterator *phalcon_get_iterator(zval *iterator TSRMLS_DC) {
 	}
 
 	ce = Z_OBJCE_P(iterator);
-	it = ce->get_iterator(ce, iterator, 0 TSRMLS_CC);
+	it = ce->get_iterator(ce, iterator, 0);
 	if (!it || EG(exception)) {
 		return NULL;
 	}

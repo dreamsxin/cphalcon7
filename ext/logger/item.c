@@ -58,10 +58,10 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Item){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Logger, Item, logger_item, phalcon_logger_item_method_entry, 0);
 
-	zend_declare_property_null(phalcon_logger_item_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_logger_item_ce, SL("_message"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_logger_item_ce, SL("_time"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_logger_item_ce, SL("_context"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_logger_item_ce, SL("_type"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_logger_item_ce, SL("_message"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_logger_item_ce, SL("_time"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_logger_item_ce, SL("_context"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -83,12 +83,12 @@ PHP_METHOD(Phalcon_Logger_Item, __construct){
 		time = PHALCON_GLOBAL(z_zero);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_message"), message TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_time"), time TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_message"), message);
+	phalcon_update_property_this(this_ptr, SL("_type"), type);
+	phalcon_update_property_this(this_ptr, SL("_time"), time);
 
 	if (context && Z_TYPE_P(context) == IS_ARRAY) {
-		phalcon_update_property_this(this_ptr, SL("_context"), context TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_context"), context);
 	}
 }
 

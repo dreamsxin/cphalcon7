@@ -78,24 +78,24 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Message){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Validation, Message, validation_message, phalcon_validation_message_method_entry, 0);
 
-	zend_declare_property_null(phalcon_validation_message_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_message_ce, SL("_message"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_validation_message_ce, SL("_field"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_validation_message_ce, SL("_code"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_validation_message_ce, SL("_type"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_message_ce, SL("_message"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_message_ce, SL("_field"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_validation_message_ce, SL("_code"), 0, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_validation_message_ce TSRMLS_CC, 1, phalcon_validation_messageinterface_ce);
+	zend_class_implements(phalcon_validation_message_ce, 1, phalcon_validation_messageinterface_ce);
 
 	return SUCCESS;
 }
 
-zval* phalcon_validation_message_construct_helper(zval *message, zval *field, const char *type, zval *code TSRMLS_DC)
+zval* phalcon_validation_message_construct_helper(zval *message, zval *field, const char *type, zval *code)
 {
 	zval *result, *params[4], *tmp;
 
-	MAKE_STD_ZVAL(result);
+	PHALCON_ALLOC_GHOST_ZVAL(result);
 	object_init_ex(result, phalcon_validation_message_ce);
 
-	MAKE_STD_ZVAL(tmp);
+	PHALCON_ALLOC_GHOST_ZVAL(tmp);
 	ZVAL_STRING(tmp, type, 1);
 
 	params[0] = message;
@@ -104,7 +104,7 @@ zval* phalcon_validation_message_construct_helper(zval *message, zval *field, co
 	params[3] = code;
 
 	if (FAILURE == phalcon_call_class_method_aparams(NULL, result, Z_OBJCE_P(result), phalcon_fcall_method, SL("__construct"), 4, params)) {
-		MAKE_STD_ZVAL(result);
+		PHALCON_ALLOC_GHOST_ZVAL(result);
 		ZVAL_NULL(result);
 	}
 
@@ -137,10 +137,10 @@ PHP_METHOD(Phalcon_Validation_Message, __construct){
 		code = PHALCON_GLOBAL(z_zero);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_message"), message TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_field"), field TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_code"), code TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_message"), message);
+	phalcon_update_property_this(this_ptr, SL("_field"), field);
+	phalcon_update_property_this(this_ptr, SL("_type"), type);
+	phalcon_update_property_this(this_ptr, SL("_code"), code);
 }
 
 /**
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Validation_Message, setType){
 
 	phalcon_fetch_params(0, 1, 0, &type);
 	
-	phalcon_update_property_this(this_ptr, SL("_type"), type TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_type"), type);
 	RETURN_THISW();
 }
 
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Validation_Message, setCode){
 
 	phalcon_fetch_params(0, 1, 0, &code);
 
-	phalcon_update_property_this(this_ptr, SL("_code"), code TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_code"), code);
 	RETURN_THISW();
 }
 
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Validation_Message, setMessage){
 
 	phalcon_fetch_params(0, 1, 0, &message);
 	
-	phalcon_update_property_this(this_ptr, SL("_message"), message TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_message"), message);
 	RETURN_THISW();
 }
 
@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Validation_Message, setField){
 
 	phalcon_fetch_params(0, 1, 0, &field);
 	
-	phalcon_update_property_this(this_ptr, SL("_field"), field TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_field"), field);
 	RETURN_THISW();
 }
 

@@ -105,9 +105,9 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Sqlite){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Db\\Dialect, Sqlite, db_dialect_sqlite, phalcon_db_dialect_ce, phalcon_db_dialect_sqlite_method_entry, 0);
 
-	zend_declare_property_string(phalcon_db_dialect_sqlite_ce, SL("_escapeChar"), "\"", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_db_dialect_sqlite_ce, SL("_escapeChar"), "\"", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_db_dialect_sqlite_ce TSRMLS_CC, 1, phalcon_db_dialectinterface_ce);
+	zend_class_implements(phalcon_db_dialect_sqlite_ce, 1, phalcon_db_dialectinterface_ce);
 
 	return SUCCESS;
 }
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 
 	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
 	if (zend_is_true(is_not_null)) {
-		phalcon_concat_self_str(&sql, SL(" NOT NULL") TSRMLS_CC);
+		phalcon_concat_self_str(&sql, SL(" NOT NULL"));
 	}
 
 	PHALCON_CALL_METHOD(&is_autoincrement, column, "isautoincrement");
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 	 * See http://www.sqlite.org/syntaxdiagrams.html#column-constraint
 	 */
 	if (zend_is_true(is_autoincrement)) {
-		phalcon_concat_self_str(&sql, SL(" PRIMARY KEY AUTOINCREMENT") TSRMLS_CC);
+		phalcon_concat_self_str(&sql, SL(" PRIMARY KEY AUTOINCREMENT"));
 	}
 
 	RETURN_CTOR(sql);

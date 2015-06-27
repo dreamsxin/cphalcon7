@@ -97,11 +97,11 @@ PHALCON_INIT_CLASS(Phalcon_CLI_Dispatcher){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Dispatcher, cli_dispatcher, phalcon_dispatcher_ce, phalcon_cli_dispatcher_method_entry, 0);
 
-	zend_declare_property_string(phalcon_cli_dispatcher_ce, SL("_handlerSuffix"), "Task", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_cli_dispatcher_ce, SL("_defaultHandler"), "main", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_cli_dispatcher_ce, SL("_defaultAction"), "main", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_cli_dispatcher_ce, SL("_handlerSuffix"), "Task", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_cli_dispatcher_ce, SL("_defaultHandler"), "main", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_cli_dispatcher_ce, SL("_defaultAction"), "main", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_cli_dispatcher_ce TSRMLS_CC, 1, phalcon_dispatcherinterface_ce);
+	zend_class_implements(phalcon_cli_dispatcher_ce, 1, phalcon_dispatcherinterface_ce);
 
 	return SUCCESS;
 }
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &task_suffix);
 	
-	phalcon_update_property_this(this_ptr, SL("_handlerSuffix"), task_suffix TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_handlerSuffix"), task_suffix);
 	
 }
 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setDefaultTask){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 	
-	phalcon_update_property_this(this_ptr, SL("_defaultHandler"), task_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_defaultHandler"), task_name);
 	
 }
 
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskName){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 	
-	phalcon_update_property_this(this_ptr, SL("_handlerName"), task_name TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_handlerName"), task_name);
 	
 }
 

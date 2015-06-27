@@ -40,7 +40,7 @@ void phalcon_orm_destroy_cache(TSRMLS_D) {
 /**
  * Obtains a prepared ast in the phalcon's superglobals
  */
-void phalcon_orm_get_prepared_ast(zval **return_value, zval *unique_id TSRMLS_DC) {
+void phalcon_orm_get_prepared_ast(zval **return_value, zval *unique_id) {
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 	zval **temp_ast;
@@ -60,7 +60,7 @@ void phalcon_orm_get_prepared_ast(zval **return_value, zval *unique_id TSRMLS_DC
 /**
  * Stores a prepared ast in the phalcon's superglobals
  */
-void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast TSRMLS_DC) {
+void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast) {
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 	zval *copy_ast;
@@ -73,7 +73,7 @@ void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast TSRMLS_DC)
 				zend_hash_init(phalcon_globals_ptr->orm.ast_cache, 0, NULL, ZVAL_PTR_DTOR, 0);
 			}
 
-			MAKE_STD_ZVAL(copy_ast); 	
+			PHALCON_ALLOC_GHOST_ZVAL(copy_ast); 	
 			array_init(copy_ast);
 
 			zend_hash_copy(Z_ARRVAL_P(copy_ast), Z_ARRVAL_P(prepared_ast), (copy_ctor_func_t)zval_add_ref);
@@ -93,7 +93,7 @@ void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast TSRMLS_DC)
 /**
  * Escapes single quotes into database single quotes
  */
-void phalcon_orm_singlequotes(zval *return_value, zval *str TSRMLS_DC) {
+void phalcon_orm_singlequotes(zval *return_value, zval *str) {
 
 	int i;
 	smart_str  escaped_str = {0};

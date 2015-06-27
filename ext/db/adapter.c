@@ -179,20 +179,20 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter){
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Db, Adapter, db_adapter, phalcon_di_injectable_ce, phalcon_db_adapter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_profiler"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_descriptor"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_dialectType"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_type"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_dialect"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_connectionId"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_sqlStatement"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_sqlVariables"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_db_adapter_ce, SL("_sqlBindTypes"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_db_adapter_ce, SL("_transactionLevel"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_db_adapter_ce, SL("_transactionsWithSavepoints"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_db_adapter_ce, SL("_connectionConsecutive"), 0, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC TSRMLS_CC);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_profiler"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_descriptor"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_dialectType"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_type"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_dialect"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_connectionId"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_sqlStatement"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_sqlVariables"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_ce, SL("_sqlBindTypes"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_db_adapter_ce, SL("_transactionLevel"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_db_adapter_ce, SL("_transactionsWithSavepoints"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_db_adapter_ce, SL("_connectionConsecutive"), 0, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
-	zend_class_implements(phalcon_db_adapter_ce TSRMLS_CC, 1, phalcon_db_adapterinterface_ce);
+	zend_class_implements(phalcon_db_adapter_ce, 1, phalcon_db_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -217,12 +217,12 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	 * Every new connection created obtain a consecutive number from the static
 	 * property self::$_connectionConsecutive
 	 */
-	connection_consecutive = phalcon_fetch_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive") TSRMLS_CC);
+	connection_consecutive = phalcon_fetch_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"));
 
 	PHALCON_INIT_VAR(next_consecutive);
 	phalcon_add_function(next_consecutive, connection_consecutive, PHALCON_GLOBAL(z_one));
-	phalcon_update_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"), next_consecutive TSRMLS_CC);
-	phalcon_update_property_this(this_ptr, SL("_connectionId"), connection_consecutive TSRMLS_CC);
+	phalcon_update_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"), next_consecutive);
+	phalcon_update_property_this(this_ptr, SL("_connectionId"), connection_consecutive);
 
 	/** 
 	 * Dialect class can override the default dialect
@@ -238,10 +238,10 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	 * Create the instance only if the dialect is a string
 	 */
 	if (likely(Z_TYPE_P(dialect_class) == IS_STRING)) {
-		ce0 = phalcon_fetch_class(dialect_class TSRMLS_CC);
+		ce0 = phalcon_fetch_class(dialect_class);
 		PHALCON_INIT_VAR(dialect_object);
 		object_init_ex(dialect_object, ce0);
-		if (phalcon_has_constructor(dialect_object TSRMLS_CC)) {
+		if (phalcon_has_constructor(dialect_object)) {
 			PHALCON_CALL_METHOD(NULL, dialect_object, "__construct");
 		}
 		PHALCON_CALL_SELF(NULL, "setdialect", dialect_object);
@@ -249,7 +249,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 		PHALCON_CALL_SELF(NULL, "setdialect", dialect_class);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_descriptor"), descriptor TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_descriptor"), descriptor);
 
 	PHALCON_MM_RESTORE();
 }
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setProfiler){
 
 	phalcon_fetch_params(0, 1, 0, &profiler);
 
-	phalcon_update_property_this(this_ptr, SL("_profiler"), profiler TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_profiler"), profiler);
 
 }
 
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setDialect){
 
 	phalcon_fetch_params(0, 1, 0, &dialect);
 	PHALCON_VERIFY_INTERFACE_EX(dialect, phalcon_db_dialectinterface_ce, phalcon_db_exception_ce, 0);
-	phalcon_update_property_this(this_ptr, SL("_dialect"), dialect TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_dialect"), dialect);
 }
 
 /**
@@ -510,7 +510,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	/** 
 	 * A valid array with more than one element is required
 	 */
-	if (!phalcon_fast_count_ev(values TSRMLS_CC)) {
+	if (!phalcon_fast_count_ev(values)) {
 		PHALCON_INIT_VAR(exception_message);
 		PHALCON_CONCAT_SVS(exception_message, "Unable to insert into ", table, " without data");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, exception_message);
@@ -576,7 +576,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	 * Build the final SQL INSERT statement
 	 */
 	PHALCON_INIT_VAR(joined_values);
-	phalcon_fast_join_str(joined_values, SL(", "), placeholders TSRMLS_CC);
+	phalcon_fast_join_str(joined_values, SL(", "), placeholders);
 	if (Z_TYPE_P(fields) == IS_ARRAY) { 
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 
@@ -600,7 +600,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 		}
 
 		PHALCON_INIT_VAR(joined_fields);
-		phalcon_fast_join_str(joined_fields, SL(", "), escaped_fields TSRMLS_CC);
+		phalcon_fast_join_str(joined_fields, SL(", "), escaped_fields);
 
 		PHALCON_INIT_VAR(insert_sql);
 		PHALCON_CONCAT_SVSVSVS(insert_sql, "INSERT INTO ", escaped_table, " (", joined_fields, ") VALUES (", joined_values, ")");
@@ -800,7 +800,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 	}
 
 	PHALCON_INIT_VAR(set_clause);
-	phalcon_fast_join_str(set_clause, SL(", "), placeholders TSRMLS_CC);
+	phalcon_fast_join_str(set_clause, SL(", "), placeholders);
 	if (Z_TYPE_P(where_condition) != IS_NULL) {
 
 		PHALCON_INIT_VAR(update_sql);
@@ -810,7 +810,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 		 * String conditions are simply appended to the SQL
 		 */
 		if (Z_TYPE_P(where_condition) == IS_STRING) {
-			phalcon_concat_self(&update_sql, where_condition TSRMLS_CC);
+			phalcon_concat_self(&update_sql, where_condition);
 		} else {
 			/** 
 			 * Array conditions may have bound params and bound types
@@ -827,7 +827,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 			if (phalcon_array_isset_string(where_condition, SS("conditions"))) {
 				PHALCON_OBS_VAR(conditions);
 				phalcon_array_fetch_string(&conditions, where_condition, SL("conditions"), PH_NOISY);
-				phalcon_concat_self(&update_sql, conditions TSRMLS_CC);
+				phalcon_concat_self(&update_sql, conditions);
 			}
 
 			/** 
@@ -1109,7 +1109,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createTable){
 		return;
 	}
 
-	if (!phalcon_fast_count_ev(columns TSRMLS_CC)) {
+	if (!phalcon_fast_count_ev(columns)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The table must contain at least one column");
 		return;
 	}
@@ -1953,7 +1953,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setNestedTransactionsWithSavepoints){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_transactionsWithSavepoints"), nested_transactions_with_savepoints TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_transactionsWithSavepoints"), nested_transactions_with_savepoints);
 
 	RETURN_THIS();
 }

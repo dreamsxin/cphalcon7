@@ -29,7 +29,7 @@
 
 void phalcon_time(zval *return_value);
 #ifdef HAVE_GETTIMEOFDAY
-void phalcon_microtime(zval *return_value, zval *get_as_float TSRMLS_DC);
+void phalcon_microtime(zval *return_value, zval *get_as_float);
 #endif
 
 #endif /* PHALCON_KERNEL_TIME_H */

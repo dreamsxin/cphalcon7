@@ -66,7 +66,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Xcache){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Annotations\\Adapter, Xcache, annotations_adapter_xcache, phalcon_annotations_adapter_ce, phalcon_annotations_adapter_xcache_method_entry, 0);
 
-	zend_class_implements(phalcon_annotations_adapter_xcache_ce TSRMLS_CC, 1, phalcon_annotations_adapterinterface_ce);
+	zend_class_implements(phalcon_annotations_adapter_xcache_ce, 1, phalcon_annotations_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Xcache, read){
 	
 	PHALCON_CALL_FUNCTION(&serialized, "xcache_get", prefixed_key);
 	if (Z_TYPE_P(serialized) == IS_STRING) {
-		phalcon_unserialize(return_value, serialized TSRMLS_CC);
+		phalcon_unserialize(return_value, serialized);
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
 			zval_dtor(return_value);
 			RETVAL_NULL();
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Xcache, write){
 	phalcon_strtolower_inplace(prefixed_key);
 	
 	PHALCON_INIT_VAR(serialized);
-	phalcon_serialize(serialized, &data TSRMLS_CC);
+	phalcon_serialize(serialized, &data);
 	PHALCON_CALL_FUNCTION(NULL, "xcache_set", prefixed_key, serialized);
 	
 	PHALCON_MM_RESTORE();

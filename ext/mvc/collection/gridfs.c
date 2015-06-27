@@ -94,8 +94,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_GridFS){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Collection, GridFS, mvc_collection_gridfs, phalcon_mvc_collection_ce, phalcon_mvc_collection_gridfs_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_collection_gridfs_ce, SL("sha1"), ZEND_ACC_PUBLIC TSRMLS_CC);
-	zend_declare_property_null(phalcon_mvc_collection_gridfs_ce, SL("md5"), ZEND_ACC_PUBLIC TSRMLS_CC);
+	zend_declare_property_null(phalcon_mvc_collection_gridfs_ce, SL("sha1"), ZEND_ACC_PUBLIC);
+	zend_declare_property_null(phalcon_mvc_collection_gridfs_ce, SL("md5"), ZEND_ACC_PUBLIC);
 
 	return SUCCESS;
 }
@@ -351,8 +351,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 		PHALCON_CALL_FUNCTION(&sha1, "sha1_file", filename);
 		PHALCON_CALL_FUNCTION(&md5, "md5_file", filename);
 
-		phalcon_update_property_this(this_ptr, SL("sha1"), sha1 TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("md5"), md5 TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("sha1"), sha1);
+		phalcon_update_property_this(this_ptr, SL("md5"), md5);
 	}
 
 	PHALCON_CALL_PARENT(&status, phalcon_mvc_collection_gridfs_ce, this_ptr, "save", arr, white_list, mode);
@@ -397,8 +397,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, saveBytes){
 		PHALCON_CALL_FUNCTION(&sha1, "sha1", bytes);
 		PHALCON_CALL_FUNCTION(&md5, "md5", bytes);
 
-		phalcon_update_property_this(this_ptr, SL("sha1"), sha1 TSRMLS_CC);
-		phalcon_update_property_this(this_ptr, SL("md5"), md5 TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("sha1"), sha1);
+		phalcon_update_property_this(this_ptr, SL("md5"), md5);
 	}
 
 	PHALCON_CALL_PARENT(&status, phalcon_mvc_collection_gridfs_ce, this_ptr, "save", arr, white_list, mode);
@@ -536,12 +536,12 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, drop){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name  TSRMLS_CC);
-	ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
+	phalcon_get_called_class(class_name );
+	ce0 = phalcon_fetch_class(class_name);
 
 	PHALCON_INIT_VAR(collection);
 	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection TSRMLS_CC)) {
+	if (phalcon_has_constructor(collection)) {
 		PHALCON_CALL_METHOD(NULL, collection, "__construct");
 	}
 

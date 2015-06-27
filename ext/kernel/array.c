@@ -700,7 +700,7 @@ void phalcon_array_get_current(zval *return_value, zval *array){
 	RETURN_FALSE;
 }
 
-int phalcon_fast_in_array(zval *needle, zval *haystack TSRMLS_DC) {
+int phalcon_fast_in_array(zval *needle, zval *haystack) {
 
 	zval         **tmp;
 	HashTable      *arr;
@@ -721,7 +721,7 @@ int phalcon_fast_in_array(zval *needle, zval *haystack TSRMLS_DC) {
 	zend_hash_internal_pointer_reset_ex(arr, &pos);
 
 	while (zend_hash_get_current_data_ex(arr, (void **) &tmp, &pos) == SUCCESS) {
-		if (phalcon_is_equal(needle, *tmp TSRMLS_CC)) {
+		if (phalcon_is_equal(needle, *tmp)) {
 			return 1;
 		}
 		zend_hash_move_forward_ex(arr, &pos);
@@ -730,7 +730,7 @@ int phalcon_fast_in_array(zval *needle, zval *haystack TSRMLS_DC) {
 	return 0;
 }
 
-void phalcon_fast_array_merge(zval *return_value, zval **array1, zval **array2 TSRMLS_DC) {
+void phalcon_fast_array_merge(zval *return_value, zval **array1, zval **array2) {
 
 	int init_size, num;
 
@@ -752,9 +752,9 @@ void phalcon_fast_array_merge(zval *return_value, zval **array1, zval **array2 T
 
 	array_init_size(return_value, init_size);
 
-	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(*array1), 0 TSRMLS_CC);
+	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(*array1), 0);
 
-	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(*array2), 0 TSRMLS_CC);
+	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(*array2), 0);
 
 }
 
@@ -812,7 +812,7 @@ void phalcon_array_merge_recursive_n2(zval **a1, zval *a2)
 	}
 }
 
-HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval ***list, int list_count, HashTable **removed TSRMLS_DC) /* {{{ */
+HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval ***list, int list_count, HashTable **removed) /* {{{ */
 {
 	HashTable 	*out_hash = NULL;	/* Output hashtable */
 	int			 num_in,			/* Number of entries in the input hashtable */
@@ -902,32 +902,15 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 }
 /* }}} */
 
-void phalcon_array_unshift(zval *arr, zval *arg TSRMLS_DC)
+void phalcon_array_unshift(zval *arr, zval *arg)
 {
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-
 		zval** args[1]      = { &arg };
-
-		#if PHP_VERSION_ID < 50600
-			HashTable  oldhash;
-			HashTable *newhash = Z_ARRVAL_P(arr);
-			newhash = php_splice(newhash, 0, 0, args, 1, NULL);
-
-			oldhash = *Z_ARRVAL_P(arr);
-			if (Z_ARRVAL_P(arr) == &EG(symbol_table)) {
-				zend_reset_all_cv(&EG(symbol_table) TSRMLS_CC);
-			}
-			*Z_ARRVAL_P(arr)   = *newhash;
-
-			FREE_HASHTABLE(newhash);
-			zend_hash_destroy(&oldhash);
-		#else
-			php_splice(Z_ARRVAL_P(arr), 0, 0, args, 1, NULL TSRMLS_CC);
-		#endif
+		php_splice(Z_ARRVAL_P(arr), 0, 0, args, 1, NULL);
 	}
 }
 
-void phalcon_array_keys(zval *return_value, zval *arr TSRMLS_DC)
+void phalcon_array_keys(zval *return_value, zval *arr)
 {
 
 	zval *new_val, **entry;
@@ -942,7 +925,7 @@ void phalcon_array_keys(zval *return_value, zval *arr TSRMLS_DC)
 
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(arr), &pos);
 		while (zend_hash_get_current_data_ex(Z_ARRVAL_P(arr), (void**)&entry, &pos) == SUCCESS) {
-			MAKE_STD_ZVAL(new_val);
+			PHALCON_ALLOC_GHOST_ZVAL(new_val);
 
 			switch (zend_hash_get_current_key_ex(Z_ARRVAL_P(arr), &skey, &skey_len, &nkey, 1, &pos)) {
 				case HASH_KEY_IS_STRING:
@@ -979,7 +962,7 @@ void phalcon_array_values(zval *return_value, zval *arr)
 	}
 }
 
-int phalcon_array_key_exists(zval *arr, zval *key TSRMLS_DC)
+int phalcon_array_key_exists(zval *arr, zval *key)
 {
 	HashTable *h = HASH_OF(arr);
 	if (h) {
@@ -1034,7 +1017,7 @@ int phalcon_array_is_associative(zval *arr) {
 /**
  * Implementation of Multiple array-offset update
  */
-void phalcon_array_update_multi_ex(zval **arr, zval *value, const char *types, int types_length, int types_count, va_list ap TSRMLS_DC)
+void phalcon_array_update_multi_ex(zval **arr, zval *value, const char *types, int types_length, int types_count, va_list ap)
 {
 	long old_l[PHALCON_MAX_ARRAY_LEVELS], old_ll[PHALCON_MAX_ARRAY_LEVELS];
 	char *s, *old_s[PHALCON_MAX_ARRAY_LEVELS], old_type[PHALCON_MAX_ARRAY_LEVELS];
@@ -1077,7 +1060,7 @@ void phalcon_array_update_multi_ex(zval **arr, zval *value, const char *types, i
 					if (i == (types_length - 1)) {
 						phalcon_array_update_string(&p, s, l, value, PH_COPY | PH_SEPARATE);
 					} else {
-						MAKE_STD_ZVAL(tmp);
+						PHALCON_ALLOC_GHOST_ZVAL(tmp);
 						array_init(tmp);
 						phalcon_array_update_string(&p, s, l, tmp, PH_SEPARATE);
 						if (re_update) {
@@ -1110,7 +1093,7 @@ void phalcon_array_update_multi_ex(zval **arr, zval *value, const char *types, i
 					if (i == (types_length - 1)) {
 						phalcon_array_update_long(&p, ll, value, PH_COPY | PH_SEPARATE);
 					} else {
-						MAKE_STD_ZVAL(tmp);
+						PHALCON_ALLOC_GHOST_ZVAL(tmp);
 						array_init(tmp);
 						phalcon_array_update_long(&p, ll, tmp, PH_SEPARATE);
 						if (re_update) {
@@ -1143,7 +1126,7 @@ void phalcon_array_update_multi_ex(zval **arr, zval *value, const char *types, i
 					if (i == (types_length - 1)) {
 						phalcon_array_update_zval(&p, item, value, PH_COPY | PH_SEPARATE);
 					} else {
-						MAKE_STD_ZVAL(tmp);
+						PHALCON_ALLOC_GHOST_ZVAL(tmp);
 						array_init(tmp);
 						phalcon_array_update_zval(&p, item, tmp, PH_SEPARATE);
 						if (re_update) {
@@ -1218,14 +1201,14 @@ void phalcon_array_update_multi_ex(zval **arr, zval *value, const char *types, i
 	}
 }
 
-int phalcon_array_update_multi(zval **arr, zval *value TSRMLS_DC, const char *types, int types_length, int types_count, ...)
+int phalcon_array_update_multi(zval **arr, zval *value, const char *types, int types_length, int types_count, ...)
 {
 	va_list ap;
 
 	va_start(ap, types_count);
 	SEPARATE_ZVAL_IF_NOT_REF(arr);
 
-	phalcon_array_update_multi_ex(arr, value, types, types_length, types_count, ap TSRMLS_CC);
+	phalcon_array_update_multi_ex(arr, value, types, types_length, types_count, ap);
 	va_end(ap);
 
 	return 0;

@@ -77,10 +77,10 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Sqlite){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Db\\Adapter\\Pdo, Sqlite, db_adapter_pdo_sqlite, phalcon_db_adapter_pdo_ce, phalcon_db_adapter_pdo_sqlite_method_entry, 0);
 
-	zend_declare_property_string(phalcon_db_adapter_pdo_sqlite_ce, SL("_type"), "sqlite", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_db_adapter_pdo_sqlite_ce, SL("_dialectType"), "sqlite", ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_string(phalcon_db_adapter_pdo_sqlite_ce, SL("_type"), "sqlite", ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_db_adapter_pdo_sqlite_ce, SL("_dialectType"), "sqlite", ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_db_adapter_pdo_sqlite_ce TSRMLS_CC, 1, phalcon_db_adapterinterface_ce);
+	zend_class_implements(phalcon_db_adapter_pdo_sqlite_ce, 1, phalcon_db_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			PHALCON_INIT_NVAR(matches);
 
 			PHALCON_INIT_NVAR(pos);
-			RETURN_MM_ON_FAILURE(phalcon_preg_match(pos, size_pattern, column_type, matches TSRMLS_CC));
+			RETURN_MM_ON_FAILURE(phalcon_preg_match(pos, size_pattern, column_type, matches));
 
 			if (zend_is_true(pos)) {
 				if (phalcon_array_isset_long(matches, 1)) {

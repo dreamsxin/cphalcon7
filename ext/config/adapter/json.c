@@ -66,7 +66,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Json){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Config\\Adapter, Json, config_adapter_json, phalcon_config_adapter_ce, phalcon_config_adapter_json_method_entry, 0);
 
-	zend_class_implements(phalcon_config_adapter_json_ce TSRMLS_CC, 1, phalcon_config_adapterinterface_ce);
+	zend_class_implements(phalcon_config_adapter_json_ce, 1, phalcon_config_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Json, read){
 	if (zend_is_true(absolute_path)) {
 		PHALCON_CPY_WRT(config_dir_path, file_path);
 	} else {
-		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath") TSRMLS_CC);
+		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
 		PHALCON_INIT_VAR(config_dir_path);
 		PHALCON_CONCAT_VV(config_dir_path, base_path, file_path);
@@ -100,12 +100,12 @@ PHP_METHOD(Phalcon_Config_Adapter_Json, read){
 
 	PHALCON_INIT_VAR(contents);
 	PHALCON_INIT_VAR(array);
-	phalcon_file_get_contents(contents, config_dir_path TSRMLS_CC);
+	phalcon_file_get_contents(contents, config_dir_path);
 
 	if (Z_TYPE_P(contents) == IS_STRING) {
-		if (phalcon_json_decode(array, contents, 1 TSRMLS_CC) != FAILURE) {
+		if (phalcon_json_decode(array, contents, 1) != FAILURE) {
 			if (Z_TYPE_P(array) == IS_ARRAY) {
-				phalcon_config_construct_internal(getThis(), array TSRMLS_CC);
+				phalcon_config_construct_internal(getThis(), array);
 			}
 		}
 	}

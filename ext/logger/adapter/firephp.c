@@ -64,10 +64,10 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_Firephp){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Logger\\Adapter, Firephp, logger_adapter_firephp, phalcon_logger_adapter_ce, phalcon_logger_adapter_firephp_method_entry, 0);
 
-	zend_declare_property_bool(phalcon_logger_adapter_firephp_ce, SL("_initialized"), 0, ZEND_ACC_PRIVATE | ZEND_ACC_STATIC TSRMLS_CC);
-	zend_declare_property_long(phalcon_logger_adapter_firephp_ce, SL("_index"), 1, ZEND_ACC_PRIVATE | ZEND_ACC_STATIC TSRMLS_CC);
+	zend_declare_property_bool(phalcon_logger_adapter_firephp_ce, SL("_initialized"), 0, ZEND_ACC_PRIVATE | ZEND_ACC_STATIC);
+	zend_declare_property_long(phalcon_logger_adapter_firephp_ce, SL("_index"), 1, ZEND_ACC_PRIVATE | ZEND_ACC_STATIC);
 
-	zend_class_implements(phalcon_logger_adapter_firephp_ce TSRMLS_CC, 1, phalcon_logger_adapterinterface_ce);
+	zend_class_implements(phalcon_logger_adapter_firephp_ce, 1, phalcon_logger_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -84,7 +84,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, getFormatter){
 	formatter = phalcon_fetch_nproperty_this(this_ptr, SL("_formatter"), PH_NOISY);
 	if (Z_TYPE_P(formatter) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_logger_formatter_firephp_ce);
-		phalcon_update_property_this(this_ptr, SL("_formatter"), return_value TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_formatter"), return_value);
 		return;
 	}
 
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 
 	PHALCON_CALL_METHOD(&formatter, this_ptr, "getformatter");
 
-	initialized = phalcon_fetch_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_initialized") TSRMLS_CC);
+	initialized = phalcon_fetch_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_initialized"));
 	if (!zend_is_true(initialized)) {
 		/**
 		 * Send the required initialization headers.
@@ -132,15 +132,15 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		 */
 		h.line     = "X-Wf-Protocol-1: http://meta.wildfirehq.org/Protocol/JsonStream/0.2";
 		h.line_len = sizeof("X-Wf-Protocol-1: http://meta.wildfirehq.org/Protocol/JsonStream/0.2")-1;
-		sapi_header_op(SAPI_HEADER_REPLACE, &h TSRMLS_CC);
+		sapi_header_op(SAPI_HEADER_REPLACE, &h);
 
 		h.line     = "X-Wf-1-Plugin-1: http://meta.firephp.org/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.3";
 		h.line_len = sizeof("X-Wf-1-Plugin-1: http://meta.firephp.org/Wildfire/Plugin/FirePHP/Library-FirePHPCore/0.3")-1;
-		sapi_header_op(SAPI_HEADER_REPLACE, &h TSRMLS_CC);
+		sapi_header_op(SAPI_HEADER_REPLACE, &h);
 
 		h.line     = "X-Wf-1-Structure-1: http://meta.firephp.org/Wildfire/Structure/FirePHP/FirebugConsole/0.1";
 		h.line_len = sizeof("X-Wf-1-Structure-1: http://meta.firephp.org/Wildfire/Structure/FirePHP/FirebugConsole/0.1")-1;
-		sapi_header_op(SAPI_HEADER_REPLACE, &h TSRMLS_CC);
+		sapi_header_op(SAPI_HEADER_REPLACE, &h);
 
 		ZVAL_TRUE(initialized); /* This will also update the property because "initialized" was not separated */
 	}
@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	PHALCON_CALL_METHOD(&applied_format, formatter, "format", message, type, time, context);
 	convert_to_string(applied_format);
 
-	index = phalcon_fetch_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index") TSRMLS_CC);
+	index = phalcon_fetch_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"));
 	assert(Z_TYPE_P(index) == IS_LONG);
 
 	if (Z_REFCOUNT_P(index) > 1) {
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		/* Send the result */
 		h.line     = str.c;
 		h.line_len = str.len;
-		sapi_header_op(SAPI_HEADER_REPLACE, &h TSRMLS_CC);
+		sapi_header_op(SAPI_HEADER_REPLACE, &h);
 
 		ZVAL_LONG(index, Z_LVAL_P(index)+1);
 
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	}
 
 	if (separate_index) {
-		phalcon_update_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"), index TSRMLS_CC);
+		phalcon_update_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"), index);
 	}
 
 	/* Deallocate the smnart string if it is not empty */

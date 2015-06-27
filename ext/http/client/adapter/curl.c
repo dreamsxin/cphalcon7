@@ -58,9 +58,9 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Adapter_Curl){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Http\\Client\\Adapter, Curl, http_client_adapter_curl, phalcon_http_client_adapter_ce,  phalcon_http_client_adapter_curl_method_entry, 0);
 
-	zend_declare_property_null(phalcon_http_client_adapter_curl_ce, SL("_curl"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_http_client_adapter_curl_ce, SL("_curl"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_http_client_adapter_curl_ce TSRMLS_CC, 1, phalcon_http_client_adapterinterface_ce);
+	zend_class_implements(phalcon_http_client_adapter_curl_ce, 1, phalcon_http_client_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -80,14 +80,14 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 	if (method) {
 		PHALCON_INIT_VAR(upper_method);
 		phalcon_fast_strtoupper(upper_method, method);
-		phalcon_update_property_this(this_ptr, SL("_method"), upper_method TSRMLS_CC);
+		phalcon_update_property_this(this_ptr, SL("_method"), upper_method);
 	}
 
 	PHALCON_INIT_VAR(header);
 	object_init_ex(header, phalcon_http_client_header_ce);
 	PHALCON_CALL_METHOD(NULL, header, "__construct");
 
-	phalcon_update_property_this(this_ptr, SL("_header"), header TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_header"), header);
 
 	PHALCON_CALL_FUNCTION(&curl, "curl_init");
 
@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 
 	PHALCON_CALL_FUNCTION(NULL, "curl_setopt_array", curl, options);
 
-	phalcon_update_property_this(this_ptr, SL("_curl"), curl TSRMLS_CC);
+	phalcon_update_property_this(this_ptr, SL("_curl"), curl);
 
 	PHALCON_MM_RESTORE();
 }
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	authtype = phalcon_fetch_nproperty_this(this_ptr, SL("_authtype"), PH_NOISY);
 
 	PHALCON_INIT_VAR(constant);
-	if (!zend_get_constant(SL("CURLOPT_URL"), constant TSRMLS_CC)) {
+	if (!zend_get_constant(SL("CURLOPT_URL"), constant)) {
 		RETURN_MM_FALSE;
 	}
 

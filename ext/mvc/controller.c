@@ -77,7 +77,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Controller){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Controller, mvc_controller, phalcon_di_injectable_ce, phalcon_mvc_controller_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_class_implements(phalcon_mvc_controller_ce TSRMLS_CC, 1, phalcon_mvc_controllerinterface_ce);
+	zend_class_implements(phalcon_mvc_controller_ce, 1, phalcon_mvc_controllerinterface_ce);
 	return SUCCESS;
 }
 
@@ -87,7 +87,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Controller){
  */
 PHP_METHOD(Phalcon_Mvc_Controller, __construct){
 
-	if (phalcon_method_exists_ex(this_ptr, SS("onconstruct") TSRMLS_CC) == SUCCESS) {
+	if (phalcon_method_exists_ex(this_ptr, SS("onconstruct")) == SUCCESS) {
 		PHALCON_MM_GROW();
 		PHALCON_CALL_METHOD(NULL, this_ptr, "onconstruct");
 		PHALCON_MM_RESTORE();

@@ -77,7 +77,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Uniqueness){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Validator, Uniqueness, mvc_model_validator_uniqueness, phalcon_mvc_model_validator_ce, phalcon_mvc_model_validator_uniqueness_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_validator_uniqueness_ce TSRMLS_CC, 1, phalcon_mvc_model_validatorinterface_ce);
+	zend_class_implements(phalcon_mvc_model_validator_uniqueness_ce, 1, phalcon_mvc_model_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -309,7 +309,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	}
 	
 	PHALCON_INIT_VAR(join_conditions);
-	phalcon_fast_join_str(join_conditions, SL(" AND "), conditions TSRMLS_CC);
+	phalcon_fast_join_str(join_conditions, SL(" AND "), conditions);
 	
 	/** 
 	 * We don't trust the user, so we pass the parameters as bound parameters
@@ -337,7 +337,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		if (!zend_is_true(message)) {
 			if (Z_TYPE_P(field) == IS_ARRAY) { 
 				PHALCON_INIT_VAR(join_fields);
-				phalcon_fast_join_str(join_fields, SL(", "), field TSRMLS_CC);
+				phalcon_fast_join_str(join_fields, SL(", "), field);
 	
 				PHALCON_INIT_NVAR(message);
 				PHALCON_CONCAT_SVS(message, "Value of fields: '", join_fields, "' are already present in another record");

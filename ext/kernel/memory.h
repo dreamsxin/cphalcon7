@@ -23,33 +23,33 @@
 #include "php_phalcon.h"
 #include "kernel/main.h"
 
-void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr TSRMLS_DC);
+void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr);
 void phalcon_deinitialize_memory(TSRMLS_D);
 
 /* Memory Frames */
 #ifndef PHALCON_RELEASE
-void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory TSRMLS_DC);
+void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory);
 void phalcon_dump_current_frame(TSRMLS_D);
 void phalcon_dump_all_frames(TSRMLS_D);
 
-void ZEND_FASTCALL phalcon_memory_grow_stack(const char *func TSRMLS_DC);
-int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func TSRMLS_DC);
+void ZEND_FASTCALL phalcon_memory_grow_stack(const char *func);
+int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func);
 
-#define PHALCON_MM_GROW()       phalcon_memory_grow_stack(__func__ TSRMLS_CC)
-#define PHALCON_MM_RESTORE()    phalcon_memory_restore_stack(__func__ TSRMLS_CC)
+#define PHALCON_MM_GROW()       phalcon_memory_grow_stack(__func__)
+#define PHALCON_MM_RESTORE()    phalcon_memory_restore_stack(__func__)
 
-void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func TSRMLS_DC) /* PHALCON_ATTR_NONNULL */;
-void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func TSRMLS_DC);
-void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var, const char *func TSRMLS_DC);
+void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func) /* PHALCON_ATTR_NONNULL */;
+void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func);
+void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var, const char *func);
 
 #define PHALCON_MEMORY_ALLOC(z) \
-	phalcon_memory_alloc((z), __func__ TSRMLS_CC)
+	phalcon_memory_alloc((z), __func__)
 
 #define PHALCON_MEMORY_ALLOC_PNULL(z) \
-	phalcon_memory_alloc_pnull((z), __func__ TSRMLS_CC)
+	phalcon_memory_alloc_pnull((z), __func__)
 
 #define PHALCON_MEMORY_OBSERVE(z) \
-	phalcon_memory_observe((z), __func__ TSRMLS_CC)
+	phalcon_memory_observe((z), __func__)
 
 #else
 void ZEND_FASTCALL phalcon_memory_grow_stack(TSRMLS_D);
@@ -58,22 +58,22 @@ int ZEND_FASTCALL phalcon_memory_restore_stack(TSRMLS_D);
 #define PHALCON_MM_GROW()       phalcon_memory_grow_stack(TSRMLS_C)
 #define PHALCON_MM_RESTORE()    phalcon_memory_restore_stack(TSRMLS_C)
 
-void ZEND_FASTCALL phalcon_memory_observe(zval **var TSRMLS_DC) /* PHALCON_ATTR_NONNULL */;
-void ZEND_FASTCALL phalcon_memory_alloc(zval **var TSRMLS_DC);
-void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var TSRMLS_DC);
+void ZEND_FASTCALL phalcon_memory_observe(zval **var) /* PHALCON_ATTR_NONNULL */;
+void ZEND_FASTCALL phalcon_memory_alloc(zval **var);
+void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var);
 
 #define PHALCON_MEMORY_ALLOC(z) \
-	phalcon_memory_alloc((z) TSRMLS_CC)
+	phalcon_memory_alloc((z))
 
 #define PHALCON_MEMORY_ALLOC_PNULL(z) \
-	phalcon_memory_alloc_pnull((z) TSRMLS_CC)
+	phalcon_memory_alloc_pnull((z))
 
 #define PHALCON_MEMORY_OBSERVE(z) \
-	phalcon_memory_observe((z) TSRMLS_CC)
+	phalcon_memory_observe((z))
 
 #endif
 
-void phalcon_memory_remove(zval **var TSRMLS_DC) PHALCON_ATTR_NONNULL;
+void phalcon_memory_remove(zval **var) PHALCON_ATTR_NONNULL;
 
 int ZEND_FASTCALL phalcon_clean_restore_stack(TSRMLS_D);
 
@@ -82,8 +82,8 @@ void phalcon_create_symbol_table(TSRMLS_D);
 void phalcon_clean_symbol_tables(TSRMLS_D);
 
 /** Export symbols to active symbol table */
-int phalcon_set_symbol(zval *key_name, zval *value TSRMLS_DC);
-int phalcon_set_symbol_str(char *key_name, unsigned int key_length, zval *value TSRMLS_DC);
+int phalcon_set_symbol(zval *key_name, zval *value);
+int phalcon_set_symbol_str(char *key_name, unsigned int key_length, zval *value);
 
 void ZEND_FASTCALL phalcon_copy_ctor(zval *destiny, zval *origin) PHALCON_ATTR_NONNULL;
 
@@ -105,7 +105,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 /* Memory macros */
 #define PHALCON_ALLOC_GHOST_ZVAL(z)                   \
 	do {                                              \
-		ALLOC_ZVAL(z);                                \
+		(z) = (zval *) emalloc(sizeof(zval));         \
 		Z_SET_REFCOUNT_P(z, 0);                       \
 	} while (0)
 		
@@ -236,7 +236,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 			phalcon_ptr_dtor(d); \
 		} \
 	} else { \
-			phalcon_memory_observe(&d TSRMLS_CC); \
+			phalcon_memory_observe(&d); \
 	} \
 	ALLOC_ZVAL(d); \
 	Z_TYPE_P(d) = Z_TYPE_P(v); \

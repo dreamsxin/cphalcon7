@@ -103,7 +103,7 @@ zval* phalcon_validation_message_construct_helper(zval *message, zval *field, co
 	params[2] = tmp;
 	params[3] = code;
 
-	if (FAILURE == phalcon_call_class_method_aparams(NULL, Z_OBJCE_P(result), phalcon_fcall_method, result, SL("__construct"), 4, params TSRMLS_CC)) {
+	if (FAILURE == phalcon_call_class_method_aparams(NULL, result, Z_OBJCE_P(result), phalcon_fcall_method, SL("__construct"), 4, params)) {
 		MAKE_STD_ZVAL(result);
 		ZVAL_NULL(result);
 	}

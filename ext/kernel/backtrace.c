@@ -25,7 +25,7 @@
 
 #include <execinfo.h>
 #include <Zend/zend.h>
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 
 /**
  * A buffer for backtrace. It is better to have it allocated statically

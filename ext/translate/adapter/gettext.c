@@ -64,7 +64,7 @@ static zval* phalcon_translate_adapter_gettext_read_dimension(zval *object, zval
 
 static int phalcon_translate_adapter_gettext_has_dimension(zval *object, zval *offset, int check_empty TSRMLS_DC)
 {
-	zval *translation = NULL, *params[1];
+	zval translation, *params[1];
 	uint32_t result;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
@@ -72,13 +72,13 @@ static int phalcon_translate_adapter_gettext_has_dimension(zval *object, zval *o
 	}
 
 	params[0] = offset;
-	result = phalcon_call_func_aparams(&translation, SL("gettext"), 1, params TSRMLS_CC);
+	result = phalcon_call_func_aparams(&translation, SL("gettext"), 1, params);
 
 	if (result) {
 		return 0;
 	}
 
-	return (1 == check_empty) ? Z_STRLEN_P(translation) : 1;
+	return (1 == check_empty) ? Z_STRLEN(translation) : 1;
 }
 
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct);

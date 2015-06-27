@@ -40,7 +40,7 @@ SOFTWARE.
 
 #ifdef PHALCON_NON_FREE
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 
 #include "assets/filters/cssminifier.h"
 #include "assets/exception.h"

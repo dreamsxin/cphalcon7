@@ -535,7 +535,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 			ZVAL_STRINGL(key, str_key, str_key_len - 1, 1);
 			efree(str_key);
 
-			if (FAILURE == phalcon_call_func_aparams(NULL, SL("apc_delete"), 1, params TSRMLS_CC)) {
+			if (FAILURE == phalcon_call_func_aparams(NULL, SL("apc_delete"), 1, params)) {
 				break;
 			}
 		}
@@ -544,7 +544,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 		it->funcs->get_current_key(it, itkey TSRMLS_CC);
 		if (likely(Z_TYPE_P(itkey) == IS_STRING)) {
 			ZVAL_STRINGL(key, Z_STRVAL_P(itkey), Z_STRLEN_P(itkey), 1);
-			if (FAILURE == phalcon_call_func_aparams(NULL, SL("apc_delete"), 1, params TSRMLS_CC)) {
+			if (FAILURE == phalcon_call_func_aparams(NULL, SL("apc_delete"), 1, params)) {
 				break;
 			}
 		}

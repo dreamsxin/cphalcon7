@@ -263,19 +263,6 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		}                                             \
 	} while (0)
 
-#define PHALCON_OBSERVE_OR_NULLIFY_PPZV(ppzv)              \
-	do {                                                   \
-		zval **tmp_ = (ppzv);                              \
-		if (tmp_ != NULL) {                                \
-			if (*tmp_) {                                   \
-				phalcon_ptr_dtor(tmp_);                    \
-				*tmp_ = NULL;                              \
-			} else {                                       \
-				PHALCON_MEMORY_OBSERVE((ppzv));            \
-			}                                              \
-		}                                                  \
-	} while (0)
-
 #define PHALCON_OBSERVE_OR_NULLIFY_VAR(z)             \
 	do {                                              \
 		if (z) {                                      \

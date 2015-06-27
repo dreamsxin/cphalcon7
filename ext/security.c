@@ -594,7 +594,7 @@ PHP_METHOD(Phalcon_Security, checkHash){
 
 	params[0] = *password;
 	params[1] = *password_hash;
-	RETURN_ON_FAILURE(phalcon_call_func_aparams(&hash, SL("crypt"), 2, params TSRMLS_CC));
+	RETURN_ON_FAILURE(phalcon_call_func_aparams(&hash, SL("crypt"), 2, params));
 
 	if (UNEXPECTED(Z_TYPE_P(hash) != IS_STRING)) {
 		convert_to_string(hash);
@@ -1058,135 +1058,27 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 		i_size = 0;
 	}
 
+	zval *algo, *iter, *len;
 
-#if defined(PHALCON_USE_PHP_HASH)
+	MAKE_STD_ZVAL(algo);
+	ZVAL_STRING(algo, s_hash, 1);
+
+	MAKE_STD_ZVAL(iter);
+	ZVAL_LONG(iter, i_iterations);
+
+	MAKE_STD_ZVAL(len);
+	ZVAL_LONG(len, i_size);
+
 	{
-		const php_hash_ops *ops = php_hash_fetch_ops(s_hash, hash ? (size_t)(Z_STRLEN_P(*hash)) : strlen(s_hash));
-		void *context;
-		unsigned char *K1, *K2, *digest, *temp, *result, *computed_salt;
-		long int i, j, loops, digest_length;
-		int salt_len = Z_STRLEN_P(*salt);
-		int pass_len = Z_STRLEN_P(*password);
-		int k;
-
-		if (!ops) {
-			zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unknown hashing algorithm: %s", s_hash);
-			return;
-		}
-
-		context = emalloc(ops->context_size);
-		ops->hash_init(context);
-
-		K1     = emalloc(2 * ops->block_size + 2 * ops->digest_size);
-		K2     = K1 + ops->block_size;
-		digest = K2 + ops->block_size;
-		temp   = digest + ops->digest_size;
-
-		/* Set up keys that will be used for all HMAC rounds */
-		memset(K1, 0, ops->block_size);
-		if (pass_len > ops->block_size) {
-			ops->hash_init(context);
-			ops->hash_update(context, (unsigned char*)Z_STRVAL_P(*password), pass_len);
-			ops->hash_final(K1, context);
-		}
-		else {
-			memcpy(K1, Z_STRVAL_P(*password), pass_len);
-		}
-
-		for (i = 0; i < ops->block_size; ++i) {
-			K2[i] = K1[i] ^ 0x5C;
-			K1[i] = K1[i] ^ 0x36;
-		}
-
-		digest_length = (i_size) ? i_size : ops->digest_size;
-		loops         = ceil((float)digest_length / (float)ops->digest_size);
-
-		result        = safe_emalloc(loops, ops->digest_size, 1);
-		computed_salt = safe_emalloc(salt_len, 1, 4);
-		memcpy(computed_salt, Z_STRVAL_P(*salt), salt_len);
-
-		for (i = 1; i <= loops; ++i) {
-			computed_salt[salt_len+0] = (unsigned char)(i >> 24);
-			computed_salt[salt_len+1] = (unsigned char)(i >> 16);
-			computed_salt[salt_len+2] = (unsigned char)(i >> 8);
-			computed_salt[salt_len+3] = (unsigned char)(i);
-
-			ops->hash_init(context);
-			ops->hash_update(context, K1, ops->block_size);
-			ops->hash_update(context, computed_salt, (long int)(salt_len) + 4);
-			ops->hash_final(digest, context);
-
-			ops->hash_init(context);
-			ops->hash_update(context, K2, ops->block_size);
-			ops->hash_update(context, digest, ops->digest_size);
-			ops->hash_final(digest, context);
-
-			memcpy(temp, digest, ops->digest_size);
-
-			for (j = 1; j < i_iterations; ++j) {
-				ops->hash_init(context);
-				ops->hash_update(context, K1, ops->block_size);
-				ops->hash_update(context, digest, ops->digest_size);
-				ops->hash_final(digest, context);
-
-				ops->hash_init(context);
-				ops->hash_update(context, K2, ops->block_size);
-				ops->hash_update(context, digest, ops->digest_size);
-				ops->hash_final(digest, context);
-
-				for (k = 0; k < ops->digest_size; ++k) {
-					temp[k] ^= digest[k];
-				}
-			}
-
-			memcpy(result + (i-1) * ops->digest_size, temp, ops->digest_size);
-		}
-
-		memset(K1, 0, 2 * ops->block_size);
-		memset(computed_salt, 0, salt_len + 4);
-		efree(K1);
-		efree(computed_salt);
-		efree(context);
-
-		if (digest_length != ops->digest_size) {
-			char *retval = safe_emalloc(i_size, 1, 1);
-			memcpy(retval, result, i_size);
-			retval[i_size] = 0;
-			efree(result);
-			RETVAL_STRINGL(retval, i_size, 0);
-		}
-		else {
-			result[digest_length] = 0;
-			RETVAL_STRINGL((char*)result, digest_length, 0);
+		zval *params[] = { algo, *password, *salt, iter, len, PHALCON_GLOBAL(z_true) };
+		if (FAILURE == phalcon_call_func_aparams(return_value, SL("hash_pbkdf2"), 6, params)) {
+			;
 		}
 	}
-#elif PHP_VERSION_ID >= 50000
-	{
-		zval *algo, *iter, *len;
 
-		MAKE_STD_ZVAL(algo);
-		ZVAL_STRING(algo, s_hash, 1);
-
-		MAKE_STD_ZVAL(iter);
-		ZVAL_LONG(iter, i_iterations);
-
-		MAKE_STD_ZVAL(len);
-		ZVAL_LONG(len, i_size);
-
-		{
-			zval *params[] = { algo, *password, *salt, iter, len, PHALCON_GLOBAL(z_true) };
-			if (FAILURE == phalcon_return_call_function(return_value, return_value_ptr, SL("hash_pbkdf2"), 6, params TSRMLS_CC)) {
-				;
-			}
-		}
-
-		phalcon_ptr_dtor(&algo);
-		phalcon_ptr_dtor(&iter);
-		phalcon_ptr_dtor(&len);
-	}
-#else
-	ZEND_MN(Phalcon_Security_pbkdf2)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
-#endif
+	phalcon_ptr_dtor(&algo);
+	phalcon_ptr_dtor(&iter);
+	phalcon_ptr_dtor(&len);
 }
 
 /**

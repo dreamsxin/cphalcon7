@@ -21,7 +21,7 @@
 
 #include "kernel/memory.h"
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 
 /**
  * Destroyes the prepared ASTs

@@ -13,7 +13,7 @@
 #include "mvc/view/engine/volt/volt.h"
 #include "mvc/view/exception.h"
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 
 #include "kernel/main.h"
 #include "kernel/memory.h"

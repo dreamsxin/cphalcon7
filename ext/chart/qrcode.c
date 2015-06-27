@@ -746,7 +746,7 @@ static zbar_image_t *_php_zbarcode_get_page(MagickWand *wand)
 
 static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t *image, zend_bool extended, zval *return_array TSRMLS_DC)
 {
-	zval *params[3], *fromtext = NULL, *totext = NULL, *from = NULL, *to = NULL, *symbol_array = NULL, *loc_array = NULL, *coords = NULL;
+	zval *params[3], *fromtext = NULL, totext, *from = NULL, *to = NULL, *symbol_array = NULL, *loc_array = NULL, *coords = NULL;
 	const zbar_symbol_t *symbol;
 
 	PHALCON_MM_GROW();
@@ -792,11 +792,11 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 			params[0] = fromtext;
 			params[1] = from;
 			params[2] = to;
-			uint32_t result = phalcon_call_func_aparams(&totext, SL("mb_convert_encoding"), 3, params TSRMLS_CC);
+			uint32_t result = phalcon_call_func_aparams(&totext, SL("mb_convert_encoding"), 3, params);
 			if (result) {
 				RETURN_MM();
 			}
-			phalcon_array_update_string(&symbol_array, SL("data"), totext, PH_COPY | PH_SEPARATE);                
+			phalcon_array_update_string(&symbol_array, SL("data"), &totext, PH_COPY | PH_SEPARATE);                
         } else {
 			phalcon_array_update_string_string(&symbol_array, SL("data"), (char *)data, strlen(data), PH_COPY | PH_SEPARATE);
 		}

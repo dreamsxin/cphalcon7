@@ -19,7 +19,7 @@
 #include "kernel/string.h"
 
 #include <ctype.h>
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 #include <ext/standard/php_string.h>
 #include <ext/standard/php_rand.h>
 #include <ext/standard/php_lcg.h>
@@ -1635,51 +1635,6 @@ void phalcon_crc32(zval *return_value, zval *str TSRMLS_DC) {
 
 	RETVAL_LONG(crc ^ 0xFFFFFFFF);
 }
-#if PHALCON_USE_PHP_PCRE
-
-/**
- * Execute preg-match without function lookup in the PHP userland
- */
-int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches TSRMLS_DC)
-{
-	zval copy;
-	int use_copy = 0;
-	pcre_cache_entry *pce;
-
-	if (Z_TYPE_P(regex) != IS_STRING) {
-		zend_error(E_WARNING, "Invalid arguments supplied for phalcon_preg_match()");
-		ZVAL_FALSE(return_value);
-		return SUCCESS;
-	}
-
-	if (Z_TYPE_P(subject) != IS_STRING) {
-		zend_make_printable_zval(subject, &copy, &use_copy);
-		if (use_copy) {
-			subject = &copy;
-		}
-	}
-
-	/* Compile regex or get it from cache. */
-	if ((pce = pcre_get_compiled_regex_cache(Z_STRVAL_P(regex), Z_STRLEN_P(regex) TSRMLS_CC)) == NULL) {
-
-		if (use_copy) {
-			phalcon_dtor(subject);
-		}
-
-		ZVAL_FALSE(return_value);
-		return SUCCESS;
-	}
-
-	php_pcre_match_impl(pce, Z_STRVAL_P(subject), Z_STRLEN_P(subject), return_value, matches, 0, 0, 0, 0 TSRMLS_CC);
-
-	if (use_copy) {
-		phalcon_dtor(&copy);
-	}
-
-	return SUCCESS;
-}
-
-#else
 
 int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches TSRMLS_DC)
 {
@@ -1690,7 +1645,7 @@ int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *mat
 		Z_SET_ISREF_P(matches);
 	}
 
-	result = phalcon_return_call_function(return_value, NULL, SL("preg_match"), (matches ? 3 : 2), params TSRMLS_CC);
+	result = phalcon_call_func_aparams(return_value, SL("preg_match"), (matches ? 3 : 2), params);
 
 	if (matches) {
 		Z_UNSET_ISREF_P(matches);
@@ -1698,45 +1653,6 @@ int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *mat
 
 	return result;
 }
-
-#endif /* PHALCON_USE_PHP_PCRE */
-
-#ifdef PHALCON_USE_PHP_JSON
-
-int phalcon_json_encode(zval *return_value, zval *v, int opts TSRMLS_DC)
-{
-	smart_str buf = { NULL, 0, 0 };
-
-	php_json_encode(&buf, v, opts TSRMLS_CC);
-	smart_str_0(&buf);
-	ZVAL_STRINGL(return_value, buf.c, buf.len, 1);
-	smart_str_free(&buf);
-
-	return SUCCESS;
-}
-
-int phalcon_json_decode(zval *return_value, zval *v, zend_bool assoc TSRMLS_DC)
-{
-	zval copy;
-	int use_copy = 0;
-
-	if (unlikely(Z_TYPE_P(v) != IS_STRING)) {
-		zend_make_printable_zval(v, &copy, &use_copy);
-		if (use_copy) {
-			v = &copy;
-		}
-	}
-
-	php_json_decode(return_value, Z_STRVAL_P(v), Z_STRLEN_P(v), assoc, 512 /* JSON_PARSER_DEFAULT_DEPTH */ TSRMLS_CC);
-
-	if (unlikely(use_copy)) {
-		phalcon_dtor(&copy);
-	}
-
-	return SUCCESS;
-}
-
-#else
 
 int phalcon_json_encode(zval *return_value, zval *v, int opts TSRMLS_DC)
 {
@@ -1749,7 +1665,7 @@ int phalcon_json_encode(zval *return_value, zval *v, int opts TSRMLS_DC)
 
 	params[0] = v;
 	params[1] = zopts;
-	result = phalcon_return_call_function(return_value, NULL, ZEND_STRL("json_encode"), 2, params TSRMLS_CC);
+	result = phalcon_call_func_aparams(return_value, ZEND_STRL("json_encode"), 2, params);
 
 	phalcon_ptr_dtor(&zopts);
 	return result;
@@ -1760,10 +1676,8 @@ int phalcon_json_decode(zval *return_value, zval *v, zend_bool assoc TSRMLS_DC)
 	zval *zassoc = assoc ? PHALCON_GLOBAL(z_true) : PHALCON_GLOBAL(z_false);
 	zval *params[] = { v, zassoc };
 
-	return phalcon_return_call_function(return_value, NULL, ZEND_STRL("json_decode"), 2, params TSRMLS_CC);
+	return phalcon_call_func_aparams(return_value, ZEND_STRL("json_decode"), 2, params);
 }
-
-#endif /* PHALCON_USE_PHP_JSON */
 
 void phalcon_lcfirst(zval *return_value, zval *s)
 {
@@ -1825,11 +1739,7 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep TSRMLS_
 		smart_str formstr = { NULL, 0, 0 };
 		int res;
 
-#if PHP_VERSION_ID < 50400
-		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep TSRMLS_CC);
-#else
 		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738 TSRMLS_CC);
-#endif
 
 		if (res == SUCCESS) {
 			if (!formstr.c) {

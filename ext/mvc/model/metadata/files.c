@@ -22,7 +22,7 @@
 #include "mvc/model/metadatainterface.h"
 #include "mvc/model/exception.h"
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 #include <ext/standard/php_var.h>
 #include <ext/spl/spl_directory.h>
 

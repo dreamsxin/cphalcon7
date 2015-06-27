@@ -20,7 +20,7 @@
 #include "kernel/variables.h"
 #include "kernel/memory.h"
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 #include <ext/standard/php_var.h>
 
 /**

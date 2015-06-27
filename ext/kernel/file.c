@@ -28,8 +28,8 @@
 #include <main/php_streams.h>
 #include <Zend/zend_exceptions.h>
 #include <Zend/zend_interfaces.h>
+#include <Zend/zend_smart_str.h>
 #include <ext/standard/file.h>
-#include <ext/standard/php_smart_str.h>
 #include <ext/standard/php_filestat.h>
 #include <ext/standard/php_string.h>
 

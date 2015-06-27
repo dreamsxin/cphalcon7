@@ -22,7 +22,7 @@
 #include "logger/formatter.h"
 #include "logger/formatterinterface.h"
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 #include <Zend/zend_builtin_functions.h>
 
 #include "kernel/main.h"

@@ -29,7 +29,7 @@
 
 #include "php_phalcon.h"
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 #include <main/spprintf.h>
 
 #include "annotations/parser.h"

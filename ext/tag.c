@@ -331,21 +331,19 @@ PHALCON_INIT_CLASS(Phalcon_Tag){
 	return SUCCESS;
 }
 
-static void phalcon_tag_get_escaper(zval **return_value_ptr, zval *params TSRMLS_DC)
+static void phalcon_tag_get_escaper(zval *return_value, zval *params)
 {
-	zval *autoescape, *result = NULL;
+	zval *autoescape;
 
 	if (!phalcon_array_isset_string_fetch(&autoescape, params, SS("escape"))) {
 		autoescape = phalcon_fetch_static_property_ce(phalcon_tag_ce, SL("_autoEscape") TSRMLS_CC);
 	}
 
 	if (zend_is_true(autoescape)) {
-		if (FAILURE == phalcon_call_class_method_aparams(&result, NULL, phalcon_fcall_self, NULL, SL("getescaperservice"), 0, NULL TSRMLS_CC)) {
-			assert(result == NULL);
+		if (FAILURE == phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_self, SL("getescaperservice"), 0, NULL)) {
+			;
 		}
 	}
-
-	*return_value_ptr = result;
 }
 
 static zend_bool phalcon_tag_attribute_filter(HashTable *ht, void *pData, zend_hash_key *hash_key, void *pParam)
@@ -354,9 +352,9 @@ static zend_bool phalcon_tag_attribute_filter(HashTable *ht, void *pData, zend_h
 	return hash_key->key && hash_key->key->len && Z_TYPE_P(*z) != IS_ARRAY;
 }
 
-PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes TSRMLS_DC)
+PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 {
-	zval *escaper, *escaped = NULL, *attrs;
+	zval *escaper, escaped, *attrs;
 	zval *value;
 	HashPosition hp;
 	uint i;
@@ -382,10 +380,8 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes T
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(escaper);
-	phalcon_tag_get_escaper(&escaper, attributes TSRMLS_CC);
+	phalcon_tag_get_escaper(&escaper, attributes);
 	if (EG(exception)) {
-		assert(escaper == NULL);
 		PHALCON_MM_RESTORE();
 		return;
 	}
@@ -406,7 +402,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes T
 		phalcon_array_unset_string(&attrs, SS("escape"), 0);
 	}
 
-	if (escaper) {
+	if (!Z_ISUNDEF(escaper)) {
 		for (
 			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(attrs), &hp);
 			zend_hash_get_current_data_ex(Z_ARRVAL_P(attrs), (void**)&value, &hp) == SUCCESS;
@@ -415,11 +411,10 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes T
 			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(attrs), &hp);
 			if (Z_TYPE_P(&key) == IS_STRING && Z_TYPE_P(*value) != IS_NULL) {
 				PHALCON_CALL_METHOD(&escaped, escaper, "escapehtmlattr", *value);
-				PHALCON_SCONCAT_SVSVS(code, " ", &key, "=\"", escaped, "\"");
+				PHALCON_SCONCAT_SVSVS(code, " ", &key, "=\"", &escaped, "\"");
 			}
 		}
-	}
-	else {
+	} else {
 		for (
 			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(attrs), &hp);
 			zend_hash_get_current_data_ex(Z_ARRVAL_P(attrs), (void**)&value, &hp) == SUCCESS;
@@ -827,7 +822,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<a", 1);
 
-	phalcon_tag_render_attributes(code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
@@ -849,7 +844,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 PHP_METHOD(Phalcon_Tag, _inputField){
 
 	zval *type, *parameters, *as_value = NULL, *params = NULL, *default_params, *value = NULL;
-	zval *id = NULL, *name, *code, *doctype, *escaper;
+	zval *id = NULL, *name, *code, *doctype;
 
 	PHALCON_MM_GROW();
 
@@ -910,20 +905,12 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 		}
 	}
 
-	PHALCON_OBS_VAR(escaper);
-	phalcon_tag_get_escaper(&escaper, params TSRMLS_CC);
-	if (EG(exception)) {
-		assert(escaper == NULL);
-		PHALCON_MM_RESTORE();
-		return;
-	}
-
 	phalcon_array_update_string(&params, ISL(type), type, PH_COPY);
 
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<input", 1);
 
-	phalcon_tag_render_attributes(code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
@@ -1026,7 +1013,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<input", 1);
 
-	phalcon_tag_render_attributes(code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
@@ -1445,7 +1432,7 @@ PHP_METHOD(Phalcon_Tag, select){
 PHP_METHOD(Phalcon_Tag, textArea){
 
 	zval *parameters, *params = NULL, *default_params, *id = NULL, *name, *content = NULL, *code;
-	zval *escaped = NULL, *escaper;
+	zval *escaped = NULL, escaper;
 
 	PHALCON_MM_GROW();
 
@@ -1484,24 +1471,22 @@ PHP_METHOD(Phalcon_Tag, textArea){
 
 	PHALCON_CALL_SELF(&content, "getvalue", id, params);
 
-	PHALCON_OBS_VAR(escaper);
-	phalcon_tag_get_escaper(&escaper, params TSRMLS_CC);
+	phalcon_tag_get_escaper(&escaper, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
 	}
 
-	if (escaper) {
+	if (!Z_ISUNDEF(escaper))
 		PHALCON_CALL_METHOD(&escaped, escaper, "escapehtml", content);
-	}
-	else {
+	} else {
 		escaped = content;
 	}
 
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<textarea", 1);
 
-	phalcon_tag_render_attributes(code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
@@ -1593,7 +1578,7 @@ PHP_METHOD(Phalcon_Tag, form){
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<form", 1);
 
-	phalcon_tag_render_attributes(code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
@@ -1848,7 +1833,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 		ZVAL_STRING(code, "<link rel=\"stylesheet\"", 1);
 	}
 
-	phalcon_tag_render_attributes(code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
@@ -1967,7 +1952,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<script", 1);
 
-	phalcon_tag_render_attributes(code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
@@ -2055,7 +2040,7 @@ PHP_METHOD(Phalcon_Tag, image){
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<img", 1);
 
-	phalcon_tag_render_attributes(code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;
@@ -2225,7 +2210,7 @@ PHP_METHOD(Phalcon_Tag, tagHtml){
 	PHALCON_INIT_VAR(local_code);
 	PHALCON_CONCAT_SV(local_code, "<", tag_name);
 
-	phalcon_tag_render_attributes(local_code, params TSRMLS_CC);
+	phalcon_tag_render_attributes(local_code, params);
 	if (EG(exception)) {
 		PHALCON_MM_RESTORE();
 		return;

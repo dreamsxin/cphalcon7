@@ -21,9 +21,9 @@
 #include "internal/arginfo.h"
 
 #include <Zend/zend_interfaces.h>
+#include <Zend/zend_smart_str.h>
 #include <ext/spl/spl_array.h>
 #include <ext/standard/php_var.h>
-#include <ext/standard/php_smart_str.h>
 
 #include "kernel/main.h"
 #include "kernel/hash.h"

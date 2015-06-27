@@ -466,47 +466,12 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Image_Adapter);
 	PHALCON_INIT(Phalcon_Image_Adapter_GD);
 	PHALCON_INIT(Phalcon_Image_Adapter_Imagick);
-	PHALCON_INIT(Phalcon_Amf);
-	PHALCON_INIT(Phalcon_Amf_Header);
-	PHALCON_INIT(Phalcon_Amf_Message);
-	PHALCON_INIT(Phalcon_Amf_Packet);
-	PHALCON_INIT(Phalcon_Amf_Deserializer);
-	PHALCON_INIT(Phalcon_Amf_Serializer);
-	PHALCON_INIT(Phalcon_Amf_Exception);
-	PHALCON_INIT(Phalcon_Mvc_Amf);
-	PHALCON_INIT(Phalcon_Mvc_Amf_Exception);
 	PHALCON_INIT(Phalcon_Registry);
 	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Json);
 	PHALCON_INIT(Phalcon_Arr);
 	PHALCON_INIT(Phalcon_Chart_QRcode);
 	PHALCON_INIT(Phalcon_Chart_Captcha);
-	PHALCON_INIT(Phalcon_Scws);
 	PHALCON_INIT(Phalcon_Async);
-
-#if PHP_VERSION_ID < 50500
-	setlocale(LC_ALL, old_lc_all);
-	free(old_lc_all);
-#endif
-
-/*
-	orig_execute_internal = zend_execute_internal;
-	if (!zend_execute_internal && !getenv("PHALCON_NO_RVO")) {
-		zend_execute_internal = phalcon_execute_internal;
-	}
-*/
-
-#if 0
-	{
-		zend_module_entry *entry;
-		if ((entry = zend_hash_str_find_ptr(&module_registry, ZEND_STRS("mbstring"))) == SUCCESS) {
-#ifdef ZTS
-			mbstring_globals_id = *(entry->globals_id_ptr);
-#else
-			mbstring_globals    = ((zend_mbstring_globals*)(entry->globals_ptr));
-#endif
-		}
-	}
-#endif
 
 	return SUCCESS;
 }
@@ -518,9 +483,7 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 	assert(PHALCON_GLOBAL(orm).ast_cache == NULL);
 
 	UNREGISTER_INI_ENTRIES();
-/*
-	zend_execute_internal = orig_execute_internal;
-*/
+
 	return SUCCESS;
 }
 

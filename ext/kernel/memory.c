@@ -77,13 +77,6 @@ void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr TSRMLS_
 	phalcon_globals_ptr->start_memory = start;
 	phalcon_globals_ptr->end_memory   = start + PHALCON_NUM_PREALLOCATED_FRAMES;
 
-	phalcon_globals_ptr->fcache = pemalloc(sizeof(HashTable), 1);
-#ifndef PHALCON_RELEASE
-	zend_hash_init(phalcon_globals_ptr->fcache, 128, NULL, phalcon_fcall_cache_dtor, 1);
-#else
-	zend_hash_init(phalcon_globals_ptr->fcache, 128, NULL, NULL, 1);
-#endif
-
 	/* 'Allocator sizeof operand mismatch' warning can be safely ignored */
 	ALLOC_INIT_ZVAL(phalcon_globals_ptr->z_null);
 	Z_SET_REFCOUNT_P(phalcon_globals_ptr->z_null, 2);
@@ -132,8 +125,6 @@ void phalcon_deinitialize_memory(TSRMLS_D)
 
 	phalcon_orm_destroy_cache(TSRMLS_C);
 
-	zend_hash_apply_with_arguments(phalcon_globals_ptr->fcache TSRMLS_CC, phalcon_cleanup_fcache, 0);
-
 #ifndef PHALCON_RELEASE
 	assert(phalcon_globals_ptr->start_memory != NULL);
 #endif
@@ -145,10 +136,6 @@ void phalcon_deinitialize_memory(TSRMLS_D)
 
 	pefree(phalcon_globals_ptr->start_memory, 1);
 	phalcon_globals_ptr->start_memory = NULL;
-
-	zend_hash_destroy(phalcon_globals_ptr->fcache);
-	pefree(phalcon_globals_ptr->fcache, 1);
-	phalcon_globals_ptr->fcache = NULL;
 
 	for (i = 0; i < 2; i++) {
 		phalcon_ptr_dtor(&phalcon_globals_ptr->z_null);

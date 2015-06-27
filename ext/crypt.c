@@ -21,7 +21,7 @@
 #include "cryptinterface.h"
 #include "crypt/exception.h"
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 #include <ext/standard/php_string.h>
 #include <ext/standard/base64.h>
 

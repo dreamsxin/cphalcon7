@@ -23,7 +23,7 @@
 
 #include "php_phalcon.h"
 
-void phalcon_tag_render_attributes(zval *code, zval *attributes TSRMLS_DC);
+void phalcon_tag_render_attributes(zval *code, zval *attributes);
 
 extern zend_class_entry *phalcon_tag_ce;
 

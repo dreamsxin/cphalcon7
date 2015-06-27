@@ -471,8 +471,7 @@ PHALCON_ATTR_WARN_UNUSED_RESULT static int phalcon_config_toarray_internal(zval 
 	}
 	else {
 		zval *params[] = { this_ptr };
-		zval *return_value = *return_value_ptr;
-		result = phalcon_return_call_function(return_value, return_value_ptr, SL("get_object_vars"), 1, params TSRMLS_CC);
+		result = phalcon_call_func_aparams(return_value, SL("get_object_vars"), 1, params);
 	}
 
 	return result;

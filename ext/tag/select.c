@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 	{
 		zend_class_entry *scope = EG(scope);
 		EG(scope) = phalcon_tag_ce;
-		phalcon_tag_render_attributes(code, params TSRMLS_CC);
+		phalcon_tag_render_attributes(code, params);
 		EG(scope) = scope;
 	}
 

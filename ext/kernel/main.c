@@ -295,7 +295,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 	va_list va;
 	zval **arg, *param;
 	int arg_count;
-	int i, use_args_num;
+	int use_args_num;
 
 	param = ZEND_CALL_ARG(EG(current_execute_data), 1);
 	arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
@@ -319,7 +319,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 	use_args_num = required_args + optional_args;
 	num_args = num_args > use_args_num ? use_args_num : num_args;
 
-	i = 0;
 	while (num_args-- > 0) {
 		arg = va_arg(va, zval **);
 		*arg = param;

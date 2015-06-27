@@ -28,7 +28,7 @@ SOFTWARE.
 
 #ifdef PHALCON_NON_FREE
 
-#include <ext/standard/php_smart_str.h>
+#include <Zend/zend_smart_str.h>
 
 #include "assets/filters/jsminifier.h"
 #include "assets/exception.h"

@@ -61,15 +61,15 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
 			return zend_symtable_update(ht, Z_STRVAL_P(key), Z_STRLEN_P(key)+1, (void**)&value, sizeof(zval*), NULL);
 
 		case IS_TRUE:
-			return zend_hash_index_update(ht, 1, (void*)&value, sizeof(zval*), NULL);
+			return zend_hash_index_update(ht, 1, (void*)&value);
 
 		case IS_FALSE:
-			return zend_hash_index_update(ht, 0, (void*)&value, sizeof(zval*), NULL);
+			return zend_hash_index_update(ht, 0, (void*)&value);
 
 		case IS_RESOURCE:
 		case IS_DOUBLE:
 		case IS_LONG:
-			return zend_hash_index_update(ht, ((Z_TYPE_P(key) == IS_DOUBLE) ? (ulong)Z_DVAL_P(key) : (ulong)Z_LVAL_P(key)), (void*)&value, sizeof(zval*), NULL);
+			return zend_hash_index_update(ht, ((Z_TYPE_P(key) == IS_DOUBLE) ? (ulong)Z_DVAL_P(key) : (ulong)Z_LVAL_P(key)), (void*)&value);
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");
@@ -132,7 +132,7 @@ zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
 					case BP_VAR_W: {
 						zval *value;
 						ALLOC_INIT_ZVAL(value);
-						zend_hash_index_update(ht, index, (void**)&value, sizeof(void*), (void**)&ret);
+						zend_hash_index_update(ht, index, (void**)&value);
 						break;
 					}
 				}
@@ -257,7 +257,7 @@ zval** phalcon_hash_fast_get(HashTable *ht, int type, const zval *key)
 					case BP_VAR_W: {
 						zval *value;
 						ALLOC_INIT_ZVAL(value);
-						zend_hash_index_update(ht, index, (void**)&value, sizeof(void*), (void**)&ret);
+						zend_hash_index_update(ht, index, (void**)&value);
 						break;
 					}
 				}
@@ -332,15 +332,15 @@ int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zval *
 			return zend_hash_quick_update(ht, Z_STRVAL(key->constant), Z_STRLEN(key->constant)+1, key->hash_value, (void**)&value, sizeof(zval*), NULL);
 
 		case IS_TRUE:
-			return zend_hash_index_update(ht, 1, (void*)&value, sizeof(zval*), NULL);
+			return zend_hash_index_update(ht, 1, (void*)&value);
 
 		case IS_FALSE:
-			return zend_hash_index_update(ht, 0, (void*)&value, sizeof(zval*), NULL);
+			return zend_hash_index_update(ht, 0, (void*)&value);
 
 		case IS_RESOURCE:
 		case IS_DOUBLE:
 		case IS_LONG:
-			return zend_hash_index_update(ht, ((Z_TYPE(key->constant) == IS_DOUBLE) ? (ulong)Z_DVAL(key->constant) : (ulong)Z_LVAL(key->constant)), (void*)&value, sizeof(zval*), NULL);
+			return zend_hash_index_update(ht, ((Z_TYPE(key->constant) == IS_DOUBLE) ? (ulong)Z_DVAL(key->constant) : (ulong)Z_LVAL(key->constant)), (void*)&value);
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");

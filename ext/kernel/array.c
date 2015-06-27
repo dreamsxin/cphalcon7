@@ -283,20 +283,20 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 			break;
 
 		case IS_DOUBLE:
-			status = zend_hash_index_update(ht, (ulong)Z_DVAL_P(index), (void*)&value, sizeof(zval*), NULL);
+			status = zend_hash_index_update(ht, (ulong)Z_DVAL_P(index), (void*)&value);
 			break;
 
 		case IS_TRUE:
-			status = zend_hash_index_update(ht, 1, (void*)&value, sizeof(zval*), NULL);
+			status = zend_hash_index_update(ht, 1, (void*)&value);
 			break;
 
 		case IS_FALSE:
-			status = zend_hash_index_update(ht, 0, (void*)&value, sizeof(zval*), NULL);
+			status = zend_hash_index_update(ht, 0, (void*)&value);
 			break;
 
 		case IS_LONG:
 		case IS_RESOURCE:
-			status = zend_hash_index_update(ht, Z_LVAL_P(index), (void*)&value, sizeof(zval*), NULL);
+			status = zend_hash_index_update(ht, Z_LVAL_P(index), (void*)&value);
 			break;
 
 		case IS_STRING:
@@ -367,7 +367,7 @@ int phalcon_array_update_long(zval **arr, ulong index, zval *value, int flags){
 		Z_ADDREF_P(value);
 	}
 
-	return zend_hash_index_update(Z_ARRVAL_P(*arr), index, (void*)&value, sizeof(zval *), NULL);
+	return zend_hash_index_update(Z_ARRVAL_P(*arr), index, (void*)&value);
 }
 
 int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index, int flags){

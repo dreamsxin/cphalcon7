@@ -254,17 +254,17 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	 */
 	if (!phalcon_array_isset_string_fetch(&priority, options, SS("priority"))) {
 		PHALCON_INIT_VAR(priority);
-		ZVAL_STRING(priority, "100", 1);
+		ZVAL_STRING(priority, "100");
 	}
 
 	if (!phalcon_array_isset_string_fetch(&delay, options, SS("delay"))) {
 		PHALCON_INIT_VAR(delay);
-		ZVAL_STRING(delay, "0", 1);
+		ZVAL_STRING(delay, "0");
 	}
 
 	if (!phalcon_array_isset_string_fetch(&ttr, options, SS("ttr"))) {
 		PHALCON_INIT_VAR(ttr);
-		ZVAL_STRING(ttr, "86400", 1);
+		ZVAL_STRING(ttr, "86400");
 	}
 
 	/** 
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, reserve){
 	if (zend_is_true(timeout)) {
 		PHALCON_CONCAT_SV(command, "reserve-with-timeout ", timeout);
 	} else {
-		ZVAL_STRING(command, "reserve", 1);
+		ZVAL_STRING(command, "reserve");
 	}
 	PHALCON_CALL_METHOD(NULL, this_ptr, "write", command);
 	PHALCON_CALL_METHOD(&response, this_ptr, "readstatus");
@@ -443,7 +443,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, stats){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(command);
-	ZVAL_STRING(command, "stats ", 1);
+	ZVAL_STRING(command, "stats ");
 
 	PHALCON_CALL_METHOD(NULL, this_ptr, "write", command);
 	PHALCON_CALL_METHOD(&response, this_ptr, "readyaml");
@@ -526,7 +526,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekReady){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(command);
-	ZVAL_STRING(command, "peek-ready", 1);
+	ZVAL_STRING(command, "peek-ready");
 	PHALCON_CALL_METHOD(NULL, this_ptr, "write", command);
 	PHALCON_CALL_METHOD(&response, this_ptr, "readstatus");
 
@@ -552,7 +552,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekDelayed){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(command);
-	ZVAL_STRING(command, "peek-delayed", 1);
+	ZVAL_STRING(command, "peek-delayed");
 	PHALCON_CALL_METHOD(NULL, this_ptr, "write", command);
 	PHALCON_CALL_METHOD(&response, this_ptr, "readstatus");
 
@@ -578,7 +578,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekBuried){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(command);
-	ZVAL_STRING(command, "peek-buried", 1);
+	ZVAL_STRING(command, "peek-buried");
 	PHALCON_CALL_METHOD(NULL, this_ptr, "write", command);
 	PHALCON_CALL_METHOD(&response, this_ptr, "readstatus");
 

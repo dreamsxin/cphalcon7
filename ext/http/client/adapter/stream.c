@@ -102,20 +102,20 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 	PHALCON_CALL_FUNCTION(&stream, "stream_context_create");
 
 	PHALCON_INIT_VAR(http);
-	ZVAL_STRING(http, "http", 1);
+	ZVAL_STRING(http, "http");
 
 	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "user_agent", 1);
+	ZVAL_STRING(option, "user_agent");
 
 	PHALCON_INIT_VAR(value);
-	ZVAL_STRING(value, "Phalcon HTTP Client(Stream)", 1);
+	ZVAL_STRING(value, "Phalcon HTTP Client(Stream)");
 
 	PHALCON_CALL_METHOD(NULL, header, "set", option, value);
 
 	phalcon_update_property_this(this_ptr, SL("_header"), header);
 
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "follow_location", 1);
+	ZVAL_STRING(option, "follow_location");
 
 	PHALCON_INIT_NVAR(value);
 	ZVAL_LONG(value, 1);
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, value);
 
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "protocol_version", 1);
+	ZVAL_STRING(option, "protocol_version");
 
 	PHALCON_INIT_NVAR(value);
 	ZVAL_DOUBLE(value, 1.1);
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, value);	
 
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "max_redirects", 1);
+	ZVAL_STRING(option, "max_redirects");
 
 	PHALCON_INIT_NVAR(value);
 	ZVAL_LONG(value, 20);
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 	if (PHALCON_IS_NOT_EMPTY(username)) {
 		if (PHALCON_IS_STRING(authtype, "basic")) {
 			PHALCON_INIT_NVAR(key);
-			ZVAL_STRING(key, "Authorization", 1);
+			ZVAL_STRING(key, "Authorization");
 
 			PHALCON_INIT_NVAR(value);
 			PHALCON_CONCAT_SVSV(value, "Basic ", username, ":", password);
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 			}
 
 			PHALCON_INIT_NVAR(key);
-			ZVAL_STRING(key, "Authorization", 1);
+			ZVAL_STRING(key, "Authorization");
 
 			if (phalcon_array_isset_string_fetch(&nonce, digest, SS("nonce"))) {
 				PHALCON_INIT_VAR(nonce);
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 	}
 
 	PHALCON_INIT_VAR(http);
-	ZVAL_STRING(http, "http", 1);
+	ZVAL_STRING(http, "http");
 
 	PHALCON_CALL_FUNCTION(&uniqid, "uniqid");
 
@@ -278,17 +278,17 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 	
 	if (Z_TYPE_P(data) == IS_STRING && PHALCON_IS_NOT_EMPTY(data)) {
 		PHALCON_INIT_NVAR(key);
-		ZVAL_STRING(key, "Content-Type", 1);
+		ZVAL_STRING(key, "Content-Type");
 
 		if (PHALCON_IS_EMPTY(type)) {
 			PHALCON_INIT_NVAR(type);
-			ZVAL_STRING(type, "application/x-www-form-urlencoded", 1);
+			ZVAL_STRING(type, "application/x-www-form-urlencoded");
 		}
 
 		PHALCON_CALL_METHOD(NULL, header, "set", key, type);
 
 		PHALCON_INIT_NVAR(key);
-		ZVAL_STRING(key, "Content-Length", 1);		
+		ZVAL_STRING(key, "Content-Length");		
 
 		PHALCON_INIT_NVAR(value);
 		ZVAL_LONG(value, Z_STRLEN_P(data));
@@ -301,12 +301,12 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		PHALCON_CALL_METHOD(&headers, header, "build", option);
 
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "header", 1);
+		ZVAL_STRING(option, "header");
 
 		PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, headers);
 
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "content", 1);
+		ZVAL_STRING(option, "content");
 		
 		PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, data);
 
@@ -350,7 +350,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		PHALCON_SCONCAT_SVS(body, "--", boundary, "--\r\n");
 
 		PHALCON_INIT_NVAR(key);
-		ZVAL_STRING(key, "Content-Type", 1);
+		ZVAL_STRING(key, "Content-Type");
 
 		PHALCON_INIT_NVAR(value);
 		PHALCON_CONCAT_SV(value, "multipart/form-data; boundary=", boundary);
@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		PHALCON_CALL_METHOD(NULL, header, "set", key, value);
 
 		PHALCON_INIT_NVAR(key);
-		ZVAL_STRING(key, "Content-Length", 1);		
+		ZVAL_STRING(key, "Content-Length");		
 
 		PHALCON_INIT_NVAR(value);
 		ZVAL_LONG(value, Z_STRLEN_P(body));
@@ -368,12 +368,12 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		PHALCON_CALL_METHOD(&headers, header, "build");
 
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "header", 1);
+		ZVAL_STRING(option, "header");
 
 		PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, headers);
 
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "content", 1);
+		ZVAL_STRING(option, "content");
 		
 		PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, body);
 	}
@@ -407,16 +407,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 	timeout = phalcon_fetch_nproperty_this(this_ptr, SL("_timeout"), PH_NOISY);
 
 	PHALCON_INIT_VAR(http);
-	ZVAL_STRING(http, "http", 1);
+	ZVAL_STRING(http, "http");
 	
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "method", 1);
+	ZVAL_STRING(option, "method");
 
 	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, method);
 
 	if (PHALCON_IS_NOT_EMPTY(useragent)) {
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "User-Agent", 1);
+		ZVAL_STRING(option, "User-Agent");
 
 		PHALCON_CALL_METHOD(NULL, header, "set", option, useragent);
 
@@ -424,7 +424,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 	}
 	
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "timeout", 1);
+	ZVAL_STRING(option, "timeout");
 
 	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, timeout);
 
@@ -438,7 +438,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 	PHALCON_CALL_FUNCTION(NULL, "set_error_handler", handler);
 
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "r", 1);
+	ZVAL_STRING(option, "r");
 
 	PHALCON_CALL_FUNCTION(&fp, "fopen", url, option, PHALCON_GLOBAL(z_false), stream);
 

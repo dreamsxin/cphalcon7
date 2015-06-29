@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "annotations", 1);
+	ZVAL_STRING(service, "annotations");
 
 	PHALCON_CALL_METHOD(&annotations, dependency_injector, "get", service);
 
@@ -173,34 +173,34 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	array_init(field_default_values);
 
 	PHALCON_INIT_VAR(column_annot_name);
-	ZVAL_STRING(column_annot_name, "Column", 1);
+	ZVAL_STRING(column_annot_name, "Column");
 
 	PHALCON_INIT_VAR(primary_annot_name);
-	ZVAL_STRING(primary_annot_name, "Primary", 1);
+	ZVAL_STRING(primary_annot_name, "Primary");
 
 	PHALCON_INIT_VAR(id_annot_name);
-	ZVAL_STRING(id_annot_name, "Identity", 1);
+	ZVAL_STRING(id_annot_name, "Identity");
 
 	PHALCON_INIT_VAR(column_map_name);
-	ZVAL_STRING(column_map_name, "column", 1);
+	ZVAL_STRING(column_map_name, "column");
 
 	PHALCON_INIT_VAR(column_type_name);
-	ZVAL_STRING(column_type_name, "type", 1);
+	ZVAL_STRING(column_type_name, "type");
 
 	PHALCON_INIT_VAR(column_size_name);
-	ZVAL_STRING(column_size_name, "size", 1);
+	ZVAL_STRING(column_size_name, "size");
 
 	PHALCON_INIT_VAR(column_bytes_name);
-	ZVAL_STRING(column_bytes_name, "bytes", 1);
+	ZVAL_STRING(column_bytes_name, "bytes");
 
 	PHALCON_INIT_VAR(column_scale_name);
-	ZVAL_STRING(column_scale_name, "scale", 1);
+	ZVAL_STRING(column_scale_name, "scale");
 
 	PHALCON_INIT_VAR(column_default_value);
-	ZVAL_STRING(column_default_value, "default", 1);
+	ZVAL_STRING(column_default_value, "default");
 
 	PHALCON_INIT_VAR(column_nullable_name);
-	ZVAL_STRING(column_nullable_name, "nullable", 1);
+	ZVAL_STRING(column_nullable_name, "nullable");
 
 	phalcon_is_iterable(properties_annotations, &ah0, &hp0, 0, 0);
 	
@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "annotations", 1);
+	ZVAL_STRING(service, "annotations");
 
 	PHALCON_CALL_METHOD(&annotations, dependency_injector, "get", service);
 
@@ -414,10 +414,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	array_init(reversed_column_map);
 
 	PHALCON_INIT_VAR(column_annot_name);
-	ZVAL_STRING(column_annot_name, "Column", 1);
+	ZVAL_STRING(column_annot_name, "Column");
 
 	PHALCON_INIT_VAR(column_map_name);
-	ZVAL_STRING(column_map_name, "column", 1);
+	ZVAL_STRING(column_map_name, "column");
 
 	phalcon_is_iterable(properties_annotations, &ah0, &hp0, 0, 0);
 

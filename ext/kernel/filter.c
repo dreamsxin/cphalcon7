@@ -63,13 +63,13 @@ void phalcon_filter_alphanum(zval *return_value, zval *param){
 	}
 
 	if (use_copy) {
-		phalcon_dtor(param);
+		phalcon_ptr_dtor(param);
 	}
 
 	smart_str_0(&filtered_str);
 
-	if (filtered_str.c) {
-		RETURN_STRINGL(filtered_str.c, filtered_str.len, 0);
+	if (filtered_str.s) {
+		RETURN_STR(filtered_str.s);
 	} else {
 		RETURN_EMPTY_STRING();
 	}
@@ -109,8 +109,8 @@ void phalcon_filter_identifier(zval *return_value, zval *param){
 
 	smart_str_0(&filtered_str);
 
-	if (filtered_str.c) {
-		RETURN_STRINGL(filtered_str.c, filtered_str.len, 0);
+	if (filtered_str.s) {
+		RETURN_STR(filtered_str.s);
 	} else {
 		RETURN_EMPTY_STRING();
 	}
@@ -318,8 +318,8 @@ void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_ch
 
 	smart_str_0(&escaped_str);
 
-	if (escaped_str.c) {
-		RETURN_STRINGL(escaped_str.c, escaped_str.len, 0);
+	if (escaped_str.s) {
+		RETURN_STR(escaped_str.s);
 	} else {
 		RETURN_EMPTY_STRING();
 	}
@@ -332,7 +332,7 @@ void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_ch
 void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style, const zval *charset) {
 
 	size_t length;
-	char *escaped;
+	zend_string *escaped;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
 		/* Nothing to escape */
@@ -349,9 +349,9 @@ void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style,
 		RETURN_ZVAL(str, 1, 0);
 	}
 
-	escaped = php_escape_html_entities((unsigned char*) Z_STRVAL_P(str), Z_STRLEN_P(str), &length, 0, Z_LVAL_P(quote_style), Z_STRVAL_P(charset));
+	escaped = php_escape_html_entities((unsigned char*) Z_STRVAL_P(str), Z_STRLEN_P(str), 0, Z_LVAL_P(quote_style), Z_STRVAL_P(charset));
 
-	RETURN_STRINGL(escaped, length, 0);
+	RETURN_STR(escaped);
 }
 
 /**
@@ -391,12 +391,12 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 	}
 
 	PHALCON_INIT_NVAR(tmp);
-	ZVAL_STRING(tmp, "*", 1);
+	ZVAL_STRING(tmp, "*");
 
 	PHALCON_CALL_METHOD(&elements, document, "getelementsbytagname", tmp);
 
 	PHALCON_INIT_VAR(regexp);
-	ZVAL_STRING(regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i", 1);
+	ZVAL_STRING(regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
 
 	PHALCON_OBS_NVAR(tmp);
 	phalcon_read_property(&tmp, elements, SL("length"), PH_NOISY);

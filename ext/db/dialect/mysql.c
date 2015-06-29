@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				PHALCON_CONCAT_SVS(column_sql, "INT(", size, ")");
 			}
 			else {
-				ZVAL_STRING(column_sql, "INT", 1);
+				ZVAL_STRING(column_sql, "INT");
 			}
 	
 			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 			break;
 	
 		case 1:
-			ZVAL_STRING(column_sql, "DATE", 1);
+			ZVAL_STRING(column_sql, "DATE");
 			break;
 	
 		case 2:
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 			break;
 	
 		case 4:
-			ZVAL_STRING(column_sql, "DATETIME", 1);
+			ZVAL_STRING(column_sql, "DATETIME");
 			break;
 	
 		case 5:
@@ -171,11 +171,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 			break;
 	
 		case 6:
-			ZVAL_STRING(column_sql, "TEXT", 1);
+			ZVAL_STRING(column_sql, "TEXT");
 			break;
 	
 		case 7:
-			ZVAL_STRING(column_sql, "FLOAT", 1);
+			ZVAL_STRING(column_sql, "FLOAT");
 	
 			PHALCON_CALL_METHOD(&scale, column, "getscale");
 			if (zend_is_true(size)) {
@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 			break;
 	
 		case 8:
-			ZVAL_STRING(column_sql, "TINYINT(1)", 1);
+			ZVAL_STRING(column_sql, "TINYINT(1)");
 			break;
 	
 		default:
@@ -1093,7 +1093,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, describeReferences){
 	phalcon_fetch_params(1, 1, 1, &table, &schema);
 	
 	PHALCON_INIT_VAR(sql);
-	ZVAL_STRING(sql, "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND ", 1);
+	ZVAL_STRING(sql, "SELECT TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME,REFERENCED_TABLE_SCHEMA,REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_NAME IS NOT NULL AND ");
 	if (schema && zend_is_true(schema)) {
 		PHALCON_SCONCAT_SVSVS(sql, "CONSTRAINT_SCHEMA = \"", schema, "\" AND TABLE_NAME = \"", table, "\"");
 	} else {
@@ -1119,7 +1119,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, tableOptions){
 	phalcon_fetch_params(1, 1, 1, &table, &schema);
 	
 	PHALCON_INIT_VAR(sql);
-	ZVAL_STRING(sql, "SELECT TABLES.TABLE_TYPE AS table_type,TABLES.AUTO_INCREMENT AS auto_increment,TABLES.ENGINE AS engine,TABLES.TABLE_COLLATION AS table_collation FROM INFORMATION_SCHEMA.TABLES WHERE ", 1);
+	ZVAL_STRING(sql, "SELECT TABLES.TABLE_TYPE AS table_type,TABLES.AUTO_INCREMENT AS auto_increment,TABLES.ENGINE AS engine,TABLES.TABLE_COLLATION AS table_collation FROM INFORMATION_SCHEMA.TABLES WHERE ");
 	if (schema && zend_is_true(schema)) {
 		PHALCON_SCONCAT_SVSVS(sql, "TABLES.TABLE_SCHEMA = \"", schema, "\" AND TABLES.TABLE_NAME = \"", table, "\"");
 	} else {

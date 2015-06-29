@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode){
 	PHALCON_CONCAT_VSV(status_value, code, " ", message);
 
 	PHALCON_INIT_VAR(status_header);
-	ZVAL_STRING(status_header, "Status", 1);
+	ZVAL_STRING(status_header, "Status");
 	PHALCON_CALL_METHOD(NULL, headers, "set", status_header, status_value);
 	phalcon_update_property_this(this_ptr, SL("_headers"), headers);
 	RETURN_THIS();
@@ -409,7 +409,7 @@ PHP_METHOD(Phalcon_Http_Response, setExpires){
 	 * All the expiration times are sent in UTC
 	 */
 	PHALCON_INIT_VAR(utc_zone);
-	ZVAL_STRING(utc_zone, "UTC", 1);
+	ZVAL_STRING(utc_zone, "UTC");
 	datetimezone_ce = php_date_get_timezone_ce();
 
 	PHALCON_INIT_VAR(timezone);
@@ -422,7 +422,7 @@ PHP_METHOD(Phalcon_Http_Response, setExpires){
 	PHALCON_CALL_METHOD(NULL, date, "settimezone", timezone);
 
 	PHALCON_INIT_VAR(format);
-	ZVAL_STRING(format, "D, d M Y H:i:s", 1);
+	ZVAL_STRING(format, "D, d M Y H:i:s");
 	PHALCON_CALL_METHOD(&utc_format, date, "format", format);
 
 	PHALCON_INIT_VAR(utc_date);
@@ -432,7 +432,7 @@ PHP_METHOD(Phalcon_Http_Response, setExpires){
 	 * The 'Expires' header set this info
 	 */
 	PHALCON_INIT_VAR(expires_header);
-	ZVAL_STRING(expires_header, "Expires", 1);
+	ZVAL_STRING(expires_header, "Expires");
 	PHALCON_CALL_METHOD(NULL, this_ptr, "setheader", expires_header, utc_date);
 
 	RETURN_THIS();
@@ -453,7 +453,7 @@ PHP_METHOD(Phalcon_Http_Response, setNotModified){
 	ZVAL_LONG(code, 304);
 
 	PHALCON_INIT_VAR(status);
-	ZVAL_STRING(status, "Not modified", 1);
+	ZVAL_STRING(status, "Not modified");
 	PHALCON_CALL_METHOD(NULL, this_ptr, "setstatuscode", code, status);
 	RETURN_THIS();
 }
@@ -485,7 +485,7 @@ PHP_METHOD(Phalcon_Http_Response, setContentType){
 	PHALCON_CALL_METHOD(&headers, this_ptr, "getheaders");
 
 	PHALCON_INIT_VAR(name);
-	ZVAL_STRING(name, "Content-Type", 1);
+	ZVAL_STRING(name, "Content-Type");
 	if (Z_TYPE_P(charset) == IS_NULL) {
 		PHALCON_CALL_METHOD(NULL, headers, "set", name, content_type);
 	} else {
@@ -515,7 +515,7 @@ PHP_METHOD(Phalcon_Http_Response, setEtag){
 	phalcon_fetch_params(1, 1, 0, &etag);
 
 	PHALCON_INIT_VAR(name);
-	ZVAL_STRING(name, "ETag", 1);
+	ZVAL_STRING(name, "ETag");
 
 	PHALCON_CALL_METHOD(&headers, this_ptr, "getheaders");
 	PHALCON_CALL_METHOD(NULL, headers, "set", name, etag);
@@ -595,7 +595,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	} else if (Z_TYPE_P(location) == IS_STRING && strstr(Z_STRVAL_P(location), "://")) {
 		PHALCON_INIT_VAR(matched);
 		PHALCON_INIT_VAR(pattern);
-		ZVAL_STRING(pattern, "/^[^:\\/?#]++:/", 1);
+		ZVAL_STRING(pattern, "/^[^:\\/?#]++:/");
 		RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, pattern, location, NULL));
 		if (zend_is_true(matched)) {
 			header = location;
@@ -634,13 +634,13 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	/* The HTTP status is 302 by default, a temporary redirection */
 	PHALCON_INIT_VAR(status_text);
 	if (Z_LVAL_P(status_code) < 300 || Z_LVAL_P(status_code) > 308) {
-		ZVAL_STRING(status_text, "Redirect", 1);
+		ZVAL_STRING(status_text, "Redirect");
 		if (!Z_LVAL_P(status_code)) {
 			ZVAL_LONG(status_code, 302);
 		}
 	}
 	else {
-		ZVAL_STRING(status_text, redirect_phrases[Z_LVAL_P(status_code) - 300], 1);
+		ZVAL_STRING(status_text, redirect_phrases[Z_LVAL_P(status_code) - 300]);
 	}
 
 	PHALCON_CALL_METHOD(NULL, this_ptr, "setstatuscode", status_code, status_text);
@@ -649,7 +649,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	 * Change the current location using 'Location'
 	 */
 	PHALCON_INIT_VAR(header_name);
-	ZVAL_STRING(header_name, "Location", 1);
+	ZVAL_STRING(header_name, "Location");
 	PHALCON_CALL_METHOD(NULL, this_ptr, "setheader", header_name, header);
 
 	RETURN_THIS();
@@ -725,7 +725,7 @@ PHP_METHOD(Phalcon_Http_Response, setBsonContent){
 	phalcon_fetch_params(1, 1, 0, &content);
 
 	PHALCON_INIT_VAR(content_type);
-	ZVAL_STRING(content_type, "application/bson", 1);
+	ZVAL_STRING(content_type, "application/bson");
 	PHALCON_CALL_METHOD(NULL, this_ptr, "setContentType", content_type);
 
 	PHALCON_CALL_FUNCTION(&bson_content, "bson_encode", content);
@@ -903,7 +903,7 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 		PHALCON_CALL_METHOD(&headers, this_ptr, "getheaders");
 
 		PHALCON_INIT_VAR(content_description);
-		ZVAL_STRING(content_description, "Content-Description: File Transfer", 1);
+		ZVAL_STRING(content_description, "Content-Description: File Transfer");
 		PHALCON_CALL_METHOD(NULL, headers, "setraw", content_description);
 
 		PHALCON_INIT_VAR(content_disposition);
@@ -911,7 +911,7 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 		PHALCON_CALL_METHOD(NULL, headers, "setraw", content_disposition);
 
 		PHALCON_INIT_VAR(content_transfer);
-		ZVAL_STRING(content_transfer, "Content-Transfer-Encoding: binary", 1);
+		ZVAL_STRING(content_transfer, "Content-Transfer-Encoding: binary");
 		PHALCON_CALL_METHOD(NULL, headers, "setraw", content_transfer);
 	}
 	phalcon_update_property_this(this_ptr, SL("_file"), file_path);

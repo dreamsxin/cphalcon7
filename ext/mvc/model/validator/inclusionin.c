@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	phalcon_fetch_params(1, 1, 0, &record);
 	
 	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field", 1);
+	ZVAL_STRING(option, "field");
 	
 	PHALCON_CALL_METHOD(&field, this_ptr, "getoption", option);
 	if (Z_TYPE_P(field) != IS_STRING) {
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	 * The 'domain' option must be a valid array of not allowed values
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "domain", 1);
+	ZVAL_STRING(option, "domain");
 	
 	PHALCON_CALL_METHOD(&is_set, this_ptr, "issetoption", option);
 	if (PHALCON_IS_FALSE(is_set)) {
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	}
 	
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "domain", 1);
+	ZVAL_STRING(option, "domain");
 	
 	PHALCON_CALL_METHOD(&domain, this_ptr, "getoption", option);
 	if (Z_TYPE_P(domain) != IS_ARRAY) { 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	 * Allow empty
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty", 1);
+	ZVAL_STRING(option, "allowEmpty");
 
 	PHALCON_CALL_METHOD(&allow_empty, this_ptr, "getoption", option);
 	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	 * Allow empty
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty", 1);
+	ZVAL_STRING(option, "allowEmpty");
 
 	PHALCON_CALL_METHOD(&allow_empty, this_ptr, "getoption", option);
 
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 		}
 	
 		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Inclusion", 1);
+		ZVAL_STRING(type, "Inclusion");
 
 		/*
 		 * Is code set

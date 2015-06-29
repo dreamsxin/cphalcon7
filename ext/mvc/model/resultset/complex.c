@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			int i_hydrate_mode  = phalcon_get_intval(hydrate_mode);
 
 			PHALCON_INIT_VAR(underscore);
-			ZVAL_STRING(underscore, "_", 1);
+			ZVAL_STRING(underscore, "_");
 
 			PHALCON_INIT_VAR(empty_str);
 			ZVAL_EMPTY_STRING(empty_str);

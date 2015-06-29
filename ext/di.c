@@ -824,7 +824,7 @@ PHP_METHOD(Phalcon_DI, get){
 	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "di:beforeServiceResolve", 1);
+		ZVAL_STRING(event_name, "di:beforeServiceResolve");
 
 		PHALCON_INIT_NVAR(event_data);
 		array_init(event_data);
@@ -862,7 +862,7 @@ PHP_METHOD(Phalcon_DI, get){
 
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "di:afterServiceResolve", 1);
+		ZVAL_STRING(event_name, "di:afterServiceResolve");
 
 		PHALCON_INIT_NVAR(event_data);
 		array_init(event_data);

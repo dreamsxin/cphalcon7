@@ -785,7 +785,7 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 
 	PHALCON_INIT_VAR(color);
 	if (!fontcolor || Z_TYPE_P(*fontcolor) == IS_NULL) {
-		ZVAL_STRING(color, "000000", 1);
+		ZVAL_STRING(color, "000000");
 	}
 	else {
 		PHALCON_ENSURE_IS_STRING(fontcolor);
@@ -821,7 +821,7 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 		c[3] = c[1];
 		c[2] = c[1];
 		c[1] = c[0];
-		ZVAL_STRING(color, c, 0);
+		ZVAL_STRING(color, c);
 	}
 
 	if (Z_STRLEN_P(color) < 6) {
@@ -917,7 +917,7 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
 		c[3] = c[1];
 		c[2] = c[1];
 		c[1] = c[0];
-		ZVAL_STRING(tmp_color, c, 0);
+		ZVAL_STRING(tmp_color, c);
 	}
 
 	if (Z_STRLEN_P(tmp_color) < 6) {
@@ -1132,7 +1132,7 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 
 		if (PHALCON_IS_EMPTY(format)) {
 			PHALCON_INIT_VAR(ext);
-			ZVAL_STRING(ext, "png", 1);
+			ZVAL_STRING(ext, "png");
 		} else {
 			PHALCON_CPY_WRT(ext, format);
 		}

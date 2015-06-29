@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		add_assoc_long_ex(paths, ISS(controller), 1);
 
 		PHALCON_INIT_VAR(action_pattern);
-		ZVAL_STRING(action_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#", 1);
+		ZVAL_STRING(action_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
 
 		PHALCON_INIT_VAR(route);
 		object_init_ex(route, phalcon_mvc_router_route_ce);
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		add_assoc_long_ex(paths, ISS(params), 3);
 
 		PHALCON_INIT_VAR(params_pattern);
-		ZVAL_STRING(params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#", 1);
+		ZVAL_STRING(params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
 
 		PHALCON_INIT_NVAR(route);
 		object_init_ex(route, phalcon_mvc_router_route_ce);
@@ -647,7 +647,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	}
 
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "router:beforeCheckRoutes", 1);
+	ZVAL_STRING(event_name, "router:beforeCheckRoutes");
 
 	PHALCON_CALL_METHOD(NULL, this_ptr, "fireevent", event_name);
 
@@ -754,7 +754,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		}
 
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "router:beforeCheckRoute", 1);
+		ZVAL_STRING(event_name, "router:beforeCheckRoute");
 
 		PHALCON_CALL_METHOD(NULL, this_ptr, "fireevent", event_name);
 
@@ -781,7 +781,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		if (zend_is_true(route_found)) {
 			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "router:matchedRoute", 1);
+			ZVAL_STRING(event_name, "router:matchedRoute");
 
 			PHALCON_CALL_METHOD(NULL, this_ptr, "fireevent", event_name, route);
 
@@ -892,7 +892,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			}
 		} else {
 			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "router:notMatchedRoute", 1);
+			ZVAL_STRING(event_name, "router:notMatchedRoute");
 
 			PHALCON_CALL_METHOD(NULL, this_ptr, "fireevent", event_name, route);
 		}
@@ -1047,7 +1047,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			PHALCON_INIT_NVAR(debug_message);
-			ZVAL_STRING(debug_message, "--Use Debug", 1);
+			ZVAL_STRING(debug_message, "--Use Debug");
 			phalcon_debug_print_r(debug_message);
 		}
 
@@ -1071,7 +1071,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	}
 
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "router:afterCheckRoutes", 1);
+	ZVAL_STRING(event_name, "router:afterCheckRoutes");
 
 	PHALCON_CALL_METHOD(NULL, this_ptr, "fireevent", event_name);
 

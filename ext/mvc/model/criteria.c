@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, innerJoin) {
 	}
 
 	PHALCON_INIT_VAR(type);
-	ZVAL_STRING(type, "INNER", 1);
+	ZVAL_STRING(type, "INNER");
 
 	PHALCON_CALL_SELF(NULL, "join", model, conditions, alias, type);
 
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, leftJoin) {
 	}
 
 	PHALCON_INIT_VAR(type);
-	ZVAL_STRING(type, "LEFT", 1);
+	ZVAL_STRING(type, "LEFT");
 
 	PHALCON_CALL_SELF(NULL, "join", model, conditions, alias, type);
 
@@ -524,7 +524,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, rightJoin) {
 	}
 
 	PHALCON_INIT_VAR(type);
-	ZVAL_STRING(type, "RIGHT", 1);
+	ZVAL_STRING(type, "RIGHT");
 
 	PHALCON_CALL_SELF(NULL, "join", model, conditions, alias, type);
 
@@ -1808,7 +1808,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	}
 
 	PHALCON_INIT_VAR(phql);
-	ZVAL_STRING(phql, "SELECT ", 1);
+	ZVAL_STRING(phql, "SELECT ");
 
 	PHALCON_OBS_VAR(columns);
 	phalcon_read_property_this(&columns, this_ptr, SL("_columns"), PH_NOISY);
@@ -2096,7 +2096,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 	}
 
 	PHALCON_INIT_VAR(phql);
-	ZVAL_STRING(phql, "INSERT INTO ", 1);
+	ZVAL_STRING(phql, "INSERT INTO ");
 
 	PHALCON_SCONCAT_SVS(phql, "[", model, "] ");
 

@@ -240,7 +240,7 @@ void phalcon_get_class_ns(zval *result, const zval *object, int lower) {
 	}
 
 	if (found) {
-		ZVAL_NEW_STR(result, zend_string_init(class_name + i, class_length - i + 1));
+		ZVAL_NEW_STR(result, zend_string_init(class_name + i, class_length - i + 1, 0));
 	} else {
 		ZVAL_STRINGL(result, class_name, class_length);
 	}
@@ -507,14 +507,12 @@ zend_class_entry *phalcon_class_exists(const zval *class_name, uint32_t class_le
 
 zend_class_entry *phalcon_class_exists_ex(const zval *class_name, int autoload) {
 
-	zend_class_entry *ce;
-
 	if (Z_TYPE_P(class_name) == IS_STRING) {
 		return phalcon_class_exists(class_name, autoload);
 	}
 
 	php_error_docref(NULL, E_WARNING, "class name must be a string");
-	return 0;
+	return NULL;
 }
 
 zend_class_entry *phalcon_class_str_exists(const char *class_name, uint32_t class_len, int autoload) {
@@ -525,7 +523,7 @@ zend_class_entry *phalcon_class_str_exists(const char *class_name, uint32_t clas
 		return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0 ? ce : NULL;
 	}
 
-	return 0;
+	return ce;
 }
 
 /**

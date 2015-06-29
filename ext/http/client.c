@@ -73,7 +73,7 @@ PHP_METHOD(Phalcon_Http_Client, factory){
 
 	if (!method) {
 		PHALCON_INIT_NVAR(method);
-		ZVAL_STRING(method, "GET", 1);
+		ZVAL_STRING(method, "GET");
 	}
 
 	if (phalcon_function_exists_ex(SS("curl_init")) != FAILURE) {

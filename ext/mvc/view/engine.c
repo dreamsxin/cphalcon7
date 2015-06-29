@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	} else if (phalcon_compare_strict_string(method_name, SL("getSession"))) {
 		PHALCON_SEPARATE_PARAM(method_name);
 		PHALCON_INIT_NVAR(method_name);
-		ZVAL_STRING(method_name, "get", 1);
+		ZVAL_STRING(method_name, "get");
 
 		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_session);
 	} else if (phalcon_compare_strict_string(method_name, SL("getParam"))) {

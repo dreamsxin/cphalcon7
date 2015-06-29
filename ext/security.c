@@ -687,7 +687,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
 
 	PHALCON_INIT_VAR(key);
-	ZVAL_STRING(key, "$PHALCON/CSRF/KEY$", 1);
+	ZVAL_STRING(key, "$PHALCON/CSRF/KEY$");
 	PHALCON_CALL_METHOD(NULL, session, "set", key, safe_bytes);
 
 	RETURN_CTOR(safe_bytes);
@@ -736,7 +736,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
 
 	PHALCON_INIT_VAR(key);
-	ZVAL_STRING(key, "$PHALCON/CSRF$", 1);
+	ZVAL_STRING(key, "$PHALCON/CSRF$");
 	PHALCON_CALL_METHOD(NULL, session, "set", key, token);
 
 	RETURN_CTOR(token);
@@ -778,7 +778,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 
 	if (!token_key || Z_TYPE_P(token_key) == IS_NULL) {
 		PHALCON_INIT_NVAR(key);
-		ZVAL_STRING(key, "$PHALCON/CSRF/KEY$", 1);
+		ZVAL_STRING(key, "$PHALCON/CSRF/KEY$");
 
 		PHALCON_CALL_METHOD(&token_key, session, "get", key);
 	}
@@ -799,7 +799,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	}
 
 	PHALCON_INIT_NVAR(key);
-	ZVAL_STRING(key, "$PHALCON/CSRF$", 1);
+	ZVAL_STRING(key, "$PHALCON/CSRF$");
 
 	PHALCON_CALL_METHOD(&session_token, session, "get", key);
 
@@ -835,7 +835,7 @@ PHP_METHOD(Phalcon_Security, getSessionToken){
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
 
 	PHALCON_INIT_VAR(key);
-	ZVAL_STRING(key, "$PHALCON/CSRF$", 1);
+	ZVAL_STRING(key, "$PHALCON/CSRF$");
 
 	PHALCON_RETURN_CALL_METHOD(session, "get", key);
 
@@ -864,12 +864,12 @@ PHP_METHOD(Phalcon_Security, destroyToken){
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
 
 	PHALCON_INIT_VAR(key);
-	ZVAL_STRING(key, "$PHALCON/CSRF$", 1);
+	ZVAL_STRING(key, "$PHALCON/CSRF$");
 
 	PHALCON_CALL_METHOD(NULL, session, "remove", key);
 
 	PHALCON_INIT_NVAR(key);
-	ZVAL_STRING(key, "$PHALCON/CSRF/KEY$", 1);
+	ZVAL_STRING(key, "$PHALCON/CSRF/KEY$");
 	PHALCON_CALL_METHOD(NULL, session, "remove", key);
 
 	PHALCON_MM_RESTORE();
@@ -943,7 +943,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		PHALCON_MM_GROW();
 
 		PHALCON_INIT_VAR(algo);
-		ZVAL_STRING(algo, s_hash, 1);
+		ZVAL_STRING(algo, s_hash);
 
 		PHALCON_CALL_FUNCTION(&tmp, "hash", algo, PHALCON_GLOBAL(z_null), PHALCON_GLOBAL(z_true));
 		if (PHALCON_IS_FALSE(tmp) || Z_TYPE_P(tmp) != IS_STRING) {
@@ -1061,7 +1061,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	zval *algo, *iter, *len;
 
 	PHALCON_ALLOC_GHOST_ZVAL(algo);
-	ZVAL_STRING(algo, s_hash, 1);
+	ZVAL_STRING(algo, s_hash);
 
 	PHALCON_ALLOC_GHOST_ZVAL(iter);
 	ZVAL_LONG(iter, i_iterations);

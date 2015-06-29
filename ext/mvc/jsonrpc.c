@@ -223,7 +223,7 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
 		zval *p[3];
 
 		PHALCON_ALLOC_GHOST_ZVAL(event_name);
-		ZVAL_STRING(event_name, event, 1);
+		ZVAL_STRING(event_name, event);
 
 		p[0] = event_name;
 		p[1] = this_ptr;
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 					phalcon_array_fetch_string(&class_name, module, SL("className"), PH_NOISY);
 				} else {
 					PHALCON_INIT_NVAR(class_name);
-					ZVAL_STRING(class_name, "Module", 1);
+					ZVAL_STRING(class_name, "Module");
 				}
 		
 				/* If the developer has specified a path, try to include the file */

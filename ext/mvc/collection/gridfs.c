@@ -171,10 +171,10 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 	phalcon_array_update_string(&criteria, SL("sha1"), sha1, PH_COPY);
 
 	PHALCON_INIT_VAR(operation);
-	ZVAL_STRING(operation, "$gte", 1);
+	ZVAL_STRING(operation, "$gte");
 
 	PHALCON_INIT_VAR(field);
-	ZVAL_STRING(field, "use", 1);
+	ZVAL_STRING(field, "use");
 
 	PHALCON_INIT_VAR(value);
 	ZVAL_LONG(value, 1)
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 	phalcon_array_update_multi_2(&criteria, field, operation, value, 0);
 
 	PHALCON_INIT_NVAR(operation);
-	ZVAL_STRING(operation, "$inc", 1);
+	ZVAL_STRING(operation, "$inc");
 
 	PHALCON_INIT_VAR(new_object);
 	array_init_size(new_object, 1);
@@ -264,10 +264,10 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 	phalcon_array_update_string(&criteria, SL("sha1"), sha1, PH_COPY);
 
 	PHALCON_INIT_VAR(operation);
-	ZVAL_STRING(operation, "$inc", 1);
+	ZVAL_STRING(operation, "$inc");
 
 	PHALCON_INIT_VAR(field);
-	ZVAL_STRING(field, "use", 1);
+	ZVAL_STRING(field, "use");
 
 	PHALCON_INIT_VAR(value);
 	ZVAL_LONG(value, -1)
@@ -304,7 +304,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 	phalcon_array_update_string(&criteria, SL("md5"), md5, PH_COPY);
 
 	PHALCON_INIT_NVAR(operation);
-	ZVAL_STRING(operation, "$lte", 1);
+	ZVAL_STRING(operation, "$lte");
 
 	PHALCON_INIT_NVAR(value);
 	ZVAL_LONG(value, 0)

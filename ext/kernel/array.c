@@ -340,7 +340,7 @@ int phalcon_array_update_quick_string(zval **arr, const char *index, uint index_
 		Z_ADDREF_P(value);
 	}
 
-	return zend_hash_update(Z_ARRVAL_P(*arr), zend_string_init(index, index_length, 0), value);
+	return zend_hash_update(Z_ARRVAL_P(*arr), zend_string_init(index, index_length, 0), value) ? SUCCESS : FAILURE;
 }
 
 int phalcon_array_update_long(zval **arr, ulong index, zval *value, int flags){

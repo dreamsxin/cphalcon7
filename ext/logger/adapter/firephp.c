@@ -208,9 +208,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	}
 
 	/* Deallocate the smnart string if it is not empty */
-	if (str.c) {
-		smart_str_free(&str);
-	}
+	smart_str_free(&str);
 
 	PHALCON_MM_RESTORE();
 }

@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, setDI){
 	 * We automatically set ourselves as application service
 	 */
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "application", 1);
+	ZVAL_STRING(service, "application");
 
 	PHALCON_CALL_METHOD(&exists, dependency_injector, "has", service);
 	if (!zend_is_true(exists)) {
@@ -745,7 +745,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	 * Calling beforeHandle routing
 	 */
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "micro:beforeHandleRoute", 1);
+	ZVAL_STRING(event_name, "micro:beforeHandleRoute");
 
 	PHALCON_CALL_SELF(&status, "fireeventcancel", event_name);
 	if (PHALCON_IS_FALSE(status)) {
@@ -777,7 +777,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		PHALCON_CALL_METHOD(&route_id, matched_route, "getrouteid");
 		if (!phalcon_array_isset_fetch(&handler, handlers, route_id)) {
 			PHALCON_INIT_NVAR(error_message);
-			ZVAL_STRING(error_message, "Matched route doesn't have an associate handler", 1);
+			ZVAL_STRING(error_message, "Matched route doesn't have an associate handler");
 
 			PHALCON_RETURN_CALL_SELF("_throwexception", error_message);
 			RETURN_MM();
@@ -792,7 +792,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 * Calling beforeExecuteRoute event
 		 */
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "micro:beforeExecuteRoute", 1);
+		ZVAL_STRING(event_name, "micro:beforeExecuteRoute");
 
 		PHALCON_CALL_SELF(&status, "fireeventcancel", event_name);
 		if (PHALCON_IS_FALSE(status)) {
@@ -842,7 +842,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 				}
 				if (!phalcon_is_callable(before)) {
 					PHALCON_INIT_NVAR(error_message);
-					ZVAL_STRING(error_message, "The before handler is not callable", 1);
+					ZVAL_STRING(error_message, "The before handler is not callable");
 
 					PHALCON_RETURN_CALL_SELF("_throwexception", error_message);
 					RETURN_MM();
@@ -887,7 +887,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 * Calling afterExecuteRoute event
 		 */
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "micro:afterExecuteRoute", 1);
+		ZVAL_STRING(event_name, "micro:afterExecuteRoute");
 		PHALCON_CALL_SELF(NULL, "fireevent", event_name);
 
 		after_handlers = phalcon_fetch_nproperty_this(this_ptr, SL("_afterHandlers"), PH_NOISY);
@@ -930,7 +930,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 				}
 				if (!phalcon_is_callable(after)) {
 					PHALCON_INIT_NVAR(error_message);
-					ZVAL_STRING(error_message, "One of the 'after' handlers is not callable", 1);
+					ZVAL_STRING(error_message, "One of the 'after' handlers is not callable");
 
 					PHALCON_RETURN_CALL_SELF("_throwexception", error_message);
 					RETURN_MM();
@@ -948,7 +948,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 * Calling beforeNotFound event
 		 */
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "micro:beforeNotFound", 1);
+		ZVAL_STRING(event_name, "micro:beforeNotFound");
 
 		PHALCON_CALL_SELF(&status, "fireeventcancel", event_name);
 		if (PHALCON_IS_FALSE(status)) {
@@ -961,7 +961,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		not_found_handler = phalcon_fetch_nproperty_this(this_ptr, SL("_notFoundHandler"), PH_NOISY);
 		if (!phalcon_is_callable(not_found_handler)) {
 			PHALCON_INIT_NVAR(error_message);
-			ZVAL_STRING(error_message, "The Not-Found handler is not callable or is not defined", 1);
+			ZVAL_STRING(error_message, "The Not-Found handler is not callable or is not defined");
 
 			PHALCON_RETURN_CALL_SELF("_throwexception", error_message);
 			RETURN_MM();
@@ -985,7 +985,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	 * Calling afterHandleRoute event
 	 */
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "micro:afterHandleRoute", 1);
+	ZVAL_STRING(event_name, "micro:afterHandleRoute");
 	PHALCON_CALL_SELF(NULL, "fireevent", event_name);
 
 	finish_handlers = phalcon_fetch_nproperty_this(this_ptr, SL("_finishHandlers"), PH_NOISY);
@@ -1033,7 +1033,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			}
 			if (!phalcon_is_callable(finish)) {
 				PHALCON_INIT_NVAR(error_message);
-				ZVAL_STRING(error_message, "One of finish handlers is not callable", 1);
+				ZVAL_STRING(error_message, "One of finish handlers is not callable");
 
 				PHALCON_RETURN_CALL_SELF("_throwexception", error_message);
 				RETURN_MM();

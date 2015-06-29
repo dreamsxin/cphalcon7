@@ -317,10 +317,10 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		ZVAL_LONG(type, 517); /* FILTER_SANITIZE_EMAIL */
 	
 		PHALCON_INIT_VAR(quote);
-		ZVAL_STRING(quote, "'", 1);
+		ZVAL_STRING(quote, "'");
 	
 		PHALCON_INIT_VAR(empty_str);
-		ZVAL_STRING(empty_str, "", 1);
+		ZVAL_STRING(empty_str, "");
 	
 		PHALCON_INIT_VAR(escaped);
 		phalcon_fast_str_replace(escaped, quote, empty_str, value);

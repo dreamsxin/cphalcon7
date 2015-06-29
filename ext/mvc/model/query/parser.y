@@ -263,14 +263,14 @@ static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 	zval *key1, *key2, *rows, *values;
 
 	PHALCON_ALLOC_GHOST_ZVAL(key1);
-	ZVAL_STRING(key1, phalcon_interned_rows, 1);
+	ZVAL_STRING(key1, phalcon_interned_rows);
 
 	PHALCON_ALLOC_GHOST_ZVAL(rows);
 	if (!phalcon_array_isset_fetch(&rows, ret, key1)) {
 		array_init_size(rows, 1);		
 
 		PHALCON_ALLOC_GHOST_ZVAL(key2);
-		ZVAL_STRING(key2, phalcon_interned_values, 1);
+		ZVAL_STRING(key2, phalcon_interned_values);
 
 		PHALCON_ALLOC_GHOST_ZVAL(values);
 		if (phalcon_array_isset_fetch(&values, ret, key2)) {

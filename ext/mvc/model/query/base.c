@@ -146,9 +146,9 @@ static void phql_scanner_error_msg(phql_parser_status *parser_status, zval **err
 			snprintf(error, length, "Scanning error before '%s' when parsing: %s (%d)", state->start, parser_status->phql, parser_status->phql_length);
 		}
 		error[length - 1] = '\0';
-		ZVAL_STRING(*error_msg, error, 1);
+		ZVAL_STRING(*error_msg, error);
 	} else {
-		ZVAL_STRING(*error_msg, "Scanning error near to EOF", 1);
+		ZVAL_STRING(*error_msg, "Scanning error near to EOF");
 	}
 
 	if (error) {
@@ -196,7 +196,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 	if (!phql) {
 		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-		ZVAL_STRING(*error_msg, "PHQL statement cannot be NULL", 1);
+		ZVAL_STRING(*error_msg, "PHQL statement cannot be NULL");
 		return FAILURE;
 	}
 
@@ -213,7 +213,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	phql_parser = phql_Alloc(phql_wrapper_alloc);
 	if (unlikely(!phql_parser)) {
 		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-		ZVAL_STRING(*error_msg, "Memory allocation error", 1);
+		ZVAL_STRING(*error_msg, "Memory allocation error");
 		return FAILURE;
 	}
 
@@ -353,7 +353,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 					phql_parse_with_token(phql_parser, PHQL_T_INTEGER, PHQL_INTEGER, &token, parser_status);
 				} else {
 					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
+					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -362,7 +362,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 					phql_parse_with_token(phql_parser, PHQL_T_DOUBLE, PHQL_DOUBLE, &token, parser_status);
 				} else {
 					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
+					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -371,7 +371,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 					phql_parse_with_token(phql_parser, PHQL_T_STRING, PHQL_STRING, &token, parser_status);
 				} else {
 					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
+					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -380,7 +380,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 					phql_(phql_parser, PHQL_TRUE, NULL, parser_status);
 				} else {
 					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
+					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -389,7 +389,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 					phql_(phql_parser, PHQL_FALSE, NULL, parser_status);
 				} else {
 					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements", 1);
+					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -543,7 +543,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				snprintf(error, error_length, "Scanner: Unknown opcode %c", token.opcode);
 				error[error_length - 1] = '\0';
 				PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-				ZVAL_STRING(*error_msg, error, 1);
+				ZVAL_STRING(*error_msg, error);
 				efree(error);
 				break;
 		}
@@ -580,7 +580,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 		if (parser_status->syntax_error) {
 			if (!*error_msg) {
 				PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-				ZVAL_STRING(*error_msg, parser_status->syntax_error, 1);
+				ZVAL_STRING(*error_msg, parser_status->syntax_error);
 			}
 			efree(parser_status->syntax_error);
 		}

@@ -47,7 +47,7 @@ static void psr_log_abstractlogger_log_helper(INTERNAL_FUNCTION_PARAMETERS, cons
 	}
 
 	PHALCON_ALLOC_GHOST_ZVAL(level);
-	ZVAL_STRING(level, lvl, 1);
+	ZVAL_STRING(level, lvl);
 	Z_SET_REFCOUNT_P(level, 0);
 
 	fci.size           = sizeof(fci);
@@ -67,7 +67,7 @@ static void psr_log_abstractlogger_log_helper(INTERNAL_FUNCTION_PARAMETERS, cons
 
 	if ((fcic.function_handler = zend_hash_str_find(fci.function_table, ZEND_STRS("log"))) == NULL) {
 		fcic.initialized = 0;
-		ZVAL_STRING(&function_name, "log", 0);
+		ZVAL_STRING(&function_name, "log");
 	}
 
 	zend_call_function(&fci, &fcic);

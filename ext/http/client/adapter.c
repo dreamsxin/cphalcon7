@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 
 	if (!authtype) {
 		PHALCON_INIT_NVAR(authtype);
-		ZVAL_STRING(authtype, "any", 1);
+		ZVAL_STRING(authtype, "any");
 	}
 
 	phalcon_update_property_this(this_ptr, SL("_authtype"), authtype);

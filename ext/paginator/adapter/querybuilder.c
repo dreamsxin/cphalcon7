@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	/* Get the connection through the model */
 	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsManager", 1);
+	ZVAL_STRING(service_name, "modelsManager");
 
 	PHALCON_CALL_METHOD(&models_manager, dependency_injector, "getshared", service_name);
 	if (Z_TYPE_P(models_manager) != IS_OBJECT) {
@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		 */
 		if (PHALCON_IS_STRING(type, "object")) {
 			PHALCON_INIT_VAR(select_columns);
-			ZVAL_STRING(select_columns, "*", 1);
+			ZVAL_STRING(select_columns, "*");
 
 			phalcon_array_update_string(&intermediate, ISL(columns), select_columns, PH_COPY);
 			break;
@@ -406,7 +406,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 				phalcon_fast_str_replace(sql_tmp, string_wildcard, value, sql);
 
 				PHALCON_INIT_NVAR(sql);
-				ZVAL_STRING(sql, Z_STRVAL_P(sql_tmp), 1);
+				ZVAL_STRING(sql, Z_STRVAL_P(sql_tmp));
 
 				phalcon_array_unset(&bind_types, wildcard, PH_SEPARATE);
 			} else if (Z_TYPE_P(wildcard) == IS_LONG) {

@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 	phalcon_fetch_params(1, 1, 0, &record);
 	
 	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field", 1);
+	ZVAL_STRING(option, "field");
 	
 	PHALCON_CALL_METHOD(&field_name, this_ptr, "getoption", option);
 	if (Z_TYPE_P(field_name) != IS_STRING) {
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 	 * The 'pattern' option must be a valid regular expression
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "pattern", 1);
+	ZVAL_STRING(option, "pattern");
 	
 	PHALCON_CALL_METHOD(&is_set, this_ptr, "issetoption", option);
 	if (!zend_is_true(is_set)) {
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 	 * Allow empty
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty", 1);
+	ZVAL_STRING(option, "allowEmpty");
 
 	PHALCON_CALL_METHOD(&allow_empty, this_ptr, "getoption", option);
 	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
@@ -134,7 +134,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 	 * Allow empty
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty", 1);
+	ZVAL_STRING(option, "allowEmpty");
 
 	PHALCON_CALL_METHOD(&allow_empty, this_ptr, "getoption", option);
 
@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 	 * The regular expression is set in the option 'pattern'
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "pattern", 1);
+	ZVAL_STRING(option, "pattern");
 
 	PHALCON_CALL_METHOD(&pattern, this_ptr, "getoption", option);
 	
@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 		}
 	
 		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Regex", 1);
+		ZVAL_STRING(type, "Regex");
 
 		/*
 		 * Is code set

@@ -778,16 +778,16 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 
         if (phalcon_function_exists_ex(SS("mb_convert_encoding")) == SUCCESS) {
 			PHALCON_INIT_NVAR(fromtext);
-			ZVAL_STRING(fromtext, data, 1);
+			ZVAL_STRING(fromtext, data);
 
 			PHALCON_INIT_NVAR(from);
-			ZVAL_STRING(from, "shift-jis", 1);
+			ZVAL_STRING(from, "shift-jis");
 
 			PHALCON_INIT_NVAR(to);
-			ZVAL_STRING(to, "utf-8", 1);
+			ZVAL_STRING(to, "utf-8");
 
 			PHALCON_INIT_NVAR(fromtext);
-			ZVAL_STRING(fromtext, data, 1);
+			ZVAL_STRING(fromtext, data);
 
 			params[0] = fromtext;
 			params[1] = from;

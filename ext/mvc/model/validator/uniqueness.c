@@ -108,13 +108,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	phalcon_fetch_params(1, 1, 0, &record);
 	
 	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field", 1);
+	ZVAL_STRING(option, "field");
 	
 	PHALCON_CALL_METHOD(&field, this_ptr, "getoption", option);
 	PHALCON_CALL_METHOD(&dependency_injector, record, "getdi");
 	
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "modelsMetadata", 1);
+	ZVAL_STRING(service, "modelsMetadata");
 	
 	PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(meta_data, phalcon_mvc_model_metadatainterface_ce);
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 * Append the message to the validator
 		 */
 		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Unique", 1);
+		ZVAL_STRING(type, "Unique");
 
 		/*
 		 * Is code set

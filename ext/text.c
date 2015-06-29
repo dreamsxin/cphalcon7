@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_Text, increment){
 	
 	if (Z_TYPE_P(separator) == IS_NULL) {
 		PHALCON_INIT_NVAR(separator);
-		ZVAL_STRING(separator, "_", 1);
+		ZVAL_STRING(separator, "_");
 	}
 	
 	PHALCON_INIT_VAR(parts);
@@ -405,7 +405,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 		
 	if (PHALCON_IS_EMPTY(format)) {
 		PHALCON_INIT_NVAR(format);
-		ZVAL_STRING(format, "%01.2f %s", 1);
+		ZVAL_STRING(format, "%01.2f %s");
 	}
 
 	if (!si) {
@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 	ZVAL_DOUBLE(z_size, size);
 
 	PHALCON_INIT_NVAR(z_force_unit);
-	ZVAL_STRING(z_force_unit, units[power], 1);
+	ZVAL_STRING(z_force_unit, units[power]);
 
 	PHALCON_RETURN_CALL_FUNCTION("sprintf", format, z_size, z_force_unit);
 
@@ -472,10 +472,10 @@ PHP_METHOD(Phalcon_Text, reduceSlashes){
 	phalcon_fetch_params(1, 1, 0, &str);
 
 	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "#(?<!:)//+#", 1);
+	ZVAL_STRING(pattern, "#(?<!:)//+#");
 
 	PHALCON_INIT_VAR(replacement);
-	ZVAL_STRING(replacement, "/", 1);
+	ZVAL_STRING(replacement, "/");
 
 	PHALCON_RETURN_CALL_FUNCTION("preg_replace", pattern, replacement, str);
 

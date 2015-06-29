@@ -1218,7 +1218,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 					phalcon_update_property_this(this_ptr, SL("_activeRenderPath"), view_engine_path);
 		
 					PHALCON_INIT_NVAR(event_name);
-					ZVAL_STRING(event_name, "view:beforeRenderView", 1);
+					ZVAL_STRING(event_name, "view:beforeRenderView");
 		
 					PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, view_engine_path);
 					if (PHALCON_IS_FALSE(status)) {
@@ -1237,7 +1237,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 				if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 					PHALCON_INIT_NVAR(event_name);
-					ZVAL_STRING(event_name, "view:afterRenderView", 1);
+					ZVAL_STRING(event_name, "view:afterRenderView");
 					PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr);
 				}
 
@@ -1267,7 +1267,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			phalcon_update_property_this(this_ptr, SL("_activeRenderPath"), view_engine_path);
 
 			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "view:notFoundView", 1);
+			ZVAL_STRING(event_name, "view:notFoundView");
 			PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr);
 		}
 		if (!zend_is_true(silence)) {
@@ -1431,10 +1431,10 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	}
 
 	PHALCON_INIT_VAR(ds);
-	ZVAL_STRING(ds, slash, 1);
+	ZVAL_STRING(ds, slash);
 
 	PHALCON_INIT_VAR(namespace_separator);
-	ZVAL_STRING(namespace_separator, "\\", 1);
+	ZVAL_STRING(namespace_separator, "\\");
 
 	phalcon_update_property_this(this_ptr, SL("_currentRenderLevel"), PHALCON_GLOBAL(z_zero));
 
@@ -1457,7 +1457,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	phalcon_update_property_this(this_ptr, SL("_namespaceName"), namespace_name);
 
 	PHALCON_INIT_VAR(converter_key);
-	ZVAL_STRING(converter_key, "controller", 1);
+	ZVAL_STRING(converter_key, "controller");
 
 	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
 
@@ -1472,7 +1472,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	}
 
 	PHALCON_INIT_NVAR(converter_key);
-	ZVAL_STRING(converter_key, "action", 1);
+	ZVAL_STRING(converter_key, "action");
 
 	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
 
@@ -1487,7 +1487,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	}
 
 	PHALCON_INIT_NVAR(converter_key);
-	ZVAL_STRING(converter_key, "namespace", 1);
+	ZVAL_STRING(converter_key, "namespace");
 
 	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
 
@@ -1522,7 +1522,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	phalcon_read_property_this(&layouts_dir, this_ptr, SL("_layoutsDir"), PH_NOISY);
 	if (!zend_is_true(layouts_dir)) {
 		PHALCON_INIT_NVAR(layouts_dir);
-		ZVAL_STRING(layouts_dir, "layouts/", 1);
+		ZVAL_STRING(layouts_dir, "layouts/");
 	}
 
 	PHALCON_OBS_VAR(enable_namespace_view);
@@ -1603,7 +1603,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 
 		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "view:beforeRender", 1);
+		ZVAL_STRING(event_name, "view:beforeRender");
 
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr);
 		if (PHALCON_IS_FALSE(status)) {
@@ -1771,7 +1771,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "view:afterRender", 1);
+		ZVAL_STRING(event_name, "view:afterRender");
 		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr);
 	}
 
@@ -2054,7 +2054,7 @@ PHP_METHOD(Phalcon_Mvc_View, _createCache){
 	}
 
 	PHALCON_INIT_VAR(cache_service);
-	ZVAL_STRING(cache_service, "viewCache", 1);
+	ZVAL_STRING(cache_service, "viewCache");
 
 	PHALCON_OBS_VAR(view_options);
 	phalcon_read_property_this(&view_options, this_ptr, SL("_options"), PH_NOISY);

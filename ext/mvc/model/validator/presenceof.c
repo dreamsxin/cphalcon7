@@ -94,7 +94,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 	phalcon_fetch_params(1, 1, 0, &record);
 	
 	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field", 1);
+	ZVAL_STRING(option, "field");
 	
 	PHALCON_CALL_METHOD(&field_name, this_ptr, "getoption", option);
 	if (Z_TYPE_P(field_name) != IS_STRING) {
@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 		}
 	
 		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "PresenceOf", 1);
+		ZVAL_STRING(type, "PresenceOf");
 
 		/*
 		 * Is code set

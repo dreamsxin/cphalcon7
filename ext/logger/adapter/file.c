@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 		}
 	} else {
 		PHALCON_INIT_VAR(mode);
-		ZVAL_STRING(mode, "ab", 1);
+		ZVAL_STRING(mode, "ab");
 	}
 	
 	/** 
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 		}
 	} else {
 		PHALCON_INIT_NVAR(mode);
-		ZVAL_STRING(mode, "ab", 1);
+		ZVAL_STRING(mode, "ab");
 	}
 
 	/**

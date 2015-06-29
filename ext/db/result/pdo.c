@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 				PHALCON_INIT_VAR(matches);
 	
 				PHALCON_INIT_VAR(pattern);
-				ZVAL_STRING(pattern, "/^SELECT\\s+(.*)$/i", 1);
+				ZVAL_STRING(pattern, "/^SELECT\\s+(.*)$/i");
 	
 				PHALCON_INIT_VAR(match);
 				RETURN_MM_ON_FAILURE(phalcon_preg_match(match, pattern, sql_statement, matches));

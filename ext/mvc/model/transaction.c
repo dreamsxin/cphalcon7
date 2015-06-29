@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	}
 	if (Z_TYPE_P(service) != IS_STRING) {
 		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, "db", 1);
+		ZVAL_STRING(service, "db");
 	}
 	
 	PHALCON_CALL_METHOD(&connection, dependency_injector, "get", service);
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 	if (zend_is_true(success)) {
 		if (!zend_is_true(rollback_message)) {
 			PHALCON_INIT_NVAR(rollback_message);
-			ZVAL_STRING(rollback_message, "Transaction aborted", 1);
+			ZVAL_STRING(rollback_message, "Transaction aborted");
 		}
 		if (Z_TYPE_P(rollback_record) == IS_OBJECT) {
 			phalcon_update_property_this(this_ptr, SL("_rollbackRecord"), rollback_record);
@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 	
 		if (PG(connection_status) & PHP_CONNECTION_ABORTED) {
 			PHALCON_INIT_VAR(message);
-			ZVAL_STRING(message, "The request was aborted", 1);
+			ZVAL_STRING(message, "The request was aborted");
 			PHALCON_CALL_METHOD(NULL, this_ptr, "rollback", message);
 		}
 	}

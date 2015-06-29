@@ -373,7 +373,7 @@ PHP_METHOD(Phalcon_Dispatcher, setParams){
 		ZVAL_LONG(exception_code, PHALCON_EXCEPTION_INVALID_PARAMS);
 
 		PHALCON_INIT_VAR(exception_message);
-		ZVAL_STRING(exception_message, "Parameters must be an Array", 1);
+		ZVAL_STRING(exception_message, "Parameters must be an Array");
 		PHALCON_CALL_METHOD(NULL, this_ptr, "_throwdispatchexception", exception_message, exception_code);
 		RETURN_MM_NULL();
 	}
@@ -436,7 +436,7 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 				ZVAL_LONG(exception_code, PHALCON_EXCEPTION_NO_DI);
 
 				PHALCON_INIT_VAR(exception_message);
-				ZVAL_STRING(exception_message, "A dependency injection object is required to access the 'filter' service", 1);
+				ZVAL_STRING(exception_message, "A dependency injection object is required to access the 'filter' service");
 				PHALCON_CALL_METHOD(NULL, this_ptr, "_throwdispatchexception", exception_message, exception_code);
 				RETURN_MM();
 			}
@@ -537,7 +537,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		ZVAL_LONG(exception_code, PHALCON_EXCEPTION_NO_DI);
 
 		PHALCON_INIT_VAR(exception_message);
-		ZVAL_STRING(exception_message, "A dependency injection container is required to access related dispatching services", 1);
+		ZVAL_STRING(exception_message, "A dependency injection container is required to access related dispatching services");
 		PHALCON_CALL_METHOD(NULL, this_ptr, "_throwdispatchexception", exception_message, exception_code);
 		RETURN_MM();
 	}
@@ -551,7 +551,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	 * Calling beforeDispatchLoop
 	 */
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "dispatch:beforeDispatchLoop", 1);
+	ZVAL_STRING(event_name, "dispatch:beforeDispatchLoop");
 	PHALCON_CALL_METHOD(&status, this_ptr, "fireevent", event_name);
 	if (PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
@@ -585,7 +585,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			ZVAL_LONG(exception_code, PHALCON_EXCEPTION_CYCLIC_ROUTING);
 
 			PHALCON_INIT_NVAR(exception_message);
-			ZVAL_STRING(exception_message, "Dispatcher has detected a cyclic routing causing stability problems", 1);
+			ZVAL_STRING(exception_message, "Dispatcher has detected a cyclic routing causing stability problems");
 			PHALCON_CALL_METHOD(NULL, this_ptr, "_throwdispatchexception", exception_message, exception_code);
 			break;
 		}
@@ -624,7 +624,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 */
 		if (events_manager) {
 			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "dispatch:beforeDispatch", 1);
+			ZVAL_STRING(event_name, "dispatch:beforeDispatch");
 			PHALCON_CALL_METHOD(&status, this_ptr, "fireevent", event_name);
 			if (PHALCON_IS_FALSE(status)) {
 				continue;
@@ -727,7 +727,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			ZVAL_LONG(exception_code, PHALCON_EXCEPTION_INVALID_HANDLER);
 
 			PHALCON_INIT_NVAR(exception_message);
-			ZVAL_STRING(exception_message, "Invalid handler returned from the services container", 1);
+			ZVAL_STRING(exception_message, "Invalid handler returned from the services container");
 
 			PHALCON_CALL_METHOD(&status, this_ptr, "_throwdispatchexception", exception_message, exception_code);
 			if (PHALCON_IS_FALSE(status)) {
@@ -763,7 +763,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 */
 			if (events_manager) {
 				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "dispatch:beforeNotFoundAction", 1);
+				ZVAL_STRING(event_name, "dispatch:beforeNotFoundAction");
 				PHALCON_CALL_METHOD(&status, this_ptr, "fireevent", event_name);
 				if (PHALCON_IS_FALSE(status)) {
 					continue;
@@ -801,7 +801,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 */
 		if (events_manager) {
 			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "dispatch:beforeExecuteRoute", 1);
+			ZVAL_STRING(event_name, "dispatch:beforeExecuteRoute");
 			PHALCON_CALL_METHOD(&status, this_ptr, "fireevent", event_name);
 			if (PHALCON_IS_FALSE(status)) {
 				continue;
@@ -847,7 +847,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 */
 			if (events_manager) {
 				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "dispatch:afterInitialize", 1);
+				ZVAL_STRING(event_name, "dispatch:afterInitialize");
 				PHALCON_CALL_METHOD(&status, this_ptr, "fireevent", event_name);
 				if (PHALCON_IS_FALSE(status)) {
 					continue;
@@ -874,7 +874,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			ZVAL_LONG(exception_code, PHALCON_EXCEPTION_INVALID_PARAMS);
 
 			PHALCON_INIT_NVAR(exception_message);
-			ZVAL_STRING(exception_message, "Action parameters must be an Array", 1);
+			ZVAL_STRING(exception_message, "Action parameters must be an Array");
 
 			/**
 			 * An invalid parameter variable was passed throw an exception
@@ -939,7 +939,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 * Call afterExecuteRoute
 			 */
 			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "dispatch:afterExecuteRoute", 1);
+			ZVAL_STRING(event_name, "dispatch:afterExecuteRoute");
 			PHALCON_CALL_METHOD(&status, this_ptr, "fireevent", event_name);
 			if (PHALCON_IS_FALSE(status)) {
 				continue;
@@ -954,7 +954,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 * Call afterDispatch
 			 */
 			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "dispatch:afterDispatch", 1);
+			ZVAL_STRING(event_name, "dispatch:afterDispatch");
 			PHALCON_CALL_METHOD(&status, this_ptr, "fireevent", event_name);
 		}
 
@@ -978,7 +978,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	 * Call afterDispatchLoop
 	 */
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "dispatch:afterDispatchLoop", 1);
+	ZVAL_STRING(event_name, "dispatch:afterDispatchLoop");
 	PHALCON_CALL_METHOD(NULL, this_ptr, "fireevent", event_name);
 
 	if (handler) {
@@ -1085,7 +1085,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 		ZVAL_LONG(exception_code, PHALCON_EXCEPTION_INVALID_PARAMS);
 
 		PHALCON_INIT_VAR(exception_message);
-		ZVAL_STRING(exception_message, "Forward parameter must be an Array", 1);
+		ZVAL_STRING(exception_message, "Forward parameter must be an Array");
 		PHALCON_CALL_METHOD(NULL, this_ptr, "_throwdispatchexception", exception_message);
 		RETURN_MM_NULL();
 	}
@@ -1357,7 +1357,7 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 
 		/* Shortcut, save one method call */
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "dispatch:beforeException", 1);
+		ZVAL_STRING(event_name, "dispatch:beforeException");
 
 		zval *params[] = {PHALCON_FETCH_VA_ARGS event_name, exception};
 		ret2 = phalcon_call_class_method_aparams(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), PHALCON_CALL_NUM_PARAMS(params), PHALCON_PASS_CALL_PARAMS(params));

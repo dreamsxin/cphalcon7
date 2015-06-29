@@ -127,7 +127,7 @@ void phalcon_init_interned_strings();
 			ZVAL_STRINGL(pz, string, INTERNED_LEN(string)-1);     \
 		}                                                         \
 		else {                                                    \
-			ZVAL_STRING(pz, string, 1);                           \
+			ZVAL_STRING(pz, string);                           \
 		}                                                         \
 	} while (0)
 

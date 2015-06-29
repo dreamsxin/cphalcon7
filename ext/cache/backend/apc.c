@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	
 	PHALCON_INIT_VAR(prefix_pattern);
 	if (!prefix) {
-		ZVAL_STRING(prefix_pattern, "/^_PHCA/", 1);
+		ZVAL_STRING(prefix_pattern, "/^_PHCA/");
 	}
 	else {
 		PHALCON_CONCAT_SVS(prefix_pattern, "/^_PHCA", prefix, "/");
@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	assert(phalcon_has_constructor(iterator));
 	if (!phalcon_cache_backend_is_old_apcu) {
 		PHALCON_ALLOC_GHOST_ZVAL(type);
-		ZVAL_STRING(type, "user", 1);
+		ZVAL_STRING(type, "user");
 		PHALCON_CALL_METHOD(NULL, iterator, "__construct", type, prefix_pattern);
 	}
 	else {
@@ -468,7 +468,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 	PHALCON_MM_GROW();
 	
 	PHALCON_INIT_VAR(prefix_pattern);
-	ZVAL_STRING(prefix_pattern, "/^_PHCA/", 1);	
+	ZVAL_STRING(prefix_pattern, "/^_PHCA/");	
 	
 	apciterator_ce = zend_fetch_class(SSL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
 	
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 	assert(phalcon_has_constructor(iterator));
 	if (!phalcon_cache_backend_is_old_apcu) {
 		PHALCON_ALLOC_GHOST_ZVAL(type);
-		ZVAL_STRING(type, "user", 1);
+		ZVAL_STRING(type, "user");
 		PHALCON_CALL_METHOD(NULL, iterator, "__construct", type, prefix_pattern);
 	}
 	else {

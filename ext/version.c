@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Version, get){
 			break;
 
 		default:
-			ZVAL_STRING(suffix, "", 1);
+			ZVAL_EMPTY_STRING(suffix);
 			break;
 
 	}
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Version, getId){
 	phalcon_array_fetch_long(&special_number, version, 4, PH_NOISY);
 
 	PHALCON_INIT_VAR(format);
-	ZVAL_STRING(format, "%02s", 1);
+	ZVAL_STRING(format, "%02s");
 
 	PHALCON_CALL_FUNCTION(&real_medium, "sprintf", format, medium);
 

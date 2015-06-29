@@ -172,7 +172,7 @@ int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval
 		zval *params[1];
 
 		PHALCON_ALLOC_GHOST_ZVAL(t);
-		ZVAL_STRING(t, type, 1);
+		ZVAL_STRING(t, type);
 		params[0] = t;
 
 		ALLOC_INIT_ZVAL(*return_value_ptr);

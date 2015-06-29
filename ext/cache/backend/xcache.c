@@ -329,7 +329,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 
 	PHALCON_INIT_VAR(prefixed);
 	if (!prefix) {
-		ZVAL_STRING(prefixed, "_PHCX", 1);
+		ZVAL_STRING(prefixed, "_PHCX");
 	}
 	else {
 		PHALCON_CONCAT_SV(prefixed, "_PHCX", prefix);
@@ -518,7 +518,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 	z_zero = PHALCON_GLOBAL(z_zero);
 
 	PHALCON_INIT_VAR(prefixed);
-	ZVAL_STRING(prefixed, "_PHCX", 1);
+	ZVAL_STRING(prefixed, "_PHCX");
 	
 	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
 	

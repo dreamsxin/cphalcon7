@@ -820,7 +820,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 	phalcon_array_update_string(&params, SL("href"), internal_url, PH_COPY);
 
 	PHALCON_INIT_VAR(code);
-	ZVAL_STRING(code, "<a", 1);
+	ZVAL_STRING(code, "<a");
 
 	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
@@ -908,7 +908,7 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 	phalcon_array_update_string(&params, ISL(type), type, PH_COPY);
 
 	PHALCON_INIT_VAR(code);
-	ZVAL_STRING(code, "<input", 1);
+	ZVAL_STRING(code, "<input");
 
 	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
@@ -1011,7 +1011,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 	phalcon_array_update_string(&params, ISL(type), type, PH_COPY);
 
 	PHALCON_INIT_VAR(code);
-	ZVAL_STRING(code, "<input", 1);
+	ZVAL_STRING(code, "<input");
 
 	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
@@ -1040,7 +1040,7 @@ static void phalcon_tag_generic_field(INTERNAL_FUNCTION_PARAMETERS, const char* 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
 	PHALCON_ALLOC_GHOST_ZVAL(field_type);
-	ZVAL_STRING(field_type, type, 1);
+	ZVAL_STRING(field_type, type);
 
 	if (as_value) {
 		PHALCON_RETURN_CALL_SELFW("_inputfield", field_type, parameters, PHALCON_GLOBAL(z_true));
@@ -1057,7 +1057,7 @@ static void phalcon_tag_generic_field_checked(INTERNAL_FUNCTION_PARAMETERS, cons
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
 	PHALCON_ALLOC_GHOST_ZVAL(field_type);
-	ZVAL_STRING(field_type, type, 1);
+	ZVAL_STRING(field_type, type);
 	PHALCON_RETURN_CALL_SELFW("_inputfieldchecked", field_type, parameters);
 }
 
@@ -1484,7 +1484,7 @@ PHP_METHOD(Phalcon_Tag, textArea){
 	}
 
 	PHALCON_INIT_VAR(code);
-	ZVAL_STRING(code, "<textarea", 1);
+	ZVAL_STRING(code, "<textarea");
 
 	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
@@ -1576,7 +1576,7 @@ PHP_METHOD(Phalcon_Tag, form){
 	}
 	
 	PHALCON_INIT_VAR(code);
-	ZVAL_STRING(code, "<form", 1);
+	ZVAL_STRING(code, "<form");
 
 	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
@@ -1830,7 +1830,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 		phalcon_array_unset_string(&params, SS("rel"), PH_SEPARATE);
 		PHALCON_CONCAT_SVS(code, "<link rel=\"", rel, "\"");
 	} else {
-		ZVAL_STRING(code, "<link rel=\"stylesheet\"", 1);
+		ZVAL_STRING(code, "<link rel=\"stylesheet\"");
 	}
 
 	phalcon_tag_render_attributes(code, params);
@@ -1950,7 +1950,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 	}
 	
 	PHALCON_INIT_VAR(code);
-	ZVAL_STRING(code, "<script", 1);
+	ZVAL_STRING(code, "<script");
 
 	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
@@ -2038,7 +2038,7 @@ PHP_METHOD(Phalcon_Tag, image){
 	}
 	
 	PHALCON_INIT_VAR(code);
-	ZVAL_STRING(code, "<img", 1);
+	ZVAL_STRING(code, "<img");
 
 	phalcon_tag_render_attributes(code, params);
 	if (EG(exception)) {
@@ -2082,7 +2082,7 @@ PHP_METHOD(Phalcon_Tag, friendlyTitle){
 	
 	if (!separator) {
 		PHALCON_INIT_VAR(separator);
-		ZVAL_STRING(separator, "-", 1);
+		ZVAL_STRING(separator, "-");
 	}
 	
 	if (!lowercase) {
@@ -2090,7 +2090,7 @@ PHP_METHOD(Phalcon_Tag, friendlyTitle){
 	}
 	
 	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "~[^a-z0-9A-Z]+~", 1);
+	ZVAL_STRING(pattern, "~[^a-z0-9A-Z]+~");
 	
 	PHALCON_CALL_FUNCTION(&friendly, "preg_replace", pattern, separator, text);
 	if (zend_is_true(lowercase)) {

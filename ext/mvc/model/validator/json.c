@@ -96,7 +96,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 	phalcon_fetch_params(1, 1, 0, &record);
 
 	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field", 1);
+	ZVAL_STRING(option, "field");
 
 	PHALCON_CALL_METHOD(&field_name, this_ptr, "getoption", option);
 	if (Z_TYPE_P(field_name) != IS_STRING) {
@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 
 	if (!PHALCON_IS_TRUE(invalid)) {
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "keys", 1);
+		ZVAL_STRING(option, "keys");
 
 		PHALCON_CALL_METHOD(&keys, this_ptr, "getoption", option);
 
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 		}
 
 		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Json", 1);
+		ZVAL_STRING(type, "Json");
 
 		/*
 		 * Is code set

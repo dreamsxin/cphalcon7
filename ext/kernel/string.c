@@ -281,8 +281,8 @@ void phalcon_camelize(zval *return_value, const zval *str){
 
 	smart_str_0(&camelize_str);
 
-	if (camelize_str.c) {
-		RETURN_STRINGL(camelize_str.c, camelize_str.len, 0);
+	if (camelize_str.s) {
+		RETURN_STR(camelize_str.s);
 	} else {
 		RETURN_EMPTY_STRING();
 	}
@@ -321,8 +321,8 @@ void phalcon_uncamelize(zval *return_value, const zval *str){
 	}
 	smart_str_0(&uncamelize_str);
 
-	if (uncamelize_str.c) {
-		RETURN_STRINGL(uncamelize_str.c, uncamelize_str.len, 0);
+	if (uncamelize_str.s) {
+		RETURN_STR(uncamelize_str.s);
 	} else {
 		RETURN_EMPTY_STRING();
 	}
@@ -1506,7 +1506,7 @@ zval *phalcon_eol(int eol) {
 	 * Check if the eol is true and return PHP_EOL or empty string
 	 */
 	if (eol) {
-		ZVAL_STRING(local_eol, PHP_EOL, 1);
+		ZVAL_STRING(local_eol, PHP_EOL);
 	} else {
 		ZVAL_EMPTY_STRING(local_eol);
 	}
@@ -1733,12 +1733,11 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
 
 		if (res == SUCCESS) {
-			if (!formstr.c) {
+			if (!formstr.s) {
 				ZVAL_EMPTY_STRING(return_value);
-			}
-			else {
+			} else {
 				smart_str_0(&formstr);
-				ZVAL_STRINGL(return_value, formstr.c, formstr.len);
+				ZVAL_STR(return_value, formstr.s);
 			}
 
 			return SUCCESS;
@@ -1757,7 +1756,8 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, zval *charset)
 {
 	zval copy;
-	char *escaped, *cs;
+	zend_string *escaped;
+	char *cs;
 	int qs, use_copy = 0;
 	size_t escaped_len;
 
@@ -1771,8 +1771,8 @@ void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, z
 	cs = (charset && Z_TYPE_P(charset) == IS_STRING) ? Z_STRVAL_P(charset) : NULL;
 	qs = (quoting && Z_TYPE_P(quoting) == IS_LONG)   ? Z_LVAL_P(quoting)   : ENT_COMPAT;
 
-	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), &escaped_len, 0, qs, cs, 1);
-	ZVAL_STRINGL(return_value, escaped, escaped_len);
+	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), 0, qs, cs, 1);
+	ZVAL_STR(return_value, escaped);
 
 	if (unlikely(use_copy)) {
 		phalcon_dtor(copy);
@@ -1782,7 +1782,8 @@ void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, z
 void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval *charset)
 {
 	zval copy;
-	char *escaped, *cs;
+	zend_string *escaped;
+	char *cs;
 	int qs, use_copy = 0;
 	size_t escaped_len;
 
@@ -1796,8 +1797,8 @@ void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval 
 	cs = (charset && Z_TYPE_P(charset) == IS_STRING) ? Z_STRVAL_P(charset) : NULL;
 	qs = (quoting && Z_TYPE_P(quoting) == IS_LONG)   ? Z_LVAL_P(quoting)   : ENT_COMPAT;
 
-	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), &escaped_len, 1, qs, cs, 1);
-	ZVAL_STRINGL(return_value, escaped, escaped_len);
+	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), 1, qs, cs, 1);
+	ZVAL_STR(return_value, escaped);
 
 	if (unlikely(use_copy)) {
 		phalcon_dtor(copy);
@@ -1836,7 +1837,7 @@ void phalcon_date(zval *return_value, zval *format, zval *timestamp)
 	ts = (timestamp) ? phalcon_get_intval(timestamp) : time(NULL);
 
 	formatted = php_format_date(Z_STRVAL_P(format), Z_STRLEN_P(format), ts, 1);
-	ZVAL_STRING(return_value, formatted, 0);
+	ZVAL_STRING(return_value, formatted);
 
 	if (unlikely(use_copy)) {
 		phalcon_dtor(copy);
@@ -1855,7 +1856,7 @@ void phalcon_addslashes(zval *return_value, zval *str)
 		}
 	}
 
-	ZVAL_STRING(return_value, php_addslashes(Z_STRVAL_P(str), Z_STRLEN_P(str), &Z_STRLEN_P(return_value), 0), 0);
+	ZVAL_STRING(return_value, php_addslashes(Z_STRVAL_P(str), Z_STRLEN_P(str), &Z_STRLEN_P(return_value), 0));
 
 	if (unlikely(use_copy)) {
 		phalcon_dtor(copy);

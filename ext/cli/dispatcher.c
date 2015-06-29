@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 	
 		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "dispatch:beforeException", 1);
+		ZVAL_STRING(event_name, "dispatch:beforeException");
 	
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, exception);
 		if (PHALCON_IS_FALSE(status)) {
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 	
 		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "dispatch:beforeException", 1);
+		ZVAL_STRING(event_name, "dispatch:beforeException");
 	
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, exception);
 		if (PHALCON_IS_FALSE(status)) {

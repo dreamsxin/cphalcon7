@@ -40,8 +40,8 @@ void phalcon_serialize(zval *return_value, zval **var) {
 		RETURN_FALSE;
 	}
 
-	if (buf.c) {
-		RETURN_STRINGL(buf.c, buf.len, 0);
+	if (buf.s) {
+		RETURN_STR(buf.s);
 	} else {
 		RETURN_NULL();
 	}

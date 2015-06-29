@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 		}
 
 		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, "modelsManager", 1);
+		ZVAL_STRING(service_name, "modelsManager");
 
 		PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 		if (zend_is_true(has)) {
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 		}
 
 		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, "modelsMetadata", 1);
+		ZVAL_STRING(service_name, "modelsMetadata");
 
 		PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 		if (zend_is_true(has)) {
@@ -1134,8 +1134,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				INIT_ZVAL(question_mark);
 				INIT_ZVAL(colon);
 
-				ZVAL_STRING(&question_mark, "?", 0);
-				ZVAL_STRING(&colon, ":", 0);
+				ZVAL_STRING(&question_mark, "?");
+				ZVAL_STRING(&colon, ":");
 
 				PHALCON_INIT_VAR(placeholder);
 				phalcon_fast_str_replace(placeholder, &question_mark, &colon, value);
@@ -4318,7 +4318,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				phalcon_fast_str_replace(sql_tmp, string_wildcard, value, sql_select);
 
 				PHALCON_INIT_NVAR(sql_select);
-				ZVAL_STRING(sql_select, Z_STRVAL_P(sql_tmp), 1);
+				ZVAL_STRING(sql_select, Z_STRVAL_P(sql_tmp));
 			} else if (Z_TYPE_P(wildcard) == IS_LONG) {
 				PHALCON_INIT_NVAR(string_wildcard);
 				PHALCON_CONCAT_SV(string_wildcard, ":", wildcard);
@@ -4425,7 +4425,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		 * Simple resultsets contains only complete objects
 		 */
 		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, "modelsResultsetSimple", 1);
+		ZVAL_STRING(service_name, "modelsResultsetSimple");
 
 		PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 		if (zend_is_true(has)) {
@@ -4452,7 +4452,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		 * Complex resultsets may contain complete objects and scalars
 		 */
 		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, "modelsResultsetComplex", 1);
+		ZVAL_STRING(service_name, "modelsResultsetComplex");
 
 		PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 		if (zend_is_true(has)) {
@@ -4550,7 +4550,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	PHALCON_CALL_METHOD(&dialect, connection, "getdialect");
 
 	PHALCON_INIT_VAR(double_colon);
-	ZVAL_STRING(double_colon, ":", 1);
+	ZVAL_STRING(double_colon, ":");
 
 	PHALCON_INIT_VAR(empty_string);
 	ZVAL_EMPTY_STRING(empty_string);
@@ -4839,7 +4839,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 	 * We create another Phalcon\Mvc\Model\Query to get the related records
 	 */
 	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery", 1);
+	ZVAL_STRING(service_name, "modelsQuery");
 
 	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 	if (zend_is_true(has)) {
@@ -4933,7 +4933,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 		phalcon_array_fetch_string(&values, intermediate, SL("values"), PH_NOISY);
 
 		PHALCON_INIT_VAR(double_colon);
-		ZVAL_STRING(double_colon, ":", 1);
+		ZVAL_STRING(double_colon, ":");
 
 		PHALCON_INIT_VAR(empty_string);
 		ZVAL_EMPTY_STRING(empty_string);
@@ -5114,7 +5114,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 					phalcon_fast_str_replace(sql_tmp, string_wildcard, raw_value, update_sql);
 
 					PHALCON_INIT_NVAR(update_sql);
-					ZVAL_STRING(update_sql, Z_STRVAL_P(sql_tmp), 1);
+					ZVAL_STRING(update_sql, Z_STRVAL_P(sql_tmp));
 
 					phalcon_array_unset(&bind_types, wildcard, PH_SEPARATE);
 				} else {
@@ -5282,7 +5282,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 					phalcon_fast_str_replace(sql_tmp, string_wildcard, raw_value, delete_sql);
 
 					PHALCON_INIT_NVAR(delete_sql);
-					ZVAL_STRING(delete_sql, Z_STRVAL_P(sql_tmp), 1);
+					ZVAL_STRING(delete_sql, Z_STRVAL_P(sql_tmp));
 
 					phalcon_array_unset(&bind_types, wildcard, PH_SEPARATE);
 				} else {

@@ -988,7 +988,7 @@ PHP_METHOD(Phalcon_Arr, callback){
 	phalcon_fetch_params(1, 1, 0, &str);
 
 	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "#^([^\\(]*+)\\((.*)\\)$#", 1);
+	ZVAL_STRING(pattern, "#^([^\\(]*+)\\((.*)\\)$#");
 
 	PHALCON_INIT_VAR(matches);
 
@@ -1013,10 +1013,10 @@ PHP_METHOD(Phalcon_Arr, callback){
 			php_pcre_split_impl(pce, Z_STRVAL_P(match), Z_STRLEN_P(match), tmp, -1, 0);
 
 			PHALCON_INIT_VAR(search);
-			ZVAL_STRING(search, "\\,", 1);
+			ZVAL_STRING(search, "\\,");
 
 			PHALCON_INIT_VAR(replace);
-			ZVAL_STRING(replace, ",", 1);
+			ZVAL_STRING(replace, ",");
 
 			PHALCON_INIT_VAR(params);
 			PHALCON_CALL_FUNCTION(&params, "str_replace", search, replace, tmp);

@@ -814,7 +814,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	PHALCON_MM_GROW();
 
 	INIT_ZVAL(star);
-	ZVAL_STRING(&star, "*", 0);
+	ZVAL_STRING(&star, "*");
 
 	phalcon_fetch_params(1, 3, 0, &role, &resource, &access);
 	
@@ -826,7 +826,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 	
 		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "acl:beforeCheckAccess", 1);
+		ZVAL_STRING(event_name, "acl:beforeCheckAccess");
 	
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr);
 		if (PHALCON_IS_FALSE(status)) {
@@ -910,7 +910,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	phalcon_update_property_this(this_ptr, SL("_accessGranted"), return_value);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "acl:afterCheckAccess", 1);
+		ZVAL_STRING(event_name, "acl:afterCheckAccess");
 		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr, return_value);
 	}
 	

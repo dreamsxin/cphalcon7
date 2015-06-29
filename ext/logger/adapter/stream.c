@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 		}
 	} else {
 		PHALCON_INIT_VAR(mode);
-		ZVAL_STRING(mode, "ab", 1);
+		ZVAL_STRING(mode, "ab");
 	}
 	
 	/** 

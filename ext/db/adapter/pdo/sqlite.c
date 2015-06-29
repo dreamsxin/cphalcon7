@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 	phalcon_read_property_this(&dialect, this_ptr, SL("_dialect"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(size_pattern);
-	ZVAL_STRING(size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#", 1);
+	ZVAL_STRING(size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#");
 	
 	PHALCON_CALL_METHOD(&sql, dialect, "describecolumns", table, schema);
 
@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 				phalcon_array_update_string_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_BOOLEAN, 0);
 				phalcon_array_update_string_long(&definition, SL("bindType"), 5, 0);
 				PHALCON_INIT_NVAR(column_type);
-				ZVAL_STRING(column_type, "boolean", 1); // Change column type to skip size check.
+				ZVAL_STRING(column_type, "boolean"); // Change column type to skip size check.
 				break;
 			}
 

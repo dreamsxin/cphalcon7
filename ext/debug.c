@@ -389,10 +389,10 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 		charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset"));
 
 		INIT_ZVAL(line_break);
-		ZVAL_STRING(&line_break, "\n", 0);
+		ZVAL_STRING(&line_break, "\n");
 
 		INIT_ZVAL(escaped_line_break);
-		ZVAL_STRING(&escaped_line_break, "\\n", 0);
+		ZVAL_STRING(&escaped_line_break, "\\n");
 
 		ALLOC_INIT_ZVAL(replaced_value);
 		phalcon_fast_str_replace(replaced_value, &line_break, &escaped_line_break, value);
@@ -742,16 +742,16 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 	phalcon_fetch_params(0, 1, 3, 0, &n, &trace, &link_format);
 
 	PHALCON_INIT_VAR(space);
-	ZVAL_STRING(space, " ", 1);
+	ZVAL_STRING(space, " ");
 
 	PHALCON_INIT_VAR(two_spaces);
-	ZVAL_STRING(two_spaces, "  ", 1);
+	ZVAL_STRING(two_spaces, "  ");
 
 	PHALCON_INIT_VAR(underscore);
-	ZVAL_STRING(underscore, "_", 1);
+	ZVAL_STRING(underscore, "_");
 
 	PHALCON_INIT_VAR(minus);
-	ZVAL_STRING(minus, "-", 1);
+	ZVAL_STRING(minus, "-");
 
 	/** 
 	 * Every trace in the backtrace have a unique number
@@ -771,7 +771,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		}
 		else if (is_phalcon_class(class_ce)) {
 			PHALCON_INIT_VAR(namespace_separator);
-			ZVAL_STRING(namespace_separator, "\\", 1);
+			ZVAL_STRING(namespace_separator, "\\");
 
 			/* Prepare the class name according to the Phalcon's conventions */
 			PHALCON_INIT_VAR(prepare_uri_class);
@@ -968,15 +968,15 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			}
 
 			PHALCON_INIT_VAR(comment_pattern);
-			ZVAL_STRING(comment_pattern, "#\\*\\/$#", 1);
+			ZVAL_STRING(comment_pattern, "#\\*\\/$#");
 
 			charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset"));
 
 			PHALCON_INIT_VAR(tab);
-			ZVAL_STRING(tab, "\t", 1);
+			ZVAL_STRING(tab, "\t");
 
 			PHALCON_INIT_VAR(comment);
-			ZVAL_STRING(comment, "* /", 1);
+			ZVAL_STRING(comment, "* /");
 			PHALCON_CPY_WRT(i, first_line);
 
 			while (PHALCON_LE(i, last_line)) {
@@ -1132,7 +1132,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		link_format = "file://%f#%l";
 	}
 
-	ZVAL_STRING(&z_link_format, link_format, 0);
+	ZVAL_STRING(&z_link_format, link_format);
 
 	PHALCON_CALL_METHOD(&formatted_file, getThis(), "getfilelink", file, line, &z_link_format);
 

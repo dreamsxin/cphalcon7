@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 	if (Z_TYPE_P(base_uri) == IS_NULL) {
 
 		PHALCON_INIT_VAR(slash);
-		ZVAL_STRING(slash, "/", 1);
+		ZVAL_STRING(slash, "/");
 		_SERVER = phalcon_get_global(SS("_SERVER"));
 		if (phalcon_array_isset_string_fetch(&php_self, _SERVER, SS("PHP_SELF"))) {
 			PHALCON_INIT_VAR(uri);
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 		if (strstr(Z_STRVAL_P(uri), ":")) {
 			PHALCON_INIT_VAR(matched);
 			PHALCON_INIT_VAR(regexp);
-			ZVAL_STRING(regexp, "/^[^:\\/?#]++:/", 1);
+			ZVAL_STRING(regexp, "/^[^:\\/?#]++:/");
 			RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, regexp, uri, NULL));
 			if (zend_is_true(matched)) {
 				PHALCON_INIT_NVAR(local);
@@ -429,7 +429,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 		if (strstr(Z_STRVAL_P(*uri), "://")) {
 			PHALCON_INIT_VAR(matched);
 			PHALCON_INIT_VAR(pattern);
-			ZVAL_STRING(pattern, "/^[^:\\/?#]++:/", 1);
+			ZVAL_STRING(pattern, "/^[^:\\/?#]++:/");
 			RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, pattern, *uri, NULL));
 			if (zend_is_true(matched)) {
 				RETURN_CTOR(*uri);

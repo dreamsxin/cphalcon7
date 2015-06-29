@@ -147,12 +147,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getColumnDefinition){
 	
 		case 0:
 			PHALCON_INIT_VAR(column_sql);
-			ZVAL_STRING(column_sql, "INTEGER", 1);
+			ZVAL_STRING(column_sql, "INTEGER");
 			break;
 	
 		case 1:
 			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "DATE", 1);
+			ZVAL_STRING(column_sql, "DATE");
 			break;
 	
 		case 2:
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getColumnDefinition){
 	
 		case 4:
 			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "TIMESTAMP", 1);
+			ZVAL_STRING(column_sql, "TIMESTAMP");
 			break;
 	
 		case 5:
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getColumnDefinition){
 	
 		case 6:
 			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "TEXT", 1);
+			ZVAL_STRING(column_sql, "TEXT");
 			break;
 	
 		case 7:
@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getColumnDefinition){
 	
 		case 8:
 			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "TINYINT(1)", 1);
+			ZVAL_STRING(column_sql, "TINYINT(1)");
 			break;
 	
 		default:
@@ -655,7 +655,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, describeReferences){
 	phalcon_fetch_params(1, 1, 1, &table, &schema);
 	
 	PHALCON_INIT_VAR(sql);
-	ZVAL_STRING(sql, "SELECT AC.TABLE_NAME, CC.COLUMN_NAME, AC.CONSTRAINT_NAME, AC.R_OWNER, RCC.TABLE_NAME R_TABLE_NAME, RCC.COLUMN_NAME R_COLUMN_NAME FROM ALL_CONSTRAINTS AC JOIN ALL_CONS_COLUMNS CC ON AC.CONSTRAINT_NAME = CC.CONSTRAINT_NAME JOIN ALL_CONS_COLUMNS RCC ON AC.R_OWNER = RCC.OWNER AND AC.R_CONSTRAINT_NAME = RCC.CONSTRAINT_NAME WHERE AC.CONSTRAINT_TYPE='R' ", 1);
+	ZVAL_STRING(sql, "SELECT AC.TABLE_NAME, CC.COLUMN_NAME, AC.CONSTRAINT_NAME, AC.R_OWNER, RCC.TABLE_NAME R_TABLE_NAME, RCC.COLUMN_NAME R_COLUMN_NAME FROM ALL_CONSTRAINTS AC JOIN ALL_CONS_COLUMNS CC ON AC.CONSTRAINT_NAME = CC.CONSTRAINT_NAME JOIN ALL_CONS_COLUMNS RCC ON AC.R_OWNER = RCC.OWNER AND AC.R_CONSTRAINT_NAME = RCC.CONSTRAINT_NAME WHERE AC.CONSTRAINT_TYPE='R' ");
 	if (schema && zend_is_true(schema)) {
 		PHALCON_SCONCAT_SVSVS(sql, "AND AC.OWNER='", schema, "' AND AC.TABLE_NAME = '", table, "'");
 	} else {
@@ -975,17 +975,17 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	if (phalcon_array_isset_string_fetch(&distinct, definition, SS("distinct"))) {
 		assert(Z_TYPE_P(distinct) == IS_LONG);
 		if (Z_LVAL_P(distinct) == 0) {
-			ZVAL_STRING(sql, "SELECT ALL ", 1);
+			ZVAL_STRING(sql, "SELECT ALL ");
 		}
 		else if (Z_LVAL_P(distinct) == 1) {
-			ZVAL_STRING(sql, "SELECT DISTINCT ", 1);
+			ZVAL_STRING(sql, "SELECT DISTINCT ");
 		}
 		else {
-			ZVAL_STRING(sql, "SELECT ", 1);
+			ZVAL_STRING(sql, "SELECT ");
 		}
 	}
 	else {
-		ZVAL_STRING(sql, "SELECT ", 1);
+		ZVAL_STRING(sql, "SELECT ");
 	}
 
 	PHALCON_SCONCAT_VSV(sql, columns_sql, " FROM ", tables_sql);

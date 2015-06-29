@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 				}
 
 				PHALCON_INIT_VAR(service);
-				ZVAL_STRING(service, "crypt", 1);
+				ZVAL_STRING(service, "crypt");
 
 				PHALCON_CALL_METHOD(&crypt, dependency_injector, "getshared", service);
 				PHALCON_VERIFY_INTERFACE(crypt, phalcon_cryptinterface_ce);
@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 		}
 
 		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, "crypt", 1);
+		ZVAL_STRING(service, "crypt");
 
 		PHALCON_CALL_METHOD(&crypt, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(crypt, phalcon_cryptinterface_ce);

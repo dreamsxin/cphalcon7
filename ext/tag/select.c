@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 		}
 		if (!phalcon_array_isset_string(params, SS("emptyText"))) {
 			PHALCON_INIT_VAR(empty_text);
-			ZVAL_STRING(empty_text, "Choose...", 1);
+			ZVAL_STRING(empty_text, "Choose...");
 		} else {
 			PHALCON_OBS_NVAR(empty_text);
 			phalcon_array_fetch_string(&empty_text, params, SL("emptyText"), PH_NOISY);
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 	}
 
 	PHALCON_INIT_VAR(code);
-	ZVAL_STRING(code, "<select", 1);
+	ZVAL_STRING(code, "<select");
 	{
 		zend_class_entry *scope = EG(scope);
 		EG(scope) = phalcon_tag_ce;
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 	phalcon_concat_self_str(&code, SL(">" PHP_EOL));
 
 	PHALCON_INIT_VAR(close_option);
-	ZVAL_STRING(close_option, "</option>" PHP_EOL, 1);
+	ZVAL_STRING(close_option, "</option>" PHP_EOL);
 	if (zend_is_true(use_empty)) {
 		/** 
 		 * Create an empty value

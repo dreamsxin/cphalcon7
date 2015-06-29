@@ -3604,7 +3604,7 @@ static void phvolt_scanner_error_msg(phvolt_parser_status *parser_status, zval *
 	}
 
 	error[length - 1] = '\0';
-	ZVAL_STRING(*error_msg, error, 1);
+	ZVAL_STRING(*error_msg, error);
 	efree(error);
 }
 
@@ -3671,7 +3671,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 	/** Check if the view has code */
 	if (!Z_STRVAL_P(view_code)) {
 		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-		ZVAL_STRING(*error_msg, "View code cannot be null", 1);
+		ZVAL_STRING(*error_msg, "View code cannot be null");
 		return FAILURE;
 	}
 
@@ -3684,7 +3684,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 	phvolt_parser = phvolt_Alloc(phvolt_wrapper_alloc);
 	if (unlikely(!phvolt_parser)) {
 		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-		ZVAL_STRING(*error_msg, "Memory allocation error", 1);
+		ZVAL_STRING(*error_msg, "Memory allocation error");
 		return FAILURE;
 	}
 
@@ -4101,7 +4101,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 					error = emalloc(sizeof(char) * (48 + Z_STRLEN_P(state->active_file)));
 					snprintf(error, 48 + Z_STRLEN_P(state->active_file) + state->active_line, "Scanner: unknown opcode %d on in %s line %d", token.opcode, Z_STRVAL_P(state->active_file), state->active_line);
 					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, error, 1);
+					ZVAL_STRING(*error_msg, error);
 					efree(error);
 				}
 				break;
@@ -4138,7 +4138,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 		if (parser_status->syntax_error) {
 			if (!*error_msg) {
 				PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
-				ZVAL_STRING(*error_msg, parser_status->syntax_error, 1);
+				ZVAL_STRING(*error_msg, parser_status->syntax_error);
 			}
 			efree(parser_status->syntax_error);
 		}

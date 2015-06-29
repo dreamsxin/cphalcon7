@@ -65,8 +65,8 @@
 
 #define PHALCON_STRING_OFFSET(op1, index) ((index >= 0 && index < Z_STRLEN_P(op1)) ? Z_STRVAL_P(op1)[index] : '\0')
 
-#define phalcon_increment(var) fast_increment_function(var)
-#define phalcon_decrement(var) fast_decrement_function(var)
+#define phalcon_increment(var) increment_function(var)
+#define phalcon_decrement(var) decrement_function(var)
 
 void phalcon_make_printable_zval(zval *expr, zval *expr_copy, int *use_copy);
 

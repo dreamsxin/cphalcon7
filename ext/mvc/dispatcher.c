@@ -244,7 +244,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 		ZVAL_LONG(exception_code, 0);
 
 		PHALCON_INIT_VAR(exception_message);
-		ZVAL_STRING(exception_message, "A dependency injection container is required to access the 'response' service", 1);
+		ZVAL_STRING(exception_message, "A dependency injection container is required to access the 'response' service");
 
 		PHALCON_INIT_VAR(exception);
 		object_init_ex(exception, phalcon_mvc_dispatcher_exception_ce);
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	ZVAL_LONG(status_code, 404);
 
 	PHALCON_INIT_VAR(status_message);
-	ZVAL_STRING(status_message, "Not Found", 1);
+	ZVAL_STRING(status_message, "Not Found");
 	PHALCON_CALL_METHOD(NULL, response, "setstatuscode", status_code, status_message);
 
 	/**
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 
 		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "dispatch:beforeException", 1);
+		ZVAL_STRING(event_name, "dispatch:beforeException");
 
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, exception);
 		if (PHALCON_IS_FALSE(status)) {
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException){
 	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_ALLOC_GHOST_ZVAL(event_name);
-		ZVAL_STRING(event_name, "dispatch:beforeException", 1);
+		ZVAL_STRING(event_name, "dispatch:beforeException");
 
 		PHALCON_RETURN_CALL_METHODW(events_manager, "fire", event_name, this_ptr, exception);
 	}

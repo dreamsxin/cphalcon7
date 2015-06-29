@@ -193,7 +193,7 @@ static void phalcon_flash_message_helper(INTERNAL_FUNCTION_PARAMETERS, const cha
 	phalcon_fetch_params(0, 1, 0, &msg);
 
 	PHALCON_ALLOC_GHOST_ZVAL(type);
-	ZVAL_STRING(type, stype, 1);
+	ZVAL_STRING(type, stype);
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "message", type, *msg);
 }

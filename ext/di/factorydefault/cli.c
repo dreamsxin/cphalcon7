@@ -75,7 +75,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault_CLI, __construct){
 	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_router);
 
 	PHALCON_INIT_VAR(definition);
-	ZVAL_STRING(definition, "Phalcon\\CLI\\Router", 1);
+	ZVAL_STRING(definition, "Phalcon\\CLI\\Router");
 
 	PHALCON_INIT_VAR(router);
 	object_init_ex(router, phalcon_di_service_ce);
@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault_CLI, __construct){
 	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_dispatcher);
 
 	PHALCON_INIT_NVAR(definition);
-	ZVAL_STRING(definition, "Phalcon\\CLI\\Dispatcher", 1);
+	ZVAL_STRING(definition, "Phalcon\\CLI\\Dispatcher");
 
 	PHALCON_INIT_VAR(dispatcher);
 	object_init_ex(dispatcher, phalcon_di_service_ce);

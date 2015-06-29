@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, innerJoin){
 	}
 
 	PHALCON_INIT_VAR(type);
-	ZVAL_STRING(type, "INNER", 1);
+	ZVAL_STRING(type, "INNER");
 
 	PHALCON_INIT_VAR(join);
 	array_init_size(join, 4);
@@ -669,7 +669,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, leftJoin){
 	}
 
 	PHALCON_INIT_VAR(type);
-	ZVAL_STRING(type, "LEFT", 1);
+	ZVAL_STRING(type, "LEFT");
 
 	PHALCON_INIT_VAR(join);
 	array_init_size(join, 4);
@@ -710,7 +710,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, rightJoin){
 	}
 
 	PHALCON_INIT_VAR(type);
-	ZVAL_STRING(type, "RIGHT", 1);
+	ZVAL_STRING(type, "RIGHT");
 
 	PHALCON_INIT_VAR(join);
 	array_init_size(join, 4);
@@ -1468,14 +1468,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	distinct = phalcon_fetch_nproperty_this(this_ptr, SL("_distinct"), PH_NOISY);
 	if (PHALCON_IS_BOOL(distinct)) {
 		if (Z_BVAL_P(distinct)) {
-			ZVAL_STRING(phql, "SELECT DISTINCT ", 1);
+			ZVAL_STRING(phql, "SELECT DISTINCT ");
 		}
 		else {
-			ZVAL_STRING(phql, "SELECT ALL ", 1);
+			ZVAL_STRING(phql, "SELECT ALL ");
 		}
 	}
 	else {
-		ZVAL_STRING(phql, "SELECT ", 1);
+		ZVAL_STRING(phql, "SELECT ");
 	}
 
 	PHALCON_OBS_VAR(columns);
@@ -1823,7 +1823,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 
 	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery", 1);
+	ZVAL_STRING(service_name, "modelsQuery");
 
 	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 	if (zend_is_true(has)) {

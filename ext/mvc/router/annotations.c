@@ -284,7 +284,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 						}
 	
 						PHALCON_INIT_NVAR(service);
-						ZVAL_STRING(service, "annotations", 1);
+						ZVAL_STRING(service, "annotations");
 	
 						PHALCON_CALL_METHOD(&annotations_service, dependency_injector, "getshared", service);
 						PHALCON_VERIFY_INTERFACE(annotations_service, phalcon_annotations_adapterinterface_ce);
@@ -565,7 +565,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		if (Z_TYPE_P(methods) == IS_NULL) {
 	
 			PHALCON_INIT_NVAR(parameter);
-			ZVAL_STRING(parameter, "methods", 1);
+			ZVAL_STRING(parameter, "methods");
 	
 			PHALCON_CALL_METHOD(&methods, annotation, "getargument", parameter);
 			if (Z_TYPE_P(methods) == IS_ARRAY || Z_TYPE_P(methods) == IS_STRING) {
@@ -576,7 +576,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		}
 	
 		PHALCON_INIT_NVAR(parameter);
-		ZVAL_STRING(parameter, "converts", 1);
+		ZVAL_STRING(parameter, "converts");
 	
 		PHALCON_CALL_METHOD(&converts, annotation, "getargument", parameter);
 		if (Z_TYPE_P(converts) == IS_ARRAY) { 
@@ -596,7 +596,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		}
 	
 		PHALCON_INIT_NVAR(parameter);
-		ZVAL_STRING(parameter, "conversors", 1);
+		ZVAL_STRING(parameter, "conversors");
 	
 		PHALCON_CALL_METHOD(&converts, annotation, "getargument", parameter);
 		if (Z_TYPE_P(converts) == IS_ARRAY) { 

@@ -443,7 +443,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "modelsManager:afterInitialize", 1);
+		ZVAL_STRING(event_name, "modelsManager:afterInitialize");
 		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr, model);
 	}
 
@@ -2261,15 +2261,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		switch (phalcon_get_intval(type)) {
 
 			case 0:
-				ZVAL_STRING(retrieve_method, "findFirst", 1);
+				ZVAL_STRING(retrieve_method, "findFirst");
 				break;
 
 			case 1:
-				ZVAL_STRING(retrieve_method, "findFirst", 1);
+				ZVAL_STRING(retrieve_method, "findFirst");
 				break;
 
 			case 2:
-				ZVAL_STRING(retrieve_method, "find", 1);
+				ZVAL_STRING(retrieve_method, "find");
 				break;
 
 		}
@@ -2913,7 +2913,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 	 * Create a query
 	 */
 	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery", 1);
+	ZVAL_STRING(service_name, "modelsQuery");
 
 	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 	if (zend_is_true(has)) {
@@ -2970,7 +2970,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 	 * Create a query
 	 */
 	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery", 1);
+	ZVAL_STRING(service_name, "modelsQuery");
 
 	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 	if (zend_is_true(has)) {
@@ -3025,7 +3025,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 	 * Create a query builder
 	 */
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "modelsQueryBuilder", 1);
+	ZVAL_STRING(service, "modelsQueryBuilder");
 
 	PHALCON_INIT_VAR(service_params);
 	array_init(service_params);

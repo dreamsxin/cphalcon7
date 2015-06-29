@@ -279,7 +279,7 @@ static int phalcon_mvc_application_fire_event(zval *mgr, const char *event, zval
 		zval *p[3];
 
 		PHALCON_ALLOC_GHOST_ZVAL(event_name);
-		ZVAL_STRING(event_name, event, 1);
+		ZVAL_STRING(event_name, event);
 
 		p[0] = event_name;
 		p[1] = this_ptr;
@@ -393,7 +393,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				phalcon_array_fetch_string(&class_name, module, SL("className"), PH_NOISY);
 			} else {
 				PHALCON_INIT_NVAR(class_name);
-				ZVAL_STRING(class_name, "Module", 1);
+				ZVAL_STRING(class_name, "Module");
 			}
 
 			/* If the developer has specified a path, try to include the file */
@@ -459,7 +459,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	if (f_implicit_view) {
 		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, "view", 1);
+		ZVAL_STRING(service, "view");
 
 		PHALCON_CALL_METHOD(&view, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(view, phalcon_mvc_viewinterface_ce);

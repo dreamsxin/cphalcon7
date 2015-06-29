@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 
 	if (!phalcon_array_isset_string_fetch(&service, options, SS("service"))) {
 		PHALCON_INIT_VAR(service);
-		ZVAL_STRING(service, "cache", 1);
+		ZVAL_STRING(service, "cache");
 	}
 
 	phalcon_update_property_this(this_ptr, SL("_cache"), service);

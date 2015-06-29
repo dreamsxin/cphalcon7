@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 		add_next_index_zval(arguments, class_name);
 
 		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, "sessionBag", 1);
+		ZVAL_STRING(service, "sessionBag");
 
 		PHALCON_CALL_METHOD(&result, dependency_injector, "get", service, arguments);
 		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), result);

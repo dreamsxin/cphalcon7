@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 			PHALCON_INIT_VAR(event_name);
-			ZVAL_STRING(event_name, "collectionManager:afterInitialize", 1);
+			ZVAL_STRING(event_name, "collectionManager:afterInitialize");
 			PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr);
 		}
 	
@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 	}
 	
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "mongo", 1);
+	ZVAL_STRING(service, "mongo");
 	
 	PHALCON_OBS_VAR(connection_services);
 	phalcon_read_property_this(&connection_services, this_ptr, SL("_connectionServices"), PH_NOISY);

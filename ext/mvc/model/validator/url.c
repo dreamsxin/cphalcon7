@@ -93,7 +93,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 	phalcon_fetch_params(1, 1, 0, &record);
 	
 	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field", 1);
+	ZVAL_STRING(option, "field");
 	
 	PHALCON_CALL_METHOD(&field, this_ptr, "getoption", option);
 	if (Z_TYPE_P(field) != IS_STRING) {
@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 	 * Allow empty
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty", 1);
+	ZVAL_STRING(option, "allowEmpty");
 
 	PHALCON_CALL_METHOD(&allow_empty, this_ptr, "getoption", option);
 	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 	 * Allow empty
 	 */
 	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty", 1);
+	ZVAL_STRING(option, "allowEmpty");
 
 	PHALCON_CALL_METHOD(&allow_empty, this_ptr, "getoption", option);
 
@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 		}
 	
 		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Url", 1);
+		ZVAL_STRING(type, "Url");
 
 		/*
 		 * Is code set

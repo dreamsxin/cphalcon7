@@ -46,7 +46,7 @@ void phalcon_filter_alphanum(zval *return_value, zval *param){
 	int use_copy = 0;
 
 	if (Z_TYPE_P(param) != IS_STRING) {
-		zend_make_printable_zval(param, &copy, &use_copy);
+		zend_make_printable_zval(param, &copy);
 		if (use_copy) {
 			param = &copy;
 		}
@@ -87,7 +87,7 @@ void phalcon_filter_identifier(zval *return_value, zval *param){
 	int use_copy = 0;
 
 	if (Z_TYPE_P(param) != IS_STRING) {
-		zend_make_printable_zval(param, &copy, &use_copy);
+		zend_make_printable_zval(param, &copy);
 		if (use_copy) {
 			param = &copy;
 		}
@@ -196,7 +196,7 @@ void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_ch
 	long int value;
 
 	if (Z_TYPE_P(param) != IS_STRING) {
-		zend_make_printable_zval(param, &copy, &use_copy);
+		zend_make_printable_zval(param, &copy);
 		if (use_copy) {
 			param = &copy;
 		}

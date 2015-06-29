@@ -58,7 +58,7 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
 
 	switch (Z_TYPE_P(key)) {
 		case IS_STRING:
-			return zend_symtable_update(ht, Z_STR_P(key), value);
+			return zend_symtable_update(ht, Z_STR_P(key), value) ? SUCCESS : FAILURE;
 
 		case IS_TRUE:
 			return zend_hash_index_update(ht, 1, value) ? SUCCESS : FAILURE;

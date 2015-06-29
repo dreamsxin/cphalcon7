@@ -61,7 +61,7 @@ void phalcon_raw_url_encode(zval *return_value, zval *url) {
 	int use_copy = 0, length;
 
 	if (Z_TYPE_P(url) == IS_STRING) {
-		zend_make_printable_zval(url, &copy, &use_copy);
+		zend_make_printable_zval(url, &copy);
 		if (use_copy) {
 			url = &copy;
 		}

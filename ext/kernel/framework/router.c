@@ -162,7 +162,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 							if (replace) {
 								use_copy = 0;
 								if (Z_TYPE_P(replace) != IS_STRING) {
-									zend_make_printable_zval(replace, &replace_copy, &use_copy);
+									zend_make_printable_zval(replace, &replace_copy);
 									if (use_copy) {
 										replace = &replace_copy;
 									}
@@ -196,7 +196,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 							if (replace) {
 								use_copy = 0;
 								if (Z_TYPE_P(replace) != IS_STRING) {
-									zend_make_printable_zval(replace, &replace_copy, &use_copy);
+									zend_make_printable_zval(replace, &replace_copy);
 									if (use_copy) {
 										replace = &replace_copy;
 									}
@@ -222,7 +222,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 						if (replace) {
 							use_copy = 0;
 							if (Z_TYPE_P(replace) != IS_STRING) {
-								zend_make_printable_zval(replace, &replace_copy, &use_copy);
+								zend_make_printable_zval(replace, &replace_copy);
 								if (use_copy) {
 									replace = &replace_copy;
 								}

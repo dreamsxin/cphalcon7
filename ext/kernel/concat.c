@@ -32,7 +32,7 @@ void phalcon_concat_sv(zval **result, const char *op1, uint32_t op1_len, zval *o
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
@@ -42,7 +42,7 @@ void phalcon_concat_sv(zval **result, const char *op1, uint32_t op1_len, zval *o
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -79,7 +79,7 @@ void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
@@ -89,7 +89,7 @@ void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -127,14 +127,14 @@ void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval 
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
@@ -144,7 +144,7 @@ void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval 
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -187,14 +187,14 @@ void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
@@ -204,7 +204,7 @@ void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -248,21 +248,21 @@ void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zva
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op6) != IS_STRING) {
-		zend_make_printable_zval(op6, &op6_copy, &use_copy6);
+		zend_make_printable_zval(op6, &op6_copy6);
 		if (use_copy6) {
 			op6 = &op6_copy;
 		}
@@ -272,7 +272,7 @@ void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zva
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -321,21 +321,21 @@ void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zv
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op6) != IS_STRING) {
-		zend_make_printable_zval(op6, &op6_copy, &use_copy6);
+		zend_make_printable_zval(op6, &op6_copy6);
 		if (use_copy6) {
 			op6 = &op6_copy;
 		}
@@ -345,7 +345,7 @@ void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zv
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -395,28 +395,28 @@ void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, 
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op6) != IS_STRING) {
-		zend_make_printable_zval(op6, &op6_copy, &use_copy6);
+		zend_make_printable_zval(op6, &op6_copy6);
 		if (use_copy6) {
 			op6 = &op6_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op8) != IS_STRING) {
-		zend_make_printable_zval(op8, &op8_copy, &use_copy8);
+		zend_make_printable_zval(op8, &op8_copy8);
 		if (use_copy8) {
 			op8 = &op8_copy;
 		}
@@ -426,7 +426,7 @@ void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, 
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -483,21 +483,21 @@ void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op5) != IS_STRING) {
-		zend_make_printable_zval(op5, &op5_copy, &use_copy5);
+		zend_make_printable_zval(op5, &op5_copy5);
 		if (use_copy5) {
 			op5 = &op5_copy;
 		}
@@ -507,7 +507,7 @@ void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -555,14 +555,14 @@ void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
@@ -572,7 +572,7 @@ void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -614,14 +614,14 @@ void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval 
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
@@ -631,7 +631,7 @@ void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval 
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -674,7 +674,7 @@ void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_l
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
@@ -684,7 +684,7 @@ void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_l
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -721,14 +721,14 @@ void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
@@ -738,7 +738,7 @@ void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -780,14 +780,14 @@ void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
@@ -797,7 +797,7 @@ void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -840,21 +840,21 @@ void phalcon_concat_vsvsv(zval **result, zval *op1, const char *op2, uint32_t op
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op5) != IS_STRING) {
-		zend_make_printable_zval(op5, &op5_copy, &use_copy5);
+		zend_make_printable_zval(op5, &op5_copy5);
 		if (use_copy5) {
 			op5 = &op5_copy;
 		}
@@ -864,7 +864,7 @@ void phalcon_concat_vsvsv(zval **result, zval *op1, const char *op2, uint32_t op
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -912,21 +912,21 @@ void phalcon_concat_vsvsvs(zval **result, zval *op1, const char *op2, uint32_t o
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op5) != IS_STRING) {
-		zend_make_printable_zval(op5, &op5_copy, &use_copy5);
+		zend_make_printable_zval(op5, &op5_copy5);
 		if (use_copy5) {
 			op5 = &op5_copy;
 		}
@@ -936,7 +936,7 @@ void phalcon_concat_vsvsvs(zval **result, zval *op1, const char *op2, uint32_t o
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -985,28 +985,28 @@ void phalcon_concat_vsvsvsv(zval **result, zval *op1, const char *op2, uint32_t 
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op5) != IS_STRING) {
-		zend_make_printable_zval(op5, &op5_copy, &use_copy5);
+		zend_make_printable_zval(op5, &op5_copy5);
 		if (use_copy5) {
 			op5 = &op5_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op7) != IS_STRING) {
-		zend_make_printable_zval(op7, &op7_copy, &use_copy7);
+		zend_make_printable_zval(op7, &op7_copy7);
 		if (use_copy7) {
 			op7 = &op7_copy;
 		}
@@ -1016,7 +1016,7 @@ void phalcon_concat_vsvsvsv(zval **result, zval *op1, const char *op2, uint32_t 
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1070,21 +1070,21 @@ void phalcon_concat_vsvv(zval **result, zval *op1, const char *op2, uint32_t op2
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
@@ -1094,7 +1094,7 @@ void phalcon_concat_vsvv(zval **result, zval *op1, const char *op2, uint32_t op2
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1141,28 +1141,28 @@ void phalcon_concat_vsvvv(zval **result, zval *op1, const char *op2, uint32_t op
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op5) != IS_STRING) {
-		zend_make_printable_zval(op5, &op5_copy, &use_copy5);
+		zend_make_printable_zval(op5, &op5_copy5);
 		if (use_copy5) {
 			op5 = &op5_copy;
 		}
@@ -1172,7 +1172,7 @@ void phalcon_concat_vsvvv(zval **result, zval *op1, const char *op2, uint32_t op
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1224,14 +1224,14 @@ void phalcon_concat_vv(zval **result, zval *op1, zval *op2, int self_var){
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
@@ -1241,7 +1241,7 @@ void phalcon_concat_vv(zval **result, zval *op1, zval *op2, int self_var){
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1282,14 +1282,14 @@ void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, ui
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
@@ -1299,7 +1299,7 @@ void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, ui
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1341,21 +1341,21 @@ void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, u
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
@@ -1365,7 +1365,7 @@ void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, u
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1412,21 +1412,21 @@ void phalcon_concat_vvv(zval **result, zval *op1, zval *op2, zval *op3, int self
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
@@ -1436,7 +1436,7 @@ void phalcon_concat_vvv(zval **result, zval *op1, zval *op2, zval *op3, int self
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1482,28 +1482,28 @@ void phalcon_concat_vvvsv(zval **result, zval *op1, zval *op2, zval *op3, const 
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op5) != IS_STRING) {
-		zend_make_printable_zval(op5, &op5_copy, &use_copy5);
+		zend_make_printable_zval(op5, &op5_copy5);
 		if (use_copy5) {
 			op5 = &op5_copy;
 		}
@@ -1513,7 +1513,7 @@ void phalcon_concat_vvvsv(zval **result, zval *op1, zval *op2, zval *op3, const 
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1565,28 +1565,28 @@ void phalcon_concat_vvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *o
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
@@ -1596,7 +1596,7 @@ void phalcon_concat_vvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *o
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1647,42 +1647,42 @@ void phalcon_concat_vvvvsvv(zval **result, zval *op1, zval *op2, zval *op3, zval
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op6) != IS_STRING) {
-		zend_make_printable_zval(op6, &op6_copy, &use_copy6);
+		zend_make_printable_zval(op6, &op6_copy6);
 		if (use_copy6) {
 			op6 = &op6_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op7) != IS_STRING) {
-		zend_make_printable_zval(op7, &op7_copy, &use_copy7);
+		zend_make_printable_zval(op7, &op7_copy7);
 		if (use_copy7) {
 			op7 = &op7_copy;
 		}
@@ -1692,7 +1692,7 @@ void phalcon_concat_vvvvsvv(zval **result, zval *op1, zval *op2, zval *op3, zval
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}
@@ -1754,35 +1754,35 @@ void phalcon_concat_vvvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *
 	uint offset = 0, length;
 
 	if (Z_TYPE_P(op1) != IS_STRING) {
-		zend_make_printable_zval(op1, &op1_copy, &use_copy1);
+		zend_make_printable_zval(op1, &op1_copy1);
 		if (use_copy1) {
 			op1 = &op1_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op2) != IS_STRING) {
-		zend_make_printable_zval(op2, &op2_copy, &use_copy2);
+		zend_make_printable_zval(op2, &op2_copy2);
 		if (use_copy2) {
 			op2 = &op2_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op3) != IS_STRING) {
-		zend_make_printable_zval(op3, &op3_copy, &use_copy3);
+		zend_make_printable_zval(op3, &op3_copy3);
 		if (use_copy3) {
 			op3 = &op3_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op4) != IS_STRING) {
-		zend_make_printable_zval(op4, &op4_copy, &use_copy4);
+		zend_make_printable_zval(op4, &op4_copy4);
 		if (use_copy4) {
 			op4 = &op4_copy;
 		}
 	}
 
 	if (Z_TYPE_P(op5) != IS_STRING) {
-		zend_make_printable_zval(op5, &op5_copy, &use_copy5);
+		zend_make_printable_zval(op5, &op5_copy5);
 		if (use_copy5) {
 			op5 = &op5_copy;
 		}
@@ -1792,7 +1792,7 @@ void phalcon_concat_vvvvv(zval **result, zval *op1, zval *op2, zval *op3, zval *
 	if (self_var) {
 
 		if (Z_TYPE_P(*result) != IS_STRING) {
-			zend_make_printable_zval(*result, &result_copy, &use_copy);
+			zend_make_printable_zval(*result, &result_copy);
 			if (use_copy) {
 				PHALCON_CPY_WRT_CTOR(*result, (&result_copy));
 			}

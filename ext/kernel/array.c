@@ -279,28 +279,28 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 
 	switch (Z_TYPE_P(index)) {
 		case IS_NULL:
-			status = zend_symtable_update(ht, zend_string_init("", 1, 0), value);
+			status = zend_symtable_update(ht, zend_string_init("", 1, 0), value) ? SUCCESS : FAILURE;
 			break;
 
 		case IS_DOUBLE:
-			status = zend_hash_index_update(ht, (ulong)Z_DVAL_P(index), value);
+			status = zend_hash_index_update(ht, (ulong)Z_DVAL_P(index), value) ? SUCCESS : FAILURE;
 			break;
 
 		case IS_TRUE:
-			status = zend_hash_index_update(ht, 1, value);
+			status = zend_hash_index_update(ht, 1, value) ? SUCCESS : FAILURE;
 			break;
 
 		case IS_FALSE:
-			status = zend_hash_index_update(ht, 0, value);
+			status = zend_hash_index_update(ht, 0, value) ? SUCCESS : FAILURE;
 			break;
 
 		case IS_LONG:
 		case IS_RESOURCE:
-			status = zend_hash_index_update(ht, Z_LVAL_P(index), value);
+			status = zend_hash_index_update(ht, Z_LVAL_P(index), value) ? SUCCESS : FAILURE;
 			break;
 
 		case IS_STRING:
-			status = zend_symtable_update(ht, Z_STR_P(index), value);
+			status = zend_symtable_update(ht, Z_STR_P(index), value) ? SUCCESS : FAILURE;
 			break;
 
 		default:

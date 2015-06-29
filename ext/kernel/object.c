@@ -240,11 +240,7 @@ void phalcon_get_class_ns(zval *result, const zval *object, int lower) {
 	}
 
 	if (found) {
-		Z_STRLEN_P(result) = class_length - i;
-		Z_STRVAL_P(result) = (char *) emalloc(class_length - i + 1);
-		memcpy(Z_STRVAL_P(result), class_name + i, class_length - i);
-		Z_STRVAL_P(result)[Z_STRLEN_P(result)] = 0;
-		Z_TYPE_P(result) = IS_STRING;
+		ZVAL_NEW_STR(result, zend_string_init(class_name + i, class_length - i + 1));
 	} else {
 		ZVAL_STRINGL(result, class_name, class_length);
 	}

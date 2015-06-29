@@ -58,7 +58,7 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
 
 	switch (Z_TYPE_P(key)) {
 		case IS_STRING:
-			return zend_symtable_update(ht, Z_STRL_P(key), value);
+			return zend_symtable_update(ht, Z_STR_P(key), value);
 
 		case IS_TRUE:
 			return zend_hash_index_update(ht, 1, value) ? SUCCESS : FAILURE;
@@ -198,82 +198,6 @@ int phalcon_hash_unset(HashTable *ht, const zval *key)
 
 		case IS_STRING:
 			return (zend_symtable_del(ht, Z_STR_P(key)) == SUCCESS);
-
-		default:
-			zend_error(E_WARNING, "Illegal offset type");
-			return 0;
-	}
-}
-
-/**
- * @brief Adds or updates item @a key in the hash table @a ht
- * @param ht Hash table
- * @param[in] key Literal key
- * @param[in] value Value
- * @return Whether the operation succeeded
- * @retval SUCCESS
- * @retval FAILURE
- * @note @a value's reference count in not updated
- * @note If <tt>key->constant</tt> is @c IS_NULL, @a value is appended to @a ht
- * @throw E_WARNING if @a key type is not supported
- */
-int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zval *key)
-{
-	if (Z_TYPE(key->constant) == IS_NULL) {
-		return zend_hash_next_index_insert(ht, value) ? SUCCESS : FAILURE;
-	}
-
-	switch (Z_TYPE(key->constant)) {
-		case IS_STRING:
-			if (*(Z_STRVAL(key->constant)) >= '0' && *(Z_STRVAL(key->constant)) <= '9') {
-				return zend_symtable_update(ht, Z_STR(key->constant), value);
-			}
-
-			return zend_hash_update(ht, Z_STR(key->constant), value);
-
-		case IS_TRUE:
-			return zend_hash_index_update(ht, 1, value);
-
-		case IS_FALSE:
-			return zend_hash_index_update(ht, 0, value);
-
-		case IS_RESOURCE:
-		case IS_DOUBLE:
-		case IS_LONG:
-			return zend_hash_index_update(ht, ((Z_TYPE(key->constant) == IS_DOUBLE) ? (ulong)Z_DVAL(key->constant) : (ulong)Z_LVAL(key->constant)), value);
-
-		default:
-			zend_error(E_WARNING, "Illegal offset type");
-			return FAILURE;
-	}
-}
-
-/**
- * @brief Unset key identified by @a key from @a ht
- * @param ht
- * @param key
- * @return
- */
-int phalcon_hash_fast_unset(HashTable *ht, const zval *key)
-{
-	switch (Z_TYPE(key->constant)) {
-		case IS_TRUE:
-			return (zend_hash_index_del(ht, 1) == SUCCESS);
-
-		case IS_FALSE:
-			return (zend_hash_index_del(ht, 0) == SUCCESS);
-
-		case IS_LONG:
-		case IS_DOUBLE:
-		case IS_RESOURCE:
-			return (zend_hash_index_del(ht, (Z_TYPE(key->constant) == IS_DOUBLE) ? ((ulong)Z_DVAL(key->constant)) : (ulong)Z_LVAL(key->constant)) == SUCCESS);
-
-		case IS_STRING:
-			if (*(Z_STRVAL(key->constant)) >= '0' && *(Z_STRVAL(key->constant)) <= '9') {
-				return (zend_symtable_del(ht, Z_STR(key->constant)) == SUCCESS);
-			}
-
-			return (zend_hash_del(ht, Z_STR(key->constant)) == SUCCESS);
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");

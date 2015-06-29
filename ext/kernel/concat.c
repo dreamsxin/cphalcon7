@@ -1879,7 +1879,7 @@ void phalcon_concat_self(zval **left, zval *right){
 		}
 	}
 
-	SEPARATE_ZVAL_IF_NOT_REF(left);
+	SEPARATE_ZVAL_IF_NOT_REF(*left);
 
 	length = Z_STRLEN_P(*left) + Z_STRLEN_P(right);
 	Z_STRVAL_P(*left) = str_erealloc(Z_STRVAL_P(*left), length + 1);
@@ -1925,7 +1925,7 @@ void phalcon_concat_self_str(zval **left, const char *right, int right_length){
 		}
 	}
 
-	SEPARATE_ZVAL_IF_NOT_REF(left);
+	SEPARATE_ZVAL_IF_NOT_REF(*left);
 
 	length = Z_STRLEN_P(*left) + right_length;
 	Z_STRVAL_P(*left) = str_erealloc(Z_STRVAL_P(*left), length + 1);
@@ -1974,7 +1974,7 @@ void phalcon_concat_self_long(zval **left, const long right) {
 
 	if (right_length > 0) {
 
-		SEPARATE_ZVAL_IF_NOT_REF(left);
+		SEPARATE_ZVAL_IF_NOT_REF(*left);
 
 		length = Z_STRLEN_P(*left) + right_length;
 		Z_STRVAL_P(*left) = str_erealloc(Z_STRVAL_P(*left), length + 1);
@@ -2013,7 +2013,7 @@ void phalcon_concat_self_char(zval **left, unsigned char right) {
 		}
 	}
 
-	SEPARATE_ZVAL_IF_NOT_REF(left);
+	SEPARATE_ZVAL_IF_NOT_REF(*left);
 
 	Z_STRLEN_P(*left)++;
 	Z_STRVAL_P(*left) = str_erealloc(Z_STRVAL_P(*left), Z_STRLEN_P(*left) + 1);

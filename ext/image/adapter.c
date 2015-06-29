@@ -414,23 +414,23 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 	image_width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY);
 	image_height = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
 
-	SEPARATE_ZVAL_IF_NOT_REF(w);
+	SEPARATE_ZVAL_IF_NOT_REF(*w);
 	if (Z_TYPE_P(*w) != IS_LONG) {
 		convert_to_long(*w);
 	}
 
-	SEPARATE_ZVAL_IF_NOT_REF(h);
+	SEPARATE_ZVAL_IF_NOT_REF(*h);
 	if (Z_TYPE_P(*h) != IS_LONG) {
 		convert_to_long(*h);
 	}
 
 	if (ofs_x && Z_TYPE_P(*ofs_x) != IS_NULL && !PHALCON_IS_BOOL(*ofs_x) && Z_TYPE_P(*ofs_x) != IS_LONG) {
-		SEPARATE_ZVAL_IF_NOT_REF(ofs_x);
+		SEPARATE_ZVAL_IF_NOT_REF(*ofs_x);
 		convert_to_long(*ofs_x);
 	}
 		
 	if (ofs_y && Z_TYPE_P(*ofs_y) != IS_NULL && !PHALCON_IS_BOOL(*ofs_y) && Z_TYPE_P(*ofs_x) != IS_LONG) {
-		SEPARATE_ZVAL_IF_NOT_REF(ofs_y);
+		SEPARATE_ZVAL_IF_NOT_REF(*ofs_y);
 		convert_to_long(*ofs_y);
 	}
 
@@ -575,7 +575,7 @@ PHP_METHOD(Phalcon_Image_Adapter, sharpen){
 
 	PHALCON_MM_GROW();
 
-	SEPARATE_ZVAL_IF_NOT_REF(amount);
+	SEPARATE_ZVAL_IF_NOT_REF(*amount);
 	if (Z_TYPE_P(*amount) != IS_LONG) {
 		convert_to_long(*amount);
 	}

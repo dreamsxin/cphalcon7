@@ -264,7 +264,7 @@ static void phalcon_registry_unset_property(zval *object, zval *member, void **c
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
 
-	phalcon_hash_fast_unset(Z_ARRVAL_P(obj->properties), key);
+	phalcon_hash_unset(Z_ARRVAL_P(obj->properties), key);
 }
 
 /**

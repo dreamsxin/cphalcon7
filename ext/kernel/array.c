@@ -92,11 +92,11 @@ int phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char
 
 int phalcon_array_isset_long_fetch(zval **fetched, const zval *arr, ulong index) {
 
-	zval **zv;
+	zval *zv;
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-		if (zend_hash_index_find(Z_ARRVAL_P(arr), index, (void**)&zv) == SUCCESS) {
-			*fetched = *zv;
+		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
+			*fetched = zv;
 			return 1;
 		}
 	}
@@ -173,7 +173,7 @@ int ZEND_FASTCALL phalcon_array_unset(zval **arr, const zval *index, int flags) 
 
 	switch (Z_TYPE_P(index)) {
 		case IS_NULL:
-			return (zend_hash_del(ht, "", 1) == SUCCESS);
+			return (zend_hash_str_del(ht, "", 1) == SUCCESS);
 
 		case IS_DOUBLE:
 			return (zend_hash_index_del(ht, (ulong)Z_DVAL_P(index)) == SUCCESS);
@@ -207,7 +207,7 @@ int ZEND_FASTCALL phalcon_array_unset_string(zval **arr, const char *index, uint
 		SEPARATE_ZVAL_IF_NOT_REF(arr);
 	}
 
-	return zend_hash_del(Z_ARRVAL_P(*arr), index, index_length);
+	return zend_hash_str_del(Z_ARRVAL_P(*arr), index, index_length);
 }
 
 int ZEND_FASTCALL phalcon_array_unset_long(zval **arr, ulong index, int flags) {
@@ -439,11 +439,11 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 
 int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, int silent){
 
-	zval **zv;
+	zval *zv;
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-		if (zend_hash_index_find(Z_ARRVAL_P(arr), index, (void**)&zv) == SUCCESS) {
-			*return_value = *zv;
+		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
+			*return_value = zv;
 			Z_ADDREF_P(*return_value);
 			return SUCCESS;
 		}

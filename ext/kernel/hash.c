@@ -53,7 +53,7 @@ int phalcon_has_numeric_keys(const zval *data)
 int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
 {
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
-		return zend_hash_next_index_insert(ht, value);
+		return zend_hash_next_index_insert(ht, value) ? SUCCESS : FAILURE;
 	}
 
 	switch (Z_TYPE_P(key)) {
@@ -61,15 +61,15 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
 			return zend_symtable_update(ht, Z_STRL_P(key), value);
 
 		case IS_TRUE:
-			return zend_hash_index_update(ht, 1, value);
+			return zend_hash_index_update(ht, 1, value) ? SUCCESS : FAILURE;
 
 		case IS_FALSE:
-			return zend_hash_index_update(ht, 0, value);
+			return zend_hash_index_update(ht, 0, value) ? SUCCESS : FAILURE;
 
 		case IS_RESOURCE:
 		case IS_DOUBLE:
 		case IS_LONG:
-			return zend_hash_index_update(ht, ((Z_TYPE_P(key) == IS_DOUBLE) ? (ulong)Z_DVAL_P(key) : (ulong)Z_LVAL_P(key)), value);
+			return zend_hash_index_update(ht, ((Z_TYPE_P(key) == IS_DOUBLE) ? (ulong)Z_DVAL_P(key) : (ulong)Z_LVAL_P(key)), value) ? SUCCESS : FAILURE;
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");
@@ -220,7 +220,7 @@ int phalcon_hash_unset(HashTable *ht, const zval *key)
 int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zval *key)
 {
 	if (Z_TYPE(key->constant) == IS_NULL) {
-		return zend_hash_next_index_insert(ht, value);
+		return zend_hash_next_index_insert(ht, value) ? SUCCESS : FAILURE;
 	}
 
 	switch (Z_TYPE(key->constant)) {

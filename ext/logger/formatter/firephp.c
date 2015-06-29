@@ -240,8 +240,8 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 						 * too much information; this is not suitable to send
 						 * in the HTTP headers
 						 */
-						zend_hash_quick_del(Z_ARRVAL_P(*ppzval), "args", sizeof("args"), zend_inline_hash_func(SS("args")));
-						zend_hash_quick_del(Z_ARRVAL_P(*ppzval), "object", sizeof("object"), zend_inline_hash_func(SS("object")));
+						zend_hash_str_del(Z_ARRVAL_P(*ppzval), SS("args"));
+						zend_hash_str_del(Z_ARRVAL_P(*ppzval), SS("object"));
 						found = 1;
 					}
 				}
@@ -281,22 +281,22 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	add_assoc_zval_ex(meta, SS("Type"), type_str);
 
 	if (i_show_backtrace && Z_TYPE_P(backtrace) == IS_ARRAY) {
-		zval **ppzval;
+		zval *pzval;
 
-		if (likely(SUCCESS == zend_hash_index_find(Z_ARRVAL_P(backtrace), 0, (void**)&ppzval)) && likely(Z_TYPE_P(*ppzval) == IS_ARRAY)) {
-			zval **file = NULL, **line = NULL;
+		if (likely((pzval = zend_hash_index_find(Z_ARRVAL_P(backtrace), 0)) != NULL) && likely(Z_TYPE_P(pzval) == IS_ARRAY)) {
+			zval *file, *line;
 
-			zend_hash_quick_find(Z_ARRVAL_P(*ppzval), SS("file"), zend_inline_hash_func(SS("file")), (void**)&file);
-			zend_hash_quick_find(Z_ARRVAL_P(*ppzval), SS("line"), zend_inline_hash_func(SS("line")), (void**)&line);
+			file = zend_hash_str_find(Z_ARRVAL_P(pzval), SS("file"));
+			line = zend_hash_str_find(Z_ARRVAL_P(pzval), SS("line"));
 
 			if (likely(file != NULL)) {
-				Z_ADDREF_P(*file);
-				add_assoc_zval_ex(meta, SS("File"), *file);
+				Z_ADDREF_P(file);
+				add_assoc_zval_ex(meta, SS("File"), file);
 			}
 
 			if (likely(line != NULL)) {
-				Z_ADDREF_P(*line);
-				add_assoc_zval_ex(meta, SS("Line"), *line);
+				Z_ADDREF_P(line);
+				add_assoc_zval_ex(meta, SS("Line"), line);
 			}
 		}
 	}

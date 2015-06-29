@@ -279,28 +279,28 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 
 	switch (Z_TYPE_P(index)) {
 		case IS_NULL:
-			status = zend_symtable_update(ht, "", 1, (void*)&value, sizeof(zval*), NULL);
+			status = zend_symtable_update(ht, zend_string_init("", 1, 0), value);
 			break;
 
 		case IS_DOUBLE:
-			status = zend_hash_index_update(ht, (ulong)Z_DVAL_P(index), (void*)&value);
+			status = zend_hash_index_update(ht, (ulong)Z_DVAL_P(index), value);
 			break;
 
 		case IS_TRUE:
-			status = zend_hash_index_update(ht, 1, (void*)&value);
+			status = zend_hash_index_update(ht, 1, value);
 			break;
 
 		case IS_FALSE:
-			status = zend_hash_index_update(ht, 0, (void*)&value);
+			status = zend_hash_index_update(ht, 0, value);
 			break;
 
 		case IS_LONG:
 		case IS_RESOURCE:
-			status = zend_hash_index_update(ht, Z_LVAL_P(index), (void*)&value);
+			status = zend_hash_index_update(ht, Z_LVAL_P(index), value);
 			break;
 
 		case IS_STRING:
-			status = zend_symtable_update(ht, Z_STRVAL_P(index), Z_STRLEN_P(index)+1, (void*)&value, sizeof(zval*), NULL);
+			status = zend_symtable_update(ht, Z_STR_P(index), value);
 			break;
 
 		default:
@@ -340,7 +340,7 @@ int phalcon_array_update_quick_string(zval **arr, const char *index, uint index_
 		Z_ADDREF_P(value);
 	}
 
-	return zend_hash_quick_update(Z_ARRVAL_P(*arr), index, index_length, key, (void*)&value, sizeof(zval *), NULL);
+	return zend_hash_update(Z_ARRVAL_P(*arr), zend_string_init(index, index_length, 0), value);
 }
 
 int phalcon_array_update_long(zval **arr, ulong index, zval *value, int flags){
@@ -367,7 +367,7 @@ int phalcon_array_update_long(zval **arr, ulong index, zval *value, int flags){
 		Z_ADDREF_P(value);
 	}
 
-	return zend_hash_index_update(Z_ARRVAL_P(*arr), index, (void*)&value);
+	return zend_hash_index_update(Z_ARRVAL_P(*arr), index, value);
 }
 
 int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index, int flags){

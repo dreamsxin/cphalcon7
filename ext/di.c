@@ -180,37 +180,36 @@ static int phalcon_di_call_method(const char *method, INTERNAL_FUNCTION_PARAMETE
 
 static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_object *obj, zval *offset, zval *parameters)
 {
-	zval *tmp = NULL;
-	zval **retval = &tmp, **service;
+	zval *retval, *service;
 	zend_class_entry *ce;
 
 	assert(Z_TYPE_P(offset) == IS_STRING);
 
 	if (UNEXPECTED(!offset)) {
-		return EG(uninitialized_zval_ptr);
+		return &EG(uninitialized_zval);
 	}
 
-	if (SUCCESS == zend_symtable_find(obj->shared, Z_STRVAL_P(offset), Z_STRLEN_P(offset)+1, (void**)&retval)) {
+	if ((retval = zend_symtable_find(obj->shared, Z_STR_P(offset))) != NULL) {
 		obj->fresh = 0;
-		return *retval;
+		return retval;
 	}
 
 	/* Resolve the instance normally */
-	if (SUCCESS == zend_symtable_find(obj->services, Z_STRVAL_P(offset), Z_STRLEN_P(offset)+1, (void**)&service)) {
+	if ((service = zend_symtable_find(obj->services, Z_STR_P(offset))) != NULL) {
 		zval *params[] = { parameters, this_ptr };
 
 		/* The service is registered in the DI */
-		if (FAILURE == phalcon_call_method(retval, *service, "resolve", 2, params)) {
+		if (FAILURE == phalcon_call_method(retval, service, "resolve", 2, params)) {
 			return NULL;
 		}
 
 		/* *retval has refcount = 1 here, it will be used in zend_symtable_update() */
-		ce = (Z_TYPE_P(*retval) == IS_OBJECT) ? Z_OBJCE_P(*retval) : NULL;
+		ce = (Z_TYPE_P(retval) == IS_OBJECT) ? Z_OBJCE_P(retval) : NULL;
 	}
 	else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
 		if ((ce = phalcon_class_exists_ex(offset, 1)) != NULL) {
-			PHALCON_ALLOC_GHOST_ZVAL(*retval);
+			PHALCON_ALLOC_GHOST_ZVAL(retval);
 			if (FAILURE == phalcon_create_instance_params_ce(*retval, ce, parameters)) {
 				return NULL;
 			}
@@ -226,8 +225,8 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	/* Pass the DI itself if the instance implements Phalcon\DI\InjectionAwareInterface */
 	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1)) {
 		zval *params[] = { this_ptr };
-		if (FAILURE == phalcon_call_method(NULL, *retval, "setdi", 1, params)) {
-			phalcon_ptr_dtor(*retval);
+		if (FAILURE == phalcon_call_method(NULL, retval, "setdi", 1, params)) {
+			phalcon_ptr_dtor(retval);
 			return NULL;
 		}
 	}
@@ -235,11 +234,11 @@ static zval* phalcon_di_read_dimension_internal(zval *this_ptr, phalcon_di_objec
 	/**
 	 * Save the instance in the first level shared
 	 */
-	assert(Z_REFCOUNT_P(*retval) == 1);
-	zend_symtable_update(obj->shared, Z_STRVAL_P(offset), Z_STRLEN_P(offset)+1, (void*)retval, sizeof(zval*), NULL);
+	assert(Z_REFCOUNT_P(retval) == 1);
+	zend_symtable_update(obj->shared, Z_STR_P(offset), retval);
 	obj->fresh = 1;
 
-	return *retval;
+	return retval;
 }
 
 static zval* phalcon_di_read_dimension(zval *object, zval *offset, int type, zval *rv)
@@ -377,16 +376,16 @@ static HashTable* phalcon_di_get_properties(zval* object)
 		PHALCON_ALLOC_GHOST_ZVAL(zv);
 		array_init_size(zv, zend_hash_num_elements(obj->services));
 		zend_hash_copy(Z_ARRVAL_P(zv), obj->services, (copy_ctor_func_t)zval_add_ref);
-		zend_hash_quick_update(props, "_services", sizeof("_services"), zend_inline_hash_func(SS("_sharedInstances")), (void*)&zv, sizeof(zval*), NULL);
+		zend_hash_update(props, zend_string_init(SS("_services"), 0), zv);
 
 		PHALCON_ALLOC_GHOST_ZVAL(zv);
 		array_init_size(zv, zend_hash_num_elements(obj->shared));
 		zend_hash_copy(Z_ARRVAL_P(zv), obj->shared, (copy_ctor_func_t)zval_add_ref);
-		zend_hash_quick_update(props, "_sharedInstances", sizeof("_sharedInstances"), zend_inline_hash_func(SS("_sharedInstances")), (void*)&zv, sizeof(zval*), NULL);
+		zend_hash_update(props, zend_string_init(SS("_sharedInstances"), 0), zv);
 
 		PHALCON_ALLOC_GHOST_ZVAL(zv);
 		ZVAL_BOOL(zv, obj->fresh);
-		zend_hash_quick_update(props, "_freshInstance", sizeof("_freshInstance"), zend_inline_hash_func(SS("_freshInstance")), (void*)&zv, sizeof(zval*), NULL);
+		zend_hash_update(props, zend_string_init(SS("_freshInstance"), 0), zv);
 	}
 
 	return props;

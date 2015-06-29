@@ -1057,7 +1057,7 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 		Z_ADDREF_P(value);
 
 		if (Z_TYPE_P(index) == IS_STRING) {
-			zend_symtable_update(Z_ARRVAL_P(tmp), Z_STRVAL_P(index), Z_STRLEN_P(index) + 1, &value, sizeof(zval*), NULL);
+			zend_symtable_update(Z_ARRVAL_P(tmp), Z_STR_P(index), value);
 		} else if (Z_TYPE_P(index) == IS_LONG) {
 			zend_hash_index_update(Z_ARRVAL_P(tmp), Z_LVAL_P(index), value);
 		} else if (Z_TYPE_P(index) == IS_NULL) {

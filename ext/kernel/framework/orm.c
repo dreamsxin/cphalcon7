@@ -78,7 +78,7 @@ void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast) {
 
 			zend_hash_copy(Z_ARRVAL_P(copy_ast), Z_ARRVAL_P(prepared_ast), (copy_ctor_func_t)zval_add_ref);
 
-			zend_hash_index_update(phalcon_globals_ptr->orm.ast_cache, Z_LVAL_P(unique_id), &copy_ast);
+			zend_hash_index_update(phalcon_globals_ptr->orm.ast_cache, Z_LVAL_P(unique_id), copy_ast);
 		}
 	}
 

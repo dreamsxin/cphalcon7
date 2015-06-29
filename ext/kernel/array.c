@@ -855,9 +855,9 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 
 		/* Update output hash depending on key type */
 		if (p->key->len == 0) {
-			zend_hash_next_index_insert(out_hash, &entry);
+			zend_hash_next_index_insert(out_hash, entry);
 		} else {
-			zend_hash_update(out_hash, p->key, &entry);
+			zend_hash_update(out_hash, p->key, entry);
 		}
 	}
 
@@ -867,9 +867,9 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 			entry = *((zval **)p->pData);
 			Z_ADDREF_P(entry);
 			if (p->key->len == 0) {
-				zend_hash_next_index_insert(*removed, &entry);
+				zend_hash_next_index_insert(*removed, entry);
 			} else {
-				zend_hash_update(*removed, p->key, &entry);
+				zend_hash_update(*removed, p->key, entry);
 			}
 		}
 	} else { /* otherwise just skip those entries */
@@ -882,7 +882,7 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 		for (i = 0; i < list_count; i++) {
 			entry = *list[i];
 			Z_ADDREF_P(entry);
-			zend_hash_next_index_insert(out_hash, &entry);
+			zend_hash_next_index_insert(out_hash, entry);
 		}
 	}
 
@@ -891,9 +891,9 @@ HashTable* phalcon_array_splice(HashTable *in_hash, int offset, int length, zval
 		entry = *((zval **)p->pData);
 		Z_ADDREF_P(entry);
 		if (p->key->len == 0) {
-			zend_hash_next_index_insert(out_hash, &entry);
+			zend_hash_next_index_insert(out_hash, entry);
 		} else {
-			zend_hash_update(out_hash, p->key, &entry);
+			zend_hash_update(out_hash, p->key, entry);
 		}
 	}
 
@@ -930,12 +930,12 @@ void phalcon_array_keys(zval *return_value, zval *arr)
 			switch (zend_hash_get_current_key_ex(Z_ARRVAL_P(arr), &skey, &skey_len, &nkey, 1, &pos)) {
 				case HASH_KEY_IS_STRING:
 					ZVAL_STRINGL(new_val, skey, skey_len - 1);
-					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &new_val);
+					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), new_val);
 					break;
 
 				case HASH_KEY_IS_LONG:
 					ZVAL_LONG(new_val, nkey);
-					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &new_val);
+					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), new_val);
 					break;
 			}
 

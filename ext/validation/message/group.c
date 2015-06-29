@@ -138,7 +138,7 @@ static void phalcon_validation_message_group_get_current_data(zend_object_iterat
 	position = phalcon_fetch_nproperty_this((zval*)it->data, SL("_position"), PH_NOISY);
 	messages = phalcon_fetch_nproperty_this((zval*)it->data, SL("_messages"), PH_NOISY);
 
-	*data = phalcon_hash_get(Z_ARRVAL_P(messages), position, BP_VAR_NA);
+	**data = phalcon_hash_get(Z_ARRVAL_P(messages), position, BP_VAR_NA);
 }
 
 static void phalcon_validation_message_group_get_current_key(zend_object_iterator *it, zval *key)
@@ -201,8 +201,8 @@ static zval* phalcon_validation_message_group_read_dimension(zval *object, zval 
 
 	messages = phalcon_fetch_nproperty_this(object, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_ARRAY) {
-		zval **res = phalcon_hash_get(Z_ARRVAL_P(messages), offset, type);
-		return res ? *res : NULL;
+		zval *res = phalcon_hash_get(Z_ARRVAL_P(messages), offset, type);
+		return res ? res : NULL;
 	}
 
 	return NULL;
@@ -247,18 +247,18 @@ static int phalcon_validation_message_group_has_dimension(zval *object, zval *of
 
 	messages = phalcon_fetch_nproperty_this(object, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_ARRAY) {
-		zval **tmp = phalcon_hash_get(Z_ARRVAL_P(messages), offset, BP_VAR_NA);
+		zval *tmp = phalcon_hash_get(Z_ARRVAL_P(messages), offset, BP_VAR_NA);
 
 		if (!tmp) {
 			return 0;
 		}
 
 		if (0 == check_empty) {
-			return Z_TYPE_P(*tmp) != IS_NULL;
+			return Z_TYPE_P(tmp) != IS_NULL;
 		}
 
 		if (1 == check_empty) {
-			return zend_is_true(*tmp);
+			return zend_is_true(tmp);
 		}
 
 		return 1;

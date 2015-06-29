@@ -247,7 +247,7 @@ static void phalcon_forms_form_get_current_data(zend_object_iterator *it, zval *
 
 	position = phalcon_fetch_nproperty_this((zval*)it->data, SL("_position"), PH_NOISY);
 	elements = phalcon_fetch_nproperty_this((zval*)it->data, SL("_elementsIndexed"), PH_NOISY);
-	*data = phalcon_hash_get(Z_ARRVAL_P(elements), position, BP_VAR_NA);
+	**data = phalcon_hash_get(Z_ARRVAL_P(elements), position, BP_VAR_NA);
 }
 
 static void phalcon_forms_form_get_current_key(zend_object_iterator *it, zval *key)

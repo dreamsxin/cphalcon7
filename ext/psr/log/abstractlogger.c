@@ -65,7 +65,7 @@ static void psr_log_abstractlogger_log_helper(INTERNAL_FUNCTION_PARAMETERS, cons
 	fcic.calling_scope = ce;
 	fcic.called_scope  = ce;
 
-	if (zend_hash_quick_find(fci.function_table, ZEND_STRS("log"), zend_inline_hash_func(ZEND_STRS("log")), (void**)&fcic.function_handler) == FAILURE) {
+	if ((fcic.function_handler = zend_hash_str_find(fci.function_table, ZEND_STRS("log"))) == NULL) {
 		fcic.initialized = 0;
 		ZVAL_STRING(&function_name, "log", 0);
 	}

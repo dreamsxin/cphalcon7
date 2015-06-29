@@ -75,7 +75,7 @@ static zend_object_handlers phalcon_forms_manager_object_handlers;
 
 static zval* phalcon_forms_manager_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
-	zval *forms, **res, tmp;
+	zval *forms, *res, tmp;
 
 	if (UNEXPECTED(!offset)) {
 		return EG(uninitialized_zval_ptr);
@@ -94,7 +94,7 @@ static zval* phalcon_forms_manager_read_dimension(zval *object, zval *offset, in
 	}
 
 	res = phalcon_hash_get(Z_ARRVAL_P(forms), offset, type);
-	if (!res || res == &EG(uninitialized_zval_ptr)) {
+	if (!res || res == &EG(uninitialized_zval)) {
 		if (UNEXPECTED(Z_TYPE_P(offset) != IS_STRING)) {
 			ZVAL_ZVAL(&tmp, offset, 1, 0);
 			convert_to_string(&tmp);
@@ -110,7 +110,7 @@ static zval* phalcon_forms_manager_read_dimension(zval *object, zval *offset, in
 		return NULL;
 	}
 
-	return *res;
+	return res;
 }
 
 /**

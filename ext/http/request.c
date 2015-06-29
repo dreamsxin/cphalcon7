@@ -1046,7 +1046,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 
 static const char* phalcon_http_request_getmethod_helper()
 {
-	zval **value;
+	zval *value;
 	const char *method = SG(request_info).request_method;
 	if (unlikely(!method)) {
 		zval *_SERVER, key;
@@ -1057,8 +1057,8 @@ static const char* phalcon_http_request_getmethod_helper()
 		_SERVER = phalcon_get_global(SS("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA);
-			if (value && Z_TYPE_P(*value) == IS_STRING) {
-				return Z_STRVAL_P(*value);
+			if (value && Z_TYPE_P(value) == IS_STRING) {
+				return Z_STRVAL_P(value);
 			}
 		}
 
@@ -1090,15 +1090,15 @@ PHP_METHOD(Phalcon_Http_Request, getMethod){
  */
 PHP_METHOD(Phalcon_Http_Request, getURI){
 
-	zval **value, *_SERVER, key = zval_used_for_init;
+	zval *value, *_SERVER, key = zval_used_for_init;
 
 	INIT_ZVAL(key);
 	ZVAL_STRING(&key, "REQUEST_URI", 0);
 
 	_SERVER = phalcon_get_global(SS("_SERVER"));
 	value = (Z_TYPE_P(_SERVER) == IS_ARRAY) ? phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA) : NULL;
-	if (value && Z_TYPE_P(*value) == IS_STRING) {
-		RETURN_ZVAL(*value, 1, 0);
+	if (value && Z_TYPE_P(value) == IS_STRING) {
+		RETURN_ZVAL(value, 1, 0);
 	}
 
 	RETURN_EMPTY_STRING();
@@ -1885,7 +1885,7 @@ PHP_METHOD(Phalcon_Http_Request, getBestLanguage){
 PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
 
 	zval *_SERVER;
-	zval **value;
+	zval *value;
 	char *auth_user = SG(request_info).auth_user;
 	char *auth_password = SG(request_info).auth_password;
 
@@ -1897,15 +1897,15 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
 			ZVAL_STRING(&key, "PHP_AUTH_USER", 0);
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA);
-			if (value && Z_TYPE_P(*value) == IS_STRING) {
-				auth_user = Z_STRVAL_P(*value);
+			if (value && Z_TYPE_P(value) == IS_STRING) {
+				auth_user = Z_STRVAL_P(value);
 			}
 
 			ZVAL_STRING(&key, "PHP_AUTH_PW", 0);
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA);
-			if (value && Z_TYPE_P(*value) == IS_STRING) {
-				auth_password = Z_STRVAL_P(*value);
+			if (value && Z_TYPE_P(value) == IS_STRING) {
+				auth_password = Z_STRVAL_P(value);
 			}
 		}
 	}
@@ -1942,13 +1942,13 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 		zval *_SERVER = phalcon_get_global(SS("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			zval key = zval_used_for_init;
-			zval **value;
+			zval *value;
 
 			ZVAL_STRING(&key, "PHP_AUTH_DIGEST", 0);
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_NA);
-			if (value && Z_TYPE_P(*value) == IS_STRING) {
-				auth_digest = Z_STRVAL_P(*value);
+			if (value && Z_TYPE_P(value) == IS_STRING) {
+				auth_digest = Z_STRVAL_P(value);
 			}
 		}
 	}

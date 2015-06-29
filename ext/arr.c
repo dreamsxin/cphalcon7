@@ -725,7 +725,7 @@ PHP_METHOD(Phalcon_Arr, unshift){
 PHP_METHOD(Phalcon_Arr, map){
 
 	zval *callbacks, *array, *keys = NULL;
-	zval *key = NULL, *val = NULL, *value = NULL, *key1 = NULL, **callback = NULL, *params = NULL;
+	zval *key = NULL, *val = NULL, *value = NULL, *key1 = NULL, *callback = NULL, *params = NULL;
 	HashTable *ah0, *ah1;
 	HashPosition hp0, hp1;
 	zval **hd;
@@ -763,7 +763,7 @@ PHP_METHOD(Phalcon_Arr, map){
 					phalcon_array_update_long(&params, 0, val, PH_COPY | PH_SEPARATE);
 
 					PHALCON_INIT_NVAR(value);
-					PHALCON_CALL_USER_FUNC_ARRAY(value, *callback, params);
+					PHALCON_CALL_USER_FUNC_ARRAY(value, callback, params);
 					
 					PHALCON_CPY_WRT(val, value);
 

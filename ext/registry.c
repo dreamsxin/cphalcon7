@@ -212,7 +212,7 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
  * @param key Literal key
  * @return Pointer to @a member
  */
-static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
+static zval* phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
 
@@ -229,12 +229,12 @@ static zval** phalcon_registry_get_property_ptr_ptr(zval *object, zval *member, 
  */
 static zval* phalcon_registry_read_property(zval *object, zval *member, int type, void **cache_slot, zval *rv)
 {
-	zval **result;
+	zval *result;
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
 
 	result = phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, type);
 
-	return result ? *result : NULL;
+	return result ? result : NULL;
 }
 
 /**
@@ -278,7 +278,7 @@ static void phalcon_registry_unset_property(zval *object, zval *member, void **c
 static int phalcon_registry_has_property(zval *object, zval *member, int has_set_exists, void **cache_slot)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
-	zval **tmp;
+	zval *tmp;
 
 	tmp = phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, BP_VAR_NA);
 
@@ -287,11 +287,11 @@ static int phalcon_registry_has_property(zval *object, zval *member, int has_set
 	}
 
 	if (0 == has_set_exists) {
-		return Z_TYPE_P(*tmp) != IS_NULL;
+		return Z_TYPE_P(tmp) != IS_NULL;
 	}
 
 	if (1 == has_set_exists) {
-		return zend_is_true(*tmp);
+		return zend_is_true(tmp);
 	}
 
 	return 1;
@@ -302,7 +302,7 @@ static int phalcon_registry_has_property(zval *object, zval *member, int has_set
  */
 static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
-	zval **ret;
+	zval *ret;
 	phalcon_registry_object *obj;
 
 	if (UNEXPECTED(!offset)) {
@@ -314,22 +314,22 @@ static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int typ
 
 	/* For write context we need to return a reference */
 	if ((type == BP_VAR_W || type == BP_VAR_RW || type == BP_VAR_UNSET) && !Z_ISREF_P(*ret)) {
-		if (Z_REFCOUNT_P(*ret) > 1) {
+		if (Z_REFCOUNT_P(ret) > 1) {
 			zval *newval;
 
 			PHALCON_ALLOC_GHOST_ZVAL(newval);
-			*newval = **ret;
+			*newval = *ret;
 			zval_copy_ctor(newval);
 			Z_SET_REFCOUNT_P(newval, 1);
 
-			Z_DELREF_P(*ret);
-			*ret = newval;
+			Z_DELREF_P(ret);
+			ret = newval;
 		}
 
-		Z_SET_ISREF_P(*ret);
+		Z_SET_ISREF_P(ret);
 	}
 
-	return *ret;
+	return ret;
 }
 
 /**
@@ -536,7 +536,7 @@ static zend_object_iterator* phalcon_registry_get_iterator(zend_class_entry *ce,
  */
 static PHP_METHOD(Phalcon_Registry, __get)
 {
-	zval **property, **result;
+	zval **property, *result;
 	phalcon_registry_object *obj;
 
 	assert(return_value_ptr != NULL);
@@ -546,7 +546,7 @@ static PHP_METHOD(Phalcon_Registry, __get)
 	obj    = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_registry_object);
 	result = phalcon_hash_get(Z_ARRVAL_P(obj->properties), *property, BP_VAR_W);
 
-	RETURN_ZVAL(*result, 1, 0);
+	RETURN_ZVAL(result, 1, 0);
 }
 
 /**
@@ -623,7 +623,7 @@ static PHP_METHOD(Phalcon_Registry, offsetGet)
 		ZEND_MN(Phalcon_Registry___get)(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 	}
 	else {
-		zval **offset, **result;
+		zval **offset, *result;
 		phalcon_registry_object *obj;
 
 		phalcon_fetch_params(0, 1, 0, &offset);
@@ -631,7 +631,7 @@ static PHP_METHOD(Phalcon_Registry, offsetGet)
 		obj    = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_registry_object);
 		result = phalcon_hash_get(Z_ARRVAL_P(obj->properties), *offset, BP_VAR_R);
 
-		RETURN_ZVAL(*result, 1, 0);
+		RETURN_ZVAL(result, 1, 0);
 	}
 }
 

@@ -93,9 +93,9 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
  * @note The implementation is suitable for @c read_property, @c get_property_ptr_ptr and @c read_dimension object handlers
  * @warning If @a type is @c BP_VAR_W or @c BP_VAR_RW and @a key was not found, it is added to @a ht and its value is set to @c IS_NULL
  */
-zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
+zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 {
-	zval **ret = NULL;
+	zval *ret = NULL;
 
 	switch (Z_TYPE_P(key)) {
 		case IS_RESOURCE:
@@ -114,7 +114,7 @@ zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
 				index = (Z_TYPE_P(key) == IS_DOUBLE) ? ((long int)Z_DVAL_P(key)) : Z_LVAL_P(key);
 			}
 
-			if (FAILURE == zend_hash_index_find(ht, index, (void**)&ret)) {
+			if ((ret = zend_hash_index_find(ht, index)) == NULL) {
 				switch (type) {
 					case BP_VAR_R:
 						zend_error(E_NOTICE, "Undefined offset: %ld", index);
@@ -122,7 +122,7 @@ zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
 					case BP_VAR_UNSET:
 					case BP_VAR_IS: {
 						TSRMLS_FETCH();
-						ret = &EG(uninitialized_zval_ptr);
+						ret = &EG(uninitialized_zval);
 						break;
 					}
 
@@ -142,7 +142,7 @@ zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
 		}
 
 		case IS_STRING:
-			if (FAILURE == zend_symtable_find(ht, Z_STRVAL_P(key), Z_STRLEN_P(key)+1, (void**)&ret)) {
+			if ((ret = zend_symtable_find(ht, Z_STR_P(key)))  == NULL) {
 				switch (type) {
 					case BP_VAR_R:
 						zend_error(E_NOTICE, "Undefined offset: %s", Z_STRVAL_P(key));
@@ -150,7 +150,7 @@ zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
 					case BP_VAR_UNSET:
 					case BP_VAR_IS: {
 						TSRMLS_FETCH();
-						ret = &EG(uninitialized_zval_ptr);
+						ret = &EG(uninitialized_zval);
 						break;
 					}
 
@@ -171,7 +171,7 @@ zval** phalcon_hash_get(HashTable *ht, const zval *key, int type)
 		default: {
 			TSRMLS_FETCH();
 			zend_error(E_WARNING, "Illegal offset type");
-			return (type == BP_VAR_W || type == BP_VAR_RW) ? &EG(error_zval_ptr) : &EG(uninitialized_zval_ptr);
+			return (type == BP_VAR_W || type == BP_VAR_RW) ? &EG(error_zval) : &EG(uninitialized_zval);
 		}
 	}
 }
@@ -197,111 +197,11 @@ int phalcon_hash_unset(HashTable *ht, const zval *key)
 			return (zend_hash_index_del(ht, (Z_TYPE_P(key) == IS_DOUBLE) ? ((long int)Z_DVAL_P(key)) : Z_LVAL_P(key)) == SUCCESS);
 
 		case IS_STRING:
-			return (zend_symtable_del(ht, Z_STRVAL_P(key), Z_STRLEN_P(key)+1) == SUCCESS);
+			return (zend_symtable_del(ht, Z_STR_P(key)) == SUCCESS);
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");
 			return 0;
-	}
-}
-
-/**
- * @brief Returns the entry @a ht identified by @a key (<tt>key->constant</tt>)
- * @param[in] ht Hash table
- * @param[in] type One of @c BP_VAR_XXX values
- * @param[in] key Zend literal key
- * @return Pointer to the stored value or a pointer to the special variable / @c NULL if the key was not found
- * @retval <tt>&EG(error_zval_ptr)</tt> when the key was not found and @a type is one of @c BP_VAR_W, @c BP_VAR_RW
- * @retval <tt>&EG(uninitialized_zval_ptr)</tt> when the key was not found and @a type is one of @c BP_VAR_R, @c BP_VAR_UNSET, @c BP_VAR_IS
- * @retval @c NULL when the key was not found and @a type is not any of the above
- * @throw @c E_WARNING when the key is of not supported type; in this case the function never returns @c NULL
- * @throw @c E_NOTICE if @a key was not found and @a type is @c BP_VAR_R or @c BP_VAR_RW
- * @note Reference count of the returned item is not modified
- * @note The implementation is suitable for @c read_property, @c get_property_ptr_ptr and @c read_dimension object handlers
- * @warning If @a type is @c BP_VAR_W or @c BP_VAR_RW and the key was not found, it is added to @a ht and its value is set to @c IS_NULL
- */
-zval** phalcon_hash_fast_get(HashTable *ht, int type, const zval *key)
-{
-	zval **ret = NULL;
-
-	switch (Z_TYPE(key->constant)) {
-		case IS_RESOURCE:
-			zend_error(E_STRICT, "Resource ID#%ld used as offset, casting to integer (%ld)", Z_LVAL(key->constant), Z_LVAL(key->constant));
-			/* no break */
-		case IS_LONG:
-		case IS_DOUBLE:
-		case IS_BOOL: {
-			ulong index = 0;
-			if (Z_TYPE(key->constant) == IS_TRUE) {
-				index = 1;
-			} else if (Z_TYPE(key->constant) == IS_FALSE) {
-				index = 0;
-			} else {
-				index = (Z_TYPE(key->constant) == IS_DOUBLE) ? ((long int)Z_DVAL(key->constant)) : Z_LVAL(key->constant);
-			}
-			if (FAILURE == zend_hash_index_find(ht, index, (void**)&ret)) {
-				switch (type) {
-					case BP_VAR_R:
-						zend_error(E_NOTICE, "Undefined offset: %ld", index);
-						/* no break */
-					case BP_VAR_UNSET:
-					case BP_VAR_IS: {
-						TSRMLS_FETCH();
-						ret = &EG(uninitialized_zval_ptr);
-						break;
-					}
-
-					case BP_VAR_RW:
-						zend_error(E_NOTICE, "Undefined offset: %ld", index);
-						/* no break */
-					case BP_VAR_W: {
-						zval *value;
-						ALLOC_INIT_ZVAL(value);
-						zend_hash_index_update(ht, index, value);
-						break;
-					}
-				}
-			}
-
-			return ret;
-		}
-
-		case IS_STRING:
-			if (*(Z_STRVAL(key->constant)) >= '0' && *(Z_STRVAL(key->constant)) <= '9') {
-				return phalcon_hash_get(ht, &key->constant, type);
-			}
-
-			if (FAILURE == zend_hash_quick_find(ht, Z_STRVAL(key->constant), Z_STRLEN(key->constant)+1, key->hash_value, (void**)&ret)) {
-				switch (type) {
-					case BP_VAR_R:
-						zend_error(E_NOTICE, "Undefined offset: %s", Z_STRVAL(key->constant));
-						/* no break */
-					case BP_VAR_UNSET:
-					case BP_VAR_IS: {
-						TSRMLS_FETCH();
-						ret = &EG(uninitialized_zval_ptr);
-						break;
-					}
-
-					case BP_VAR_RW:
-						zend_error(E_NOTICE, "Undefined offset: %s", Z_STRVAL(key->constant));
-						/* no break */
-					case BP_VAR_W: {
-						zval *value;
-						ALLOC_INIT_ZVAL(value);
-						zend_hash_update(ht, Z_STR(key->constant), value);
-						break;
-					}
-				}
-			}
-
-			return ret;
-
-		default: {
-			TSRMLS_FETCH();
-			zend_error(E_WARNING, "Illegal offset type");
-			return (type == BP_VAR_W || type == BP_VAR_RW) ? &EG(error_zval_ptr) : &EG(uninitialized_zval_ptr);
-		}
 	}
 }
 
@@ -370,10 +270,10 @@ int phalcon_hash_fast_unset(HashTable *ht, const zval *key)
 
 		case IS_STRING:
 			if (*(Z_STRVAL(key->constant)) >= '0' && *(Z_STRVAL(key->constant)) <= '9') {
-				return (zend_symtable_del(ht, Z_STRVAL(key->constant), Z_STRLEN(key->constant)+1) == SUCCESS);
+				return (zend_symtable_del(ht, Z_STR(key->constant)) == SUCCESS);
 			}
 
-			return (zend_hash_quick_del(ht, Z_STRVAL(key->constant), Z_STRLEN(key->constant)+1, key->hash_value) == SUCCESS);
+			return (zend_hash_del(ht, Z_STR(key->constant)) == SUCCESS);
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");

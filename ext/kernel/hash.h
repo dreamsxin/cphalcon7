@@ -44,12 +44,10 @@ static inline zval *phalcon_get_current_key_w(HashTable *ht, HashPosition *pos)
 
 /** int phalcon_has_numeric_keys(const zval *data); */
 int phalcon_hash_update_or_insert(HashTable *ht, const zval *offset, zval *value);
-
-zval** phalcon_hash_fast_get(HashTable *ht, int type, const zval *key) PHALCON_ATTR_NONNULL;
 int phalcon_hash_quick_update_or_insert(HashTable *ht, zval *value, const zval *key) PHALCON_ATTR_NONNULL;
 int phalcon_hash_fast_unset(HashTable *ht, const zval *key) PHALCON_ATTR_NONNULL;
 
-zval** phalcon_hash_get(HashTable *ht, const zval *key, int type);
+zval* phalcon_hash_get(HashTable *ht, const zval *key, int type);
 int phalcon_hash_unset(HashTable *ht, const zval *offset);
 
 #endif /* PHALCON_KERNEL_HASH_H */

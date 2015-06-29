@@ -133,7 +133,7 @@ static int phalcon_di_call_method_internal(zval *return_value, zval **return_val
 
 		service[0] = tolower(service[0]);
 
-		if (SUCCESS == zend_symtable_exists(obj->services, method, method_len + 1)) {
+		if (SUCCESS == zend_symtable_exists(obj->services, zend_string_init(method, method_len + 1, 0))) {
 			zval *svc;
 			zval *params[2];
 
@@ -267,18 +267,18 @@ static zval* phalcon_di_read_dimension(zval *object, zval *offset, int type, zva
 
 static int phalcon_di_has_dimension_internal(phalcon_di_object *obj, zval *offset, int check_empty)
 {
-	zval **tmp = phalcon_hash_get(obj->services, offset, BP_VAR_NA);
+	zval *tmp = phalcon_hash_get(obj->services, offset, BP_VAR_NA);
 
 	if (!tmp) {
 		return 0;
 	}
 
 	if (0 == check_empty) {
-		return Z_TYPE_P(*tmp) != IS_NULL;
+		return Z_TYPE_P(tmp) != IS_NULL;
 	}
 
 	if (1 == check_empty) {
-		return zend_is_true(*tmp);
+		return zend_is_true(tmp);
 	}
 
 	return 1;
@@ -338,7 +338,7 @@ static void phalcon_di_write_dimension(zval *object, zval *offset, zval *value)
 static inline void phalcon_di_unset_dimension_internal(phalcon_di_object *obj, zval *offset)
 {
 	assert(Z_TYPE_P(offset) == IS_STRING);
-	zend_symtable_del(obj->services, Z_STRVAL_P(offset), Z_STRLEN_P(offset)+1);
+	zend_symtable_del(obj->services, Z_STR_P(offset));
 }
 
 static void phalcon_di_unset_dimension(zval *object, zval *offset)
@@ -698,7 +698,7 @@ PHP_METHOD(Phalcon_DI, attempt){
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	if (!zend_symtable_exists(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1)) {
+	if (!zend_symtable_exists(obj->services, Z_STR_P(*name))) {
 		PHALCON_MM_GROW();
 
 		if (!shared) {
@@ -762,15 +762,15 @@ PHP_METHOD(Phalcon_DI, setService)
  */
 PHP_METHOD(Phalcon_DI, getRaw){
 
-	zval **name, **service;
+	zval **name, *service;
 	phalcon_di_object *obj;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	if (SUCCESS == zend_symtable_find(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1, (void**)&service)) {
-		PHALCON_RETURN_CALL_METHODW(*service, "getdefinition");
+	if ((service = zend_symtable_find(obj->services, Z_STR_P(*name))) != NULL) {
+		PHALCON_RETURN_CALL_METHODW(service, "getdefinition");
 		return;
 	}
 
@@ -785,15 +785,15 @@ PHP_METHOD(Phalcon_DI, getRaw){
  */
 PHP_METHOD(Phalcon_DI, getService){
 
-	zval **name, **service;
+	zval **name, *service;
 	phalcon_di_object *obj;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	if (SUCCESS == zend_symtable_find(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1, (void**)&service)) {
-		RETURN_ZVAL(*service, 1, 0);
+	if ((service = zend_symtable_find(obj->services, Z_STR_P(*name))) != NULL) {
+		RETURN_ZVAL(service, 1, 0);
 	}
 
 	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(*name));
@@ -808,7 +808,7 @@ PHP_METHOD(Phalcon_DI, getService){
  */
 PHP_METHOD(Phalcon_DI, get){
 
-	zval *name, *parameters = NULL, *events_manager, *event_name = NULL, *event_data = NULL, **service;
+	zval *name, *parameters = NULL, *events_manager, *event_name = NULL, *event_data = NULL, *service;
 	phalcon_di_object *obj;
 	zend_class_entry *ce;
 
@@ -836,13 +836,9 @@ PHP_METHOD(Phalcon_DI, get){
 	}
 
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	if (SUCCESS == zend_symtable_find(obj->services, Z_STRVAL_P(name), Z_STRLEN_P(name)+1, (void**)&service)) {
+	if ((service = zend_symtable_find(obj->services, Z_STR_P(name))) != NULL) {
 		/* The service is registered in the DI */
-		PHALCON_RETURN_CALL_METHOD(*service, "resolve", parameters, this_ptr);
-
-		if (return_value_ptr) {
-			return_value = *return_value_ptr;
-		}
+		PHALCON_RETURN_CALL_METHOD(service, "resolve", parameters, this_ptr);
 
 		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
 	}
@@ -925,7 +921,7 @@ PHP_METHOD(Phalcon_DI, has){
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
-	RETURN_BOOL(zend_symtable_exists(obj->services, Z_STRVAL_P(*name), Z_STRLEN_P(*name)+1));
+	RETURN_BOOL(zend_symtable_exists(obj->services, Z_STR_P(*name)));
 }
 
 /**

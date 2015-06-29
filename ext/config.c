@@ -131,14 +131,14 @@ static int phalcon_config_count_elements(zval *object, long int *count)
  */
 static zval* phalcon_config_read_internal(phalcon_config_object *object, zval *key, int type)
 {
-	zval **retval;
+	zval *retval;
 
 	if (UNEXPECTED(!key) || Z_TYPE_P(key) == IS_NULL) {
 		return EG(uninitialized_zval_ptr);
 	}
 
 	retval = phalcon_hash_get(object->props, key, type);
-	return retval ? *retval : NULL;
+	return retval ? retval : NULL;
 }
 
 /**
@@ -239,18 +239,18 @@ static void phalcon_config_write_dimension(zval *object, zval *offset, zval *val
  */
 static int phalcon_config_has_internal(phalcon_config_object *object, zval *key, int check_empty)
 {
-	zval **tmp = phalcon_hash_get(object->props, key, BP_VAR_NA);
+	zval *tmp = phalcon_hash_get(object->props, key, BP_VAR_NA);
 
 	if (!tmp) {
 		return 0;
 	}
 
 	if (0 == check_empty) {
-		return Z_TYPE_P(*tmp) != IS_NULL;
+		return Z_TYPE_P(tmp) != IS_NULL;
 	}
 
 	if (1 == check_empty) {
-		return zend_is_true(*tmp);
+		return zend_is_true(tmp);
 	}
 
 	return 1;

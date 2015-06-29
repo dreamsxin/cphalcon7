@@ -103,10 +103,10 @@ static const zend_function_entry phalcon_session_adapter_method_entry[] = {
 	PHP_FE_END
 };
 
-static zval** phalcon_session_adapter_get_property_ptr_ptr_internal(zval *object, zval *member, int type)
+static zval* phalcon_session_adapter_get_property_ptr_ptr_internal(zval *object, zval *member, int type)
 {
 	zval *unique_id, *_SESSION, key = zval_used_for_init, *pkey = &key;
-	zval **value;
+	zval *value;
 
 	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
 
@@ -127,7 +127,7 @@ static zval** phalcon_session_adapter_get_property_ptr_ptr_internal(zval *object
 
 static int phalcon_session_adapter_has_property_internal(zval *object, zval *member, int has_set_exists)
 {
-	zval *unique_id, *_SESSION, **tmp;
+	zval *unique_id, *_SESSION, *tmp;
 	zval key = zval_used_for_init, *pkey = &key;
 
 	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
@@ -146,11 +146,11 @@ static int phalcon_session_adapter_has_property_internal(zval *object, zval *mem
 	}
 
 	if (0 == has_set_exists) {
-		return Z_TYPE_P(*tmp) != IS_NULL;
+		return Z_TYPE_P(tmp) != IS_NULL;
 	}
 
 	if (1 == has_set_exists) {
-		return zend_is_true(*tmp);
+		return zend_is_true(tmp);
 	}
 
 	return 1;
@@ -187,7 +187,7 @@ static void phalcon_session_adapter_unset_property_internal(zval *object, zval *
 	}
 }
 
-static zval** phalcon_session_adapter_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
+static zval* phalcon_session_adapter_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
 {
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
 		return zend_get_std_object_handlers()->get_property_ptr_ptr(object, member, type, cache_slot);
@@ -227,7 +227,7 @@ static void phalcon_session_adapter_unset_property(zval *object, zval *member, v
 
 static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
-	zval **ret;
+	zval *ret;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
 		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
@@ -241,22 +241,22 @@ static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, 
 
 	/* For write context we need to return a reference */
 	if ((type == BP_VAR_W || type == BP_VAR_RW || type == BP_VAR_UNSET) && !Z_ISREF_P(*ret)) {
-		if (Z_REFCOUNT_P(*ret) > 1) {
+		if (Z_REFCOUNT_P(ret) > 1) {
 			zval *newval;
 
 			PHALCON_ALLOC_GHOST_ZVAL(newval);
-			*newval = **ret;
+			*newval = *ret;
 			zval_copy_ctor(newval);
 			Z_SET_REFCOUNT_P(newval, 1);
 
-			Z_DELREF_P(*ret);
-			*ret = newval;
+			Z_DELREF_P(ret);
+			ret = newval;
 		}
 
 		Z_SET_ISREF_P(*ret);
 	}
 
-	return *ret;
+	return ret;
 }
 
 static void phalcon_session_adapter_write_dimension(zval *object, zval *offset, zval *value)
@@ -275,7 +275,7 @@ static void phalcon_session_adapter_write_dimension(zval *object, zval *offset, 
 
 static int phalcon_session_adapter_has_dimension(zval *object, zval *member, int check_empty)
 {
-	zval **tmp;
+	zval *tmp;
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
 		return zend_get_std_object_handlers()->has_dimension(object, member, check_empty);
@@ -288,11 +288,11 @@ static int phalcon_session_adapter_has_dimension(zval *object, zval *member, int
 	}
 
 	if (0 == check_empty) {
-		return Z_TYPE_P(*tmp) != IS_NULL;
+		return Z_TYPE_P(tmp) != IS_NULL;
 	}
 
 	if (1 == check_empty) {
-		return zend_is_true(*tmp);
+		return zend_is_true(tmp);
 	}
 
 	return 1;
@@ -553,9 +553,9 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 
 	if (!remove || !zend_is_true(remove)) {
 		/* Fast path */
-		zval **value = phalcon_session_adapter_get_property_ptr_ptr_internal(getThis(), index, BP_VAR_NA);
+		zval *value = phalcon_session_adapter_get_property_ptr_ptr_internal(getThis(), index, BP_VAR_NA);
 		if (value) {
-			RETURN_ZVAL(*value, 1, 0);
+			RETURN_ZVAL(value, 1, 0);
 		}
 
 		RETURN_ZVAL(default_value, 1, 0);
@@ -715,7 +715,7 @@ PHP_METHOD(Phalcon_Session_Adapter, destroy){
 
 PHP_METHOD(Phalcon_Session_Adapter, __get)
 {
-	zval **property, **retval;
+	zval **property, *retval;
 
 	assert(return_value_ptr != NULL);
 
@@ -723,7 +723,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __get)
 	retval = phalcon_session_adapter_get_property_ptr_ptr_internal(getThis(), *property, BP_VAR_W);
 
 	zval_ptr_dtor(return_value_ptr);
-	*return_value_ptr = *retval;
+	*return_value_ptr = retval;
 	Z_ADDREF_P(*return_value_ptr);
 	Z_SET_ISREF_P(*return_value_ptr);
 }

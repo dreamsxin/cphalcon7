@@ -131,7 +131,7 @@ int ZEND_FASTCALL phalcon_array_isset(const zval *arr, const zval *index) {
 			return zend_hash_index_exists(h, Z_LVAL_P(index));
 
 		case IS_STRING:
-			return zend_symtable_exists(h, Z_STRVAL_P(index), Z_STRLEN_P(index)+1);
+			return zend_symtable_exists(h, Z_STR_P(index));
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");
@@ -189,7 +189,7 @@ int ZEND_FASTCALL phalcon_array_unset(zval **arr, const zval *index, int flags) 
 			return (zend_hash_index_del(ht, Z_LVAL_P(index)) == SUCCESS);
 
 		case IS_STRING:
-			return (zend_symtable_del(ht, Z_STRVAL_P(index), Z_STRLEN_P(index)+1) == SUCCESS);
+			return (zend_symtable_del(ht, Z_STR_P(index)) == SUCCESS);
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");
@@ -372,7 +372,7 @@ int phalcon_array_update_long(zval **arr, ulong index, zval *value, int flags){
 
 int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index, int flags){
 
-	zval **zv;
+	zval *zv;
 	HashTable *ht;
 	int result;
 	ulong uidx = 0;
@@ -382,31 +382,31 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		ht = Z_ARRVAL_P(arr);
 		switch (Z_TYPE_P(index)) {
 			case IS_NULL:
-				result = (zv = zend_hash_str_find(ht, SS(""))) != NULL;
+				result = (zv = zend_hash_str_find(ht, SS(""))) != NULL ? SUCCESS : FAILURE;
 				sidx   = "";
 				break;
 
 			case IS_DOUBLE:
 				uidx   = (ulong)Z_DVAL_P(index);
-				result = zend_hash_index_find(ht, uidx, (void**) &zv);
+				result = (zv = zend_hash_index_find(ht, uidx)) != NULL ? SUCCESS : FAILURE;
 				break;
 
 			case IS_TRUE:
-				result = zend_hash_index_find(ht, 1, (void**) &zv);
+				result = (zv = zend_hash_index_find(ht, 1)) != NULL ? SUCCESS : FAILURE;
 				break;
 
 			case IS_FALSE:
-				result = zend_hash_index_find(ht, 0, (void**) &zv);
+				result = (zv = zend_hash_index_find(ht, 0) != NULL ? SUCCESS : FAILURE;
 				break;
 
 			case IS_LONG:
 			case IS_RESOURCE:
-				result = zend_hash_index_find(ht, Z_LVAL_P(index), (void**) &zv);
+				result = (zv = zend_hash_index_find(ht, Z_LVAL_P(index))) != NULL ? SUCCESS : FAILURE;
 				break;
 
 			case IS_STRING:
 				sidx   = Z_STRLEN_P(index) ? Z_STRVAL_P(index) : "";
-				result = zend_symtable_find(ht, Z_STRVAL_P(index), Z_STRLEN_P(index)+1, (void**) &zv);
+				result = (zv = zend_symtable_find(ht, Z_STR_P(index))) != NULL ? SUCCESS : FAILURE;
 				break;
 
 			default:
@@ -419,7 +419,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		}
 
 		if (result != FAILURE) {
-			*return_value = *zv;
+			*return_value = zv;
 			Z_ADDREF_P(*return_value);
 			return SUCCESS;
 		}
@@ -968,13 +968,13 @@ int phalcon_array_key_exists(zval *arr, zval *key)
 	if (h) {
 		switch (Z_TYPE_P(key)) {
 			case IS_STRING:
-				return zend_symtable_exists(h, Z_STRVAL_P(key), Z_STRLEN_P(key) + 1);
+				return zend_symtable_exists(h, Z_STR_P(key));
 
 			case IS_LONG:
 				return zend_hash_index_exists(h, Z_LVAL_P(key));
 
 			case IS_NULL:
-				return zend_hash_exists(h, "", 1);
+				return zend_hash_exists(h, zend_string_init("", 1, 0));
 
 			default:
 				zend_error(E_WARNING, "The key should be either a string or an integer");

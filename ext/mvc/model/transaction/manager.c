@@ -319,20 +319,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 		phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
 		if (Z_TYPE_P(transactions) == IS_ARRAY) { 
 	
-			phalcon_is_iterable(transactions, &ah0, &hp0, 0, 1);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-				PHALCON_GET_HVALUE(transaction);
-	
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(transactions), transaction) {
 				if (Z_TYPE_P(transaction) == IS_OBJECT) {
 					false_value = PHALCON_GLOBAL(z_false);
 					PHALCON_CALL_METHOD(NULL, transaction, "setisnewtransaction", false_value);
 					RETURN_CTOR(transaction);
 				}
-	
-				zend_hash_move_backwards_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 	
 		}
 	}
@@ -381,22 +374,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, commit){
 
 	PHALCON_OBS_VAR(transactions);
 	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
-	if (Z_TYPE_P(transactions) == IS_ARRAY) { 
-	
-		phalcon_is_iterable(transactions, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(transaction);
-	
+	if (Z_TYPE_P(transactions) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(transactions), transaction) {
 			PHALCON_CALL_METHOD(&connection, transaction, "getconnection");
 			PHALCON_CALL_METHOD(&is_under_transaction, connection, "isundertransaction");
 			if (zend_is_true(is_under_transaction)) {
 				PHALCON_CALL_METHOD(NULL, connection, "commit");
 			}
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	}
 	
@@ -427,14 +412,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, rollback){
 	
 	PHALCON_OBS_VAR(transactions);
 	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
-	if (Z_TYPE_P(transactions) == IS_ARRAY) { 
-	
-		phalcon_is_iterable(transactions, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(transaction);
-	
+	if (Z_TYPE_P(transactions) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(transactions), transaction) {
 			PHALCON_CALL_METHOD(&connection, transaction, "getconnection");
 			PHALCON_CALL_METHOD(&is_under_transaction, connection, "isundertransaction");
 			if (zend_is_true(is_under_transaction)) {
@@ -445,9 +424,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, rollback){
 			if (zend_is_true(collect)) {
 				PHALCON_CALL_METHOD(NULL, this_ptr, "_collecttransaction", transaction);
 			}
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	}
 	
@@ -513,20 +490,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, _collectTransaction){
 	
 		PHALCON_INIT_VAR(new_transactions);
 		array_init(new_transactions);
-	
-		phalcon_is_iterable(transactions, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(managed_transaction);
-	
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(transactions), managed_transaction) {
 			if (PHALCON_IS_EQUAL(managed_transaction, transaction)) {
 				phalcon_array_append(&new_transactions, transaction, PH_SEPARATE);
 				phalcon_property_decr(this_ptr, SL("_number"));
 			}
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 		phalcon_update_property_this(this_ptr, SL("_transactions"), new_transactions);
 	}
@@ -550,17 +520,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, collectTransactions){
 	PHALCON_OBS_VAR(transactions);
 	phalcon_read_property_this(&transactions, this_ptr, SL("_transactions"), PH_NOISY);
 	if (phalcon_fast_count_ev(transactions)) {
-	
-		phalcon_is_iterable(transactions, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(managed_transaction);
-	
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(transactions), managed_transaction) {
 			phalcon_property_decr(this_ptr, SL("_number"));
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 		phalcon_update_property_null(this_ptr, SL("_transactions"));
 	}

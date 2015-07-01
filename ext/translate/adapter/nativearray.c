@@ -169,15 +169,15 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
 		for (
 			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(placeholders), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(placeholders), (void**)&value, &hp0) == SUCCESS;
+			(value = zend_hash_get_current_data_ex(Z_ARRVAL_P(placeholders), &hp0)) != NULL;
 			zend_hash_move_forward_ex(Z_ARRVAL_P(placeholders), &hp0)
 		) {
-			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(placeholders), &hp0);
+			zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(placeholders), &hp0);
 
-			PHALCON_CONCAT_SVS(key_placeholder, "%", &key, "%");
+			PHALCON_CONCAT_SVS(key_placeholder, "%", key, "%");
 
 			ALLOC_INIT_ZVAL(replaced);
-			phalcon_fast_str_replace(replaced, key_placeholder, *value, translation);
+			phalcon_fast_str_replace(replaced, key_placeholder, value, translation);
 			zval_dtor(key_placeholder);
 
 			zval_ptr_dtor(&translation);

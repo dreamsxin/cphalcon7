@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 
 	if (!SG(headers_sent)) {
 		zval *headers = phalcon_fetch_nproperty_this(this_ptr, SL("_headers"), PH_NOISY);
-		zval **value;
+		zval *value;
 		HashPosition hp0;
 
 		if (Z_TYPE_P(headers) != IS_ARRAY) {
@@ -165,16 +165,16 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 	
 		for (
 			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(headers), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(headers), (void**)&value, &hp0) == SUCCESS;
+			(value = zend_hash_get_current_data_ex(Z_ARRVAL_P(headers), &hp0)) != NULL;
 			zend_hash_move_forward_ex(Z_ARRVAL_P(headers), &hp0)
 		) {
-			zval header = phalcon_get_current_key_w(Z_ARRVAL_P(headers), &hp0);
+			zval *header = phalcon_get_current_key_w(Z_ARRVAL_P(headers), &hp0);
 
-			if (PHALCON_IS_NOT_EMPTY(*value)) {
+			if (PHALCON_IS_NOT_EMPTY(value)) {
 				zval *http_header;
 				
 				PHALCON_ALLOC_GHOST_ZVAL(http_header);
-				PHALCON_CONCAT_VSV(http_header, &header, ": ", *value);
+				PHALCON_CONCAT_VSV(http_header, &header, ": ", value);
 				ctr.line     = Z_STRVAL_P(http_header);
 				ctr.line_len = Z_STRLEN_P(http_header);
 				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
@@ -184,8 +184,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 				ctr.line     = Z_STRVAL(header);
 				ctr.line_len = Z_STRLEN(header);
 				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
-			}
-			else {
+			} else {
 				zval *tmp, *pheader = &header;
 
 				PHALCON_ALLOC_GHOST_ZVAL(tmp);
@@ -257,19 +256,16 @@ PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 	
 		PHALCON_OBS_VAR(data_headers);
 		phalcon_array_fetch_string(&data_headers, data, SL("_headers"), PH_NOISY);
-	
-		phalcon_is_iterable(data_headers, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
-	
-			PHALCON_CALL_METHOD(NULL, headers, "set", key, value);
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
-	
+
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data_headers), idx, str_key, value) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
+			PHALCON_CALL_METHOD(NULL, headers, "set", &key, value);	
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	RETURN_CTOR(headers);

@@ -146,12 +146,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		/** 
 		 * The field can be an array of values
 		 */
-		phalcon_is_iterable(field, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(compose_field);
-	
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(field), compose_field) {
 			/** 
 			 * The reversed column map is used in the case to get real column name
 			 */
@@ -193,9 +188,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 			phalcon_array_fetch(&bind_type, bind_data_types, column_field, PH_NOISY);
 			phalcon_array_append(&bind_types, bind_type, PH_SEPARATE);
 			phalcon_increment(number);
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	} else {
 		/** 
@@ -258,12 +251,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	
 		PHALCON_CALL_METHOD(&primary_fields, meta_data, "getprimarykeyattributes", record);
 	
-		phalcon_is_iterable(primary_fields, &ah1, &hp1, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(primary_field);
-	
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(primary_fields), primary_field) {
 			if (!phalcon_array_isset(bind_data_types, primary_field)) {
 				PHALCON_INIT_NVAR(exception_message);
 				PHALCON_CONCAT_SVS(exception_message, "Column '", primary_field, "\" isn't part of the table columns");
@@ -302,9 +290,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 			phalcon_array_fetch(&bind_type, bind_data_types, primary_field, PH_NOISY);
 			phalcon_array_append(&bind_types, bind_type, PH_SEPARATE);
 			phalcon_increment(number);
-	
-			zend_hash_move_forward_ex(ah1, &hp1);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	}
 	

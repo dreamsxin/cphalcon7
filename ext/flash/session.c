@@ -262,19 +262,16 @@ PHP_METHOD(Phalcon_Flash_Session, output){
 	}
 
 	PHALCON_CALL_METHOD(&messages, this_ptr, "getmessages", type, remove);
-	if (Z_TYPE_P(messages) == IS_ARRAY) { 
-
-		phalcon_is_iterable(messages, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(message_type, ah0, hp0);
-			PHALCON_GET_HVALUE(message);
-
-			PHALCON_CALL_METHOD(NULL, this_ptr, "outputmessage", message_type, message);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+	if (Z_TYPE_P(messages) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(messages), idx, str_key, message) {
+			zval message_type;
+			if (str_key) {
+				ZVAL_STR(&message_type, str_key);
+			} else {
+				ZVAL_LONG(&message_type, idx);
+			}
+			PHALCON_CALL_METHOD(NULL, this_ptr, "outputmessage", &message_type, message);
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_MM_RESTORE();

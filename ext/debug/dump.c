@@ -283,12 +283,13 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		phalcon_concat_self(&return_value, output);
 
-		phalcon_is_iterable(variable, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(variable), idx, str_key, value) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
 
 			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
 
@@ -306,7 +307,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			array_init(replace_pairs);
 
 			phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(&replace_pairs, SL(":key"), key, PH_COPY);
+			phalcon_array_update_string(&replace_pairs, SL(":key"), &key, PH_COPY);
 
 			PHALCON_INIT_NVAR(output);
 			phalcon_strtr_array(output, str, replace_pairs);
@@ -314,7 +315,6 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			phalcon_concat_self(&return_value, output);
 
 			if (PHALCON_IS_LONG(tab, 1) && !PHALCON_IS_EMPTY(name) && !phalcon_is_numeric(key) && PHALCON_IS_IDENTICAL(name, key)) {
-				zend_hash_move_forward_ex(ah0, &hp0);
 				continue;
 			} else {
 				PHALCON_INIT_NVAR(new_tab);
@@ -323,9 +323,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 				PHALCON_CALL_SELF(&tmp, "output", value, PHALCON_GLOBAL(z_null), new_tab);
 				PHALCON_SCONCAT_VS(return_value, tmp, "\n");
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_NVAR(new_tab);
 		ZVAL_LONG(new_tab, Z_LVAL_P(tab) - 1);
@@ -407,12 +405,13 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(properties);
 		phalcon_get_object_vars(properties, variable, !zend_is_true(detailed));
 
-		phalcon_is_iterable(properties, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(properties), idx, str_key, value) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
 
 			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
 
@@ -430,7 +429,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			array_init(replace_pairs);
 
 			phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(&replace_pairs, SL(":key"), key, PH_COPY);
+			phalcon_array_update_string(&replace_pairs, SL(":key"), &key, PH_COPY);
 
 			if (PHALCON_PROPERTY_IS_PUBLIC_ZVAL(variable, key)) {
 				phalcon_array_update_string_string(&replace_pairs, SL(":type"), SL("public"), 0);
@@ -450,9 +449,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			PHALCON_CALL_SELF(&tmp, "output", value, PHALCON_GLOBAL(z_null), new_tab);
 			PHALCON_SCONCAT_VS(return_value, tmp, ")\n");
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_NVAR(methods);
 
@@ -488,12 +485,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, output);
 
-		phalcon_is_iterable(methods, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(method);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(methods), method) {
 			PHALCON_INIT_NVAR(new_tab);
 			ZVAL_LONG(new_tab, Z_LVAL_P(tab) + 1);
 
@@ -523,9 +515,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
 
 			PHALCON_SCONCAT_VS(return_value, tmp, "\n");
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_NVAR(new_tab);
 		ZVAL_LONG(new_tab, Z_LVAL_P(tab) - 1);
@@ -740,18 +730,10 @@ PHP_METHOD(Phalcon_Debug_Dump, variables){
 
 	PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
-	phalcon_is_iterable(arg_list, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(name, ah0, hp0);
-		PHALCON_GET_HVALUE(variable);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(arg_list), variable) {
 		PHALCON_CALL_SELF(&output, "variable", variable);
 		PHALCON_SCONCAT(return_value, output);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_MM();
 }

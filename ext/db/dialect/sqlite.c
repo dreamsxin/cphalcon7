@@ -591,7 +591,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, listTables){
 
 	phalcon_fetch_params(0, 0, 1, &schema_name);
 	
-	RETURN_STRING("SELECT tbl_name FROM sqlite_master WHERE type = 'table' ORDER BY tbl_name", 1);
+	RETURN_STRING("SELECT tbl_name FROM sqlite_master WHERE type = 'table' ORDER BY tbl_name");
 }
 
 /**
@@ -606,7 +606,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, listViews){
 
 	phalcon_fetch_params(0, 0, 1, &schema_name);
 
-	RETURN_STRING("SELECT tbl_name FROM sqlite_master WHERE type = 'view' ORDER BY tbl_name", 1);
+	RETURN_STRING("SELECT tbl_name FROM sqlite_master WHERE type = 'view' ORDER BY tbl_name");
 }
 
 /**

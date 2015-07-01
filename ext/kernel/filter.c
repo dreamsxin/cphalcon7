@@ -104,7 +104,7 @@ void phalcon_filter_identifier(zval *return_value, zval *param){
 	}
 
 	if (use_copy) {
-		phalcon_dtor(param);
+		phalcon_ptr_dtor(param);
 	}
 
 	smart_str_0(&filtered_str);
@@ -141,10 +141,10 @@ void phalcon_is_basic_charset(zval *return_value, const zval *param){
 	}
 
 	if (!iso88591) {
-		RETURN_STRING("ASCII", 1);
+		RETURN_STRING("ASCII");
 	}
 
-	RETURN_STRING("ISO-8859-1", 1);
+	RETURN_STRING("ISO-8859-1");
 }
 
 static long phalcon_unpack(char *data, int size, int issigned, int *map)
@@ -313,7 +313,7 @@ void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_ch
 	}
 
 	if (use_copy) {
-		phalcon_dtor(param);
+		phalcon_ptr_dtor(param);
 	}
 
 	smart_str_0(&escaped_str);
@@ -331,7 +331,6 @@ void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_ch
  */
 void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style, const zval *charset) {
 
-	size_t length;
 	zend_string *escaped;
 
 	if (Z_TYPE_P(str) != IS_STRING) {

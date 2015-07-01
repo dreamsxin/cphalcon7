@@ -300,17 +300,13 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower) {
 	if (j > 0) {
 
 		if (found) {
-			Z_STRLEN_P(result) = class_length - j - 1;
-			Z_STRVAL_P(result) = (char *) emalloc(class_length - j);
-			memcpy(Z_STRVAL_P(result), class_name, class_length - j - 1);
-			Z_STRVAL_P(result)[Z_STRLEN_P(result)] = 0;
-			Z_TYPE_P(result) = IS_STRING;
+			ZVAL_STRINGL(result, class_name, class_length - j - 1);
 		} else {
 			ZVAL_EMPTY_STRING(result);
 		}
 
 		if (lower) {
-			zend_str_tolower(Z_STRVAL_P(result), Z_STRLEN_P(result));
+			zend_string_tolower(Z_STR_P(result));
 		}
 	} else {
 		ZVAL_NULL(result);
@@ -323,7 +319,8 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower) {
  */
 void phalcon_get_called_class(zval *return_value)
 {
-	zend_class_entry *called_scope = EX(called_scope);
+	zend_execute_data *ex = EG(current_execute_data);
+	zend_class_entry *called_scope = ex->called_scope;
 	if (called_scope) {
 		RETURN_NEW_STR(called_scope->name);
 	}
@@ -360,7 +357,7 @@ void phalcon_get_parent_class(zval *result, const zval *object, int lower) {
  */
 void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 
-	zval **value;
+	zval *value;
 	HashTable *properties;
 	HashPosition pos;
 	char *key;
@@ -388,14 +385,13 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 		array_init(result);
 
 		zend_hash_internal_pointer_reset_ex(properties, &pos);
-
-		while (zend_hash_get_current_data_ex(properties, (void **) &value, &pos) == SUCCESS) {
-			if (zend_hash_get_current_key_ex(properties, &key, &key_len, &num_index, 0, &pos) == HASH_KEY_IS_STRING) {
+		while ((value = zend_hash_get_current_data_ex(properties, &pos)) != NULL) {
+			if (zend_hash_get_current_key_ex(properties, &key, &key_len, &num_index, &pos) == HASH_KEY_IS_STRING) {
 				if (!check_access || zend_check_property_access(zobj, key, key_len-1) == SUCCESS) {
 					zend_unmangle_property_name(key, key_len-1, &class_name, &prop_name);
 					/* Not separating references */
-					Z_ADDREF_P(*value);
-					add_assoc_zval_ex(result, prop_name, strlen(prop_name)+1, *value);
+					Z_ADDREF_P(value);
+					add_assoc_zval_ex(result, prop_name, strlen(prop_name)+1, value);
 				}
 			}
 			zend_hash_move_forward_ex(properties, &pos);
@@ -428,9 +424,9 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 	}
 
 	array_init(return_value);
-	zend_hash_internal_pointer_reset_ex(&ce->function_table, &pos);
 
-	while (zend_hash_get_current_data_ex(&ce->function_table, (void **) &mptr, &pos) == SUCCESS) {
+	zend_hash_internal_pointer_reset_ex(&ce->function_table, &pos);
+	while ((mptr = zend_hash_get_current_data_ptr_ex(&ce->function_table, &pos)) != NULL) {
 		if (!check_access || (mptr->common.fn_flags & ZEND_ACC_PUBLIC) 
 		 || (EG(scope) &&
 		     (((mptr->common.fn_flags & ZEND_ACC_PROTECTED) &&
@@ -443,7 +439,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 			uint len = strlen(mptr->common.function_name);
 
 			/* Do not display old-style inherited constructors */
-			if (zend_hash_get_current_key_ex(&ce->function_table, &key, &key_len, &num_index, 0, &pos) != HASH_KEY_IS_STRING) {
+			if (zend_hash_get_current_key_ex(&ce->function_table, &key, &key_len, &num_index, &pos) != HASH_KEY_IS_STRING) {
 				ZVAL_NEW_STR(&method_name, mptr->common.function_name);
 				zend_hash_next_index_insert(return_value->value.ht, method_name);
 			} else if ((mptr->common.fn_flags & ZEND_ACC_CTOR) == 0 ||
@@ -1492,7 +1488,7 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 
 		if (param_count > 0) {
 			HashPosition pos;
-			zval **item;
+			zval *item;
 			int i = 0;
 
 			if (likely(param_count) <= 10) {
@@ -1505,10 +1501,10 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 
 			for (
 				zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(params), &pos);
-				zend_hash_get_current_data_ex(Z_ARRVAL_P(params), (void**)&item, &pos) == SUCCESS;
+				(item = zend_hash_get_current_data_ex(Z_ARRVAL_P(params), &pos)) != NULL;
 				zend_hash_move_forward_ex(Z_ARRVAL_P(params), &pos), ++i
 			) {
-				params_ptr[i] = *item;
+				params_ptr[i] = item;
 			}
 		}
 		else {

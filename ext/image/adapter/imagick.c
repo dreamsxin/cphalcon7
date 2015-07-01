@@ -2198,23 +2198,18 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, convert)
 
 	argv = emalloc(sizeof(char*) * argc);
 
+	HashTable *ht;
 	if (Z_TYPE_P(command) != IS_ARRAY) {
-		phalcon_is_iterable(command_parts, &ah0, &hp0, 0, 0);
+		ht = Z_ARRVAL_P(command_parts);
 	} else {
-		phalcon_is_iterable(command, &ah0, &hp0, 0, 0);
+		ht = Z_ARRVAL_P(command);
 	}
 
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(value);
+	ZEND_HASH_FOREACH_VAL(ht, value) {
 		convert_to_string(value);
-
 		argv[i] = estrdup(Z_STRVAL_P(value));
-
 		i++;
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	MagickCoreGenesis(*argv, MagickTrue);
 	exception = AcquireExceptionInfo();

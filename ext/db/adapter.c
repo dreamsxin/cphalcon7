@@ -533,13 +533,13 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	 * Objects are casted using __toString, null values are converted to string 'null',
 	 * everything else is passed as '?'
 	 */
-	phalcon_is_iterable(values, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(position, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(values), idx, str_key, value) {
+		zval position;
+		if (str_key) {
+			ZVAL_STR(&position, str_key);
+		} else {
+			ZVAL_LONG(&position, idx);
+		}
 		if (Z_TYPE_P(value) == IS_OBJECT) {
 			PHALCON_INIT_NVAR(str_value);
 			phalcon_strval(str_value, value);
@@ -557,14 +557,12 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 					}
 
 					PHALCON_OBS_NVAR(bind_type);
-					phalcon_array_fetch(&bind_type, data_types, position, PH_NOISY);
+					phalcon_array_fetch(&bind_type, data_types, &position, PH_NOISY);
 					phalcon_array_append(&bind_data_types, bind_type, PH_SEPARATE);
 				}
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, this_ptr, "escapeidentifier", table);
@@ -583,17 +581,10 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 			PHALCON_INIT_VAR(escaped_fields);
 			array_init(escaped_fields);
 
-			phalcon_is_iterable(fields, &ah1, &hp1, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(field);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(fields), field) {
 				PHALCON_CALL_METHOD(&escaped_field, this_ptr, "escapeidentifier", field);
 				phalcon_array_append(&escaped_fields, escaped_field, 0);
-
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		} else {
 			PHALCON_CPY_WRT(escaped_fields, fields);
@@ -664,18 +655,16 @@ PHP_METHOD(Phalcon_Db_Adapter, insertAsDict){
 	PHALCON_INIT_VAR(values);
 	array_init(values);
 
-	phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(field, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
-		phalcon_array_append(&fields, field, 0);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
+		zval field;
+		if (str_key) {
+			ZVAL_STR(&field, str_key);
+		} else {
+			ZVAL_LONG(&field, idx);
+		}
+		phalcon_array_append(&fields, &field, 0);
 		phalcon_array_append(&values, values, 0);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_RETURN_CALL_METHOD(this_ptr, "insert", table, values, fields, data_types);
 	RETURN_MM();
@@ -744,20 +733,20 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 	 * Objects are casted using __toString, null values are converted to string 'null',
 	 * everything else is passed as '?'
 	 */
-	phalcon_is_iterable(values, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(position, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
-		if (!phalcon_array_isset(fields, position)) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(values), idx, str_key, value) {
+		zval position;
+		if (str_key) {
+			ZVAL_STR(&position, str_key);
+		} else {
+			ZVAL_LONG(&position, idx);
+		}
+		if (!phalcon_array_isset(fields, &position)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The number of values in the update is not the same as fields");
 			return;
 		}
 
 		PHALCON_OBS_NVAR(field);
-		phalcon_array_fetch(&field, fields, position, PH_NOISY);
+		phalcon_array_fetch(&field, fields, &position, PH_NOISY);
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CALL_METHOD(&escaped_field, this_ptr, "escapeidentifier", field);
 		} else {
@@ -777,21 +766,19 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 				PHALCON_CONCAT_VS(set_clause_part, escaped_field, " = ?");
 				phalcon_array_append(&update_values, value, PH_SEPARATE);
 				if (Z_TYPE_P(data_types) == IS_ARRAY) { 
-					if (!phalcon_array_isset(data_types, position)) {
+					if (!phalcon_array_isset(data_types, &position)) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Incomplete number of bind types");
 						return;
 					}
 
 					PHALCON_OBS_NVAR(bind_type);
-					phalcon_array_fetch(&bind_type, data_types, position, PH_NOISY);
+					phalcon_array_fetch(&bind_type, data_types, &position, PH_NOISY);
 					phalcon_array_append(&bind_data_types, bind_type, PH_SEPARATE);
 				}
 			}
 			phalcon_array_append(&placeholders, set_clause_part, PH_SEPARATE);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, this_ptr, "escapeidentifier", table);
@@ -1471,7 +1458,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getColumnDefinition){
 PHP_METHOD(Phalcon_Db_Adapter, listTables){
 
 	zval *schema_name = NULL, *dialect, *sql = NULL, *fetch_num, *tables = NULL;
-	zval **table, *table_name;
+	zval *table, *table_name;
 	HashPosition hp0;
 
 	PHALCON_MM_GROW();
@@ -1502,16 +1489,11 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 
 	if (Z_TYPE_P(tables) == IS_ARRAY) {
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(tables)));
-
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(tables), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(tables), (void**)&table, &hp0) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(tables), &hp0)
-		) {
-			if (phalcon_array_isset_long_fetch(&table_name, *table, 0)) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(tables), table) {
+			if (phalcon_array_isset_long_fetch(&table_name, table, 0)) {
 				phalcon_array_append(&return_value, table_name, 0);
 			}
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_MM_RESTORE();
@@ -1530,7 +1512,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 PHP_METHOD(Phalcon_Db_Adapter, listViews){
 
 	zval *schema_name = NULL, *dialect, *sql = NULL, *fetch_num, *tables = NULL;
-	zval **table, *table_name;
+	zval *table, *table_name;
 	HashPosition hp0;
 
 	PHALCON_MM_GROW();
@@ -1561,16 +1543,12 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 
 	if (Z_TYPE_P(tables) == IS_ARRAY) {
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(tables)));
-
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(tables), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(tables), (void**)&table, &hp0) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(tables), &hp0)
-		) {
-			if (phalcon_array_isset_long_fetch(&table_name, *table, 0)) {
+		
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(tables), table) {
+			if (phalcon_array_isset_long_fetch(&table_name, table, 0)) {
 				phalcon_array_append(&return_value, table_name, 0);
 			}
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_MM_RESTORE();
@@ -1625,42 +1603,34 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 	PHALCON_INIT_VAR(indexes);
 	array_init(indexes);
 
-	phalcon_is_iterable(describe, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(index);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), index) {
 		PHALCON_OBS_NVAR(key_name);
 		phalcon_array_fetch_long(&key_name, index, 2, PH_NOISY);
 
 		PHALCON_OBS_NVAR(column_name);
 		phalcon_array_fetch_long(&column_name, index, 4, PH_NOISY);
 		phalcon_array_append_multi_2(&indexes, key_name, column_name, 0);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	array_init(return_value);
 
-	phalcon_is_iterable(indexes, &ah1, &hp1, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-		PHALCON_GET_HKEY(name, ah1, hp1);
-		PHALCON_GET_HVALUE(index_columns);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(indexes), idx, str_key, index_columns) {
+		zval name;
+		if (str_key) {
+			ZVAL_STR(&name, str_key);
+		} else {
+			ZVAL_LONG(&name, idx);
+		}
 
 		/** 
 		 * Every index is abstracted using a Phalcon\Db\Index instance
 		 */
 		PHALCON_INIT_NVAR(index);
 		object_init_ex(index, phalcon_db_index_ce);
-		PHALCON_CALL_METHOD(NULL, index, "__construct", name, index_columns);
+		PHALCON_CALL_METHOD(NULL, index, "__construct", &name, index_columns);
 
-		phalcon_array_update_zval(&return_value, name, index, PH_COPY);
-
-		zend_hash_move_forward_ex(ah1, &hp1);
-	}
+		phalcon_array_update_zval(&return_value, &name, index, PH_COPY);
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_MM_RESTORE();
 }
@@ -1720,12 +1690,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 	 */
 	PHALCON_CALL_METHOD(&describe, this_ptr, "fetchall", sql, fetch_num);
 
-	phalcon_is_iterable(describe, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(reference);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), reference) {
 		PHALCON_OBS_NVAR(constraint_name);
 		phalcon_array_fetch_long(&constraint_name, reference, 2, PH_NOISY);
 		if (!phalcon_array_isset(references, constraint_name)) {
@@ -1751,21 +1716,19 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 		PHALCON_OBS_NVAR(referenced_columns);
 		phalcon_array_fetch_long(&referenced_columns, reference, 5, PH_NOISY);
 		phalcon_array_update_zval_string_append_multi_3(&references, constraint_name, SL("referencedColumns"), referenced_columns, 0);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	array_init(return_value);
 
-	phalcon_is_iterable(references, &ah1, &hp1, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-		PHALCON_GET_HKEY(name, ah1, hp1);
-		PHALCON_GET_HVALUE(array_reference);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(references), idx, str_key, array_reference) {
+		zval name;
+		if (str_key) {
+			ZVAL_STR(&name, str_key);
+		} else {
+			ZVAL_LONG(&name, idx);
+		}
 
 		PHALCON_OBS_NVAR(referenced_schema);
-
 		phalcon_array_fetch_string(&referenced_schema, array_reference, SL("referencedSchema"), PH_NOISY);
 
 		PHALCON_OBS_NVAR(referenced_table);
@@ -1786,12 +1749,10 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
 		PHALCON_INIT_NVAR(reference);
 		object_init_ex(reference, phalcon_db_reference_ce);
-		PHALCON_CALL_METHOD(NULL, reference, "__construct", name, definition);
+		PHALCON_CALL_METHOD(NULL, reference, "__construct", &name, definition);
 
-		phalcon_array_update_zval(&return_value, name, reference, PH_COPY);
-
-		zend_hash_move_forward_ex(ah1, &hp1);
-	}
+		phalcon_array_update_zval(&return_value, &name, reference, PH_COPY);
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_MM_RESTORE();
 }

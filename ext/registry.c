@@ -469,13 +469,11 @@ static int phalcon_registry_iterator_valid(zend_object_iterator *it)
 /**
  * @brief Get current data from the iterator @a it into @ data (<tt>Iterator::current()</tt>)
  */
-static void phalcon_registry_iterator_get_current_data(zend_object_iterator *it, zval ***data)
+static zval *phalcon_registry_iterator_get_current_data(zend_object_iterator *it)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
 
-	if (FAILURE == zend_hash_get_current_data_ex(Z_ARRVAL_P(obj->properties), (void**)data, &obj->pos)) {
-		*data = NULL;
-	}
+	return zend_hash_get_current_data_ex(Z_ARRVAL_P(obj->properties), &obj->pos);
 }
 
 /**
@@ -673,11 +671,11 @@ static PHP_METHOD(Phalcon_Registry, offsetExists)
  */
 static PHP_METHOD(Phalcon_Registry, current)
 {
+	zval *data;
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_registry_object);
-	zval **data;
 
-	if (SUCCESS == zend_hash_get_current_data_ex(Z_ARRVAL_P(obj->properties), (void**)&data, &obj->pos)) {
-		RETURN_ZVAL(*data, 1, 0);
+	if ((data = zend_hash_get_current_data_ex(Z_ARRVAL_P(obj->properties), &obj->pos)) != NULL) {
+		RETURN_ZVAL(data, 1, 0);
 	}
 }
 

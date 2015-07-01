@@ -877,7 +877,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnectionService){
 		}
 	}
 
-	RETURN_MM_STRING("db", 1);
+	RETURN_MM_STRING("db");
 }
 
 /**
@@ -912,7 +912,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
 		}
 	}
 
-	RETURN_MM_STRING("db", 1);
+	RETURN_MM_STRING("db");
 }
 
 /**
@@ -950,19 +950,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 			/** 
 			 * Notify all the events on the behavior
 			 */
-			phalcon_is_iterable(models_behaviors, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(behavior);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(models_behaviors), behavior) {
 				PHALCON_CALL_METHOD(&status, behavior, "notify", event_name, model);
 				if (PHALCON_IS_FALSE(status)) {
 					RETURN_CTOR(status);
 				}
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 	}
@@ -1045,19 +1038,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 			PHALCON_OBS_VAR(models_behaviors);
 			phalcon_array_fetch(&models_behaviors, behaviors, entity_name, PH_NOISY);
 
-			phalcon_is_iterable(models_behaviors, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(behavior);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(models_behaviors), behavior) {
 				PHALCON_CALL_METHOD(&result, behavior, "missingmethod", model, event_name, data);
 				if (Z_TYPE_P(result) != IS_NULL) {
 					RETURN_CTOR(result);
 				}
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 	}
@@ -2201,26 +2187,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * Compound relation
 		 */
 		PHALCON_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
-
-		phalcon_is_iterable(fields, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(ref_position, ah0, hp0);
-			PHALCON_GET_HVALUE(field);
-
+		
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, ref_position, field) {
+			zval tmp;
+			if (ref_position) {
+				ZVAL_STR(&tmp, ref_position);
+			} else {
+				ZVAL_LONG(&tmp, idx);
+			}
 			PHALCON_CALL_METHOD(&value, record, "readattribute", field);
 
 			PHALCON_OBS_NVAR(referenced_field);
-			phalcon_array_fetch(&referenced_field, referenced_fields, ref_position, PH_NOISY);
+			phalcon_array_fetch(&referenced_field, referenced_fields, &tmp, PH_NOISY);
 
 			PHALCON_INIT_NVAR(condition);
-			PHALCON_CONCAT_SVSV(condition, "[", referenced_field, "] = ?", ref_position);
+			PHALCON_CONCAT_SVSV(condition, "[", referenced_field, "] = ?", &tmp);
 			phalcon_array_append(&conditions, condition, PH_SEPARATE);
 			phalcon_array_append(&placeholders, value, PH_SEPARATE);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 	}
 
@@ -2756,16 +2740,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 			PHALCON_OBS_VAR(relations);
 			phalcon_array_fetch(&relations, belongs_to, entity_name, PH_NOISY);
 
-			phalcon_is_iterable(relations, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(relation);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
 				phalcon_array_append(&all_relations, relation, PH_SEPARATE);
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 	}
@@ -2781,16 +2758,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 			PHALCON_OBS_NVAR(relations);
 			phalcon_array_fetch(&relations, has_many, entity_name, PH_NOISY);
 
-			phalcon_is_iterable(relations, &ah1, &hp1, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(relation);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
 				phalcon_array_append(&all_relations, relation, PH_SEPARATE);
-
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 	}
@@ -2806,16 +2776,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 			PHALCON_OBS_NVAR(relations);
 			phalcon_array_fetch(&relations, has_one, entity_name, PH_NOISY);
 
-			phalcon_is_iterable(relations, &ah2, &hp2, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(relation);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
 				phalcon_array_append(&all_relations, relation, PH_SEPARATE);
-
-				zend_hash_move_forward_ex(ah2, &hp2);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 	}

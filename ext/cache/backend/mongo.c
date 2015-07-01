@@ -473,17 +473,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 	
 	PHALCON_CALL_FUNCTION(&documents_array, "iterator_to_array", documents);
 
-	phalcon_is_iterable(documents_array, &ah0, &hp0, 0, 0);
-	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(documents_array), document) {
 		zval *key;
-		if (likely(phalcon_array_isset_string_fetch(&key, *hd, SS("key")))) {
+		if (likely(phalcon_array_isset_string_fetch(key, document, SS("key")))) {
 			Z_ADDREF_P(key);
 			add_next_index_zval(return_value, key);
 		}
-	
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 	
 	PHALCON_MM_RESTORE();
 }

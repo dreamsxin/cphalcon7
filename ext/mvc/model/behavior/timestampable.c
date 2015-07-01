@@ -135,18 +135,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 		 * Assign the value to the field, use writeattribute if the property is protected
 		 */
 		if (unlikely(Z_TYPE_P(field) == IS_ARRAY)) { 
-	
-			phalcon_is_iterable(field, &ah0, &hp0, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-				PHALCON_GET_HVALUE(single_field);
-	
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(field), single_field) {
 				PHALCON_CALL_METHOD(NULL, model, "writeattribute", single_field, timestamp);
-	
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
-	
+			} ZEND_HASH_FOREACH_END();
 		} else {
 			PHALCON_CALL_METHOD(NULL, model, "writeattribute", field, timestamp);
 		}

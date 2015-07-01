@@ -129,19 +129,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
 	
 		PHALCON_OBS_VAR(startup);
 		phalcon_array_fetch_string(&startup, descriptor, SL("startup"), PH_NOISY);
-		if (Z_TYPE_P(startup) == IS_ARRAY) { 
-	
-			phalcon_is_iterable(startup, &ah0, &hp0, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-				PHALCON_GET_HVALUE(value);
-	
+		if (Z_TYPE_P(startup) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(startup), value) {
 				PHALCON_CALL_METHOD(NULL, this_ptr, "execute", value);
-	
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
-	
+			} ZEND_HASH_FOREACH_END();
 		}
 	}
 	
@@ -197,13 +188,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 	 * 5:nullable, 6:constraint_type, 7:default, 8:position;
 	 */
 	PHALCON_INIT_VAR(old_column);
-	
-	phalcon_is_iterable(describe, &ah0, &hp0, 0, 0);
-	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-		PHALCON_GET_HVALUE(field);
-	
+
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), field) {
 		PHALCON_INIT_NVAR(definition);
 		array_init_size(definition, 1);
 		add_assoc_long_ex(definition, SS("bindType"), 2);
@@ -379,19 +365,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 		if (!PHALCON_IS_EMPTY(attribute)) {
 			phalcon_array_update_string(&definition, SL("default"), attribute, PH_COPY);
 		}
-	
+
 		/** 
 		 * Create a Phalcon\Db\Column to abstract the column
 		 */
 		PHALCON_INIT_NVAR(column);
 		object_init_ex(column, phalcon_db_column_ce);
 		PHALCON_CALL_METHOD(NULL, column, "__construct", column_name, definition);
-	
+
 		phalcon_array_append(&columns, column, PH_SEPARATE);
 		PHALCON_CPY_WRT(old_column, column_name);
-	
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 	
 	RETURN_CTOR(columns);
 }

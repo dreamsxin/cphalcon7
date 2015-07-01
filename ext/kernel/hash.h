@@ -25,6 +25,15 @@
 
 #define phalcon_get_current_data_w(ht, pos) zend_hash_get_current_data_ex(ht, pos);
 
+#define phalcon_is_iterable(var, array_hash, hash_pointer, duplicate, reverse) \
+	if (!phalcon_is_iterable_ex(var, array_hash, hash_pointer, duplicate, reverse)) { \
+		zend_error(E_ERROR, "The argument is not iterable()"); \
+		PHALCON_MM_RESTORE(); \
+		return; \
+	}
+
+int phalcon_is_iterable_ex(zval *arr, HashTable **arr_hash, HashPosition *hash_position, int duplicate, int reverse);
+
 static inline void phalcon_get_current_key(zval **key, HashTable *ht, HashPosition *pos)
 {
 	zval tmp;

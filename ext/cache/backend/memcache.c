@@ -457,14 +457,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, queryKeys){
 
 		for (
 			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(keys), &pos);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), (void**)&value, &pos) == SUCCESS;
+			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), &pos) != NULL;
 			zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos)
 		) {
-			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
+			zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
 	
-			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(&key, prefix, NULL)) {
+			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(key, prefix, NULL)) {
 				PHALCON_INIT_NVAR(real_key);
-				ZVAL_NEW_STR(real_key, Z_STR(key));
+				ZVAL_NEW_STR(real_key, Z_STR_P(key));
 				phalcon_array_append(&return_value, real_key, 0);
 			}
 		}
@@ -631,15 +631,15 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 	if (Z_TYPE_P(special_key) != IS_NULL) {
 		PHALCON_CALL_METHOD(&keys, memcache, "get", special_key);
 		if (Z_TYPE_P(keys) == IS_ARRAY) {
-			phalcon_is_iterable(keys, &ah0, &hp0, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-				PHALCON_GET_HKEY(key, ah0, hp0);
-
-				PHALCON_CALL_METHOD(NULL, memcache, "delete", key);
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(keys), idx, str_key) {
+				zval key;
+				if (str_key) {
+					ZVAL_STR(&key, str_key);
+				} else {
+					ZVAL_LONG(&key, idx);
+				}
+				PHALCON_CALL_METHOD(NULL, memcache, "delete", &key);
+			} ZEND_HASH_FOREACH_END();
 			
 			zend_hash_clean(Z_ARRVAL_P(keys));
 			PHALCON_CALL_METHOD(NULL, memcache, "set", special_key, keys);
@@ -654,48 +654,34 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 			RETURN_MM_FALSE;
 		}
 
-		phalcon_is_iterable(all_slabs, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-			PHALCON_GET_HVALUE(slabs);
-
-			phalcon_is_iterable(slabs, &ah1, &hp1, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-				PHALCON_GET_HKEY(slabid, ah1, hp1);
-
-				PHALCON_CALL_METHOD(&cachedump, memcache, "cachedump", slabid);
-				if (Z_TYPE_P(cachedump) != IS_ARRAY) {
-					continue;
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(all_slabs), slabs) {
+			ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(slabs), idx, str_key) {
+				zval slabid;
+				if (str_key) {
+					ZVAL_STR(&slabid, str_key);
+				} else {
+					ZVAL_LONG(&slabid, idx);
 				}
 
-				phalcon_is_iterable(cachedump, &ah2, &hp2, 0, 0);
+				PHALCON_CALL_METHOD(&cachedump, memcache, "cachedump", &slabid);
 
-				while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-					PHALCON_GET_HVALUE(keys);
-
-					if (Z_TYPE_P(keys) != IS_ARRAY) {
-						continue;
-					}
-
-					phalcon_is_iterable(keys, &ah3, &hp3, 0, 0);
-
-					while (zend_hash_get_current_data_ex(ah3, (void**) &hd, &hp3) == SUCCESS) {
-						PHALCON_GET_HKEY(key, ah3, hp3);
-
-						PHALCON_CALL_METHOD(NULL, memcache, "delete", key);
-
-						zend_hash_move_forward_ex(ah3, &hp3);
-					}
-
-					zend_hash_move_forward_ex(ah2, &hp2);
+				if (Z_TYPE_P(cachedump) == IS_ARRAY) {
+					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(cachedump), keys) {
+						if (Z_TYPE_P(keys) == IS_ARRAY) {
+							ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(keys), idx, str_key) {
+								zval key;
+								if (str_key) {
+									ZVAL_STR(&key, str_key);
+								} else {
+									ZVAL_LONG(&key, idx);
+								}
+								PHALCON_CALL_METHOD(NULL, memcache, "delete", &key);
+							} ZEND_HASH_FOREACH_END();
+						}
+					} ZEND_HASH_FOREACH_END();
 				}
-
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+			} ZEND_HASH_FOREACH_END();
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	RETURN_MM_TRUE;

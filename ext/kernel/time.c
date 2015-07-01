@@ -58,5 +58,5 @@ void phalcon_microtime(zval *return_value, zval *get_as_float)
 	}
 
 	snprintf(ret, 100, "%.8F %ld", tp.tv_usec / MICRO_IN_SEC, tp.tv_sec);
-	RETURN_STRING(ret, 1);
+	RETURN_STRING(ret);
 }

@@ -110,12 +110,12 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 	phalcon_symbol_table *active_symbol_table;
 
 	/** Frequently used zvals */
-	zval *z_null;
-	zval *z_true;
-	zval *z_false;
-	zval *z_zero;
-	zval *z_one;
-	zval *z_two;
+	zval z_null;
+	zval z_true;
+	zval z_false;
+	zval z_zero;
+	zval z_one;
+	zval z_two;
 
 	/** DEBUG */
 	phalcon_debug_options debug;

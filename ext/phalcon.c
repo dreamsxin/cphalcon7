@@ -505,45 +505,6 @@ static PHP_GSHUTDOWN_FUNCTION(phalcon)
 	phalcon_deinitialize_memory();
 }
 
-/*
-static ZEND_MODULE_POST_ZEND_DEACTIVATE_D(phalcon)
-{
-	TSRMLS_FETCH();
-
-#ifndef PHALCON_RELEASE
-	if (!CG(unclean_shutdown)) {
-		phalcon_verify_permanent_zvals(1);
-	}
-#endif
-
-	if (CG(unclean_shutdown)) {
-		zend_phalcon_globals *pg = PHALCON_VGLOBAL;
-
-		INIT_PZVAL(pg->z_null);
-		Z_ADDREF_P(pg->z_null);
-		ZVAL_NULL(pg->z_null);
-
-		INIT_PZVAL(pg->z_false);
-		Z_ADDREF_P(pg->z_false);
-		ZVAL_FALSE(pg->z_false);
-
-		INIT_PZVAL(pg->z_true);
-		Z_ADDREF_P(pg->z_true);
-		ZVAL_TRUE(pg->z_true);
-
-		INIT_PZVAL(pg->z_zero);
-		Z_ADDREF_P(pg->z_zero);
-		ZVAL_LONG(pg->z_zero, 0);
-
-		INIT_PZVAL(pg->z_one);
-		Z_ADDREF_P(pg->z_one);
-		ZVAL_LONG(pg->z_one, 1);
-	}
-
-	return SUCCESS;
-}
-*/
-
 static const zend_module_dep phalcon_deps[] = {
 	ZEND_MOD_REQUIRED("spl")
 	ZEND_MOD_REQUIRED("date")

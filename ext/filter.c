@@ -182,9 +182,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	zval *value, *filters, *norecursive = NULL, *new_value = NULL, *filter = NULL, *array_value = NULL;
 	zval *item_value = NULL, *item_key = NULL, *filter_value = NULL, *sanizited_value = NULL;
 	zval *key = NULL;
-	HashTable *ah0, *ah1, *ah2;
-	HashPosition hp0, hp1, hp2;
-	zval **hd;
+	ulong item_idx;
 
 	PHALCON_MM_GROW();
 
@@ -199,74 +197,53 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	 */
 	if (Z_TYPE_P(filters) == IS_ARRAY) { 
 		PHALCON_CPY_WRT(new_value, value);
-		if (Z_TYPE_P(value) != IS_NULL) {
-	
-			phalcon_is_iterable(filters, &ah0, &hp0, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-				PHALCON_GET_HVALUE(filter);
-	
+		if (Z_TYPE_P(value) != IS_NULL) {	
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(filters), filter) {	
 				/** 
 				 * If the value to filter is an array we apply the filters recursively
 				 */
 				if (Z_TYPE_P(new_value) == IS_ARRAY && !zend_is_true(norecursive)) { 
-	
 					PHALCON_INIT_NVAR(array_value);
 					array_init(array_value);
-	
-					phalcon_is_iterable(new_value, &ah1, &hp1, 0, 0);
-	
-					while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-	
-						PHALCON_GET_HKEY(item_key, ah1, hp1);
-						PHALCON_GET_HVALUE(item_value);
-	
+
+					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(new_value), item_idx, item_key, item_value) {
 						PHALCON_CALL_METHOD(&filter_value, this_ptr, "_sanitize", item_value, filter);
-						phalcon_array_update_zval(&array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
-	
-						zend_hash_move_forward_ex(ah1, &hp1);
-					}
+
+						if (key) {
+							phalcon_array_update_zval(&array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
+						} else {
+							phalcon_array_update_long(&array_value, item_idx, filter_value, PH_COPY | PH_SEPARATE);
+						}
+					} ZEND_HASH_FOREACH_END();
 	
 					PHALCON_CPY_WRT(new_value, array_value);
 				} else {
 					PHALCON_CALL_METHOD(&filter_value, this_ptr, "_sanitize", new_value, filter);
 					PHALCON_CPY_WRT(new_value, filter_value);
 				}
-	
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 	
 		}
-	
+
 		RETURN_CCTOR(new_value);
 	}
-	
+
 	/** 
 	 * Apply a single filter value
 	 */
 	if (Z_TYPE_P(value) == IS_ARRAY && !zend_is_true(norecursive)) { 
-
 		PHALCON_INIT_VAR(sanizited_value);
 		array_init(sanizited_value);
-	
-		phalcon_is_iterable(value, &ah2, &hp2, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-	
-			PHALCON_GET_HKEY(key, ah2, hp2);
-			PHALCON_GET_HVALUE(item_value);
-	
+
+		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(value), key, item_value) {
 			PHALCON_CALL_METHOD(&filter_value, this_ptr, "_sanitize", item_value, filters);
 			phalcon_array_update_zval(&sanizited_value, key, filter_value, PH_COPY);
-	
-			zend_hash_move_forward_ex(ah2, &hp2);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	} else {
 		PHALCON_CALL_METHOD(&sanizited_value, this_ptr, "_sanitize", value, filters);
 	}
-	
+
 	RETURN_CCTOR(sanizited_value);
 }
 
@@ -472,7 +449,6 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
  * @return object[]
  */
 PHP_METHOD(Phalcon_Filter, getFilters){
-
 
 	RETURN_MEMBER(this_ptr, "_filters");
 }

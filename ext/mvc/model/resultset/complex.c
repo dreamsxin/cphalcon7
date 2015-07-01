@@ -257,12 +257,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			PHALCON_INIT_VAR(dirty_state);
 			ZVAL_LONG(dirty_state, 0);
 
-			phalcon_is_iterable(columns_types, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HKEY(alias, ah0, hp0);
-				PHALCON_GET_HVALUE(column);
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns_types), idx, str_key, column) {
+				zval alias;
+				if (str_key) {
+					ZVAL_STR(&alias, str_key);
+				} else {
+					ZVAL_LONG(&alias, idx);
+				}
 
 				PHALCON_OBS_NVAR(type);
 				phalcon_array_fetch_string(&type, column, SL("type"), PH_NOISY);
@@ -286,12 +287,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					PHALCON_INIT_NVAR(row_model);
 					array_init(row_model);
 
-					phalcon_is_iterable(attributes, &ah1, &hp1, 0, 0);
-
-					while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-						PHALCON_GET_HVALUE(attribute);
-
+					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
 						/** 
 						 * Columns are supposed to be in the form _table_field
 						 */
@@ -301,9 +297,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 						PHALCON_OBS_NVAR(column_value);
 						phalcon_array_fetch(&column_value, row, column_alias, PH_NOISY);
 						phalcon_array_update_zval(&row_model, attribute, column_value, PH_COPY | PH_SEPARATE);
-
-						zend_hash_move_forward_ex(ah1, &hp1);
-					}
+					} ZEND_HASH_FOREACH_END();
 
 					/** 
 					 * Generate the column value according to the hydration type
@@ -364,7 +358,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					} else {
 						PHALCON_OBS_NVAR(value);
 						if (phalcon_array_isset(row, alias)) {
-							phalcon_array_fetch(&value, row, alias, PH_NOISY);
+							phalcon_array_fetch(&value, row, &alias, PH_NOISY);
 						}
 					}
 
@@ -372,10 +366,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					 * If a 'balias' is defined is not an unnamed scalar
 					 */
 					if (phalcon_array_isset_string(column, SS("balias"))) {
-						PHALCON_CPY_WRT(attribute, alias);
+						PHALCON_CPY_WRT(attribute, &alias);
 					} else {
 						PHALCON_INIT_NVAR(n_alias);
-						phalcon_fast_str_replace(n_alias, underscore, empty_str, alias);
+						phalcon_fast_str_replace(n_alias, underscore, empty_str, &alias);
 						PHALCON_CPY_WRT(attribute, n_alias);
 					}
 
@@ -401,9 +395,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 						break;
 
 				}
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 			/** 
 			 * Store the generated row in this_ptr->activeRow to be retrieved by 'current'

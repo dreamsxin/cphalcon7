@@ -210,19 +210,18 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters){
 	
 	PHALCON_INIT_VAR(build_arguments);
 	array_init(build_arguments);
-	
-	phalcon_is_iterable(arguments, &ah0, &hp0, 0, 0);
-	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-		PHALCON_GET_HKEY(position, ah0, hp0);
-		PHALCON_GET_HVALUE(argument);
-	
-		PHALCON_CALL_METHOD(&value, this_ptr, "_buildparameter", dependency_injector, position, argument);
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(arguments), idx, str_key, argument) {
+		zval position;
+		if (str_key) {
+			ZVAL_STR(&position, str_key);
+		} else {
+			ZVAL_LONG(&position, idx);
+		}
+
+		PHALCON_CALL_METHOD(&value, this_ptr, "_buildparameter", dependency_injector, &position, argument);
 		phalcon_array_append(&build_arguments, value, PH_SEPARATE);
-	
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 	
 	RETURN_CTOR(build_arguments);
 }
@@ -326,19 +325,20 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 		/** 
 		 * The method call has parameters
 		 */
-		phalcon_is_iterable(param_calls, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HKEY(method_position, ah0, hp0);
-			PHALCON_GET_HVALUE(method);
-	
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(param_calls), idx, str_key, method) {
+			zval method_position;
+			if (str_key) {
+				ZVAL_STR(&method_position, str_key);
+			} else {
+				ZVAL_LONG(&method_position, idx);
+			}
+
 			/** 
 			 * The call parameter must be an array of arrays
 			 */
 			if (Z_TYPE_P(method) != IS_ARRAY) { 
 				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "Method call must be an array on position ", method_position);
+				PHALCON_CONCAT_SV(exception_message, "Method call must be an array on position ", &method_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
 				return;
 			}
@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 */
 			if (!phalcon_array_isset_string(method, SS("method"))) {
 				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "The method name is required on position ", method_position);
+				PHALCON_CONCAT_SV(exception_message, "The method name is required on position ", &method_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
 				return;
 			}
@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 				phalcon_array_fetch_string(&arguments, method, SL("arguments"), PH_NOISY);
 				if (Z_TYPE_P(arguments) != IS_ARRAY) { 
 					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SV(exception_message, "Call arguments must be an array ", method_position);
+					PHALCON_CONCAT_SV(exception_message, "Call arguments must be an array ", &method_position);
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
 					return;
 				}
@@ -385,11 +385,6 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 					 */
 					PHALCON_INIT_NVAR(status);/**/
 					PHALCON_CALL_USER_FUNC_ARRAY(status, method_call, build_arguments);
-	
-					/** 
-					 * Go to next method call
-					 */
-					zend_hash_move_forward_ex(ah0, &hp0);
 					continue;
 				}
 			}
@@ -400,8 +395,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			PHALCON_INIT_NVAR(status);/**/
 			PHALCON_CALL_USER_FUNC(status, method_call);
 	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	}
 	
@@ -420,23 +414,24 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "Setter injection parameters must be an array");
 			return;
 		}
-	
+
 		/** 
 		 * The method call has parameters
 		 */
-		phalcon_is_iterable(param_calls, &ah1, &hp1, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-	
-			PHALCON_GET_HKEY(property_position, ah1, hp1);
-			PHALCON_GET_HVALUE(property);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(param_calls), idx, str_key, property) {
+			zval property_position;
+			if (str_key) {
+				ZVAL_STR(&property_position, str_key);
+			} else {
+				ZVAL_LONG(&property_position, idx);
+			}
 	
 			/** 
 			 * The call parameter must be an array of arrays
 			 */
 			if (Z_TYPE_P(property) != IS_ARRAY) { 
 				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "Property must be an array on position ", property_position);
+				PHALCON_CONCAT_SV(exception_message, "Property must be an array on position ", &property_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
 				return;
 			}
@@ -446,7 +441,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 */
 			if (!phalcon_array_isset_string(property, SS("name"))) {
 				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "The property name is required on position ", property_position);
+				PHALCON_CONCAT_SV(exception_message, "The property name is required on position ", &property_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
 				return;
 			}
@@ -456,7 +451,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 */
 			if (!phalcon_array_isset_string(property, SS("value"))) {
 				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "The property value is required on position ", property_position);
+				PHALCON_CONCAT_SV(exception_message, "The property value is required on position ", &property_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
 				return;
 			}
@@ -470,16 +465,13 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			/** 
 			 * Resolve the parameter
 			 */
-			PHALCON_CALL_METHOD(&value, this_ptr, "_buildparameter", dependency_injector, property_position, property_value);
+			PHALCON_CALL_METHOD(&value, this_ptr, "_buildparameter", dependency_injector, &property_position, property_value);
 	
 			/** 
 			 * Update the public property
 			 */
 			phalcon_update_property_zval_zval(instance, property_name, value);
-	
-			zend_hash_move_forward_ex(ah1, &hp1);
-		}
-	
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	RETURN_CTOR(instance);

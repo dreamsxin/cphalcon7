@@ -253,13 +253,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 	
 			PHALCON_OBS_VAR(controller_suffix);
 			phalcon_read_property_this(&controller_suffix, this_ptr, SL("_controllerSuffix"), PH_NOISY);
-	
-			phalcon_is_iterable(handlers, &ah0, &hp0, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-				PHALCON_GET_HVALUE(scope);
-	
+
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(handlers), scope) {
 				if (Z_TYPE_P(scope) == IS_ARRAY) { 
 	
 					/** 
@@ -269,7 +264,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 					phalcon_array_fetch_long(&prefix, scope, 0, PH_NOISY);
 					if (Z_TYPE_P(prefix) == IS_STRING) {
 						if (!phalcon_start_with(real_uri, prefix, NULL)) {
-							zend_hash_move_forward_ex(ah0, &hp0);
 							continue;
 						}
 					}
@@ -343,59 +337,37 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 						 * Process class annotations
 						 */
 						PHALCON_CALL_METHOD(&annotations, class_annotations, "getannotations");
-						if (Z_TYPE_P(annotations) == IS_ARRAY) { 
-	
-							phalcon_is_iterable(annotations, &ah1, &hp1, 0, 0);
-	
-							while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-	
-								PHALCON_GET_HVALUE(annotation);
-	
+						if (Z_TYPE_P(annotations) == IS_ARRAY) {
+							ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 								PHALCON_CALL_METHOD(NULL, this_ptr, "processcontrollerannotation", controller_name, annotation);
-	
-								zend_hash_move_forward_ex(ah1, &hp1);
-							}
+							} ZEND_HASH_FOREACH_END();
 	
 						}
 					}
-	
+
 					/** 
 					 * Process method annotations
 					 */
 					PHALCON_CALL_METHOD(&method_annotations, handler_annotations, "getmethodsannotations");
-					if (Z_TYPE_P(method_annotations) == IS_ARRAY) { 
-	
-						phalcon_is_iterable(method_annotations, &ah2, &hp2, 0, 0);
-	
-						while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-	
-							PHALCON_GET_HKEY(method, ah2, hp2);
-							PHALCON_GET_HVALUE(collection);
-	
+					if (Z_TYPE_P(method_annotations) == IS_ARRAY) {
+						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(method_annotations), idx, str_key, collection) {
+							zval method;
+							if (str_key) {
+								ZVAL_STR(&method, str_key);
+							} else {
+								ZVAL_LONG(&method, idx);
+							}
 							if (Z_TYPE_P(collection) == IS_OBJECT) {
 								PHALCON_CALL_METHOD(&annotations, collection, "getannotations");
-	
-								phalcon_is_iterable(annotations, &ah3, &hp3, 0, 0);
-	
-								while (zend_hash_get_current_data_ex(ah3, (void**) &hd, &hp3) == SUCCESS) {
-	
-									PHALCON_GET_HVALUE(annotation);
-	
+								ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 									PHALCON_CALL_METHOD(NULL, this_ptr, "processactionannotation", module_name, namespace_name, controller_name, method, annotation);
-	
-									zend_hash_move_forward_ex(ah3, &hp3);
-								}
+								} ZEND_HASH_FOREACH_END();
 	
 							}
-	
-							zend_hash_move_forward_ex(ah2, &hp2);
-						}
-	
+						} ZEND_HASH_FOREACH_END();
 					}
 				}
-	
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 	
 		}
 	
@@ -579,40 +551,32 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		ZVAL_STRING(parameter, "converts");
 	
 		PHALCON_CALL_METHOD(&converts, annotation, "getargument", parameter);
-		if (Z_TYPE_P(converts) == IS_ARRAY) { 
-	
-			phalcon_is_iterable(converts, &ah0, &hp0, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-				PHALCON_GET_HKEY(param, ah0, hp0);
-				PHALCON_GET_HVALUE(convert);
-	
-				PHALCON_CALL_METHOD(NULL, route, "convert", param, convert);
-	
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
-	
+		if (Z_TYPE_P(converts) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(converts), idx, str_key, convert) {
+				zval param;
+				if (str_key) {
+					ZVAL_STR(&param, str_key);
+				} else {
+					ZVAL_LONG(&param, idx);
+				}
+				PHALCON_CALL_METHOD(NULL, route, "convert", &param, convert);
+			} ZEND_HASH_FOREACH_END();
 		}
 	
 		PHALCON_INIT_NVAR(parameter);
 		ZVAL_STRING(parameter, "conversors");
 	
 		PHALCON_CALL_METHOD(&converts, annotation, "getargument", parameter);
-		if (Z_TYPE_P(converts) == IS_ARRAY) { 
-	
-			phalcon_is_iterable(converts, &ah1, &hp1, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-	
-				PHALCON_GET_HKEY(conversor_param, ah1, hp1);
-				PHALCON_GET_HVALUE(convert);
-	
-				PHALCON_CALL_METHOD(NULL, route, "convert", conversor_param, convert);
-	
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
-	
+		if (Z_TYPE_P(converts) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(all_attributes), idx, str_key, convert) {
+				zval conversor_param;
+				if (str_key) {
+					ZVAL_STR(&conversor_param, str_key);
+				} else {
+					ZVAL_LONG(&conversor_param, idx);
+				}
+				PHALCON_CALL_METHOD(NULL, route, "convert", &conversor_param, convert);
+			} ZEND_HASH_FOREACH_END();
 		}
 	
 		PHALCON_INIT_NVAR(parameter);

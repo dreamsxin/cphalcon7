@@ -618,16 +618,16 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
 	phalcon_fetch_params(0, 1, 1, 0, &data);
 
 	if (Z_TYPE_P(data) == IS_ARRAY) { 
-		phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
+			zval index;
+			if (str_key) {
+				ZVAL_STR(&index, str_key);
+			} else {
+				ZVAL_LONG(&index, idx);
+			}
 
-			PHALCON_GET_HKEY(index, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
-
-			PHALCON_CALL_SELF(NULL, "set", index, value);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+			PHALCON_CALL_SELF(NULL, "set", &index, value);
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_MM_RESTORE();

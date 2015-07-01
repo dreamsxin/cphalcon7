@@ -301,12 +301,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 		RETURN_MM_FALSE;
 	}	
 
-	phalcon_is_iterable(content_parts, &ah0, &hp0, 0, 0);	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-		PHALCON_GET_HKEY(key, ah0, hp0);
-		PHALCON_GET_HVALUE(header);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(content_parts), header) {
 		if (Z_TYPE_P(header) == IS_STRING) {
 			PHALCON_INIT_NVAR(header_parts);
 			if (phalcon_memnstr_str(header , SL(":"))) {
@@ -324,8 +319,6 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 						phalcon_update_property_this(this_ptr, SL("_status_message"), value);
 					}
 				}
-
-				zend_hash_move_forward_ex(ah0, &hp0);
 				continue;
 			}
 		} else {
@@ -344,9 +337,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
 				PHALCON_CALL_METHOD(NULL, this_ptr, "set", name, trimmed);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_MM_RESTORE();
 }
@@ -389,19 +380,19 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 
 	fields = phalcon_fetch_nproperty_this(this_ptr, SL("_fields"), PH_NOISY);
 
-	phalcon_is_iterable(fields, &ah0, &hp0, 0, 0);	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-		PHALCON_GET_HKEY(filed, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, value) {
+		zval filed;
+		if (str_key) {
+			ZVAL_STR(&filed, str_key);
+		} else {
+			ZVAL_LONG(&filed, idx);
+		}
 
 		PHALCON_INIT_NVAR(line);
-		PHALCON_CONCAT_VSV(line, filed, ": ", value);
+		PHALCON_CONCAT_VSV(line, &filed, ": ", value);
 
 		phalcon_merge_append(lines, line);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	if (f & PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS) {
 		PHALCON_INIT_VAR(join_filed);

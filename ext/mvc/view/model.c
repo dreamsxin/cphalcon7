@@ -387,20 +387,13 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 			RETURN_MM_EMPTY_ARRAY();
 		}
 
-		phalcon_is_iterable(childs, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(child);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(childs), child) {
 			PHALCON_CALL_METHOD(&child_capture_to, child, "getcaptureto");
 
 			if (phalcon_memnstr(capture_to, child_capture_to)) {
 				phalcon_array_append(&return_value, child, 0);
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 	} else {
 		RETURN_MM_MEMBER(this_ptr, "_childs");
@@ -436,20 +429,13 @@ PHP_METHOD(Phalcon_Mvc_View_Model, hasChild){
 	}
 
 	if (capture_to) {
-		phalcon_is_iterable(childs, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(child);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(childs), child) {
 			PHALCON_CALL_METHOD(&child_capture_to, child, "getcaptureto");
 
 			if (phalcon_memnstr(capture_to, child_capture_to)) {
 				RETURN_MM_TRUE;
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		RETURN_MM_FALSE;
 	}
@@ -602,12 +588,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	PHALCON_CALL_SELF(&childs, "getchild");
 
 	if (Z_TYPE_P(childs) == IS_ARRAY && phalcon_fast_count_ev(childs)) {
-		phalcon_is_iterable(childs, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(child);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(childs), child) {
 			PHALCON_CALL_METHOD(&isappend, child, "isappend");
 			PHALCON_CALL_METHOD(&capture, child, "getcaptureto");
 			PHALCON_CALL_METHOD(&content, child, "render");
@@ -626,9 +607,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 			} else {
 				phalcon_array_update_zval(&child_contents, capture, content, PH_COPY);
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	phalcon_ob_start();
@@ -697,21 +676,17 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	/** 
 	 * Views are rendered in each engine
 	 */
-	phalcon_is_iterable(engines, &ah1, &hp1, 0, 0);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(engines), idx, extension, engine) {
+		zval tmp;
+		if (extension) {
+			ZVAL_STR(&tmp, extension);
+		} else {
+			ZVAL_LONG(&tmp, idx);
+		}
 
-	while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-		PHALCON_GET_HKEY(extension, ah1, hp1);
-		PHALCON_GET_HVALUE(engine);
-
-		phalcon_is_iterable(paths, &ah2, &hp2, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(path);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(paths), path) {
 			PHALCON_INIT_NVAR(view_engine_path);
-			PHALCON_CONCAT_VVV(view_engine_path, path, views_dir_path, extension);
+			PHALCON_CONCAT_VVV(view_engine_path, path, views_dir_path, &tmp);
 
 			if (phalcon_file_exists(view_engine_path) == SUCCESS) {
 
@@ -731,7 +706,6 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 					PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, view_engine_path);
 					if (PHALCON_IS_FALSE(status)) {
-						zend_hash_move_forward_ex(ah0, &hp0);
 						continue;
 					}
 				}
@@ -755,12 +729,8 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				PHALCON_CONCAT_SV(debug_message, "--Not Found: ", view_engine_path);
 				phalcon_debug_print_r(debug_message);
 			}
-
-			zend_hash_move_forward_ex(ah2, &hp2);
-		}
-
-		zend_hash_move_forward_ex(ah1, &hp1);
-	}
+		} ZEND_HASH_FOREACH_END();
+	} ZEND_HASH_FOREACH_END();
 
 	/** 
 	 * Always throw an exception if the view does not exist

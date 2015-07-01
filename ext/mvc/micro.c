@@ -483,13 +483,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 		/* Get the main prefix for the collection */
 		PHALCON_CALL_METHOD(&prefix, collection, "getprefix");
 
-		phalcon_is_iterable(handlers, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-			zval *methods, *pattern, *sub_handler, *name;
-
-			PHALCON_GET_HVALUE(handler);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(handlers), handler) {
 			if (Z_TYPE_P(handler) != IS_ARRAY) { 
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "One of the registered handlers is invalid");
 				return;
@@ -530,9 +524,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 			if (Z_TYPE_P(name) != IS_NULL) {
 				PHALCON_CALL_METHOD(NULL, route, "setname", name);
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 	}
 
@@ -808,12 +800,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			/** 
 			 * Calls the before handlers
 			 */
-			phalcon_is_iterable(before_handlers, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(before);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(before_handlers), before) {
 				if (Z_TYPE_P(before) == IS_OBJECT) {
 					int is_middleware = instanceof_function_ex(Z_OBJCE_P(before), phalcon_mvc_micro_middlewareinterface_ce, 1);
 
@@ -835,8 +822,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 						if (zend_is_true(stopped)) {
 							break;
 						}
-
-						zend_hash_move_forward_ex(ah0, &hp0);
 						continue;
 					}
 				}
@@ -864,9 +849,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 				if (zend_is_true(stopped)) {
 					RETURN_CCTOR(status);
 				}
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 
@@ -897,12 +880,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			/** 
 			 * Calls the after handlers
 			 */
-			phalcon_is_iterable(after_handlers, &ah1, &hp1, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(after);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(after_handlers), after) {
 				if (Z_TYPE_P(after) == IS_OBJECT) {
 					int is_middleware = instanceof_function_ex(Z_OBJCE_P(after), phalcon_mvc_micro_middlewareinterface_ce, 1);
 					if (is_middleware) {
@@ -923,8 +901,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 						if (zend_is_true(stopped)) {
 							break;
 						}
-
-						zend_hash_move_forward_ex(ah1, &hp1);
 						continue;
 					}
 				}
@@ -938,9 +914,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 
 				PHALCON_INIT_NVAR(status);/**/
 				PHALCON_CALL_USER_FUNC(status, after);
-
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 	} else {
@@ -997,12 +971,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/** 
 		 * Calls the finish handlers
 		 */
-		phalcon_is_iterable(finish_handlers, &ah2, &hp2, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(finish);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(finish_handlers), finish) {
 			/** 
 			 * Try to execute middleware as plugins
 			 */
@@ -1026,8 +995,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 					if (zend_is_true(stopped)) {
 						break;
 					}
-
-					zend_hash_move_forward_ex(ah2, &hp2);
 					continue;
 				}
 			}
@@ -1062,9 +1029,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			if (zend_is_true(stopped)) {
 				break;
 			}
-
-			zend_hash_move_forward_ex(ah2, &hp2);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 	}
 

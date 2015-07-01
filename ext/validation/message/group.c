@@ -489,15 +489,9 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
 		/** 
 		 * An array of messages is simply merged into the current one
 		 */
-		phalcon_is_iterable(messages, &ah0, &hp0, 0, 0);
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(message);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), message) {
 			PHALCON_CALL_SELF(NULL, "appendmessage", message);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	} else {
 		zend_class_entry *ce     = Z_OBJCE_P(messages);
 		zend_object_iterator *it = ce->get_iterator(ce, messages, 0);
@@ -560,17 +554,11 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 	
 	PHALCON_OBS_VAR(messages);
 	phalcon_read_property_this(&messages, this_ptr, SL("_messages"), PH_NOISY);
-	if (Z_TYPE_P(messages) == IS_ARRAY) { 
-	
+	if (Z_TYPE_P(messages) == IS_ARRAY) {
 		/** 
 		 * A group of messages is iterated and appended one-by-one to the current list
 		 */
-		phalcon_is_iterable(messages, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(message);
-	
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), message) {
 			/** 
 			 * Get the field name
 			 */
@@ -580,9 +568,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 					phalcon_array_append(&filtered, message, PH_SEPARATE);
 				}
 			}
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	}
 	

@@ -241,28 +241,22 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 	
 	/* Check if the queue has something to log */
 	queue = phalcon_fetch_nproperty_this(this_ptr, SL("_queue"), PH_NOISY);
-	if (Z_TYPE_P(queue) == IS_ARRAY) { 
-		HashPosition hp;
-		zval **message;
+	if (Z_TYPE_P(queue) == IS_ARRAY) {
+		zval *message;
 
 		PHALCON_MM_GROW();
 
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(queue), &hp);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(queue), (void**)&message, &hp) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(queue), &hp)
-		) {
-			PHALCON_CALL_METHOD(&message_str, *message, "getmessage");
-			PHALCON_CALL_METHOD(&type, *message, "gettype");
-			PHALCON_CALL_METHOD(&time, *message, "gettime");
-			PHALCON_CALL_METHOD(&context, *message, "getcontext");
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), message) {
+			PHALCON_CALL_METHOD(&message_str, message, "getmessage");
+			PHALCON_CALL_METHOD(&type, message, "gettype");
+			PHALCON_CALL_METHOD(&time, message, "gettime");
+			PHALCON_CALL_METHOD(&context, message, "getcontext");
 			PHALCON_CALL_METHOD(NULL, this_ptr, "loginternal", message_str, type, time, context);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		if (Z_REFCOUNT_P(queue) == 1 || Z_ISREF_P(queue)) {
 			zend_hash_clean(Z_ARRVAL_P(queue));
-		}
-		else {
+		} else {
 			PHALCON_ALLOC_GHOST_ZVAL(queue);
 			array_init(queue);
 			phalcon_update_property_this(getThis(), SL("_queue"), queue);

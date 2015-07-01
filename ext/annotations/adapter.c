@@ -258,22 +258,19 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getMethod){
 	if (Z_TYPE_P(class_annotations) == IS_OBJECT) {
 	
 		PHALCON_CALL_METHOD(&methods, class_annotations, "getmethodsannotations");
-		if (Z_TYPE_P(methods) == IS_ARRAY) { 
-	
-			phalcon_is_iterable(methods, &ah0, &hp0, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-				PHALCON_GET_HKEY(name, ah0, hp0);
-				PHALCON_GET_HVALUE(method);
-	
-				if (PHALCON_IS_EQUAL(name, method_name)) {
-					RETURN_CTOR(method);
+		if (Z_TYPE_P(methods) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(methods), idx, str_key, method) {
+				zval name;
+				if (str_key) {
+					ZVAL_STR(&name, str_key);
+				} else {
+					ZVAL_LONG(&name, idx);
 				}
 	
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
-	
+				if (PHALCON_IS_EQUAL(&name, method_name)) {
+					RETURN_CTOR(method);
+				}
+			} ZEND_HASH_FOREACH_END();
 		}
 	}
 	
@@ -346,21 +343,18 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getProperty){
 	if (Z_TYPE_P(class_annotations) == IS_OBJECT) {
 	
 		PHALCON_CALL_METHOD(&properties, class_annotations, "getpropertiesannotations");
-		if (Z_TYPE_P(properties) == IS_ARRAY) { 
-	
-			phalcon_is_iterable(properties, &ah0, &hp0, 0, 0);
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-				PHALCON_GET_HKEY(name, ah0, hp0);
-				PHALCON_GET_HVALUE(property);
-	
-				if (PHALCON_IS_EQUAL(name, property_name)) {
+		if (Z_TYPE_P(properties) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(properties), idx, str_key, property) {
+				zval name;
+				if (str_key) {
+					ZVAL_STR(&name, str_key);
+				} else {
+					ZVAL_LONG(&name, idx);
+				}
+				if (PHALCON_IS_EQUAL(&name, property_name)) {
 					RETURN_CTOR(property);
 				}
-	
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 	
 		}
 	}

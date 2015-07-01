@@ -369,17 +369,11 @@ static zval *phql_ret_zval_list(zval *list_left, zval *right_list)
 
 	list = Z_ARRVAL_P(list_left);
 	if (zend_hash_index_exists(list, 0)) {
-		HashPosition pos;
-		zval **item;
-
-		for (
-			zend_hash_internal_pointer_reset_ex(list, &pos);
-			zend_hash_get_current_data_ex(list, (void**)&item, &pos) != FAILURE;
-			zend_hash_move_forward_ex(list, &pos)
-		) {
-			Z_ADDREF_P(*item);
-			add_next_index_zval(ret, *item);
-		}
+		zval *item;
+		ZEND_HASH_FOREACH_VAL(list, item) {
+			Z_ADDREF_P(item);
+			add_next_index_zval(ret, item);
+		} ZEND_HASH_FOREACH_END();
 
 		zval_ptr_dtor(&list_left);
 	} else {

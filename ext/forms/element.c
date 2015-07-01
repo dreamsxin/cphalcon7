@@ -654,22 +654,21 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 	zval_dtor(escaped);
 	ZVAL_NULL(escaped);
 
-	if (attributes && Z_TYPE_P(attributes) == IS_ARRAY) {	
-		phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-		
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
-		
-			if (Z_TYPE_P(key) != IS_LONG) {
+	if (attributes && Z_TYPE_P(attributes) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
+			if (Z_TYPE(key) != IS_LONG) {
 				phalcon_htmlspecialchars(escaped, value, NULL, NULL);
-				PHALCON_SCONCAT_SVSVS(html, " ", key, "=\"", escaped, "\"");
+				PHALCON_SCONCAT_SVSVS(html, " ", &key, "=\"", escaped, "\"");
 				zval_dtor(escaped);
 				ZVAL_NULL(escaped);
 			}
-		
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 		
 	/** 

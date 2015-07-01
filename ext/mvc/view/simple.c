@@ -321,13 +321,13 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 			phalcon_array_append(&arguments, this_ptr, PH_SEPARATE);
 			phalcon_array_append(&arguments, dependency_injector, PH_SEPARATE);
 
-			phalcon_is_iterable(registered_engines, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HKEY(extension, ah0, hp0);
-				PHALCON_GET_HVALUE(engine_service);
-
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(registered_engines), idx, extension, engine_service) {
+				zval tmp;
+				if (extension) {
+					ZVAL_STR(&tmp, extension);
+				} else {
+					ZVAL_LONG(&tmp, idx);
+				}
 				if (Z_TYPE_P(engine_service) == IS_OBJECT) {
 
 					/** 
@@ -348,15 +348,13 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 						PHALCON_VERIFY_INTERFACE(engine_object, phalcon_mvc_view_engineinterface_ce);
 					} else {
 						PHALCON_INIT_NVAR(exception_message);
-						PHALCON_CONCAT_SV(exception_message, "Invalid template engine registration for extension: ", extension);
+						PHALCON_CONCAT_SV(exception_message, "Invalid template engine registration for extension: ", &tmp);
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
 						return;
 					}
 				}
 				phalcon_array_update_zval(&engines, extension, engine_object, PH_COPY | PH_SEPARATE);
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 
@@ -432,15 +430,15 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	/** 
 	 * Views are rendered in each engine
 	 */
-	phalcon_is_iterable(engines, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(extension, ah0, hp0);
-		PHALCON_GET_HVALUE(engine);
-
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(engines), idx, extension, engine) {
+		zval tmp;
+		if (extension) {
+			ZVAL_STR(&tmp, extension);
+		} else {
+			ZVAL_LONG(&tmp, idx);
+		}
 		PHALCON_INIT_NVAR(view_engine_path);
-		PHALCON_CONCAT_VV(view_engine_path, views_dir_path, extension);
+		PHALCON_CONCAT_VV(view_engine_path, views_dir_path, &tmp);
 
 		if (phalcon_file_exists(view_engine_path) == SUCCESS) {
 
@@ -460,7 +458,6 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
 				PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, view_engine_path);
 				if (PHALCON_IS_FALSE(status)) {
-					zend_hash_move_forward_ex(ah0, &hp0);
 					continue;
 				}
 			}
@@ -484,9 +481,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 			PHALCON_CONCAT_SV(debug_message, "--Not Found: ", view_engine_path);
 			phalcon_debug_print_r(debug_message);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/** 
 	 * Always throw an exception if the view does not exist

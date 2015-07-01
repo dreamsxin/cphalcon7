@@ -134,10 +134,10 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getTypeString) {
 
 	itype = Z_LVAL_P(*type);
 	if (itype > 0 && itype < 10) {
-		RETURN_STRING(lut[itype], 1);
+		RETURN_STRING(lut[itype]);
 	}
 
-	RETURN_STRING("CUSTOM", 1);
+	RETURN_STRING("CUSTOM");
 }
 
 /**
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 		if (Z_TYPE_P(backtrace) == IS_ARRAY) {
 			HashPosition pos;
 			HashTable *ht = Z_ARRVAL_P(backtrace);
-			zval **ppzval;
+			zval *pzval;
 			int found = 0;
 			ulong idx;
 			char *key;
@@ -216,52 +216,27 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 			 * that we are working with the array / hash table and thus we can
 			 * save some time by omitting Z_TYPE_P(x) == IS_ARRAY checks
 			 */
-
-			for (
-				zend_hash_internal_pointer_reset_ex(ht, &pos);
-				zend_hash_has_more_elements_ex(ht, &pos) == SUCCESS;
-			) {
-				zend_hash_get_current_data_ex(ht, (void**)&ppzval, &pos);
-				zend_hash_get_current_key_ex(ht, &key, &key_len, &idx, 0, &pos);
-				zend_hash_move_forward_ex(ht, &pos);
-
-				if (Z_TYPE_P(*ppzval) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_NUM_KEY_VAL(ht, idx, pzval) {
+				if (Z_TYPE_P(pzval) == IS_ARRAY) {
 					/*
 					 * Here we need to skip the latest calls into Phalcon's core.
 					 * Calls to Zend internal functions will have "file" index not set.
 					 * We remove these entries from the array.
 					 */
-					if (!found && !zend_hash_str_exists(Z_ARRVAL_P(*ppzval), SS("file"))) {
+					if (!found && !zend_hash_str_exists(Z_ARRVAL_P(pzval), SS("file"))) {
 						zend_hash_index_del(ht, idx);
-					}
-					else {
+					} else {
 						/*
 						 * Remove args and object indices. They usually give
 						 * too much information; this is not suitable to send
 						 * in the HTTP headers
 						 */
-						zend_hash_str_del(Z_ARRVAL_P(*ppzval), SS("args"));
-						zend_hash_str_del(Z_ARRVAL_P(*ppzval), SS("object"));
+						zend_hash_str_del(Z_ARRVAL_P(pzval), SS("args"));
+						zend_hash_str_del(Z_ARRVAL_P(pzval), SS("object"));
 						found = 1;
 					}
 				}
-			}
-
-			/*
-			 * Now we need to renumber the hash table because we removed several
-			 * heading elements. If we don't do this, json_encode() will convert
-			 * this array to a JavaScript object which is an unwanted side effect
-			 */
-			p = ht->pListHead;
-			i = 0;
-			while (p != NULL) {
-				p->nKeyLength = 0;
-				p->h = i++;
-				p = p->pListNext;
-			}
-
-			ht->nNextFreeElement = i;
-			zend_hash_rehash(ht);
+			} ZEND_HASH_FOREACH_END();
 		}
 	}
 

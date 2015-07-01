@@ -190,8 +190,8 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
 
 	zval *key_name, *lifetime = NULL, *backends;
 	zval *content = NULL;
+	zval *backend;
 	HashPosition hp0;
-	zval **backend;
 
 	PHALCON_MM_GROW();
 
@@ -203,16 +203,12 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
 	
 	backends = phalcon_fetch_nproperty_this(this_ptr, SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(backends), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(backends), (void**)&backend, &hp0) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(backends), &hp0)
-		) {
-			PHALCON_CALL_METHOD(&content, *backend, "get", key_name, lifetime);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
+			PHALCON_CALL_METHOD(&content, backend, "get", key_name, lifetime);
 			if (Z_TYPE_P(content) != IS_NULL) {
 				RETURN_CCTOR(content);
 			}
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	RETURN_MM_NULL();
@@ -228,26 +224,21 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
 PHP_METHOD(Phalcon_Cache_Multiple, start){
 
 	zval *key_name, *lifetime = NULL, *backends;
-	HashPosition hp0;
-	zval **backend;
+	zval *backend;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
-	
+
 	if (!lifetime) {
 		lifetime = PHALCON_GLOBAL(z_null);
 	}
-	
+
 	backends = phalcon_fetch_nproperty_this(this_ptr, SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(backends), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(backends), (void**)&backend, &hp0) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(backends), &hp0)
-		) {
-			PHALCON_CALL_METHOD(NULL, *backend, "start", key_name, lifetime);
-		}
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
+			PHALCON_CALL_METHOD(NULL, backend, "start", key_name, lifetime);
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -265,8 +256,8 @@ PHP_METHOD(Phalcon_Cache_Multiple, save){
 
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL;
 	zval *backends;
+	zval *backend;
 	HashPosition hp0;
-	zval **backend;
 
 	PHALCON_MM_GROW();
 
@@ -290,13 +281,9 @@ PHP_METHOD(Phalcon_Cache_Multiple, save){
 	
 	backends = phalcon_fetch_nproperty_this(this_ptr, SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(backends), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(backends), (void**)&backend, &hp0) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(backends), &hp0)
-		) {
-			PHALCON_CALL_METHOD(NULL, *backend, "save", key_name, content, lifetime, stop_buffer);
-		}
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
+			PHALCON_CALL_METHOD(NULL, backend, "save", key_name, content, lifetime, stop_buffer);
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -311,21 +298,17 @@ PHP_METHOD(Phalcon_Cache_Multiple, save){
 PHP_METHOD(Phalcon_Cache_Multiple, delete){
 
 	zval *key_name, *backends;
+	zval *backend;
 	HashPosition hp0;
-	zval **backend;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &key_name);
 	backends = phalcon_fetch_nproperty_this(this_ptr, SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(backends), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(backends), (void**)&backend, &hp0) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(backends), &hp0)
-		) {
-			PHALCON_CALL_METHOD(NULL, *backend, "delete", key_name);
-		}
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
+			PHALCON_CALL_METHOD(NULL, backend, "delete", key_name);
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -342,8 +325,8 @@ PHP_METHOD(Phalcon_Cache_Multiple, exists){
 
 	zval *key_name = NULL, *lifetime = NULL, *backends;
 	zval *exists = NULL;
+	zval *backend;
 	HashPosition hp0;
-	zval **backend;
 
 	PHALCON_MM_GROW();
 
@@ -359,16 +342,12 @@ PHP_METHOD(Phalcon_Cache_Multiple, exists){
 	
 	backends = phalcon_fetch_nproperty_this(this_ptr, SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(backends), &hp0);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(backends), (void**)&backend, &hp0) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(backends), &hp0)
-		) {
-			PHALCON_CALL_METHOD(&exists, *backend, "exists", key_name, lifetime);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
+			PHALCON_CALL_METHOD(&exists, backend, "exists", key_name, lifetime);
 			if (zend_is_true(exists)) {
 				RETURN_MM_TRUE;
 			}
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	RETURN_MM_FALSE;

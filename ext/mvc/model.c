@@ -494,7 +494,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model){
  */
 static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model, zval *target)
 {
-	zval *messages = NULL, **message;
+	zval *messages = NULL, *message;
 	HashPosition hp;
 
 	if (
@@ -508,27 +508,21 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
 		return FAILURE;
 	}
 
-	for (
-		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(messages), &hp);
-		zend_hash_get_current_data_ex(Z_ARRVAL_P(messages), (void**)&message, &hp) == SUCCESS;
-		zend_hash_move_forward_ex(Z_ARRVAL_P(messages), &hp)
-	) {
-		if (Z_TYPE_P(*message) == IS_OBJECT) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), message) {
+		if (Z_TYPE_P(message) == IS_OBJECT) {
 			zval *params[] = { target };
-			if (FAILURE == phalcon_call_method(NULL, *message, "setmodel", 1, params)) {
+			if (FAILURE == phalcon_call_method(NULL, message, "setmodel", 1, params)) {
 				break;
 			}
 		}
 
-		{
-			zval *params[] = { *message };
-			if (FAILURE == phalcon_call_method(NULL, this_ptr, "appendmessage", 1, params)) {
-				break;
-			}
+		zval *params[] = { message };
+		if (FAILURE == phalcon_call_method(NULL, this_ptr, "appendmessage", 1, params)) {
+			break;
 		}
-	}
+	} ZEND_HASH_FOREACH_END();
 
-	zval_ptr_dtor(&messages);
+	zval_ptr_dtor(messages);
 	return likely(!EG(exception)) ? SUCCESS : FAILURE;
 }
 
@@ -1191,9 +1185,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 
 	zval *data, *column_map = NULL, *value = NULL, *key = NULL, *attribute = NULL;
 	zval *exception_message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *key;
 
 	PHALCON_MM_GROW();
 
@@ -1208,18 +1200,11 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 		return;
 	}
 
-	phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(key, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), key, value) {
 		/**
 		 * Only string keys in the data are valid
 		 */
 		if (Z_TYPE_P(column_map) == IS_ARRAY) { 
-
 			/**
 			 * Every field must be part of the column map
 			 */
@@ -1236,9 +1221,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 		} else {
 			phalcon_update_property_zval_zval(this_ptr, key, value);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 
 	PHALCON_MM_RESTORE();
@@ -1303,15 +1286,8 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 	 */
 	PHALCON_CALL_METHOD(NULL, object, "setdirtystate", dirty_state);
 
-	phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(key, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
-		if (Z_TYPE_P(key) == IS_STRING) {
-
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), key, value) {
+		if (key) {
 			if (PHALCON_GLOBAL(orm).enable_auto_convert && data_types) {
 				if (phalcon_array_isset(data_types, key)) {
 					PHALCON_OBS_NVAR(field_type);
@@ -1333,8 +1309,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 			/**
 			 * Only string keys in the data are valid
 			 */
-			if (Z_TYPE_P(column_map) == IS_ARRAY) { 
-
+			if (Z_TYPE_P(column_map) == IS_ARRAY) {
 				/**
 				 * Every field must be part of the column map
 				 */
@@ -1352,9 +1327,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 				phalcon_update_property_zval_zval(object, key, convert_value);
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	if (zend_is_true(keep_snapshots)) {
 		PHALCON_CALL_METHOD(NULL, object, "setsnapshotdata", data, column_map);
@@ -1424,14 +1397,8 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 		object_init(hydrate);
 	}
 
-	phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(key, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
-		if (Z_TYPE_P(key) == IS_STRING) {
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), key, value) {
+		if (key) {
 
 			if (PHALCON_GLOBAL(orm).enable_auto_convert && data_types) {
 				if (phalcon_array_isset(data_types, key)) {
@@ -1478,9 +1445,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 				}
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(hydrate);
 }
@@ -1533,22 +1498,14 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
 	 * Mark the object as persistent
 	 */
 	PHALCON_CALL_METHOD(NULL, object, "setdirtystate", dirty_state);
-
-	phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(key, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
-		if (Z_TYPE_P(key) != IS_STRING) {
+	
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), key, value) {
+		if (!key) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid key in array data provided to dumpResult()");
 			return;
 		}
-		phalcon_update_property_zval_zval(object, key, value);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+		phalcon_update_property_str_zval(object, key, value);
+	} ZEND_HASH_FOREACH_END();
 
 	/**
 	 * Call afterFetch, this allows the developer to execute actions after a record is
@@ -2042,12 +1999,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 		/**
 		 * We need to create a primary key based on the current data
 		 */
-		phalcon_is_iterable(primary_keys, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(field);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(primary_keys), field) {
 			if (Z_TYPE_P(column_map) == IS_ARRAY) { 
 				if (phalcon_array_isset(column_map, field)) {
 					PHALCON_OBS_NVAR(attribute_field);
@@ -2112,9 +2064,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 			}
 
 			phalcon_array_append(&where_pk, pk_condition, PH_SEPARATE);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		/**
 		 * There are no primary key fields defined, assume the record does not exist
@@ -3046,21 +2996,17 @@ PHP_METHOD(Phalcon_Mvc_Model, getMessages){
 	phalcon_read_property_this(&messages, this_ptr, SL("_errorMessages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_ARRAY) {
 		HashPosition pos;
-		zval **value, *field = NULL;
+		zval *value, *field = NULL;
 
 		array_init(return_value);
 
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(messages), &pos);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(messages), (void**)&value, &pos) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(messages), &pos)
-		) {
-			PHALCON_CALL_METHOD(&field, *value, "getfield");
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), value) {
+			PHALCON_CALL_METHOD(&field, value, "getfield");
 
 			if (PHALCON_IS_EQUAL(filter, field)) {
 				phalcon_array_append(&return_value, *value, PH_COPY);
 			}
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_MM_RESTORE();
@@ -3077,13 +3023,11 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 	zval *manager, *belongs_to = NULL, *error = NULL, *relation = NULL, *foreign_key = NULL;
 	zval *action = NULL, *relation_class = NULL, *referenced_model = NULL;
 	zval *conditions = NULL, *bind_params = NULL, *fields = NULL, *referenced_fields = NULL;
-	zval *field = NULL, *position = NULL, *value = NULL, *referenced_field = NULL;
+	zval *field = NULL, *key, *value = NULL, *referenced_field = NULL;
 	zval *condition = NULL, *extra_conditions = NULL, *join_conditions = NULL;
 	zval *parameters = NULL, *rowcount = NULL, *user_message = NULL, *joined_fields = NULL;
 	zval *type = NULL, *event_name = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -3102,12 +3046,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 		PHALCON_INIT_VAR(error);
 		ZVAL_BOOL(error, 0);
 
-		phalcon_is_iterable(belongs_to, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(relation);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(belongs_to), relation) {
 			PHALCON_CALL_METHOD(&foreign_key, relation, "getforeignkey");
 			if (PHALCON_IS_NOT_FALSE(foreign_key)) {
 
@@ -3155,12 +3094,12 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 						/**
 						 * Create a compound condition
 						 */
-						phalcon_is_iterable(fields, &ah1, &hp1, 0, 0);
-
-						while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-							PHALCON_GET_HKEY(position, ah1, hp1);
-							PHALCON_GET_HVALUE(field);
+						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, key, field) {
+							if (key) {
+								ZVAL_STR(&postion, key);
+							} else {
+								ZVAL_LONG(&postion, idx);
+							}
 
 							if (phalcon_isset_property_zval(this_ptr, field)) {
 								PHALCON_OBS_NVAR(value);
@@ -3177,8 +3116,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 							phalcon_array_append(&conditions, condition, PH_SEPARATE);
 							phalcon_array_append(&bind_params, value, PH_SEPARATE);
 
-							zend_hash_move_forward_ex(ah1, &hp1);
-						}
+						} ZEND_HASH_FOREACH_END();
 
 					} else {
 						/**
@@ -3257,9 +3195,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 					}
 				}
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		/**
 		 * Call 'onValidationFails' if the validation fails
@@ -3311,12 +3247,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 		PHALCON_INIT_VAR(error);
 		ZVAL_BOOL(error, 0);
 
-		phalcon_is_iterable(relations, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(relation);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
 			/**
 			 * Check if the relation has a virtual foreign key
 			 */
@@ -3363,12 +3294,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 					array_init(bind_params);
 					if (Z_TYPE_P(fields) == IS_ARRAY) { 
 
-						phalcon_is_iterable(fields, &ah1, &hp1, 0, 0);
-
-						while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-							PHALCON_GET_HKEY(position, ah1, hp1);
-							PHALCON_GET_HVALUE(field);
+						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, position, field) {
+							zval tmp;
+							if (position) {
+								ZVAL_STR(&tmp, position);
+							} else {
+								ZVAL_LONG(&tmp, idx);
+							}
 
 							if (phalcon_isset_property_zval(this_ptr, field)) {
 								PHALCON_OBS_NVAR(value);
@@ -3378,15 +3310,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 							}
 
 							PHALCON_OBS_NVAR(referenced_field);
-							phalcon_array_fetch(&referenced_field, referenced_fields, position, PH_NOISY);
+							phalcon_array_fetch(&referenced_field, referenced_fields, &tmp, PH_NOISY);
 
 							PHALCON_INIT_NVAR(condition);
-							PHALCON_CONCAT_SVSV(condition, "[", referenced_field, "] = ?", position);
+							PHALCON_CONCAT_SVSV(condition, "[", referenced_field, "] = ?", &tmp);
 							phalcon_array_append(&conditions, condition, PH_SEPARATE);
 							phalcon_array_append(&bind_params, value, PH_SEPARATE);
-
-							zend_hash_move_forward_ex(ah1, &hp1);
-						}
+						} ZEND_HASH_FOREACH_END();
 
 					} else {
 						if (phalcon_isset_property_zval(this_ptr, fields)) {
@@ -3454,9 +3384,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 					}
 				}
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		/**
 		 * Call validation fails event
@@ -3505,12 +3433,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 	PHALCON_CALL_METHOD(&relations, manager, "gethasoneandhasmany", this_ptr);
 	if (phalcon_fast_count_ev(relations)) {
 
-		phalcon_is_iterable(relations, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(relation);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
 			/**
 			 * Check if the relation has a virtual foreign key
 			 */
@@ -3557,12 +3480,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 					array_init(bind_params);
 					if (Z_TYPE_P(fields) == IS_ARRAY) { 
 
-						phalcon_is_iterable(fields, &ah1, &hp1, 0, 0);
-
-						while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-							PHALCON_GET_HKEY(position, ah1, hp1);
-							PHALCON_GET_HVALUE(field);
+						ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(fields), idx, position, field) {
+							zval tmp;
+							if (position) {
+								ZVAL_STR(&tmp, position);
+							} else {
+								ZVAL_LONG(&tmp, idx);
+							}
 
 							if (phalcon_isset_property_zval(this_ptr, field)) {
 								PHALCON_OBS_NVAR(value);
@@ -3572,15 +3496,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 							}
 
 							PHALCON_OBS_NVAR(referenced_field);
-							phalcon_array_fetch(&referenced_field, referenced_fields, position, PH_NOISY);
+							phalcon_array_fetch(&referenced_field, referenced_fields, &tmp, PH_NOISY);
 
 							PHALCON_INIT_NVAR(condition);
-							PHALCON_CONCAT_SVSV(condition, "[", referenced_field, "] = ?", position);
+							PHALCON_CONCAT_SVSV(condition, "[", referenced_field, "] = ?", &tmp);
 							phalcon_array_append(&conditions, condition, PH_SEPARATE);
 							phalcon_array_append(&bind_params, value, PH_SEPARATE);
-
-							zend_hash_move_forward_ex(ah1, &hp1);
-						}
+						} ZEND_HASH_FOREACH_END();
 
 					} else {
 						if (phalcon_isset_property_zval(this_ptr, fields)) {
@@ -3635,9 +3557,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 					}
 				}
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 	}
 
@@ -3751,12 +3671,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		RETURN_MM_FALSE;
 	}
 
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(field);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), field) {
 		/**
 		 * We don't check fields that must be omitted
 		 */
@@ -3797,12 +3712,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 			 */
 			if (Z_TYPE_P(value) == IS_NULL) {
 				if (!PHALCON_GLOBAL(orm).not_null_validations) {
-					zend_hash_move_forward_ex(ah0, &hp0);
 					continue;
 				}
 
 				if (!zend_is_true(exists) && PHALCON_IS_EQUAL(field, identity_field)) {
-					zend_hash_move_forward_ex(ah0, &hp0);
 					continue;
 				}
 
@@ -3858,8 +3771,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 							PHALCON_CALL_METHOD(NULL, this_ptr, "appendmessage", message, attribute_field, type);
 
 							error = PHALCON_GLOBAL(z_true);
-
-							zend_hash_move_forward_ex(ah0, &hp0);
 							continue;
 						}
 
@@ -3912,7 +3823,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 				} else if (phalcon_is_equal_long(field_type, PHALCON_DB_COLUMN_TYPE_VARCHAR)
 					|| phalcon_is_equal_long(field_type, PHALCON_DB_COLUMN_TYPE_CHAR)) {
 					if (!PHALCON_GLOBAL(orm).length_validations) {
-						zend_hash_move_forward_ex(ah0, &hp0);
 						continue;
 					}
 
@@ -3941,9 +3851,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 				}
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	if (PHALCON_IS_TRUE(error)) {
 		PHALCON_INIT_NVAR(event_name);
@@ -4122,12 +4030,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	/**
 	 * All fields in the model makes part or the INSERT
 	 */
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(field);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), field) {
 		if (!phalcon_array_isset(automatic_attributes, field)) {
 
 			/**
@@ -4203,9 +4106,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 				}
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/**
 	 * If there is an identity field we add it using "null" or "default"
@@ -4398,17 +4299,14 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	 * We only make the update based on the non-primary attributes, values in primary
 	 * key attributes are ignored
 	 */
+	HashTable *ht;
 	if (PHALCON_GLOBAL(orm).allow_update_primary) {
 		PHALCON_CALL_SELF(&columns, "getcolumns");
-		phalcon_is_iterable(columns, &ah0, &hp0, 0, 0);
+		ht = Z_ARRVAL_P(columns);
 	} else {
-		phalcon_is_iterable(non_primary, &ah0, &hp0, 0, 0);
+		ht = Z_ARRVAL_P(non_primary);
 	}
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(field);
-
+	ZEND_HASH_FOREACH_STR_KEY_VAL(ht, field) {
 		if (!phalcon_array_isset(automatic_attributes, field)) {
 
 			/**
@@ -4514,9 +4412,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 				phalcon_array_append(&bind_types, bind_skip, PH_SEPARATE);
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/**
 	 * If there is no fields to update we return true
@@ -4552,12 +4448,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			return;
 		}
 
-		phalcon_is_iterable(primary_keys, &ah1, &hp1, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(field);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(primary_keys), field) {
 			/**
 			 * Check if the model has a column map
 			 */
@@ -4581,9 +4472,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			} else {
 				phalcon_array_append(&unique_params, null_value, PH_SEPARATE);
 			}
-
-			zend_hash_move_forward_ex(ah1, &hp1);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	/**
@@ -4634,9 +4523,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSaveRelatedRecords){
 	zval *manager = NULL, *record = NULL, *name = NULL, *relation = NULL, *type = NULL, *columns = NULL;
 	zval *referenced_model = NULL, *referenced_fields = NULL;
 	zval *status = NULL, *referenced_value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -4654,17 +4540,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSaveRelatedRecords){
 
 	PHALCON_CALL_METHOD(&manager, this_ptr, "getmodelsmanager");
 
-	phalcon_is_iterable(related, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(name, ah0, hp0);
-		PHALCON_GET_HVALUE(record);
-
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(related), name, record) {
+		zval tmp;
+		ZVA_STR(&tmp, name);
 		/**
 		 * Try to get a relation with the same name
 		 */
-		PHALCON_CALL_METHOD(&relation, manager, "getrelationbyalias", class_name, name);
+		PHALCON_CALL_METHOD(&relation, manager, "getrelationbyalias", class_name, &tmp);
 		if (Z_TYPE_P(relation) == IS_OBJECT) {
 
 			/**
@@ -4723,9 +4605,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSaveRelatedRecords){
 				phalcon_update_property_zval_zval(this_ptr, columns, referenced_value);
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_MM_TRUE;
 }
@@ -4747,9 +4627,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 	zval *intermediate_fields = NULL, *intermediate_referenced_fields = NULL;
 	zval *record_after = NULL, *intermediate_model = NULL, *intermediate_value = NULL;
 	zval *status = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 
 	phalcon_fetch_params(0, 2, 0, &connection, &related);
 
@@ -4766,17 +4643,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 
 	PHALCON_CALL_METHOD(&manager, this_ptr, "getmodelsmanager");
 
-	phalcon_is_iterable(related, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(name, ah0, hp0);
-		PHALCON_GET_HVALUE(record);
-
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(related), name, record) {
+		zval tmp;
+		ZVAL_STR(&tmp, name);
 		/**
 		 * Try to get a relation with the same name
 		 */
-		PHALCON_CALL_METHOD(&relation, manager, "getrelationbyalias", class_name, name);
+		PHALCON_CALL_METHOD(&relation, manager, "getrelationbyalias", class_name, &tmp);
 		if (Z_TYPE_P(relation) == IS_OBJECT) {
 
 			PHALCON_CALL_METHOD(&type, relation, "gettype");
@@ -4785,7 +4658,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 			 * Discard belongsTo relations
 			 */
 			if (PHALCON_IS_LONG(type, 0)) {
-				zend_hash_move_forward_ex(ah0, &hp0);
 				continue;
 			}
 
@@ -4845,12 +4717,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 				PHALCON_CALL_METHOD(&intermediate_referenced_fields, relation, "getintermediatereferencedfields");
 			}
 
-			phalcon_is_iterable(related_records, &ah1, &hp1, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(record_after);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(related_records), record_after) {
 				/**
 				 * For non has-many-to-many relations just assign the local value in the referenced
 				 * model
@@ -4909,7 +4776,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 					 */
 					PHALCON_CALL_METHOD(&status, intermediate_model, "save");
 					if (!zend_is_true(status)) {
-
 						/**
 						 * Get the validation messages generated by the referenced model
 						 */
@@ -4924,9 +4790,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 						RETURN_MM_FALSE;
 					}
 				}
-
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		} else {
 			if (Z_TYPE_P(record) != IS_ARRAY) { 
@@ -4938,9 +4802,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 				return;
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/**
 	 * Commit the implicit transaction
@@ -5026,12 +4888,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	PHALCON_INIT_VAR(bind_params);
 	array_init(bind_params);
 
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(attribute);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
 		if (Z_TYPE_P(data) == IS_ARRAY && phalcon_array_isset(data, attribute)) {
 			/**
 			 * If the white-list is an array check if the attribute is on that list
@@ -5068,9 +4925,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 
 			phalcon_array_update_zval(&bind_params, attribute, value, PH_COPY);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/**
 	 * Create/Get the current database connection
@@ -5233,16 +5088,17 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 			RETURN_MM_FALSE;
 		}
 
-		phalcon_is_iterable(related, &ah0, &hp0, 0, 0);
+		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(related), idx, related_key) {
+			zval tmp;
+			if (related_key) {
+				ZVAL_STR(&tmp, related_key);
+			} else {
+				ZVAL_LONG(&tmp, idx);
+			}
 
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
+			phalcon_unset_property_array(this_ptr, SL("_relatedResult"), &tmp);
 
-			PHALCON_GET_HKEY(related_key, ah0, hp0);
-
-			phalcon_unset_property_array(this_ptr, SL("_relatedResult"), related_key);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	/**
@@ -5442,12 +5298,7 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	/**
 	 * Create a condition from the primary keys
 	 */
-	phalcon_is_iterable(primary_keys, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(primary_key);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(primary_keys), primary_key) {
 		/**
 		 * Every column part of the primary key must be in the bind data types
 		 */
@@ -5490,20 +5341,14 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 
 		phalcon_array_update_zval(&bind_params, attribute_field, value, PH_COPY);
 
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_METHOD(&write_connection, this_ptr, "getwriteconnection", PHALCON_GLOBAL(z_null), bind_params, PHALCON_GLOBAL(z_null));
 
 	/**
 	 * Create a condition from the primary keys
 	 */
-	phalcon_is_iterable(primary_keys, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(primary_key);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(primary_keys), primary_key) {
 		/**
 		 * Take the column values based on the column map if any
 		 */
@@ -5530,9 +5375,7 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		PHALCON_OBS_NVAR(bind_type);
 		phalcon_array_fetch(&bind_type, bind_data_types, primary_key, PH_NOISY);
 		phalcon_array_append(&bind_types, bind_type, PH_SEPARATE);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/**
 	 * Join the conditions in the array using an AND operator
@@ -5629,9 +5472,6 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 	zval *unique_params, *unique_types, *attributes = NULL;
 	zval *field_item = NULL, *fields, *escaped_table = NULL;
 	zval *select, *dialect = NULL, *sql = NULL, *fetch_type, *row = NULL, *column_map = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -5661,12 +5501,7 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 		/**
 		 * We need to create a primary key based on the current data
 		 */
-		phalcon_is_iterable(primary_keys, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(field);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(primary_keys), field) {
 			if (Z_TYPE_P(column_map) == IS_ARRAY) { 
 				if (phalcon_array_isset(column_map, field)) {
 					PHALCON_OBS_NVAR(attribute_field);
@@ -5688,9 +5523,7 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 
 				phalcon_array_update_zval(&bind_params, attribute_field, value, PH_COPY);
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_CALL_METHOD(&read_connection, this_ptr, "getreadconnection", PHALCON_GLOBAL(z_null), bind_params, PHALCON_GLOBAL(z_null));
@@ -5743,20 +5576,14 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 	PHALCON_INIT_VAR(fields);
 	array_init(fields);
 
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(field);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), field) {
 		PHALCON_INIT_NVAR(field_item);
 		array_init_size(field_item, 1);
 		phalcon_array_append(&field_item, field, PH_COPY);
 
 		phalcon_array_append(&fields, field_item, PH_COPY);
 
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_METHOD(&escaped_table, read_connection, "escapeidentifier", table);
 
@@ -5873,9 +5700,6 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributes){
 
 	zval *attributes, *replace = NULL, *null_value, *keys_attributes;
 	zval *attribute = NULL, *meta_data = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -5895,16 +5719,9 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributes){
 	PHALCON_INIT_VAR(keys_attributes);
 	array_init(keys_attributes);
 
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(attribute);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
 		phalcon_array_update_zval(&keys_attributes, attribute, null_value, PH_COPY);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_METHOD(&meta_data, this_ptr, "getmodelsmetadata");
 	PHALCON_CALL_METHOD(NULL, meta_data, "setautomaticcreateattributes", this_ptr, keys_attributes, replace);
@@ -5937,9 +5754,6 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributesOnCreate){
 
 	zval *attributes, *replace = NULL, *null_value, *keys_attributes;
 	zval *attribute = NULL, *meta_data = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -5960,16 +5774,9 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributesOnCreate){
 	PHALCON_INIT_VAR(keys_attributes);
 	array_init(keys_attributes);
 
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(attribute);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
 		phalcon_array_update_zval(&keys_attributes, attribute, null_value, PH_COPY);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_METHOD(&meta_data, this_ptr, "getmodelsmetadata");
 	PHALCON_CALL_METHOD(NULL, meta_data, "setautomaticcreateattributes", this_ptr, keys_attributes, replace);
@@ -6023,9 +5830,6 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributesOnUpdate){
 
 	zval *attributes, *replace = NULL, *null_value, *keys_attributes;
 	zval *attribute = NULL, *meta_data = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -6045,16 +5849,9 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributesOnUpdate){
 	PHALCON_INIT_VAR(keys_attributes);
 	array_init(keys_attributes);
 
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(attribute);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
 		phalcon_array_update_zval(&keys_attributes, attribute, null_value, PH_COPY);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_METHOD(&meta_data, this_ptr, "getmodelsmetadata");
 	PHALCON_CALL_METHOD(NULL, meta_data, "setautomaticupdateattributes", this_ptr, keys_attributes, replace);
@@ -6337,9 +6134,6 @@ PHP_METHOD(Phalcon_Mvc_Model, setSnapshotData){
 
 	zval *data, *column_map = NULL, *snapshot, *value = NULL, *key = NULL, *exception_message = NULL;
 	zval *attribute = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -6362,18 +6156,11 @@ PHP_METHOD(Phalcon_Mvc_Model, setSnapshotData){
 		PHALCON_INIT_VAR(snapshot);
 		array_init(snapshot);
 
-		phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
-
+		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), key, value) {
 			/**
 			 * Use only strings
 			 */
-			if (Z_TYPE_P(key) != IS_STRING) {
-				zend_hash_move_forward_ex(ah0, &hp0);
+			if (!key) {
 				continue;
 			}
 
@@ -6382,7 +6169,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setSnapshotData){
 			 */
 			if (!phalcon_array_isset(column_map, key)) {
 				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column \"", key, "\" doesn't make part of the column map");
+				PHALCON_CONCAT_SVS(exception_message, "Column \"", Z_STRVAL_P(key), "\" doesn't make part of the column map");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
 				return;
 			}
@@ -6390,9 +6177,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setSnapshotData){
 			PHALCON_OBS_NVAR(attribute);
 			phalcon_array_fetch(&attribute, column_map, key, PH_NOISY);
 			phalcon_array_update_zval(&snapshot, attribute, value, PH_COPY);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		phalcon_update_property_this(this_ptr, SL("_snapshot"), snapshot);
 		RETURN_MM_NULL();
@@ -6567,33 +6352,34 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 	/**
 	 * Check every attribute in the model
 	 */
-	phalcon_is_iterable(all_attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(name, ah0, hp0);
-		PHALCON_GET_HVALUE(type);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(all_attributes), idx, str_key, type) {
+		zval name;
+		if (str_key) {
+			ZVAL_STR(&name, str_key);
+		} else {
+			ZVAL_LONG(&name, idx);
+		}
 
 		/**
 		 * If some attribute is not present in the snapshot, we assume the record as
 		 * changed
 		 */
-		if (!phalcon_array_isset(snapshot, name)) {
+		if (!phalcon_array_isset(snapshot, &name)) {
 			RETURN_MM_TRUE;
 		}
 
 		/**
 		 * If some attribute is not present in the model, we assume the record as changed
 		 */
-		if (!phalcon_isset_property_zval(this_ptr, name)) {
+		if (!phalcon_isset_property_zval(this_ptr, &name)) {
 			RETURN_MM_TRUE;
 		}
 
 		PHALCON_OBS_NVAR(value);
-		phalcon_read_property_zval(&value, this_ptr, name, PH_NOISY);
+		phalcon_read_property_zval(&value, this_ptr, &name, PH_NOISY);
 
 		PHALCON_OBS_NVAR(original_value);
-		phalcon_array_fetch(&original_value, snapshot, name, PH_NOISY);
+		phalcon_array_fetch(&original_value, snapshot, &name, PH_NOISY);
 
 		/**
 		 * Check if the field has changed
@@ -6601,9 +6387,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 		if (!PHALCON_IS_EQUAL(value, original_value)) {
 			RETURN_MM_TRUE;
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_MM_FALSE;
 }
@@ -6668,49 +6452,45 @@ PHP_METHOD(Phalcon_Mvc_Model, getChangedFields){
 	/**
 	 * Check every attribute in the model
 	 */
-	phalcon_is_iterable(all_attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(name, ah0, hp0);
-		PHALCON_GET_HVALUE(type);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(all_attributes), idx, name, type) {
+		zval tmp;
+		if (name) {
+			ZVAL_STR(&tmp, name);
+		} else {
+			ZVAL_LONG(&tmp, idx);
+		}
 
 		/**
 		 * If some attribute is not present in the snapshot, we assume the record as
 		 * changed
 		 */
-		if (!phalcon_array_isset(snapshot, name)) {
-			phalcon_array_append(&changed, name, PH_SEPARATE);
-			zend_hash_move_forward_ex(ah0, &hp0);
+		if (!phalcon_array_isset(snapshot, &tmp)) {
+			phalcon_array_append(&changed, &tmp, PH_SEPARATE);
 			continue;
 		}
 
 		/**
 		 * If some attribute is not present in the model, we assume the record as changed
 		 */
-		if (!phalcon_isset_property_zval(this_ptr, name)) {
-			phalcon_array_append(&changed, name, PH_SEPARATE);
-			zend_hash_move_forward_ex(ah0, &hp0);
+		if (!phalcon_isset_property_zval(this_ptr, &tmp)) {
+			phalcon_array_append(&changed, &tmp, PH_SEPARATE);
 			continue;
 		}
 
 		PHALCON_OBS_NVAR(value);
-		phalcon_read_property_zval(&value, this_ptr, name, PH_NOISY);
+		phalcon_read_property_zval(&value, this_ptr, &tmp, PH_NOISY);
 
 		PHALCON_OBS_NVAR(original_value);
-		phalcon_array_fetch(&original_value, snapshot, name, PH_NOISY);
+		phalcon_array_fetch(&original_value, snapshot, &tmp, PH_NOISY);
 
 		/**
 		 * Check if the field has changed
 		 */
 		if (!PHALCON_IS_EQUAL(value, original_value)) {
-			phalcon_array_append(&changed, name, PH_SEPARATE);
-			zend_hash_move_forward_ex(ah0, &hp0);
+			phalcon_array_append(&changed, &tmp, PH_SEPARATE);
 			continue;
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(changed);
 }
@@ -7216,12 +6996,13 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 				PHALCON_INIT_VAR(related);
 				array_init(related);
 
-				phalcon_is_iterable(values, &ah0, &hp0, 0, 0);
-
-				while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-					PHALCON_GET_HKEY(key, ah0, hp0);
-					PHALCON_GET_HVALUE(item);
+				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(values), idx, key, item) {
+					zval tmp;
+					if (key) {
+						ZVAL_STR(&tmp, key);
+					} else {
+						ZVAL_LONG(&tmp, idx);
+					}
 
 					if (Z_TYPE_P(item) == IS_OBJECT) {
 						PHALCON_INIT_NVAR(model_name);
@@ -7229,7 +7010,6 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 
 						if (instanceof_function_ex(Z_OBJCE_P(item), phalcon_mvc_model_resultsetinterface_ce, 1)) {
 							phalcon_update_property_array(this_ptr, SL("_relatedResult"), lower_property, item);
-							zend_hash_move_forward_ex(ah0, &hp0);
 							continue;
 						}
 
@@ -7247,7 +7027,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 						PHALCON_CALL_METHOD(&referenced_model, manager, "load", referenced_model_name, PHALCON_GLOBAL(z_false));
 						if (Z_TYPE_P(referenced_model) == IS_OBJECT) {
 							PHALCON_INIT_NVAR(lower_key);
-							phalcon_fast_strtolower(lower_key, key);
+							phalcon_fast_strtolower(lower_key, &tmp);
 							PHALCON_CALL_METHOD(NULL, referenced_model, "assign", item);
 						}
 					} else {
@@ -7256,9 +7036,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
 						return;
 					}
-
-					zend_hash_move_forward_ex(ah0, &hp0);
-				}
+				} ZEND_HASH_FOREACH_END();
 
 				if (phalcon_fast_count_ev(related)) {
 					phalcon_update_property_array(this_ptr, SL("_related"), lower_property, related);
@@ -7446,12 +7224,7 @@ PHP_METHOD(Phalcon_Mvc_Model, serialize){
 	PHALCON_INIT_VAR(data);
 	array_init(data);
 
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(attribute);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
 		/**
 		 * Check if the columns must be renamed
 		 */
@@ -7476,9 +7249,7 @@ PHP_METHOD(Phalcon_Mvc_Model, serialize){
 		} else {
 			phalcon_array_update_zval(&data, attribute_field, null_value, PH_COPY);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/**
 	 * Use the standard serialize function to serialize the array data
@@ -7552,17 +7323,9 @@ PHP_METHOD(Phalcon_Mvc_Model, unserialize){
 			/**
 			 * Update the objects attributes
 			 */
-			phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HKEY(key, ah0, hp0);
-				PHALCON_GET_HVALUE(value);
-
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), key, value) {
 				phalcon_update_property_zval_zval(this_ptr, key, value);
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 			RETURN_MM_NULL();
 		}
@@ -7613,7 +7376,6 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 		rename_columns = PHALCON_GLOBAL(z_true);
 	}
 
-
 	PHALCON_CALL_METHOD(&meta_data, this_ptr, "getmodelsmetadata");
 
 	PHALCON_INIT_VAR(data);
@@ -7631,12 +7393,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	 */
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
-	phalcon_is_iterable(attributes, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(attribute);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
 		/**
 		 * Check if the columns must be renamed
 		 */
@@ -7684,9 +7441,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 				phalcon_array_update_zval(&data, attribute_field, null_value, PH_COPY);
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_INIT_NVAR(event_name);
 	ZVAL_STRING(event_name, "afterToArray");

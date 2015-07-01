@@ -188,12 +188,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	PHALCON_INIT_VAR(field_default_values);
 	array_init(field_default_values);
 
-	phalcon_is_iterable(columns, &ah0, &hp0, 0, 0);
-	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(column);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column) {
 		PHALCON_CALL_METHOD(&field_name, column, "getname");
 		phalcon_array_append(&attributes, field_name, PH_SEPARATE);
 
@@ -265,9 +260,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		if (Z_TYPE_P(default_value) != IS_NULL) {
 			phalcon_array_update_zval(&field_default_values, field_name, default_value, PH_COPY);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/** 
 	 * Create an array using the MODELS_* constants as indexes
@@ -329,33 +322,25 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 		PHALCON_CALL_METHOD(&columns, model, "getcolumns");
 
 		if (Z_TYPE_P(columns) == IS_ARRAY) {
-
-			phalcon_is_iterable(columns, &ah0, &hp0, 0, 0);	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(column_name);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column_name) {
 				if (!phalcon_array_isset(ordered_column_map, column_name)) {
 					phalcon_array_update_zval(&ordered_column_map, column_name, column_name, PH_COPY);
 				}
-		
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 
 		PHALCON_INIT_VAR(reversed_column_map);
 		array_init(reversed_column_map);
 
-		phalcon_is_iterable(ordered_column_map, &ah1, &hp1, 0, 0);	
-		while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-			PHALCON_GET_HKEY(name, ah1, hp1);
-			PHALCON_GET_HVALUE(user_name);
-
-			phalcon_array_update_zval(&reversed_column_map, user_name, name, PH_COPY);
-	
-			zend_hash_move_forward_ex(ah1, &hp1);
-		}
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(ordered_column_map), idx, str_key, user_name) {
+			zval name;
+			if (str_key) {
+				ZVAL_STR(&name, str_key);
+			} else {
+				ZVAL_LONG(&name, idx);
+			}
+			phalcon_array_update_zval(&reversed_column_map, user_name, &name, PH_COPY);
+		} ZEND_HASH_FOREACH_END();
 	} else {
 		PHALCON_INIT_NVAR(ordered_column_map);
 		PHALCON_INIT_VAR(reversed_column_map);

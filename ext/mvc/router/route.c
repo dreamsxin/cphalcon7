@@ -748,19 +748,17 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 	PHALCON_OBS_VAR(paths);
 	phalcon_read_property_this(&paths, this_ptr, SL("_paths"), PH_NOISY);
 
-	phalcon_is_iterable(paths, &ah0, &hp0, 0, 0);
-
 	array_init_size(return_value, zend_hash_num_elements(ah0));
 
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(path, ah0, hp0);
-		PHALCON_GET_HVALUE(position);
-
-		phalcon_array_update_zval(&return_value, position, path, PH_COPY);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(paths), idx, str_key, position) {
+		zval path;
+		if (str_key) {
+			ZVAL_STR(&path, str_key);
+		} else {
+			ZVAL_LONG(&path, idx);
+		}
+		phalcon_array_update_zval(&return_value, position, &path, PH_COPY);
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_MM();
 }

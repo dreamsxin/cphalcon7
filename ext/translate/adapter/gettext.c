@@ -166,15 +166,15 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 	}
 	
 	if (Z_TYPE_P(directory) == IS_ARRAY) {
-		phalcon_is_iterable(directory, &ah0, &hp0, 0, 0);
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
-
-			PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", key, value);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(directory), idx, str_key, value) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
+			PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", &key, value);
+		} ZEND_HASH_FOREACH_END();
 	} else {
 		PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", default_domain, directory);
 	}
@@ -211,21 +211,21 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 	}
 
 	if (placeholders && Z_TYPE_P(placeholders) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(placeholders))) {
-		phalcon_is_iterable(placeholders, &ah0, &hp0, 0, 0);
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
-
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
 			PHALCON_INIT_NVAR(key_placeholder);
-			PHALCON_CONCAT_SVS(key_placeholder, "%", key, "%");
+			PHALCON_CONCAT_SVS(key_placeholder, "%", &key, "%");
 
 			PHALCON_INIT_NVAR(replaced);
 			phalcon_fast_str_replace(replaced, key_placeholder, value, translation);
 
 			PHALCON_CPY_WRT(translation, replaced);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	RETURN_CTOR(translation);

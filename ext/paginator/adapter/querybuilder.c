@@ -344,12 +344,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	PHALCON_OBS_VAR(columns);
 	phalcon_array_fetch_string(&columns, intermediate, ISL(columns), PH_NOISY);
 
-	phalcon_is_iterable(columns, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(column);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column) {
 		PHALCON_OBS_NVAR(type);
 		phalcon_array_fetch_string(&type, column, ISL(type), PH_NOISY);
 
@@ -366,9 +361,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			phalcon_array_update_string(&intermediate, ISL(columns), select_columns, PH_COPY);
 			break;
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_METHOD(&dialect, connection, "getdialect");
 	PHALCON_CALL_METHOD(&sql_select, dialect, "select", intermediate);
@@ -387,18 +380,19 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		PHALCON_INIT_VAR(processed);
 		array_init(processed);
 
-		phalcon_is_iterable(bind_params, &ah1, &hp1, 0, 0);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, value) {
+			zval wildcard;
+			if (str_key) {
+				ZVAL_STR(&wildcard, str_key);
+			} else {
+				ZVAL_LONG(&wildcard, idx);
+			}
 
-		while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-			PHALCON_GET_HKEY(wildcard, ah1, hp1);
-			PHALCON_GET_HVALUE(value);
-
-			SEPARATE_ZVAL(&value);
+			SEPARATE_ZVAL(value);
 
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				PHALCON_INIT_NVAR(string_wildcard);
-				PHALCON_CONCAT_SV(string_wildcard, ":", wildcard);
+				PHALCON_CONCAT_SV(string_wildcard, ":", &wildcard);
 
 				convert_to_string(value);
 
@@ -408,17 +402,15 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 				PHALCON_INIT_NVAR(sql);
 				ZVAL_STRING(sql, Z_STRVAL_P(sql_tmp));
 
-				phalcon_array_unset(&bind_types, wildcard, PH_SEPARATE);
+				phalcon_array_unset(&bind_types, &wildcard, PH_SEPARATE);
 			} else if (Z_TYPE_P(wildcard) == IS_LONG) {
 				PHALCON_INIT_NVAR(string_wildcard);
-				PHALCON_CONCAT_SV(string_wildcard, ":", wildcard);
+				PHALCON_CONCAT_SV(string_wildcard, ":", &wildcard);
 				phalcon_array_update_zval(&processed, string_wildcard, value, PH_COPY);
 			} else {
-				phalcon_array_update_zval(&processed, wildcard, value, PH_COPY);
+				phalcon_array_update_zval(&processed, &wildcard, value, PH_COPY);
 			}
-
-			zend_hash_move_forward_ex(ah1, &hp1);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 	} else {
 		PHALCON_CPY_WRT(processed, bind_params);
@@ -432,25 +424,24 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		PHALCON_INIT_VAR(processed_types);
 		array_init(processed_types);
 
-		phalcon_is_iterable(bind_types, &ah2, &hp2, 0, 0);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_types), idx, str_key, value) {
+			zval wildcard;
+			if (str_key) {
+				ZVAL_STR(&wildcard, str_key);
+			} else {
+				ZVAL_LONG(&wildcard, idx);
+			}
 
-		while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-
-			PHALCON_GET_HKEY(wildcard, ah2, hp2);
-			PHALCON_GET_HVALUE(value);
-
-			SEPARATE_ZVAL(&value);
+			SEPARATE_ZVAL(value);
 
 			if (Z_TYPE_P(wildcard) == IS_LONG) {
 				PHALCON_INIT_NVAR(string_wildcard);
-				PHALCON_CONCAT_SV(string_wildcard, ":", wildcard);
+				PHALCON_CONCAT_SV(string_wildcard, ":", &wildcard);
 				phalcon_array_update_zval(&processed_types, string_wildcard, value, PH_COPY);
 			} else {
-				phalcon_array_update_zval(&processed_types, wildcard, value, PH_COPY);
+				phalcon_array_update_zval(&processed_types, &wildcard, value, PH_COPY);
 			}
-
-			zend_hash_move_forward_ex(ah2, &hp2);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 	} else {
 		PHALCON_CPY_WRT(processed_types, bind_types);

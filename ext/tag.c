@@ -356,8 +356,10 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 {
 	zval *escaper, escaped, *attrs;
 	zval *value;
+	zend_string *key;
 	HashPosition hp;
 	uint i;
+	ulong idx;
 
 	struct str_size_t {
 		const char *str;
@@ -402,30 +404,18 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 		phalcon_array_unset_string(&attrs, SS("escape"), 0);
 	}
 
-	if (!Z_ISUNDEF(escaper)) {
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(attrs), &hp);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(attrs), (void**)&value, &hp) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(attrs), &hp)
-		) {
-			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(attrs), &hp);
-			if (Z_TYPE_P(&key) == IS_STRING && Z_TYPE_P(*value) != IS_NULL) {
-				PHALCON_CALL_METHOD(&escaped, escaper, "escapehtmlattr", *value);
-				PHALCON_SCONCAT_SVSVS(code, " ", &key, "=\"", &escaped, "\"");
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attrs), idx, key, value) {
+		if (key && Z_TYPE_P(value) != IS_NULL) {
+			zval tmp;
+			ZVAL_STR(&tmp, key);
+			if (!Z_ISUNDEF(escaper)) {
+				PHALCON_CALL_METHOD(&escaped, escaper, "escapehtmlattr", value);
+				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", &escaped, "\"");
+			} else {
+				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", value, "\"");
 			}
 		}
-	} else {
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(attrs), &hp);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(attrs), (void**)&value, &hp) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(attrs), &hp)
-		) {
-			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(attrs), &hp);
-			if (Z_TYPE_P(&key) == IS_STRING && Z_TYPE_P(*value) != IS_NULL) {
-				PHALCON_SCONCAT_SVSVS(code, " ", &key, "=\"", *value, "\"");
-			}
-		}
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_MM_RESTORE();
 }
@@ -1597,7 +1587,7 @@ PHP_METHOD(Phalcon_Tag, form){
 PHP_METHOD(Phalcon_Tag, endForm){
 
 
-	RETURN_STRING("</form>", 1);
+	RETURN_STRING("</form>");
 }
 
 /**
@@ -2129,27 +2119,27 @@ PHP_METHOD(Phalcon_Tag, getDocType){
 	doctype = phalcon_fetch_static_property_ce(phalcon_tag_ce, SL("_documentType"));
 
 	switch (phalcon_get_intval(doctype)) {
-		case 1:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">" PHP_EOL, 1);
+		case 1:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">" PHP_EOL);
 		/* no break */
-		case 2:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/html4/strict.dtd\">" PHP_EOL, 1);
+		case 2:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/html4/strict.dtd\">" PHP_EOL);
 		/* no break */
-		case 3:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/html4/loose.dtd\">" PHP_EOL, 1);
+		case 3:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/html4/loose.dtd\">" PHP_EOL);
 		/* no break */
-		case 4:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"" PHP_EOL"\t\"http://www.w3.org/TR/html4/frameset.dtd\">" PHP_EOL, 1);
+		case 4:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Frameset//EN\"" PHP_EOL"\t\"http://www.w3.org/TR/html4/frameset.dtd\">" PHP_EOL);
 		/* no break */
-		case 5:  RETURN_STRING("<!DOCTYPE html>" PHP_EOL, 1);
+		case 5:  RETURN_STRING("<!DOCTYPE html>" PHP_EOL);
 		/* no break */
-		case 6:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" PHP_EOL, 1);
+		case 6:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" PHP_EOL);
 		/* no break */
-		case 7:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" PHP_EOL, 1);
+		case 7:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">" PHP_EOL);
 		/* no break */
-		case 8:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">" PHP_EOL, 1);
+		case 8:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Frameset//EN\"" PHP_EOL "\t\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd\">" PHP_EOL);
 		/* no break */
-		case 9:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"" PHP_EOL"\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" PHP_EOL, 1);
+		case 9:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"" PHP_EOL"\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" PHP_EOL);
 		/* no break */
 		case 10: RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 2.0//EN\"" PHP_EOL "\t\"http://www.w3.org/MarkUp/DTD/xhtml2.dtd\">" PHP_EOL, 1);
 		/* no break */
-		case 11: RETURN_STRING("<!DOCTYPE html>" PHP_EOL, 1);
+		case 11: RETURN_STRING("<!DOCTYPE html>" PHP_EOL);
 		/* no break */
 		default: RETURN_EMPTY_STRING();
 	}

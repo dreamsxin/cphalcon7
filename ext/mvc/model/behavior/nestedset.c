@@ -1293,12 +1293,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 
 	PHALCON_CALL_METHOD(&childs, owner, "find", condition);
 
-	phalcon_is_iterable(childs, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(child);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(childs), child) {
 		PHALCON_CALL_SELF(&child_left, "getleftattribute", child);
 		PHALCON_CALL_SELF(&child_right, "getrightattribute", right);
 		PHALCON_CALL_SELF(&child_level, "getlevelattribute", right);
@@ -1317,8 +1312,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 			phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 			RETURN_MM_FALSE;
 		}
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	phalcon_update_property_bool(this_ptr, SL("_ignoreEvent"), 0);
 

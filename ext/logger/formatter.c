@@ -73,10 +73,10 @@ PHP_METHOD(Phalcon_Logger_Formatter, getTypeString){
 	
 	itype = Z_LVAL_P(*type);
 	if (itype >= 0 && itype < 10) {
-		RETURN_STRING(lut[itype], 1);
+		RETURN_STRING(lut[itype]);
 	}
 	
-	RETURN_STRING("CUSTOM", 1);
+	RETURN_STRING("CUSTOM");
 }
 
 /**
@@ -93,42 +93,34 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 	phalcon_fetch_params(0, 2, 0, &message, &context);
 
 	if (Z_TYPE_P(*context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(*context)) > 0) {
-		HashTable *ht = Z_ARRVAL_P(*context);
-		HashPosition hp;
-		zval *replace, **val;
+		zval *replace, *val;
+		zend_string *str_key;
+		ulong idx;
 
 		PHALCON_ALLOC_GHOST_ZVAL(replace);
 		array_init_size(replace, zend_hash_num_elements(ht));
 
-		for (
-			zend_hash_internal_pointer_reset_ex(ht, &hp);
-			zend_hash_get_current_data_ex(ht, (void**)&val, &hp) == SUCCESS;
-			zend_hash_move_forward_ex(ht, &hp)
-		) {
-			char *str_index, *idx;
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(*context), idx, str_key, val) {
+			zval index;
+			char *tmp;
 			uint str_length;
 			ulong num_index;
-			int type = zend_hash_get_current_key_ex(ht, &str_index, &str_length, &num_index, 0, &hp);
 
-			if (HASH_KEY_IS_STRING == type) {
-				str_length       += 2;
-				idx               = emalloc(str_length);
-				idx[0]            = '{';
-				idx[str_length-2] = '}';
-				idx[str_length-1] = '\0';
-				memcpy(idx + 1, str_index, str_length - 3);
-			}
-			else if (HASH_KEY_IS_LONG == type) {
-				str_length = spprintf(&idx, 0, "{%ld}", num_index);
-			}
-			else { /* Better safe than sorry */
+			if (str_key) {;
+				str_length = spprintf(&tmp, 0, "{%s}", str_key.val);
+				ZVAL_STRINGL(&index, tmp, str_length);
+			} else if (HASH_KEY_IS_LONG == type) {
+				spprintf(index->val, 0, "{%s}", str_key.val);
+				str_length = spprintf(&tmp, 0, "{%ld}", num_index);
+				ZVAL_STRINGL(&index, tmp, str_length);
+			} else {
 				continue;
 			}
 
-			Z_ADDREF_P(*val);
-			zend_hash_add(Z_ARRVAL_P(replace), idx, str_length, (void*)val, sizeof(zval*), NULL);
-			efree(idx);
-		}
+			Z_ADDREF_P(val);
+			zend_hash_add(Z_ARRVAL_P(replace), Z_STR(index), val);
+			efree(tmp);
+		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_RETURN_CALL_FUNCTIONW("strtr", *message, replace);
 		return;

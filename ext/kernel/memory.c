@@ -49,12 +49,7 @@ void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr)
 	size_t i;
 
 	start = (phalcon_memory_entry *) pecalloc(PHALCON_NUM_PREALLOCATED_FRAMES, sizeof(phalcon_memory_entry), 1);
-/* pecalloc() will take care of these members for every frame
-	start->pointer      = 0;
-	start->hash_pointer = 0;
-	start->prev = NULL;
-	start->next = NULL;
-*/
+
 	for (i = 0; i < PHALCON_NUM_PREALLOCATED_FRAMES; ++i) {
 		start[i].addresses       = pecalloc(24, sizeof(zval*), 1);
 		start[i].capacity        = 24;
@@ -77,34 +72,12 @@ void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr)
 	phalcon_globals_ptr->start_memory = start;
 	phalcon_globals_ptr->end_memory   = start + PHALCON_NUM_PREALLOCATED_FRAMES;
 
-	/* 'Allocator sizeof operand mismatch' warning can be safely ignored */
-	ALLOC_INIT_ZVAL(phalcon_globals_ptr->z_null);
-	Z_SET_REFCOUNT_P(phalcon_globals_ptr->z_null, 2);
-	ZVAL_NULL(phalcon_globals_ptr->z_null);
-
-	/* 'Allocator sizeof operand mismatch' warning can be safely ignored */
-	ALLOC_INIT_ZVAL(phalcon_globals_ptr->z_false);
-	Z_SET_REFCOUNT_P(phalcon_globals_ptr->z_false, 2);
-	ZVAL_FALSE(phalcon_globals_ptr->z_false);
-
-	/* 'Allocator sizeof operand mismatch' warning can be safely ignored */
-	ALLOC_INIT_ZVAL(phalcon_globals_ptr->z_true);
-	Z_SET_REFCOUNT_P(phalcon_globals_ptr->z_true, 2);
-	ZVAL_TRUE(phalcon_globals_ptr->z_true);
-
-	/* 'Allocator sizeof operand mismatch' warning can be safely ignored */
-	ALLOC_INIT_ZVAL(phalcon_globals_ptr->z_zero);
-	Z_SET_REFCOUNT_P(phalcon_globals_ptr->z_zero, 2);
-	ZVAL_LONG(phalcon_globals_ptr->z_zero, 0);
-
-	/* 'Allocator sizeof operand mismatch' warning can be safely ignored */
-	ALLOC_INIT_ZVAL(phalcon_globals_ptr->z_one);
-	Z_SET_REFCOUNT_P(phalcon_globals_ptr->z_one, 2);
-	ZVAL_LONG(phalcon_globals_ptr->z_one, 1);
-
-	ALLOC_INIT_ZVAL(phalcon_globals_ptr->z_two);
-	Z_SET_REFCOUNT_P(phalcon_globals_ptr->z_two, 2);
-	ZVAL_LONG(phalcon_globals_ptr->z_two, 2);
+	ZVAL_NULL(&phalcon_globals_ptr->z_null);
+	ZVAL_FALSE(&phalcon_globals_ptr->z_false);
+	ZVAL_TRUE(&phalcon_globals_ptr->z_true);
+	ZVAL_LONG(&phalcon_globals_ptr->z_zero, 0);
+	ZVAL_LONG(&phalcon_globals_ptr->z_one, 1);
+	ZVAL_LONG(&phalcon_globals_ptr->z_two, 2);
 
 	phalcon_globals_ptr->initialized = 1;
 }
@@ -136,15 +109,6 @@ void phalcon_deinitialize_memory()
 
 	pefree(phalcon_globals_ptr->start_memory, 1);
 	phalcon_globals_ptr->start_memory = NULL;
-
-	for (i = 0; i < 2; i++) {
-		phalcon_ptr_dtor(phalcon_globals_ptr->z_null);
-		phalcon_ptr_dtor(phalcon_globals_ptr->z_false);
-		phalcon_ptr_dtor(phalcon_globals_ptr->z_true);
-		phalcon_ptr_dtor(phalcon_globals_ptr->z_zero);
-		phalcon_ptr_dtor(phalcon_globals_ptr->z_one);
-		phalcon_ptr_dtor(phalcon_globals_ptr->z_two);
-	}
 
 	phalcon_globals_ptr->initialized = 0;
 }

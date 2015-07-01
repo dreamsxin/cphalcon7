@@ -262,32 +262,6 @@ int phalcon_is_callable(zval *var) {
 }
 
 /**
- * Initialize an array to start an iteration over it
- */
-int phalcon_is_iterable_ex(zval *arr, HashTable **arr_hash, HashPosition *hash_position, int duplicate, int reverse) {
-
-	if (unlikely(Z_TYPE_P(arr) != IS_ARRAY)) {
-		return 0;
-	}
-
-	if (duplicate) {
-		ALLOC_HASHTABLE(*arr_hash);
-		zend_hash_init(*arr_hash, 0, NULL, NULL, 0);
-		zend_hash_copy(*arr_hash, Z_ARRVAL_P(arr), NULL);
-	} else {
-		*arr_hash = Z_ARRVAL_P(arr);
-	}
-
-	if (reverse) {
-		zend_hash_internal_pointer_end_ex(*arr_hash, hash_position);
-	} else {
-		zend_hash_internal_pointer_reset_ex(*arr_hash, hash_position);
-	}
-
-	return 1;
-}
-
-/**
  * Parses method parameters with minimum overhead
  */
 int phalcon_fetch_parameters(int num_args, int required_args, int optional_args, ...)

@@ -58,71 +58,71 @@ typedef zend_function phalcon_fcall_cache_entry;
 #if defined(_MSC_VER)
 #define PHALCON_PASS_CALL_PARAMS(x) x + 1
 #define PHALCON_CALL_NUM_PARAMS(x) ((sizeof(x) - sizeof(x[0]))/sizeof(x[0]))
-#define PHALCON_FETCH_VA_ARGS NULL,
+#define PHALCON_FETCH_VA_ARGS
 #else
 #define PHALCON_PASS_CALL_PARAMS(x) x
-#define PHALCON_CALL_NUM_PARAMS(x) sizeof(x)/sizeof(zval*)
+#define PHALCON_CALL_NUM_PARAMS(x) sizeof(x)/sizeof(zval)
 #define PHALCON_FETCH_VA_ARGS
 #endif
 
 #define PHALCON_CALL_FUNCTIONW(return_value, func_name, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_func_aparams(return_value, func_name, PHALCON_FUNC_STRLEN(func_name), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 
 #define PHALCON_CALL_FUNCTION(return_value, func_name, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_func_aparams(return_value, func_name, PHALCON_FUNC_STRLEN(func_name), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_ZVAL_FUNCTIONW(return_value, func_name, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_zval_func_aparams(return_value, func_name, PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_ZVAL_FUNCTION(return_value, func_name, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_zval_func_aparams(return_value, func_name, PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_FUNCTIONW(func_name, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_func_aparams(return_value, func_name, PHALCON_FUNC_STRLEN(func_name), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_FUNCTION(func_name, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_func_aparams(return_value, func_name, PHALCON_FUNC_STRLEN(func_name), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_ZVAL_FUNCTIONW(func, ...) \
 	do { \
-		zval *params_[] = {__VA_ARGS__}; \
+		zval params_[] = {__VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_zval_func_aparams(return_value, func, PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_ZVAL_FUNCTION(func, ...) \
 	do { \
-		zval *params_[] = {__VA_ARGS__}; \
+		zval params_[] = {__VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_zval_func_aparams(return_value, func, PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_METHODW(return_value, object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_METHOD(return_value, object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
@@ -138,113 +138,113 @@ typedef zend_function phalcon_fcall_cache_entry;
 
 #define PHALCON_RETURN_CALL_METHODW(object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_METHOD(object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 
 #define PHALCON_CALL_PARENTW(return_value, class_entry, object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, class_entry, phalcon_fcall_parent, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_PARENT(return_value, class_entry, object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, class_entry, phalcon_fcall_parent, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_PARENTW(class_entry, object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, class_entry, phalcon_fcall_parent, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_PARENT(class_entry, object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, class_entry, phalcon_fcall_parent, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 
 #define PHALCON_CALL_SELFW(return_value, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_self, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_SELF(return_value, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_self, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_SELFW(method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_self, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_SELF(method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_self, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 
 #define PHALCON_CALL_STATICW(return_value, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_static, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_STATIC(return_value, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_static, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_STATICW(method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_static, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_STATIC(method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_static, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_CE_STATICW(return_value, class_entry, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, class_entry, phalcon_fcall_ce, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 
 #define PHALCON_CALL_CE_STATIC(return_value, class_entry, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, class_entry, phalcon_fcall_ce, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_CE_STATICW(class_entry, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, class_entry, phalcon_fcall_ce, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_CE_STATIC(class_entry, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		zval params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, NULL, class_entry, phalcon_fcall_ce, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 

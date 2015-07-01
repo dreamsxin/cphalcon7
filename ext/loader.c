@@ -487,9 +487,6 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	zval *class_name, *directory, *extensions, *ds = NULL;
 	zval *events_manager, *event_name = NULL, *directories = NULL, *dir = NULL;
 	zval *fixed_dir = NULL, *extension = NULL, *file_path = NULL, *debug_message = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 	char slash[2] = {DEFAULT_SLASH, 0};
 
 	PHALCON_MM_GROW();
@@ -523,21 +520,14 @@ PHP_METHOD(Phalcon_Loader, findFile){
 		phalcon_debug_print_r(debug_message);
 	}
 
-	phalcon_is_iterable(directories, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-		PHALCON_GET_HVALUE(dir);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(directories), dir) {
 		/** 
 		 * Add a trailing directory separator if the user forgot to do that
 		 */
 		PHALCON_INIT_NVAR(fixed_dir);
 		phalcon_fix_path(&fixed_dir, dir, ds);
 
-		phalcon_is_iterable(extensions, &ah1, &hp1, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(extension);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(extensions), extension) {
 
 			PHALCON_INIT_NVAR(file_path);
 			PHALCON_CONCAT_VVSV(file_path, fixed_dir, class_name, ".", extension);
@@ -588,11 +578,9 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				phalcon_debug_print_r(debug_message);
 			}
 
-			zend_hash_move_forward_ex(ah1, &hp1);
-		}
+		} ZEND_HASH_FOREACH_END();
 
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_MM_FALSE;
 }
@@ -612,9 +600,6 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	zval *pseudo_separator, *prefixes;
 	zval *prefix = NULL, *ds_class_name, *ns_class_name;
 	zval *directories, *found = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 	char slash[2] = {DEFAULT_SLASH, 0};
 
 	PHALCON_MM_GROW();
@@ -674,13 +659,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		phalcon_read_property_this(&namespaces, this_ptr, SL("_namespaces"), PH_NOISY);
 		if (Z_TYPE_P(namespaces) == IS_ARRAY) { 
 
-			phalcon_is_iterable(namespaces, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HKEY(ns_prefix, ah0, hp0);
-				PHALCON_GET_HVALUE(directory);
-
+			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(namespaces), ns_prefix, directory) {
 				/** 
 				 * The class name must start with the current namespace
 				 */
@@ -688,7 +667,6 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 				PHALCON_CONCAT_VV(ns_prefixed, ns_prefix, namespace_separator);
 
 				if (phalcon_start_with(class_name, ns_prefixed, NULL)) {
-
 					/** 
 					 * Get the possible file path
 					 */
@@ -704,8 +682,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 					}
 				}
 
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 	}
 
@@ -720,13 +697,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		phalcon_read_property_this(&prefixes, this_ptr, SL("_prefixes"), PH_NOISY);
 		if (Z_TYPE_P(prefixes) == IS_ARRAY) { 
 
-			phalcon_is_iterable(prefixes, &ah1, &hp1, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-				PHALCON_GET_HKEY(prefix, ah1, hp1);
-				PHALCON_GET_HVALUE(directory);
-
+			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(prefixes), prefix, directory) {
 				/** 
 				 * The class name starts with the prefix?
 				 */
@@ -746,9 +717,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 						}
 					}
 				}
-
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 	}
 

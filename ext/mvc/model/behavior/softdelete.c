@@ -131,17 +131,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 				 * Transfer the messages from the cloned model to the original model
 				 */
 				PHALCON_CALL_METHOD(&messages, update_model, "getmessages");
-	
-				phalcon_is_iterable(messages, &ah0, &hp0, 0, 0);
-	
-				while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-					PHALCON_GET_HVALUE(message);
-	
+
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), message) {
 					PHALCON_CALL_METHOD(NULL, model, "appendmessage", message);
-	
-					zend_hash_move_forward_ex(ah0, &hp0);
-				}
+				} ZEND_HASH_FOREACH_END();
 	
 				RETURN_MM_FALSE;
 			}

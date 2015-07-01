@@ -319,12 +319,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		/**
 		 * We create the message with implicit flush or other
 		 */
-		phalcon_is_iterable(message, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(msg);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(message), msg) {
 			/**
 			 * We create the applying formatting or not
 			 */
@@ -340,9 +335,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 			} else {
 				phalcon_concat_self(&content, html_message);
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		/**
 		 * We return the message as string if the implicit_flush is turned off

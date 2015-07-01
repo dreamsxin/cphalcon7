@@ -158,24 +158,22 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 		reflection_data = phalcon_fetch_nproperty_this(this_ptr, SL("_reflectionData"), PH_NOISY);
 		if (phalcon_array_isset_string_fetch(&reflection_methods, reflection_data, SS("methods"))) {
 			if (phalcon_fast_count_ev(reflection_methods)) {
-	
 				array_init(return_value);
-	
-				phalcon_is_iterable(reflection_methods, &ah0, &hp0, 0, 0);
-	
-				while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-					PHALCON_GET_HKEY(method_name, ah0, hp0);
-					PHALCON_GET_HVALUE(reflection_method);
-	
+
+				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(reflection_methods), idx, str_key, reflection_method) {
+					zval method_name;
+					if (str_key) {
+						ZVAL_STR(&method_name, str_key);
+					} else {
+						ZVAL_LONG(&method_name, idx);
+					}
+
 					PHALCON_INIT_NVAR(collection);
 					object_init_ex(collection, phalcon_annotations_collection_ce);
 					PHALCON_CALL_METHOD(NULL, collection, "__construct", reflection_method);
-	
-					phalcon_array_update_zval(&return_value, method_name, collection, PH_COPY);
-	
-					zend_hash_move_forward_ex(ah0, &hp0);
-				}
+
+					phalcon_array_update_zval(&return_value, &method_name, collection, PH_COPY);
+				} ZEND_HASH_FOREACH_END();
 	
 				phalcon_update_property_this(this_ptr, SL("_methodAnnotations"), return_value);
 	
@@ -213,24 +211,22 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 		if (phalcon_array_isset_string_fetch(&reflection_properties, reflection_data, SS("properties"))) {
 
 			if (phalcon_fast_count_ev(reflection_properties)) {
-
 				array_init(return_value);
 
-				phalcon_is_iterable(reflection_properties, &ah0, &hp0, 0, 0);
-
-				while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-					PHALCON_GET_HKEY(property, ah0, hp0);
-					PHALCON_GET_HVALUE(reflection_property);
+				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(all_attributes), idx, str_key, reflection_property) {
+					zval property;
+					if (str_key) {
+						ZVAL_STR(&property, str_key);
+					} else {
+						ZVAL_LONG(&property, idx);
+					}
 
 					PHALCON_INIT_NVAR(collection);
 					object_init_ex(collection, phalcon_annotations_collection_ce);
 					PHALCON_CALL_METHOD(NULL, collection, "__construct", reflection_property);
 
-					phalcon_array_update_zval(&return_value, property, collection, PH_COPY);
-
-					zend_hash_move_forward_ex(ah0, &hp0);
-				}
+					phalcon_array_update_zval(&return_value, &property, collection, PH_COPY);
+				} ZEND_HASH_FOREACH_END();
 
 				phalcon_update_property_this(this_ptr, SL("_propertyAnnotations"), return_value);
 	

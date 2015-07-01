@@ -460,22 +460,16 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, queryKeys){
 	
 	/* Get the key from redisd */
 	PHALCON_CALL_METHOD(&keys, redis, "smembers", special_key);
-	if (Z_TYPE_P(keys) == IS_ARRAY) { 
-		HashPosition pos;
-		zval **value;
+	if (Z_TYPE_P(keys) == IS_ARRAY) {
+		zval *value;
 
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(keys), &pos);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), (void**)&value, &pos) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos)
-		) {
-	
-			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(*value, prefix, NULL)) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), value) {
+			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(value, prefix, NULL)) {
 				PHALCON_INIT_NVAR(real_key);
-				ZVAL_NEW_STR(real_key, Z_STR_P(*value));
+				ZVAL_NEW_STR(real_key, Z_STR_P(value));
 				phalcon_array_append(&return_value, real_key, 0);
 			}
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -625,7 +619,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 
 	zval *redis, *options, *special_key;
 	zval *keys = NULL, *real_key = NULL, *last_key = NULL;
-	zval **value;
+	zval *value;
 	HashPosition pos;
 
 	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
@@ -650,20 +644,16 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 	/* Get the key from redisd */
 	PHALCON_CALL_METHOD(&keys, redis, "smembers", special_key);
 	if (Z_TYPE_P(keys) == IS_ARRAY) {
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(keys), &pos);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), (void**)&value, &pos) == SUCCESS;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos)
-		) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), value) {
 			PHALCON_INIT_NVAR(real_key);
-			ZVAL_NEW_STR(real_key, Z_STR_P(*value));
+			ZVAL_NEW_STR(real_key, Z_STR_P(value));
 
 			PHALCON_INIT_NVAR(last_key);
 			PHALCON_CONCAT_SV(last_key, "_PHCR", real_key);
 
 			PHALCON_CALL_METHOD(NULL, redis, "delete", last_key);	
 			PHALCON_CALL_METHOD(NULL, redis, "srem", special_key, real_key);
-		}
+		} ZEND_HASH_FOREACH_END();
 		
 		zend_hash_clean(Z_ARRVAL_P(keys));
 	}

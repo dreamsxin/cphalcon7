@@ -355,14 +355,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 
 		for (
 			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(keys), &pos);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), (void**)&value, &pos) == SUCCESS;
+			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), &pos) != NULL;
 			zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos)
 		) {
-			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
+			zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
 	
-			if (Z_TYPE(key) == IS_STRING && phalcon_memnstr(&key, prefixed)) {
+			if (Z_TYPE_P(key) == IS_STRING && phalcon_memnstr(key, prefixed)) {
 				PHALCON_INIT_NVAR(real_key);
-				phalcon_substr(real_key, &key, 5, 0);
+				phalcon_substr(real_key, key, 5, 0);
 				phalcon_array_append(&return_value, real_key, 0);
 			}
 		}
@@ -511,7 +511,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 	zval *prefixed, *options, *special_key, *z_zero;
 	zval *keys = NULL, *real_key = NULL;
 	HashPosition pos;
-	zval **value;
 
 	PHALCON_MM_GROW();
 
@@ -531,13 +530,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 	if (Z_TYPE_P(keys) == IS_ARRAY) {
 		for (
 			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(keys), &pos);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), (void**)&value, &pos) == SUCCESS;
+			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), &pos) == SUCCESS;
 			zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos)
 		) {
-			zval key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
+			zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
 
 			PHALCON_INIT_NVAR(real_key);
-			ZVAL_NEW_STR(real_key, Z_STR(key));
+			ZVAL_NEW_STR(real_key, Z_STR_Pkey));
 	
 			PHALCON_CALL_FUNCTION(NULL, "xcache_unset", real_key);
 		}

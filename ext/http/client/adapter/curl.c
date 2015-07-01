@@ -237,10 +237,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		}
 
 		if (Z_TYPE_P(files) == IS_ARRAY) {
-			phalcon_is_iterable(files, &ah0, &hp0, 0, 0);
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-				PHALCON_GET_HVALUE(file);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
 				if (PHALCON_IS_NOT_EMPTY(file)) {
 					curlfile_ce = zend_fetch_class(SSL("CURLFile"), ZEND_FETCH_CLASS_AUTO);
 
@@ -250,9 +247,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 					phalcon_array_append(&data, tmp, 0);
 				}
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 
 		if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
@@ -267,24 +262,20 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		PHALCON_INIT_VAR(body);
 
 		if (Z_TYPE_P(data) == IS_ARRAY) {
-			phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-				PHALCON_GET_HKEY(key, ah0, hp0);
-				PHALCON_GET_HVALUE(value);
-
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(all_attributes), idx, str_key, value) {
+				zval key;
+				if (str_key) {
+					ZVAL_STR(&key, str_key);
+				} else {
+					ZVAL_LONG(&key, idx);
+				}
 				PHALCON_SCONCAT_SVS(body, "--", boundary, "\r\n");
-				PHALCON_SCONCAT_SVSVS(body, "Content-Disposition: form-data; name=\"", key, "\"\r\n\r\n", value, "\r\n");
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+				PHALCON_SCONCAT_SVSVS(body, "Content-Disposition: form-data; name=\"", &key, "\"\r\n\r\n", value, "\r\n");
+			} ZEND_HASH_FOREACH_END();
 		}
 
-
 		if (Z_TYPE_P(files) == IS_ARRAY) {
-			phalcon_is_iterable(files, &ah1, &hp1, 0, 0);
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-				PHALCON_GET_HVALUE(file);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
 				if (PHALCON_IS_NOT_EMPTY(file)) {
 					PHALCON_CALL_FUNCTION(&path_parts, "pathinfo", file);
 
@@ -296,9 +287,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 						PHALCON_SCONCAT_SVS(body, "Content-Type: application/octet-stream\r\n\r\n", filedata, "\r\n");
 					}
 				}
-
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 
 		if (!PHALCON_IS_EMPTY(body)) {

@@ -507,17 +507,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 		phalcon_array_fetch(&value, arr, index, PH_NOISY);
 
 		PHALCON_SEPARATE_PARAM(data);
-		phalcon_is_iterable(value, &ah2, &hp2, 0, 0);
 
-		while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-			zval key2 = phalcon_get_current_key_w(ah2, &hp2);
-
-			if (!phalcon_array_isset(data, &key2)) {
-				phalcon_array_update_zval(&data, &key2, *hd, PH_COPY | PH_SEPARATE);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), idx, k, v) {
+			zval tmp;
+			if (k) {
+				ZVAL_STR(&tmp, k);
+			} else {
+				ZVAL_LONG(&tmp, idx);
 			}
 
-			zend_hash_move_forward_ex(ah2, &hp2);
-		}
+			if (!phalcon_array_isset(data, &tmp)) {
+				phalcon_array_update_zval(&data, &tmp, v, PH_COPY | PH_SEPARATE);
+			}
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	phalcon_array_update_multi_2(&meta_data, key, index, data, 0);

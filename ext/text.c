@@ -500,9 +500,6 @@ PHP_METHOD(Phalcon_Text, concat){
 	zval *separator, *a, *b;
 	zval *arg_num = NULL, *arg_list = NULL, *offset, *args = NULL;
 	zval *c = NULL, *a_trimmed = NULL, *b_trimmed = NULL, *c_trimmed = NULL, *tmp = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -518,12 +515,7 @@ PHP_METHOD(Phalcon_Text, concat){
 
 		PHALCON_CALL_FUNCTION(&args, "array_slice", arg_list, offset);
 
-		phalcon_is_iterable(args, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(c);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(args), c) {
 			PHALCON_INIT_NVAR(b_trimmed);
 			phalcon_fast_trim(b_trimmed, b, separator, PHALCON_TRIM_RIGHT);
 
@@ -535,8 +527,7 @@ PHP_METHOD(Phalcon_Text, concat){
 
 			PHALCON_CPY_WRT(b, tmp);
 
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_INIT_NVAR(a_trimmed);

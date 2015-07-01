@@ -206,7 +206,7 @@ void phalcon_unique_path_key(zval *return_value, zval *path) {
 	strKey = emalloc(24);
 	snprintf(strKey, 23, "v%lu", h);    
 
-	RETURN_STRING(strKey, 0);
+	RETURN_STRING(strKey);
 }
 
 /**
@@ -226,7 +226,7 @@ void phalcon_realpath(zval *return_value, zval *filename) {
 	}
 
 	if (VCWD_REALPATH(Z_STRVAL_P(filename), resolved_path_buff)) {
-		RETURN_STRING(resolved_path_buff, 1);
+		RETURN_STRING(resolved_path_buff);
 	}
 
 	RETURN_FALSE;

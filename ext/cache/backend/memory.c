@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 
 			for (
 				zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(data), &pos);
-				(type = zend_hash_get_current_key_ex(Z_ARRVAL_P(data), &str_index, &str_index_len, &num_index, 0, &pos)) != HASH_KEY_NON_EXISTANT;
+				(type = zend_hash_get_current_key_ex(Z_ARRVAL_P(data), &str_index, &str_index_len, &num_index, &pos)) != HASH_KEY_NON_EXISTANT;
 				zend_hash_move_forward_ex(Z_ARRVAL_P(data), &pos)
 			) {
 				if (type == HASH_KEY_IS_STRING && str_index_len > (uint)(Z_STRLEN_P(prefix)) && !memcmp(Z_STRVAL_P(prefix), str_index, str_index_len-1)) {

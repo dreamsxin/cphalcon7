@@ -174,12 +174,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 	
 	PHALCON_INIT_VAR(old_column);
 	
-	phalcon_is_iterable(describe, &ah0, &hp0, 0, 0);			
-	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-		PHALCON_GET_HVALUE(field);
-	
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), field) {
 		PHALCON_INIT_NVAR(definition);
 		array_init_size(definition, 1);
 		add_assoc_long_ex(definition, SS("bindType"), 2);
@@ -473,8 +468,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		phalcon_array_append(&columns, column, PH_SEPARATE);
 		PHALCON_CPY_WRT(old_column, column_name);
 
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 	
 	RETURN_CTOR(columns);
 }
@@ -521,53 +515,38 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 	 */
 	PHALCON_INIT_VAR(indexes);
 	array_init(indexes);
-	
-	phalcon_is_iterable(describe, &ah0, &hp0, 0, 0);
-	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-		PHALCON_GET_HVALUE(index);
-	
+
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), index) {
 		PHALCON_OBS_NVAR(key_name);
 		phalcon_array_fetch_long(&key_name, index, 1, PH_NOISY);
 	
 		PHALCON_CALL_METHOD(&sql_index_describe, dialect, "describeindex", key_name);
 		PHALCON_CALL_METHOD(&describe_index, this_ptr, "fetchall", sql_index_describe, fetch_num);
-	
-		phalcon_is_iterable(describe_index, &ah1, &hp1, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(index_column);
-	
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe_index), index_column) {
 			PHALCON_OBS_NVAR(column_name);
 			phalcon_array_fetch_long(&column_name, index_column, 2, PH_NOISY);
 			phalcon_array_append_multi_2(&indexes, key_name, column_name, 0);
-	
-			zend_hash_move_forward_ex(ah1, &hp1);
-		}
-	
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+		} ZEND_HASH_FOREACH_END();
+	} ZEND_HASH_FOREACH_END();
 	
 	PHALCON_INIT_VAR(index_objects);
 	array_init(index_objects);
-	
-	phalcon_is_iterable(indexes, &ah2, &hp2, 0, 0);
-	
-	while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-	
-		PHALCON_GET_HKEY(name, ah2, hp2);
-		PHALCON_GET_HVALUE(index_columns);
-	
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(indexes), idx, str_key, index_columns) {
+		zval name;
+		if (str_key) {
+			ZVAL_STR(&name, str_key);
+		} else {
+			ZVAL_LONG(&name, idx);
+		}
+
 		PHALCON_INIT_NVAR(index);
 		object_init_ex(index, phalcon_db_index_ce);
-		PHALCON_CALL_METHOD(NULL, index, "__construct", name, index_columns);
-	
-		phalcon_array_update_zval(&index_objects, name, index, PH_COPY | PH_SEPARATE);
-	
-		zend_hash_move_forward_ex(ah2, &hp2);
-	}
+		PHALCON_CALL_METHOD(NULL, index, "__construct", &name, index_columns);
+
+		phalcon_array_update_zval(&index_objects, &name, index, PH_COPY | PH_SEPARATE);
+	} ZEND_HASH_FOREACH_END();
 	
 	RETURN_CTOR(index_objects);
 }
@@ -622,16 +601,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 	 */
 	PHALCON_INIT_VAR(reference_objects);
 	array_init(reference_objects);
-	
-	phalcon_is_iterable(describe, &ah0, &hp0, 0, 0);
-	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-		PHALCON_GET_HKEY(number, ah0, hp0);
-		PHALCON_GET_HVALUE(reference_describe);
-	
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(describe), idx, str_key, reference_describe) {
+		zval number;
+		if (str_key) {
+			ZVAL_STR(&number, str_key);
+		} else {
+			ZVAL_LONG(&number, idx);
+		}
+
 		PHALCON_INIT_NVAR(constraint_name);
-		PHALCON_CONCAT_SV(constraint_name, "foreign_key_", number);
+		PHALCON_CONCAT_SV(constraint_name, "foreign_key_", &number);
 	
 		PHALCON_OBS_NVAR(referenced_table);
 		phalcon_array_fetch_long(&referenced_table, reference_describe, 2, PH_NOISY);
@@ -663,11 +643,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 		PHALCON_INIT_NVAR(reference);
 		object_init_ex(reference, phalcon_db_reference_ce);
 		PHALCON_CALL_METHOD(NULL, reference, "__construct", constraint_name, reference_array);
-	
 		phalcon_array_update_zval(&reference_objects, constraint_name, reference, PH_COPY | PH_SEPARATE);
-	
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 	
 	RETURN_CTOR(reference_objects);
 }

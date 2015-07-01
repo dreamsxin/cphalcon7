@@ -429,18 +429,10 @@ PHP_METHOD(Phalcon_Mvc_View, setBasePath){
 		PHALCON_INIT_VAR(base_paths);
 		array_init(base_paths);
 
-		phalcon_is_iterable(base_path, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(path);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(base_path), path) {
 			phalcon_add_trailing_slash(&path);
-
 			phalcon_array_append(&base_paths, path, 0);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		phalcon_update_property_this(this_ptr, SL("_basePath"), base_paths);
 	} else {
@@ -915,9 +907,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 	zval *engines = NULL, *dependency_injector, *registered_engines;
 	zval *php_engine, *arguments, *engine_service = NULL;
 	zval *extension = NULL, *engine_object = NULL, *exception_message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -957,42 +947,36 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 			phalcon_array_append(&arguments, this_ptr, 0);
 			phalcon_array_append(&arguments, dependency_injector, 0);
 
-			phalcon_is_iterable(registered_engines, &ah0, &hp0, 0, 0);
+			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(registered_engines), extension, engine_service) {
+				if (extension) {
+					if (Z_TYPE_P(engine_service) == IS_OBJECT) {
 
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HKEY(extension, ah0, hp0);
-				PHALCON_GET_HVALUE(engine_service);
-
-				if (Z_TYPE_P(engine_service) == IS_OBJECT) {
-
-					/** 
-					 * Engine can be a closure
-					 */
-					if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
-						PHALCON_INIT_NVAR(engine_object); /**/
-						PHALCON_CALL_USER_FUNC_ARRAY(engine_object, engine_service, arguments);
+						/** 
+						 * Engine can be a closure
+						 */
+						if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
+							PHALCON_INIT_NVAR(engine_object); /**/
+							PHALCON_CALL_USER_FUNC_ARRAY(engine_object, engine_service, arguments);
+						} else {
+							PHALCON_CPY_WRT(engine_object, engine_service);
+						}
 					} else {
-						PHALCON_CPY_WRT(engine_object, engine_service);
+						/** 
+						 * Engine can be a string representing a service in the DI
+						 */
+						if (Z_TYPE_P(engine_service) == IS_STRING) {
+							PHALCON_CALL_METHOD(&engine_object, dependency_injector, "getshared", engine_service, arguments);
+							PHALCON_VERIFY_INTERFACE(engine_object, phalcon_mvc_view_engineinterface_ce);
+						} else {
+							PHALCON_INIT_NVAR(exception_message);
+							PHALCON_CONCAT_SV(exception_message, "Invalid template engine registration for extension: ", extension);
+							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+							return;
+						}
 					}
-				} else {
-					/** 
-					 * Engine can be a string representing a service in the DI
-					 */
-					if (Z_TYPE_P(engine_service) == IS_STRING) {
-						PHALCON_CALL_METHOD(&engine_object, dependency_injector, "getshared", engine_service, arguments);
-						PHALCON_VERIFY_INTERFACE(engine_object, phalcon_mvc_view_engineinterface_ce);
-					} else {
-						PHALCON_INIT_NVAR(exception_message);
-						PHALCON_CONCAT_SV(exception_message, "Invalid template engine registration for extension: ", extension);
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
-						return;
-					}
+					phalcon_array_update_zval(&engines, extension, engine_object, PH_COPY | 0);
 				}
-				phalcon_array_update_zval(&engines, extension, engine_object, PH_COPY | 0);
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 		}
 
@@ -1023,9 +1007,6 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	zval *view_params, *events_manager, *engine = NULL;
 	zval *extension = NULL, *view_engine_path = NULL, *event_name = NULL;
 	zval *status = NULL, *exception_message;
-	HashTable *ah0, *ah1, *ah2;
-	HashPosition hp0, hp1, hp2;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1081,18 +1062,11 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		phalcon_read_property_this(&views_dir, this_ptr, SL("_viewsDir"), PH_NOISY);
 
 		if (Z_TYPE_P(base_path) == IS_ARRAY) {
-			phalcon_is_iterable(base_path, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(path);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(base_path), path) {
 				PHALCON_INIT_NVAR(views_dir_path);
 				PHALCON_CONCAT_VVV(views_dir_path, path, views_dir, view_path);
 				phalcon_array_append(&views_dir_paths, views_dir_path, 0);
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 		} else {
 			PHALCON_INIT_VAR(views_dir_path);
 			PHALCON_CONCAT_VVV(views_dir_path, base_path, views_dir, view_path);
@@ -1187,19 +1161,8 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	/** 
 	 * Views are rendered in each engine
 	 */
-	phalcon_is_iterable(engines, &ah1, &hp1, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-		PHALCON_GET_HKEY(extension, ah1, hp1);
-		PHALCON_GET_HVALUE(engine);
-
-		phalcon_is_iterable(views_dir_paths, &ah2, &hp2, 0, 0);
-		
-		while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(path);
-
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(engines), extension, engine) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(views_dir_paths), path) {
 			PHALCON_INIT_NVAR(view_engine_path);
 			PHALCON_CONCAT_VV(view_engine_path, path, extension);
 
@@ -1222,7 +1185,6 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		
 					PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, view_engine_path);
 					if (PHALCON_IS_FALSE(status)) {
-						zend_hash_move_forward_ex(ah0, &hp0);
 						continue;
 					}
 				}
@@ -1247,16 +1209,13 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 				PHALCON_CONCAT_SV(debug_message, "--Not Found: ", view_engine_path);
 				phalcon_debug_print_r(debug_message);
 			}
-
-			zend_hash_move_forward_ex(ah2, &hp2);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		if (!zend_is_true(not_exists)) {
 			break;
 		}
 
-		zend_hash_move_forward_ex(ah1, &hp1);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	if (PHALCON_IS_TRUE(not_exists)) {
 
@@ -1340,8 +1299,9 @@ PHP_METHOD(Phalcon_Mvc_View, getEngines) {
 PHP_METHOD(Phalcon_Mvc_View, exists) {
 
 	zval **view, *base_dir, *view_dir, *engines;
+	zend_string *ext;
 	HashPosition pos;
-	zval *path;
+	zval path;
 	int exists = 0;
 
 	phalcon_fetch_params(0, 1, 0, &view);
@@ -1360,21 +1320,15 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 		zval_ptr_dtor(&engines);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(path);
-	for (
-		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(engines), &pos);
-		!exists && HASH_KEY_NON_EXISTANT != zend_hash_get_current_key_type_ex(Z_ARRVAL_P(engines), &pos);
-		zend_hash_move_forward_ex(Z_ARRVAL_P(engines), &pos)
-	) {
-		zval ext = phalcon_get_current_key_w(Z_ARRVAL_P(engines), &pos);
-
-		PHALCON_CONCAT_VVVV(path, base_dir, view_dir, *view, &ext);
-		exists = (SUCCESS == phalcon_file_exists(path));
-		zval_dtor(path);
+	ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL_P(engines), ext) {
+		PHALCON_CONCAT_VVVV(path, base_dir, view_dir, *view, ext);
+		if ((exists = (SUCCESS == phalcon_file_exists(path)))) {
+			break;
+		}
 	}
 
 	ZVAL_NULL(path);
-	zval_ptr_dtor(&path);
+	zval_dtor(path);
 
 	RETURN_BOOL(exists);
 }
@@ -1669,18 +1623,14 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 					ZVAL_BOOL(silence, 0);
 
-					phalcon_is_iterable(templates_before, &ah0, &hp0, 0, 0);
-
-					while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
+					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(templates_before), template_before) {
 						PHALCON_GET_HVALUE(template_before);
 
 						PHALCON_INIT_NVAR(view_temp_path);
 						PHALCON_CONCAT_VV(view_temp_path, layouts_dir, template_before);
 						PHALCON_CALL_METHOD(NULL, this_ptr, "_enginerender", engines, view_temp_path, silence, PHALCON_GLOBAL(z_true), enable_layouts_absolute_path);
 
-						zend_hash_move_forward_ex(ah0, &hp0);
-					}
+					} ZEND_HASH_FOREACH_END();
 
 					PHALCON_INIT_NVAR(silence);
 					ZVAL_BOOL(silence, 1);
@@ -1731,18 +1681,11 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 					PHALCON_INIT_NVAR(silence);
 					ZVAL_BOOL(silence, 0);
 
-					phalcon_is_iterable(templates_after, &ah1, &hp1, 0, 0);
-
-					while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-						PHALCON_GET_HVALUE(template_after);
-
+					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(templates_after), template_after) {
 						PHALCON_INIT_NVAR(view_temp_path);
 						PHALCON_CONCAT_VV(view_temp_path, layouts_dir, template_after);
 						PHALCON_CALL_METHOD(NULL, this_ptr, "_enginerender", engines, view_temp_path, silence, PHALCON_GLOBAL(z_true), enable_layouts_absolute_path);
-
-						zend_hash_move_forward_ex(ah1, &hp1);
-					}
+					} ZEND_HASH_FOREACH_END();
 
 					PHALCON_INIT_NVAR(silence);
 					ZVAL_BOOL(silence, 1);
@@ -2140,10 +2083,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 
 	zval *options = NULL, *view_options = NULL, *cache_options = NULL;
 	zval *value = NULL, *key = NULL, *cache_level, *cache_mode;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
-
+	ulong idx;
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(0, 1, 0, 1, &options);
@@ -2172,17 +2112,14 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 			array_init(cache_options);
 		}
 
-		phalcon_is_iterable(options, &ah0, &hp0, 0, 0);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(options), idx, key, value) {
+			if (key) {
+				phalcon_array_update_zval(&cache_options, key, value, PH_COPY | PH_SEPARATE);
+			} else {
+				phalcon_array_update_long(&cache_options, idx, value, PH_COPY | PH_SEPARATE);
+			}
 
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
-
-			phalcon_array_update_zval(&cache_options, key, value, PH_COPY | PH_SEPARATE);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		/** 
 		 * Check if the user has defined a default cache level or use 5 as default

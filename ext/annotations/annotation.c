@@ -122,16 +122,11 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	 * Process annotation arguments
 	 */
 	if (phalcon_array_isset_string_fetch(&expr_arguments, reflection_data, SS("arguments"))) {
-	
-		phalcon_is_iterable(expr_arguments, &ah0, &hp0, 0, 0);
-	
 		PHALCON_INIT_VAR(arguments);
 		array_init_size(arguments, zend_hash_num_elements(ah0));
 
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(expr_arguments), argument) {
 			zval *n;
-
-			PHALCON_GET_HVALUE(argument);
 	
 			PHALCON_OBS_NVAR(expr);
 			phalcon_array_fetch_string(&expr, argument, SL("expr"), PH_NOISY);
@@ -142,9 +137,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 			} else {
 				phalcon_array_append(&arguments, resolved_argument, 0);
 			}
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 		phalcon_update_property_this(this_ptr, SL("_arguments"), arguments);
 		phalcon_update_property_this(this_ptr, SL("_exprArguments"), expr_arguments);
@@ -223,14 +216,11 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 		case PHANNOT_T_ARRAY:
 			PHALCON_OBS_VAR(items);
 			phalcon_array_fetch_string(&items, expr, SL("items"), PH_NOISY);
-	
-			phalcon_is_iterable(items, &ah0, &hp0, 0, 0);
+
 			array_init_size(return_value, zend_hash_num_elements(ah0));
-	
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
+
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(items), item) {
 				zval *name;
-	
-				PHALCON_GET_HVALUE(item);
 	
 				PHALCON_OBS_NVAR(expr);
 				phalcon_array_fetch_string(&expr, item, SL("expr"), PH_NOISY);
@@ -241,9 +231,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 				} else {
 					phalcon_array_append(&return_value, resolved_item, 0);
 				}
-	
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 	
 			RETURN_MM();
 			/* no break because of implicit return */

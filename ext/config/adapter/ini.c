@@ -177,38 +177,35 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	PHALCON_INIT_VAR(config);
 	array_init(config);
 
-	phalcon_is_iterable(ini_config, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(section, ah0, hp0);
-		PHALCON_GET_HVALUE(directives);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(ini_config), idx, str_key, directives) {
+		zval section;
+		if (str_key) {
+			ZVAL_STR(&section, str_key);
+		} else {
+			ZVAL_LONG(&section, idx);
+		}
 
 		if (unlikely(Z_TYPE_P(directives) != IS_ARRAY) || zend_hash_num_elements(Z_ARRVAL_P(directives)) == 0) {
-			phalcon_array_update_zval(&config, section, directives, PH_COPY);
-		}
-		else {
-			phalcon_is_iterable(directives, &ah1, &hp1, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-				PHALCON_GET_HKEY(key, ah1, hp1);
-				PHALCON_GET_HVALUE(value);
-
-				if (Z_TYPE_P(key) == IS_STRING && memchr(Z_STRVAL_P(key), '.', Z_STRLEN_P(key))) {
-					PHALCON_INIT_NVAR(directive_parts);
-					phalcon_fast_explode_str(directive_parts, SL("."), key);
-					phalcon_config_adapter_ini_update_zval_directive(&config, section, directive_parts, value);
+			phalcon_array_update_zval(&config, &section, directives, PH_COPY);
+		} else {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(directives), idx, str_key, value) {
+				zval key;
+				if (str_key) {
+					ZVAL_STR(&key, str_key);
 				} else {
-					phalcon_array_update_multi_2(&config, section, key, value, 0);
+					ZVAL_LONG(&key, idx);
 				}
 
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
+				if (str_key && memchr(Z_STRVAL(key), '.', Z_STRLEN(key))) {
+					PHALCON_INIT_NVAR(directive_parts);
+					phalcon_fast_explode_str(directive_parts, SL("."), &key);
+					phalcon_config_adapter_ini_update_zval_directive(&config, &section, directive_parts, value);
+				} else {
+					phalcon_array_update_multi_2(&config, &section, &key, value, 0);
+				}
+			} ZEND_HASH_FOREACH_END();
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	if (Z_TYPE_P(config) == IS_ARRAY) {
 		phalcon_config_construct_internal(getThis(), config);

@@ -67,7 +67,7 @@ void phalcon_fast_strlen(zval *return_value, zval *str){
 	ZVAL_LONG(return_value, Z_STRLEN_P(str));
 
 	if (use_copy) {
-		phalcon_dtor(str);
+		phalcon_ptr_dtor(str);
 	}
 }
 
@@ -88,7 +88,7 @@ int phalcon_fast_strlen_ev(zval *str){
 
 	length = Z_STRLEN_P(str);
 	if (use_copy) {
-		phalcon_dtor(str);
+		phalcon_ptr_dtor(str);
 	}
 
 	return length;
@@ -113,10 +113,10 @@ void phalcon_fast_strtolower(zval *return_value, zval *str){
 
 	length = Z_STRLEN_P(str);
 	lower_str = estrndup(Z_STRVAL_P(str), length);
-	php_strtolower(lower_str, length);
+	zend_str_tolower(lower_str, length);
 
 	if (use_copy) {
-		phalcon_dtor(str);
+		phalcon_ptr_dtor(str);
 	}
 
 	ZVAL_STRINGL(return_value, lower_str, length);
@@ -124,7 +124,7 @@ void phalcon_fast_strtolower(zval *return_value, zval *str){
 
 void phalcon_strtolower_inplace(zval *s) {
 	if (likely(Z_TYPE_P(s) == IS_STRING)) {
-		php_strtolower(Z_STRVAL_P(s), Z_STRLEN_P(s));
+		zend_str_tolower(Z_STRVAL_P(s), Z_STRLEN_P(s));
 	}
 }
 
@@ -139,24 +139,24 @@ void phalcon_fast_join(zval *result, zval *glue, zval *pieces){
 		return;
 	}
 
-	php_implode(glue, pieces, result);
+	php_implode(Z_STR_P(glue), pieces, result);
 }
 
 /**
  * Appends to a smart_str a printable version of a zval
  */
-void phalcon_append_printable_zval(smart_str *implstr, zval **tmp) {
+void phalcon_append_printable_zval(smart_str *implstr, zval *tmp) {
 
 	zval tmp_val;
 	unsigned int str_len;
 
-	switch (Z_TYPE_P(*tmp)) {
+	switch (Z_TYPE_P(tmp)) {
 		case IS_STRING:
-			smart_str_appendl(implstr, Z_STRVAL_P(*tmp), Z_STRLEN_P(*tmp));
+			smart_str_appendl(implstr, Z_STRVAL_P(tmp), Z_STRLEN_P(tmp));
 			break;
 
 		case IS_LONG:
-			smart_str_append_long(implstr, Z_LVAL_P(*tmp));
+			smart_str_append_long(implstr, Z_LVAL_P(tmp));
 			break;
 
 		case IS_TRUE:
@@ -171,25 +171,21 @@ void phalcon_append_printable_zval(smart_str *implstr, zval **tmp) {
 
 		case IS_DOUBLE: {
 			char *stmp;
-			str_len = spprintf(&stmp, 0, "%.*G", (int) EG(precision), Z_DVAL_P(*tmp));
+			str_len = spprintf(&stmp, 0, "%.*G", (int) EG(precision), Z_DVAL_P(tmp));
 			smart_str_appendl(implstr, stmp, str_len);
 			efree(stmp);
-		}
 			break;
+		}
 
 		case IS_OBJECT: {
-			int copy;
 			zval expr;
-			zend_make_printable_zval(*tmp, &expr, &copy);
+			zend_make_printable_zval(tmp, &expr);
 			smart_str_appendl(implstr, Z_STRVAL(expr), Z_STRLEN(expr));
-			if (copy) {
-				phalcon_dtor(expr);
-			}
-		}
 			break;
+		}
 
 		default:
-			tmp_val = **tmp;
+			tmp_val = *tmp;
 			zval_copy_ctor(&tmp_val);
 			convert_to_string(&tmp_val);
 			smart_str_appendl(implstr, Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));
@@ -205,7 +201,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval **tmp) {
  */
 void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_length, zval *pieces){
 
-	zval         **tmp;
+	zval         *tmp;
 	HashTable      *arr;
 	HashPosition   pos;
 	smart_str      implstr = {0};
@@ -223,15 +219,13 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 		RETURN_EMPTY_STRING();
 	}
 
-	zend_hash_internal_pointer_reset_ex(arr, &pos);
-
-	while (zend_hash_get_current_data_ex(arr, (void **) &tmp, &pos) == SUCCESS) {
+	ZEND_HASH_FOREACH_VAL(arr, tmp) {
 		phalcon_append_printable_zval(&implstr, tmp);
 		if (++i != numelems) {
 			smart_str_appendl(&implstr, glue, glue_length);
 		}
-		zend_hash_move_forward_ex(arr, &pos);
-	}
+	} ZEND_HASH_FOREACH_END();
+
 	smart_str_0(&implstr);
 
 	if (implstr.len) {
@@ -570,7 +564,7 @@ static PATNREPL *php_strtr_array_prepare_repls(int slen, HashTable *pats, zend_l
 {
 	PATNREPL		*patterns;
 	HashPosition	hpos;
-	zval			**entry;
+	zval			*entry;
 	int				num_pats = zend_hash_num_elements(pats),
 					i;
 
@@ -579,14 +573,14 @@ static PATNREPL *php_strtr_array_prepare_repls(int slen, HashTable *pats, zend_l
 	zend_llist_init(*allocs, sizeof(void*), &php_strtr_free_strp, 0);
 
 	for (i = 0, zend_hash_internal_pointer_reset_ex(pats, &hpos);
-			zend_hash_get_current_data_ex(pats, (void **)&entry, &hpos) == SUCCESS;
+			(entry = zend_hash_get_current_data_ex(pats, &hpos)) != NULL;
 			zend_hash_move_forward_ex(pats, &hpos)) {
 		char	*string_key;
 		uint  	string_key_len;
 		ulong	num_key;
 		zval	*tzv = NULL;
 
-		switch (zend_hash_get_current_key_ex(pats, &string_key, &string_key_len, &num_key, 0, &hpos)) {
+		switch (zend_hash_get_current_key_ex(pats, &string_key, &string_key_len, &num_key, &hpos)) {
 		case HASH_KEY_IS_LONG:
 			string_key_len = 1 + zend_spprintf(&string_key, 0, "%ld", (long)num_key);
 			zend_llist_add_element(*allocs, &string_key);
@@ -605,19 +599,19 @@ static PATNREPL *php_strtr_array_prepare_repls(int slen, HashTable *pats, zend_l
 				continue;
 			}
 
-			if (Z_TYPE_P(*entry) != IS_STRING) {
-				tzv = *entry;
+			if (Z_TYPE_P(entry) != IS_STRING) {
+				tzv = entry;
 				zval_addref_p(tzv);
 				SEPARATE_ZVAL(&tzv);
 				convert_to_string(tzv);
 				entry = &tzv;
-				zend_llist_add_element(*allocs, &Z_STRVAL_P(*entry));
+				zend_llist_add_element(*allocs, &Z_STRVAL_P(entry));
 			}
 
 			S(&patterns[i].pat) = string_key;
 			L(&patterns[i].pat) = string_key_len;
-			S(&patterns[i].repl) = Z_STRVAL_P(*entry);
-			L(&patterns[i].repl) = Z_STRLEN_P(*entry);
+			S(&patterns[i].repl) = Z_STRVAL_P(entry);
+			L(&patterns[i].repl) = Z_STRLEN_P(entry);
 			i++;
 
 			if (tzv) {
@@ -901,10 +895,10 @@ void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, 
 	}
 
 	haystack_dup = estrndup(Z_STRVAL_P(haystack), Z_STRLEN_P(haystack));
-	php_strtolower(haystack_dup, Z_STRLEN_P(haystack));
+	zend_str_tolower(haystack_dup, Z_STRLEN_P(haystack));
 
 	needle_dup = estrndup(needle, needle_length);
-	php_strtolower(needle_dup, needle_length);
+	zend_str_tolower(needle_dup, needle_length);
 
 	found = php_memnstr(haystack_dup, needle, needle_length, haystack_dup + Z_STRLEN_P(haystack));
 
@@ -1012,9 +1006,9 @@ void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where)
 	}
 
 	if (charlist) {
-		php_trim(Z_STRVAL_P(str), Z_STRLEN_P(str), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), return_value, where);
+		ZVAL_STR(return_value, php_trim(Z_STR_P(str), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), return_value, where));
 	} else {
-		php_trim(Z_STRVAL_P(str), Z_STRLEN_P(str), NULL, 0, return_value, where);
+		ZVAL_STR(return_value, php_trim(Z_STR_P(str), NULL, 0, where));
 	}
 
 	if (use_copy) {
@@ -1431,21 +1425,21 @@ void phalcon_append_printable_array(smart_str *implstr, zval *value) {
 
 	if (numelems > 0) {
 		zend_hash_internal_pointer_reset_ex(arr, &pos);
-		while (zend_hash_get_current_data_ex(arr, (void **) &tmp, &pos) == SUCCESS) {
+		while ((tmp = zend_hash_get_current_data_ex(arr, &pos)) != NULL) {
 
 			/**
 			 * We don't serialize objects
 			 */
-			if (Z_TYPE_P(*tmp) == IS_OBJECT) {
+			if (Z_TYPE_P(tmp) == IS_OBJECT) {
 				smart_str_appendc(implstr, 'O');
 				{
 					char stmp[MAX_LENGTH_OF_LONG + 1];
-					str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJVAL_P(*tmp).handle);
+					str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJVAL_P(tmp).handle);
 					smart_str_appendl(implstr, stmp, str_len);
 				}
 			} else {
-				if (Z_TYPE_P(*tmp) == IS_ARRAY) {
-					phalcon_append_printable_array(implstr, *tmp);
+				if (Z_TYPE_P(tmp) == IS_ARRAY) {
+					phalcon_append_printable_array(implstr, tmp);
 				} else {
 					phalcon_append_printable_zval(implstr, tmp);
 				}
@@ -1476,18 +1470,17 @@ void phalcon_unique_key(zval *return_value, zval *prefix, zval *value) {
 	if (Z_TYPE_P(value) == IS_ARRAY) {
 		phalcon_append_printable_array(&implstr, value);
 	} else {
-		phalcon_append_printable_zval(&implstr, &value);
+		phalcon_append_printable_zval(&implstr, value);
 	}
 
 	smart_str_0(&implstr);
 
 	if (implstr.len) {
-		RETURN_STRINGL(implstr.c, implstr.len, 0);
+		RETURN_STR(implstr.s);
 	} else {
 		smart_str_free(&implstr);
 		RETURN_NULL();
 	}
-
 }
 
 /**

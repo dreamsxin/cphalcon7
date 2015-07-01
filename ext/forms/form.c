@@ -612,15 +612,15 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 	PHALCON_INIT_VAR(filter_data);
 	array_init(filter_data);
 
-	phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
+		zval key;
+		if (str_key) {
+			ZVAL_STR(&key, str_key);
+		} else {
+			ZVAL_LONG(&key, idx);
+		}
 
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(key, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
-		if (!phalcon_array_isset(elements, key)) {
-			zend_hash_move_forward_ex(ah0, &hp0);
+		if (!phalcon_array_isset(elements, &key)) {
 			continue;
 		}
 
@@ -629,7 +629,6 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		 */
 		if (Z_TYPE_P(whitelist) == IS_ARRAY) {
 			if (!phalcon_fast_in_array(key, whitelist)) {
-				zend_hash_move_forward_ex(ah0, &hp0);
 				continue;
 			}
 		}
@@ -638,7 +637,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		 * Get the element
 		 */
 		PHALCON_OBS_NVAR(element);
-		phalcon_array_fetch(&element, elements, key, PH_NOISY);
+		phalcon_array_fetch(&element, elements, &key, PH_NOISY);
 
 		/**
 		 * Check if the method has filters
@@ -655,7 +654,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 
 		if (Z_TYPE_P(entity) == IS_OBJECT) {
 			PHALCON_INIT_NVAR(method);
-			PHALCON_CONCAT_SV(method, "set", key);
+			PHALCON_CONCAT_SV(method, "set", &key);
 			zend_str_tolower(Z_STRVAL_P(method), Z_STRLEN_P(method));
 
 			/**
@@ -663,20 +662,17 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 			 */
 			if (phalcon_method_exists(entity, method) == SUCCESS) {
 				PHALCON_CALL_METHOD(NULL, entity, Z_STRVAL_P(method), filtered_value);
-				zend_hash_move_forward_ex(ah0, &hp0);
 				continue;
 			}
 
 			/**
 			 * Use the public property if it doesn't have a setter
 			 */
-			phalcon_update_property_zval_zval(entity, key, filtered_value);
+			phalcon_update_property_zval_zval(entity, &key, filtered_value);
 		} else {
-			phalcon_array_update_zval(&filter_data, key, filtered_value, PH_COPY);
+			phalcon_array_update_zval(&filter_data, &key, filtered_value, PH_COPY);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	phalcon_update_property_this(this_ptr, SL("_filterData"), filter_data);
 	phalcon_update_property_this(this_ptr, SL("_data"), data);
@@ -739,12 +735,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 	PHALCON_INIT_VAR(messages);
 	array_init(messages);
 
-	phalcon_is_iterable(elements, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(element);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(elements), element) {
 		PHALCON_CALL_METHOD(&validators, element, "getvalidators");
 		if (Z_TYPE_P(validators) == IS_ARRAY) {
 			if (phalcon_fast_count_ev(validators)) {
@@ -760,20 +751,13 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				PHALCON_INIT_NVAR(prepared_validators);
 				array_init(prepared_validators);
 
-				phalcon_is_iterable(validators, &ah1, &hp1, 0, 0);
-
-				while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-					PHALCON_GET_HVALUE(validator);
-
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(validators), validator) {
 					PHALCON_INIT_NVAR(scope);
 					array_init_size(scope, 2);
 					phalcon_array_append(&scope, name, 0);
 					phalcon_array_append(&scope, validator, 0);
 					phalcon_array_append(&prepared_validators, scope, PH_SEPARATE);
-
-					zend_hash_move_forward_ex(ah1, &hp1);
-				}
+				} ZEND_HASH_FOREACH_END();
 
 				/**
 				 * Create an implicit validation
@@ -807,9 +791,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				}
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	/**
 	 * If the validation fails update the messages
@@ -849,25 +831,17 @@ PHP_METHOD(Phalcon_Forms_Form, getMessages){
 		if (Z_TYPE_P(messages) != IS_ARRAY) {
 			object_init_ex(return_value, phalcon_validation_message_group_ce);
 			phalcon_validation_group_construct_helper(return_value, NULL);
-		}
-		else {
+		} else {
 			RETURN_ZVAL(messages, 1, 0);
 		}
-	}
-	else {
+	} else {
 		object_init_ex(return_value, phalcon_validation_message_group_ce);
 		phalcon_validation_group_construct_helper(return_value, NULL);
 
 		if (Z_TYPE_P(messages) == IS_ARRAY) {
-			HashPosition hp;
-			zval **v;
-
-			for (
-				zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(messages), &hp);
-				zend_hash_get_current_data_ex(Z_ARRVAL_P(messages), (void**)&v, &hp) == SUCCESS;
-				zend_hash_move_forward_ex(Z_ARRVAL_P(messages), &hp)
-			) {
-				PHALCON_CALL_METHODW(NULL, return_value, "appendmessages", *v);
+			zval *v;
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), v) {
+				PHALCON_CALL_METHODW(NULL, return_value, "appendmessages", v);
 			}
 		}
 	}
@@ -954,21 +928,19 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 		elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY);
 
 		if (Z_TYPE_P(elements) == IS_ARRAY) {
-			HashPosition hp;
-
-			for (
-				zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(elements), &hp);
-				zend_hash_get_current_key_type_ex(Z_ARRVAL_P(elements), &hp) != HASH_KEY_NON_EXISTANT;
-				zend_hash_move_forward_ex(Z_ARRVAL_P(elements), &hp)
-			) {
-				zval key = phalcon_get_current_key_w(Z_ARRVAL_P(elements), &hp);
-
+			ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(elements), idx, str_key) {
+				zval key;
+				if (str_key) {
+					ZVAL_STR(&key, related_key);
+				} else {
+					ZVAL_LONG(&tmp, idx);
+				}
 				++i;
 				if (phalcon_is_equal(&key, pos)) {
 					found = 1;
 					break;
 				}
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 
 		if (!found) {
@@ -1282,13 +1254,7 @@ PHP_METHOD(Phalcon_Forms_Form, clear){
 
 	elements = phalcon_fetch_nproperty_this(this_ptr, SL("_elements"), PH_NOISY);
 	if (Z_TYPE_P(elements) == IS_ARRAY) {
-
-		phalcon_is_iterable(elements, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(element);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(elements), element) {
 			if (Z_TYPE_P(fields) != IS_ARRAY) {
 				PHALCON_CALL_METHOD(NULL, element, "clear");
 			} else {
@@ -1297,9 +1263,7 @@ PHP_METHOD(Phalcon_Forms_Form, clear){
 					PHALCON_CALL_METHOD(NULL, element, "clear");
 				}
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 	}
 

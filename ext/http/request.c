@@ -864,7 +864,7 @@ PHP_METHOD(Phalcon_Http_Request, getServerAddress){
 		RETURN_ZVAL(server_addr, 1, 0);
 	}
 
-	RETURN_STRING("127.0.0.1", 1);
+	RETURN_STRING("127.0.0.1");
 }
 
 /**
@@ -881,7 +881,7 @@ PHP_METHOD(Phalcon_Http_Request, getServerName){
 		RETURN_ZVAL(server_name, 1, 0);
 	}
 
-	RETURN_STRING("localhost", 1);
+	RETURN_STRING("localhost");
 }
 
 /**
@@ -1077,7 +1077,7 @@ PHP_METHOD(Phalcon_Http_Request, getMethod){
 
 	const char *method = phalcon_http_request_getmethod_helper();
 	if (method) {
-		RETURN_STRING(method, !IS_INTERNED(method));
+		RETURN_STRING(method);
 	}
 
 	RETURN_EMPTY_STRING();
@@ -1145,18 +1145,11 @@ PHP_METHOD(Phalcon_Http_Request, isMethod){
 		RETURN_MM();
 	}
 
-	phalcon_is_iterable(methods, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(method);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(methods), method) {
 		if (PHALCON_IS_EQUAL(method, http_method)) {
 			RETURN_MM_TRUE;
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_MM_FALSE;
 }
@@ -1338,26 +1331,19 @@ PHP_METHOD(Phalcon_Http_Request, isOptions){
 
 static int phalcon_http_request_hasfiles_helper(zval *arr, int only_successful)
 {
-	HashPosition hp;
-	zval **value;
+	zval *value;
 	int nfiles = 0;
 
 	assert(Z_TYPE_P(arr) == IS_ARRAY);
-
-	for (
-		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(arr), &hp);
-		zend_hash_get_current_data_ex(Z_ARRVAL_P(arr), (void**) &value, &hp) == SUCCESS;
-		zend_hash_move_forward_ex(Z_ARRVAL_P(arr), &hp)
-	) {
-		if (Z_TYPE_P(*value) < IS_ARRAY) {
-			if (!zend_is_true(*value) || !only_successful) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(arr), value) {
+		if (Z_TYPE_P(value) < IS_ARRAY) {
+			if (!zend_is_true(value) || !only_successful) {
 				++nfiles;
 			}
+		} else if (Z_TYPE_P(value) == IS_ARRAY) {
+			nfiles += phalcon_http_request_hasfiles_helper(value, only_successful);
 		}
-		else if (Z_TYPE_P(*value) == IS_ARRAY) {
-			nfiles += phalcon_http_request_hasfiles_helper(*value, only_successful);
-		}
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	return nfiles;
 }
@@ -1370,8 +1356,7 @@ static int phalcon_http_request_hasfiles_helper(zval *arr, int only_successful)
 PHP_METHOD(Phalcon_Http_Request, hasFiles){
 
 	zval *not_errored = NULL, *_FILES, *error = NULL;
-	HashPosition hp0;
-	zval **hd;
+	zval *file;
 	int nfiles = 0;
 	int only_successful;
 
@@ -1384,22 +1369,17 @@ PHP_METHOD(Phalcon_Http_Request, hasFiles){
 		RETURN_LONG(0);
 	}
 
-	for (
-		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(_FILES), &hp0);
-		zend_hash_get_current_data_ex(Z_ARRVAL_P(_FILES), (void**)&hd, &hp0) == SUCCESS;
-		zend_hash_move_forward_ex(Z_ARRVAL_P(_FILES), &hp0)
-	) {
-		if (phalcon_array_isset_string_fetch(&error, *hd, SS("error"))) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(_FILES), file) {
+		if (phalcon_array_isset_string_fetch(&error, file, SS("error"))) {
 			if (Z_TYPE_P(error) < IS_ARRAY) {
 				if (!zend_is_true(error) || !only_successful) {
 					++nfiles;
 				}
-			}
-			else if (Z_TYPE_P(error) == IS_ARRAY) {
+			} else if (Z_TYPE_P(error) == IS_ARRAY) {
 				nfiles += phalcon_http_request_hasfiles_helper(error, only_successful);
 			}
 		}
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_LONG(nfiles);
 }
@@ -1412,7 +1392,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 		&& Z_TYPE_P(size) == IS_ARRAY
 	) {
 		HashPosition pos_name, pos_type, pos_tmp, pos_error, pos_size;
-		zval **dname, **dtype, **dtmp, **derror, **dsize;
+		zval *dname, *dtype, *dtmp, *derror, *dsize;
 		zval *arr, *file, *key;
 		size_t prefix_len = prefix->len;
 		int res;
@@ -1424,36 +1404,35 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(size),     &pos_size);
 
 		while (
-			   zend_hash_get_current_data_ex(Z_ARRVAL_P(name),     (void**)&dname,  &pos_name)  == SUCCESS
-			&& zend_hash_get_current_data_ex(Z_ARRVAL_P(type),     (void**)&dtype,  &pos_type)  == SUCCESS
-			&& zend_hash_get_current_data_ex(Z_ARRVAL_P(tmp_name), (void**)&dtmp,   &pos_tmp)   == SUCCESS
-			&& zend_hash_get_current_data_ex(Z_ARRVAL_P(error),    (void**)&derror, &pos_error) == SUCCESS
-			&& zend_hash_get_current_data_ex(Z_ARRVAL_P(size),     (void**)&dsize,  &pos_size)  == SUCCESS
+			(dname = zend_hash_get_current_data_ex(Z_ARRVAL_P(name), &pos_name)) != NULL &&
+			(dtype = zend_hash_get_current_data_ex(Z_ARRVAL_P(type), &pos_type)) != NULL && 
+			(dtmp = zend_hash_get_current_data_ex(Z_ARRVAL_P(tmp_name), &pos_tmp)) != NULL && 
+			(derror = zend_hash_get_current_data_ex(Z_ARRVAL_P(error), &pos_error)) != NULL && 
+			(dsize = zend_hash_get_current_data_ex(Z_ARRVAL_P(size), &pos_size)) != NULL
 		) {
 			zval index = phalcon_get_current_key_w(Z_ARRVAL_P(name), &pos_name);
 
 			if (Z_TYPE(index) == IS_STRING) {
 				smart_str_appendl(prefix, Z_STRVAL(index), Z_STRLEN(index));
-			}
-			else {
+			} else {
 				smart_str_append_long(prefix, Z_LVAL(index));
 			}
 
-			if (Z_TYPE_P(*derror) < IS_ARRAY) {
-				if (!zend_is_true(*derror) || !only_successful) {
-					Z_ADDREF_P(*dname);
-					Z_ADDREF_P(*dtype);
-					Z_ADDREF_P(*dtmp);
-					Z_ADDREF_P(*derror);
-					Z_ADDREF_P(*dsize);
+			if (Z_TYPE_P(derror) < IS_ARRAY) {
+				if (!zend_is_true(derror) || !only_successful) {
+					Z_ADDREF_P(dname);
+					Z_ADDREF_P(dtype);
+					Z_ADDREF_P(dtmp);
+					Z_ADDREF_P(derror);
+					Z_ADDREF_P(dsize);
 
 					PHALCON_ALLOC_GHOST_ZVAL(arr);
 					array_init_size(arr, 5);
-					add_assoc_zval_ex(arr, ISS(name),      *dname);
-					add_assoc_zval_ex(arr, ISS(type),      *dtype);
-					add_assoc_zval_ex(arr, SS("tmp_name"), *dtmp);
-					add_assoc_zval_ex(arr, SS("error"),    *derror);
-					add_assoc_zval_ex(arr, SS("size"),     *dsize);
+					add_assoc_zval_ex(arr, ISS(name),      dname);
+					add_assoc_zval_ex(arr, ISS(type),      dtype);
+					add_assoc_zval_ex(arr, SS("tmp_name"), dtmp);
+					add_assoc_zval_ex(arr, SS("error"),    derror);
+					add_assoc_zval_ex(arr, SS("size"),     dsize);
 
 					PHALCON_ALLOC_GHOST_ZVAL(key);
 					ZVAL_STRINGL(key, prefix->c, prefix->len);
@@ -1463,7 +1442,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 					object_init_ex(file, phalcon_http_request_file_ce);
 
 					{
-						zval *params[] = { arr, key };
+						zval params[] = { arr, key };
 						res = phalcon_call_method(NULL, file, "__construct", 2, params);
 					}
 
@@ -1471,7 +1450,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 					zval_ptr_dtor(&key);
 
 					if (res != FAILURE) {
-						add_next_index_zval(*return_value, file);
+						add_next_index_zval(return_value, file);
 					}
 					else {
 						break;
@@ -1523,15 +1502,15 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 		RETURN_MM();
 	}
 
-	phalcon_is_iterable(_FILES, &ah0, &hp0, 0, 0);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(_FILES), idx, str_key, value) {
+		zval index;
+		if (str_key) {
+			ZVAL_STR(&index, str_key);
+		} else {
+			ZVAL_LONG(&index, idx);
+		}
 
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(index, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
-
-		if (dst_index && !PHALCON_IS_EQUAL(dst_index, index)) {
-			zend_hash_move_forward_ex(ah0, &hp0);
+		if (dst_index && !PHALCON_IS_EQUAL(dst_index, &index)) {
 			continue;
 		}
 
@@ -1541,15 +1520,11 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 					PHALCON_INIT_NVAR(request_file);
 					object_init_ex(request_file, phalcon_http_request_file_ce);
 
-					PHALCON_INIT_NVAR(key);
-					ZVAL_STRINGL(key, Z_STRVAL_P(index), Z_STRLEN_P(index));
-
-					PHALCON_CALL_METHOD(NULL, request_file, "__construct", value, key);
+					PHALCON_CALL_METHOD(NULL, request_file, "__construct", value, &index);
 
 					phalcon_array_append(&return_value, request_file, 0);
 				}
-			}
-			else if (Z_TYPE_P(error) == IS_ARRAY) {
+			} else if (Z_TYPE_P(error) == IS_ARRAY) {
 				PHALCON_OBS_NVAR(name);
 				PHALCON_OBS_NVAR(type);
 				PHALCON_OBS_NVAR(tmp_name);
@@ -1564,10 +1539,9 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 					prefix.len = 0;
 				}
 
-				if (likely(Z_TYPE_P(index) == IS_STRING)) {
-					smart_str_appendl(&prefix, Z_STRVAL_P(index), Z_STRLEN_P(index));
-				}
-				else {
+				if (likely(Z_TYPE(index) == IS_STRING)) {
+					smart_str_appendl(&prefix, Z_STRVAL(index), Z_STRLEN(index));
+				} else {
 					smart_str_append_long(&prefix, Z_LVAL_P(index));
 				}
 
@@ -1575,9 +1549,7 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 				phalcon_http_request_getuploadedfiles_helper(&return_value, name, type, tmp_name, error, size, only_successful, &prefix);
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	smart_str_free(&prefix);
 
@@ -1593,7 +1565,7 @@ PHP_METHOD(Phalcon_Http_Request, getHeaders){
 
 	zval *_SERVER;
 	HashPosition hp0;
-	zval **hd;
+	zval *hd;
 
 	array_init(return_value);
 	_SERVER = phalcon_get_global(SS("_SERVER"));
@@ -1603,17 +1575,17 @@ PHP_METHOD(Phalcon_Http_Request, getHeaders){
 
 	for (
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(_SERVER), &hp0);
-		zend_hash_get_current_data_ex(Z_ARRVAL_P(_SERVER), (void**)&hd, &hp0) == SUCCESS;
+		(hd = zend_hash_get_current_data_ex(Z_ARRVAL_P(_SERVER), &hp0)) != NULL;
 		zend_hash_move_forward_ex(Z_ARRVAL_P(_SERVER), &hp0)
 	) {
-		zval key = phalcon_get_current_key_w(Z_ARRVAL_P(_SERVER), &hp0);
+		zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(_SERVER), &hp0);
 
-		if (Z_TYPE(key) == IS_STRING && Z_STRLEN(key) > 5 && !memcmp(Z_STRVAL(key), "HTTP_", 5)) {
+		if (Z_TYPE_P(key) == IS_STRING && Z_STRLEN_P(key) > 5 && !memcmp(Z_STRVAL_P(key), "HTTP_", 5)) {
 			zval *header;
 
 			PHALCON_ALLOC_GHOST_ZVAL(header);
-			ZVAL_STRINGL(header, Z_STRVAL(key) + 5, Z_STRLEN(key) - 5);
-			phalcon_array_update_zval(&return_value, header, *hd, PH_COPY);
+			ZVAL_STRINGL(header, Z_STRVAL_P(key) + 5, Z_STRLEN_P(key) - 5);
+			phalcon_array_update_zval(&return_value, header, hd, PH_COPY);
 		}
 	}
 }
@@ -1666,12 +1638,7 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 	ZVAL_STRING(pattern, "/,\\s*/");
 	PHALCON_CALL_FUNCTION(&parts, "preg_split", pattern, http_server);
 
-	phalcon_is_iterable(parts, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(part);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(parts), part) {
 		PHALCON_INIT_NVAR(header_parts);
 		phalcon_fast_explode_str(header_parts, SL(";"), part);
 		if (phalcon_array_isset_long(header_parts, 1)) {
@@ -1692,9 +1659,7 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 		phalcon_array_update_zval(&quality_part, name, header_name, PH_COPY);
 		phalcon_array_update_string(&quality_part, SL("quality"), quality, PH_COPY);
 		phalcon_array_append(&return_value, quality_part, 0);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_MM_RESTORE();
 }
@@ -1725,12 +1690,7 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 	PHALCON_INIT_VAR(selected_name);
 	ZVAL_EMPTY_STRING(selected_name);
 
-	phalcon_is_iterable(quality_parts, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(accept);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(quality_parts), accept) {
 		if (i == 0) {
 			PHALCON_OBS_NVAR(quality);
 			phalcon_array_fetch_string(&quality, accept, SL("quality"), PH_NOISY);
@@ -1752,8 +1712,7 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 		}
 
 		++i;
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(selected_name);
 }
@@ -1969,15 +1928,11 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 		if (zend_is_true(ret) && Z_TYPE_P(matches) == IS_ARRAY) {
 			array_init(return_value);
 
-			phalcon_is_iterable(matches, &ah0, &hp0, 0, 0);
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-				PHALCON_GET_HVALUE(match);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(matches), match) {
 				if (Z_TYPE_P(match) == IS_ARRAY && phalcon_array_isset_long_fetch(&tmp1, match, 1) && phalcon_array_isset_long_fetch(&tmp2, match, 3)) {
 					phalcon_array_update_zval(&return_value, tmp1, tmp2, PH_COPY);
 				}
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 			RETURN_MM();
 		}

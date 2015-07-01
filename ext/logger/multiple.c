@@ -129,18 +129,10 @@ PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 	
 	PHALCON_OBS_VAR(loggers);
 	phalcon_read_property_this(&loggers, this_ptr, SL("_loggers"), PH_NOISY);
-	if (Z_TYPE_P(loggers) == IS_ARRAY) { 
-	
-		phalcon_is_iterable(loggers, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(logger);
-	
+	if (Z_TYPE_P(loggers) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(loggers), logger) {
 			PHALCON_CALL_METHOD(NULL, logger, "setformatter", formatter);
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	}
 	
@@ -189,19 +181,10 @@ PHP_METHOD(Phalcon_Logger_Multiple, log){
 
 	PHALCON_OBS_VAR(loggers);
 	phalcon_read_property_this(&loggers, this_ptr, SL("_loggers"), PH_NOISY);
-	if (Z_TYPE_P(loggers) == IS_ARRAY) { 
-	
-		phalcon_is_iterable(loggers, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(logger);
-	
+	if (Z_TYPE_P(loggers) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(loggers), logger) {
 			PHALCON_CALL_METHOD(NULL, logger, "log", message, type, context);
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
-	
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	PHALCON_MM_RESTORE();

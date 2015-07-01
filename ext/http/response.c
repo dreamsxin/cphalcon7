@@ -209,19 +209,15 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode){
 	PHALCON_CALL_METHOD(&current_headers_raw, headers, "toarray");
 
 	if (Z_TYPE_P(current_headers_raw) == IS_ARRAY) {
-
-		phalcon_is_iterable(current_headers_raw, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(header_name, ah0, hp0);
-
-			if (Z_TYPE_P(header_name) == IS_STRING && (size_t)(Z_STRLEN_P(header_name)) > sizeof("HTTP/x.y ")-1 && !memcmp(Z_STRVAL_P(header_name), "HTTP/", 5)) {
-				PHALCON_CALL_METHOD(NULL, headers, "remove", header_name);
+		ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL_P(current_headers_raw), str_key) {
+			if (str_key) {
+				zval header_name;
+				ZVAL_STR(&header_name, str_key);
+				if ((size_t)(Z_STRLEN(header_name)) > sizeof("HTTP/x.y ")-1 && !memcmp(Z_STRVAL(header_name), "HTTP/", 5)) {
+					PHALCON_CALL_METHOD(NULL, headers, "remove", &header_name);
+				}
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_INIT_VAR(header_value);

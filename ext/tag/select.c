@@ -385,45 +385,39 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 	PHALCON_INIT_VAR(code);
 	ZVAL_EMPTY_STRING(code);
 
-	phalcon_is_iterable(data, &ah0, &hp0, 0, 0);
-
-	PHALCON_INIT_VAR(escaped);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(option_value, ah0, hp0);
-		PHALCON_GET_HVALUE(option_text);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, option_text) {
+		zval option_value, escaped;
+		if (str_key) {
+			ZVAL_STR(&option_value, str_key);
+		} else {
+			ZVAL_LONG(&option_value, idx);
+		}
 
 		if (Z_TYPE_P(option_text) == IS_ARRAY) {
-			phalcon_htmlspecialchars(escaped, option_value, NULL, NULL);
+			phalcon_htmlspecialchars(escaped, &option_value, NULL, NULL);
 
 			PHALCON_CALL_SELF(&array_options, "_optionsfromarray", option_text, value, close_option);
 
 			PHALCON_SCONCAT_SVSVS(code, "\t<optgroup label=\"", escaped, "\">" PHP_EOL, array_options, "\t</optgroup>" PHP_EOL);
 		} else {
-			phalcon_htmlspecialchars(escaped, option_value, NULL, NULL);
+			phalcon_htmlspecialchars(&escaped, option_value, NULL, NULL);
 		
 			if (Z_TYPE_P(value) == IS_ARRAY) { 
-				if (phalcon_fast_in_array(option_value, value)) {
+				if (phalcon_fast_in_array(&option_value, value)) {
 					PHALCON_SCONCAT_SVSVV(code, "\t<option selected=\"selected\" value=\"", escaped, "\">", option_text, close_option);
 				} else {
 					PHALCON_SCONCAT_SVSVV(code, "\t<option value=\"", escaped, "\">", option_text, close_option);
 				}
 			} else {
-				convert_to_string(option_value);
-				if (PHALCON_IS_EQUAL(option_value, value)) {
+				convert_to_string(&option_value);
+				if (PHALCON_IS_EQUAL(&option_value, value)) {
 					PHALCON_SCONCAT_SVSVV(code, "\t<option selected=\"selected\" value=\"", escaped, "\">", option_text, close_option);
 				} else {
 					PHALCON_SCONCAT_SVSVV(code, "\t<option value=\"", escaped, "\">", option_text, close_option);
 				}
 			}
 		}
-		
-		zval_dtor(escaped);
-		ZVAL_NULL(escaped);
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(code);
 }

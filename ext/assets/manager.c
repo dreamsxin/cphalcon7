@@ -664,12 +664,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		}
 	}
 
-	phalcon_is_iterable(resources, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HVALUE(resource);
-
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(resources), resource) {
 		PHALCON_INIT_NVAR(filter_needed);
 		ZVAL_FALSE(filter_needed);
 
@@ -803,7 +798,6 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				phalcon_concat_self(&output, html);
 			}
 
-			zend_hash_move_forward_ex(ah0, &hp0);
 			continue;
 		}
 
@@ -823,13 +817,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 * Only filter the resource if it's marked as 'filterable'
 			 */
 			if (zend_is_true(must_filter)) {
-
-				phalcon_is_iterable(filters, &ah1, &hp1, 0, 0);
-
-				while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-
-					PHALCON_GET_HVALUE(filter);
-
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(filters), filter) {
 					/** 
 					 * Filters must be valid objects
 					 */
@@ -843,9 +831,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 					 */
 					PHALCON_CALL_METHOD(&filtered_content, filter, "filter", content);
 					PHALCON_CPY_WRT_CTOR(content, filtered_content);
-
-					zend_hash_move_forward_ex(ah1, &hp1);
-				}
+				} ZEND_HASH_FOREACH_END();
 
 				/**
 				 * Update the joined filtered content
@@ -947,9 +933,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				phalcon_concat_self(&output, html);
 			}
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	if (Z_TYPE_P(filters) == IS_ARRAY) { 
 		if (zend_is_true(join)) {

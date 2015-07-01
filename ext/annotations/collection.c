@@ -116,7 +116,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Collection){
  */
 PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 
-	zval *reflection_data = NULL, *annotations, **annotation_data;
+	zval *reflection_data = NULL, *annotations, *annotation_data;
 	zval *annotation = NULL;
 	HashPosition hp0;
 
@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 
 	for (
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(reflection_data), &hp0);
-		zend_hash_get_current_data_ex(Z_ARRVAL_P(reflection_data), (void**)&annotation_data, &hp0) == SUCCESS;
+		(annotation_data = zend_hash_get_current_data_ex(Z_ARRVAL_P(reflection_data), &hp0)) != NULL;
 		zend_hash_move_forward_ex(Z_ARRVAL_P(reflection_data), &hp0)
 	) {
 		PHALCON_INIT_NVAR(annotation);
@@ -272,24 +272,16 @@ PHP_METHOD(Phalcon_Annotations_Collection, get){
 	
 	PHALCON_OBS_VAR(annotations);
 	phalcon_read_property_this(&annotations, this_ptr, SL("_annotations"), PH_NOISY);
-	if (Z_TYPE_P(annotations) == IS_ARRAY) { 
-	
-		phalcon_is_iterable(annotations, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(annotation);
-	
+	if (Z_TYPE_P(annotations) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
 			if (PHALCON_IS_EQUAL(name, annotation_name)) {
 				RETURN_CCTOR(annotation);
 			}
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	
 	}
-	
+
 	PHALCON_INIT_VAR(exception_message);
 	PHALCON_CONCAT_SVS(exception_message, "The collection doesn't have an annotation called '", name, "'");
 	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_annotations_exception_ce, exception_message);
@@ -318,22 +310,13 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 	
 	PHALCON_OBS_VAR(annotations);
 	phalcon_read_property_this(&annotations, this_ptr, SL("_annotations"), PH_NOISY);
-	if (Z_TYPE_P(annotations) == IS_ARRAY) { 
-	
-		phalcon_is_iterable(annotations, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(annotation);
-	
+	if (Z_TYPE_P(annotations) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
 			if (PHALCON_IS_EQUAL(name, annotation_name)) {
 				phalcon_array_append(&found, annotation, 0);
 			}
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
-	
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	RETURN_CTOR(found);
@@ -358,22 +341,13 @@ PHP_METHOD(Phalcon_Annotations_Collection, has){
 	
 	PHALCON_OBS_VAR(annotations);
 	phalcon_read_property_this(&annotations, this_ptr, SL("_annotations"), PH_NOISY);
-	if (Z_TYPE_P(annotations) == IS_ARRAY) { 
-	
-		phalcon_is_iterable(annotations, &ah0, &hp0, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(annotation);
-	
+	if (Z_TYPE_P(annotations) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
 			if (PHALCON_IS_EQUAL(name, annotation_name)) {
 				RETURN_MM_TRUE;
 			}
-	
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
-	
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	RETURN_MM_FALSE;

@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 
 			for (
 				zend_hash_internal_pointer_reset_ex(props, &hp);
-				zend_hash_get_current_data_ex(props, (void**)&property, &hp) != FAILURE;
+				(property = zend_hash_get_current_data_ptr_ex(props, &hp)) != NULL;
 				zend_hash_move_forward_ex(props, &hp)
 			) {
 				const char *cmt;
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 
 			for (
 				zend_hash_internal_pointer_reset_ex(methods, &hp);
-				zend_hash_get_current_data_ex(methods, (void**)&method, &hp) != FAILURE;
+				(method = zend_hash_get_current_data_ptr_ex(methods, &hp)) != NULL;
 				zend_hash_move_forward_ex(methods, &hp)
 			) {
 				const char *cmt;

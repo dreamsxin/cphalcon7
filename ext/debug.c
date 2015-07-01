@@ -415,9 +415,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 	zval *argument, *n = NULL, *number_arguments, *dump;
 	zval *v = NULL, *k = NULL, *var_dump = NULL, *escaped_string = NULL, *next = NULL, *array_dump = NULL;
 	zval *class_name = NULL, *joined_dump;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -437,22 +435,22 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 				PHALCON_INIT_VAR(dump);
 				array_init(dump);
 
-				phalcon_is_iterable(argument, &ah0, &hp0, 0, 0);
-
-				while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-					PHALCON_GET_HKEY(k, ah0, hp0);
-					PHALCON_GET_HVALUE(v);
-
+				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(argument), idx, k, v) {
+					zval tmp;
+					if (k) {
+						ZVAL_STR(&tmp, k);
+					} else {
+						ZVAL_LONG(&tmp, idx);
+					}
 					if (PHALCON_IS_SCALAR(v)) {
 						if (PHALCON_IS_STRING(v, "")) {
 							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVS(var_dump, "[", k, "] =&gt; (empty string)");
+							PHALCON_CONCAT_SVS(var_dump, "[", &tmp, "] =&gt; (empty string)");
 						} else {
 							PHALCON_CALL_METHOD(&escaped_string, this_ptr, "_escapestring", v);
 
 							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVSV(var_dump, "[", k, "] =&gt; ", escaped_string);
+							PHALCON_CONCAT_SVSV(var_dump, "[", &tmp, "] =&gt; ", escaped_string);
 						}
 						phalcon_array_append(&dump, var_dump, PH_SEPARATE);
 					} else {
@@ -463,9 +461,8 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 							PHALCON_CALL_METHOD(&array_dump, this_ptr, "_getarraydump", v, next);
 
 							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVSVS(var_dump, "[", k, "] =&gt; Array(", array_dump, ")");
+							PHALCON_CONCAT_SVSVS(var_dump, "[", &tmp, "] =&gt; Array(", array_dump, ")");
 							phalcon_array_append(&dump, var_dump, PH_SEPARATE);
-							zend_hash_move_forward_ex(ah0, &hp0);
 							continue;
 						}
 						if (Z_TYPE_P(v) == IS_OBJECT) {
@@ -474,27 +471,23 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 							ZVAL_NEW_STR(class_name, ce->name);
 
 							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVSVS(var_dump, "[", k, "] =&gt; Object(", class_name, ")");
+							PHALCON_CONCAT_SVSVS(var_dump, "[", &tmp, "] =&gt; Object(", class_name, ")");
 							phalcon_array_append(&dump, var_dump, PH_SEPARATE);
-							zend_hash_move_forward_ex(ah0, &hp0);
 							continue;
 						}
 
 						if (Z_TYPE_P(v) == IS_NULL) {
 							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVS(var_dump, "[", k, "] =&gt; null");
+							PHALCON_CONCAT_SVS(var_dump, "[", &tmp, "] =&gt; null");
 							phalcon_array_append(&dump, var_dump, PH_SEPARATE);
-							zend_hash_move_forward_ex(ah0, &hp0);
 							continue;
 						}
 
 						PHALCON_INIT_NVAR(var_dump);
-						PHALCON_CONCAT_SVSV(var_dump, "[", k, "] =&gt; ", v);
+						PHALCON_CONCAT_SVSV(var_dump, "[", &tmp, "] =&gt; ", v);
 						phalcon_array_append(&dump, var_dump, PH_SEPARATE);
 					}
-
-					zend_hash_move_forward_ex(ah0, &hp0);
-				}
+				} ZEND_HASH_FOREACH_END();
 
 				PHALCON_INIT_VAR(joined_dump);
 				phalcon_fast_join_str(joined_dump, SL(", "), dump);
@@ -531,9 +524,9 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 		 */
 		if (PHALCON_IS_BOOL(variable)) {
 			if (zend_is_true(variable)) {
-				RETURN_MM_STRING("true", 1);
+				RETURN_MM_STRING("true");
 			} else {
-				RETURN_MM_STRING("false", 1);
+				RETURN_MM_STRING("false");
 			}
 		}
 
@@ -600,7 +593,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 	 * Null variables are represented as 'null'
 	 * Other types are represented by its type
 	 */
-	RETURN_MM_STRING(zend_zval_type_name(variable), 1);
+	RETURN_MM_STRING(zend_zval_type_name(variable));
 }
 
 /**
@@ -733,9 +726,6 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 	zval *comment, *i = NULL, *line_position = NULL, *current_line = NULL;
 	zval *trimmed = NULL, *is_comment = NULL, *spaced_current_line = NULL;
 	zval *escaped_line = NULL, *formatted_file = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -849,12 +839,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			PHALCON_INIT_VAR(arguments);
 			array_init(arguments);
 
-			phalcon_is_iterable(trace_args, &ah0, &hp0, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-				PHALCON_GET_HVALUE(argument);
-
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(trace_args), argument) {
 				/** 
 				 * Every argument is generated using _getVarDump
 				 */
@@ -867,9 +852,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 * Append the HTML generated to the argument's list
 				 */
 				phalcon_array_append(&arguments, span_argument, PH_SEPARATE);
-
-				zend_hash_move_forward_ex(ah0, &hp0);
-			}
+			} ZEND_HASH_FOREACH_END();
 
 			/** 
 			 * Join all the arguments
@@ -1060,13 +1043,11 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	zval *key_server = NULL, *files = NULL, *key_file = NULL;
 	zval *memory, *data_var = NULL, *key_var = NULL, *variable = NULL, *dumped_argument = NULL;
 	zval *js_sources = NULL, *formatted_file = NULL;
-	HashTable *ah0, *ah1, *ah2, *ah3, *ah4;
-	HashPosition hp0, hp1, hp2, hp3, hp4;
-	zval **hd;
-	char* link_format;
 	zend_bool ini_exists = 1;
 	zval z_link_format = zval_used_for_init;
 	zend_class_entry *ce;
+	ulong idx;
+	char* link_format;
 
 	PHALCON_MM_GROW();
 
@@ -1176,21 +1157,20 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
 		PHALCON_CALL_METHOD(&trace, exception, "gettrace");
 
-		phalcon_is_iterable(trace, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(n, ah0, hp0);
-			PHALCON_GET_HVALUE(trace_item);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(trace), idx, n, trace_item) {
+			zval tmp;
+			if (n) {
+				ZVAL_STR(&tmp, n);
+			} else {
+				ZVAL_LONG(&tmp, idx);
+			}
 
 			/** 
 			 * Every line in the trace is rendered using 'showTraceItem'
 			 */
-			PHALCON_CALL_METHOD(&html_item, this_ptr, "showtraceitem", n, trace_item, &z_link_format);
+			PHALCON_CALL_METHOD(&html_item, this_ptr, "showtraceitem", &tmp, trace_item, &z_link_format);
 			phalcon_concat_self(&html, html_item);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
 
@@ -1202,20 +1182,20 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		_REQUEST = phalcon_get_global(SS("_REQUEST"));
 
 		if (Z_TYPE_P(_REQUEST) == IS_ARRAY) {
-			phalcon_is_iterable(_REQUEST, &ah1, &hp1, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-				PHALCON_GET_HKEY(key_request, ah1, hp1);
-				PHALCON_GET_HVALUE(value);
-
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(_REQUEST), idx, key_request, value) {
+				zval tmp;
+				if (key_request) {
+					ZVAL_STR(&tmp, key_request);
+				} else {
+					ZVAL_LONG(&tmp, idx);
+				}
 				if (Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_METHOD(&joined_value, this_ptr, "_getvardump", value);
-					PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", key_request, "</td><td>", joined_value, "</td></tr>");
+					PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", &tmp, "</td><td>", joined_value, "</td></tr>");
 				} else {
-					PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", key_request, "</td><td>", value, "</td></tr>");
+					PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", &tmp, "</td><td>", value, "</td></tr>");
 				}
-				zend_hash_move_forward_ex(ah1, &hp1);
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
@@ -1228,18 +1208,16 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		_SERVER = phalcon_get_global(SS("_SERVER"));
 
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
-			phalcon_is_iterable(_SERVER, &ah2, &hp2, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-
-				PHALCON_GET_HKEY(key_server, ah2, hp2);
-				PHALCON_GET_HVALUE(value);
-
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(_SERVER), idx, key_server, value) {
+				zval tmp;
+				if (key_server) {
+					ZVAL_STR(&tmp, key_server);
+				} else {
+					ZVAL_LONG(&tmp, idx);
+				}
 				PHALCON_CALL_METHOD(&dumped_argument, this_ptr, "_getvardump", value);
-				PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", key_server, "</td><td>", dumped_argument, "</td></tr>");
-
-				zend_hash_move_forward_ex(ah2, &hp2);
-			}
+				PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", &tmp, "</td><td>", dumped_argument, "</td></tr>");
+			} ZEND_HASH_FOREACH_END();
 		}
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
@@ -1251,17 +1229,16 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-4\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
 		phalcon_concat_self_str(&html, SL("<tr><th>#</th><th>Path</th></tr>"));
 
-		phalcon_is_iterable(files, &ah3, &hp3, 0, 0);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(files), idx, key_file, value) {
+			zval tmp;
+			if (key_file) {
+				ZVAL_STR(&tmp, key_file);
+			} else {
+				ZVAL_LONG(&tmp, idx);
+			}
 
-		while (zend_hash_get_current_data_ex(ah3, (void**) &hd, &hp3) == SUCCESS) {
-
-			PHALCON_GET_HKEY(key_file, ah3, hp3);
-			PHALCON_GET_HVALUE(value);
-
-			PHALCON_SCONCAT_SVSVS(html, "<tr><td>", key_file, "</th><td>", value, "</td></tr>");
-
-			zend_hash_move_forward_ex(ah3, &hp3);
-		}
+			PHALCON_SCONCAT_SVSVS(html, "<tr><td>", &tmp, "</th><td>", value, "</td></tr>");
+		} ZEND_HASH_FOREACH_END();
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
 
@@ -1281,21 +1258,20 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 			phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-6\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
 			phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>"));
 
-			phalcon_is_iterable(data_vars, &ah4, &hp4, 0, 0);
-
-			while (zend_hash_get_current_data_ex(ah4, (void**) &hd, &hp4) == SUCCESS) {
-
-				PHALCON_GET_HKEY(key_var, ah4, hp4);
-				PHALCON_GET_HVALUE(data_var);
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data_vars), idx, key_var, data_var) {
+				zval tmp;
+				if (key_var) {
+					ZVAL_STR(&tmp, key_var);
+				} else {
+					ZVAL_LONG(&tmp, idx);
+				}
 
 				PHALCON_OBS_NVAR(variable);
 				phalcon_array_fetch_long(&variable, data_var, 0, PH_NOISY);
 
 				PHALCON_CALL_METHOD(&dumped_argument, this_ptr, "_getvardump", variable);
-				PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", key_var, "</td><td>", dumped_argument, "</td></tr>");
-
-				zend_hash_move_forward_ex(ah4, &hp4);
-			}
+				PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", &tmp, "</td><td>", dumped_argument, "</td></tr>");
+			} ZEND_HASH_FOREACH_END();
 
 			phalcon_concat_self_str(&html, SL("</table></div>"));
 		}

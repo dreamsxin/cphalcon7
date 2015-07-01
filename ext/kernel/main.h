@@ -77,9 +77,6 @@ long int phalcon_fast_count_int(zval *value);
 void phalcon_fast_count(zval *result, zval *array);
 int phalcon_fast_count_ev(zval *array);
 
-/* Utils functions */
-int phalcon_is_iterable_ex(zval *arr, HashTable **arr_hash, HashPosition *hash_position, int duplicate, int reverse);
-
 static inline int is_phalcon_class(const zend_class_entry *ce)
 {
 	return
@@ -189,7 +186,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define RETURN_MM_TRUE PHALCON_MM_RESTORE(); RETURN_TRUE;
 
 /** Return string restoring memory frame */
-#define RETURN_MM_STRING(str, copy) PHALCON_MM_RESTORE(); RETURN_STRING(str, copy);
+#define RETURN_MM_STRING(str) PHALCON_MM_RESTORE(); RETURN_STRING(str);
 #define RETURN_MM_EMPTY_STRING() PHALCON_MM_RESTORE(); RETURN_EMPTY_STRING();
 
 /* Return long */
@@ -215,14 +212,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 		PHALCON_INIT_NVAR(var); \
 		it->funcs->get_current_key(it, var); \
 	} while (0)
-
-/** Check if an array is iterable or not */
-#define phalcon_is_iterable(var, array_hash, hash_pointer, duplicate, reverse) \
-	if (!phalcon_is_iterable_ex(var, array_hash, hash_pointer, duplicate, reverse)) { \
-		zend_error(E_ERROR, "The argument is not iterable()"); \
-		PHALCON_MM_RESTORE(); \
-		return; \
-	}
 
 #define PHALCON_GET_HVALUE(var) \
 	PHALCON_OBS_NVAR(var); \

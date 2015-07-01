@@ -256,19 +256,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 		PHALCON_INIT_VAR(dsn_parts);
 		array_init(dsn_parts);
 
-		phalcon_is_iterable(descriptor, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(value);
-
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(descriptor), idx, str_key, value) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
 			PHALCON_INIT_NVAR(dsn_attribute);
-			PHALCON_CONCAT_VSV(dsn_attribute, key, "=", value);
+			PHALCON_CONCAT_VSV(dsn_attribute, &key, "=", value);
 			phalcon_array_append(&dsn_parts, dsn_attribute, PH_SEPARATE);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_VAR(dsn_attributes);
 		phalcon_fast_join_str(dsn_attributes, SL(";"), dsn_parts);
@@ -373,19 +371,20 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 
 	z_one = PHALCON_GLOBAL(z_one);
 
-	phalcon_is_iterable(placeholders, &ah0, &hp0, 0, 0);
-
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-		PHALCON_GET_HKEY(wildcard, ah0, hp0);
-		PHALCON_GET_HVALUE(value);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
+		zval wildcard;
+		if (str_key) {
+			ZVAL_STR(&wildcard, str_key);
+		} else {
+			ZVAL_LONG(&wildcard, idx);
+		}
 
 		if (Z_TYPE_P(wildcard) == IS_LONG) {
 			PHALCON_INIT_NVAR(parameter);
-			phalcon_add_function(parameter, wildcard, z_one);
+			phalcon_add_function(parameter, &wildcard, z_one);
 		} else {
 			if (Z_TYPE_P(wildcard) == IS_STRING) {
-				PHALCON_CPY_WRT(parameter, wildcard);
+				PHALCON_CPY_WRT(parameter, &wildcard);
 			} else {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid bind parameter");
 				return;
@@ -394,13 +393,13 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 
 		if (Z_TYPE_P(data_types) == IS_ARRAY) {
 
-			if (likely(phalcon_array_isset(data_types, wildcard))) {
+			if (likely(phalcon_array_isset(data_types, &wildcard))) {
 
 				/**
 				 * The bind type is double so we try to get the double value
 				 */
 				PHALCON_OBS_NVAR(type);
-				phalcon_array_fetch(&type, data_types, wildcard, PH_NOISY);
+				phalcon_array_fetch(&type, data_types, &wildcard, PH_NOISY);
 				if (phalcon_compare_strict_long(type, 32)) {
 
 					PHALCON_INIT_NVAR(cast_value);
@@ -426,27 +425,20 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 			} else {
 				PHALCON_INIT_NVAR(type);
 				if (Z_TYPE_P(value) == IS_LONG) {
-					ZVAL_LONG(type, 1 /* BIND_PARAM_INT */);
-				}
-				else {
-					ZVAL_LONG(type, 2 /* BIND_PARAM_STR */);
+					ZVAL_LONG(type, PHALCON_DB_COLUMN_BIND_PARAM_INT);
+				} else {
+					ZVAL_LONG(type, PHALCON_DB_COLUMN_BIND_PARAM_STR);
 				}
 				Z_SET_ISREF_P(value);
 				PHALCON_CALL_METHOD(NULL, statement, "bindvalue", parameter, value, type);
 				Z_UNSET_ISREF_P(value);
-/*
-				PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid bind type parameter");
-				return;
-*/
 			}
 		} else {
 			Z_SET_ISREF_P(value);
 			PHALCON_CALL_METHOD(NULL, statement, "bindvalue", parameter, value);
 			Z_UNSET_ISREF_P(value);
 		}
-
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 
 	profiler = phalcon_fetch_nproperty_this(this_ptr, SL("_profiler"), PH_NOISY);
 
@@ -775,13 +767,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 	PHALCON_CALL_FUNCTION(&status, "preg_match_all", bind_pattern, sql, matches, set_order);
 	Z_UNSET_ISREF_P(matches);
 	if (zend_is_true(status)) {
-
-		phalcon_is_iterable(matches, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(place_match);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(matches), place_match) {
 			PHALCON_OBS_NVAR(numeric_place);
 			phalcon_array_fetch_long(&numeric_place, place_match, 1, PH_NOISY);
 			if (phalcon_array_isset(params, numeric_place)) {
@@ -804,11 +790,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 					return;
 				}
 			}
-
 			phalcon_array_append(&placeholders, value, PH_SEPARATE);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_VAR(question);
 		ZVAL_STRING(question, "?");

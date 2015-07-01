@@ -21,6 +21,32 @@
 #include "kernel/memory.h"
 
 /**
+ * Initialize an array to start an iteration over it
+ */
+int phalcon_is_iterable_ex(zval *arr, HashTable **arr_hash, HashPosition *hash_position, int duplicate, int reverse) {
+
+	if (unlikely(Z_TYPE_P(arr) != IS_ARRAY)) {
+		return 0;
+	}
+
+	if (duplicate) {
+		ALLOC_HASHTABLE(*arr_hash);
+		zend_hash_init(*arr_hash, 0, NULL, NULL, 0);
+		zend_hash_copy(*arr_hash, Z_ARRVAL_P(arr), NULL);
+	} else {
+		*arr_hash = Z_ARRVAL_P(arr);
+	}
+
+	if (reverse) {
+		zend_hash_internal_pointer_end_ex(*arr_hash, hash_position);
+	} else {
+		zend_hash_internal_pointer_reset_ex(*arr_hash, hash_position);
+	}
+
+	return 1;
+}
+
+/**
 int phalcon_has_numeric_keys(const zval *data)
 {
 	zend_long idx;

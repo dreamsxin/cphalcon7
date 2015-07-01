@@ -706,13 +706,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	
 	PHALCON_OBS_VAR(columns);
 	phalcon_array_fetch_string(&columns, definition, SL("columns"), PH_NOISY);
-	
-	phalcon_is_iterable(columns, &ah0, &hp0, 0, 0);
-	
-	while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-	
-		PHALCON_GET_HVALUE(column);
-	
+
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column) {
 		PHALCON_CALL_METHOD(&column_name, column, "getname");
 		PHALCON_CALL_METHOD(&column_definition, this_ptr, "getcolumndefinition", column);
 
@@ -744,9 +739,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 		}
 	
 		phalcon_array_append(&create_lines, column_line, PH_SEPARATE);
-	
-		zend_hash_move_forward_ex(ah0, &hp0);
-	}
+	} ZEND_HASH_FOREACH_END();
 	
 	/** 
 	 * Create related indexes
@@ -755,18 +748,13 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	
 		PHALCON_OBS_VAR(indexes);
 		phalcon_array_fetch_string(&indexes, definition, SL("indexes"), PH_NOISY);
-	
-		phalcon_is_iterable(indexes, &ah1, &hp1, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah1, (void**) &hd, &hp1) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(index);
-	
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(indexes), index) {
 			PHALCON_CALL_METHOD(&index_name, index, "getname");
 			PHALCON_CALL_METHOD(&columns, index, "getcolumns");
 			PHALCON_CALL_METHOD(&column_list, this_ptr, "getcolumnlist", columns);
 			PHALCON_CALL_METHOD(&index_type, index, "gettype");
-	
+
 			/** 
 			 * If the index name is primary we add a primary key
 			 */
@@ -778,12 +766,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 			} else {
 				PHALCON_CONCAT_SVSVS(index_sql, "KEY `", index_name, "` (", column_list, ")");
 			}
-	
 			phalcon_array_append(&create_lines, index_sql, PH_SEPARATE);
-	
-			zend_hash_move_forward_ex(ah1, &hp1);
-		}
-	
+		} ZEND_HASH_FOREACH_END();
 	}
 	
 	/** 
@@ -793,13 +777,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	
 		PHALCON_OBS_VAR(references);
 		phalcon_array_fetch_string(&references, definition, SL("references"), PH_NOISY);
-	
-		phalcon_is_iterable(references, &ah2, &hp2, 0, 0);
-	
-		while (zend_hash_get_current_data_ex(ah2, (void**) &hd, &hp2) == SUCCESS) {
-	
-			PHALCON_GET_HVALUE(reference);
-	
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(references), reference) {
 			PHALCON_CALL_METHOD(&name, reference, "getname");
 			PHALCON_CALL_METHOD(&columns, reference, "getcolumns");
 			PHALCON_CALL_METHOD(&column_list, this_ptr, "getcolumnlist", columns);
@@ -813,12 +792,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 			PHALCON_INIT_NVAR(reference_sql);
 			PHALCON_CONCAT_VSVSVS(reference_sql, constaint_sql, " REFERENCES `", referenced_table, "`(", referenced_column_list, ")");
 			phalcon_array_append(&create_lines, reference_sql, PH_SEPARATE);
-	
-			zend_hash_move_forward_ex(ah2, &hp2);
-		}
-	
+		} ZEND_HASH_FOREACH_END();
 	}
-	
+
 	PHALCON_INIT_VAR(joined_lines);
 	phalcon_fast_join_str(joined_lines, SL(",\n\t"), create_lines);
 	PHALCON_SCONCAT_VS(sql, joined_lines, "\n)");
@@ -826,7 +802,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 		PHALCON_CALL_METHOD(&options, this_ptr, "_gettableoptions", definition);
 		PHALCON_SCONCAT_SV(sql, " ", options);
 	}
-	
+
 	RETURN_CTOR(sql);
 }
 
@@ -1032,7 +1008,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, listTables){
 		PHALCON_CONCAT_SVS(return_value, "SHOW TABLES FROM `", schema_name, "`");
 	}
 	else {
-		RETURN_STRING("SHOW TABLES", 1);
+		RETURN_STRING("SHOW TABLES");
 	}
 }
 
@@ -1052,7 +1028,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, listViews){
 		PHALCON_CONCAT_SVS(return_value, "SELECT `TABLE_NAME` AS view_name FROM `INFORMATION_SCHEMA`.`VIEWS` WHERE `TABLE_SCHEMA` = '", schema_name, "' ORDER BY view_name");
 	}
 	else {
-		RETURN_STRING("SELECT `TABLE_NAME` AS view_name FROM `INFORMATION_SCHEMA`.`VIEWS` ORDER BY view_name", 1);
+		RETURN_STRING("SELECT `TABLE_NAME` AS view_name FROM `INFORMATION_SCHEMA`.`VIEWS` ORDER BY view_name");
 	}
 }
 

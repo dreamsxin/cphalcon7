@@ -172,23 +172,20 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, reset)
 		PHALCON_INIT_VAR(real_key);
 		phalcon_concat_svs(&real_key, SL("$PMM$"), prefix, SL("meta-"), 0);
 		PHALCON_CALL_FUNCTION(NULL, "xcache_unset_by_prefix", real_key);
-	}
-	else if (Z_TYPE_P(meta) == IS_ARRAY) {
-		HashTable *ht = Z_ARRVAL_P(meta);
-		HashPosition hp;
+	} else if (Z_TYPE_P(meta) == IS_ARRAY) {
 		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
 
-		for (
-			zend_hash_internal_pointer_reset_ex(ht, &hp);
-			zend_hash_get_current_key_type_ex(ht, &hp) != HASH_KEY_NON_EXISTENT;
-			zend_hash_move_forward_ex(ht, &hp)
-		) {
-			zval key = phalcon_get_current_key_w(ht, &hp);
-
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(meta), idx, str_key, value) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
 			PHALCON_INIT_NVAR(real_key);
 			phalcon_concat_svsv(&real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0);
 			PHALCON_CALL_FUNCTION(NULL, "xcache_unset", real_key);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_xcache_ce, getThis(), "reset");

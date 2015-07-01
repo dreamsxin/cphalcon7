@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Events_Manager, getResponses){
  */
 PHP_METHOD(Phalcon_Events_Manager, detach){
 
-	zval *type, *handler, *events = NULL, *queue, *priority_queue = NULL;
+	zval *type, *handler, *events = NULL, *queue, priority_queue;
 	zval *listener = NULL, *handler_embeded = NULL, *priority = NULL;
 	zval *r0 = NULL, *key = NULL;
 	HashTable *ah0;
@@ -346,26 +346,25 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHOD(NULL, queue, "next");
 		}
 	} else {
-		PHALCON_CPY_WRT(priority_queue, queue);
-
-		phalcon_is_iterable(queue, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(listener);
+		ZVAL_ARR(&priority_queue, zend_array_dup(queue));
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(queue), idx, str_key, listener) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
 
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
 
 			if (phalcon_is_equal_object(handler_embeded, handler)) {
-				phalcon_array_unset(&priority_queue, key, PH_SEPARATE);
+				phalcon_array_unset(&priority_queue, &key, PH_SEPARATE);
 			}
 
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_array_update_zval(&events, type, priority_queue, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_zval(&events, type, &priority_queue, PH_COPY | PH_SEPARATE);
 	phalcon_update_property_this(this_ptr, SL("_events"), events);
 
 	PHALCON_MM_RESTORE();
@@ -612,13 +611,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 			PHALCON_CALL_METHOD(NULL, iterator, "next");
 		}
 	} else {
-
-		phalcon_is_iterable(queue, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HVALUE(listener);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), listener) {
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
 			/** 
 			 * Only handler objects are valid
@@ -637,7 +630,6 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					if (zend_is_true(handler_referenced)) {
 						PHALCON_CALL_METHOD(&handler, handler_embeded, "get");
 					} else {
-						zend_hash_move_forward_ex(ah0, &hp0);
 						continue;
 					}
 
@@ -716,10 +708,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					}
 				}
 			}
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
-
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	RETURN_CCTOR(status);
@@ -924,19 +913,10 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 			PHALCON_CALL_METHOD(NULL, iterator, "next");
 		}
 	} else {
-		phalcon_is_iterable(queue, &ah0, &hp0, 0, 0);
-
-		while (zend_hash_get_current_data_ex(ah0, (void**) &hd, &hp0) == SUCCESS) {
-
-			PHALCON_GET_HKEY(key, ah0, hp0);
-			PHALCON_GET_HVALUE(listener);
-
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), listener) {
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
-
 			phalcon_array_append(&return_value, handler_embeded, 0);
-
-			zend_hash_move_forward_ex(ah0, &hp0);
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	RETURN_MM();

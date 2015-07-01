@@ -137,19 +137,19 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, __construct){
 	phalcon_fetch_params(0, 1, 4, &message, &field, &type, &code, &collection);
 	
 	if (!field) {
-		field = PHALCON_GLOBAL(z_null);
+		field = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (!type) {
-		type = PHALCON_GLOBAL(z_null);
+		type = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (!collection) {
-		collection = PHALCON_GLOBAL(z_null);
+		collection = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!code) {
-		code = PHALCON_GLOBAL(z_zero);
+		code = &PHALCON_GLOBAL(z_zero);
 	}
 	
 	phalcon_update_property_this(this_ptr, SL("_message"), message);

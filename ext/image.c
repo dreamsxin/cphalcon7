@@ -88,11 +88,11 @@ PHP_METHOD(Phalcon_Image, factory){
 	phalcon_fetch_params(1, 1, 2, &file, &width, &height);
 
 	if (!width) {
-		width = PHALCON_GLOBAL(z_null);
+		width = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!height) {
-		height = PHALCON_GLOBAL(z_null);
+		height = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (phalcon_class_str_exists(SL("imagick"), 0) != NULL) {

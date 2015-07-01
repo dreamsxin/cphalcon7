@@ -93,11 +93,11 @@ PHP_METHOD(Phalcon_Forms_Element_Select, __construct){
 	phalcon_fetch_params(0, 1, 1, 2, &name, &options, &attributes);
 
 	if (!options) {
-		options = PHALCON_GLOBAL(z_null);
+		options = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!attributes) {
-		attributes = PHALCON_GLOBAL(z_null);
+		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
 	phalcon_update_property_this(this_ptr, SL("_optionsValues"), options);
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 	phalcon_fetch_params(0, 1, 0, &option);
 	PHALCON_ENSURE_IS_ARRAY(option);
 
-	values = phalcon_fetch_nproperty_this(getThis(), SL("_optionsValues"), PH_NOISY);
+	values = phalcon_read_property(getThis(), SL("_optionsValues"), PH_NOISY);
 	
 	ALLOC_ZVAL(tmp);
 	if (Z_TYPE_P(values) != IS_ARRAY) {
@@ -177,10 +177,10 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 	phalcon_fetch_params(0, 1, 0, 1, &attributes);
 	
 	if (!attributes) {
-		attributes = PHALCON_GLOBAL(z_null);
+		attributes = &PHALCON_GLOBAL(z_null);
 	}
 	
-	options = phalcon_fetch_nproperty_this(this_ptr, SL("_optionsValues"), PH_NOISY);
+	options = phalcon_read_property(this_ptr, SL("_optionsValues"), PH_NOISY);
 	
 	/** 
 	 * Merged passed attributes with previously defined ones

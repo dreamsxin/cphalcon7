@@ -155,17 +155,17 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 	PHALCON_MM_GROW();
 
-	stream = phalcon_fetch_nproperty_this(this_ptr, SL("_stream"), PH_NOISY);
-	header = phalcon_fetch_nproperty_this(this_ptr, SL("_header"), PH_NOISY);
-	data = phalcon_fetch_nproperty_this(this_ptr, SL("_data"), PH_NOISY);
-	type = phalcon_fetch_nproperty_this(this_ptr, SL("_type"), PH_NOISY);
-	files = phalcon_fetch_nproperty_this(this_ptr, SL("_files"), PH_NOISY);
-	username = phalcon_fetch_nproperty_this(this_ptr, SL("_username"), PH_NOISY);
-	password = phalcon_fetch_nproperty_this(this_ptr, SL("_password"), PH_NOISY);
-	authtype = phalcon_fetch_nproperty_this(this_ptr, SL("_authtype"), PH_NOISY);
-	digest = phalcon_fetch_nproperty_this(this_ptr, SL("_digest"), PH_NOISY);
-	method = phalcon_fetch_nproperty_this(this_ptr, SL("_method"), PH_NOISY);
-	entity_body = phalcon_fetch_nproperty_this(this_ptr, SL("_entity_body"), PH_NOISY);
+	stream = phalcon_read_property(this_ptr, SL("_stream"), PH_NOISY);
+	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
+	data = phalcon_read_property(this_ptr, SL("_data"), PH_NOISY);
+	type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
+	files = phalcon_read_property(this_ptr, SL("_files"), PH_NOISY);
+	username = phalcon_read_property(this_ptr, SL("_username"), PH_NOISY);
+	password = phalcon_read_property(this_ptr, SL("_password"), PH_NOISY);
+	authtype = phalcon_read_property(this_ptr, SL("_authtype"), PH_NOISY);
+	digest = phalcon_read_property(this_ptr, SL("_digest"), PH_NOISY);
+	method = phalcon_read_property(this_ptr, SL("_method"), PH_NOISY);
+	entity_body = phalcon_read_property(this_ptr, SL("_entity_body"), PH_NOISY);
 
 	if (PHALCON_IS_NOT_EMPTY(username)) {
 		if (PHALCON_IS_STRING(authtype, "basic")) {
@@ -397,11 +397,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 	PHALCON_CALL_SELF(&uri, "geturi");
 	PHALCON_CALL_METHOD(&url, uri, "build");
 
-	stream = phalcon_fetch_nproperty_this(this_ptr, SL("_stream"), PH_NOISY);
-	header = phalcon_fetch_nproperty_this(this_ptr, SL("_header"), PH_NOISY);
-	method = phalcon_fetch_nproperty_this(this_ptr, SL("_method"), PH_NOISY);
-	useragent = phalcon_fetch_nproperty_this(this_ptr, SL("_useragent"), PH_NOISY);
-	timeout = phalcon_fetch_nproperty_this(this_ptr, SL("_timeout"), PH_NOISY);
+	stream = phalcon_read_property(this_ptr, SL("_stream"), PH_NOISY);
+	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
+	method = phalcon_read_property(this_ptr, SL("_method"), PH_NOISY);
+	useragent = phalcon_read_property(this_ptr, SL("_useragent"), PH_NOISY);
+	timeout = phalcon_read_property(this_ptr, SL("_timeout"), PH_NOISY);
 
 	PHALCON_INIT_VAR(http);
 	ZVAL_STRING(http, "http");
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 	PHALCON_INIT_NVAR(option);
 	ZVAL_STRING(option, "r");
 
-	PHALCON_CALL_FUNCTION(&fp, "fopen", url, option, PHALCON_GLOBAL(z_false), stream);
+	PHALCON_CALL_FUNCTION(&fp, "fopen", url, option, &PHALCON_GLOBAL(z_false), stream);
 
 	PHALCON_CALL_FUNCTION(NULL, "restore_error_handler");
 

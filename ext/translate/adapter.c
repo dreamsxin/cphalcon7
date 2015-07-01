@@ -62,7 +62,7 @@ static zval* phalcon_translate_adapter_read_dimension(zval *object, zval *offset
 {
 	zval *ret = NULL;
 	int status;
-	zval *params[] = { offset, PHALCON_GLOBAL(z_null) };
+	zval *params[] = { offset, &PHALCON_GLOBAL(z_null) };
 
 	if (!is_phalcon_class(Z_OBJCE_P(object))) {
 		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, _){
 	phalcon_fetch_params(0, 0, 1, 1, &translate_key, &placeholders);
 
 	if (!placeholders) {
-		placeholders = PHALCON_GLOBAL(z_null);
+		placeholders = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_RETURN_CALL_METHODW(this_ptr, "query", translate_key, placeholders);

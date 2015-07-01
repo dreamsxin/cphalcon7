@@ -555,7 +555,7 @@ PHP_METHOD(Phalcon_Arr, choice){
 	phalcon_fetch_params(1, 3, 1, &array, &key, &value1, &value2);
 
 	if (!value2) {
-		value2 = PHALCON_GLOBAL(z_null);
+		value2 = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (phalcon_array_isset(array, key)) {
@@ -1008,7 +1008,7 @@ PHP_METHOD(Phalcon_Arr, flatten){
 			PHALCON_INIT_NVAR(arr);
 			PHALCON_CALL_SELF(&arr, "flatten", value);
 
-			php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(arr), 0);
+			php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(arr));
 		} else {
 			if (zend_is_true(is_assoc)) {
 				if (key) {
@@ -1081,7 +1081,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 	phalcon_fetch_params(1, 1, 1, &array, &filters);
 
 	if (!filters) {
-		filters = PHALCON_GLOBAL(z_null);
+		filters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(filters) != IS_NULL && !phalcon_is_callable(filters)) {
@@ -1132,7 +1132,7 @@ PHP_METHOD(Phalcon_Arr, sum){
 	phalcon_fetch_params(1, 2, 2, &array, &path, &default_value, &delimiter);
 
 	if (!default_value) {
-		default_value = PHALCON_GLOBAL(z_null);
+		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!delimiter) {

@@ -162,8 +162,7 @@ PHP_METHOD(Phalcon_CLI_Console, addModules){
 		return;
 	}
 
-	PHALCON_OBS_VAR(original_modules);
-	phalcon_read_property_this(&original_modules, this_ptr, SL("_modules"), PH_NOISY);
+	original_modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
 
 	PHALCON_INIT_VAR(register_modules);
 	phalcon_fast_array_merge(register_modules, &modules, &original_modules);
@@ -216,15 +215,13 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		array_init(arguments);
 	}
 
-	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cli_console_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
-	PHALCON_OBS_VAR(events_manager);
-	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
+	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 	PHALCON_INIT_VAR(service);
 	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_router);
@@ -246,8 +243,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			}
 		}
 
-		PHALCON_OBS_VAR(modules);
-		phalcon_read_property_this(&modules, this_ptr, SL("_modules"), PH_NOISY);
+		modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
 		if (!phalcon_array_isset(modules, module_name)) {
 			PHALCON_INIT_VAR(exception_msg);
 			PHALCON_CONCAT_SVS(exception_msg, "Module '", module_name, "' isn't registered in the console container");

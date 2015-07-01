@@ -340,7 +340,7 @@ PHP_METHOD(Phalcon_Debug, debugVar){
 	phalcon_fetch_params(0, 1, 1, 1, &var, &key);
 
 	if (!key) {
-		key = PHALCON_GLOBAL(z_null);
+		key = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_INIT_VAR(ztime);
@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 		zval line_break;
 		zval escaped_line_break;
 
-		charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset"));
+		charset = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_charset"));
 
 		INIT_ZVAL(line_break);
 		ZVAL_STRING(&line_break, "\n");
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 		ZVAL_STRING(&escaped_line_break, "\\n");
 
 		ALLOC_INIT_ZVAL(replaced_value);
-		phalcon_fast_str_replace(replaced_value, &line_break, &escaped_line_break, value);
+		PHALCON_STR_REPLACE(replaced_value, &line_break, &escaped_line_break, value);
 		phalcon_htmlentities(return_value, replaced_value, NULL, charset);
 		phalcon_ptr_dtor(replaced_value);
 		return;
@@ -456,7 +456,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 					} else {
 						if (Z_TYPE_P(v) == IS_ARRAY) { 
 							PHALCON_INIT_NVAR(next);
-							phalcon_add_function(next, n, PHALCON_GLOBAL(z_one));
+							phalcon_add_function(next, n, &PHALCON_GLOBAL(z_one));
 
 							PHALCON_CALL_METHOD(&array_dump, this_ptr, "_getarraydump", v, next);
 
@@ -644,8 +644,7 @@ PHP_METHOD(Phalcon_Debug, getCssSources){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(uri);
-	phalcon_read_property_this(&uri, this_ptr, SL("_uri"), PH_NOISY);
+	uri = phalcon_read_property(this_ptr, SL("_uri"), PH_NOISY);
 
 	PHALCON_INIT_VAR(sources);
 	PHALCON_CONCAT_SVS(sources, "<link href=\"", uri, "jquery/jquery-ui.css\" type=\"text/css\" rel=\"stylesheet\" />");
@@ -664,8 +663,7 @@ PHP_METHOD(Phalcon_Debug, getJsSources){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(uri);
-	phalcon_read_property_this(&uri, this_ptr, SL("_uri"), PH_NOISY);
+	uri = phalcon_read_property(this_ptr, SL("_uri"), PH_NOISY);
 
 	PHALCON_INIT_VAR(sources);
 	PHALCON_CONCAT_SVS(sources, "<script type=\"text/javascript\" src=\"", uri, "jquery/jquery.js\"></script>");
@@ -765,7 +763,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 			/* Prepare the class name according to the Phalcon's conventions */
 			PHALCON_INIT_VAR(prepare_uri_class);
-			phalcon_fast_str_replace(prepare_uri_class, namespace_separator, underscore, class_name);
+			PHALCON_STR_REPLACE(prepare_uri_class, namespace_separator, underscore, class_name);
 
 			/* Generate a link to the official docs */
 			PHALCON_SCONCAT_SVSVS(html, "<span class=\"error-class\"><a target=\"_new\" href=\"http://docs.phalconphp.com/en/latest/api/", prepare_uri_class, ".html\">", class_name, "</a></span>");
@@ -774,7 +772,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			phalcon_fast_strtolower(lower_class_name, class_name);
 
 			PHALCON_INIT_VAR(prepare_internal_class);
-			phalcon_fast_str_replace(prepare_internal_class, underscore, minus, lower_class_name);
+			PHALCON_STR_REPLACE(prepare_internal_class, underscore, minus, lower_class_name);
 
 			/* Generate a link to the official docs */
 			PHALCON_SCONCAT_SVSVS(html, "<span class=\"error-class\"><a target=\"_new\" href=\"http://php.net/manual/en/class.", prepare_internal_class, ".php\">", class_name, "</a></span>");
@@ -817,7 +815,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 * Prepare function's name according to the conventions in the docs
 				 */
 				PHALCON_INIT_VAR(prepared_function_name);
-				phalcon_fast_str_replace(prepared_function_name, underscore, minus, function_name);
+				PHALCON_STR_REPLACE(prepared_function_name, underscore, minus, function_name);
 				PHALCON_SCONCAT_SVSVS(html, "<span class=\"error-function\"><a target=\"_new\" href=\"http://php.net/manual/en/function.", prepared_function_name, ".php\">", function_name, "</a></span>");
 			} else {
 				PHALCON_SCONCAT_SVS(html, "<span class=\"error-function\">", function_name, "</span>");
@@ -870,7 +868,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 	 */
 	if (phalcon_array_isset_string(trace, SS("file"))) {
 
-		z_one = PHALCON_GLOBAL(z_one);
+		z_one = &PHALCON_GLOBAL(z_one);
 
 		PHALCON_OBS_VAR(file);
 		phalcon_array_fetch_string(&file, trace, SL("file"), PH_NOISY);
@@ -885,8 +883,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		 */
 		PHALCON_SCONCAT_SVSVS(html, "<br/><div class=\"error-file\">", formatted_file, " (", line, ")</div>");
 
-		PHALCON_OBS_VAR(show_files);
-		phalcon_read_property_this(&show_files, this_ptr, SL("_showFiles"), PH_NOISY);
+		show_files = phalcon_read_property(this_ptr, SL("_showFiles"), PH_NOISY);
 
 		/** 
 		 * The developer can change if the files must be opened or not
@@ -901,8 +898,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			PHALCON_INIT_VAR(number_lines);
 			phalcon_fast_count(number_lines, lines);
 
-			PHALCON_OBS_VAR(show_file_fragment);
-			phalcon_read_property_this(&show_file_fragment, this_ptr, SL("_showFileFragment"), PH_NOISY);
+			show_file_fragment = phalcon_read_property(this_ptr, SL("_showFileFragment"), PH_NOISY);
 
 			/** 
 			 * File fragments just show a piece of the file where the exception is located
@@ -912,7 +908,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/** 
 				 * Take lines back to the current exception's line
 				 */
-				before_context = phalcon_fetch_nproperty_this(getThis(), SL("_beforeContext"), PH_NOISY);
+				before_context = phalcon_read_property(getThis(), SL("_beforeContext"), PH_NOISY);
 
 				PHALCON_INIT_VAR(before_line);
 				phalcon_sub_function(before_line, line, before_context);
@@ -929,7 +925,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/** 
 				 * Take lines after the current exception's line
 				 */
-				after_context = phalcon_fetch_nproperty_this(getThis(), SL("_afterContext"), PH_NOISY);
+				after_context = phalcon_read_property(getThis(), SL("_afterContext"), PH_NOISY);
 
 				PHALCON_INIT_VAR(after_line);
 				phalcon_add_function(after_line, line, after_context);
@@ -953,7 +949,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			PHALCON_INIT_VAR(comment_pattern);
 			ZVAL_STRING(comment_pattern, "#\\*\\/$#");
 
-			charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset"));
+			charset = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_charset"));
 
 			PHALCON_INIT_VAR(tab);
 			ZVAL_STRING(tab, "\t");
@@ -991,7 +987,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 						if (zend_is_true(is_comment)) {
 							PHALCON_INIT_NVAR(spaced_current_line);
-							phalcon_fast_str_replace(spaced_current_line, comment, space, current_line);
+							PHALCON_STR_REPLACE(spaced_current_line, comment, space, current_line);
 							PHALCON_CPY_WRT(current_line, spaced_current_line);
 						}
 					}
@@ -1008,7 +1004,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 						phalcon_concat_self_str(&html, SL("&nbsp;\n"));
 					} else {
 						PHALCON_INIT_NVAR(spaced_current_line);
-						phalcon_fast_str_replace(spaced_current_line, tab, two_spaces, current_line);
+						PHALCON_STR_REPLACE(spaced_current_line, tab, two_spaces, current_line);
 
 						PHALCON_INIT_NVAR(escaped_line);
 						phalcon_htmlentities(escaped_line, spaced_current_line, NULL, charset);
@@ -1061,7 +1057,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_ob_end_clean();
 	}
 
-	is_active = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_isActive"));
+	is_active = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_isActive"));
 
 	/** 
 	 * Avoid that multiple exceptions being showed
@@ -1125,15 +1121,13 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	PHALCON_SCONCAT_SVSVS(html, "<span class=\"error-file\">", formatted_file, " (", line, ")</span>");
 	phalcon_concat_self_str(&html, SL("</div>"));
 
-	PHALCON_OBS_VAR(show_back_trace);
-	phalcon_read_property_this(&show_back_trace, this_ptr, SL("_showBackTrace"), PH_NOISY);
+	show_back_trace = phalcon_read_property(this_ptr, SL("_showBackTrace"), PH_NOISY);
 
 	/** 
 	 * Check if the developer wants to show the backtrace or not
 	 */
 	if (zend_is_true(show_back_trace)) {
-		PHALCON_OBS_VAR(data_vars);
-		phalcon_read_property_this(&data_vars, this_ptr, SL("_data"), PH_NOISY);
+		data_vars = phalcon_read_property(this_ptr, SL("_data"), PH_NOISY);
 
 		/** 
 		 * Create the tabs in the page
@@ -1317,11 +1311,11 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 	phalcon_fetch_params(0, 1, 2, 3, &severity, &message, &file, &line, &context);
 
 	if (!file) {
-		file = PHALCON_GLOBAL(z_null);
+		file = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!line) {
-		line = PHALCON_GLOBAL(z_null);
+		line = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (context && Z_TYPE_P(context) == IS_ARRAY) {
@@ -1332,10 +1326,10 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 		) {
 			PHALCON_CPY_WRT(previous, e);
 		} else {
-			previous = PHALCON_GLOBAL(z_null);
+			previous = &PHALCON_GLOBAL(z_null);
 		}
 	} else {
-		previous = PHALCON_GLOBAL(z_null);
+		previous = &PHALCON_GLOBAL(z_null);
 	}
 
 	default_exception_ce = zend_get_error_exception();
@@ -1343,7 +1337,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 	ALLOC_INIT_ZVAL(exception);
 	object_init_ex(exception, default_exception_ce);
 
-	PHALCON_CALL_METHOD(NULL, exception, "__construct", message, PHALCON_GLOBAL(z_zero), severity, file, line, previous);
+	PHALCON_CALL_METHOD(NULL, exception, "__construct", message, &PHALCON_GLOBAL(z_zero), severity, file, line, previous);
 
 	zend_throw_exception_object(exception);
 
@@ -1376,7 +1370,7 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
 		ALLOC_INIT_ZVAL(exception);
 		object_init_ex(exception, default_exception_ce);
 
-		PHALCON_CALL_METHOD(NULL, exception, "__construct", message, PHALCON_GLOBAL(z_zero), type, file, line);
+		PHALCON_CALL_METHOD(NULL, exception, "__construct", message, &PHALCON_GLOBAL(z_zero), type, file, line);
 
 		zend_throw_exception_object(exception);
 	}
@@ -1391,7 +1385,7 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
  * @return string
  */
 PHP_METHOD(Phalcon_Debug, getCharset) {
-	zval *charset = phalcon_fetch_static_property_ce(phalcon_debug_ce, SL("_charset"));
+	zval *charset = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_charset"));
 	RETURN_ZVAL(charset, 1, 0);
 }
 

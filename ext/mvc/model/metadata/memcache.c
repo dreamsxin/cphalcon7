@@ -180,8 +180,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 	
-	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY);
-	memcache = phalcon_fetch_nproperty_this(this_ptr, SL("_memcache"), PH_NOISY);
+	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
+	memcache = phalcon_read_property(this_ptr, SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE_P(memcache) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(memcache, "get", key, lifetime);
@@ -206,8 +206,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, write){
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
 	
-	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY);
-	memcache = phalcon_fetch_nproperty_this(this_ptr, SL("_memcache"), PH_NOISY);
+	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
+	memcache = phalcon_read_property(this_ptr, SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE_P(memcache) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, memcache, "save", key, data, lifetime);	
@@ -222,7 +222,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, reset)
 
 	PHALCON_MM_GROW();
 
-	memcache = phalcon_fetch_nproperty_this(this_ptr, SL("_memcache"), PH_NOISY);
+	memcache = phalcon_read_property(this_ptr, SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE_P(memcache) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, memcache, "flush");	

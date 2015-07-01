@@ -244,15 +244,15 @@ PHP_METHOD(Phalcon_Assets_Manager, addCss){
 	phalcon_fetch_params(1, 1, 3, &path, &local, &filter, &attributes);
 
 	if (!local) {
-		local = PHALCON_GLOBAL(z_true);
+		local = &PHALCON_GLOBAL(z_true);
 	}
 
 	if (!filter) {
-		filter = PHALCON_GLOBAL(z_true);
+		filter = &PHALCON_GLOBAL(z_true);
 	}
 
 	if (!attributes) {
-		attributes = PHALCON_GLOBAL(z_null);
+		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_INIT_VAR(type);
@@ -289,15 +289,15 @@ PHP_METHOD(Phalcon_Assets_Manager, addJs){
 	phalcon_fetch_params(1, 1, 3, &path, &local, &filter, &attributes);
 
 	if (!local) {
-		local = PHALCON_GLOBAL(z_true);
+		local = &PHALCON_GLOBAL(z_true);
 	}
 
 	if (!filter) {
-		filter = PHALCON_GLOBAL(z_true);
+		filter = &PHALCON_GLOBAL(z_true);
 	}
 
 	if (!attributes) {
-		attributes = PHALCON_GLOBAL(z_null);
+		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_INIT_VAR(type);
@@ -330,8 +330,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 
 	phalcon_fetch_params(1, 2, 0, &type, &resource);
 
-	PHALCON_OBS_VAR(collections);
-	phalcon_read_property_this(&collections, this_ptr, SL("_collections"), PH_NOISY);
+	collections = phalcon_read_property(this_ptr, SL("_collections"), PH_NOISY);
 	if (phalcon_array_isset(collections, type)) {
 		PHALCON_OBS_VAR(collection);
 		phalcon_array_fetch(&collection, collections, type, PH_NOISY);
@@ -430,7 +429,7 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
 		return;
 	}
 
-	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY);
+	collections = phalcon_read_property(this_ptr, SL("_collections"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&collection, collections, id)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "The collection does not exist in the manager");
 		return;
@@ -448,7 +447,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
 
 	zval *collections, *collection;
 
-	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY);
+	collections = phalcon_read_property(this_ptr, SL("_collections"), PH_NOISY);
 
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
@@ -470,7 +469,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getJs){
 
 	zval *collections, *collection;
 
-	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY);
+	collections = phalcon_read_property(this_ptr, SL("_collections"), PH_NOISY);
 
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
@@ -495,7 +494,7 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	collections = phalcon_fetch_nproperty_this(this_ptr, SL("_collections"), PH_NOISY);
+	collections = phalcon_read_property(this_ptr, SL("_collections"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&collection, collections, name)) {
 		RETURN_ZVAL(collection, 1, 0);
 	}
@@ -534,13 +533,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	phalcon_fetch_params(1, 2, 2, &collection, &callback, &type, &args);
 
 	if (!args) {
-		args = PHALCON_GLOBAL(z_null);
+		args = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_INIT_VAR(output);
 
-	PHALCON_OBS_VAR(use_implicit_output);
-	phalcon_read_property_this(&use_implicit_output, this_ptr, SL("_implicitOutput"), PH_NOISY);
+	use_implicit_output = phalcon_read_property(this_ptr, SL("_implicitOutput"), PH_NOISY);
 
 	/** 
 	 * Get the resources as an array
@@ -569,8 +567,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 
 		PHALCON_INIT_VAR(target_base_path);
 
-		PHALCON_OBS_VAR(options);
-		phalcon_read_property_this(&options, this_ptr, SL("_options"), PH_NOISY);
+		options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
 
 		/** 
 		 * Check for global options in the assets manager
@@ -1012,11 +1009,11 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 	phalcon_fetch_params(1, 0, 2, &collection_name, &args);
 
 	if (!collection_name) {
-		collection_name = PHALCON_GLOBAL(z_null);
+		collection_name = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!args) {
-		args = PHALCON_GLOBAL(z_null);
+		args = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (PHALCON_IS_EMPTY(collection_name)) {
@@ -1053,11 +1050,11 @@ PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 	phalcon_fetch_params(1, 0, 2, &collection_name, &args);
 
 	if (!collection_name) {
-		collection_name = PHALCON_GLOBAL(z_null);
+		collection_name = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!args) {
-		args = PHALCON_GLOBAL(z_null);
+		args = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (PHALCON_IS_EMPTY(collection_name)) {

@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, getTotalElapsedSeconds){
 
 	zval *final_time, *initial_time;
 
-	final_time   = phalcon_fetch_nproperty_this(this_ptr, SL("_finalTime"), PH_NOISY);
-	initial_time = phalcon_fetch_nproperty_this(this_ptr, SL("_initialTime"), PH_NOISY);
+	final_time   = phalcon_read_property(this_ptr, SL("_finalTime"), PH_NOISY);
+	initial_time = phalcon_read_property(this_ptr, SL("_initialTime"), PH_NOISY);
 	phalcon_sub_function(return_value, final_time, initial_time);
 }

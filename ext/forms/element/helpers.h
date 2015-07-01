@@ -33,10 +33,10 @@ static inline void phalcon_forms_element_render_helper(const char *method, int u
 	phalcon_fetch_params(0, 0, 1, &attributes);
 
 	if (!attributes) {
-		attributes = &PHALCON_GLOBAL(z_null);
+		attributes = &&PHALCON_GLOBAL(z_null);
 	}
 
-	uc = use_checked ? PHALCON_GLOBAL(z_true) : PHALCON_GLOBAL(z_false);
+	uc = use_checked ? &PHALCON_GLOBAL(z_true) : &PHALCON_GLOBAL(z_false);
 
 	PHALCON_CALL_METHODW(&widget_attributes, getThis(), "prepareattributes", *attributes, uc);
 

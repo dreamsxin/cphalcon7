@@ -81,7 +81,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, getFormatter){
 
 	zval *formatter;
 
-	formatter = phalcon_fetch_nproperty_this(this_ptr, SL("_formatter"), PH_NOISY);
+	formatter = phalcon_read_property(this_ptr, SL("_formatter"), PH_NOISY);
 	if (Z_TYPE_P(formatter) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_logger_formatter_firephp_ce);
 		phalcon_update_property_this(this_ptr, SL("_formatter"), return_value);
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 
 	PHALCON_CALL_METHOD(&formatter, this_ptr, "getformatter");
 
-	initialized = phalcon_fetch_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_initialized"));
+	initialized = phalcon_read_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_initialized"));
 	if (!zend_is_true(initialized)) {
 		/**
 		 * Send the required initialization headers.
@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	PHALCON_CALL_METHOD(&applied_format, formatter, "format", message, type, time, context);
 	convert_to_string(applied_format);
 
-	index = phalcon_fetch_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"));
+	index = phalcon_read_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"));
 	assert(Z_TYPE_P(index) == IS_LONG);
 
 	if (Z_REFCOUNT_P(index) > 1) {

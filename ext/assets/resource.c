@@ -173,19 +173,19 @@ PHP_METHOD(Phalcon_Assets_Resource, __construct){
 	zval *type, *path, *local = NULL, *filter = NULL, *attributes = NULL;
 
 	phalcon_fetch_params(0, 2, 3, &type, &path, &local, &filter, &attributes);
-	
+
 	if (!local) {
-		local = PHALCON_GLOBAL(z_true);
+		local = &PHALCON_GLOBAL(z_true);
 	}
-	
+
 	if (!filter) {
-		filter = PHALCON_GLOBAL(z_true);
+		filter = &PHALCON_GLOBAL(z_true);
 	}
-	
+
 	if (!attributes) {
-		attributes = PHALCON_GLOBAL(z_null);
+		attributes = &PHALCON_GLOBAL(z_null);
 	}
-	
+
 	phalcon_update_property_this(this_ptr, SL("_type"), type);
 	phalcon_update_property_this(this_ptr, SL("_path"), path);
 	phalcon_update_property_this(this_ptr, SL("_local"), local);
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setType){
 	zval *type;
 
 	phalcon_fetch_params(0, 1, 0, &type);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_type"), type);
 	RETURN_THISW();
 }
@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setPath){
 	zval *path;
 
 	phalcon_fetch_params(0, 1, 0, &path);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_path"), path);
 	RETURN_THISW();
 }
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setLocal){
 	zval *local;
 
 	phalcon_fetch_params(0, 1, 0, &local);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_local"), local);
 	RETURN_THISW();
 }
@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setFilter){
 	zval *filter;
 
 	phalcon_fetch_params(0, 1, 0, &filter);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_filter"), filter);
 	RETURN_THISW();
 }
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setAttributes){
 	zval *attributes;
 
 	phalcon_fetch_params(0, 1, 0, &attributes);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_attributes"), attributes);
 	RETURN_THISW();
 }
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setTargetUri){
 	zval *target_uri;
 
 	phalcon_fetch_params(0, 1, 0, &target_uri);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_targetUri"), target_uri);
 	RETURN_THISW();
 }
@@ -368,7 +368,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setSourcePath){
 	zval *source_path;
 
 	phalcon_fetch_params(0, 1, 0, &source_path);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_sourcePath"), source_path);
 	RETURN_THISW();
 }
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setTargetPath){
 	zval *target_path;
 
 	phalcon_fetch_params(0, 1, 0, &target_path);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_targetPath"), target_path);
 	RETURN_THISW();
 }
@@ -426,32 +426,29 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 0, 1, &base_path);
-	
+
 	if (!base_path) {
-		base_path = PHALCON_GLOBAL(z_null);
+		base_path = &PHALCON_GLOBAL(z_null);
 	}
-	
-	PHALCON_OBS_VAR(source_path);
-	phalcon_read_property_this(&source_path, this_ptr, SL("_sourcePath"), PH_NOISY);
+
+	source_path = phalcon_read_property(this_ptr, SL("_sourcePath"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(source_path)) {
-		PHALCON_OBS_NVAR(source_path);
-		phalcon_read_property_this(&source_path, this_ptr, SL("_path"), PH_NOISY);
+		source_path = phalcon_read_property(this_ptr, SL("_path"), PH_NOISY);
 	}
-	
+
 	/** 
 	 * A base path for resources can be set in the assets manager
 	 */
 	PHALCON_INIT_VAR(complete_path);
 	PHALCON_CONCAT_VV(complete_path, base_path, source_path);
-	
-	PHALCON_OBS_VAR(local);
-	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY);
-	
+
+	local = phalcon_read_property(this_ptr, SL("_local"), PH_NOISY);
+
 	/** 
 	 * Local resources are loaded from the local disk
 	 */
 	if (zend_is_true(local)) {
-	
+
 		/** 
 		 * Check first if the file is readable
 		 */
@@ -462,7 +459,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 			return;
 		}
 	}
-	
+
 	/** 
 	 * Use file_get_contents to respect the openbase_dir. Access urls must be enabled
 	 */
@@ -473,7 +470,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
 		return;
 	}
-	
+
 	PHALCON_MM_RESTORE();
 }
 
@@ -486,11 +483,11 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetUri){
 
 	zval *target_uri;
 
-	target_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_targetUri"), PH_NOISY);
+	target_uri = phalcon_read_property(this_ptr, SL("_targetUri"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(target_uri)) {
-		target_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_path"), PH_NOISY);
+		target_uri = phalcon_read_property(this_ptr, SL("_path"), PH_NOISY);
 	}
-	
+
 	RETURN_ZVAL(target_uri, 1, 0);
 }
 
@@ -507,34 +504,32 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 0, 1, &base_path);
-	
+
 	if (!base_path) {
-		base_path = PHALCON_GLOBAL(z_null);
+		base_path = &PHALCON_GLOBAL(z_null);
 	}
-	
-	PHALCON_OBS_VAR(source_path);
-	phalcon_read_property_this(&source_path, this_ptr, SL("_sourcePath"), PH_NOISY);
+
+	source_path = phalcon_read_property(this_ptr, SL("_sourcePath"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(source_path)) {
 		PHALCON_OBS_NVAR(source_path);
-		phalcon_read_property_this(&source_path, this_ptr, SL("_path"), PH_NOISY);
+		source_path = phalcon_read_property(this_ptr, SL("_path"), PH_NOISY);
 	}
-	
-	PHALCON_OBS_VAR(local);
-	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY);
+
+	local = phalcon_read_property(this_ptr, SL("_local"), PH_NOISY);
 	if (zend_is_true(local)) {
 		/** 
 		 * A base path for resources can be set in the assets manager
 		 */
 		PHALCON_INIT_VAR(complete_path);
 		PHALCON_CONCAT_VV(complete_path, base_path, source_path);
-	
+
 		/** 
 		 * Get the real template path
 		 */
 		phalcon_file_realpath(return_value, complete_path);
 		RETURN_MM();
 	}
-	
+
 	RETURN_CCTOR(source_path);
 }
 
@@ -551,28 +546,26 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 0, 1, &base_path);
-	
+
 	if (!base_path) {
-		base_path = PHALCON_GLOBAL(z_null);
+		base_path = &PHALCON_GLOBAL(z_null);
 	}
-	
-	PHALCON_OBS_VAR(target_path);
-	phalcon_read_property_this(&target_path, this_ptr, SL("_targetPath"), PH_NOISY);
+
+	target_path = phalcon_read_property(this_ptr, SL("_targetPath"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(target_path)) {
 		PHALCON_OBS_NVAR(target_path);
-		phalcon_read_property_this(&target_path, this_ptr, SL("_path"), PH_NOISY);
+		target_path = phalcon_read_property(this_ptr, SL("_path"), PH_NOISY);
 	}
-	
-	PHALCON_OBS_VAR(local);
-	phalcon_read_property_this(&local, this_ptr, SL("_local"), PH_NOISY);
+
+	local = phalcon_read_property(this_ptr, SL("_local"), PH_NOISY);
 	if (zend_is_true(local)) {
-	
+
 		/** 
 		 * A base path for resources can be set in the assets manager
 		 */
 		PHALCON_INIT_VAR(complete_path);
 		PHALCON_CONCAT_VV(complete_path, base_path, target_path);
-	
+
 		/** 
 		 * Get the real template path, the target path can optionally don't exist
 		 */
@@ -580,9 +573,9 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 			phalcon_file_realpath(return_value, complete_path);
 			RETURN_MM();
 		}
-	
+
 		RETURN_CTOR(complete_path);
 	}
-	
+
 	RETURN_CCTOR(target_path);
 }

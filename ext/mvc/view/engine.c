@@ -93,7 +93,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 	phalcon_fetch_params(0, 1, 1, &view, &dependency_injector);
 	
 	if (!dependency_injector) {
-		dependency_injector = PHALCON_GLOBAL(z_null);
+		dependency_injector = &PHALCON_GLOBAL(z_null);
 	}
 	
 	phalcon_update_property_this(this_ptr, SL("_view"), view);
@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, getContent)
 {
-	zval *view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY);
+	zval *view = phalcon_read_property(this_ptr, SL("_view"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(view, "getcontent");
 }
 
@@ -125,10 +125,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, partial){
 	phalcon_fetch_params(0, 1, 1, &partial_path, &params);
 	
 	if (!params) {
-		params = PHALCON_GLOBAL(z_null);
+		params = &PHALCON_GLOBAL(z_null);
 	}
 	
-	view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY);
+	view = phalcon_read_property(this_ptr, SL("_view"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(view, "partial", partial_path, params);
 }
 
@@ -195,14 +195,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		array_init(arguments);
 	}
 
-	PHALCON_OBS_VAR(methods);
-	phalcon_read_property_this(&methods, this_ptr, SL("_methods"), PH_NOISY);
+	methods = phalcon_read_property(this_ptr, SL("_methods"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&method, methods, method_name)) {
 			PHALCON_CALL_USER_FUNC_ARRAY(return_value, method, arguments);
 			RETURN_MM();
 	}
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "A dependency injection object is required to access internal services");
 		return;

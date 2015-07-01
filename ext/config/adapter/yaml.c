@@ -88,13 +88,13 @@ PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 	PHALCON_ENSURE_IS_STRING(&file_path);
 
 	if (absolute_path == NULL) {
-		absolute_path = PHALCON_GLOBAL(z_false);
+		absolute_path = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (zend_is_true(absolute_path)) {
 		PHALCON_CPY_WRT(config_dir_path, file_path);
 	} else {
-		base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
+		base_path = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
 		PHALCON_INIT_VAR(config_dir_path);
 		PHALCON_CONCAT_VV(config_dir_path, base_path, file_path);

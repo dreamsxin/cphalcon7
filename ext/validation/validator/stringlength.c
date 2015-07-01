@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 	PHALCON_CALL_SELF(&valid, "valid", value, minimum, maximum);
 
 	if (PHALCON_IS_FALSE(valid)) {
-		type = phalcon_fetch_nproperty_this(this_ptr, SL("_type"), PH_NOISY);
+		type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
 
 		PHALCON_OBS_VAR(label);
 		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), phalcon_interned_label));
@@ -190,11 +190,11 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 	phalcon_fetch_params(1, 1, 2, &value, &minimum, &maximum);
 
 	if (!minimum) {
-		minimum = PHALCON_GLOBAL(z_null);
+		minimum = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!maximum) {
-		maximum = PHALCON_GLOBAL(z_null);
+		maximum = &PHALCON_GLOBAL(z_null);
 	}
 
 	/* At least one of 'min' or 'max' must be set */

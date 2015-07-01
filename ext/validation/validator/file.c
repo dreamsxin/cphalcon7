@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 	PHALCON_CALL_SELF(&valid, "valid", value, minsize, maxsize, mimes, minwidth, maxwidth, minheight, maxheight);
 
 	if (PHALCON_IS_FALSE(valid)) {
-		type = phalcon_fetch_nproperty_this(this_ptr, SL("_type"), PH_NOISY);
+		type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
 
 		PHALCON_OBS_VAR(label);
 		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), phalcon_interned_label));
@@ -343,31 +343,31 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 	}
 
 	if (!minsize) {
-		minsize = PHALCON_GLOBAL(z_null);
+		minsize = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!maxsize) {
-		maxsize = PHALCON_GLOBAL(z_null);
+		maxsize = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!mimes) {
-		mimes = PHALCON_GLOBAL(z_null);
+		mimes = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!minwidth) {
-		minwidth = PHALCON_GLOBAL(z_null);
+		minwidth = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!maxwidth) {
-		maxwidth = PHALCON_GLOBAL(z_null);
+		maxwidth = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!minheight) {
-		minheight = PHALCON_GLOBAL(z_null);
+		minheight = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!maxheight) {
-		maxheight = PHALCON_GLOBAL(z_null);
+		maxheight = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_CALL_METHOD(&valid, file, "isfile");

@@ -68,7 +68,7 @@ PHP_METHOD(Phalcon_Http_Client, factory){
 	phalcon_fetch_params(1, 0, 2, &uri, &method);
 
 	if (!uri) {
-		uri = PHALCON_GLOBAL(z_null);
+		uri = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!method) {

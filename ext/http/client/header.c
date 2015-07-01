@@ -225,9 +225,9 @@ PHP_METHOD(Phalcon_Http_Client_Header, addMultiple){
 
 	phalcon_fetch_params(1, 1, 0, &values);
 
-	fields = phalcon_fetch_nproperty_this(this_ptr, SL("_fields"), PH_NOISY);
+	fields = phalcon_read_property(this_ptr, SL("_fields"), PH_NOISY);
 
-	phalcon_array_merge_recursive_n(&fields, values);
+	phalcon_array_merge_recursive_n(fields, values);
 
 	phalcon_update_property_this(this_ptr, SL("_fields"), fields);
 
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, get){
 
 	phalcon_fetch_params(1, 1, 0, &name);
 
-	fields = phalcon_fetch_nproperty_this(this_ptr, SL("_fields"), PH_NOISY);
+	fields = phalcon_read_property(this_ptr, SL("_fields"), PH_NOISY);
 
 	PHALCON_OBS_VAR(field);
 	phalcon_array_fetch(&field, fields, name, PH_NOISY);
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, remove){
 
 	phalcon_fetch_params(1, 1, 0, &name);
 
-	fields = phalcon_fetch_nproperty_this(this_ptr, SL("_fields"), PH_NOISY);
+	fields = phalcon_read_property(this_ptr, SL("_fields"), PH_NOISY);
 	
 	phalcon_array_unset(&fields, name, 0);
 
@@ -362,13 +362,12 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 	PHALCON_INIT_VAR(lines);
 	array_init(lines);
 
-	PHALCON_OBS_VAR(messages);
-	phalcon_read_static_property_ce(&messages, phalcon_http_client_header_ce, SL("_messages"));
+	messages = phalcon_read_static_property_ce(phalcon_http_client_header_ce, SL("_messages"));
 
-	status_code = phalcon_fetch_nproperty_this(this_ptr, SL("_status_code"), PH_NOISY);
+	status_code = phalcon_read_property(this_ptr, SL("_status_code"), PH_NOISY);
 	
 	if ((f & PHALCON_HTTP_CLIENT_HEADER_BUILD_STATUS) && phalcon_array_isset_fetch(&message, messages, status_code)) {
-		version  = phalcon_fetch_nproperty_this(this_ptr, SL("_version "), PH_NOISY);
+		version  = phalcon_read_property(this_ptr, SL("_version "), PH_NOISY);
 
 		PHALCON_INIT_NVAR(line);
 		PHALCON_CONCAT_SVS(line, "HTTP/", version, " ");
@@ -378,7 +377,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 
 	}
 
-	fields = phalcon_fetch_nproperty_this(this_ptr, SL("_fields"), PH_NOISY);
+	fields = phalcon_read_property(this_ptr, SL("_fields"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, value) {
 		zval filed;
@@ -408,7 +407,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, count){
 
 	zval *fields;
 
-	fields = phalcon_fetch_nproperty_this(this_ptr, SL("_fields"), PH_NOISY);
+	fields = phalcon_read_property(this_ptr, SL("_fields"), PH_NOISY);
 	phalcon_fast_count(return_value, fields);
 }
 

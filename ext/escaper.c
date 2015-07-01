@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	/**
 	 * Strict encoding detection with fallback to non-strict detection.
 	 */
-	strict_check = PHALCON_GLOBAL(z_true);
+	strict_check = &PHALCON_GLOBAL(z_true);
 
 	PHALCON_INIT_NVAR(charset);
 	ZVAL_STRING(charset, "UTF-32");
@@ -292,8 +292,8 @@ PHP_METHOD(Phalcon_Escaper, escapeHtml){
 	phalcon_fetch_params(0, 0, 1, 0, &text);
 
 	if (Z_TYPE_P(text) == IS_STRING) {
-		html_quote_type = phalcon_fetch_nproperty_this(this_ptr, SL("_htmlQuoteType"), PH_NOISY);
-		encoding        = phalcon_fetch_nproperty_this(this_ptr, SL("_encoding"), PH_NOISY);
+		html_quote_type = phalcon_read_property(this_ptr, SL("_htmlQuoteType"), PH_NOISY);
+		encoding        = phalcon_read_property(this_ptr, SL("_encoding"), PH_NOISY);
 
 		phalcon_htmlspecialchars(return_value, text, html_quote_type, encoding);
 		return;
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Escaper, escapeHtmlAttr){
 		INIT_ZVAL(quoting);
 		ZVAL_LONG(&quoting, ENT_QUOTES);
 
-		encoding = phalcon_fetch_nproperty_this(this_ptr, SL("_encoding"), PH_NOISY);
+		encoding = phalcon_read_property(this_ptr, SL("_encoding"), PH_NOISY);
 
 		phalcon_htmlspecialchars(return_value, attribute, &quoting, encoding);
 		return;

@@ -81,7 +81,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 	
-	data = phalcon_fetch_nproperty_this(this_ptr, SL("_data"), PH_NOISY);
+	data = phalcon_read_property(this_ptr, SL("_data"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(lowercased_key);
 	phalcon_fast_strtolower(lowercased_key, key);

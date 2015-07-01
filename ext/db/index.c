@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Db_Index, __construct){
 	phalcon_fetch_params(1, 2, 1, &index_name, &columns, &type);
 
 	if (!type) {
-		type = PHALCON_GLOBAL(z_null);
+		type = &PHALCON_GLOBAL(z_null);
 	}
 
 	phalcon_update_property_this(this_ptr, SL("_indexName"), index_name);
@@ -135,8 +135,7 @@ PHP_METHOD(Phalcon_Db_Index, getType){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(type);
-	phalcon_read_property_this(&type, this_ptr, SL("_type"), PH_NOISY);
+	type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
 
 	if (Z_TYPE_P(type) == IS_STRING) {
 		RETVAL_ZVAL(type, 1, 0);

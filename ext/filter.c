@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	phalcon_fetch_params(0, 1, 2, 1, &value, &filters, &norecursive);
 
 	if (!norecursive) {
-		norecursive = PHALCON_GLOBAL(z_false);
+		norecursive = &PHALCON_GLOBAL(z_false);
 	}
 	
 	/** 
@@ -264,9 +264,8 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(0, 1, 2, 0, &value, &filter);
-	
-	PHALCON_OBS_VAR(filters);
-	phalcon_read_property_this(&filters, this_ptr, SL("_filters"), PH_NOISY);
+
+	filters = phalcon_read_property(this_ptr, SL("_filters"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&filter_object, filters, filter) && (Z_TYPE_P(filter_object) == IS_OBJECT || phalcon_is_callable(filter_object))) {
 	
 		/** 
@@ -300,7 +299,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		ZVAL_STRING(empty_str, "");
 	
 		PHALCON_INIT_VAR(escaped);
-		phalcon_fast_str_replace(escaped, quote, empty_str, value);
+		PHALCON_STR_REPLACE(escaped, quote, empty_str, value);
 	
 		PHALCON_CALL_FUNCTION(&filtered, "filter_var", escaped, type);
 		goto ph_end_0;
@@ -422,11 +421,8 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 	
 	if (PHALCON_IS_STRING(filter, "xssclean")) {
-		PHALCON_OBS_VAR(allow_tags);
-		phalcon_read_property_this(&allow_tags, this_ptr, SL("_allowTags"), PH_NOISY);
-
-		PHALCON_OBS_VAR(allow_attributes);
-		phalcon_read_property_this(&allow_attributes, this_ptr, SL("_allowAttributes"), PH_NOISY);
+		allow_tags = phalcon_read_property(this_ptr, SL("_allowTags"), PH_NOISY);
+		allow_attributes = phalcon_read_property(this_ptr, SL("_allowAttributes"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(filtered);
 		phalcon_xss_clean(filtered, value, allow_tags, allow_attributes);

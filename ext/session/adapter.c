@@ -108,7 +108,7 @@ static zval* phalcon_session_adapter_get_property_ptr_ptr_internal(zval *object,
 	zval *unique_id, *_SESSION, key = zval_used_for_init, *pkey = &key;
 	zval *value;
 
-	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
+	unique_id = phalcon_read_property(object, SL("_uniqueId"), PH_NOISY);
 
 	_SESSION = phalcon_get_global(SS("_SESSION"));
 	if (Z_TYPE_P(_SESSION) != IS_ARRAY) {
@@ -130,7 +130,7 @@ static int phalcon_session_adapter_has_property_internal(zval *object, zval *mem
 	zval *unique_id, *_SESSION, *tmp;
 	zval key = zval_used_for_init, *pkey = &key;
 
-	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
+	unique_id = phalcon_read_property(object, SL("_uniqueId"), PH_NOISY);
 
 	_SESSION = phalcon_get_global(SS("_SESSION"));
 	if (Z_TYPE_P(_SESSION) != IS_ARRAY) {
@@ -161,7 +161,7 @@ static void phalcon_session_adapter_write_property_internal(zval *object, zval *
 	zval *unique_id, *_SESSION;
 	zval key = zval_used_for_init, *pkey = &key;
 
-	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
+	unique_id = phalcon_read_property(object, SL("_uniqueId"), PH_NOISY);
 
 	_SESSION = phalcon_get_global(SS("_SESSION"));
 	if (Z_TYPE_P(_SESSION) == IS_ARRAY) {
@@ -177,7 +177,7 @@ static void phalcon_session_adapter_unset_property_internal(zval *object, zval *
 	zval *unique_id, *_SESSION;
 	zval key = zval_used_for_init, *pkey = &key;
 
-	unique_id = phalcon_fetch_nproperty_this(object, SL("_uniqueId"), PH_NOISY);
+	unique_id = phalcon_read_property(object, SL("_uniqueId"), PH_NOISY);
 
 	_SESSION = phalcon_get_global(SS("_SESSION"));
 	if (Z_TYPE_P(_SESSION) == IS_ARRAY) {
@@ -267,7 +267,7 @@ static void phalcon_session_adapter_write_dimension(zval *object, zval *offset, 
 	}
 
 	if (!offset) {
-		offset = PHALCON_GLOBAL(z_null);
+		offset = &PHALCON_GLOBAL(z_null);
 	}
 
 	phalcon_session_adapter_write_property_internal(object, offset, value);
@@ -447,23 +447,23 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 
 	if (expire || path || secure || domain || http_only || http_only) {
 		if (!expire) {
-			expire = phalcon_fetch_nproperty_this(getThis(), SL("_expire"), PH_NOISY);
+			expire = phalcon_read_property(getThis(), SL("_expire"), PH_NOISY);
 		}
 
 		if (!path) {
-			path = phalcon_fetch_nproperty_this(getThis(), SL("_path"), PH_NOISY);
+			path = phalcon_read_property(getThis(), SL("_path"), PH_NOISY);
 		}
 
 		if (!secure) {
-			secure = phalcon_fetch_nproperty_this(getThis(), SL("_secure"), PH_NOISY);
+			secure = phalcon_read_property(getThis(), SL("_secure"), PH_NOISY);
 		}
 
 		if (!domain) {
-			domain = phalcon_fetch_nproperty_this(getThis(), SL("_domain"), PH_NOISY);
+			domain = phalcon_read_property(getThis(), SL("_domain"), PH_NOISY);
 		}
 
 		if (!http_only) {
-			http_only = phalcon_fetch_nproperty_this(getThis(), SL("_httpOnly"), PH_NOISY);
+			http_only = phalcon_read_property(getThis(), SL("_httpOnly"), PH_NOISY);
 		}
 
 		PHALCON_CALL_FUNCTIONW(NULL, "session_set_cookie_params", expire, path, secure, domain, http_only);
@@ -474,7 +474,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __destruct) {
 
 	zval *started;
 
-	started = phalcon_fetch_nproperty_this(getThis(), SL("_started"), PH_NOISY);
+	started = phalcon_read_property(getThis(), SL("_started"), PH_NOISY);
 	if (zend_is_true(started)) {
 		RETURN_ON_FAILURE(phalcon_session_write_close());
 		phalcon_update_property_bool(this_ptr, SL("_started"), 0);
@@ -548,7 +548,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 
 	phalcon_fetch_params(0, 0, 1, 2, &index, &default_value, &remove);
 	if (!default_value) {
-		default_value = PHALCON_GLOBAL(z_null);
+		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!remove || !zend_is_true(remove)) {
@@ -561,7 +561,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 		RETURN_ZVAL(default_value, 1, 0);
 	}
 
-	unique_id = phalcon_fetch_nproperty_this(this_ptr, SL("_uniqueId"), PH_NOISY);
+	unique_id = phalcon_read_property(this_ptr, SL("_uniqueId"), PH_NOISY);
 
 	PHALCON_MM_GROW();
 	PHALCON_INIT_VAR(key);

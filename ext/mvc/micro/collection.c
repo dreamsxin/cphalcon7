@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setHandler){
 	phalcon_fetch_params(0, 1, 1, &handler, &lazy);
 	
 	if (!lazy) {
-		lazy = PHALCON_GLOBAL(z_false);
+		lazy = &PHALCON_GLOBAL(z_false);
 	}
 	
 	phalcon_update_property_this(this_ptr, SL("_handler"), handler);

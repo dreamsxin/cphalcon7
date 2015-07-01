@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, __construct){
 	zval *options = NULL, *empty_array;
 
 	phalcon_fetch_params(0, 0, 1, &options);
-	
+
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		zval *prefix, *ttl;
 
@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, __construct){
 			phalcon_update_property_this(this_ptr, SL("_ttl"), ttl);
 		}
 	}
-	
+
 	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
 	array_init(empty_array);
 	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array);
@@ -120,17 +120,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, read)
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &key);
-	
-	prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
-	
+
+	prefix = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
+
 	PHALCON_INIT_VAR(apc_key);
 	PHALCON_CONCAT_SVV(apc_key, "$PMM$", prefix, key);
-	
+
 	PHALCON_CALL_FUNCTION(&data, "apc_fetch", apc_key);
 	if (Z_TYPE_P(data) == IS_ARRAY) { 
 		RETURN_CCTOR(data);
 	}
-	
+
 	RETURN_MM_NULL();
 }
 
@@ -147,28 +147,27 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, write){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
-	
-	prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
-	
+
+	prefix = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
+
 	PHALCON_INIT_VAR(apc_key);
 	PHALCON_CONCAT_SVV(apc_key, "$PMM$", prefix, key);
-	
-	PHALCON_OBS_VAR(ttl);
-	phalcon_read_property_this(&ttl, this_ptr, SL("_ttl"), PH_NOISY);
+
+	ttl = phalcon_read_property(this_ptr, SL("_ttl"), PH_NOISY);
 	PHALCON_CALL_FUNCTION(NULL, "apc_store", apc_key, data, ttl);
-	
+
 	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset)
 {
-	zval *meta = phalcon_fetch_nproperty_this(this_ptr, SL("_metaData"), PH_NOISY);
+	zval *meta = phalcon_read_property(this_ptr, SL("_metaData"), PH_NOISY);
 	zval *real_key = NULL;
 
 	PHALCON_MM_GROW();
 
 	if (Z_TYPE_P(meta) == IS_ARRAY) {
-		zval *prefix = phalcon_fetch_nproperty_this(this_ptr, SL("_prefix"), PH_NOISY);
+		zval *prefix = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(meta), idx, str_key, value) {
 			zval key;

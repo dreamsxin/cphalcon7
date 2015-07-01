@@ -82,7 +82,7 @@ PHP_METHOD(Phalcon_Config_Adapter, __construct){
 	phalcon_fetch_params(0, 1, 0, 2, &file_path, &absolute_path);
 
 	if (absolute_path == NULL) {
-		absolute_path = PHALCON_GLOBAL(z_false);
+		absolute_path = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (file_path) {
@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 
 	phalcon_fetch_params(0, 1, 0, 2, &file_path, &absolute_path);
 
-	instances = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));
+	instances = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));
 	if (!phalcon_array_isset_fetch(&instance, instances, file_path)) {
 		PHALCON_INIT_VAR(class_name);
 		phalcon_get_called_class(class_name );
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 
 		if (file_path) {
 			if (absolute_path == NULL) {
-				absolute_path = PHALCON_GLOBAL(z_false);
+				absolute_path = &PHALCON_GLOBAL(z_false);
 			}
 
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", file_path, absolute_path);
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Config_Adapter, getBasePath){
 
 	zval *base_path;
 	
-	base_path = phalcon_fetch_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
+	base_path = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
 	RETURN_ZVAL(base_path, 1, 0);
 }
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Config_Adapter, load){
 
 	if (file_path) {
 		if (absolute_path == NULL) {
-			absolute_path = PHALCON_GLOBAL(z_false);
+			absolute_path = &PHALCON_GLOBAL(z_false);
 		}
 
 		PHALCON_RETURN_CALL_STATICW("factory", file_path, absolute_path);

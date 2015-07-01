@@ -121,8 +121,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, offsetGet){
 	phalcon_fetch_params(1, 1, 0, &index);
 	
 	if (phalcon_isset_property_zval(this_ptr, index)) {
-		PHALCON_OBS_VAR(value);
-		phalcon_read_property_zval(&value, this_ptr, index, PH_NOISY);
+		value = phalcon_read_property_zval(this_ptr, index, PH_NOISY);
 		RETURN_CTOR(value);
 	}
 	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "The index does not exist in the row");
@@ -179,8 +178,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, readAttribute){
 	phalcon_fetch_params(1, 1, 0, &attribute);
 	
 	if (phalcon_isset_property_zval(this_ptr, attribute)) {
-		PHALCON_OBS_VAR(attribute_value);
-		phalcon_read_property_zval(&attribute_value, this_ptr, attribute, PH_NOISY);
+		attribute_value = phalcon_read_property_zval(this_ptr, attribute, PH_NOISY);
 		RETURN_CTOR(attribute_value);
 	}
 	RETURN_MM_NULL();

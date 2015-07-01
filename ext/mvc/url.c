@@ -125,8 +125,7 @@ PHP_METHOD(Phalcon_Mvc_Url, setBaseUri){
 
 	phalcon_update_property_this(this_ptr, SL("_baseUri"), base_uri);
 
-	PHALCON_OBS_VAR(static_base_uri);
-	phalcon_read_property_this(&static_base_uri, this_ptr, SL("_staticBaseUri"), PH_NOISY);
+	static_base_uri = phalcon_read_property(this_ptr, SL("_staticBaseUri"), PH_NOISY);
 	if (Z_TYPE_P(static_base_uri) == IS_NULL) {
 		phalcon_update_property_this(this_ptr, SL("_staticBaseUri"), base_uri);
 	}
@@ -165,8 +164,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(base_uri);
-	phalcon_read_property_this(&base_uri, this_ptr, SL("_baseUri"), PH_NOISY);
+	base_uri = phalcon_read_property(this_ptr, SL("_baseUri"), PH_NOISY);
 	if (Z_TYPE_P(base_uri) == IS_NULL) {
 
 		PHALCON_INIT_VAR(slash);
@@ -203,8 +201,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStaticBaseUri){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(static_base_uri);
-	phalcon_read_property_this(&static_base_uri, this_ptr, SL("_staticBaseUri"), PH_NOISY);
+	static_base_uri = phalcon_read_property(this_ptr, SL("_staticBaseUri"), PH_NOISY);
 	if (Z_TYPE_P(static_base_uri) != IS_NULL) {
 		RETURN_CCTOR(static_base_uri);
 	}
@@ -276,15 +273,15 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 	phalcon_fetch_params(0, 1, 0, 3, &uri, &args, &local);
 
 	if (!uri) {
-		uri = PHALCON_GLOBAL(z_null);
+		uri = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!args) {
-		args = PHALCON_GLOBAL(z_null);
+		args = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!local) {
-		local = PHALCON_GLOBAL(z_null);
+		local = &PHALCON_GLOBAL(z_null);
 	} else {
 		PHALCON_SEPARATE_PARAM(local);
 	}
@@ -314,13 +311,13 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 			return;
 		}
 
-		router = phalcon_fetch_nproperty_this(this_ptr, SL("_router"), PH_NOISY);
+		router = phalcon_read_property(this_ptr, SL("_router"), PH_NOISY);
 
 		/**
 		 * Check if the router has not previously set
 		 */
 		if (Z_TYPE_P(router) != IS_OBJECT) {
-			dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+			dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 			if (!zend_is_true(dependency_injector)) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_url_exception_ce, "A dependency injector container is required to obtain the \"url\" service");
 				return;
@@ -421,7 +418,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 	PHALCON_MM_GROW();
 
 	if (!uri) {
-		uri = &PHALCON_GLOBAL(z_null);
+		uri = &&PHALCON_GLOBAL(z_null);
 	}
 	else {
 		PHALCON_ENSURE_IS_STRING(uri);
@@ -437,7 +434,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 		}
 	}
 
-	static_base_uri = phalcon_fetch_nproperty_this(this_ptr, SL("_staticBaseUri"), PH_NOISY);
+	static_base_uri = phalcon_read_property(this_ptr, SL("_staticBaseUri"), PH_NOISY);
 	if (Z_TYPE_P(static_base_uri) != IS_NULL) {
 		PHALCON_CONCAT_VV(return_value, static_base_uri, *uri);
 	} else {	
@@ -474,9 +471,9 @@ PHP_METHOD(Phalcon_Mvc_Url, path){
 	phalcon_fetch_params(0, 0, 0, 1, &path);
 
 	if (!path) {
-		path = PHALCON_GLOBAL(z_null);
+		path = &PHALCON_GLOBAL(z_null);
 	}
 
-	base_path = phalcon_fetch_nproperty_this(this_ptr, SL("_basePath"), PH_NOISY);
+	base_path = phalcon_read_property(this_ptr, SL("_basePath"), PH_NOISY);
 	PHALCON_CONCAT_VV(return_value, base_path, path);
 }

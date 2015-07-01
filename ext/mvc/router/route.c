@@ -196,15 +196,15 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	phalcon_fetch_params(1, 1, 3, &pattern, &paths, &http_methods, &regex);
 
 	if (!paths) {
-		paths = PHALCON_GLOBAL(z_null);
+		paths = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!http_methods) {
-		http_methods = PHALCON_GLOBAL(z_null);
+		http_methods = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!regex) {
-		regex = PHALCON_GLOBAL(z_null);
+		regex = &PHALCON_GLOBAL(z_null);
 	}
 
 	/** 
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	/** 
 	 * Get the unique Id from the static member _uniqueId
 	 */
-	unique_id = phalcon_fetch_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId"));
+	unique_id = phalcon_read_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId"));
 	if (Z_REFCOUNT_P(unique_id) > 1) {
 		PHALCON_INIT_VAR(unique_id);
 		separate = 1;
@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 	PHALCON_CPY_WRT(compiled_pattern, pattern);
 
 	if (!regex) {
-		regex = PHALCON_GLOBAL(z_null);
+		regex = &PHALCON_GLOBAL(z_null);
 	}
 
 	/** 
@@ -286,9 +286,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			PHALCON_INIT_NVAR(compiled_pattern);
 			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_string_fetch(&params_pattern, regex, SS(":module"))) {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, params_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, params_pattern, pattern_copy);
 			} else {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, id_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, id_pattern, pattern_copy);
 			}
 		}
 
@@ -303,9 +303,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			PHALCON_INIT_NVAR(compiled_pattern);
 			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_string_fetch(&params_pattern, regex, SS(":controller"))) {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, params_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, params_pattern, pattern_copy);
 			} else {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, id_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, id_pattern, pattern_copy);
 			}
 		}
 
@@ -320,9 +320,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			PHALCON_INIT_NVAR(compiled_pattern);
 			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_string_fetch(&params_pattern, regex, SS(":namespace"))) {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, params_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, params_pattern, pattern_copy);
 			} else {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, id_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, id_pattern, pattern_copy);
 			}
 		}
 
@@ -337,9 +337,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			PHALCON_INIT_NVAR(compiled_pattern);
 			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_string_fetch(&params_pattern, regex, SS(":action"))) {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, params_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, params_pattern, pattern_copy);
 			} else {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, id_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, id_pattern, pattern_copy);
 			}
 		}
 
@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				ZVAL_STRING(params_pattern, "(/.*+)?+");
 			}
 
-			phalcon_fast_str_replace(compiled_pattern, &wildcard, params_pattern, pattern_copy);
+			PHALCON_STR_REPLACE(compiled_pattern, &wildcard, params_pattern, pattern_copy);
 		}
 
 		/** 
@@ -377,11 +377,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			PHALCON_INIT_NVAR(compiled_pattern);
 			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_string_fetch(&params_pattern, regex, SS(":int"))) {
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, params_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, params_pattern, pattern_copy);
 			} else {
 				PHALCON_INIT_NVAR(params_pattern);
 				ZVAL_STRING(params_pattern, "([0-9]++)");
-				phalcon_fast_str_replace(compiled_pattern, &wildcard, params_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(compiled_pattern, &wildcard, params_pattern, pattern_copy);
 			}
 		}
 	}
@@ -444,7 +444,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	phalcon_fetch_params(1, 1, 2, &pattern, &paths, &regex);
 
 	if (!paths) {
-		paths = PHALCON_GLOBAL(z_null);
+		paths = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(pattern) != IS_STRING) {
@@ -745,8 +745,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(paths);
-	phalcon_read_property_this(&paths, this_ptr, SL("_paths"), PH_NOISY);
+	paths = phalcon_read_property(this_ptr, SL("_paths"), PH_NOISY);
 
 	array_init_size(return_value, zend_hash_num_elements(ah0));
 
@@ -945,11 +944,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaults){
 	zval *namespace_name, *module_name;
 	zval *controller_name, *action_name, *params;
 
-	namespace_name  = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultNamespace"), PH_NOISY);
-	module_name     = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultModule"), PH_NOISY);
-	controller_name = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultController"), PH_NOISY);
-	action_name     = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultAction"), PH_NOISY);
-	params          = phalcon_fetch_nproperty_this(this_ptr, SL("_defaultParams"), PH_NOISY);
+	namespace_name  = phalcon_read_property(this_ptr, SL("_defaultNamespace"), PH_NOISY);
+	module_name     = phalcon_read_property(this_ptr, SL("_defaultModule"), PH_NOISY);
+	controller_name = phalcon_read_property(this_ptr, SL("_defaultController"), PH_NOISY);
+	action_name     = phalcon_read_property(this_ptr, SL("_defaultAction"), PH_NOISY);
+	params          = phalcon_read_property(this_ptr, SL("_defaultParams"), PH_NOISY);
 
 	array_init_size(return_value, 5);
 

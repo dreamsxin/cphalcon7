@@ -69,7 +69,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault_CLI, __construct){
 
 	PHALCON_CALL_PARENT(NULL, phalcon_di_factorydefault_cli_ce, this_ptr, "__construct");
 
-	shared = PHALCON_GLOBAL(z_true);
+	shared = &PHALCON_GLOBAL(z_true);
 
 	PHALCON_INIT_VAR(name);
 	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_router);

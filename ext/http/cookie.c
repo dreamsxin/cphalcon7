@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Http_Cookie, __construct){
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (!expire) {
-		expire = &PHALCON_GLOBAL(z_zero);
+		expire = &&PHALCON_GLOBAL(z_zero);
 	}
 
 	phalcon_update_property_this(this_ptr, SL("_name"), *name);
@@ -244,37 +244,29 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 	phalcon_fetch_params(0, 1, 0, 2, &filters, &default_value);
 
 	if (!filters) {
-		filters = PHALCON_GLOBAL(z_null);
+		filters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!default_value) {
-		default_value = PHALCON_GLOBAL(z_null);
+		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
 	PHALCON_INIT_VAR(dependency_injector);
 
-	PHALCON_OBS_VAR(readed);
-	phalcon_read_property_this(&readed, this_ptr, SL("_readed"), PH_NOISY);
+	readed = phalcon_read_property(this_ptr, SL("_readed"), PH_NOISY);
 	if (PHALCON_IS_FALSE(readed)) {
-
-		PHALCON_OBS_VAR(name);
-		phalcon_read_property_this(&name, this_ptr, SL("_name"), PH_NOISY);
+		name = phalcon_read_property(this_ptr, SL("_name"), PH_NOISY);
 
 		_COOKIE = phalcon_get_global(SS("_COOKIE"));
 		if (phalcon_array_isset_fetch(&value, _COOKIE, name)) {
-
-			PHALCON_OBS_VAR(encryption);
-			phalcon_read_property_this(&encryption, this_ptr, SL("_useEncryption"), PH_NOISY);
+			encryption = phalcon_read_property(this_ptr, SL("_useEncryption"), PH_NOISY);
 			if (zend_is_true(encryption)) {
-
-				PHALCON_OBS_NVAR(dependency_injector);
-				phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+				dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 				if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'filter' service");
 					return;
@@ -299,14 +291,10 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 			 */
 			phalcon_update_property_this(this_ptr, SL("_value"), decrypted_value);
 			if (Z_TYPE_P(filters) != IS_NULL) {
-
-				PHALCON_OBS_VAR(filter);
-				phalcon_read_property_this(&filter, this_ptr, SL("_filter"), PH_NOISY);
+				filter = phalcon_read_property(this_ptr, SL("_filter"), PH_NOISY);
 				if (Z_TYPE_P(filter) != IS_OBJECT) {
 					if (Z_TYPE_P(dependency_injector) == IS_NULL) {
-
-						PHALCON_OBS_NVAR(dependency_injector);
-						phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+						dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 						PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_http_cookie_exception_ce, 1);
 					}
 
@@ -332,8 +320,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 		RETURN_CTOR(default_value);
 	}
 
-	PHALCON_OBS_NVAR(value);
-	phalcon_read_property_this(&value, this_ptr, SL("_value"), PH_NOISY);
+	value = phalcon_read_property(this_ptr, SL("_value"), PH_NOISY);
 
 	RETURN_CTOR(value);
 }
@@ -353,29 +340,14 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(name);
-	phalcon_read_property_this(&name, this_ptr, SL("_name"), PH_NOISY);
-
-	PHALCON_OBS_VAR(value);
-	phalcon_read_property_this(&value, this_ptr, SL("_value"), PH_NOISY);
-
-	PHALCON_OBS_VAR(expire);
-	phalcon_read_property_this(&expire, this_ptr, SL("_expire"), PH_NOISY);
-
-	PHALCON_OBS_VAR(domain);
-	phalcon_read_property_this(&domain, this_ptr, SL("_domain"), PH_NOISY);
-
-	PHALCON_OBS_VAR(path);
-	phalcon_read_property_this(&path, this_ptr, SL("_path"), PH_NOISY);
-
-	PHALCON_OBS_VAR(secure);
-	phalcon_read_property_this(&secure, this_ptr, SL("_secure"), PH_NOISY);
-
-	PHALCON_OBS_VAR(http_only);
-	phalcon_read_property_this(&http_only, this_ptr, SL("_httpOnly"), PH_NOISY);
-
-	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	name = phalcon_read_property(this_ptr, SL("_name"), PH_NOISY);
+	value = phalcon_read_property(this_ptr, SL("_value"), PH_NOISY);
+	expire = phalcon_read_property(this_ptr, SL("_expire"), PH_NOISY);
+	domain = phalcon_read_property(this_ptr, SL("_domain"), PH_NOISY);
+	path = phalcon_read_property(this_ptr, SL("_path"), PH_NOISY);
+	secure = phalcon_read_property(this_ptr, SL("_secure"), PH_NOISY);
+	http_only = phalcon_read_property(this_ptr, SL("_httpOnly"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_INIT_VAR(service);
 		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
@@ -421,8 +393,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 		}
 	}
 
-	PHALCON_OBS_VAR(encryption);
-	phalcon_read_property_this(&encryption, this_ptr, SL("_useEncryption"), PH_NOISY);
+	encryption = phalcon_read_property(this_ptr, SL("_useEncryption"), PH_NOISY);
 	if (zend_is_true(encryption) && PHALCON_IS_NOT_EMPTY(value)) {
 		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'filter' service");
@@ -482,12 +453,9 @@ PHP_METHOD(Phalcon_Http_Cookie, restore){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
-
-		PHALCON_OBS_VAR(dependency_injector);
-		phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+		dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 		if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 
 			PHALCON_INIT_VAR(service);
@@ -496,8 +464,7 @@ PHP_METHOD(Phalcon_Http_Cookie, restore){
 			PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
 
-			PHALCON_OBS_VAR(name);
-			phalcon_read_property_this(&name, this_ptr, SL("_name"), PH_NOISY);
+			name = phalcon_read_property(this_ptr, SL("_name"), PH_NOISY);
 
 			PHALCON_INIT_VAR(key);
 			PHALCON_CONCAT_SV(key, "_PHCOOKIE_", name);
@@ -552,23 +519,13 @@ PHP_METHOD(Phalcon_Http_Cookie, delete){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(name);
-	phalcon_read_property_this(&name, this_ptr, SL("_name"), PH_NOISY);
+	name = phalcon_read_property(this_ptr, SL("_name"), PH_NOISY);
+	domain = phalcon_read_property(this_ptr, SL("_domain"), PH_NOISY);
+	path = phalcon_read_property(this_ptr, SL("_path"), PH_NOISY);
+	secure = phalcon_read_property(this_ptr, SL("_secure"), PH_NOISY);
+	http_only = phalcon_read_property(this_ptr, SL("_httpOnly"), PH_NOISY);
 
-	PHALCON_OBS_VAR(domain);
-	phalcon_read_property_this(&domain, this_ptr, SL("_domain"), PH_NOISY);
-
-	PHALCON_OBS_VAR(path);
-	phalcon_read_property_this(&path, this_ptr, SL("_path"), PH_NOISY);
-
-	PHALCON_OBS_VAR(secure);
-	phalcon_read_property_this(&secure, this_ptr, SL("_secure"), PH_NOISY);
-
-	PHALCON_OBS_VAR(http_only);
-	phalcon_read_property_this(&http_only, this_ptr, SL("_httpOnly"), PH_NOISY);
-
-	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_INIT_VAR(service);
 		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
@@ -644,8 +601,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setExpiration){
 
 	phalcon_fetch_params(0, 1, 1, 0, &expire);
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
@@ -666,14 +622,12 @@ PHP_METHOD(Phalcon_Http_Cookie, getExpiration){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	PHALCON_OBS_VAR(expire);
-	phalcon_read_property_this(&expire, this_ptr, SL("_expire"), PH_NOISY);
+	expire = phalcon_read_property(this_ptr, SL("_expire"), PH_NOISY);
 
 	RETURN_CTOR(expire);
 }
@@ -692,8 +646,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setPath){
 
 	phalcon_fetch_params(0, 1, 1, 0, &path);
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
@@ -714,14 +667,12 @@ PHP_METHOD(Phalcon_Http_Cookie, getPath){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	PHALCON_OBS_VAR(path);
-	phalcon_read_property_this(&path, this_ptr, SL("_path"), PH_NOISY);
+	path = phalcon_read_property(this_ptr, SL("_path"), PH_NOISY);
 
 	RETURN_CTOR(path);
 }
@@ -740,8 +691,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setDomain){
 
 	phalcon_fetch_params(0, 1, 1, 0, &domain);
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
@@ -762,14 +712,12 @@ PHP_METHOD(Phalcon_Http_Cookie, getDomain){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	PHALCON_OBS_VAR(domain);
-	phalcon_read_property_this(&domain, this_ptr, SL("_domain"), PH_NOISY);
+	domain = phalcon_read_property(this_ptr, SL("_domain"), PH_NOISY);
 
 	RETURN_CTOR(domain);
 }
@@ -788,8 +736,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setSecure){
 
 	phalcon_fetch_params(0, 1, 1, 0, &secure);
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
@@ -810,14 +757,12 @@ PHP_METHOD(Phalcon_Http_Cookie, getSecure){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	PHALCON_OBS_VAR(secure);
-	phalcon_read_property_this(&secure, this_ptr, SL("_secure"), PH_NOISY);
+	secure = phalcon_read_property(this_ptr, SL("_secure"), PH_NOISY);
 
 	RETURN_CTOR(secure);
 }
@@ -836,8 +781,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setHttpOnly){
 
 	phalcon_fetch_params(0, 1, 1, 0, &http_only);
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
@@ -858,14 +802,12 @@ PHP_METHOD(Phalcon_Http_Cookie, getHttpOnly){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(restored);
-	phalcon_read_property_this(&restored, this_ptr, SL("_restored"), PH_NOISY);
+	restored = phalcon_read_property(this_ptr, SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
 		PHALCON_CALL_METHOD(NULL, this_ptr, "restore");
 	}
 
-	PHALCON_OBS_VAR(http_only);
-	phalcon_read_property_this(&http_only, this_ptr, SL("_httpOnly"), PH_NOISY);
+	http_only = phalcon_read_property(this_ptr, SL("_httpOnly"), PH_NOISY);
 
 	RETURN_CTOR(http_only);
 }
@@ -879,7 +821,7 @@ PHP_METHOD(Phalcon_Http_Cookie, __toString){
 
 	zval *value;
 
-	value = phalcon_fetch_nproperty_this(this_ptr, SL("_value"), PH_NOISY);
+	value = phalcon_read_property(this_ptr, SL("_value"), PH_NOISY);
 	if (Z_TYPE_P(value) == IS_NULL) {
 		if (FAILURE == phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "getvalue", 0, NULL)) {
 			if (EG(exception)) {

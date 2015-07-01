@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	PHALCON_MM_GROW();
 
-	original_builder = phalcon_fetch_nproperty_this(this_ptr, SL("_builder"), PH_NOISY);
+	original_builder = phalcon_read_property(this_ptr, SL("_builder"), PH_NOISY);
 
 	/* Make a copy of the original builder to leave it as it is */
 	PHALCON_INIT_VAR(builder);
@@ -270,8 +270,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		RETURN_MM();
 	}
 
-	limit         = phalcon_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY);
-	number_page   = phalcon_fetch_nproperty_this(this_ptr, SL("_page"), PH_NOISY);
+	limit         = phalcon_read_property(this_ptr, SL("_limitRows"), PH_NOISY);
+	number_page   = phalcon_read_property(this_ptr, SL("_page"), PH_NOISY);
 	i_limit       = phalcon_get_intval(limit);
 	i_number_page = phalcon_get_intval(number_page);
 
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	PHALCON_CALL_METHOD(&items, query, "execute");
 
 	/* Remove the 'ORDER BY' clause, PostgreSQL requires this */
-	PHALCON_CALL_METHOD(NULL, total_builder, "orderby", PHALCON_GLOBAL(z_null));
+	PHALCON_CALL_METHOD(NULL, total_builder, "orderby", &PHALCON_GLOBAL(z_null));
 
 	/* Obtain the PHQL for the total query */
 	PHALCON_CALL_METHOD(&total_query, total_builder, "getquery");
@@ -397,7 +397,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 				convert_to_string(value);
 
 				PHALCON_INIT_NVAR(sql_tmp);
-				phalcon_fast_str_replace(sql_tmp, string_wildcard, value, sql);
+				PHALCON_STR_REPLACE(sql_tmp, string_wildcard, value, sql);
 
 				PHALCON_INIT_NVAR(sql);
 				ZVAL_STRING(sql, Z_STRVAL_P(sql_tmp));

@@ -102,18 +102,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 0, 1, &descriptor);
-	
+
 	if (!descriptor) {
 		PHALCON_INIT_VAR(descriptor);
 	} else {
 		PHALCON_SEPARATE_PARAM(descriptor);
 	}
-	
+
 	if (!zend_is_true(descriptor)) {
-		PHALCON_OBS_NVAR(descriptor);
-		phalcon_read_property_this(&descriptor, this_ptr, SL("_descriptor"), PH_NOISY);
+		descriptor = phalcon_read_property(this_ptr, SL("_descriptor"), PH_NOISY);
 	}
-	
+
 	if (phalcon_array_isset_string(descriptor, SS("schema"))) {
 		PHALCON_OBS_VAR(schema);
 		phalcon_array_fetch_string(&schema, descriptor, SL("schema"), PH_NOISY);
@@ -134,13 +133,13 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		 * To avoid this we set the password to null
 		 */
 		if (Z_TYPE_P(password) == IS_STRING && Z_STRLEN_P(password) == 0) {
-			phalcon_array_update_string(&descriptor, SL("password"), PHALCON_GLOBAL(z_null), PH_SEPARATE | PH_COPY);
+			phalcon_array_update_string(&descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_SEPARATE | PH_COPY);
 		}
 	}
 
-	
+
 	PHALCON_CALL_PARENT(NULL, phalcon_db_adapter_pdo_postgresql_ce, this_ptr, "connect", descriptor);
-	
+
 	/** 
 	 * Execute the search path in the after connect
 	 */
@@ -149,7 +148,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		PHALCON_CONCAT_SVS(sql, "SET search_path TO '", schema, "'");
 		PHALCON_CALL_METHOD(NULL, this_ptr, "execute", sql);
 	}
-	
+
 	PHALCON_MM_RESTORE();
 }
 
@@ -175,27 +174,26 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &table, &schema);
-	
+
 	if (!schema || !zend_is_true(schema)) {
-		schema = phalcon_fetch_nproperty_this(this_ptr, SL("_schema"), PH_NOISY);
+		schema = phalcon_read_property(this_ptr, SL("_schema"), PH_NOISY);
 	}
-	
+
 	PHALCON_INIT_VAR(columns);
 	array_init(columns);
-	
-	PHALCON_OBS_VAR(dialect);
-	phalcon_read_property_this(&dialect, this_ptr, SL("_dialect"), PH_NOISY);
-	
+
+	dialect = phalcon_read_property(this_ptr, SL("_dialect"), PH_NOISY);
+
 	PHALCON_CALL_METHOD(&sql, dialect, "describecolumns", table, schema);
-	
+
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
 	 */
 	PHALCON_INIT_VAR(fetch_num);
 	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
-	
+
 	PHALCON_CALL_METHOD(&describe, this_ptr, "fetchall", sql, fetch_num);
-	
+
 	/** 
 	 * 0:name, 1:type, 2:size, 3:numeric size, 4:numeric scale, 5: null, 6: key, 7: extra, 8: position, 9: element type
 	 */
@@ -205,7 +203,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		PHALCON_INIT_NVAR(definition);
 		array_init_size(definition, 1);
 		add_assoc_long_ex(definition, SS("bindType"), 2);
-	
+
 		PHALCON_OBS_NVAR(char_size);
 		phalcon_array_fetch_long(&char_size, field, 2, PH_NOISY);
 		if (Z_TYPE_P(char_size) != IS_NULL) {
@@ -223,7 +221,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		if (phalcon_is_numeric(numeric_scale)) {
 			convert_to_long(numeric_scale);
 		}
-	
+
 		PHALCON_OBS_NVAR(column_type);
 		phalcon_array_fetch_long(&column_type, field, 1, PH_NOISY);
 
@@ -411,7 +409,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		} else if (!PHALCON_IS_EMPTY(attribute)) {
 			phalcon_array_update_string(&definition, SL("default"), attribute, PH_COPY);
 		}
-	
+
 		PHALCON_OBS_NVAR(column_name);
 		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY);
 
@@ -425,7 +423,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		phalcon_array_append(&columns, column, PH_SEPARATE);
 		PHALCON_CPY_WRT(old_column, column_name);
 	} ZEND_HASH_FOREACH_END();
-	
+
 	RETURN_CTOR(columns);
 }
 
@@ -453,11 +451,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, getDefaultIdValue){
 
 	PHALCON_INIT_VAR(null_value);
 	ZVAL_STRING(null_value, "default");
-	
+
 	PHALCON_INIT_VAR(default_value);
 	object_init_ex(default_value, phalcon_db_rawvalue_ce);
 	PHALCON_CALL_METHOD(NULL, default_value, "__construct", null_value);
-	
+
 	RETURN_CTOR(default_value);
 }
 

@@ -170,7 +170,7 @@ static int phalcon_di_call_method(const char *method, INTERNAL_FUNCTION_PARAMETE
 	int num_args = ZEND_NUM_ARGS();
 
 	if (!num_args) {
-		param = &PHALCON_GLOBAL(z_null);
+		param = &&PHALCON_GLOBAL(z_null);
 	} else if (phalcon_fetch_parameters(num_args, 1, 0, &param) == FAILURE) {
 		return FAILURE;
 	}
@@ -256,7 +256,7 @@ static zval* phalcon_di_read_dimension(zval *object, zval *offset, int type, zva
 		offset = &tmp;
 	}
 
-	ret = phalcon_di_read_dimension_internal(object, obj, offset, PHALCON_GLOBAL(z_null));
+	ret = phalcon_di_read_dimension_internal(object, obj, offset, &PHALCON_GLOBAL(z_null));
 
 	if (UNEXPECTED(offset == &tmp)) {
 		phalcon_dtor(tmp);
@@ -298,7 +298,7 @@ static int phalcon_di_has_dimension(zval *object, zval *offset, int check_empty)
 static zval* phalcon_di_write_dimension_internal(phalcon_di_object *obj, zval *offset, zval *value)
 {
 	zval *retval;
-	zval *params[] = { offset, value, PHALCON_GLOBAL(z_true) };
+	zval *params[] = { offset, value, &PHALCON_GLOBAL(z_true) };
 
 	assert(Z_TYPE_P(offset) == IS_STRING);
 
@@ -575,7 +575,7 @@ PHP_METHOD(Phalcon_DI, __construct){
 
 	zval *default_di;
 
-	default_di = phalcon_fetch_static_property_ce(phalcon_di_ce, SL("_default"));
+	default_di = phalcon_read_static_property_ce(phalcon_di_ce, SL("_default"));
 	if (Z_TYPE_P(default_di) == IS_NULL) {
 		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), this_ptr);
 	}
@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_DI, set) {
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	if (!shared) {
-		shared = &PHALCON_GLOBAL(z_false);
+		shared = &&PHALCON_GLOBAL(z_false);
 	}
 
 	PHALCON_ALLOC_GHOST_ZVAL(service);
@@ -702,7 +702,7 @@ PHP_METHOD(Phalcon_DI, attempt){
 		PHALCON_MM_GROW();
 
 		if (!shared) {
-			shared = &PHALCON_GLOBAL(z_false);
+			shared = &&PHALCON_GLOBAL(z_false);
 		}
 
 		object_init_ex(return_value, phalcon_di_service_ce);
@@ -818,10 +818,10 @@ PHP_METHOD(Phalcon_DI, get){
 	PHALCON_ENSURE_IS_STRING(&name);
 	
 	if (!parameters) {
-		parameters = PHALCON_GLOBAL(z_null);
+		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
+	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_NVAR(event_name);
 		ZVAL_STRING(event_name, "di:beforeServiceResolve");
@@ -893,7 +893,7 @@ PHP_METHOD(Phalcon_DI, getShared){
 	phalcon_fetch_params(0, 1, 1, &name, &parameters);
 	PHALCON_ENSURE_IS_STRING(name);
 	if (!parameters) {
-		parameters = &PHALCON_GLOBAL(z_null);
+		parameters = &&PHALCON_GLOBAL(z_null);
 	}
 
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_object);
@@ -1007,7 +1007,7 @@ PHP_METHOD(Phalcon_DI, __call){
 	PHALCON_ENSURE_IS_STRING(method);
 
 	if (!arguments) {
-		arguments = &PHALCON_GLOBAL(z_null);
+		arguments = &&PHALCON_GLOBAL(z_null);
 	}
 	
 	phalcon_di_call_method_internal(return_value, return_value_ptr, getThis(), Z_STRVAL_P(*method), *arguments);
@@ -1037,7 +1037,7 @@ PHP_METHOD(Phalcon_DI, getDefault){
 
 	zval *default_di;
 
-	default_di = phalcon_fetch_static_property_ce(phalcon_di_ce, SL("_default"));
+	default_di = phalcon_read_static_property_ce(phalcon_di_ce, SL("_default"));
 	RETURN_CTORW(default_di);
 }
 

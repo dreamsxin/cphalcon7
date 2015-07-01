@@ -79,36 +79,14 @@ PHALCON_ATTR_NONNULL static inline int phalcon_isset_property_zval(zval *object,
 }
 
 /** Reading properties */
-zval* phalcon_fetch_property_this(zval *object, const char *property_name, uint32_t property_length, int silent);
-int phalcon_read_property(zval **result, zval *object, const char *property_name, uint32_t property_length, int silent);
-int phalcon_read_property_zval(zval **result, zval *object, const zval *property, int silent);
+zval* phalcon_read_property(zval *object, const char *property_name, uint32_t property_length, int silent);
 
 /**
- * Reads a property from this_ptr (with pre-calculated key)
- * Variables must be defined in the class definition. This function ignores magic methods or dynamic properties
+ * Reads a property from an object
  */
-PHALCON_ATTR_NONNULL static inline int phalcon_read_property_this(zval **result, zval *object, const char *property_name, uint32_t property_length, int silent)
+PHALCON_ATTR_NONNULL static inline zval* phalcon_read_property_zval(zval *object, const zval *property, int silent)
 {
-	zval *tmp = phalcon_fetch_property_this(object, property_name, property_length, silent);
-	if (EXPECTED(tmp != NULL)) {
-		*result = tmp;
-		Z_ADDREF_P(*result);
-		return SUCCESS;
-	}
-
-	ALLOC_INIT_ZVAL(*result);
-	return FAILURE;
-}
-
-PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this(zval *object, const char *property_name, uint32_t property_length, int silent)
-{
-	zval *result = phalcon_fetch_property_this(object, property_name, property_length, silent);
-	return result ? result : &EG(uninitialized_zval);
-}
-
-PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this_zval(zval *object, const zval *property, int silent)
-{
-	return phalcon_fetch_nproperty_this(object, Z_STRVAL_P(property), Z_STRLEN_P(property), silent);
+	return phalcon_read_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property), silent);
 }
 
 /**
@@ -117,7 +95,7 @@ PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_nproperty_this_zval(zval 
 PHALCON_ATTR_NONNULL3(1,2,3)
 static inline int phalcon_return_property(zval *return_value, zval *object, const char *property_name, uint32_t property_length)
 {
-	zval *tmp = phalcon_fetch_nproperty_this(object, property_name, property_length, PH_NOISY);
+	zval *tmp = phalcon_read_property(object, property_name, property_length, PH_NOISY);
 	if (tmp) {
 		ZVAL_ZVAL(return_value, tmp, 1, 0);
 	} else {
@@ -159,23 +137,14 @@ int phalcon_read_static_property(zval **result, const char *class_name, uint32_t
 int phalcon_read_class_property(zval **result, int type, const char *property, uint32_t len) PHALCON_ATTR_NONNULL;
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);
 
-PHALCON_ATTR_NONNULL static inline zval* phalcon_fetch_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len)
+PHALCON_ATTR_NONNULL
+static inline zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len)
 {
 	return zend_read_static_property(ce, property, len, (zend_bool)ZEND_FETCH_CLASS_SILENT);
 }
 
-PHALCON_ATTR_NONNULL static inline int phalcon_read_static_property_ce(zval **result, zend_class_entry *ce, const char *property, uint32_t len)
-{
-	*result = phalcon_fetch_static_property_ce(ce, property, len);
-	if (*result) {
-		Z_ADDREF_P(*result);
-		return SUCCESS;
-	}
-
-	return FAILURE;
-}
-
-PHALCON_ATTR_NONNULL static inline int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value)
+PHALCON_ATTR_NONNULL
+static inline int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value)
 {
 
 	return zend_update_static_property(ce, name, len, value);

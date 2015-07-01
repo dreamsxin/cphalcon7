@@ -83,7 +83,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 	phalcon_fetch_params(1, 1, 1, &parameters, &data);
 
 	if (!data) {
-		data = PHALCON_GLOBAL(z_null);
+		data = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(parameters) != IS_ARRAY) { 
@@ -288,14 +288,12 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
 					/** 
 					 * Read the variable directly from the model/object
 					 */
-					PHALCON_OBS_NVAR(option_value);
-					phalcon_read_property_zval(&option_value, option, using_zero, PH_NOISY);
+					option_value = phalcon_read_property_zval(option, using_zero, PH_NOISY);
 
 					/** 
 					 * Read the text directly from the model/object
 					 */
-					PHALCON_OBS_NVAR(option_text);
-					phalcon_read_property_zval(&option_text, option, using_one, PH_NOISY);
+					option_text = phalcon_read_property_zval(option, using_one, PH_NOISY);
 				}
 			} else {
 				if (Z_TYPE_P(option) == IS_ARRAY) { 

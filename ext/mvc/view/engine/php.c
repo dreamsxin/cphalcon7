@@ -74,7 +74,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	PHALCON_ENSURE_IS_STRING(path);
 	
 	if (!must_clean) {
-		must_clean = &PHALCON_GLOBAL(z_false);
+		must_clean = &&PHALCON_GLOBAL(z_false);
 	}
 	
 	clean = PHALCON_IS_TRUE(*must_clean);
@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		PHALCON_ALLOC_GHOST_ZVAL(contents);
 		phalcon_ob_get_contents(contents);
 	
-		view = phalcon_fetch_nproperty_this(this_ptr, SL("_view"), PH_NOISY);
+		view = phalcon_read_property(this_ptr, SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHODW(NULL, view, "setcontent", contents);
 	}
 

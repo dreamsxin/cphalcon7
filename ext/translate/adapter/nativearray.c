@@ -50,7 +50,7 @@ static zval* phalcon_translate_adapter_nativearray_read_dimension(zval *object, 
 		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
 	}
 
-	translate = phalcon_fetch_nproperty_this(object, SL("_translate"), PH_NOISY);
+	translate = phalcon_read_property(object, SL("_translate"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&translation, translate, offset)) {
 		return translation;
 	}
@@ -66,7 +66,7 @@ static int phalcon_translate_adapter_nativearray_has_dimension(zval *object, zva
 		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty);
 	}
 
-	translate = phalcon_fetch_nproperty_this(object, SL("_translate"), PH_NOISY);
+	translate = phalcon_read_property(object, SL("_translate"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&translation, translate, offset)) {
 		return 0;
 	}
@@ -155,10 +155,10 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 	phalcon_fetch_params(0, 0, 1, 1, &index, &placeholders);
 	
 	if (!placeholders) {
-		placeholders = PHALCON_GLOBAL(z_null);
+		placeholders = &PHALCON_GLOBAL(z_null);
 	}
 	
-	translate = phalcon_fetch_nproperty_this(this_ptr, SL("_translate"), PH_NOISY);
+	translate = phalcon_read_property(this_ptr, SL("_translate"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&translation, translate, index)) {
 		translation = index;
 	}
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 			PHALCON_CONCAT_SVS(key_placeholder, "%", key, "%");
 
 			ALLOC_INIT_ZVAL(replaced);
-			phalcon_fast_str_replace(replaced, key_placeholder, value, translation);
+			PHALCON_STR_REPLACE(replaced, key_placeholder, value, translation);
 			zval_dtor(key_placeholder);
 
 			zval_ptr_dtor(&translation);

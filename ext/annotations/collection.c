@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 	HashPosition hp0;
 
 	phalcon_fetch_params(0, 0, 1, &reflection_data);
-	
+
 	if (!reflection_data || Z_TYPE_P(reflection_data) == IS_NULL) {
 		return;
 	}
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, count){
 
 	zval *annotations;
 
-	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_annotations"), PH_NOISY);
+	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		RETURN_LONG(zend_hash_num_elements(Z_ARRVAL_P(annotations)));
 	}
@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, rewind){
 
 
 	phalcon_update_property_long(this_ptr, SL("_position"), 0);
-	
+
 }
 
 /**
@@ -187,12 +187,12 @@ PHP_METHOD(Phalcon_Annotations_Collection, current){
 
 	zval *position, *annotations, *annotation;
 
-	position    = phalcon_fetch_nproperty_this(this_ptr, SL("_position"), PH_NOISY);
-	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_annotations"), PH_NOISY);
+	position    = phalcon_read_property(this_ptr, SL("_position"), PH_NOISY);
+	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&annotation, annotations, position)) {
 		RETURN_ZVAL(annotation, 1, 0);
 	}
-	
+
 	RETURN_NULL();
 }
 
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, next){
 
 
 	phalcon_property_incr(this_ptr, SL("_position"));
-	
+
 }
 
 /**
@@ -229,15 +229,13 @@ PHP_METHOD(Phalcon_Annotations_Collection, valid){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(position);
-	phalcon_read_property_this(&position, this_ptr, SL("_position"), PH_NOISY);
-	
-	PHALCON_OBS_VAR(annotations);
-	phalcon_read_property_this(&annotations, this_ptr, SL("_annotations"), PH_NOISY);
+	position = phalcon_read_property(this_ptr, SL("_position"), PH_NOISY);
+
+	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
 	if (phalcon_array_isset(annotations, position)) {
 		RETURN_MM_TRUE;
 	}
-	
+
 	RETURN_MM_FALSE;
 }
 
@@ -269,9 +267,8 @@ PHP_METHOD(Phalcon_Annotations_Collection, get){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &name);
-	
-	PHALCON_OBS_VAR(annotations);
-	phalcon_read_property_this(&annotations, this_ptr, SL("_annotations"), PH_NOISY);
+
+	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
@@ -279,7 +276,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, get){
 				RETURN_CCTOR(annotation);
 			}
 		} ZEND_HASH_FOREACH_END();
-	
+
 	}
 
 	PHALCON_INIT_VAR(exception_message);
@@ -304,12 +301,11 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &name);
-	
+
 	PHALCON_INIT_VAR(found);
 	array_init(found);
-	
-	PHALCON_OBS_VAR(annotations);
-	phalcon_read_property_this(&annotations, this_ptr, SL("_annotations"), PH_NOISY);
+
+	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
@@ -318,7 +314,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
-	
+
 	RETURN_CTOR(found);
 }
 
@@ -338,9 +334,8 @@ PHP_METHOD(Phalcon_Annotations_Collection, has){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &name);
-	
-	PHALCON_OBS_VAR(annotations);
-	phalcon_read_property_this(&annotations, this_ptr, SL("_annotations"), PH_NOISY);
+
+	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
@@ -349,7 +344,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, has){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
-	
+
 	RETURN_MM_FALSE;
 }
 

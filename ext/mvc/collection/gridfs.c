@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 	}
 
 	if (!isBytes) {
-		isBytes = PHALCON_GLOBAL(z_false);
+		isBytes = &PHALCON_GLOBAL(z_false);
 	}
 
 	phalcon_array_update_string_long(&options, SL("w"), 0, 0);
@@ -161,8 +161,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 		return;
 	}
 
-	sha1 = phalcon_fetch_nproperty_this(this_ptr, SL("sha1"), PH_NOISY);
-	md5 = phalcon_fetch_nproperty_this(this_ptr, SL("md5"), PH_NOISY);
+	sha1 = phalcon_read_property(this_ptr, SL("sha1"), PH_NOISY);
+	md5 = phalcon_read_property(this_ptr, SL("md5"), PH_NOISY);
 
 	PHALCON_INIT_VAR(criteria);
 	array_init_size(criteria, 3);
@@ -237,11 +237,11 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 	phalcon_fetch_params(1, 0, 2, &sha1, &md5);
 
 	if (!sha1) {
-		sha1 = phalcon_fetch_nproperty_this(this_ptr, SL("sha1"), PH_NOISY);
+		sha1 = phalcon_read_property(this_ptr, SL("sha1"), PH_NOISY);
 	}
 
 	if (!md5) {
-		md5 = phalcon_fetch_nproperty_this(this_ptr, SL("md5"), PH_NOISY);
+		md5 = phalcon_read_property(this_ptr, SL("md5"), PH_NOISY);
 	}
 
 	PHALCON_CALL_METHOD(&source, this_ptr, "getsource");
@@ -330,23 +330,20 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 	phalcon_fetch_params(1, 1, 3, &filename, &arr, &white_list, &mode);
 
 	if (!arr) {
-		arr = PHALCON_GLOBAL(z_null);
+		arr = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!mode) {
-		mode = PHALCON_GLOBAL(z_null);
+		mode = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (zend_is_true(filename)) {
-		PHALCON_OBS_VAR(old_sha1);
-		phalcon_read_property_this(&old_sha1, this_ptr, SL("sha1"), PH_NOISY);
-
-		PHALCON_OBS_VAR(old_md5);
-		phalcon_read_property_this(&old_md5, this_ptr, SL("md5"), PH_NOISY);
+		old_sha1 = phalcon_read_property(this_ptr, SL("sha1"), PH_NOISY);
+		old_md5 = phalcon_read_property(this_ptr, SL("md5"), PH_NOISY);
 
 		PHALCON_CALL_FUNCTION(&sha1, "sha1_file", filename);
 		PHALCON_CALL_FUNCTION(&md5, "md5_file", filename);
@@ -379,20 +376,20 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, saveBytes){
 	phalcon_fetch_params(1, 1, 3, &bytes, &arr, &white_list, &mode);
 
 	if (!arr) {
-		arr = PHALCON_GLOBAL(z_null);
+		arr = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!mode) {
-		mode = PHALCON_GLOBAL(z_null);
+		mode = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (zend_is_true(bytes)) {
-		old_sha1 = phalcon_fetch_nproperty_this(this_ptr, SL("sha1"), PH_NOISY);
-		old_md5 = phalcon_fetch_nproperty_this(this_ptr, SL("md5"), PH_NOISY);
+		old_sha1 = phalcon_read_property(this_ptr, SL("sha1"), PH_NOISY);
+		old_md5 = phalcon_read_property(this_ptr, SL("md5"), PH_NOISY);
 
 		PHALCON_CALL_FUNCTION(&sha1, "sha1", bytes);
 		PHALCON_CALL_FUNCTION(&md5, "md5", bytes);
@@ -408,7 +405,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, saveBytes){
 	}
 
 	if (zend_is_true(bytes)) {
-		PHALCON_CALL_SELF(&status, "store", bytes, PHALCON_GLOBAL(z_null), PHALCON_GLOBAL(z_null), PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_SELF(&status, "store", bytes, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 		if (zend_is_true(old_sha1)) {
 			PHALCON_CALL_SELF(NULL, "remove", old_sha1, old_md5);
 		}
@@ -426,18 +423,18 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, create){
 	phalcon_fetch_params(1, 0, 3, &filename, &data, &white_list);
 
 	if (!filename) {
-		filename = PHALCON_GLOBAL(z_null);
+		filename = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!data) {
-		data = PHALCON_GLOBAL(z_null);
+		data = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "save", filename, data, white_list, PHALCON_GLOBAL(z_true));
+	PHALCON_RETURN_CALL_METHOD(this_ptr, "save", filename, data, white_list, &PHALCON_GLOBAL(z_true));
 	RETURN_MM();
 }
 
@@ -450,18 +447,18 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, createBytes){
 	phalcon_fetch_params(1, 0, 3, &bytes, &data, &white_list);
 
 	if (!bytes) {
-		bytes = PHALCON_GLOBAL(z_null);
+		bytes = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!data) {
-		data = PHALCON_GLOBAL(z_null);
+		data = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "savebytes", bytes, data, white_list, PHALCON_GLOBAL(z_true));
+	PHALCON_RETURN_CALL_METHOD(this_ptr, "savebytes", bytes, data, white_list, &PHALCON_GLOBAL(z_true));
 	RETURN_MM();
 }
 
@@ -473,18 +470,18 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, update){
 	phalcon_fetch_params(1, 0, 4, &filename, &data, &white_list, &isBytes);
 
 	if (!filename) {
-		filename = PHALCON_GLOBAL(z_null);
+		filename = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!data) {
-		data = PHALCON_GLOBAL(z_null);
+		data = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "save", filename, data, white_list, PHALCON_GLOBAL(z_false));
+	PHALCON_RETURN_CALL_METHOD(this_ptr, "save", filename, data, white_list, &PHALCON_GLOBAL(z_false));
 	RETURN_MM();
 }
 
@@ -497,18 +494,18 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, updateBytes){
 	phalcon_fetch_params(1, 0, 3, &bytes, &data, &white_list);
 
 	if (!bytes) {
-		bytes = PHALCON_GLOBAL(z_null);
+		bytes = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!data) {
-		data = PHALCON_GLOBAL(z_null);
+		data = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "saveBytes", bytes, data, white_list, PHALCON_GLOBAL(z_false));
+	PHALCON_RETURN_CALL_METHOD(this_ptr, "saveBytes", bytes, data, white_list, &PHALCON_GLOBAL(z_false));
 	RETURN_MM();
 }
 
@@ -600,8 +597,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getFile){
 		return;
 	}
 
-	sha1 = phalcon_fetch_nproperty_this(this_ptr, SL("sha1"), PH_NOISY);
-	md5 = phalcon_fetch_nproperty_this(this_ptr, SL("md5"), PH_NOISY);
+	sha1 = phalcon_read_property(this_ptr, SL("sha1"), PH_NOISY);
+	md5 = phalcon_read_property(this_ptr, SL("md5"), PH_NOISY);
 
 	PHALCON_INIT_VAR(criteria);
 	array_init_size(criteria, 2);

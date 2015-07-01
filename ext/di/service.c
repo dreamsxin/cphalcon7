@@ -350,11 +350,11 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 	phalcon_fetch_params(0, 0, 0, 2, &parameters, &dependency_injector);
 
 	if (!parameters) {
-		parameters = PHALCON_GLOBAL(z_null);
+		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!dependency_injector) {
-		dependency_injector = PHALCON_GLOBAL(z_null);
+		dependency_injector = &PHALCON_GLOBAL(z_null);
 	}
 
 	/* Check if the service is shared */

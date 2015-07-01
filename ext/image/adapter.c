@@ -251,8 +251,8 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 			PHALCON_INIT_VAR(height);
 		}
 
-		image_width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY);
-		image_height = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
+		image_width  = phalcon_read_property(this_ptr, SL("_width"), PH_NOISY);
+		image_height = phalcon_read_property(this_ptr, SL("_height"), PH_NOISY);
 
 		tmp_image_width  = phalcon_get_intval(image_width);
 		tmp_image_height = phalcon_get_intval(image_height);
@@ -371,13 +371,13 @@ PHP_METHOD(Phalcon_Image_Adapter, liquidRescale){
 	PHALCON_MM_GROW();
 
 	if (!delta_x) {
-		delta_x = &PHALCON_GLOBAL(z_zero);
+		delta_x = &&PHALCON_GLOBAL(z_zero);
 	} else {
 		PHALCON_ENSURE_IS_LONG(delta_x);
 	}
 
 	if (!rigidity) {
-		rigidity = &PHALCON_GLOBAL(z_zero);
+		rigidity = &&PHALCON_GLOBAL(z_zero);
 	} else {
 		PHALCON_ENSURE_IS_LONG(rigidity);
 	}
@@ -411,8 +411,8 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 
 	PHALCON_MM_GROW();
 
-	image_width  = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY);
-	image_height = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
+	image_width  = phalcon_read_property(this_ptr, SL("_width"), PH_NOISY);
+	image_height = phalcon_read_property(this_ptr, SL("_height"), PH_NOISY);
 
 	SEPARATE_ZVAL_IF_NOT_REF(*w);
 	if (Z_TYPE_P(*w) != IS_LONG) {
@@ -611,7 +611,7 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
 
 	PHALCON_MM_GROW();
 
-	image_height     = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
+	image_height     = phalcon_read_property(this_ptr, SL("_height"), PH_NOISY);
 	tmp_image_height = phalcon_get_intval(image_height);
 
 	if (!h || Z_TYPE_P(*h) != IS_LONG || Z_LVAL_P(*h) > tmp_image_height) {
@@ -639,7 +639,7 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
 	}
 
 	if (!fade_in) {
-		fade_in = &PHALCON_GLOBAL(z_false);
+		fade_in = &&PHALCON_GLOBAL(z_false);
 	}
 
 	PHALCON_CALL_METHOD(NULL, this_ptr, "_reflection", height, opacity, *fade_in);
@@ -668,10 +668,10 @@ PHP_METHOD(Phalcon_Image_Adapter, watermark){
 
 	PHALCON_MM_GROW();
 
-	image_width      = phalcon_fetch_nproperty_this(this_ptr, SL("_width"), PH_NOISY);
-	image_height     = phalcon_fetch_nproperty_this(this_ptr, SL("_height"), PH_NOISY);
-	watermark_width  = phalcon_fetch_nproperty_this(*watermark, SL("_width"), PH_NOISY);
-	watermark_height = phalcon_fetch_nproperty_this(*watermark, SL("_height"), PH_NOISY);
+	image_width      = phalcon_read_property(this_ptr, SL("_width"), PH_NOISY);
+	image_height     = phalcon_read_property(this_ptr, SL("_height"), PH_NOISY);
+	watermark_width  = phalcon_read_property(*watermark, SL("_width"), PH_NOISY);
+	watermark_height = phalcon_read_property(*watermark, SL("_height"), PH_NOISY);
 
 	tmp_image_width      = phalcon_get_intval(image_width);
 	tmp_image_height     = phalcon_get_intval(image_height);
@@ -756,14 +756,14 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 	PHALCON_MM_GROW();
 
 	if (!ofs_x) {
-		offset_x = PHALCON_GLOBAL(z_null);
+		offset_x = &PHALCON_GLOBAL(z_null);
 	}
 	else {
 		PHALCON_CPY_WRT_CTOR(offset_x, *ofs_x);
 	}
 
 	if (!ofs_y) {
-		offset_y = PHALCON_GLOBAL(z_null);
+		offset_y = &PHALCON_GLOBAL(z_null);
 	}
 	else {
 		PHALCON_CPY_WRT_CTOR(offset_y, *ofs_y);
@@ -807,7 +807,7 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 	}
 
 	if (!fontfile) {
-		fontfile = &PHALCON_GLOBAL(z_null);
+		fontfile = &&PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_STRLEN_P(color) == 3) {
@@ -1054,8 +1054,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 	PHALCON_MM_GROW();
 
 	if (!fname) {
-		PHALCON_OBS_VAR(file);
-		phalcon_read_property_this(&file, this_ptr, SL("_realpath"), PH_NOISY);
+		file = phalcon_read_property(this_ptr, SL("_realpath"), PH_NOISY);
 		convert_to_string_ex(&file);
 	}
 	else {
@@ -1128,7 +1127,7 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 	phalcon_fetch_params(0, 1, 0, 2, &ext, &quality);
 
 	if (!ext) {
-		format = phalcon_fetch_nproperty_this(this_ptr, SL("_format"), PH_NOISY);
+		format = phalcon_read_property(this_ptr, SL("_format"), PH_NOISY);
 
 		if (PHALCON_IS_EMPTY(format)) {
 			PHALCON_INIT_VAR(ext);

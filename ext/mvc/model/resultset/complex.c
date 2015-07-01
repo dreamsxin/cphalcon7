@@ -102,11 +102,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
 	phalcon_fetch_params(1, 2, 2, &columns_types, &result, &cache, &source_model);
 
 	if (!cache) {
-		cache = PHALCON_GLOBAL(z_null);
+		cache = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!source_model) {
-		source_model = PHALCON_GLOBAL(z_null);
+		source_model = &PHALCON_GLOBAL(z_null);
 	}
 
 	/** 
@@ -167,8 +167,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 
 	PHALCON_MM_GROW();
 
-	source_model       = phalcon_fetch_nproperty_this(this_ptr, SL("_sourceModel"), PH_NOISY);
-	type       = phalcon_fetch_nproperty_this(this_ptr, SL("_type"), PH_NOISY);
+	source_model       = phalcon_read_property(this_ptr, SL("_sourceModel"), PH_NOISY);
+	type       = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
 	i_type     = (Z_TYPE_P(type) == IS_LONG) ? Z_LVAL_P(type) : phalcon_get_intval(type);
 	is_partial = (i_type == PHALCON_MVC_MODEL_RESULTSET_TYPE_PARTIAL);
 	type       = NULL;
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 		/** 
 		 * The result is bigger than 32 rows so it's retrieved one by one
 		 */
-		zval *result = phalcon_fetch_nproperty_this(this_ptr, SL("_result"), PH_NOISY);
+		zval *result = phalcon_read_property(this_ptr, SL("_result"), PH_NOISY);
 		if (PHALCON_IS_NOT_FALSE(result)) {
 			PHALCON_CALL_METHOD(&row, result, "fetch", result);
 		} else {
@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 		/** 
 		 * The full rows are dumped in this_ptr->rows
 		 */
-		zval *rows = phalcon_fetch_nproperty_this(this_ptr, SL("_rows"), PH_NOISY);
+		zval *rows = phalcon_read_property(this_ptr, SL("_rows"), PH_NOISY);
 		if (Z_TYPE_P(rows) == IS_ARRAY) { 
 			phalcon_array_get_current(row, rows);
 			if (Z_TYPE_P(row) == IS_OBJECT) {
@@ -218,8 +218,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			/** 
 			 * Get current hydration mode
 			 */
-			zval *hydrate_mode  = phalcon_fetch_nproperty_this(this_ptr, SL("_hydrateMode"), PH_NOISY);
-			zval *columns_types = phalcon_fetch_nproperty_this(this_ptr, SL("_columnTypes"), PH_NOISY);
+			zval *hydrate_mode  = phalcon_read_property(this_ptr, SL("_hydrateMode"), PH_NOISY);
+			zval *columns_types = phalcon_read_property(this_ptr, SL("_columnTypes"), PH_NOISY);
 			int i_hydrate_mode  = phalcon_get_intval(hydrate_mode);
 
 			PHALCON_INIT_VAR(underscore);
@@ -312,14 +312,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							 */
 							if (!phalcon_array_isset_string_fetch(&instance, column, SS("instance"))) {
 								php_error_docref(NULL, E_NOTICE, "Undefined index: instance");
-								instance = PHALCON_GLOBAL(z_null);
+								instance = &PHALCON_GLOBAL(z_null);
 							}
 
 							/** 
 							 * Check if the resultset must keep snapshots
 							 */
 							if (!phalcon_array_isset_string_fetch(&keep_snapshots, column, SS("keepSnapshots"))) {
-								keep_snapshots = PHALCON_GLOBAL(z_false);
+								keep_snapshots = &PHALCON_GLOBAL(z_false);
 							}
 
 							/** 
@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 						PHALCON_CPY_WRT(attribute, &alias);
 					} else {
 						PHALCON_INIT_NVAR(n_alias);
-						phalcon_fast_str_replace(n_alias, underscore, empty_str, &alias);
+						PHALCON_STR_REPLACE(n_alias, underscore, empty_str, &alias);
 						PHALCON_CPY_WRT(attribute, n_alias);
 					}
 
@@ -468,9 +468,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 	 */
 	PHALCON_CALL_METHOD(&records, this_ptr, "toarray");
 
-	cache        = phalcon_fetch_nproperty_this(this_ptr, SL("_cache"), PH_NOISY);
-	column_types = phalcon_fetch_nproperty_this(this_ptr, SL("_columnTypes"), PH_NOISY);
-	hydrate_mode = phalcon_fetch_nproperty_this(this_ptr, SL("_hydrateMode"), PH_NOISY);
+	cache        = phalcon_read_property(this_ptr, SL("_cache"), PH_NOISY);
+	column_types = phalcon_read_property(this_ptr, SL("_columnTypes"), PH_NOISY);
+	hydrate_mode = phalcon_read_property(this_ptr, SL("_hydrateMode"), PH_NOISY);
 
 	PHALCON_INIT_VAR(data);
 	array_init_size(data, 4);

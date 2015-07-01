@@ -212,13 +212,9 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 	if (Z_TYPE_P(name) != IS_NULL) {
 		if (phalcon_array_isset_fetch(&value, data, name)) {
 			if (Z_TYPE_P(filters) != IS_NULL) {
-
-				PHALCON_OBS_VAR(filter);
-				phalcon_read_property_this(&filter, this_ptr, SL("_filter"), PH_NOISY);
+				filter = phalcon_read_property(this_ptr, SL("_filter"), PH_NOISY);
 				if (Z_TYPE_P(filter) != IS_OBJECT) {
-
-					PHALCON_OBS_VAR(dependency_injector);
-					phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+					dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 					if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
 						return;
@@ -250,11 +246,9 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 
 		RETURN_CTOR(default_value);
 	} else if (Z_TYPE_P(filters) != IS_NULL) {
-		PHALCON_OBS_VAR(filter);
-		phalcon_read_property_this(&filter, this_ptr, SL("_filter"), PH_NOISY);
+		filter = phalcon_read_property(this_ptr, SL("_filter"), PH_NOISY);
 		if (Z_TYPE_P(filter) != IS_OBJECT) {
-			PHALCON_OBS_VAR(dependency_injector);
-			phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+			dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 			if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
 				return;
@@ -308,23 +302,23 @@ PHP_METHOD(Phalcon_Http_Request, get){
 	phalcon_fetch_params(1, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
 	if (!name) {
-		name = PHALCON_GLOBAL(z_null);
+		name = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!filters) {
-		filters = PHALCON_GLOBAL(z_null);
+		filters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!default_value) {
-		default_value = PHALCON_GLOBAL(z_null);
+		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!not_allow_empty) {
-		not_allow_empty = PHALCON_GLOBAL(z_false);
+		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (!norecursive) {
-		norecursive = PHALCON_GLOBAL(z_false);
+		norecursive = &PHALCON_GLOBAL(z_false);
 	}
 
 	request = phalcon_get_global(SS("_REQUEST"));
@@ -362,23 +356,23 @@ PHP_METHOD(Phalcon_Http_Request, getPost){
 	phalcon_fetch_params(1, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
 	if (!name) {
-		name = PHALCON_GLOBAL(z_null);
+		name = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!filters) {
-		filters = PHALCON_GLOBAL(z_null);
+		filters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!default_value) {
-		default_value = PHALCON_GLOBAL(z_null);
+		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!not_allow_empty) {
-		not_allow_empty = PHALCON_GLOBAL(z_false);
+		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (!norecursive) {
-		norecursive = PHALCON_GLOBAL(z_false);
+		norecursive = &PHALCON_GLOBAL(z_false);
 	}
 
 	post = phalcon_get_global(SS("_POST"));
@@ -414,23 +408,23 @@ PHP_METHOD(Phalcon_Http_Request, getPut){
 	phalcon_fetch_params(1, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
 	if (!name) {
-		name = PHALCON_GLOBAL(z_null);
+		name = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!filters) {
-		filters = PHALCON_GLOBAL(z_null);
+		filters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!default_value) {
-		default_value = PHALCON_GLOBAL(z_null);
+		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!not_allow_empty) {
-		not_allow_empty = PHALCON_GLOBAL(z_false);
+		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (!norecursive) {
-		norecursive = PHALCON_GLOBAL(z_false);
+		norecursive = &PHALCON_GLOBAL(z_false);
 	}
 
 	PHALCON_CALL_METHOD(&is_put, this_ptr, "isput");
@@ -439,8 +433,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut){
 		put = phalcon_get_global(SS("_PUT"));
 	}
 	else {
-		PHALCON_OBS_VAR(put);
-		phalcon_read_property_this(&put, this_ptr, SL("_put"), PH_NOISY);
+		put = phalcon_read_property(this_ptr, SL("_put"), PH_NOISY);
 		if (Z_TYPE_P(put) != IS_ARRAY) {
 			PHALCON_CALL_METHOD(&raw, this_ptr, "getrawbody");
 
@@ -491,23 +484,23 @@ PHP_METHOD(Phalcon_Http_Request, getQuery){
 	phalcon_fetch_params(1, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
 	if (!name) {
-		name = PHALCON_GLOBAL(z_null);
+		name = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!filters) {
-		filters = PHALCON_GLOBAL(z_null);
+		filters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!default_value) {
-		default_value = PHALCON_GLOBAL(z_null);
+		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!not_allow_empty) {
-		not_allow_empty = PHALCON_GLOBAL(z_false);
+		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (!norecursive) {
-		norecursive = PHALCON_GLOBAL(z_false);
+		norecursive = &PHALCON_GLOBAL(z_false);
 	}
 
 	get = phalcon_get_global(SS("_GET"));
@@ -590,8 +583,7 @@ PHP_METHOD(Phalcon_Http_Request, hasPut){
 		put = phalcon_get_global(SS("_PUT"));
 	}
 	else {
-		PHALCON_OBS_VAR(put);
-		phalcon_read_property_this(&put, this_ptr, SL("_put"), PH_NOISY);
+		put = phalcon_read_property(this_ptr, SL("_put"), PH_NOISY);
 		if (Z_TYPE_P(put) != IS_ARRAY) {
 			PHALCON_CALL_METHOD(&raw, this_ptr, "getrawbody");
 
@@ -771,7 +763,7 @@ PHP_METHOD(Phalcon_Http_Request, getRawBody){
 
 	zval *raw;
 
-	raw = phalcon_fetch_nproperty_this(getThis(), SL("_rawBody"), PH_NOISY);
+	raw = phalcon_read_property(getThis(), SL("_rawBody"), PH_NOISY);
 	if (Z_TYPE_P(raw) == IS_STRING) {
 		RETURN_ZVAL(raw, 1, 0);
 	}
@@ -1002,7 +994,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 	phalcon_fetch_params(1, 0, 1, &trust_forwarded_header);
 
 	if (!trust_forwarded_header) {
-		trust_forwarded_header = PHALCON_GLOBAL(z_false);
+		trust_forwarded_header = &PHALCON_GLOBAL(z_false);
 	}
 
 	PHALCON_INIT_VAR(address);

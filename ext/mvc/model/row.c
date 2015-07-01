@@ -134,8 +134,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetGet){
 	phalcon_fetch_params(0, 1, 1, 0, &index);
 	
 	if (phalcon_isset_property_zval(this_ptr, index)) {
-		PHALCON_OBS_VAR(value);
-		phalcon_read_property_zval(&value, this_ptr, index, PH_NOISY);
+		value = phalcon_read_property_zval(this_ptr, index, PH_NOISY);
 		RETURN_CTOR(value);
 	}
 

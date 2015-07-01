@@ -179,8 +179,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 	
-	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY);
-	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY);
+	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
+	libmemcached = phalcon_read_property(this_ptr, SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(libmemcached, "get", key, lifetime);
@@ -205,8 +205,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, write){
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
 	
-	lifetime = phalcon_fetch_nproperty_this(this_ptr, SL("_lifetime"), PH_NOISY);
-	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY);
+	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
+	libmemcached = phalcon_read_property(this_ptr, SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, libmemcached, "save", key, data, lifetime);	
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, reset)
 
 	PHALCON_MM_GROW();
 
-	libmemcached = phalcon_fetch_nproperty_this(this_ptr, SL("_libmemcached"), PH_NOISY);
+	libmemcached = phalcon_read_property(this_ptr, SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, libmemcached, "flush");	

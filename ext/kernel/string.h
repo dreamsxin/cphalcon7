@@ -31,7 +31,6 @@ int phalcon_memnstr_str(const zval *haystack, char *needle, unsigned int needle_
 int phalcon_same_name(const char *key, const char *name, uint32_t name_len);
 
 void phalcon_strtr(zval *return_value, zval *str, zval *str_from, zval *str_to);
-void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs);
 void phalcon_strtr_str(zval *return_value, zval *str, char *str_from, unsigned int str_from_length, char *str_to, unsigned int str_to_length);
 
 /** Function replacement */
@@ -46,7 +45,8 @@ void phalcon_fast_explode_str(zval *result, const char *delimiter, int delimiter
 void phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle);
 void phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *needle, unsigned int needle_length);
 void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, unsigned int needle_length);
-void phalcon_fast_str_replace(zval *return_value, zval *search, zval *replace, zval *subject);
+#define PHALCON_STR_REPLACE(return_value, search, replace, subject)  \
+	PHALCON_CALL_FUNCTIONW(return_value, "str_replace", search, replace, subject)
 void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where);
 void phalcon_fast_strip_tags(zval *return_value, zval *str);
 void phalcon_fast_strtoupper(zval *return_value, zval *str);

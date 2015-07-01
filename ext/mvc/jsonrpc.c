@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 	phalcon_fetch_params(1, 1, 1, &modules, &merge);
 	
 	if (!merge) {
-		merge = PHALCON_GLOBAL(z_false);
+		merge = &PHALCON_GLOBAL(z_false);
 	}
 	
 	if (Z_TYPE_P(modules) != IS_ARRAY) { 
@@ -161,8 +161,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 	if (PHALCON_IS_FALSE(merge)) {
 		phalcon_update_property_this(this_ptr, SL("_modules"), modules);
 	} else {
-		PHALCON_OBS_VAR(registered_modules);
-		phalcon_read_property_this(&registered_modules, this_ptr, SL("_modules"), PH_NOISY);
+		registered_modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
 		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_modules);
 			phalcon_fast_array_merge(merged_modules, &registered_modules, &modules);
@@ -261,13 +260,13 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 	PHALCON_MM_GROW();
 	
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 	
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
+	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) != IS_OBJECT) {
 		events_manager = NULL;
 	}
@@ -289,7 +288,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	PHALCON_VERIFY_INTERFACE(request, phalcon_http_requestinterface_ce);
 
 	PHALCON_CALL_METHOD(&json, request, "getrawbody");
-	PHALCON_CALL_FUNCTION(&data, "json_decode", json, PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_FUNCTION(&data, "json_decode", json, &PHALCON_GLOBAL(z_true));
 
 
 	PHALCON_INIT_NVAR(service);
@@ -351,8 +350,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		
 		/* If the router doesn't return a valid module we use the default module */
 		if (!zend_is_true(module_name)) {
-			PHALCON_OBS_NVAR(module_name);
-			phalcon_read_property_this(&module_name, this_ptr, SL("_defaultModule"), PH_NOISY);
+			module_name = phalcon_read_property(this_ptr, SL("_defaultModule"), PH_NOISY);
 		}
 		
 		/** 
@@ -366,8 +364,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			/** 
 			 * Check if the module passed by the router is registered in the modules container
 			 */
-			PHALCON_OBS_VAR(modules);
-			phalcon_read_property_this(&modules, this_ptr, SL("_modules"), PH_NOISY);
+			modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
 			if (!phalcon_array_isset_fetch(&module, modules, module_name)) {
 				convert_to_string(module_name);
 				zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module %s is not registered in the jsonrpc container", Z_STRVAL_P(module_name));
@@ -432,7 +429,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			/* Calling afterStartModule event */
 			if (events_manager) {
 				if (!module_object) {
-					module_object = PHALCON_GLOBAL(z_null);
+					module_object = &PHALCON_GLOBAL(z_null);
 				}
 
 				phalcon_update_property_this(this_ptr, SL("_moduleObject"), module_object);
@@ -493,7 +490,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	if (phalcon_array_isset_string_fetch(&jsonrpc_id, data, SS("id"))) {
 		phalcon_array_update_string(&jsonrpc_message, SL("id"), jsonrpc_id, PH_COPY);
 	} else {
-		phalcon_array_update_string(&jsonrpc_message, SL("id"), PHALCON_GLOBAL(z_null), PH_COPY);
+		phalcon_array_update_string(&jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);
 	}
 
 	PHALCON_CALL_METHOD(NULL, response, "setjsoncontent", jsonrpc_message);

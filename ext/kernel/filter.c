@@ -358,7 +358,7 @@ void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style,
  */
 void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes){
 
-	zval *document, *ret = NULL, *tmp = NULL, *elements = NULL, *element = NULL;
+	zval *document, ret, *tmp = NULL, elements, *element = NULL;
 	zval *element_name = NULL, *element_attrs = NULL;
 	zval *element_attr = NULL, *element_attr_parent = NULL, *element_attr_name = NULL, *element_attr_value = NULL, *matched = NULL, *regexp;
 	zval *joined_tags, *clean_str = NULL;
@@ -379,47 +379,43 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		PHALCON_CALL_FUNCTION(NULL, "libxml_use_internal_errors", PHALCON_GLOBAL(z_true));
 	}
 
-	PHALCON_CALL_METHOD(&ret, document, "loadhtml", str);
+	PHALCON_CALL_METHOD(&ret, document, "loadhtml", *str);
 
 	if (phalcon_function_exists_ex(SS("libxml_clear_errors")) == SUCCESS) {
 		PHALCON_CALL_FUNCTION(NULL, "libxml_clear_errors");
 	}
 
-	if (!zend_is_true(ret)) {
+	if (!zend_is_true(&ret)) {
 		RETURN_MM();
 	}
 
 	PHALCON_INIT_NVAR(tmp);
 	ZVAL_STRING(tmp, "*");
 
-	PHALCON_CALL_METHOD(&elements, document, "getelementsbytagname", tmp);
+	PHALCON_CALL_METHOD(&elements, document, "getelementsbytagname", *tmp);
 
 	PHALCON_INIT_VAR(regexp);
 	ZVAL_STRING(regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
 
-	PHALCON_OBS_NVAR(tmp);
-	phalcon_read_property(&tmp, elements, SL("length"), PH_NOISY);
+	tmp = phalcon_read_property(&elements, SL("length"), PH_NOISY);
 
 	element_length = Z_LVAL_P(tmp);
 
 	for (i = 0; i < element_length; i++) {
-		PHALCON_INIT_NVAR(tmp);
-		ZVAL_LONG(tmp, i);
+		zval t;
+		ZVAL_LONG(&t, i);
 	
-		PHALCON_CALL_METHOD(&element, elements, "item", tmp);
+		PHALCON_CALL_METHOD(&element, elements, "item", 5);
 
-		PHALCON_OBS_NVAR(element_name);
-		phalcon_read_property(&element_name, element, SL("nodeName"), PH_NOISY);
+		element_name = phalcon_read_property(element, SL("nodeName"), PH_NOISY);
 
 		if (Z_TYPE_P(allow_tags) == IS_ARRAY && !phalcon_fast_in_array(element_name, allow_tags)) {
 			continue;
 		}
 
-		PHALCON_OBS_NVAR(element_attrs);
-		phalcon_read_property(&element_attrs, element, SL("attributes"), PH_NOISY);
+		element_attrs = phalcon_read_property(element, SL("attributes"), PH_NOISY);
 
-		PHALCON_OBS_NVAR(tmp);
-		phalcon_read_property(&tmp, element_attrs, SL("length"), PH_NOISY);
+		tmp = phalcon_read_property(element_attrs, SL("length"), PH_NOISY);
 
 		element_attrs_length = Z_LVAL_P(tmp);
 
@@ -427,22 +423,19 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 			PHALCON_INIT_NVAR(tmp);
 			ZVAL_LONG(tmp, j);
 
-			PHALCON_CALL_METHOD(&element_attr, element_attrs, "item", tmp);
+			PHALCON_CALL_METHOD(&element_attr, element_attrs, "item", *tmp);
 
-			PHALCON_OBS_NVAR(element_attr_name);
-			phalcon_read_property(&element_attr_name, element_attr, SL("nodeName"), PH_NOISY);
+			element_attr_name = phalcon_read_property(element_attr, SL("nodeName"), PH_NOISY);
 			if (Z_TYPE_P(allow_attributes) == IS_ARRAY && !phalcon_fast_in_array(element_attr_name, allow_attributes)) {
 				PHALCON_CALL_METHOD(NULL, element, "removeattributenode", element_attr);
 			} else if (phalcon_memnstr_str(element_attr_name, SL("style"))) {
-				PHALCON_OBS_NVAR(element_attr_value);
-				phalcon_read_property(&element_attr_value, element_attr, SL("nodeValue"), PH_NOISY);
+				element_attr_value = phalcon_read_property(element_attr, SL("nodeValue"), PH_NOISY);
 
 				PHALCON_INIT_NVAR(matched);
 				RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, regexp, element_attr_value, NULL));
 
 				if (zend_is_true(matched)) {
-					PHALCON_OBS_NVAR(element_attr_parent);
-					phalcon_read_property(&element_attr_parent, element_attr, SL("parentNode"), PH_NOISY);
+					element_attr_parent = phalcon_read_property(element_attr, SL("parentNode"), PH_NOISY);
 
 					PHALCON_CALL_METHOD(NULL, element, "removeattributenode", element_attr);
 				}

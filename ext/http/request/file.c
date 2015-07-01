@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Http_Request_File, getRealType){
 
 	PHALCON_MM_GROW();
 
-	mime = phalcon_fetch_nproperty_this(this_ptr, SL("_real_type"), PH_NOISY);
+	mime = phalcon_read_property(this_ptr, SL("_real_type"), PH_NOISY);
 
 	if (Z_TYPE_P(mime) == IS_STRING) {
 		RETURN_CTOR(mime);
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Http_Request_File, getRealType){
 		RETURN_MM_NULL();
 	}
 
-	temp_file = phalcon_fetch_nproperty_this(this_ptr, SL("_tmp"), PH_NOISY);
+	temp_file = phalcon_read_property(this_ptr, SL("_tmp"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTION(&ret, "finfo_file", finfo, temp_file);
 	PHALCON_CALL_FUNCTION(NULL, "finfo_close", finfo);
@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_Http_Request_File, moveTo){
 
 	phalcon_fetch_params(0, 1, 0, &destination);
 	
-	temp_file = phalcon_fetch_nproperty_this(this_ptr, SL("_tmp"), PH_NOISY);
+	temp_file = phalcon_read_property(this_ptr, SL("_tmp"), PH_NOISY);
 	PHALCON_RETURN_CALL_FUNCTIONW("move_uploaded_file", temp_file, destination);
 }
 

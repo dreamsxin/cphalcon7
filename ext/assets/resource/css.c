@@ -73,9 +73,9 @@ PHP_METHOD(Phalcon_Assets_Resource_Css, __construct){
 	ZVAL_STRING(type, "css");
 	
 	PHALCON_CALL_PARENTW(NULL, phalcon_assets_resource_css_ce, this_ptr, "__construct", type, path,
-		(local ? local : PHALCON_GLOBAL(z_true)),
-		(filter ? filter : PHALCON_GLOBAL(z_true)),
-		(attributes ? attributes : PHALCON_GLOBAL(z_null))
+		(local ? local : &PHALCON_GLOBAL(z_true)),
+		(filter ? filter : &PHALCON_GLOBAL(z_true)),
+		(attributes ? attributes : &PHALCON_GLOBAL(z_null))
 	);
 }
 

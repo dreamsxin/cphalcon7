@@ -110,8 +110,8 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call){
 
 	phalcon_fetch_params(1, 1, 1, &method, &data);
 
-	httpclient = phalcon_fetch_nproperty_this(this_ptr, SL("_httpclient"), PH_NOISY);
-	id = phalcon_fetch_nproperty_this(this_ptr, SL("_id"), PH_NOISY);
+	httpclient = phalcon_read_property(this_ptr, SL("_httpclient"), PH_NOISY);
+	id = phalcon_read_property(this_ptr, SL("_id"), PH_NOISY);
 	i = Z_LVAL_P(id) + 1;
 	ZVAL_LONG(id, i);
 
@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call){
 	PHALCON_CALL_METHOD(NULL, jsonrpc_response, "setcode", code);
 
 	if (PHALCON_IS_NOT_EMPTY(body)) {
-		PHALCON_CALL_FUNCTION(&json, "json_decode", body, PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_FUNCTION(&json, "json_decode", body, &PHALCON_GLOBAL(z_true));
 
 		if (Z_TYPE_P(json) == IS_ARRAY) {
 			if (phalcon_array_isset_string(json, SS("id"))) {

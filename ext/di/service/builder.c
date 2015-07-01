@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 	phalcon_fetch_params(1, 2, 1, &dependency_injector, &definition, &parameters);
 	
 	if (!parameters) {
-		parameters = PHALCON_GLOBAL(z_null);
+		parameters = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 

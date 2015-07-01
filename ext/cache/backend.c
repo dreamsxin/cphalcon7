@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
 	
 	if (!lifetime) {
-		lifetime = PHALCON_GLOBAL(z_null);
+		lifetime = &PHALCON_GLOBAL(z_null);
 	}
 	
 	/** 
@@ -143,16 +143,16 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	}
 
 	if (Z_TYPE_P(return_value) == IS_NULL) {
-		fresh = PHALCON_GLOBAL(z_true);
+		fresh = &PHALCON_GLOBAL(z_true);
 	
-		frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY);
+		frontend = phalcon_read_property(this_ptr, SL("_frontend"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, frontend, "start");
 	} else {
-		fresh = PHALCON_GLOBAL(z_false);
+		fresh = &PHALCON_GLOBAL(z_false);
 	}
 	
 	phalcon_update_property_this(this_ptr, SL("_fresh"), fresh);
-	phalcon_update_property_this(this_ptr, SL("_started"), PHALCON_GLOBAL(z_true));
+	phalcon_update_property_this(this_ptr, SL("_started"), &PHALCON_GLOBAL(z_true));
 	
 	/** 
 	 * Update the last lifetime to be used in save()
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Cache_Backend, stop){
 	
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
 		PHALCON_MM_GROW();
-		frontend = phalcon_fetch_nproperty_this(this_ptr, SL("_frontend"), PH_NOISY);
+		frontend = phalcon_read_property(this_ptr, SL("_frontend"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, frontend, "stop");
 		PHALCON_MM_RESTORE();
 	}

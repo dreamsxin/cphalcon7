@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Failed, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Failed, getRecordMessages)
 {
-	zval *record = phalcon_fetch_nproperty_this(this_ptr, SL("_record"), PH_NOISY);
+	zval *record = phalcon_read_property(this_ptr, SL("_record"), PH_NOISY);
 	if (Z_TYPE_P(record) != IS_NULL) {
 		PHALCON_RETURN_CALL_METHODW(record, "getmessages");
 	}

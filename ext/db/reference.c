@@ -232,19 +232,19 @@ PHP_METHOD(Phalcon_Db_Reference, __set_state){
 	}
 
 	if (!phalcon_array_isset_string_fetch(&referenced_schema, data, SS("_referencedSchema"))) {
-		referenced_schema = PHALCON_GLOBAL(z_null);
+		referenced_schema = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (!phalcon_array_isset_string_fetch(&referenced_table, data, SS("_referencedTable"))) {
-		referenced_table = PHALCON_GLOBAL(z_null);
+		referenced_table = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (!phalcon_array_isset_string_fetch(&columns, data, SS("_columns"))) {
-		columns = PHALCON_GLOBAL(z_null);
+		columns = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (!phalcon_array_isset_string_fetch(&referenced_columns, data, SS("_referencedColumns"))) {
-		referenced_columns = PHALCON_GLOBAL(z_null);
+		referenced_columns = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_ALLOC_GHOST_ZVAL(definition);

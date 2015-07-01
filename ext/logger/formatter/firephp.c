@@ -186,8 +186,8 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 		}
 	}
 
-	show_backtrace   = phalcon_fetch_nproperty_this(getThis(), SL("_showBacktrace"), PH_NOISY);
-	enable_labels    = phalcon_fetch_nproperty_this(getThis(), SL("_enableLabels"), PH_NOISY);
+	show_backtrace   = phalcon_read_property(getThis(), SL("_showBacktrace"), PH_NOISY);
+	enable_labels    = phalcon_read_property(getThis(), SL("_enableLabels"), PH_NOISY);
 	i_show_backtrace = zend_is_true(show_backtrace);
 	i_enable_labels  = zend_is_true(enable_labels);
 

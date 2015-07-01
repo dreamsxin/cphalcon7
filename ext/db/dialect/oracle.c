@@ -418,7 +418,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, dropTable){
 	phalcon_fetch_params(1, 2, 1, &table_name, &schema_name, &if_exists);
 	
 	if (!if_exists) {
-		if_exists = PHALCON_GLOBAL(z_true);
+		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 	
 	if (zend_is_true(schema_name)) {
@@ -489,7 +489,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, dropView){
 	phalcon_fetch_params(1, 2, 1, &view_name, &schema_name, &if_exists);
 	
 	if (!if_exists) {
-		if_exists = PHALCON_GLOBAL(z_true);
+		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 	
 	if (zend_is_true(schema_name)) {
@@ -705,8 +705,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getSqlTable){
 	}
 	
 	if (Z_TYPE_P(escape_char) == IS_NULL) {
-		PHALCON_OBS_NVAR(escape_char);
-		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
+		escape_char = phalcon_read_property(this_ptr, SL("_escapeChar"), PH_NOISY);
 	}
 	if (Z_TYPE_P(table) == IS_ARRAY) { 
 	
@@ -853,8 +852,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	PHALCON_MM_GROW();
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		PHALCON_OBS_VAR(escape_char);
-		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
+		escape_char = phalcon_read_property(this_ptr, SL("_escapeChar"), PH_NOISY);
 	} else {
 		PHALCON_INIT_NVAR(escape_char);
 	}
@@ -1131,7 +1129,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 					ZVAL_LONG(tmp2, 0);
 				}
 
-				z_one = PHALCON_GLOBAL(z_one);
+				z_one = &PHALCON_GLOBAL(z_one);
 
 				PHALCON_INIT_VAR(ini_range);
 				phalcon_add_function(ini_range, tmp2, z_one);

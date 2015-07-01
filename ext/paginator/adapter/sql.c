@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
 	zval *db, *sql, *total_sql, *bind;
 	zval *limit, *number_page;
-	zval *fetch_mode, *items = NULL;
+	zval fetch_mode, *items = NULL;
 	zval *row = NULL, *rowcount;
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
@@ -255,13 +255,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
 	PHALCON_MM_GROW();
 
-	db = phalcon_fetch_nproperty_this(this_ptr, SL("_db"), PH_NOISY);
-	sql = phalcon_fetch_nproperty_this(this_ptr, SL("_sql"), PH_NOISY);
-	total_sql = phalcon_fetch_nproperty_this(this_ptr, SL("_total_sql"), PH_NOISY);
-	bind = phalcon_fetch_nproperty_this(this_ptr, SL("_bind"), PH_NOISY);
+	db = phalcon_read_property(this_ptr, SL("_db"), PH_NOISY);
+	sql = phalcon_read_property(this_ptr, SL("_sql"), PH_NOISY);
+	total_sql = phalcon_read_property(this_ptr, SL("_total_sql"), PH_NOISY);
+	bind = phalcon_read_property(this_ptr, SL("_bind"), PH_NOISY);
 
-	limit         = phalcon_fetch_nproperty_this(this_ptr, SL("_limitRows"), PH_NOISY);
-	number_page   = phalcon_fetch_nproperty_this(this_ptr, SL("_page"), PH_NOISY);
+	limit         = phalcon_read_property(this_ptr, SL("_limitRows"), PH_NOISY);
+	number_page   = phalcon_read_property(this_ptr, SL("_page"), PH_NOISY);
 	i_limit       = phalcon_get_intval(limit);
 	i_number_page = phalcon_get_intval(number_page);
 
@@ -277,13 +277,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	i_number = (i_number_page - 1) * i_limit;
 	i_before = (i_number_page == 1) ? 1 : (i_number_page - 1);
 
-	PHALCON_INIT_VAR(fetch_mode);
-	ZVAL_LONG(fetch_mode, PDO_FETCH_OBJ);
+	ZVAL_LONG(&fetch_mode, PDO_FETCH_OBJ);
 
 	PHALCON_CALL_METHOD(&row, db, "fetchone", total_sql, fetch_mode, bind);
 	
-	PHALCON_OBS_VAR(rowcount);
-	phalcon_read_property(&rowcount, row, SL("rowcount"), PH_NOISY);
+	rowcount = phalcon_read_property(row, SL("rowcount"), PH_NOISY);
 
 	/* Set the limit clause avoiding negative offsets */
 	if (i_number < i_limit) {

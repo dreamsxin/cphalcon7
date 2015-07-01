@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Http_Uri, __construct){
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
 		phalcon_update_property_this(this_ptr, SL("_parts"), uri);
 	} else if (Z_TYPE_P(uri) == IS_OBJECT && Z_OBJCE_P(uri) == phalcon_http_uri_ce) {
-		phalcon_read_property(&parts, uri, SL("_parts"), PH_NOISY);
+		parts = phalcon_read_property(uri, SL("_parts"), PH_NOISY);
 		phalcon_update_property_this(this_ptr, SL("_parts"), parts);
 	} else {
 		phalcon_update_property_empty_array(this_ptr, SL("_parts"));
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Http_Uri, __get){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY);
+	parts = phalcon_read_property(this_ptr, SL("_parts"), PH_NOISY);
 
 	if (!phalcon_array_isset_fetch(&value, parts, key)) {
 		 RETURN_NULL();
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Http_Uri, __isset){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY);
+	parts = phalcon_read_property(this_ptr, SL("_parts"), PH_NOISY);
 
 	RETURN_BOOL(phalcon_array_isset(parts, key));
 }
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Http_Uri, __isset){
  * @return array
  */
 PHP_METHOD(Phalcon_Http_Uri, getParts){
-	
+
 	RETURN_MEMBER(this_ptr, "_parts");
 }
 
@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Http_Uri, getPath){
 
 	zval *parts, *value;
 
-	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY);
+	parts = phalcon_read_property(this_ptr, SL("_parts"), PH_NOISY);
 
 	if (!phalcon_array_isset_string_fetch(&value, parts, SS("path"))) {
 		 RETURN_NULL();
@@ -284,7 +284,7 @@ PHP_METHOD(Phalcon_Http_Uri, build){
 
 	PHALCON_MM_GROW();
 
-	parts = phalcon_fetch_nproperty_this(this_ptr, SL("_parts"), PH_NOISY);
+	parts = phalcon_read_property(this_ptr, SL("_parts"), PH_NOISY);
 
 	PHALCON_INIT_VAR(uri);
 
@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Http_Uri, extend){
 		PHALCON_CALL_METHOD(&parts2, self, "getParts");
 	}
 
-	phalcon_array_merge_recursive_n(&parts, parts2);
+	phalcon_array_merge_recursive_n(parts, parts2);
 
 	phalcon_update_property_this(this_ptr, SL("_parts"), parts);
 

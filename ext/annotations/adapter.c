@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getReader){
 
 	zval *reader;
 
-	reader = phalcon_fetch_nproperty_this(this_ptr, SL("_reader"), PH_NOISY);
+	reader = phalcon_read_property(this_ptr, SL("_reader"), PH_NOISY);
 	if (Z_TYPE_P(reader) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_annotations_reader_ce);
 		phalcon_update_property_this(this_ptr, SL("_reader"), return_value);
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 		PHALCON_CPY_WRT(real_class_name, class_name);
 	}
 	
-	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_annotations"), PH_NOISY);
+	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&class_annotations, annotations, real_class_name)) {
 		RETURN_CTOR(class_annotations);
 	}

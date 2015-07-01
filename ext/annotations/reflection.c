@@ -117,10 +117,10 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 
 	PHALCON_MM_GROW();
 
-	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_classAnnotations"), PH_NOISY);
+	annotations = phalcon_read_property(this_ptr, SL("_classAnnotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) != IS_OBJECT) {
 	
-		reflection_data = phalcon_fetch_nproperty_this(this_ptr, SL("_reflectionData"), PH_NOISY);
+		reflection_data = phalcon_read_property(this_ptr, SL("_reflectionData"), PH_NOISY);
 		if (phalcon_array_isset_string_fetch(&reflection_class, reflection_data, SS("class"))) {
 			object_init_ex(return_value, phalcon_annotations_collection_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", reflection_class);
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 			RETURN_MM();
 		}
 	
-		phalcon_update_property_this(this_ptr, SL("_classAnnotations"), PHALCON_GLOBAL(z_false));
+		phalcon_update_property_this(this_ptr, SL("_classAnnotations"), &PHALCON_GLOBAL(z_false));
 		RETURN_MM_FALSE;
 	}
 	
@@ -152,10 +152,10 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 
 	PHALCON_MM_GROW();
 
-	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_methodAnnotations"), PH_NOISY);
+	annotations = phalcon_read_property(this_ptr, SL("_methodAnnotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) != IS_OBJECT) {
 	
-		reflection_data = phalcon_fetch_nproperty_this(this_ptr, SL("_reflectionData"), PH_NOISY);
+		reflection_data = phalcon_read_property(this_ptr, SL("_reflectionData"), PH_NOISY);
 		if (phalcon_array_isset_string_fetch(&reflection_methods, reflection_data, SS("methods"))) {
 			if (phalcon_fast_count_ev(reflection_methods)) {
 				array_init(return_value);
@@ -204,10 +204,10 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 
 	PHALCON_MM_GROW();
 
-	annotations = phalcon_fetch_nproperty_this(this_ptr, SL("_propertyAnnotations"), PH_NOISY);
+	annotations = phalcon_read_property(this_ptr, SL("_propertyAnnotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) != IS_OBJECT) {
 
-		reflection_data = phalcon_fetch_nproperty_this(this_ptr, SL("_reflectionData"), PH_NOISY);
+		reflection_data = phalcon_read_property(this_ptr, SL("_reflectionData"), PH_NOISY);
 		if (phalcon_array_isset_string_fetch(&reflection_properties, reflection_data, SS("properties"))) {
 
 			if (phalcon_fast_count_ev(reflection_properties)) {

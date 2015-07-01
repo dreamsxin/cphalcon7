@@ -74,7 +74,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 
 	PHALCON_CALL_PARENT(NULL, phalcon_di_factorydefault_ce, this_ptr, "__construct");
 
-	shared = PHALCON_GLOBAL(z_true);
+	shared = &PHALCON_GLOBAL(z_true);
 
 	/**
 	 * Mvc Router

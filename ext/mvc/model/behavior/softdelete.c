@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 		/** 
 		 * Skip the current operation
 		 */
-		PHALCON_CALL_METHOD(NULL, model, "skipoperation", PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_METHOD(NULL, model, "skipoperation", &PHALCON_GLOBAL(z_true));
 	
 		/** 
 		 * 'value' is the value to be updated instead of delete the record

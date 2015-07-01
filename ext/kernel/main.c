@@ -111,7 +111,7 @@ zval* phalcon_get_global(const char *global, unsigned int global_length) {
 		}
 	}
 
-	return PHALCON_GLOBAL(z_null);
+	return &PHALCON_GLOBAL(z_null);
 }
 
 /**

@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 	phalcon_fetch_params(1, 1, 1, &modules, &merge);
 
 	if (!merge) {
-		merge = PHALCON_GLOBAL(z_false);
+		merge = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (Z_TYPE_P(modules) != IS_ARRAY) { 
@@ -217,8 +217,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 	if (PHALCON_IS_FALSE(merge)) {
 		phalcon_update_property_this(this_ptr, SL("_modules"), modules);
 	} else {
-		PHALCON_OBS_VAR(registered_modules);
-		phalcon_read_property_this(&registered_modules, this_ptr, SL("_modules"), PH_NOISY);
+		registered_modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
 		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_modules);
 			phalcon_fast_array_merge(merged_modules, &registered_modules, &modules);
@@ -319,16 +318,16 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	phalcon_fetch_params(1, 0, 1, &uri);
 
 	if (!uri) {
-		uri = PHALCON_GLOBAL(z_null);
+		uri = &PHALCON_GLOBAL(z_null);
 	}
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
-	events_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_eventsManager"), PH_NOISY);
+	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) != IS_OBJECT) {
 		events_manager = NULL;
 	}
@@ -354,8 +353,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* If the router doesn't return a valid module we use the default module */
 	if (!zend_is_true(module_name)) {
-		PHALCON_OBS_NVAR(module_name);
-		phalcon_read_property_this(&module_name, this_ptr, SL("_defaultModule"), PH_NOISY);
+		module_name = phalcon_read_property(this_ptr, SL("_defaultModule"), PH_NOISY);
 	}
 
 	/** 
@@ -369,8 +367,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/** 
 		 * Check if the module passed by the router is registered in the modules container
 		 */
-		PHALCON_OBS_VAR(modules);
-		phalcon_read_property_this(&modules, this_ptr, SL("_modules"), PH_NOISY);
+		modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
 		if (!phalcon_array_isset_fetch(&module, modules, module_name)) {
 			convert_to_string(module_name);
 			zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module %s is not registered in the application container", Z_STRVAL_P(module_name));
@@ -435,7 +432,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/* Calling afterStartModule event */
 		if (events_manager) {
 			if (!module_object) {
-				module_object = PHALCON_GLOBAL(z_null);
+				module_object = &PHALCON_GLOBAL(z_null);
 			}
 
 			phalcon_update_property_this(this_ptr, SL("_moduleObject"), module_object);
@@ -448,7 +445,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/** 
 	 * Check whether use implicit views or not
 	 */
-	implicit_view = phalcon_fetch_nproperty_this(this_ptr, SL("_implicitView"), PH_NOISY);
+	implicit_view = phalcon_read_property(this_ptr, SL("_implicitView"), PH_NOISY);
 
 	/*
 	 * The safe way is to use a flag because it *might* be possible to alter the value
@@ -565,7 +562,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 						PHALCON_CALL_METHOD(NULL, view, "render", controller_name, action_name, params, namespace_name, possible_response);
 					} else {
 						if (Z_TYPE_P(possible_response) == IS_ARRAY) {
-							PHALCON_CALL_METHOD(NULL, view, "setvars", possible_response, PHALCON_GLOBAL(z_true));
+							PHALCON_CALL_METHOD(NULL, view, "setvars", possible_response, &PHALCON_GLOBAL(z_true));
 						}
 						/* Automatic render based on the latest controller executed */
 						PHALCON_CALL_METHOD(NULL, view, "render", controller_name, action_name, params, namespace_name);

@@ -224,8 +224,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getColumnList){
 	PHALCON_INIT_VAR(str_list);
 	array_init(str_list);
 
-	PHALCON_OBS_VAR(escape_char);
-	phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
+	escape_char = phalcon_read_property(this_ptr, SL("_escapeChar"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(column_list), column) {
 		PHALCON_INIT_NVAR(column_quoted);
@@ -278,13 +277,12 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	}
 
 	if (!quoting) {
-		quoting = PHALCON_GLOBAL(z_false);
+		quoting = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		if (Z_TYPE_P(escape_char) == IS_NULL) {
-			PHALCON_OBS_NVAR(escape_char);
-			phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
+			escape_char = phalcon_read_property(this_ptr, SL("_escapeChar"), PH_NOISY);
 		}
 	}
 
@@ -697,8 +695,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 	}
 
 	if (Z_TYPE_P(escape_char) == IS_NULL) {
-		PHALCON_OBS_NVAR(escape_char);
-		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
+		escape_char = phalcon_read_property(this_ptr, SL("_escapeChar"), PH_NOISY);
 	}
 	if (Z_TYPE_P(table) == IS_ARRAY) { 
 
@@ -804,8 +801,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		PHALCON_OBS_VAR(escape_char);
-		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
+		escape_char = phalcon_read_property(this_ptr, SL("_escapeChar"), PH_NOISY);
 	} else {
 		PHALCON_INIT_NVAR(escape_char);
 	}
@@ -1195,7 +1191,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	if (!quoting) {
-		quoting = PHALCON_GLOBAL(z_false);
+		quoting = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (!phalcon_array_isset_string_fetch(&tables, definition, SS("tables"))) {
@@ -1214,8 +1210,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		PHALCON_OBS_VAR(escape_char);
-		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
+		escape_char = phalcon_read_property(this_ptr, SL("_escapeChar"), PH_NOISY);
 	} else {
 		PHALCON_INIT_VAR(escape_char);
 	}
@@ -1372,8 +1367,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		PHALCON_OBS_VAR(escape_char);
-		phalcon_read_property_this(&escape_char, this_ptr, SL("_escapeChar"), PH_NOISY);
+		escape_char = phalcon_read_property(this_ptr, SL("_escapeChar"), PH_NOISY);
 	} else {
 		PHALCON_INIT_VAR(escape_char);
 	}

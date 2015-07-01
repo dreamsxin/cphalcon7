@@ -387,7 +387,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropTable){
 	phalcon_fetch_params(1, 2, 1, &table_name, &schema_name, &if_exists);
 	
 	if (!if_exists) {
-		if_exists = PHALCON_GLOBAL(z_true);
+		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 	
 	if (zend_is_true(schema_name)) {
@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 	phalcon_fetch_params(1, 2, 1, &view_name, &schema_name, &if_exists);
 	
 	if (!if_exists) {
-		if_exists = PHALCON_GLOBAL(z_true);
+		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 	
 	if (zend_is_true(schema_name)) {

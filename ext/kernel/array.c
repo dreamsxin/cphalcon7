@@ -736,18 +736,16 @@ void phalcon_fast_array_merge(zval *return_value, zval **array1, zval **array2) 
 
 	array_init_size(return_value, init_size);
 
-	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(*array1), 0);
-
-	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(*array2), 0);
-
+	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(*array1));
+	php_array_merge(Z_ARRVAL_P(return_value), Z_ARRVAL_P(*array2));
 }
 
-void phalcon_array_merge_recursive_n(zval **a1, zval *a2)
+void phalcon_array_merge_recursive_n(zval *a1, zval *a2)
 {
 	HashPosition hp;
-	zval *value, key, *tmp1, *tmp2;
+	zval *value, *key, *tmp1, *tmp2;
 
-	assert(Z_TYPE_P(*a1) == IS_ARRAY);
+	assert(Z_TYPE_P(a1) == IS_ARRAY);
 	assert(Z_TYPE_P(a2)  == IS_ARRAY);
 
 	for (
@@ -757,24 +755,24 @@ void phalcon_array_merge_recursive_n(zval **a1, zval *a2)
 	) {
 		key = phalcon_get_current_key_w(Z_ARRVAL_P(a2), &hp);
 
-		if (!phalcon_array_isset(*a1, &key) || Z_TYPE_P(*value) != IS_ARRAY) {
-			phalcon_array_update_zval(a1, &key, value, PH_COPY | PH_SEPARATE);
+		if (!phalcon_array_isset(a1, key) || Z_TYPE_P(value) != IS_ARRAY) {
+			phalcon_array_update_zval(a1, key, value, PH_COPY | PH_SEPARATE);
 		} else {
-			phalcon_array_fetch(&tmp1, *a1, &key, PH_NOISY);
-			phalcon_array_fetch(&tmp2, a2, &key, PH_NOISY);
-			phalcon_array_merge_recursive_n(&tmp1, tmp2);
+			phalcon_array_fetch(&tmp1, a1, key, PH_NOISY);
+			phalcon_array_fetch(&tmp2, a2, key, PH_NOISY);
+			phalcon_array_merge_recursive_n(tmp1, tmp2);
 			phalcon_ptr_dtor(tmp1);
 			phalcon_ptr_dtor(tmp2);
 		}
 	}
 }
 
-void phalcon_array_merge_recursive_n2(zval **a1, zval *a2)
+void phalcon_array_merge_recursive_n2(zval *a1, zval *a2)
 {
 	HashPosition hp;
-	zval *value, key, *tmp1, *tmp2;
+	zval *value, *key, *tmp1, *tmp2;
 
-	assert(Z_TYPE_P(*a1) == IS_ARRAY);
+	assert(Z_TYPE_P(a1) == IS_ARRAY);
 	assert(Z_TYPE_P(a2)  == IS_ARRAY);
 
 	for (
@@ -784,12 +782,12 @@ void phalcon_array_merge_recursive_n2(zval **a1, zval *a2)
 	) {
 		key = phalcon_get_current_key_w(Z_ARRVAL_P(a2), &hp);
 
-		if (!phalcon_array_isset(*a1, &key)) {
-			phalcon_array_update_zval(a1, &key, value, PH_COPY | PH_SEPARATE);
+		if (!phalcon_array_isset(a1, &key)) {
+			phalcon_array_update_zval(a1, key, value, PH_COPY | PH_SEPARATE);
 		} else if (Z_TYPE_P(*value) == IS_ARRAY) {
-			phalcon_array_fetch(&tmp1, *a1, &key, PH_NOISY);
-			phalcon_array_fetch(&tmp2, a2, &key, PH_NOISY);
-			phalcon_array_merge_recursive_n2(&tmp1, tmp2);
+			phalcon_array_fetch(&tmp1, a1, key, PH_NOISY);
+			phalcon_array_fetch(&tmp2, a2, key, PH_NOISY);
+			phalcon_array_merge_recursive_n2(tmp1, tmp2);
 			phalcon_ptr_dtor(tmp1);
 			phalcon_ptr_dtor(tmp2);
 		}
@@ -911,7 +909,7 @@ void phalcon_array_keys(zval *return_value, zval *arr)
 		while ((entry = zend_hash_get_current_data_ex(Z_ARRVAL_P(arr), &pos)) != NULL) {
 			PHALCON_ALLOC_GHOST_ZVAL(new_val);
 
-			switch (zend_hash_get_current_key_ex(Z_ARRVAL_P(arr), &skey, &skey_len, &nkey, &pos)) {
+			switch (zend_hash_get_current_key_ex(Z_ARRVAL_P(arr), &zend_string_init(skey, skey_len, 0), &nkey, &pos)) {
 				case HASH_KEY_IS_STRING:
 					ZVAL_STRINGL(new_val, skey, skey_len - 1);
 					zend_hash_next_index_insert(Z_ARRVAL_P(return_value), new_val);
@@ -981,7 +979,7 @@ int phalcon_array_is_associative(zval *arr) {
 
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(arr), &pos);
 		while ((entry = zend_hash_get_current_data_ex(Z_ARRVAL_P(arr), &pos)) != NULL) {
-			if (HASH_KEY_IS_LONG == zend_hash_get_current_key_ex(Z_ARRVAL_P(arr), &skey, &skey_len, &nkey, &pos)) {
+			if (HASH_KEY_IS_LONG == zend_hash_get_current_key_ex(Z_ARRVAL_P(arr), &zend_string_init(skey, skey_len, 0), &nkey, &pos)) {
 				if (expected != nkey) {
 					return 1;
 				}

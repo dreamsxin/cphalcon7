@@ -126,15 +126,15 @@ PHP_METHOD(Phalcon_Validation_Message, __construct){
 	phalcon_fetch_params(0, 1, 3, &message, &field, &type, &code);
 	
 	if (!field) {
-		field = PHALCON_GLOBAL(z_null);
+		field = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (!type) {
-		type = PHALCON_GLOBAL(z_null);
+		type = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!code) {
-		code = PHALCON_GLOBAL(z_zero);
+		code = &PHALCON_GLOBAL(z_zero);
 	}
 	
 	phalcon_update_property_this(this_ptr, SL("_message"), message);

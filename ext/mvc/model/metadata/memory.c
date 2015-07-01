@@ -72,7 +72,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memory, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 	
 	if (!options) {
-		options = PHALCON_GLOBAL(z_null);
+		options = &PHALCON_GLOBAL(z_null);
 	}
 	
 	PHALCON_ALLOC_GHOST_ZVAL(empty_array);

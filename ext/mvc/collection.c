@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 	}
 
 	if (Z_TYPE_P(id) != IS_OBJECT) {
-		collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+		collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 		/**
 		 * Check if the collection use implicit ids
@@ -405,14 +405,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 	}
 
 	if (phalcon_isset_property_zval(this_ptr, id_name)) {
-
-		PHALCON_OBS_VAR(id);
-		phalcon_read_property_zval(&id, this_ptr, id_name, PH_NOISY);
+		id = phalcon_read_property_zval(this_ptr, id_name, PH_NOISY);
 		if (Z_TYPE_P(id) == IS_OBJECT) {
 			mongo_id = id;
 		} else {
-			PHALCON_OBS_VAR(collection_manager);
-			phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY);
+			collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 			/**
 			 * Check if the collection use implicit ids
@@ -431,7 +428,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 			}
 		}
 	} else {
-		mongo_id = PHALCON_GLOBAL(z_null);
+		mongo_id = &PHALCON_GLOBAL(z_null);
 	}
 
 	RETURN_CTOR(mongo_id);
@@ -464,7 +461,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setEventsManager){
 
 	phalcon_fetch_params(0, 0, 1, 0, &events_manager);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHODW(NULL, collection_manager, "setcustomeventsmanager", this_ptr, events_manager);
 }
 
@@ -477,7 +474,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getEventsManager){
 
 	zval *collection_manager;
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(collection_manager, "getcustomeventsmanager", this_ptr);
 }
 
@@ -504,7 +501,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setColumnMap){
 
 	phalcon_fetch_params(0, 0, 1, 0, &column_map);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHODW(NULL, collection_manager, "setcolumnmap", this_ptr, column_map);
 
 	RETURN_THISW();
@@ -519,7 +516,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getColumnMap){
 
 	zval *collection_manager;
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(collection_manager, "getcolumnmap", this_ptr);
 }
 
@@ -562,9 +559,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, getReservedAttributes){
 
 	zval *reserved;
 
-	reserved = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_reserved"));
+	reserved = phalcon_read_static_property_ce(phalcon_mvc_collection_ce, SL("_reserved"));
 	if (Z_TYPE_P(reserved) == IS_NULL) {
-		zval *dummy = PHALCON_GLOBAL(z_true);
+		zval *dummy = &PHALCON_GLOBAL(z_true);
 
 		array_init_size(return_value, 5);
 		Z_ADDREF_P(dummy); add_assoc_zval_ex(return_value, SS("_connection"), dummy);
@@ -592,7 +589,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, useImplicitObjectIds){
 
 	phalcon_fetch_params(0, 1, 1, 0, &use_implicit_object_ids);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, collection_manager, "useimplicitobjectids", this_ptr, use_implicit_object_ids);
 
 	PHALCON_MM_RESTORE();
@@ -611,7 +608,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setStrictMode){
 
 	phalcon_fetch_params(0, 1, 1, 0, &strict_mode);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, collection_manager, "setstrictmode", this_ptr, strict_mode);
 
 	PHALCON_MM_RESTORE();
@@ -629,7 +626,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setSource){
 
 	phalcon_fetch_params(0, 0, 1, 0, &source);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHODW(NULL, collection_manager, "setsource", this_ptr, source);
 
 	RETURN_THISW();
@@ -644,7 +641,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getSource){
 
 	zval *collection_manager;
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 	PHALCON_RETURN_CALL_METHODW(collection_manager, "getsource", this_ptr);
 }
@@ -663,7 +660,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setConnectionService){
 
 	phalcon_fetch_params(0, 1, 1, 0, &connection_service);
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, collection_manager, "setconnectionservice", this_ptr, connection_service);
 	RETURN_THIS();
 }
@@ -677,7 +674,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnectionService){
 
 	zval *collection_manager;
 
-	collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(collection_manager, "getconnectionservice", this_ptr);
 }
 
@@ -692,10 +689,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(connection);
-	phalcon_read_property_this(&connection, this_ptr, SL("_connection"), PH_NOISY);
+	connection = phalcon_read_property(this_ptr, SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) != IS_OBJECT) {
-		collection_manager = phalcon_fetch_nproperty_this(this_ptr, SL("_collectionManager"), PH_NOISY);
+		collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&connection, collection_manager, "getconnection", this_ptr);
 		phalcon_update_property_this(this_ptr, SL("_connection"), connection);
@@ -733,7 +729,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 	phalcon_fetch_params(0, 1, 1, 1, &data, &white_list);
 	
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (Z_TYPE_P(data) != IS_ARRAY) { 
@@ -801,8 +797,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, readAttribute){
 	phalcon_fetch_params(0, 1, 1, 0, &attribute);
 
 	if (phalcon_isset_property_zval(this_ptr, attribute)) {
-		PHALCON_OBS_VAR(attribute_value);
-		phalcon_read_property_zval(&attribute_value, this_ptr, attribute, PH_NOISY);
+		attribute_value = phalcon_read_property_zval(this_ptr, attribute, PH_NOISY);
 		RETURN_CTOR(attribute_value);
 	}
 	RETURN_MM_NULL();
@@ -1372,8 +1367,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, validationHasFailed){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_OBS_VAR(error_messages);
-	phalcon_read_property_this(&error_messages, this_ptr, SL("_errorMessages"), PH_NOISY);
+	error_messages = phalcon_read_property(this_ptr, SL("_errorMessages"), PH_NOISY);
 	if (Z_TYPE_P(error_messages) == IS_ARRAY) {
 		if (phalcon_fast_count_ev(error_messages)) {
 			RETURN_MM_TRUE;
@@ -1415,8 +1409,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	/**
 	 * Send a notification to the events manager
 	 */
-	PHALCON_OBS_VAR(collection_manager);
-	phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(collection_manager, "notifyevent", *event_name, this_ptr);
 	RETURN_MM();
 }
@@ -1455,8 +1448,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	/**
 	 * Send a notification to the events manager
 	 */
-	PHALCON_OBS_VAR(collection_manager);
-	phalcon_read_property_this(&collection_manager, this_ptr, SL("_collectionManager"), PH_NOISY);
+	collection_manager = phalcon_read_property(this_ptr, SL("_collectionManager"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&status, collection_manager, "notifyevent", *event_name, this_ptr);
 	if (PHALCON_IS_FALSE(status)) {
@@ -1480,9 +1472,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _cancelOperation){
 	phalcon_fetch_params(0, 1, 1, 0, &disable_events);
 
 	if (!zend_is_true(disable_events)) {
-
-		PHALCON_OBS_VAR(operation_made);
-		phalcon_read_property_this(&operation_made, this_ptr, SL("_operationMade"), PH_NOISY);
+		operation_made = phalcon_read_property(this_ptr, SL("_operationMade"), PH_NOISY);
 		if (PHALCON_IS_LONG(operation_made, 3)) {
 			PHALCON_INIT_VAR(event_name);
 			ZVAL_STRING(event_name, "notDeleted");
@@ -1523,7 +1513,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _exists){
 		 */
 		PHALCON_CALL_METHOD(&document_count, collection, "count", parameters);
 
-		z_zero = PHALCON_GLOBAL(z_zero);
+		z_zero = &PHALCON_GLOBAL(z_zero);
 		is_smaller_function(return_value, z_zero, document_count);
 
 		RETURN_MM();
@@ -1588,15 +1578,15 @@ PHP_METHOD(Phalcon_Mvc_Collection, appendMessage){
 	phalcon_fetch_params(0, 1, 1, 3, &message, &field, &type, &code);
 
 	if (!field) {
-		field = PHALCON_GLOBAL(z_null);
+		field = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!type) {
-		type = PHALCON_GLOBAL(z_null);
+		type = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!code) {
-		code = PHALCON_GLOBAL(z_null);
+		code = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(message) != IS_OBJECT) {
@@ -1636,7 +1626,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	zval *params[2];
 	zval func;
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
@@ -1647,15 +1637,15 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	phalcon_fetch_params(0, 1, 0, 3, &arr, &white_list, &mode);
 
 	if (!arr) {
-		arr = PHALCON_GLOBAL(z_null);
+		arr = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!mode) {
-		mode = PHALCON_GLOBAL(z_null);
+		mode = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(arr) != IS_NULL) {
@@ -1765,7 +1755,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 				PHALCON_INIT_VAR(collection_message);
 				object_init_ex(collection_message, phalcon_mvc_collection_message_ce);
-				PHALCON_CALL_METHOD(NULL, collection_message, "__construct", message, PHALCON_GLOBAL(z_null), type);
+				PHALCON_CALL_METHOD(NULL, collection_message, "__construct", message, &PHALCON_GLOBAL(z_null), type);
 
 				PHALCON_INIT_VAR(messages);
 				array_init_size(messages, 1);
@@ -1783,7 +1773,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 				PHALCON_INIT_VAR(collection_message);
 				object_init_ex(collection_message, phalcon_mvc_collection_message_ce);
-				PHALCON_CALL_METHOD(NULL, collection_message, "__construct", message, PHALCON_GLOBAL(z_null), type);
+				PHALCON_CALL_METHOD(NULL, collection_message, "__construct", message, &PHALCON_GLOBAL(z_null), type);
 
 				PHALCON_INIT_VAR(messages);
 				array_init_size(messages, 1);
@@ -1804,7 +1794,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	 */
 	phalcon_update_property_this(this_ptr, SL("_errorMessages"), empty_array);
 
-	disable_events = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
+	disable_events = phalcon_read_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
 
 	/**
 	 * Execute the preSave hook
@@ -1842,8 +1832,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 			}
 
 			if (phalcon_isset_property_zval(this_ptr, attribute_field)) {
-				PHALCON_OBS_NVAR(value);
-				phalcon_read_property_zval(&value, this_ptr, attribute_field, PH_NOISY);
+				value = phalcon_read_property_zval(this_ptr, attribute_field, PH_NOISY);
 
 				phalcon_array_update_zval(&data, &tmp, value, PH_COPY);
 			}
@@ -2006,7 +1995,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 	phalcon_fetch_params(0, 1, 0, 1, &parameters);
 
 	if (!parameters) {
-		parameters = PHALCON_GLOBAL(z_null);
+		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_INIT_VAR(class_name);
@@ -2054,7 +2043,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 
 	PHALCON_CALL_METHOD(&connection, collection, "getconnection");
 
-	unique = PHALCON_GLOBAL(z_true);
+	unique = &PHALCON_GLOBAL(z_true);
 	PHALCON_RETURN_CALL_SELF("_getresultset", params, collection, connection, unique);
 	RETURN_MM();
 }
@@ -2108,7 +2097,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, find){
 	phalcon_fetch_params(0, 1, 0, 1, &parameters);
 
 	if (!parameters) {
-		parameters = PHALCON_GLOBAL(z_null);
+		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(parameters) != IS_NULL) {
@@ -2130,7 +2119,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, find){
 
 	PHALCON_CALL_METHOD(&connection, collection, "getconnection");
 
-	unique = PHALCON_GLOBAL(z_false);
+	unique = &PHALCON_GLOBAL(z_false);
 	PHALCON_RETURN_CALL_SELF("_getresultset", parameters, collection, connection, unique);
 	RETURN_MM();
 }
@@ -2155,7 +2144,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, count){
 	phalcon_fetch_params(0, 1, 0, 1, &parameters);
 
 	if (!parameters) {
-		parameters = PHALCON_GLOBAL(z_null);
+		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(parameters) != IS_NULL) {
@@ -2247,11 +2236,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	phalcon_fetch_params(0, 1, 1, 2, &fields, &condition, &finalize);
 
 	if (!condition) {
-		condition = PHALCON_GLOBAL(z_null);
+		condition = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!finalize) {
-		finalize = PHALCON_GLOBAL(z_null);
+		finalize = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(fields) != IS_ARRAY) {
@@ -2344,14 +2333,14 @@ PHP_METHOD(Phalcon_Mvc_Collection, create){
 	phalcon_fetch_params(0, 1, 0, 2, &data, &white_list);
 
 	if (!data) {
-		data = PHALCON_GLOBAL(z_null);
+		data = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "save", data, white_list, PHALCON_GLOBAL(z_true));
+	PHALCON_RETURN_CALL_METHOD(this_ptr, "save", data, white_list, &PHALCON_GLOBAL(z_true));
 	RETURN_MM();
 }
 
@@ -2369,14 +2358,14 @@ PHP_METHOD(Phalcon_Mvc_Collection, update){
 	phalcon_fetch_params(0, 1, 0, 2, &data, &white_list);
 
 	if (!data) {
-		data = PHALCON_GLOBAL(z_null);
+		data = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!white_list) {
-		white_list = PHALCON_GLOBAL(z_null);
+		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "save", data, white_list, PHALCON_GLOBAL(z_false));
+	PHALCON_RETURN_CALL_METHOD(this_ptr, "save", data, white_list, &PHALCON_GLOBAL(z_false));
 	RETURN_MM();
 }
 
@@ -2410,7 +2399,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 		return;
 	}
 
-	disable_events = phalcon_fetch_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
+	disable_events = phalcon_read_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
 	if (!zend_is_true(disable_events)) {
 
 		PHALCON_INIT_VAR(event_name);
@@ -2514,11 +2503,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 	phalcon_fetch_params(0, 1, 0, 3, &columns, &rename_columns, &allow_empty);
 
 	if (!rename_columns) {
-		rename_columns = PHALCON_GLOBAL(z_true);
+		rename_columns = &PHALCON_GLOBAL(z_true);
 	}
 
 	if (!allow_empty) {
-		allow_empty = PHALCON_GLOBAL(z_false);
+		allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
 	PHALCON_INIT_VAR(data);
@@ -2563,8 +2552,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 		}
 
 		if (phalcon_isset_property_zval(this_ptr, attribute_field)) {
-			PHALCON_OBS_NVAR(value);
-			phalcon_read_property_zval(&value, this_ptr, attribute_field, PH_NOISY);
+			value = phalcon_read_property_zval(this_ptr, attribute_field, PH_NOISY);
 
 			if (zend_is_true(allow_empty)) {
 				phalcon_array_update_zval(&data, attribute_field, value, PH_COPY);
@@ -3058,7 +3046,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 	phalcon_fetch_params(0, 1, 1, 1, &method, &arguments);
 	
 	if (!arguments) {
-		arguments = PHALCON_GLOBAL(z_null);
+		arguments = &PHALCON_GLOBAL(z_null);
 	}
 	
 	PHALCON_INIT_VAR(extra_method);

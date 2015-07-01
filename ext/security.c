@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		i_bytes = Z_LVAL_P(*number_bytes);
 	}
 	else {
-		zval *n = phalcon_fetch_nproperty_this(this_ptr, SL("_numberBytes"), PH_NOISY);
+		zval *n = phalcon_read_property(this_ptr, SL("_numberBytes"), PH_NOISY);
 		i_bytes = (Z_TYPE_P(n) == IS_LONG) ? Z_LVAL_P(n) : phalcon_get_intval(n);
 	}
 
@@ -369,13 +369,13 @@ PHP_METHOD(Phalcon_Security, hash)
 	PHALCON_ENSURE_IS_STRING(password);
 
 	if (!work_factor || Z_TYPE_P(*work_factor) == IS_NULL) {
-		tmp         = phalcon_fetch_nproperty_this(this_ptr, SL("_workFactor"), PH_NOISY);
+		tmp         = phalcon_read_property(this_ptr, SL("_workFactor"), PH_NOISY);
 		work_factor = &tmp;
 	}
 
 	i_factor = (Z_TYPE_P(*work_factor) == IS_LONG) ? Z_LVAL_P(*work_factor) : phalcon_get_intval(*work_factor);
 
-	default_hash = phalcon_fetch_nproperty_this(getThis(), SL("_defaultHash"), PH_NOISY);
+	default_hash = phalcon_read_property(getThis(), SL("_defaultHash"), PH_NOISY);
 	i_hash       = (Z_TYPE_P(default_hash) == IS_LONG) ? Z_LVAL_P(default_hash) : phalcon_get_intval(default_hash);
 
 	switch (i_hash) {
@@ -673,8 +673,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 	PHALCON_INIT_VAR(safe_bytes);
 	phalcon_filter_alphanum(safe_bytes, base64bytes);
 
-	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
@@ -723,7 +722,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 	PHALCON_INIT_VAR(token);
 	phalcon_md5(token, random_bytes);
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
@@ -760,11 +759,10 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	phalcon_fetch_params(0, 1, 0, 2, &token_key, &token_value);
 
 	if (!token_value) {
-		token_value = PHALCON_GLOBAL(z_null);
+		token_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_OBS_VAR(dependency_injector);
-	phalcon_read_property_this(&dependency_injector, this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
@@ -822,7 +820,7 @@ PHP_METHOD(Phalcon_Security, getSessionToken){
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
@@ -851,7 +849,7 @@ PHP_METHOD(Phalcon_Security, destroyToken){
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_fetch_nproperty_this(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
@@ -887,7 +885,7 @@ PHP_METHOD(Phalcon_Security, computeHmac)
 	phalcon_fetch_params(0, 3, 1, &data, &key, &algo, &raw);
 
 	if (!raw) {
-		raw = &(PHALCON_GLOBAL(z_false));
+		raw = &(&PHALCON_GLOBAL(z_false));
 	}
 
 	PHALCON_RETURN_CALL_FUNCTIONW("hash_hmac", *algo, *data, *key, *raw);
@@ -945,7 +943,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		PHALCON_INIT_VAR(algo);
 		ZVAL_STRING(algo, s_hash);
 
-		PHALCON_CALL_FUNCTION(&tmp, "hash", algo, PHALCON_GLOBAL(z_null), PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_FUNCTION(&tmp, "hash", algo, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 		if (PHALCON_IS_FALSE(tmp) || Z_TYPE_P(tmp) != IS_STRING) {
 			RETURN_MM_FALSE;
 		}
@@ -973,7 +971,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 			s[salt_len+2] = (unsigned char)(i >> 8);
 			s[salt_len+3] = (unsigned char)(i);
 
-			PHALCON_CALL_FUNCTION(&K1, "hash_hmac", algo, computed_salt, *password, PHALCON_GLOBAL(z_true));
+			PHALCON_CALL_FUNCTION(&K1, "hash_hmac", algo, computed_salt, *password, &PHALCON_GLOBAL(z_true));
             if (Z_TYPE_P(K1) != IS_STRING) {
                 RETURN_MM_FALSE;
             }
@@ -983,7 +981,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 			for (j = 1; j < i_iterations; ++j) {
 				char *k1, *k2;
 
-				PHALCON_CALL_FUNCTION(&tmp, "hash_hmac", algo, K1, *password, PHALCON_GLOBAL(z_true));
+				PHALCON_CALL_FUNCTION(&tmp, "hash_hmac", algo, K1, *password, &PHALCON_GLOBAL(z_true));
                 if (Z_TYPE_P(tmp) != IS_STRING) {
                     RETURN_MM_FALSE;
                 }
@@ -1070,7 +1068,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	ZVAL_LONG(len, i_size);
 
 	{
-		zval *params[] = { algo, *password, *salt, iter, len, PHALCON_GLOBAL(z_true) };
+		zval *params[] = { algo, *password, *salt, iter, len, &PHALCON_GLOBAL(z_true) };
 		if (FAILURE == phalcon_call_func_aparams(return_value, SL("hash_pbkdf2"), 6, params)) {
 			;
 		}

@@ -106,15 +106,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 	phalcon_fetch_params(1, 1, 3, &message, &field, &type, &code);
 	
 	if (!field) {
-		field = PHALCON_GLOBAL(z_null);
+		field = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (!type) {
-		type = PHALCON_GLOBAL(z_null);
+		type = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!code) {
-		code = PHALCON_GLOBAL(z_zero);
+		code = &PHALCON_GLOBAL(z_zero);
 	}
 	
 	if (!zend_is_true(type)) {
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, getOption){
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	
-	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, options, option)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, isSetOption){
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	
-	options = phalcon_fetch_nproperty_this(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
 	
 	RETURN_BOOL(phalcon_array_isset(options, option));
 }

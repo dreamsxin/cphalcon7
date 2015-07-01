@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 	    PHALCON_CALL_METHOD(NULL, active_profile, "setsqlbindtypes", sql_bindtypes);
 	}
 
-	PHALCON_CALL_FUNCTION(&time, "microtime", PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_FUNCTION(&time, "microtime", &PHALCON_GLOBAL(z_true));
 	PHALCON_CALL_METHOD(NULL, active_profile, "setinitialtime", time);
 
 	if (phalcon_method_exists_ex(this_ptr, SS("beforestartprofile")) == SUCCESS) {
@@ -153,9 +153,9 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_CALL_FUNCTION(&final_time, "microtime", PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_FUNCTION(&final_time, "microtime", &PHALCON_GLOBAL(z_true));
 	
-	active_profile = phalcon_fetch_nproperty_this(this_ptr, SL("_activeProfile"), PH_NOISY);
+	active_profile = phalcon_read_property(this_ptr, SL("_activeProfile"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, active_profile, "setfinaltime", final_time);
 	
 	PHALCON_CALL_METHOD(&initial_time, active_profile, "getinitialtime");
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 	PHALCON_INIT_VAR(difference);
 	phalcon_sub_function(difference, final_time, initial_time);
 	
-	total_seconds = phalcon_fetch_nproperty_this(this_ptr, SL("_totalSeconds"), PH_NOISY);
+	total_seconds = phalcon_read_property(this_ptr, SL("_totalSeconds"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(new_total_seconds);
 	phalcon_add_function(new_total_seconds, total_seconds, difference);
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Db_Profiler, getNumberTotalStatements){
 
 	zval *all_profiles;
 
-	all_profiles = phalcon_fetch_nproperty_this(this_ptr, SL("_allProfiles"), PH_NOISY);
+	all_profiles = phalcon_read_property(this_ptr, SL("_allProfiles"), PH_NOISY);
 	phalcon_fast_count(return_value, all_profiles);
 }
 

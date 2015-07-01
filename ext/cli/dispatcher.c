@@ -116,9 +116,9 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskSuffix){
 	zval *task_suffix;
 
 	phalcon_fetch_params(0, 1, 0, &task_suffix);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_handlerSuffix"), task_suffix);
-	
+
 }
 
 /**
@@ -131,9 +131,9 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setDefaultTask){
 	zval *task_name;
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_defaultHandler"), task_name);
-	
+
 }
 
 /**
@@ -146,9 +146,9 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskName){
 	zval *task_name;
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_handlerName"), task_name);
-	
+
 }
 
 /**
@@ -176,28 +176,27 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &message, &exception_code);
-	
+
 	if (!exception_code) {
-		exception_code = PHALCON_GLOBAL(z_zero);
+		exception_code = &PHALCON_GLOBAL(z_zero);
 	}
-	
+
 	PHALCON_INIT_VAR(exception);
 	object_init_ex(exception, phalcon_cli_dispatcher_exception_ce);
 	PHALCON_CALL_METHOD(NULL, exception, "__construct", message, exception_code);
-	
-	PHALCON_OBS_VAR(events_manager);
-	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
+
+	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-	
+
 		PHALCON_INIT_VAR(event_name);
 		ZVAL_STRING(event_name, "dispatch:beforeException");
-	
+
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, exception);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 	}
-	
+
 	/** 
 	 * Throw the exception if it wasn't handled
 	 */
@@ -218,20 +217,19 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &exception);
-	
-	PHALCON_OBS_VAR(events_manager);
-	phalcon_read_property_this(&events_manager, this_ptr, SL("_eventsManager"), PH_NOISY);
+
+	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-	
+
 		PHALCON_INIT_VAR(event_name);
 		ZVAL_STRING(event_name, "dispatch:beforeException");
-	
+
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, exception);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 	}
-	
+
 	PHALCON_MM_RESTORE();
 }
 

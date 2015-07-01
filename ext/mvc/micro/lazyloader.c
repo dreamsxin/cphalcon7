@@ -75,7 +75,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &definition);
 	PHALCON_ENSURE_IS_STRING(definition);
-	
+
 	phalcon_update_property_this(this_ptr, SL("_definition"), *definition);
 }
 
@@ -95,14 +95,12 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(0, 1, 2, 0, &method, &arguments);
-	
-	PHALCON_OBS_VAR(handler);
-	phalcon_read_property_this(&handler, this_ptr, SL("_handler"), PH_NOISY);
+
+	handler = phalcon_read_property(this_ptr, SL("_handler"), PH_NOISY);
 	if (Z_TYPE_P(handler) != IS_OBJECT) {
-		PHALCON_OBS_VAR(definition);
-		phalcon_read_property_this(&definition, this_ptr, SL("_definition"), PH_NOISY);
+		definition = phalcon_read_property(this_ptr, SL("_definition"), PH_NOISY);
 		ce0 = phalcon_fetch_class(definition);
-	
+
 		PHALCON_INIT_NVAR(handler);
 		object_init_ex(handler, ce0);
 		if (phalcon_has_constructor(handler)) {
@@ -110,12 +108,12 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 		}
 		phalcon_update_property_this(this_ptr, SL("_handler"), handler);
 	}
-	
+
 	PHALCON_INIT_VAR(call_handler);
 	array_init_size(call_handler, 2);
 	phalcon_array_append(&call_handler, handler, 0);
 	phalcon_array_append(&call_handler, method, 0);
-	
+
 	/** 
 	 * Call the handler
 	 */

@@ -359,8 +359,8 @@ void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style,
 void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes){
 
 	zval *document, ret, *tmp = NULL, elements;
-	zval *element_attr_parent = NULL, *element_attr_name = NULL, *element_attr_value = NULL, *matched = NULL, *regexp;
-	zval *joined_tags, clean_str, ret2;
+	zval *element_attr_name = NULL, *element_attr_value = NULL, *matched = NULL, *regexp;
+	zval *joined_tags, clean_str;
 	zend_class_entry *ce0;
 	int i, j, element_length, element_attrs_length;
 
@@ -434,8 +434,6 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 				RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, regexp, element_attr_value, NULL));
 
 				if (zend_is_true(matched)) {
-					element_attr_parent = phalcon_read_property(&element_attr, SL("parentNode"), PH_NOISY);
-
 					PHALCON_CALL_METHOD(NULL, &element, "removeattributenode", element_attr);
 				}
 			}

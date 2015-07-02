@@ -308,22 +308,19 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 			efree(result);
 			RETURN_FALSE;
 		}
-	}
-	else {
-		zval *tmp = NULL, *n;
-
-		PHALCON_ALLOC_GHOST_ZVAL(n);
-		ZVAL_LONG(n, i_bytes);
+	} else {
+		zval tmp, n;
+		ZVAL_LONG(&n, i_bytes);
 		PHALCON_CALL_FUNCTIONW(&tmp, "openssl_random_pseudo_bytes", n);
 
-		if (Z_TYPE_P(tmp) != IS_STRING || Z_STRLEN_P(tmp) < i_bytes) {
-			phalcon_ptr_dtor(tmp);
+		if (Z_TYPE(tmp) != IS_STRING || Z_STRLEN(tmp) < i_bytes) {
+			phalcon_dtor(tmp);
 			RETURN_FALSE;
 		}
 
-		result = Z_STRVAL_P(tmp);
-		ZVAL_NULL(tmp);
-		phalcon_ptr_dtor(tmp);
+		result = Z_STRVAL(tmp);
+		ZVAL_NULL(&tmp);
+		phalcon_dtor(tmp);
 	}
 
 	result[i_bytes] = 0;
@@ -331,14 +328,13 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 
 	if (encode) {
 		int encoded_len;
-		char *encoded = (char*)php_base64_encode((unsigned char*)result, i_bytes, &encoded_len);
+		zend_string *encoded = php_base64_encode((unsigned char*)result, i_bytes);
 		if (encoded) {
-			assert(encoded_len >= i_bytes);
-			php_strtr(encoded, encoded_len, "+=", "./", 2);
-			encoded[i_bytes] = 0;
-			RETVAL_STRINGL(encoded, i_bytes, 0);
-		}
-		else {
+			assert(encoded->len >= i_bytes);
+			php_strtr(encoded->val, encoded->len, "+=", "./", 2);
+			encoded->val[i_bytes] = 0;
+			RETVAL_STRINGL(encoded->val, i_bytes, 0);
+		} else {
 			RETVAL_FALSE;
 		}
 

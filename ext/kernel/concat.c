@@ -42,7 +42,7 @@ void phalcon_concat_svs(zval **result, const char *op1, uint32_t op1_len, zval *
 
 	phalcon_concat_sv(result, op1, op1_len, op2, self_var);
 	concat_function(&ret, *result, &zop3);
-	ZVAL_ZVAL(*result, ret, 1, 0);
+	ZVAL_ZVAL(*result, &ret, 1, 0);
 }
 
 void phalcon_concat_svsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var){
@@ -161,7 +161,7 @@ void phalcon_concat_vvs(zval **result, zval *op1, zval *op2, const char *op3, ui
 
 	phalcon_concat_vv(result, op1, op2, self_var);
 	concat_function(&ret, *result, &zop3);
-	ZVAL_ZVAL(*result, ret, 1, 0);
+	ZVAL_ZVAL(*result, &ret, 1, 0);
 }
 
 void phalcon_concat_vvsv(zval **result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var){
@@ -222,7 +222,7 @@ void phalcon_concat_self_str(zval **left, const char *right, int right_length){
  */
 void phalcon_concat_self_long(zval **left, const long right) {
 	zval zright;
-	ZVAL_LONG(&zright, right, right_length);
+	ZVAL_LONG(&zright, right);
 	phalcon_concat_self(left, &zright);
 }
 
@@ -231,6 +231,8 @@ void phalcon_concat_self_long(zval **left, const long right) {
  */
 void phalcon_concat_self_char(zval **left, unsigned char right) {
 	zval zright;
-	ZVAL_STRINGL(&zright, &right, 1);
+	char c[1];
+	c[0] = right;
+	ZVAL_STRINGL(&zright, c, 1);
 	phalcon_concat_self(left, &zright);
 }

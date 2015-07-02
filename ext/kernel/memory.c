@@ -711,7 +711,7 @@ int phalcon_set_symbol_str(char *key_name, unsigned int key_length, zval *value)
 
 	if (&EG(symbol_table)) {
 		Z_ADDREF_P(value);
-		zend_hash_str_update(&EG(symbol_table), key_name, key_length, &value);
+		zend_hash_str_update(&EG(symbol_table), key_name, key_length, value);
 		if (EG(exception)) {
 			return FAILURE;
 		}

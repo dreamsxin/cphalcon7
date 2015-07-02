@@ -321,7 +321,7 @@ void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *
 void phalcon_file_get_contents(zval *return_value, zval *filename)
 {
 
-	char *contents;
+	zend_string *contents;
 	php_stream *stream;
 	int len;
 	long maxlen = PHP_STREAM_COPY_ALL;
@@ -341,14 +341,10 @@ void phalcon_file_get_contents(zval *return_value, zval *filename)
 		RETURN_FALSE;
 	}
 
-	if ((len = php_stream_copy_to_mem(stream, &contents, maxlen, 0)) > 0) {
-		RETVAL_STRINGL(contents, len, 0);
+	if ((contents = php_stream_copy_to_mem(stream, maxlen, 0)) != NULL) {
+		RETVAL_STR(contents);
 	} else {
-		if (len == 0) {
-			RETVAL_EMPTY_STRING();
-		} else {
-			RETVAL_FALSE;
-		}
+		RETVAL_FALSE;
 	}
 
 	php_stream_close(stream);

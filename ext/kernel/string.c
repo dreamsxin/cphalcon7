@@ -520,7 +520,7 @@ void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, 
  */
 zend_string* phalcon_trim(zval *str, zval *charlist, int where) {
 	zval copy;
-	zend_string *str;
+	zend_string *s;
 	int use_copy = 0;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
@@ -532,16 +532,16 @@ zend_string* phalcon_trim(zval *str, zval *charlist, int where) {
 	}
 
 	if (charlist) {
-		str = php_trim(Z_STR_P(copy), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), where);
+		s = php_trim(Z_STR(copy), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), where);
 	} else {
-		str = php_trim(Z_STR_P(copy), NULL, 0, where);
+		s = php_trim(Z_STR(copy), NULL, 0, where);
 	}
 
 	if (use_copy) {
 		phalcon_dtor(copy);
 	}
 
-	return str;
+	return s;
 }
 
 /**
@@ -941,45 +941,36 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned 
 
 void phalcon_append_printable_array(smart_str *implstr, zval *value) {
 
-	zval         **tmp;
-	HashTable      *arr;
-	HashPosition   pos;
+	zval *tmp;
 	unsigned int numelems, i = 0, str_len;
 
-	arr = Z_ARRVAL_P(value);
-	numelems = zend_hash_num_elements(arr);
+	numelems = zend_hash_num_elements(Z_ARRVAL_P(value));
 
 	smart_str_appendc(implstr, '[');
 
-	if (numelems > 0) {
-		zend_hash_internal_pointer_reset_ex(arr, &pos);
-		while ((tmp = zend_hash_get_current_data_ex(arr, &pos)) != NULL) {
-
-			/**
-			 * We don't serialize objects
-			 */
-			if (Z_TYPE_P(tmp) == IS_OBJECT) {
-				smart_str_appendc(implstr, 'O');
-				{
-					char stmp[MAX_LENGTH_OF_LONG + 1];
-					str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJ_HANDLE_P(tmp));
-					smart_str_appendl(implstr, stmp, str_len);
-				}
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), tmp) {
+		/**
+		 * We don't serialize objects
+		 */
+		if (Z_TYPE_P(tmp) == IS_OBJECT) {
+			smart_str_appendc(implstr, 'O');
+			{
+				char stmp[MAX_LENGTH_OF_LONG + 1];
+				str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJ_HANDLE_P(tmp));
+				smart_str_appendl(implstr, stmp, str_len);
+			}
+		} else {
+			if (Z_TYPE_P(tmp) == IS_ARRAY) {
+				phalcon_append_printable_array(implstr, tmp);
 			} else {
-				if (Z_TYPE_P(tmp) == IS_ARRAY) {
-					phalcon_append_printable_array(implstr, tmp);
-				} else {
-					phalcon_append_printable_zval(implstr, tmp);
-				}
+				phalcon_append_printable_zval(implstr, tmp);
 			}
-
-			if (++i != numelems) {
-				smart_str_appendc(implstr, ',');
-			}
-
-			zend_hash_move_forward_ex(arr, &pos);
 		}
-	}
+
+		if (++i != numelems) {
+			smart_str_appendc(implstr, ',');
+		}
+	} ZEND_HASH_FOREACH_END();
 
 	smart_str_appendc(implstr, ']');
 }
@@ -1003,7 +994,7 @@ void phalcon_unique_key(zval *return_value, zval *prefix, zval *value) {
 
 	smart_str_0(&implstr);
 
-	if (implstr.len) {
+	if (implstr.s->len) {
 		RETURN_STR(implstr.s);
 	} else {
 		smart_str_free(&implstr);
@@ -1041,7 +1032,7 @@ zval *phalcon_eol(int eol) {
 void phalcon_base64_encode(zval *return_value, zval *data) {
 
 	zval copy;
-	char *encoded;
+	zend_string *encoded;
 	int use_copy = 0, length;
 
 	if (Z_TYPE_P(data) != IS_STRING) {
@@ -1051,14 +1042,14 @@ void phalcon_base64_encode(zval *return_value, zval *data) {
 		}
 	}
 
-	encoded = (char *) php_base64_encode((unsigned char *)(Z_STRVAL_P(data)), Z_STRLEN_P(data), &length);
+	encoded = php_base64_encode((unsigned char *)(Z_STRVAL_P(data)), Z_STRLEN_P(data));
 
 	if (use_copy) {
-		phalcon_dtor(data);
+		phalcon_ptr_dtor(data);
 	}
 
 	if (encoded) {
-		RETURN_STRINGL(encoded, length);
+		RETURN_STR(encoded);
 	} else {
 		RETURN_NULL();
 	}

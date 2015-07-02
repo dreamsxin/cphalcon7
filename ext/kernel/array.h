@@ -64,7 +64,7 @@ int phalcon_array_isset_long_fetch(zval **fetched, const zval *arr, ulong index)
  * @retval 1 Exists
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  */
-PHALCON_ATTR_NONNULL static inline int phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length);
+int ZEND_FASTCALL phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length) PHALCON_ATTR_NONNULL;
 
 
 /**

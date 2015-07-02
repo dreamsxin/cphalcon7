@@ -771,24 +771,19 @@ PHP_METHOD(Phalcon_Http_Request, getRawBody){
 	zval *zcontext = NULL;
 	php_stream_context *context = php_stream_context_from_zval(zcontext, 0);
 	php_stream *stream = php_stream_open_wrapper_ex("php://input", "rb", REPORT_ERRORS, NULL, context);
+	zend_string *content;
 	long int maxlen    = PHP_STREAM_COPY_ALL;
-	char *content;
 	int len;
 
 	if (!stream) {
 		RETURN_FALSE;
 	}
 
-	len = php_stream_copy_to_mem(stream, &content, maxlen, 0);
-	if (len > 0) {
-		RETVAL_STRINGL(content, len, 0);
+	content = php_stream_copy_to_mem(stream, maxlen, 0);
+	if (content != NULL) {
+		RETVAL_STR(content);
 		phalcon_update_property_this(getThis(), SL("_rawBody"), return_value);
-	}
-	else if (!len) {
-		RETVAL_EMPTY_STRING();
-		phalcon_update_property_this(getThis(), SL("_rawBody"), return_value);
-	}
-	else {
+	} else {
 		RETVAL_FALSE;
 	}
 

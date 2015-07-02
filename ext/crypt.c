@@ -473,7 +473,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 
 		PHALCON_INIT_NVAR(arguments);
 		array_init_size(arguments, 1);
-		phalcon_array_append(&arguments, source, 0);
+		phalcon_array_append(arguments, source, 0);
 
 		PHALCON_INIT_NVAR(value);
 		PHALCON_CALL_USER_FUNC_ARRAY(value, handler, arguments);
@@ -555,7 +555,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	if (phalcon_is_callable(handler)) {
 		PHALCON_INIT_NVAR(arguments);
 		array_init_size(arguments, 1);
-		phalcon_array_append(&arguments, return_value, 0);
+		phalcon_array_append(arguments, return_value, 0);
 
 		PHALCON_INIT_NVAR(value);
 		PHALCON_CALL_USER_FUNC_ARRAY(value, handler, arguments);
@@ -600,7 +600,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 		PHALCON_INIT_NVAR(arguments);
 		array_init_size(arguments, 1);
-		phalcon_array_append(&arguments, text, 0);
+		phalcon_array_append(arguments, text, 0);
 
 		PHALCON_INIT_NVAR(value);
 		PHALCON_CALL_USER_FUNC_ARRAY(value, handler, arguments);
@@ -671,7 +671,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	if (phalcon_is_callable(handler)) {
 		PHALCON_INIT_NVAR(arguments);
 		array_init_size(arguments, 1);
-		phalcon_array_append(&arguments, return_value, 0);
+		phalcon_array_append(arguments, return_value, 0);
 
 		PHALCON_INIT_NVAR(value);
 		PHALCON_CALL_USER_FUNC_ARRAY(value, handler, arguments);

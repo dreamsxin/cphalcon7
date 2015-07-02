@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 					object_init_ex(collection, phalcon_annotations_collection_ce);
 					PHALCON_CALL_METHOD(NULL, collection, "__construct", reflection_method);
 
-					phalcon_array_update_zval(&return_value, &method_name, collection, PH_COPY);
+					phalcon_array_update_zval(return_value, &method_name, collection, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 	
 				phalcon_update_property_this(this_ptr, SL("_methodAnnotations"), return_value);
@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 					object_init_ex(collection, phalcon_annotations_collection_ce);
 					PHALCON_CALL_METHOD(NULL, collection, "__construct", reflection_property);
 
-					phalcon_array_update_zval(&return_value, &property, collection, PH_COPY);
+					phalcon_array_update_zval(return_value, &property, collection, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 
 				phalcon_update_property_this(this_ptr, SL("_propertyAnnotations"), return_value);

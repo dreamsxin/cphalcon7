@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 2);
-	phalcon_array_update_string(&conditions, SL("key"), prefixed_key, PH_COPY);
+	phalcon_array_update_string(conditions, SL("key"), prefixed_key, PH_COPY);
 
 	PHALCON_ALLOC_GHOST_ZVAL(time_condition);
 	array_init_size(time_condition, 1);
@@ -345,28 +345,28 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 1);
-	phalcon_array_update_string(&conditions, SL("key"), last_key, PH_COPY);
+	phalcon_array_update_string(conditions, SL("key"), last_key, PH_COPY);
 
 	PHALCON_CALL_METHOD(&document, collection, "findone", conditions);
 
 	if (Z_TYPE_P(document) == IS_ARRAY) { 
-		phalcon_array_update_string(&document, SL("time"), timestamp, PH_COPY);
+		phalcon_array_update_string(document, SL("time"), timestamp, PH_COPY);
 		if (prepared_content) {
-			phalcon_array_update_string(&document, SL("data"), prepared_content, PH_COPY);
+			phalcon_array_update_string(document, SL("data"), prepared_content, PH_COPY);
 		} else {
-			phalcon_array_update_string(&document, SL("data"), cached_content, PH_COPY);
+			phalcon_array_update_string(document, SL("data"), cached_content, PH_COPY);
 		}
 		PHALCON_CALL_METHOD(NULL, collection, "save", document);
 	} else {
 		PHALCON_INIT_VAR(data);
 		array_init_size(data, 3);
-		phalcon_array_update_string(&data, SL("key"), last_key, PH_COPY);
-		phalcon_array_update_string(&data, SL("time"), timestamp, PH_COPY);
+		phalcon_array_update_string(data, SL("key"), last_key, PH_COPY);
+		phalcon_array_update_string(data, SL("time"), timestamp, PH_COPY);
 
 		if (prepared_content) {
-			phalcon_array_update_string(&data, SL("data"), prepared_content, PH_COPY);
+			phalcon_array_update_string(data, SL("data"), prepared_content, PH_COPY);
 		} else {
-			phalcon_array_update_string(&data, SL("data"), cached_content, PH_COPY);
+			phalcon_array_update_string(data, SL("data"), cached_content, PH_COPY);
 		}
 
 		PHALCON_CALL_METHOD(NULL, collection, "save", data);
@@ -411,7 +411,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 1);
-	phalcon_array_update_string(&conditions, SL("key"), prefixed_key, PH_COPY);
+	phalcon_array_update_string(conditions, SL("key"), prefixed_key, PH_COPY);
 	PHALCON_CALL_METHOD(NULL, collection, "remove", conditions);
 
 	if ((php_rand() % 100) == 0) {
@@ -459,13 +459,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 		assert(phalcon_has_constructor(regex));
 		PHALCON_CALL_METHOD(NULL, regex, "__construct", pattern);
 
-		phalcon_array_update_string(&conditions, SL("key"), regex, PH_COPY);
+		phalcon_array_update_string(conditions, SL("key"), regex, PH_COPY);
 	}
 
 	PHALCON_ALLOC_GHOST_ZVAL(time_condition);
 	array_init_size(time_condition, 1);
 	add_assoc_long_ex(time_condition, SS("$gt"), (long int)time(NULL));
-	phalcon_array_update_string(&conditions, SL("time"), time_condition, 0);
+	phalcon_array_update_string(conditions, SL("time"), time_condition, 0);
 
 	PHALCON_CALL_METHOD(&documents, collection, "find", conditions, fields);
 
@@ -517,12 +517,12 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 
 		PHALCON_INIT_VAR(conditions);
 		array_init_size(conditions, 2);
-		phalcon_array_update_string(&conditions, SL("key"), last_key, PH_COPY);
+		phalcon_array_update_string(conditions, SL("key"), last_key, PH_COPY);
 
 		PHALCON_ALLOC_GHOST_ZVAL(time_condition);
 		array_init_size(time_condition, 1);
 		add_assoc_long_ex(time_condition, SS("$gt"), (long int)time(NULL));
-		phalcon_array_update_string(&conditions, SL("time"), time_condition, 0);
+		phalcon_array_update_string(conditions, SL("time"), time_condition, 0);
 
 		PHALCON_CALL_METHOD(&number, collection, "count", conditions);
 
@@ -600,7 +600,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 1);
-	phalcon_array_update_string(&conditions, SL("key"), prefixed_key, PH_COPY);
+	phalcon_array_update_string(conditions, SL("key"), prefixed_key, PH_COPY);
 
 	PHALCON_CALL_METHOD(&document, collection, "findone", conditions);
 
@@ -704,7 +704,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 1);
-	phalcon_array_update_string(&conditions, SL("key"), prefixed_key, PH_COPY);
+	phalcon_array_update_string(conditions, SL("key"), prefixed_key, PH_COPY);
 
 	PHALCON_CALL_METHOD(&document, collection, "findone", conditions);
 

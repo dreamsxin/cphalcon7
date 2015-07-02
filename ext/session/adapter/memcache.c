@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 	PHALCON_INIT_VAR(option);
 	array_init_size(option, 1);
 
-	phalcon_array_update_string(&option, SL("lifetime"), lifetime, PH_COPY);
+	phalcon_array_update_string(option, SL("lifetime"), lifetime, PH_COPY);
 
 	PHALCON_INIT_VAR(frontend_data);
 	object_init_ex(frontend_data, phalcon_cache_frontend_data_ce);
@@ -172,10 +172,10 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 	PHALCON_INIT_NVAR(option);
 	array_init_size(option, 3);
 
-	phalcon_array_update_string(&option, SL("host"), host, PH_COPY);
-	phalcon_array_update_string(&option, SL("port"), port, PH_COPY);
-	phalcon_array_update_string(&option, SL("persistent"), persistent, PH_COPY);
-	phalcon_array_update_string(&option, SL("prefix"), prefix, PH_COPY);
+	phalcon_array_update_string(option, SL("host"), host, PH_COPY);
+	phalcon_array_update_string(option, SL("port"), port, PH_COPY);
+	phalcon_array_update_string(option, SL("persistent"), persistent, PH_COPY);
+	phalcon_array_update_string(option, SL("prefix"), prefix, PH_COPY);
 
 	PHALCON_INIT_VAR(memcache);
 	object_init_ex(memcache, phalcon_cache_backend_memcache_ce);
@@ -187,37 +187,37 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 	/* open callback */
 	PHALCON_INIT_VAR(callable_open);
 	array_init_size(callable_open, 2);
-	phalcon_array_append(&callable_open, this_ptr, 0);
+	phalcon_array_append(callable_open, this_ptr, 0);
 	phalcon_array_append_string(&callable_open, SL("open"), 0);
 
 	/* close callback */
 	PHALCON_INIT_VAR(callable_close);
 	array_init_size(callable_close, 2);
-	phalcon_array_append(&callable_close, this_ptr, 0);
+	phalcon_array_append(callable_close, this_ptr, 0);
 	phalcon_array_append_string(&callable_close, SL("close"), 0);
 
 	/* read callback */
 	PHALCON_INIT_VAR(callable_read);
 	array_init_size(callable_read, 2);
-	phalcon_array_append(&callable_read, this_ptr, 0);
+	phalcon_array_append(callable_read, this_ptr, 0);
 	phalcon_array_append_string(&callable_read, SL("read"), 0);
 
 	/* write callback */
 	PHALCON_INIT_VAR(callable_write);
 	array_init_size(callable_write, 2);
-	phalcon_array_append(&callable_write, this_ptr, 0);
+	phalcon_array_append(callable_write, this_ptr, 0);
 	phalcon_array_append_string(&callable_write, SL("write"), 0);
 
 	/* destroy callback */
 	PHALCON_INIT_VAR(callable_destroy);
 	array_init_size(callable_destroy, 2);
-	phalcon_array_append(&callable_destroy, this_ptr, 0);
+	phalcon_array_append(callable_destroy, this_ptr, 0);
 	phalcon_array_append_string(&callable_destroy, SL("destroy"), 0);
 
 	/* gc callback */
 	PHALCON_INIT_VAR(callable_gc);
 	array_init_size(callable_gc, 2);
-	phalcon_array_append(&callable_gc, this_ptr, 0);
+	phalcon_array_append(callable_gc, this_ptr, 0);
 	phalcon_array_append_string(&callable_gc, SL("gc"), 0);
 
 	PHALCON_CALL_FUNCTION(NULL, "session_set_save_handler", callable_open, callable_close, callable_read, callable_write, callable_destroy, callable_gc);

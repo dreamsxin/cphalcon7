@@ -210,9 +210,9 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 						PHALCON_CALL_METHOD(&filter_value, this_ptr, "_sanitize", item_value, filter);
 
 						if (key) {
-							phalcon_array_update_zval(&array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_zval(array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
 						} else {
-							phalcon_array_update_long(&array_value, item_idx, filter_value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_long(array_value, item_idx, filter_value, PH_COPY | PH_SEPARATE);
 						}
 					} ZEND_HASH_FOREACH_END();
 	
@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 
 		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(value), key, item_value) {
 			PHALCON_CALL_METHOD(&filter_value, this_ptr, "_sanitize", item_value, filters);
-			phalcon_array_update_zval(&sanizited_value, key, filter_value, PH_COPY);
+			phalcon_array_update_zval(sanizited_value, key, filter_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	
 	} else {
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 			(Z_TYPE_P(filter_object) == IS_OBJECT && instanceof_function(Z_OBJCE_P(filter_object), zend_ce_closure))) {
 			PHALCON_INIT_VAR(arguments);
 			array_init_size(arguments, 1);
-			phalcon_array_append(&arguments, value, 0);
+			phalcon_array_append(arguments, value, 0);
 			PHALCON_CALL_USER_FUNC_ARRAY(return_value, filter_object, arguments);
 			RETURN_MM();
 		}
@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	
 		PHALCON_INIT_VAR(options);
 		array_init_size(options, 1);
-		phalcon_array_update_string(&options, SL("flags"), allow_fraction, PH_COPY);
+		phalcon_array_update_string(options, SL("flags"), allow_fraction, PH_COPY);
 	
 		PHALCON_INIT_NVAR(type);
 		ZVAL_LONG(type, 520); /* FILTER_SANITIZE_NUMBER_FLOAT */
@@ -382,7 +382,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	
 	if (PHALCON_IS_STRING(filter, "trim")) {
 		PHALCON_INIT_NVAR(filtered);
-		phalcon_fast_trim(filtered, value, NULL, PHALCON_TRIM_BOTH);
+		ZVAL_STR(filtered, phalcon_trim(value, NULL, PHALCON_TRIM_BOTH);
 		goto ph_end_0;
 	}
 	

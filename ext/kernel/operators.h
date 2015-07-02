@@ -68,14 +68,13 @@
 #define phalcon_increment(var) increment_function(var)
 #define phalcon_decrement(var) decrement_function(var)
 
-void phalcon_make_printable_zval(zval *expr, zval *expr_copy, int *use_copy);
+int phalcon_make_printable_zval(zval *expr, zval *expr_copy);
 
 #define phalcon_sub_function(result, left, right) fast_sub_function(result, left, right)
 #define phalcon_add_function(result, left, right) fast_add_function(result, left, right)
 #define phalcon_div_function(result, left, right) fast_div_function(result, left, right)
 
 /** Operator functions */
-int phalcon_add_function_ex(zval *result, zval *op1, zval *op2);
 int phalcon_and_function(zval *result, zval *left, zval *right);
 void phalcon_negate(zval *z);
 

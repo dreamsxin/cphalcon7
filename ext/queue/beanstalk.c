@@ -637,9 +637,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, readYaml){
 	}
 
 	array_init_size(return_value, 3);
-	phalcon_array_append(&return_value, status, PH_COPY);
-	phalcon_array_append(&return_value, num_bytes, PH_COPY);
-	phalcon_array_append(&return_value, data, PH_COPY);
+	phalcon_array_append(return_value, status, PH_COPY);
+	phalcon_array_append(return_value, num_bytes, PH_COPY);
+	phalcon_array_append(return_value, data, PH_COPY);
 
 	RETURN_MM();
 }

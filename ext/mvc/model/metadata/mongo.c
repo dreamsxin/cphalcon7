@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 	PHALCON_INIT_VAR(option);
 	array_init_size(option, 1);
 
-	phalcon_array_update_string(&option, SL("lifetime"), lifetime, PH_COPY);
+	phalcon_array_update_string(option, SL("lifetime"), lifetime, PH_COPY);
 
 	PHALCON_INIT_VAR(frontend_data);
 	object_init_ex(frontend_data, phalcon_cache_frontend_data_ce);

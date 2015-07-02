@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 		}
 
 		if (unlikely(Z_TYPE_P(directives) != IS_ARRAY) || zend_hash_num_elements(Z_ARRVAL_P(directives)) == 0) {
-			phalcon_array_update_zval(&config, &section, directives, PH_COPY);
+			phalcon_array_update_zval(config, &section, directives, PH_COPY);
 		} else {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(directives), idx, str_key, value) {
 				zval key;

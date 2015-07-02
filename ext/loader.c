@@ -440,7 +440,7 @@ PHP_METHOD(Phalcon_Loader, register){
 	if (PHALCON_IS_FALSE(registered)) {
 		PHALCON_INIT_VAR(autoloader);
 		array_init_size(autoloader, 2);
-		phalcon_array_append(&autoloader, this_ptr, 0);
+		phalcon_array_append(autoloader, this_ptr, 0);
 		add_next_index_stringl(autoloader, SL("autoLoad"));
 		PHALCON_CALL_FUNCTION(NULL, "spl_autoload_register", autoloader);
 		phalcon_update_property_this(this_ptr, SL("_registered"), &PHALCON_GLOBAL(z_true));
@@ -464,7 +464,7 @@ PHP_METHOD(Phalcon_Loader, unregister){
 	if (PHALCON_IS_TRUE(registered)) {
 		PHALCON_INIT_VAR(autoloader);
 		array_init_size(autoloader, 2);
-		phalcon_array_append(&autoloader, this_ptr, 0);
+		phalcon_array_append(autoloader, this_ptr, 0);
 		add_next_index_stringl(autoloader, SL("autoLoad"));
 		PHALCON_CALL_FUNCTION(NULL, "spl_autoload_unregister", autoloader);
 		phalcon_update_property_this(this_ptr, SL("_registered"), &PHALCON_GLOBAL(z_false));
@@ -503,7 +503,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 		PHALCON_INIT_VAR(directories);
 		array_init(directories);
-		phalcon_array_append(&directories, directory, PH_COPY);
+		phalcon_array_append(directories, directory, PH_COPY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(directories, directory);
 	}

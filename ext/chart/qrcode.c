@@ -790,7 +790,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 			if (result) {
 				RETURN_MM();
 			}
-			phalcon_array_update_string(&symbol_array, SL("data"), &totext, PH_COPY | PH_SEPARATE);                
+			phalcon_array_update_string(symbol_array, SL("data"), &totext, PH_COPY | PH_SEPARATE);                
         } else {
 			phalcon_array_update_string_string(&symbol_array, SL("data"), (char *)data, strlen(data), PH_COPY | PH_SEPARATE);
 		}
@@ -810,11 +810,11 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 				phalcon_array_update_string_long(&coords, SL("x"), zbar_symbol_get_loc_x(symbol, i), 0);
 				phalcon_array_update_string_long(&coords, SL("y"), zbar_symbol_get_loc_y(symbol, i), 0);
 
-				phalcon_array_append(&loc_array, coords, PH_COPY | PH_SEPARATE);	
+				phalcon_array_append(loc_array, coords, PH_COPY | PH_SEPARATE);	
 			}
-			phalcon_array_update_string(&symbol_array, SL("location"), loc_array, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_string(symbol_array, SL("location"), loc_array, PH_COPY | PH_SEPARATE);
 		}
-		phalcon_array_append(&return_array, symbol_array, PH_COPY | PH_SEPARATE);
+		phalcon_array_append(return_array, symbol_array, PH_COPY | PH_SEPARATE);
 	}
 
 	RETURN_MM();

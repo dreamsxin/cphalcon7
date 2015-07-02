@@ -285,14 +285,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
 	/* Set the limit clause avoiding negative offsets */
 	if (i_number < i_limit) {
-		phalcon_array_update_string(&bind, SL("limit"), limit, PH_COPY);
+		phalcon_array_update_string(bind, SL("limit"), limit, PH_COPY);
 		phalcon_array_update_string_long(&bind, SL("offset"), 0, 0);
 	} else {
 		zval *number;
 		PHALCON_ALLOC_GHOST_ZVAL(number);
 		ZVAL_LONG(number, i_number);
-		phalcon_array_update_string(&bind, SL("limit"), limit, PH_COPY);
-		phalcon_array_update_string(&bind, SL("offset"), number, PH_COPY);
+		phalcon_array_update_string(bind, SL("limit"), limit, PH_COPY);
+		phalcon_array_update_string(bind, SL("offset"), number, PH_COPY);
 	}
 
 	PHALCON_CALL_METHOD(&items, db, "fetchall", sql, fetch_mode, bind);

@@ -162,7 +162,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 							if (replace) {
 								use_copy = 0;
 								if (Z_TYPE_P(replace) != IS_STRING) {
-									zend_make_printable_zval(replace, &replace_copy);
+									use_copy = zend_make_printable_zval(replace, &replace_copy);
 									if (use_copy) {
 										replace = &replace_copy;
 									}
@@ -196,7 +196,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 							if (replace) {
 								use_copy = 0;
 								if (Z_TYPE_P(replace) != IS_STRING) {
-									zend_make_printable_zval(replace, &replace_copy);
+									use_copy = zend_make_printable_zval(replace, &replace_copy);
 									if (use_copy) {
 										replace = &replace_copy;
 									}
@@ -222,7 +222,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 						if (replace) {
 							use_copy = 0;
 							if (Z_TYPE_P(replace) != IS_STRING) {
-								zend_make_printable_zval(replace, &replace_copy);
+								use_copy = zend_make_printable_zval(replace, &replace_copy);
 								if (use_copy) {
 									replace = &replace_copy;
 								}
@@ -255,8 +255,8 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 	}
 	smart_str_0(&route_str);
 
-	if (route_str.len) {
-		RETURN_STRINGL(route_str.c, route_str.len, 0);
+	if (route_str.s->len) {
+		RETURN_STR(route_str.s);
 	} else {
 		smart_str_free(&route_str);
 		RETURN_EMPTY_STRING();
@@ -422,8 +422,8 @@ void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches){
 	}
 	smart_str_0(&route_str);
 
-	if (route_str.len) {
-		RETURN_STRINGL(route_str.c, route_str.len, 0);
+	if (route_str.s->len) {
+		RETURN_STR(route_str.s);
 	} else {
 		smart_str_free(&route_str);
 		RETURN_EMPTY_STRING();

@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		efree(result);
 	}
 	else {
-		RETURN_STRINGL(result, i_bytes, 0);
+		RETURN_STRINGL(result, i_bytes);
 	}
 }
 

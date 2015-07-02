@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 	PHALCON_INIT_VAR(option);
 	array_init_size(option, 1);
 
-	phalcon_array_update_string(&option, SL("lifetime"), lifetime, PH_COPY);
+	phalcon_array_update_string(option, SL("lifetime"), lifetime, PH_COPY);
 
 	PHALCON_INIT_VAR(frontend_data);
 	object_init_ex(frontend_data, phalcon_cache_frontend_data_ce);
@@ -152,22 +152,22 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 	phalcon_array_update_string_string(&option, SL("statsKey"), SL("$PMM$"), PH_COPY);
 
 	if (host) {
-		phalcon_array_update_string(&option, SL("host"), host, PH_COPY);
+		phalcon_array_update_string(option, SL("host"), host, PH_COPY);
 	}
 
 	if (port) {
-		phalcon_array_update_string(&option, SL("port"), port, PH_COPY);
+		phalcon_array_update_string(option, SL("port"), port, PH_COPY);
 	}
 
 	if (auth) {
-		phalcon_array_update_string(&option, SL("auth"), auth, PH_COPY);
+		phalcon_array_update_string(option, SL("auth"), auth, PH_COPY);
 	}
 
 	if (persistent) {
-		phalcon_array_update_string(&option, SL("persistent"), persistent, PH_COPY);
+		phalcon_array_update_string(option, SL("persistent"), persistent, PH_COPY);
 	}
 
-	phalcon_array_update_string(&option, SL("prefix"), prefix, PH_COPY);
+	phalcon_array_update_string(option, SL("prefix"), prefix, PH_COPY);
 
 	PHALCON_INIT_VAR(redis);
 	object_init_ex(redis, phalcon_cache_backend_redis_ce);

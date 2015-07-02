@@ -265,9 +265,9 @@ PHP_METHOD(Phalcon_Async, recvAll){
 
 		PHALCON_CALL_FUNCTION(&result, "msg_receive", seg, pid, type, size, message, &PHALCON_GLOBAL(z_true), flag);
 		if (zend_is_true(result)) {
-			phalcon_array_update_zval(&return_value, type, message, PH_COPY);
+			phalcon_array_update_zval(return_value, type, message, PH_COPY);
 		} else {
-			phalcon_array_update_zval(&return_value, type, &PHALCON_GLOBAL(z_null), PH_COPY);
+			phalcon_array_update_zval(return_value, type, &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
 		
 	}

@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 				/* A module definition object, can be a Closure instance */
 				PHALCON_INIT_VAR(module_params);
 				array_init_size(module_params, 1);
-				phalcon_array_append(&module_params, dependency_injector, 0);
+				phalcon_array_append(module_params, dependency_injector, 0);
 
 				PHALCON_INIT_NVAR(status);/**/
 				PHALCON_CALL_USER_FUNC_ARRAY(status, module, module_params);
@@ -480,17 +480,17 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	phalcon_array_update_string_string(&jsonrpc_message, SL("jsonrpc"), SL("2.0"), 0);
 
 	if (PHALCON_IS_NOT_EMPTY(jsonrpc_error)) {
-		phalcon_array_update_string(&jsonrpc_message, SL("error"), jsonrpc_error, PH_COPY);
+		phalcon_array_update_string(jsonrpc_message, SL("error"), jsonrpc_error, PH_COPY);
 	}
 
 	if (jsonrpc_result != NULL) {
-		phalcon_array_update_string(&jsonrpc_message, SL("result"), jsonrpc_result, PH_COPY);
+		phalcon_array_update_string(jsonrpc_message, SL("result"), jsonrpc_result, PH_COPY);
 	}
 	
 	if (phalcon_array_isset_string_fetch(&jsonrpc_id, data, SS("id"))) {
-		phalcon_array_update_string(&jsonrpc_message, SL("id"), jsonrpc_id, PH_COPY);
+		phalcon_array_update_string(jsonrpc_message, SL("id"), jsonrpc_id, PH_COPY);
 	} else {
-		phalcon_array_update_string(&jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);
+		phalcon_array_update_string(jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);
 	}
 
 	PHALCON_CALL_METHOD(NULL, response, "setjsoncontent", jsonrpc_message);

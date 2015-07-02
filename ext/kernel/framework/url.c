@@ -57,11 +57,11 @@ void phalcon_get_uri(zval *return_value, zval *path) {
 void phalcon_raw_url_encode(zval *return_value, zval *url) {
 
 	zval copy;
-	char *escaped;
+	zend_string *escaped;
 	int use_copy = 0, length;
 
 	if (Z_TYPE_P(url) == IS_STRING) {
-		zend_make_printable_zval(url, &copy);
+		use_copy = zend_make_printable_zval(url, &copy);
 		if (use_copy) {
 			url = &copy;
 		}
@@ -73,8 +73,8 @@ void phalcon_raw_url_encode(zval *return_value, zval *url) {
 		phalcon_ptr_dtor(url);
 	}
 
-	if (escaped) {
-		RETURN_STRINGL(escaped, length, 0);
+	if (escaped->len) {
+		RETURN_STR(escaped);
 	} else {
 		RETURN_NULL();
 	}

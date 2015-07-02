@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFile){
 		PHALCON_INIT_VAR(files);
 		array_init(files);
 
-		phalcon_array_append(&files, file, PH_COPY);
+		phalcon_array_append(files, file, PH_COPY);
 	} else {
 		PHALCON_CPY_WRT(files, file);
 	}
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFiles){
 		PHALCON_INIT_VAR(arr);
 		array_init(arr);
 
-		phalcon_array_append(&arr, files, PH_COPY);
+		phalcon_array_append(arr, files, PH_COPY);
 	} else {
 		PHALCON_CPY_WRT(arr, files);
 	}

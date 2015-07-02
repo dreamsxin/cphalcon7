@@ -467,7 +467,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, queryKeys){
 			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(value, prefix, NULL)) {
 				PHALCON_INIT_NVAR(real_key);
 				ZVAL_NEW_STR(real_key, Z_STR_P(value));
-				phalcon_array_append(&return_value, real_key, 0);
+				phalcon_array_append(return_value, real_key, 0);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
@@ -684,7 +684,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, setTrackingKey)
 
 	SEPARATE_ZVAL(options);
 
-	phalcon_array_update_string(&options, SL("statsKey"), *key, PH_COPY);
+	phalcon_array_update_string(options, SL("statsKey"), *key, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();

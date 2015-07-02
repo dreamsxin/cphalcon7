@@ -329,8 +329,8 @@ PHP_METHOD(Phalcon_Validation, add){
 	
 	PHALCON_ALLOC_GHOST_ZVAL(scope);
 	array_init_size(scope, 2);
-	phalcon_array_append(&scope, *attribute, 0);
-	phalcon_array_append(&scope, *validator, 0);
+	phalcon_array_append(scope, *attribute, 0);
+	phalcon_array_append(scope, *validator, 0);
 	phalcon_update_property_array_append(this_ptr, SL("_validators"), scope);
 	
 	RETURN_THISW();

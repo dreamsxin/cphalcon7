@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		object_init_ex(route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHOD(NULL, route, "__construct", action_pattern, paths);
 
-		phalcon_array_append(&routes, route, 0);
+		phalcon_array_append(routes, route, 0);
 
 		PHALCON_INIT_NVAR(paths);
 		array_init_size(paths, 3);
@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		object_init_ex(route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHOD(NULL, route, "__construct", params_pattern, paths);
 
-		phalcon_array_append(&routes, route, 0);
+		phalcon_array_append(routes, route, 0);
 	}
 
 	phalcon_update_property_empty_array(this_ptr, SL("_params"));
@@ -556,11 +556,11 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
 
 	array_init_size(return_value, 5);
 
-	phalcon_array_update_string(&return_value, ISL(namespace),  namespace_name,  PH_COPY);
-	phalcon_array_update_string(&return_value, ISL(module),     module_name,     PH_COPY);
-	phalcon_array_update_string(&return_value, ISL(controller), controller_name, PH_COPY);
-	phalcon_array_update_string(&return_value, ISL(action),     action_name,     PH_COPY);
-	phalcon_array_update_string(&return_value, ISL(params),     params,          PH_COPY);
+	phalcon_array_update_string(return_value, ISL(namespace),  namespace_name,  PH_COPY);
+	phalcon_array_update_string(return_value, ISL(module),     module_name,     PH_COPY);
+	phalcon_array_update_string(return_value, ISL(controller), controller_name, PH_COPY);
+	phalcon_array_update_string(return_value, ISL(action),     action_name,     PH_COPY);
+	phalcon_array_update_string(return_value, ISL(params),     params,          PH_COPY);
 }
 
 /**
@@ -793,9 +793,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				 */
 				PHALCON_INIT_NVAR(before_match_params);
 				array_init_size(before_match_params, 3);
-				phalcon_array_append(&before_match_params, handled_uri, 0);
-				phalcon_array_append(&before_match_params, route, 0);
-				phalcon_array_append(&before_match_params, this_ptr, 0);
+				phalcon_array_append(before_match_params, handled_uri, 0);
+				phalcon_array_append(before_match_params, route, 0);
+				phalcon_array_append(before_match_params, this_ptr, 0);
 
 				/**
 				 * Call the function in the PHP userland
@@ -841,26 +841,26 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 								if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
 									PHALCON_INIT_NVAR(parameters);
 									array_init_size(parameters, 1);
-									phalcon_array_append(&parameters, match_position, 0);
+									phalcon_array_append(parameters, match_position, 0);
 
 									PHALCON_INIT_NVAR(converted_part);/**/
 									PHALCON_CALL_USER_FUNC_ARRAY(converted_part, converter, parameters);
-									phalcon_array_update_zval(&parts, part, converted_part, PH_COPY);
+									phalcon_array_update_zval(parts, part, converted_part, PH_COPY);
 									continue;
 								}
 
 								/* Update the parts if there is no converter */
-								phalcon_array_update_zval(&parts, &tmp, match_position, PH_COPY);
+								phalcon_array_update_zval(parts, &tmp, match_position, PH_COPY);
 							} else {
 								/* Apply the converters anyway */
 								if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
 									PHALCON_INIT_NVAR(parameters);
 									array_init_size(parameters, 1);
-									phalcon_array_append(&parameters, position, 0);
+									phalcon_array_append(parameters, position, 0);
 
 									PHALCON_INIT_NVAR(converted_part);/**/
 									PHALCON_CALL_USER_FUNC_ARRAY(converted_part, converter, parameters);
-									phalcon_array_update_zval(&parts, &tmp, converted_part, PH_COPY);
+									phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
 								}
 							}
 						}
@@ -1005,7 +1005,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			} else if (!PHALCON_IS_EMPTY(str_params)) {
 				PHALCON_INIT_NVAR(params);
 				array_init_size(params, 1);
-				phalcon_array_append(&params, str_params, PH_COPY);
+				phalcon_array_append(params, str_params, PH_COPY);
 			}
 
 			phalcon_array_unset_string(&parts, SS("params"), PH_SEPARATE);

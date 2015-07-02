@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, save){
 		}
 
 		if (!phalcon_array_isset(keys, last_key)) {
-			phalcon_array_update_zval(&keys, last_key, ttl, PH_COPY);
+			phalcon_array_update_zval(keys, last_key, ttl, PH_COPY);
 			PHALCON_CALL_METHOD(NULL, memcache, "set", special_key, keys);
 		}
 	}
@@ -465,7 +465,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, queryKeys){
 			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(key, prefix, NULL)) {
 				PHALCON_INIT_NVAR(real_key);
 				ZVAL_NEW_STR(real_key, Z_STR_P(key));
-				phalcon_array_append(&return_value, real_key, 0);
+				phalcon_array_append(return_value, real_key, 0);
 			}
 		}
 	}
@@ -710,7 +710,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, setTrackingKey)
 
 	SEPARATE_ZVAL(options);
 
-	phalcon_array_update_string(&options, SL("statsKey"), *key, PH_COPY);
+	phalcon_array_update_string(options, SL("statsKey"), *key, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();

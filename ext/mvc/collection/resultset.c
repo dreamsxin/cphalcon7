@@ -254,7 +254,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, toArray){
 
 		PHALCON_CALL_METHOD(&current, this_ptr, "current");
 		PHALCON_CALL_METHOD(&arr, current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
-		phalcon_array_append(&records, arr, 0);
+		phalcon_array_append(records, arr, 0);
 		PHALCON_CALL_METHOD(NULL, this_ptr, "next");
 	}
 
@@ -281,8 +281,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, serialize){
 
 	PHALCON_INIT_VAR(data);
 	array_init_size(data, 3);
-	phalcon_array_update_string(&data, SL("collection"), collection, PH_COPY);
-	phalcon_array_update_string(&data, SL("rows"), records, PH_COPY);
+	phalcon_array_update_string(data, SL("collection"), collection, PH_COPY);
+	phalcon_array_update_string(data, SL("rows"), records, PH_COPY);
 	phalcon_update_property_bool(this_ptr, SL("_activeRow"), 0);
 
 	/** 
@@ -702,7 +702,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 
 			PHALCON_INIT_NVAR(parameters);
 			array_init_size(parameters, 1);
-			phalcon_array_append(&parameters, record, PH_SEPARATE);
+			phalcon_array_append(parameters, record, PH_SEPARATE);
 
 			PHALCON_INIT_NVAR(status);/**/
 			PHALCON_CALL_USER_FUNC_ARRAY(status, condition_callback, parameters);
@@ -784,7 +784,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, filter){
 		}
 
 		PHALCON_CALL_METHOD(&record, this_ptr, "current");
-		phalcon_array_update_long(&parameters, 0, record, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_long(parameters, 0, record, PH_COPY | PH_SEPARATE);
 
 		PHALCON_INIT_NVAR(processed_record);/**/
 		PHALCON_CALL_USER_FUNC_ARRAY(processed_record, filter, parameters);
@@ -798,7 +798,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, filter){
 			}
 		}
 
-		phalcon_array_append(&records, processed_record, PH_SEPARATE);
+		phalcon_array_append(records, processed_record, PH_SEPARATE);
 		PHALCON_CALL_METHOD(NULL, this_ptr, "next");
 	}
 
@@ -862,7 +862,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 
 			PHALCON_INIT_NVAR(parameters);
 			array_init_size(parameters, 1);
-			phalcon_array_append(&parameters, record, PH_SEPARATE);
+			phalcon_array_append(parameters, record, PH_SEPARATE);
 
 			PHALCON_INIT_NVAR(status);/**/
 			PHALCON_CALL_USER_FUNC_ARRAY(status, condition_callback, parameters);

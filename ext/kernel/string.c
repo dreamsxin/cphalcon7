@@ -58,7 +58,7 @@ void phalcon_fast_strlen(zval *return_value, zval *str){
 	int use_copy = 0;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -80,7 +80,7 @@ int phalcon_fast_strlen_ev(zval *str){
 	int use_copy = 0, length;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -105,7 +105,7 @@ void phalcon_fast_strtolower(zval *return_value, zval *str){
 	unsigned int length;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -179,8 +179,11 @@ void phalcon_append_printable_zval(smart_str *implstr, zval *tmp) {
 
 		case IS_OBJECT: {
 			zval expr;
-			zend_make_printable_zval(tmp, &expr);
+			int copy = zend_make_printable_zval(tmp, &expr);
 			smart_str_appendl(implstr, Z_STRVAL(expr), Z_STRLEN(expr));
+			if (copy) {
+				phalcon_dtor(expr);
+			}
 			break;
 		}
 
@@ -515,16 +518,13 @@ void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, 
 /**
  * Fast call to PHP trim() function
  */
-void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where) {
-
+zend_string* phalcon_trim(zval *str, zval *charlist, int where) {
 	zval copy;
+	zend_string *str;
 	int use_copy = 0;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_make_printable_zval(str, &copy);
-		if (use_copy) {
-			str = &copy;
-		}
+		use_copy = zend_make_printable_zval(str, &copy);
 	}
 
 	if (charlist && Z_TYPE_P(charlist) != IS_STRING) {
@@ -532,14 +532,16 @@ void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where)
 	}
 
 	if (charlist) {
-		ZVAL_STR(return_value, php_trim(Z_STR_P(str), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), return_value, where));
+		str = php_trim(Z_STR_P(copy), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), where);
 	} else {
-		ZVAL_STR(return_value, php_trim(Z_STR_P(str), NULL, 0, where));
+		str = php_trim(Z_STR_P(copy), NULL, 0, where);
 	}
 
 	if (use_copy) {
 		phalcon_dtor(copy);
 	}
+
+	return str;
 }
 
 /**
@@ -553,7 +555,7 @@ void phalcon_fast_strip_tags(zval *return_value, zval *str) {
 	size_t len;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -580,7 +582,7 @@ void phalcon_fast_strtoupper(zval *return_value, zval *str) {
 	unsigned int length;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -591,7 +593,7 @@ void phalcon_fast_strtoupper(zval *return_value, zval *str) {
 	php_strtoupper(lower_str, length);
 
 	if (use_copy) {
-		phalcon_dtor(str);
+		phalcon_ptr_dtor(str);
 	}
 
 	ZVAL_STRINGL(return_value, lower_str, length);
@@ -841,8 +843,8 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 
 	smart_str_0(&random_str);
 
-	if (random_str.len) {
-		RETURN_STRINGL(random_str.c, random_str.len, 0);
+	if (random_str.s->len) {
+		RETURN_STR(random_str.s);
 	} else {
 		smart_str_free(&random_str);
 		RETURN_EMPTY_STRING();
@@ -882,7 +884,7 @@ void phalcon_remove_extra_slashes(zval *return_value, const zval *str) {
     	memcpy(removed_str, Z_STRVAL_P(str), i);
     	removed_str[i] = '\0';
 
-    	RETURN_STRINGL(removed_str, i, 0);
+    	RETURN_STRINGL(removed_str, i);
     }
 
     RETURN_EMPTY_STRING();
@@ -934,7 +936,7 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned 
 		RETURN_EMPTY_STRING();
 	}
 
-	RETURN_STRINGL(Z_STRVAL_P(str) + from, (int)length, 1);
+	RETURN_STRINGL(Z_STRVAL_P(str) + from, (int)length);
 }
 
 void phalcon_append_printable_array(smart_str *implstr, zval *value) {
@@ -960,7 +962,7 @@ void phalcon_append_printable_array(smart_str *implstr, zval *value) {
 				smart_str_appendc(implstr, 'O');
 				{
 					char stmp[MAX_LENGTH_OF_LONG + 1];
-					str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJVAL_P(tmp).handle);
+					str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJ_HANDLE_P(tmp));
 					smart_str_appendl(implstr, stmp, str_len);
 				}
 			} else {
@@ -1043,7 +1045,7 @@ void phalcon_base64_encode(zval *return_value, zval *data) {
 	int use_copy = 0, length;
 
 	if (Z_TYPE_P(data) != IS_STRING) {
-		zend_make_printable_zval(data, &copy);
+		use_copy = zend_make_printable_zval(data, &copy);
 		if (use_copy) {
 			data = &copy;
 		}
@@ -1056,7 +1058,7 @@ void phalcon_base64_encode(zval *return_value, zval *data) {
 	}
 
 	if (encoded) {
-		RETURN_STRINGL(encoded, length, 0);
+		RETURN_STRINGL(encoded, length);
 	} else {
 		RETURN_NULL();
 	}
@@ -1072,7 +1074,7 @@ void phalcon_base64_decode(zval *return_value, zval *data) {
 	int use_copy = 0, length;
 
 	if (Z_TYPE_P(data) != IS_STRING) {
-		zend_make_printable_zval(data, &copy);
+		use_copy = zend_make_printable_zval(data, &copy);
 		if (use_copy) {
 			data = &copy;
 		}
@@ -1085,7 +1087,7 @@ void phalcon_base64_decode(zval *return_value, zval *data) {
 	}
 
 	if (decoded) {
-		RETURN_STRINGL(decoded, length, 0);
+		RETURN_STRINGL(decoded, length);
 	} else {
 		RETURN_NULL();
 	}
@@ -1100,7 +1102,7 @@ void phalcon_md5(zval *return_value, zval *str) {
 	int use_copy = 0;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -1125,7 +1127,7 @@ void phalcon_crc32(zval *return_value, zval *str) {
 	php_uint32 crcinit = 0;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -1196,7 +1198,7 @@ void phalcon_lcfirst(zval *return_value, zval *s)
 	int use_copy = 0;
 
 	if (unlikely(Z_TYPE_P(s) != IS_STRING)) {
-		zend_make_printable_zval(s, &copy);
+		use_copy = zend_make_printable_zval(s, &copy);
 		if (use_copy) {
 			s = &copy;
 		}
@@ -1223,7 +1225,7 @@ void phalcon_ucfirst(zval *return_value, zval *s)
 	int use_copy = 0;
 
 	if (unlikely(Z_TYPE_P(s) != IS_STRING)) {
-		zend_make_printable_zval(s, &copy);
+		use_copy = zend_make_printable_zval(s, &copy);
 		if (use_copy) {
 			s = &copy;
 		}
@@ -1281,7 +1283,7 @@ void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, z
 	size_t escaped_len;
 
 	if (unlikely(Z_TYPE_P(string) != IS_STRING)) {
-		zend_make_printable_zval(string, &copy);
+		use_copy = zend_make_printable_zval(string, &copy);
 		if (use_copy) {
 			string = &copy;
 		}
@@ -1307,7 +1309,7 @@ void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval 
 	size_t escaped_len;
 
 	if (unlikely(Z_TYPE_P(string) != IS_STRING)) {
-		zend_make_printable_zval(string, &copy);
+		use_copy = zend_make_printable_zval(string, &copy);
 		if (use_copy) {
 			string = &copy;
 		}
@@ -1329,7 +1331,7 @@ void phalcon_strval(zval *return_value, zval *v)
 	zval copy;
 	int use_copy = 0;
 
-	zend_make_printable_zval(v, &copy);
+	use_copy = zend_make_printable_zval(v, &copy);
 	if (use_copy) {
 		zval *tmp = &copy;
 		ZVAL_ZVAL(return_value, tmp, 0, 0);
@@ -1347,7 +1349,7 @@ void phalcon_date(zval *return_value, zval *format, zval *timestamp)
 	char *formatted;
 
 	if (unlikely(Z_TYPE_P(format) != IS_STRING)) {
-		zend_make_printable_zval(format, &copy);
+		use_copy = zend_make_printable_zval(format, &copy);
 		if (use_copy) {
 			format = &copy;
 		}
@@ -1369,7 +1371,7 @@ void phalcon_addslashes(zval *return_value, zval *str)
 	int use_copy = 0;
 
 	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -1424,7 +1426,7 @@ void phalcon_stripslashes(zval *return_value, zval *str)
 	int use_copy = 0;
 
 	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}
@@ -1445,7 +1447,7 @@ void phalcon_stripcslashes(zval *return_value, zval *str)
 	int use_copy = 0;
 
 	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
-		zend_make_printable_zval(str, &copy);
+		use_copy = zend_make_printable_zval(str, &copy);
 		if (use_copy) {
 			str = &copy;
 		}

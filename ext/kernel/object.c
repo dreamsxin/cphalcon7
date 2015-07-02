@@ -100,7 +100,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (phalcon_array_isset_string_fetch(&fetched, p, s, l + 1)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
-							phalcon_array_update_string(&fetched, s, l, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_string(fetched, s, l, value, PH_COPY | PH_SEPARATE);
 						} else {
 							p = fetched;
 						}
@@ -108,11 +108,11 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 					}
 				}
 				if (i == (types_length - 1)) {
-					phalcon_array_update_string(&p, s, l, value, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_string(p, s, l, value, PH_COPY | PH_SEPARATE);
 				} else {
 					PHALCON_ALLOC_GHOST_ZVAL(tmp);
 					array_init(tmp);
-					phalcon_array_update_string(&p, s, l, tmp, PH_SEPARATE);
+					phalcon_array_update_string(p, s, l, tmp, PH_SEPARATE);
 					p = tmp;
 				}
 				break;
@@ -122,7 +122,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (phalcon_array_isset_long_fetch(&fetched, p, ll)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
-							phalcon_array_update_long(&fetched, ll, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_long(fetched, ll, value, PH_COPY | PH_SEPARATE);
 						} else {
 							p = fetched;
 						}
@@ -130,11 +130,11 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 					}
 				}
 				if (i == (types_length - 1)) {
-					phalcon_array_update_long(&p, ll, value, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_long(p, ll, value, PH_COPY | PH_SEPARATE);
 				} else {
 					PHALCON_ALLOC_GHOST_ZVAL(tmp);
 					array_init(tmp);
-					phalcon_array_update_long(&p, ll, tmp, PH_SEPARATE);
+					phalcon_array_update_long(p, ll, tmp, PH_SEPARATE);
 					p = tmp;
 				}
 				break;
@@ -144,7 +144,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (phalcon_array_isset_fetch(&fetched, p, item)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
-							phalcon_array_update_zval(&fetched, item, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_zval(fetched, item, value, PH_COPY | PH_SEPARATE);
 						} else {
 							p = fetched;
 						}
@@ -152,17 +152,17 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 					}
 				}
 				if (i == (types_length - 1)) {
-					phalcon_array_update_zval(&p, item, value, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_zval(p, item, value, PH_COPY | PH_SEPARATE);
 				} else {
 					PHALCON_ALLOC_GHOST_ZVAL(tmp);
 					array_init(tmp);
-					phalcon_array_update_zval(&p, item, tmp, PH_SEPARATE);
+					phalcon_array_update_zval(p, item, tmp, PH_SEPARATE);
 					p = tmp;
 				}
 				break;
 
 			case 'a':
-				phalcon_array_append(&p, value, PH_SEPARATE);
+				phalcon_array_append(p, value, PH_SEPARATE);
 				break;
 		}
 	}
@@ -403,8 +403,8 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 
 	zval method_name;
 	zend_class_entry *ce = NULL, *pce;
-	HashPosition pos;
 	zend_function *mptr;
+	zend_string *key;
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		ce = Z_OBJCE_P(object);
@@ -419,7 +419,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 	}
 
 	if (check_access) {
-		PHALCON_CALL_FUNCTION(return_value, "get_class_methods", object);
+		PHALCON_CALL_FUNCTION(return_value, "get_class_methods", *object);
 	} else {
 		array_init(return_value);
 
@@ -436,7 +436,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 
 				if (mptr->type == ZEND_USER_FUNCTION &&
 					(!mptr->op_array.refcount || *mptr->op_array.refcount > 1) &&
-					 !same_name(key, mptr->common.function_name)) {
+					 !zend_string_equals_ci(key, mptr->common.function_name)) {
 					ZVAL_STR_COPY(&method_name, zend_find_alias_name(mptr->common.scope, key));
 					zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), &method_name);
 				} else {
@@ -462,25 +462,25 @@ zend_class_entry *phalcon_fetch_class(const zval *class_name) {
 }
 
 zend_class_entry* phalcon_fetch_self_class() {
-	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_SELF);
+	return zend_fetch_class(NULL, ZEND_FETCH_CLASS_SELF);
 }
 
 zend_class_entry* phalcon_fetch_parent_class() {
-	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_PARENT);
+	return zend_fetch_class(NULL, ZEND_FETCH_CLASS_PARENT);
 }
 
 zend_class_entry* phalcon_fetch_static_class() {
-	return zend_fetch_class(NULL, 0, ZEND_FETCH_CLASS_STATIC);
+	return zend_fetch_class(NULL, ZEND_FETCH_CLASS_STATIC);
 }
 
 /**
  * Checks if a class exist
  */
-zend_class_entry *phalcon_class_exists(const zval *class_name, uint32_t class_len, int autoload) {
+zend_class_entry *phalcon_class_exists(const zval *class_name, int autoload) {
 
 	zend_class_entry *ce;
 
-	if ((ce = zend_lookup_class_ex(Z_STR_P(class_name), NULL, autoload) != NULL) {
+	if ((ce = zend_lookup_class_ex(Z_STR_P(class_name), NULL, autoload)) != NULL) {
 		return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0 ? ce : NULL;
 	}
 
@@ -550,12 +550,11 @@ int phalcon_clone(zval *destination, zval *obj) {
 			status = FAILURE;
 		} else {
 			if (!EG(exception)) {
-				Z_OBJVAL_P(destination) = clone_call(obj);
-				Z_TYPE_P(destination) = IS_OBJECT;
+				ZVAL_OBJ(destination, clone_call(obj));
 				Z_SET_REFCOUNT_P(destination, 1);
 				Z_UNSET_ISREF_P(destination);
 				if (EG(exception)) {
-					phalcon_dtor(destination);
+					phalcon_ptr_dtor(destination);
 					ZVAL_NULL(destination);
 				}
 			}
@@ -759,16 +758,12 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 	EG(scope) = ce;
 
 	if (!Z_OBJ_HT_P(object)->write_property) {
-		const char *class_name;
-		uint32_t class_name_len;
-
-		zend_get_object_classname(object, &class_name, &class_name_len);
-		zend_error(E_CORE_ERROR, "Property %s of class %s cannot be updated", property_name, class_name);
+		zend_error(E_CORE_ERROR, "Property %s of class %s cannot be updated", property_name, ce->name->val);
 	}
 
 	ZVAL_STRINGL(&property, property_name, property_length);
 
-	Z_OBJ_HT_P(object)->write_property(object, property, value, 0);
+	Z_OBJ_HT_P(object)->write_property(object, &property, value, 0);
 
 	phalcon_dtor(property);
 
@@ -799,43 +794,43 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 
 	{
 		zend_object *zobj;
-		zval **variable_ptr;
+		zval *variable_ptr;
 		zend_property_info *property_info;
 
 		zobj = Z_OBJ_P(object);
 
-		if (phalcon_hash_quick_find(&ce->properties_info, property_name, property_length + 1, key, (void **) &property_info) == SUCCESS) {
+		if ((property_info = zend_hash_str_find_ptr(&ce->properties_info, property_name, property_length + 1)) != NULL) {
 			assert(property_info != NULL);
 
 			/** This is as zend_std_write_property, but we're not interesed in validate properties visibility */
-			if (property_info->offset >= 0 ? (zobj->properties ? ((variable_ptr = (zval**) zobj->properties_table[property_info->offset]) != NULL) : (*(variable_ptr = &zobj->properties_table[property_info->offset]) != NULL)) : (EXPECTED(zobj->properties != NULL) && EXPECTED(phalcon_hash_quick_find(zobj->properties, property_info->name->val, property_info->name->len + 1, property_info->h, (void **) &variable_ptr) == SUCCESS))) {
+			if (property_info->offset >= 0 ? (zobj->properties ? ((variable_ptr = &zobj->properties_table[property_info->offset]) != NULL) : ((variable_ptr = &zobj->properties_table[property_info->offset]) != NULL)) : (EXPECTED(zobj->properties != NULL) && EXPECTED((variable_ptr = zend_hash_find(zobj->properties, property_info->name)) != NULL))) {
 
-				if (EXPECTED(*variable_ptr != value)) {
+				if (EXPECTED(variable_ptr != value)) {
 
 					/* if we are assigning reference, we shouldn't move it, but instead assign variable to the same pointer */
-					if (PZVAL_IS_REF(*variable_ptr)) {
+					if (Z_ISREF_P(variable_ptr)) {
 
-						zval garbage = **variable_ptr; /* old value should be destroyed */
+						zval garbage = *variable_ptr; /* old value should be destroyed */
 
 						/* To check: can't *variable_ptr be some system variable like error_zval here? */
-						Z_TYPE_P(*variable_ptr) = Z_TYPE_P(value);
-						(*variable_ptr)->value = value->value;
+						Z_TYPE_P(variable_ptr) = Z_TYPE_P(value);
+						(variable_ptr)->value = value->value;
 						if (Z_REFCOUNT_P(value) > 0) {
-							zval_copy_ctor(*variable_ptr);
+							zval_copy_ctor(variable_ptr);
 						} else {
 							efree(value);
 						}
 						phalcon_dtor(garbage);
 
 					} else {
-						zval *garbage = *variable_ptr;
+						zval *garbage = variable_ptr;
 
 						/* if we assign referenced variable, we should separate it */
 						Z_ADDREF_P(value);
 						if (PZVAL_IS_REF(value)) {
 							SEPARATE_ZVAL(&value);
 						}
-						*variable_ptr = value;
+						variable_ptr = value;
 						phalcon_ptr_dtor(garbage);
 					}
 				}
@@ -1340,7 +1335,7 @@ int phalcon_read_class_property(zval **result, int type, const char *property, u
 
 	type |= (ZEND_FETCH_CLASS_SILENT | ZEND_FETCH_CLASS_NO_AUTOLOAD);
 	type &= ZEND_FETCH_CLASS_MASK;
-	ce    = zend_fetch_class(NULL, 0, type);
+	ce    = zend_fetch_class(NULL, type);
 
 	if (likely(ce != NULL)) {
 		return phalcon_read_static_property_ce(result, ce, property, len);

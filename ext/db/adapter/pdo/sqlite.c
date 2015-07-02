@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
 	} else {
 		PHALCON_OBS_VAR(dbname);
 		phalcon_array_fetch_string(&dbname, descriptor, SL("dbname"), PH_NOISY);
-		phalcon_array_update_string(&descriptor, SL("dsn"), dbname, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(descriptor, SL("dsn"), dbname, PH_COPY | PH_SEPARATE);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_db_adapter_pdo_sqlite_ce, this_ptr, "connect", descriptor);
@@ -192,14 +192,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 					PHALCON_OBS_NVAR(match_one);
 					phalcon_array_fetch_long(&match_one, matches, 1, PH_NOISY);
 					convert_to_long(match_one);
-					phalcon_array_update_string(&definition, SL("size"), match_one, PH_COPY);
-					phalcon_array_update_string(&definition, SL("bytes"), match_one, PH_COPY);
+					phalcon_array_update_string(definition, SL("size"), match_one, PH_COPY);
+					phalcon_array_update_string(definition, SL("bytes"), match_one, PH_COPY);
 				}
 				if (phalcon_array_isset_long(matches, 2)) {
 					PHALCON_OBS_NVAR(match_two);
 					phalcon_array_fetch_long(&match_two, matches, 2, PH_NOISY);
 					convert_to_long(match_two);
-					phalcon_array_update_string(&definition, SL("scale"), match_two, PH_COPY);
+					phalcon_array_update_string(definition, SL("scale"), match_two, PH_COPY);
 				}
 			}
 		} else {
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			 */
 			if (phalcon_memnstr_str(column_type, SL("smallint"))) {
 				phalcon_array_update_string_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
-				phalcon_array_update_string(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
+				phalcon_array_update_string(definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
 				phalcon_array_update_string_long(&definition, SL("bindType"), 1, 0);
 				phalcon_array_update_string_long(&definition, SL("bytes"), 16, 0);
 
@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			 */
 			if (phalcon_memnstr_str(column_type, SL("mediumint"))) {
 				phalcon_array_update_string_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
-				phalcon_array_update_string(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
+				phalcon_array_update_string(definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
 				phalcon_array_update_string_long(&definition, SL("bindType"), 1, 0);
 				phalcon_array_update_string_long(&definition, SL("bytes"), 24, 0);
 
@@ -271,7 +271,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			 */
 			if (phalcon_memnstr_str(column_type, SL("bigint"))) {
 				phalcon_array_update_string_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
-				phalcon_array_update_string(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
+				phalcon_array_update_string(definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
 				phalcon_array_update_string_long(&definition, SL("bindType"), 1, 0);
 				phalcon_array_update_string_long(&definition, SL("bytes"), 64, 0);
 
@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 					phalcon_array_update_string_long(&definition, SL("bytes"), 40, 0);
 				}
 				if (phalcon_is_numeric(match_two)) {
-					phalcon_array_update_string(&definition, SL("scale"), match_two, PH_COPY);
+					phalcon_array_update_string(definition, SL("scale"), match_two, PH_COPY);
 				} else {
 					phalcon_array_update_string_long(&definition, SL("scale"), 2, 0);
 				}
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			 */
 			if (phalcon_memnstr_str(column_type, SL("double"))) {
 				phalcon_array_update_string_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DOUBLE, 0);
-				phalcon_array_update_string(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
+				phalcon_array_update_string(definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
 				phalcon_array_update_string_long(&definition, SL("bindType"), 32, 0);
 				phalcon_array_update_string_long(&definition, SL("bytes"), 64, 0);
 				break;
@@ -423,7 +423,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		if (!zend_is_true(old_column)) {
 			phalcon_array_update_string_bool(&definition, SL("first"), 1, 0);
 		} else {
-			phalcon_array_update_string(&definition, SL("after"), old_column, PH_COPY);
+			phalcon_array_update_string(definition, SL("after"), old_column, PH_COPY);
 		}
 
 		/** 
@@ -453,7 +453,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		PHALCON_OBS_NVAR(attribute);
 		phalcon_array_fetch_long(&attribute, field, 4, PH_NOISY);
 		if (!PHALCON_IS_EMPTY(attribute)) {
-			phalcon_array_update_string(&definition, SL("default"), attribute, PH_COPY);
+			phalcon_array_update_string(definition, SL("default"), attribute, PH_COPY);
 		}
 
 		/** 
@@ -463,7 +463,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		object_init_ex(column, phalcon_db_column_ce);
 		PHALCON_CALL_METHOD(NULL, column, "__construct", column_name, definition);
 
-		phalcon_array_append(&columns, column, PH_SEPARATE);
+		phalcon_array_append(columns, column, PH_SEPARATE);
 		PHALCON_CPY_WRT(old_column, column_name);
 
 	} ZEND_HASH_FOREACH_END();
@@ -542,7 +542,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 		object_init_ex(index, phalcon_db_index_ce);
 		PHALCON_CALL_METHOD(NULL, index, "__construct", &name, index_columns);
 
-		phalcon_array_update_zval(&index_objects, &name, index, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_zval(index_objects, &name, index, PH_COPY | PH_SEPARATE);
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(index_objects);
@@ -620,18 +620,18 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 
 		PHALCON_INIT_NVAR(columns);
 		array_init_size(columns, 1);
-		phalcon_array_append(&columns, from, PH_SEPARATE);
+		phalcon_array_append(columns, from, PH_SEPARATE);
 
 		PHALCON_INIT_NVAR(referenced_columns);
 		array_init_size(referenced_columns, 1);
-		phalcon_array_append(&referenced_columns, to, PH_SEPARATE);
+		phalcon_array_append(referenced_columns, to, PH_SEPARATE);
 
 		PHALCON_INIT_NVAR(reference_array);
 		array_init_size(reference_array, 4);
 		add_assoc_null_ex(reference_array, SS("referencedSchema"));
-		phalcon_array_update_string(&reference_array, SL("referencedTable"), referenced_table, PH_COPY | PH_SEPARATE);
-		phalcon_array_update_string(&reference_array, SL("columns"), columns, PH_COPY | PH_SEPARATE);
-		phalcon_array_update_string(&reference_array, SL("referencedColumns"), referenced_columns, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(reference_array, SL("referencedTable"), referenced_table, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(reference_array, SL("columns"), columns, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(reference_array, SL("referencedColumns"), referenced_columns, PH_COPY | PH_SEPARATE);
 
 		/** 
 		 * Every route is abstracted as a Phalcon\Db\Reference instance
@@ -639,7 +639,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 		PHALCON_INIT_NVAR(reference);
 		object_init_ex(reference, phalcon_db_reference_ce);
 		PHALCON_CALL_METHOD(NULL, reference, "__construct", constraint_name, reference_array);
-		phalcon_array_update_zval(&reference_objects, constraint_name, reference, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_zval(reference_objects, constraint_name, reference, PH_COPY | PH_SEPARATE);
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(reference_objects);

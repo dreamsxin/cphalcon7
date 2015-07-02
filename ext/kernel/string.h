@@ -47,7 +47,7 @@ void phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *nee
 void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, unsigned int needle_length);
 #define PHALCON_STR_REPLACE(return_value, search, replace, subject)  \
 	PHALCON_CALL_FUNCTIONW(return_value, "str_replace", search, replace, subject)
-void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where);
+zend_string* phalcon_trim(zval *str, zval *charlist, int where);
 void phalcon_fast_strip_tags(zval *return_value, zval *str);
 void phalcon_fast_strtoupper(zval *return_value, zval *str);
 

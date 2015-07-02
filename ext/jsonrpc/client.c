@@ -121,13 +121,13 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call){
 	array_init(jsonrpc_message);
 
 	phalcon_array_update_string_string(&jsonrpc_message, SL("jsonrpc"), SL("2.0"), 0);
-	phalcon_array_update_string(&jsonrpc_message, SL("method"), method, PH_COPY);
+	phalcon_array_update_string(jsonrpc_message, SL("method"), method, PH_COPY);
 	
 	if (data) {
-		phalcon_array_update_string(&jsonrpc_message, SL("params"), data, PH_COPY);
+		phalcon_array_update_string(jsonrpc_message, SL("params"), data, PH_COPY);
 	}
 	
-	phalcon_array_update_string(&jsonrpc_message, SL("id"), id, PH_COPY);
+	phalcon_array_update_string(jsonrpc_message, SL("id"), id, PH_COPY);
 
 	PHALCON_CALL_FUNCTION(&json_message, "json_encode", jsonrpc_message);
 

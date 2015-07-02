@@ -309,8 +309,8 @@ void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *
 
 	smart_str_0(&virtual_str);
 
-	if (virtual_str.len) {
-		RETURN_STRINGL(virtual_str.c, virtual_str.len, 0);
+	if (virtual_str.s->len) {
+		RETURN_STR(virtual_str.s);
 	} else {
 		smart_str_free(&virtual_str);
 		RETURN_FALSE;
@@ -391,7 +391,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 		case IS_TRUE:
 		case IS_FALSE:
 		case IS_CONSTANT:
-			zend_make_printable_zval(data, &copy);
+			use_copy = zend_make_printable_zval(data, &copy);
 			if (use_copy) {
 				data = &copy;
 			}

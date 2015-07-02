@@ -332,9 +332,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 		PHALCON_CALL_METHOD(&current, this_ptr, "current");
 		if (Z_TYPE_P(current) == IS_OBJECT && phalcon_method_exists_ex(current, SS("toarray")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&arr, current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
-			phalcon_array_append(&records, arr, 0);
+			phalcon_array_append(records, arr, 0);
 		} else {
-			phalcon_array_append(&records, current, 0);
+			phalcon_array_append(records, current, 0);
 		}
 		PHALCON_CALL_METHOD(NULL, this_ptr, "next");
 	}
@@ -366,11 +366,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, serialize){
 
 	PHALCON_INIT_VAR(data);
 	array_init_size(data, 5);
-	phalcon_array_update_string(&data, SL("model"), model, PH_COPY);
-	phalcon_array_update_string(&data, SL("cache"), cache, PH_COPY);
-	phalcon_array_update_string(&data, SL("rows"), records, PH_COPY);
-	phalcon_array_update_string(&data, SL("columnMap"), column_map, PH_COPY);
-	phalcon_array_update_string(&data, SL("hydrateMode"), hydrate_mode, PH_COPY);
+	phalcon_array_update_string(data, SL("model"), model, PH_COPY);
+	phalcon_array_update_string(data, SL("cache"), cache, PH_COPY);
+	phalcon_array_update_string(data, SL("rows"), records, PH_COPY);
+	phalcon_array_update_string(data, SL("columnMap"), column_map, PH_COPY);
+	phalcon_array_update_string(data, SL("hydrateMode"), hydrate_mode, PH_COPY);
 
 	/** 
 	 * Force to re-execute the query

@@ -155,8 +155,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addResource){
 
 	PHALCON_INIT_VAR(scope);
 	array_init_size(scope, 2);
-	phalcon_array_append(&scope, prefix, 0);
-	phalcon_array_append(&scope, handler, 0);
+	phalcon_array_append(scope, prefix, 0);
+	phalcon_array_append(scope, handler, 0);
 	phalcon_update_property_array_append(this_ptr, SL("_handlers"), scope);
 	phalcon_update_property_this(this_ptr, SL("_processed"), &PHALCON_GLOBAL(z_false));
 
@@ -194,9 +194,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addModuleResource){
 
 	PHALCON_ALLOC_GHOST_ZVAL(scope);
 	array_init_size(scope, 3);
-	phalcon_array_append(&scope, prefix, 0);
-	phalcon_array_append(&scope, handler, 0);
-	phalcon_array_append(&scope, module, 0);
+	phalcon_array_append(scope, prefix, 0);
+	phalcon_array_append(scope, handler, 0);
+	phalcon_array_append(scope, module, 0);
 	phalcon_update_property_array_append(this_ptr, SL("_handlers"), scope);
 	zval_ptr_dtor(&scope);
 
@@ -486,19 +486,19 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		 * Update the module if any
 		 */
 		if (Z_TYPE_P(module) == IS_STRING) {
-			phalcon_array_update_string(&paths, ISL(module), module, PH_COPY);
+			phalcon_array_update_string(paths, ISL(module), module, PH_COPY);
 		}
 
 		/** 
 		 * Update the namespace if any
 		 */
 		if (Z_TYPE_P(namespace) == IS_STRING) {
-			phalcon_array_update_string(&paths, ISL(namespace), namespace, PH_COPY);
+			phalcon_array_update_string(paths, ISL(namespace), namespace, PH_COPY);
 		}
 
-		phalcon_array_update_string(&paths, ISL(controller), controller, PH_COPY);
-		phalcon_array_update_string(&paths, ISL(action), real_action_name, PH_COPY);
-		phalcon_array_update_string(&paths, SL("\0exact"), &PHALCON_GLOBAL(z_true), PH_COPY);
+		phalcon_array_update_string(paths, ISL(controller), controller, PH_COPY);
+		phalcon_array_update_string(paths, ISL(action), real_action_name, PH_COPY);
+		phalcon_array_update_string(paths, SL("\0exact"), &PHALCON_GLOBAL(z_true), PH_COPY);
 
 		PHALCON_INIT_VAR(position);
 		ZVAL_LONG(position, 0);

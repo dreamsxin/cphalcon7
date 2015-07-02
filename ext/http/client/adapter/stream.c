@@ -429,7 +429,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 
 	PHALCON_INIT_VAR(handler);
 	array_init_size(handler, 2);
-	phalcon_array_append(&handler, this_ptr, PH_SEPARATE);
+	phalcon_array_append(handler, this_ptr, PH_SEPARATE);
 	add_next_index_stringl(handler, SL("errorHandler"));
 
 	PHALCON_CALL_FUNCTION(NULL, "set_error_handler", handler);

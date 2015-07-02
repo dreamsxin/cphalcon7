@@ -79,7 +79,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_isset_property_zval(zval *object,
 }
 
 /** Reading properties */
-zval* phalcon_read_property(zval *object, const char *property_name, uint32_t property_length, int silent);
+zval* phalcon_read_property(zval *object, const char *property_name, size_t property_length, int silent);
 
 /**
  * Reads a property from an object

@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			PHALCON_INIT_VAR(select_columns);
 			ZVAL_STRING(select_columns, "*");
 
-			phalcon_array_update_string(&intermediate, ISL(columns), select_columns, PH_COPY);
+			phalcon_array_update_string(intermediate, ISL(columns), select_columns, PH_COPY);
 			break;
 		}
 	} ZEND_HASH_FOREACH_END();
@@ -406,9 +406,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			} else if (Z_TYPE_P(wildcard) == IS_LONG) {
 				PHALCON_INIT_NVAR(string_wildcard);
 				PHALCON_CONCAT_SV(string_wildcard, ":", &wildcard);
-				phalcon_array_update_zval(&processed, string_wildcard, value, PH_COPY);
+				phalcon_array_update_zval(processed, string_wildcard, value, PH_COPY);
 			} else {
-				phalcon_array_update_zval(&processed, &wildcard, value, PH_COPY);
+				phalcon_array_update_zval(processed, &wildcard, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -437,9 +437,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			if (Z_TYPE_P(wildcard) == IS_LONG) {
 				PHALCON_INIT_NVAR(string_wildcard);
 				PHALCON_CONCAT_SV(string_wildcard, ":", &wildcard);
-				phalcon_array_update_zval(&processed_types, string_wildcard, value, PH_COPY);
+				phalcon_array_update_zval(processed_types, string_wildcard, value, PH_COPY);
 			} else {
-				phalcon_array_update_zval(&processed_types, &wildcard, value, PH_COPY);
+				phalcon_array_update_zval(processed_types, &wildcard, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 

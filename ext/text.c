@@ -517,10 +517,10 @@ PHP_METHOD(Phalcon_Text, concat){
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(args), c) {
 			PHALCON_INIT_NVAR(b_trimmed);
-			phalcon_fast_trim(b_trimmed, b, separator, PHALCON_TRIM_RIGHT);
+			ZVAL_STR(b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_RIGHT));
 
 			PHALCON_INIT_NVAR(c_trimmed);
-			phalcon_fast_trim(c_trimmed, c, separator, PHALCON_TRIM_LEFT);
+			ZVAL_STR(c_trimmed, phalcon_trim(c, separator, PHALCON_TRIM_LEFT));
 
 			PHALCON_INIT_NVAR(tmp);
 			PHALCON_CONCAT_VVV(tmp, b_trimmed, separator, c_trimmed)
@@ -531,10 +531,10 @@ PHP_METHOD(Phalcon_Text, concat){
 	}
 
 	PHALCON_INIT_NVAR(a_trimmed);
-	phalcon_fast_trim(a_trimmed, a, separator, PHALCON_TRIM_RIGHT);
+	ZVAL_STR(a_trimmed, phalcon_trim(a, separator, PHALCON_TRIM_RIGHT));
 
 	PHALCON_INIT_NVAR(b_trimmed);
-	phalcon_fast_trim(b_trimmed, b, separator, PHALCON_TRIM_LEFT);
+	ZVAL_STR(b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_LEFT));
 
 	PHALCON_INIT_NVAR(tmp);
 	PHALCON_CONCAT_VVV(tmp, a_trimmed, separator, b_trimmed)

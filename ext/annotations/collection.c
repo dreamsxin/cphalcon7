@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 		PHALCON_INIT_NVAR(annotation);
 		object_init_ex(annotation, phalcon_annotations_annotation_ce);
 		PHALCON_CALL_METHOD(NULL, annotation, "__construct", *annotation_data);
-		phalcon_array_append(&annotations, annotation, 0);
+		phalcon_array_append(annotations, annotation, 0);
 	}
 
 	phalcon_update_property_this(this_ptr, SL("_annotations"), annotations);
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
 			if (PHALCON_IS_EQUAL(name, annotation_name)) {
-				phalcon_array_append(&found, annotation, 0);
+				phalcon_array_append(found, annotation, 0);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

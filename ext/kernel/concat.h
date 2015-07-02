@@ -166,10 +166,10 @@ void phalcon_concat_svsvs(zval **result, const char *op1, uint32_t op1_len, zval
 void phalcon_concat_svsvsv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, int self_var);
 void phalcon_concat_svsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, int self_var);
 void phalcon_concat_svsvsvsvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, const char *op5, uint32_t op5_len, zval *op6, const char *op7, uint32_t op7_len, zval *op8, const char *op9, uint32_t op9_len, int self_var);
-
 void phalcon_concat_svsvv(zval **result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, zval *op5, int self_var);
 void phalcon_concat_svv(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, int self_var);
 void phalcon_concat_svvs(zval **result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, const char *op4, uint32_t op4_len, int self_var);
+
 void phalcon_concat_vs(zval **result, zval *op1, const char *op2, uint32_t op2_len, int self_var);
 void phalcon_concat_vsv(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, int self_var);
 void phalcon_concat_vsvs(zval **result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, int self_var);

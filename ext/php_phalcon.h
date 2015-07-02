@@ -210,7 +210,6 @@ extern int nusphere_dbg_present;
 #define Z_ISREF_PP(ppz)					Z_ISREF_P(*(ppz))
 #define Z_SET_ISREF_PP(ppz)				Z_SET_ISREF_P(*(ppz))
 #define Z_UNSET_ISREF_PP(ppz)			Z_UNSET_ISREF_P(*(ppz))
-#define Z_SET_ISREF_TO_PP(ppz, isref)	Z_SET_ISREF_TO_P(*(ppz), isref)
 
 #ifndef HASH_KEY_NON_EXISTENT
 #	define HASH_KEY_NON_EXISTENT    HASH_KEY_NON_EXISTANT

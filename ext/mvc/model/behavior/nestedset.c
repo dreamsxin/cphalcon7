@@ -375,8 +375,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, missingMethod){
 
 	PHALCON_INIT_VAR(call_object);
 	array_init_size(call_object, 2);
-	phalcon_array_append(&call_object, this_ptr, 0);
-	phalcon_array_append(&call_object, method, 0);
+	phalcon_array_append(call_object, this_ptr, 0);
+	phalcon_array_append(call_object, method, 0);
 
 	PHALCON_CALL_USER_FUNC_ARRAY(return_value, call_object, arguments);
 
@@ -1299,7 +1299,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 		phalcon_array_update_zval_long(&values, left_attribute, (phalcon_get_intval(child_left) + phalcon_get_intval(delta)), 0);
 		phalcon_array_update_zval_long(&values, right_attribute, (phalcon_get_intval(child_right) + phalcon_get_intval(delta)), 0);
 		phalcon_array_update_zval_long(&values, level_attribute, (phalcon_get_intval(child_level) + phalcon_get_intval(level_delta)), 0);
-		phalcon_array_update_zval(&values, root_attribute, primary_key, PH_COPY);
+		phalcon_array_update_zval(values, root_attribute, primary_key, PH_COPY);
 
 		PHALCON_CALL_METHOD(&ret, child, "update", values);
 		if (!zend_is_true(ret)) {
@@ -1597,7 +1597,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_INIT_NVAR(values);
 			array_init(values);
 
-			phalcon_array_update_zval(&values, left_attribute, tmp, PH_COPY);
+			phalcon_array_update_zval(values, left_attribute, tmp, PH_COPY);
 
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
@@ -1633,7 +1633,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_INIT_NVAR(values);
 			array_init(values);
 
-			phalcon_array_update_zval(&values, right_attribute, tmp, PH_COPY);
+			phalcon_array_update_zval(values, right_attribute, tmp, PH_COPY);
 
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
@@ -1675,7 +1675,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			phalcon_array_update_zval_long(&values, left_attribute, (phalcon_get_intval(child_left) + phalcon_get_intval(delta)), 0);
 			phalcon_array_update_zval_long(&values, right_attribute, (phalcon_get_intval(child_right) + phalcon_get_intval(delta)), 0);
 			phalcon_array_update_zval_long(&values, level_attribute, (phalcon_get_intval(child_level) + phalcon_get_intval(level_delta)), 0);
-			phalcon_array_update_zval(&values, root_attribute, root2, PH_COPY);
+			phalcon_array_update_zval(values, root_attribute, root2, PH_COPY);
 
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
@@ -1771,7 +1771,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_INIT_NVAR(values);
 			array_init(values);
 
-			phalcon_array_update_zval(&values, left_attribute, tmp, PH_COPY);
+			phalcon_array_update_zval(values, left_attribute, tmp, PH_COPY);
 
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
@@ -1811,7 +1811,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			PHALCON_INIT_NVAR(values);
 			array_init(values);
 
-			phalcon_array_update_zval(&values, right_attribute, tmp, PH_COPY);
+			phalcon_array_update_zval(values, right_attribute, tmp, PH_COPY);
 
 			PHALCON_CALL_METHOD(&ret, child, "update", values);
 			if (!zend_is_true(ret)) {
@@ -1900,7 +1900,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
 		PHALCON_INIT_NVAR(values);
 		array_init(values);
 
-		phalcon_array_update_zval(&values, left_attribute, tmp, PH_COPY);
+		phalcon_array_update_zval(values, left_attribute, tmp, PH_COPY);
 
 		PHALCON_CALL_METHOD(&ret, child, "update", values);
 		if (!zend_is_true(ret)) {
@@ -1939,7 +1939,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
 		PHALCON_INIT_NVAR(values);
 		array_init(values);
 
-		phalcon_array_update_zval(&values, right_attribute, tmp, PH_COPY);
+		phalcon_array_update_zval(values, right_attribute, tmp, PH_COPY);
 
 		PHALCON_CALL_METHOD(&ret, child, "update", values);
 		if (!zend_is_true(ret)) {

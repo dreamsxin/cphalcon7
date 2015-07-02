@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Http_Uri, __construct){
 			Z_SET_ISREF_P(params);
 			PHALCON_CALL_FUNCTION(NULL, "parse_str", query, params);
 			Z_UNSET_ISREF_P(params);
-			phalcon_array_update_string(&parts, SL("query"), params, PH_COPY);
+			phalcon_array_update_string(parts, SL("query"), params, PH_COPY);
 		}
 
 		phalcon_update_property_this(this_ptr, SL("_parts"), parts);

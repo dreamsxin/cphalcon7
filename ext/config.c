@@ -721,7 +721,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 					break;
 				}
 
-				phalcon_array_update_zval(&return_value, &tmp, array_value, 0);
+				phalcon_array_update_zval(return_value, &tmp, array_value, 0);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

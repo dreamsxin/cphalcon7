@@ -1506,7 +1506,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _exists){
 	if (zend_is_true(mongo_id)) {
 		PHALCON_INIT_VAR(parameters);
 		array_init_size(parameters, 1);
-		phalcon_array_update_string(&parameters, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_string(parameters, SL("_id"), mongo_id, PH_COPY);
 
 		/**
 		 * Perform the count using the function provided by the driver
@@ -1759,7 +1759,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 				PHALCON_INIT_VAR(messages);
 				array_init_size(messages, 1);
-				phalcon_array_append(&messages, collection_message, PH_SEPARATE);
+				phalcon_array_append(messages, collection_message, PH_SEPARATE);
 				phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages);
 				RETURN_MM_FALSE;
 			}
@@ -1777,7 +1777,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 				PHALCON_INIT_VAR(messages);
 				array_init_size(messages, 1);
-				phalcon_array_append(&messages, collection_message, PH_SEPARATE);
+				phalcon_array_append(messages, collection_message, PH_SEPARATE);
 				phalcon_update_property_this(this_ptr, SL("_errorMessages"), messages);
 				RETURN_MM_FALSE;
 			}
@@ -1834,7 +1834,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 			if (phalcon_isset_property_zval(this_ptr, attribute_field)) {
 				value = phalcon_read_property_zval(this_ptr, attribute_field, PH_NOISY);
 
-				phalcon_array_update_zval(&data, &tmp, value, PH_COPY);
+				phalcon_array_update_zval(data, &tmp, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
@@ -1947,11 +1947,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, findById){
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 1);
-	phalcon_array_update_string(&conditions, SL("_id"), mongo_id, PH_COPY);
+	phalcon_array_update_string(conditions, SL("_id"), mongo_id, PH_COPY);
 
 	PHALCON_INIT_VAR(parameters);
 	array_init_size(parameters, 1);
-	phalcon_array_append(&parameters, conditions, 0);
+	phalcon_array_append(parameters, conditions, 0);
 	PHALCON_RETURN_CALL_SELF("findfirst", parameters);
 	RETURN_MM();
 }
@@ -2032,11 +2032,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 
 		PHALCON_INIT_VAR(conditions);
 		array_init_size(conditions, 1);
-		phalcon_array_update_string(&conditions, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_string(conditions, SL("_id"), mongo_id, PH_COPY);
 
 		PHALCON_INIT_VAR(params);
 		array_init_size(params, 1);
-		phalcon_array_append(&params, conditions, 0);
+		phalcon_array_append(params, conditions, 0);
 	} else {
 		PHALCON_CPY_WRT(params, parameters);
 	}
@@ -2275,11 +2275,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	array_init(options);
 
 	if (!PHALCON_IS_EMPTY(condition)) {
-		phalcon_array_update_string(&options, SL("condition"), condition, PH_COPY);
+		phalcon_array_update_string(options, SL("condition"), condition, PH_COPY);
 	}
 
 	if (!PHALCON_IS_EMPTY(finalize)) {
-		phalcon_array_update_string(&options, SL("finalize"), finalize, PH_COPY);
+		phalcon_array_update_string(options, SL("finalize"), finalize, PH_COPY);
 	}
 
 	/**
@@ -2287,7 +2287,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	 */
 	PHALCON_INIT_VAR(initial);
 	array_init_size(initial, 1);
-	phalcon_array_update_string(&initial, SL("summatory"), fields, PH_COPY);
+	phalcon_array_update_string(initial, SL("summatory"), fields, PH_COPY);
 
 	/**
 	 * Uses a javascript hash to group the results, however this is slow with larger
@@ -2426,7 +2426,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
 	PHALCON_INIT_VAR(id_condition);
 	array_init_size(id_condition, 1);
-	phalcon_array_update_string(&id_condition, SL("_id"), mongo_id, PH_COPY);
+	phalcon_array_update_string(id_condition, SL("_id"), mongo_id, PH_COPY);
 
 	PHALCON_INIT_VAR(success);
 	ZVAL_BOOL(success, 0);
@@ -2555,9 +2555,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 			value = phalcon_read_property_zval(this_ptr, attribute_field, PH_NOISY);
 
 			if (zend_is_true(allow_empty)) {
-				phalcon_array_update_zval(&data, attribute_field, value, PH_COPY);
+				phalcon_array_update_zval(data, attribute_field, value, PH_COPY);
 			} else if (Z_TYPE_P(value) != IS_NULL) {
-				phalcon_array_update_zval(&data, attribute_field, value, PH_COPY);
+				phalcon_array_update_zval(data, attribute_field, value, PH_COPY);
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
@@ -2746,7 +2746,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 		PHALCON_INIT_VAR(criteria);
 		array_init_size(criteria, 1);
 
-		phalcon_array_update_string(&criteria, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_string(criteria, SL("_id"), mongo_id, PH_COPY);
 
 		PHALCON_INIT_VAR(key);
 		ZVAL_STRING(key, "$inc");
@@ -2798,7 +2798,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 		PHALCON_INIT_VAR(criteria);
 		array_init_size(criteria, 1);
 
-		phalcon_array_update_string(&criteria, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_string(criteria, SL("_id"), mongo_id, PH_COPY);
 
 		PHALCON_CALL_METHOD(&row, mongo_collection, "findone", criteria);
 
@@ -2901,7 +2901,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 		}
 		if (Z_TYPE_P(value) == IS_ARRAY) {
 			PHALCON_CALL_SELF(&value1, "parse", value);
-			phalcon_array_update_zval(&conditions, &tmp, value1, PH_COPY);
+			phalcon_array_update_zval(conditions, &tmp, value1, PH_COPY);
 		}
 
 		PHALCON_OBS_NVAR(value2);
@@ -2913,7 +2913,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 
 			if (!PHALCON_IS_EQUAL(column, &tmp)) {
 				phalcon_array_unset(&conditions, &tmp, 0);
-				phalcon_array_update_zval(&conditions, column, value2, PH_COPY);
+				phalcon_array_update_zval(conditions, column, value2, PH_COPY);
 			}
 		} else {
 			PHALCON_CPY_WRT(column, &tmp);
@@ -2927,7 +2927,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 					if (phalcon_has_constructor(mongo_id)) {
 						PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", value2);
 					}
-					phalcon_array_update_zval(&conditions, column, mongo_id, PH_COPY);
+					phalcon_array_update_zval(conditions, column, mongo_id, PH_COPY);
 				}
 			}
 		}
@@ -3128,11 +3128,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 1);
-	phalcon_array_update_zval(&conditions, field, value, PH_COPY);
+	phalcon_array_update_zval(conditions, field, value, PH_COPY);
 
 	PHALCON_INIT_VAR(params);
 	array_init_size(params, 1);
-	phalcon_array_append(&params, conditions, 0);
+	phalcon_array_append(params, conditions, 0);
 
 	/** 
 	 * Execute the query

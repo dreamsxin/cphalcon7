@@ -171,8 +171,8 @@ PHP_METHOD(Phalcon_Debug_Dump, all){
 
 	PHALCON_INIT_VAR(call_object);
 	array_init_size(call_object, 2);
-	phalcon_array_append(&call_object, this_ptr, PH_SEPARATE);
-	phalcon_array_append(&call_object, method_name, PH_SEPARATE);
+	phalcon_array_append(call_object, this_ptr, PH_SEPARATE);
+	phalcon_array_append(call_object, method_name, PH_SEPARATE);
 
 	PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
@@ -275,8 +275,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(&replace_pairs, SL(":count"), count, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":count"), count, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -305,8 +305,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_INIT_NVAR(replace_pairs);
 			array_init(replace_pairs);
 
-			phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(&replace_pairs, SL(":key"), &key, PH_COPY);
+			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+			phalcon_array_update_string(replace_pairs, SL(":key"), &key, PH_COPY);
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -345,8 +345,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(&replace_pairs, SL(":class"), class_name, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":class"), class_name, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -367,8 +367,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_INIT_NVAR(replace_pairs);
 			array_init(replace_pairs);
 
-			phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(&replace_pairs, SL(":parent"), class_name, PH_COPY);
+			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+			phalcon_array_update_string(replace_pairs, SL(":parent"), class_name, PH_COPY);
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -424,8 +424,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_INIT_NVAR(replace_pairs);
 			array_init(replace_pairs);
 
-			phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(&replace_pairs, SL(":key"), &key, PH_COPY);
+			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+			phalcon_array_update_string(replace_pairs, SL(":key"), &key, PH_COPY);
 
 			if (PHALCON_PROPERTY_IS_PUBLIC_ZVAL(variable, key)) {
 				phalcon_array_update_string_string(&replace_pairs, SL(":type"), SL("public"), 0);
@@ -471,9 +471,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(&replace_pairs, SL(":class"), class_name, PH_COPY);
-		phalcon_array_update_string(&replace_pairs, SL(":count"), count, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":class"), class_name, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":count"), count, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -498,8 +498,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_INIT_NVAR(replace_pairs);
 			array_init(replace_pairs);
 
-			phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(&replace_pairs, SL(":method"), method, PH_COPY);
+			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+			phalcon_array_update_string(replace_pairs, SL(":method"), method, PH_COPY);
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -528,8 +528,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -546,8 +546,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -564,9 +564,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
 		phalcon_array_update_string_long(&replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
-		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -583,9 +583,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
 		phalcon_array_update_string_long(&replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
-		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -602,7 +602,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
 		if (zend_is_true(variable)) {
 			phalcon_array_update_string_string(&replace_pairs, SL(":var"), SL("TRUE") , 0);
 		} else {
@@ -624,7 +624,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -641,8 +641,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(&replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -683,8 +683,8 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
 	PHALCON_INIT_VAR(replace_pairs);
 	array_init(replace_pairs);
 
-	phalcon_array_update_string(&replace_pairs, SL(":style"), style, PH_SEPARATE);
-	phalcon_array_update_string(&replace_pairs, SL(":output"), &output, PH_SEPARATE);
+	phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_SEPARATE);
+	phalcon_array_update_string(replace_pairs, SL(":output"), &output, PH_SEPARATE);
 
 	PHALCON_RETURN_CALL_FUNCTION("strtr", str, replace_pairs);
 

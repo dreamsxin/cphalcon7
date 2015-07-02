@@ -454,12 +454,12 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 
 	/* Update the parameter */
 	if (phalcon_array_isset_string_fetch(&arguments, definition, SS("arguments"))) {
-		phalcon_array_update_zval(&arguments, *position, *parameter, PH_COPY);
+		phalcon_array_update_zval(arguments, *position, *parameter, PH_COPY);
 	} else {
 		PHALCON_ALLOC_GHOST_ZVAL(arguments);
 		array_init_size(arguments, 1);
-		phalcon_array_update_zval(&arguments, *position, *parameter, PH_COPY);
-		phalcon_array_update_string(&definition, SL("arguments"), arguments, 0);
+		phalcon_array_update_zval(arguments, *position, *parameter, PH_COPY);
+		phalcon_array_update_string(definition, SL("arguments"), arguments, 0);
 	}
 
 	RETURN_THISW();

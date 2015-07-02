@@ -411,10 +411,10 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _crop) {
 
 	PHALCON_INIT_VAR(rect);
 	array_init_size(rect, 4);
-	phalcon_array_update_string(&rect, SL("x"), offset_x, PH_COPY);
-	phalcon_array_update_string(&rect, SL("y"), offset_y, PH_COPY);
-	phalcon_array_update_string(&rect, SL("width"), width, PH_COPY);
-	phalcon_array_update_string(&rect, SL("height"), height, PH_COPY);
+	phalcon_array_update_string(rect, SL("x"), offset_x, PH_COPY);
+	phalcon_array_update_string(rect, SL("y"), offset_y, PH_COPY);
+	phalcon_array_update_string(rect, SL("width"), width, PH_COPY);
+	phalcon_array_update_string(rect, SL("height"), height, PH_COPY);
 
 	PHALCON_CALL_FUNCTION(&tmp_image, "imagecrop", image, rect);
 
@@ -565,17 +565,17 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _sharpen) {
 	phalcon_array_append_long(&item, -1, 0);
 	phalcon_array_append_long(&item, -1, 0);
 
-	phalcon_array_append(&matrix, item, 0);
+	phalcon_array_append(matrix, item, 0);
 
 	/* 2 */
 	PHALCON_INIT_NVAR(item);
 	array_init_size(item, 3);
 
 	phalcon_array_append_long(&item, -1, 0);
-	phalcon_array_append(&item, tmp_amount, 0);
+	phalcon_array_append(item, tmp_amount, 0);
 	phalcon_array_append_long(&item, -1, 0);
 
-	phalcon_array_append(&matrix, item, 0);
+	phalcon_array_append(matrix, item, 0);
 
 	/* 3 */
 	PHALCON_INIT_NVAR(item);
@@ -585,7 +585,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _sharpen) {
 	phalcon_array_append_long(&item, -1, 0);
 	phalcon_array_append_long(&item, -1, 0);
 
-	phalcon_array_append(&matrix, item, 9);
+	phalcon_array_append(matrix, item, 9);
 
 	b = b - 8;
 

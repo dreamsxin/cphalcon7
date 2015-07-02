@@ -770,15 +770,15 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			PHALCON_INIT_NVAR(parameters);
 			array_init_size(parameters, 3);
 			if (Z_TYPE_P(attributes) == IS_ARRAY) { 
-				phalcon_array_update_long(&attributes, 0, prefixed_path, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_long(attributes, 0, prefixed_path, PH_COPY | PH_SEPARATE);
 
-				phalcon_array_append(&parameters, attributes, 0);
+				phalcon_array_append(parameters, attributes, 0);
 			} else {
-				phalcon_array_append(&parameters, prefixed_path, 0);
+				phalcon_array_append(parameters, prefixed_path, 0);
 			}
 
-			phalcon_array_append(&parameters, local, 0);
-			phalcon_array_append(&parameters, args, 0);
+			phalcon_array_append(parameters, local, 0);
+			phalcon_array_append(parameters, args, 0);
 
 			/** 
 			 * Call the callback to generate the HTML
@@ -905,15 +905,15 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			PHALCON_INIT_NVAR(parameters);
 			array_init_size(parameters, 3);
 			if (Z_TYPE_P(attributes) == IS_ARRAY) { 
-				phalcon_array_update_long(&attributes, 0, prefixed_path, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_long(attributes, 0, prefixed_path, PH_COPY | PH_SEPARATE);
 
-				phalcon_array_append(&parameters, attributes, 0);
+				phalcon_array_append(parameters, attributes, 0);
 			} else {
-				phalcon_array_append(&parameters, prefixed_path, 0);
+				phalcon_array_append(parameters, prefixed_path, 0);
 			}
 
-			phalcon_array_append(&parameters, local, 0);
-			phalcon_array_append(&parameters, args, 0);
+			phalcon_array_append(parameters, local, 0);
+			phalcon_array_append(parameters, args, 0);
 
 			/** 
 			 * Call the callback to generate the HTML
@@ -964,15 +964,15 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			PHALCON_INIT_NVAR(parameters);
 			array_init_size(parameters, 3);
 			if (Z_TYPE_P(attributes) == IS_ARRAY) { 
-				phalcon_array_update_long(&attributes, 0, prefixed_path, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_long(attributes, 0, prefixed_path, PH_COPY | PH_SEPARATE);
 
-				phalcon_array_append(&parameters, attributes, 0);
+				phalcon_array_append(parameters, attributes, 0);
 			} else {
-				phalcon_array_append(&parameters, prefixed_path, 0);
+				phalcon_array_append(parameters, prefixed_path, 0);
 			}
 
-			phalcon_array_append(&parameters, local, 0);
-			phalcon_array_append(&parameters, args, 0);
+			phalcon_array_append(parameters, local, 0);
+			phalcon_array_append(parameters, args, 0);
 
 			/** 
 			 * Call the callback to generate the HTML

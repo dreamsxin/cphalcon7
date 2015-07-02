@@ -190,16 +190,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column) {
 		PHALCON_CALL_METHOD(&field_name, column, "getname");
-		phalcon_array_append(&attributes, field_name, PH_SEPARATE);
+		phalcon_array_append(attributes, field_name, PH_SEPARATE);
 
 		/** 
 		 * To mark fields as primary keys
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isprimary");
 		if (PHALCON_IS_TRUE(feature)) {
-			phalcon_array_append(&primary_keys, field_name, PH_COPY);
+			phalcon_array_append(primary_keys, field_name, PH_COPY);
 		} else {
-			phalcon_array_append(&non_primary_keys, field_name, PH_COPY);
+			phalcon_array_append(non_primary_keys, field_name, PH_COPY);
 		}
 
 		/** 
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isnotnull");
 		if (PHALCON_IS_TRUE(feature)) {
-			phalcon_array_append(&not_null, field_name, PH_COPY);
+			phalcon_array_append(not_null, field_name, PH_COPY);
 		}
 	
 		/** 
@@ -230,35 +230,35 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 * To get the internal types
 		 */
 		PHALCON_CALL_METHOD(&type, column, "gettype");
-		phalcon_array_update_zval(&field_types, field_name, type, PH_COPY);
+		phalcon_array_update_zval(field_types, field_name, type, PH_COPY);
 
 		/** 
 		 * To get the internal size
 		 */
 		PHALCON_CALL_METHOD(&size, column, "getsize");
-		phalcon_array_update_zval(&field_sizes, field_name, size, PH_COPY);
+		phalcon_array_update_zval(field_sizes, field_name, size, PH_COPY);
 
 		/** 
 		 * To get the internal bytes
 		 */
 		PHALCON_CALL_METHOD(&bytes, column, "getbytes");
-		phalcon_array_update_zval(&field_bytes, field_name, bytes, PH_COPY);
+		phalcon_array_update_zval(field_bytes, field_name, bytes, PH_COPY);
 
 		/** 
 		 * To get the internal scale
 		 */
 		PHALCON_CALL_METHOD(&scale, column, "getscale");
-		phalcon_array_update_zval(&field_scales, field_name, scale, PH_COPY);		
+		phalcon_array_update_zval(field_scales, field_name, scale, PH_COPY);		
 
 		/** 
 		 * To mark how the fields must be escaped
 		 */
 		PHALCON_CALL_METHOD(&bind_type, column, "getbindtype");
-		phalcon_array_update_zval(&field_bind_types, field_name, bind_type, PH_COPY);
+		phalcon_array_update_zval(field_bind_types, field_name, bind_type, PH_COPY);
 
 		PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE_P(default_value) != IS_NULL) {
-			phalcon_array_update_zval(&field_default_values, field_name, default_value, PH_COPY);
+			phalcon_array_update_zval(field_default_values, field_name, default_value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -266,20 +266,20 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	 * Create an array using the MODELS_* constants as indexes
 	 */
 	array_init_size(return_value, 14);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_ATTRIBUTES,  attributes, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_PRIMARY_KEY,  primary_keys, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_NON_PRIMARY_KEY,  non_primary_keys, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_NOT_NULL,  not_null, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES,  field_types, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES_NUMERIC,  numeric_typed, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_IDENTITY_COLUMN,  identity_field, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES_BIND,  field_bind_types, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_INSERT, automatic_create_attributes, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_UPDATE, automatic_update_attributes, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_DEFAULT_VALUE, field_default_values, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SZIE, field_sizes, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SCALE, field_scales, PH_COPY);
-	phalcon_array_update_long(&return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_BYTE, field_bytes, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_ATTRIBUTES,  attributes, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_PRIMARY_KEY,  primary_keys, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_NON_PRIMARY_KEY,  non_primary_keys, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_NOT_NULL,  not_null, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES,  field_types, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES_NUMERIC,  numeric_typed, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_IDENTITY_COLUMN,  identity_field, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES_BIND,  field_bind_types, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_INSERT, automatic_create_attributes, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_UPDATE, automatic_update_attributes, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_DEFAULT_VALUE, field_default_values, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SZIE, field_sizes, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SCALE, field_scales, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_BYTE, field_bytes, PH_COPY);
 
 	PHALCON_MM_RESTORE();
 }
@@ -324,7 +324,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 		if (Z_TYPE_P(columns) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column_name) {
 				if (!phalcon_array_isset(ordered_column_map, column_name)) {
-					phalcon_array_update_zval(&ordered_column_map, column_name, column_name, PH_COPY);
+					phalcon_array_update_zval(ordered_column_map, column_name, column_name, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
@@ -339,7 +339,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 			} else {
 				ZVAL_LONG(&name, idx);
 			}
-			phalcon_array_update_zval(&reversed_column_map, user_name, &name, PH_COPY);
+			phalcon_array_update_zval(reversed_column_map, user_name, &name, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	} else {
 		PHALCON_INIT_NVAR(ordered_column_map);
@@ -350,8 +350,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 	 * Store the column map
 	 */
 	array_init_size(return_value, 2);
-	phalcon_array_update_long(&return_value, 0, ordered_column_map, PH_COPY);
-	phalcon_array_update_long(&return_value, 1, reversed_column_map, PH_COPY);
+	phalcon_array_update_long(return_value, 0, ordered_column_map, PH_COPY);
+	phalcon_array_update_long(return_value, 1, reversed_column_map, PH_COPY);
 	
 	PHALCON_MM_RESTORE();
 }

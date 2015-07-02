@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 			}
 			PHALCON_INIT_NVAR(dsn_attribute);
 			PHALCON_CONCAT_VSV(dsn_attribute, &key, "=", value);
-			phalcon_array_append(&dsn_parts, dsn_attribute, PH_SEPARATE);
+			phalcon_array_append(dsn_parts, dsn_attribute, PH_SEPARATE);
 		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_VAR(dsn_attributes);
@@ -788,7 +788,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 					return;
 				}
 			}
-			phalcon_array_append(&placeholders, value, PH_SEPARATE);
+			phalcon_array_append(placeholders, value, PH_SEPARATE);
 		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_VAR(question);
@@ -803,8 +803,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 	 * Returns an array with the processed SQL and parameters
 	 */
 	array_init_size(return_value, 2);
-	phalcon_array_update_string(&return_value, SL("sql"), bound_sql, PH_COPY);
-	phalcon_array_update_string(&return_value, SL("params"), placeholders, PH_COPY);
+	phalcon_array_update_string(return_value, SL("sql"), bound_sql, PH_COPY);
+	phalcon_array_update_string(return_value, SL("params"), placeholders, PH_COPY);
 
 	RETURN_MM();
 }

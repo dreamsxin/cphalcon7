@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 					object_init_ex(tmp, curlfile_ce);
 					PHALCON_CALL_METHOD(NULL, tmp, "__construct", file);
 
-					phalcon_array_append(&data, tmp, 0);
+					phalcon_array_append(data, tmp, 0);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}

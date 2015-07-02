@@ -669,7 +669,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 			 */
 			phalcon_update_property_zval_zval(entity, &key, filtered_value);
 		} else {
-			phalcon_array_update_zval(&filter_data, &key, filtered_value, PH_COPY);
+			phalcon_array_update_zval(filter_data, &key, filtered_value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -753,9 +753,9 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(validators), validator) {
 					PHALCON_INIT_NVAR(scope);
 					array_init_size(scope, 2);
-					phalcon_array_append(&scope, name, 0);
-					phalcon_array_append(&scope, validator, 0);
-					phalcon_array_append(&prepared_validators, scope, PH_SEPARATE);
+					phalcon_array_append(scope, name, 0);
+					phalcon_array_append(scope, validator, 0);
+					phalcon_array_append(prepared_validators, scope, PH_SEPARATE);
 				} ZEND_HASH_FOREACH_END();
 
 				/**
@@ -784,7 +784,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				PHALCON_CALL_METHOD(&element_messages, validation, "validate", data, entity);
 				if (phalcon_fast_count_ev(element_messages)) {
 					PHALCON_CALL_METHOD(&name, element, "getname");
-					phalcon_array_update_zval(&messages, name, element_messages, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_zval(messages, name, element_messages, PH_COPY | PH_SEPARATE);
 
 					not_failed = &PHALCON_GLOBAL(z_false);
 				}
@@ -922,7 +922,7 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 		PHALCON_INIT_VAR(values);
 		array_init_size(values, 1);
 
-		phalcon_array_update_zval(&values, name, element, PH_COPY);
+		phalcon_array_update_zval(values, name, element, PH_COPY);
 
 		elements = phalcon_read_property(this_ptr, SL("_elements"), PH_NOISY);
 
@@ -1382,7 +1382,7 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessage){
 
 	PHALCON_CALL_METHOD(NULL, element_messages, "appendmessage", message);
 
-	phalcon_array_update_zval(&current_messages, filed, element_messages, PH_COPY);
+	phalcon_array_update_zval(current_messages, filed, element_messages, PH_COPY);
 	phalcon_update_property_this(this_ptr, SL("_messages"), current_messages);
 
 	RETURN_THIS();
@@ -1421,7 +1421,7 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 
 	PHALCON_CALL_METHOD(NULL, element_messages, "appendmessages", messages);
 
-	phalcon_array_update_zval(&current_messages, filed, element_messages, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_zval(current_messages, filed, element_messages, PH_COPY | PH_SEPARATE);
 	phalcon_update_property_this(this_ptr, SL("_messages"), current_messages);
 
 	RETURN_THIS();

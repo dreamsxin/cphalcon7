@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 			 * Is code set
 			 */
 			PHALCON_INIT_NVAR(option);
-			PHALCON_ZVAL_MAYBE_INTERNED_STRING(option, phalcon_interned_code);
+			ZVAL_STRING(option, phalcon_interned_code);
 
 			PHALCON_CALL_METHOD(&is_set_code, this_ptr, "issetoption", option);
 			if (zend_is_true(is_set_code)) {
@@ -236,7 +236,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 			 * Is code set
 			 */
 			PHALCON_INIT_NVAR(option);
-			PHALCON_ZVAL_MAYBE_INTERNED_STRING(option, phalcon_interned_code);
+			ZVAL_STRING(option, phalcon_interned_code);
 
 			PHALCON_CALL_METHOD(&is_set_code, this_ptr, "issetoption", option);
 			if (zend_is_true(is_set_code)) {

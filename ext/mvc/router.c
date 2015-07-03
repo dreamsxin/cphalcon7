@@ -634,7 +634,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	array_init(params);
 
 	PHALCON_INIT_VAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_request);
+	ZVAL_STRING(service, phalcon_interned_request);
 
 	PHALCON_INIT_VAR(matches);
 	phalcon_update_property_bool(this_ptr, SL("_wasMatched"), 0);
@@ -1119,7 +1119,7 @@ static void phalcon_mvc_router_add_helper(INTERNAL_FUNCTION_PARAMETERS, const ch
 	}
 
 	PHALCON_ALLOC_GHOST_ZVAL(http_method);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(http_method, method);
+	ZVAL_STRING(http_method, method);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "add", pattern, paths, http_method);
 }
 

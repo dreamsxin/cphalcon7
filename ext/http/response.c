@@ -608,7 +608,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 
 	if (!header) {
 		PHALCON_INIT_NVAR(service_name);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_url);
+		ZVAL_STRING(service_name, phalcon_interned_url);
 
 		PHALCON_CALL_METHOD(&url, dependency_injector, "getshared", service_name);
 		PHALCON_VERIFY_INTERFACE(url, phalcon_mvc_urlinterface_ce);
@@ -617,7 +617,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	}
 
 	PHALCON_INIT_NVAR(service_name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_view);
+	ZVAL_STRING(service_name, phalcon_interned_view);
 
 	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 	if (zend_is_true(has)) {

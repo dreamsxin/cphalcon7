@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, beforeStore){
 	zval *data;
 
 	phalcon_fetch_params(0, 1, 0, &data);
-	phalcon_serialize(return_value, &data);
+	phalcon_serialize(return_value, data);
 }
 
 /**

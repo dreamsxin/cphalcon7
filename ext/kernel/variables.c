@@ -26,7 +26,7 @@
 /**
  * Serializes php variables without using the PHP userland
  */
-void phalcon_serialize(zval *return_value, zval **var) {
+void phalcon_serialize(zval *return_value, zval *var) {
 
 	php_serialize_data_t var_hash;
 	smart_str buf = {0};
@@ -65,7 +65,7 @@ void phalcon_unserialize(zval *return_value, zval *var) {
 
 	p = (const unsigned char*) Z_STRVAL_P(var);
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
-	if (!php_var_unserialize(&return_value, &p, p + Z_STRLEN_P(var), &var_hash)) {
+	if (!php_var_unserialize(return_value, &p, p + Z_STRLEN_P(var), &var_hash)) {
 		PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 		phalcon_dtor(return_value);
 		ZVAL_NULL(return_value);

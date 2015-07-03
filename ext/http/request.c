@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 					}
 
 					PHALCON_INIT_VAR(service);
-					PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_filter);
+					ZVAL_STRING(service, phalcon_interned_filter);
 
 					PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 					PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 			}
 
 			PHALCON_INIT_VAR(service);
-			PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_filter);
+			ZVAL_STRING(service, phalcon_interned_filter);
 
 			PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
@@ -1158,7 +1158,7 @@ PHP_METHOD(Phalcon_Http_Request, isPost){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(post);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(post, phalcon_interned_POST);
+	ZVAL_STRING(post, phalcon_interned_POST);
 
 	PHALCON_CALL_METHOD(&method, this_ptr, "getmethod");
 	is_equal_function(return_value, method, post);
@@ -1183,7 +1183,7 @@ PHP_METHOD(Phalcon_Http_Request, isGet){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(get);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(get, phalcon_interned_GET);
+	ZVAL_STRING(get, phalcon_interned_GET);
 
 	PHALCON_CALL_METHOD(&method, this_ptr, "getmethod");
 	is_equal_function(return_value, method, get);
@@ -1208,7 +1208,7 @@ PHP_METHOD(Phalcon_Http_Request, isPut){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(put);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(put, phalcon_interned_PUT);
+	ZVAL_STRING(put, phalcon_interned_PUT);
 
 	PHALCON_CALL_METHOD(&method, this_ptr, "getmethod");
 	is_equal_function(return_value, method, put);
@@ -1233,7 +1233,7 @@ PHP_METHOD(Phalcon_Http_Request, isPatch){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(patch);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(patch, phalcon_interned_PATCH);
+	ZVAL_STRING(patch, phalcon_interned_PATCH);
 
 	PHALCON_CALL_METHOD(&method, this_ptr, "getmethod");
 	is_equal_function(return_value, method, patch);
@@ -1258,7 +1258,7 @@ PHP_METHOD(Phalcon_Http_Request, isHead){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(head);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(head, phalcon_interned_HEAD);
+	ZVAL_STRING(head, phalcon_interned_HEAD);
 
 	PHALCON_CALL_METHOD(&method, this_ptr, "getmethod");
 	is_equal_function(return_value, method, head);
@@ -1283,7 +1283,7 @@ PHP_METHOD(Phalcon_Http_Request, isDelete){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(delete);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(delete, phalcon_interned_DELETE);
+	ZVAL_STRING(delete, phalcon_interned_DELETE);
 
 	PHALCON_CALL_METHOD(&method, this_ptr, "getmethod");
 	is_equal_function(return_value, method, delete);
@@ -1308,7 +1308,7 @@ PHP_METHOD(Phalcon_Http_Request, isOptions){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(options);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(options, phalcon_interned_OPTIONS);
+	ZVAL_STRING(options, phalcon_interned_OPTIONS);
 
 	PHALCON_CALL_METHOD(&method, this_ptr, "getmethod");
 	is_equal_function(return_value, method, options);

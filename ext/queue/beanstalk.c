@@ -271,7 +271,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	 * Data is automatically serialized before be sent to the server
 	 */
 	PHALCON_INIT_VAR(serialized);
-	phalcon_serialize(serialized, &data);
+	phalcon_serialize(serialized, data);
 
 	if (Z_TYPE_P(serialized) == IS_STRING) {
 		PHALCON_INIT_VAR(serialized_length);

@@ -1276,8 +1276,8 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 
 	if (phalcon_has_constructor_ce(ce)) {
 		int param_count = (Z_TYPE_P(params) == IS_ARRAY) ? zend_hash_num_elements(Z_ARRVAL_P(params)) : 0;
-		zval *static_params[10];
-		zval **params_ptr, **params_arr = NULL;
+		zval static_params[10];
+		zval *params_str, *params_arr = NULL;
 
 		if (param_count > 0) {
 			HashPosition pos;
@@ -1286,10 +1286,9 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 
 			if (likely(param_count) <= 10) {
 				params_ptr = static_params;
-			}
-			else {
-				params_arr = emalloc(param_count * sizeof(zval*));
-				params_ptr = &params;
+			} else {
+				params_arr = emalloc(param_count * sizeof(zval));
+				params_ptr = params_arr;
 			}
 
 			for (
@@ -1297,10 +1296,9 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 				(item = zend_hash_get_current_data_ex(Z_ARRVAL_P(params), &pos)) != NULL;
 				zend_hash_move_forward_ex(Z_ARRVAL_P(params), &pos), ++i
 			) {
-				params_ptr[i] = item;
+				params_ptr[i] = *item;
 			}
-		}
-		else {
+		} else {
 			params_ptr = NULL;
 		}
 

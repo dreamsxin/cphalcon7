@@ -324,7 +324,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 			}
 
 			PHALCON_INIT_VAR(service);
-			PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_router);
+			ZVAL_STRING(service, phalcon_interned_router);
 
 			router = NULL;
 			PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", service);

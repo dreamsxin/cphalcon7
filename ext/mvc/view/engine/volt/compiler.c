@@ -3491,7 +3491,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 	 */
 	if (Z_TYPE_P(compilation) == IS_ARRAY) { 
 		PHALCON_INIT_VAR(final_compilation);
-		phalcon_serialize(final_compilation, &compilation);
+		phalcon_serialize(final_compilation, compilation);
 	} else {
 		PHALCON_CPY_WRT(final_compilation, compilation);
 	}

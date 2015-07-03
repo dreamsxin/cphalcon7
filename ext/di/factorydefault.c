@@ -80,7 +80,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Mvc Router
 	 */
 	PHALCON_INIT_VAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_router);
+	ZVAL_STRING(name, phalcon_interned_router);
 
 	PHALCON_INIT_VAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Router");
@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Mvc Dispatcher
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_dispatcher);
+	ZVAL_STRING(name, phalcon_interned_dispatcher);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Dispatcher");
@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Mvc Url
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_url);
+	ZVAL_STRING(name, phalcon_interned_url);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Url");
@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models manager for ORM
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_modelsManager);
+	ZVAL_STRING(name, phalcon_interned_modelsManager);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Manager");
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models meta-data using the Memory adapter
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_modelsMetadata);
+	ZVAL_STRING(name, phalcon_interned_modelsMetadata);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\MetaData\\Memory");
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models Query for ORM
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_modelsQuery);
+	ZVAL_STRING(name, phalcon_interned_modelsQuery);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Query");
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models Query Builder for ORM
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_modelsQueryBuilder);
+	ZVAL_STRING(name, phalcon_interned_modelsQueryBuilder);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Query\\Builder");
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models Criteria for ORM
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_modelsCriteria);
+	ZVAL_STRING(name, phalcon_interned_modelsCriteria);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Criteria");
@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Request/Response are always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_response);
+	ZVAL_STRING(name, phalcon_interned_response);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Response");
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Http Response Cookies
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_cookies);
+	ZVAL_STRING(name, phalcon_interned_cookies);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Response\\Cookies");
@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Http Request
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_request);
+	ZVAL_STRING(name, phalcon_interned_request);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Request");
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Filter/Escaper services are always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_filter);
+	ZVAL_STRING(name, phalcon_interned_filter);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Filter");
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Escaper
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_escaper);
+	ZVAL_STRING(name, phalcon_interned_escaper);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Escaper");
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Default annotations service
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_annotations);
+	ZVAL_STRING(name, phalcon_interned_annotations);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Annotations\\Adapter\\Memory");
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Security doesn't need to be shared, but anyways we register it as shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_security);
+	ZVAL_STRING(name, phalcon_interned_security);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Security");
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Crypt Service
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_crypt);
+	ZVAL_STRING(name, phalcon_interned_crypt);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Crypt");
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Flash services are always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_flash);
+	ZVAL_STRING(name, phalcon_interned_flash);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Flash\\Direct");
@@ -335,7 +335,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Flash Session
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_flashSession);
+	ZVAL_STRING(name, phalcon_interned_flashSession);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Flash\\Session");
@@ -350,7 +350,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Tag/Helpers
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_tag);
+	ZVAL_STRING(name, phalcon_interned_tag);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Tag");
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Session is always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_session);
+	ZVAL_STRING(name, phalcon_interned_session);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Session\\Adapter\\Files");
@@ -380,7 +380,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Session/Bag
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_sessionBag);
+	ZVAL_STRING(name, phalcon_interned_sessionBag);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Session\\Bag");
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Events Manager is always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_eventsManager);
+	ZVAL_STRING(name, phalcon_interned_eventsManager);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Events\\Manager");
@@ -410,7 +410,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Model Transaction Manager
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_transactionManager);
+	ZVAL_STRING(name, phalcon_interned_transactionManager);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Transaction\\Manager");
@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Assets Manager
 	 */
 	PHALCON_INIT_NVAR(name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(name, phalcon_interned_assets);
+	ZVAL_STRING(name, phalcon_interned_assets);
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Assets\\Manager");

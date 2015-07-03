@@ -451,7 +451,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	if (phalcon_array_isset(sql_column_aliases, column_name)) {
 		array_init_size(return_value, 2);
 		PHALCON_ALLOC_GHOST_ZVAL(s_qualified);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(s_qualified, phalcon_interned_qualified);
+		ZVAL_STRING(s_qualified, phalcon_interned_qualified);
 		add_assoc_zval_ex(return_value, ISS(type), s_qualified);
 		phalcon_array_update_string(return_value, ISL(name), column_name, PH_COPY);
 		RETURN_MM();
@@ -629,7 +629,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	 * Create an array with the qualified info
 	 */
 	PHALCON_ALLOC_GHOST_ZVAL(s_qualified);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(s_qualified, phalcon_interned_qualified);
+	ZVAL_STRING(s_qualified, phalcon_interned_qualified);
 	array_init_size(return_value, 4);
 	add_assoc_zval_ex(return_value, ISS(type), s_qualified);
 	phalcon_array_update_string(return_value, ISL(domain), source, PH_COPY);
@@ -658,7 +658,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCallArgument){
 	if (PHALCON_IS_LONG(argument_type, PHQL_T_STARALL)) {
 		zval *s_all;
 		PHALCON_ALLOC_GHOST_ZVAL(s_all);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(s_all, phalcon_interned_all);
+		ZVAL_STRING(s_all, phalcon_interned_all);
 		array_init_size(return_value, 1);
 		add_assoc_zval_ex(return_value, ISS(type), s_all);
 		RETURN_MM();
@@ -798,7 +798,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 		}
 
 		PHALCON_ALLOC_GHOST_ZVAL(s_functionCall);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(s_functionCall, phalcon_interned_functionCall);
+		ZVAL_STRING(s_functionCall, phalcon_interned_functionCall);
 		add_assoc_zval_ex(return_value, ISS(type), s_functionCall);
 		phalcon_array_update_string(return_value, ISL(name), name, PH_COPY);
 		phalcon_array_update_string(return_value, ISL(arguments), function_args, PH_COPY);
@@ -808,7 +808,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 		}
 	} else {
 		PHALCON_ALLOC_GHOST_ZVAL(s_functionCall);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(s_functionCall, phalcon_interned_functionCall);
+		ZVAL_STRING(s_functionCall, phalcon_interned_functionCall);
 		add_assoc_zval_ex(return_value, ISS(type), s_functionCall);
 		phalcon_array_update_string(return_value, ISL(name), name, PH_COPY);
 	}
@@ -5192,7 +5192,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			 */
 			if (!phalcon_array_isset_string_fetch(&cache_service, cache_options, SS("service"))) {
 				PHALCON_INIT_VAR(cache_service);
-				PHALCON_ZVAL_MAYBE_INTERNED_STRING(cache_service, phalcon_interned_modelsCache);
+				ZVAL_STRING(cache_service, phalcon_interned_modelsCache);
 			}
 
 			dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);

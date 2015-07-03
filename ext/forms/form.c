@@ -600,7 +600,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 	}
 
 	PHALCON_INIT_VAR(service_name);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_filter);
+	ZVAL_STRING(service_name, phalcon_interned_filter);
 
 	PHALCON_CALL_METHOD(&dependency_injector, this_ptr, "getdi");
 	PHALCON_VERIFY_INTERFACE(dependency_injector, phalcon_diinterface_ce);

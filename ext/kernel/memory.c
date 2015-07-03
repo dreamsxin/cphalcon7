@@ -613,47 +613,6 @@ void ZEND_FASTCALL phalcon_copy_ctor(zval *destination, zval *origin) {
 	}
 }
 
-static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)
-{
-	switch (Z_TYPE_P(zvalue)) {
-		case IS_STRING:
-		case IS_CONSTANT:
-			CHECK_ZVAL_STRING_REL(zvalue);
-			zend_string_free(zvalue->value.str);
-			break;
-		case IS_ARRAY:  {
-				TSRMLS_FETCH();
-				if (Z_ARRVAL_P(zvalue) && (Z_ARRVAL_P(zvalue) != &EG(symbol_table))) {
-					/* break possible cycles */
-					zend_hash_destroy(Z_ARRVAL_P(zvalue));
-					FREE_HASHTABLE(Z_ARRVAL_P(zvalue));
-					ZVAL_NULL(zvalue);
-				}
-			}
-			break;
-		case IS_OBJECT:
-			{
-				TSRMLS_FETCH();
-				Z_OBJ_HT_P(zvalue)->del_ref(zvalue);
-			}
-			break;
-		case IS_RESOURCE:
-			{
-				TSRMLS_FETCH();
-				zend_list_delete(zvalue->value.lval);
-			}
-			break;
-		case IS_LONG:
-		case IS_DOUBLE:
-		case IS_TRUE:
-		case IS_FALSE:
-		case IS_NULL:
-		default:
-			return;
-			break;
-	}
-}
-
 /**
  * Releases memory for an allocated zval
  */

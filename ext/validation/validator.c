@@ -91,7 +91,7 @@ int phalcon_validation_validator_getoption_helper(const zend_class_entry *ce, zv
 	}
 
 	PHALCON_ALLOC_GHOST_ZVAL(opt);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(opt, option);
+	ZVAL_STRING(opt, option);
 	params[0] = opt;
 
 	ALLOC_INIT_ZVAL(*result);

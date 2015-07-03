@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 		const char *cn = Z_OBJCE_P(getThis())->name->val;
 
 		PHALCON_ALLOC_GHOST_ZVAL(class_name);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(class_name, cn);
+		ZVAL_STRING(class_name, cn);
 
 		PHALCON_INIT_VAR(arguments);
 		array_init_size(arguments, 1);

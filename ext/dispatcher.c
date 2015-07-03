@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 			}
 
 			PHALCON_INIT_VAR(service);
-			PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_filter);
+			ZVAL_STRING(service, phalcon_interned_filter);
 
 			PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);

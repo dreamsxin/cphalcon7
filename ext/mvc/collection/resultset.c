@@ -288,7 +288,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, serialize){
 	/** 
 	 * Serialize the cache using the serialize function
 	 */
-	phalcon_serialize(return_value, &data);
+	phalcon_serialize(return_value, data);
 	RETURN_MM();
 }
 

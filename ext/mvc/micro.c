@@ -561,7 +561,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, getRouter){
 		PHALCON_MM_GROW();
 
 		PHALCON_INIT_VAR(service_name);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_router);
+		ZVAL_STRING(service_name, phalcon_interned_router);
 
 		PHALCON_CALL_METHOD(&tmp, this_ptr, "getsharedservice", service_name);
 		PHALCON_VERIFY_INTERFACE(tmp, phalcon_mvc_routerinterface_ce);
@@ -748,7 +748,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	 * Handling routing information
 	 */
 	PHALCON_INIT_VAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_router);
+	ZVAL_STRING(service, phalcon_interned_router);
 
 	PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(router, phalcon_mvc_routerinterface_ce);

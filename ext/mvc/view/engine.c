@@ -213,15 +213,15 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		|| phalcon_compare_strict_string(method_name, SL("getPut"))
 		|| phalcon_compare_strict_string(method_name, SL("getQuery"))
 		|| phalcon_compare_strict_string(method_name, SL("getServer"))) {
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_request);
+		ZVAL_STRING(service_name, phalcon_interned_request);
 	} else if (phalcon_compare_strict_string(method_name, SL("getSession"))) {
 		PHALCON_SEPARATE_PARAM(method_name);
 		PHALCON_INIT_NVAR(method_name);
 		ZVAL_STRING(method_name, "get");
 
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_session);
+		ZVAL_STRING(service_name, phalcon_interned_session);
 	} else if (phalcon_compare_strict_string(method_name, SL("getParam"))) {
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_dispatcher);
+		ZVAL_STRING(service_name, phalcon_interned_dispatcher);
 	}
 
 	PHALCON_CALL_METHOD(&service, dependency_injector, "getshared", service_name);

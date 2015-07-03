@@ -676,7 +676,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 	}
 
 	PHALCON_INIT_VAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+	ZVAL_STRING(service, phalcon_interned_session);
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -725,7 +725,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 	}
 
 	PHALCON_INIT_VAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+	ZVAL_STRING(service, phalcon_interned_session);
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -765,7 +765,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	}
 
 	PHALCON_INIT_VAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+	ZVAL_STRING(service, phalcon_interned_session);
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -779,7 +779,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 
 	if (Z_TYPE_P(token_value) == IS_NULL) {
 		PHALCON_INIT_NVAR(service);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_request);
+		ZVAL_STRING(service, phalcon_interned_request);
 
 		PHALCON_CALL_METHOD(&request, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(request, phalcon_http_requestinterface_ce);
@@ -823,7 +823,7 @@ PHP_METHOD(Phalcon_Security, getSessionToken){
 	}
 
 	PHALCON_INIT_VAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+	ZVAL_STRING(service, phalcon_interned_session);
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -852,7 +852,7 @@ PHP_METHOD(Phalcon_Security, destroyToken){
 	}
 
 	PHALCON_INIT_VAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+	ZVAL_STRING(service, phalcon_interned_session);
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);

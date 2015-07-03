@@ -1387,7 +1387,7 @@ void phalcon_add_trailing_slash(zval* v)
 			SEPARATE_ZVAL(v);
 			c = Z_STRVAL_P(v);
 
-			if (!STR_IS_INTERNED(c)) {
+			if (!IS_INTERNED(Z_STR_P(v))) {
 				c = erealloc(c, len+2);
 			}
 			else {

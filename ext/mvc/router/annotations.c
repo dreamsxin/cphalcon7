@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		phalcon_fast_strtolower(action_name, real_action_name);
 
 		PHALCON_INIT_VAR(parameter);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(parameter, phalcon_interned_paths);
+		ZVAL_STRING(parameter, phalcon_interned_paths);
 
 		/** 
 		 * Check for existing paths in the annotation
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		}
 
 		PHALCON_INIT_NVAR(parameter);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(parameter, phalcon_interned_name);
+		ZVAL_STRING(parameter, phalcon_interned_name);
 
 		PHALCON_CALL_METHOD(&route_name, annotation, "getargument", parameter);
 		if (Z_TYPE_P(route_name) == IS_STRING) {

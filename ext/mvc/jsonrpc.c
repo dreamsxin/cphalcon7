@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	/* Deserializer Json */
 
 	PHALCON_INIT_NVAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_request);
+	ZVAL_STRING(service, phalcon_interned_request);
 	
 	PHALCON_CALL_METHOD(&request, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(request, phalcon_http_requestinterface_ce);
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 
 	PHALCON_INIT_NVAR(service);
-	PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_response);
+	ZVAL_STRING(service, phalcon_interned_response);
 
 	PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);
@@ -328,14 +328,14 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		}
 
 		PHALCON_INIT_NVAR(service);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_url);
+		ZVAL_STRING(service, phalcon_interned_url);
 		PHALCON_CALL_METHOD(&url, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(url, phalcon_mvc_urlinterface_ce);
 
 		PHALCON_CALL_METHOD(&uri, url, "get", jsonrpc_method);
 
 		PHALCON_INIT_NVAR(service);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_router);
+		ZVAL_STRING(service, phalcon_interned_router);
 		PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(router, phalcon_mvc_routerinterface_ce);
 
@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		PHALCON_CALL_METHOD(&exact, router, "isexactcontrollername");
 
 		PHALCON_INIT_NVAR(service);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_dispatcher);
+		ZVAL_STRING(service, phalcon_interned_dispatcher);
 		
 		PHALCON_CALL_METHOD(&dispatcher, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(dispatcher, phalcon_dispatcherinterface_ce);

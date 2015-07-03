@@ -480,7 +480,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 	phalcon_array_update_string(data, SL("hydrateMode"), hydrate_mode, PH_COPY);
 
 	PHALCON_INIT_VAR(serialized);
-	phalcon_serialize(serialized, &data);
+	phalcon_serialize(serialized, data);
 
 	/** 
 	 * Avoid return bad serialized data

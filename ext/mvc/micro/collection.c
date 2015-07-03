@@ -117,7 +117,7 @@ void phalcon_mvc_collection_addmap(zval *this_ptr, const char *method, zval *rou
 
 	PHALCON_ALLOC_GHOST_ZVAL(z_method);
 	if (method) {
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(z_method, method);
+		ZVAL_STRING(z_method, method);
 	}
 	else {
 		ZVAL_NULL(z_method);

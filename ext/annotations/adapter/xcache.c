@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Xcache, write){
 	phalcon_strtolower_inplace(prefixed_key);
 	
 	PHALCON_INIT_VAR(serialized);
-	phalcon_serialize(serialized, &data);
+	phalcon_serialize(serialized, data);
 	PHALCON_CALL_FUNCTION(NULL, "xcache_set", prefixed_key, serialized);
 	
 	PHALCON_MM_RESTORE();

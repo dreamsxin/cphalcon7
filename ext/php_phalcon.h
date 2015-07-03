@@ -149,19 +149,6 @@ extern zend_module_entry phalcon_module_entry;
 
 extern int nusphere_dbg_present;
 
-
-#ifndef ZTS
-
-#define STR_IS_INTERNED(s) \
-	(((s) >= CG(interned_strings_start)) && ((s) < CG(interned_strings_end)))
-
-#else
-
-#define STR_IS_INTERNED(s) \
-	(0)
-
-#endif
-
 /* Compatibility macros for PHP 5.3 */
 #ifndef PHP_FE_END
 	#define PHP_FE_END { NULL, NULL, NULL, 0, 0 }

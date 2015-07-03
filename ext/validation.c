@@ -542,7 +542,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 				if (zend_is_true(field_filters)) {
 	
 					PHALCON_INIT_VAR(service_name);
-					PHALCON_ZVAL_MAYBE_INTERNED_STRING(service_name, phalcon_interned_filter);
+					ZVAL_STRING(service_name, phalcon_interned_filter);
 	
 					PHALCON_CALL_METHOD(&dependency_injector, this_ptr, "getdi");
 					if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {

@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 					}
 
 					PHALCON_INIT_NVAR(service);
-					PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_filter);
+					ZVAL_STRING(service, phalcon_interned_filter);
 
 					PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 					PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
@@ -350,7 +350,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_INIT_VAR(service);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+		ZVAL_STRING(service, phalcon_interned_session);
 
 		PHALCON_CALL_METHOD(&has_session, dependency_injector, "has", service);
 		if (zend_is_true(has_session)) {
@@ -459,7 +459,7 @@ PHP_METHOD(Phalcon_Http_Cookie, restore){
 		if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 
 			PHALCON_INIT_VAR(service);
-			PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+			ZVAL_STRING(service, phalcon_interned_session);
 
 			PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -528,7 +528,7 @@ PHP_METHOD(Phalcon_Http_Cookie, delete){
 	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_INIT_VAR(service);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+		ZVAL_STRING(service, phalcon_interned_session);
 
 		PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);

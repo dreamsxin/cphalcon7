@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 		PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_session_exception_ce, 1);
 
 		PHALCON_INIT_VAR(service);
-		PHALCON_ZVAL_MAYBE_INTERNED_STRING(service, phalcon_interned_session);
+		ZVAL_STRING(service, phalcon_interned_session);
 
 		session = NULL;
 		PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);

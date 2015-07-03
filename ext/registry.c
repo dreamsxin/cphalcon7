@@ -403,7 +403,7 @@ static int phalcon_registry_serialize(zval *object, unsigned char **buffer, uint
 	php_serialize_data_t var_hash;
 
 	PHP_VAR_SERIALIZE_INIT(var_hash);
-	php_var_serialize(&buf, &obj->properties, &var_hash);
+	php_var_serialize(&buf, obj->properties, &var_hash);
 	PHP_VAR_SERIALIZE_DESTROY(var_hash);
 
 	if (buf.s) {
@@ -432,7 +432,7 @@ static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, con
 	max = buf + buf_len;
 
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
-	retval = (php_var_unserialize(&pzv, &buf, max, &var_hash) && Z_TYPE(zv) == IS_ARRAY) ? SUCCESS : FAILURE;
+	retval = (php_var_unserialize(pzv, &buf, max, &var_hash) && Z_TYPE(zv) == IS_ARRAY) ? SUCCESS : FAILURE;
 	if (SUCCESS == retval) {
 		if (zend_hash_num_elements(Z_ARRVAL(zv)) != 0) {
 			zend_hash_copy(Z_ARRVAL_P(obj->properties), Z_ARRVAL(zv), (copy_ctor_func_t)zval_add_ref);
@@ -770,7 +770,7 @@ static PHP_METHOD(Phalcon_Registry, unserialize)
 	max = buf + Z_STRLEN_P(*str);
 
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
-	if (php_var_unserialize(&pzv, &buf, max, &var_hash) && Z_TYPE(zv) == IS_ARRAY) {
+	if (php_var_unserialize(pzv, &buf, max, &var_hash) && Z_TYPE(zv) == IS_ARRAY) {
 		if (zend_hash_num_elements(Z_ARRVAL(zv)) != 0) {
 			zend_hash_copy(Z_ARRVAL_P(obj->properties), Z_ARRVAL(zv), (copy_ctor_func_t) zval_add_ref);
 		}

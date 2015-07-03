@@ -619,15 +619,15 @@ static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)
 		case IS_STRING:
 		case IS_CONSTANT:
 			CHECK_ZVAL_STRING_REL(zvalue);
-			STR_FREE_REL(zvalue->value.str.val);
+			zend_string_free(zvalue->value.str);
 			break;
 		case IS_ARRAY:  {
 				TSRMLS_FETCH();
 				if (zvalue->value.ht && (zvalue->value.ht != &EG(symbol_table))) {
 					/* break possible cycles */
-					Z_TYPE_P(zvalue) = IS_NULL;
 					zend_hash_destroy(zvalue->value.ht);
 					FREE_HASHTABLE(zvalue->value.ht);
+					ZVAL_NULL(zvalue);
 				}
 			}
 			break;

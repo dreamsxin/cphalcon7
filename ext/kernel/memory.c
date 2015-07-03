@@ -615,7 +615,7 @@ void ZEND_FASTCALL phalcon_copy_ctor(zval *destination, zval *origin) {
 
 static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)
 {
-	switch (Z_TYPE_P(zvalue) & IS_CONSTANT_TYPE_MASK) {
+	switch (Z_TYPE_P(zvalue)) {
 		case IS_STRING:
 		case IS_CONSTANT:
 			CHECK_ZVAL_STRING_REL(zvalue);
@@ -623,10 +623,10 @@ static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)
 			break;
 		case IS_ARRAY:  {
 				TSRMLS_FETCH();
-				if (zvalue->value.ht && (zvalue->value.ht != &EG(symbol_table))) {
+				if (Z_ARRVAL_P(zvalue) && (Z_ARRVAL_P(zvalue) != &EG(symbol_table))) {
 					/* break possible cycles */
-					zend_hash_destroy(zvalue->value.ht);
-					FREE_HASHTABLE(zvalue->value.ht);
+					zend_hash_destroy(Z_ARRVAL_P(zvalue));
+					FREE_HASHTABLE(Z_ARRVAL_P(zvalue));
 					ZVAL_NULL(zvalue);
 				}
 			}
@@ -681,12 +681,4 @@ void ZEND_FASTCALL phalcon_dtor(zval var)
 	if (!Z_ISREF_P(var)) {
 		zval_dtor(var);
 	}
-}
-
-void phalcon_value_dtor(zval *var ZEND_FILE_LINE_DC)
-{
-	if (Z_TYPE_P(var) <= IS_TRUE) {
-		return;
-	}
-	phalcon_dtor_func(var ZEND_FILE_LINE_RELAY_CC);
 }

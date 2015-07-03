@@ -79,7 +79,6 @@ void ZEND_FASTCALL phalcon_copy_ctor(zval *destiny, zval *origin) PHALCON_ATTR_N
 
 void ZEND_FASTCALL phalcon_ptr_dtor(zval *var);
 void ZEND_FASTCALL phalcon_dtor(zval var);
-void phalcon_value_dtor(zval *var ZEND_FILE_LINE_DC);
 
 /**
  * @brief destroys @c pzval if it is not @c NULL
@@ -180,7 +179,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 			ZVAL_UNREF(z); \
 		} else { \
 			if (!Z_ISREF_P(z)) { \
-				phalcon_value_dtor(z ZEND_FILE_LINE_CC); \
+				zend_ptr_dtor(z); \
 			} \
 			Z_SET_REFCOUNT_P(z, 1); \
 			ZVAL_UNREF(z); \

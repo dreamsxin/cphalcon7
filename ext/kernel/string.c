@@ -1364,19 +1364,19 @@ void phalcon_addslashes(zval *return_value, zval *str)
 		}
 	}
 
-	ZVAL_STRING(return_value, php_addslashes(Z_STRVAL_P(str), Z_STRLEN_P(str), &Z_STRLEN_P(return_value), 0));
+	ZVAL_STR(return_value, php_addslashes(Z_STR_P(str), 0));
 
 	if (unlikely(use_copy)) {
 		phalcon_dtor(copy);
 	}
 }
 
-void phalcon_add_trailing_slash(zval** v)
+void phalcon_add_trailing_slash(zval* v)
 {
 	PHALCON_ENSURE_IS_STRING(v);
-	if (Z_STRLEN_P(*v)) {
-		int len = Z_STRLEN_P(*v);
-		char *c = Z_STRVAL_P(*v);
+	if (Z_STRLEN_P(v)) {
+		int len = Z_STRLEN_P(v);
+		char *c = Z_STRVAL_P(v);
 
 #ifdef PHP_WIN32
 		if (c[len - 1] != '/' && c[len - 1] != '\\')
@@ -1385,7 +1385,7 @@ void phalcon_add_trailing_slash(zval** v)
 #endif
 		{            
 			SEPARATE_ZVAL(v);
-			c = Z_STRVAL_P(*v);
+			c = Z_STRVAL_P(v);
 
 			if (!STR_IS_INTERNED(c)) {
 				c = erealloc(c, len+2);
@@ -1393,7 +1393,7 @@ void phalcon_add_trailing_slash(zval** v)
 			else {
 				c = emalloc(len + 2);
 				if (c != NULL) {
-					memcpy(c, Z_STRVAL_P(*v), Z_STRLEN_P(*v));
+					memcpy(c, Z_STRVAL_P(v), Z_STRLEN_P(v));
 				}
 			}
 
@@ -1401,7 +1401,7 @@ void phalcon_add_trailing_slash(zval** v)
 				c[len]   = PHP_DIR_SEPARATOR;
 				c[len + 1] = 0;
 
-				ZVAL_STRINGL(*v, c, len+1);
+				ZVAL_STRINGL(v, c, len+1);
 			}
 		}
 	}

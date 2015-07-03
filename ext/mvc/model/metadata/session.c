@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, reset)
 
 	phalcon_concat_sv(&pprefix, SL("$PMM$"), prefix, 0);
 	_SESSION = phalcon_get_global(SS("_SESSION"));
-	phalcon_array_unset(&_SESSION, &prefix_key, 0);
+	phalcon_array_unset(_SESSION, &prefix_key, 0);
 	zval_dtor(&prefix_key);
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_session_ce, getThis(), "reset");

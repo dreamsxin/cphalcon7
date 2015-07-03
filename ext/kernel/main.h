@@ -91,7 +91,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #ifndef INIT_PZVAL_COPY
  #define INIT_PZVAL_COPY(z, v) ZVAL_COPY_VALUE(z, v);\
   Z_SET_REFCOUNT_P(z, 1);\
-  Z_UNSET_ISREF_P(z);
+  ZVAL_UNREF(z);
 #endif
 
 #ifndef ZVAL_COPY_VALUE

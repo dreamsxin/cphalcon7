@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, remove){
 
 	headers = phalcon_read_property(this_ptr, SL("_headers"), PH_NOISY);
 
-	phalcon_array_unset(&headers, header_index, 0);
+	phalcon_array_unset(headers, header_index, 0);
 
 	phalcon_update_property_this(this_ptr, SL("_headers"), headers);
 }

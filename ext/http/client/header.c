@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, remove){
 
 	fields = phalcon_read_property(this_ptr, SL("_fields"), PH_NOISY);
 	
-	phalcon_array_unset(&fields, name, 0);
+	phalcon_array_unset(fields, name, 0);
 
 	phalcon_update_property_this(this_ptr, SL("_fields"), fields);
 

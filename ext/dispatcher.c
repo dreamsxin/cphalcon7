@@ -1346,7 +1346,7 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 	Z_SET_ISREF_P(data);
 	zval *params[] = {PHALCON_FETCH_VA_ARGS event_name, data, cancelable};
 	ret = phalcon_call_class_method_aparams(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), PHALCON_CALL_NUM_PARAMS(params), PHALCON_PASS_CALL_PARAMS(params));
-	Z_UNSET_ISREF_P(data);
+	ZVAL_UNREF(data);
 
 	if (EG(exception)) {
 		zval exception;

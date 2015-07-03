@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 	PHALCON_CALL_FUNCTION(&keys, "xcache_get", special_key);
 	if (Z_TYPE_P(keys) == IS_ARRAY) { 
 		zval *z_zero = &PHALCON_GLOBAL(z_zero);
-		phalcon_array_unset(&keys, prefixed_key, 0);
+		phalcon_array_unset(keys, prefixed_key, 0);
 		PHALCON_CALL_FUNCTION(NULL, "xcache_set", special_key, keys, z_zero);
 	}
 	

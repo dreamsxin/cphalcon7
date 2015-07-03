@@ -150,9 +150,9 @@ PHP_METHOD(Phalcon_Http_Uri, __construct){
 		PHALCON_CALL_FUNCTION(&parts, "parse_url", uri);
 		if (phalcon_array_isset_string_fetch(&query, parts, SS("query"))) {
 			PHALCON_INIT_VAR(params);
-			Z_SET_ISREF_P(params);
+			ZVAL_MAKE_REF(params);
 			PHALCON_CALL_FUNCTION(NULL, "parse_str", query, params);
-			Z_UNSET_ISREF_P(params);
+			ZVAL_UNREF(params);
 			phalcon_array_update_string(parts, SL("query"), params, PH_COPY);
 		}
 

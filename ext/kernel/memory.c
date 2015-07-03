@@ -174,9 +174,9 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 		if (g->active_symbol_table) {
 			active_symbol_table = g->active_symbol_table;
 			if (active_symbol_table->scope == active_memory) {
-				zend_hash_destroy(EG(active_symbol_table));
-				FREE_HASHTABLE(EG(active_symbol_table));
-				EG(active_symbol_table) = active_symbol_table->symbol_table;
+				zend_hash_destroy(&EG(symbol_table));
+				FREE_HASHTABLE(&EG(symbol_table));
+				EG(current_execute_data)->symbol_table = active_symbol_table->symbol_table;
 				g->active_symbol_table = active_symbol_table->prev;
 				efree(active_symbol_table);
 			}
@@ -217,7 +217,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 			if (EXPECTED(ptr != NULL && *(ptr) != NULL)) {
 				if (Z_REFCOUNT_P(*ptr) == 1) {
 					if (!Z_ISREF_P(*ptr) || Z_TYPE_P(*ptr) == IS_OBJECT) {
-						zval_ptr_dtor(ptr);
+						zval_ptr_dtor(*ptr);
 					} else {
 						efree(*ptr);
 					}
@@ -306,7 +306,7 @@ void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory)
 				case IS_FALSE:    fprintf(stderr, "value=(bool)0\n"); break;
 				case IS_ARRAY:    fprintf(stderr, "value=array(%p), %d elements\n", Z_ARRVAL_P(*var), zend_hash_num_elements(Z_ARRVAL_P(*var))); break;
 				case IS_OBJECT:   fprintf(stderr, "value=object(%u), %s\n", Z_OBJ_HANDLE_P(*var), Z_OBJCE_P(*var)->name->val); break;
-				case IS_STRING:   fprintf(stderr, "value=%*s (%p)\n", Z_STRLEN_P(*var), Z_STRVAL_P(*var), Z_STRVAL_P(*var)); break;
+				case IS_STRING:   fprintf(stderr, "value=%s (%p)\n", Z_STRVAL_P(*var), Z_STRVAL_P(*var)); break;
 				case IS_RESOURCE: fprintf(stderr, "value=(resource)%ld\n", Z_LVAL_P(*var)); break;
 				default:          fprintf(stderr, "\n"); break;
 			}
@@ -600,14 +600,6 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var)
 	++active_memory->hash_pointer;
 }
 #endif
-
-/**
- * Removes a memory pointer from the active memory pool
- */
-void phalcon_memory_remove(zval **var) {
-	zval_ptr_dtor(var);
-	*var = NULL;
-}
 
 /**
  * Cleans the phalcon memory stack recursivery

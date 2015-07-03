@@ -112,7 +112,7 @@ void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message){
 	PHALCON_ALLOC_GHOST_ZVAL(object);
 	object_init_ex(object, ce);
 
-	PHALCON_CALL_METHODW(NULL, object, "__construct", message);
+	PHALCON_CALL_METHODW(NULL, object, "__construct", *message);
 	zend_throw_exception_object(object);
 }
 
@@ -143,7 +143,7 @@ void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, con
  */
 void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ...) {
 
-	zval *object, *msg;
+	zval *object, msg;
 	int len;
 	char *buffer;
 	va_list args;
@@ -155,12 +155,11 @@ void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ..
 	len = vspprintf(&buffer, 0, format, args);
 	va_end(args);
 
-	ALLOC_INIT_ZVAL(msg);
-	ZVAL_STRINGL(msg, buffer, len);
+	ZVAL_STRINGL(&msg, buffer, len);
 
-	PHALCON_CALL_METHODW(NULL, object, "__construct", NULL, msg);
+	PHALCON_CALL_METHODW(NULL, object, "__construct", PHALCON_GLOBAL(z_null), msg);
 
 	zend_throw_exception_object(object);
 
-	phalcon_ptr_dtor(msg);
+	phalcon_dtor(msg);
 }

@@ -253,7 +253,7 @@ static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, 
 			ret = newval;
 		}
 
-		Z_SET_ISREF_P(*ret);
+		ZVAL_MAKE_REF(*ret);
 	}
 
 	return ret;
@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 	_SESSION = phalcon_get_global(SS("_SESSION"));
 	if (phalcon_array_isset_fetch(&value, _SESSION, key)) {
 		RETVAL_ZVAL(value, 1, 0);
-		phalcon_array_unset(&_SESSION, key, 0);
+		phalcon_array_unset(_SESSION, key, 0);
 	}
 	else {
 		RETVAL_ZVAL(default_value, 1, 0);
@@ -725,7 +725,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __get)
 	zval_ptr_dtor(return_value_ptr);
 	*return_value_ptr = retval;
 	Z_ADDREF_P(*return_value_ptr);
-	Z_SET_ISREF_P(*return_value_ptr);
+	ZVAL_MAKE_REF(*return_value_ptr);
 }
 
 PHP_METHOD(Phalcon_Session_Adapter, count)

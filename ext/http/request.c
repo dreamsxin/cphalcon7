@@ -1908,9 +1908,9 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 		ZVAL_LONG(set_order, 2);
 
 		PHALCON_INIT_VAR(matches);
-		Z_SET_ISREF_P(matches);
+		ZVAL_MAKE_REF(matches);
 		PHALCON_CALL_FUNCTION(&ret, "preg_match_all", pattern, digest, matches, set_order);
-		Z_UNSET_ISREF_P(matches);
+		ZVAL_UNREF(matches);
 
 		if (zend_is_true(ret) && Z_TYPE_P(matches) == IS_ARRAY) {
 			array_init(return_value);

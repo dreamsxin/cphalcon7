@@ -518,7 +518,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, delete){
 	if (Z_TYPE_P(special_key) != IS_NULL) {
 		PHALCON_CALL_METHOD(&keys, memcache, "get", special_key);
 		if (Z_TYPE_P(keys) == IS_ARRAY) {
-			phalcon_array_unset(&keys, prefixed_key, 0);
+			phalcon_array_unset(keys, prefixed_key, 0);
 			PHALCON_CALL_METHOD(NULL, memcache, "set", special_key, keys);
 		}
 	}

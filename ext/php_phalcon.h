@@ -186,14 +186,14 @@ extern int nusphere_dbg_present;
 #ifndef INIT_PZVAL
 #	define INIT_PZVAL(z)         \
 		Z_SET_REFCOUNT_P(z, 1);  \
-		Z_UNSET_ISREF_P(z);
+		ZVAL_UNREF(z);
 #endif
 
 #ifndef INIT_PZVAL_COPY
 #	define INIT_PZVAL_COPY(z, v) \
 		ZVAL_COPY_VALUE(z, v);   \
 		Z_SET_REFCOUNT_P(z, 1);  \
-		Z_UNSET_ISREF_P(z);
+		ZVAL_UNREF(z);
 #endif
 
 #ifndef ZVAL_COPY_VALUE
@@ -202,14 +202,10 @@ extern int nusphere_dbg_present;
 		Z_TYPE_P(z) = Z_TYPE_P(v);
 #endif
 
-#define Z_UNSET_ISREF_P(zv)				if (Z_ISREF_P(zv)) {ZVAL_UNREF(zv);}
 #define Z_REFCOUNT_PP(ppz)				Z_REFCOUNT_P(*(ppz))
 #define Z_SET_REFCOUNT_PP(ppz, rc)		Z_SET_REFCOUNT_P(*(ppz), rc)
 #define Z_ADDREF_PP(ppz)				Z_ADDREF_P(*(ppz))
 #define Z_DELREF_PP(ppz)				Z_DELREF_P(*(ppz))
-#define Z_ISREF_PP(ppz)					Z_ISREF_P(*(ppz))
-#define Z_SET_ISREF_PP(ppz)				Z_SET_ISREF_P(*(ppz))
-#define Z_UNSET_ISREF_PP(ppz)			Z_UNSET_ISREF_P(*(ppz))
 
 #ifndef HASH_KEY_NON_EXISTENT
 #	define HASH_KEY_NON_EXISTENT    HASH_KEY_NON_EXISTANT

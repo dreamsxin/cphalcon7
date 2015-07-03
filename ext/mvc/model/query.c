@@ -4815,8 +4815,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 					if (phalcon_array_isset(bind_params, wildcard)) {
 						PHALCON_OBS_NVAR(update_value);
 						phalcon_array_fetch(&update_value, bind_params, wildcard, PH_NOISY);
-						phalcon_array_unset(&select_bind_params, wildcard, PH_SEPARATE);
-						phalcon_array_unset(&select_bind_types, wildcard, PH_SEPARATE);
+						phalcon_array_unset(select_bind_params, wildcard, PH_SEPARATE);
+						phalcon_array_unset(select_bind_types, wildcard, PH_SEPARATE);
 					} else {
 						PHALCON_INIT_NVAR(exception_message);
 						PHALCON_CONCAT_SVS(exception_message, "Bound parameter '", wildcard, "' cannot be replaced because it's not in the placeholders list");
@@ -4930,7 +4930,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 					PHALCON_INIT_NVAR(update_sql);
 					ZVAL_STRING(update_sql, Z_STRVAL_P(sql_tmp));
 
-					phalcon_array_unset(&bind_types, wildcard, PH_SEPARATE);
+					phalcon_array_unset(bind_types, wildcard, PH_SEPARATE);
 				} else {
 					phalcon_array_update_zval(processed, &tmp, raw_value, PH_COPY);
 				}
@@ -5098,7 +5098,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 					PHALCON_INIT_NVAR(delete_sql);
 					ZVAL_STRING(delete_sql, Z_STRVAL_P(sql_tmp));
 
-					phalcon_array_unset(&bind_types, &tmp, PH_SEPARATE);
+					phalcon_array_unset(bind_types, &tmp, PH_SEPARATE);
 				} else {
 					phalcon_array_update_zval(processed, &tmp, raw_value, PH_COPY);
 				}

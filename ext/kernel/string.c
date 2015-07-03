@@ -1033,7 +1033,7 @@ void phalcon_base64_encode(zval *return_value, zval *data) {
 
 	zval copy;
 	zend_string *encoded;
-	int use_copy = 0, length;
+	int use_copy = 0;
 
 	if (Z_TYPE_P(data) != IS_STRING) {
 		use_copy = zend_make_printable_zval(data, &copy);
@@ -1061,8 +1061,8 @@ void phalcon_base64_encode(zval *return_value, zval *data) {
 void phalcon_base64_decode(zval *return_value, zval *data) {
 
 	zval copy;
-	char *decoded;
-	int use_copy = 0, length;
+	zend_string *decoded;
+	int use_copy = 0;
 
 	if (Z_TYPE_P(data) != IS_STRING) {
 		use_copy = zend_make_printable_zval(data, &copy);
@@ -1071,14 +1071,14 @@ void phalcon_base64_decode(zval *return_value, zval *data) {
 		}
 	}
 
-	decoded = (char *) php_base64_decode((unsigned char *)(Z_STRVAL_P(data)), Z_STRLEN_P(data), &length);
+	decoded = php_base64_decode((unsigned char *)(Z_STRVAL_P(data)), Z_STRLEN_P(data));
 
 	if (use_copy) {
-		phalcon_dtor(data);
+		phalcon_ptr_dtor(data);
 	}
 
 	if (decoded) {
-		RETURN_STRINGL(decoded, length);
+		RETURN_STR(decoded);
 	} else {
 		RETURN_NULL();
 	}
@@ -1133,7 +1133,7 @@ void phalcon_crc32(zval *return_value, zval *str) {
 	}
 
 	if (use_copy) {
-		phalcon_dtor(str);
+		phalcon_ptr_dtor(str);
 	}
 
 	RETVAL_LONG(crc ^ 0xFFFFFFFF);
@@ -1141,17 +1141,16 @@ void phalcon_crc32(zval *return_value, zval *str) {
 
 int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches)
 {
-	zval *params[] = { regex, subject, matches };
 	int result;
 
 	if (matches) {
-		Z_SET_ISREF_P(matches);
-	}
-
-	result = phalcon_call_func_aparams(return_value, SL("preg_match"), (matches ? 3 : 2), params);
-
-	if (matches) {
-		Z_UNSET_ISREF_P(matches);
+		ZVAL_MAKE_REF(matches);
+		zval params[] = { *regex, *subject, *matches };
+		result = phalcon_call_func_aparams(return_value, SL("preg_match"), 3, params);
+		ZVAL_UNREF(matches);
+	} else {
+		zval params[] = { *regex, *subject };
+		result = phalcon_call_func_aparams(return_value, SL("preg_match"), 2, params);
 	}
 
 	return result;
@@ -1177,9 +1176,9 @@ int phalcon_json_encode(zval *return_value, zval *v, int opts)
 int phalcon_json_decode(zval *return_value, zval *v, zend_bool assoc)
 {
 	zval *zassoc = assoc ? &PHALCON_GLOBAL(z_true) : &PHALCON_GLOBAL(z_false);
-	zval *params[] = { v, zassoc };
+	zval params[] = { *v, *zassoc };
 
-	return phalcon_call_func_aparams(return_value, ZEND_STRL("json_decode"), 2, params);
+	return phalcon_call_func_aparams(return_value, SL("json_decode"), 2, params);
 }
 
 void phalcon_lcfirst(zval *return_value, zval *s)

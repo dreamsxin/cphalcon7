@@ -902,7 +902,7 @@ PHP_METHOD(Phalcon_Date, span2){
 	if (Z_LVAL_P(count_output) == 1) {
 		Z_SET_ISREF_P(output);
 		PHALCON_CALL_FUNCTION(return_value_ptr, "array_pop", output);
-		Z_UNSET_ISREF_P(output);
+		ZVAL_UNREF(output);
 		RETURN_MM();
 	}
 

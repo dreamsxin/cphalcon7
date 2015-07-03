@@ -353,7 +353,7 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 	}
 
 	Z_ADDREF_P(*return_value_ptr);
-	Z_SET_ISREF_P(*return_value_ptr);
+	ZVAL_MAKE_REF(*return_value_ptr);
 }
 
 

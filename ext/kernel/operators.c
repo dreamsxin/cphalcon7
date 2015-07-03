@@ -33,7 +33,7 @@ int phalcon_make_printable_zval(zval *expr, zval *expr_copy){
 	int use_copy = zend_make_printable_zval(expr, expr_copy);
 	if (use_copy) {
 		Z_SET_REFCOUNT_P(expr_copy, 1);
-		Z_UNSET_ISREF_P(expr_copy);
+		ZVAL_UNREF(expr_copy);
 	}
 	return use_copy;
 }

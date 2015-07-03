@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
 
 			if (phalcon_is_equal_object(handler_embeded, handler)) {
-				phalcon_array_unset(&priority_queue, &key, PH_SEPARATE);
+				phalcon_array_unset(priority_queue, &key, PH_SEPARATE);
 			}
 
 		} ZEND_HASH_FOREACH_END();
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
 		PHALCON_INIT_NVAR(events);
 	} else {
 		if (phalcon_array_isset(events, type)) {
-			phalcon_array_unset(&events, type, PH_SEPARATE);
+			phalcon_array_unset(events, type, PH_SEPARATE);
 		}
 	}
 

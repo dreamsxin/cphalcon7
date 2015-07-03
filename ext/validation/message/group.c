@@ -286,7 +286,7 @@ static void phalcon_validation_message_group_unset_dimension(zval *object, zval 
 		array_init_size(messages, 0);
 	}
 	else {
-		phalcon_array_unset(&messages, offset, 0);
+		phalcon_array_unset(messages, offset, 0);
 	}
 
 	if (separate) {

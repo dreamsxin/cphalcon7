@@ -412,13 +412,13 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				/**
 				 * 1024 is ignore the bind type
 				 */
-				Z_SET_ISREF_P(cast_value);
+				ZVAL_MAKE_REF(cast_value);
 				if (phalcon_compare_strict_long(type, 1024)) {
 					PHALCON_CALL_METHOD(NULL, statement, "bindvalue", parameter, cast_value);
 				} else {
 					PHALCON_CALL_METHOD(NULL, statement, "bindvalue", parameter, cast_value, type);
 				}
-				Z_UNSET_ISREF_P(cast_value);
+				ZVAL_UNREF(cast_value);
 
 			} else {
 				PHALCON_INIT_NVAR(type);
@@ -427,14 +427,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				} else {
 					ZVAL_LONG(type, PHALCON_DB_COLUMN_BIND_PARAM_STR);
 				}
-				Z_SET_ISREF_P(value);
+				ZVAL_MAKE_REF(value);
 				PHALCON_CALL_METHOD(NULL, statement, "bindvalue", parameter, value, type);
-				Z_UNSET_ISREF_P(value);
+				ZVAL_UNREF(value);
 			}
 		} else {
-			Z_SET_ISREF_P(value);
+			ZVAL_MAKE_REF(value);
 			PHALCON_CALL_METHOD(NULL, statement, "bindvalue", parameter, value);
-			Z_UNSET_ISREF_P(value);
+			ZVAL_UNREF(value);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -760,10 +760,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 
 	PHALCON_INIT_VAR(bind_pattern);
 	ZVAL_STRING(bind_pattern, "/\\?([0-9]+)|:([a-zA-Z0-9_]+):/");
-	Z_SET_ISREF_P(matches);
+	ZVAL_MAKE_REF(matches);
 
 	PHALCON_CALL_FUNCTION(&status, "preg_match_all", bind_pattern, sql, matches, set_order);
-	Z_UNSET_ISREF_P(matches);
+	ZVAL_UNREF(matches);
 	if (zend_is_true(status)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(matches), place_match) {
 			PHALCON_OBS_NVAR(numeric_place);

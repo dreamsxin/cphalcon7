@@ -33,16 +33,6 @@
 #include <ext/standard/php_filestat.h>
 #include <ext/standard/php_string.h>
 
-#define PHP_STREAM_TO_ZVAL(stream, arg) \
-	php_stream_from_zval_no_verify(stream, arg); \
-	if (stream == NULL) {   \
-		if (return_value) { \
-			RETURN_FALSE;   \
-		} else { \
-			return; \
-		} \
-	}
-
 /**
  * Checks if a file exist
  *
@@ -315,15 +305,12 @@ void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *
 		smart_str_free(&virtual_str);
 		RETURN_FALSE;
 	}
-
 }
 
 void phalcon_file_get_contents(zval *return_value, zval *filename)
 {
-
 	zend_string *contents;
 	php_stream *stream;
-	int len;
 	long maxlen = PHP_STREAM_COPY_ALL;
 	zval *zcontext = NULL;
 	php_stream_context *context = NULL;
@@ -478,13 +465,11 @@ void phalcon_filemtime(zval *return_value, zval *path)
 void phalcon_basename(zval *return_value, zval *path)
 {
 	if (likely(Z_TYPE_P(path) == IS_STRING)) {
-		char *ret;
-		size_t ret_len;
+		zend_string *ret;
 
-		php_basename(Z_STRVAL_P(path), Z_STRLEN_P(path), NULL, 0, &ret, &ret_len);
-		ZVAL_STRINGL(return_value, ret, (int)ret_len);
-	}
-	else {
+		ret = php_basename(Z_STRVAL_P(path), Z_STRLEN_P(path), NULL, 0);
+		ZVAL_STR(return_value, ret);
+	} else {
 		ZVAL_FALSE(return_value);
 	}
 }
@@ -522,7 +507,7 @@ void phalcon_fwrite(zval *return_value, zval *stream_zval, zval *data)
 		}
 	}
 
-	PHP_STREAM_TO_ZVAL(stream, &stream_zval);
+	php_stream_to_zval(stream, stream_zval);
 
 	num_bytes = php_stream_write(stream, Z_STRVAL_P(data), Z_STRLEN_P(data));
 	if (return_value) {
@@ -540,7 +525,7 @@ int phalcon_feof(zval *stream_zval)
 		return 0;
 	}
 
-	php_stream_from_zval_no_verify(stream, &stream_zval);
+	php_stream_from_zval_no_verify(stream, stream_zval);
 	if (stream == NULL) {
 		return 0;
 	}
@@ -557,13 +542,13 @@ int phalcon_fclose(zval *stream_zval)
 		return 0;
 	}
 
-	php_stream_from_zval_no_verify(stream, &stream_zval);
+	php_stream_from_zval_no_verify(stream, stream_zval);
 	if (stream == NULL) {
 		return 0;
 	}
 
 	if ((stream->flags & PHP_STREAM_FLAG_NO_FCLOSE) != 0) {
-		php_error_docref(NULL, E_WARNING, "%d is not a valid stream resource", stream->rsrc_id);
+		php_error_docref(NULL, E_WARNING, "%d is not a valid stream resource", php_stream_get_resource_id(stream));
 		return 0;
 	}
 

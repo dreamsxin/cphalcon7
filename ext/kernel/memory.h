@@ -73,8 +73,6 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var);
 
 #endif
 
-void phalcon_memory_remove(zval **var) PHALCON_ATTR_NONNULL;
-
 int ZEND_FASTCALL phalcon_clean_restore_stack();
 
 /* Virtual symbol tables */
@@ -121,7 +119,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 #define PHALCON_INIT_ZVAL_NREF(z) \
 	ALLOC_ZVAL(z); \
 	Z_SET_REFCOUNT_P(z, 0); \
-	Z_UNSET_ISREF_P(z);
+	ZVAL_UNREF(z);
 
 #define PHALCON_INIT_VAR(z) \
 	PHALCON_MEMORY_ALLOC(&z)
@@ -134,11 +132,11 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 					Z_DELREF_P(z);                    \
 					ALLOC_ZVAL(z);                    \
 					Z_SET_REFCOUNT_P(z, 1);           \
-					Z_UNSET_ISREF_P(z);               \
+					ZVAL_UNREF(z);               \
 				} else {                              \
 					phalcon_ptr_dtor(z);              \
 					Z_SET_REFCOUNT_P(z, 1);           \
-					Z_UNSET_ISREF_P(z);               \
+					ZVAL_UNREF(z);               \
 				}                                     \
 				ZVAL_NULL(z);                         \
 			}                                         \
@@ -155,7 +153,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		phalcon_ptr_dtor(z); \
 		ALLOC_ZVAL(z); \
 		Z_SET_REFCOUNT_P(z, 1); \
-		Z_UNSET_ISREF_P(z); \
+		ZVAL_UNREF(z); \
 		ZVAL_NULL(z); \
 	} else {\
 		phalcon_ptr_dtor(z); \
@@ -172,7 +170,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 				}                                     \
 				ALLOC_ZVAL(z);                        \
 				Z_SET_REFCOUNT_P(z, 1);               \
-				Z_UNSET_ISREF_P(z);                   \
+				ZVAL_UNREF(z);                   \
 			}                                         \
 			ZVAL_NULL(z);                             \
 		} else {                                      \
@@ -187,13 +185,13 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 			Z_DELREF_P(z); \
 			ALLOC_ZVAL(z); \
 			Z_SET_REFCOUNT_P(z, 1); \
-			Z_UNSET_ISREF_P(z); \
+			ZVAL_UNREF(z); \
 		} else { \
 			if (!Z_ISREF_P(z)) { \
 				phalcon_value_dtor(z ZEND_FILE_LINE_CC); \
 			} \
 			Z_SET_REFCOUNT_P(z, 1); \
-			Z_UNSET_ISREF_P(z); \
+			ZVAL_UNREF(z); \
 		} \
 		ZVAL_NULL(z); \
 	} else { \
@@ -227,7 +225,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		*d = *v;                                      \
 		zval_copy_ctor(d);                            \
 		Z_SET_REFCOUNT_P(d, 1);                       \
-		Z_UNSET_ISREF_P(d);                           \
+		ZVAL_UNREF(d);                           \
 	} while (0)
 
 #define PHALCON_MAKE_REFERENCE(d, v)	\
@@ -242,7 +240,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 	Z_TYPE_P(d) = Z_TYPE_P(v); \
 	d->value = v->value; \
 	Z_SET_REFCOUNT_P(d, 1); \
-	Z_SET_ISREF_P(d);
+	ZVAL_MAKE_REF(d);
 
 /* */
 #define PHALCON_OBS_VAR(z) \
@@ -286,7 +284,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		}                                             \
 	} while (0)
 
-#define PHALCON_SEPARATE(z) SEPARATE_ZVAL(&z)
+#define PHALCON_SEPARATE(z) SEPARATE_ZVAL(z)
 #define PHALCON_SEPARATE_PARAM(z)                     \
 	do {                                              \
 		zval *orig_ptr = z;                           \
@@ -295,7 +293,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		*z = *orig_ptr;                               \
 		zval_copy_ctor(z);                            \
 		Z_SET_REFCOUNT_P(z, 1);                       \
-		Z_UNSET_ISREF_P(z);                           \
+		ZVAL_UNREF(z);                           \
 	} while (0)
 
 #define PHALCON_SEPARATE_PARAM_NMO(z) { \
@@ -305,7 +303,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 			*z = *orig_ptr; \
 			zval_copy_ctor(z); \
 			Z_SET_REFCOUNT_P(z, 1); \
-			Z_UNSET_ISREF_P(z); \
+			ZVAL_UNREF(z); \
 		} \
 	}
 

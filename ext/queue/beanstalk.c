@@ -675,7 +675,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		}
 	}
 
-	php_stream_from_zval_no_verify(stream, &connection);
+	php_stream_from_zval_no_verify(stream, connection);
 	if (!stream) {
 		RETURN_MM_FALSE;
 	}
@@ -764,7 +764,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, write){
 		}
 	}
 
-	php_stream_from_zval_no_verify(stream, &connection);
+	php_stream_from_zval_no_verify(stream, connection);
 	if (!stream) {
 		RETURN_MM_FALSE;
 	}
@@ -791,14 +791,14 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, disconnect){
 		RETURN_FALSE;
 	}
 
-	php_stream_from_zval_no_verify(stream, &connection);
+	php_stream_from_zval_no_verify(stream, connection);
 	if (!stream) {
 		RETURN_FALSE;
 	}
 
 	if ((stream->flags & PHP_STREAM_FLAG_NO_FCLOSE) == 0) {
 		if (!stream->is_persistent) {
-			zend_list_delete(stream->rsrc_id);
+			zend_list_delete(stream->res);
 		}
 		else {
 			php_stream_pclose(stream);

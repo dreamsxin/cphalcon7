@@ -724,36 +724,32 @@ PHP_METHOD(Phalcon_Crypt, encryptBase64){
  */
 PHP_METHOD(Phalcon_Crypt, decryptBase64){
 
-	zval **text, **key = NULL, **safe = NULL, *decrypt_text;
-	char *decoded;
-	int decoded_len;
+	zval *text, *key = NULL, *safe = NULL, decrypt_text;
+	zend_string *decoded;
 
 	phalcon_fetch_params(0, 1, 2, &text, &key, &safe);
 
 	PHALCON_ENSURE_IS_STRING(text);
+
 	if (!key) {
-		key = &&PHALCON_GLOBAL(z_null);
+		key = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (safe && zend_is_true(*safe)) {
-		char *tmp = estrndup(Z_STRVAL_P(*text), Z_STRLEN_P(*text));
-		php_strtr(tmp, Z_STRLEN_P(*text), "-_", "+/", 2);
-		decoded = (char*)php_base64_decode((unsigned char*)tmp, Z_STRLEN_P(*text), &decoded_len);
+	if (safe && zend_is_true(safe)) {
+		char *tmp = estrndup(Z_STRVAL_P(text), Z_STRLEN_P(text));
+		php_strtr(tmp, Z_STRLEN_P(text), "-_", "+/", 2);
+		decoded = php_base64_decode((unsigned char*)tmp, Z_STRLEN_P(text), &decoded_len);
 		efree(tmp);
-	}
-	else {
-		decoded = (char*)php_base64_decode((unsigned char*)(Z_STRVAL_P(*text)), Z_STRLEN_P(*text), &decoded_len);
+	} else {
+		decoded = php_base64_decode((unsigned char*)(Z_STRVAL_P(text)), Z_STRLEN_P(text), &decoded_len);
 	}
 
 	if (!decoded) {
 		RETURN_FALSE;
 	}
 
-	PHALCON_MM_GROW();
-	PHALCON_ALLOC_GHOST_ZVAL(decrypt_text);
-	ZVAL_STRINGL(decrypt_text, decoded, decoded_len);
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "decrypt", decrypt_text, *key);
-	RETURN_MM();
+	ZVAL_STR(&decrypt_text, decoded);
+	PHALCON_RETURN_CALL_METHODW(this_ptr, "decrypt", decrypt_text, *key);
 }
 
 /**

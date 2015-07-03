@@ -2912,7 +2912,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 			phalcon_array_fetch(&column, column_map, &tmp, PH_NOISY);
 
 			if (!PHALCON_IS_EQUAL(column, &tmp)) {
-				phalcon_array_unset(&conditions, &tmp, 0);
+				phalcon_array_unset(conditions, &tmp, 0);
 				phalcon_array_update_zval(conditions, column, value2, PH_COPY);
 			}
 		} else {

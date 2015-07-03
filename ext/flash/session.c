@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Flash_Session, getMessages){
 			if (phalcon_array_isset_fetch(&return_messages, messages, type)) {
 				RETVAL_ZVAL(return_messages, 1, 0);
 				if (zend_is_true(remove)) {
-					phalcon_array_unset(&messages, type, 0);
+					phalcon_array_unset(messages, type, 0);
 					PHALCON_CALL_METHOD(NULL, this_ptr, "_setsessionmessages", messages);
 				}
 

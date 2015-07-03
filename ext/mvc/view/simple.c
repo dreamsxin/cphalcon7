@@ -571,11 +571,6 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 		}
 	}
 
-	/** 
-	 * Create a virtual symbol table
-	 */
-	phalcon_create_symbol_table();
-
 	phalcon_ob_start();
 
 	view_params = phalcon_read_property(this_ptr, SL("_viewParams"), PH_NOISY);
@@ -671,12 +666,6 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 		} else {
 			PHALCON_CPY_WRT(merged_params, params);
 		}
-
-		/** 
-		 * Create a virtual symbol table
-		 */
-		phalcon_create_symbol_table();
-
 	} else {
 		PHALCON_CPY_WRT(merged_params, params);
 	}

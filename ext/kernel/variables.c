@@ -90,7 +90,7 @@ void phalcon_var_export(zval **var) {
  */
 void phalcon_var_export_ex(zval *return_value, zval **var) {
 
-    smart_str buf = { NULL, 0, 0 };
+    smart_str buf = { 0 };
 
     php_var_export_ex(var, 1, &buf);
     smart_str_0(&buf);

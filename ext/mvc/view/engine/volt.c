@@ -229,12 +229,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 	 * Export the variables into the current symbol table
 	 */
 	if (Z_TYPE_P(*params) == IS_ARRAY) {
-		if (!EG(active_symbol_table)) {
-			zend_rebuild_symbol_table();
-		}
-
 		zend_hash_merge_ex(
-			EG(active_symbol_table),
+			EG(symbol_table),
 			Z_ARRVAL_P(*params),
 			(copy_ctor_func_t)zval_add_ref,
 			sizeof(zval*),

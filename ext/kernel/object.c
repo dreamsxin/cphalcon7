@@ -1253,31 +1253,16 @@ int phalcon_method_exists_ce(const zend_class_entry *ce, const zval *method_name
  */
 int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_name, uint32_t method_len)
 {
-
 	return (ce && zend_hash_str_exists(&ce->function_table, method_name, method_len)) ? SUCCESS : FAILURE;
 }
 
 /**
  * Query a static property value from a zend_class_entry
  */
-int phalcon_read_static_property(zval **result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length){
+int phalcon_read_static_property(zval *result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length){
 	zend_class_entry *ce;
 	if ((ce = zend_lookup_class(zend_string_init(class_name, class_length, 0))) != NULL) {
-		return phalcon_read_static_property_ce(result, ce, property_name, property_length);
-	}
-
-	return FAILURE;
-}
-
-int phalcon_read_class_property(zval **result, int type, const char *property, uint32_t len) {
-	zend_class_entry *ce;
-
-	type |= (ZEND_FETCH_CLASS_SILENT | ZEND_FETCH_CLASS_NO_AUTOLOAD);
-	type &= ZEND_FETCH_CLASS_MASK;
-	ce    = zend_fetch_class(NULL, type);
-
-	if (likely(ce != NULL)) {
-		return phalcon_read_static_property_ce(result, ce, property, len);
+		ZVAL_ZVAL(result, phalcon_read_static_property_ce(ce, property_name, property_length), 1, 0);
 	}
 
 	return FAILURE;

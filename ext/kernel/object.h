@@ -133,8 +133,7 @@ int phalcon_property_decr(zval *object, const char *property_name, uint32_t prop
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index) PHALCON_ATTR_NONNULL;
 
 /** Static properties */
-int phalcon_read_static_property(zval **result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length) PHALCON_ATTR_NONNULL;
-int phalcon_read_class_property(zval **result, int type, const char *property, uint32_t len) PHALCON_ATTR_NONNULL;
+int phalcon_read_static_property(zval *result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length) PHALCON_ATTR_NONNULL;
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);
 
 PHALCON_ATTR_NONNULL

@@ -3664,7 +3664,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 			phalcon_array_fetch_string(&unique_id, ast, SL("id"), PH_NOISY);
 
 			PHALCON_OBS_NVAR(ir_phql_cache);
-			phalcon_read_static_property(&ir_phql_cache, SL("phalcon\\mvc\\model\\query"), SL("_irPhqlCache"));
+			phalcon_read_static_property(ir_phql_cache, SL("phalcon\\mvc\\model\\query"), SL("_irPhqlCache"));
 
 			if (phalcon_array_isset_fetch(&ir_phql_cache2, ir_phql_cache, type) && phalcon_array_isset(ir_phql_cache2, unique_id)) {
 				PHALCON_OBS_NVAR(ir_phql);

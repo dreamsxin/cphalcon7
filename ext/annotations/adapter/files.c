@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	zval **key, **data, *annotations_dir;
 	zval *virtual_key, *path, *php_export;
 	zval *status;
-	smart_str exp = { NULL, 0, 0 };
+	smart_str exp = { 0 };
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 	PHALCON_ENSURE_IS_STRING(key);

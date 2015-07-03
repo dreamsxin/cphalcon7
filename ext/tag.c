@@ -717,8 +717,6 @@ PHP_METHOD(Phalcon_Tag, resetInput){
 
 	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_displayValues"), empty_array);
 
-	phalcon_set_symbol_str(SS("_POST"), empty_array);
-
 	zval_ptr_dtor(&empty_array);
 }
 

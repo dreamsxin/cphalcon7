@@ -1474,7 +1474,7 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 	HashPosition hp0;
 	zval **hd;
 	int only_successful;
-	smart_str prefix = { NULL, 0, 0 };
+	smart_str prefix = { 0 };
 
 	PHALCON_MM_GROW();
 

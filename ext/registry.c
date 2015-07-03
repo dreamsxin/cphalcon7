@@ -399,7 +399,7 @@ static int phalcon_registry_compare_objects(zval *object1, zval *object2)
 static int phalcon_registry_serialize(zval *object, unsigned char **buffer, uint32_t *buf_len, zend_serialize_data *data)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
-	smart_str buf = { NULL, 0, 0 };
+	smart_str buf = { 0 };
 	php_serialize_data_t var_hash;
 
 	PHP_VAR_SERIALIZE_INIT(var_hash);
@@ -733,7 +733,7 @@ static PHP_METHOD(Phalcon_Registry, jsonSerialize)
 static PHP_METHOD(Phalcon_Registry, serialize)
 {
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_registry_object);
-	smart_str buf = { NULL, 0, 0 };
+	smart_str buf = { 0 };
 	php_serialize_data_t var_hash;
 
 	PHP_VAR_SERIALIZE_INIT(var_hash);

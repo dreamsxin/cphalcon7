@@ -507,7 +507,7 @@ void phalcon_fwrite(zval *return_value, zval *stream_zval, zval *data)
 		}
 	}
 
-	php_stream_to_zval(stream, stream_zval);
+	php_stream_from_zval(stream, stream_zval);
 
 	num_bytes = php_stream_write(stream, Z_STRVAL_P(data), Z_STRLEN_P(data));
 	if (return_value) {

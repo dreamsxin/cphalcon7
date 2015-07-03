@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	zval *message, *type, *time, *context, *formatter = NULL, *applied_format = NULL;
 	zval *initialized, *index;
 	sapi_header_line h = { NULL, 0, 0 };
-	smart_str str      = { NULL, 0, 0 };
+	smart_str str      = { 0 };
 	int size, offset;
 	int separate_index = 0;
 	size_t num_bytes;

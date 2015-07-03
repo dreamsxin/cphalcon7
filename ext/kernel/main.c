@@ -40,9 +40,6 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 	/* Memory options */
 	phalcon_globals->active_memory = NULL;
 
-	/* Virtual Symbol Tables */
-	phalcon_globals->active_symbol_table = NULL;
-
 	/* Recursive Lock */
 	phalcon_globals->recursive_lock = 0;
 

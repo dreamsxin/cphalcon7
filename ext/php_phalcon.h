@@ -106,9 +106,6 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 	phalcon_memory_entry *end_memory;      /**< The last preallocate frame */
 	phalcon_memory_entry *active_memory;   /**< The current memory frame */
 
-	/** Virtual Symbol Tables */
-	phalcon_symbol_table *active_symbol_table;
-
 	/** Frequently used zvals */
 	zval z_null;
 	zval z_true;

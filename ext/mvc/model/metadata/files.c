@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 
 	zval **key, **data, *meta_data_dir, *virtual_key;
 	zval *path, *php_export, *status;
-	smart_str exp = { NULL, 0, 0 };
+	smart_str exp = { 0 };
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 

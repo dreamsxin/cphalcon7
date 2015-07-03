@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	zval *payload, *body, *backtrace = NULL, *meta, *encoded;
 	zval *show_backtrace, *enable_labels;
 	int i_show_backtrace, i_enable_labels;
-	smart_str result = { NULL, 0, 0 };
+	smart_str result = { 0 };
 	uint i;
 	Bucket *p;
 

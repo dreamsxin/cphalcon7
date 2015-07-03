@@ -75,14 +75,6 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var);
 
 int ZEND_FASTCALL phalcon_clean_restore_stack();
 
-/* Virtual symbol tables */
-void phalcon_create_symbol_table();
-void phalcon_clean_symbol_tables();
-
-/** Export symbols to active symbol table */
-int phalcon_set_symbol(zval *key_name, zval *value);
-int phalcon_set_symbol_str(char *key_name, unsigned int key_length, zval *value);
-
 void ZEND_FASTCALL phalcon_copy_ctor(zval *destiny, zval *origin) PHALCON_ATTR_NONNULL;
 
 void ZEND_FASTCALL phalcon_ptr_dtor(zval *var);

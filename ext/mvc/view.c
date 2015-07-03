@@ -1522,11 +1522,6 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
 
 	/** 
-	 * Create a virtual symbol table
-	 */
-	phalcon_create_symbol_table();
-
-	/** 
 	 * Call beforeRender if there is an events manager
 	 */
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
@@ -1798,12 +1793,6 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 		 * Update the parameters with the new ones
 		 */
 		phalcon_update_property_this(this_ptr, SL("_viewParams"), new_params);
-
-		/** 
-		 * Create a virtual symbol table
-		 */
-		phalcon_create_symbol_table();
-
 	}
 
 	partials_dir = phalcon_read_property(this_ptr, SL("_partialsDir"), PH_NOISY);

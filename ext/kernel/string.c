@@ -1158,18 +1158,17 @@ int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *mat
 
 int phalcon_json_encode(zval *return_value, zval *v, int opts)
 {
-	zval *zopts;
-	zval *params[2];
+	zval zopts;
+	zval params[2];
 	int result;
 
-	PHALCON_ALLOC_GHOST_ZVAL(zopts);
-	ZVAL_LONG(zopts, opts);
+	ZVAL_LONG(&zopts, opts);
 
-	params[0] = v;
+	params[0] = *v;
 	params[1] = zopts;
-	result = phalcon_call_func_aparams(return_value, ZEND_STRL("json_encode"), 2, params);
+	result = phalcon_call_func_aparams(return_value, SL("json_encode"), 2, params);
 
-	phalcon_ptr_dtor(zopts);
+	phalcon_dtor(zopts);
 	return result;
 }
 
@@ -1238,7 +1237,7 @@ void phalcon_ucfirst(zval *return_value, zval *s)
 int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 {
 	if (Z_TYPE_P(params) == IS_ARRAY || Z_TYPE_P(params) == IS_OBJECT) {
-		smart_str formstr = { NULL, 0, 0 };
+		smart_str formstr = { 0 };
 		int res;
 
 		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
@@ -1270,7 +1269,6 @@ void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, z
 	zend_string *escaped;
 	char *cs;
 	int qs, use_copy = 0;
-	size_t escaped_len;
 
 	if (unlikely(Z_TYPE_P(string) != IS_STRING)) {
 		use_copy = zend_make_printable_zval(string, &copy);
@@ -1296,7 +1294,6 @@ void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval 
 	zend_string *escaped;
 	char *cs;
 	int qs, use_copy = 0;
-	size_t escaped_len;
 
 	if (unlikely(Z_TYPE_P(string) != IS_STRING)) {
 		use_copy = zend_make_printable_zval(string, &copy);
@@ -1336,7 +1333,7 @@ void phalcon_date(zval *return_value, zval *format, zval *timestamp)
 	long int ts;
 	zval copy;
 	int use_copy = 0;
-	char *formatted;
+	zend_string *formatted;
 
 	if (unlikely(Z_TYPE_P(format) != IS_STRING)) {
 		use_copy = zend_make_printable_zval(format, &copy);
@@ -1348,7 +1345,7 @@ void phalcon_date(zval *return_value, zval *format, zval *timestamp)
 	ts = (timestamp) ? phalcon_get_intval(timestamp) : time(NULL);
 
 	formatted = php_format_date(Z_STRVAL_P(format), Z_STRLEN_P(format), ts, 1);
-	ZVAL_STRING(return_value, formatted);
+	ZVAL_STR(return_value, formatted);
 
 	if (unlikely(use_copy)) {
 		phalcon_dtor(copy);

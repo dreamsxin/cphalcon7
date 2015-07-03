@@ -163,25 +163,12 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 {
 	size_t i;
 	phalcon_memory_entry *prev, *active_memory;
-	phalcon_symbol_table *active_symbol_table;
 	zval **ptr;
 
 	active_memory = g->active_memory;
 	assert(active_memory != NULL);
 
 	if (EXPECTED(!CG(unclean_shutdown))) {
-		/* Clean active symbol table */
-		if (g->active_symbol_table) {
-			active_symbol_table = g->active_symbol_table;
-			if (active_symbol_table->scope == active_memory) {
-				zend_hash_destroy(&EG(symbol_table));
-				FREE_HASHTABLE(&EG(symbol_table));
-				EG(current_execute_data)->symbol_table = active_symbol_table->symbol_table;
-				g->active_symbol_table = active_symbol_table->prev;
-				efree(active_symbol_table);
-			}
-		}
-
 		/* Check for non freed hash key zvals, mark as null to avoid string freeing */
 		for (i = 0; i < active_memory->hash_pointer; ++i) {
 			assert(active_memory->hash_addresses[i] != NULL && *(active_memory->hash_addresses[i]) != NULL);
@@ -624,92 +611,6 @@ void ZEND_FASTCALL phalcon_copy_ctor(zval *destination, zval *origin) {
 	} else {
 		ZVAL_NULL(origin);
 	}
-}
-
-/**
- * Creates virtual symbol tables dynamically
- */
-void phalcon_create_symbol_table() {
-
-	phalcon_symbol_table *entry;
-	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
-	HashTable *symbol_table;
-
-#ifndef PHALCON_RELEASE
-	if (!phalcon_globals_ptr->active_memory) {
-		fprintf(stderr, "ERROR: Trying to create a virtual symbol table without a memory frame");
-		phalcon_print_backtrace();
-		return;
-	}
-#endif
-
-	entry = (phalcon_symbol_table *) emalloc(sizeof(phalcon_symbol_table));
-	entry->scope = phalcon_globals_ptr->active_memory;
-	entry->symbol_table = EG(active_symbol_table);
-	entry->prev = phalcon_globals_ptr->active_symbol_table;
-	phalcon_globals_ptr->active_symbol_table = entry;
-
-	ALLOC_HASHTABLE(symbol_table);
-	zend_hash_init(symbol_table, 0, NULL, ZVAL_PTR_DTOR, 0);
-	EG(active_symbol_table) = symbol_table;
-}
-
-/**
- * Restores all the virtual symbol tables
- */
-void phalcon_clean_symbol_tables() {
-
-	/*unsigned int i;
-
-	if (PHALCON_GLOBAL(symbol_tables)) {
-		for (i = PHALCON_GLOBAL(number_symbol_tables); i > 0; i--) {
-			EG(active_symbol_table) = PHALCON_GLOBAL(symbol_tables)[i - 1];
-		}
-		efree(PHALCON_GLOBAL(symbol_tables));
-		PHALCON_GLOBAL(symbol_tables) = NULL;
-	}*/
-}
-
-/**
- * Exports symbols to the active symbol table
- */
-int phalcon_set_symbol(zval *key_name, zval *value) {
-
-	if (!EG(active_symbol_table)) {
-		zend_rebuild_symbol_table();
-	}
-
-	if (EG(active_symbol_table)) {
-		if (Z_TYPE_P(key_name) == IS_STRING) {
-			Z_ADDREF_P(value);
-			zend_hash_update(EG(active_symbol_table), Z_STR_P(key_name), &value);
-			if (EG(exception)) {
-				return FAILURE;
-			}
-		}
-	}
-
-	return SUCCESS;
-}
-
-/**
- * Exports a string symbol to the active symbol table
- */
-int phalcon_set_symbol_str(char *key_name, unsigned int key_length, zval *value) {
-
-	if (!EG(active_symbol_table)) {
-		zend_rebuild_symbol_table();
-	}
-
-	if (&EG(symbol_table)) {
-		Z_ADDREF_P(value);
-		zend_hash_str_update(&EG(symbol_table), key_name, key_length, value);
-		if (EG(exception)) {
-			return FAILURE;
-		}
-	}
-
-	return SUCCESS;
 }
 
 static inline void phalcon_dtor_func(zval *zvalue ZEND_FILE_LINE_DC)

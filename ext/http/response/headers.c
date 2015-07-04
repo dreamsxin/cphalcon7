@@ -174,18 +174,17 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 				zval *http_header;
 				
 				PHALCON_ALLOC_GHOST_ZVAL(http_header);
-				PHALCON_CONCAT_VSV(http_header, &header, ": ", value);
+				PHALCON_CONCAT_VSV(http_header, header, ": ", value);
 				ctr.line     = Z_STRVAL_P(http_header);
 				ctr.line_len = Z_STRLEN_P(http_header);
 				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
-				zval_ptr_dtor(&http_header);
-			}
-			else if (Z_TYPE(header) == IS_STRING) {
-				ctr.line     = Z_STRVAL(header);
-				ctr.line_len = Z_STRLEN(header);
+				zval_ptr_dtor(http_header);
+			} else if (Z_TYPE_P(header) == IS_STRING) {
+				ctr.line     = Z_STRVAL_P(header);
+				ctr.line_len = Z_STRLEN_P(header);
 				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
 			} else {
-				zval *tmp, *pheader = &header;
+				zval *tmp, *pheader = header;
 
 				PHALCON_ALLOC_GHOST_ZVAL(tmp);
 				ZVAL_ZVAL(tmp, pheader, 1, 0);
@@ -195,7 +194,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 				ctr.line_len = Z_STRLEN_P(tmp);
 				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
 
-				zval_ptr_dtor(&tmp);
+				zval_ptr_dtor(tmp);
 			}
 		}
 	
@@ -211,15 +210,8 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
  */
 PHP_METHOD(Phalcon_Http_Response_Headers, reset){
 
-	zval *empty_array;
 
-	PHALCON_MM_GROW();
-
-	PHALCON_INIT_VAR(empty_array);
-	array_init(empty_array);
-	phalcon_update_property_this(getThis(), SL("_headers"), empty_array);
-	
-	PHALCON_MM_RESTORE();
+	phalcon_update_property_empty_array(getThis(), SL("_headers"));
 }
 
 /**
@@ -241,10 +233,9 @@ PHP_METHOD(Phalcon_Http_Response_Headers, toArray){
  */
 PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 
-	zval *data, *headers, *data_headers, *value = NULL, *key = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *data, *headers, *data_headers, *value = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 	PHALCON_INIT_NVAR(option);
 	array_init_size(option, 3);
 
-	phalcon_array_update_string_string(&option, SL("statsKey"), SL("$PMM$"), PH_COPY);
+	phalcon_array_update_string_string(option, SL("statsKey"), SL("$PMM$"), PH_COPY);
 
 	phalcon_array_update_string(option, SL("host"), host, PH_COPY);
 	phalcon_array_update_string(option, SL("port"), port, PH_COPY);

@@ -93,7 +93,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 
 	zval *config, *limit, *page, *data;
 
-	phalcon_fetch_params(0, 0, 1, 0, &config);
+	phalcon_fetch_params(0, 1, 0, &config);
 	
 	if (phalcon_array_isset_string_fetch(&limit, config, SS("limit"))) {
 		phalcon_update_property_this(getThis(), SL("_limitRows"), limit);

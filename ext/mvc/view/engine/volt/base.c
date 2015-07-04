@@ -199,7 +199,7 @@ int phvolt_parse_view(zval *result, zval *view_code, zval *template_path){
 	if (phvolt_internal_parse_view(&result, view_code, template_path, &error_msg) == FAILURE) {
 		if (likely(error_msg != NULL)) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, Z_STRVAL_P(error_msg));
-			zval_ptr_dtor(&error_msg);
+			zval_ptr_dtor(error_msg);
 		}
 		else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Error parsing the view");
@@ -725,7 +725,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 			if (parser_status->ret) {
 				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
 				ZVAL_NULL(parser_status->ret);
-				zval_ptr_dtor(&parser_status->ret);
+				zval_ptr_dtor(parser_status->ret);
 			} else {
 				array_init(*result);
 			}

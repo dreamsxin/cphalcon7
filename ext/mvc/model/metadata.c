@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 4, 0, &model, &key, &table, &schema);
+	phalcon_fetch_params(1, 4, 0, &model, &key, &table, &schema);
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
@@ -313,7 +313,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setStrategy){
 
 	zval *strategy;
 
-	phalcon_fetch_params(0, 0, 1, 0, &strategy);
+	phalcon_fetch_params(0, 1, 0, &strategy);
 
 	if (Z_TYPE_P(strategy) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data extraction strategy is not valid");
@@ -359,7 +359,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 1);
 
 	PHALCON_CALL_METHOD(&table, model, "getsource");
@@ -458,7 +458,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 4, 0, &model, &index, &data, &replace);
+	phalcon_fetch_params(1, 4, 0, &model, &index, &data, &replace);
 	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 1);
 
 	if (Z_TYPE_P(index) != IS_LONG) {
@@ -533,7 +533,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 1);
 
 	if (!PHALCON_GLOBAL(orm).column_renaming) {
@@ -618,14 +618,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttributes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_ALLOC_GHOST_ZVAL(what);
 	ZVAL_LONG(what, PHALCON_MVC_MODEL_METADATA_MODELS_ATTRIBUTES);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "readmetadataindex", model, what);
-	if (return_value_ptr) {
-		return_value = *return_value_ptr;
-	}
 
 	if (Z_TYPE_P(return_value) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupted");
@@ -651,7 +648,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getPrimaryKeyAttributes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 1);
@@ -681,7 +678,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getNonPrimaryKeyAttributes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 2);
@@ -711,7 +708,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getNotNullAttributes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 3);
@@ -742,7 +739,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isNotNull){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &model, &attribute);
+	phalcon_fetch_params(1, 2, 0, &model, &attribute);
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getnotnullattributes", model);
 
@@ -769,7 +766,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataTypes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 4);
@@ -800,7 +797,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataType){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &model, &attribute);
+	phalcon_fetch_params(1, 2, 0, &model, &attribute);
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatatypes", model);
 
@@ -830,7 +827,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSizes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 13);
@@ -861,7 +858,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSize){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &model, &attribute);
+	phalcon_fetch_params(1, 2, 0, &model, &attribute);
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatasizes", model);
 
@@ -892,7 +889,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataBytes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &model, &attribute);
+	phalcon_fetch_params(1, 2, 0, &model, &attribute);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 15);
@@ -929,7 +926,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScales){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 14);
@@ -960,7 +957,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScale){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &model, &attribute);
+	phalcon_fetch_params(1, 2, 0, &model, &attribute);
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatascales", model);
 
@@ -990,7 +987,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataTypesNumeric){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 5);
@@ -1021,7 +1018,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isNumeric){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model, &attribute);
+	phalcon_fetch_params(1, 1, 0, &model, &attribute);
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatatypesnumeric", model);
 
@@ -1048,7 +1045,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getIdentityField){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 8);
@@ -1073,7 +1070,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getBindTypes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 9);
@@ -1103,7 +1100,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDefaultValues){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 12);
@@ -1133,7 +1130,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAutomaticCreateAttributes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 10);
@@ -1163,7 +1160,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAutomaticUpdateAttributes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 11);
@@ -1193,7 +1190,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setAutomaticCreateAttributes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 3, 0, &model, &attributes, &replace);
+	phalcon_fetch_params(1, 3, 0, &model, &attributes, &replace);
 
 	PHALCON_INIT_VAR(create_index);
 	ZVAL_LONG(create_index, 10);
@@ -1218,7 +1215,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setAutomaticUpdateAttributes){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 3, 0, &model, &attributes, &replace);
+	phalcon_fetch_params(1, 3, 0, &model, &attributes, &replace);
 
 	PHALCON_INIT_VAR(create_index);
 	ZVAL_LONG(create_index, 11);
@@ -1243,7 +1240,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getColumnMap){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 0);
@@ -1275,7 +1272,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getReverseColumnMap){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &model);
+	phalcon_fetch_params(1, 1, 0, &model);
 
 	PHALCON_INIT_VAR(index);
 	ZVAL_LONG(index, 1);
@@ -1309,7 +1306,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &model, &attribute);
+	phalcon_fetch_params(1, 2, 0, &model, &attribute);
 
 	if (Z_TYPE_P(attribute) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Attribute must be a string");

@@ -416,14 +416,14 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 			 */
 			if (phalcon_array_isset_string_fetch(&current_value, merged_attributes, SS("value"))) {
 				if (PHALCON_IS_EQUAL(current_value, value)) {
-					phalcon_array_update_string_string(&merged_attributes, SL("checked"), SL("checked"), PH_SEPARATE);
+					phalcon_array_update_string_string(merged_attributes, SL("checked"), SL("checked"), PH_SEPARATE);
 				}
 			} else {
 				/** 
 				 * Evaluate the current value and mark the check as checked
 				 */
 				if (zend_is_true(value)) {
-					phalcon_array_update_string_string(&merged_attributes, SL("checked"), SL("checked"), PH_SEPARATE);
+					phalcon_array_update_string_string(merged_attributes, SL("checked"), SL("checked"), PH_SEPARATE);
 				}
 				phalcon_array_update_string(merged_attributes, SL("value"), value, PH_COPY | PH_SEPARATE);
 			}
@@ -625,11 +625,10 @@ PHP_METHOD(Phalcon_Forms_Element, getLabel){
  */
 PHP_METHOD(Phalcon_Forms_Element, label){
 
-	zval *label, *attributes = NULL, *name = NULL, *html = NULL, *key = NULL, *value = NULL;
+	zval *label, *attributes = NULL, *name = NULL, *html = NULL, *value = NULL;
 	zval *escaped;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -875,12 +874,13 @@ PHP_METHOD(Phalcon_Forms_Element, clear)
  */
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
-	if (FAILURE == phalcon_return_call_method(return_value, return_value_ptr, getThis(), "render", 0, NULL)) {
+	
+	if (FAILURE == phalcon_call_class_method_aparams(&return_value, getThis(), Z_OBJCE_P(getThis()), phalcon_fcall_method, "render", 6, 0, NULL)) {
 		if (EG(exception)) {			
 			zval e;
 			ZVAL_OBJ(&e, EG(exception));
 
-			zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1);
+			zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
 
 			Z_ADDREF_P(m);
 			if (Z_TYPE_P(m) != IS_STRING) {

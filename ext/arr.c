@@ -268,9 +268,6 @@ PHP_METHOD(Phalcon_Arr, path){
 
 	zval *array, *path, *default_value = NULL, *delimiter = NULL;
 	zval *is_array = NULL, *keys = NULL, *key = NULL, *values = NULL, *arr = NULL, *value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -300,7 +297,7 @@ PHP_METHOD(Phalcon_Arr, path){
 	}
 
 	do {
-		Z_SET_ISREF_P(keys);
+		ZVAL_MAKE_REF(keys);
 		PHALCON_CALL_FUNCTION(&key, "array_shift", keys);
 		ZVAL_UNREF(keys);
 
@@ -374,9 +371,6 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 	zval *array, *path, *value, *delimiter = NULL;
 	zval *keys = NULL, *key = NULL, *is_digit = NULL, *cpy_array = NULL, *arr = NULL, *tmp, *is_array = NULL, *joined_keys = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 	int found = 1;
 
 	PHALCON_MM_GROW();
@@ -400,7 +394,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 	// Set current $array to inner-most array  path
 	while ((int) zend_hash_num_elements(Z_ARRVAL_P(keys)) > 1) {
 		PHALCON_INIT_NVAR(key);
-		Z_SET_ISREF_P(keys);
+		ZVAL_MAKE_REF(keys);
 		PHALCON_CALL_FUNCTION(&key, "array_shift", keys);
 		ZVAL_UNREF(keys);
 
@@ -413,7 +407,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 					PHALCON_INIT_NVAR(joined_keys);
 					phalcon_fast_join_str(joined_keys, SL("."), keys);
 
-					Z_SET_ISREF_P(arr);
+					ZVAL_MAKE_REF(arr);
 					PHALCON_CALL_SELF(NULL, "set_path", arr, keys, value);
 					ZVAL_UNREF(arr);
 				}
@@ -440,7 +434,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 	if (found) {
 		PHALCON_INIT_NVAR(key);
-		Z_SET_ISREF_P(keys);
+		ZVAL_MAKE_REF(keys);
 		PHALCON_CALL_FUNCTION(&key, "array_shift", keys);
 		ZVAL_UNREF(keys);
 
@@ -494,7 +488,7 @@ PHP_METHOD(Phalcon_Arr, range){
 
 	array_init(return_value);
 	for (i = s; i <= m; i += s) {
-		phalcon_array_update_long_long(&return_value, i, i, 0);
+		phalcon_array_update_long_long(return_value, i, i, 0);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -528,8 +522,6 @@ PHP_METHOD(Phalcon_Arr, get){
 		array_init(return_value);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
-			PHALCON_GET_HVALUE(key);
-
 			if (phalcon_array_isset(array, key)) {
 				PHALCON_OBS_NVAR(value);
 				phalcon_array_fetch(&value, array, key, PH_NOISY);
@@ -602,7 +594,7 @@ PHP_METHOD(Phalcon_Arr, extract){
 		PHALCON_INIT_NVAR(value);
 		PHALCON_CALL_SELF(&value, "path", array, path, default_value);
 
-		Z_SET_ISREF_P(return_value);
+		ZVAL_MAKE_REF(return_value);
 		PHALCON_CALL_SELF(NULL, "set_path", return_value, path, value);
 		ZVAL_UNREF(return_value);
 	} ZEND_HASH_FOREACH_END();
@@ -671,7 +663,7 @@ PHP_METHOD(Phalcon_Arr, unshift){
 
 	phalcon_array_update_zval(tmp1, key, val, PH_COPY | PH_SEPARATE);
 
-	PHALCON_CALL_FUNCTION(return_value_ptr, "array_reverse", tmp1, tmp);
+	PHALCON_CALL_FUNCTION(&return_value, "array_reverse", tmp1, tmp);
 
 	PHALCON_MM_RESTORE();
 }

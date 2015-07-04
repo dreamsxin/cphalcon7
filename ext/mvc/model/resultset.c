@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 				}
 
 				phalcon_update_property_this(getThis(), SL("_rows"), r);
-				zval_ptr_dtor(&r);
+				zval_ptr_dtor(r);
 			}
 		}
 		else if (Z_TYPE_P(rows) == IS_ARRAY) {
@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetExists){
 
 	PHALCON_CALL_METHODW(&count, getThis(), "count");
 	is_smaller_function(return_value, index, count);
-	zval_ptr_dtor(&count);
+	zval_ptr_dtor(count);
 }
 
 /**

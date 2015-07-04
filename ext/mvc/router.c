@@ -332,12 +332,12 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 			phalcon_fast_explode_str(url_parts, SL("?"), url);
 
 			phalcon_array_fetch_long(&real_uri, url_parts, 0, PH_NOISY);
-			zval_ptr_dtor(&url_parts);
+			zval_ptr_dtor(url_parts);
 			if (PHALCON_IS_NOT_EMPTY(real_uri)) {
 				RETURN_ZVAL(real_uri, 1, 1);
 			}
 
-			zval_ptr_dtor(&real_uri);
+			zval_ptr_dtor(real_uri);
 		}
 	}
 

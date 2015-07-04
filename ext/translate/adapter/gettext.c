@@ -250,10 +250,10 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, exists){
 	}
 
 	if (Z_STRLEN_P(translation) > 0) {
-		zval_ptr_dtor(&translation);
+		zval_ptr_dtor(translation);
 		RETURN_TRUE;
 	}
 	
-	zval_ptr_dtor(&translation);		
+	zval_ptr_dtor(translation);		
 	RETURN_FALSE;
 }

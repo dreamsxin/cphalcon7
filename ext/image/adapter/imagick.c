@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _resize) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &width, &height);
+	phalcon_fetch_params(1, 2, 0, &width, &height);
 
 	im = phalcon_read_property(getThis(), SL("_image"), PH_NOISY);
 
@@ -404,7 +404,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _liquidRescale){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 4, 0, &width, &height, &delta_x, &rigidity);
+	phalcon_fetch_params(1, 4, 0, &width, &height, &delta_x, &rigidity);
 
 	im = phalcon_read_property(getThis(), SL("_image"), PH_NOISY);
 
@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _crop) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 4, 0, &width, &height, &offset_x, &offset_y);
+	phalcon_fetch_params(1, 4, 0, &width, &height, &offset_x, &offset_y);
 
 	im   = phalcon_read_property(getThis(), SL("_image"), PH_NOISY);
 	zero = &PHALCON_GLOBAL(z_zero);
@@ -480,7 +480,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _rotate) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &degrees);
+	phalcon_fetch_params(1, 1, 0, &degrees);
 
 	imagick_pixel_ce = zend_fetch_class(SSL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
 
@@ -563,7 +563,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _sharpen) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &amount);
+	phalcon_fetch_params(1, 1, 0, &amount);
 
 	im = phalcon_read_property(getThis(), SL("_image"), PH_NOISY);
 
@@ -610,7 +610,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _reflection) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 3, 0, &height, &opacity, &fade_in);
+	phalcon_fetch_params(1, 3, 0, &height, &opacity, &fade_in);
 
 	imagick_ce       = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 	imagick_pixel_ce = zend_fetch_class(SSL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
@@ -780,7 +780,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _watermark) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 4, 0, &watermark_image, &offset_x, &offset_y, &opacity);
+	phalcon_fetch_params(1, 4, 0, &watermark_image, &offset_x, &offset_y, &opacity);
 
 	ce0 = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1154,7 +1154,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _mask){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &mask);
+	phalcon_fetch_params(1, 1, 0, &mask);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1209,7 +1209,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _background) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 4, 0, &r, &g, &b, &opacity);
+	phalcon_fetch_params(1, 4, 0, &r, &g, &b, &opacity);
 
 	imagick_ce       = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 	imagick_pixel_ce = zend_fetch_class(SSL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
@@ -1302,7 +1302,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _blur){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &radius);
+	phalcon_fetch_params(1, 1, 0, &radius);
 
 	im = phalcon_read_property(getThis(), SL("_image"), PH_NOISY);
 
@@ -1380,7 +1380,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &file, &quality);
+	phalcon_fetch_params(1, 2, 0, &file, &quality);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1474,7 +1474,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _render) {
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &extension, &quality);
+	phalcon_fetch_params(1, 2, 0, &extension, &quality);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1551,7 +1551,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, shadow)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 5, &color, &opacity, &sigma, &x, &y);
+	phalcon_fetch_params(1, 0, 5, &color, &opacity, &sigma, &x, &y);
 
 	imagickpixel_ce = zend_fetch_class(SSL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
@@ -1654,7 +1654,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, colorize)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &color, &composition);
+	phalcon_fetch_params(1, 1, 1, &color, &composition);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1700,7 +1700,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, gamma)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &gamma, &channel);
+	phalcon_fetch_params(1, 1, 1, &gamma, &channel);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1736,7 +1736,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, levels)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 6, &gamma, &input_min, &input_max, &output_min, &output_max, &channel);
+	phalcon_fetch_params(1, 0, 6, &gamma, &input_min, &input_max, &output_min, &output_max, &channel);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1833,7 +1833,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, brightness_contrast)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &brightness, &contrast);
+	phalcon_fetch_params(1, 2, 0, &brightness, &contrast);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1915,7 +1915,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, hsl)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 3, &hue, &saturation, &lightness);
+	phalcon_fetch_params(1, 0, 3, &hue, &saturation, &lightness);
 
 	if (!hue) {
 		PHALCON_INIT_VAR(hue);
@@ -1969,7 +1969,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, curves_graph)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &fx);
+	phalcon_fetch_params(1, 1, 0, &fx);
 
 	im = phalcon_read_property(getThis(), SL("_image"), PH_NOISY);
 
@@ -1994,7 +1994,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, vignette)
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 2, &color, &composition, &crop_factor);
+	phalcon_fetch_params(1, 1, 2, &color, &composition, &crop_factor);
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -2176,7 +2176,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, convert)
 	PHALCON_MM_GROW();
 
 #ifdef PHALCON_USE_MAGICKWAND
-	phalcon_fetch_params(0, 1, 1, 0, &command);
+	phalcon_fetch_params(1, 1, 0, &command);
 
 	if (Z_TYPE_P(command) != IS_ARRAY) {
 		PHALCON_INIT_VAR(command_parts);

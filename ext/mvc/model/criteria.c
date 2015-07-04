@@ -925,7 +925,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, inWhere) {
 	}
 
 	hidden_param = phalcon_read_property(getThis(), SL("_hiddenParamNumber"), PH_NOISY);
-	SEPARATE_ZVAL(&hidden_param);
+	SEPARATE_ZVAL(hidden_param);
 
 	PHALCON_INIT_VAR(bind_params);
 	array_init(bind_params);
@@ -1004,7 +1004,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, notInWhere) {
 	}
 
 	hidden_param = phalcon_read_property(getThis(), SL("_hiddenParamNumber"), PH_NOISY);
-	SEPARATE_ZVAL(&hidden_param);
+	SEPARATE_ZVAL(hidden_param);
 
 	PHALCON_INIT_VAR(bind_params);
 	array_init(bind_params);

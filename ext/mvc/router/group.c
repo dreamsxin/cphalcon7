@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, __construct){
 
 	zval *paths = NULL;
 
-	phalcon_fetch_params(0, 0, 0, 1, &paths);
+	phalcon_fetch_params(0, 0, 1, &paths);
 
 	if (!paths) {
 		paths = &PHALCON_GLOBAL(z_null);
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setHostname){
 
 	zval *hostname;
 
-	phalcon_fetch_params(0, 0, 1, 0, &hostname);
+	phalcon_fetch_params(0, 1, 0, &hostname);
 
 	phalcon_update_property_this(getThis(), SL("_hostname"), hostname);
 	RETURN_THISW();
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setPrefix){
 
 	zval *prefix;
 
-	phalcon_fetch_params(0, 0, 1, 0, &prefix);
+	phalcon_fetch_params(0, 1, 0, &prefix);
 
 	phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
 	RETURN_THISW();
@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, beforeMatch){
 
 	zval *before_match;
 
-	phalcon_fetch_params(0, 0, 1, 0, &before_match);
+	phalcon_fetch_params(0, 1, 0, &before_match);
 
 	phalcon_update_property_this(getThis(), SL("_beforeMatch"), before_match);
 	RETURN_THISW();
@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setPaths){
 
 	zval *paths;
 
-	phalcon_fetch_params(0, 0, 1, 0, &paths);
+	phalcon_fetch_params(0, 1, 0, &paths);
 
 	phalcon_update_property_this(getThis(), SL("_paths"), paths);
 
@@ -451,7 +451,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, add){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 2, &pattern, &paths, &http_methods);
+	phalcon_fetch_params(1, 1, 2, &pattern, &paths, &http_methods);
 
 	if (!paths) {
 		paths = &PHALCON_GLOBAL(z_null);
@@ -469,7 +469,7 @@ static void phalcon_mvc_router_group_add_helper(INTERNAL_FUNCTION_PARAMETERS, co
 {
 	zval *pattern, *paths = NULL, *http_method;
 
-	phalcon_fetch_params(0, 0, 1, 1, &pattern, &paths);
+	phalcon_fetch_params(0, 1, 1, &pattern, &paths);
 
 	if (!paths) {
 		paths = &PHALCON_GLOBAL(z_null);
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, clear){
 	PHALCON_ALLOC_GHOST_ZVAL(empty_routes);
 	array_init(empty_routes);
 	phalcon_update_property_this(getThis(), SL("_routes"), empty_routes);
-	zval_ptr_dtor(&empty_routes);
+	zval_ptr_dtor(empty_routes);
 }
 
 /**

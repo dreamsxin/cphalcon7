@@ -757,9 +757,6 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 	 * The injected service must be an object
 	 */
 	PHALCON_RETURN_CALL_METHOD(dependency_injector, "getshared", cache_service);
-	if (return_value_ptr) {
-		return_value = *return_value_ptr;
-	}
 
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "The injected caching service is invalid");

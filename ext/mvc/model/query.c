@@ -1106,9 +1106,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				PHALCON_OBS_VAR(value);
 				phalcon_array_fetch_string(&value, expr, SL("value"), PH_NOISY);
 
-				INIT_ZVAL(question_mark);
-				INIT_ZVAL(colon);
-
 				ZVAL_STRING(&question_mark, "?");
 				ZVAL_STRING(&colon, ":");
 
@@ -1204,7 +1201,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 							return;
 						}
 						
-						phalcon_array_update_string_long(&return_value, SL("times"), value_times, PH_COPY);
+						phalcon_array_update_string_long(return_value, SL("times"), value_times, PH_COPY);
 					} else {
 						PHALCON_THROW_EXCEPTION_FORMAT(phalcon_mvc_model_exception_ce, "Unknown bind type: %s", Z_STRVAL_P(value_type));
 						return;
@@ -1722,23 +1719,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 	switch (phalcon_get_intval(type)) {
 
 		case PHQL_T_INNERJOIN:
-			RETVAL_STRING("INNER", 1);
+			RETVAL_STRING("INNER");
 			break;
 
 		case PHQL_T_LEFTJOIN:
-			RETVAL_STRING("LEFT", 1);
+			RETVAL_STRING("LEFT");
 			break;
 
 		case PHQL_T_RIGHTJOIN:
-			RETVAL_STRING("RIGHT", 1);
+			RETVAL_STRING("RIGHT");
 			break;
 
 		case PHQL_T_CROSSJOIN:
-			RETVAL_STRING("CROSS", 1);
+			RETVAL_STRING("CROSS");
 			break;
 
 		case PHQL_T_FULLJOIN:
-			RETVAL_STRING("FULL OUTER", 1);
+			RETVAL_STRING("FULL OUTER");
 			break;
 
 		default: {
@@ -2962,7 +2959,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 				phalcon_array_update_str(sql_column, IS(balias), alias, PH_COPY | PH_SEPARATE);
 				phalcon_array_update_str(sql_column, IS(sqlAlias), alias, PH_COPY | PH_SEPARATE);
 				phalcon_array_update_zval(sql_columns, alias, sql_column, PH_COPY | PH_SEPARATE);
-				phalcon_array_update_zval_bool(&sql_column_aliases, alias, 1, PH_SEPARATE);
+				phalcon_array_update_zval_bool(sql_column_aliases, alias, 1, PH_SEPARATE);
 			} else {
 
 				/** 
@@ -3926,7 +3923,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			/** 
 			 * Mark the type of connection in the connection flags
 			 */
-			phalcon_array_update_zval_bool(&connections, type, 1, PH_SEPARATE);
+			phalcon_array_update_zval_bool(connections, type, 1, PH_SEPARATE);
 
 			PHALCON_INIT_NVAR(connection_types);
 			phalcon_fast_count(connection_types, connections);
@@ -4140,7 +4137,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				PHALCON_INIT_NVAR(string_wildcard);
 				PHALCON_CONCAT_SV(string_wildcard, ":", &tmp);
 
-				SEPARATE_ZVAL(&value);
+				SEPARATE_ZVAL(value);
 				convert_to_string(value);
 
 				PHALCON_INIT_NVAR(sql_tmp);
@@ -4921,7 +4918,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 					PHALCON_INIT_NVAR(string_wildcard);
 					PHALCON_CONCAT_SV(string_wildcard, ":", &tmp);
 
-					SEPARATE_ZVAL(&raw_value);
+					SEPARATE_ZVAL(raw_value);
 					convert_to_string(raw_value);
 
 					PHALCON_INIT_NVAR(sql_tmp);
@@ -5089,7 +5086,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 					PHALCON_INIT_NVAR(string_wildcard);
 					PHALCON_CONCAT_SV(string_wildcard, ":", &tmp);
 
-					SEPARATE_ZVAL(&raw_value);
+					SEPARATE_ZVAL(raw_value);
 					convert_to_string(raw_value);
 
 					PHALCON_INIT_NVAR(sql_tmp);
@@ -5659,7 +5656,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 
 			PHALCON_CALL_METHOD(&connection_type, connection, "gettype");
 
-			phalcon_array_update_zval_bool(&connections, connection_type, 1, PH_SEPARATE);
+			phalcon_array_update_zval_bool(connections, connection_type, 1, PH_SEPARATE);
 
 			PHALCON_INIT_NVAR(connection_types);
 			phalcon_fast_count(connection_types, connections);

@@ -304,7 +304,7 @@ PHP_METHOD(Phalcon_Http_Request_File, isUploadedFile) {
 	}
 
 	if (phalcon_call_method(&tmp_name, getThis(), "gettempname", 0, NULL) == SUCCESS) {
-		if (Z_TYPE_P(tmp_name) == IS_STRING && zend_hash_exists(SG(rfc1867_uploaded_files), Z_STRVAL_P(tmp_name), Z_STRLEN_P(tmp_name) + 1)) {
+		if (Z_TYPE_P(tmp_name) == IS_STRING && zend_hash_exists(SG(rfc1867_uploaded_files), Z_STR_P(tmp_name))) {
 			RETVAL_TRUE;
 		}
 		else {
@@ -312,7 +312,7 @@ PHP_METHOD(Phalcon_Http_Request_File, isUploadedFile) {
 		}
 	}
 
-	zval_ptr_dtor(&tmp_name);
+	zval_ptr_dtor(tmp_name);
 }
 
 /**

@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 
 	zval *options, *data;
 
-	phalcon_fetch_params(0, 0, 1, 0, &options);
+	phalcon_fetch_params(0, 1, 0, &options);
 	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Invalid options");
@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 	HashPosition hp0;
 	zval **value;
 
-	phalcon_fetch_params(0, 0, 1, 1, &index, &placeholders);
+	phalcon_fetch_params(0, 1, 1, &index, &placeholders);
 	
 	if (!placeholders) {
 		placeholders = &PHALCON_GLOBAL(z_null);
@@ -180,12 +180,12 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 			PHALCON_STR_REPLACE(replaced, key_placeholder, value, translation);
 			zval_dtor(key_placeholder);
 
-			zval_ptr_dtor(&translation);
+			zval_ptr_dtor(translation);
 			translation = replaced;
 		}
 
 		ZVAL_NULL(key_placeholder);
-		zval_ptr_dtor(&key_placeholder);
+		zval_ptr_dtor(key_placeholder);
 		RETURN_ZVAL(translation, 1, 1);
 	}
 

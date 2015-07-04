@@ -440,7 +440,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut){
 			PHALCON_INIT_NVAR(put);
 			array_init(put);
 
-			PHALCON_ENSURE_IS_STRING(&raw);
+			PHALCON_ENSURE_IS_STRING(raw);
 			tmp = estrndup(Z_STRVAL_P(raw), Z_STRLEN_P(raw));
 			sapi_module.treat_data(PARSE_STRING, tmp, put);
 
@@ -590,7 +590,7 @@ PHP_METHOD(Phalcon_Http_Request, hasPut){
 			PHALCON_INIT_NVAR(put);
 			array_init(put);
 
-			PHALCON_ENSURE_IS_STRING(&raw);
+			PHALCON_ENSURE_IS_STRING(raw);
 			tmp = estrndup(Z_STRVAL_P(raw), Z_STRLEN_P(raw));
 			sapi_module.treat_data(PARSE_STRING, tmp, put);
 
@@ -678,12 +678,12 @@ PHP_METHOD(Phalcon_Http_Request, getScheme){
 	PHALCON_CALL_METHOD(&https, getThis(), "getserver", https_header);
 	if (zend_is_true(https)) {
 		if (PHALCON_IS_STRING(https, "off")) {
-			RETVAL_STRING("http", 1);
+			RETVAL_STRING("http");
 		} else {
-			RETVAL_STRING("https", 1);
+			RETVAL_STRING("https");
 		}
 	} else {
-		RETVAL_STRING("http", 1);
+		RETVAL_STRING("http");
 	}
 
 	PHALCON_MM_RESTORE();
@@ -773,7 +773,6 @@ PHP_METHOD(Phalcon_Http_Request, getRawBody){
 	php_stream *stream = php_stream_open_wrapper_ex("php://input", "rb", REPORT_ERRORS, NULL, context);
 	zend_string *content;
 	long int maxlen    = PHP_STREAM_COPY_ALL;
-	int len;
 
 	if (!stream) {
 		RETURN_FALSE;
@@ -1037,8 +1036,6 @@ static const char* phalcon_http_request_getmethod_helper()
 	const char *method = SG(request_info).request_method;
 	if (unlikely(!method)) {
 		zval *_SERVER, key;
-
-		INIT_ZVAL(key);
 		ZVAL_STRING(&key, "REQUEST_METHOD");
 
 		_SERVER = phalcon_get_global(SS("_SERVER"));
@@ -1077,9 +1074,8 @@ PHP_METHOD(Phalcon_Http_Request, getMethod){
  */
 PHP_METHOD(Phalcon_Http_Request, getURI){
 
-	zval *value, *_SERVER, key = zval_used_for_init;
+	zval *value, *_SERVER, key;
 
-	INIT_ZVAL(key);
 	ZVAL_STRING(&key, "REQUEST_URI");
 
 	_SERVER = phalcon_get_global(SS("_SERVER"));
@@ -1117,9 +1113,6 @@ PHP_METHOD(Phalcon_Http_Request, getUserAgent){
 PHP_METHOD(Phalcon_Http_Request, isMethod){
 
 	zval *methods, *http_method = NULL, *method = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1381,7 +1374,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 		HashPosition pos_name, pos_type, pos_tmp, pos_error, pos_size;
 		zval *dname, *dtype, *dtmp, *derror, *dsize;
 		zval *arr, *file, *key;
-		size_t prefix_len = prefix->len;
+		size_t prefix_len = prefix->s->len;
 		int res;
 
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(name),     &pos_name);
@@ -1397,12 +1390,12 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 			(derror = zend_hash_get_current_data_ex(Z_ARRVAL_P(error), &pos_error)) != NULL && 
 			(dsize = zend_hash_get_current_data_ex(Z_ARRVAL_P(size), &pos_size)) != NULL
 		) {
-			zval index = phalcon_get_current_key_w(Z_ARRVAL_P(name), &pos_name);
+			zval *index = phalcon_get_current_key_w(Z_ARRVAL_P(name), &pos_name);
 
-			if (Z_TYPE(index) == IS_STRING) {
-				smart_str_appendl(prefix, Z_STRVAL(index), Z_STRLEN(index));
+			if (Z_TYPE_P(index) == IS_STRING) {
+				smart_str_appendl(prefix, Z_STRVAL_P(index), Z_STRLEN_P(index));
 			} else {
-				smart_str_append_long(prefix, Z_LVAL(index));
+				smart_str_append_long(prefix, Z_LVAL_P(index));
 			}
 
 			if (Z_TYPE_P(derror) < IS_ARRAY) {
@@ -1429,12 +1422,12 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 					object_init_ex(file, phalcon_http_request_file_ce);
 
 					{
-						zval params[] = { arr, key };
+						zval *params[] = { arr, key };
 						res = phalcon_call_method(NULL, file, "__construct", 2, params);
 					}
 
-					zval_ptr_dtor(&arr);
-					zval_ptr_dtor(&key);
+					zval_ptr_dtor(arr);
+					zval_ptr_dtor(key);
 
 					if (res != FAILURE) {
 						add_next_index_zval(return_value, file);

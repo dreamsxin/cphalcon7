@@ -666,9 +666,8 @@ static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, co
 /**
  * Reads a property from an object
  */
-zval* phalcon_read_property(zval *object, const char *property_name, size_t property_length, int silent) {
-
-	zval rv;
+zval* phalcon_read_property(zval *object, const char *property_name, size_t property_length, int silent)
+{
 	zend_class_entry *ce;
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
@@ -683,13 +682,14 @@ zval* phalcon_read_property(zval *object, const char *property_name, size_t prop
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
-	return zend_read_property(ce, object, property_name, property_length, silent, &rv);
+	return zend_read_property(ce, object, property_name, property_length, silent, NULL);
 }
 
 /**
  * Checks whether obj is an object and updates property with long value
  */
-int phalcon_update_property_long(zval *object, const char *property_name, uint32_t property_length, long value) {
+int phalcon_update_property_long(zval *object, const char *property_name, uint32_t property_length, long value)
+{
 
 	zval *v;
 
@@ -1158,6 +1158,35 @@ int phalcon_update_property_empty_array(zval *object, const char *property_name,
 	array_init(empty_array);
 
 	return phalcon_update_property_zval(object, property_name, property_length, empty_array);
+}
+
+/**
+ * Checks if an array property exists on object
+ */
+int phalcon_isset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index) {
+
+	zval *tmp;
+
+	if (Z_TYPE_P(object) == IS_OBJECT) {
+		tmp = phalcon_read_property(object, property, property_length, PH_NOISY);
+		return phalcon_array_isset(tmp, index);
+	}
+
+	return 0;
+}
+
+/**
+ * Reads a array property from an object
+ */
+zval *phalcon_read_property_array(zval *object, const char *property, size_t property_length, const zval *index) {
+
+	zval *tmp, *retval;
+
+	if ((tmp = phalcon_read_property(object, property, property_length, PH_NOISY)) == NULL || !phalcon_array_isset_fetch(&retval, tmp, index)) {
+		retval = &EG(uninitialized_zval);
+	}
+
+	return retval;
 }
 
 /**

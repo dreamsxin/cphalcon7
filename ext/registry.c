@@ -326,7 +326,7 @@ static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int typ
 			ret = newval;
 		}
 
-		Z_SET_ISREF_P(ret);
+		ZVAL_MAKE_REF(ret);
 	}
 
 	return ret;
@@ -453,7 +453,7 @@ static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, con
  */
 static void phalcon_registry_iterator_dtor(zend_object_iterator *it)
 {
-	zval_ptr_dtor(&it->data);
+	zval_ptr_dtor(it->data);
 	efree(it);
 }
 
@@ -536,8 +536,6 @@ static PHP_METHOD(Phalcon_Registry, __get)
 {
 	zval **property, *result;
 	phalcon_registry_object *obj;
-
-	assert(return_value_ptr != NULL);
 
 	phalcon_fetch_params(0, 1, 0, &property);
 

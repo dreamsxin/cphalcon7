@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	uint i;
 	Bucket *p;
 
-	phalcon_fetch_params(0, 0, 4, 0, &message, &type, &timestamp, &context);
+	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
 	/*
 	 * We intentionally do not use Phalcon's MM for better performance.
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	{
 		zval *params[] = { type };
 		if (FAILURE == phalcon_call_method(&type_str, getThis(), "gettypestring", 1, params)) {
-			zval_ptr_dtor(&interpolated);
+			zval_ptr_dtor(interpolated);
 			return;
 		}
 	}
@@ -306,13 +306,13 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	/* Convert everything to JSON */
 	ALLOC_INIT_ZVAL(encoded);
 	if (FAILURE == phalcon_json_encode(encoded, payload, 0)) {
-		zval_ptr_dtor(&payload);
-		zval_ptr_dtor(&encoded);
+		zval_ptr_dtor(payload);
+		zval_ptr_dtor(encoded);
 		return;
 	}
 
 	/* As promised, kill the payload and all associated elements */
-	zval_ptr_dtor(&payload);
+	zval_ptr_dtor(payload);
 
 	/*
 	 * We don't want to use Phalcon's concatenation API because it
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	}
 
 	/* We don't need the JSON message anymore */
-	zval_ptr_dtor(&encoded);
+	zval_ptr_dtor(encoded);
 	/* Do not free the smart string because we steal its data for zval */
 	RETURN_STR(result.s);
 }

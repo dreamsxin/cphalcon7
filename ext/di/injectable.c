@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setEventsManager)
 {
 	zval *events_manager;
 
-	phalcon_fetch_params(0, 0, 1, 0, &events_manager);
+	phalcon_fetch_params(0, 1, 0, &events_manager);
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 
 	phalcon_update_property_this(getThis(), SL("_eventsManager"), events_manager);
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 2, &event_name, &data, &cancelable);
+	phalcon_fetch_params(1, 1, 2, &event_name, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(&event_name);
 
 	if (!data) {
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 2, &event_name, &data, &cancelable);
+	phalcon_fetch_params(1, 1, 2, &event_name, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(&event_name);
 
 	if (!data) {

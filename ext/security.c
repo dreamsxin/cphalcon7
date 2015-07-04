@@ -550,9 +550,6 @@ PHP_METHOD(Phalcon_Security, hash)
 	ZVAL_STRINGL(z_salt, salt, salt_len);
 
 	PHALCON_RETURN_CALL_FUNCTION("crypt", *password, z_salt);
-	if (return_value_ptr) {
-		return_value = *return_value_ptr;
-	}
 
 	if (Z_STRLEN_P(return_value) < 13) {
 		zval_dtor(return_value);
@@ -627,7 +624,7 @@ PHP_METHOD(Phalcon_Security, isLegacyHash){
 
 	zval *password_hash;
 
-	phalcon_fetch_params(0, 0, 1, 0, &password_hash);
+	phalcon_fetch_params(0, 1, 0, &password_hash);
 
 	if (phalcon_start_with_str(password_hash, SL("$2a$"))) {
 		RETURN_TRUE;
@@ -649,7 +646,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 1, &number_bytes);
+	phalcon_fetch_params(0, 0, 1, &number_bytes);
 
 	if (!number_bytes) {
 		PHALCON_INIT_VAR(number_bytes);
@@ -701,7 +698,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 1, &number_bytes);
+	phalcon_fetch_params(0, 0, 1, &number_bytes);
 
 	if (!number_bytes) {
 		PHALCON_INIT_VAR(number_bytes);
@@ -752,7 +749,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 2, &token_key, &token_value);
+	phalcon_fetch_params(0, 0, 2, &token_key, &token_value);
 
 	if (!token_value) {
 		token_value = &PHALCON_GLOBAL(z_null);

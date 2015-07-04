@@ -73,7 +73,7 @@ static void psr_log_abstractlogger_log_helper(INTERNAL_FUNCTION_PARAMETERS, cons
 	zend_call_function(&fci, &fcic);
 
 	if (retval) {
-		zval_ptr_dtor(&retval);
+		zval_ptr_dtor(retval);
 	}
 }
 

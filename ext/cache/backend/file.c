@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, __construct){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &frontend, &options);
+	phalcon_fetch_params(1, 1, 1, &frontend, &options);
 
 	if (!options || !phalcon_array_isset_string(options, SS("cacheDir"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory must be specified with the option cacheDir");
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	prefix  = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
+	phalcon_fetch_params(1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
@@ -328,7 +328,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, delete){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &key_name);
+	phalcon_fetch_params(1, 1, 0, &key_name);
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	prefix  = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 1, &prefix);
+	phalcon_fetch_params(1, 0, 1, &prefix);
 
 	array_init(return_value);
 
@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 2, &key_name, &lifetime);
+	phalcon_fetch_params(1, 0, 2, &key_name, &lifetime);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);

@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addModuleResource){
 	phalcon_array_append(scope, handler, 0);
 	phalcon_array_append(scope, module, 0);
 	phalcon_update_property_array_append(getThis(), SL("_handlers"), scope);
-	zval_ptr_dtor(&scope);
+	zval_ptr_dtor(scope);
 
 	phalcon_update_property_this(getThis(), SL("_processed"), &PHALCON_GLOBAL(z_false));
 

@@ -756,7 +756,6 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	PHALCON_MM_GROW();
 
-	INIT_ZVAL(star);
 	ZVAL_STRING(&star, "*");
 
 	phalcon_fetch_params(1, 3, 0, &role, &resource, &access);

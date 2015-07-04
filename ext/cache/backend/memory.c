@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
 
 	if (Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, save){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
+	phalcon_fetch_params(1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, delete){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &key_name);
+	phalcon_fetch_params(1, 1, 0, &key_name);
 
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 1, &prefix);
+	phalcon_fetch_params(1, 0, 1, &prefix);
 
 	if (prefix && unlikely(Z_TYPE_P(prefix) != IS_STRING)) {
 		PHALCON_SEPARATE_PARAM(prefix);
@@ -288,7 +288,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, exists){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 2, &key_name, &lifetime);
+	phalcon_fetch_params(1, 0, 2, &key_name, &lifetime);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);

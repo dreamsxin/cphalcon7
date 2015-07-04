@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Text, increment){
 	if (phalcon_array_isset_long(parts, 1)) {
 		PHALCON_OBS_VAR(number);
 		phalcon_array_fetch_long(&number, parts, 1, PH_NOISY);
-		SEPARATE_ZVAL(&number);
+		SEPARATE_ZVAL(number);
 		phalcon_increment(number);
 	} else {
 		number = &PHALCON_GLOBAL(z_one);

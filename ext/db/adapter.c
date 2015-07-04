@@ -1564,7 +1564,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 
 	zval *table, *schema = NULL, *dialect, *fetch_num, *sql = NULL, *describe = NULL;
 	zval *indexes, *index = NULL, *key_name = NULL, *column_name = NULL;
-	zval *index_columns = NULL, *name = NULL;
+	zval *index_columns = NULL;
 	zend_string *str_key;
 	ulong idx;
 
@@ -1647,10 +1647,9 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 	zval *referenced_schema = NULL, *referenced_table = NULL;
 	zval *reference_array = NULL, *column_name = NULL, *referenced_columns = NULL;
 	zval *array_reference = NULL;
-	zval *name = NULL, *columns = NULL, *definition = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zval *columns = NULL, *definition = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -1705,11 +1704,11 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
 		PHALCON_OBS_NVAR(column_name);
 		phalcon_array_fetch_long(&column_name, reference, 1, PH_NOISY);
-		phalcon_array_update_zval_string_append_multi_3(&references, constraint_name, SL("columns"), column_name, 0);
+		phalcon_array_update_zval_string_append_multi_3(references, constraint_name, SL("columns"), column_name, 0);
 
 		PHALCON_OBS_NVAR(referenced_columns);
 		phalcon_array_fetch_long(&referenced_columns, reference, 5, PH_NOISY);
-		phalcon_array_update_zval_string_append_multi_3(&references, constraint_name, SL("referencedColumns"), referenced_columns, 0);
+		phalcon_array_update_zval_string_append_multi_3(references, constraint_name, SL("referencedColumns"), referenced_columns, 0);
 	} ZEND_HASH_FOREACH_END();
 
 	array_init(return_value);

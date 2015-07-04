@@ -191,13 +191,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 		case PHANNOT_T_DOUBLE:
 		case PHANNOT_T_STRING:
 		case PHANNOT_T_IDENTIFIER:
-			if (return_value_ptr) {
-				zval_ptr_dtor(return_value_ptr);
-				phalcon_array_fetch_string(return_value_ptr, expr, SL("value"), PH_NOISY);
-			}
-			else {
-				phalcon_array_fetch_string(&return_value, expr, SL("value"), PH_NOISY);
-			}
+			phalcon_array_fetch_string(&return_value, expr, SL("value"), PH_NOISY);
 			RETURN_MM();
 			/* no break because of implicit return */
 	

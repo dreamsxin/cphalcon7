@@ -1136,7 +1136,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 			PHALCON_INIT_VAR(escaped_fields);
 			array_init(escaped_fields);
 
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(base_fieldsath), field) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(fields), field) {
 				PHALCON_INIT_NVAR(escaped_field);
 				PHALCON_CONCAT_VVV(escaped_field, escape_char, field, escape_char);
 				phalcon_array_append(escaped_fields, escaped_field, 0);
@@ -1169,11 +1169,13 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 
 	zval *definition, *quoting = NULL, *tables, *fields, *values, *escape_char;
 	zval *sql, *updated_tables, *table = NULL, *table_expression = NULL, *tables_sql = NULL;
-	zval *updated_fields, *position = NULL, *column = NULL, *column_name = NULL, *column_expression = NULL, *columns_sql = NULL;
+	zval *updated_fields, *column = NULL, *column_name = NULL, *column_expression = NULL, *columns_sql = NULL;
 	zval *value_expr = NULL, *value = NULL, *value_expression = NULL;
 	zval *where_conditions, *where_expression = NULL;
 	zval *order_fields, *order_items, *order_item = NULL, *order_expression = NULL, *order_sql_item = NULL, *sql_order_type = NULL, *order_sql_item_type = NULL, *order_sql;
 	zval *limit_value, *number, *offset, *tmp1 = NULL, *tmp2 = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

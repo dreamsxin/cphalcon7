@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Crypt, setCipher){
 
 	zval *cipher;
 
-	phalcon_fetch_params(0, 0, 1, 0, &cipher);
+	phalcon_fetch_params(0, 1, 0, &cipher);
 
 	phalcon_update_property_this(getThis(), SL("_cipher"), cipher);
 	RETURN_THISW();
@@ -464,7 +464,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &source, &key);
+	phalcon_fetch_params(0, 1, 1, &source, &key);
 
 	handler = phalcon_read_property(getThis(), SL("_beforeEncrypt"), PH_NOISY);
 
@@ -586,7 +586,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &text, &key);
+	phalcon_fetch_params(1, 1, 1, &text, &key);
 
 	if (phalcon_function_exists_ex(SS("mcrypt_get_iv_size")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "mcrypt extension is required");
@@ -695,7 +695,7 @@ PHP_METHOD(Phalcon_Crypt, encryptBase64){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 2, &text, &key, &safe);
+	phalcon_fetch_params(1, 1, 2, &text, &key, &safe);
 
 	if (!key) {
 		key = &PHALCON_GLOBAL(z_null);
@@ -783,7 +783,7 @@ PHP_METHOD(Phalcon_Crypt, beforeEncrypt){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &handler);
+	phalcon_fetch_params(1, 1, 0, &handler);
 	
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
@@ -805,7 +805,7 @@ PHP_METHOD(Phalcon_Crypt, afterEncrypt){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &handler);
+	phalcon_fetch_params(1, 1, 0, &handler);
 	
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
@@ -827,7 +827,7 @@ PHP_METHOD(Phalcon_Crypt, beforeDecrypt){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &handler);
+	phalcon_fetch_params(1, 1, 0, &handler);
 	
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
@@ -849,7 +849,7 @@ PHP_METHOD(Phalcon_Crypt, afterDecrypt){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &handler);
+	phalcon_fetch_params(1, 1, 0, &handler);
 	
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");

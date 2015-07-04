@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	zval *config, *db, *sql, *total_sql, *bind, *limit, *page;
 	long int i_limit;
 
-	phalcon_fetch_params(0, 0, 1, 0, &config);
+	phalcon_fetch_params(0, 1, 0, &config);
 	
 	if (!phalcon_array_isset_string_fetch(&db, config, SS("db"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'db' is required");
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setDb){
 
 	zval *db;
 
-	phalcon_fetch_params(0, 0, 1, 0, &db);
+	phalcon_fetch_params(0, 1, 0, &db);
 	PHALCON_VERIFY_INTERFACE_EX(db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
 
 	phalcon_update_property_this(getThis(), SL("_db"), db);
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	/* Set the limit clause avoiding negative offsets */
 	if (i_number < i_limit) {
 		phalcon_array_update_string(bind, SL("limit"), limit, PH_COPY);
-		phalcon_array_update_string_long(&bind, SL("offset"), 0, 0);
+		phalcon_array_update_string_long(bind, SL("offset"), 0, 0);
 	} else {
 		zval *number;
 		PHALCON_ALLOC_GHOST_ZVAL(number);

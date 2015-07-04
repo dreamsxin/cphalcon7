@@ -106,14 +106,14 @@ static void phalcon_di_service_dtor(void *v)
 	}
 
 	if (obj->definition) {
-		zval_ptr_dtor(&obj->definition);
+		zval_ptr_dtor(obj->definition);
 	}
 
 	if (obj->shared_instance) {
-		zval_ptr_dtor(&obj->shared_instance);
+		zval_ptr_dtor(obj->shared_instance);
 	}
 
-	zend_object_std_dtor(&obj->obj);
+	zend_object_std_dtor(obj->obj);
 	efree(obj);
 }
 
@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_DI_Service, setShared)
 	zval *shared;
 	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
-	phalcon_fetch_params(0, 0, 1, 0, &shared);
+	phalcon_fetch_params(0, 1, 0, &shared);
 	obj->shared = zend_is_true(shared);
 }
 
@@ -294,10 +294,10 @@ PHP_METHOD(Phalcon_DI_Service, setSharedInstance)
 	zval *shared_instance;
 	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
-	phalcon_fetch_params(0, 0, 1, 0, &shared_instance);
+	phalcon_fetch_params(0, 1, 0, &shared_instance);
 
 	if (obj->shared_instance) {
-		zval_ptr_dtor(&obj->shared_instance);
+		zval_ptr_dtor(obj->shared_instance);
 	}
 
 	obj->shared_instance = shared_instance;
@@ -313,10 +313,10 @@ PHP_METHOD(Phalcon_DI_Service, setDefinition)
 	zval *definition;
 	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
-	phalcon_fetch_params(0, 0, 1, 0, &definition);
+	phalcon_fetch_params(0, 1, 0, &definition);
 
 	if (obj->definition) {
-		zval_ptr_dtor(&obj->definition);
+		zval_ptr_dtor(obj->definition);
 	}
 
 	obj->definition = definition;
@@ -347,7 +347,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 	int found;
 	phalcon_di_service_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_di_service_object);
 
-	phalcon_fetch_params(0, 0, 0, 2, &parameters, &dependency_injector);
+	phalcon_fetch_params(0, 0, 2, &parameters, &dependency_injector);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -517,7 +517,7 @@ PHP_METHOD(Phalcon_DI_Service, __set_state){
 
 	zval *attributes, *name, *definition, *shared;
 
-	phalcon_fetch_params(0, 0, 1, 0, &attributes);
+	phalcon_fetch_params(0, 1, 0, &attributes);
 
 	if (
 			!phalcon_array_isset_string_fetch(&name, attributes, SS("_name"))

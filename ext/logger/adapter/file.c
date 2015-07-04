@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, logInternal){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 4, 0, &message, &type, &time, &context);
+	phalcon_fetch_params(1, 4, 0, &message, &type, &time, &context);
 
 	file_handler = phalcon_read_property(getThis(), SL("_fileHandler"), PH_NOISY);
 	if (Z_TYPE_P(file_handler) != IS_RESOURCE) {

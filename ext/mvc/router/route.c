@@ -279,7 +279,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		 * Replace the module part
 		 */
 		if (phalcon_memnstr_str(pattern, SL(":module"))) {
-			INIT_ZVAL(wildcard);
 			ZVAL_STRING(&wildcard, ":module");
 
 			PHALCON_CPY_WRT(pattern_copy, compiled_pattern);
@@ -296,7 +295,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		 * Replace the controller placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL(":controller"))) {
-			INIT_ZVAL(wildcard);
 			ZVAL_STRING(&wildcard, ":controller");
 
 			PHALCON_CPY_WRT(pattern_copy, compiled_pattern);
@@ -313,7 +311,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		 * Replace the namespace placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL(":namespace"))) {
-			INIT_ZVAL(wildcard);
 			ZVAL_STRING(&wildcard, ":namespace");
 
 			PHALCON_CPY_WRT(pattern_copy, compiled_pattern);
@@ -330,7 +327,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		 * Replace the action placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL(":action"))) {
-			INIT_ZVAL(wildcard);
 			ZVAL_STRING(&wildcard, ":action");
 
 			PHALCON_CPY_WRT(pattern_copy, compiled_pattern);
@@ -347,7 +343,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		 * Replace the params placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL(":params"))) {
-			INIT_ZVAL(wildcard);
 			ZVAL_STRING(&wildcard, ":params");
 
 			PHALCON_CPY_WRT(pattern_copy, compiled_pattern);
@@ -355,7 +350,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 			PHALCON_INIT_NVAR(compiled_pattern);
 			if (Z_TYPE_P(regex) != IS_ARRAY || !phalcon_array_isset_string_fetch(&params_pattern, regex, SS(":params"))) {
 				if (phalcon_memnstr_str(pattern, SL("/:params"))) {
-					INIT_ZVAL(wildcard);
 					ZVAL_STRING(&wildcard, "/:params");
 				}
 
@@ -370,7 +364,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		 * Replace the int placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL(":int"))) {
-			INIT_ZVAL(wildcard);
 			ZVAL_STRING(&wildcard, ":int");
 
 			PHALCON_CPY_WRT(pattern_copy, compiled_pattern);

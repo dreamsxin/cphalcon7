@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 	PHALCON_INIT_NVAR(option);
 	array_init(option);
 
-	phalcon_array_update_string_string(&option, SL("statsKey"), SL("$PMM$"), PH_COPY);
+	phalcon_array_update_string_string(option, SL("statsKey"), SL("$PMM$"), PH_COPY);
 
 	phalcon_array_update_string(option, SL("servers"), servers, PH_COPY);
 	if (client) {

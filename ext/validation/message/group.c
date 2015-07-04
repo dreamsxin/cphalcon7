@@ -309,7 +309,7 @@ static int phalcon_validation_message_group_count_elements(zval *object, long in
 	res = phalcon_call_method(&cnt, object, "count", 0, NULL);
 	if (res == SUCCESS) {
 		*count = (Z_TYPE_P(cnt) == IS_LONG) ? Z_LVAL_P(cnt) : phalcon_get_intval(cnt);
-		zval_ptr_dtor(&cnt);
+		zval_ptr_dtor(cnt);
 	}
 
 	return res;
@@ -451,7 +451,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessage){
 
 	zval *message;
 
-	phalcon_fetch_params(0, 0, 1, 0, &message);
+	phalcon_fetch_params(0, 1, 0, &message);
 
 	PHALCON_VERIFY_INTERFACE_EX(message, phalcon_validation_messageinterface_ce, phalcon_validation_exception_ce, 0);
 	phalcon_update_property_array_append(getThis(), SL("_messages"), message);
@@ -476,7 +476,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &messages);
+	phalcon_fetch_params(1, 1, 0, &messages);
 
 	if (Z_TYPE_P(messages) != IS_ARRAY) { 
 		if (Z_TYPE_P(messages) != IS_OBJECT) {
@@ -547,7 +547,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &field_name);
+	phalcon_fetch_params(1, 1, 0, &field_name);
 
 	PHALCON_INIT_VAR(filtered);
 	array_init(filtered);

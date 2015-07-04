@@ -138,10 +138,6 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	 * Get the cache content verifying if it was expired
 	 */
 	PHALCON_RETURN_CALL_METHOD(getThis(), "get", key_name, lifetime);
-	if (return_value_ptr) {
-		return_value = *return_value_ptr;
-	}
-
 	if (Z_TYPE_P(return_value) == IS_NULL) {
 		fresh = &PHALCON_GLOBAL(z_true);
 	

@@ -415,9 +415,6 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 PHP_METHOD(Phalcon_Http_Response_Cookies, send){
 
 	zval *cookies, *cookie = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

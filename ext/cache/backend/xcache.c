@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, __construct){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &frontend, &options);
+	phalcon_fetch_params(1, 1, 1, &frontend, &options);
 	
 	if (!options) {
 		PHALCON_INIT_VAR(options);
@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, __construct){
 	}
 
 	if (!phalcon_array_isset_string(options, SS("statsKey"))) {
-		phalcon_array_update_string_string(&options, SL("statsKey"), SL("_PHCX"), 0);
+		phalcon_array_update_string_string(options, SL("statsKey"), SL("_PHCX"), 0);
 	}
 	
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_xcache_ce, getThis(), "__construct", frontend, options);
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, get){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
 	
 	frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
 	prefix   = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
+	phalcon_fetch_params(1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &key_name);
+	phalcon_fetch_params(1, 1, 0, &key_name);
 	
 	prefix  = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 1, &prefix);
+	phalcon_fetch_params(1, 0, 1, &prefix);
 
 	PHALCON_INIT_VAR(prefixed);
 	if (!prefix) {
@@ -384,7 +384,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, exists){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 2, &key_name, &lifetime);
+	phalcon_fetch_params(1, 0, 2, &key_name, &lifetime);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);

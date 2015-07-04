@@ -321,9 +321,6 @@ static void phalcon_mvc_micro_generic_add(INTERNAL_FUNCTION_PARAMETERS, const ch
 	 * Routes are added to the router
 	 */
 	PHALCON_RETURN_CALL_METHOD(router, method, route_pattern);
-	if (return_value_ptr) {
-		return_value = *return_value_ptr;
-	}
 
 	/**
 	 * Using the id produced by the router we store the handler

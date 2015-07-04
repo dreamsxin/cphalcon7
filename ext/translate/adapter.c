@@ -97,7 +97,7 @@ static int phalcon_translate_adapter_has_dimension(zval *object, zval *offset, i
 	}
 
 	retval = zend_is_true(exists);
-	zval_ptr_dtor(&exists);
+	zval_ptr_dtor(exists);
 	return retval;
 }
 
@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, _){
 
 	zval *translate_key, *placeholders = NULL;
 
-	phalcon_fetch_params(0, 0, 1, 1, &translate_key, &placeholders);
+	phalcon_fetch_params(0, 1, 1, &translate_key, &placeholders);
 
 	if (!placeholders) {
 		placeholders = &PHALCON_GLOBAL(z_null);

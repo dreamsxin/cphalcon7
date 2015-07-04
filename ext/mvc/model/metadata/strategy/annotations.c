@@ -238,26 +238,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 		PHALCON_CALL_METHOD(&feature, column_annotation, "getargument", column_type_name);
 
 		if (PHALCON_IS_STRING(feature, "integer")) {
-			phalcon_array_update_zval_long(&field_types, real_property, 0, 0);
-			phalcon_array_update_zval_long(&field_bind_types, real_property, 1, 0);
-			phalcon_array_update_zval_bool(&numeric_typed, real_property, 1, 0);
+			phalcon_array_update_zval_long(field_types, real_property, 0, 0);
+			phalcon_array_update_zval_long(field_bind_types, real_property, 1, 0);
+			phalcon_array_update_zval_bool(numeric_typed, real_property, 1, 0);
 		} else if (PHALCON_IS_STRING(feature, "decimal")) {
-			phalcon_array_update_zval_long(&field_types, real_property, 3, 0);
-			phalcon_array_update_zval_long(&field_bind_types, real_property, 32, 0);
-			phalcon_array_update_zval_bool(&numeric_typed, real_property, 1, 0);
+			phalcon_array_update_zval_long(field_types, real_property, 3, 0);
+			phalcon_array_update_zval_long(field_bind_types, real_property, 32, 0);
+			phalcon_array_update_zval_bool(numeric_typed, real_property, 1, 0);
 		} else if (PHALCON_IS_STRING(feature, "boolean")) {
-			phalcon_array_update_zval_long(&field_types, real_property, 8, 0);
-			phalcon_array_update_zval_long(&field_bind_types, real_property, 5, 0);
+			phalcon_array_update_zval_long(field_types, real_property, 8, 0);
+			phalcon_array_update_zval_long(field_bind_types, real_property, 5, 0);
 		} else {
 			if (PHALCON_IS_STRING(feature, "date")) {
-				phalcon_array_update_zval_long(&field_types, real_property, 1, 0);
+				phalcon_array_update_zval_long(field_types, real_property, 1, 0);
 			} else {
 				/**
 				 * By default all columns are varchar/string
 				 */
-				phalcon_array_update_zval_long(&field_types, real_property, 2, 0);
+				phalcon_array_update_zval_long(field_types, real_property, 2, 0);
 			}
-			phalcon_array_update_zval_long(&field_bind_types, real_property, 2, 0);
+			phalcon_array_update_zval_long(field_bind_types, real_property, 2, 0);
 		}
 
 		PHALCON_CALL_METHOD(&feature, column_annotation, "getargument", column_size_name);

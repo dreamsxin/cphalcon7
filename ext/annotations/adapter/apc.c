@@ -88,10 +88,6 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read){
 	phalcon_strtolower_inplace(prefixed_key);
 	
 	PHALCON_RETURN_CALL_FUNCTION("apc_fetch", prefixed_key);
-	if (return_value_ptr) {
-		return_value = *return_value_ptr;
-	}
-
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		zval_dtor(return_value);
 		ZVAL_NULL(return_value);

@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	PHALCON_CALL_METHOD(NULL, frontend_data, "__construct", option);
 
-	phalcon_array_update_string_string(&options, SL("statsKey"), SL("$PMM$"), PH_COPY);;
+	phalcon_array_update_string_string(options, SL("statsKey"), SL("$PMM$"), PH_COPY);;
 
 	PHALCON_INIT_VAR(mongo);
 	object_init_ex(mongo, phalcon_cache_backend_mongo_ce);

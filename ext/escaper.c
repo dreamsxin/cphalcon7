@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &str);
+	phalcon_fetch_params(0, 1, 0, &str);
 
 	/**
 	 * Check if charset is ASCII or ISO-8859-1
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Escaper, normalizeEncoding){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, 0, &str);
+	phalcon_fetch_params(0, 1, 0, &str);
 
 	/**
 	 * mbstring is required here
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Escaper, escapeHtml){
 	zval *text;
 	zval *html_quote_type, *encoding;
 
-	phalcon_fetch_params(0, 0, 1, 0, &text);
+	phalcon_fetch_params(0, 1, 0, &text);
 
 	if (Z_TYPE_P(text) == IS_STRING) {
 		html_quote_type = phalcon_read_property(getThis(), SL("_htmlQuoteType"), PH_NOISY);
@@ -312,12 +312,10 @@ PHP_METHOD(Phalcon_Escaper, escapeHtmlAttr){
 
 	zval *attribute, *encoding;
 
-	phalcon_fetch_params(0, 0, 1, 0, &attribute);
+	phalcon_fetch_params(0, 1, 0, &attribute);
 
 	if (Z_TYPE_P(attribute) == IS_STRING && zend_is_true(attribute)) {
 		zval quoting;
-
-		INIT_ZVAL(quoting);
 		ZVAL_LONG(&quoting, ENT_QUOTES);
 
 		encoding = phalcon_read_property(getThis(), SL("_encoding"), PH_NOISY);
@@ -339,7 +337,7 @@ PHP_METHOD(Phalcon_Escaper, escapeCss){
 
 	zval *css, *normalized = NULL;
 
-	phalcon_fetch_params(0, 0, 1, 0, &css);
+	phalcon_fetch_params(0, 1, 0, &css);
 
 	if (Z_TYPE_P(css) == IS_STRING && zend_is_true(css)) {
 		PHALCON_MM_GROW();
@@ -369,7 +367,7 @@ PHP_METHOD(Phalcon_Escaper, escapeJs){
 
 	zval *js, *normalized = NULL;
 
-	phalcon_fetch_params(0, 0, 1, 0, &js);
+	phalcon_fetch_params(0, 1, 0, &js);
 
 	if (Z_TYPE_P(js) == IS_STRING && zend_is_true(js)) {
 		PHALCON_MM_GROW();
@@ -399,7 +397,7 @@ PHP_METHOD(Phalcon_Escaper, escapeUrl){
 
 	zval *url;
 
-	phalcon_fetch_params(0, 0, 1, 0, &url);
+	phalcon_fetch_params(0, 1, 0, &url);
 
 	phalcon_raw_url_encode(return_value, url);
 }

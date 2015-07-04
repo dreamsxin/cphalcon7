@@ -455,25 +455,24 @@ void phalcon_config_construct_internal(zval* this_ptr, zval *array_config)
  * Internal implementation of non-recursive @c toArray(). Used as an alternative
  * to @c get_object_properties().
  */
-PHALCON_ATTR_WARN_UNUSED_RESULT static int phalcon_config_toarray_internal(zval **return_value_ptr, zval *this_ptr)
+PHALCON_ATTR_WARN_UNUSED_RESULT static int phalcon_config_toarray_internal(zval *return_value, zval *this_ptr)
 {
 	phalcon_config_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_config_object);
 	int result;
 
 	assert(!EG(exception));
 	if (likely(obj->obj.ce == phalcon_config_ce)) {
-		array_init_size(*return_value_ptr, zend_hash_num_elements(obj->props));
-		zend_hash_copy(Z_ARRVAL_P(*return_value_ptr), obj->props, (copy_ctor_func_t)zval_add_ref);
+		array_init_size(return_value, zend_hash_num_elements(obj->props));
+		zend_hash_copy(Z_ARRVAL_P(return_value), obj->props, (copy_ctor_func_t)zval_add_ref);
 		return SUCCESS;
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SS("toarray")) == SUCCESS) {
-		zval *return_value = *return_value_ptr;
-		result = phalcon_return_call_method(return_value, return_value_ptr, getThis(), "toarray", 0, NULL);
+		result = phalcon_return_call_method(&return_value, getThis(), "toarray", 0, NULL);
 	}
 	else {
 		zval *params[] = { this_ptr };
-		result = phalcon_call_func_aparams(return_value, SL("get_object_vars"), 1, params);
+		result = phalcon_call_func_aparams(&return_value, SL("get_object_vars"), 1, params);
 	}
 
 	return result;

@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Forms_Manager, create){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 2, &name, &entity);
+	phalcon_fetch_params(1, 0, 2, &name, &entity);
 	
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Forms_Manager, has){
 
 	zval *name, *forms;
 
-	phalcon_fetch_params(0, 0, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 	
 	forms = phalcon_read_property(getThis(), SL("_forms"), PH_NOISY);
 	RETURN_BOOL(phalcon_array_isset(forms, name));

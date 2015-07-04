@@ -190,10 +190,8 @@ PHP_METHOD(Phalcon_Http_Response, __construct){
 PHP_METHOD(Phalcon_Http_Response, setStatusCode){
 
 	zval *code, *message, *headers = NULL, *header_value, *status_value;
-	zval *status_header, *current_headers_raw = NULL, *header_name = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *status_header, *current_headers_raw = NULL;
+	zend_string *str_key;
 
 	PHALCON_MM_GROW();
 

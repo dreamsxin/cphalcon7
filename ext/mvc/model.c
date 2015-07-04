@@ -502,7 +502,7 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
 		|| Z_TYPE_P(messages) != IS_ARRAY
 	) {
 		if (messages) {
-			zval_ptr_dtor(&messages);
+			zval_ptr_dtor(messages);
 		}
 
 		return FAILURE;
@@ -1746,7 +1746,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	PHALCON_OBS_VAR(bind_types);
 	if (phalcon_array_isset_string_fetch(&bind_params, params, SS("bind"))) {
 		Z_ADDREF_P(bind_params);
-		SEPARATE_ZVAL(&bind_params);
+		SEPARATE_ZVAL(bind_params);
 		if (Z_TYPE_P(bind_params) != IS_ARRAY) {
 			zval_dtor(bind_params);
 			array_init_size(bind_params, 1);
@@ -1754,7 +1754,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 		if (phalcon_array_isset_string_fetch(&bind_types, params, SS("bindTypes"))) {
 			Z_ADDREF_P(bind_types);
-			SEPARATE_ZVAL(&bind_types);
+			SEPARATE_ZVAL(bind_types);
 			if (Z_TYPE_P(bind_types) != IS_ARRAY) {
 				zval_dtor(bind_types);
 				array_init_size(bind_types, 1);
@@ -5781,7 +5781,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getSkipAttributesOnUpdate){
 
 	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
 	PHALCON_RETURN_CALL_METHODW(meta_data, "getautomaticupdateattributes", getThis());
-	zval_ptr_dtor(&meta_data);
+	zval_ptr_dtor(meta_data);
 }
 
 /**

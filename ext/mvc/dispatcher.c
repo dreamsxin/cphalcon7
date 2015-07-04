@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 		PHALCON_ALLOC_GHOST_ZVAL(name);
 		PHALCON_CONCAT_SV(name, "\\", controller_name);
 		phalcon_update_property_this(getThis(), SL("_handlerName"), name);
-		zval_ptr_dtor(&name);
+		zval_ptr_dtor(name);
 		phalcon_update_property_this(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_true));
 	}
 	else {

@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isnumeric");
 		if (PHALCON_IS_TRUE(feature)) {
-			phalcon_array_update_zval_bool(&numeric_typed, field_name, 1, PH_COPY);
+			phalcon_array_update_zval_bool(numeric_typed, field_name, 1, PH_COPY);
 		}
 
 		/** 

@@ -304,17 +304,17 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	array_init(jsonrpc_error);
 
 	if (PHALCON_IS_EMPTY(data)) {
-		phalcon_array_update_string_long(&jsonrpc_error, SL("code"), __LINE__, 0);
-		phalcon_array_update_string_string(&jsonrpc_error, SL("message"), SL("Parse error"), 0);
+		phalcon_array_update_string_long(jsonrpc_error, SL("code"), __LINE__, 0);
+		phalcon_array_update_string_string(jsonrpc_error, SL("message"), SL("Parse error"), 0);
 	} else if (Z_TYPE_P(data) != IS_ARRAY) {
-		phalcon_array_update_string_long(&jsonrpc_error, SL("code"), __LINE__, 0);
-		phalcon_array_update_string_string(&jsonrpc_error, SL("message"), SL("Parse error"), 0);
+		phalcon_array_update_string_long(jsonrpc_error, SL("code"), __LINE__, 0);
+		phalcon_array_update_string_string(jsonrpc_error, SL("message"), SL("Parse error"), 0);
 	} else if (!phalcon_array_isset_string(data, SS("jsonrpc"))) {		
-			phalcon_array_update_string_long(&jsonrpc_error, SL("code"), __LINE__, 0);
-			phalcon_array_update_string_string(&jsonrpc_error, SL("message"), SL("Invalid Request"), 0);
+			phalcon_array_update_string_long(jsonrpc_error, SL("code"), __LINE__, 0);
+			phalcon_array_update_string_string(jsonrpc_error, SL("message"), SL("Invalid Request"), 0);
 	} else if (!phalcon_array_isset_string(data, SS("method"))) {
-			phalcon_array_update_string_long(&jsonrpc_error, SL("code"), __LINE__, 0);
-			phalcon_array_update_string_string(&jsonrpc_error, SL("message"), SL("Invalid Request"), 0);
+			phalcon_array_update_string_long(jsonrpc_error, SL("code"), __LINE__, 0);
+			phalcon_array_update_string_string(jsonrpc_error, SL("message"), SL("Invalid Request"), 0);
 	} else {
 		PHALCON_OBS_VAR(jsonrpc_method);
 		phalcon_array_fetch_string(&jsonrpc_method, data, SL("method"), PH_NOISY);
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		RETURN_MM();
 	}
 	
-	phalcon_array_update_string_string(&jsonrpc_message, SL("jsonrpc"), SL("2.0"), 0);
+	phalcon_array_update_string_string(jsonrpc_message, SL("jsonrpc"), SL("2.0"), 0);
 
 	if (PHALCON_IS_NOT_EMPTY(jsonrpc_error)) {
 		phalcon_array_update_string(jsonrpc_message, SL("error"), jsonrpc_error, PH_COPY);

@@ -107,5 +107,5 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, write){
 	PHALCON_ALLOC_GHOST_ZVAL(lowercased_key);
 	phalcon_fast_strtolower(lowercased_key, key);
 	phalcon_update_property_array(getThis(), SL("_data"), lowercased_key, data);
-	zval_ptr_dtor(&lowercased_key);
+	zval_ptr_dtor(lowercased_key);
 }

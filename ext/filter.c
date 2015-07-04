@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 1, &value, &filters, &norecursive);
+	phalcon_fetch_params(0, 2, 1, &value, &filters, &norecursive);
 
 	if (!norecursive) {
 		norecursive = &PHALCON_GLOBAL(z_false);
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 2, 0, &value, &filter);
+	phalcon_fetch_params(0, 2, 0, &value, &filter);
 
 	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&filter_object, filters, filter) && (Z_TYPE_P(filter_object) == IS_OBJECT || phalcon_is_callable(filter_object))) {

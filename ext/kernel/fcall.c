@@ -52,7 +52,12 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 {
 	zval retval, *arguments;
 	HashTable *function_table;
-	int i = 0, status;
+	int i, status, is_null = 0;
+
+	if (*retval_ptr == NULL) {
+		is_null = 1;
+		*retval_ptr = &retval;
+	}
 
 	if (type != phalcon_fcall_function && !object) {
 		object = &EG(current_execute_data)->This;
@@ -71,12 +76,15 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 		ZVAL_ZVAL(&arguments[i], params[i], 1, 0);
 	}
 
-	if ((status = call_user_function(function_table, object, function_name, &retval, param_count, arguments)) == FAILURE || EG(exception)) {
-		*retval_ptr = &retval;
+	if ((status = call_user_function(function_table, object, function_name, *retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+		status = FAILURE;
+		if (is_null) {
+			*retval_ptr = NULL;
+		}
+	} else if (is_null) {
 		Z_TRY_ADDREF_P(*retval_ptr);
-	} else {
-		*retval_ptr = NULL;
 	}
+	zval_dtor(&retval);
 	return status;
 }
 

@@ -126,13 +126,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, setOptions){
 		return;
 	}
 
-	compiler = phalcon_read_property(this_ptr, SL("_compiler"), PH_NOISY);
+	compiler = phalcon_read_property(getThis(), SL("_compiler"), PH_NOISY);
 
 	if (Z_TYPE_P(compiler) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, compiler, "setoptions", options);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_options"), options);
+	phalcon_update_property_this(getThis(), SL("_options"), options);
 	
 }
 
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, setOptions){
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getOptions){
 
 
-	RETURN_MEMBER(this_ptr, "_options");
+	RETURN_MEMBER(getThis(), "_options");
 }
 
 /**
@@ -158,11 +158,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getCompiler){
 
 	PHALCON_MM_GROW();
 
-	compiler = phalcon_read_property(this_ptr, SL("_compiler"), PH_NOISY);
+	compiler = phalcon_read_property(getThis(), SL("_compiler"), PH_NOISY);
 	if (Z_TYPE_P(compiler) != IS_OBJECT) {
-		view = phalcon_read_property(this_ptr, SL("_view"), PH_NOISY);
-		options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
-		dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+		view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
+		options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
+		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	
 		PHALCON_INIT_NVAR(compiler);
 		object_init_ex(compiler, phalcon_mvc_view_engine_volt_compiler_ce);
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getCompiler){
 			PHALCON_CALL_METHOD(NULL, compiler, "setoptions", options);
 		}
 	
-		phalcon_update_property_this(this_ptr, SL("_compiler"), compiler);
+		phalcon_update_property_this(getThis(), SL("_compiler"), compiler);
 	}
 	
 	RETURN_CCTOR(compiler);
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 	/** 
 	 * The compilation process is done by Phalcon\Mvc\View\Engine\Volt\Compiler
 	 */
-	PHALCON_CALL_METHOD(&compiler, this_ptr, "getcompiler");
+	PHALCON_CALL_METHOD(&compiler, getThis(), "getcompiler");
 	PHALCON_CALL_METHOD(NULL, compiler, "compile", *template_path);
 	PHALCON_CALL_METHOD(&compiled_template_path, compiler, "getcompiledtemplatepath");
 	
@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 		PHALCON_INIT_VAR(contents);
 		phalcon_ob_get_contents(contents);
 	
-		view = phalcon_read_property(this_ptr, SL("_view"), PH_NOISY);
+		view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, view, "setcontent", contents);
 	}
 	

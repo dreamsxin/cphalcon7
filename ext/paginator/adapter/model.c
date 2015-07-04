@@ -80,13 +80,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	phalcon_update_property_this(this_ptr, SL("_config"), config);
+	phalcon_update_property_this(getThis(), SL("_config"), config);
 	if (phalcon_array_isset_string_fetch(&limit, config, SS("limit"))) {
-		phalcon_update_property_this(this_ptr, SL("_limitRows"), limit);
+		phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
 	}
 
 	if (phalcon_array_isset_string_fetch(&page, config, SS("page"))) {
-		phalcon_update_property_this(this_ptr, SL("_page"), page);
+		phalcon_update_property_this(getThis(), SL("_page"), page);
 	}
 }
 
@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, setCurrentPage){
 
 	phalcon_fetch_params(0, 1, 0, &page);
 
-	phalcon_update_property_this(this_ptr, SL("_page"), page);
+	phalcon_update_property_this(getThis(), SL("_page"), page);
 	RETURN_THISW();
 }
 
@@ -124,10 +124,10 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	z_one  = &PHALCON_GLOBAL(z_one);
 	z_zero = &PHALCON_GLOBAL(z_zero);
 
-	show        = phalcon_read_property(this_ptr, SL("_limitRows"), PH_NOISY);
-	config      = phalcon_read_property(this_ptr, SL("_config"), PH_NOISY);
+	show        = phalcon_read_property(getThis(), SL("_limitRows"), PH_NOISY);
+	config      = phalcon_read_property(getThis(), SL("_config"), PH_NOISY);
 
-	page_number = phalcon_read_property(this_ptr, SL("_page"), PH_NOISY);
+	page_number = phalcon_read_property(getThis(), SL("_page"), PH_NOISY);
 
 	i_show = (Z_TYPE_P(show) == IS_LONG) ? Z_LVAL_P(show) : phalcon_get_intval(show);
 

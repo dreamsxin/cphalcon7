@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters){
 			ZVAL_LONG(&position, idx);
 		}
 
-		PHALCON_CALL_METHOD(&value, this_ptr, "_buildparameter", dependency_injector, &position, argument);
+		PHALCON_CALL_METHOD(&value, getThis(), "_buildparameter", dependency_injector, &position, argument);
 		phalcon_array_append(build_arguments, value, PH_SEPARATE);
 	} ZEND_HASH_FOREACH_END();
 	
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			/** 
 			 * Resolve the constructor parameters
 			 */
-			PHALCON_CALL_METHOD(&build_arguments, this_ptr, "_buildparameters", dependency_injector, arguments);
+			PHALCON_CALL_METHOD(&build_arguments, getThis(), "_buildparameters", dependency_injector, arguments);
 	
 			/** 
 			 * Create the instance based on the parameters
@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 					/** 
 					 * Resolve the constructor parameters
 					 */
-					PHALCON_CALL_METHOD(&build_arguments, this_ptr, "_buildparameters", dependency_injector, arguments);
+					PHALCON_CALL_METHOD(&build_arguments, getThis(), "_buildparameters", dependency_injector, arguments);
 	
 					/** 
 					 * Call the method on the instance
@@ -465,7 +465,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			/** 
 			 * Resolve the parameter
 			 */
-			PHALCON_CALL_METHOD(&value, this_ptr, "_buildparameter", dependency_injector, &property_position, property_value);
+			PHALCON_CALL_METHOD(&value, getThis(), "_buildparameter", dependency_injector, &property_position, property_value);
 	
 			/** 
 			 * Update the public property

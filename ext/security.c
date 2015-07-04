@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Security, setRandomBytes){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_numberBytes"), *random_bytes);
+	phalcon_update_property_this(getThis(), SL("_numberBytes"), *random_bytes);
 }
 
 /**
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Security, setRandomBytes){
 PHP_METHOD(Phalcon_Security, getRandomBytes){
 
 
-	RETURN_MEMBER(this_ptr, "_numberBytes");
+	RETURN_MEMBER(getThis(), "_numberBytes");
 }
 
 /**
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Security, setWorkFactor){
 	phalcon_fetch_params(0, 1, 0, &work_factor);
 
 	PHALCON_ENSURE_IS_LONG(work_factor);
-	phalcon_update_property_this(this_ptr, SL("_workFactor"), *work_factor);
+	phalcon_update_property_this(getThis(), SL("_workFactor"), *work_factor);
 }
 
 /**
@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Security, setWorkFactor){
 PHP_METHOD(Phalcon_Security, getWorkFactor){
 
 
-	RETURN_MEMBER(this_ptr, "_workFactor");
+	RETURN_MEMBER(getThis(), "_workFactor");
 }
 
 /**
@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		i_bytes = Z_LVAL_P(*number_bytes);
 	}
 	else {
-		zval *n = phalcon_read_property(this_ptr, SL("_numberBytes"), PH_NOISY);
+		zval *n = phalcon_read_property(getThis(), SL("_numberBytes"), PH_NOISY);
 		i_bytes = (Z_TYPE_P(n) == IS_LONG) ? Z_LVAL_P(n) : phalcon_get_intval(n);
 	}
 
@@ -314,13 +314,13 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		PHALCON_CALL_FUNCTIONW(&tmp, "openssl_random_pseudo_bytes", n);
 
 		if (Z_TYPE(tmp) != IS_STRING || Z_STRLEN(tmp) < i_bytes) {
-			phalcon_dtor(tmp);
+			zval_dtor(tmp);
 			RETURN_FALSE;
 		}
 
 		result = Z_STRVAL(tmp);
 		ZVAL_NULL(&tmp);
-		phalcon_dtor(tmp);
+		zval_dtor(tmp);
 	}
 
 	result[i_bytes] = 0;
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Security, hash)
 	PHALCON_ENSURE_IS_STRING(password);
 
 	if (!work_factor || Z_TYPE_P(*work_factor) == IS_NULL) {
-		tmp         = phalcon_read_property(this_ptr, SL("_workFactor"), PH_NOISY);
+		tmp         = phalcon_read_property(getThis(), SL("_workFactor"), PH_NOISY);
 		work_factor = &tmp;
 	}
 
@@ -432,7 +432,7 @@ PHP_METHOD(Phalcon_Security, hash)
 		 */
 			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 22);
-			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
+			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
 				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
@@ -455,7 +455,7 @@ PHP_METHOD(Phalcon_Security, hash)
 		/* Standard DES-based hash with a two character salt from the alphabet "./0-9A-Za-z". */
 			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 2);
-			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
+			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
 				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
@@ -484,7 +484,7 @@ PHP_METHOD(Phalcon_Security, hash)
 
 			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 4);
-			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
+			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
 				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
@@ -500,7 +500,7 @@ PHP_METHOD(Phalcon_Security, hash)
 		/* MD5 hashing with a twelve character salt starting with $1$ */
 			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 12);
-			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
+			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
 				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
@@ -527,7 +527,7 @@ PHP_METHOD(Phalcon_Security, hash)
 		 */
 			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 16);
-			PHALCON_CALL_METHOD(&salt_bytes, this_ptr, "getsaltbytes", n_bytes);
+			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
 				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				RETURN_MM();
@@ -555,7 +555,7 @@ PHP_METHOD(Phalcon_Security, hash)
 	}
 
 	if (Z_STRLEN_P(return_value) < 13) {
-		phalcon_dtor(return_value);
+		zval_dtor(return_value);
 		RETURN_MM_FALSE;
 	}
 
@@ -608,11 +608,11 @@ PHP_METHOD(Phalcon_Security, checkHash){
 			--n;
 		}
 
-		phalcon_ptr_dtor(hash);
+		zval_ptr_dtor(hash);
 		RETURN_BOOL(check == 0);
 	}
 
-	phalcon_ptr_dtor(hash);
+	zval_ptr_dtor(hash);
 	RETURN_FALSE;
 }
 
@@ -669,14 +669,14 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 	PHALCON_INIT_VAR(safe_bytes);
 	phalcon_filter_alphanum(safe_bytes, base64bytes);
 
-	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, phalcon_interned_session);
+	ZVAL_STR(service, IS(session));
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -718,14 +718,14 @@ PHP_METHOD(Phalcon_Security, getToken){
 	PHALCON_INIT_VAR(token);
 	phalcon_md5(token, random_bytes);
 
-	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, phalcon_interned_session);
+	ZVAL_STR(service, IS(session));
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -758,14 +758,14 @@ PHP_METHOD(Phalcon_Security, checkToken){
 		token_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, phalcon_interned_session);
+	ZVAL_STR(service, IS(session));
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -779,7 +779,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 
 	if (Z_TYPE_P(token_value) == IS_NULL) {
 		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, phalcon_interned_request);
+		ZVAL_STR(service, IS(request));
 
 		PHALCON_CALL_METHOD(&request, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(request, phalcon_http_requestinterface_ce);
@@ -816,14 +816,14 @@ PHP_METHOD(Phalcon_Security, getSessionToken){
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, phalcon_interned_session);
+	ZVAL_STR(service, IS(session));
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -845,14 +845,14 @@ PHP_METHOD(Phalcon_Security, destroyToken){
 
 	PHALCON_MM_GROW();
 
-	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "A dependency injection container is required to access the 'session' service");
 		return;
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, phalcon_interned_session);
+	ZVAL_STR(service, IS(session));
 
 	PHALCON_CALL_METHOD(&session, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(session, phalcon_session_adapterinterface_ce);
@@ -1070,9 +1070,9 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 		}
 	}
 
-	phalcon_ptr_dtor(algo);
-	phalcon_ptr_dtor(iter);
-	phalcon_ptr_dtor(len);
+	zval_ptr_dtor(algo);
+	zval_ptr_dtor(iter);
+	zval_ptr_dtor(len);
 }
 
 /**

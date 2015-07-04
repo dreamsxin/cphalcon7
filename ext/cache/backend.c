@@ -105,13 +105,13 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 		 * A common option is the prefix
 		 */
 		if (phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
-			phalcon_update_property_this(this_ptr, SL("_prefix"), prefix);
+			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_options"), options);
+		phalcon_update_property_this(getThis(), SL("_options"), options);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_frontend"), frontend);
+	phalcon_update_property_this(getThis(), SL("_frontend"), frontend);
 }
 
 /**
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	/** 
 	 * Get the cache content verifying if it was expired
 	 */
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "get", key_name, lifetime);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "get", key_name, lifetime);
 	if (return_value_ptr) {
 		return_value = *return_value_ptr;
 	}
@@ -145,20 +145,20 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	if (Z_TYPE_P(return_value) == IS_NULL) {
 		fresh = &PHALCON_GLOBAL(z_true);
 	
-		frontend = phalcon_read_property(this_ptr, SL("_frontend"), PH_NOISY);
+		frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, frontend, "start");
 	} else {
 		fresh = &PHALCON_GLOBAL(z_false);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_fresh"), fresh);
-	phalcon_update_property_this(this_ptr, SL("_started"), &PHALCON_GLOBAL(z_true));
+	phalcon_update_property_this(getThis(), SL("_fresh"), fresh);
+	phalcon_update_property_this(getThis(), SL("_started"), &PHALCON_GLOBAL(z_true));
 	
 	/** 
 	 * Update the last lifetime to be used in save()
 	 */
 	if (Z_TYPE_P(lifetime) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_lastLifetime"), lifetime);
+		phalcon_update_property_this(getThis(), SL("_lastLifetime"), lifetime);
 	}
 
 	RETURN_MM();
@@ -177,12 +177,12 @@ PHP_METHOD(Phalcon_Cache_Backend, stop){
 	
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
 		PHALCON_MM_GROW();
-		frontend = phalcon_read_property(this_ptr, SL("_frontend"), PH_NOISY);
+		frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, frontend, "stop");
 		PHALCON_MM_RESTORE();
 	}
 
-	phalcon_update_property_bool(this_ptr, SL("_started"), 0);
+	phalcon_update_property_bool(getThis(), SL("_started"), 0);
 }
 
 /**
@@ -193,7 +193,7 @@ PHP_METHOD(Phalcon_Cache_Backend, stop){
 PHP_METHOD(Phalcon_Cache_Backend, getFrontend){
 
 
-	RETURN_MEMBER(this_ptr, "_frontend");
+	RETURN_MEMBER(getThis(), "_frontend");
 }
 
 /**
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Cache_Backend, getFrontend){
 PHP_METHOD(Phalcon_Cache_Backend, getOptions){
 
 
-	RETURN_MEMBER(this_ptr, "_options");
+	RETURN_MEMBER(getThis(), "_options");
 }
 
 /**
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Cache_Backend, getOptions){
 PHP_METHOD(Phalcon_Cache_Backend, isFresh){
 
 
-	RETURN_MEMBER(this_ptr, "_fresh");
+	RETURN_MEMBER(getThis(), "_fresh");
 }
 
 /**
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Cache_Backend, isFresh){
 PHP_METHOD(Phalcon_Cache_Backend, isStarted){
 
 
-	RETURN_MEMBER(this_ptr, "_started");
+	RETURN_MEMBER(getThis(), "_started");
 }
 
 /**
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Cache_Backend, setLastKey){
 
 	phalcon_fetch_params(0, 1, 0, &last_key);
 	
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), last_key);
+	phalcon_update_property_this(getThis(), SL("_lastKey"), last_key);
 	
 }
 
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Cache_Backend, setLastKey){
 PHP_METHOD(Phalcon_Cache_Backend, getLastKey){
 
 
-	RETURN_MEMBER(this_ptr, "_lastKey");
+	RETURN_MEMBER(getThis(), "_lastKey");
 }
 
 /**
@@ -263,5 +263,5 @@ PHP_METHOD(Phalcon_Cache_Backend, getLastKey){
 PHP_METHOD(Phalcon_Cache_Backend, getLifetime){
 
 
-	RETURN_MEMBER(this_ptr, "_lastLifetime");
+	RETURN_MEMBER(getThis(), "_lastLifetime");
 }

@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 		}
 
 		PHALCON_CALL_FUNCTION(NULL, "openlog", name, option, facility);
-		phalcon_update_property_bool(this_ptr, SL("_opened"), 1);
+		phalcon_update_property_bool(getThis(), SL("_opened"), 1);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -140,11 +140,11 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
 
 	PHALCON_MM_GROW();
 
-	formatter = phalcon_read_property(this_ptr, SL("_formatter"), PH_NOISY);
+	formatter = phalcon_read_property(getThis(), SL("_formatter"), PH_NOISY);
 	if (Z_TYPE_P(formatter) != IS_OBJECT) {
 		PHALCON_INIT_NVAR(formatter);
 		object_init_ex(formatter, phalcon_logger_formatter_syslog_ce);
-		phalcon_update_property_this(this_ptr, SL("_formatter"), formatter);
+		phalcon_update_property_this(getThis(), SL("_formatter"), formatter);
 	}
 
 	RETURN_CTOR(formatter);
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
 
 	phalcon_fetch_params(1, 4, 0, &message, &type, &time, &context);
 
-	PHALCON_CALL_METHOD(&formatter, this_ptr, "getformatter");
+	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHOD(&applied_format, formatter, "format", message, type, time, context);
 	if (Z_TYPE_P(applied_format) != IS_ARRAY) { 
 		syslog_type    = type;
@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, close){
 
 	zval *opened;
 
-	opened = phalcon_read_property(this_ptr, SL("_opened"), PH_NOISY);
+	opened = phalcon_read_property(getThis(), SL("_opened"), PH_NOISY);
 	if (zend_is_true(opened)) {
 		PHALCON_CALL_FUNCTIONW(NULL, "closelog");
 	}

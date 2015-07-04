@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLStatement){
 
 	phalcon_fetch_params(0, 1, 0, &sql_statement);
 	
-	phalcon_update_property_this(this_ptr, SL("_sqlStatement"), sql_statement);
+	phalcon_update_property_this(getThis(), SL("_sqlStatement"), sql_statement);
 	
 }
 
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLStatement){
 PHP_METHOD(Phalcon_Db_Profiler_Item, getSQLStatement){
 
 
-	RETURN_MEMBER(this_ptr, "_sqlStatement");
+	RETURN_MEMBER(getThis(), "_sqlStatement");
 }
 
 /**
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLVariables){
 
 	phalcon_fetch_params(0, 1, 0, &sql_variables);
 	
-	phalcon_update_property_this(this_ptr, SL("_sqlVariables"), sql_variables);
+	phalcon_update_property_this(getThis(), SL("_sqlVariables"), sql_variables);
 	
 }
 
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLVariables){
 PHP_METHOD(Phalcon_Db_Profiler_Item, getSQLVariables){
 
 
-	RETURN_MEMBER(this_ptr, "_sqlVariables");
+	RETURN_MEMBER(getThis(), "_sqlVariables");
 }
 
 /**
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLBindTypes){
 
 	phalcon_fetch_params(0, 1, 0, &sql_bindtypes);
 
-	phalcon_update_property_this(this_ptr, SL("_sqlBindTypes"), sql_bindtypes);
+	phalcon_update_property_this(getThis(), SL("_sqlBindTypes"), sql_bindtypes);
 
 }
 
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLBindTypes){
 PHP_METHOD(Phalcon_Db_Profiler_Item, getSQLBindTypes){
 
 
-	RETURN_MEMBER(this_ptr, "_sqlBindTypes");
+	RETURN_MEMBER(getThis(), "_sqlBindTypes");
 }
 
 /**
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setInitialTime){
 
 	phalcon_fetch_params(0, 1, 0, &initial_time);
 	
-	phalcon_update_property_this(this_ptr, SL("_initialTime"), initial_time);
+	phalcon_update_property_this(getThis(), SL("_initialTime"), initial_time);
 	
 }
 
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setFinalTime){
 
 	phalcon_fetch_params(0, 1, 0, &final_time);
 	
-	phalcon_update_property_this(this_ptr, SL("_finalTime"), final_time);
+	phalcon_update_property_this(getThis(), SL("_finalTime"), final_time);
 	
 }
 
@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setFinalTime){
 PHP_METHOD(Phalcon_Db_Profiler_Item, getInitialTime){
 
 
-	RETURN_MEMBER(this_ptr, "_initialTime");
+	RETURN_MEMBER(getThis(), "_initialTime");
 }
 
 /**
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, getInitialTime){
 PHP_METHOD(Phalcon_Db_Profiler_Item, getFinalTime){
 
 
-	RETURN_MEMBER(this_ptr, "_finalTime");
+	RETURN_MEMBER(getThis(), "_finalTime");
 }
 
 /**
@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, getTotalElapsedSeconds){
 
 	zval *final_time, *initial_time;
 
-	final_time   = phalcon_read_property(this_ptr, SL("_finalTime"), PH_NOISY);
-	initial_time = phalcon_read_property(this_ptr, SL("_initialTime"), PH_NOISY);
+	final_time   = phalcon_read_property(getThis(), SL("_finalTime"), PH_NOISY);
+	initial_time = phalcon_read_property(getThis(), SL("_initialTime"), PH_NOISY);
 	phalcon_sub_function(return_value, final_time, initial_time);
 }

@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 
 	PHALCON_OBS_VAR(allow_empty);
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &allow_empty, getThis(), phalcon_interned_allowEmpty));
+	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &allow_empty, getThis(), ISV(allowEmpty)));
 	if (zend_is_true(allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
 		RETURN_MM_TRUE;
 	}
@@ -112,10 +112,10 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 	PHALCON_CALL_SELF(&valid, "valid", value, minimum, maximum);
 
 	if (PHALCON_IS_FALSE(valid)) {
-		type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
+		type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
 
 		PHALCON_OBS_VAR(label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), phalcon_interned_label));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), ISV(label)));
 		if (!zend_is_true(label)) {
 			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(label)) {
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 		}
 
 		PHALCON_OBS_VAR(code);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), phalcon_interned_code));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), ISV(code)));
 		if (Z_TYPE_P(code) == IS_NULL) {
 			ZVAL_LONG(code, 0);
 		}
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_function(valid, maximum, length);
 		if (PHALCON_IS_TRUE(valid)) {
-			phalcon_update_property_string(this_ptr, SL("_type"), SL("TooLong"));
+			phalcon_update_property_string(getThis(), SL("_type"), SL("TooLong"));
 			RETURN_MM_FALSE;
 		}
 	}
@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_function(valid, length, minimum);
 		if (PHALCON_IS_TRUE(valid)) {
-			phalcon_update_property_string(this_ptr, SL("_type"), SL("TooShort"));
+			phalcon_update_property_string(getThis(), SL("_type"), SL("TooShort"));
 			RETURN_MM_FALSE;
 		}
 	}

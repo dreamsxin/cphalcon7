@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_CLI_Console, __construct){
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector);
+		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
 	}
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_CLI_Console, registerModules){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_console_exception_ce, "Modules must be an Array");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_modules"), modules);
+	phalcon_update_property_this(getThis(), SL("_modules"), modules);
 
 }
 
@@ -162,11 +162,11 @@ PHP_METHOD(Phalcon_CLI_Console, addModules){
 		return;
 	}
 
-	original_modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
+	original_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 
 	PHALCON_INIT_VAR(register_modules);
-	phalcon_fast_array_merge(register_modules, &modules, &original_modules);
-	phalcon_update_property_this(this_ptr, SL("_modules"), register_modules);
+	phalcon_fast_array_merge(register_modules, modules, original_modules);
+	phalcon_update_property_this(getThis(), SL("_modules"), register_modules);
 
 	PHALCON_MM_RESTORE();
 }
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_CLI_Console, addModules){
 PHP_METHOD(Phalcon_CLI_Console, getModules){
 
 
-	RETURN_MEMBER(this_ptr, "_modules");
+	RETURN_MEMBER(getThis(), "_modules");
 }
 
 /**
@@ -200,11 +200,11 @@ PHP_METHOD(Phalcon_CLI_Console, getModules){
  */
 PHP_METHOD(Phalcon_CLI_Console, handle){
 
-	zval *arguments = NULL, *dependency_injector, *events_manager;
-	zval *service = NULL, *router = NULL, *module_name = NULL, *namespace_name = NULL, *event_name = NULL;
+	zval *arguments = NULL, *dependency_injector, *events_manager, event_name;
+	zval service, *router = NULL, *module_name = NULL;
 	zval *status = NULL, *modules, *exception_msg = NULL, *module;
-	zval *path, *class_name = NULL, *module_object = NULL, *task_name = NULL;
-	zval *action_name = NULL, *params = NULL, *dispatcher = NULL;
+	zval *path, *class_name = NULL, *module_object = NULL;
+	zval *namespace_name = NULL, *task_name = NULL, *action_name = NULL, *params = NULL, *dispatcher = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -215,35 +215,32 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		array_init(arguments);
 	}
 
-	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cli_console_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
-	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
+	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 
-	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, phalcon_interned_router);
-
-	PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", service);
+	ZVAL_STR(&service, IS(router));
+	PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_CLASS(router, phalcon_cli_router_ce);
+
 	PHALCON_CALL_METHOD(NULL, router, "handle", arguments);
 
 	PHALCON_CALL_METHOD(&module_name, router, "getmodulename");
 	if (zend_is_true(module_name)) {
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+			ZVAL_STRING(&event_name, "console:beforeStartModule");
 
-			PHALCON_INIT_VAR(event_name);
-			ZVAL_STRING(event_name, "console:beforeStartModule");
-
-			PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, module_name);
+			PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), module_name);
 			if (PHALCON_IS_FALSE(status)) {
 				RETURN_MM_FALSE;
 			}
 		}
 
-		modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
+		modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 		if (!phalcon_array_isset(modules, module_name)) {
 			PHALCON_INIT_VAR(exception_msg);
 			PHALCON_CONCAT_SVS(exception_msg, "Module '", module_name, "' isn't registered in the console container");
@@ -262,7 +259,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 
 			PHALCON_OBS_VAR(path);
 			phalcon_array_fetch_string(&path, module, SL("path"), PH_NOISY);
-			convert_to_string_ex(&path);
+			convert_to_string_ex(path);
 
 			if (phalcon_file_exists(path) == SUCCESS) {
 				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path)));
@@ -285,12 +282,11 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		PHALCON_CALL_METHOD(NULL, module_object, "registerautoloaders");
 		PHALCON_CALL_METHOD(NULL, module_object, "registerservices", dependency_injector);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-			phalcon_update_property_this(this_ptr, SL("_moduleObject"), module_object);
+			phalcon_update_property_this(getThis(), SL("_moduleObject"), module_object);
 
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "console:afterStartModule");
+			ZVAL_STRING(&event_name, "console:afterStartModule");
 
-			PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, module_name);
+			PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), module_name);
 			if (PHALCON_IS_FALSE(status)) {
 				RETURN_MM_FALSE;
 			}
@@ -302,10 +298,9 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	PHALCON_CALL_METHOD(&action_name, router, "getactionname");
 	PHALCON_CALL_METHOD(&params, router, "getparams");
 
-	PHALCON_INIT_NVAR(service);
-	ZVAL_STRING(service, phalcon_interned_dispatcher);
+	ZVAL_STR(&service, IS(dispatcher));
 
-	PHALCON_CALL_METHOD(&dispatcher, dependency_injector, "getshared", service);
+	PHALCON_CALL_METHOD(&dispatcher, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(dispatcher, phalcon_dispatcherinterface_ce);
 
 	PHALCON_CALL_METHOD(NULL, dispatcher, "setnamespacename", namespace_name);
@@ -313,26 +308,20 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	PHALCON_CALL_METHOD(NULL, dispatcher, "setactionname", action_name);
 	PHALCON_CALL_METHOD(NULL, dispatcher, "setparams", params);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "console:beforeHandleTask");
 
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "console:beforeHandleTask");
-
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, dispatcher);
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), dispatcher);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 	}
 
-	PHALCON_RETURN_CALL_METHOD(dispatcher, "dispatch");
-	if (return_value_ptr) {
-		return_value = *return_value_ptr;
-	}
+	PHALCON_CALL_METHOD(&status, dispatcher, "dispatch");
 
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "console:afterHandleTask");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr, return_value);
+		ZVAL_STRING(&event_name, "console:afterHandleTask");
+		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), status);
 	}
 
-	PHALCON_MM_RESTORE();
+	RETURN_CTOR(status);
 }

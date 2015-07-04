@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Crypt, setCipher){
 
 	phalcon_fetch_params(0, 0, 1, 0, &cipher);
 
-	phalcon_update_property_this(this_ptr, SL("_cipher"), cipher);
+	phalcon_update_property_this(getThis(), SL("_cipher"), cipher);
 	RETURN_THISW();
 }
 
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Crypt, setCipher){
 PHP_METHOD(Phalcon_Crypt, getCipher){
 
 
-	RETURN_MEMBER(this_ptr, "_cipher");
+	RETURN_MEMBER(getThis(), "_cipher");
 }
 
 /**
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Crypt, setMode){
 	phalcon_fetch_params(0, 1, 0, &mode);
 	PHALCON_ENSURE_IS_STRING(mode);
 
-	phalcon_update_property_this(this_ptr, SL("_mode"), *mode);
+	phalcon_update_property_this(getThis(), SL("_mode"), *mode);
 	RETURN_THISW();
 }
 
@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Crypt, setMode){
 PHP_METHOD(Phalcon_Crypt, getMode){
 
 
-	RETURN_MEMBER(this_ptr, "_mode");
+	RETURN_MEMBER(getThis(), "_mode");
 }
 
 /**
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Crypt, setKey){
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	phalcon_update_property_this(this_ptr, SL("_key"), *key);
+	phalcon_update_property_this(getThis(), SL("_key"), *key);
 	RETURN_THISW();
 }
 
@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Crypt, setKey){
 PHP_METHOD(Phalcon_Crypt, getKey){
 
 
-	RETURN_MEMBER(this_ptr, "_key");
+	RETURN_MEMBER(getThis(), "_key");
 }
 
 /**
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Crypt, setPadding) {
 	phalcon_fetch_params(0, 1, 0, &scheme);
 	PHALCON_ENSURE_IS_LONG(scheme);
 
-	phalcon_update_property_this(this_ptr, SL("_padding"), *scheme);
+	phalcon_update_property_this(getThis(), SL("_padding"), *scheme);
 	RETURN_THISW();
 }
 
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Crypt, setPadding) {
  */
 PHP_METHOD(Phalcon_Crypt, getPadding) {
 
-	RETURN_MEMBER(this_ptr, "_padding");
+	RETURN_MEMBER(getThis(), "_padding");
 }
 
 /**
@@ -466,7 +466,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 
 	phalcon_fetch_params(0, 1, 1, 1, &source, &key);
 
-	handler = phalcon_read_property(this_ptr, SL("_beforeEncrypt"), PH_NOISY);
+	handler = phalcon_read_property(getThis(), SL("_beforeEncrypt"), PH_NOISY);
 
 	if (phalcon_is_callable(handler)) {
 		PHALCON_SEPARATE_PARAM(source);
@@ -496,7 +496,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
-		encrypt_key = phalcon_read_property(this_ptr, SL("_key"), PH_NOISY);
+		encrypt_key = phalcon_read_property(getThis(), SL("_key"), PH_NOISY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(encrypt_key, key);
 		if (Z_TYPE_P(encrypt_key) != IS_STRING) {
@@ -509,8 +509,8 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		return;
 	}
 
-	cipher = phalcon_read_property(this_ptr, SL("_cipher"), PH_NOISY);
-	mode   = phalcon_read_property(this_ptr, SL("_mode"), PH_NOISY);
+	cipher = phalcon_read_property(getThis(), SL("_cipher"), PH_NOISY);
+	mode   = phalcon_read_property(getThis(), SL("_mode"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTION(&iv_size, "mcrypt_get_iv_size", cipher, mode);
 	if (unlikely(Z_TYPE_P(iv_size) != IS_LONG)) {
@@ -535,7 +535,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		convert_to_long(block_size);
 	}
 
-	padding_type = phalcon_read_property(this_ptr, SL("_padding"), PH_NOISY);
+	padding_type = phalcon_read_property(getThis(), SL("_padding"), PH_NOISY);
 
 	assert(Z_TYPE_P(padding_type) == IS_LONG);
 	assert(Z_TYPE_P(block_size) == IS_LONG);
@@ -550,7 +550,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 
 	PHALCON_CONCAT_VV(return_value, iv, encrypt);
 
-	handler = phalcon_read_property(this_ptr, SL("_afterEncrypt"), PH_NOISY);
+	handler = phalcon_read_property(getThis(), SL("_afterEncrypt"), PH_NOISY);
 
 	if (phalcon_is_callable(handler)) {
 		PHALCON_INIT_NVAR(arguments);
@@ -593,7 +593,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		return;
 	}
 
-	handler = phalcon_read_property(this_ptr, SL("_beforeDecrypt"), PH_NOISY);
+	handler = phalcon_read_property(getThis(), SL("_beforeDecrypt"), PH_NOISY);
 
 	if (phalcon_is_callable(handler)) {
 		PHALCON_SEPARATE_PARAM(text);
@@ -609,7 +609,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
-		decrypt_key = phalcon_read_property(this_ptr, SL("_key"), PH_NOISY);
+		decrypt_key = phalcon_read_property(getThis(), SL("_key"), PH_NOISY);
 	} else {
 		decrypt_key = key;
 	}
@@ -619,8 +619,8 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		return;
 	}
 
-	cipher = phalcon_read_property(this_ptr, SL("_cipher"), PH_NOISY);
-	mode   = phalcon_read_property(this_ptr, SL("_mode"), PH_NOISY);
+	cipher = phalcon_read_property(getThis(), SL("_cipher"), PH_NOISY);
+	mode   = phalcon_read_property(getThis(), SL("_mode"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTION(&iv_size, "mcrypt_get_iv_size", cipher, mode);
 	if (unlikely(Z_TYPE_P(iv_size) != IS_LONG)) {
@@ -657,7 +657,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		convert_to_long(block_size);
 	}
 
-	padding_type = phalcon_read_property(this_ptr, SL("_padding"), PH_NOISY);
+	padding_type = phalcon_read_property(getThis(), SL("_padding"), PH_NOISY);
 
 	assert(Z_TYPE_P(padding_type) == IS_LONG);
 	assert(Z_TYPE_P(block_size) == IS_LONG);
@@ -666,7 +666,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 	phalcon_crypt_unpad_text(return_value, decrypted, mode, Z_LVAL_P(block_size), Z_LVAL_P(padding_type));
 
-	handler = phalcon_read_property(this_ptr, SL("_afterDecrypt"), PH_NOISY);
+	handler = phalcon_read_property(getThis(), SL("_afterDecrypt"), PH_NOISY);
 
 	if (phalcon_is_callable(handler)) {
 		PHALCON_INIT_NVAR(arguments);
@@ -705,7 +705,7 @@ PHP_METHOD(Phalcon_Crypt, encryptBase64){
 		safe = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_CALL_METHOD(&encrypted, this_ptr, "encrypt", text, key);
+	PHALCON_CALL_METHOD(&encrypted, getThis(), "encrypt", text, key);
 	phalcon_base64_encode(return_value, encrypted);
 
 	if (zend_is_true(safe)) {
@@ -749,7 +749,7 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 	}
 
 	ZVAL_STR(&decrypt_text, decoded);
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "decrypt", decrypt_text, *key);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "decrypt", decrypt_text, *key);
 }
 
 /**
@@ -790,7 +790,7 @@ PHP_METHOD(Phalcon_Crypt, beforeEncrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_beforeEncrypt"), handler);
+	phalcon_update_property_this(getThis(), SL("_beforeEncrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -812,7 +812,7 @@ PHP_METHOD(Phalcon_Crypt, afterEncrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_afterEncrypt"), handler);
+	phalcon_update_property_this(getThis(), SL("_afterEncrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -834,7 +834,7 @@ PHP_METHOD(Phalcon_Crypt, beforeDecrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_beforeDecrypt"), handler);
+	phalcon_update_property_this(getThis(), SL("_beforeDecrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -856,6 +856,6 @@ PHP_METHOD(Phalcon_Crypt, afterDecrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_afterDecrypt"), handler);
+	phalcon_update_property_this(getThis(), SL("_afterDecrypt"), handler);
 	RETURN_THIS();
 }

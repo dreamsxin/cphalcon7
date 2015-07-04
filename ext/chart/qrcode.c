@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	PHALCON_SEPARATE_PARAM(text);
 	convert_to_string(text);
 
-	phalcon_update_property_this(this_ptr, SL("_text"), text);
+	phalcon_update_property_this(getThis(), SL("_text"), text);
 
 	if (version) {
 		PHALCON_SEPARATE_PARAM(version);
@@ -235,9 +235,9 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "version must be within the range of 1 to 40");
 			return;
 		}
-		phalcon_update_property_this(this_ptr, SL("_version"), version);
+		phalcon_update_property_this(getThis(), SL("_version"), version);
 	} else {
-		version = phalcon_read_property(this_ptr, SL("_version"), PH_NOISY);
+		version = phalcon_read_property(getThis(), SL("_version"), PH_NOISY);
 	}
 
 	if (level) {
@@ -248,9 +248,9 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Error level. there are 4 values: LEVEL_L, LEVEL_M, LEVEL_Q, LEVEL_H");
 			return;
 		}
-		phalcon_update_property_this(this_ptr, SL("_level"), level);
+		phalcon_update_property_this(getThis(), SL("_level"), level);
 	} else {
-		level = phalcon_read_property(this_ptr, SL("_level"), PH_NOISY);
+		level = phalcon_read_property(getThis(), SL("_level"), PH_NOISY);
 	}
 
 	if (mode) {
@@ -261,9 +261,9 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Error mode. there are 4 values: MODE_NUL, MODE_NUM, MODE_8, MODE_KANJI");
 			return;
 		}
-		phalcon_update_property_this(this_ptr, SL("_mode"), mode);
+		phalcon_update_property_this(getThis(), SL("_mode"), mode);
 	} else {
-		mode = phalcon_read_property(this_ptr, SL("_mode"), PH_NOISY);
+		mode = phalcon_read_property(getThis(), SL("_mode"), PH_NOISY);
 	}
 
 	if (casesensitive) {
@@ -271,9 +271,9 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "casesensitive parameter must be bool");
 			return;
 		}
-		phalcon_update_property_this(this_ptr, SL("_casesensitive"), casesensitive);
+		phalcon_update_property_this(getThis(), SL("_casesensitive"), casesensitive);
 	} else {
-		casesensitive = phalcon_read_property(this_ptr, SL("_casesensitive"), PH_NOISY);
+		casesensitive = phalcon_read_property(getThis(), SL("_casesensitive"), PH_NOISY);
 	}
 
 	php_qrcode *qr = NULL;
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		PHALCON_INIT_VAR(zid);
 		ZEND_REGISTER_RESOURCE(zid, qr, phalcon_list_qrcode);
 
-		phalcon_update_property_this(this_ptr, SL("_qr"), zid);
+		phalcon_update_property_this(getThis(), SL("_qr"), zid);
 		RETURN_MM_TRUE;
 	}
 
@@ -377,7 +377,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 		m = Z_LVAL_P(margin);
 	}
 
-	zid = phalcon_read_property(this_ptr, SL("_qr"), PH_NOISY);
+	zid = phalcon_read_property(getThis(), SL("_qr"), PH_NOISY);
 
 	if (Z_TYPE_P(zid) == IS_NULL) {
 		RETURN_MM_FALSE;
@@ -583,7 +583,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 
 	fn = Z_STRVAL_P(filename);
 
-	zid = phalcon_read_property(this_ptr, SL("_qr"), PH_NOISY);
+	zid = phalcon_read_property(getThis(), SL("_qr"), PH_NOISY);
 
 	if (Z_TYPE_P(zid) == IS_NULL) {
 		RETURN_MM_FALSE;

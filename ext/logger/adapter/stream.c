@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 		zend_throw_exception_ex(exception, 0, "Cannot open stream '%s'", Z_STRVAL_P(*name));
 	}
 	else {
-		phalcon_update_property_this(this_ptr, SL("_stream"), stream);
+		phalcon_update_property_this(getThis(), SL("_stream"), stream);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -134,13 +134,13 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter){
 
 	PHALCON_MM_GROW();
 
-	formatter = phalcon_read_property(this_ptr, SL("_formatter"), PH_NOISY);
+	formatter = phalcon_read_property(getThis(), SL("_formatter"), PH_NOISY);
 	if (Z_TYPE_P(formatter) != IS_OBJECT) {
 		PHALCON_INIT_NVAR(formatter);
 		object_init_ex(formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHOD(NULL, formatter, "__construct");
 
-		phalcon_update_property_this(this_ptr, SL("_formatter"), formatter);
+		phalcon_update_property_this(getThis(), SL("_formatter"), formatter);
 	}
 
 	RETURN_CTOR(formatter);
@@ -162,13 +162,13 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
 
 	phalcon_fetch_params(0, 1, 4, 0, &message, &type, &time, &context);
 
-	stream = phalcon_read_property(this_ptr, SL("_stream"), PH_NOISY);
+	stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
 	if (Z_TYPE_P(stream) != IS_RESOURCE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&formatter, this_ptr, "getformatter");
+	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHOD(&applied_format, formatter, "format", message, type, time, context);
 	PHALCON_CALL_FUNCTION(NULL, "fwrite", stream, applied_format);
 
@@ -182,6 +182,6 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, close)
 {
-	zval *stream = phalcon_read_property(this_ptr, SL("_stream"), PH_NOISY);
+	zval *stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
 	PHALCON_RETURN_CALL_FUNCTIONW("fclose", stream);
 }

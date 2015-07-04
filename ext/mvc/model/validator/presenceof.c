@@ -96,7 +96,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 	PHALCON_INIT_VAR(option);
 	ZVAL_STRING(option, "field");
 	
-	PHALCON_CALL_METHOD(&field_name, this_ptr, "getoption", option);
+	PHALCON_CALL_METHOD(&field_name, getThis(), "getoption", option);
 	if (Z_TYPE_P(field_name) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
@@ -112,9 +112,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 		 * Check if the developer has defined a custom message
 		 */
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, phalcon_interned_message);
+		ZVAL_STR(option, IS(message));
 	
-		PHALCON_CALL_METHOD(&message, this_ptr, "getoption", option);
+		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
 		if (!zend_is_true(message)) {
 			PHALCON_INIT_NVAR(message);
 			PHALCON_CONCAT_SVS(message, "'", field_name, "' is required");
@@ -127,17 +127,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 		 * Is code set
 		 */
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, phalcon_interned_code);
+		ZVAL_STR(option, IS(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, this_ptr, "issetoption", option);
+		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
 		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, this_ptr, "getoption", option);
+			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
 		} else {
 			PHALCON_INIT_VAR(code);
 			ZVAL_LONG(code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, this_ptr, "appendmessage", message, field_name, type, code);
+		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field_name, type, code);
 		RETURN_MM_FALSE;
 	}
 	

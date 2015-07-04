@@ -47,8 +47,10 @@
 
 #define SL(str)   ZEND_STRL(str)
 #define SS(str)   ZEND_STRS(str)
-#define ISL(str)  (phalcon_interned_##str), (sizeof(#str)-1)
-#define ISS(str)  (phalcon_interned_##str), (sizeof(#str))
+#define IS(str)   (phalcon_interned_##str)
+#define ISV(str)  (phalcon_interned_##str)->val
+#define ISL(str)  (phalcon_interned_##str)->val, (sizeof(#str)-1)
+#define ISS(str)  (phalcon_interned_##str)->val, (sizeof(#str))
 #define SSL(str)   zend_string_init(SL(str), 0)
 #define SSS(str)   zend_string_init(SS(str), 0)
 
@@ -102,40 +104,40 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 
 /** Return zval checking if it's needed to ctor */
 #define RETURN_CCTOR(var) { \
-		RETVAL_ZVAL_FAST(var); \
+		RETVAL_ZVAL(var, 1, 0); \
 	} \
 	PHALCON_MM_RESTORE(); \
 	return;
 
 /** Return zval checking if it's needed to ctor, without restoring the memory stack  */
 #define RETURN_CCTORW(var) { \
-		RETVAL_ZVAL_FAST(var); \
+		RETVAL_ZVAL(var, 1, 0); \
 	} \
 	return;
 
 /** Return zval with always ctor */
 #define RETURN_CTOR(var) { \
-		RETVAL_ZVAL_FAST(var); \
+		RETVAL_ZVAL(var, 1, 0); \
 	} \
 	PHALCON_MM_RESTORE(); \
 	return;
 
 /** Return zval with always ctor, without restoring the memory stack */
 #define RETURN_CTORW(var) { \
-		RETVAL_ZVAL_FAST(var); \
+		RETVAL_ZVAL(var, 1, 0); \
 	} \
 	return;
 
 /** Return this pointer */
 #define RETURN_THIS() { \
-		RETVAL_ZVAL_FAST(this_ptr); \
+		RETVAL_ZVAL(getThis(), 1, 0); \
 	} \
 	PHALCON_MM_RESTORE(); \
 	return;
 
 /** Return zval with always ctor, without restoring the memory stack */
 #define RETURN_THISW() \
-	RETURN_ZVAL_FAST(this_ptr);
+	RETURN_ZVAL(getThis(), 1, 0);
 
 /**
  * Returns variables without ctor
@@ -233,7 +235,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 		zend_class_entry ce; \
 		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
-		phalcon_ ##lcname## _ce = zend_register_internal_class_ex(&ce, parent_ce, NULL); \
+		phalcon_ ##lcname## _ce = zend_register_internal_class_ex(&ce, parent_ce); \
 		if (!phalcon_ ##lcname## _ce) { \
 			fprintf(stderr, "Phalcon Error: Class to extend '%s' was not found when registering class '%s'\n", (parent_ce ? parent_ce->name->val : "(null)"), ZEND_NS_NAME(#ns, #class_name)); \
 			return FAILURE; \
@@ -371,19 +373,11 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_VERIFY_CLASS(instance, class_ce)              PHALCON_VERIFY_CLASS_EX(instance, class_ce, spl_ce_LogicException, 1)
 #define PHALCON_VERIFY_CLASS_OR_NULL(pzv, class_ce)           PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, spl_ce_LogicException, 1)
 
-#define phalcon_convert_to_explicit_type_mm_ex(ppzv, str_type) \
-	if (Z_TYPE_P(*ppzv) != str_type) { \
-		if (!Z_ISREF_P(*ppzv)) { \
-			PHALCON_SEPARATE(*ppzv); \
-		} \
-		convert_to_explicit_type(*ppzv, str_type); \
-	}
-
-#define PHALCON_ENSURE_IS_STRING(ppzv)    convert_to_explicit_type_ex(ppzv, IS_STRING)
-#define PHALCON_ENSURE_IS_LONG(ppzv)      convert_to_explicit_type_ex(ppzv, IS_LONG)
-#define PHALCON_ENSURE_IS_DOUBLE(ppzv)    convert_to_explicit_type_ex(ppzv, IS_DOUBLE)
-#define PHALCON_ENSURE_IS_BOOL(ppzv)      convert_to_explicit_type_ex(ppzv, IS_BOOL)
-#define PHALCON_ENSURE_IS_ARRAY(ppzv)     convert_to_explicit_type_ex(ppzv, IS_ARRAY)
+#define PHALCON_ENSURE_IS_STRING(pzv)    convert_to_explicit_type_ex(pzv, IS_STRING)
+#define PHALCON_ENSURE_IS_LONG(pzv)      convert_to_explicit_type_ex(pzv, IS_LONG)
+#define PHALCON_ENSURE_IS_DOUBLE(pzv)    convert_to_explicit_type_ex(pzv, IS_DOUBLE)
+#define PHALCON_ENSURE_IS_BOOL(pzv)      convert_to_explicit_type_ex(pzv, IS_BOOL)
+#define PHALCON_ENSURE_IS_ARRAY(pzv)     convert_to_explicit_type_ex(pzv, IS_ARRAY)
 
 void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table);
 

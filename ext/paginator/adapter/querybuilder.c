@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	PHALCON_VERIFY_INTERFACE_EX(builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
 
-	phalcon_update_property_this(this_ptr, SL("_builder"), builder);
+	phalcon_update_property_this(getThis(), SL("_builder"), builder);
 
 	if (!phalcon_array_isset_string_fetch(&limit, config, SS("limit"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
@@ -139,10 +139,10 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_limitRows"), limit);
+	phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
 
 	if (phalcon_array_isset_string_fetch(&page, config, SS("page"))) {
-		phalcon_update_property_this(this_ptr, SL("_page"), page);
+		phalcon_update_property_this(getThis(), SL("_page"), page);
 	}
 }
 
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setCurrentPage){
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
 
-	phalcon_update_property_this(this_ptr, SL("_page"), *current_page);
+	phalcon_update_property_this(getThis(), SL("_page"), *current_page);
 	RETURN_THISW();
 }
 
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setCurrentPage){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getCurrentPage){
 
-	RETURN_MEMBER(this_ptr, "_page");
+	RETURN_MEMBER(getThis(), "_page");
 }
 
 /**
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setLimit){
 	phalcon_fetch_params(0, 1, 0, &current_limit);
 	PHALCON_ENSURE_IS_LONG(current_limit);
 
-	phalcon_update_property_this(this_ptr, SL("_limitRows"), *current_limit);
+	phalcon_update_property_this(getThis(), SL("_limitRows"), *current_limit);
 	RETURN_THISW();
 }
 
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setLimit){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getLimit){
 
-	RETURN_MEMBER(this_ptr, "_limitRows");
+	RETURN_MEMBER(getThis(), "_limitRows");
 }
 
 /**
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setQueryBuilder){
 	phalcon_fetch_params(0, 0, 1, 0, &query_builder);
 	PHALCON_VERIFY_INTERFACE_EX(query_builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
 
-	phalcon_update_property_this(this_ptr, SL("_builder"), query_builder);
+	phalcon_update_property_this(getThis(), SL("_builder"), query_builder);
 
 	RETURN_THISW();
 }
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setQueryBuilder){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getQueryBuilder){
 
-	RETURN_MEMBER(this_ptr, "_builder");
+	RETURN_MEMBER(getThis(), "_builder");
 }
 
 /**
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	PHALCON_MM_GROW();
 
-	original_builder = phalcon_read_property(this_ptr, SL("_builder"), PH_NOISY);
+	original_builder = phalcon_read_property(getThis(), SL("_builder"), PH_NOISY);
 
 	/* Make a copy of the original builder to leave it as it is */
 	PHALCON_INIT_VAR(builder);
@@ -270,8 +270,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		RETURN_MM();
 	}
 
-	limit         = phalcon_read_property(this_ptr, SL("_limitRows"), PH_NOISY);
-	number_page   = phalcon_read_property(this_ptr, SL("_page"), PH_NOISY);
+	limit         = phalcon_read_property(getThis(), SL("_limitRows"), PH_NOISY);
+	number_page   = phalcon_read_property(getThis(), SL("_page"), PH_NOISY);
 	i_limit       = phalcon_get_intval(limit);
 	i_number_page = phalcon_get_intval(number_page);
 
@@ -342,14 +342,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	PHALCON_CALL_METHOD(&intermediate, total_query, "parse");
 
 	PHALCON_OBS_VAR(columns);
-	phalcon_array_fetch_string(&columns, intermediate, ISL(columns), PH_NOISY);
+	phalcon_array_fetch_str(&columns, intermediate, IS(columns), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column) {
 		PHALCON_OBS_NVAR(type);
-		phalcon_array_fetch_string(&type, column, ISL(type), PH_NOISY);
+		phalcon_array_fetch_str(&type, column, IS(type), PH_NOISY);
 
 		PHALCON_OBS_NVAR(sql_column);
-		phalcon_array_fetch_string(&sql_column, column, ISL(column), PH_NOISY);
+		phalcon_array_fetch_str(&sql_column, column, IS(column), PH_NOISY);
 
 		/**
 		 * Complete objects are treated in a different way
@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			PHALCON_INIT_VAR(select_columns);
 			ZVAL_STRING(select_columns, "*");
 
-			phalcon_array_update_string(intermediate, ISL(columns), select_columns, PH_COPY);
+			phalcon_array_update_str(intermediate, IS(columns), select_columns, PH_COPY);
 			break;
 		}
 	} ZEND_HASH_FOREACH_END();

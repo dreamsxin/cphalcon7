@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, __construct){
 	phalcon_fetch_params(0, 0, 1, &frontend_options);
 	
 	if (frontend_options) {
-		phalcon_update_property_this(this_ptr, SL("_frontendOptions"), frontend_options);
+		phalcon_update_property_this(getThis(), SL("_frontendOptions"), frontend_options);
 	}
 }
 
@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, getLifetime){
 
 	zval *options, *lifetime;
 
-	options = phalcon_read_property(this_ptr, SL("_frontendOptions"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_frontendOptions"), PH_NOISY);
 	if (phalcon_array_isset_string_fetch(&lifetime, options, SS("lifetime"))) {
 		RETURN_ZVAL(lifetime, 1, 0);
 	}
@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, getLifetime){
 PHP_METHOD(Phalcon_Cache_Frontend_Output, isBuffering){
 
 
-	RETURN_MEMBER(this_ptr, "_buffering");
+	RETURN_MEMBER(getThis(), "_buffering");
 }
 
 /**
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, isBuffering){
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Output, start){
 
-	phalcon_update_property_bool(this_ptr, SL("_buffering"), 1);
+	phalcon_update_property_bool(getThis(), SL("_buffering"), 1);
 	phalcon_ob_start();
 }
 
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, getContent){
 
 	zval *buffering;
 
-	buffering = phalcon_read_property(this_ptr, SL("_buffering"), PH_NOISY);
+	buffering = phalcon_read_property(getThis(), SL("_buffering"), PH_NOISY);
 	if (zend_is_true(buffering)) {
 		phalcon_ob_get_contents(return_value);
 	}
@@ -190,12 +190,12 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, stop){
 
 	zval *buffering;
 
-	buffering = phalcon_read_property(this_ptr, SL("_buffering"), PH_NOISY);
+	buffering = phalcon_read_property(getThis(), SL("_buffering"), PH_NOISY);
 	if (zend_is_true(buffering)) {
 		phalcon_ob_end_clean();
 	}
 	
-	phalcon_update_property_bool(this_ptr, SL("_buffering"), 0);
+	phalcon_update_property_bool(getThis(), SL("_buffering"), 0);
 }
 
 /**

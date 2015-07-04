@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetExists){
 
 	phalcon_fetch_params(0, 0, 1, 0, &index);
 	
-	if (phalcon_isset_property_zval(this_ptr, index)) {
+	if (phalcon_isset_property_zval(getThis(), index)) {
 		RETURN_TRUE;
 	}
 	RETURN_FALSE;
@@ -133,8 +133,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetGet){
 
 	phalcon_fetch_params(0, 1, 1, 0, &index);
 	
-	if (phalcon_isset_property_zval(this_ptr, index)) {
-		value = phalcon_read_property_zval(this_ptr, index, PH_NOISY);
+	if (phalcon_isset_property_zval(getThis(), index)) {
+		value = phalcon_read_property_zval(getThis(), index, PH_NOISY);
 		RETURN_CTOR(value);
 	}
 
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetSet){
 
 	phalcon_fetch_params(0, 0, 2, 0, &index, &value);
 	
-	phalcon_update_property_zval_zval(this_ptr, index, value);
+	phalcon_update_property_zval_zval(getThis(), index, value);
 }
 
 /**
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
 
 	HashTable *properties;
 
-	properties = Z_OBJ_HT_P(this_ptr)->get_properties(this_ptr);
+	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());
 
 	if (!properties) {
 		RETURN_FALSE;
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Row, count){
 	HashTable *properties;
-	properties = Z_OBJ_HT_P(this_ptr)->get_properties(this_ptr);	
+	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());	
 	if (properties) {
 		RETURN_LONG(zend_hash_num_elements(properties));
 	}

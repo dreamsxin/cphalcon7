@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
+	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
 	if (!phalcon_array_isset_string_fetch(&persistent, options, SS("persistent"))) {
 		PHALCON_INIT_VAR(persistent);
@@ -159,9 +159,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 
 	PHALCON_CALL_METHOD(NULL, memcache, "__construct", frontend_data, option);
 
-	phalcon_update_property_this(this_ptr, SL("_memcache"), memcache);
+	phalcon_update_property_this(getThis(), SL("_memcache"), memcache);
 	
-	phalcon_update_property_empty_array(this_ptr, SL("_metaData"));
+	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 
 	PHALCON_MM_RESTORE();
 }
@@ -180,8 +180,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 	
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
-	memcache = phalcon_read_property(this_ptr, SL("_memcache"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
+	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE_P(memcache) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(memcache, "get", key, lifetime);
@@ -206,8 +206,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, write){
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
 	
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
-	memcache = phalcon_read_property(this_ptr, SL("_memcache"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
+	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE_P(memcache) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, memcache, "save", key, data, lifetime);	
@@ -222,7 +222,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, reset)
 
 	PHALCON_MM_GROW();
 
-	memcache = phalcon_read_property(this_ptr, SL("_memcache"), PH_NOISY);
+	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE_P(memcache) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, memcache, "flush");	

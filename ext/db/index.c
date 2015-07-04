@@ -95,9 +95,9 @@ PHP_METHOD(Phalcon_Db_Index, __construct){
 		type = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_indexName"), index_name);
-	phalcon_update_property_this(this_ptr, SL("_columns"), columns);
-	phalcon_update_property_this(this_ptr, SL("_type"), type);
+	phalcon_update_property_this(getThis(), SL("_indexName"), index_name);
+	phalcon_update_property_this(getThis(), SL("_columns"), columns);
+	phalcon_update_property_this(getThis(), SL("_type"), type);
 
 	PHALCON_MM_RESTORE();
 }
@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Db_Index, __construct){
 PHP_METHOD(Phalcon_Db_Index, getName){
 
 
-	RETURN_MEMBER(this_ptr, "_indexName");
+	RETURN_MEMBER(getThis(), "_indexName");
 }
 
 /**
@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Db_Index, getName){
 PHP_METHOD(Phalcon_Db_Index, getColumns){
 
 
-	RETURN_MEMBER(this_ptr, "_columns");
+	RETURN_MEMBER(getThis(), "_columns");
 }
 
 /**
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Db_Index, getType){
 
 	PHALCON_MM_GROW();
 
-	type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
+	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
 
 	if (Z_TYPE_P(type) == IS_STRING) {
 		RETVAL_ZVAL(type, 1, 0);

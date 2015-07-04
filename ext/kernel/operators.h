@@ -70,9 +70,9 @@
 
 int phalcon_make_printable_zval(zval *expr, zval *expr_copy);
 
-#define phalcon_sub_function(result, left, right) fast_sub_function(result, left, right)
-#define phalcon_add_function(result, left, right) fast_add_function(result, left, right)
-#define phalcon_div_function(result, left, right) fast_div_function(result, left, right)
+#define phalcon_sub_function(result, left, right) sub_function(result, left, right)
+#define phalcon_add_function(result, left, right) add_function(result, left, right)
+#define phalcon_div_function(result, left, right) div_function(result, left, right)
 
 /** Operator functions */
 int phalcon_and_function(zval *result, zval *left, zval *right);

@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &task_suffix);
 
-	phalcon_update_property_this(this_ptr, SL("_handlerSuffix"), task_suffix);
+	phalcon_update_property_this(getThis(), SL("_handlerSuffix"), task_suffix);
 
 }
 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setDefaultTask){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultHandler"), task_name);
+	phalcon_update_property_this(getThis(), SL("_defaultHandler"), task_name);
 
 }
 
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskName){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 
-	phalcon_update_property_this(this_ptr, SL("_handlerName"), task_name);
+	phalcon_update_property_this(getThis(), SL("_handlerName"), task_name);
 
 }
 
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskName){
 PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskName){
 
 
-	RETURN_MEMBER(this_ptr, "_handlerName");
+	RETURN_MEMBER(getThis(), "_handlerName");
 }
 
 /**
@@ -170,8 +170,8 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskName){
  */
 PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 
-	zval *message, *exception_code = NULL, *exception, *events_manager;
-	zval *event_name, *status = NULL;
+	zval *message, *exception_code = NULL, exception, *events_manager;
+	zval event_name, *status = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -181,17 +181,14 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 		exception_code = &PHALCON_GLOBAL(z_zero);
 	}
 
-	PHALCON_INIT_VAR(exception);
-	object_init_ex(exception, phalcon_cli_dispatcher_exception_ce);
-	PHALCON_CALL_METHOD(NULL, exception, "__construct", message, exception_code);
+	object_init_ex(&exception, phalcon_cli_dispatcher_exception_ce);
+	PHALCON_CALL_METHOD(NULL, &exception, "__construct", message, exception_code);
 
-	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
+	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
-		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "dispatch:beforeException");
-
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, exception);
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), &exception);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -200,7 +197,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 	/** 
 	 * Throw the exception if it wasn't handled
 	 */
-	phalcon_throw_exception(exception);
+	phalcon_throw_exception(&exception);
 	RETURN_MM();
 }
 
@@ -218,13 +215,13 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 
 	phalcon_fetch_params(1, 1, 0, &exception);
 
-	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
+	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 
 		PHALCON_INIT_VAR(event_name);
 		ZVAL_STRING(event_name, "dispatch:beforeException");
 
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, exception);
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis(), exception);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -241,10 +238,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskClass){
 
 
-	PHALCON_MM_GROW();
-
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "gethandlerclass");
-	RETURN_MM();
+	PHALCON_RETURN_CALL_METHODW(getThis(), "gethandlerclass");
 }
 
 /**
@@ -255,7 +249,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskClass){
 PHP_METHOD(Phalcon_CLI_Dispatcher, getLastTask){
 
 
-	RETURN_MEMBER(this_ptr, "_lastHandler");
+	RETURN_MEMBER(getThis(), "_lastHandler");
 }
 
 /**
@@ -266,6 +260,6 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, getLastTask){
 PHP_METHOD(Phalcon_CLI_Dispatcher, getActiveTask){
 
 
-	RETURN_MEMBER(this_ptr, "_activeHandler");
+	RETURN_MEMBER(getThis(), "_activeHandler");
 }
 

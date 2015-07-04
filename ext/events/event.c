@@ -115,14 +115,14 @@ PHP_METHOD(Phalcon_Events_Event, __construct){
 		cancelable = &PHALCON_GLOBAL(z_true);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_type"), type);
-	phalcon_update_property_this(this_ptr, SL("_source"), source);
+	phalcon_update_property_this(getThis(), SL("_type"), type);
+	phalcon_update_property_this(getThis(), SL("_source"), source);
 	if (Z_TYPE_P(data) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_data"), data);
+		phalcon_update_property_this(getThis(), SL("_data"), data);
 	}
 	
 	if (PHALCON_IS_NOT_TRUE(cancelable)) {
-		phalcon_update_property_this(this_ptr, SL("_cancelable"), cancelable);
+		phalcon_update_property_this(getThis(), SL("_cancelable"), cancelable);
 	}
 }
 
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Events_Event, setType){
 
 	phalcon_fetch_params(0, 1, 0, &event_type);
 	
-	phalcon_update_property_this(this_ptr, SL("_type"), event_type);
+	phalcon_update_property_this(getThis(), SL("_type"), event_type);
 	
 }
 
@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Events_Event, setType){
 PHP_METHOD(Phalcon_Events_Event, getType){
 
 
-	RETURN_MEMBER(this_ptr, "_type");
+	RETURN_MEMBER(getThis(), "_type");
 }
 
 /**
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Events_Event, getType){
 PHP_METHOD(Phalcon_Events_Event, getSource){
 
 
-	RETURN_MEMBER(this_ptr, "_source");
+	RETURN_MEMBER(getThis(), "_source");
 }
 
 /**
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Events_Event, setData){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 	
-	phalcon_update_property_this(this_ptr, SL("_data"), data);
+	phalcon_update_property_this(getThis(), SL("_data"), data);
 	
 }
 
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Events_Event, setData){
 PHP_METHOD(Phalcon_Events_Event, getData){
 
 
-	RETURN_MEMBER(this_ptr, "_data");
+	RETURN_MEMBER(getThis(), "_data");
 }
 
 /**
@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_Events_Event, setCancelable){
 
 	phalcon_fetch_params(0, 1, 0, &cancelable);
 	
-	phalcon_update_property_this(this_ptr, SL("_cancelable"), cancelable);
+	phalcon_update_property_this(getThis(), SL("_cancelable"), cancelable);
 	
 }
 
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Events_Event, setCancelable){
 PHP_METHOD(Phalcon_Events_Event, getCancelable){
 
 
-	RETURN_MEMBER(this_ptr, "_cancelable");
+	RETURN_MEMBER(getThis(), "_cancelable");
 }
 
 /**
@@ -222,9 +222,9 @@ PHP_METHOD(Phalcon_Events_Event, stop){
 
 	zval *cancelable;
 
-	cancelable = phalcon_read_property(this_ptr, SL("_cancelable"), PH_NOISY);
+	cancelable = phalcon_read_property(getThis(), SL("_cancelable"), PH_NOISY);
 	if (zend_is_true(cancelable)) {
-		phalcon_update_property_bool(this_ptr, SL("_stopped"), 1);
+		phalcon_update_property_bool(getThis(), SL("_stopped"), 1);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Trying to cancel a non-cancelable event");
 		return;
@@ -237,5 +237,5 @@ PHP_METHOD(Phalcon_Events_Event, stop){
 PHP_METHOD(Phalcon_Events_Event, isStopped){
 
 
-	RETURN_MEMBER(this_ptr, "_stopped");
+	RETURN_MEMBER(getThis(), "_stopped");
 }

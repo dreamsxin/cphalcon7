@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 */
 
 	if (Z_TYPE_P(context) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(&interpolated, this_ptr, "interpolate", message, context);
+		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
 	}
 	else {
 		interpolated = message;
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
 	{
 		zval *params[] = { type };
-		if (FAILURE == phalcon_call_method(&type_str, this_ptr, "gettypestring", 1, params)) {
+		if (FAILURE == phalcon_call_method(&type_str, getThis(), "gettypestring", 1, params)) {
 			zval_ptr_dtor(&interpolated);
 			return;
 		}

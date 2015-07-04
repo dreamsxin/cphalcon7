@@ -80,14 +80,14 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 	if (method) {
 		PHALCON_INIT_VAR(upper_method);
 		phalcon_fast_strtoupper(upper_method, method);
-		phalcon_update_property_this(this_ptr, SL("_method"), upper_method);
+		phalcon_update_property_this(getThis(), SL("_method"), upper_method);
 	}
 
 	PHALCON_INIT_VAR(header);
 	object_init_ex(header, phalcon_http_client_header_ce);
 	PHALCON_CALL_METHOD(NULL, header, "__construct");
 
-	phalcon_update_property_this(this_ptr, SL("_header"), header);
+	phalcon_update_property_this(getThis(), SL("_header"), header);
 
 	PHALCON_CALL_FUNCTION(&curl, "curl_init");
 
@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 
 	PHALCON_CALL_FUNCTION(NULL, "curl_setopt_array", curl, options);
 
-	phalcon_update_property_this(this_ptr, SL("_curl"), curl);
+	phalcon_update_property_this(getThis(), SL("_curl"), curl);
 
 	PHALCON_MM_RESTORE();
 }
@@ -142,16 +142,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	PHALCON_CALL_SELF(&uri, "geturi");
 	PHALCON_CALL_METHOD(&url, uri, "build");
 
-	method = phalcon_read_property(this_ptr, SL("_method"), PH_NOISY);
-	useragent = phalcon_read_property(this_ptr, SL("_useragent"), PH_NOISY);
-	data = phalcon_read_property(this_ptr, SL("_data"), PH_NOISY);
-	type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
-	files = phalcon_read_property(this_ptr, SL("_files"), PH_NOISY);
-	timeout = phalcon_read_property(this_ptr, SL("_timeout"), PH_NOISY);
-	curl = phalcon_read_property(this_ptr, SL("_curl"), PH_NOISY);
-	username = phalcon_read_property(this_ptr, SL("_username"), PH_NOISY);
-	password = phalcon_read_property(this_ptr, SL("_password"), PH_NOISY);
-	authtype = phalcon_read_property(this_ptr, SL("_authtype"), PH_NOISY);
+	method = phalcon_read_property(getThis(), SL("_method"), PH_NOISY);
+	useragent = phalcon_read_property(getThis(), SL("_useragent"), PH_NOISY);
+	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
+	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
+	files = phalcon_read_property(getThis(), SL("_files"), PH_NOISY);
+	timeout = phalcon_read_property(getThis(), SL("_timeout"), PH_NOISY);
+	curl = phalcon_read_property(getThis(), SL("_curl"), PH_NOISY);
+	username = phalcon_read_property(getThis(), SL("_username"), PH_NOISY);
+	password = phalcon_read_property(getThis(), SL("_password"), PH_NOISY);
+	authtype = phalcon_read_property(getThis(), SL("_authtype"), PH_NOISY);
 
 	PHALCON_INIT_VAR(constant);
 	if (!zend_get_constant(SL("CURLOPT_URL"), constant)) {
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, useragent);
 	}
 
-	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
+	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
 
 	if (PHALCON_IS_NOT_EMPTY(username)) {
 		if (PHALCON_IS_STRING(authtype, "any")) {

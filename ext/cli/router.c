@@ -128,8 +128,8 @@ PHALCON_INIT_CLASS(Phalcon_CLI_Router){
  */
 PHP_METHOD(Phalcon_CLI_Router, __construct){
 
-	phalcon_update_property_empty_array(this_ptr, SL("_params"));
-	phalcon_update_property_empty_array(this_ptr, SL("_defaultParams"));
+	phalcon_update_property_empty_array(getThis(), SL("_params"));
+	phalcon_update_property_empty_array(getThis(), SL("_defaultParams"));
 }
 
 /**
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &module_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultModule"), module_name);
+	phalcon_update_property_this(getThis(), SL("_defaultModule"), module_name);
 
 }
 
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultNamespace){
 
 	phalcon_fetch_params(0, 1, 0, &namespace_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultNamespace"), namespace_name);
+	phalcon_update_property_this(getThis(), SL("_defaultNamespace"), namespace_name);
 
 }
 
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultTask){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultTask"), task_name);
+	phalcon_update_property_this(getThis(), SL("_defaultTask"), task_name);
 
 }
 
@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultAction){
 
 	phalcon_fetch_params(0, 1, 0, &action_name);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultAction"), action_name);
+	phalcon_update_property_this(getThis(), SL("_defaultAction"), action_name);
 
 }
 
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	if (phalcon_array_isset_string(arguments, SS("module"))) {
 		PHALCON_OBS_NVAR(module_name);
 		phalcon_array_fetch_string(&module_name, arguments, SL("module"), PH_NOISY);
-		phalcon_array_unset_string(&arguments, SS("module"), PH_SEPARATE);
+		phalcon_array_unset_string(arguments, SS("module"), PH_SEPARATE);
 	}
 
 	/**
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	if (phalcon_array_isset_string(arguments, SS("namespace"))) {
 		PHALCON_OBS_NVAR(namespace_name);
 		phalcon_array_fetch_string(&namespace_name, arguments, SL("namespace"), PH_NOISY);
-		phalcon_array_unset_string(&arguments, SS("namespace"), PH_SEPARATE);
+		phalcon_array_unset_string(arguments, SS("namespace"), PH_SEPARATE);
 	}
 
 	/** 
@@ -249,7 +249,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	if (phalcon_array_isset_string(arguments, SS("task"))) {
 		PHALCON_OBS_NVAR(task_name);
 		phalcon_array_fetch_string(&task_name, arguments, SL("task"), PH_NOISY);
-		phalcon_array_unset_string(&arguments, SS("task"), PH_SEPARATE);
+		phalcon_array_unset_string(arguments, SS("task"), PH_SEPARATE);
 	}
 
 	/** 
@@ -258,14 +258,14 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	if (phalcon_array_isset_string(arguments, SS("action"))) {
 		PHALCON_OBS_NVAR(action_name);
 		phalcon_array_fetch_string(&action_name, arguments, SL("action"), PH_NOISY);
-		phalcon_array_unset_string(&arguments, SS("action"), PH_SEPARATE);
+		phalcon_array_unset_string(arguments, SS("action"), PH_SEPARATE);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_module"), module_name);
-	phalcon_update_property_this(this_ptr, SL("_namespace"), namespace_name);
-	phalcon_update_property_this(this_ptr, SL("_task"), task_name);
-	phalcon_update_property_this(this_ptr, SL("_action"), action_name);
-	phalcon_update_property_this(this_ptr, SL("_params"), arguments);
+	phalcon_update_property_this(getThis(), SL("_module"), module_name);
+	phalcon_update_property_this(getThis(), SL("_namespace"), namespace_name);
+	phalcon_update_property_this(getThis(), SL("_task"), task_name);
+	phalcon_update_property_this(getThis(), SL("_action"), action_name);
+	phalcon_update_property_this(getThis(), SL("_params"), arguments);
 
 	PHALCON_MM_RESTORE();
 }
@@ -278,7 +278,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 PHP_METHOD(Phalcon_CLI_Router, getModuleName){
 
 
-	RETURN_MEMBER(this_ptr, "_module");
+	RETURN_MEMBER(getThis(), "_module");
 }
 
 /**
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_CLI_Router, getModuleName){
 PHP_METHOD(Phalcon_CLI_Router, getNamespaceName){
 
 
-	RETURN_MEMBER(this_ptr, "_namespace");
+	RETURN_MEMBER(getThis(), "_namespace");
 }
 
 /**
@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_CLI_Router, getNamespaceName){
 PHP_METHOD(Phalcon_CLI_Router, getTaskName){
 
 
-	RETURN_MEMBER(this_ptr, "_task");
+	RETURN_MEMBER(getThis(), "_task");
 }
 
 /**
@@ -311,7 +311,7 @@ PHP_METHOD(Phalcon_CLI_Router, getTaskName){
 PHP_METHOD(Phalcon_CLI_Router, getActionName){
 
 
-	RETURN_MEMBER(this_ptr, "_action");
+	RETURN_MEMBER(getThis(), "_action");
 }
 
 /**
@@ -322,6 +322,6 @@ PHP_METHOD(Phalcon_CLI_Router, getActionName){
 PHP_METHOD(Phalcon_CLI_Router, getParams){
 
 
-	RETURN_MEMBER(this_ptr, "_params");
+	RETURN_MEMBER(getThis(), "_params");
 }
 

@@ -94,13 +94,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_string_fetch(&meta_data_dir, options, SS("metaDataDir"))) {
-			phalcon_update_property_this(this_ptr, SL("_metaDataDir"), meta_data_dir);
+			phalcon_update_property_this(getThis(), SL("_metaDataDir"), meta_data_dir);
 		}
 	}
 	
 	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
 	array_init(empty_array);
-	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array);
+	phalcon_update_property_this(getThis(), SL("_metaData"), empty_array);
 }
 
 /**
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 
 	PHALCON_MM_GROW();
 
-	meta_data_dir = phalcon_read_property(this_ptr, SL("_metaDataDir"), PH_NOISY);
+	meta_data_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(virtual_key);
 	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
@@ -143,18 +143,18 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 
-	zval **key, **data, *meta_data_dir, *virtual_key;
+	zval *key, *data, *meta_data_dir, *virtual_key;
 	zval *path, *php_export, *status;
 	smart_str exp = { 0 };
 
-	phalcon_fetch_params(0, 2, 0, &key, &data);
-
 	PHALCON_MM_GROW();
 
-	meta_data_dir = phalcon_read_property(this_ptr, SL("_metaDataDir"), PH_NOISY);
+	phalcon_fetch_params(1, 2, 0, &key, &data);
+
+	meta_data_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, meta_data_dir, virtual_key, ".php");
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 
 	PHALCON_MM_GROW();
 
-	metadata_dir = phalcon_read_property(this_ptr, SL("_metaDataDir"), PH_NOISY);
+	metadata_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
 
 	PHALCON_INIT_VAR(pattern);
 	PHALCON_CONCAT_VS(pattern, metadata_dir, "meta-*.php");

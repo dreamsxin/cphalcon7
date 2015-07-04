@@ -307,37 +307,8 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_zval_string(zval *ar
  * @arg @c PH_SEPARATE: separate @a arr if its reference count is greater than 1; @c *arr will contain the separated version
  * @arg @c PH_COPY: increment the reference count on @c **value
  */
-int phalcon_array_update_quick_string(zval *arr, const char *index, uint index_length, ulong key, zval *value, int flags) PHALCON_ATTR_NONNULL;
-
-/**
- * @brief Updates value in @a arr at position @a index with @a value
- * @param[in,out] arr Array
- * @param index Index
- * @param index_length Length of the index, should NOT include the trailing zero
- * @param value Value
- * @param flags Flags
- * @return Whether the operation succeeded
- * @retval @c FAILURE Failure, @a arr is not an array
- * @retval @c SUCCESS Success
- * @throw @c E_WARNING if @a arr is not an array
- * @see phalcon_array_update_quick_string()
- *
- * The function is a wrapper over @c phalcon_array_update_quick_string()
- *
- * Flags may be a bitwise OR of the following values:
- * @arg @c PH_SEPARATE: separate @a arr if its reference count is greater than 1; @c *arr will contain the separated version
- * @arg @c PH_COPY: increment the reference count on @c *value
- */
-PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string(zval *arr, const char *index, uint index_length, zval *value, int flags)
-{
-#ifdef __GNUC__
-	if (__builtin_constant_p(index) && __builtin_constant_p(index_length)) {
-		return phalcon_array_update_quick_string(arr, index, index_length + 1, zend_inline_hash_func(index, index_length + 1), value, flags);
-	}
-#endif
-
-	return phalcon_array_update_quick_string(arr, index, index_length + 1, zend_hash_func(index, index_length + 1), value, flags);
-}
+int phalcon_array_update_string(zval *arr, const char *index, uint index_length, zval *value, int flags) PHALCON_ATTR_NONNULL;
+int phalcon_array_update_str(zval *arr, zend_string *index, zval *value, int flags) PHALCON_ATTR_NONNULL;
 
 /**
  * @brief Updates value in @a arr at position @a index with boolean @a value
@@ -374,7 +345,7 @@ PHALCON_ATTR_NONNULL static inline int phalcon_array_update_string_bool(zval *ar
  * @retval @c FAILURE Failure, @a arr is not an array
  * @retval @c SUCCESS Success
  * @throw @c E_WARNING if @a arr is not an array
- * @see phalcon_array_update_string()
+ * @see phalcon_array_update_str()
  *
  * Equivalent to <tt>$arr[$index] = $value</tt> in PHP, where @c $index is a string key and $value is an integer.
  */

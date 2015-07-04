@@ -97,15 +97,15 @@ PHP_METHOD(Phalcon_Events_Listener, __construct){
 	phalcon_fetch_params(0, 0, 3, &listener, &priority, &event);
 
 	if (listener) {
-		phalcon_update_property_this(this_ptr, SL("_listener"), listener);
+		phalcon_update_property_this(getThis(), SL("_listener"), listener);
 	}
 
 	if (priority) {
-		phalcon_update_property_this(this_ptr, SL("_priority"), priority);
+		phalcon_update_property_this(getThis(), SL("_priority"), priority);
 	}
 
 	if (event) {
-		phalcon_update_property_this(this_ptr, SL("_event"), event);
+		phalcon_update_property_this(getThis(), SL("_event"), event);
 	}
 }
 
@@ -115,14 +115,14 @@ PHP_METHOD(Phalcon_Events_Listener, setListener){
 
 	phalcon_fetch_params(0, 1, 0, &listener);
 
-	phalcon_update_property_this(this_ptr, SL("_listener"), listener);
+	phalcon_update_property_this(getThis(), SL("_listener"), listener);
 
 }
 
 PHP_METHOD(Phalcon_Events_Listener, getListener){
 
 
-	RETURN_MEMBER(this_ptr, "_listener");
+	RETURN_MEMBER(getThis(), "_listener");
 }
 
 PHP_METHOD(Phalcon_Events_Listener, setPriority){
@@ -131,14 +131,14 @@ PHP_METHOD(Phalcon_Events_Listener, setPriority){
 
 	phalcon_fetch_params(0, 1, 0, &priority);
 
-	phalcon_update_property_this(this_ptr, SL("_priority"), priority);
+	phalcon_update_property_this(getThis(), SL("_priority"), priority);
 
 }
 
 PHP_METHOD(Phalcon_Events_Listener, getPriority){
 
 
-	RETURN_MEMBER(this_ptr, "_priority");
+	RETURN_MEMBER(getThis(), "_priority");
 }
 
 PHP_METHOD(Phalcon_Events_Listener, setEvent){
@@ -147,12 +147,12 @@ PHP_METHOD(Phalcon_Events_Listener, setEvent){
 
 	phalcon_fetch_params(0, 1, 0, &event);
 
-	phalcon_update_property_this(this_ptr, SL("_event"), event);
+	phalcon_update_property_this(getThis(), SL("_event"), event);
 
 }
 
 PHP_METHOD(Phalcon_Events_Listener, getEvent){
 
 
-	RETURN_MEMBER(this_ptr, "_event");
+	RETURN_MEMBER(getThis(), "_event");
 }

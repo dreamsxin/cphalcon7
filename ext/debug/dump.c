@@ -139,17 +139,17 @@ PHP_METHOD(Phalcon_Debug_Dump, __construct){
 	phalcon_array_update_string_string(&default_styles, SL("res"), SL("color:lime"), 0);
 	phalcon_array_update_string_string(&default_styles, SL("str"), SL("color:teal"), 0);
 
-	phalcon_update_property_this(this_ptr, SL("_styles"), default_styles);
+	phalcon_update_property_this(getThis(), SL("_styles"), default_styles);
 
 	if (styles && Z_TYPE_P(styles) != IS_NULL) {
 		PHALCON_CALL_SELF(NULL, "setstyles", styles);
 	}
 
 	if (detailed && zend_is_true(detailed)) {
-		phalcon_update_property_bool(this_ptr, SL("_detailed"), 1);
+		phalcon_update_property_bool(getThis(), SL("_detailed"), 1);
 	}
 
-	phalcon_update_property_empty_array(this_ptr, SL("_objects"));
+	phalcon_update_property_empty_array(getThis(), SL("_objects"));
 
 	PHALCON_MM_RESTORE();
 }
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Debug_Dump, all){
 
 	PHALCON_INIT_VAR(call_object);
 	array_init_size(call_object, 2);
-	phalcon_array_append(call_object, this_ptr, PH_SEPARATE);
+	phalcon_array_append(call_object, getThis(), PH_SEPARATE);
 	phalcon_array_append(call_object, method_name, PH_SEPARATE);
 
 	PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Debug_Dump, getStyle){
 
 	phalcon_fetch_params(1, 1, 0, &type);
 
-	styles  = phalcon_read_property(this_ptr, SL("_styles"), PH_NOISY);
+	styles  = phalcon_read_property(getThis(), SL("_styles"), PH_NOISY);
 
 	if (phalcon_array_isset(styles, type)) {
 		PHALCON_OBS_VAR(style);
@@ -221,12 +221,12 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 		return;
 	}
 
-	default_styles  = phalcon_read_property(this_ptr, SL("_styles"), PH_NOISY);
+	default_styles  = phalcon_read_property(getThis(), SL("_styles"), PH_NOISY);
 
 	PHALCON_INIT_VAR(new_styles);
 	phalcon_fast_array_merge(new_styles, &default_styles, &styles);
 
-	phalcon_update_property_this(this_ptr, SL("_styles"), new_styles);
+	phalcon_update_property_this(getThis(), SL("_styles"), new_styles);
 
 	RETURN_THIS();
 }
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
-		phalcon_concat_self(&return_value, output);
+		phalcon_concat_self(return_value, output);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(variable), idx, str_key, value) {
 			zval key;
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
 
-			phalcon_concat_self(&return_value, tmp);
+			phalcon_concat_self(return_value, tmp);
 
 			PHALCON_INIT_NVAR(str);
 			ZVAL_STRING(str, "[<span style=':style'>:key</span>] => ");
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
-			phalcon_concat_self(&return_value, output);
+			phalcon_concat_self(return_value, output);
 
 			if (PHALCON_IS_LONG(tab, 1) && !PHALCON_IS_EMPTY(name) && !phalcon_is_numeric(key) && PHALCON_IS_IDENTICAL(name, key)) {
 				continue;
@@ -377,7 +377,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT_STR(return_value, " (\n");
 
-		objects  = phalcon_read_property(this_ptr, SL("_objects"), PH_NOISY);
+		objects  = phalcon_read_property(getThis(), SL("_objects"), PH_NOISY);
 
 		if (phalcon_fast_in_array(variable, objects)) {
 			
@@ -394,9 +394,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			RETURN_MM();
 		}
 
-		phalcon_update_property_array_append(this_ptr, SL("_objects"), variable);
+		phalcon_update_property_array_append(getThis(), SL("_objects"), variable);
 
-		detailed  = phalcon_read_property(this_ptr, SL("_detailed"), PH_NOISY);
+		detailed  = phalcon_read_property(getThis(), SL("_detailed"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(properties);
 		phalcon_get_object_vars(properties, variable, !zend_is_true(detailed));

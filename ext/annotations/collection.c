@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 		phalcon_array_append(annotations, annotation, 0);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_annotations"), annotations);
+	phalcon_update_property_this(getThis(), SL("_annotations"), annotations);
 	PHALCON_MM_RESTORE();
 }
 
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, count){
 
 	zval *annotations;
 
-	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
+	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		RETURN_LONG(zend_hash_num_elements(Z_ARRVAL_P(annotations)));
 	}
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, count){
 PHP_METHOD(Phalcon_Annotations_Collection, rewind){
 
 
-	phalcon_update_property_long(this_ptr, SL("_position"), 0);
+	phalcon_update_property_long(getThis(), SL("_position"), 0);
 
 }
 
@@ -187,8 +187,8 @@ PHP_METHOD(Phalcon_Annotations_Collection, current){
 
 	zval *position, *annotations, *annotation;
 
-	position    = phalcon_read_property(this_ptr, SL("_position"), PH_NOISY);
-	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
+	position    = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
+	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&annotation, annotations, position)) {
 		RETURN_ZVAL(annotation, 1, 0);
 	}
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, current){
 PHP_METHOD(Phalcon_Annotations_Collection, key){
 
 
-	RETURN_MEMBER(this_ptr, "_position");
+	RETURN_MEMBER(getThis(), "_position");
 }
 
 /**
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, key){
 PHP_METHOD(Phalcon_Annotations_Collection, next){
 
 
-	phalcon_property_incr(this_ptr, SL("_position"));
+	phalcon_property_incr(getThis(), SL("_position"));
 
 }
 
@@ -229,9 +229,9 @@ PHP_METHOD(Phalcon_Annotations_Collection, valid){
 
 	PHALCON_MM_GROW();
 
-	position = phalcon_read_property(this_ptr, SL("_position"), PH_NOISY);
+	position = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
 
-	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
+	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
 	if (phalcon_array_isset(annotations, position)) {
 		RETURN_MM_TRUE;
 	}
@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, valid){
 PHP_METHOD(Phalcon_Annotations_Collection, getAnnotations){
 
 
-	RETURN_MEMBER(this_ptr, "_annotations");
+	RETURN_MEMBER(getThis(), "_annotations");
 }
 
 /**
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, get){
 
 	phalcon_fetch_params(1, 1, 0, &name);
 
-	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
+	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 	PHALCON_INIT_VAR(found);
 	array_init(found);
 
-	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
+	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
@@ -335,7 +335,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, has){
 
 	phalcon_fetch_params(1, 1, 0, &name);
 
-	annotations = phalcon_read_property(this_ptr, SL("_annotations"), PH_NOISY);
+	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");

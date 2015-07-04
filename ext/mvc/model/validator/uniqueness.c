@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	PHALCON_INIT_VAR(option);
 	ZVAL_STRING(option, "field");
 	
-	PHALCON_CALL_METHOD(&field, this_ptr, "getoption", option);
+	PHALCON_CALL_METHOD(&field, getThis(), "getoption", option);
 	PHALCON_CALL_METHOD(&dependency_injector, record, "getdi");
 	
 	PHALCON_INIT_VAR(service);
@@ -317,9 +317,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 * Check if the developer has defined a custom message
 		 */
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, phalcon_interned_message);
+		ZVAL_STR(option, IS(message));
 	
-		PHALCON_CALL_METHOD(&message, this_ptr, "getoption", option);
+		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
 		if (!zend_is_true(message)) {
 			if (Z_TYPE_P(field) == IS_ARRAY) { 
 				PHALCON_INIT_VAR(join_fields);
@@ -343,17 +343,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 * Is code set
 		 */
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, phalcon_interned_code);
+		ZVAL_STR(option, IS(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, this_ptr, "issetoption", option);
+		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
 		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, this_ptr, "getoption", option);
+			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
 		} else {
 			PHALCON_INIT_VAR(code);
 			ZVAL_LONG(code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, this_ptr, "appendmessage", message, field, type, code);
+		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field, type, code);
 		RETURN_MM_FALSE;
 	}
 	

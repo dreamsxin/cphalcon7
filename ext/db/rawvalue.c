@@ -75,7 +75,7 @@ PHP_METHOD(Phalcon_Db_RawValue, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 	
-	phalcon_update_property_this(this_ptr, SL("_value"), value);
+	phalcon_update_property_this(getThis(), SL("_value"), value);
 	
 }
 
@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Db_RawValue, __construct){
 PHP_METHOD(Phalcon_Db_RawValue, getValue){
 
 
-	RETURN_MEMBER(this_ptr, "_value");
+	RETURN_MEMBER(getThis(), "_value");
 }
 
 /**
@@ -96,5 +96,5 @@ PHP_METHOD(Phalcon_Db_RawValue, getValue){
 PHP_METHOD(Phalcon_Db_RawValue, __toString){
 
 
-	RETURN_MEMBER(this_ptr, "_value");
+	RETURN_MEMBER(getThis(), "_value");
 }

@@ -316,7 +316,7 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 	return status;
 }
 
-int phalcon_array_update_quick_string(zval *arr, const char *index, uint index_length, ulong key, zval *value, int flags){
+int phalcon_array_update_string(zval *arr, const char *index, uint index_length, zval *value, int flags){
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
 		zend_error(E_WARNING, "Cannot use a scalar value as an array (3)");
@@ -341,6 +341,33 @@ int phalcon_array_update_quick_string(zval *arr, const char *index, uint index_l
 	}
 
 	return zend_hash_update(Z_ARRVAL_P(arr), zend_string_init(index, index_length, 0), value) ? SUCCESS : FAILURE;
+}
+
+int phalcon_array_update_str(zval *arr, zend_string *index, zval *value, int flags){
+
+	if (Z_TYPE_P(arr) != IS_ARRAY) {
+		zend_error(E_WARNING, "Cannot use a scalar value as an array (3)");
+		return FAILURE;
+	}
+
+	if ((flags & PH_CTOR) == PH_CTOR) {
+		zval *new_zv;
+		Z_DELREF_P(value);
+		ALLOC_ZVAL(new_zv);
+		INIT_PZVAL_COPY(new_zv, value);
+		value = new_zv;
+		zval_copy_ctor(new_zv);
+	}
+
+	if ((flags & PH_SEPARATE) == PH_SEPARATE) {
+		SEPARATE_ZVAL_IF_NOT_REF(arr);
+	}
+
+	if ((flags & PH_COPY) == PH_COPY) {
+		Z_ADDREF_P(value);
+	}
+
+	return zend_hash_update(Z_ARRVAL_P(arr), index, value) ? SUCCESS : FAILURE;
 }
 
 int phalcon_array_update_long(zval *arr, ulong index, zval *value, int flags){
@@ -785,8 +812,8 @@ void phalcon_array_merge_recursive_n(zval *a1, zval *a2)
 			phalcon_array_fetch(&tmp1, a1, key, PH_NOISY);
 			phalcon_array_fetch(&tmp2, a2, key, PH_NOISY);
 			phalcon_array_merge_recursive_n(tmp1, tmp2);
-			phalcon_ptr_dtor(tmp1);
-			phalcon_ptr_dtor(tmp2);
+			zval_ptr_dtor(tmp1);
+			zval_ptr_dtor(tmp2);
 		}
 	}
 }
@@ -812,8 +839,8 @@ void phalcon_array_merge_recursive_n2(zval *a1, zval *a2)
 			phalcon_array_fetch(&tmp1, a1, key, PH_NOISY);
 			phalcon_array_fetch(&tmp2, a2, key, PH_NOISY);
 			phalcon_array_merge_recursive_n2(tmp1, tmp2);
-			phalcon_ptr_dtor(tmp1);
-			phalcon_ptr_dtor(tmp2);
+			zval_ptr_dtor(tmp1);
+			zval_ptr_dtor(tmp2);
 		}
 	}
 }
@@ -875,13 +902,13 @@ int phalcon_array_key_exists(zval *arr, zval *key)
 	if (h) {
 		switch (Z_TYPE_P(key)) {
 			case IS_STRING:
-				return zend_symtable_exists(h, Z_STR_P(key));
+				return zend_hash_exists(h, Z_STR_P(key));
 
 			case IS_LONG:
 				return zend_hash_index_exists(h, Z_LVAL_P(key));
 
 			case IS_NULL:
-				return zend_hash_exists(h, zend_string_init("", 1, 0));
+				return zend_hash_str_exists(h, "", 0);
 
 			default:
 				zend_error(E_WARNING, "The key should be either a string or an integer");

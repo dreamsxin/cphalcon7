@@ -134,7 +134,7 @@ static zval* phalcon_config_read_internal(phalcon_config_object *object, zval *k
 	zval *retval;
 
 	if (UNEXPECTED(!key) || Z_TYPE_P(key) == IS_NULL) {
-		return EG(uninitialized_zval_ptr);
+		return &EG(uninitialized_zval);
 	}
 
 	retval = phalcon_hash_get(object->props, key, type);
@@ -150,7 +150,7 @@ static zval* phalcon_config_read_property(zval *object, zval *offset, int type, 
 
 	if (!is_phalcon_class(obj->obj.ce)) {
 		if (BP_VAR_IS == type && !zend_get_std_object_handlers()->has_property(object, offset, 0, cache_slot, rv)) {
-			return EG(uninitialized_zval_ptr);
+			return &EG(uninitialized_zval);
 		}
 
 		return zend_get_std_object_handlers()->read_property(object, offset, type, cache_slot, rv);
@@ -168,7 +168,7 @@ static zval* phalcon_config_read_dimension(zval *object, zval *offset, int type,
 
 	if (!is_phalcon_class(obj->obj.ce)) {
 		if (BP_VAR_IS == type && !zend_get_std_object_handlers()->has_dimension(object, offset, 0, rv)) {
-			return EG(uninitialized_zval_ptr);
+			return &EG(uninitialized_zval);
 		}
 
 		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
@@ -457,7 +457,7 @@ void phalcon_config_construct_internal(zval* this_ptr, zval *array_config)
  */
 PHALCON_ATTR_WARN_UNUSED_RESULT static int phalcon_config_toarray_internal(zval **return_value_ptr, zval *this_ptr)
 {
-	phalcon_config_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(this_ptr, phalcon_config_object);
+	phalcon_config_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_config_object);
 	int result;
 
 	assert(!EG(exception));
@@ -467,9 +467,9 @@ PHALCON_ATTR_WARN_UNUSED_RESULT static int phalcon_config_toarray_internal(zval 
 		return SUCCESS;
 	}
 
-	if (phalcon_method_exists_ex(this_ptr, SS("toarray")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SS("toarray")) == SUCCESS) {
 		zval *return_value = *return_value_ptr;
-		result = phalcon_return_call_method(return_value, return_value_ptr, this_ptr, "toarray", 0, NULL);
+		result = phalcon_return_call_method(return_value, return_value_ptr, getThis(), "toarray", 0, NULL);
 	}
 	else {
 		zval *params[] = { this_ptr };
@@ -635,7 +635,7 @@ PHP_METHOD(Phalcon_Config, merge){
 	if (Z_TYPE_P(config) == IS_OBJECT) {
 		ALLOC_INIT_ZVAL(array_config);
 		if (FAILURE == phalcon_config_toarray_internal(&array_config, config)) {
-			phalcon_ptr_dtor(array_config);
+			zval_ptr_dtor(array_config);
 			return;
 		}
 	} else {
@@ -678,7 +678,7 @@ PHP_METHOD(Phalcon_Config, merge){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_ptr_dtor(array_config);
+	zval_ptr_dtor(array_config);
 
 	RETURN_THISW();
 }

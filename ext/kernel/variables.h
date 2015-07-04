@@ -25,9 +25,9 @@
 void phalcon_serialize(zval *return_value, zval *var );
 void phalcon_unserialize(zval *return_value, zval *var);
 
-void phalcon_var_export(zval **var);
-void phalcon_var_export_ex(zval *return_value, zval **var);
+void phalcon_var_export(zval *var);
+void phalcon_var_export_ex(zval *return_value, zval *var);
 
-void phalcon_var_dump(zval **var);
+void phalcon_var_dump(zval *var);
 
 #endif

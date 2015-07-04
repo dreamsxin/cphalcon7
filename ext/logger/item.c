@@ -83,12 +83,12 @@ PHP_METHOD(Phalcon_Logger_Item, __construct){
 		time = &PHALCON_GLOBAL(z_zero);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_message"), message);
-	phalcon_update_property_this(this_ptr, SL("_type"), type);
-	phalcon_update_property_this(this_ptr, SL("_time"), time);
+	phalcon_update_property_this(getThis(), SL("_message"), message);
+	phalcon_update_property_this(getThis(), SL("_type"), type);
+	phalcon_update_property_this(getThis(), SL("_time"), time);
 
 	if (context && Z_TYPE_P(context) == IS_ARRAY) {
-		phalcon_update_property_this(this_ptr, SL("_context"), context);
+		phalcon_update_property_this(getThis(), SL("_context"), context);
 	}
 }
 
@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Logger_Item, __construct){
 PHP_METHOD(Phalcon_Logger_Item, getMessage){
 
 
-	RETURN_MEMBER(this_ptr, "_message");
+	RETURN_MEMBER(getThis(), "_message");
 }
 
 /**
@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Logger_Item, getMessage){
 PHP_METHOD(Phalcon_Logger_Item, getType){
 
 
-	RETURN_MEMBER(this_ptr, "_type");
+	RETURN_MEMBER(getThis(), "_type");
 }
 
 /**
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Logger_Item, getType){
 PHP_METHOD(Phalcon_Logger_Item, getTime){
 
 
-	RETURN_MEMBER(this_ptr, "_time");
+	RETURN_MEMBER(getThis(), "_time");
 }
 
 PHP_METHOD(Phalcon_Logger_Item, getContext) {

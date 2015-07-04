@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setTemplate){
 
 	phalcon_fetch_params(0, 1, 0, &template);
 
-	phalcon_update_property_this(this_ptr, SL("_template"), template);
+	phalcon_update_property_this(getThis(), SL("_template"), template);
 
 	RETURN_THISW();
 }
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setTemplate){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, getTemplate){
 
-	RETURN_MEMBER(this_ptr, "_template");
+	RETURN_MEMBER(getThis(), "_template");
 }
 
 /**
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 	}
 
 	if (zend_is_true(merge)) {
-		view_params = phalcon_read_property(this_ptr, SL("_viewParams"), PH_NOISY);
+		view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
 			phalcon_fast_array_merge(merged_params, &view_params, &params);
@@ -216,9 +216,9 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 			PHALCON_CPY_WRT(merged_params, params);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_viewParams"), merged_params);
+		phalcon_update_property_this(getThis(), SL("_viewParams"), merged_params);
 	} else {
-		phalcon_update_property_this(this_ptr, SL("_viewParams"), params);
+		phalcon_update_property_this(getThis(), SL("_viewParams"), params);
 	}
 
 	RETURN_THIS();
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, getVars){
 
-	RETURN_MEMBER(this_ptr, "_viewParams");
+	RETURN_MEMBER(getThis(), "_viewParams");
 }
 
 /**
@@ -254,7 +254,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
 	}
 
 	if (zend_is_true(isappend)) {
-		view_params = phalcon_read_property(this_ptr, SL("_viewParams"), PH_NOISY);
+		view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 
 		if (Z_TYPE_P(view_params) == IS_ARRAY && phalcon_array_isset(view_params, key)) { 
 			PHALCON_OBS_VAR(var);
@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
 		PHALCON_CPY_WRT(var_append, value);
 	}
 
-	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, var_append);
+	phalcon_update_property_array(getThis(), SL("_viewParams"), key, var_append);
 
 	RETURN_THIS();
 }
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getVar){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	view_params = phalcon_read_property(this_ptr, SL("_viewParams"), PH_NOISY);
+	view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 
 	if (Z_TYPE_P(view_params) == IS_ARRAY && phalcon_array_isset(view_params, key)) { 
 		PHALCON_OBS_VAR(var);
@@ -328,7 +328,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, addChild){
 		PHALCON_CALL_METHOD(NULL, child, "setappend", append);
 	}
 
-	phalcon_update_property_array_append(this_ptr, SL("_childs"), child);
+	phalcon_update_property_array_append(getThis(), SL("_childs"), child);
 
 	RETURN_THIS();
 }
@@ -377,7 +377,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 	if (capture_to) {
 		array_init(return_value);
 
-		childs = phalcon_read_property(this_ptr, SL("_childs"), PH_NOISY);
+		childs = phalcon_read_property(getThis(), SL("_childs"), PH_NOISY);
 
 		if (Z_TYPE_P(childs) != IS_ARRAY) {
 			RETURN_MM_EMPTY_ARRAY();
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		RETURN_MM_MEMBER(this_ptr, "_childs");
+		RETURN_MM_MEMBER(getThis(), "_childs");
 	}
 }
 
@@ -413,7 +413,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, hasChild){
 
 	phalcon_fetch_params(1, 0, 1, &capture_to);
 
-	childs = phalcon_read_property(this_ptr, SL("_childs"), PH_NOISY);
+	childs = phalcon_read_property(getThis(), SL("_childs"), PH_NOISY);
 
 	if (Z_TYPE_P(childs) != IS_ARRAY) {
 		RETURN_MM_FALSE;
@@ -450,7 +450,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setCaptureTo){
 
 	phalcon_fetch_params(0, 1, 0, &capture);
 
-	phalcon_update_property_this(this_ptr, SL("_captureTo"), capture);
+	phalcon_update_property_this(getThis(), SL("_captureTo"), capture);
 
 	RETURN_THISW();
 }
@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setCaptureTo){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, getCaptureTo){
 
-	RETURN_MEMBER(this_ptr, "_captureTo");
+	RETURN_MEMBER(getThis(), "_captureTo");
 }
 
 /**
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setTerminal){
 
 	phalcon_fetch_params(0, 1, 0, &terminate);
 
-	phalcon_update_property_this(this_ptr, SL("_terminate"), terminate);
+	phalcon_update_property_this(getThis(), SL("_terminate"), terminate);
 
 	RETURN_THISW();
 }
@@ -489,7 +489,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setTerminal){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, getTerminal){
 
-	RETURN_MEMBER(this_ptr, "_terminate");
+	RETURN_MEMBER(getThis(), "_terminate");
 }
 
 /**
@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setAppend){
 
 	phalcon_fetch_params(0, 1, 0, &append);
 
-	phalcon_update_property_this(this_ptr, SL("_append"), append);
+	phalcon_update_property_this(getThis(), SL("_append"), append);
 
 	RETURN_THISW();
 }
@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, isAppend){
 
 	PHALCON_MM_GROW();
 
-	append = phalcon_read_property(this_ptr, SL("_append"), PH_NOISY);
+	append = phalcon_read_property(getThis(), SL("_append"), PH_NOISY);
 
 	if (zend_is_true(append)) {
 		RETURN_MM_TRUE;
@@ -541,7 +541,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setView){
 
 	phalcon_fetch_params(0, 1, 0, &view);
 
-	phalcon_update_property_this(this_ptr, SL("_view"), view);
+	phalcon_update_property_this(getThis(), SL("_view"), view);
 
 	RETURN_THISW();
 }
@@ -554,7 +554,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setView){
 PHP_METHOD(Phalcon_Mvc_View_Model, getView){
 
 
-	RETURN_MEMBER(this_ptr, "_view");
+	RETURN_MEMBER(getThis(), "_view");
 }
 
 /**
@@ -606,7 +606,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 	phalcon_ob_start();
 
-	view = phalcon_read_property(this_ptr, SL("_view"), PH_NOISY);
+	view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 
 	if (Z_TYPE_P(view) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
@@ -629,7 +629,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		PHALCON_INIT_VAR(event_name);
 		ZVAL_STRING(event_name, "view:beforeRender");
 
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr);
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis());
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_NULL();
 		}
@@ -697,7 +697,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 					PHALCON_INIT_NVAR(event_name);
 					ZVAL_STRING(event_name, "view:beforeRenderView");
 
-					PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, this_ptr, view_engine_path);
+					PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis(), view_engine_path);
 					if (PHALCON_IS_FALSE(status)) {
 						continue;
 					}
@@ -713,7 +713,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 					PHALCON_INIT_NVAR(event_name);
 					ZVAL_STRING(event_name, "view:afterRenderView");
-					PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr);
+					PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis());
 				}
 
 				break;
@@ -741,7 +741,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_NVAR(event_name);
 		ZVAL_STRING(event_name, "view:afterRender");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, this_ptr);
+		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis());
 	}
 
 	PHALCON_INIT_VAR(contents);
@@ -764,7 +764,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __set){
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
 
-	phalcon_update_property_array(this_ptr, SL("_viewParams"), key, value);
+	phalcon_update_property_array(getThis(), SL("_viewParams"), key, value);
 
 }
 
@@ -780,7 +780,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __get){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	params = phalcon_read_property(this_ptr, SL("_viewParams"), PH_NOISY);
+	params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -800,7 +800,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __isset){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	params = phalcon_read_property(this_ptr, SL("_viewParams"), PH_NOISY);
+	params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset(params, key)) {
 		RETURN_TRUE;
 	}

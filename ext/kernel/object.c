@@ -413,7 +413,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 	}
 
 	if (check_access) {
-		PHALCON_CALL_FUNCTION(return_value, "get_class_methods", *object);
+		PHALCON_CALL_FUNCTION(&return_value, "get_class_methods", object);
 	} else {
 		array_init(return_value);
 
@@ -548,7 +548,7 @@ int phalcon_clone(zval *destination, zval *obj) {
 				Z_SET_REFCOUNT_P(destination, 1);
 				ZVAL_UNREF(destination);
 				if (EG(exception)) {
-					phalcon_ptr_dtor(destination);
+					zval_ptr_dtor(destination);
 					ZVAL_NULL(destination);
 				}
 			}
@@ -725,7 +725,6 @@ int phalcon_update_property_bool(zval *object, const char *property_name, uint32
  * Checks whether obj is an object and updates property with null value
  */
 int phalcon_update_property_null(zval *object, const char *property_name, uint32_t property_length) {
-
 	zval *v = &PHALCON_GLOBAL(z_null);
 	return phalcon_update_property_zval(object, property_name, property_length, v);
 }
@@ -734,13 +733,17 @@ int phalcon_update_property_null(zval *object, const char *property_name, uint32
  * Checks whether obj is an object and updates property with another zval
  */
 int phalcon_update_property_zval(zval *object, const char *property_name, uint32_t property_length, zval *value){
-
 	zend_class_entry *ce, *old_scope;
 	zval property;
 
+	if (!object) {
+		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (1)");
+		return FAILURE;
+	}
+
 	old_scope = EG(scope);
 	if (Z_TYPE_P(object) != IS_OBJECT) {
-		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object");
+		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (2)");
 		return FAILURE;
 	}
 
@@ -759,7 +762,7 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 
 	Z_OBJ_HT_P(object)->write_property(object, &property, value, 0);
 
-	phalcon_dtor(property);
+	zval_dtor(&property);
 
 	EG(scope) = old_scope;
 	return SUCCESS;
@@ -1276,8 +1279,8 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 
 	if (phalcon_has_constructor_ce(ce)) {
 		int param_count = (Z_TYPE_P(params) == IS_ARRAY) ? zend_hash_num_elements(Z_ARRVAL_P(params)) : 0;
-		zval static_params[10];
-		zval *params_str, *params_arr = NULL;
+		zval *static_params[10];
+		zval **params_ptr, **params_arr = NULL;
 
 		if (param_count > 0) {
 			HashPosition pos;
@@ -1287,7 +1290,7 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 			if (likely(param_count) <= 10) {
 				params_ptr = static_params;
 			} else {
-				params_arr = emalloc(param_count * sizeof(zval));
+				params_arr = emalloc(param_count * sizeof(zval*));
 				params_ptr = params_arr;
 			}
 
@@ -1296,13 +1299,13 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 				(item = zend_hash_get_current_data_ex(Z_ARRVAL_P(params), &pos)) != NULL;
 				zend_hash_move_forward_ex(Z_ARRVAL_P(params), &pos), ++i
 			) {
-				params_ptr[i] = *item;
+				params_ptr[i] = item;
 			}
 		} else {
 			params_ptr = NULL;
 		}
 
-		outcome = phalcon_call_method(NULL, return_value, "__construct", param_count, params_ptr);
+		outcome = phalcon_call_class_method_aparams(NULL, return_value, Z_OBJCE_P(return_value), phalcon_fcall_method, "__construct", 11, param_count, params_ptr);
 
 		if (unlikely(params_arr != NULL)) {
 			efree(params_arr);
@@ -1350,23 +1353,6 @@ int phalcon_create_instance_params(zval *return_value, const zval *class_name, z
 	}
 
 	return phalcon_create_instance_params_ce(return_value, ce, params);
-}
-
-/**
- * Creates a closure
- */
-int phalcon_create_closure_ex(zval *return_value, zval *this_ptr, zend_class_entry *ce, const char *method_name, uint32_t method_length) {
-
-	zend_function *function_ptr;
-
-	if ((function_ptr = zend_hash_str_find_ptr(&ce->function_table, method_name, method_length)) == NULL) {
-		ZVAL_NULL(return_value);
-		return FAILURE;
-	}
-
-	zend_create_closure(return_value, function_ptr, ce, this_ptr);
-
-	return SUCCESS;
 }
 
 /**

@@ -26,7 +26,6 @@
 zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigned long *position, char *cursor, char *marker){
 
 	zval *zv, *tmp;
-	int result = FAILURE;
 	unsigned int length = 0, variable_length, ch, j;
 	char *item = NULL, *cursor_var, *variable = NULL;
 	int not_valid = 0;
@@ -69,7 +68,7 @@ zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigne
 					item = variable;
 					length = variable_length;
 				}
-				if (zend_hash_exists(Z_ARRVAL_P(replacements), item, length + 1)) {
+				if (zend_hash_str_exists(Z_ARRVAL_P(replacements), item, length + 1)) {
 					if ((zv = zend_hash_str_find(Z_ARRVAL_P(replacements), item, length + 1)) != NULL) {
 						efree(item);
 						(*position)++;
@@ -80,7 +79,7 @@ zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigne
 				if ((zv = zend_hash_index_find(Z_ARRVAL_P(paths), *position)) != NULL) {
 					if (Z_TYPE_P(zv) == IS_STRING) {
 						if (zend_hash_exists(Z_ARRVAL_P(replacements), Z_STR_P(zv))) {
-							if ((tmp = zend_hash_find(Z_ARRVAL_P(replacements), Z_STR_P(zv)) == SUCCESS) {
+							if ((tmp = zend_hash_find(Z_ARRVAL_P(replacements), Z_STR_P(zv))) == SUCCESS) {
 								(*position)++;
 								return tmp;
 							}
@@ -169,7 +168,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 								}
 								smart_str_appendl(&route_str, Z_STRVAL_P(replace), Z_STRLEN_P(replace));
 								if (use_copy) {
-									phalcon_dtor(replace_copy);
+									zval_dtor(&replace_copy);
 								}
 							}
 							cursor++;
@@ -203,7 +202,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 								}
 								smart_str_appendl(&route_str, Z_STRVAL_P(replace), Z_STRLEN_P(replace));
 								if (use_copy) {
-									phalcon_dtor(replace_copy);
+									zval_dtor(&replace_copy);
 								}
 							}
 							cursor++;
@@ -229,7 +228,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 							}
 							smart_str_appendl(&route_str, Z_STRVAL_P(replace), Z_STRLEN_P(replace));
 							if (use_copy) {
-								phalcon_dtor(replace_copy);
+								zval_dtor(&replace_copy);
 							}
 						}
 						looking_placeholder = 0;

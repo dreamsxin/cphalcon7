@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 	
 	if (PHALCON_IS_FALSE(valid)) {
 		PHALCON_OBS_VAR(label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), phalcon_interned_label));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), ISV(label)));
 		if (!zend_is_true(label)) {
 			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(label)) {
@@ -108,7 +108,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 		}
 
 		PHALCON_OBS_VAR(with_label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &with_label, getThis(), phalcon_interned_label));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &with_label, getThis(), ISV(label)));
 		if (!zend_is_true(with_label)) {
 			PHALCON_CALL_METHOD(&with_label, validator, "getlabel", with_attribute);
 			if (!zend_is_true(with_label)) {
@@ -122,14 +122,14 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 		Z_ADDREF_P(with_label); add_assoc_zval_ex(pairs, SS(":with"), with_label);
 
 		PHALCON_OBS_VAR(message_str);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), phalcon_interned_message));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
 		if (!zend_is_true(message_str)) {
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), &message_str, validator, "Confirmation"));
 		}
 	
 		PHALCON_OBS_VAR(code);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), phalcon_interned_code));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), ISV(code)));
 		if (Z_TYPE_P(code) == IS_NULL) {
 			ZVAL_LONG(code, 0);
 		}

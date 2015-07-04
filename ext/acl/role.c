@@ -87,9 +87,9 @@ PHP_METHOD(Phalcon_Acl_Role, __construct){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_name"), name);
+	phalcon_update_property_this(getThis(), SL("_name"), name);
 	if (description && Z_TYPE_P(description) != IS_NULL) {
-		phalcon_update_property_this(this_ptr, SL("_description"), description);
+		phalcon_update_property_this(getThis(), SL("_description"), description);
 	}
 }
 
@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Acl_Role, __construct){
 PHP_METHOD(Phalcon_Acl_Role, getName){
 
 
-	RETURN_MEMBER(this_ptr, "_name");
+	RETURN_MEMBER(getThis(), "_name");
 }
 
 /**
@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Acl_Role, getName){
 PHP_METHOD(Phalcon_Acl_Role, getDescription){
 
 
-	RETURN_MEMBER(this_ptr, "_description");
+	RETURN_MEMBER(getThis(), "_description");
 }
 
 /**
@@ -123,6 +123,6 @@ PHP_METHOD(Phalcon_Acl_Role, getDescription){
 PHP_METHOD(Phalcon_Acl_Role, __toString){
 
 
-	RETURN_MEMBER(this_ptr, "_name");
+	RETURN_MEMBER(getThis(), "_name");
 }
 

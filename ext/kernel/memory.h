@@ -75,11 +75,6 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var);
 
 int ZEND_FASTCALL phalcon_clean_restore_stack();
 
-void ZEND_FASTCALL phalcon_copy_ctor(zval *destiny, zval *origin) PHALCON_ATTR_NONNULL;
-
-void ZEND_FASTCALL phalcon_ptr_dtor(zval *var);
-void ZEND_FASTCALL phalcon_dtor(zval var);
-
 /**
  * @brief destroys @c pzval if it is not @c NULL
  * @param pzval
@@ -125,7 +120,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 					Z_SET_REFCOUNT_P(z, 1);           \
 					ZVAL_UNREF(z);               \
 				} else {                              \
-					phalcon_ptr_dtor(z);              \
+					zval_ptr_dtor(z);              \
 					Z_SET_REFCOUNT_P(z, 1);           \
 					ZVAL_UNREF(z);               \
 				}                                     \
@@ -141,13 +136,13 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
  */
 #define PHALCON_INIT_BNVAR(z) \
 	if (Z_REFCOUNT_P(z) > 1) { \
-		phalcon_ptr_dtor(z); \
+		zval_ptr_dtor(z); \
 		ALLOC_ZVAL(z); \
 		Z_SET_REFCOUNT_P(z, 1); \
 		ZVAL_UNREF(z); \
 		ZVAL_NULL(z); \
 	} else {\
-		phalcon_ptr_dtor(z); \
+		zval_ptr_dtor(z); \
 		PHALCON_ALLOC_ZVAL(z); \
 	}
 
@@ -193,7 +188,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 	do {                                              \
 		if (d) {                                      \
 			if (Z_REFCOUNT_P(d) > 0) {                \
-				phalcon_ptr_dtor(d);                 \
+				zval_ptr_dtor(d);                 \
 			}                                         \
 		}                                             \
 		else {                                        \
@@ -207,7 +202,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 	do {                                              \
 		if (d) {                                      \
 			if (Z_REFCOUNT_P(d) > 0) {                \
-				phalcon_ptr_dtor(d);                 \
+				zval_ptr_dtor(d);                 \
 			}                                         \
 		} else {                                      \
 			PHALCON_MEMORY_OBSERVE(&d);               \
@@ -222,7 +217,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 #define PHALCON_MAKE_REFERENCE(d, v)	\
 	if (d) { \
 		if (Z_REFCOUNT_P(d) > 0) { \
-			phalcon_ptr_dtor(d); \
+			zval_ptr_dtor(d); \
 		} \
 	} else { \
 			phalcon_memory_observe(&d); \
@@ -244,7 +239,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 				Z_DELREF_P(z);                        \
 			}                                         \
 			else {                                    \
-				phalcon_ptr_dtor(z);                    \
+				zval_ptr_dtor(z);                    \
 				z = NULL;                             \
 			}                                         \
 		} else {                                      \
@@ -255,7 +250,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 #define PHALCON_OBSERVE_OR_NULLIFY_VAR(z)             \
 	do {                                              \
 		if (z) {                                      \
-			phalcon_ptr_dtor(z);                     \
+			zval_ptr_dtor(z);                     \
 			z = NULL;                                 \
 		} else {                                      \
 			PHALCON_MEMORY_OBSERVE(&z);               \

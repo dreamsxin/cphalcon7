@@ -115,7 +115,7 @@ static zval* phalcon_session_adapter_get_property_ptr_ptr_internal(zval *object,
 		if (type == BP_VAR_R || type == BP_VAR_RW) {
 			php_error_docref(NULL, E_WARNING, "Session is not started or $_SESSION is invalid");
 		}
-		return (type == BP_VAR_W || type == BP_VAR_RW) ? &EG(error_zval_ptr) : &EG(uninitialized_zval_ptr);
+		return (type == BP_VAR_W || type == BP_VAR_RW) ? &EG(error_zval) : &EG(uninitialized_zval);
 	}
 
 	phalcon_concat_vv(&pkey, unique_id, member, 0);
@@ -234,7 +234,7 @@ static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, 
 	}
 
 	if (UNEXPECTED(!offset)) {
-		return EG(uninitialized_zval_ptr);
+		return &EG(uninitialized_zval);
 	}
 
 	ret = phalcon_session_adapter_get_property_ptr_ptr_internal(object, offset, type);
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 	phalcon_fetch_params(0, 0, 0, 6, &options, &expire, &path, &secure, &domain, &http_only);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "setoptions", options);
+		PHALCON_CALL_METHODW(NULL, getThis(), "setoptions", options);
 	}
 
 	if (expire || path || secure || domain || http_only || http_only) {
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __destruct) {
 	started = phalcon_read_property(getThis(), SL("_started"), PH_NOISY);
 	if (zend_is_true(started)) {
 		RETURN_ON_FAILURE(phalcon_session_write_close());
-		phalcon_update_property_bool(this_ptr, SL("_started"), 0);
+		phalcon_update_property_bool(getThis(), SL("_started"), 0);
 	}
 }
 
@@ -490,7 +490,7 @@ PHP_METHOD(Phalcon_Session_Adapter, start){
 
 	if (!SG(headers_sent)) {
 		RETURN_ON_FAILURE(phalcon_session_start());
-		phalcon_update_property_bool(this_ptr, SL("_started"), 1);
+		phalcon_update_property_bool(getThis(), SL("_started"), 1);
 		RETURN_TRUE;
 	}
 
@@ -516,10 +516,10 @@ PHP_METHOD(Phalcon_Session_Adapter, setOptions){
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_string_fetch(&unique_id, options, SS("uniqueId"))) {
-			phalcon_update_property_this(this_ptr, SL("_uniqueId"), unique_id);
+			phalcon_update_property_this(getThis(), SL("_uniqueId"), unique_id);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_options"), options);
+		phalcon_update_property_this(getThis(), SL("_options"), options);
 	}
 }
 
@@ -561,7 +561,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 		RETURN_ZVAL(default_value, 1, 0);
 	}
 
-	unique_id = phalcon_read_property(this_ptr, SL("_uniqueId"), PH_NOISY);
+	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
 
 	PHALCON_MM_GROW();
 	PHALCON_INIT_VAR(key);
@@ -679,7 +679,7 @@ PHP_METHOD(Phalcon_Session_Adapter, remove){
  */
 PHP_METHOD(Phalcon_Session_Adapter, getId){
 
-	RETURN_ON_FAILURE(phalcon_get_session_id(return_value, return_value_ptr));
+	RETURN_ON_FAILURE(phalcon_get_session_id(return_value));
 }
 
 /**
@@ -694,7 +694,7 @@ PHP_METHOD(Phalcon_Session_Adapter, getId){
 PHP_METHOD(Phalcon_Session_Adapter, isStarted){
 
 
-	RETURN_MEMBER(this_ptr, "_started");
+	RETURN_MEMBER(getThis(), "_started");
 }
 
 /**
@@ -708,7 +708,7 @@ PHP_METHOD(Phalcon_Session_Adapter, isStarted){
  */
 PHP_METHOD(Phalcon_Session_Adapter, destroy){
 
-	phalcon_update_property_bool(this_ptr, SL("_started"), 0);
+	phalcon_update_property_bool(getThis(), SL("_started"), 0);
 	RETURN_ON_FAILURE(phalcon_session_destroy());
 	RETURN_TRUE;
 }

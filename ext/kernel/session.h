@@ -24,7 +24,7 @@
 
 int phalcon_session_start() PHALCON_ATTR_WARN_UNUSED_RESULT;
 int phalcon_session_destroy() PHALCON_ATTR_WARN_UNUSED_RESULT;
-int phalcon_get_session_id(zval *return_value, zval **return_value_ptr) PHALCON_ATTR_WARN_UNUSED_RESULT;
+int phalcon_get_session_id(zval *return_value) PHALCON_ATTR_WARN_UNUSED_RESULT;
 int phalcon_set_session_id(zval *sid) PHALCON_ATTR_WARN_UNUSED_RESULT;
 int phalcon_session_write_close() PHALCON_ATTR_WARN_UNUSED_RESULT;
 

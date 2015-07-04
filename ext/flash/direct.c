@@ -64,5 +64,5 @@ PHP_METHOD(Phalcon_Flash_Direct, message)
 
 	phalcon_fetch_params(0, 2, 0, &type, &message);
 	
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "outputmessage", type, message);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "outputmessage", type, message);
 }

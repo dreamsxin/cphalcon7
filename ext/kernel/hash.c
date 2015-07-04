@@ -109,8 +109,8 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
  * @param[in] key
  * @param[in] type One of @c BP_VAR_XXX values
  * @return Pointer to the stored value or a pointer to the special variable / @c NULL if @a key was not found
- * @retval <tt>&EG(error_zval_ptr)</tt> when @a key was not found and @a type is one of @c BP_VAR_W, @c BP_VAR_RW
- * @retval <tt>&EG(uninitialized_zval_ptr)</tt> when @a key was not found and @a type is one of @c BP_VAR_R, @c BP_VAR_UNSET, @c BP_VAR_IS
+ * @retval <tt>&EG(error_zval)</tt> when @a key was not found and @a type is one of @c BP_VAR_W, @c BP_VAR_RW
+ * @retval <tt>&EG(uninitialized_zval)</tt> when @a key was not found and @a type is one of @c BP_VAR_R, @c BP_VAR_UNSET, @c BP_VAR_IS
  * @retval @c NULL when @a key was not found and @a type is not any of the above
  * @throw @c E_WARNING when @a key is of not supported type; in this case the function never returns @c NULL
  * @throw @c E_STRICT when @a key is a resource

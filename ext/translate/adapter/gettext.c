@@ -153,9 +153,9 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 		RETURN_MM();
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_locale"), locale);
-	phalcon_update_property_this(this_ptr, SL("_defaultDomain"), default_domain);
-	phalcon_update_property_this(this_ptr, SL("_directory"), directory);
+	phalcon_update_property_this(getThis(), SL("_locale"), locale);
+	phalcon_update_property_this(getThis(), SL("_defaultDomain"), default_domain);
+	phalcon_update_property_this(getThis(), SL("_directory"), directory);
 
 	PHALCON_INIT_VAR(setting);
 	PHALCON_CONCAT_SV(setting, "LC_ALL=", locale);

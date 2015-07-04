@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, __construct){
 	object_init_ex(header, phalcon_http_client_header_ce);
 	PHALCON_CALL_METHOD(NULL, header, "__construct");
 
-	phalcon_update_property_this(this_ptr, SL("_header"), header);
+	phalcon_update_property_this(getThis(), SL("_header"), header);
 
 	if (headers) {
 		PHALCON_CALL_SELF(NULL, "setheader", headers);
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, setHeader){
 
 	phalcon_fetch_params(0, 1, 0, &headers);
 
-	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
+	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
 	PHALCON_CALL_METHODW(NULL, header, "parse", headers);
 
 	RETURN_THISW();
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, setHeader){
 
 PHP_METHOD(Phalcon_Http_Client_Response, getHeader){
 
-	RETURN_MEMBER(this_ptr, "_header");
+	RETURN_MEMBER(getThis(), "_header");
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, setBody){
@@ -135,14 +135,14 @@ PHP_METHOD(Phalcon_Http_Client_Response, setBody){
 
 	phalcon_fetch_params(0, 1, 0, &body);
 
-	phalcon_update_property_this(this_ptr, SL("_body"), body);
+	phalcon_update_property_this(getThis(), SL("_body"), body);
 
 	RETURN_THISW();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, getBody){
 
-	RETURN_MEMBER(this_ptr, "_body");
+	RETURN_MEMBER(getThis(), "_body");
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode){
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode){
 
 	phalcon_fetch_params(0, 1, 0, &status_code);
 
-	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
+	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
 	
 	PHALCON_CALL_METHODW(NULL, header, "setstatuscode", status_code);
 
@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, getStatusCode){
 
 	zval *header;
 	
-	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
+	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
 
 	PHALCON_RETURN_CALL_METHODW(header, "getstatuscode");
 }

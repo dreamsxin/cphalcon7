@@ -88,7 +88,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, set){
 
 	phalcon_fetch_params(0, 2, 0, &name, &value);
 	
-	phalcon_update_property_array(this_ptr, SL("_headers"), name, value);
+	phalcon_update_property_array(getThis(), SL("_headers"), name, value);
 	
 }
 
@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, get){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	
-	headers = phalcon_read_property(this_ptr, SL("_headers"), PH_NOISY);
+	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&header_value, headers, name)) {
 		RETURN_ZVAL(header_value, 1, 0);
 	}
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, setRaw){
 
 	phalcon_fetch_params(0, 1, 0, &header);
 	
-	phalcon_update_property_array(this_ptr, SL("_headers"), header, &PHALCON_GLOBAL(z_null));
+	phalcon_update_property_array(getThis(), SL("_headers"), header, &PHALCON_GLOBAL(z_null));
 }
 
 /**
@@ -137,11 +137,11 @@ PHP_METHOD(Phalcon_Http_Response_Headers, remove){
 
 	phalcon_fetch_params(0, 1, 0, &header_index);
 
-	headers = phalcon_read_property(this_ptr, SL("_headers"), PH_NOISY);
+	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
 
 	phalcon_array_unset(headers, header_index, 0);
 
-	phalcon_update_property_this(this_ptr, SL("_headers"), headers);
+	phalcon_update_property_this(getThis(), SL("_headers"), headers);
 }
 
 /**
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 	sapi_header_line ctr = { NULL, 0, 0 };
 
 	if (!SG(headers_sent)) {
-		zval *headers = phalcon_read_property(this_ptr, SL("_headers"), PH_NOISY);
+		zval *headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
 		zval *value;
 		HashPosition hp0;
 
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, reset){
 
 	PHALCON_INIT_VAR(empty_array);
 	array_init(empty_array);
-	phalcon_update_property_this(this_ptr, SL("_headers"), empty_array);
+	phalcon_update_property_this(getThis(), SL("_headers"), empty_array);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, reset){
 PHP_METHOD(Phalcon_Http_Response_Headers, toArray){
 
 
-	RETURN_MEMBER(this_ptr, "_headers");
+	RETURN_MEMBER(getThis(), "_headers");
 }
 
 /**

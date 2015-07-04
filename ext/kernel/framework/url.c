@@ -58,7 +58,7 @@ void phalcon_raw_url_encode(zval *return_value, zval *url) {
 
 	zval copy;
 	zend_string *escaped;
-	int use_copy = 0, length;
+	int use_copy = 0;
 
 	if (Z_TYPE_P(url) == IS_STRING) {
 		use_copy = zend_make_printable_zval(url, &copy);
@@ -67,10 +67,10 @@ void phalcon_raw_url_encode(zval *return_value, zval *url) {
 		}
 	}
 
-	escaped = php_raw_url_encode(Z_STRVAL_P(url), Z_STRLEN_P(url), &length);
+	escaped = php_raw_url_encode(Z_STRVAL_P(url), Z_STRLEN_P(url));
 
 	if (use_copy) {
-		phalcon_ptr_dtor(url);
+		zval_ptr_dtor(url);
 	}
 
 	if (escaped->len) {

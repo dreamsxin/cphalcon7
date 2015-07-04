@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
+	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
 	if (!phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
 		PHALCON_INIT_VAR(prefix);
@@ -174,9 +174,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 
 	PHALCON_CALL_METHOD(NULL, redis, "__construct", frontend_data, option);
 
-	phalcon_update_property_this(this_ptr, SL("_redis"), redis);
+	phalcon_update_property_this(getThis(), SL("_redis"), redis);
 	
-	phalcon_update_property_empty_array(this_ptr, SL("_metaData"));
+	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 
 	PHALCON_MM_RESTORE();
 }
@@ -195,8 +195,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 	
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(redis, "get", key, lifetime);
@@ -221,8 +221,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, write){
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
 	
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, redis, "save", key, data, lifetime);	
@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, reset)
 
 	PHALCON_MM_GROW();
 
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, redis, "flush");	

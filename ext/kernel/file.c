@@ -97,27 +97,6 @@ void phalcon_fast_filemtime(zval *return_value, zval *filename){
 }
 
 /**
- * Adds a trailing directory separator if the path doesn't have it
- */
-void phalcon_fix_path(zval **return_value, zval *path, zval *directory_separator) {
-
-	if (Z_TYPE_P(path) != IS_STRING || Z_TYPE_P(directory_separator) != IS_STRING) {
-		return;
-	}
-
-	if (Z_STRLEN_P(path) > 0 && Z_STRLEN_P(directory_separator) > 0) {
-		if (Z_STRVAL_P(path)[Z_STRLEN_P(path) - 1] != Z_STRVAL_P(directory_separator)[0]) {
-			PHALCON_CONCAT_VV(*return_value, path, directory_separator);
-			return;
-		}
-	}
-
-	phalcon_ptr_dtor(*return_value);
-	*return_value = path;
-	Z_ADDREF_P(path);
-}
-
-/**
  * Replaces directory separators by the virtual separator
  */
 void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_separator) {
@@ -397,7 +376,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 	php_stream_close(stream);
 
 	if (use_copy) {
-		phalcon_ptr_dtor(data);
+		zval_ptr_dtor(data);
 	}
 
 	if (numbytes < 0) {

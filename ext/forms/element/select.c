@@ -100,9 +100,9 @@ PHP_METHOD(Phalcon_Forms_Element_Select, __construct){
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_optionsValues"), options);
+	phalcon_update_property_this(getThis(), SL("_optionsValues"), options);
 
-	PHALCON_CALL_PARENT(NULL, phalcon_forms_element_select_ce, this_ptr, "__construct", name, attributes);
+	PHALCON_CALL_PARENT(NULL, phalcon_forms_element_select_ce, getThis(), "__construct", name, attributes);
 
 	PHALCON_MM_RESTORE();
 }
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, setOptions){
 
 	phalcon_fetch_params(0, 0, 1, 0, &options);
 	
-	phalcon_update_property_this(this_ptr, SL("_optionsValues"), options);
+	phalcon_update_property_this(getThis(), SL("_optionsValues"), options);
 	RETURN_THISW();
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, setOptions){
 PHP_METHOD(Phalcon_Forms_Element_Select, getOptions){
 
 
-	RETURN_MEMBER(this_ptr, "_optionsValues");
+	RETURN_MEMBER(getThis(), "_optionsValues");
 }
 
 /**
@@ -180,12 +180,12 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 	
-	options = phalcon_read_property(this_ptr, SL("_optionsValues"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_optionsValues"), PH_NOISY);
 	
 	/** 
 	 * Merged passed attributes with previously defined ones
 	 */
-	PHALCON_CALL_METHOD(&widget_attributes, this_ptr, "prepareattributes", attributes);
+	PHALCON_CALL_METHOD(&widget_attributes, getThis(), "prepareattributes", attributes);
 	PHALCON_RETURN_CALL_CE_STATIC(phalcon_tag_select_ce, "selectfield", widget_attributes, options);
 	RETURN_MM();
 }

@@ -231,14 +231,14 @@ static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 	zval *key1, *key2, *rows, *values;
 
 	PHALCON_ALLOC_GHOST_ZVAL(key1);
-	ZVAL_STRING(key1, phalcon_interned_rows);
+	ZVAL_STR(key1, IS(rows));
 
 	PHALCON_ALLOC_GHOST_ZVAL(rows);
 	if (!phalcon_array_isset_fetch(&rows, ret, key1)) {
 		array_init_size(rows, 1);		
 
 		PHALCON_ALLOC_GHOST_ZVAL(key2);
-		ZVAL_STRING(key2, phalcon_interned_values);
+		ZVAL_STR(key2, IS(values));
 
 		PHALCON_ALLOC_GHOST_ZVAL(values);
 		if (phalcon_array_isset_fetch(&values, ret, key2)) {
@@ -1351,12 +1351,12 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 134:
     case 135:
 /* #line 878 "parser.y" */
-{ phalcon_safe_zval_ptr_dtor((yypminor->yy68)); }
+{ phalcon_safe_zval_ptr_dtor(yypminor->yy68)); }
 /* #line 1356 "parser.c" */
       break;
     case 97:
 /* #line 968 "parser.y" */
-{ zephir_safe_zval_ptr_dtor((yypminor->yy68)); }
+{ zephir_safe_zval_ptr_dtor(yypminor->yy68)); }
 /* #line 1361 "parser.c" */
       break;
     default:  break;   /* If no destructor action specified: do nothing */

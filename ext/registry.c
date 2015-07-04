@@ -102,7 +102,7 @@ static void phalcon_registry_dtor(void *v)
 {
 	phalcon_registry_object *obj = v;
 
-	phalcon_ptr_dtor(obj->properties);
+	zval_ptr_dtor(obj->properties);
 	zend_object_std_dtor(&obj->obj);
 	efree(obj);
 }
@@ -197,7 +197,7 @@ static int phalcon_registry_call_method(const char *method, INTERNAL_FUNCTION_PA
 	}
 
 	if (params) {
-		phalcon_ptr_dtor(params);
+		zval_ptr_dtor(params);
 		efree(args);
 	}
 
@@ -306,7 +306,7 @@ static zval* phalcon_registry_read_dimension(zval *object, zval *offset, int typ
 	phalcon_registry_object *obj;
 
 	if (UNEXPECTED(!offset)) {
-		return EG(uninitialized_zval_ptr);
+		return &EG(uninitialized_zval);
 	}
 
 	obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
@@ -442,7 +442,7 @@ static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, con
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Bad parameters passed to Phalcon\\Registry::unserialize()");
 	}
 
-	phalcon_dtor(pzv);
+	zval_dtor(pzv);
 	PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 
 	return retval;
@@ -453,7 +453,7 @@ static int phalcon_registry_unserialize(zval **object, zend_class_entry *ce, con
  */
 static void phalcon_registry_iterator_dtor(zend_object_iterator *it)
 {
-	phalcon_ptr_dtor((zval*)it->data);
+	zval_ptr_dtor(&it->data);
 	efree(it);
 }
 
@@ -462,7 +462,7 @@ static void phalcon_registry_iterator_dtor(zend_object_iterator *it)
  */
 static int phalcon_registry_iterator_valid(zend_object_iterator *it)
 {
-	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
+	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(&it->data, phalcon_registry_object);
 	return obj->pos != NULL ? SUCCESS : FAILURE;
 }
 
@@ -471,7 +471,7 @@ static int phalcon_registry_iterator_valid(zend_object_iterator *it)
  */
 static zval *phalcon_registry_iterator_get_current_data(zend_object_iterator *it)
 {
-	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
+	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(&it->data, phalcon_registry_object);
 
 	return zend_hash_get_current_data_ex(Z_ARRVAL_P(obj->properties), &obj->pos);
 }
@@ -481,7 +481,7 @@ static zval *phalcon_registry_iterator_get_current_data(zend_object_iterator *it
  */
 static void phalcon_registry_iterator_get_current_key(zend_object_iterator *it, zval *key)
 {
-	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
+	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(&it->data, phalcon_registry_object);
 
 	zend_hash_get_current_key_zval_ex(Z_ARRVAL_P(obj->properties), key, &obj->pos);
 }
@@ -491,7 +491,7 @@ static void phalcon_registry_iterator_get_current_key(zend_object_iterator *it, 
  */
 static void phalcon_registry_iterator_move_forward(zend_object_iterator *it)
 {
-	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
+	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(&it->data, phalcon_registry_object);
 	zend_hash_move_forward_ex(Z_ARRVAL_P(obj->properties), &obj->pos);
 }
 
@@ -500,7 +500,7 @@ static void phalcon_registry_iterator_move_forward(zend_object_iterator *it)
  */
 static void phalcon_registry_iterator_rewind(zend_object_iterator *it)
 {
-	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL((zval*)it->data, phalcon_registry_object);
+	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(&it->data, phalcon_registry_object);
 	zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(obj->properties), &obj->pos);
 }
 
@@ -779,7 +779,7 @@ static PHP_METHOD(Phalcon_Registry, unserialize)
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Bad parameters passed to Phalcon\\Registry::unserialize()");
 	}
 
-	phalcon_dtor(pzv);
+	zval_dtor(pzv);
 	PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
 }
 

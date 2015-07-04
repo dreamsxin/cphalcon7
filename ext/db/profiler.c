@@ -132,11 +132,11 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 	PHALCON_CALL_FUNCTION(&time, "microtime", &PHALCON_GLOBAL(z_true));
 	PHALCON_CALL_METHOD(NULL, active_profile, "setinitialtime", time);
 
-	if (phalcon_method_exists_ex(this_ptr, SS("beforestartprofile")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, this_ptr, "beforestartprofile", active_profile);
+	if (phalcon_method_exists_ex(getThis(), SS("beforestartprofile")) == SUCCESS) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "beforestartprofile", active_profile);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_activeProfile"), active_profile);
+	phalcon_update_property_this(getThis(), SL("_activeProfile"), active_profile);
 	
 	RETURN_THIS();
 }
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 
 	PHALCON_CALL_FUNCTION(&final_time, "microtime", &PHALCON_GLOBAL(z_true));
 	
-	active_profile = phalcon_read_property(this_ptr, SL("_activeProfile"), PH_NOISY);
+	active_profile = phalcon_read_property(getThis(), SL("_activeProfile"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, active_profile, "setfinaltime", final_time);
 	
 	PHALCON_CALL_METHOD(&initial_time, active_profile, "getinitialtime");
@@ -163,14 +163,14 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 	PHALCON_INIT_VAR(difference);
 	phalcon_sub_function(difference, final_time, initial_time);
 	
-	total_seconds = phalcon_read_property(this_ptr, SL("_totalSeconds"), PH_NOISY);
+	total_seconds = phalcon_read_property(getThis(), SL("_totalSeconds"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(new_total_seconds);
 	phalcon_add_function(new_total_seconds, total_seconds, difference);
-	phalcon_update_property_this(this_ptr, SL("_totalSeconds"), new_total_seconds);
-	phalcon_update_property_array_append(this_ptr, SL("_allProfiles"), active_profile);
-	if (phalcon_method_exists_ex(this_ptr, SS("afterendprofile")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, this_ptr, "afterendprofile", active_profile);
+	phalcon_update_property_this(getThis(), SL("_totalSeconds"), new_total_seconds);
+	phalcon_update_property_array_append(getThis(), SL("_allProfiles"), active_profile);
+	if (phalcon_method_exists_ex(getThis(), SS("afterendprofile")) == SUCCESS) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "afterendprofile", active_profile);
 	}
 	
 	RETURN_THIS();
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Db_Profiler, getNumberTotalStatements){
 
 	zval *all_profiles;
 
-	all_profiles = phalcon_read_property(this_ptr, SL("_allProfiles"), PH_NOISY);
+	all_profiles = phalcon_read_property(getThis(), SL("_allProfiles"), PH_NOISY);
 	phalcon_fast_count(return_value, all_profiles);
 }
 
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Db_Profiler, getNumberTotalStatements){
 PHP_METHOD(Phalcon_Db_Profiler, getTotalElapsedSeconds){
 
 
-	RETURN_MEMBER(this_ptr, "_totalSeconds");
+	RETURN_MEMBER(getThis(), "_totalSeconds");
 }
 
 /**
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Db_Profiler, getTotalElapsedSeconds){
 PHP_METHOD(Phalcon_Db_Profiler, getProfiles){
 
 
-	RETURN_MEMBER(this_ptr, "_allProfiles");
+	RETURN_MEMBER(getThis(), "_allProfiles");
 }
 
 /**
@@ -218,12 +218,7 @@ PHP_METHOD(Phalcon_Db_Profiler, getProfiles){
  */
 PHP_METHOD(Phalcon_Db_Profiler, reset){
 
-	zval *empty_arr;
-
-	PHALCON_ALLOC_GHOST_ZVAL(empty_arr);
-	array_init(empty_arr);
-	phalcon_update_property_this(this_ptr, SL("_allProfiles"), empty_arr);
-	zval_ptr_dtor(&empty_arr);
+	phalcon_update_property_empty_array(getThis(), SL("_allProfiles"));
 	RETURN_THISW();
 }
 
@@ -235,5 +230,5 @@ PHP_METHOD(Phalcon_Db_Profiler, reset){
 PHP_METHOD(Phalcon_Db_Profiler, getLastProfile){
 
 
-	RETURN_MEMBER(this_ptr, "_activeProfile");
+	RETURN_MEMBER(getThis(), "_activeProfile");
 }

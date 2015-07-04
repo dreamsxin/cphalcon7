@@ -1088,7 +1088,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
 		PHALCON_INIT_VAR(service);
-		ZVAL_STRING(service, phalcon_interned_filter);
+		ZVAL_STR(service, IS(filter));
 
 		PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);

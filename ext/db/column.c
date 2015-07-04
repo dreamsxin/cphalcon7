@@ -162,13 +162,13 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &column_name, &definition);
 	
-	phalcon_update_property_this(this_ptr, SL("_columnName"), column_name);
+	phalcon_update_property_this(getThis(), SL("_columnName"), column_name);
 	
 	/** 
 	 * Get the column type, one of the TYPE_* constants
 	 */
 	if (phalcon_array_isset_string_fetch(&type, definition, SS("type"))) {
-		phalcon_update_property_this(this_ptr, SL("_type"), type);
+		phalcon_update_property_this(getThis(), SL("_type"), type);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column type is required");
 		return;
@@ -178,23 +178,23 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 * Check if the field is nullable
 	 */
 	if (phalcon_array_isset_string_fetch(&not_null, definition, SS("notNull"))) {
-		phalcon_update_property_this(this_ptr, SL("_notNull"), not_null);
+		phalcon_update_property_this(getThis(), SL("_notNull"), not_null);
 	}
 	
 	/** 
 	 * Check if the field is primary key
 	 */
 	if (phalcon_array_isset_string_fetch(&primary, definition, SS("primary"))) {
-		phalcon_update_property_this(this_ptr, SL("_primary"), primary);
+		phalcon_update_property_this(getThis(), SL("_primary"), primary);
 	}
 
 	if (phalcon_array_isset_string_fetch(&size, definition, SS("size"))) {
-		phalcon_update_property_this(this_ptr, SL("_size"), size);
-		phalcon_update_property_this(this_ptr, SL("_bytes"), size);
+		phalcon_update_property_this(getThis(), SL("_size"), size);
+		phalcon_update_property_this(getThis(), SL("_bytes"), size);
 	}
 
 	if (phalcon_array_isset_string_fetch(&bytes, definition, SS("bytes"))) {
-		phalcon_update_property_this(this_ptr, SL("_bytes"), bytes);
+		phalcon_update_property_this(getThis(), SL("_bytes"), bytes);
 	}
 
 	/** 
@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 		int is_numeric = (i_type == 3 || i_type == 7 || i_type == 9);
 	
 		if (is_numeric) {
-			phalcon_update_property_this(this_ptr, SL("_scale"), scale);
+			phalcon_update_property_this(getThis(), SL("_scale"), scale);
 		}
 	}
 	
@@ -213,14 +213,14 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 * Check if the field is unsigned (only MySQL)
 	 */
 	if (phalcon_array_isset_string_fetch(&dunsigned, definition, SS("unsigned"))) {
-		phalcon_update_property_this(this_ptr, SL("_unsigned"), dunsigned);
+		phalcon_update_property_this(getThis(), SL("_unsigned"), dunsigned);
 	}
 	
 	/** 
 	 * Check if the field is numeric
 	 */
 	if (phalcon_array_isset_string_fetch(&is_numeric, definition, SS("isNumeric"))) {
-		phalcon_update_property_this(this_ptr, SL("_isNumeric"), is_numeric);
+		phalcon_update_property_this(getThis(), SL("_isNumeric"), is_numeric);
 	}
 	
 	/** 
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 */
 	if (phalcon_array_isset_string_fetch(&auto_increment, definition, SS("autoIncrement"))) {
 		if (PHALCON_IS_LONG(type, 0)) {
-			phalcon_update_property_this(this_ptr, SL("_autoIncrement"), auto_increment);
+			phalcon_update_property_this(getThis(), SL("_autoIncrement"), auto_increment);
 		} else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column type cannot be auto-increment");
 			return;
@@ -239,28 +239,28 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 * Check if the field is placed at the first position of the table
 	 */
 	if (phalcon_array_isset_string_fetch(&first, definition, SS("first"))) {
-		phalcon_update_property_this(this_ptr, SL("_first"), first);
+		phalcon_update_property_this(getThis(), SL("_first"), first);
 	}
 	
 	/** 
 	 * Name of the column which is placed before the current field
 	 */
 	if (phalcon_array_isset_string_fetch(&after, definition, SS("after"))) {
-		phalcon_update_property_this(this_ptr, SL("_after"), after);
+		phalcon_update_property_this(getThis(), SL("_after"), after);
 	}
 	
 	/** 
 	 * The bind type to cast the field when passing it to PDO
 	 */
 	if (phalcon_array_isset_string_fetch(&bind_type, definition, SS("bindType"))) {
-		phalcon_update_property_this(this_ptr, SL("_bindType"), bind_type);
+		phalcon_update_property_this(getThis(), SL("_bindType"), bind_type);
 	}
 	
 	/** 
 	 * Default values
 	 */
 	if (phalcon_array_isset_string_fetch(&default_value, definition, SS("default"))) {
-		phalcon_update_property_this(this_ptr, SL("_default"), default_value);
+		phalcon_update_property_this(getThis(), SL("_default"), default_value);
 	}
 }
 
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 PHP_METHOD(Phalcon_Db_Column, getSchemaName){
 
 
-	RETURN_MEMBER(this_ptr, "_schemaName");
+	RETURN_MEMBER(getThis(), "_schemaName");
 }
 
 /**
@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Db_Column, getSchemaName){
 PHP_METHOD(Phalcon_Db_Column, getName){
 
 
-	RETURN_MEMBER(this_ptr, "_columnName");
+	RETURN_MEMBER(getThis(), "_columnName");
 }
 
 /**
@@ -294,7 +294,7 @@ PHP_METHOD(Phalcon_Db_Column, getName){
 PHP_METHOD(Phalcon_Db_Column, getType){
 
 
-	RETURN_MEMBER(this_ptr, "_type");
+	RETURN_MEMBER(getThis(), "_type");
 }
 
 /**
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Db_Column, getType){
 PHP_METHOD(Phalcon_Db_Column, getSize){
 
 
-	RETURN_MEMBER(this_ptr, "_size");
+	RETURN_MEMBER(getThis(), "_size");
 }
 
 /**
@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_Db_Column, getSize){
 PHP_METHOD(Phalcon_Db_Column, getBytes){
 
 
-	RETURN_MEMBER(this_ptr, "_bytes");
+	RETURN_MEMBER(getThis(), "_bytes");
 }
 
 /**
@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_Db_Column, getBytes){
 PHP_METHOD(Phalcon_Db_Column, getScale){
 
 
-	RETURN_MEMBER(this_ptr, "_scale");
+	RETURN_MEMBER(getThis(), "_scale");
 }
 
 /**
@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Db_Column, getScale){
 PHP_METHOD(Phalcon_Db_Column, isUnsigned){
 
 
-	RETURN_MEMBER(this_ptr, "_unsigned");
+	RETURN_MEMBER(getThis(), "_unsigned");
 }
 
 /**
@@ -349,7 +349,7 @@ PHP_METHOD(Phalcon_Db_Column, isUnsigned){
 PHP_METHOD(Phalcon_Db_Column, isNotNull){
 
 
-	RETURN_MEMBER(this_ptr, "_notNull");
+	RETURN_MEMBER(getThis(), "_notNull");
 }
 
 /**
@@ -360,7 +360,7 @@ PHP_METHOD(Phalcon_Db_Column, isNotNull){
 PHP_METHOD(Phalcon_Db_Column, isPrimary){
 
 
-	RETURN_MEMBER(this_ptr, "_primary");
+	RETURN_MEMBER(getThis(), "_primary");
 }
 
 /**
@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Db_Column, isPrimary){
 PHP_METHOD(Phalcon_Db_Column, isAutoIncrement){
 
 
-	RETURN_MEMBER(this_ptr, "_autoIncrement");
+	RETURN_MEMBER(getThis(), "_autoIncrement");
 }
 
 /**
@@ -382,7 +382,7 @@ PHP_METHOD(Phalcon_Db_Column, isAutoIncrement){
 PHP_METHOD(Phalcon_Db_Column, isNumeric){
 
 
-	RETURN_MEMBER(this_ptr, "_isNumeric");
+	RETURN_MEMBER(getThis(), "_isNumeric");
 }
 
 /**
@@ -393,7 +393,7 @@ PHP_METHOD(Phalcon_Db_Column, isNumeric){
 PHP_METHOD(Phalcon_Db_Column, isFirst){
 
 
-	RETURN_MEMBER(this_ptr, "_first");
+	RETURN_MEMBER(getThis(), "_first");
 }
 
 /**
@@ -404,7 +404,7 @@ PHP_METHOD(Phalcon_Db_Column, isFirst){
 PHP_METHOD(Phalcon_Db_Column, getAfterPosition){
 
 
-	RETURN_MEMBER(this_ptr, "_after");
+	RETURN_MEMBER(getThis(), "_after");
 }
 
 /**
@@ -415,7 +415,7 @@ PHP_METHOD(Phalcon_Db_Column, getAfterPosition){
 PHP_METHOD(Phalcon_Db_Column, getBindType){
 
 
-	RETURN_MEMBER(this_ptr, "_bindType");
+	RETURN_MEMBER(getThis(), "_bindType");
 }
 
 /**
@@ -426,7 +426,7 @@ PHP_METHOD(Phalcon_Db_Column, getBindType){
 PHP_METHOD(Phalcon_Db_Column, getDefaultValue){
 
 
-	RETURN_MEMBER(this_ptr, "_default");
+	RETURN_MEMBER(getThis(), "_default");
 }
 
 /**

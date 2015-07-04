@@ -67,7 +67,7 @@ void phalcon_unserialize(zval *return_value, zval *var) {
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
 	if (!php_var_unserialize(return_value, &p, p + Z_STRLEN_P(var), &var_hash)) {
 		PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
-		phalcon_dtor(return_value);
+		zval_ptr_dtor(return_value);
 		ZVAL_NULL(return_value);
 		if (!EG(exception)) {
 			php_error_docref(NULL, E_NOTICE, "Error at offset %ld of %d bytes", (long)((char*)p - Z_STRVAL_P(var)), Z_STRLEN_P(var));
@@ -81,25 +81,25 @@ void phalcon_unserialize(zval *return_value, zval *var) {
 /**
  * var_export outputs php variables without using the PHP userland
  */
-void phalcon_var_export(zval **var) {
+void phalcon_var_export(zval *var) {
     php_var_export(var, 1);
 }
 
 /**
  * var_export returns php variables without using the PHP userland
  */
-void phalcon_var_export_ex(zval *return_value, zval **var) {
+void phalcon_var_export_ex(zval *return_value, zval *var) {
 
     smart_str buf = { 0 };
 
     php_var_export_ex(var, 1, &buf);
     smart_str_0(&buf);
-    ZVAL_STRINGL(return_value, buf.c, buf.len);
+    ZVAL_STR(return_value, buf.s);
 }
 
 /**
  * var_dump outputs php variables without using the PHP userland
  */
-void phalcon_var_dump(zval **var) {
+void phalcon_var_dump(zval *var) {
     php_var_dump(var, 1);
 }

@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, __construct){
 	
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_string_fetch(&annotations_dir, options, SS("annotationsDir"))) {
-			phalcon_update_property_this(this_ptr, SL("_annotationsDir"), annotations_dir);
+			phalcon_update_property_this(getThis(), SL("_annotationsDir"), annotations_dir);
 		}
 	}
 }
@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 
 	PHALCON_MM_GROW();
 
-	annotations_dir = phalcon_read_property(this_ptr, SL("_annotationsDir"), PH_NOISY);
+	annotations_dir = phalcon_read_property(getThis(), SL("_annotationsDir"), PH_NOISY);
 	
 	/** 
 	 * Paths must be normalized before be used as keys
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 
 	PHALCON_MM_GROW();
 
-	annotations_dir = phalcon_read_property(this_ptr, SL("_annotationsDir"), PH_NOISY);
+	annotations_dir = phalcon_read_property(getThis(), SL("_annotationsDir"), PH_NOISY);
 	
 	/** 
 	 * Paths must be normalized before be used as keys

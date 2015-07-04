@@ -81,7 +81,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 	
-	data = phalcon_read_property(this_ptr, SL("_data"), PH_NOISY);
+	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(lowercased_key);
 	phalcon_fast_strtolower(lowercased_key, key);
@@ -106,6 +106,6 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, write){
 	
 	PHALCON_ALLOC_GHOST_ZVAL(lowercased_key);
 	phalcon_fast_strtolower(lowercased_key, key);
-	phalcon_update_property_array(this_ptr, SL("_data"), lowercased_key, data);
+	phalcon_update_property_array(getThis(), SL("_data"), lowercased_key, data);
 	zval_ptr_dtor(&lowercased_key);
 }

@@ -107,34 +107,34 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &reference_name, &definition);
 	
-	phalcon_update_property_this(this_ptr, SL("_referenceName"), reference_name);
+	phalcon_update_property_this(getThis(), SL("_referenceName"), reference_name);
 	if (phalcon_array_isset_string_fetch(&referenced_table, definition, SS("referencedTable"))) {
-		phalcon_update_property_this(this_ptr, SL("_referencedTable"), referenced_table);
+		phalcon_update_property_this(getThis(), SL("_referencedTable"), referenced_table);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Referenced table is required");
 		return;
 	}
 	
 	if (phalcon_array_isset_string_fetch(&columns, definition, SS("columns"))) {
-		phalcon_update_property_this(this_ptr, SL("_columns"), columns);
+		phalcon_update_property_this(getThis(), SL("_columns"), columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Foreign key columns are required");
 		return;
 	}
 	
 	if (phalcon_array_isset_string_fetch(&referenced_columns, definition, SS("referencedColumns"))) {
-		phalcon_update_property_this(this_ptr, SL("_referencedColumns"), referenced_columns);
+		phalcon_update_property_this(getThis(), SL("_referencedColumns"), referenced_columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Referenced columns of the foreign key are required");
 		return;
 	}
 	
 	if (phalcon_array_isset_string_fetch(&schema, definition, SS("schema"))) {
-		phalcon_update_property_this(this_ptr, SL("_schemaName"), schema);
+		phalcon_update_property_this(getThis(), SL("_schemaName"), schema);
 	}
 	
 	if (phalcon_array_isset_string_fetch(&referenced_schema, definition, SS("referencedSchema"))) {
-		phalcon_update_property_this(this_ptr, SL("_referencedSchema"), referenced_schema);
+		phalcon_update_property_this(getThis(), SL("_referencedSchema"), referenced_schema);
 	}
 	
 	number_columns            = phalcon_fast_count_int(columns);
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 PHP_METHOD(Phalcon_Db_Reference, getName){
 
 
-	RETURN_MEMBER(this_ptr, "_referenceName");
+	RETURN_MEMBER(getThis(), "_referenceName");
 }
 
 /**
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Db_Reference, getName){
 PHP_METHOD(Phalcon_Db_Reference, getSchemaName){
 
 
-	RETURN_MEMBER(this_ptr, "_schemaName");
+	RETURN_MEMBER(getThis(), "_schemaName");
 }
 
 /**
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Db_Reference, getSchemaName){
 PHP_METHOD(Phalcon_Db_Reference, getReferencedSchema){
 
 
-	RETURN_MEMBER(this_ptr, "_referencedSchema");
+	RETURN_MEMBER(getThis(), "_referencedSchema");
 }
 
 /**
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Db_Reference, getReferencedSchema){
 PHP_METHOD(Phalcon_Db_Reference, getColumns){
 
 
-	RETURN_MEMBER(this_ptr, "_columns");
+	RETURN_MEMBER(getThis(), "_columns");
 }
 
 /**
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Db_Reference, getColumns){
 PHP_METHOD(Phalcon_Db_Reference, getReferencedTable){
 
 
-	RETURN_MEMBER(this_ptr, "_referencedTable");
+	RETURN_MEMBER(getThis(), "_referencedTable");
 }
 
 /**
@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Db_Reference, getReferencedTable){
 PHP_METHOD(Phalcon_Db_Reference, getReferencedColumns){
 
 
-	RETURN_MEMBER(this_ptr, "_referencedColumns");
+	RETURN_MEMBER(getThis(), "_referencedColumns");
 }
 
 /**

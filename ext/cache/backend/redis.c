@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 		phalcon_array_update_string_string(&options, SL("statsKey"), SL("_PHCR"), 0);
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, this_ptr, "__construct", frontend, options);
+	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, options);
 
 	PHALCON_MM_RESTORE();
 }
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 
 	PHALCON_MM_GROW();
 
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	ce0 = zend_fetch_class(SSL("Redis"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_INIT_VAR(redis);
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 		}
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_redis"), redis);
+	phalcon_update_property_this(getThis(), SL("_redis"), redis);
 	RETURN_CTOR(redis);
 }
 
@@ -235,18 +235,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, get){
 
 	phalcon_fetch_params(0, 1, 1, 1, &key_name, &lifetime);
 	
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
 		redis = NULL;
-		PHALCON_CALL_METHOD(&redis, this_ptr, "_connect");
+		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 	}
 	
-	frontend = phalcon_read_property(this_ptr, SL("_frontend"), PH_NOISY);
-	prefix   = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
+	frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
+	prefix   = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_SVV(prefixed_key, "_PHCR", prefix, key_name);
-	phalcon_update_property_this(this_ptr, SL("_lastKey"), prefixed_key);
+	phalcon_update_property_this(getThis(), SL("_lastKey"), prefixed_key);
 	
 	PHALCON_CALL_METHOD(&cached_content, redis, "get", prefixed_key);
 	if (PHALCON_IS_FALSE(cached_content)) {
@@ -281,12 +281,12 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 	phalcon_fetch_params(0, 1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		last_key = phalcon_read_property(this_ptr, SL("_lastKey"), PH_NOISY);
+		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
 
 		PHALCON_INIT_VAR(prefixed_key);
 		ZVAL_STRINGL(prefixed_key, Z_STRVAL_P(last_key)+5, Z_STRLEN_P(last_key)-5);
 	} else {
-		zval *prefix = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
+		zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 		PHALCON_INIT_VAR(prefixed_key);
 		PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
@@ -303,13 +303,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 	/** 
 	 * Check if a connection is created or make a new one
 	 */
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
 		redis = NULL;
-		PHALCON_CALL_METHOD(&redis, this_ptr, "_connect");
+		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 	}
 
-	frontend = phalcon_read_property(this_ptr, SL("_frontend"), PH_NOISY);
+	frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, frontend, "getcontent");
 	} else {
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 	 * Take the lifetime from the frontend or read it from the set in start()
 	 */
 	if (!lifetime || Z_TYPE_P(lifetime) == IS_NULL) {
-		zval *last_lifetime = phalcon_read_property(this_ptr, SL("_lastLifetime"), PH_NOISY);
+		zval *last_lifetime = phalcon_read_property(getThis(), SL("_lastLifetime"), PH_NOISY);
 
 		if (Z_TYPE_P(last_lifetime) == IS_NULL) {
 			PHALCON_CALL_METHOD(&ttl, frontend, "getlifetime");
@@ -350,7 +350,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 		return;
 	}
 	
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
 	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 		zend_print_zval(cached_content, 0);
 	}
 	
-	phalcon_update_property_bool(this_ptr, SL("_started"), 0);
+	phalcon_update_property_bool(getThis(), SL("_started"), 0);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -392,13 +392,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, delete){
 
 	phalcon_fetch_params(0, 1, 1, 0, &key_name);
 	
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
 		redis = NULL;
-		PHALCON_CALL_METHOD(&redis, this_ptr, "_connect");
+		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 	}
 	
-	prefix = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
+	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(prefixed_key);
 	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
@@ -406,7 +406,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, delete){
 	PHALCON_INIT_VAR(last_key);
 	PHALCON_CONCAT_SV(last_key, "_PHCR", prefixed_key);
 	
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
 	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, queryKeys){
 
 	phalcon_fetch_params(0, 0, 0, 1, &prefix);
 
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
 		zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Unexpected inconsistency in options");
 		return;
@@ -452,10 +452,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, queryKeys){
 
 	PHALCON_MM_GROW();
 
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
 		redis = NULL;
-		PHALCON_CALL_METHOD(&redis, this_ptr, "_connect");
+		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 	}
 	
 	/* Get the key from redisd */
@@ -492,19 +492,19 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, exists){
 	phalcon_fetch_params(0, 1, 0, 2, &key_name, &lifetime);
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		last_key = phalcon_read_property(this_ptr, SL("_lastKey"), PH_NOISY);
+		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
 	} else {
-		zval *prefix = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
+		zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(last_key);
 		PHALCON_CONCAT_SVV(last_key, "_PHCR", prefix, key_name);
 	}
 
 	if (zend_is_true(last_key)) {
-		redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+		redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 		if (Z_TYPE_P(redis) != IS_OBJECT) {
 			redis = NULL;
-			PHALCON_CALL_METHOD(&redis, this_ptr, "_connect");
+			PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 		}
 	
 		PHALCON_CALL_METHOD(&value, redis, "get", last_key);
@@ -534,9 +534,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, increment){
 	phalcon_fetch_params(0, 1, 0, 2, &key_name, &value);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		last_key = phalcon_read_property(this_ptr, SL("_lastKey"), PH_NOISY);
+		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
 	} else {
-		prefix = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
+		prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(last_key);
 		PHALCON_CONCAT_SVV(last_key, "_PHCR", prefix, key_name);
@@ -552,10 +552,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, increment){
 		convert_to_long_ex(&value);
 	}
 
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
 		redis = NULL;
-		PHALCON_CALL_METHOD(&redis, this_ptr, "_connect");
+		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 	}
 
 	PHALCON_RETURN_CALL_METHOD(redis, "incrby", last_key, value);
@@ -579,9 +579,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, decrement){
 	phalcon_fetch_params(0, 1, 0, 2, &key_name, &value);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		last_key = phalcon_read_property(this_ptr, SL("_lastKey"), PH_NOISY);
+		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
 	} else {
-		prefix = phalcon_read_property(this_ptr, SL("_prefix"), PH_NOISY);
+		prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	
 		PHALCON_INIT_VAR(last_key);
 		PHALCON_CONCAT_SVV(last_key, "_PHCR", prefix, key_name);
@@ -600,10 +600,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, decrement){
 		convert_to_long_ex(&value);
 	}
 
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
 		redis = NULL;
-		PHALCON_CALL_METHOD(&redis, this_ptr, "_connect");
+		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 	}
 
 	PHALCON_RETURN_CALL_METHOD(redis, "decrby", last_key, value);
@@ -622,7 +622,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 	zval *value;
 	HashPosition pos;
 
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
 	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
 		zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Unexpected inconsistency in options");
@@ -635,10 +635,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 
 	PHALCON_MM_GROW();
 
-	redis = phalcon_read_property(this_ptr, SL("_redis"), PH_NOISY);
+	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
 		redis = NULL;
-		PHALCON_CALL_METHOD(&redis, this_ptr, "_connect");
+		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 	}
 	
 	/* Get the key from redisd */

@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Mvc_Application, __construct){
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_application_exception_ce, 0);
-		phalcon_update_property_this(this_ptr, SL("_dependencyInjector"), dependency_injector);
+		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
 	}
 }
 
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Mvc_Application, useImplicitView){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_view);
 
-	phalcon_update_property_this(this_ptr, SL("_implicitView"), implicit_view);
+	phalcon_update_property_this(getThis(), SL("_implicitView"), implicit_view);
 	RETURN_THISW();
 }
 
@@ -215,9 +215,9 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 		return;
 	}
 	if (PHALCON_IS_FALSE(merge)) {
-		phalcon_update_property_this(this_ptr, SL("_modules"), modules);
+		phalcon_update_property_this(getThis(), SL("_modules"), modules);
 	} else {
-		registered_modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
+		registered_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_modules);
 			phalcon_fast_array_merge(merged_modules, &registered_modules, &modules);
@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 			PHALCON_CPY_WRT(merged_modules, modules);
 		}
 
-		phalcon_update_property_this(this_ptr, SL("_modules"), merged_modules);
+		phalcon_update_property_this(getThis(), SL("_modules"), merged_modules);
 	}
 
 	RETURN_THIS();
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 PHP_METHOD(Phalcon_Mvc_Application, getModules){
 
 
-	RETURN_MEMBER(this_ptr, "_modules");
+	RETURN_MEMBER(getThis(), "_modules");
 }
 
 /**
@@ -254,7 +254,7 @@ PHP_METHOD(Phalcon_Mvc_Application, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &default_module);
 
-	phalcon_update_property_this(this_ptr, SL("_defaultModule"), default_module);
+	phalcon_update_property_this(getThis(), SL("_defaultModule"), default_module);
 	RETURN_THISW();
 }
 
@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Mvc_Application, setDefaultModule){
 PHP_METHOD(Phalcon_Mvc_Application, getDefaultModule){
 
 
-	RETURN_MEMBER(this_ptr, "_defaultModule");
+	RETURN_MEMBER(getThis(), "_defaultModule");
 }
 
 static int phalcon_mvc_application_fire_event(zval *mgr, const char *event, zval *this_ptr, zval *params)
@@ -321,13 +321,13 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		uri = &PHALCON_GLOBAL(z_null);
 	}
 
-	dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
-	events_manager = phalcon_read_property(this_ptr, SL("_eventsManager"), PH_NOISY);
+	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) != IS_OBJECT) {
 		events_manager = NULL;
 	}
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, phalcon_interned_router);
+	ZVAL_STR(service, IS(router));
 	PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(router, phalcon_mvc_routerinterface_ce);
 
@@ -353,7 +353,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* If the router doesn't return a valid module we use the default module */
 	if (!zend_is_true(module_name)) {
-		module_name = phalcon_read_property(this_ptr, SL("_defaultModule"), PH_NOISY);
+		module_name = phalcon_read_property(getThis(), SL("_defaultModule"), PH_NOISY);
 	}
 
 	/** 
@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/** 
 		 * Check if the module passed by the router is registered in the modules container
 		 */
-		modules = phalcon_read_property(this_ptr, SL("_modules"), PH_NOISY);
+		modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 		if (!phalcon_array_isset_fetch(&module, modules, module_name)) {
 			convert_to_string(module_name);
 			zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module %s is not registered in the application container", Z_STRVAL_P(module_name));
@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				module_object = &PHALCON_GLOBAL(z_null);
 			}
 
-			phalcon_update_property_this(this_ptr, SL("_moduleObject"), module_object);
+			phalcon_update_property_this(getThis(), SL("_moduleObject"), module_object);
 			if (FAILURE == phalcon_mvc_application_fire_event(events_manager, "application:afterStartModule", getThis(), module_name)) {
 				RETURN_MM_FALSE;
 			}
@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/** 
 	 * Check whether use implicit views or not
 	 */
-	implicit_view = phalcon_read_property(this_ptr, SL("_implicitView"), PH_NOISY);
+	implicit_view = phalcon_read_property(getThis(), SL("_implicitView"), PH_NOISY);
 
 	/*
 	 * The safe way is to use a flag because it *might* be possible to alter the value
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(&exact, router, "isexactcontrollername");
 
 	PHALCON_INIT_NVAR(service);
-	ZVAL_STRING(service, phalcon_interned_dispatcher);
+	ZVAL_STR(service, IS(dispatcher));
 
 	PHALCON_CALL_METHOD(&dispatcher, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(dispatcher, phalcon_dispatcherinterface_ce);
@@ -513,7 +513,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			ZVAL_TRUE(returned_response);
 		} else {
 			PHALCON_INIT_NVAR(service);
-			ZVAL_STRING(service, phalcon_interned_response);
+			ZVAL_STR(service, IS(response));
 
 			PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);
@@ -572,7 +572,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 	} else {		
 		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, phalcon_interned_response);
+		ZVAL_STR(service, IS(response));
 
 		PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);

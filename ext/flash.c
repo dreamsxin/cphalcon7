@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Flash, __construct){
 		add_assoc_stringl_ex(css_classes, SS("success"), SL("successMessage"));
 		add_assoc_stringl_ex(css_classes, SS("warning"), SL("warningMessage"));
 	}
-	phalcon_update_property_this(this_ptr, SL("_cssClasses"), css_classes);
+	phalcon_update_property_this(getThis(), SL("_cssClasses"), css_classes);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Flash, setImplicitFlush){
 
 	phalcon_fetch_params(0, 0, 1, 0, &implicit_flush);
 	
-	phalcon_update_property_this(this_ptr, SL("_implicitFlush"), implicit_flush);
+	phalcon_update_property_this(getThis(), SL("_implicitFlush"), implicit_flush);
 	RETURN_THISW();
 }
 
@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Flash, setAutomaticHtml){
 
 	phalcon_fetch_params(0, 0, 1, 0, &automatic_html);
 	
-	phalcon_update_property_this(this_ptr, SL("_automaticHtml"), automatic_html);
+	phalcon_update_property_this(getThis(), SL("_automaticHtml"), automatic_html);
 	RETURN_THISW();
 }
 
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 	phalcon_fetch_params(0, 0, 1, 0, &css_classes);
 	
 	if (Z_TYPE_P(css_classes) == IS_ARRAY) { 
-		phalcon_update_property_this(this_ptr, SL("_cssClasses"), css_classes);
+		phalcon_update_property_this(getThis(), SL("_cssClasses"), css_classes);
 		RETURN_THISW();
 	}
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_flash_exception_ce, "CSS classes must be an Array");
@@ -188,14 +188,13 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 
 static void phalcon_flash_message_helper(INTERNAL_FUNCTION_PARAMETERS, const char *stype)
 {
-	zval **msg, *type;
+	zval *msg, type;
 
 	phalcon_fetch_params(0, 1, 0, &msg);
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
-	ZVAL_STRING(type, stype);
+	ZVAL_STRING(&type, stype);
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "message", type, *msg);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "message", &type, msg);
 }
 
 /**
@@ -273,9 +272,6 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 	zval *type, *message, *automatic_html, *classes;
 	zval *type_classes, *joined_classes, *css_classes = NULL;
 	zval *implicit_flush, *content, *msg = NULL, *html_message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 	int flag_automatic_html;
 	int flag_implicit_flush;
 
@@ -283,11 +279,11 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 
 	phalcon_fetch_params(0, 1, 2, 0, &type, &message);
 
-	automatic_html      = phalcon_read_property(this_ptr, SL("_automaticHtml"), PH_NOISY);
+	automatic_html      = phalcon_read_property(getThis(), SL("_automaticHtml"), PH_NOISY);
 	flag_automatic_html = zend_is_true(automatic_html);
 	if (flag_automatic_html) {
 
-		classes = phalcon_read_property(this_ptr, SL("_cssClasses"), PH_NOISY);
+		classes = phalcon_read_property(getThis(), SL("_cssClasses"), PH_NOISY);
 
 		PHALCON_INIT_VAR(css_classes);
 		if (phalcon_array_isset_fetch(&type_classes, classes, type)) {
@@ -304,7 +300,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		}
 	}
 
-	implicit_flush      = phalcon_read_property(this_ptr, SL("_implicitFlush"), PH_NOISY);
+	implicit_flush      = phalcon_read_property(getThis(), SL("_implicitFlush"), PH_NOISY);
 	flag_implicit_flush = zend_is_true(implicit_flush);
 	if (Z_TYPE_P(message) == IS_ARRAY) {
 
@@ -333,7 +329,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 			if (flag_implicit_flush) {
 				zend_print_zval(html_message, 0);
 			} else {
-				phalcon_concat_self(&content, html_message);
+				phalcon_concat_self(content, html_message);
 			}
 		} ZEND_HASH_FOREACH_END();
 

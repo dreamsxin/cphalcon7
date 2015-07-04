@@ -68,7 +68,7 @@ void phalcon_round(zval *return_value, zval *op1, zval *op2, zval *op3)
 	long mode = PHP_ROUND_HALF_UP;
 	double return_val;
 
-	convert_scalar_to_number_ex(&op1);
+	convert_scalar_to_number_ex(op1);
 
 	if (op2) {
 		places = phalcon_get_intval_ex(op2);

@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, __construct){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "$options argument must be an Array");
 		return;
 	}
-	phalcon_update_property_this(this_ptr, SL("_options"), options);
+	phalcon_update_property_this(getThis(), SL("_options"), options);
 	
 }
 
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 		int len;
 
 		PHALCON_INIT_VAR(t);
-		phalcon_get_class(t, this_ptr, 0);
+		phalcon_get_class(t, getThis(), 0);
 
 		assert(Z_TYPE_P(t) == IS_STRING);
 
@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 	object_init_ex(model_message, phalcon_mvc_model_message_ce);
 	PHALCON_CALL_METHOD(NULL, model_message, "__construct", message, field, t, code);
 	
-	phalcon_update_property_array_append(this_ptr, SL("_messages"), model_message);
+	phalcon_update_property_array_append(getThis(), SL("_messages"), model_message);
 	
 	PHALCON_MM_RESTORE();
 }
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 PHP_METHOD(Phalcon_Mvc_Model_Validator, getMessages){
 
 
-	RETURN_MEMBER(this_ptr, "_messages");
+	RETURN_MEMBER(getThis(), "_messages");
 }
 
 /**
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, getMessages){
 PHP_METHOD(Phalcon_Mvc_Model_Validator, getOptions){
 
 
-	RETURN_MEMBER(this_ptr, "_options");
+	RETURN_MEMBER(getThis(), "_options");
 }
 
 /**
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, getOption){
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, options, option)) {
 		RETURN_ZVAL(value, 1, 0);
 	}
@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, isSetOption){
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
 	RETURN_BOOL(phalcon_array_isset(options, option));
 }

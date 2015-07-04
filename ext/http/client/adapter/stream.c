@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 	if (method) {
 		PHALCON_INIT_VAR(upper_method);
 		phalcon_fast_strtoupper(upper_method, method);
-		phalcon_update_property_this(this_ptr, SL("_method"), upper_method);
+		phalcon_update_property_this(getThis(), SL("_method"), upper_method);
 	}
 
 	PHALCON_INIT_VAR(header);
@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	PHALCON_CALL_METHOD(NULL, header, "set", option, value);
 
-	phalcon_update_property_this(this_ptr, SL("_header"), header);
+	phalcon_update_property_this(getThis(), SL("_header"), header);
 
 	PHALCON_INIT_NVAR(option);
 	ZVAL_STRING(option, "follow_location");
@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", stream, http, option, value);
 
-	phalcon_update_property_this(this_ptr, SL("_stream"), stream);
+	phalcon_update_property_this(getThis(), SL("_stream"), stream);
 
 	PHALCON_MM_RESTORE();
 }
@@ -155,17 +155,17 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 	PHALCON_MM_GROW();
 
-	stream = phalcon_read_property(this_ptr, SL("_stream"), PH_NOISY);
-	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
-	data = phalcon_read_property(this_ptr, SL("_data"), PH_NOISY);
-	type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
-	files = phalcon_read_property(this_ptr, SL("_files"), PH_NOISY);
-	username = phalcon_read_property(this_ptr, SL("_username"), PH_NOISY);
-	password = phalcon_read_property(this_ptr, SL("_password"), PH_NOISY);
-	authtype = phalcon_read_property(this_ptr, SL("_authtype"), PH_NOISY);
-	digest = phalcon_read_property(this_ptr, SL("_digest"), PH_NOISY);
-	method = phalcon_read_property(this_ptr, SL("_method"), PH_NOISY);
-	entity_body = phalcon_read_property(this_ptr, SL("_entity_body"), PH_NOISY);
+	stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
+	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
+	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
+	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
+	files = phalcon_read_property(getThis(), SL("_files"), PH_NOISY);
+	username = phalcon_read_property(getThis(), SL("_username"), PH_NOISY);
+	password = phalcon_read_property(getThis(), SL("_password"), PH_NOISY);
+	authtype = phalcon_read_property(getThis(), SL("_authtype"), PH_NOISY);
+	digest = phalcon_read_property(getThis(), SL("_digest"), PH_NOISY);
+	method = phalcon_read_property(getThis(), SL("_method"), PH_NOISY);
+	entity_body = phalcon_read_property(getThis(), SL("_entity_body"), PH_NOISY);
 
 	if (PHALCON_IS_NOT_EMPTY(username)) {
 		if (PHALCON_IS_STRING(authtype, "basic")) {
@@ -397,11 +397,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 	PHALCON_CALL_SELF(&uri, "geturi");
 	PHALCON_CALL_METHOD(&url, uri, "build");
 
-	stream = phalcon_read_property(this_ptr, SL("_stream"), PH_NOISY);
-	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
-	method = phalcon_read_property(this_ptr, SL("_method"), PH_NOISY);
-	useragent = phalcon_read_property(this_ptr, SL("_useragent"), PH_NOISY);
-	timeout = phalcon_read_property(this_ptr, SL("_timeout"), PH_NOISY);
+	stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
+	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
+	method = phalcon_read_property(getThis(), SL("_method"), PH_NOISY);
+	useragent = phalcon_read_property(getThis(), SL("_useragent"), PH_NOISY);
+	timeout = phalcon_read_property(getThis(), SL("_timeout"), PH_NOISY);
 
 	PHALCON_INIT_VAR(http);
 	ZVAL_STRING(http, "http");
@@ -429,7 +429,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 
 	PHALCON_INIT_VAR(handler);
 	array_init_size(handler, 2);
-	phalcon_array_append(handler, this_ptr, PH_SEPARATE);
+	phalcon_array_append(handler, getThis(), PH_SEPARATE);
 	add_next_index_stringl(handler, SL("errorHandler"));
 
 	PHALCON_CALL_FUNCTION(NULL, "set_error_handler", handler);

@@ -95,10 +95,10 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 		ZVAL_STRING(message_str, "Validation failed");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_model"), model);
-	phalcon_update_property_this(this_ptr, SL("_messages"), validation_messages);
+	phalcon_update_property_this(getThis(), SL("_model"), model);
+	phalcon_update_property_this(getThis(), SL("_messages"), validation_messages);
 
-	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_validationfailed_ce, this_ptr, "__construct", message_str);
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_validationfailed_ce, getThis(), "__construct", message_str);
 
 	PHALCON_MM_RESTORE();
 }
@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, getMessages){
 
 
-	RETURN_MEMBER(this_ptr, "_messages");
+	RETURN_MEMBER(getThis(), "_messages");
 }
 
 /**
@@ -122,5 +122,5 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, getMessages){
 PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, getModel){
 
 
-	RETURN_MEMBER(this_ptr, "_model");
+	RETURN_MEMBER(getThis(), "_model");
 }

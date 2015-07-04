@@ -216,12 +216,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 	}
 
 	PHALCON_CALL_METHOD(&name, column, "getname");
-	PHALCON_CALL_METHOD(&column_definition, this_ptr, "getcolumndefinition", column);
+	PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
 	PHALCON_SCONCAT_SVSV(sql, "\"", name, "\" ", column_definition);
 
 	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
 	if (zend_is_true(is_not_null)) {
-		phalcon_concat_self_str(&sql, SL(" NOT NULL"));
+		phalcon_concat_self_str(sql, SL(" NOT NULL"));
 	}
 
 	PHALCON_CALL_METHOD(&is_autoincrement, column, "isautoincrement");
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 	 * See http://www.sqlite.org/syntaxdiagrams.html#column-constraint
 	 */
 	if (zend_is_true(is_autoincrement)) {
-		phalcon_concat_self_str(&sql, SL(" PRIMARY KEY AUTOINCREMENT"));
+		phalcon_concat_self_str(sql, SL(" PRIMARY KEY AUTOINCREMENT"));
 	}
 
 	RETURN_CTOR(sql);
@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addIndex){
 	}
 
 	PHALCON_CALL_METHOD(&columns, index, "getcolumns");
-	PHALCON_CALL_METHOD(&quoted_column_list, this_ptr, "getcolumnlist", columns);
+	PHALCON_CALL_METHOD(&quoted_column_list, getThis(), "getcolumnlist", columns);
 
 	PHALCON_SCONCAT_VS(sql, quoted_column_list, ")");
 	RETURN_CTOR(sql);

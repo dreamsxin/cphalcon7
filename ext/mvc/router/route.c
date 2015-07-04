@@ -210,12 +210,12 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	/** 
 	 * Configure the route (extract parameters, paths, etc)
 	 */
-	PHALCON_CALL_METHOD(NULL, this_ptr, "reconfigure", pattern, paths, regex);
+	PHALCON_CALL_METHOD(NULL, getThis(), "reconfigure", pattern, paths, regex);
 
 	/** 
 	 * Update the HTTP method constraints
 	 */
-	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods);
+	phalcon_update_property_this(getThis(), SL("_methods"), http_methods);
 
 	/** 
 	 * Get the unique Id from the static member _uniqueId
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	}
 
 	PHALCON_CPY_WRT_CTOR(route_id, unique_id); /* route_id is now separated from unique_id */
-	phalcon_update_property_this(this_ptr, SL("_id"), route_id);
+	phalcon_update_property_this(getThis(), SL("_id"), route_id);
 
 	/* increment_function() will increment the value of the static property as well */
 	increment_function(unique_id);
@@ -422,7 +422,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, via){
 
 	phalcon_fetch_params(0, 1, 0, &http_methods);
 
-	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods);
+	phalcon_update_property_this(getThis(), SL("_methods"), http_methods);
 	RETURN_THISW();
 }
 
@@ -602,7 +602,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 		/** 
 		 * Transform the route's pattern to a regular expression
 		 */
-		PHALCON_CALL_METHOD(&compiled_pattern, this_ptr, "compilepattern", pcre_pattern, regex);
+		PHALCON_CALL_METHOD(&compiled_pattern, getThis(), "compilepattern", pcre_pattern, regex);
 	} else {
 		PHALCON_CPY_WRT(compiled_pattern, pattern);
 	}
@@ -610,17 +610,17 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	/** 
 	 * Update the original pattern
 	 */
-	phalcon_update_property_this(this_ptr, SL("_pattern"), pattern);
+	phalcon_update_property_this(getThis(), SL("_pattern"), pattern);
 
 	/** 
 	 * Update the compiled pattern
 	 */
-	phalcon_update_property_this(this_ptr, SL("_compiledPattern"), compiled_pattern);
+	phalcon_update_property_this(getThis(), SL("_compiledPattern"), compiled_pattern);
 
 	/** 
 	 * Update the route's paths
 	 */
-	phalcon_update_property_this(this_ptr, SL("_paths"), route_paths);
+	phalcon_update_property_this(getThis(), SL("_paths"), route_paths);
 
 	PHALCON_MM_RESTORE();
 }
@@ -633,7 +633,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getName){
 
 
-	RETURN_MEMBER(this_ptr, "_name");
+	RETURN_MEMBER(getThis(), "_name");
 }
 
 /**
@@ -654,7 +654,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setName){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_update_property_this(this_ptr, SL("_name"), name);
+	phalcon_update_property_this(getThis(), SL("_name"), name);
 	RETURN_THISW();
 }
 
@@ -672,7 +672,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, beforeMatch){
 
 	phalcon_fetch_params(0, 1, 0, &callback);
 
-	phalcon_update_property_this(this_ptr, SL("_beforeMatch"), callback);
+	phalcon_update_property_this(getThis(), SL("_beforeMatch"), callback);
 	RETURN_THISW();
 }
 
@@ -684,7 +684,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, beforeMatch){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getBeforeMatch){
 
 
-	RETURN_MEMBER(this_ptr, "_beforeMatch");
+	RETURN_MEMBER(getThis(), "_beforeMatch");
 }
 
 /**
@@ -695,7 +695,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getBeforeMatch){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getRouteId){
 
 
-	RETURN_MEMBER(this_ptr, "_id");
+	RETURN_MEMBER(getThis(), "_id");
 }
 
 /**
@@ -706,7 +706,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getRouteId){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getPattern){
 
 
-	RETURN_MEMBER(this_ptr, "_pattern");
+	RETURN_MEMBER(getThis(), "_pattern");
 }
 
 /**
@@ -717,7 +717,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getPattern){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getCompiledPattern){
 
 
-	RETURN_MEMBER(this_ptr, "_compiledPattern");
+	RETURN_MEMBER(getThis(), "_compiledPattern");
 }
 
 /**
@@ -728,7 +728,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getCompiledPattern){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getPaths){
 
 
-	RETURN_MEMBER(this_ptr, "_paths");
+	RETURN_MEMBER(getThis(), "_paths");
 }
 
 /**
@@ -745,7 +745,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 
 	PHALCON_MM_GROW();
 
-	paths = phalcon_read_property(this_ptr, SL("_paths"), PH_NOISY);
+	paths = phalcon_read_property(getThis(), SL("_paths"), PH_NOISY);
 
 	array_init_size(return_value, zend_hash_num_elements(ah0));
 
@@ -779,7 +779,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHttpMethods){
 
 	phalcon_fetch_params(0, 1, 0, &http_methods);
 
-	phalcon_update_property_this(this_ptr, SL("_methods"), http_methods);
+	phalcon_update_property_this(getThis(), SL("_methods"), http_methods);
 	RETURN_THISW();
 }
 
@@ -791,7 +791,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHttpMethods){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getHttpMethods){
 
 
-	RETURN_MEMBER(this_ptr, "_methods");
+	RETURN_MEMBER(getThis(), "_methods");
 }
 
 /**
@@ -810,7 +810,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHostname){
 
 	phalcon_fetch_params(0, 1, 0, &hostname);
 
-	phalcon_update_property_this(this_ptr, SL("_hostname"), hostname);
+	phalcon_update_property_this(getThis(), SL("_hostname"), hostname);
 	RETURN_THISW();
 }
 
@@ -822,7 +822,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHostname){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getHostname){
 
 
-	RETURN_MEMBER(this_ptr, "_hostname");
+	RETURN_MEMBER(getThis(), "_hostname");
 }
 
 /**
@@ -849,7 +849,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setGroup) {
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getGroup) {
 
-	RETURN_MEMBER(this_ptr, "_group");
+	RETURN_MEMBER(getThis(), "_group");
 }
 
 /**
@@ -865,7 +865,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, convert){
 
 	phalcon_fetch_params(0, 2, 0, &name, &converter);
 
-	phalcon_update_property_array(this_ptr, SL("_converters"), name, converter);
+	phalcon_update_property_array(getThis(), SL("_converters"), name, converter);
 	RETURN_THISW();
 }
 
@@ -877,7 +877,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, convert){
 PHP_METHOD(Phalcon_Mvc_Router_Route, getConverters){
 
 
-	RETURN_MEMBER(this_ptr, "_converters");
+	RETURN_MEMBER(getThis(), "_converters");
 }
 
 /**
@@ -908,27 +908,27 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 
 	/* Set the default namespace */
 	if (phalcon_array_isset_string_fetch(&namespace_name, defaults, SS("namespace"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultNamespace"), namespace_name);
+		phalcon_update_property_this(getThis(), SL("_defaultNamespace"), namespace_name);
 	}
 
 	/* Set the default module */
 	if (phalcon_array_isset_string_fetch(&module_name, defaults, SS("module"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultModule"), module_name);
+		phalcon_update_property_this(getThis(), SL("_defaultModule"), module_name);
 	}
 
 	/* Set the default controller */
 	if (phalcon_array_isset_string_fetch(&controller_name, defaults, SS("controller"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultController"), controller_name);
+		phalcon_update_property_this(getThis(), SL("_defaultController"), controller_name);
 	}
 
 	/* Set the default action */
 	if (phalcon_array_isset_string_fetch(&action_name, defaults, SS("action"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultAction"), action_name);
+		phalcon_update_property_this(getThis(), SL("_defaultAction"), action_name);
 	}
 
 	/* Set default parameters */
 	if (phalcon_array_isset_string_fetch(&params, defaults, SS("params"))) {
-		phalcon_update_property_this(this_ptr, SL("_defaultParams"), params);
+		phalcon_update_property_this(getThis(), SL("_defaultParams"), params);
 	}
 
 	RETURN_THISW();
@@ -944,19 +944,19 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaults){
 	zval *namespace_name, *module_name;
 	zval *controller_name, *action_name, *params;
 
-	namespace_name  = phalcon_read_property(this_ptr, SL("_defaultNamespace"), PH_NOISY);
-	module_name     = phalcon_read_property(this_ptr, SL("_defaultModule"), PH_NOISY);
-	controller_name = phalcon_read_property(this_ptr, SL("_defaultController"), PH_NOISY);
-	action_name     = phalcon_read_property(this_ptr, SL("_defaultAction"), PH_NOISY);
-	params          = phalcon_read_property(this_ptr, SL("_defaultParams"), PH_NOISY);
+	namespace_name  = phalcon_read_property(getThis(), SL("_defaultNamespace"), PH_NOISY);
+	module_name     = phalcon_read_property(getThis(), SL("_defaultModule"), PH_NOISY);
+	controller_name = phalcon_read_property(getThis(), SL("_defaultController"), PH_NOISY);
+	action_name     = phalcon_read_property(getThis(), SL("_defaultAction"), PH_NOISY);
+	params          = phalcon_read_property(getThis(), SL("_defaultParams"), PH_NOISY);
 
 	array_init_size(return_value, 5);
 
-	phalcon_array_update_string(return_value, ISL(namespace),  namespace_name,  PH_COPY);
-	phalcon_array_update_string(return_value, ISL(module),     module_name,     PH_COPY);
-	phalcon_array_update_string(return_value, ISL(controller), controller_name, PH_COPY);
-	phalcon_array_update_string(return_value, ISL(action),     action_name,     PH_COPY);
-	phalcon_array_update_string(return_value, ISL(params),     params,          PH_COPY);
+	phalcon_array_update_str(return_value, IS(namespace),  namespace_name,  PH_COPY);
+	phalcon_array_update_str(return_value, IS(module),     module_name,     PH_COPY);
+	phalcon_array_update_str(return_value, IS(controller), controller_name, PH_COPY);
+	phalcon_array_update_str(return_value, IS(action),     action_name,     PH_COPY);
+	phalcon_array_update_str(return_value, IS(params),     params,          PH_COPY);
 }
 
 /**
@@ -966,7 +966,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaults){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultNamespace){
 
-	RETURN_MEMBER(this_ptr, "_defaultNamespace");
+	RETURN_MEMBER(getThis(), "_defaultNamespace");
 }
 
 /**
@@ -976,7 +976,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultNamespace){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultModule){
 
-	RETURN_MEMBER(this_ptr, "_defaultModule");
+	RETURN_MEMBER(getThis(), "_defaultModule");
 }
 
 /**
@@ -986,7 +986,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultModule){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultController){
 
-	RETURN_MEMBER(this_ptr, "_defaultController");
+	RETURN_MEMBER(getThis(), "_defaultController");
 }
 
 /**
@@ -996,7 +996,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultController){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultAction){
 
-	RETURN_MEMBER(this_ptr, "_defaultAction");
+	RETURN_MEMBER(getThis(), "_defaultAction");
 }
 
 /**
@@ -1006,7 +1006,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultAction){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaultParams){
 
-	RETURN_MEMBER(this_ptr, "_defaultParams");
+	RETURN_MEMBER(getThis(), "_defaultParams");
 }
 
 /**
@@ -1025,7 +1025,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setUrlGenerator){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_urlGenerator"), generator);
+	phalcon_update_property_this(getThis(), SL("_urlGenerator"), generator);
 
 	RETURN_THISW();
 }
@@ -1037,7 +1037,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setUrlGenerator){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getUrlGenerator){
 
-	RETURN_MEMBER(this_ptr, "_urlGenerator");
+	RETURN_MEMBER(getThis(), "_urlGenerator");
 }
 
 /**
@@ -1051,7 +1051,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setCaseSensitive){
 
 	phalcon_fetch_params(0, 1, 0, &case_sensitive);
 
-	phalcon_update_property_bool(this_ptr, SL("_caseSensitive"), zend_is_true(case_sensitive));
+	phalcon_update_property_bool(getThis(), SL("_caseSensitive"), zend_is_true(case_sensitive));
 
 	RETURN_THISW();
 }
@@ -1063,5 +1063,5 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setCaseSensitive){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getCaseSensitive){
 
-	RETURN_MEMBER(this_ptr, "_caseSensitive");
+	RETURN_MEMBER(getThis(), "_caseSensitive");
 }

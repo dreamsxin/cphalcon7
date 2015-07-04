@@ -139,7 +139,7 @@ void phalcon_mvc_collection_addmap(zval *this_ptr, const char *method, zval *rou
 		add_next_index_null(handler_definition);
 	}
 
-	phalcon_update_property_array_append(this_ptr, SL("_handlers"), handler_definition);
+	phalcon_update_property_array_append(getThis(), SL("_handlers"), handler_definition);
 }
 
 /**
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setPrefix){
 
 	phalcon_fetch_params(0, 1, 0, &prefix);
 	
-	phalcon_update_property_this(this_ptr, SL("_prefix"), prefix);
+	phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
 	RETURN_THISW();
 }
 
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setPrefix){
 PHP_METHOD(Phalcon_Mvc_Micro_Collection, getPrefix){
 
 
-	RETURN_MEMBER(this_ptr, "_prefix");
+	RETURN_MEMBER(getThis(), "_prefix");
 }
 
 /**
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, getPrefix){
 PHP_METHOD(Phalcon_Mvc_Micro_Collection, getHandlers){
 
 
-	RETURN_MEMBER(this_ptr, "_handlers");
+	RETURN_MEMBER(getThis(), "_handlers");
 }
 
 /**
@@ -197,8 +197,8 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setHandler){
 		lazy = &PHALCON_GLOBAL(z_false);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_handler"), handler);
-	phalcon_update_property_this(this_ptr, SL("_lazy"), lazy);
+	phalcon_update_property_this(getThis(), SL("_handler"), handler);
+	phalcon_update_property_this(getThis(), SL("_lazy"), lazy);
 	RETURN_THISW();
 }
 
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setLazy){
 
 	phalcon_fetch_params(0, 1, 0, &lazy);
 	
-	phalcon_update_property_this(this_ptr, SL("_lazy"), lazy);
+	phalcon_update_property_this(getThis(), SL("_lazy"), lazy);
 	RETURN_THISW();
 }
 
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setLazy){
 PHP_METHOD(Phalcon_Mvc_Micro_Collection, isLazy){
 
 
-	RETURN_MEMBER(this_ptr, "_lazy");
+	RETURN_MEMBER(getThis(), "_lazy");
 }
 
 /**
@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, isLazy){
 PHP_METHOD(Phalcon_Mvc_Micro_Collection, getHandler){
 
 
-	RETURN_MEMBER(this_ptr, "_handler");
+	RETURN_MEMBER(getThis(), "_handler");
 }
 
 /**

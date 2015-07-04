@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct){
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
+	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
 	if (!phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
 		PHALCON_INIT_VAR(prefix);
@@ -181,47 +181,47 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct){
 
 	PHALCON_CALL_METHOD(NULL, libmemcached, "__construct", frontend_data, option);
 
-	phalcon_update_property_this(this_ptr, SL("_libmemcached"), libmemcached);
+	phalcon_update_property_this(getThis(), SL("_libmemcached"), libmemcached);
 
 	/* open callback */
 	PHALCON_INIT_VAR(callable_open);
 	array_init_size(callable_open, 2);
-	phalcon_array_append(callable_open, this_ptr, 0);
+	phalcon_array_append(callable_open, getThis(), 0);
 	phalcon_array_append_string(&callable_open, SL("open"), 0);
 
 	/* close callback */
 	PHALCON_INIT_VAR(callable_close);
 	array_init_size(callable_close, 2);
-	phalcon_array_append(callable_close, this_ptr, 0);
+	phalcon_array_append(callable_close, getThis(), 0);
 	phalcon_array_append_string(&callable_close, SL("close"), 0);
 
 	/* read callback */
 	PHALCON_INIT_VAR(callable_read);
 	array_init_size(callable_read, 2);
-	phalcon_array_append(callable_read, this_ptr, 0);
+	phalcon_array_append(callable_read, getThis(), 0);
 	phalcon_array_append_string(&callable_read, SL("read"), 0);
 
 	/* write callback */
 	PHALCON_INIT_VAR(callable_write);
 	array_init_size(callable_write, 2);
-	phalcon_array_append(callable_write, this_ptr, 0);
+	phalcon_array_append(callable_write, getThis(), 0);
 	phalcon_array_append_string(&callable_write, SL("write"), 0);
 
 	/* destroy callback */
 	PHALCON_INIT_VAR(callable_destroy);
 	array_init_size(callable_destroy, 2);
-	phalcon_array_append(callable_destroy, this_ptr, 0);
+	phalcon_array_append(callable_destroy, getThis(), 0);
 	phalcon_array_append_string(&callable_destroy, SL("destroy"), 0);
 
 	/* gc callback */
 	PHALCON_INIT_VAR(callable_gc);
 	array_init_size(callable_gc, 2);
-	phalcon_array_append(callable_gc, this_ptr, 0);
+	phalcon_array_append(callable_gc, getThis(), 0);
 	phalcon_array_append_string(&callable_gc, SL("gc"), 0);
 
 	PHALCON_CALL_FUNCTION(NULL, "session_set_save_handler", callable_open, callable_close, callable_read, callable_write, callable_destroy, callable_gc);
 
-	PHALCON_CALL_PARENT(NULL, phalcon_session_adapter_libmemcached_ce, this_ptr, "__construct", options);
+	PHALCON_CALL_PARENT(NULL, phalcon_session_adapter_libmemcached_ce, getThis(), "__construct", options);
 
 	PHALCON_MM_RESTORE();
 }
@@ -258,8 +258,8 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, read){
 
 	phalcon_fetch_params(1, 1, 0, &sid);
 
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
-	libmemcached = phalcon_read_property(this_ptr, SL("_libmemcached"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
+	libmemcached = phalcon_read_property(getThis(), SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(libmemcached, "get", sid, lifetime);
@@ -284,8 +284,8 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, write){
 
 	phalcon_fetch_params(1, 2, 0, &sid, &data);
 
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
-	libmemcached = phalcon_read_property(this_ptr, SL("_libmemcached"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
+	libmemcached = phalcon_read_property(getThis(), SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, libmemcached, "save", sid, data, lifetime);	
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, destroy){
 		PHALCON_CALL_SELF(&sid, "getid");
 	}
 
-	libmemcached = phalcon_read_property(this_ptr, SL("_libmemcached"), PH_NOISY);
+	libmemcached = phalcon_read_property(getThis(), SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(libmemcached, "delete", sid);

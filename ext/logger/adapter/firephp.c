@@ -81,10 +81,10 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, getFormatter){
 
 	zval *formatter;
 
-	formatter = phalcon_read_property(this_ptr, SL("_formatter"), PH_NOISY);
+	formatter = phalcon_read_property(getThis(), SL("_formatter"), PH_NOISY);
 	if (Z_TYPE_P(formatter) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_logger_formatter_firephp_ce);
-		phalcon_update_property_this(this_ptr, SL("_formatter"), return_value);
+		phalcon_update_property_this(getThis(), SL("_formatter"), return_value);
 		return;
 	}
 
@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 
 	phalcon_fetch_params(1, 4, 0, &message, &type, &time, &context);
 
-	PHALCON_CALL_METHOD(&formatter, this_ptr, "getformatter");
+	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
 
 	initialized = phalcon_read_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_initialized"));
 	if (!zend_is_true(initialized)) {

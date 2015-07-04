@@ -36,14 +36,14 @@ int phalcon_session_destroy()
 	return phalcon_call_func_aparams(NULL, SL("session_destroy"), 0, NULL);
 }
 
-int phalcon_get_session_id(zval *return_value, zval **return_value_ptr)
+int phalcon_get_session_id(zval *return_value)
 {
-	return phalcon_call_func_aparams(return_value, SL("session_id"), 0, NULL);
+	return phalcon_call_func_aparams(&return_value, SL("session_id"), 0, NULL);
 }
 
 int phalcon_set_session_id(zval *sid)
 {
-	zval params[] = { *sid };
+	zval *params[] = { sid };
 	return phalcon_call_func_aparams(NULL, SL("session_id"), 1, params);
 }
 

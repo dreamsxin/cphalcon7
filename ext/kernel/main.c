@@ -136,7 +136,7 @@ long int phalcon_fast_count_int(zval *value) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				result = Z_LVAL(retval);
-				phalcon_dtor(retval);
+				zval_dtor(&retval);
 			}
 
 			return result;
@@ -177,7 +177,7 @@ void phalcon_fast_count(zval *result, zval *value) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				ZVAL_LONG(result, Z_LVAL(retval));
-				phalcon_dtor(retval);
+				zval_dtor(&retval);
 			}
 			return;
 		}
@@ -218,7 +218,7 @@ int phalcon_fast_count_ev(zval *value) {
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				count = Z_LVAL(retval);
-				phalcon_dtor(retval);
+				zval_dtor(&retval);
 				return (int) count > 0;
 			}
 			return 0;

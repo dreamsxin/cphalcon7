@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Filter, __construct){
 	phalcon_array_append_string(&allow_tags, SL("th"), 0);
 	phalcon_array_append_string(&allow_tags, SL("td"), 0);
 
-	phalcon_update_property_this(this_ptr, SL("_allowTags"), allow_tags);
+	phalcon_update_property_this(getThis(), SL("_allowTags"), allow_tags);
 
 	PHALCON_INIT_VAR(allow_attributes);
 	array_init(allow_attributes);
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Filter, __construct){
 	phalcon_array_append_string(&allow_attributes, SL("target"), 0);
 	phalcon_array_append_string(&allow_attributes, SL("align"), 0);
 
-	phalcon_update_property_this(this_ptr, SL("_allowAttributes"), allow_attributes);
+	phalcon_update_property_this(getThis(), SL("_allowAttributes"), allow_attributes);
 
 	PHALCON_MM_RESTORE();
 }
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Filter, add){
 		return;
 	}
 	
-	phalcon_update_property_array(this_ptr, SL("_filters"), *name, *handler);
+	phalcon_update_property_array(getThis(), SL("_filters"), *name, *handler);
 	RETURN_THISW();
 }
 
@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 					array_init(array_value);
 
 					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(new_value), item_idx, item_key, item_value) {
-						PHALCON_CALL_METHOD(&filter_value, this_ptr, "_sanitize", item_value, filter);
+						PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filter);
 
 						if (key) {
 							phalcon_array_update_zval(array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	
 					PHALCON_CPY_WRT(new_value, array_value);
 				} else {
-					PHALCON_CALL_METHOD(&filter_value, this_ptr, "_sanitize", new_value, filter);
+					PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", new_value, filter);
 					PHALCON_CPY_WRT(new_value, filter_value);
 				}
 			} ZEND_HASH_FOREACH_END();
@@ -236,12 +236,12 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		array_init(sanizited_value);
 
 		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(value), key, item_value) {
-			PHALCON_CALL_METHOD(&filter_value, this_ptr, "_sanitize", item_value, filters);
+			PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filters);
 			phalcon_array_update_zval(sanizited_value, key, filter_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	
 	} else {
-		PHALCON_CALL_METHOD(&sanizited_value, this_ptr, "_sanitize", value, filters);
+		PHALCON_CALL_METHOD(&sanizited_value, getThis(), "_sanitize", value, filters);
 	}
 
 	RETURN_CCTOR(sanizited_value);
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	phalcon_fetch_params(0, 1, 2, 0, &value, &filter);
 
-	filters = phalcon_read_property(this_ptr, SL("_filters"), PH_NOISY);
+	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&filter_object, filters, filter) && (Z_TYPE_P(filter_object) == IS_OBJECT || phalcon_is_callable(filter_object))) {
 	
 		/** 
@@ -324,7 +324,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 	
 	if (PHALCON_IS_STRING(filter, "abs")) {	
-		convert_scalar_to_number_ex(&value);
+		convert_scalar_to_number_ex(value);
 	
 		PHALCON_INIT_NVAR(filtered);
 		if (Z_TYPE_P(value) == IS_DOUBLE) {
@@ -421,8 +421,8 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 	
 	if (PHALCON_IS_STRING(filter, "xssclean")) {
-		allow_tags = phalcon_read_property(this_ptr, SL("_allowTags"), PH_NOISY);
-		allow_attributes = phalcon_read_property(this_ptr, SL("_allowAttributes"), PH_NOISY);
+		allow_tags = phalcon_read_property(getThis(), SL("_allowTags"), PH_NOISY);
+		allow_attributes = phalcon_read_property(getThis(), SL("_allowAttributes"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(filtered);
 		phalcon_xss_clean(filtered, value, allow_tags, allow_attributes);
@@ -446,5 +446,5 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
  */
 PHP_METHOD(Phalcon_Filter, getFilters){
 
-	RETURN_MEMBER(this_ptr, "_filters");
+	RETURN_MEMBER(getThis(), "_filters");
 }

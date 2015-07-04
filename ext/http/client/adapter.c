@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUserAgent){
 
 	phalcon_fetch_params(0, 1, 0, &useragent);
 
-	phalcon_update_property_this(this_ptr, SL("_useragent"), useragent);
+	phalcon_update_property_this(getThis(), SL("_useragent"), useragent);
 
 	RETURN_THISW();
 }
@@ -150,22 +150,22 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 
 	phalcon_fetch_params(1, 2, 3, &username, &password, &authtype, &digest, &entity_body);
 
-	phalcon_update_property_this(this_ptr, SL("_username"), username);
-	phalcon_update_property_this(this_ptr, SL("_password"), password);
+	phalcon_update_property_this(getThis(), SL("_username"), username);
+	phalcon_update_property_this(getThis(), SL("_password"), password);
 
 	if (!authtype) {
 		PHALCON_INIT_NVAR(authtype);
 		ZVAL_STRING(authtype, "any");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_authtype"), authtype);
+	phalcon_update_property_this(getThis(), SL("_authtype"), authtype);
 
 	if (digest && Z_TYPE_P(digest) == IS_ARRAY) {
-		phalcon_update_property_this(this_ptr, SL("_digest"), digest);
+		phalcon_update_property_this(getThis(), SL("_digest"), digest);
 	}
 
 	if (entity_body) {
-		phalcon_update_property_this(this_ptr, SL("_entity_body"), entity_body);
+		phalcon_update_property_this(getThis(), SL("_entity_body"), entity_body);
 	}
 
 	RETURN_THIS();
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setHeader){
 
 	phalcon_fetch_params(0, 2, 0, &name, &value);
 
-	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
+	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(NULL, header, "set", name, value);
 
@@ -203,7 +203,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setHeaders){
 
 	phalcon_fetch_params(0, 1, 0, &headers);
 
-	header = phalcon_read_property(this_ptr, SL("_header"), PH_NOISY);
+	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(NULL, header, "setMultiple", headers);
 
@@ -228,11 +228,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setData){
 		return;
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_data"), data);
+	phalcon_update_property_this(getThis(), SL("_data"), data);
 
 	if (type) {
 		convert_to_string(type);
-		phalcon_update_property_this(this_ptr, SL("_type"), type);
+		phalcon_update_property_this(getThis(), SL("_type"), type);
 	}
 
 	RETURN_THISW();
@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFile){
 		PHALCON_CPY_WRT(files, file);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_files"), files);
+	phalcon_update_property_this(getThis(), SL("_files"), files);
 
 	zend_error_noreturn(E_DEPRECATED, "Method Phalcon\\Http\\Client\\Adapter::setFile is deprecated, please use Phalcon\\Http\\Client\\Adapter::setFiles instead");
 
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFiles){
 		PHALCON_CPY_WRT(arr, files);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_files"), arr);
+	phalcon_update_property_this(getThis(), SL("_files"), arr);
 
 	RETURN_THIS();
 }
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getPath){
 
 	zval *base_uri;
 
-	base_uri = phalcon_read_property(this_ptr, SL("_base_uri"), PH_NOISY);
+	base_uri = phalcon_read_property(getThis(), SL("_base_uri"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&return_value, base_uri, "getpath");
 }
@@ -324,16 +324,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, get){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "seturi", uri);
+		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("GET"));
+	phalcon_update_property_string(getThis(), SL("_method"), SL("GET"));
 	
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
+	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
 
 /**
@@ -350,16 +350,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, head){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "seturi", uri);
+		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("HEAD"));
+	phalcon_update_property_string(getThis(), SL("_method"), SL("HEAD"));
 
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
+	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
 
 /**
@@ -376,16 +376,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, post){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "seturi", uri);
+		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("POST"));
+	phalcon_update_property_string(getThis(), SL("_method"), SL("POST"));
 
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
+	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
 
 /**
@@ -402,16 +402,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, put){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "seturi", uri);
+		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("PUT"));
+	phalcon_update_property_string(getThis(), SL("_method"), SL("PUT"));
 
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
+	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
 
 /**
@@ -428,16 +428,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, delete){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "seturi", uri);
+		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, this_ptr, "setdata", data);
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(this_ptr, SL("_method"), SL("DELETE"));
+	phalcon_update_property_string(getThis(), SL("_method"), SL("DELETE"));
 
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "send");
+	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
 
 /**
@@ -452,11 +452,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUri){
 
 	phalcon_fetch_params(0, 1, 0, &uri);
 
-	base_uri = phalcon_read_property(this_ptr, SL("_base_uri"), PH_NOISY);
+	base_uri = phalcon_read_property(getThis(), SL("_base_uri"), PH_NOISY);
 
 	if (Z_TYPE_P(base_uri) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, base_uri, "extend", uri);
-		phalcon_update_property_this(this_ptr, SL("_base_uri"), base_uri);
+		phalcon_update_property_this(getThis(), SL("_base_uri"), base_uri);
 	} else {
 		PHALCON_CALL_SELFW(NULL, "setbaseuri", uri);
 	}
@@ -473,11 +473,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getUri){
 
 	zval *base_uri;
 
-	base_uri = phalcon_read_property(this_ptr, SL("_base_uri"), PH_NOISY);
+	base_uri = phalcon_read_property(getThis(), SL("_base_uri"), PH_NOISY);
 
 	if (Z_TYPE_P(base_uri) != IS_OBJECT) {
 		PHALCON_CALL_SELFW(NULL, "setbaseuri");
-		base_uri = phalcon_read_property(this_ptr, SL("_base_uri"), PH_NOISY);
+		base_uri = phalcon_read_property(getThis(), SL("_base_uri"), PH_NOISY);
 	}
 
 	RETURN_CTORW(base_uri);
@@ -505,7 +505,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setBaseUri){
 	object_init_ex(base_uri, phalcon_http_uri_ce);
 	PHALCON_CALL_METHOD(NULL, base_uri, "__construct", uri);
 
-	phalcon_update_property_this(this_ptr, SL("_base_uri"), base_uri);
+	phalcon_update_property_this(getThis(), SL("_base_uri"), base_uri);
 
 	RETURN_THIS();
 }
@@ -522,7 +522,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setMethod){
 
 	phalcon_fetch_params(0, 1, 0, &method);
 
-	phalcon_update_property_this(this_ptr, SL("_method"), method);
+	phalcon_update_property_this(getThis(), SL("_method"), method);
 
 	RETURN_THISW();
 }
@@ -539,7 +539,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setTimeOut){
 
 	phalcon_fetch_params(0, 1, 0, &time);
 
-	phalcon_update_property_this(this_ptr, SL("_timeout"), time);
+	phalcon_update_property_this(getThis(), SL("_timeout"), time);
 
 	RETURN_THISW();
 }
@@ -559,6 +559,6 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, send){
 		PHALCON_CALL_SELFW(NULL, "seturi", uri);
 	}
 
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "sendinternal");
+	PHALCON_RETURN_CALL_METHODW(getThis(), "sendinternal");
 }
 

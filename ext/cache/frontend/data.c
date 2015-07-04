@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, __construct){
 	phalcon_fetch_params(0, 0, 1, &frontend_options);
 	
 	if (frontend_options) {
-		phalcon_update_property_this(this_ptr, SL("_frontendOptions"), frontend_options);
+		phalcon_update_property_this(getThis(), SL("_frontendOptions"), frontend_options);
 	}
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, getLifetime){
 
 	zval *options, *lifetime;
 
-	options = phalcon_read_property(this_ptr, SL("_frontendOptions"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_frontendOptions"), PH_NOISY);
 	if (phalcon_array_isset_string_fetch(&lifetime, options, SS("lifetime"))) {
 		RETURN_ZVAL(lifetime, 1, 0);
 	}

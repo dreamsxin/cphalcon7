@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, _){
 		placeholders = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHODW(this_ptr, "query", translate_key, placeholders);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "query", translate_key, placeholders);
 }
 
 /**

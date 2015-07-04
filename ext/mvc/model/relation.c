@@ -124,11 +124,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_type"), type);
-	phalcon_update_property_this(this_ptr, SL("_referencedModel"), referenced_model);
-	phalcon_update_property_this(this_ptr, SL("_fields"), fields);
-	phalcon_update_property_this(this_ptr, SL("_referencedFields"), referenced_fields);
-	phalcon_update_property_this(this_ptr, SL("_options"), options);
+	phalcon_update_property_this(getThis(), SL("_type"), type);
+	phalcon_update_property_this(getThis(), SL("_referencedModel"), referenced_model);
+	phalcon_update_property_this(getThis(), SL("_fields"), fields);
+	phalcon_update_property_this(getThis(), SL("_referencedFields"), referenced_fields);
+	phalcon_update_property_this(getThis(), SL("_options"), options);
 }
 
 /**
@@ -145,9 +145,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, setIntermediateRelation){
 
 	phalcon_fetch_params(0, 3, 0, &intermediate_fields, &intermediate_model, &intermediate_referenced_fields);
 	
-	phalcon_update_property_this(this_ptr, SL("_intermediateFields"), intermediate_fields);
-	phalcon_update_property_this(this_ptr, SL("_intermediateModel"), intermediate_model);
-	phalcon_update_property_this(this_ptr, SL("_intermediateReferencedFields"), intermediate_referenced_fields);
+	phalcon_update_property_this(getThis(), SL("_intermediateFields"), intermediate_fields);
+	phalcon_update_property_this(getThis(), SL("_intermediateModel"), intermediate_model);
+	phalcon_update_property_this(getThis(), SL("_intermediateReferencedFields"), intermediate_referenced_fields);
 	
 }
 
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, setIntermediateRelation){
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getType){
 
 
-	RETURN_MEMBER(this_ptr, "_type");
+	RETURN_MEMBER(getThis(), "_type");
 }
 
 /**
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getType){
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getReferencedModel){
 
 
-	RETURN_MEMBER(this_ptr, "_referencedModel");
+	RETURN_MEMBER(getThis(), "_referencedModel");
 }
 
 /**
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getReferencedModel){
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getFields){
 
 
-	RETURN_MEMBER(this_ptr, "_fields");
+	RETURN_MEMBER(getThis(), "_fields");
 }
 
 /**
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getFields){
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getReferencedFields){
 
 
-	RETURN_MEMBER(this_ptr, "_referencedFields");
+	RETURN_MEMBER(getThis(), "_referencedFields");
 }
 
 /**
@@ -203,7 +203,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getReferencedFields){
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getOptions){
 
 
-	RETURN_MEMBER(this_ptr, "_options");
+	RETURN_MEMBER(getThis(), "_options");
 }
 
 /**
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isForeignKey){
 
 	PHALCON_MM_GROW();
 
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (Z_TYPE_P(options) == IS_ARRAY) { 
 		if (phalcon_array_isset_string(options, SS("foreignKey"))) {
 			RETURN_MM_TRUE;
@@ -236,7 +236,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getForeignKey){
 
 	zval *options, *foreign_key;
 
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
 	if (phalcon_array_isset_string_fetch(&foreign_key, options, SS("foreignKey"))) {
 		if (zend_is_true(foreign_key)) {
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isThrough){
 
 	zval *type;
 
-	type = phalcon_read_property(this_ptr, SL("_type"), PH_NOISY);
+	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
 	if (PHALCON_IS_LONG(type, 3) || PHALCON_IS_LONG(type, 4)) {
 		RETURN_TRUE;
 	}
@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isReusable){
 
 	zval *options, *reusable;
 
-	options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
 	if (phalcon_array_isset_string_fetch(&reusable, options, SS("reusable"))) {
 		RETURN_ZVAL(reusable, 1, 0);
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isReusable){
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getIntermediateFields){
 
 
-	RETURN_MEMBER(this_ptr, "_intermediateFields");
+	RETURN_MEMBER(getThis(), "_intermediateFields");
 }
 
 /**
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getIntermediateFields){
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getIntermediateModel){
 
 
-	RETURN_MEMBER(this_ptr, "_intermediateModel");
+	RETURN_MEMBER(getThis(), "_intermediateModel");
 }
 
 /**
@@ -312,5 +312,5 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getIntermediateModel){
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getIntermediateReferencedFields){
 
 
-	RETURN_MEMBER(this_ptr, "_intermediateReferencedFields");
+	RETURN_MEMBER(getThis(), "_intermediateReferencedFields");
 }

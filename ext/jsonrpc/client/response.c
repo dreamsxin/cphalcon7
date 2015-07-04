@@ -93,7 +93,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, __construct){
 	phalcon_fetch_params(0, 0, 1, &body);
 
 	if (body) {
-		phalcon_update_property_this(this_ptr, SL("_body"), body);
+		phalcon_update_property_this(getThis(), SL("_body"), body);
 	}
 }
 
@@ -103,14 +103,14 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, setId){
 
 	phalcon_fetch_params(0, 1, 0, &id);
 
-	phalcon_update_property_this(this_ptr, SL("_id"), id);
+	phalcon_update_property_this(getThis(), SL("_id"), id);
 
 	RETURN_THISW();
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, getId){
 
-	RETURN_MEMBER(this_ptr, "_id");
+	RETURN_MEMBER(getThis(), "_id");
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, setResult){
@@ -119,14 +119,14 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, setResult){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 
-	phalcon_update_property_this(this_ptr, SL("_data"), data);
+	phalcon_update_property_this(getThis(), SL("_data"), data);
 
 	RETURN_THISW();
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, getResult){
 
-	RETURN_MEMBER(this_ptr, "_data");
+	RETURN_MEMBER(getThis(), "_data");
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, setError){
@@ -135,14 +135,14 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, setError){
 
 	phalcon_fetch_params(0, 1, 0, &error);
 
-	phalcon_update_property_this(this_ptr, SL("_error"), error);
+	phalcon_update_property_this(getThis(), SL("_error"), error);
 
 	RETURN_THISW();
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, getError){
 
-	RETURN_MEMBER(this_ptr, "_error");
+	RETURN_MEMBER(getThis(), "_error");
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, setCode){
@@ -151,13 +151,13 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, setCode){
 
 	phalcon_fetch_params(0, 1, 0, &code);
 
-	phalcon_update_property_this(this_ptr, SL("_code"), code);
+	phalcon_update_property_this(getThis(), SL("_code"), code);
 
 	RETURN_THISW();
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, getCode){
 
-	RETURN_MEMBER(this_ptr, "_code");
+	RETURN_MEMBER(getThis(), "_code");
 }
 

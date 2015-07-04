@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Version, get){
 			break;
 
 	}
-	phalcon_concat_self(&result, suffix);
+	phalcon_concat_self(result, suffix);
 	ZVAL_STR(return_value, phalcon_trim(result, NULL, PHALCON_TRIM_BOTH));
 	RETURN_MM();
 }

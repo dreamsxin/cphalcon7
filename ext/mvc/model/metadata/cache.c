@@ -112,16 +112,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 		ZVAL_STRING(service, "cache");
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_cache"), service);
+	phalcon_update_property_this(getThis(), SL("_cache"), service);
 
 	if (!phalcon_array_isset_string_fetch(&lifetime, options, SS("lifetime"))) {
 		PHALCON_INIT_VAR(lifetime);
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
+	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
-	phalcon_update_property_empty_array(this_ptr, SL("_metaData"));
+	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 
 	PHALCON_MM_RESTORE();
 }
@@ -132,14 +132,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 
 	PHALCON_MM_GROW();;
 
-	cache = phalcon_read_property(this_ptr, SL("_cache"), PH_NOISY);
+	cache = phalcon_read_property(getThis(), SL("_cache"), PH_NOISY);
 
 	if (Z_TYPE_P(cache) == IS_STRING) {
-		dependency_injector = phalcon_read_property(this_ptr, SL("_dependencyInjector"), PH_NOISY);
+		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&tmp, dependency_injector, "getshared", cache);
 
-		phalcon_update_property_this(this_ptr, SL("_cache"), tmp);
+		phalcon_update_property_this(getThis(), SL("_cache"), tmp);
 
 		RETURN_CTOR(tmp);
 	}
@@ -161,9 +161,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 
-	PHALCON_CALL_METHOD(&cache, this_ptr, "_getcache");
+	PHALCON_CALL_METHOD(&cache, getThis(), "_getcache");
 
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 
 	if (Z_TYPE_P(cache) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(cache, "get", key, lifetime);
@@ -187,9 +187,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, write){
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
 
-	PHALCON_CALL_METHOD(&cache, this_ptr, "_getcache");
+	PHALCON_CALL_METHOD(&cache, getThis(), "_getcache");
 
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 
 	if (Z_TYPE_P(cache) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, cache, "save", key, data, lifetime);	
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, reset)
 
 	PHALCON_MM_GROW();
 
-	PHALCON_CALL_METHOD(&cache, this_ptr, "_getcache");
+	PHALCON_CALL_METHOD(&cache, getThis(), "_getcache");
 
 	if (Z_TYPE_P(cache) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, cache, "flush");	

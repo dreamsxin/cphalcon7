@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 		ZVAL_LONG(lifetime, 8600);
 	}
 
-	phalcon_update_property_this(this_ptr, SL("_lifetime"), lifetime);
+	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
 	if (!phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
 		PHALCON_INIT_VAR(prefix);
@@ -155,9 +155,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	PHALCON_CALL_METHOD(NULL, mongo, "__construct", frontend_data, options);
 
-	phalcon_update_property_this(this_ptr, SL("_mongo"), mongo);
+	phalcon_update_property_this(getThis(), SL("_mongo"), mongo);
 	
-	phalcon_update_property_empty_array(this_ptr, SL("_metaData"));
+	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 
 	PHALCON_MM_RESTORE();
 }
@@ -176,8 +176,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, read){
 
 	phalcon_fetch_params(1, 1, 0, &key);
 	
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
-	mongo = phalcon_read_property(this_ptr, SL("_mongo"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
+	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
 
 	if (Z_TYPE_P(mongo) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(mongo, "get", key, lifetime);
@@ -202,8 +202,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, write){
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
 	
-	lifetime = phalcon_read_property(this_ptr, SL("_lifetime"), PH_NOISY);
-	mongo = phalcon_read_property(this_ptr, SL("_mongo"), PH_NOISY);
+	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
+	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
 
 	if (Z_TYPE_P(mongo) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, mongo, "save", key, data, lifetime);	
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, reset)
 
 	PHALCON_MM_GROW();
 
-	mongo = phalcon_read_property(this_ptr, SL("_mongo"), PH_NOISY);
+	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
 
 	if (Z_TYPE_P(mongo) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, mongo, "flush");	

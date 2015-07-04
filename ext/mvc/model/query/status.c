@@ -94,8 +94,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &success, &model);
 	
-	phalcon_update_property_this(this_ptr, SL("_success"), success);
-	phalcon_update_property_this(this_ptr, SL("_model"), model);
+	phalcon_update_property_this(getThis(), SL("_success"), success);
+	phalcon_update_property_this(getThis(), SL("_model"), model);
 	
 }
 
@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, __construct){
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getModel){
 
 
-	RETURN_MEMBER(this_ptr, "_model");
+	RETURN_MEMBER(getThis(), "_model");
 }
 
 /**
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getMessages){
 
 	zval *model;
 
-	model = phalcon_read_property(this_ptr, SL("_model"), PH_NOISY);
+	model = phalcon_read_property(getThis(), SL("_model"), PH_NOISY);
 	if (Z_TYPE_P(model) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHODW(model, "getmessages");
 		return;
@@ -136,6 +136,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getMessages){
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, success){
 
 
-	RETURN_MEMBER(this_ptr, "_success");
+	RETURN_MEMBER(getThis(), "_success");
 }
 

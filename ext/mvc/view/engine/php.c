@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		PHALCON_ALLOC_GHOST_ZVAL(contents);
 		phalcon_ob_get_contents(contents);
 	
-		view = phalcon_read_property(this_ptr, SL("_view"), PH_NOISY);
+		view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHODW(NULL, view, "setcontent", contents);
 	}
 

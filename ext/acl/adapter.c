@@ -80,7 +80,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, setEventsManager){
 
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 	
-	phalcon_update_property_this(this_ptr, SL("_eventsManager"), events_manager);
+	phalcon_update_property_this(getThis(), SL("_eventsManager"), events_manager);
 	
 }
 
@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, setEventsManager){
 PHP_METHOD(Phalcon_Acl_Adapter, getEventsManager){
 
 
-	RETURN_MEMBER(this_ptr, "_eventsManager");
+	RETURN_MEMBER(getThis(), "_eventsManager");
 }
 
 /**
@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, setDefaultAction){
 
 	phalcon_fetch_params(0, 1, 0, &default_access);
 	
-	phalcon_update_property_this(this_ptr, SL("_defaultAccess"), default_access);
+	phalcon_update_property_this(getThis(), SL("_defaultAccess"), default_access);
 	
 }
 
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, setDefaultAction){
 PHP_METHOD(Phalcon_Acl_Adapter, getDefaultAction){
 
 
-	RETURN_MEMBER(this_ptr, "_defaultAccess");
+	RETURN_MEMBER(getThis(), "_defaultAccess");
 }
 
 /**
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, getDefaultAction){
 PHP_METHOD(Phalcon_Acl_Adapter, getActiveRole){
 
 
-	RETURN_MEMBER(this_ptr, "_activeRole");
+	RETURN_MEMBER(getThis(), "_activeRole");
 }
 
 /**
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, getActiveRole){
 PHP_METHOD(Phalcon_Acl_Adapter, getActiveResource){
 
 
-	RETURN_MEMBER(this_ptr, "_activeResource");
+	RETURN_MEMBER(getThis(), "_activeResource");
 }
 
 /**
@@ -151,5 +151,5 @@ PHP_METHOD(Phalcon_Acl_Adapter, getActiveResource){
 PHP_METHOD(Phalcon_Acl_Adapter, getActiveAccess){
 
 
-	RETURN_MEMBER(this_ptr, "_activeAccess");
+	RETURN_MEMBER(getThis(), "_activeAccess");
 }

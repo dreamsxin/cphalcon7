@@ -67,7 +67,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Syslog, format){
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 	
 	if (Z_TYPE_P(context) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(&interpolated, this_ptr, "interpolate", message, context);
+		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
 	}
 	else {
 		interpolated = message;

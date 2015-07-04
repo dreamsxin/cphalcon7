@@ -77,7 +77,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memory, __construct){
 	
 	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
 	array_init(empty_array);
-	phalcon_update_property_this(this_ptr, SL("_metaData"), empty_array);
+	phalcon_update_property_this(getThis(), SL("_metaData"), empty_array);
 }
 
 /**

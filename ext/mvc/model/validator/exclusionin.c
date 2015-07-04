@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 	PHALCON_INIT_VAR(option);
 	ZVAL_STRING(option, "field");
 	
-	PHALCON_CALL_METHOD(&field_name, this_ptr, "getoption", option);
+	PHALCON_CALL_METHOD(&field_name, getThis(), "getoption", option);
 	if (Z_TYPE_P(field_name) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 	PHALCON_INIT_NVAR(option);
 	ZVAL_STRING(option, "domain");
 	
-	PHALCON_CALL_METHOD(&is_set, this_ptr, "issetoption", option);
+	PHALCON_CALL_METHOD(&is_set, getThis(), "issetoption", option);
 	if (PHALCON_IS_FALSE(is_set)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'domain' is required for this validator");
 		return;
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 	PHALCON_INIT_NVAR(option);
 	ZVAL_STRING(option, "domain");
 	
-	PHALCON_CALL_METHOD(&domain, this_ptr, "getoption", option);
+	PHALCON_CALL_METHOD(&domain, getThis(), "getoption", option);
 	if (Z_TYPE_P(domain) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Option 'domain' must be an array");
 		return;
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 	PHALCON_INIT_NVAR(option);
 	ZVAL_STRING(option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, this_ptr, "getoption", option);
+	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
 	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
 		RETURN_MM_TRUE;
 	}
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 	PHALCON_INIT_NVAR(option);
 	ZVAL_STRING(option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, this_ptr, "getoption", option);
+	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
 
 	if (allow_empty && zend_is_true(allow_empty)) {
 		if (PHALCON_IS_EMPTY(value)) {
@@ -161,9 +161,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 		 * Check if the developer has defined a custom message
 		 */
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, phalcon_interned_message);
+		ZVAL_STR(option, IS(message));
 	
-		PHALCON_CALL_METHOD(&message, this_ptr, "getoption", option);
+		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
 		if (!zend_is_true(message)) {
 			PHALCON_INIT_VAR(joined_domain);
 			phalcon_fast_join_str(joined_domain, SL(", "), domain);
@@ -179,17 +179,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 		 * Is code set
 		 */
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, phalcon_interned_code);
+		ZVAL_STR(option, IS(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, this_ptr, "issetoption", option);
+		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
 		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, this_ptr, "getoption", option);
+			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
 		} else {
 			PHALCON_INIT_VAR(code);
 			ZVAL_LONG(code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, this_ptr, "appendmessage", message, field_name, type, code);
+		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field_name, type, code);
 		RETURN_MM_FALSE;
 	}
 	

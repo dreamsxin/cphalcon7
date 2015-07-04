@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 		return;
 	}
 	
-	phalcon_update_property_this(this_ptr, SL("_translate"), data);
+	phalcon_update_property_this(getThis(), SL("_translate"), data);
 
 	Z_OBJ_HT_P(getThis()) = &phalcon_translate_adapter_nativearray_object_handlers;
 }
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 		placeholders = &PHALCON_GLOBAL(z_null);
 	}
 	
-	translate = phalcon_read_property(this_ptr, SL("_translate"), PH_NOISY);
+	translate = phalcon_read_property(getThis(), SL("_translate"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&translation, translate, index)) {
 		translation = index;
 	}

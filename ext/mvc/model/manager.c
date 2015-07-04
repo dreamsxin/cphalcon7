@@ -2194,7 +2194,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	phalcon_array_update_string(find_params, SL("di"), dependency_injector, PH_COPY);
 	if (Z_TYPE_P(parameters) == IS_ARRAY) { 
 		PHALCON_INIT_VAR(find_arguments);
-		phalcon_fast_array_merge(find_arguments, &find_params, &parameters);
+		phalcon_fast_array_merge(find_arguments, find_params, parameters);
 	} else {
 		PHALCON_CPY_WRT(find_arguments, find_params);
 	}
@@ -2660,7 +2660,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneAndHasMany){
 
 	PHALCON_CALL_METHOD(&has_one, getThis(), "gethasone", model);
 	PHALCON_CALL_METHOD(&has_many, getThis(), "gethasmany", model);
-	phalcon_fast_array_merge(return_value, &has_one, &has_many);
+	phalcon_fast_array_merge(return_value, has_one, has_many);
 	RETURN_MM();
 }
 

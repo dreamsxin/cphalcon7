@@ -1055,7 +1055,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 
 	if (!fname) {
 		file = phalcon_read_property(getThis(), SL("_realpath"), PH_NOISY);
-		convert_to_string_ex(&file);
+		convert_to_string_ex(file);
 	}
 	else {
 		PHALCON_ENSURE_IS_STRING(fname);

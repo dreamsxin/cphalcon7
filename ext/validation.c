@@ -625,7 +625,7 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 	}
 	else {
 		PHALCON_INIT_VAR(m);
-		phalcon_fast_array_merge(m, &default_messages, &messages);
+		phalcon_fast_array_merge(m, default_messages, messages);
 		phalcon_update_property_this(getThis(), SL("_defaultMessages"), m);
 	}
 

@@ -267,7 +267,7 @@ static zval* phalcon_di_read_dimension(zval *object, zval *offset, int type, zva
 
 static int phalcon_di_has_dimension_internal(phalcon_di_object *obj, zval *offset, int check_empty)
 {
-	zval *tmp = phalcon_hash_get(obj->services, offset, BP_VAR_NA);
+	zval *tmp = phalcon_hash_get(obj->services, offset, BP_VAR_UNSET);
 
 	if (!tmp) {
 		return 0;

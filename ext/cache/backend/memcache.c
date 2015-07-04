@@ -544,7 +544,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, increment){
 
 	if (Z_TYPE_P(value) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(&value);
+		convert_to_long_ex(value);
 	}
 
 	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
@@ -586,7 +586,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, decrement){
 
 	if (Z_TYPE_P(value) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(&value);
+		convert_to_long_ex(value);
 	}
 
 	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);

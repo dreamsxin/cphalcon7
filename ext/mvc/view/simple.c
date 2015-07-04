@@ -581,7 +581,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 	if (Z_TYPE_P(params) == IS_ARRAY) { 
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
-			phalcon_fast_array_merge(merged_params, &view_params, &params);
+			phalcon_fast_array_merge(merged_params, view_params, params);
 		} else {
 			PHALCON_CPY_WRT(merged_params, params);
 		}
@@ -662,7 +662,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 		 */
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
-			phalcon_fast_array_merge(merged_params, &view_params, &params);
+			phalcon_fast_array_merge(merged_params, view_params, params);
 		} else {
 			PHALCON_CPY_WRT(merged_params, params);
 		}
@@ -879,7 +879,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setVars){
 		view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_params);
-			phalcon_fast_array_merge(merged_params, &view_params, &params);
+			phalcon_fast_array_merge(merged_params, view_params, params);
 		} else {
 			PHALCON_CPY_WRT(merged_params, params);
 		}

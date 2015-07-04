@@ -2498,7 +2498,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 					 */
 					if (phalcon_array_isset_long(sql_join, 0)) {
 						PHALCON_INIT_NVAR(new_sql_joins);
-						phalcon_fast_array_merge(new_sql_joins, &sql_joins, &sql_join);
+						phalcon_fast_array_merge(new_sql_joins, sql_joins, sql_join);
 						PHALCON_CPY_WRT(sql_joins, new_sql_joins);
 					} else {
 						phalcon_array_append(sql_joins, sql_join, PH_SEPARATE);
@@ -5291,7 +5291,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	if (Z_TYPE_P(default_bind_types) == IS_ARRAY) { 
 		if (Z_TYPE_P(bind_types) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_types);
-			phalcon_fast_array_merge(merged_types, &default_bind_types, &bind_types);
+			phalcon_fast_array_merge(merged_types, default_bind_types, bind_types);
 		} else {
 			PHALCON_CPY_WRT(merged_types, default_bind_types);
 		}

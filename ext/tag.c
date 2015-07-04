@@ -618,7 +618,7 @@ PHP_METHOD(Phalcon_Tag, setDefaults){
 		display_values = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_displayValues"));
 		if (Z_TYPE_P(display_values) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_values);
-			phalcon_fast_array_merge(merged_values, &display_values, &values);
+			phalcon_fast_array_merge(merged_values, display_values, values);
 			phalcon_update_static_property_ce(phalcon_tag_ce, SL("_displayValues"), merged_values);
 		} else {
 			phalcon_update_static_property_ce(phalcon_tag_ce, SL("_displayValues"), values);

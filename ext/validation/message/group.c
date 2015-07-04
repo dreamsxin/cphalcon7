@@ -138,7 +138,7 @@ static void phalcon_validation_message_group_get_current_data(zend_object_iterat
 	position = phalcon_read_property(&it->data, SL("_position"), PH_NOISY);
 	messages = phalcon_read_property(&it->data, SL("_messages"), PH_NOISY);
 
-	**data = phalcon_hash_get(Z_ARRVAL_P(messages), position, BP_VAR_NA);
+	**data = phalcon_hash_get(Z_ARRVAL_P(messages), position, BP_VAR_UNSET);
 }
 
 static void phalcon_validation_message_group_get_current_key(zend_object_iterator *it, zval *key)
@@ -247,7 +247,7 @@ static int phalcon_validation_message_group_has_dimension(zval *object, zval *of
 
 	messages = phalcon_read_property(object, SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_ARRAY) {
-		zval *tmp = phalcon_hash_get(Z_ARRVAL_P(messages), offset, BP_VAR_NA);
+		zval *tmp = phalcon_hash_get(Z_ARRVAL_P(messages), offset, BP_VAR_UNSET);
 
 		if (!tmp) {
 			return 0;
@@ -377,7 +377,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, offsetGet){
 	zval **index, *ret;
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	ret = phalcon_validation_message_group_read_dimension(getThis(), *index, BP_VAR_NA);
+	ret = phalcon_validation_message_group_read_dimension(getThis(), *index, BP_VAR_UNSET);
 	if (ret) {
 		RETURN_ZVAL(ret, 1, 0);
 	}

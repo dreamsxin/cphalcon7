@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 	default_styles  = phalcon_read_property(getThis(), SL("_styles"), PH_NOISY);
 
 	PHALCON_INIT_VAR(new_styles);
-	phalcon_fast_array_merge(new_styles, &default_styles, &styles);
+	phalcon_fast_array_merge(new_styles, default_styles, styles);
 
 	phalcon_update_property_this(getThis(), SL("_styles"), new_styles);
 

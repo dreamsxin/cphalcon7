@@ -549,7 +549,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, increment){
 		ZVAL_LONG(value, 1); 
 	} else if (Z_TYPE_P(value) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(&value);
+		convert_to_long_ex(value);
 	}
 
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
@@ -597,7 +597,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, decrement){
 
 	if (Z_TYPE_P(value) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(&value);
+		convert_to_long_ex(value);
 	}
 
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);

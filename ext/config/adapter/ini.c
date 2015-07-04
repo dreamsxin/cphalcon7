@@ -92,7 +92,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 	}
 
 	if (Z_TYPE_P(*temp1) != IS_ARRAY) {
-		convert_to_array_ex(temp1);
+		convert_to_array_ex(*temp1);
 	}
 
 	for (i = 0; i < n - 1; i++) {
@@ -104,7 +104,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 			phalcon_array_update_zval(temp1, index, t2, PH_COPY);
 		}
 		else if (Z_TYPE_P(*temp2) != IS_ARRAY) {
-			convert_to_array_ex(temp2);
+			convert_to_array_ex(*temp2);
 		}
 
 		t1 = t2;

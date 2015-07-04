@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 		registered_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_modules);
-			phalcon_fast_array_merge(merged_modules, &registered_modules, &modules);
+			phalcon_fast_array_merge(merged_modules, registered_modules, modules);
 		} else {
 			PHALCON_CPY_WRT(merged_modules, modules);
 		}
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		
 					PHALCON_OBS_VAR(path);
 					phalcon_array_fetch_string(&path, module, SL("path"), PH_NOISY);
-					convert_to_string_ex(&path);
+					convert_to_string_ex(path);
 					if (Z_TYPE_P(class_name) != IS_STRING || phalcon_class_exists(Z_STR_P(class_name), 0) == NULL) {
 						if (phalcon_file_exists(path) == SUCCESS) {
 							RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path)));

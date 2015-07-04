@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Forms_Element, addValidators){
 		current_validators = phalcon_read_property(getThis(), SL("_validators"), PH_NOISY);
 		if (Z_TYPE_P(current_validators) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_validators);
-			phalcon_fast_array_merge(merged_validators, &current_validators, &validators);
+			phalcon_fast_array_merge(merged_validators, current_validators, validators);
 		} else {
 			merged_validators = validators;
 		}
@@ -394,7 +394,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	default_attributes = phalcon_read_property(getThis(), SL("_attributes"), PH_NOISY);
 	if (Z_TYPE_P(default_attributes) == IS_ARRAY) { 
 		PHALCON_INIT_VAR(merged_attributes);
-		phalcon_fast_array_merge(merged_attributes, &default_attributes, &widget_attributes);
+		phalcon_fast_array_merge(merged_attributes, default_attributes, widget_attributes);
 	} else {
 		PHALCON_CPY_WRT(merged_attributes, widget_attributes);
 	}
@@ -884,7 +884,7 @@ PHP_METHOD(Phalcon_Forms_Element, __toString)
 
 			Z_ADDREF_P(m);
 			if (Z_TYPE_P(m) != IS_STRING) {
-				convert_to_string_ex(&m);
+				convert_to_string_ex(m);
 			}
 
 			zend_clear_exception();

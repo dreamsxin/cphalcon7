@@ -2860,7 +2860,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 			PHALCON_INIT_VAR(new_errors);
 			errors = phalcon_read_property(getThis(), SL("_errorMessages"), PH_NOISY);
 			if (Z_TYPE_P(errors) == IS_ARRAY) {
-				phalcon_fast_array_merge(new_errors, &errors, &messages);
+				phalcon_fast_array_merge(new_errors, errors, messages);
 				phalcon_update_property_this(getThis(), SL("_errorMessages"), new_errors);
 			} else {
 				phalcon_update_property_this(getThis(), SL("_errorMessages"), messages);
@@ -3767,7 +3767,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 					PHALCON_CALL_METHOD(&field_size, meta_data, "getdatasize", getThis(), field);
 					if (Z_TYPE_P(field_size) != IS_NULL) {
 						if (phalcon_function_exists_ex(SS("mb_strlen")) == SUCCESS) {
-							convert_to_string_ex(&value);
+							convert_to_string_ex(value);
 							PHALCON_CALL_FUNCTION(&length, "mb_strlen", value);
 						} else {						
 							PHALCON_INIT_NVAR(length);

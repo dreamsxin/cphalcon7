@@ -138,7 +138,7 @@ static int phalcon_session_adapter_has_property_internal(zval *object, zval *mem
 	}
 
 	phalcon_concat_vv(&pkey, unique_id, member, 0);
-	tmp = phalcon_hash_get(Z_ARRVAL_P(_SESSION), pkey, BP_VAR_NA);
+	tmp = phalcon_hash_get(Z_ARRVAL_P(_SESSION), pkey, BP_VAR_UNSET);
 	zval_dtor(&key);
 
 	if (!tmp) {
@@ -281,7 +281,7 @@ static int phalcon_session_adapter_has_dimension(zval *object, zval *member, int
 		return zend_get_std_object_handlers()->has_dimension(object, member, check_empty);
 	}
 
-	tmp = phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, BP_VAR_NA);
+	tmp = phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, BP_VAR_UNSET);
 
 	if (!tmp) {
 		return 0;
@@ -553,7 +553,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 
 	if (!remove || !zend_is_true(remove)) {
 		/* Fast path */
-		zval *value = phalcon_session_adapter_get_property_ptr_ptr_internal(getThis(), index, BP_VAR_NA);
+		zval *value = phalcon_session_adapter_get_property_ptr_ptr_internal(getThis(), index, BP_VAR_UNSET);
 		if (value) {
 			RETURN_ZVAL(value, 1, 0);
 		}

@@ -142,23 +142,21 @@ PHP_METHOD(Phalcon_Forms_Element_Select, getOptions){
  */
 PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 
-	zval **option, *values, *tmp;
+	zval *option, *values, tmp;
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	PHALCON_ENSURE_IS_ARRAY(option);
 
 	values = phalcon_read_property(getThis(), SL("_optionsValues"), PH_NOISY);
-	
-	ALLOC_ZVAL(tmp);
+
 	if (Z_TYPE_P(values) != IS_ARRAY) {
-		MAKE_COPY_ZVAL(option, tmp);
-	}
-	else {
-		add_function(tmp, *option, values);
+		ZVAL_COPY_VALUE(&tmp, option);
+	} else {
+		add_function(&tmp, option, values);
 	}
 
-	Z_SET_REFCOUNT_P(tmp, 0);
-	phalcon_update_property_this(getThis(), SL("_optionsValues"), tmp);
+	Z_TRY_ADDREF(tmp);
+	phalcon_update_property_this(getThis(), SL("_optionsValues"), &tmp);
 	RETURN_THISW();
 }
 
@@ -174,7 +172,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, 1, &attributes);
+	phalcon_fetch_params(0, 1, 0, &attributes);
 	
 	if (!attributes) {
 		attributes = &PHALCON_GLOBAL(z_null);

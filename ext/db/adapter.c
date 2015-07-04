@@ -695,13 +695,12 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 
 	zval *table, *fields, *values, *where_condition = NULL;
 	zval *data_types = NULL, *placeholders, *update_values;
-	zval *bind_data_types = NULL, *value = NULL, *position = NULL, *field = NULL;
+	zval *bind_data_types = NULL, *value = NULL, *field = NULL;
 	zval *escaped_field = NULL, *set_clause_part = NULL, *bind_type = NULL;
 	zval *escaped_table = NULL, *set_clause, *update_sql = NULL;
 	zval *conditions, *where_bind, *where_types;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -1457,7 +1456,6 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 
 	zval *schema_name = NULL, *dialect, *sql = NULL, *fetch_num, *tables = NULL;
 	zval *table, *table_name;
-	HashPosition hp0;
 
 	PHALCON_MM_GROW();
 
@@ -1511,7 +1509,6 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 
 	zval *schema_name = NULL, *dialect, *sql = NULL, *fetch_num, *tables = NULL;
 	zval *table, *table_name;
-	HashPosition hp0;
 
 	PHALCON_MM_GROW();
 
@@ -1568,9 +1565,8 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 	zval *table, *schema = NULL, *dialect, *fetch_num, *sql = NULL, *describe = NULL;
 	zval *indexes, *index = NULL, *key_name = NULL, *column_name = NULL;
 	zval *index_columns = NULL, *name = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

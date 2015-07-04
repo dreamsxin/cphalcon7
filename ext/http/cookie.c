@@ -417,13 +417,13 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 	/** 
 	 * Sets the cookie using the standard 'setcookie' function
 	 */
-	convert_to_string_ex(&name);
-	convert_to_string_ex(&encrypt_value);
-	convert_to_long_ex(&expire);
-	convert_to_string_ex(&path);
-	convert_to_string_ex(&domain);
-	convert_to_long_ex(&secure);
-	convert_to_long_ex(&http_only);
+	convert_to_string_ex(name);
+	convert_to_string_ex(encrypt_value);
+	convert_to_long_ex(expire);
+	convert_to_string_ex(path);
+	convert_to_string_ex(domain);
+	convert_to_long_ex(secure);
+	convert_to_long_ex(http_only);
 
 	php_setcookie(
 		Z_STRVAL_P(name), Z_STRLEN_P(name),
@@ -540,11 +540,11 @@ PHP_METHOD(Phalcon_Http_Cookie, delete){
 
 	phalcon_update_property_null(getThis(), SL("_value"));
 
-	convert_to_string_ex(&name);
-	convert_to_string_ex(&path);
-	convert_to_string_ex(&domain);
-	convert_to_long_ex(&secure);
-	convert_to_long_ex(&http_only);
+	convert_to_string_ex(name);
+	convert_to_string_ex(path);
+	convert_to_string_ex(domain);
+	convert_to_long_ex(secure);
+	convert_to_long_ex(http_only);
 
 	php_setcookie(
 		Z_STRVAL_P(name), Z_STRLEN_P(name),
@@ -831,7 +831,7 @@ PHP_METHOD(Phalcon_Http_Cookie, __toString){
 
 				Z_ADDREF_P(m);
 				if (Z_TYPE_P(m) != IS_STRING) {
-					convert_to_string_ex(&m);
+					convert_to_string_ex(m);
 				}
 
 				zend_clear_exception();

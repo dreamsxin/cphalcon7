@@ -239,7 +239,7 @@ static void phalcon_config_write_dimension(zval *object, zval *offset, zval *val
  */
 static int phalcon_config_has_internal(phalcon_config_object *object, zval *key, int check_empty)
 {
-	zval *tmp = phalcon_hash_get(object->props, key, BP_VAR_NA);
+	zval *tmp = phalcon_hash_get(object->props, key, BP_VAR_UNSET);
 
 	if (!tmp) {
 		return 0;
@@ -537,7 +537,7 @@ PHP_METHOD(Phalcon_Config, get){
 
 	phalcon_fetch_params(0, 1, 1, &index, &default_value);
 
-	value = phalcon_config_read_internal(PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_config_object), index, BP_VAR_NA);
+	value = phalcon_config_read_internal(PHALCON_GET_OBJECT_FROM_ZVAL(getThis(), phalcon_config_object), index, BP_VAR_UNSET);
 	if (!value || Z_TYPE_P(value) == IS_NULL) {
 		if (default_value) {
 			RETURN_ZVAL(default_value, 1, 0);
@@ -652,7 +652,7 @@ PHP_METHOD(Phalcon_Config, merge){
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
-		active_value = phalcon_config_read_internal(obj, &tmp, BP_VAR_NA);
+		active_value = phalcon_config_read_internal(obj, &tmp, BP_VAR_UNSET);
 
 		/**
 		 * The key is already defined in the object, we have to merge it

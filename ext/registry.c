@@ -280,7 +280,7 @@ static int phalcon_registry_has_property(zval *object, zval *member, int has_set
 	phalcon_registry_object *obj = PHALCON_GET_OBJECT_FROM_ZVAL(object, phalcon_registry_object);
 	zval *tmp;
 
-	tmp = phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, BP_VAR_NA);
+	tmp = phalcon_hash_get(Z_ARRVAL_P(obj->properties), member, BP_VAR_UNSET);
 
 	if (!tmp) {
 		return 0;

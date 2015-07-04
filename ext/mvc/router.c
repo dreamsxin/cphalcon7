@@ -1013,7 +1013,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 		if (zend_hash_num_elements(Z_ARRVAL_P(params))) {
 			PHALCON_INIT_VAR(params_merge);
-			phalcon_fast_array_merge(params_merge, &params, &parts);
+			phalcon_fast_array_merge(params_merge, params, parts);
 		} else {
 			params_merge = parts;
 		}
@@ -1287,7 +1287,7 @@ PHP_METHOD(Phalcon_Mvc_Router, mount){
 	routes = phalcon_read_property(getThis(), SL("_routes"), PH_NOISY);
 	if (Z_TYPE_P(routes) == IS_ARRAY) {
 		PHALCON_INIT_VAR(new_routes);
-		phalcon_fast_array_merge(new_routes, &routes, &group_routes);
+		phalcon_fast_array_merge(new_routes, routes, group_routes);
 		phalcon_update_property_this(getThis(), SL("_routes"), new_routes);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_routes"), group_routes);

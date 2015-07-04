@@ -241,13 +241,13 @@ static int phalcon_forms_form_valid(zend_object_iterator *it)
 	return (phalcon_array_isset(elements, position)) ? SUCCESS : FAILURE;
 }
 
-static void phalcon_forms_form_get_current_data(zend_object_iterator *it, zval ***data)
+static zval *phalcon_forms_form_get_current_data(zend_object_iterator *it)
 {
 	zval *position, *elements;
 
 	position = phalcon_read_property(&it->data, SL("_position"), PH_NOISY);
 	elements = phalcon_read_property(&it->data, SL("_elementsIndexed"), PH_NOISY);
-	**data = phalcon_hash_get(Z_ARRVAL_P(elements), position, BP_VAR_NA);
+	return phalcon_hash_get(Z_ARRVAL_P(elements), position, BP_VAR_UNSET);
 }
 
 static void phalcon_forms_form_get_current_key(zend_object_iterator *it, zval *key)
@@ -303,8 +303,7 @@ static zend_object_iterator* phalcon_forms_form_get_iterator(zend_class_entry *c
 
 	result = emalloc(sizeof(zend_object_iterator));
 
-	Z_ADDREF_P(object);
-	result->data  = object;
+	ZVAL_COPY(&result->data, object);
 	result->funcs = &phalcon_forms_form_iterator_funcs;
 
 	return result;
@@ -321,10 +320,11 @@ static int phalcon_forms_form_count_elements(zval *object, long int *count)
 		return SUCCESS;
 	}
 
-	res = phalcon_call_method(&cnt, object, "count", 0, NULL);
+	res = phalcon_call_class_method_aparams(&cnt, object, Z_OBJCE_P(object), phalcon_fcall_method, "count", 5, 0, NULL);
+
 	if (res == SUCCESS) {
 		*count = (Z_TYPE_P(cnt) == IS_LONG) ? Z_LVAL_P(cnt) : phalcon_get_intval(cnt);
-		zval_ptr_dtor(&cnt);
+		zval_ptr_dtor(cnt);
 	}
 
 	return res;
@@ -564,12 +564,11 @@ PHP_METHOD(Phalcon_Forms_Form, getElements){
 PHP_METHOD(Phalcon_Forms_Form, bind){
 
 	zval *data, *entity, *whitelist = NULL, *elements, *service_name, *dependency_injector = NULL, *filter = NULL, *filter_data;
-	zval *value = NULL, *key = NULL, *element = NULL, *filters = NULL;
+	zval *value = NULL, *element = NULL, *filters = NULL;
 	zval *filtered_value = NULL;
 	zval *method = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -627,7 +626,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		 * Check if the item is in the whitelist
 		 */
 		if (Z_TYPE_P(whitelist) == IS_ARRAY) {
-			if (!phalcon_fast_in_array(key, whitelist)) {
+			if (!phalcon_fast_in_array(&key, whitelist)) {
 				continue;
 			}
 		}
@@ -692,9 +691,6 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 	zval *messages, *element = NULL, *validators = NULL, *name = NULL, *prepared_validators = NULL;
 	zval *validator = NULL, *scope = NULL, *validation = NULL, *filters = NULL;
 	zval *element_messages = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -841,7 +837,7 @@ PHP_METHOD(Phalcon_Forms_Form, getMessages){
 			zval *v;
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), v) {
 				PHALCON_CALL_METHODW(NULL, return_value, "appendmessages", v);
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 	}
 }
@@ -893,6 +889,8 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 
 	zval *element, *pos = NULL, *type = NULL, *name = NULL, *values, *elements;
 	zval *tmp0 = NULL, *tmp1 = NULL, *length, *offset, *preserve_keys;
+	zend_string *str_key;
+	ulong idx;
 	int found = 0, i = 0;
 
 	PHALCON_MM_GROW();
@@ -930,7 +928,7 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 			ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(elements), idx, str_key) {
 				zval key;
 				if (str_key) {
-					ZVAL_STR(&key, related_key);
+					ZVAL_STR(&key, str_key);
 				} else {
 					ZVAL_LONG(&tmp, idx);
 				}

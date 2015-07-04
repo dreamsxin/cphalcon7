@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Loader, registerNamespaces){
 		current_namespaces = phalcon_read_property(getThis(), SL("_namespaces"), PH_NOISY);
 		if (Z_TYPE_P(current_namespaces) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_namespaces);
-			phalcon_fast_array_merge(merged_namespaces, &current_namespaces, &namespaces);
+			phalcon_fast_array_merge(merged_namespaces, current_namespaces, namespaces);
 		} else {
 			merged_namespaces = namespaces;
 		}
@@ -304,7 +304,7 @@ PHP_METHOD(Phalcon_Loader, registerPrefixes){
 		current_prefixes = phalcon_read_property(getThis(), SL("_prefixes"), PH_NOISY);
 		if (Z_TYPE_P(current_prefixes) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_prefixes);
-			phalcon_fast_array_merge(merged_prefixes, &current_prefixes, &prefixes);
+			phalcon_fast_array_merge(merged_prefixes, current_prefixes, prefixes);
 		} else {
 			merged_prefixes = prefixes;
 		}
@@ -353,7 +353,7 @@ PHP_METHOD(Phalcon_Loader, registerDirs){
 		current_directories = phalcon_read_property(getThis(), SL("_directories"), PH_NOISY);
 		if (Z_TYPE_P(current_directories) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_directories);
-			phalcon_fast_array_merge(merged_directories, &current_directories, &directories);
+			phalcon_fast_array_merge(merged_directories, current_directories, directories);
 		} else {
 			merged_directories = directories;
 		}
@@ -401,7 +401,7 @@ PHP_METHOD(Phalcon_Loader, registerClasses){
 		current_classes = phalcon_read_property(getThis(), SL("_classes"), PH_NOISY);
 		if (Z_TYPE_P(current_classes) == IS_ARRAY) { 
 			PHALCON_INIT_VAR(merged_classes);
-			phalcon_fast_array_merge(merged_classes, &current_classes, &classes);
+			phalcon_fast_array_merge(merged_classes, current_classes, classes);
 		} else {
 			merged_classes = classes;
 		}
@@ -498,7 +498,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	if (Z_TYPE_P(directory) != IS_ARRAY) {
 		if (Z_TYPE_P(directory) != IS_STRING) {
 			PHALCON_SEPARATE_PARAM(directory);
-			convert_to_string_ex(&directory);
+			convert_to_string_ex(directory);
 		}
 
 		PHALCON_INIT_VAR(directories);
@@ -621,7 +621,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 
 			PHALCON_OBS_VAR(file_path);
 			phalcon_array_fetch(&file_path, classes, class_name, PH_NOISY);
-			convert_to_string_ex(&file_path);
+			convert_to_string_ex(file_path);
 			if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 				phalcon_update_property_this(getThis(), SL("_foundPath"), file_path);
 

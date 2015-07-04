@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Async, recv){
 		ZVAL_LONG(pid, 0);
 	} else if (Z_TYPE_P(pid) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(pid);
-		convert_to_long_ex(&pid);
+		convert_to_long_ex(pid);
 	}
 
 	if (!flag) {
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Async, recv){
 		ZVAL_LONG(flag, 0);
 	} else if (Z_TYPE_P(pid) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(flag);
-		convert_to_long_ex(&flag);
+		convert_to_long_ex(flag);
 	}
 
 	filename = phalcon_read_static_property_ce(phalcon_async_ce, SL("_filename"));
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Async, recvAll){
 		ZVAL_LONG(flag, 0);
 	} else if (Z_TYPE_P(pid) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(flag);
-		convert_to_long_ex(&flag);
+		convert_to_long_ex(flag);
 	}
 
 	num = phalcon_read_static_property_ce(phalcon_async_ce, SL("_num"));

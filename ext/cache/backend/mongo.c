@@ -586,7 +586,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 
 	if (Z_TYPE_P(value) != IS_LONG) {	
 		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(&value);
+		convert_to_long_ex(value);
 	}
 
 	frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
@@ -643,7 +643,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 
 		if(Z_TYPE_P(cached_content) != IS_LONG) {
 			PHALCON_SEPARATE_PARAM(cached_content);
-			convert_to_long_ex(&cached_content);
+			convert_to_long_ex(cached_content);
 		}
 
 		if (phalcon_is_numeric(cached_content)) {
@@ -690,7 +690,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
 	if (Z_TYPE_P(value) != IS_LONG) {	
 		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(&value);
+		convert_to_long_ex(value);
 	}
 
 	frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
@@ -747,7 +747,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
 		if(Z_TYPE_P(cached_content) != IS_LONG) {
 			PHALCON_SEPARATE_PARAM(cached_content);
-			convert_to_long_ex(&cached_content);
+			convert_to_long_ex(cached_content);
 		}
 
 		if (phalcon_is_numeric(cached_content)) {

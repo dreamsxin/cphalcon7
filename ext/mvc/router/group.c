@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, getRoutes){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 
-	zval **pattern, **paths = NULL, **http_methods = NULL, *prefix, *prefix_pattern;
+	zval *pattern, *paths = NULL, *http_methods = NULL, *prefix, *prefix_pattern;
 	zval *default_paths, *merged_paths = NULL;
 
 	phalcon_fetch_params(0, 1, 2, &pattern, &paths, &http_methods);
@@ -373,17 +373,17 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	PHALCON_MM_GROW();
 
 	if (!paths) {
-		paths = &&PHALCON_GLOBAL(z_null);
+		paths = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!http_methods) {
-		http_methods = &&PHALCON_GLOBAL(z_null);
+		http_methods = &PHALCON_GLOBAL(z_null);
 	}
 
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	if (Z_TYPE_P(prefix) != IS_STRING) {
-		convert_to_string_ex(&prefix);
+		convert_to_string_ex(prefix);
 	}
 
 	/**
@@ -391,9 +391,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	 */
 	PHALCON_INIT_VAR(prefix_pattern);
 	{
-		const char *s_pattern = Z_STRVAL_P(*pattern); /* NUL-terminated */
+		const char *s_pattern = Z_STRVAL_P*pattern); /* NUL-terminated */
 		const char *s_prefix  = Z_STRVAL_P(prefix);   /* NUL-terminated */
-		int pattern_len       = Z_STRLEN_P(*pattern);
+		int pattern_len       = Z_STRLEN_P(pattern);
 		int prefix_len        = Z_STRLEN_P(prefix);
 		if (prefix_len && *s_pattern == '/' && s_prefix[prefix_len-1] == '/') {
 			char *new_pattern = safe_emalloc(prefix_len - 1 /* slash */ + 1 /* \0 */, 1, pattern_len);
@@ -402,7 +402,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 			ZVAL_STRINGL(prefix_pattern, new_pattern, prefix_len + pattern_len - 1);
 		}
 		else {
-			PHALCON_CONCAT_VV(prefix_pattern, prefix, *pattern);
+			PHALCON_CONCAT_VV(prefix_pattern, prefix, pattern);
 		}
 	}
 
@@ -411,21 +411,21 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	/**
 	 * Check if the paths need to be merged with current paths
 	 */
-	if (Z_TYPE_P(default_paths) == IS_ARRAY && Z_TYPE_P(*paths) == IS_ARRAY) {
+	if (Z_TYPE_P(default_paths) == IS_ARRAY && Z_TYPE_P(paths) == IS_ARRAY) {
 		/**
 		 * Merge the paths with the default paths
 		 */
 		PHALCON_INIT_VAR(merged_paths);
-		phalcon_fast_array_merge(merged_paths, &default_paths, paths);
+		phalcon_fast_array_merge(merged_paths, default_paths, paths);
 	} else {
-		merged_paths = *paths;
+		merged_paths = paths;
 	}
 
 	/**
 	 * Every route is internally stored as a Phalcon\Mvc\Router\Route
 	 */
 	object_init_ex(return_value, phalcon_mvc_router_route_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", prefix_pattern, merged_paths, *http_methods);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", prefix_pattern, merged_paths, http_methods);
 	PHALCON_CALL_METHOD(NULL, return_value, "setgroup", getThis());
 
 	phalcon_update_property_array_append(getThis(), SL("_routes"), return_value);

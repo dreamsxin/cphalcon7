@@ -239,7 +239,7 @@ typedef enum _phalcon_call_type {
 #define PHALCON_CALL_USER_FUNC(return_value, handler) PHALCON_CALL_USER_FUNC_ARRAY(return_value, handler, NULL)
 #define PHALCON_CALL_USER_FUNC_ARRAY(return_value, handler, params) \
 	do { \
-		RETURN_MM_ON_FAILURE(phalcon_call_func_aparams(return_value, handler, sizeof(params)/sizeof(zval*), params)); \
+		RETURN_MM_ON_FAILURE(phalcon_call_zval_func_aparams(return_value, handler, sizeof(params)/sizeof(zval*), params)); \
 	} while (0)
 
 #define PHALCON_CALL_USER_FUNC_ARRAY_NOEX(return_value, handler, params) \

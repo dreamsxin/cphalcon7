@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_DI, getRaw){
 
 	zval *name, *service;
 
-	phalcon_fetch_params(0, 1, 0, name);
+	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {

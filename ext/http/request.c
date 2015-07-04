@@ -1364,7 +1364,7 @@ PHP_METHOD(Phalcon_Http_Request, hasFiles){
 	RETURN_LONG(nfiles);
 }
 
-static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zval *name, zval *type, zval *tmp_name, zval *error, zval *size, int only_successful, smart_str *prefix)
+static void phalcon_http_request_getuploadedfiles_helper(zval **retval_ptr, zval *name, zval *type, zval *tmp_name, zval *error, zval *size, int only_successful, smart_str *prefix)
 {
 	if (
 		   Z_TYPE_P(name) == IS_ARRAY && Z_TYPE_P(type) == IS_ARRAY
@@ -1415,8 +1415,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 					add_assoc_zval_ex(arr, SS("size"),     dsize);
 
 					PHALCON_ALLOC_GHOST_ZVAL(key);
-					ZVAL_STRINGL(key, prefix->c, prefix->len);
-					prefix->len = prefix_len;
+					ZVAL_STR(key, prefix->s);
 
 					PHALCON_ALLOC_GHOST_ZVAL(file);
 					object_init_ex(file, phalcon_http_request_file_ce);
@@ -1430,7 +1429,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 					zval_ptr_dtor(key);
 
 					if (res != FAILURE) {
-						add_next_index_zval(return_value, file);
+						add_next_index_zval(*retval_ptr, file);
 					}
 					else {
 						break;
@@ -1439,7 +1438,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **return_value, zv
 			}
 			else if (Z_TYPE_P(*derror) == IS_ARRAY) {
 				smart_str_appendc(prefix, '.');
-				phalcon_http_request_getuploadedfiles_helper(return_value, *dname, *dtype, *dtmp, *derror, *dsize, only_successful, prefix);
+				phalcon_http_request_getuploadedfiles_helper(retval_ptr, *dname, *dtype, *dtmp, *derror, *dsize, only_successful, prefix);
 				prefix->len = prefix_len;
 			}
 

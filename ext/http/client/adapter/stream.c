@@ -149,9 +149,8 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 	zval *key = NULL, *value = NULL, *realm, *qop, *nonce, *nc, *cnonce, *qoc, *ha1 = NULL, *path = NULL, *md5_entity_body = NULL, *ha2 = NULL;
 	zval *http, *option = NULL, *body, *headers = NULL, *uniqid = NULL, *boundary;
 	zval *path_parts = NULL, *filename, *basename, *filedata = NULL, *tmp = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

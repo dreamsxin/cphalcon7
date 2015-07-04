@@ -576,9 +576,6 @@ PHP_METHOD(Phalcon_Arr, choice){
 PHP_METHOD(Phalcon_Arr, extract){
 
 	zval *array, *paths, *default_value = NULL, *path = NULL, *value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -615,9 +612,6 @@ PHP_METHOD(Phalcon_Arr, extract){
 PHP_METHOD(Phalcon_Arr, pluck){
 
 	zval *array, *key, *row = NULL, *value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -686,7 +680,8 @@ PHP_METHOD(Phalcon_Arr, unshift){
 PHP_METHOD(Phalcon_Arr, map){
 
 	zval *callbacks, *array, *keys = NULL;
-	zval *key = NULL, *val = NULL, *value = NULL, *key1 = NULL, *callback = NULL, *params = NULL;
+	zval *val = NULL, *value = NULL, *key1 = NULL, *callback = NULL, *params = NULL;
+	zend_string *str_key;
 	ulong idx;
 
 	PHALCON_MM_GROW();
@@ -695,10 +690,10 @@ PHP_METHOD(Phalcon_Arr, map){
 
 	PHALCON_SEPARATE_PARAM(array);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, key, val) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, str_key, val) {
 		zval tmp;
-		if (key) {
-			ZVAL_STR(&tmp, key);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}

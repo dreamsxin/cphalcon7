@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 		ZVAL_STRING(&escaped_line_break, "\\n");
 
 		ALLOC_INIT_ZVAL(replaced_value);
-		PHALCON_STR_REPLACE(replaced_value, &line_break, &escaped_line_break, value);
+		PHALCON_STR_REPLACE(&replaced_value, &line_break, &escaped_line_break, value);
 		phalcon_htmlentities(return_value, replaced_value, NULL, charset);
 		zval_ptr_dtor(replaced_value);
 		return;
@@ -410,8 +410,9 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 PHP_METHOD(Phalcon_Debug, _getArrayDump){
 
 	zval *argument, *n = NULL, *number_arguments, *dump;
-	zval *v = NULL, *k = NULL, *var_dump = NULL, *escaped_string = NULL, *next = NULL, *array_dump = NULL;
+	zval *v = NULL, *var_dump = NULL, *escaped_string = NULL, *next = NULL, *array_dump = NULL;
 	zval *class_name = NULL, *joined_dump;
+	zend_string *str_key;
 	ulong idx;
 
 	PHALCON_MM_GROW();
@@ -432,10 +433,10 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 				PHALCON_INIT_VAR(dump);
 				array_init(dump);
 
-				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(argument), idx, k, v) {
+				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(argument), idx, str_key, v) {
 					zval tmp;
-					if (k) {
-						ZVAL_STR(&tmp, k);
+					if (str_key) {
+						ZVAL_STR(&tmp, str_key);
 					} else {
 						ZVAL_LONG(&tmp, idx);
 					}

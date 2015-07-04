@@ -1034,13 +1034,13 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2){
 	if (!output) {
 		PHALCON_INIT_NVAR(output);
 		array_init_size(output, 7);
-		phalcon_array_append_string(&output, SL(" years"), 0);
-		phalcon_array_append_string(&output, SL(" months"), 0);
-		phalcon_array_append_string(&output, SL(" weeks"), 0);
-		phalcon_array_append_string(&output, SL(" days"), 0);
-		phalcon_array_append_string(&output, SL(" hours"), 0);
-		phalcon_array_append_string(&output, SL(" minutes"), 0);
-		phalcon_array_append_string(&output, SL(" seconds"), 0);
+		phalcon_array_append_string(output, SL(" years"), 0);
+		phalcon_array_append_string(output, SL(" months"), 0);
+		phalcon_array_append_string(output, SL(" weeks"), 0);
+		phalcon_array_append_string(output, SL(" days"), 0);
+		phalcon_array_append_string(output, SL(" hours"), 0);
+		phalcon_array_append_string(output, SL(" minutes"), 0);
+		phalcon_array_append_string(output, SL(" seconds"), 0);
 	}
 
 	hours = offset / PHALCON_DATE_HOUR;

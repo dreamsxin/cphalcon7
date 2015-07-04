@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Debug_Dump, all){
 
 	PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, call_object, arg_list);
+	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_object, &arg_list);
 
 	RETURN_MM();
 }
@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 PHP_METHOD(Phalcon_Debug_Dump, output){
 
 	zval *variable, *name = NULL, *tab = NULL, *space, *tmp = NULL, *new_tab = NULL;
-	zval output, *str = NULL, *type = NULL, *style = NULL, *count = NULL, *key = NULL, *value = NULL, *replace_pairs = NULL;
+	zval *output = NULL, *str = NULL, *type = NULL, *style = NULL, *count = NULL, *key = NULL, *value = NULL, *replace_pairs = NULL;
 	zval *class_name = NULL, *objects, *detailed = NULL, *properties = NULL, *methods = NULL, *method = NULL;
 	HashTable *ah0;
 	HashPosition hp0;

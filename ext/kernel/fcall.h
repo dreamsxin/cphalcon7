@@ -239,7 +239,7 @@ typedef enum _phalcon_call_type {
 #define PHALCON_CALL_USER_FUNC(return_value, handler) PHALCON_CALL_USER_FUNC_ARRAY(return_value, handler, NULL)
 #define PHALCON_CALL_USER_FUNC_ARRAY(return_value, handler, params) \
 	do { \
-		RETURN_MM_ON_FAILURE(phalcon_call_zval_func_aparams(return_value, handler, sizeof(params)/sizeof(zval*), params)); \
+		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array(return_value, handler, params)); \
 	} while (0)
 
 #define PHALCON_CALL_USER_FUNC_ARRAY_NOEX(return_value, handler, params) \
@@ -258,22 +258,57 @@ int phalcon_call_func_aparams(zval **return_value, const char *func_name, uint f
 int phalcon_call_zval_func_aparams(zval **return_value, zval *func_name, uint param_count, zval *params[]);
 int phalcon_call_class_method_aparams(zval **return_value, zval *object, zend_class_entry *ce, phalcon_call_type type, const char *method_name, uint method_len, uint param_count, zval *params[]);
 
-/** Fast call_user_func_array/call_user_func */
-static inline int phalcon_call_user_func_array_noex(zval **retval_ptr, zval *handler, zval *params[]){
-
-	if (zend_is_callable(handler, 0, NULL)) {
-		return phalcon_call_user_function(retval_ptr, NULL, NULL, phalcon_fcall_function, handler, sizeof(params)/sizeof(zval*), params);
-	}
-
-	return FAILURE;
-}
-
 /**
  * Replaces call_user_func_array avoiding function lookup
  */
-static inline int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params[])
+static inline int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 {
-	return phalcon_call_user_function(retval_ptr, NULL, NULL, phalcon_fcall_function, handler, sizeof(params)/sizeof(zval*), params);
+	zval retval, *arguments, *param;
+	int param_count, i, status, is_null = 0;
+
+	if (*retval_ptr == NULL) {
+		is_null = 1;
+		*retval_ptr = &retval;
+	}
+
+	if (params && Z_TYPE_P(params) != IS_ARRAY) {
+		status = FAILURE;
+		ZVAL_NULL(*retval_ptr);
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
+	} else {
+		param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
+
+		arguments = emalloc(sizeof(zval) * param_count);
+
+		i = 0;
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
+			ZVAL_ZVAL(&arguments[i], param, 1, 0);
+			i++;
+		} ZEND_HASH_FOREACH_END();
+
+		if ((status = call_user_function(EG(function_table), NULL, handler, *retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+			status = FAILURE;
+			if (is_null) {
+				ZVAL_NULL(*retval_ptr);
+			}
+		}
+	}
+
+	if (is_null) {
+		Z_TRY_ADDREF_P(*retval_ptr);
+	}
+	zval_dtor(&retval);
+	return status;
+}
+
+/** Fast call_user_func_array/call_user_func */
+static inline int phalcon_call_user_func_array_noex(zval **retval_ptr, zval *handler, zval *params){
+
+	if (zend_is_callable(handler, 0, NULL)) {
+		return phalcon_call_user_func_array(retval_ptr, handler, params);
+	}
+
+	return FAILURE;
 }
 
 /**

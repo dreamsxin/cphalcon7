@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, missingMethod){
 	phalcon_array_append(call_object, getThis(), 0);
 	phalcon_array_append(call_object, method, 0);
 
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, call_object, arguments);
+	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_object, arguments);
 
 	RETURN_MM();
 }

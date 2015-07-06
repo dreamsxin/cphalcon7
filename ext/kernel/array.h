@@ -407,6 +407,15 @@ static inline int phalcon_array_update_string_string(zval *arr, const char *inde
 	return phalcon_array_update_string(arr, index, index_length, &zvalue, flags & PH_SEPARATE);
 }
 
+static inline int phalcon_array_update_str_string(zval *arr, zend_string *index, char *value, uint value_length, int flags)
+{
+	zval zvalue;
+
+	ZVAL_STRINGL(&zvalue, value, value_length);
+
+	return phalcon_array_update_str(arr, index, &zvalue, flags & PH_SEPARATE);
+}
+
 /**
  * @brief Updates value in @a arr at position @a index with @a value
  * @param[in,out] arr Array

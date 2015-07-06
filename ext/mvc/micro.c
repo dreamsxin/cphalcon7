@@ -442,9 +442,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 	zval *lazy_handler = NULL, *prefix = NULL, *handler = NULL;
 	zval *real_handler = NULL, *prefixed_pattern = NULL;
 	zval *route = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -481,6 +478,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 		PHALCON_CALL_METHOD(&prefix, collection, "getprefix");
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(handlers), handler) {
+			zval *methods, *pattern, *sub_handler, *name;
 			if (Z_TYPE_P(handler) != IS_ARRAY) { 
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "One of the registered handlers is invalid");
 				return;
@@ -855,8 +853,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 */
 		PHALCON_CALL_METHOD(&params, router, "getparams");
 
-		PHALCON_INIT_VAR(returned_value);/**/
-		PHALCON_CALL_USER_FUNC_ARRAY(returned_value, handler, params);
+		PHALCON_CALL_USER_FUNC_ARRAY(&returned_value, handler, params);
 
 		/** 
 		 * Update the returned value
@@ -1012,8 +1009,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			/** 
 			 * Call the 'finish' middleware
 			 */
-			PHALCON_INIT_NVAR(status);/**/
-			PHALCON_CALL_USER_FUNC_ARRAY(status, finish, params);
+			PHALCON_CALL_USER_FUNC_ARRAY(&status, finish, params);
 
 			/** 
 			 * Reload the status
@@ -1252,8 +1248,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, _throwException){
 	array_init_size(arguments, 1);
 	phalcon_array_append(arguments, object, 0);
 
-	PHALCON_INIT_VAR(status);
-	PHALCON_CALL_USER_FUNC_ARRAY(status, handler, arguments);
+	PHALCON_CALL_USER_FUNC_ARRAY(&status, handler, arguments);
 
 	if (Z_TYPE_P(status) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(status), phalcon_http_responseinterface_ce, 1)) {
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_micro_exception_ce, message);

@@ -416,9 +416,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, fireExtensionEvent){
 				phalcon_array_append(call_object, extension, 0);
 				phalcon_array_append(call_object, name, 0);
 				if (Z_TYPE_P(arguments) == IS_ARRAY) { 
-					PHALCON_CALL_USER_FUNC_ARRAY(status, call_object, arguments);
+					PHALCON_CALL_USER_FUNC_ARRAY(&status, call_object, arguments);
 				} else {
-					PHALCON_CALL_USER_FUNC(status, call_object);
+					PHALCON_CALL_USER_FUNC(&status, call_object);
 				}
 
 				/** 
@@ -1764,8 +1764,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				PHALCON_INIT_NVAR(escaped_quoute);
 				ZVAL_STRING(escaped_quoute, "\\'");
 
-				PHALCON_INIT_NVAR(escaped_string);
-				PHALCON_STR_REPLACE(escaped_string, single_quote, escaped_quoute, value);
+				PHALCON_STR_REPLACE(&escaped_string, single_quote, escaped_quoute, value);
 
 				PHALCON_CONCAT_SVS(expr_code, "'", escaped_string, "'");
 				break;
@@ -2402,7 +2401,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileCache){
 	phalcon_array_fetch_string(&block_statements, statement, SL("block_statements"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&code, getThis(), "_statementlist", block_statements, extends_mode);
-	phalcon_concat_self(&compilation, code);
+	phalcon_concat_self(compilation, code);
 
 	/** 
 	 * Check if the cache has a lifetime
@@ -3695,8 +3694,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 				phalcon_array_append(params, options, 0);
 				phalcon_array_append(params, extends_mode, 0);
 
-				PHALCON_INIT_NVAR(compiled_template_path);/**/
-				PHALCON_CALL_USER_FUNC_ARRAY(compiled_template_path, compiled_path, params);
+				PHALCON_CALL_USER_FUNC_ARRAY(&compiled_template_path, compiled_path, params);
 
 				/** 
 				 * The closure must return a valid path

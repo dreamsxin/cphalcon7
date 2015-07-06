@@ -101,6 +101,8 @@ int phalcon_array_isset_long_fetch(zval **fetched, const zval *arr, ulong index)
 		}
 	}
 
+	*fetched = &EG(uninitialized_zval);
+
 	return 0;
 }
 

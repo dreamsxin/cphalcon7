@@ -368,8 +368,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					if (phalcon_array_isset_string(column, SS("balias"))) {
 						PHALCON_CPY_WRT(attribute, &alias);
 					} else {
-						PHALCON_INIT_NVAR(n_alias);
-						PHALCON_STR_REPLACE(n_alias, underscore, empty_str, &alias);
+						PHALCON_STR_REPLACE(&n_alias, underscore, empty_str, &alias);
 						PHALCON_CPY_WRT(attribute, n_alias);
 					}
 

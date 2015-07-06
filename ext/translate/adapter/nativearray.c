@@ -148,9 +148,9 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
 	zval *index, *placeholders = NULL, *translate, *translation = NULL;
-	zval *key_placeholder, *replaced;
-	HashPosition hp0;
-	zval **value;
+	zval *replaced = NULL, *value;
+	zend_string *str_key;
+	ulong idx;
 
 	phalcon_fetch_params(0, 1, 1, &index, &placeholders);
 	
@@ -164,29 +164,21 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 	}
 
 	if (Z_TYPE_P(placeholders) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(placeholders))) {
-		ALLOC_INIT_ZVAL(key_placeholder);
-		Z_ADDREF_P(translation);
 
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(placeholders), &hp0);
-			(value = zend_hash_get_current_data_ex(Z_ARRVAL_P(placeholders), &hp0)) != NULL;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(placeholders), &hp0)
-		) {
-			zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(placeholders), &hp0);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
+			zval key, key_placeholder, *replaced = NULL;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
 
-			PHALCON_CONCAT_SVS(key_placeholder, "%", key, "%");
+			PHALCON_CONCAT_SVS(&key_placeholder, "%", &key, "%");
 
-			ALLOC_INIT_ZVAL(replaced);
-			PHALCON_STR_REPLACE(replaced, key_placeholder, value, translation);
-			zval_dtor(key_placeholder);
+			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, translation);
 
-			zval_ptr_dtor(translation);
 			translation = replaced;
-		}
-
-		ZVAL_NULL(key_placeholder);
-		zval_ptr_dtor(key_placeholder);
-		RETURN_ZVAL(translation, 1, 1);
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	RETURN_ZVAL(translation, 1, 0);

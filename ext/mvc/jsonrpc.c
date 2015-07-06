@@ -419,8 +419,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 				array_init_size(module_params, 1);
 				phalcon_array_append(module_params, dependency_injector, 0);
 
-				PHALCON_INIT_NVAR(status);/**/
-				PHALCON_CALL_USER_FUNC_ARRAY(status, module, module_params);
+				PHALCON_CALL_USER_FUNC_ARRAY(&status, module, module_params);
 			} else {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
 				return;

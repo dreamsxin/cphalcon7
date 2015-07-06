@@ -79,9 +79,11 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 	if ((status = call_user_function(function_table, object, function_name, *retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 		if (is_null) {
-			*retval_ptr = NULL;
+			ZVAL_NULL(*retval_ptr);
 		}
-	} else if (is_null) {
+	}
+
+	if (is_null) {
 		Z_TRY_ADDREF_P(*retval_ptr);
 	}
 	zval_dtor(&retval);

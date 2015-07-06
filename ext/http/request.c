@@ -1374,7 +1374,6 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **retval_ptr, zval
 		HashPosition pos_name, pos_type, pos_tmp, pos_error, pos_size;
 		zval *dname, *dtype, *dtmp, *derror, *dsize;
 		zval *arr, *file, *key;
-		size_t prefix_len = prefix->s->len;
 		int res;
 
 		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(name),     &pos_name);
@@ -1435,11 +1434,9 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **retval_ptr, zval
 						break;
 					}
 				}
-			}
-			else if (Z_TYPE_P(*derror) == IS_ARRAY) {
+			} else if (Z_TYPE_P(derror) == IS_ARRAY) {
 				smart_str_appendc(prefix, '.');
-				phalcon_http_request_getuploadedfiles_helper(retval_ptr, *dname, *dtype, *dtmp, *derror, *dsize, only_successful, prefix);
-				prefix->len = prefix_len;
+				phalcon_http_request_getuploadedfiles_helper(retval_ptr, dname, dtype, dtmp, derror, dsize, only_successful, prefix);
 			}
 
 			zend_hash_move_forward_ex(Z_ARRVAL_P(name),     &pos_name);
@@ -1460,11 +1457,10 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **retval_ptr, zval
  */
 PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 
-	zval *dst_index = NULL, *not_errored = NULL, *_FILES, *index = NULL, *value = NULL, *request_file = NULL, *key = NULL;
+	zval *dst_index = NULL, *not_errored = NULL, *_FILES, *value = NULL, *request_file = NULL;
 	zval *name = NULL, *type = NULL, *tmp_name = NULL, *error, *size = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 	int only_successful;
 	smart_str prefix = { 0 };
 
@@ -1514,14 +1510,10 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 				phalcon_array_fetch_string(&tmp_name, value, SL("tmp_name"), PH_NOISY);
 				phalcon_array_fetch_string(&size, value, SL("size"), PH_NOISY);
 
-				if (prefix.len) {
-					prefix.len = 0;
-				}
-
 				if (likely(Z_TYPE(index) == IS_STRING)) {
 					smart_str_appendl(&prefix, Z_STRVAL(index), Z_STRLEN(index));
 				} else {
-					smart_str_append_long(&prefix, Z_LVAL_P(index));
+					smart_str_append_long(&prefix, Z_LVAL(index));
 				}
 
 				smart_str_appendc(&prefix, '.');
@@ -1598,9 +1590,6 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 	zval *server_index, *name, *quality_one;
 	zval *http_server = NULL, *pattern, *parts = NULL, *part = NULL, *header_parts = NULL;
 	zval *quality_part = NULL, *quality = NULL, *header_name = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1654,9 +1643,6 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 
 	zval *quality_parts, *name, *quality = NULL, *selected_name = NULL;
 	zval *accept = NULL, *accept_quality = NULL, *best_quality = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 	long int i = 0;
 
 	PHALCON_MM_GROW();
@@ -1867,9 +1853,6 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
 PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 
 	zval *digest, *pattern, *set_order, *matches, *match = NULL, *ret = NULL, *tmp1, *tmp2;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 	const char *auth_digest = SG(request_info).auth_digest;
 
 	PHALCON_MM_GROW();
@@ -1877,7 +1860,7 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 	if (unlikely(!auth_digest)) {
 		zval *_SERVER = phalcon_get_global(SS("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
-			zval key = zval_used_for_init;
+			zval key;
 			zval *value;
 
 			ZVAL_STRING(&key, "PHP_AUTH_DIGEST");

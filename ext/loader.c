@@ -719,14 +719,12 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		/** 
 		 * Change the pseudo-separator by the directory separator in the class name
 		 */
-		PHALCON_INIT_VAR(ds_class_name);
-		PHALCON_STR_REPLACE(ds_class_name, pseudo_separator, ds, class_name);
+		PHALCON_STR_REPLACE(&ds_class_name, pseudo_separator, ds, class_name);
 
 		/** 
 		 * And change the namespace separator by directory separator too
 		 */
-		PHALCON_INIT_VAR(ns_class_name);
-		PHALCON_STR_REPLACE(ns_class_name, namespace_separator, ds, ds_class_name);
+		PHALCON_STR_REPLACE(&ns_class_name, namespace_separator, ds, ds_class_name);
 
 		/** 
 		 * Checking in directories

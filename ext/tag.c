@@ -331,7 +331,7 @@ PHALCON_INIT_CLASS(Phalcon_Tag){
 	return SUCCESS;
 }
 
-static void phalcon_tag_get_escaper(zval *return_value, zval *params)
+static void phalcon_tag_get_escaper(zval **return_value, zval *params)
 {
 	zval *autoescape;
 
@@ -346,20 +346,12 @@ static void phalcon_tag_get_escaper(zval *return_value, zval *params)
 	}
 }
 
-static zend_bool phalcon_tag_attribute_filter(HashTable *ht, void *pData, zend_hash_key *hash_key, void *pParam)
-{
-	zval **z = (zval**)pData;
-	return hash_key->key && hash_key->key->len && Z_TYPE_P(*z) != IS_ARRAY;
-}
-
 PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 {
-	zval *escaper, escaped, *attrs;
+	zval *escaper = NULL, *escaped = NULL, *attrs;
 	zval *value;
 	zend_string *key;
-	HashPosition hp;
 	uint i;
-	ulong idx;
 
 	struct str_size_t {
 		const char *str;
@@ -394,23 +386,23 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 	for (i=0; i<sizeof(order)/sizeof(order[0]); ++i) {
 		if ((value = zend_hash_str_find(Z_ARRVAL_P(attributes), order[i].str, order[i].size)) != NULL) {
 			Z_ADDREF_P(value);
-			add_assoc_zval_ex(attrs, order[i].str, order[i].size, *value);
+			add_assoc_zval_ex(attrs, order[i].str, order[i].size, value);
 		}
 	}
 
-	zend_hash_merge_ex(Z_ARRVAL_P(attrs), Z_ARRVAL_P(attributes), (copy_ctor_func_t)zval_add_ref, sizeof(zval*), phalcon_tag_attribute_filter, NULL);
+	zend_hash_merge(Z_ARRVAL_P(attrs), Z_ARRVAL_P(attributes), (copy_ctor_func_t)zval_add_ref, 1);
 
 	if (phalcon_array_isset_string(attrs, SS("escape"))) {
 		phalcon_array_unset_string(attrs, SS("escape"), 0);
 	}
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attrs), idx, key, value) {
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(attrs), key, value) {
 		if (key && Z_TYPE_P(value) != IS_NULL) {
 			zval tmp;
 			ZVAL_STR(&tmp, key);
-			if (!Z_ISUNDEF(escaper)) {
+			if (Z_TYPE_P(escaper) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&escaped, escaper, "escapehtmlattr", value);
-				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", &escaped, "\"");
+				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", escaped, "\"");
 			} else {
 				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", value, "\"");
 			}
@@ -1420,7 +1412,7 @@ PHP_METHOD(Phalcon_Tag, select){
 PHP_METHOD(Phalcon_Tag, textArea){
 
 	zval *parameters, *params = NULL, *default_params, *id = NULL, *name, *content = NULL, *code;
-	zval *escaped = NULL, escaper;
+	zval *escaped = NULL, *escaper = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -1465,7 +1457,7 @@ PHP_METHOD(Phalcon_Tag, textArea){
 		return;
 	}
 
-	if (!Z_ISUNDEF(escaper))
+	if (Z_TYPE_P(escaper) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&escaped, escaper, "escapehtml", content);
 	} else {
 		escaped = content;
@@ -1796,7 +1788,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 	}
 	
 	if (!phalcon_array_isset_string(params, SS("type"))) {
-		phalcon_array_update_str_string(&params, IS(type), SL("text/css"), PH_SEPARATE);
+		phalcon_array_update_str_string(params, IS(type), SL("text/css"), PH_SEPARATE);
 	}
 	
 	/** 
@@ -1921,7 +1913,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 	}
 	
 	if (!phalcon_array_isset_string(params, SS("type"))) {
-		phalcon_array_update_str_string(&params, IS(type), SL("text/javascript"), PH_SEPARATE);
+		phalcon_array_update_str_string(params, IS(type), SL("text/javascript"), PH_SEPARATE);
 	}
 	
 	/** 
@@ -2135,7 +2127,7 @@ PHP_METHOD(Phalcon_Tag, getDocType){
 		/* no break */
 		case 9:  RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\"" PHP_EOL"\t\"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" PHP_EOL);
 		/* no break */
-		case 10: RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 2.0//EN\"" PHP_EOL "\t\"http://www.w3.org/MarkUp/DTD/xhtml2.dtd\">" PHP_EOL, 1);
+		case 10: RETURN_STRING("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 2.0//EN\"" PHP_EOL "\t\"http://www.w3.org/MarkUp/DTD/xhtml2.dtd\">" PHP_EOL);
 		/* no break */
 		case 11: RETURN_STRING("<!DOCTYPE html>" PHP_EOL);
 		/* no break */

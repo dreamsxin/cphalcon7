@@ -783,8 +783,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/** 
 			 * Call the callback to generate the HTML
 			 */
-			PHALCON_INIT_NVAR(html);/**/
-			PHALCON_CALL_USER_FUNC_ARRAY(html, callback, parameters);
+			PHALCON_CALL_USER_FUNC_ARRAY(&html, callback, parameters);
 
 			/** 
 			 * Implicit output prints the content directly
@@ -918,8 +917,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/** 
 			 * Call the callback to generate the HTML
 			 */
-			PHALCON_INIT_NVAR(html);/**/
-			PHALCON_CALL_USER_FUNC_ARRAY(html, callback, parameters);
+			PHALCON_CALL_USER_FUNC_ARRAY(&html, callback, parameters);
 
 			/** 
 			 * Implicit output prints the content directly
@@ -977,8 +975,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/** 
 			 * Call the callback to generate the HTML
 			 */
-			PHALCON_INIT_NVAR(html);/**/
-			PHALCON_CALL_USER_FUNC_ARRAY(html, callback, parameters);
+			PHALCON_CALL_USER_FUNC_ARRAY(&html, callback, parameters);
 
 			/** 
 			 * Implicit output prints the content directly

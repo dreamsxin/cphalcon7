@@ -2786,8 +2786,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 		array_init_size(arguments, 1);
 		phalcon_array_append(arguments, value, 0);
 
-		PHALCON_INIT_NVAR(status);
-		PHALCON_CALL_USER_FUNC_ARRAY(status, handler, arguments);
+		PHALCON_CALL_USER_FUNC_ARRAY(&status, handler, arguments);
 
 		if (PHALCON_IS_FALSE(status)) {
 			if (phalcon_array_isset_string(validator, SS("message"))) {
@@ -6471,7 +6470,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getRelated){
 	add_next_index_null(model_args);
 	phalcon_array_append(model_args, getThis(), PH_SEPARATE);
 	phalcon_array_append(model_args, arguments, PH_SEPARATE);
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, call_object, model_args);
+
+	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_object, model_args);
 	RETURN_MM();
 }
 
@@ -6546,7 +6546,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _getRelatedRecords){
 		array_init_size(call_object, 2);
 		phalcon_array_append(call_object, manager, PH_SEPARATE);
 		add_next_index_stringl(call_object, SL("getRelationRecords"));
-		PHALCON_CALL_USER_FUNC_ARRAY(return_value, call_object, call_args);
+		PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_object, call_args);
 		RETURN_MM();
 	}
 
@@ -7023,8 +7023,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 		/**
 		 * Get the related records
 		 */
-		PHALCON_INIT_VAR(result);/**/
-		PHALCON_CALL_USER_FUNC_ARRAY(result, call_object, call_args);
+		PHALCON_CALL_USER_FUNC_ARRAY(&result, call_object, call_args);
 
 		/**
 		 * Assign the result to the object

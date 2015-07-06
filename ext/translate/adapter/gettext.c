@@ -221,8 +221,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 			PHALCON_INIT_NVAR(key_placeholder);
 			PHALCON_CONCAT_SVS(key_placeholder, "%", &key, "%");
 
-			PHALCON_INIT_NVAR(replaced);
-			PHALCON_STR_REPLACE(replaced, key_placeholder, value, translation);
+			PHALCON_STR_REPLACE(&replaced, key_placeholder, value, translation);
 
 			PHALCON_CPY_WRT(translation, replaced);
 		} ZEND_HASH_FOREACH_END();

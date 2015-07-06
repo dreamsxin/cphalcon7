@@ -362,7 +362,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 			phalcon_array_append(arguments, base_uri, 0);
 			phalcon_array_append(arguments, paths, 0);
 			phalcon_array_append(arguments, uri, 0);
-			PHALCON_CALL_USER_FUNC_ARRAY(return_value, generator, arguments);
+			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, generator, arguments);
 		} else {
 			/**
 			 * Replace the patterns by its variables

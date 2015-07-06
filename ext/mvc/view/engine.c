@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	methods = phalcon_read_property(getThis(), SL("_methods"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&method, methods, method_name)) {
-			PHALCON_CALL_USER_FUNC_ARRAY(return_value, method, arguments);
+			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, method, arguments);
 			RETURN_MM();
 	}
 
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	phalcon_array_append(callback, service, 0);
 	phalcon_array_append(callback, method_name, 0);
 
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, callback, arguments);
+	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, callback, arguments);
 
 	RETURN_MM();
 }

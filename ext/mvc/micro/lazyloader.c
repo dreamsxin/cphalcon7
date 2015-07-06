@@ -71,12 +71,12 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Micro_LazyLoader){
  */
 PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
 
-	zval **definition;
+	zval *definition;
 
 	phalcon_fetch_params(0, 1, 0, &definition);
 	PHALCON_ENSURE_IS_STRING(definition);
 
-	phalcon_update_property_this(getThis(), SL("_definition"), *definition);
+	phalcon_update_property_this(getThis(), SL("_definition"), definition);
 }
 
 /**
@@ -117,6 +117,6 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 	/** 
 	 * Call the handler
 	 */
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, call_handler, arguments);
+	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_handler, arguments);
 	RETURN_MM();
 }

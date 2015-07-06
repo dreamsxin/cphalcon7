@@ -396,8 +396,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 				convert_to_string(value);
 
-				PHALCON_INIT_NVAR(sql_tmp);
-				PHALCON_STR_REPLACE(sql_tmp, string_wildcard, value, sql);
+				PHALCON_STR_REPLACE(&sql_tmp, string_wildcard, value, sql);
 
 				PHALCON_INIT_NVAR(sql);
 				ZVAL_STRING(sql, Z_STRVAL_P(sql_tmp));

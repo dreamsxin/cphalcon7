@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 			PHALCON_INIT_VAR(arguments);
 			array_init_size(arguments, 1);
 			phalcon_array_append(arguments, value, 0);
-			PHALCON_CALL_USER_FUNC_ARRAY(return_value, filter_object, arguments);
+			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, filter_object, arguments);
 			RETURN_MM();
 		}
 	
@@ -297,9 +297,8 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	
 		PHALCON_INIT_VAR(empty_str);
 		ZVAL_STRING(empty_str, "");
-	
-		PHALCON_INIT_VAR(escaped);
-		PHALCON_STR_REPLACE(escaped, quote, empty_str, value);
+
+		PHALCON_STR_REPLACE(&escaped, quote, empty_str, value);
 	
 		PHALCON_CALL_FUNCTION(&filtered, "filter_var", escaped, type);
 		goto ph_end_0;

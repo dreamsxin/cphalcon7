@@ -949,8 +949,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 						 * Engine can be a closure
 						 */
 						if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
-							PHALCON_INIT_NVAR(engine_object); /**/
-							PHALCON_CALL_USER_FUNC_ARRAY(engine_object, engine_service, arguments);
+							PHALCON_CALL_USER_FUNC_ARRAY(&engine_object, engine_service, arguments);
 						} else {
 							PHALCON_CPY_WRT(engine_object, engine_service);
 						}
@@ -1402,8 +1401,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		phalcon_array_append(parameters, controller_name, 0);
 
 		PHALCON_SEPARATE_PARAM(controller_name);
-		PHALCON_INIT_NVAR(controller_name);
-		PHALCON_CALL_USER_FUNC_ARRAY(controller_name, converter, parameters);
+		PHALCON_CALL_USER_FUNC_ARRAY(&controller_name, converter, parameters);
 	}
 
 	PHALCON_INIT_NVAR(converter_key);
@@ -1417,8 +1415,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		phalcon_array_append(parameters, action_name, 0);
 
 		PHALCON_SEPARATE_PARAM(action_name);
-		PHALCON_INIT_NVAR(action_name);
-		PHALCON_CALL_USER_FUNC_ARRAY(action_name, converter, parameters);
+		PHALCON_CALL_USER_FUNC_ARRAY(&action_name, converter, parameters);
 	}
 
 	PHALCON_INIT_NVAR(converter_key);
@@ -1432,8 +1429,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		phalcon_array_append(parameters, namespace_name, 0);
 
 		PHALCON_SEPARATE_PARAM(namespace_name);
-		PHALCON_INIT_NVAR(namespace_name);
-		PHALCON_CALL_USER_FUNC_ARRAY(namespace_name, converter, parameters);
+		PHALCON_CALL_USER_FUNC_ARRAY(&namespace_name, converter, parameters);
 	}
 
 	lower_case = phalcon_read_property(getThis(), SL("_lowerCase"), PH_NOISY);
@@ -1468,8 +1464,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 			PHALCON_CPY_WRT_CTOR(lower_namespace_name, namespace_name);
 		}
 
-		PHALCON_INIT_VAR(ds_lower_namespace_name);
-		PHALCON_STR_REPLACE(ds_lower_namespace_name, namespace_separator, ds, lower_namespace_name);
+		PHALCON_STR_REPLACE(&ds_lower_namespace_name, namespace_separator, ds, lower_namespace_name);
 
 		PHALCON_INIT_VAR(layout_namespace);
 		PHALCON_CONCAT_SV(layout_namespace, "namespace/", ds_lower_namespace_name);
@@ -1893,8 +1888,7 @@ PHP_METHOD(Phalcon_Mvc_View, getRender){
 		array_init_size(params, 1);
 		phalcon_array_append(params, view, 0);
 
-		PHALCON_INIT_VAR(status);/**/
-		PHALCON_CALL_USER_FUNC_ARRAY(status, config_callback, params);
+		PHALCON_CALL_USER_FUNC_ARRAY(&status, config_callback, params);
 	}
 
 	/** 

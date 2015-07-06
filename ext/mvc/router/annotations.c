@@ -464,8 +464,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		PHALCON_INIT_VAR(empty_str);
 		ZVAL_EMPTY_STRING(empty_str);
 
-		PHALCON_INIT_VAR(real_action_name);
-		PHALCON_STR_REPLACE(real_action_name, action_suffix, empty_str, action);
+		PHALCON_STR_REPLACE(&real_action_name, action_suffix, empty_str, action);
 
 		PHALCON_INIT_VAR(action_name);
 		phalcon_fast_strtolower(action_name, real_action_name);

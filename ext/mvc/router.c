@@ -584,19 +584,18 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	zval *route = NULL, *case_sensitive = NULL, *methods = NULL;
 	zval *service, *match_method = NULL, *hostname = NULL, *regex_host_name = NULL;
 	zval *matched = NULL, *pattern = NULL, *case_pattern = NULL, *before_match = NULL, *before_match_params = NULL;
-	zval *paths = NULL, *converters = NULL, *position = NULL, *part = NULL;
+	zval *paths = NULL, *converters = NULL, *position = NULL;
 	zval *parameters = NULL, *converted_part = NULL;
 	zval *namespace, *module, *controller;
 	zval *action, *params_str, *str_params;
 	zval *params_merge = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 	zval *dependency_injector, *tmp;
 	zval *match_position = NULL, *converter = NULL;
 	zval *exact = NULL;
 	zval *default_namespace = NULL, *default_module = NULL, *default_controller = NULL;
 	zval *default_action = NULL, *default_params = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -732,7 +731,6 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				RETURN_MM_ON_FAILURE(phalcon_preg_match(matched, regex_host_name, current_host_name, NULL));
 
 				if (!zend_is_true(matched)) {
-					zend_hash_move_backwards_ex(ah0, &hp0);
 					continue;
 				}
 			} else {
@@ -800,8 +798,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				/**
 				 * Call the function in the PHP userland
 				 */
-				PHALCON_INIT_NVAR(route_found);/**/
-				PHALCON_CALL_USER_FUNC_ARRAY(route_found, before_match, before_match_params);
+				PHALCON_CALL_USER_FUNC_ARRAY(&route_found, before_match, before_match_params);
 			}
 
 			if (zend_is_true(route_found)) {
@@ -828,14 +825,14 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 					 */
 					PHALCON_CALL_METHOD(&converters, route, "getconverters");
 
-					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(paths), idx, part, position) {
+					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(paths), idx, str_key, position) {
 						zval tmp;
-						if (part) {
-							ZVAL_STR(&tmp, part);
+						if (str_key) {
+							ZVAL_STR(&tmp, str_key);
 						} else {
 							ZVAL_LONG(&tmp, idx);
 						}
-						if (!part || part->val[0] != '\0') {
+						if (!str_key || str_key->val[0] != '\0') {
 							if (phalcon_array_isset_fetch(&match_position, matches, position)) {
 								/* Check if the part has a converter */
 								if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
@@ -843,9 +840,8 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 									array_init_size(parameters, 1);
 									phalcon_array_append(parameters, match_position, 0);
 
-									PHALCON_INIT_NVAR(converted_part);/**/
-									PHALCON_CALL_USER_FUNC_ARRAY(converted_part, converter, parameters);
-									phalcon_array_update_zval(parts, part, converted_part, PH_COPY);
+									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
+									phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
 									continue;
 								}
 
@@ -858,8 +854,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 									array_init_size(parameters, 1);
 									phalcon_array_append(parameters, position, 0);
 
-									PHALCON_INIT_NVAR(converted_part);/**/
-									PHALCON_CALL_USER_FUNC_ARRAY(converted_part, converter, parameters);
+									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
 									phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
 								}
 							}
@@ -1207,7 +1202,7 @@ PHP_METHOD(Phalcon_Mvc_Router, addHead){
 	phalcon_mvc_router_add_helper(INTERNAL_FUNCTION_PARAM_PASSTHRU, IS(HEAD));
 }
 
-static int phalcon_router_call_convert(void *pDest, int num_args, va_list args, zend_hash_key *hash_key)
+static int phalcon_router_call_convert(zval *pDest, int num_args, va_list args, zend_hash_key *hash_key)
 {
 	zval *route, key = zval_used_for_init;
 	zval *params[2];
@@ -1223,7 +1218,7 @@ static int phalcon_router_call_convert(void *pDest, int num_args, va_list args, 
 	}
 
 	params[0] = &key;
-	params[1] = *((zval**)pDest);
+	params[1] = pDest;
 
 	if (FAILURE == phalcon_call_method(NULL, route, "convert", 2, params)) {
 		return ZEND_HASH_APPLY_STOP;
@@ -1471,7 +1466,6 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteById){
 PHP_METHOD(Phalcon_Mvc_Router, getRouteByName){
 
 	zval *name, *routes, *route, *routes_name_lookup, *route_name = NULL;
-	HashPosition hp0;
 
 	PHALCON_MM_GROW();
 

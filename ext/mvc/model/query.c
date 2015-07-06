@@ -716,7 +716,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 			PHALCON_INIT_NVAR(tmp);
 			array_init(tmp);
 
-			phalcon_array_update_str_string(&tmp, IS(type), SL("when"), PH_COPY);
+			phalcon_array_update_str_string(tmp, IS(type), SL("when"), PH_COPY);
 			phalcon_array_update_string(tmp, SL("when"), when_left, PH_COPY);
 			phalcon_array_update_string(tmp, SL("then"), when_right, PH_COPY);
 
@@ -726,7 +726,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 			PHALCON_INIT_NVAR(tmp);
 			array_init(tmp);
 
-			phalcon_array_update_str_string(&tmp, IS(type), SL("else"), PH_COPY);
+			phalcon_array_update_str_string(tmp, IS(type), SL("else"), PH_COPY);
 			phalcon_array_update_string(tmp, SL("expr"), when_left, PH_COPY);
 
 			phalcon_array_append(when_clauses, tmp, 0);
@@ -737,7 +737,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 
 	array_init(return_value);
 
-	phalcon_array_update_str_string(&return_value, IS(type), SL("case"), PH_COPY);
+	phalcon_array_update_str_string(return_value, IS(type), SL("case"), PH_COPY);
 	phalcon_array_update_string(return_value, SL("expr"), tmp1, PH_COPY);
 	phalcon_array_update_string(return_value, SL("when-clauses"), when_clauses, PH_COPY);
 
@@ -1109,8 +1109,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				ZVAL_STRING(&question_mark, "?");
 				ZVAL_STRING(&colon, ":");
 
-				PHALCON_INIT_VAR(placeholder);
-				PHALCON_STR_REPLACE(placeholder, &question_mark, &colon, value);
+				PHALCON_STR_REPLACE(&placeholder, &question_mark, &colon, value);
 
 				array_init_size(return_value, 2);
 				add_assoc_stringl_ex(return_value, ISS(type), SL("placeholder"));
@@ -4140,8 +4139,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				SEPARATE_ZVAL(value);
 				convert_to_string(value);
 
-				PHALCON_INIT_NVAR(sql_tmp);
-				PHALCON_STR_REPLACE(sql_tmp, string_wildcard, value, sql_select);
+				PHALCON_STR_REPLACE(&sql_tmp, string_wildcard, value, sql_select);
 
 				PHALCON_INIT_NVAR(sql_select);
 				ZVAL_STRING(sql_select, Z_STRVAL_P(sql_tmp));
@@ -4466,8 +4464,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 					PHALCON_CALL_METHOD(&insert_expr, dialect, "getsqlexpression", expr_value);
 
-					PHALCON_INIT_NVAR(wildcard);
-					PHALCON_STR_REPLACE(wildcard, double_colon, empty_string, insert_expr);
+					PHALCON_STR_REPLACE(&wildcard, double_colon, empty_string, insert_expr);
 					if (!phalcon_array_isset(bind_params, wildcard)) {
 						PHALCON_INIT_NVAR(exception_message);
 						PHALCON_CONCAT_SVS(exception_message, "Bound parameter '", wildcard, "' cannot be replaced because it isn't in the placeholders list");
@@ -4807,8 +4804,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 					PHALCON_CALL_METHOD(&update_expr, dialect, "getsqlexpression", expr_value);
 
-					PHALCON_INIT_NVAR(wildcard);
-					PHALCON_STR_REPLACE(wildcard, double_colon, empty_string, update_expr);
+					PHALCON_STR_REPLACE(&wildcard, double_colon, empty_string, update_expr);
 					if (phalcon_array_isset(bind_params, wildcard)) {
 						PHALCON_OBS_NVAR(update_value);
 						phalcon_array_fetch(&update_value, bind_params, wildcard, PH_NOISY);
@@ -4921,8 +4917,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 					SEPARATE_ZVAL(raw_value);
 					convert_to_string(raw_value);
 
-					PHALCON_INIT_NVAR(sql_tmp);
-					PHALCON_STR_REPLACE(sql_tmp, string_wildcard, raw_value, update_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, string_wildcard, raw_value, update_sql);
 
 					PHALCON_INIT_NVAR(update_sql);
 					ZVAL_STRING(update_sql, Z_STRVAL_P(sql_tmp));
@@ -5089,8 +5084,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 					SEPARATE_ZVAL(raw_value);
 					convert_to_string(raw_value);
 
-					PHALCON_INIT_NVAR(sql_tmp);
-					PHALCON_STR_REPLACE(sql_tmp, string_wildcard, raw_value, delete_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, string_wildcard, raw_value, delete_sql);
 
 					PHALCON_INIT_NVAR(delete_sql);
 					ZVAL_STRING(delete_sql, Z_STRVAL_P(sql_tmp));

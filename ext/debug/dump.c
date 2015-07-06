@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Debug_Dump, all){
 
 	PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
-	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_object, &arg_list);
+	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_object, arg_list);
 
 	RETURN_MM();
 }
@@ -239,9 +239,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 	zval *variable, *name = NULL, *tab = NULL, *space, *tmp = NULL, *new_tab = NULL;
 	zval *output = NULL, *str = NULL, *type = NULL, *style = NULL, *count = NULL, *key = NULL, *value = NULL, *replace_pairs = NULL;
 	zval *class_name = NULL, *objects, *detailed = NULL, *properties = NULL, *methods = NULL, *method = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -312,7 +311,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			phalcon_concat_self(return_value, output);
 
-			if (PHALCON_IS_LONG(tab, 1) && !PHALCON_IS_EMPTY(name) && !phalcon_is_numeric(key) && PHALCON_IS_IDENTICAL(name, key)) {
+			if (PHALCON_IS_LONG(tab, 1) && !PHALCON_IS_EMPTY(name) && !phalcon_is_numeric(&key) && PHALCON_IS_IDENTICAL(name, &key)) {
 				continue;
 			} else {
 				PHALCON_INIT_NVAR(new_tab);
@@ -427,11 +426,11 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
 			phalcon_array_update_string(replace_pairs, SL(":key"), &key, PH_COPY);
 
-			if (PHALCON_PROPERTY_IS_PUBLIC_ZVAL(variable, key)) {
+			if (PHALCON_PROPERTY_IS_PUBLIC_ZVAL(variable, &key)) {
 				phalcon_array_update_string_string(replace_pairs, SL(":type"), SL("public"), 0);
-			} else if (PHALCON_PROPERTY_IS_PRIVATE_ZVAL(variable, key)) {
+			} else if (PHALCON_PROPERTY_IS_PRIVATE_ZVAL(variable, &key)) {
 				phalcon_array_update_string_string(replace_pairs, SL(":type"), SL("private"), 0);
-			} else if (PHALCON_PROPERTY_IS_PROTECTED_ZVAL(variable, key)) {
+			} else if (PHALCON_PROPERTY_IS_PROTECTED_ZVAL(variable, &key)) {
 				phalcon_array_update_string_string(replace_pairs, SL(":type"), SL("protected"), 0);
 			}
 

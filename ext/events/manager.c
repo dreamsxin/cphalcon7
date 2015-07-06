@@ -549,8 +549,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/** 
 					 * Call the function in the PHP userland
 					 */
-					PHALCON_INIT_NVAR(status);/**/
-					PHALCON_CALL_USER_FUNC_ARRAY(status, handler, arguments);
+					PHALCON_CALL_USER_FUNC_ARRAY(&status, handler, arguments);
 
 					/** 
 					 * Trace the response
@@ -653,8 +652,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/** 
 					 * Call the function in the PHP userland
 					 */
-					PHALCON_INIT_NVAR(status);/**/
-					PHALCON_CALL_USER_FUNC_ARRAY(status, handler, arguments);
+					PHALCON_CALL_USER_FUNC_ARRAY(&status, handler, arguments);
 
 					/** 
 					 * Trace the response

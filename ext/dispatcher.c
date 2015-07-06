@@ -898,9 +898,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		phalcon_array_append(call_object, handler, 0);
 		phalcon_array_append(call_object, action_method, 0);
 
-		PHALCON_INIT_NVAR(value);
 		/* Call the method allowing exceptions */
-		PHALCON_CALL_USER_FUNC_ARRAY_NOEX(value, call_object, params);
+		PHALCON_CALL_USER_FUNC_ARRAY_NOEX(&value, call_object, params);
 
 		/* Check if an exception has ocurred */
 		if (EG(exception)) {

@@ -704,8 +704,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 			array_init_size(parameters, 1);
 			phalcon_array_append(parameters, record, PH_SEPARATE);
 
-			PHALCON_INIT_NVAR(status);/**/
-			PHALCON_CALL_USER_FUNC_ARRAY(status, condition_callback, parameters);
+			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, parameters);
 			if (PHALCON_IS_FALSE(status)) {
 				continue;
 			}
@@ -786,8 +785,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, filter){
 		PHALCON_CALL_METHOD(&record, getThis(), "current");
 		phalcon_array_update_long(parameters, 0, record, PH_COPY | PH_SEPARATE);
 
-		PHALCON_INIT_NVAR(processed_record);/**/
-		PHALCON_CALL_USER_FUNC_ARRAY(processed_record, filter, parameters);
+		PHALCON_CALL_USER_FUNC_ARRAY(&processed_record, filter, parameters);
 
 		/** 
 		 * Only add processed records to 'records' if the returned value is an array/object
@@ -864,8 +862,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 			array_init_size(parameters, 1);
 			phalcon_array_append(parameters, record, PH_SEPARATE);
 
-			PHALCON_INIT_NVAR(status);/**/
-			PHALCON_CALL_USER_FUNC_ARRAY(status, condition_callback, parameters);
+			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, parameters);
 			if (PHALCON_IS_FALSE(status)) {
 				continue;
 			}

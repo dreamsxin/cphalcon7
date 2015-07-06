@@ -988,7 +988,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 				}
 			}
 
-			phalcon_concat_self(&result, K2);
+			phalcon_concat_self(result, K2);
 		}
 
 		if (i_size == i_hash_len) {

@@ -137,8 +137,7 @@ PHP_METHOD(Phalcon_Async, call){
 
 	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", key);
 
-	PHALCON_INIT_VAR(result);
-	PHALCON_CALL_USER_FUNC_ARRAY(result, callable, arguments);
+	PHALCON_CALL_USER_FUNC_ARRAY(&result, callable, arguments);
 
 	PHALCON_CALL_FUNCTION(&pid, "posix_getpid");
 

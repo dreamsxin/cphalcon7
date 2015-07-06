@@ -2262,8 +2262,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	phalcon_array_append(call_object, referenced_entity, 0);
 	phalcon_array_append(call_object, retrieve_method, 0);
 
-	PHALCON_INIT_NVAR(records);/**/
-	PHALCON_CALL_USER_FUNC_ARRAY(records, call_object, arguments);
+	PHALCON_CALL_USER_FUNC_ARRAY(&records, call_object, arguments);
 
 	/** 
 	 * Store the result in the cache if it's reusable

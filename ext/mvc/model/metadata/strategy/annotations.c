@@ -357,11 +357,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	zval *annotations = NULL, *class_name, *reflection = NULL;
 	zval *exception_message = NULL, *properties_annotations = NULL;
 	zval *column_annot_name, *column_map_name;
-	zval *prop_annotations = NULL, *property = NULL, *has_annotation = NULL;
+	zval *prop_annotations = NULL, *has_annotation = NULL;
 	zval *column_annotation = NULL, *real_property = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

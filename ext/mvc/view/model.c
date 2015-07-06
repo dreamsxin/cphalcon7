@@ -366,9 +366,6 @@ PHP_METHOD(Phalcon_Mvc_View_Model, appendChild){
 PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 
 	zval *capture_to = NULL, *childs, *child = NULL, *child_capture_to = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -405,9 +402,6 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 PHP_METHOD(Phalcon_Mvc_View_Model, hasChild){
 
 	zval *capture_to = NULL, *childs, *child = NULL, *child_capture_to = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -568,11 +562,10 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	zval *childs = NULL, *child = NULL, *isappend = NULL, *capture = NULL, *content = NULL;
 	zval *view, *dependency_injector = NULL, *service = NULL, *events_manager = NULL, *event_name = NULL;
 	zval *status = NULL, *not_exists = NULL, *base_path = NULL, *paths = NULL, *views_dir = NULL, *vars = NULL, *new_vars, *template = NULL;
-	zval *views_dir_path, *engines = NULL, *engine = NULL, *extension = NULL, *path = NULL;
+	zval *views_dir_path, *engines = NULL, *engine = NULL, *path = NULL;
 	zval *view_engine_path = NULL, *exception_message, *contents;
-	HashTable *ah0, *ah1, *ah2;
-	HashPosition hp0, hp1, hp2;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -669,17 +662,17 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	/** 
 	 * Views are rendered in each engine
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(engines), idx, extension, engine) {
-		zval tmp;
-		if (extension) {
-			ZVAL_STR(&tmp, extension);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(engines), idx, str_key, engine) {
+		zval extension;
+		if (str_key) {
+			ZVAL_STR(&extension, str_key);
 		} else {
-			ZVAL_LONG(&tmp, idx);
+			ZVAL_LONG(&extension, idx);
 		}
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(paths), path) {
 			PHALCON_INIT_NVAR(view_engine_path);
-			PHALCON_CONCAT_VVV(view_engine_path, path, views_dir_path, &tmp);
+			PHALCON_CONCAT_VVV(view_engine_path, path, views_dir_path, &extension);
 
 			if (phalcon_file_exists(view_engine_path) == SUCCESS) {
 

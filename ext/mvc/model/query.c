@@ -3774,7 +3774,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 				array_init(ir_phql_cache);
 			}
 
-			phalcon_array_update_multi_2(&ir_phql_cache, type, unique_id, ir_phql, PH_COPY);
+			phalcon_array_update_multi_2(ir_phql_cache, type, unique_id, ir_phql, PH_COPY);
 			phalcon_update_static_property_ce(phalcon_mvc_model_query_ce, SL("_irPhqlCache"), ir_phql_cache);
 		}
 	}

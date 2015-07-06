@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
 			char *c = Z_STRVAL_P(return_value);
 			int len = Z_STRLEN_P(return_value);
 			memmove(c, c+1, len); /* This will include the trailing zero */
-			RETVAL_STRINGL(c, len - 1, 0);
+			RETVAL_STRINGL(c, len - 1);
 		}
 	}
 }

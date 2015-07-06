@@ -484,12 +484,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getExtensions){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, addFunction){
 
-	zval **name, **definition;
+	zval *name, *definition;
 
 	phalcon_fetch_params(0, 2, 0, &name, &definition);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	phalcon_update_property_array(getThis(), SL("_functions"), *name, *definition);
+	phalcon_update_property_array(getThis(), SL("_functions"), name, definition);
 	RETURN_THISW();
 }
 
@@ -513,12 +513,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getFunctions){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, addFilter){
 
-	zval **name, **definition;
+	zval *name, *definition;
 
 	phalcon_fetch_params(0, 2, 0, &name, &definition);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	phalcon_update_property_array(getThis(), SL("_filters"), *name, *definition);
+	phalcon_update_property_array(getThis(), SL("_filters"), name, definition);
 	RETURN_THISW();
 }
 
@@ -1577,9 +1577,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 	zval *single_quote = NULL, *escaped_quoute = NULL, *escaped_string = NULL;
 	zval *start_code = NULL, *end_code = NULL, *ternary = NULL;
 	zval *ternary_code = NULL, *line = NULL, *file = NULL, *exception_message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1972,9 +1969,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends){
 
 	zval *statements, *is_statement_list = NULL, *statement = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1995,7 +1989,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends){
 	ZVAL_TRUE(is_statement_list);
 
 	if (!phalcon_array_isset_string(statements, SS("type"))) {
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(statements), statement) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(statements), statement) {
 			if (Z_TYPE_P(statement) != IS_ARRAY) { 
 				ZVAL_FALSE(is_statement_list);
 				break;
@@ -2031,9 +2025,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 	zval *block_statements, *for_else = NULL, *bstatement = NULL;
 	zval *type = NULL, *code = NULL, *loop_context, *iterator = NULL, *variable;
 	zval *key, *if_expr, *if_expr_code = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -2622,9 +2613,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileSet){
 	zval *statement, *compilation, *assignments;
 	zval *assignment = NULL, *expr = NULL, *expr_code = NULL, *variable = NULL;
 	zval *op = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -2820,11 +2808,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileMacro){
 
 	zval *statement, *extends_mode, *name, *macros;
 	zval *exception_message, *code, *parameters;
-	zval *parameter = NULL, *position = NULL, *variable_name = NULL, *block_statements;
+	zval *parameter = NULL, *variable_name = NULL, *block_statements;
 	zval *block_code = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -2871,18 +2858,18 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileMacro){
 		PHALCON_OBS_VAR(parameters);
 		phalcon_array_fetch_string(&parameters, statement, SL("parameters"), PH_NOISY);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(parameters), idx, position, parameter) {
-			zval tmp;
-			if (position) {
-				ZVAL_STR(&tmp, position);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(parameters), idx, str_key, parameter) {
+			zval position;
+			if (str_key) {
+				ZVAL_STR(&position, str_key);
 			} else {
-				ZVAL_LONG(&tmp, idx);
+				ZVAL_LONG(&position, idx);
 			}
 
 			PHALCON_OBS_NVAR(variable_name);
 			phalcon_array_fetch_string(&variable_name, parameter, SL("variable"), PH_NOISY);
-			PHALCON_SCONCAT_SVS(code, "if (isset($__p[", position, "])) { ");
-			PHALCON_SCONCAT_SVSVS(code, "$", variable_name, " = $__p[", &tmp, "];");
+			PHALCON_SCONCAT_SVS(code, "if (isset($__p[", &position, "])) { ");
+			PHALCON_SCONCAT_SVSVS(code, "$", variable_name, " = $__p[", &position, "];");
 			phalcon_concat_self_str(code, SL(" } else { "));
 			PHALCON_SCONCAT_SVS(code, "if (isset($__p['", variable_name, "'])) { ");
 			PHALCON_SCONCAT_SVSVS(code, "$", variable_name, " = $__p['", variable_name, "'];");
@@ -2943,9 +2930,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 	zval *temp_compilation = NULL, *type = NULL, *block_name = NULL, *block_statements = NULL;
 	zval *blocks = NULL, *code = NULL, *path = NULL, *view = NULL, *views_dir = NULL, *final_path = NULL;
 	zval *sub_compiler = NULL, *compiled_path = NULL, *level;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -3046,32 +3030,27 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 				break;
 
 			case 300:
-				PHALCON_INIT_NVAR(temp_compilation);
-				PHALCON_CALL_METHOD(temp_compilation, getThis(), "compileif", statement, extends_mode);
+				PHALCON_CALL_METHOD(&temp_compilation, getThis(), "compileif", statement, extends_mode);
 				phalcon_concat_self(compilation, temp_compilation);
 				break;
 
 			case 302:
-				PHALCON_INIT_NVAR(temp_compilation);
-				PHALCON_CALL_METHOD(temp_compilation, getThis(), "compileelseif", statement);
+				PHALCON_CALL_METHOD(&temp_compilation, getThis(), "compileelseif", statement);
 				phalcon_concat_self(compilation, temp_compilation);
 				break;
 
 			case 304:
-				PHALCON_INIT_NVAR(temp_compilation);
-				PHALCON_CALL_METHOD(temp_compilation, getThis(), "compileforeach", statement, extends_mode);
+				PHALCON_CALL_METHOD(&temp_compilation, getThis(), "compileforeach", statement, extends_mode);
 				phalcon_concat_self(compilation, temp_compilation);
 				break;
 
 			case 306:
-				PHALCON_INIT_NVAR(temp_compilation);
-				PHALCON_CALL_METHOD(temp_compilation, getThis(), "compileset", statement);
+				PHALCON_CALL_METHOD(&temp_compilation, getThis(), "compileset", statement);
 				phalcon_concat_self(compilation, temp_compilation);
 				break;
 
 			case 359:
-				PHALCON_INIT_NVAR(temp_compilation);
-				PHALCON_CALL_METHOD(temp_compilation, getThis(), "compileecho", statement);
+				PHALCON_CALL_METHOD(&temp_compilation, getThis(), "compileecho", statement);
 				phalcon_concat_self(compilation, temp_compilation);
 				break;
 
@@ -3279,7 +3258,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 	zval *view_code, *extends_mode = NULL, *current_path;
 	zval *intermediate, *compilation = NULL, *extended;
 	zval *final_compilation = NULL, *blocks = NULL, *extended_blocks;
-	zval *block = NULL, *name = NULL, *local_block = NULL, *block_compilation = NULL;
+	zval *block = NULL, *local_block = NULL, *block_compilation = NULL;
+	zend_string *str_key;
 
 	PHALCON_MM_GROW();
 
@@ -3321,18 +3301,14 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 			blocks = phalcon_read_property(getThis(), SL("_blocks"), PH_NOISY);
 			extended_blocks = phalcon_read_property(getThis(), SL("_extendedBlocks"), PH_NOISY);
 
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(extended_blocks), idx, name, block) {
+			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(extended_blocks), str_key, block) {
 				zval tmp;
-				if (name) {
-					ZVAL_STR(&tmp, name);
-				} else {
-					ZVAL_LONG(&tmp, idx);
-				}
 
 				/** 
 				 * If name is a string then is a block name
 				 */
-				if (name) {
+				if (str_key) {
+					ZVAL_STR(&tmp, str_key);
 					if (Z_TYPE_P(block) == IS_ARRAY) { 
 						if (phalcon_array_isset(blocks, &tmp)) {
 							/** 

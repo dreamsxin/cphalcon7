@@ -110,36 +110,34 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Micro_Collection){
  * @param mixed $handler
  * @param string $name
  */
-void phalcon_mvc_collection_addmap(zval *this_ptr, const char *method, zval *route_pattern, zval *handler, zval *name)
+void phalcon_mvc_collection_addmap(zval *this_ptr, zend_string *method, zval *route_pattern, zval *handler, zval *name)
 {
-	zval *handler_definition;
-	zval *z_method;
-
-	PHALCON_ALLOC_GHOST_ZVAL(z_method);
-	if (method) {
-		ZVAL_STRING(z_method, method);
-	}
-	else {
-		ZVAL_NULL(z_method);
-	}
+	zval handler_definition;
 
 	Z_ADDREF_P(route_pattern);
 	Z_ADDREF_P(handler);
 
-	PHALCON_ALLOC_GHOST_ZVAL(handler_definition);
-	array_init_size(handler_definition, 3 + (name != NULL ? 1 : 0));
-	add_next_index_zval(handler_definition, z_method);
-	add_next_index_zval(handler_definition, route_pattern);
-	add_next_index_zval(handler_definition, handler);
+	array_init_size(&handler_definition, 3 + (name != NULL ? 1 : 0));
+	if (method) {
+		zval zmethod;
+		ZVAL_STR(&zmethod, method);
+		Z_ADDREF(zmethod);
+		add_next_index_zval(&handler_definition, &zmethod);
+	} else {
+		add_next_index_null(&handler_definition);
+	}
+	add_next_index_zval(&handler_definition, route_pattern);
+	add_next_index_zval(&handler_definition, handler);
 	if (name) {
 		Z_ADDREF_P(name);
-		add_next_index_zval(handler_definition, name);
-	}
-	else {
-		add_next_index_null(handler_definition);
+		add_next_index_zval(&handler_definition, name);
+	} else {
+		add_next_index_null(&handler_definition);
 	}
 
-	phalcon_update_property_array_append(getThis(), SL("_handlers"), handler_definition);
+	Z_ADDREF(handler_definition);
+
+	phalcon_update_property_array_append(this_ptr, SL("_handlers"), &handler_definition);
 }
 
 /**

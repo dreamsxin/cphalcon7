@@ -367,10 +367,10 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	zval *pattern, *paths = NULL, *http_methods = NULL, *prefix, *prefix_pattern;
 	zval *default_paths, *merged_paths = NULL;
 
-	phalcon_fetch_params(0, 1, 2, &pattern, &paths, &http_methods);
-	PHALCON_ENSURE_IS_STRING(pattern);
-
 	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 2, &pattern, &paths, &http_methods);
+	PHALCON_ENSURE_IS_STRING(pattern);
 
 	if (!paths) {
 		paths = &PHALCON_GLOBAL(z_null);
@@ -391,7 +391,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	 */
 	PHALCON_INIT_VAR(prefix_pattern);
 	{
-		const char *s_pattern = Z_STRVAL_P*pattern); /* NUL-terminated */
+		const char *s_pattern = Z_STRVAL_P(pattern); /* NUL-terminated */
 		const char *s_prefix  = Z_STRVAL_P(prefix);   /* NUL-terminated */
 		int pattern_len       = Z_STRLEN_P(pattern);
 		int prefix_len        = Z_STRLEN_P(prefix);
@@ -465,9 +465,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, add){
 	RETURN_MM();
 }
 
-static void phalcon_mvc_router_group_add_helper(INTERNAL_FUNCTION_PARAMETERS, const char *method)
+static void phalcon_mvc_router_group_add_helper(INTERNAL_FUNCTION_PARAMETERS, zend_string *method)
 {
-	zval *pattern, *paths = NULL, *http_method;
+	zval *pattern, *paths = NULL, http_method;
 
 	phalcon_fetch_params(0, 1, 1, &pattern, &paths);
 
@@ -475,9 +475,8 @@ static void phalcon_mvc_router_group_add_helper(INTERNAL_FUNCTION_PARAMETERS, co
 		paths = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(http_method);
-	ZVAL_STRING(http_method, method);
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_addroute", pattern, paths, http_method);
+	ZVAL_STR(&http_method, method);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_addroute", pattern, paths, &http_method);
 }
 
 /**

@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 					phalcon_fast_explode_str(directive_parts, SL("."), &key);
 					phalcon_config_adapter_ini_update_zval_directive(&config, &section, directive_parts, value);
 				} else {
-					phalcon_array_update_multi_2(&config, &section, &key, value, 0);
+					phalcon_array_update_multi_2(config, &section, &key, value, 0);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}

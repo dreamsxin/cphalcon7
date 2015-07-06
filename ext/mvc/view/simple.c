@@ -272,10 +272,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 
 	zval *engines = NULL, *dependency_injector, *registered_engines;
 	zval *php_engine, *arguments, *engine_service = NULL;
-	zval *extension = NULL, *engine_object = NULL, *exception_message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *engine_object = NULL, *exception_message = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -317,12 +316,12 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 			phalcon_array_append(arguments, getThis(), PH_SEPARATE);
 			phalcon_array_append(arguments, dependency_injector, PH_SEPARATE);
 
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(registered_engines), idx, extension, engine_service) {
-				zval tmp;
-				if (extension) {
-					ZVAL_STR(&tmp, extension);
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(registered_engines), idx, str_key, engine_service) {
+				zval extension;
+				if (str_key) {
+					ZVAL_STR(&extension, str_key);
 				} else {
-					ZVAL_LONG(&tmp, idx);
+					ZVAL_LONG(&extension, idx);
 				}
 				if (Z_TYPE_P(engine_service) == IS_OBJECT) {
 
@@ -343,12 +342,12 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 						PHALCON_VERIFY_INTERFACE(engine_object, phalcon_mvc_view_engineinterface_ce);
 					} else {
 						PHALCON_INIT_NVAR(exception_message);
-						PHALCON_CONCAT_SV(exception_message, "Invalid template engine registration for extension: ", &tmp);
+						PHALCON_CONCAT_SV(exception_message, "Invalid template engine registration for extension: ", &extension);
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
 						return;
 					}
 				}
-				phalcon_array_update_zval(engines, extension, engine_object, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_zval(engines, &extension, engine_object, PH_COPY | PH_SEPARATE);
 			} ZEND_HASH_FOREACH_END();
 
 		}
@@ -371,11 +370,10 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
 	zval *path, *params, *events_manager, *event_name = NULL, *debug_message = NULL;
 	zval *status = NULL, *not_exists = NULL, *views_dir;
-	zval *views_dir_path, *engines = NULL, *engine = NULL, *extension = NULL;
+	zval *views_dir_path, *engines = NULL, *engine = NULL;
 	zval *view_engine_path = NULL, *exception_message;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -422,15 +420,15 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	/** 
 	 * Views are rendered in each engine
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(engines), idx, extension, engine) {
-		zval tmp;
-		if (extension) {
-			ZVAL_STR(&tmp, extension);
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(engines), idx, str_key, engine) {
+		zval extension;
+		if (str_key) {
+			ZVAL_STR(&extension, str_key);
 		} else {
-			ZVAL_LONG(&tmp, idx);
+			ZVAL_LONG(&extension, idx);
 		}
 		PHALCON_INIT_NVAR(view_engine_path);
-		PHALCON_CONCAT_VV(view_engine_path, views_dir_path, &tmp);
+		PHALCON_CONCAT_VV(view_engine_path, views_dir_path, &extension);
 
 		if (phalcon_file_exists(view_engine_path) == SUCCESS) {
 

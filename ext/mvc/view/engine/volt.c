@@ -21,7 +21,6 @@
 #include "mvc/view/engine/volt/compiler.h"
 #include "mvc/view/engine.h"
 #include "mvc/view/engineinterface.h"
-#include "mvc/view/engine/helpers.h"
 #include "mvc/view/exception.h"
 
 #include "kernel/main.h"
@@ -197,7 +196,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getCompiler){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 
-	zval **template_path, **params, **must_clean = NULL, *compiler = NULL;
+	zval *template_path, *params, *must_clean = NULL, *compiler = NULL;
 	zval *compiled_template_path = NULL, *contents;
 	zval *view;
 	int clean;
@@ -207,9 +206,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 	
 	if (!must_clean) {
 		clean = 0;
-	}
-	else {
-		clean = PHALCON_IS_TRUE(*must_clean);
+	} else {
+		clean = PHALCON_IS_TRUE(must_clean);
 	}
 	
 	if (clean) {
@@ -222,25 +220,14 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 	 * The compilation process is done by Phalcon\Mvc\View\Engine\Volt\Compiler
 	 */
 	PHALCON_CALL_METHOD(&compiler, getThis(), "getcompiler");
-	PHALCON_CALL_METHOD(NULL, compiler, "compile", *template_path);
+	PHALCON_CALL_METHOD(NULL, compiler, "compile", template_path);
 	PHALCON_CALL_METHOD(&compiled_template_path, compiler, "getcompiledtemplatepath");
 	
 	/** 
 	 * Export the variables into the current symbol table
 	 */
-	if (Z_TYPE_P(*params) == IS_ARRAY) {
-		zend_hash_merge_ex(
-			EG(symbol_table),
-			Z_ARRVAL_P(*params),
-			(copy_ctor_func_t)zval_add_ref,
-			sizeof(zval*),
-			phalcon_mvc_view_engine_php_symtable_merger
-#ifdef ZTS
-			C
-#else
-			, NULL
-#endif
-		);
+	if (Z_TYPE_P(params) == IS_ARRAY) {
+		zend_hash_merge(&EG(symbol_table), Z_ARRVAL_P(params), (copy_ctor_func_t)zval_add_ref, 0);
 	}
 	
 	convert_to_string(compiled_template_path);

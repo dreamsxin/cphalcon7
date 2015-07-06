@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 
-	zval **key, *meta_data_dir, *virtual_key;
+	zval *key, *meta_data_dir, *virtual_key;
 	zval *path, data;
 
 	phalcon_fetch_params(0, 1, 0, &key);
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 	meta_data_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, meta_data_dir, virtual_key, ".php");
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 	smart_str_0(&exp);
 	
 	PHALCON_INIT_VAR(php_export);
-	ZVAL_STRINGL(php_export, exp.c, exp.len);
+	ZVAL_STR(php_export, exp.s);
 
 	PHALCON_INIT_VAR(status);
 	phalcon_file_put_contents(status, path, php_export);

@@ -113,14 +113,26 @@ typedef enum _phalcon_call_type {
 		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
+#define PHALCON_CALL_ZVAL_METHODW(return_value, object, method, ...) \
+	do { \
+		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		RETURN_ON_FAILURE(phalcon_call_class_zval_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
+	} while (0)
+
+#define PHALCON_CALL_ZVAL_METHOD(return_value, object, method, ...) \
+	do { \
+		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
+		RETURN_MM_ON_FAILURE(phalcon_call_class_zval_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
+	} while (0)
+
 #define PHALCON_CALL_METHOD_ARRAYW(return_value, object, method, params) \
 	do { \
-		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_FUNC_STRLEN(method), sizeof(params)/sizeof(zval*), params)); \
+		RETURN_ON_FAILURE(phalcon_call_class_method_array(return_value, object, method, PHALCON_FUNC_STRLEN(method), params)); \
 	} while (0)
 
 #define PHALCON_CALL_METHOD_ARRAY(return_value, object, method, params) \
 	do { \
-		RETURN_MM_ON_FAILURE(phalcon_call_class_method_aparams(return_value, object, Z_OBJCE_P(object), phalcon_fcall_method, method, PHALCON_FUNC_STRLEN(method), sizeof(params)/sizeof(zval*), params)); \
+		RETURN_MM_ON_FAILURE(phalcon_call_class_method_array(return_value, object, method, PHALCON_FUNC_STRLEN(method), params)); \
 	} while (0)
 
 #define PHALCON_RETURN_CALL_METHODW(object, method, ...) \
@@ -256,50 +268,24 @@ int phalcon_has_constructor_ce(const zend_class_entry *ce);
 int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry *ce, phalcon_call_type type, zval *function_name, uint32_t param_count, zval *params[]);
 int phalcon_call_func_aparams(zval **return_value, const char *func_name, uint func_length, uint param_count, zval *params[]);
 int phalcon_call_zval_func_aparams(zval **return_value, zval *func_name, uint param_count, zval *params[]);
+
+int phalcon_call_class_zval_method_aparams(zval **return_value, zval *object, zend_class_entry *ce, phalcon_call_type type, zval *method, uint param_count, zval *params[]);
 int phalcon_call_class_method_aparams(zval **return_value, zval *object, zend_class_entry *ce, phalcon_call_type type, const char *method_name, uint method_len, uint param_count, zval *params[]);
+
+int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *method, zval *params);
+
+static inline int phalcon_call_class_method_array(zval **retval_ptr, zval *object, const char *method_name, uint method_length, zval *params)
+{
+	zval method;
+	ZVAL_STRINGL(&method, method_name, method_length);
+
+	return phalcon_call_class_zval_method_array(retval_ptr, object, &method, params);
+}
 
 /**
  * Replaces call_user_func_array avoiding function lookup
  */
-static inline int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
-{
-	zval retval, *arguments, *param;
-	int param_count, i, status, is_null = 0;
-
-	if (*retval_ptr == NULL) {
-		is_null = 1;
-		*retval_ptr = &retval;
-	}
-
-	if (params && Z_TYPE_P(params) != IS_ARRAY) {
-		status = FAILURE;
-		ZVAL_NULL(*retval_ptr);
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
-	} else {
-		param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
-
-		arguments = emalloc(sizeof(zval) * param_count);
-
-		i = 0;
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
-			ZVAL_ZVAL(&arguments[i], param, 1, 0);
-			i++;
-		} ZEND_HASH_FOREACH_END();
-
-		if ((status = call_user_function(EG(function_table), NULL, handler, *retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
-			status = FAILURE;
-			if (is_null) {
-				ZVAL_NULL(*retval_ptr);
-			}
-		}
-	}
-
-	if (is_null) {
-		Z_TRY_ADDREF_P(*retval_ptr);
-	}
-	zval_dtor(&retval);
-	return status;
-}
+int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params);
 
 /** Fast call_user_func_array/call_user_func */
 static inline int phalcon_call_user_func_array_noex(zval **retval_ptr, zval *handler, zval *params){

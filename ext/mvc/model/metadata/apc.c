@@ -163,6 +163,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset)
 {
 	zval *meta = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	zval *real_key = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -178,7 +180,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset)
 			}
 
 			PHALCON_INIT_NVAR(real_key);
-			phalcon_concat_svsv(&real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0);
+			phalcon_concat_svsv(real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0);
 			PHALCON_CALL_FUNCTION(NULL, "apc_delete", real_key);
 		} ZEND_HASH_FOREACH_END();
 	}

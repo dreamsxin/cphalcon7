@@ -168,7 +168,6 @@ mvc/collectioninterface.c \
 mvc/view/engine/php.c \
 mvc/view/engine/volt/compiler.c \
 mvc/view/engine/volt.c \
-mvc/view/engine/helpers.c \
 mvc/view/exception.c \
 mvc/view/engineinterface.c \
 mvc/view/simple.c \

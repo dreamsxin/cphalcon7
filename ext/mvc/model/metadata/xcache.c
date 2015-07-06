@@ -162,6 +162,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, reset)
 {
 	zval *meta = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	zval *real_key = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -169,12 +171,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, reset)
 		zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 		PHALCON_INIT_VAR(real_key);
-		phalcon_concat_svs(&real_key, SL("$PMM$"), prefix, SL("meta-"), 0);
+		phalcon_concat_svs(real_key, SL("$PMM$"), prefix, SL("meta-"), 0);
 		PHALCON_CALL_FUNCTION(NULL, "xcache_unset_by_prefix", real_key);
 	} else if (Z_TYPE_P(meta) == IS_ARRAY) {
 		zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(meta), idx, str_key, value) {
+		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(meta), idx, str_key) {
 			zval key;
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
@@ -182,7 +184,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, reset)
 				ZVAL_LONG(&key, idx);
 			}
 			PHALCON_INIT_NVAR(real_key);
-			phalcon_concat_svsv(&real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0);
+			phalcon_concat_svsv(real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0);
 			PHALCON_CALL_FUNCTION(NULL, "xcache_unset", real_key);
 		} ZEND_HASH_FOREACH_END();
 	}

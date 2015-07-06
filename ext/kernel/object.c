@@ -663,6 +663,19 @@ static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, co
 	return original_ce;
 }
 
+static inline zend_class_entry *phalcon_lookup_str_class_ce(zend_class_entry *ce, zend_string *property) {
+
+	zend_class_entry *original_ce = ce;
+
+	while (ce) {
+		if (zend_hash_exists(&ce->properties_info, property)) {
+			return ce;
+		}
+		ce = ce->parent;
+	}
+	return original_ce;
+}
+
 /**
  * Reads a property from an object
  */
@@ -765,6 +778,29 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 	zval_dtor(&property);
 
 	EG(scope) = old_scope;
+	return SUCCESS;
+}
+
+int phalcon_update_property_str_zval(zval *object, zend_string *property, zval *value){
+	zend_class_entry *ce;
+
+	if (!object) {
+		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (1)");
+		return FAILURE;
+	}
+
+	if (Z_TYPE_P(object) != IS_OBJECT) {
+		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (2)");
+		return FAILURE;
+	}
+
+	ce = Z_OBJCE_P(object);
+	if (ce->parent) {
+		ce = phalcon_lookup_str_class_ce(ce, property);
+	}
+
+	zend_update_property_ex(ce, object, property, value);
+
 	return SUCCESS;
 }
 

@@ -1059,7 +1059,8 @@ PHP_METHOD(Phalcon_Arr, key){
 PHP_METHOD(Phalcon_Arr, filter){
 
 	zval *array, *filters = NULL, *service, *dependency_injector = NULL, *filter = NULL;
-	zval *sanizited_value = NULL, *key = NULL, *value = NULL, *filter_value = NULL;
+	zval *sanizited_value = NULL, *value = NULL, *filter_value = NULL;
+	zend_string *str_key;
 	ulong idx;
 
 	PHALCON_MM_GROW();
@@ -1082,10 +1083,10 @@ PHP_METHOD(Phalcon_Arr, filter){
 		PHALCON_INIT_VAR(sanizited_value);
 		array_init(sanizited_value);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, key, value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, str_key, value) {
 			PHALCON_CALL_METHOD(&filter_value, filter, "sanitize", value, filters);
-			if (key) {
-				phalcon_array_update_zval(sanizited_value, key, filter_value, PH_COPY);
+			if (str_key) {
+				phalcon_array_update_str(sanizited_value, str_key, filter_value, PH_COPY);
 			} else {
 				phalcon_array_update_long(sanizited_value, idx, filter_value, PH_COPY);
 			}

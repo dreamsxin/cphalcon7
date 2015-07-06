@@ -86,9 +86,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	zval *identity_field = NULL, *column = NULL, *field_name = NULL, *feature = NULL;
 	zval *type = NULL, *size = NULL, *bytes = NULL, *scale = NULL, *bind_type = NULL;
 	zval *field_default_values, *default_value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -295,10 +292,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 
 	zval *model, *dependency_injector;
 	zval *ordered_column_map = NULL, *columns = NULL, *column_name = NULL, *reversed_column_map = NULL;
-	zval *user_name = NULL, *name = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zval *user_name = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

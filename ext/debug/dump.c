@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 PHP_METHOD(Phalcon_Debug_Dump, output){
 
 	zval *variable, *name = NULL, *tab = NULL, *space, *tmp = NULL, *new_tab = NULL;
-	zval *output = NULL, *str = NULL, *type = NULL, *style = NULL, *count = NULL, *key = NULL, *value = NULL, *replace_pairs = NULL;
+	zval *output = NULL, *str = NULL, *type = NULL, *style = NULL, *count = NULL, *value = NULL, *replace_pairs = NULL;
 	zval *class_name = NULL, *objects, *detailed = NULL, *properties = NULL, *methods = NULL, *method = NULL;
 	zend_string *str_key;
 	ulong idx;
@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
  */
 PHP_METHOD(Phalcon_Debug_Dump, variable){
 
-	zval *variable, *name = NULL, *str, *type, style, output, *replace_pairs;
+	zval *variable, *name = NULL, *str, *type, *style = NULL, *output = NULL, *replace_pairs;
 
 	PHALCON_MM_GROW();
 
@@ -683,7 +683,7 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
 	array_init(replace_pairs);
 
 	phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_SEPARATE);
-	phalcon_array_update_string(replace_pairs, SL(":output"), &output, PH_SEPARATE);
+	phalcon_array_update_string(replace_pairs, SL(":output"), output, PH_SEPARATE);
 
 	PHALCON_RETURN_CALL_FUNCTION("strtr", str, replace_pairs);
 
@@ -706,10 +706,7 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
  */
 PHP_METHOD(Phalcon_Debug_Dump, variables){
 
-	zval *arg_list = NULL, *name = NULL, *variable = NULL, output;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *arg_list = NULL, *variable = NULL, *output = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -717,7 +714,7 @@ PHP_METHOD(Phalcon_Debug_Dump, variables){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(arg_list), variable) {
 		PHALCON_CALL_SELF(&output, "variable", variable);
-		PHALCON_SCONCAT(return_value, &output);
+		PHALCON_SCONCAT(return_value, output);
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_MM();

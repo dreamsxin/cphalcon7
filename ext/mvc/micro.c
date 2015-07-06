@@ -710,9 +710,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	zval *returned_value = NULL, *after_handlers, *after = NULL;
 	zval *not_found_handler, *finish_handlers;
 	zval *finish = NULL, *returned_response_sent = NULL;
-	HashTable *ah0, *ah1, *ah2;
-	HashPosition hp0, hp1, hp2;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -831,8 +828,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 				/** 
 				 * Call the before handler, if it returns false exit
 				 */
-				PHALCON_INIT_NVAR(status);/**/
-				PHALCON_CALL_USER_FUNC(status, before);
+				PHALCON_CALL_USER_FUNC(&status, before);
 				if (PHALCON_IS_FALSE(status)) {
 					RETURN_MM_FALSE;
 				}
@@ -906,8 +902,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 					RETURN_MM();
 				}
 
-				PHALCON_INIT_NVAR(status);/**/
-				PHALCON_CALL_USER_FUNC(status, after);
+				PHALCON_CALL_USER_FUNC(&status, after);
 			} ZEND_HASH_FOREACH_END();
 
 		}
@@ -938,7 +933,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/** 
 		 * Call the Not-Found handler
 		 */
-		PHALCON_CALL_USER_FUNC(return_value, not_found_handler);
+		PHALCON_CALL_USER_FUNC(&return_value, not_found_handler);
 
 		/** 
 		 * Update the returned value

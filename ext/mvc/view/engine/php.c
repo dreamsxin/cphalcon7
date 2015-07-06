@@ -20,7 +20,6 @@
 #include "mvc/view/engine/php.h"
 #include "mvc/view/engine.h"
 #include "mvc/view/engineinterface.h"
-#include "mvc/view/engine/helpers.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -66,46 +65,34 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Php){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
-	zval **path, **params, **must_clean = NULL, *contents;
+	zval *path, *params, *must_clean = NULL, *contents;
 	zval *view;
 	int clean;
 
 	phalcon_fetch_params(0, 2, 1, &path, &params, &must_clean);
 	PHALCON_ENSURE_IS_STRING(path);
-	
+
 	if (!must_clean) {
-		must_clean = &&PHALCON_GLOBAL(z_false);
+		must_clean = &PHALCON_GLOBAL(z_false);
 	}
-	
-	clean = PHALCON_IS_TRUE(*must_clean);
+
+	clean = PHALCON_IS_TRUE(must_clean);
 
 	if (clean) {
 		phalcon_ob_clean();
 	}
-	
+
 	/** 
 	 * Create the variables in local symbol table
 	 */
-	if (Z_TYPE_P(*params) == IS_ARRAY) {
-
-		zend_hash_merge_ex(
-			EG(symbol_table),
-			Z_ARRVAL_P(*params),
-			(copy_ctor_func_t)zval_add_ref,
-			sizeof(zval*),
-			phalcon_mvc_view_engine_php_symtable_merger
-#ifdef ZTS
-			C
-#else
-			, NULL
-#endif
-		);
+	if (Z_TYPE_P(params) == IS_ARRAY) {
+		zend_hash_merge(&EG(symbol_table), Z_ARRVAL_P(params), (copy_ctor_func_t)zval_add_ref, 0);
 	}
-	
+
 	/** 
 	 * Require the file
 	 */
-	if (phalcon_require(Z_STRVAL_P(*path)) == FAILURE) {
+	if (phalcon_require(Z_STRVAL_P(path)) == FAILURE) {
 		RETURN_FALSE;
 	}
 

@@ -725,16 +725,15 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getPaths){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 
-	zval *paths, *position = NULL, *path = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *paths, *position = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
 	paths = phalcon_read_property(getThis(), SL("_paths"), PH_NOISY);
 
-	array_init_size(return_value, zend_hash_num_elements(ah0));
+	array_init(return_value);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(paths), idx, str_key, position) {
 		zval path;

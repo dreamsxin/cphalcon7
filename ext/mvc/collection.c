@@ -718,11 +718,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
 PHP_METHOD(Phalcon_Mvc_Collection, assign){
 
 	zval *data, *white_list = NULL, *column_map = NULL;
-	zval *value = NULL, *key = NULL, *attribute = NULL;
+	zval *value = NULL, *attribute = NULL;
 	zval *exception_message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -739,10 +738,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, key, value) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
 		zval tmp;
-		if (key) {
-			ZVAL_STR(&tmp, key);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
@@ -833,10 +832,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, writeAttribute){
 PHP_METHOD(Phalcon_Mvc_Collection, cloneResult){
 
 	zval *collection, *document, *cloned_collection;
-	zval *column_map = NULL, *attribute = NULL, *value = NULL, *attribute_field = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *column_map = NULL, *value = NULL, *attribute_field = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -858,10 +856,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, cloneResult){
 
 	PHALCON_CALL_METHOD(&column_map, collection, "getcolumnmap");
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(document), idx, attribute, value) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(document), idx, str_key, value) {
 		zval tmp;
-		if (attribute) {
-			ZVAL_STR(&tmp, attribute);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
@@ -1310,9 +1308,6 @@ PHP_METHOD(Phalcon_Mvc_Collection, _postSave){
 PHP_METHOD(Phalcon_Mvc_Collection, validate){
 
 	zval *validator, *status = NULL, *messages = NULL, *message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1385,7 +1380,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, validationHasFailed){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 
-	zval **event_name, *collection_manager;
+	zval *event_name, *collection_manager;
 
 	zval *lower;
 	char *tmp;
@@ -1396,8 +1391,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(lower);
-	tmp = zend_str_tolower_dup(Z_STRVAL_P(*event_name), Z_STRLEN_P(*event_name));
-	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(*event_name));
+	tmp = zend_str_tolower_dup(Z_STRVAL_P(event_name), Z_STRLEN_P(event_name));
+	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(event_name));
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -1410,7 +1405,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	 * Send a notification to the events manager
 	 */
 	collection_manager = phalcon_read_property(getThis(), SL("_collectionManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHOD(collection_manager, "notifyevent", *event_name, getThis());
+	PHALCON_RETURN_CALL_METHOD(collection_manager, "notifyevent", event_name, getThis());
 	RETURN_MM();
 }
 
@@ -1422,7 +1417,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 
-	zval **event_name, *status = NULL, *collection_manager;
+	zval *event_name, *status = NULL, *collection_manager;
 	zval *lower;
 	char *tmp;
 
@@ -1432,8 +1427,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(lower);
-	tmp = zend_str_tolower_dup(Z_STRVAL_P(*event_name), Z_STRLEN_P(*event_name));
-	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(*event_name));
+	tmp = zend_str_tolower_dup(Z_STRVAL_P(event_name), Z_STRLEN_P(event_name));
+	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(event_name));
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -1450,7 +1445,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	 */
 	collection_manager = phalcon_read_property(getThis(), SL("_collectionManager"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&status, collection_manager, "notifyevent", *event_name, getThis());
+	PHALCON_CALL_METHOD(&status, collection_manager, "notifyevent", event_name, getThis());
 	if (PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
 	}
@@ -1614,17 +1609,15 @@ PHP_METHOD(Phalcon_Mvc_Collection, appendMessage){
 PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 	zval *arr = NULL, *white_list = NULL, *mode = NULL;
-	zval *column_map = NULL, *attributes = NULL, *reserved = NULL, *attribute = NULL, *attribute_field = NULL, *new_value = NULL, *possible_setter = NULL;
+	zval *column_map = NULL, *attributes = NULL, *reserved = NULL, *attribute_field = NULL, *new_value = NULL, *possible_setter = NULL;
 	zval *source = NULL, *connection = NULL;
 	zval *collection = NULL, *exists = NULL, *empty_array, *disable_events;
 	zval *type, *message, *collection_message, *messages, *status = NULL, *data;
 	zval *value = NULL, *success = NULL, *options;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 	zval *dependency_injector, *ok, *id;
-	zval *params[2];
 	zval func;
+	zend_string *str_key;
+	ulong idx;
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
@@ -1667,10 +1660,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		/**
 		 * We only assign values to the public properties
 		 */
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(arr), idx, attribute, new_value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(arr), idx, str_key, new_value) {
 			zval tmp;
-			if (attribute) {
-				ZVAL_STR(&tmp, attribute);
+			if (str_key) {
+				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
@@ -1706,7 +1699,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 						phalcon_update_property_zval_zval(getThis(), &tmp, new_value);
 					}
 				}
-			} else if (Z_TYPE_P(attributes) == IS_ARRAY && phalcon_array_isset(&tmp, attribute)) {
+			} else if (Z_TYPE_P(attributes) == IS_ARRAY && phalcon_array_isset(&tmp, attributes)) {
 				PHALCON_INIT_NVAR(possible_setter);
 				PHALCON_CONCAT_SV(possible_setter, "set", &tmp);
 				zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
@@ -1808,10 +1801,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	array_init(data);
 
 	if (Z_TYPE_P(attributes) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(attributes), idx, attribute) {
+		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(attributes), idx, str_key) {
 			zval tmp;
-			if (attribute) {
-				ZVAL_STR(&tmp, attribute);
+			if (str_key) {
+				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
@@ -1839,8 +1832,6 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	PHALCON_INIT_NVAR(status);
-
 	if (PHALCON_IS_FALSE(mode)){
 		ZVAL_STRING(&func, "save");
 	} else {
@@ -1855,17 +1846,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 	phalcon_array_update_string_long(options, SL("w"), 1, 0);
 
-	params[0] = data;
-	params[1] = options;
-
 	/**
 	 * Save the document
 	 */
-	call_user_function(NULL, &collection, &func, status, 2, params);
-
-	if (EG(exception)) {
-		RETURN_MM();
-	}
+	PHALCON_CALL_ZVAL_METHOD(NULL, collection, &func, data);
 
 	PHALCON_INIT_NVAR(success);
 	ZVAL_FALSE(success);
@@ -2294,7 +2278,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	 * datasets
 	 */
 	PHALCON_INIT_VAR(reduce);
-	ZVAL_STRING(reduce, "function (curr, result) { for (var key in result.summatory) {if (typeof curr[key] !== \"undefined\") { if (typeof curr[key] === \"string\") {result.summatory[key] += curr[key].trim().length > 0 ? parseFloat(curr[key].trim()) : 0;} else {result.summatory[key] += curr[key];} } }}", PH_COPY);
+	ZVAL_STRING(reduce, "function (curr, result) { for (var key in result.summatory) {if (typeof curr[key] !== \"undefined\") { if (typeof curr[key] === \"string\") {result.summatory[key] += curr[key].trim().length > 0 ? parseFloat(curr[key].trim()) : 0;} else {result.summatory[key] += curr[key];} } }}");
 
 	PHALCON_CALL_METHOD(&group, collection, "group", keys, initial, reduce, options);
 	if (phalcon_array_isset_string(group, SS("retval"))) {
@@ -2493,10 +2477,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, getOperationMade){
 PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 
 	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, *data, *reserved = NULL;
-	zval *attributes = NULL, *column_map = NULL, *attribute = NULL, *attribute_field = NULL, *value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *attributes = NULL, *column_map = NULL, *attribute_field = NULL, *value = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -2528,10 +2511,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 	/**
 	 * We only assign values to the public properties
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, attribute, value) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
 		zval tmp;
-		if (attribute) {
-			ZVAL_STR(&tmp, attribute);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
@@ -2581,7 +2564,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, serialize){
 	/**
 	 * Use the standard serialize function to serialize the array data
 	 */
-	phalcon_serialize(return_value, &data);
+	phalcon_serialize(return_value, data);
 	RETURN_MM();
 }
 
@@ -2593,10 +2576,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, serialize){
 PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 
 	zval *data, *attributes, *dependency_injector = NULL;
-	zval *service, *manager = NULL, *value = NULL, *key = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *service, *manager = NULL, *value = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -2645,10 +2627,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 			/**
 			 * Update the objects attributes
 			 */
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, key, value) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
 				zval tmp;
-				if (key) {
-					ZVAL_STR(&tmp, key);
+				if (str_key) {
+					ZVAL_STR(&tmp, str_key);
 				} else {
 					ZVAL_LONG(&tmp, idx);
 				}
@@ -2754,7 +2736,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 		PHALCON_INIT_VAR(new_object);
 		array_init_size(new_object, 1);
 
-		phalcon_array_update_multi_2(&new_object, key, field, value, 0);
+		phalcon_array_update_multi_2(new_object, key, field, value, 0);
 
 		PHALCON_INIT_VAR(options);
 		array_init_size(options, 1);
@@ -2775,10 +2757,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 
 	zval *mongo_id = NULL, *source = NULL, *connection = NULL, *mongo_collection = NULL; 
-	zval *criteria, *row = NULL, *filed = NULL, *value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *criteria, *row = NULL, *value = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -2802,10 +2783,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 
 		PHALCON_CALL_METHOD(&row, mongo_collection, "findone", criteria);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(row), idx, filed, value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(row), idx, str_key, value) {
 			zval tmp;
-			if (filed) {
-				ZVAL_STR(&tmp, filed);
+			if (str_key) {
+				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
@@ -2869,10 +2850,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, drop){
 PHP_METHOD(Phalcon_Mvc_Collection, parse){
 
 	zval *conditions, *column_map = NULL, *collection_manager = NULL, *use_implicit_ids = NULL, *mongo_id = NULL;
-	zval *key = NULL, *value = NULL, *column = NULL, *value1 = NULL, *value2 = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *value = NULL, *column = NULL, *value1 = NULL, *value2 = NULL;
+	zend_string *str_key;
+	ulong idx;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -2892,10 +2872,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 
 	ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(conditions), idx, key, value) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(conditions), idx, str_key, value) {
 		zval tmp;
-		if (key) {
-			ZVAL_STR(&tmp, key);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}

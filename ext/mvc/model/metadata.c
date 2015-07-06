@@ -510,7 +510,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_array_update_multi_2(&meta_data, key, index, data, 0);
+	phalcon_array_update_multi_2(meta_data, key, index, data, 0);
 	phalcon_update_property_this(getThis(), SL("_metaData"), meta_data);
 
 	PHALCON_MM_RESTORE();

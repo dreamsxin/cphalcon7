@@ -219,10 +219,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 	zval *namespace_name = NULL, *module_name = NULL, *suffixed = NULL;
 	zval *handler_annotations = NULL, *class_annotations = NULL;
 	zval *annotations = NULL, *annotation = NULL, *method_annotations = NULL;
-	zval *collection = NULL, *method = NULL;
-	HashTable *ah0, *ah1, *ah2, *ah3;
-	HashPosition hp0, hp1, hp2, hp3;
-	zval **hd;
+	zval *collection = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -354,7 +353,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 							if (Z_TYPE_P(collection) == IS_OBJECT) {
 								PHALCON_CALL_METHOD(&annotations, collection, "getannotations");
 								ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
-									PHALCON_CALL_METHOD(NULL, getThis(), "processactionannotation", module_name, namespace_name, controller_name, method, annotation);
+									PHALCON_CALL_METHOD(NULL, getThis(), "processactionannotation", module_name, namespace_name, controller_name, &method, annotation);
 								} ZEND_HASH_FOREACH_END();
 
 							}
@@ -420,11 +419,10 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 	zval *annotation, *methods = NULL, *name = NULL;
 	zval *empty_str, *real_action_name, *action_name;
 	zval *parameter = NULL, *paths = NULL, *position;
-	zval *value = NULL, *uri = NULL, *route = NULL, *converts = NULL, *convert = NULL, *param = NULL;
-	zval *conversor_param = NULL, *route_name = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zval *value = NULL, *uri = NULL, *route = NULL, *converts = NULL, *convert = NULL;
+	zval *route_name = NULL;
+	zend_string *str_key;
+	ulong idx;
 	int is_route;
 
 	PHALCON_MM_GROW();
@@ -439,21 +437,20 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		is_route = 1;
 	} else if (PHALCON_IS_STRING(name, "Get")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(GET, !IS_INTERNED(phalcon_interned_GET)));
+		ZVAL_STR(methods, IS(GET));
 	} else if (PHALCON_IS_STRING(name, "Post")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(POST, !IS_INTERNED(phalcon_interned_POST)));
+		ZVAL_STR(methods, IS(POST));
 	} else if (PHALCON_IS_STRING(name, "Put")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(PUT, !IS_INTERNED(phalcon_interned_PUT)));
+		ZVAL_STR(methods, IS(PUT));
 	} else if (PHALCON_IS_STRING(name, "Delete")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(DELETE, !IS_INTERNED(phalcon_interned_DELETE)));
+		ZVAL_STR(methods, IS(DELETE));
 	} else if (PHALCON_IS_STRING(name, "Options")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(OPTIONS, !IS_INTERNED(phalcon_interned_OPTIONS)));
-	}
-	else {
+		ZVAL_STR(methods, IS(OPTIONS));
+	} else {
 		is_route = 0;
 	}
 
@@ -561,7 +558,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 
 		PHALCON_CALL_METHOD(&converts, annotation, "getargument", parameter);
 		if (Z_TYPE_P(converts) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(all_attributes), idx, str_key, convert) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(converts), idx, str_key, convert) {
 				zval conversor_param;
 				if (str_key) {
 					ZVAL_STR(&conversor_param, str_key);

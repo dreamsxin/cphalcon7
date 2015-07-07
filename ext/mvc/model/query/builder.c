@@ -199,13 +199,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 	zval *models, *columns, *group_clause, *joins;
 	zval *having_clause, *order_clause, *limit_clause;
 	zval *offset_clause, *for_update, *shared_lock;
-	zval *limit, *offset, *single_condition_array = NULL, *single_condition_key = NULL;
+	zval *limit, *offset, *single_condition_array = NULL;
 	zval *condition_string = NULL, *new_condition_string = NULL, *bind_params, *bind_types;	
 	zval *merged_conditions, *merged_bind_params, *merged_bind_types;
 	zval *current_bind_params, *current_bind_types;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -410,15 +409,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, distinct){
 
-	zval **distinct;
+	zval *distinct;
 
 	phalcon_fetch_params(0, 1, 0, &distinct);
 
-	if (Z_TYPE_P(*distinct) != IS_NULL && !PHALCON_IS_BOOL(*distinct)) {
+	if (Z_TYPE_P(distinct) != IS_NULL && !PHALCON_IS_BOOL(distinct)) {
 		PHALCON_ENSURE_IS_BOOL(distinct);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_distinct"), *distinct);
+	phalcon_update_property_this(getThis(), SL("_distinct"), distinct);
 	RETURN_THISW();
 }
 
@@ -1074,9 +1073,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, inWhere){
 	zval *expr, *values, *use_orwhere = NULL, *hidden_param, *bind_params;
 	zval *bind_keys, *value = NULL, *key = NULL, *query_key = NULL, *joined_keys;
 	zval *conditions;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1153,9 +1149,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, notInWhere){
 	zval *expr, *values, *use_orwhere = NULL, *hidden_param, *bind_params;
 	zval *bind_keys, *value = NULL, *key = NULL, *query_key = NULL, *joined_keys;
 	zval *conditions;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1398,17 +1391,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	zval *dependency_injector = NULL, *models, *conditions = NULL, *distinct;
 	zval *model = NULL, *phql, *columns;
-	zval *selected_columns = NULL, *column = NULL, *column_alias = NULL;
-	zval *aliased_column = NULL, *joined_columns = NULL, *model_column_alias = NULL;
-	zval *selected_column = NULL, *selected_models, *model_alias = NULL;
+	zval *selected_columns = NULL, *column = NULL;
+	zval *aliased_column = NULL, *joined_columns = NULL;
+	zval *selected_column = NULL, *selected_models;
 	zval *selected_model = NULL, *joined_models, *joins;
 	zval *join = NULL, *join_model = NULL, *join_conditions = NULL, *join_alias = NULL;
 	zval *join_type = NULL, *group, *group_items, *group_item = NULL;
 	zval *escaped_item = NULL, *joined_items = NULL, *having, *order;
 	zval *order_items, *order_item = NULL, *limit, *number, *for_update;
-	HashTable *ah0, *ah1, *ah2, *ah3, *ah4, *ah5;
-	HashPosition hp0, hp1, hp2, hp3, hp4, hp5;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -1436,10 +1428,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	distinct = phalcon_read_property(getThis(), SL("_distinct"), PH_NOISY);
 	if (PHALCON_IS_BOOL(distinct)) {
-		if (Z_BVAL_P(distinct)) {
+		if (Z_TYPE_P(distinct) == IS_TRUE) {
 			ZVAL_STRING(phql, "SELECT DISTINCT ");
-		}
-		else {
+		} else {
 			ZVAL_STRING(phql, "SELECT ALL ");
 		}
 	}

@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &file_path, &absolute_path);
-	PHALCON_ENSURE_IS_STRING(&file_path);
+	PHALCON_ENSURE_IS_STRING(file_path);
 
 	if (absolute_path == NULL) {
 		absolute_path = &PHALCON_GLOBAL(z_false);
@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 	}
 
 	PHALCON_OBS_VAR(config);
-	if (phalcon_require_ret(&config, Z_STRVAL_P(config_dir_path)) == FAILURE) {
+	if (phalcon_require_ret(config, Z_STRVAL_P(config_dir_path)) == FAILURE) {
 		zend_throw_exception_ex(phalcon_config_exception_ce, 0, "Configuration file '%s' cannot be read", Z_STRVAL_P(config_dir_path));
 		PHALCON_MM_RESTORE();
 		return;

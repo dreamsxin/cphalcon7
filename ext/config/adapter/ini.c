@@ -88,7 +88,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 	if (!phalcon_array_isset_fetch(temp1, *arr, section)) {
 		PHALCON_ALLOC_GHOST_ZVAL(t1);
 		array_init_size(t1, 1);
-		phalcon_array_update_zval(arr, section, t1, PH_COPY);
+		phalcon_array_update_zval(*arr, section, t1, PH_COPY);
 	}
 
 	if (Z_TYPE_P(*temp1) != IS_ARRAY) {
@@ -101,7 +101,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 		if (!phalcon_array_isset_fetch(temp2, *temp1, index)) {
 			PHALCON_ALLOC_GHOST_ZVAL(t2);
 			array_init_size(t2, 1);
-			phalcon_array_update_zval(temp1, index, t2, PH_COPY);
+			phalcon_array_update_zval(*temp1, index, t2, PH_COPY);
 		}
 		else if (Z_TYPE_P(*temp2) != IS_ARRAY) {
 			convert_to_array_ex(*temp2);
@@ -112,7 +112,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 	}
 
 	phalcon_array_fetch_long(&index, directive, n - 1, PH_NOISY);
-	phalcon_array_update_zval(temp1, index, value, PH_COPY);
+	phalcon_array_update_zval(*temp1, index, value, PH_COPY);
 	zval_ptr_dtor(index);
 }
 
@@ -137,15 +137,14 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 
 	zval *file_path, *absolute_path = NULL, *config_dir_path, *base_path;
 	zval *ini_config = NULL, *config, *directives = NULL;
-	zval *section = NULL, *value = NULL, *key = NULL, *directive_parts = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zval *value = NULL, *directive_parts = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &file_path, &absolute_path);
-	PHALCON_ENSURE_IS_STRING(&file_path);
+	PHALCON_ENSURE_IS_STRING(file_path);
 
 	if (absolute_path == NULL) {
 		absolute_path = &PHALCON_GLOBAL(z_false);

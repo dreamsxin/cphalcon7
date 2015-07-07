@@ -487,29 +487,29 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getLastInitialized){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
-	zval **model_name, **new_instance = NULL, *initialized;
+	zval *model_name, *new_instance = NULL, *initialized;
 	zval *lowercased, *model, *dependency_injector;
 	zend_class_entry *ce0;
 
-	phalcon_fetch_params(0, 1, 1, &model_name, &new_instance);
-
 	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 1, &model_name, &new_instance);
 	PHALCON_ENSURE_IS_STRING(model_name);
 
 	if (!new_instance) {
-		new_instance = &&PHALCON_GLOBAL(z_false);
+		new_instance = &PHALCON_GLOBAL(z_false);
 	}
 
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
 	PHALCON_INIT_VAR(lowercased);
-	ZVAL_STRINGL(lowercased, zend_str_tolower_dup(Z_STRVAL_P(*model_name), Z_STRLEN_P(*model_name)), Z_STRLEN_P(*model_name));
+	ZVAL_STRINGL(lowercased, zend_str_tolower_dup(Z_STRVAL_P(model_name), Z_STRLEN_P(model_name)), Z_STRLEN_P(model_name));
 
 	/** 
 	 * Check if a model with the same is already loaded
 	 */
 	if (phalcon_array_isset_fetch(&model, initialized, lowercased)) {
-		if (zend_is_true(*new_instance)) {
+		if (zend_is_true(new_instance)) {
 			dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
 			if (Z_TYPE_P(model) != IS_OBJECT) {
@@ -532,7 +532,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	/** 
 	 * Load it using an autoloader
 	 */
-	if ((ce0 = phalcon_class_exists(*model_name, 1)) != NULL) {
+	if ((ce0 = phalcon_class_exists(model_name, 1)) != NULL) {
 		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
 		object_init_ex(return_value, ce0);
@@ -545,7 +545,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	/** 
 	 * The model doesn't exist throw an exception
 	 */
-	zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0, "Model '%s' could not be loaded", Z_STRVAL_P(*model_name));
+	zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0, "Model '%s' could not be loaded", Z_STRVAL_P(model_name));
 	PHALCON_MM_RESTORE();
 }
 
@@ -917,9 +917,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	zval *event_name, *model, *status = NULL, *behaviors, *entity_name = NULL;
 	zval *models_behaviors, *behavior = NULL, *events_manager, *mgr;
 	zval *fire_event_name = NULL, *custom_events_manager;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1003,9 +1000,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 	zval *model, *event_name, *data, *behaviors, *entity_name;
 	zval *models_behaviors, *behavior = NULL, *result = NULL, *events_manager;
 	zval *fire_event_name;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1978,13 +1972,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	zval *fields = NULL, *value = NULL, *condition = NULL, *join_conditions;
 	zval *referenced_fields = NULL, *joined_join_conditions;
 	zval *joined_conditions = NULL, *builder = NULL, *query = NULL, *referenced_field = NULL;
-	zval *field = NULL, *ref_position = NULL, *dependency_injector = NULL;
+	zval *field = NULL, *dependency_injector = NULL;
 	zval *find_params, *find_arguments = NULL, *arguments;
 	zval *type = NULL, *retrieve_method = NULL, *reusable = NULL, *unique_key;
 	zval *records = NULL, *referenced_entity = NULL, *call_object;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 	int f_reusable;
 
 	PHALCON_MM_GROW();
@@ -2006,7 +1999,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		if (phalcon_array_isset_long(parameters, 0)) {
 			PHALCON_OBS_NVAR(pre_conditions);
 			phalcon_array_fetch_long(&pre_conditions, parameters, 0, PH_NOISY);
-			phalcon_array_unset_long(&parameters, 0, PH_SEPARATE);
+			phalcon_array_unset_long(parameters, 0, PH_SEPARATE);
 		} else {
 			if (phalcon_array_isset_string(parameters, SS("conditions"))) {
 				PHALCON_OBS_NVAR(pre_conditions);
@@ -2156,10 +2149,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 */
 		PHALCON_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
 		
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, ref_position, field) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, field) {
 			zval tmp;
-			if (ref_position) {
-				ZVAL_STR(&tmp, ref_position);
+			if (str_key) {
+				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
@@ -2674,9 +2667,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 	zval *model_name, *entity_name, *all_relations;
 	zval *belongs_to, *relations = NULL, *relation = NULL, *has_many;
 	zval *has_one;
-	HashTable *ah0, *ah1, *ah2;
-	HashPosition hp0, hp1, hp2;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

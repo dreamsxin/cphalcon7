@@ -67,9 +67,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 
 	zval *type, *model, *options = NULL, *value, *field, *actual_value = NULL;
 	zval *update_model, *status = NULL, *messages = NULL, *message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

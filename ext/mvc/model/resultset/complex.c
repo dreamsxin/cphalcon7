@@ -155,14 +155,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 
 	zval *source_model = NULL, *type = NULL, *row = NULL, *underscore;
 	zval *empty_str, *active_row = NULL;
-	zval *dirty_state, *column = NULL, *alias = NULL, *source = NULL, *attributes = NULL;
+	zval *dirty_state, *column = NULL, *source = NULL, *attributes = NULL;
 	zval *column_map = NULL, *row_model = NULL, *attribute = NULL, *column_alias = NULL;
 	zval *column_value = NULL;
 	zval *value = NULL, *sql_alias = NULL, *n_alias = NULL;
 	zend_class_entry *ce;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 	int i_type, is_partial;
 
 	PHALCON_MM_GROW();
@@ -357,7 +356,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 						phalcon_array_fetch(&value, row, sql_alias, PH_NOISY);
 					} else {
 						PHALCON_OBS_NVAR(value);
-						if (phalcon_array_isset(row, alias)) {
+						if (phalcon_array_isset(row, &alias)) {
 							phalcon_array_fetch(&value, row, &alias, PH_NOISY);
 						}
 					}

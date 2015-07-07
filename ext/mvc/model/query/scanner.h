@@ -30,6 +30,7 @@
 #define PHQL_T_INTEGER 258
 #define PHQL_T_DOUBLE 259
 #define PHQL_T_STRING 260
+#define PHQL_T_HINTEGER 261
 #define PHQL_T_IDENTIFIER 265
 
 /* Operators */
@@ -68,6 +69,7 @@
 #define PHQL_T_SPLACEHOLDER 274
 #define PHQL_T_NTPLACEHOLDER 277
 #define PHQL_T_STPLACEHOLDER 278
+#define PHQL_T_BPLACEHOLDER 279
 
 /** Reserved words */
 #define PHQL_T_UPDATE 300

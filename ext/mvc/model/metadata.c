@@ -34,6 +34,7 @@
 #include "kernel/exception.h"
 #include "kernel/string.h"
 #include "kernel/file.h"
+#include "kernel/operators.h"
 
 /**
  * Phalcon\Mvc\Model\MetaData
@@ -399,21 +400,20 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 
-	zval **model, **index, *table = NULL, *schema = NULL, *class_name;
+	zval *model, *index, *table = NULL, *schema = NULL, *class_name;
 	zval *key, *meta_data = NULL, *meta_data_index, *attributes;
-
-	phalcon_fetch_params(0, 2, 0, &model, &index);
-
-	PHALCON_VERIFY_INTERFACE_EX(*model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
-	PHALCON_ENSURE_IS_LONG(index);
 
 	PHALCON_MM_GROW();
 
-	PHALCON_CALL_METHOD(&table, *model, "getsource");
-	PHALCON_CALL_METHOD(&schema, *model, "getschema");
+	phalcon_fetch_params(1, 2, 0, &model, &index);
+	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
+	PHALCON_ENSURE_IS_LONG(index);
+
+	PHALCON_CALL_METHOD(&table, model, "getsource");
+	PHALCON_CALL_METHOD(&schema, model, "getschema");
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, *model, 1);
+	phalcon_get_class(class_name, model, 1);
 
 	/** 
 	 * Unique key for meta-data is created using class-name-schema-table
@@ -424,7 +424,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 	meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 
 	if (!phalcon_array_isset(meta_data, key)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", *model, key, table, schema);
+		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema);
 		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	}
 
@@ -432,7 +432,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 	phalcon_array_fetch(&meta_data_index, meta_data, key, PH_NOISY);
 
 	PHALCON_OBS_VAR(attributes);
-	phalcon_array_fetch(&attributes, meta_data_index, *index, PH_NOISY);
+	phalcon_array_fetch(&attributes, meta_data_index, index, PH_NOISY);
 
 	RETURN_CTOR(attributes);
 }
@@ -451,10 +451,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 
 	zval *model, *index, *data, *replace, *table = NULL, *schema = NULL, *class_name;
-	zval *key, *meta_data = NULL, *arr, *value;
-	HashTable *ah2;
-	HashPosition hp2;
-	zval **hd;
+	zval *key, *meta_data = NULL, *arr, *value, *v;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -496,10 +495,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 
 		PHALCON_SEPARATE_PARAM(data);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), idx, k, v) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), idx, str_key, v) {
 			zval tmp;
-			if (k) {
-				ZVAL_STR(&tmp, k);
+			if (str_key) {
+				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
@@ -569,11 +568,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 
-	zval **model, **index, *key_name, *column_map = NULL, *null_value;
+	zval *model, *index, *key_name, *column_map = NULL, *null_value;
 	zval *column_map_model, *attributes;
 
 	phalcon_fetch_params(0, 2, 0, &model, &index);
-	PHALCON_VERIFY_CLASS_EX(*model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
 	PHALCON_ENSURE_IS_LONG(index);
 
 	PHALCON_MM_GROW();
@@ -583,12 +582,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 	}
 
 	PHALCON_INIT_VAR(key_name);
-	phalcon_get_class(key_name, *model, 1);
+	phalcon_get_class(key_name, model, 1);
 
 	column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
 	if (!phalcon_array_isset(column_map, key_name)) {
 		null_value = &PHALCON_GLOBAL(z_null);
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", *model, null_value, null_value, null_value);
+		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, null_value, null_value, null_value);
 
 		column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
 	}
@@ -597,7 +596,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 	phalcon_array_fetch(&column_map_model, column_map, key_name, PH_NOISY);
 
 	PHALCON_OBS_VAR(attributes);
-	phalcon_array_fetch(&attributes, column_map_model, *index, PH_NOISY);
+	phalcon_array_fetch(&attributes, column_map_model, index, PH_NOISY);
 
 	RETURN_CTOR(attributes);
 }

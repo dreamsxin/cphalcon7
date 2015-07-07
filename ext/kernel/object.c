@@ -822,6 +822,12 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 	return SUCCESS;
 }
 
+int phalcon_update_property_zval_null(zval *object, const zval *property){
+
+	zval *v = &PHALCON_GLOBAL(z_null);
+	return phalcon_update_property_zval(object, Z_STRVAL_P(property), Z_STRLEN_P(property), v);
+}
+
 /**
  * Checks whether obj is an object and updates zval property with long value
  */

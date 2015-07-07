@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &file_path, &absolute_path);
-	PHALCON_ENSURE_IS_STRING(&file_path);
+	PHALCON_ENSURE_IS_STRING(file_path);
 
 	if (absolute_path == NULL) {
 		absolute_path = &PHALCON_GLOBAL(z_false);

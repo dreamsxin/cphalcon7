@@ -83,12 +83,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	zval *identity_field = NULL, *column_annot_name;
 	zval *primary_annot_name, *id_annot_name;
 	zval *column_map_name, *column_type_name, *column_size_name, *column_bytes_name, *column_scale_name, *column_nullable_name;
-	zval *prop_annotations = NULL, *property = NULL, *has_annotation = NULL;
+	zval *prop_annotations = NULL, *has_annotation = NULL;
 	zval *column_annotation = NULL, *real_property = NULL, *feature = NULL;
 	zval *field_default_values, *column_default_value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -283,12 +282,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 
 		PHALCON_CALL_METHOD(&feature, column_annotation, "getargument", column_default_value);
 		if (!PHALCON_IS_EMPTY(feature)) {
-			phalcon_array_update_zval(field_default_values, property, feature, PH_COPY);
+			phalcon_array_update_zval(field_default_values, &property, feature, PH_COPY);
 		}
 
 		PHALCON_CALL_METHOD(&feature, column_annotation, "getargument", column_default_value);
 		if (!PHALCON_IS_EMPTY(feature)) {
-			phalcon_array_update_zval(field_default_values, property, feature, PH_COPY);
+			phalcon_array_update_zval(field_default_values, &property, feature, PH_COPY);
 		}
 
 		/** 
@@ -359,6 +358,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	zval *column_annot_name, *column_map_name;
 	zval *prop_annotations = NULL, *has_annotation = NULL;
 	zval *column_annotation = NULL, *real_property = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

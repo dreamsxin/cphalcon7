@@ -100,6 +100,7 @@ int ZEND_FASTCALL phalcon_array_isset_long(const zval *arr, ulong index);
  * @retval 1 Exists
  */
 int ZEND_FASTCALL phalcon_array_isset_string(const zval *arr, const char *index, uint index_length);
+int ZEND_FASTCALL phalcon_array_isset_str(const zval *arr, zend_string *index);
 
 /**
  * @brief Unsets @a index from array @a arr
@@ -416,6 +417,15 @@ static inline int phalcon_array_update_str_string(zval *arr, zend_string *index,
 	return phalcon_array_update_str(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
+static inline int phalcon_array_update_str_str(zval *arr, zend_string *index, zend_string *value, int flags)
+{
+	zval zvalue;
+
+	ZVAL_STR(&zvalue, value);
+
+	return phalcon_array_update_str(arr, index, &zvalue, flags & PH_SEPARATE);
+}
+
 /**
  * @brief Updates value in @a arr at position @a index with @a value
  * @param[in,out] arr Array
@@ -602,6 +612,7 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
  * @warning @c *return_value should be either @c NULL (preferred) or point to not initialized memory; if @c *return_value points to a valid variable, mmemory leak is possible
  */
 int phalcon_array_fetch_string(zval **return_value, const zval *arr, const char *index, uint index_length, int silent);
+int phalcon_array_fetch_str(zval **return_value, const zval *arr, zend_string *index, int silent);
 
 
 /**

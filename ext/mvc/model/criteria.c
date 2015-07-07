@@ -744,7 +744,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 		current_bind_types = phalcon_read_property(getThis(), SL("_bindTypes"), PH_NOISY);
 		if (Z_TYPE_P(current_bind_types) == IS_ARRAY) {
 			PHALCON_INIT_VAR(merged_params_types);
-			phalcon_fast_array_merge(merged_params_types, &current_bind_types, &bind_types);
+			phalcon_fast_array_merge(merged_params_types, current_bind_types, bind_types);
 		} else {
 			PHALCON_CPY_WRT(merged_params_types, bind_types);
 		}
@@ -907,9 +907,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, inWhere) {
 	zval *expr, *values, *use_orwhere = NULL, *hidden_param, *bind_params;
 	zval *bind_keys, *value = NULL, *key = NULL, *query_key = NULL, *joined_keys;
 	zval *conditions;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -986,9 +983,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, notInWhere) {
 	zval *expr, *values, *use_orwhere = NULL, *hidden_param, *bind_params;
 	zval *bind_keys, *value = NULL, *key = NULL, *query_key = NULL, *joined_keys;
 	zval *conditions;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -1318,10 +1312,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 	zval *data_types = NULL, *bind, *value = NULL, *field = NULL, *type, *condition = NULL;
 	zval *value_pattern = NULL, *join_conditions;
 	zval *column_map = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
 	zend_class_entry *ce0;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -1376,11 +1369,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 		/** 
 		 * We look for attributes in the array passed as data
 		 */
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, field, value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
 			zval *real_field;
 			zval tmp;
-			if (field) {
-				ZVAL_STR(&tmp, field);
+			if (str_key) {
+				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
@@ -1675,9 +1668,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	zval *join_type = NULL, *group, *group_items, *group_item = NULL;
 	zval *escaped_item = NULL, *joined_items = NULL, *having, *order;
 	zval *order_items, *order_item = NULL, *limit, *number, *for_update;
-	HashTable *ah0, *ah1, *ah2, *ah3;
-	HashPosition hp0, hp1, hp2, hp3;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -1783,20 +1775,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 			PHALCON_INIT_VAR(selected_columns);
 			array_init(selected_columns);
 		
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns), idx, column_alias, column) {
-				zval tmp;
-				if (name) {
-					ZVAL_STR(&tmp, name);
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns), idx, str_key, column) {
+				zval column_alias;
+				if (str_key) {
+					ZVAL_STR(&column_alias, str_key);
 				} else {
-					ZVAL_LONG(&tmp, idx);
+					ZVAL_LONG(&column_alias, idx);
 				}
 
-				if (Z_TYPE(column) == IS_LONG) {
+				if (Z_TYPE_P(column) == IS_LONG) {
 					phalcon_array_append(selected_columns, column, PH_COPY);
 				} else {
 					PHALCON_INIT_NVAR(aliased_column);
-					PHALCON_CONCAT_VSV(aliased_column, column, " AS ", column_alias);
-					phalcon_array_append(selected_columns, &tmp, PH_COPY);
+					PHALCON_CONCAT_VSV(aliased_column, column, " AS ", &column_alias);
+					phalcon_array_append(selected_columns, aliased_column, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 

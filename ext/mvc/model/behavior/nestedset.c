@@ -503,7 +503,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, getPrimaryKey){
 
 	primary_key = phalcon_read_property(getThis(), SL("_primaryKey"), PH_NOISY);
 
-	phalcon_read_property_zval(&primary_key_value, model, primary_key, PH_NOISY);
+	primary_key_value = phalcon_read_property_zval(model, primary_key, PH_NOISY);
 
 	RETURN_CTOR(primary_key_value);
 }
@@ -1222,9 +1222,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 	zval *left_attribute, *right_attribute, *level_attribute, *root_attribute, *condition, *childs = NULL, *child = NULL;
 	zval *child_left = NULL, *child_right = NULL, *child_level = NULL, *values = NULL, *ret = NULL;
 	zval *tmp1, *tmp2;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

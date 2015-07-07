@@ -161,17 +161,18 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, write){
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset)
 {
-	zval *meta = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
-	zval *real_key = NULL;
+	zval *real_key = NULL, *meta;
 	zend_string *str_key;
 	ulong idx;
 
 	PHALCON_MM_GROW();
 
+	meta = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
+
 	if (Z_TYPE_P(meta) == IS_ARRAY) {
 		zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(meta), idx, str_key, value) {
+		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(meta), idx, str_key) {
 			zval key;
 			if (str_key) {
 				ZVAL_STR(&key, str_key);

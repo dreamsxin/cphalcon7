@@ -669,7 +669,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				PHALCON_INIT_NVAR(camelized_namespace);
 				phalcon_camelize(camelized_namespace, namespace_name);
 			}
-			if (phalcon_end_with_str(camelized_namespace, SL("\\"))) {
+			if (phalcon_end_with_str(camelized_namespace, SL("\\"), NULL)) {
 				PHALCON_CONCAT_VVV(handler_class, camelized_namespace, camelized_class, handler_suffix);
 			} else {
 				PHALCON_CONCAT_VSVV(handler_class, camelized_namespace, "\\", camelized_class, handler_suffix);
@@ -687,7 +687,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 * DI doesn't have a service with that name, try to load it using an autoloader
 			 */
 			assert(Z_TYPE_P(handler_class) == IS_STRING);
-			has = (phalcon_class_exists(Z_STR_P(handler_class), 1) != NULL) ? 1 : 0;
+			has = (phalcon_class_exists(handler_class, 1) != NULL) ? 1 : 0;
 		} else {
 			has = zend_is_true(has_service) ? 1 : 0;
 		}
@@ -1209,7 +1209,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 			PHALCON_INIT_NVAR(camelized_namespace);
 			phalcon_camelize(camelized_namespace, namespace_name);
 		}
-		if (phalcon_end_with_str(camelized_namespace, SL("\\"))) {
+		if (phalcon_end_with_str(camelized_namespace, SL("\\"), NULL)) {
 			PHALCON_CONCAT_VVV(return_value, camelized_namespace, camelized_class, handler_suffix);
 		} else {
 			PHALCON_CONCAT_VSVV(return_value, camelized_namespace, "\\", camelized_class, handler_suffix);

@@ -289,9 +289,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 	zval *auto_begin = NULL, *dependency_injector, *number;
 	zval *transactions, *transaction = NULL, *false_value = NULL;
 	zval *service;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -359,9 +356,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, commit){
 
 	zval *transactions, *transaction = NULL, *connection = NULL;
 	zval *is_under_transaction = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -390,9 +384,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, rollback){
 
 	zval *collect = NULL, *transactions, *transaction = NULL, *connection = NULL;
 	zval *is_under_transaction = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -467,9 +458,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, _collectTransaction){
 
 	zval *transaction, *transactions, *new_transactions;
 	zval *managed_transaction = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -500,16 +488,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, _collectTransaction){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, collectTransactions){
 
-	zval *transactions, *managed_transaction = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *transactions;
 
 	PHALCON_MM_GROW();
 
 	transactions = phalcon_read_property(getThis(), SL("_transactions"), PH_NOISY);
-	if (phalcon_fast_count_ev(transactions)) {
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(transactions), managed_transaction) {
+	if (Z_TYPE_P(transactions) == IS_ARRAY) {
+		ZEND_HASH_FOREACH(Z_ARRVAL_P(transactions), 0) {
 			phalcon_property_decr(getThis(), SL("_number"));
 		} ZEND_HASH_FOREACH_END();
 

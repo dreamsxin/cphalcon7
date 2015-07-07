@@ -373,11 +373,13 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_VERIFY_CLASS(instance, class_ce)              PHALCON_VERIFY_CLASS_EX(instance, class_ce, spl_ce_LogicException, 1)
 #define PHALCON_VERIFY_CLASS_OR_NULL(pzv, class_ce)           PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, spl_ce_LogicException, 1)
 
-#define PHALCON_ENSURE_IS_STRING(pzv)    convert_to_explicit_type_ex(pzv, IS_STRING)
-#define PHALCON_ENSURE_IS_LONG(pzv)      convert_to_explicit_type_ex(pzv, IS_LONG)
-#define PHALCON_ENSURE_IS_DOUBLE(pzv)    convert_to_explicit_type_ex(pzv, IS_DOUBLE)
-#define PHALCON_ENSURE_IS_BOOL(pzv)      convert_to_explicit_type_ex(pzv, IS_BOOL)
-#define PHALCON_ENSURE_IS_ARRAY(pzv)     convert_to_explicit_type_ex(pzv, IS_ARRAY)
+#define PHALCON_ENSURE_IS_STRING(pzv)    convert_to_string_ex(pzv)
+#define PHALCON_ENSURE_IS_LONG(pzv)      convert_to_long_ex(pzv)
+#define PHALCON_ENSURE_IS_DOUBLE(pzv)    convert_to_double_ex(pzv)
+#define PHALCON_ENSURE_IS_BOOL(pzv)      convert_to_boolean_ex(pzv)
+#define PHALCON_ENSURE_IS_ARRAY(pzv)     convert_to_array_ex(pzv)
+#define PHALCON_ENSURE_IS_OBJECT(pzv)    convert_to_object_ex(pzv)
+#define PHALCON_ENSURE_IS_NULL(pzv)      convert_to_null_ex(pzv)
 
 void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table);
 

@@ -99,9 +99,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	zval *primary_fields = NULL, *primary_field = NULL, *attribute_field = NULL;
 	zval *join_conditions, *params;
 	zval *message = NULL, *join_fields, *type, *is_set_code = NULL, *code = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

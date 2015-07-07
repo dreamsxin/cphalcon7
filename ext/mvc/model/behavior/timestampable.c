@@ -70,9 +70,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 
 	zval *type, *model, *take_action = NULL, *options = NULL, *timestamp = NULL;
 	zval *format, *generator, *field, *single_field = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -97,7 +94,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 			return;
 		}
 	
-		PHALCON_INIT_VAR(timestamp);
 		if (phalcon_array_isset_string(options, SS("format"))) {
 			/** 
 			 * Format is a format for date()
@@ -105,6 +101,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 			PHALCON_OBS_VAR(format);
 			phalcon_array_fetch_string(&format, options, SL("format"), PH_NOISY);
 	
+			PHALCON_INIT_VAR(timestamp);
 			phalcon_date(timestamp, format, NULL);
 		} else if (phalcon_array_isset_string(options, SS("generator"))) {
 			/**
@@ -114,8 +111,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 			phalcon_array_fetch_string(&generator, options, SL("generator"), PH_NOISY);
 			if (Z_TYPE_P(generator) == IS_OBJECT) {
 				if (instanceof_function(Z_OBJCE_P(generator), zend_ce_closure)) {
-					PHALCON_INIT_NVAR(timestamp);/**/
-					PHALCON_CALL_USER_FUNC(timestamp, generator);
+					PHALCON_CALL_USER_FUNC(&timestamp, generator);
 				}
 			}
 		}
@@ -123,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 		/** 
 		 * Last resort call time()
 		 */
-		if (Z_TYPE_P(timestamp) == IS_NULL) {
+		if (!timestamp || Z_TYPE_P(timestamp) == IS_NULL) {
 			PHALCON_INIT_NVAR(timestamp);
 			ZVAL_LONG(timestamp, (long) time(NULL));
 		}

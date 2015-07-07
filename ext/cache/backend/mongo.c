@@ -430,10 +430,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
 	zval *prefix = NULL, *collection = NULL, *fields = NULL, *pattern, *regex;
-	zval *conditions, *documents = NULL, *documents_array = NULL, *time_condition;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *conditions, *documents = NULL, *document, *documents_array = NULL, *time_condition;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -475,7 +472,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(documents_array), document) {
 		zval *key;
-		if (likely(phalcon_array_isset_string_fetch(key, document, SS("key")))) {
+		if (likely(phalcon_array_isset_string_fetch(&key, document, SS("key")))) {
 			Z_ADDREF_P(key);
 			add_next_index_zval(return_value, key);
 		}

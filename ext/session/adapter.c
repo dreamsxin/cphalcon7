@@ -103,286 +103,12 @@ static const zend_function_entry phalcon_session_adapter_method_entry[] = {
 	PHP_FE_END
 };
 
-static zval* phalcon_session_adapter_get_property_ptr_ptr_internal(zval *object, zval *member, int type)
-{
-	zval *unique_id, *_SESSION, key = zval_used_for_init, *pkey = &key;
-	zval *value;
-
-	unique_id = phalcon_read_property(object, SL("_uniqueId"), PH_NOISY);
-
-	_SESSION = phalcon_get_global(SS("_SESSION"));
-	if (Z_TYPE_P(_SESSION) != IS_ARRAY) {
-		if (type == BP_VAR_R || type == BP_VAR_RW) {
-			php_error_docref(NULL, E_WARNING, "Session is not started or $_SESSION is invalid");
-		}
-		return (type == BP_VAR_W || type == BP_VAR_RW) ? &EG(error_zval) : &EG(uninitialized_zval);
-	}
-
-	phalcon_concat_vv(&pkey, unique_id, member, 0);
-	value = phalcon_hash_get(Z_ARRVAL_P(_SESSION), pkey, type);
-	zval_dtor(&key);
-
-	return value;
-}
-
-static int phalcon_session_adapter_has_property_internal(zval *object, zval *member, int has_set_exists)
-{
-	zval *unique_id, *_SESSION, *tmp;
-	zval key = zval_used_for_init, *pkey = &key;
-
-	unique_id = phalcon_read_property(object, SL("_uniqueId"), PH_NOISY);
-
-	_SESSION = phalcon_get_global(SS("_SESSION"));
-	if (Z_TYPE_P(_SESSION) != IS_ARRAY) {
-		return 0;
-	}
-
-	phalcon_concat_vv(&pkey, unique_id, member, 0);
-	tmp = phalcon_hash_get(Z_ARRVAL_P(_SESSION), pkey, BP_VAR_UNSET);
-	zval_dtor(&key);
-
-	if (!tmp) {
-		return 0;
-	}
-
-	if (0 == has_set_exists) {
-		return Z_TYPE_P(tmp) != IS_NULL;
-	}
-
-	if (1 == has_set_exists) {
-		return zend_is_true(tmp);
-	}
-
-	return 1;
-}
-
-static void phalcon_session_adapter_write_property_internal(zval *object, zval *member, zval *value)
-{
-	zval *unique_id, *_SESSION;
-	zval key = zval_used_for_init, *pkey = &key;
-
-	unique_id = phalcon_read_property(object, SL("_uniqueId"), PH_NOISY);
-
-	_SESSION = phalcon_get_global(SS("_SESSION"));
-	if (Z_TYPE_P(_SESSION) == IS_ARRAY) {
-		phalcon_concat_vv(&pkey, unique_id, member, 0);
-		Z_ADDREF_P(value);
-		phalcon_hash_update_or_insert(Z_ARRVAL_P(_SESSION), pkey, value);
-		zval_dtor(&key);
-	}
-}
-
-static void phalcon_session_adapter_unset_property_internal(zval *object, zval *member)
-{
-	zval *unique_id, *_SESSION;
-	zval key = zval_used_for_init, *pkey = &key;
-
-	unique_id = phalcon_read_property(object, SL("_uniqueId"), PH_NOISY);
-
-	_SESSION = phalcon_get_global(SS("_SESSION"));
-	if (Z_TYPE_P(_SESSION) == IS_ARRAY) {
-		phalcon_concat_vv(&pkey, unique_id, member, 0);
-		phalcon_hash_unset(Z_ARRVAL_P(_SESSION), pkey);
-		zval_dtor(&key);
-	}
-}
-
-static zval* phalcon_session_adapter_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
-{
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->get_property_ptr_ptr(object, member, type, cache_slot);
-	}
-
-	return phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, type);
-}
-
-static int phalcon_session_adapter_has_property(zval *object, zval *member, int has_set_exists, void **cache_slot)
-{
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_property(object, member, has_set_exists, cache_slot);
-	}
-
-	return phalcon_session_adapter_has_property_internal(object, member, has_set_exists);
-}
-
-static void phalcon_session_adapter_write_property(zval *object, zval *member, zval *value, void **cache_slot)
-{
-	if (!is_phalcon_class(Z_OBJCE_P(object)) || phalcon_isset_property_zval(object, member)) {
-		zend_get_std_object_handlers()->write_property(object, member, value, cache_slot);
-	}
-	else {
-		phalcon_session_adapter_write_property_internal(object, member, value);
-	}
-}
-
-static void phalcon_session_adapter_unset_property(zval *object, zval *member, void **cache_slot)
-{
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->unset_property(object, member, cache_slot);
-	}
-	else {
-		phalcon_session_adapter_unset_property_internal(object, member);
-	}
-}
-
-static zval* phalcon_session_adapter_read_dimension(zval *object, zval *offset, int type, zval *rv)
-{
-	zval *ret;
-
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
-	}
-
-	if (UNEXPECTED(!offset)) {
-		return &EG(uninitialized_zval);
-	}
-
-	ret = phalcon_session_adapter_get_property_ptr_ptr_internal(object, offset, type);
-
-	/* For write context we need to return a reference */
-	if ((type == BP_VAR_W || type == BP_VAR_RW || type == BP_VAR_UNSET) && !Z_ISREF_P(*ret)) {
-		if (Z_REFCOUNT_P(ret) > 1) {
-			zval *newval;
-
-			PHALCON_ALLOC_GHOST_ZVAL(newval);
-			*newval = *ret;
-			zval_copy_ctor(newval);
-			Z_SET_REFCOUNT_P(newval, 1);
-
-			Z_DELREF_P(ret);
-			ret = newval;
-		}
-
-		ZVAL_MAKE_REF(*ret);
-	}
-
-	return ret;
-}
-
-static void phalcon_session_adapter_write_dimension(zval *object, zval *offset, zval *value)
-{
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->write_dimension(object, offset, value);
-		return;
-	}
-
-	if (!offset) {
-		offset = &PHALCON_GLOBAL(z_null);
-	}
-
-	phalcon_session_adapter_write_property_internal(object, offset, value);
-}
-
-static int phalcon_session_adapter_has_dimension(zval *object, zval *member, int check_empty)
-{
-	zval *tmp;
-
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_dimension(object, member, check_empty);
-	}
-
-	tmp = phalcon_session_adapter_get_property_ptr_ptr_internal(object, member, BP_VAR_UNSET);
-
-	if (!tmp) {
-		return 0;
-	}
-
-	if (0 == check_empty) {
-		return Z_TYPE_P(tmp) != IS_NULL;
-	}
-
-	if (1 == check_empty) {
-		return zend_is_true(tmp);
-	}
-
-	return 1;
-}
-
-static void phalcon_session_adapter_unset_dimension(zval *object, zval *offset)
-{
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		zend_get_std_object_handlers()->unset_dimension(object, offset);
-		return;
-	}
-
-	phalcon_session_adapter_unset_property_internal(object, offset);
-}
-
-static int phalcon_session_adapter_count_elements(zval *object, long *count)
-{
-	int res;
-	zval *cnt = NULL;
-
-	if (is_phalcon_class(Z_OBJCE_P(object))) {
-		zval *_SESSION = phalcon_get_global(SS("_SESSION"));
-		if (Z_TYPE_P(_SESSION) == IS_ARRAY) {
-			*count = zend_hash_num_elements(Z_ARRVAL_P(_SESSION));
-			return SUCCESS;
-		}
-
-		return FAILURE;
-	}
-
-	res = phalcon_call_method(&cnt, object, "count", 0, NULL);
-	if (res == SUCCESS) {
-		*count = (Z_TYPE_P(cnt) == IS_LONG) ? Z_LVAL_P(cnt) : phalcon_get_intval(cnt);
-		zval_ptr_dtor(cnt);
-	}
-
-	return res;
-}
-
-static zend_object *phalcon_session_adapter_object_ctor(zend_class_entry *ce)
-{
-	zend_object *obj = emalloc(sizeof(zend_object));
-	zend_object_value retval;
-
-	zend_object_std_init(obj, ce);
-	object_properties_init(obj, ce);
-
-	phalcon_session_adapter_object_handlers.offset = 0;
-    phalcon_session_adapter_object_handlers.free_obj = zend_objects_free_object_storage;
-
-	return obj;
-}
-
-static zend_object_iterator* phalcon_session_adapter_get_iterator(zend_class_entry *ce, zval *object, int by_ref)
-{
-	zval *iterator;
-	zval *data;
-	zval *params[1];
-	zend_object_iterator *ret;
-
-	data = phalcon_get_global(SS("_SESSION"));
-	if (Z_TYPE_P(data) != IS_ARRAY) {
-		return NULL;
-	}
-
-	PHALCON_ALLOC_GHOST_ZVAL(iterator);
-	object_init_ex(iterator, spl_ce_ArrayIterator);
-	params[0] = data;
-	if (FAILURE == phalcon_call_method(NULL, iterator, "__construct", 1, params)) {
-		ret = NULL;
-	}
-	else if (Z_TYPE_P(iterator) == IS_OBJECT) {
-		ret = spl_ce_ArrayIterator->get_iterator(spl_ce_ArrayIterator, iterator, by_ref);
-	}
-	else {
-		ret = NULL;
-	}
-
-	zval_ptr_dtor(iterator);
-	return ret;
-}
-
 /**
  * Phalcon\Session\Adapter initializer
  */
 PHALCON_INIT_CLASS(Phalcon_Session_Adapter){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Session, Adapter, session_adapter, phalcon_session_adapter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
-
-	phalcon_session_adapter_ce->create_object = phalcon_session_adapter_object_ctor;
 
 	zend_declare_property_null(phalcon_session_adapter_ce, SL("_uniqueId"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_session_adapter_ce, SL("_started"), 0, ZEND_ACC_PROTECTED);
@@ -392,27 +118,6 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter){
 	zend_declare_property_null(phalcon_session_adapter_ce, SL("_secure"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_session_adapter_ce, SL("_domain"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_session_adapter_ce, SL("_httpOnly"), 0, ZEND_ACC_PROTECTED);
-
-	/**
-	 * T2414 - niden - Removed if statement for nuSphere Debugger
-	   if (!nusphere_dbg_present) {
-	 */
-	phalcon_session_adapter_object_handlers = *zend_get_std_object_handlers();
-	phalcon_session_adapter_object_handlers.get_property_ptr_ptr = phalcon_session_adapter_get_property_ptr_ptr;
-	phalcon_session_adapter_object_handlers.has_property         = phalcon_session_adapter_has_property;
-	phalcon_session_adapter_object_handlers.write_property       = phalcon_session_adapter_write_property;
-	phalcon_session_adapter_object_handlers.unset_property       = phalcon_session_adapter_unset_property;
-	phalcon_session_adapter_object_handlers.count_elements       = phalcon_session_adapter_count_elements;
-	phalcon_session_adapter_object_handlers.read_dimension       = phalcon_session_adapter_read_dimension;
-	phalcon_session_adapter_object_handlers.write_dimension      = phalcon_session_adapter_write_dimension;
-	phalcon_session_adapter_object_handlers.has_dimension        = phalcon_session_adapter_has_dimension;
-	phalcon_session_adapter_object_handlers.unset_dimension      = phalcon_session_adapter_unset_dimension;
-	/**
-	 * T2414 - niden - Removed if statement for nuSphere Debugger
-       }
-	 */
-
-	phalcon_session_adapter_ce->get_iterator = phalcon_session_adapter_get_iterator;
 
 	zend_class_implements(
 		phalcon_session_adapter_ce, 4,
@@ -546,33 +251,26 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 	zval *index, *default_value = NULL, *remove = NULL, *unique_id, *key, *_SESSION;
 	zval *value;
 
-	phalcon_fetch_params(0, 1, 2, &index, &default_value, &remove);
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 2, &index, &default_value, &remove);
+
 	if (!default_value) {
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!remove || !zend_is_true(remove)) {
-		/* Fast path */
-		zval *value = phalcon_session_adapter_get_property_ptr_ptr_internal(getThis(), index, BP_VAR_UNSET);
-		if (value) {
-			RETURN_ZVAL(value, 1, 0);
-		}
-
-		RETURN_ZVAL(default_value, 1, 0);
-	}
-
 	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
 
-	PHALCON_MM_GROW();
 	PHALCON_INIT_VAR(key);
 	PHALCON_CONCAT_VV(key, unique_id, index);
 
 	_SESSION = phalcon_get_global(SS("_SESSION"));
 	if (phalcon_array_isset_fetch(&value, _SESSION, key)) {
 		RETVAL_ZVAL(value, 1, 0);
-		phalcon_array_unset(_SESSION, key, 0);
-	}
-	else {
+		if (remove && zend_is_true(remove)) {
+			phalcon_array_unset(_SESSION, key, 0);
+		}
+	} else {
 		RETVAL_ZVAL(default_value, 1, 0);
 	}
 
@@ -591,10 +289,20 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
  */
 PHP_METHOD(Phalcon_Session_Adapter, set){
 
-	zval *index, *value;
+	zval *index, *value, *unique_id;
 
-	phalcon_fetch_params(0, 2, 0, &index, &value);
-	phalcon_session_adapter_write_property_internal(getThis(), index, value);
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 2, 0, &index, &value);
+	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
+
+	PHALCON_INIT_VAR(key);
+	PHALCON_CONCAT_VV(key, unique_id, index);
+
+	_SESSION = phalcon_get_global(SS("_SESSION"));
+	phalcon_array_update_zval(_SESSION, key, value, PH_COPY);
+
+	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -609,9 +317,8 @@ PHP_METHOD(Phalcon_Session_Adapter, set){
 PHP_METHOD(Phalcon_Session_Adapter, sets){
 
 	zval *data, *index = NULL, *value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -645,10 +352,21 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
  */
 PHP_METHOD(Phalcon_Session_Adapter, has){
 
-	zval *index;
+	zval *index, *unique_id;
 
-	phalcon_fetch_params(0, 1, 0, &index);
-	RETURN_BOOL(phalcon_session_adapter_has_property_internal(getThis(), index, 2));
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 0, &index);
+	
+	PHALCON_INIT_VAR(key);
+	PHALCON_CONCAT_VV(key, unique_id, index);
+
+	_SESSION = phalcon_get_global(SS("_SESSION"));
+	if(phalcon_array_isset(_SESSION, key)) {
+		RETURN_MM_TRUE;
+	}
+
+	RETURN_MM_FALSE;
 }
 
 /**
@@ -662,10 +380,19 @@ PHP_METHOD(Phalcon_Session_Adapter, has){
  */
 PHP_METHOD(Phalcon_Session_Adapter, remove){
 
-	zval *index;
+	zval *index, *unique_id;
 
-	phalcon_fetch_params(0, 1, 0, &index);
-	phalcon_session_adapter_unset_property_internal(getThis(), index);
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 0, &index);
+	
+	PHALCON_INIT_VAR(key);
+	PHALCON_CONCAT_VV(key, unique_id, index);
+
+	_SESSION = phalcon_get_global(SS("_SESSION"));
+	phalcon_array_unset(_SESSION, key, 0);
+
+	RETURN_MM();
 }
 
 /**
@@ -715,37 +442,27 @@ PHP_METHOD(Phalcon_Session_Adapter, destroy){
 
 PHP_METHOD(Phalcon_Session_Adapter, __get)
 {
-	zval **property, *retval;
-
-	assert(return_value_ptr != NULL);
+	zval *property, *retval;
 
 	phalcon_fetch_params(0, 1, 0, &property);
-	retval = phalcon_session_adapter_get_property_ptr_ptr_internal(getThis(), *property, BP_VAR_W);
-
-	zval_ptr_dtor(return_value_ptr);
-	return_value = retval;
-	Z_ADDREF_P(return_value);
-	ZVAL_MAKE_REF(return_value);
+	
+	PHALCON_RETURN_CALL_SELFW("get", property);
 }
 
 PHP_METHOD(Phalcon_Session_Adapter, count)
 {
-	long int count;
+	zval *_SESSION = phalcon_get_global(SS("_SESSION"));
 
-	if (SUCCESS == phalcon_session_adapter_count_elements(getThis(), &count)) {
-		RETURN_LONG(count);
-	}
-
-	RETURN_NULL();
+	RETURN_LONG(phalcon_fast_count_int(_SESSION));
 }
 
 PHP_METHOD(Phalcon_Session_Adapter, getIterator)
 {
-	zval *data;
+	zval *_SESSION;
 
-	data = phalcon_get_global(SS("_SESSION"));
+	_SESSION = phalcon_get_global(SS("_SESSION"));
 	object_init_ex(return_value, spl_ce_ArrayIterator);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", data);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", _SESSION);
 }
 
 /**

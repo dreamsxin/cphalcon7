@@ -1748,13 +1748,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 
 	zval *join_type, *join_source, *model_alias;
-	zval *join_alias, *relation, *fields = NULL, *referenced_fields = NULL;
+	zval *join_alias, *relation, *fields = NULL, *referenced_fields = NULL, *referenced_field = NULL;
 	zval *left = NULL, *left_expr = NULL, *right = NULL, *right_expr = NULL, *sql_join_condition = NULL;
 	zval *sql_join_conditions;
-	zval *field = NULL, *position = NULL, *exception_message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *field = NULL, *exception_message = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -1812,12 +1811,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 		 * Resolve the compound operation
 		 */
 		PHALCON_INIT_VAR(sql_join_conditions);
-		array_init_size(sql_join_conditions, zend_hash_num_elements(ah0));
+		array_init(sql_join_conditions);
 		
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, position, field) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, field) {
 			zval tmp;
-			if (position) {
-				ZVAL_STR(&tmp, position);
+			if (str_key) {
+				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
@@ -1896,15 +1895,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 	zval *manager = NULL, *intermediate_model = NULL, *intermediate_source = NULL;
 	zval *intermediate_schema = NULL, *intermediate_full_source;
 	zval *intermediate_fields = NULL, *intermediate_referenced_fields = NULL;
-	zval *referenced_model_name = NULL, *field = NULL, *position = NULL;
+	zval *referenced_model_name = NULL, *field = NULL;
 	zval *exception_message = NULL;
 	zval *left = NULL, *left_expr = NULL, *right = NULL, *right_expr = NULL, *sql_equals_join_condition = NULL;
 	zval *sql_join_condition_first, *sql_join_conditions_first;
 	zval *sql_join_first, *sql_join_condition_second;
 	zval *sql_join_conditions_second, *sql_join_second;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -1975,10 +1973,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 	PHALCON_CALL_METHOD(&referenced_model_name, relation, "getreferencedmodel");
 	if (Z_TYPE_P(fields) == IS_ARRAY) { 
 		/** @todo The code seems dead - the empty array will be returned */
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, position, field) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, field) {
 			zval tmp;
-			if (position) {
-				ZVAL_STR(&tmp, position);
+			if (str_key) {
+				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
@@ -2139,15 +2137,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	zval *manager = NULL, *joins, *select_joins = NULL, *join_item = NULL;
 	zval *join_data = NULL, *source = NULL, *schema = NULL, *model = NULL, *model_name = NULL;
 	zval *complete_source = NULL, *join_type = NULL, *alias_expr = NULL;
-	zval *alias = NULL, *exception_message, *join_alias_name = NULL;
-	zval *join_expr = NULL, *pre_condition = NULL, *from_model_name = NULL;
-	zval *join_model = NULL, *join_alias = NULL, *join_source = NULL;
+	zval *alias = NULL, *exception_message;
+	zval *join_expr = NULL, *pre_condition = NULL;
+	zval *join_model = NULL,*join_source = NULL;
 	zval *model_name_alias = NULL, *relation = NULL, *relations = NULL;
 	zval *model_alias = NULL, *is_through = NULL;
 	zval *sql_join = NULL, *new_sql_joins = NULL, *sql_join_conditions = NULL;
-	HashTable *ah0, *ah1, *ah2, *ah3;
-	HashPosition hp0, hp1, hp2, hp3;
-	zval **hd;
+	zend_string *str_key, *str_key2;
+	ulong idx, idx2;
 
 	PHALCON_MM_GROW();
 
@@ -2361,10 +2358,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	phalcon_update_property_this(getThis(), SL("_sqlAliasesModelsInstances"), sql_aliases_models_instances);
 	phalcon_update_property_this(getThis(), SL("_modelsInstances"), models_instances);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(join_prepared), idx, join_alias_name, join_item) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(join_prepared), idx, str_key, join_item) {
 		zval tmp;
-		if (join_alias_name) {
-			ZVAL_STR(&tmp, join_alias_name);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
@@ -2381,18 +2378,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	/** 
 	 * Create join relationships dynamically
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(from_models), idx, from_model_name, source) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(from_models), idx, str_key, source) {
 		zval tmp;
-		if (from_model_name) {
-			ZVAL_STR(&tmp, from_model_name);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(join_models), idx2, join_alias, join_model) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(join_models), idx2, str_key2, join_model) {
 			zval tmp2;
-			if (join_alias) {
-				ZVAL_STR(&tmp2, join_alias);
+			if (str_key2) {
+				ZVAL_STR(&tmp2, str_key2);
 			} else {
 				ZVAL_LONG(&tmp2, idx2);
 			}
@@ -2535,9 +2532,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getOrderClause){
 	zval *order, *order_columns = NULL, *order_item = NULL;
 	zval *order_column = NULL, *order_part_expr = NULL, *order_sort = NULL;
 	zval *order_part_sort = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -2594,9 +2588,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getOrderClause){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getGroupClause){
 
 	zval *group, *group_item = NULL, *group_part_expr = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -2628,12 +2619,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getLimitClause) {
 	zval *limit_clause, *tmp = NULL;
 	zval *limit, *offset;
 
-	phalcon_fetch_params(0, 1, 0, &limit_clause);
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 0, &limit_clause);
 	assert(Z_TYPE_P(limit_clause) == IS_ARRAY);
 
-	array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(limit_clause)));
-
-	PHALCON_MM_GROW();
+	array_init_size(return_value);
 
 	if (likely(phalcon_array_isset_string_fetch(&limit, limit_clause, SS("number")))) {
 		PHALCON_CALL_METHOD(&tmp, getThis(), "_getexpression", limit);

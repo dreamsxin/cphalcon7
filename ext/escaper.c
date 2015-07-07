@@ -108,11 +108,11 @@ PHALCON_INIT_CLASS(Phalcon_Escaper){
  */
 PHP_METHOD(Phalcon_Escaper, setEncoding){
 
-	zval **encoding;
+	zval *encoding;
 
 	phalcon_fetch_params(0, 1, 0, &encoding);
 	PHALCON_ENSURE_IS_STRING(encoding);
-	phalcon_update_property_this(getThis(), SL("_encoding"), *encoding);
+	phalcon_update_property_this(getThis(), SL("_encoding"), encoding);
 }
 
 /**
@@ -137,11 +137,11 @@ PHP_METHOD(Phalcon_Escaper, getEncoding){
  */
 PHP_METHOD(Phalcon_Escaper, setHtmlQuoteType){
 
-	zval **quote_type;
+	zval *quote_type;
 
 	phalcon_fetch_params(0, 1, 0, &quote_type);
 	PHALCON_ENSURE_IS_LONG(quote_type);
-	phalcon_update_property_this(getThis(), SL("_htmlQuoteType"), *quote_type);
+	phalcon_update_property_this(getThis(), SL("_htmlQuoteType"), quote_type);
 }
 
 /**

@@ -245,20 +245,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 		}
 		else {
 			HashPosition pos;
-			char *str_index;
-			uint str_index_len;
+			zend_string *str_index;
 			ulong num_index;
 			int type;
 
 			for (
 				zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(data), &pos);
-				(type = zend_hash_get_current_key_ex(Z_ARRVAL_P(data), &zend_string_init(str_index, str_index_len, 0), &num_index, &pos)) != HASH_KEY_NON_EXISTANT;
+				(type = zend_hash_get_current_key_ex(Z_ARRVAL_P(data), &str_index, &num_index, &pos)) != HASH_KEY_NON_EXISTENT;
 				zend_hash_move_forward_ex(Z_ARRVAL_P(data), &pos)
 			) {
-				if (type == HASH_KEY_IS_STRING && str_index_len > (uint)(Z_STRLEN_P(prefix)) && !memcmp(Z_STRVAL_P(prefix), str_index, str_index_len-1)) {
-					add_next_index_stringl(return_value, str_index, str_index_len - 1);
-				}
-				else if (unlikely(type == HASH_KEY_IS_LONG)) {
+				if (type == HASH_KEY_IS_STRING && ZSTR_LEN(str_index) > (uint)(Z_STRLEN_P(prefix)) && !memcmp(Z_STRVAL_P(prefix), ZSTR_VAL(str_index), ZSTR_LEN(str_index)-1)) {
+					add_next_index_str(return_value, str_index);
+				} else if (unlikely(type == HASH_KEY_IS_LONG)) {
 					char buf[8 * sizeof(ulong) + 2];
                     int buflength = 8 * sizeof(ulong) + 2;
 					int size;
@@ -318,27 +316,26 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, exists){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 
-	zval **key_name, **value = NULL, *last_key, *data;
+	zval *key_name, *value = NULL, *last_key, *data;
 	zval *cached_content;
-
-	phalcon_fetch_params(0, 1, 1, &key_name, &value);
-
-	if (!value || Z_TYPE_P(*value) == IS_NULL) {
-		value = &&PHALCON_GLOBAL(z_one);
-	}
-	else {
-		PHALCON_ENSURE_IS_LONG(value);
-	}
 
 	PHALCON_MM_GROW();
 
-	if (Z_TYPE_P(*key_name) == IS_NULL) {
+	phalcon_fetch_params(1, 1, 1, &key_name, &value);
+
+	if (!value || Z_TYPE_P(value) == IS_NULL) {
+		value = &PHALCON_GLOBAL(z_one);
+	} else {
+		PHALCON_ENSURE_IS_LONG(value);
+	}
+
+	if (Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
 	} else {
 		zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 		PHALCON_INIT_VAR(last_key);
-		PHALCON_CONCAT_VV(last_key, prefix, *key_name);
+		PHALCON_CONCAT_VV(last_key, prefix, key_name);
 	}
 
 	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
@@ -348,7 +345,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 	}
 
 
-	add_function(return_value, cached_content, *value);
+	add_function(return_value, cached_content, value);
 	phalcon_update_property_array(getThis(), SL("_data"), last_key, return_value);
 
 	PHALCON_MM_RESTORE();
@@ -363,27 +360,26 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, decrement){
 
-	zval **key_name, **value = NULL, *last_key, *data;
+	zval *key_name, *value = NULL, *last_key, *data;
 	zval *cached_content;
-
-	phalcon_fetch_params(0, 1, 1, &key_name, &value);
-
-	if (!value || Z_TYPE_P(*value) == IS_NULL) {
-		value = &&PHALCON_GLOBAL(z_one);
-	}
-	else {
-		PHALCON_ENSURE_IS_LONG(value);
-	}
 
 	PHALCON_MM_GROW();
 
-	if (Z_TYPE_P(*key_name) == IS_NULL) {
+	phalcon_fetch_params(1, 1, 1, &key_name, &value);
+
+	if (!value || Z_TYPE_P(value) == IS_NULL) {
+		value = &PHALCON_GLOBAL(z_one);
+	} else {
+		PHALCON_ENSURE_IS_LONG(value);
+	}
+
+	if (Z_TYPE_P(key_name) == IS_NULL) {
 		last_key = phalcon_read_property(getThis(), SL("_lastKey"), PH_NOISY);
 	} else {
 		zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 		PHALCON_INIT_VAR(last_key);
-		PHALCON_CONCAT_VV(last_key, prefix, *key_name);
+		PHALCON_CONCAT_VV(last_key, prefix, key_name);
 	}
 
 	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
@@ -392,7 +388,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, decrement){
 		RETURN_MM();
 	}
 
-	phalcon_sub_function(return_value, cached_content, *value);
+	phalcon_sub_function(return_value, cached_content, value);
 	phalcon_update_property_array(getThis(), SL("_data"), last_key, return_value);
 
 	PHALCON_MM_RESTORE();

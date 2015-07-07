@@ -180,6 +180,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, __construct){
 PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, _connect){
 
 	zval *options, *memcache, *servers, *client = NULL, *res = NULL;
+	zend_string *str_key;
+	ulong idx;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -208,24 +210,20 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, _connect){
 	}
 
 	if (client && Z_TYPE_P(client) == IS_ARRAY) {
-		HashPosition hp;
-		zval *hd;
+		zval *value;
 
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(client), &hp);
-			(hd = zend_hash_get_current_data_ex(Z_ARRVAL_P(client), &hp)) != NULL;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(client), &hp)
-		) {
-			zval option = phalcon_get_current_key_w(Z_ARRVAL_P(client), &hp);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(client), idx, str_key, value) {
+			zval option;
 
-			if (Z_TYPE(option) == IS_STRING) {
-				if ((res = zend_get_constant(Z_STR(option))) != NULL) {
-					PHALCON_CALL_METHOD(NULL, memcache, "setoption", res, hd);
+			if (str_key) {
+				if ((res = zend_get_constant(str_key)) != NULL) {
+					PHALCON_CALL_METHOD(NULL, memcache, "setoption", res, value);
 				}
 			} else {
-				PHALCON_CALL_METHOD(NULL, memcache, "setoption", &option, hd);
+				ZVAL_LONG(&option, idx);
+				PHALCON_CALL_METHOD(NULL, memcache, "setoption", &option, value);
 			}
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	phalcon_update_property_this(getThis(), SL("_memcache"), memcache);
@@ -687,8 +685,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, getTrackingKey)
 
 PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, setTrackingKey)
 {
-	zval **key, *options;
-	int separated;
+	zval *key, *options;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
@@ -696,7 +693,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, setTrackingKey)
 
 	SEPARATE_ZVAL(options);
 
-	phalcon_array_update_string(options, SL("statsKey"), *key, PH_COPY);
+	phalcon_array_update_string(options, SL("statsKey"), key, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();

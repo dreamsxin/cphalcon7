@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, delete){
 PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 
 	zval *prefix = NULL, *options, *cache_dir, *iterator;
-	zval **item, *is_directory = NULL, *key = NULL;
+	zval *item, *is_directory = NULL, *key = NULL;
 	zend_object_iterator *it;
 
 	PHALCON_MM_GROW();
@@ -398,16 +398,16 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 
 	it->funcs->rewind(it);
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
-		it->funcs->get_current_data(it, &item);
+		item = it->funcs->get_current_data(it);
 
 		PHALCON_OBSERVE_OR_NULLIFY_VAR(is_directory);
-		if (FAILURE == phalcon_call_method(&is_directory, *item, "isdir", 0, NULL)) {
+		if (FAILURE == phalcon_call_method(&is_directory, item, "isdir", 0, NULL)) {
 			break;
 		}
 
 		if (!EG(exception) && PHALCON_IS_FALSE(is_directory)) {
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(key);
-			if (FAILURE == phalcon_call_method(&key, *item, "getfilename", 0, NULL)) {
+			if (FAILURE == phalcon_call_method(&key, item, "getfilename", 0, NULL)) {
 				break;
 			}
 
@@ -497,28 +497,27 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 
-	zval **key_name, **value = NULL, *lifetime = NULL, *options, *prefix, *prefixed_key, *status;
+	zval *key_name, *value = NULL, *lifetime = NULL, *options, *prefix, *prefixed_key, *status;
 	zval *cache_dir, *cache_file;
 	zval *modified_time;
 	zval *cached_content, *tmp = NULL;
 	long int now, ttl, mtime, diff;
 	int expired;
 
-	phalcon_fetch_params(0, 1, 1, &key_name, &value);
-	if (!value || Z_TYPE_P(*value) == IS_NULL) {
-		value = &&PHALCON_GLOBAL(z_one);
-	}
-	else {
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 1, &key_name, &value);
+	if (!value) {
+		value = &PHALCON_GLOBAL(z_one);
+	} else {
 		PHALCON_ENSURE_IS_LONG(value);
 	}
-
-	PHALCON_MM_GROW();
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	prefix  = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_INIT_VAR(prefixed_key);
-	PHALCON_CONCAT_VV(prefixed_key, prefix, *key_name);
+	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
 	phalcon_update_property_this(getThis(), SL("_lastKey"), prefixed_key);
 
 	PHALCON_OBS_VAR(cache_dir);
@@ -577,7 +576,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 				RETURN_MM();
 			}
 
-			add_function(return_value, *value, cached_content);
+			add_function(return_value, value, cached_content);
 
 			PHALCON_INIT_VAR(status);
 			phalcon_file_put_contents(status, cache_file, return_value);
@@ -604,7 +603,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 
-	zval **key_name, **value = NULL, *lifetime = NULL, *options, *prefix, *prefixed_key, *status;
+	zval *key_name, *value = NULL, *lifetime = NULL, *options, *prefix, *prefixed_key, *status;
 	zval *cache_dir, *cache_file;
 	zval *modified_time;
 	zval *cached_content, *tmp = NULL;
@@ -612,10 +611,9 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 	int expired;
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
-	if (!value || Z_TYPE_P(*value) == IS_NULL) {
-		value = &&PHALCON_GLOBAL(z_one);
-	}
-	else {
+	if (!value) {
+		value = &PHALCON_GLOBAL(z_one);
+	} else {
 		PHALCON_ENSURE_IS_LONG(value);
 	}
 
@@ -625,7 +623,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 	prefix  = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_INIT_VAR(prefixed_key);
-	PHALCON_CONCAT_VV(prefixed_key, prefix, *key_name);
+	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
 	phalcon_update_property_this(getThis(), SL("_lastKey"), prefixed_key);
 
 	PHALCON_OBS_VAR(cache_dir);
@@ -684,7 +682,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 				RETURN_MM();
 			}
 
-			phalcon_sub_function(return_value, cached_content, *value);
+			phalcon_sub_function(return_value, cached_content, value);
 
 			PHALCON_INIT_VAR(status);
 			phalcon_file_put_contents(status, cache_file, return_value);
@@ -698,8 +696,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 		}
 	}
 
-	RETVAL_FALSE;
-	PHALCON_MM_RESTORE();
+	RETURN_MM_FALSE;
 }
 
 /**
@@ -710,7 +707,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 
 	zval *options, *prefix, *cache_dir, *iterator;
-	zval **item, *is_file = NULL, *key = NULL, *cache_file = NULL;
+	zval *item, *is_file = NULL, *key = NULL, *cache_file = NULL;
 	zend_object_iterator *it;
 
 	PHALCON_MM_GROW();
@@ -741,21 +738,21 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 
 	it->funcs->rewind(it);
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
-		it->funcs->get_current_data(it, &item);
+		item = it->funcs->get_current_data(it);
 
 		PHALCON_OBSERVE_OR_NULLIFY_VAR(is_file);
-		if (FAILURE == phalcon_call_method(&is_file, *item, "isfile", 0, NULL)) {
+		if (FAILURE == phalcon_call_method(&is_file, item, "isfile", 0, NULL)) {
 			break;
 		}
 
 		if (PHALCON_IS_TRUE(is_file)) {
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(key);
-			if (FAILURE == phalcon_call_method(&key, *item, "getfilename", 0, NULL)) {
+			if (FAILURE == phalcon_call_method(&key, item, "getfilename", 0, NULL)) {
 				break;
 			}
 
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(cache_file);
-			if (FAILURE == phalcon_call_method(&cache_file, *item, "getpathname", 0, NULL)) {
+			if (FAILURE == phalcon_call_method(&cache_file, item, "getpathname", 0, NULL)) {
 				break;
 			}
 

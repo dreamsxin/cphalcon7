@@ -371,6 +371,29 @@ int phalcon_memnstr(const zval *haystack, const zval *needle) {
 	return 0;
 }
 
+int phalcon_memnstr_string(const zval *haystack, const zend_string *needle) {
+
+	if (Z_TYPE_P(haystack) != IS_STRING) {
+		zend_error(E_WARNING, "Invalid arguments supplied for memnstr()");
+		return 0;
+	}
+
+	if (Z_STRLEN_P(haystack) >= ZSTR_LEN(needle)) {
+		return zend_memnstr(Z_STRVAL_P(haystack), ZSTR_VAL(needle), ZSTR_LEN(needle), Z_STRVAL_P(haystack) + Z_STRLEN_P(haystack)) ? 1 : 0;
+	}
+
+	return 0;
+}
+
+int phalcon_memnstr_string_string(zend_string *haystack, zend_string *needle) {
+
+	if (ZSTR_LEN(haystack) >= ZSTR_LEN(needle)) {
+		return zend_memnstr(ZSTR_VAL(haystack), ZSTR_VAL(needle), ZSTR_LEN(needle), ZSTR_VAL(haystack) + ZSTR_LEN(haystack)) ? 1 : 0;
+	}
+
+	return 0;
+}
+
 /**
  * Check if a string is contained into another
  */
@@ -937,6 +960,25 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned 
 	}
 
 	RETURN_STRINGL(Z_STRVAL_P(str) + from, (int)length);
+}
+
+void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, unsigned long length) {
+
+	uint str_len = (uint)(ZSTR_LEN(str));
+
+	if (str_len < from){
+		RETURN_FALSE;
+	}
+
+	if (!length || (str_len < length + from)) {
+		length = str_len - from;
+	}
+
+	if (!length){
+		RETURN_EMPTY_STRING();
+	}
+
+	RETURN_STRINGL(ZSTR_VAL(str) + from, (int)length);
 }
 
 void phalcon_append_printable_array(smart_str *implstr, zval *value) {

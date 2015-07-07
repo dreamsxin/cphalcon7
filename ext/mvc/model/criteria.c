@@ -1662,7 +1662,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
 	zval *column_map = NULL, *attribute_field = NULL, *exception_message;
 	zval *primary_key_condition, *phql, *columns;
-	zval *selected_columns = NULL, *column = NULL, *column_alias = NULL;
+	zval *selected_columns = NULL, *column = NULL;
 	zval *aliased_column = NULL, *joined_columns = NULL;
 	zval *joins, *join = NULL, *join_model = NULL, *join_conditions = NULL, *join_alias = NULL;
 	zval *join_type = NULL, *group, *group_items, *group_item = NULL;
@@ -2008,11 +2008,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 
 	zval *model, *exception_message;
 	zval *phql, *columns, *selected_columns, *joined_columns, *column = NULL;
-	zval *rows, *index = NULL, *index2 = NULL, *insert_sqls, *bind_params, *keys = NULL, *key = NULL, *row = NULL, *value = NULL;
+	zval *rows, *insert_sqls, *bind_params, *keys = NULL, *key = NULL, *row = NULL, *value = NULL;
 	zval *joined_keys = NULL, *insert_sql = NULL, *joined_insert_sqls;
-	HashTable *ah0, *ah1, *ah2;
-	HashPosition hp0, hp1, hp2;
-	zval **hd;
+	zend_string *str_key, *str_key2;
+	ulong idx, idx2;
 
 	PHALCON_MM_GROW();
 
@@ -2049,10 +2048,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 	PHALCON_INIT_VAR(bind_params);
 	array_init(bind_params);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(rows), idx, index, row) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(rows), idx, str_key, row) {
 		zval tmp;
-		if (index) {
-			ZVAL_STR(&tmp, index);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
@@ -2061,12 +2060,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 		array_init(keys);
 
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns), idx, index2, column) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns), idx2, str_key2, column) {
 			zval tmp2;
-			if (index2) {
-				ZVAL_STR(&tmp2, index2);
+			if (str_key2) {
+				ZVAL_STR(&tmp2, str_key2);
 			} else {
-				ZVAL_LONG(&tmp2, idx);
+				ZVAL_LONG(&tmp2, idx2);
 			}
 
 			if (phalcon_array_isset(row, column)) {
@@ -2126,9 +2125,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	zval *column = NULL, *value = NULL, *bind_name = NULL, *updated_column = NULL, *joined_columns = NULL;
 	zval *order, *order_items, *order_item = NULL, *escaped_item = NULL, *joined_items = NULL;
 	zval *limit, *offset, *number;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -2225,10 +2223,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	PHALCON_INIT_VAR(updated_columns);
 	array_init(updated_columns);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns), idx, column, value) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns), idx, str_key, value) {
 		zval tmp;
-		if (column) {
-			ZVAL_STR(&tmp, column);
+		if (str_key) {
+			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
@@ -2336,9 +2334,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	zval *order, *order_items, *order_item = NULL, *escaped_item = NULL, *joined_items = NULL;
 	zval *limit, *offset, *number;
 	zend_class_entry *ce0;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

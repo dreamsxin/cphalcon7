@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Config, count)
 	zval arr;
 
 	phalcon_get_object_vars(&arr, getThis(), 0);
-	RETURN_LONG(phalcon_fast_count_int(arr));
+	RETURN_LONG(phalcon_fast_count_int(&arr));
 }
 
 PHP_METHOD(Phalcon_Config, __wakeup)

@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 	}
 
 	if (!phalcon_array_isset_string(options, SS("persistent"))) {
-		phalcon_array_update_string_bool(&options, SL("persistent"), 0, 0);
+		phalcon_array_update_string_bool(options, SL("persistent"), 0, 0);
 	}
 
 	if (!phalcon_array_isset_string(options, SS("statsKey"))) {
@@ -620,20 +620,19 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 	zval *redis, *options, *special_key;
 	zval *keys = NULL, *real_key = NULL, *last_key = NULL;
 	zval *value;
-	HashPosition pos;
+
+	PHALCON_MM_GROW();
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
 	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
-		zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Unexpected inconsistency in options");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
 
 	if (Z_TYPE_P(special_key) == IS_NULL) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
-
-	PHALCON_MM_GROW();
 
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 	if (Z_TYPE_P(redis) != IS_OBJECT) {
@@ -675,8 +674,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, getTrackingKey)
 
 PHP_METHOD(Phalcon_Cache_Backend_Redis, setTrackingKey)
 {
-	zval **key, *options;
-	int separated;
+	zval *key, *options;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
@@ -684,7 +682,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, setTrackingKey)
 
 	SEPARATE_ZVAL(options);
 
-	phalcon_array_update_string(options, SL("statsKey"), *key, PH_COPY);
+	phalcon_array_update_string(options, SL("statsKey"), key, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();

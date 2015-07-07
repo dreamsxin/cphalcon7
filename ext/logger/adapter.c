@@ -151,19 +151,16 @@ static int phalcon_logger_adapter_string_level_to_int(const zval *level)
  */
 PHP_METHOD(Phalcon_Logger_Adapter, setLogLevel){
 
-	zval **level, *lvl;
+	zval *level, *lvl;
 
 	phalcon_fetch_params(0, 1, 0, &level);
-	if (Z_TYPE_P(*level) == IS_STRING) {
+	if (Z_TYPE_P(level) == IS_STRING) {
 		PHALCON_ALLOC_GHOST_ZVAL(lvl);
-		ZVAL_LONG(lvl, phalcon_logger_adapter_string_level_to_int(*level));
-	}
-	else if (Z_TYPE_P(*level) != IS_LONG) {
-		PHALCON_ENSURE_IS_LONG(level);
-		lvl = *level;
-	}
-	else {
-		lvl = *level;
+		ZVAL_LONG(lvl, phalcon_logger_adapter_string_level_to_int(level));
+	} else if (Z_TYPE_P(level) != IS_LONG) {
+		lvl = level;
+	} else {
+		lvl = level;
 	}
 
 	phalcon_update_property_this(getThis(), SL("_logLevel"), lvl);
@@ -294,7 +291,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 
 static void phalcon_logger_adapter_log_helper(INTERNAL_FUNCTION_PARAMETERS, int level)
 {
-	zval **message, **context = NULL, *type;
+	zval *message, *context = NULL, *type;
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 	PHALCON_ENSURE_IS_STRING(message);
@@ -303,10 +300,10 @@ static void phalcon_logger_adapter_log_helper(INTERNAL_FUNCTION_PARAMETERS, int 
 	ZVAL_LONG(type, level);
 
 	if (!context) {
-		context = &&PHALCON_GLOBAL(z_null);
+		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "log", type, *message, *context);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", type, message, context);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -416,11 +413,13 @@ PHP_METHOD(Phalcon_Logger_Adapter, critical){
  */
 PHP_METHOD(Phalcon_Logger_Adapter, log){
 
-	zval **message = NULL, **type, **context = NULL, *timestamp, *transaction;
+	zval *message = NULL, *type, *context = NULL, *timestamp, *transaction;
 	zval *queue_item, *log_level, *level;
 	int i_level;
 
-	phalcon_fetch_params(0, 1, 2, &type, &message, &context);
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 2, &type, &message, &context);
 
 	/*
 	 * Backwards compatibility.
@@ -442,34 +441,31 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 	if (message == NULL) {
 		message = type;
 		type    = NULL;
-	}
-	else if (Z_TYPE_P(*message) == IS_LONG && Z_TYPE_P(*type) == IS_STRING) {
-		zval **tmp = message;
+	} else if (Z_TYPE_P(message) == IS_LONG && Z_TYPE_P(type) == IS_STRING) {
+		zval *tmp = message;
 		message    = type;
 		type       = tmp;
 	}
 
 	if (!context) {
-		context = &&PHALCON_GLOBAL(z_null);
+		context = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!type) {
 		i_level = PHALCON_LOGGER_DEBUG;
 	}
-	else if (Z_TYPE_P(*type) == IS_STRING) {
-		i_level = phalcon_logger_adapter_string_level_to_int(*type);
+	else if (Z_TYPE_P(type) == IS_STRING) {
+		i_level = phalcon_logger_adapter_string_level_to_int(type);
 	}
 	else {
 		PHALCON_ENSURE_IS_LONG(type);
-		i_level = Z_LVAL_P(*type);
+		i_level = Z_LVAL_P(type);
 	}
 
 	log_level = phalcon_read_property(getThis(), SL("_logLevel"), PH_NOISY);
 
 	/* Only log the message if this is allowed by the current log level */
 	if (phalcon_get_intval(log_level) >= i_level) {
-		PHALCON_MM_GROW();
-
 		PHALCON_INIT_VAR(timestamp);
 		ZVAL_LONG(timestamp, (long)time(NULL));
 
@@ -480,16 +476,14 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 		if (zend_is_true(transaction)) {
 			PHALCON_INIT_VAR(queue_item);
 			object_init_ex(queue_item, phalcon_logger_item_ce);
-			PHALCON_CALL_METHOD(NULL, queue_item, "__construct", *message, level, timestamp, *context);
+			PHALCON_CALL_METHOD(NULL, queue_item, "__construct", message, level, timestamp, context);
 
 			phalcon_update_property_array_append(getThis(), SL("_queue"), queue_item);
 		}
 		else {
-			PHALCON_CALL_METHOD(NULL, getThis(), "loginternal", *message, level, timestamp, *context);
+			PHALCON_CALL_METHOD(NULL, getThis(), "loginternal", message, level, timestamp, context);
 		}
-
-		PHALCON_MM_RESTORE();
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }

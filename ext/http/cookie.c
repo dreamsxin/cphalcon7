@@ -423,16 +423,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 	convert_to_long_ex(secure);
 	convert_to_long_ex(http_only);
 
-	php_setcookie(
-		Z_STRVAL_P(name), Z_STRLEN_P(name),
-		Z_STRVAL_P(encrypt_value), Z_STRLEN_P(encrypt_value),
-		Z_LVAL_P(expire),
-		Z_STRVAL_P(path), Z_STRLEN_P(path),
-		Z_STRVAL_P(domain), Z_STRLEN_P(domain),
-		Z_LVAL_P(secure),
-		1,
-		Z_LVAL_P(http_only)
-	);
+	php_setcookie(Z_STR_P(name), Z_STR_P(encrypt_value), Z_LVAL_P(expire), Z_STR_P(path), Z_STR_P(domain), Z_LVAL_P(secure), 1, Z_LVAL_P(http_only));
 
 	RETURN_THIS();
 }
@@ -544,16 +535,7 @@ PHP_METHOD(Phalcon_Http_Cookie, delete){
 	convert_to_long_ex(secure);
 	convert_to_long_ex(http_only);
 
-	php_setcookie(
-		Z_STRVAL_P(name), Z_STRLEN_P(name),
-		NULL, 0,
-		time(NULL) - 691200,
-		Z_STRVAL_P(path), Z_STRLEN_P(path),
-		Z_STRVAL_P(domain), Z_STRLEN_P(domain),
-		Z_LVAL_P(secure),
-		1,
-		Z_LVAL_P(http_only)
-	);
+	php_setcookie(Z_STR_P(name), NULL, time(NULL) - 691200, Z_STR_P(path), Z_STR_P(domain), Z_LVAL_P(secure), 1, Z_LVAL_P(http_only));
 
 	PHALCON_MM_RESTORE();
 }

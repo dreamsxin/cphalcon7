@@ -90,22 +90,22 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getShowBacktrace) {
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, setShowBacktrace) {
 
-	zval **show;
+	zval *show;
 
 	phalcon_fetch_params(0, 1, 0, &show);
 
 	PHALCON_ENSURE_IS_BOOL(show);
-	phalcon_update_property_this(getThis(), SL("_showBacktrace"), *show);
+	phalcon_update_property_this(getThis(), SL("_showBacktrace"), show);
 }
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, enableLabels) {
 
-	zval **enable;
+	zval *enable;
 
 	phalcon_fetch_params(0, 1, 0, &enable);
 
 	PHALCON_ENSURE_IS_BOOL(enable);
-	phalcon_update_property_this(getThis(), SL("_enableLabels"), *enable);
+	phalcon_update_property_this(getThis(), SL("_enableLabels"), enable);
 }
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, labelsEnabled) {
@@ -126,13 +126,13 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getTypeString) {
 		"INFO",  "INFO",  "LOG",  "INFO",  "LOG"
 	};
 
-	zval **type;
+	zval *type;
 	int itype;
 
 	phalcon_fetch_params(0, 1, 0, &type);
 	PHALCON_ENSURE_IS_LONG(type);
 
-	itype = Z_LVAL_P(*type);
+	itype = Z_LVAL_P(type);
 	if (itype > 0 && itype < 10) {
 		RETURN_STRING(lut[itype]);
 	}
@@ -156,8 +156,6 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	zval *show_backtrace, *enable_labels;
 	int i_show_backtrace, i_enable_labels;
 	smart_str result = { 0 };
-	uint i;
-	Bucket *p;
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
@@ -202,13 +200,10 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 		zend_fetch_debug_backtrace(backtrace, 1, DEBUG_BACKTRACE_IGNORE_ARGS, 0);
 
 		if (Z_TYPE_P(backtrace) == IS_ARRAY) {
-			HashPosition pos;
 			HashTable *ht = Z_ARRVAL_P(backtrace);
 			zval *pzval;
 			int found = 0;
 			ulong idx;
-			char *key;
-			uint key_len;
 
 			/*
 			 * At this point we know that the backtrace is the array.
@@ -322,7 +317,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 * memory reallocations.
 	 */
 	if (Z_TYPE_P(encoded) == IS_STRING && Z_STRVAL_P(encoded) != NULL) {
-		smart_str_alloc4(&result, (uint)(Z_STRLEN_P(encoded) + 2 + 5), 0, i);
+		smart_str_alloc(&result, (uint)(Z_STRLEN_P(encoded) + 2 + 5), 0);
 
 		/*
 		 * The format is:

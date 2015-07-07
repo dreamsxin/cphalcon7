@@ -92,9 +92,9 @@ static int phalcon_session_bag_maybe_initialize(zval *this_ptr)
 {
 	zval *initialized;
 
-	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
+	initialized = phalcon_read_property(this_ptr, SL("_initialized"), PH_NOISY);
 	if (PHALCON_IS_FALSE(initialized)) {
-		return phalcon_call_method(NULL, getThis(), "initialize", 0, NULL);
+		return phalcon_call_method(NULL, this_ptr, "initialize", 0, NULL);
 	}
 
 	return SUCCESS;
@@ -156,11 +156,11 @@ PHALCON_INIT_CLASS(Phalcon_Session_Bag){
  */
 PHP_METHOD(Phalcon_Session_Bag, __construct){
 
-	zval **name;
+	zval *name;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
-	phalcon_update_property_this(getThis(), SL("_name"), *name);
+	phalcon_update_property_this(getThis(), SL("_name"), name);
 }
 
 /**
@@ -331,11 +331,10 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 
 	/* Retrieve the data */
 	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	zval_ptr_dtor(return_value_ptr);
+
 	if (phalcon_array_isset_fetch(&value, data, property)) {
-		return_value = value;
-	}
-	else {
+		ZVAL_ZVAL(return_value, value, 1, 0);
+	} else {
 		zval *tmp, *name, *data, *session;
 
 		ALLOC_INIT_ZVAL(tmp);
@@ -347,11 +346,8 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 		data    = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
 		session = phalcon_read_property(getThis(), SL("_session"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
+		PHALCON_RETURN_CALL_METHODW(session, "__set", name, data);
 	}
-
-	Z_ADDREF_P(return_value);
-	ZVAL_MAKE_REF(return_value);
 }
 
 

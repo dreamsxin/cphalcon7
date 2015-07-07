@@ -523,9 +523,6 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	zval *target_path = NULL, *path = NULL, *prefixed_path = NULL, *attributes = NULL;
 	zval *parameters = NULL, *html = NULL, *content = NULL, *must_filter = NULL;
 	zval *filter = NULL, *filtered_content = NULL, *target_uri = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 	zval *type_css;
 
 	PHALCON_MM_GROW();

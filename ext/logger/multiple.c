@@ -119,9 +119,6 @@ PHP_METHOD(Phalcon_Logger_Multiple, getLoggers){
 PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 
 	zval *formatter, *loggers, *logger = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -161,9 +158,6 @@ PHP_METHOD(Phalcon_Logger_Multiple, getFormatter){
 PHP_METHOD(Phalcon_Logger_Multiple, log){
 
 	zval *message, *type = NULL, *context = NULL, *loggers, *logger = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

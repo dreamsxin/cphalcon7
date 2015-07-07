@@ -197,20 +197,20 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 		struct timeval tv;
 		php_stream *stream;
 		int err;
-		char *errstr = NULL;
+		zend_string *errstr = NULL;
 
 		tv.tv_sec  = timeout / 1000000;
 		tv.tv_usec = timeout % 1000000;
 
-		stream = php_stream_xport_create(hostname, hostname_len, ENFORCE_SAFE_MODE | REPORT_ERRORS, STREAM_XPORT_CLIENT | STREAM_XPORT_CONNECT, NULL, &tv, NULL, &errstr, &err);
+		stream = php_stream_xport_create(hostname, hostname_len, REPORT_ERRORS, STREAM_XPORT_CLIENT | STREAM_XPORT_CONNECT, NULL, &tv, NULL, &errstr, &err);
 		efree(hostname);
 
 		if (!stream) {
-			zend_throw_exception_ex(phalcon_exception_ce, err, "Unable to connect to Beanstalk server at %s:%ld (%s)", Z_STRVAL_P(host), Z_LVAL_P(port), (errstr == NULL ? "Unknown error" : errstr));
+			zend_throw_exception_ex(phalcon_exception_ce, err, "Unable to connect to Beanstalk server at %s:%ld (%s)", Z_STRVAL_P(host), Z_LVAL_P(port), (errstr == NULL ? "Unknown error" : errstr->val));
 		}
 
 		if (errstr) {
-			efree(errstr);
+			zend_string_release(errstr);
 		}
 
 		if (!stream) {
@@ -501,7 +501,7 @@ static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_p
 		length = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHODW(&serialized, getThis(), "read", length);
+	PHALCON_CALL_METHODW(&serialized, this_ptr, "read", length);
 
 	PHALCON_ALLOC_GHOST_ZVAL(body);
 	phalcon_unserialize(body, serialized);
@@ -511,7 +511,7 @@ static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_p
 	}
 
 	object_init_ex(return_value, phalcon_queue_beanstalk_job_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", getThis(), job_id, body);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", this_ptr, job_id, body);
 }
 
 /**
@@ -653,7 +653,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, readYaml){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 
-	zval **length = NULL, *connection, *meta;
+	zval *length = NULL, *connection, *meta;
 	php_stream *stream;
 
 	PHALCON_MM_GROW();
@@ -661,7 +661,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 	phalcon_fetch_params(0, 0, 1, &length);
 
 	if (!length) {
-		length = &&PHALCON_GLOBAL(z_zero);
+		length = &PHALCON_GLOBAL(z_zero);
 	}
 	else {
 		PHALCON_ENSURE_IS_LONG(length);
@@ -680,7 +680,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		RETURN_MM_FALSE;
 	}
 
-	if (zend_is_true(*length)) {
+	if (zend_is_true(length)) {
 		long int total_length;
 		long int len;
 		zend_bool timeout = 0;
@@ -690,7 +690,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 			RETURN_MM_FALSE;
 		}
 
-		total_length = Z_LVAL_P(*length) + 2;
+		total_length = Z_LVAL_P(length) + 2;
 
 		buf = ecalloc(1, total_length + 1);
 		len = php_stream_read(stream, buf, total_length);
@@ -811,7 +811,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, disconnect){
 PHP_METHOD(Phalcon_Queue_Beanstalk, __sleep){
 
 	array_init_size(return_value, 1);
-	add_next_index_string(return_value, "_parameters", 1);
+	add_next_index_string(return_value, "_parameters");
 }
 
 PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){

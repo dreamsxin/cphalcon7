@@ -290,12 +290,11 @@ PHP_METHOD(Phalcon_Events_Manager, getResponses){
  */
 PHP_METHOD(Phalcon_Events_Manager, detach){
 
-	zval *type, *handler, *events = NULL, *queue, priority_queue;
+	zval *type, *handler, *events = NULL, *queue, *priority_queue = NULL;
 	zval *listener = NULL, *handler_embeded = NULL, *priority = NULL;
 	zval *r0 = NULL, *key = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -344,7 +343,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHOD(NULL, queue, "next");
 		}
 	} else {
-		ZVAL_ARR(&priority_queue, zend_array_dup(queue));
+		ZVAL_ARR(&priority_queue, zend_array_dup(Z_ARRVAL_P(queue)));
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(queue), idx, str_key, listener) {
 			zval key;
 			if (str_key) {

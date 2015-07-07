@@ -184,12 +184,12 @@ PHP_METHOD(Phalcon_Crypt, getCipher){
  */
 PHP_METHOD(Phalcon_Crypt, setMode){
 
-	zval **mode;
+	zval *mode;
 
 	phalcon_fetch_params(0, 1, 0, &mode);
 	PHALCON_ENSURE_IS_STRING(mode);
 
-	phalcon_update_property_this(getThis(), SL("_mode"), *mode);
+	phalcon_update_property_this(getThis(), SL("_mode"), mode);
 	RETURN_THISW();
 }
 
@@ -212,12 +212,12 @@ PHP_METHOD(Phalcon_Crypt, getMode){
  */
 PHP_METHOD(Phalcon_Crypt, setKey){
 
-	zval **key;
+	zval *key;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	phalcon_update_property_this(getThis(), SL("_key"), *key);
+	phalcon_update_property_this(getThis(), SL("_key"), key);
 	RETURN_THISW();
 }
 
@@ -241,12 +241,12 @@ PHP_METHOD(Phalcon_Crypt, getKey){
  */
 PHP_METHOD(Phalcon_Crypt, setPadding) {
 
-	zval **scheme;
+	zval *scheme;
 
 	phalcon_fetch_params(0, 1, 0, &scheme);
 	PHALCON_ENSURE_IS_LONG(scheme);
 
-	phalcon_update_property_this(getThis(), SL("_padding"), *scheme);
+	phalcon_update_property_this(getThis(), SL("_padding"), scheme);
 	RETURN_THISW();
 }
 
@@ -328,10 +328,9 @@ static void phalcon_crypt_pad_text(zval *return_value, zval *text, zval *mode, u
 
 	if (!padding_size) {
 		ZVAL_ZVAL(return_value, text, 1, 0);
-	}
-	else {
+	} else {
 		assert(padding_size <= block_size);
-		phalcon_concat_vs(&return_value, text, padding, padding_size, 0);
+		phalcon_concat_vs(return_value, text, padding, padding_size, 0);
 	}
 }
 
@@ -734,10 +733,10 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 	if (safe && zend_is_true(safe)) {
 		char *tmp = estrndup(Z_STRVAL_P(text), Z_STRLEN_P(text));
 		php_strtr(tmp, Z_STRLEN_P(text), "-_", "+/", 2);
-		decoded = php_base64_decode((unsigned char*)tmp, Z_STRLEN_P(text), &decoded_len);
+		decoded = php_base64_decode((unsigned char*)tmp, Z_STRLEN_P(text));
 		efree(tmp);
 	} else {
-		decoded = php_base64_decode((unsigned char*)(Z_STRVAL_P(text)), Z_STRLEN_P(text), &decoded_len);
+		decoded = php_base64_decode((unsigned char*)(Z_STRVAL_P(text)), Z_STRLEN_P(text));
 	}
 
 	if (!decoded) {
@@ -745,7 +744,7 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 	}
 
 	ZVAL_STR(&decrypt_text, decoded);
-	PHALCON_RETURN_CALL_METHODW(getThis(), "decrypt", decrypt_text, *key);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "decrypt", &decrypt_text, key);
 }
 
 /**

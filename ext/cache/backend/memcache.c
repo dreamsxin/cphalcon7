@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, __construct){
 	}
 
 	if (!phalcon_array_isset_string(options, SS("persistent"))) {
-		phalcon_array_update_string_bool(&options, SL("persistent"), 0, 0);
+		phalcon_array_update_string_bool(options, SL("persistent"), 0, 0);
 	}
 
 	if (!phalcon_array_isset_string(options, SS("statsKey"))) {
@@ -453,7 +453,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, queryKeys){
 	PHALCON_CALL_METHOD(&keys, memcache, "get", special_key);
 	if (Z_TYPE_P(keys) == IS_ARRAY) { 
 		HashPosition pos;
-		zval **value;
 
 		for (
 			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(keys), &pos);
@@ -607,10 +606,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, decrement){
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 
 	zval *memcache, *options, *special_key;
-	zval *keys = NULL, *key = NULL, *param, *all_slabs = NULL, *slabs = NULL, *slabid = NULL, *cachedump = NULL;
-	HashTable *ah0, *ah1, *ah2, *ah3;
-	HashPosition hp0, hp1, hp2, hp3;
-	zval **hd;
+	zval *keys = NULL, *param, *all_slabs = NULL, *slabs = NULL, *cachedump = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -631,7 +629,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 	if (Z_TYPE_P(special_key) != IS_NULL) {
 		PHALCON_CALL_METHOD(&keys, memcache, "get", special_key);
 		if (Z_TYPE_P(keys) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(keys), idx, str_key) {
+			ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(keys), idx, str_key) {
 				zval key;
 				if (str_key) {
 					ZVAL_STR(&key, str_key);
@@ -701,8 +699,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, getTrackingKey)
 
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, setTrackingKey)
 {
-	zval **key, *options;
-	int separated;
+	zval *key, *options;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
@@ -710,7 +707,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, setTrackingKey)
 
 	SEPARATE_ZVAL(options);
 
-	phalcon_array_update_string(options, SL("statsKey"), *key, PH_COPY);
+	phalcon_array_update_string(options, SL("statsKey"), key, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();

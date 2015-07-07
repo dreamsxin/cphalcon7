@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 	}
 
 	_roleInherits = phalcon_read_property(getThis(), SL("_roleInherits"), PH_NOISY);
-	phalcon_array_append_multi_2(&_roleInherits, role_name, role_inherit_name, 0);
+	phalcon_array_append_multi_2(_roleInherits, role_name, role_inherit_name, 0);
 	phalcon_update_property_this(getThis(), SL("_roleInherits"), _roleInherits);
 	RETURN_MM_TRUE;
 }
@@ -397,9 +397,6 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResourceAccess){
 	zval *resource_name, *access_list, *resources_names;
 	zval *exception_message, *internal_access_list;
 	zval *access_name = NULL, *access_key = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -446,9 +443,6 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, dropResourceAccess){
 
 	zval *resource_name, *access_list, *access_name = NULL;
 	zval *access_key = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -483,9 +477,6 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 	zval *roles_names, *exception_message = NULL, *resources_names;
 	zval *default_access, *access_list, *internal_access;
 	zval *access_name = NULL, *access_key = NULL, *access_key_all = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -598,10 +589,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, allow){
 
 	zval *role_name, *resource_name, *access, *action, *roles_names;
-	zval *key = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -657,10 +646,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, allow){
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, deny){
 
 	zval *role_name, *resource_name, *access, *action, *roles_names;
-	zval *key = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -697,7 +684,6 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 	zval *inherited_roles, access_key;
 	zval *parent_role;
 	int result = PHALCON_ACL_DUNNO;
-	HashPosition hp;
 
 	assert(Z_TYPE_P(role) == IS_STRING);
 	assert(Z_TYPE_P(resource) == IS_STRING);
@@ -713,7 +699,7 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 		zval *have_access;
 
 		phalcon_concat_vsvsv(&access_key, parent_role, SL("!"), resource, SL("!"), access, 0);
-		found = phalcon_array_isset_fetch(&have_access, access_list, access_key);
+		found = phalcon_array_isset_fetch(&have_access, access_list, &access_key);
 
 		if (found) {
 			result = zend_is_true(have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
@@ -726,7 +712,7 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	zval_dtor(access_key);
+	zval_dtor(&access_key);
 	return result;
 }
 

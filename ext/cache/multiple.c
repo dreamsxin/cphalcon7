@@ -191,7 +191,6 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
 	zval *key_name, *lifetime = NULL, *backends;
 	zval *content = NULL;
 	zval *backend;
-	HashPosition hp0;
 
 	PHALCON_MM_GROW();
 
@@ -257,7 +256,6 @@ PHP_METHOD(Phalcon_Cache_Multiple, save){
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL;
 	zval *backends;
 	zval *backend;
-	HashPosition hp0;
 
 	PHALCON_MM_GROW();
 
@@ -299,7 +297,6 @@ PHP_METHOD(Phalcon_Cache_Multiple, delete){
 
 	zval *key_name, *backends;
 	zval *backend;
-	HashPosition hp0;
 
 	PHALCON_MM_GROW();
 
@@ -326,7 +323,6 @@ PHP_METHOD(Phalcon_Cache_Multiple, exists){
 	zval *key_name = NULL, *lifetime = NULL, *backends;
 	zval *exists = NULL;
 	zval *backend;
-	HashPosition hp0;
 
 	PHALCON_MM_GROW();
 

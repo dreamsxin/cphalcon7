@@ -27,6 +27,8 @@
 
 /** Fast char position */
 int phalcon_memnstr(const zval *haystack, const zval *needle);
+int phalcon_memnstr_string(const zval *haystack, const zend_string *needle);
+int phalcon_memnstr_string_string(zend_string *haystack, zend_string *needle);
 int phalcon_memnstr_str(const zval *haystack, char *needle, unsigned int needle_length);
 int phalcon_same_name(const char *key, const char *name, uint32_t name_len);
 
@@ -80,6 +82,7 @@ int phalcon_spprintf(char **message, int max_len, char *format, ...);
 
 /* Substr */
 void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned long length);
+void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, unsigned long length);
 
 /** EOL */
 zval *phalcon_eol(int eol);

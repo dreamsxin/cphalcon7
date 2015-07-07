@@ -595,10 +595,12 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	zval *class_name, *events_manager, *event_name = NULL;
 	zval *classes, *file_path = NULL, *extensions, *ds, *namespace_separator;
 	zval *empty_str, *namespaces, *directory = NULL;
-	zval *ns_prefix = NULL, *ns_prefixed = NULL, *file_name = NULL;
+	zval *ns_prefixed = NULL, *file_name = NULL;
 	zval *pseudo_separator, *prefixes;
-	zval *prefix = NULL, *ds_class_name, *ns_class_name;
+	zval *ds_class_name, *ns_class_name;
 	zval *directories, *found = NULL;
+	zend_string *str_key;
+	ulong idx;
 	char slash[2] = {DEFAULT_SLASH, 0};
 
 	PHALCON_MM_GROW();
@@ -654,19 +656,25 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		namespaces = phalcon_read_property(getThis(), SL("_namespaces"), PH_NOISY);
 		if (Z_TYPE_P(namespaces) == IS_ARRAY) { 
 
-			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(namespaces), ns_prefix, directory) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(namespaces), idx, str_key, directory) {
+				zval ns_prefix;
+				if (str_key) {
+					ZVAL_STR(&ns_prefix, str_key);
+				} else {
+					ZVAL_LONG(&ns_prefix, idx);
+				}
 				/** 
 				 * The class name must start with the current namespace
 				 */
 				PHALCON_INIT_NVAR(ns_prefixed);
-				PHALCON_CONCAT_VV(ns_prefixed, ns_prefix, namespace_separator);
+				PHALCON_CONCAT_VV(ns_prefixed, &ns_prefix, namespace_separator);
 
 				if (phalcon_start_with(class_name, ns_prefixed, NULL)) {
 					/** 
 					 * Get the possible file path
 					 */
 					PHALCON_INIT_NVAR(file_name);
-					phalcon_possible_autoload_filepath(file_name, ns_prefix, class_name, ds, NULL);
+					phalcon_possible_autoload_filepath(file_name, &ns_prefix, class_name, ds, NULL);
 					if (zend_is_true(file_name)) {
 
 						PHALCON_CALL_METHOD(&found, getThis(), "findfile", file_name, directory, extensions, ds);
@@ -691,17 +699,24 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		prefixes = phalcon_read_property(getThis(), SL("_prefixes"), PH_NOISY);
 		if (Z_TYPE_P(prefixes) == IS_ARRAY) { 
 
-			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(prefixes), prefix, directory) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(prefixes), idx, str_key, directory) {
+				zval prefix;
+				if (str_key) {
+					ZVAL_STR(&prefix, str_key);
+				} else {
+					ZVAL_LONG(&prefix, idx);
+				}
+
 				/** 
 				 * The class name starts with the prefix?
 				 */
-				if (phalcon_start_with(class_name, prefix, NULL)) {
+				if (phalcon_start_with(class_name, &prefix, NULL)) {
 
 					/** 
 					 * Get the possible file path
 					 */
 					PHALCON_INIT_NVAR(file_name);
-					phalcon_possible_autoload_filepath(file_name, prefix, class_name, ds, pseudo_separator);
+					phalcon_possible_autoload_filepath(file_name, &prefix, class_name, ds, pseudo_separator);
 					if (zend_is_true(file_name)) {
 
 						PHALCON_CALL_METHOD(&found, getThis(), "findfile", file_name, directory, extensions, ds);

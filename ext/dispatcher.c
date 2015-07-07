@@ -669,7 +669,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				PHALCON_INIT_NVAR(camelized_namespace);
 				phalcon_camelize(camelized_namespace, namespace_name);
 			}
-			if (phalcon_end_with_str(camelized_namespace, SL("\\"), NULL)) {
+			if (phalcon_end_with_str(camelized_namespace, SL("\\"))) {
 				PHALCON_CONCAT_VVV(handler_class, camelized_namespace, camelized_class, handler_suffix);
 			} else {
 				PHALCON_CONCAT_VSVV(handler_class, camelized_namespace, "\\", camelized_class, handler_suffix);
@@ -1209,7 +1209,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 			PHALCON_INIT_NVAR(camelized_namespace);
 			phalcon_camelize(camelized_namespace, namespace_name);
 		}
-		if (phalcon_end_with_str(camelized_namespace, SL("\\"), NULL)) {
+		if (phalcon_end_with_str(camelized_namespace, SL("\\"))) {
 			PHALCON_CONCAT_VVV(return_value, camelized_namespace, camelized_class, handler_suffix);
 		} else {
 			PHALCON_CONCAT_VSVV(return_value, camelized_namespace, "\\", camelized_class, handler_suffix);
@@ -1326,7 +1326,7 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
  */
 PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 
-	zval *event_name, *data = NULL, *cancelable = NULL, status;
+	zval *event_name, *data = NULL, *cancelable = NULL, *status = NULL;
 	int ret, ret2;
 
 	PHALCON_MM_GROW();
@@ -1343,8 +1343,8 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 	}
 
 	ZVAL_MAKE_REF(data);
-	zval *params[] = {PHALCON_FETCH_VA_ARGS event_name, data, cancelable};
-	ret = phalcon_call_class_method_aparams(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), PHALCON_CALL_NUM_PARAMS(params), PHALCON_PASS_CALL_PARAMS(params));
+	zval *params[] = {event_name, data, cancelable};
+	ret = phalcon_call_class_method_aparams(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 3, params);
 	ZVAL_UNREF(data);
 
 	if (EG(exception)) {
@@ -1357,15 +1357,15 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 		PHALCON_INIT_NVAR(event_name);
 		ZVAL_STRING(event_name, "dispatch:beforeException");
 
-		zval *params[] = {PHALCON_FETCH_VA_ARGS event_name, exception};
-		ret2 = phalcon_call_class_method_aparams(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), PHALCON_CALL_NUM_PARAMS(params), PHALCON_PASS_CALL_PARAMS(params));
+		zval *params[] = {event_name, &exception};
+		ret2 = phalcon_call_class_method_aparams(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 2, params);
 
-		if (ret2 == SUCCESS && PHALCON_IS_FALSE(&status)) {
+		if (ret2 == SUCCESS && PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 	}
 
-	if (ret == FAILURE || PHALCON_IS_FALSE(&status)) {
+	if (ret == FAILURE || PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
 	}
 

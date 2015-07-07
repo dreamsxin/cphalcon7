@@ -29,6 +29,7 @@
 #include "kernel/array.h"
 #include "kernel/concat.h"
 #include "kernel/file.h"
+#include "kernel/operators.h"
 
 /**
  * Phalcon\Assets\Collection

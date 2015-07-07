@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	 * We need to send the data in chunks not exceeding 5,000 bytes.
 	 * Allocate the smart string once to avoid performance penalties.
 	 */
-	smart_str_alloc4(&str, (uint)(size > chunk ? chunk : size), 0, num_bytes);
+	num_bytes = smart_str_alloc(&str, (uint)(size > chunk ? chunk : size), 0);
 
 	while (size > 0) {
 		smart_str_appends(&str, "X-Wf-1-1-1-");
@@ -190,8 +190,8 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		smart_str_0(&str); /* Not strictly necessary but just to be safe */
 
 		/* Send the result */
-		h.line     = str.c;
-		h.line_len = str.len;
+		h.line     = str.s->val;
+		h.line_len = str.s->len;
 		sapi_header_op(SAPI_HEADER_REPLACE, &h);
 
 		ZVAL_LONG(index, Z_LVAL_P(index)+1);
@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		 * Do not free and then reallocate memory. Just pretend the string
 		 * is empty. We will take care of deallocation later.
 		 */
-		str.len = 0;
+		str.s->len = 0;
 	}
 
 	if (separate_index) {

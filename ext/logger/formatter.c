@@ -65,13 +65,13 @@ PHP_METHOD(Phalcon_Logger_Formatter, getTypeString){
 		"NOTICE",    "INFO",     "DEBUG", "CUSTOM", "SPECIAL"
 	};
 
-	zval **type;
+	zval *type;
 	int itype;
 
 	phalcon_fetch_params(0, 1, 0, &type);
 	PHALCON_ENSURE_IS_LONG(type);
 	
-	itype = Z_LVAL_P(*type);
+	itype = Z_LVAL_P(type);
 	if (itype >= 0 && itype < 10) {
 		RETURN_STRING(lut[itype]);
 	}
@@ -88,43 +88,37 @@ PHP_METHOD(Phalcon_Logger_Formatter, getTypeString){
  */
 PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 {
-	zval **message, **context;
+	zval *message, *context;
+	zval replace, *val;
+	zend_string *str_key;
+	ulong idx;
 
 	phalcon_fetch_params(0, 2, 0, &message, &context);
 
-	if (Z_TYPE_P(*context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(*context)) > 0) {
-		zval *replace, *val;
-		zend_string *str_key;
-		ulong idx;
+	if (Z_TYPE_P(context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(context)) > 0) {
+		array_init(&replace);
 
-		PHALCON_ALLOC_GHOST_ZVAL(replace);
-		array_init_size(replace, zend_hash_num_elements(ht));
-
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(*context), idx, str_key, val) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(context), idx, str_key, val) {
 			zval index;
 			char *tmp;
 			uint str_length;
-			ulong num_index;
 
 			if (str_key) {;
-				str_length = spprintf(&tmp, 0, "{%s}", str_key.val);
-				ZVAL_STRINGL(&index, tmp, str_length);
-			} else if (HASH_KEY_IS_LONG == type) {
-				spprintf(index->val, 0, "{%s}", str_key.val);
-				str_length = spprintf(&tmp, 0, "{%ld}", num_index);
+				str_length = spprintf(&tmp, 0, "{%s}", str_key->val);
 				ZVAL_STRINGL(&index, tmp, str_length);
 			} else {
-				continue;
+				str_length = spprintf(&tmp, 0, "{%ld}", idx);
+				ZVAL_STRINGL(&index, tmp, str_length);
 			}
 
 			Z_ADDREF_P(val);
-			zend_hash_add(Z_ARRVAL_P(replace), Z_STR(index), val);
+			zend_hash_add(Z_ARRVAL(replace), Z_STR(index), val);
 			efree(tmp);
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_RETURN_CALL_FUNCTIONW("strtr", *message, replace);
+		PHALCON_RETURN_CALL_FUNCTIONW("strtr", message, &replace);
 		return;
 	}
 
-	RETURN_ZVAL(*message, 1, 0);
+	RETURN_ZVAL(message, 1, 0);
 }

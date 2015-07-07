@@ -155,18 +155,18 @@ PHP_METHOD(Phalcon_Filter, __construct){
  */
 PHP_METHOD(Phalcon_Filter, add){
 
-	zval **name, **handler;
+	zval *name, *handler;
 
 	phalcon_fetch_params(0, 2, 0, &name, &handler);
 
 	PHALCON_ENSURE_IS_STRING(name);
 	
-	if (Z_TYPE_P(*handler) != IS_OBJECT && !phalcon_is_callable(*handler)) {
+	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_filter_exception_ce, "Filter must be an object or callable");
 		return;
 	}
 	
-	phalcon_update_property_array(getThis(), SL("_filters"), *name, *handler);
+	phalcon_update_property_array(getThis(), SL("_filters"), name, handler);
 	RETURN_THISW();
 }
 
@@ -180,13 +180,13 @@ PHP_METHOD(Phalcon_Filter, add){
 PHP_METHOD(Phalcon_Filter, sanitize){
 
 	zval *value, *filters, *norecursive = NULL, *new_value = NULL, *filter = NULL, *array_value = NULL;
-	zval *item_value = NULL, *item_key = NULL, *filter_value = NULL, *sanizited_value = NULL;
-	zval *key = NULL;
+	zval *item_value = NULL, *filter_value = NULL, *sanizited_value = NULL;
+	zend_string *item_key;
 	ulong item_idx;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 2, 1, &value, &filters, &norecursive);
+	phalcon_fetch_params(1, 2, 1, &value, &filters, &norecursive);
 
 	if (!norecursive) {
 		norecursive = &PHALCON_GLOBAL(z_false);
@@ -209,8 +209,8 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(new_value), item_idx, item_key, item_value) {
 						PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filter);
 
-						if (key) {
-							phalcon_array_update_zval(array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
+						if (item_key) {
+							phalcon_array_update_str(array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
 						} else {
 							phalcon_array_update_long(array_value, item_idx, filter_value, PH_COPY | PH_SEPARATE);
 						}
@@ -235,9 +235,13 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		PHALCON_INIT_VAR(sanizited_value);
 		array_init(sanizited_value);
 
-		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(value), key, item_value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), item_idx, item_key, item_value) {
 			PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filters);
-			phalcon_array_update_zval(sanizited_value, key, filter_value, PH_COPY);
+			if (item_key) {
+				phalcon_array_update_str(sanizited_value, item_key, filter_value, PH_COPY);
+			} else {
+				phalcon_array_update_long(sanizited_value, item_idx, filter_value, PH_COPY);
+			}
 		} ZEND_HASH_FOREACH_END();
 	
 	} else {
@@ -381,7 +385,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	
 	if (PHALCON_IS_STRING(filter, "trim")) {
 		PHALCON_INIT_NVAR(filtered);
-		ZVAL_STR(filtered, phalcon_trim(value, NULL, PHALCON_TRIM_BOTH);
+		ZVAL_STR(filtered, phalcon_trim(value, NULL, PHALCON_TRIM_BOTH));
 		goto ph_end_0;
 	}
 	

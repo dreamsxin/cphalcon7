@@ -88,15 +88,15 @@ PHALCON_INIT_CLASS(Phalcon_Queue_Beanstalk_Job){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk_Job, __construct){
 
-	zval **queue, **id, **body;
+	zval *queue, *id, *body;
 
 	phalcon_fetch_params(0, 3, 0, &queue, &id, &body);
-	PHALCON_VERIFY_CLASS_EX(*queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
 	PHALCON_ENSURE_IS_STRING(id);
 
-	phalcon_update_property_this(getThis(), SL("_queue"), *queue);
-	phalcon_update_property_this(getThis(), SL("_id"),    *id   );
-	phalcon_update_property_this(getThis(), SL("_body"),  *body );
+	phalcon_update_property_this(getThis(), SL("_queue"), queue);
+	phalcon_update_property_this(getThis(), SL("_id"),    id   );
+	phalcon_update_property_this(getThis(), SL("_body"),  body );
 }
 
 /**

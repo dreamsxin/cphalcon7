@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
 		if (!zend_is_true(message_str)) {
 			PHALCON_OBSERVE_OR_NULLIFY_VAR(message_str);
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), &message_str, validator, "Confirmation"));
+			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), message_str, validator, "Confirmation"));
 		}
 	
 		PHALCON_OBS_VAR(code);

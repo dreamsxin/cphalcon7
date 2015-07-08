@@ -238,10 +238,9 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getMethods){
 PHP_METHOD(Phalcon_Annotations_Adapter, getMethod){
 
 	zval *class_name, *method_name, *class_annotations = NULL;
-	zval *methods = NULL, *method = NULL, *name = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *methods = NULL, *method = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -323,10 +322,9 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getProperties){
 PHP_METHOD(Phalcon_Annotations_Adapter, getProperty){
 
 	zval *class_name, *property_name, *class_annotations = NULL;
-	zval *properties = NULL, *property = NULL, *name = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *properties = NULL, *property = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

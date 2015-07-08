@@ -118,36 +118,30 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 
 	zval *reflection_data = NULL, *annotations, *annotation_data;
 	zval *annotation = NULL;
-	HashPosition hp0;
-
-	phalcon_fetch_params(0, 0, 1, &reflection_data);
-
-	if (!reflection_data || Z_TYPE_P(reflection_data) == IS_NULL) {
-		return;
-	}
-
-	if (Z_TYPE_P(reflection_data) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Reflection data must be an array");
-		return;
-	}
 
 	PHALCON_MM_GROW();
 
-	PHALCON_INIT_VAR(annotations);
-	array_init_size(annotations, zend_hash_num_elements(Z_ARRVAL_P(reflection_data)));
+	phalcon_fetch_params(1, 0, 1, &reflection_data);
 
-	for (
-		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(reflection_data), &hp0);
-		(annotation_data = zend_hash_get_current_data_ex(Z_ARRVAL_P(reflection_data), &hp0)) != NULL;
-		zend_hash_move_forward_ex(Z_ARRVAL_P(reflection_data), &hp0)
-	) {
-		PHALCON_INIT_NVAR(annotation);
-		object_init_ex(annotation, phalcon_annotations_annotation_ce);
-		PHALCON_CALL_METHOD(NULL, annotation, "__construct", *annotation_data);
-		phalcon_array_append(annotations, annotation, 0);
+	if (reflection_data && Z_TYPE_P(reflection_data) != IS_NULL) {
+		if (Z_TYPE_P(reflection_data) != IS_ARRAY) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Reflection data must be an array");
+			return;
+		}
+
+		PHALCON_INIT_VAR(annotations);
+		array_init(annotations);
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(reflection_data), annotation_data) {
+			PHALCON_INIT_NVAR(annotation);
+			object_init_ex(annotation, phalcon_annotations_annotation_ce);
+			PHALCON_CALL_METHOD(NULL, annotation, "__construct", annotation_data);
+			phalcon_array_append(annotations, annotation, 0);
+		} ZEND_HASH_FOREACH_END();
+
+		phalcon_update_property_this(getThis(), SL("_annotations"), annotations);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_annotations"), annotations);
 	PHALCON_MM_RESTORE();
 }
 
@@ -260,9 +254,6 @@ PHP_METHOD(Phalcon_Annotations_Collection, get){
 
 	zval *name, *annotations, *annotation = NULL, *annotation_name = NULL;
 	zval *exception_message;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -294,9 +285,6 @@ PHP_METHOD(Phalcon_Annotations_Collection, get){
 PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 
 	zval *name, *found, *annotations, *annotation = NULL, *annotation_name = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
@@ -327,9 +315,6 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 PHP_METHOD(Phalcon_Annotations_Collection, has){
 
 	zval *name, *annotations, *annotation = NULL, *annotation_name = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 

@@ -40,40 +40,6 @@
  */
 zend_class_entry *phalcon_translate_adapter_nativearray_ce;
 
-static zend_object_handlers phalcon_translate_adapter_nativearray_object_handlers;
-
-static zval* phalcon_translate_adapter_nativearray_read_dimension(zval *object, zval *offset, int type, zval *rv)
-{
-	zval *translate, *translation;
-
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
-	}
-
-	translate = phalcon_read_property(object, SL("_translate"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&translation, translate, offset)) {
-		return translation;
-	}
-
-	return offset;
-}
-
-static int phalcon_translate_adapter_nativearray_has_dimension(zval *object, zval *offset, int check_empty)
-{
-	zval *translate, *translation;
-
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty);
-	}
-
-	translate = phalcon_read_property(object, SL("_translate"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(&translation, translate, offset)) {
-		return 0;
-	}
-
-	return (1 == check_empty) ? zend_is_true(translation) : 1;
-}
-
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct);
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query);
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, exists);
@@ -99,11 +65,6 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_NativeArray){
 	zend_declare_property_null(phalcon_translate_adapter_nativearray_ce, SL("_translate"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_translate_adapter_nativearray_ce, 1, phalcon_translate_adapterinterface_ce);
-
-	phalcon_translate_adapter_nativearray_object_handlers                = phalcon_translate_adapter_object_handlers;
-	phalcon_translate_adapter_nativearray_object_handlers.read_dimension = phalcon_translate_adapter_nativearray_read_dimension;
-	phalcon_translate_adapter_nativearray_object_handlers.has_dimension  = phalcon_translate_adapter_nativearray_has_dimension;
-
 	return SUCCESS;
 }
 
@@ -134,8 +95,6 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 	}
 	
 	phalcon_update_property_this(getThis(), SL("_translate"), data);
-
-	Z_OBJ_HT_P(getThis()) = &phalcon_translate_adapter_nativearray_object_handlers;
 }
 
 /**
@@ -148,7 +107,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
 	zval *index, *placeholders = NULL, *translate, *translation = NULL;
-	zval *replaced = NULL, *value;
+	zval *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -163,8 +122,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 		translation = index;
 	}
 
-	if (Z_TYPE_P(placeholders) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(placeholders))) {
-
+	if (Z_TYPE_P(placeholders) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
 			zval key, key_placeholder, *replaced = NULL;
 			if (str_key) {
@@ -192,8 +150,14 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, exists){
 
-	zval **index;
+	zval *index, *translate;
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	RETURN_BOOL(phalcon_translate_adapter_nativearray_has_dimension(getThis(), *index, 0));
+
+	translate = phalcon_read_property(getThis(), SL("_translate"), PH_NOISY);
+	if (phalcon_array_isset(translate, index)) {
+		RETURN_TRUE;
+	}
+
+	RETURN_FALSE;
 }

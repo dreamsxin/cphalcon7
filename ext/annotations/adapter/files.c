@@ -113,12 +113,12 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, __construct){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 
-	zval **key, *annotations_dir, *virtual_key, *path;
-
-	phalcon_fetch_params(0, 1, 0, &key);
-	PHALCON_ENSURE_IS_STRING(key);
+	zval *key, *annotations_dir, *virtual_key, *path;
 
 	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 0, &key);
+	PHALCON_ENSURE_IS_STRING(key);
 
 	annotations_dir = phalcon_read_property(getThis(), SL("_annotationsDir"), PH_NOISY);
 	
@@ -126,15 +126,15 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 	 * Paths must be normalized before be used as keys
 	 */
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, annotations_dir, virtual_key, ".php");
 	
 	if (phalcon_file_exists(path) == SUCCESS) {
-		zval *tmp = NULL;
+		zval tmp;
 		RETURN_MM_ON_FAILURE(phalcon_require_ret(&tmp, Z_STRVAL_P(path)));
-		RETVAL_ZVAL(tmp, 1, 1);
+		RETVAL_ZVAL(&tmp, 1, 1);
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -148,15 +148,15 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 
-	zval **key, **data, *annotations_dir;
+	zval *key, *data, *annotations_dir;
 	zval *virtual_key, *path, *php_export;
 	zval *status;
 	smart_str exp = { 0 };
 
-	phalcon_fetch_params(0, 2, 0, &key, &data);
-	PHALCON_ENSURE_IS_STRING(key);
-
 	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 2, 0, &key, &data);
+	PHALCON_ENSURE_IS_STRING(key);
 
 	annotations_dir = phalcon_read_property(getThis(), SL("_annotationsDir"), PH_NOISY);
 	
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	 * Paths must be normalized before be used as keys
 	 */
 	PHALCON_INIT_VAR(virtual_key);
-	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(*key), Z_STRLEN_P(*key), '_');
+	phalcon_prepare_virtual_path_ex(virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 	
 	PHALCON_INIT_VAR(path);
 	PHALCON_CONCAT_VVS(path, annotations_dir, virtual_key, ".php");
@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	smart_str_0(&exp);
 	
 	PHALCON_INIT_VAR(php_export);
-	ZVAL_STRINGL(php_export, exp.c, exp.len);
+	ZVAL_STR(php_export, exp.s);
 	
 	PHALCON_INIT_VAR(status);
 	phalcon_file_put_contents(status, path, php_export);

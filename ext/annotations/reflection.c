@@ -144,11 +144,10 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 
 	zval *annotations, *reflection_data, *reflection_methods;
-	zval *reflection_method = NULL, *method_name = NULL;
+	zval *reflection_method = NULL;
 	zval *collection = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -196,11 +195,10 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 
 	zval *annotations, *reflection_data, *reflection_properties;
-	zval *reflection_property = NULL, *property = NULL;
+	zval *reflection_property = NULL;
 	zval *collection = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -213,7 +211,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 			if (phalcon_fast_count_ev(reflection_properties)) {
 				array_init(return_value);
 
-				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(all_attributes), idx, str_key, reflection_property) {
+				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(reflection_properties), idx, str_key, reflection_property) {
 					zval property;
 					if (str_key) {
 						ZVAL_STR(&property, str_key);

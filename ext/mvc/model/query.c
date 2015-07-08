@@ -2545,7 +2545,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getOrderClause){
 		PHALCON_CPY_WRT(order_columns, order);
 	}
 
-	array_init_size(return_value, zend_hash_num_elements(ah0));
+	array_init(return_value);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(order_columns), order_item) {
 		PHALCON_OBS_NVAR(order_column);
@@ -2598,7 +2598,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getGroupClause){
 		/** 
 		 * The select is grouped by several columns
 		 */
-		array_init_size(return_value, zend_hash_num_elements(ah0));
+		array_init(return_value);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(group), group_item) {
 			PHALCON_CALL_METHOD(&group_part_expr, getThis(), "_getexpression", group_item);

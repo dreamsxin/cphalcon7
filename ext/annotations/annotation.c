@@ -101,19 +101,16 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 
 	zval *reflection_data, *name = NULL, *arguments, *expr_arguments;
 	zval *argument = NULL, *expr = NULL, *resolved_argument = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &reflection_data);
-	
+
 	if (Z_TYPE_P(reflection_data) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Reflection data must be an array");
 		return;
 	}
-	
+
 	PHALCON_OBS_VAR(name);
 	phalcon_array_fetch_string(&name, reflection_data, SL("name"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_name"), name);
@@ -123,7 +120,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	 */
 	if (phalcon_array_isset_string_fetch(&expr_arguments, reflection_data, SS("arguments"))) {
 		PHALCON_INIT_VAR(arguments);
-		array_init_size(arguments, zend_hash_num_elements(ah0));
+		array_init(arguments);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(expr_arguments), argument) {
 			zval *n;
@@ -167,14 +164,10 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
 	zval *expr = NULL, *type, *items, *item = NULL;
 	zval *resolved_item = NULL, *exception_message;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &expr);
-	
+	phalcon_fetch_params(1, 1, 0, &expr);	
 	PHALCON_SEPARATE_PARAM(expr);
 	
 	if (Z_TYPE_P(expr) != IS_ARRAY) { 
@@ -211,7 +204,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 			PHALCON_OBS_VAR(items);
 			phalcon_array_fetch_string(&items, expr, SL("items"), PH_NOISY);
 
-			array_init_size(return_value, zend_hash_num_elements(ah0));
+			array_init(return_value);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(items), item) {
 				zval *name;

@@ -327,13 +327,12 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 #endif
 
 	if (encode) {
-		int encoded_len;
 		zend_string *encoded = php_base64_encode((unsigned char*)result, i_bytes);
 		if (encoded) {
 			assert(encoded->len >= i_bytes);
 			php_strtr(encoded->val, encoded->len, "+=", "./", 2);
 			encoded->val[i_bytes] = 0;
-			RETVAL_STRINGL(encoded->val, i_bytes, 0);
+			RETVAL_STRINGL(encoded->val, i_bytes);
 		} else {
 			RETVAL_FALSE;
 		}
@@ -354,7 +353,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
  */
 PHP_METHOD(Phalcon_Security, hash)
 {
-	zval *password, *work_factor = NULL, *tmp, *n_bytes, *salt_bytes = NULL, *default_hash;
+	zval *password, *work_factor = NULL, *n_bytes, *salt_bytes = NULL, *default_hash;
 	zval z_salt;
 	char variant;
 	char *salt;
@@ -366,8 +365,7 @@ PHP_METHOD(Phalcon_Security, hash)
 	PHALCON_ENSURE_IS_STRING(password);
 
 	if (!work_factor || Z_TYPE_P(work_factor) == IS_NULL) {
-		tmp         = phalcon_read_property(getThis(), SL("_workFactor"), PH_NOISY);
-		work_factor = &tmp;
+		work_factor = phalcon_read_property(getThis(), SL("_workFactor"), PH_NOISY);
 	}
 
 	i_factor = (Z_TYPE_P(work_factor) == IS_LONG) ? Z_LVAL_P(work_factor) : phalcon_get_intval(work_factor);
@@ -569,34 +567,33 @@ PHP_METHOD(Phalcon_Security, hash)
  */
 PHP_METHOD(Phalcon_Security, checkHash){
 
-	zval **password, **password_hash, **max_pass_length = NULL, *hash = NULL;
+	zval *password, *password_hash, *max_pass_length = NULL, *hash = NULL;
 	zval *params[2];
 	int check = 0;
 
 	phalcon_fetch_params(0, 2, 1, &password, &password_hash, &max_pass_length);
-
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(password_hash);
 
 	if (max_pass_length) {
 		PHALCON_ENSURE_IS_LONG(max_pass_length);
-		if (Z_LVAL_P(*max_pass_length) > 0 && Z_STRLEN_P(*password) > Z_LVAL_P(*max_pass_length)) {
+		if (Z_LVAL_P(max_pass_length) > 0 && Z_STRLEN_P(password) > Z_LVAL_P(max_pass_length)) {
 			RETURN_FALSE;
 		}
 	}
 
-	params[0] = *password;
-	params[1] = *password_hash;
+	params[0] = password;
+	params[1] = password_hash;
 	RETURN_ON_FAILURE(phalcon_call_func_aparams(&hash, SL("crypt"), 2, params));
 
 	if (UNEXPECTED(Z_TYPE_P(hash) != IS_STRING)) {
 		convert_to_string(hash);
 	}
 
-	if (Z_STRLEN_P(hash) == Z_STRLEN_P(*password_hash)) {
+	if (Z_STRLEN_P(hash) == Z_STRLEN_P(password_hash)) {
 		int n    = Z_STRLEN_P(hash);
 		char *h1 = Z_STRVAL_P(hash);
-		char *h2 = Z_STRVAL_P(*password_hash);
+		char *h2 = Z_STRVAL_P(password_hash);
 
 		while (n) {
 			check |= ((unsigned int)*h1) ^ ((unsigned int)*h2);
@@ -873,15 +870,15 @@ PHP_METHOD(Phalcon_Security, destroyToken){
  */
 PHP_METHOD(Phalcon_Security, computeHmac)
 {
-	zval **data, **key, **algo, **raw = NULL;
+	zval *data, *key, *algo, *raw = NULL;
 
 	phalcon_fetch_params(0, 3, 1, &data, &key, &algo, &raw);
 
 	if (!raw) {
-		raw = &(&PHALCON_GLOBAL(z_false));
+		raw = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_RETURN_CALL_FUNCTIONW("hash_hmac", *algo, *data, *key, *raw);
+	PHALCON_RETURN_CALL_FUNCTIONW("hash_hmac", algo, data, key, raw);
 }
 
 /**
@@ -890,7 +887,7 @@ PHP_METHOD(Phalcon_Security, computeHmac)
  */
 PHP_METHOD(Phalcon_Security, pbkdf2)
 {
-	zval **password, **salt, **hash = NULL, **iterations = NULL, **size = NULL;
+	zval *password, *salt, *hash = NULL, *iterations = NULL, *size = NULL;
 	char* s_hash;
 	int i_iterations = 0, i_size = 0;
 
@@ -899,16 +896,16 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(salt);
 
-	if (Z_STRLEN_P(*salt) > INT_MAX - 4) {
-		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_P(*salt));
+	if (Z_STRLEN_P(salt) > INT_MAX - 4) {
+		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_P(salt));
 		return;
 	}
 
-	s_hash = (!hash || Z_TYPE_P(*hash) != IS_STRING) ? "sha512" : Z_STRVAL_P(*hash);
+	s_hash = (!hash || Z_TYPE_P(hash) != IS_STRING) ? "sha512" : Z_STRVAL_P(hash);
 
 	if (iterations) {
 		PHALCON_ENSURE_IS_LONG(iterations);
-		i_iterations = Z_LVAL_P(*iterations);
+		i_iterations = Z_LVAL_P(iterations);
 	}
 
 	if (i_iterations <= 0) {
@@ -917,7 +914,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 
 	if (size) {
 		PHALCON_ENSURE_IS_LONG(size);
-		i_size = Z_LVAL_P(*size);
+		i_size = Z_LVAL_P(size);
 	}
 
 	if (i_size < 0) {
@@ -927,7 +924,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 	{
 		zval *algo, *tmp = NULL, *K1 = NULL, *K2 = NULL, *computed_salt, *result;
 		int i_hash_len, block_count, i, j, k;
-		int salt_len = Z_STRLEN_P(*salt);
+		int salt_len = Z_STRLEN_P(salt);
 		char *s;
 		div_t d;
 
@@ -949,7 +946,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		PHALCON_INIT_VAR(computed_salt);
 		s = safe_emalloc(salt_len, 1, 5);
 		s[salt_len + 4] = 0;
-		memcpy(s, Z_STRVAL_P(*salt), salt_len);
+		memcpy(s, Z_STRVAL_P(salt), salt_len);
 		ZVAL_STRINGL(computed_salt, s, salt_len + 4);
 
 		PHALCON_INIT_VAR(result);
@@ -964,7 +961,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 			s[salt_len+2] = (unsigned char)(i >> 8);
 			s[salt_len+3] = (unsigned char)(i);
 
-			PHALCON_CALL_FUNCTION(&K1, "hash_hmac", algo, computed_salt, *password, &PHALCON_GLOBAL(z_true));
+			PHALCON_CALL_FUNCTION(&K1, "hash_hmac", algo, computed_salt, password, &PHALCON_GLOBAL(z_true));
             if (Z_TYPE_P(K1) != IS_STRING) {
                 RETURN_MM_FALSE;
             }
@@ -974,7 +971,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 			for (j = 1; j < i_iterations; ++j) {
 				char *k1, *k2;
 
-				PHALCON_CALL_FUNCTION(&tmp, "hash_hmac", algo, K1, *password, &PHALCON_GLOBAL(z_true));
+				PHALCON_CALL_FUNCTION(&tmp, "hash_hmac", algo, K1, password, &PHALCON_GLOBAL(z_true));
                 if (Z_TYPE_P(tmp) != IS_STRING) {
                     RETURN_MM_FALSE;
                 }
@@ -992,7 +989,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		}
 
 		if (i_size == i_hash_len) {
-			RETVAL_STRINGL(Z_STRVAL_P(result), Z_STRLEN_P(result), 0);
+			RETVAL_STRINGL(Z_STRVAL_P(result), Z_STRLEN_P(result));
 			ZVAL_NULL(result);
 		}
 		else {
@@ -1015,7 +1012,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
  */
 PHP_METHOD(Phalcon_Security, deriveKey)
 {
-	zval **password, **salt, **hash = NULL, **iterations = NULL, **size = NULL;
+	zval *password, *salt, *hash = NULL, *iterations = NULL, *size = NULL;
 	char* s_hash;
 	int i_iterations = 0, i_size = 0;
 
@@ -1024,16 +1021,16 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(salt);
 
-	if (Z_STRLEN_P(*salt) > INT_MAX - 4) {
-		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_P(*salt));
+	if (Z_STRLEN_P(salt) > INT_MAX - 4) {
+		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_P(salt));
 		return;
 	}
 
-	s_hash = (!hash || Z_TYPE_P(*hash) != IS_STRING) ? "sha512" : Z_STRVAL_P(*hash);
+	s_hash = (!hash || Z_TYPE_P(hash) != IS_STRING) ? "sha512" : Z_STRVAL_P(hash);
 
 	if (iterations) {
 		PHALCON_ENSURE_IS_LONG(iterations);
-		i_iterations = Z_LVAL_P(*iterations);
+		i_iterations = Z_LVAL_P(iterations);
 	}
 
 	if (i_iterations <= 0) {
@@ -1042,7 +1039,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 
 	if (size) {
 		PHALCON_ENSURE_IS_LONG(size);
-		i_size = Z_LVAL_P(*size);
+		i_size = Z_LVAL_P(size);
 	}
 
 	if (i_size < 0) {
@@ -1061,8 +1058,8 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	ZVAL_LONG(len, i_size);
 
 	{
-		zval *params[] = { algo, *password, *salt, iter, len, &PHALCON_GLOBAL(z_true) };
-		if (FAILURE == phalcon_call_func_aparams(return_value, SL("hash_pbkdf2"), 6, params)) {
+		zval *params[] = { algo, password, salt, iter, len, &PHALCON_GLOBAL(z_true) };
+		if (FAILURE == phalcon_call_func_aparams(&return_value, SL("hash_pbkdf2"), 6, params)) {
 			;
 		}
 	}
@@ -1077,12 +1074,12 @@ PHP_METHOD(Phalcon_Security, deriveKey)
  */
 PHP_METHOD(Phalcon_Security, setDefaultHash)
 {
-	zval **default_hash;
+	zval *default_hash;
 
 	phalcon_fetch_params(0, 1, 0, &default_hash);
 	PHALCON_ENSURE_IS_LONG(default_hash);
 
-	phalcon_update_property_this(getThis(), SL("_defaultHash"), *default_hash);
+	phalcon_update_property_this(getThis(), SL("_defaultHash"), default_hash);
 }
 
 /**

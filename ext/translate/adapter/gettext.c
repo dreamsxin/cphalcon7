@@ -40,47 +40,6 @@
  */
 zend_class_entry *phalcon_translate_adapter_gettext_ce;
 
-static zend_object_handlers phalcon_translate_adapter_gettext_object_handlers;
-
-static zval* phalcon_translate_adapter_gettext_read_dimension(zval *object, zval *offset, int type, zval *rv)
-{
-	zval *translation = NULL, *params[1];
-	uint32_t result;
-
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->read_dimension(object, offset, type, rv);
-	}
-
-	params[0] = offset;
-	result = phalcon_call_func_aparams(&translation, SL("gettext"), 1, params);
-
-	if (result) {
-		PHALCON_ALLOC_GHOST_ZVAL(translation);
-		ZVAL_NULL(translation)
-	}
-
-	return translation;
-}
-
-static int phalcon_translate_adapter_gettext_has_dimension(zval *object, zval *offset, int check_empty)
-{
-	zval translation, *params[1];
-	uint32_t result;
-
-	if (!is_phalcon_class(Z_OBJCE_P(object))) {
-		return zend_get_std_object_handlers()->has_dimension(object, offset, check_empty);
-	}
-
-	params[0] = offset;
-	result = phalcon_call_func_aparams(&translation, SL("gettext"), 1, params);
-
-	if (result) {
-		return 0;
-	}
-
-	return (1 == check_empty) ? Z_STRLEN(translation) : 1;
-}
-
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct);
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query);
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, exists);
@@ -109,10 +68,6 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_Gettext){
 
 	zend_class_implements(phalcon_translate_adapter_gettext_ce, 1, phalcon_translate_adapterinterface_ce);
 
-	phalcon_translate_adapter_gettext_object_handlers                = phalcon_translate_adapter_object_handlers;
-	phalcon_translate_adapter_gettext_object_handlers.read_dimension = phalcon_translate_adapter_gettext_read_dimension;
-	phalcon_translate_adapter_gettext_object_handlers.has_dimension  = phalcon_translate_adapter_gettext_has_dimension;
-
 	return SUCCESS;
 }
 
@@ -124,10 +79,9 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_Gettext){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 
-	zval *options, *locale, *constant, *default_domain, *directory, *setting, *key = NULL, *value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *options, *locale, *constant, *default_domain, *directory, *setting, *value = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -195,10 +149,9 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 
 	zval *index, *placeholders = NULL, *domain = NULL;
-	zval *translation = NULL, *key = NULL, *value = NULL, *key_placeholder = NULL, *replaced = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *translation = NULL, *value = NULL, *key_placeholder = NULL, *replaced = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Flash_Session, message){
 		array_init(messages);
 	}
 	
-	phalcon_array_append_multi_2(&messages, type, message, 0);
+	phalcon_array_append_multi_2(messages, type, message, 0);
 	PHALCON_CALL_METHOD(NULL, getThis(), "_setsessionmessages", messages);
 	
 	PHALCON_MM_RESTORE();
@@ -244,10 +244,9 @@ PHP_METHOD(Phalcon_Flash_Session, getMessages){
  */
 PHP_METHOD(Phalcon_Flash_Session, output){
 
-	zval *type = NULL, *remove = NULL, *messages = NULL, *message_type = NULL, *message = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *type = NULL, *remove = NULL, *messages = NULL, *message = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

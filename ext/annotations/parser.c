@@ -28,9 +28,9 @@ static zval *phannot_ret_literal_zval(int type, phannot_parser_token *T)
 
 	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
-	add_assoc_long(ret, phalcon_interned_type, type);
+	add_assoc_long(ret, ISV(type), type);
 	if (T) {
-		add_assoc_stringl(ret, phalcon_interned_value, T->token, T->token_len, 0);
+		add_assoc_stringl(ret, ISV(value), T->token, T->token_len);
 		efree(T);
 	}
 
@@ -43,10 +43,10 @@ static zval *phannot_ret_array(zval *items)
 
 	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
-	add_assoc_long(ret, phalcon_interned_type, PHANNOT_T_ARRAY);
+	add_assoc_long(ret, ISV(type), PHANNOT_T_ARRAY);
 
 	if (items) {
-		add_assoc_zval(ret, phalcon_interned_items, items);
+		add_assoc_zval(ret, ISV(items), items);
 	}
 
 	return ret;
@@ -95,9 +95,9 @@ static zval *phannot_ret_named_item(phannot_parser_token *name, zval *expr)
 
 	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 2);
-	add_assoc_zval(ret, phalcon_interned_expr, expr);
+	add_assoc_zval(ret, ISV(expr), expr);
 	if (name != NULL) {
-		add_assoc_stringl(ret, phalcon_interned_name, name->token, name->token_len, 0);
+		add_assoc_stringl(ret, ISV(name), name->token, name->token_len);
 		efree(name);
 	}
 
@@ -111,19 +111,19 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 	PHALCON_ALLOC_GHOST_ZVAL(ret);
 	array_init_size(ret, 5);
 
-	add_assoc_long(ret, phalcon_interned_type, PHANNOT_T_ANNOTATION);
+	add_assoc_long(ret, ISV(type), PHANNOT_T_ANNOTATION);
 
 	if (name) {
-		add_assoc_stringl(ret, phalcon_interned_name, name->token, name->token_len, 0);
+		add_assoc_stringl(ret, ISV(name), name->token, name->token_len);
 		efree(name);
 	}
 
 	if (arguments) {
-		add_assoc_zval(ret, phalcon_interned_arguments, arguments);
+		add_assoc_zval(ret, ISV(arguments), arguments);
 	}
 
-	add_assoc_string(ret, phalcon_interned_file, (char*)state->active_file, !IS_INTERNED(state->active_file));
-	add_assoc_long(ret, phalcon_interned_line, state->active_line);
+	add_assoc_string(ret, ISV(file), (char*)state->active_file);
+	add_assoc_long(ret, ISV(line), state->active_line);
 
 	return ret;
 }
@@ -506,7 +506,7 @@ static void jj_destructor(JJCODETYPE jjmajor, JJMINORTYPE *jjpminor){
     case 24:
     case 25:
 /* #line 211 "parser.y" */
-{ zval_ptr_dtor(jjpminor->jj36); }
+{ zval_ptr_dtor((jjpminor->jj36)); }
 /* #line 511 "parser.c" */
       break;
     default:  break;   /* If no destructor action specified: do nothing */
@@ -1262,13 +1262,13 @@ static void phannot_scanner_error_msg(phannot_parser_status *parser_status, char
 /**
  * Receives the comment tokenizes and parses it
  */
-int phannot_parse_annotations(zval *result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line){
+int phannot_parse_annotations(zval *result, zend_string *comment, const char *file_path, uint32_t line){
 
 	char *error_msg = NULL;
 
 	ZVAL_NULL(result);
 
-	if (phannot_internal_parse_annotations(&result, comment, comment_len, file_path, line, &error_msg) == FAILURE) {
+	if (phannot_internal_parse_annotations(&result, comment, file_path, line, &error_msg) == FAILURE) {
 		if (likely(error_msg != NULL)) {
 			zend_throw_exception_ex(phalcon_annotations_exception_ce, 0, "%s", error_msg);
 			efree(error_msg);
@@ -1286,18 +1286,17 @@ int phannot_parse_annotations(zval *result, const char *comment, uint32_t commen
 /**
  * Remove comment separators from a docblock
  */
-static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, const char *comment, uint32_t length, uint32_t *start_lines)
+static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, zend_string *comment, uint32_t *start_lines)
 {
-	int start_mode = 1, open_parentheses;
-	uint32_t i, j;
+	int start_mode = 1, j, i, open_parentheses;
 	smart_str processed_str = {0};
 	char ch;
 
 	(*start_lines) = 0;
 
-	for (i = 0; i < length; i++) {
+	for (i = 0; i < comment->len; i++) {
 
-		ch = comment[i];
+		ch = comment->val[i];
 
 		if (start_mode) {
 			if (ch == ' ' || ch == '*' || ch == '/' || ch == '\t' || ch == 11) {
@@ -1312,9 +1311,9 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, con
 			i++;
 
 			open_parentheses = 0;
-			for (j = i; j < length; j++) {
+			for (j = i; j < comment->len; j++) {
 
-				ch = comment[j];
+				ch = comment->val[j];
 
 				if (start_mode) {
 					if (ch == ' ' || ch == '*' || ch == '/' || ch == '\t' || ch == 11) {
@@ -1380,7 +1379,7 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, con
 /**
  * Parses a comment returning an intermediate array representation
  */
-int phannot_internal_parse_annotations(zval **result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line, char **error_msg)
+int phannot_internal_parse_annotations(zval **result, zend_string *comment, const char *file_path, uint32_t line, char **error_msg)
 {
 	phannot_scanner_state *state;
 	phannot_scanner_token token;
@@ -1402,7 +1401,7 @@ int phannot_internal_parse_annotations(zval **result, const char *comment, uint3
 		return FAILURE;
 	}
 
-	if (comment_len < 2) {
+	if (comment->len < 2) {
 		ZVAL_BOOL(*result, 0);
 		return SUCCESS;
 	}
@@ -1410,7 +1409,7 @@ int phannot_internal_parse_annotations(zval **result, const char *comment, uint3
 	/**
 	 * Remove comment separators
 	 */
-	phannot_remove_comment_separators(&processed_comment, &processed_comment_len, comment, comment_len, &start_lines);
+	phannot_remove_comment_separators(&processed_comment, &processed_comment_len, comment, &start_lines);
 
 	if (processed_comment_len < 2) {
 		ZVAL_BOOL(*result, 0);

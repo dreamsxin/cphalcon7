@@ -50,18 +50,6 @@
  */
 zend_class_entry *phalcon_di_service_ce;
 
-static zend_object_handlers phalcon_di_service_object_handlers;
-
-typedef struct _phalcon_di_service_object {
-	zend_object obj;
-	const char *name;
-	zval *definition;
-	zval *shared_instance;
-	size_t name_len;
-	zend_bool shared;
-	zend_bool resolved;
-} phalcon_di_service_object;
-
 PHP_METHOD(Phalcon_DI_Service, __construct);
 PHP_METHOD(Phalcon_DI_Service, getName);
 PHP_METHOD(Phalcon_DI_Service, setShared);
@@ -256,9 +244,8 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 		if (instanceof_function_ex(Z_OBJCE_P(definition), zend_ce_closure, 0)) {
 			if (Z_TYPE_P(parameters) == IS_ARRAY) {
 				PHALCON_CALL_USER_FUNC_ARRAY(&instance, definition, parameters);
-			}
-			else {
-				PHALCON_CALL_USER_FUNC(instance, definition);
+			} else {
+				PHALCON_CALL_USER_FUNC(&instance, definition);
 			}
 		} else {
 			PHALCON_CPY_WRT(instance, definition);
@@ -346,7 +333,7 @@ PHP_METHOD(Phalcon_DI_Service, getParameter){
 	phalcon_fetch_params(0, 1, 0, &position);
 	PHALCON_ENSURE_IS_LONG(position);
 
-	definition = phalcon_read_property(getThis(), SL("_definition"));
+	definition = phalcon_read_property(getThis(), SL("_definition"), PH_NOISY);
 	if (Z_TYPE_P(definition) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_di_exception_ce, "Definition must be an array to obtain its parameters");
 		return;

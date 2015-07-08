@@ -96,21 +96,20 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	PHALCON_INIT_VAR(annotations);
 	array_init(annotations);
 
-	file = phalcon_get_class_filename(class_ce);
+	file = ZSTR_VAL(phalcon_get_class_filename(class_ce));
 	if (!file) {
 		file = "(unknown)";
 	}
 
 	/* Class info */
 	{
-		const char *cmt;
-		uint32_t cmt_len;
+		zend_string *cmt;
 
-		if (phalcon_get_class_doc_comment(class_ce, &cmt, &cmt_len)) {
+		if ((cmt = phalcon_get_class_doc_comment(class_ce)) != NULL) {
 			line = phalcon_get_class_startline(class_ce);
 
 			PHALCON_INIT_VAR(class_annotations);
-			RETURN_MM_ON_FAILURE(phannot_parse_annotations(class_annotations, cmt, cmt_len, file, line));
+			RETURN_MM_ON_FAILURE(phannot_parse_annotations(class_annotations, cmt, file, line));
 
 			if (Z_TYPE_P(class_annotations) == IS_ARRAY) {
 				phalcon_array_update_string(annotations, SL("class"), class_annotations, PH_COPY);
@@ -133,14 +132,13 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 				(property = zend_hash_get_current_data_ptr_ex(props, &hp)) != NULL;
 				zend_hash_move_forward_ex(props, &hp)
 			) {
-				const char *cmt;
-				uint32_t cmt_len;
+				zend_string *cmt;
 
-				if (phalcon_get_property_doc_comment(property, &cmt, &cmt_len)) {
+				if ((cmt = phalcon_get_property_doc_comment(property)) != NULL) {
 					zval *property_annotations;
 
 					PHALCON_ALLOC_GHOST_ZVAL(property_annotations);
-					if (FAILURE == phannot_parse_annotations(property_annotations, cmt, cmt_len, file, 0)) {
+					if (FAILURE == phannot_parse_annotations(property_annotations, cmt, file, 0)) {
 						zval_ptr_dtor(property_annotations);
 						RETURN_MM();
 					}
@@ -177,22 +175,21 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 				(method = zend_hash_get_current_data_ptr_ex(methods, &hp)) != NULL;
 				zend_hash_move_forward_ex(methods, &hp)
 			) {
-				const char *cmt;
-				uint32_t cmt_len;
+				zend_string *cmt;
 
-				if (phalcon_get_function_doc_comment(method, &cmt, &cmt_len)) {
+				if ((cmt = phalcon_get_function_doc_comment(method)) != NULL) {
 					zval *method_annotations;
 
 					line = phalcon_get_function_startline(method);
 
 					PHALCON_ALLOC_GHOST_ZVAL(method_annotations);
-					if (FAILURE == phannot_parse_annotations(method_annotations, cmt, cmt_len, file, line)) {
+					if (FAILURE == phannot_parse_annotations(method_annotations, cmt, file, line)) {
 						zval_ptr_dtor(method_annotations);
 						RETURN_MM();
 					}
 
 					if (Z_TYPE_P(method_annotations) == IS_ARRAY) {
-						add_assoc_zval_ex(annotations_methods, method->common.function_name, strlen(method->common.function_name) + 1, method_annotations);
+						add_assoc_zval_ex(annotations_methods, method->common.function_name->val, method->common.function_name->len + 1, method_annotations);
 					}
 					else {
 						zval_ptr_dtor(method_annotations);
@@ -219,7 +216,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
  */
 PHP_METHOD(Phalcon_Annotations_Reader, parseDocBlock)
 {
-	zval **doc_block, **file = NULL, **line = NULL;
+	zval *doc_block, *file = NULL, *line = NULL;
 
 	phalcon_fetch_params(0, 3, 0, &doc_block, &file, &line);
 
@@ -227,5 +224,5 @@ PHP_METHOD(Phalcon_Annotations_Reader, parseDocBlock)
 	PHALCON_ENSURE_IS_STRING(file);
 	PHALCON_ENSURE_IS_LONG(line);
 
-	RETURN_ON_FAILURE(phannot_parse_annotations(return_value, Z_STRVAL_P(*doc_block), Z_STRLEN_P(*doc_block), Z_STRVAL_P(*file), Z_LVAL_P(*line)));
+	RETURN_ON_FAILURE(phannot_parse_annotations(return_value, Z_STR_P(doc_block), Z_STRVAL_P(file), Z_LVAL_P(line)));
 }

@@ -98,13 +98,13 @@ static void phannot_scanner_error_msg(phannot_parser_status *parser_status, char
 /**
  * Receives the comment tokenizes and parses it
  */
-int phannot_parse_annotations(zval *result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line){
+int phannot_parse_annotations(zval *result, zend_string *comment, const char *file_path, uint32_t line){
 
 	char *error_msg = NULL;
 
 	ZVAL_NULL(result);
 
-	if (phannot_internal_parse_annotations(&result, comment, comment_len, file_path, line, &error_msg) == FAILURE) {
+	if (phannot_internal_parse_annotations(&result, comment, file_path, line, &error_msg) == FAILURE) {
 		if (likely(error_msg != NULL)) {
 			zend_throw_exception_ex(phalcon_annotations_exception_ce, 0, "%s", error_msg);
 			efree(error_msg);
@@ -122,7 +122,7 @@ int phannot_parse_annotations(zval *result, const char *comment, uint32_t commen
 /**
  * Remove comment separators from a docblock
  */
-static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, const char *comment, uint32_t length, uint32_t *start_lines)
+static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, zend_string *comment, uint32_t *start_lines)
 {
 	int start_mode = 1, j, i, open_parentheses;
 	smart_str processed_str = {0};
@@ -130,9 +130,9 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, con
 
 	(*start_lines) = 0;
 
-	for (i = 0; i < length; i++) {
+	for (i = 0; i < comment->len; i++) {
 
-		ch = comment[i];
+		ch = comment->val[i];
 
 		if (start_mode) {
 			if (ch == ' ' || ch == '*' || ch == '/' || ch == '\t' || ch == 11) {
@@ -147,9 +147,9 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, con
 			i++;
 
 			open_parentheses = 0;
-			for (j = i; j < length; j++) {
+			for (j = i; j < comment->len; j++) {
 
-				ch = comment[j];
+				ch = comment->val[j];
 
 				if (start_mode) {
 					if (ch == ' ' || ch == '*' || ch == '/' || ch == '\t' || ch == 11) {
@@ -215,7 +215,7 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, con
 /**
  * Parses a comment returning an intermediate array representation
  */
-int phannot_internal_parse_annotations(zval **result, const char *comment, uint32_t comment_len, const char *file_path, uint32_t line, char **error_msg)
+int phannot_internal_parse_annotations(zval **result, zend_string *comment, const char *file_path, uint32_t line, char **error_msg)
 {
 	phannot_scanner_state *state;
 	phannot_scanner_token token;
@@ -237,7 +237,7 @@ int phannot_internal_parse_annotations(zval **result, const char *comment, uint3
 		return FAILURE;
 	}
 
-	if (comment_len < 2) {
+	if (comment->len < 2) {
 		ZVAL_BOOL(*result, 0);
 		return SUCCESS;
 	}
@@ -245,7 +245,7 @@ int phannot_internal_parse_annotations(zval **result, const char *comment, uint3
 	/**
 	 * Remove comment separators
 	 */
-	phannot_remove_comment_separators(&processed_comment, &processed_comment_len, comment, comment_len, &start_lines);
+	phannot_remove_comment_separators(&processed_comment, &processed_comment_len, comment, &start_lines);
 
 	if (processed_comment_len < 2) {
 		ZVAL_BOOL(*result, 0);

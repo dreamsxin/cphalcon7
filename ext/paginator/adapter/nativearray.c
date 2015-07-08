@@ -123,12 +123,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage){
 
-	zval **current_page;
+	zval *current_page;
 
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
 	
-	phalcon_update_property_this(getThis(), SL("_page"), *current_page);
+	phalcon_update_property_this(getThis(), SL("_page"), current_page);
 	RETURN_THISW();
 }
 

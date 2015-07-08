@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 2, &event_name, &data, &cancelable);
-	PHALCON_ENSURE_IS_STRING(&event_name);
+	PHALCON_ENSURE_IS_STRING(event_name);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 2, &event_name, &data, &cancelable);
-	PHALCON_ENSURE_IS_STRING(&event_name);
+	PHALCON_ENSURE_IS_STRING(event_name);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
  */
 PHP_METHOD(Phalcon_DI_Injectable, __get){
 
-	zval **property_name, *dependency_injector = NULL;
+	zval *property_name, *dependency_injector = NULL;
 	zval *has_service = NULL, *service = NULL, *class_name, *arguments, *result = NULL;
 
 	phalcon_fetch_params(0, 1, 0, &property_name);
@@ -295,16 +295,16 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 		}
 	}
 
-	PHALCON_CALL_METHOD(&has_service, dependency_injector, "has", *property_name);
+	PHALCON_CALL_METHOD(&has_service, dependency_injector, "has", property_name);
 	if (zend_is_true(has_service)) {
-		PHALCON_CALL_METHOD(&result, dependency_injector, "getshared", *property_name);
-		phalcon_update_property_zval(getThis(), Z_STRVAL_P(*property_name), Z_STRLEN_P(*property_name), result);
+		PHALCON_CALL_METHOD(&result, dependency_injector, "getshared", property_name);
+		phalcon_update_property_zval(getThis(), Z_STRVAL_P(property_name), Z_STRLEN_P(property_name), result);
 		RETURN_CTOR(result);
 	}
 
-	assert(Z_TYPE_P(*property_name) == IS_STRING);
+	assert(Z_TYPE_P(property_name) == IS_STRING);
 
-	if (Z_STRLEN_P(*property_name) == sizeof("di")-1 && !memcmp(Z_STRVAL_P(*property_name), "di", sizeof("di")-1)) {
+	if (Z_STRLEN_P(property_name) == sizeof("di")-1 && !memcmp(Z_STRVAL_P(property_name), "di", sizeof("di")-1)) {
 		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("di"), dependency_injector);
 		RETURN_CTOR(dependency_injector);
 	}
@@ -312,7 +312,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	/**
 	 * Accessing the persistent property will create a session bag in any class
 	 */
-	if (Z_STRLEN_P(*property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(*property_name), "persistent", sizeof("persistent")-1)) {
+	if (Z_STRLEN_P(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(property_name), "persistent", sizeof("persistent")-1)) {
 		const char *cn = Z_OBJCE_P(getThis())->name->val;
 
 		PHALCON_ALLOC_GHOST_ZVAL(class_name);
@@ -333,6 +333,6 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	/**
 	 * A notice is shown if the property is not defined or is not a valid service
 	 */
-	php_error_docref(NULL, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name->val, Z_STRVAL_P(*property_name));
+	php_error_docref(NULL, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name->val, Z_STRVAL_P(property_name));
 	RETURN_MM_NULL();
 }

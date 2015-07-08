@@ -42,8 +42,6 @@
  */
 zend_class_entry *phalcon_session_adapter_ce;
 
-static zend_object_handlers phalcon_session_adapter_object_handlers;
-
 PHP_METHOD(Phalcon_Session_Adapter, __construct);
 PHP_METHOD(Phalcon_Session_Adapter, __destruct);
 PHP_METHOD(Phalcon_Session_Adapter, start);
@@ -289,7 +287,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
  */
 PHP_METHOD(Phalcon_Session_Adapter, set){
 
-	zval *index, *value, *unique_id;
+	zval *index, *value, *unique_id, *key, *_SESSION;
 
 	PHALCON_MM_GROW();
 
@@ -316,7 +314,7 @@ PHP_METHOD(Phalcon_Session_Adapter, set){
  */
 PHP_METHOD(Phalcon_Session_Adapter, sets){
 
-	zval *data, *index = NULL, *value = NULL;
+	zval *data, *value = NULL;
 	zend_string *str_key;
 	ulong idx;
 
@@ -352,11 +350,12 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
  */
 PHP_METHOD(Phalcon_Session_Adapter, has){
 
-	zval *index, *unique_id;
+	zval *index, *unique_id, *key, *_SESSION;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &index);
+	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(key);
 	PHALCON_CONCAT_VV(key, unique_id, index);
@@ -380,11 +379,12 @@ PHP_METHOD(Phalcon_Session_Adapter, has){
  */
 PHP_METHOD(Phalcon_Session_Adapter, remove){
 
-	zval *index, *unique_id;
+	zval *index, *unique_id, *key, *_SESSION;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &index);
+	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
 	
 	PHALCON_INIT_VAR(key);
 	PHALCON_CONCAT_VV(key, unique_id, index);
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Session_Adapter, destroy){
 
 PHP_METHOD(Phalcon_Session_Adapter, __get)
 {
-	zval *property, *retval;
+	zval *property;
 
 	phalcon_fetch_params(0, 1, 0, &property);
 	

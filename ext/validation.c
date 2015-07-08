@@ -154,7 +154,7 @@ int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval
 {
 	if (is_phalcon_class(ce)) {
 		zval *msg;
-		zval *messages = phalcon_read_property(getThis(), SL("_defaultMessages"), PH_NOISY);
+		zval *messages = phalcon_read_property(this_ptr, SL("_defaultMessages"), PH_NOISY);
 
 		PHALCON_ALLOC_GHOST_ZVAL(return_value);
 		if (phalcon_array_isset_string_fetch(&msg, messages, type, strlen(type)+1)) {
@@ -165,16 +165,14 @@ int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval
 		}
 
 		return SUCCESS;
-	}
-
-	{
+	} else {
 		zval t;
 		zval *params[1];
 
 		ZVAL_STRING(&t, type);
 		params[0] = &t;
 
-		return phalcon_return_call_method(&return_value, NULL, getThis(), "getdefaultmessage", 1, params);
+		return phalcon_return_call_method(&return_value, this_ptr, "getdefaultmessage", 1, params);
 	}
 }
 
@@ -318,17 +316,17 @@ PHP_METHOD(Phalcon_Validation, validate){
  */
 PHP_METHOD(Phalcon_Validation, add){
 
-	zval **attribute, **validator, *scope;
+	zval *attribute, *validator, *scope;
 
 	phalcon_fetch_params(0, 2, 0, &attribute, &validator);
 
 	PHALCON_ENSURE_IS_STRING(attribute);
-	PHALCON_VERIFY_INTERFACE_EX(*validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce, 0);
 	
 	PHALCON_ALLOC_GHOST_ZVAL(scope);
 	array_init_size(scope, 2);
-	phalcon_array_append(scope, *attribute, 0);
-	phalcon_array_append(scope, *validator, 0);
+	phalcon_array_append(scope, attribute, 0);
+	phalcon_array_append(scope, validator, 0);
 	phalcon_update_property_array_append(getThis(), SL("_validators"), scope);
 	
 	RETURN_THISW();

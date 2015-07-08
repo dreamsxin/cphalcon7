@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey){
 	strKey = emalloc(24);
 	snprintf(strKey, 24, "%lu", hash);
 
-	RETURN_STRING(strKey, 0);
+	RETURN_STRING(strKey);
 }
 
 /**
@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey32){
 	strKey = emalloc(24);
 	snprintf(strKey, 24, "%lu", hash);
 
-	RETURN_STRING(strKey, 0);
+	RETURN_STRING(strKey);
 }
 
 /**
@@ -177,5 +177,5 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey64){
 	strKey = emalloc(24);
 	snprintf(strKey, 24, "%llu", hash);
 
-	RETURN_STRING(strKey, 0);
+	RETURN_STRING(strKey);
 }

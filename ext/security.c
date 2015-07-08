@@ -202,18 +202,18 @@ PHALCON_INIT_CLASS(Phalcon_Security){
  */
 PHP_METHOD(Phalcon_Security, setRandomBytes){
 
-	zval **random_bytes;
+	zval *random_bytes;
 
 	phalcon_fetch_params(0, 1, 0, &random_bytes);
 
 	PHALCON_ENSURE_IS_LONG(random_bytes);
 
-	if (Z_LVAL_P(*random_bytes) < 16) {
+	if (Z_LVAL_P(random_bytes) < 16) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "At least 16 bytes are needed to produce a correct salt");
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_numberBytes"), *random_bytes);
+	phalcon_update_property_this(getThis(), SL("_numberBytes"), random_bytes);
 }
 
 /**
@@ -234,12 +234,12 @@ PHP_METHOD(Phalcon_Security, getRandomBytes){
  */
 PHP_METHOD(Phalcon_Security, setWorkFactor){
 
-	zval **work_factor;
+	zval *work_factor;
 
 	phalcon_fetch_params(0, 1, 0, &work_factor);
 
 	PHALCON_ENSURE_IS_LONG(work_factor);
-	phalcon_update_property_this(getThis(), SL("_workFactor"), *work_factor);
+	phalcon_update_property_this(getThis(), SL("_workFactor"), work_factor);
 }
 
 /**
@@ -260,21 +260,21 @@ PHP_METHOD(Phalcon_Security, getWorkFactor){
  */
 PHP_METHOD(Phalcon_Security, getSaltBytes)
 {
-	zval **number_bytes = NULL, **b64 = NULL;
+	zval *number_bytes = NULL, *b64 = NULL;
 	int i_bytes, encode;
 	char *result = NULL;
 
 	phalcon_fetch_params(0, 0, 2, &number_bytes, &b64);
 	if (number_bytes) {
 		PHALCON_ENSURE_IS_LONG(number_bytes);
-		i_bytes = Z_LVAL_P(*number_bytes);
+		i_bytes = Z_LVAL_P(number_bytes);
 	}
 	else {
 		zval *n = phalcon_read_property(getThis(), SL("_numberBytes"), PH_NOISY);
 		i_bytes = (Z_TYPE_P(n) == IS_LONG) ? Z_LVAL_P(n) : phalcon_get_intval(n);
 	}
 
-	encode = (!b64 || zend_is_true(*b64)) ? 1 : 0;
+	encode = (!b64 || zend_is_true(b64)) ? 1 : 0;
 
 #if PHP_WIN32
 	{
@@ -309,17 +309,17 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 			RETURN_FALSE;
 		}
 	} else {
-		zval tmp, n;
+		zval *tmp = NULL, n;
 		ZVAL_LONG(&n, i_bytes);
-		PHALCON_CALL_FUNCTIONW(&tmp, "openssl_random_pseudo_bytes", n);
+		PHALCON_CALL_FUNCTIONW(&tmp, "openssl_random_pseudo_bytes", &n);
 
-		if (Z_TYPE(tmp) != IS_STRING || Z_STRLEN(tmp) < i_bytes) {
+		if (Z_TYPE_P(tmp) != IS_STRING || Z_STRLEN_P(tmp) < i_bytes) {
 			zval_dtor(tmp);
 			RETURN_FALSE;
 		}
 
-		result = Z_STRVAL(tmp);
-		ZVAL_NULL(&tmp);
+		result = Z_STRVAL_P(tmp);
+		ZVAL_NULL(tmp);
 		zval_dtor(tmp);
 	}
 
@@ -354,7 +354,8 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
  */
 PHP_METHOD(Phalcon_Security, hash)
 {
-	zval **password, **work_factor = NULL, *tmp, *n_bytes, *z_salt, *salt_bytes = NULL, *default_hash;
+	zval *password, *work_factor = NULL, *tmp, *n_bytes, *salt_bytes = NULL, *default_hash;
+	zval z_salt;
 	char variant;
 	char *salt;
 	int salt_len, i_factor, i_hash;
@@ -364,12 +365,12 @@ PHP_METHOD(Phalcon_Security, hash)
 	phalcon_fetch_params(0, 1, 1, &password, &work_factor);
 	PHALCON_ENSURE_IS_STRING(password);
 
-	if (!work_factor || Z_TYPE_P(*work_factor) == IS_NULL) {
+	if (!work_factor || Z_TYPE_P(work_factor) == IS_NULL) {
 		tmp         = phalcon_read_property(getThis(), SL("_workFactor"), PH_NOISY);
 		work_factor = &tmp;
 	}
 
-	i_factor = (Z_TYPE_P(*work_factor) == IS_LONG) ? Z_LVAL_P(*work_factor) : phalcon_get_intval(*work_factor);
+	i_factor = (Z_TYPE_P(work_factor) == IS_LONG) ? Z_LVAL_P(work_factor) : phalcon_get_intval(work_factor);
 
 	default_hash = phalcon_read_property(getThis(), SL("_defaultHash"), PH_NOISY);
 	i_hash       = (Z_TYPE_P(default_hash) == IS_LONG) ? Z_LVAL_P(default_hash) : phalcon_get_intval(default_hash);
@@ -546,10 +547,9 @@ PHP_METHOD(Phalcon_Security, hash)
 		}
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(z_salt);
-	ZVAL_STRINGL(z_salt, salt, salt_len);
+	ZVAL_STRINGL(&z_salt, salt, salt_len);
 
-	PHALCON_RETURN_CALL_FUNCTION("crypt", *password, z_salt);
+	PHALCON_RETURN_CALL_FUNCTION("crypt", password, &z_salt);
 
 	if (Z_STRLEN_P(return_value) < 13) {
 		zval_dtor(return_value);

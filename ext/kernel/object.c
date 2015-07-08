@@ -687,7 +687,7 @@ zval* phalcon_read_property(zval *object, const char *property_name, size_t prop
 		if (silent == PH_NOISY) {
 			php_error_docref(NULL, E_NOTICE, "Trying to get property of non-object");
 		}
-		return NULL;
+		return &PHALCON_GLOBAL(z_null);
 	}
 
 	ce = Z_OBJCE_P(object);

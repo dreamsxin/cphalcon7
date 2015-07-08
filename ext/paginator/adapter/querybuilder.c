@@ -153,12 +153,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setCurrentPage){
 
-	zval **current_page;
+	zval *current_page;
 
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
 
-	phalcon_update_property_this(getThis(), SL("_page"), *current_page);
+	phalcon_update_property_this(getThis(), SL("_page"), current_page);
 	RETURN_THISW();
 }
 
@@ -181,12 +181,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getCurrentPage){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setLimit){
 
-	zval **current_limit;
+	zval *current_limit;
 
 	phalcon_fetch_params(0, 1, 0, &current_limit);
 	PHALCON_ENSURE_IS_LONG(current_limit);
 
-	phalcon_update_property_this(getThis(), SL("_limitRows"), *current_limit);
+	phalcon_update_property_this(getThis(), SL("_limitRows"), current_limit);
 	RETURN_THISW();
 }
 
@@ -243,13 +243,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	zval *dependency_injector = NULL, *service_name, *models_manager = NULL;
 	zval *models = NULL, *model_name = NULL, *model = NULL, *connection = NULL;
 	zval *bind_params = NULL, *bind_types = NULL, *processed = NULL;
-	zval *value = NULL, *wildcard = NULL, *string_wildcard = NULL, *processed_types = NULL;
+	zval *value = NULL, *string_wildcard = NULL, *processed_types = NULL;
 	zval *intermediate = NULL, *columns, *select_columns, *type = NULL, *column = NULL, *sql_column = NULL;
 	zval *dialect = NULL, *sql_select = NULL, *sql, *sql_tmp = NULL;
 	zval *paginate;
-	HashTable *ah0, *ah1, *ah2;
-	HashPosition hp0, hp1, hp2;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 	ldiv_t tp;
@@ -402,7 +401,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 				ZVAL_STRING(sql, Z_STRVAL_P(sql_tmp));
 
 				phalcon_array_unset(bind_types, &wildcard, PH_SEPARATE);
-			} else if (Z_TYPE_P(wildcard) == IS_LONG) {
+			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_INIT_NVAR(string_wildcard);
 				PHALCON_CONCAT_SV(string_wildcard, ":", &wildcard);
 				phalcon_array_update_zval(processed, string_wildcard, value, PH_COPY);
@@ -433,7 +432,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 			SEPARATE_ZVAL(value);
 
-			if (Z_TYPE_P(wildcard) == IS_LONG) {
+			if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_INIT_NVAR(string_wildcard);
 				PHALCON_CONCAT_SV(string_wildcard, ":", &wildcard);
 				phalcon_array_update_zval(processed_types, string_wildcard, value, PH_COPY);

@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 
 	zval *type, *handler, *events = NULL, *queue, *priority_queue = NULL;
 	zval *listener = NULL, *handler_embeded = NULL, *priority = NULL;
-	zval *r0 = NULL, *key = NULL;
+	zval *r0 = NULL;
 	zend_string *str_key;
 	ulong idx;
 
@@ -343,7 +343,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHOD(NULL, queue, "next");
 		}
 	} else {
-		ZVAL_ARR(&priority_queue, zend_array_dup(Z_ARRVAL_P(queue)));
+		ZVAL_ARR(priority_queue, zend_array_dup(Z_ARRVAL_P(queue)));
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(queue), idx, str_key, listener) {
 			zval key;
 			if (str_key) {
@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_array_update_zval(events, type, &priority_queue, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_zval(events, type, priority_queue, PH_COPY | PH_SEPARATE);
 	phalcon_update_property_this(getThis(), SL("_events"), events);
 
 	PHALCON_MM_RESTORE();
@@ -411,9 +411,6 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 	zval *source = NULL, *data = NULL, *cancelable = NULL, *collect, *iterator;
 	zval *handler = NULL, *is_stopped = NULL, *handler_referenced = NULL, *listener = NULL, *handler_embeded = NULL;
 	zval *r0 = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
 	zend_class_entry *weakref_ce;
 
 	phalcon_fetch_params(0, 2, 0, &queue, &event);
@@ -437,7 +434,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
 	PHALCON_VERIFY_CLASS_EX(event, phalcon_events_event_ce, phalcon_events_exception_ce, 0);
 
-	weakref_ce = zend_lookup_class_ex(zend_string_init(SL("WeakRef"), 0), NULL, 0));
+	weakref_ce = zend_lookup_class_ex(zend_string_init(SL("WeakRef"), 0), NULL, 0);
 
 	PHALCON_MM_GROW();
 
@@ -508,7 +505,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				/**
 				 * Check if the event is a weak reference.
 				 */
-				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), *weakref_ce)) {
+				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), weakref_ce)) {
 					/**
 					 * Checks whether the object referenced still exists.
 					 */
@@ -615,7 +612,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				/**
 				  * Check if the event is a weak reference.
 				  */
-				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), *weakref_ce)) {
+				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), weakref_ce)) {
 					/**
 					 * Checks whether the object referenced still exists.
 					 */
@@ -852,10 +849,7 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 
 	zval *type, *full = NULL, *events = NULL, *queue, *iterator;
 	zval *listener = NULL, *handler_embeded = NULL;
-	zval *r0 = NULL, *key = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *r0 = NULL;
 
 	PHALCON_MM_GROW();
 

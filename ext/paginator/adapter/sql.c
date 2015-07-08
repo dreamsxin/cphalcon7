@@ -162,12 +162,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setCurrentPage){
 
-	zval **current_page;
+	zval *current_page;
 
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
 	
-	phalcon_update_property_this(getThis(), SL("_page"), *current_page);
+	phalcon_update_property_this(getThis(), SL("_page"), current_page);
 	RETURN_THISW();
 }
 
@@ -190,12 +190,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getCurrentPage){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setLimit){
 
-	zval **current_limit;
+	zval *current_limit;
 
 	phalcon_fetch_params(0, 1, 0, &current_limit);
 	PHALCON_ENSURE_IS_LONG(current_limit);
 
-	phalcon_update_property_this(getThis(), SL("_limitRows"), *current_limit);
+	phalcon_update_property_this(getThis(), SL("_limitRows"), current_limit);
 	RETURN_THISW();
 }
 
@@ -279,7 +279,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
 	ZVAL_LONG(&fetch_mode, PDO_FETCH_OBJ);
 
-	PHALCON_CALL_METHOD(&row, db, "fetchone", total_sql, fetch_mode, bind);
+	PHALCON_CALL_METHOD(&row, db, "fetchone", total_sql, &fetch_mode, bind);
 	
 	rowcount = phalcon_read_property(row, SL("rowcount"), PH_NOISY);
 
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 		phalcon_array_update_string(bind, SL("offset"), number, PH_COPY);
 	}
 
-	PHALCON_CALL_METHOD(&items, db, "fetchall", sql, fetch_mode, bind);
+	PHALCON_CALL_METHOD(&items, db, "fetchall", sql, &fetch_mode, bind);
 	
 	i_rowcount    = phalcon_get_intval(rowcount);
 	tp            = ldiv(i_rowcount, i_limit);

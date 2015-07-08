@@ -191,10 +191,9 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters){
 
 	zval *dependency_injector, *arguments, *build_arguments;
-	zval *argument = NULL, *position = NULL, *value = NULL;
-	HashTable *ah0;
-	HashPosition hp0;
-	zval **hd;
+	zval *argument = NULL, *value = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -238,13 +237,12 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 
 	zval *dependency_injector, *definition, *parameters = NULL;
 	zval *class_name, *instance = NULL, *arguments = NULL, *build_arguments = NULL;
-	zval *param_calls = NULL, *method = NULL, *method_position = NULL;
+	zval *param_calls = NULL, *method = NULL;
 	zval *exception_message = NULL, *method_name = NULL, *method_call = NULL;
-	zval *status = NULL, *property = NULL, *property_position = NULL;
+	zval *status = NULL, *property = NULL;
 	zval *property_name = NULL, *property_value = NULL, *value = NULL;
-	HashTable *ah0, *ah1;
-	HashPosition hp0, hp1;
-	zval **hd;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 

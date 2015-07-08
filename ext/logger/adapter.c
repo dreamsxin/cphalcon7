@@ -22,8 +22,6 @@
 #include "logger/formatterinterface.h"
 #include "logger/item.h"
 #include "logger.h"
-#include "psr/log/loggerinterface.h"
-#include "psr/log/invalidargumentexception.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -90,17 +88,7 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter){
 	zend_declare_property_null(phalcon_logger_adapter_ce, SL("_formatter"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_logger_adapter_ce, SL("_logLevel"), PHALCON_LOGGER_SPECIAL, ZEND_ACC_PROTECTED);
 
-	/* Prior to PHP 5.3.9, a class could not implement two interfaces
-	 * that specified a method with the same name, since it would cause
-	 * ambiguity. More recent versions of PHP allow this as long as
-	 * the duplicate methods have the same signature.
-	 */
-	if (PHALCON_GLOBAL(register_psr3_classes)) {
-		zend_class_implements(phalcon_logger_adapter_ce, 2, phalcon_logger_adapterinterface_ce, psr_log_loggerinterface_ce);
-	}
-	else {
-		zend_class_implements(phalcon_logger_adapter_ce, 1, phalcon_logger_adapterinterface_ce);
-	}
+	zend_class_implements(phalcon_logger_adapter_ce, 1, phalcon_logger_adapterinterface_ce);
 
 	return SUCCESS;
 }
@@ -187,10 +175,9 @@ PHP_METHOD(Phalcon_Logger_Adapter, getLogLevel){
 PHP_METHOD(Phalcon_Logger_Adapter, setFormatter){
 
 	zval *formatter;
-	zend_class_entry *exception = PHALCON_GLOBAL(register_psr3_classes) ? psr_log_invalidargumentexception_ce : phalcon_logger_exception_ce;
 
 	phalcon_fetch_params(0, 1, 0, &formatter);
-	PHALCON_VERIFY_INTERFACE_EX(formatter, phalcon_logger_formatterinterface_ce, exception, 0);
+	PHALCON_VERIFY_INTERFACE_EX(formatter, phalcon_logger_formatterinterface_ce, phalcon_logger_exception_ce, 0);
 
 	phalcon_update_property_this(getThis(), SL("_formatter"), formatter);
 	RETURN_THISW();

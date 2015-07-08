@@ -1204,7 +1204,7 @@ PHP_METHOD(Phalcon_Mvc_Router, addHead){
 
 static int phalcon_router_call_convert(zval *pDest, int num_args, va_list args, zend_hash_key *hash_key)
 {
-	zval *route, key = zval_used_for_init;
+	zval *route, key;
 	zval *params[2];
 
 	assert(num_args == 1);

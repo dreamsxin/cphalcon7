@@ -127,7 +127,7 @@ const zend_function_entry phalcon_registry_method_entry[] = {
 };
 
 PHALCON_INIT_CLASS(Phalcon_Registry){
-	PHALCON_REGISTER_CLASS(Phalcon, Registry, registry, phalcon_registry_method_entry, ZEND_ACC_FINAL_CLASS);
+	PHALCON_REGISTER_CLASS(Phalcon, Registry, registry, phalcon_registry_method_entry, 0);
 
 	zend_declare_property_null(phalcon_registry_ce, SL("_data"), ZEND_ACC_PROTECTED);
 
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Registry, count){
 
 	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
 
-	phalcon_fast_count(return_value, data)
+	phalcon_fast_count(return_value, data);
 }
 
 /**
@@ -345,10 +345,8 @@ PHP_METHOD(Phalcon_Registry, serialize){
  * @brief Phalcon\Registry Phalcon\Registry::unserialize(string $str)
  */
 PHP_METHOD(Phalcon_Registry, unserialize){
-	zval *data;
-	zval **str;
+	zval *data, *str, zv;
 	php_unserialize_data_t var_hash;
-	zval zv;
 	const unsigned char *buf, *max;
 
 	phalcon_fetch_params(0, 1, 0, &str);
@@ -361,8 +359,8 @@ PHP_METHOD(Phalcon_Registry, unserialize){
 		return;
 	}
 
-	buf = (unsigned char*)(Z_STRVAL_P(*str));
-	max = buf + Z_STRLEN_P(*str);
+	buf = (unsigned char*)(Z_STRVAL_P(str));
+	max = buf + Z_STRLEN_P(str);
 
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
 	if (php_var_unserialize(&zv, &buf, max, &var_hash) && Z_TYPE(zv) == IS_ARRAY) {

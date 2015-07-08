@@ -353,8 +353,6 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _resize) {
 
 	zval *width, *height;
 	zval *image = NULL, *tmp_image = NULL;
-	zval *ori_width, *ori_height, *pre_width, *pre_height, *reduction_width, *reduction_height, *ret = NULL, *dst;
-	int tmp_width, tmp_height, tmp_pre_width, tmp_pre_height, tmp_reduction_width, tmp_reduction_height;
 
 	PHALCON_MM_GROW();
 
@@ -400,7 +398,6 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _liquidRescale){
 PHP_METHOD(Phalcon_Image_Adapter_GD, _crop) {
 	zval *width, *height, *offset_x, *offset_y;
 	zval *image, *tmp_image = NULL;
-	zval *dst, *ret = NULL;
 	zval *rect;
 
 	PHALCON_MM_GROW();
@@ -490,13 +487,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _rotate) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _flip) {
 
-	zval *direction;
-	zval *image = NULL;
-	zval *flipped_image = NULL;
-	zval *width, *height;
-	zval *dst_x = NULL, *dst_y = NULL, *src_x = NULL, *src_y = NULL, *src_width = NULL, *src_height = NULL;
-	int w, h, x, y;
-	zval *mode;
+	zval *direction, *image, *mode;
 
 	PHALCON_MM_GROW();
 
@@ -561,9 +552,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _sharpen) {
 	PHALCON_INIT_NVAR(item);
 	array_init_size(item, 3);
 
-	phalcon_array_append_long(&item, -1, 0);
-	phalcon_array_append_long(&item, -1, 0);
-	phalcon_array_append_long(&item, -1, 0);
+	phalcon_array_append_long(item, -1, 0);
+	phalcon_array_append_long(item, -1, 0);
+	phalcon_array_append_long(item, -1, 0);
 
 	phalcon_array_append(matrix, item, 0);
 
@@ -571,9 +562,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _sharpen) {
 	PHALCON_INIT_NVAR(item);
 	array_init_size(item, 3);
 
-	phalcon_array_append_long(&item, -1, 0);
+	phalcon_array_append_long(item, -1, 0);
 	phalcon_array_append(item, tmp_amount, 0);
-	phalcon_array_append_long(&item, -1, 0);
+	phalcon_array_append_long(item, -1, 0);
 
 	phalcon_array_append(matrix, item, 0);
 
@@ -581,9 +572,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _sharpen) {
 	PHALCON_INIT_NVAR(item);
 	array_init_size(item, 3);
 
-	phalcon_array_append_long(&item, -1, 0);
-	phalcon_array_append_long(&item, -1, 0);
-	phalcon_array_append_long(&item, -1, 0);
+	phalcon_array_append_long(item, -1, 0);
+	phalcon_array_append_long(item, -1, 0);
+	phalcon_array_append_long(item, -1, 0);
 
 	phalcon_array_append(matrix, item, 9);
 

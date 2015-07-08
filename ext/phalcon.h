@@ -346,15 +346,6 @@
 #include "paginator/adapter/sql.h"
 #include "paginator/exception.h"
 
-#include "psr/log/abstractlogger.h"
-#include "psr/log/invalidargumentexception.h"
-#include "psr/log/loggerawareinterface.h"
-#include "psr/log/loggerawaretrait.h"
-#include "psr/log/loggerinterface.h"
-#include "psr/log/loggertrait.h"
-#include "psr/log/loglevel.h"
-#include "psr/log/nulllogger.h"
-
 #include "queue/beanstalk.h"
 #include "queue/beanstalk/job.h"
 

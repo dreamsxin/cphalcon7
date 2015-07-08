@@ -22,7 +22,6 @@
 #include "logger/adapterinterface.h"
 #include "logger/exception.h"
 #include "logger/formatter/line.h"
-#include "psr/log/invalidargumentexception.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -88,7 +87,6 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_Stream){
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 
 	zval *name, *options = NULL, *mode = NULL, *stream = NULL;
-	zend_class_entry *exception = PHALCON_GLOBAL(register_psr3_classes) ? psr_log_invalidargumentexception_ce : phalcon_logger_exception_ce;
 
 	phalcon_fetch_params(0, 1, 1, &name, &options);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -101,7 +99,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 
 	if (phalcon_array_isset_string_fetch(&mode, options, SS("mode"))) {
 		if (phalcon_memnstr_str(mode, SL("r"))) {
-			PHALCON_THROW_EXCEPTION_STR(exception, "Stream must be opened in append or write mode");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Stream must be opened in append or write mode");
 			return;
 		}
 	} else {
@@ -114,7 +112,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 	 */
 	PHALCON_CALL_FUNCTION(&stream, "fopen", name, mode);
 	if (Z_TYPE_P(stream) != IS_RESOURCE) {
-		zend_throw_exception_ex(exception, 0, "Cannot open stream '%s'", Z_STRVAL_P(name));
+		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open stream '%s'", Z_STRVAL_P(name));
 	}
 	else {
 		phalcon_update_property_this(getThis(), SL("_stream"), stream);

@@ -21,7 +21,6 @@
 #include "logger/adapterinterface.h"
 #include "logger/exception.h"
 #include "logger.h"
-#include "psr/log/invalidargumentexception.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -92,11 +91,10 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Multiple){
 PHP_METHOD(Phalcon_Logger_Multiple, push){
 
 	zval *logger;
-	zend_class_entry *exception = PHALCON_GLOBAL(register_psr3_classes) ? psr_log_invalidargumentexception_ce : phalcon_logger_exception_ce;
 
 	phalcon_fetch_params(0, 1, 0, &logger);
 
-	PHALCON_VERIFY_INTERFACE_EX(logger, phalcon_logger_adapterinterface_ce, exception, 0)
+	PHALCON_VERIFY_INTERFACE_EX(logger, phalcon_logger_adapterinterface_ce, phalcon_logger_exception_ce, 0)
 	phalcon_update_property_array_append(getThis(), SL("_loggers"), logger);
 }
 

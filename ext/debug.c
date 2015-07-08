@@ -1029,7 +1029,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	zval *files = NULL, *memory, *data_var = NULL, *variable = NULL, *dumped_argument = NULL;
 	zval *js_sources = NULL, *formatted_file = NULL;
 	zend_bool ini_exists = 1;
-	zval z_link_format = zval_used_for_init;
+	zval z_link_format;
 	zend_class_entry *ce;
 	zend_string *str_key;
 	ulong idx;

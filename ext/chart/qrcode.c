@@ -121,7 +121,7 @@ typedef struct {
     QRcode *c;
 } php_qrcode;
 
-static void qr_dtor(zend_rsrc_list_entry *rsrc)
+static void qr_dtor(zend_resource *rsrc)
 {
     php_qrcode *qr = (php_qrcode *) rsrc->ptr;
 
@@ -283,14 +283,14 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	if (Z_LVAL_P(mode) == QR_MODE_8) {
 		qr->c = QRcode_encodeString8bit(Z_STRVAL_P(text), Z_LVAL_P(version), Z_LVAL_P(level));
 	} else {
-		qr->c = QRcode_encodeString(Z_STRVAL_P(text), Z_LVAL_P(version), Z_LVAL_P(level), Z_LVAL_P(mode), Z_BVAL_P(casesensitive));
+		qr->c = QRcode_encodeString(Z_STRVAL_P(text), Z_LVAL_P(version), Z_LVAL_P(level), Z_LVAL_P(mode), zend_is_true(casesensitive) ? 1 : 0);
 	}
 
 	if (qr->c == NULL)  {
 		efree(qr);
 	} else {
 		PHALCON_INIT_VAR(zid);
-		ZEND_REGISTER_RESOURCE(zid, qr, phalcon_list_qrcode);
+		ZVAL_RES(zid, zend_register_resource(qr, phalcon_list_qrcode));
 
 		phalcon_update_property_this(getThis(), SL("_qr"), zid);
 		RETURN_MM_TRUE;
@@ -332,7 +332,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 	unsigned char *row, *p, *q;
 	int x, y, xx, yy, bit;
 	int realwidth;
-	char *path;
+	zend_string *path;
 	int b;
 	char buf[4096];
 
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 		RETURN_MM_FALSE;
 	}
 
-	ZEND_FETCH_RESOURCE2(qr, php_qrcode *, &zid, -1, "qr handle", phalcon_list_qrcode, NULL);
+	qr = zend_fetch_resource(Z_RES_P(zid), "qr handle", phalcon_list_qrcode);
 
 	fp = php_open_temporary_file(NULL, NULL, &path);
 	if (!fp) {
@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 	phalcon_ob_end_clean();
 
 	fclose (fp);
-	VCWD_UNLINK((const char *)path);
+	VCWD_UNLINK(path->val);
 	efree(path);
 
 	RETURN_MM();
@@ -588,8 +588,8 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 	if (Z_TYPE_P(zid) == IS_NULL) {
 		RETURN_MM_FALSE;
 	}
-
-	ZEND_FETCH_RESOURCE2(qr, php_qrcode *, &zid, -1, "qr handle", phalcon_list_qrcode, NULL);
+	
+	qr = zend_fetch_resource(Z_RES_P(zid), "qr handle", phalcon_list_qrcode);
 
 	fp = VCWD_FOPEN(fn, "wb");
 	if (!fp) {

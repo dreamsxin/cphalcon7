@@ -203,9 +203,9 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, zen
 
 	smart_str_0(&processed_str);
 
-	if (processed_str.len) {
-		*ret     = processed_str.c;
-		*ret_len = processed_str.len;
+	if (processed_str.s->len) {
+		*ret     = processed_str.s->val;
+		*ret_len = processed_str.s->len;
 	} else {
 		*ret     = NULL;
 		*ret_len = 0;

@@ -959,7 +959,7 @@ for_update_clause(R) ::= . {
 	R = NULL;
 }
 
-%destructor select_limit_clause { zephir_safe_zval_ptr_dtor($$); }
+%destructor select_limit_clause { phalcon_safe_zval_ptr_dtor($$); }
 
 select_limit_clause(R) ::= LIMIT integer_or_placeholder(I) . {
 	R = phql_ret_limit_clause(I, NULL);

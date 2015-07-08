@@ -1814,7 +1814,7 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
 	if (unlikely(!auth_user)) {
 		_SERVER = phalcon_get_global(SS("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
-			zval key = zval_used_for_init;
+			zval key;
 
 			ZVAL_STRING(&key, "PHP_AUTH_USER");
 

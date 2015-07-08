@@ -22,7 +22,6 @@
 #include "logger/adapterinterface.h"
 #include "logger/exception.h"
 #include "logger/formatter/line.h"
-#include "psr/log/invalidargumentexception.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -95,7 +94,6 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_File){
 PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 
 	zval *name, *options = NULL, *mode = NULL, *handler = NULL;
-	zend_class_entry *exception = PHALCON_GLOBAL(register_psr3_classes) ? psr_log_invalidargumentexception_ce : phalcon_logger_exception_ce;
 
 	phalcon_fetch_params(0, 1, 1, &name, &options);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -108,7 +106,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 
 	if (phalcon_array_isset_string_fetch(&mode, options, SS("mode"))) {
 		if (phalcon_memnstr_str(mode, SL("r"))) {
-			PHALCON_THROW_EXCEPTION_STR(exception, "Logger must be opened in append or write mode");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Logger must be opened in append or write mode");
 			return;
 		}
 	} else {
@@ -121,7 +119,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 	 */
 	PHALCON_CALL_FUNCTION(&handler, "fopen", name, mode);
 	if (Z_TYPE_P(handler) != IS_RESOURCE) {
-		zend_throw_exception_ex(exception, 0, "Cannot open log file '%s'", Z_STRVAL_P(name));
+		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open log file '%s'", Z_STRVAL_P(name));
 	}
 	else {
 		phalcon_update_property_this(getThis(), SL("_path"), name);
@@ -217,13 +215,12 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getPath) {
 PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 
 	zval *path, *options, *mode = NULL, *file_handler = NULL;
-	zend_class_entry *exception = PHALCON_GLOBAL(register_psr3_classes) ? psr_log_invalidargumentexception_ce : phalcon_logger_exception_ce;
 
 	PHALCON_MM_GROW();
 
 	path = phalcon_read_property(getThis(), SL("_path"), PH_NOISY);
 	if (Z_TYPE_P(path) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(exception, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 		return;
 	}
 
@@ -232,7 +229,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 		PHALCON_OBS_VAR(mode);
 		phalcon_array_fetch_string(&mode, options, SL("mode"), PH_NOISY);
 		if (Z_TYPE_P(mode) != IS_STRING) {
-			PHALCON_THROW_EXCEPTION_STR(exception, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 			return;
 		}
 	} else {

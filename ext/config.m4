@@ -403,14 +403,6 @@ image/adapterinterface.c \
 image/exception.c \
 image/adapter/gd.c \
 image/adapter/imagick.c \
-psr/log/abstractlogger.c \
-psr/log/invalidargumentexception.c \
-psr/log/loggerawareinterface.c \
-psr/log/loggerawaretrait.c \
-psr/log/loggerinterface.c \
-psr/log/loggertrait.c \
-psr/log/loglevel.c \
-psr/log/nulllogger.c \
 chart/qrcode.c \
 chart/captcha.c \
 chart/exception.c \

@@ -61,8 +61,6 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_BOOLEAN("phalcon.orm.allow_update_primary",     "0", PHP_INI_ALL,    OnUpdateBool, orm.allow_update_primary,     zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables auttomatic escape */
 	STD_PHP_INI_BOOLEAN("phalcon.db.escape_identifiers",        "1", PHP_INI_ALL,    OnUpdateBool, db.escape_identifiers,        zend_phalcon_globals, phalcon_globals)
-	/* Whether to register PSR-3 classes */
-	STD_PHP_INI_BOOLEAN("phalcon.register_psr3_classes",        "0", PHP_INI_SYSTEM, OnUpdateBool, register_psr3_classes,        zend_phalcon_globals, phalcon_globals)
 PHP_INI_END()
 
 static PHP_MINIT_FUNCTION(phalcon)
@@ -189,18 +187,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Translate_AdapterInterface);
 	PHALCON_INIT(Phalcon_Validation_ValidatorInterface);
 	PHALCON_INIT(Phalcon_Validation_MessageInterface);
-
-	/* 3. Register PSR-3 classes */
-	if (PHALCON_GLOBAL(register_psr3_classes)) {
-		PHALCON_INIT(Psr_Log_LoggerAwareInterface);
-		PHALCON_INIT(Psr_Log_LoggerInterface);
-		PHALCON_INIT(Psr_Log_InvalidArgumentException);
-		PHALCON_INIT(Psr_Log_LogLevel);
-		PHALCON_INIT(Psr_Log_AbstractLogger);
-		PHALCON_INIT(Psr_Log_NullLogger);
-		PHALCON_INIT(Psr_Log_LoggerAwareTrait);
-		PHALCON_INIT(Psr_Log_LoggerTrait);
-	}
 
 	/* 4. Register everything else */
 	PHALCON_INIT(Phalcon_DI_Injectable);

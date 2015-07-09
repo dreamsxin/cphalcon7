@@ -117,11 +117,11 @@ static inline int phalcon_return_property_zval(zval *return_value, zval *object,
 
 /** Updating properties */
 int phalcon_update_property_long(zval *obj, const char *property_name, uint32_t property_length, long value);
-int phalcon_update_property_string(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length);
+int phalcon_update_property_str(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length);
 int phalcon_update_property_bool(zval *obj, const char *property_name, uint32_t property_length, int value);
 int phalcon_update_property_null(zval *obj, const char *property_name, uint32_t property_length);
 int phalcon_update_property_zval(zval *obj, const char *property_name, uint32_t property_length, zval *value);
-int phalcon_update_property_str_zval(zval *obj, zend_string *property, zval *value);
+int phalcon_update_property_string_zval(zval *obj, zend_string *property, zval *value);
 int phalcon_update_property_zval_null(zval *obj, const zval *property);
 int phalcon_update_property_zval_long(zval *obj, const zval *property, int value);
 int phalcon_update_property_zval_zval(zval *obj, const zval *property, zval *value);

@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 					PHALCON_CALL_METHOD(&row, result, "fetch");
 	
 					PHALCON_OBS_NVAR(row_count);
-					phalcon_array_fetch_string(&row_count, row, SL("numrows"), PH_NOISY);
+					phalcon_array_fetch_str(&row_count, row, SL("numrows"), PH_NOISY);
 				}
 			} else {
 				PHALCON_INIT_NVAR(row_count);

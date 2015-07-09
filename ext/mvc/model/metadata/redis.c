@@ -107,30 +107,30 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&host, options, SS("host"))) {
+	if (!phalcon_array_isset_str_fetch(&host, options, SS("host"))) {
 		host = NULL;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&port, options, SS("port"))) {
+	if (!phalcon_array_isset_str_fetch(&port, options, SS("port"))) {
 		port = NULL;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&auth, options, SS("auth"))) {
+	if (!phalcon_array_isset_str_fetch(&auth, options, SS("auth"))) {
 		auth = NULL;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&persistent, options, SS("persistent"))) {
+	if (!phalcon_array_isset_str_fetch(&persistent, options, SS("persistent"))) {
 		persistent = NULL;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&lifetime, options, SS("lifetime"))) {
+	if (!phalcon_array_isset_str_fetch(&lifetime, options, SS("lifetime"))) {
 		PHALCON_INIT_VAR(lifetime);
 		ZVAL_LONG(lifetime, 8600);
 	}
 
 	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
-	if (!phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
+	if (!phalcon_array_isset_str_fetch(&prefix, options, SS("prefix"))) {
 		PHALCON_INIT_VAR(prefix);
 		ZVAL_EMPTY_STRING(prefix);
 	}

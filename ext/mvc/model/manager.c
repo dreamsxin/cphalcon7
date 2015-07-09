@@ -1269,9 +1269,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	/** 
 	 * Check an alias for the relation
 	 */
-	if (phalcon_array_isset_string(options, SS("alias"))) {
+	if (phalcon_array_isset_str(options, SS("alias"))) {
 		PHALCON_OBS_VAR(alias);
-		phalcon_array_fetch_string(&alias, options, SL("alias"), PH_NOISY);
+		phalcon_array_fetch_str(&alias, options, SL("alias"), PH_NOISY);
 
 		PHALCON_INIT_VAR(lower_alias);
 		phalcon_fast_strtolower(lower_alias, alias);
@@ -1398,9 +1398,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	/** 
 	 * Check an alias for the relation
 	 */
-	if (phalcon_array_isset_string(options, SS("alias"))) {
+	if (phalcon_array_isset_str(options, SS("alias"))) {
 		PHALCON_OBS_VAR(alias);
-		phalcon_array_fetch_string(&alias, options, SL("alias"), PH_NOISY);
+		phalcon_array_fetch_str(&alias, options, SL("alias"), PH_NOISY);
 
 		PHALCON_INIT_VAR(lower_alias);
 		phalcon_fast_strtolower(lower_alias, alias);
@@ -1526,9 +1526,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	/** 
 	 * Check an alias for the relation
 	 */
-	if (phalcon_array_isset_string(options, SS("alias"))) {
+	if (phalcon_array_isset_str(options, SS("alias"))) {
 		PHALCON_OBS_VAR(alias);
-		phalcon_array_fetch_string(&alias, options, SL("alias"), PH_NOISY);
+		phalcon_array_fetch_str(&alias, options, SL("alias"), PH_NOISY);
 
 		PHALCON_INIT_VAR(lower_alias);
 		phalcon_fast_strtolower(lower_alias, alias);
@@ -1685,9 +1685,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	/** 
 	 * Check an alias for the relation
 	 */
-	if (phalcon_array_isset_string(options, SS("alias"))) {
+	if (phalcon_array_isset_str(options, SS("alias"))) {
 		PHALCON_OBS_VAR(alias);
-		phalcon_array_fetch_string(&alias, options, SL("alias"), PH_NOISY);
+		phalcon_array_fetch_str(&alias, options, SL("alias"), PH_NOISY);
 
 		PHALCON_INIT_VAR(lower_alias);
 		phalcon_fast_strtolower(lower_alias, alias);
@@ -2001,9 +2001,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 			phalcon_array_fetch_long(&pre_conditions, parameters, 0, PH_NOISY);
 			phalcon_array_unset_long(parameters, 0, PH_SEPARATE);
 		} else {
-			if (phalcon_array_isset_string(parameters, SS("conditions"))) {
+			if (phalcon_array_isset_str(parameters, SS("conditions"))) {
 				PHALCON_OBS_NVAR(pre_conditions);
-				phalcon_array_fetch_string(&pre_conditions, parameters, SL("conditions"), PH_NOISY);
+				phalcon_array_fetch_str(&pre_conditions, parameters, SL("conditions"), PH_NOISY);
 				phalcon_array_unset_string(parameters, SS("conditions"), PH_SEPARATE);
 			}
 		}
@@ -2017,9 +2017,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	 * Re-use bound parameters
 	 */
 	if (Z_TYPE_P(parameters) == IS_ARRAY) { 
-		if (phalcon_array_isset_string(parameters, SS("bind"))) {
+		if (phalcon_array_isset_str(parameters, SS("bind"))) {
 			PHALCON_OBS_VAR(placeholders);
-			phalcon_array_fetch_string(&placeholders, parameters, SL("bind"), PH_NOISY);
+			phalcon_array_fetch_str(&placeholders, parameters, SL("bind"), PH_NOISY);
 			phalcon_array_unset_string(parameters, SS("bind"), PH_SEPARATE);
 		} else {
 			PHALCON_INIT_NVAR(placeholders);

@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	/** 
 	 * All the arguments must have a type
 	 */
-	if (!phalcon_array_isset_string(argument, SS("type"))) {
+	if (!phalcon_array_isset_str(argument, SS("type"))) {
 		PHALCON_INIT_NVAR(exception_message);
 		PHALCON_CONCAT_SVS(exception_message, "Argument at position ", position, " must have a type");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
@@ -97,13 +97,13 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	}
 	
 	PHALCON_OBS_VAR(type);
-	phalcon_array_fetch_string(&type, argument, SL("type"), PH_NOISY);
+	phalcon_array_fetch_str(&type, argument, SL("type"), PH_NOISY);
 	
 	/** 
 	 * If the argument type is 'service', we obtain the service from the DI
 	 */
 	if (PHALCON_IS_STRING(type, "service")) {
-		if (!phalcon_array_isset_string_fetch(&name, argument, SS("name"))) {
+		if (!phalcon_array_isset_str_fetch(&name, argument, SS("name"))) {
 			PHALCON_INIT_NVAR(exception_message);
 			PHALCON_CONCAT_SV(exception_message, "Service 'name' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	 * If the argument type is 'parameter', we assign the value as it is
 	 */
 	if (PHALCON_IS_STRING(type, "parameter")) {
-		if (!phalcon_array_isset_string(argument, SS("value"))) {
+		if (!phalcon_array_isset_str(argument, SS("value"))) {
 			PHALCON_INIT_NVAR(exception_message);
 			PHALCON_CONCAT_SV(exception_message, "Service 'value' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 		}
 	
 		PHALCON_OBS_VAR(value);
-		phalcon_array_fetch_string(&value, argument, SL("value"), PH_NOISY);
+		phalcon_array_fetch_str(&value, argument, SL("value"), PH_NOISY);
 	
 		RETURN_CCTOR(value);
 	}
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	 * If the argument type is 'instance', we assign the value as it is
 	 */
 	if (PHALCON_IS_STRING(type, "instance")) {
-		if (!phalcon_array_isset_string(argument, SS("className"))) {
+		if (!phalcon_array_isset_str(argument, SS("className"))) {
 			PHALCON_INIT_NVAR(exception_message);
 			PHALCON_CONCAT_SV(exception_message, "Service 'className' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
@@ -152,15 +152,15 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 		}
 	
 		PHALCON_OBS_NVAR(name);
-		phalcon_array_fetch_string(&name, argument, SL("className"), PH_NOISY);
-		if (!phalcon_array_isset_string(argument, SS("arguments"))) {
+		phalcon_array_fetch_str(&name, argument, SL("className"), PH_NOISY);
+		if (!phalcon_array_isset_str(argument, SS("arguments"))) {
 			/** 
 			 * The instance parameter does not have arguments for its constructor
 			 */
 			PHALCON_CALL_METHOD(&value, dependency_injector, "get", name);
 		} else {
 			PHALCON_OBS_VAR(instance_arguments);
-			phalcon_array_fetch_string(&instance_arguments, argument, SL("arguments"), PH_NOISY);
+			phalcon_array_fetch_str(&instance_arguments, argument, SL("arguments"), PH_NOISY);
 	
 			/** 
 			 * Build the instance with arguments
@@ -260,13 +260,13 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 	/** 
 	 * The class name is required
 	 */
-	if (!phalcon_array_isset_string(definition, SS("className"))) {
+	if (!phalcon_array_isset_str(definition, SS("className"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "Invalid service definition. Missing 'className' parameter");
 		return;
 	}
 	
 	PHALCON_OBS_VAR(class_name);
-	phalcon_array_fetch_string(&class_name, definition, SL("className"), PH_NOISY);
+	phalcon_array_fetch_str(&class_name, definition, SL("className"), PH_NOISY);
 	if (Z_TYPE_P(parameters) == IS_ARRAY) { 
 	
 		/** 
@@ -280,9 +280,9 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 		/** 
 		 * Check if the argument has constructor arguments
 		 */
-		if (phalcon_array_isset_string(definition, SS("arguments"))) {
+		if (phalcon_array_isset_str(definition, SS("arguments"))) {
 			PHALCON_OBS_VAR(arguments);
-			phalcon_array_fetch_string(&arguments, definition, SL("arguments"), PH_NOISY);
+			phalcon_array_fetch_str(&arguments, definition, SL("arguments"), PH_NOISY);
 	
 			/** 
 			 * Resolve the constructor parameters
@@ -307,14 +307,14 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 	/** 
 	 * The definition has calls?
 	 */
-	if (phalcon_array_isset_string(definition, SS("calls"))) {
+	if (phalcon_array_isset_str(definition, SS("calls"))) {
 		if (Z_TYPE_P(instance) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "The definition has setter injection parameters but the constructor didn't return an instance");
 			return;
 		}
 	
 		PHALCON_OBS_VAR(param_calls);
-		phalcon_array_fetch_string(&param_calls, definition, SL("calls"), PH_NOISY);
+		phalcon_array_fetch_str(&param_calls, definition, SL("calls"), PH_NOISY);
 		if (Z_TYPE_P(param_calls) != IS_ARRAY) { 
 			PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "Setter injection parameters must be an array");
 			return;
@@ -344,7 +344,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			/** 
 			 * A param 'method' is required
 			 */
-			if (!phalcon_array_isset_string(method, SS("method"))) {
+			if (!phalcon_array_isset_str(method, SS("method"))) {
 				PHALCON_INIT_NVAR(exception_message);
 				PHALCON_CONCAT_SV(exception_message, "The method name is required on position ", &method_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			}
 	
 			PHALCON_OBS_NVAR(method_name);
-			phalcon_array_fetch_string(&method_name, method, SL("method"), PH_NOISY);
+			phalcon_array_fetch_str(&method_name, method, SL("method"), PH_NOISY);
 	
 			/** 
 			 * Create the method call
@@ -361,10 +361,10 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			array_init_size(method_call, 2);
 			phalcon_array_append(method_call, instance, PH_SEPARATE);
 			phalcon_array_append(method_call, method_name, PH_SEPARATE);
-			if (phalcon_array_isset_string(method, SS("arguments"))) {
+			if (phalcon_array_isset_str(method, SS("arguments"))) {
 	
 				PHALCON_OBS_NVAR(arguments);
-				phalcon_array_fetch_string(&arguments, method, SL("arguments"), PH_NOISY);
+				phalcon_array_fetch_str(&arguments, method, SL("arguments"), PH_NOISY);
 				if (Z_TYPE_P(arguments) != IS_ARRAY) { 
 					PHALCON_INIT_NVAR(exception_message);
 					PHALCON_CONCAT_SV(exception_message, "Call arguments must be an array ", &method_position);
@@ -398,14 +398,14 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 	/** 
 	 * The definition has properties?
 	 */
-	if (phalcon_array_isset_string(definition, SS("properties"))) {
+	if (phalcon_array_isset_str(definition, SS("properties"))) {
 		if (Z_TYPE_P(instance) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "The definition has properties injection parameters but the constructor didn't return an instance");
 			return;
 		}
 	
 		PHALCON_OBS_NVAR(param_calls);
-		phalcon_array_fetch_string(&param_calls, definition, SL("properties"), PH_NOISY);
+		phalcon_array_fetch_str(&param_calls, definition, SL("properties"), PH_NOISY);
 		if (Z_TYPE_P(param_calls) != IS_ARRAY) { 
 			PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "Setter injection parameters must be an array");
 			return;
@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			/** 
 			 * A param 'name' is required
 			 */
-			if (!phalcon_array_isset_string(property, SS("name"))) {
+			if (!phalcon_array_isset_str(property, SS("name"))) {
 				PHALCON_INIT_NVAR(exception_message);
 				PHALCON_CONCAT_SV(exception_message, "The property name is required on position ", &property_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			/** 
 			 * A param 'value' is required
 			 */
-			if (!phalcon_array_isset_string(property, SS("value"))) {
+			if (!phalcon_array_isset_str(property, SS("value"))) {
 				PHALCON_INIT_NVAR(exception_message);
 				PHALCON_CONCAT_SV(exception_message, "The property value is required on position ", &property_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
@@ -453,10 +453,10 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			}
 	
 			PHALCON_OBS_NVAR(property_name);
-			phalcon_array_fetch_string(&property_name, property, SL("name"), PH_NOISY);
+			phalcon_array_fetch_str(&property_name, property, SL("name"), PH_NOISY);
 	
 			PHALCON_OBS_NVAR(property_value);
-			phalcon_array_fetch_string(&property_value, property, SL("value"), PH_NOISY);
+			phalcon_array_fetch_str(&property_value, property, SL("value"), PH_NOISY);
 	
 			/** 
 			 * Resolve the parameter

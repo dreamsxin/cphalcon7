@@ -97,17 +97,17 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 
 	if (!phalcon_array_isset_long(params, 0)) {
 		PHALCON_OBS_VAR(id);
-		phalcon_array_fetch_string(&id, params, SL("id"), PH_NOISY);
+		phalcon_array_fetch_str(&id, params, SL("id"), PH_NOISY);
 		phalcon_array_update_long(params, 0, id, PH_COPY | PH_SEPARATE);
 	}
 
 	PHALCON_OBS_NVAR(id);
 	phalcon_array_fetch_long(&id, params, 0, PH_NOISY);
-	if (!phalcon_array_isset_string(params, SS("name"))) {
+	if (!phalcon_array_isset_str(params, SS("name"))) {
 		phalcon_array_update_string(params, SL("name"), id, PH_COPY | PH_SEPARATE);
 	} else {
 		PHALCON_OBS_VAR(name);
-		phalcon_array_fetch_string(&name, params, SL("name"), PH_NOISY);
+		phalcon_array_fetch_str(&name, params, SL("name"), PH_NOISY);
 		if (!zend_is_true(name)) {
 			phalcon_array_update_string(params, SL("name"), id, PH_COPY | PH_SEPARATE);
 		}
@@ -117,45 +117,45 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 	 * Automatically assign the id if the name is not an array
 	 */
 	if (!phalcon_memnstr_str(id, SL("["))) {
-		if (!phalcon_array_isset_string(params, SS("id"))) {
+		if (!phalcon_array_isset_str(params, SS("id"))) {
 			phalcon_array_update_string(params, SL("id"), id, PH_COPY | PH_SEPARATE);
 		}
 	}
 
-	if (!phalcon_array_isset_string(params, SS("value"))) {
+	if (!phalcon_array_isset_str(params, SS("value"))) {
 		PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", id, params);
 	} else {
 		PHALCON_OBS_VAR(value);
-		phalcon_array_fetch_string(&value, params, SL("value"), PH_NOISY);
+		phalcon_array_fetch_str(&value, params, SL("value"), PH_NOISY);
 		phalcon_array_unset_string(params, SS("value"), PH_SEPARATE);
 	}
 
 	PHALCON_INIT_VAR(use_empty);
 	ZVAL_FALSE(use_empty);
-	if (phalcon_array_isset_string(params, SS("useEmpty"))) {
-		if (!phalcon_array_isset_string(params, SS("emptyValue"))) {
+	if (phalcon_array_isset_str(params, SS("useEmpty"))) {
+		if (!phalcon_array_isset_str(params, SS("emptyValue"))) {
 			PHALCON_INIT_VAR(empty_value);
 			ZVAL_EMPTY_STRING(empty_value);
 		} else {
 			PHALCON_OBS_NVAR(empty_value);
-			phalcon_array_fetch_string(&empty_value, params, SL("emptyValue"), PH_NOISY);
+			phalcon_array_fetch_str(&empty_value, params, SL("emptyValue"), PH_NOISY);
 			phalcon_array_unset_string(params, SS("emptyValue"), PH_SEPARATE);
 		}
-		if (!phalcon_array_isset_string(params, SS("emptyText"))) {
+		if (!phalcon_array_isset_str(params, SS("emptyText"))) {
 			PHALCON_INIT_VAR(empty_text);
 			ZVAL_STRING(empty_text, "Choose...");
 		} else {
 			PHALCON_OBS_NVAR(empty_text);
-			phalcon_array_fetch_string(&empty_text, params, SL("emptyText"), PH_NOISY);
+			phalcon_array_fetch_str(&empty_text, params, SL("emptyText"), PH_NOISY);
 			phalcon_array_unset_string(params, SS("emptyText"), PH_SEPARATE);
 		}
 
 		PHALCON_OBS_NVAR(use_empty);
-		phalcon_array_fetch_string(&use_empty, params, SL("useEmpty"), PH_NOISY);
+		phalcon_array_fetch_str(&use_empty, params, SL("useEmpty"), PH_NOISY);
 		phalcon_array_unset_string(params, SS("useEmpty"), PH_SEPARATE);
 	}
 
-	if (phalcon_array_isset_string_fetch(&using, params, SS("using"))) {
+	if (phalcon_array_isset_str_fetch(&using, params, SS("using"))) {
 		phalcon_array_unset_string(params, SS("using"), PH_SEPARATE);
 	}
 

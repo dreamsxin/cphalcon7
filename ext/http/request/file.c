@@ -139,9 +139,9 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 
 		PHALCON_CALL_PARENT(NULL, phalcon_http_request_file_ce, getThis(), "__construct", file);
 	} else {
-		if (phalcon_array_isset_string(file, SS("name"))) {
+		if (phalcon_array_isset_str(file, SS("name"))) {
 			PHALCON_OBS_VAR(name);
-			phalcon_array_fetch_string(&name, file, SL("name"), PH_NOISY);
+			phalcon_array_fetch_str(&name, file, SL("name"), PH_NOISY);
 			phalcon_update_property_this(getThis(), SL("_name"), name);
 
 			if ((constant = zend_get_constant_str(SL("PATHINFO_EXTENSION"))) != NULL) {
@@ -150,27 +150,27 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 			}
 		}
 		
-		if (phalcon_array_isset_string(file, SS("tmp_name"))) {
+		if (phalcon_array_isset_str(file, SS("tmp_name"))) {
 			PHALCON_OBS_VAR(temp_name);
-			phalcon_array_fetch_string(&temp_name, file, SL("tmp_name"), PH_NOISY);
+			phalcon_array_fetch_str(&temp_name, file, SL("tmp_name"), PH_NOISY);
 			phalcon_update_property_this(getThis(), SL("_tmp"), temp_name);
 		}
 		
-		if (phalcon_array_isset_string(file, SS("size"))) {
+		if (phalcon_array_isset_str(file, SS("size"))) {
 			PHALCON_OBS_VAR(size);
-			phalcon_array_fetch_string(&size, file, SL("size"), PH_NOISY);
+			phalcon_array_fetch_str(&size, file, SL("size"), PH_NOISY);
 			phalcon_update_property_this(getThis(), SL("_size"), size);
 		}
 		
-		if (phalcon_array_isset_string(file, SS("type"))) {
+		if (phalcon_array_isset_str(file, SS("type"))) {
 			PHALCON_OBS_VAR(type);
-			phalcon_array_fetch_string(&type, file, SL("type"), PH_NOISY);
+			phalcon_array_fetch_str(&type, file, SL("type"), PH_NOISY);
 			phalcon_update_property_this(getThis(), SL("_type"), type);
 		}
 
-		if (phalcon_array_isset_string(file, SS("error"))) {
+		if (phalcon_array_isset_str(file, SS("error"))) {
 			PHALCON_OBS_VAR(error);
-			phalcon_array_fetch_string(&error, file, SL("error"), PH_NOISY);
+			phalcon_array_fetch_str(&error, file, SL("error"), PH_NOISY);
 			phalcon_update_property_this(getThis(), SL("_error"), error);
 		}
 

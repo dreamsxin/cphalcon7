@@ -84,7 +84,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&data, options, SS("content"))) {
+	if (!phalcon_array_isset_str_fetch(&data, options, SS("content"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Translation content was not provided");
 		return;
 	}

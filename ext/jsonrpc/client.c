@@ -149,23 +149,23 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call){
 		PHALCON_CALL_FUNCTION(&json, "json_decode", body, &PHALCON_GLOBAL(z_true));
 
 		if (Z_TYPE_P(json) == IS_ARRAY) {
-			if (phalcon_array_isset_string(json, SS("id"))) {
+			if (phalcon_array_isset_str(json, SS("id"))) {
 				PHALCON_OBS_VAR(id);
-				phalcon_array_fetch_string(&id, json, SL("id"), PH_NOISY);
+				phalcon_array_fetch_str(&id, json, SL("id"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(NULL, jsonrpc_response, "setid", id);
 			}
 
-			if (phalcon_array_isset_string(json, SS("result"))) {
+			if (phalcon_array_isset_str(json, SS("result"))) {
 				PHALCON_OBS_VAR(result);
-				phalcon_array_fetch_string(&result, json, SL("result"), PH_NOISY);
+				phalcon_array_fetch_str(&result, json, SL("result"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(NULL, jsonrpc_response, "setresult", result);
 			}
 
-			if (phalcon_array_isset_string(json, SS("error"))) {
+			if (phalcon_array_isset_str(json, SS("error"))) {
 				PHALCON_OBS_VAR(error);
-				phalcon_array_fetch_string(&error, json, SL("error"), PH_NOISY);
+				phalcon_array_fetch_str(&error, json, SL("error"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(NULL, jsonrpc_response, "seterror", error);
 			}

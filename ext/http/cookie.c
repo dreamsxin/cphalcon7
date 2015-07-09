@@ -460,32 +460,32 @@ PHP_METHOD(Phalcon_Http_Cookie, restore){
 
 			PHALCON_CALL_METHOD(&definition, session, "get", key);
 			if (Z_TYPE_P(definition) == IS_ARRAY) { 
-				if (phalcon_array_isset_string(definition, SS("expire"))) {
+				if (phalcon_array_isset_str(definition, SS("expire"))) {
 					PHALCON_OBS_VAR(expire);
-					phalcon_array_fetch_string(&expire, definition, SL("expire"), PH_NOISY);
+					phalcon_array_fetch_str(&expire, definition, SL("expire"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_expire"), expire);
 				}
-				if (phalcon_array_isset_string(definition, SS("domain"))) {
+				if (phalcon_array_isset_str(definition, SS("domain"))) {
 					PHALCON_OBS_VAR(domain);
-					phalcon_array_fetch_string(&domain, definition, SL("domain"), PH_NOISY);
+					phalcon_array_fetch_str(&domain, definition, SL("domain"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_domain"), domain);
 				}
 
-				if (phalcon_array_isset_string(definition, SS("path"))) {
+				if (phalcon_array_isset_str(definition, SS("path"))) {
 					PHALCON_OBS_VAR(path);
-					phalcon_array_fetch_string(&path, definition, SL("path"), PH_NOISY);
+					phalcon_array_fetch_str(&path, definition, SL("path"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_path"), path);
 				}
 
-				if (phalcon_array_isset_string(definition, SS("secure"))) {
+				if (phalcon_array_isset_str(definition, SS("secure"))) {
 					PHALCON_OBS_VAR(secure);
-					phalcon_array_fetch_string(&secure, definition, SL("secure"), PH_NOISY);
+					phalcon_array_fetch_str(&secure, definition, SL("secure"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_secure"), secure);
 				}
 
-				if (phalcon_array_isset_string(definition, SS("httpOnly"))) {
+				if (phalcon_array_isset_str(definition, SS("httpOnly"))) {
 					PHALCON_OBS_VAR(http_only);
-					phalcon_array_fetch_string(&http_only, definition, SL("httpOnly"), PH_NOISY);
+					phalcon_array_fetch_str(&http_only, definition, SL("httpOnly"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_httpOnly"), http_only);
 				}
 			}

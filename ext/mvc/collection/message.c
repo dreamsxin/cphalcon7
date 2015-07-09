@@ -321,16 +321,16 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, __set_state){
 	phalcon_fetch_params(1, 1, 0, &message);
 	
 	PHALCON_OBS_VAR(message_text);
-	phalcon_array_fetch_string(&message_text, message, SL("_message"), PH_NOISY);
+	phalcon_array_fetch_str(&message_text, message, SL("_message"), PH_NOISY);
 
 	PHALCON_OBS_VAR(field);
-	phalcon_array_fetch_string(&field, message, SL("_field"), PH_NOISY);
+	phalcon_array_fetch_str(&field, message, SL("_field"), PH_NOISY);
 
 	PHALCON_OBS_VAR(type);
-	phalcon_array_fetch_string(&type, message, SL("_type"), PH_NOISY);
+	phalcon_array_fetch_str(&type, message, SL("_type"), PH_NOISY);
 
 	PHALCON_OBS_VAR(code);
-	phalcon_array_fetch_string(&code, message, SL("_code"), PH_NOISY);
+	phalcon_array_fetch_str(&code, message, SL("_code"), PH_NOISY);
 
 	object_init_ex(return_value, phalcon_mvc_collection_message_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", message_text, field, type, code);

@@ -109,12 +109,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
 	if (!zend_is_true(descriptor)) {
 		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
 	}
-	if (!phalcon_array_isset_string(descriptor, SS("dbname"))) {
+	if (!phalcon_array_isset_str(descriptor, SS("dbname"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "dbname must be specified");
 		return;
 	} else {
 		PHALCON_OBS_VAR(dbname);
-		phalcon_array_fetch_string(&dbname, descriptor, SL("dbname"), PH_NOISY);
+		phalcon_array_fetch_str(&dbname, descriptor, SL("dbname"), PH_NOISY);
 		phalcon_array_update_string(descriptor, SL("dsn"), dbname, PH_COPY | PH_SEPARATE);
 	}
 

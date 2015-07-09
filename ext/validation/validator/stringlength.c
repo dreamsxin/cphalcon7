@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_function(valid, maximum, length);
 		if (PHALCON_IS_TRUE(valid)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("TooLong"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("TooLong"));
 			RETURN_MM_FALSE;
 		}
 	}
@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_function(valid, length, minimum);
 		if (PHALCON_IS_TRUE(valid)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("TooShort"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("TooShort"));
 			RETURN_MM_FALSE;
 		}
 	}

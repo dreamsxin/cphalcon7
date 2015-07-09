@@ -101,9 +101,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
 	if (zend_is_true(name)) {
-		if (phalcon_array_isset_string(options, SS("option"))) {
+		if (phalcon_array_isset_str(options, SS("option"))) {
 			PHALCON_OBS_VAR(option);
-			phalcon_array_fetch_string(&option, options, SL("option"), PH_NOISY);
+			phalcon_array_fetch_str(&option, options, SL("option"), PH_NOISY);
 		} else {
 			/** 
 			 * Open the log in LOG_ODELAY mode
@@ -111,9 +111,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 			PHALCON_INIT_NVAR(option);
 			ZVAL_LONG(option, 4);
 		}
-		if (phalcon_array_isset_string(options, SS("facility"))) {
+		if (phalcon_array_isset_str(options, SS("facility"))) {
 			PHALCON_OBS_VAR(facility);
-			phalcon_array_fetch_string(&facility, options, SL("facility"), PH_NOISY);
+			phalcon_array_fetch_str(&facility, options, SL("facility"), PH_NOISY);
 		} else {
 			/** 
 			 * By default the facility is LOG_USER

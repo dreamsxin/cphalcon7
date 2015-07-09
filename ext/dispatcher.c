@@ -1103,17 +1103,17 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 	/**
 	 * Check if we need to forward to another namespace
 	 */
-	if (phalcon_array_isset_string_fetch(&namespace_name, forward_parts, SS("namespace"))) {
+	if (phalcon_array_isset_str_fetch(&namespace_name, forward_parts, SS("namespace"))) {
 		phalcon_update_property_this(getThis(), SL("_namespaceName"), namespace_name);
 	}
 
 	/**
 	 * Check if we need to forward to another controller
 	 */
-	if (phalcon_array_isset_string_fetch(&controller_name, forward_parts, SS("controller"))) {
+	if (phalcon_array_isset_str_fetch(&controller_name, forward_parts, SS("controller"))) {
 		phalcon_update_property_this(getThis(), SL("_handlerName"), controller_name);
 	} else {
-		if (phalcon_array_isset_string_fetch(&task_name, forward_parts, SS("task"))) {
+		if (phalcon_array_isset_str_fetch(&task_name, forward_parts, SS("task"))) {
 			phalcon_update_property_this(getThis(), SL("_handlerName"), task_name);
 		}
 	}
@@ -1121,14 +1121,14 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 	/**
 	 * Check if we need to forward to another action
 	 */
-	if (phalcon_array_isset_string_fetch(&action_name, forward_parts, SS("action"))) {
+	if (phalcon_array_isset_str_fetch(&action_name, forward_parts, SS("action"))) {
 		phalcon_update_property_this(getThis(), SL("_actionName"), action_name);
 	}
 
 	/**
 	 * Check if we need to forward changing the current parameters
 	 */
-	if (phalcon_array_isset_string_fetch(&params, forward_parts, SS("params"))) {
+	if (phalcon_array_isset_str_fetch(&params, forward_parts, SS("params"))) {
 		phalcon_update_property_this(getThis(), SL("_params"), params);
 	}
 

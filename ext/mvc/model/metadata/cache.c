@@ -107,14 +107,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&service, options, SS("service"))) {
+	if (!phalcon_array_isset_str_fetch(&service, options, SS("service"))) {
 		PHALCON_INIT_VAR(service);
 		ZVAL_STRING(service, "cache");
 	}
 
 	phalcon_update_property_this(getThis(), SL("_cache"), service);
 
-	if (!phalcon_array_isset_string_fetch(&lifetime, options, SS("lifetime"))) {
+	if (!phalcon_array_isset_str_fetch(&lifetime, options, SS("lifetime"))) {
 		PHALCON_INIT_VAR(lifetime);
 		ZVAL_LONG(lifetime, 8600);
 	}

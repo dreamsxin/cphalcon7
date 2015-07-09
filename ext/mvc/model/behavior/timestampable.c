@@ -89,26 +89,26 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 		/** 
 		 * The field name is required in this behavior
 		 */
-		if (!phalcon_array_isset_string(options, SS("field"))) {
+		if (!phalcon_array_isset_str(options, SS("field"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'field' is required");
 			return;
 		}
 	
-		if (phalcon_array_isset_string(options, SS("format"))) {
+		if (phalcon_array_isset_str(options, SS("format"))) {
 			/** 
 			 * Format is a format for date()
 			 */
 			PHALCON_OBS_VAR(format);
-			phalcon_array_fetch_string(&format, options, SL("format"), PH_NOISY);
+			phalcon_array_fetch_str(&format, options, SL("format"), PH_NOISY);
 	
 			PHALCON_INIT_VAR(timestamp);
 			phalcon_date(timestamp, format, NULL);
-		} else if (phalcon_array_isset_string(options, SS("generator"))) {
+		} else if (phalcon_array_isset_str(options, SS("generator"))) {
 			/**
 			 * A generator is a closure that produce the correct timestamp value
 			 */
 			PHALCON_OBS_VAR(generator);
-			phalcon_array_fetch_string(&generator, options, SL("generator"), PH_NOISY);
+			phalcon_array_fetch_str(&generator, options, SL("generator"), PH_NOISY);
 			if (Z_TYPE_P(generator) == IS_OBJECT) {
 				if (instanceof_function(Z_OBJCE_P(generator), zend_ce_closure)) {
 					PHALCON_CALL_USER_FUNC(&timestamp, generator);
@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 		}
 	
 		PHALCON_OBS_VAR(field);
-		phalcon_array_fetch_string(&field, options, SL("field"), PH_NOISY);
+		phalcon_array_fetch_str(&field, options, SL("field"), PH_NOISY);
 	
 		/** 
 		 * Assign the value to the field, use writeattribute if the property is protected

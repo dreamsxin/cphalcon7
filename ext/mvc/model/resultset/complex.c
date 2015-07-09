@@ -265,20 +265,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 				}
 
 				PHALCON_OBS_NVAR(type);
-				phalcon_array_fetch_string(&type, column, SL("type"), PH_NOISY);
+				phalcon_array_fetch_str(&type, column, SL("type"), PH_NOISY);
 				if (PHALCON_IS_STRING(type, "object")) {
 
 					/** 
 					 * Object columns are assigned column by column
 					 */
 					PHALCON_OBS_NVAR(source);
-					phalcon_array_fetch_string(&source, column, SL("column"), PH_NOISY);
+					phalcon_array_fetch_str(&source, column, SL("column"), PH_NOISY);
 
 					PHALCON_OBS_NVAR(attributes);
-					phalcon_array_fetch_string(&attributes, column, SL("attributes"), PH_NOISY);
+					phalcon_array_fetch_str(&attributes, column, SL("attributes"), PH_NOISY);
 
 					PHALCON_OBS_NVAR(column_map);
-					phalcon_array_fetch_string(&column_map, column, SL("columnMap"), PH_NOISY);
+					phalcon_array_fetch_str(&column_map, column, SL("columnMap"), PH_NOISY);
 
 					/** 
 					 * Assign the values from the _source_attribute notation to its real column name
@@ -309,7 +309,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							/** 
 							 * Get the base instance
 							 */
-							if (!phalcon_array_isset_string_fetch(&instance, column, SS("instance"))) {
+							if (!phalcon_array_isset_str_fetch(&instance, column, SS("instance"))) {
 								php_error_docref(NULL, E_NOTICE, "Undefined index: instance");
 								instance = &PHALCON_GLOBAL(z_null);
 							}
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							/** 
 							 * Check if the resultset must keep snapshots
 							 */
-							if (!phalcon_array_isset_string_fetch(&keep_snapshots, column, SS("keepSnapshots"))) {
+							if (!phalcon_array_isset_str_fetch(&keep_snapshots, column, SS("keepSnapshots"))) {
 								keep_snapshots = &PHALCON_GLOBAL(z_false);
 							}
 
@@ -341,16 +341,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					 * the model name
 					 */
 					PHALCON_OBS_NVAR(attribute);
-					if (phalcon_array_isset_string(column, SS("balias"))) {
-						phalcon_array_fetch_string(&attribute, column, SL("balias"), PH_NOISY);
+					if (phalcon_array_isset_str(column, SS("balias"))) {
+						phalcon_array_fetch_str(&attribute, column, SL("balias"), PH_NOISY);
 					}
 				} else {
 					/** 
 					 * Scalar columns are simply assigned to the result object
 					 */
-					if (phalcon_array_isset_string(column, SS("sqlAlias"))) {
+					if (phalcon_array_isset_str(column, SS("sqlAlias"))) {
 						PHALCON_OBS_NVAR(sql_alias);
-						phalcon_array_fetch_string(&sql_alias, column, SL("sqlAlias"), PH_NOISY);
+						phalcon_array_fetch_str(&sql_alias, column, SL("sqlAlias"), PH_NOISY);
 
 						PHALCON_OBS_NVAR(value);
 						phalcon_array_fetch(&value, row, sql_alias, PH_NOISY);
@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					/** 
 					 * If a 'balias' is defined is not an unnamed scalar
 					 */
-					if (phalcon_array_isset_string(column, SS("balias"))) {
+					if (phalcon_array_isset_str(column, SS("balias"))) {
 						PHALCON_CPY_WRT(attribute, &alias);
 					} else {
 						PHALCON_STR_REPLACE(&n_alias, underscore, empty_str, &alias);
@@ -514,19 +514,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, unserialize){
 	}
 
 	PHALCON_OBS_VAR(rows);
-	phalcon_array_fetch_string(&rows, resultset, SL("rows"), PH_NOISY);
+	phalcon_array_fetch_str(&rows, resultset, SL("rows"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_rows"), rows);
 
 	PHALCON_OBS_VAR(cache);
-	phalcon_array_fetch_string(&cache, resultset, SL("cache"), PH_NOISY);
+	phalcon_array_fetch_str(&cache, resultset, SL("cache"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_cache"), cache);
 
 	PHALCON_OBS_VAR(column_types);
-	phalcon_array_fetch_string(&column_types, resultset, SL("columnTypes"), PH_NOISY);
+	phalcon_array_fetch_str(&column_types, resultset, SL("columnTypes"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_columnTypes"), column_types);
 
 	PHALCON_OBS_VAR(hydrate_mode);
-	phalcon_array_fetch_string(&hydrate_mode, resultset, SL("hydrateMode"), PH_NOISY);
+	phalcon_array_fetch_str(&hydrate_mode, resultset, SL("hydrateMode"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_hydrateMode"), hydrate_mode);
 
 	PHALCON_MM_RESTORE();

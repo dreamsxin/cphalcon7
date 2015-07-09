@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	if (!phalcon_array_isset_string_fetch(&builder, config, SS("builder"))) {
+	if (!phalcon_array_isset_str_fetch(&builder, config, SS("builder"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'builder' is required");
 		return;
 	}
@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	phalcon_update_property_this(getThis(), SL("_builder"), builder);
 
-	if (!phalcon_array_isset_string_fetch(&limit, config, SS("limit"))) {
+	if (!phalcon_array_isset_str_fetch(&limit, config, SS("limit"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
 		return;
 	}
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
 
-	if (phalcon_array_isset_string_fetch(&page, config, SS("page"))) {
+	if (phalcon_array_isset_str_fetch(&page, config, SS("page"))) {
 		phalcon_update_property_this(getThis(), SL("_page"), page);
 	}
 }
@@ -341,14 +341,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	PHALCON_CALL_METHOD(&intermediate, total_query, "parse");
 
 	PHALCON_OBS_VAR(columns);
-	phalcon_array_fetch_str(&columns, intermediate, IS(columns), PH_NOISY);
+	phalcon_array_fetch_string(&columns, intermediate, IS(columns), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column) {
 		PHALCON_OBS_NVAR(type);
-		phalcon_array_fetch_str(&type, column, IS(type), PH_NOISY);
+		phalcon_array_fetch_string(&type, column, IS(type), PH_NOISY);
 
 		PHALCON_OBS_NVAR(sql_column);
-		phalcon_array_fetch_str(&sql_column, column, IS(column), PH_NOISY);
+		phalcon_array_fetch_string(&sql_column, column, IS(column), PH_NOISY);
 
 		/**
 		 * Complete objects are treated in a different way
@@ -449,7 +449,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	PHALCON_CALL_METHOD(&row, result, "fetch");
 
 	PHALCON_OBS_VAR(rowcount);
-	phalcon_array_fetch_string(&rowcount, row, SL("rowcount"), PH_NOISY);
+	phalcon_array_fetch_str(&rowcount, row, SL("rowcount"), PH_NOISY);
 
 	i_rowcount    = phalcon_get_intval(rowcount);
 	tp            = ldiv(i_rowcount, i_limit);

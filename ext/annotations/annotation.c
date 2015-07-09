@@ -112,13 +112,13 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	}
 
 	PHALCON_OBS_VAR(name);
-	phalcon_array_fetch_string(&name, reflection_data, SL("name"), PH_NOISY);
+	phalcon_array_fetch_str(&name, reflection_data, SL("name"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_name"), name);
 	
 	/** 
 	 * Process annotation arguments
 	 */
-	if (phalcon_array_isset_string_fetch(&expr_arguments, reflection_data, SS("arguments"))) {
+	if (phalcon_array_isset_str_fetch(&expr_arguments, reflection_data, SS("arguments"))) {
 		PHALCON_INIT_VAR(arguments);
 		array_init(arguments);
 
@@ -126,10 +126,10 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 			zval *n;
 	
 			PHALCON_OBS_NVAR(expr);
-			phalcon_array_fetch_string(&expr, argument, SL("expr"), PH_NOISY);
+			phalcon_array_fetch_str(&expr, argument, SL("expr"), PH_NOISY);
 	
 			PHALCON_CALL_METHOD(&resolved_argument, getThis(), "getexpression", expr);
-			if (phalcon_array_isset_string_fetch(&n, argument, SS("name"))) {
+			if (phalcon_array_isset_str_fetch(&n, argument, SS("name"))) {
 				phalcon_array_update_zval(arguments, n, resolved_argument, PH_COPY);
 			} else {
 				phalcon_array_append(arguments, resolved_argument, 0);
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 	}
 	
 	PHALCON_OBS_VAR(type);
-	phalcon_array_fetch_string(&type, expr, SL("type"), PH_NOISY);
+	phalcon_array_fetch_str(&type, expr, SL("type"), PH_NOISY);
 	
 	switch (phalcon_get_intval(type)) {
 	
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 		case PHANNOT_T_DOUBLE:
 		case PHANNOT_T_STRING:
 		case PHANNOT_T_IDENTIFIER:
-			phalcon_array_fetch_string(&return_value, expr, SL("value"), PH_NOISY);
+			phalcon_array_fetch_str(&return_value, expr, SL("value"), PH_NOISY);
 			RETURN_MM();
 			/* no break because of implicit return */
 	
@@ -202,7 +202,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 	
 		case PHANNOT_T_ARRAY:
 			PHALCON_OBS_VAR(items);
-			phalcon_array_fetch_string(&items, expr, SL("items"), PH_NOISY);
+			phalcon_array_fetch_str(&items, expr, SL("items"), PH_NOISY);
 
 			array_init(return_value);
 
@@ -210,10 +210,10 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 				zval *name;
 	
 				PHALCON_OBS_NVAR(expr);
-				phalcon_array_fetch_string(&expr, item, SL("expr"), PH_NOISY);
+				phalcon_array_fetch_str(&expr, item, SL("expr"), PH_NOISY);
 	
 				PHALCON_CALL_METHOD(&resolved_item, getThis(), "getexpression", expr);
-				if (phalcon_array_isset_string_fetch(&name, item, SS("name"))) {
+				if (phalcon_array_isset_str_fetch(&name, item, SS("name"))) {
 					phalcon_array_update_zval(return_value, name, resolved_item, PH_COPY);
 				} else {
 					phalcon_array_append(return_value, resolved_item, 0);

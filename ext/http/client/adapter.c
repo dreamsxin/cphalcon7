@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, get){
 		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(getThis(), SL("_method"), SL("GET"));
+	phalcon_update_property_str(getThis(), SL("_method"), SL("GET"));
 	
 	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
@@ -357,7 +357,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, head){
 		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(getThis(), SL("_method"), SL("HEAD"));
+	phalcon_update_property_str(getThis(), SL("_method"), SL("HEAD"));
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, post){
 		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(getThis(), SL("_method"), SL("POST"));
+	phalcon_update_property_str(getThis(), SL("_method"), SL("POST"));
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
@@ -409,7 +409,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, put){
 		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(getThis(), SL("_method"), SL("PUT"));
+	phalcon_update_property_str(getThis(), SL("_method"), SL("PUT"));
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }
@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, delete){
 		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
 	}
 
-	phalcon_update_property_string(getThis(), SL("_method"), SL("DELETE"));
+	phalcon_update_property_str(getThis(), SL("_method"), SL("DELETE"));
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
 }

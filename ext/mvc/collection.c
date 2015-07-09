@@ -349,9 +349,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
 	if (Z_TYPE_P(column_map) == IS_ARRAY) {
-		if (phalcon_array_isset_string(column_map, SS("_id"))) {
+		if (phalcon_array_isset_str(column_map, SS("_id"))) {
 			PHALCON_OBS_NVAR(id_name);
-			phalcon_array_fetch_string(&id_name, column_map, SL("_id"), PH_NOISY);
+			phalcon_array_fetch_str(&id_name, column_map, SL("_id"), PH_NOISY);
 		}
 	}
 
@@ -398,9 +398,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
 	if (Z_TYPE_P(column_map) == IS_ARRAY) { 
-		if (phalcon_array_isset_string(column_map, SS("_id"))) {
+		if (phalcon_array_isset_str(column_map, SS("_id"))) {
 			PHALCON_OBS_NVAR(id_name);
-			phalcon_array_fetch_string(&id_name, column_map, SL("_id"), PH_NOISY);
+			phalcon_array_fetch_str(&id_name, column_map, SL("_id"), PH_NOISY);
 		}
 	}
 
@@ -920,9 +920,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
 	/**
 	 * Convert the string to an array
 	 */
-	if (phalcon_array_isset_string(params, SS("conditions"))) {
+	if (phalcon_array_isset_str(params, SS("conditions"))) {
 		PHALCON_OBS_NVAR(conditions);
-		phalcon_array_fetch_string(&conditions, params, SL("conditions"), PH_NOISY);
+		phalcon_array_fetch_str(&conditions, params, SL("conditions"), PH_NOISY);
 	} else if (phalcon_array_isset_long(params, 0)) {
 		PHALCON_OBS_VAR(conditions);
 		phalcon_array_fetch_long(&conditions, params, 0, PH_NOISY);	
@@ -942,9 +942,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
 	 * Perform the find
 	 */
 	PHALCON_INIT_VAR(documents_cursor);
-	if (phalcon_array_isset_string(params, SS("fields"))) {
+	if (phalcon_array_isset_str(params, SS("fields"))) {
 		PHALCON_OBS_VAR(fields);
-		phalcon_array_fetch_string(&fields, params, SL("fields"), PH_NOISY);
+		phalcon_array_fetch_str(&fields, params, SL("fields"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&documents_cursor, mongo_collection, "find", new_conditions, fields);
 	} else {
@@ -954,31 +954,31 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
 	/**
 	 * Check if a 'limit' clause was defined
 	 */
-	if (phalcon_array_isset_string(params, SS("limit"))) {
+	if (phalcon_array_isset_str(params, SS("limit"))) {
 		PHALCON_OBS_VAR(limit);
-		phalcon_array_fetch_string(&limit, params, SL("limit"), PH_NOISY);
+		phalcon_array_fetch_str(&limit, params, SL("limit"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, documents_cursor, "limit", limit);
 	}
 
 	/**
 	 * Check if a 'sort' clause was defined
 	 */
-	if (phalcon_array_isset_string(params, SS("sort"))) {
+	if (phalcon_array_isset_str(params, SS("sort"))) {
 		PHALCON_OBS_VAR(sort);
-		phalcon_array_fetch_string(&sort, params, SL("sort"), PH_NOISY);
+		phalcon_array_fetch_str(&sort, params, SL("sort"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, documents_cursor, "sort", sort);
-	} else if (phalcon_array_isset_string(params, SS("order"))) {
+	} else if (phalcon_array_isset_str(params, SS("order"))) {
 		PHALCON_OBS_VAR(sort);
-		phalcon_array_fetch_string(&sort, params, SL("order"), PH_NOISY);
+		phalcon_array_fetch_str(&sort, params, SL("order"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, documents_cursor, "sort", sort);
 	}
 
 	/**
 	 * Check if a 'skip' clause was defined
 	 */
-	if (phalcon_array_isset_string(params, SS("skip"))) {
+	if (phalcon_array_isset_str(params, SS("skip"))) {
 		PHALCON_OBS_NVAR(sort);
-		phalcon_array_fetch_string(&sort, params, SL("skip"), PH_NOISY);
+		phalcon_array_fetch_str(&sort, params, SL("skip"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, documents_cursor, "skip", sort);
 	}
 
@@ -986,7 +986,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
 	 * If a group of specific fields are requested we use a
 	 * Phalcon\Mvc\Collection\Document instead
 	 */
-	if (phalcon_array_isset_string(params, SS("fields"))) {
+	if (phalcon_array_isset_str(params, SS("fields"))) {
 		PHALCON_INIT_VAR(base);
 		object_init_ex(base, phalcon_mvc_collection_document_ce);
 	} else {
@@ -1050,9 +1050,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getGroupResultset){
 		PHALCON_OBS_VAR(conditions);
 		phalcon_array_fetch_long(&conditions, params, 0, PH_NOISY);
 	} else {
-		if (phalcon_array_isset_string(params, SS("conditions"))) {
+		if (phalcon_array_isset_str(params, SS("conditions"))) {
 			PHALCON_OBS_NVAR(conditions);
-			phalcon_array_fetch_string(&conditions, params, SL("conditions"), PH_NOISY);
+			phalcon_array_fetch_str(&conditions, params, SL("conditions"), PH_NOISY);
 		} else {
 			PHALCON_INIT_NVAR(conditions);
 			array_init(conditions);
@@ -1063,14 +1063,14 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getGroupResultset){
 
 	PHALCON_INIT_VAR(simple);
 	ZVAL_BOOL(simple, 1);
-	if (phalcon_array_isset_string(params, SS("limit"))) {
+	if (phalcon_array_isset_str(params, SS("limit"))) {
 		ZVAL_BOOL(simple, 0);
 	} else {
-		if (phalcon_array_isset_string(params, SS("sort"))) {
+		if (phalcon_array_isset_str(params, SS("sort"))) {
 			PHALCON_INIT_NVAR(simple);
 			ZVAL_BOOL(simple, 0);
 		} else {
-			if (phalcon_array_isset_string(params, SS("skip"))) {
+			if (phalcon_array_isset_str(params, SS("skip"))) {
 				PHALCON_INIT_NVAR(simple);
 				ZVAL_BOOL(simple, 0);
 			}
@@ -1087,27 +1087,27 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getGroupResultset){
 		/**
 		 * Check if a 'limit' clause was defined
 		 */
-		if (phalcon_array_isset_string(params, SS("limit"))) {
+		if (phalcon_array_isset_str(params, SS("limit"))) {
 			PHALCON_OBS_VAR(limit);
-			phalcon_array_fetch_string(&limit, params, SL("limit"), PH_NOISY);
+			phalcon_array_fetch_str(&limit, params, SL("limit"), PH_NOISY);
 			PHALCON_CALL_METHOD(NULL, documents_cursor, "limit", limit);
 		}
 
 		/**
 		 * Check if a 'sort' clause was defined
 		 */
-		if (phalcon_array_isset_string(params, SS("sort"))) {
+		if (phalcon_array_isset_str(params, SS("sort"))) {
 			PHALCON_OBS_VAR(sort);
-			phalcon_array_fetch_string(&sort, params, SL("sort"), PH_NOISY);
+			phalcon_array_fetch_str(&sort, params, SL("sort"), PH_NOISY);
 			PHALCON_CALL_METHOD(NULL, documents_cursor, "sort", sort);
 		}
 
 		/**
 		 * Check if a 'skip' clause was defined
 		 */
-		if (phalcon_array_isset_string(params, SS("skip"))) {
+		if (phalcon_array_isset_str(params, SS("skip"))) {
 			PHALCON_OBS_NVAR(sort);
-			phalcon_array_fetch_string(&sort, params, SL("skip"), PH_NOISY);
+			phalcon_array_fetch_str(&sort, params, SL("skip"), PH_NOISY);
 			PHALCON_CALL_METHOD(NULL, documents_cursor, "skip", sort);
 		}
 
@@ -1854,17 +1854,17 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	PHALCON_INIT_NVAR(success);
 	ZVAL_FALSE(success);
 
-	if (phalcon_array_isset_string_fetch(&ok, status, SS("ok"))) {
+	if (phalcon_array_isset_str_fetch(&ok, status, SS("ok"))) {
 		if (zend_is_true(ok)) {
 			ZVAL_TRUE(success);
-			if (PHALCON_IS_FALSE(exists) && phalcon_array_isset_string_fetch(&id, data, SS("_id"))) {
+			if (PHALCON_IS_FALSE(exists) && phalcon_array_isset_str_fetch(&id, data, SS("_id"))) {
 				PHALCON_INIT_NVAR(attribute_field);
 				ZVAL_STRING(attribute_field, "_id");
 
 				if (Z_TYPE_P(column_map) == IS_ARRAY) { 
-					if (phalcon_array_isset_string(column_map, SS("_id"))) {
+					if (phalcon_array_isset_str(column_map, SS("_id"))) {
 						PHALCON_OBS_NVAR(attribute_field);
-						phalcon_array_fetch_string(&attribute_field, column_map, SL("_id"), PH_NOISY);
+						phalcon_array_fetch_str(&attribute_field, column_map, SL("_id"), PH_NOISY);
 					}
 				}
 
@@ -2281,16 +2281,16 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	ZVAL_STRING(reduce, "function (curr, result) { for (var key in result.summatory) {if (typeof curr[key] !== \"undefined\") { if (typeof curr[key] === \"string\") {result.summatory[key] += curr[key].trim().length > 0 ? parseFloat(curr[key].trim()) : 0;} else {result.summatory[key] += curr[key];} } }}");
 
 	PHALCON_CALL_METHOD(&group, collection, "group", keys, initial, reduce, options);
-	if (phalcon_array_isset_string(group, SS("retval"))) {
+	if (phalcon_array_isset_str(group, SS("retval"))) {
 		PHALCON_OBS_VAR(retval);
-		phalcon_array_fetch_string(&retval, group, SL("retval"), PH_NOISY);
+		phalcon_array_fetch_str(&retval, group, SL("retval"), PH_NOISY);
 		if (phalcon_array_isset_long(retval, 0)) {
 
 			PHALCON_OBS_VAR(first_retval);
 			phalcon_array_fetch_long(&first_retval, retval, 0, PH_NOISY);
-			if (phalcon_array_isset_string(first_retval, SS("summatory"))) {
+			if (phalcon_array_isset_str(first_retval, SS("summatory"))) {
 				PHALCON_OBS_VAR(summatory);
-				phalcon_array_fetch_string(&summatory, first_retval, SL("summatory"), PH_NOISY);
+				phalcon_array_fetch_str(&summatory, first_retval, SL("summatory"), PH_NOISY);
 				RETURN_CTOR(summatory);
 			}
 
@@ -2430,10 +2430,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 	/**
 	 * Check the operation status
 	 */
-	if (phalcon_array_isset_string(status, SS("ok"))) {
+	if (phalcon_array_isset_str(status, SS("ok"))) {
 
 		PHALCON_OBS_VAR(ok);
-		phalcon_array_fetch_string(&ok, status, SL("ok"), PH_NOISY);
+		phalcon_array_fetch_str(&ok, status, SL("ok"), PH_NOISY);
 		if (zend_is_true(ok)) {
 
 			ZVAL_BOOL(success, 1);
@@ -2828,9 +2828,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, drop){
 	if (Z_TYPE_P(mongo_collection) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&status, mongo_collection, "drop");
 
-		if (phalcon_array_isset_string(status, SS("ok"))) {
+		if (phalcon_array_isset_str(status, SS("ok"))) {
 			PHALCON_OBS_NVAR(ok);
-			phalcon_array_fetch_string(&ok, status, SL("ok"), PH_NOISY);
+			phalcon_array_fetch_str(&ok, status, SL("ok"), PH_NOISY);
 		}
 	}
 

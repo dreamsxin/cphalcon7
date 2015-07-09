@@ -121,10 +121,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
 	 * depends on particular NLS* parameter. Check if the developer has defined custom
 	 * startup or create one from scratch
 	 */
-	if (phalcon_array_isset_string(descriptor, SS("startup"))) {
+	if (phalcon_array_isset_str(descriptor, SS("startup"))) {
 
 		PHALCON_OBS_VAR(startup);
-		phalcon_array_fetch_string(&startup, descriptor, SL("startup"), PH_NOISY);
+		phalcon_array_fetch_str(&startup, descriptor, SL("startup"), PH_NOISY);
 		if (Z_TYPE_P(startup) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(startup), value) {
 				PHALCON_CALL_METHOD(NULL, getThis(), "execute", value);

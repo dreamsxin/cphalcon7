@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 		PHALCON_INIT_VAR(slash);
 		ZVAL_STRING(slash, "/");
 		_SERVER = phalcon_get_global(SS("_SERVER"));
-		if (phalcon_array_isset_string_fetch(&php_self, _SERVER, SS("PHP_SELF"))) {
+		if (phalcon_array_isset_str_fetch(&php_self, _SERVER, SS("PHP_SELF"))) {
 			PHALCON_INIT_VAR(uri);
 			phalcon_get_uri(uri, php_self);
 		} else {
@@ -306,7 +306,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 			ZVAL_ZVAL(return_value, uri, 1, 0);
 		}
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
-		if (!phalcon_array_isset_string_fetch(&route_name, uri, SS("for"))) {
+		if (!phalcon_array_isset_str_fetch(&route_name, uri, SS("for"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_url_exception_ce, "It's necessary to define the route name with the parameter \"for\"");
 			return;
 		}
@@ -372,7 +372,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 
 			PHALCON_CONCAT_VV(return_value, base_uri, processed_uri);
 
-			if (phalcon_array_isset_string_fetch(&hostname, uri, SS("hostname"))) {
+			if (phalcon_array_isset_str_fetch(&hostname, uri, SS("hostname"))) {
 				if (zend_is_true(hostname)) {
 					PHALCON_CALL_METHOD(&hostname, route, "gethostname");
 

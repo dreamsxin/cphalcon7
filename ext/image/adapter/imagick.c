@@ -1783,9 +1783,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, levels)
 
 	PHALCON_CALL_METHOD(&range, im, "getquantumrange");
 
-	if (Z_TYPE_P(range) == IS_ARRAY && phalcon_array_isset_string(range, SS("quantumRangeLong"))) {
+	if (Z_TYPE_P(range) == IS_ARRAY && phalcon_array_isset_str(range, SS("quantumRangeLong"))) {
 		PHALCON_OBS_VAR(quantum_range_long);
-		phalcon_array_fetch_string(&quantum_range_long, range, SL("quantumRangeLong"), PH_NOISY);
+		phalcon_array_fetch_str(&quantum_range_long, range, SL("quantumRangeLong"), PH_NOISY);
 
 		tmp_input_min = round(phalcon_get_intval(input_min) * phalcon_get_intval(quantum_range_long) / 255);
 		tmp_input_max = round(phalcon_get_intval(input_max) * phalcon_get_intval(quantum_range_long) / 255);

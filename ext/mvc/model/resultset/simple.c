@@ -408,23 +408,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, unserialize){
 	}
 
 	PHALCON_OBS_VAR(model);
-	phalcon_array_fetch_string(&model, resultset, SL("model"), PH_NOISY);
+	phalcon_array_fetch_str(&model, resultset, SL("model"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_model"), model);
 
 	PHALCON_OBS_VAR(rows);
-	phalcon_array_fetch_string(&rows, resultset, SL("rows"), PH_NOISY);
+	phalcon_array_fetch_str(&rows, resultset, SL("rows"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_rows"), rows);
 
 	PHALCON_OBS_VAR(cache);
-	phalcon_array_fetch_string(&cache, resultset, SL("cache"), PH_NOISY);
+	phalcon_array_fetch_str(&cache, resultset, SL("cache"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_cache"), cache);
 
 	PHALCON_OBS_VAR(column_map);
-	phalcon_array_fetch_string(&column_map, resultset, SL("columnMap"), PH_NOISY);
+	phalcon_array_fetch_str(&column_map, resultset, SL("columnMap"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_columnMap"), column_map);
 
 	PHALCON_OBS_VAR(hydrate_mode);
-	phalcon_array_fetch_string(&hydrate_mode, resultset, SL("hydrateMode"), PH_NOISY);
+	phalcon_array_fetch_str(&hydrate_mode, resultset, SL("hydrateMode"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_hydrateMode"), hydrate_mode);
 
 	PHALCON_MM_RESTORE();

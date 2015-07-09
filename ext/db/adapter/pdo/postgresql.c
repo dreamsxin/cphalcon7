@@ -113,9 +113,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
 	}
 
-	if (phalcon_array_isset_string(descriptor, SS("schema"))) {
+	if (phalcon_array_isset_str(descriptor, SS("schema"))) {
 		PHALCON_OBS_VAR(schema);
-		phalcon_array_fetch_string(&schema, descriptor, SL("schema"), PH_NOISY);
+		phalcon_array_fetch_str(&schema, descriptor, SL("schema"), PH_NOISY);
 		phalcon_array_unset_string(descriptor, SS("schema"), PH_SEPARATE);
 
 		phalcon_update_property_this(getThis(), SL("_schema"), schema);
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		PHALCON_INIT_VAR(schema);
 	}
 
-	if (phalcon_array_isset_string_fetch(&password, descriptor, SS("password"))) {
+	if (phalcon_array_isset_str_fetch(&password, descriptor, SS("password"))) {
 		/* There is a bug in pdo_pgsql driver when the password is empty,
 		 * the driver tries to access invalid memory:
 		 *

@@ -110,23 +110,23 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&servers, options, SS("servers"))) {
+	if (!phalcon_array_isset_str_fetch(&servers, options, SS("servers"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "No servers given in options");
 		return;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&client, options, SS("client"))) {
+	if (!phalcon_array_isset_str_fetch(&client, options, SS("client"))) {
 		client = NULL;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&lifetime, options, SS("lifetime"))) {
+	if (!phalcon_array_isset_str_fetch(&lifetime, options, SS("lifetime"))) {
 		PHALCON_INIT_VAR(lifetime);
 		ZVAL_LONG(lifetime, 8600);
 	}
 
 	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
-	if (!phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
+	if (!phalcon_array_isset_str_fetch(&prefix, options, SS("prefix"))) {
 		PHALCON_INIT_VAR(prefix);
 		ZVAL_EMPTY_STRING(prefix);
 	}

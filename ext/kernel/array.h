@@ -64,7 +64,7 @@ int phalcon_array_isset_long_fetch(zval **fetched, const zval *arr, ulong index)
  * @retval 1 Exists
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  */
-int ZEND_FASTCALL phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length);
+int ZEND_FASTCALL phalcon_array_isset_str_fetch(zval **fetched, const zval *arr, const char *index, uint index_length);
 
 
 /**
@@ -99,8 +99,8 @@ int ZEND_FASTCALL phalcon_array_isset_long(const zval *arr, ulong index);
  * @retval 0 Not exists or @a arr is not an array
  * @retval 1 Exists
  */
-int ZEND_FASTCALL phalcon_array_isset_string(const zval *arr, const char *index, uint index_length);
-int ZEND_FASTCALL phalcon_array_isset_str(const zval *arr, zend_string *index);
+int ZEND_FASTCALL phalcon_array_isset_str(const zval *arr, const char *index, uint index_length);
+int ZEND_FASTCALL phalcon_array_isset_string(const zval *arr, zend_string *index);
 
 /**
  * @brief Unsets @a index from array @a arr
@@ -611,8 +611,8 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
  * @throw @c E_NOTICE if @c index does not exist and @c silent = @c PH_NOISY
  * @warning @c *return_value should be either @c NULL (preferred) or point to not initialized memory; if @c *return_value points to a valid variable, mmemory leak is possible
  */
-int phalcon_array_fetch_string(zval **return_value, const zval *arr, const char *index, uint index_length, int silent);
-int phalcon_array_fetch_str(zval **return_value, const zval *arr, zend_string *index, int silent);
+int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *index, uint index_length, int silent);
+int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string *index, int silent);
 
 
 /**

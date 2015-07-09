@@ -228,36 +228,36 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	/** 
 	 * Check for a module
 	 */
-	if (phalcon_array_isset_string(arguments, SS("module"))) {
+	if (phalcon_array_isset_str(arguments, SS("module"))) {
 		PHALCON_OBS_NVAR(module_name);
-		phalcon_array_fetch_string(&module_name, arguments, SL("module"), PH_NOISY);
+		phalcon_array_fetch_str(&module_name, arguments, SL("module"), PH_NOISY);
 		phalcon_array_unset_string(arguments, SS("module"), PH_SEPARATE);
 	}
 
 	/**
 	 * Check for a namespace
 	 */
-	if (phalcon_array_isset_string(arguments, SS("namespace"))) {
+	if (phalcon_array_isset_str(arguments, SS("namespace"))) {
 		PHALCON_OBS_NVAR(namespace_name);
-		phalcon_array_fetch_string(&namespace_name, arguments, SL("namespace"), PH_NOISY);
+		phalcon_array_fetch_str(&namespace_name, arguments, SL("namespace"), PH_NOISY);
 		phalcon_array_unset_string(arguments, SS("namespace"), PH_SEPARATE);
 	}
 
 	/** 
 	 * Check for a task
 	 */
-	if (phalcon_array_isset_string(arguments, SS("task"))) {
+	if (phalcon_array_isset_str(arguments, SS("task"))) {
 		PHALCON_OBS_NVAR(task_name);
-		phalcon_array_fetch_string(&task_name, arguments, SL("task"), PH_NOISY);
+		phalcon_array_fetch_str(&task_name, arguments, SL("task"), PH_NOISY);
 		phalcon_array_unset_string(arguments, SS("task"), PH_SEPARATE);
 	}
 
 	/** 
 	 * Check for an action
 	 */
-	if (phalcon_array_isset_string(arguments, SS("action"))) {
+	if (phalcon_array_isset_str(arguments, SS("action"))) {
 		PHALCON_OBS_NVAR(action_name);
-		phalcon_array_fetch_string(&action_name, arguments, SL("action"), PH_NOISY);
+		phalcon_array_fetch_str(&action_name, arguments, SL("action"), PH_NOISY);
 		phalcon_array_unset_string(arguments, SS("action"), PH_SEPARATE);
 	}
 

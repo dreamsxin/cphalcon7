@@ -469,13 +469,13 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createView){
 
 	phalcon_fetch_params(1, 3, 0, &view_name, &definition, &schema_name);
 	
-	if (!phalcon_array_isset_string(definition, SS("sql"))) {
+	if (!phalcon_array_isset_str(definition, SS("sql"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
 		return;
 	}
 	
 	PHALCON_OBS_VAR(view_sql);
-	phalcon_array_fetch_string(&view_sql, definition, SL("sql"), PH_NOISY);
+	phalcon_array_fetch_str(&view_sql, definition, SL("sql"), PH_NOISY);
 	if (zend_is_true(schema_name)) {
 		PHALCON_INIT_VAR(view);
 		PHALCON_CONCAT_VSV(view, schema_name, "\".\"", view_name);

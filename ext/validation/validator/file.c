@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 	}
 
 	if (!file) {
-		phalcon_update_property_string(getThis(), SL("_type"), SL("TypeUnknow"));
+		phalcon_update_property_str(getThis(), SL("_type"), SL("TypeUnknow"));
 		RETURN_MM_FALSE;
 	}
 
@@ -373,7 +373,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 	PHALCON_CALL_METHOD(&valid, file, "isfile");
 
 	if (!zend_is_true(valid)) {
-		phalcon_update_property_string(getThis(), SL("_type"), SL("FileValid"));
+		phalcon_update_property_str(getThis(), SL("_type"), SL("FileValid"));
 		RETURN_MM_FALSE;
 	}
 
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_or_equal_function(valid, minsize, size);
 		if (!zend_is_true(valid)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("TooSmall"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("TooSmall"));
 			RETURN_MM_FALSE;
 		}
 	}
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_or_equal_function(valid, size, maxsize);
 		if (!zend_is_true(valid)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("TooLarge"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("TooLarge"));
 			RETURN_MM_FALSE;
 		}
 	}
@@ -416,7 +416,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 		PHALCON_CALL_FUNCTION(NULL, "finfo_close", finfo);
 		
 		if (!phalcon_fast_in_array(mime, mimes)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("MimeValid"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("MimeValid"));
 			RETURN_MM_FALSE;
 		}
 	}
@@ -453,7 +453,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_or_equal_function(valid, minwidth, width);
 		if (!zend_is_true(valid)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("TooNarrow"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("TooNarrow"));
 			RETURN_MM_FALSE;
 		}
 	}
@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_or_equal_function(valid, width, maxwidth);
 		if (!zend_is_true(valid)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("TooWide"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("TooWide"));
 			RETURN_MM_FALSE;
 		}
 	}
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_or_equal_function(valid, minheight, height);
 		if (!zend_is_true(valid)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("TooShort"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("TooShort"));
 			RETURN_MM_FALSE;
 		}
 	}
@@ -480,7 +480,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 		PHALCON_INIT_NVAR(valid);
 		is_smaller_or_equal_function(valid, height, maxheight);
 		if (!zend_is_true(valid)) {
-			phalcon_update_property_string(getThis(), SL("_type"), SL("TooLong"));
+			phalcon_update_property_str(getThis(), SL("_type"), SL("TooLong"));
 			RETURN_MM_FALSE;
 		}
 	}

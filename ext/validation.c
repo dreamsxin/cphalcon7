@@ -157,7 +157,7 @@ int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval
 		zval *messages = phalcon_read_property(this_ptr, SL("_defaultMessages"), PH_NOISY);
 
 		PHALCON_ALLOC_GHOST_ZVAL(return_value);
-		if (phalcon_array_isset_string_fetch(&msg, messages, type, strlen(type)+1)) {
+		if (phalcon_array_isset_str_fetch(&msg, messages, type, strlen(type)+1)) {
 			ZVAL_ZVAL(return_value, msg, 1, 0);
 		}
 		else {

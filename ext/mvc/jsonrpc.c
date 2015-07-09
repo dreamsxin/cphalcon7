@@ -309,19 +309,19 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	} else if (Z_TYPE_P(data) != IS_ARRAY) {
 		phalcon_array_update_string_long(jsonrpc_error, SL("code"), __LINE__, 0);
 		phalcon_array_update_string_string(jsonrpc_error, SL("message"), SL("Parse error"), 0);
-	} else if (!phalcon_array_isset_string(data, SS("jsonrpc"))) {		
+	} else if (!phalcon_array_isset_str(data, SS("jsonrpc"))) {		
 			phalcon_array_update_string_long(jsonrpc_error, SL("code"), __LINE__, 0);
 			phalcon_array_update_string_string(jsonrpc_error, SL("message"), SL("Invalid Request"), 0);
-	} else if (!phalcon_array_isset_string(data, SS("method"))) {
+	} else if (!phalcon_array_isset_str(data, SS("method"))) {
 			phalcon_array_update_string_long(jsonrpc_error, SL("code"), __LINE__, 0);
 			phalcon_array_update_string_string(jsonrpc_error, SL("message"), SL("Invalid Request"), 0);
 	} else {
 		PHALCON_OBS_VAR(jsonrpc_method);
-		phalcon_array_fetch_string(&jsonrpc_method, data, SL("method"), PH_NOISY);
+		phalcon_array_fetch_str(&jsonrpc_method, data, SL("method"), PH_NOISY);
 
-		if (phalcon_array_isset_string(data, SS("params"))) {
+		if (phalcon_array_isset_str(data, SS("params"))) {
 			PHALCON_OBS_VAR(jsonrpc_params);
-			phalcon_array_fetch_string(&jsonrpc_params, data, SL("params"), PH_NOISY);
+			phalcon_array_fetch_str(&jsonrpc_params, data, SL("params"), PH_NOISY);
 		} else {
 			PHALCON_INIT_VAR(jsonrpc_params);
 			array_init(jsonrpc_params);
@@ -382,19 +382,19 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			/* An array module definition contains a path to a module definition class */
 			if (Z_TYPE_P(module) == IS_ARRAY) { 
 				/* Class name used to load the module definition */
-				if (phalcon_array_isset_string(module, SS("className"))) {
+				if (phalcon_array_isset_str(module, SS("className"))) {
 					PHALCON_OBS_VAR(class_name);
-					phalcon_array_fetch_string(&class_name, module, SL("className"), PH_NOISY);
+					phalcon_array_fetch_str(&class_name, module, SL("className"), PH_NOISY);
 				} else {
 					PHALCON_INIT_NVAR(class_name);
 					ZVAL_STRING(class_name, "Module");
 				}
 		
 				/* If the developer has specified a path, try to include the file */
-				if (phalcon_array_isset_string(module, SS("path"))) {
+				if (phalcon_array_isset_str(module, SS("path"))) {
 		
 					PHALCON_OBS_VAR(path);
-					phalcon_array_fetch_string(&path, module, SL("path"), PH_NOISY);
+					phalcon_array_fetch_str(&path, module, SL("path"), PH_NOISY);
 					convert_to_string_ex(path);
 					if (Z_TYPE_P(class_name) != IS_STRING || phalcon_class_exists(class_name, 0) == NULL) {
 						if (phalcon_file_exists(path) == SUCCESS) {
@@ -486,7 +486,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		phalcon_array_update_string(jsonrpc_message, SL("result"), jsonrpc_result, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&jsonrpc_id, data, SS("id"))) {
+	if (phalcon_array_isset_str_fetch(&jsonrpc_id, data, SS("id"))) {
 		phalcon_array_update_string(jsonrpc_message, SL("id"), jsonrpc_id, PH_COPY);
 	} else {
 		phalcon_array_update_string(jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);

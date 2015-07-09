@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, getLifetime){
 	zval *options, *lifetime;
 
 	options = phalcon_read_property(getThis(), SL("_frontendOptions"), PH_NOISY);
-	if (phalcon_array_isset_string_fetch(&lifetime, options, SS("lifetime"))) {
+	if (phalcon_array_isset_str_fetch(&lifetime, options, SS("lifetime"))) {
 		RETURN_ZVAL(lifetime, 1, 0);
 	}
 	else {

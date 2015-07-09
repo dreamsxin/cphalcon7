@@ -129,19 +129,19 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!phalcon_array_isset_string(options, SS("mongo"))) {
-		if (!phalcon_array_isset_string(options, SS("server"))) {
+	if (!phalcon_array_isset_str(options, SS("mongo"))) {
+		if (!phalcon_array_isset_str(options, SS("server"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'server' is required");
 			return;
 		}
 	}
 
-	if (!phalcon_array_isset_string(options, SS("db"))) {
+	if (!phalcon_array_isset_str(options, SS("db"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'db' is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_string(options, SS("collection"))) {
+	if (!phalcon_array_isset_str(options, SS("collection"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'collection' is required");
 		return;
 	}
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 		/** 
 		 * If mongo is defined a valid Mongo object must be passed
 		 */
-		if (phalcon_array_isset_string_fetch(&mongo, options, SS("mongo"))) {
+		if (phalcon_array_isset_str_fetch(&mongo, options, SS("mongo"))) {
 			if (Z_TYPE_P(mongo) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The 'mongo' parameter must be a valid Mongo instance");
 				return;
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 			/** 
 			 * Server must be defined otherwise
 			 */
-			phalcon_array_isset_string_fetch(&server, options, SS("server"));
+			phalcon_array_isset_str_fetch(&server, options, SS("server"));
 			if (!server || Z_TYPE_P(server) != IS_STRING) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The backend requires a valid MongoDB connection string");
 				return;
@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 		/** 
 		 * Check if the database name is a string
 		 */
-		phalcon_array_isset_string_fetch(&database, options, SS("db"));
+		phalcon_array_isset_str_fetch(&database, options, SS("db"));
 		if (!database || Z_TYPE_P(database) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
 			return;
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 		/** 
 		 * Retrieve the connection name
 		 */
-		phalcon_array_isset_string_fetch(&collection, options, SS("collection"));
+		phalcon_array_isset_str_fetch(&collection, options, SS("collection"));
 		if (!collection || Z_TYPE_P(collection) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
 			return;
@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
 	PHALCON_CALL_METHOD(&document, collection, "findone", conditions);
 	if (Z_TYPE_P(document) == IS_ARRAY) { 
-		if (likely(phalcon_array_isset_string_fetch(&cached_content, document, SS("data")))) {
+		if (likely(phalcon_array_isset_str_fetch(&cached_content, document, SS("data")))) {
 			if (phalcon_is_numeric(cached_content)) {
 				RETURN_CCTOR(cached_content);
 			} else {
@@ -472,7 +472,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(documents_array), document) {
 		zval *key;
-		if (likely(phalcon_array_isset_string_fetch(&key, document, SS("key")))) {
+		if (likely(phalcon_array_isset_str_fetch(&key, document, SS("key")))) {
 			Z_ADDREF_P(key);
 			add_next_index_zval(return_value, key);
 		}
@@ -612,13 +612,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 		PHALCON_CPY_WRT(ttl, lifetime);
 	}
 
-	if (!phalcon_array_isset_string(document, SS("time"))) {
+	if (!phalcon_array_isset_str(document, SS("time"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache is currupted");
 		return;
 	}
 
 	PHALCON_OBS_VAR(modified_time);
-	phalcon_array_fetch_string(&modified_time, document, SL("time"), PH_NOISY);
+	phalcon_array_fetch_str(&modified_time, document, SL("time"), PH_NOISY);
 
 	PHALCON_INIT_VAR(difference);
 	phalcon_sub_function(difference, timestamp, ttl);
@@ -630,13 +630,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 	 * The expiration is based on the column 'time'
 	 */
 	if (PHALCON_IS_TRUE(not_expired)) {
-		if (!phalcon_array_isset_string(document, SS("data"))) {
+		if (!phalcon_array_isset_str(document, SS("data"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache is currupted");
 			return;
 		}
 
 		PHALCON_OBS_VAR(cached_content);
-		phalcon_array_fetch_string(&cached_content, document, SL("data"), PH_NOISY);
+		phalcon_array_fetch_str(&cached_content, document, SL("data"), PH_NOISY);
 
 		if(Z_TYPE_P(cached_content) != IS_LONG) {
 			PHALCON_SEPARATE_PARAM(cached_content);
@@ -716,13 +716,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 		PHALCON_CPY_WRT(ttl, lifetime);
 	}
 
-	if (!phalcon_array_isset_string(document, SS("time"))) {
+	if (!phalcon_array_isset_str(document, SS("time"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache is currupted");
 		return;
 	}
 
 	PHALCON_OBS_VAR(modified_time);
-	phalcon_array_fetch_string(&modified_time, document, SL("time"), PH_NOISY);
+	phalcon_array_fetch_str(&modified_time, document, SL("time"), PH_NOISY);
 
 	PHALCON_INIT_VAR(difference);
 	phalcon_sub_function(difference, timestamp, ttl);
@@ -734,13 +734,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 	 * The expiration is based on the column 'time'
 	 */
 	if (PHALCON_IS_TRUE(not_expired)) {
-		if (!phalcon_array_isset_string(document, SS("data"))) {
+		if (!phalcon_array_isset_str(document, SS("data"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache is currupted");
 			return;
 		}
 
 		PHALCON_OBS_VAR(cached_content);
-		phalcon_array_fetch_string(&cached_content, document, SL("data"), PH_NOISY);
+		phalcon_array_fetch_str(&cached_content, document, SL("data"), PH_NOISY);
 
 		if(Z_TYPE_P(cached_content) != IS_LONG) {
 			PHALCON_SEPARATE_PARAM(cached_content);

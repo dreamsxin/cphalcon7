@@ -191,9 +191,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 	
 	PHALCON_CALL_METHOD(&status, mongo_collection, "update", criteria, new_object);
 
-	if (phalcon_array_isset_string_fetch(&ok, status, SS("ok"))) {
+	if (phalcon_array_isset_str_fetch(&ok, status, SS("ok"))) {
 		if (zend_is_true(ok)) {
-			if (phalcon_array_isset_string_fetch(&exist, status, SS("updatedExisting"))) {
+			if (phalcon_array_isset_str_fetch(&exist, status, SS("updatedExisting"))) {
 				if (zend_is_true(exist)) {
 					RETURN_MM_TRUE;
 				}
@@ -279,9 +279,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 	
 	PHALCON_CALL_METHOD(&status, mongo_collection, "update", criteria, new_object);
 
-	if (phalcon_array_isset_string_fetch(&ok, status, SS("ok"))) {
+	if (phalcon_array_isset_str_fetch(&ok, status, SS("ok"))) {
 		if (zend_is_true(ok)) {
-			if (phalcon_array_isset_string_fetch(&exist, status, SS("updatedExisting"))) {
+			if (phalcon_array_isset_str_fetch(&exist, status, SS("updatedExisting"))) {
 				if (!zend_is_true(exist)) {
 					RETURN_MM_FALSE;
 				}
@@ -553,18 +553,18 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, drop){
 	if (Z_TYPE_P(mongo_collection) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&status, mongo_collection, "drop");
 
-		if (phalcon_array_isset_string(status, SS("ok"))) {
+		if (phalcon_array_isset_str(status, SS("ok"))) {
 			PHALCON_OBS_NVAR(ok);
-			phalcon_array_fetch_string(&ok, status, SL("ok"), PH_NOISY);
+			phalcon_array_fetch_str(&ok, status, SL("ok"), PH_NOISY);
 		}
 	}
 
 	PHALCON_CALL_METHOD(&grid_fs, connection, "getgridfs", source);
 	if (Z_TYPE_P(grid_fs) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&status, grid_fs, "drop");
-		if (phalcon_array_isset_string(status, SS("ok"))) {
+		if (phalcon_array_isset_str(status, SS("ok"))) {
 			PHALCON_OBS_NVAR(ok);
-			phalcon_array_fetch_string(&ok, status, SL("ok"), PH_NOISY);
+			phalcon_array_fetch_str(&ok, status, SL("ok"), PH_NOISY);
 		}
 	}
 

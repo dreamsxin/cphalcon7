@@ -74,12 +74,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 	
 	if (PHALCON_IS_STRING(type, "beforeDelete")) {
 		PHALCON_CALL_METHOD(&options, getThis(), "getoptions");
-		if (!phalcon_array_isset_string(options, SS("value"))) {
+		if (!phalcon_array_isset_str(options, SS("value"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'value' is required");
 			return;
 		}
 	
-		if (!phalcon_array_isset_string(options, SS("field"))) {
+		if (!phalcon_array_isset_str(options, SS("field"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'field' is required");
 			return;
 		}
@@ -93,13 +93,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 		 * 'value' is the value to be updated instead of delete the record
 		 */
 		PHALCON_OBS_VAR(value);
-		phalcon_array_fetch_string(&value, options, SL("value"), PH_NOISY);
+		phalcon_array_fetch_str(&value, options, SL("value"), PH_NOISY);
 	
 		/** 
 		 * 'field' is the attribute to be updated instead of delete the record
 		 */
 		PHALCON_OBS_VAR(field);
-		phalcon_array_fetch_string(&field, options, SL("field"), PH_NOISY);
+		phalcon_array_fetch_str(&field, options, SL("field"), PH_NOISY);
 	
 		PHALCON_CALL_METHOD(&actual_value, model, "readattribute", field);
 	

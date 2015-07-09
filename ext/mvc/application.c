@@ -385,19 +385,19 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/* An array module definition contains a path to a module definition class */
 		if (Z_TYPE_P(module) == IS_ARRAY) { 
 			/* Class name used to load the module definition */
-			if (phalcon_array_isset_string(module, SS("className"))) {
+			if (phalcon_array_isset_str(module, SS("className"))) {
 				PHALCON_OBS_VAR(class_name);
-				phalcon_array_fetch_string(&class_name, module, SL("className"), PH_NOISY);
+				phalcon_array_fetch_str(&class_name, module, SL("className"), PH_NOISY);
 			} else {
 				PHALCON_INIT_NVAR(class_name);
 				ZVAL_STRING(class_name, "Module");
 			}
 
 			/* If the developer has specified a path, try to include the file */
-			if (phalcon_array_isset_string(module, SS("path"))) {
+			if (phalcon_array_isset_str(module, SS("path"))) {
 
 				PHALCON_OBS_VAR(path);
-				phalcon_array_fetch_string(&path, module, SL("path"), PH_NOISY);
+				phalcon_array_fetch_str(&path, module, SL("path"), PH_NOISY);
 				convert_to_string_ex(path);
 				if (Z_TYPE_P(class_name) != IS_STRING || phalcon_class_exists(class_name, 0) == NULL) {
 					if (phalcon_file_exists(path) == SUCCESS) {

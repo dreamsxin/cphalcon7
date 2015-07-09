@@ -76,7 +76,7 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 	return 0;
 }
 
-int phalcon_array_isset_string_fetch(zval **fetched, const zval *arr, const char *index, uint index_length) {
+int phalcon_array_isset_str_fetch(zval **fetched, const zval *arr, const char *index, uint index_length) {
 
 	zval *zv;
 
@@ -141,7 +141,7 @@ int ZEND_FASTCALL phalcon_array_isset(const zval *arr, const zval *index) {
 	}
 }
 
-int ZEND_FASTCALL phalcon_array_isset_string(const zval *arr, const char *index, uint index_length) {
+int ZEND_FASTCALL phalcon_array_isset_str(const zval *arr, const char *index, uint index_length) {
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		return zend_hash_str_exists(Z_ARRVAL_P(arr), index, index_length);
@@ -150,7 +150,7 @@ int ZEND_FASTCALL phalcon_array_isset_string(const zval *arr, const char *index,
 	return 0;
 }
 
-int ZEND_FASTCALL phalcon_array_isset_str(const zval *arr, zend_string *index) {
+int ZEND_FASTCALL phalcon_array_isset_string(const zval *arr, zend_string *index) {
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		return zend_hash_exists(Z_ARRVAL_P(arr), index);
@@ -475,7 +475,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 	return FAILURE;
 }
 
-int phalcon_array_fetch_string(zval **return_value, const zval *arr, const char *index, uint index_length, int flags){
+int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *index, uint index_length, int flags){
 
 	zval *zv;
 
@@ -499,7 +499,7 @@ int phalcon_array_fetch_string(zval **return_value, const zval *arr, const char 
 	return FAILURE;
 }
 
-int phalcon_array_fetch_str(zval **return_value, const zval *arr, zend_string *index, int flags){
+int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string *index, int flags){
 
 	zval *zv;
 
@@ -648,7 +648,7 @@ void phalcon_array_update_zval_string_append_multi_3(zval *arr, const zval *inde
 
 		phalcon_array_update_zval(arr, index1, temp1, 0);
 
-		phalcon_array_fetch_string(&temp2, temp1, index2, index2_length, PH_SILENT);
+		phalcon_array_fetch_str(&temp2, temp1, index2, index2_length, PH_SILENT);
 
 		SEPARATE_ZVAL_IF_NOT_REF(temp2);
 		if (Z_TYPE_P(temp2) != IS_ARRAY) {
@@ -729,7 +729,7 @@ void phalcon_array_update_zval_string_string_multi_3(zval *arr, const zval *inde
 
 		phalcon_array_update_zval(arr, index1, temp1, 0);
 
-		phalcon_array_fetch_string(&temp2, temp1, index2, index2_length, PH_SILENT);
+		phalcon_array_fetch_str(&temp2, temp1, index2, index2_length, PH_SILENT);
 
 		SEPARATE_ZVAL_IF_NOT_REF(temp2);
 		if (Z_TYPE_P(temp2) != IS_ARRAY) {
@@ -1007,7 +1007,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 				l = va_arg(ap, int);
 				old_s[i] = s;
 				old_l[i] = l;
-				if (phalcon_array_isset_string_fetch(&fetched, p, s, l + 1)) {
+				if (phalcon_array_isset_str_fetch(&fetched, p, s, l + 1)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);

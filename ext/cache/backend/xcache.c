@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, __construct){
 		array_init(options);
 	}
 
-	if (!phalcon_array_isset_string(options, SS("statsKey"))) {
+	if (!phalcon_array_isset_str(options, SS("statsKey"))) {
 		phalcon_array_update_string_string(options, SL("statsKey"), SL("_PHCX"), 0);
 	}
 	
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 	
 		options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
-		if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
+		if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SS("statsKey")))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 			return;
 		}
@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 	
 	PHALCON_RETURN_CALL_FUNCTION("xcache_unset", prefixed_key);
 	
-	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SS("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -337,7 +337,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
-	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SS("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -510,7 +510,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
-	if (unlikely(!phalcon_array_isset_string_fetch(&special_key, options, SS("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SS("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}

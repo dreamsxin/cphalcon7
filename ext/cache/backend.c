@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 		/**
 		 * A common option is the prefix
 		 */
-		if (phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
+		if (phalcon_array_isset_str_fetch(&prefix, options, SS("prefix"))) {
 			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
 		}
 

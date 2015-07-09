@@ -741,11 +741,11 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 	 */
 	PHALCON_INIT_VAR(html);
 	PHALCON_CONCAT_SVS(html, "<tr><td align=\"right\" valign=\"top\" class=\"error-number\">#", n, "</td><td>");
-	if (phalcon_array_isset_string(trace, SS("class"))) {
+	if (phalcon_array_isset_str(trace, SS("class"))) {
 		zend_class_entry *class_ce;
 
 		PHALCON_OBS_VAR(class_name);
-		phalcon_array_fetch_string(&class_name, trace, SL("class"), PH_NOISY);
+		phalcon_array_fetch_str(&class_name, trace, SL("class"), PH_NOISY);
 
 		class_ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT);
 
@@ -777,22 +777,22 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		 * Object access operator: static/instance
 		 */
 		PHALCON_OBS_VAR(type);
-		phalcon_array_fetch_string(&type, trace, SL("type"), PH_NOISY);
+		phalcon_array_fetch_str(&type, trace, SL("type"), PH_NOISY);
 		phalcon_concat_self(html, type);
 	}
 
 	/** 
 	 * Normally the backtrace contains only classes
 	 */
-	if (phalcon_array_isset_string(trace, SS("class"))) {
+	if (phalcon_array_isset_str(trace, SS("class"))) {
 		PHALCON_OBS_VAR(function_name);
-		phalcon_array_fetch_string(&function_name, trace, SL("function"), PH_NOISY);
+		phalcon_array_fetch_str(&function_name, trace, SL("function"), PH_NOISY);
 		PHALCON_SCONCAT_SVS(html, "<span class=\"error-function\">", function_name, "</span>");
 	} else {
 		zend_function *func;
 
 		PHALCON_OBS_NVAR(function_name);
-		phalcon_array_fetch_string(&function_name, trace, SL("function"), PH_NOISY);
+		phalcon_array_fetch_str(&function_name, trace, SL("function"), PH_NOISY);
 		convert_to_string(function_name);
 
 		/** 
@@ -820,10 +820,10 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 	/** 
 	 * Check for arguments in the function
 	 */
-	if (phalcon_array_isset_string(trace, SS("args"))) {
+	if (phalcon_array_isset_str(trace, SS("args"))) {
 
 		PHALCON_OBS_VAR(trace_args);
-		phalcon_array_fetch_string(&trace_args, trace, SL("args"), PH_NOISY);
+		phalcon_array_fetch_str(&trace_args, trace, SL("args"), PH_NOISY);
 		if (phalcon_fast_count_ev(trace_args)) {
 
 			PHALCON_INIT_VAR(arguments);
@@ -858,15 +858,15 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 	/** 
 	 * When 'file' is present, it usually means the function is provided by the user
 	 */
-	if (phalcon_array_isset_string(trace, SS("file"))) {
+	if (phalcon_array_isset_str(trace, SS("file"))) {
 
 		z_one = &PHALCON_GLOBAL(z_one);
 
 		PHALCON_OBS_VAR(file);
-		phalcon_array_fetch_string(&file, trace, SL("file"), PH_NOISY);
+		phalcon_array_fetch_str(&file, trace, SL("file"), PH_NOISY);
 
 		PHALCON_OBS_VAR(line);
-		phalcon_array_fetch_string(&line, trace, SL("line"), PH_NOISY);
+		phalcon_array_fetch_str(&line, trace, SL("line"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&formatted_file, getThis(), "getfilelink", file, line, link_format);
 
@@ -1310,7 +1310,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 
 	if (context && Z_TYPE_P(context) == IS_ARRAY) {
 		if (
-			phalcon_array_isset_string_fetch(&e, context, SS("e")) && 
+			phalcon_array_isset_str_fetch(&e, context, SS("e")) && 
 			Z_TYPE_P(e) == IS_OBJECT && 
 			instanceof_function_ex(Z_OBJCE_P(e), zend_exception_get_default(), 1)
 		) {
@@ -1349,10 +1349,10 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
 	PHALCON_CALL_FUNCTION(&error, "error_get_last");
 
 	if (
-		phalcon_array_isset_string_fetch(&message, error, SS("message")) && 
-		phalcon_array_isset_string_fetch(&type, error, SS("type")) && 
-		phalcon_array_isset_string_fetch(&file, error, SS("file")) && 
-		phalcon_array_isset_string_fetch(&line, error, SS("line"))
+		phalcon_array_isset_str_fetch(&message, error, SS("message")) && 
+		phalcon_array_isset_str_fetch(&type, error, SS("type")) && 
+		phalcon_array_isset_str_fetch(&file, error, SS("file")) && 
+		phalcon_array_isset_str_fetch(&line, error, SS("line"))
 		
 	) {
 		default_exception_ce = zend_get_error_exception();

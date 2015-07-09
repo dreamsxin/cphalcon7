@@ -209,9 +209,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	/**
 	 * Check for a username or use null as default
 	 */
-	if (phalcon_array_isset_string(descriptor, SS("username"))) {
+	if (phalcon_array_isset_str(descriptor, SS("username"))) {
 		PHALCON_OBS_VAR(username);
-		phalcon_array_fetch_string(&username, descriptor, SL("username"), PH_NOISY);
+		phalcon_array_fetch_str(&username, descriptor, SL("username"), PH_NOISY);
 		phalcon_array_unset_string(descriptor, SS("username"), PH_SEPARATE);
 	} else {
 		PHALCON_INIT_NVAR(username);
@@ -220,9 +220,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	/**
 	 * Check for a password or use null as default
 	 */
-	if (phalcon_array_isset_string(descriptor, SS("password"))) {
+	if (phalcon_array_isset_str(descriptor, SS("password"))) {
 		PHALCON_OBS_VAR(password);
-		phalcon_array_fetch_string(&password, descriptor, SL("password"), PH_NOISY);
+		phalcon_array_fetch_str(&password, descriptor, SL("password"), PH_NOISY);
 		phalcon_array_unset_string(descriptor, SS("password"), PH_SEPARATE);
 	} else {
 		PHALCON_INIT_NVAR(password);
@@ -231,9 +231,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	/**
 	 * Check if the developer has defined custom options or create one from scratch
 	 */
-	if (phalcon_array_isset_string(descriptor, SS("options"))) {
+	if (phalcon_array_isset_str(descriptor, SS("options"))) {
 		PHALCON_OBS_VAR(options);
-		phalcon_array_fetch_string(&options, descriptor, SL("options"), PH_NOISY);
+		phalcon_array_fetch_str(&options, descriptor, SL("options"), PH_NOISY);
 		phalcon_array_unset_string(descriptor, SS("options"), PH_SEPARATE);
 	} else {
 		PHALCON_INIT_NVAR(options);
@@ -243,14 +243,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	/**
 	 * Remove the dialectClass from the descriptor if any
 	 */
-	if (phalcon_array_isset_string(descriptor, SS("dialectClass"))) {
+	if (phalcon_array_isset_str(descriptor, SS("dialectClass"))) {
 		phalcon_array_unset_string(descriptor, SS("dialectClass"), PH_SEPARATE);
 	}
 
 	/**
 	 * Check if the user has defined a custom dsn
 	 */
-	if (!phalcon_array_isset_string(descriptor, SS("dsn"))) {
+	if (!phalcon_array_isset_str(descriptor, SS("dsn"))) {
 
 		PHALCON_INIT_VAR(dsn_parts);
 		array_init(dsn_parts);
@@ -271,7 +271,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 		phalcon_fast_join_str(dsn_attributes, SL(";"), dsn_parts);
 	} else {
 		PHALCON_OBS_NVAR(dsn_attributes);
-		phalcon_array_fetch_string(&dsn_attributes, descriptor, SL("dsn"), PH_NOISY);
+		phalcon_array_fetch_str(&dsn_attributes, descriptor, SL("dsn"), PH_NOISY);
 	}
 
 	pdo_type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
@@ -287,10 +287,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	/**
 	 * Check if the connection must be persistent
 	 */
-	if (phalcon_array_isset_string(descriptor, SS("persistent"))) {
+	if (phalcon_array_isset_str(descriptor, SS("persistent"))) {
 
 		PHALCON_OBS_VAR(persistent);
-		phalcon_array_fetch_string(&persistent, descriptor, SL("persistent"), PH_NOISY);
+		phalcon_array_fetch_str(&persistent, descriptor, SL("persistent"), PH_NOISY);
 		if (zend_is_true(persistent)) {
 			phalcon_array_update_long_bool(options, PDO_ATTR_PERSISTENT, 1, PH_SEPARATE);
 		}

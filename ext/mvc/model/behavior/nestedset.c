@@ -280,44 +280,44 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, __construct){
 	phalcon_fetch_params(1, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_string(options, SS("hasManyRoots"))) {
+		if (phalcon_array_isset_str(options, SS("hasManyRoots"))) {
 			PHALCON_OBS_NVAR(option);
-			phalcon_array_fetch_string(&option, options, SL("hasManyRoots"), PH_NOISY);
+			phalcon_array_fetch_str(&option, options, SL("hasManyRoots"), PH_NOISY);
 
 			phalcon_update_property_this(getThis(), SL("_hasManyRoots"), option);
 		}
 
-		if (phalcon_array_isset_string(options, SS("rootAttribute"))) {
+		if (phalcon_array_isset_str(options, SS("rootAttribute"))) {
 			PHALCON_OBS_NVAR(option);
-			phalcon_array_fetch_string(&option, options, SL("rootAttribute"), PH_NOISY);
+			phalcon_array_fetch_str(&option, options, SL("rootAttribute"), PH_NOISY);
 
 			phalcon_update_property_this(getThis(), SL("_rootAttribute"), option);
 		}
 
-		if (phalcon_array_isset_string(options, SS("leftAttribute"))) {
+		if (phalcon_array_isset_str(options, SS("leftAttribute"))) {
 			PHALCON_OBS_NVAR(option);
-			phalcon_array_fetch_string(&option, options, SL("leftAttribute"), PH_NOISY);
+			phalcon_array_fetch_str(&option, options, SL("leftAttribute"), PH_NOISY);
 
 			phalcon_update_property_this(getThis(), SL("_leftAttribute"), option);
 		}
 
-		if (phalcon_array_isset_string(options, SS("rightAttribute"))) {
+		if (phalcon_array_isset_str(options, SS("rightAttribute"))) {
 			PHALCON_OBS_NVAR(option);
-			phalcon_array_fetch_string(&option, options, SL("rightAttribute"), PH_NOISY);
+			phalcon_array_fetch_str(&option, options, SL("rightAttribute"), PH_NOISY);
 
 			phalcon_update_property_this(getThis(), SL("_rightAttribute"), option);
 		}
 
-		if (phalcon_array_isset_string(options, SS("levelAttribute"))) {
+		if (phalcon_array_isset_str(options, SS("levelAttribute"))) {
 			PHALCON_OBS_NVAR(option);
-			phalcon_array_fetch_string(&option, options, SL("levelAttribute"), PH_NOISY);
+			phalcon_array_fetch_str(&option, options, SL("levelAttribute"), PH_NOISY);
 
 			phalcon_update_property_this(getThis(), SL("_levelAttribute"), option);
 		}
 
-		if (phalcon_array_isset_string(options, SS("primaryKey"))) {
+		if (phalcon_array_isset_str(options, SS("primaryKey"))) {
 			PHALCON_OBS_NVAR(option);
-			phalcon_array_fetch_string(&option, options, SL("primaryKey"), PH_NOISY);
+			phalcon_array_fetch_str(&option, options, SL("primaryKey"), PH_NOISY);
 
 			phalcon_update_property_this(getThis(), SL("_primaryKey"), option);
 		}

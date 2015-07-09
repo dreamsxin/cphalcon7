@@ -313,11 +313,11 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, unserialize){
 	}
 
 	PHALCON_OBS_VAR(collection);
-	phalcon_array_fetch_string(&collection, resultset, SL("collection"), PH_NOISY);
+	phalcon_array_fetch_str(&collection, resultset, SL("collection"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_collection"), collection);
 
 	PHALCON_OBS_VAR(rows);
-	phalcon_array_fetch_string(&rows, resultset, SL("rows"), PH_NOISY);
+	phalcon_array_fetch_str(&rows, resultset, SL("rows"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_rows"), rows);
 
 	PHALCON_MM_RESTORE();

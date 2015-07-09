@@ -92,11 +92,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_string_fetch(&prefix, options, SS("prefix"))) {
+		if (phalcon_array_isset_str_fetch(&prefix, options, SS("prefix"))) {
 			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
 		}
 
-		if (phalcon_array_isset_string_fetch(&ttl, options, SS("lifetime"))) {
+		if (phalcon_array_isset_str_fetch(&ttl, options, SS("lifetime"))) {
 			phalcon_update_property_this(getThis(), SL("_ttl"), ttl);
 		}
 	}

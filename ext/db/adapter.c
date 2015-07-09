@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	/** 
 	 * Dialect class can override the default dialect
 	 */
-	if (!phalcon_array_isset_string_fetch(&dialect_class, descriptor, SS("dialectClass"))) {
+	if (!phalcon_array_isset_str_fetch(&dialect_class, descriptor, SS("dialectClass"))) {
 		dialect_type = phalcon_read_property(getThis(), SL("_dialectType"), PH_NOISY);
 
 		PHALCON_INIT_VAR(dialect_class);
@@ -808,18 +808,18 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 			 * If an index 'conditions' is present it contains string where conditions that are
 			 * appended to the UPDATE sql
 			 */
-			if (phalcon_array_isset_string(where_condition, SS("conditions"))) {
+			if (phalcon_array_isset_str(where_condition, SS("conditions"))) {
 				PHALCON_OBS_VAR(conditions);
-				phalcon_array_fetch_string(&conditions, where_condition, SL("conditions"), PH_NOISY);
+				phalcon_array_fetch_str(&conditions, where_condition, SL("conditions"), PH_NOISY);
 				phalcon_concat_self(update_sql, conditions);
 			}
 
 			/** 
 			 * Bound parameters are arbitrary values that are passed by separate
 			 */
-			if (phalcon_array_isset_string(where_condition, SS("bind"))) {
+			if (phalcon_array_isset_str(where_condition, SS("bind"))) {
 				PHALCON_OBS_VAR(where_bind);
-				phalcon_array_fetch_string(&where_bind, where_condition, SL("bind"), PH_NOISY);
+				phalcon_array_fetch_str(&where_bind, where_condition, SL("bind"), PH_NOISY);
 				phalcon_merge_append(update_values, where_bind);
 			}
 
@@ -827,9 +827,9 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 			 * Bind types is how the bound parameters must be casted before be sent to the
 			 * database system
 			 */
-			if (phalcon_array_isset_string(where_condition, SS("bindTypes"))) {
+			if (phalcon_array_isset_str(where_condition, SS("bindTypes"))) {
 				PHALCON_OBS_VAR(where_types);
-				phalcon_array_fetch_string(&where_types, where_condition, SL("bindTypes"), PH_NOISY);
+				phalcon_array_fetch_str(&where_types, where_condition, SL("bindTypes"), PH_NOISY);
 				phalcon_merge_append(bind_data_types, where_types);
 			}
 		}
@@ -1088,7 +1088,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createTable){
 		return;
 	}
 
-	if (!phalcon_array_isset_string_fetch(&columns, definition, SS("columns"))) {
+	if (!phalcon_array_isset_str_fetch(&columns, definition, SS("columns"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The table must contain at least one column");
 		return;
 	}
@@ -1165,7 +1165,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createView){
 		return;
 	}
 
-	if (!phalcon_array_isset_string(definition, SS("sql"))) {
+	if (!phalcon_array_isset_str(definition, SS("sql"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The table must contain at least one column");
 		return;
 	}
@@ -1722,16 +1722,16 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 		}
 
 		PHALCON_OBS_NVAR(referenced_schema);
-		phalcon_array_fetch_string(&referenced_schema, array_reference, SL("referencedSchema"), PH_NOISY);
+		phalcon_array_fetch_str(&referenced_schema, array_reference, SL("referencedSchema"), PH_NOISY);
 
 		PHALCON_OBS_NVAR(referenced_table);
-		phalcon_array_fetch_string(&referenced_table, array_reference, SL("referencedTable"), PH_NOISY);
+		phalcon_array_fetch_str(&referenced_table, array_reference, SL("referencedTable"), PH_NOISY);
 
 		PHALCON_OBS_NVAR(columns);
-		phalcon_array_fetch_string(&columns, array_reference, SL("columns"), PH_NOISY);
+		phalcon_array_fetch_str(&columns, array_reference, SL("columns"), PH_NOISY);
 
 		PHALCON_OBS_NVAR(referenced_columns);
-		phalcon_array_fetch_string(&referenced_columns, array_reference, SL("referencedColumns"), PH_NOISY);
+		phalcon_array_fetch_str(&referenced_columns, array_reference, SL("referencedColumns"), PH_NOISY);
 
 		PHALCON_INIT_NVAR(definition);
 		array_init_size(definition, 4);

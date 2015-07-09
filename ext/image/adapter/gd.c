@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 	if ((gd_version = zend_get_constant_str(SL("GD_VERSION"))) == NULL) {
 		PHALCON_CALL_FUNCTION(&gd_info, "gd_info");
 
-		if (phalcon_array_isset_string_fetch(&gd_version, gd_info, SS("GD Version"))) {
+		if (phalcon_array_isset_str_fetch(&gd_version, gd_info, SS("GD Version"))) {
 
 			PHALCON_INIT_VAR(matches);
 		
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 			ZVAL_LONG(type, -1);
 		}
 
-		if (phalcon_array_isset_string_fetch(&mime, imageinfo, SS("mime"))) {
+		if (phalcon_array_isset_str_fetch(&mime, imageinfo, SS("mime"))) {
 			convert_to_string(mime);
 			phalcon_update_property_this(getThis(), SL("_mime"), mime);
 		}
@@ -1012,7 +1012,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 			PHALCON_CALL_FUNCTION(&index, "imagecolorat", mask_image, zx, zy);
 			PHALCON_CALL_FUNCTION(&alpha, "imagecolorsforindex", mask_image, index);
 
-			if (phalcon_array_isset_string_fetch(&red, alpha, SS("red"))) {
+			if (phalcon_array_isset_str_fetch(&red, alpha, SS("red"))) {
 				i = (int)(127 - (phalcon_get_intval(red) / 2));
 
 				PHALCON_INIT_NVAR(alpha);
@@ -1022,9 +1022,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 			PHALCON_CALL_FUNCTION(&index2, "imagecolorat", image, zx, zy);
 			PHALCON_CALL_FUNCTION(&c, "imagecolorsforindex", image, index2);
 
-			phalcon_array_isset_string_fetch(&r, c, SS("red"));
-			phalcon_array_isset_string_fetch(&g, c, SS("green"));
-			phalcon_array_isset_string_fetch(&b, c, SS("blue"));
+			phalcon_array_isset_str_fetch(&r, c, SS("red"));
+			phalcon_array_isset_str_fetch(&g, c, SS("green"));
+			phalcon_array_isset_str_fetch(&b, c, SS("blue"));
 
 			PHALCON_CALL_FUNCTION(&color, "imagecolorallocatealpha", newimage, r, g, b, alpha);
 			PHALCON_CALL_FUNCTION(NULL, "imagesetpixel", newimage, zx, zy, color);

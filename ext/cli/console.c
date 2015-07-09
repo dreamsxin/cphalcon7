@@ -255,10 +255,10 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			return;
 		}
 
-		if (phalcon_array_isset_string(module, SS("path"))) {
+		if (phalcon_array_isset_str(module, SS("path"))) {
 
 			PHALCON_OBS_VAR(path);
-			phalcon_array_fetch_string(&path, module, SL("path"), PH_NOISY);
+			phalcon_array_fetch_str(&path, module, SL("path"), PH_NOISY);
 			convert_to_string_ex(path);
 
 			if (phalcon_file_exists(path) == SUCCESS) {
@@ -270,9 +270,9 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			}
 		}
 
-		if (phalcon_array_isset_string(module, SS("className"))) {
+		if (phalcon_array_isset_str(module, SS("className"))) {
 			PHALCON_OBS_VAR(class_name);
-			phalcon_array_fetch_string(&class_name, module, SL("className"), PH_NOISY);
+			phalcon_array_fetch_str(&class_name, module, SL("className"), PH_NOISY);
 		} else {
 			PHALCON_INIT_NVAR(class_name);
 			ZVAL_STRING(class_name, "Module");

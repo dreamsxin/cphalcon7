@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	/** 
 	 * Get the column type, one of the TYPE_* constants
 	 */
-	if (phalcon_array_isset_string_fetch(&type, definition, SS("type"))) {
+	if (phalcon_array_isset_str_fetch(&type, definition, SS("type"))) {
 		phalcon_update_property_this(getThis(), SL("_type"), type);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column type is required");
@@ -177,30 +177,30 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	/** 
 	 * Check if the field is nullable
 	 */
-	if (phalcon_array_isset_string_fetch(&not_null, definition, SS("notNull"))) {
+	if (phalcon_array_isset_str_fetch(&not_null, definition, SS("notNull"))) {
 		phalcon_update_property_this(getThis(), SL("_notNull"), not_null);
 	}
 	
 	/** 
 	 * Check if the field is primary key
 	 */
-	if (phalcon_array_isset_string_fetch(&primary, definition, SS("primary"))) {
+	if (phalcon_array_isset_str_fetch(&primary, definition, SS("primary"))) {
 		phalcon_update_property_this(getThis(), SL("_primary"), primary);
 	}
 
-	if (phalcon_array_isset_string_fetch(&size, definition, SS("size"))) {
+	if (phalcon_array_isset_str_fetch(&size, definition, SS("size"))) {
 		phalcon_update_property_this(getThis(), SL("_size"), size);
 		phalcon_update_property_this(getThis(), SL("_bytes"), size);
 	}
 
-	if (phalcon_array_isset_string_fetch(&bytes, definition, SS("bytes"))) {
+	if (phalcon_array_isset_str_fetch(&bytes, definition, SS("bytes"))) {
 		phalcon_update_property_this(getThis(), SL("_bytes"), bytes);
 	}
 
 	/** 
 	 * Check if the column has a decimal scale
 	 */
-	if (phalcon_array_isset_string_fetch(&scale, definition, SS("scale"))) {
+	if (phalcon_array_isset_str_fetch(&scale, definition, SS("scale"))) {
 		int i_type     = phalcon_get_intval(type);
 		int is_numeric = (i_type == 3 || i_type == 7 || i_type == 9);
 	
@@ -212,21 +212,21 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	/** 
 	 * Check if the field is unsigned (only MySQL)
 	 */
-	if (phalcon_array_isset_string_fetch(&dunsigned, definition, SS("unsigned"))) {
+	if (phalcon_array_isset_str_fetch(&dunsigned, definition, SS("unsigned"))) {
 		phalcon_update_property_this(getThis(), SL("_unsigned"), dunsigned);
 	}
 	
 	/** 
 	 * Check if the field is numeric
 	 */
-	if (phalcon_array_isset_string_fetch(&is_numeric, definition, SS("isNumeric"))) {
+	if (phalcon_array_isset_str_fetch(&is_numeric, definition, SS("isNumeric"))) {
 		phalcon_update_property_this(getThis(), SL("_isNumeric"), is_numeric);
 	}
 	
 	/** 
 	 * Check if the field is auto-increment/serial
 	 */
-	if (phalcon_array_isset_string_fetch(&auto_increment, definition, SS("autoIncrement"))) {
+	if (phalcon_array_isset_str_fetch(&auto_increment, definition, SS("autoIncrement"))) {
 		if (PHALCON_IS_LONG(type, 0)) {
 			phalcon_update_property_this(getThis(), SL("_autoIncrement"), auto_increment);
 		} else {
@@ -238,28 +238,28 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	/** 
 	 * Check if the field is placed at the first position of the table
 	 */
-	if (phalcon_array_isset_string_fetch(&first, definition, SS("first"))) {
+	if (phalcon_array_isset_str_fetch(&first, definition, SS("first"))) {
 		phalcon_update_property_this(getThis(), SL("_first"), first);
 	}
 	
 	/** 
 	 * Name of the column which is placed before the current field
 	 */
-	if (phalcon_array_isset_string_fetch(&after, definition, SS("after"))) {
+	if (phalcon_array_isset_str_fetch(&after, definition, SS("after"))) {
 		phalcon_update_property_this(getThis(), SL("_after"), after);
 	}
 	
 	/** 
 	 * The bind type to cast the field when passing it to PDO
 	 */
-	if (phalcon_array_isset_string_fetch(&bind_type, definition, SS("bindType"))) {
+	if (phalcon_array_isset_str_fetch(&bind_type, definition, SS("bindType"))) {
 		phalcon_update_property_this(getThis(), SL("_bindType"), bind_type);
 	}
 	
 	/** 
 	 * Default values
 	 */
-	if (phalcon_array_isset_string_fetch(&default_value, definition, SS("default"))) {
+	if (phalcon_array_isset_str_fetch(&default_value, definition, SS("default"))) {
 		phalcon_update_property_this(getThis(), SL("_default"), default_value);
 	}
 }
@@ -450,7 +450,7 @@ PHP_METHOD(Phalcon_Db_Column, __set_state){
 		return;
 	}
 	
-	if (!phalcon_array_isset_string_fetch(&column_name, data, SS("_columnName"))) {
+	if (!phalcon_array_isset_str_fetch(&column_name, data, SS("_columnName"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Column name is required");
 		return;
 	}
@@ -458,52 +458,52 @@ PHP_METHOD(Phalcon_Db_Column, __set_state){
 	PHALCON_INIT_VAR(definition);
 	array_init(definition);
 
-	if (phalcon_array_isset_string_fetch(&column_type, data, SS("_type"))) {
+	if (phalcon_array_isset_str_fetch(&column_type, data, SS("_type"))) {
 		phalcon_array_update_string(definition, SL("type"), column_type, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&not_null, data, SS("_notNull"))) {
+	if (phalcon_array_isset_str_fetch(&not_null, data, SS("_notNull"))) {
 		phalcon_array_update_string(definition, SL("notNull"), not_null, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&primary, data, SS("_primary"))) {
+	if (phalcon_array_isset_str_fetch(&primary, data, SS("_primary"))) {
 		phalcon_array_update_string(definition, SL("primary"), primary, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&size, data, SS("_size"))) {
+	if (phalcon_array_isset_str_fetch(&size, data, SS("_size"))) {
 		phalcon_array_update_string(definition, SL("size"), size, PH_COPY);
 		phalcon_array_update_string(definition, SL("bytes"), size, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&bytes, data, SS("_bytes"))) {
+	if (phalcon_array_isset_str_fetch(&bytes, data, SS("_bytes"))) {
 		phalcon_array_update_string(definition, SL("bytes"), bytes, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&scale, data, SS("_scale"))) {
+	if (phalcon_array_isset_str_fetch(&scale, data, SS("_scale"))) {
 		phalcon_array_update_string(definition, SL("scale"), scale, PH_COPY);
 	}
 
-	if (phalcon_array_isset_string_fetch(&dunsigned, data, SS("_unsigned"))) {
+	if (phalcon_array_isset_str_fetch(&dunsigned, data, SS("_unsigned"))) {
 		phalcon_array_update_string(definition, SL("unsigned"), dunsigned, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&after, data, SS("_after"))) {
+	if (phalcon_array_isset_str_fetch(&after, data, SS("_after"))) {
 		phalcon_array_update_string(definition, SL("after"), after, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&is_numeric, data, SS("_isNumeric"))) {
+	if (phalcon_array_isset_str_fetch(&is_numeric, data, SS("_isNumeric"))) {
 		phalcon_array_update_string(definition, SL("isNumeric"), is_numeric, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&first, data, SS("_first"))) {
+	if (phalcon_array_isset_str_fetch(&first, data, SS("_first"))) {
 		phalcon_array_update_string(definition, SL("first"), first, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&bind_type, data, SS("_bindType"))) {
+	if (phalcon_array_isset_str_fetch(&bind_type, data, SS("_bindType"))) {
 		phalcon_array_update_string(definition, SL("bindType"), bind_type, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_string_fetch(&default_value, data, SS("_default"))) {
+	if (phalcon_array_isset_str_fetch(&default_value, data, SS("_default"))) {
 		phalcon_array_update_string(definition, SL("default"), default_value, PH_COPY);
 	}
 	

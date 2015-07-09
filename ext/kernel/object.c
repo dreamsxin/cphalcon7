@@ -91,7 +91,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 			case 's':
 				s = va_arg(ap, char*);
 				l = va_arg(ap, int);
-				if (phalcon_array_isset_string_fetch(&fetched, p, s, l + 1)) {
+				if (phalcon_array_isset_str_fetch(&fetched, p, s, l + 1)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							phalcon_array_update_string(fetched, s, l, value, PH_COPY | PH_SEPARATE);
@@ -715,7 +715,7 @@ int phalcon_update_property_long(zval *object, const char *property_name, uint32
 /**
  * Checks whether obj is an object and updates property with string value
  */
-int phalcon_update_property_string(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length)
+int phalcon_update_property_str(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length)
 {
 	zval *value;
 
@@ -781,7 +781,7 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 	return SUCCESS;
 }
 
-int phalcon_update_property_str_zval(zval *object, zend_string *property, zval *value){
+int phalcon_update_property_string_zval(zval *object, zend_string *property, zval *value){
 	zend_class_entry *ce;
 
 	if (!object) {

@@ -414,7 +414,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 			 * Check if the element already has a default value, compare it with the one in the
 			 * attributes, if they are the same mark the element as checked
 			 */
-			if (phalcon_array_isset_string_fetch(&current_value, merged_attributes, SS("value"))) {
+			if (phalcon_array_isset_str_fetch(&current_value, merged_attributes, SS("value"))) {
 				if (PHALCON_IS_EQUAL(current_value, value)) {
 					phalcon_array_update_string_string(merged_attributes, SL("checked"), SL("checked"), PH_SEPARATE);
 				}
@@ -639,7 +639,7 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 	/** 
 	 * Check if there is an 'id' attribute defined
 	 */
-	if (!attributes || !phalcon_array_isset_string_fetch(&name, attributes, SS("id"))) {
+	if (!attributes || !phalcon_array_isset_str_fetch(&name, attributes, SS("id"))) {
 		name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
 	}
 

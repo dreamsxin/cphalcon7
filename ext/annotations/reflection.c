@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 	if (Z_TYPE_P(annotations) != IS_OBJECT) {
 	
 		reflection_data = phalcon_read_property(getThis(), SL("_reflectionData"), PH_NOISY);
-		if (phalcon_array_isset_string_fetch(&reflection_class, reflection_data, SS("class"))) {
+		if (phalcon_array_isset_str_fetch(&reflection_class, reflection_data, SS("class"))) {
 			object_init_ex(return_value, phalcon_annotations_collection_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", reflection_class);
 	
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 	if (Z_TYPE_P(annotations) != IS_OBJECT) {
 	
 		reflection_data = phalcon_read_property(getThis(), SL("_reflectionData"), PH_NOISY);
-		if (phalcon_array_isset_string_fetch(&reflection_methods, reflection_data, SS("methods"))) {
+		if (phalcon_array_isset_str_fetch(&reflection_methods, reflection_data, SS("methods"))) {
 			if (phalcon_fast_count_ev(reflection_methods)) {
 				array_init(return_value);
 
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 	if (Z_TYPE_P(annotations) != IS_OBJECT) {
 
 		reflection_data = phalcon_read_property(getThis(), SL("_reflectionData"), PH_NOISY);
-		if (phalcon_array_isset_string_fetch(&reflection_properties, reflection_data, SS("properties"))) {
+		if (phalcon_array_isset_str_fetch(&reflection_properties, reflection_data, SS("properties"))) {
 
 			if (phalcon_fast_count_ev(reflection_properties)) {
 				array_init(return_value);
@@ -268,9 +268,9 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __set_state){
 		/** 
 		 * Check for a '_reflectionData' in the array to build the Reflection
 		 */
-		if (phalcon_array_isset_string(data, SS("_reflectionData"))) {
+		if (phalcon_array_isset_str(data, SS("_reflectionData"))) {
 			PHALCON_OBS_VAR(reflection_data);
-			phalcon_array_fetch_string(&reflection_data, data, SL("_reflectionData"), PH_NOISY);
+			phalcon_array_fetch_str(&reflection_data, data, SL("_reflectionData"), PH_NOISY);
 			object_init_ex(return_value, phalcon_annotations_reflection_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", reflection_data);
 	

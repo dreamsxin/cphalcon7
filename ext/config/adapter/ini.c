@@ -73,6 +73,18 @@ static const zend_function_entry phalcon_config_adapter_ini_method_entry[] = {
 	PHP_FE_END
 };
 
+/**
+ * Phalcon\Config\Adapter\Ini initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Ini){
+
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Config\\Adapter, Ini, config_adapter_ini, phalcon_config_adapter_ce, phalcon_config_adapter_ini_method_entry, 0);
+
+	zend_class_implements(phalcon_config_adapter_ini_ce, 1, phalcon_config_adapterinterface_ce);
+
+	return SUCCESS;
+}
+
 static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *section, zval *directive, zval *value)
 {
 	zval *t1, *t2;
@@ -114,18 +126,6 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 	phalcon_array_fetch_long(&index, directive, n - 1, PH_NOISY);
 	phalcon_array_update_zval(*temp1, index, value, PH_COPY);
 	zval_ptr_dtor(index);
-}
-
-/**
- * Phalcon\Config\Adapter\Ini initializer
- */
-PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Ini){
-
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Config\\Adapter, Ini, config_adapter_ini, phalcon_config_adapter_ce, phalcon_config_adapter_ini_method_entry, 0);
-
-	zend_class_implements(phalcon_config_adapter_ini_ce, 1, phalcon_config_adapterinterface_ce);
-
-	return SUCCESS;
 }
 
 /**

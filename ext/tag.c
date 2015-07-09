@@ -702,14 +702,7 @@ PHP_METHOD(Phalcon_Tag, getValue){
  */
 PHP_METHOD(Phalcon_Tag, resetInput){
 
-	zval *empty_array;
-
-	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
-	array_init(empty_array);
-
-	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_displayValues"), empty_array);
-
-	zval_ptr_dtor(empty_array);
+	phalcon_update_static_property_empty_array_ce(phalcon_tag_ce, SL("_displayValues"));
 }
 
 /**

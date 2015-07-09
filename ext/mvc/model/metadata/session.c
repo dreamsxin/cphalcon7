@@ -82,7 +82,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Session){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct){
 
-	zval *options = NULL, *prefix, *empty_array;
+	zval *options = NULL, *prefix;
 
 	phalcon_fetch_params(0, 0, 1, &options);
 	
@@ -91,10 +91,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct){
 			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
 		}
 	}
-	
-	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
-	array_init(empty_array);
-	phalcon_update_property_this(getThis(), SL("_metaData"), empty_array);
+
+	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 }
 
 /**

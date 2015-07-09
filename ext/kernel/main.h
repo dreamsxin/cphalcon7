@@ -224,7 +224,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_REGISTER_CLASS(ns, class_name, name, methods, flags) \
 	{ \
 		zend_class_entry ce; \
-		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
 		phalcon_ ##name## _ce = zend_register_internal_class(&ce); \
 		phalcon_ ##name## _ce->ce_flags |= flags;  \
@@ -233,7 +232,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_REGISTER_CLASS_EX(ns, class_name, lcname, parent_ce, methods, flags) \
 	{ \
 		zend_class_entry ce; \
-		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
 		phalcon_ ##lcname## _ce = zend_register_internal_class_ex(&ce, parent_ce); \
 		if (!phalcon_ ##lcname## _ce) { \
@@ -246,7 +244,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_REGISTER_INTERFACE(ns, classname, name, methods) \
 	{ \
 		zend_class_entry ce; \
-		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #classname, methods); \
 		phalcon_ ##name## _ce = zend_register_internal_interface(&ce); \
 	}
@@ -254,7 +251,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_REGISTER_INTERFACE_EX(ns, classname, lcname, parent_ce, methods) \
 	{ \
 		zend_class_entry ce; \
-		memset(&ce, 0, sizeof(zend_class_entry)); \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #classname, methods); \
 		phalcon_ ##lcname## _ce = phalcon_register_internal_interface_ex(&ce, parent_ce); \
 		if (!phalcon_ ##lcname## _ce) { \

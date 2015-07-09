@@ -161,6 +161,13 @@ static inline int phalcon_update_static_property_ce(zend_class_entry *ce, const 
 	return zend_update_static_property(ce, name, len, value);
 }
 
+static inline int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len)
+{
+	zval empty_array;
+	array_init(&empty_array);
+	return zend_update_static_property(ce, name, len, &empty_array);
+}
+
 /**
  * Update a static property
  */

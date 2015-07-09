@@ -438,12 +438,8 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, send){
  */
 PHP_METHOD(Phalcon_Http_Response_Cookies, reset){
 
-	zval *empty_array;
-
 	PHALCON_MM_GROW();
 
-	PHALCON_INIT_VAR(empty_array);
-	array_init(empty_array);
-	phalcon_update_property_this(getThis(), SL("_cookies"), empty_array);
+	phalcon_update_property_empty_array(getThis(), SL("_cookies"));
 	RETURN_THIS();
 }

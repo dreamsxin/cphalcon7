@@ -124,9 +124,8 @@ static phalcon_memory_entry* phalcon_memory_grow_stack_common(zend_phalcon_globa
 	}
 	else if (!g->active_memory->next) {
 		phalcon_memory_entry *entry;
-#ifndef PHP_WIN32
+
 		assert(g->active_memory >= g->end_memory - 1 || g->active_memory < g->start_memory);
-#endif
 		entry = (phalcon_memory_entry *) ecalloc(1, sizeof(phalcon_memory_entry));
 
 #ifndef PHALCON_RELEASE
@@ -153,9 +152,9 @@ static phalcon_memory_entry* phalcon_memory_grow_stack_common(zend_phalcon_globa
 
 static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 {
-	size_t i;
 	phalcon_memory_entry *prev, *active_memory;
 	zval **ptr;
+	size_t i;
 
 	active_memory = g->active_memory;
 	assert(active_memory != NULL);
@@ -163,28 +162,27 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 	if (EXPECTED(!CG(unclean_shutdown))) {
 		/* Check for non freed hash key zvals, mark as null to avoid string freeing */
 		for (i = 0; i < active_memory->hash_pointer; ++i) {
-			assert(active_memory->hash_addresses[i] != NULL && *(active_memory->hash_addresses[i]) != NULL);
-			if (Z_REFCOUNT_P(*active_memory->hash_addresses[i]) <= 1) {
-				ZVAL_NULL(*active_memory->hash_addresses[i]);
+			ptr = active_memory->hash_addresses[i];
+			assert(ptr != NULL && *ptr != NULL);
+			if (Z_REFCOUNT_P(*ptr) <= 1) {
+				ZVAL_NULL(*ptr);
 			} else {
-				zval_copy_ctor(*active_memory->hash_addresses[i]);
+				zval_copy_ctor(*ptr);
 			}
 		}
 
 #ifndef PHALCON_RELEASE
 		for (i = 0; i < active_memory->pointer; ++i) {
-			if (active_memory->addresses[i] != NULL && *(active_memory->addresses[i]) != NULL) {
-				zval **var = active_memory->addresses[i];
-
-				if (Z_TYPE_P(*var) > IS_CALLABLE) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
+			ptr = active_memory->addresses[i];
+			if (ptr != NULL && *ptr != NULL) {
+				if (Z_TYPE_P(*ptr) > IS_CALLABLE) {
+					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *ptr, Z_TYPE_P(*ptr), active_memory->func);
 				}
 
-				if (Z_REFCOUNT_P(*var) == 0) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has 0 references, type=%d [%s]\n", __func__, (int)i, *var, Z_TYPE_P(*var), active_memory->func);
-				}
-				else if (Z_REFCOUNT_P(*var) >= 1000000) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has too many references (%u), type=%d  [%s]\n", __func__, (int)i, *var, Z_REFCOUNT_P(*var), Z_TYPE_P(*var), active_memory->func);
+				if (Z_REFCOUNT_P(*ptr) == 0) {
+					fprintf(stderr, "%s: observed variable #%d (%p) has 0 references, type=%d [%s]\n", __func__, (int)i, *ptr, Z_TYPE_P(*ptr), active_memory->func);
+				} else if (Z_REFCOUNT_P(*ptr) >= 1000000) {
+					fprintf(stderr, "%s: observed variable #%d (%p) has too many references (%u), type=%d  [%s]\n", __func__, (int)i, *ptr, Z_REFCOUNT_P(*ptr), Z_TYPE_P(*ptr), active_memory->func);
 				}
 			}
 		}
@@ -193,7 +191,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 		/* Traverse all zvals allocated, reduce the reference counting or free them */
 		for (i = 0; i < active_memory->pointer; ++i) {
 			ptr = active_memory->addresses[i];
-			if (EXPECTED(ptr != NULL && *(ptr) != NULL)) {
+			if (EXPECTED(ptr != NULL && *ptr != NULL)) {
 				if (Z_REFCOUNT_P(*ptr) == 1) {
 					if (!Z_ISREF_P(*ptr) || Z_TYPE_P(*ptr) == IS_OBJECT) {
 						zval_ptr_dtor(*ptr);
@@ -230,8 +228,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 		efree(g->active_memory);
 		g->active_memory = prev;
 		prev->next = NULL;
-	}
-	else {
+	} else {
 #ifndef PHALCON_RELEASE
 		assert(g->active_memory->permanent == 1);
 #endif

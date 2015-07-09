@@ -1362,10 +1362,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isEmpty){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, reset){
 
-	zval *empty_array;
-
-	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
-	array_init(empty_array);
-	phalcon_update_property_this(getThis(), SL("_metaData"), empty_array);
-	phalcon_update_property_this(getThis(), SL("_columnMap"), empty_array);
+	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
+	phalcon_update_property_empty_array(getThis(), SL("_columnMap"));
 }

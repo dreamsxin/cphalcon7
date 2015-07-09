@@ -204,12 +204,8 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 	data = &tmp;
 
 	if (Z_TYPE_P(*data) != IS_ARRAY) {
-		zval *empty_array;
-		PHALCON_ALLOC_GHOST_ZVAL(empty_array);
-		array_init(empty_array);
-		phalcon_update_property_this(getThis(), SL("_data"), empty_array);
-	}
-	else {
+		phalcon_update_property_empty_array(getThis(), SL("_data"));
+	} else {
 		phalcon_update_property_this(getThis(), SL("_data"), *data);
 	}
 

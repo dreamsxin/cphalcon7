@@ -1194,12 +1194,10 @@ int phalcon_update_property_array_merge_append(zval *object, const char *propert
  */
 int phalcon_update_property_empty_array(zval *object, const char *property_name, uint32_t property_length) {
 
-	zval *empty_array;
+	zval empty_array;
+	array_init(&empty_array);
 
-	PHALCON_ALLOC_GHOST_ZVAL(empty_array);
-	array_init(empty_array);
-
-	return phalcon_update_property_zval(object, property_name, property_length, empty_array);
+	return phalcon_update_property_zval(object, property_name, property_length, &empty_array);
 }
 
 /**

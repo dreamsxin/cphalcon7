@@ -31,8 +31,6 @@
 
 #include "phalcon.h"
 
-int nusphere_dbg_present;
-
 ZEND_DECLARE_MODULE_GLOBALS(phalcon)
 
 PHP_INI_BEGIN()
@@ -66,8 +64,6 @@ PHP_INI_END()
 static PHP_MINIT_FUNCTION(phalcon)
 {
 	REGISTER_INI_ENTRIES();
-
-	nusphere_dbg_present = (zend_get_extension("DBG") != NULL);
 
 	/* 1. Register exceptions */
 	PHALCON_INIT(Phalcon_Exception);
@@ -117,6 +113,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
 	PHALCON_INIT(Phalcon_DI_InjectionAwareInterface);
+	PHALCON_INIT(Phalcon_DI_ServiceInterface);
 	PHALCON_INIT(Phalcon_Events_EventsAwareInterface);
 
 	PHALCON_INIT(Phalcon_Acl_AdapterInterface);
@@ -135,7 +132,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Db_ReferenceInterface);
 	PHALCON_INIT(Phalcon_Db_ResultInterface);
 	PHALCON_INIT(Phalcon_DispatcherInterface);
-	PHALCON_INIT(Phalcon_DI_ServiceInterface);
 	PHALCON_INIT(Phalcon_Config_AdapterInterface);
 	PHALCON_INIT(Phalcon_EscaperInterface);
 	PHALCON_INIT(Phalcon_Events_ManagerInterface);
@@ -189,41 +185,34 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Validation_MessageInterface);
 
 	/* 4. Register everything else */
-	PHALCON_INIT(Phalcon_DI_Injectable);
 	PHALCON_INIT(Phalcon_DI);
-	PHALCON_INIT(Phalcon_Db_Adapter);
+	PHALCON_INIT(Phalcon_DI_Injectable);
+	PHALCON_INIT(Phalcon_DI_FactoryDefault);
+	PHALCON_INIT(Phalcon_DI_FactoryDefault_CLI);
+	PHALCON_INIT(Phalcon_DI_Service);
+	PHALCON_INIT(Phalcon_DI_Service_Builder);
 	PHALCON_INIT(Phalcon_Forms_Element);
-	PHALCON_INIT(Phalcon_Validation_Validator);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator);
 	PHALCON_INIT(Phalcon_Cache_Backend);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData);
-	PHALCON_INIT(Phalcon_Db_Adapter_Pdo);
-	PHALCON_INIT(Phalcon_Db_Dialect);
 	PHALCON_INIT(Phalcon_Annotations_Adapter);
 	PHALCON_INIT(Phalcon_Logger_Adapter);
 	PHALCON_INIT(Phalcon_Logger_Formatter);
-	PHALCON_INIT(Phalcon_Mvc_Model_Resultset);
-	PHALCON_INIT(Phalcon_Mvc_Model_Behavior);
 	PHALCON_INIT(Phalcon_Assets_Resource);
 	PHALCON_INIT(Phalcon_Flash);
 	PHALCON_INIT(Phalcon_Dispatcher);
-	PHALCON_INIT(Phalcon_Mvc_View_Engine);
-	PHALCON_INIT(Phalcon_Mvc_View_Model);
 	PHALCON_INIT(Phalcon_Translate_Adapter);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Data);
-	PHALCON_INIT(Phalcon_DI_FactoryDefault);
 	PHALCON_INIT(Phalcon_Config);
 	PHALCON_INIT(Phalcon_Config_Adapter);
 	PHALCON_INIT(Phalcon_Config_Adapter_Ini);
 	PHALCON_INIT(Phalcon_Config_Adapter_Json);
 	PHALCON_INIT(Phalcon_Config_Adapter_Php);
 	PHALCON_INIT(Phalcon_Config_Adapter_Yaml);
-	PHALCON_INIT(Phalcon_Mvc_Router);
-	PHALCON_INIT(Phalcon_Acl_Adapter);
-	PHALCON_INIT(Phalcon_Session_Adapter);
-	PHALCON_INIT(Phalcon_Db);
 	PHALCON_INIT(Phalcon_Acl);
-	PHALCON_INIT(Phalcon_Tag);
+	PHALCON_INIT(Phalcon_Acl_Adapter);
+	PHALCON_INIT(Phalcon_Acl_Role);
+	PHALCON_INIT(Phalcon_Acl_Resource);
+	PHALCON_INIT(Phalcon_Acl_Adapter_Memory);
+	PHALCON_INIT(Phalcon_Session_Adapter);
 	PHALCON_INIT(Phalcon_Cache_Multiple);
 	PHALCON_INIT(Phalcon_Cache_Backend_Apc);
 	PHALCON_INIT(Phalcon_Cache_Backend_File);
@@ -238,12 +227,14 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cache_Frontend_None);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Base64);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Igbinary);
+	PHALCON_INIT(Phalcon_Tag);
 	PHALCON_INIT(Phalcon_Tag_Select);
 	PHALCON_INIT(Phalcon_Paginator_Adapter_Model);
 	PHALCON_INIT(Phalcon_Paginator_Adapter_NativeArray);
 	PHALCON_INIT(Phalcon_Paginator_Adapter_QueryBuilder);
 	PHALCON_INIT(Phalcon_Paginator_Adapter_Sql);
 	PHALCON_INIT(Phalcon_Validation);
+	PHALCON_INIT(Phalcon_Validation_Validator);
 	PHALCON_INIT(Phalcon_Validation_Message);
 	PHALCON_INIT(Phalcon_Validation_Message_Group);
 	PHALCON_INIT(Phalcon_Validation_Validator_Regex);
@@ -258,12 +249,16 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Validation_Validator_Url);
 	PHALCON_INIT(Phalcon_Validation_Validator_File);
 	PHALCON_INIT(Phalcon_Validation_Validator_Numericality);
-	PHALCON_INIT(Phalcon_Db_Index);
-	PHALCON_INIT(Phalcon_Db_Column);
+	PHALCON_INIT(Phalcon_Db);
+	PHALCON_INIT(Phalcon_Db_Adapter);
+	PHALCON_INIT(Phalcon_Db_Adapter_Pdo);
 	PHALCON_INIT(Phalcon_Db_Adapter_Pdo_Sqlite);
 	PHALCON_INIT(Phalcon_Db_Adapter_Pdo_Mysql);
 	PHALCON_INIT(Phalcon_Db_Adapter_Pdo_Oracle);
 	PHALCON_INIT(Phalcon_Db_Adapter_Pdo_Postgresql);
+	PHALCON_INIT(Phalcon_Db_Index);
+	PHALCON_INIT(Phalcon_Db_Column);
+	PHALCON_INIT(Phalcon_Db_Dialect);
 	PHALCON_INIT(Phalcon_Db_Dialect_Sqlite);
 	PHALCON_INIT(Phalcon_Db_Dialect_Mysql);
 	PHALCON_INIT(Phalcon_Db_Dialect_Oracle);
@@ -273,9 +268,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Db_RawValue);
 	PHALCON_INIT(Phalcon_Db_Reference);
 	PHALCON_INIT(Phalcon_Db_Result_Pdo);
-	PHALCON_INIT(Phalcon_Acl_Role);
-	PHALCON_INIT(Phalcon_Acl_Resource);
-	PHALCON_INIT(Phalcon_Acl_Adapter_Memory);
 	PHALCON_INIT(Phalcon_Kernel);
 	PHALCON_INIT(Phalcon_Debug);
 	PHALCON_INIT(Phalcon_Debug_Dump);
@@ -288,9 +280,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Session_Adapter_Memcache);
 	PHALCON_INIT(Phalcon_Session_Adapter_Libmemcached);
 	PHALCON_INIT(Phalcon_Filter);
-	PHALCON_INIT(Phalcon_DI_FactoryDefault_CLI);
-	PHALCON_INIT(Phalcon_DI_Service);
-	PHALCON_INIT(Phalcon_DI_Service_Builder);
 	PHALCON_INIT(Phalcon_Flash_Direct);
 	PHALCON_INIT(Phalcon_Flash_Session);
 	PHALCON_INIT(Phalcon_CLI_Task);
@@ -355,14 +344,16 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Http_Client_Adapter);
 	PHALCON_INIT(Phalcon_Http_Client_Adapter_Curl);
 	PHALCON_INIT(Phalcon_Http_Client_Adapter_Stream);
-	PHALCON_INIT(Phalcon_Mvc_JsonRpc);
 	PHALCON_INIT(Phalcon_JsonRpc_Client);
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Response);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk_Job);
+	PHALCON_INIT(Phalcon_Mvc_JsonRpc);
+	PHALCON_INIT(Phalcon_Mvc_Router);
+	PHALCON_INIT(Phalcon_Mvc_View_Engine);
+	PHALCON_INIT(Phalcon_Mvc_View_Model);
 	PHALCON_INIT(Phalcon_Mvc_View);
 	PHALCON_INIT(Phalcon_Mvc_Url);
-	PHALCON_INIT(Phalcon_Mvc_Model);
 	PHALCON_INIT(Phalcon_Mvc_Micro);
 	PHALCON_INIT(Phalcon_Mvc_Application);
 	PHALCON_INIT(Phalcon_Mvc_Collection);
@@ -373,6 +364,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Collection_GridFS);
 	PHALCON_INIT(Phalcon_Mvc_Collection_Resultset);
 	PHALCON_INIT(Phalcon_Mvc_Dispatcher);
+	PHALCON_INIT(Phalcon_Mvc_Model);
+	PHALCON_INIT(Phalcon_Mvc_Model_Resultset);
+	PHALCON_INIT(Phalcon_Mvc_Model_Behavior);
 	PHALCON_INIT(Phalcon_Mvc_Model_Row);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query);
 	PHALCON_INIT(Phalcon_Mvc_Micro_Collection);
@@ -382,39 +376,42 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_Manager);
 	PHALCON_INIT(Phalcon_Mvc_Model_Message);
 	PHALCON_INIT(Phalcon_Mvc_Model_Relation);
-	PHALCON_INIT(Phalcon_Mvc_Model_Transaction);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Lang);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Url);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Status);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Apc);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Files);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Regex);
 	PHALCON_INIT(Phalcon_Mvc_Model_ValidationFailed);
 	PHALCON_INIT(Phalcon_Mvc_Model_Resultset_Simple);
 	PHALCON_INIT(Phalcon_Mvc_Model_Resultset_Complex);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Memory);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Xcache);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Email);
+	PHALCON_INIT(Phalcon_Mvc_Model_MetaData);
+	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Apc);
+	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Files);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Session);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Memcache);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Libmemcached);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Redis);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Mongo);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Cache);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Uniqueness);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_PresenceOf);
+	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Memory);
+	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Xcache);
+	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Strategy_Annotations);
+	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Strategy_Introspection);
+	PHALCON_INIT(Phalcon_Mvc_Model_Transaction);
+	PHALCON_INIT(Phalcon_Mvc_Model_Transaction_Manager);
 	PHALCON_INIT(Phalcon_Mvc_Model_Transaction_Failed);
 	PHALCON_INIT(Phalcon_Mvc_Model_Behavior_SoftDelete);
 	PHALCON_INIT(Phalcon_Mvc_Model_Behavior_NestedSet);
-	PHALCON_INIT(Phalcon_Mvc_Model_Transaction_Manager);
 	PHALCON_INIT(Phalcon_Mvc_Model_Behavior_Timestampable);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Strategy_Annotations);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Strategy_Introspection);
+	PHALCON_INIT(Phalcon_Mvc_Model_Validator);
+	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Url);
+	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Regex);
+	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Email);
 	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Inclusionin);
 	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Numericality);
 	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Exclusionin);
 	PHALCON_INIT(Phalcon_Mvc_Model_Validator_StringLength);
+	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Uniqueness);
+	PHALCON_INIT(Phalcon_Mvc_Model_Validator_PresenceOf);
+	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Json);
 	PHALCON_INIT(Phalcon_Mvc_Router_Route);
 	PHALCON_INIT(Phalcon_Mvc_Router_Group);
 	PHALCON_INIT(Phalcon_Mvc_Router_Annotations);
@@ -433,7 +430,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Image_Adapter_GD);
 	PHALCON_INIT(Phalcon_Image_Adapter_Imagick);
 	PHALCON_INIT(Phalcon_Registry);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Json);
 	PHALCON_INIT(Phalcon_Arr);
 	PHALCON_INIT(Phalcon_Chart_QRcode);
 	PHALCON_INIT(Phalcon_Chart_Captcha);

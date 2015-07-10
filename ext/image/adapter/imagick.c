@@ -1628,7 +1628,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, setResourceLimit)
 	if (EXPECTED(imagick_ce != NULL)) {
 		zval *params[] = { *resource, *limit };
 
-		PHALCON_ALLOC_GHOST_ZVAL(im);
+		PHALCON_ALLOC_INIT_ZVAL(im);
 		object_init_ex(im, imagick_ce);
 		if (FAILURE == phalcon_call_method(NULL, im, "setresourcelimit", 2, params)) {
 			;

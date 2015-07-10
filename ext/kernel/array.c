@@ -261,7 +261,7 @@ int phalcon_array_update_zval(zval *arr, const zval *index, zval *value, int fla
 	if ((flags & PH_CTOR) == PH_CTOR) {
 		zval *new_zv;
 		Z_DELREF_P(value);
-		ALLOC_ZVAL(new_zv);
+		PHALCON_ALLOC_ZVAL(new_zv);
 		INIT_PZVAL_COPY(new_zv, value);
 		value = new_zv;
 		zval_copy_ctor(new_zv);
@@ -337,7 +337,7 @@ int phalcon_array_update_string(zval *arr, const char *index, uint index_length,
 	if ((flags & PH_CTOR) == PH_CTOR) {
 		zval *new_zv;
 		Z_DELREF_P(value);
-		ALLOC_ZVAL(new_zv);
+		PHALCON_ALLOC_ZVAL(new_zv);
 		INIT_PZVAL_COPY(new_zv, value);
 		value = new_zv;
 		zval_copy_ctor(new_zv);
@@ -364,7 +364,7 @@ int phalcon_array_update_str(zval *arr, zend_string *index, zval *value, int fla
 	if ((flags & PH_CTOR) == PH_CTOR) {
 		zval *new_zv;
 		Z_DELREF_P(value);
-		ALLOC_ZVAL(new_zv);
+		PHALCON_ALLOC_ZVAL(new_zv);
 		INIT_PZVAL_COPY(new_zv, value);
 		value = new_zv;
 		zval_copy_ctor(new_zv);
@@ -391,7 +391,7 @@ int phalcon_array_update_long(zval *arr, ulong index, zval *value, int flags){
 	if ((flags & PH_CTOR) == PH_CTOR) {
 		zval *new_zv;
 		Z_DELREF_P(value);
-		ALLOC_ZVAL(new_zv);
+		PHALCON_ALLOC_ZVAL(new_zv);
 		INIT_PZVAL_COPY(new_zv, value);
 		value = new_zv;
 		zval_copy_ctor(new_zv);
@@ -471,7 +471,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		}
 	}
 
-	ALLOC_INIT_ZVAL(*return_value);
+	PHALCON_ALLOC_INIT_ZVAL(*return_value);
 	return FAILURE;
 }
 
@@ -495,7 +495,7 @@ int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *in
 		}
 	}
 
-	ALLOC_INIT_ZVAL(*return_value);
+	PHALCON_ALLOC_INIT_ZVAL(*return_value);
 	return FAILURE;
 }
 
@@ -519,7 +519,7 @@ int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string
 		}
 	}
 
-	ALLOC_INIT_ZVAL(*return_value);
+	PHALCON_ALLOC_INIT_ZVAL(*return_value);
 	return FAILURE;
 }
 
@@ -544,7 +544,7 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
 		}
 	}
 
-	ALLOC_INIT_ZVAL(*return_value);
+	PHALCON_ALLOC_INIT_ZVAL(*return_value);
 	return FAILURE;
 }
 
@@ -1025,7 +1025,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (i == (types_length - 1)) {
 						phalcon_array_update_string(p, s, l, value, PH_COPY | PH_SEPARATE);
 					} else {
-						PHALCON_ALLOC_GHOST_ZVAL(tmp);
+						PHALCON_ALLOC_INIT_ZVAL(tmp);
 						array_init(tmp);
 						phalcon_array_update_string(p, s, l, tmp, PH_SEPARATE);
 						if (re_update) {
@@ -1058,7 +1058,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (i == (types_length - 1)) {
 						phalcon_array_update_long(p, ll, value, PH_COPY | PH_SEPARATE);
 					} else {
-						PHALCON_ALLOC_GHOST_ZVAL(tmp);
+						PHALCON_ALLOC_INIT_ZVAL(tmp);
 						array_init(tmp);
 						phalcon_array_update_long(p, ll, tmp, PH_SEPARATE);
 						if (re_update) {
@@ -1091,7 +1091,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (i == (types_length - 1)) {
 						phalcon_array_update_zval(p, item, value, PH_COPY | PH_SEPARATE);
 					} else {
-						PHALCON_ALLOC_GHOST_ZVAL(tmp);
+						PHALCON_ALLOC_INIT_ZVAL(tmp);
 						array_init(tmp);
 						phalcon_array_update_zval(p, item, tmp, PH_SEPARATE);
 						if (re_update) {

@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 		phalcon_array_update_string_long(bind, SL("offset"), 0, 0);
 	} else {
 		zval *number;
-		PHALCON_ALLOC_GHOST_ZVAL(number);
+		PHALCON_ALLOC_INIT_ZVAL(number);
 		ZVAL_LONG(number, i_number);
 		phalcon_array_update_string(bind, SL("limit"), limit, PH_COPY);
 		phalcon_array_update_string(bind, SL("offset"), number, PH_COPY);

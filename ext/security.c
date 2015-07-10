@@ -429,7 +429,7 @@ PHP_METHOD(Phalcon_Security, hash)
 		 * underlying Blowfish-based hashing algorithm and must be in
 		 * range 04-31, values outside this range will cause crypt() to fail.
 		 */
-			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
+			PHALCON_ALLOC_INIT_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 22);
 			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Security, hash)
 
 		case PHALCON_SECURITY_CRYPT_STD_DES: {
 		/* Standard DES-based hash with a two character salt from the alphabet "./0-9A-Za-z". */
-			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
+			PHALCON_ALLOC_INIT_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 2);
 			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
@@ -481,7 +481,7 @@ PHP_METHOD(Phalcon_Security, hash)
 			buf[2] = ascii64[(i_factor >> 12) & 0x3F];
 			buf[3] = ascii64[(i_factor >> 18) & 0x3F];
 
-			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
+			PHALCON_ALLOC_INIT_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 4);
 			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
@@ -497,7 +497,7 @@ PHP_METHOD(Phalcon_Security, hash)
 
 		case PHALCON_SECURITY_CRYPT_MD5: {
 		/* MD5 hashing with a twelve character salt starting with $1$ */
-			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
+			PHALCON_ALLOC_INIT_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 12);
 			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
@@ -524,7 +524,7 @@ PHP_METHOD(Phalcon_Security, hash)
 		 * a maximum of 999,999,999. Any selection of N outside this range
 		 * will be truncated to the nearest limit.
 		 */
-			PHALCON_ALLOC_GHOST_ZVAL(n_bytes);
+			PHALCON_ALLOC_INIT_ZVAL(n_bytes);
 			ZVAL_LONG(n_bytes, 16);
 			PHALCON_CALL_METHOD(&salt_bytes, getThis(), "getsaltbytes", n_bytes);
 			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
@@ -1048,13 +1048,13 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 
 	zval *algo, *iter, *len;
 
-	PHALCON_ALLOC_GHOST_ZVAL(algo);
+	PHALCON_ALLOC_INIT_ZVAL(algo);
 	ZVAL_STRING(algo, s_hash);
 
-	PHALCON_ALLOC_GHOST_ZVAL(iter);
+	PHALCON_ALLOC_INIT_ZVAL(iter);
 	ZVAL_LONG(iter, i_iterations);
 
-	PHALCON_ALLOC_GHOST_ZVAL(len);
+	PHALCON_ALLOC_INIT_ZVAL(len);
 	ZVAL_LONG(len, i_size);
 
 	{

@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Db_Reference, __set_state){
 		referenced_columns = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(definition);
+	PHALCON_ALLOC_INIT_ZVAL(definition);
 	array_init_size(definition, 4);
 	phalcon_array_update_string(definition, SL("referencedSchema"),  referenced_schema, PH_COPY);
 	phalcon_array_update_string(definition, SL("referencedTable"),   referenced_table, PH_COPY);

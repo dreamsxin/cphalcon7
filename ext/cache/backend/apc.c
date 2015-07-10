@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, delete){
 	
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	
-	PHALCON_ALLOC_GHOST_ZVAL(key);
+	PHALCON_ALLOC_INIT_ZVAL(key);
 	PHALCON_CONCAT_SVV(key, "_PHCA", prefix, key_name);
 	
 	PHALCON_RETURN_CALL_FUNCTION("apc_delete", key);
@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	object_init_ex(iterator, apciterator_ce);
 	assert(phalcon_has_constructor(iterator));
 	if (!phalcon_cache_backend_is_old_apcu) {
-		PHALCON_ALLOC_GHOST_ZVAL(type);
+		PHALCON_ALLOC_INIT_ZVAL(type);
 		ZVAL_STRING(type, "user");
 		PHALCON_CALL_METHOD(NULL, iterator, "__construct", type, prefix_pattern);
 	}
@@ -472,7 +472,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 	object_init_ex(iterator, apciterator_ce);
 	assert(phalcon_has_constructor(iterator));
 	if (!phalcon_cache_backend_is_old_apcu) {
-		PHALCON_ALLOC_GHOST_ZVAL(type);
+		PHALCON_ALLOC_INIT_ZVAL(type);
 		ZVAL_STRING(type, "user");
 		PHALCON_CALL_METHOD(NULL, iterator, "__construct", type, prefix_pattern);
 	}

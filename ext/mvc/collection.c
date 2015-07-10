@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	 * Inject the manager service from the DI
 	 */
 	if (!collection_manager || Z_TYPE_P(*collection_manager) != IS_OBJECT) {
-		PHALCON_ALLOC_GHOST_ZVAL(service_name);
+		PHALCON_ALLOC_INIT_ZVAL(service_name);
 		ZVAL_STRING(service_name, "collectionManager");
 
 		PHALCON_CALL_METHOD(&mm, di, "getshared", service_name);

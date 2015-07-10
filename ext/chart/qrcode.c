@@ -917,7 +917,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 				continue;
 			}
 			/* Scan the page for barcodes */
-			PHALCON_ALLOC_GHOST_ZVAL(page_array);
+			PHALCON_ALLOC_INIT_ZVAL(page_array);
 
 			_php_zbarcode_scan_page(zbar_scanner, zbar_page, ext, page_array);
 			add_index_zval(return_value, i++, page_array);

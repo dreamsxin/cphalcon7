@@ -1405,7 +1405,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **retval_ptr, zval
 					Z_ADDREF_P(derror);
 					Z_ADDREF_P(dsize);
 
-					PHALCON_ALLOC_GHOST_ZVAL(arr);
+					PHALCON_ALLOC_INIT_ZVAL(arr);
 					array_init_size(arr, 5);
 					add_assoc_zval_ex(arr, ISS(name),      dname);
 					add_assoc_zval_ex(arr, ISS(type),      dtype);
@@ -1413,10 +1413,10 @@ static void phalcon_http_request_getuploadedfiles_helper(zval **retval_ptr, zval
 					add_assoc_zval_ex(arr, SS("error"),    derror);
 					add_assoc_zval_ex(arr, SS("size"),     dsize);
 
-					PHALCON_ALLOC_GHOST_ZVAL(key);
+					PHALCON_ALLOC_INIT_ZVAL(key);
 					ZVAL_STR(key, prefix->s);
 
-					PHALCON_ALLOC_GHOST_ZVAL(file);
+					PHALCON_ALLOC_INIT_ZVAL(file);
 					object_init_ex(file, phalcon_http_request_file_ce);
 
 					{
@@ -1554,7 +1554,7 @@ PHP_METHOD(Phalcon_Http_Request, getHeaders){
 		if (Z_TYPE_P(key) == IS_STRING && Z_STRLEN_P(key) > 5 && !memcmp(Z_STRVAL_P(key), "HTTP_", 5)) {
 			zval *header;
 
-			PHALCON_ALLOC_GHOST_ZVAL(header);
+			PHALCON_ALLOC_INIT_ZVAL(header);
 			ZVAL_STRINGL(header, Z_STRVAL_P(key) + 5, Z_STRLEN_P(key) - 5);
 			phalcon_array_update_zval(return_value, header, hd, PH_COPY);
 		}

@@ -328,7 +328,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 		 */
 		_SERVER = phalcon_get_global(SS("_SERVER"));
 		if (phalcon_array_isset_str_fetch(&url, _SERVER, SS("REQUEST_URI"))) {
-			ALLOC_INIT_ZVAL(url_parts);
+			PHALCON_ALLOC_INIT_ZVAL(url_parts);
 			phalcon_fast_explode_str(url_parts, SL("?"), url);
 
 			phalcon_array_fetch_long(&real_uri, url_parts, 0, PH_NOISY);
@@ -1113,7 +1113,7 @@ static void phalcon_mvc_router_add_helper(INTERNAL_FUNCTION_PARAMETERS, zend_str
 		paths = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(http_method);
+	PHALCON_ALLOC_INIT_ZVAL(http_method);
 	ZVAL_STR(http_method, method);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "add", pattern, paths, http_method);
 }

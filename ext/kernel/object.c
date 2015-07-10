@@ -104,7 +104,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (i == (types_length - 1)) {
 					phalcon_array_update_string(p, s, l, value, PH_COPY | PH_SEPARATE);
 				} else {
-					PHALCON_ALLOC_GHOST_ZVAL(tmp);
+					PHALCON_ALLOC_INIT_ZVAL(tmp);
 					array_init(tmp);
 					phalcon_array_update_string(p, s, l, tmp, PH_SEPARATE);
 					p = tmp;
@@ -126,7 +126,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (i == (types_length - 1)) {
 					phalcon_array_update_long(p, ll, value, PH_COPY | PH_SEPARATE);
 				} else {
-					PHALCON_ALLOC_GHOST_ZVAL(tmp);
+					PHALCON_ALLOC_INIT_ZVAL(tmp);
 					array_init(tmp);
 					phalcon_array_update_long(p, ll, tmp, PH_SEPARATE);
 					p = tmp;
@@ -148,7 +148,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (i == (types_length - 1)) {
 					phalcon_array_update_zval(p, item, value, PH_COPY | PH_SEPARATE);
 				} else {
-					PHALCON_ALLOC_GHOST_ZVAL(tmp);
+					PHALCON_ALLOC_INIT_ZVAL(tmp);
 					array_init(tmp);
 					phalcon_array_update_zval(p, item, tmp, PH_SEPARATE);
 					p = tmp;
@@ -871,7 +871,7 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 		if (Z_REFCOUNT_P(tmp) > 1) {
 			if (!Z_ISREF_P(tmp)) {
 				zval *new_zv;
-				ALLOC_ZVAL(new_zv);
+				PHALCON_ALLOC_ZVAL(new_zv);
 				INIT_PZVAL_COPY(new_zv, tmp);
 				tmp = new_zv;
 				zval_copy_ctor(new_zv);
@@ -887,7 +887,7 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 				convert_to_array(tmp);
 			} else {
 				zval *new_zv;
-				ALLOC_ZVAL(new_zv);
+				PHALCON_ALLOC_ZVAL(new_zv);
 				INIT_PZVAL_COPY(new_zv, tmp);
 				tmp = new_zv;
 				zval_copy_ctor(new_zv);
@@ -934,7 +934,7 @@ int phalcon_update_property_array_multi(zval *object, const char *property, uint
 		if (Z_REFCOUNT_P(tmp_arr) > 1) {
 			if (!Z_ISREF_P(tmp_arr)) {
 				zval *new_zv;
-				ALLOC_ZVAL(new_zv);
+				PHALCON_ALLOC_ZVAL(new_zv);
 				INIT_PZVAL_COPY(new_zv, tmp_arr);
 				tmp_arr = new_zv;
 				zval_copy_ctor(new_zv);
@@ -950,7 +950,7 @@ int phalcon_update_property_array_multi(zval *object, const char *property, uint
 				convert_to_array(tmp_arr);
 			} else {
 				zval *new_zv;
-				ALLOC_ZVAL(new_zv);
+				PHALCON_ALLOC_ZVAL(new_zv);
 				INIT_PZVAL_COPY(new_zv, tmp_arr);
 				tmp_arr = new_zv;
 				zval_copy_ctor(new_zv);
@@ -991,7 +991,7 @@ int phalcon_update_property_array_string(zval *object, const char *property, uin
 		if (Z_REFCOUNT_P(tmp) > 1) {
 			if (!Z_ISREF_P(tmp)) {
 				zval *new_zv;
-				ALLOC_ZVAL(new_zv);
+				PHALCON_ALLOC_ZVAL(new_zv);
 				INIT_PZVAL_COPY(new_zv, tmp);
 				tmp = new_zv;
 				zval_copy_ctor(new_zv);
@@ -1007,7 +1007,7 @@ int phalcon_update_property_array_string(zval *object, const char *property, uin
 				convert_to_array(tmp);
 			} else {
 				zval *new_zv;
-				ALLOC_ZVAL(new_zv);
+				PHALCON_ALLOC_ZVAL(new_zv);
 				INIT_PZVAL_COPY(new_zv, tmp);
 				tmp = new_zv;
 				zval_copy_ctor(new_zv);
@@ -1051,7 +1051,7 @@ int phalcon_update_property_array_append(zval *object, const char *property, uin
 	if (Z_REFCOUNT_P(tmp) > 1) {
 		if (!Z_ISREF_P(tmp)) {
 			zval *new_zv;
-			ALLOC_ZVAL(new_zv);
+			PHALCON_ALLOC_ZVAL(new_zv);
 			INIT_PZVAL_COPY(new_zv, tmp);
 			tmp = new_zv;
 			zval_copy_ctor(new_zv);
@@ -1067,7 +1067,7 @@ int phalcon_update_property_array_append(zval *object, const char *property, uin
 			convert_to_array(tmp);
 		} else {
 			zval *new_zv;
-			ALLOC_ZVAL(new_zv);
+			PHALCON_ALLOC_ZVAL(new_zv);
 			INIT_PZVAL_COPY(new_zv, tmp);
 			tmp = new_zv;
 			zval_copy_ctor(new_zv);
@@ -1104,7 +1104,7 @@ int phalcon_update_property_array_merge(zval *object, const char *property, uint
 	/** Separation only when refcount > 1 */
 	if (Z_REFCOUNT_P(tmp) > 1) {
 		zval *new_zv;
-		ALLOC_ZVAL(new_zv);
+		PHALCON_ALLOC_ZVAL(new_zv);
 		INIT_PZVAL_COPY(new_zv, tmp);
 		tmp = new_zv;
 		zval_copy_ctor(new_zv);
@@ -1118,7 +1118,7 @@ int phalcon_update_property_array_merge(zval *object, const char *property, uint
 			convert_to_array(tmp);
 		} else {
 			zval *new_zv;
-			ALLOC_ZVAL(new_zv);
+			PHALCON_ALLOC_ZVAL(new_zv);
 			INIT_PZVAL_COPY(new_zv, tmp);
 			tmp = new_zv;
 			zval_copy_ctor(new_zv);
@@ -1156,7 +1156,7 @@ int phalcon_update_property_array_merge_append(zval *object, const char *propert
 	/** Separation only when refcount > 1 */
 	if (Z_REFCOUNT_P(tmp) > 1) {
 		zval *new_zv;
-		ALLOC_ZVAL(new_zv);
+		PHALCON_ALLOC_ZVAL(new_zv);
 		INIT_PZVAL_COPY(new_zv, tmp);
 		tmp = new_zv;
 		zval_copy_ctor(new_zv);
@@ -1170,7 +1170,7 @@ int phalcon_update_property_array_merge_append(zval *object, const char *propert
 			convert_to_array(tmp);
 		} else {
 			zval *new_zv;
-			ALLOC_ZVAL(new_zv);
+			PHALCON_ALLOC_ZVAL(new_zv);
 			INIT_PZVAL_COPY(new_zv, tmp);
 			tmp = new_zv;
 			zval_copy_ctor(new_zv);
@@ -1245,7 +1245,7 @@ int phalcon_unset_property_array(zval *object, const char *property, uint32_t pr
 		if (Z_REFCOUNT_P(tmp) > 1) {
 			if (!Z_ISREF_P(tmp)) {
 				zval *new_zv;
-				ALLOC_ZVAL(new_zv);
+				PHALCON_ALLOC_ZVAL(new_zv);
 				INIT_PZVAL_COPY(new_zv, tmp);
 				tmp = new_zv;
 				zval_copy_ctor(new_zv);
@@ -1452,7 +1452,7 @@ int phalcon_property_incr(zval *object, const char *property_name, uint32_t prop
 		if (Z_REFCOUNT_P(tmp) > 1) {
 			if (!Z_ISREF_P(tmp)) {
 				zval *new_zv;
-				ALLOC_ZVAL(new_zv);
+				PHALCON_ALLOC_ZVAL(new_zv);
 				INIT_PZVAL_COPY(new_zv, tmp);
 				tmp = new_zv;
 				zval_copy_ctor(new_zv);

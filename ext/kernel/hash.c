@@ -157,7 +157,7 @@ zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 						/* no break */
 					case BP_VAR_W: {
 						zval *value;
-						ALLOC_INIT_ZVAL(value);
+						PHALCON_ALLOC_INIT_ZVAL(value);
 						zend_hash_index_update(ht, index, value);
 						break;
 					}
@@ -185,7 +185,7 @@ zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 						/* no break */
 					case BP_VAR_W: {
 						zval *value;
-						ALLOC_INIT_ZVAL(value);
+						PHALCON_ALLOC_INIT_ZVAL(value);
 						zend_symtable_update(ht, Z_STR_P(key), value);
 						break;
 					}

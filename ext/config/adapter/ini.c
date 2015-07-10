@@ -98,7 +98,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 	assert(n > 1);
 
 	if (!phalcon_array_isset_fetch(temp1, *arr, section)) {
-		PHALCON_ALLOC_GHOST_ZVAL(t1);
+		PHALCON_ALLOC_INIT_ZVAL(t1);
 		array_init_size(t1, 1);
 		phalcon_array_update_zval(*arr, section, t1, PH_COPY);
 	}
@@ -111,7 +111,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 		phalcon_array_fetch_long(&index, directive, i, PH_NOISY);
 
 		if (!phalcon_array_isset_fetch(temp2, *temp1, index)) {
-			PHALCON_ALLOC_GHOST_ZVAL(t2);
+			PHALCON_ALLOC_INIT_ZVAL(t2);
 			array_init_size(t2, 1);
 			phalcon_array_update_zval(*temp1, index, t2, PH_COPY);
 		}

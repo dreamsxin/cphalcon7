@@ -1296,7 +1296,7 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 	engines  = phalcon_read_property(getThis(), SL("_registeredEngines"), PH_NOISY);
 
 	if (Z_TYPE_P(engines) != IS_ARRAY) {
-		PHALCON_ALLOC_GHOST_ZVAL(engines);
+		PHALCON_ALLOC_INIT_ZVAL(engines);
 		array_init_size(engines, 1);
 		add_assoc_stringl_ex(engines, SS(".phtml"), (char*)phalcon_mvc_view_engine_php_ce->name->val, phalcon_mvc_view_engine_php_ce->name->len);
 		phalcon_update_property_this(getThis(), SL("_registeredEngines"), engines);

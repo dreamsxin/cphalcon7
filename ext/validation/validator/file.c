@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		}
 
 		if (phalcon_compare_strict_string(type, SL("TooLarge"))) {
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 			Z_ADDREF_P(maxsize); add_assoc_zval_ex(pairs, SS(":max"), maxsize);
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooLarge", code);
 		} else if (phalcon_compare_strict_string(type, SL("TooSmall"))) {
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":min"), minsize);
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 			PHALCON_INIT_VAR(join_mimes);
 			phalcon_fast_join_str(join_mimes, SL(", "), mimes);
 
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 			Z_ADDREF_P(join_mimes); add_assoc_zval_ex(pairs, SS(":mimes"), join_mimes);
@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "FileType", code);
 		} else if (phalcon_compare_strict_string(type, SL("TooLarge"))) {
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 			Z_ADDREF_P(maxsize); add_assoc_zval_ex(pairs, SS(":max"), maxsize);
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooLarge", code);
 		} else if (phalcon_compare_strict_string(type, SL("TooNarrow"))) {
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":min"), minwidth);
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooNarrow", code);
 		} else if (phalcon_compare_strict_string(type, SL("TooWide"))) {
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":max"), maxwidth);
@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooWide", code);
 		}  else if (phalcon_compare_strict_string(type, SL("TooShort"))) {
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":min"), minwidth);
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooShort", code);
 		} else if (phalcon_compare_strict_string(type, SL("TooLong"))) {
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":max"), maxwidth);
@@ -279,7 +279,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooLong", code);
 		} else {
-			PHALCON_ALLOC_GHOST_ZVAL(pairs);
+			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 1);
 			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 

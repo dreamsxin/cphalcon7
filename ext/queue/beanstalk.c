@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 		tv.tv_usec = 0;
 		php_stream_set_option(stream, PHP_STREAM_OPTION_READ_TIMEOUT, 0, &tv);
 
-		PHALCON_ALLOC_GHOST_ZVAL(connection);
+		PHALCON_ALLOC_INIT_ZVAL(connection);
 		php_stream_to_zval(stream, connection);
 		phalcon_update_property_this(getThis(), SL("_connection"), connection);
 		RETVAL_ZVAL(connection, 1, 1);
@@ -503,7 +503,7 @@ static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_p
 
 	PHALCON_CALL_METHODW(&serialized, this_ptr, "read", length);
 
-	PHALCON_ALLOC_GHOST_ZVAL(body);
+	PHALCON_ALLOC_INIT_ZVAL(body);
 	phalcon_unserialize(body, serialized);
 	zval_ptr_dtor(serialized);
 	if (Z_REFCOUNT_P(body) >= 1) {

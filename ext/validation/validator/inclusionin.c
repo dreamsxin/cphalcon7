@@ -120,10 +120,10 @@ PHP_METHOD(Phalcon_Validation_Validator_InclusionIn, validate){
 			}
 		}
 
-		ALLOC_INIT_ZVAL(joined_domain);
+		PHALCON_ALLOC_INIT_ZVAL(joined_domain);
 		phalcon_fast_join_str(joined_domain, SL(", "), domain);
 
-		PHALCON_ALLOC_GHOST_ZVAL(pairs);
+		PHALCON_ALLOC_INIT_ZVAL(pairs);
 		array_init_size(pairs, 2);
 		Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 		add_assoc_zval_ex(pairs, SS(":domain"), joined_domain);

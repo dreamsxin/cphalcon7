@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 				if ((cmt = phalcon_get_property_doc_comment(property)) != NULL) {
 					zval *property_annotations;
 
-					PHALCON_ALLOC_GHOST_ZVAL(property_annotations);
+					PHALCON_ALLOC_INIT_ZVAL(property_annotations);
 					if (FAILURE == phannot_parse_annotations(property_annotations, cmt, file, 0)) {
 						zval_ptr_dtor(property_annotations);
 						RETURN_MM();
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 
 					line = phalcon_get_function_startline(method);
 
-					PHALCON_ALLOC_GHOST_ZVAL(method_annotations);
+					PHALCON_ALLOC_INIT_ZVAL(method_annotations);
 					if (FAILURE == phannot_parse_annotations(method_annotations, cmt, file, line)) {
 						zval_ptr_dtor(method_annotations);
 						RETURN_MM();

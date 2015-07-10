@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isInitialized){
 
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
-	ALLOC_INIT_ZVAL(lowercased);
+	PHALCON_ALLOC_INIT_ZVAL(lowercased);
 	phalcon_fast_strtolower(lowercased, model_name);
 
 	RETVAL_BOOL(phalcon_array_isset(initialized, lowercased));

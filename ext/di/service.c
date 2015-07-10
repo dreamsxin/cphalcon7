@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 	if (phalcon_array_isset_str_fetch(&arguments, definition, SS("arguments"))) {
 		phalcon_array_update_zval(arguments, position, parameter, PH_COPY);
 	} else {
-		PHALCON_ALLOC_GHOST_ZVAL(arguments);
+		PHALCON_ALLOC_INIT_ZVAL(arguments);
 		array_init_size(arguments, 1);
 		phalcon_array_update_zval(arguments, position, parameter, PH_COPY);
 	}

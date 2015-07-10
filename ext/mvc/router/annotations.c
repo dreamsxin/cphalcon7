@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addModuleResource){
 		return;
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(scope);
+	PHALCON_ALLOC_INIT_ZVAL(scope);
 	array_init_size(scope, 3);
 	phalcon_array_append(scope, prefix, 0);
 	phalcon_array_append(scope, handler, 0);

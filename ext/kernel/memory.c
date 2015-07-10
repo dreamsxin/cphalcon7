@@ -502,7 +502,7 @@ void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func)
 	phalcon_verify_frame(frame, func, var);
 
 	phalcon_do_memory_observe(var, g);
-	ALLOC_INIT_ZVAL(*var);
+	PHALCON_ALLOC_INIT_ZVAL(*var);
 }
 
 /**
@@ -517,7 +517,7 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var, const char *func)
 	phalcon_verify_frame(frame, func, var);
 
 	phalcon_do_memory_observe(var, g);
-	ALLOC_INIT_ZVAL(*var);
+	PHALCON_ALLOC_INIT_ZVAL(*var);
 
 	if (frame->hash_pointer == frame->hash_capacity) {
 		phalcon_reallocate_hmemory(g);
@@ -546,7 +546,7 @@ void ZEND_FASTCALL phalcon_memory_alloc(zval **var)
 {
 	zend_phalcon_globals *g = PHALCON_VGLOBAL;
 	phalcon_do_memory_observe(var, g);
-	ALLOC_INIT_ZVAL(*var);
+	PHALCON_ALLOC_INIT_ZVAL(*var);
 }
 
 /**
@@ -566,7 +566,7 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var)
 	}
 #endif
 	phalcon_do_memory_observe(var, g);
-	ALLOC_INIT_ZVAL(*var);
+	PHALCON_ALLOC_INIT_ZVAL(*var);
 
 	if (active_memory->hash_pointer == active_memory->hash_capacity) {
 		phalcon_reallocate_hmemory(g);

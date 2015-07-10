@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	}
 
 	if (clean) {
-		PHALCON_ALLOC_GHOST_ZVAL(contents);
+		PHALCON_ALLOC_INIT_ZVAL(contents);
 		phalcon_ob_get_contents(contents);
 	
 		view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);

@@ -335,7 +335,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
 
 	strategy = phalcon_read_property(getThis(), SL("_strategy"), PH_NOISY);
 	if (Z_TYPE_P(strategy) == IS_NULL) {
-		PHALCON_ALLOC_GHOST_ZVAL(strategy);
+		PHALCON_ALLOC_INIT_ZVAL(strategy);
 		object_init_ex(strategy, phalcon_mvc_model_metadata_strategy_introspection_ce);
 		phalcon_update_property_this(getThis(), SL("_strategy"), strategy);
 	}
@@ -619,7 +619,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttributes){
 
 	phalcon_fetch_params(1, 1, 0, &model);
 
-	PHALCON_ALLOC_GHOST_ZVAL(what);
+	PHALCON_ALLOC_INIT_ZVAL(what);
 	ZVAL_LONG(what, PHALCON_MVC_MODEL_METADATA_MODELS_ATTRIBUTES);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "readmetadataindex", model, what);
 

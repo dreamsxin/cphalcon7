@@ -24,7 +24,7 @@ static zval *phvolt_ret_literal_zval(int type, phvolt_parser_token *T, phvolt_sc
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", type);
 	if (T) {
@@ -43,7 +43,7 @@ static zval *phvolt_ret_if_statement(zval *expr, zval *true_statements, zval *fa
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_IF);
 	add_assoc_zval(ret, "expr", expr);
@@ -66,7 +66,7 @@ static zval *phvolt_ret_elseif_statement(zval *expr, phvolt_scanner_state *state
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_ELSEIF);
 	add_assoc_zval(ret, "expr", expr);
@@ -82,7 +82,7 @@ static zval *phvolt_ret_elsefor_statement(phvolt_scanner_state *state)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_ELSEFOR);
 
@@ -97,7 +97,7 @@ static zval *phvolt_ret_for_statement(phvolt_parser_token *variable, phvolt_pars
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_FOR);
 
@@ -128,7 +128,7 @@ static zval *phvolt_ret_cache_statement(zval *expr, zval *lifetime, zval *block_
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, "type", PHVOLT_T_CACHE);
@@ -150,7 +150,7 @@ static zval *phvolt_ret_set_statement(zval *assignments)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, "type", PHVOLT_T_SET);
 
@@ -164,7 +164,7 @@ static zval *phvolt_ret_set_assignment(phvolt_parser_token *variable, int operat
 
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 5);
 
 	add_assoc_stringl(ret, "variable", variable->token, variable->token_len);
@@ -185,7 +185,7 @@ static zval *phvolt_ret_echo_statement(zval *expr, phvolt_scanner_state *state)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 	add_assoc_long(ret, "type", PHVOLT_T_ECHO);
 	add_assoc_zval(ret, "expr", expr);
@@ -201,7 +201,7 @@ static zval *phvolt_ret_block_statement(phvolt_parser_token *name, zval *block_s
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, "type", PHVOLT_T_BLOCK);
@@ -224,7 +224,7 @@ static zval *phvolt_ret_macro_statement(phvolt_parser_token *macro_name, zval *p
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_MACRO);
 
@@ -250,7 +250,7 @@ static zval *phvolt_ret_macro_parameter(phvolt_parser_token *variable, zval *def
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 5);
 
 	add_assoc_stringl(ret, "variable", variable->token, variable->token_len);
@@ -271,7 +271,7 @@ static zval *phvolt_ret_extends_statement(phvolt_parser_token *P, phvolt_scanner
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 
 	add_assoc_long(ret, "type", PHVOLT_T_EXTENDS);
@@ -289,7 +289,7 @@ static zval *phvolt_ret_include_statement(zval *path, zval *params, phvolt_scann
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 
 	add_assoc_long(ret, "type", PHVOLT_T_INCLUDE);
@@ -310,7 +310,7 @@ static zval *phvolt_ret_do_statement(zval *expr, phvolt_scanner_state *state)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 
 	add_assoc_long(ret, "type", PHVOLT_T_DO);
@@ -328,7 +328,7 @@ static zval *phvolt_ret_return_statement(zval *expr, phvolt_scanner_state *state
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 
 	add_assoc_long(ret, "type", PHVOLT_T_RETURN);
@@ -346,7 +346,7 @@ static zval *phvolt_ret_autoescape_statement(int enable, zval *block_statements,
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 5);
 
 	add_assoc_long(ret, "type", PHVOLT_T_AUTOESCAPE);
@@ -364,7 +364,7 @@ static zval *phvolt_ret_empty_statement(phvolt_scanner_state *state)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 3);
 	add_assoc_long(ret, "type", PHVOLT_T_EMPTY_STATEMENT);
 
@@ -379,7 +379,7 @@ static zval *phvolt_ret_break_statement(phvolt_scanner_state *state)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 3);
 	add_assoc_long(ret, "type", PHVOLT_T_BREAK);
 
@@ -394,7 +394,7 @@ static zval *phvolt_ret_continue_statement(phvolt_scanner_state *state)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 3);
 	add_assoc_long(ret, "type", PHVOLT_T_CONTINUE);
 
@@ -412,7 +412,7 @@ static zval *phvolt_ret_zval_list(zval *list_left, zval *right_list)
 	HashPosition pos;
 	HashTable *list;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	if (list_left) {
@@ -446,7 +446,7 @@ static zval *phvolt_ret_named_item(phvolt_parser_token *name, zval *expr, phvolt
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_zval(ret, "expr", expr);
 	if (name != NULL) {
@@ -465,7 +465,7 @@ static zval *phvolt_ret_expr(int type, zval *left, zval *right, zval *ternary, p
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", type);
 
@@ -492,7 +492,7 @@ static zval *phvolt_ret_slice(zval *left, zval *start, zval *end, phvolt_scanner
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_SLICE);
 	add_assoc_zval(ret, "left", left);
@@ -517,7 +517,7 @@ static zval *phvolt_ret_func_call(zval *expr, zval *arguments, phvolt_scanner_st
 
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_FCALL);
 	add_assoc_zval(ret, "name", expr);
@@ -538,7 +538,7 @@ static zval *phvolt_ret_macro_call_statement(zval *expr, zval *arguments, zval *
 
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_CALL);
 	add_assoc_zval(ret, "name", expr);
@@ -3584,7 +3584,7 @@ static void phvolt_scanner_error_msg(phvolt_parser_status *parser_status, zval *
 	int length;
 	phvolt_scanner_state *state = parser_status->scanner_state;
 
-	PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+	PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 	if (state->start) {
 		error = emalloc(sizeof(char) * 72 + state->start_length +  Z_STRLEN_P(state->active_file));
 		if (state->start_length > 16) {
@@ -3614,10 +3614,8 @@ int phvolt_parse_view(zval *result, zval *view_code, zval *template_path){
 
 	zval *error_msg = NULL;
 
-	ZVAL_NULL(result);
-
 	if (Z_TYPE_P(view_code) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "View code must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "View code must be a string");
 		return FAILURE;
 	}
 
@@ -3669,7 +3667,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 
 	/** Check if the view has code */
 	if (!Z_STRVAL_P(view_code)) {
-		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 		ZVAL_STRING(*error_msg, "View code cannot be null");
 		return FAILURE;
 	}
@@ -3682,7 +3680,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 	/** Start the reentrant parser */
 	phvolt_parser = phvolt_Alloc(phvolt_wrapper_alloc);
 	if (unlikely(!phvolt_parser)) {
-		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 		ZVAL_STRING(*error_msg, "Memory allocation error");
 		return FAILURE;
 	}
@@ -4099,7 +4097,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 				if (!*error_msg) {
 					error = emalloc(sizeof(char) * (48 + Z_STRLEN_P(state->active_file)));
 					snprintf(error, 48 + Z_STRLEN_P(state->active_file) + state->active_line, "Scanner: unknown opcode %d on in %s line %d", token.opcode, Z_STRVAL_P(state->active_file), state->active_line);
-					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, error);
 					efree(error);
 				}
@@ -4136,7 +4134,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 		status = FAILURE;
 		if (parser_status->syntax_error) {
 			if (!*error_msg) {
-				PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+				PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 				ZVAL_STRING(*error_msg, parser_status->syntax_error);
 			}
 			efree(parser_status->syntax_error);

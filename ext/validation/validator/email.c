@@ -108,7 +108,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Email, validate){
 			}
 		}
 
-		PHALCON_ALLOC_GHOST_ZVAL(pairs);
+		PHALCON_ALLOC_INIT_ZVAL(pairs);
 		array_init_size(pairs, 1);
 		Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
 
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Email, valid){
 
 	phalcon_fetch_params(1, 1, 0, &value);
 
-	PHALCON_ALLOC_GHOST_ZVAL(validate_email);
+	PHALCON_ALLOC_INIT_ZVAL(validate_email);
 	ZVAL_LONG(validate_email, 274);
 	
 	PHALCON_CALL_FUNCTION(&valid, "filter_var", value, validate_email);

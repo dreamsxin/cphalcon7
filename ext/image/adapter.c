@@ -487,10 +487,10 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 		tmp_height = tmp_max_height;
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(width);
-	PHALCON_ALLOC_GHOST_ZVAL(height);
-	PHALCON_ALLOC_GHOST_ZVAL(offset_x);
-	PHALCON_ALLOC_GHOST_ZVAL(offset_y);
+	PHALCON_ALLOC_INIT_ZVAL(width);
+	PHALCON_ALLOC_INIT_ZVAL(height);
+	PHALCON_ALLOC_INIT_ZVAL(offset_x);
+	PHALCON_ALLOC_INIT_ZVAL(offset_y);
 
 	ZVAL_LONG(width,    tmp_width);
 	ZVAL_LONG(height,   tmp_height);
@@ -532,7 +532,7 @@ PHP_METHOD(Phalcon_Image_Adapter, rotate){
 		} while (tmp_degrees < -180);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(d);
+	PHALCON_ALLOC_INIT_ZVAL(d);
 	ZVAL_LONG(d, tmp_degrees);
 	PHALCON_CALL_METHOD(NULL, getThis(), "_rotate", d);
 
@@ -554,7 +554,7 @@ PHP_METHOD(Phalcon_Image_Adapter, flip){
 	phalcon_fetch_params(1, 1, 0, &direction);
 	PHALCON_ENSURE_IS_LONG(direction);
 
-	PHALCON_ALLOC_GHOST_ZVAL(dir);
+	PHALCON_ALLOC_INIT_ZVAL(dir);
 	ZVAL_LONG(dir, (Z_LVAL_P(direction) != 11) ? 12 : 11);
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "_flip", dir);
@@ -991,7 +991,7 @@ PHP_METHOD(Phalcon_Image_Adapter, pixelate){
 
 	phalcon_fetch_params(1, 0, 1, &amount);
 
-	PHALCON_ALLOC_GHOST_ZVAL(amt);
+	PHALCON_ALLOC_INIT_ZVAL(amt);
 	if (!amount || Z_TYPE_P(amount) != IS_LONG) {
 		ZVAL_LONG(amt, 10);
 	} else {

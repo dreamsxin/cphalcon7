@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
 	/*
 	 * We intentionally do not use Phalcon's MM for better performance.
-	 * All variables allocated with ALLOC_INIT_ZVAL() will have
+	 * All variables allocated with PHALCON_ALLOC_INIT_ZVAL() will have
 	 * their reference count set to 1 and therefore they can be nicely
 	 * put into the result array; when that array will be destroyed,
 	 * all inserted variables will be automatically destroyed, too
@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 * For 5.4+ there is an extra argument.
 	 */
 	if (i_show_backtrace) {
-		ALLOC_INIT_ZVAL(backtrace);
+		PHALCON_ALLOC_INIT_ZVAL(backtrace);
 
 		zend_fetch_debug_backtrace(backtrace, 1, DEBUG_BACKTRACE_IGNORE_ARGS, 0);
 
@@ -243,10 +243,10 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 *     array('backtrace' => array(backtrace goes here)
 	 * )
 	 */
-	PHALCON_ALLOC_GHOST_ZVAL(payload);
+	PHALCON_ALLOC_INIT_ZVAL(payload);
 	array_init_size(payload, 2);
 
-	PHALCON_ALLOC_GHOST_ZVAL(meta);
+	PHALCON_ALLOC_INIT_ZVAL(meta);
 	array_init_size(meta, 4);
 	add_assoc_zval_ex(meta, SS("Type"), type_str);
 
@@ -279,11 +279,11 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 		body = interpolated;
 	}
 	else if (i_enable_labels && !i_show_backtrace) {
-		PHALCON_ALLOC_GHOST_ZVAL(body);
+		PHALCON_ALLOC_INIT_ZVAL(body);
 		ZVAL_EMPTY_STRING(body);
 	}
 	else {
-		PHALCON_ALLOC_GHOST_ZVAL(body);
+		PHALCON_ALLOC_INIT_ZVAL(body);
 		array_init_size(body, 2);
 
 		if (i_show_backtrace) {
@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	add_next_index_zval(payload, body);
 
 	/* Convert everything to JSON */
-	ALLOC_INIT_ZVAL(encoded);
+	PHALCON_ALLOC_INIT_ZVAL(encoded);
 	if (FAILURE == phalcon_json_encode(encoded, payload, 0)) {
 		zval_ptr_dtor(payload);
 		zval_ptr_dtor(encoded);

@@ -169,7 +169,7 @@ static inline int phalcon_array_append_long(zval *arr, long value, int flags)
 {
 	zval *zvalue;
 
-	PHALCON_ALLOC_GHOST_ZVAL(zvalue);
+	PHALCON_ALLOC_INIT_ZVAL(zvalue);
 	ZVAL_LONG(zvalue, value);
 
 	return phalcon_array_append(arr, zvalue, flags);
@@ -193,7 +193,7 @@ static inline int phalcon_array_append_string(zval *arr, const char *value, uint
 {
 	zval *zvalue;
 
-	PHALCON_ALLOC_GHOST_ZVAL(zvalue);
+	PHALCON_ALLOC_INIT_ZVAL(zvalue);
 	ZVAL_STRINGL(zvalue, value, value_length);
 
 	return phalcon_array_append(arr, zvalue, separate);

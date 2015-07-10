@@ -1956,7 +1956,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getDefaultIdValue){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_ALLOC_GHOST_ZVAL(null_value);
+	PHALCON_ALLOC_INIT_ZVAL(null_value);
 	ZVAL_STRING(null_value, "null");
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", null_value);

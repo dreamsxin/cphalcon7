@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 			}
 		}
 
-		PHALCON_ALLOC_GHOST_ZVAL(pairs);
+		PHALCON_ALLOC_INIT_ZVAL(pairs);
 		array_init_size(pairs, 2);
 		Z_ADDREF_P(label);          add_assoc_zval_ex(pairs, SS(":field"), label);
 		Z_ADDREF_P(with_label); add_assoc_zval_ex(pairs, SS(":with"), with_label);

@@ -108,8 +108,9 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 	arguments = emalloc(sizeof(zval) * param_count);
 
 	i = 0;
-	while(i++ < param_count) {
+	while(i < param_count) {
 		ZVAL_ZVAL(&arguments[i], params[i], 1, 0);
+		i++;
 	}
 
 	if ((status = call_user_function(function_table, object, function_name, *retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
@@ -122,7 +123,6 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 	if (is_null) {
 		Z_TRY_ADDREF_P(*retval_ptr);
 	}
-	zval_dtor(&retval);
 	return status;
 }
 
@@ -224,6 +224,7 @@ int phalcon_call_class_method_aparams(zval **retval_ptr, zval *object, zend_clas
 {
 	zval method;
 	ZVAL_STRINGL(&method, method_name, method_len);
+
 	return phalcon_call_class_zval_method_aparams(retval_ptr, object, ce, type, &method, param_count, params);
 }
 

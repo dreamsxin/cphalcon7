@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Loader, __construct){
 
 	zval *extensions;
 
-	PHALCON_ALLOC_GHOST_ZVAL(extensions);
+	PHALCON_ALLOC_INIT_ZVAL(extensions);
 	array_init_size(extensions, 1);
 	add_next_index_stringl(extensions, SL("php"));
 	phalcon_update_property_this(getThis(), SL("_extensions"), extensions);

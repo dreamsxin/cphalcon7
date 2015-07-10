@@ -46,7 +46,7 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 	PHALCON_MM_GROW();
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
-		ALLOC_INIT_ZVAL(exception);
+		PHALCON_ALLOC_INIT_ZVAL(exception);
 		object_init_ex(exception, zend_exception_get_default());
 		PHALCON_CALL_METHOD(NULL, exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
 	} else {
@@ -84,7 +84,7 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
 	zval *object, msg;
 	zend_class_entry *default_exception_ce;
 
-	ALLOC_INIT_ZVAL(object);
+	PHALCON_ALLOC_INIT_ZVAL(object);
 	object_init_ex(object, ce);
 
 	ZVAL_STRINGL(&msg, message, message_len);

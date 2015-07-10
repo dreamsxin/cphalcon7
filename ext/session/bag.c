@@ -113,7 +113,7 @@ static zend_object_iterator* phalcon_session_bag_get_iterator(zend_class_entry *
 
 	data = phalcon_read_property(object, SL("_data"), PH_NOISY);
 
-	PHALCON_ALLOC_GHOST_ZVAL(iterator);
+	PHALCON_ALLOC_INIT_ZVAL(iterator);
 	object_init_ex(iterator, spl_ce_ArrayIterator);
 	params[0] = data;
 	if (FAILURE == phalcon_call_method(NULL, iterator, "__construct", 1, params)) {
@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 	} else {
 		zval *tmp, *name, *data, *session;
 
-		ALLOC_INIT_ZVAL(tmp);
+		PHALCON_ALLOC_INIT_ZVAL(tmp);
 		Z_DELREF_P(tmp);
 		phalcon_update_property_array(getThis(), SL("_data"), property, tmp);
 		return_value = tmp;

@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, emergency){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
+	PHALCON_ALLOC_INIT_ZVAL(type);
 	ZVAL_LONG(type, PHALCON_LOGGER_EMERGENCY);
 	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
 
@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, debug){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
+	PHALCON_ALLOC_INIT_ZVAL(type);
 	ZVAL_LONG(type, PHALCON_LOGGER_DEBUG);
 	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
 
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, error){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
+	PHALCON_ALLOC_INIT_ZVAL(type);
 	ZVAL_LONG(type, PHALCON_LOGGER_ERROR);
 	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
 
@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, info){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
+	PHALCON_ALLOC_INIT_ZVAL(type);
 	ZVAL_LONG(type, PHALCON_LOGGER_INFO);
 	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
 
@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, notice){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
+	PHALCON_ALLOC_INIT_ZVAL(type);
 	ZVAL_LONG(type, PHALCON_LOGGER_NOTICE);
 	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
 
@@ -323,7 +323,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, warning){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
+	PHALCON_ALLOC_INIT_ZVAL(type);
 	ZVAL_LONG(type, PHALCON_LOGGER_WARNING);
 	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
 
@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, alert){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
+	PHALCON_ALLOC_INIT_ZVAL(type);
 	ZVAL_LONG(type, PHALCON_LOGGER_ALERT);
 	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
 
@@ -373,7 +373,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, critical){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(type);
+	PHALCON_ALLOC_INIT_ZVAL(type);
 	ZVAL_LONG(type, PHALCON_LOGGER_CRITICAL);
 	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
 

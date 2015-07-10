@@ -92,10 +92,10 @@ zval* phalcon_validation_message_construct_helper(zval *message, zval *field, co
 {
 	zval *result, *params[4], *tmp;
 
-	PHALCON_ALLOC_GHOST_ZVAL(result);
+	PHALCON_ALLOC_INIT_ZVAL(result);
 	object_init_ex(result, phalcon_validation_message_ce);
 
-	PHALCON_ALLOC_GHOST_ZVAL(tmp);
+	PHALCON_ALLOC_INIT_ZVAL(tmp);
 	ZVAL_STRING(tmp, type);
 
 	params[0] = message;
@@ -104,7 +104,7 @@ zval* phalcon_validation_message_construct_helper(zval *message, zval *field, co
 	params[3] = code;
 
 	if (FAILURE == phalcon_call_class_method_aparams(NULL, result, Z_OBJCE_P(result), phalcon_fcall_method, SL("__construct"), 4, params)) {
-		PHALCON_ALLOC_GHOST_ZVAL(result);
+		PHALCON_ALLOC_INIT_ZVAL(result);
 		ZVAL_NULL(result);
 	}
 

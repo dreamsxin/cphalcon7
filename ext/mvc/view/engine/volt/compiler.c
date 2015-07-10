@@ -752,7 +752,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 			PHALCON_INIT_VAR(event);
 			ZVAL_STRING(event, "compileFunction");
 
-			PHALCON_ALLOC_GHOST_ZVAL(fire_arguments);
+			PHALCON_ALLOC_INIT_ZVAL(fire_arguments);
 			array_init_size(fire_arguments, 3);
 			phalcon_array_append(fire_arguments, name, 0);
 			phalcon_array_append(fire_arguments, arguments, 0);
@@ -787,7 +787,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 					if (instanceof_function(Z_OBJCE_P(definition), zend_ce_closure)) {
 						zval *parameters;
 
-						PHALCON_ALLOC_GHOST_ZVAL(parameters);
+						PHALCON_ALLOC_INIT_ZVAL(parameters);
 						array_init_size(parameters, 2);
 						phalcon_array_append(parameters, arguments, 0);
 						phalcon_array_append(parameters, func_arguments, 0);
@@ -1285,7 +1285,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 				if (instanceof_function(Z_OBJCE_P(definition), zend_ce_closure)) {
 					zval *parameters;
 
-					PHALCON_ALLOC_GHOST_ZVAL(parameters);
+					PHALCON_ALLOC_INIT_ZVAL(parameters);
 					array_init_size(parameters, 2);
 					phalcon_array_append(parameters, arguments, 0);
 					phalcon_array_append(parameters, func_arguments, 0);
@@ -3387,26 +3387,22 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileString){
 
-	zval *view_code, *extends_mode = NULL, *current_path;
+	zval *view_code, *extends_mode = NULL, current_path;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &view_code, &extends_mode);
+	phalcon_fetch_params(0, 1, 1, &view_code, &extends_mode);
 
 	if (!extends_mode) {
 		extends_mode = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (Z_TYPE_P(view_code) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "The code must be string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "The code must be string");
 		return;
 	}
 
-	PHALCON_INIT_VAR(current_path);
-	ZVAL_STRING(current_path, "eval code");
-	phalcon_update_property_this(getThis(), SL("_currentPath"), current_path);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_compilesource", view_code, extends_mode);
-	RETURN_MM();
+	ZVAL_STRING(&current_path, "eval code");
+	phalcon_update_property_this(getThis(), SL("_currentPath"), &current_path);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_compilesource", view_code, extends_mode);
 }
 
 /**

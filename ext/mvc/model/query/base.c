@@ -134,7 +134,7 @@ static void phql_scanner_error_msg(phql_parser_status *parser_status, zval **err
 	unsigned int length;
 	phql_scanner_state *state = parser_status->scanner_state;
 
-	PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+	PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 	if (state->start) {
 		length = 64 + state->start_length + parser_status->phql_length;
 		error = emalloc(sizeof(char) * length);
@@ -195,12 +195,12 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	zval *unique_id;
 
 	if (!phql) {
-		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 		ZVAL_STRING(*error_msg, "PHQL statement cannot be NULL");
 		return FAILURE;
 	}
 
-	PHALCON_ALLOC_GHOST_ZVAL(unique_id);
+	PHALCON_ALLOC_INIT_ZVAL(unique_id);
 	ZVAL_LONG(unique_id, zend_inline_hash_func(phql, phql_length + 1));
 
 	phalcon_orm_get_prepared_ast(result, unique_id);
@@ -212,7 +212,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 	phql_parser = phql_Alloc(phql_wrapper_alloc);
 	if (unlikely(!phql_parser)) {
-		PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 		ZVAL_STRING(*error_msg, "Memory allocation error");
 		return FAILURE;
 	}
@@ -352,7 +352,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_INTEGER, PHQL_INTEGER, &token, parser_status);
 				} else {
-					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -361,7 +361,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_DOUBLE, PHQL_DOUBLE, &token, parser_status);
 				} else {
-					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -370,7 +370,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_STRING, PHQL_STRING, &token, parser_status);
 				} else {
-					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -379,7 +379,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_(phql_parser, PHQL_TRUE, NULL, parser_status);
 				} else {
-					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -388,7 +388,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_(phql_parser, PHQL_FALSE, NULL, parser_status);
 				} else {
-					PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
@@ -539,7 +539,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				error = emalloc(error_length);
 				snprintf(error, error_length, "Scanner: Unknown opcode %c", token.opcode);
 				error[error_length - 1] = '\0';
-				PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+				PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 				ZVAL_STRING(*error_msg, error);
 				efree(error);
 				break;
@@ -576,7 +576,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 		status = FAILURE;
 		if (parser_status->syntax_error) {
 			if (!*error_msg) {
-				PHALCON_ALLOC_GHOST_ZVAL(*error_msg);
+				PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 				ZVAL_STRING(*error_msg, parser_status->syntax_error);
 			}
 			efree(parser_status->syntax_error);

@@ -60,7 +60,7 @@ static zval *phql_ret_literal_zval(int type, phql_parser_token *T)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, ISV(type), type);
 	if (T) {
@@ -75,7 +75,7 @@ static zval *phql_ret_placeholder_zval(int type, phql_parser_token *T)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, ISV(type), type);
 	add_assoc_stringl(ret, ISV(value), T->token, T->token_len);
@@ -88,7 +88,7 @@ static zval *phql_ret_qualified_name(phql_parser_token *A, phql_parser_token *B,
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, ISV(type), PHQL_T_QUALIFIED);
@@ -113,7 +113,7 @@ static zval *phql_ret_raw_qualified_name(phql_parser_token *A, phql_parser_token
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, ISV(type), PHQL_T_RAW_QUALIFIED);
@@ -133,7 +133,7 @@ static zval *phql_ret_select_statement(zval *S, zval *W, zval *O, zval *G, zval 
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, ISV(type), PHQL_T_SELECT);
@@ -165,7 +165,7 @@ static zval *phql_ret_select_clause(zval *distinct, zval *columns, zval *tables,
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 
 	if (distinct) {
@@ -185,7 +185,7 @@ static zval *phql_ret_distinct_all(int distinct)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	ZVAL_LONG(ret, distinct);
 
 	return ret;
@@ -195,7 +195,7 @@ static zval *phql_ret_distinct(void)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	ZVAL_TRUE(ret);
 
 	return ret;
@@ -205,7 +205,7 @@ static zval *phql_ret_order_item(zval *column, int sort){
 
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 	add_assoc_zval(ret, ISV(column), column);
 	if (sort != 0 ) {
@@ -219,7 +219,7 @@ static zval *phql_ret_limit_clause(zval *L, zval *O)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 2);
 
 	add_assoc_zval(ret, ISV(number), L);
@@ -235,7 +235,7 @@ static zval *phql_ret_for_update_clause()
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	ZVAL_TRUE(ret);
 
 	return ret;
@@ -245,7 +245,7 @@ static zval *phql_ret_insert_statement(zval *Q, zval *F, zval *V)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 
 	add_assoc_long(ret, ISV(type), PHQL_T_INSERT);
@@ -262,17 +262,17 @@ static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 {
 	zval *key1, *key2, *rows, *values;
 
-	PHALCON_ALLOC_GHOST_ZVAL(key1);
+	PHALCON_ALLOC_INIT_ZVAL(key1);
 	ZVAL_STR(key1, IS(rows));
 
-	PHALCON_ALLOC_GHOST_ZVAL(rows);
+	PHALCON_ALLOC_INIT_ZVAL(rows);
 	if (!phalcon_array_isset_fetch(&rows, ret, key1)) {
 		array_init_size(rows, 1);		
 
-		PHALCON_ALLOC_GHOST_ZVAL(key2);
+		PHALCON_ALLOC_INIT_ZVAL(key2);
 		ZVAL_STR(key2, IS(values));
 
-		PHALCON_ALLOC_GHOST_ZVAL(values);
+		PHALCON_ALLOC_INIT_ZVAL(values);
 		if (phalcon_array_isset_fetch(&values, ret, key2)) {
 			Z_ADDREF_P(values);
 			add_next_index_zval(rows, values);	
@@ -290,7 +290,7 @@ static zval *phql_ret_update_statement(zval *U, zval *W, zval *L)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, ISV(type), PHQL_T_UPDATE);
@@ -309,7 +309,7 @@ static zval *phql_ret_update_clause(zval *tables, zval *values)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, ISV(tables), tables);
 	add_assoc_zval(ret, ISV(values), values);
@@ -321,7 +321,7 @@ static zval *phql_ret_update_item(zval *column, zval *expr)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, ISV(column), column);
 	add_assoc_zval(ret, ISV(expr), expr);
@@ -333,7 +333,7 @@ static zval *phql_ret_delete_statement(zval *D, zval *W, zval *L)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	add_assoc_long(ret, ISV(type), PHQL_T_DELETE);
@@ -352,7 +352,7 @@ static zval *phql_ret_delete_clause(zval *tables)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 1);
 	add_assoc_zval(ret, ISV(tables), tables);
 
@@ -364,7 +364,7 @@ static zval *phql_ret_zval_list(zval *list_left, zval *right_list)
 	zval *ret;
 	HashTable *list;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init(ret);
 
 	list = Z_ARRVAL_P(list_left);
@@ -391,7 +391,7 @@ static zval *phql_ret_column_item(int type, zval *column, phql_parser_token *ide
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 	add_assoc_long(ret, ISV(type), type);
 	if (column) {
@@ -413,7 +413,7 @@ static zval *phql_ret_assoc_name(zval *qualified_name, phql_parser_token *alias)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, ISV(qualifiedName), qualified_name);
 	if (alias) {
@@ -428,7 +428,7 @@ static zval *phql_ret_join_type(int type)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	ZVAL_LONG(ret, type);
 
 	return ret;
@@ -438,7 +438,7 @@ static zval *phql_ret_join_item(zval *type, zval *qualified, zval *alias, zval *
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 	add_assoc_zval(ret, ISV(type), type);
 
@@ -461,7 +461,7 @@ static zval *phql_ret_expr(int type, zval *left, zval *right)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, ISV(type), type);
 	if (left) {
@@ -478,7 +478,7 @@ static zval *phql_ret_func_call(phql_parser_token *name, zval *arguments, zval *
 {
 	zval *ret;
 
-	PHALCON_ALLOC_GHOST_ZVAL(ret);
+	PHALCON_ALLOC_INIT_ZVAL(ret);
 	array_init_size(ret, 4);
 	add_assoc_long(ret, ISV(type), PHQL_T_FCALL);
 	add_assoc_stringl(ret, ISV(name), name->token, name->token_len);

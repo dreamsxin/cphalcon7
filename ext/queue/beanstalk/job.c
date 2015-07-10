@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, delete){
 	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
 	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
 	
-	PHALCON_ALLOC_GHOST_ZVAL(command);
+	PHALCON_ALLOC_INIT_ZVAL(command);
 	PHALCON_CONCAT_SV(command, "delete ", id);
 	PHALCON_CALL_METHOD(NULL, queue, "write", command);
 	
@@ -178,7 +178,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, release){
 	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
 	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_ALLOC_GHOST_ZVAL(command);
+	PHALCON_ALLOC_INIT_ZVAL(command);
 	PHALCON_CONCAT_SVSVSV(command, "release ", id, " ", priority, " ", delay);
 	PHALCON_CALL_METHOD(NULL, queue, "write", command);
 
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, bury){
 	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
 	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_ALLOC_GHOST_ZVAL(command);
+	PHALCON_ALLOC_INIT_ZVAL(command);
 	PHALCON_CONCAT_SVSV(command, "bury ", id, " ", priority);
 	PHALCON_CALL_METHOD(NULL, queue, "write", command);
 	PHALCON_CALL_METHOD(&response, queue, "readstatus");
@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, touch){
 	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
 	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_ALLOC_GHOST_ZVAL(command);
+	PHALCON_ALLOC_INIT_ZVAL(command);
 	PHALCON_CONCAT_SV(command, "touch ", id);
 	PHALCON_CALL_METHOD(NULL, queue, "write", command);
 	PHALCON_CALL_METHOD(&response, queue, "readstatus");
@@ -278,7 +278,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, kick){
 	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
 	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_ALLOC_GHOST_ZVAL(command);
+	PHALCON_ALLOC_INIT_ZVAL(command);
 	PHALCON_CONCAT_SV(command, "kick-job ", id);
 	PHALCON_CALL_METHOD(NULL, queue, "write", command);
 	PHALCON_CALL_METHOD(&response, queue, "readstatus");

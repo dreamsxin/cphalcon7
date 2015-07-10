@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		PHALCON_CALL_METHOD(NULL, builder, "limit", limit);
 	} else {
 		zval *number;
-		PHALCON_ALLOC_GHOST_ZVAL(number);
+		PHALCON_ALLOC_INIT_ZVAL(number);
 		ZVAL_LONG(number, i_number);
 		PHALCON_CALL_METHOD(NULL, builder, "limit", limit, number);
 	}

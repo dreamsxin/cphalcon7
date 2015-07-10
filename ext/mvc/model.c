@@ -1759,13 +1759,13 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 			}
 		}
 		else {
-			PHALCON_ALLOC_GHOST_ZVAL(bind_types);
+			PHALCON_ALLOC_INIT_ZVAL(bind_types);
 			array_init_size(bind_types, 1);
 		}
 	}
 	else {
-		PHALCON_ALLOC_GHOST_ZVAL(bind_params);
-		PHALCON_ALLOC_GHOST_ZVAL(bind_types);
+		PHALCON_ALLOC_INIT_ZVAL(bind_params);
+		PHALCON_ALLOC_INIT_ZVAL(bind_types);
 		array_init_size(bind_params, 1);
 		array_init_size(bind_types, 1);
 	}
@@ -2788,7 +2788,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 				PHALCON_OBS_VAR(message_str);
 				phalcon_array_fetch_str(&message_str, validator, SL("message"), PH_NOISY);
 
-				PHALCON_ALLOC_GHOST_ZVAL(pairs);
+				PHALCON_ALLOC_INIT_ZVAL(pairs);
 				array_init_size(pairs, 1);
 				Z_ADDREF_P(field); add_assoc_zval_ex(pairs, SS(":field"), field);
 

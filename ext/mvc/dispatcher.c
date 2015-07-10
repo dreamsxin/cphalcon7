@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 
 	if (is_exact && zend_is_true(is_exact)) {
 		zval *name;
-		PHALCON_ALLOC_GHOST_ZVAL(name);
+		PHALCON_ALLOC_INIT_ZVAL(name);
 		PHALCON_CONCAT_SV(name, "\\", controller_name);
 		phalcon_update_property_this(getThis(), SL("_handlerName"), name);
 		zval_ptr_dtor(name);
@@ -311,7 +311,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_ALLOC_GHOST_ZVAL(event_name);
+		PHALCON_ALLOC_INIT_ZVAL(event_name);
 		ZVAL_STRING(event_name, "dispatch:beforeException");
 
 		PHALCON_RETURN_CALL_METHODW(events_manager, "fire", event_name, getThis(), exception);

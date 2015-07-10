@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, clear){
 
 	zval *empty_routes;
 
-	PHALCON_ALLOC_GHOST_ZVAL(empty_routes);
+	PHALCON_ALLOC_INIT_ZVAL(empty_routes);
 	array_init(empty_routes);
 	phalcon_update_property_this(getThis(), SL("_routes"), empty_routes);
 	zval_ptr_dtor(empty_routes);

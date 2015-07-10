@@ -173,8 +173,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);
 	i_next        = (i_number_page < i_total_pages) ? (i_number_page + 1) : i_total_pages;
 
-	PHALCON_ALLOC_GHOST_ZVAL(start);
-	PHALCON_ALLOC_GHOST_ZVAL(lim);
+	PHALCON_ALLOC_INIT_ZVAL(start);
+	PHALCON_ALLOC_INIT_ZVAL(lim);
 	ZVAL_LONG(start, i_number);
 	ZVAL_LONG(lim, i_limit);
 

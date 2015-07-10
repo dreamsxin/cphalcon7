@@ -46,7 +46,7 @@ static inline zval *phalcon_get_current_key_w(HashTable *ht, HashPosition *pos)
 	zval *key, tmp;
 	zend_hash_get_current_key_zval_ex(ht, &tmp, pos);
 
-	ALLOC_INIT_ZVAL(key);
+	PHALCON_ALLOC_INIT_ZVAL(key);
 	ZVAL_COPY_VALUE(key, &tmp);
 	return key;
 }

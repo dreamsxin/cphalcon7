@@ -1324,7 +1324,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 
 	default_exception_ce = zend_get_error_exception();
 
-	ALLOC_INIT_ZVAL(exception);
+	PHALCON_ALLOC_INIT_ZVAL(exception);
 	object_init_ex(exception, default_exception_ce);
 
 	PHALCON_CALL_METHOD(NULL, exception, "__construct", message, &PHALCON_GLOBAL(z_zero), severity, file, line, previous);
@@ -1357,7 +1357,7 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
 	) {
 		default_exception_ce = zend_get_error_exception();
 
-		ALLOC_INIT_ZVAL(exception);
+		PHALCON_ALLOC_INIT_ZVAL(exception);
 		object_init_ex(exception, default_exception_ce);
 
 		PHALCON_CALL_METHOD(NULL, exception, "__construct", message, &PHALCON_GLOBAL(z_zero), type, file, line);

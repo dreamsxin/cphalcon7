@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	 */
 	if (phalcon_array_isset(sql_column_aliases, column_name)) {
 		array_init_size(return_value, 2);
-		PHALCON_ALLOC_GHOST_ZVAL(s_qualified);
+		PHALCON_ALLOC_INIT_ZVAL(s_qualified);
 		ZVAL_STR(s_qualified, IS(qualified));
 		add_assoc_zval_ex(return_value, ISS(type), s_qualified);
 		phalcon_array_update_str(return_value, IS(name), column_name, PH_COPY);
@@ -625,7 +625,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	/** 
 	 * Create an array with the qualified info
 	 */
-	PHALCON_ALLOC_GHOST_ZVAL(s_qualified);
+	PHALCON_ALLOC_INIT_ZVAL(s_qualified);
 	ZVAL_STR(s_qualified, IS(qualified));
 	array_init_size(return_value, 4);
 	add_assoc_zval_ex(return_value, ISS(type), s_qualified);
@@ -654,7 +654,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCallArgument){
 	phalcon_array_fetch_string(&argument_type, argument, IS(type), PH_NOISY);
 	if (PHALCON_IS_LONG(argument_type, PHQL_T_STARALL)) {
 		zval *s_all;
-		PHALCON_ALLOC_GHOST_ZVAL(s_all);
+		PHALCON_ALLOC_INIT_ZVAL(s_all);
 		ZVAL_STR(s_all, IS(all));
 		array_init_size(return_value, 1);
 		add_assoc_zval_ex(return_value, ISS(type), s_all);
@@ -788,7 +788,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 			phalcon_array_append(function_args, argument_expr, 0);
 		}
 
-		PHALCON_ALLOC_GHOST_ZVAL(s_functionCall);
+		PHALCON_ALLOC_INIT_ZVAL(s_functionCall);
 		ZVAL_STR(s_functionCall, IS(functionCall));
 		add_assoc_zval_ex(return_value, ISS(type), s_functionCall);
 		phalcon_array_update_str(return_value, IS(name), name, PH_COPY);
@@ -798,7 +798,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 			add_assoc_bool_ex(return_value, ISS(distinct), distinct);
 		}
 	} else {
-		PHALCON_ALLOC_GHOST_ZVAL(s_functionCall);
+		PHALCON_ALLOC_INIT_ZVAL(s_functionCall);
 		ZVAL_STR(s_functionCall, IS(functionCall));
 		add_assoc_zval_ex(return_value, ISS(type), s_functionCall);
 		phalcon_array_update_str(return_value, IS(name), name, PH_COPY);

@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	if (Z_STRLEN_P(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(property_name), "persistent", sizeof("persistent")-1)) {
 		const char *cn = Z_OBJCE_P(getThis())->name->val;
 
-		PHALCON_ALLOC_GHOST_ZVAL(class_name);
+		PHALCON_ALLOC_INIT_ZVAL(class_name);
 		ZVAL_STRING(class_name, cn);
 
 		PHALCON_INIT_VAR(arguments);

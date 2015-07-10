@@ -271,7 +271,7 @@ static void phalcon_forms_form_rewind(zend_object_iterator *it)
 
 	elements = phalcon_read_property(&it->data, SL("_elements"), PH_NOISY);
 
-	PHALCON_ALLOC_GHOST_ZVAL(indexed);
+	PHALCON_ALLOC_INIT_ZVAL(indexed);
 	if (Z_TYPE_P(elements) == IS_ARRAY) {
 		phalcon_array_values(indexed, elements);
 	}

@@ -505,7 +505,7 @@ PHP_METHOD(Phalcon_Tag, getEscaperService){
 
 		PHALCON_VERIFY_INTERFACE(dependency_injector, phalcon_diinterface_ce);
 	
-		PHALCON_ALLOC_GHOST_ZVAL(service);
+		PHALCON_ALLOC_INIT_ZVAL(service);
 		ZVAL_STR(service, IS(escaper));
 	
 		escaper = NULL;
@@ -1012,7 +1012,7 @@ static void phalcon_tag_generic_field(INTERNAL_FUNCTION_PARAMETERS, const char* 
 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
-	PHALCON_ALLOC_GHOST_ZVAL(field_type);
+	PHALCON_ALLOC_INIT_ZVAL(field_type);
 	ZVAL_STRING(field_type, type);
 
 	if (as_value) {
@@ -1029,7 +1029,7 @@ static void phalcon_tag_generic_field_checked(INTERNAL_FUNCTION_PARAMETERS, cons
 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
-	PHALCON_ALLOC_GHOST_ZVAL(field_type);
+	PHALCON_ALLOC_INIT_ZVAL(field_type);
 	ZVAL_STRING(field_type, type);
 	PHALCON_RETURN_CALL_SELFW("_inputfieldchecked", field_type, parameters);
 }
@@ -1624,7 +1624,7 @@ PHP_METHOD(Phalcon_Tag, appendTitle){
 	
 	document_title = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_documentTitle"));
 	document_title_separator = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_documentTitleSeparator"));
-	ALLOC_INIT_ZVAL(r0);
+	PHALCON_ALLOC_INIT_ZVAL(r0);
 	PHALCON_CONCAT_VVV(r0, document_title, document_title_separator, title);
 	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_documentTitle"), r0);
 	zval_ptr_dtor(r0);
@@ -1644,7 +1644,7 @@ PHP_METHOD(Phalcon_Tag, prependTitle){
 	document_title = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_documentTitle"));
 	document_title_separator = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_documentTitleSeparator"));
 	
-	ALLOC_INIT_ZVAL(r0);
+	PHALCON_ALLOC_INIT_ZVAL(r0);
 	PHALCON_CONCAT_VVV(r0, title, document_title_separator, document_title);
 	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_documentTitle"), r0);
 	zval_ptr_dtor(r0);

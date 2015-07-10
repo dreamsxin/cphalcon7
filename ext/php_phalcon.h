@@ -145,23 +145,13 @@ ZEND_EXTERN_MODULE_GLOBALS(phalcon)
 extern zend_module_entry phalcon_module_entry;
 #define phpext_phalcon_ptr &phalcon_module_entry
 
-/* Compatibility macros for PHP 5.3 */
-#ifndef PHP_FE_END
-	#define PHP_FE_END { NULL, NULL, NULL, 0, 0 }
-#endif
+#define PHALCON_ALLOC_ZVAL(z)             \
+	(z) = (zval *) emalloc(sizeof(zval));
 
-#ifndef ALLOC_ZVAL
-#	define ALLOC_ZVAL(z)	\
-		(z) = (zval *) emalloc(sizeof(zval))
-
-#define ALLOC_INIT_ZVAL(zp) \
-	ALLOC_ZVAL(zp);		    \
-	ZVAL_UNDEF(zp);
-#endif
-
-#ifndef Z_TYPE_PP
-#	define Z_TYPE_PP(pz) Z_TYPE_P(*(pz))
-#endif
+#define PHALCON_ALLOC_INIT_ZVAL(z)        \
+	PHALCON_ALLOC_ZVAL(z);		          \
+	Z_SET_REFCOUNT_P(z, 1);               \
+	ZVAL_UNDEF(z);
 
 #ifndef INIT_PZVAL
 #	define INIT_PZVAL(z)         \

@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 			if (PHALCON_IS_NOT_EMPTY(value)) {
 				zval *http_header;
 				
-				PHALCON_ALLOC_GHOST_ZVAL(http_header);
+				PHALCON_ALLOC_INIT_ZVAL(http_header);
 				PHALCON_CONCAT_VSV(http_header, header, ": ", value);
 				ctr.line     = Z_STRVAL_P(http_header);
 				ctr.line_len = Z_STRLEN_P(http_header);
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send){
 			} else {
 				zval *tmp, *pheader = header;
 
-				PHALCON_ALLOC_GHOST_ZVAL(tmp);
+				PHALCON_ALLOC_INIT_ZVAL(tmp);
 				ZVAL_ZVAL(tmp, pheader, 1, 0);
 				convert_to_string(tmp);
 

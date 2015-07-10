@@ -221,7 +221,7 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
 		uint params_cnt = 2 + (params != NULL ? 1 : 0);
 		zval *p[3];
 
-		PHALCON_ALLOC_GHOST_ZVAL(event_name);
+		PHALCON_ALLOC_INIT_ZVAL(event_name);
 		ZVAL_STRING(event_name, event);
 
 		p[0] = event_name;

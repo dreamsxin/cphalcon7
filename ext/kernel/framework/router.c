@@ -338,7 +338,7 @@ void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches){
 							if (!not_valid) {
 								{
 									zval *tmp;
-									PHALCON_ALLOC_GHOST_ZVAL(tmp);
+									PHALCON_ALLOC_INIT_ZVAL(tmp);
 									ZVAL_LONG(tmp, number_matches);
 
 									if (variable) {

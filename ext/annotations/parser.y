@@ -94,7 +94,7 @@ static zval *phannot_ret_zval_list(zval *list_left, zval *right_list)
 					break;
 				}
 
-				Z_ADDREF_P(item);
+				Z_TRY_ADDREF_P(item);
 				add_next_index_zval(ret, item);
 
 			}

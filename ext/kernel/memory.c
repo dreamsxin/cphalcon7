@@ -178,11 +178,12 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 				if (Z_TYPE_P(*ptr) > IS_CALLABLE) {
 					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *ptr, Z_TYPE_P(*ptr), active_memory->func);
 				}
-
-				if (Z_REFCOUNT_P(*ptr) == 0) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has 0 references, type=%d [%s]\n", __func__, (int)i, *ptr, Z_TYPE_P(*ptr), active_memory->func);
-				} else if (Z_REFCOUNT_P(*ptr) >= 1000000) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has too many references (%u), type=%d  [%s]\n", __func__, (int)i, *ptr, Z_REFCOUNT_P(*ptr), Z_TYPE_P(*ptr), active_memory->func);
+				if (Z_REFCOUNTED_P(*ptr)) {
+					if (Z_REFCOUNT_P(*ptr) == 0) {
+						fprintf(stderr, "%s: observed variable #%d (%p) has 0 references, type=%d [%s]\n", __func__, (int)i, *ptr, Z_TYPE_P(*ptr), active_memory->func);
+					} else if (Z_REFCOUNT_P(*ptr) >= 1000000) {
+						fprintf(stderr, "%s: observed variable #%d (%p) has too many references (%u), type=%d  [%s]\n", __func__, (int)i, *ptr, Z_REFCOUNT_P(*ptr), Z_TYPE_P(*ptr), active_memory->func);
+					}
 				}
 			}
 		}
@@ -192,14 +193,18 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 		for (i = 0; i < active_memory->pointer; ++i) {
 			ptr = active_memory->addresses[i];
 			if (EXPECTED(ptr != NULL && *ptr != NULL)) {
-				if (Z_REFCOUNT_P(*ptr) == 1) {
-					if (!Z_ISREF_P(*ptr) || Z_TYPE_P(*ptr) == IS_OBJECT) {
-						zval_ptr_dtor(*ptr);
+				if (Z_REFCOUNTED_P(*ptr)) {
+					if (Z_REFCOUNT_P(*ptr) == 1) {
+						if (!Z_ISREF_P(*ptr) || Z_TYPE_P(*ptr) == IS_OBJECT) {
+							zval_ptr_dtor(*ptr);
+						} else {
+							efree(*ptr);
+						}
 					} else {
-						efree(*ptr);
+						Z_TRY_DELREF_P(*ptr);
 					}
 				} else {
-					Z_DELREF_P(*ptr);
+					zval_dtor(*ptr);
 				}
 			}
 		}

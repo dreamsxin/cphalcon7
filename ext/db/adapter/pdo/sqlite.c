@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
 	if (!zend_is_true(descriptor)) {
 		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
 	}
-	if (!phalcon_array_isset_str(descriptor, SS("dbname"))) {
+	if (!phalcon_array_isset_str(descriptor, SL("dbname"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "dbname must be specified");
 		return;
 	} else {
@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), field) {
 		PHALCON_INIT_NVAR(definition);
 		array_init_size(definition, 1);
-		add_assoc_long_ex(definition, SS("bindType"), 2);
+		add_assoc_long_ex(definition, SL("bindType"), 2);
 
 		PHALCON_OBS_NVAR(column_type);
 		phalcon_array_fetch_long(&column_type, field, 2, PH_NOISY);
@@ -623,7 +623,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 
 		PHALCON_INIT_NVAR(reference_array);
 		array_init_size(reference_array, 4);
-		add_assoc_null_ex(reference_array, SS("referencedSchema"));
+		add_assoc_null_ex(reference_array, SL("referencedSchema"));
 		phalcon_array_update_string(reference_array, SL("referencedTable"), referenced_table, PH_COPY | PH_SEPARATE);
 		phalcon_array_update_string(reference_array, SL("columns"), columns, PH_COPY | PH_SEPARATE);
 		phalcon_array_update_string(reference_array, SL("referencedColumns"), referenced_columns, PH_COPY | PH_SEPARATE);

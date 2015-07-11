@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 	
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_str_fetch(&prefix, options, SS("prefix"))) {
+		if (phalcon_array_isset_str_fetch(&prefix, options, SL("prefix"))) {
 			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
 		}
 	}
@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 	
-	session = phalcon_get_global(SS("_SESSION"));
+	session = phalcon_get_global(SL("_SESSION"));
 	
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	
@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, write){
 	
 	PHALCON_INIT_VAR(prefix_key);
 	PHALCON_CONCAT_SV(prefix_key, "$PMM$", prefix);
-	_SESSION = phalcon_get_global(SS("_SESSION"));
+	_SESSION = phalcon_get_global(SL("_SESSION"));
 	phalcon_array_update_multi_2(_SESSION, prefix_key, key, data, 0);
 	
 	PHALCON_MM_RESTORE();
@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, reset)
 	zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	phalcon_concat_sv(&prefix_key, SL("$PMM$"), prefix, 0);
-	_SESSION = phalcon_get_global(SS("_SESSION"));
+	_SESSION = phalcon_get_global(SL("_SESSION"));
 	phalcon_array_unset(_SESSION, &prefix_key, 0);
 	zval_dtor(&prefix_key);
 

@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, __construct){
 		phalcon_update_property_this(getThis(), SL("_paths"), paths);
 	}
 
-	if (phalcon_method_exists_ex(getThis(), SS("initialize")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("initialize")) == SUCCESS) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "initialize", paths);
 	}
 }

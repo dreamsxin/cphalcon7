@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		 */
 		PHALCON_INIT_VAR(paths);
 		array_init_size(paths, 1);
-		add_assoc_long_ex(paths, ISS(controller), 1);
+		add_assoc_long_ex(paths, ISL(controller), 1);
 
 		PHALCON_INIT_VAR(action_pattern);
 		ZVAL_STRING(action_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
@@ -251,9 +251,9 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 
 		PHALCON_INIT_NVAR(paths);
 		array_init_size(paths, 3);
-		add_assoc_long_ex(paths, ISS(controller), 1);
-		add_assoc_long_ex(paths, ISS(action), 2);
-		add_assoc_long_ex(paths, ISS(params), 3);
+		add_assoc_long_ex(paths, ISL(controller), 1);
+		add_assoc_long_ex(paths, ISL(action), 2);
+		add_assoc_long_ex(paths, ISL(params), 3);
 
 		PHALCON_INIT_VAR(params_pattern);
 		ZVAL_STRING(params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
@@ -316,8 +316,8 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 	 * By default we use $_GET['url'] to obtain the rewrite information
 	 */
 	if (!zend_is_true(uri_source)) { /* FIXME: Compare with URI_SOURCE_SERVER_REQUEST_URI */
-		_GET = phalcon_get_global(SS("_GET"));
-		if (phalcon_array_isset_str_fetch(&url, _GET, SS("_url"))) {
+		_GET = phalcon_get_global(SL("_GET"));
+		if (phalcon_array_isset_str_fetch(&url, _GET, SL("_url"))) {
 			if (PHALCON_IS_NOT_EMPTY(url)) {
 				RETURN_ZVAL(url, 1, 0);
 			}
@@ -326,8 +326,8 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 		/**
 		 * Otherwise use the standard $_SERVER['REQUEST_URI']
 		 */
-		_SERVER = phalcon_get_global(SS("_SERVER"));
-		if (phalcon_array_isset_str_fetch(&url, _SERVER, SS("REQUEST_URI"))) {
+		_SERVER = phalcon_get_global(SL("_SERVER"));
+		if (phalcon_array_isset_str_fetch(&url, _SERVER, SL("REQUEST_URI"))) {
 			PHALCON_ALLOC_INIT_ZVAL(url_parts);
 			phalcon_fast_explode_str(url_parts, SL("?"), url);
 
@@ -511,27 +511,27 @@ PHP_METHOD(Phalcon_Mvc_Router, setDefaults){
 	}
 
 	/* Set the default namespace */
-	if (phalcon_array_isset_str_fetch(&namespace_name, defaults, SS("namespace"))) {
+	if (phalcon_array_isset_str_fetch(&namespace_name, defaults, SL("namespace"))) {
 		phalcon_update_property_this(getThis(), SL("_defaultNamespace"), namespace_name);
 	}
 
 	/* Set the default module */
-	if (phalcon_array_isset_str_fetch(&module_name, defaults, SS("module"))) {
+	if (phalcon_array_isset_str_fetch(&module_name, defaults, SL("module"))) {
 		phalcon_update_property_this(getThis(), SL("_defaultModule"), module_name);
 	}
 
 	/* Set the default controller */
-	if (phalcon_array_isset_str_fetch(&controller_name, defaults, SS("controller"))) {
+	if (phalcon_array_isset_str_fetch(&controller_name, defaults, SL("controller"))) {
 		phalcon_update_property_this(getThis(), SL("_defaultController"), controller_name);
 	}
 
 	/* Set the default action */
-	if (phalcon_array_isset_str_fetch(&action_name, defaults, SS("action"))) {
+	if (phalcon_array_isset_str_fetch(&action_name, defaults, SL("action"))) {
 		phalcon_update_property_this(getThis(), SL("_defaultAction"), action_name);
 	}
 
 	/* Set default parameters */
-	if (phalcon_array_isset_str_fetch(&params, defaults, SS("params"))) {
+	if (phalcon_array_isset_str_fetch(&params, defaults, SL("params"))) {
 		phalcon_update_property_this(getThis(), SL("_defaultParams"), params);
 	}
 
@@ -906,9 +906,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		/**
 		 * Check for a namespace
 		 */
-		if (phalcon_array_isset_str_fetch(&namespace, parts, SS("namespace"))) {
+		if (phalcon_array_isset_str_fetch(&namespace, parts, SL("namespace"))) {
 			phalcon_update_property_this(getThis(), SL("_namespace"), namespace);
-			phalcon_array_unset_string(parts, SS("namespace"), PH_SEPARATE);
+			phalcon_array_unset_string(parts, SL("namespace"), PH_SEPARATE);
 		} else {
 			PHALCON_CALL_METHOD(&default_namespace, route, "getdefaultnamespace");
 			
@@ -923,9 +923,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		/**
 		 * Check for a module
 		 */
-		if (phalcon_array_isset_str_fetch(&module, parts, SS("module"))) {
+		if (phalcon_array_isset_str_fetch(&module, parts, SL("module"))) {
 			phalcon_update_property_this(getThis(), SL("_module"), module);
-			phalcon_array_unset_string(parts, SS("module"), PH_SEPARATE);
+			phalcon_array_unset_string(parts, SL("module"), PH_SEPARATE);
 		} else {
 			PHALCON_CALL_METHOD(&default_module, route, "getdefaultmodule");
 			
@@ -937,9 +937,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			}
 		}
 
-		if (phalcon_array_isset_str_fetch(&exact, parts, SS("\0exact"))) {
+		if (phalcon_array_isset_str_fetch(&exact, parts, SL("\0exact"))) {
 			phalcon_update_property_this(getThis(), SL("_isExactControllerName"), exact);
-			phalcon_array_unset_string(parts, SS("\0exact"), PH_SEPARATE);
+			phalcon_array_unset_string(parts, SL("\0exact"), PH_SEPARATE);
 		}
 		else {
 			PHALCON_INIT_VAR(exact);
@@ -950,9 +950,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		/**
 		 * Check for a controller
 		 */
-		if (phalcon_array_isset_str_fetch(&controller, parts, SS("controller"))) {
+		if (phalcon_array_isset_str_fetch(&controller, parts, SL("controller"))) {
 			phalcon_update_property_this(getThis(), SL("_controller"), controller);
-			phalcon_array_unset_string(parts, SS("controller"), PH_SEPARATE);
+			phalcon_array_unset_string(parts, SL("controller"), PH_SEPARATE);
 		} else {
 			PHALCON_CALL_METHOD(&default_controller, route, "getdefaultcontroller");
 			
@@ -967,9 +967,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		/**
 		 * Check for an action
 		 */
-		if (phalcon_array_isset_str_fetch(&action, parts, SS("action"))) {
+		if (phalcon_array_isset_str_fetch(&action, parts, SL("action"))) {
 			phalcon_update_property_this(getThis(), SL("_action"), action);
-			phalcon_array_unset_string(parts, SS("action"), PH_SEPARATE);
+			phalcon_array_unset_string(parts, SL("action"), PH_SEPARATE);
 		} else {
 			PHALCON_CALL_METHOD(&default_action, route, "getdefaultaction");
 			
@@ -984,7 +984,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		/**
 		 * Check for parameters
 		 */
-		if (phalcon_array_isset_str_fetch(&params_str, parts, SS("params"))) {
+		if (phalcon_array_isset_str_fetch(&params_str, parts, SL("params"))) {
 			PHALCON_INIT_VAR(str_params);
 			if (phalcon_start_with_str(params_str, SL("/"))) {
 				phalcon_substr(str_params, params_str, 1, 0);
@@ -1003,7 +1003,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				phalcon_array_append(params, str_params, PH_COPY);
 			}
 
-			phalcon_array_unset_string(parts, SS("params"), PH_SEPARATE);
+			phalcon_array_unset_string(parts, SL("params"), PH_SEPARATE);
 		}
 
 		if (zend_hash_num_elements(Z_ARRVAL_P(params))) {

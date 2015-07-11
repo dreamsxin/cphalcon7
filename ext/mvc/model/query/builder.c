@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		/** 
 		 * Process conditions
 		 */
-		if (phalcon_array_isset_str_fetch(&conditions, params, SS("conditions")) || phalcon_array_isset_long_fetch(&conditions, params, 0)) {
+		if (phalcon_array_isset_str_fetch(&conditions, params, SL("conditions")) || phalcon_array_isset_long_fetch(&conditions, params, 0)) {
 			if (Z_TYPE_P(conditions) == IS_ARRAY) {
 
 				/* ----------- INITIALIZING LOOP VARIABLES ----------- */
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 			}	
 		}
 
-		if (phalcon_array_isset_str_fetch(&bind_params, params, SS("bind"))) {
+		if (phalcon_array_isset_str_fetch(&bind_params, params, SL("bind"))) {
 			if (Z_TYPE_P(bind_params) == IS_ARRAY) {
 				current_bind_params = phalcon_read_property(getThis(), SL("_bindParams"), PH_NOISY);
 				if (Z_TYPE_P(current_bind_params) == IS_ARRAY) { 
@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 			}
 		}
 
-		if (phalcon_array_isset_str_fetch(&bind_types, params, SS("bindTypes"))) {
+		if (phalcon_array_isset_str_fetch(&bind_types, params, SL("bindTypes"))) {
 			if (Z_TYPE_P(bind_types) == IS_ARRAY) {
 				current_bind_types = phalcon_read_property(getThis(), SL("_bindTypes"), PH_NOISY);
 				if (Z_TYPE_P(current_bind_types) == IS_ARRAY) { 
@@ -315,49 +315,49 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		/** 
 		 * Assign 'FROM' clause
 		 */
-		if (phalcon_array_isset_str_fetch(&models, params, SS("models"))) {
+		if (phalcon_array_isset_str_fetch(&models, params, SL("models"))) {
 			phalcon_update_property_this(getThis(), SL("_models"), models);
 		}
 
 		/** 
 		 * Assign COLUMNS clause
 		 */
-		if (phalcon_array_isset_str_fetch(&columns, params, SS("columns"))) {
+		if (phalcon_array_isset_str_fetch(&columns, params, SL("columns"))) {
 			phalcon_update_property_this(getThis(), SL("_columns"), columns);
 		}
 
 		/**
 		 * Assign JOIN clause
 		 */
-		if (phalcon_array_isset_str_fetch(&joins, params, SS("joins"))) {
+		if (phalcon_array_isset_str_fetch(&joins, params, SL("joins"))) {
 			phalcon_update_property_this(getThis(), SL("_joins"), joins);
 		}
 
 		/** 
 		 * Assign GROUP clause
 		 */
-		if (phalcon_array_isset_str_fetch(&group_clause, params, SS("group"))) {
+		if (phalcon_array_isset_str_fetch(&group_clause, params, SL("group"))) {
 			phalcon_update_property_this(getThis(), SL("_group"), group_clause);
 		}
 
 		/** 
 		 * Assign HAVING clause
 		 */
-		if (phalcon_array_isset_str_fetch(&having_clause, params, SS("having"))) {
+		if (phalcon_array_isset_str_fetch(&having_clause, params, SL("having"))) {
 			phalcon_update_property_this(getThis(), SL("_having"), having_clause);
 		}
 
 		/** 
 		 * Assign ORDER clause
 		 */
-		if (phalcon_array_isset_str_fetch(&order_clause, params, SS("order"))) {
+		if (phalcon_array_isset_str_fetch(&order_clause, params, SL("order"))) {
 			phalcon_update_property_this(getThis(), SL("_order"), order_clause);
 		}
 
 		/** 
 		 * Assign LIMIT clause
 		 */
-		if (phalcon_array_isset_str_fetch(&limit_clause, params, SS("limit"))) {
+		if (phalcon_array_isset_str_fetch(&limit_clause, params, SL("limit"))) {
 			if (Z_TYPE_P(limit_clause) == IS_ARRAY
 				&& phalcon_array_isset_long_fetch(&limit, limit_clause, 0)
 				&& phalcon_array_isset_long_fetch(&offset, limit_clause, 1)
@@ -372,21 +372,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		/** 
 		 * Assign OFFSET clause
 		 */
-		if (phalcon_array_isset_str_fetch(&offset_clause, params, SS("offset"))) {
+		if (phalcon_array_isset_str_fetch(&offset_clause, params, SL("offset"))) {
 			phalcon_update_property_this(getThis(), SL("_offset"), offset_clause);
 		}
 
 		/** 
 		 * Assign FOR UPDATE clause
 		 */
-		if (phalcon_array_isset_str_fetch(&for_update, params, SS("for_update"))) {
+		if (phalcon_array_isset_str_fetch(&for_update, params, SL("for_update"))) {
 			phalcon_update_property_this(getThis(), SL("_forUpdate"), for_update);
 		}
 
 		/** 
 		 * Assign SHARED LOCK clause
 		 */
-		if (phalcon_array_isset_str_fetch(&shared_lock, params, SS("shared_lock"))) {
+		if (phalcon_array_isset_str_fetch(&shared_lock, params, SL("shared_lock"))) {
 			phalcon_update_property_this(getThis(), SL("_sharedLock"), shared_lock);
 		}
 	}
@@ -1704,7 +1704,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 			PHALCON_OBS_VAR(number);
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_str_fetch(&offset, limit, SS("offset")) && Z_TYPE_P(offset) != IS_NULL) {
+			if (phalcon_array_isset_str_fetch(&offset, limit, SL("offset")) && Z_TYPE_P(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", number, " OFFSET ", offset);
 			} else {
 				PHALCON_SCONCAT_SV(phql, " LIMIT ", number);

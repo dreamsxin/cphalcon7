@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Db, setup){
 	/**
 	 * Enables/Disables globally the escaping of SQL identifiers
 	 */
-	if (phalcon_array_isset_str_fetch(&escape_identifiers, options, SS("escapeSqlIdentifiers"))) {
+	if (phalcon_array_isset_str_fetch(&escape_identifiers, options, SL("escapeSqlIdentifiers"))) {
 		PHALCON_GLOBAL(db).escape_identifiers = zend_is_true(escape_identifiers);
 	}
 }

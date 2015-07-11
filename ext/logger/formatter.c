@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 				ZVAL_STRINGL(&index, tmp, str_length);
 			}
 
-			Z_ADDREF_P(val);
+			Z_TRY_ADDREF_P(val);
 			zend_hash_add(Z_ARRVAL(replace), Z_STR(index), val);
 			efree(tmp);
 		} ZEND_HASH_FOREACH_END();

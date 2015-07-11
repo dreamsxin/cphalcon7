@@ -150,8 +150,8 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		if (phalcon_compare_strict_string(type, SL("TooLarge"))) {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(maxsize); add_assoc_zval_ex(pairs, SS(":max"), maxsize);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(maxsize); add_assoc_zval_ex(pairs, SL(":max"), maxsize);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -166,8 +166,8 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		} else if (phalcon_compare_strict_string(type, SL("TooSmall"))) {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":min"), minsize);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SL(":min"), minsize);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -185,8 +185,8 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(join_mimes); add_assoc_zval_ex(pairs, SS(":mimes"), join_mimes);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(join_mimes); add_assoc_zval_ex(pairs, SL(":mimes"), join_mimes);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -201,8 +201,8 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		} else if (phalcon_compare_strict_string(type, SL("TooLarge"))) {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(maxsize); add_assoc_zval_ex(pairs, SS(":max"), maxsize);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(maxsize); add_assoc_zval_ex(pairs, SL(":max"), maxsize);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -217,8 +217,8 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		} else if (phalcon_compare_strict_string(type, SL("TooNarrow"))) {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":min"), minwidth);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SL(":min"), minwidth);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -233,8 +233,8 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		} else if (phalcon_compare_strict_string(type, SL("TooWide"))) {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":max"), maxwidth);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SL(":max"), maxwidth);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -249,8 +249,8 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		}  else if (phalcon_compare_strict_string(type, SL("TooShort"))) {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":min"), minwidth);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SL(":min"), minwidth);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -265,8 +265,8 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		} else if (phalcon_compare_strict_string(type, SL("TooLong"))) {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SS(":max"), maxwidth);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(minsize); add_assoc_zval_ex(pairs, SL(":max"), maxwidth);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		} else {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 1);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "File", code);
 		}
 
-		Z_DELREF_P(message);
+		Z_TRY_DELREF_P(message);
 
 		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
 		RETURN_MM_FALSE;
@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 
 		PHALCON_CALL_METHOD(&width, image, "getImageWidth");
 		PHALCON_CALL_METHOD(&height, image, "getImageHeight");
-	} else if (phalcon_function_exists_ex(SS("getimagesize")) != FAILURE) {
+	} else if (phalcon_function_exists_ex(SL("getimagesize")) != FAILURE) {
 		PHALCON_CALL_FUNCTION(&imageinfo, "getimagesize", pathname);
 		if (!phalcon_array_isset_long_fetch(&width, imageinfo, 0)) {
 			PHALCON_INIT_VAR(width);

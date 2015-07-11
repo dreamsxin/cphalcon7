@@ -118,8 +118,8 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 
 		PHALCON_ALLOC_INIT_ZVAL(pairs);
 		array_init_size(pairs, 2);
-		Z_ADDREF_P(label);          add_assoc_zval_ex(pairs, SS(":field"), label);
-		Z_ADDREF_P(with_label); add_assoc_zval_ex(pairs, SS(":with"), with_label);
+		Z_TRY_ADDREF_P(label);          add_assoc_zval_ex(pairs, SL(":field"), label);
+		Z_TRY_ADDREF_P(with_label); add_assoc_zval_ex(pairs, SL(":with"), with_label);
 
 		PHALCON_OBS_VAR(message_str);
 		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 		PHALCON_CALL_FUNCTION(&prepared, "strtr", message_str, pairs);
 	
 		message = phalcon_validation_message_construct_helper(prepared, attribute, "Confirmation", code);
-		Z_DELREF_P(message);
+		Z_TRY_DELREF_P(message);
 	
 		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
 		RETURN_MM_FALSE;

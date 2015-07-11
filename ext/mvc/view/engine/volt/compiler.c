@@ -454,7 +454,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, addExtension){
 	/** 
 	 * Initialize the extension
 	 */
-	if (phalcon_method_exists_ex(extension, SS("initialize")) == SUCCESS) {
+	if (phalcon_method_exists_ex(extension, SL("initialize")) == SUCCESS) {
 		PHALCON_MM_GROW();
 		PHALCON_CALL_METHOD(NULL, extension, "initialize", getThis());
 		PHALCON_MM_RESTORE();
@@ -716,7 +716,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 
 	PHALCON_INIT_VAR(code);
 
-	if (phalcon_array_isset_str(expr, SS("arguments"))) {
+	if (phalcon_array_isset_str(expr, SL("arguments"))) {
 		PHALCON_OBS_VAR(func_arguments);
 		phalcon_array_fetch_str(&func_arguments, expr, SL("arguments"), PH_NOISY);
 
@@ -897,23 +897,23 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 			if (Z_TYPE_P(array_helpers) != IS_ARRAY) { 
 				PHALCON_INIT_NVAR(array_helpers);
 				array_init_size(array_helpers, 17);
-				add_assoc_bool_ex(array_helpers, SS("link_to"), 1);
-				add_assoc_bool_ex(array_helpers, SS("image"), 1);
-				add_assoc_bool_ex(array_helpers, SS("form"), 1);
-				add_assoc_bool_ex(array_helpers, SS("select"), 1);
-				add_assoc_bool_ex(array_helpers, SS("select_static"), 1);
-				add_assoc_bool_ex(array_helpers, SS("submit_button"), 1);
-				add_assoc_bool_ex(array_helpers, SS("radio_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("check_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("file_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("hidden_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("password_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("text_area"), 1);
-				add_assoc_bool_ex(array_helpers, SS("text_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("date_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("numeric_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("email_field"), 1);
-				add_assoc_bool_ex(array_helpers, SS("image_input"), 1);
+				add_assoc_bool_ex(array_helpers, SL("link_to"), 1);
+				add_assoc_bool_ex(array_helpers, SL("image"), 1);
+				add_assoc_bool_ex(array_helpers, SL("form"), 1);
+				add_assoc_bool_ex(array_helpers, SL("select"), 1);
+				add_assoc_bool_ex(array_helpers, SL("select_static"), 1);
+				add_assoc_bool_ex(array_helpers, SL("submit_button"), 1);
+				add_assoc_bool_ex(array_helpers, SL("radio_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("check_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("file_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("hidden_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("password_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("text_area"), 1);
+				add_assoc_bool_ex(array_helpers, SL("text_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("date_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("numeric_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("email_field"), 1);
+				add_assoc_bool_ex(array_helpers, SL("image_input"), 1);
 				phalcon_update_property_this(getThis(), SL("_arrayHelpers"), array_helpers);
 			}
 
@@ -1086,7 +1086,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 
 		PHALCON_OBS_VAR(test_name);
 		phalcon_array_fetch_str(&test_name, test, SL("name"), PH_NOISY);
-		if (phalcon_array_isset_str(test_name, SS("value"))) {
+		if (phalcon_array_isset_str(test_name, SL("value"))) {
 
 			/** 
 			 * Checks if a value is divisible by other
@@ -1203,7 +1203,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	/** 
 	 * Resolve arguments
 	 */
-	if (phalcon_array_isset_str(filter, SS("arguments"))) {
+	if (phalcon_array_isset_str(filter, SL("arguments"))) {
 
 		PHALCON_OBS_NVAR(file);
 		phalcon_array_fetch_str(&file, filter, SL("file"), PH_NOISY);
@@ -1220,7 +1220,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 		if (!PHALCON_IS_STRING(name, "default")) {
 			PHALCON_INIT_VAR(resolved_expr);
 			array_init_size(resolved_expr, 4);
-			add_assoc_long_ex(resolved_expr, ISS(type), PHVOLT_T_RESOLVED_EXPR);
+			add_assoc_long_ex(resolved_expr, ISL(type), PHVOLT_T_RESOLVED_EXPR);
 			phalcon_array_update_str(resolved_expr, IS(value), left, PH_COPY);
 			phalcon_array_update_str(resolved_expr, IS(file), file, PH_COPY);
 			phalcon_array_update_str(resolved_expr, IS(line), line, PH_COPY);
@@ -1616,7 +1616,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 			}
 		}
 
-		if (!phalcon_array_isset_str_fetch(&type, expr, SS("type"))) {
+		if (!phalcon_array_isset_str_fetch(&type, expr, SL("type"))) {
 
 			PHALCON_INIT_NVAR(items);
 			array_init(items);
@@ -1628,12 +1628,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				phalcon_array_fetch_str(&single_expr_expr, single_expr, SL("expr"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(&single_expr_code, getThis(), "expression", single_expr_expr);
-				if (phalcon_array_isset_str_fetch(&name, single_expr, SS("name"))) {
+
+				if (phalcon_array_isset_str_fetch(&name, single_expr, SL("name"))) {
 					PHALCON_INIT_NVAR(parameter);
 					PHALCON_CONCAT_SVSV(parameter, "'", name, "' => ", single_expr_code);
-					phalcon_array_append(items, parameter, PH_SEPARATE);
+					phalcon_array_append(items, parameter, PH_COPY);
 				} else {
-					phalcon_array_append(items, single_expr_code, PH_SEPARATE);
+					phalcon_array_append(items, single_expr_code, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 
@@ -1653,7 +1654,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 		/** 
 		 * Left part of expression is always resolved
 		 */
-		if (phalcon_array_isset_str_fetch(&left, expr, SS("left"))) {
+		if (phalcon_array_isset_str_fetch(&left, expr, SL("left"))) {
 			PHALCON_CALL_METHOD(&left_code, getThis(), "expression", left);
 		} else {
 			PHALCON_INIT_NVAR(left_code);
@@ -1685,7 +1686,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 		 * From here, right part of expression is always resolved
 		 */
 		PHALCON_INIT_NVAR(right_code);
-		if (phalcon_array_isset_str_fetch(&right, expr, SS("right"))) {
+		if (phalcon_array_isset_str_fetch(&right, expr, SL("right"))) {
 			PHALCON_CALL_METHOD(&right_code, getThis(), "expression", right);
 		}
 
@@ -1737,7 +1738,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				break;
 
 			case PHVOLT_T_ARRAY:
-				if (phalcon_array_isset_str(expr, SS("left"))) {
+				if (phalcon_array_isset_str(expr, SL("left"))) {
 					PHALCON_CONCAT_SVS(expr_code, "array(", left_code, ")");
 				} else {
 					ZVAL_STRING(expr_code, "array()");
@@ -1839,7 +1840,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				 * Evaluate the start part of the slice
 				 */
 				PHALCON_INIT_NVAR(start_code);
-				if (phalcon_array_isset_str_fetch(&start, expr, SS("start"))) {
+				if (phalcon_array_isset_str_fetch(&start, expr, SL("start"))) {
 					PHALCON_CALL_METHOD(&start_code, getThis(), "expression", start);
 				} else {
 					ZVAL_STRING(start_code, "null");
@@ -1849,7 +1850,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				 * Evaluate the end part of the slice
 				 */
 				PHALCON_INIT_NVAR(end_code);
-				if (phalcon_array_isset_str_fetch(&end, expr, SS("end"))) {
+				if (phalcon_array_isset_str_fetch(&end, expr, SL("end"))) {
 					PHALCON_CALL_METHOD(&end_code, getThis(), "expression", end);
 				} else {
 					ZVAL_STRING(end_code, "null");
@@ -1988,7 +1989,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends){
 	PHALCON_INIT_VAR(is_statement_list);
 	ZVAL_TRUE(is_statement_list);
 
-	if (!phalcon_array_isset_str(statements, SS("type"))) {
+	if (!phalcon_array_isset_str(statements, SL("type"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(statements), statement) {
 			if (Z_TYPE_P(statement) != IS_ARRAY) { 
 				ZVAL_FALSE(is_statement_list);
@@ -2037,7 +2038,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("expr"))) {
+	if (!phalcon_array_isset_str(statement, SL("expr"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2081,7 +2082,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 			/** 
 			 * Check if the statement is valid
 			 */
-			if (!phalcon_array_isset_str(bstatement, SS("type"))) {
+			if (!phalcon_array_isset_str(bstatement, SL("type"))) {
 				break;
 			}
 
@@ -2132,7 +2133,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 	/** 
 	 * Check if a 'key' variable needs to be calculated
 	 */
-	if (phalcon_array_isset_str(statement, SS("key"))) {
+	if (phalcon_array_isset_str(statement, SL("key"))) {
 		PHALCON_OBS_VAR(key);
 		phalcon_array_fetch_str(&key, statement, SL("key"), PH_NOISY);
 		PHALCON_SCONCAT_SVSVSVS(compilation, "<?php foreach (", iterator, " as $", key, " => $", variable, ") { ");
@@ -2143,7 +2144,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 	/** 
 	 * Check for an 'if' expr in the block
 	 */
-	if (phalcon_array_isset_str_fetch(&if_expr, statement, SS("if_expr"))) {
+	if (phalcon_array_isset_str_fetch(&if_expr, statement, SL("if_expr"))) {
 		PHALCON_CALL_METHOD(&if_expr_code, getThis(), "expression", if_expr);
 		PHALCON_SCONCAT_SVS(compilation, "if (", if_expr_code, ") { ?>");
 	} else {
@@ -2173,7 +2174,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 	 * Append the internal block compilation
 	 */
 	phalcon_concat_self(compilation, code);
-	if (phalcon_array_isset_str(statement, SS("if_expr"))) {
+	if (phalcon_array_isset_str(statement, SL("if_expr"))) {
 		phalcon_concat_self_str(compilation, SL("<?php } ?>"));
 	}
 
@@ -2250,7 +2251,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileIf){
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("expr"))) {
+	if (!phalcon_array_isset_str(statement, SL("expr"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2264,7 +2265,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileIf){
 	 * 'If' statement
 	 */
 	PHALCON_SCONCAT_SVS(compilation, "<?php if (", expr_code, ") { ?>");
-	if (phalcon_array_isset_str_fetch(&block_statements, statement, SS("true_statements"))) {
+	if (phalcon_array_isset_str_fetch(&block_statements, statement, SL("true_statements"))) {
 		/**
 		 * Process statements in the 'true' block
 		 */
@@ -2275,7 +2276,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileIf){
 	/** 
 	 * Check for a 'else'/'elseif' block
 	 */
-	if (phalcon_array_isset_str_fetch(&block_statements, statement, SS("false_statements"))) {
+	if (phalcon_array_isset_str_fetch(&block_statements, statement, SL("false_statements"))) {
 		phalcon_concat_self_str(compilation, SL("<?php } else { ?>"));
 
 		/** 
@@ -2307,7 +2308,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileElseIf){
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("expr"))) {
+	if (!phalcon_array_isset_str(statement, SL("expr"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2348,7 +2349,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileCache){
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("expr"))) {
+	if (!phalcon_array_isset_str(statement, SL("expr"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2367,7 +2368,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileCache){
 	 * Cache statement
 	 */
 	PHALCON_SCONCAT_SVS(compilation, "<?php $_cache[", expr_code, "] = $this->di->get('viewCache'); ");
-	if (phalcon_array_isset_str_fetch(&lifetime, statement, SS("lifetime"))) {
+	if (phalcon_array_isset_str_fetch(&lifetime, statement, SL("lifetime"))) {
 		PHALCON_SCONCAT_SVS(compilation, "$_cacheKey[", expr_code, "]");
 		
 		PHALCON_OBS_NVAR(lifetime_type);
@@ -2397,7 +2398,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileCache){
 	/** 
 	 * Check if the cache has a lifetime
 	 */
-	if (phalcon_array_isset_str_fetch(&lifetime, statement, SS("lifetime"))) {
+	if (phalcon_array_isset_str_fetch(&lifetime, statement, SL("lifetime"))) {
 		PHALCON_OBS_NVAR(lifetime_type);
 		phalcon_array_fetch_str(&lifetime_type, lifetime, SL("type"), PH_NOISY);
 
@@ -2436,7 +2437,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileEcho){
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("expr"))) {
+	if (!phalcon_array_isset_str(statement, SL("expr"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2508,7 +2509,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("path"))) {
+	if (!phalcon_array_isset_str(statement, SL("path"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2533,7 +2534,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 		/** 
 		 * Static compilation cannot be performed if the user passed extra parameters
 		 */
-		if (!phalcon_array_isset_str(statement, SS("params"))) {
+		if (!phalcon_array_isset_str(statement, SL("params"))) {
 
 			/** 
 			 * Get the static path
@@ -2588,7 +2589,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 	 * Resolve the path's expression
 	 */
 	PHALCON_CALL_METHOD(&path, getThis(), "expression", path_expr);
-	if (!phalcon_array_isset_str(statement, SS("params"))) {
+	if (!phalcon_array_isset_str(statement, SL("params"))) {
 		PHALCON_CONCAT_SVS(return_value, "<?php $this->partial(", path, "); ?>");
 		RETURN_MM();
 	}
@@ -2621,7 +2622,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileSet){
 	/** 
 	 * A valid assigment list is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("assignments"))) {
+	if (!phalcon_array_isset_str(statement, SL("assignments"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2705,7 +2706,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileDo){
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("expr"))) {
+	if (!phalcon_array_isset_str(statement, SL("expr"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2741,7 +2742,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileReturn){
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("expr"))) {
+	if (!phalcon_array_isset_str(statement, SL("expr"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2774,7 +2775,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileAutoEscape){
 	/** 
 	 * A valid option is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("enable"))) {
+	if (!phalcon_array_isset_str(statement, SL("enable"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2820,7 +2821,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileMacro){
 	/** 
 	 * A valid name is required
 	 */
-	if (!phalcon_array_isset_str(statement, SS("name"))) {
+	if (!phalcon_array_isset_str(statement, SL("name"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
@@ -2847,7 +2848,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileMacro){
 
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<?php function vmacro_");
-	if (!phalcon_array_isset_str(statement, SS("parameters"))) {
+	if (!phalcon_array_isset_str(statement, SL("parameters"))) {
 		PHALCON_SCONCAT_VS(code, name, "() { ?>");
 	} else {
 		/** 
@@ -2884,7 +2885,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileMacro){
 	/** 
 	 * Block statements are allowed
 	 */
-	if (phalcon_array_isset_str(statement, SS("block_statements"))) {
+	if (phalcon_array_isset_str(statement, SL("block_statements"))) {
 		/** 
 		 * Get block statements
 		 */
@@ -2975,7 +2976,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 		/** 
 		 * Check if the statement is valid
 		 */
-		if (!phalcon_array_isset_str(statement, SS("type"))) {
+		if (!phalcon_array_isset_str(statement, SL("type"))) {
 			PHALCON_OBS_NVAR(line);
 			phalcon_array_fetch_str(&line, statement, SL("line"), PH_NOISY);
 
@@ -3060,7 +3061,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 				 */
 				PHALCON_OBS_NVAR(block_name);
 				phalcon_array_fetch_str(&block_name, statement, SL("name"), PH_NOISY);
-				if (phalcon_array_isset_str(statement, SS("block_statements"))) {
+				if (phalcon_array_isset_str(statement, SL("block_statements"))) {
 					PHALCON_OBS_NVAR(block_statements);
 					phalcon_array_fetch_str(&block_statements, statement, SL("block_statements"), PH_NOISY);
 				} else {
@@ -3552,7 +3553,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 		/** 
 		 * This makes that templates will be compiled always
 		 */
-		if (phalcon_array_isset_str(options, SS("compileAlways"))) {
+		if (phalcon_array_isset_str(options, SL("compileAlways"))) {
 
 			PHALCON_OBS_NVAR(compile_always);
 			phalcon_array_fetch_str(&compile_always, options, SL("compileAlways"), PH_NOISY);
@@ -3565,7 +3566,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 		/** 
 		 * Prefix is prepended to the template name
 		 */
-		if (phalcon_array_isset_str(options, SS("prefix"))) {
+		if (phalcon_array_isset_str(options, SL("prefix"))) {
 
 			PHALCON_OBS_NVAR(prefix);
 			phalcon_array_fetch_str(&prefix, options, SL("prefix"), PH_NOISY);
@@ -3578,7 +3579,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 		/** 
 		 * Compiled path is a directory where the compiled templates will be located
 		 */
-		if (phalcon_array_isset_str(options, SS("compiledPath"))) {
+		if (phalcon_array_isset_str(options, SL("compiledPath"))) {
 
 			PHALCON_OBS_NVAR(compiled_path);
 			phalcon_array_fetch_str(&compiled_path, options, SL("compiledPath"), PH_NOISY);
@@ -3593,7 +3594,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 		/** 
 		 * There is no compiled separator by default
 		 */
-		if (phalcon_array_isset_str(options, SS("compiledSeparator"))) {
+		if (phalcon_array_isset_str(options, SL("compiledSeparator"))) {
 
 			PHALCON_OBS_NVAR(compiled_separator);
 			phalcon_array_fetch_str(&compiled_separator, options, SL("compiledSeparator"), PH_NOISY);
@@ -3606,7 +3607,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 		/** 
 		 * By default the compile extension is .php
 		 */
-		if (phalcon_array_isset_str(options, SS("compiledExtension"))) {
+		if (phalcon_array_isset_str(options, SL("compiledExtension"))) {
 
 			PHALCON_OBS_NVAR(compiled_extension);
 			phalcon_array_fetch_str(&compiled_extension, options, SL("compiledExtension"), PH_NOISY);
@@ -3619,7 +3620,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 		/** 
 		 * Stat option assumes the compilation of the file
 		 */
-		if (phalcon_array_isset_str(options, SS("stat"))) {
+		if (phalcon_array_isset_str(options, SL("stat"))) {
 			PHALCON_OBS_NVAR(stat);
 			phalcon_array_fetch_str(&stat, options, SL("stat"), PH_NOISY);
 		}

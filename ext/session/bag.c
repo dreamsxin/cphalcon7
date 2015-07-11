@@ -334,7 +334,7 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 		zval *tmp, *name, *data, *session;
 
 		PHALCON_ALLOC_INIT_ZVAL(tmp);
-		Z_DELREF_P(tmp);
+		Z_TRY_DELREF_P(tmp);
 		phalcon_update_property_array(getThis(), SL("_data"), property, tmp);
 		return_value = tmp;
 

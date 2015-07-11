@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 				if (PHALCON_IS_NOT_EMPTY(file)) {
 					PHALCON_CALL_FUNCTION(&path_parts, "pathinfo", file);
 
-					if (phalcon_array_isset_str_fetch(&filename, path_parts, SS("filename")) && phalcon_array_isset_str_fetch(&basename, path_parts, SS("basename"))) {
+					if (phalcon_array_isset_str_fetch(&filename, path_parts, SL("filename")) && phalcon_array_isset_str_fetch(&basename, path_parts, SL("basename"))) {
 						PHALCON_CALL_FUNCTION(&filedata, "file_get_contents", file);
 
 						PHALCON_SCONCAT_SVS(body, "--", boundary, "\r\n");

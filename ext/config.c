@@ -306,7 +306,7 @@ PHP_METHOD(Phalcon_Config, merge){
 			 */
 			if (active_value) {
 				if ((Z_TYPE_P(value)  == IS_OBJECT || Z_TYPE_P(value) == IS_ARRAY) && Z_TYPE_P(active_value) == IS_OBJECT) {
-					if (phalcon_method_exists_ex(active_value, SS("merge")) == SUCCESS) { /* Path AAA in the test */
+					if (phalcon_method_exists_ex(active_value, SL("merge")) == SUCCESS) { /* Path AAA in the test */
 						zval *params[] = { value };
 						if (FAILURE == phalcon_call_method(NULL, active_value, "merge", 1, params)) {
 							break;
@@ -355,7 +355,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
-			if (Z_TYPE_P(value) == IS_OBJECT && phalcon_method_exists_ex(value, SS("toarray")) == SUCCESS) {
+			if (Z_TYPE_P(value) == IS_OBJECT && phalcon_method_exists_ex(value, SL("toarray")) == SUCCESS) {
 				zval *array_value = NULL;
 				if (SUCCESS == phalcon_call_method(&array_value, value, "toarray", 0, NULL)) {
 					phalcon_array_update_zval(return_value, &tmp, array_value, 0);

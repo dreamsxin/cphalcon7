@@ -124,10 +124,10 @@ PHP_METHOD(Phalcon_Flash, __construct){
 	if (Z_TYPE_P(css_classes) != IS_ARRAY) { 
 		PHALCON_INIT_NVAR(css_classes);
 		array_init_size(css_classes, 4);
-		add_assoc_stringl_ex(css_classes, SS("error"), SL("errorMessage"));
-		add_assoc_stringl_ex(css_classes, SS("notice"), SL("noticeMessage"));
-		add_assoc_stringl_ex(css_classes, SS("success"), SL("successMessage"));
-		add_assoc_stringl_ex(css_classes, SS("warning"), SL("warningMessage"));
+		add_assoc_stringl_ex(css_classes, SL("error"), SL("errorMessage"));
+		add_assoc_stringl_ex(css_classes, SL("notice"), SL("noticeMessage"));
+		add_assoc_stringl_ex(css_classes, SL("success"), SL("successMessage"));
+		add_assoc_stringl_ex(css_classes, SL("warning"), SL("warningMessage"));
 	}
 	phalcon_update_property_this(getThis(), SL("_cssClasses"), css_classes);
 	

@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Date, offset){
 		PHALCON_SEPARATE_PARAM(now);
 
 		PHALCON_INIT_VAR(format);
-		phalcon_get_class_constant(format, ce0, SS("RFC2822"));
+		phalcon_get_class_constant(format, ce0, SL("RFC2822"));
 
 		PHALCON_CALL_FUNCTION(&tmp, "date", format, now);
 
@@ -746,43 +746,43 @@ PHP_METHOD(Phalcon_Date, span){
 		timespan *= -1;
 	}
 
-	if (phalcon_array_isset_str(output, SS("years"))) {
+	if (phalcon_array_isset_str(output, SL("years"))) {
 		i = (int) floor(timespan / PHALCON_DATE_YEAR);
 		phalcon_array_update_string_long(output, SL("years"), i, 0);
 		timespan -= PHALCON_DATE_YEAR * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("months"))) {
+	if (phalcon_array_isset_str(output, SL("months"))) {
 		i = (int) floor(timespan / PHALCON_DATE_MONTH);
 		phalcon_array_update_string_long(output, SL("months"), i, 0);
 		timespan -= PHALCON_DATE_MONTH * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("weeks"))) {
+	if (phalcon_array_isset_str(output, SL("weeks"))) {
 		i = (int) floor(timespan / PHALCON_DATE_WEEK);
 		phalcon_array_update_string_long(output, SL("weeks"), i, 0);
 		timespan -= PHALCON_DATE_WEEK * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("days"))) {
+	if (phalcon_array_isset_str(output, SL("days"))) {
 		i = (int) floor(timespan / PHALCON_DATE_DAY);
 		phalcon_array_update_string_long(output, SL("days"), i, 0);
 		timespan -= PHALCON_DATE_DAY * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("hours"))) {
+	if (phalcon_array_isset_str(output, SL("hours"))) {
 		i = (int) floor(timespan / PHALCON_DATE_HOUR);
 		phalcon_array_update_string_long(output, SL("hours"), i, 0);
 		timespan -= PHALCON_DATE_HOUR * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("minutes"))) {
+	if (phalcon_array_isset_str(output, SL("minutes"))) {
 		i = (int) floor(timespan / PHALCON_DATE_MINUTE);
 		phalcon_array_update_string_long(output, SL("minutes"), i, 0);
 		timespan -= PHALCON_DATE_MINUTE * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("seconds"))) {
+	if (phalcon_array_isset_str(output, SL("seconds"))) {
 		phalcon_array_update_string_long(output, SL("seconds"), timespan, 0);
 	}
 
@@ -859,43 +859,43 @@ PHP_METHOD(Phalcon_Date, span2){
 		timespan *= -1;
 	}
 
-	if (phalcon_array_isset_str(output, SS("years"))) {
+	if (phalcon_array_isset_str(output, SL("years"))) {
 		i = (int) floor(timespan / PHALCON_DATE_YEAR);
 		phalcon_array_update_string_long(output, SL("years"), i, 0);
 		timespan -= PHALCON_DATE_YEAR * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("months"))) {
+	if (phalcon_array_isset_str(output, SL("months"))) {
 		i = (int) floor(timespan / PHALCON_DATE_MONTH);
 		phalcon_array_update_string_long(output, SL("months"), i, 0);
 		timespan -= PHALCON_DATE_MONTH * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("weeks"))) {
+	if (phalcon_array_isset_str(output, SL("weeks"))) {
 		i = (int) floor(timespan / PHALCON_DATE_WEEK);
 		phalcon_array_update_string_long(output, SL("weeks"), i, 0);
 		timespan -= PHALCON_DATE_WEEK * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("days"))) {
+	if (phalcon_array_isset_str(output, SL("days"))) {
 		i = (int) floor(timespan / PHALCON_DATE_DAY);
 		phalcon_array_update_string_long(output, SL("days"), i, 0);
 		timespan -= PHALCON_DATE_DAY * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("hours"))) {
+	if (phalcon_array_isset_str(output, SL("hours"))) {
 		i = (int) floor(timespan / PHALCON_DATE_HOUR);
 		phalcon_array_update_string_long(output, SL("hours"), i, 0);
 		timespan -= PHALCON_DATE_HOUR * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("minutes"))) {
+	if (phalcon_array_isset_str(output, SL("minutes"))) {
 		i = (int) floor(timespan / PHALCON_DATE_MINUTE);
 		phalcon_array_update_string_long(output, SL("minutes"), i, 0);
 		timespan -= PHALCON_DATE_MINUTE * i;
 	}
 
-	if (phalcon_array_isset_str(output, SS("seconds"))) {
+	if (phalcon_array_isset_str(output, SL("seconds"))) {
 		phalcon_array_update_string_long(output, SL("seconds"), timespan, 0);
 	}
 

@@ -158,12 +158,12 @@ PHP_METHOD(Phalcon_Db_Index, __set_state){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 	
-	if (!phalcon_array_isset_str_fetch(&index_name, data, SS("_indexName"))) {
+	if (!phalcon_array_isset_str_fetch(&index_name, data, SL("_indexName"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "_indexName parameter is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&columns, data, SS("_columns"))) {
+	if (!phalcon_array_isset_str_fetch(&columns, data, SL("_columns"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "_columns parameter is required");
 		return;
 	}

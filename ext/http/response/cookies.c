@@ -357,7 +357,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, has){
 	}
 
 	/* Check the superglobal */
-	_COOKIE = phalcon_get_global(SS("_COOKIE"));
+	_COOKIE = phalcon_get_global(SL("_COOKIE"));
 	RETURN_BOOL(phalcon_array_isset(_COOKIE, name));
 }
 
@@ -389,7 +389,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 		RETURN_MM_TRUE;
 	}
 
-	_COOKIE = phalcon_get_global(SS("_COOKIE"));
+	_COOKIE = phalcon_get_global(SL("_COOKIE"));
 	if (phalcon_array_isset(_COOKIE, name)) {
 		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 

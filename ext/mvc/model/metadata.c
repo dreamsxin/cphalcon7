@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 				/** 
 				 * Check if there is a method 'metaData' in the model to retrieve meta-data from it
 				 */
-				if (phalcon_method_exists_ex(model, SS("metadata")) == SUCCESS) {
+				if (phalcon_method_exists_ex(model, SL("metadata")) == SUCCESS) {
 					PHALCON_CALL_METHOD(&model_metadata, model, "metadata");
 					if (Z_TYPE_P(model_metadata) != IS_ARRAY) { 
 						PHALCON_INIT_VAR(exception_message);

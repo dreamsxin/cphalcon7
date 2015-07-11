@@ -113,10 +113,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
 	}
 
-	if (phalcon_array_isset_str(descriptor, SS("schema"))) {
+	if (phalcon_array_isset_str(descriptor, SL("schema"))) {
 		PHALCON_OBS_VAR(schema);
 		phalcon_array_fetch_str(&schema, descriptor, SL("schema"), PH_NOISY);
-		phalcon_array_unset_string(descriptor, SS("schema"), PH_SEPARATE);
+		phalcon_array_unset_string(descriptor, SL("schema"), PH_SEPARATE);
 
 		phalcon_update_property_this(getThis(), SL("_schema"), schema);
 	}
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		PHALCON_INIT_VAR(schema);
 	}
 
-	if (phalcon_array_isset_str_fetch(&password, descriptor, SS("password"))) {
+	if (phalcon_array_isset_str_fetch(&password, descriptor, SL("password"))) {
 		/* There is a bug in pdo_pgsql driver when the password is empty,
 		 * the driver tries to access invalid memory:
 		 *
@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), field) {
 		PHALCON_INIT_NVAR(definition);
 		array_init_size(definition, 1);
-		add_assoc_long_ex(definition, SS("bindType"), 2);
+		add_assoc_long_ex(definition, SL("bindType"), 2);
 
 		PHALCON_OBS_NVAR(char_size);
 		phalcon_array_fetch_long(&char_size, field, 2, PH_NOISY);

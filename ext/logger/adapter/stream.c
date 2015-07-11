@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_array_isset_str_fetch(&mode, options, SS("mode"))) {
+	if (phalcon_array_isset_str_fetch(&mode, options, SL("mode"))) {
 		if (phalcon_memnstr_str(mode, SL("r"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Stream must be opened in append or write mode");
 			return;

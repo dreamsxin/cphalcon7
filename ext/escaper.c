@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	/**
 	 * We require mbstring extension here
 	 */
-	if (phalcon_function_exists_ex(SS("mb_detect_encoding")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("mb_detect_encoding")) == FAILURE) {
 		RETURN_MM_NULL();
 	}
 
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Escaper, normalizeEncoding){
 	/**
 	 * mbstring is required here
 	 */
-	if (phalcon_function_exists_ex(SS("mb_convert_encoding")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("mb_convert_encoding")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_escaper_exception_ce, "Extension 'mbstring' is required");
 		return;
 	}

@@ -151,14 +151,14 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 		PHALCON_CPY_WRT_CTOR(parameters, options);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&tmp, parameters, SS("host"))) {
+	if (!phalcon_array_isset_str_fetch(&tmp, parameters, SL("host"))) {
 		phalcon_array_update_string_string(parameters, SL("host"), SL("127.0.0.1"), 0);
 	}
 	else {
 		convert_to_string(tmp);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&tmp, parameters, SS("port"))) {
+	if (!phalcon_array_isset_str_fetch(&tmp, parameters, SL("port"))) {
 		phalcon_array_update_string_long(parameters, SL("port"), 11300, 0);
 	}
 	else {
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 
 	parameters = phalcon_read_property(getThis(), SL("_parameters"), PH_NOISY);
 
-	if (!phalcon_array_isset_str_fetch(&host, parameters, SS("host")) || !phalcon_array_isset_str_fetch(&port, parameters, SS("port"))) {
+	if (!phalcon_array_isset_str_fetch(&host, parameters, SL("host")) || !phalcon_array_isset_str_fetch(&port, parameters, SL("port"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -252,17 +252,17 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	/** 
 	 * Priority is 100 by default
 	 */
-	if (!phalcon_array_isset_str_fetch(&priority, options, SS("priority"))) {
+	if (!phalcon_array_isset_str_fetch(&priority, options, SL("priority"))) {
 		PHALCON_INIT_VAR(priority);
 		ZVAL_STRING(priority, "100");
 	}
 
-	if (!phalcon_array_isset_str_fetch(&delay, options, SS("delay"))) {
+	if (!phalcon_array_isset_str_fetch(&delay, options, SL("delay"))) {
 		PHALCON_INIT_VAR(delay);
 		ZVAL_STRING(delay, "0");
 	}
 
-	if (!phalcon_array_isset_str_fetch(&ttr, options, SS("ttr"))) {
+	if (!phalcon_array_isset_str_fetch(&ttr, options, SL("ttr"))) {
 		PHALCON_INIT_VAR(ttr);
 		ZVAL_STRING(ttr, "86400");
 	}
@@ -701,7 +701,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		array_init_size(meta, 4);
 		if (php_stream_populate_meta_data(stream, meta)) {
 			zval *t;
-			if (phalcon_array_isset_str_fetch(&t, meta, SS("timed_out"))) {
+			if (phalcon_array_isset_str_fetch(&t, meta, SL("timed_out"))) {
 				timeout = zend_is_true(t);
 			}
 		}
@@ -824,8 +824,8 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 	params = phalcon_read_property(getThis(), SL("_parameters"), PH_NOISY);
 	if (
 			Z_TYPE_P(params) != IS_ARRAY
-		 || !phalcon_array_isset_str_fetch(&host, params, SS("host"))
-		 || !phalcon_array_isset_str_fetch(&port, params, SS("port"))
+		 || !phalcon_array_isset_str_fetch(&host, params, SL("host"))
+		 || !phalcon_array_isset_str_fetch(&port, params, SL("port"))
 	) {
 		fail = 1;
 	}

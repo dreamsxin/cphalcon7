@@ -539,11 +539,11 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			 * Check if the user has defined a different options to the default
 			 */
 			if (Z_TYPE_P(cache_options) == IS_ARRAY) { 
-				if (phalcon_array_isset_str(cache_options, SS("key"))) {
+				if (phalcon_array_isset_str(cache_options, SL("key"))) {
 					PHALCON_OBS_NVAR(key);
 					phalcon_array_fetch_str(&key, cache_options, SL("key"), PH_NOISY);
 				}
-				if (phalcon_array_isset_str(cache_options, SS("lifetime"))) {
+				if (phalcon_array_isset_str(cache_options, SL("lifetime"))) {
 					PHALCON_OBS_NVAR(lifetime);
 					phalcon_array_fetch_str(&lifetime, cache_options, SL("lifetime"), PH_NOISY);
 				}
@@ -744,7 +744,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 
 	cache_options = phalcon_read_property(getThis(), SL("_cacheOptions"), PH_NOISY);
 	if (Z_TYPE_P(cache_options) == IS_ARRAY) { 
-		if (phalcon_array_isset_str(cache_options, SS("service"))) {
+		if (phalcon_array_isset_str(cache_options, SL("service"))) {
 			PHALCON_OBS_NVAR(cache_service);
 			phalcon_array_fetch_str(&cache_service, cache_options, SL("service"), PH_NOISY);
 		}

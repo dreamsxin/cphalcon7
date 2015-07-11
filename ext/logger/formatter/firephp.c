@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 * their reference count set to 1 and therefore they can be nicely
 	 * put into the result array; when that array will be destroyed,
 	 * all inserted variables will be automatically destroyed, too
-	 * and we will just save some time by not using Z_ADDREF_P and Z_DELREF_P
+	 * and we will just save some time by not using Z_TRY_ADDREF_P and Z_TRY_DELREF_P
 	 */
 
 	if (Z_TYPE_P(context) == IS_ARRAY) {
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	}
 	else {
 		interpolated = message;
-		Z_ADDREF_P(interpolated);
+		Z_TRY_ADDREF_P(interpolated);
 	}
 
 	{
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 					 * Calls to Zend internal functions will have "file" index not set.
 					 * We remove these entries from the array.
 					 */
-					if (!found && !zend_hash_str_exists(Z_ARRVAL_P(pzval), SS("file"))) {
+					if (!found && !zend_hash_str_exists(Z_ARRVAL_P(pzval), SL("file"))) {
 						zend_hash_index_del(ht, idx);
 					} else {
 						/*
@@ -226,8 +226,8 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 						 * too much information; this is not suitable to send
 						 * in the HTTP headers
 						 */
-						zend_hash_str_del(Z_ARRVAL_P(pzval), SS("args"));
-						zend_hash_str_del(Z_ARRVAL_P(pzval), SS("object"));
+						zend_hash_str_del(Z_ARRVAL_P(pzval), SL("args"));
+						zend_hash_str_del(Z_ARRVAL_P(pzval), SL("object"));
 						found = 1;
 					}
 				}
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
 	PHALCON_ALLOC_INIT_ZVAL(meta);
 	array_init_size(meta, 4);
-	add_assoc_zval_ex(meta, SS("Type"), type_str);
+	add_assoc_zval_ex(meta, SL("Type"), type_str);
 
 	if (i_show_backtrace && Z_TYPE_P(backtrace) == IS_ARRAY) {
 		zval *pzval;
@@ -256,23 +256,23 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 		if (likely((pzval = zend_hash_index_find(Z_ARRVAL_P(backtrace), 0)) != NULL) && likely(Z_TYPE_P(pzval) == IS_ARRAY)) {
 			zval *file, *line;
 
-			file = zend_hash_str_find(Z_ARRVAL_P(pzval), SS("file"));
-			line = zend_hash_str_find(Z_ARRVAL_P(pzval), SS("line"));
+			file = zend_hash_str_find(Z_ARRVAL_P(pzval), SL("file"));
+			line = zend_hash_str_find(Z_ARRVAL_P(pzval), SL("line"));
 
 			if (likely(file != NULL)) {
-				Z_ADDREF_P(file);
-				add_assoc_zval_ex(meta, SS("File"), file);
+				Z_TRY_ADDREF_P(file);
+				add_assoc_zval_ex(meta, SL("File"), file);
 			}
 
 			if (likely(line != NULL)) {
-				Z_ADDREF_P(line);
-				add_assoc_zval_ex(meta, SS("Line"), line);
+				Z_TRY_ADDREF_P(line);
+				add_assoc_zval_ex(meta, SL("Line"), line);
 			}
 		}
 	}
 
 	if (i_enable_labels) {
-		add_assoc_zval_ex(meta, SS("Label"), interpolated);
+		add_assoc_zval_ex(meta, SL("Label"), interpolated);
 	}
 
 	if (!i_enable_labels && !i_show_backtrace) {
@@ -287,11 +287,11 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 		array_init_size(body, 2);
 
 		if (i_show_backtrace) {
-			add_assoc_zval_ex(body, SS("backtrace"), backtrace);
+			add_assoc_zval_ex(body, SL("backtrace"), backtrace);
 		}
 
 		if (!i_enable_labels) {
-			add_assoc_zval_ex(body, SS("message"), interpolated);
+			add_assoc_zval_ex(body, SL("message"), interpolated);
 		}
 	}
 

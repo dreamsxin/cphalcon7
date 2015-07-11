@@ -770,7 +770,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 		type = zbar_get_symbol_name(symbol_type);
 		quality = zbar_symbol_get_quality(symbol);
 
-        if (phalcon_function_exists_ex(SS("mb_convert_encoding")) == SUCCESS) {
+        if (phalcon_function_exists_ex(SL("mb_convert_encoding")) == SUCCESS) {
 			PHALCON_INIT_NVAR(fromtext);
 			ZVAL_STRING(fromtext, data);
 

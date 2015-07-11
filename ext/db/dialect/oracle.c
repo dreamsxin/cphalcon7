@@ -453,7 +453,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, createView){
 
 	phalcon_fetch_params(1, 3, 0, &view_name, &definition, &schema_name);
 	
-	if (!phalcon_array_isset_str(definition, SS("sql"))) {
+	if (!phalcon_array_isset_str(definition, SL("sql"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
 		return;
 	}
@@ -836,12 +836,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SELECT definition");
 		return;
 	}
-	if (!phalcon_array_isset_str(definition, SS("tables"))) {
+	if (!phalcon_array_isset_str(definition, SL("tables"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
 		return;
 	}
 
-	if (!phalcon_array_isset_str(definition, SS("columns"))) {
+	if (!phalcon_array_isset_str(definition, SL("columns"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
 		return;
 	}
@@ -953,7 +953,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	}
 
 	PHALCON_INIT_VAR(sql);
-	if (phalcon_array_isset_str_fetch(&distinct, definition, SS("distinct"))) {
+	if (phalcon_array_isset_str_fetch(&distinct, definition, SL("distinct"))) {
 		assert(Z_TYPE_P(distinct) == IS_LONG);
 		if (Z_LVAL_P(distinct) == 0) {
 			ZVAL_STRING(sql, "SELECT ALL ");
@@ -974,7 +974,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	/**
 	 * Check for joins
 	 */
-	if (phalcon_array_isset_str(definition, SS("joins"))) {
+	if (phalcon_array_isset_str(definition, SL("joins"))) {
 
 		PHALCON_OBS_VAR(joins);
 		phalcon_array_fetch_str(&joins, definition, SL("joins"), PH_NOISY);
@@ -995,7 +995,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 			/**
 			 * Check if the join has conditions
 			 */
-			if (phalcon_array_isset_str(join, SS("conditions"))) {
+			if (phalcon_array_isset_str(join, SL("conditions"))) {
 
 				PHALCON_OBS_NVAR(join_conditions_array);
 				phalcon_array_fetch_str(&join_conditions_array, join, SL("conditions"), PH_NOISY);
@@ -1022,7 +1022,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	/**
 	 * Check for a WHERE clause
 	 */
-	if (phalcon_array_isset_str(definition, SS("where"))) {
+	if (phalcon_array_isset_str(definition, SL("where"))) {
 
 		PHALCON_OBS_VAR(where_conditions);
 		phalcon_array_fetch_str(&where_conditions, definition, SL("where"), PH_NOISY);
@@ -1037,7 +1037,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	/**
 	 * Check for a GROUP clause
 	 */
-	if (phalcon_array_isset_str(definition, SS("group"))) {
+	if (phalcon_array_isset_str(definition, SL("group"))) {
 
 		PHALCON_INIT_VAR(group_items);
 		array_init(group_items);
@@ -1061,7 +1061,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	/**
 	 * Check for a HAVING clause
 	 */
-	if (phalcon_array_isset_str(definition, SS("having"))) {
+	if (phalcon_array_isset_str(definition, SL("having"))) {
 		PHALCON_OBS_VAR(having_conditions);
 		phalcon_array_fetch_str(&having_conditions, definition, SL("having"), PH_NOISY);
 
@@ -1072,7 +1072,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	/**
 	 * Check for a ORDER clause
 	 */
-	if (phalcon_array_isset_str(definition, SS("order"))) {
+	if (phalcon_array_isset_str(definition, SL("order"))) {
 
 		PHALCON_OBS_VAR(order_fields);
 		phalcon_array_fetch_str(&order_fields, definition, SL("order"), PH_NOISY);
@@ -1112,13 +1112,13 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	 * Unfortunately because we use the column wildcard "*",
 	 * this puts an extra column into the query result set.
 	 */
-	if (phalcon_array_isset_str_fetch(&limit_value, definition, SS("limit"))) {
+	if (phalcon_array_isset_str_fetch(&limit_value, definition, SL("limit"))) {
 		if (likely(Z_TYPE_P(limit_value) == IS_ARRAY)) {
-			if (likely(phalcon_array_isset_str_fetch(&number, limit_value, SS("number")))) {
+			if (likely(phalcon_array_isset_str_fetch(&number, limit_value, SL("number")))) {
 				PHALCON_OBS_NVAR(tmp1);
 				phalcon_array_fetch_str(&tmp1, number, SL("value"), PH_NOISY);
 
-				if (phalcon_array_isset_str_fetch(&offset, limit_value, SS("offset"))) {
+				if (phalcon_array_isset_str_fetch(&offset, limit_value, SL("offset"))) {
 					PHALCON_OBS_NVAR(tmp2);
 					phalcon_array_fetch_str(&tmp2, offset, SL("value"), PH_NOISY);
 				} else {

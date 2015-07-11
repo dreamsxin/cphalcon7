@@ -218,7 +218,7 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 #define PHALCON_GET_HVALUE(var) \
 	PHALCON_OBS_NVAR(var); \
 	var = *hd; \
-	Z_ADDREF_P(var);
+	Z_TRY_ADDREF_P(var);
 
 /** class/interface registering */
 #define PHALCON_REGISTER_CLASS(ns, class_name, name, methods, flags) \

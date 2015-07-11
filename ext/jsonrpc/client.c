@@ -149,21 +149,21 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call){
 		PHALCON_CALL_FUNCTION(&json, "json_decode", body, &PHALCON_GLOBAL(z_true));
 
 		if (Z_TYPE_P(json) == IS_ARRAY) {
-			if (phalcon_array_isset_str(json, SS("id"))) {
+			if (phalcon_array_isset_str(json, SL("id"))) {
 				PHALCON_OBS_VAR(id);
 				phalcon_array_fetch_str(&id, json, SL("id"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(NULL, jsonrpc_response, "setid", id);
 			}
 
-			if (phalcon_array_isset_str(json, SS("result"))) {
+			if (phalcon_array_isset_str(json, SL("result"))) {
 				PHALCON_OBS_VAR(result);
 				phalcon_array_fetch_str(&result, json, SL("result"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(NULL, jsonrpc_response, "setresult", result);
 			}
 
-			if (phalcon_array_isset_str(json, SS("error"))) {
+			if (phalcon_array_isset_str(json, SL("error"))) {
 				PHALCON_OBS_VAR(error);
 				phalcon_array_fetch_str(&error, json, SL("error"), PH_NOISY);
 

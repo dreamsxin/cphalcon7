@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, bindTypes) {
 
 		phalcon_update_property_this(getThis(), SL("_bindTypes"), merged_types);
 	} else {
-		phalcon_update_property_this(getThis(), SS("_bindTypes"), bind_types);
+		phalcon_update_property_this(getThis(), SL("_bindTypes"), bind_types);
 	}
 
 	RETURN_THIS();
@@ -1971,7 +1971,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
 			PHALCON_OBS_VAR(number);
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_str_fetch(&offset, limit, SS("offset")) && Z_TYPE_P(offset) != IS_NULL) {
+			if (phalcon_array_isset_str_fetch(&offset, limit, SL("offset")) && Z_TYPE_P(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", number, " OFFSET ", offset);
 			} else {
 				PHALCON_SCONCAT_SV(phql, " LIMIT ", number);
@@ -2301,7 +2301,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
 			PHALCON_OBS_VAR(number);
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_str_fetch(&offset, limit, SS("offset")) && Z_TYPE_P(offset) != IS_NULL) {
+			if (phalcon_array_isset_str_fetch(&offset, limit, SL("offset")) && Z_TYPE_P(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", number, " OFFSET ", offset);
 			} else {
 				PHALCON_SCONCAT_SV(phql, " LIMIT ", number);
@@ -2476,7 +2476,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
 			PHALCON_OBS_VAR(number);
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_str_fetch(&offset, limit, SS("offset")) && Z_TYPE_P(offset) != IS_NULL) {
+			if (phalcon_array_isset_str_fetch(&offset, limit, SL("offset")) && Z_TYPE_P(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", number, " OFFSET ", offset);
 			} else {
 				PHALCON_SCONCAT_SV(phql, " LIMIT ", number);

@@ -39,6 +39,7 @@ typedef struct _phalcon_memory_entry {
 	size_t pointer;
 	size_t capacity;
 	zval ***addresses;
+	const int *lines;
 	size_t hash_pointer;
 	size_t hash_capacity;
 	zval ***hash_addresses;
@@ -146,12 +147,13 @@ extern zend_module_entry phalcon_module_entry;
 #define phpext_phalcon_ptr &phalcon_module_entry
 
 #define PHALCON_ALLOC_ZVAL(z)             \
-	(z) = (zval *) emalloc(sizeof(zval));
+	(z) = (zval *) emalloc(sizeof(zval)); \
 
 #define PHALCON_ALLOC_INIT_ZVAL(z)        \
-	PHALCON_ALLOC_ZVAL(z);		          \
-	Z_SET_REFCOUNT_P(z, 1);               \
-	ZVAL_UNDEF(z);
+	PHALCON_ALLOC_ZVAL(z);                \
+	INIT_ZVAL(*z);
+
+#define INIT_ZVAL(z) z = EG(uninitialized_zval);
 
 #ifndef INIT_PZVAL
 #	define INIT_PZVAL(z)         \
@@ -170,15 +172,6 @@ extern zend_module_entry phalcon_module_entry;
 #	define ZVAL_COPY_VALUE(z, v)  \
 		(z)->value  = (v)->value; \
 		Z_TYPE_P(z) = Z_TYPE_P(v);
-#endif
-
-#define Z_REFCOUNT_PP(ppz)				Z_REFCOUNT_P(*(ppz))
-#define Z_SET_REFCOUNT_PP(ppz, rc)		Z_SET_REFCOUNT_P(*(ppz), rc)
-#define Z_ADDREF_PP(ppz)				Z_ADDREF_P(*(ppz))
-#define Z_DELREF_PP(ppz)				Z_DELREF_P(*(ppz))
-
-#ifndef HASH_KEY_NON_EXISTENT
-#	define HASH_KEY_NON_EXISTENT    HASH_KEY_NON_EXISTANT
 #endif
 
 #define PHALCON_INIT_CLASS(name) \

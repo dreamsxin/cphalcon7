@@ -385,7 +385,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/* An array module definition contains a path to a module definition class */
 		if (Z_TYPE_P(module) == IS_ARRAY) { 
 			/* Class name used to load the module definition */
-			if (phalcon_array_isset_str(module, SS("className"))) {
+			if (phalcon_array_isset_str(module, SL("className"))) {
 				PHALCON_OBS_VAR(class_name);
 				phalcon_array_fetch_str(&class_name, module, SL("className"), PH_NOISY);
 			} else {
@@ -394,7 +394,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			}
 
 			/* If the developer has specified a path, try to include the file */
-			if (phalcon_array_isset_str(module, SS("path"))) {
+			if (phalcon_array_isset_str(module, SL("path"))) {
 
 				PHALCON_OBS_VAR(path);
 				phalcon_array_fetch_str(&path, module, SL("path"), PH_NOISY);

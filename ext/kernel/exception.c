@@ -31,7 +31,7 @@
  * Throws a zval object as exception
  */
 void phalcon_throw_exception(zval *object){
-	Z_ADDREF_P(object);
+	Z_TRY_ADDREF_P(object);
 	zend_throw_exception_object(object);
 }
 
@@ -53,7 +53,7 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 		exception = object;
 	}
 
-	Z_ADDREF_P(exception);
+	Z_TRY_ADDREF_P(exception);
 
 	if (line > 0) {
 		PHALCON_CALL_METHOD(&curline, exception, "getline");

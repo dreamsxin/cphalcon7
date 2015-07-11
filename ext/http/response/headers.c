@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 	
 	PHALCON_INIT_VAR(headers);
 	object_init_ex(headers, phalcon_http_response_headers_ce);
-	if (phalcon_array_isset_str(data, SS("_headers"))) {
+	if (phalcon_array_isset_str(data, SL("_headers"))) {
 	
 		PHALCON_OBS_VAR(data_headers);
 		phalcon_array_fetch_str(&data_headers, data, SL("_headers"), PH_NOISY);

@@ -74,12 +74,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 	
 	if (PHALCON_IS_STRING(type, "beforeDelete")) {
 		PHALCON_CALL_METHOD(&options, getThis(), "getoptions");
-		if (!phalcon_array_isset_str(options, SS("value"))) {
+		if (!phalcon_array_isset_str(options, SL("value"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'value' is required");
 			return;
 		}
 	
-		if (!phalcon_array_isset_str(options, SS("field"))) {
+		if (!phalcon_array_isset_str(options, SL("field"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'field' is required");
 			return;
 		}

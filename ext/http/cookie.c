@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 	if (PHALCON_IS_FALSE(readed)) {
 		name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
 
-		_COOKIE = phalcon_get_global(SS("_COOKIE"));
+		_COOKIE = phalcon_get_global(SL("_COOKIE"));
 		if (phalcon_array_isset_fetch(&value, _COOKIE, name)) {
 			encryption = phalcon_read_property(getThis(), SL("_useEncryption"), PH_NOISY);
 			if (zend_is_true(encryption)) {
@@ -460,30 +460,30 @@ PHP_METHOD(Phalcon_Http_Cookie, restore){
 
 			PHALCON_CALL_METHOD(&definition, session, "get", key);
 			if (Z_TYPE_P(definition) == IS_ARRAY) { 
-				if (phalcon_array_isset_str(definition, SS("expire"))) {
+				if (phalcon_array_isset_str(definition, SL("expire"))) {
 					PHALCON_OBS_VAR(expire);
 					phalcon_array_fetch_str(&expire, definition, SL("expire"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_expire"), expire);
 				}
-				if (phalcon_array_isset_str(definition, SS("domain"))) {
+				if (phalcon_array_isset_str(definition, SL("domain"))) {
 					PHALCON_OBS_VAR(domain);
 					phalcon_array_fetch_str(&domain, definition, SL("domain"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_domain"), domain);
 				}
 
-				if (phalcon_array_isset_str(definition, SS("path"))) {
+				if (phalcon_array_isset_str(definition, SL("path"))) {
 					PHALCON_OBS_VAR(path);
 					phalcon_array_fetch_str(&path, definition, SL("path"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_path"), path);
 				}
 
-				if (phalcon_array_isset_str(definition, SS("secure"))) {
+				if (phalcon_array_isset_str(definition, SL("secure"))) {
 					PHALCON_OBS_VAR(secure);
 					phalcon_array_fetch_str(&secure, definition, SL("secure"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_secure"), secure);
 				}
 
-				if (phalcon_array_isset_str(definition, SS("httpOnly"))) {
+				if (phalcon_array_isset_str(definition, SL("httpOnly"))) {
 					PHALCON_OBS_VAR(http_only);
 					phalcon_array_fetch_str(&http_only, definition, SL("httpOnly"), PH_NOISY);
 					phalcon_update_property_this(getThis(), SL("_httpOnly"), http_only);
@@ -809,7 +809,7 @@ PHP_METHOD(Phalcon_Http_Cookie, __toString){
 				ZVAL_OBJ(&e, EG(exception));
 				zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
 
-				Z_ADDREF_P(m);
+				Z_TRY_ADDREF_P(m);
 				if (Z_TYPE_P(m) != IS_STRING) {
 					convert_to_string_ex(m);
 				}

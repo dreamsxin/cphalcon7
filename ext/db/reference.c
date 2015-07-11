@@ -108,32 +108,32 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 	phalcon_fetch_params(0, 2, 0, &reference_name, &definition);
 	
 	phalcon_update_property_this(getThis(), SL("_referenceName"), reference_name);
-	if (phalcon_array_isset_str_fetch(&referenced_table, definition, SS("referencedTable"))) {
+	if (phalcon_array_isset_str_fetch(&referenced_table, definition, SL("referencedTable"))) {
 		phalcon_update_property_this(getThis(), SL("_referencedTable"), referenced_table);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Referenced table is required");
 		return;
 	}
 	
-	if (phalcon_array_isset_str_fetch(&columns, definition, SS("columns"))) {
+	if (phalcon_array_isset_str_fetch(&columns, definition, SL("columns"))) {
 		phalcon_update_property_this(getThis(), SL("_columns"), columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Foreign key columns are required");
 		return;
 	}
 	
-	if (phalcon_array_isset_str_fetch(&referenced_columns, definition, SS("referencedColumns"))) {
+	if (phalcon_array_isset_str_fetch(&referenced_columns, definition, SL("referencedColumns"))) {
 		phalcon_update_property_this(getThis(), SL("_referencedColumns"), referenced_columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Referenced columns of the foreign key are required");
 		return;
 	}
 	
-	if (phalcon_array_isset_str_fetch(&schema, definition, SS("schema"))) {
+	if (phalcon_array_isset_str_fetch(&schema, definition, SL("schema"))) {
 		phalcon_update_property_this(getThis(), SL("_schemaName"), schema);
 	}
 	
-	if (phalcon_array_isset_str_fetch(&referenced_schema, definition, SS("referencedSchema"))) {
+	if (phalcon_array_isset_str_fetch(&referenced_schema, definition, SL("referencedSchema"))) {
 		phalcon_update_property_this(getThis(), SL("_referencedSchema"), referenced_schema);
 	}
 	
@@ -226,24 +226,24 @@ PHP_METHOD(Phalcon_Db_Reference, __set_state){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 	
-	if (!phalcon_array_isset_str_fetch(&constraint_name, data, SS("_referenceName"))) {
+	if (!phalcon_array_isset_str_fetch(&constraint_name, data, SL("_referenceName"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "_referenceName parameter is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&referenced_schema, data, SS("_referencedSchema"))) {
+	if (!phalcon_array_isset_str_fetch(&referenced_schema, data, SL("_referencedSchema"))) {
 		referenced_schema = &PHALCON_GLOBAL(z_null);
 	}
 	
-	if (!phalcon_array_isset_str_fetch(&referenced_table, data, SS("_referencedTable"))) {
+	if (!phalcon_array_isset_str_fetch(&referenced_table, data, SL("_referencedTable"))) {
 		referenced_table = &PHALCON_GLOBAL(z_null);
 	}
 	
-	if (!phalcon_array_isset_str_fetch(&columns, data, SS("_columns"))) {
+	if (!phalcon_array_isset_str_fetch(&columns, data, SL("_columns"))) {
 		columns = &PHALCON_GLOBAL(z_null);
 	}
 	
-	if (!phalcon_array_isset_str_fetch(&referenced_columns, data, SS("_referencedColumns"))) {
+	if (!phalcon_array_isset_str_fetch(&referenced_columns, data, SL("_referencedColumns"))) {
 		referenced_columns = &PHALCON_GLOBAL(z_null);
 	}
 

@@ -683,7 +683,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 			/** 
 			 * We only can delete resultsets whose every element is a complete object
 			 */
-			if (phalcon_method_exists_ex(record, SS("getwriteconnection")) == FAILURE) {
+			if (phalcon_method_exists_ex(record, SL("getwriteconnection")) == FAILURE) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "The returned record is not valid");
 				return;
 			}
@@ -841,7 +841,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 			/** 
 			 * We only can update resultsets whose every element is a complete object
 			 */
-			if (phalcon_method_exists_ex(record, SS("getwriteconnection")) == FAILURE) {
+			if (phalcon_method_exists_ex(record, SL("getwriteconnection")) == FAILURE) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "The returned record is not valid");
 				return;
 			}

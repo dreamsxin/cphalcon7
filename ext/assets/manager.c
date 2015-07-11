@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_str_fetch(&collection, collections, SS("css"))) {
+	if (!phalcon_array_isset_str_fetch(&collection, collections, SL("css"))) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		return;
 	}
@@ -474,7 +474,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getJs){
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_str_fetch(&collection, collections, SS("js"))) {
+	if (!phalcon_array_isset_str_fetch(&collection, collections, SL("js"))) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		return;
 	}
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/** 
 			 * The source base path is a global location where all resources are located
 			 */
-			if (phalcon_array_isset_str(options, SS("sourceBasePath"))) {
+			if (phalcon_array_isset_str(options, SL("sourceBasePath"))) {
 				PHALCON_OBS_NVAR(source_base_path);
 				phalcon_array_fetch_str(&source_base_path, options, SL("sourceBasePath"), PH_NOISY);
 			}
@@ -582,7 +582,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/** 
 			 * The target base path is a global location where all resources are written
 			 */
-			if (phalcon_array_isset_str(options, SS("targetBasePath"))) {
+			if (phalcon_array_isset_str(options, SL("targetBasePath"))) {
 				PHALCON_OBS_NVAR(target_base_path);
 				phalcon_array_fetch_str(&target_base_path, options, SL("targetBasePath"), PH_NOISY);
 			}

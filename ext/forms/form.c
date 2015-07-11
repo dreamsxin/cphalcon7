@@ -402,7 +402,7 @@ PHP_METHOD(Phalcon_Forms_Form, __construct){
 	/**
 	 * Check for an 'initialize' method and call it
 	 */
-	if (phalcon_method_exists_ex(getThis(), SS("initialize")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("initialize")) == SUCCESS) {
 		PHALCON_MM_GROW();
 		PHALCON_CALL_METHOD(NULL, getThis(), "initialize", entity, user_options);
 		PHALCON_MM_RESTORE();
@@ -718,7 +718,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 	/**
 	 * Check if there is a method 'beforeValidation'
 	 */
-	if (phalcon_method_exists_ex(getThis(), SS("beforevalidation")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("beforevalidation")) == SUCCESS) {
 		PHALCON_CALL_METHOD(&status, getThis(), "beforevalidation", data, entity);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_CTOR(status);
@@ -798,7 +798,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 	/**
 	 * Check if there is a method 'afterValidation'
 	 */
-	if (phalcon_method_exists_ex(getThis(), SS("aftervalidation")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("aftervalidation")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "aftervalidation", messages);
 	}
 

@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 		}
 
 		PHALCON_CALL_METHOD(&current, getThis(), "current");
-		if (Z_TYPE_P(current) == IS_OBJECT && phalcon_method_exists_ex(current, SS("toarray")) == SUCCESS) {
+		if (Z_TYPE_P(current) == IS_OBJECT && phalcon_method_exists_ex(current, SL("toarray")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&arr, current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
 			phalcon_array_append(records, arr, 0);
 		} else {

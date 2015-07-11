@@ -1074,16 +1074,16 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		 * Check if the user has defined a different options to the default
 		 */
 		if (Z_TYPE_P(view_options) == IS_ARRAY) { 
-			if (phalcon_array_isset_str(view_options, SS("cache"))) {
+			if (phalcon_array_isset_str(view_options, SL("cache"))) {
 
 				PHALCON_OBS_VAR(cache_options);
 				phalcon_array_fetch_str(&cache_options, view_options, SL("cache"), PH_NOISY);
 				if (Z_TYPE_P(cache_options) == IS_ARRAY) { 
-					if (phalcon_array_isset_str(cache_options, SS("key"))) {
+					if (phalcon_array_isset_str(cache_options, SL("key"))) {
 						PHALCON_OBS_NVAR(key);
 						phalcon_array_fetch_str(&key, cache_options, SL("key"), PH_NOISY);
 					}
-					if (phalcon_array_isset_str(cache_options, SS("lifetime"))) {
+					if (phalcon_array_isset_str(cache_options, SL("lifetime"))) {
 						PHALCON_OBS_NVAR(lifetime);
 						phalcon_array_fetch_str(&lifetime, cache_options, SL("lifetime"), PH_NOISY);
 					}
@@ -1298,7 +1298,7 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 	if (Z_TYPE_P(engines) != IS_ARRAY) {
 		PHALCON_ALLOC_INIT_ZVAL(engines);
 		array_init_size(engines, 1);
-		add_assoc_stringl_ex(engines, SS(".phtml"), (char*)phalcon_mvc_view_engine_php_ce->name->val, phalcon_mvc_view_engine_php_ce->name->len);
+		add_assoc_stringl_ex(engines, SL(".phtml"), (char*)phalcon_mvc_view_engine_php_ce->name->val, phalcon_mvc_view_engine_php_ce->name->len);
 		phalcon_update_property_this(getThis(), SL("_registeredEngines"), engines);
 		assert(Z_REFCOUNT_P(engines) > 1);
 		zval_ptr_dtor(engines);
@@ -1950,12 +1950,12 @@ PHP_METHOD(Phalcon_Mvc_View, _createCache){
 
 	view_options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (Z_TYPE_P(view_options) == IS_ARRAY) { 
-		if (phalcon_array_isset_str(view_options, SS("cache"))) {
+		if (phalcon_array_isset_str(view_options, SL("cache"))) {
 
 			PHALCON_OBS_VAR(cache_options);
 			phalcon_array_fetch_str(&cache_options, view_options, SL("cache"), PH_NOISY);
 			if (Z_TYPE_P(cache_options) == IS_ARRAY) { 
-				if (phalcon_array_isset_str(cache_options, SS("service"))) {
+				if (phalcon_array_isset_str(cache_options, SL("service"))) {
 					PHALCON_OBS_NVAR(cache_service);
 					phalcon_array_fetch_str(&cache_service, cache_options, SL("service"), PH_NOISY);
 				}
@@ -2050,7 +2050,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 		/** 
 		 * Get the default cache options
 		 */
-		if (phalcon_array_isset_str(view_options, SS("cache"))) {
+		if (phalcon_array_isset_str(view_options, SL("cache"))) {
 			PHALCON_OBS_VAR(cache_options);
 			phalcon_array_fetch_str(&cache_options, view_options, SL("cache"), PH_NOISY);
 		} else {
@@ -2070,7 +2070,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 		/** 
 		 * Check if the user has defined a default cache level or use 5 as default
 		 */
-		if (phalcon_array_isset_str(cache_options, SS("level"))) {
+		if (phalcon_array_isset_str(cache_options, SL("level"))) {
 			PHALCON_OBS_VAR(cache_level);
 			phalcon_array_fetch_str(&cache_level, cache_options, SL("level"), PH_NOISY);
 			phalcon_update_property_this(getThis(), SL("_cacheLevel"), cache_level);
@@ -2078,7 +2078,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 			phalcon_update_property_long(getThis(), SL("_cacheLevel"), 5);
 		}
 
-		if (phalcon_array_isset_str(cache_options, SS("mode"))) {
+		if (phalcon_array_isset_str(cache_options, SL("mode"))) {
 			PHALCON_OBS_VAR(cache_mode);
 			phalcon_array_fetch_str(&cache_mode, cache_options, SL("mode"), PH_NOISY);
 			phalcon_update_property_this(getThis(), SL("_cacheMode"), cache_mode);

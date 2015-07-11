@@ -271,7 +271,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 
 	/* Update the shared instance if the service is shared */
 	if (zend_is_true(shared)) {
-		Z_ADDREF_P(instance);
+		Z_TRY_ADDREF_P(instance);
 		phalcon_update_property_this(getThis(), SL("_sharedInstance"), shared_instance);
 	}
 
@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 	}
 
 	/* Update the parameter */
-	if (phalcon_array_isset_str_fetch(&arguments, definition, SS("arguments"))) {
+	if (phalcon_array_isset_str_fetch(&arguments, definition, SL("arguments"))) {
 		phalcon_array_update_zval(arguments, position, parameter, PH_COPY);
 	} else {
 		PHALCON_ALLOC_INIT_ZVAL(arguments);
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_DI_Service, getParameter){
 
 	/* Update the parameter */
 	if (
-		phalcon_array_isset_str_fetch(&arguments, definition, SS("arguments")) &&
+		phalcon_array_isset_str_fetch(&arguments, definition, SL("arguments")) &&
 		phalcon_array_isset_fetch(&parameter, arguments, position)
 	) {
 		RETURN_ZVAL(parameter, 1, 0);
@@ -375,9 +375,9 @@ PHP_METHOD(Phalcon_DI_Service, __set_state){
 	phalcon_fetch_params(1, 1, 0, &attributes);
 
 	if (
-			!phalcon_array_isset_str_fetch(&name, attributes, SS("_name"))
-		 || !phalcon_array_isset_str_fetch(&definition, attributes, SS("_definition"))
-		 || !phalcon_array_isset_str_fetch(&shared, attributes, SS("_shared"))
+			!phalcon_array_isset_str_fetch(&name, attributes, SL("_name"))
+		 || !phalcon_array_isset_str_fetch(&definition, attributes, SL("_definition"))
+		 || !phalcon_array_isset_str_fetch(&shared, attributes, SL("_shared"))
 	) {
 		PHALCON_THROW_EXCEPTION_STR(spl_ce_BadMethodCallException, "Bad parameters passed to Phalcon\\DI\\Service::__set_state()");
 		return;

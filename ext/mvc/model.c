@@ -596,7 +596,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 	 * This allows the developer to execute initialization stuff every time an instance
 	 * is created
 	 */
-	if (phalcon_method_exists_ex(getThis(), SS("onconstruct")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("onconstruct")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "onconstruct");
 	}
 
@@ -1077,7 +1077,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 		RETURN_MM();
 	}
 
-	if (phalcon_method_exists_ex(getThis(), SS("selectreadconnection")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("selectreadconnection")) == SUCCESS) {
 		PHALCON_CALL_METHOD(&connection, getThis(), "selectreadconnection", intermediate, bind_params, bind_types);
 		if (Z_TYPE_P(connection) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectReadConnection' didn't returned a valid connection");
@@ -1132,7 +1132,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 		RETURN_MM();
 	}
 
-	if (phalcon_method_exists_ex(getThis(), SS("selectwriteconnection")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("selectwriteconnection")) == SUCCESS) {
 		PHALCON_CALL_METHOD(&connection, getThis(), "selectwriteconnection", intermediate, bind_params, bind_types);
 		if (Z_TYPE_P(connection) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectWriteConnection' didn't returned a valid connection");
@@ -1320,7 +1320,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 	 * Call afterFetch, this allows the developer to execute actions after a record is
 	 * fetched from the database
 	 */
-	if (phalcon_method_exists_ex(object, SS("afterfetch")) == SUCCESS) {
+	if (phalcon_method_exists_ex(object, SL("afterfetch")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, object, "afterfetch");
 	}
 
@@ -1491,7 +1491,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
 	 * Call afterFetch, this allows the developer to execute actions after a record is
 	 * fetched from the database
 	 */
-	if (phalcon_method_exists_ex(object, SS("afterfetch")) == SUCCESS) {
+	if (phalcon_method_exists_ex(object, SL("afterfetch")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, object, "afterfetch");
 	}
 
@@ -1602,7 +1602,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	/**
 	 * Pass the cache options to the query
 	 */
-	if (phalcon_array_isset_str(params, SS("cache"))) {
+	if (phalcon_array_isset_str(params, SL("cache"))) {
 		PHALCON_OBS_VAR(cache);
 		phalcon_array_fetch_str(&cache, params, SL("cache"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, query, "cache", cache);
@@ -1617,7 +1617,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	 * Define an hydration mode
 	 */
 	if (Z_TYPE_P(resultset) == IS_OBJECT) {
-		if (phalcon_array_isset_str(params, SS("hydration"))) {
+		if (phalcon_array_isset_str(params, SL("hydration"))) {
 			PHALCON_OBS_VAR(hydration);
 			phalcon_array_fetch_str(&hydration, params, SL("hydration"), PH_NOISY);
 			PHALCON_CALL_METHOD(NULL, resultset, "sethydratemode", hydration);
@@ -1742,16 +1742,16 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	 */
 	PHALCON_OBS_VAR(bind_params);
 	PHALCON_OBS_VAR(bind_types);
-	if (phalcon_array_isset_str_fetch(&bind_params, params, SS("bind"))) {
-		Z_ADDREF_P(bind_params);
+	if (phalcon_array_isset_str_fetch(&bind_params, params, SL("bind"))) {
+		Z_TRY_ADDREF_P(bind_params);
 		SEPARATE_ZVAL(bind_params);
 		if (Z_TYPE_P(bind_params) != IS_ARRAY) {
 			zval_dtor(bind_params);
 			array_init_size(bind_params, 1);
 		}
 
-		if (phalcon_array_isset_str_fetch(&bind_types, params, SS("bindTypes"))) {
-			Z_ADDREF_P(bind_types);
+		if (phalcon_array_isset_str_fetch(&bind_types, params, SL("bindTypes"))) {
+			Z_TRY_ADDREF_P(bind_types);
 			SEPARATE_ZVAL(bind_types);
 			if (Z_TYPE_P(bind_types) != IS_ARRAY) {
 				zval_dtor(bind_types);
@@ -1787,7 +1787,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	/**
 	 * Pass the cache options to the query
 	 */
-	if (phalcon_array_isset_str_fetch(&cache, params, SS("cache"))) {
+	if (phalcon_array_isset_str_fetch(&cache, params, SL("cache"))) {
 		PHALCON_CALL_METHOD(NULL, query, "cache", cache);
 	}
 
@@ -1813,7 +1813,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		/**
 		 * Define an hydration mode
 		 */
-		if (phalcon_array_isset_str_fetch(&hydration, params, SS("hydration"))) {
+		if (phalcon_array_isset_str_fetch(&hydration, params, SL("hydration"))) {
 			PHALCON_CALL_METHOD(NULL, result, "sethydratemode", hydration);
 		}
 
@@ -2184,7 +2184,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	} else {
 		PHALCON_CPY_WRT(params, parameters);
 	}
-	if (phalcon_array_isset_str(params, SS("column"))) {
+	if (phalcon_array_isset_str(params, SL("column"))) {
 		PHALCON_OBS_VAR(group_column);
 		phalcon_array_fetch_str(&group_column, params, SL("column"), PH_NOISY);
 	} else {
@@ -2195,14 +2195,14 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	/**
 	 * Builds the columns to query according to the received parameters
 	 */
-	if (phalcon_array_isset_str(params, SS("distinct"))) {
+	if (phalcon_array_isset_str(params, SL("distinct"))) {
 		PHALCON_OBS_VAR(distinct_column);
 		phalcon_array_fetch_str(&distinct_column, params, SL("distinct"), PH_NOISY);
 
 		PHALCON_INIT_VAR(columns);
 		PHALCON_CONCAT_VSVSV(columns, function, "(DISTINCT ", distinct_column, ") AS ", alias);
 	} else {
-		if (phalcon_array_isset_str(params, SS("group"))) {
+		if (phalcon_array_isset_str(params, SL("group"))) {
 			PHALCON_OBS_VAR(group_columns);
 			phalcon_array_fetch_str(&group_columns, params, SL("group"), PH_NOISY);
 
@@ -2254,7 +2254,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	PHALCON_CALL_METHOD(NULL, builder, "columns", columns);
 	PHALCON_CALL_METHOD(NULL, builder, "from", model_name);
 
-	if (phalcon_method_exists_ex(model, SS("beforequery")) == SUCCESS) {
+	if (phalcon_method_exists_ex(model, SL("beforequery")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, model, "beforequery", builder);
 	}
 
@@ -2266,11 +2266,11 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	PHALCON_INIT_VAR(bind_params);
 
 	PHALCON_INIT_VAR(bind_types);
-	if (phalcon_array_isset_str(params, SS("bind"))) {
+	if (phalcon_array_isset_str(params, SL("bind"))) {
 
 		PHALCON_OBS_NVAR(bind_params);
 		phalcon_array_fetch_str(&bind_params, params, SL("bind"), PH_NOISY);
-		if (phalcon_array_isset_str(params, SS("bindTypes"))) {
+		if (phalcon_array_isset_str(params, SL("bindTypes"))) {
 			PHALCON_OBS_NVAR(bind_types);
 			phalcon_array_fetch_str(&bind_types, params, SL("bindTypes"), PH_NOISY);
 		}
@@ -2279,7 +2279,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	/**
 	 * Pass the cache options to the query
 	 */
-	if (phalcon_array_isset_str(params, SS("cache"))) {
+	if (phalcon_array_isset_str(params, SL("cache"))) {
 		PHALCON_OBS_VAR(cache);
 		phalcon_array_fetch_str(&cache, params, SL("cache"), PH_NOISY);
 		PHALCON_CALL_METHOD(NULL, query, "cache", cache);
@@ -2293,7 +2293,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	/**
 	 * Return the full resultset if the query is grouped
 	 */
-	if (phalcon_array_isset_str(params, SS("group"))) {
+	if (phalcon_array_isset_str(params, SL("group"))) {
 		RETURN_CTOR(resultset);
 	}
 
@@ -2673,7 +2673,7 @@ PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
 			return;
 		}
 
-		if (phalcon_method_exists_ex(getThis(), SS("messages")) == SUCCESS) {
+		if (phalcon_method_exists_ex(getThis(), SL("messages")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&custom_message, getThis(), "messages", message, field, type, code);
 		} else {
 			PHALCON_CPY_WRT(custom_message, message);
@@ -2685,7 +2685,7 @@ PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
 
 		phalcon_update_property_array_append(getThis(), SL("_errorMessages"), model_message);
 	} else {
-		if (phalcon_method_exists_ex(getThis(), SS("messages")) == SUCCESS) {
+		if (phalcon_method_exists_ex(getThis(), SL("messages")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&message_message, message, "getmessage");
 			PHALCON_CALL_METHOD(&message_field, message, "getfield");
 			PHALCON_CALL_METHOD(&message_type, message, "gettype");
@@ -2748,12 +2748,12 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 	}
 
 	if (Z_TYPE_P(validator) == IS_ARRAY) {
-		if (!phalcon_array_isset_str(validator, SS("field"))) {
+		if (!phalcon_array_isset_str(validator, SL("field"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid field");
 			return;
 		}
 
-		if (!phalcon_array_isset_str(validator, SS("validator"))) {
+		if (!phalcon_array_isset_str(validator, SL("validator"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid validator");
 			return;
 		}
@@ -2784,13 +2784,13 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 		PHALCON_CALL_USER_FUNC_ARRAY(&status, handler, arguments);
 
 		if (PHALCON_IS_FALSE(status)) {
-			if (phalcon_array_isset_str(validator, SS("message"))) {
+			if (phalcon_array_isset_str(validator, SL("message"))) {
 				PHALCON_OBS_VAR(message_str);
 				phalcon_array_fetch_str(&message_str, validator, SL("message"), PH_NOISY);
 
 				PHALCON_ALLOC_INIT_ZVAL(pairs);
 				array_init_size(pairs, 1);
-				Z_ADDREF_P(field); add_assoc_zval_ex(pairs, SS(":field"), field);
+				Z_TRY_ADDREF_P(field); add_assoc_zval_ex(pairs, SL(":field"), field);
 
 				PHALCON_CALL_FUNCTION(&message, "strtr", message_str, pairs);
 			} else {
@@ -2798,7 +2798,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 				PHALCON_CONCAT_SVS(message, "Invalid '", field, "' format");
 			}
 
-			if (phalcon_array_isset_str(validator, SS("type"))) {
+			if (phalcon_array_isset_str(validator, SL("type"))) {
 				PHALCON_OBS_VAR(type);
 				phalcon_array_fetch_str(&type, validator, SL("type"), PH_NOISY);
 			} else {
@@ -2806,7 +2806,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 				ZVAL_STRING(type, "Validator");
 			}
 
-			if (phalcon_array_isset_str(validator, SS("code"))) {
+			if (phalcon_array_isset_str(validator, SL("code"))) {
 				PHALCON_OBS_VAR(code);
 				phalcon_array_fetch_str(&code, validator, SL("code"), PH_NOISY);
 			} else {
@@ -3008,7 +3008,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 				 * Try to find a different action in the foreign key's options
 				 */
 				if (Z_TYPE_P(foreign_key) == IS_ARRAY) { 
-					if (phalcon_array_isset_str(foreign_key, SS("action"))) {
+					if (phalcon_array_isset_str(foreign_key, SL("action"))) {
 						PHALCON_OBS_NVAR(action);
 						phalcon_array_fetch_str(&action, foreign_key, SL("action"), PH_NOISY);
 					}
@@ -3077,7 +3077,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 					/**
 					 * Check if the virtual foreign key has extra conditions
 					 */
-					if (phalcon_array_isset_str(foreign_key, SS("conditions"))) {
+					if (phalcon_array_isset_str(foreign_key, SL("conditions"))) {
 						PHALCON_OBS_NVAR(extra_conditions);
 						phalcon_array_fetch_str(&extra_conditions, foreign_key, SL("conditions"), PH_NOISY);
 						phalcon_array_append(conditions, extra_conditions, PH_SEPARATE);
@@ -3104,7 +3104,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 						/**
 						 * Get the user message or produce a new one
 						 */
-						if (phalcon_array_isset_str(foreign_key, SS("message"))) {
+						if (phalcon_array_isset_str(foreign_key, SL("message"))) {
 							PHALCON_OBS_NVAR(user_message);
 							phalcon_array_fetch_str(&user_message, foreign_key, SL("message"), PH_NOISY);
 						} else {
@@ -3201,7 +3201,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 				 * Try to find a different action in the foreign key's options
 				 */
 				if (Z_TYPE_P(foreign_key) == IS_ARRAY) { 
-					if (phalcon_array_isset_str(foreign_key, SS("action"))) {
+					if (phalcon_array_isset_str(foreign_key, SL("action"))) {
 						PHALCON_OBS_NVAR(action);
 						phalcon_array_fetch_str(&action, foreign_key, SL("action"), PH_NOISY);
 					}
@@ -3262,7 +3262,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 					/**
 					 * Check if the virtual foreign key has extra conditions
 					 */
-					if (phalcon_array_isset_str(foreign_key, SS("conditions"))) {
+					if (phalcon_array_isset_str(foreign_key, SL("conditions"))) {
 						PHALCON_OBS_NVAR(extra_conditions);
 						phalcon_array_fetch_str(&extra_conditions, foreign_key, SL("conditions"), PH_NOISY);
 						phalcon_array_append(conditions, extra_conditions, PH_SEPARATE);
@@ -3289,7 +3289,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 						/**
 						 * Create a new message
 						 */
-						if (phalcon_array_isset_str(foreign_key, SS("message"))) {
+						if (phalcon_array_isset_str(foreign_key, SL("message"))) {
 							PHALCON_OBS_NVAR(user_message);
 							phalcon_array_fetch_str(&user_message, foreign_key, SL("message"), PH_NOISY);
 						} else {
@@ -3375,7 +3375,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 				 * Try to find a different action in the foreign key's options
 				 */
 				if (Z_TYPE_P(foreign_key) == IS_ARRAY) { 
-					if (phalcon_array_isset_str(foreign_key, SS("action"))) {
+					if (phalcon_array_isset_str(foreign_key, SL("action"))) {
 						PHALCON_OBS_NVAR(action);
 						phalcon_array_fetch_str(&action, foreign_key, SL("action"), PH_NOISY);
 					}
@@ -3444,7 +3444,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 					/**
 					 * Check if the virtual foreign key has extra conditions
 					 */
-					if (phalcon_array_isset_str(foreign_key, SS("conditions"))) {
+					if (phalcon_array_isset_str(foreign_key, SL("conditions"))) {
 						PHALCON_OBS_NVAR(extra_conditions);
 						phalcon_array_fetch_str(&extra_conditions, foreign_key, SL("conditions"), PH_NOISY);
 						phalcon_array_append(conditions, extra_conditions, PH_SEPARATE);
@@ -3509,7 +3509,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 	phalcon_fetch_params(1, 3, 0, &meta_data, &exists, &identity_field);
 
-	if (phalcon_method_exists_ex(getThis(), SS("filters")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("filters")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "filters");
 	}
 
@@ -3747,7 +3747,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 					PHALCON_CALL_METHOD(&field_size, meta_data, "getdatasize", getThis(), field);
 					if (Z_TYPE_P(field_size) != IS_NULL) {
-						if (phalcon_function_exists_ex(SS("mb_strlen")) == SUCCESS) {
+						if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
 							convert_to_string_ex(value);
 							PHALCON_CALL_FUNCTION(&length, "mb_strlen", value);
 						} else {						
@@ -4107,7 +4107,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 		 */
 		PHALCON_CALL_METHOD(&support_sequences, connection, "supportsequences");
 		if (PHALCON_IS_TRUE(support_sequences)) {
-			if (phalcon_method_exists_ex(getThis(), SS("getsequencename")) == SUCCESS) {
+			if (phalcon_method_exists_ex(getThis(), SL("getsequencename")) == SUCCESS) {
 				PHALCON_CALL_METHOD(&sequence_name, getThis(), "getsequencename");
 			} else {
 				PHALCON_CALL_METHOD(&schema, getThis(), "getschema"); 
@@ -7334,7 +7334,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables globally the internal events
 	 */
-	if (phalcon_array_isset_str(options, SS("events"))) {
+	if (phalcon_array_isset_str(options, SL("events"))) {
 		PHALCON_OBS_VAR(disable_events);
 		phalcon_array_fetch_str(&disable_events, options, SL("events"), PH_NOISY);
 		PHALCON_GLOBAL(orm).events = zend_is_true(disable_events);
@@ -7343,7 +7343,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables virtual foreign keys
 	 */
-	if (phalcon_array_isset_str(options, SS("virtualForeignKeys"))) {
+	if (phalcon_array_isset_str(options, SL("virtualForeignKeys"))) {
 		PHALCON_OBS_VAR(virtual_foreign_keys);
 		phalcon_array_fetch_str(&virtual_foreign_keys, options, SL("virtualForeignKeys"), PH_NOISY);
 		PHALCON_GLOBAL(orm).virtual_foreign_keys = zend_is_true(virtual_foreign_keys);
@@ -7352,7 +7352,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables column renaming
 	 */
-	if (phalcon_array_isset_str(options, SS("columnRenaming"))) {
+	if (phalcon_array_isset_str(options, SL("columnRenaming"))) {
 		PHALCON_OBS_VAR(column_renaming);
 		phalcon_array_fetch_str(&column_renaming, options, SL("columnRenaming"), PH_NOISY);
 		PHALCON_GLOBAL(orm).column_renaming = zend_is_true(column_renaming);
@@ -7361,7 +7361,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables automatic not null validation
 	 */
-	if (phalcon_array_isset_str(options, SS("notNullValidations"))) {
+	if (phalcon_array_isset_str(options, SL("notNullValidations"))) {
 		PHALCON_OBS_VAR(not_null_validations);
 		phalcon_array_fetch_str(&not_null_validations, options, SL("notNullValidations"), PH_NOISY);
 		PHALCON_GLOBAL(orm).not_null_validations = zend_is_true(not_null_validations);
@@ -7370,7 +7370,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables automatic length validation
 	 */
-	if (phalcon_array_isset_str(options, SS("lengthValidations"))) {
+	if (phalcon_array_isset_str(options, SL("lengthValidations"))) {
 		PHALCON_OBS_VAR(length_validations);
 		phalcon_array_fetch_str(&length_validations, options, SL("lengthValidations"), PH_NOISY);
 		PHALCON_GLOBAL(orm).length_validations = zend_is_true(length_validations);
@@ -7379,7 +7379,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables throws an exception if the saving process fails
 	 */
-	if (phalcon_array_isset_str(options, SS("exceptionOnFailedSave"))) {
+	if (phalcon_array_isset_str(options, SL("exceptionOnFailedSave"))) {
 		PHALCON_OBS_VAR(exception_on_failed_save);
 		phalcon_array_fetch_str(&exception_on_failed_save, options, SL("exceptionOnFailedSave"), PH_NOISY);
 		PHALCON_GLOBAL(orm).exception_on_failed_save = zend_is_true(exception_on_failed_save);
@@ -7388,7 +7388,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables literals in PHQL this improves the security of applications
 	 */
-	if (phalcon_array_isset_str(options, SS("phqlLiterals"))) {
+	if (phalcon_array_isset_str(options, SL("phqlLiterals"))) {
 		PHALCON_OBS_VAR(phql_literals);
 		phalcon_array_fetch_str(&phql_literals, options, SL("phqlLiterals"), PH_NOISY);
 		PHALCON_GLOBAL(orm).enable_literals = zend_is_true(phql_literals);
@@ -7397,7 +7397,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables AST cache
 	 */
-	if (phalcon_array_isset_str(options, SS("astCache"))) {
+	if (phalcon_array_isset_str(options, SL("astCache"))) {
 		PHALCON_OBS_VAR(phql_cache);
 		phalcon_array_fetch_str(&phql_cache, options, SL("astCache"), PH_NOISY);
 		PHALCON_GLOBAL(orm).enable_ast_cache = zend_is_true(phql_cache);
@@ -7406,7 +7406,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables property method
 	 */
-	if (phalcon_array_isset_str(options, SS("propertyMethod"))) {
+	if (phalcon_array_isset_str(options, SL("propertyMethod"))) {
 		PHALCON_OBS_VAR(property_method);
 		phalcon_array_fetch_str(&property_method, options, SL("propertyMethod"), PH_NOISY);
 		PHALCON_GLOBAL(orm).enable_property_method = zend_is_true(property_method);
@@ -7415,7 +7415,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables auto convert
 	 */
-	if (phalcon_array_isset_str(options, SS("autoConvert"))) {
+	if (phalcon_array_isset_str(options, SL("autoConvert"))) {
 		PHALCON_OBS_VAR(auto_convert);
 		phalcon_array_fetch_str(&auto_convert, options, SL("autoConvert"), PH_NOISY);
 		PHALCON_GLOBAL(orm).enable_auto_convert = zend_is_true(auto_convert);
@@ -7424,7 +7424,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	/**
 	 * Enables/Disables allow update primary
 	 */
-	if (phalcon_array_isset_str(options, SS("allowUpdatePrimary"))) {
+	if (phalcon_array_isset_str(options, SL("allowUpdatePrimary"))) {
 		PHALCON_OBS_VAR(allow_update_primary);
 		phalcon_array_fetch_str(&allow_update_primary, options, SL("allowUpdatePrimary"), PH_NOISY);
 		PHALCON_GLOBAL(orm).allow_update_primary = zend_is_true(allow_update_primary);
@@ -7495,7 +7495,7 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 		if (phalcon_array_isset_long(parameters, 0)) {
 			PHALCON_OBS_NVAR(delete_conditions);
 			phalcon_array_fetch_long(&delete_conditions, parameters, 0, PH_NOISY);
-		} else if (phalcon_array_isset_str(parameters, SS("conditions"))) {
+		} else if (phalcon_array_isset_str(parameters, SL("conditions"))) {
 			PHALCON_OBS_NVAR(delete_conditions);
 			phalcon_array_fetch_str(&delete_conditions, parameters, SL("conditions"), PH_NOISY);
 		} else {
@@ -7506,7 +7506,7 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 		if (phalcon_array_isset_long(parameters, 1)) {
 			PHALCON_OBS_NVAR(bind_params);
 			phalcon_array_fetch_long(&bind_params, parameters, 1, PH_NOISY);
-		} else if (phalcon_array_isset_str(parameters, SS("bind"))) {
+		} else if (phalcon_array_isset_str(parameters, SL("bind"))) {
 			PHALCON_OBS_NVAR(bind_params);
 			phalcon_array_fetch_str(&bind_params, parameters, SL("bind"), PH_NOISY);
 		}
@@ -7514,7 +7514,7 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 		if (phalcon_array_isset_long(parameters, 2)) {
 			PHALCON_OBS_NVAR(bind_types);
 			phalcon_array_fetch_long(&bind_types, parameters, 2, PH_NOISY);
-		} else if (phalcon_array_isset_str(parameters, SS("bindTypes"))) {
+		} else if (phalcon_array_isset_str(parameters, SL("bindTypes"))) {
 			PHALCON_OBS_NVAR(bind_types);
 			phalcon_array_fetch_str(&bind_types, parameters, SL("bindTypes"), PH_NOISY);
 		}
@@ -7554,7 +7554,7 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 
 	PHALCON_CALL_METHOD(&dialect, write_connection, "getdialect");
 
-	if (phalcon_array_isset_str_fetch(&where_conditions, intermediate, SS("where"))) {		
+	if (phalcon_array_isset_str_fetch(&where_conditions, intermediate, SL("where"))) {		
 		if (Z_TYPE_P(where_conditions) == IS_ARRAY) { 
 			PHALCON_CALL_METHOD(&where_expression, dialect, "getsqlexpression", where_conditions);
 		} else {

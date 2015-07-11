@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		 */
 		PHALCON_INIT_NVAR(definition);
 		array_init(definition);
-		add_assoc_long_ex(definition, SS("bindType"), 2);
+		add_assoc_long_ex(definition, SL("bindType"), 2);
 	
 		/** 
 		 * By checking every column type we convert it to a Phalcon\Db\Column

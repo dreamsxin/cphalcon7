@@ -95,15 +95,15 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 	
-	if (phalcon_array_isset_str_fetch(&limit, config, SS("limit"))) {
+	if (phalcon_array_isset_str_fetch(&limit, config, SL("limit"))) {
 		phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
 	}
 	
-	if (phalcon_array_isset_str_fetch(&page, config, SS("page"))) {
+	if (phalcon_array_isset_str_fetch(&page, config, SL("page"))) {
 		phalcon_update_property_this(getThis(), SL("_page"), page);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&data, config, SS("data"))) {
+	if (!phalcon_array_isset_str_fetch(&data, config, SL("data"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'data' is required");
 		return;
 	}
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 	params[2] = lim;
 	RETURN_ON_FAILURE(phalcon_call_func_aparams(&slice, SL("array_slice"), 3, params));
 
-	Z_DELREF_P(slice);
+	Z_TRY_DELREF_P(slice);
 	
 	object_init(return_value);
 	phalcon_update_property_zval(return_value, SL("items"),       slice);

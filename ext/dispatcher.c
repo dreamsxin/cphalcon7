@@ -819,7 +819,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Calling beforeExecuteRoute as callback and event
 		 */
-		if (phalcon_method_exists_ex(handler, SS("beforeexecuteroute")) == SUCCESS) {
+		if (phalcon_method_exists_ex(handler, SL("beforeexecuteroute")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&status, handler, "beforeexecuteroute", getThis());
 			if (PHALCON_IS_FALSE(status)) {
 				continue;
@@ -838,7 +838,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 * Call the 'initialize' method just once per request
 		 */
 		if (PHALCON_IS_TRUE(was_fresh)) {
-			if (phalcon_method_exists_ex(handler, SS("initialize")) == SUCCESS) {
+			if (phalcon_method_exists_ex(handler, SL("initialize")) == SUCCESS) {
 				PHALCON_CALL_METHOD(NULL, handler, "initialize");
 			}
 
@@ -959,7 +959,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Calling afterExecuteRoute as callback and event
 		 */
-		if (phalcon_method_exists_ex(handler, SS("afterexecuteroute")) == SUCCESS) {
+		if (phalcon_method_exists_ex(handler, SL("afterexecuteroute")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&status, handler, "afterexecuteroute", getThis(), value);
 			if (PHALCON_IS_FALSE(status)) {
 				continue;
@@ -1103,17 +1103,17 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 	/**
 	 * Check if we need to forward to another namespace
 	 */
-	if (phalcon_array_isset_str_fetch(&namespace_name, forward_parts, SS("namespace"))) {
+	if (phalcon_array_isset_str_fetch(&namespace_name, forward_parts, SL("namespace"))) {
 		phalcon_update_property_this(getThis(), SL("_namespaceName"), namespace_name);
 	}
 
 	/**
 	 * Check if we need to forward to another controller
 	 */
-	if (phalcon_array_isset_str_fetch(&controller_name, forward_parts, SS("controller"))) {
+	if (phalcon_array_isset_str_fetch(&controller_name, forward_parts, SL("controller"))) {
 		phalcon_update_property_this(getThis(), SL("_handlerName"), controller_name);
 	} else {
-		if (phalcon_array_isset_str_fetch(&task_name, forward_parts, SS("task"))) {
+		if (phalcon_array_isset_str_fetch(&task_name, forward_parts, SL("task"))) {
 			phalcon_update_property_this(getThis(), SL("_handlerName"), task_name);
 		}
 	}
@@ -1121,14 +1121,14 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 	/**
 	 * Check if we need to forward to another action
 	 */
-	if (phalcon_array_isset_str_fetch(&action_name, forward_parts, SS("action"))) {
+	if (phalcon_array_isset_str_fetch(&action_name, forward_parts, SL("action"))) {
 		phalcon_update_property_this(getThis(), SL("_actionName"), action_name);
 	}
 
 	/**
 	 * Check if we need to forward changing the current parameters
 	 */
-	if (phalcon_array_isset_str_fetch(&params, forward_parts, SS("params"))) {
+	if (phalcon_array_isset_str_fetch(&params, forward_parts, SL("params"))) {
 		phalcon_update_property_this(getThis(), SL("_params"), params);
 	}
 

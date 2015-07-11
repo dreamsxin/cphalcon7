@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		}
 	}
 #else
-	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("openssl_random_pseudo_bytes")) == FAILURE) {
 		ssize_t read_bytes = 0;
 		int fd = open("/dev/urandom", O_RDONLY);
 		if (EXPECTED(fd >= 0)) {
@@ -650,7 +650,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 		ZVAL_LONG(number_bytes, 12);
 	}
 
-	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("openssl_random_pseudo_bytes")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Openssl extension must be loaded");
 		return;
 	}
@@ -702,7 +702,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 		ZVAL_LONG(number_bytes, 12);
 	}
 
-	if (phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("openssl_random_pseudo_bytes")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Openssl extension must be loaded");
 		return;
 	}

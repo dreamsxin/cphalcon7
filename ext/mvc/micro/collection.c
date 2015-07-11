@@ -114,8 +114,8 @@ void phalcon_mvc_collection_addmap(zval *this_ptr, zend_string *method, zval *ro
 {
 	zval handler_definition;
 
-	Z_ADDREF_P(route_pattern);
-	Z_ADDREF_P(handler);
+	Z_TRY_ADDREF_P(route_pattern);
+	Z_TRY_ADDREF_P(handler);
 
 	array_init_size(&handler_definition, 3 + (name != NULL ? 1 : 0));
 	if (method) {
@@ -129,7 +129,7 @@ void phalcon_mvc_collection_addmap(zval *this_ptr, zend_string *method, zval *ro
 	add_next_index_zval(&handler_definition, route_pattern);
 	add_next_index_zval(&handler_definition, handler);
 	if (name) {
-		Z_ADDREF_P(name);
+		Z_TRY_ADDREF_P(name);
 		add_next_index_zval(&handler_definition, name);
 	} else {
 		add_next_index_null(&handler_definition);

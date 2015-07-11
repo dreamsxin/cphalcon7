@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			return;
 		}
 
-		if (phalcon_array_isset_str(module, SS("path"))) {
+		if (phalcon_array_isset_str(module, SL("path"))) {
 
 			PHALCON_OBS_VAR(path);
 			phalcon_array_fetch_str(&path, module, SL("path"), PH_NOISY);
@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			}
 		}
 
-		if (phalcon_array_isset_str(module, SS("className"))) {
+		if (phalcon_array_isset_str(module, SL("className"))) {
 			PHALCON_OBS_VAR(class_name);
 			phalcon_array_fetch_str(&class_name, module, SL("className"), PH_NOISY);
 		} else {

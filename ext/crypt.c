@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		text = source;
 	}
 
-	if (phalcon_function_exists_ex(SS("mcrypt_get_iv_size")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("mcrypt_get_iv_size")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "mcrypt extension is required");
 		return;
 	}
@@ -585,7 +585,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 	phalcon_fetch_params(1, 1, 1, &text, &key);
 
-	if (phalcon_function_exists_ex(SS("mcrypt_get_iv_size")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("mcrypt_get_iv_size")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "mcrypt extension is required");
 		return;
 	}

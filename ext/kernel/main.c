@@ -58,12 +58,12 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 	phalcon_globals->orm.enable_auto_convert = 1;
 
 	/* Security options */
-	phalcon_globals->security.crypt_std_des_supported  = zend_hash_str_exists(constants, SS("CRYPT_STD_DES"));
-	phalcon_globals->security.crypt_ext_des_supported  = zend_hash_str_exists(constants, SS("CRYPT_EXT_DES"));
-	phalcon_globals->security.crypt_md5_supported      = zend_hash_str_exists(constants, SS("CRYPT_MD5"));
-	phalcon_globals->security.crypt_blowfish_supported = zend_hash_str_exists(constants, SS("CRYPT_BLOWFISH"));
-	phalcon_globals->security.crypt_sha256_supported   = zend_hash_str_exists(constants, SS("CRYPT_SHA256"));
-	phalcon_globals->security.crypt_sha512_supported   = zend_hash_str_exists(constants, SS("CRYPT_SHA512"));
+	phalcon_globals->security.crypt_std_des_supported  = zend_hash_str_exists(constants, SL("CRYPT_STD_DES"));
+	phalcon_globals->security.crypt_ext_des_supported  = zend_hash_str_exists(constants, SL("CRYPT_EXT_DES"));
+	phalcon_globals->security.crypt_md5_supported      = zend_hash_str_exists(constants, SL("CRYPT_MD5"));
+	phalcon_globals->security.crypt_blowfish_supported = zend_hash_str_exists(constants, SL("CRYPT_BLOWFISH"));
+	phalcon_globals->security.crypt_sha256_supported   = zend_hash_str_exists(constants, SL("CRYPT_SHA256"));
+	phalcon_globals->security.crypt_sha512_supported   = zend_hash_str_exists(constants, SL("CRYPT_SHA512"));
 
 	phalcon_globals->security.crypt_blowfish_y_supported = phalcon_globals->security.crypt_blowfish_supported;
 

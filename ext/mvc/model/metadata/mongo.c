@@ -109,31 +109,31 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	PHALCON_SEPARATE_PARAM(options);
 	
-	if (!phalcon_array_isset_str(options, SS("mongo"))) {
-		if (!phalcon_array_isset_str(options, SS("server"))) {
+	if (!phalcon_array_isset_str(options, SL("mongo"))) {
+		if (!phalcon_array_isset_str(options, SL("server"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The parameter 'server' is required");
 			return;
 		}
 	}
 
-	if (!phalcon_array_isset_str(options, SS("db"))) {
+	if (!phalcon_array_isset_str(options, SL("db"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The parameter 'db' is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_str(options, SS("collection"))) {
+	if (!phalcon_array_isset_str(options, SL("collection"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The parameter 'collection' is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&lifetime, options, SS("lifetime"))) {
+	if (!phalcon_array_isset_str_fetch(&lifetime, options, SL("lifetime"))) {
 		PHALCON_INIT_VAR(lifetime);
 		ZVAL_LONG(lifetime, 8600);
 	}
 
 	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
-	if (!phalcon_array_isset_str_fetch(&prefix, options, SS("prefix"))) {
+	if (!phalcon_array_isset_str_fetch(&prefix, options, SL("prefix"))) {
 		PHALCON_INIT_VAR(prefix);
 		ZVAL_EMPTY_STRING(prefix);
 	}

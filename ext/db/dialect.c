@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		return;
 	}
 
-	if (!phalcon_array_isset_str(expression, SS("type"))) {
+	if (!phalcon_array_isset_str(expression, SL("type"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SQL expression");
 		return;
 	}
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		/**
 		 * A domain could be a table/schema
 		 */
-		if (phalcon_array_isset_str(expression, SS("domain"))) {
+		if (phalcon_array_isset_str(expression, SL("domain"))) {
 
 			PHALCON_OBS_VAR(domain);
 			phalcon_array_fetch_str(&domain, expression, SL("domain"), PH_NOISY);
@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		/**
 		 * Some unary operators uses the left operand...
 		 */
-		if (phalcon_array_isset_str(expression, SS("left"))) {
+		if (phalcon_array_isset_str(expression, SL("left"))) {
 			PHALCON_OBS_NVAR(left);
 			phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 
@@ -388,7 +388,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		/**
 		 * ...Others uses the right operand
 		 */
-		if (phalcon_array_isset_str(expression, SS("right"))) {
+		if (phalcon_array_isset_str(expression, SL("right"))) {
 			PHALCON_OBS_NVAR(right);
 			phalcon_array_fetch_str(&right, expression, SL("right"), PH_NOISY);
 
@@ -405,7 +405,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		PHALCON_OBS_NVAR(value);
 		phalcon_array_fetch_str(&value, expression, SL("value"), PH_NOISY);
 
-		if (phalcon_array_isset_str_fetch(&times, expression, SS("times"))) {
+		if (phalcon_array_isset_str_fetch(&times, expression, SL("times"))) {
 			PHALCON_INIT_NVAR(placeholders);
 			array_init(placeholders);
 
@@ -640,7 +640,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 
 	PHALCON_INIT_VAR(sql_arguments);
 	array_init(sql_arguments);
-	if (phalcon_array_isset_str(expression, SS("arguments"))) {
+	if (phalcon_array_isset_str(expression, SL("arguments"))) {
 
 		PHALCON_OBS_VAR(arguments);
 		phalcon_array_fetch_str(&arguments, expression, SL("arguments"), PH_NOISY);
@@ -652,7 +652,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 
 		PHALCON_INIT_VAR(arguments_joined);
 		phalcon_fast_join_str(arguments_joined, SL(", "), sql_arguments);
-		if (phalcon_array_isset_str(expression, SS("distinct"))) {
+		if (phalcon_array_isset_str(expression, SL("distinct"))) {
 			PHALCON_CONCAT_VSVS(return_value, name, "(DISTINCT ", arguments_joined, ")");
 		} else {
 			PHALCON_CONCAT_VSVS(return_value, name, "(", arguments_joined, ")");
@@ -784,12 +784,12 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SELECT definition");
 		return;
 	}
-	if (!phalcon_array_isset_str(definition, SS("tables"))) {
+	if (!phalcon_array_isset_str(definition, SL("tables"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&columns, definition, SS("columns"))) {
+	if (!phalcon_array_isset_str_fetch(&columns, definition, SL("columns"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
 		return;
 	}
@@ -812,7 +812,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			 */
 			if (
 				    phalcon_array_isset_long_fetch(&column_item, column, 0)
-				 || phalcon_array_isset_str_fetch(&column_item, column, SS("column"))
+				 || phalcon_array_isset_str_fetch(&column_item, column, SL("column"))
 			) {
 				if (Z_TYPE_P(column_item) == IS_ARRAY) {
 					PHALCON_CALL_METHOD(&column_sql, getThis(), "getsqlexpression", column_item, escape_char);
@@ -899,7 +899,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	}
 
 	PHALCON_INIT_VAR(sql);
-	if (phalcon_array_isset_str_fetch(&distinct, definition, SS("distinct"))) {
+	if (phalcon_array_isset_str_fetch(&distinct, definition, SL("distinct"))) {
 		assert(Z_TYPE_P(distinct) == IS_LONG);
 		if (Z_LVAL_P(distinct) == 0) {
 			ZVAL_STRING(sql, "SELECT ALL ");
@@ -920,7 +920,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	/**
 	 * Check for joins
 	 */
-	if (phalcon_array_isset_str(definition, SS("joins"))) {
+	if (phalcon_array_isset_str(definition, SL("joins"))) {
 
 		PHALCON_OBS_VAR(joins);
 		phalcon_array_fetch_str(&joins, definition, SL("joins"), PH_NOISY);
@@ -941,7 +941,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			/**
 			 * Check if the join has conditions
 			 */
-			if (phalcon_array_isset_str(join, SS("conditions"))) {
+			if (phalcon_array_isset_str(join, SL("conditions"))) {
 
 				PHALCON_OBS_NVAR(join_conditions_array);
 				phalcon_array_fetch_str(&join_conditions_array, join, SL("conditions"), PH_NOISY);
@@ -966,7 +966,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	}
 
 	/* Check for a WHERE clause */
-	if (phalcon_array_isset_str_fetch(&where_conditions, definition, SS("where"))) {
+	if (phalcon_array_isset_str_fetch(&where_conditions, definition, SL("where"))) {
 
 		if (Z_TYPE_P(where_conditions) == IS_ARRAY) { 
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", where_conditions, escape_char);
@@ -977,7 +977,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	}
 
 	/* Check for a GROUP clause */
-	if (phalcon_array_isset_str_fetch(&group_fields, definition, SS("group"))) {
+	if (phalcon_array_isset_str_fetch(&group_fields, definition, SL("group"))) {
 
 		PHALCON_INIT_VAR(group_items);
 		array_init(group_items);
@@ -996,13 +996,13 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	}
 
 	/* Check for a HAVING clause */
-	if (phalcon_array_isset_str_fetch(&having_conditions, definition, SS("having"))) {
+	if (phalcon_array_isset_str_fetch(&having_conditions, definition, SL("having"))) {
 		PHALCON_CALL_METHOD(&having_expression, getThis(), "getsqlexpression", having_conditions, escape_char);
 		PHALCON_SCONCAT_SV(sql, " HAVING ", having_expression);
 	}
 
 	/* Check for a ORDER clause */
-	if (phalcon_array_isset_str_fetch(&order_fields, definition, SS("order"))) {
+	if (phalcon_array_isset_str_fetch(&order_fields, definition, SL("order"))) {
 		PHALCON_INIT_VAR(order_items);
 		array_init(order_items);
 
@@ -1036,16 +1036,16 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	/**
 	 * Check for a LIMIT condition
 	 */
-	if (phalcon_array_isset_str_fetch(&limit_value, definition, SS("limit"))) {
+	if (phalcon_array_isset_str_fetch(&limit_value, definition, SL("limit"))) {
 		if (likely(Z_TYPE_P(limit_value) == IS_ARRAY)) {
-			if (likely(phalcon_array_isset_str_fetch(&number, limit_value, SS("number")))) {
+			if (likely(phalcon_array_isset_str_fetch(&number, limit_value, SL("number")))) {
 				PHALCON_OBS_NVAR(tmp1);
 				phalcon_array_fetch_str(&tmp1, number, SL("value"), PH_NOISY);
 
 				/**
 				 * Check for a OFFSET condition
 				 */
-				if (phalcon_array_isset_str_fetch(&offset, limit_value, SS("offset"))) {
+				if (phalcon_array_isset_str_fetch(&offset, limit_value, SL("offset"))) {
 					PHALCON_OBS_NVAR(tmp2);
 					phalcon_array_fetch_str(&tmp2, offset, SL("value"), PH_NOISY);
 					PHALCON_SCONCAT_SVSV(sql, " LIMIT ", tmp1, " OFFSET ", tmp2);
@@ -1061,7 +1061,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	/**
 	 * Check for a FOR UPDATE clause
 	 */
-	if (phalcon_array_isset_str(definition, SS("forupdate"))) {
+	if (phalcon_array_isset_str(definition, SL("forupdate"))) {
 		PHALCON_RETURN_CALL_METHOD(getThis(), "forupdate", sql);
 		RETURN_MM();
 	}
@@ -1091,17 +1091,17 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid INSERT definition");
 		return;
 	}
-	if (!phalcon_array_isset_str_fetch(&table, definition, SS("table"))) {
+	if (!phalcon_array_isset_str_fetch(&table, definition, SL("table"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'table' is required in the definition array");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&fields, definition, SS("fields"))) {
+	if (!phalcon_array_isset_str_fetch(&fields, definition, SL("fields"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&values, definition, SS("values"))) {
+	if (!phalcon_array_isset_str_fetch(&values, definition, SL("values"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'values' is required in the definition array");
 		return;
 	}
@@ -1190,17 +1190,17 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 		quoting = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&tables, definition, SS("tables"))) {
+	if (!phalcon_array_isset_str_fetch(&tables, definition, SL("tables"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&fields, definition, SS("fields"))) {
+	if (!phalcon_array_isset_str_fetch(&fields, definition, SL("fields"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&values, definition, SS("values"))) {
+	if (!phalcon_array_isset_str_fetch(&values, definition, SL("values"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
 		return;
 	}
@@ -1266,7 +1266,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	PHALCON_SCONCAT_SV(sql, " SET ", columns_sql);
 
 	/* Check for a WHERE clause */
-	if (phalcon_array_isset_str_fetch(&where_conditions, definition, SS("where"))) {
+	if (phalcon_array_isset_str_fetch(&where_conditions, definition, SL("where"))) {
 
 		if (Z_TYPE_P(where_conditions) == IS_ARRAY) { 
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", where_conditions, escape_char);
@@ -1277,7 +1277,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	/* Check for a ORDER clause */
-	if (phalcon_array_isset_str_fetch(&order_fields, definition, SS("order"))) {
+	if (phalcon_array_isset_str_fetch(&order_fields, definition, SL("order"))) {
 		PHALCON_INIT_VAR(order_items);
 		array_init(order_items);
 
@@ -1310,16 +1310,16 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	/**
 	 * Check for a LIMIT condition
 	 */
-	if (phalcon_array_isset_str_fetch(&limit_value, definition, SS("limit"))) {
+	if (phalcon_array_isset_str_fetch(&limit_value, definition, SL("limit"))) {
 		if (likely(Z_TYPE_P(limit_value) == IS_ARRAY)) {
-			if (likely(phalcon_array_isset_str_fetch(&number, limit_value, SS("number")))) {
+			if (likely(phalcon_array_isset_str_fetch(&number, limit_value, SL("number")))) {
 				PHALCON_OBS_NVAR(tmp1);
 				phalcon_array_fetch_str(&tmp1, number, SL("value"), PH_NOISY);
 
 				/**
 				 * Check for a OFFSET condition
 				 */
-				if (phalcon_array_isset_str_fetch(&offset, limit_value, SS("offset"))) {
+				if (phalcon_array_isset_str_fetch(&offset, limit_value, SL("offset"))) {
 					PHALCON_OBS_NVAR(tmp2);
 					phalcon_array_fetch_str(&tmp2, offset, SL("value"), PH_NOISY);
 					PHALCON_SCONCAT_SVSV(sql, " LIMIT ", tmp1, " OFFSET ", tmp2);
@@ -1357,7 +1357,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid Update definition");
 		return;
 	}
-	if (!phalcon_array_isset_str_fetch(&tables, definition, SS("tables"))) {
+	if (!phalcon_array_isset_str_fetch(&tables, definition, SL("tables"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
 		return;
 	}
@@ -1386,7 +1386,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	PHALCON_SCONCAT_SV(sql, "DELETE FROM ", tables_sql);
 
 	/* Check for a WHERE clause */
-	if (phalcon_array_isset_str_fetch(&where_conditions, definition, SS("where"))) {
+	if (phalcon_array_isset_str_fetch(&where_conditions, definition, SL("where"))) {
 
 		if (Z_TYPE_P(where_conditions) == IS_ARRAY) { 
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", where_conditions, escape_char);
@@ -1397,7 +1397,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	}
 
 	/* Check for a ORDER clause */
-	if (phalcon_array_isset_str_fetch(&order_fields, definition, SS("order"))) {
+	if (phalcon_array_isset_str_fetch(&order_fields, definition, SL("order"))) {
 		PHALCON_INIT_VAR(order_items);
 		array_init(order_items);
 
@@ -1430,16 +1430,16 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	/**
 	 * Check for a LIMIT condition
 	 */
-	if (phalcon_array_isset_str_fetch(&limit_value, definition, SS("limit"))) {
+	if (phalcon_array_isset_str_fetch(&limit_value, definition, SL("limit"))) {
 		if (likely(Z_TYPE_P(limit_value) == IS_ARRAY)) {
-			if (likely(phalcon_array_isset_str_fetch(&number, limit_value, SS("number")))) {
+			if (likely(phalcon_array_isset_str_fetch(&number, limit_value, SL("number")))) {
 				PHALCON_OBS_NVAR(tmp1);
 				phalcon_array_fetch_str(&tmp1, number, SL("value"), PH_NOISY);
 
 				/**
 				 * Check for a OFFSET condition
 				 */
-				if (phalcon_array_isset_str_fetch(&offset, limit_value, SS("offset"))) {
+				if (phalcon_array_isset_str_fetch(&offset, limit_value, SL("offset"))) {
 					PHALCON_OBS_NVAR(tmp2);
 					phalcon_array_fetch_str(&tmp2, offset, SL("value"), PH_NOISY);
 					PHALCON_SCONCAT_SVSV(sql, " LIMIT ", tmp1, " OFFSET ", tmp2);

@@ -309,7 +309,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							/** 
 							 * Get the base instance
 							 */
-							if (!phalcon_array_isset_str_fetch(&instance, column, SS("instance"))) {
+							if (!phalcon_array_isset_str_fetch(&instance, column, SL("instance"))) {
 								php_error_docref(NULL, E_NOTICE, "Undefined index: instance");
 								instance = &PHALCON_GLOBAL(z_null);
 							}
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							/** 
 							 * Check if the resultset must keep snapshots
 							 */
-							if (!phalcon_array_isset_str_fetch(&keep_snapshots, column, SS("keepSnapshots"))) {
+							if (!phalcon_array_isset_str_fetch(&keep_snapshots, column, SL("keepSnapshots"))) {
 								keep_snapshots = &PHALCON_GLOBAL(z_false);
 							}
 
@@ -341,14 +341,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					 * the model name
 					 */
 					PHALCON_OBS_NVAR(attribute);
-					if (phalcon_array_isset_str(column, SS("balias"))) {
+					if (phalcon_array_isset_str(column, SL("balias"))) {
 						phalcon_array_fetch_str(&attribute, column, SL("balias"), PH_NOISY);
 					}
 				} else {
 					/** 
 					 * Scalar columns are simply assigned to the result object
 					 */
-					if (phalcon_array_isset_str(column, SS("sqlAlias"))) {
+					if (phalcon_array_isset_str(column, SL("sqlAlias"))) {
 						PHALCON_OBS_NVAR(sql_alias);
 						phalcon_array_fetch_str(&sql_alias, column, SL("sqlAlias"), PH_NOISY);
 
@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					/** 
 					 * If a 'balias' is defined is not an unnamed scalar
 					 */
-					if (phalcon_array_isset_str(column, SS("balias"))) {
+					if (phalcon_array_isset_str(column, SL("balias"))) {
 						PHALCON_CPY_WRT(attribute, &alias);
 					} else {
 						PHALCON_STR_REPLACE(&n_alias, underscore, empty_str, &alias);
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, toArray){
 		}
 
 		PHALCON_CALL_METHOD(&current, getThis(), "current");
-		if (Z_TYPE_P(current) == IS_OBJECT && phalcon_method_exists_ex(current, SS("toarray")) == SUCCESS) {
+		if (Z_TYPE_P(current) == IS_OBJECT && phalcon_method_exists_ex(current, SL("toarray")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&arr, current, "toarray");
 			phalcon_array_append(return_value, arr, 0);
 		} else {

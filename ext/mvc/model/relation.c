@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isForeignKey){
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (Z_TYPE_P(options) == IS_ARRAY) { 
-		if (phalcon_array_isset_str(options, SS("foreignKey"))) {
+		if (phalcon_array_isset_str(options, SL("foreignKey"))) {
 			RETURN_MM_TRUE;
 		}
 	}
@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getForeignKey){
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
-	if (phalcon_array_isset_str_fetch(&foreign_key, options, SS("foreignKey"))) {
+	if (phalcon_array_isset_str_fetch(&foreign_key, options, SL("foreignKey"))) {
 		if (zend_is_true(foreign_key)) {
 			RETURN_ZVAL(foreign_key, 1, 0);
 		}
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isReusable){
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
-	if (phalcon_array_isset_str_fetch(&reusable, options, SS("reusable"))) {
+	if (phalcon_array_isset_str_fetch(&reusable, options, SL("reusable"))) {
 		RETURN_ZVAL(reusable, 1, 0);
 	}
 	

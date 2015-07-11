@@ -71,7 +71,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Syslog, format){
 	}
 	else {
 		interpolated = message;
-		Z_ADDREF_P(interpolated);
+		Z_TRY_ADDREF_P(interpolated);
 	}
 
 	array_init_size(return_value, 2);

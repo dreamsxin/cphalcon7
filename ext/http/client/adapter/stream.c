@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 			PHALCON_CALL_METHOD(NULL, header, "set", key, value);
 		} else if (PHALCON_IS_STRING(authtype, "digest") && PHALCON_IS_NOT_EMPTY(digest)) {
-			if (phalcon_array_isset_str_fetch(&realm, digest, SS("realm"))) {
+			if (phalcon_array_isset_str_fetch(&realm, digest, SL("realm"))) {
 				PHALCON_INIT_VAR(realm);
 				ZVAL_NULL(realm);
 			}
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 			PHALCON_CALL_FUNCTION(&ha1, "md5", tmp);
 
-			if (!phalcon_array_isset_str_fetch(&qop, digest, SS("qop"))) {
+			if (!phalcon_array_isset_str_fetch(&qop, digest, SL("qop"))) {
 				PHALCON_INIT_VAR(qop);
 				ZVAL_NULL(qop);
 			}
@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 			PHALCON_INIT_NVAR(key);
 			ZVAL_STRING(key, "Authorization");
 
-			if (phalcon_array_isset_str_fetch(&nonce, digest, SS("nonce"))) {
+			if (phalcon_array_isset_str_fetch(&nonce, digest, SL("nonce"))) {
 				PHALCON_INIT_VAR(nonce);
 				ZVAL_NULL(nonce);
 			}
@@ -230,22 +230,22 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 				PHALCON_CALL_METHOD(NULL, header, "set", key, tmp);
 			} else {			
-				if (phalcon_array_isset_str_fetch(&nc, digest, SS("nc"))) {
+				if (phalcon_array_isset_str_fetch(&nc, digest, SL("nc"))) {
 					PHALCON_INIT_VAR(nc);
 					ZVAL_NULL(nc);
 				}
 				
-				if (phalcon_array_isset_str_fetch(&cnonce, digest, SS("cnonce"))) {
+				if (phalcon_array_isset_str_fetch(&cnonce, digest, SL("cnonce"))) {
 					PHALCON_INIT_VAR(cnonce);
 					ZVAL_NULL(cnonce);
 				}
 				
-				if (phalcon_array_isset_str_fetch(&qoc, digest, SS("qoc"))) {
+				if (phalcon_array_isset_str_fetch(&qoc, digest, SL("qoc"))) {
 					PHALCON_INIT_VAR(qoc);
 					ZVAL_NULL(qoc);
 				}
 				
-				if (phalcon_array_isset_str_fetch(&qoc, digest, SS("qoc"))) {
+				if (phalcon_array_isset_str_fetch(&qoc, digest, SL("qoc"))) {
 					PHALCON_INIT_VAR(qoc);
 					ZVAL_NULL(qoc);
 				}
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 			if (PHALCON_IS_NOT_EMPTY(file)) {
 				PHALCON_CALL_FUNCTION(&path_parts, "pathinfo", file);
 
-				if (phalcon_array_isset_str_fetch(&filename, path_parts, SS("filename")) && phalcon_array_isset_str_fetch(&basename, path_parts, SS("basename"))) {
+				if (phalcon_array_isset_str_fetch(&filename, path_parts, SL("filename")) && phalcon_array_isset_str_fetch(&basename, path_parts, SL("basename"))) {
 					PHALCON_CALL_FUNCTION(&filedata, "file_get_contents", file);
 
 					PHALCON_SCONCAT_SVS(body, "--", boundary, "\r\n");
@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal){
 	object_init_ex(response, phalcon_http_client_response_ce);
 	PHALCON_CALL_METHOD(NULL, response, "__construct");
 
-	if (phalcon_array_isset_str_fetch(&wrapper_data, meta, SS("wrapper_data"))) {
+	if (phalcon_array_isset_str_fetch(&wrapper_data, meta, SL("wrapper_data"))) {
 		PHALCON_CALL_METHOD(NULL, response, "setHeader", wrapper_data);
 	}
 

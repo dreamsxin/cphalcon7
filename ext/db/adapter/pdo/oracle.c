@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
 	 * depends on particular NLS* parameter. Check if the developer has defined custom
 	 * startup or create one from scratch
 	 */
-	if (phalcon_array_isset_str(descriptor, SS("startup"))) {
+	if (phalcon_array_isset_str(descriptor, SL("startup"))) {
 
 		PHALCON_OBS_VAR(startup);
 		phalcon_array_fetch_str(&startup, descriptor, SL("startup"), PH_NOISY);
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), field) {
 		PHALCON_INIT_NVAR(definition);
 		array_init_size(definition, 1);
-		add_assoc_long_ex(definition, SS("bindType"), 2);
+		add_assoc_long_ex(definition, SL("bindType"), 2);
 
 		PHALCON_OBS_NVAR(column_size);
 		phalcon_array_fetch_long(&column_size, field, 2, PH_NOISY);

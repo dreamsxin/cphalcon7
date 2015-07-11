@@ -86,10 +86,10 @@ static int phalcon_cache_backend_is_old_apcu = -1;
 PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Apc){
 
 	if (-1 == phalcon_cache_backend_is_old_apcu) {
-		phalcon_cache_backend_is_old_apcu = zend_hash_str_exists(&module_registry, SS("apcu"));
+		phalcon_cache_backend_is_old_apcu = zend_hash_str_exists(&module_registry, SL("apcu"));
 		if (phalcon_cache_backend_is_old_apcu) {
 			zend_constant *c;
-			if ((c = zend_hash_str_find_ptr(EG(zend_constants), SS("APCU_APC_FULL_BC"))) != NULL) {
+			if ((c = zend_hash_str_find_ptr(EG(zend_constants), SL("APCU_APC_FULL_BC"))) != NULL) {
 				phalcon_cache_backend_is_old_apcu = !zend_is_true(&c->value);
 			}
 		}
@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, increment){
 	PHALCON_CONCAT_SVV(prefixed_key, "_PHCA", prefix, key_name);
 	phalcon_update_property_this(getThis(), SL("_lastKey"), prefixed_key);
 	
-	if (SUCCESS == phalcon_function_exists_ex(SS("apc_inc"))) {
+	if (SUCCESS == phalcon_function_exists_ex(SL("apc_inc"))) {
 		PHALCON_RETURN_CALL_FUNCTION("apc_inc", prefixed_key, value);
 	} else {
 		PHALCON_CALL_FUNCTION(&cached_content, "apc_fetch", prefixed_key);
@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, decrement){
 	PHALCON_CONCAT_SVV(prefixed_key, "_PHCA", prefix, key_name);
 	phalcon_update_property_this(getThis(), SL("_lastKey"), prefixed_key);
 	
-	if (SUCCESS == phalcon_function_exists_ex(SS("apc_dec"))) {
+	if (SUCCESS == phalcon_function_exists_ex(SL("apc_dec"))) {
 		PHALCON_RETURN_CALL_FUNCTION("apc_dec", prefixed_key, value);
 	} else {
 		PHALCON_CALL_FUNCTION(&cached_content, "apc_fetch", prefixed_key);

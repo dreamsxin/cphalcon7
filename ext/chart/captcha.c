@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	PHALCON_CALL_METHOD(NULL, imagick, "newimage", width,  height, imagickpixel);
 
 	PHALCON_INIT_VAR(gravity);
-	phalcon_get_class_constant(gravity, imagick_ce, SS("GRAVITY_CENTER"));
+	phalcon_get_class_constant(gravity, imagick_ce, SL("GRAVITY_CENTER"));
 
 	PHALCON_CALL_METHOD(NULL, draw, "setgravity", gravity);
 	PHALCON_CALL_METHOD(NULL, imagick, "annotateimage", draw, offset_x, offset_y, &PHALCON_GLOBAL(z_zero), word);

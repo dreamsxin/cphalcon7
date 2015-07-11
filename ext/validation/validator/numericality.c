@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Numericality, validate){
 
 		PHALCON_ALLOC_INIT_ZVAL(pairs);
 		array_init_size(pairs, 1);
-		Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
+		Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
 
 		PHALCON_OBS_VAR(message_str);
 		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Numericality, validate){
 		PHALCON_CALL_FUNCTION(&prepared, "strtr", message_str, pairs);
 
 		message = phalcon_validation_message_construct_helper(prepared, attribute, "Numericality", code);
-		Z_DELREF_P(message);
+		Z_TRY_DELREF_P(message);
 	
 		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
 		RETURN_MM_FALSE;

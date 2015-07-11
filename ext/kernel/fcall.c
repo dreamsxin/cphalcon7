@@ -52,12 +52,7 @@ int phalcon_call_user_function2(zval **retval_ptr, zval *object, zend_class_entr
 {
 	zval retval;
 	HashTable *function_table;
-	int status, is_null = 0;
-
-	if (*retval_ptr == NULL) {
-		is_null = 1;
-		*retval_ptr = &retval;
-	}
+	int status;
 
 	if (type != phalcon_fcall_function && !object) {
 		object = &EG(current_execute_data)->This;
@@ -69,18 +64,15 @@ int phalcon_call_user_function2(zval **retval_ptr, zval *object, zend_class_entr
 
 	function_table = ce ? &ce->function_table : EG(function_table);
 
-
-	if ((status = call_user_function(function_table, object, function_name, *retval_ptr, param_count, params)) == FAILURE || EG(exception)) {
+	if ((status = call_user_function(function_table, object, function_name, &retval, param_count, params)) == FAILURE || EG(exception)) {
 		status = FAILURE;
-		if (is_null) {
-			ZVAL_NULL(*retval_ptr);
-		}
 	}
 
-	if (is_null) {
-		Z_TRY_ADDREF_P(*retval_ptr);
+	if (retval_ptr) {
+		PHALCON_ALLOC_ZVAL(*retval_ptr);
+		ZVAL_COPY(*retval_ptr, &retval);
 	}
-	zval_dtor(&retval);
+
 	return status;
 }
 
@@ -88,12 +80,7 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 {
 	zval retval, *arguments;
 	HashTable *function_table;
-	int i, status, is_null = 0;
-
-	if (*retval_ptr == NULL) {
-		is_null = 1;
-		*retval_ptr = &retval;
-	}
+	int i, status;
 
 	if (type != phalcon_fcall_function && !object) {
 		object = &EG(current_execute_data)->This;
@@ -109,20 +96,21 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 
 	i = 0;
 	while(i < param_count) {
-		ZVAL_ZVAL(&arguments[i], params[i], 1, 0);
+		ZVAL_COPY(&arguments[i], params[i]);
 		i++;
 	}
 
-	if ((status = call_user_function(function_table, object, function_name, *retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+	if ((status = call_user_function(function_table, object, function_name, &retval, param_count, arguments)) == FAILURE || EG(exception)) {
 		status = FAILURE;
-		if (is_null) {
-			ZVAL_NULL(*retval_ptr);
-		}
 	}
 
-	if (is_null) {
-		Z_TRY_ADDREF_P(*retval_ptr);
+	if (retval_ptr) {
+		PHALCON_ALLOC_ZVAL(*retval_ptr);
+		ZVAL_COPY(*retval_ptr, &retval);
 	}
+
+	efree(arguments);
+
 	return status;
 }
 
@@ -184,12 +172,12 @@ int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend
 		case phalcon_fcall_method:
 		default:
 			assert(object != NULL);
-			Z_ADDREF_P(object);
+			Z_TRY_ADDREF_P(object);
 			add_next_index_zval(&func, object);
 			break;
 	}
 
-	Z_ADDREF_P(method);
+	Z_TRY_ADDREF_P(method);
 	add_next_index_zval(&func, method);
 
 	if ((status = phalcon_call_user_function(retval_ptr, object ? object : NULL, ce, type, &func, param_count, params)) == FAILURE) {
@@ -242,7 +230,7 @@ int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *
 
 	array_init_size(&func, 2);
 	
-	Z_ADDREF_P(object);
+	Z_TRY_ADDREF_P(object);
 	add_next_index_zval(&func, object);
 	add_next_index_zval(&func, method);
 

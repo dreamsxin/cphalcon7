@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 	/** 
 	 * Check for a columnMap() method on the model
 	 */
-	if (phalcon_method_exists_ex(model, SS("columnmap")) == SUCCESS) {
+	if (phalcon_method_exists_ex(model, SL("columnmap")) == SUCCESS) {
 	
 		PHALCON_CALL_METHOD(&ordered_column_map, model, "columnmap");
 		if (Z_TYPE_P(ordered_column_map) != IS_ARRAY) { 

@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
 	if (zend_is_true(name)) {
-		if (phalcon_array_isset_str(options, SS("option"))) {
+		if (phalcon_array_isset_str(options, SL("option"))) {
 			PHALCON_OBS_VAR(option);
 			phalcon_array_fetch_str(&option, options, SL("option"), PH_NOISY);
 		} else {
@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 			PHALCON_INIT_NVAR(option);
 			ZVAL_LONG(option, 4);
 		}
-		if (phalcon_array_isset_str(options, SS("facility"))) {
+		if (phalcon_array_isset_str(options, SL("facility"))) {
 			PHALCON_OBS_VAR(facility);
 			phalcon_array_fetch_str(&facility, options, SL("facility"), PH_NOISY);
 		} else {

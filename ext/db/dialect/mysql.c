@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 
 	phalcon_fetch_params(1, 1, 0, &definition);
 	
-	if (phalcon_array_isset_str(definition, SS("options"))) {
+	if (phalcon_array_isset_str(definition, SL("options"))) {
 	
 		PHALCON_INIT_VAR(table_options);
 		array_init(table_options);
@@ -585,7 +585,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 		/** 
 		 * Check if there is an ENGINE option
 		 */
-		if (phalcon_array_isset_str(options, SS("ENGINE"))) {
+		if (phalcon_array_isset_str(options, SL("ENGINE"))) {
 	
 			PHALCON_OBS_VAR(engine);
 			phalcon_array_fetch_str(&engine, options, SL("ENGINE"), PH_NOISY);
@@ -599,7 +599,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 		/** 
 		 * Check if there is an AUTO_INCREMENT option
 		 */
-		if (phalcon_array_isset_str(options, SS("AUTO_INCREMENT"))) {
+		if (phalcon_array_isset_str(options, SL("AUTO_INCREMENT"))) {
 	
 			PHALCON_OBS_VAR(auto_increment);
 			phalcon_array_fetch_str(&auto_increment, options, SL("AUTO_INCREMENT"), PH_NOISY);
@@ -613,7 +613,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 		/** 
 		 * Check if there is a TABLE_COLLATION option
 		 */
-		if (phalcon_array_isset_str(options, SS("TABLE_COLLATION"))) {
+		if (phalcon_array_isset_str(options, SL("TABLE_COLLATION"))) {
 	
 			PHALCON_OBS_VAR(table_collation);
 			phalcon_array_fetch_str(&table_collation, options, SL("TABLE_COLLATION"), PH_NOISY);
@@ -666,7 +666,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 
 	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &definition);
 	
-	if (!phalcon_array_isset_str(definition, SS("columns"))) {
+	if (!phalcon_array_isset_str(definition, SL("columns"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
 		return;
 	}
@@ -680,11 +680,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	
 	PHALCON_INIT_VAR(temporary);
 	ZVAL_BOOL(temporary, 0);
-	if (phalcon_array_isset_str(definition, SS("options"))) {
+	if (phalcon_array_isset_str(definition, SL("options"))) {
 	
 		PHALCON_OBS_VAR(options);
 		phalcon_array_fetch_str(&options, definition, SL("options"), PH_NOISY);
-		phalcon_array_isset_str_fetch(&temporary, options, SS("temporary"));
+		phalcon_array_isset_str_fetch(&temporary, options, SL("temporary"));
 	}
 	
 	/** 
@@ -741,7 +741,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	/** 
 	 * Create related indexes
 	 */
-	if (phalcon_array_isset_str(definition, SS("indexes"))) {
+	if (phalcon_array_isset_str(definition, SL("indexes"))) {
 	
 		PHALCON_OBS_VAR(indexes);
 		phalcon_array_fetch_str(&indexes, definition, SL("indexes"), PH_NOISY);
@@ -770,7 +770,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	/** 
 	 * Create related references
 	 */
-	if (phalcon_array_isset_str(definition, SS("references"))) {
+	if (phalcon_array_isset_str(definition, SL("references"))) {
 	
 		PHALCON_OBS_VAR(references);
 		phalcon_array_fetch_str(&references, definition, SL("references"), PH_NOISY);
@@ -795,7 +795,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	PHALCON_INIT_VAR(joined_lines);
 	phalcon_fast_join_str(joined_lines, SL(",\n\t"), create_lines);
 	PHALCON_SCONCAT_VS(sql, joined_lines, "\n)");
-	if (phalcon_array_isset_str(definition, SS("options"))) {
+	if (phalcon_array_isset_str(definition, SL("options"))) {
 		PHALCON_CALL_METHOD(&options, getThis(), "_gettableoptions", definition);
 		PHALCON_SCONCAT_SV(sql, " ", options);
 	}
@@ -856,7 +856,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createView){
 
 	phalcon_fetch_params(1, 3, 0, &view_name, &definition, &schema_name);
 	
-	if (!phalcon_array_isset_str(definition, SS("sql"))) {
+	if (!phalcon_array_isset_str(definition, SL("sql"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
 		return;
 	}

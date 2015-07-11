@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, offsetSet){
 	zval *index, *message;
 
 	phalcon_fetch_params(0, 2, 0, &index, &message);
-	Z_ADDREF_P(message);
+	Z_TRY_ADDREF_P(message);
 	phalcon_update_property_array(getThis(), SL("_messages"), index, message);
 }
 
@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 			/** 
 			 * Get the field name
 			 */
-			if (phalcon_method_exists_ex(message, SS("getfield")) == SUCCESS) {
+			if (phalcon_method_exists_ex(message, SL("getfield")) == SUCCESS) {
 				PHALCON_CALL_METHOD(&field, message, "getfield");
 				if (PHALCON_IS_EQUAL(field_name, field)) {
 					phalcon_array_append(filtered, message, PH_SEPARATE);
@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, __set_state){
 
 	phalcon_fetch_params(0, 1, 0, &group);
 
-	if (phalcon_array_isset_str_fetch(&messages, group, SS("_messages"))) {
+	if (phalcon_array_isset_str_fetch(&messages, group, SL("_messages"))) {
 		object_init_ex(return_value, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHODW(NULL, return_value, "__construct", messages);
 	}

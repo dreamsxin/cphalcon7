@@ -145,19 +145,19 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 		array_init_size(options, 4);
 	}
 
-	if (!phalcon_array_isset_str(options, SS("host"))) {
+	if (!phalcon_array_isset_str(options, SL("host"))) {
 		phalcon_array_update_string_string(options, SL("host"), SL("127.0.0.1"), 0);
 	}
 
-	if (!phalcon_array_isset_str(options, SS("port"))) {
+	if (!phalcon_array_isset_str(options, SL("port"))) {
 		phalcon_array_update_string_long(options, SL("port"), 6379, 0);
 	}
 
-	if (!phalcon_array_isset_str(options, SS("persistent"))) {
+	if (!phalcon_array_isset_str(options, SL("persistent"))) {
 		phalcon_array_update_string_bool(options, SL("persistent"), 0, 0);
 	}
 
-	if (!phalcon_array_isset_str(options, SS("statsKey"))) {
+	if (!phalcon_array_isset_str(options, SL("statsKey"))) {
 		phalcon_array_update_string_string(options, SL("statsKey"), SL("_PHCR"), 0);
 	}
 
@@ -187,9 +187,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 	}
 	
 	if (
-		   !phalcon_array_isset_str_fetch(&host, options, SS("host"))
-		|| !phalcon_array_isset_str_fetch(&port, options, SS("port"))
-		|| !phalcon_array_isset_str_fetch(&persistent, options, SS("persistent"))
+		   !phalcon_array_isset_str_fetch(&host, options, SL("host"))
+		|| !phalcon_array_isset_str_fetch(&port, options, SL("port"))
+		|| !phalcon_array_isset_str_fetch(&persistent, options, SL("persistent"))
 	) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 		return;
 	}
 	
-	if (phalcon_array_isset_str_fetch(&auth, options, SS("auth"))) {
+	if (phalcon_array_isset_str_fetch(&auth, options, SL("auth"))) {
 		PHALCON_CALL_METHOD(&success, redis, "auth", auth);
 
 		if (!zend_is_true(success)) {
@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
-	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SS("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -408,7 +408,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, delete){
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
-	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SS("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -440,7 +440,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, queryKeys){
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SS("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SL("statsKey")))) {
 		zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Unexpected inconsistency in options");
 		return;
 	}
@@ -625,7 +625,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
-	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SS("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -665,7 +665,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, getTrackingKey)
 	zval *stats_key;
 	zval *options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
-	if (!phalcon_array_isset_str_fetch(&stats_key, options, SS("statsKey"))) {
+	if (!phalcon_array_isset_str_fetch(&stats_key, options, SL("statsKey"))) {
 		RETURN_NULL();
 	}
 

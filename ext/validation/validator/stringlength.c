@@ -132,8 +132,8 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 		if (phalcon_compare_strict_string(type, SL("TooLong"))) {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(maximum); add_assoc_zval_ex(pairs, SS(":max"), maximum);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(maximum); add_assoc_zval_ex(pairs, SL(":max"), maximum);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), "messageMaximum"));
@@ -148,8 +148,8 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 		} else {
 			PHALCON_ALLOC_INIT_ZVAL(pairs);
 			array_init_size(pairs, 2);
-			Z_ADDREF_P(label); add_assoc_zval_ex(pairs, SS(":field"), label);
-			Z_ADDREF_P(minimum); add_assoc_zval_ex(pairs, SS(":min"), minimum);
+			Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+			Z_TRY_ADDREF_P(minimum); add_assoc_zval_ex(pairs, SL(":min"), minimum);
 
 			PHALCON_OBS_VAR(message_str);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), "messageMinimum"));
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooShort", code);
 		}
 
-		Z_DELREF_P(message);
+		Z_TRY_DELREF_P(message);
 
 		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
 		RETURN_MM_FALSE;
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 	}
 
 	/* Check if mbstring is available to calculate the correct length */
-	if (phalcon_function_exists_ex(SS("mb_strlen")) == SUCCESS) {
+	if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
 		PHALCON_CALL_FUNCTION(&length, "mb_strlen", value);
 	} else {
 		convert_to_string(value);

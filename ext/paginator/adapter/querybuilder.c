@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	if (!phalcon_array_isset_str_fetch(&builder, config, SS("builder"))) {
+	if (!phalcon_array_isset_str_fetch(&builder, config, SL("builder"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'builder' is required");
 		return;
 	}
@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	phalcon_update_property_this(getThis(), SL("_builder"), builder);
 
-	if (!phalcon_array_isset_str_fetch(&limit, config, SS("limit"))) {
+	if (!phalcon_array_isset_str_fetch(&limit, config, SL("limit"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
 		return;
 	}
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
 
-	if (phalcon_array_isset_str_fetch(&page, config, SS("page"))) {
+	if (phalcon_array_isset_str_fetch(&page, config, SL("page"))) {
 		phalcon_update_property_this(getThis(), SL("_page"), page);
 	}
 }

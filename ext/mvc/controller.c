@@ -87,7 +87,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Controller){
  */
 PHP_METHOD(Phalcon_Mvc_Controller, __construct){
 
-	if (phalcon_method_exists_ex(getThis(), SS("onconstruct")) == SUCCESS) {
+	if (phalcon_method_exists_ex(getThis(), SL("onconstruct")) == SUCCESS) {
 		PHALCON_MM_GROW();
 		PHALCON_CALL_METHOD(NULL, getThis(), "onconstruct");
 		PHALCON_MM_RESTORE();

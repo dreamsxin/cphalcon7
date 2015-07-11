@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		/** 
 		 * Call the 'initialize' method if it's implemented
 		 */
-		if (phalcon_method_exists_ex(model, SS("initialize")) == SUCCESS) {
+		if (phalcon_method_exists_ex(model, SL("initialize")) == SUCCESS) {
 			PHALCON_CALL_METHOD(NULL, model, "initialize");
 		}
 

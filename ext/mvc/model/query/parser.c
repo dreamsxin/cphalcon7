@@ -242,13 +242,13 @@ static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 
 		PHALCON_ALLOC_INIT_ZVAL(values);
 		if (phalcon_array_isset_fetch(&values, ret, key2)) {
-			Z_ADDREF_P(values);
+			Z_TRY_ADDREF_P(values);
 			add_next_index_zval(rows, values);	
 		}
 	}
 
 	add_next_index_zval(rows, V);
-	Z_ADDREF_P(rows);
+	Z_TRY_ADDREF_P(rows);
 	add_assoc_zval(ret, ISV(rows), rows);
 
 	return ret;
@@ -339,7 +339,7 @@ static zval *phql_ret_zval_list(zval *list_left, zval *right_list)
 	if (zend_hash_index_exists(list, 0)) {
 		zval *item;
 		ZEND_HASH_FOREACH_VAL(list, item) {
-			Z_ADDREF_P(item);
+			Z_TRY_ADDREF_P(item);
 			add_next_index_zval(ret, item);
 		} ZEND_HASH_FOREACH_END();
 

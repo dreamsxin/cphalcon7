@@ -396,7 +396,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 	
 	if (PHALCON_IS_STRING(filter, "lower")) {
-		if (phalcon_function_exists_ex(SS("mb_strtolower")) == SUCCESS) {
+		if (phalcon_function_exists_ex(SL("mb_strtolower")) == SUCCESS) {
 			/** 
 			 * 'lower' checks for the mbstring extension to make a correct lowercase
 			 * transformation
@@ -410,7 +410,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 	
 	if (PHALCON_IS_STRING(filter, "upper")) {
-		if (phalcon_function_exists_ex(SS("mb_strtoupper")) == SUCCESS) {
+		if (phalcon_function_exists_ex(SL("mb_strtoupper")) == SUCCESS) {
 			/** 
 			 * 'upper' checks for the mbstring extension to make a correct lowercase
 			 * transformation

@@ -55,7 +55,6 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 	int i, l, ll; char *s;
 	va_list ap;
 	zval *fetched, *tmp_arr, *tmp, *p, *item;
-	int separated = 0;
 
 	tmp_arr = phalcon_read_static_property_ce(ce, property, property_length);
 

@@ -1468,7 +1468,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
 
 	PHALCON_CALL_METHOD(NULL, connection, "commit");
 
-	RETURN_MM();
+	RETURN_MM_TRUE;
 }
 
 /**

@@ -221,9 +221,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 
 	PHALCON_INIT_VAR(next_consecutive);
 	phalcon_add_function(next_consecutive, connection_consecutive, &PHALCON_GLOBAL(z_one));
-	zend_printf("\nnext_consecutive\n");
-	zend_print_zval_r(next_consecutive, 0);
-	zend_printf("\n---next_consecutive\n");
+
 	phalcon_update_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"), next_consecutive);
 	phalcon_update_property_this(getThis(), SL("_connectionId"), connection_consecutive);
 

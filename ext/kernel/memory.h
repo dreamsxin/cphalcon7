@@ -177,15 +177,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 #define PHALCON_SEPARATE_ARRAY(a) SEPARATE_ARRAY(a)
 
 #define PHALCON_SEPARATE(z) SEPARATE_ZVAL(z)
-#define PHALCON_SEPARATE_PARAM(z)                     \
-	do {                                              \
-		zval *orig_ptr = z;                           \
-		PHALCON_MEMORY_OBSERVE(&z);                   \
-		PHALCON_ALLOC_ZVAL(z);                        \
-		*z = *orig_ptr;                               \
-		zval_copy_ctor(z);                            \
-		Z_SET_REFCOUNT_P(z, 1);                       \
-		ZVAL_UNREF(z);                                \
-	} while (0)
+#define PHALCON_SEPARATE_PARAM(z) \
+	SEPARATE_ZVAL_IF_NOT_REF(z)
 
 #endif /* PHALCON_KERNEL_MEMORY_H */

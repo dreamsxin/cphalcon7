@@ -157,7 +157,6 @@ static inline zval* phalcon_read_static_property_ce(zend_class_entry *ce, const 
 
 static inline int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value)
 {
-
 	return zend_update_static_property(ce, name, len, value);
 }
 

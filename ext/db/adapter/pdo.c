@@ -192,18 +192,16 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 
 	PHALCON_MM_GROW();
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "|z", &descriptor) == FAILURE) {
-		RETURN_MM_NULL();
-	}
+	phalcon_fetch_params(1, 0, 1, &descriptor);
 
-	if (!descriptor) {
-		PHALCON_INIT_VAR(descriptor);
+	if (!descriptor || Z_TYPE_P(descriptor) == IS_NULL) {
+		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
 	} else {
 		PHALCON_SEPARATE_PARAM(descriptor);
 	}
 
-	if (Z_TYPE_P(descriptor) == IS_NULL) {
-		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
+	if (Z_TYPE_P(descriptor) != IS_ARRAY) {
+		RETURN_MM_FALSE;
 	}
 
 	/**

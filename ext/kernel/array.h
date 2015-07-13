@@ -167,12 +167,10 @@ int phalcon_array_append(zval *arr, zval *value, int flags);
  */
 static inline int phalcon_array_append_long(zval *arr, long value, int flags)
 {
-	zval *zvalue;
+	zval zvalue;
+	ZVAL_LONG(&zvalue, value);
 
-	PHALCON_ALLOC_INIT_ZVAL(zvalue);
-	ZVAL_LONG(zvalue, value);
-
-	return phalcon_array_append(arr, zvalue, flags);
+	return phalcon_array_append(arr, &zvalue, flags);
 }
 
 /**
@@ -191,12 +189,9 @@ static inline int phalcon_array_append_long(zval *arr, long value, int flags)
  */
 static inline int phalcon_array_append_string(zval *arr, const char *value, uint value_length, int separate)
 {
-	zval *zvalue;
-
-	PHALCON_ALLOC_INIT_ZVAL(zvalue);
-	ZVAL_STRINGL(zvalue, value, value_length);
-
-	return phalcon_array_append(arr, zvalue, separate);
+	zval zvalue;
+	ZVAL_STRINGL(&zvalue, value, value_length);
+	return phalcon_array_append(arr, &zvalue, separate);
 }
 
 /**
@@ -236,9 +231,7 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 static inline int phalcon_array_update_zval_bool(zval *arr, zval *index, int value, int flags)
 {
 	zval zvalue;
-
 	ZVAL_BOOL(&zvalue, value);
-
 	return phalcon_array_update_zval(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
@@ -259,9 +252,7 @@ static inline int phalcon_array_update_zval_bool(zval *arr, zval *index, int val
 static inline int phalcon_array_update_zval_long(zval *arr, zval *index, long value, int flags)
 {
 	zval zvalue;
-
 	ZVAL_LONG(&zvalue, value);
-
 	return phalcon_array_update_zval(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 
@@ -283,9 +274,7 @@ static inline int phalcon_array_update_zval_long(zval *arr, zval *index, long va
 static inline int phalcon_array_update_zval_string(zval *arr, zval *index, char *value, uint value_length, int flags)
 {
 	zval zvalue;
-
 	ZVAL_STRINGL(&zvalue, value, value_length);
-
 	return phalcon_array_update_zval(arr, index, &zvalue, flags & PH_SEPARATE);
 }
 

@@ -26,23 +26,28 @@
 #include "kernel/string.h"
 
 void phalcon_concat_sv(zval *result, const char *op1, uint32_t op1_len, zval *op2, int self_var){
-	zval zop1, ret;
+	zval zop1;
 	ZVAL_STRINGL(&zop1, op1, op1_len);
 	if (self_var) {
-		concat_function(&ret, result, &zop1);
-		concat_function(result, &ret, op2);
+		concat_function(result, result, &zop1);
+		concat_function(result, result, op2);
 	} else {
 		concat_function(result, &zop1, op2);
 	}
 }
 
 void phalcon_concat_svs(zval *result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, int self_var){
-	zval zop3, ret;
+	zval zop1, zop3;
+	ZVAL_STRINGL(&zop1, op1, op1_len);
 	ZVAL_STRINGL(&zop3, op3, op3_len);
 
-	phalcon_concat_sv(result, op1, op1_len, op2, self_var);
-	concat_function(&ret, result, &zop3);
-	ZVAL_ZVAL(result, &ret, 1, 0);
+	if (self_var) {
+		concat_function(result, result, &zop1);
+		concat_function(result, result, op2);
+	} else {
+		concat_function(result, &zop1, op2);
+	}
+	concat_function(result, result, &zop3);
 }
 
 void phalcon_concat_svsv(zval *result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var){
@@ -78,17 +83,15 @@ void phalcon_concat_svsvv(zval *result, const char *op1, uint32_t op1_len, zval 
 }
 
 void phalcon_concat_svv(zval *result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, int self_var){
-	zval zop1, ret;
+	zval zop1;
 	ZVAL_STRINGL(&zop1, op1, op1_len);
 	if (self_var) {
-		concat_function(&ret, result, &zop1);
-		concat_function(result, &ret, op2);
-		concat_function(&ret, result, op3);
+		concat_function(result, result, &zop1);
+		concat_function(result, result, op2);
 	} else {
 		concat_function(result, &zop1, op2);
-		concat_function(&ret, result, op3);
 	}
-	ZVAL_ZVAL(result, &ret, 1, 0);
+	concat_function(result, result, op3);
 }
 
 void phalcon_concat_svvs(zval *result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, const char *op4, uint32_t op4_len, int self_var){
@@ -97,21 +100,26 @@ void phalcon_concat_svvs(zval *result, const char *op1, uint32_t op1_len, zval *
 }
 
 void phalcon_concat_vs(zval *result, zval *op1, const char *op2, uint32_t op2_len, int self_var){
-	zval zop2, ret;
+	zval zop2;
 	ZVAL_STRINGL(&zop2, op2, op2_len);
 	if (self_var) {
-		concat_function(&ret, result, op1);
-		concat_function(result, &ret, &zop2);
+		concat_function(result, result, op1);
+		concat_function(result, result, &zop2);
 	} else {
 		concat_function(result, op1, &zop2);
 	}
 }
 
 void phalcon_concat_vsv(zval *result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, int self_var){
-	zval ret;
-	phalcon_concat_vs(result, op1, op2, op2_len, self_var);
-	concat_function(&ret, result, op3);
-	ZVAL_ZVAL(result, &ret, 1, 0);
+	zval zop2;
+	ZVAL_STRINGL(&zop2, op2, op2_len);
+	if (self_var) {
+		concat_function(result, result, op1);
+		concat_function(result, result, &zop2);
+	} else {
+		concat_function(result, op1, &zop2);
+	}
+	concat_function(result, result, op3);
 }
 
 void phalcon_concat_vsvs(zval *result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, const char *op4, uint32_t op4_len, int self_var){
@@ -146,22 +154,25 @@ void phalcon_concat_vsvvv(zval *result, zval *op1, const char *op2, uint32_t op2
 }
 
 void phalcon_concat_vv(zval *result, zval *op1, zval *op2, int self_var){
-	zval ret;
 	if (self_var) {
-		concat_function(&ret, result, op1);
-		concat_function(result, &ret, op2);
+		concat_function(result, result, op1);
+		concat_function(result, result, op2);
 	} else {
 		concat_function(result, op1, op2);
 	}
 }
 
 void phalcon_concat_vvs(zval *result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, int self_var){
-	zval zop3, ret;
+	zval zop3;
 	ZVAL_STRINGL(&zop3, op3, op3_len);
 
-	phalcon_concat_vv(result, op1, op2, self_var);
-	concat_function(&ret, result, &zop3);
-	ZVAL_ZVAL(result, &ret, 1, 0);
+	if (self_var) {
+		concat_function(result, result, op1);
+		concat_function(result, result, op2);
+	} else {
+		concat_function(result, op1, op2);
+	}
+	concat_function(result, result, &zop3);
 }
 
 void phalcon_concat_vvsv(zval *result, zval *op1, zval *op2, const char *op3, uint32_t op3_len, zval *op4, int self_var){
@@ -170,17 +181,13 @@ void phalcon_concat_vvsv(zval *result, zval *op1, zval *op2, const char *op3, ui
 }
 
 void phalcon_concat_vvv(zval *result, zval *op1, zval *op2, zval *op3, int self_var){
-	zval ret;
 	if (self_var) {
-		concat_function(&ret, result, op1);
-		concat_function(result, &ret, op2);
-		concat_function(&ret, result, op3);
+		concat_function(result, result, op1);
+		concat_function(result, result, op2);
 	} else {
 		concat_function(result, op1, op2);
-		concat_function(&ret, result, op3);
 	}
-
-	ZVAL_ZVAL(result, &ret, 1, 0);
+	concat_function(result, result, op3);
 }
 
 void phalcon_concat_vvvsv(zval *result, zval *op1, zval *op2, zval *op3, const char *op4, uint32_t op4_len, zval *op5, int self_var){
@@ -203,9 +210,7 @@ void phalcon_concat_vvvvsvv(zval *result, zval *op1, zval *op2, zval *op3, zval 
  * Appends the content of the right operator to the left operator
  */
 void phalcon_concat_self(zval *left, zval *right){
-	zval ret;
-	concat_function(&ret, left, right);
-	ZVAL_ZVAL(left, &ret, 1, 0);
+	concat_function(left, left, right);
 }
 
 /**
@@ -214,7 +219,8 @@ void phalcon_concat_self(zval *left, zval *right){
 void phalcon_concat_self_str(zval *left, const char *right, int right_length){
 	zval zright;
 	ZVAL_STRINGL(&zright, right, right_length);
-	phalcon_concat_self(left, &zright);
+
+	concat_function(left, left, &zright);
 }
 
 /**
@@ -223,7 +229,8 @@ void phalcon_concat_self_str(zval *left, const char *right, int right_length){
 void phalcon_concat_self_long(zval *left, const long right) {
 	zval zright;
 	ZVAL_LONG(&zright, right);
-	phalcon_concat_self(left, &zright);
+
+	concat_function(left, left, &zright);
 }
 
 /**
@@ -234,5 +241,6 @@ void phalcon_concat_self_char(zval *left, unsigned char right) {
 	char c[1];
 	c[0] = right;
 	ZVAL_STRINGL(&zright, c, 1);
-	phalcon_concat_self(left, &zright);
+
+	concat_function(left, left, &zright);
 }

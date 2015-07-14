@@ -105,7 +105,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 					Z_SET_REFCOUNT_P(z, 1);           \
 					ZVAL_UNREF(z);                    \
 				} else {                              \
-					zval_ptr_dtor(z);                 \
+					zval_dtor(z);                     \
 					Z_SET_REFCOUNT_P(z, 1);           \
 					ZVAL_UNREF(z);                    \
 				}                                     \

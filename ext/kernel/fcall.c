@@ -69,7 +69,9 @@ int phalcon_call_user_function2(zval **retval_ptr, zval *object, zend_class_entr
 	}
 
 	if (retval_ptr) {
-		PHALCON_ALLOC_ZVAL(*retval_ptr);
+		if (*retval_ptr == NULL) {
+			PHALCON_ALLOC_ZVAL(*retval_ptr);
+		}
 		ZVAL_COPY(*retval_ptr, &retval);
 	}
 
@@ -105,7 +107,9 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 	}
 
 	if (retval_ptr) {
-		PHALCON_ALLOC_ZVAL(*retval_ptr);
+		if (*retval_ptr == NULL) {
+			PHALCON_ALLOC_ZVAL(*retval_ptr);
+		}
 		ZVAL_COPY(*retval_ptr, &retval);
 	}
 

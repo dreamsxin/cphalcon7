@@ -634,7 +634,7 @@ static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, co
 	zend_class_entry *original_ce = ce;
 
 	while (ce) {
-		if (zend_hash_str_exists(&ce->properties_info, property_name, property_length + 1)) {
+		if (zend_hash_str_exists(&ce->properties_info, property_name, property_length)) {
 			return ce;
 		}
 		ce = ce->parent;

@@ -419,6 +419,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 	ulong uidx = 0;
 	char *sidx = NULL;
 
+	PHALCON_ALLOC_ZVAL(*return_value);
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		ht = Z_ARRVAL_P(arr);
 		switch (Z_TYPE_P(index)) {
@@ -460,8 +461,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		}
 
 		if (result != FAILURE) {
-			*return_value = zv;
-			Z_TRY_ADDREF_P(*return_value);
+			ZVAL_COPY_VALUE(*return_value, zv);
 			return SUCCESS;
 		}
 
@@ -474,7 +474,6 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		}
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(*return_value);
 	return FAILURE;
 }
 
@@ -482,10 +481,10 @@ int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *in
 
 	zval *zv;
 
+	PHALCON_ALLOC_ZVAL(*return_value);
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
-			*return_value = zv;
-			Z_TRY_ADDREF_P(*return_value);
+			ZVAL_COPY_VALUE(*return_value, zv);
 			return SUCCESS;
 		}
 
@@ -498,7 +497,6 @@ int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *in
 		}
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(*return_value);
 	return FAILURE;
 }
 
@@ -506,10 +504,10 @@ int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string
 
 	zval *zv;
 
+	PHALCON_ALLOC_ZVAL(*return_value);
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			*return_value = zv;
-			Z_TRY_ADDREF_P(*return_value);
+			ZVAL_COPY_VALUE(*return_value, zv);
 			return SUCCESS;
 		}
 
@@ -522,7 +520,6 @@ int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string
 		}
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(*return_value);
 	return FAILURE;
 }
 
@@ -530,24 +527,22 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
 
 	zval *zv;
 
+	PHALCON_ALLOC_ZVAL(*return_value);
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			*return_value = zv;
-			Z_TRY_ADDREF_P(*return_value);
+			ZVAL_COPY_VALUE(*return_value, zv);
 			return SUCCESS;
 		}
 
 		if (silent == PH_NOISY) {
 			zend_error(E_NOTICE, "Undefined index: %lu", index);
 		}
-	}
-	else {
+	} else {
 		if (silent == PH_NOISY) {
 			zend_error(E_NOTICE, "Cannot use a scalar value as an array");
 		}
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(*return_value);
 	return FAILURE;
 }
 

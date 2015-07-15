@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 			}
 			PHALCON_INIT_NVAR(dsn_attribute);
 			PHALCON_CONCAT_VSV(dsn_attribute, &key, "=", value);
-			phalcon_array_append(dsn_parts, dsn_attribute, PH_SEPARATE);
+			phalcon_array_append(dsn_parts, dsn_attribute, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_VAR(dsn_attributes);

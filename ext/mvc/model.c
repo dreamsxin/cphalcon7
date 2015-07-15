@@ -1595,7 +1595,9 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	PHALCON_INIT_NVAR(event_name);
 	ZVAL_STRING(event_name, "beforeQuery");
 
+	ZVAL_MAKE_REF(builder);
 	PHALCON_CALL_METHOD(NULL, model, "fireevent", event_name, builder);
+	ZVAL_UNREF(builder);
 
 	PHALCON_CALL_METHOD(&query, builder, "getquery");
 
@@ -1627,7 +1629,9 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 		PHALCON_INIT_NVAR(event_name);
 		ZVAL_STRING(event_name, "afterQuery");
 
+		ZVAL_MAKE_REF(resultset);
 		PHALCON_CALL_METHOD(NULL, model, "fireevent", event_name, resultset);
+		ZVAL_UNREF(resultset);
 	}
 
 	RETURN_CTOR(resultset);
@@ -1735,7 +1739,9 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	PHALCON_INIT_NVAR(event_name);
 	ZVAL_STRING(event_name, "beforeQuery");
 
+	ZVAL_MAKE_REF(builder);
 	PHALCON_CALL_METHOD(NULL, model, "fireevent", event_name, builder);
+	ZVAL_UNREF(builder);
 
 	/**
 	 * Check for bind parameters
@@ -1762,8 +1768,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 			PHALCON_ALLOC_INIT_ZVAL(bind_types);
 			array_init_size(bind_types, 1);
 		}
-	}
-	else {
+	} else {
 		PHALCON_ALLOC_INIT_ZVAL(bind_params);
 		PHALCON_ALLOC_INIT_ZVAL(bind_types);
 		array_init_size(bind_params, 1);
@@ -1808,7 +1813,9 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		PHALCON_INIT_NVAR(event_name);
 		ZVAL_STRING(event_name, "afterQuery");
 
+		ZVAL_MAKE_REF(result);
 		PHALCON_CALL_METHOD(NULL, model, "fireevent", event_name, result);
+		ZVAL_UNREF(result);
 
 		/**
 		 * Define an hydration mode
@@ -7296,7 +7303,9 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	PHALCON_INIT_NVAR(event_name);
 	ZVAL_STRING(event_name, "afterToArray");
 
+	ZVAL_MAKE_REF(data);
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, data);
+	ZVAL_UNREF(data);
 
 	RETURN_CTOR(data);
 }

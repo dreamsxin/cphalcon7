@@ -503,29 +503,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
 	PHALCON_INIT_VAR(lowercased);
-	ZVAL_STRINGL(lowercased, zend_str_tolower_dup(Z_STRVAL_P(model_name), Z_STRLEN_P(model_name)), Z_STRLEN_P(model_name));
+	ZVAL_STR(lowercased, zend_string_tolower(Z_STR_P(model_name)));
 
 	/** 
 	 * Check if a model with the same is already loaded
 	 */
-	if (phalcon_array_isset_fetch(&model, initialized, lowercased)) {
-		if (zend_is_true(new_instance)) {
-			dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-
-			if (Z_TYPE_P(model) != IS_OBJECT) {
-				/* This shouls never happen but better safe than sorry */
-				RETURN_MM_NULL();
-			}
-
-			object_init_ex(return_value, Z_OBJCE_P(model));
-
-			if (phalcon_has_constructor(return_value)) {
-				PHALCON_CALL_METHOD(NULL, return_value, "__construct", dependency_injector, getThis());
-			}
-
-			RETURN_MM();
-		}
-
+	if (!zend_is_true(new_instance) && phalcon_array_isset_fetch(&model, initialized, lowercased)) {
 		RETURN_CTOR(model);
 	}
 

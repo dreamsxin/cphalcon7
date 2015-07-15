@@ -101,8 +101,7 @@ void phalcon_fast_strtolower(zval *return_value, zval *str){
 
 	zval copy;
 	int use_copy = 0;
-	char *lower_str;
-	unsigned int length;
+	zend_string *lower_str;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
 		use_copy = zend_make_printable_zval(str, &copy);
@@ -111,15 +110,13 @@ void phalcon_fast_strtolower(zval *return_value, zval *str){
 		}
 	}
 
-	length = Z_STRLEN_P(str);
-	lower_str = estrndup(Z_STRVAL_P(str), length);
-	zend_str_tolower(lower_str, length);
+	lower_str = zend_string_tolower(Z_STR_P(str));
 
 	if (use_copy) {
 		zval_ptr_dtor(str);
 	}
 
-	ZVAL_STRINGL(return_value, lower_str, length);
+	ZVAL_STR(return_value, lower_str);
 }
 
 void phalcon_strtolower_inplace(zval *s) {
@@ -1237,9 +1234,8 @@ void phalcon_lcfirst(zval *return_value, zval *s)
 
 	if (!Z_STRLEN_P(s)) {
 		ZVAL_EMPTY_STRING(return_value);
-	}
-	else {
-		ZVAL_NEW_STR(return_value, Z_STR_P(s));
+	} else {
+		ZVAL_DUP(return_value, s);
 		c = Z_STRVAL_P(return_value);
 		*c = tolower((unsigned char)*c);
 	}
@@ -1266,7 +1262,7 @@ void phalcon_ucfirst(zval *return_value, zval *s)
 		ZVAL_EMPTY_STRING(return_value);
 	}
 	else {
-		ZVAL_NEW_STR(return_value, Z_STR_P(s));
+		ZVAL_DUP(return_value, s);
 		c = Z_STRVAL_P(return_value);
 		*c = toupper((unsigned char)*c);
 	}

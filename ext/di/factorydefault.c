@@ -63,12 +63,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_FactoryDefault){
  */
 PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 
-	zval *shared, *name = NULL, *definition = NULL, *router, *dispatcher;
-	zval *url, *models_manager, *models_metadata, *models_query, *models_query_builder, *models_criteria;
-	zval *response, *cookies, *request, *filter, *escaper;
-	zval *annotations, *security, *crypt, *flash, *flash_session;
-	zval *tag, *session, *session_bag, *events_manager;
-	zval *transaction_manager, *assets;
+	zval *shared, *name = NULL, *definition = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -85,11 +80,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_VAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Router");
 
-	PHALCON_INIT_VAR(router);
-	object_init_ex(router, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, router, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, router, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Mvc Dispatcher
@@ -100,11 +91,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Dispatcher");
 
-	PHALCON_INIT_VAR(dispatcher);
-	object_init_ex(dispatcher, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, dispatcher, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, dispatcher, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Mvc Url
@@ -115,11 +102,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Url");
 
-	PHALCON_INIT_VAR(url);
-	object_init_ex(url, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, url, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, url, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Models manager for ORM
@@ -130,11 +113,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Manager");
 
-	PHALCON_INIT_VAR(models_manager);
-	object_init_ex(models_manager, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, models_manager, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, models_manager, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Models meta-data using the Memory adapter
@@ -145,11 +124,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\MetaData\\Memory");
 
-	PHALCON_INIT_VAR(models_metadata);
-	object_init_ex(models_metadata, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, models_metadata, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, models_metadata, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Models Query for ORM
@@ -160,11 +135,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Query");
 
-	PHALCON_INIT_VAR(models_query);
-	object_init_ex(models_query, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, models_query, "__construct", name, definition);
-
-	phalcon_di_set_service(getThis(), name, models_query, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Models Query Builder for ORM
@@ -175,11 +146,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Query\\Builder");
 
-	PHALCON_INIT_VAR(models_query_builder);
-	object_init_ex(models_query_builder, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, models_query_builder, "__construct", name, definition);
-
-	phalcon_di_set_service(getThis(), name, models_query_builder, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Models Criteria for ORM
@@ -190,11 +157,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Criteria");
 
-	PHALCON_INIT_VAR(models_criteria);
-	object_init_ex(models_criteria, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, models_criteria, "__construct", name, definition);
-
-	phalcon_di_set_service(getThis(), name, models_criteria, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Request/Response are always shared
@@ -205,11 +168,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Response");
 
-	PHALCON_INIT_VAR(response);
-	object_init_ex(response, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, response, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, response, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Http Response Cookies
@@ -220,12 +179,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Response\\Cookies");
 
-	PHALCON_INIT_VAR(cookies);
-	object_init_ex(cookies, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, cookies, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, cookies, PH_COPY);
-
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 	/**
 	 * Http Request
 	 */
@@ -235,11 +189,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Request");
 
-	PHALCON_INIT_VAR(request);
-	object_init_ex(request, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, request, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, request, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Filter/Escaper services are always shared
@@ -250,11 +200,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Filter");
 
-	PHALCON_INIT_VAR(filter);
-	object_init_ex(filter, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, filter, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, filter, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Escaper
@@ -265,11 +211,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Escaper");
 
-	PHALCON_INIT_VAR(escaper);
-	object_init_ex(escaper, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, escaper, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, escaper, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Default annotations service
@@ -280,11 +222,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Annotations\\Adapter\\Memory");
 
-	PHALCON_INIT_VAR(annotations);
-	object_init_ex(annotations, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, annotations, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, annotations, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Security doesn't need to be shared, but anyways we register it as shared
@@ -295,11 +233,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Security");
 
-	PHALCON_INIT_VAR(security);
-	object_init_ex(security, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, security, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, security, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Crypt Service
@@ -310,11 +244,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Crypt");
 
-	PHALCON_INIT_VAR(crypt);
-	object_init_ex(crypt, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, crypt, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, crypt, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Flash services are always shared
@@ -325,11 +255,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Flash\\Direct");
 
-	PHALCON_INIT_VAR(flash);
-	object_init_ex(flash, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, flash, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, flash, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Flash Session
@@ -340,11 +266,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Flash\\Session");
 
-	PHALCON_INIT_VAR(flash_session);
-	object_init_ex(flash_session, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, flash_session, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, flash_session, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Tag/Helpers
@@ -355,11 +277,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Tag");
 
-	PHALCON_INIT_VAR(tag);
-	object_init_ex(tag, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, tag, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, tag, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Session is always shared
@@ -370,11 +288,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Session\\Adapter\\Files");
 
-	PHALCON_INIT_VAR(session);
-	object_init_ex(session, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, session, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, session, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Session/Bag
@@ -385,11 +299,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Session\\Bag");
 
-	PHALCON_INIT_VAR(session_bag);
-	object_init_ex(session_bag, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, session_bag, "__construct", name, definition);
-
-	phalcon_di_set_service(getThis(), name, session_bag, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Events Manager is always shared
@@ -400,11 +310,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Events\\Manager");
 
-	PHALCON_INIT_VAR(events_manager);
-	object_init_ex(events_manager, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, events_manager, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, events_manager, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Model Transaction Manager
@@ -415,11 +321,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Transaction\\Manager");
 
-	PHALCON_INIT_VAR(transaction_manager);
-	object_init_ex(transaction_manager, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, transaction_manager, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, transaction_manager, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	/**
 	 * Assets Manager
@@ -430,11 +332,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Assets\\Manager");
 
-	PHALCON_INIT_VAR(assets);
-	object_init_ex(assets, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, assets, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, assets, PH_COPY);
+	PHALCON_CALL_SELF(NULL, "set", name, definition, shared);
 
 	PHALCON_MM_RESTORE();
 }

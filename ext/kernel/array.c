@@ -60,7 +60,7 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 			break;
 
 		case IS_STRING:
-			result = (val = zend_symtable_find(h, Z_STR_P(index))) != NULL;
+			result = (val = zend_hash_find(h, Z_STR_P(index))) != NULL;
 			break;
 
 		default:
@@ -68,7 +68,7 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 			return 0;
 	}
 
-	if (result == SUCCESS) {
+	if (result) {
 		*fetched = val;
 		return 1;
 	}
@@ -133,7 +133,7 @@ int ZEND_FASTCALL phalcon_array_isset(const zval *arr, const zval *index) {
 			return zend_hash_index_exists(h, Z_LVAL_P(index));
 
 		case IS_STRING:
-			return zend_symtable_exists(h, Z_STR_P(index));
+			return zend_hash_exists(h, Z_STR_P(index));
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");
@@ -293,7 +293,7 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 
 	switch (Z_TYPE_P(index)) {
 		case IS_NULL:
-			status = zend_symtable_update(ht, zend_string_init("", 1, 0), value) ? SUCCESS : FAILURE;
+			status = zend_hash_update(ht, zend_string_init("", 1, 0), value) ? SUCCESS : FAILURE;
 			break;
 
 		case IS_DOUBLE:
@@ -314,7 +314,7 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 			break;
 
 		case IS_STRING:
-			status = zend_symtable_update(ht, Z_STR_P(index), value) ? SUCCESS : FAILURE;
+			status = zend_hash_update(ht, Z_STR_P(index), value) ? SUCCESS : FAILURE;
 			break;
 
 		default:
@@ -415,7 +415,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 
 	zval *zv;
 	HashTable *ht;
-	int result;
+	int result = 0;
 	ulong uidx = 0;
 	char *sidx = NULL;
 
@@ -424,31 +424,31 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		ht = Z_ARRVAL_P(arr);
 		switch (Z_TYPE_P(index)) {
 			case IS_NULL:
-				result = (zv = zend_hash_str_find(ht, SL(""))) != NULL ? SUCCESS : FAILURE;
+				result = (zv = zend_hash_str_find(ht, SL(""))) != NULL;
 				sidx   = "";
 				break;
 
 			case IS_DOUBLE:
 				uidx   = (ulong)Z_DVAL_P(index);
-				result = (zv = zend_hash_index_find(ht, uidx)) != NULL ? SUCCESS : FAILURE;
+				result = (zv = zend_hash_index_find(ht, uidx)) != NULL;
 				break;
 
 			case IS_TRUE:
-				result = (zv = zend_hash_index_find(ht, 1)) != NULL ? SUCCESS : FAILURE;
+				result = (zv = zend_hash_index_find(ht, 1)) != NULL;
 				break;
 
 			case IS_FALSE:
-				result = (zv = zend_hash_index_find(ht, 0)) != NULL ? SUCCESS : FAILURE;
+				result = (zv = zend_hash_index_find(ht, 0)) != NULL;
 				break;
 
 			case IS_LONG:
 			case IS_RESOURCE:
-				result = (zv = zend_hash_index_find(ht, Z_LVAL_P(index))) != NULL ? SUCCESS : FAILURE;
+				result = (zv = zend_hash_index_find(ht, Z_LVAL_P(index))) != NULL;
 				break;
 
 			case IS_STRING:
 				sidx   = Z_STRLEN_P(index) ? Z_STRVAL_P(index) : "";
-				result = (zv = zend_symtable_find(ht, Z_STR_P(index))) != NULL ? SUCCESS : FAILURE;
+				result = (zv = zend_symtable_find(ht, Z_STR_P(index))) != NULL;
 				break;
 
 			default:
@@ -456,16 +456,13 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 					zend_error(E_WARNING, "Illegal offset type");
 				}
 
-				result = FAILURE;
+				result = 0;
 				break;
 		}
 
-		if (result != FAILURE) {
+		if (result) {
 			ZVAL_COPY_VALUE(*return_value, zv);
-			return SUCCESS;
-		}
-
-		if ((flags & PH_NOISY) == PH_NOISY) {
+		} else if ((flags & PH_NOISY) == PH_NOISY) {
 			if (sidx == NULL) {
 				zend_error(E_NOTICE, "Undefined index: %ld", uidx);
 			} else {
@@ -474,7 +471,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		}
 	}
 
-	return FAILURE;
+	return result;
 }
 
 int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *index, uint index_length, int flags){

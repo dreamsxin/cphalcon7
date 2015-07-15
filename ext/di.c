@@ -237,7 +237,6 @@ PHP_METHOD(Phalcon_DI, set) {
 	object_init_ex(return_value, phalcon_di_service_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, shared);
 
-	Z_TRY_ADDREF_P(return_value);
 	phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
 }
 
@@ -258,7 +257,6 @@ PHP_METHOD(Phalcon_DI, setShared){
 	object_init_ex(return_value, phalcon_di_service_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, &PHALCON_GLOBAL(z_true));
 
-	Z_TRY_ADDREF_P(return_value);
 	phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
 }
 
@@ -302,7 +300,6 @@ PHP_METHOD(Phalcon_DI, attempt){
 		object_init_ex(return_value, phalcon_di_service_ce);
 		PHALCON_CALL_METHOD(NULL, return_value, "__construct", name, definition, shared);
 	
-		Z_TRY_ADDREF_P(return_value);
 		phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
 	}
 }
@@ -320,7 +317,6 @@ PHP_METHOD(Phalcon_DI, setService)
 
 	phalcon_fetch_params(0, 1, 1, &name, &raw_definition);
 
-	Z_TRY_ADDREF_P(raw_definition);
 	phalcon_update_property_array(getThis(), SL("_services"), name, raw_definition);
 
 	RETURN_ZVAL(raw_definition, 1, 0);
@@ -407,6 +403,7 @@ PHP_METHOD(Phalcon_DI, get){
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
 		service = phalcon_read_property_array(getThis(), SL("_services"), name);
 		PHALCON_CALL_METHOD(&return_value, service, "resolve", parameters, getThis());
+		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
 	} else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
 		if ((ce = phalcon_class_exists_ex(name, 1)) != NULL) {

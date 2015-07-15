@@ -233,8 +233,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model, Query, mvc_model_query, phalcon_di_injectable_ce, phalcon_mvc_model_query_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_manager"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_metaData"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_modelsManager"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_modelsMetaData"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_type"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_phql"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_ast"), ZEND_ACC_PROTECTED);
@@ -536,6 +536,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		models_instances = phalcon_read_property(getThis(), SL("_modelsInstances"), PH_NOISY);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(models_instances), model) {
+
 			/** 
 			 * Check if the atribute belongs to the current model
 			 */
@@ -587,7 +588,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			zval *phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
 			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SVSV(exception_message, "Can't obtain the model '", column_name, "' source from the _models list, when preparing: ", phql);
+			PHALCON_CONCAT_SVSV(exception_message, "Can't obtain the model '", class_name, "' source from the _models list, when preparing: ", phql);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
 			return;
 		}
@@ -2209,8 +2210,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 
 		PHALCON_INIT_NVAR(complete_source);
 		array_init_size(complete_source, 2);
-		phalcon_array_append(complete_source, source, PH_SEPARATE);
-		phalcon_array_append(complete_source, schema, 0);
+		phalcon_array_append(complete_source, source, PH_COPY);
+		phalcon_array_append(complete_source, schema, PH_COPY);
 
 		/** 
 		 * Check join alias
@@ -2240,52 +2241,52 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			/** 
 			 * Add the alias to the source
 			 */
-			phalcon_array_append(complete_source, alias, PH_SEPARATE);
+			phalcon_array_append(complete_source, alias, PH_COPY);
 
 			/** 
 			 * Set the join type
 			 */
-			phalcon_array_update_zval(join_types, alias, join_type, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(join_types, alias, join_type, PH_COPY);
 
 			/** 
 			 * Update alias => alias
 			 */
-			phalcon_array_update_zval(sql_aliases, alias, alias, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_aliases, alias, alias, PH_COPY);
 
 			/** 
 			 * Update model => alias
 			 */
-			phalcon_array_update_zval(join_models, alias, model_name, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(join_models, alias, model_name, PH_COPY);
 
 			/** 
 			 * Update model => alias
 			 */
-			phalcon_array_update_zval(sql_models_aliases, model_name, alias, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_models_aliases, model_name, alias, PH_COPY);
 
 			/** 
 			 * Update alias => model
 			 */
-			phalcon_array_update_zval(sql_aliases_models, alias, model_name, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_aliases_models, alias, model_name, PH_COPY);
 
 			/** 
 			 * Update alias => model
 			 */
-			phalcon_array_update_zval(sql_aliases_models_instances, alias, model, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_aliases_models_instances, alias, model, PH_COPY);
 
 			/** 
 			 * Update model => alias
 			 */
-			phalcon_array_update_zval(models, model_name, alias, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(models, model_name, alias, PH_COPY);
 
 			/** 
 			 * Complete source related to a model
 			 */
-			phalcon_array_update_zval(join_sources, alias, complete_source, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(join_sources, alias, complete_source, PH_COPY);
 
 			/** 
 			 * Complete source related to a model
 			 */
-			phalcon_array_update_zval(join_prepared, alias, join_item, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(join_prepared, alias, join_item, PH_COPY);
 		} else {
 			/** 
 			 * Check if alias is unique
@@ -2302,50 +2303,50 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			/** 
 			 * Set the join type
 			 */
-			phalcon_array_update_zval(join_types, model_name, join_type, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(join_types, model_name, join_type, PH_COPY);
 
 			/** 
 			 * Update model => source
 			 */
-			phalcon_array_update_zval(sql_aliases, model_name, source, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_aliases, model_name, source, PH_COPY);
 
 			/** 
 			 * Update model => source
 			 */
-			phalcon_array_update_zval(join_models, model_name, source, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(join_models, model_name, source, PH_COPY);
 
 			/** 
 			 * Update model => model
 			 */
-			phalcon_array_update_zval(sql_models_aliases, model_name, model_name, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_models_aliases, model_name, model_name, PH_COPY);
 
 			/** 
 			 * Update model => model
 			 */
-			phalcon_array_update_zval(sql_aliases_models, model_name, model_name, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_aliases_models, model_name, model_name, PH_COPY);
 
 			/** 
 			 * Update model => model instance
 			 */
-			phalcon_array_update_zval(sql_aliases_models_instances, model_name, model, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_aliases_models_instances, model_name, model, PH_COPY);
 
 			/** 
 			 * Update model => source
 			 */
-			phalcon_array_update_zval(models, model_name, source, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(models, model_name, source, PH_COPY);
 
 			/** 
 			 * Complete source related to a model
 			 */
-			phalcon_array_update_zval(join_sources, model_name, complete_source, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(join_sources, model_name, complete_source, PH_COPY);
 
 			/** 
 			 * Complete source related to a model
 			 */
-			phalcon_array_update_zval(join_prepared, model_name, join_item, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(join_prepared, model_name, join_item, PH_COPY);
 		}
 
-		phalcon_array_update_zval(models_instances, model_name, model, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_zval(models_instances, model_name, model, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	/** 
@@ -3498,32 +3499,32 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 		if (zend_is_true(schema)) {
 			PHALCON_INIT_NVAR(complete_source);
 			array_init_size(complete_source, 2);
-			phalcon_array_append(complete_source, source, 0);
-			phalcon_array_append(complete_source, schema, 0);
+			phalcon_array_append(complete_source, source, PH_COPY);
+			phalcon_array_append(complete_source, schema, PH_COPY);
 		} else {
 			PHALCON_INIT_NVAR(complete_source);
 			array_init_size(complete_source, 2);
-			phalcon_array_append(complete_source, source, 0);
+			phalcon_array_append(complete_source, source, PH_COPY);
 			add_next_index_null(complete_source);
 		}
 
 		if (phalcon_array_isset_str(table, SL("alias"))) {
 			PHALCON_OBS_NVAR(alias);
 			phalcon_array_fetch_str(&alias, table, SL("alias"), PH_NOISY);
-			phalcon_array_update_zval(sql_aliases, alias, alias, PH_COPY | PH_SEPARATE);
-			phalcon_array_append(complete_source, alias, PH_SEPARATE);
-			phalcon_array_append(sql_tables, complete_source, PH_SEPARATE);
-			phalcon_array_update_zval(sql_aliases_models_instances, alias, model, PH_COPY | PH_SEPARATE);
-			phalcon_array_update_zval(models, alias, model_name, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_aliases, alias, alias, PH_COPY);
+			phalcon_array_append(complete_source, alias, PH_COPY);
+			phalcon_array_append(sql_tables, complete_source, PH_COPY);
+			phalcon_array_update_zval(sql_aliases_models_instances, alias, model, PH_COPY);
+			phalcon_array_update_zval(models, alias, model_name, PH_COPY);
 		} else {
-			phalcon_array_update_zval(sql_aliases, model_name, source, PH_COPY | PH_SEPARATE);
-			phalcon_array_update_zval(sql_aliases_models_instances, model_name, model, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(sql_aliases, model_name, source, PH_COPY);
+			phalcon_array_update_zval(sql_aliases_models_instances, model_name, model, PH_COPY);
 			phalcon_array_append(sql_tables, source, PH_SEPARATE);
-			phalcon_array_update_zval(models, model_name, source, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(models, model_name, source, PH_COPY);
 		}
 
-		phalcon_array_append(sql_models, model_name, PH_SEPARATE);
-		phalcon_array_update_zval(models_instances, model_name, model, PH_COPY | PH_SEPARATE);
+		phalcon_array_append(sql_models, model_name, PH_COPY);
+		phalcon_array_update_zval(models_instances, model_name, model, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	/** 
@@ -3535,8 +3536,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 	phalcon_update_property_this(getThis(), SL("_sqlAliasesModelsInstances"), sql_aliases_models_instances);
 
 	array_init_size(return_value, 4);
-	phalcon_array_update_str(return_value, IS(tables), sql_tables, PH_COPY | PH_SEPARATE);
-	phalcon_array_update_str(return_value, IS(models), sql_models, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_str(return_value, IS(tables), sql_tables, PH_COPY);
+	phalcon_array_update_str(return_value, IS(models), sql_models, PH_COPY);
 	if (phalcon_array_isset_str_fetch(&where, ast, SL("where"))) {
 		PHALCON_INIT_VAR(not_quoting);
 		ZVAL_TRUE(not_quoting);
@@ -3621,7 +3622,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 			PHALCON_OBS_NVAR(unique_id);
 			phalcon_array_fetch_str(&unique_id, ast, SL("id"), PH_NOISY);
 
-			PHALCON_OBS_NVAR(ir_phql_cache);
+			PHALCON_INIT_NVAR(ir_phql_cache);
 			phalcon_read_static_property(ir_phql_cache, SL("phalcon\\mvc\\model\\query"), SL("_irPhqlCache"));
 
 			if (phalcon_array_isset_fetch(&ir_phql_cache2, ir_phql_cache, type) && phalcon_array_isset(ir_phql_cache2, unique_id)) {

@@ -100,16 +100,9 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 			if (Z_REFCOUNTED_P(z)) {                  \
 				if (Z_REFCOUNT_P(z) > 1) {            \
 					Z_DELREF_P(z);                    \
-					PHALCON_ALLOC_ZVAL(z);            \
-					Z_SET_REFCOUNT_P(z, 1);           \
-					ZVAL_UNREF(z);                    \
-				} else {                              \
-					zval_dtor(z);                     \
+					PHALCON_ALLOC_INIT_ZVAL(z);       \
 				}                                     \
-			} else {                                  \
-				zval_dtor(z);                         \
 			}                                         \
-			ZVAL_NULL(z);                             \
 		} else {                                      \
 			PHALCON_MEMORY_ALLOC(&z);                 \
 		}                                             \
@@ -154,7 +147,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 				&& Z_REFCOUNT_P(z) > 1) {             \
 				Z_DELREF_P(z);                        \
 			} else {                                  \
-				zval_ptr_dtor(z);                     \
+				zval_dtor(z);                         \
 				z = NULL;                             \
 			}                                         \
 		} else {                                      \

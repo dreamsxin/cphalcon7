@@ -90,12 +90,12 @@ PHALCON_INIT_CLASS(Phalcon_DI_Injectable){
  */
 PHP_METHOD(Phalcon_DI_Injectable, setDI){
 
-	zval **dependency_injector;
+	zval *dependency_injector;
 
 	phalcon_fetch_params(0, 1, 0, &dependency_injector);
 
-	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(*dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
-	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), *dependency_injector);
+	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
+	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
 
 	RETURN_THISW();
 }

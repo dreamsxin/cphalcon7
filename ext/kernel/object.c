@@ -149,6 +149,29 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 	return SUCCESS;
 }
 
+zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len)
+{
+	zval *value;
+	value = zend_read_static_property(ce, property, len, (zend_bool)ZEND_FETCH_CLASS_SILENT);
+	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
+		value = Z_REFVAL_P(value);
+	}
+	return value;
+}
+
+int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value)
+{
+	Z_TRY_ADDREF_P(value);
+	return zend_update_static_property(ce, name, len, value);
+}
+
+int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len)
+{
+	zval empty_array;
+	array_init(&empty_array);
+	return zend_update_static_property(ce, name, len, &empty_array);
+}
+
 /**
  * Returns a class name into a zval result
  */
@@ -156,10 +179,10 @@ void phalcon_get_class(zval *result, const zval *object, int lower) {
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(object);
-		ZVAL_NEW_STR(result, ce->name);
+		ZVAL_STR(result, ce->name);
 
 		if (lower) {
-			zend_str_tolower(Z_STRVAL_P(result), Z_STRLEN_P(result));
+			ZVAL_STR(result, zend_string_tolower(Z_STR_P(result)));
 		}
 
 	} else {
@@ -219,7 +242,7 @@ void phalcon_get_class_ns(zval *result, const zval *object, int lower) {
 	}
 
 	if (lower) {
-		zend_str_tolower(Z_STRVAL_P(result), Z_STRLEN_P(result));
+		ZVAL_STR(result, zend_string_tolower(Z_STR_P(result)));
 	}
 
 }
@@ -295,7 +318,7 @@ void phalcon_get_called_class(zval *return_value)
 	zend_execute_data *ex = EG(current_execute_data);
 	zend_class_entry *called_scope = ex->called_scope;
 	if (called_scope) {
-		RETURN_NEW_STR(called_scope->name);
+		ZVAL_NEW_STR(return_value, called_scope->name);
 	}
 
 	if (!EG(scope))  {
@@ -660,6 +683,7 @@ static inline zend_class_entry *phalcon_lookup_str_class_ce(zend_class_entry *ce
  */
 zval* phalcon_read_property(zval *object, const char *property_name, size_t property_length, int silent)
 {
+	zval *value;
 	zend_class_entry *ce;
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
@@ -674,7 +698,12 @@ zval* phalcon_read_property(zval *object, const char *property_name, size_t prop
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
-	return zend_read_property(ce, object, property_name, property_length, silent, NULL);
+	value = zend_read_property(ce, object, property_name, property_length, silent, NULL);
+	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
+		value = Z_REFVAL_P(value);
+	}
+
+	return value;
 }
 
 /**

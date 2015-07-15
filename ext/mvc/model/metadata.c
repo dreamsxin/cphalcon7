@@ -571,11 +571,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 	zval *model, *index, *key_name, *column_map = NULL, *null_value;
 	zval *column_map_model, *attributes;
 
-	phalcon_fetch_params(0, 2, 0, &model, &index);
-	PHALCON_VERIFY_CLASS_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
-	PHALCON_ENSURE_IS_LONG(index);
-
 	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 2, 0, &model, &index);
+	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 1);
+	PHALCON_ENSURE_IS_LONG(index);
 
 	if (!PHALCON_GLOBAL(orm).column_renaming) {
 		RETURN_MM();

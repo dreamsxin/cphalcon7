@@ -150,28 +150,14 @@ int phalcon_unset_property_array(zval *object, const char *property, uint32_t pr
 int phalcon_read_static_property(zval *result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length);
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);
 
-static inline zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len)
-{
-	return zend_read_static_property(ce, property, len, (zend_bool)ZEND_FETCH_CLASS_SILENT);
-}
-
-static inline int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value)
-{
-	Z_TRY_ADDREF_P(value);
-	return zend_update_static_property(ce, name, len, value);
-}
-
-static inline int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len)
-{
-	zval empty_array;
-	array_init(&empty_array);
-	return zend_update_static_property(ce, name, len, &empty_array);
-}
+zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len);
+int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);
+int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len);
 
 /**
  * Update a static property
  */
- static inline int phalcon_update_static_property(const char *class_name, uint32_t class_length, const char *name, uint32_t name_length, zval *value)
+static inline int phalcon_update_static_property(const char *class_name, uint32_t class_length, const char *name, uint32_t name_length, zval *value)
 {
 	zend_class_entry *ce;
 	if ((ce = zend_lookup_class(zend_string_init(class_name, class_length, 0))) != NULL) {

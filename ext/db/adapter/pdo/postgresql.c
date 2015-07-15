@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		object_init_ex(column, phalcon_db_column_ce);
 		PHALCON_CALL_METHOD(NULL, column, "__construct", column_name, definition);
 
-		phalcon_array_append(columns, column, PH_SEPARATE);
+		phalcon_array_append(columns, column, PH_COPY);
 		PHALCON_CPY_WRT(old_column, column_name);
 	} ZEND_HASH_FOREACH_END();
 

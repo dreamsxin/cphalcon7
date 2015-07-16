@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	if (phalcon_array_isset_str(descriptor, SL("username"))) {
 		PHALCON_OBS_VAR(username);
 		phalcon_array_fetch_str(&username, descriptor, SL("username"), PH_NOISY);
-		phalcon_array_unset_string(descriptor, SL("username"), PH_SEPARATE);
+		phalcon_array_unset_str(descriptor, SL("username"), PH_COPY);
 	} else {
 		PHALCON_INIT_NVAR(username);
 	}
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	if (phalcon_array_isset_str(descriptor, SL("password"))) {
 		PHALCON_OBS_VAR(password);
 		phalcon_array_fetch_str(&password, descriptor, SL("password"), PH_NOISY);
-		phalcon_array_unset_string(descriptor, SL("password"), PH_SEPARATE);
+		phalcon_array_unset_str(descriptor, SL("password"), PH_COPY);
 	} else {
 		PHALCON_INIT_NVAR(password);
 	}
@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	if (phalcon_array_isset_str(descriptor, SL("options"))) {
 		PHALCON_OBS_VAR(options);
 		phalcon_array_fetch_str(&options, descriptor, SL("options"), PH_NOISY);
-		phalcon_array_unset_string(descriptor, SL("options"), PH_SEPARATE);
+		phalcon_array_unset_str(descriptor, SL("options"), PH_COPY);
 	} else {
 		PHALCON_INIT_NVAR(options);
 		array_init(options);
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	 * Remove the dialectClass from the descriptor if any
 	 */
 	if (phalcon_array_isset_str(descriptor, SL("dialectClass"))) {
-		phalcon_array_unset_string(descriptor, SL("dialectClass"), PH_SEPARATE);
+		phalcon_array_unset_str(descriptor, SL("dialectClass"), PH_COPY);
 	}
 
 	/**
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	/**
 	 * Default options
 	 */
-	phalcon_array_update_long_long(options, PDO_ATTR_ERRMODE, PDO_ERRMODE_EXCEPTION, PH_SEPARATE);
+	phalcon_array_update_long_long(options, PDO_ATTR_ERRMODE, PDO_ERRMODE_EXCEPTION, PH_COPY);
 
 	/**
 	 * Check if the connection must be persistent
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 		PHALCON_OBS_VAR(persistent);
 		phalcon_array_fetch_str(&persistent, descriptor, SL("persistent"), PH_NOISY);
 		if (zend_is_true(persistent)) {
-			phalcon_array_update_long_bool(options, PDO_ATTR_PERSISTENT, 1, PH_SEPARATE);
+			phalcon_array_update_long_bool(options, PDO_ATTR_PERSISTENT, 1, PH_COPY);
 		}
 	}
 
@@ -779,7 +779,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 					return;
 				}
 			}
-			phalcon_array_append(placeholders, value, PH_SEPARATE);
+			phalcon_array_append(placeholders, value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_INIT_VAR(question);

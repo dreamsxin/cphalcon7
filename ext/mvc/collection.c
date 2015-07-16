@@ -1752,7 +1752,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 				PHALCON_INIT_VAR(messages);
 				array_init_size(messages, 1);
-				phalcon_array_append(messages, collection_message, PH_SEPARATE);
+				phalcon_array_append(messages, collection_message, PH_COPY);
 				phalcon_update_property_this(getThis(), SL("_errorMessages"), messages);
 				RETURN_MM_FALSE;
 			}
@@ -1770,7 +1770,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 				PHALCON_INIT_VAR(messages);
 				array_init_size(messages, 1);
-				phalcon_array_append(messages, collection_message, PH_SEPARATE);
+				phalcon_array_append(messages, collection_message, PH_COPY);
 				phalcon_update_property_this(getThis(), SL("_errorMessages"), messages);
 				RETURN_MM_FALSE;
 			}

@@ -210,9 +210,9 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 						PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filter);
 
 						if (item_key) {
-							phalcon_array_update_string(array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_string(array_value, item_key, filter_value, PH_COPY);
 						} else {
-							phalcon_array_update_long(array_value, item_idx, filter_value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_long(array_value, item_idx, filter_value, PH_COPY);
 						}
 					} ZEND_HASH_FOREACH_END();
 	

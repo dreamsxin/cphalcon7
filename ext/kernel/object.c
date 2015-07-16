@@ -75,7 +75,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (phalcon_array_isset_str_fetch(&fetched, p, s, l + 1)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
-							phalcon_array_update_str(fetched, s, l, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_str(fetched, s, l, value, PH_COPY);
 						} else {
 							p = fetched;
 						}
@@ -83,11 +83,11 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 					}
 				}
 				if (i == (types_length - 1)) {
-					phalcon_array_update_str(p, s, l, value, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_str(p, s, l, value, PH_COPY);
 				} else {
 					PHALCON_ALLOC_INIT_ZVAL(tmp);
 					array_init(tmp);
-					phalcon_array_update_str(p, s, l, tmp, PH_SEPARATE);
+					phalcon_array_update_str(p, s, l, tmp, PH_COPY);
 					p = tmp;
 				}
 				break;
@@ -97,7 +97,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (phalcon_array_isset_long_fetch(&fetched, p, ll)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
-							phalcon_array_update_long(fetched, ll, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_long(fetched, ll, value, PH_COPY);
 						} else {
 							p = fetched;
 						}
@@ -105,11 +105,11 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 					}
 				}
 				if (i == (types_length - 1)) {
-					phalcon_array_update_long(p, ll, value, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_long(p, ll, value, PH_COPY);
 				} else {
 					PHALCON_ALLOC_INIT_ZVAL(tmp);
 					array_init(tmp);
-					phalcon_array_update_long(p, ll, tmp, PH_SEPARATE);
+					phalcon_array_update_long(p, ll, tmp, PH_COPY);
 					p = tmp;
 				}
 				break;
@@ -119,7 +119,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (phalcon_array_isset_fetch(&fetched, p, item)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
-							phalcon_array_update_zval(fetched, item, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_zval(fetched, item, value, PH_COPY);
 						} else {
 							p = fetched;
 						}
@@ -127,17 +127,17 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 					}
 				}
 				if (i == (types_length - 1)) {
-					phalcon_array_update_zval(p, item, value, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_zval(p, item, value, PH_COPY);
 				} else {
 					PHALCON_ALLOC_INIT_ZVAL(tmp);
 					array_init(tmp);
-					phalcon_array_update_zval(p, item, tmp, PH_SEPARATE);
+					phalcon_array_update_zval(p, item, tmp, PH_COPY);
 					p = tmp;
 				}
 				break;
 
 			case 'a':
-				phalcon_array_append(p, value, PH_SEPARATE);
+				phalcon_array_append(p, value, PH_COPY);
 				break;
 		}
 	}
@@ -547,8 +547,6 @@ int phalcon_clone(zval *destination, zval *obj) {
 		} else {
 			if (!EG(exception)) {
 				ZVAL_OBJ(destination, clone_call(obj));
-				Z_SET_REFCOUNT_P(destination, 1);
-				ZVAL_UNREF(destination);
 				if (EG(exception)) {
 					zval_ptr_dtor(destination);
 					ZVAL_NULL(destination);
@@ -1052,7 +1050,7 @@ int phalcon_unset_property_array(zval *object, const char *property, uint32_t pr
 			convert_to_array(tmp);
 		}
 
-		phalcon_array_unset(tmp, index, PH_SEPARATE);
+		phalcon_array_unset(tmp, index, PH_COPY);
 
 		phalcon_update_property_zval(object, property, property_length, tmp);
 	}

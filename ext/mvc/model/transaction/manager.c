@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, get){
 		if (zend_is_true(rollback_pendent)) {
 			PHALCON_INIT_NVAR(rollback_pendent);
 			array_init_size(rollback_pendent, 2);
-			phalcon_array_append(rollback_pendent, getThis(), PH_SEPARATE);
+			phalcon_array_append(rollback_pendent, getThis(), PH_COPY);
 			add_next_index_stringl(rollback_pendent, SL("rollbackPendent"));
 			PHALCON_CALL_FUNCTION(NULL, "register_shutdown_function", rollback_pendent);
 		}
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, _collectTransaction){
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(transactions), managed_transaction) {
 			if (PHALCON_IS_EQUAL(managed_transaction, transaction)) {
-				phalcon_array_append(new_transactions, transaction, PH_SEPARATE);
+				phalcon_array_append(new_transactions, transaction, PH_COPY);
 				phalcon_property_decr(getThis(), SL("_number"));
 			}
 		} ZEND_HASH_FOREACH_END();

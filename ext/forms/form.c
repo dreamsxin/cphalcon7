@@ -751,7 +751,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 					array_init_size(scope, 2);
 					phalcon_array_append(scope, name, 0);
 					phalcon_array_append(scope, validator, 0);
-					phalcon_array_append(prepared_validators, scope, PH_SEPARATE);
+					phalcon_array_append(prepared_validators, scope, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 
 				/**
@@ -780,7 +780,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				PHALCON_CALL_METHOD(&element_messages, validation, "validate", data, entity);
 				if (phalcon_fast_count_ev(element_messages)) {
 					PHALCON_CALL_METHOD(&name, element, "getname");
-					phalcon_array_update_zval(messages, name, element_messages, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_zval(messages, name, element_messages, PH_COPY);
 
 					not_failed = &PHALCON_GLOBAL(z_false);
 				}
@@ -1417,7 +1417,7 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 
 	PHALCON_CALL_METHOD(NULL, element_messages, "appendmessages", messages);
 
-	phalcon_array_update_zval(current_messages, filed, element_messages, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_zval(current_messages, filed, element_messages, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_messages"), current_messages);
 
 	RETURN_THIS();

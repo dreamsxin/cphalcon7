@@ -1885,14 +1885,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(group), group_item) {
 				if (phalcon_is_numeric(group_item)) {
-					phalcon_array_append(group_items, group_item, PH_SEPARATE);
+					phalcon_array_append(group_items, group_item, PH_COPY);
 				} else {
 					if (phalcon_memnstr_str(group_item, SL("."))) {
-						phalcon_array_append(group_items, group_item, PH_SEPARATE);
+						phalcon_array_append(group_items, group_item, PH_COPY);
 					} else {
 						PHALCON_INIT_NVAR(escaped_item);
 						PHALCON_CONCAT_SVS(escaped_item, "[", group_item, "]");
-						phalcon_array_append(group_items, escaped_item, PH_SEPARATE);
+						phalcon_array_append(group_items, escaped_item, PH_COPY);
 					}
 				}
 			} ZEND_HASH_FOREACH_END();

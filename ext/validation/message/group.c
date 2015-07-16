@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 			if (phalcon_method_exists_ex(message, SL("getfield")) == SUCCESS) {
 				PHALCON_CALL_METHOD(&field, message, "getfield");
 				if (PHALCON_IS_EQUAL(field_name, field)) {
-					phalcon_array_append(filtered, message, PH_SEPARATE);
+					phalcon_array_append(filtered, message, PH_COPY);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();

@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 		PHALCON_CPY_WRT(widget_attributes, attributes);
 	}
 
-	phalcon_array_update_long(widget_attributes, 0, name, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_long(widget_attributes, 0, name, PH_COPY);
 
 	/** 
 	 * Merge passed parameters with default ones

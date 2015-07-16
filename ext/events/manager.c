@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 			/** 
 			 * Append the events to the queue
 			 */
-			phalcon_array_update_zval(events, event_type, priority_queue, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(events, event_type, priority_queue, PH_COPY);
 			phalcon_update_property_this(getThis(), SL("_events"), events);
 		} else {
 			PHALCON_INIT_NVAR(priority_queue);
@@ -208,13 +208,13 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 	if (unlikely(Z_TYPE_P(priority_queue) == IS_OBJECT)) {
 		PHALCON_CALL_METHOD(NULL, priority_queue, "insert", listener, priority);
 	} else {
-		phalcon_array_append(priority_queue, listener, PH_SEPARATE);
+		phalcon_array_append(priority_queue, listener, PH_COPY);
 	}
 
 	/** 
 	 * Append the events to the queue
 	 */
-	phalcon_array_update_zval(events, event_type, priority_queue, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_zval(events, event_type, priority_queue, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_events"), events);
 
 	PHALCON_MM_RESTORE();
@@ -355,13 +355,13 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
 
 			if (phalcon_is_equal_object(handler_embeded, handler)) {
-				phalcon_array_unset(priority_queue, &key, PH_SEPARATE);
+				phalcon_array_unset(priority_queue, &key, PH_COPY);
 			}
 
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_array_update_zval(events, type, priority_queue, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_zval(events, type, priority_queue, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_events"), events);
 
 	PHALCON_MM_RESTORE();
@@ -389,7 +389,7 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
 		PHALCON_INIT_NVAR(events);
 	} else {
 		if (phalcon_array_isset(events, type)) {
-			phalcon_array_unset(events, type, PH_SEPARATE);
+			phalcon_array_unset(events, type, PH_COPY);
 		}
 	}
 

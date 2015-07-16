@@ -400,7 +400,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 				PHALCON_INIT_NVAR(sql);
 				ZVAL_STRING(sql, Z_STRVAL_P(sql_tmp));
 
-				phalcon_array_unset(bind_types, &wildcard, PH_SEPARATE);
+				phalcon_array_unset(bind_types, &wildcard, PH_COPY);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_INIT_NVAR(string_wildcard);
 				PHALCON_CONCAT_SV(string_wildcard, ":", &wildcard);

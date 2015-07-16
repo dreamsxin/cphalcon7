@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_DI, get){
  */
 PHP_METHOD(Phalcon_DI, getShared){
 
-	zval *name, *parameters, *instance = NULL;
+	zval *name, *parameters = NULL, *instance = NULL;
 
 	phalcon_fetch_params(0, 1, 1, &name, &parameters);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -459,7 +459,7 @@ PHP_METHOD(Phalcon_DI, getShared){
 		instance = phalcon_read_property_array(getThis(), SL("_sharedInstances"), name);
 		phalcon_update_property_bool(getThis(), SL("_freshInstance"), 0);
 	} else if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
-		PHALCON_CALL_SELF(&instance, "get", name, parameters);
+		PHALCON_CALL_SELFW(&instance, "get", name, parameters);
 		if (instance) {			
 			Z_TRY_ADDREF_P(instance);
 			phalcon_update_property_bool(getThis(), SL("_freshInstance"), 1);
@@ -567,7 +567,7 @@ PHALCON_DOC_METHOD(Phalcon_DI, offsetUnset);
  */
 PHP_METHOD(Phalcon_DI, __call){
 
-	zval *method, *arguments, *possible_service, *name, *definition;
+	zval *method, *arguments = NULL, *possible_service, *name, *definition;
 
 	PHALCON_MM_GROW();
 

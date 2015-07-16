@@ -2060,9 +2060,9 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(options), idx, str_key, value) {
 			if (str_key) {
-				phalcon_array_update_string(cache_options, str_key, value, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_string(cache_options, str_key, value, PH_COPY);
 			} else {
-				phalcon_array_update_long(cache_options, idx, value, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_long(cache_options, idx, value, 0);
 			}
 
 		} ZEND_HASH_FOREACH_END();
@@ -2086,7 +2086,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 			phalcon_update_property_bool(getThis(), SL("_cacheMode"), 0);
 		}
 
-		phalcon_array_update_str(view_options, SL("cache"), cache_options, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(view_options, SL("cache"), cache_options, PH_COPY);
 		phalcon_update_property_this(getThis(), SL("_options"), view_options);
 	} else {
 		/** 

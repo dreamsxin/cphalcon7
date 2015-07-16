@@ -544,14 +544,14 @@ PHP_METHOD(Phalcon_Date, days){
 	PHALCON_INIT_NVAR(months);
 	array_init(months);
 
-	phalcon_array_update_long(months, y, tmp, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_long(months, y, tmp, PH_COPY);
 
 	for (i = 1; i < t; i++) {
 		sprintf(buf, "%02d", i);
 		phalcon_array_update_long_string(tmp, i, buf, 2, 0);
 	}
 
-	phalcon_array_update_long_long_multi_2(months, y, m, tmp, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_long_long_multi_2(months, y, m, tmp, PH_COPY);
 
 	phalcon_update_static_property_ce(phalcon_date_ce, SL("_months"), months);
 
@@ -606,7 +606,7 @@ PHP_METHOD(Phalcon_Date, months){
 			PHALCON_CALL_FUNCTION(&tmp, "mktime", tmp1, tmp1, tmp1, tmp3, tmp2);
 			PHALCON_CALL_FUNCTION(&value, "strftime", format, tmp);
 
-			phalcon_array_update_long(return_value, i, value, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_long(return_value, i, value, PH_COPY);
 		}
 	} else {
 		PHALCON_RETURN_CALL_SELF("hours");

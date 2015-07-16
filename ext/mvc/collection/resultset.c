@@ -368,7 +368,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
 			}
 		}
 	} else if (Z_TYPE_P(rows) == IS_ARRAY) {
-		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(rows), NULL);
+		zend_hash_internal_pointer_reset(Z_ARRVAL_P(rows));
 	}
 
 	phalcon_update_property_this(getThis(), SL("_pointer"), z_zero);
@@ -702,7 +702,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 
 			PHALCON_INIT_NVAR(parameters);
 			array_init_size(parameters, 1);
-			phalcon_array_append(parameters, record, PH_SEPARATE);
+			phalcon_array_append(parameters, record, PH_COPY);
 
 			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, parameters);
 			if (PHALCON_IS_FALSE(status)) {
@@ -783,7 +783,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, filter){
 		}
 
 		PHALCON_CALL_METHOD(&record, getThis(), "current");
-		phalcon_array_update_long(parameters, 0, record, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_long(parameters, 0, record, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&processed_record, filter, parameters);
 
@@ -796,7 +796,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, filter){
 			}
 		}
 
-		phalcon_array_append(records, processed_record, PH_SEPARATE);
+		phalcon_array_append(records, processed_record, PH_COPY);
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 
@@ -860,7 +860,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 
 			PHALCON_INIT_NVAR(parameters);
 			array_init_size(parameters, 1);
-			phalcon_array_append(parameters, record, PH_SEPARATE);
+			phalcon_array_append(parameters, record, PH_COPY);
 
 			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, parameters);
 			if (PHALCON_IS_FALSE(status)) {

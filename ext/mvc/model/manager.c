@@ -1066,7 +1066,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
 	/** 
 	 * Append the behavior to the list of behaviors
 	 */
-	phalcon_array_append(models_behaviors, behavior, PH_SEPARATE);
+	phalcon_array_append(models_behaviors, behavior, PH_COPY);
 
 	/** 
 	 * Update the behaviors list
@@ -1265,7 +1265,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(relations, relation, PH_SEPARATE);
+	phalcon_array_append(relations, relation, PH_COPY);
 
 	/** 
 	 * Update the global alias
@@ -1294,7 +1294,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(single_relations, relation, PH_SEPARATE);
+	phalcon_array_append(single_relations, relation, PH_COPY);
 
 	/** 
 	 * Update relations by model
@@ -1394,7 +1394,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(relations, relation, PH_SEPARATE);
+	phalcon_array_append(relations, relation, PH_COPY);
 
 	/** 
 	 * Update the global alias
@@ -1423,7 +1423,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(single_relations, relation, PH_SEPARATE);
+	phalcon_array_append(single_relations, relation, PH_COPY);
 
 	/** 
 	 * Update relations by model
@@ -1522,7 +1522,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(relations, relation, PH_SEPARATE);
+	phalcon_array_append(relations, relation, PH_COPY);
 
 	/** 
 	 * Update the global alias
@@ -1551,7 +1551,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(single_relations, relation, PH_SEPARATE);
+	phalcon_array_append(single_relations, relation, PH_COPY);
 
 	/** 
 	 * Update relations by model
@@ -1681,7 +1681,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(relations, relation, PH_SEPARATE);
+	phalcon_array_append(relations, relation, PH_COPY);
 
 	/** 
 	 * Update the global alias
@@ -1710,7 +1710,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(single_relations, relation, PH_SEPARATE);
+	phalcon_array_append(single_relations, relation, PH_COPY);
 
 	/** 
 	 * Update relations by model
@@ -1982,12 +1982,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		if (phalcon_array_isset_long(parameters, 0)) {
 			PHALCON_OBS_NVAR(pre_conditions);
 			phalcon_array_fetch_long(&pre_conditions, parameters, 0, PH_NOISY);
-			phalcon_array_unset_long(parameters, 0, PH_SEPARATE);
+			phalcon_array_unset_long(parameters, 0, PH_COPY);
 		} else {
 			if (phalcon_array_isset_str(parameters, SL("conditions"))) {
 				PHALCON_OBS_NVAR(pre_conditions);
 				phalcon_array_fetch_str(&pre_conditions, parameters, SL("conditions"), PH_NOISY);
-				phalcon_array_unset_string(parameters, SL("conditions"), PH_SEPARATE);
+				phalcon_array_unset_str(parameters, SL("conditions"), PH_COPY);
 			}
 		}
 	} else {
@@ -2003,7 +2003,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		if (phalcon_array_isset_str(parameters, SL("bind"))) {
 			PHALCON_OBS_VAR(placeholders);
 			phalcon_array_fetch_str(&placeholders, parameters, SL("bind"), PH_NOISY);
-			phalcon_array_unset_string(parameters, SL("bind"), PH_SEPARATE);
+			phalcon_array_unset_str(parameters, SL("bind"), PH_COPY);
 		} else {
 			PHALCON_INIT_NVAR(placeholders);
 			array_init(placeholders);
@@ -2040,7 +2040,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 			PHALCON_INIT_VAR(condition);
 			PHALCON_CONCAT_SVSVS(condition, "[", intermediate_model, "].[", intermediate_fields, "] = ?0");
 			phalcon_array_append(conditions, condition, 0);
-			phalcon_array_append(placeholders, value, PH_SEPARATE);
+			phalcon_array_append(placeholders, value, PH_COPY);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
 			return;
@@ -2059,7 +2059,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 			PHALCON_INIT_NVAR(condition);
 			PHALCON_CONCAT_SVSV(condition, "[", intermediate_model, "].[", intermediate_fields);
 			PHALCON_SCONCAT_SVSVS(condition, "] = [", referenced_model, "].[", referenced_fields, "]");
-			phalcon_array_append(join_conditions, condition, PH_SEPARATE);
+			phalcon_array_append(join_conditions, condition, PH_COPY);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
 			return;
@@ -2075,7 +2075,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * Add extra conditions passed by the programmer
 		 */
 		if (PHALCON_IS_NOT_EMPTY(pre_conditions)) {
-			phalcon_array_append(conditions, pre_conditions, PH_SEPARATE);
+			phalcon_array_append(conditions, pre_conditions, PH_COPY);
 		}
 
 		/** 
@@ -2107,7 +2107,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	if (PHALCON_IS_NOT_EMPTY(pre_conditions)) {
 		PHALCON_INIT_NVAR(conditions);
 		array_init_size(conditions, 1);
-		phalcon_array_append(conditions, pre_conditions, PH_SEPARATE);
+		phalcon_array_append(conditions, pre_conditions, PH_COPY);
 	} else {
 		PHALCON_INIT_NVAR(conditions);
 		array_init(conditions);
@@ -2124,8 +2124,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
 		PHALCON_INIT_NVAR(condition);
 		PHALCON_CONCAT_SVS(condition, "[", referenced_field, "] = ?0");
-		phalcon_array_append(conditions, condition, PH_SEPARATE);
-		phalcon_array_append(placeholders, value, PH_SEPARATE);
+		phalcon_array_append(conditions, condition, PH_COPY);
+		phalcon_array_append(placeholders, value, PH_COPY);
 	} else {
 		/** 
 		 * Compound relation
@@ -2146,8 +2146,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
 			PHALCON_INIT_NVAR(condition);
 			PHALCON_CONCAT_SVSV(condition, "[", referenced_field, "] = ?", &tmp);
-			phalcon_array_append(conditions, condition, PH_SEPARATE);
-			phalcon_array_append(placeholders, value, PH_SEPARATE);
+			phalcon_array_append(conditions, condition, PH_COPY);
+			phalcon_array_append(placeholders, value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 	}
@@ -2177,7 +2177,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
 	PHALCON_INIT_VAR(arguments);
 	array_init_size(arguments, 1);
-	phalcon_array_append(arguments, find_arguments, PH_SEPARATE);
+	phalcon_array_append(arguments, find_arguments, PH_COPY);
 
 	/** 
 	 * Check the right method to get the data
@@ -2672,7 +2672,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 			phalcon_array_fetch(&relations, belongs_to, entity_name, PH_NOISY);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
-				phalcon_array_append(all_relations, relation, PH_SEPARATE);
+				phalcon_array_append(all_relations, relation, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 
 		}
@@ -2689,7 +2689,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 			phalcon_array_fetch(&relations, has_many, entity_name, PH_NOISY);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
-				phalcon_array_append(all_relations, relation, PH_SEPARATE);
+				phalcon_array_append(all_relations, relation, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 
 		}
@@ -2706,7 +2706,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 			phalcon_array_fetch(&relations, has_one, entity_name, PH_NOISY);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
-				phalcon_array_append(all_relations, relation, PH_SEPARATE);
+				phalcon_array_append(all_relations, relation, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 
 		}

@@ -284,7 +284,7 @@ PHP_METHOD(Phalcon_Debug, listenExceptions){
 
 	PHALCON_INIT_VAR(handler);
 	array_init_size(handler, 2);
-	phalcon_array_append(handler, getThis(), PH_SEPARATE);
+	phalcon_array_append(handler, getThis(), PH_COPY);
 	add_next_index_stringl(handler, SL("onUncaughtException"));
 	PHALCON_CALL_FUNCTION(NULL, "set_exception_handler", handler);
 	RETURN_THIS();
@@ -303,13 +303,13 @@ PHP_METHOD(Phalcon_Debug, listenLowSeverity){
 
 	PHALCON_INIT_VAR(handler);
 	array_init_size(handler, 2);
-	phalcon_array_append(handler, getThis(), PH_SEPARATE);
+	phalcon_array_append(handler, getThis(), PH_COPY);
 	add_next_index_stringl(handler, SL("onUserDefinedError"));
 	PHALCON_CALL_FUNCTION(NULL, "set_error_handler", handler);
 
 	PHALCON_INIT_NVAR(handler);
 	array_init_size(handler, 2);
-	phalcon_array_append(handler, getThis(), PH_SEPARATE);
+	phalcon_array_append(handler, getThis(), PH_COPY);
 	add_next_index_stringl(handler, SL("onShutdown"));
 	PHALCON_CALL_FUNCTION(NULL, "register_shutdown_function", handler);
 
@@ -351,9 +351,9 @@ PHP_METHOD(Phalcon_Debug, debugVar){
 
 	PHALCON_INIT_VAR(data);
 	array_init_size(data, 3);
-	phalcon_array_append(data, var, PH_SEPARATE);
-	phalcon_array_append(data, backtrace, PH_SEPARATE);
-	phalcon_array_append(data, ztime, PH_SEPARATE);
+	phalcon_array_append(data, var, PH_COPY);
+	phalcon_array_append(data, backtrace, PH_COPY);
+	phalcon_array_append(data, ztime, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_data"), data);
 	RETURN_THIS();
 }
@@ -449,7 +449,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 							PHALCON_INIT_NVAR(var_dump);
 							PHALCON_CONCAT_SVSV(var_dump, "[", &tmp, "] =&gt; ", escaped_string);
 						}
-						phalcon_array_append(dump, var_dump, PH_SEPARATE);
+						phalcon_array_append(dump, var_dump, PH_COPY);
 					} else {
 						if (Z_TYPE_P(v) == IS_ARRAY) { 
 							PHALCON_INIT_NVAR(next);
@@ -459,7 +459,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 
 							PHALCON_INIT_NVAR(var_dump);
 							PHALCON_CONCAT_SVSVS(var_dump, "[", &tmp, "] =&gt; Array(", array_dump, ")");
-							phalcon_array_append(dump, var_dump, PH_SEPARATE);
+							phalcon_array_append(dump, var_dump, PH_COPY);
 							continue;
 						}
 						if (Z_TYPE_P(v) == IS_OBJECT) {
@@ -469,20 +469,20 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 
 							PHALCON_INIT_NVAR(var_dump);
 							PHALCON_CONCAT_SVSVS(var_dump, "[", &tmp, "] =&gt; Object(", class_name, ")");
-							phalcon_array_append(dump, var_dump, PH_SEPARATE);
+							phalcon_array_append(dump, var_dump, PH_COPY);
 							continue;
 						}
 
 						if (Z_TYPE_P(v) == IS_NULL) {
 							PHALCON_INIT_NVAR(var_dump);
 							PHALCON_CONCAT_SVS(var_dump, "[", &tmp, "] =&gt; null");
-							phalcon_array_append(dump, var_dump, PH_SEPARATE);
+							phalcon_array_append(dump, var_dump, PH_COPY);
 							continue;
 						}
 
 						PHALCON_INIT_NVAR(var_dump);
 						PHALCON_CONCAT_SVSV(var_dump, "[", &tmp, "] =&gt; ", v);
-						phalcon_array_append(dump, var_dump, PH_SEPARATE);
+						phalcon_array_append(dump, var_dump, PH_COPY);
 					}
 				} ZEND_HASH_FOREACH_END();
 
@@ -841,7 +841,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/** 
 				 * Append the HTML generated to the argument's list
 				 */
-				phalcon_array_append(arguments, span_argument, PH_SEPARATE);
+				phalcon_array_append(arguments, span_argument, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 
 			/** 

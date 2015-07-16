@@ -171,8 +171,8 @@ PHP_METHOD(Phalcon_Debug_Dump, all){
 
 	PHALCON_INIT_VAR(call_object);
 	array_init_size(call_object, 2);
-	phalcon_array_append(call_object, getThis(), PH_SEPARATE);
-	phalcon_array_append(call_object, method_name, PH_SEPARATE);
+	phalcon_array_append(call_object, getThis(), PH_COPY);
+	phalcon_array_append(call_object, method_name, PH_COPY);
 
 	PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
@@ -682,8 +682,8 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
 	PHALCON_INIT_VAR(replace_pairs);
 	array_init(replace_pairs);
 
-	phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_SEPARATE);
-	phalcon_array_update_str(replace_pairs, SL(":output"), output, PH_SEPARATE);
+	phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+	phalcon_array_update_str(replace_pairs, SL(":output"), output, PH_COPY);
 
 	PHALCON_RETURN_CALL_FUNCTION("strtr", str, replace_pairs);
 

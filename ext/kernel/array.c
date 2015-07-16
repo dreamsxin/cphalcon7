@@ -212,7 +212,7 @@ int ZEND_FASTCALL phalcon_array_unset(zval *arr, const zval *index, int flags) {
 	}
 }
 
-int ZEND_FASTCALL phalcon_array_unset_string(zval *arr, const char *index, uint index_length, int flags) {
+int ZEND_FASTCALL phalcon_array_unset_str(zval *arr, const char *index, uint index_length, int flags) {
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
 		return FAILURE;
@@ -852,7 +852,7 @@ void phalcon_array_merge_recursive_n(zval *a1, zval *a2)
 		key = phalcon_get_current_key_w(Z_ARRVAL_P(a2), &hp);
 
 		if (!phalcon_array_isset(a1, key) || Z_TYPE_P(value) != IS_ARRAY) {
-			phalcon_array_update_zval(a1, key, value, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(a1, key, value, PH_COPY);
 		} else {
 			phalcon_array_fetch(&tmp1, a1, key, PH_NOISY);
 			phalcon_array_fetch(&tmp2, a2, key, PH_NOISY);
@@ -879,7 +879,7 @@ void phalcon_array_merge_recursive_n2(zval *a1, zval *a2)
 		key = phalcon_get_current_key_w(Z_ARRVAL_P(a2), &hp);
 
 		if (!phalcon_array_isset(a1, key)) {
-			phalcon_array_update_zval(a1, key, value, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_zval(a1, key, value, PH_COPY);
 		} else if (Z_TYPE_P(value) == IS_ARRAY) {
 			phalcon_array_fetch(&tmp1, a1, key, PH_NOISY);
 			phalcon_array_fetch(&tmp2, a2, key, PH_NOISY);
@@ -1021,7 +1021,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
-							phalcon_array_update_str(p, s, l, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_str(p, s, l, value, PH_COPY);
 						} else {
 							p = fetched;
 						}
@@ -1033,11 +1033,11 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 				if (!must_continue) {
 					re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
 					if (i == (types_length - 1)) {
-						phalcon_array_update_str(p, s, l, value, PH_COPY | PH_SEPARATE);
+						phalcon_array_update_str(p, s, l, value, PH_COPY);
 					} else {
 						PHALCON_ALLOC_INIT_ZVAL(tmp);
 						array_init(tmp);
-						phalcon_array_update_str(p, s, l, tmp, PH_SEPARATE);
+						phalcon_array_update_str(p, s, l, tmp, PH_COPY);
 						if (re_update) {
 							wrap_tmp = 1;
 						} else {
@@ -1054,7 +1054,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
-							phalcon_array_update_long(p, ll, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_long(p, ll, value, PH_COPY);
 						} else {
 							p = fetched;
 						}
@@ -1066,11 +1066,11 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 				if (!must_continue) {
 					re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
 					if (i == (types_length - 1)) {
-						phalcon_array_update_long(p, ll, value, PH_COPY | PH_SEPARATE);
+						phalcon_array_update_long(p, ll, value, PH_COPY);
 					} else {
 						PHALCON_ALLOC_INIT_ZVAL(tmp);
 						array_init(tmp);
-						phalcon_array_update_long(p, ll, tmp, PH_SEPARATE);
+						phalcon_array_update_long(p, ll, tmp, PH_COPY);
 						if (re_update) {
 							wrap_tmp = 1;
 						} else {
@@ -1087,7 +1087,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
-							phalcon_array_update_zval(p, item, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_zval(p, item, value, PH_COPY);
 						} else {
 							p = fetched;
 						}
@@ -1099,11 +1099,11 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 				if (!must_continue) {
 					re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
 					if (i == (types_length - 1)) {
-						phalcon_array_update_zval(p, item, value, PH_COPY | PH_SEPARATE);
+						phalcon_array_update_zval(p, item, value, PH_COPY);
 					} else {
 						PHALCON_ALLOC_INIT_ZVAL(tmp);
 						array_init(tmp);
-						phalcon_array_update_zval(p, item, tmp, PH_SEPARATE);
+						phalcon_array_update_zval(p, item, tmp, PH_COPY);
 						if (re_update) {
 							wrap_tmp = 1;
 						} else {
@@ -1115,7 +1115,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 
 			case 'a':
 				re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
-				phalcon_array_append(p, value, PH_SEPARATE);
+				phalcon_array_append(p, value, PH_COPY);
 				break;
 		}
 
@@ -1132,9 +1132,9 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 
 					case 's':
 						if (j == i - 1) {
-							phalcon_array_update_str((old_p[j]), old_s[j], old_l[j], p, PH_SEPARATE);
+							phalcon_array_update_str((old_p[j]), old_s[j], old_l[j], p, PH_COPY);
 						} else {
-							phalcon_array_update_str((old_p[j]), old_s[j], old_l[j], old_p[j+1], PH_SEPARATE);
+							phalcon_array_update_str((old_p[j]), old_s[j], old_l[j], old_p[j+1], PH_COPY);
 						}
 						if (wrap_tmp) {
 							p = tmp;
@@ -1144,9 +1144,9 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 
 					case 'l':
 						if (j == i - 1) {
-							phalcon_array_update_long((old_p[j]), old_ll[j], p, PH_SEPARATE);
+							phalcon_array_update_long((old_p[j]), old_ll[j], p, PH_COPY);
 						} else {
-							phalcon_array_update_long((old_p[j]), old_ll[j], old_p[j+1], PH_SEPARATE);
+							phalcon_array_update_long((old_p[j]), old_ll[j], old_p[j+1], PH_COPY);
 						}
 						if (wrap_tmp) {
 							p = tmp;
@@ -1156,9 +1156,9 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 
 					case 'z':
 						if (j == i - 1) {
-							phalcon_array_update_zval((old_p[j]), old_item[j], p, PH_SEPARATE);
+							phalcon_array_update_zval((old_p[j]), old_item[j], p, PH_COPY);
 						} else {
-							phalcon_array_update_zval((old_p[j]), old_item[j], old_p[j+1], PH_SEPARATE);
+							phalcon_array_update_zval((old_p[j]), old_item[j], old_p[j+1], PH_COPY);
 						}
 						if (wrap_tmp) {
 							p = tmp;

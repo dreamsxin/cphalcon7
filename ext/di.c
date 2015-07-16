@@ -458,10 +458,9 @@ PHP_METHOD(Phalcon_DI, getShared){
 	if (phalcon_isset_property_array(getThis(), SL("_sharedInstances"), name)) {
 		instance = phalcon_read_property_array(getThis(), SL("_sharedInstances"), name);
 		phalcon_update_property_bool(getThis(), SL("_freshInstance"), 0);
-	} else if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
+	} else {
 		PHALCON_CALL_SELFW(&instance, "get", name, parameters);
-		if (instance) {			
-			Z_TRY_ADDREF_P(instance);
+		if (instance) {
 			phalcon_update_property_bool(getThis(), SL("_freshInstance"), 1);
 			phalcon_update_property_array(getThis(), SL("_sharedInstances"), name, instance);
 		}

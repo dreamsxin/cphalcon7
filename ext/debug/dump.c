@@ -127,17 +127,17 @@ PHP_METHOD(Phalcon_Debug_Dump, __construct){
 	PHALCON_INIT_VAR(default_styles);
 	array_init(default_styles);
 
-	phalcon_array_update_string_string(default_styles, SL("pre"), SL("background-color:#f3f3f3; font-size:11px; padding:10px; border:1px solid #ccc; text-align:left; color:#333"), 0);
-	phalcon_array_update_string_string(default_styles, SL("arr"), SL("color:red"), 0);
-	phalcon_array_update_string_string(default_styles, SL("bool"), SL("color:green"), 0);
-	phalcon_array_update_string_string(default_styles, SL("float"), SL("color:fuchsia"), 0);
-	phalcon_array_update_string_string(default_styles, SL("int"), SL("color:blue"), 0);
-	phalcon_array_update_string_string(default_styles, SL("null"), SL("color:black"), 0);
-	phalcon_array_update_string_string(default_styles, SL("num"), SL("color:navy"), 0);
-	phalcon_array_update_string_string(default_styles, SL("obj"), SL("color:purple"), 0);
-	phalcon_array_update_string_string(default_styles, SL("other"), SL("color:maroon"), 0);
-	phalcon_array_update_string_string(default_styles, SL("res"), SL("color:lime"), 0);
-	phalcon_array_update_string_string(default_styles, SL("str"), SL("color:teal"), 0);
+	phalcon_array_update_str_str(default_styles, SL("pre"), SL("background-color:#f3f3f3; font-size:11px; padding:10px; border:1px solid #ccc; text-align:left; color:#333"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("arr"), SL("color:red"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("bool"), SL("color:green"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("float"), SL("color:fuchsia"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("int"), SL("color:blue"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("null"), SL("color:black"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("num"), SL("color:navy"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("obj"), SL("color:purple"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("other"), SL("color:maroon"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("res"), SL("color:lime"), PH_COPY);
+	phalcon_array_update_str_str(default_styles, SL("str"), SL("color:teal"), PH_COPY);
 
 	phalcon_update_property_this(getThis(), SL("_styles"), default_styles);
 
@@ -274,8 +274,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(replace_pairs, SL(":count"), count, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":count"), count, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -304,8 +304,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_INIT_NVAR(replace_pairs);
 			array_init(replace_pairs);
 
-			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(replace_pairs, SL(":key"), &key, PH_COPY);
+			phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+			phalcon_array_update_str(replace_pairs, SL(":key"), &key, PH_COPY);
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -344,8 +344,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(replace_pairs, SL(":class"), class_name, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":class"), class_name, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -366,8 +366,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_INIT_NVAR(replace_pairs);
 			array_init(replace_pairs);
 
-			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(replace_pairs, SL(":parent"), class_name, PH_COPY);
+			phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+			phalcon_array_update_str(replace_pairs, SL(":parent"), class_name, PH_COPY);
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -423,15 +423,15 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_INIT_NVAR(replace_pairs);
 			array_init(replace_pairs);
 
-			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(replace_pairs, SL(":key"), &key, PH_COPY);
+			phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+			phalcon_array_update_str(replace_pairs, SL(":key"), &key, PH_COPY);
 
 			if (PHALCON_PROPERTY_IS_PUBLIC_ZVAL(variable, &key)) {
-				phalcon_array_update_string_string(replace_pairs, SL(":type"), SL("public"), 0);
+				phalcon_array_update_str_str(replace_pairs, SL(":type"), SL("public"), PH_COPY);
 			} else if (PHALCON_PROPERTY_IS_PRIVATE_ZVAL(variable, &key)) {
-				phalcon_array_update_string_string(replace_pairs, SL(":type"), SL("private"), 0);
+				phalcon_array_update_str_str(replace_pairs, SL(":type"), SL("private"), PH_COPY);
 			} else if (PHALCON_PROPERTY_IS_PROTECTED_ZVAL(variable, &key)) {
-				phalcon_array_update_string_string(replace_pairs, SL(":type"), SL("protected"), 0);
+				phalcon_array_update_str_str(replace_pairs, SL(":type"), SL("protected"), PH_COPY);
 			}
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
@@ -470,9 +470,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(replace_pairs, SL(":class"), class_name, PH_COPY);
-		phalcon_array_update_string(replace_pairs, SL(":count"), count, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":class"), class_name, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":count"), count, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -497,8 +497,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 			PHALCON_INIT_NVAR(replace_pairs);
 			array_init(replace_pairs);
 
-			phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_string(replace_pairs, SL(":method"), method, PH_COPY);
+			phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+			phalcon_array_update_str(replace_pairs, SL(":method"), method, PH_COPY);
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -527,8 +527,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -545,8 +545,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -563,9 +563,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string_long(replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
-		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str_long(replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
+		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -582,9 +582,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string_long(replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
-		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str_long(replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
+		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -601,11 +601,11 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
 		if (zend_is_true(variable)) {
-			phalcon_array_update_string_string(replace_pairs, SL(":var"), SL("TRUE") , 0);
+			phalcon_array_update_str_str(replace_pairs, SL(":var"), SL("TRUE") , PH_COPY);
 		} else {
-			phalcon_array_update_string_string(replace_pairs, SL(":var"), SL("FALSE") , 0);
+			phalcon_array_update_str_str(replace_pairs, SL(":var"), SL("FALSE") , PH_COPY);
 		}
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
@@ -623,7 +623,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -640,8 +640,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		PHALCON_INIT_NVAR(replace_pairs);
 		array_init(replace_pairs);
 
-		phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_string(replace_pairs, SL(":var"), variable, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
 
 		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
@@ -682,8 +682,8 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
 	PHALCON_INIT_VAR(replace_pairs);
 	array_init(replace_pairs);
 
-	phalcon_array_update_string(replace_pairs, SL(":style"), style, PH_SEPARATE);
-	phalcon_array_update_string(replace_pairs, SL(":output"), output, PH_SEPARATE);
+	phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_SEPARATE);
+	phalcon_array_update_str(replace_pairs, SL(":output"), output, PH_SEPARATE);
 
 	PHALCON_RETURN_CALL_FUNCTION("strtr", str, replace_pairs);
 

@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 	PHALCON_INIT_VAR(option);
 	array_init_size(option, 1);
 
-	phalcon_array_update_string(option, SL("lifetime"), lifetime, PH_COPY);
+	phalcon_array_update_str(option, SL("lifetime"), lifetime, PH_COPY);
 
 	PHALCON_INIT_VAR(frontend_data);
 	object_init_ex(frontend_data, phalcon_cache_frontend_data_ce);
@@ -172,10 +172,10 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 	PHALCON_INIT_NVAR(option);
 	array_init_size(option, 3);
 
-	phalcon_array_update_string(option, SL("host"), host, PH_COPY);
-	phalcon_array_update_string(option, SL("port"), port, PH_COPY);
-	phalcon_array_update_string(option, SL("persistent"), persistent, PH_COPY);
-	phalcon_array_update_string(option, SL("prefix"), prefix, PH_COPY);
+	phalcon_array_update_str(option, SL("host"), host, PH_COPY);
+	phalcon_array_update_str(option, SL("port"), port, PH_COPY);
+	phalcon_array_update_str(option, SL("persistent"), persistent, PH_COPY);
+	phalcon_array_update_str(option, SL("prefix"), prefix, PH_COPY);
 
 	PHALCON_INIT_VAR(memcache);
 	object_init_ex(memcache, phalcon_cache_backend_memcache_ce);

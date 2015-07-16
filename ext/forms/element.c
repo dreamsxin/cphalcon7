@@ -416,19 +416,19 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 			 */
 			if (phalcon_array_isset_str_fetch(&current_value, merged_attributes, SL("value"))) {
 				if (PHALCON_IS_EQUAL(current_value, value)) {
-					phalcon_array_update_string_string(merged_attributes, SL("checked"), SL("checked"), PH_SEPARATE);
+					phalcon_array_update_str_str(merged_attributes, SL("checked"), SL("checked"), PH_COPY);
 				}
 			} else {
 				/** 
 				 * Evaluate the current value and mark the check as checked
 				 */
 				if (zend_is_true(value)) {
-					phalcon_array_update_string_string(merged_attributes, SL("checked"), SL("checked"), PH_SEPARATE);
+					phalcon_array_update_str_str(merged_attributes, SL("checked"), SL("checked"), PH_COPY);
 				}
-				phalcon_array_update_string(merged_attributes, SL("value"), value, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_str(merged_attributes, SL("value"), value, PH_COPY);
 			}
 		} else {
-			phalcon_array_update_string(merged_attributes, SL("value"), value, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_str(merged_attributes, SL("value"), value, PH_COPY);
 		}
 	}
 

@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 						PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filter);
 
 						if (item_key) {
-							phalcon_array_update_str(array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_string(array_value, item_key, filter_value, PH_COPY | PH_SEPARATE);
 						} else {
 							phalcon_array_update_long(array_value, item_idx, filter_value, PH_COPY | PH_SEPARATE);
 						}
@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), item_idx, item_key, item_value) {
 			PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filters);
 			if (item_key) {
-				phalcon_array_update_str(sanizited_value, item_key, filter_value, PH_COPY);
+				phalcon_array_update_string(sanizited_value, item_key, filter_value, PH_COPY);
 			} else {
 				phalcon_array_update_long(sanizited_value, item_idx, filter_value, PH_COPY);
 			}
@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	
 		PHALCON_INIT_VAR(options);
 		array_init_size(options, 1);
-		phalcon_array_update_string(options, SL("flags"), allow_fraction, PH_COPY);
+		phalcon_array_update_str(options, SL("flags"), allow_fraction, PH_COPY);
 	
 		PHALCON_INIT_NVAR(type);
 		ZVAL_LONG(type, 520); /* FILTER_SANITIZE_NUMBER_FLOAT */

@@ -141,14 +141,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 	PHALCON_INIT_VAR(option);
 	array_init_size(option, 1);
 
-	phalcon_array_update_string(option, SL("lifetime"), lifetime, PH_COPY);
+	phalcon_array_update_str(option, SL("lifetime"), lifetime, PH_COPY);
 
 	PHALCON_INIT_VAR(frontend_data);
 	object_init_ex(frontend_data, phalcon_cache_frontend_data_ce);
 
 	PHALCON_CALL_METHOD(NULL, frontend_data, "__construct", option);
 
-	phalcon_array_update_string_string(options, SL("statsKey"), SL("$PMM$"), PH_COPY);;
+	phalcon_array_update_str_str(options, SL("statsKey"), SL("$PMM$"), PH_COPY);;
 
 	PHALCON_INIT_VAR(mongo);
 	object_init_ex(mongo, phalcon_cache_backend_mongo_ce);

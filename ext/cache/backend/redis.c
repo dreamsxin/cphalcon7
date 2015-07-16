@@ -146,19 +146,19 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 	}
 
 	if (!phalcon_array_isset_str(options, SL("host"))) {
-		phalcon_array_update_string_string(options, SL("host"), SL("127.0.0.1"), 0);
+		phalcon_array_update_str_str(options, SL("host"), SL("127.0.0.1"), PH_COPY);
 	}
 
 	if (!phalcon_array_isset_str(options, SL("port"))) {
-		phalcon_array_update_string_long(options, SL("port"), 6379, 0);
+		phalcon_array_update_str_long(options, SL("port"), 6379, 0);
 	}
 
 	if (!phalcon_array_isset_str(options, SL("persistent"))) {
-		phalcon_array_update_string_bool(options, SL("persistent"), 0, 0);
+		phalcon_array_update_str_bool(options, SL("persistent"), 0, 0);
 	}
 
 	if (!phalcon_array_isset_str(options, SL("statsKey"))) {
-		phalcon_array_update_string_string(options, SL("statsKey"), SL("_PHCR"), 0);
+		phalcon_array_update_str_str(options, SL("statsKey"), SL("_PHCR"), PH_COPY);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, options);
@@ -682,7 +682,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, setTrackingKey)
 
 	SEPARATE_ZVAL(options);
 
-	phalcon_array_update_string(options, SL("statsKey"), key, PH_COPY);
+	phalcon_array_update_str(options, SL("statsKey"), key, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();

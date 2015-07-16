@@ -1261,37 +1261,37 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, getParams) {
 
 	conditions = phalcon_read_property(getThis(), SL("_conditions"), PH_NOISY);
 	if (Z_TYPE_P(conditions) != IS_NULL) {
-		phalcon_array_update_string(params, SL("conditions"), conditions, PH_COPY);
+		phalcon_array_update_str(params, SL("conditions"), conditions, PH_COPY);
 	}
 
 	bind_params = phalcon_read_property(getThis(), SL("_bindParams"), PH_NOISY);
 	if (Z_TYPE_P(bind_params) != IS_NULL) {
-		phalcon_array_update_string(params, SL("bind"), bind_params, PH_COPY);
+		phalcon_array_update_str(params, SL("bind"), bind_params, PH_COPY);
 	}
 
 	bind_types = phalcon_read_property(getThis(), SL("_bindTypes"), PH_NOISY);
 	if (Z_TYPE_P(bind_types) != IS_NULL) {
-		phalcon_array_update_string(params, SL("bindTypes"), bind_types, PH_COPY);
+		phalcon_array_update_str(params, SL("bindTypes"), bind_types, PH_COPY);
 	}
 
 	order = phalcon_read_property(getThis(), SL("_order"), PH_NOISY);
 	if (Z_TYPE_P(order) != IS_NULL) {
-		phalcon_array_update_string(params, SL("order"), order, PH_COPY);
+		phalcon_array_update_str(params, SL("order"), order, PH_COPY);
 	}
 
 	limit = phalcon_read_property(getThis(), SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
-		phalcon_array_update_string(params, SL("limit"), limit, PH_COPY);
+		phalcon_array_update_str(params, SL("limit"), limit, PH_COPY);
 	}
 
 	offset = phalcon_read_property(getThis(), SL("_offset"), PH_NOISY);
 	if (Z_TYPE_P(offset) != IS_NULL) {
-		phalcon_array_update_string(params, SL("offset"), offset, PH_COPY);
+		phalcon_array_update_str(params, SL("offset"), offset, PH_COPY);
 	}
 
 	cache = phalcon_read_property(getThis(), SL("_cacheOptions"), PH_NOISY);
 	if (Z_TYPE_P(cache) != IS_NULL) {
-		phalcon_array_update_string(params, SL("cache"), cache, PH_COPY);
+		phalcon_array_update_str(params, SL("cache"), cache, PH_COPY);
 	}
 
 	RETURN_CTOR(params);

@@ -1501,7 +1501,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _exists){
 	if (zend_is_true(mongo_id)) {
 		PHALCON_INIT_VAR(parameters);
 		array_init_size(parameters, 1);
-		phalcon_array_update_string(parameters, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_str(parameters, SL("_id"), mongo_id, PH_COPY);
 
 		/**
 		 * Perform the count using the function provided by the driver
@@ -1844,7 +1844,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	PHALCON_INIT_VAR(options);
 	array_init_size(options, 1);
 
-	phalcon_array_update_string_long(options, SL("w"), 1, 0);
+	phalcon_array_update_str_long(options, SL("w"), 1, 0);
 
 	/**
 	 * Save the document
@@ -1931,7 +1931,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findById){
 
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 1);
-	phalcon_array_update_string(conditions, SL("_id"), mongo_id, PH_COPY);
+	phalcon_array_update_str(conditions, SL("_id"), mongo_id, PH_COPY);
 
 	PHALCON_INIT_VAR(parameters);
 	array_init_size(parameters, 1);
@@ -2016,7 +2016,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 
 		PHALCON_INIT_VAR(conditions);
 		array_init_size(conditions, 1);
-		phalcon_array_update_string(conditions, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_str(conditions, SL("_id"), mongo_id, PH_COPY);
 
 		PHALCON_INIT_VAR(params);
 		array_init_size(params, 1);
@@ -2259,11 +2259,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	array_init(options);
 
 	if (!PHALCON_IS_EMPTY(condition)) {
-		phalcon_array_update_string(options, SL("condition"), condition, PH_COPY);
+		phalcon_array_update_str(options, SL("condition"), condition, PH_COPY);
 	}
 
 	if (!PHALCON_IS_EMPTY(finalize)) {
-		phalcon_array_update_string(options, SL("finalize"), finalize, PH_COPY);
+		phalcon_array_update_str(options, SL("finalize"), finalize, PH_COPY);
 	}
 
 	/**
@@ -2271,7 +2271,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	 */
 	PHALCON_INIT_VAR(initial);
 	array_init_size(initial, 1);
-	phalcon_array_update_string(initial, SL("summatory"), fields, PH_COPY);
+	phalcon_array_update_str(initial, SL("summatory"), fields, PH_COPY);
 
 	/**
 	 * Uses a javascript hash to group the results, however this is slow with larger
@@ -2410,14 +2410,14 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
 	PHALCON_INIT_VAR(id_condition);
 	array_init_size(id_condition, 1);
-	phalcon_array_update_string(id_condition, SL("_id"), mongo_id, PH_COPY);
+	phalcon_array_update_str(id_condition, SL("_id"), mongo_id, PH_COPY);
 
 	PHALCON_INIT_VAR(success);
 	ZVAL_BOOL(success, 0);
 
 	PHALCON_INIT_VAR(options);
 	array_init_size(options, 1);
-	phalcon_array_update_string_long(options, SL("w"), 1, 0);
+	phalcon_array_update_str_long(options, SL("w"), 1, 0);
 
 	/**
 	 * Remove the instance
@@ -2728,7 +2728,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 		PHALCON_INIT_VAR(criteria);
 		array_init_size(criteria, 1);
 
-		phalcon_array_update_string(criteria, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_str(criteria, SL("_id"), mongo_id, PH_COPY);
 
 		PHALCON_INIT_VAR(key);
 		ZVAL_STRING(key, "$inc");
@@ -2741,7 +2741,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 		PHALCON_INIT_VAR(options);
 		array_init_size(options, 1);
 
-		phalcon_array_update_string_long(options, SL("w"), 0, 0);
+		phalcon_array_update_str_long(options, SL("w"), 0, 0);
 		PHALCON_CALL_METHOD(&status, mongo_collection, "update", criteria, new_object, options);
 
 		if (zend_is_true(status)) {
@@ -2779,7 +2779,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 		PHALCON_INIT_VAR(criteria);
 		array_init_size(criteria, 1);
 
-		phalcon_array_update_string(criteria, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_str(criteria, SL("_id"), mongo_id, PH_COPY);
 
 		PHALCON_CALL_METHOD(&row, mongo_collection, "findone", criteria);
 

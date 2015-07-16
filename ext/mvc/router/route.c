@@ -496,7 +496,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 			 * Process module name
 			 */
 			if (Z_TYPE_P(module_name) != IS_NULL) {
-				phalcon_array_update_string(route_paths, SL("module"), module_name, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_str(route_paths, SL("module"), module_name, PH_COPY | PH_SEPARATE);
 			}
 
 			/** 
@@ -525,7 +525,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 					 * Update the namespace
 					 */
 					if (zend_is_true(namespace_name)) {
-						phalcon_array_update_string(route_paths, SL("namespace"), namespace_name, PH_COPY | PH_SEPARATE);
+						phalcon_array_update_str(route_paths, SL("namespace"), namespace_name, PH_COPY | PH_SEPARATE);
 					}
 				} else {
 					PHALCON_CPY_WRT(real_class_name, controller_name);
@@ -540,14 +540,14 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 				/** 
 				 * Update the controller path
 				 */
-				phalcon_array_update_string(route_paths, SL("controller"), lower_name, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_str(route_paths, SL("controller"), lower_name, PH_COPY | PH_SEPARATE);
 			}
 
 			/** 
 			 * Process action name
 			 */
 			if (Z_TYPE_P(action_name) != IS_NULL) {
-				phalcon_array_update_string(route_paths, SL("action"), action_name, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_str(route_paths, SL("action"), action_name, PH_COPY | PH_SEPARATE);
 			}
 		} else {
 			PHALCON_CPY_WRT(route_paths, paths);
@@ -557,7 +557,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 						PHALCON_INIT_VAR(lower_name);
 						phalcon_uncamelize(lower_name, controller_name);
 
-						phalcon_array_update_string(route_paths, SL("controller"), lower_name, PH_COPY);
+						phalcon_array_update_str(route_paths, SL("controller"), lower_name, PH_COPY);
 					}
 				}
 			}
@@ -938,11 +938,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getDefaults){
 
 	array_init_size(return_value, 5);
 
-	phalcon_array_update_str(return_value, IS(namespace),  namespace_name,  PH_COPY);
-	phalcon_array_update_str(return_value, IS(module),     module_name,     PH_COPY);
-	phalcon_array_update_str(return_value, IS(controller), controller_name, PH_COPY);
-	phalcon_array_update_str(return_value, IS(action),     action_name,     PH_COPY);
-	phalcon_array_update_str(return_value, IS(params),     params,          PH_COPY);
+	phalcon_array_update_string(return_value, IS(namespace),  namespace_name,  PH_COPY);
+	phalcon_array_update_string(return_value, IS(module),     module_name,     PH_COPY);
+	phalcon_array_update_string(return_value, IS(controller), controller_name, PH_COPY);
+	phalcon_array_update_string(return_value, IS(action),     action_name,     PH_COPY);
+	phalcon_array_update_string(return_value, IS(params),     params,          PH_COPY);
 }
 
 /**

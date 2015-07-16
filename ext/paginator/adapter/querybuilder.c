@@ -357,7 +357,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			PHALCON_INIT_VAR(select_columns);
 			ZVAL_STRING(select_columns, "*");
 
-			phalcon_array_update_str(intermediate, IS(columns), select_columns, PH_COPY);
+			phalcon_array_update_string(intermediate, IS(columns), select_columns, PH_COPY);
 			break;
 		}
 	} ZEND_HASH_FOREACH_END();

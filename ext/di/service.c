@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 		phalcon_array_update_zval(arguments, position, parameter, PH_COPY);
 	}
 
-	phalcon_array_update_string(definition, SL("arguments"), arguments, PH_COPY);
+	phalcon_array_update_str(definition, SL("arguments"), arguments, PH_COPY);
 
 	RETURN_THISW();
 }

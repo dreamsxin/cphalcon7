@@ -249,10 +249,10 @@ PHP_METHOD(Phalcon_Db_Reference, __set_state){
 
 	PHALCON_ALLOC_INIT_ZVAL(definition);
 	array_init_size(definition, 4);
-	phalcon_array_update_string(definition, SL("referencedSchema"),  referenced_schema, PH_COPY);
-	phalcon_array_update_string(definition, SL("referencedTable"),   referenced_table, PH_COPY);
-	phalcon_array_update_string(definition, SL("columns"),           columns, PH_COPY);
-	phalcon_array_update_string(definition, SL("referencedColumns"), referenced_columns, PH_COPY);
+	phalcon_array_update_str(definition, SL("referencedSchema"),  referenced_schema, PH_COPY);
+	phalcon_array_update_str(definition, SL("referencedTable"),   referenced_table, PH_COPY);
+	phalcon_array_update_str(definition, SL("columns"),           columns, PH_COPY);
+	phalcon_array_update_str(definition, SL("referencedColumns"), referenced_columns, PH_COPY);
 
 	object_init_ex(return_value, phalcon_db_reference_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", constraint_name, definition);

@@ -3100,7 +3100,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 					PHALCON_INIT_NVAR(parameters);
 					array_init_size(parameters, 2);
 					phalcon_array_append(parameters, join_conditions, 0);
-					phalcon_array_update_string(parameters, SL("bind"), bind_params, PH_COPY);
+					phalcon_array_update_str(parameters, SL("bind"), bind_params, PH_COPY);
 
 					/**
 					 * Let's make the checking
@@ -3285,7 +3285,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 					PHALCON_INIT_NVAR(parameters);
 					array_init_size(parameters, 2);
 					phalcon_array_append(parameters, join_conditions, 0);
-					phalcon_array_update_string(parameters, SL("bind"), bind_params, PH_COPY);
+					phalcon_array_update_str(parameters, SL("bind"), bind_params, PH_COPY);
 
 					/**
 					 * Let's make the checking
@@ -3467,7 +3467,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 					PHALCON_INIT_NVAR(parameters);
 					array_init_size(parameters, 2);
 					phalcon_array_append(parameters, join_conditions, 0);
-					phalcon_array_update_string(parameters, SL("bind"), bind_params, PH_COPY);
+					phalcon_array_update_str(parameters, SL("bind"), bind_params, PH_COPY);
 
 					/**
 					 * Let's make the checking
@@ -4386,9 +4386,9 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	 */
 	PHALCON_INIT_VAR(conditions);
 	array_init_size(conditions, 3);
-	phalcon_array_update_str(conditions, IS(conditions), unique_key, PH_COPY);
-	phalcon_array_update_string(conditions, SL("bind"), unique_params, PH_COPY);
-	phalcon_array_update_string(conditions, SL("bindTypes"), unique_types, PH_COPY);
+	phalcon_array_update_string(conditions, IS(conditions), unique_key, PH_COPY);
+	phalcon_array_update_str(conditions, SL("bind"), unique_params, PH_COPY);
+	phalcon_array_update_str(conditions, SL("bindTypes"), unique_types, PH_COPY);
 
 	/**
 	 * Perform the low level update
@@ -5480,9 +5480,9 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 
 	PHALCON_INIT_VAR(select);
 	array_init_size(select, 3);
-	phalcon_array_update_str(select, IS(columns), fields, PH_COPY);
-	phalcon_array_update_str(select, IS(tables), escaped_table, PH_COPY);
-	phalcon_array_update_str(select, IS(where), unique_key, PH_COPY);
+	phalcon_array_update_string(select, IS(columns), fields, PH_COPY);
+	phalcon_array_update_string(select, IS(tables), escaped_table, PH_COPY);
+	phalcon_array_update_string(select, IS(where), unique_key, PH_COPY);
 
 	/**
 	 * We directly build the SELECT to save resources
@@ -6724,8 +6724,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 
 	PHALCON_INIT_VAR(parameters);
 	array_init_size(parameters, 2);
-	phalcon_array_update_str(parameters, IS(conditions), conditions, PH_COPY);
-	phalcon_array_update_string(parameters, SL("bind"), bind_params, PH_COPY);
+	phalcon_array_update_string(parameters, IS(conditions), conditions, PH_COPY);
+	phalcon_array_update_str(parameters, SL("bind"), bind_params, PH_COPY);
 
 	/**
 	 * Execute the query

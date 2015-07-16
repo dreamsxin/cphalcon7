@@ -1696,20 +1696,20 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
 			PHALCON_INIT_NVAR(reference_array);
 			array_init_size(reference_array, 4);
-			phalcon_array_update_string(reference_array, SL("referencedSchema"), referenced_schema, PH_COPY);
-			phalcon_array_update_string(reference_array, SL("referencedTable"), referenced_table, PH_COPY);
-			phalcon_array_update_string(reference_array, SL("columns"), empty_arr, PH_COPY);
-			phalcon_array_update_string(reference_array, SL("referencedColumns"), empty_arr, PH_COPY);
+			phalcon_array_update_str(reference_array, SL("referencedSchema"), referenced_schema, PH_COPY);
+			phalcon_array_update_str(reference_array, SL("referencedTable"), referenced_table, PH_COPY);
+			phalcon_array_update_str(reference_array, SL("columns"), empty_arr, PH_COPY);
+			phalcon_array_update_str(reference_array, SL("referencedColumns"), empty_arr, PH_COPY);
 			phalcon_array_update_zval(references, constraint_name, reference_array, PH_COPY);
 		}
 
 		PHALCON_OBS_NVAR(column_name);
 		phalcon_array_fetch_long(&column_name, reference, 1, PH_NOISY);
-		phalcon_array_update_zval_string_append_multi_3(references, constraint_name, SL("columns"), column_name, 0);
+		phalcon_array_update_zval_str_append_multi_3(references, constraint_name, SL("columns"), column_name, 0);
 
 		PHALCON_OBS_NVAR(referenced_columns);
 		phalcon_array_fetch_long(&referenced_columns, reference, 5, PH_NOISY);
-		phalcon_array_update_zval_string_append_multi_3(references, constraint_name, SL("referencedColumns"), referenced_columns, 0);
+		phalcon_array_update_zval_str_append_multi_3(references, constraint_name, SL("referencedColumns"), referenced_columns, 0);
 	} ZEND_HASH_FOREACH_END();
 
 	array_init(return_value);
@@ -1736,10 +1736,10 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
 		PHALCON_INIT_NVAR(definition);
 		array_init_size(definition, 4);
-		phalcon_array_update_string(definition, SL("referencedSchema"), referenced_schema, PH_COPY);
-		phalcon_array_update_string(definition, SL("referencedTable"), referenced_table, PH_COPY);
-		phalcon_array_update_string(definition, SL("columns"), columns, PH_COPY );
-		phalcon_array_update_string(definition, SL("referencedColumns"), referenced_columns, PH_COPY);
+		phalcon_array_update_str(definition, SL("referencedSchema"), referenced_schema, PH_COPY);
+		phalcon_array_update_str(definition, SL("referencedTable"), referenced_table, PH_COPY);
+		phalcon_array_update_str(definition, SL("columns"), columns, PH_COPY );
+		phalcon_array_update_str(definition, SL("referencedColumns"), referenced_columns, PH_COPY);
 
 		PHALCON_INIT_NVAR(reference);
 		object_init_ex(reference, phalcon_db_reference_ce);

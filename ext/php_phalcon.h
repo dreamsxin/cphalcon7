@@ -40,9 +40,6 @@ typedef struct _phalcon_memory_entry {
 	size_t capacity;
 	zval ***addresses;
 	const int *lines;
-	size_t hash_pointer;
-	size_t hash_capacity;
-	zval ***hash_addresses;
 	struct _phalcon_memory_entry *prev;
 	struct _phalcon_memory_entry *next;
 #ifndef PHALCON_RELEASE

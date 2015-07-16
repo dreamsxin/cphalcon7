@@ -1625,7 +1625,7 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 		PHALCON_INIT_NVAR(quality_part);
 		array_init_size(quality_part, 2);
 		phalcon_array_update_zval(quality_part, name, header_name, PH_COPY);
-		phalcon_array_update_string(quality_part, SL("quality"), quality, PH_COPY);
+		phalcon_array_update_str(quality_part, SL("quality"), quality, PH_COPY);
 		phalcon_array_append(return_value, quality_part, 0);
 	} ZEND_HASH_FOREACH_END();
 
@@ -1841,8 +1841,8 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
 	}
 
 	array_init_size(return_value, 2);
-	add_assoc_stringl_ex(return_value, SL("username"), auth_user, strlen(auth_user));
-	add_assoc_stringl_ex(return_value, SL("password"), auth_password, strlen(auth_password));
+	phalcon_array_update_str_str(return_value, SL("username"), auth_user, strlen(auth_user), PH_COPY);
+	phalcon_array_update_str_str(return_value, SL("password"), auth_password, strlen(auth_password), PH_COPY);
 }
 
 /**

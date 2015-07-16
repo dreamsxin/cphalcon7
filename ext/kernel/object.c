@@ -75,7 +75,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 				if (phalcon_array_isset_str_fetch(&fetched, p, s, l + 1)) {
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
-							phalcon_array_update_string(fetched, s, l, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_str(fetched, s, l, value, PH_COPY | PH_SEPARATE);
 						} else {
 							p = fetched;
 						}
@@ -83,11 +83,11 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 					}
 				}
 				if (i == (types_length - 1)) {
-					phalcon_array_update_string(p, s, l, value, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_str(p, s, l, value, PH_COPY | PH_SEPARATE);
 				} else {
 					PHALCON_ALLOC_INIT_ZVAL(tmp);
 					array_init(tmp);
-					phalcon_array_update_string(p, s, l, tmp, PH_SEPARATE);
+					phalcon_array_update_str(p, s, l, tmp, PH_SEPARATE);
 					p = tmp;
 				}
 				break;
@@ -799,17 +799,12 @@ int phalcon_update_property_string_zval(zval *object, zend_string *property, zva
  */
 int phalcon_update_property_this(zval *object, const char *property_name, uint32_t property_length, zval *value)
 {
-	zend_class_entry *ce;
-
 	if (unlikely(Z_TYPE_P(object) != IS_OBJECT)) {
 		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object");
 		return FAILURE;
 	}
 
-	ce = Z_OBJCE_P(object);
-	zend_update_property(ce, object, property_name, property_length, value); 
-
-	return SUCCESS;
+	return phalcon_update_property_zval(object, property_name, property_length, value);
 }
 
 int phalcon_update_property_zval_null(zval *object, const zval *property)

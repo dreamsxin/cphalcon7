@@ -482,19 +482,19 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		 * Update the module if any
 		 */
 		if (Z_TYPE_P(module) == IS_STRING) {
-			phalcon_array_update_str(paths, IS(module), module, PH_COPY);
+			phalcon_array_update_string(paths, IS(module), module, PH_COPY);
 		}
 
 		/** 
 		 * Update the namespace if any
 		 */
 		if (Z_TYPE_P(namespace) == IS_STRING) {
-			phalcon_array_update_str(paths, IS(namespace), namespace, PH_COPY);
+			phalcon_array_update_string(paths, IS(namespace), namespace, PH_COPY);
 		}
 
-		phalcon_array_update_str(paths, IS(controller), controller, PH_COPY);
-		phalcon_array_update_str(paths, IS(action), real_action_name, PH_COPY);
-		phalcon_array_update_string(paths, SL("\0exact"), &PHALCON_GLOBAL(z_true), PH_COPY);
+		phalcon_array_update_string(paths, IS(controller), controller, PH_COPY);
+		phalcon_array_update_string(paths, IS(action), real_action_name, PH_COPY);
+		phalcon_array_update_str(paths, SL("\0exact"), &PHALCON_GLOBAL(z_true), PH_COPY);
 
 		PHALCON_INIT_VAR(position);
 		ZVAL_LONG(position, 0);

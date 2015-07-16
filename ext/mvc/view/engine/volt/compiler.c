@@ -1221,15 +1221,15 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 			PHALCON_INIT_VAR(resolved_expr);
 			array_init_size(resolved_expr, 4);
 			add_assoc_long_ex(resolved_expr, ISL(type), PHVOLT_T_RESOLVED_EXPR);
-			phalcon_array_update_str(resolved_expr, IS(value), left, PH_COPY);
-			phalcon_array_update_str(resolved_expr, IS(file), file, PH_COPY);
-			phalcon_array_update_str(resolved_expr, IS(line), line, PH_COPY);
+			phalcon_array_update_string(resolved_expr, IS(value), left, PH_COPY);
+			phalcon_array_update_string(resolved_expr, IS(file), file, PH_COPY);
+			phalcon_array_update_string(resolved_expr, IS(line), line, PH_COPY);
 
 			PHALCON_INIT_VAR(resolved_param);
 			array_init_size(resolved_param, 3);
-			phalcon_array_update_str(resolved_param, IS(expr), resolved_expr, PH_COPY);
-			phalcon_array_update_str(resolved_param, IS(file), file, PH_COPY);
-			phalcon_array_update_str(resolved_param, IS(line), line, PH_COPY);
+			phalcon_array_update_string(resolved_param, IS(expr), resolved_expr, PH_COPY);
+			phalcon_array_update_string(resolved_param, IS(file), file, PH_COPY);
+			phalcon_array_update_string(resolved_param, IS(line), line, PH_COPY);
 
 			ZVAL_MAKE_REF(func_arguments);
 			PHALCON_CALL_FUNCTION(NULL, "array_unshift", func_arguments, resolved_param);

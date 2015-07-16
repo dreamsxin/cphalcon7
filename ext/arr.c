@@ -853,7 +853,7 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, key, value) {
 		if (key) {
-			phalcon_array_update_str(return_value, key, value, PH_COPY);
+			phalcon_array_update_string(return_value, key, value, PH_COPY);
 		} else {
 			phalcon_array_update_long(return_value, idx, value, PH_COPY);
 		}
@@ -998,7 +998,7 @@ PHP_METHOD(Phalcon_Arr, flatten){
 		} else {
 			if (zend_is_true(is_assoc)) {
 				if (key) {
-					phalcon_array_update_str(return_value, key, value, PH_COPY);
+					phalcon_array_update_string(return_value, key, value, PH_COPY);
 				} else {
 					phalcon_array_update_long(return_value, idx, value, PH_COPY);
 				}
@@ -1086,7 +1086,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, str_key, value) {
 			PHALCON_CALL_METHOD(&filter_value, filter, "sanitize", value, filters);
 			if (str_key) {
-				phalcon_array_update_str(sanizited_value, str_key, filter_value, PH_COPY);
+				phalcon_array_update_string(sanizited_value, str_key, filter_value, PH_COPY);
 			} else {
 				phalcon_array_update_long(sanizited_value, idx, filter_value, PH_COPY);
 			}

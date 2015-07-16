@@ -355,23 +355,23 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 			PHALCON_INIT_VAR(definition);
 			array_init(definition);
 			if (!PHALCON_IS_LONG(expire, 0)) {
-				phalcon_array_update_string(definition, SL("expire"), expire, PH_COPY);
+				phalcon_array_update_str(definition, SL("expire"), expire, PH_COPY);
 			}
 
 			if (PHALCON_IS_NOT_EMPTY(path)) {
-				phalcon_array_update_string(definition, SL("path"), path, PH_COPY);
+				phalcon_array_update_str(definition, SL("path"), path, PH_COPY);
 			}
 
 			if (PHALCON_IS_NOT_EMPTY(domain)) {
-				phalcon_array_update_str(definition, IS(domain), domain, PH_COPY);
+				phalcon_array_update_string(definition, IS(domain), domain, PH_COPY);
 			}
 
 			if (PHALCON_IS_NOT_EMPTY(secure)) {
-				phalcon_array_update_string(definition, SL("secure"), secure, PH_COPY);
+				phalcon_array_update_str(definition, SL("secure"), secure, PH_COPY);
 			}
 
 			if (PHALCON_IS_NOT_EMPTY(http_only)) {
-				phalcon_array_update_string(definition, SL("httpOnly"), http_only, PH_COPY);
+				phalcon_array_update_str(definition, SL("httpOnly"), http_only, PH_COPY);
 			}
 
 			/**

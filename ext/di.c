@@ -394,8 +394,8 @@ PHP_METHOD(Phalcon_DI, get){
 		PHALCON_INIT_NVAR(event_data);
 		array_init(event_data);
 
-		phalcon_array_update_string(event_data, SL("name"), name, PH_COPY);
-		phalcon_array_update_string(event_data, SL("parameters"), parameters, PH_COPY);
+		phalcon_array_update_str(event_data, SL("name"), name, PH_COPY);
+		phalcon_array_update_str(event_data, SL("parameters"), parameters, PH_COPY);
 
 		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis(), event_data);
 	}
@@ -428,9 +428,9 @@ PHP_METHOD(Phalcon_DI, get){
 		PHALCON_INIT_NVAR(event_data);
 		array_init(event_data);
 
-		phalcon_array_update_string(event_data, SL("name"), name, PH_COPY);
-		phalcon_array_update_string(event_data, SL("parameters"), parameters, PH_COPY);
-		phalcon_array_update_string(event_data, SL("instance"), return_value, PH_COPY);
+		phalcon_array_update_str(event_data, SL("name"), name, PH_COPY);
+		phalcon_array_update_str(event_data, SL("parameters"), parameters, PH_COPY);
+		phalcon_array_update_str(event_data, SL("instance"), return_value, PH_COPY);
 
 		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis(), event_data);
 	}

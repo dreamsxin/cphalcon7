@@ -156,17 +156,17 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, __construct){
 		PHALCON_INIT_VAR(server);
 		array_init_size(server, 3);
 
-		phalcon_array_update_string_string(server, SL("host"), SL("127.0.0.1"), 0);
-		phalcon_array_update_string_long(server, SL("port"), 11211, 0);
-		phalcon_array_update_string_long(server, SL("weight"), 1, 0);
+		phalcon_array_update_str_str(server, SL("host"), SL("127.0.0.1"), PH_COPY);
+		phalcon_array_update_str_long(server, SL("port"), 11211, 0);
+		phalcon_array_update_str_long(server, SL("weight"), 1, 0);
 
 		phalcon_array_append(servers, server, 0);
 
-		phalcon_array_update_string(options, SL("servers"), servers, PH_COPY);
+		phalcon_array_update_str(options, SL("servers"), servers, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_str(options, SL("statsKey"))) {
-		phalcon_array_update_string_string(options, SL("statsKey"), SL("_PHCM"), 0);
+		phalcon_array_update_str_str(options, SL("statsKey"), SL("_PHCM"), PH_COPY);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_libmemcached_ce, getThis(), "__construct", frontend, options);
@@ -693,7 +693,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, setTrackingKey)
 
 	SEPARATE_ZVAL(options);
 
-	phalcon_array_update_string(options, SL("statsKey"), key, PH_COPY);
+	phalcon_array_update_str(options, SL("statsKey"), key, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_options"), options);
 
 	RETURN_THISW();

@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Http_Uri, __construct){
 			ZVAL_MAKE_REF(params);
 			PHALCON_CALL_FUNCTION(NULL, "parse_str", query, params);
 			ZVAL_UNREF(params);
-			phalcon_array_update_string(parts, SL("query"), params, PH_COPY);
+			phalcon_array_update_str(parts, SL("query"), params, PH_COPY);
 		}
 
 		phalcon_update_property_this(getThis(), SL("_parts"), parts);

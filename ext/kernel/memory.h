@@ -65,9 +65,6 @@ void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var);
 #define PHALCON_MEMORY_ALLOC(z) \
 	phalcon_memory_alloc((z))
 
-#define PHALCON_MEMORY_ALLOC_PNULL(z) \
-	phalcon_memory_alloc_pnull((z))
-
 #define PHALCON_MEMORY_OBSERVE(z) \
 	phalcon_memory_observe((z))
 

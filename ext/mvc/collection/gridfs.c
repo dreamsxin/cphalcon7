@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 		isBytes = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_array_update_string_long(options, SL("w"), 0, 0);
+	phalcon_array_update_str_long(options, SL("w"), 0, 0);
 
 	PHALCON_CALL_SELF(&mongo_id, "getid");
 
@@ -167,8 +167,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 	PHALCON_INIT_VAR(criteria);
 	array_init_size(criteria, 3);
 
-	phalcon_array_update_string(criteria, SL("md5"), md5, PH_COPY);
-	phalcon_array_update_string(criteria, SL("sha1"), sha1, PH_COPY);
+	phalcon_array_update_str(criteria, SL("md5"), md5, PH_COPY);
+	phalcon_array_update_str(criteria, SL("sha1"), sha1, PH_COPY);
 
 	PHALCON_INIT_VAR(operation);
 	ZVAL_STRING(operation, "$gte");
@@ -209,8 +209,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 		return;
 	}
 
-	phalcon_array_update_string(metadata, SL("sha1"), sha1, PH_COPY);
-	phalcon_array_update_string(metadata, SL("use"), value, PH_COPY);
+	phalcon_array_update_str(metadata, SL("sha1"), sha1, PH_COPY);
+	phalcon_array_update_str(metadata, SL("use"), value, PH_COPY);
 
 	if (zend_is_true(isBytes)) {
 		PHALCON_CALL_METHOD(&status, grid_fs, "storebytes", file, metadata, options);
@@ -260,8 +260,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 	PHALCON_INIT_VAR(criteria);
 	array_init_size(criteria, 2);
 
-	phalcon_array_update_string(criteria, SL("md5"), md5, PH_COPY);
-	phalcon_array_update_string(criteria, SL("sha1"), sha1, PH_COPY);
+	phalcon_array_update_str(criteria, SL("md5"), md5, PH_COPY);
+	phalcon_array_update_str(criteria, SL("sha1"), sha1, PH_COPY);
 
 	PHALCON_INIT_VAR(operation);
 	ZVAL_STRING(operation, "$inc");
@@ -300,8 +300,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 	PHALCON_INIT_NVAR(criteria);
 	array_init_size(criteria, 3);
 
-	phalcon_array_update_string(criteria, SL("sha1"), sha1, PH_COPY);
-	phalcon_array_update_string(criteria, SL("md5"), md5, PH_COPY);
+	phalcon_array_update_str(criteria, SL("sha1"), sha1, PH_COPY);
+	phalcon_array_update_str(criteria, SL("md5"), md5, PH_COPY);
 
 	PHALCON_INIT_NVAR(operation);
 	ZVAL_STRING(operation, "$lte");
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 	PHALCON_INIT_VAR(options);
 	array_init_size(options, 1);
 
-	phalcon_array_update_string_long(options, SL("w"), 0, 0);
+	phalcon_array_update_str_long(options, SL("w"), 0, 0);
 
 	PHALCON_RETURN_CALL_METHOD(grid_fs, "remove", criteria, options);
 	RETURN_MM();
@@ -603,8 +603,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getFile){
 	PHALCON_INIT_VAR(criteria);
 	array_init_size(criteria, 2);
 
-	phalcon_array_update_string(criteria, SL("md5"), md5, PH_COPY);
-	phalcon_array_update_string(criteria, SL("sha1"), sha1, PH_COPY);
+	phalcon_array_update_str(criteria, SL("md5"), md5, PH_COPY);
+	phalcon_array_update_str(criteria, SL("sha1"), sha1, PH_COPY);
 
 	PHALCON_RETURN_CALL_METHOD(grid_fs, "findone", criteria);
 	RETURN_MM();

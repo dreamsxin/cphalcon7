@@ -73,6 +73,8 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 		return 1;
 	}
 
+	*fetched = &EG(uninitialized_zval);
+
 	return 0;
 }
 
@@ -86,6 +88,8 @@ int phalcon_array_isset_str_fetch(zval **fetched, const zval *arr, const char *i
 			return 1;
 		}
 	}
+
+	*fetched = &EG(uninitialized_zval);
 
 	return 0;
 }
@@ -330,7 +334,7 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 	return status;
 }
 
-int phalcon_array_update_string(zval *arr, const char *index, uint index_length, zval *value, int flags){
+int phalcon_array_update_str(zval *arr, const char *index, uint index_length, zval *value, int flags){
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
 		zend_error(E_WARNING, "Cannot use a scalar value as an array (3)");
@@ -357,7 +361,7 @@ int phalcon_array_update_string(zval *arr, const char *index, uint index_length,
 	return zend_hash_update(Z_ARRVAL_P(arr), zend_string_init(index, index_length, 0), value) ? SUCCESS : FAILURE;
 }
 
-int phalcon_array_update_str(zval *arr, zend_string *index, zval *value, int flags){
+int phalcon_array_update_string(zval *arr, zend_string *index, zval *value, int flags){
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
 		zend_error(E_WARNING, "Cannot use a scalar value as an array (3)");
@@ -462,7 +466,10 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 
 		if (result) {
 			ZVAL_COPY_VALUE(*return_value, zv);
-		} else if ((flags & PH_NOISY) == PH_NOISY) {
+			return 1;
+		}
+
+		if ((flags & PH_NOISY) == PH_NOISY) {
 			if (sidx == NULL) {
 				zend_error(E_NOTICE, "Undefined index: %ld", uidx);
 			} else {
@@ -471,7 +478,9 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		}
 	}
 
-	return result;
+	ZVAL_NULL(*return_value);
+
+	return 0;
 }
 
 int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *index, uint index_length, int flags){
@@ -493,6 +502,8 @@ int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *in
 			zend_error(E_NOTICE, "Cannot use a scalar value as an array");
 		}
 	}
+
+	ZVAL_NULL(*return_value);
 
 	return FAILURE;
 }
@@ -517,6 +528,8 @@ int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string
 		}
 	}
 
+	ZVAL_NULL(*return_value);
+
 	return FAILURE;
 }
 
@@ -539,6 +552,8 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
 			zend_error(E_NOTICE, "Cannot use a scalar value as an array");
 		}
 	}
+
+	ZVAL_NULL(*return_value);
 
 	return FAILURE;
 }
@@ -578,7 +593,7 @@ void phalcon_array_update_multi_2(zval *arr, const zval *index1, const zval *ind
 
 }
 
-void phalcon_array_update_string_multi_2(zval *arr, const zval *index1, const char *index2, uint index2_length, zval *value, int flags){
+void phalcon_array_update_str_multi_2(zval *arr, const zval *index1, const char *index2, uint index2_length, zval *value, int flags){
 
 	zval *temp;
 
@@ -591,7 +606,7 @@ void phalcon_array_update_string_multi_2(zval *arr, const zval *index1, const ch
 		}
 
 		phalcon_array_update_zval(arr, index1, temp, 0);
-		phalcon_array_update_string(temp, index2, index2_length, value, flags | PH_COPY);
+		phalcon_array_update_str(temp, index2, index2_length, value, flags | PH_COPY);
 	}
 }
 
@@ -625,11 +640,11 @@ void phalcon_array_update_long_string_multi_2(zval *arr, ulong index1, const cha
 		}
 
 		phalcon_array_update_long(arr, index1, temp, 0);
-		phalcon_array_update_string(temp, index2, index2_length, value, flags | PH_COPY);
+		phalcon_array_update_str(temp, index2, index2_length, value, flags | PH_COPY);
 	}
 }
 
-void phalcon_array_update_zval_string_append_multi_3(zval *arr, const zval *index1, const char *index2, uint index2_length, zval *value, int flags){
+void phalcon_array_update_zval_str_append_multi_3(zval *arr, const zval *index1, const char *index2, uint index2_length, zval *value, int flags){
 
 	zval *temp1, *temp2;
 
@@ -650,7 +665,7 @@ void phalcon_array_update_zval_string_append_multi_3(zval *arr, const zval *inde
 			convert_to_array(temp2);
 		}
 
-		phalcon_array_update_string(temp1, index2, index2_length, temp2, 0);
+		phalcon_array_update_str(temp1, index2, index2_length, temp2, 0);
 		phalcon_array_append(temp2, value, flags);
 	}
 }
@@ -682,7 +697,7 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 	}
 }
 
-void phalcon_array_update_string_zval_zval_multi_3(zval *arr, const zval *index1, const zval *index2, const char *index3, uint index3_length, zval *value, int flags){
+void phalcon_array_update_str_zval_zval_multi_3(zval *arr, const zval *index1, const zval *index2, const char *index3, uint index3_length, zval *value, int flags){
 
 	zval *temp1, *temp2;
 
@@ -705,7 +720,7 @@ void phalcon_array_update_string_zval_zval_multi_3(zval *arr, const zval *index1
 		}
 
 		phalcon_array_update_zval(temp1, index2, temp2, 0);
-		phalcon_array_update_string(temp2, index3, index3_length, value, PH_COPY);
+		phalcon_array_update_str(temp2, index3, index3_length, value, PH_COPY);
 	}
 }
 
@@ -731,8 +746,8 @@ void phalcon_array_update_zval_string_string_multi_3(zval *arr, const zval *inde
 			convert_to_array(temp2);
 		}
 
-		phalcon_array_update_string(temp1, index2, index2_length, temp2, 0);
-		phalcon_array_update_string(temp2, index3, index3_length, value, PH_COPY);
+		phalcon_array_update_str(temp1, index2, index2_length, temp2, 0);
+		phalcon_array_update_str(temp2, index3, index3_length, value, PH_COPY);
 	}
 }
 
@@ -1006,7 +1021,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (Z_TYPE_P(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
-							phalcon_array_update_string(p, s, l, value, PH_COPY | PH_SEPARATE);
+							phalcon_array_update_str(p, s, l, value, PH_COPY | PH_SEPARATE);
 						} else {
 							p = fetched;
 						}
@@ -1018,11 +1033,11 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 				if (!must_continue) {
 					re_update = Z_REFCOUNT_P(p) > 1 && !Z_ISREF_P(p);
 					if (i == (types_length - 1)) {
-						phalcon_array_update_string(p, s, l, value, PH_COPY | PH_SEPARATE);
+						phalcon_array_update_str(p, s, l, value, PH_COPY | PH_SEPARATE);
 					} else {
 						PHALCON_ALLOC_INIT_ZVAL(tmp);
 						array_init(tmp);
-						phalcon_array_update_string(p, s, l, tmp, PH_SEPARATE);
+						phalcon_array_update_str(p, s, l, tmp, PH_SEPARATE);
 						if (re_update) {
 							wrap_tmp = 1;
 						} else {
@@ -1117,9 +1132,9 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 
 					case 's':
 						if (j == i - 1) {
-							phalcon_array_update_string((old_p[j]), old_s[j], old_l[j], p, PH_SEPARATE);
+							phalcon_array_update_str((old_p[j]), old_s[j], old_l[j], p, PH_SEPARATE);
 						} else {
-							phalcon_array_update_string((old_p[j]), old_s[j], old_l[j], old_p[j+1], PH_SEPARATE);
+							phalcon_array_update_str((old_p[j]), old_s[j], old_l[j], old_p[j+1], PH_SEPARATE);
 						}
 						if (wrap_tmp) {
 							p = tmp;

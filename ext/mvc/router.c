@@ -556,11 +556,11 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
 
 	array_init_size(return_value, 5);
 
-	phalcon_array_update_str(return_value, IS(namespace),  namespace_name,  PH_COPY);
-	phalcon_array_update_str(return_value, IS(module),     module_name,     PH_COPY);
-	phalcon_array_update_str(return_value, IS(controller), controller_name, PH_COPY);
-	phalcon_array_update_str(return_value, IS(action),     action_name,     PH_COPY);
-	phalcon_array_update_str(return_value, IS(params),     params,          PH_COPY);
+	phalcon_array_update_string(return_value, IS(namespace),  namespace_name,  PH_COPY);
+	phalcon_array_update_string(return_value, IS(module),     module_name,     PH_COPY);
+	phalcon_array_update_string(return_value, IS(controller), controller_name, PH_COPY);
+	phalcon_array_update_string(return_value, IS(action),     action_name,     PH_COPY);
+	phalcon_array_update_string(return_value, IS(params),     params,          PH_COPY);
 }
 
 /**

@@ -1054,13 +1054,13 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 				PHALCON_INIT_VAR(real_controller_name);
 				phalcon_get_class_ns(real_controller_name, controller_part, 0);
 
-				phalcon_array_update_string(forward_parts, SL("controller"), real_controller_name, PH_COPY);
+				phalcon_array_update_str(forward_parts, SL("controller"), real_controller_name, PH_COPY);
 
 				PHALCON_INIT_VAR(real_namespace_name);
 				phalcon_get_ns_class(real_namespace_name, controller_name, 0);
 
 				if (zend_is_true(namespace_name)) {
-					phalcon_array_update_string(forward_parts, SL("namespace"), real_namespace_name, PH_COPY);
+					phalcon_array_update_str(forward_parts, SL("namespace"), real_namespace_name, PH_COPY);
 				}
 			} else {
 				PHALCON_CPY_WRT(real_controller_name, controller_part);
@@ -1068,10 +1068,10 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 
 			PHALCON_INIT_NVAR(controller_part);
 			phalcon_uncamelize(controller_part, real_controller_name);
-			phalcon_array_update_string(forward_parts, SL("controller"), controller_part, PH_COPY);
+			phalcon_array_update_str(forward_parts, SL("controller"), controller_part, PH_COPY);
 
 			if (Z_TYPE_P(action_part) != IS_NULL) {
-				phalcon_array_update_string(forward_parts, SL("action"), action_part, PH_COPY);
+				phalcon_array_update_str(forward_parts, SL("action"), action_part, PH_COPY);
 			}
 		}
 	} else {

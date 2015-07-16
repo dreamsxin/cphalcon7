@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 	PHALCON_INIT_VAR(option);
 	array_init_size(option, 1);
 
-	phalcon_array_update_string(option, SL("lifetime"), lifetime, PH_COPY);
+	phalcon_array_update_str(option, SL("lifetime"), lifetime, PH_COPY);
 
 	PHALCON_INIT_VAR(frontend_data);
 	object_init_ex(frontend_data, phalcon_cache_frontend_data_ce);
@@ -145,13 +145,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 	PHALCON_INIT_NVAR(option);
 	array_init(option);
 
-	phalcon_array_update_string_string(option, SL("statsKey"), SL("$PMM$"), PH_COPY);
+	phalcon_array_update_str_str(option, SL("statsKey"), SL("$PMM$"), PH_COPY);
 
-	phalcon_array_update_string(option, SL("servers"), servers, PH_COPY);
+	phalcon_array_update_str(option, SL("servers"), servers, PH_COPY);
 	if (client) {
-		phalcon_array_update_string(option, SL("client"), client, PH_COPY);
+		phalcon_array_update_str(option, SL("client"), client, PH_COPY);
 	}
-	phalcon_array_update_string(option, SL("prefix"), prefix, PH_COPY);
+	phalcon_array_update_str(option, SL("prefix"), prefix, PH_COPY);
 
 	PHALCON_INIT_VAR(libmemcached);
 	object_init_ex(libmemcached, phalcon_cache_backend_libmemcached_ce);

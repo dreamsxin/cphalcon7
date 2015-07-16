@@ -450,7 +450,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		PHALCON_ALLOC_INIT_ZVAL(s_qualified);
 		ZVAL_STR(s_qualified, IS(qualified));
 		add_assoc_zval_ex(return_value, ISL(type), s_qualified);
-		phalcon_array_update_str(return_value, IS(name), column_name, PH_COPY);
+		phalcon_array_update_string(return_value, IS(name), column_name, PH_COPY);
 		RETURN_MM();
 	}
 
@@ -630,9 +630,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	ZVAL_STR(s_qualified, IS(qualified));
 	array_init_size(return_value, 4);
 	add_assoc_zval_ex(return_value, ISL(type), s_qualified);
-	phalcon_array_update_str(return_value, IS(domain), source, PH_COPY);
-	phalcon_array_update_str(return_value, IS(name), real_column_name, PH_COPY);
-	phalcon_array_update_str(return_value, IS(balias), column_name, PH_COPY);
+	phalcon_array_update_string(return_value, IS(domain), source, PH_COPY);
+	phalcon_array_update_string(return_value, IS(name), real_column_name, PH_COPY);
+	phalcon_array_update_string(return_value, IS(balias), column_name, PH_COPY);
 
 	RETURN_MM();
 }
@@ -711,9 +711,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 			PHALCON_INIT_NVAR(tmp);
 			array_init(tmp);
 
-			phalcon_array_update_str_string(tmp, IS(type), SL("when"), PH_COPY);
-			phalcon_array_update_string(tmp, SL("when"), when_left, PH_COPY);
-			phalcon_array_update_string(tmp, SL("then"), when_right, PH_COPY);
+			phalcon_array_update_string_str(tmp, IS(type), SL("when"), PH_COPY);
+			phalcon_array_update_str(tmp, SL("when"), when_left, PH_COPY);
+			phalcon_array_update_str(tmp, SL("then"), when_right, PH_COPY);
 
 			phalcon_array_append(when_clauses, tmp, 0);
 		} else {
@@ -721,8 +721,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 			PHALCON_INIT_NVAR(tmp);
 			array_init(tmp);
 
-			phalcon_array_update_str_string(tmp, IS(type), SL("else"), PH_COPY);
-			phalcon_array_update_string(tmp, SL("expr"), when_left, PH_COPY);
+			phalcon_array_update_string_str(tmp, IS(type), SL("else"), PH_COPY);
+			phalcon_array_update_str(tmp, SL("expr"), when_left, PH_COPY);
 
 			phalcon_array_append(when_clauses, tmp, 0);
 		}
@@ -732,9 +732,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 
 	array_init(return_value);
 
-	phalcon_array_update_str_string(return_value, IS(type), SL("case"), PH_COPY);
-	phalcon_array_update_string(return_value, SL("expr"), tmp1, PH_COPY);
-	phalcon_array_update_string(return_value, SL("when-clauses"), when_clauses, PH_COPY);
+	phalcon_array_update_string_str(return_value, IS(type), SL("case"), PH_COPY);
+	phalcon_array_update_str(return_value, SL("expr"), tmp1, PH_COPY);
+	phalcon_array_update_str(return_value, SL("when-clauses"), when_clauses, PH_COPY);
 
 	RETURN_MM();
 }
@@ -792,8 +792,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 		PHALCON_ALLOC_INIT_ZVAL(s_functionCall);
 		ZVAL_STR(s_functionCall, IS(functionCall));
 		add_assoc_zval_ex(return_value, ISL(type), s_functionCall);
-		phalcon_array_update_str(return_value, IS(name), name, PH_COPY);
-		phalcon_array_update_str(return_value, IS(arguments), function_args, PH_COPY);
+		phalcon_array_update_string(return_value, IS(name), name, PH_COPY);
+		phalcon_array_update_string(return_value, IS(arguments), function_args, PH_COPY);
 
 		if (distinct) {
 			add_assoc_bool_ex(return_value, ISL(distinct), distinct);
@@ -802,7 +802,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 		PHALCON_ALLOC_INIT_ZVAL(s_functionCall);
 		ZVAL_STR(s_functionCall, IS(functionCall));
 		add_assoc_zval_ex(return_value, ISL(type), s_functionCall);
-		phalcon_array_update_str(return_value, IS(name), name, PH_COPY);
+		phalcon_array_update_string(return_value, IS(name), name, PH_COPY);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -868,73 +868,73 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 			case PHQL_T_LESS:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("<"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("<"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_EQUALS:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("="));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("="), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_GREATER:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL(">"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL(">"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_NOTEQUALS:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("<>"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("<>"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_LESSEQUAL:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("<="));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("<="), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_GREATEREQUAL:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL(">="));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL(">="), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_AND:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("AND"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("AND"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_OR:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("OR"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("OR"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_QUALIFIED:
@@ -948,79 +948,79 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 			case PHQL_T_ADD:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("+"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("+"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_SUB:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("-"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("-"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_MUL:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("*"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("*"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_DIV:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("/"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("/"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_MOD:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("%"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("%"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_BITWISE_AND:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("&"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("&"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_BITWISE_OR:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("|"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("|"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_ENCLOSED:
 				assert(left != NULL);
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("parentheses"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("parentheses"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
 				break;
 
 			case PHQL_T_MINUS:
 				assert(right != NULL);
 				array_init_size(return_value, 3);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("unary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("-"));
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("-"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_INTEGER:
@@ -1029,8 +1029,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				phalcon_array_fetch_str(&value, expr, SL("value"), PH_NOISY);
 
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("literal"));
-				phalcon_array_update_str(return_value, IS(value), value, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("literal"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(value), value, PH_COPY);
 				break;
 
 			case PHQL_T_HINTEGER:
@@ -1038,8 +1038,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				phalcon_array_fetch_str(&value, expr, SL("value"), PH_NOISY);
 
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("literal"));
-				phalcon_array_update_str(return_value, IS(value), value, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("literal"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(value), value, PH_COPY);
 				break;
 
 			case PHQL_T_RAW_QUALIFIED:
@@ -1047,20 +1047,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				phalcon_array_fetch_str(&value, expr, SL("name"), PH_NOISY);
 
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("literal"));
-				phalcon_array_update_str(return_value, IS(value), value, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("literal"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(value), value, PH_COPY);
 				break;
 
 			case PHQL_T_TRUE:
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("literal"));
-				add_assoc_stringl_ex(return_value, ISL(value), SL("TRUE"));
+				phalcon_array_update_string_str(return_value, IS(type), SL("literal"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(value), SL("TRUE"), PH_COPY);
 				break;
 
 			case PHQL_T_FALSE:
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("literal"));
-				add_assoc_stringl_ex(return_value, ISL(value), SL("FALSE"));
+				phalcon_array_update_string_str(return_value, IS(type), SL("literal"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(value), SL("FALSE"), PH_COPY);
 				break;
 
 			case PHQL_T_STRING:
@@ -1085,8 +1085,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				}
 
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("literal"));
-				phalcon_array_update_str(return_value, IS(value), expr_value, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("literal"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(value), expr_value, PH_COPY);
 				break;
 
 			case PHQL_T_NPLACEHOLDER: {
@@ -1101,8 +1101,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				PHALCON_STR_REPLACE(&placeholder, &question_mark, &colon, value);
 
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("placeholder"));
-				phalcon_array_update_str(return_value, IS(value), placeholder, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("placeholder"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(value), placeholder, PH_COPY);
 				break;
 			}
 
@@ -1114,8 +1114,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				PHALCON_CONCAT_SV(placeholder, ":", value);
 
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("placeholder"));
-				phalcon_array_update_str(return_value, IS(value), placeholder, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("placeholder"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(value), placeholder, PH_COPY);
 				break;
 
 			case PHQL_T_BPLACEHOLDER:
@@ -1137,8 +1137,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 					PHALCON_CONCAT_SV(placeholder, ":", value_name);
 
 					array_init(return_value);
-					add_assoc_stringl_ex(return_value, ISL(type), SL("placeholder"));
-					phalcon_array_update_str(return_value, IS(value), placeholder, PH_COPY);
+					phalcon_array_update_string_str(return_value, IS(type), SL("placeholder"), PH_COPY);
+					phalcon_array_update_string(return_value, IS(value), placeholder, PH_COPY);
 
 					if (phalcon_comparestr_str(value_type, SL("str"), NULL)) {
 						PHALCON_INIT_NVAR(value_type);
@@ -1187,7 +1187,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 							return;
 						}
 						
-						phalcon_array_update_string_long(return_value, SL("times"), value_times, PH_COPY);
+						phalcon_array_update_str_long(return_value, SL("times"), value_times, PH_COPY);
 					} else {
 						PHALCON_THROW_EXCEPTION_FORMAT(phalcon_mvc_model_exception_ce, "Unknown bind type: %s", Z_STRVAL_P(value_type));
 						return;
@@ -1200,102 +1200,102 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 					PHALCON_CONCAT_SV(placeholder, ":", value);
 
 					array_init_size(return_value, 2);
-					add_assoc_stringl_ex(return_value, ISL(type), SL("placeholder"));
-					phalcon_array_update_str(return_value, IS(value), placeholder, PH_COPY);
+					phalcon_array_update_string_str(return_value, IS(type), SL("placeholder"), PH_COPY);
+					phalcon_array_update_string(return_value, IS(value), placeholder, PH_COPY);
 				}
 				break;
 			}
 
 			case PHQL_T_NULL:
 				array_init_size(return_value, 2);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("literal"));
-				add_assoc_stringl_ex(return_value, ISL(value), SL("NULL"));
+				phalcon_array_update_string_str(return_value, IS(type), SL("literal"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(value), SL("NULL"), PH_COPY);
 				break;
 
 			case PHQL_T_LIKE:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("LIKE"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("LIKE"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_NLIKE:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("NOT LIKE"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("NOT LIKE"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_ILIKE:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("ILIKE"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("ILIKE"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_NILIKE:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("NOT ILIKE"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("NOT ILIKE"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_NOT:
 				assert(right != NULL);
 				array_init_size(return_value, 3);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("unary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("NOT "));
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("NOT "), PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_ISNULL:
 				assert(left != NULL);
 				array_init_size(return_value, 3);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("unary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL(" IS NULL"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL(" IS NULL"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
 				break;
 
 			case PHQL_T_ISNOTNULL:
 				assert(left != NULL);
 				array_init_size(return_value, 3);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("unary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL(" IS NOT NULL"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL(" IS NOT NULL"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
 				break;
 
 			case PHQL_T_IN:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("IN"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("IN"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_NOTIN:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("NOT IN"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("NOT IN"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_EXISTS:
 				assert(right != NULL);
 				array_init_size(return_value, 3);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("unary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("EXISTS"));
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("EXISTS"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_DISTINCT:
@@ -1306,35 +1306,35 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 			case PHQL_T_BETWEEN:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("BETWEEN"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("BETWEEN"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_AGAINST:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("AGAINST"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("AGAINST"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_CAST:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 3);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("cast"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("cast"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_CONVERT:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 3);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("convert"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("convert"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_FCALL:
@@ -1348,55 +1348,55 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 			case PHQL_T_TS_MATCHES:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("@@"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("@@"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_TS_OR:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("||"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("||"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_TS_AND:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("||"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("||"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_TS_NEGATE:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("!!"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("!!"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_TS_CONTAINS_ANOTHER:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("@>"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("@>"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_TS_CONTAINS_IN:
 				assert(left != NULL && right != NULL);
 				array_init_size(return_value, 4);
-				add_assoc_stringl_ex(return_value, ISL(type), SL("binary-op"));
-				add_assoc_stringl_ex(return_value, ISL(op), SL("<@"));
-				phalcon_array_update_str(return_value, IS(left), left, PH_COPY);
-				phalcon_array_update_str(return_value, IS(right), right, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(op), SL("<@"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(left), left, PH_COPY);
+				phalcon_array_update_string(return_value, IS(right), right, PH_COPY);
 				break;
 
 			case PHQL_T_SELECT:
@@ -1404,8 +1404,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
 				PHALCON_CALL_METHOD(&expr_value, getThis(), "_prepareselect", expr, &PHALCON_GLOBAL(z_true));
 
-				add_assoc_stringl_ex(return_value, ISL(type), SL("select"));
-				phalcon_array_update_str(return_value, IS(value), expr_value, PH_COPY);
+				phalcon_array_update_string_str(return_value, IS(type), SL("select"), PH_COPY);
+				phalcon_array_update_string(return_value, IS(value), expr_value, PH_COPY);
 				break;
 
 			default:
@@ -1441,8 +1441,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 		} ZEND_HASH_FOREACH_END();
 
 		array_init_size(return_value, 2);
-		add_assoc_stringl_ex(return_value, ISL(type), SL("list"));
-		phalcon_array_append(return_value, list_items, 0);
+		phalcon_array_update_string_str(return_value, IS(type), SL("list"), PH_COPY);
+		phalcon_array_append(return_value, list_items, PH_COPY);
 
 		RETURN_MM();
 	}
@@ -1491,9 +1491,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 			if (str_key) {
 				PHALCON_INIT_NVAR(sql_column);
 				array_init_size(sql_column, 3);
-				add_assoc_stringl_ex(sql_column, ISL(type), SL("object"));
-				phalcon_array_update_str_str(sql_column, IS(model), str_key, PH_COPY);
-				phalcon_array_update_str(sql_column, IS(column), source, PH_COPY);
+				phalcon_array_update_string_str(sql_column, IS(type), SL("object"), PH_COPY);
+				phalcon_array_update_string_string(sql_column, IS(model), str_key, PH_COPY);
+				phalcon_array_update_string(sql_column, IS(column), source, PH_COPY);
 
 				phalcon_array_append(return_value, sql_column, 0);
 			}
@@ -1553,10 +1553,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 		 */
 		PHALCON_INIT_VAR(sql_column);
 		array_init_size(sql_column, 4);
-		add_assoc_stringl_ex(sql_column, ISL(type), SL("object"));
-		phalcon_array_update_str(sql_column, IS(model), model_name, PH_COPY);
-		phalcon_array_update_str(sql_column, IS(column), sql_column_alias, PH_COPY);
-		phalcon_array_update_str(sql_column, IS(balias), prepared_alias, PH_COPY);
+		phalcon_array_update_string_str(sql_column, IS(type), SL("object"), PH_COPY);
+		phalcon_array_update_string(sql_column, IS(model), model_name, PH_COPY);
+		phalcon_array_update_string(sql_column, IS(column), sql_column_alias, PH_COPY);
+		phalcon_array_update_string(sql_column, IS(balias), prepared_alias, PH_COPY);
 
 		array_init_size(return_value, 1);
 		phalcon_array_append(return_value, sql_column, 0);
@@ -1575,7 +1575,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 		 */
 		PHALCON_INIT_NVAR(sql_column);
 		array_init_size(sql_column, 4);
-		add_assoc_stringl_ex(sql_column, ISL(type), SL("scalar"));
+		phalcon_array_update_string_str(sql_column, IS(type), SL("scalar"), PH_COPY);
 
 		PHALCON_OBS_VAR(column_data);
 		phalcon_array_fetch_str(&column_data, column, SL("column"), PH_NOISY);
@@ -1586,11 +1586,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 		 * Create balias and sqlAlias
 		 */
 		if (phalcon_array_isset_str_fetch(&balias, sql_expr_column, SL("balias"))) {
-			phalcon_array_update_str(sql_column, IS(balias), balias, PH_COPY);
-			phalcon_array_update_str(sql_column, IS(sqlAlias), balias, PH_COPY);
+			phalcon_array_update_string(sql_column, IS(balias), balias, PH_COPY);
+			phalcon_array_update_string(sql_column, IS(sqlAlias), balias, PH_COPY);
 		}
 
-		phalcon_array_update_str(sql_column, IS(column), sql_expr_column, PH_COPY);
+		phalcon_array_update_string(sql_column, IS(column), sql_expr_column, PH_COPY);
 
 		array_init_size(return_value, 1);
 		phalcon_array_append(return_value, sql_column, 0);
@@ -1667,10 +1667,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
 			PHALCON_CALL_METHOD(&schema, model, "getschema");
 
 			array_init_size(return_value, 4);
-			phalcon_array_update_string(return_value, SL("schema"), schema, PH_COPY);
-			phalcon_array_update_string(return_value, SL("source"), source, PH_COPY);
-			phalcon_array_update_string(return_value, SL("modelName"), model_name, PH_COPY);
-			phalcon_array_update_string(return_value, SL("model"), model, PH_COPY);
+			phalcon_array_update_str(return_value, SL("schema"), schema, PH_COPY);
+			phalcon_array_update_str(return_value, SL("source"), source, PH_COPY);
+			phalcon_array_update_str(return_value, SL("modelName"), model_name, PH_COPY);
+			phalcon_array_update_str(return_value, SL("model"), model, PH_COPY);
 			RETURN_MM();
 		}
 	}
@@ -1780,8 +1780,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 		PHALCON_INIT_VAR(left);
 		array_init_size(left, 3);
 		add_assoc_long_ex(left, ISL(type), PHQL_T_QUALIFIED);
-		phalcon_array_update_str(left, IS(domain), model_alias, PH_COPY);
-		phalcon_array_update_str(left, IS(name), fields, PH_COPY);
+		phalcon_array_update_string(left, IS(domain), model_alias, PH_COPY);
+		phalcon_array_update_string(left, IS(name), fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&left_expr, getThis(), "_getqualified", left);
 
@@ -1790,9 +1790,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 		 */
 		PHALCON_INIT_VAR(right);
 		array_init_size(right, 3);
-		add_assoc_stringl_ex(right, ISL(type), SL("qualified"));
-		phalcon_array_update_str(right, IS(domain), join_alias, PH_COPY);
-		phalcon_array_update_str(right, IS(name), referenced_fields, PH_COPY);
+		phalcon_array_update_string_str(right, IS(type), SL("qualified"), PH_COPY);
+		phalcon_array_update_string(right, IS(domain), join_alias, PH_COPY);
+		phalcon_array_update_string(right, IS(name), referenced_fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&right_expr, getThis(), "_getqualified", right);
 
@@ -1801,10 +1801,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 		 */
 		PHALCON_INIT_NVAR(sql_join_condition);
 		array_init_size(sql_join_condition, 4);
-		add_assoc_stringl_ex(sql_join_condition, ISL(type), SL("binary-op"));
-		add_assoc_stringl_ex(sql_join_condition, ISL(op), SL("="));
-		phalcon_array_update_str(sql_join_condition, IS(left), left_expr, PH_COPY);
-		phalcon_array_update_str(sql_join_condition, IS(right), right_expr, PH_COPY);
+		phalcon_array_update_string_str(sql_join_condition, IS(type), SL("binary-op"), PH_COPY);
+		phalcon_array_update_string_str(sql_join_condition, IS(op), SL("="), PH_COPY);
+		phalcon_array_update_string(sql_join_condition, IS(left), left_expr, PH_COPY);
+		phalcon_array_update_string(sql_join_condition, IS(right), right_expr, PH_COPY);
 
 		phalcon_array_append(sql_join_conditions, sql_join_condition, 0);
 	} else {
@@ -1837,8 +1837,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 			PHALCON_INIT_NVAR(left);
 			array_init_size(left, 3);
 			add_assoc_long_ex(left, ISL(type), PHQL_T_QUALIFIED);
-			phalcon_array_update_str(left, IS(domain), model_alias, PH_COPY);
-			phalcon_array_update_str(left, IS(name), field, PH_COPY);
+			phalcon_array_update_string(left, IS(domain), model_alias, PH_COPY);
+			phalcon_array_update_string(left, IS(name), field, PH_COPY);
 
 			PHALCON_CALL_METHOD(&left_expr, getThis(), "_getqualified", left);
 
@@ -1847,9 +1847,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 			 */
 			PHALCON_INIT_NVAR(right);
 			array_init_size(right, 3);
-			add_assoc_stringl_ex(right, ISL(type), SL("qualified"));
-			phalcon_array_update_str(right, IS(domain), join_alias, PH_COPY);
-			phalcon_array_update_str(right, IS(name), referenced_field, PH_COPY);
+			phalcon_array_update_string_str(right, IS(type), SL("qualified"), PH_COPY);
+			phalcon_array_update_string(right, IS(domain), join_alias, PH_COPY);
+			phalcon_array_update_string(right, IS(name), referenced_field, PH_COPY);
 
 			PHALCON_CALL_METHOD(&right_expr, getThis(), "_getqualified", right);
 
@@ -1858,10 +1858,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 			 */
 			PHALCON_INIT_NVAR(sql_join_condition);
 			array_init_size(sql_join_condition, 4);
-			add_assoc_stringl_ex(sql_join_condition, ISL(type), SL("binary-op"));
-			add_assoc_stringl_ex(sql_join_condition, ISL(op), SL("="));
-			phalcon_array_update_str(sql_join_condition, IS(left), left_expr, PH_COPY);
-			phalcon_array_update_str(sql_join_condition, IS(right), right_expr, PH_COPY);
+			phalcon_array_update_string_str(sql_join_condition, IS(type), SL("binary-op"), PH_COPY);
+			phalcon_array_update_string_str(sql_join_condition, IS(op), SL("="), PH_COPY);
+			phalcon_array_update_string(sql_join_condition, IS(left), left_expr, PH_COPY);
+			phalcon_array_update_string(sql_join_condition, IS(right), right_expr, PH_COPY);
 			phalcon_array_append(sql_join_conditions, sql_join_condition, 0);
 		} ZEND_HASH_FOREACH_END();
 
@@ -1871,9 +1871,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 	 * A single join
 	 */
 	array_init_size(return_value, 3);
-	phalcon_array_update_str(return_value, IS(type), join_type, PH_COPY);
-	phalcon_array_update_str(return_value, IS(source), join_source, PH_COPY);
-	phalcon_array_update_str(return_value, IS(conditions), sql_join_conditions, PH_COPY);
+	phalcon_array_update_string(return_value, IS(type), join_type, PH_COPY);
+	phalcon_array_update_string(return_value, IS(source), join_source, PH_COPY);
+	phalcon_array_update_string(return_value, IS(conditions), sql_join_conditions, PH_COPY);
 
 	RETURN_MM();
 }
@@ -1997,8 +1997,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 			PHALCON_INIT_NVAR(left);
 			array_init_size(left, 3);
 			add_assoc_long_ex(left, ISL(type), PHQL_T_QUALIFIED);
-			phalcon_array_update_str(left, IS(domain), model_alias, PH_COPY);
-			phalcon_array_update_str(left, IS(name), field, PH_COPY);
+			phalcon_array_update_string(left, IS(domain), model_alias, PH_COPY);
+			phalcon_array_update_string(left, IS(name), field, PH_COPY);
 
 			PHALCON_CALL_METHOD(&left_expr, getThis(), "_getqualified", left);
 
@@ -2007,9 +2007,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 			 */
 			PHALCON_INIT_NVAR(right);
 			array_init_size(right, 3);
-			add_assoc_stringl_ex(right, ISL(type), SL("qualified"));
-			phalcon_array_update_str(right, IS(domain), join_alias, PH_COPY);
-			phalcon_array_update_str(right, IS(name), referenced_fields, PH_COPY);
+			phalcon_array_update_string_str(right, IS(type), SL("qualified"), PH_COPY);
+			phalcon_array_update_string(right, IS(domain), join_alias, PH_COPY);
+			phalcon_array_update_string(right, IS(name), referenced_fields, PH_COPY);
 
 			PHALCON_CALL_METHOD(&right_expr, getThis(), "_getqualified", right);
 
@@ -2018,10 +2018,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 			 */
 			PHALCON_INIT_NVAR(sql_equals_join_condition);
 			array_init_size(sql_equals_join_condition, 4);
-			add_assoc_stringl_ex(sql_equals_join_condition, ISL(type), SL("binary-op"));
-			add_assoc_stringl_ex(sql_equals_join_condition, ISL(op), SL("="));
-			phalcon_array_update_str(sql_equals_join_condition, IS(left), left_expr, PH_COPY);
-			phalcon_array_update_str(sql_equals_join_condition, IS(right), right_expr, PH_COPY);
+			phalcon_array_update_string_str(sql_equals_join_condition, IS(type), SL("binary-op"), PH_COPY);
+			phalcon_array_update_string_str(sql_equals_join_condition, IS(op), SL("="), PH_COPY);
+			phalcon_array_update_string(sql_equals_join_condition, IS(left), left_expr, PH_COPY);
+			phalcon_array_update_string(sql_equals_join_condition, IS(right), right_expr, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
@@ -2031,8 +2031,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		PHALCON_INIT_NVAR(left);
 		array_init_size(left, 3);
 		add_assoc_long_ex(left, ISL(type), PHQL_T_QUALIFIED);
-		phalcon_array_update_str(left, IS(domain), model_alias, PH_COPY);
-		phalcon_array_update_str(left, IS(name), fields, PH_COPY);
+		phalcon_array_update_string(left, IS(domain), model_alias, PH_COPY);
+		phalcon_array_update_string(left, IS(name), fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&left_expr, getThis(), "_getqualified", left);
 
@@ -2041,9 +2041,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		 */
 		PHALCON_INIT_NVAR(right);
 		array_init_size(right, 3);
-		add_assoc_stringl_ex(right, ISL(type), SL("qualified"));
-		phalcon_array_update_str(right, IS(domain), intermediate_model_name, PH_COPY);
-		phalcon_array_update_str(right, IS(name), intermediate_fields, PH_COPY);
+		phalcon_array_update_string_str(right, IS(type), SL("qualified"), PH_COPY);
+		phalcon_array_update_string(right, IS(domain), intermediate_model_name, PH_COPY);
+		phalcon_array_update_string(right, IS(name), intermediate_fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&right_expr, getThis(), "_getqualified", right);
 
@@ -2052,10 +2052,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		 */
 		PHALCON_INIT_VAR(sql_join_condition_first);
 		array_init_size(sql_join_condition_first, 4);
-		add_assoc_stringl_ex(sql_join_condition_first, ISL(type), SL("binary-op"));
-		add_assoc_stringl_ex(sql_join_condition_first, ISL(op), SL("="));
-		phalcon_array_update_str(sql_join_condition_first, IS(left), left_expr, PH_COPY);
-		phalcon_array_update_str(sql_join_condition_first, IS(right), right_expr, PH_COPY);
+		phalcon_array_update_string_str(sql_join_condition_first, IS(type), SL("binary-op"), PH_COPY);
+		phalcon_array_update_string_str(sql_join_condition_first, IS(op), SL("="), PH_COPY);
+		phalcon_array_update_string(sql_join_condition_first, IS(left), left_expr, PH_COPY);
+		phalcon_array_update_string(sql_join_condition_first, IS(right), right_expr, PH_COPY);
 
 		PHALCON_INIT_VAR(sql_join_conditions_first);
 		array_init_size(sql_join_conditions_first, 1);
@@ -2066,9 +2066,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		 */
 		PHALCON_INIT_VAR(sql_join_first);
 		array_init_size(sql_join_first, 3);
-		phalcon_array_update_str(sql_join_first, IS(type), join_type, PH_COPY);
-		phalcon_array_update_str(sql_join_first, IS(source), intermediate_source, PH_COPY);
-		phalcon_array_update_str(sql_join_first, IS(conditions), sql_join_conditions_first, PH_COPY);
+		phalcon_array_update_string(sql_join_first, IS(type), join_type, PH_COPY);
+		phalcon_array_update_string(sql_join_first, IS(source), intermediate_source, PH_COPY);
+		phalcon_array_update_string(sql_join_first, IS(conditions), sql_join_conditions_first, PH_COPY);
 
 		/** 
 		 * Create the left part of the expression
@@ -2076,8 +2076,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		PHALCON_INIT_NVAR(left);
 		array_init_size(left, 3);
 		add_assoc_long_ex(left, ISL(type), PHQL_T_QUALIFIED);
-		phalcon_array_update_str(left, IS(domain), intermediate_model_name, PH_COPY);
-		phalcon_array_update_str(left, IS(name), intermediate_referenced_fields, PH_COPY);
+		phalcon_array_update_string(left, IS(domain), intermediate_model_name, PH_COPY);
+		phalcon_array_update_string(left, IS(name), intermediate_referenced_fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&left_expr, getThis(), "_getqualified", left);
 
@@ -2086,9 +2086,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		 */
 		PHALCON_INIT_NVAR(right);
 		array_init_size(right, 3);
-		add_assoc_stringl_ex(right, ISL(type), SL("qualified"));
-		phalcon_array_update_str(right, IS(domain), referenced_model_name, PH_COPY);
-		phalcon_array_update_str(right, IS(name), referenced_fields, PH_COPY);
+		phalcon_array_update_string_str(right, IS(type), SL("qualified"), PH_COPY);
+		phalcon_array_update_string(right, IS(domain), referenced_model_name, PH_COPY);
+		phalcon_array_update_string(right, IS(name), referenced_fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&right_expr, getThis(), "_getqualified", right);
 
@@ -2097,10 +2097,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		 */
 		PHALCON_INIT_VAR(sql_join_condition_second);
 		array_init_size(sql_join_condition_second, 4);
-		add_assoc_stringl_ex(sql_join_condition_second, ISL(type), SL("binary-op"));
-		add_assoc_stringl_ex(sql_join_condition_second, ISL(op), SL("="));
-		phalcon_array_update_str(sql_join_condition_second, IS(left), left_expr, PH_COPY);
-		phalcon_array_update_str(sql_join_condition_second, IS(right), right_expr, PH_COPY);
+		phalcon_array_update_string_str(sql_join_condition_second, IS(type), SL("binary-op"), PH_COPY);
+		phalcon_array_update_string_str(sql_join_condition_second, IS(op), SL("="), PH_COPY);
+		phalcon_array_update_string(sql_join_condition_second, IS(left), left_expr, PH_COPY);
+		phalcon_array_update_string(sql_join_condition_second, IS(right), right_expr, PH_COPY);
 
 		PHALCON_INIT_VAR(sql_join_conditions_second);
 		array_init_size(sql_join_conditions_second, 1);
@@ -2111,9 +2111,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		 */
 		PHALCON_INIT_VAR(sql_join_second);
 		array_init_size(sql_join_second, 3);
-		phalcon_array_update_str(sql_join_second, IS(type), join_type, PH_COPY);
-		phalcon_array_update_str(sql_join_second, IS(source), join_source, PH_COPY);
-		phalcon_array_update_str(sql_join_second, IS(conditions), sql_join_conditions_second, PH_COPY);
+		phalcon_array_update_string(sql_join_second, IS(type), join_type, PH_COPY);
+		phalcon_array_update_string(sql_join_second, IS(source), join_source, PH_COPY);
+		phalcon_array_update_string(sql_join_second, IS(conditions), sql_join_conditions_second, PH_COPY);
 
 		phalcon_array_update_long(return_value, 0, sql_join_first, PH_COPY);
 		phalcon_array_update_long(return_value, 1, sql_join_second, PH_COPY);
@@ -2490,9 +2490,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 					 */
 					PHALCON_INIT_NVAR(sql_join);
 					array_init_size(sql_join, 3);
-					phalcon_array_update_str(sql_join, IS(type), join_type, PH_COPY | PH_SEPARATE);
-					phalcon_array_update_str(sql_join, IS(source), join_source, PH_COPY);
-					phalcon_array_update_str(sql_join, IS(conditions), sql_join_conditions, PH_COPY);
+					phalcon_array_update_string(sql_join, IS(type), join_type, PH_COPY | PH_SEPARATE);
+					phalcon_array_update_string(sql_join, IS(source), join_source, PH_COPY);
+					phalcon_array_update_string(sql_join, IS(conditions), sql_join_conditions, PH_COPY);
 					phalcon_array_append(sql_joins, sql_join, PH_SEPARATE);
 				}
 			} else {
@@ -2511,9 +2511,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 				 */
 				PHALCON_INIT_NVAR(sql_join);
 				array_init_size(sql_join, 3);
-				phalcon_array_update_str(sql_join, IS(type), join_type, PH_COPY | PH_SEPARATE);
-				phalcon_array_update_str(sql_join, IS(source), join_source, PH_COPY);
-				phalcon_array_update_str(sql_join, IS(conditions), sql_join_conditions, PH_COPY);
+				phalcon_array_update_string(sql_join, IS(type), join_type, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_string(sql_join, IS(source), join_source, PH_COPY);
+				phalcon_array_update_string(sql_join, IS(conditions), sql_join_conditions, PH_COPY);
 				phalcon_array_append(sql_joins, sql_join, PH_SEPARATE);
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -2629,12 +2629,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getLimitClause) {
 
 	if (likely(phalcon_array_isset_str_fetch(&limit, limit_clause, SL("number")))) {
 		PHALCON_CALL_METHOD(&tmp, getThis(), "_getexpression", limit);
-		phalcon_array_update_str(return_value, IS(number), tmp, PH_COPY);
+		phalcon_array_update_string(return_value, IS(number), tmp, PH_COPY);
 	}
 
 	if (phalcon_array_isset_str_fetch(&offset, limit_clause, SL("offset"))) {
 		PHALCON_CALL_METHOD(&tmp, getThis(), "_getexpression", offset);
-		phalcon_array_update_str(return_value, IS(offset), tmp, PH_COPY);
+		phalcon_array_update_string(return_value, IS(offset), tmp, PH_COPY);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -2928,8 +2928,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 				/** 
 				 * The best alias is the one provided by the user
 				 */
-				phalcon_array_update_str(sql_column, IS(balias), alias, PH_COPY | PH_SEPARATE);
-				phalcon_array_update_str(sql_column, IS(sqlAlias), alias, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_string(sql_column, IS(balias), alias, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_string(sql_column, IS(sqlAlias), alias, PH_COPY | PH_SEPARATE);
 				phalcon_array_update_zval(sql_columns, alias, sql_column, PH_COPY | PH_SEPARATE);
 				phalcon_array_update_zval_bool(sql_column_aliases, alias, 1, PH_SEPARATE);
 			} else {
@@ -2966,14 +2966,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	array_init_size(sql_select, 10);
 
 	if (distinct) {
-		phalcon_array_update_string(sql_select, SL("distinct"), distinct, PH_COPY);
+		phalcon_array_update_str(sql_select, SL("distinct"), distinct, PH_COPY);
 	}
 
-	phalcon_array_update_str(sql_select, IS(models), sql_models, PH_COPY);
-	phalcon_array_update_str(sql_select, IS(tables), sql_tables, PH_COPY);
-	phalcon_array_update_str(sql_select, IS(columns), sql_columns, PH_COPY);
+	phalcon_array_update_string(sql_select, IS(models), sql_models, PH_COPY);
+	phalcon_array_update_string(sql_select, IS(tables), sql_tables, PH_COPY);
+	phalcon_array_update_string(sql_select, IS(columns), sql_columns, PH_COPY);
 	if (phalcon_fast_count_ev(sql_joins)) {
-		phalcon_array_update_str(sql_select, IS(joins), sql_joins, PH_COPY);
+		phalcon_array_update_string(sql_select, IS(joins), sql_joins, PH_COPY);
 	}
 
 	/** 
@@ -2981,7 +2981,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	 */
 	if (phalcon_array_isset_str_fetch(&where, ast, SL("where"))) {
 		PHALCON_CALL_METHOD(&where_expr, getThis(), "_getexpression", where);
-		phalcon_array_update_str(sql_select, IS(where), where_expr, PH_COPY);
+		phalcon_array_update_string(sql_select, IS(where), where_expr, PH_COPY);
 	}
 
 	/** 
@@ -2989,7 +2989,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	 */
 	if (phalcon_array_isset_str_fetch(&group_by, ast, SL("groupBy"))) {
 		PHALCON_CALL_METHOD(&sql_group, getThis(), "_getgroupclause", group_by);
-		phalcon_array_update_str(sql_select, IS(group), sql_group, PH_COPY);
+		phalcon_array_update_string(sql_select, IS(group), sql_group, PH_COPY);
 	}
 
 	/** 
@@ -2997,7 +2997,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	 */
 	if (phalcon_array_isset_str_fetch(&having, ast, SL("having"))) {
 		PHALCON_CALL_METHOD(&having_expr, getThis(), "_getexpression", having);
-		phalcon_array_update_str(sql_select, IS(having), having_expr, PH_COPY);
+		phalcon_array_update_string(sql_select, IS(having), having_expr, PH_COPY);
 	}
 
 	/** 
@@ -3008,7 +3008,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 		phalcon_array_fetch_str(&order, ast, SL("orderBy"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&sql_order, getThis(), "_getorderclause", order);
-		phalcon_array_update_str(sql_select, IS(order), sql_order, PH_COPY);
+		phalcon_array_update_string(sql_select, IS(order), sql_order, PH_COPY);
 	}
 
 	/** 
@@ -3016,14 +3016,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	 */
 	if (phalcon_array_isset_str_fetch(&limit, ast, SL("limit"))) {
 		PHALCON_CALL_METHOD(&sql_limit, getThis(), "_getlimitclause", limit);
-		phalcon_array_update_str(sql_select, IS(limit), sql_limit, PH_COPY);
+		phalcon_array_update_string(sql_select, IS(limit), sql_limit, PH_COPY);
 	}
 
 	/** 
 	 * Process FOR UPDATE clause if any
 	 */
 	if (phalcon_array_isset_str_fetch(&forupdate, ast, SL("forupdate"))) {
-		phalcon_array_update_str(sql_select, IS(forupdate), forupdate, PH_COPY);
+		phalcon_array_update_string(sql_select, IS(forupdate), forupdate, PH_COPY);
 	}
 
 	RETURN_CTOR(sql_select);
@@ -3125,8 +3125,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
 			PHALCON_INIT_NVAR(value);
 			array_init_size(value, 2);
-			phalcon_array_update_str(value, IS(type), expr_type, PH_COPY);
-			phalcon_array_update_str(value, IS(value), expr_insert, PH_COPY);
+			phalcon_array_update_string(value, IS(type), expr_type, PH_COPY);
+			phalcon_array_update_string(value, IS(value), expr_insert, PH_COPY);
 			phalcon_array_append(expr_values, value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
@@ -3136,8 +3136,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
 	PHALCON_INIT_VAR(sql_insert);
 	array_init(sql_insert);
-	phalcon_array_update_str(sql_insert, IS(model), model_name, PH_COPY | PH_SEPARATE);
-	phalcon_array_update_str(sql_insert, IS(table), table, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_string(sql_insert, IS(model), model_name, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_string(sql_insert, IS(table), table, PH_COPY | PH_SEPARATE);
 
 	PHALCON_CALL_SELF(&meta_data, "getmodelsmetadata");
 
@@ -3170,13 +3170,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 			phalcon_array_append(sql_fields, name, PH_SEPARATE);
 		} ZEND_HASH_FOREACH_END();
 
-		phalcon_array_update_str(sql_insert, IS(fields), sql_fields, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(sql_insert, IS(fields), sql_fields, PH_COPY | PH_SEPARATE);
 	}
 
 	if (i_rows == 1) {
-		phalcon_array_update_str(sql_insert, IS(values), expr_values, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(sql_insert, IS(values), expr_values, PH_COPY | PH_SEPARATE);
 	} else {
-		phalcon_array_update_str(sql_insert, IS(rows), expr_rows, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(sql_insert, IS(rows), expr_rows, PH_COPY | PH_SEPARATE);
 	}
 
 	RETURN_CTOR(sql_insert);
@@ -3371,26 +3371,26 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 
 		PHALCON_INIT_NVAR(value);
 		array_init_size(value, 2);
-		phalcon_array_update_str(value, IS(type), type, PH_COPY | PH_SEPARATE);
-		phalcon_array_update_string(value, SL("value"), expr_value, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(value, IS(type), type, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(value, SL("value"), expr_value, PH_COPY | PH_SEPARATE);
 		phalcon_array_append(sql_values, value, PH_SEPARATE);
 	} ZEND_HASH_FOREACH_END();
 
 	array_init_size(return_value, 7);
-	phalcon_array_update_str(return_value, IS(tables), sql_tables, PH_COPY | PH_SEPARATE);
-	phalcon_array_update_str(return_value, IS(models), sql_models, PH_COPY);
-	phalcon_array_update_str(return_value, IS(fields), sql_fields, PH_COPY);
-	phalcon_array_update_str(return_value, IS(values), sql_values, PH_COPY);
+	phalcon_array_update_string(return_value, IS(tables), sql_tables, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_string(return_value, IS(models), sql_models, PH_COPY);
+	phalcon_array_update_string(return_value, IS(fields), sql_fields, PH_COPY);
+	phalcon_array_update_string(return_value, IS(values), sql_values, PH_COPY);
 	if (phalcon_array_isset_str_fetch(&where, ast, SL("where"))) {
 		ZVAL_TRUE(not_quoting);
 
 		PHALCON_CALL_METHOD(&where_expr, getThis(), "_getexpression", where, not_quoting);
-		phalcon_array_update_str(return_value, IS(where), where_expr, PH_COPY);
+		phalcon_array_update_string(return_value, IS(where), where_expr, PH_COPY);
 	}
 
 	if (phalcon_array_isset_str_fetch(&limit, ast, SL("limit"))) {
 		PHALCON_CALL_METHOD(&sql_limit, getThis(), "_getlimitclause", limit);
-		phalcon_array_update_str(return_value, IS(limit), sql_limit, PH_COPY);
+		phalcon_array_update_string(return_value, IS(limit), sql_limit, PH_COPY);
 	}
 
 	RETURN_MM();
@@ -3536,19 +3536,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 	phalcon_update_property_this(getThis(), SL("_sqlAliasesModelsInstances"), sql_aliases_models_instances);
 
 	array_init_size(return_value, 4);
-	phalcon_array_update_str(return_value, IS(tables), sql_tables, PH_COPY);
-	phalcon_array_update_str(return_value, IS(models), sql_models, PH_COPY);
+	phalcon_array_update_string(return_value, IS(tables), sql_tables, PH_COPY);
+	phalcon_array_update_string(return_value, IS(models), sql_models, PH_COPY);
 	if (phalcon_array_isset_str_fetch(&where, ast, SL("where"))) {
 		PHALCON_INIT_VAR(not_quoting);
 		ZVAL_TRUE(not_quoting);
 
 		PHALCON_CALL_METHOD(&where_expr, getThis(), "_getexpression", where, not_quoting);
-		phalcon_array_update_str(return_value, IS(where), where_expr, PH_COPY);
+		phalcon_array_update_string(return_value, IS(where), where_expr, PH_COPY);
 	}
 
 	if (phalcon_array_isset_str_fetch(&limit, ast, SL("limit"))) {
 		PHALCON_CALL_METHOD(&sql_limit, getThis(), "_getlimitclause", limit);
-		phalcon_array_update_str(return_value, IS(limit), sql_limit, PH_COPY);
+		phalcon_array_update_string(return_value, IS(limit), sql_limit, PH_COPY);
 	}
 
 	RETURN_MM();
@@ -4014,16 +4014,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				/** 
 				 * We cache required meta-data to make its future access faster
 				 */
-				phalcon_array_update_string_multi_2(columns, &tmp, SL("instance"),   instance, 0);
-				phalcon_array_update_string_multi_2(columns, &tmp, SL("attributes"), attributes, 0);
-				phalcon_array_update_string_multi_2(columns, &tmp, SL("columnMap"),  column_map, 0);
+				phalcon_array_update_str_multi_2(columns, &tmp, SL("instance"),   instance, 0);
+				phalcon_array_update_str_multi_2(columns, &tmp, SL("attributes"), attributes, 0);
+				phalcon_array_update_str_multi_2(columns, &tmp, SL("columnMap"),  column_map, 0);
 
 				/** 
 				 * Check if the model keeps snapshots
 				 */
 				PHALCON_CALL_METHOD(&is_keeping_snapshots, manager, "iskeepingsnapshots", instance);
 				if (zend_is_true(is_keeping_snapshots)) {
-					phalcon_array_update_string_multi_2(columns, &tmp, SL("keepSnapshots"), is_keeping_snapshots, 0);
+					phalcon_array_update_str_multi_2(columns, &tmp, SL("keepSnapshots"), is_keeping_snapshots, 0);
 				}
 			} else {
 				/** 
@@ -4069,7 +4069,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_array_update_string(intermediate, SL("columns"), select_columns, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_str(intermediate, SL("columns"), select_columns, PH_COPY | PH_SEPARATE);
 
 	/** 
 	 * The corresponding SQL dialect generates the SQL statement based accordingly with
@@ -4562,9 +4562,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
 	PHALCON_INIT_VAR(a0);
 	array_init_size(a0, 3);
-	add_assoc_stringl_ex(a0, ISL(type), SL("object"));
-	phalcon_array_update_string(a0, SL("model"), model_name, PH_COPY | PH_SEPARATE);
-	phalcon_array_update_string(a0, SL("column"), source, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_string_str(a0, IS(type), SL("object"), PH_COPY);
+	phalcon_array_update_str(a0, SL("model"), model_name, PH_COPY);
+	phalcon_array_update_str(a0, SL("column"), source, PH_COPY);
 	phalcon_array_append(select_column, a0, PH_SEPARATE);
 
 	PHALCON_INIT_VAR(selected_columns);
@@ -4577,9 +4577,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 	 */
 	PHALCON_INIT_VAR(select_ir);
 	array_init_size(select_ir, 3);
-	phalcon_array_update_string(select_ir, SL("columns"), select_column, PH_COPY | PH_SEPARATE);
-	phalcon_array_update_string(select_ir, SL("models"), selected_models, PH_COPY | PH_SEPARATE);
-	phalcon_array_update_string(select_ir, SL("tables"), selected_tables, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_str(select_ir, SL("columns"), select_column, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_str(select_ir, SL("models"), selected_models, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_str(select_ir, SL("tables"), selected_tables, PH_COPY | PH_SEPARATE);
 
 	/** 
 	 * Check if a WHERE clause was especified
@@ -4587,7 +4587,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 	if (phalcon_array_isset_str(intermediate, SL("where"))) {
 		PHALCON_OBS_VAR(where_conditions);
 		phalcon_array_fetch_str(&where_conditions, intermediate, SL("where"), PH_NOISY);
-		phalcon_array_update_string(select_ir, SL("where"), where_conditions, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(select_ir, SL("where"), where_conditions, PH_COPY | PH_SEPARATE);
 	}
 
 	/** 
@@ -4596,7 +4596,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 	if (phalcon_array_isset_str(intermediate, SL("limit"))) {
 		PHALCON_OBS_VAR(limit_conditions);
 		phalcon_array_fetch_str(&limit_conditions, intermediate, SL("limit"), PH_NOISY);
-		phalcon_array_update_string(select_ir, SL("limit"), limit_conditions, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(select_ir, SL("limit"), limit_conditions, PH_COPY | PH_SEPARATE);
 	}
 
 	PHALCON_INIT_VAR(type_select);
@@ -5803,9 +5803,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
 				/** 
 				 * We cache required meta-data to make its future access faster
 				 */
-				phalcon_array_update_string_multi_2(columns, &tmp, SL("instance"),   instance, 0);
-				phalcon_array_update_string_multi_2(columns, &tmp, SL("attributes"), attributes, 0);
-				phalcon_array_update_string_multi_2(columns, &tmp, SL("columnMap"),  column_map, 0);
+				phalcon_array_update_str_multi_2(columns, &tmp, SL("instance"),   instance, 0);
+				phalcon_array_update_str_multi_2(columns, &tmp, SL("attributes"), attributes, 0);
+				phalcon_array_update_str_multi_2(columns, &tmp, SL("columnMap"),  column_map, 0);
 			} else {
 				/** 
 				 * Query only the columns that are registered as attributes in the metaData
@@ -5840,7 +5840,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
 
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_array_update_string(intermediate, SL("columns"), select_columns, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_str(intermediate, SL("columns"), select_columns, PH_COPY | PH_SEPARATE);
 
 	PHALCON_CALL_SELF(&connection, "getconnection");
 	PHALCON_CALL_METHOD(&dialect, connection, "getdialect");
@@ -5910,7 +5910,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlInsert){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_array_update_string(intermediate, SL("fields"), insert_fields, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_str(intermediate, SL("fields"), insert_fields, PH_COPY | PH_SEPARATE);
 
 	PHALCON_CALL_SELF(&connection, "getconnection");
 
@@ -5952,7 +5952,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlInsert){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_array_update_string(intermediate, SL("values"), insert_values, PH_COPY | PH_SEPARATE);
+	phalcon_array_update_str(intermediate, SL("values"), insert_values, PH_COPY | PH_SEPARATE);
 
 	PHALCON_RETURN_CALL_METHOD(dialect, "insert", intermediate);
 

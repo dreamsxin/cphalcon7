@@ -790,7 +790,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 
 	PHALCON_CALL_SELF(&url, "geturlservice");		
 	PHALCON_CALL_METHOD(&internal_url, url, "get", action, query, z_local);
-	phalcon_array_update_string(params, SL("href"), internal_url, PH_COPY);
+	phalcon_array_update_str(params, SL("href"), internal_url, PH_COPY);
 
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<a");
@@ -849,11 +849,11 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 
 		if (phalcon_array_isset_str_fetch(&name, params, SL("name"))) {
 			if (!zend_is_true(name)) {
-				phalcon_array_update_str(params, IS(name), id, PH_COPY);
+				phalcon_array_update_string(params, IS(name), id, PH_COPY);
 			}
 		}
 		else {
-			phalcon_array_update_str(params, IS(name), id, PH_COPY);
+			phalcon_array_update_string(params, IS(name), id, PH_COPY);
 		}
 
 		/**
@@ -861,24 +861,24 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 		 */
 		if (!phalcon_memnstr_str(id, SL("["))) {
 			if (!phalcon_array_isset_str(params, SL("id"))) {
-				phalcon_array_update_string(params, SL("id"), id, PH_COPY);
+				phalcon_array_update_str(params, SL("id"), id, PH_COPY);
 			}
 		}
 
 		PHALCON_CALL_SELF(&value, "getvalue", id, params);
-		phalcon_array_update_str(params, IS(value), value, PH_COPY);
+		phalcon_array_update_string(params, IS(value), value, PH_COPY);
 	} else {
 		/**
 		 * Use the 'id' as value if the user hadn't set it
 		 */
 		if (!phalcon_array_isset_str(params, SL("value"))) {
 			if (phalcon_array_isset_long_fetch(&value, params, 0)) {
-				phalcon_array_update_str(params, IS(value), value, PH_COPY);
+				phalcon_array_update_string(params, IS(value), value, PH_COPY);
 			}
 		}
 	}
 
-	phalcon_array_update_str(params, IS(type), type, PH_COPY);
+	phalcon_array_update_string(params, IS(type), type, PH_COPY);
 
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<input");
@@ -939,10 +939,10 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 	}
 	
 	if (!phalcon_array_isset_str_fetch(&name, params, SL("name"))) {
-		phalcon_array_update_str(params, IS(name), id, PH_COPY);
+		phalcon_array_update_string(params, IS(name), id, PH_COPY);
 	} else {
 		if (!zend_is_true(name)) {
-			phalcon_array_update_str(params, IS(name), id, PH_COPY);
+			phalcon_array_update_string(params, IS(name), id, PH_COPY);
 		}
 	}
 	
@@ -951,7 +951,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 	 */
 	if (!phalcon_memnstr_str(id, SL("["))) {
 		if (!phalcon_array_isset_str(params, SL("id"))) {
-			phalcon_array_update_string(params, SL("id"), id, PH_COPY);
+			phalcon_array_update_str(params, SL("id"), id, PH_COPY);
 		}
 	}
 
@@ -964,10 +964,10 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 		PHALCON_CALL_SELF(&value, "getvalue", id, params);
 
 		if (Z_TYPE_P(value) != IS_NULL && PHALCON_IS_EQUAL(current_value, value)) {
-			phalcon_array_update_string_string(params, SL("checked"), SL("checked"), 0);
+			phalcon_array_update_str_str(params, SL("checked"), SL("checked"), PH_COPY);
 		}
 
-		phalcon_array_update_str(params, IS(value), current_value, PH_COPY);
+		phalcon_array_update_string(params, IS(value), current_value, PH_COPY);
 	} else {
 		PHALCON_CALL_SELF(&value, "getvalue", id, params);
 
@@ -975,13 +975,13 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 		 * Evaluate the value in POST
 		 */
 		if (zend_is_true(value)) {
-			phalcon_array_update_string_string(params, SL("checked"), SL("checked"), 0);
+			phalcon_array_update_str_str(params, SL("checked"), SL("checked"), PH_COPY);
 		}
 
-		phalcon_array_update_str(params, IS(value), value, PH_COPY);
+		phalcon_array_update_string(params, IS(value), value, PH_COPY);
 	}
 
-	phalcon_array_update_str(params, IS(type), type, PH_COPY);
+	phalcon_array_update_string(params, IS(type), type, PH_COPY);
 
 	PHALCON_INIT_VAR(code);
 	ZVAL_STRING(code, "<input");
@@ -1431,15 +1431,15 @@ PHP_METHOD(Phalcon_Tag, textArea){
 	}
 	
 	if (!phalcon_array_isset_str_fetch(&name, params, SL("name"))) {
-		phalcon_array_update_str(params, IS(name), id, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_string(params, IS(name), id, PH_COPY | PH_SEPARATE);
 	} else {
 		if (!zend_is_true(name)) {
-			phalcon_array_update_str(params, IS(name), id, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_string(params, IS(name), id, PH_COPY | PH_SEPARATE);
 		}
 	}
 	
 	if (!phalcon_array_isset_str(params, SL("id"))) {
-		phalcon_array_update_string(params, SL("id"), id, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(params, SL("id"), id, PH_COPY | PH_SEPARATE);
 	}
 
 	PHALCON_CALL_SELF(&content, "getvalue", id, params);
@@ -1526,7 +1526,7 @@ PHP_METHOD(Phalcon_Tag, form){
 	 * By default the method is POST
 	 */
 	if (!phalcon_array_isset_str(params, SL("method"))) {
-		phalcon_array_update_string_string(params, SL("method"), SL("post"), PH_SEPARATE);
+		phalcon_array_update_str_str(params, SL("method"), SL("post"), PH_SEPARATE);
 	}
 	
 	if (Z_TYPE_P(params_action) != IS_NULL) {
@@ -1545,7 +1545,7 @@ PHP_METHOD(Phalcon_Tag, form){
 	}
 	
 	if (Z_TYPE_P(action) != IS_NULL) {
-		phalcon_array_update_string(params, SL("action"), action, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(params, SL("action"), action, PH_COPY | PH_SEPARATE);
 	}
 	
 	PHALCON_INIT_VAR(code);
@@ -1756,9 +1756,9 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 
 	if (!phalcon_array_isset_str(params, SL("href"))) {
 		if (phalcon_array_isset_long_fetch(&first_param, params, 0)) {
-			phalcon_array_update_string(params, SL("href"), first_param, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_str(params, SL("href"), first_param, PH_COPY | PH_SEPARATE);
 		} else {
-			phalcon_array_update_string_string(params, SL("href"), SL(""), PH_SEPARATE);
+			phalcon_array_update_str_str(params, SL("href"), SL(""), PH_SEPARATE);
 		}
 	}
 	
@@ -1781,7 +1781,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 	}
 	
 	if (!phalcon_array_isset_str(params, SL("type"))) {
-		phalcon_array_update_str_string(params, IS(type), SL("text/css"), PH_SEPARATE);
+		phalcon_array_update_string_str(params, IS(type), SL("text/css"), PH_SEPARATE);
 	}
 	
 	/** 
@@ -1794,7 +1794,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 		phalcon_array_fetch_str(&url_href, params, SL("href"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&href, url, "getstatic", url_href, z_args);
-		phalcon_array_update_string(params, SL("href"), href, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(params, SL("href"), href, PH_COPY | PH_SEPARATE);
 	}
 	
 	PHALCON_INIT_VAR(code);
@@ -1883,9 +1883,9 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 
 	if (!phalcon_array_isset_str(params, SL("src"))) {
 		if (phalcon_array_isset_long_fetch(&first_param, params, 0)) {
-			phalcon_array_update_string(params, SL("src"), first_param, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_str(params, SL("src"), first_param, PH_COPY | PH_SEPARATE);
 		} else {
-			phalcon_array_update_string_string(params, SL("src"), SL(""), PH_SEPARATE);
+			phalcon_array_update_str_str(params, SL("src"), SL(""), PH_SEPARATE);
 		}
 	}
 	
@@ -1906,7 +1906,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 	}
 	
 	if (!phalcon_array_isset_str(params, SL("type"))) {
-		phalcon_array_update_str_string(params, IS(type), SL("text/javascript"), PH_SEPARATE);
+		phalcon_array_update_string_str(params, IS(type), SL("text/javascript"), PH_SEPARATE);
 	}
 	
 	/** 
@@ -1919,7 +1919,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 		phalcon_array_fetch_str(&params_src, params, SL("src"), PH_NOISY);
 	
 		PHALCON_CALL_METHOD(&src, url, "getstatic", params_src, z_args);
-		phalcon_array_update_string(params, SL("src"), src, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(params, SL("src"), src, PH_COPY | PH_SEPARATE);
 	}
 	
 	PHALCON_INIT_VAR(code);
@@ -1991,9 +1991,9 @@ PHP_METHOD(Phalcon_Tag, image){
 
 	if (!phalcon_array_isset_str(params, SL("src"))) {
 		if (phalcon_array_isset_long_fetch(&first_param, params, 0)) {
-			phalcon_array_update_string(params, SL("src"), first_param, PH_COPY | PH_SEPARATE);
+			phalcon_array_update_str(params, SL("src"), first_param, PH_COPY | PH_SEPARATE);
 		} else {
-			phalcon_array_update_string_string(params, SL("src"), SL(""), PH_SEPARATE);
+			phalcon_array_update_str_str(params, SL("src"), SL(""), PH_SEPARATE);
 		}
 	}
 	
@@ -2007,7 +2007,7 @@ PHP_METHOD(Phalcon_Tag, image){
 		phalcon_array_fetch_str(&url_src, params, SL("src"), PH_NOISY);
 	
 		PHALCON_CALL_METHOD(&src, url, "getstatic", url_src);
-		phalcon_array_update_string(params, SL("src"), src, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(params, SL("src"), src, PH_COPY | PH_SEPARATE);
 	}
 	
 	PHALCON_INIT_VAR(code);

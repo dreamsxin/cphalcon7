@@ -926,7 +926,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 			object_init_ex(php_engine, phalcon_mvc_view_engine_php_ce);
 			PHALCON_CALL_METHOD(NULL, php_engine, "__construct", getThis(), dependency_injector);
 
-			phalcon_array_update_string(engines, SL(".phtml"), php_engine, PH_COPY);
+			phalcon_array_update_str(engines, SL(".phtml"), php_engine, PH_COPY);
 		} else {
 			if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "A dependency injector container is required to obtain the application services");
@@ -1298,7 +1298,7 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 	if (Z_TYPE_P(engines) != IS_ARRAY) {
 		PHALCON_ALLOC_INIT_ZVAL(engines);
 		array_init_size(engines, 1);
-		add_assoc_stringl_ex(engines, SL(".phtml"), (char*)phalcon_mvc_view_engine_php_ce->name->val, phalcon_mvc_view_engine_php_ce->name->len);
+		phalcon_array_update_str_string(engines, SL(".phtml"), phalcon_mvc_view_engine_php_ce->name, PH_COPY);
 		phalcon_update_property_this(getThis(), SL("_registeredEngines"), engines);
 		assert(Z_REFCOUNT_P(engines) > 1);
 		zval_ptr_dtor(engines);
@@ -2060,7 +2060,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(options), idx, str_key, value) {
 			if (str_key) {
-				phalcon_array_update_str(cache_options, str_key, value, PH_COPY | PH_SEPARATE);
+				phalcon_array_update_string(cache_options, str_key, value, PH_COPY | PH_SEPARATE);
 			} else {
 				phalcon_array_update_long(cache_options, idx, value, PH_COPY | PH_SEPARATE);
 			}
@@ -2086,7 +2086,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 			phalcon_update_property_bool(getThis(), SL("_cacheMode"), 0);
 		}
 
-		phalcon_array_update_string(view_options, SL("cache"), cache_options, PH_COPY | PH_SEPARATE);
+		phalcon_array_update_str(view_options, SL("cache"), cache_options, PH_COPY | PH_SEPARATE);
 		phalcon_update_property_this(getThis(), SL("_options"), view_options);
 	} else {
 		/** 

@@ -152,16 +152,15 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 	}
 
 	if (!phalcon_array_isset_str_fetch(&tmp, parameters, SL("host"))) {
-		phalcon_array_update_string_string(parameters, SL("host"), SL("127.0.0.1"), 0);
+		phalcon_array_update_str_str(parameters, SL("host"), SL("127.0.0.1"), PH_COPY);
 	}
 	else {
 		convert_to_string(tmp);
 	}
 
 	if (!phalcon_array_isset_str_fetch(&tmp, parameters, SL("port"))) {
-		phalcon_array_update_string_long(parameters, SL("port"), 11300, 0);
-	}
-	else {
+		phalcon_array_update_str_long(parameters, SL("port"), 11300, 0);
+	} else {
 		convert_to_long(tmp);
 	}
 

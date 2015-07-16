@@ -281,8 +281,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, serialize){
 
 	PHALCON_INIT_VAR(data);
 	array_init_size(data, 3);
-	phalcon_array_update_string(data, SL("collection"), collection, PH_COPY);
-	phalcon_array_update_string(data, SL("rows"), records, PH_COPY);
+	phalcon_array_update_str(data, SL("collection"), collection, PH_COPY);
+	phalcon_array_update_str(data, SL("rows"), records, PH_COPY);
 	phalcon_update_property_bool(getThis(), SL("_activeRow"), 0);
 
 	/** 

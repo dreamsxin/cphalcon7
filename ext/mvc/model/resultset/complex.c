@@ -472,10 +472,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 
 	PHALCON_INIT_VAR(data);
 	array_init_size(data, 4);
-	phalcon_array_update_string(data, SL("cache"), cache, PH_COPY);
-	phalcon_array_update_string(data, SL("rows"), records, PH_COPY);
-	phalcon_array_update_string(data, SL("columnTypes"), column_types, PH_COPY);
-	phalcon_array_update_string(data, SL("hydrateMode"), hydrate_mode, PH_COPY);
+	phalcon_array_update_str(data, SL("cache"), cache, PH_COPY);
+	phalcon_array_update_str(data, SL("rows"), records, PH_COPY);
+	phalcon_array_update_str(data, SL("columnTypes"), column_types, PH_COPY);
+	phalcon_array_update_str(data, SL("hydrateMode"), hydrate_mode, PH_COPY);
 
 	PHALCON_INIT_VAR(serialized);
 	phalcon_serialize(serialized, data);

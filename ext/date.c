@@ -748,42 +748,42 @@ PHP_METHOD(Phalcon_Date, span){
 
 	if (phalcon_array_isset_str(output, SL("years"))) {
 		i = (int) floor(timespan / PHALCON_DATE_YEAR);
-		phalcon_array_update_string_long(output, SL("years"), i, 0);
+		phalcon_array_update_str_long(output, SL("years"), i, 0);
 		timespan -= PHALCON_DATE_YEAR * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("months"))) {
 		i = (int) floor(timespan / PHALCON_DATE_MONTH);
-		phalcon_array_update_string_long(output, SL("months"), i, 0);
+		phalcon_array_update_str_long(output, SL("months"), i, 0);
 		timespan -= PHALCON_DATE_MONTH * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("weeks"))) {
 		i = (int) floor(timespan / PHALCON_DATE_WEEK);
-		phalcon_array_update_string_long(output, SL("weeks"), i, 0);
+		phalcon_array_update_str_long(output, SL("weeks"), i, 0);
 		timespan -= PHALCON_DATE_WEEK * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("days"))) {
 		i = (int) floor(timespan / PHALCON_DATE_DAY);
-		phalcon_array_update_string_long(output, SL("days"), i, 0);
+		phalcon_array_update_str_long(output, SL("days"), i, 0);
 		timespan -= PHALCON_DATE_DAY * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("hours"))) {
 		i = (int) floor(timespan / PHALCON_DATE_HOUR);
-		phalcon_array_update_string_long(output, SL("hours"), i, 0);
+		phalcon_array_update_str_long(output, SL("hours"), i, 0);
 		timespan -= PHALCON_DATE_HOUR * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("minutes"))) {
 		i = (int) floor(timespan / PHALCON_DATE_MINUTE);
-		phalcon_array_update_string_long(output, SL("minutes"), i, 0);
+		phalcon_array_update_str_long(output, SL("minutes"), i, 0);
 		timespan -= PHALCON_DATE_MINUTE * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("seconds"))) {
-		phalcon_array_update_string_long(output, SL("seconds"), timespan, 0);
+		phalcon_array_update_str_long(output, SL("seconds"), timespan, 0);
 	}
 
 	if (Z_LVAL_P(count_output) == 1) {
@@ -861,42 +861,42 @@ PHP_METHOD(Phalcon_Date, span2){
 
 	if (phalcon_array_isset_str(output, SL("years"))) {
 		i = (int) floor(timespan / PHALCON_DATE_YEAR);
-		phalcon_array_update_string_long(output, SL("years"), i, 0);
+		phalcon_array_update_str_long(output, SL("years"), i, 0);
 		timespan -= PHALCON_DATE_YEAR * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("months"))) {
 		i = (int) floor(timespan / PHALCON_DATE_MONTH);
-		phalcon_array_update_string_long(output, SL("months"), i, 0);
+		phalcon_array_update_str_long(output, SL("months"), i, 0);
 		timespan -= PHALCON_DATE_MONTH * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("weeks"))) {
 		i = (int) floor(timespan / PHALCON_DATE_WEEK);
-		phalcon_array_update_string_long(output, SL("weeks"), i, 0);
+		phalcon_array_update_str_long(output, SL("weeks"), i, 0);
 		timespan -= PHALCON_DATE_WEEK * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("days"))) {
 		i = (int) floor(timespan / PHALCON_DATE_DAY);
-		phalcon_array_update_string_long(output, SL("days"), i, 0);
+		phalcon_array_update_str_long(output, SL("days"), i, 0);
 		timespan -= PHALCON_DATE_DAY * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("hours"))) {
 		i = (int) floor(timespan / PHALCON_DATE_HOUR);
-		phalcon_array_update_string_long(output, SL("hours"), i, 0);
+		phalcon_array_update_str_long(output, SL("hours"), i, 0);
 		timespan -= PHALCON_DATE_HOUR * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("minutes"))) {
 		i = (int) floor(timespan / PHALCON_DATE_MINUTE);
-		phalcon_array_update_string_long(output, SL("minutes"), i, 0);
+		phalcon_array_update_str_long(output, SL("minutes"), i, 0);
 		timespan -= PHALCON_DATE_MINUTE * i;
 	}
 
 	if (phalcon_array_isset_str(output, SL("seconds"))) {
-		phalcon_array_update_string_long(output, SL("seconds"), timespan, 0);
+		phalcon_array_update_str_long(output, SL("seconds"), timespan, 0);
 	}
 
 	if (Z_LVAL_P(count_output) == 1) {

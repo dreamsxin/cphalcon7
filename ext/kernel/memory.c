@@ -53,8 +53,6 @@ void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr)
 	for (i = 0; i < PHALCON_NUM_PREALLOCATED_FRAMES; ++i) {
 		start[i].addresses       = pecalloc(24, sizeof(zval*), 1);
 		start[i].capacity        = 24;
-		start[i].hash_addresses  = pecalloc(8, sizeof(zval*), 1);
-		start[i].hash_capacity   = 8;
 
 #ifndef PHALCON_RELEASE
 		start[i].permanent = 1;
@@ -103,7 +101,6 @@ void phalcon_deinitialize_memory()
 #endif
 
 	for (i = 0; i < PHALCON_NUM_PREALLOCATED_FRAMES; ++i) {
-		pefree(phalcon_globals_ptr->start_memory[i].hash_addresses, 1);
 		pefree(phalcon_globals_ptr->start_memory[i].addresses, 1);
 	}
 
@@ -145,7 +142,6 @@ static phalcon_memory_entry* phalcon_memory_grow_stack_common(zend_phalcon_globa
 	}
 
 	assert(g->active_memory->pointer == 0);
-	assert(g->active_memory->hash_pointer == 0);
 
 	return g->active_memory;
 }
@@ -160,16 +156,6 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 	assert(active_memory != NULL);
 
 	if (EXPECTED(!CG(unclean_shutdown))) {
-		/* Check for non freed hash key zvals, mark as null to avoid string freeing */
-		for (i = 0; i < active_memory->hash_pointer; ++i) {
-			ptr = active_memory->hash_addresses[i];
-			assert(ptr != NULL && *ptr != NULL);
-			if (Z_REFCOUNT_P(*ptr) <= 1) {
-				ZVAL_NULL(*ptr);
-			} else {
-				zval_copy_ctor(*ptr);
-			}
-		}
 
 #ifndef PHALCON_RELEASE
 		for (i = 0; i < active_memory->pointer; ++i) {
@@ -220,10 +206,6 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 #endif
 		assert(prev != NULL);
 
-		if (active_memory->hash_addresses != NULL) {
-			efree(active_memory->hash_addresses);
-		}
-
 		if (active_memory->addresses != NULL) {
 			efree(active_memory->addresses);
 		}
@@ -237,7 +219,6 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 #endif
 
 		active_memory->pointer      = 0;
-		active_memory->hash_pointer = 0;
 		g->active_memory = prev;
 	}
 
@@ -265,13 +246,6 @@ void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory)
 	assert(active_memory != NULL);
 
 	fprintf(stderr, "Dump of the memory frame %p (%s)\n", active_memory, active_memory->func);
-
-	if (active_memory->hash_pointer) {
-		for (i = 0; i < active_memory->hash_pointer; ++i) {
-			assert(active_memory->hash_addresses[i] != NULL && *(active_memory->hash_addresses[i]) != NULL);
-			fprintf(stderr, "Hash ptr %lu (%p => %p), type=%u, refcnt=%u\n", (ulong)i, active_memory->hash_addresses[i], *active_memory->hash_addresses[i], Z_TYPE_P(*active_memory->hash_addresses[i]), Z_REFCOUNT_P(*active_memory->hash_addresses[i]));
-		}
-	}
 
 	for (i = 0; i < active_memory->pointer; ++i) {
 		if (EXPECTED(active_memory->addresses[i] != NULL && *(active_memory->addresses[i]) != NULL)) {
@@ -402,24 +376,6 @@ PHALCON_ATTR_NONNULL static void phalcon_reallocate_memory(const zend_phalcon_gl
 #endif
 }
 
-PHALCON_ATTR_NONNULL static void phalcon_reallocate_hmemory(const zend_phalcon_globals *g)
-{
-	phalcon_memory_entry *frame = g->active_memory;
-	int persistent = (frame >= g->start_memory && frame < g->end_memory);
-	void *buf = perealloc(frame->hash_addresses, sizeof(zval **) * (frame->hash_capacity + 4), persistent);
-	if (EXPECTED(buf != NULL)) {
-		frame->hash_capacity += 4;
-		frame->hash_addresses = buf;
-	}
-	else {
-		zend_error(E_CORE_ERROR, "Memory allocation failed");
-	}
-
-#ifndef PHALCON_RELEASE
-	assert(frame->permanent == persistent);
-#endif
-}
-
 PHALCON_ATTR_NONNULL1(2) static inline void phalcon_do_memory_observe(zval **var, const zend_phalcon_globals *g)
 {
 	phalcon_memory_entry *frame = g->active_memory;
@@ -508,28 +464,6 @@ void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func)
 	PHALCON_ALLOC_INIT_ZVAL(*var);
 }
 
-/**
- * Observes a variable and allocates memory for it
- * Marks hash key zvals to be nulled before freeing
- */
-void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var, const char *func)
-{
-	zend_phalcon_globals *g     = PHALCON_VGLOBAL;
-	phalcon_memory_entry *frame = g->active_memory;
-
-	phalcon_verify_frame(frame, func, var);
-
-	phalcon_do_memory_observe(var, g);
-	PHALCON_ALLOC_INIT_ZVAL(*var);
-
-	if (frame->hash_pointer == frame->hash_capacity) {
-		phalcon_reallocate_hmemory(g);
-	}
-
-	frame->hash_addresses[frame->hash_pointer] = var;
-	++frame->hash_pointer;
-}
-
 #else
 
 /**
@@ -552,32 +486,6 @@ void ZEND_FASTCALL phalcon_memory_alloc(zval **var)
 	PHALCON_ALLOC_INIT_ZVAL(*var);
 }
 
-/**
- * Observes a variable and allocates memory for it
- * Marks hash key zvals to be nulled before freeing
- */
-void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var)
-{
-	zend_phalcon_globals *g = PHALCON_VGLOBAL;
-	phalcon_memory_entry *active_memory = g->active_memory;
-
-#ifndef PHALCON_RELEASE
-	if (UNEXPECTED(active_memory == NULL)) {
-		fprintf(stderr, "PHALCON_MM_GROW() must be called before using any of MM functions or macros!");
-		phalcon_print_backtrace();
-		abort();
-	}
-#endif
-	phalcon_do_memory_observe(var, g);
-	PHALCON_ALLOC_INIT_ZVAL(*var);
-
-	if (active_memory->hash_pointer == active_memory->hash_capacity) {
-		phalcon_reallocate_hmemory(g);
-	}
-
-	active_memory->hash_addresses[active_memory->hash_pointer] = var;
-	++active_memory->hash_pointer;
-}
 #endif
 
 /**

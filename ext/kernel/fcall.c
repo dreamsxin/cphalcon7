@@ -263,12 +263,7 @@ int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *
 int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 {
 	zval retval, *arguments, *param;
-	int param_count, i, status, is_null = 0;
-
-	if (*retval_ptr == NULL) {
-		is_null = 1;
-		*retval_ptr = &retval;
-	}
+	int param_count, i, status;
 
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
 		status = FAILURE;
@@ -281,21 +276,23 @@ int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 
 		i = 0;
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
-			ZVAL_ZVAL(&arguments[i], param, 1, 0);
+			ZVAL_COPY(&arguments[i], param);
 			i++;
 		} ZEND_HASH_FOREACH_END();
 
-		if ((status = call_user_function(EG(function_table), NULL, handler, *retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+		if ((status = call_user_function(EG(function_table), NULL, handler, &retval, param_count, arguments)) == FAILURE || EG(exception)) {
 			status = FAILURE;
-			if (is_null) {
-				ZVAL_NULL(*retval_ptr);
-			}
 		}
 	}
 
-	if (is_null) {
-		Z_TRY_ADDREF_P(*retval_ptr);
+	if (retval_ptr) {
+		if (*retval_ptr == NULL) {
+			PHALCON_ALLOC_ZVAL(*retval_ptr);
+		}
+		ZVAL_COPY(*retval_ptr, &retval);
 	}
-	zval_dtor(&retval);
+
+	efree(arguments);
+
 	return status;
 }

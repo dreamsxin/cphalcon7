@@ -895,8 +895,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 */
 		PHALCON_INIT_NVAR(call_object);
 		array_init_size(call_object, 2);
-		phalcon_array_append(call_object, handler, 0);
-		phalcon_array_append(call_object, action_method, 0);
+		phalcon_array_append(call_object, handler, PH_COPY);
+		phalcon_array_append(call_object, action_method, PH_COPY);
 
 		/* Call the method allowing exceptions */
 		PHALCON_CALL_USER_FUNC_ARRAY_NOEX(&value, call_object, params);
@@ -919,8 +919,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				if (PHALCON_IS_FALSE(tmp)) {
 					continue;
 				}
-			}
-			else {
+			} else {
 				/* Exception was not handled, rethrow it */
 				phalcon_throw_exception(exception);
 				RETURN_MM();

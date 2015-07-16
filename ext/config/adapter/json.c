@@ -28,6 +28,7 @@
 #include "kernel/string.h"
 #include "kernel/concat.h"
 #include "kernel/object.h"
+#include "kernel/fcall.h"
 
 /**
  * Phalcon\Config\Adapter\Json
@@ -78,7 +79,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Json){
  */
 PHP_METHOD(Phalcon_Config_Adapter_Json, read){
 
-	zval *file_path, *absolute_path = NULL, *config_dir_path, *base_path, *contents, *array;
+	zval *file_path, *absolute_path = NULL, *config_dir_path, *base_path, *contents, *config;
 
 	PHALCON_MM_GROW();
 
@@ -99,13 +100,13 @@ PHP_METHOD(Phalcon_Config_Adapter_Json, read){
 	}
 
 	PHALCON_INIT_VAR(contents);
-	PHALCON_INIT_VAR(array);
 	phalcon_file_get_contents(contents, config_dir_path);
 
 	if (Z_TYPE_P(contents) == IS_STRING) {
-		if (phalcon_json_decode(array, contents, 1) != FAILURE) {
-			if (Z_TYPE_P(array) == IS_ARRAY) {
-				phalcon_config_construct_internal(getThis(), array);
+		PHALCON_INIT_VAR(config);
+		if (phalcon_json_decode(config, contents, 1) != FAILURE) {
+			if (Z_TYPE_P(config) == IS_ARRAY) {
+				PHALCON_CALL_METHOD(NULL, getThis(), "val", config);
 			}
 		}
 	}

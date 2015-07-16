@@ -59,6 +59,7 @@
 zend_class_entry *phalcon_config_ce;
 
 PHP_METHOD(Phalcon_Config, __construct);
+PHP_METHOD(Phalcon_Config, val);
 PHP_METHOD(Phalcon_Config, offsetExists);
 PHP_METHOD(Phalcon_Config, get);
 PHP_METHOD(Phalcon_Config, offsetGet);
@@ -71,6 +72,10 @@ PHP_METHOD(Phalcon_Config, __wakeup);
 PHP_METHOD(Phalcon_Config, __set_state);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config___construct, 0, 0, 0)
+	ZEND_ARG_INFO(0, arrayConfig)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config_val, 0, 0, 1)
 	ZEND_ARG_INFO(0, arrayConfig)
 ZEND_END_ARG_INFO()
 
@@ -91,6 +96,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_config_method_entry[] = {
 	PHP_ME(Phalcon_Config, __construct, arginfo_phalcon_config___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Config, val, arginfo_phalcon_config_val, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Config, offsetExists, arginfo_arrayaccess_offsetexists, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Config, get, arginfo_phalcon_config_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Config, offsetGet, arginfo_arrayaccess_offsetget, ZEND_ACC_PUBLIC)
@@ -127,12 +133,10 @@ PHALCON_INIT_CLASS(Phalcon_Config){
  */
 PHP_METHOD(Phalcon_Config, __construct){
 
-	zval *array_config = NULL, *value;
-	zend_string *str_key;
-	ulong idx;
+	zval *array_config = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &array_config);
-	
+
 	/** 
 	 * Throw exceptions if bad parameters are passed
 	 */
@@ -142,16 +146,40 @@ PHP_METHOD(Phalcon_Config, __construct){
 	}
 
 	if (array_config && Z_TYPE_P(array_config) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array_config), idx, str_key, value) {
-			zval key;
-			if (str_key) {
-				ZVAL_STR(&key, str_key);
-			} else {
-				ZVAL_LONG(&key, idx);
-			}
-			PHALCON_CALL_SELFW(NULL, "offsetset", &key, value);
-		} ZEND_HASH_FOREACH_END();
+		PHALCON_CALL_SELFW(NULL, "val", array_config);
 	}
+}
+
+/**
+ * Sets values
+ *
+ * @param array $arrayConfig
+ */
+PHP_METHOD(Phalcon_Config, val){
+
+	zval *array_config, *value;
+	zend_string *str_key;
+	ulong idx;
+
+	phalcon_fetch_params(0, 1, 0, &array_config);
+
+	/** 
+	 * Throw exceptions if bad parameters are passed
+	 */
+	if (Z_TYPE_P(array_config) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_config_exception_ce, "The configuration must be an Array");
+		return;
+	}
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array_config), idx, str_key, value) {
+		zval key;
+		if (str_key) {
+			ZVAL_STR(&key, str_key);
+		} else {
+			ZVAL_LONG(&key, idx);
+		}
+		PHALCON_CALL_SELFW(NULL, "offsetset", &key, value);
+	} ZEND_HASH_FOREACH_END();
 }
 
 /**

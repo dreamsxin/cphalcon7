@@ -86,7 +86,7 @@ PHP_METHOD(Phalcon_Config_Adapter, __construct){
 	}
 
 	if (file_path) {
-		PHALCON_CALL_SELF(NULL, "read", file_path, absolute_path);
+		PHALCON_CALL_METHOD(NULL, getThis(), "read", file_path, absolute_path);
 	}
 
 	PHALCON_MM_RESTORE();

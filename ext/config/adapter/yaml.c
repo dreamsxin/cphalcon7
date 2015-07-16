@@ -80,7 +80,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Yaml){
  */
 PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 
-	zval *file_path, *absolute_path = NULL, *config_dir_path, *base_path = NULL, *array = NULL;
+	zval *file_path, *absolute_path = NULL, *config_dir_path, *base_path = NULL, *config = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -100,10 +100,10 @@ PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 		PHALCON_CONCAT_VV(config_dir_path, base_path, file_path);
 	}
 
-	PHALCON_CALL_FUNCTION(&array, "yaml_parse_file", config_dir_path);
+	PHALCON_CALL_FUNCTION(&config, "yaml_parse_file", config_dir_path);
 
-	if (Z_TYPE_P(array) == IS_ARRAY) {
-		phalcon_config_construct_internal(getThis(), array);
+	if (Z_TYPE_P(config) == IS_ARRAY) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "val", config);
 	}
 
 	RETURN_THIS();

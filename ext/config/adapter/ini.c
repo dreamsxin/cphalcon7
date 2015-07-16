@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	} ZEND_HASH_FOREACH_END();
 
 	if (Z_TYPE_P(config) == IS_ARRAY) {
-		phalcon_config_construct_internal(getThis(), config);
+		PHALCON_CALL_METHOD(NULL, getThis(), "val", config);
 	}
 
 	RETURN_THIS();

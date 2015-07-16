@@ -70,7 +70,7 @@ zend_class_entry *phalcon_config_adapter_php_ce;
 PHP_METHOD(Phalcon_Config_Adapter_Php, read);
 
 static const zend_function_entry phalcon_config_adapter_php_method_entry[] = {
-	PHP_ME(Phalcon_Config_Adapter_Php, read, arginfo_phalcon_config_adapter_read, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Config_Adapter_Php, read, arginfo_phalcon_config_adapter_read, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 		PHALCON_CONCAT_VV(config_dir_path, base_path, file_path);
 	}
 
-	PHALCON_OBS_VAR(config);
+	PHALCON_INIT_VAR(config);
 	if (phalcon_require_ret(config, Z_STRVAL_P(config_dir_path)) == FAILURE) {
 		zend_throw_exception_ex(phalcon_config_exception_ce, 0, "Configuration file '%s' cannot be read", Z_STRVAL_P(config_dir_path));
 		PHALCON_MM_RESTORE();
@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 	}
 
 	if (Z_TYPE_P(config) == IS_ARRAY) {
-		phalcon_config_construct_internal(getThis(), config);
+		PHALCON_CALL_METHOD(NULL, getThis(), "val", config);
 	}
 
 	RETURN_THIS();

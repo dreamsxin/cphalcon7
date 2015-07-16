@@ -1397,7 +1397,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
-	if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(lower), Z_STRLEN_P(lower)+1 ) == SUCCESS) {
+	if (phalcon_method_exists(getThis(), lower) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(lower));
 	}
 
@@ -1433,7 +1433,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
-	if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(lower), Z_STRLEN_P(lower)+1 ) == SUCCESS) {
+	if (phalcon_method_exists(getThis(), lower) == SUCCESS) {
 		PHALCON_CALL_METHOD(&status, getThis(), Z_STRVAL_P(lower));
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
@@ -1684,7 +1684,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 					PHALCON_INIT_NVAR(possible_setter);
 					PHALCON_CONCAT_SV(possible_setter, "set", attribute_field);
 					zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
-					if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
+					if (phalcon_method_exists(getThis(), possible_setter) == SUCCESS) {
 						PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(possible_setter), new_value);
 					} else {
 						phalcon_update_property_zval_zval(getThis(), attribute_field, new_value);
@@ -1693,7 +1693,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 					PHALCON_INIT_NVAR(possible_setter);
 					PHALCON_CONCAT_SV(possible_setter, "set", &tmp);
 					zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
-					if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
+					if (phalcon_method_exists(getThis(), possible_setter) == SUCCESS) {
 						PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(possible_setter), new_value);
 					} else {
 						phalcon_update_property_zval_zval(getThis(), &tmp, new_value);
@@ -1703,7 +1703,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 				PHALCON_INIT_NVAR(possible_setter);
 				PHALCON_CONCAT_SV(possible_setter, "set", &tmp);
 				zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
-				if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
+				if (phalcon_method_exists(getThis(), possible_setter) == SUCCESS) {
 					PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(possible_setter), new_value);
 				} else {
 					phalcon_update_property_zval_zval(getThis(), &tmp, new_value);
@@ -2941,7 +2941,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __set){
 
 		PHALCON_CALL_FUNCTION(&method_exists, "method_exists", class_name, possible_setter);
 		if (!zend_is_true(method_exists)) {
-			if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
+			if (phalcon_method_exists(getThis(), possible_setter) == SUCCESS) {
 				PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(possible_setter), value);
 				RETURN_CTOR(value);
 			}
@@ -2992,7 +2992,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __get){
 
 		PHALCON_CALL_FUNCTION(&method_exists, "method_exists", class_name, possible_getter);
 		if (!zend_is_true(method_exists)) {
-			if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_getter), Z_STRLEN_P(possible_getter)+1) == SUCCESS) {
+			if (phalcon_method_exists(getThis(), possible_getter) == SUCCESS) {
 				PHALCON_CALL_METHOD(&return_value, getThis(), Z_STRVAL_P(possible_getter));
 				RETURN_MM();
 			}

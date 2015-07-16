@@ -72,7 +72,7 @@ int phalcon_isset_property(zval *object, const char *property_name, uint32_t pro
 static inline int phalcon_isset_property_zval(zval *object, const zval *property)
 {
 	if (Z_TYPE_P(property) == IS_STRING) {
-		return phalcon_isset_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property) + 1);
+		return phalcon_isset_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property));
 	}
 
 	return 0;

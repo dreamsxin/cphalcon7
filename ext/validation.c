@@ -484,7 +484,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		PHALCON_INIT_VAR(method);
 		PHALCON_CONCAT_SV(method, "get", attribute);
 		zend_str_tolower(Z_STRVAL_P(method), Z_STRLEN_P(method));
-		if (phalcon_method_exists_ex(entity, Z_STRVAL_P(method), Z_STRLEN_P(method)+1) == SUCCESS) {
+		if (phalcon_method_exists_ex(entity, Z_STRVAL_P(method), Z_STRLEN_P(method)) == SUCCESS) {
 			PHALCON_CALL_METHOD(&value, entity, Z_STRVAL_P(method));
 		} else if (phalcon_method_exists_ex(entity, SL("readattribute")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&value, entity, "readattribute", attribute);

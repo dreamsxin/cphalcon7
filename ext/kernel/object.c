@@ -763,6 +763,7 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
+	Z_TRY_ADDREF_P(value);
 	zend_update_property(ce, object, property_name, property_length, value);
 	return SUCCESS;
 }
@@ -1092,7 +1093,7 @@ int phalcon_method_exists(const zval *object, const zval *method_name){
  *
  * @param object
  * @param method_name
- * @param method_length strlen(method_name)+1
+ * @param method_length strlen(method_name)
  */
 int phalcon_method_exists_ex(const zval *object, const char *method_name, uint32_t method_len)
 {
@@ -1132,7 +1133,7 @@ int phalcon_method_exists_ce(const zend_class_entry *ce, const zval *method_name
  *
  * @param zend_class_entry
  * @param method_name
- * @param method_length strlen(method_name)+1
+ * @param method_length strlen(method_name)
  */
 int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_name, uint32_t method_len)
 {

@@ -4813,7 +4813,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 					PHALCON_INIT_NVAR(possible_setter);
 					PHALCON_CONCAT_SV(possible_setter, "set", attribute);
 					zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
-					if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
+					if (phalcon_method_exists(getThis(), possible_setter) == SUCCESS) {
 						PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(possible_setter), value);
 					} else {
 						phalcon_update_property_zval_zval(getThis(), attribute, value);
@@ -6770,7 +6770,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 			 * Check method is not 
 			 */
 			if (phalcon_method_exists_ce(phalcon_mvc_model_ce, possible_setter) != SUCCESS) {
-				if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter)+1) == SUCCESS) {
+				if (phalcon_method_exists(getThis(), possible_setter) == SUCCESS) {
 					PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(possible_setter), value);
 					RETURN_CTOR(value);
 				}
@@ -6944,7 +6944,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 			zend_str_tolower(Z_STRVAL_P(possible_getter), Z_STRLEN_P(possible_getter));
 
 			if (phalcon_method_exists_ce(phalcon_mvc_model_ce, possible_getter) != SUCCESS) {
-				if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_getter), Z_STRLEN_P(possible_getter)+1) == SUCCESS) {
+				if (phalcon_method_exists(getThis(), possible_getter) == SUCCESS) {
 					PHALCON_CALL_METHOD(&return_value, getThis(), Z_STRVAL_P(possible_getter));
 					RETURN_MM();
 				}
@@ -7281,7 +7281,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 			PHALCON_INIT_NVAR(possible_getter);
 			PHALCON_CONCAT_SV(possible_getter, "get", attribute_field);
 			zend_str_tolower(Z_STRVAL_P(possible_getter), Z_STRLEN_P(possible_getter));
-			if (phalcon_method_exists_ex(getThis(), Z_STRVAL_P(possible_getter), Z_STRLEN_P(possible_getter)+1) == SUCCESS) {
+			if (phalcon_method_exists(getThis(), possible_getter) == SUCCESS) {
 				PHALCON_CALL_METHOD(&possible_value, getThis(), Z_STRVAL_P(possible_getter));
 				phalcon_array_update_zval(data, attribute_field, possible_value, PH_COPY);
 			} else if (phalcon_isset_property_zval(getThis(), attribute_field)) {

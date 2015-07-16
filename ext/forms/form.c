@@ -1159,7 +1159,7 @@ PHP_METHOD(Phalcon_Forms_Form, getValues){
 		PHALCON_INIT_VAR(method);
 		PHALCON_CONCAT_SV(method, "get", name);
 		zend_str_tolower(Z_STRVAL_P(method), Z_STRLEN_P(method));
-		if (phalcon_method_exists_ex(entity, Z_STRVAL_P(method), Z_STRLEN_P(method)+1) == SUCCESS) {
+		if (phalcon_method_exists(entity, method) == SUCCESS) {
 			PHALCON_RETURN_CALL_METHOD(entity, Z_STRVAL_P(method));
 			RETURN_MM();
 		}

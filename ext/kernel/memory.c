@@ -180,11 +180,14 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 			ptr = active_memory->addresses[i];
 			if (EXPECTED(ptr != NULL && *ptr != NULL)) {
 				if (Z_REFCOUNTED_P(*ptr)) {
-					if (Z_REFCOUNT_P(*ptr) > 1) {
-						zval_ptr_dtor(*ptr);
+					if (Z_REFCOUNT_P(*ptr) <= 1) {
+						if (!Z_ISREF_P(*ptr) || Z_TYPE_P(*ptr) == IS_OBJECT) {
+							zval_ptr_dtor(*ptr);
+						} else {
+							efree(*ptr);
+						}
 					} else {
-						zval_ptr_dtor(*ptr);
-						efree(*ptr);
+						Z_DELREF_P(*ptr);
 					}
 				} else {
 					zval_dtor(*ptr);

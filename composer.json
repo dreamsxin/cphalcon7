@@ -2,9 +2,6 @@
     "name": "phalcon/cphalcon",
     "description": "Web framework delivered as a C-extension for PHP",
     "keywords": ["extension"],
-    "require": {
-        "php": "~5.3"
-    },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"
     },

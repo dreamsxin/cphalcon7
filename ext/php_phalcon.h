@@ -134,7 +134,7 @@ ZEND_EXTERN_MODULE_GLOBALS(phalcon)
 
 #ifdef ZTS
 	#define PHALCON_GLOBAL(v) TSRMG(phalcon_globals_id, zend_phalcon_globals *, v)
-	#define PHALCON_VGLOBAL   ((zend_phalcon_globals *) (*((void ***) tsrm_ls))[TSRM_UNSHUFFLE_RSRC_ID(phalcon_globals_id)])
+	#define PHALCON_VGLOBAL   ((zend_phalcon_globals *) (*((void ***)))[TSRM_UNSHUFFLE_RSRC_ID(phalcon_globals_id)])
 #else
 	#define PHALCON_GLOBAL(v) (phalcon_globals.v)
 	#define PHALCON_VGLOBAL &(phalcon_globals)

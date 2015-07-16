@@ -465,7 +465,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 		}
 
 		if (result) {
-			ZVAL_COPY_VALUE(*return_value, zv);
+			ZVAL_COPY(*return_value, zv);
 			return 1;
 		}
 
@@ -490,7 +490,7 @@ int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *in
 	PHALCON_ALLOC_ZVAL(*return_value);
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
-			ZVAL_COPY_VALUE(*return_value, zv);
+			ZVAL_COPY(*return_value, zv);
 			return SUCCESS;
 		}
 
@@ -515,7 +515,7 @@ int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string
 	PHALCON_ALLOC_ZVAL(*return_value);
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			ZVAL_COPY_VALUE(*return_value, zv);
+			ZVAL_COPY(*return_value, zv);
 			return SUCCESS;
 		}
 
@@ -540,7 +540,7 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
 	PHALCON_ALLOC_ZVAL(*return_value);
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			ZVAL_COPY_VALUE(*return_value, zv);
+			ZVAL_COPY(*return_value, zv);
 			return SUCCESS;
 		}
 
@@ -753,7 +753,7 @@ void phalcon_array_update_zval_string_string_multi_3(zval *arr, const zval *inde
 
 
 void phalcon_merge_append(zval *left, zval *values){
-	zval           *tmp;
+	zval *tmp;
 
 	if (Z_TYPE_P(left) != IS_ARRAY) {
 		zend_error(E_NOTICE, "The first parameter of phalcon_merge_append must be an array");

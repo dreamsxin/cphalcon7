@@ -721,7 +721,6 @@ int phalcon_update_property_str(zval *object, const char *property_name, uint32_
 {
 	zval value;
 	ZVAL_STRINGL(&value, str, str_length);
-	Z_SET_REFCOUNT(value, 0);
 	return phalcon_update_property_zval(object, property_name, property_length, &value);
 }
 

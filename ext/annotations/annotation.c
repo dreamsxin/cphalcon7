@@ -184,8 +184,9 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 		case PHANNOT_T_DOUBLE:
 		case PHANNOT_T_STRING:
 		case PHANNOT_T_IDENTIFIER:
-			phalcon_array_fetch_str(&return_value, expr, SL("value"), PH_NOISY);
-			RETURN_MM();
+			PHALCON_OBS_VAR(items);
+			phalcon_array_fetch_str(&items, expr, SL("value"), PH_NOISY);
+			RETURN_CTOR(items);
 			/* no break because of implicit return */
 	
 		case PHANNOT_T_NULL:

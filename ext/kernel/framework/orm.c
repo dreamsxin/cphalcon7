@@ -118,7 +118,7 @@ void phalcon_orm_singlequotes(zval *return_value, zval *str) {
 
 	smart_str_0(&escaped_str);
 
-	if (escaped_str.s->len) {
+	if (escaped_str.s) {
 		RETURN_STR(escaped_str.s);
 	} else {
 		smart_str_free(&escaped_str);

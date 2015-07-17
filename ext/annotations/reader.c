@@ -74,25 +74,26 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	const char *file;
 	uint32_t line;
 
-	phalcon_fetch_params(0, 1, 0, &class_name);
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 0, &class_name);
 
 	if (unlikely(Z_TYPE_P(class_name) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "The class name must be a string");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The class name must be a string");
 		return;
 	}
 
 	class_ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT);
 	if (!class_ce) {
-		zend_throw_exception_ex(phalcon_annotations_exception_ce, 0, "Class %s does not exist", Z_STRVAL_P(class_name));
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_annotations_exception_ce, "Class %s does not exist", Z_STRVAL_P(class_name));
 		return;
 	}
 
 	if (class_ce->type != ZEND_USER_CLASS) {
 		array_init(return_value);
-		return;
+		RETURN_MM();
 	}
 
-	PHALCON_MM_GROW();
 	PHALCON_INIT_VAR(annotations);
 	array_init(annotations);
 

@@ -108,14 +108,12 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 #define PHALCON_CPY_WRT(d, v)                         \
 	do {                                              \
 		if (d) {                                      \
-			if (Z_REFCOUNTED_P(d)                     \
-				&& Z_REFCOUNT_P(d) > 0) {             \
-				zval_ptr_dtor(d);                     \
-			}                                         \
+			Z_DELREF_P(d);                            \
 		} else {                                      \
 			PHALCON_MEMORY_OBSERVE(&d);               \
 		}                                             \
-		Z_TRY_ADDREF_P(v);                            \
+		ZVAL_MAKE_REF(v);                             \
+		Z_ADDREF_P(v);                                \
 		d = v;                                        \
 	} while (0)
 

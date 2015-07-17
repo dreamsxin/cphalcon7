@@ -227,7 +227,7 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 
 	smart_str_0(&implstr);
 
-	if (implstr.s->len) {
+	if (implstr.s) {
 		RETURN_STR(implstr.s);
 	} else {
 		smart_str_free(&implstr);
@@ -863,7 +863,7 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 
 	smart_str_0(&random_str);
 
-	if (random_str.s->len) {
+	if (random_str.s) {
 		RETURN_STR(random_str.s);
 	} else {
 		smart_str_free(&random_str);
@@ -1033,7 +1033,7 @@ void phalcon_unique_key(zval *return_value, zval *prefix, zval *value) {
 
 	smart_str_0(&implstr);
 
-	if (implstr.s->len) {
+	if (implstr.s) {
 		RETURN_STR(implstr.s);
 	} else {
 		smart_str_free(&implstr);

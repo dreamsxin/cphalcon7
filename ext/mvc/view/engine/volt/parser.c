@@ -3241,7 +3241,7 @@ static void yy_syntax_error(
 
 		smart_str_0(&error_str);
 
-		if (error_str.s->len) {
+		if (error_str.s) {
 			status->syntax_error = error_str.s->val;
 			status->syntax_error_len = error_str.s->len;
 		} else {

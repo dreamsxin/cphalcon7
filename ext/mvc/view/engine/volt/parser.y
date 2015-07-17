@@ -680,7 +680,7 @@ static zval *phvolt_ret_macro_call_statement(zval *expr, zval *arguments, zval *
 
 		smart_str_0(&error_str);
 
-		if (error_str.s->len) {
+		if (error_str.s) {
 			status->syntax_error = error_str.s->val;
 			status->syntax_error_len = error_str.s->len;
 		} else {

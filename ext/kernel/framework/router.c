@@ -254,7 +254,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
 	}
 	smart_str_0(&route_str);
 
-	if (route_str.s->len) {
+	if (route_str.s) {
 		RETURN_STR(route_str.s);
 	} else {
 		smart_str_free(&route_str);
@@ -421,7 +421,7 @@ void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches){
 	}
 	smart_str_0(&route_str);
 
-	if (route_str.s->len) {
+	if (route_str.s) {
 		RETURN_STR(route_str.s);
 	} else {
 		smart_str_free(&route_str);

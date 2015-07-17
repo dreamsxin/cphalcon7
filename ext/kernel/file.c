@@ -278,7 +278,7 @@ void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *
 
 	smart_str_0(&virtual_str);
 
-	if (virtual_str.s->len) {
+	if (virtual_str.s) {
 		RETURN_STR(virtual_str.s);
 	} else {
 		smart_str_free(&virtual_str);

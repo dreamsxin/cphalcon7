@@ -26,7 +26,7 @@ static zval *phannot_ret_literal_zval(int type, phannot_parser_token *T)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_INIT_ZVAL(ret);
+	PHALCON_ALLOC_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, ISV(type), type);
 	if (T) {
@@ -41,7 +41,7 @@ static zval *phannot_ret_array(zval *items)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_INIT_ZVAL(ret);
+	PHALCON_ALLOC_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_long(ret, ISV(type), PHANNOT_T_ARRAY);
 
@@ -58,7 +58,7 @@ static zval *phannot_ret_zval_list(zval *list_left, zval *right_list)
 	HashPosition pos;
 	HashTable *list;
 
-	PHALCON_ALLOC_INIT_ZVAL(ret);
+	PHALCON_ALLOC_ZVAL(ret);
 	array_init(ret);
 
 	if (list_left) {
@@ -93,7 +93,7 @@ static zval *phannot_ret_named_item(phannot_parser_token *name, zval *expr)
 {
 	zval *ret;
 
-	PHALCON_ALLOC_INIT_ZVAL(ret);
+	PHALCON_ALLOC_ZVAL(ret);
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, ISV(expr), expr);
 	if (name != NULL) {
@@ -108,7 +108,7 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 {
 	zval *ret;
 
-	PHALCON_ALLOC_INIT_ZVAL(ret);
+	PHALCON_ALLOC_ZVAL(ret);
 	array_init_size(ret, 5);
 
 	add_assoc_long(ret, ISV(type), PHANNOT_T_ANNOTATION);
@@ -1367,7 +1367,7 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, zen
 
 	smart_str_0(&processed_str);
 
-	if (processed_str.s->len) {
+	if (processed_str.s) {
 		*ret     = processed_str.s->val;
 		*ret_len = processed_str.s->len;
 	} else {
@@ -1591,8 +1591,6 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 		}
 	}
 
-	efree(processed_comment);
 	efree(parser_status);
-
 	return status;
 }

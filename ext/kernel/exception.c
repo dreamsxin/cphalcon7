@@ -154,7 +154,7 @@ void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ..
 
 	ZVAL_STRINGL(&msg, buffer, len);
 
-	PHALCON_CALL_METHODW(NULL, &object, "__construct", &PHALCON_GLOBAL(z_null), &msg);
+	PHALCON_CALL_METHODW(NULL, &object, "__construct", &msg);
 
 	zend_throw_exception_object(&object);
 

@@ -3150,7 +3150,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	}
 
 	PHALCON_ALLOC_INIT_ZVAL(unique_id);
-	ZVAL_LONG(unique_id, zend_inline_hash_func(phql, phql_length + 1));
+	ZVAL_LONG(unique_id, zend_inline_hash_func(phql, phql_length));
 
 	phalcon_orm_get_prepared_ast(result, unique_id);
 

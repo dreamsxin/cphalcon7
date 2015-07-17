@@ -532,7 +532,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, delete){
 PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, queryKeys){
 
 	zval *prefix = NULL, *memcache, *options, *special_key;
-	zval *keys = NULL, *real_key = NULL;
+	zval *keys = NULL;
+	zend_string *str_key;
+	ulong idx;
 
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
@@ -558,21 +560,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, queryKeys){
 	/* Get the key from memcached */
 	PHALCON_CALL_METHOD(&keys, memcache, "get", special_key);
 	if (Z_TYPE_P(keys) == IS_ARRAY) {
-		HashPosition pos;
-
-		for (
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(keys), &pos);
-			zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), &pos) != NULL;
-			zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos)
-		) {
-			zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
-
-			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(key, prefix, NULL)) {
-				PHALCON_INIT_NVAR(real_key);
-				ZVAL_NEW_STR(real_key, Z_STR_P(key));
-				phalcon_array_append(return_value, real_key, 0);
+		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(keys), idx, str_key) {
+			zval key;
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
 			}
-		}
+
+			if (!prefix || !zend_is_true(prefix) || phalcon_start_with(&key, prefix, NULL)) {
+				phalcon_array_append(return_value, &key, PH_COPY);
+			}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_MM_RESTORE();
@@ -629,8 +628,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, flush){
 
 	zval *memcache, *options, *special_key;
 	zval *keys = NULL;
-	HashPosition pos;
-	zval *value;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -651,15 +650,16 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, flush){
 	if (Z_TYPE_P(special_key) != IS_NULL) {
 		PHALCON_CALL_METHOD(&keys, memcache, "get", special_key);
 		if (Z_TYPE_P(keys) == IS_ARRAY) {
-			for (
-				zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(keys), &pos);
-				(value = zend_hash_get_current_data_ex(Z_ARRVAL_P(keys), &pos)) != NULL;
-				zend_hash_move_forward_ex(Z_ARRVAL_P(keys), &pos)
-			) {
-				zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(keys), &pos);
+			ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(keys), idx, str_key) {
+				zval key;
+				if (str_key) {
+					ZVAL_STR(&key, str_key);
+				} else {
+					ZVAL_LONG(&key, idx);
+				}
 				
-				PHALCON_CALL_METHOD(NULL, memcache, "delete", key);
-			}
+				PHALCON_CALL_METHOD(NULL, memcache, "delete", &key);
+			} ZEND_HASH_FOREACH_END();
 			
 			zend_hash_clean(Z_ARRVAL_P(keys));
 			PHALCON_CALL_METHOD(NULL, memcache, "set", special_key, keys);

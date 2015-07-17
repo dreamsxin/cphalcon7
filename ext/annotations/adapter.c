@@ -191,6 +191,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 			PHALCON_CALL_METHOD(NULL, class_annotations, "__construct", parsed_annotations);
 	
 			phalcon_update_property_array(getThis(), SL("_annotations"), real_class_name, class_annotations);
+
 			PHALCON_CALL_METHOD(NULL, getThis(), "write", real_class_name, class_annotations);
 		}
 	}
@@ -349,6 +350,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getProperty){
 				} else {
 					ZVAL_LONG(&name, idx);
 				}
+
 				if (PHALCON_IS_EQUAL(&name, property_name)) {
 					RETURN_CTOR(property);
 				}

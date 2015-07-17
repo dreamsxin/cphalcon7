@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 			if (phalcon_array_isset_str_fetch(&n, argument, SL("name"))) {
 				phalcon_array_update_zval(arguments, n, resolved_argument, PH_COPY);
 			} else {
-				phalcon_array_append(arguments, resolved_argument, 0);
+				phalcon_array_append(arguments, resolved_argument, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	
@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getName){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
-	zval *expr = NULL, *type, *items, *item = NULL;
+	zval *expr, *type, *items, *item = NULL, *item_expr = NULL;
 	zval *resolved_item = NULL, *exception_message;
 
 	PHALCON_MM_GROW();
@@ -208,15 +208,15 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(items), item) {
 				zval *name;
-	
-				PHALCON_OBS_NVAR(expr);
-				phalcon_array_fetch_str(&expr, item, SL("expr"), PH_NOISY);
-	
-				PHALCON_CALL_METHOD(&resolved_item, getThis(), "getexpression", expr);
+
+				PHALCON_OBS_NVAR(item_expr);
+				phalcon_array_fetch_str(&item_expr, item, SL("expr"), PH_NOISY);
+
+				PHALCON_CALL_METHOD(&resolved_item, getThis(), "getexpression", item_expr);
 				if (phalcon_array_isset_str_fetch(&name, item, SL("name"))) {
 					phalcon_array_update_zval(return_value, name, resolved_item, PH_COPY);
 				} else {
-					phalcon_array_append(return_value, resolved_item, 0);
+					phalcon_array_append(return_value, resolved_item, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 	

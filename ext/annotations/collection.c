@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 			PHALCON_INIT_NVAR(annotation);
 			object_init_ex(annotation, phalcon_annotations_annotation_ce);
 			PHALCON_CALL_METHOD(NULL, annotation, "__construct", annotation_data);
-			phalcon_array_append(annotations, annotation, 0);
+			phalcon_array_append(annotations, annotation, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_update_property_this(getThis(), SL("_annotations"), annotations);

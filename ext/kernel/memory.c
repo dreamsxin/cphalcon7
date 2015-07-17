@@ -189,9 +189,6 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 					} else {
 						Z_DELREF_P(*ptr);
 					}
-				} else {
-					zval_dtor(*ptr);
-					efree(*ptr);
 				}
 			}
 		}

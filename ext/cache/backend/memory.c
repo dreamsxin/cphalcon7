@@ -227,6 +227,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 
 	zval *prefix = NULL;
 	zval *data;
+	zend_string *str_key;
+	ulong idx;
 
 	PHALCON_MM_GROW();
 
@@ -242,30 +244,20 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 	if (likely(Z_TYPE_P(data) == IS_ARRAY)) {
 		if (!prefix) {
 			phalcon_array_keys(return_value, data);
-		}
-		else {
-			HashPosition pos;
-			zend_string *str_index;
-			ulong num_index;
-			int type;
-
-			for (
-				zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(data), &pos);
-				(type = zend_hash_get_current_key_ex(Z_ARRVAL_P(data), &str_index, &num_index, &pos)) != HASH_KEY_NON_EXISTENT;
-				zend_hash_move_forward_ex(Z_ARRVAL_P(data), &pos)
-			) {
-				if (type == HASH_KEY_IS_STRING && ZSTR_LEN(str_index) > (uint)(Z_STRLEN_P(prefix)) && !memcmp(Z_STRVAL_P(prefix), ZSTR_VAL(str_index), ZSTR_LEN(str_index)-1)) {
-					add_next_index_str(return_value, str_index);
-				} else if (unlikely(type == HASH_KEY_IS_LONG)) {
+		} else {
+			ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(data), idx, str_key) {
+				if (str_key && ZSTR_LEN(str_key) > (uint)(Z_STRLEN_P(prefix)) && !memcmp(Z_STRVAL_P(prefix), ZSTR_VAL(str_key), ZSTR_LEN(str_key)-1)) {
+					add_next_index_str(return_value, str_key);
+				} else {
 					char buf[8 * sizeof(ulong) + 2];
                     int buflength = 8 * sizeof(ulong) + 2;
 					int size;
-					size = snprintf(buf, buflength, "%ld", (long) num_index);
+					size = snprintf(buf, buflength, "%ld", (long) idx);
 					if (size >= Z_STRLEN_P(prefix) && !memcmp(Z_STRVAL_P(prefix), buf, size)) {
-						add_next_index_long(return_value, (long) num_index);
+						add_next_index_long(return_value, (long) idx);
 					}
 				}
-			}
+			} ZEND_HASH_FOREACH_END();
 		}
 	}
 

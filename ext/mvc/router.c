@@ -1477,7 +1477,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteByName){
 	}
 
 	routes_name_lookup = phalcon_read_property(getThis(), SL("_routesNameLookup"), PH_NOISY);
-	if (PHALCON_IS_NOT_EMPTY(name) && (route = zend_hash_str_find(Z_ARRVAL_P(routes_name_lookup), Z_STRVAL_P(name), Z_STRLEN_P(name) + 1)) != NULL) {
+	if (PHALCON_IS_NOT_EMPTY(name) && (route = zend_hash_find(Z_ARRVAL_P(routes_name_lookup), Z_STR_P(name))) != NULL) {
 		RETURN_CTOR(route);
 	}
 
@@ -1487,7 +1487,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteByName){
 			PHALCON_CALL_METHOD(&route_name, route, "getname");
 			convert_to_string(route_name);
 			if (PHALCON_IS_NOT_EMPTY(route_name)) {
-				phalcon_update_property_array_string(getThis(), SL("_routesNameLookup"), Z_STRVAL_P(route_name), Z_STRLEN_P(route_name) + 1, route);
+				phalcon_update_property_array_string(getThis(), SL("_routesNameLookup"), Z_STR_P(route_name), route);
 			}
 
 			if (phalcon_is_equal(route_name, name)) {

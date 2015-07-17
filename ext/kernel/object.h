@@ -132,7 +132,8 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 /** Updating array properties */
 int phalcon_update_property_array(zval *object, const char *property, uint32_t property_length, const zval *index, zval *value);
 int phalcon_update_property_array_multi(zval *object, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);
-int phalcon_update_property_array_string(zval *object, const char *property, uint32_t property_length, const char *index, uint32_t index_length, zval *value);
+int phalcon_update_property_array_str(zval *object, const char *property, uint32_t property_length, const char *index, uint32_t index_length, zval *value);
+int phalcon_update_property_array_string(zval *object, const char *property, uint32_t property_length, zend_string *index, zval *value);
 int phalcon_update_property_array_append(zval *object, const char *property, uint32_t property_length, zval *value);
 int phalcon_update_property_array_merge(zval *object, const char *property, uint32_t property_length, zval *values);
 int phalcon_update_property_array_merge_append(zval *object, const char *property, uint32_t property_length, zval *values);

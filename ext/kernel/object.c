@@ -900,11 +900,19 @@ int phalcon_update_property_array_multi(zval *object, const char *property, uint
 /**
  * Updates an array property using a string index
  */
-int phalcon_update_property_array_string(zval *object, const char *property, uint32_t property_length, const char *index, uint32_t index_length, zval *value)
+int phalcon_update_property_array_str(zval *object, const char *property, uint32_t property_length, const char *index, uint32_t index_length, zval *value)
 {
 	zval tmp;
-	ZVAL_STRINGL(&tmp, index, index_length);
 
+	ZVAL_STRINGL(&tmp, index, index_length);
+	return phalcon_update_property_array(object, property, property_length, &tmp, value);
+}
+
+int phalcon_update_property_array_string(zval *object, const char *property, uint32_t property_length, zend_string *index, zval *value)
+{
+	zval tmp;
+
+	ZVAL_STR(&tmp, index);
 	return phalcon_update_property_array(object, property, property_length, &tmp, value);
 }
 
@@ -1175,13 +1183,10 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 				params_ptr = params_arr;
 			}
 
-			for (
-				zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(params), &pos);
-				(item = zend_hash_get_current_data_ex(Z_ARRVAL_P(params), &pos)) != NULL;
-				zend_hash_move_forward_ex(Z_ARRVAL_P(params), &pos), ++i
-			) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), item) {
 				params_ptr[i] = item;
-			}
+				++i;
+			} ZEND_HASH_FOREACH_END();
 		} else {
 			params_ptr = NULL;
 		}

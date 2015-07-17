@@ -68,8 +68,8 @@ zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigne
 					item = variable;
 					length = variable_length;
 				}
-				if (zend_hash_str_exists(Z_ARRVAL_P(replacements), item, length + 1)) {
-					if ((zv = zend_hash_str_find(Z_ARRVAL_P(replacements), item, length + 1)) != NULL) {
+				if (zend_hash_str_exists(Z_ARRVAL_P(replacements), item, length)) {
+					if ((zv = zend_hash_str_find(Z_ARRVAL_P(replacements), item, length)) != NULL) {
 						efree(item);
 						(*position)++;
 						return zv;
@@ -372,13 +372,13 @@ void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches){
 											} else {
 												smart_str_appendl(&route_str, regexp, regexp_length);
 											}
-											zend_hash_str_update(Z_ARRVAL_P(matches), variable, variable_length + 1, tmp);
+											zend_hash_str_update(Z_ARRVAL_P(matches), variable, variable_length, tmp);
 										}
 										efree(regexp);
 										efree(variable);
 									} else {
 										smart_str_appendl(&route_str, "([^/]*)", strlen("([^/]*)"));
-										zend_hash_str_update(Z_ARRVAL_P(matches), item, length + 1, tmp);
+										zend_hash_str_update(Z_ARRVAL_P(matches), item, length, tmp);
 									}
 								}
 							} else {

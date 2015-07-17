@@ -170,7 +170,7 @@ void phalcon_unique_path_key(zval *return_value, zval *path) {
 		return;
 	}
 
-	h = zend_hash_func(Z_STRVAL_P(path), Z_STRLEN_P(path) + 1);
+	h = zend_string_hash_val(Z_STR_P(path));
 
 	strKey = emalloc(24);
 	snprintf(strKey, 23, "v%lu", h);    

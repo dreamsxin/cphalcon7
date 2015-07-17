@@ -407,30 +407,17 @@ static zval *phvolt_ret_continue_statement(phvolt_scanner_state *state)
 
 static zval *phvolt_ret_zval_list(zval *list_left, zval *right_list)
 {
+	zval *ret, *item;
 
-	zval *ret;
-	HashPosition pos;
-	HashTable *list;
-
-	PHALCON_ALLOC_INIT_ZVAL(ret);
+	PHALCON_ALLOC_ZVAL(ret);
 	array_init(ret);
 
 	if (list_left) {
-
-		list = Z_ARRVAL_P(list_left);
-		if (zend_hash_index_exists(list, 0)) {
-			zend_hash_internal_pointer_reset_ex(list, &pos);
-			for (;; zend_hash_move_forward_ex(list, &pos)) {
-
-				zval *item;
-
-				if ((item = zend_hash_get_current_data_ex(list, &pos)) == NULL) {
-					break;
-				}
-
+		if (zend_hash_index_exists(Z_ARRVAL_P(list_left), 0)) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(list_left), item) {
 				Z_TRY_ADDREF_P(item);
 				add_next_index_zval(ret, item);
-			}
+			} ZEND_HASH_FOREACH_END();
 			zval_ptr_dtor(list_left);
 		} else {
 			add_next_index_zval(ret, list_left);

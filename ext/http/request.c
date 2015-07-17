@@ -1535,8 +1535,8 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 PHP_METHOD(Phalcon_Http_Request, getHeaders){
 
 	zval *_SERVER;
-	HashPosition hp0;
-	zval *hd;
+	zval *value;
+	zend_string *str_key;
 
 	array_init(return_value);
 	_SERVER = phalcon_get_global(SL("_SERVER"));
@@ -1544,21 +1544,13 @@ PHP_METHOD(Phalcon_Http_Request, getHeaders){
 		return;
 	}
 
-	for (
-		zend_hash_internal_pointer_reset_ex(Z_ARRVAL_P(_SERVER), &hp0);
-		(hd = zend_hash_get_current_data_ex(Z_ARRVAL_P(_SERVER), &hp0)) != NULL;
-		zend_hash_move_forward_ex(Z_ARRVAL_P(_SERVER), &hp0)
-	) {
-		zval *key = phalcon_get_current_key_w(Z_ARRVAL_P(_SERVER), &hp0);
-
-		if (Z_TYPE_P(key) == IS_STRING && Z_STRLEN_P(key) > 5 && !memcmp(Z_STRVAL_P(key), "HTTP_", 5)) {
-			zval *header;
-
-			PHALCON_ALLOC_INIT_ZVAL(header);
-			ZVAL_STRINGL(header, Z_STRVAL_P(key) + 5, Z_STRLEN_P(key) - 5);
-			phalcon_array_update_zval(return_value, header, hd, PH_COPY);
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(_SERVER), str_key, value) {
+		if (str_key && ZSTR_LEN(str_key) > 5 && !memcmp(ZSTR_VAL(str_key), "HTTP_", 5)) {
+			zval header;
+			ZVAL_STRINGL(&header, ZSTR_VAL(str_key) + 5, ZSTR_LEN(str_key) - 5);
+			phalcon_array_update_zval(return_value, &header, value, PH_COPY);
 		}
-	}
+	} ZEND_HASH_FOREACH_END();
 }
 
 /**

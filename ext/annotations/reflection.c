@@ -119,12 +119,12 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 
 	annotations = phalcon_read_property(getThis(), SL("_classAnnotations"), PH_NOISY);
 	if (Z_TYPE_P(annotations) != IS_OBJECT) {
-	
+
 		reflection_data = phalcon_read_property(getThis(), SL("_reflectionData"), PH_NOISY);
 		if (phalcon_array_isset_str_fetch(&reflection_class, reflection_data, SL("class"))) {
 			object_init_ex(return_value, phalcon_annotations_collection_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", reflection_class);
-	
+
 			phalcon_update_property_this(getThis(), SL("_classAnnotations"), return_value);
 			RETURN_MM();
 		}
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 		phalcon_update_property_this(getThis(), SL("_classAnnotations"), &PHALCON_GLOBAL(z_false));
 		RETURN_MM_FALSE;
 	}
-	
+
 	RETURN_CTOR(annotations);
 }
 

@@ -122,17 +122,12 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	{
 		HashTable *props = &class_ce->properties_info;
 		if (zend_hash_num_elements(props) > 0) {
-			HashPosition hp;
 			zend_property_info *property;
 
 			PHALCON_INIT_VAR(annotations_properties);
 			array_init_size(annotations_properties, zend_hash_num_elements(props));
 
-			for (
-				zend_hash_internal_pointer_reset_ex(props, &hp);
-				(property = zend_hash_get_current_data_ptr_ex(props, &hp)) != NULL;
-				zend_hash_move_forward_ex(props, &hp)
-			) {
+			ZEND_HASH_FOREACH_PTR(props, property) {
 				zend_string *cmt;
 
 				if ((cmt = phalcon_get_property_doc_comment(property)) != NULL) {
@@ -147,13 +142,13 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 					if (Z_TYPE_P(property_annotations) == IS_ARRAY) {
 						const char *prop_name, *class_name;
 						if (zend_unmangle_property_name(property->name, &class_name, &prop_name) == SUCCESS) {
-							add_assoc_zval_ex(annotations_properties, prop_name, strlen(prop_name) + 1, property_annotations);
+							add_assoc_zval_ex(annotations_properties, prop_name, strlen(prop_name), property_annotations);
 						}
 					} else {
 						zval_ptr_dtor(property_annotations);
 					}
 				}
-			}
+			} ZEND_HASH_FOREACH_END();
 
 			if (zend_hash_num_elements(Z_ARRVAL_P(annotations_properties))) {
 				phalcon_array_update_str(annotations, SL("properties"), annotations_properties, PH_COPY);
@@ -165,17 +160,12 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	{
 		HashTable *methods = &class_ce->function_table;
 		if (zend_hash_num_elements(methods) > 0) {
-			HashPosition hp;
 			zend_function *method;
 
 			PHALCON_INIT_VAR(annotations_methods);
 			array_init_size(annotations_methods, zend_hash_num_elements(methods));
 
-			for (
-				zend_hash_internal_pointer_reset_ex(methods, &hp);
-				(method = zend_hash_get_current_data_ptr_ex(methods, &hp)) != NULL;
-				zend_hash_move_forward_ex(methods, &hp)
-			) {
+			ZEND_HASH_FOREACH_PTR(methods, method) {
 				zend_string *cmt;
 
 				if ((cmt = phalcon_get_function_doc_comment(method)) != NULL) {
@@ -190,13 +180,12 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 					}
 
 					if (Z_TYPE_P(method_annotations) == IS_ARRAY) {
-						add_assoc_zval_ex(annotations_methods, method->common.function_name->val, method->common.function_name->len + 1, method_annotations);
-					}
-					else {
+						zend_hash_add(Z_ARRVAL_P(annotations_methods), method->common.function_name, method_annotations);
+					} else {
 						zval_ptr_dtor(method_annotations);
 					}
 				}
-			}
+			} ZEND_HASH_FOREACH_END();
 
 			if (zend_hash_num_elements(Z_ARRVAL_P(annotations_methods))) {
 				phalcon_array_update_str(annotations, SL("methods"), annotations_methods, PH_COPY);

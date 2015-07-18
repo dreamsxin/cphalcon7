@@ -78,6 +78,8 @@
 zend_class_entry *phalcon_mvc_model_query_ce;
 
 PHP_METHOD(Phalcon_Mvc_Model_Query, __construct);
+PHP_METHOD(Phalcon_Mvc_Model_Query, setPhql);
+PHP_METHOD(Phalcon_Mvc_Model_Query, getPhql);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setUniqueRow);
@@ -133,6 +135,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, phql)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setphql, 0, 1, 0)
+	ZEND_ARG_INFO(0, phql)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setuniquerow, 0, 0, 1)
 	ZEND_ARG_INFO(0, uniqueRow)
 ZEND_END_ARG_INFO()
@@ -173,6 +179,8 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, __construct, arginfo_phalcon_mvc_model_query___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Mvc_Model_Query, setPhql, arginfo_phalcon_mvc_model_query_setphql, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, getPhql, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getModelsManager, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getModelsMetaData, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setUniqueRow, arginfo_phalcon_mvc_model_query_setuniquerow, ZEND_ACC_PUBLIC)
@@ -282,6 +290,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, __construct){
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
 	}
+}
+
+PHP_METHOD(Phalcon_Mvc_Model_Query, setPhql){
+
+	zval *phql;
+
+	phalcon_fetch_params(0, 1, 0, &phql);
+
+	phalcon_update_property_this(getThis(), SL("_phql"), phql);
+}
+
+PHP_METHOD(Phalcon_Mvc_Model_Query, getPhql){
+
+
+	RETURN_MEMBER(getThis(), "_phql");
 }
 
 /**

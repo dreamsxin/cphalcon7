@@ -95,23 +95,23 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 	array_init(options);
 
 	if ((constant = zend_get_constant_str(SL("CURLOPT_RETURNTRANSFER"))) != NULL) {
-		phalcon_array_update_zval_bool(options, constant, 1, 0);
+		phalcon_array_update_zval_bool(options, constant, 1, PH_COPY);
 	}
 
 	if ((constant = zend_get_constant_str(SL("CURLOPT_AUTOREFERER"))) != NULL) {
-		phalcon_array_update_zval_bool(options, constant, 1, 0);
+		phalcon_array_update_zval_bool(options, constant, 1, PH_COPY);
 	}
 
 	if ((constant = zend_get_constant_str(SL("CURLOPT_FOLLOWLOCATION"))) != NULL) {
-		phalcon_array_update_zval_bool(options, constant, 1, 0);
+		phalcon_array_update_zval_bool(options, constant, 1, PH_COPY);
 	}
 
 	if ((constant = zend_get_constant_str(SL("CURLOPT_MAXREDIRS"))) != NULL) {
-		phalcon_array_update_zval_long(options, constant, 20, 0);
+		phalcon_array_update_zval_long(options, constant, 20, PH_COPY);
 	}
 
 	if ((constant = zend_get_constant_str(SL("CURLOPT_HEADER"))) != NULL) {
-		phalcon_array_update_zval_bool(options, constant, 1, 0);
+		phalcon_array_update_zval_bool(options, constant, 1, PH_COPY);
 	}
 
 	if ((constant = zend_get_constant_str(SL("CURLOPT_USERAGENT"))) != NULL) {
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 					object_init_ex(tmp, curlfile_ce);
 					PHALCON_CALL_METHOD(NULL, tmp, "__construct", file);
 
-					phalcon_array_append(data, tmp, 0);
+					phalcon_array_append(data, tmp, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}

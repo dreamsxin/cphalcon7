@@ -537,9 +537,9 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					if (Z_TYPE_P(arguments) == IS_NULL) {
 						PHALCON_INIT_NVAR(arguments);
 						array_init_size(arguments, 3);
-						phalcon_array_append(arguments, event, 0);
-						phalcon_array_append(arguments, source, 0);
-						phalcon_array_append(arguments, data, 0);
+						phalcon_array_append(arguments, event, PH_COPY);
+						phalcon_array_append(arguments, source, PH_COPY);
+						phalcon_array_append(arguments, data, PH_COPY);
 					}
 
 					/** 
@@ -640,9 +640,9 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					if (Z_TYPE_P(arguments) == IS_NULL) {
 						PHALCON_INIT_NVAR(arguments);
 						array_init_size(arguments, 3);
-						phalcon_array_append(arguments, event, 0);
-						phalcon_array_append(arguments, source, 0);
-						phalcon_array_append(arguments, data, 0);
+						phalcon_array_append(arguments, event, PH_COPY);
+						phalcon_array_append(arguments, source, PH_COPY);
+						phalcon_array_append(arguments, data, PH_COPY);
 					}
 
 					/** 
@@ -895,14 +895,14 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 			PHALCON_CALL_METHOD(&listener, iterator, "current");
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
 
-			phalcon_array_append(return_value, handler_embeded, 0);
+			phalcon_array_append(return_value, handler_embeded, PH_COPY);
 
 			PHALCON_CALL_METHOD(NULL, iterator, "next");
 		}
 	} else {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), listener) {
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
-			phalcon_array_append(return_value, handler_embeded, 0);
+			phalcon_array_append(return_value, handler_embeded, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	}
 

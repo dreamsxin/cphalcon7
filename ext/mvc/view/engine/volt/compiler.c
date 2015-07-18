@@ -413,8 +413,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, fireExtensionEvent){
 				PHALCON_INIT_NVAR(status);
 				PHALCON_INIT_NVAR(call_object);
 				array_init_size(call_object, 2);
-				phalcon_array_append(call_object, extension, 0);
-				phalcon_array_append(call_object, name, 0);
+				phalcon_array_append(call_object, extension, PH_COPY);
+				phalcon_array_append(call_object, name, PH_COPY);
 				if (Z_TYPE_P(arguments) == IS_ARRAY) { 
 					PHALCON_CALL_USER_FUNC_ARRAY(&status, call_object, arguments);
 				} else {
@@ -754,9 +754,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 
 			PHALCON_ALLOC_INIT_ZVAL(fire_arguments);
 			array_init_size(fire_arguments, 3);
-			phalcon_array_append(fire_arguments, name, 0);
-			phalcon_array_append(fire_arguments, arguments, 0);
-			phalcon_array_append(fire_arguments, func_arguments, 0);
+			phalcon_array_append(fire_arguments, name, PH_COPY);
+			phalcon_array_append(fire_arguments, arguments, PH_COPY);
+			phalcon_array_append(fire_arguments, func_arguments, PH_COPY);
 
 			PHALCON_CALL_METHOD(&code, getThis(), "fireextensionevent", event, fire_arguments);
 			if (Z_TYPE_P(code) == IS_STRING) {
@@ -789,8 +789,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 
 						PHALCON_ALLOC_INIT_ZVAL(parameters);
 						array_init_size(parameters, 2);
-						phalcon_array_append(parameters, arguments, 0);
-						phalcon_array_append(parameters, func_arguments, 0);
+						phalcon_array_append(parameters, arguments, PH_COPY);
+						phalcon_array_append(parameters, func_arguments, PH_COPY);
 						PHALCON_RETURN_CALL_FUNCTION("call_user_func_array", definition, parameters);
 						RETURN_MM();
 					}
@@ -1252,9 +1252,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 
 		PHALCON_INIT_VAR(fire_arguments);
 		array_init_size(fire_arguments, 3);
-		phalcon_array_append(fire_arguments, name, 0);
-		phalcon_array_append(fire_arguments, arguments, 0);
-		phalcon_array_append(fire_arguments, func_arguments, 0);
+		phalcon_array_append(fire_arguments, name, PH_COPY);
+		phalcon_array_append(fire_arguments, arguments, PH_COPY);
+		phalcon_array_append(fire_arguments, func_arguments, PH_COPY);
 
 		PHALCON_CALL_METHOD(&code, getThis(), "fireextensionevent", event, fire_arguments);
 		if (Z_TYPE_P(code) == IS_STRING) {
@@ -1287,8 +1287,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 
 					PHALCON_ALLOC_INIT_ZVAL(parameters);
 					array_init_size(parameters, 2);
-					phalcon_array_append(parameters, arguments, 0);
-					phalcon_array_append(parameters, func_arguments, 0);
+					phalcon_array_append(parameters, arguments, PH_COPY);
+					phalcon_array_append(parameters, func_arguments, PH_COPY);
 					PHALCON_RETURN_CALL_FUNCTION("call_user_func_array", definition, parameters);
 					RETURN_MM();
 				}
@@ -1608,7 +1608,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 
 			PHALCON_INIT_NVAR(fire_arguments);
 			array_init_size(fire_arguments, 1);
-			phalcon_array_append(fire_arguments, expr, 0);
+			phalcon_array_append(fire_arguments, expr, PH_COPY);
 
 			PHALCON_CALL_METHOD(&expr_code, getThis(), "fireextensionevent", event, fire_arguments);
 			if (Z_TYPE_P(expr_code) == IS_STRING) {
@@ -3663,9 +3663,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 
 				PHALCON_INIT_VAR(params);
 				array_init_size(params, 3);
-				phalcon_array_append(params, template_path, 0);
-				phalcon_array_append(params, options, 0);
-				phalcon_array_append(params, extends_mode, 0);
+				phalcon_array_append(params, template_path, PH_COPY);
+				phalcon_array_append(params, options, PH_COPY);
+				phalcon_array_append(params, extends_mode, PH_COPY);
 
 				PHALCON_CALL_USER_FUNC_ARRAY(&compiled_template_path, compiled_path, params);
 

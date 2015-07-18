@@ -353,8 +353,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 		ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL_P(keys), str_key) {	
 			if (str_key && phalcon_memnstr_string_string(str_key, Z_STR_P(prefixed))) {
 				PHALCON_INIT_NVAR(real_key);
-				phalcon_substr_string(real_key, str_key, 5, 0);
-				phalcon_array_append(return_value, real_key, 0);
+				phalcon_substr_string(real_key, str_key, 5, PH_COPY);
+				phalcon_array_append(return_value, real_key, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

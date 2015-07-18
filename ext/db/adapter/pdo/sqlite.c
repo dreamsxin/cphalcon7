@@ -519,7 +519,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe_index), index_column) {
 			PHALCON_OBS_NVAR(column_name);
 			phalcon_array_fetch_long(&column_name, index_column, 2, PH_NOISY);
-			phalcon_array_append_multi_2(indexes, key_name, column_name, 0);
+			phalcon_array_append_multi_2(indexes, key_name, column_name, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	} ZEND_HASH_FOREACH_END();
 

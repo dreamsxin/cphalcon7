@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		object_init_ex(route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHOD(NULL, route, "__construct", action_pattern, paths);
 
-		phalcon_array_append(routes, route, 0);
+		phalcon_array_append(routes, route, PH_COPY);
 
 		PHALCON_INIT_NVAR(paths);
 		array_init_size(paths, 3);
@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		object_init_ex(route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHOD(NULL, route, "__construct", params_pattern, paths);
 
-		phalcon_array_append(routes, route, 0);
+		phalcon_array_append(routes, route, PH_COPY);
 	}
 
 	phalcon_update_property_empty_array(getThis(), SL("_params"));
@@ -791,9 +791,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				 */
 				PHALCON_INIT_NVAR(before_match_params);
 				array_init_size(before_match_params, 3);
-				phalcon_array_append(before_match_params, handled_uri, 0);
-				phalcon_array_append(before_match_params, route, 0);
-				phalcon_array_append(before_match_params, getThis(), 0);
+				phalcon_array_append(before_match_params, handled_uri, PH_COPY);
+				phalcon_array_append(before_match_params, route, PH_COPY);
+				phalcon_array_append(before_match_params, getThis(), PH_COPY);
 
 				/**
 				 * Call the function in the PHP userland
@@ -838,7 +838,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 								if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
 									PHALCON_INIT_NVAR(parameters);
 									array_init_size(parameters, 1);
-									phalcon_array_append(parameters, match_position, 0);
+									phalcon_array_append(parameters, match_position, PH_COPY);
 
 									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
 									phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
@@ -852,7 +852,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 								if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
 									PHALCON_INIT_NVAR(parameters);
 									array_init_size(parameters, 1);
-									phalcon_array_append(parameters, position, 0);
+									phalcon_array_append(parameters, position, PH_COPY);
 
 									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
 									phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);

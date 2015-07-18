@@ -1497,7 +1497,7 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 
 					PHALCON_CALL_METHOD(NULL, request_file, "__construct", value, &index);
 
-					phalcon_array_append(return_value, request_file, 0);
+					phalcon_array_append(return_value, request_file, PH_COPY);
 				}
 			} else if (Z_TYPE_P(error) == IS_ARRAY) {
 				PHALCON_OBS_NVAR(name);
@@ -1618,7 +1618,8 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 		array_init_size(quality_part, 2);
 		phalcon_array_update_zval(quality_part, name, header_name, PH_COPY);
 		phalcon_array_update_str(quality_part, SL("quality"), quality, PH_COPY);
-		phalcon_array_append(return_value, quality_part, 0);
+
+		phalcon_array_append(return_value, quality_part, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_MM_RESTORE();

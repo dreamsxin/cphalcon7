@@ -384,7 +384,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 			PHALCON_CALL_METHOD(&child_capture_to, child, "getcaptureto");
 
 			if (phalcon_memnstr(capture_to, child_capture_to)) {
-				phalcon_array_append(return_value, child, 0);
+				phalcon_array_append(return_value, child, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -635,7 +635,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (Z_TYPE_P(base_path) != IS_ARRAY) {
 		PHALCON_INIT_VAR(paths);
 		array_init(paths);
-		phalcon_array_append(paths, base_path, 0);
+		phalcon_array_append(paths, base_path, PH_COPY);
 	} else {
 		PHALCON_CPY_WRT(paths, base_path);
 	}

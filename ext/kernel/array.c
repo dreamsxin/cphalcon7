@@ -570,7 +570,7 @@ void phalcon_array_append_multi_2(zval *arr, const zval *index, zval *value, int
 			convert_to_array(temp);
 		}
 
-		phalcon_array_update_zval(arr, index, temp, 0);
+		phalcon_array_update_zval(arr, index, temp, PH_COPY);
 		phalcon_array_append(temp, value, flags);
 	}
 }
@@ -587,7 +587,7 @@ void phalcon_array_update_multi_2(zval *arr, const zval *index1, const zval *ind
 			convert_to_array(temp);
 		}
 
-		phalcon_array_update_zval(arr, index1, temp, 0);
+		phalcon_array_update_zval(arr, index1, temp, PH_COPY);
 		phalcon_array_update_zval(temp, index2, value, flags | PH_COPY);
 	}
 
@@ -605,7 +605,7 @@ void phalcon_array_update_str_multi_2(zval *arr, const zval *index1, const char 
 			convert_to_array(temp);
 		}
 
-		phalcon_array_update_zval(arr, index1, temp, 0);
+		phalcon_array_update_zval(arr, index1, temp, PH_COPY);
 		phalcon_array_update_str(temp, index2, index2_length, value, flags | PH_COPY);
 	}
 }
@@ -622,8 +622,8 @@ void phalcon_array_update_long_long_multi_2(zval *arr, ulong index1, ulong index
 			convert_to_array(temp);
 		}
 
-		phalcon_array_update_long(arr, index1, temp, 0);
-		phalcon_array_update_long(temp, index2, value, flags | PH_COPY);
+		phalcon_array_update_long(arr, index1, temp, PH_COPY);
+		phalcon_array_update_long(temp, index2, value, flags);
 	}
 }
 
@@ -639,8 +639,8 @@ void phalcon_array_update_long_string_multi_2(zval *arr, ulong index1, const cha
 			convert_to_array(temp);
 		}
 
-		phalcon_array_update_long(arr, index1, temp, 0);
-		phalcon_array_update_str(temp, index2, index2_length, value, flags | PH_COPY);
+		phalcon_array_update_long(arr, index1, temp, PH_COPY);
+		phalcon_array_update_str(temp, index2, index2_length, value, flags);
 	}
 }
 
@@ -656,7 +656,7 @@ void phalcon_array_update_zval_str_append_multi_3(zval *arr, const zval *index1,
 			convert_to_array(temp1);
 		}
 
-		phalcon_array_update_zval(arr, index1, temp1, 0);
+		phalcon_array_update_zval(arr, index1, temp1, PH_COPY);
 
 		phalcon_array_fetch_str(&temp2, temp1, index2, index2_length, PH_SILENT);
 
@@ -665,7 +665,7 @@ void phalcon_array_update_zval_str_append_multi_3(zval *arr, const zval *index1,
 			convert_to_array(temp2);
 		}
 
-		phalcon_array_update_str(temp1, index2, index2_length, temp2, 0);
+		phalcon_array_update_str(temp1, index2, index2_length, temp2, PH_COPY);
 		phalcon_array_append(temp2, value, flags);
 	}
 }
@@ -683,7 +683,7 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 			convert_to_array(temp1);
 		}
 
-		phalcon_array_update_zval(arr, index1, temp1, 0);
+		phalcon_array_update_zval(arr, index1, temp1, PH_COPY);
 
 		phalcon_array_fetch(&temp2, temp1, index2, PH_SILENT);
 
@@ -692,7 +692,7 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 			convert_to_array(temp2);
 		}
 
-		phalcon_array_update_zval(temp1, index2, temp2, 0);
+		phalcon_array_update_zval(temp1, index2, temp2, PH_COPY);
 		phalcon_array_update_zval(temp2, index3, value, PH_COPY);
 	}
 }
@@ -710,7 +710,7 @@ void phalcon_array_update_str_zval_zval_multi_3(zval *arr, const zval *index1, c
 			convert_to_array(temp1);
 		}
 
-		phalcon_array_update_zval(arr, index1, temp1, 0);
+		phalcon_array_update_zval(arr, index1, temp1, PH_COPY);
 
 		phalcon_array_fetch(&temp2, temp1, index2, PH_SILENT);
 
@@ -719,8 +719,8 @@ void phalcon_array_update_str_zval_zval_multi_3(zval *arr, const zval *index1, c
 			convert_to_array(temp2);
 		}
 
-		phalcon_array_update_zval(temp1, index2, temp2, 0);
-		phalcon_array_update_str(temp2, index3, index3_length, value, PH_COPY);
+		phalcon_array_update_zval(temp1, index2, temp2, PH_COPY);
+		phalcon_array_update_str(temp2, index3, index3_length, value, flags);
 	}
 }
 
@@ -737,7 +737,7 @@ void phalcon_array_update_zval_string_string_multi_3(zval *arr, const zval *inde
 			convert_to_array(temp1);
 		}
 
-		phalcon_array_update_zval(arr, index1, temp1, 0);
+		phalcon_array_update_zval(arr, index1, temp1, PH_COPY);
 
 		phalcon_array_fetch_str(&temp2, temp1, index2, index2_length, PH_SILENT);
 
@@ -746,8 +746,8 @@ void phalcon_array_update_zval_string_string_multi_3(zval *arr, const zval *inde
 			convert_to_array(temp2);
 		}
 
-		phalcon_array_update_str(temp1, index2, index2_length, temp2, 0);
-		phalcon_array_update_str(temp2, index3, index3_length, value, PH_COPY);
+		phalcon_array_update_str(temp1, index2, index2_length, temp2, PH_COPY);
+		phalcon_array_update_str(temp2, index3, index3_length, value, flags);
 	}
 }
 

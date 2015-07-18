@@ -749,8 +749,8 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(validators), validator) {
 					PHALCON_INIT_NVAR(scope);
 					array_init_size(scope, 2);
-					phalcon_array_append(scope, name, 0);
-					phalcon_array_append(scope, validator, 0);
+					phalcon_array_append(scope, name, PH_COPY);
+					phalcon_array_append(scope, validator, PH_COPY);
 					phalcon_array_append(prepared_validators, scope, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 

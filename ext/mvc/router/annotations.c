@@ -155,8 +155,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addResource){
 
 	PHALCON_INIT_VAR(scope);
 	array_init_size(scope, 2);
-	phalcon_array_append(scope, prefix, 0);
-	phalcon_array_append(scope, handler, 0);
+	phalcon_array_append(scope, prefix, PH_COPY);
+	phalcon_array_append(scope, handler, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_handlers"), scope);
 	phalcon_update_property_this(getThis(), SL("_processed"), &PHALCON_GLOBAL(z_false));
 
@@ -194,9 +194,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addModuleResource){
 
 	PHALCON_ALLOC_INIT_ZVAL(scope);
 	array_init_size(scope, 3);
-	phalcon_array_append(scope, prefix, 0);
-	phalcon_array_append(scope, handler, 0);
-	phalcon_array_append(scope, module, 0);
+	phalcon_array_append(scope, prefix, PH_COPY);
+	phalcon_array_append(scope, handler, PH_COPY);
+	phalcon_array_append(scope, module, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_handlers"), scope);
 	zval_ptr_dtor(scope);
 

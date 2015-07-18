@@ -1139,7 +1139,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(fields), field) {
 				PHALCON_INIT_NVAR(escaped_field);
 				PHALCON_CONCAT_VVV(escaped_field, escape_char, field, escape_char);
-				phalcon_array_append(escaped_fields, escaped_field, 0);
+				phalcon_array_append(escaped_fields, escaped_field, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 
 		} else {

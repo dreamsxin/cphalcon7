@@ -157,10 +157,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, __construct){
 		array_init_size(server, 3);
 
 		phalcon_array_update_str_str(server, SL("host"), SL("127.0.0.1"), PH_COPY);
-		phalcon_array_update_str_long(server, SL("port"), 11211, 0);
-		phalcon_array_update_str_long(server, SL("weight"), 1, 0);
+		phalcon_array_update_str_long(server, SL("port"), 11211, PH_COPY);
+		phalcon_array_update_str_long(server, SL("weight"), 1, PH_COPY);
 
-		phalcon_array_append(servers, server, 0);
+		phalcon_array_append(servers, server, PH_COPY);
 
 		phalcon_array_update_str(options, SL("servers"), servers, PH_COPY);
 	}

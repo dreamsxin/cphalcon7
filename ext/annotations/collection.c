@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(annotations), annotation) {
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
 			if (PHALCON_IS_EQUAL(name, annotation_name)) {
-				phalcon_array_append(found, annotation, 0);
+				phalcon_array_append(found, annotation, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

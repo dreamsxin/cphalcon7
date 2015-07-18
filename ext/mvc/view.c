@@ -428,7 +428,7 @@ PHP_METHOD(Phalcon_Mvc_View, setBasePath){
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(base_path), path) {
 			phalcon_add_trailing_slash(path);
-			phalcon_array_append(base_paths, path, 0);
+			phalcon_array_append(base_paths, path, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_update_property_this(getThis(), SL("_basePath"), base_paths);
@@ -607,7 +607,7 @@ PHP_METHOD(Phalcon_Mvc_View, setTemplateBefore){
 	if (Z_TYPE_P(template_before) != IS_ARRAY) { 
 		PHALCON_INIT_VAR(array_template);
 		array_init_size(array_template, 1);
-		phalcon_array_append(array_template, template_before, 0);
+		phalcon_array_append(array_template, template_before, PH_COPY);
 		phalcon_update_property_this(getThis(), SL("_templatesBefore"), array_template);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_templatesBefore"), template_before);
@@ -645,7 +645,7 @@ PHP_METHOD(Phalcon_Mvc_View, setTemplateAfter){
 	if (Z_TYPE_P(template_after) != IS_ARRAY) { 
 		PHALCON_INIT_VAR(array_template);
 		array_init_size(array_template, 1);
-		phalcon_array_append(array_template, template_after, 0);
+		phalcon_array_append(array_template, template_after, PH_COPY);
 		phalcon_update_property_this(getThis(), SL("_templatesAfter"), array_template);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_templatesAfter"), template_after);
@@ -935,8 +935,8 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 
 			PHALCON_INIT_VAR(arguments);
 			array_init_size(arguments, 2);
-			phalcon_array_append(arguments, getThis(), 0);
-			phalcon_array_append(arguments, dependency_injector, 0);
+			phalcon_array_append(arguments, getThis(), PH_COPY);
+			phalcon_array_append(arguments, dependency_injector, PH_COPY);
 
 			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(registered_engines), str_key, engine_service) {
 				zval extension;
@@ -966,7 +966,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 							return;
 						}
 					}
-					phalcon_array_update_zval(engines, &extension, engine_object, PH_COPY | 0);
+					phalcon_array_update_zval(engines, &extension, engine_object, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 
@@ -1041,7 +1041,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	array_init(views_dir_paths);
 
 	if (zend_is_true(absolute_path)) {
-		phalcon_array_append(views_dir_paths, view_path, 0);
+		phalcon_array_append(views_dir_paths, view_path, PH_COPY);
 	} else {
 		base_path = phalcon_read_property(getThis(), SL("_basePath"), PH_NOISY);
 		views_dir = phalcon_read_property(getThis(), SL("_viewsDir"), PH_NOISY);
@@ -1050,12 +1050,12 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(base_path), path) {
 				PHALCON_INIT_NVAR(views_dir_path);
 				PHALCON_CONCAT_VVV(views_dir_path, path, views_dir, view_path);
-				phalcon_array_append(views_dir_paths, views_dir_path, 0);
+				phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 		} else {
 			PHALCON_INIT_VAR(views_dir_path);
 			PHALCON_CONCAT_VVV(views_dir_path, base_path, views_dir, view_path);
-			phalcon_array_append(views_dir_paths, views_dir_path, 0);
+			phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
 		}
 	}
 
@@ -1402,7 +1402,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	if (phalcon_is_callable(converter)) {
 		PHALCON_INIT_NVAR(parameters);
 		array_init_size(parameters, 1);
-		phalcon_array_append(parameters, controller_name, 0);
+		phalcon_array_append(parameters, controller_name, PH_COPY);
 
 		PHALCON_SEPARATE_PARAM(controller_name);
 		PHALCON_CALL_USER_FUNC_ARRAY(&controller_name, converter, parameters);
@@ -1416,7 +1416,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	if (phalcon_is_callable(converter)) {
 		PHALCON_INIT_NVAR(parameters);
 		array_init_size(parameters, 1);
-		phalcon_array_append(parameters, action_name, 0);
+		phalcon_array_append(parameters, action_name, PH_COPY);
 
 		PHALCON_SEPARATE_PARAM(action_name);
 		PHALCON_CALL_USER_FUNC_ARRAY(&action_name, converter, parameters);
@@ -1430,7 +1430,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	if (phalcon_is_callable(converter)) {
 		PHALCON_INIT_NVAR(parameters);
 		array_init_size(parameters, 1);
-		phalcon_array_append(parameters, namespace_name, 0);
+		phalcon_array_append(parameters, namespace_name, PH_COPY);
 
 		PHALCON_SEPARATE_PARAM(namespace_name);
 		PHALCON_CALL_USER_FUNC_ARRAY(&namespace_name, converter, parameters);
@@ -1726,9 +1726,9 @@ PHP_METHOD(Phalcon_Mvc_View, pick){
 
 		PHALCON_INIT_NVAR(pick_view);
 		array_init_size(pick_view, 2);
-		phalcon_array_append(pick_view, render_view, 0);
+		phalcon_array_append(pick_view, render_view, PH_COPY);
 		if (Z_TYPE_P(layout) != IS_NULL) {
-			phalcon_array_append(pick_view, layout, 0);
+			phalcon_array_append(pick_view, layout, PH_COPY);
 		}
 	}
 	phalcon_update_property_this(getThis(), SL("_pickView"), pick_view);
@@ -1888,7 +1888,7 @@ PHP_METHOD(Phalcon_Mvc_View, getRender){
 	if (Z_TYPE_P(config_callback) == IS_OBJECT) {
 		PHALCON_INIT_NVAR(params);
 		array_init_size(params, 1);
-		phalcon_array_append(params, view, 0);
+		phalcon_array_append(params, view, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&status, config_callback, params);
 	}
@@ -2062,7 +2062,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 			if (str_key) {
 				phalcon_array_update_string(cache_options, str_key, value, PH_COPY);
 			} else {
-				phalcon_array_update_long(cache_options, idx, value, 0);
+				phalcon_array_update_long(cache_options, idx, value, PH_COPY);
 			}
 
 		} ZEND_HASH_FOREACH_END();

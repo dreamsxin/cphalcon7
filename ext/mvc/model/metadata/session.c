@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, write){
 	PHALCON_INIT_VAR(prefix_key);
 	PHALCON_CONCAT_SV(prefix_key, "$PMM$", prefix);
 	_SESSION = phalcon_get_global(SL("_SESSION"));
-	phalcon_array_update_multi_2(_SESSION, prefix_key, key, data, 0);
+	phalcon_array_update_multi_2(_SESSION, prefix_key, key, data, PH_COPY);
 	
 	PHALCON_MM_RESTORE();
 }

@@ -254,7 +254,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, toArray){
 
 		PHALCON_CALL_METHOD(&current, getThis(), "current");
 		PHALCON_CALL_METHOD(&arr, current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
-		phalcon_array_append(records, arr, 0);
+		phalcon_array_append(records, arr, PH_COPY);
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 

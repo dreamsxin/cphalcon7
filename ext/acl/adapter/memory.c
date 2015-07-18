@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 	}
 
 	_roleInherits = phalcon_read_property(getThis(), SL("_roleInherits"), PH_NOISY);
-	phalcon_array_append_multi_2(_roleInherits, role_name, role_inherit_name, 0);
+	phalcon_array_append_multi_2(_roleInherits, role_name, role_inherit_name, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_roleInherits"), _roleInherits);
 	RETURN_MM_TRUE;
 }

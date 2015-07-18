@@ -151,11 +151,6 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	index = phalcon_read_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"));
 	assert(Z_TYPE_P(index) == IS_LONG);
 
-	if (Z_REFCOUNT_P(index) > 1) {
-		PHALCON_INIT_VAR(index);
-		separate_index = 1;
-	}
-
 	size   = Z_STRLEN_P(applied_format);
 	offset = 0;
 

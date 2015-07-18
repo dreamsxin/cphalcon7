@@ -1300,7 +1300,6 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 		array_init_size(engines, 1);
 		phalcon_array_update_str_string(engines, SL(".phtml"), phalcon_mvc_view_engine_php_ce->name, PH_COPY);
 		phalcon_update_property_this(getThis(), SL("_registeredEngines"), engines);
-		assert(Z_REFCOUNT_P(engines) > 1);
 		zval_ptr_dtor(engines);
 	}
 

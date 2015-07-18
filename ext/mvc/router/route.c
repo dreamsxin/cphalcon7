@@ -189,7 +189,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 
 	zval *pattern, *paths = NULL, *http_methods = NULL, *regex = NULL, *unique_id = NULL;
 	zval *route_id = NULL;
-	int separate = 0;
 
 	PHALCON_MM_GROW();
 
@@ -221,10 +220,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	 * Get the unique Id from the static member _uniqueId
 	 */
 	unique_id = phalcon_read_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId"));
-	if (Z_REFCOUNT_P(unique_id) > 1) {
-		PHALCON_INIT_VAR(unique_id);
-		separate = 1;
-	}
 
 	if (Z_TYPE_P(unique_id) == IS_NULL) {
 		ZVAL_LONG(unique_id, 0);
@@ -235,9 +230,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 
 	/* increment_function() will increment the value of the static property as well */
 	increment_function(unique_id);
-	if (separate) {
-		phalcon_update_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId"), unique_id);
-	}
+	phalcon_update_static_property_ce(phalcon_mvc_router_route_ce, SL("_uniqueId"), unique_id);
 
 	PHALCON_MM_RESTORE();
 }

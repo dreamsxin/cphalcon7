@@ -238,13 +238,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 			PHALCON_CALL_METHOD(NULL, getThis(), "loginternal", message_str, type, time, context);
 		} ZEND_HASH_FOREACH_END();
 
-		if (Z_REFCOUNT_P(queue) == 1 || Z_ISREF_P(queue)) {
-			zend_hash_clean(Z_ARRVAL_P(queue));
-		} else {
-			PHALCON_ALLOC_INIT_ZVAL(queue);
-			array_init(queue);
-			phalcon_update_property_this(getThis(), SL("_queue"), queue);
-		}
+		phalcon_update_property_empty_array(getThis(), SL("_queue"));
 
 		PHALCON_MM_RESTORE();
 	}

@@ -124,6 +124,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setIntermediate);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getIntermediate);
+PHP_METHOD(Phalcon_Mvc_Model_Query, getModels);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getSql);
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect);
@@ -225,6 +226,7 @@ static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, getBindTypes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setIntermediate, arginfo_phalcon_mvc_model_query_setintermediate, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getIntermediate, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, getModels, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getConnection, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getSql, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, _getSqlSelect, NULL, ZEND_ACC_PUBLIC)
@@ -5108,7 +5110,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	zval *bind_params = NULL, *bind_types = NULL, *use_rawsql = NULL, *unique_row;
 	zval *cache_options, *cache_key = NULL, *lifetime = NULL, *cache_service = NULL;
 	zval *dependency_injector, *cache = NULL, *frontend = NULL, *result = NULL, *is_fresh;
-	zval *prepared_result = NULL, *intermediate = NULL, *default_bind_params;
+	zval *prepared_result = NULL, *event_name = NULL, *intermediate = NULL, *default_bind_params;
 	zval *merged_params = NULL, *default_bind_types;
 	zval *merged_types = NULL, *type, *exception_message;
 	zval *value = NULL;
@@ -5132,12 +5134,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 		use_rawsql = &PHALCON_GLOBAL(z_false);
 	}
 
+	PHALCON_INIT_NVAR(event_name);
+	ZVAL_STRING(event_name, "query:beforeExecute");
+
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, merged_params);
+
 	cache_options = phalcon_read_property(getThis(), SL("_cacheOptions"), PH_NOISY);
 	cache_options_is_not_null = (Z_TYPE_P(cache_options) != IS_NULL); /* to keep scan-build happy */
 
 	unique_row = phalcon_read_property(getThis(), SL("_uniqueRow"), PH_NOISY);
 
-	/** 
+	/**
 	 * The statement is parsed from its PHQL string or a previously processed IR
 	 */
 	PHALCON_CALL_METHOD(&intermediate, getThis(), "parse");
@@ -5296,6 +5303,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			return;
 
 	}
+
+	PHALCON_INIT_NVAR(event_name);
+	ZVAL_STRING(event_name, "query:afterExecute");
+
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
 
 	/** 
 	 * We store the resultset in the cache if any
@@ -5516,6 +5528,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getIntermediate){
 
 
 	RETURN_MEMBER(getThis(), "_intermediate");
+}
+
+/**
+ * Returns the models of the PHQL statement
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, getModels){
+
+
+	RETURN_MEMBER(getThis(), "_models");
 }
 
 /**

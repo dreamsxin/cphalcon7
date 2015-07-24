@@ -173,25 +173,22 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
-	zval *model, *key = NULL, *table = NULL, *schema = NULL, *strategy = NULL, *class_name;
+	zval *model, *keyL, *table, *schema, *read_meta = NULL, *strategy = NULL, *class_name;
 	zval *meta_data = NULL, *prefix_key = NULL, *data = NULL, *model_metadata = NULL;
 	zval *exception_message, *dependency_injector;
-	zval *key_name, *column_map = NULL, *model_column_map = NULL;
+	zval *column_map = NULL, *model_column_map = NULL;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 3, &model, &key, &table, &schema);
+	phalcon_fetch_params(1, 4, 1, &model, &key, &table, &schema, &read_meta);
 
-	if (!key) {
-		key = &PHALCON_GLOBAL(z_null);
+	if (!read_meta) {
+		read_meta = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!table) {
-		table = &PHALCON_GLOBAL(z_null);
-	}
-
-	if (!schema) {
-		schema = &PHALCON_GLOBAL(z_null);
+	if (Z_TYPE_P(key) == IS_NULL) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The key is not valid");
+		return;
 	}
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
@@ -200,7 +197,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
 	PHALCON_INIT_VAR(class_name);
 	phalcon_get_class(class_name, model, 0);
-	if (Z_TYPE_P(key) != IS_NULL) {
+	if (zend_is_true(read_meta)) {
 		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 		if (!phalcon_array_isset(meta_data, key)) {
 
@@ -263,11 +260,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		RETURN_MM_NULL();
 	}
 
-	PHALCON_INIT_VAR(key_name);
-	phalcon_fast_strtolower(key_name, class_name);
-
 	column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
-	if (phalcon_array_isset(column_map, key_name)) {
+	if (phalcon_array_isset(column_map, key)) {
 		RETURN_MM_NULL();
 	}
 
@@ -280,7 +274,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 	 * Create the map key name
 	 */
 	PHALCON_INIT_NVAR(prefix_key);
-	PHALCON_CONCAT_SV(prefix_key, "map-", key_name);
+	PHALCON_CONCAT_SV(prefix_key, "map-", key);
 
 	/** 
 	 * Check if the meta-data is already in the adapter
@@ -307,7 +301,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 	/** 
 	 * Update the column map locally
 	 */
-	phalcon_update_property_array(getThis(), SL("_columnMap"), key_name, model_column_map);
+	phalcon_update_property_array(getThis(), SL("_columnMap"), key, model_column_map);
 
 	/** 
 	 * Write the data to the adapter
@@ -389,7 +383,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 
 	meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	if (!phalcon_array_isset(meta_data, key)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema);
+		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema, PHALCON_GLOBAL(z_true));
 		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	}
 
@@ -436,7 +430,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 	meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 
 	if (!phalcon_array_isset(meta_data, key)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema);
+		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema, PHALCON_GLOBAL(z_true));
 		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	}
 
@@ -496,7 +490,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 
 	meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	if (!phalcon_array_isset(meta_data, key)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema);
+		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema, PHALCON_GLOBAL(z_true));
 		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	} else if (!zend_is_true(replace)) {
 		PHALCON_OBS_VAR(arr);
@@ -539,7 +533,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 
-	zval *model, *key_name, *column_map = NULL;
+	zval *model, *table = NULL, *schema = NULL, *key, *column_map = NULL;
 	zval *data;
 
 	PHALCON_MM_GROW();
@@ -551,18 +545,27 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 		RETURN_MM();
 	}
 
-	PHALCON_INIT_VAR(key_name);
-	phalcon_get_class(key_name, model, 1);
+	PHALCON_CALL_METHOD(&table, model, "getsource");
+	PHALCON_CALL_METHOD(&schema, model, "getschema");
+
+	PHALCON_INIT_VAR(class_name);
+	phalcon_get_class(class_name, model, 1 TSRMLS_CC);
+
+	/** 
+	 * Unique key for map is created using class-name-schema-table
+	 */
+	PHALCON_INIT_VAR(key);
+	PHALCON_CONCAT_VSVV(key, class_name, "-", schema, table);
 
 	column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
-	if (!phalcon_array_isset(column_map, key_name)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model);
+	if (!phalcon_array_isset(column_map, key)) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema);
 
 		column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
 	}
 
 	PHALCON_OBS_VAR(data);
-	phalcon_array_fetch(&data, column_map, key_name, PH_NOISY);
+	phalcon_array_fetch(&data, column_map, key, PH_NOISY);
 
 	RETURN_CTOR(data);
 }
@@ -579,7 +582,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 
-	zval *model, *index, *key_name, *column_map = NULL;
+	zval *model, *index, *table = NULL, *schema = NULL, *key, *column_map = NULL;
 	zval *column_map_model, *attributes;
 
 	PHALCON_MM_GROW();
@@ -592,18 +595,27 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 		RETURN_MM();
 	}
 
-	PHALCON_INIT_VAR(key_name);
-	phalcon_get_class(key_name, model, 1);
+	PHALCON_CALL_METHOD(&table, model, "getsource");
+	PHALCON_CALL_METHOD(&schema, model, "getschema");
+
+	PHALCON_INIT_VAR(class_name);
+	phalcon_get_class(class_name, model, 1 TSRMLS_CC);
+
+	/** 
+	 * Unique key for map is created using class-name-schema-table
+	 */
+	PHALCON_INIT_VAR(key);
+	PHALCON_CONCAT_VSVV(key, class_name, "-", schema, table);
 
 	column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
-	if (!phalcon_array_isset(column_map, key_name)) {
-		PHALCON_CALL_SELF(NULL, "_initialize", model);
+	if (!phalcon_array_isset(column_map, key)) {
+		PHALCON_CALL_SELF(NULL, "_initialize", model, key, table, schema);
 
 		column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
 	}
 
 	PHALCON_OBS_VAR(column_map_model);
-	phalcon_array_fetch(&column_map_model, column_map, key_name, PH_NOISY);
+	phalcon_array_fetch(&column_map_model, column_map, key, PH_NOISY);
 
 	PHALCON_OBS_VAR(attributes);
 	phalcon_array_fetch(&attributes, column_map_model, index, PH_NOISY);

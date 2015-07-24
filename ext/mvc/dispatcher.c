@@ -304,18 +304,19 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
  * phalcon_dispatcher_fire_event() first
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException){
+	zval *exception, event_name;
 
-	zval *exception, *events_manager, *event_name;
+	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, &exception);
+	phalcon_fetch_params(1, 1, 0, &exception);
 
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
-	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_ALLOC_INIT_ZVAL(event_name);
-		ZVAL_STRING(event_name, "dispatch:beforeException");
+	ZVAL_STRING(&event_name, "dispatch:beforeException", 1);
 
-		PHALCON_RETURN_CALL_METHODW(events_manager, "fire", event_name, getThis(), exception);
-	}
+	ZVAL_MAKE_REF(exception);
+	PHALCON_RETURN_CALL_METHOD(this_ptr, "fireevent", &event_name, exception);
+	ZVAL_UNREF(exception);
+
+	RETURN_MM();
 }
 
 /**

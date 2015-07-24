@@ -1522,15 +1522,12 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/** 
 	 * Call beforeRender if there is an events manager
 	 */
-	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+	PHALCON_INIT_NVAR(event_name);
+	ZVAL_STRING(event_name, "view:beforeRender");
 
-		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "view:beforeRender");
-
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis());
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_MM_FALSE;
-		}
+	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", event_name);
+	if (PHALCON_IS_FALSE(status)) {
+		RETURN_MM_FALSE;
 	}
 
 	/** 
@@ -1673,11 +1670,9 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/** 
 	 * Call afterRender event
 	 */
-	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "view:afterRender");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis());
-	}
+	PHALCON_INIT_NVAR(event_name);
+	ZVAL_STRING(event_name, "view:afterRender");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
 
 	RETURN_THIS();
 }

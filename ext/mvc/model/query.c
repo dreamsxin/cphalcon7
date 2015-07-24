@@ -4662,8 +4662,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
 	PHALCON_CALL_METHOD(NULL, query, "settype", type_select);
 	PHALCON_CALL_METHOD(NULL, query, "setintermediate", select_ir);
-
-	PHALCON_RETURN_CALL_METHOD(query, "execute", bind_params, bind_types);
+	PHALCON_CALL_METHOD(NULL, query, "setbindparams", bind_params);
+	PHALCON_CALL_METHOD(NULL, query, "setbindtypes", bind_types);
+	PHALCON_RETURN_CALL_METHOD(query, "execute");
 	PHALCON_MM_RESTORE();
 }
 
@@ -5380,13 +5381,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getSingleResult){
 	/** 
 	 * The query is already programmed to return just one row
 	 */
+	PHALCON_CALL_METHOD(&result, getThis(), "execute", bind_params, bind_types);
+
 	if (zend_is_true(unique_row)) {
-		PHALCON_RETURN_CALL_METHOD(getThis(), "execute", bind_params, bind_types);
 		RETURN_MM();
 	}
 
-	PHALCON_CALL_METHOD(&result, getThis(), "execute", bind_params, bind_types);
-	PHALCON_CALL_METHOD(&first_result, result, "getfirst"); /* @todo is this correct? */
+	PHALCON_CALL_METHOD(&first_result, result, "getfirst");
 
 	RETURN_CCTOR(first_result);
 }

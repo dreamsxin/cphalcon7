@@ -5320,9 +5320,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	PHALCON_INIT_NVAR(event_name);
 	ZVAL_STRING(event_name, "query:afterExecute");
 
-	ZVAL_MAKE_REF(builder);
+	ZVAL_MAKE_REF(result);
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, result);
-	ZVAL_UNREF(module_name);
+	ZVAL_UNREF(result);
 
 	/** 
 	 * We store the resultset in the cache if any

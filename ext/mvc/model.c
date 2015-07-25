@@ -3863,22 +3863,20 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSave){
 PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 
 	zval *meta_data, *connection, *table, *identity_field;
-	zval *null_value, *bind_skip, *fields, *values;
+	zval *bind_skip, *fields, *values;
 	zval *bind_types, *attributes = NULL, *bind_data_types = NULL;
 	zval *automatic_attributes = NULL, *column_map = NULL, *field = NULL;
 	zval *attribute_field = NULL, *exception_message = NULL;
 	zval *value = NULL, *bind_type = NULL, *default_value = NULL, *use_explicit_identity = NULL;
 	zval *success = NULL, *sequence_name = NULL, *support_sequences = NULL;
 	zval *schema = NULL, *source = NULL, *last_insert_id = NULL;
-	zval *not_null = NULL, *default_values = NULL, *data_types = NULL, *field_type = NULL;
+	zval *not_null_attributes = NULL, *default_values = NULL, *data_types = NULL, *field_type = NULL;
 	zval *convert_value = NULL;
 	int identity_field_is_not_false; /* scan-build insists on using flags */
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 4, 0, &meta_data, &connection, &table, &identity_field);
-
-	null_value = &PHALCON_GLOBAL(z_null);
 
 	PHALCON_INIT_VAR(bind_skip);
 	ZVAL_LONG(bind_skip, 1024);
@@ -3895,7 +3893,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	PHALCON_CALL_METHOD(&attributes, meta_data, "getattributes", getThis());
 	PHALCON_CALL_METHOD(&bind_data_types, meta_data, "getbindtypes", getThis());
 	PHALCON_CALL_METHOD(&automatic_attributes, meta_data, "getautomaticcreateattributes", getThis());
-	PHALCON_CALL_METHOD(&not_null, meta_data, "getnotnullattributes", getThis());
+	PHALCON_CALL_METHOD(&not_null_attributes, meta_data, "getnotnullattributes", getThis());
 	PHALCON_CALL_METHOD(&default_values, meta_data, "getdefaultvalues", getThis());
 	PHALCON_CALL_METHOD(&data_types, meta_data, "getdatatypes", getThis());
 
@@ -3944,38 +3942,47 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 					}
 
 					value = phalcon_read_property_zval(getThis(), attribute_field, PH_NOISY);
+				} else {
+					value = &PHALCON_GLOBAL(z_null);
+				}
 
-					if (Z_TYPE_P(value) != IS_NULL || !phalcon_fast_in_array(field, not_null) || !phalcon_array_isset(default_values, field)) {
+				if (Z_TYPE_P(value) == IS_NULL) {
+					if (PHALCON_GLOBAL(orm).not_null_validations) {
+						if (!phalcon_fast_in_array(field, not_null_attributes)) { // Allow null value
+							phalcon_array_append(fields, field, PH_COPY);
+							phalcon_array_append(values, &PHALCON_GLOBAL(z_null), PH_COPY);
+							phalcon_array_append(bind_types, bind_skip, PH_COPY);
+						} else if (!phalcon_array_isset(default_values, field)) { // Has default value
+							phalcon_array_append(fields, field, PH_COPY);
+							phalcon_array_append(values, &PHALCON_GLOBAL(z_null), PH_COPY);
+							phalcon_array_append(bind_types, bind_skip, PH_COPY);
+						}
+					}
+				} else {
+					if (PHALCON_GLOBAL(orm).enable_auto_convert) {
+						if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
+							PHALCON_OBS_NVAR(field_type);
+							phalcon_array_fetch(&field_type, data_types, field, PH_NOISY);
 
-						if (PHALCON_GLOBAL(orm).enable_auto_convert) {
-							if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
-								PHALCON_OBS_NVAR(field_type);
-								phalcon_array_fetch(&field_type, data_types, field, PH_NOISY);
-
-								if (phalcon_is_equal_long(field_type, PHALCON_DB_COLUMN_TYPE_JSON)) {
-									PHALCON_INIT_NVAR(convert_value);
-									RETURN_MM_ON_FAILURE(phalcon_json_encode(convert_value, value, 0));
-								} else {
-									PHALCON_CPY_WRT(convert_value, value);
-								}
+							if (phalcon_is_equal_long(field_type, PHALCON_DB_COLUMN_TYPE_JSON)) {
+								PHALCON_INIT_NVAR(convert_value);
+								RETURN_MM_ON_FAILURE(phalcon_json_encode(convert_value, value, 0));
 							} else {
 								PHALCON_CPY_WRT(convert_value, value);
 							}
 						} else {
 							PHALCON_CPY_WRT(convert_value, value);
 						}
-
-						phalcon_array_append(fields, field, PH_COPY);
-						phalcon_array_append(values, convert_value, PH_COPY);
-
-						PHALCON_OBS_NVAR(bind_type);
-						phalcon_array_fetch(&bind_type, bind_data_types, field, PH_NOISY);
-						phalcon_array_append(bind_types, bind_type, PH_COPY);
+					} else {
+						PHALCON_CPY_WRT(convert_value, value);
 					}
-				} else if (!phalcon_fast_in_array(field, not_null) || !phalcon_array_isset(default_values, field)) {
+
 					phalcon_array_append(fields, field, PH_COPY);
-					phalcon_array_append(values, null_value, PH_COPY);
-					phalcon_array_append(bind_types, bind_skip, PH_COPY);
+					phalcon_array_append(values, convert_value, PH_COPY);
+
+					PHALCON_OBS_NVAR(bind_type);
+					phalcon_array_fetch(&bind_type, bind_data_types, field, PH_NOISY);
+					phalcon_array_append(bind_types, bind_type, PH_COPY);
 				}
 			}
 		}

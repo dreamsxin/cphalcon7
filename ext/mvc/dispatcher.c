@@ -310,10 +310,10 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException){
 
 	phalcon_fetch_params(1, 1, 0, &exception);
 
-	ZVAL_STRING(&event_name, "dispatch:beforeException", 1);
+	ZVAL_STRING(&event_name, "dispatch:beforeException");
 
 	ZVAL_MAKE_REF(exception);
-	PHALCON_RETURN_CALL_METHOD(this_ptr, "fireevent", &event_name, exception);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "fireevent", &event_name, exception);
 	ZVAL_UNREF(exception);
 
 	RETURN_MM();

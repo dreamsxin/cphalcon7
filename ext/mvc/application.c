@@ -304,7 +304,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Call boot event, this allows the developer to perform initialization actions */
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "application:boot", 1);
+	ZVAL_STRING(event_name, "application:boot");
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", event_name);
 	if (PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	 */
 	if (zend_is_true(module_name)) {		
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "application:beforeStartModule", 1);
+		ZVAL_STRING(event_name, "application:beforeStartModule");
 
 		ZVAL_MAKE_REF(module_name);
 		PHALCON_CALL_METHOD(&status, getThis(), "fireevent", event_name, module_name);
@@ -411,7 +411,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 
 		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "application:afterStartModule", 1);
+		ZVAL_STRING(event_name, "application:afterStartModule");
 
 		ZVAL_MAKE_REF(module_name);
 		PHALCON_CALL_METHOD(&status, getThis(), "fireevent", event_name, module_name);
@@ -472,7 +472,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Calling beforeHandleRequest */
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "application:beforeHandleRequest", 1);
+	ZVAL_STRING(event_name, "application:beforeHandleRequest");
 
 	ZVAL_MAKE_REF(dispatcher);
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", event_name, dispatcher);
@@ -487,7 +487,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Calling afterHandleRequest */
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "application:afterHandleRequest", 1);
+	ZVAL_STRING(event_name, "application:afterHandleRequest");
 
 	ZVAL_MAKE_REF(controller);
 	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name, controller);
@@ -531,7 +531,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				 * This allows to make a custom view render
 				 */
 				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "application:beforeRenderView", 1);
+				ZVAL_STRING(event_name, "application:beforeRenderView");
 
 				ZVAL_MAKE_REF(view);
 				PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name, view);
@@ -557,7 +557,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				}
 
 				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "application:afterRenderView", 1);
+				ZVAL_STRING(event_name, "application:afterRenderView");
 
 				ZVAL_MAKE_REF(view);
 				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, view);
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Calling beforeSendResponse */
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "application:beforeSendResponse", 1);
+	ZVAL_STRING(event_name, "application:beforeSendResponse");
 
 	ZVAL_MAKE_REF(response);
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", event_name, response);
@@ -601,7 +601,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(NULL, response, "sendcookies");
 
 	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "application:afterSendResponse", 1);
+	ZVAL_STRING(event_name, "application:afterSendResponse");
 
 	ZVAL_MAKE_REF(response);
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, response);

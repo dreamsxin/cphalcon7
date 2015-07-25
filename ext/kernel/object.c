@@ -1172,7 +1172,6 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 		zval **params_ptr, **params_arr = NULL;
 
 		if (param_count > 0) {
-			HashPosition pos;
 			zval *item;
 			int i = 0;
 

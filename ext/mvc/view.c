@@ -1340,8 +1340,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	zval *controller_name, *action_name, *params = NULL, *namespace_name = NULL, *view_model = NULL;
 	zval *disabled, *contents = NULL, *model_content = NULL, *layouts_dir = NULL, *layout, *enable_namespace_view, *lower_case;
 	zval *layout_name = NULL, *layout_namespace = NULL, *engines = NULL, *pick_view, *render_view = NULL;
-	zval *pick_view_action;
-	zval *events_manager, *event_name = NULL, *status = NULL;
+	zval *pick_view_action, *event_name = NULL, *status = NULL;
 	zval *silence = NULL, *disabled_levels, *render_level, *enable_layouts_absolute_path;
 	zval *templates_before, *template_before = NULL;
 	zval *view_temp_path = NULL, *templates_after, *template_after = NULL, *main_view;
@@ -1516,8 +1515,6 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 			PHALCON_CPY_WRT(layout_name, pick_view_action);
 		}
 	}
-
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 
 	/** 
 	 * Call beforeRender if there is an events manager

@@ -1663,7 +1663,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	zval *parameters = NULL, *auto_create = NULL, *model_name, *params = NULL, *builder = NULL;
-	zval *query = NULL, *cache, *event_name = NULL, tmp;
+	zval *query = NULL, *cache, *event_name = NULL;
 	zval *dependency_injector = NULL, *service_name, *has = NULL, *service_params, *manager = NULL, *model = NULL;
 	zval *result = NULL, *hydration = NULL;
 

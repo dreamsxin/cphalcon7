@@ -149,8 +149,6 @@ int phalcon_call_zval_func_aparams(zval **retval_ptr, zval *func, uint param_cou
 	return status;
 }
 
-
-
 int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend_class_entry *ce, phalcon_call_type type, zval *method, uint param_count, zval *params[])
 {
 	zval func;
@@ -244,15 +242,17 @@ int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *
 		return FAILURE;
 	}
 
-	param_count = params ? zend_hash_num_elements(Z_ARRVAL_P(params)) : NULL;
-	arguments = params ? emalloc(sizeof(zval) * param_count) : NULL;
-
 	if (params) {
+		param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
+		arguments = (zval*)emalloc(sizeof(zval) * param_count);
 		i = 0;
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
 			ZVAL_ZVAL(&arguments[i], param, 1, 0);
 			i++;
 		} ZEND_HASH_FOREACH_END();
+	} else {
+		param_count = 0;
+		arguments = NULL;
 	}
 
 	if ((status = phalcon_call_user_function2(retval_ptr, object, Z_OBJCE_P(object), phalcon_fcall_method, &func, param_count, arguments)) == FAILURE) {
@@ -270,15 +270,18 @@ int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 		status = FAILURE;
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
 	} else {
-		param_count = params ? zend_hash_num_elements(Z_ARRVAL_P(params)) : 0;
-		arguments = params ? emalloc(sizeof(zval) * param_count) : NULL;
 
 		if (params) {
+			param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
+			arguments = (zval*)emalloc(sizeof(zval) * param_count);
 			i = 0;
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
 				ZVAL_COPY(&arguments[i], param);
 				i++;
 			} ZEND_HASH_FOREACH_END();
+		} else {
+			param_count = 0;
+			arguments = NULL;
 		}
 
 		if ((status = call_user_function(EG(function_table), NULL, handler, &retval, param_count, arguments)) == FAILURE || EG(exception)) {

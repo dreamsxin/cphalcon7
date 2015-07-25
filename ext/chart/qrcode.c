@@ -740,7 +740,7 @@ static zbar_image_t *_php_zbarcode_get_page(MagickWand *wand)
 
 static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t *image, zend_bool extended, zval *return_array)
 {
-	zval *params[3], *fromtext = NULL, totext, *from = NULL, *to = NULL, *symbol_array = NULL, *loc_array = NULL, *coords = NULL;
+	zval *params[3], *fromtext = NULL, *totext = NULL, *from = NULL, *to = NULL, *symbol_array = NULL, *loc_array = NULL, *coords = NULL;
 	const zbar_symbol_t *symbol;
 
 	PHALCON_MM_GROW();
@@ -790,7 +790,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 			if (result) {
 				RETURN_MM();
 			}
-			phalcon_array_update_str(symbol_array, SL("data"), &totext, PH_COPY);                
+			phalcon_array_update_str(symbol_array, SL("data"), totext, PH_COPY);                
         } else {
 			phalcon_array_update_str_str(symbol_array, SL("data"), (char *)data, strlen(data), PH_COPY);
 		}
@@ -848,8 +848,8 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 		e = Z_LVAL_P(enhance);
 	}
 
-	if (extended && Z_TYPE_P(extended) == IS_LONG) {
-		ext = Z_BVAL_P(extended);
+	if (extended && Z_TYPE_P(extended) == IS_TRUE) {
+		ext = 1;
 	}
 
 	magick_wand = NewMagickWand();

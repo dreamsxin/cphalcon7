@@ -607,7 +607,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		PHALCON_CALL_METHOD(&real_uri, getThis(), "getrewriteuri");
 	} else {
-		real_uri = uri;
+		PHALCON_CPY_WRT(real_uri, uri);
 	}
 
 	/**
@@ -648,7 +648,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	PHALCON_INIT_NVAR(event_name);
 	ZVAL_STRING(event_name, "router:beforeCheckRoutes");
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+	ZVAL_MAKE_REF(handled_uri);
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, handled_uri);
+	ZVAL_UNREF(handled_uri);
 
 	/**
 	 * Routes are traversed in reversed order
@@ -773,7 +775,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			PHALCON_INIT_NVAR(event_name);
 			ZVAL_STRING(event_name, "router:matchedRoute");
 
+			ZVAL_MAKE_REF(route);
 			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, route);
+			ZVAL_UNREF(route);
 
 			PHALCON_CALL_METHOD(&before_match, route, "getbeforematch");
 			if (Z_TYPE_P(before_match) != IS_NULL) {
@@ -878,7 +882,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			PHALCON_INIT_NVAR(event_name);
 			ZVAL_STRING(event_name, "router:notMatchedRoute");
 
+			ZVAL_MAKE_REF(route);
 			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, route);
+			ZVAL_UNREF(route);
 		}
 	} ZEND_HASH_FOREACH_END();
 

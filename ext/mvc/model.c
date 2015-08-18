@@ -4289,6 +4289,9 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	 * If there is no fields to update we return true
 	 */
 	if (!phalcon_fast_count_ev(fields)) {
+		if (PHALCON_GLOBAL(orm).enable_strict) {
+			RETURN_MM_FALSE;
+		}
 		RETURN_MM_TRUE;
 	}
 
@@ -5275,10 +5278,20 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		PHALCON_CPY_WRT(table, source);
 	}
 
+	PHALCON_CALL_METHOD(NULL, write_connection, "begin", &PHALCON_GLOBAL(z_false));
+
 	/**
 	 * Do the deletion
 	 */
 	PHALCON_CALL_METHOD(&success, write_connection, "delete", table, delete_conditions, values, bind_types);
+	if (zend_is_true(success)) {
+		if (PHALCON_GLOBAL(orm).enable_strict) {
+			PHALCON_CALL_METHOD(&success, write_connection, "affectedrows");
+			if (!zend_is_true(success)) {
+				RETURN_MM_FALSE;
+			}
+		}
+	}
 
 	/**
 	 * Check if there is virtual foreign keys with cascade action
@@ -5286,9 +5299,12 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	if (PHALCON_GLOBAL(orm).virtual_foreign_keys) {
 		PHALCON_CALL_METHOD(&check_foreign_keys, getThis(), "_checkforeignkeysreversecascade");
 		if (PHALCON_IS_FALSE(check_foreign_keys)) {
+			PHALCON_CALL_METHOD(NULL, write_connection, "rollback", &PHALCON_GLOBAL(z_false));
 			RETURN_MM_FALSE;
 		}
 	}
+
+	PHALCON_CALL_METHOD(NULL, write_connection, "commit", &PHALCON_GLOBAL(z_false));
 
 	/**
 	 * Force perform the record existence checking again
@@ -7280,6 +7296,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
  * phqlLiterals          — Enables/Disables literals in PHQL this improves the security of applications
  * propertyMethod        — Enables/Disables property method
  * autoConvert           — Enables/Disables auto convert
+ * strict                — Enables/Disables strict mode
  *
  * @param array $options
  */
@@ -7289,6 +7306,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	zval *column_renaming, *not_null_validations, *length_validations;
 	zval *exception_on_failed_save, *phql_literals;
 	zval *phql_cache, *property_method, *auto_convert, *allow_update_primary;
+	zval *enable_strict;
 
 	PHALCON_MM_GROW();
 
@@ -7396,6 +7414,15 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 		PHALCON_OBS_VAR(allow_update_primary);
 		phalcon_array_fetch_str(&allow_update_primary, options, SL("allowUpdatePrimary"), PH_NOISY);
 		PHALCON_GLOBAL(orm).allow_update_primary = zend_is_true(allow_update_primary);
+	}
+
+	/**
+	 * Enables/Disables strict mode
+	 */
+	if (phalcon_array_isset_str(options, SL("strict"))) {
+		PHALCON_OBS_VAR(enable_strict);
+		phalcon_array_fetch_str(&enable_strict, options, SL("strict"), PH_NOISY);
+		PHALCON_GLOBAL(orm).enable_strict = zend_is_true(enable_strict);
 	}
 
 	PHALCON_MM_RESTORE();

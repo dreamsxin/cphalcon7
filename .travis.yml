@@ -3,7 +3,7 @@ language:
   - c
 
 php:
-  - 7.0
+  - nightly
 
 services:
   - mongodb

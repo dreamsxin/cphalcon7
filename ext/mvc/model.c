@@ -5319,9 +5319,10 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		PHALCON_INIT_NVAR(event_name);
 		ZVAL_STRING(event_name, "afterOperation");
 		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		RETURN_MM_TRUE;
 	}
 
-	RETURN_CTOR(success);
+	RETURN_MM_FALSE;
 }
 
 /**
@@ -7563,7 +7564,11 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 		PHALCON_CALL_METHOD(&success, write_connection, "affectedRows");
 	}
 
-	RETURN_CTOR(success);
+	if (zend_is_true(success)) {
+		RETURN_MM_TRUE;
+	}
+
+	RETURN_MM_FALSE;
 }
 
 /*

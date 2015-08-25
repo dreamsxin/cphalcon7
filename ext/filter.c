@@ -192,17 +192,17 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		norecursive = &PHALCON_GLOBAL(z_false);
 	}
 	
-	/** 
+	/**
 	 * Apply an array of filters
 	 */
-	if (Z_TYPE_P(filters) == IS_ARRAY) { 
+	if (Z_TYPE_P(filters) == IS_ARRAY) {
 		PHALCON_CPY_WRT(new_value, value);
-		if (Z_TYPE_P(value) != IS_NULL) {	
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(filters), filter) {	
+		if (Z_TYPE_P(value) != IS_NULL) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(filters), filter) {
 				/** 
 				 * If the value to filter is an array we apply the filters recursively
 				 */
-				if (Z_TYPE_P(new_value) == IS_ARRAY && !zend_is_true(norecursive)) { 
+				if (Z_TYPE_P(new_value) == IS_ARRAY && !zend_is_true(norecursive)) {
 					PHALCON_INIT_NVAR(array_value);
 					array_init(array_value);
 

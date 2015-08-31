@@ -68,14 +68,19 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction_Failed){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Failed, __construct){
 
-	zval *message, *record;
+	zval *message, *record, *code = NULL;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &message, &record);
+	phalcon_fetch_params(1, 2, 1, &message, &record, &code);
+
+	if (!code) {
+		code = &PHALCON_GLOBAL(z_zero);
+	}
 
 	phalcon_update_property_this(getThis(), SL("_record"), record);
-	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_transaction_failed_ce, getThis(), "__construct", message);
+
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_transaction_failed_ce, getThis(), "__construct", message, code);
 
 	PHALCON_MM_RESTORE();
 }

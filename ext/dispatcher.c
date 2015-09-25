@@ -504,9 +504,9 @@ PHP_METHOD(Phalcon_Dispatcher, setFinished){
 	phalcon_fetch_params(0, 1, 0, &finished);
 
 	if (PHALCON_IS_TRUE(finished)) {
-		phalcon_update_property_this(this_ptr, SL("_finished"), PHALCON_GLOBAL(z_true) TSRMLS_CC);
+		phalcon_update_property_this(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_true) TSRMLS_CC);
 	} else {
-		phalcon_update_property_this(this_ptr, SL("_finished"), PHALCON_GLOBAL(z_false) TSRMLS_CC);
+		phalcon_update_property_this(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false) TSRMLS_CC);
 	}
 }
 

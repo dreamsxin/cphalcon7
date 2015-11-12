@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			/**
 			 * Numeric
 			 */
-			if (phalcon_memnstr_str(column_type, SL("numeric"))) {
+			if (phalcon_memnstr_str(column_type, SL("numeric")) || phalcon_memnstr_str(column_type, SL("double"))) {
 				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DECIMAL, 0);
 				phalcon_array_update_str_bool(definition, SL("isNumeric"), 1, 0);
 				if (phalcon_is_numeric(numeric_size)) {

@@ -577,7 +577,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 
 		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "db:beforeQuery");
+		ZVAL_STRING(event_name, "db:beforeExecute");
 		phalcon_update_property_this(getThis(), SL("_sqlStatement"), sql_statement);
 		phalcon_update_property_this(getThis(), SL("_sqlVariables"), bind_params);
 		phalcon_update_property_this(getThis(), SL("_sqlBindTypes"), bind_types);
@@ -617,7 +617,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		phalcon_update_property_this(getThis(), SL("_affectedRows"), affected_rows);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "db:afterQuery");
+			ZVAL_STRING(event_name, "db:afterExecute");
 			PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis(), bind_params);
 		}
 	}

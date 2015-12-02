@@ -1833,6 +1833,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	}
 
 	if (PHALCON_IS_FALSE(mode)){
+		PHALCON_INIT_NVAR(attribute_field);
+		ZVAL_STRING(attribute_field, "_id");
+
+		PHALCON_CALL_SELF(&id, "getidstring");
+		phalcon_array_update_zval(data, attribute_field, id, PH_COPY);
 		ZVAL_STRING(&func, "save");
 	} else {
 		ZVAL_STRING(&func, "insert");

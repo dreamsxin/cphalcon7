@@ -1390,7 +1390,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getGroupBy){
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	zval *dependency_injector = NULL, *models, *conditions = NULL, *distinct;
-	zval *model = NULL, *phql, *columns;
+	zval *model = NULL, *model_instance, *phql, *columns;
 	zval *selected_columns = NULL, *column = NULL;
 	zval *aliased_column = NULL, *joined_columns = NULL;
 	zval *selected_column = NULL, *selected_models;
@@ -1401,6 +1401,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	zval *order_items, *order_item = NULL, *limit, *number, *for_update;
 	zend_string *str_key;
 	ulong idx;
+	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
 
@@ -1420,6 +1421,40 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	} else if (!zend_is_true(models)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
 		return;
+	}
+
+	if (Z_TYPE_P(models) == IS_ARRAY) { 
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(models), idx, str_key, model) {
+			zval model_alias;
+			if (str_key) {
+				ZVAL_STR(&model_alias, str_key);
+			} else {
+				ZVAL_LONG(&model_alias, idx);
+			}
+	
+			ce0 = phalcon_fetch_class(model TSRMLS_CC);
+
+			if (phalcon_method_exists_ce_ex(ce0, SS("beforequery") TSRMLS_CC) == SUCCESS) {
+				PHALCON_INIT_NVAR(model_instance);
+				object_init_ex(model_instance, ce0);
+				if (phalcon_has_constructor(model_instance TSRMLS_CC)) {
+					PHALCON_CALL_METHOD(NULL, model_instance, "__construct", dependency_injector);
+				}
+
+				PHALCON_CALL_METHOD(NULL, model_instance, "beforequery", getThis(), &model_alias);
+			}
+		} ZEND_HASH_FOREACH_END();
+	} else {
+		ce0 = phalcon_fetch_class(models TSRMLS_CC);
+		if (phalcon_method_exists_ce_ex(ce0, SS("beforequery") TSRMLS_CC) == SUCCESS) {
+			PHALCON_INIT_VAR(model_instance);
+			object_init_ex(model_instance, ce0);
+			if (phalcon_has_constructor(model_instance TSRMLS_CC)) {
+				PHALCON_CALL_METHOD(NULL, model_instance, "__construct", dependency_injector);
+			}
+
+			PHALCON_CALL_METHOD(NULL, model_instance, "beforequery", getThis());
+		}
 	}
 
 	PHALCON_CALL_SELF(&conditions, "getConditions");

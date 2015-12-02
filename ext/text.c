@@ -45,6 +45,8 @@ PHP_METHOD(Phalcon_Text, upper);
 PHP_METHOD(Phalcon_Text, bytes);
 PHP_METHOD(Phalcon_Text, reduceSlashes);
 PHP_METHOD(Phalcon_Text, concat);
+PHP_METHOD(Phalcon_Text, underscore);
+PHP_METHOD(Phalcon_Text, humanize);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_camelize, 0, 0, 1)
 	ZEND_ARG_INFO(0, str)
@@ -540,4 +542,64 @@ PHP_METHOD(Phalcon_Text, concat){
 	PHALCON_CONCAT_VVV(tmp, a_trimmed, separator, b_trimmed)
 
 	RETURN_CTOR(tmp);
+}
+
+/**
+ * Makes a phrase underscored instead of spaced
+ *
+ * <code>
+ *   echo Phalcon\Text::underscore('look behind'); // 'look_behind'
+ *   echo Phalcon\Text::underscore('Awesome Phalcon'); // 'Awesome_Phalcon'
+ * </code>
+ */
+PHP_METHOD(Phalcon_Text, underscore){
+
+	zval *str, *trimmed, *pattern, *replacement;
+
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 0, &str);
+
+	PHALCON_INIT_VAR(trimmed);
+	ZVAL_STR(trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
+
+	PHALCON_INIT_VAR(pattern);
+	ZVAL_STRING(pattern, "#\\s+#");
+
+	PHALCON_INIT_VAR(replacement);
+	ZVAL_STRING(replacement, "_");
+
+	PHALCON_RETURN_CALL_FUNCTION("preg_replace", pattern, replacement, trimmed);
+
+	RETURN_MM();
+}
+
+/**
+ * Makes an underscored or dashed phrase human-readable
+ *
+ * <code>
+ *   echo Phalcon\Text::humanize('start-a-horse'); // 'start a horse'
+ *   echo Phalcon\Text::humanize('five_cats'); // 'five cats'
+ * </code>
+ */
+PHP_METHOD(Phalcon_Text, humanize){
+
+	zval *str, *trimmed, *pattern, *replacement;
+
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 1, 0, &str);
+
+	PHALCON_INIT_VAR(trimmed);
+	ZVAL_STR(trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
+
+	PHALCON_INIT_VAR(pattern);
+	ZVAL_STRING(pattern, "#[_-]+#");
+
+	PHALCON_INIT_VAR(replacement);
+	ZVAL_STRING(replacement, " ");
+
+	PHALCON_RETURN_CALL_FUNCTION("preg_replace", pattern, replacement, trimmed);
+
+	RETURN_MM();
 }

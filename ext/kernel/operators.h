@@ -123,4 +123,13 @@ int phalcon_less_equal_long(zval *op1, long op2);
 int phalcon_greater_equal(zval *op1, zval *op2);
 int phalcon_greater_equal_long(zval *op1, long op2);
 
+long phalcon_safe_mod_long_long(long op1, long op2);
+long phalcon_safe_mod_long_double(long op1, double op2);
+long phalcon_safe_mod_double_long(double op1, long op2);
+long phalcon_safe_mod_double_double(double op1, double op2);
+long phalcon_safe_mod_zval_long(zval *op1, long op2);
+long phalcon_safe_mod_zval_double(zval *op1, double op2);
+long phalcon_safe_mod_long_zval(long op1, zval *op2);
+long phalcon_safe_mod_double_zval(double op1, zval *op2);
+
 #endif /* PHALCON_KERNEL_OPERATORS_H */

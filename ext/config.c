@@ -172,14 +172,20 @@ PHP_METHOD(Phalcon_Config, val){
 	}
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array_config), idx, str_key, value) {
-		zval key;
+		zval key, instance;
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 		} else {
 			ZVAL_LONG(&key, idx);
 		}
 
-		PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, value);
+		if (Z_TYPE_P(value) == IS_ARRAY) {
+			object_init_ex(&instance, phalcon_config_ce);
+			PHALCON_CALL_METHODW(NULL, &instance, "__construct", value);
+			PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, &instance);
+		} else {
+			PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, value);
+		}
 	} ZEND_HASH_FOREACH_END();
 }
 

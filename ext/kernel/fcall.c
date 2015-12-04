@@ -80,12 +80,13 @@ int phalcon_call_user_function2(zval **retval_ptr, zval *object, zend_class_entr
 
 int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry *ce, phalcon_call_type type, zval *function_name, uint32_t param_count, zval *params[])
 {
+	zend_execute_data *execute_data  = EG(current_execute_data);
 	zval retval, *arguments;
 	HashTable *function_table;
 	int i, status;
 
 	if (type != phalcon_fcall_function && !object) {
-		object = &EG(current_execute_data)->This;
+		object = execute_data && Z_OBJ(execute_data->This) ? &execute_data->This : NULL;
 	}
 
 	if (!ce && object) {
@@ -102,7 +103,7 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 		i++;
 	}
 
-	if ((status = call_user_function(function_table, object, function_name, &retval, param_count, arguments)) == FAILURE || EG(exception)) {
+	if ((status = call_user_function_ex(function_table, object, function_name, &retval, param_count, arguments, 0, NULL TSRMLS_CC)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 	}
 
@@ -162,9 +163,17 @@ int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend
 	}
 	array_init_size(&func, 2);
 	switch (type) {
-		case phalcon_fcall_parent: add_next_index_str(&func, IS(parent)); break;
-		case phalcon_fcall_self:   assert(!ce); add_next_index_str(&func, IS(self)); break;
-		case phalcon_fcall_static: assert(!ce); add_next_index_str(&func, IS(static)); break;
+		case phalcon_fcall_parent:
+			add_next_index_str(&func, zend_string_copy(IS(parent)));
+			break;
+		case phalcon_fcall_self:
+			assert(!ce);
+			add_next_index_str(&func, zend_string_copy(IS(self)));
+			break;
+		case phalcon_fcall_static:
+			assert(!ce);
+			add_next_index_str(&func, zend_string_copy(IS(static)));
+			break;
 
 		case phalcon_fcall_ce:
 			assert(ce != NULL);
@@ -206,7 +215,8 @@ int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend
 		}
 	}
 
-	zval_ptr_dtor(&func);
+	zval_dtor(&func);
+
 	return status;
 }
 

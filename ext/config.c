@@ -178,7 +178,8 @@ PHP_METHOD(Phalcon_Config, val){
 		} else {
 			ZVAL_LONG(&key, idx);
 		}
-		PHALCON_CALL_SELFW(NULL, "offsetset", &key, value);
+
+		PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, value);
 	} ZEND_HASH_FOREACH_END();
 }
 
@@ -327,12 +328,8 @@ PHP_METHOD(Phalcon_Config, merge){
 				ZVAL_LONG(&tmp, idx);
 			}
 
-			active_value = phalcon_read_property_zval(getThis(), &tmp, PH_NOISY);
-
-			/**
-			 * The key is already defined in the object, we have to merge it
-			 */
-			if (active_value) {
+			if (phalcon_isset_property_zval(getThis(), &tmp)) {
+				active_value = phalcon_read_property_zval(getThis(), &tmp, PH_NOISY);
 				if ((Z_TYPE_P(value)  == IS_OBJECT || Z_TYPE_P(value) == IS_ARRAY) && Z_TYPE_P(active_value) == IS_OBJECT) {
 					if (phalcon_method_exists_ex(active_value, SL("merge")) == SUCCESS) { /* Path AAA in the test */
 						zval *params[] = { value };

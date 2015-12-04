@@ -144,18 +144,18 @@ ZEND_EXTERN_MODULE_GLOBALS(phalcon)
 extern zend_module_entry phalcon_module_entry;
 #define phpext_phalcon_ptr &phalcon_module_entry
 
-#define PHALCON_ALLOC_ZVAL(z)             \
-	(z) = (zval *) emalloc(sizeof(zval)); \
-
-#define PHALCON_ALLOC_INIT_ZVAL(z)        \
-	PHALCON_ALLOC_ZVAL(z);                \
-	INIT_ZVAL(*z);
-
 #define INIT_ZVAL(z) z = EG(uninitialized_zval);
 
+#define PHALCON_ALLOC_ZVAL(z) \
+	(z) = (zval *) emalloc(sizeof(zval)); \
+
+#define PHALCON_ALLOC_INIT_ZVAL(z) \
+	PHALCON_ALLOC_ZVAL(z); \
+	INIT_ZVAL(*z);
+
 #ifndef INIT_PZVAL
-#	define INIT_PZVAL(z)         \
-		Z_SET_REFCOUNT_P(z, 1);  \
+#	define INIT_PZVAL(z) \
+		Z_SET_REFCOUNT_P(z, 1); \
 		ZVAL_UNREF(z);
 #endif
 
@@ -167,7 +167,7 @@ extern zend_module_entry phalcon_module_entry;
 #endif
 
 #ifndef ZVAL_COPY_VALUE
-#	define ZVAL_COPY_VALUE(z, v)  \
+#	define ZVAL_COPY_VALUE(z, v) \
 		(z)->value  = (v)->value; \
 		Z_TYPE_P(z) = Z_TYPE_P(v);
 #endif

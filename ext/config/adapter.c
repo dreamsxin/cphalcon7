@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 	instances = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));
 	if (!phalcon_array_isset_fetch(&instance, instances, file_path)) {
 		PHALCON_INIT_VAR(class_name);
-		phalcon_get_called_class(class_name );
+		phalcon_get_called_class(class_name);
 		ce0 = phalcon_fetch_class(class_name);
 
 		object_init_ex(return_value, ce0);
@@ -178,7 +178,8 @@ PHP_METHOD(Phalcon_Config_Adapter, load){
 	phalcon_fetch_params(1, 0, 2, &file_path, &absolute_path);
 
 	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name );
+	phalcon_get_called_class(class_name);
+
 	ce0 = phalcon_fetch_class(class_name);
 
 	object_init_ex(return_value, ce0);
@@ -188,10 +189,10 @@ PHP_METHOD(Phalcon_Config_Adapter, load){
 			absolute_path = &PHALCON_GLOBAL(z_false);
 		}
 
-		PHALCON_RETURN_CALL_STATICW("factory", file_path, absolute_path);
+		PHALCON_RETURN_CALL_STATIC("factory", file_path, absolute_path);
 	} else {
-		PHALCON_RETURN_CALL_STATICW("factory");
+		PHALCON_RETURN_CALL_STATIC("factory");
 	}
 
-	PHALCON_MM_RESTORE();
+	RETURN_MM();
 }

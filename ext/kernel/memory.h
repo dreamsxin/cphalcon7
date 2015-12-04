@@ -26,11 +26,11 @@
 void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr);
 void phalcon_deinitialize_memory();
 
-/* Memory Frames */
-#ifndef PHALCON_RELEASE
-void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory);
-void phalcon_dump_current_frame();
-void phalcon_dump_all_frames();
+void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func) /* PHALCON_ATTR_NONNULL */;
+void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func);
+
+#define PHALCON_MEMORY_ALLOC(z) phalcon_memory_alloc((z), __func__)
+#define PHALCON_MEMORY_OBSERVE(z) phalcon_memory_observe((z), __func__)
 
 void ZEND_FASTCALL phalcon_memory_grow_stack(const char *func);
 int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func);
@@ -38,36 +38,11 @@ int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func);
 #define PHALCON_MM_GROW()       phalcon_memory_grow_stack(__func__)
 #define PHALCON_MM_RESTORE()    phalcon_memory_restore_stack(__func__)
 
-void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func) /* PHALCON_ATTR_NONNULL */;
-void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func);
-void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var, const char *func);
-
-#define PHALCON_MEMORY_ALLOC(z) \
-	phalcon_memory_alloc((z), __func__)
-
-#define PHALCON_MEMORY_ALLOC_PNULL(z) \
-	phalcon_memory_alloc_pnull((z), __func__)
-
-#define PHALCON_MEMORY_OBSERVE(z) \
-	phalcon_memory_observe((z), __func__)
-
-#else
-void ZEND_FASTCALL phalcon_memory_grow_stack();
-int ZEND_FASTCALL phalcon_memory_restore_stack();
-
-#define PHALCON_MM_GROW()       phalcon_memory_grow_stack()
-#define PHALCON_MM_RESTORE()    phalcon_memory_restore_stack()
-
-void ZEND_FASTCALL phalcon_memory_observe(zval **var) /* PHALCON_ATTR_NONNULL */;
-void ZEND_FASTCALL phalcon_memory_alloc(zval **var);
-void ZEND_FASTCALL phalcon_memory_alloc_pnull(zval **var);
-
-#define PHALCON_MEMORY_ALLOC(z) \
-	phalcon_memory_alloc((z))
-
-#define PHALCON_MEMORY_OBSERVE(z) \
-	phalcon_memory_observe((z))
-
+/* Memory Frames */
+#ifndef PHALCON_RELEASE
+void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory);
+void phalcon_dump_current_frame();
+void phalcon_dump_all_frames();
 #endif
 
 int ZEND_FASTCALL phalcon_clean_restore_stack();
@@ -95,13 +70,14 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 	do { \
 		if (z) { \
 			if (Z_REFCOUNTED_P(z)) { \
-				if (Z_REFCOUNT_P(z) > 1) { \
+				if (Z_REFCOUNT_P(z) <= 1) { \
+					zval_ptr_dtor(z); \
+				} else { \
 					Z_DELREF_P(z); \
-					PHALCON_ALLOC_INIT_ZVAL(z); \
 				} \
 			} \
 		} else { \
-			PHALCON_MEMORY_ALLOC(&z); \
+			PHALCON_INIT_VAR(z); \
 		} \
 	} while (0)
 
@@ -137,8 +113,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 #define PHALCON_OBS_NVAR(z) \
 	do { \
 		if (z) { \
-			if (Z_REFCOUNTED_P(z) \
-				&& Z_REFCOUNT_P(z) > 1) { \
+			if (Z_REFCOUNTED_P(z) && Z_REFCOUNT_P(z) > 1) { \
 				Z_DELREF_P(z); \
 			} else { \
 				zval_dtor(z); \
@@ -149,13 +124,17 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		} \
 	} while (0)
 
-#define PHALCON_OBSERVE_OR_NULLIFY_VAR(z) \
+#define PHALCON_OBSERVE_OR_NULLIFY_PPZV(ppzv) \
 	do { \
-		if (z) { \
-			zval_ptr_dtor(z); \
-			z = NULL; \
-		} else { \
-			PHALCON_MEMORY_OBSERVE(&z); \
+		zval ** restrict tmp_ = (ppzv); \
+		if (tmp_ != NULL) { \
+			if (*tmp_) { \
+				zval_ptr_dtor(*tmp_); \
+				*tmp_ = NULL; \
+			} \
+			else { \
+				PHALCON_MEMORY_OBSERVE((ppzv)); \
+			} \
 		} \
 	} while (0)
 

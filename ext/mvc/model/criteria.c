@@ -1335,7 +1335,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 	if (zend_hash_num_elements(Z_ARRVAL_P(data))) {
 
 		PHALCON_INIT_VAR(service);
-		ZVAL_STR(service, IS(modelsMetadata));
+		ZVAL_STRING(service, ISV(modelsMetadata));
 
 		PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(meta_data, phalcon_mvc_model_metadatainterface_ce);
@@ -1697,7 +1697,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 		 * using the related primary key
 		 */
 		PHALCON_INIT_VAR(service_name);
-		ZVAL_STR(service_name, IS(modelsMetadata));
+		ZVAL_STRING(service_name, ISV(modelsMetadata));
 
 		/** 
 		 * Get the models metadata service to obtain the column names, column map and
@@ -2147,7 +2147,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	}
 
 	PHALCON_INIT_VAR(service_name);
-	ZVAL_STR(service_name, IS(modelsMetadata));
+	ZVAL_STRING(service_name, ISV(modelsMetadata));
 
 	PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", service_name);
 	PHALCON_VERIFY_INTERFACE(meta_data, phalcon_mvc_model_metadatainterface_ce);
@@ -2360,7 +2360,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 		 * using the related primary key
 		 */
 		PHALCON_INIT_VAR(service_name);
-		ZVAL_STR(service_name, IS(modelsMetadata));
+		ZVAL_STRING(service_name, ISV(modelsMetadata));
 
 		/**
 		 * Get the models metadata service to obtain the column names, column map and

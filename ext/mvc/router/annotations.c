@@ -437,19 +437,19 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		is_route = 1;
 	} else if (PHALCON_IS_STRING(name, "Get")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(GET));
+		ZVAL_STRING(methods, ISV(GET));
 	} else if (PHALCON_IS_STRING(name, "Post")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(POST));
+		ZVAL_STRING(methods, ISV(POST));
 	} else if (PHALCON_IS_STRING(name, "Put")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(PUT));
+		ZVAL_STRING(methods, ISV(PUT));
 	} else if (PHALCON_IS_STRING(name, "Delete")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(DELETE));
+		ZVAL_STRING(methods, ISV(DELETE));
 	} else if (PHALCON_IS_STRING(name, "Options")) {
 		is_route = 1;
-		ZVAL_STR(methods, IS(OPTIONS));
+		ZVAL_STRING(methods, ISV(OPTIONS));
 	} else {
 		is_route = 0;
 	}
@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		}
 
 		PHALCON_INIT_NVAR(parameter);
-		ZVAL_STR(parameter, IS(name));
+		ZVAL_STRING(parameter, ISV(name));
 
 		PHALCON_CALL_METHOD(&route_name, annotation, "getargument", parameter);
 		if (Z_TYPE_P(route_name) == IS_STRING) {

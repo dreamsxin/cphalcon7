@@ -1891,7 +1891,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 		}
 
 		PHALCON_INIT_VAR(service_name);
-		ZVAL_STR(service_name, IS(modelsMetadata));
+		ZVAL_STRING(service_name, ISV(modelsMetadata));
 
 		PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
 		if (zend_is_true(has)) {

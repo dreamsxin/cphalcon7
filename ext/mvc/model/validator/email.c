@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Email, validate){
 		 * Check if the developer has defined a custom message
 		 */
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STR(option, IS(message));
+		ZVAL_STRING(option, ISV(message));
 	
 		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
 		if (!zend_is_true(message)) {
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Email, validate){
 		 * Is code set
 		 */
 		PHALCON_INIT_NVAR(option);
-		ZVAL_STR(option, IS(code));
+		ZVAL_STRING(option, ISV(code));
 
 		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
 		if (zend_is_true(is_set_code)) {

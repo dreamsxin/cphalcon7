@@ -311,7 +311,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	}
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STR(service, IS(router));
+	ZVAL_STRING(service, ISV(router));
 	PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(router, phalcon_mvc_routerinterface_ce);
 
@@ -451,7 +451,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(&exact, router, "isexactcontrollername");
 
 	PHALCON_INIT_NVAR(service);
-	ZVAL_STR(service, IS(dispatcher));
+	ZVAL_STRING(service, ISV(dispatcher));
 
 	PHALCON_CALL_METHOD(&dispatcher, dependency_injector, "getshared", service);
 	PHALCON_VERIFY_INTERFACE(dispatcher, phalcon_dispatcherinterface_ce);
@@ -509,7 +509,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			ZVAL_TRUE(returned_response);
 		} else {
 			PHALCON_INIT_NVAR(service);
-			ZVAL_STR(service, IS(response));
+			ZVAL_STRING(service, ISV(response));
 
 			PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);
@@ -566,7 +566,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 	} else {		
 		PHALCON_INIT_NVAR(service);
-		ZVAL_STR(service, IS(response));
+		ZVAL_STRING(service, ISV(response));
 
 		PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);

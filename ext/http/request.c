@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 					}
 
 					PHALCON_INIT_VAR(service);
-					ZVAL_STR(service, IS(filter));
+					ZVAL_STRING(service, ISV(filter));
 
 					PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 					PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
@@ -259,7 +259,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 			}
 
 			PHALCON_INIT_VAR(service);
-			ZVAL_STR(service, IS(filter));
+			ZVAL_STRING(service, ISV(filter));
 
 			PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
@@ -1202,7 +1202,7 @@ PHP_METHOD(Phalcon_Http_Request, isPost){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(post);
-	ZVAL_STR(post, IS(POST));
+	ZVAL_STRING(post, ISV(POST));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, method, post);
@@ -1227,7 +1227,7 @@ PHP_METHOD(Phalcon_Http_Request, isGet){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(get);
-	ZVAL_STR(get, IS(GET));
+	ZVAL_STRING(get, ISV(GET));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, method, get);
@@ -1252,7 +1252,7 @@ PHP_METHOD(Phalcon_Http_Request, isPut){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(put);
-	ZVAL_STR(put, IS(PUT));
+	ZVAL_STRING(put, ISV(PUT));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, method, put);
@@ -1277,7 +1277,7 @@ PHP_METHOD(Phalcon_Http_Request, isPatch){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(patch);
-	ZVAL_STR(patch, IS(PATCH));
+	ZVAL_STRING(patch, ISV(PATCH));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, method, patch);
@@ -1302,7 +1302,7 @@ PHP_METHOD(Phalcon_Http_Request, isHead){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(head);
-	ZVAL_STR(head, IS(HEAD));
+	ZVAL_STRING(head, ISV(HEAD));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, method, head);
@@ -1327,7 +1327,7 @@ PHP_METHOD(Phalcon_Http_Request, isDelete){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(delete);
-	ZVAL_STR(delete, IS(DELETE));
+	ZVAL_STRING(delete, ISV(DELETE));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, method, delete);
@@ -1352,7 +1352,7 @@ PHP_METHOD(Phalcon_Http_Request, isOptions){
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(options);
-	ZVAL_STR(options, IS(OPTIONS));
+	ZVAL_STRING(options, ISV(OPTIONS));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, method, options);

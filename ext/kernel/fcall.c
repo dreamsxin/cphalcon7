@@ -85,6 +85,8 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 	HashTable *function_table;
 	int i, status;
 
+	ZVAL_UNDEF(&retval);
+
 	if (type != phalcon_fcall_function && !object) {
 		object = execute_data && Z_OBJ(execute_data->This) ? &execute_data->This : NULL;
 	}
@@ -111,7 +113,11 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 		if (*retval_ptr == NULL) {
 			PHALCON_ALLOC_ZVAL(*retval_ptr);
 		}
-		ZVAL_COPY(*retval_ptr, &retval);
+		if (Z_TYPE_P(&retval) != IS_UNDEF) {
+			ZVAL_COPY(*retval_ptr, &retval);
+		} else {
+			ZVAL_NULL(*retval_ptr);
+		}
 	}
 
 	efree(arguments);
@@ -273,7 +279,7 @@ int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *
 
 int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 {
-	zval retval, *arguments, *param;
+	zval retval, *arguments = NULL, *param;
 	int param_count, i, status;
 
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {

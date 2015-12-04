@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 
 	/* Check if the service is shared */
 	if (Z_TYPE_P(shared) != IS_NULL && Z_TYPE_P(shared_instance) != IS_NULL) {
-		RETURN_ZVAL(shared_instance, 1, 0);
+		RETURN_CTOR(shared_instance);
 	}
 
 	definition = phalcon_read_property(getThis(), SL("_definition"), PH_NOISY);

@@ -24,7 +24,7 @@
 
 int phalcon_file_exists(zval *filename);
 int phalcon_compare_mtime(zval *filename1, zval *filename2);
-void phalcon_fix_path(zval **return_value, zval *path, zval *directory_separator);
+void phalcon_fix_path(zval *return_value, zval *path, zval *directory_separator);
 void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_separator);
 void phalcon_unique_path_key(zval *return_value, zval *path);
 void phalcon_file_realpath(zval *return_value, zval *filename);

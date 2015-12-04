@@ -599,7 +599,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 	}
 
 	PHALCON_INIT_VAR(service_name);
-	ZVAL_STR(service_name, IS(filter));
+	ZVAL_STRING(service_name, ISV(filter));
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	PHALCON_VERIFY_INTERFACE(dependency_injector, phalcon_diinterface_ce);

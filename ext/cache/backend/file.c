@@ -400,13 +400,13 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
 		item = it->funcs->get_current_data(it);
 
-		PHALCON_OBSERVE_OR_NULLIFY_VAR(is_directory);
+		PHALCON_OBSERVE_OR_NULLIFY_PPZV(&is_directory);
 		if (FAILURE == phalcon_call_method(&is_directory, item, "isdir", 0, NULL)) {
 			break;
 		}
 
 		if (!EG(exception) && PHALCON_IS_FALSE(is_directory)) {
-			PHALCON_OBSERVE_OR_NULLIFY_VAR(key);
+			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&key);
 			if (FAILURE == phalcon_call_method(&key, item, "getfilename", 0, NULL)) {
 				break;
 			}
@@ -740,18 +740,18 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
 		item = it->funcs->get_current_data(it);
 
-		PHALCON_OBSERVE_OR_NULLIFY_VAR(is_file);
+		PHALCON_OBSERVE_OR_NULLIFY_PPZV(&is_file);
 		if (FAILURE == phalcon_call_method(&is_file, item, "isfile", 0, NULL)) {
 			break;
 		}
 
 		if (PHALCON_IS_TRUE(is_file)) {
-			PHALCON_OBSERVE_OR_NULLIFY_VAR(key);
+			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&key);
 			if (FAILURE == phalcon_call_method(&key, item, "getfilename", 0, NULL)) {
 				break;
 			}
 
-			PHALCON_OBSERVE_OR_NULLIFY_VAR(cache_file);
+			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&cache_file);
 			if (FAILURE == phalcon_call_method(&cache_file, item, "getpathname", 0, NULL)) {
 				break;
 			}

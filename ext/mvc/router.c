@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	array_init(params);
 
 	PHALCON_INIT_VAR(service);
-	ZVAL_STR(service, IS(request));
+	ZVAL_STRING(service, ISV(request));
 
 	PHALCON_INIT_VAR(matches);
 	phalcon_update_property_bool(getThis(), SL("_wasMatched"), 0);

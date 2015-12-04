@@ -486,7 +486,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 	zval *class_name, *directory, *extensions, *ds = NULL;
 	zval *events_manager, *event_name = NULL, *directories = NULL, *dir = NULL;
-	zval *fixed_dir = NULL, *extension = NULL, *file_path = NULL, *debug_message = NULL;
+	zval *extension = NULL, *debug_message = NULL;
 	char slash[2] = {DEFAULT_SLASH, 0};
 
 	PHALCON_MM_GROW();
@@ -523,19 +523,19 @@ PHP_METHOD(Phalcon_Loader, findFile){
 		/** 
 		 * Add a trailing directory separator if the user forgot to do that
 		 */
-		PHALCON_INIT_NVAR(fixed_dir);
+		zval fixed_dir;
 		phalcon_fix_path(&fixed_dir, dir, ds);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(extensions), extension) {
 
-			PHALCON_INIT_NVAR(file_path);
-			PHALCON_CONCAT_VVSV(file_path, fixed_dir, class_name, ".", extension);
+			zval file_path;
+			PHALCON_CONCAT_VVSV(&file_path, &fixed_dir, class_name, ".", extension);
 
 			/** 
 			 * Check if a events manager is available
 			 */
 			if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-				phalcon_update_property_this(getThis(), SL("_checkedPath"), file_path);
+				phalcon_update_property_this(getThis(), SL("_checkedPath"), &file_path);
 
 				PHALCON_INIT_NVAR(event_name);
 				ZVAL_STRING(event_name, "loader:beforeCheckPath");
@@ -545,27 +545,27 @@ PHP_METHOD(Phalcon_Loader, findFile){
 			/** 
 			 * This is probably a good path, let's check if the file exist
 			 */
-			if (phalcon_file_exists(file_path) == SUCCESS) {
+			if (phalcon_file_exists(&file_path) == SUCCESS) {
 
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_INIT_NVAR(debug_message);
-					PHALCON_CONCAT_SV(debug_message, "--Found: ", file_path);
+					PHALCON_CONCAT_SV(debug_message, "--Found: ", &file_path);
 					phalcon_debug_print_r(debug_message);
 				}
 
 				if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-					phalcon_update_property_this(getThis(), SL("_foundPath"), file_path);
+					phalcon_update_property_this(getThis(), SL("_foundPath"), &file_path);
 
 					PHALCON_INIT_NVAR(event_name);
 					ZVAL_STRING(event_name, "loader:pathFound");
-					PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis(), file_path);
+					PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis(), &file_path);
 				}
 
 				/** 
 				 * Simulate a require
 				 */
-				assert(Z_TYPE_P(file_path) == IS_STRING);
-				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(file_path)));
+				assert(Z_TYPE(file_path) == IS_STRING);
+				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
 
 				/** 
 				 * Return true mean success
@@ -573,7 +573,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				RETURN_MM_TRUE;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_INIT_NVAR(debug_message);
-				PHALCON_CONCAT_SV(debug_message, "--Not Found: ", file_path);
+				PHALCON_CONCAT_SV(debug_message, "--Not Found: ", &file_path);
 				phalcon_debug_print_r(debug_message);
 			}
 

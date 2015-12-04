@@ -52,16 +52,17 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
  */
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...) {
 
+	zval *fetched, *tmp_arr, arr, *tmp, *p, *item;
 	int i, l, ll; char *s;
 	va_list ap;
-	zval *fetched, *tmp_arr, *tmp, *p, *item;
 
 	tmp_arr = phalcon_read_static_property_ce(ce, property, property_length);
 
 	/** Convert the value to array if not is an array */
 	if (Z_TYPE_P(tmp_arr) != IS_ARRAY) {
-		PHALCON_ALLOC_INIT_ZVAL(tmp_arr);
-		array_init(tmp_arr);
+		array_init(&arr);
+		tmp_arr = &arr;
+		Z_TRY_ADDREF_P(tmp_arr);
 	}
 
 	va_start(ap, types_count);
@@ -319,7 +320,7 @@ void phalcon_get_called_class(zval *return_value)
 	zend_execute_data *ex = EG(current_execute_data);
 	zend_class_entry *called_scope = ex->called_scope;
 	if (called_scope) {
-		ZVAL_STR_COPY(return_value, called_scope->name);
+		ZVAL_STR(return_value, zend_string_copy(called_scope->name));
 	}
 
 	if (!EG(scope))  {
@@ -421,7 +422,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 	}
 
 	if (check_access) {
-		PHALCON_CALL_FUNCTION(&return_value, "get_class_methods", object);
+		PHALCON_CALL_FUNCTIONW(return_value ? &return_value : NULL, "get_class_methods", object);
 	} else {
 		array_init(return_value);
 

@@ -75,7 +75,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Mvc Router
 	 */
 	PHALCON_INIT_VAR(name);
-	ZVAL_STR(name, IS(router));
+	ZVAL_STRING(name, ISV(router));
 
 	PHALCON_INIT_VAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Router");
@@ -86,7 +86,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Mvc Dispatcher
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(dispatcher));
+	ZVAL_STRING(name, ISV(dispatcher));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Dispatcher");
@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Mvc Url
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(url));
+	ZVAL_STRING(name, ISV(url));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Url");
@@ -108,7 +108,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models manager for ORM
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(modelsManager));
+	ZVAL_STRING(name, ISV(modelsManager));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Manager");
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models meta-data using the Memory adapter
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(modelsMetadata));
+	ZVAL_STRING(name, ISV(modelsMetadata));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\MetaData\\Memory");
@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models Query for ORM
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(modelsQuery));
+	ZVAL_STRING(name, ISV(modelsQuery));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Query");
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models Query Builder for ORM
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(modelsQueryBuilder));
+	ZVAL_STRING(name, ISV(modelsQueryBuilder));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Query\\Builder");
@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Models Criteria for ORM
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(modelsCriteria));
+	ZVAL_STRING(name, ISV(modelsCriteria));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Criteria");
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Request/Response are always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(response));
+	ZVAL_STRING(name, ISV(response));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Response");
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Http Response Cookies
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(cookies));
+	ZVAL_STRING(name, ISV(cookies));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Response\\Cookies");
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Http Request
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(request));
+	ZVAL_STRING(name, ISV(request));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Http\\Request");
@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Filter/Escaper services are always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(filter));
+	ZVAL_STRING(name, ISV(filter));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Filter");
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Escaper
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(escaper));
+	ZVAL_STRING(name, ISV(escaper));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Escaper");
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Default annotations service
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(annotations));
+	ZVAL_STRING(name, ISV(annotations));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Annotations\\Adapter\\Memory");
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Security doesn't need to be shared, but anyways we register it as shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(security));
+	ZVAL_STRING(name, ISV(security));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Security");
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Crypt Service
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(crypt));
+	ZVAL_STRING(name, ISV(crypt));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Crypt");
@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Flash services are always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(flash));
+	ZVAL_STRING(name, ISV(flash));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Flash\\Direct");
@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Flash Session
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(flashSession));
+	ZVAL_STRING(name, ISV(flashSession));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Flash\\Session");
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Tag/Helpers
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(tag));
+	ZVAL_STRING(name, ISV(tag));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Tag");
@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Session is always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(session));
+	ZVAL_STRING(name, ISV(session));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Session\\Adapter\\Files");
@@ -294,7 +294,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Session/Bag
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(sessionBag));
+	ZVAL_STRING(name, ISV(sessionBag));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Session\\Bag");
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Events Manager is always shared
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(eventsManager));
+	ZVAL_STRING(name, ISV(eventsManager));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Events\\Manager");
@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Model Transaction Manager
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(transactionManager));
+	ZVAL_STRING(name, ISV(transactionManager));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Mvc\\Model\\Transaction\\Manager");
@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 * Assets Manager
 	 */
 	PHALCON_INIT_NVAR(name);
-	ZVAL_STR(name, IS(assets));
+	ZVAL_STRING(name, ISV(assets));
 
 	PHALCON_INIT_NVAR(definition);
 	ZVAL_STRING(definition, "Phalcon\\Assets\\Manager");

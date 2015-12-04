@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 			}
 
 			PHALCON_INIT_VAR(service);
-			ZVAL_STR(service, IS(filter));
+			ZVAL_STRING(service, ISV(filter));
 
 			PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);

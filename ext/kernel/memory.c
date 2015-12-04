@@ -185,6 +185,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 							zval_ptr_dtor(*ptr);
 						} else {
 							efree(*ptr);
+							*ptr = NULL;
 						}
 					} else {
 						Z_DELREF_P(*ptr);
@@ -295,6 +296,8 @@ void phalcon_dump_all_frames()
 
 	fprintf(stderr, "*** DUMP END ***\n");
 }
+#endif
+
 
 /**
  * Finishes the current memory stack by releasing allocated memory
@@ -326,37 +329,15 @@ int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func)
 void ZEND_FASTCALL phalcon_memory_grow_stack(const char *func)
 {
 	phalcon_memory_entry *entry;
-	zend_phalcon_globals *g = PHALCON_VGLOBAL;
+	zend_phalcon_globals *g = PHALCON_VGLOBAL;	
+
 	if (g->start_memory == NULL) {
 		phalcon_initialize_memory(g);
 	}
+
 	entry = phalcon_memory_grow_stack_common(g);
 	entry->func = func;
 }
-
-#else
-
-/**
- * Adds a memory frame in the current executed method
- */
-void ZEND_FASTCALL ZEND_FASTCALL phalcon_memory_grow_stack()
-{
-	zend_phalcon_globals *g = PHALCON_VGLOBAL;
-	if (g->start_memory == NULL) {
-		phalcon_initialize_memory(g);
-	}
-	phalcon_memory_grow_stack_common(g);
-}
-
-/**
- * Finishes the current memory stack by releasing allocated memory
- */
-int ZEND_FASTCALL phalcon_memory_restore_stack()
-{
-	phalcon_memory_restore_stack_common(PHALCON_VGLOBAL);
-	return SUCCESS;
-}
-#endif
 
 PHALCON_ATTR_NONNULL static void phalcon_reallocate_memory(const zend_phalcon_globals *g)
 {
@@ -436,6 +417,8 @@ static void phalcon_verify_frame(const phalcon_memory_entry *frame, const char *
 	}
 }
 
+#endif
+
 /**
  * Observes a memory pointer to release its memory at the end of the request
  */
@@ -444,7 +427,9 @@ void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func)
 	zend_phalcon_globals *g     = PHALCON_VGLOBAL;
 	phalcon_memory_entry *frame = g->active_memory;
 
+#ifndef PHALCON_RELEASE
 	phalcon_verify_frame(frame, func, var);
+#endif
 
 	phalcon_do_memory_observe(var, g);
 	*var = NULL; /* In case an exception or error happens BEFORE the observed variable gets initialized */
@@ -458,35 +443,14 @@ void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func)
 	zend_phalcon_globals *g     = PHALCON_VGLOBAL;
 	phalcon_memory_entry *frame = g->active_memory;
 
+#ifndef PHALCON_RELEASE
 	phalcon_verify_frame(frame, func, var);
-
-	phalcon_do_memory_observe(var, g);
-	PHALCON_ALLOC_INIT_ZVAL(*var);
-}
-
-#else
-
-/**
- * Observes a memory pointer to release its memory at the end of the request
- */
-void ZEND_FASTCALL phalcon_memory_observe(zval **var)
-{
-	zend_phalcon_globals *g = PHALCON_VGLOBAL;
-	phalcon_do_memory_observe(var, g);
-	*var = NULL; /* In case an exception or error happens BEFORE the observed variable gets initialized */
-}
-
-/**
- * Observes a variable and allocates memory for it
- */
-void ZEND_FASTCALL phalcon_memory_alloc(zval **var)
-{
-	zend_phalcon_globals *g = PHALCON_VGLOBAL;
-	phalcon_do_memory_observe(var, g);
-	PHALCON_ALLOC_INIT_ZVAL(*var);
-}
-
 #endif
+
+	phalcon_do_memory_observe(var, g);
+	PHALCON_ALLOC_INIT_ZVAL(*var);
+}
+
 
 /**
  * Cleans the phalcon memory stack recursivery

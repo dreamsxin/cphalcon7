@@ -556,7 +556,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, getRouter){
 		PHALCON_MM_GROW();
 
 		PHALCON_INIT_VAR(service_name);
-		ZVAL_STR(service_name, IS(router));
+		ZVAL_STRING(service_name, ISV(router));
 
 		PHALCON_CALL_METHOD(&tmp, getThis(), "getsharedservice", service_name);
 		PHALCON_VERIFY_INTERFACE(tmp, phalcon_mvc_routerinterface_ce);

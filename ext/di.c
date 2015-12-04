@@ -382,7 +382,7 @@ PHP_METHOD(Phalcon_DI, get){
 
 	phalcon_fetch_params(1, 1, 1, &name, &parameters);
 	PHALCON_ENSURE_IS_STRING(name);
-	
+
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
@@ -461,6 +461,7 @@ PHP_METHOD(Phalcon_DI, getShared){
 		phalcon_update_property_bool(getThis(), SL("_freshInstance"), 0);
 	} else {
 		PHALCON_CALL_SELFW(&instance, "get", name, parameters);
+
 		if (instance) {
 			phalcon_update_property_bool(getThis(), SL("_freshInstance"), 1);
 			phalcon_update_property_array(getThis(), SL("_sharedInstances"), name, instance);

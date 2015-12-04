@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 		 * Check if the validation must be canceled if this validator fails
 		 */
 		if (PHALCON_IS_FALSE(status)) {
-			PHALCON_OBSERVE_OR_NULLIFY_VAR(must_cancel);
+			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&must_cancel);
 			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(Z_OBJCE_P(validator), &must_cancel, validator, "cancelOnFail"));
 
 			if (zend_is_true(must_cancel)) {
@@ -538,7 +538,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 				if (zend_is_true(field_filters)) {
 	
 					PHALCON_INIT_VAR(service_name);
-					ZVAL_STR(service_name, IS(filter));
+					ZVAL_STRING(service_name, ISV(filter));
 	
 					PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 					if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {

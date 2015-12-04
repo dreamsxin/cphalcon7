@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 
-	ZVAL_STR(&service, IS(router));
+	ZVAL_STRING(&service, ISV(router));
 	PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_CLASS(router, phalcon_cli_router_ce);
 
@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	PHALCON_CALL_METHOD(&action_name, router, "getactionname");
 	PHALCON_CALL_METHOD(&params, router, "getparams");
 
-	ZVAL_STR(&service, IS(dispatcher));
+	ZVAL_STRING(&service, ISV(dispatcher));
 
 	PHALCON_CALL_METHOD(&dispatcher, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(dispatcher, phalcon_dispatcherinterface_ce);

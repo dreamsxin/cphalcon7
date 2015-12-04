@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 		}
 
 		PHALCON_INIT_VAR(service);
-		ZVAL_STR(service, IS(response));
+		ZVAL_STRING(service, ISV(response));
 
 		PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
 		PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);

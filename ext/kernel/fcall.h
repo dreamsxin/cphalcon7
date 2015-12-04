@@ -162,7 +162,6 @@ typedef enum _phalcon_call_type {
 
 #define PHALCON_RETURN_CALL_PARENTW(class_entry, object, method, ...) \
 	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_ON_FAILURE(phalcon_call_class_method_aparams(&return_value, object, class_entry, phalcon_fcall_parent, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 

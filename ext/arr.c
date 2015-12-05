@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Arr, path){
 	PHALCON_SEPARATE_PARAM(array);
 
 	if (!delimiter) {
-		PHALCON_OBS_VAR(delimiter);
+		PHALCON_INIT_NVAR(delimiter);
 		phalcon_read_static_property(delimiter, SL("phalcon\\arr"), SL("delimiter"));
 	}
 
@@ -381,7 +381,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 		PHALCON_CPY_WRT_CTOR(keys, path);
 	} else {
 		if (!delimiter) {
-			PHALCON_OBS_VAR(delimiter);
+			PHALCON_INIT_NVAR(delimiter);
 			phalcon_read_static_property(delimiter, SL("phalcon\\utils\\arr"), SL("delimiter"));
 		}
 
@@ -1122,7 +1122,7 @@ PHP_METHOD(Phalcon_Arr, sum){
 	}
 
 	if (!delimiter) {
-		PHALCON_OBS_VAR(delimiter);
+		PHALCON_INIT_NVAR(delimiter);
 		phalcon_read_static_property(delimiter, SL("phalcon\\arr"), SL("delimiter"));
 	}
 

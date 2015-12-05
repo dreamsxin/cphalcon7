@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Config, offsetGet){
 	zval *index;
 
 	phalcon_fetch_params(0, 1, 0, &index);
-
+	PHALCON_ENSURE_IS_STRING(index);
 	phalcon_return_property_zval(return_value, getThis(), index);
 }
 
@@ -270,6 +270,7 @@ PHP_METHOD(Phalcon_Config, offsetSet){
 	zval *index, *value;
 
 	phalcon_fetch_params(0, 2, 0, &index, &value);
+	PHALCON_ENSURE_IS_STRING(index);
 	phalcon_update_property_zval_zval(getThis(), index, value);
 }
 
@@ -287,6 +288,7 @@ PHP_METHOD(Phalcon_Config, offsetUnset){
 	zval *index;
 
 	phalcon_fetch_params(0, 1, 0, &index);
+	PHALCON_ENSURE_IS_STRING(index);
 	phalcon_update_property_zval_null(getThis(), index);
 }
 

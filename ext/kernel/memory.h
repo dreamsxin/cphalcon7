@@ -130,7 +130,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		if (tmp_ != NULL) { \
 			if (*tmp_) { \
 				zval_ptr_dtor(*tmp_); \
-				*tmp_ = NULL; \
+				ZVAL_NULL(*tmp_); \
 			} \
 			else { \
 				PHALCON_MEMORY_OBSERVE((ppzv)); \

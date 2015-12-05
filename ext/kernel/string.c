@@ -620,6 +620,94 @@ void phalcon_fast_strtoupper(zval *return_value, zval *str) {
 }
 
 /**
+ * Fast call to PHP trim() function
+ */
+void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where) {
+	zval copy;
+	int use_copy = 0;
+	zend_string *trimmed;
+
+	if (Z_TYPE_P(str) != IS_STRING) {
+		use_copy = zend_make_printable_zval(str, &copy);
+		if (use_copy) {
+			str = &copy;
+		}
+	}
+
+	if (charlist && Z_TYPE_P(charlist) == IS_STRING) {
+		trimmed = php_trim(Z_STR_P(str), Z_STRVAL_P(charlist), Z_STRLEN_P(charlist), where);
+	} else {
+		trimmed = php_trim(Z_STR_P(str), NULL, 0, where);
+	}
+	ZVAL_STR(return_value, trimmed);
+
+	if (use_copy) {
+		zval_dtor(&copy);
+	}
+}
+
+/**
+ * Immediate function resolution for str_replace function
+ */
+void phalcon_fast_str_replace(zval *return_value_ptr, zval *search, zval *replace, zval *subject) {
+
+	zval replace_copy, search_copy;
+	int copy_replace = 0, copy_search = 0;
+
+	if (Z_TYPE_P(subject) != IS_STRING) {
+		ZVAL_NULL(return_value_ptr);
+		zend_error(E_WARNING, "Invalid arguments supplied for str_replace()");
+		return;
+	}
+
+	/**
+	 * Fallback to userland function if the first parameter is an array
+	 */
+	if (Z_TYPE_P(search) == IS_ARRAY) {
+		do {
+			zval *params[] = { search, replace, subject };
+			ZVAL_NULL(return_value_ptr);
+			phalcon_call_func_aparams(&return_value_ptr, "str_replace", sizeof("str_replace")-1, 3, params);
+			return;
+		} while(0);
+	}
+
+	if (Z_TYPE_P(replace) != IS_STRING) {
+		copy_replace = zend_make_printable_zval(replace, &replace_copy);
+		if (copy_replace) {
+			replace = &replace_copy;
+		}
+	}
+
+	if (Z_TYPE_P(search) != IS_STRING) {
+		copy_search = zend_make_printable_zval(search, &search_copy);
+		if (copy_search) {
+			search = &search_copy;
+		}
+	}
+
+	if (Z_STRLEN_P(subject) == 0) {
+		ZVAL_STRINGL(return_value_ptr, "", 0);
+		return;
+	}
+
+	ZVAL_STR(return_value_ptr, php_str_to_str(Z_STRVAL_P(subject),
+			Z_STRLEN_P(subject),
+			Z_STRVAL_P(search),
+			Z_STRLEN_P(search),
+			Z_STRVAL_P(replace),
+			Z_STRLEN_P(replace)));
+
+	if (copy_replace) {
+		zval_dtor(replace);
+	}
+
+	if (copy_search) {
+		zval_dtor(search);
+	}
+}
+
+/**
  * Checks if a zval string starts with a zval string
  */
 int phalcon_start_with(const zval *str, const zval *compared, zval *case_sensitive){

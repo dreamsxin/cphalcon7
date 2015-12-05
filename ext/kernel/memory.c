@@ -182,7 +182,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 				if (Z_REFCOUNTED_P(*ptr)) {
 					if (Z_REFCOUNT_P(*ptr) <= 1) {
 						if (!Z_ISREF_P(*ptr) || Z_TYPE_P(*ptr) == IS_OBJECT) {
-							zval_ptr_dtor(*ptr);
+							Z_DELREF_P(*ptr);
 						} else {
 							efree(*ptr);
 							*ptr = NULL;

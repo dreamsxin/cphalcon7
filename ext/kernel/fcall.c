@@ -105,22 +105,19 @@ int phalcon_call_user_function(zval **retval_ptr, zval *object, zend_class_entry
 		i++;
 	}
 
-	if ((status = call_user_function_ex(function_table, object, function_name, &retval, param_count, arguments, 0, NULL TSRMLS_CC)) == FAILURE || EG(exception)) {
+	if ((status = call_user_function_ex(function_table, object, function_name, &retval, param_count, arguments, 0, NULL)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 	}
+
+	efree(arguments);
 
 	if (retval_ptr) {
 		if (*retval_ptr == NULL) {
 			PHALCON_ALLOC_ZVAL(*retval_ptr);
 		}
-		if (Z_TYPE_P(&retval) != IS_UNDEF) {
-			ZVAL_COPY(*retval_ptr, &retval);
-		} else {
-			ZVAL_NULL(*retval_ptr);
-		}
-	}
 
-	efree(arguments);
+		ZVAL_COPY(*retval_ptr, &retval);
+	}
 
 	return status;
 }
@@ -229,9 +226,13 @@ int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend
 int phalcon_call_class_method_aparams(zval **retval_ptr, zval *object, zend_class_entry *ce, phalcon_call_type type, const char *method_name, uint method_len, uint param_count, zval *params[])
 {
 	zval method;
+	int status;
+
 	ZVAL_STRINGL(&method, method_name, method_len);
 
-	return phalcon_call_class_zval_method_aparams(retval_ptr, object, ce, type, &method, param_count, params);
+	status = phalcon_call_class_zval_method_aparams(retval_ptr, object, ce, type, &method, param_count, params);
+
+	return status;
 }
 
 int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *method, zval *params)
@@ -280,14 +281,13 @@ int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *
 int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 {
 	zval retval, *arguments = NULL, *param;
-	int param_count, i, status;
+	int param_count = 0, i, status;
 
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
 		status = FAILURE;
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
 	} else {
-
-		if (params) {
+		if (params && Z_TYPE_P(params) == IS_ARRAY) {
 			param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
 			arguments = (zval*)emalloc(sizeof(zval) * param_count);
 			i = 0;
@@ -297,7 +297,7 @@ int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 			} ZEND_HASH_FOREACH_END();
 		} else {
 			param_count = 0;
-			arguments = NULL;
+			arguments = (zval*)emalloc(sizeof(zval) * param_count);
 		}
 
 		if ((status = call_user_function(EG(function_table), NULL, handler, &retval, param_count, arguments)) == FAILURE || EG(exception)) {

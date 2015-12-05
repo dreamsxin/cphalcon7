@@ -597,7 +597,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	zval *empty_str, *namespaces, *directory = NULL;
 	zval *ns_prefixed = NULL, *file_name = NULL;
 	zval *pseudo_separator, *prefixes;
-	zval *ds_class_name, *ns_class_name;
+	zval *ds_class_name = NULL, *ns_class_name = NULL;
 	zval *directories, *found = NULL;
 	zend_string *str_key;
 	ulong idx;

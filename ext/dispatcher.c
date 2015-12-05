@@ -706,6 +706,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 * Handlers are retrieved as shared instances from the Service Container
 		 */
 		PHALCON_CALL_METHOD(&has_service, dependency_injector, "has", handler_class);
+
 		if (!zend_is_true(has_service)) {
 			/**
 			 * DI doesn't have a service with that name, try to load it using an autoloader

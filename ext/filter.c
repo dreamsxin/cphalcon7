@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	zval *value, *filter, *filters, *filter_object;
-	zval *arguments, *type = NULL, *quote, *empty_str, *escaped;
+	zval *arguments, *type = NULL, *quote, *empty_str, *escaped = NULL;
 	zval *allow_tags, *allow_attributes;
 	zval *filtered = NULL, *allow_fraction, *options, *exception_message;
 

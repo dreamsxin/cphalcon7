@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 			ZVAL_FALSE(returned_response);
 		}
-		
+
 		if (PHALCON_IS_FALSE(returned_response)) {
 
 			if (Z_TYPE_P(controller) == IS_OBJECT) {

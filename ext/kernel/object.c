@@ -487,7 +487,7 @@ zend_class_entry *phalcon_class_exists(const zval *class_name, int autoload) {
 		return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0 ? ce : NULL;
 	}
 
-	return 0;
+	return NULL;
 }
 
 zend_class_entry *phalcon_class_exists_ex(const zval *class_name, int autoload) {

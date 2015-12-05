@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Debug, clearVars){
  */
 PHP_METHOD(Phalcon_Debug, _escapeString){
 
-	zval *value, *charset, *replaced_value;
+	zval *value, *charset, *replaced_value = NULL;
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
@@ -391,7 +391,7 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 		ZVAL_STRING(&line_break, "\n");
 		ZVAL_STRING(&escaped_line_break, "\\n");
 
-		PHALCON_STR_REPLACE(&replaced_value, &line_break, &escaped_line_break, value);
+		PHALCON_STR_REPLACEW(&replaced_value, &line_break, &escaped_line_break, value);
 		phalcon_htmlentities(return_value, replaced_value, NULL, charset);
 		zval_ptr_dtor(replaced_value);
 		return;
@@ -707,9 +707,9 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 	zval *n, *trace, *link_format, *space, *two_spaces, *underscore;
 	zval *minus, *html, *class_name;
-	zval *namespace_separator, *prepare_uri_class;
-	zval *lower_class_name, *prepared_function_name;
-	zval *prepare_internal_class, *type, *function_name = NULL;
+	zval *namespace_separator, *prepare_uri_class = NULL;
+	zval *lower_class_name, *prepared_function_name = NULL;
+	zval *prepare_internal_class = NULL, *type, *function_name = NULL;
 	zval *trace_args, *arguments, *argument = NULL, *dumped_argument = NULL;
 	zval *span_argument = NULL, *joined_arguments, *z_one;
 	zval *file, *line, *show_files, *lines = NULL, *number_lines;

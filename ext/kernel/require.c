@@ -29,6 +29,7 @@
  */
 int phalcon_require_ret(zval *return_value, const char *require_path)
 {
+	zval ret;
 	zend_file_handle file_handle;
 	zend_op_array *op_array;
 	char realpath[MAXPATHLEN];
@@ -55,16 +56,19 @@ int phalcon_require_ret(zval *return_value, const char *require_path)
 	zend_destroy_file_handle(&file_handle);
 
 	if (op_array) {
-        ZVAL_UNDEF(return_value);
-		zend_execute(op_array, return_value);
+		ZVAL_UNDEF(&ret);
+		zend_execute(op_array, &ret);
 		zend_exception_restore();
 		destroy_op_array(op_array);
 		efree(op_array);
 
         if (EG(exception)) {
-            zval_ptr_dtor(return_value);
+            zval_ptr_dtor(&ret);
 			return FAILURE;
         }
+		if (return_value) {
+			ZVAL_COPY(return_value, &ret);
+		}
 
 	    return SUCCESS;
 	}

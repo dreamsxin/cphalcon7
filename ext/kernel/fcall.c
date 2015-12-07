@@ -180,7 +180,7 @@ int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend
 
 		case phalcon_fcall_ce:
 			assert(ce != NULL);
-			add_next_index_str(&func, ce->name);
+			add_next_index_str(&func, zend_string_copy(ce->name));
 			break;
 
 		case phalcon_fcall_method:

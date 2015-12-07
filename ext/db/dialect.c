@@ -900,18 +900,18 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	PHALCON_INIT_VAR(sql);
 	if (phalcon_array_isset_str_fetch(&distinct, definition, SL("distinct"))) {
-		assert(Z_TYPE_P(distinct) == IS_LONG);
-		if (Z_LVAL_P(distinct) == 0) {
-			ZVAL_STRING(sql, "SELECT ALL ");
-		}
-		else if (Z_LVAL_P(distinct) == 1) {
-			ZVAL_STRING(sql, "SELECT DISTINCT ");
-		}
-		else {
+		if (Z_TYPE_P(distinct) == IS_LONG) {
+			if (Z_LVAL_P(distinct) == 0) {
+				ZVAL_STRING(sql, "SELECT ALL ");
+			} else if (Z_LVAL_P(distinct) == 1) {
+				ZVAL_STRING(sql, "SELECT DISTINCT ");
+			} else {
+				ZVAL_STRING(sql, "SELECT ");
+			}
+		} else {
 			ZVAL_STRING(sql, "SELECT ");
 		}
-	}
-	else {
+	} else {
 		ZVAL_STRING(sql, "SELECT ");
 	}
 

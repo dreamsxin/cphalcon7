@@ -1543,7 +1543,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	}
 
 	PHALCON_INIT_VAR(model_name);
-	phalcon_get_called_class(model_name );
+	phalcon_get_called_class(model_name);
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
@@ -1624,7 +1624,6 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 			phalcon_array_fetch_str(&hydration, params, SL("hydration"), PH_NOISY);
 			PHALCON_CALL_METHOD(NULL, resultset, "sethydratemode", hydration);
 		}
-
 
 		PHALCON_INIT_NVAR(event_name);
 		ZVAL_STRING(event_name, "afterQuery");

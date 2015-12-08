@@ -1618,16 +1618,15 @@ PHP_METHOD(Phalcon_Tag, setTitleSeparator){
  */
 PHP_METHOD(Phalcon_Tag, appendTitle){
 
-	zval *title, *document_title, *document_title_separator, *r0;
+	zval *title, *document_title, *document_title_separator, s;
 
 	phalcon_fetch_params(0, 1, 0, &title);
-	
+
 	document_title = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_documentTitle"));
 	document_title_separator = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_documentTitleSeparator"));
-	PHALCON_ALLOC_INIT_ZVAL(r0);
-	PHALCON_CONCAT_VVV(r0, document_title, document_title_separator, title);
-	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_documentTitle"), r0);
-	zval_ptr_dtor(r0);
+
+	PHALCON_CONCAT_VVV(&s, document_title, document_title_separator, title);
+	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_documentTitle"), &s);
 }
 
 /**
@@ -1637,17 +1636,15 @@ PHP_METHOD(Phalcon_Tag, appendTitle){
  */
 PHP_METHOD(Phalcon_Tag, prependTitle){
 
-	zval *title, *document_title, *document_title_separator, *r0;
+	zval *title, *document_title, *document_title_separator, s;
 
 	phalcon_fetch_params(0, 1, 0, &title);
-	
+
 	document_title = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_documentTitle"));
 	document_title_separator = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_documentTitleSeparator"));
-	
-	PHALCON_ALLOC_INIT_ZVAL(r0);
-	PHALCON_CONCAT_VVV(r0, title, document_title_separator, document_title);
-	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_documentTitle"), r0);
-	zval_ptr_dtor(r0);
+
+	PHALCON_CONCAT_VVV(&s, title, document_title_separator, document_title);
+	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_documentTitle"), &s);
 }
 
 /**

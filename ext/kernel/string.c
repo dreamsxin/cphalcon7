@@ -1016,35 +1016,40 @@ int phalcon_spprintf(char **message, int max_len, char *format, ...)
  * Makes a substr like the PHP function. This function doesn't support negative lengths
  */
 void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned long length) {
+	uint str_len;
 
-	uint str_len = (uint)(Z_STRLEN_P(str));
 	if (Z_TYPE_P(str) != IS_STRING) {
 
 		if (Z_TYPE_P(str) == IS_NULL || PHALCON_IS_BOOL(str)) {
-			RETURN_FALSE;
+			ZVAL_FALSE(return_value);
+			return;
 		}
 
 		if (Z_TYPE_P(str) == IS_LONG) {
-			RETURN_EMPTY_STRING();
+			ZVAL_NULL(return_value);
+			return;
 		}
 
 		zend_error(E_WARNING, "Invalid arguments supplied for phalcon_substr()");
-		RETURN_FALSE;
+		ZVAL_FALSE(return_value);
+		return;
 	}
-
+	
+	str_len = (uint)(Z_STRLEN_P(str));
 	if (str_len < from){
-		RETURN_FALSE;
+		ZVAL_FALSE(return_value);
+		return;
 	}
 
 	if (!length || (str_len < length + from)) {
 		length = str_len - from;
 	}
 
-	if (!length){
-		RETURN_EMPTY_STRING();
+	if (length){
+		ZVAL_STRINGL(return_value, Z_STRVAL_P(str) + from, length);
+	} else {
+		ZVAL_NULL(return_value);
 	}
-
-	RETURN_STRINGL(Z_STRVAL_P(str) + from, (int)length);
 }
 
 void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, unsigned long length) {
@@ -1052,18 +1057,19 @@ void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long f
 	uint str_len = (uint)(ZSTR_LEN(str));
 
 	if (str_len < from){
-		RETURN_FALSE;
+		ZVAL_FALSE(return_value);
+		return;
 	}
 
 	if (!length || (str_len < length + from)) {
 		length = str_len - from;
 	}
 
-	if (!length){
-		RETURN_EMPTY_STRING();
+	if (length){
+		ZVAL_STRINGL(return_value, ZSTR_VAL(str) + from, length);
+	} else {
+		ZVAL_NULL(return_value);
 	}
-
-	RETURN_STRINGL(ZSTR_VAL(str) + from, (int)length);
 }
 
 void phalcon_append_printable_array(smart_str *implstr, zval *value) {

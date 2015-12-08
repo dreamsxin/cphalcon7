@@ -334,8 +334,10 @@ PHP_METHOD(Phalcon_Mvc_Router, getDI){
  */
 PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 
-	zval *uri_source, *_GET, *url = NULL, *_SERVER, *url_parts;
+	zval *uri_source, *_GET, *url = NULL, *_SERVER, url_parts;
 	zval *real_uri;
+
+	PHALCON_MM_GROW();
 
 	/**
 	 * The developer can change the URI source
@@ -349,7 +351,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 		_GET = phalcon_get_global(SL("_GET"));
 		if (phalcon_array_isset_str_fetch(&url, _GET, SL("_url"))) {
 			if (PHALCON_IS_NOT_EMPTY(url)) {
-				RETURN_ZVAL(url, 1, 0);
+				RETURN_CTOR(url);
 			}
 		}
 	} else {
@@ -358,20 +360,16 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 		 */
 		_SERVER = phalcon_get_global(SL("_SERVER"));
 		if (phalcon_array_isset_str_fetch(&url, _SERVER, SL("REQUEST_URI"))) {
-			PHALCON_ALLOC_INIT_ZVAL(url_parts);
-			phalcon_fast_explode_str(url_parts, SL("?"), url);
+			phalcon_fast_explode_str(&url_parts, SL("?"), url);
 
-			phalcon_array_fetch_long(&real_uri, url_parts, 0, PH_NOISY);
-			zval_ptr_dtor(url_parts);
+			phalcon_array_fetch_long(&real_uri, &url_parts, 0, PH_NOISY);
 			if (PHALCON_IS_NOT_EMPTY(real_uri)) {
-				RETURN_ZVAL(real_uri, 1, 1);
+				RETURN_CTOR(real_uri);
 			}
-
-			zval_ptr_dtor(real_uri);
 		}
 	}
 
-	RETURN_STRING("/");
+	RETURN_MM_STRING("/");
 }
 
 /**
@@ -656,9 +654,6 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	PHALCON_INIT_VAR(route_found);
 	ZVAL_FALSE(route_found);
 
-	PHALCON_INIT_VAR(parts);
-	array_init(parts);
-
 	PHALCON_INIT_VAR(params);
 	array_init(params);
 
@@ -847,7 +842,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				 * Start from the default paths
 				 */
 				PHALCON_CALL_METHOD(&paths, route, "getpaths");
-				PHALCON_CPY_WRT(parts, paths);
+				PHALCON_CPY_WRT_CTOR(parts, paths);
 
 				/**
 				 * Check if the matches has variables
@@ -876,21 +871,12 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
 									phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
-									continue;
+								} else {
+									/* Update the parts if there is no converter */
+									phalcon_array_update_zval(parts, &tmp, match_position, PH_COPY);
 								}
-
-								/* Update the parts if there is no converter */
-								phalcon_array_update_zval(parts, &tmp, match_position, PH_COPY);
 							} else {
-								/* Apply the converters anyway */
-								if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
-									PHALCON_INIT_NVAR(parameters);
-									array_init_size(parameters, 1);
-									phalcon_array_append(parameters, position, PH_COPY);
-
-									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
-									phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
-								}
+								phalcon_array_unset(parts, &tmp, 0);
 							}
 						}
 					} ZEND_HASH_FOREACH_END();
@@ -930,7 +916,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 		tmp = phalcon_read_property(getThis(), SL("_notFoundPaths"), PH_NOISY);
 		if (Z_TYPE_P(tmp) != IS_NULL) {
-			PHALCON_CPY_WRT(parts, tmp);
+			PHALCON_CPY_WRT_CTOR(parts, tmp);
 
 			PHALCON_INIT_NVAR(route_found);
 			ZVAL_TRUE(route_found);
@@ -1021,22 +1007,25 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 * Check for parameters
 		 */
 		if (phalcon_array_isset_str_fetch(&params_str, parts, SL("params"))) {
-			PHALCON_INIT_VAR(str_params);
-			if (phalcon_start_with_str(params_str, SL("/"))) {
-				phalcon_substr(str_params, params_str, 1, 0);
-			} else {
-				phalcon_substr(str_params, params_str, 0, 0);
-			}
-			if (zend_is_true(str_params)) {
-				zval slash;
-				ZVAL_STRINGL(&slash, "/", 1);
+			if (Z_TYPE_P(params_str) == IS_STRING) {
+				PHALCON_INIT_VAR(str_params);
+				if (phalcon_start_with_str(params_str, SL("/"))) {
+					phalcon_substr(str_params, params_str, 1, 0);
+				} else {
+					phalcon_substr(str_params, params_str, 0, 0);
+				}
 
-				PHALCON_INIT_NVAR(params);
-				phalcon_fast_explode(params, &slash, str_params);
-			} else if (!PHALCON_IS_EMPTY(str_params)) {
-				PHALCON_INIT_NVAR(params);
-				array_init_size(params, 1);
-				phalcon_array_append(params, str_params, PH_COPY);
+				if (zend_is_true(str_params)) {
+					zval slash;
+					ZVAL_STRINGL(&slash, "/", 1);
+
+					PHALCON_INIT_NVAR(params);
+					phalcon_fast_explode(params, &slash, str_params);
+				} else if (!PHALCON_IS_EMPTY(str_params)) {
+					PHALCON_INIT_NVAR(params);
+					array_init_size(params, 1);
+					phalcon_array_append(params, str_params, PH_COPY);
+				}
 			}
 
 			phalcon_array_unset_str(parts, SL("params"), PH_COPY);

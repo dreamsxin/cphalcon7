@@ -94,7 +94,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	zval *service, *meta_data = NULL, *bind_types, *bind_data_types = NULL;
 	zval *column_map = NULL, *conditions, *bind_params;
 	zval *number = NULL, *compose_field = NULL, *column_field = NULL;
-	zval *exception_message = NULL, *value = NULL, *compose_condition = NULL;
+	zval exception_message, *value = NULL, *compose_condition = NULL;
 	zval *bind_type = NULL, *condition = NULL, *operation_made = NULL;
 	zval *primary_fields = NULL, *primary_field = NULL, *attribute_field = NULL;
 	zval *join_conditions, *params;
@@ -152,9 +152,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 					PHALCON_OBS_NVAR(column_field);
 					phalcon_array_fetch(&column_field, column_map, compose_field, PH_NOISY);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column '", compose_field, "\" isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column '", compose_field, "\" isn't part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -165,9 +164,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 			 * Some database systems require that we pass the values using bind casting
 			 */
 			if (!phalcon_array_isset(bind_data_types, column_field)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column '", column_field, "\" isn't part of the table columns");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column '", column_field, "\" isn't part of the table columns");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 	
@@ -196,9 +194,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 				PHALCON_OBS_NVAR(column_field);
 				phalcon_array_fetch(&column_field, column_map, field, PH_NOISY);
 			} else {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column '", field, "\" isn't part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "\" isn't part of the column map");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 		} else {
@@ -209,9 +206,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 * Some database systems require that we pass the values using bind casting
 		 */
 		if (!phalcon_array_isset(bind_data_types, column_field)) {
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "Column '", column_field, "\" isn't part of the table columns");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "Column '", column_field, "\" isn't part of the table columns");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 		}
 	
@@ -250,9 +246,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(primary_fields), primary_field) {
 			if (!phalcon_array_isset(bind_data_types, primary_field)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column '", primary_field, "\" isn't part of the table columns");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_field, "\" isn't part of the table columns");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 	
@@ -264,9 +259,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 					PHALCON_OBS_NVAR(attribute_field);
 					phalcon_array_fetch(&attribute_field, column_map, primary_field, PH_NOISY);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column '", primary_field, "\" isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_field, "\" isn't part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {

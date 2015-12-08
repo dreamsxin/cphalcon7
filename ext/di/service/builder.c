@@ -70,7 +70,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_Service_Builder){
 PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 
 	zval *dependency_injector, *position, *argument;
-	zval *exception_message = NULL, *type, *name = NULL, *value = NULL, *instance_arguments;
+	zval exception_message, *type, *name = NULL, *value = NULL, *instance_arguments;
 
 	PHALCON_MM_GROW();
 
@@ -80,9 +80,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	 * All the arguments must be an array
 	 */
 	if (Z_TYPE_P(argument) != IS_ARRAY) { 
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Argument at position ", position, " must be an array");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Argument at position ", position, " must be an array");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 		return;
 	}
 	
@@ -90,9 +89,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	 * All the arguments must have a type
 	 */
 	if (!phalcon_array_isset_str(argument, SL("type"))) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Argument at position ", position, " must have a type");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Argument at position ", position, " must have a type");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 		return;
 	}
 	
@@ -104,9 +102,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	 */
 	if (PHALCON_IS_STRING(type, "service")) {
 		if (!phalcon_array_isset_str_fetch(&name, argument, SL("name"))) {
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SV(exception_message, "Service 'name' is required in parameter on position ", position);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+			PHALCON_CONCAT_SV(&exception_message, "Service 'name' is required in parameter on position ", position);
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 			return;
 		}
 
@@ -124,9 +121,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	 */
 	if (PHALCON_IS_STRING(type, "parameter")) {
 		if (!phalcon_array_isset_str(argument, SL("value"))) {
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SV(exception_message, "Service 'value' is required in parameter on position ", position);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+			PHALCON_CONCAT_SV(&exception_message, "Service 'value' is required in parameter on position ", position);
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 			return;
 		}
 	
@@ -141,9 +137,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	 */
 	if (PHALCON_IS_STRING(type, "instance")) {
 		if (!phalcon_array_isset_str(argument, SL("className"))) {
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SV(exception_message, "Service 'className' is required in parameter on position ", position);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+			PHALCON_CONCAT_SV(&exception_message, "Service 'className' is required in parameter on position ", position);
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 			return;
 		}
 		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
@@ -175,9 +170,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 	/** 
 	 * Unknown parameter type 
 	 */
-	PHALCON_INIT_NVAR(exception_message);
-	PHALCON_CONCAT_SV(exception_message, "Unknown service type in parameter on position ", position);
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+	PHALCON_CONCAT_SV(&exception_message, "Unknown service type in parameter on position ", position);
+	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 	return;
 }
 
@@ -238,7 +232,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 	zval *dependency_injector, *definition, *parameters = NULL;
 	zval *class_name, *instance = NULL, *arguments = NULL, *build_arguments = NULL;
 	zval *param_calls = NULL, *method = NULL;
-	zval *exception_message = NULL, *method_name = NULL, *method_call = NULL;
+	zval exception_message, *method_name = NULL, *method_call = NULL;
 	zval *status = NULL, *property = NULL;
 	zval *property_name = NULL, *property_value = NULL, *value = NULL;
 	zend_string *str_key;
@@ -335,9 +329,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 * The call parameter must be an array of arrays
 			 */
 			if (Z_TYPE_P(method) != IS_ARRAY) { 
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "Method call must be an array on position ", &method_position);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+				PHALCON_CONCAT_SV(&exception_message, "Method call must be an array on position ", &method_position);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 				return;
 			}
 	
@@ -345,9 +338,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 * A param 'method' is required
 			 */
 			if (!phalcon_array_isset_str(method, SL("method"))) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "The method name is required on position ", &method_position);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+				PHALCON_CONCAT_SV(&exception_message, "The method name is required on position ", &method_position);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 				return;
 			}
 	
@@ -366,9 +358,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 				PHALCON_OBS_NVAR(arguments);
 				phalcon_array_fetch_str(&arguments, method, SL("arguments"), PH_NOISY);
 				if (Z_TYPE_P(arguments) != IS_ARRAY) { 
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SV(exception_message, "Call arguments must be an array ", &method_position);
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+					PHALCON_CONCAT_SV(&exception_message, "Call arguments must be an array ", &method_position);
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 					return;
 				}
 	
@@ -426,9 +417,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 * The call parameter must be an array of arrays
 			 */
 			if (Z_TYPE_P(property) != IS_ARRAY) { 
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "Property must be an array on position ", &property_position);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+				PHALCON_CONCAT_SV(&exception_message, "Property must be an array on position ", &property_position);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 				return;
 			}
 	
@@ -436,9 +426,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 * A param 'name' is required
 			 */
 			if (!phalcon_array_isset_str(property, SL("name"))) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "The property name is required on position ", &property_position);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+				PHALCON_CONCAT_SV(&exception_message, "The property name is required on position ", &property_position);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 				return;
 			}
 	
@@ -446,9 +435,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 			 * A param 'value' is required
 			 */
 			if (!phalcon_array_isset_str(property, SL("value"))) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SV(exception_message, "The property value is required on position ", &property_position);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, exception_message);
+				PHALCON_CONCAT_SV(&exception_message, "The property value is required on position ", &property_position);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 				return;
 			}
 	

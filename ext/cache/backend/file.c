@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 	zval *options, *prefix, *prefixed_key, *cache_dir;
 	zval *cache_file, *tmp = NULL;
 	zval *modified_time;
-	zval *cached_content, *exception_message;
+	zval *cached_content, exception_message;
 	long int now, ttl, mtime, diff;
 	int expired;
 
@@ -214,9 +214,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 			PHALCON_INIT_VAR(cached_content);
 			phalcon_file_get_contents(cached_content, cache_file);
 			if (PHALCON_IS_FALSE(cached_content)) {
-				PHALCON_INIT_VAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Cache file ", cache_file, " could not be opened");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cache_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Cache file ", cache_file, " could not be opened");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cache_exception_ce, &exception_message);
 				return;
 			}
 

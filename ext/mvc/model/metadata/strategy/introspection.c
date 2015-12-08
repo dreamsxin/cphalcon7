@@ -79,7 +79,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 
 	zval *model, *dependency_injector, *class_name;
 	zval *schema = NULL, *table = NULL, *read_connection = NULL, *exists = NULL;
-	zval *complete_table = NULL, *exception_message = NULL;
+	zval *complete_table = NULL, exception_message;
 	zval *columns = NULL, *attributes, *primary_keys, *non_primary_keys;
 	zval *numeric_typed, *not_null, *field_types, *field_sizes, *field_bytes, *field_scales;
 	zval *field_bind_types, *automatic_create_attributes, *automatic_update_attributes;
@@ -113,9 +113,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		/** 
 		 * The table not exists
 		 */
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVSV(exception_message, "Table \"", complete_table, "\" doesn't exist on database when dumping meta-data for ", class_name);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SVSV(&exception_message, "Table \"", complete_table, "\" doesn't exist on database when dumping meta-data for ", class_name);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 
@@ -134,9 +133,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		/** 
 		 * The table not exists
 		 */
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVSV(exception_message, "Cannot obtain table columns for the mapped source \"", complete_table, "\" used in model ", class_name);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SVSV(&exception_message, "Cannot obtain table columns for the mapped source \"", complete_table, "\" used in model ", class_name);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 

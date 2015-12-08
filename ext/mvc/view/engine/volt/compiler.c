@@ -698,7 +698,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 	zval *expr, *code = NULL, *func_arguments = NULL, *arguments = NULL;
 	zval *name_expr, *name_type, *name = NULL;
 	zval *event;
-	zval *line = NULL, *file = NULL, *exception_message = NULL;
+	zval *line = NULL, *file = NULL, exception_message;
 	zval *block, *escaped_code = NULL, *camelized;
 	zval *method, *class_name, *array_helpers = NULL;
 
@@ -802,9 +802,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 				PHALCON_OBS_VAR(file);
 				phalcon_array_fetch_str(&file, expr, SL("file"), PH_NOISY);
 
-				PHALCON_INIT_VAR(exception_message);
-				PHALCON_CONCAT_SVSVSV(exception_message, "Invalid definition for user function '", name, "' in ", file, " on line ", line);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+				PHALCON_CONCAT_SVSVSV(&exception_message, "Invalid definition for user function '", name, "' in ", file, " on line ", line);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 				return;
 			}
 		}
@@ -983,9 +982,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		PHALCON_OBS_NVAR(file);
 		phalcon_array_fetch_str(&file, expr, SL("file"), PH_NOISY);
 
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVSVSV(exception_message, "Undefined function '", name, "' in ", file, " on line ", line);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+		PHALCON_CONCAT_SVSVSV(&exception_message, "Undefined function '", name, "' in ", file, " on line ", line);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
@@ -1147,7 +1145,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 
 	zval *filter, *left, *code = NULL, *type, *name = NULL, *function_name;
-	zval *line = NULL, *file = NULL, *exception_message = NULL, *func_arguments = NULL;
+	zval *line = NULL, *file = NULL, exception_message, *func_arguments = NULL;
 	zval *arguments = NULL, *resolved_expr, *resolved_param;
 	zval *extensions, *event, *fire_arguments, *filters;
 
@@ -1190,9 +1188,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 		PHALCON_OBS_VAR(file);
 		phalcon_array_fetch_str(&file, filter, SL("file"), PH_NOISY);
 
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVSV(exception_message, "Unknown filter type in ", file, " on line ", line);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+		PHALCON_CONCAT_SVSV(&exception_message, "Unknown filter type in ", file, " on line ", line);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
@@ -1303,9 +1300,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 			PHALCON_OBS_NVAR(file);
 			phalcon_array_fetch_str(&file, filter, SL("file"), PH_NOISY);
 
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SVSVSV(exception_message, "Invalid definition for user filter '", name, "' in ", file, " on line ", line);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+			PHALCON_CONCAT_SVSVSV(&exception_message, "Invalid definition for user filter '", name, "' in ", file, " on line ", line);
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 			return;
 		}
 	}
@@ -1556,9 +1552,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	PHALCON_OBS_NVAR(file);
 	phalcon_array_fetch_str(&file, filter, SL("file"), PH_NOISY);
 
-	PHALCON_INIT_NVAR(exception_message);
-	PHALCON_CONCAT_SVSVSV(exception_message, "Unknown filter \"", name, "\" in ", file, " on line ", line);
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+	PHALCON_CONCAT_SVSVSV(&exception_message, "Unknown filter \"", name, "\" in ", file, " on line ", line);
+	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 	return;
 }
 
@@ -1576,7 +1571,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 	zval *left = NULL, *left_code = NULL, *right_code = NULL, *right = NULL, *value = NULL;
 	zval *single_quote = NULL, *escaped_quoute = NULL, *escaped_string = NULL;
 	zval *start_code = NULL, *end_code = NULL, *ternary = NULL;
-	zval *ternary_code = NULL, *line = NULL, *file = NULL, *exception_message = NULL;
+	zval *ternary_code = NULL, *line = NULL, *file = NULL, exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -1948,9 +1943,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				PHALCON_OBS_NVAR(file);
 				phalcon_array_fetch_str(&file, expr, SL("file"), PH_NOISY);
 
-				PHALCON_INIT_VAR(exception_message);
-				PHALCON_CONCAT_SVSVSV(exception_message, "Unknown expression ", type, " in ", file, " on line ", line);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+				PHALCON_CONCAT_SVSVSV(&exception_message, "Unknown expression ", type, " in ", file, " on line ", line);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 				return;
 
 		}
@@ -2808,7 +2802,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileAutoEscape){
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileMacro){
 
 	zval *statement, *extends_mode, *name, *macros;
-	zval *exception_message, *code, *parameters;
+	zval exception_message, *code, *parameters;
 	zval *parameter = NULL, *variable_name = NULL, *block_statements;
 	zval *block_code = NULL;
 	zend_string *str_key;
@@ -2835,9 +2829,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileMacro){
 	 * Check if the macro is already defined
 	 */
 	if (phalcon_array_isset(macros, name)) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Macro \"", name, "\" is already defined");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Macro \"", name, "\" is already defined");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	} else {
 		/** 
@@ -2927,7 +2920,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 
 	zval *statements, *extends_mode = NULL, *extended = NULL, *block_mode = NULL;
 	zval *compilation = NULL, *extensions, *statement = NULL, *line = NULL;
-	zval *file = NULL, *exception_message = NULL, *event = NULL, *fire_arguments = NULL;
+	zval *file = NULL, exception_message, *event = NULL, *fire_arguments = NULL;
 	zval *temp_compilation = NULL, *type = NULL, *block_name = NULL, *block_statements = NULL;
 	zval *blocks = NULL, *code = NULL, *path = NULL, *view = NULL, *views_dir = NULL, *final_path = NULL;
 	zval *sub_compiler = NULL, *compiled_path = NULL, *level;
@@ -2983,9 +2976,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 			PHALCON_OBS_NVAR(file);
 			phalcon_array_fetch_str(&file, statement, SL("file"), PH_NOISY);
 
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SVSV(exception_message, "Invalid statement in ", file, " on line ", line);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+			PHALCON_CONCAT_SVSV(&exception_message, "Invalid statement in ", file, " on line ", line);
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 			return;
 		}
 
@@ -3219,9 +3211,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 				PHALCON_OBS_NVAR(file);
 				phalcon_array_fetch_str(&file, statement, SL("file"), PH_NOISY);
 
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVSVSV(exception_message, "Unknown statement ", type, " in ", file, " on line ", line);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+				PHALCON_CONCAT_SVSVSV(&exception_message, "Unknown statement ", type, " in ", file, " on line ", line);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 				return;
 
 		}
@@ -3420,7 +3411,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileString){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 
-	zval *path, *compiled_path, *extends_mode = NULL, *exception_message = NULL;
+	zval *path, *compiled_path, *extends_mode = NULL, exception_message;
 	zval *view_code, *compilation = NULL, *final_compilation = NULL;
 	zval *status;
 
@@ -3441,9 +3432,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 	 * Check if the template exists
 	 */
 	if (phalcon_file_exists(path) == FAILURE) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Template file ", path, " does not exist");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Template file ", path, " does not exist");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
@@ -3454,9 +3444,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 	PHALCON_INIT_VAR(view_code);
 	phalcon_file_get_contents(view_code, path);
 	if (PHALCON_IS_FALSE(view_code)) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Template file ", path, " could not be opened");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Template file ", path, " could not be opened");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
@@ -3509,7 +3498,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 	zval *compilation = NULL, *options, *real_template_path;
 	zval *template_sep_path = NULL, *compiled_template_path = NULL;
 	zval *params, *real_compiled_path = NULL, *blocks_code;
-	zval *exception_message = NULL;
+	zval exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -3711,9 +3700,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 						PHALCON_INIT_VAR(blocks_code);
 						phalcon_file_get_contents(blocks_code, real_compiled_path);
 						if (PHALCON_IS_FALSE(blocks_code)) {
-							PHALCON_INIT_VAR(exception_message);
-							PHALCON_CONCAT_SVS(exception_message, "Extends compilation file ", real_compiled_path, " could not be opened");
-							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+							PHALCON_CONCAT_SVS(&exception_message, "Extends compilation file ", real_compiled_path, " could not be opened");
+							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 							return;
 						}
 
@@ -3740,9 +3728,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 			 * Stat is off but the compiled file doesn't exist
 			 */
 			if (phalcon_file_exists(real_compiled_path) == FAILURE) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Compiled template file ", real_compiled_path, " does not exist");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Compiled template file ", real_compiled_path, " does not exist");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 				return;
 			}
 		}

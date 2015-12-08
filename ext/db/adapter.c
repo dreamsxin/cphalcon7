@@ -481,7 +481,7 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchAll){
  */
 PHP_METHOD(Phalcon_Db_Adapter, insert){
 
-	zval *table, *values, *fields = NULL, *data_types = NULL, *exception_message;
+	zval *table, *values, *fields = NULL, *data_types = NULL, exception_message;
 	zval *placeholders, *insert_values, *bind_data_types = NULL;
 	zval *value = NULL, *str_value = NULL, *bind_type = NULL;
 	zval *escaped_table = NULL, *joined_values, *escaped_fields = NULL;
@@ -511,9 +511,8 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	 * A valid array with more than one element is required
 	 */
 	if (!phalcon_fast_count_ev(values)) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Unable to insert into ", table, " without data");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Unable to insert into ", table, " without data");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
 		return;
 	}
 
@@ -1075,7 +1074,7 @@ PHP_METHOD(Phalcon_Db_Adapter, sharedLock){
 PHP_METHOD(Phalcon_Db_Adapter, createTable){
 
 	zval *table_name, *schema_name, *definition;
-	zval *exception_message, *columns, *dialect;
+	zval exception_message, *columns, *dialect;
 	zval *sql = NULL;
 
 	PHALCON_MM_GROW();
@@ -1083,9 +1082,8 @@ PHP_METHOD(Phalcon_Db_Adapter, createTable){
 	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Invalid definition to create the table '", table_name, "'");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Invalid definition to create the table '", table_name, "'");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
 		return;
 	}
 
@@ -1148,7 +1146,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropTable){
  */
 PHP_METHOD(Phalcon_Db_Adapter, createView){
 
-	zval *view_name, *definition, *schema_name = NULL, *exception_message;
+	zval *view_name, *definition, *schema_name = NULL, exception_message;
 	zval *dialect, *sql = NULL;
 
 	PHALCON_MM_GROW();
@@ -1160,9 +1158,8 @@ PHP_METHOD(Phalcon_Db_Adapter, createView){
 	}
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Invalid definition to create the view '", view_name, "'");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Invalid definition to create the view '", view_name, "'");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
 		return;
 	}
 

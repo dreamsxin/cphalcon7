@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 
 	zval *engines = NULL, *dependency_injector, *registered_engines;
 	zval *php_engine, *arguments, *engine_service = NULL;
-	zval *engine_object = NULL, *exception_message = NULL;
+	zval *engine_object = NULL, exception_message;
 	zend_string *str_key;
 	ulong idx;
 
@@ -341,9 +341,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 						PHALCON_CALL_METHOD(&engine_object, dependency_injector, "getshared", engine_service, arguments);
 						PHALCON_VERIFY_INTERFACE(engine_object, phalcon_mvc_view_engineinterface_ce);
 					} else {
-						PHALCON_INIT_NVAR(exception_message);
-						PHALCON_CONCAT_SV(exception_message, "Invalid template engine registration for extension: ", &extension);
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+						PHALCON_CONCAT_SV(&exception_message, "Invalid template engine registration for extension: ", &extension);
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 						return;
 					}
 				}
@@ -368,10 +367,10 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
-	zval *path, *params, *events_manager, *event_name = NULL, *debug_message = NULL;
+	zval *path, *params, *events_manager, event_name, *debug_message = NULL;
 	zval *status = NULL, *not_exists = NULL, *views_dir;
 	zval *views_dir_path, *engines = NULL, *engine = NULL;
-	zval *view_engine_path = NULL, *exception_message;
+	zval *view_engine_path = NULL, exception_message;
 	zend_string *str_key;
 	ulong idx;
 
@@ -388,11 +387,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	 * Call beforeRender if there is an events manager
 	 */
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "view:beforeRender");
 
-		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "view:beforeRender");
-
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis());
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis());
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_NULL();
 		}
@@ -442,11 +439,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 			 * Call beforeRenderView if there is a events manager available
 			 */
 			if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-
-				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "view:beforeRenderView");
-
-				PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis(), view_engine_path);
+				ZVAL_STRING(&event_name, "view:beforeRenderView");
+				PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), view_engine_path);
 				if (PHALCON_IS_FALSE(status)) {
 					continue;
 				}
@@ -460,9 +454,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 			PHALCON_INIT_NVAR(not_exists);
 			ZVAL_FALSE(not_exists);
 			if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "view:afterRenderView");
-				PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis());
+				ZVAL_STRING(&event_name, "view:afterRenderView");
+				PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis());
 			}
 
 			break;
@@ -477,9 +470,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	 * Always throw an exception if the view does not exist
 	 */
 	if (PHALCON_IS_TRUE(not_exists)) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "View '", views_dir_path, "' was not found in the views directory");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "View '", views_dir_path, "' was not found in the views directory");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
@@ -487,9 +479,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	 * Call afterRender event
 	 */
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "view:afterRender");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis());
+		ZVAL_STRING(&event_name, "view:afterRender");
+		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis());
 	}
 
 	PHALCON_MM_RESTORE();

@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 
 	zval *model, *class_name, *initialized, *events_manager;
-	zval *event_name;
+	zval event_name;
 
 	PHALCON_MM_GROW();
 
@@ -220,9 +220,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		 */
 		events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-			PHALCON_INIT_VAR(event_name);
-			ZVAL_STRING(event_name, "collectionManager:afterInitialize");
-			PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis());
+			ZVAL_STRING(&event_name, "collectionManager:afterInitialize");
+			PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis());
 		}
 
 		phalcon_update_property_array(getThis(), SL("_initialized"), class_name, model);
@@ -476,13 +475,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 
-	zval *event_name, *model, *status = NULL, *events_manager;
+	zval *eventname, *model, *status = NULL, *events_manager;
 	zval *fire_event_name = NULL, *custom_events_manager;
 	zval *entity_name;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &event_name, &model);
+	phalcon_fetch_params(1, 2, 0, &eventname, &model);
 
 	PHALCON_INIT_VAR(status);
 
@@ -493,7 +492,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 
 		PHALCON_INIT_VAR(fire_event_name);
-		PHALCON_CONCAT_SV(fire_event_name, "collection:", event_name);
+		PHALCON_CONCAT_SV(fire_event_name, "collection:", eventname);
 
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", fire_event_name, model);
 		if (PHALCON_IS_FALSE(status)) {
@@ -512,7 +511,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 		if (phalcon_array_isset(custom_events_manager, entity_name)) {
 
 			PHALCON_INIT_NVAR(fire_event_name);
-			PHALCON_CONCAT_SV(fire_event_name, "collection:", event_name);
+			PHALCON_CONCAT_SV(fire_event_name, "collection:", eventname);
 
 			PHALCON_CALL_METHOD(&status, custom_events_manager, "fire", fire_event_name, model);
 			if (PHALCON_IS_FALSE(status)) {

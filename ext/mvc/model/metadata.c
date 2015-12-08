@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
 	zval *model, *key, *table, *schema, *read_meta = NULL, *strategy = NULL, *class_name;
 	zval *meta_data = NULL, *prefix_key = NULL, *data = NULL, *model_metadata = NULL;
-	zval *exception_message, *dependency_injector;
+	zval exception_message, *dependency_injector;
 	zval *column_map = NULL, *model_column_map = NULL;
 
 	PHALCON_MM_GROW();
@@ -221,10 +221,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 				 */
 				if (phalcon_method_exists_ex(model, SL("metadata")) == SUCCESS) {
 					PHALCON_CALL_METHOD(&model_metadata, model, "metadata");
-					if (Z_TYPE_P(model_metadata) != IS_ARRAY) { 
-						PHALCON_INIT_VAR(exception_message);
-						PHALCON_CONCAT_SV(exception_message, "Invalid meta-data for model ", class_name);
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					if (Z_TYPE_P(model_metadata) != IS_ARRAY) {
+						PHALCON_CONCAT_SV(&exception_message, "Invalid meta-data for model ", class_name);
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {

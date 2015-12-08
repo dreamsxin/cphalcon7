@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	zval *value, *filter, *filters, *filter_object;
 	zval *arguments, *type = NULL, *quote, *empty_str, *escaped = NULL;
 	zval *allow_tags, *allow_attributes;
-	zval *filtered = NULL, *allow_fraction, *options, *exception_message;
+	zval *filtered = NULL, *allow_fraction, *options, exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -431,10 +431,9 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		phalcon_xss_clean(filtered, value, allow_tags, allow_attributes);
 		goto ph_end_0;
 	}
-	
-	PHALCON_INIT_VAR(exception_message);
-	PHALCON_CONCAT_SVS(exception_message, "Sanitize filter ", filter, " is not supported");
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_filter_exception_ce, exception_message);
+
+	PHALCON_CONCAT_SVS(&exception_message, "Sanitize filter ", filter, " is not supported");
+	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_filter_exception_ce, &exception_message);
 	return;
 	
 	ph_end_0:

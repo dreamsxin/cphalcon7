@@ -1662,7 +1662,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	zval *dependency_injector = NULL, *model, *conditions = NULL;
 	zval *service_name, *meta_data = NULL, *model_instance;
 	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
-	zval *column_map = NULL, *attribute_field = NULL, *exception_message;
+	zval *column_map = NULL, *attribute_field = NULL, exception_message;
 	zval *primary_key_condition, *phql, *columns;
 	zval *selected_columns = NULL, *column = NULL;
 	zval *aliased_column = NULL, *joined_columns = NULL;
@@ -1737,9 +1737,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 						PHALCON_OBS_VAR(attribute_field);
 						phalcon_array_fetch(&attribute_field, column_map, first_primary_key, PH_NOISY);
 					} else {
-						PHALCON_INIT_VAR(exception_message);
-						PHALCON_CONCAT_SVS(exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+						PHALCON_CONCAT_SVS(&exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {
@@ -2008,7 +2007,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 
-	zval *model, *exception_message;
+	zval *model, exception_message;
 	zval *phql, *columns, *selected_columns, *joined_columns, *column = NULL;
 	zval *rows, *insert_sqls, *bind_params, *keys = NULL, *key = NULL, *row = NULL, *value = NULL;
 	zval *joined_keys = NULL, *insert_sql = NULL, *joined_insert_sqls;
@@ -2077,9 +2076,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 				PHALCON_OBS_NVAR(value);
 				phalcon_array_fetch(&value, row, &tmp2, PH_NOISY);
 			} else {
-				PHALCON_INIT_VAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Values can't find column '", column, "' value");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Values can't find column '", column, "' value");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
@@ -2122,7 +2120,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	zval *dependency_injector = NULL, *model, *conditions = NULL;
 	zval *service_name, *meta_data = NULL, *model_instance, *connection = NULL;
 	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
-	zval *column_map = NULL, *attribute_field = NULL, *exception_message;
+	zval *column_map = NULL, *attribute_field = NULL, exception_message;
 	zval *primary_key_condition, *phql, *bind_params, *columns, *updated_columns;
 	zval *column = NULL, *value = NULL, *bind_name = NULL, *updated_column = NULL, *joined_columns = NULL;
 	zval *order, *order_items, *order_item = NULL, *escaped_item = NULL, *joined_items = NULL;
@@ -2188,9 +2186,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 						PHALCON_OBS_VAR(attribute_field);
 						phalcon_array_fetch(&attribute_field, column_map, first_primary_key, PH_NOISY);
 					} else {
-						PHALCON_INIT_VAR(exception_message);
-						PHALCON_CONCAT_SVS(exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+						PHALCON_CONCAT_SVS(&exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {
@@ -2331,7 +2328,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	zval *dependency_injector = NULL, *model, *conditions = NULL;
 	zval *service_name, *meta_data = NULL, *model_instance;
 	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
-	zval *column_map = NULL, *attribute_field = NULL, *exception_message;
+	zval *column_map = NULL, *attribute_field = NULL, exception_message;
 	zval *primary_key_condition, *phql;
 	zval *order, *order_items, *order_item = NULL, *escaped_item = NULL, *joined_items = NULL;
 	zval *limit, *offset, *number;
@@ -2400,9 +2397,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 						PHALCON_OBS_VAR(attribute_field);
 						phalcon_array_fetch(&attribute_field, column_map, first_primary_key, PH_NOISY);
 					} else {
-						PHALCON_INIT_VAR(exception_message);
-						PHALCON_CONCAT_SVS(exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+						PHALCON_CONCAT_SVS(&exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {

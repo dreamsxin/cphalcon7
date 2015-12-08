@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addRole){
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 
 	zval *role_name, *role_to_inherit, *roles_names;
-	zval *exception_message = NULL, *role_inherit_name = NULL;
+	zval exception_message, *role_inherit_name = NULL;
 	zval *roles_inherits, *empty_arr, *_roleInherits;
 
 	PHALCON_MM_GROW();
@@ -247,9 +247,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 
 	roles_names = phalcon_read_property(getThis(), SL("_rolesNames"), PH_NOISY);
 	if (!phalcon_array_isset(roles_names, role_name)) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Role '", role_name, "' does not exist in the role list");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Role '", role_name, "' does not exist in the role list");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, &exception_message);
 		return;
 	}
 
@@ -263,9 +262,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 	 * Check if the role to inherit is valid
 	 */
 	if (!phalcon_array_isset(roles_names, role_inherit_name)) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Role '", role_inherit_name, "' (to inherit) does not exist in the role list");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Role '", role_inherit_name, "' (to inherit) does not exist in the role list");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, &exception_message);
 		return;
 	}
 
@@ -395,7 +393,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResource){
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResourceAccess){
 
 	zval *resource_name, *access_list, *resources_names;
-	zval *exception_message, *internal_access_list;
+	zval exception_message, *internal_access_list;
 	zval *access_name = NULL, *access_key = NULL;
 
 	PHALCON_MM_GROW();
@@ -404,9 +402,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResourceAccess){
 
 	resources_names = phalcon_read_property(getThis(), SL("_resourcesNames"), PH_NOISY);
 	if (!phalcon_array_isset(resources_names, resource_name)) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Resource '", resource_name, "' does not exist in ACL");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Resource '", resource_name, "' does not exist in ACL");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, &exception_message);
 		return;
 	}
 
@@ -474,7 +471,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, dropResourceAccess){
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 
 	zval *role_name, *resource_name, *access, *action;
-	zval *roles_names, *exception_message = NULL, *resources_names;
+	zval *roles_names, exception_message, *resources_names;
 	zval *default_access, *access_list, *internal_access;
 	zval *access_name = NULL, *access_key = NULL, *access_key_all = NULL;
 
@@ -484,17 +481,15 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 
 	roles_names = phalcon_read_property(getThis(), SL("_rolesNames"), PH_NOISY);
 	if (!phalcon_array_isset(roles_names, role_name)) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Role \"", role_name, "\" does not exist in ACL");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Role \"", role_name, "\" does not exist in ACL");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, &exception_message);
 		return;
 	}
 
 	resources_names = phalcon_read_property(getThis(), SL("_resourcesNames"), PH_NOISY);
 	if (!phalcon_array_isset(resources_names, resource_name)) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Resource \"", resource_name, "\" does not exist in ACL");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Resource \"", resource_name, "\" does not exist in ACL");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, &exception_message);
 		return;
 	}
 
@@ -506,9 +501,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 			PHALCON_INIT_NVAR(access_key);
 			PHALCON_CONCAT_VSV(access_key, resource_name, "!", access_name);
 			if (!phalcon_array_isset(access_list, access_key)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVSVS(exception_message, "Acccess '", access_name, "' does not exist in resource '", resource_name, "'");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, exception_message);
+				PHALCON_CONCAT_SVSVS(&exception_message, "Acccess '", access_name, "' does not exist in resource '", resource_name, "'");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, &exception_message);
 				return;
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -530,9 +524,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 			PHALCON_INIT_NVAR(access_key);
 			PHALCON_CONCAT_VSV(access_key, resource_name, "!", access);
 			if (!phalcon_array_isset(access_list, access_key)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVSVS(exception_message, "Acccess '", access, "' does not exist in resource '", resource_name, "'");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, exception_message);
+				PHALCON_CONCAT_SVSVS(&exception_message, "Acccess '", access, "' does not exist in resource '", resource_name, "'");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_acl_exception_ce, &exception_message);
 				return;
 			}
 		}
@@ -735,7 +728,7 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	zval *role, *resource, *access, *events_manager, *role_inherits;
-	zval *event_name = NULL, *status = NULL, *default_access, *roles_names;
+	zval event_name, *status = NULL, *default_access, *roles_names;
 	zval *have_access = NULL, *access_list, *access_key = NULL;
 	zval star;
 	int allow_access;
@@ -752,11 +745,9 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "acl:beforeCheckAccess");
 
-		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "acl:beforeCheckAccess");
-
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis());
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis());
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_CTOR(status);
 		}
@@ -837,9 +828,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	phalcon_update_property_this(getThis(), SL("_accessGranted"), return_value);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "acl:afterCheckAccess");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis(), return_value);
+		ZVAL_STRING(&event_name, "acl:afterCheckAccess");
+		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), return_value);
 	}
 
 	PHALCON_MM_RESTORE();

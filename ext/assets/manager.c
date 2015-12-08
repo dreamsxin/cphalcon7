@@ -518,7 +518,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	zval *target_base_path = NULL, *options, *collection_source_path = NULL;
 	zval *complete_source_path = NULL, *collection_target_path = NULL;
 	zval *complete_target_path = NULL, *filtered_joined_content = NULL;
-	zval *join = NULL, *exception_message = NULL, *is_directory;
+	zval *join = NULL, exception_message, *is_directory;
 	zval *resource = NULL, *filter_needed = NULL, *local = NULL, *source_path = NULL;
 	zval *target_path = NULL, *path = NULL, *prefixed_path = NULL, *attributes = NULL;
 	zval *parameters = NULL, *html = NULL, *content = NULL, *must_filter = NULL;
@@ -637,9 +637,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 * We need a valid final target path
 			 */
 			if (PHALCON_IS_EMPTY(complete_target_path)) {
-				PHALCON_INIT_VAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Path '", complete_target_path, "' is not a valid target path (1)");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Path '", complete_target_path, "' is not a valid target path (1)");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
 				return;
 			}
 
@@ -650,9 +649,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 * The targetpath needs to be a valid file
 			 */
 			if (PHALCON_IS_TRUE(is_directory)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Path '", complete_target_path, "' is not a valid target path (2)");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Path '", complete_target_path, "' is not a valid target path (2)");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
 				return;
 			}
 		}
@@ -688,9 +686,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				if (!zend_is_true(source_path)) {
 					PHALCON_CALL_METHOD(&source_path, resource, "getpath");
 
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Resource '", source_path, "' does not have a valid source path");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Resource '", source_path, "' does not have a valid source path");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -715,9 +712,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 * We need a valid final target path
 			 */
 			if (PHALCON_IS_EMPTY(target_path)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Resource '", source_path, "' does not have a valid target path");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Resource '", source_path, "' does not have a valid target path");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
 				return;
 			}
 
@@ -727,9 +723,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				 * Make sure the target path is not the same source path
 				 */
 				if (PHALCON_IS_EQUAL(target_path, source_path)) {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Resource '", target_path, "' have the same source and target paths");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Resource '", target_path, "' have the same source and target paths");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
 					return;
 				}
 				if (phalcon_file_exists(target_path) == SUCCESS) {

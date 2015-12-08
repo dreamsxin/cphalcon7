@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getName){
 PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
 	zval *expr, *type, *items, *item = NULL, *item_expr = NULL;
-	zval *resolved_item = NULL, *exception_message;
+	zval *resolved_item = NULL, exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -231,9 +231,8 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 			/* no break because of implicit return */
 	
 		default:
-			PHALCON_INIT_VAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "The expression ", type, " is unknown");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_annotations_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "The expression ", type, " is unknown");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_annotations_exception_ce, &exception_message);
 			return;
 	
 	}

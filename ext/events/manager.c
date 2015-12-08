@@ -720,7 +720,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 PHP_METHOD(Phalcon_Events_Manager, fire){
 
 	zval *event_type, *source, *data = NULL, *cancelable = NULL, *events;
-	zval *exception_message, *event_parts, *type;
+	zval exception_message, *event_parts, *type;
 	zval *event_name, *status = NULL, *collect, *event = NULL, *fire_events = NULL;
 
 	PHALCON_MM_GROW();
@@ -749,9 +749,8 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	 * All valid events must have a colon separator
 	 */
 	if (!phalcon_memnstr_str(event_type, SL(":"))) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SV(exception_message, "Invalid event type ", event_type);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_events_exception_ce, exception_message);
+		PHALCON_CONCAT_SV(&exception_message, "Invalid event type ", event_type);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_events_exception_ce, &exception_message);
 		return;
 	}
 

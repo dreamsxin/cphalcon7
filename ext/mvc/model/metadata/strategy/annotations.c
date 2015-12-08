@@ -76,7 +76,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 
 	zval *model, *dependency_injector, *service;
 	zval *annotations = NULL, *class_name, *reflection = NULL;
-	zval *exception_message = NULL, *properties_annotations = NULL;
+	zval exception_message, *properties_annotations = NULL;
 	zval *attributes, *primary_keys, *non_primary_keys;
 	zval *numeric_typed, *not_null, *field_types, *field_sizes, *field_bytes, *field_scales;
 	zval *field_bind_types, *automatic_create_attributes, *automatic_update_attributes;
@@ -108,9 +108,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 
 	PHALCON_CALL_METHOD(&reflection, annotations, "get", class_name);
 	if (Z_TYPE_P(reflection) != IS_OBJECT) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SV(exception_message, "No annotations were found in class ", class_name);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SV(&exception_message, "No annotations were found in class ", class_name);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 
@@ -120,9 +119,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	PHALCON_CALL_METHOD(&properties_annotations, reflection, "getpropertiesannotations");
 
 	if (!zend_is_true(properties_annotations) || !phalcon_fast_count_ev(properties_annotations)) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SV(exception_message, "No properties with annotations were found in class ", class_name);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SV(&exception_message, "No properties with annotations were found in class ", class_name);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 
@@ -354,7 +352,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	zval *model, *dependency_injector, *service;
 	zval *ordered_column_map, *reversed_column_map = NULL;
 	zval *annotations = NULL, *class_name, *reflection = NULL;
-	zval *exception_message = NULL, *properties_annotations = NULL;
+	zval exception_message, *properties_annotations = NULL;
 	zval *column_annot_name, *column_map_name;
 	zval *prop_annotations = NULL, *has_annotation = NULL;
 	zval *column_annotation = NULL, *real_property = NULL;
@@ -384,9 +382,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 
 	PHALCON_CALL_METHOD(&reflection, annotations, "get", class_name);
 	if (Z_TYPE_P(reflection) != IS_OBJECT) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SV(exception_message, "No annotations were found in class ", class_name);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SV(&exception_message, "No annotations were found in class ", class_name);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 
@@ -395,9 +392,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	 */
 	PHALCON_CALL_METHOD(&properties_annotations, reflection, "getpropertiesannotations");
 	if (!phalcon_fast_count_ev(properties_annotations)) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SV(exception_message, "No properties with annotations were found in class ", class_name);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SV(&exception_message, "No properties with annotations were found in class ", class_name);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 

@@ -1839,7 +1839,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 	zval *z_one, *number_models, *invalid_condition;
 	zval *model = NULL, *service_name, *has = NULL, *meta_data = NULL, *model_instance;
 	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
-	zval *column_map = NULL, *attribute_field = NULL, *exception_message;
+	zval *column_map = NULL, *attribute_field = NULL, exception_message;
 	zval *primary_key_condition;
 	zend_class_entry *ce0;
 
@@ -1938,9 +1938,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 						PHALCON_OBS_VAR(attribute_field);
 						phalcon_array_fetch(&attribute_field, column_map, first_primary_key, PH_NOISY);
 					} else {
-						PHALCON_INIT_VAR(exception_message);
-						PHALCON_CONCAT_SVS(exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+						PHALCON_CONCAT_SVS(&exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {

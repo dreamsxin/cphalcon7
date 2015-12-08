@@ -90,12 +90,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior, mustTakeAction){
 
-	zval *event_name, *options;
+	zval *eventname, *options;
 
-	phalcon_fetch_params(0, 1, 0, &event_name);
+	phalcon_fetch_params(0, 1, 0, &eventname);
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-	if (phalcon_array_isset(options, event_name)) {
+	if (phalcon_array_isset(options, eventname)) {
 		RETURN_TRUE;
 	}
 	
@@ -110,13 +110,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior, mustTakeAction){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior, getOptions){
 
-	zval *event_name = NULL, *options, *event_options;
+	zval *eventname = NULL, *options, *event_options;
 
-	phalcon_fetch_params(0, 0, 1, &event_name);
+	phalcon_fetch_params(0, 0, 1, &eventname);
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-	if (event_name && Z_TYPE_P(event_name) != IS_NULL) {
-		if (phalcon_array_isset_fetch(&event_options, options, event_name)) {
+	if (eventname && Z_TYPE_P(eventname) != IS_NULL) {
+		if (phalcon_array_isset_fetch(&event_options, options, eventname)) {
 			RETURN_ZVAL(event_options, 1, 0);
 		}
 		RETURN_NULL();

@@ -421,7 +421,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getTargetPath){
 PHP_METHOD(Phalcon_Assets_Resource, getContent){
 
 	zval *base_path = NULL, *source_path = NULL, *complete_path;
-	zval *local, *exception_message = NULL;
+	zval *local, exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -453,9 +453,8 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 		 * Check first if the file is readable
 		 */
 		if (phalcon_file_exists(complete_path) == FAILURE) {
-			PHALCON_INIT_VAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "Resource's content for \"", complete_path, "\" cannot be loaded");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "Resource's content for \"", complete_path, "\" cannot be loaded");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
 			return;
 		}
 	}
@@ -465,9 +464,8 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 	 */
 	phalcon_file_get_contents(return_value, complete_path);
 	if (PHALCON_IS_FALSE(return_value)) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Resource's content for \"", complete_path, "\" cannot be read");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Resource's content for \"", complete_path, "\" cannot be read");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
 		return;
 	}
 

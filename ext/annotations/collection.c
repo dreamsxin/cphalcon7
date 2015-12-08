@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAnnotations){
 PHP_METHOD(Phalcon_Annotations_Collection, get){
 
 	zval *name, *annotations, *annotation = NULL, *annotation_name = NULL;
-	zval *exception_message;
+	zval exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -270,9 +270,8 @@ PHP_METHOD(Phalcon_Annotations_Collection, get){
 
 	}
 
-	PHALCON_INIT_VAR(exception_message);
-	PHALCON_CONCAT_SVS(exception_message, "The collection doesn't have an annotation called '", name, "'");
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_annotations_exception_ce, exception_message);
+	PHALCON_CONCAT_SVS(&exception_message, "The collection doesn't have an annotation called '", name, "'");
+	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_annotations_exception_ce, &exception_message);
 	return;
 }
 

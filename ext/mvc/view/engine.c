@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
-	zval *method_name, *arguments = NULL, *methods, *method, *dependency_injector, *exception_message = NULL;
+	zval *method_name, *arguments = NULL, *methods, *method, *dependency_injector, exception_message;
 	zval *service_name, *service = NULL, *callback;
 
 	PHALCON_MM_GROW();
@@ -227,16 +227,14 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	PHALCON_CALL_METHOD(&service, dependency_injector, "getshared", service_name);
 
 	if (Z_TYPE_P(service) != IS_OBJECT) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "The injected service '", service_name, "' is not valid");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "The injected service '", service_name, "' is not valid");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
 	if (!phalcon_method_exists(service, method_name) == FAILURE) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "The method \"", method_name, "\" doesn't exist on view");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "The method \"", method_name, "\" doesn't exist on view");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 

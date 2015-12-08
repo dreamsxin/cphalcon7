@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 
 #ifdef PHALCON_USE_QRENCODE
 	zval *filename, *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL;
-	zval *zid, *exception_message;
+	zval *zid, exception_message;
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_colorp palette;
@@ -593,9 +593,8 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 
 	fp = VCWD_FOPEN(fn, "wb");
 	if (!fp) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Unable to open '", filename, "' for writing");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_chart_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Unable to open '", filename, "' for writing");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_chart_exception_ce, &exception_message);
 		return;
 	}	
 

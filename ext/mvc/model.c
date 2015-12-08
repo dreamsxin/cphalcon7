@@ -1165,7 +1165,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 PHP_METHOD(Phalcon_Mvc_Model, assign){
 
 	zval *data, *column_map = NULL, *value = NULL, *attribute = NULL;
-	zval *exception_message = NULL;
+	zval exception_message;
 	zend_string *str_key;
 
 	PHALCON_MM_GROW();
@@ -1194,9 +1194,8 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 					phalcon_array_fetch(&attribute, column_map, &key, PH_NOISY);
 					phalcon_update_property_zval_zval(getThis(), attribute, value);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column \"", &key, "\" doesn't make part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -1231,7 +1230,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 
 	zval *base, *data, *column_map, *dirty_state = NULL, *keep_snapshots = NULL, *source_model = NULL;
-	zval *object, *value = NULL, *attribute = NULL, *exception_message = NULL;
+	zval *object, *value = NULL, *attribute = NULL, exception_message;
 	zval *data_types = NULL, *field_type = NULL, *convert_value = NULL;
 	zend_string *str_key;
 
@@ -1300,9 +1299,8 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 					phalcon_array_fetch(&attribute, column_map, &key, PH_NOISY);
 					phalcon_update_property_zval_zval(object, attribute, convert_value);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column \"", &key, "\" doesn't make part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -1339,7 +1337,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 
 	zval *data, *column_map, *hydration_mode, *source_model = NULL, *hydrate = NULL;
-	zval *value = NULL, *exception_message = NULL, *attribute = NULL;
+	zval *value = NULL, exception_message, *attribute = NULL;
 	zval *data_types = NULL, *field_type = NULL, *convert_value = NULL;
 	zend_string *str_key;
 
@@ -1406,9 +1404,8 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 				 * Every field must be part of the column map
 				 */
 				if (!phalcon_array_isset(column_map, &key)) {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column \"", &key, "\" doesn't make part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 
@@ -1532,7 +1529,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	zval *parameters = NULL, *model_name;
 	zval *dependency_injector = NULL, *service_name, *has = NULL, *service_params, *manager = NULL, *model = NULL;
 	zval *params = NULL, *builder = NULL, *query = NULL, *cache;
-	zval *event_name = NULL, *resultset = NULL, *hydration;
+	zval event_name, *resultset = NULL, *hydration;
 
 	PHALCON_MM_GROW();
 
@@ -1592,11 +1589,10 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 
 	PHALCON_CALL_METHOD(NULL, builder, "from", model_name);
 
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "beforeQuery");
+	ZVAL_STRING(&event_name, "beforeQuery");
 
 	ZVAL_MAKE_REF(builder);
-	PHALCON_CALL_METHOD(NULL, model, "fireevent", event_name, builder);
+	PHALCON_CALL_METHOD(NULL, model, "fireevent", &event_name, builder);
 	ZVAL_UNREF(builder);
 
 	PHALCON_CALL_METHOD(&query, builder, "getquery");
@@ -1625,11 +1621,10 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 			PHALCON_CALL_METHOD(NULL, resultset, "sethydratemode", hydration);
 		}
 
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "afterQuery");
+		ZVAL_STRING(&event_name, "afterQuery");
 
 		ZVAL_MAKE_REF(resultset);
-		PHALCON_CALL_METHOD(NULL, model, "fireevent", event_name, resultset);
+		PHALCON_CALL_METHOD(NULL, model, "fireevent", &event_name, resultset);
 		ZVAL_UNREF(resultset);
 	}
 
@@ -1662,7 +1657,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	zval *parameters = NULL, *auto_create = NULL, *model_name, *params = NULL, *builder = NULL;
-	zval *query = NULL, *cache, *event_name = NULL;
+	zval *query = NULL, *cache, event_name;
 	zval *dependency_injector = NULL, *service_name, *has = NULL, *service_params, *manager = NULL, *model = NULL;
 	zval *result = NULL, *hydration = NULL;
 
@@ -1734,11 +1729,10 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	PHALCON_CALL_METHOD(NULL, builder, "from", model_name);
 
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "beforeQuery");
+	ZVAL_STRING(&event_name, "beforeQuery");
 
 	ZVAL_MAKE_REF(builder);
-	PHALCON_CALL_METHOD(NULL, model, "fireevent", event_name, builder);
+	PHALCON_CALL_METHOD(NULL, model, "fireevent", &event_name, builder);
 	ZVAL_UNREF(builder);
 
 	/**
@@ -1765,12 +1759,10 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	PHALCON_CALL_METHOD(&result, query, "execute");
 
 	if (zend_is_true(result)) {
-
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "afterQuery");
+		ZVAL_STRING(&event_name, "afterQuery");
 
 		ZVAL_MAKE_REF(result);
-		PHALCON_CALL_METHOD(NULL, model, "fireevent", event_name, result);
+		PHALCON_CALL_METHOD(NULL, model, "fireevent", &event_name, result);
 		ZVAL_UNREF(result);
 
 		/**
@@ -1892,7 +1884,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 	zval *unique_types = NULL, *unique_key = NULL, *primary_keys = NULL;
 	zval *bind_data_types = NULL, *number_primary, *column_map = NULL;
 	zval *null_value, *number_empty, *where_pk, *field = NULL;
-	zval *attribute_field = NULL, *exception_message = NULL;
+	zval *attribute_field = NULL, exception_message;
 	zval *value = NULL, *escaped_field = NULL, *pk_condition = NULL, *type = NULL;
 	zval *v, *join_where;
 
@@ -1942,9 +1934,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 					PHALCON_OBS_NVAR(attribute_field);
 					phalcon_array_fetch(&attribute_field, column_map, field, PH_NOISY);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -1986,9 +1977,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 			}
 
 			if (!phalcon_array_isset(bind_data_types, field)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' isn't a part of the table columns");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't a part of the table columns");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
@@ -2458,13 +2448,13 @@ PHP_METHOD(Phalcon_Mvc_Model, average){
  */
 PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 
-	zval *event_name, *data = NULL, *cancelable = NULL, *models_manager;
+	zval *eventname, *data = NULL, *cancelable = NULL, *models_manager;
 	zval *lower;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &event_name, &data, &cancelable);
-	PHALCON_ENSURE_IS_STRING(event_name);
+	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
+	PHALCON_ENSURE_IS_STRING(eventname);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -2476,7 +2466,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 
 	if (likely(PHALCON_GLOBAL(orm).events)) {
 		PHALCON_INIT_VAR(lower);
-		phalcon_fast_strtolower(lower, event_name);
+		phalcon_fast_strtolower(lower, eventname);
 
 		/**
 		 * Check if there is a method with the same name of the event
@@ -2490,7 +2480,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_RETURN_CALL_METHOD(models_manager, "notifyevent", event_name, getThis());
+		PHALCON_RETURN_CALL_METHOD(models_manager, "notifyevent", eventname, getThis());
 	}
 
 	RETURN_MM();
@@ -2505,13 +2495,13 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 
-	zval *event_name, *data = NULL, *cancelable = NULL, *status = NULL, *models_manager;
+	zval *eventname, *data = NULL, *cancelable = NULL, *status = NULL, *models_manager;
 	zval *lower;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &event_name, &data, &cancelable);
-	PHALCON_ENSURE_IS_STRING(event_name);
+	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
+	PHALCON_ENSURE_IS_STRING(eventname);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -2523,7 +2513,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 
 	if (likely(PHALCON_GLOBAL(orm).events)) {
 		PHALCON_INIT_VAR(lower);
-		phalcon_fast_strtolower(lower, event_name);
+		phalcon_fast_strtolower(lower, eventname);
 
 		/**
 		 * Check if there is a method with the same name of the event
@@ -2540,7 +2530,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(&status, models_manager, "notifyevent", event_name, getThis());
+		PHALCON_CALL_METHOD(&status, models_manager, "notifyevent", eventname, getThis());
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -2556,20 +2546,19 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _cancelOperation){
 
-	zval *operation_made, *event_name = NULL;
+	zval *operation_made, event_name;
 
 	PHALCON_MM_GROW();
 
 	operation_made = phalcon_read_property(getThis(), SL("_operationMade"), PH_NOISY);
+
 	if (PHALCON_IS_LONG(operation_made, 3)) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "notDeleted");
+		ZVAL_STRING(&event_name, "notDeleted");
 	} else {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "notSaved");
+		ZVAL_STRING(&event_name, "notSaved");
 	}
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
 	PHALCON_MM_RESTORE();
 }
@@ -2598,7 +2587,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _cancelOperation){
  */
 PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
 
-	zval *message, *field = NULL, *type = NULL, *code = NULL, *custom_message = NULL, *exception_message, *model_message;
+	zval *message, *field = NULL, *type = NULL, *code = NULL, *custom_message = NULL, exception_message, *model_message;
 	zval *message_message = NULL, *message_field = NULL, *message_type = NULL, *message_code = NULL; 
 
 	PHALCON_MM_GROW();
@@ -2625,9 +2614,8 @@ PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
 			PHALCON_INIT_NVAR(type);
 			ZVAL_STRING(type, zend_zval_type_name(message));
 
-			PHALCON_INIT_VAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "Invalid message format '", type, "'");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "Invalid message format '", type, "'");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 		}
 
@@ -2932,7 +2920,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 	zval *field = NULL, *value = NULL, *referenced_field = NULL;
 	zval *condition = NULL, *extra_conditions = NULL, *join_conditions = NULL;
 	zval *parameters = NULL, *rowcount = NULL, *user_message = NULL, *joined_fields = NULL;
-	zval *type = NULL, *event_name = NULL;
+	zval *type = NULL, event_name;
 	zend_string *str_key;
 	ulong idx;
 
@@ -3098,9 +3086,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 		 * Call 'onValidationFails' if the validation fails
 		 */
 		if (PHALCON_IS_TRUE(error)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "onValidationFails");
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+			ZVAL_STRING(&event_name, "onValidationFails");
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 			PHALCON_CALL_METHOD(NULL, getThis(), "_canceloperation");
 			RETURN_MM_FALSE;
 		}
@@ -3122,7 +3109,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 	zval *bind_params = NULL, *field = NULL, *value = NULL, *referenced_field = NULL;
 	zval *condition = NULL, *extra_conditions = NULL, *join_conditions = NULL;
 	zval *parameters = NULL, *rowcount = NULL, *user_message = NULL, *type = NULL;
-	zval *event_name = NULL;
+	zval event_name;
 	zend_string *str_key;
 	ulong idx;
 
@@ -3275,9 +3262,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 		 * Call validation fails event
 		 */
 		if (PHALCON_IS_TRUE(error)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "onValidationFails");
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+			ZVAL_STRING(&event_name, "onValidationFails");
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 			PHALCON_CALL_METHOD(NULL, getThis(), "_canceloperation");
 
 			RETURN_MM_FALSE;
@@ -3455,12 +3441,12 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
-	zval *meta_data, *exists, *identity_field, *event_name = NULL;
+	zval *meta_data, *exists, *identity_field, event_name;
 	zval *status = NULL, *attributes = NULL, *data_type_numeric = NULL, *data_types = NULL;
 	zval *column_map = NULL, *automatic_attributes = NULL, *default_values = NULL, *error = NULL;
 	zval *field = NULL, *field_type = NULL, *is_not_null = NULL, *field_size = NULL, *field_scale = NULL;
 	zval *attribute_field = NULL, *value = NULL, *str_value = NULL, *message = NULL, *type = NULL, *length = NULL, *pos = NULL;
-	zval *skipped, *exception_message = NULL;
+	zval *skipped, exception_message;
 	double num, max;
 
 	PHALCON_MM_GROW();
@@ -3475,30 +3461,26 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 	 * Run Validation Callbacks Before
 	 */
 	if (likely(PHALCON_GLOBAL(orm).events)) {
-
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "beforeValidation");
+		ZVAL_STRING(&event_name, "beforeValidation");
 
 		/**
 		 * Call the beforeValidation
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 
 		if (!zend_is_true(exists)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "beforeValidationOnCreate");
+			ZVAL_STRING(&event_name, "beforeValidationOnCreate");
 		} else {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "beforeValidationOnUpdate");
+			ZVAL_STRING(&event_name, "beforeValidationOnUpdate");
 		}
 
 		/**
 		 * Call the specific beforeValidation event for the current action
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -3534,17 +3516,15 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 	error = &PHALCON_GLOBAL(z_false);
 
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "validation");
+	ZVAL_STRING(&event_name, "validation");
 
 	/**
 	 * Call the main validation event
 	 */
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(status)) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "onValidationFails");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		ZVAL_STRING(&event_name, "onValidationFails");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
 		RETURN_MM_FALSE;
 	}
@@ -3560,9 +3540,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 					PHALCON_OBS_NVAR(attribute_field);
 					phalcon_array_fetch(&attribute_field, column_map, field, PH_NOISY);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -3731,9 +3710,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 	} ZEND_HASH_FOREACH_END();
 
 	if (PHALCON_IS_TRUE(error)) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "onValidationFails");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		ZVAL_STRING(&event_name, "onValidationFails");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		PHALCON_CALL_METHOD(NULL, getThis(), "_canceloperation");
 
 		RETURN_MM_FALSE;
@@ -3744,46 +3722,40 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 	 */
 	if (likely(PHALCON_GLOBAL(orm).events)) {
 		if (!zend_is_true(exists)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "afterValidationOnCreate");
+			ZVAL_STRING(&event_name, "afterValidationOnCreate");
 		} else {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "afterValidationOnUpdate");
+			ZVAL_STRING(&event_name, "afterValidationOnUpdate");
 		}
 
 		/**
 		 * Run Validation Callbacks After
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "afterValidation");
+		ZVAL_STRING(&event_name, "afterValidation");
 
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "beforeSave");
+		ZVAL_STRING(&event_name, "beforeSave");
 
 		/**
 		 * Run Before Callbacks
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 
 		if (zend_is_true(exists)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "beforeUpdate");
+			ZVAL_STRING(&event_name, "beforeUpdate");
 		} else {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "beforeCreate");
+			ZVAL_STRING(&event_name, "beforeCreate");
 		}
 
 		phalcon_update_property_bool(getThis(), SL("_skipped"), 0);
@@ -3791,7 +3763,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		/**
 		 * The operation can be skipped here
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -3817,7 +3789,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _postSave){
 
-	zval *success, *exists, *event_name = NULL;
+	zval *success, *exists, event_name;
 
 	PHALCON_MM_GROW();
 
@@ -3826,24 +3798,20 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSave){
 	if (likely(PHALCON_GLOBAL(orm).events)) {
 		if (PHALCON_IS_TRUE(success)) {
 			if (zend_is_true(exists)) {
-				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "afterUpdate");
+				ZVAL_STRING(&event_name, "afterUpdate");
 			} else {
-				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "afterCreate");
+				ZVAL_STRING(&event_name, "afterCreate");
 			}
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "afterSave");
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+			ZVAL_STRING(&event_name, "afterSave");
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
 			RETURN_CTOR(success);
 		}
 
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "notSave");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		ZVAL_STRING(&event_name, "notSave");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		PHALCON_CALL_METHOD(NULL, getThis(), "_canceloperation");
 		RETURN_MM_FALSE;
 	}
@@ -3865,7 +3833,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	zval *bind_skip, *fields, *values;
 	zval *bind_types, *attributes = NULL, *bind_data_types = NULL;
 	zval *automatic_attributes = NULL, *column_map = NULL, *field = NULL;
-	zval *attribute_field = NULL, *exception_message = NULL;
+	zval *attribute_field = NULL, exception_message;
 	zval *value = NULL, *bind_type = NULL, *default_value = NULL, *use_explicit_identity = NULL;
 	zval *success = NULL, *sequence_name = NULL, *support_sequences = NULL;
 	zval *schema = NULL, *source = NULL, *last_insert_id = NULL;
@@ -3912,9 +3880,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 					PHALCON_OBS_NVAR(attribute_field);
 					phalcon_array_fetch(&attribute_field, column_map, field, PH_NOISY);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -3934,9 +3901,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 					 * Every column must have a bind data type defined
 					 */
 					if (!phalcon_array_isset(bind_data_types, field)) {
-						PHALCON_INIT_NVAR(exception_message);
-						PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' has not defined a bind data type");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+						PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' has not defined a bind data type");
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 
@@ -4010,9 +3976,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 				PHALCON_OBS_NVAR(attribute_field);
 				phalcon_array_fetch(&attribute_field, column_map, identity_field, PH_NOISY);
 			} else {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Identity column '", identity_field, "' isn't part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Identity column '", identity_field, "' isn't part of the column map");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 		} else {
@@ -4041,9 +4006,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 				 * The field is valid we look for a bind value (normally int)
 				 */
 				if (!phalcon_array_isset(bind_data_types, identity_field)) {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Identity column '", identity_field, "' isn't part of the table columns");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Identity column '", identity_field, "' isn't part of the table columns");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 
@@ -4120,7 +4084,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	zval *bind_skip, *fields, *values, *bind_types;
 	zval *manager, *use_dynamic_update = NULL, *snapshot;
 	zval *bind_data_types = NULL, *non_primary = NULL, *automatic_attributes = NULL;
-	zval *column_map = NULL, *columns = NULL, *field = NULL, *exception_message = NULL;
+	zval *column_map = NULL, *columns = NULL, *field = NULL, exception_message;
 	zval *attribute_field = NULL, *value = NULL, *bind_type = NULL, *changed = NULL;
 	zval *snapshot_value = NULL, *unique_key, *unique_params = NULL;
 	zval *unique_types, *primary_keys = NULL, *conditions, *ret = NULL, *type, *message;
@@ -4184,9 +4148,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			 * Check a bind type for field to update
 			 */
 			if (!phalcon_array_isset(bind_data_types, field)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' have not defined a bind data type");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' have not defined a bind data type");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
@@ -4198,9 +4161,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 					PHALCON_OBS_NVAR(attribute_field);
 					phalcon_array_fetch(&attribute_field, column_map, field, PH_NOISY);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -4325,9 +4287,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 					PHALCON_OBS_NVAR(attribute_field);
 					phalcon_array_fetch(&attribute_field, column_map, field, PH_NOISY);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -4492,7 +4453,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 	zval *connection, *related, *nesting, *class_name;
 	zval *manager = NULL, *record = NULL, *relation = NULL, *type = NULL, *columns = NULL;
 	zval *referenced_model = NULL, *referenced_fields = NULL;
-	zval *related_records = NULL, *exception_message = NULL;
+	zval *related_records = NULL, exception_message;
 	zval *value = NULL, *is_through = NULL, *new_instance, *intermediate_model_name = NULL;
 	zval *intermediate_fields = NULL, *intermediate_referenced_fields = NULL;
 	zval *record_after = NULL, *intermediate_model = NULL, *intermediate_value = NULL;
@@ -4563,9 +4524,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 				if (!phalcon_isset_property_zval(getThis(), columns)) {
 					PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
 
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "The column '", columns, "' needs to be present in the model");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "The column '", columns, "' needs to be present in the model");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 
@@ -4666,9 +4626,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 				if (Z_TYPE_P(record) != IS_ARRAY) { 
 					PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
 
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVSVS(exception_message, "There are no defined relations for the model \"", class_name, "\" using alias \"", &tmp, "\"");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVSVS(&exception_message, "There are no defined relations for the model \"", class_name, "\" using alias \"", &tmp, "\"");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			}
@@ -4708,10 +4667,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 PHP_METHOD(Phalcon_Mvc_Model, save){
 
 	zval *data = NULL, *white_list = NULL, *exists = NULL, *exists_check = NULL, *exists2 = NULL;
-	zval *event_name = NULL, *type, *message, *meta_data = NULL, *attributes = NULL;
+	zval event_name, *type, *message, *meta_data = NULL, *attributes = NULL;
 	zval *attribute = NULL, *value = NULL, *possible_setter = NULL, *bind_params, *write_connection = NULL;
 	zval *related, *status = NULL, *schema = NULL, *source = NULL, *table = NULL, *read_connection = NULL;
-	zval *error_messages = NULL, *identity_field = NULL;
+	zval *error_messages, *identity_field = NULL;
 	zval *nesting = NULL, *exception, *success = NULL, *new_success = NULL, *snapshot_data = NULL;
 	zend_string *str_key;
 	ulong idx;
@@ -4839,9 +4798,8 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		phalcon_update_property_long(getThis(), SL("_operationMade"), 1);
 	}
 
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "beforeOperation");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+	ZVAL_STRING(&event_name, "beforeOperation");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
 	}
@@ -4877,9 +4835,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	/**
 	 * Clean the messages
 	 */
-	PHALCON_INIT_VAR(error_messages);
-	array_init(error_messages);
-	phalcon_update_property_this(getThis(), SL("_errorMessages"), error_messages);
+	phalcon_update_property_empty_array(getThis(), SL("_errorMessages"));
 
 	/**
 	 * Query the identity field
@@ -4976,9 +4932,8 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		PHALCON_CALL_METHOD(&snapshot_data, getThis(), "toarray");
 		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", snapshot_data);
 
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "afterOperation");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		ZVAL_STRING(&event_name, "afterOperation");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	}
 
 	RETURN_CTOR(new_success);
@@ -5099,10 +5054,10 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	zval *meta_data = NULL, *write_connection = NULL, *empty_array;
 	zval *bind_params, *check_foreign_keys = NULL, *values, *bind_types;
 	zval *conditions, *primary_keys = NULL, *bind_data_types = NULL;
-	zval *column_map = NULL, *primary_key = NULL, *exception_message = NULL;
+	zval *column_map = NULL, *primary_key = NULL, exception_message;
 	zval *attribute_field = NULL, *value = NULL, *escaped_field = NULL;
 	zval *primary_condition = NULL, *bind_type = NULL, *delete_conditions;
-	zval *event_name = NULL, *status = NULL, *skipped, *schema = NULL, *source = NULL;
+	zval event_name, *status = NULL, *skipped, *schema = NULL, *source = NULL;
 	zval *table = NULL, *success = NULL;
 
 	PHALCON_MM_GROW();
@@ -5114,9 +5069,8 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	 */
 	phalcon_update_property_long(getThis(), SL("_operationMade"), 3);
 
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "beforeOperation");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+	ZVAL_STRING(&event_name, "beforeOperation");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
 	}
@@ -5167,9 +5121,8 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		 * Every column part of the primary key must be in the bind data types
 		 */
 		if (!phalcon_array_isset(bind_data_types, primary_key)) {
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "Column '", primary_key, "' have not defined a bind data type");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_key, "' have not defined a bind data type");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 		}
 
@@ -5181,9 +5134,8 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 				PHALCON_OBS_NVAR(attribute_field);
 				phalcon_array_fetch(&attribute_field, column_map, primary_key, PH_NOISY);
 			} else {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column '", primary_key, "' isn't part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_key, "' isn't part of the column map");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 		} else {
@@ -5194,9 +5146,8 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		 * If the attribute is currently set in the object add it to the conditions
 		 */
 		if (!phalcon_isset_property_zval(getThis(), attribute_field)) {
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "Cannot delete the record because the primary key attribute: '", attribute_field, "' wasn't set");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "Cannot delete the record because the primary key attribute: '", attribute_field, "' wasn't set");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 		}
 
@@ -5247,13 +5198,12 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 
 	phalcon_update_property_bool(getThis(), SL("_skipped"), 0);
 
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "beforeDelete");
+	ZVAL_STRING(&event_name, "beforeDelete");
 
 	/**
 	 * Fire the beforeDelete event
 	 */
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
 	} else {
@@ -5311,13 +5261,11 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	phalcon_update_property_long(getThis(), SL("_dirtyState"), 2);
 
 	if (zend_is_true(success)) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "afterDelete");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		ZVAL_STRING(&event_name, "afterDelete");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "afterOperation");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		ZVAL_STRING(&event_name, "afterOperation");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		RETURN_MM_TRUE;
 	}
 
@@ -5342,7 +5290,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getOperationMade){
 PHP_METHOD(Phalcon_Mvc_Model, refresh){
 
 	zval *dirty_state, *meta_data = NULL, *bind_params, *primary_keys = NULL, *number_primary = NULL;
-	zval *field = NULL, *attribute_field = NULL, *value = NULL, *exception_message = NULL;
+	zval *field = NULL, *attribute_field = NULL, *value = NULL, exception_message;
 	zval *read_connection = NULL, *schema = NULL, *source = NULL, *table = NULL, *unique_key = NULL, *exists = NULL;
 	zval *unique_params, *unique_types, *attributes = NULL;
 	zval *field_item = NULL, *fields, *escaped_table = NULL;
@@ -5381,9 +5329,8 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 					PHALCON_OBS_NVAR(attribute_field);
 					phalcon_array_fetch(&attribute_field, column_map, field, PH_NOISY);
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -5992,7 +5939,7 @@ PHP_METHOD(Phalcon_Mvc_Model, keepSnapshots){
  */
 PHP_METHOD(Phalcon_Mvc_Model, setSnapshotData){
 
-	zval *data, *column_map = NULL, *snapshot, *value = NULL, *exception_message = NULL;
+	zval *data, *column_map = NULL, *snapshot, *value = NULL, exception_message;
 	zval *attribute = NULL;
 	zend_string *str_key;
 
@@ -6026,9 +5973,8 @@ PHP_METHOD(Phalcon_Mvc_Model, setSnapshotData){
 				 * Every field must be part of the column map
 				 */
 				if (!phalcon_array_isset(column_map, &key)) {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVS(exception_message, "Column \"", &key, "\" doesn't make part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 
@@ -6088,7 +6034,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 
 	zval *field_name = NULL, *snapshot, *dirty_state, *meta_data = NULL;
 	zval *column_map = NULL, *attributes = NULL, *all_attributes = NULL;
-	zval *exception_message = NULL, *value = NULL, *original_value = NULL;
+	zval exception_message, *value = NULL, *original_value = NULL;
 	zend_string *str_key;
 	ulong idx;
 
@@ -6153,16 +6099,14 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 		 */
 		if (Z_TYPE_P(column_map) == IS_ARRAY) { 
 			if (!phalcon_array_isset(column_map, field_name)) {
-				PHALCON_INIT_VAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "The field '", field_name, "' is not part of the model");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "The field '", field_name, "' is not part of the model");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 		} else {
 			if (!phalcon_array_isset(attributes, field_name)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "The field '", field_name, "' is not part of the model");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "The field '", field_name, "' is not part of the model");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 		}
@@ -6171,9 +6115,8 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 		 * The field is not part of the model, throw exception
 		 */
 		if (!phalcon_isset_property_zval(getThis(), field_name)) {
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "The field '", field_name, "' is not defined on the model");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "The field '", field_name, "' is not defined on the model");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 		}
 
@@ -6181,9 +6124,8 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 		 * The field is not part of the data snapshot, throw exception
 		 */
 		if (!phalcon_array_isset(snapshot, field_name)) {
-			PHALCON_INIT_NVAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "The field '", field_name, "' was not found in the snapshot");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "The field '", field_name, "' was not found in the snapshot");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 		}
 
@@ -6385,7 +6327,7 @@ PHP_METHOD(Phalcon_Mvc_Model, useDynamicUpdate){
 PHP_METHOD(Phalcon_Mvc_Model, getRelated){
 
 	zval *alias, *arguments = NULL, *manager, *class_name;
-	zval *relation = NULL, *exception_message, *call_object;
+	zval *relation = NULL, exception_message, *call_object;
 	zval *model_args;
 
 	PHALCON_MM_GROW();
@@ -6406,9 +6348,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getRelated){
 	 */
 	PHALCON_CALL_METHOD(&relation, manager, "getrelationbyalias", class_name, alias);
 	if (Z_TYPE_P(relation) != IS_OBJECT) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVSVS(exception_message, "There is no defined relations for the model \"", class_name, "\" using alias \"", alias, "\"");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SVSVS(&exception_message, "There is no defined relations for the model \"", class_name, "\" using alias \"", alias, "\"");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 
@@ -6519,7 +6460,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _getRelatedRecords){
 PHP_METHOD(Phalcon_Mvc_Model, __call){
 
 	zval *method, *arguments = NULL, *model_name, *records = NULL;
-	zval *models_manager, *status = NULL, *exception_message;
+	zval *models_manager, *status = NULL, exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -6554,9 +6495,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __call){
 	/**
 	 * The method doesn't exist throw an exception
 	 */
-	PHALCON_INIT_VAR(exception_message);
-	PHALCON_CONCAT_SVSVS(exception_message, "The method \"", method, "\" doesn't exist on model \"", model_name, "\"");
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+	PHALCON_CONCAT_SVSVS(&exception_message, "The method \"", method, "\" doesn't exist on model \"", model_name, "\"");
+	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 	return;
 }
 
@@ -6570,7 +6510,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __call){
 PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 
 	zval *method, *arguments = NULL, *extra_method = NULL;
-	zval *model_name, *exception_message = NULL, *value;
+	zval *model_name, exception_message, *value;
 	zval *model, *meta_data = NULL, *attributes = NULL, *field = NULL, *extra_method_first;
 	zval *conditions, *bind_params, *parameters;
 	zend_class_entry *ce0;
@@ -6623,16 +6563,14 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 		/**
 		 * The method doesn't exist throw an exception
 		 */
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVSVS(exception_message, "The static method \"", method, "\" doesn't exist on model \"", model_name, "\"");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SVSVS(&exception_message, "The static method \"", method, "\" doesn't exist on model \"", model_name, "\"");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 
 	if (!phalcon_array_isset_long(arguments, 0)) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "The static method \"", method, "\" requires one argument");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "The static method \"", method, "\" requires one argument");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 
@@ -6682,9 +6620,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 			PHALCON_INIT_NVAR(field);
 			phalcon_uncamelize(field, extra_method);
 			if (!phalcon_array_isset(attributes, field)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Cannot resolve attribute \"", extra_method, "' in the model");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Cannot resolve attribute \"", extra_method, "' in the model");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 		}
@@ -6720,7 +6657,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 	zval *property, *value, *lower_property = NULL, *possible_setter = NULL;
 	zval *model_name = NULL, *values = NULL, *meta_data = NULL, *column_map = NULL, *attributes = NULL;
 	zval *related, *lower_key = NULL, *item = NULL;
-	zval *manager = NULL, *exception_message = NULL;
+	zval *manager = NULL, exception_message;
 	zval *relation = NULL, *referenced_model_name = NULL, *referenced_model = NULL, *type = NULL;
 	zend_string *str_key;
 	ulong idx;
@@ -6808,9 +6745,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 						phalcon_update_property_array(getThis(), SL("_relatedResult"), lower_property, value);
 					} else if (!instanceof_function_ex(Z_OBJCE_P(value), phalcon_mvc_modelinterface_ce, 1)
 						|| !PHALCON_IS_EQUAL(referenced_model_name, model_name)) {
-						PHALCON_INIT_NVAR(exception_message);
-						PHALCON_CONCAT_SVSVS(exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+						PHALCON_CONCAT_SVSVS(&exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					} else {
 						phalcon_update_property_array(getThis(), SL("_related"), lower_property, value);
@@ -6823,9 +6759,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 							PHALCON_CALL_METHOD(NULL, referenced_model, "assign", value);	
 					}
 				} else {
-					PHALCON_INIT_NVAR(exception_message);
-					PHALCON_CONCAT_SVSVS(exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+					PHALCON_CONCAT_SVSVS(&exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -6859,9 +6794,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 
 						if (!instanceof_function_ex(Z_OBJCE_P(item), phalcon_mvc_modelinterface_ce, 1)
 							|| !PHALCON_IS_EQUAL(referenced_model_name, model_name)) {
-							PHALCON_INIT_NVAR(exception_message);
-							PHALCON_CONCAT_SVSVS(exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
-							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+							PHALCON_CONCAT_SVSVS(&exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
+							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 							return;
 						}
 
@@ -6875,9 +6809,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 							PHALCON_CALL_METHOD(NULL, referenced_model, "assign", item);
 						}
 					} else {
-						PHALCON_INIT_NVAR(exception_message);
-						PHALCON_CONCAT_SVSVS(exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+						PHALCON_CONCAT_SVSVS(&exception_message, "Property \"", property, "\" must be an model `", referenced_model_name, "`");
+						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} ZEND_HASH_FOREACH_END();
@@ -7042,7 +6975,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __isset){
 PHP_METHOD(Phalcon_Mvc_Model, serialize){
 
 	zval *meta_data = NULL, *attributes = NULL, *column_map = NULL, *null_value, *data;
-	zval *attribute = NULL, *attribute_field = NULL, *value = NULL, *exception_message = NULL;
+	zval *attribute = NULL, *attribute_field = NULL, *value = NULL, exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -7069,9 +7002,8 @@ PHP_METHOD(Phalcon_Mvc_Model, serialize){
 		 */
 		if (Z_TYPE_P(column_map) == IS_ARRAY) { 
 			if (!phalcon_array_isset(column_map, attribute)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column \"", attribute, "\" doesn't make part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column \"", attribute, "\" doesn't make part of the column map");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
@@ -7200,7 +7132,7 @@ PHP_METHOD(Phalcon_Mvc_Model, dump){
 PHP_METHOD(Phalcon_Mvc_Model, toArray){
 
 	zval *columns = NULL, *rename_columns = NULL, *meta_data = NULL, *data, *null_value, *attributes = NULL;
-	zval *column_map = NULL, *attribute = NULL, *exception_message = NULL, *event_name = NULL;
+	zval *column_map = NULL, *attribute = NULL, exception_message, event_name;
 	zval *attribute_field = NULL, *possible_getter = NULL, *possible_value = NULL, *value = NULL;
 
 	PHALCON_MM_GROW();
@@ -7234,9 +7166,8 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 		 */
 		if (zend_is_true(rename_columns) && Z_TYPE_P(column_map) == IS_ARRAY) { 
 			if (!phalcon_array_isset(column_map, attribute)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column \"", attribute, "\" doesn't make part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column \"", attribute, "\" doesn't make part of the column map");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
@@ -7275,11 +7206,10 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "afterToArray");
+	ZVAL_STRING(&event_name, "afterToArray");
 
 	ZVAL_MAKE_REF(data);
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name, data);
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, data);
 	ZVAL_UNREF(data);
 
 	RETURN_CTOR(data);

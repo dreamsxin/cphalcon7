@@ -397,7 +397,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getCustomEventsManager){
 PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 
 	zval *model, *class_name, *initialized, *events_manager;
-	zval *event_name;
+	zval event_name;
 
 	PHALCON_MM_GROW();
 
@@ -438,9 +438,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 */
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "modelsManager:afterInitialize");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", event_name, getThis(), model);
+		ZVAL_STRING(&event_name, "modelsManager:afterInitialize");
+		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), model);
 	}
 
 	RETURN_MM_TRUE;
@@ -897,13 +896,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 
-	zval *event_name, *model, *status = NULL, *behaviors, *entity_name = NULL;
+	zval *eventname, *model, *status = NULL, *behaviors, *entity_name = NULL;
 	zval *models_behaviors, *behavior = NULL, *events_manager, *mgr;
 	zval *fire_event_name = NULL, *custom_events_manager;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &event_name, &model);
+	phalcon_fetch_params(1, 2, 0, &eventname, &model);
 
 	PHALCON_INIT_VAR(status);
 
@@ -921,7 +920,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 			 * Notify all the events on the behavior
 			 */
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(models_behaviors), behavior) {
-				PHALCON_CALL_METHOD(&status, behavior, "notify", event_name, model);
+				PHALCON_CALL_METHOD(&status, behavior, "notify", eventname, model);
 				if (PHALCON_IS_FALSE(status)) {
 					RETURN_CTOR(status);
 				}
@@ -937,7 +936,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 
 		PHALCON_INIT_VAR(fire_event_name);
-		PHALCON_CONCAT_SV(fire_event_name, "model:", event_name);
+		PHALCON_CONCAT_SV(fire_event_name, "model:", eventname);
 
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", fire_event_name, model);
 		if (PHALCON_IS_FALSE(status)) {
@@ -956,7 +955,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 		if (phalcon_array_isset_fetch(&mgr, custom_events_manager, entity_name)) {
 
 			PHALCON_INIT_NVAR(fire_event_name);
-			PHALCON_CONCAT_SV(fire_event_name, "model:", event_name);
+			PHALCON_CONCAT_SV(fire_event_name, "model:", eventname);
 
 			PHALCON_CALL_METHOD(&status, mgr, "fire", fire_event_name, model);
 			if (PHALCON_IS_FALSE(status)) {
@@ -980,13 +979,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 
-	zval *model, *event_name, *data, *behaviors, *entity_name;
+	zval *model, *eventname, *data, *behaviors, *entity_name;
 	zval *models_behaviors, *behavior = NULL, *result = NULL, *events_manager;
 	zval *fire_event_name;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 3, 0, &model, &event_name, &data);
+	phalcon_fetch_params(1, 3, 0, &model, &eventname, &data);
 
 	/** 
 	 * Dispatch events to the global events manager
@@ -1005,7 +1004,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 			phalcon_array_fetch(&models_behaviors, behaviors, entity_name, PH_NOISY);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(models_behaviors), behavior) {
-				PHALCON_CALL_METHOD(&result, behavior, "missingmethod", model, event_name, data);
+				PHALCON_CALL_METHOD(&result, behavior, "missingmethod", model, eventname, data);
 				if (Z_TYPE_P(result) != IS_NULL) {
 					RETURN_CTOR(result);
 				}
@@ -1020,7 +1019,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_INIT_VAR(fire_event_name);
-		PHALCON_CONCAT_SV(fire_event_name, "model:", event_name);
+		PHALCON_CONCAT_SV(fire_event_name, "model:", eventname);
 		PHALCON_RETURN_CALL_METHOD(events_manager, "fire", fire_event_name, model, data);
 		RETURN_MM();
 	}
@@ -2969,7 +2968,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, registerNamespaceAlias){
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getNamespaceAlias){
 
 	zval *alias, *namespace_aliases, *namespace;
-	zval *exception_message;
+	zval exception_message;
 
 	PHALCON_MM_GROW();
 
@@ -2982,9 +2981,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getNamespaceAlias){
 		RETURN_CTOR(namespace);
 	}
 
-	PHALCON_INIT_VAR(exception_message);
-	PHALCON_CONCAT_SVS(exception_message, "Namespace alias '", alias, "' is not registered");
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, exception_message);
+	PHALCON_CONCAT_SVS(&exception_message, "Namespace alias '", alias, "' is not registered");
+	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 	return;
 }
 

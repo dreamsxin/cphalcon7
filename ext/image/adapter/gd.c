@@ -129,7 +129,7 @@ PHALCON_INIT_CLASS(Phalcon_Image_Adapter_GD){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 
-	zval *ret = NULL, *gd_info = NULL, *gd_version, *version, *exception_message;
+	zval *ret = NULL, *gd_info = NULL, *gd_version, *version, exception_message;
 	zval *pattern, *matches;
 	int rc;
 
@@ -171,9 +171,8 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 	rc = php_version_compare(Z_STRVAL_P(gd_version), "2.0.1");
 
 	if (-1 == rc) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SV(exception_message, "Phalcon\\Image\\Adapter\\GD requires GD version '2.0.1' or greater, you have '", gd_version);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_image_exception_ce, exception_message);
+		PHALCON_CONCAT_SV(&exception_message, "Phalcon\\Image\\Adapter\\GD requires GD version '2.0.1' or greater, you have '", gd_version);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_image_exception_ce, &exception_message);
 		return;
 	}
 
@@ -191,7 +190,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
-	zval *file, *width = NULL, *height = NULL, *exception_message;
+	zval *file, *width = NULL, *height = NULL, exception_message;
 	zval *checked, *realpath, *type, *format, *mime = NULL, *image = NULL, *imageinfo = NULL;
 	zval *saveflag, *blendmode;
 
@@ -332,9 +331,8 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
 		phalcon_update_property_this(getThis(), SL("_mime"), mime);
 	} else {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "Failed to create image from file '", file, "'");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_image_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "Failed to create image from file '", file, "'");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_image_exception_ce, &exception_message);
 		return;
 	}
 

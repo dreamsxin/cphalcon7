@@ -719,7 +719,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 
 	zval *data, *white_list = NULL, *column_map = NULL;
 	zval *value = NULL, *attribute = NULL;
-	zval *exception_message = NULL;
+	zval exception_message;
 	zend_string *str_key;
 	ulong idx;
 
@@ -763,9 +763,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 				phalcon_array_fetch(&attribute, column_map, &tmp, PH_NOISY);
 				phalcon_update_property_zval_zval(getThis(), attribute, value);
 			} else {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Column \"", &tmp, "\" doesn't make part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column \"", &tmp, "\" doesn't make part of the column map");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, &exception_message);
 				return;
 			}
 		} else {
@@ -899,7 +898,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
 	zval *params, *collection, *connection, *unique;
 	zval *source = NULL, *mongo_collection = NULL, *conditions = NULL, *new_conditions = NULL;
 	zval *fields, *documents_cursor = NULL, *limit, *sort = NULL;
-	zval *class_name = NULL, *base = NULL, *document = NULL, *exception_message = NULL;
+	zval *class_name = NULL, *base = NULL, *document = NULL, exception_message;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -996,9 +995,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
 			ce0 = phalcon_fetch_class(class_name TSRMLS_CC);
 			object_init_ex(base, ce0);
 			if (!instanceof_function_ex(Z_OBJCE_P(base), phalcon_mvc_collection_document_ce, 1 TSRMLS_CC) && !instanceof_function_ex(Z_OBJCE_P(base), phalcon_mvc_collection_document_ce, 1 TSRMLS_CC)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Object of class '", class_name, "' must be an implementation of Phalcon\\Mvc\\CollectionInterface or an instance of Phalcon\\Mvc\\Collection\\Document");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Object of class '", class_name, "' must be an implementation of Phalcon\\Mvc\\CollectionInterface or an instance of Phalcon\\Mvc\\Collection\\Document");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, &exception_message);
 				return;
 			}
 		} else {
@@ -1148,7 +1146,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getGroupResultset){
 PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 
 	zval *dependency_injector, *disable_events;
-	zval *exists, *event_name = NULL, *status = NULL;
+	zval *exists, event_name, *status = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -1158,24 +1156,20 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 	 * Run Validation Callbacks Before
 	 */
 	if (!zend_is_true(disable_events)) {
+		ZVAL_STRING(&event_name, "beforeValidation");
 
-		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "beforeValidation");
-
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 
 		if (!zend_is_true(exists)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "beforeValidationOnCreate");
+			ZVAL_STRING(&event_name, "beforeValidationOnCreate");
 		} else {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "beforeValidationOnUpdate");
+			ZVAL_STRING(&event_name, "beforeValidationOnUpdate");
 		}
 
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -1184,15 +1178,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 	/**
 	 * Run validation
 	 */
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "validation");
-
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+	ZVAL_STRING(&event_name, "validation");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(status)) {
 		if (!zend_is_true(disable_events)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "onValidationFails");
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+			ZVAL_STRING(&event_name, "onValidationFails");
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		}
 		RETURN_MM_FALSE;
 	}
@@ -1203,22 +1194,19 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 		 * Run Validation Callbacks After
 		 */
 		if (!zend_is_true(exists)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "afterValidationOnCreate");
+			ZVAL_STRING(&event_name, "afterValidationOnCreate");
 		} else {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "afterValidationOnUpdate");
+			ZVAL_STRING(&event_name, "afterValidationOnUpdate");
 		}
 
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "afterValidation");
+		ZVAL_STRING(&event_name, "afterValidation");
 
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -1226,23 +1214,20 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 		/**
 		 * Run Before Callbacks
 		 */
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "beforeSave");
+		ZVAL_STRING(&event_name, "beforeSave");
 
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
 
 		if (zend_is_true(exists)) {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "beforeUpdate");
+			ZVAL_STRING(&event_name, "beforeUpdate");
 		} else {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "beforeCreate");
+			ZVAL_STRING(&event_name, "beforeCreate");
 		}
 
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -1261,7 +1246,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, _postSave){
 
-	zval *disable_events, *success, *exists, *event_name = NULL;
+	zval *disable_events, *success, *exists, event_name;
 
 	PHALCON_MM_GROW();
 
@@ -1270,25 +1255,21 @@ PHP_METHOD(Phalcon_Mvc_Collection, _postSave){
 	if (PHALCON_IS_TRUE(success)) {
 		if (!zend_is_true(disable_events)) {
 			if (PHALCON_IS_TRUE(exists)) {
-				PHALCON_INIT_VAR(event_name);
-				ZVAL_STRING(event_name, "afterUpdate");
+				ZVAL_STRING(&event_name, "afterUpdate");
 			} else {
-				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "afterCreate");
+				ZVAL_STRING(&event_name, "afterCreate");
 			}
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "afterSave");
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+			ZVAL_STRING(&event_name, "afterSave");
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		}
 
 		RETURN_CTOR(success);
 	}
 	if (!zend_is_true(disable_events)) {
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "notSave");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		ZVAL_STRING(&event_name, "notSave");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	}
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "_canceloperation", disable_events);
@@ -1395,19 +1376,19 @@ PHP_METHOD(Phalcon_Mvc_Collection, validationHasFailed){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 
-	zval *event_name, *collection_manager;
+	zval *eventname, *collection_manager;
 
 	zval *lower;
 	char *tmp;
 
-	phalcon_fetch_params(0, 1, 0, &event_name);
-	PHALCON_ENSURE_IS_STRING(event_name);
+	phalcon_fetch_params(0, 1, 0, &eventname);
+	PHALCON_ENSURE_IS_STRING(eventname);
 
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(lower);
-	tmp = zend_str_tolower_dup(Z_STRVAL_P(event_name), Z_STRLEN_P(event_name));
-	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(event_name));
+	tmp = zend_str_tolower_dup(Z_STRVAL_P(eventname), Z_STRLEN_P(eventname));
+	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(eventname));
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -1420,7 +1401,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 	 * Send a notification to the events manager
 	 */
 	collection_manager = phalcon_read_property(getThis(), SL("_collectionManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHOD(collection_manager, "notifyevent", event_name, getThis());
+	PHALCON_RETURN_CALL_METHOD(collection_manager, "notifyevent", eventname, getThis());
 	RETURN_MM();
 }
 
@@ -1432,18 +1413,18 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 
-	zval *event_name, *status = NULL, *collection_manager;
+	zval *eventname, *status = NULL, *collection_manager;
 	zval *lower;
 	char *tmp;
 
-	phalcon_fetch_params(0, 1, 0, &event_name);
-	PHALCON_ENSURE_IS_STRING(event_name);
+	phalcon_fetch_params(0, 1, 0, &eventname);
+	PHALCON_ENSURE_IS_STRING(eventname);
 
 	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(lower);
-	tmp = zend_str_tolower_dup(Z_STRVAL_P(event_name), Z_STRLEN_P(event_name));
-	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(event_name));
+	tmp = zend_str_tolower_dup(Z_STRVAL_P(eventname), Z_STRLEN_P(eventname));
+	ZVAL_STRINGL(lower, tmp, Z_STRLEN_P(eventname));
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -1460,7 +1441,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 	 */
 	collection_manager = phalcon_read_property(getThis(), SL("_collectionManager"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&status, collection_manager, "notifyevent", event_name, getThis());
+	PHALCON_CALL_METHOD(&status, collection_manager, "notifyevent", eventname, getThis());
 	if (PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
 	}
@@ -1475,7 +1456,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, _cancelOperation){
 
-	zval *disable_events, *operation_made, *event_name = NULL;
+	zval *disable_events, *operation_made, event_name;
 
 	PHALCON_MM_GROW();
 
@@ -1484,14 +1465,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, _cancelOperation){
 	if (!zend_is_true(disable_events)) {
 		operation_made = phalcon_read_property(getThis(), SL("_operationMade"), PH_NOISY);
 		if (PHALCON_IS_LONG(operation_made, 3)) {
-			PHALCON_INIT_VAR(event_name);
-			ZVAL_STRING(event_name, "notDeleted");
+			ZVAL_STRING(&event_name, "notDeleted");
 		} else {
-			PHALCON_INIT_NVAR(event_name);
-			ZVAL_STRING(event_name, "notSaved");
+			ZVAL_STRING(&event_name, "notSaved");
 		}
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	}
 	RETURN_MM_FALSE;
 }
@@ -2390,7 +2369,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, update){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
-	zval *mongo_id = NULL, *disable_events, *event_name = NULL, *status = NULL;
+	zval *mongo_id = NULL, *disable_events, event_name, *status = NULL;
 	zval *connection = NULL, *source = NULL, *collection = NULL;
 	zval *id_condition, *success = NULL, *options, *ok;
 
@@ -2405,11 +2384,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
 	disable_events = phalcon_read_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
 	if (!zend_is_true(disable_events)) {
+		ZVAL_STRING(&event_name, "beforeDelete");
 
-		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "beforeDelete");
-
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", event_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -2458,9 +2435,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
 			ZVAL_BOOL(success, 1);
 			if (!zend_is_true(disable_events)) {
-				PHALCON_INIT_NVAR(event_name);
-				ZVAL_STRING(event_name, "afterDelete");
-				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", event_name);
+				ZVAL_STRING(&event_name, "afterDelete");
+				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 			}
 		}
 	} else {
@@ -3036,7 +3012,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __get){
 PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 
 	zval *method, *arguments = NULL, *extra_method = NULL;
-	zval *class_name, *exception_message = NULL;
+	zval *class_name, exception_message;
 	zval *collection, *extra_method_first = NULL, *field = NULL, *value, *conditions, *params;
 	zend_class_entry *ce0;
 	const char *type = NULL;
@@ -3083,16 +3059,14 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 	phalcon_get_called_class(class_name );
 
 	if (!type) {
-		PHALCON_INIT_VAR(exception_message);
-		PHALCON_CONCAT_SVSVS(exception_message, "The static method \"", method, "\" doesn't exist on collection \"", class_name, "\"");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, exception_message);
+		PHALCON_CONCAT_SVSVS(&exception_message, "The static method \"", method, "\" doesn't exist on collection \"", class_name, "\"");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, &exception_message);
 		return;
 	}
 
 	if (!phalcon_array_isset_long(arguments, 0)) {
-		PHALCON_INIT_NVAR(exception_message);
-		PHALCON_CONCAT_SVS(exception_message, "The static method \"", method, "\" requires one argument");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, exception_message);
+		PHALCON_CONCAT_SVS(&exception_message, "The static method \"", method, "\" requires one argument");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, &exception_message);
 		return;
 	}
 
@@ -3113,9 +3087,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 			PHALCON_INIT_NVAR(field);
 			phalcon_uncamelize(field, extra_method);
 			if (!phalcon_isset_property_zval(collection, field)) {
-				PHALCON_INIT_NVAR(exception_message);
-				PHALCON_CONCAT_SVS(exception_message, "Cannot resolve attribute \"", extra_method, "' in the collection");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Cannot resolve attribute \"", extra_method, "' in the collection");
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, &exception_message);
 				return;
 			}
 		}

@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBasePath){
 PHP_METHOD(Phalcon_Mvc_Url, get){
 
 	zval *uri = NULL, *args = NULL, *local = NULL, *base_uri = NULL, *router = NULL, *dependency_injector;
-	zval *service, *route_name, *hostname, *route = NULL, *exception_message;
+	zval *service, *route_name, *hostname, *route = NULL, exception_message;
 	zval *pattern = NULL, *paths = NULL, *processed_uri = NULL, *query_string;
 	zval *matched, *regexp;
 	zval *generator = NULL, *arguments;
@@ -337,9 +337,8 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 		 */
 		PHALCON_CALL_METHOD(&route, router, "getroutebyname", route_name);
 		if (Z_TYPE_P(route) != IS_OBJECT) {
-			PHALCON_INIT_VAR(exception_message);
-			PHALCON_CONCAT_SVS(exception_message, "Cannot obtain a route using the name \"", route_name, "\"");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_url_exception_ce, exception_message);
+			PHALCON_CONCAT_SVS(&exception_message, "Cannot obtain a route using the name \"", route_name, "\"");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_url_exception_ce, &exception_message);
 			return;
 		}
 

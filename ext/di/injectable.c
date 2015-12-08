@@ -152,13 +152,13 @@ PHP_METHOD(Phalcon_DI_Injectable, getEventsManager){
  */
 PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 
-	zval *event_name, *data = NULL, *cancelable = NULL, *events_manager;
+	zval *eventname, *data = NULL, *cancelable = NULL, *events_manager;
 	zval *lower, *event_parts, *name = NULL, *status = NULL;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &event_name, &data, &cancelable);
-	PHALCON_ENSURE_IS_STRING(event_name);
+	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
+	PHALCON_ENSURE_IS_STRING(eventname);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 	}
 
 	PHALCON_INIT_VAR(lower);
-	phalcon_fast_strtolower(lower, event_name);
+	phalcon_fast_strtolower(lower, eventname);
 
 	if (phalcon_memnstr_str(lower, SL(":"))) {
 		PHALCON_INIT_VAR(event_parts);
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis(), data, cancelable);
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", eventname, getThis(), data, cancelable);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -214,13 +214,13 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
  */
 PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 
-	zval *event_name, *data = NULL, *cancelable = NULL, *status = NULL, *events_manager;
+	zval *eventname, *data = NULL, *cancelable = NULL, *status = NULL, *events_manager;
 	zval *lower, *event_parts, *name = NULL;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 2, &event_name, &data, &cancelable);
-	PHALCON_ENSURE_IS_STRING(event_name);
+	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
+	PHALCON_ENSURE_IS_STRING(eventname);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 	}
 
 	PHALCON_INIT_VAR(lower);
-	phalcon_fast_strtolower(lower, event_name);
+	phalcon_fast_strtolower(lower, eventname);
 
 	if (phalcon_memnstr_str(lower, SL(":"))) {
 		PHALCON_INIT_VAR(event_parts);
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis(), data, cancelable);
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", eventname, getThis(), data, cancelable);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}

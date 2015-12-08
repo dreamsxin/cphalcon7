@@ -704,7 +704,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, getSharedService){
 PHP_METHOD(Phalcon_Mvc_Micro, handle){
 
 	zval *uri = NULL, *dependency_injector, *error_message = NULL;
-	zval *event_name = NULL, *status = NULL, *service, *router = NULL, *matched_route = NULL;
+	zval event_name, *status = NULL, *service, *router = NULL, *matched_route = NULL;
 	zval *handlers, *route_id = NULL, *handler = NULL, *before_handlers;
 	zval *before = NULL, *stopped = NULL, *params = NULL;
 	zval *returned_value = NULL, *after_handlers, *after = NULL;
@@ -728,10 +728,8 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	/** 
 	 * Calling beforeHandle routing
 	 */
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "micro:beforeHandleRoute");
-
-	PHALCON_CALL_SELF(&status, "fireeventcancel", event_name);
+	ZVAL_STRING(&event_name, "micro:beforeHandleRoute");
+	PHALCON_CALL_SELF(&status, "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(status)) {
 		RETURN_MM_FALSE;
 	}
@@ -775,10 +773,8 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/** 
 		 * Calling beforeExecuteRoute event
 		 */
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "micro:beforeExecuteRoute");
-
-		PHALCON_CALL_SELF(&status, "fireeventcancel", event_name);
+		ZVAL_STRING(&event_name, "micro:beforeExecuteRoute");
+		PHALCON_CALL_SELF(&status, "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		} else {
@@ -859,9 +855,8 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/** 
 		 * Calling afterExecuteRoute event
 		 */
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "micro:afterExecuteRoute");
-		PHALCON_CALL_SELF(NULL, "fireevent", event_name);
+		ZVAL_STRING(&event_name, "micro:afterExecuteRoute");
+		PHALCON_CALL_SELF(NULL, "fireevent", &event_name);
 
 		after_handlers = phalcon_read_property(getThis(), SL("_afterHandlers"), PH_NOISY);
 		if (Z_TYPE_P(after_handlers) == IS_ARRAY) { 
@@ -910,10 +905,9 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/** 
 		 * Calling beforeNotFound event
 		 */
-		PHALCON_INIT_NVAR(event_name);
-		ZVAL_STRING(event_name, "micro:beforeNotFound");
+		ZVAL_STRING(&event_name, "micro:beforeNotFound");
 
-		PHALCON_CALL_SELF(&status, "fireeventcancel", event_name);
+		PHALCON_CALL_SELF(&status, "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		}
@@ -947,9 +941,8 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	/** 
 	 * Calling afterHandleRoute event
 	 */
-	PHALCON_INIT_NVAR(event_name);
-	ZVAL_STRING(event_name, "micro:afterHandleRoute");
-	PHALCON_CALL_SELF(NULL, "fireevent", event_name);
+	ZVAL_STRING(&event_name, "micro:afterHandleRoute");
+	PHALCON_CALL_SELF(NULL, "fireevent", &event_name);
 
 	finish_handlers = phalcon_read_property(getThis(), SL("_finishHandlers"), PH_NOISY);
 	if (Z_TYPE_P(finish_handlers) == IS_ARRAY) { 

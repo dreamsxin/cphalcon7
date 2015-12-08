@@ -65,14 +65,13 @@ PHALCON_INIT_CLASS(Phalcon_Assets_Resource_Js){
  */
 PHP_METHOD(Phalcon_Assets_Resource_Js, __construct){
 
-	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, *type;
+	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, type;
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
-	
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_STRING(type, "js");
-	
-	PHALCON_CALL_PARENTW(NULL, phalcon_assets_resource_js_ce, getThis(), "__construct",	type, path,
+
+	ZVAL_STRING(&type, "js");
+
+	PHALCON_CALL_PARENTW(NULL, phalcon_assets_resource_js_ce, getThis(), "__construct",	&type, path,
 		(local ? local : &PHALCON_GLOBAL(z_true)),
 		(filter ? filter : &PHALCON_GLOBAL(z_true)),
 		(attributes ? attributes : &PHALCON_GLOBAL(z_null))

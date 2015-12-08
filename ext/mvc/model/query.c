@@ -457,7 +457,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	zval *model = NULL, *column_map = NULL, *real_column_name = NULL;
 	zval *has_model = NULL, *models_instances;
 	zval *has_attribute = NULL, *models, *class_name;
-	zval *s_qualified;
+	zval s_qualified;
 
 	PHALCON_MM_GROW();
 
@@ -473,9 +473,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	 */
 	if (phalcon_array_isset(sql_column_aliases, column_name)) {
 		array_init_size(return_value, 2);
-		PHALCON_ALLOC_INIT_ZVAL(s_qualified);
-		ZVAL_STRING(s_qualified, ISV(qualified));
-		add_assoc_zval_ex(return_value, ISL(type), s_qualified);
+		ZVAL_STRING(&s_qualified, ISV(qualified));
+		add_assoc_zval_ex(return_value, ISL(type), &s_qualified);
 		phalcon_array_update_string(return_value, IS(name), column_name, PH_COPY);
 		RETURN_MM();
 	}
@@ -651,10 +650,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	/** 
 	 * Create an array with the qualified info
 	 */
-	PHALCON_ALLOC_INIT_ZVAL(s_qualified);
-	ZVAL_STRING(s_qualified, ISV(qualified));
+	ZVAL_STRING(&s_qualified, ISV(qualified));
 	array_init_size(return_value, 4);
-	add_assoc_zval_ex(return_value, ISL(type), s_qualified);
+	add_assoc_zval_ex(return_value, ISL(type), &s_qualified);
 	phalcon_array_update_string(return_value, IS(domain), source, PH_COPY);
 	phalcon_array_update_string(return_value, IS(name), real_column_name, PH_COPY);
 	phalcon_array_update_string(return_value, IS(balias), column_name, PH_COPY);

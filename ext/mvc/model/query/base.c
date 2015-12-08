@@ -192,7 +192,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	phql_scanner_token token;
 	void* phql_parser;
 	char *error;
-	zval *unique_id;
+	zval unique_id;
 
 	if (!phql) {
 		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
@@ -200,13 +200,12 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 		return FAILURE;
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(unique_id);
-	ZVAL_LONG(unique_id, zend_inline_hash_func(phql, phql_length));
+	ZVAL_LONG(&unique_id, zend_inline_hash_func(phql, phql_length));
 
-	phalcon_orm_get_prepared_ast(result, unique_id);
+	phalcon_orm_get_prepared_ast(result, &unique_id);
 
 	if (Z_TYPE_P(*result) == IS_ARRAY) {
-		zval_ptr_dtor(unique_id);
+		zval_ptr_dtor(&unique_id);
 		return SUCCESS;
 	}
 
@@ -594,7 +593,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				 */
 				if (phalcon_globals_ptr->orm.cache_level >= 1) {
 					if (Z_TYPE_P(parser_status->ret) == IS_ARRAY) {
-						add_assoc_long(parser_status->ret, "id", Z_LVAL_P(unique_id));
+						add_assoc_long(parser_status->ret, "id", Z_LVAL(unique_id));
 					}
 				}
 
@@ -605,7 +604,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				/**
 				 * Store the parsed definition in the cache
 				 */
-				phalcon_orm_set_prepared_ast(unique_id, *result);
+				phalcon_orm_set_prepared_ast(&unique_id, *result);
 
 			} else {
 				efree(parser_status->ret);
@@ -613,7 +612,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 		}
 	}
 
-	zval_ptr_dtor(unique_id);
+	zval_ptr_dtor(&unique_id);
 
 	efree(parser_status);
 	efree(state);

@@ -635,15 +635,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttributes){
 
-	zval *model, *what;
+	zval *model, what;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &model);
 
-	PHALCON_ALLOC_INIT_ZVAL(what);
-	ZVAL_LONG(what, PHALCON_MVC_MODEL_METADATA_MODELS_ATTRIBUTES);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "readmetadataindex", model, what);
+	ZVAL_LONG(&what, PHALCON_MVC_MODEL_METADATA_MODELS_ATTRIBUTES);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "readmetadataindex", model, &what);
 
 	if (Z_TYPE_P(return_value) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupted");

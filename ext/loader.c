@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 		array_init(directories);
 		phalcon_array_append(directories, directory, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(directories, directory);
+		PHALCON_CPY_WRT(directories, directory);
 	}
 
 	if (ds == NULL) {

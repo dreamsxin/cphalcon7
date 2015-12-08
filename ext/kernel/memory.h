@@ -116,7 +116,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 			if (Z_REFCOUNTED_P(z) && Z_REFCOUNT_P(z) > 1) { \
 				Z_DELREF_P(z); \
 			} else { \
-				zval_dtor(z); \
+				zval_ptr_dtor(z); \
 				z = NULL; \
 			} \
 		} else { \

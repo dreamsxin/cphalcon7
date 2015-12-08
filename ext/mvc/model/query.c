@@ -598,7 +598,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		/** 
 		 * Check if the _models property is correctly prepared
 		 */
-		PHALCON_OBS_VAR(models);
 		models = phalcon_read_property(getThis(), SL("_models"), PH_NOISY);
 		if (Z_TYPE_P(models) != IS_ARRAY) { 
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The models list was not loaded correctly");
@@ -2925,10 +2924,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	 */
 	if (phalcon_array_isset_str_fetch(&joins, select, SL("joins"))) {
 
-		PHALCON_INIT_VAR(sql_joins);
 		if (phalcon_fast_count_ev(joins)) {
 			PHALCON_CALL_METHOD(&sql_joins, getThis(), "_getjoins", select);
 		} else {
+			PHALCON_INIT_NVAR(sql_joins);
 			array_init(sql_joins);
 		}
 	} else {
@@ -3043,10 +3042,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	/** 
 	 * Process ORDER BY clause if any
 	 */
-	if (phalcon_array_isset_str(ast, SL("orderBy"))) {
-		PHALCON_OBS_VAR(order);
-		phalcon_array_fetch_str(&order, ast, SL("orderBy"), PH_NOISY);
-
+	if (phalcon_array_isset_str_fetch(&order, ast, SL("orderBy"))) {
 		PHALCON_CALL_METHOD(&sql_order, getThis(), "_getorderclause", order);
 		phalcon_array_update_string(sql_select, IS(order), sql_order, PH_COPY);
 	}

@@ -181,7 +181,7 @@ void phalcon_get_class(zval *result, const zval *object, int lower) {
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(object);
-		ZVAL_STR(result, ce->name);
+		ZVAL_STR(result, zend_string_copy(ce->name));
 
 		if (lower) {
 			ZVAL_STR(result, zend_string_tolower(Z_STR_P(result)));
@@ -337,7 +337,7 @@ void phalcon_get_parent_class(zval *result, const zval *object, int lower) {
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(object);
 		if (ce && ce->parent) {
-			ZVAL_NEW_STR(result, ce->parent->name);
+			ZVAL_STR(result, zend_string_copy(ce->parent->name));
 
 			if (lower) {
 				zend_str_tolower(Z_STRVAL_P(result), Z_STRLEN_P(result));

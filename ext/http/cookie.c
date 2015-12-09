@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 		_COOKIE = phalcon_get_global(SL("_COOKIE"));
 		if (phalcon_array_isset_fetch(&value, _COOKIE, name)) {
 			encryption = phalcon_read_property(getThis(), SL("_useEncryption"), PH_NOISY);
-			if (zend_is_true(encryption)) {
+			if (zend_is_true(encryption) && PHALCON_IS_NOT_EMPTY(value)) {
 				dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 				if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'filter' service");

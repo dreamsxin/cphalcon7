@@ -730,7 +730,11 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 		key = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (safe && zend_is_true(safe)) {
+	if (!safe) {
+		safe = &PHALCON_GLOBAL(z_false);
+	}
+
+	if (zend_is_true(safe)) {
 		char *tmp = estrndup(Z_STRVAL_P(text), Z_STRLEN_P(text));
 		php_strtr(tmp, Z_STRLEN_P(text), "-_", "+/", 2);
 		decoded = php_base64_decode((unsigned char*)tmp, Z_STRLEN_P(text));

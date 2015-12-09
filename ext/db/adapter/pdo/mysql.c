@@ -90,28 +90,28 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &identifier);
-	
+
 	if (Z_TYPE_P(identifier) == IS_ARRAY) { 
-	
+
 		PHALCON_OBS_VAR(domain);
 		phalcon_array_fetch_long(&domain, identifier, 0, PH_NOISY);
-	
+
 		PHALCON_OBS_VAR(name);
 		phalcon_array_fetch_long(&name, identifier, 1, PH_NOISY);
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CONCAT_SVSVS(return_value, "`", domain, "`.`", name, "`");
 			RETURN_MM();
 		}
-	
+
 		PHALCON_CONCAT_VSV(return_value, domain, ".", name);
-	
+
 		RETURN_MM();
 	}
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CONCAT_SVS(return_value, "`", identifier, "`");
 		RETURN_MM();
 	}
-	
+
 	RETURN_CTOR(identifier);
 }
 
@@ -130,41 +130,38 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 
 	zval *table, *schema = NULL, *dialect, *sql = NULL, *fetch_num;
 	zval *describe = NULL, *old_column = NULL, *size_pattern, *columns;
-	zval *field = NULL, *definition = NULL, *column_type = NULL, *matches = NULL;
-	zval *pos = NULL, *match_one = NULL, *match_two = NULL, *attribute = NULL, *column_name = NULL;
-	zval *column = NULL;
+	zval *field = NULL, *definition = NULL, *column_type = NULL;
+	zval *match_one = NULL, *match_two = NULL, *attribute = NULL, *column_name = NULL;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &table, &schema);
-	
+
 	if (!schema) {
 		schema = &PHALCON_GLOBAL(z_null);
 	}
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
-	
+
 	/** 
 	 * Get the SQL to describe a table
 	 */
 	PHALCON_CALL_METHOD(&sql, dialect, "describecolumns", table, schema);
-	
+
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
 	 */
 	PHALCON_INIT_VAR(fetch_num);
 	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
-	
+
 	/** 
 	 * Get the describe
 	 */
 	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", sql, fetch_num);
-	
-	PHALCON_INIT_VAR(old_column);
-	
+
 	PHALCON_INIT_VAR(size_pattern);
 	ZVAL_STRING(size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#");
-	
+
 	PHALCON_INIT_VAR(columns);
 	array_init(columns);
 
@@ -172,40 +169,39 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	 * Field Indexes: 0:name, 1:type, 2:not null, 3:key, 4:default, 5:extra
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), field) {
+		zval matches, column, pos;
+
 		/** 
 		 * By default the bind types is two
 		 */
 		PHALCON_INIT_NVAR(definition);
 		array_init(definition);
 		add_assoc_long_ex(definition, SL("bindType"), 2);
-	
+
 		/** 
 		 * By checking every column type we convert it to a Phalcon\Db\Column
 		 */
 		PHALCON_OBS_NVAR(column_type);
 		phalcon_array_fetch_long(&column_type, field, 1, PH_NOISY);
-	
+
 		/** 
 		 * If the column type has a parentheses we try to get the column size from it
 		 */
 		if (phalcon_memnstr_str(column_type, SL("("))) {
 
-			PHALCON_INIT_NVAR(matches);
+			RETURN_MM_ON_FAILURE(phalcon_preg_match(&pos, size_pattern, column_type, &matches));
 
-			PHALCON_INIT_NVAR(pos);
-			RETURN_MM_ON_FAILURE(phalcon_preg_match(pos, size_pattern, column_type, matches));
-
-			if (zend_is_true(pos)) {
-				if (phalcon_array_isset_long(matches, 1)) {
+			if (zend_is_true(&pos)) {
+				if (phalcon_array_isset_long(&matches, 1)) {
 					PHALCON_OBS_NVAR(match_one);
-					phalcon_array_fetch_long(&match_one, matches, 1, PH_NOISY);
+					phalcon_array_fetch_long(&match_one, &matches, 1, PH_NOISY);
 					convert_to_long(match_one);
 					phalcon_array_update_str(definition, SL("size"), match_one, PH_COPY);
 					phalcon_array_update_str(definition, SL("bytes"), match_one, PH_COPY);
 				}
-				if (phalcon_array_isset_long(matches, 2)) {
+				if (phalcon_array_isset_long(&matches, 2)) {
 					PHALCON_OBS_NVAR(match_two);
-					phalcon_array_fetch_long(&match_two, matches, 2, PH_NOISY);
+					phalcon_array_fetch_long(&match_two, &matches, 2, PH_NOISY);
 					convert_to_long(match_two);
 					phalcon_array_update_str(definition, SL("scale"), match_two, PH_COPY);
 				}
@@ -221,7 +217,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		 * Check the column type to get the correct Phalcon type
 		 */
 		while (1) {
-
 			/**
 			 * Point are varchars
 			 */
@@ -387,23 +382,23 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
 			break;
 		}
-	
+
 		/** 
 		 * Check if the column is unsigned, only MySQL support this
 		 */
 		if (phalcon_memnstr_str(column_type, SL("unsigned"))) {
 			phalcon_array_update_str(definition, SL("unsigned"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		}
-	
+
 		/** 
 		 * Positions
 		 */
-		if (!zend_is_true(old_column)) {
+		if (!old_column || !zend_is_true(old_column)) {
 			phalcon_array_update_str(definition, SL("first"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		} else {
 			phalcon_array_update_str(definition, SL("after"), old_column, PH_COPY);
 		}
-	
+
 		/** 
 		 * Check if the field is primary key
 		 */
@@ -412,7 +407,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		if (PHALCON_IS_STRING(attribute, "PRI")) {
 			phalcon_array_update_str(definition, SL("primary"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		}
-	
+
 		/** 
 		 * Check if the column allows null values
 		 */
@@ -421,7 +416,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		if (PHALCON_IS_STRING(attribute, "NO")) {
 			phalcon_array_update_str(definition, SL("notNull"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		}
-	
+
 		/** 
 		 * Check if the column is auto increment
 		 */
@@ -430,10 +425,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		if (PHALCON_IS_STRING(attribute, "auto_increment")) {
 			phalcon_array_update_str(definition, SL("autoIncrement"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		}
-	
+
 		PHALCON_OBS_NVAR(column_name);
 		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY);
-	
+
 		/** 
 		 * If the column set the default values, get it
 		 */
@@ -442,17 +437,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		if (Z_TYPE_P(attribute) == IS_STRING) {
 			phalcon_array_update_str(definition, SL("default"), attribute, PH_COPY);
 		}
-	
+
 		/** 
 		 * Every route is stored as a Phalcon\Db\Column
 		 */
-		PHALCON_INIT_NVAR(column);
-		object_init_ex(column, phalcon_db_column_ce);
-		PHALCON_CALL_METHOD(NULL, column, "__construct", column_name, definition);
+		object_init_ex(&column, phalcon_db_column_ce);
+		PHALCON_CALL_METHOD(NULL, &column, "__construct", column_name, definition);
 
-		phalcon_array_append(columns, column, PH_COPY);
+		phalcon_array_append(columns, &column, PH_COPY);
+
 		PHALCON_CPY_WRT(old_column, column_name);
 	} ZEND_HASH_FOREACH_END();
-	
+
 	RETURN_CTOR(columns);
 }

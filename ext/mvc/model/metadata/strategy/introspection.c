@@ -83,7 +83,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	zval *columns = NULL, *attributes, *primary_keys, *non_primary_keys;
 	zval *numeric_typed, *not_null, *field_types, *field_sizes, *field_bytes, *field_scales;
 	zval *field_bind_types, *automatic_create_attributes, *automatic_update_attributes;
-	zval *identity_field = NULL, *column = NULL, *field_name = NULL, *feature = NULL;
+	zval identity_field, *column = NULL, *field_name = NULL, *feature = NULL;
 	zval *type = NULL, *size = NULL, *bytes = NULL, *scale = NULL, *bind_type = NULL;
 	zval *field_default_values, *default_value = NULL;
 
@@ -177,8 +177,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	PHALCON_INIT_VAR(automatic_update_attributes);
 	array_init(automatic_update_attributes);
 
-	PHALCON_INIT_VAR(identity_field);
-	ZVAL_FALSE(identity_field);
+	ZVAL_FALSE(&identity_field);
 
 	PHALCON_INIT_VAR(field_default_values);
 	array_init(field_default_values);
@@ -218,7 +217,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isautoincrement");
 		if (PHALCON_IS_TRUE(feature)) {
-			PHALCON_CPY_WRT(identity_field, field_name);
+			ZVAL_COPY(&identity_field, field_name);
 		}
 
 		/** 
@@ -267,7 +266,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_NOT_NULL,  not_null, PH_COPY);
 	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES,  field_types, PH_COPY);
 	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES_NUMERIC,  numeric_typed, PH_COPY);
-	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_IDENTITY_COLUMN,  identity_field, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_IDENTITY_COLUMN,  &identity_field, PH_COPY);
 	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES_BIND,  field_bind_types, PH_COPY);
 	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_INSERT, automatic_create_attributes, PH_COPY);
 	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_UPDATE, automatic_update_attributes, PH_COPY);

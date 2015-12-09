@@ -3548,14 +3548,14 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 				PHALCON_CPY_WRT(attribute_field, field);
 			}
 
+			PHALCON_INIT_NVAR(value);
 			if (phalcon_isset_property_zval(getThis(), attribute_field)) {
 
 				/**
 				 * Read the attribute from the this_ptr using the real or renamed name
 				 */
-				value = phalcon_read_property_zval(getThis(), attribute_field, PH_NOISY);
+				ZVAL_COPY_VALUE(value, phalcon_read_property_zval(getThis(), attribute_field, PH_NOISY));
 			} else {
-				PHALCON_INIT_NVAR(value);
 				ZVAL_NULL(value);
 			}
 
@@ -3892,7 +3892,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			 * Check every attribute in the model except identity field
 			 */
 			if (!PHALCON_IS_EQUAL(field, identity_field)) {
-
 				/**
 				 * This isset checks that the property be defined in the model
 				 */

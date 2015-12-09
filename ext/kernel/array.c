@@ -30,7 +30,7 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 
 	HashTable *h;
 	zval *val;
-	int result;
+	int result = 0;
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
 		return 0;

@@ -188,7 +188,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Router_Route){
 PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 
 	zval *pattern, *paths = NULL, *http_methods = NULL, *regex = NULL, *unique_id = NULL;
-	zval *route_id = NULL;
+	zval route_id;
 
 	PHALCON_MM_GROW();
 
@@ -225,8 +225,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 		ZVAL_LONG(unique_id, 0);
 	}
 
-	PHALCON_CPY_WRT_CTOR(route_id, unique_id); /* route_id is now separated from unique_id */
-	phalcon_update_property_this(getThis(), SL("_id"), route_id);
+	ZVAL_COPY(&route_id, unique_id); /* route_id is now separated from unique_id */
+	phalcon_update_property_this(getThis(), SL("_id"), &route_id);
 
 	/* increment_function() will increment the value of the static property as well */
 	increment_function(unique_id);

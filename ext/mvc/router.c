@@ -868,8 +868,13 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 									/* Update the parts if there is no converter */
 									phalcon_array_update_zval(parts, &tmp, match_position, PH_COPY);
 								}
-							} else {
-								phalcon_array_unset(parts, &tmp, 0);
+							} else if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
+								PHALCON_INIT_NVAR(parameters);
+								array_init_size(parameters, 1);
+								phalcon_array_append(parameters, position, PH_COPY);
+
+								PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
+								phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
 							}
 						}
 					} ZEND_HASH_FOREACH_END();

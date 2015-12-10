@@ -465,6 +465,7 @@ static PHP_RINIT_FUNCTION(phalcon){
 
 static PHP_RSHUTDOWN_FUNCTION(phalcon){
 	phalcon_deinitialize_memory();
+	phalcon_release_interned_strings();
 	return SUCCESS;
 }
 

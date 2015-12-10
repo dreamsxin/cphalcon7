@@ -105,14 +105,14 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 
 /** Return zval checking if it's needed to ctor */
 #define RETURN_CCTOR(var) { \
-		RETVAL_ZVAL(var, 1, 0); \
+		ZVAL_DUP(return_value, var); \
 	} \
 	PHALCON_MM_RESTORE(); \
 	return;
 
 /** Return zval checking if it's needed to ctor, without restoring the memory stack  */
 #define RETURN_CCTORW(var) { \
-		RETVAL_ZVAL(var, 1, 0); \
+		ZVAL_DUP(return_value, var); \
 	} \
 	return;
 

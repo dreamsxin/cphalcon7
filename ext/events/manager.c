@@ -125,15 +125,15 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 
 	zval *event_type, *handler, *priority = NULL, *events = NULL;
 	zval *listener = NULL, *enable_priorities, *priority_queue = NULL;
-	zval *mode;
+	zval _priority;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 1, &event_type, &handler, &priority);
 
 	if (!priority) {
-		PHALCON_INIT_VAR(priority);
-		ZVAL_LONG(priority, 100);
+		ZVAL_LONG(&_priority, 100);
+		priority = &_priority;
 	}
 
 	if (unlikely(Z_TYPE_P(event_type) != IS_STRING)) {
@@ -175,15 +175,9 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 			}
 
 			/** 
-			 * Extract only the Data
+			 * Extract only the Data, Set extraction flags
 			 */
-			PHALCON_INIT_VAR(mode);
-			ZVAL_LONG(mode, 1);
-
-			/** 
-			 * Set extraction flags
-			 */
-			PHALCON_CALL_METHOD(NULL, priority_queue, "setextractflags", mode);
+			PHALCON_CALL_METHOD(NULL, priority_queue, "setextractflags", &PHALCON_GLOBAL(z_one));
 
 			/** 
 			 * Append the events to the queue
@@ -198,7 +192,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		/** 
 		 * Get the current SplPriorityQueue
 		 */
-		PHALCON_OBS_NVAR(priority_queue);
+		PHALCON_INIT_VAR(priority_queue);
 		phalcon_array_fetch(&priority_queue, events, event_type, PH_NOISY);
 	}
 
@@ -314,7 +308,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 		RETURN_MM_FALSE;
 	}
 
-	PHALCON_OBS_VAR(queue);
+	PHALCON_INIT_VAR(queue);
 	phalcon_array_fetch(&queue, events, type, PH_NOISY);
 
 	if (Z_TYPE_P(queue) == IS_OBJECT) {
@@ -386,10 +380,8 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
 	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
 	if (Z_TYPE_P(type) == IS_NULL) {
 		PHALCON_INIT_NVAR(events);
-	} else {
-		if (phalcon_array_isset(events, type)) {
-			phalcon_array_unset(events, type, PH_COPY);
-		}
+	} else if (phalcon_array_isset(events, type)) {
+		phalcon_array_unset(events, type, PH_COPY);
 	}
 
 	phalcon_update_property_this(getThis(), SL("_events"), events);
@@ -412,7 +404,9 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 	zval *r0 = NULL;
 	zend_class_entry *weakref_ce;
 
-	phalcon_fetch_params(0, 2, 0, &queue, &event);
+	PHALCON_MM_GROW();
+
+	phalcon_fetch_params(1, 2, 0, &queue, &event);
 
 	if (unlikely(Z_TYPE_P(queue) != IS_ARRAY)) {
 		if (Z_TYPE_P(queue) == IS_OBJECT) {
@@ -421,12 +415,11 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				   !instanceof_function_ex(ce, phalcon_events_event_ce, 0)
 				&& !instanceof_function_ex(ce, spl_ce_SplPriorityQueue, 0)
 			) {
-				zend_throw_exception_ex(phalcon_events_exception_ce, 0, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", ce->name->val);
+				PHALCON_THROW_EXCEPTION_FORMAT(phalcon_events_exception_ce, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", ce->name->val);
 				return;
 			}
-		}
-		else {
-			zend_throw_exception_ex(phalcon_events_exception_ce, 0, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", zend_zval_type_name(queue));
+		} else {
+			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_events_exception_ce, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", zend_zval_type_name(queue));
 			return;
 		}
 	}
@@ -435,11 +428,8 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
 	weakref_ce = zend_lookup_class_ex(zend_string_init(SL("WeakRef"), 0), NULL, 0);
 
-	PHALCON_MM_GROW();
 
 	PHALCON_INIT_VAR(status);
-
-	PHALCON_INIT_VAR(arguments);
 
 	/** 
 	 * Get the event type
@@ -533,7 +523,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/** 
 					 * Create the closure arguments
 					 */
-					if (Z_TYPE_P(arguments) == IS_NULL) {
+					if (!arguments || Z_TYPE_P(arguments) == IS_NULL) {
 						PHALCON_INIT_NVAR(arguments);
 						array_init_size(arguments, 3);
 						phalcon_array_append(arguments, event, PH_COPY);
@@ -636,7 +626,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/** 
 					 * Create the closure arguments
 					 */
-					if (Z_TYPE_P(arguments) == IS_NULL) {
+					if (!arguments || Z_TYPE_P(arguments) == IS_NULL) {
 						PHALCON_INIT_NVAR(arguments);
 						array_init_size(arguments, 3);
 						phalcon_array_append(arguments, event, PH_COPY);
@@ -719,7 +709,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 PHP_METHOD(Phalcon_Events_Manager, fire){
 
 	zval *event_type, *source, *data = NULL, *cancelable = NULL, *events;
-	zval exception_message, *event_parts, *type;
+	zval exception_message, event_parts, *type;
 	zval *event_name, *status = NULL, *collect, *event = NULL, *fire_events = NULL;
 
 	PHALCON_MM_GROW();
@@ -753,14 +743,13 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 		return;
 	}
 
-	PHALCON_INIT_VAR(event_parts);
-	phalcon_fast_explode_str(event_parts, SL(":"), event_type);
+	phalcon_fast_explode_str(&event_parts, SL(":"), event_type);
 
 	PHALCON_OBS_VAR(type);
-	phalcon_array_fetch_long(&type, event_parts, 0, PH_NOISY);
+	phalcon_array_fetch_long(&type, &event_parts, 0, PH_NOISY);
 
 	PHALCON_OBS_VAR(event_name);
-	phalcon_array_fetch_long(&event_name, event_parts, 1, PH_NOISY);
+	phalcon_array_fetch_long(&event_name, &event_parts, 1, PH_NOISY);
 
 	PHALCON_INIT_VAR(status);
 

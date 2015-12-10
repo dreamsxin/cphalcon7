@@ -91,17 +91,42 @@ zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_
 /**
  * Gets the global zval into PG macro
  */
-zval* phalcon_get_global(const char *global, unsigned int global_length) {
+zval* phalcon_get_global_str(const char *global, unsigned int global_length) {
 
-	zend_bool jit_initialization = PG(auto_globals_jit);
-	if (jit_initialization) {
-		zend_is_auto_global_str((char *)global, global_length - 1);
+	if (PG(auto_globals_jit)) {
+		zend_is_auto_global_str((char *)global, global_length);
 	}
 
 	if (&EG(symbol_table)) {
 		zval *gv;
 		if ((gv = zend_hash_str_find(&EG(symbol_table), global, global_length)) != NULL) {
-			if (gv && Z_TYPE_P(gv) == IS_ARRAY) {
+			if (EXPECTED(Z_TYPE_P(gv) == IS_REFERENCE)) {
+				gv = Z_REFVAL_P(gv);
+			}
+			if (Z_TYPE_P(gv) == IS_ARRAY) {
+				return gv;
+			}
+		}
+	}
+
+	return &PHALCON_GLOBAL(z_null);
+}
+
+/**
+ * Gets the global zval into PG macro
+ */
+zval* phalcon_get_global(zend_string *name) {
+
+	if (PG(auto_globals_jit)) {
+		zend_is_auto_global_str((char *)name->val, name->len);
+	}
+	if (&EG(symbol_table)) {
+		zval *gv;
+		if ((gv = zend_hash_find(&EG(symbol_table), name)) != NULL) {
+			if (EXPECTED(Z_TYPE_P(gv) == IS_REFERENCE)) {
+				gv = Z_REFVAL_P(gv);
+			}
+			if (Z_TYPE_P(gv) == IS_ARRAY) {
 				return gv;
 			}
 		}

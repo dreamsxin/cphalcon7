@@ -1,14 +1,18 @@
-language:
-  - php
-  - c
+language: php
+sudo: false
 
 php:
+  - 7.0
   - nightly
+
+cache:
+    - apt
 
 services:
   - mongodb
   - memcached
   - redis-server
+  - beanstalkd
 
 before_install:
  - composer install --prefer-dist
@@ -17,19 +21,24 @@ before_install:
 
 before_script:
  - git submodule --quiet update --init --recursive
- - (cd ext; export CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --silent --enable-phalcon && make --silent -j4 > /dev/null && sudo make --silent install && phpenv config-add ../unit-tests/ci/phalcon.ini)
+ - (cd ext; export CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --silent --enable-phalcon && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/phalcon.ini)
  - ulimit -c unlimited || true
 
 script:
  - ZEND_DONT_UNLOAD_MODULES=1 $(phpenv which php) ./unit-tests/ci/phpunit.php --debug -c unit-tests/phpunit.xml
 
 after_failure:
- - sudo apt-get -qq install gdb
  - ./unit-tests/ci/after_failure.sh
 
 notifications:
   email:
-    - andres@phalconphp.com
-    - eduar@phalconphp.com
-    - nikos@phalconphp.com
-    - vladimir@phalconphp.com
+    - dreamsxin@qq.com
+
+addons:
+  apt:
+    packages:
+      - gdb
+      - re2c
+      - libpng12-dev
+      - libqrencode-dev
+      - libzbar-dev

@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 
 		PHALCON_INIT_VAR(slash);
 		ZVAL_STRING(slash, "/");
-		_SERVER = phalcon_get_global(SL("_SERVER"));
+		_SERVER = phalcon_get_global_str(SL("_SERVER"));
 		if (phalcon_array_isset_str_fetch(&php_self, _SERVER, SL("PHP_SELF"))) {
 			PHALCON_INIT_VAR(uri);
 			phalcon_get_uri(uri, php_self);

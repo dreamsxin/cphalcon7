@@ -655,7 +655,7 @@ PHP_METHOD(Phalcon_Tag, hasValue){
 	/**
 	 * Check if there is a post value for the item
 	 */
-	_POST = phalcon_get_global(SL("_POST"));
+	_POST = phalcon_get_global_str(SL("_POST"));
 	RETURN_BOOL(phalcon_array_isset(_POST, name));
 }
 
@@ -686,7 +686,7 @@ PHP_METHOD(Phalcon_Tag, getValue){
 			assert(value == NULL);
 
 			/* Check if there is a post value for the item */
-			_POST = phalcon_get_global(SL("_POST"));
+			_POST = phalcon_get_global_str(SL("_POST"));
 			if (!phalcon_array_isset_fetch(&value, _POST, name)) {
 				RETURN_NULL();
 			}

@@ -423,7 +423,10 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
 	ulong uidx = 0;
 	char *sidx = NULL;
 
-	PHALCON_ALLOC_ZVAL(*return_value);
+	if (*return_value == NULL) {
+		PHALCON_ALLOC_ZVAL(*return_value);
+	}
+
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		ht = Z_ARRVAL_P(arr);
 		switch (Z_TYPE_P(index)) {
@@ -487,7 +490,10 @@ int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *in
 
 	zval *zv;
 
-	PHALCON_ALLOC_ZVAL(*return_value);
+	if (*return_value == NULL) {
+		PHALCON_ALLOC_ZVAL(*return_value);
+	}
+
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
 			ZVAL_COPY(*return_value, zv);
@@ -512,7 +518,10 @@ int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string
 
 	zval *zv;
 
-	PHALCON_ALLOC_ZVAL(*return_value);
+	if (*return_value == NULL) {
+		PHALCON_ALLOC_ZVAL(*return_value);
+	}
+
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_find(Z_ARRVAL_P(arr), index)) != NULL) {
 			ZVAL_COPY(*return_value, zv);
@@ -537,7 +546,10 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
 
 	zval *zv;
 
-	PHALCON_ALLOC_ZVAL(*return_value);
+	if (*return_value == NULL) {
+		PHALCON_ALLOC_ZVAL(*return_value);
+	}
+
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
 			ZVAL_COPY(*return_value, zv);
@@ -560,7 +572,7 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
 
 void phalcon_array_append_multi_2(zval *arr, const zval *index, zval *value, int flags){
 
-	zval *temp;
+	zval *temp = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch(&temp, arr, index, PH_SILENT);
@@ -577,7 +589,7 @@ void phalcon_array_append_multi_2(zval *arr, const zval *index, zval *value, int
 
 void phalcon_array_update_multi_2(zval *arr, const zval *index1, const zval *index2, zval *value, int flags){
 
-	zval *temp;
+	zval *temp = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch(&temp, arr, index1, PH_SILENT);
@@ -595,7 +607,7 @@ void phalcon_array_update_multi_2(zval *arr, const zval *index1, const zval *ind
 
 void phalcon_array_update_str_multi_2(zval *arr, const zval *index1, const char *index2, uint index2_length, zval *value, int flags){
 
-	zval *temp;
+	zval *temp = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch(&temp, arr, index1, PH_SILENT);
@@ -612,7 +624,7 @@ void phalcon_array_update_str_multi_2(zval *arr, const zval *index1, const char 
 
 void phalcon_array_update_long_long_multi_2(zval *arr, ulong index1, ulong index2, zval *value, int flags){
 
-	zval *temp;
+	zval *temp = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch_long(&temp, arr, index1, PH_SILENT);
@@ -629,7 +641,7 @@ void phalcon_array_update_long_long_multi_2(zval *arr, ulong index1, ulong index
 
 void phalcon_array_update_long_string_multi_2(zval *arr, ulong index1, const char *index2, uint index2_length, zval *value, int flags){
 
-	zval *temp;
+	zval *temp = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch_long(&temp, arr, index1, PH_SILENT);
@@ -646,7 +658,7 @@ void phalcon_array_update_long_string_multi_2(zval *arr, ulong index1, const cha
 
 void phalcon_array_update_zval_str_append_multi_3(zval *arr, const zval *index1, const char *index2, uint index2_length, zval *value, int flags){
 
-	zval *temp1, *temp2;
+	zval *temp1 = NULL, *temp2 = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch(&temp1, arr, index1, PH_SILENT);
@@ -672,7 +684,7 @@ void phalcon_array_update_zval_str_append_multi_3(zval *arr, const zval *index1,
 
 void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, const zval *index2, const zval *index3, zval *value, int flags){
 
-	zval *temp1, *temp2;
+	zval *temp1 = NULL, *temp2 = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 
@@ -699,7 +711,7 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 
 void phalcon_array_update_str_zval_zval_multi_3(zval *arr, const zval *index1, const zval *index2, const char *index3, uint index3_length, zval *value, int flags){
 
-	zval *temp1, *temp2;
+	zval *temp1 = NULL, *temp2 = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 
@@ -726,7 +738,7 @@ void phalcon_array_update_str_zval_zval_multi_3(zval *arr, const zval *index1, c
 
 void phalcon_array_update_zval_string_string_multi_3(zval *arr, const zval *index1, const char *index2, uint index2_length, const char *index3, uint index3_length, zval *value, int flags){
 
-	zval *temp1, *temp2;
+	zval *temp1 = NULL, *temp2 = NULL;
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 

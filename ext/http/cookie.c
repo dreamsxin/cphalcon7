@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 	if (PHALCON_IS_FALSE(readed)) {
 		name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
 
-		_COOKIE = phalcon_get_global(SL("_COOKIE"));
+		_COOKIE = phalcon_get_global_str(SL("_COOKIE"));
 		if (phalcon_array_isset_fetch(&value, _COOKIE, name)) {
 			encryption = phalcon_read_property(getThis(), SL("_useEncryption"), PH_NOISY);
 			if (zend_is_true(encryption) && PHALCON_IS_NOT_EMPTY(value)) {

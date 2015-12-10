@@ -1163,7 +1163,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		 */
 		phalcon_concat_self_str(html, SL("<div id=\"error-tabs-2\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
 		phalcon_concat_self_str(html, SL("<tr><th>Key</th><th>Value</th></tr>"));
-		_REQUEST = phalcon_get_global(SL("_REQUEST"));
+		_REQUEST = phalcon_get_global_str(SL("_REQUEST"));
 
 		if (Z_TYPE_P(_REQUEST) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(_REQUEST), idx, str_key, value) {
@@ -1189,7 +1189,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		 */
 		phalcon_concat_self_str(html, SL("<div id=\"error-tabs-3\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
 		phalcon_concat_self_str(html, SL("<tr><th>Key</th><th>Value</th></tr>"));
-		_SERVER = phalcon_get_global(SL("_SERVER"));
+		_SERVER = phalcon_get_global_str(SL("_SERVER"));
 
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(_SERVER), idx, str_key, value) {

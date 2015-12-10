@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 	 * By default we use $_GET['url'] to obtain the rewrite information
 	 */
 	if (!zend_is_true(uri_source)) { /* FIXME: Compare with URI_SOURCE_SERVER_REQUEST_URI */
-		_GET = phalcon_get_global(SL("_GET"));
+		_GET = phalcon_get_global_str(SL("_GET"));
 		if (phalcon_array_isset_str_fetch(&url, _GET, SL("_url"))) {
 			if (PHALCON_IS_NOT_EMPTY(url)) {
 				RETURN_CTOR(url);
@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 		/**
 		 * Otherwise use the standard $_SERVER['REQUEST_URI']
 		 */
-		_SERVER = phalcon_get_global(SL("_SERVER"));
+		_SERVER = phalcon_get_global_str(SL("_SERVER"));
 		if (phalcon_array_isset_str_fetch(&url, _SERVER, SL("REQUEST_URI"))) {
 			phalcon_fast_explode_str(&url_parts, SL("?"), url);
 

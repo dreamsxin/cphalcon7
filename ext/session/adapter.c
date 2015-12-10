@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 	PHALCON_INIT_VAR(key);
 	PHALCON_CONCAT_VV(key, unique_id, index);
 
-	_SESSION = phalcon_get_global(SL("_SESSION"));
+	_SESSION = phalcon_get_global_str(SL("_SESSION"));
 	if (phalcon_array_isset_fetch(&value, _SESSION, key)) {
 		RETVAL_ZVAL(value, 1, 0);
 		if (remove && zend_is_true(remove)) {
@@ -287,18 +287,16 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
  */
 PHP_METHOD(Phalcon_Session_Adapter, set){
 
-	zval *index, *value, *unique_id, *key, *_SESSION;
+	zval *index, *value, *unique_id, key;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 0, &index, &value);
 	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
 
-	PHALCON_INIT_VAR(key);
-	PHALCON_CONCAT_VV(key, unique_id, index);
+	PHALCON_CONCAT_VV(&key, unique_id, index);
 
-	_SESSION = phalcon_get_global(SL("_SESSION"));
-	phalcon_array_update_zval(_SESSION, key, value, PH_COPY);
+	phalcon_session_set(&key, value);
 
 	PHALCON_MM_RESTORE();
 }
@@ -350,18 +348,16 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
  */
 PHP_METHOD(Phalcon_Session_Adapter, has){
 
-	zval *index, *unique_id, *key, *_SESSION;
+	zval *index, *unique_id, key;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &index);
 	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
-	
-	PHALCON_INIT_VAR(key);
-	PHALCON_CONCAT_VV(key, unique_id, index);
 
-	_SESSION = phalcon_get_global(SL("_SESSION"));
-	if(phalcon_array_isset(_SESSION, key)) {
+	PHALCON_CONCAT_VV(&key, unique_id, index);
+
+	if(phalcon_session_get(&key)) {
 		RETURN_MM_TRUE;
 	}
 
@@ -389,7 +385,7 @@ PHP_METHOD(Phalcon_Session_Adapter, remove){
 	PHALCON_INIT_VAR(key);
 	PHALCON_CONCAT_VV(key, unique_id, index);
 
-	_SESSION = phalcon_get_global(SL("_SESSION"));
+	_SESSION = phalcon_get_global_str(SL("_SESSION"));
 	phalcon_array_unset(_SESSION, key, 0);
 
 	RETURN_MM();
@@ -451,7 +447,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __get)
 
 PHP_METHOD(Phalcon_Session_Adapter, count)
 {
-	zval *_SESSION = phalcon_get_global(SL("_SESSION"));
+	zval *_SESSION = phalcon_get_global_str(SL("_SESSION"));
 
 	RETURN_LONG(phalcon_fast_count_int(_SESSION));
 }
@@ -460,7 +456,7 @@ PHP_METHOD(Phalcon_Session_Adapter, getIterator)
 {
 	zval *_SESSION;
 
-	_SESSION = phalcon_get_global(SL("_SESSION"));
+	_SESSION = phalcon_get_global_str(SL("_SESSION"));
 	object_init_ex(return_value, spl_ce_ArrayIterator);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", _SESSION);
 }

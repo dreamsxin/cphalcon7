@@ -51,3 +51,19 @@ int phalcon_session_write_close()
 {
 	return phalcon_call_func_aparams(NULL, SL("session_write_close"), 0, NULL);
 }
+
+zval* phalcon_session_set(zval *name, zval *val)
+{
+#ifdef PHALCON_USE_PHP_SESSION
+	return php_set_session_var(Z_STR_P(name), val, NULL);
+#endif
+	return NULL;
+}
+
+zval* phalcon_session_get(zval *name)
+{
+#ifdef PHALCON_USE_PHP_SESSION
+	return php_get_session_var(Z_STR_P(name));
+#endif
+	return NULL;
+}

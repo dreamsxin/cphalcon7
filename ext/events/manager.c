@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Events_Manager, getResponses){
  */
 PHP_METHOD(Phalcon_Events_Manager, detach){
 
-	zval *type, *handler, *events = NULL, *queue, *priority_queue = NULL;
+	zval *type, *handler, *events = NULL, *queue, priority_queue;
 	zval *listener = NULL, *handler_embeded = NULL, *priority = NULL;
 	zval *r0 = NULL;
 	zend_string *str_key;
@@ -318,10 +318,9 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 	phalcon_array_fetch(&queue, events, type, PH_NOISY);
 
 	if (Z_TYPE_P(queue) == IS_OBJECT) {
-		PHALCON_INIT_VAR(priority_queue);
-		object_init_ex(priority_queue, spl_ce_SplPriorityQueue);
-		if (phalcon_has_constructor(priority_queue)) {
-			PHALCON_CALL_METHOD(NULL, priority_queue, "__construct");
+		object_init_ex(&priority_queue, spl_ce_SplPriorityQueue);
+		if (phalcon_has_constructor(&priority_queue)) {
+			PHALCON_CALL_METHOD(NULL, &priority_queue, "__construct");
 		}
 
 		PHALCON_CALL_METHOD(NULL, queue, "top");
@@ -337,13 +336,13 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 
 			if (!phalcon_is_equal(handler_embeded, handler)) {
 				PHALCON_CALL_METHOD(&priority, listener, "getpriority");
-				PHALCON_CALL_METHOD(NULL, priority_queue, "insert", listener, priority);
+				PHALCON_CALL_METHOD(NULL, &priority_queue, "insert", listener, priority);
 			}
 			
 			PHALCON_CALL_METHOD(NULL, queue, "next");
 		}
 	} else {
-		ZVAL_ARR(priority_queue, zend_array_dup(Z_ARRVAL_P(queue)));
+		ZVAL_ARR(&priority_queue, zend_array_dup(Z_ARRVAL_P(queue)));
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(queue), idx, str_key, listener) {
 			zval key;
 			if (str_key) {
@@ -355,13 +354,13 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
 
 			if (phalcon_is_equal_object(handler_embeded, handler)) {
-				phalcon_array_unset(priority_queue, &key, PH_COPY);
+				phalcon_array_unset(&priority_queue, &key, PH_COPY);
 			}
 
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_array_update_zval(events, type, priority_queue, PH_COPY);
+	phalcon_array_update_zval(events, type, &priority_queue, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_events"), events);
 
 	PHALCON_MM_RESTORE();

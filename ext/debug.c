@@ -492,7 +492,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 				RETURN_CTOR(joined_dump);
 			}
 
-			RETURN_NCTOR(number_arguments);
+			RETURN_CTOR(number_arguments);
 		}
 	}
 

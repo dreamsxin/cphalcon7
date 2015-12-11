@@ -2444,7 +2444,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 		ZVAL_BOOL(success, 0);
 	}
 
-	RETURN_NCTOR(success);
+	RETURN_CTOR(success);
 }
 
 /**

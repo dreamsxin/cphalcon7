@@ -97,9 +97,10 @@ static inline int phalcon_return_property(zval *return_value, zval *object, cons
 	zval *tmp = phalcon_read_property(object, property_name, property_length, PH_NOISY);
 	if (tmp) {
 		ZVAL_ZVAL(return_value, tmp, 1, 0);
-	} else {
-		ZVAL_NULL(return_value);
+		return SUCCESS;
 	}
+
+	ZVAL_NULL(return_value);
 	return FAILURE;
 }
 
@@ -108,9 +109,10 @@ static inline int phalcon_return_property_zval(zval *return_value, zval *object,
 	zval *tmp = phalcon_read_property_zval(object, property, PH_NOISY);
 	if (tmp) {
 		ZVAL_ZVAL(return_value, tmp, 1, 0);
-	} else {
-		ZVAL_NULL(return_value);
+		return SUCCESS;
 	}
+
+	ZVAL_NULL(return_value);
 	return FAILURE;
 }
 

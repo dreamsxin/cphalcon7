@@ -26,6 +26,4 @@ extern zend_class_entry *phalcon_validation_message_group_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Validation_Message_Group);
 
-PHALCON_STATIC void phalcon_validation_group_construct_helper(zval *object, zval *messages);
-
 #endif /* PHALCON_VALIDATION_MESSAGE_GROUP_H */

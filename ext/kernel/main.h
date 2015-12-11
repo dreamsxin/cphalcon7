@@ -141,16 +141,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 	RETURN_ZVAL(getThis(), 1, 0);
 
 /**
- * Returns variables without ctor
- */
-#define RETURN_NCTOR(var) { \
-		*(return_value) = *(var); \
-		INIT_PZVAL(return_value) \
-	} \
-	PHALCON_MM_RESTORE(); \
-	return;
-
-/**
  * Returns a zval in an object member
  */
 #define RETURN_MEMBER(object, member_name) \

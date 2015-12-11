@@ -69,43 +69,61 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
 	}
 
 	if (result) {
-		*fetched = val;
+		if (*fetched == NULL) {
+			*fetched = val;
+		} else {
+			ZVAL_COPY(*fetched, val);
+		}
 		return 1;
+	} else {
+		if (*fetched == NULL) {
+			*fetched = &EG(uninitialized_zval);
+		}
 	}
-
-	*fetched = &EG(uninitialized_zval);
 
 	return 0;
 }
 
 int phalcon_array_isset_str_fetch(zval **fetched, const zval *arr, const char *index, uint index_length) {
 
-	zval *zv;
+	zval *val;
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
-			*fetched = zv;
+		if ((val = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
+			if (*fetched == NULL) {
+				*fetched = val;
+			} else {
+				ZVAL_COPY(*fetched, val);
+			}
 			return 1;
 		}
 	}
 
-	*fetched = &EG(uninitialized_zval);
+	if (*fetched == NULL) {
+		*fetched = &EG(uninitialized_zval);
+	}
 
 	return 0;
 }
 
 int phalcon_array_isset_long_fetch(zval **fetched, const zval *arr, ulong index) {
 
-	zval *zv;
+	zval *val;
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			*fetched = zv;
+		if ((val = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
+			if (*fetched == NULL) {
+				*fetched = val;
+			} else {
+				ZVAL_COPY(*fetched, val);
+			}
 			return 1;
 		}
 	}
 
-	*fetched = &EG(uninitialized_zval);
+	if (*fetched == NULL) {
+		*fetched = &EG(uninitialized_zval);
+	}
 
 	return 0;
 }

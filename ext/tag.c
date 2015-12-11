@@ -676,14 +676,10 @@ PHP_METHOD(Phalcon_Tag, getValue){
 	if (!params || !phalcon_array_isset_str_fetch(&value, params, SL("value"))) {
 		display_values = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_displayValues"));
 
-		assert(value == NULL);
-
 		/**
 		 * Check if there is a predefined value for it
 		 */
 		if (!phalcon_array_isset_fetch(&value, display_values, name)) {
-
-			assert(value == NULL);
 
 			/* Check if there is a post value for the item */
 			_POST = phalcon_get_global_str(SL("_POST"));

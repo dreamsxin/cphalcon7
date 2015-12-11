@@ -290,7 +290,6 @@ PHP_METHOD(Phalcon_Forms_Form, __construct){
 	 * Check for an 'initialize' method and call it
 	 */
 	if (phalcon_method_exists_ex(getThis(), SL("initialize")) == SUCCESS) {
-		
 		PHALCON_CALL_METHOD(NULL, getThis(), "initialize", entity, user_options);
 	}
 

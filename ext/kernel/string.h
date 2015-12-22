@@ -37,6 +37,7 @@ int phalcon_same_name(const char *key, const char *name, uint32_t name_len);
 
 void phalcon_strtr(zval *return_value, zval *str, zval *str_from, zval *str_to);
 void phalcon_strtr_str(zval *return_value, zval *str, char *str_from, unsigned int str_from_length, char *str_to, unsigned int str_to_length);
+void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs);
 
 /** Function replacement */
 void phalcon_fast_strlen(zval *return_value, zval *str);

@@ -450,6 +450,153 @@ void phalcon_strtr_str(zval *return_value, zval *str, char *str_from, unsigned i
 			  str_to_length));
 }
 
+/* {{{ php_strtr_array */
+static void php_strtr_array(zval *return_value, zend_string *input, HashTable *pats)
+{
+	char *str = ZSTR_VAL(input);
+	size_t slen = ZSTR_LEN(input);
+	zend_ulong num_key;
+	zend_string *str_key;
+	size_t len, pos, old_pos;
+	int num_keys = 0;
+	size_t minlen = 128*1024;
+	size_t maxlen = 0;
+	HashTable str_hash;
+	zval *entry;
+	char *key;
+	smart_str result = {0};
+	zend_ulong bitset[256/sizeof(zend_ulong)];
+	zend_ulong *num_bitset;
+
+	/* we will collect all possible key lengths */
+	num_bitset = ecalloc((slen + sizeof(zend_ulong)) / sizeof(zend_ulong), sizeof(zend_ulong));
+	memset(bitset, 0, sizeof(bitset));
+
+	/* check if original array has numeric keys */
+	ZEND_HASH_FOREACH_STR_KEY(pats, str_key) {
+		if (UNEXPECTED(!str_key)) {
+			num_keys = 1;
+		} else {
+			len = ZSTR_LEN(str_key);
+			if (UNEXPECTED(len < 1)) {
+				RETURN_FALSE;
+			} else if (UNEXPECTED(len > slen)) {
+				/* skip long patterns */
+				continue;
+			}
+			if (len > maxlen) {
+				maxlen = len;
+			}
+			if (len < minlen) {
+				minlen = len;
+			}
+			/* remember possible key length */
+			num_bitset[len / sizeof(zend_ulong)] |= Z_UL(1) << (len % sizeof(zend_ulong));
+			bitset[((unsigned char)ZSTR_VAL(str_key)[0]) / sizeof(zend_ulong)] |= Z_UL(1) << (((unsigned char)ZSTR_VAL(str_key)[0]) % sizeof(zend_ulong));
+		}
+	} ZEND_HASH_FOREACH_END();
+
+	if (UNEXPECTED(num_keys)) {
+		zend_string *key_used;
+		/* we have to rebuild HashTable with numeric keys */
+		zend_hash_init(&str_hash, zend_hash_num_elements(pats), NULL, NULL, 0);
+		ZEND_HASH_FOREACH_KEY_VAL(pats, num_key, str_key, entry) {
+			if (UNEXPECTED(!str_key)) {
+				key_used = zend_long_to_str(num_key);
+				len = ZSTR_LEN(key_used);
+				if (UNEXPECTED(len > slen)) {
+					/* skip long patterns */
+					continue;
+				}
+				if (len > maxlen) {
+					maxlen = len;
+				}
+				if (len < minlen) {
+					minlen = len;
+				}
+				/* remember possible key length */
+				num_bitset[len / sizeof(zend_ulong)] |= Z_UL(1) << (len % sizeof(zend_ulong));
+				bitset[((unsigned char)ZSTR_VAL(key_used)[0]) / sizeof(zend_ulong)] |= Z_UL(1) << (((unsigned char)ZSTR_VAL(key_used)[0]) % sizeof(zend_ulong));
+			} else {
+				key_used = str_key;
+				len = ZSTR_LEN(key_used);
+				if (UNEXPECTED(len > slen)) {
+					/* skip long patterns */
+					continue;
+				}
+			}
+			zend_hash_add(&str_hash, key_used, entry);
+			if (UNEXPECTED(!str_key)) {
+				zend_string_release(key_used);
+			}
+		} ZEND_HASH_FOREACH_END();
+		pats = &str_hash;
+	}
+
+	if (UNEXPECTED(minlen > maxlen)) {
+		/* return the original string */
+		if (pats == &str_hash) {
+			zend_hash_destroy(&str_hash);
+		}
+		efree(num_bitset);
+		RETURN_STR_COPY(input);
+	}
+
+	old_pos = pos = 0;
+	while (pos <= slen - minlen) {
+		key = str + pos;
+		if (bitset[((unsigned char)key[0]) / sizeof(zend_ulong)] & (Z_UL(1) << (((unsigned char)key[0]) % sizeof(zend_ulong)))) {
+			len = maxlen;
+			if (len > slen - pos) {
+				len = slen - pos;
+			}
+			while (len >= minlen) {
+				if ((num_bitset[len / sizeof(zend_ulong)] & (Z_UL(1) << (len % sizeof(zend_ulong))))) {
+					entry = zend_hash_str_find(pats, key, len);
+					if (entry != NULL) {
+						zend_string *s = zval_get_string(entry);
+						smart_str_appendl(&result, str + old_pos, pos - old_pos);
+						smart_str_append(&result, s);
+						old_pos = pos + len;
+						pos = old_pos - 1;
+						zend_string_release(s);
+						break;
+					}
+				}
+				len--;
+			}
+		}
+		pos++;
+	}
+
+	if (result.s) {
+		smart_str_appendl(&result, str + old_pos, slen - old_pos);
+		smart_str_0(&result);
+		RETVAL_NEW_STR(result.s);
+	} else {
+		smart_str_free(&result);
+		RETVAL_STR_COPY(input);
+	}
+
+	if (pats == &str_hash) {
+		zend_hash_destroy(&str_hash);
+	}
+	efree(num_bitset);
+}
+/* }}} */
+
+void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs) {
+
+	if (Z_TYPE_P(str) != IS_STRING|| Z_TYPE_P(replace_pairs) != IS_ARRAY) {
+		zend_error(E_WARNING, "Invalid arguments supplied for strtr()");
+		return;
+	}
+
+	ZVAL_NEW_STR(return_value, Z_STR_P(str));
+
+	php_strtr_array(return_value, Z_STR_P(str), Z_ARRVAL_P(replace_pairs));
+}
+
 /**
  * Inmediate function resolution for strpos function
  */

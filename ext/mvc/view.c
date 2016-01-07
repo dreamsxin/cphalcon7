@@ -991,7 +991,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 	zval *engines, *view_path, *silence, *must_clean, *absolute_path = NULL, *debug_message = NULL;
 	zval *cache = NULL, *not_exists = NULL, *views_dir, *base_path;
-	zval *path = NULL, *views_dir_paths, *views_dir_path = NULL, *render_level, *cache_level, *cache_mode;
+	zval *path = NULL, *dir = NULL, *views_dir_paths, *views_dir_path = NULL, *render_level, *cache_level, *cache_mode;
 	zval *key = NULL, *lifetime = NULL, *view_options;
 	zval *cache_options, *cached_view = NULL;
 	zval *view_params, *events_manager, *engine = NULL;
@@ -1047,14 +1047,30 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 		if (Z_TYPE_P(base_path) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(base_path), path) {
-				PHALCON_INIT_NVAR(views_dir_path);
-				PHALCON_CONCAT_VVV(views_dir_path, path, views_dir, view_path);
-				phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+				if (Z_TYPE_P(views_dir) == IS_ARRAY) {
+					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(views_dir), dir) {
+						PHALCON_INIT_NVAR(views_dir_path);
+						PHALCON_CONCAT_VVV(views_dir_path, path, dir, view_path);
+						phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+					} ZEND_HASH_FOREACH_END();
+				} else {
+						PHALCON_INIT_NVAR(views_dir_path);
+						PHALCON_CONCAT_VVV(views_dir_path, path, views_dir, view_path);
+						phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+				}
 			} ZEND_HASH_FOREACH_END();
 		} else {
-			PHALCON_INIT_VAR(views_dir_path);
-			PHALCON_CONCAT_VVV(views_dir_path, base_path, views_dir, view_path);
-			phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+			if (Z_TYPE_P(views_dir) == IS_ARRAY) {
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(views_dir), dir) {
+					PHALCON_INIT_NVAR(views_dir_path);
+					PHALCON_CONCAT_VVV(views_dir_path, base_path, dir, view_path);
+					phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+				} ZEND_HASH_FOREACH_END();
+			} else {
+				PHALCON_INIT_VAR(views_dir_path);
+				PHALCON_CONCAT_VVV(views_dir_path, base_path, views_dir, view_path);
+				phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+			}
 		}
 	}
 

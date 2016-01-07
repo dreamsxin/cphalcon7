@@ -24,7 +24,16 @@ Prerequisite packages are:
 Ubuntu:
 
 ```bash
-sudo apt-get install php5-dev libpcre3-dev gcc make
+sudo add-apt-repository ppa:ondrej/php-7.0
+sudo apt-get install php7-dev libpcre3-dev gcc make
+
+# or compilation
+----------------
+cd php-src
+ ./buildconf --force
+./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-fpm-user=www-data --with-fpm-group=www-data --with-pdo-pgsql --with-pdo-mysql --with-pdo-sqlite  --with-iconv-dir --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --with-mcrypt --enable-ftp --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-gettext --disable-fileinfo --enable-maintainer-zts --enable-phpdbg-debug --enable-debug
+make -j4
+sudo make install
 ```
 
 Suse:
@@ -50,6 +59,9 @@ cd cphalcon/ext
 phpize
 make -j4
 sudo make install
+# or
+/usr/local/php/bin/phpize
+./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized" --with-php-config=/usr/local/php/bin/php-config
 ```
 
 Add the extension to your php.ini:

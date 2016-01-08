@@ -206,7 +206,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Request){
 PHP_METHOD(Phalcon_Http_Request, _get){
 
 	zval *data, *name, *filters, *default_value, *not_allow_empty, *norecursive;
-	zval *value, *filter = NULL, *dependency_injector;
+	zval value, *filter = NULL, *dependency_injector;
 	zval *service, *filter_value = NULL;
 
 	PHALCON_MM_GROW();
@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 					phalcon_update_property_this(getThis(), SL("_filter"), filter);
 				}
 
-				PHALCON_CALL_METHOD(&filter_value, filter, "sanitize", value, filters, norecursive);
+				PHALCON_CALL_METHOD(&filter_value, filter, "sanitize", &value, filters, norecursive);
 
 				if ((PHALCON_IS_EMPTY(filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(filter_value)) {
 					RETURN_CTOR(default_value);
@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 				RETURN_CTOR(filter_value);
 			}
 
-			if (PHALCON_IS_EMPTY(value) && zend_is_true(not_allow_empty)) {
+			if (PHALCON_IS_EMPTY(&value) && zend_is_true(not_allow_empty)) {
 				RETURN_CTOR(default_value);
 			}
 
@@ -527,11 +527,9 @@ PHP_METHOD(Phalcon_Http_Request, getServer){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	_SERVER = phalcon_get_global_str(SL("_SERVER"));
-	if (phalcon_array_isset_fetch(&server_value, _SERVER, name)) {
-		RETURN_ZVAL(server_value, 1, 0);
+	if (!phalcon_array_isset_fetch(return_value, _SERVER, name)) {
+		RETURN_NULL();
 	}
-
-	RETURN_NULL();
 }
 
 /**
@@ -673,20 +671,19 @@ PHP_METHOD(Phalcon_Http_Request, hasHeader){
  */
 PHP_METHOD(Phalcon_Http_Request, getHeader){
 
-	zval *header, *_SERVER, *server_value, *key;
-
-	phalcon_fetch_params(0, 1, 0, &header);
-
-	_SERVER = phalcon_get_global_str(SL("_SERVER"));
-	if (phalcon_array_isset_fetch(&server_value, _SERVER, header)) {
-		RETURN_ZVAL(server_value, 1, 0);
-	}
+	zval *header, *_SERVER, *key;
 
 	PHALCON_MM_GROW();
-	PHALCON_INIT_VAR(key);
-	PHALCON_CONCAT_SV(key, "HTTP_", header);
-	if (phalcon_array_isset_fetch(&server_value, _SERVER, key)) {
-		RETURN_CTOR(server_value);
+
+	phalcon_fetch_params(1, 1, 0, &header);
+
+	_SERVER = phalcon_get_global_str(SL("_SERVER"));
+	if (!phalcon_array_isset_fetch(return_value, _SERVER, header)) {
+		PHALCON_INIT_VAR(key);
+		PHALCON_CONCAT_SV(key, "HTTP_", header);
+		if (phalcon_array_isset_fetch(return_value, _SERVER, key)) {
+			RETURN_MM();
+		}
 	}
 
 	RETURN_MM_EMPTY_STRING();
@@ -1896,12 +1893,11 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
  */
 PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 
-	zval *digest, *pattern, *set_order, *matches, *match = NULL, *ret = NULL, *tmp1, *tmp2;
-	const char *auth_digest = SG(request_info).auth_digest;
+	zval pattern, digest, set_order, matches, *match, *ret = NULL;
 
 	PHALCON_MM_GROW();
 
-	if (unlikely(!auth_digest)) {
+	if (unlikely(!(SG(request_info).auth_digest))) {
 		zval *_SERVER = phalcon_get_global_str(SL("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			zval key;
@@ -1917,26 +1913,21 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 	}
 
 	if (auth_digest) {
-		PHALCON_INIT_VAR(digest);
-		ZVAL_STRING(digest, auth_digest);
+		ZVAL_STRING(&pattern, "#(\\w+)=(['\"]?)([^'\", ]+)\\2#");
+		ZVAL_STRING(&digest, auth_digest);
+		ZVAL_LONG(&set_order, 2);
 
-		PHALCON_INIT_VAR(pattern);
-		ZVAL_STRING(pattern, "#(\\w+)=(['\"]?)([^'\", ]+)\\2#");
-
-		PHALCON_INIT_VAR(set_order);
-		ZVAL_LONG(set_order, 2);
-
-		PHALCON_INIT_VAR(matches);
-		ZVAL_MAKE_REF(matches);
-		PHALCON_CALL_FUNCTION(&ret, "preg_match_all", pattern, digest, matches, set_order);
-		ZVAL_UNREF(matches);
+		ZVAL_MAKE_REF(&matches);
+		PHALCON_CALL_FUNCTION(&ret, "preg_match_all", &pattern, digest, &matches, &set_order);
+		ZVAL_UNREF(&matches);
 
 		if (zend_is_true(ret) && Z_TYPE_P(matches) == IS_ARRAY) {
 			array_init(return_value);
 
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(matches), match) {
-				if (Z_TYPE_P(match) == IS_ARRAY && phalcon_array_isset_long_fetch(&tmp1, match, 1) && phalcon_array_isset_long_fetch(&tmp2, match, 3)) {
-					phalcon_array_update_zval(return_value, tmp1, tmp2, PH_COPY);
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&matches), match) {
+				zval tmp1, tmp2;
+				if (Z_TYPE_P(match) == IS_ARRAY && phalcon_array_isset_fetch_long(&tmp1, match, 1) && phalcon_array_isset_fetch_long(&tmp2, match, 3)) {
+					phalcon_array_update_zval(return_value, &tmp1, &tmp2, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 

@@ -97,7 +97,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Memory){
 PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 
 	zval *key_name, *lifetime = NULL;
-	zval *data, *cached_content, *frontend, *last_key;
+	zval *data, cached_content, *frontend, *last_key;
 
 	PHALCON_MM_GROW();
 
@@ -115,17 +115,17 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 
 	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&cached_content, data, last_key)) {
-		if (Z_TYPE_P(cached_content) != IS_NULL) {
-			if (phalcon_is_numeric(cached_content)) {
-				RETVAL_ZVAL(cached_content, 1, 0);
+		if (Z_TYPE_P(&cached_content) != IS_NULL) {
+			if (phalcon_is_numeric(&cached_content)) {
+				RETURN_CTOR(&cached_content);
 			} else {
 				frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
-				PHALCON_RETURN_CALL_METHOD(frontend, "afterretrieve", cached_content);
+				PHALCON_RETURN_CALL_METHOD(frontend, "afterretrieve", &cached_content);
 			}
 		}
 	}
 
-	PHALCON_MM_RESTORE();
+	RETURN_MM_NULL();
 }
 
 /**
@@ -309,7 +309,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, exists){
 PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 
 	zval *key_name, *value = NULL, *last_key, *data;
-	zval *cached_content;
+	zval cached_content;
 
 	PHALCON_MM_GROW();
 
@@ -332,12 +332,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 
 	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&cached_content, data, last_key)) {
-		RETVAL_FALSE;
-		RETURN_MM();
+		RETURN_MM_FALSE;
 	}
 
 
-	add_function(return_value, cached_content, value);
+	add_function(return_value, &cached_content, value);
 	phalcon_update_property_array(getThis(), SL("_data"), last_key, return_value);
 
 	PHALCON_MM_RESTORE();
@@ -353,7 +352,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 PHP_METHOD(Phalcon_Cache_Backend_Memory, decrement){
 
 	zval *key_name, *value = NULL, *last_key, *data;
-	zval *cached_content;
+	zval cached_content;
 
 	PHALCON_MM_GROW();
 
@@ -376,11 +375,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, decrement){
 
 	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&cached_content, data, last_key)) {
-		RETVAL_FALSE;
-		RETURN_MM();
+		RETURN_MM_FALSE;
 	}
 
-	phalcon_sub_function(return_value, cached_content, value);
+	phalcon_sub_function(return_value, &cached_content, value);
 	phalcon_update_property_array(getThis(), SL("_data"), last_key, return_value);
 
 	PHALCON_MM_RESTORE();

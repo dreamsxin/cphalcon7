@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
  */
 PHP_METHOD(Phalcon_Filter, _sanitize){
 
-	zval *value, *filter, *filters, *filter_object;
+	zval *value, *filter, *filters, filter_object;
 	zval *arguments, *type = NULL, *quote, *empty_str, *escaped = NULL;
 	zval *allow_tags, *allow_attributes;
 	zval *filtered = NULL, *allow_fraction, *options, exception_message;
@@ -270,21 +270,21 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	phalcon_fetch_params(0, 2, 0, &value, &filter);
 
 	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&filter_object, filters, filter) && (Z_TYPE_P(filter_object) == IS_OBJECT || phalcon_is_callable(filter_object))) {
+	if (phalcon_array_isset_fetch(&filter_object, filters, filter) && (Z_TYPE_P(&filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
 	
 		/** 
 		 * If the filter is a closure we call it in the PHP userland
 		 */
-		if (phalcon_is_callable(filter_object) ||
-			(Z_TYPE_P(filter_object) == IS_OBJECT && instanceof_function(Z_OBJCE_P(filter_object), zend_ce_closure))) {
+		if (phalcon_is_callable(&filter_object) ||
+			(Z_TYPE_P(&filter_object) == IS_OBJECT && instanceof_function(Z_OBJCE_P(&filter_object), zend_ce_closure))) {
 			PHALCON_INIT_VAR(arguments);
 			array_init_size(arguments, 1);
 			phalcon_array_append(arguments, value, PH_COPY);
-			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, filter_object, arguments);
+			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, &filter_object, arguments);
 			RETURN_MM();
 		}
 	
-		PHALCON_RETURN_CALL_METHOD(filter_object, "filter", value);
+		PHALCON_RETURN_CALL_METHOD(&filter_object, "filter", value);
 		RETURN_MM();
 	}
 	

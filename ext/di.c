@@ -565,7 +565,7 @@ PHALCON_DOC_METHOD(Phalcon_DI, offsetUnset);
  */
 PHP_METHOD(Phalcon_DI, __call){
 
-	zval *method, *arguments = NULL, *possible_service, *name, *definition;
+	zval *method, *arguments = NULL, *possible_service, *name, definition;
 
 	PHALCON_MM_GROW();
 
@@ -600,10 +600,9 @@ PHP_METHOD(Phalcon_DI, __call){
 
 		PHALCON_INIT_VAR(name);
 		phalcon_lcfirst(name, possible_service);
-
 		
-		if (phalcon_array_isset_long_fetch(&definition, arguments, 0)) {
-			PHALCON_CALL_SELF(NULL, "set", name, definition);
+		if (phalcon_array_isset_fetch_long(&definition, arguments, 0)) {
+			PHALCON_CALL_SELF(NULL, "set", name, &definition);
 			return;
 		}
 	}

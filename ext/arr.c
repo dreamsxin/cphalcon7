@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Arr, is_array){
 PHP_METHOD(Phalcon_Arr, path){
 
 	zval *array, *path, *default_value = NULL, *delimiter = NULL;
-	zval *is_array = NULL, *keys = NULL, *key = NULL, *values = NULL, *arr = NULL, *value = NULL;
+	zval *is_array = NULL, *keys = NULL, *key = NULL, values, *arr = NULL, *value = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Arr, path){
 		PHALCON_CPY_WRT_CTOR(keys, path);
 	} else {
 		if (phalcon_array_isset_fetch(&values, array, path)) {
-			RETURN_CCTOR(values);
+			RETURN_CTOR(&values);
 		}
 
 		PHALCON_INIT_VAR(keys);
@@ -306,34 +306,32 @@ PHP_METHOD(Phalcon_Arr, path){
 		}
 
 		if (phalcon_array_isset(array, key)) {
-			PHALCON_OBS_NVAR(values);
 			phalcon_array_fetch(&values, array, key, PH_NOISY);
 			if (phalcon_fast_count_ev(keys) > 0) {
-				PHALCON_CALL_SELF(&is_array, "is_array", values);
+				PHALCON_CALL_SELF(&is_array, "is_array", &values);
 				if (zend_is_true(is_array)) {
-					PHALCON_CPY_WRT(array, values);
+					PHALCON_CPY_WRT(array, &values);
 				} else {
 					// Unable to dig deeper
 					break;
 				}
 			} else {
-				RETURN_CCTOR(values);
+				RETURN_CTOR(&values);
 			}
 		} else if (PHALCON_IS_STRING(key, "*")) {
-			PHALCON_INIT_NVAR(values);
 			array_init(values);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(array), arr) {
 				PHALCON_CALL_SELF(&value, "path", arr, keys);
 				
 				if (Z_TYPE_P(value) != IS_NULL) {
-					phalcon_array_append(values, value, PH_COPY);
+					phalcon_array_append(&values, value, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 
-			if (phalcon_fast_count_ev(values)) {
+			if (phalcon_fast_count_ev(&values)) {
 				// Found the values requested
-				RETURN_CCTOR(values);
+				RETURN_CTOR(&values);
 			} else {
 				// Unable to dig deeper
 				break;
@@ -370,7 +368,7 @@ end:
 PHP_METHOD(Phalcon_Arr, set_path){
 
 	zval *array, *path, *value, *delimiter = NULL;
-	zval *keys = NULL, *key = NULL, *is_digit = NULL, *cpy_array = NULL, *arr = NULL, *tmp, *is_array = NULL, *joined_keys = NULL;
+	zval *keys = NULL, *key = NULL, *is_digit = NULL, *cpy_array = NULL, *arr = NULL, v, *is_array = NULL, *joined_keys = NULL;
 	int found = 1;
 
 	PHALCON_MM_GROW();
@@ -422,8 +420,8 @@ PHP_METHOD(Phalcon_Arr, set_path){
 				convert_to_long(key);
 			}
 
-			if (phalcon_array_isset_fetch(&tmp, cpy_array, key)) {
-				PHALCON_CPY_WRT(cpy_array, tmp);
+			if (phalcon_array_isset_fetch(&v, cpy_array, key)) {
+				PHALCON_CPY_WRT(cpy_array, &v);
 			} else {
 				PHALCON_INIT_NVAR(arr);
 				array_init(arr);
@@ -508,7 +506,7 @@ PHP_METHOD(Phalcon_Arr, range){
  */
 PHP_METHOD(Phalcon_Arr, get){
 
-	zval *array, *keys, *key = NULL, *value = NULL, *default_value = NULL;
+	zval *array, *keys, *key = NULL, value, *default_value = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -530,7 +528,7 @@ PHP_METHOD(Phalcon_Arr, get){
 			}
 		} ZEND_HASH_FOREACH_END();
 	} else if (phalcon_array_isset_fetch(&value, array, keys)) {
-		RETURN_CTOR(value);
+		RETURN_CTOR(&value);
 	} else {
 		ZVAL_ZVAL(return_value, default_value, 1, 0);
 	}
@@ -911,9 +909,8 @@ PHP_METHOD(Phalcon_Arr, callback){
 	RETURN_MM_ON_FAILURE(phalcon_preg_match(ret, pattern, str, matches));
 
 	if (zend_is_true(ret)) {
-		if (!phalcon_array_isset_long_fetch(&command, matches, 1)) {
-			PHALCON_INIT_VAR(command);
-			ZVAL_EMPTY_STRING(command);
+		if (!phalcon_array_isset_fetch_long(&command, matches, 1)) {
+			ZVAL_EMPTY_STRING(&command);
 		}
 
 		if (phalcon_array_isset_long(matches, 2)) {
@@ -937,21 +934,20 @@ PHP_METHOD(Phalcon_Arr, callback){
 			PHALCON_CALL_FUNCTION(&params, "str_replace", search, replace, tmp);
 		}
 	} else {
-		PHALCON_INIT_VAR(command);
-		ZVAL_ZVAL(command, str, 1, 0);
+		ZVAL_COPY_VALUE(&command, &str);
 
 		PHALCON_INIT_VAR(params);
 	}
 
 	array_init(return_value);
 
-	if (phalcon_memnstr_str(command, SL("::"))) {
+	if (phalcon_memnstr_str(&command, SL("::"))) {
 		PHALCON_INIT_VAR(command_parts);
-		phalcon_fast_explode_str(command_parts, SL("::"), command);
+		phalcon_fast_explode_str(command_parts, SL("::"), &command);
 
 		phalcon_array_append(return_value, command_parts, PH_COPY);
 	} else {
-		phalcon_array_append(return_value, command, PH_COPY);
+		phalcon_array_append(return_value, &command, PH_COPY);
 	}
 
 	phalcon_array_append(return_value, params, PH_COPY);

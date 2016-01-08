@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
 PHP_METHOD(Phalcon_Http_Client_Header, build){
 
-	zval *flags = NULL, *messages, *status_code, *message = NULL, *version, *lines, *line = NULL;
+	zval *flags = NULL, *messages, *status_code, message, *version, *lines, *line = NULL;
 	zval *fields, *value = NULL, *join_filed;
 	zend_string *str_key;
 	ulong idx;
@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 
 		PHALCON_INIT_NVAR(line);
 		PHALCON_CONCAT_SVS(line, "HTTP/", version, " ");
-		PHALCON_SCONCAT_VSV(line, status_code, " ", message);
+		PHALCON_SCONCAT_VSV(line, status_code, " ", &message);
 
 		phalcon_merge_append(lines, line);
 
@@ -376,17 +376,16 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 	fields = phalcon_read_property(getThis(), SL("_fields"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, value) {
-		zval filed;
+		zval filed, tmp;
 		if (str_key) {
 			ZVAL_STR(&filed, str_key);
 		} else {
 			ZVAL_LONG(&filed, idx);
 		}
 
-		PHALCON_INIT_NVAR(line);
-		PHALCON_CONCAT_VSV(line, &filed, ": ", value);
+		PHALCON_CONCAT_VSV(&tmp, &filed, ": ", value);
 
-		phalcon_merge_append(lines, line);
+		phalcon_merge_append(lines, &tmp);
 	} ZEND_HASH_FOREACH_END();
 
 	if (f & PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS) {

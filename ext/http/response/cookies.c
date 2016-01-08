@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
  */
 PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 
-	zval *name, *cookies, *cookie = NULL, *dependency_injector;
+	zval *name, *cookies, *dependency_injector;
 	zval *encryption;
 
 	PHALCON_MM_GROW();
@@ -304,35 +304,25 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 	}
 
 	cookies = phalcon_read_property(getThis(), SL("_cookies"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&cookie, cookies, name)) {
-		RETURN_CTOR(cookie);
-	}
-
-	/** 
-	 * Create the cookie if the it does not exist
-	 */
-	object_init_ex(return_value, phalcon_http_cookie_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", name);
-
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-
+	if (!phalcon_array_isset_fetch(return_value, cookies, name)) {
 		/** 
-		 * Pass the DI to created cookies
+		 * Create the cookie if the it does not exist
 		 */
-		PHALCON_CALL_METHOD(NULL, return_value, "setdi", dependency_injector);
+		object_init_ex(return_value, phalcon_http_cookie_ce);
+		PHALCON_CALL_METHOD(NULL, return_value, "__construct", name);
 
-		encryption = phalcon_read_property(getThis(), SL("_useEncryption"), PH_NOISY);
+		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
+		if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
+			PHALCON_CALL_METHOD(NULL, return_value, "setdi", dependency_injector);
 
-		/** 
-		 * Enable encryption in the cookie
-		 */
-		if (zend_is_true(encryption)) {
-			PHALCON_CALL_METHOD(NULL, return_value, "useencryption", encryption);
+			encryption = phalcon_read_property(getThis(), SL("_useEncryption"), PH_NOISY);
+			if (zend_is_true(encryption)) {
+				PHALCON_CALL_METHOD(NULL, return_value, "useencryption", encryption);
+			}
 		}
-	}
 
-	phalcon_update_property_array(getThis(), SL("_cookies"), name, return_value);
+		phalcon_update_property_array(getThis(), SL("_cookies"), name, return_value);
+	}
 
 	PHALCON_MM_RESTORE();
 }

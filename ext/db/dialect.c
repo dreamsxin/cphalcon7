@@ -615,7 +615,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 
-	zval *expression, *escape_char = NULL, *name, *custom_functions = NULL, *custom_function = NULL, *sql_arguments, *arguments;
+	zval *expression, *escape_char = NULL, *name, *custom_functions = NULL, custom_function, *sql_arguments, arguments;
 	zval *argument = NULL, *argument_expression = NULL, *arguments_joined;
 
 	PHALCON_MM_GROW();
@@ -634,18 +634,16 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 	PHALCON_CALL_METHOD(&custom_functions, getThis(), "getcustomfunctions");
 
 	if (phalcon_array_isset_fetch(&custom_function, custom_functions, name)) {
-		PHALCON_RETURN_CALL_ZVAL_FUNCTION(custom_function, getThis(), expression, escape_char);
+		PHALCON_RETURN_CALL_ZVAL_FUNCTION(&custom_function, getThis(), expression, escape_char);
 		RETURN_MM();
 	}
 
 	PHALCON_INIT_VAR(sql_arguments);
 	array_init(sql_arguments);
 	if (phalcon_array_isset_str(expression, SL("arguments"))) {
-
-		PHALCON_OBS_VAR(arguments);
 		phalcon_array_fetch_str(&arguments, expression, SL("arguments"), PH_NOISY);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(arguments), argument) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&arguments), argument) {
 			PHALCON_CALL_METHOD(&argument_expression, getThis(), "getsqlexpression", argument, escape_char);
 			phalcon_array_append(sql_arguments, argument_expression, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -806,23 +804,23 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		array_init(selected_columns);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column) {
-			zval *column_item, *column_alias, *column_domain;
+			zval column_item, column_domain, column_alias;
 			/**
 			 * Escape column name
 			 */
 			if (
-				    phalcon_array_isset_long_fetch(&column_item, column, 0)
-				 || phalcon_array_isset_str_fetch(&column_item, column, SL("column"))
+				    phalcon_array_isset_fetch_long(&column_item, column, 0)
+				 || phalcon_array_isset_fetch_str(&column_item, column, SL("column"))
 			) {
-				if (Z_TYPE_P(column_item) == IS_ARRAY) {
-					PHALCON_CALL_METHOD(&column_sql, getThis(), "getsqlexpression", column_item, escape_char);
+				if (Z_TYPE_P(&column_item) == IS_ARRAY) {
+					PHALCON_CALL_METHOD(&column_sql, getThis(), "getsqlexpression", &column_item, escape_char);
 				} else if (PHALCON_IS_STRING(column_item, "*")) {
-					PHALCON_CPY_WRT(column_sql, column_item);
+					PHALCON_CPY_WRT(column_sql, &column_item);
 				} else if (PHALCON_GLOBAL(db).escape_identifiers) {
 					PHALCON_INIT_NVAR(column_sql);
-					PHALCON_CONCAT_VVV(column_sql, escape_char, column_item, escape_char);
+					PHALCON_CONCAT_VVV(column_sql, escape_char, &column_item, escape_char);
 				} else {
-					PHALCON_CPY_WRT(column_sql, column_item);
+					PHALCON_CPY_WRT(column_sql, &column_item);
 				}
 			} else {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SELECT definition");
@@ -832,14 +830,14 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			/**
 			 * Escape column domain
 			 */
-			if (phalcon_array_isset_long_fetch(&column_domain, column, 1)) {
+			if (phalcon_array_isset_fetch_long(&column_domain, column, 1)) {
 				if (zend_is_true(column_domain)) {
 					if (PHALCON_GLOBAL(db).escape_identifiers) {
 						PHALCON_INIT_NVAR(column_domain_sql);
-						PHALCON_CONCAT_VVVSV(column_domain_sql, escape_char, column_domain, escape_char, ".", column_sql);
+						PHALCON_CONCAT_VVVSV(column_domain_sql, escape_char, &column_domain, escape_char, ".", column_sql);
 					} else {
 						PHALCON_INIT_NVAR(column_domain_sql);
-						PHALCON_CONCAT_VSV(column_domain_sql, column_domain, ".", column_sql);
+						PHALCON_CONCAT_VSV(column_domain_sql, &column_domain, ".", column_sql);
 					}
 				} else {
 					PHALCON_CPY_WRT(column_domain_sql, column_sql);
@@ -851,15 +849,15 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			/**
 			 * Escape column alias
 			 */
-			if (phalcon_array_isset_long_fetch(&column_alias, column, 2)) {
+			if (phalcon_array_isset_fetch_long(&column_alias, column, 2)) {
 
 				if (zend_is_true(column_alias)) {
 					if (PHALCON_GLOBAL(db).escape_identifiers) {
 						PHALCON_INIT_NVAR(column_alias_sql);
-						PHALCON_CONCAT_VSVVV(column_alias_sql, column_domain_sql, " AS ", escape_char, column_alias, escape_char);
+						PHALCON_CONCAT_VSVVV(column_alias_sql, column_domain_sql, " AS ", escape_char, &column_alias, escape_char);
 					} else {
 						PHALCON_INIT_NVAR(column_alias_sql);
-						PHALCON_CONCAT_VSV(column_alias_sql, column_domain_sql, " AS ", column_alias);
+						PHALCON_CONCAT_VSV(column_alias_sql, column_domain_sql, " AS ", &column_alias);
 					}
 				} else {
 					PHALCON_CPY_WRT(column_alias_sql, column_domain_sql);

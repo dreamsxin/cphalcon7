@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Flash, warning)
 PHP_METHOD(Phalcon_Flash, outputMessage){
 
 	zval *type, *message, *automatic_html, *classes;
-	zval *type_classes, *joined_classes, *css_classes = NULL;
+	zval type_classes, *joined_classes, *css_classes = NULL;
 	zval *implicit_flush, *content, *msg = NULL, *html_message = NULL;
 	int flag_automatic_html;
 	int flag_implicit_flush;
@@ -282,18 +282,16 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 	automatic_html      = phalcon_read_property(getThis(), SL("_automaticHtml"), PH_NOISY);
 	flag_automatic_html = zend_is_true(automatic_html);
 	if (flag_automatic_html) {
-
 		classes = phalcon_read_property(getThis(), SL("_cssClasses"), PH_NOISY);
 
-		PHALCON_INIT_VAR(css_classes);
 		if (phalcon_array_isset_fetch(&type_classes, classes, type)) {
-			if (Z_TYPE_P(type_classes) == IS_ARRAY) {
+			if (Z_TYPE_P(&type_classes) == IS_ARRAY) {
 				PHALCON_INIT_VAR(joined_classes);
-				phalcon_fast_join_str(joined_classes, SL(" "), type_classes);
+				phalcon_fast_join_str(joined_classes, SL(" "), &type_classes);
 
 				PHALCON_CONCAT_SVS(css_classes, " class=\"", joined_classes, "\"");
 			} else {
-				PHALCON_CONCAT_SVS(css_classes, " class=\"", type_classes, "\"");
+				PHALCON_CONCAT_SVS(css_classes, " class=\"", &type_classes, "\"");
 			}
 		} else {
 			ZVAL_EMPTY_STRING(css_classes);

@@ -367,11 +367,9 @@ PHP_METHOD(Phalcon_Assets_Collection, current){
 
 	position  = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
 	resources = phalcon_read_property(getThis(), SL("_resources"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&resource, resources, position)) {
-		RETURN_ZVAL(resource, 1, 0);
+	if (!phalcon_array_isset_fetch(return_value, resources, position)) {
+		RETURN_NULL();
 	}
-
-	RETURN_NULL();
 }
 
 /**

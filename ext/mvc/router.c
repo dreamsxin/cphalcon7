@@ -618,7 +618,6 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	zval *action, *params_str, *str_params;
 	zval *params_merge = NULL;
 	zval *dependency_injector, *tmp;
-	zval *match_position = NULL, *converter = NULL;
 	zval *exact = NULL;
 	zval *default_namespace = NULL, *default_module = NULL, *default_controller = NULL;
 	zval *default_action = NULL, *default_params = NULL;
@@ -848,7 +847,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 					PHALCON_CALL_METHOD(&converters, route, "getconverters");
 
 					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(paths), idx, str_key, position) {
-						zval tmp;
+						zval tmp, match_position, converter;
 						if (str_key) {
 							ZVAL_STR(&tmp, str_key);
 						} else {
@@ -860,20 +859,20 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 								if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
 									PHALCON_INIT_NVAR(parameters);
 									array_init_size(parameters, 1);
-									phalcon_array_append(parameters, match_position, PH_COPY);
+									phalcon_array_append(parameters, &match_position, PH_COPY);
 
-									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
+									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, &converter, parameters);
 									phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
 								} else {
 									/* Update the parts if there is no converter */
-									phalcon_array_update_zval(parts, &tmp, match_position, PH_COPY);
+									phalcon_array_update_zval(parts, &tmp, &match_position, PH_COPY);
 								}
 							} else if (phalcon_array_isset_fetch(&converter, converters, &tmp)) {
 								PHALCON_INIT_NVAR(parameters);
 								array_init_size(parameters, 1);
 								phalcon_array_append(parameters, position, PH_COPY);
 
-								PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, converter, parameters);
+								PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, &converter, parameters);
 								phalcon_array_update_zval(parts, &tmp, converted_part, PH_COPY);
 							}
 						}

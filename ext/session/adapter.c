@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Session_Adapter, getOptions){
 PHP_METHOD(Phalcon_Session_Adapter, get){
 
 	zval *index, *default_value = NULL, *remove = NULL, *unique_id, *key, *_SESSION;
-	zval *value;
+	zval value;
 
 	PHALCON_MM_GROW();
 
@@ -264,15 +264,13 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
 	if (phalcon_array_isset_fetch(&value, _SESSION, key)) {
-		RETVAL_ZVAL(value, 1, 0);
 		if (remove && zend_is_true(remove)) {
 			phalcon_array_unset(_SESSION, key, 0);
 		}
-	} else {
-		RETVAL_ZVAL(default_value, 1, 0);
+		RETURN_CTOR(&value);
 	}
 
-	PHALCON_MM_RESTORE();
+	RETURN_CTOR(default_value);
 }
 
 /**

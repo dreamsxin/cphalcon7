@@ -67,7 +67,8 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 
 	PHALCON_MM_GROW();
 
-	PHALCON_CALL_PARENT(NULL, phalcon_di_factorydefault_ce, getThis(), "__construct");
+	//  PHALCON_CALL_PARENT(NULL, phalcon_di_factorydefault_ce, getThis(), "__construct");
+	PHALCON_CALL_METHOD_WITH_PARAMS(NULL, getThis(), phalcon_di_factorydefault_ce, "__construct", phalcon_fcall_parent);
 
 	shared = &PHALCON_GLOBAL(z_true);
 

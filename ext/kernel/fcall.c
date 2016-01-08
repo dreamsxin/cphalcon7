@@ -155,7 +155,7 @@ int phalcon_call_zval_func_aparams(zval **retval_ptr, zval *func, uint param_cou
 
 int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend_class_entry *ce, phalcon_call_type type, zval *method, uint param_count, zval *params[])
 {
-	zval func;
+	zval func_name;
 	int status;
 
 	if (object) {
@@ -164,37 +164,37 @@ int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend
 			return FAILURE;
 		}
 	}
-	array_init_size(&func, 2);
+	array_init_size(&func_name, 2);
 	switch (type) {
 		case phalcon_fcall_parent:
-			add_next_index_str(&func, zend_string_copy(IS(parent)));
+			add_next_index_string(&func_name, ISV(parent));
 			break;
 		case phalcon_fcall_self:
 			assert(!ce);
-			add_next_index_str(&func, zend_string_copy(IS(self)));
+			add_next_index_string(&func_name, ISV(self));
 			break;
 		case phalcon_fcall_static:
 			assert(!ce);
-			add_next_index_str(&func, zend_string_copy(IS(static)));
+			add_next_index_string(&func_name, ISV(static));
 			break;
 
 		case phalcon_fcall_ce:
 			assert(ce != NULL);
-			add_next_index_str(&func, zend_string_copy(ce->name));
+			add_next_index_string(&func_name, ce->name->val);
 			break;
 
 		case phalcon_fcall_method:
 		default:
 			assert(object != NULL);
 			Z_TRY_ADDREF_P(object);
-			add_next_index_zval(&func, object);
+			add_next_index_zval(&func_name, object);
 			break;
 	}
 
 	Z_TRY_ADDREF_P(method);
-	add_next_index_zval(&func, method);
+	add_next_index_zval(&func_name, method);
 
-	if ((status = phalcon_call_user_function(retval_ptr, object ? object : NULL, ce, type, &func, param_count, params)) == FAILURE) {
+	if ((status = phalcon_call_user_function(retval_ptr, object ? object : NULL, ce, type, &func_name, param_count, params)) == FAILURE) {
 		if (!EG(exception)) {
 			switch (type) {
 				case phalcon_fcall_parent:
@@ -217,8 +217,6 @@ int phalcon_call_class_zval_method_aparams(zval **retval_ptr, zval *object, zend
 			}
 		}
 	}
-
-	zval_dtor(&func);
 
 	return status;
 }
@@ -256,25 +254,25 @@ int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
 		status = FAILURE;
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_class_method_array()");
-		return FAILURE;
-	}
-
-	if (params) {
-		param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
-		arguments = (zval*)emalloc(sizeof(zval) * param_count);
-		i = 0;
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
-			ZVAL_ZVAL(&arguments[i], param, 1, 0);
-			i++;
-		} ZEND_HASH_FOREACH_END();
 	} else {
-		param_count = 0;
-		arguments = NULL;
+		if (params) {
+			param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
+			arguments = (zval*)emalloc(sizeof(zval) * param_count);
+			i = 0;
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
+				ZVAL_ZVAL(&arguments[i], param, 1, 0);
+				i++;
+			} ZEND_HASH_FOREACH_END();
+		} else {
+			param_count = 0;
+			arguments = NULL;
+		}
+
+		if ((status = phalcon_call_user_function2(retval_ptr, object, Z_OBJCE_P(object), phalcon_fcall_method, &func, param_count, arguments)) == FAILURE) {
+			zend_error(E_ERROR, "Call to undefined function %s::%s()", Z_OBJCE_P(object)->name->val, Z_STRVAL_P(method));
+		}
 	}
 
-	if ((status = phalcon_call_user_function2(retval_ptr, object, Z_OBJCE_P(object), phalcon_fcall_method, &func, param_count, arguments)) == FAILURE) {
-		zend_error(E_ERROR, "Call to undefined function %s::%s()", Z_OBJCE_P(object)->name->val, Z_STRVAL_P(method));
-	}
 	return status;
 }
 
@@ -312,6 +310,99 @@ int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 		ZVAL_COPY(*retval_ptr, &retval);
 	}
 
+	efree(arguments);
+
+	return status;
+}
+
+int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry *ce, const char *method_name, phalcon_call_type type, uint method_len, uint param_count, zval *params[])
+{
+	zval func_name, ret, *retval_ptr = retval ? retval : &ret;
+	zend_execute_data *execute_data  = EG(current_execute_data);
+	zval *arguments;
+	HashTable *function_table;
+	int i, status;
+
+	if (type != phalcon_fcall_function && object == NULL) {
+		object = execute_data && Z_OBJ(execute_data->This) ? &execute_data->This : NULL;
+	}
+
+	if (object != NULL) {
+		if (Z_TYPE_P(object) != IS_OBJECT) {
+			phalcon_throw_exception_format(spl_ce_RuntimeException, "Trying to call method %s on a non-object", method_name);
+			return FAILURE;
+		}
+	}
+
+	array_init_size(&func_name, 2);
+	switch (type) {
+		case phalcon_fcall_parent:
+			add_next_index_string(&func_name, ISV(parent));
+			break;
+		case phalcon_fcall_self:
+			//assert(!ce);
+			add_next_index_string(&func_name, ISV(self));
+			break;
+		case phalcon_fcall_static:
+			//assert(!ce);
+			add_next_index_string(&func_name, ISV(static));
+			break;
+
+		case phalcon_fcall_ce:
+			assert(ce != NULL);
+			add_next_index_string(&func_name, ce->name->val);
+			break;
+
+		case phalcon_fcall_method:
+		default:
+			assert(object != NULL);
+			Z_TRY_ADDREF_P(object);
+			add_next_index_zval(&func_name, object);
+			break;
+	}
+
+	add_next_index_string(&func_name, method_name);
+
+	if (!ce && object) {
+		ce = Z_OBJCE_P(object);
+	}
+
+	function_table = ce ? &ce->function_table : EG(function_table);
+
+	arguments = safe_emalloc(sizeof(zval), param_count, 0);
+
+	i = 0;
+	while(i < param_count) {
+		ZVAL_COPY_VALUE(&arguments[i], params[i]);
+		i++;
+	}
+
+	if ((status = call_user_function_ex(function_table, object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
+		status = FAILURE;
+		if (!EG(exception)) {
+			switch (type) {
+				case phalcon_fcall_parent:
+					zend_error(E_ERROR, "Call to undefined function parent::%s()", method_name);
+					break;
+				case phalcon_fcall_self:
+					zend_error(E_ERROR, "Call to undefined function self::%s()", method_name);
+					break;
+				case phalcon_fcall_static:
+					zend_error(E_ERROR, "Call to undefined function static::%s()", method_name);
+					break;
+				case phalcon_fcall_ce:
+					zend_error(E_ERROR, "Call to undefined function %s::%s()", ce->name->val, method_name);
+					break;
+				case phalcon_fcall_method:
+					zend_error(E_ERROR, "Call to undefined function %s::%s()", Z_OBJCE_P(object)->name->val, method_name);
+					break;
+				default:
+					zend_error(E_ERROR, "Call to undefined function ?::%s()", method_name);
+			}
+		}
+	}
+
+	zval_ptr_dtor(&func_name);
 	efree(arguments);
 
 	return status;

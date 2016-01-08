@@ -177,13 +177,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, getOptions){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator, getOption){
 
-	zval *option, *options, *value;
+	zval *option, *options, value;
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, options, option)) {
-		RETURN_ZVAL(value, 1, 0);
+		RETURN_CTORW(value);
 	}
 	
 	RETURN_NULL();

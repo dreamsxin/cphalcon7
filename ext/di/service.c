@@ -328,7 +328,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
  */
 PHP_METHOD(Phalcon_DI_Service, getParameter){
 
-	zval *position, *definition, *arguments, *parameter;
+	zval *position, *definition, arguments;
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	PHALCON_ENSURE_IS_LONG(position);
@@ -341,13 +341,11 @@ PHP_METHOD(Phalcon_DI_Service, getParameter){
 
 	/* Update the parameter */
 	if (
-		phalcon_array_isset_str_fetch(&arguments, definition, SL("arguments")) &&
-		phalcon_array_isset_fetch(&parameter, arguments, position)
+		!phalcon_array_isset_fetch_str(&arguments, definition, SL("arguments")) ||
+		!phalcon_array_isset_fetch(return_value, arguments, position)
 	) {
-		RETURN_ZVAL(parameter, 1, 0);
+		RETURN_NULL();
 	}
-
-	RETURN_NULL();
 }
 
 /**

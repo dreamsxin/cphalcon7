@@ -491,7 +491,7 @@ PHP_METHOD(Phalcon_Date, adjust){
 PHP_METHOD(Phalcon_Date, days){
 
 	zval *month, *year = NULL, *tmp = NULL, *tmp1, *tmp2, *total = NULL;
-	zval *months;
+	zval *months, year_months;
 	char buf[2];
 	int y, m, i, t;
 
@@ -517,8 +517,8 @@ PHP_METHOD(Phalcon_Date, days){
 	y = phalcon_get_intval(year);
 	m = phalcon_get_intval(month);
 
-	if (phalcon_array_isset_long_fetch(&tmp, months, y)) {
-		if (phalcon_array_isset_long_fetch(&return_value, tmp, m)) {
+	if (phalcon_array_isset_fetch_long(&year_months, months, y)) {
+		if (phalcon_array_isset_fetch_long(&return_value, &year_months, m)) {
 			RETURN_MM();
 		}
 	}

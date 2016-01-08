@@ -379,4 +379,6 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table);
 #define PHALCON_GET_OBJECT_FROM_ZVAL(zv, object_struct) \
 	PHALCON_GET_OBJECT_FROM_OBJ(Z_OBJ_P(zv), object_struct)
 
+#define phalcon_is_php_version(id) (PHP_VERSION_ID / 10 == id / 10 ?  1 : 0)
+
 #endif /* PHALCON_KERNEL_MAIN_H */

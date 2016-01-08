@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
 
 	zval *key, *session, *prefix, *prefix_key;
 	zval *meta_data;
-	zval *r0, *r1 = NULL;
+	zval r0, *r1 = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -118,8 +118,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
 	PHALCON_INIT_VAR(prefix_key);
 	PHALCON_CONCAT_SV(prefix_key, "$PMM$", prefix);
 	if (phalcon_array_isset_fetch(&r0, session, prefix_key)) {
-
-		if (phalcon_array_isset(r0, key)) {
+		if (phalcon_array_isset(&r0, key)) {
 			PHALCON_OBS_VAR(r1);
 			phalcon_array_fetch(&r1, session, prefix_key, PH_NOISY);
 			PHALCON_OBS_VAR(meta_data);

@@ -358,13 +358,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, setOption){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getOption){
 
-	zval *option, *options, *value;
+	zval *option, *options, value;
 
 	phalcon_fetch_params(0, 1, 0, &option);
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, options, option)) {
-		RETURN_ZVAL(value, 1, 0);
+		RETURN_CTORW(&value);
 	}
 
 	RETURN_NULL();
@@ -747,18 +747,17 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		 */
 		extensions = phalcon_read_property(getThis(), SL("_extensions"), PH_NOISY);
 		if (Z_TYPE_P(extensions) == IS_ARRAY) { 
-			zval *fire_arguments;
+			zval fire_arguments;
 
 			PHALCON_INIT_VAR(event);
 			ZVAL_STRING(event, "compileFunction");
 
-			PHALCON_ALLOC_INIT_ZVAL(fire_arguments);
-			array_init_size(fire_arguments, 3);
-			phalcon_array_append(fire_arguments, name, PH_COPY);
-			phalcon_array_append(fire_arguments, arguments, PH_COPY);
-			phalcon_array_append(fire_arguments, func_arguments, PH_COPY);
+			array_init_size(&fire_arguments, 3);
+			phalcon_array_append(&fire_arguments, name, PH_COPY);
+			phalcon_array_append(&fire_arguments, arguments, PH_COPY);
+			phalcon_array_append(&fire_arguments, func_arguments, PH_COPY);
 
-			PHALCON_CALL_METHOD(&code, getThis(), "fireextensionevent", event, fire_arguments);
+			PHALCON_CALL_METHOD(&code, getThis(), "fireextensionevent", event, &fire_arguments);
 			if (Z_TYPE_P(code) == IS_STRING) {
 				RETURN_CCTOR(code);
 			}
@@ -769,14 +768,14 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		 */
 		functions = phalcon_read_property(getThis(), SL("_functions"), PH_NOISY);
 		if (Z_TYPE_P(functions) == IS_ARRAY) { 
-			zval *definition;
+			zval definition;
 
 			if (phalcon_array_isset_fetch(&definition, functions, name)) {
 				/** 
 				 * Use the string as function
 				 */
 				if (Z_TYPE_P(definition) == IS_STRING) {
-					PHALCON_CONCAT_VSVS(return_value, definition, "(", arguments, ")");
+					PHALCON_CONCAT_VSVS(return_value, &definition, "(", arguments, ")");
 					RETURN_MM();
 				}
 
@@ -784,14 +783,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 				 * Execute the function closure returning the compiled definition
 				 */
 				if (Z_TYPE_P(definition) == IS_OBJECT) {
-					if (instanceof_function(Z_OBJCE_P(definition), zend_ce_closure)) {
-						zval *parameters;
-
-						PHALCON_ALLOC_INIT_ZVAL(parameters);
-						array_init_size(parameters, 2);
-						phalcon_array_append(parameters, arguments, PH_COPY);
-						phalcon_array_append(parameters, func_arguments, PH_COPY);
-						PHALCON_RETURN_CALL_FUNCTION("call_user_func_array", definition, parameters);
+					if (instanceof_function(Z_OBJCE_P(&definition), zend_ce_closure)) {
+						zval parameters;
+						array_init_size(&parameters, 2);
+						phalcon_array_append(&parameters, arguments, PH_COPY);
+						phalcon_array_append(&parameters, func_arguments, PH_COPY);
+						PHALCON_RETURN_CALL_FUNCTION("call_user_func_array", &definition, &parameters);
 						RETURN_MM();
 					}
 				}
@@ -1264,29 +1261,27 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	 */
 	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
 	if (Z_TYPE_P(filters) == IS_ARRAY) { 
-		zval *definition;
+		zval definition;
 
 		if (phalcon_array_isset_fetch(&definition, filters, name)) {
 			/** 
 			 * The definition is a string
 			 */
-			if (Z_TYPE_P(definition) == IS_STRING) {
-				PHALCON_CONCAT_VSVS(return_value, definition, "(", arguments, ")");
+			if (Z_TYPE_P(&definition) == IS_STRING) {
+				PHALCON_CONCAT_VSVS(return_value, &definition, "(", arguments, ")");
 				RETURN_MM();
 			}
 
 			/** 
 			 * The definition is a closure
 			 */
-			if (Z_TYPE_P(definition) == IS_OBJECT) {
-				if (instanceof_function(Z_OBJCE_P(definition), zend_ce_closure)) {
-					zval *parameters;
-
-					PHALCON_ALLOC_INIT_ZVAL(parameters);
-					array_init_size(parameters, 2);
-					phalcon_array_append(parameters, arguments, PH_COPY);
-					phalcon_array_append(parameters, func_arguments, PH_COPY);
-					PHALCON_RETURN_CALL_FUNCTION("call_user_func_array", definition, parameters);
+			if (Z_TYPE_P(&definition) == IS_OBJECT) {
+				if (instanceof_function(Z_OBJCE_P(&definition), zend_ce_closure)) {
+					zval parameters;
+					array_init_size(&parameters, 2);
+					phalcon_array_append(&parameters, arguments, PH_COPY);
+					phalcon_array_append(&parameters, func_arguments, PH_COPY);
+					PHALCON_RETURN_CALL_FUNCTION("call_user_func_array", &definition, &parameters);
 					RETURN_MM();
 				}
 			}

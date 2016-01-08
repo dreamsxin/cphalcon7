@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Forms_Element, setAttribute){
 PHP_METHOD(Phalcon_Forms_Element, getAttribute){
 
 	zval *attribute, *default_value = NULL, *attributes;
-	zval *value;
+	zval value;
 
 	phalcon_fetch_params(0, 1, 1, &attribute, &default_value);
 
@@ -472,10 +472,10 @@ PHP_METHOD(Phalcon_Forms_Element, getAttribute){
 
 	attributes = phalcon_read_property(getThis(), SL("_attributes"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, attributes, attribute)) {
-		RETURN_ZVAL(value, 1, 0);
+		RETURN_CTORW(&value);
 	}
 
-	RETURN_ZVAL(default_value, 1, 0);
+	RETURN_CTORW(default_value);
 }
 
 /**
@@ -543,7 +543,7 @@ PHP_METHOD(Phalcon_Forms_Element, setUserOption){
  */
 PHP_METHOD(Phalcon_Forms_Element, getUserOption){
 
-	zval *option, *default_value = NULL, *options, *value;
+	zval *option, *default_value = NULL, *options, value;
 
 	phalcon_fetch_params(0, 1, 1, &option, &default_value);
 
@@ -553,10 +553,10 @@ PHP_METHOD(Phalcon_Forms_Element, getUserOption){
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, options, option)) {
-		RETURN_ZVAL(value, 1, 0);
+		RETURN_CTORW(&value);
 	}
 
-	RETURN_ZVAL(default_value, 1, 0);
+	RETURN_CTORW(default_value);
 }
 
 /**

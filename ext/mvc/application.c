@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	zval *uri = NULL, *dependency_injector, event_name;
 	zval *status = NULL, *service = NULL, *router = NULL, *module_name = NULL;
 	zval *module_object = NULL, *modules;
-	zval *module, *class_name = NULL, *module_params;
+	zval module, *class_name = NULL, *module_params;
 	zval *implicit_view, *view = NULL, *namespace_name = NULL;
 	zval *controller_name = NULL, *action_name = NULL, *params = NULL, *exact = NULL;
 	zval *dispatcher = NULL, *controller = NULL, *returned_response = NULL;
@@ -352,27 +352,27 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/** 
 		 * A module definition must be an array or an object
 		 */
-		if (Z_TYPE_P(module) != IS_ARRAY && Z_TYPE_P(module) != IS_OBJECT) {
+		if (Z_TYPE_P(&module) != IS_ARRAY && Z_TYPE_P(&module) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "Invalid module definition");
 			return;
 		}
 
 		/* An array module definition contains a path to a module definition class */
-		if (Z_TYPE_P(module) == IS_ARRAY) { 
+		if (Z_TYPE_P(&module) == IS_ARRAY) { 
 			/* Class name used to load the module definition */
-			if (phalcon_array_isset_str(module, SL("className"))) {
+			if (phalcon_array_isset_str(&module, SL("className"))) {
 				PHALCON_OBS_VAR(class_name);
-				phalcon_array_fetch_str(&class_name, module, SL("className"), PH_NOISY);
+				phalcon_array_fetch_str(&class_name, &module, SL("className"), PH_NOISY);
 			} else {
 				PHALCON_INIT_NVAR(class_name);
 				ZVAL_STRING(class_name, "Module");
 			}
 
 			/* If the developer has specified a path, try to include the file */
-			if (phalcon_array_isset_str(module, SL("path"))) {
+			if (phalcon_array_isset_str(&module, SL("path"))) {
 
 				PHALCON_OBS_VAR(path);
-				phalcon_array_fetch_str(&path, module, SL("path"), PH_NOISY);
+				phalcon_array_fetch_str(&path, &module, SL("path"), PH_NOISY);
 				convert_to_string_ex(path);
 				if (Z_TYPE_P(class_name) != IS_STRING || phalcon_class_exists(class_name, 0) == NULL) {
 					if (phalcon_file_exists(path) == SUCCESS) {
@@ -391,13 +391,13 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			 */
 			PHALCON_CALL_METHOD(NULL, module_object, "registerautoloaders", dependency_injector);
 			PHALCON_CALL_METHOD(NULL, module_object, "registerservices", dependency_injector);
-		} else if (Z_TYPE_P(module) == IS_OBJECT && instanceof_function(Z_OBJCE_P(module), zend_ce_closure)) {
+		} else if (Z_TYPE_P(&module) == IS_OBJECT && instanceof_function(Z_OBJCE_P(&module), zend_ce_closure)) {
 			/* A module definition object, can be a Closure instance */
 			PHALCON_INIT_VAR(module_params);
 			array_init_size(module_params, 1);
 			phalcon_array_append(module_params, dependency_injector, PH_COPY);
 
-			PHALCON_CALL_USER_FUNC_ARRAY(&status, module, module_params);
+			PHALCON_CALL_USER_FUNC_ARRAY(&status, &module, module_params);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "Invalid module definition");
 			return;

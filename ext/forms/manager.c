@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Forms_Manager, create){
  */
 PHP_METHOD(Phalcon_Forms_Manager, get){
 
-	zval *name, *forms, *form;
+	zval *name, *forms, form;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Forms_Manager, get){
 		return;
 	}
 	
-	RETURN_ZVAL(form, 1, 0);
+	RETURN_CTORW(&form);
 }
 
 /**

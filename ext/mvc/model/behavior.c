@@ -110,18 +110,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior, mustTakeAction){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior, getOptions){
 
-	zval *eventname = NULL, *options, *event_options;
+	zval *eventname = NULL, *options, event_options;
 
 	phalcon_fetch_params(0, 0, 1, &eventname);
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (eventname && Z_TYPE_P(eventname) != IS_NULL) {
 		if (phalcon_array_isset_fetch(&event_options, options, eventname)) {
-			RETURN_ZVAL(event_options, 1, 0);
+			RETURN_CTORW(&event_options);
 		}
 		RETURN_NULL();
 	}
-	
+
 	RETURN_ZVAL(options, 1, 0);
 }
 

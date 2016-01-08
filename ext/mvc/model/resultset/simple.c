@@ -287,14 +287,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
 				phalcon_update_property_array(getThis(), SL("_rowsModels"), key, active_row);
 			} else {
-				PHALCON_OBS_NVAR(active_row);
 				phalcon_array_fetch(&active_row, rows_objects, key, PH_NOISY);
 			}
 			break;
 
 	}
 
-	phalcon_update_property_this(getThis(), SL("_activeRow"), active_row);
+	phalcon_update_property_this(getThis(), SL("_activeRow"), &active_row);
 	RETURN_MM_TRUE;
 }
 

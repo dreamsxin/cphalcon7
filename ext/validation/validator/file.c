@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 
 	zval *value, *minsize = NULL, *maxsize = NULL, *mimes = NULL, *minwidth = NULL, *maxwidth = NULL, *minheight = NULL, *maxheight = NULL;
-	zval *file = NULL, *size = NULL, *constant, *finfo = NULL, *pathname = NULL, *mime = NULL, *image, *imageinfo = NULL, *width = NULL, *height = NULL, *valid = NULL;
+	zval *file = NULL, *size = NULL, *constant, *finfo = NULL, *pathname = NULL, *mime = NULL, *image, *imageinfo = NULL, width, height, *valid = NULL;
 	zend_class_entry *imagick_ce;
 
 	PHALCON_MM_GROW();
@@ -432,26 +432,21 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 		PHALCON_CALL_METHOD(&height, image, "getImageHeight");
 	} else if (phalcon_function_exists_ex(SL("getimagesize")) != FAILURE) {
 		PHALCON_CALL_FUNCTION(&imageinfo, "getimagesize", pathname);
-		if (!phalcon_array_isset_long_fetch(&width, imageinfo, 0)) {
-			PHALCON_INIT_VAR(width);
-			ZVAL_LONG(width, -1);
+		if (!phalcon_array_isset_fetch_long(&width, imageinfo, 0)) {
+			ZVAL_LONG(&width, -1);
 		}
 
-		if (!phalcon_array_isset_long_fetch(&height, imageinfo, 1)) {
-			PHALCON_INIT_VAR(height);
-			ZVAL_LONG(height, -1);
+		if (!phalcon_array_isset_fetch_long(&height, imageinfo, 1)) {
+			ZVAL_LONG(&height, -1);
 		}
 	} else {
-		PHALCON_INIT_VAR(width);
-		ZVAL_LONG(width, -1);
-
-		PHALCON_INIT_VAR(height);
-		ZVAL_LONG(height, -1);
+		ZVAL_LONG(&width, -1);
+		ZVAL_LONG(&height, -1);
 	}
 
 	if (!PHALCON_IS_EMPTY(minwidth)) {
 		PHALCON_INIT_NVAR(valid);
-		is_smaller_or_equal_function(valid, minwidth, width);
+		is_smaller_or_equal_function(valid, minwidth, &width);
 		if (!zend_is_true(valid)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("TooNarrow"));
 			RETURN_MM_FALSE;
@@ -460,7 +455,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 
 	if (!PHALCON_IS_EMPTY(maxwidth)) {
 		PHALCON_INIT_NVAR(valid);
-		is_smaller_or_equal_function(valid, width, maxwidth);
+		is_smaller_or_equal_function(valid, &width, maxwidth);
 		if (!zend_is_true(valid)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("TooWide"));
 			RETURN_MM_FALSE;
@@ -469,7 +464,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 
 	if (!PHALCON_IS_EMPTY(minheight)) {
 		PHALCON_INIT_NVAR(valid);
-		is_smaller_or_equal_function(valid, minheight, height);
+		is_smaller_or_equal_function(valid, minheight, &height);
 		if (!zend_is_true(valid)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("TooShort"));
 			RETURN_MM_FALSE;
@@ -478,7 +473,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 
 	if (!PHALCON_IS_EMPTY(maxheight)) {
 		PHALCON_INIT_NVAR(valid);
-		is_smaller_or_equal_function(valid, height, maxheight);
+		is_smaller_or_equal_function(valid, &height, maxheight);
 		if (!zend_is_true(valid)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("TooLong"));
 			RETURN_MM_FALSE;

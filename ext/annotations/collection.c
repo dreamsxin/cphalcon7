@@ -179,15 +179,13 @@ PHP_METHOD(Phalcon_Annotations_Collection, rewind){
  */
 PHP_METHOD(Phalcon_Annotations_Collection, current){
 
-	zval *position, *annotations, *annotation;
+	zval *position, *annotations;
 
 	position    = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
 	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&annotation, annotations, position)) {
-		RETURN_ZVAL(annotation, 1, 0);
+	if (!phalcon_array_isset_fetch(return_value, annotations, position)) {
+		RETURN_NULL();
 	}
-
-	RETURN_NULL();
 }
 
 /**

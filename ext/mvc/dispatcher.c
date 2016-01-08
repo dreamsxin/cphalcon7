@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
-	zval *message, *code = NULL, *error_handlers, *error_handler = NULL;
+	zval *message, *code = NULL, *error_handlers, error_handler;
 	zval *previous_namespace_name, *previous_controller_name, *previous_action_name, *previous_params;
 	zval *namespace_name, *controller_name, *action_name, *params, *dependency_injector;
 	zval exception_code, exception_message, *exception = NULL, *service;
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
 	if (Z_TYPE_P(error_handlers) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&error_handler, error_handlers, code)) {
-			PHALCON_CALL_SELF(NULL, "forward", error_handler);
+			PHALCON_CALL_SELF(NULL, "forward", &error_handler);
 			previous_namespace_name = phalcon_read_property(getThis(), SL("_previousNamespaceName"), PH_NOISY);
 			previous_controller_name = phalcon_read_property(getThis(), SL("_previousHandlerName"), PH_NOISY);
 			previous_action_name = phalcon_read_property(getThis(), SL("_previousActionName"), PH_NOISY);

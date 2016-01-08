@@ -282,13 +282,13 @@ PHP_METHOD(Phalcon_Annotations_Annotation, numberArguments){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, getArgument){
 
-	zval *position, *arguments, *tmp;
+	zval *position, *arguments;
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	
 	arguments = phalcon_read_property(getThis(), SL("_arguments"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&tmp, arguments, position)) {
-		RETURN_ZVAL(tmp, 1, 0);
+	if (!phalcon_array_isset_fetch(return_value, arguments, position)) {
+		RETURN_NULL();
 	}
 }
 

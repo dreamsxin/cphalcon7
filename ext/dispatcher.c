@@ -423,7 +423,7 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 
 	zval *param, *filters = NULL, *default_value = NULL;
 	zval exception_code, exception_message, *service, *filter = NULL;
-	zval *params, *param_value, *dependency_injector;
+	zval *params, param_value, *dependency_injector;
 
 	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
 
@@ -445,10 +445,10 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 
 			PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
 			PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
-			PHALCON_RETURN_CALL_METHOD(filter, "sanitize", param_value, filters);
+			PHALCON_RETURN_CALL_METHOD(filter, "sanitize", &param_value, filters);
 			RETURN_MM();
 		} else {
-			RETURN_ZVAL(param_value, 1, 0);
+			RETURN_ZVAL(&param_value, 1, 0);
 		}
 	}
 
@@ -1283,7 +1283,7 @@ PHP_METHOD(Phalcon_Dispatcher, setErrorHandler){
  */
 PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 
-	zval *exception_code = NULL, *error_handlers, *error_handler = NULL;
+	zval *exception_code = NULL, *error_handlers, error_handler;
 
 	phalcon_fetch_params(0, 0, 1, &exception_code);
 
@@ -1295,7 +1295,7 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 
 	if (Z_TYPE_P(error_handlers) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&error_handler, error_handlers, exception_code)) {
-			RETURN_CCTORW(error_handler);
+			RETURN_CTORW(&error_handler);
 		}
 	}
 

@@ -296,12 +296,12 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 	arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 
 	if (num_args < required_args) {
-		phalcon_throw_exception_string(spl_ce_BadMethodCallException, "Wrong number of parameters");
+		phalcon_throw_exception_format(spl_ce_BadMethodCallException, "Wrong number of parameters, num:%d, required:%d", num_args, required_args);
 		return FAILURE;
 	}
 
 	if (num_args > arg_count) {
-		phalcon_throw_exception_string(spl_ce_BadMethodCallException, "Could not obtain parameters for parsing");
+		phalcon_throw_exception_format(spl_ce_BadMethodCallException, "Could not obtain parameters for parsing, num:%d, count:%d", num_args, arg_count);
 		return FAILURE;
 	}
 

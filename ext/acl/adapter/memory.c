@@ -674,7 +674,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, deny){
 
 static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resource, zval *access, zval *access_list, zval* role_inherits)
 {
-	zval *inherited_roles, access_key;
+	zval inherited_roles, access_key;
 	zval *parent_role;
 	int result = PHALCON_ACL_DUNNO;
 
@@ -687,15 +687,15 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 		return PHALCON_ACL_DUNNO;
 	}
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(inherited_roles), parent_role) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&inherited_roles), parent_role) {
 		int found;
-		zval *have_access;
+		zval have_access;
 
 		phalcon_concat_vsvsv(&access_key, parent_role, SL("!"), resource, SL("!"), access, 0);
 		found = phalcon_array_isset_fetch(&have_access, access_list, &access_key);
 
 		if (found) {
-			result = zend_is_true(have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
+			result = zend_is_true(&have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
 		} else {
 			result = phalcon_role_adapter_memory_check_inheritance(parent_role, resource, access, access_list, role_inherits);
 		}
@@ -729,7 +729,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	zval *role, *resource, *access, *events_manager, *role_inherits;
 	zval event_name, *status = NULL, *default_access, *roles_names;
-	zval *have_access = NULL, *access_list, *access_key = NULL;
+	zval have_access, *access_list, *access_key = NULL;
 	zval star;
 	int allow_access;
 
@@ -772,7 +772,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	 * Check if there is a direct combination for role-resource-access
 	 */
 	if (phalcon_array_isset_fetch(&have_access, access_list, access_key)) {
-		allow_access = zend_is_true(have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
+		allow_access = zend_is_true(&have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
 	}
 	else {
 		allow_access = PHALCON_ACL_DUNNO;
@@ -798,7 +798,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 		 * In the direct role
 		 */
 		if (phalcon_array_isset_fetch(&have_access, access_list, access_key)) {
-			allow_access = zend_is_true(have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
+			allow_access = zend_is_true(&have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
 		}
 		else {
 			allow_access = phalcon_role_adapter_memory_check_inheritance(role, resource, &star, access_list, role_inherits);
@@ -817,7 +817,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 		 * Try in the direct role
 		 */
 		if (phalcon_array_isset_fetch(&have_access, access_list, access_key)) {
-			allow_access = zend_is_true(have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
+			allow_access = zend_is_true(&have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
 		}
 		else {
 			allow_access = phalcon_role_adapter_memory_check_inheritance(role, &star, &star, access_list, role_inherits);

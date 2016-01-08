@@ -215,17 +215,15 @@ PHP_METHOD(Phalcon_Http_Uri, __set){
  */
 PHP_METHOD(Phalcon_Http_Uri, __get){
 
-	zval *key, *parts, *value = NULL;
+	zval *key, *parts;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
 
-	if (!phalcon_array_isset_fetch(&value, parts, key)) {
+	if (!phalcon_array_isset_fetch(return_value, parts, key)) {
 		 RETURN_NULL();
 	}
-
-	RETURN_ZVAL(value, 1, 0);
 }
 
 /**

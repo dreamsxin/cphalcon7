@@ -440,8 +440,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 
 	zval *collection, *main_handler = NULL, *handlers = NULL, *lazy = NULL;
 	zval *lazy_handler = NULL, *prefix = NULL, *handler = NULL;
-	zval *real_handler = NULL, *prefixed_pattern = NULL;
-	zval *route = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -478,46 +476,44 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 		PHALCON_CALL_METHOD(&prefix, collection, "getprefix");
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(handlers), handler) {
-			zval *methods, *pattern, *sub_handler, *name;
+			zval methods, pattern, sub_handler, name, real_handler, prefixed_pattern, route;
 			if (Z_TYPE_P(handler) != IS_ARRAY) { 
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "One of the registered handlers is invalid");
 				return;
 			}
 
 			if (
-				    !phalcon_array_isset_long_fetch(&methods, handler, 0)
-				 || !phalcon_array_isset_long_fetch(&pattern, handler, 1)
-				 || !phalcon_array_isset_long_fetch(&sub_handler, handler, 2)
-				 || !phalcon_array_isset_long_fetch(&name, handler, 3)
+				    !phalcon_array_isset_fetch_long(&methods, handler, 0)
+				 || !phalcon_array_isset_fetch_long(&pattern, handler, 1)
+				 || !phalcon_array_isset_fetch_long(&sub_handler, handler, 2)
+				 || !phalcon_array_isset_fetch_long(&name, handler, 3)
 			) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "One of the registered handlers is invalid");
 				return;
 			}
 
 			/* Create a real handler */
-			PHALCON_INIT_NVAR(real_handler);
-			array_init_size(real_handler, 2);
-			phalcon_array_append(real_handler, lazy_handler, PH_COPY);
-			phalcon_array_append(real_handler, sub_handler, PH_COPY);
+			array_init_size(&real_handler, 2);
+			phalcon_array_append(&real_handler, lazy_handler, PH_COPY);
+			phalcon_array_append(&real_handler, &sub_handler, PH_COPY);
 			if (PHALCON_IS_NOT_EMPTY(prefix)) {
 				if (PHALCON_IS_STRING(pattern, "/")) {
-					PHALCON_CPY_WRT(prefixed_pattern, prefix);
+					ZVAL_COPY_VALUE(&prefixed_pattern, prefix);
 				} else {
-					PHALCON_INIT_NVAR(prefixed_pattern);
-					PHALCON_CONCAT_VV(prefixed_pattern, prefix, pattern);
+					PHALCON_CONCAT_VV(&prefixed_pattern, prefix, &pattern);
 				}
 			} else {
-				PHALCON_CPY_WRT(prefixed_pattern, pattern);
+				ZVAL_COPY_VALUE(&prefixed_pattern, &pattern);
 			}
 
 			/* Map the route manually */
-			PHALCON_CALL_METHOD(&route, getThis(), "map", prefixed_pattern, real_handler);
-			if (Z_TYPE_P(methods) != IS_NULL) {
-				PHALCON_CALL_METHOD(NULL, route, "via", methods);
+			PHALCON_CALL_METHOD(&route, getThis(), "map", &prefixed_pattern, &real_handler);
+			if (Z_TYPE_P(&methods) != IS_NULL) {
+				PHALCON_CALL_METHOD(NULL, &route, "via", &methods);
 			}
 
-			if (Z_TYPE_P(name) != IS_NULL) {
-				PHALCON_CALL_METHOD(NULL, route, "setname", name);
+			if (Z_TYPE_P(&name) != IS_NULL) {
+				PHALCON_CALL_METHOD(NULL, &route, "setname", &name);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -705,7 +701,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 
 	zval *uri = NULL, *dependency_injector, *error_message = NULL;
 	zval event_name, *status = NULL, *service, *router = NULL, *matched_route = NULL;
-	zval *handlers, *route_id = NULL, *handler = NULL, *before_handlers;
+	zval *handlers, *route_id = NULL, handler, *before_handlers;
 	zval *before = NULL, *stopped = NULL, *params = NULL;
 	zval *returned_value = NULL, *after_handlers, *after = NULL;
 	zval *not_found_handler, *finish_handlers;
@@ -768,7 +764,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/** 
 		 * Updating active handler
 		 */
-		phalcon_update_property_this(getThis(), SL("_activeHandler"), handler);
+		phalcon_update_property_this(getThis(), SL("_activeHandler"), &handler);
 
 		/** 
 		 * Calling beforeExecuteRoute event
@@ -778,7 +774,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		if (PHALCON_IS_FALSE(status)) {
 			RETURN_MM_FALSE;
 		} else {
-			handler = phalcon_read_property(getThis(), SL("_activeHandler"), PH_NOISY);
+			ZVAL_COPY_VALUE(&handler, phalcon_read_property(getThis(), SL("_activeHandler"), PH_NOISY));
 		}
 
 		before_handlers = phalcon_read_property(getThis(), SL("_beforeHandlers"), PH_NOISY);
@@ -845,7 +841,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 */
 		PHALCON_CALL_METHOD(&params, router, "getparams");
 
-		PHALCON_CALL_USER_FUNC_ARRAY(&returned_value, handler, params);
+		PHALCON_CALL_USER_FUNC_ARRAY(&returned_value, &handler, params);
 
 		/** 
 		 * Update the returned value

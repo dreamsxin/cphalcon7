@@ -453,7 +453,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 
 	zval *expr, *column_name, *sql_column_aliases;
 	zval *meta_data = NULL, *column_domain;
-	zval *source, exception_message;
+	zval source, exception_message;
 	zval *model = NULL, *column_map = NULL, *real_column_name = NULL;
 	zval *has_model = NULL, *models_instances;
 	zval *has_attribute = NULL, *models, *class_name;
@@ -492,7 +492,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 
 		sql_aliases = phalcon_read_property(getThis(), SL("_sqlAliases"), PH_NOISY);
 
-		/** 
+		/**
 		 * The column has a domain, we need to check if it's an alias
 		 */
 		if (!phalcon_array_isset_fetch(&source, sql_aliases, column_domain)) {
@@ -646,7 +646,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	ZVAL_STRING(&s_qualified, ISV(qualified));
 	array_init_size(return_value, 4);
 	add_assoc_zval_ex(return_value, ISL(type), &s_qualified);
-	phalcon_array_update_string(return_value, IS(domain), source, PH_COPY);
+	phalcon_array_update_string(return_value, IS(domain), &source, PH_COPY);
 	phalcon_array_update_string(return_value, IS(name), real_column_name, PH_COPY);
 	phalcon_array_update_string(return_value, IS(balias), column_name, PH_COPY);
 
@@ -1764,7 +1764,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 
 	zval *join_type, *join_source, *model_alias;
-	zval *join_alias, *relation, *fields = NULL, *referenced_fields = NULL, *referenced_field = NULL;
+	zval *join_alias, *relation, *fields = NULL, *referenced_fields = NULL;
 	zval *left = NULL, *left_expr = NULL, *right = NULL, *right_expr = NULL, *sql_join_condition = NULL;
 	zval *sql_join_conditions;
 	zval *field = NULL, exception_message;
@@ -1830,7 +1830,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 		array_init(sql_join_conditions);
 		
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, field) {
-			zval tmp;
+			zval tmp, referenced_field;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -3590,7 +3590,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
-	zval event_name, *intermediate, *phql, *ast = NULL, *ir_phql = NULL, *ir_phql_cache = NULL, *ir_phql_cache2;
+	zval event_name, *intermediate, *phql, *ast = NULL, *ir_phql = NULL, *ir_phql_cache = NULL;
 	zval *unique_id = NULL, *type = NULL, exception_message;
 	zval *manager = NULL, *model_names = NULL, *tables = NULL, *key_schema, *key_source, *model_name = NULL, *model = NULL, *table = NULL;
 	zval *old_schema = NULL, *old_source = NULL, *schema = NULL, *source = NULL;	
@@ -3647,7 +3647,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 		 * Check if the prepared PHQL is already cached
 		 */
 		if (phalcon_array_isset_str(ast, SL("id"))) {
-
+			zval ir_phql_cache2;
 			/** 
 			 * Parsed ASTs have a unique id
 			 */
@@ -3657,9 +3657,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 			PHALCON_INIT_NVAR(ir_phql_cache);
 			phalcon_read_static_property(ir_phql_cache, SL("phalcon\\mvc\\model\\query"), SL("_irPhqlCache"));
 
-			if (phalcon_array_isset_fetch(&ir_phql_cache2, ir_phql_cache, type) && phalcon_array_isset(ir_phql_cache2, unique_id)) {
+			if (phalcon_array_isset_fetch(&ir_phql_cache2, ir_phql_cache, type) && phalcon_array_isset(&ir_phql_cache2, unique_id)) {
 				PHALCON_OBS_NVAR(ir_phql);
-				phalcon_array_fetch(&ir_phql, ir_phql_cache2, unique_id, PH_NOISY);
+				phalcon_array_fetch(&ir_phql, &ir_phql_cache2, unique_id, PH_NOISY);
 
 				if (Z_TYPE_P(ir_phql) == IS_ARRAY) {
 					if (phalcon_array_isset_str_fetch(&model_names, ir_phql, SL("models")) && phalcon_array_isset_str_fetch(&tables, ir_phql, SL("tables"))) {

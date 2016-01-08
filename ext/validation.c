@@ -357,14 +357,14 @@ PHP_METHOD(Phalcon_Validation, setFilters){
  */
 PHP_METHOD(Phalcon_Validation, getFilters){
 
-	zval *attribute = NULL, *filters, *attribute_filters;
+	zval *attribute = NULL, *filters, attribute_filters;
 
 	phalcon_fetch_params(0, 0, 1, &attribute);
 	
 	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
 	if (attribute && Z_TYPE_P(attribute) == IS_STRING) {
 		if (phalcon_array_isset_fetch(&attribute_filters, filters, attribute)) {
-			RETURN_ZVAL(attribute_filters, 1, 0);
+			RETURN_ZVAL(&attribute_filters, 1, 0);
 		}
 
 		RETURN_NULL();
@@ -632,13 +632,13 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 {
-	zval *type, *messages, *msg;
+	zval *type, *messages, msg;
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
 	messages = phalcon_read_property(getThis(), SL("_defaultMessages"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&msg, messages, type)) {
-		RETURN_ZVAL(msg, 1, 0);
+		RETURN_ZVAL(&msg, 1, 0);
 	}
 
 	RETURN_NULL();
@@ -670,7 +670,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, *labels, *value;
+	zval *field_param = NULL, *labels, value;
 	zval *field = NULL;
 
 	PHALCON_MM_GROW();
@@ -691,7 +691,7 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 	labels = phalcon_read_property(getThis(), SL("_labels"), PH_NOISY);
 	if (Z_TYPE_P(labels) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&value, labels, field)) {
-			RETURN_CTOR(value);
+			RETURN_CTOR(&value);
 		}
 	}
 

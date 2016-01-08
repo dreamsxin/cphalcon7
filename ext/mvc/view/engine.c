@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
-	zval *method_name, *arguments = NULL, *methods, *method, *dependency_injector, exception_message;
+	zval *method_name, *arguments = NULL, *methods, method, *dependency_injector, exception_message;
 	zval *service_name, *service = NULL, *callback;
 
 	PHALCON_MM_GROW();
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	methods = phalcon_read_property(getThis(), SL("_methods"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&method, methods, method_name)) {
-			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, method, arguments);
+			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, &method, arguments);
 			RETURN_MM();
 	}
 

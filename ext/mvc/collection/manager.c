@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setCustomEventsManager){
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
 
 	zval *model, *custom_events_manager, *class_name;
-	zval *events_manager;
+	zval events_manager;
 
 	PHALCON_MM_GROW();
 
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
 		PHALCON_INIT_VAR(class_name);
 		phalcon_get_class(class_name, model, 1);
 		if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, class_name)) {
-			RETURN_CTOR(events_manager);
+			RETURN_CTOR(&events_manager);
 		}
 	}
 
@@ -324,7 +324,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, useImplicitObjectIds){
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 
 	zval *model, *entity_name, *implicit_objects_ids;
-	zval *implicit;
+	zval implicit;
 
 	PHALCON_MM_GROW();
 
@@ -343,7 +343,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 	 */
 	implicit_objects_ids = phalcon_read_property(getThis(), SL("_implicitObjectsIds"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&implicit, implicit_objects_ids, entity_name)) {
-		RETURN_CTOR(implicit);
+		RETURN_CTOR(&implicit);
 	}
 
 	RETURN_MM_TRUE;
@@ -384,7 +384,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setStrictMode){
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 
 	zval *collection, *entity_name, *strict_modes;
-	zval *strict_mode;
+	zval strict_mode;
 
 	PHALCON_MM_GROW();
 
@@ -403,7 +403,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 	 */
 	strict_modes = phalcon_read_property(getThis(), SL("_strictModes"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&strict_mode, strict_modes, entity_name)) {
-		RETURN_CTOR(strict_mode);
+		RETURN_CTOR(&strict_mode);
 	}
 
 	RETURN_MM_TRUE;

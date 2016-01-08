@@ -1309,7 +1309,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 
 	zval *dependency_injector, *model_name, *data;
 	zval *conditions, *service, *meta_data = NULL, *model;
-	zval *data_types = NULL, *bind, *value = NULL, *field = NULL, *type, *condition = NULL;
+	zval *data_types = NULL, *bind, *value = NULL, *field = NULL;
 	zval *value_pattern = NULL, *join_conditions;
 	zval *column_map = NULL;
 	zend_string *str_key;
@@ -1370,8 +1370,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 		 * We look for attributes in the array passed as data
 		 */
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
-			zval *real_field;
-			zval tmp;
+			zval tmp, real_field, type, condition;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -1382,14 +1381,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 				real_field = &tmp;
 			}
 
-			if (phalcon_array_isset_fetch(&type, data_types, real_field)) {
+			if (phalcon_array_isset_fetch(&type, data_types, &real_field)) {
 				if (Z_TYPE_P(value) != IS_NULL && !PHALCON_IS_STRING(value, "")) {
-					if (PHALCON_IS_LONG(type, 2)) {
+					if (PHALCON_IS_LONG(&type, 2)) {
 						/**
 						 * For varchar types we use LIKE operator
 						 */
-						PHALCON_INIT_NVAR(condition);
-						PHALCON_CONCAT_VSVS(condition, field, " LIKE :", field, ":");
+						PHALCON_CONCAT_VSVS(&condition, field, " LIKE :", field, ":");
 
 						PHALCON_INIT_NVAR(value_pattern);
 						PHALCON_CONCAT_SVS(value_pattern, "%", value, "%");
@@ -1398,12 +1396,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 						/**
 						 * For the rest of data types we use a plain = operator
 						 */
-						PHALCON_INIT_NVAR(condition);
-						PHALCON_CONCAT_VSVS(condition, field, "=:", field, ":");
+						PHALCON_CONCAT_VSVS(&condition, field, "=:", field, ":");
 						phalcon_array_update_zval(bind, field, value, PH_COPY);
 					}
 
-					phalcon_array_append(conditions, condition, PH_COPY);
+					phalcon_array_append(conditions, &condition, PH_COPY);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();

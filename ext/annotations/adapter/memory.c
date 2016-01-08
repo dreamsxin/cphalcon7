@@ -75,7 +75,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Memory){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
 
-	zval *key, *data, *lowercased_key, *annotations;
+	zval *key, *data, *lowercased_key;
 
 	PHALCON_MM_GROW();
 
@@ -85,11 +85,9 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
 	
 	PHALCON_INIT_VAR(lowercased_key);
 	phalcon_fast_strtolower(lowercased_key, key);
-	if (phalcon_array_isset_fetch(&annotations, data, lowercased_key)) {
-		RETURN_CTOR(annotations);
+	if (!phalcon_array_isset_fetch(return_value, data, lowercased_key)) {
+		RETURN_MM_NULL();
 	}
-	
-	RETURN_MM_NULL();
 }
 
 /**

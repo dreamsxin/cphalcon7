@@ -490,27 +490,22 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, statsTube){
 
 static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_ptr, zval *response)
 {
-	zval *job_id, *length, *serialized = NULL, *body;
+	zval job_id, length, serialized, body;
 
-	if (!phalcon_array_isset_long_fetch(&job_id, response, 1)) {
-		job_id = &PHALCON_GLOBAL(z_null);
+	if (!phalcon_array_isset_fetch_long(&job_id, response, 1)) {
+		ZVAL_NULL(&job_id);
 	}
 
-	if (!phalcon_array_isset_long_fetch(&length, response, 2)) {
-		length = &PHALCON_GLOBAL(z_null);
+	if (!phalcon_array_isset_fetch_long(&length, response, 2)) {
+		ZVAL_NULL(&length);
 	}
 
-	PHALCON_CALL_METHODW(&serialized, this_ptr, "read", length);
+	PHALCON_CALL_METHODW(&serialized, this_ptr, "read", &length);
 
-	PHALCON_ALLOC_INIT_ZVAL(body);
-	phalcon_unserialize(body, serialized);
-	zval_ptr_dtor(serialized);
-	if (Z_REFCOUNT_P(body) >= 1) {
-		Z_DELREF_P(body);
-	}
+	phalcon_unserialize(&body, &serialized);
 
 	object_init_ex(return_value, phalcon_queue_beanstalk_job_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", this_ptr, job_id, body);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", this_ptr, &job_id, &body);
 }
 
 /**

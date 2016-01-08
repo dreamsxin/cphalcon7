@@ -105,11 +105,9 @@ PHP_METHOD(Phalcon_Http_Response_Headers, get){
 	phalcon_fetch_params(0, 1, 0, &name);
 	
 	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&header_value, headers, name)) {
-		RETURN_ZVAL(header_value, 1, 0);
+	if (!phalcon_array_isset_fetch(return_value, headers, name)) {
+		RETURN_FALSE;
 	}
-	
-	RETURN_FALSE;
 }
 
 /**

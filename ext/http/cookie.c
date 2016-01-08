@@ -234,7 +234,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setValue){
 PHP_METHOD(Phalcon_Http_Cookie, getValue){
 
 	zval *filters = NULL, *default_value = NULL, *restored, *dependency_injector = NULL;
-	zval *readed, *name, *_COOKIE, *value = NULL, *encryption;
+	zval *readed, *name, *_COOKIE, value, *encryption;
 	zval *service = NULL, *crypt = NULL, *decrypted_value = NULL, *filter = NULL;
 
 	PHALCON_MM_GROW();
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 		_COOKIE = phalcon_get_global_str(SL("_COOKIE"));
 		if (phalcon_array_isset_fetch(&value, _COOKIE, name)) {
 			encryption = phalcon_read_property(getThis(), SL("_useEncryption"), PH_NOISY);
-			if (zend_is_true(encryption) && PHALCON_IS_NOT_EMPTY(value)) {
+			if (zend_is_true(encryption) && PHALCON_IS_NOT_EMPTY(&value)) {
 				dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 				if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'filter' service");
@@ -279,9 +279,9 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 				/** 
 				 * Decrypt the value also decoding it with base64
 				 */
-				PHALCON_CALL_METHOD(&decrypted_value, crypt, "decryptbase64", value);
+				PHALCON_CALL_METHOD(&decrypted_value, crypt, "decryptbase64", &value);
 			} else {
-				PHALCON_CPY_WRT(decrypted_value, value);
+				PHALCON_CPY_WRT(decrypted_value, &value);
 			}
 
 			/** 

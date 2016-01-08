@@ -710,7 +710,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 
 	zval *event_type, *source, *data = NULL, *cancelable = NULL, *events;
 	zval exception_message, event_parts, *type;
-	zval *event_name, *status = NULL, *collect, *event = NULL, *fire_events = NULL;
+	zval *event_name, *status = NULL, *collect, *event = NULL, fire_events;
 
 	PHALCON_MM_GROW();
 
@@ -767,7 +767,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	 * Check if events are grouped by type
 	 */
 	if (phalcon_array_isset_fetch(&fire_events, events, type)) {
-		if (Z_TYPE_P(fire_events) == IS_ARRAY || Z_TYPE_P(fire_events) == IS_OBJECT) {
+		if (Z_TYPE_P(&fire_events) == IS_ARRAY || Z_TYPE_P(&fire_events) == IS_OBJECT) {
 			/** 
 			 * Create the event context
 			 */
@@ -777,7 +777,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 			/** 
 			 * Call the events queue
 			 */
-			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", fire_events, event);
+			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, event);
 		}
 	}
 
@@ -785,7 +785,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	 * Check if there are listeners for the event type itself
 	 */
 	if (phalcon_array_isset_fetch(&fire_events, events, event_type)) {
-		if (Z_TYPE_P(fire_events) == IS_ARRAY || Z_TYPE_P(fire_events) == IS_OBJECT) {
+		if (Z_TYPE_P(&fire_events) == IS_ARRAY || Z_TYPE_P(&fire_events) == IS_OBJECT) {
 			/** 
 			 * Create the event if it wasn't created before
 			 */
@@ -799,7 +799,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 			/** 
 			 * Call the events queue
 			 */
-			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", fire_events, event);
+			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, event);
 		}
 	}
 

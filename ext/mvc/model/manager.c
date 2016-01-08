@@ -487,7 +487,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getLastInitialized){
 PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
 	zval *model_name, *new_instance = NULL, *initialized;
-	zval *lowercased, *model, *dependency_injector;
+	zval *lowercased, model, *dependency_injector;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	 * Check if a model with the same is already loaded
 	 */
 	if (!zend_is_true(new_instance) && phalcon_array_isset_fetch(&model, initialized, lowercased)) {
-		RETURN_CTOR(model);
+		RETURN_CTOR(&model);
 	}
 
 	/** 
@@ -897,7 +897,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
 PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 
 	zval *eventname, *model, *status = NULL, *behaviors, *entity_name = NULL;
-	zval *models_behaviors, *behavior = NULL, *events_manager, *mgr;
+	zval models_behaviors, *behavior = NULL, *events_manager;
 	zval *fire_event_name = NULL, *custom_events_manager;
 
 	PHALCON_MM_GROW();
@@ -919,7 +919,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 			/** 
 			 * Notify all the events on the behavior
 			 */
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(models_behaviors), behavior) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&models_behaviors), behavior) {
 				PHALCON_CALL_METHOD(&status, behavior, "notify", eventname, model);
 				if (PHALCON_IS_FALSE(status)) {
 					RETURN_CTOR(status);
@@ -949,6 +949,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	 */
 	custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
 	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
+		zval mgr;
 
 		PHALCON_INIT_NVAR(entity_name);
 		phalcon_get_class(entity_name, model, 1);
@@ -957,7 +958,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 			PHALCON_INIT_NVAR(fire_event_name);
 			PHALCON_CONCAT_SV(fire_event_name, "model:", eventname);
 
-			PHALCON_CALL_METHOD(&status, mgr, "fire", fire_event_name, model);
+			PHALCON_CALL_METHOD(&status, &mgr, "fire", fire_event_name, model);
 			if (PHALCON_IS_FALSE(status)) {
 				RETURN_CTOR(status);
 			}

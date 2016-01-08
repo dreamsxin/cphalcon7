@@ -1452,8 +1452,8 @@ PHP_METHOD(Phalcon_Db_Adapter, getColumnDefinition){
  */
 PHP_METHOD(Phalcon_Db_Adapter, listTables){
 
-	zval *schema_name = NULL, *dialect, *sql = NULL, *fetch_num, *tables = NULL;
-	zval *table, *table_name;
+	zval *schema_name = NULL, *dialect, *sql = NULL, fetch_num, *tables = NULL;
+	zval *table, table_name;
 
 	PHALCON_MM_GROW();
 
@@ -1473,19 +1473,18 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 	/** 
 	 * Use fetch Num
 	 */
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	/** 
 	 * Execute the SQL returning the tables
 	 */
-	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", sql, fetch_num);
+	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", sql, &fetch_num);
 
 	if (Z_TYPE_P(tables) == IS_ARRAY) {
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(tables)));
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(tables), table) {
-			if (phalcon_array_isset_long_fetch(&table_name, table, 0)) {
-				phalcon_array_append(return_value, table_name, PH_COPY);
+			if (phalcon_array_isset_fetch_long(&table_name, table, 0)) {
+				phalcon_array_append(return_value, &table_name, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
@@ -1505,8 +1504,8 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
  */
 PHP_METHOD(Phalcon_Db_Adapter, listViews){
 
-	zval *schema_name = NULL, *dialect, *sql = NULL, *fetch_num, *tables = NULL;
-	zval *table, *table_name;
+	zval *schema_name = NULL, *dialect, *sql = NULL, fetch_num, *tables = NULL;
+	zval *table, table_name;
 
 	PHALCON_MM_GROW();
 
@@ -1526,20 +1525,19 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 	/** 
 	 * Use fetch Num
 	 */
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	/** 
 	 * Execute the SQL returning the tables
 	 */
-	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", sql, fetch_num);
+	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", sql, &fetch_num);
 
 	if (Z_TYPE_P(tables) == IS_ARRAY) {
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(tables)));
 		
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(tables), table) {
-			if (phalcon_array_isset_long_fetch(&table_name, table, 0)) {
-				phalcon_array_append(return_value, table_name, PH_COPY);
+			if (phalcon_array_isset_fetch_long(&table_name, table, 0)) {
+				phalcon_array_append(return_value, &table_name, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

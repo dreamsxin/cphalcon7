@@ -87,8 +87,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Ini){
 
 static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *section, zval *directive, zval *value)
 {
-	zval *t1, *t2;
-	zval **temp1 = &t1, **temp2 = &t2, *index = NULL;
+	zval t1, *tmp1 = &t1, t2, index;
 	int i, n;
 
 	assert(Z_TYPE_P(*arr) == IS_ARRAY);
@@ -97,34 +96,28 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval **arr, zval *s
 	n = zend_hash_num_elements(Z_ARRVAL_P(directive));
 	assert(n > 1);
 
-	if (!phalcon_array_isset_fetch(temp1, *arr, section)) {
-		PHALCON_ALLOC_INIT_ZVAL(t1);
-		array_init_size(t1, 1);
-		phalcon_array_update_zval(*arr, section, t1, PH_COPY);
-	}
-
-	if (Z_TYPE_P(*temp1) != IS_ARRAY) {
-		convert_to_array_ex(*temp1);
+	if (!phalcon_array_isset_fetch(&t1, *arr, section)) {
+		array_init(&t1);
+	} else if (Z_TYPE_P(&t1) != IS_ARRAY) {
+		convert_to_array_ex(&t1);
 	}
 
 	for (i = 0; i < n - 1; i++) {
 		phalcon_array_fetch_long(&index, directive, i, PH_NOISY);
-
-		if (!phalcon_array_isset_fetch(temp2, *temp1, index)) {
-			PHALCON_ALLOC_INIT_ZVAL(t2);
-			array_init_size(t2, 1);
-			phalcon_array_update_zval(*temp1, index, t2, PH_COPY);
-		}
-		else if (Z_TYPE_P(*temp2) != IS_ARRAY) {
-			convert_to_array_ex(*temp2);
+		if (!phalcon_array_isset_fetch(&t2, tmp1, index)) {
+			array_init(&temp2);
+			phalcon_array_update_zval(tmp1, index, &t2, PH_COPY);
+		} else if (Z_TYPE_P(&t2) != IS_ARRAY) {
+			convert_to_array_ex(&t2);
 		}
 
-		t1 = t2;
+		tmp1 = &t2;
 		zval_ptr_dtor(index);
 	}
 
 	phalcon_array_fetch_long(&index, directive, n - 1, PH_NOISY);
-	phalcon_array_update_zval(*temp1, index, value, PH_COPY);
+	phalcon_array_update_zval(&t1, &index, value, PH_COPY);
+	phalcon_array_update_zval(*arr, section, &t1, PH_COPY);
 	zval_ptr_dtor(index);
 }
 

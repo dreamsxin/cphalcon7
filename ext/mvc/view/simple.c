@@ -997,13 +997,13 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, __set){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, __get){
 
-	zval *key, *params, *value;
+	zval *key, *params, value;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
-		RETURN_ZVAL(value, 1, 0);
+		RETURN_CTORW(value);
 	}
 
 	RETURN_NULL();

@@ -420,7 +420,7 @@ PHP_METHOD(Phalcon_Assets_Manager, set){
  */
 PHP_METHOD(Phalcon_Assets_Manager, get){
 
-	zval *id, *collections, *collection;
+	zval *id, *collections;
 
 	phalcon_fetch_params(0, 1, 0, &id);
 
@@ -430,12 +430,10 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
 	}
 
 	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(&collection, collections, id)) {
+	if (!phalcon_array_isset_fetch(return_value, collections, id)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "The collection does not exist in the manager");
 		return;
 	}
-
-	RETURN_ZVAL(collection, 1, 0);
 }
 
 /**
@@ -490,17 +488,15 @@ PHP_METHOD(Phalcon_Assets_Manager, getJs){
  */
 PHP_METHOD(Phalcon_Assets_Manager, collection){
 
-	zval *name, *collections, *collection = NULL;
+	zval *name, *collections;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&collection, collections, name)) {
-		RETURN_ZVAL(collection, 1, 0);
+	if (!phalcon_array_isset_fetch(return_value, collections, name)) {
+		object_init_ex(return_value, phalcon_assets_collection_ce);
+		phalcon_update_property_array(getThis(), SL("_collections"), name, return_value);
 	}
-
-	object_init_ex(return_value, phalcon_assets_collection_ce);
-	phalcon_update_property_array(getThis(), SL("_collections"), name, return_value);
 }
 
 /**

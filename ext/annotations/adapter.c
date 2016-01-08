@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getReader){
 PHP_METHOD(Phalcon_Annotations_Adapter, get){
 
 	zval *class_name, *real_class_name = NULL, *annotations;
-	zval *class_annotations = NULL, *reader = NULL, *parsed_annotations = NULL;
+	zval class_annotations, *reader = NULL, *parsed_annotations = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -167,14 +167,14 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 
 	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&class_annotations, annotations, real_class_name)) {
-		RETURN_CTOR(class_annotations);
+		RETURN_CTOR(&class_annotations);
 	}
 
 	/** 
 	 * Try to read the annotations from the adapter
 	 */
 	PHALCON_CALL_METHOD(&class_annotations, getThis(), "read", real_class_name);
-	if (Z_TYPE_P(class_annotations) == IS_NULL) {
+	if (Z_TYPE_P(&class_annotations) == IS_NULL) {
 
 		/** 
 		 * Get the annotations reader
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 		}
 	}
 
-	RETURN_CTOR(class_annotations);
+	RETURN_CTOR(&class_annotations);
 }
 
 /**

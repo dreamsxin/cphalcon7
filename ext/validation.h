@@ -26,6 +26,6 @@ extern zend_class_entry *phalcon_validation_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Validation);
 
-PHALCON_STATIC int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval *return_value, zval *this_ptr, const char *type);
+PHALCON_STATIC int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *type);
 
 #endif /* PHALCON_VALIDATION_H */

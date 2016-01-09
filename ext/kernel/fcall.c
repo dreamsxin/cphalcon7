@@ -315,7 +315,7 @@ int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 	return status;
 }
 
-int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry *ce, const char *method_name, phalcon_call_type type, uint method_len, uint param_count, zval *params[])
+int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry *ce, phalcon_call_type type, const char *method_name, uint method_len, uint param_count, zval *params[])
 {
 	zval func_name, ret, *retval_ptr = retval ? retval : &ret;
 	zend_execute_data *execute_data  = EG(current_execute_data);

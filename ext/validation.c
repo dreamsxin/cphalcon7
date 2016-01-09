@@ -150,18 +150,17 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 	return SUCCESS;
 }
 
-int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval *return_value, zval *this_ptr, const char *type)
+int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *type)
 {
 	if (is_phalcon_class(ce)) {
 		zval *msg;
 		zval *messages = phalcon_read_property(this_ptr, SL("_defaultMessages"), PH_NOISY);
 
-		PHALCON_ALLOC_INIT_ZVAL(return_value);
 		if (phalcon_array_isset_str_fetch(&msg, messages, type, strlen(type))) {
-			ZVAL_ZVAL(return_value, msg, 1, 0);
+			ZVAL_ZVAL(retval, msg, 1, 0);
 		}
 		else {
-			ZVAL_NULL(return_value);
+			ZVAL_NULL(retval);
 		}
 
 		return SUCCESS;

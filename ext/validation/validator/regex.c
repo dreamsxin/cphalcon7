@@ -80,8 +80,8 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Regex){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Regex, validate){
 
-	zval *validator, *attribute, *value = NULL, *allow_empty, *pattern, *valid = NULL, *label, *pairs;
-	zval *message_str, *code, *prepared = NULL, *message;
+	zval *validator, *attribute, *value = NULL, allow_empty, pattern, *valid = NULL, label, pairs;
+	zval message_str, code, *prepared = NULL, *message;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	PHALCON_MM_GROW();
@@ -92,48 +92,42 @@ PHP_METHOD(Phalcon_Validation_Validator_Regex, validate){
 
 	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 
-	PHALCON_OBS_VAR(allow_empty);
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &allow_empty, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
+	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
 		RETURN_MM_TRUE;
 	}
 
 	/* The regular expression is set in the option 'pattern' */
-	PHALCON_OBS_VAR(pattern);
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &pattern, getThis(), "pattern"));
+	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&pattern, ce, getThis(), "pattern"));
 
-	PHALCON_CALL_SELF(&valid, "valid", value, pattern);
+	PHALCON_CALL_SELF(&valid, "valid", value, &pattern);
 	
 	if (PHALCON_IS_FALSE(valid)) {
-		PHALCON_OBS_VAR(label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), ISV(label)));
-		if (!zend_is_true(label)) {
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
+		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
-			if (!zend_is_true(label)) {
-				PHALCON_CPY_WRT(label, attribute);
+			if (!zend_is_true(&label)) {
+				ZVAL_COPAY_VALUE(&label, attribute);
 			}
 		}
 
-		PHALCON_ALLOC_INIT_ZVAL(pairs);
-		array_init_size(pairs, 1);
-		Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+		array_init_size(&pairs, 1);
+		Z_TRY_ADDREF_P(&label);
+		add_assoc_zval_ex(&pairs, SL(":field"), &label);
 
-		PHALCON_OBS_VAR(message_str);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(message_str)) {
-			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&message_str);
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), message_str, validator, "Regex"));
-		}
-	
-		PHALCON_OBS_VAR(code);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), ISV(code)));
-		if (Z_TYPE_P(code) == IS_NULL) {
-			ZVAL_LONG(code, 0);
+			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Regex"));
 		}
 
-		PHALCON_CALL_FUNCTION(&prepared, "strtr", message_str, pairs);
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
+		if (Z_TYPE_P(&code) == IS_NULL) {
+			ZVAL_LONG(&code, 0);
+		}
 
-		message = phalcon_validation_message_construct_helper(prepared, attribute, "Regex", code);
+		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+
+		message = phalcon_validation_message_construct_helper(prepared, attribute, "Regex", &code);
 		Z_TRY_DELREF_P(message);
 	
 		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);

@@ -81,8 +81,8 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_InclusionIn){
  */
 PHP_METHOD(Phalcon_Validation_Validator_InclusionIn, validate){
 
-	zval *validator, *attribute, *value = NULL, *allow_empty, *valid = NULL;
-	zval *label, *domain, *joined_domain, *pairs, *message_str, *message, *code;
+	zval *validator, *attribute, *value = NULL, allow_empty, *valid = NULL;
+	zval label, domain, joined_domain, pairs, message_str, *message, code;
 	zval *prepared = NULL;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
@@ -94,56 +94,50 @@ PHP_METHOD(Phalcon_Validation_Validator_InclusionIn, validate){
 
 	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 
-	PHALCON_OBS_VAR(allow_empty);
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &allow_empty, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
+	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
 		RETURN_MM_TRUE;
 	}
 
 	/* A domain is an array with a list of valid values */
-	PHALCON_OBS_VAR(domain);
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &domain, getThis(), ISV(domain)));
-	if (Z_TYPE_P(domain) != IS_ARRAY) { 
+	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&domain, ce, getThis(), ISV(domain)));
+	if (Z_TYPE_P(&domain) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Option 'domain' must be an array");
 		return;
 	}
 
-	PHALCON_CALL_SELF(&valid, "valid", value, domain);
+	PHALCON_CALL_SELF(&valid, "valid", value, &domain);
 
 	if (PHALCON_IS_FALSE(valid)) {
-		PHALCON_OBS_VAR(label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), ISV(label)));
-		if (!zend_is_true(label)) {
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
+		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(label)) {
-				PHALCON_CPY_WRT(label, attribute);
+				ZVAL_COPY_VALUE(&label, attribute);
 			}
 		}
 
-		PHALCON_ALLOC_INIT_ZVAL(joined_domain);
-		phalcon_fast_join_str(joined_domain, SL(", "), domain);
+		phalcon_fast_join_str(&joined_domain, SL(", "), &domain);
 
-		PHALCON_ALLOC_INIT_ZVAL(pairs);
-		array_init_size(pairs, 2);
-		Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
-		add_assoc_zval_ex(pairs, SL(":domain"), joined_domain);
+		array_init_size(&pairs, 2);
+		Z_TRY_ADDREF_P(&label);
+		add_assoc_zval_ex(&pairs, SL(":field"), &label);
+		Z_TRY_ADDREF_P(&joined_domain);
+		add_assoc_zval_ex(&pairs, SL(":domain"), &joined_domain);
 
-		PHALCON_OBS_VAR(message_str);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
-		if (!zend_is_true(message_str)) {
-			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&message_str);
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), message_str, validator, "InclusionIn"));
-		}
-	
-		PHALCON_OBS_VAR(code);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), ISV(code)));
-		if (Z_TYPE_P(code) == IS_NULL) {
-			ZVAL_LONG(code, 0);
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
+		if (!zend_is_true(&message_str)) {
+			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "InclusionIn"));
 		}
 
-		PHALCON_CALL_FUNCTION(&prepared, "strtr", message_str, pairs);
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
+		if (Z_TYPE_P(&code) == IS_NULL) {
+			ZVAL_LONG(&code, 0);
+		}
 
-		message = phalcon_validation_message_construct_helper(prepared, attribute, "InclusionIn", code);
+		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+
+		message = phalcon_validation_message_construct_helper(prepared, attribute, "InclusionIn", &code);
 		Z_TRY_DELREF_P(message);
 
 		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);

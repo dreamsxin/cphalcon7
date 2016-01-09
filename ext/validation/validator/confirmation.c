@@ -78,9 +78,9 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Confirmation){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 
-	zval *validator, *attribute, *with_attribute;
-	zval *value = NULL, *with_value = NULL, *valid = NULL, *message_str, *message, *code;
-	zval *label, *with_label, *pairs, *prepared = NULL;
+	zval *validator, *attribute, with_attribute;
+	zval *value = NULL, *with_value = NULL, *valid = NULL, message_str, *message, code;
+	zval label, with_label, pairs, *prepared = NULL;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	PHALCON_MM_GROW();
@@ -89,54 +89,49 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 	
 	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 1);
 
-	PHALCON_OBS_VAR(with_attribute);
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &with_attribute, getThis(), "with"));
+	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&with_attribute, ce, getThis(), "with"));
 	
 	PHALCON_CALL_METHOD(&value,      validator, "getvalue", attribute);
-	PHALCON_CALL_METHOD(&with_value, validator, "getvalue", with_attribute);
+	PHALCON_CALL_METHOD(&with_value, validator, "getvalue", &with_attribute);
 
 	PHALCON_CALL_SELF(&valid, "valid", value, with_value);
 	
 	if (PHALCON_IS_FALSE(valid)) {
-		PHALCON_OBS_VAR(label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), ISV(label)));
-		if (!zend_is_true(label)) {
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
+		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
-			if (!zend_is_true(label)) {
-				PHALCON_CPY_WRT(label, attribute);
+			if (!zend_is_true(&label)) {
+				ZVAL_COPY_VALUE(&label, attribute);
 			}
 		}
 
-		PHALCON_OBS_VAR(with_label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &with_label, getThis(), ISV(label)));
-		if (!zend_is_true(with_label)) {
-			PHALCON_CALL_METHOD(&with_label, validator, "getlabel", with_attribute);
-			if (!zend_is_true(with_label)) {
-				PHALCON_CPY_WRT(with_label, with_attribute);
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&with_label, ce, getThis(), ISV(label)));
+		if (!zend_is_true(&with_label)) {
+			PHALCON_CALL_METHOD(&with_label, validator, "getlabel", &with_attribute);
+			if (!zend_is_true(&with_label)) {
+				ZVAL_COPY_VALUE(&with_label, &with_attribute);
 			}
 		}
 
-		PHALCON_ALLOC_INIT_ZVAL(pairs);
-		array_init_size(pairs, 2);
-		Z_TRY_ADDREF_P(label);          add_assoc_zval_ex(pairs, SL(":field"), label);
-		Z_TRY_ADDREF_P(with_label); add_assoc_zval_ex(pairs, SL(":with"), with_label);
+		array_init_size(&pairs, 2);
+		Z_TRY_ADDREF_P(&label);
+		add_assoc_zval_ex(&pairs, SL(":field"), &label);
+		Z_TRY_ADDREF_P(&with_label);
+		add_assoc_zval_ex(&pairs, SL(":with"), &with_label);
 
-		PHALCON_OBS_VAR(message_str);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
-		if (!zend_is_true(message_str)) {
-			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&message_str);
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), message_str, validator, "Confirmation"));
-		}
-	
-		PHALCON_OBS_VAR(code);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), ISV(code)));
-		if (Z_TYPE_P(code) == IS_NULL) {
-			ZVAL_LONG(code, 0);
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
+		if (!zend_is_true(&message_str)) {
+			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Confirmation"));
 		}
 
-		PHALCON_CALL_FUNCTION(&prepared, "strtr", message_str, pairs);
+		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
+		if (Z_TYPE_P(&code) == IS_NULL) {
+			ZVAL_LONG(&code, 0);
+		}
+
+		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 	
-		message = phalcon_validation_message_construct_helper(prepared, attribute, "Confirmation", code);
+		message = phalcon_validation_message_construct_helper(prepared, attribute, "Confirmation", &code);
 		Z_TRY_DELREF_P(message);
 	
 		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);

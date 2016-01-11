@@ -98,8 +98,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Libmemcached){
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 
 	zval *options = NULL;
-	zval *servers, *client, *lifetime, *prefix;
-	zval *frontend_data, *libmemcached, *option;
+	zval servers, client, lifetime, prefix;
+	zval frontend_data, libmemcached, option;
 
 	PHALCON_MM_GROW();
 
@@ -110,55 +110,50 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&servers, options, SL("servers"))) {
+	if (!phalcon_array_isset_fetch_str(&servers, options, SL("servers"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "No servers given in options");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&client, options, SL("client"))) {
-		client = NULL;
+	if (!phalcon_array_isset_fetch_str(&client, options, SL("client"))) {
+		ZVAL_NULL(client);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&lifetime, options, SL("lifetime"))) {
-		PHALCON_INIT_VAR(lifetime);
-		ZVAL_LONG(lifetime, 8600);
+	if (!phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+		ZVAL_LONG(&lifetime, 8600);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
+	phalcon_update_property_this(getThis(), SL("_lifetime"), &lifetime);
 
-	if (!phalcon_array_isset_str_fetch(&prefix, options, SL("prefix"))) {
-		PHALCON_INIT_VAR(prefix);
-		ZVAL_EMPTY_STRING(prefix);
+	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+		ZVAL_EMPTY_STRING(&prefix);
 	}
 
 	/* create libmemcached instance */
-	PHALCON_INIT_VAR(option);
-	array_init_size(option, 1);
+	array_init_size(&option, 1);
 
-	phalcon_array_update_str(option, SL("lifetime"), lifetime, PH_COPY);
+	phalcon_array_update_str(&option, SL("lifetime"), &lifetime, PH_COPY);
 
-	PHALCON_INIT_VAR(frontend_data);
-	object_init_ex(frontend_data, phalcon_cache_frontend_data_ce);
+	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHOD(NULL, frontend_data, "__construct", option);
+	PHALCON_CALL_METHOD(NULL, frontend_data, "__construct", &option);
 
-	PHALCON_INIT_NVAR(option);
-	array_init(option);
+	array_init(&option);
 
-	phalcon_array_update_str_str(option, SL("statsKey"), SL("$PMM$"), PH_COPY);
+	phalcon_array_update_str_str(&option, SL("statsKey"), SL("$PMM$"), PH_COPY);
+	phalcon_array_update_str(&option, SL("servers"), &servers, PH_COPY);
 
-	phalcon_array_update_str(option, SL("servers"), servers, PH_COPY);
 	if (client) {
-		phalcon_array_update_str(option, SL("client"), client, PH_COPY);
+		phalcon_array_update_str(option, SL("client"), &client, PH_COPY);
 	}
-	phalcon_array_update_str(option, SL("prefix"), prefix, PH_COPY);
 
-	PHALCON_INIT_VAR(libmemcached);
-	object_init_ex(libmemcached, phalcon_cache_backend_libmemcached_ce);
+	phalcon_array_update_str(&option, SL("prefix"), &prefix, PH_COPY);
 
-	PHALCON_CALL_METHOD(NULL, libmemcached, "__construct", frontend_data, option);
+	object_init_ex(&libmemcached, phalcon_cache_backend_libmemcached_ce);
 
-	phalcon_update_property_this(getThis(), SL("_libmemcached"), libmemcached);
+	PHALCON_CALL_METHOD(NULL, &libmemcached, "__construct", &frontend_data, &option);
+
+	phalcon_update_property_this(getThis(), SL("_libmemcached"), &libmemcached);
 	
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 

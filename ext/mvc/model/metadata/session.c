@@ -82,13 +82,13 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Session){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct){
 
-	zval *options = NULL, *prefix;
+	zval *options = NULL, prefix;
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_str_fetch(&prefix, options, SL("prefix"))) {
-			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
+		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+			phalcon_update_property_this(getThis(), SL("_prefix"), &prefix);
 		}
 	}
 

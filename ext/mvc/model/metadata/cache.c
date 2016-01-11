@@ -76,8 +76,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Cache){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Cache, mvc_model_metadata_cache, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_cache_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_metadata_cache_ce, SL("_lifetime"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_metadata_cache_ce, SL("_cache"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_model_metadata_cache_ce, SL("_lifetime"), 8600, ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_model_metadata_cache_ce, SL("_cache"), "cache", ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_model_metadata_cache_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
@@ -91,35 +91,21 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Cache){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 
-	zval *options = NULL, *service, *lifetime;
+	zval *options = NULL, service, lifetime;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 0, 1, &options);
 
-	if (!options) {
-		PHALCON_INIT_VAR(options);
-		array_init(options);
+	if (options && Z_TYPE_P(options) != IS_ARRAY) {
+		if (phalcon_array_isset_fetch_str(&service, options, SL("service"))) {
+			phalcon_update_property_this(getThis(), SL("_cache"), &service);
+		}
+
+		if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+			phalcon_update_property_this(getThis(), SL("_lifetime"), &lifetime);
+		}
 	}
-
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
-		return;
-	}
-
-	if (!phalcon_array_isset_str_fetch(&service, options, SL("service"))) {
-		PHALCON_INIT_VAR(service);
-		ZVAL_STRING(service, "cache");
-	}
-
-	phalcon_update_property_this(getThis(), SL("_cache"), service);
-
-	if (!phalcon_array_isset_str_fetch(&lifetime, options, SL("lifetime"))) {
-		PHALCON_INIT_VAR(lifetime);
-		ZVAL_LONG(lifetime, 8600);
-	}
-
-	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
 
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 

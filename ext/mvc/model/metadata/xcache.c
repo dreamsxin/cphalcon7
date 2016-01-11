@@ -87,17 +87,17 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Xcache){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, __construct){
 
-	zval *options = NULL, *prefix, *ttl;
+	zval *options = NULL, prefix, lifetime;
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_str_fetch(&prefix, options, SL("prefix"))) {
-			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
+		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+			phalcon_update_property_this(getThis(), SL("_prefix"), &prefix);
 		}
 
-		if (phalcon_array_isset_str_fetch(&ttl, options, SL("lifetime"))) {
-			phalcon_update_property_this(getThis(), SL("_ttl"), ttl);
+		if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+			phalcon_update_property_this(getThis(), SL("_ttl"), &lifetime);
 		}
 	}
 

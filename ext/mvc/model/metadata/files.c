@@ -88,13 +88,13 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Files){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
 
-	zval *options = NULL, *meta_data_dir;
+	zval *options = NULL, meta_data_dir;
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_str_fetch(&meta_data_dir, options, SL("metaDataDir"))) {
-			phalcon_update_property_this(getThis(), SL("_metaDataDir"), meta_data_dir);
+		if (phalcon_array_isset_fetch_str(&meta_data_dir, options, SL("metaDataDir"))) {
+			phalcon_update_property_this(getThis(), SL("_metaDataDir"), &meta_data_dir);
 		}
 	}
 

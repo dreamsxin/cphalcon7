@@ -94,8 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Memcache){
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 
 	zval *options;
-	zval *host, *port, *lifetime, *persistent, *prefix;
-	zval *frontend_data, *memcache, *option;
+	zval host, port, lifetime, persistent, prefix, frontend_data, memcache, option;
 
 	PHALCON_MM_GROW();
 
@@ -106,60 +105,52 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&host, options, SL("host"))) {
+	if (!phalcon_array_isset_fetch_str(&host, options, SL("host"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "No session host given in options");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&port, options, SL("port"))) {
-		PHALCON_INIT_VAR(port);
-		ZVAL_LONG(port, 11211);
+	if (!phalcon_array_isset_fetch_str(&port, options, SL("port"))) {
+		ZVAL_LONG(&port, 11211);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&lifetime, options, SL("lifetime"))) {
-		PHALCON_INIT_VAR(lifetime);
-		ZVAL_LONG(lifetime, 8600);
+	if (!phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+		ZVAL_LONG(&lifetime, 8600);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);
+	phalcon_update_property_this(getThis(), SL("_lifetime"), &lifetime);
 
-	if (!phalcon_array_isset_str_fetch(&persistent, options, SL("persistent"))) {
-		PHALCON_INIT_VAR(persistent);
-		ZVAL_FALSE(persistent);
+	if (!phalcon_array_isset_fetch_str(&persistent, options, SL("persistent"))) {
+		ZVAL_FALSE(&persistent);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&prefix, options, SL("prefix"))) {
-		PHALCON_INIT_VAR(prefix);
-		ZVAL_EMPTY_STRING(prefix);
+	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+		ZVAL_EMPTY_STRING(&prefix);
 	}
 
 	/* create memcache instance */
-	PHALCON_INIT_VAR(option);
-	array_init_size(option, 1);
+	array_init_size(&option, 1);
 
-	phalcon_array_update_str(option, SL("lifetime"), lifetime, PH_COPY);
+	phalcon_array_update_str(&option, SL("lifetime"), &lifetime, PH_COPY);
 
-	PHALCON_INIT_VAR(frontend_data);
-	object_init_ex(frontend_data, phalcon_cache_frontend_data_ce);
+	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHOD(NULL, frontend_data, "__construct", option);
+	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &option);
 
-	PHALCON_INIT_NVAR(option);
-	array_init_size(option, 3);
+	array_init_size(&option, 3);
 
-	phalcon_array_update_str_str(option, SL("statsKey"), SL("$PMM$"), PH_COPY);
+	phalcon_array_update_str_str(&option, SL("statsKey"), SL("$PMM$"), PH_COPY);
 
-	phalcon_array_update_str(option, SL("host"), host, PH_COPY);
-	phalcon_array_update_str(option, SL("port"), port, PH_COPY);
-	phalcon_array_update_str(option, SL("persistent"), persistent, PH_COPY);
-	phalcon_array_update_str(option, SL("prefix"), prefix, PH_COPY);
+	phalcon_array_update_str(&option, SL("host"), &host, PH_COPY);
+	phalcon_array_update_str(&option, SL("port"), &port, PH_COPY);
+	phalcon_array_update_str(&option, SL("persistent"), &persistent, PH_COPY);
+	phalcon_array_update_str(&option, SL("prefix"), &prefix, PH_COPY);
 
-	PHALCON_INIT_VAR(memcache);
-	object_init_ex(memcache, phalcon_cache_backend_memcache_ce);
+	object_init_ex(&memcache, phalcon_cache_backend_memcache_ce);
 
-	PHALCON_CALL_METHOD(NULL, memcache, "__construct", frontend_data, option);
+	PHALCON_CALL_METHOD(NULL, &memcache, "__construct", &frontend_data, &option);
 
-	phalcon_update_property_this(getThis(), SL("_memcache"), memcache);
+	phalcon_update_property_this(getThis(), SL("_memcache"), &memcache);
 	
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 

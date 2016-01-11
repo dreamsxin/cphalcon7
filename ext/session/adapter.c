@@ -213,13 +213,13 @@ PHP_METHOD(Phalcon_Session_Adapter, start){
  */
 PHP_METHOD(Phalcon_Session_Adapter, setOptions){
 
-	zval *options, *unique_id;
+	zval *options, unique_id;
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_str_fetch(&unique_id, options, SL("uniqueId"))) {
-			phalcon_update_property_this(getThis(), SL("_uniqueId"), unique_id);
+		if (phalcon_array_isset_fetch_str(&unique_id, options, SL("uniqueId"))) {
+			phalcon_update_property_this(getThis(), SL("_uniqueId"), &unique_id);
 		}
 
 		phalcon_update_property_this(getThis(), SL("_options"), options);

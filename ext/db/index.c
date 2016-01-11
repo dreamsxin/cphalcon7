@@ -154,16 +154,16 @@ PHP_METHOD(Phalcon_Db_Index, getType){
  */
 PHP_METHOD(Phalcon_Db_Index, __set_state){
 
-	zval *data, *index_name, *columns;
+	zval *data, index_name, columns;
 
 	phalcon_fetch_params(0, 1, 0, &data);
 	
-	if (!phalcon_array_isset_str_fetch(&index_name, data, SL("_indexName"))) {
+	if (!phalcon_array_isset_fetch_str(&index_name, data, SL("_indexName"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "_indexName parameter is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&columns, data, SL("_columns"))) {
+	if (!phalcon_array_isset_fetch_str(&columns, data, SL("_columns"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "_columns parameter is required");
 		return;
 	}
@@ -172,5 +172,5 @@ PHP_METHOD(Phalcon_Db_Index, __set_state){
 	 * Return a Phalcon\Db\Index as part of the returning state
 	 */
 	object_init_ex(return_value, phalcon_db_index_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", index_name, columns);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &index_name, &columns);
 }

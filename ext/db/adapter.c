@@ -205,8 +205,8 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter){
 PHP_METHOD(Phalcon_Db_Adapter, __construct){
 
 	zval *descriptor, *connection_consecutive;
-	zval *next_consecutive, *dialect_type, *dialect_class = NULL;
-	zval *dialect_object;
+	zval next_consecutive, *dialect_type, dialect_class;
+	zval dialect_object;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -219,8 +219,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	 */
 	connection_consecutive = phalcon_read_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"));
 
-	PHALCON_INIT_VAR(next_consecutive);
-	phalcon_add_function(next_consecutive, connection_consecutive, &PHALCON_GLOBAL(z_one));
+	phalcon_add_function(&next_consecutive, connection_consecutive, &PHALCON_GLOBAL(z_one));
 
 	phalcon_update_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"), next_consecutive);
 	phalcon_update_property_this(getThis(), SL("_connectionId"), connection_consecutive);
@@ -228,26 +227,24 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	/** 
 	 * Dialect class can override the default dialect
 	 */
-	if (!phalcon_array_isset_str_fetch(&dialect_class, descriptor, SL("dialectClass"))) {
+	if (!phalcon_array_isset_fetch_str(&dialect_class, descriptor, SL("dialectClass"))) {
 		dialect_type = phalcon_read_property(getThis(), SL("_dialectType"), PH_NOISY);
 
-		PHALCON_INIT_VAR(dialect_class);
-		PHALCON_CONCAT_SV(dialect_class, "phalcon\\db\\dialect\\", dialect_type);
+		PHALCON_CONCAT_SV(&dialect_class, "phalcon\\db\\dialect\\", dialect_type);
 	}
 
 	/** 
 	 * Create the instance only if the dialect is a string
 	 */
-	if (likely(Z_TYPE_P(dialect_class) == IS_STRING)) {
-		ce0 = phalcon_fetch_class(dialect_class);
-		PHALCON_INIT_VAR(dialect_object);
-		object_init_ex(dialect_object, ce0);
-		if (phalcon_has_constructor(dialect_object)) {
+	if (likely(Z_TYPE_P(&dialect_class) == IS_STRING)) {
+		ce0 = phalcon_fetch_class(&dialect_class);
+		object_init_ex(&dialect_object, ce0);
+		if (phalcon_has_constructor(&dialect_object)) {
 			PHALCON_CALL_METHOD(NULL, dialect_object, "__construct");
 		}
-		PHALCON_CALL_SELF(NULL, "setdialect", dialect_object);
-	} else if (Z_TYPE_P(dialect_class) == IS_OBJECT) {
-		PHALCON_CALL_SELF(NULL, "setdialect", dialect_class);
+		PHALCON_CALL_SELF(NULL, "setdialect", &dialect_object);
+	} else if (Z_TYPE_P(&dialect_class) == IS_OBJECT) {
+		PHALCON_CALL_SELF(NULL, "setdialect", &dialect_class);
 	}
 
 	phalcon_update_property_this(getThis(), SL("_descriptor"), descriptor);
@@ -1087,12 +1084,12 @@ PHP_METHOD(Phalcon_Db_Adapter, createTable){
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&columns, definition, SL("columns"))) {
+	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The table must contain at least one column");
 		return;
 	}
 
-	if (!phalcon_fast_count_ev(columns)) {
+	if (!phalcon_fast_count_ev(&columns)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The table must contain at least one column");
 		return;
 	}

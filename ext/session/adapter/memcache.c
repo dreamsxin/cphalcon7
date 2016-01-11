@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 		ZVAL_LONG(&port, 11211);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&lifetime, options, SL("lifetime"))) {
+	if (!phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
 		ZVAL_LONG(&lifetime, 8600);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_lifetime"), lifetime);

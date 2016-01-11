@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	zval *uri = NULL, *dependency_injector, *events_manager;
 	zval *status = NULL, *service = NULL, *request = NULL, *response = NULL;
 	zval *json = NULL, *data = NULL, *jsonrpc_message, *jsonrpc_error, *jsonrpc_result = NULL;
-	zval *jsonrpc_method, *jsonrpc_params, *jsonrpc_id;
+	zval *jsonrpc_method, *jsonrpc_params, jsonrpc_id;
 	zval *url = NULL, *router = NULL, *module_name = NULL;
 	zval *module_object = NULL, *modules;
 	zval module, *class_name = NULL, *module_params;
@@ -485,8 +485,8 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		phalcon_array_update_str(jsonrpc_message, SL("result"), jsonrpc_result, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_str_fetch(&jsonrpc_id, data, SL("id"))) {
-		phalcon_array_update_str(jsonrpc_message, SL("id"), jsonrpc_id, PH_COPY);
+	if (phalcon_array_isset_fetch_str(&jsonrpc_id, data, SL("id"))) {
+		phalcon_array_update_str(jsonrpc_message, SL("id"), &jsonrpc_id, PH_COPY);
 	} else {
 		phalcon_array_update_str(jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);
 	}

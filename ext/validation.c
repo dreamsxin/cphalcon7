@@ -153,13 +153,9 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *type)
 {
 	if (is_phalcon_class(ce)) {
-		zval *msg;
 		zval *messages = phalcon_read_property(this_ptr, SL("_defaultMessages"), PH_NOISY);
 
-		if (phalcon_array_isset_str_fetch(&msg, messages, type, strlen(type))) {
-			ZVAL_ZVAL(retval, msg, 1, 0);
-		}
-		else {
+		if (!phalcon_array_isset_fetch_str(retval, messages, type, strlen(type))) {
 			ZVAL_NULL(retval);
 		}
 

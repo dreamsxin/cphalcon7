@@ -988,9 +988,9 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
  */
 PHP_METHOD(Phalcon_Dispatcher, forward){
 
-	zval *forward, *forward_parts = NULL, *parts, *number_parts, *controller_part;
+	zval *forward, forward_parts, *parts, *number_parts, *controller_part;
 	zval *real_namespace_name, *real_controller_name = NULL, *action_part, exception_code, exception_message;
-	zval *namespace_name, *controller_name, *task_name, *action_name, *params;
+	zval namespace_name, controller_name, task_name, action_name, params;
 	zval *previous_namespace_name, *previous_controller_name, *previous_action_name, *previous_params;
 	int num = 0;
 
@@ -999,8 +999,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 	phalcon_fetch_params(1, 1, 0, &forward);
 
 	if (Z_TYPE_P(forward) == IS_STRING) {
-		PHALCON_INIT_VAR(forward_parts);
-		array_init(forward_parts);
+		array_init(&forward_parts);
 
 		PHALCON_INIT_VAR(parts);
 		phalcon_fast_explode_str(parts, SL("::"), forward);
@@ -1018,7 +1017,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 					phalcon_array_fetch_long(&controller_part, parts, 1, PH_NOISY);
 
 					PHALCON_OBS_VAR(action_part);
-					phalcon_array_fetch_long(&action_part, parts, 2, PH_NOISY);
+					phalcon_array_fetch_long(action_part, parts, 2, PH_NOISY);
 					break;
 
 				case 2:
@@ -1057,17 +1056,17 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 
 			PHALCON_INIT_NVAR(controller_part);
 			phalcon_uncamelize(controller_part, real_controller_name);
-			phalcon_array_update_str(forward_parts, SL("controller"), controller_part, PH_COPY);
+			phalcon_array_update_str(&forward_parts, SL("controller"), controller_part, PH_COPY);
 
 			if (Z_TYPE_P(action_part) != IS_NULL) {
-				phalcon_array_update_str(forward_parts, SL("action"), action_part, PH_COPY);
+				phalcon_array_update_str(&forward_parts, SL("action"), action_part, PH_COPY);
 			}
 		}
 	} else {
-		PHALCON_CPY_WRT(forward_parts, forward);
+		ZVAL_COPY_VALUE(&forward_parts, forward);
 	}
 
-	if (Z_TYPE_P(forward_parts) != IS_ARRAY) {
+	if (Z_TYPE_P(&forward_parts) != IS_ARRAY) {
 		ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_INVALID_PARAMS);
 		ZVAL_STRING(&exception_message, "Forward parameter must be an Array");
 		PHALCON_CALL_METHOD(NULL, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
@@ -1089,33 +1088,31 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 	/**
 	 * Check if we need to forward to another namespace
 	 */
-	if (phalcon_array_isset_str_fetch(&namespace_name, forward_parts, SL("namespace"))) {
-		phalcon_update_property_this(getThis(), SL("_namespaceName"), namespace_name);
+	if (phalcon_array_isset_fetch_str(&namespace_name, &forward_parts, SL("namespace"))) {
+		phalcon_update_property_this(getThis(), SL("_namespaceName"), &namespace_name);
 	}
 
 	/**
 	 * Check if we need to forward to another controller
 	 */
-	if (phalcon_array_isset_str_fetch(&controller_name, forward_parts, SL("controller"))) {
-		phalcon_update_property_this(getThis(), SL("_handlerName"), controller_name);
-	} else {
-		if (phalcon_array_isset_str_fetch(&task_name, forward_parts, SL("task"))) {
-			phalcon_update_property_this(getThis(), SL("_handlerName"), task_name);
-		}
+	if (phalcon_array_isset_fetch_str(&controller_name, &forward_parts, SL("controller"))) {
+		phalcon_update_property_this(getThis(), SL("_handlerName"), &controller_name);
+	} else if (phalcon_array_isset_fetch_str(&task_name, forward_parts, SL("task"))) {
+		phalcon_update_property_this(getThis(), SL("_handlerName"), &task_name);
 	}
 
 	/**
 	 * Check if we need to forward to another action
 	 */
-	if (phalcon_array_isset_str_fetch(&action_name, forward_parts, SL("action"))) {
-		phalcon_update_property_this(getThis(), SL("_actionName"), action_name);
+	if (phalcon_array_isset_fetch_str(&action_name, &forward_parts, SL("action"))) {
+		phalcon_update_property_this(getThis(), SL("_actionName"), &action_name);
 	}
 
 	/**
 	 * Check if we need to forward changing the current parameters
 	 */
-	if (phalcon_array_isset_str_fetch(&params, forward_parts, SL("params"))) {
-		phalcon_update_property_this(getThis(), SL("_params"), params);
+	if (phalcon_array_isset_fetch_str(&params, &forward_parts, SL("params"))) {
+		phalcon_update_property_this(getThis(), SL("_params"), &params);
 	}
 
 	phalcon_update_property_this(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false));

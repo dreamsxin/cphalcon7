@@ -1607,8 +1607,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	zval *source = NULL, *connection = NULL;
 	zval *collection = NULL, *exists = NULL, *empty_array, *disable_events;
 	zval *type, *message, *collection_message, *messages, *status = NULL, *data;
-	zval *value = NULL, *success = NULL, *options;
-	zval *dependency_injector, *ok, *id;
+	zval *value = NULL, success, *options;
+	zval *dependency_injector, ok, *id;
 	zval func;
 	zend_string *str_key;
 	ulong idx;
@@ -1831,7 +1831,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		ZVAL_STRING(attribute_field, "_id");
 
 		PHALCON_CALL_SELF(&id, "getid");
-		phalcon_array_update_zval(data, attribute_field, id, PH_COPY);
+		phalcon_array_update_zval(data, attribute_field, &id, PH_COPY);
 		ZVAL_STRING(&func, "save");
 	} else {
 		ZVAL_STRING(&func, "insert");
@@ -1850,13 +1850,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	 */
 	PHALCON_CALL_ZVAL_METHOD(NULL, collection, &func, data);
 
-	PHALCON_INIT_NVAR(success);
-	ZVAL_FALSE(success);
+	ZVAL_FALSE(&success);
 
-	if (phalcon_array_isset_str_fetch(&ok, status, SL("ok"))) {
-		if (zend_is_true(ok)) {
-			ZVAL_TRUE(success);
-			if (PHALCON_IS_FALSE(exists) && phalcon_array_isset_str_fetch(&id, data, SL("_id"))) {
+	if (phalcon_array_isset_fetch_str(&ok, status, SL("ok"))) {
+		if (zend_is_true(&ok)) {
+			ZVAL_TRUE(&success);
+			if (PHALCON_IS_FALSE(exists) && phalcon_array_isset_fetch_str(&id, data, SL("_id"))) {
 				PHALCON_INIT_NVAR(attribute_field);
 				ZVAL_STRING(attribute_field, "_id");
 
@@ -1867,7 +1866,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 					}
 				}
 
-				phalcon_update_property_zval_zval(getThis(), attribute_field, id);
+				phalcon_update_property_zval_zval(getThis(), attribute_field, &id);
 			}
 		}
 	}
@@ -1875,7 +1874,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	/**
 	 * Call the postSave hooks
 	 */
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_postsave", disable_events, success, exists);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_postsave", disable_events, &success, exists);
 	RETURN_MM();
 }
 

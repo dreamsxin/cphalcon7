@@ -1656,10 +1656,10 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
  */
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
-	zval *parameters = NULL, *auto_create = NULL, *model_name, *params = NULL, *builder = NULL;
-	zval *query = NULL, *cache, event_name;
-	zval *dependency_injector = NULL, *service_name, *has = NULL, *service_params, *manager = NULL, *model = NULL;
-	zval *result = NULL, *hydration = NULL;
+	zval *parameters = NULL, *auto_create = NULL, model_name, *params = NULL, *builder = NULL;
+	zval *query = NULL, cache, event_name;
+	zval *dependency_injector = NULL, service_name, *has = NULL, *service_params, *manager = NULL, *model = NULL;
+	zval *result = NULL, hydration;
 
 	PHALCON_MM_GROW();
 
@@ -1673,8 +1673,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		auto_create = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_INIT_VAR(model_name);
-	phalcon_get_called_class(model_name );
+	phalcon_get_called_class(&model_name);
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
@@ -1683,18 +1682,17 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		return;
 	}
 
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsManager");
+	ZVAL_STRING(&service_name, "modelsManager");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
+	PHALCON_CALL_METHOD(&has, dependency_injector, "has", &service_name);
 	if (zend_is_true(has)) {
-		PHALCON_CALL_METHOD(&manager, dependency_injector, "getshared", service_name);
+		PHALCON_CALL_METHOD(&manager, dependency_injector, "getshared", &service_name);
 	} else {
 		PHALCON_INIT_NVAR(manager);
 		object_init_ex(manager, phalcon_mvc_model_manager_ce);
 	}
 
-	PHALCON_CALL_METHOD(&model, manager, "load", model_name);
+	PHALCON_CALL_METHOD(&model, manager, "load", &model_name);
 
 	if (Z_TYPE_P(parameters) != IS_ARRAY) { 
 
@@ -1710,24 +1708,23 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	/**
 	 * Builds a query with the passed parameters
 	 */
-	PHALCON_INIT_NVAR(service_name);
-	ZVAL_STRING(service_name, "modelsQueryBuilder");
+	ZVAL_STRING(&service_name, "modelsQueryBuilder");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
+	PHALCON_CALL_METHOD(&has, dependency_injector, "has", &service_name);
 	if (zend_is_true(has)) {
 		PHALCON_INIT_VAR(service_params);
 		array_init(service_params);
 
 		phalcon_array_append(service_params, params, PH_COPY);
 
-		PHALCON_CALL_METHOD(&builder, dependency_injector, "get", service_name, service_params);
+		PHALCON_CALL_METHOD(&builder, dependency_injector, "get", &service_name, service_params);
 	} else {
 		PHALCON_INIT_NVAR(builder);
 		object_init_ex(builder, phalcon_mvc_model_query_builder_ce);
 		PHALCON_CALL_METHOD(NULL, builder, "__construct", params);
 	}
 
-	PHALCON_CALL_METHOD(NULL, builder, "from", model_name);
+	PHALCON_CALL_METHOD(NULL, builder, "from", &model_name);
 
 	ZVAL_STRING(&event_name, "beforeQuery");
 
@@ -1744,8 +1741,8 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	/**
 	 * Pass the cache options to the query
 	 */
-	if (phalcon_array_isset_str_fetch(&cache, params, SL("cache"))) {
-		PHALCON_CALL_METHOD(NULL, query, "cache", cache);
+	if (phalcon_array_isset_fetch_str(&cache, params, SL("cache"))) {
+		PHALCON_CALL_METHOD(NULL, query, "cache", &cache);
 	}
 
 	/**
@@ -1768,8 +1765,8 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		/**
 		 * Define an hydration mode
 		 */
-		if (phalcon_array_isset_str_fetch(&hydration, params, SL("hydration"))) {
-			PHALCON_CALL_METHOD(NULL, result, "sethydratemode", hydration);
+		if (phalcon_array_isset_fetch_str(&hydration, params, SL("hydration"))) {
+			PHALCON_CALL_METHOD(NULL, result, "sethydratemode", &hydration);
 		}
 
 		RETURN_CTOR(result);
@@ -7370,11 +7367,11 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 PHP_METHOD(Phalcon_Mvc_Model, remove){
 
 	zval *parameters = NULL;
-	zval *dependency_injector = NULL, *service_name, *has = NULL, *model_name, *manager = NULL, *model = NULL, *write_connection = NULL;
+	zval *dependency_injector = NULL, service_name, *has = NULL, model_name, *manager = NULL, *model = NULL, *write_connection = NULL;
 	zval *schema = NULL, *source = NULL;
-	zval *delete_conditions = NULL, *bind_params = NULL, *bind_types = NULL;
-	zval *service_params, *query = NULL, *phql, *intermediate = NULL, *dialect = NULL;
-	zval *table_conditions, *where_conditions, *where_expression = NULL, *success = NULL;
+	zval delete_conditions, *bind_params = NULL, *bind_types = NULL;
+	zval *service_params, *query = NULL, phql, *intermediate = NULL, *dialect = NULL;
+	zval table_conditions, where_conditions, *where_expression = NULL, *success = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -7391,30 +7388,25 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 		return;
 	}
 
-	PHALCON_INIT_VAR(model_name);
-	phalcon_get_called_class(model_name );
+	phalcon_get_called_class(&model_name);
+	ZVAL_STRING(&service_name, "modelsManager");
 
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsManager");
+	PHALCON_CALL_METHOD(&manager, dependency_injector, "getshared", &service_name);
 
-	PHALCON_CALL_METHOD(&manager, dependency_injector, "getshared", service_name);
-
-	PHALCON_CALL_METHOD(&model, manager, "load", model_name);
+	PHALCON_CALL_METHOD(&model, manager, "load", &model_name);
 
 	PHALCON_CALL_METHOD(&schema, model, "getschema");
 	PHALCON_CALL_METHOD(&source, model, "getsource");
 
-	PHALCON_INIT_VAR(table_conditions);
-	array_init_size(table_conditions, 2);
-	phalcon_array_append(table_conditions, schema, PH_COPY);
-	phalcon_array_append(table_conditions, source, PH_COPY);
+	array_init_size(&table_conditions, 2);
+	phalcon_array_append(&table_conditions, schema, PH_COPY);
+	phalcon_array_append(&table_conditions, source, PH_COPY);
 
-	PHALCON_INIT_VAR(delete_conditions);
 	PHALCON_INIT_VAR(bind_params);
 	PHALCON_INIT_VAR(bind_types);
 
 	if (Z_TYPE_P(parameters) == IS_STRING) {
-		ZVAL_ZVAL(delete_conditions, parameters, 1, 0);
+		ZVAL_COPY_VALUE(&delete_conditions, parameters);
 	} else if (Z_TYPE_P(parameters) == IS_ARRAY) {
 		if (phalcon_array_isset_long(parameters, 0)) {
 			PHALCON_OBS_NVAR(delete_conditions);
@@ -7447,17 +7439,15 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 	/**
 	 * Process the PHQL
 	 */
-	PHALCON_INIT_VAR(phql);
 	if (PHALCON_IS_NOT_EMPTY(delete_conditions)) {
-		PHALCON_CONCAT_SVSV(phql, "DELETE FROM ", model_name, " WHERE ", delete_conditions);
+		PHALCON_CONCAT_SVSV(&phql, "DELETE FROM ", model_name, " WHERE ", &delete_conditions);
 	} else {
-		PHALCON_CONCAT_SV(phql, "DELETE FROM ", model_name);
+		PHALCON_CONCAT_SV(&phql, "DELETE FROM ", &model_name);
 	}
 
-	PHALCON_INIT_NVAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery");
+	ZVAL_STRING(&service_name, "modelsQuery");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
+	PHALCON_CALL_METHOD(&has, dependency_injector, "has", &service_name);
 	if (zend_is_true(has)) {
 		PHALCON_INIT_VAR(service_params);
 		array_init(service_params);
@@ -7465,11 +7455,11 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 		phalcon_array_append(service_params, phql, PH_COPY);
 		phalcon_array_append(service_params, dependency_injector, PH_COPY);
 
-		PHALCON_CALL_METHOD(&query, dependency_injector, "get", service_name, service_params);
+		PHALCON_CALL_METHOD(&query, dependency_injector, "get", &service_name, service_params);
 	} else {
 		PHALCON_INIT_NVAR(query);
 		object_init_ex(query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHOD(NULL, query, "__construct", phql, dependency_injector);
+		PHALCON_CALL_METHOD(NULL, query, "__construct", &phql, dependency_injector);
 	}
 
 	PHALCON_CALL_METHOD(&intermediate, query, "parse");
@@ -7478,15 +7468,15 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 
 	PHALCON_CALL_METHOD(&dialect, write_connection, "getdialect");
 
-	if (phalcon_array_isset_str_fetch(&where_conditions, intermediate, SL("where"))) {		
+	if (phalcon_array_isset_fetch_str(&where_conditions, intermediate, SL("where"))) {		
 		if (Z_TYPE_P(where_conditions) == IS_ARRAY) { 
-			PHALCON_CALL_METHOD(&where_expression, dialect, "getsqlexpression", where_conditions);
+			PHALCON_CALL_METHOD(&where_expression, dialect, "getsqlexpression", &where_conditions);
 		} else {
-			PHALCON_CPY_WRT(where_expression, where_conditions);
+			PHALCON_CPY_WRT(where_expression, &where_conditions);
 		}
 	}
 
-	PHALCON_CALL_METHOD(&success, write_connection, "delete", table_conditions, where_expression, bind_params, bind_types);
+	PHALCON_CALL_METHOD(&success, write_connection, "delete", &table_conditions, where_expression, bind_params, bind_types);
 
 	if (PHALCON_IS_TRUE(success)) {
 		PHALCON_CALL_METHOD(&success, write_connection, "affectedRows");

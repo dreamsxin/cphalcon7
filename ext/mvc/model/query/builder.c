@@ -1398,7 +1398,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	zval *join = NULL, *join_model = NULL, *join_conditions = NULL, *join_alias = NULL;
 	zval *join_type = NULL, *group, *group_items, *group_item = NULL;
 	zval *escaped_item = NULL, *joined_items = NULL, *having, *order;
-	zval *order_items, *order_item = NULL, *limit, *number, *for_update;
+	zval *order_items, *order_item = NULL, *limit, number, offset, *for_update;
 	zend_string *str_key;
 	ulong idx;
 	zend_class_entry *ce0;
@@ -1734,24 +1734,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	 */
 	limit = phalcon_read_property(getThis(), SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
-		if (Z_TYPE_P(limit) == IS_ARRAY) { 
-			zval *offset;
-
-			PHALCON_OBS_VAR(number);
+		if (Z_TYPE_P(limit) == IS_ARRAY) {
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_str_fetch(&offset, limit, SL("offset")) && Z_TYPE_P(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", number, " OFFSET ", offset);
+			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset")) && Z_TYPE_P(&offset) != IS_NULL) {
+				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", &number, " OFFSET ", &offset);
 			} else {
-				PHALCON_SCONCAT_SV(phql, " LIMIT ", number);
+				PHALCON_SCONCAT_SV(phql, " LIMIT ", &number);
 			}
 		} else {
-			zval *offset;
-
 			PHALCON_SCONCAT_SV(phql, " LIMIT ", limit);
 
-			offset = phalcon_read_property(getThis(), SL("_offset"), PH_NOISY);
+			phalcon_return_property(&offset, getThis(), SL("_offset"));
 			if (Z_TYPE_P(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SV(phql, " OFFSET ", offset);
+				PHALCON_SCONCAT_SV(phql, " OFFSET ", &offset);
 			}
 		}
 	}

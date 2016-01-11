@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Async, recvAll){
 PHP_METHOD(Phalcon_Async, count){
 
 	zval *filename, *proj, *key = NULL, *seg = NULL;
-	zval *result = NULL, *num;
+	zval *result = NULL, num;
 
 	PHALCON_MM_GROW();
 
@@ -299,8 +299,8 @@ PHP_METHOD(Phalcon_Async, count){
 
 	PHALCON_CALL_FUNCTION(&result, "msg_stat_queue", seg);
 
-	if (phalcon_array_isset_str_fetch(&num, result, SL("msg_qnum"))) {
-		RETURN_CTOR(num);
+	if (phalcon_array_isset_fetch_str(&num, result, SL("msg_qnum"))) {
+		RETURN_CTOR(&num);
 	}
 
 	RETURN_MM_FALSE;

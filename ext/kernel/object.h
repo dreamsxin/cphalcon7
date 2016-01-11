@@ -157,6 +157,22 @@ zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);
 int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len);
 
+
+/**
+ * Return a static property
+ */
+static inline int phalcon_return_static_property(zval *return_value, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length)
+{
+	zval *tmp = phalcon_read_static_property(class_name, class_length, property_name, property_length);
+	if (tmp) {
+		ZVAL_ZVAL(return_value, tmp, 1, 0);
+		return SUCCESS;
+	}
+
+	ZVAL_NULL(return_value);
+	return FAILURE;
+}
+
 /**
  * Update a static property
  */

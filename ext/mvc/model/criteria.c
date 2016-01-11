@@ -1657,8 +1657,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, getPhql) {
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
 	zval *dependency_injector = NULL, *model, *conditions = NULL;
-	zval *service_name, *meta_data = NULL, *model_instance;
-	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
+	zval service_name, *meta_data = NULL, *model_instance;
+	zval *no_primary = NULL, *primary_keys = NULL, first_primary_key;
 	zval *column_map = NULL, *attribute_field = NULL, exception_message;
 	zval *primary_key_condition, *phql, *columns;
 	zval *selected_columns = NULL, *column = NULL;
@@ -1666,7 +1666,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	zval *joins, *join = NULL, *join_model = NULL, *join_conditions = NULL, *join_alias = NULL;
 	zval *join_type = NULL, *group, *group_items, *group_item = NULL;
 	zval *escaped_item = NULL, *joined_items = NULL, *having, *order;
-	zval *order_items, *order_item = NULL, *limit, *number, *for_update;
+	zval *order_items, *order_item = NULL, *limit, offset, number, *for_update;
 	zend_string *str_key;
 	ulong idx;
 	zend_class_entry *ce0;
@@ -1693,14 +1693,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 		 * If the conditions is a single numeric field. We internally create a condition
 		 * using the related primary key
 		 */
-		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, ISV(modelsMetadata));
+		ZVAL_STRING(&service_name, ISV(modelsMetadata));
 
 		/** 
 		 * Get the models metadata service to obtain the column names, column map and
 		 * primary key
 		 */
-		PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", service_name);
+		PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", &service_name);
 		PHALCON_VERIFY_INTERFACE(meta_data, phalcon_mvc_model_metadatainterface_ce);
 		ce0 = phalcon_fetch_class(model);
 
@@ -1965,23 +1964,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	limit = phalcon_read_property(getThis(), SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
-			zval *offset;
-
-			PHALCON_OBS_VAR(number);
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_str_fetch(&offset, limit, SL("offset")) && Z_TYPE_P(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", number, " OFFSET ", offset);
+			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset")) && Z_TYPE_P(&offset) != IS_NULL) {
+				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", &number, " OFFSET ", &offset);
 			} else {
-				PHALCON_SCONCAT_SV(phql, " LIMIT ", number);
+				PHALCON_SCONCAT_SV(phql, " LIMIT ", &number);
 			}
 		} else {
-			zval *offset;
-
 			PHALCON_SCONCAT_SV(phql, " LIMIT ", limit);
 
-			offset = phalcon_read_property(getThis(), SL("_offset"), PH_NOISY);
-			if (Z_TYPE_P(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SV(phql, " OFFSET ", offset);
+			phalcon_return_property(&offset, getThis(), SL("_offset"));
+			if (Z_TYPE_P(&offset) != IS_NULL) {
+				PHALCON_SCONCAT_SV(phql, " OFFSET ", &offset);
 			}
 		}
 	}
@@ -2115,13 +2109,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 
 	zval *dependency_injector = NULL, *model, *conditions = NULL;
-	zval *service_name, *meta_data = NULL, *model_instance, *connection = NULL;
-	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
+	zval service_name, *meta_data = NULL, *model_instance, *connection = NULL;
+	zval *no_primary = NULL, *primary_keys = NULL, first_primary_key;
 	zval *column_map = NULL, *attribute_field = NULL, exception_message;
 	zval *primary_key_condition, *phql, *bind_params, *columns, *updated_columns;
-	zval *column = NULL, *value = NULL, *bind_name = NULL, *updated_column = NULL, *joined_columns = NULL;
-	zval *order, *order_items, *order_item = NULL, *escaped_item = NULL, *joined_items = NULL;
-	zval *limit, *offset, *number;
+	zval *column = NULL, *value = NULL, *joined_columns = NULL;
+	zval *order, *order_items, *order_item = NULL, *joined_items = NULL;
+	zval *limit, offset, number;
 	zend_string *str_key;
 	ulong idx;
 	zend_class_entry *ce0;
@@ -2141,10 +2135,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 		return;
 	}
 
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, ISV(modelsMetadata));
+	ZVAL_STRING(&service_name, ISV(modelsMetadata));
 
-	PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", service_name);
+	PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", &service_name);
 	PHALCON_VERIFY_INTERFACE(meta_data, phalcon_mvc_model_metadatainterface_ce);
 	ce0 = phalcon_fetch_class(model);
 
@@ -2165,8 +2158,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 		PHALCON_CALL_METHOD(&primary_keys, meta_data, "getprimarykeyattributes", model_instance);
 		if (phalcon_fast_count_ev(primary_keys)) {
 			if (phalcon_array_isset_long(primary_keys, 0)) {
-
-				PHALCON_OBS_VAR(first_primary_key);
 				phalcon_array_fetch_long(&first_primary_key, primary_keys, 0, PH_NOISY);
 
 				/** 
@@ -2179,16 +2170,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 				}
 
 				if (Z_TYPE_P(column_map) == IS_ARRAY) {
-					if (phalcon_array_isset(column_map, first_primary_key)) {
+					if (phalcon_array_isset(column_map, &first_primary_key)) {
 						PHALCON_OBS_VAR(attribute_field);
-						phalcon_array_fetch(&attribute_field, column_map, first_primary_key, PH_NOISY);
+						phalcon_array_fetch(&attribute_field, column_map, &first_primary_key, PH_NOISY);
 					} else {
-						PHALCON_CONCAT_SVS(&exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
+						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {
-					PHALCON_CPY_WRT(attribute_field, first_primary_key);
+					PHALCON_CPY_WRT(attribute_field, &first_primary_key);
 				}
 
 				PHALCON_INIT_VAR(primary_key_condition);
@@ -2220,7 +2211,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	array_init(updated_columns);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns), idx, str_key, value) {
-		zval tmp;
+		zval tmp, updated_column, bind_name;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -2228,21 +2219,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 		}
 
 		if (Z_TYPE_P(value) == IS_OBJECT) {
-			PHALCON_INIT_NVAR(updated_column);
-			PHALCON_CONCAT_VSV(updated_column, &tmp, "=", value);
+			PHALCON_CONCAT_VSV(&updated_column, &tmp, "=", value);
 		} else if (Z_TYPE_P(value) == IS_NULL) {
-			PHALCON_INIT_NVAR(updated_column);
-			PHALCON_CONCAT_VS(updated_column, &tmp, " = null");
+			PHALCON_CONCAT_VS(&updated_column, &tmp, " = null");
 		} else {
-			PHALCON_INIT_NVAR(bind_name);
-			PHALCON_CONCAT_SV(bind_name, "phu", column);
+			PHALCON_CONCAT_SV(&bind_name, "phu", column);
 
-			PHALCON_INIT_NVAR(updated_column);
-			PHALCON_CONCAT_VSVS(updated_column, &tmp, " = :", bind_name, ":");
-			phalcon_array_update_zval(bind_params, bind_name, value, PH_COPY);
+			PHALCON_CONCAT_VSVS(&updated_column, &tmp, " = :", bind_name, ":");
+			phalcon_array_update_zval(bind_params, &bind_name, value, PH_COPY);
 		}
 
-		phalcon_array_append(updated_columns, updated_column, PH_COPY);
+		phalcon_array_append(updated_columns, &updated_column, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_SELF(NULL, "bind", bind_params, &PHALCON_GLOBAL(z_true));
@@ -2268,15 +2255,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 			array_init(order_items);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(order), order_item) {
+				zval escaped_item;
 				if (phalcon_is_numeric(order_item)) {
 					phalcon_array_append(order_items, order_item, PH_COPY);
 				} else {
 					if (phalcon_memnstr_str(order_item, SL("."))) {
 						phalcon_array_append(order_items, order_item, PH_COPY);
 					} else {
-						PHALCON_INIT_NVAR(escaped_item);
-						PHALCON_CONCAT_SVS(escaped_item, "[", order_item, "]");
-						phalcon_array_append(order_items, escaped_item, PH_COPY);
+						PHALCON_CONCAT_SVS(&escaped_item, "[", order_item, "]");
+						phalcon_array_append(order_items, &escaped_item, PH_COPY);
 					}
 				}
 			} ZEND_HASH_FOREACH_END();
@@ -2295,19 +2282,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	limit = phalcon_read_property(getThis(), SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
-			PHALCON_OBS_VAR(number);
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_str_fetch(&offset, limit, SL("offset")) && Z_TYPE_P(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", number, " OFFSET ", offset);
+			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset")) && Z_TYPE_P(&offset) != IS_NULL) {
+				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", &number, " OFFSET ", &offset);
 			} else {
-				PHALCON_SCONCAT_SV(phql, " LIMIT ", number);
+				PHALCON_SCONCAT_SV(phql, " LIMIT ", &number);
 			}
 		} else {
 			PHALCON_SCONCAT_SV(phql, " LIMIT ", limit);
 
-			offset = phalcon_read_property(getThis(), SL("_offset"), PH_NOISY);
-			if (Z_TYPE_P(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SV(phql, " OFFSET ", offset);
+			phalcon_return_property(&offset, getThis(), SL("_offset"));
+			if (Z_TYPE_P(&offset) != IS_NULL) {
+				PHALCON_SCONCAT_SV(phql, " OFFSET ", &offset);
 			}
 		}
 	}
@@ -2323,12 +2309,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 
 	zval *dependency_injector = NULL, *model, *conditions = NULL;
-	zval *service_name, *meta_data = NULL, *model_instance;
+	zval service_name, *meta_data = NULL, *model_instance;
 	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
 	zval *column_map = NULL, *attribute_field = NULL, exception_message;
 	zval *primary_key_condition, *phql;
-	zval *order, *order_items, *order_item = NULL, *escaped_item = NULL, *joined_items = NULL;
-	zval *limit, *offset, *number;
+	zval *order, *order_items, *order_item = NULL, *joined_items = NULL;
+	zval *limit, offset, number;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -2353,14 +2339,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 		 * If the conditions is a single numeric field. We internally create a condition
 		 * using the related primary key
 		 */
-		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, ISV(modelsMetadata));
+		ZVAL_STRING(&service_name, ISV(modelsMetadata));
 
 		/**
 		 * Get the models metadata service to obtain the column names, column map and
 		 * primary key
 		 */
-		PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", service_name);
+		PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", &service_name);
 		PHALCON_VERIFY_INTERFACE(meta_data, phalcon_mvc_model_metadatainterface_ce);
 		ce0 = phalcon_fetch_class(model);
 
@@ -2376,8 +2361,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 		PHALCON_CALL_METHOD(&primary_keys, meta_data, "getprimarykeyattributes", model_instance);
 		if (phalcon_fast_count_ev(primary_keys)) {
 			if (phalcon_array_isset_long(primary_keys, 0)) {
-
-				PHALCON_OBS_VAR(first_primary_key);
 				phalcon_array_fetch_long(&first_primary_key, primary_keys, 0, PH_NOISY);
 
 				/**
@@ -2390,16 +2373,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 				}
 
 				if (Z_TYPE_P(column_map) == IS_ARRAY) {
-					if (phalcon_array_isset(column_map, first_primary_key)) {
+					if (phalcon_array_isset(column_map, &first_primary_key)) {
 						PHALCON_OBS_VAR(attribute_field);
-						phalcon_array_fetch(&attribute_field, column_map, first_primary_key, PH_NOISY);
+						phalcon_array_fetch(&attribute_field, column_map, &first_primary_key, PH_NOISY);
 					} else {
-						PHALCON_CONCAT_SVS(&exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
+						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {
-					PHALCON_CPY_WRT(attribute_field, first_primary_key);
+					PHALCON_CPY_WRT(attribute_field, &first_primary_key);
 				}
 
 				PHALCON_INIT_VAR(primary_key_condition);
@@ -2442,15 +2425,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 			array_init(order_items);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(order), order_item) {
+				zval escaped_item;
 				if (phalcon_is_numeric(order_item)) {
 					phalcon_array_append(order_items, order_item, PH_COPY);
 				} else {
 					if (phalcon_memnstr_str(order_item, SL("."))) {
 						phalcon_array_append(order_items, order_item, PH_COPY);
 					} else {
-						PHALCON_INIT_NVAR(escaped_item);
-						PHALCON_CONCAT_SVS(escaped_item, "[", order_item, "]");
-						phalcon_array_append(order_items, escaped_item, PH_COPY);
+						PHALCON_CONCAT_SVS(&escaped_item, "[", order_item, "]");
+						phalcon_array_append(order_items, &escaped_item, PH_COPY);
 					}
 				}
 			} ZEND_HASH_FOREACH_END();
@@ -2469,19 +2452,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	limit = phalcon_read_property(getThis(), SL("_limit"), PH_NOISY);
 	if (Z_TYPE_P(limit) != IS_NULL) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
-			PHALCON_OBS_VAR(number);
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_str_fetch(&offset, limit, SL("offset")) && Z_TYPE_P(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", number, " OFFSET ", offset);
+			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset")) && Z_TYPE_P(&offset) != IS_NULL) {
+				PHALCON_SCONCAT_SVSV(phql, " LIMIT ", &number, " OFFSET ", &offset);
 			} else {
-				PHALCON_SCONCAT_SV(phql, " LIMIT ", number);
+				PHALCON_SCONCAT_SV(phql, " LIMIT ", &number);
 			}
 		} else {
 			PHALCON_SCONCAT_SV(phql, " LIMIT ", limit);
 
-			offset = phalcon_read_property(getThis(), SL("_offset"), PH_NOISY);
-			if (Z_TYPE_P(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SV(phql, " OFFSET ", offset);
+			phalcon_return_property(&offset, getThis(), SL("_offset"));
+			if (Z_TYPE_P(&offset) != IS_NULL) {
+				PHALCON_SCONCAT_SV(phql, " OFFSET ", &offset);
 			}
 		}
 	}

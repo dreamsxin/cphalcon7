@@ -114,7 +114,7 @@ PHALCON_INIT_CLASS(Phalcon_Db){
  */
 PHP_METHOD(Phalcon_Db, setup){
 
-	zval *options, *escape_identifiers;
+	zval *options, escape_identifiers;
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Db, setup){
 	/**
 	 * Enables/Disables globally the escaping of SQL identifiers
 	 */
-	if (phalcon_array_isset_str_fetch(&escape_identifiers, options, SL("escapeSqlIdentifiers"))) {
-		PHALCON_GLOBAL(db).escape_identifiers = zend_is_true(escape_identifiers);
+	if (phalcon_array_isset_fetch_str(&escape_identifiers, options, SL("escapeSqlIdentifiers"))) {
+		PHALCON_GLOBAL(db).escape_identifiers = zend_is_true(&escape_identifiers);
 	}
 }

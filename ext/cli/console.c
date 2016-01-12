@@ -202,8 +202,8 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 
 	zval *arguments = NULL, *dependency_injector, *events_manager, event_name;
 	zval service, *router = NULL, *module_name = NULL;
-	zval *status = NULL, *modules, *exception_msg = NULL, *module;
-	zval *path, *class_name = NULL, *module_object = NULL;
+	zval *status = NULL, *modules, *exception_msg = NULL, module;
+	zval path, class_name, *module_object = NULL;
 	zval *namespace_name = NULL, *task_name = NULL, *action_name = NULL, *params = NULL, *dispatcher = NULL;
 
 	PHALCON_MM_GROW();
@@ -241,41 +241,32 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		}
 
 		modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
-		if (!phalcon_array_isset(modules, module_name)) {
+		if (!phalcon_array_isset_fetch(&module, modules, module_name)) {
 			PHALCON_INIT_VAR(exception_msg);
 			PHALCON_CONCAT_SVS(exception_msg, "Module '", module_name, "' isn't registered in the console container");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cli_console_exception_ce, exception_msg);
 			return;
 		}
 
-		PHALCON_OBS_VAR(module);
-		phalcon_array_fetch(&module, modules, module_name, PH_NOISY);
-		if (Z_TYPE_P(module) != IS_ARRAY) { 
+		if (Z_TYPE_P(&module) != IS_ARRAY) { 
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cli_console_exception_ce, "Invalid module definition path");
 			return;
 		}
 
-		if (phalcon_array_isset_str(module, SL("path"))) {
+		if (phalcon_array_isset_fetch_str(&path, &module, SL("path"))) {
+			convert_to_string_ex(&path);
 
-			PHALCON_OBS_VAR(path);
-			phalcon_array_fetch_str(&path, module, SL("path"), PH_NOISY);
-			convert_to_string_ex(path);
-
-			if (phalcon_file_exists(path) == SUCCESS) {
-				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path)));
+			if (phalcon_file_exists(&path) == SUCCESS) {
+				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL(path)));
 			} else {
-				zend_throw_exception_ex(phalcon_cli_console_exception_ce, 0, "Modules definition path '%s' does not exist", Z_STRVAL_P(path));
+				zend_throw_exception_ex(phalcon_cli_console_exception_ce, 0, "Modules definition path '%s' does not exist", Z_STRVAL(path));
 				PHALCON_MM_RESTORE();
 				return;
 			}
 		}
 
-		if (phalcon_array_isset_str(module, SL("className"))) {
-			PHALCON_OBS_VAR(class_name);
-			phalcon_array_fetch_str(&class_name, module, SL("className"), PH_NOISY);
-		} else {
-			PHALCON_INIT_NVAR(class_name);
-			ZVAL_STRING(class_name, "Module");
+		if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
+			ZVAL_STRING(&class_name, "Module");
 		}
 
 		PHALCON_CALL_METHOD(&module_object, dependency_injector, "get", class_name);

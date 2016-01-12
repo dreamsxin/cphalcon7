@@ -52,8 +52,7 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
  */
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...) {
 
-	zval *fetched, *tmp_arr, arr, *tmp, *p, *item;
-	int i, l, ll; char *s;
+	zval *tmp_arr, arr;
 	va_list ap;
 
 	tmp_arr = phalcon_read_static_property_ce(ce, property, property_length);
@@ -973,8 +972,8 @@ zval *phalcon_read_property_array(zval *object, const char *property, size_t pro
 
 	zval *tmp, *retval;
 
-	if ((tmp = phalcon_read_property(object, property, property_length, PH_NOISY)) == NULL || !phalcon_array_isset_fetch(&retval, tmp, index)) {
-		retval = &EG(uninitialized_zval);
+	if ((tmp = phalcon_read_property(object, property, property_length, PH_NOISY)) == NULL || (retval = phalcon_array_return_fetch(tmp, index)) == NULL) {
+		return &EG(uninitialized_zval);
 	}
 
 	return retval;
@@ -1087,13 +1086,15 @@ int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_n
 /**
  * Query a static property value from a zend_class_entry
  */
-int phalcon_read_static_property(zval *result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length){
+zval* phalcon_read_static_property(const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length)
+{
 	zend_class_entry *ce;
+
 	if ((ce = zend_lookup_class(zend_string_init(class_name, class_length, 0))) != NULL) {
-		ZVAL_ZVAL(result, phalcon_read_static_property_ce(ce, property_name, property_length), 1, 0);
+		return phalcon_read_static_property_ce(ce, property_name, property_length);
 	}
 
-	return FAILURE;
+	return &EG(uninitialized_zval);
 }
 
 int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, zval *params)

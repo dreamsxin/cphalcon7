@@ -150,9 +150,8 @@ zval* phalcon_read_property_array(zval *object, const char *property_name, size_
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index);
 
 /** Static properties */
-int phalcon_read_static_property(zval *result, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length);
+zval* phalcon_read_static_property(const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length);
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);
-
 zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len);
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);
 int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len);
@@ -165,7 +164,7 @@ static inline int phalcon_return_static_property(zval *return_value, const char 
 {
 	zval *tmp = phalcon_read_static_property(class_name, class_length, property_name, property_length);
 	if (tmp) {
-		ZVAL_ZVAL(return_value, tmp, 1, 0);
+		ZVAL_COPY_VALUE(return_value, tmp);
 		return SUCCESS;
 	}
 

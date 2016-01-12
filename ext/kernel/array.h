@@ -27,6 +27,8 @@
 #include "php_phalcon.h"
 #include "kernel/memory.h"
 
+zval* phalcon_array_return_fetch(const zval *arr, const zval *index);
+
 /**
  * @brief Fetches @a index if it exists from the array @a arr
  * @param[out] fetched <code>&$arr[$index]</code>; @a fetched is modified only when the function returns 1
@@ -546,12 +548,12 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 /**
  * $x[$a][$b]["str"] = $v
  */
-void phalcon_array_update_str_zval_zval_multi_3(zval *arr, const zval *index1, const zval *index2, const char *index3, uint index3_length, zval *value, int flags);
+void phalcon_array_update_zval_zval_str_multi_3(zval *arr, const zval *index1, const zval *index2, const char *index3, uint index3_length, zval *value, int flags);
 
 /**
  * $x[$a]["a-str"]["str"] = 1
  */
-void phalcon_array_update_zval_str_string_multi_3(zval *arr, const zval *index1, const char *index2, uint index2_length, const char *index3, uint index3_length, zval *value, int flags);
+void phalcon_array_update_zval_str_str_multi_3(zval *arr, const zval *index1, const char *index2, uint index2_length, const char *index3, uint index3_length, zval *value, int flags);
 
 /**
  * @brief Reads an item from @a arr at position @a index and stores it to @a return_value

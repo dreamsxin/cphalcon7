@@ -94,24 +94,24 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend){
  */
 PHP_METHOD(Phalcon_Cache_Backend, __construct){
 
-	zval *frontend, *options = NULL, *prefix;
+	zval *frontend, *options = NULL, prefix;
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 	
 	PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_cache_frontendinterface_ce, phalcon_cache_exception_ce, 0);
 
-	if (options) {
+	if (options || Z_TYPE_P(options) == IS_ARRAY) {
 		/**
 		 * A common option is the prefix
 		 */
-		if (phalcon_array_isset_str_fetch(&prefix, options, SL("prefix"))) {
-			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
+		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+			phalcon_update_property_this(getThis(), SL("_prefix"), &prefix);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_options"), options);
+		phalcon_update_property_this(getThis(), SL("_options"), &options);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_frontend"), frontend);
+	phalcon_update_property_this(getThis(), SL("_frontend"), &frontend);
 }
 
 /**

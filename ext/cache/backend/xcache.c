@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL;
 	zval *cached_content = NULL, *keys = NULL, *last_key, *frontend;
 	zval *prepared_content = NULL, *ttl = NULL, *success = NULL, *is_buffering = NULL;
-	zval *prefix, *options, *special_key, *z_zero, *tmp;
+	zval *prefix, *options, special_key, *z_zero, *tmp;
 
 	PHALCON_MM_GROW();
 
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 	
 		options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
-		if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SL("statsKey")))) {
+		if (unlikely(!phalcon_array_isset_fetch_str(&special_key, options, SL("statsKey")))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 			return;
 		}
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 		 * xcache_list() is available only to the administrator (unless XCache was
 		 * patched). We have to update the list of the stored keys.
 		 */
-		PHALCON_CALL_FUNCTION(&keys, "xcache_get", special_key);
+		PHALCON_CALL_FUNCTION(&keys, "xcache_get", &special_key);
 		if (Z_TYPE_P(keys) != IS_ARRAY) { 
 			PHALCON_INIT_NVAR(keys);
 			array_init(keys);
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 	
 		z_zero = &PHALCON_GLOBAL(z_zero);
 		phalcon_array_update_zval(keys, last_key, ttl, PH_COPY);
-		PHALCON_CALL_FUNCTION(NULL, "xcache_set", special_key, keys, z_zero);
+		PHALCON_CALL_FUNCTION(NULL, "xcache_set", &special_key, keys, z_zero);
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 
 	zval *key_name, *prefix, *prefixed_key;
-	zval *options, *special_key, *keys = NULL;
+	zval *options, special_key, *keys = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -297,16 +297,16 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 	
 	PHALCON_RETURN_CALL_FUNCTION("xcache_unset", prefixed_key);
 	
-	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SL("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
 
-	PHALCON_CALL_FUNCTION(&keys, "xcache_get", special_key);
+	PHALCON_CALL_FUNCTION(&keys, "xcache_get", &special_key);
 	if (Z_TYPE_P(keys) == IS_ARRAY) { 
 		zval *z_zero = &PHALCON_GLOBAL(z_zero);
 		phalcon_array_unset(keys, prefixed_key, 0);
-		PHALCON_CALL_FUNCTION(NULL, "xcache_set", special_key, keys, z_zero);
+		PHALCON_CALL_FUNCTION(NULL, "xcache_set", &special_key, keys, z_zero);
 	}
 	
 	PHALCON_MM_RESTORE();
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 
-	zval *prefix = NULL, *prefixed, *options, *special_key;
+	zval *prefix = NULL, *prefixed, *options, special_key;
 	zval *keys = NULL, *real_key = NULL;
 	zend_string *str_key;
 
@@ -337,7 +337,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
-	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SL("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 	 * Get the key from XCache (we cannot use xcache_list() as it is available only to
 	 * the administrator)
 	 */
-	PHALCON_CALL_FUNCTION(&keys, "xcache_get", special_key);
+	PHALCON_CALL_FUNCTION(&keys, "xcache_get", &special_key);
 	if (Z_TYPE_P(keys) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL_P(keys), str_key) {	
 			if (str_key && phalcon_memnstr_string_string(str_key, Z_STR_P(prefixed))) {
@@ -497,7 +497,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, decrement){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 
-	zval *prefixed, *options, *special_key, *z_zero;
+	zval *prefixed, *options, special_key, *z_zero;
 	zval *keys = NULL;
 	zend_string *str_key;
 	ulong idx;
@@ -511,12 +511,12 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	
-	if (unlikely(!phalcon_array_isset_str_fetch(&special_key, options, SL("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
 
-	PHALCON_CALL_FUNCTION(&keys, "xcache_get", special_key);
+	PHALCON_CALL_FUNCTION(&keys, "xcache_get", &special_key);
 	if (Z_TYPE_P(keys) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(keys), idx, str_key) {
 			zval key;
@@ -530,7 +530,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 		} ZEND_HASH_FOREACH_END();
 
 		zend_hash_clean(Z_ARRVAL_P(keys));
-		PHALCON_CALL_FUNCTION(NULL, "xcache_set", special_key, keys, z_zero);
+		PHALCON_CALL_FUNCTION(NULL, "xcache_set", &special_key, keys, z_zero);
 	}
 	
 	RETURN_MM_TRUE;

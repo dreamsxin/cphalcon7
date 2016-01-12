@@ -158,23 +158,20 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 
-	zval *mongo_collection;
+	zval *mongo_collection, *options, mongo, server, database, collection;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
 
 	mongo_collection = phalcon_read_property(getThis(), SL("_collection"), PH_NOISY);
 	if (Z_TYPE_P(mongo_collection) != IS_OBJECT) {
-		zval *options, *mongo;
-		zval *server = NULL, *database = NULL, *collection = NULL;
-
 		options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
 		/** 
 		 * If mongo is defined a valid Mongo object must be passed
 		 */
-		if (phalcon_array_isset_str_fetch(&mongo, options, SL("mongo"))) {
-			if (Z_TYPE_P(mongo) != IS_OBJECT) {
+		if (phalcon_array_isset_fetch_str(&mongo, options, SL("mongo"))) {
+			if (Z_TYPE_P(&mongo) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The 'mongo' parameter must be a valid Mongo instance");
 				return;
 			}
@@ -182,25 +179,22 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 			/** 
 			 * Server must be defined otherwise
 			 */
-			phalcon_array_isset_str_fetch(&server, options, SL("server"));
-			if (!server || Z_TYPE_P(server) != IS_STRING) {
+			if (!phalcon_array_isset_fetch_str(&server, options, SL("server")) || Z_TYPE_P(&server) != IS_STRING) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The backend requires a valid MongoDB connection string");
 				return;
 			}
 
 			ce0 = zend_fetch_class(SSL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
 
-			PHALCON_INIT_VAR(mongo);
-			object_init_ex(mongo, ce0);
-			assert(phalcon_has_constructor(mongo));
-			PHALCON_CALL_METHOD(NULL, mongo, "__construct", server);
+			object_init_ex(&mongo, ce0);
+			assert(phalcon_has_constructor(&mongo));
+			PHALCON_CALL_METHOD(NULL, &mongo, "__construct", &server);
 		}
 
 		/** 
 		 * Check if the database name is a string
 		 */
-		phalcon_array_isset_str_fetch(&database, options, SL("db"));
-		if (!database || Z_TYPE_P(database) != IS_STRING) {
+		if (!phalcon_array_isset_fetch_str(&database, options, SL("db")) || Z_TYPE_P(&database) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
 			return;
 		}
@@ -208,8 +202,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 		/** 
 		 * Retrieve the connection name
 		 */
-		phalcon_array_isset_str_fetch(&collection, options, SL("collection"));
-		if (!collection || Z_TYPE_P(collection) != IS_STRING) {
+		if (!phalcon_array_isset_fetch_str(&collection, options, SL("collection")) || Z_TYPE_P(&collection) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
 			return;
 		}
@@ -217,7 +210,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 		/** 
 		 * Make the connection and get the collection
 		 */
-		PHALCON_RETURN_CALL_METHOD(mongo, "selectcollection", database, collection);
+		PHALCON_RETURN_CALL_METHOD(&mongo, "selectcollection", &database, &collection);
 	}
 	else {
 		RETVAL_ZVAL(mongo_collection, 1, 0);
@@ -235,9 +228,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
-	zval *key_name, *lifetime = NULL, *frontend, *prefix, *prefixed_key;
-	zval *collection = NULL, *conditions, *document = NULL, *time_condition;
-	zval *cached_content;
+	zval *key_name, *lifetime = NULL, *frontend, *prefix, prefixed_key;
+	zval collection, conditions, *document = NULL, time_condition;
+	zval cached_content;
 
 	PHALCON_MM_GROW();
 
@@ -246,38 +239,35 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 	frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
 	prefix   = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
-	PHALCON_INIT_VAR(prefixed_key);
-	PHALCON_CONCAT_VV(prefixed_key, prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), prefixed_key);
+	PHALCON_CONCAT_VV(&prefixed_key, prefix, key_name);
+	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHOD(&collection, getThis(), "_getcollection");
 
-	PHALCON_INIT_VAR(conditions);
-	array_init_size(conditions, 2);
-	phalcon_array_update_str(conditions, SL("key"), prefixed_key, PH_COPY);
+	array_init_size(&conditions, 2);
+	phalcon_array_update_str(&conditions, SL("key"), prefixed_key, PH_COPY);
 
-	PHALCON_ALLOC_INIT_ZVAL(time_condition);
-	array_init_size(time_condition, 1);
-	add_assoc_long_ex(time_condition, SL("$gt"), (long int)time(NULL));
-	add_assoc_zval_ex(conditions, SL("time"), time_condition);
+	array_init_size(&time_condition, 1);
+	add_assoc_long_ex(&time_condition, SL("$gt"), (long int)time(NULL));
+	add_assoc_zval_ex(conditions, SL("time"), &time_condition);
 
-	PHALCON_CALL_METHOD(&document, collection, "findone", conditions);
+	PHALCON_CALL_METHOD(&document, collection, "findone", &conditions);
+
 	if (Z_TYPE_P(document) == IS_ARRAY) { 
-		if (likely(phalcon_array_isset_str_fetch(&cached_content, document, SL("data")))) {
-			if (phalcon_is_numeric(cached_content)) {
-				RETURN_CCTOR(cached_content);
+		if (likely(phalcon_array_isset_fetch_str(&cached_content, document, SL("data")))) {
+			if (phalcon_is_numeric(&cached_content)) {
+				RETURN_CTOR(&cached_content);
 			} else {
-				PHALCON_RETURN_CALL_METHOD(frontend, "afterretrieve", cached_content);
+				PHALCON_RETURN_CALL_METHOD(frontend, "afterretrieve", &cached_content);
 				RETURN_MM();
 			}
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache is corrupt");
 			return;
 		}
-	} else {
-		RETURN_MM_NULL();
 	}
 
+	RETURN_MM_NULL();
 }
 
 /**
@@ -428,8 +418,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
-	zval *prefix = NULL, *collection = NULL, *fields = NULL, *pattern, *regex;
-	zval *conditions, *documents = NULL, *document, *documents_array = NULL, *time_condition;
+	zval *prefix = NULL, *collection = NULL, fields, pattern, regex;
+	zval conditions, *documents = NULL, *document, *documents_array = NULL, time_condition;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -438,42 +428,37 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
 	PHALCON_CALL_METHOD(&collection, getThis(), "_getcollection");
 
-	PHALCON_INIT_VAR(fields);
-	array_init_size(fields, 1);
-	add_next_index_stringl(fields, SL("key"));
+	array_init_size(&fields, 1);
+	add_next_index_stringl(&fields, SL("key"));
 
-	PHALCON_INIT_VAR(conditions);
-	array_init_size(conditions, 2);
+	array_init_size(&conditions, 2);
 
 	if (prefix && zend_is_true(prefix)) {
-		PHALCON_INIT_VAR(pattern);
-		PHALCON_CONCAT_SVS(pattern, "/^", prefix, "/");
+		PHALCON_CONCAT_SVS(&pattern, "/^", prefix, "/");
 		ce0 = zend_fetch_class(SSL("MongoRegex"), ZEND_FETCH_CLASS_AUTO);
 
-		PHALCON_INIT_VAR(regex);
-		object_init_ex(regex, ce0);
-		assert(phalcon_has_constructor(regex));
-		PHALCON_CALL_METHOD(NULL, regex, "__construct", pattern);
+		object_init_ex(&regex, ce0);
+		assert(phalcon_has_constructor(&regex));
+		PHALCON_CALL_METHOD(NULL, &regex, "__construct", &pattern);
 
-		phalcon_array_update_str(conditions, SL("key"), regex, PH_COPY);
+		phalcon_array_update_str(&conditions, SL("key"), &regex, PH_COPY);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(time_condition);
-	array_init_size(time_condition, 1);
-	add_assoc_long_ex(time_condition, SL("$gt"), (long int)time(NULL));
-	phalcon_array_update_str(conditions, SL("time"), time_condition, 0);
+	array_init_size(&time_condition, 1);
+	add_assoc_long_ex(&time_condition, SL("$gt"), (long int)time(NULL));
+	phalcon_array_update_str(&conditions, SL("time"), &time_condition, 0);
 
-	PHALCON_CALL_METHOD(&documents, collection, "find", conditions, fields);
+	PHALCON_CALL_METHOD(&documents, collection, "find", &conditions, &fields);
 
 	array_init(return_value);
 
 	PHALCON_CALL_FUNCTION(&documents_array, "iterator_to_array", documents);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(documents_array), document) {
-		zval *key;
-		if (likely(phalcon_array_isset_str_fetch(&key, document, SL("key")))) {
+		zval key;
+		if (likely(phalcon_array_isset_fetch_str(&key, document, SL("key")))) {
 			Z_TRY_ADDREF_P(key);
-			add_next_index_zval(return_value, key);
+			add_next_index_zval(return_value, &key);
 		}
 	} ZEND_HASH_FOREACH_END();
 

@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
  */
 PHP_METHOD(Phalcon_DI_Service, setParameter){
 
-	zval *position, *parameter, *definition, *arguments;
+	zval *position, *parameter, *definition, arguments;
 
 	phalcon_fetch_params(0, 2, 0, &position, &parameter);
 	PHALCON_ENSURE_IS_LONG(position);
@@ -307,15 +307,14 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 	}
 
 	/* Update the parameter */
-	if (phalcon_array_isset_str_fetch(&arguments, definition, SL("arguments"))) {
-		phalcon_array_update_zval(arguments, position, parameter, PH_COPY);
+	if (phalcon_array_isset_fetch_str(&arguments, definition, SL("arguments"))) {
+		phalcon_array_update_zval(&arguments, position, parameter, PH_COPY);
 	} else {
-		PHALCON_ALLOC_INIT_ZVAL(arguments);
-		array_init_size(arguments, 1);
-		phalcon_array_update_zval(arguments, position, parameter, PH_COPY);
+		array_init_size(&arguments, 1);
+		phalcon_array_update_zval(&arguments, position, parameter, PH_COPY);
 	}
 
-	phalcon_array_update_str(definition, SL("arguments"), arguments, PH_COPY);
+	phalcon_array_update_str(definition, SL("arguments"), &arguments, PH_COPY);
 
 	RETURN_THISW();
 }
@@ -366,22 +365,22 @@ PHP_METHOD(Phalcon_DI_Service, isResolved)
  */
 PHP_METHOD(Phalcon_DI_Service, __set_state){
 
-	zval *attributes, *name, *definition, *shared;
+	zval *attributes, name, definition, shared;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &attributes);
 
 	if (
-			!phalcon_array_isset_str_fetch(&name, attributes, SL("_name"))
-		 || !phalcon_array_isset_str_fetch(&definition, attributes, SL("_definition"))
-		 || !phalcon_array_isset_str_fetch(&shared, attributes, SL("_shared"))
+			!phalcon_array_isset_fetch_str(&name, attributes, SL("_name"))
+		 || !phalcon_array_isset_fetch_str(&definition, attributes, SL("_definition"))
+		 || !phalcon_array_isset_fetch_str(&shared, attributes, SL("_shared"))
 	) {
 		PHALCON_THROW_EXCEPTION_STR(spl_ce_BadMethodCallException, "Bad parameters passed to Phalcon\\DI\\Service::__set_state()");
 		return;
 	}
 
 	object_init_ex(return_value, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", name, definition, shared);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &name, &definition, &shared);
 	RETURN_MM();
 }

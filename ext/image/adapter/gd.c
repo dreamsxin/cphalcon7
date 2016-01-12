@@ -928,7 +928,6 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 	zval *mask, *image, *mask_image = NULL, *blob = NULL;
 	zval *mask_image_width = NULL, *mask_image_height = NULL, *newimage = NULL;
 	zval *image_width, *image_height, saveflag, *color = NULL, c, alpha;
-	zval *r = NULL, *g = NULL, *b = NULL, *red = NULL;
 	zval *temp_image = NULL;
 	int x, y, w, h, i;
 
@@ -978,14 +977,14 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 		zval zx;
 		ZVAL_LONG(&zx, x);
 		for (y=0; y < h; y++) {
-			zval zy, *index = NULL, *index2 = NULL, *color = NULL, r, g, b;
+			zval zy, *index = NULL, red, *index2 = NULL, *color = NULL, r, g, b;
 			ZVAL_LONG(&zy, y);
 
 			PHALCON_CALL_FUNCTION(&index, "imagecolorat", mask_image, &zx, &zy);
 			PHALCON_CALL_FUNCTION(&alpha, "imagecolorsforindex", mask_image, index);
 
 			if (phalcon_array_isset_fetch_str(&red, alpha, SL("red"))) {
-				i = (int)(127 - (phalcon_get_intval(red) / 2));
+				i = (int)(127 - (phalcon_get_intval(&red) / 2));
 				ZVAL_LONG(&alpha, i);
 			}
 

@@ -70,12 +70,12 @@ PHALCON_INIT_CLASS(Phalcon_DI_Service_Builder){
 PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 
 	zval *dependency_injector, *position, *argument;
-	zval exception_message, *type, *name = NULL, *value = NULL, *instance_arguments;
+	zval exception_message, type, name, value, instance_arguments;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 3, 0, &dependency_injector, &position, &argument);
-	
+
 	/** 
 	 * All the arguments must be an array
 	 */
@@ -84,24 +84,21 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 		return;
 	}
-	
+
 	/** 
 	 * All the arguments must have a type
 	 */
-	if (!phalcon_array_isset_str(argument, SL("type"))) {
+	if (!phalcon_array_isset_fetch_str(&type, argument, SL("type"))) {
 		PHALCON_CONCAT_SVS(&exception_message, "Argument at position ", position, " must have a type");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 		return;
 	}
-	
-	PHALCON_OBS_VAR(type);
-	phalcon_array_fetch_str(&type, argument, SL("type"), PH_NOISY);
-	
+
 	/** 
 	 * If the argument type is 'service', we obtain the service from the DI
 	 */
-	if (PHALCON_IS_STRING(type, "service")) {
-		if (!phalcon_array_isset_str_fetch(&name, argument, SL("name"))) {
+	if (PHALCON_IS_STRING(&type, "service")) {
+		if (!phalcon_array_isset_fetch_str(&name, argument, SL("name"))) {
 			PHALCON_CONCAT_SV(&exception_message, "Service 'name' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 			return;
@@ -112,31 +109,28 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 			return;
 		}
 	
-		PHALCON_RETURN_CALL_METHOD(dependency_injector, "get", name);
+		PHALCON_RETURN_CALL_METHOD(dependency_injector, "get", &name);
 		RETURN_MM();
 	}
 	
 	/** 
 	 * If the argument type is 'parameter', we assign the value as it is
 	 */
-	if (PHALCON_IS_STRING(type, "parameter")) {
-		if (!phalcon_array_isset_str(argument, SL("value"))) {
+	if (PHALCON_IS_STRING(&type, "parameter")) {
+		if (!phalcon_array_isset_fetch_str(&value, argument, SL("value"))) {
 			PHALCON_CONCAT_SV(&exception_message, "Service 'value' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 			return;
 		}
-	
-		PHALCON_OBS_VAR(value);
-		phalcon_array_fetch_str(&value, argument, SL("value"), PH_NOISY);
-	
-		RETURN_CCTOR(value);
+
+		RETURN_CTOR(&value);
 	}
 	
 	/** 
 	 * If the argument type is 'instance', we assign the value as it is
 	 */
-	if (PHALCON_IS_STRING(type, "instance")) {
-		if (!phalcon_array_isset_str(argument, SL("className"))) {
+	if (PHALCON_IS_STRING(&type, "instance")) {
+		if (!phalcon_array_isset_fetch_str(&name, argument, SL("className"))) {
 			PHALCON_CONCAT_SV(&exception_message, "Service 'className' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
 			return;
@@ -145,26 +139,21 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "The dependency injector container is not valid");
 			return;
 		}
-	
-		PHALCON_OBS_NVAR(name);
-		phalcon_array_fetch_str(&name, argument, SL("className"), PH_NOISY);
-		if (!phalcon_array_isset_str(argument, SL("arguments"))) {
+
+		if (!phalcon_array_isset_fetch_str(argument, SL("arguments"))) {
 			/** 
 			 * The instance parameter does not have arguments for its constructor
 			 */
-			PHALCON_CALL_METHOD(&value, dependency_injector, "get", name);
-		} else {
-			PHALCON_OBS_VAR(instance_arguments);
-			phalcon_array_fetch_str(&instance_arguments, argument, SL("arguments"), PH_NOISY);
-	
+			PHALCON_CALL_METHOD(&value, dependency_injector, "get", &name);
+		} else {	
 			/** 
 			 * Build the instance with arguments
 			 */
-			PHALCON_RETURN_CALL_METHOD(dependency_injector, "get", name, instance_arguments);
+			PHALCON_RETURN_CALL_METHOD(dependency_injector, "get", &name, &instance_arguments);
 			RETURN_MM();
 		}
 	
-		RETURN_CCTOR(value);
+		RETURN_CTOR(&value);
 	}
 	
 	/** 

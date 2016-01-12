@@ -129,7 +129,6 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 	zval *uri = NULL, *url = NULL, *method, *useragent, *data, *type, *files, *timeout, *curl, *username, *password, *authtype;
 	zval *file = NULL, *body, *uniqid = NULL, *boundary, *key = NULL, *value = NULL;
-	zval *path_parts = NULL, *filename, *basename, *filedata = NULL;
 	zval *constant, *constant1, *header, *headers = NULL;
 	zval *content = NULL, *errorno = NULL, *error = NULL, *headersize = NULL, *httpcode = NULL, *headerstr, *bodystr, *response, *tmp = NULL;
 	zend_class_entry *curlfile_ce;
@@ -274,14 +273,15 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 		if (Z_TYPE_P(files) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
+				zval *path_parts = NULL, filename, basename, *filedata = NULL;
 				if (PHALCON_IS_NOT_EMPTY(file)) {
 					PHALCON_CALL_FUNCTION(&path_parts, "pathinfo", file);
 
-					if (phalcon_array_isset_str_fetch(&filename, path_parts, SL("filename")) && phalcon_array_isset_str_fetch(&basename, path_parts, SL("basename"))) {
+					if (phalcon_array_isset_fetch_str(&filename, path_parts, SL("filename")) && phalcon_array_isset_str_fetch(&basename, path_parts, SL("basename"))) {
 						PHALCON_CALL_FUNCTION(&filedata, "file_get_contents", file);
 
 						PHALCON_SCONCAT_SVS(body, "--", boundary, "\r\n");
-						PHALCON_SCONCAT_SVSVS(body, "Content-Disposition: form-data; name=\"", filename, "\"; filename=\"", basename, "\"\r\n");
+						PHALCON_SCONCAT_SVSVS(body, "Content-Disposition: form-data; name=\"", &filename, "\"; filename=\"", &basename, "\"\r\n");
 						PHALCON_SCONCAT_SVS(body, "Content-Type: application/octet-stream\r\n\r\n", filedata, "\r\n");
 					}
 				}

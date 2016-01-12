@@ -79,7 +79,7 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_Gettext){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 
-	zval *options, *locale, *constant, *default_domain, *directory, *setting, *value = NULL;
+	zval *options, locale, default_domain, directory, setting, *constant, *value = NULL;
 	zend_string *str_key;
 	ulong idx;
 
@@ -92,28 +92,27 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 		RETURN_MM();
 	}
 
-	if (!phalcon_array_isset_str_fetch(&locale, options, SL("locale"))) {
+	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Parameter \"locale\" is required");
 		RETURN_MM();
 	}
 
-	if (!phalcon_array_isset_str_fetch(&default_domain, options, SL("defaultDomain"))) {
+	if (!phalcon_array_isset_fetch_str(&default_domain, options, SL("defaultDomain"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Parameter \"defaultDomain\" is required");
 		RETURN_MM();
 	}
 
-	if (!phalcon_array_isset_str_fetch(&directory, options, SL("directory"))) {
+	if (!phalcon_array_isset_fetch_str(&directory, options, SL("directory"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Parameter \"directory\" is required");
 		RETURN_MM();
 	}
 
-	phalcon_update_property_this(getThis(), SL("_locale"), locale);
-	phalcon_update_property_this(getThis(), SL("_defaultDomain"), default_domain);
-	phalcon_update_property_this(getThis(), SL("_directory"), directory);
+	phalcon_update_property_this(getThis(), SL("_locale"), &locale);
+	phalcon_update_property_this(getThis(), SL("_defaultDomain"), &default_domain);
+	phalcon_update_property_this(getThis(), SL("_directory"), &directory);
 
-	PHALCON_INIT_VAR(setting);
-	PHALCON_CONCAT_SV(setting, "LC_ALL=", locale);
-	PHALCON_CALL_FUNCTION(NULL, "putenv", setting);
+	PHALCON_CONCAT_SV(&setting, "LC_ALL=", &locale);
+	PHALCON_CALL_FUNCTION(NULL, "putenv", &setting);
 
 	if ((constant = zend_get_constant_str(SL("LC_ALL"))) != NULL) {
 		PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, locale);
@@ -130,10 +129,10 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 			PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", &key, value);
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", default_domain, directory);
+		PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", &default_domain, &directory);
 	}
 
-	PHALCON_CALL_FUNCTION(NULL, "textdomain", default_domain);
+	PHALCON_CALL_FUNCTION(NULL, "textdomain", &default_domain);
 
 	PHALCON_MM_RESTORE();
 }

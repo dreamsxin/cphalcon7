@@ -134,7 +134,7 @@ PHALCON_INIT_CLASS(Phalcon_Queue_Beanstalk){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 
-	zval *options = NULL, *parameters = NULL, *tmp;
+	zval *options = NULL, parameters;
 
 	PHALCON_MM_GROW();
 
@@ -144,24 +144,18 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_INIT_VAR(parameters);
-		array_init_size(parameters, 2);
+	if (Z_TYPE_P(options) != IS_ARRAY) {
+		array_init_size(&parameters, 2);
 	} else {
-		PHALCON_CPY_WRT_CTOR(parameters, options);
+		ZVAL_COPY_VALUE(&parameters, options);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&tmp, parameters, SL("host"))) {
-		phalcon_array_update_str_str(parameters, SL("host"), SL("127.0.0.1"), PH_COPY);
-	}
-	else {
-		convert_to_string(tmp);
+	if (!phalcon_array_isset_str(&parameters, SL("host"))) {
+		phalcon_array_update_str_str(&parameters, SL("host"), SL("127.0.0.1"), PH_COPY);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&tmp, parameters, SL("port"))) {
-		phalcon_array_update_str_long(parameters, SL("port"), 11300, 0);
-	} else {
-		convert_to_long(tmp);
+	if (!phalcon_array_isset_str(&parameters, SL("port"))) {
+		phalcon_array_update_str_long(&parameters, SL("port"), 11300, 0);
 	}
 
 	phalcon_update_property_this(getThis(), SL("_parameters"), parameters);
@@ -170,29 +164,27 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 
 PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 
-	zval *connection = NULL, *parameters, *host, *port;
+	zval *connection = NULL, *parameters, host, port, new_connection;
 
 	connection = phalcon_read_property(getThis(), SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) == IS_RESOURCE) {
-		PHALCON_MM_GROW();
-		PHALCON_CALL_METHOD(NULL, getThis(), "disconnect");
-		PHALCON_MM_RESTORE();
+		PHALCON_CALL_METHODW(NULL, getThis(), "disconnect");
 	}
 
 	parameters = phalcon_read_property(getThis(), SL("_parameters"), PH_NOISY);
 
-	if (!phalcon_array_isset_str_fetch(&host, parameters, SL("host")) || !phalcon_array_isset_str_fetch(&port, parameters, SL("port"))) {
+	if (!phalcon_array_isset_fetch_str(&host, parameters, SL("host")) || !phalcon_array_isset_fetch_str(&port, parameters, SL("port"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
 
-	convert_to_string(host);
-	convert_to_long(port);
+	convert_to_string(&host);
+	convert_to_long(&port);
 
 	{
 		ulong timeout = (ulong)(FG(default_socket_timeout) * 1000000.0);
 		char *hostname;
-		long int hostname_len = spprintf(&hostname, 0, "%s:%ld", Z_STRVAL_P(host), Z_LVAL_P(port));
+		long int hostname_len = spprintf(&hostname, 0, "%s:%ld", Z_STRVAL(host), Z_LVAL(port));
 		struct timeval tv;
 		php_stream *stream;
 		int err;
@@ -205,7 +197,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 		efree(hostname);
 
 		if (!stream) {
-			zend_throw_exception_ex(phalcon_exception_ce, err, "Unable to connect to Beanstalk server at %s:%ld (%s)", Z_STRVAL_P(host), Z_LVAL_P(port), (errstr == NULL ? "Unknown error" : errstr->val));
+			zend_throw_exception_ex(phalcon_exception_ce, err, "Unable to connect to Beanstalk server at %s:%ld (%s)", Z_STRVAL(host), Z_LVAL(port), (errstr == NULL ? "Unknown error" : errstr->val));
 		}
 
 		if (errstr) {
@@ -220,9 +212,8 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 		tv.tv_usec = 0;
 		php_stream_set_option(stream, PHP_STREAM_OPTION_READ_TIMEOUT, 0, &tv);
 
-		PHALCON_ALLOC_INIT_ZVAL(connection);
-		php_stream_to_zval(stream, connection);
-		phalcon_update_property_this(getThis(), SL("_connection"), connection);
+		php_stream_to_zval(stream, &new_connection);
+		phalcon_update_property_this(getThis(), SL("_connection"), &new_connection);
 		RETVAL_ZVAL(connection, 1, 1);
 	}
 }
@@ -236,9 +227,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 
-	zval *data, *options = NULL, *priority = NULL, *delay = NULL, *ttr = NULL, *serialized;
-	zval *serialized_length, *command, *response = NULL;
-	zval *status, *job_id = NULL;
+	zval *data, *options = NULL, priority, delay, ttr, serialized;
+	zval serialized_length, command, *response = NULL;
+	zval status, job_id;
 
 	PHALCON_MM_GROW();
 
@@ -251,30 +242,25 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	/** 
 	 * Priority is 100 by default
 	 */
-	if (!phalcon_array_isset_str_fetch(&priority, options, SL("priority"))) {
-		PHALCON_INIT_VAR(priority);
-		ZVAL_STRING(priority, "100");
+	if (!phalcon_array_isset_fetch_str(&priority, options, SL("priority"))) {
+		ZVAL_STRING(&priority, "100");
 	}
 
-	if (!phalcon_array_isset_str_fetch(&delay, options, SL("delay"))) {
-		PHALCON_INIT_VAR(delay);
-		ZVAL_STRING(delay, "0");
+	if (!phalcon_array_isset_fetch_str(&delay, options, SL("delay"))) {
+		ZVAL_STRING(&delay, "0");
 	}
 
-	if (!phalcon_array_isset_str_fetch(&ttr, options, SL("ttr"))) {
-		PHALCON_INIT_VAR(ttr);
-		ZVAL_STRING(ttr, "86400");
+	if (!phalcon_array_isset_fetch_str(&ttr, options, SL("ttr"))) {
+		ZVAL_STRING(&ttr, "86400");
 	}
 
 	/** 
 	 * Data is automatically serialized before be sent to the server
 	 */
-	PHALCON_INIT_VAR(serialized);
-	phalcon_serialize(serialized, data);
+	phalcon_serialize(&serialized, data);
 
 	if (Z_TYPE_P(serialized) == IS_STRING) {
-		PHALCON_INIT_VAR(serialized_length);
-		ZVAL_LONG(serialized_length, Z_STRLEN_P(serialized));
+		ZVAL_LONG(&serialized_length, Z_STRLEN_P(serialized));
 	}
 	else {
 		RETURN_MM_FALSE;
@@ -283,26 +269,22 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	/** 
 	 * Create the command
 	 */
-	PHALCON_INIT_VAR(command);
-	PHALCON_CONCAT_SVSV(command, "put ", priority, " ", delay);
-	PHALCON_SCONCAT_SVSV(command, " ", ttr, " ", serialized_length);
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", command);
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", serialized);
+	PHALCON_CONCAT_SVSV(&command, "put ", &priority, " ", &delay);
+	PHALCON_SCONCAT_SVSV(&command, " ", &ttr, " ", &serialized_length);
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &command);
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &serialized);
 
 	PHALCON_CALL_METHOD(&response, getThis(), "readstatus");
 
-	PHALCON_OBS_VAR(status);
 	phalcon_array_fetch_long(&status, response, 0, PH_NOISY);
-	if (PHALCON_IS_STRING(status, "INSERTED")) {
-		PHALCON_OBS_VAR(job_id);
+	if (PHALCON_IS_STRING(&status, "INSERTED")) {
 		phalcon_array_fetch_long(&job_id, response, 1, PH_NOISY);
-		RETURN_CCTOR(job_id);
+		RETURN_CTOR(&job_id);
 	}
 
-	if (PHALCON_IS_STRING(status, "BURIED")) {
-		PHALCON_OBS_NVAR(job_id);
+	if (PHALCON_IS_STRING(&status, "BURIED")) {
 		phalcon_array_fetch_long(&job_id, response, 1, PH_NOISY);
-		RETURN_CCTOR(job_id);
+		RETURN_CTOR(&job_id);
 	}
 
 	RETURN_MM_FALSE;
@@ -647,7 +629,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, readYaml){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 
-	zval *length = NULL, *connection, *meta;
+	zval *length = NULL, *connection, meta, timed_out;
 	php_stream *stream;
 
 	PHALCON_MM_GROW();
@@ -691,12 +673,10 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 
 		ZVAL_STRINGL(return_value, buf, len);
 
-		PHALCON_INIT_VAR(meta);
-		array_init_size(meta, 4);
-		if (php_stream_populate_meta_data(stream, meta)) {
-			zval *t;
-			if (phalcon_array_isset_str_fetch(&t, meta, SL("timed_out"))) {
-				timeout = zend_is_true(t);
+		array_init_size(&meta, 4);
+		if (php_stream_populate_meta_data(stream, &meta)) {
+			if (phalcon_array_isset_fetch_str(&timed_out, &meta, SL("timed_out"))) {
+				timeout = zend_is_true(&t);
 			}
 		}
 
@@ -810,7 +790,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __sleep){
 
 PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 
-	zval *params, *host, *port;
+	zval *params, host, port;
 	int fail;
 
 	zend_update_property_null(phalcon_queue_beanstalk_ce, getThis(), SL("_connection"));
@@ -818,15 +798,13 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 	params = phalcon_read_property(getThis(), SL("_parameters"), PH_NOISY);
 	if (
 			Z_TYPE_P(params) != IS_ARRAY
-		 || !phalcon_array_isset_str_fetch(&host, params, SL("host"))
-		 || !phalcon_array_isset_str_fetch(&port, params, SL("port"))
+		 || !phalcon_array_isset_fetch_str(&host, params, SL("host"))
+		 || !phalcon_array_isset_fetch_str(&port, params, SL("port"))
 	) {
 		fail = 1;
-	}
-	else if (Z_TYPE_P(host) != IS_STRING || Z_TYPE_P(port) != IS_LONG) {
+	} else if (Z_TYPE(host) != IS_STRING || Z_TYPE(port) != IS_LONG) {
 		fail = 1;
-	}
-	else {
+	} else {
 		fail = 0;
 	}
 

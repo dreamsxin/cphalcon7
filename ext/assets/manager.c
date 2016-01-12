@@ -443,19 +443,19 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
  */
 PHP_METHOD(Phalcon_Assets_Manager, getCss){
 
-	zval *collections, *collection;
+	zval *collections, collection;
 
 	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
 
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_str_fetch(&collection, collections, SL("css"))) {
+	if (!phalcon_array_isset_fetch_str(&collection, collections, SL("css"))) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		return;
 	}
 
-	RETURN_ZVAL(collection, 1, 0);
+	RETURN_CTORW(&collection);
 }
 
 /**
@@ -465,19 +465,19 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
  */
 PHP_METHOD(Phalcon_Assets_Manager, getJs){
 
-	zval *collections, *collection;
+	zval *collections, collection;
 
 	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
 
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_str_fetch(&collection, collections, SL("js"))) {
+	if (!phalcon_array_isset_fetch_str(&collection, collections, SL("js"))) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		return;
 	}
 
-	RETURN_ZVAL(collection, 1, 0);
+	RETURN_CTORW(&collection);
 }
 
 /**

@@ -435,15 +435,14 @@ PHP_METHOD(Phalcon_Validation_Message_Group, valid){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, __set_state){
 
-	zval *group, *messages;
+	zval *group, messages;
 
 	phalcon_fetch_params(0, 1, 0, &group);
 
-	if (phalcon_array_isset_str_fetch(&messages, group, SL("_messages"))) {
+	if (phalcon_array_isset_fetch_str(&messages, group, SL("_messages"))) {
 		object_init_ex(return_value, phalcon_validation_message_group_ce);
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct", messages);
-	}
-	else {
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct", &messages);
+	} else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Invalid arguments passed to %s", "Phalcon\\Mvc\\Model\\Message\\Group::__set_state()");
 	}
 }

@@ -348,8 +348,7 @@ static void phalcon_tag_get_escaper(zval **return_value, zval *params)
 
 PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 {
-	zval *escaper = NULL, *escaped = NULL, *attrs;
-	zval *value;
+	zval escaper, escaped, attrs, *value;
 	zend_string *key;
 	uint i;
 
@@ -372,44 +371,38 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 
 	assert(Z_TYPE_P(attributes) == IS_ARRAY);
 
-	PHALCON_MM_GROW();
-
 	phalcon_tag_get_escaper(&escaper, attributes);
 	if (EG(exception)) {
-		PHALCON_MM_RESTORE();
 		return;
 	}
 
-	PHALCON_INIT_VAR(attrs);
-	array_init_size(attrs, zend_hash_num_elements(Z_ARRVAL_P(attributes)));
+	array_init_size(&attrs, zend_hash_num_elements(Z_ARRVAL_P(attributes)));
 
 	for (i=0; i<sizeof(order)/sizeof(order[0]); ++i) {
 		if ((value = zend_hash_str_find(Z_ARRVAL_P(attributes), order[i].str, order[i].size)) != NULL) {
 			Z_TRY_ADDREF_P(value);
-			add_assoc_zval_ex(attrs, order[i].str, order[i].size, value);
+			add_assoc_zval_ex(&attrs, order[i].str, order[i].size, value);
 		}
 	}
 
-	zend_hash_merge(Z_ARRVAL_P(attrs), Z_ARRVAL_P(attributes), (copy_ctor_func_t)zval_add_ref, 1);
+	zend_hash_merge(Z_ARRVAL_P(&attrs), Z_ARRVAL_P(attributes), (copy_ctor_func_t)zval_add_ref, 1);
 
-	if (phalcon_array_isset_str(attrs, SL("escape"))) {
-		phalcon_array_unset_str(attrs, SL("escape"), 0);
+	if (phalcon_array_isset_str(&attrs, SL("escape"))) {
+		phalcon_array_unset_str(&attrs, SL("escape"), 0);
 	}
 
-	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(attrs), key, value) {
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(&attrs), key, value) {
+		zval tmp;
 		if (key && Z_TYPE_P(value) != IS_NULL) {
-			zval tmp;
 			ZVAL_STR(&tmp, key);
-			if (Z_TYPE_P(escaper) == IS_OBJECT) {
-				PHALCON_CALL_METHOD(&escaped, escaper, "escapehtmlattr", value);
-				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", escaped, "\"");
+			if (Z_TYPE_P(&escaper) == IS_OBJECT) {
+				PHALCON_CALL_METHOD(&escaped, &escaper, "escapehtmlattr", value);
+				PHALCON_SCONCAT_SVSVS(&code, " ", &tmp, "=\"", &escaped, "\"");
 			} else {
-				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", value, "\"");
+				PHALCON_SCONCAT_SVSVS(&code, " ", &tmp, "=\"", value, "\"");
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

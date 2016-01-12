@@ -927,8 +927,8 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 
 	zval *mask, *image, *mask_image = NULL, *blob = NULL;
 	zval *mask_image_width = NULL, *mask_image_height = NULL, *newimage = NULL;
-	zval *image_width, *image_height, *saveflag, *color = NULL, *c, *alpha = NULL;
-	zval *r = NULL, *g = NULL, *b = NULL, *index = NULL, *index2 = NULL, *zx = NULL, *zy = NULL, *red = NULL;
+	zval *image_width, *image_height, saveflag, *color = NULL, c, alpha;
+	zval *r = NULL, *g = NULL, *b = NULL, *red = NULL;
 	zval *temp_image = NULL;
 	int x, y, w, h, i;
 
@@ -942,10 +942,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 
 	PHALCON_CALL_FUNCTION(&mask_image, "imagecreatefromstring", blob);
 
-	PHALCON_INIT_VAR(saveflag);
-	ZVAL_TRUE(saveflag);
+	ZVAL_TRUE(&saveflag);
 
-	PHALCON_CALL_FUNCTION(NULL, "imagesavealpha", mask_image, saveflag);
+	PHALCON_CALL_FUNCTION(NULL, "imagesavealpha", mask_image, &saveflag);
 
 	PHALCON_CALL_FUNCTION(&mask_image_width, "imagesx", mask_image);
 	PHALCON_CALL_FUNCTION(&mask_image_height, "imagesy", mask_image);
@@ -955,17 +954,14 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 
 	PHALCON_CALL_METHOD(&newimage, getThis(), "_create", image_width, image_height);
 
-	PHALCON_CALL_FUNCTION(NULL, "imagesavealpha", newimage, saveflag);
+	PHALCON_CALL_FUNCTION(NULL, "imagesavealpha", newimage, &saveflag);
 
-	PHALCON_INIT_VAR(c);
-	ZVAL_LONG(c, 0);
+	ZVAL_LONG(&c, 0);
+	ZVAL_LONG(&alpha, 127);
 
-	PHALCON_INIT_VAR(alpha);
-	ZVAL_LONG(alpha, 127);
+	PHALCON_CALL_FUNCTION(&color, "imagecolorallocatealpha", newimage, &c, &c, &c, &alpha);
 
-	PHALCON_CALL_FUNCTION(&color, "imagecolorallocatealpha", newimage, c, c, c, alpha);
-
-	PHALCON_CALL_FUNCTION(NULL, "imagefill", newimage, c, c, color);
+	PHALCON_CALL_FUNCTION(NULL, "imagefill", newimage, &c, &c, color);
 
 	if(!PHALCON_IS_EQUAL(image_width, mask_image_width) || !PHALCON_IS_EQUAL(image_height, mask_image_height)) {
 		PHALCON_CALL_FUNCTION(&temp_image, "imagecreatetruecolor", image_width, image_height);
@@ -979,36 +975,35 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 	h = phalcon_get_intval(image_height);
 
 	for (x=0; x < w; x++) {
-		PHALCON_INIT_NVAR(zx);
-		ZVAL_LONG(zx, x);
+		zval zx;
+		ZVAL_LONG(&zx, x);
 		for (y=0; y < h; y++) {
-			PHALCON_INIT_NVAR(zy);
-			ZVAL_LONG(zy, y);
+			zval zy, *index = NULL, *index2 = NULL, *color = NULL, r, g, b;
+			ZVAL_LONG(&zy, y);
 
-			PHALCON_CALL_FUNCTION(&index, "imagecolorat", mask_image, zx, zy);
+			PHALCON_CALL_FUNCTION(&index, "imagecolorat", mask_image, &zx, &zy);
 			PHALCON_CALL_FUNCTION(&alpha, "imagecolorsforindex", mask_image, index);
 
-			if (phalcon_array_isset_str_fetch(&red, alpha, SL("red"))) {
+			if (phalcon_array_isset_fetch_str(&red, alpha, SL("red"))) {
 				i = (int)(127 - (phalcon_get_intval(red) / 2));
-
-				PHALCON_INIT_NVAR(alpha);
-				ZVAL_LONG(alpha, i);
+				ZVAL_LONG(&alpha, i);
 			}
 
-			PHALCON_CALL_FUNCTION(&index2, "imagecolorat", image, zx, zy);
-			PHALCON_CALL_FUNCTION(&c, "imagecolorsforindex", image, index2);
+			PHALCON_CALL_FUNCTION(&index2, "imagecolorat", image, &zx, &zy);
+			PHALCON_CALL_FUNCTION(&color, "imagecolorsforindex", image, index2);
 
-			phalcon_array_isset_str_fetch(&r, c, SL("red"));
-			phalcon_array_isset_str_fetch(&g, c, SL("green"));
-			phalcon_array_isset_str_fetch(&b, c, SL("blue"));
+			phalcon_array_isset_fetch_str(&r, color, SL("red"));
+			phalcon_array_isset_fetch_str(&g, color, SL("green"));
+			phalcon_array_isset_fetch_str(&b, color, SL("blue"));
 
-			PHALCON_CALL_FUNCTION(&color, "imagecolorallocatealpha", newimage, r, g, b, alpha);
-			PHALCON_CALL_FUNCTION(NULL, "imagesetpixel", newimage, zx, zy, color);
+			PHALCON_CALL_FUNCTION(&color, "imagecolorallocatealpha", newimage, &r, &g, &b, &alpha);
+			PHALCON_CALL_FUNCTION(NULL, "imagesetpixel", newimage, &zx, &zy, color);
 		}
 	}
 
 	PHALCON_CALL_FUNCTION(NULL, "imagedestroy", image);
 	PHALCON_CALL_FUNCTION(NULL, "imagedestroy", mask_image);
+
 	phalcon_update_property_this(getThis(), SL("_image"), newimage);
 
 	PHALCON_MM_RESTORE();

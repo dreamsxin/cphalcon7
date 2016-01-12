@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 	zval *stream, *header, *data, *type, *files, *file = NULL, *username, *password, *authtype, *digest, *method, *entity_body;
 	zval key, value, realm, ha1_txt, *ha1 = NULL, qop, ha2_txt, *ha2 = NULL, nonce, nc, cnonce, qoc, *path = NULL, *md5_entity_body = NULL;
 	zval http, option, body, *headers = NULL, *uniqid = NULL, boundary;
-	zval *path_parts = NULL, *filename, *basename, *filedata = NULL, tmp;
+	zval *filename, *basename, *filedata = NULL, tmp;
 	zend_string *str_key;
 	ulong idx;
 
@@ -290,28 +290,29 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 				ZVAL_LONG(&key, idx);
 			}
 
-			PHALCON_SCONCAT_SVS(body, "--", boundary, "\r\n");
-			PHALCON_SCONCAT_SVSVS(body, "Content-Disposition: form-data; name=\"", &key, "\"\r\n\r\n", value, "\r\n");
+			PHALCON_SCONCAT_SVS(&body, "--", &boundary, "\r\n");
+			PHALCON_SCONCAT_SVSVS(&body, "Content-Disposition: form-data; name=\"", &key, "\"\r\n\r\n", value, "\r\n");
 		} ZEND_HASH_FOREACH_END();
 	}
 
 	if (Z_TYPE_P(files) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
+			zval *path_parts = NULL, filename, basename, *filedata = NULL;
 			if (PHALCON_IS_NOT_EMPTY(file)) {
 				PHALCON_CALL_FUNCTION(&path_parts, "pathinfo", file);
 
-				if (phalcon_array_isset_str_fetch(&filename, path_parts, SL("filename")) && phalcon_array_isset_str_fetch(&basename, path_parts, SL("basename"))) {
+				if (phalcon_array_isset_fetch_str(&filename, path_parts, SL("filename")) && phalcon_array_isset_fetch_str(&basename, path_parts, SL("basename"))) {
 					PHALCON_CALL_FUNCTION(&filedata, "file_get_contents", file);
 
-					PHALCON_SCONCAT_SVS(body, "--", boundary, "\r\n");
-					PHALCON_SCONCAT_SVSVS(body, "Content-Disposition: form-data; name=\"", filename, "\"; filename=\"", basename, "\"\r\n");
-					PHALCON_SCONCAT_SVS(body, "Content-Type: application/octet-stream\r\n\r\n", filedata, "\r\n");
+					PHALCON_SCONCAT_SVS(&body, "--", &boundary, "\r\n");
+					PHALCON_SCONCAT_SVSVS(&body, "Content-Disposition: form-data; name=\"", &filename, "\"; filename=\"", &basename, "\"\r\n");
+					PHALCON_SCONCAT_SVS(&body, "Content-Type: application/octet-stream\r\n\r\n", filedata, "\r\n");
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	if (!PHALCON_IS_EMPTY(body)) {
+	if (!PHALCON_IS_EMPTY(&body)) {
 		PHALCON_SCONCAT_SVS(&body, "--", &boundary, "--\r\n");
 
 		ZVAL_STRING(&key, "Content-Type");

@@ -116,31 +116,31 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 
-	zval *config, *db, *sql, *total_sql, *bind, *limit, *page;
+	zval *config, db, sql, total_sql, bind, limit, page;
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
 	
-	if (!phalcon_array_isset_str_fetch(&db, config, SL("db"))) {
+	if (!phalcon_array_isset_fetch_str(&db, config, SL("db"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'db' is required");
 		return;
 	}
 	
-	if (!phalcon_array_isset_str_fetch(&sql, config, SL("sql"))) {
+	if (!phalcon_array_isset_fetch_str(&sql, config, SL("sql"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'sql' is required");
 		return;
 	}
 	
-	if (!phalcon_array_isset_str_fetch(&total_sql, config, SL("total_sql"))) {
+	if (!phalcon_array_isset_fetch_str(&total_sql, config, SL("total_sql"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'sql' is required");
 		return;
 	}
 
-	if (phalcon_array_isset_str_fetch(&bind, config, SL("bind"))) {
-		if (Z_TYPE_P(bind) != IS_ARRAY) {
+	if (phalcon_array_isset_fetch_str(&bind, config, SL("bind"))) {
+		if (Z_TYPE_P(&bind) != IS_ARRAY) {
 			phalcon_update_property_empty_array(getThis(), SL("_bind"));
 		} else {
-			phalcon_update_property_this(getThis(), SL("_bind"), bind);
+			phalcon_update_property_this(getThis(), SL("_bind"), &bind);
 		}
 	} else {
 		phalcon_update_property_empty_array(getThis(), SL("_bind"));
@@ -148,25 +148,25 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 
 	PHALCON_VERIFY_INTERFACE_EX(db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_db"), db);
-	phalcon_update_property_this(getThis(), SL("_sql"), sql);
-	phalcon_update_property_this(getThis(), SL("_total_sql"), total_sql);
+	phalcon_update_property_this(getThis(), SL("_db"), &db);
+	phalcon_update_property_this(getThis(), SL("_sql"), &sql);
+	phalcon_update_property_this(getThis(), SL("_total_sql"), &total_sql);
 
-	if (!phalcon_array_isset_str_fetch(&limit, config, SL("limit"))) {
+	if (!phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
 		return;
 	}
 
-	i_limit = phalcon_get_intval(limit);
+	i_limit = phalcon_get_intval(&limit);
 	if (i_limit < 1) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "'limit' should be positive");
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
+	phalcon_update_property_this(getThis(), SL("_limitRows"), &limit);
 	
-	if (phalcon_array_isset_str_fetch(&page, config, SL("page"))) {
-		phalcon_update_property_this(getThis(), SL("_page"), page);
+	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
+		phalcon_update_property_this(getThis(), SL("_page"), &page);
 	}
 }
 

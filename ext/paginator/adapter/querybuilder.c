@@ -114,35 +114,35 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_QueryBuilder){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
-	zval *config, *builder, *limit, *page;
+	zval *config, builder, limit, *page;
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	if (!phalcon_array_isset_str_fetch(&builder, config, SL("builder"))) {
+	if (!phalcon_array_isset_fetch_str(&builder, config, SL("builder"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'builder' is required");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(&builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_builder"), builder);
+	phalcon_update_property_this(getThis(), SL("_builder"), &builder);
 
-	if (!phalcon_array_isset_str_fetch(&limit, config, SL("limit"))) {
+	if (!phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
 		return;
 	}
 
-	i_limit = phalcon_get_intval(limit);
+	i_limit = phalcon_get_intval(&limit);
 	if (i_limit < 1) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "'limit' should be positive");
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
+	phalcon_update_property_this(getThis(), SL("_limitRows"), &limit);
 
-	if (phalcon_array_isset_str_fetch(&page, config, SL("page"))) {
-		phalcon_update_property_this(getThis(), SL("_page"), page);
+	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
+		phalcon_update_property_this(getThis(), SL("_page"), &page);
 	}
 }
 

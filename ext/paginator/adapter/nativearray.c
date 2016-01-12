@@ -91,29 +91,27 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_NativeArray){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 
-	zval *config, *limit, *page, *data;
+	zval *config, limit, page, data;
 
 	phalcon_fetch_params(0, 1, 0, &config);
 	
-	if (phalcon_array_isset_str_fetch(&limit, config, SL("limit"))) {
-		phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
+	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
+		phalcon_update_property_this(getThis(), SL("_limitRows"), &limit);
 	}
 	
-	if (phalcon_array_isset_str_fetch(&page, config, SL("page"))) {
-		phalcon_update_property_this(getThis(), SL("_page"), page);
+	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
+		phalcon_update_property_this(getThis(), SL("_page"), &page);
 	}
 
-	if (!phalcon_array_isset_str_fetch(&data, config, SL("data"))) {
+	if (!phalcon_array_isset_fetch_str(&data, config, SL("data"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'data' is required");
 		return;
-	}
-
-	if (Z_TYPE_P(data) != IS_ARRAY) {
+	} else if (Z_TYPE_P(&data) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "'data' should be an array");
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_data"), data);
+	phalcon_update_property_this(getThis(), SL("_data"), &data);
 }
 
 /**

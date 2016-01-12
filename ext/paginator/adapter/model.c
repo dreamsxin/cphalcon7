@@ -76,17 +76,18 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Model){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct){
 
-	zval *config, *limit, *page;
+	zval *config, limit, page;
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
 	phalcon_update_property_this(getThis(), SL("_config"), config);
-	if (phalcon_array_isset_str_fetch(&limit, config, SL("limit"))) {
-		phalcon_update_property_this(getThis(), SL("_limitRows"), limit);
+
+	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
+		phalcon_update_property_this(getThis(), SL("_limitRows"), &limit);
 	}
 
-	if (phalcon_array_isset_str_fetch(&page, config, SL("page"))) {
-		phalcon_update_property_this(getThis(), SL("_page"), page);
+	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
+		phalcon_update_property_this(getThis(), SL("_page"), &page);
 	}
 }
 

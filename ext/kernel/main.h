@@ -22,6 +22,7 @@
 
 #include "php_phalcon.h"
 
+#include <Zend/zend_types.h>
 #include <Zend/zend_exceptions.h>
 #include <Zend/zend_interfaces.h>
 

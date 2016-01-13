@@ -417,31 +417,27 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createView){
 
-	zval *view_name, *definition, *schema_name, *view_sql;
-	zval *view = NULL, *sql;
+	zval *view_name, *definition, *schema_name, view_sql;
+	zval view, sql;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 3, 0, &view_name, &definition, &schema_name);
 	
-	if (!phalcon_array_isset_str(definition, SL("sql"))) {
+	if (!phalcon_array_isset_fetch_str(&view_sql, definition, SL("sql"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
 		return;
 	}
-	
-	PHALCON_OBS_VAR(view_sql);
-	phalcon_array_fetch_str(&view_sql, definition, SL("sql"), PH_NOISY);
+
 	if (zend_is_true(schema_name)) {
-		PHALCON_INIT_VAR(view);
-		PHALCON_CONCAT_VSV(view, view_name, ".", schema_name);
+		PHALCON_CONCAT_VSV(&view, view_name, ".", schema_name);
 	} else {
-		PHALCON_CPY_WRT(view, view_name);
+		ZVAL_COPY_VALUE(&view, view_name);
 	}
+
+	PHALCON_CONCAT_SVSV(&sql, "CREATE VIEW ", &view, " AS ", &view_sql);
 	
-	PHALCON_INIT_VAR(sql);
-	PHALCON_CONCAT_SVSV(sql, "CREATE VIEW ", view, " AS ", view_sql);
-	
-	RETURN_CTOR(sql);
+	RETURN_CTOR(&sql);
 }
 
 /**

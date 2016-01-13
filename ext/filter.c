@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 	
-	if (PHALCON_IS_STRING(filter, "int!")) {
+	if (PHALCON_IS_STRING(filter, "int!") || (PHALCON_IS_STRING(filter, "int?") && phalcon_is_numeric(value))) {
 		PHALCON_INIT_NVAR(filtered);
 		ZVAL_ZVAL(filtered, value, 1, 0);
 		convert_to_long_base(filtered, 10);
@@ -370,7 +370,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 	
-	if (PHALCON_IS_STRING(filter, "float!")) {
+	if (PHALCON_IS_STRING(filter, "float!") || (PHALCON_IS_STRING(filter, "float?") && phalcon_is_numeric(value))) {
 		PHALCON_INIT_NVAR(filtered);
 		ZVAL_ZVAL(filtered, value, 1, 0);
 		convert_to_double(filtered);

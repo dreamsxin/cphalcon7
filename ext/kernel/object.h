@@ -80,7 +80,6 @@ static inline int phalcon_isset_property_zval(zval *object, const zval *property
 
 /** Reading properties */
 zval* phalcon_read_property(zval *object, const char *property_name, size_t property_length, int silent);
-
 /**
  * Reads a property from an object
  */
@@ -202,6 +201,9 @@ static inline int phalcon_check_property_access_zval(zval *object, const zval *p
 
 	return 0;
 }
+
+int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length);
+int phalcon_property_array_isset_fetch(zval *fetched, *object, const char *property_name, size_t property_length, const zval *index);
 
 #define PHALCON_PROPERTY_IS_PUBLIC(object, property) \
 	 phalcon_check_property_access(object, property, strlen(property), ZEND_ACC_PUBLIC)

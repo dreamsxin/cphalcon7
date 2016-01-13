@@ -1222,3 +1222,40 @@ int phalcon_check_property_access(zval *object, const char *property_name, uint3
 
 	return 0;
 }
+
+int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length)
+{
+	zval *value;
+
+	if (!phalcon_isset_property(object, property_name, property_length)) {
+		return 0;
+	}
+
+	ce = Z_OBJCE_P(object);
+	if (ce->parent) {
+		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
+	}
+
+	value = zend_read_property(ce, object, property_name, property_length, silent, NULL);
+	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
+		value = Z_REFVAL_P(value);
+	}
+
+	ZVAL_COPY(fetched, value);
+	return 1;
+}
+
+int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *property, size_t property_length, const zval *index)
+{
+	zval property_value;
+
+	if (!phalcon_property_isset_fetch(&property_value, object, property, property_length)) {
+		return 0;
+	}
+
+	if (!phalcon_array_isset_fetch(fetched, &property_value, index)) {
+		return 0;
+	}
+
+	return 1;
+}

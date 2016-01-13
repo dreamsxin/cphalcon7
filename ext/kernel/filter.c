@@ -392,7 +392,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 	ZVAL_STRING(&regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
 
-	phalcon_return_property(&tmp, &elements, SL("length"), PH_NOISY);
+	phalcon_return_property(&tmp, &elements, SL("length"));
 
 	element_length = Z_LVAL_P(&tmp);
 

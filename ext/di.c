@@ -375,7 +375,7 @@ PHP_METHOD(Phalcon_DI, getService){
  */
 PHP_METHOD(Phalcon_DI, get){
 
-	zval *name, *parameters = NULL, *events_manager, event_name, *event_data = NULL, *service;
+	zval *name, *parameters = NULL, *events_manager, event_name, event_data, service;
 	zend_class_entry *ce;
 
 	PHALCON_MM_GROW();
@@ -391,18 +391,16 @@ PHP_METHOD(Phalcon_DI, get){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "di:beforeServiceResolve");
 
-		PHALCON_INIT_NVAR(event_data);
-		array_init(event_data);
+		array_init(&event_data);
 
-		phalcon_array_update_str(event_data, SL("name"), name, PH_COPY);
-		phalcon_array_update_str(event_data, SL("parameters"), parameters, PH_COPY);
+		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
+		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), event_data);
+		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), &event_data);
 	}
 
-	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
-		service = phalcon_read_property_array(getThis(), SL("_services"), name);
-		PHALCON_CALL_METHOD(&return_value, service, "resolve", parameters, getThis());
+	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name)) {
+		PHALCON_CALL_METHOD(&return_value, &service, "resolve", parameters, getThis());
 		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
 	} else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
@@ -424,14 +422,13 @@ PHP_METHOD(Phalcon_DI, get){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "di:afterServiceResolve");
 
-		PHALCON_INIT_NVAR(event_data);
-		array_init(event_data);
+		array_init(&event_data);
 
-		phalcon_array_update_str(event_data, SL("name"), name, PH_COPY);
-		phalcon_array_update_str(event_data, SL("parameters"), parameters, PH_COPY);
-		phalcon_array_update_str(event_data, SL("instance"), return_value, PH_COPY);
+		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
+		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
+		phalcon_array_update_str(&event_data, SL("instance"), return_value, PH_COPY);
 
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), event_data);
+		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), &event_data);
 	}
 
 	RETURN_MM();

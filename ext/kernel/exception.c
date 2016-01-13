@@ -38,33 +38,32 @@ void phalcon_throw_exception(zval *object){
 /**
  * Throws a zval object as exception
  */
-void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line){
-
+void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line)
+{
+	zval *curline = NULL, exception;
 	zend_class_entry *default_exception_ce;
-	zval *curline = NULL, *exception = NULL;
 
 	PHALCON_MM_GROW();
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
-		PHALCON_ALLOC_INIT_ZVAL(exception);
-		object_init_ex(exception, zend_exception_get_default());
-		PHALCON_CALL_METHOD(NULL, exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
+		object_init_ex(&exception, zend_exception_get_default());
+		PHALCON_CALL_METHOD(NULL, &exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
 	} else {
-		exception = object;
+		ZVAL_COPY(&exception, object);
 	}
 
-	Z_TRY_ADDREF_P(exception);
+	Z_TRY_ADDREF(exception);
 
 	if (line > 0) {
-		PHALCON_CALL_METHOD(&curline, exception, "getline");
+		PHALCON_CALL_METHOD(&curline, &exception, "getline");
 		if (PHALCON_IS_LONG(curline, 0)) {
 			default_exception_ce = zend_exception_get_default();
-			zend_update_property_string(default_exception_ce, exception, "file", sizeof("file")-1, file);
-			zend_update_property_long(default_exception_ce, exception, "line", sizeof("line")-1, line);
+			zend_update_property_string(default_exception_ce, &exception, "file", sizeof("file")-1, file);
+			zend_update_property_long(default_exception_ce, &exception, "line", sizeof("line")-1, line);
 		}
 	}
 
-	zend_throw_exception_object(exception);
+	zend_throw_exception_object(&exception);
 	PHALCON_MM_RESTORE();
 }
 

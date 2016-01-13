@@ -224,10 +224,11 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 
 	ZVAL_STRING(&service, ISV(router));
+
 	PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_CLASS(&router, phalcon_cli_router_ce);
 
-	PHALCON_CALL_METHOD(NULL, router, "handle", arguments);
+	PHALCON_CALL_METHOD(NULL, &router, "handle", arguments);
 
 	PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
 	if (zend_is_true(&module_name)) {
@@ -242,7 +243,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 
 		modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 		if (!phalcon_array_isset_fetch(&module, modules, &module_name)) {
-			PHALCON_CONCAT_SVS(&exception_msg, "Module '", module_name, "' isn't registered in the console container");
+			PHALCON_CONCAT_SVS(&exception_msg, "Module '", &module_name, "' isn't registered in the console container");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cli_console_exception_ce, &exception_msg);
 			return;
 		}

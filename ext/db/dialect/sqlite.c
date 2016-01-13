@@ -120,8 +120,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Sqlite){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
 
-	zval *column, *size = NULL, *column_type = NULL, *column_sql = NULL;
-	zval *scale = NULL;
+	zval *column, size, column_type, column_sql, scale;
 
 	PHALCON_MM_GROW();
 
@@ -135,48 +134,39 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
 	PHALCON_CALL_METHOD(&size, column, "getsize");
 	PHALCON_CALL_METHOD(&column_type, column, "gettype");
 	
-	switch (phalcon_get_intval(column_type)) {
+	switch (phalcon_get_intval(&column_type)) {
 	
 		case 0:
-			PHALCON_INIT_VAR(column_sql);
-			ZVAL_STRING(column_sql, "INT");
+			ZVAL_STRING(&column_sql, "INT");
 			break;
 	
 		case 1:
-			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "DATE");
+			ZVAL_STRING(&column_sql, "DATE");
 			break;
 	
 		case 2:
-			PHALCON_INIT_NVAR(column_sql);
-			PHALCON_CONCAT_SVS(column_sql, "VARCHAR(", size, ")");
+			PHALCON_CONCAT_SVS(&column_sql, "VARCHAR(", &size, ")");
 			break;
 	
 		case 3:
 			PHALCON_CALL_METHOD(&scale, column, "getscale");
-	
-			PHALCON_INIT_NVAR(column_sql);
-			PHALCON_CONCAT_SVSVS(column_sql, "NUMERIC(", size, ",", scale, ")");
+			PHALCON_CONCAT_SVSVS(&column_sql, "NUMERIC(", &size, ",", &scale, ")");
 			break;
 	
 		case 4:
-			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "TIMESTAMP");
+			ZVAL_STRING(&column_sql, "TIMESTAMP");
 			break;
 	
 		case 5:
-			PHALCON_INIT_NVAR(column_sql);
-			PHALCON_CONCAT_SVS(column_sql, "CHARACTER(", size, ")");
+			PHALCON_CONCAT_SVS(&column_sql, "CHARACTER(", size, ")");
 			break;
 	
 		case 6:
-			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "TEXT");
+			ZVAL_STRING(&column_sql, "TEXT");
 			break;
 	
 		case 7:
-			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "FLOAT");
+			ZVAL_STRING(&column_sql, "FLOAT");
 			break;
 	
 		default:
@@ -185,7 +175,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
 	
 	}
 	
-	RETURN_CTOR(column_sql);
+	RETURN_CTOR(&column_sql);
 }
 
 /**

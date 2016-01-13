@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, get){
 PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL;
-	zval *prefix, last_key, *frontend, *memcache, *cached_content = NULL;
+	zval prefix, last_key, *frontend, *memcache, *cached_content = NULL;
 	zval *prepared_content = NULL, *ttl = NULL, *success = NULL;
 	zval *options, special_key, *keys = NULL, *is_buffering = NULL;
 
@@ -289,11 +289,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 	phalcon_fetch_params(1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"), PH_NOISY);
+		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
 	} else {
-		prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
-		PHALCON_CONCAT_VV(last_key, prefix, key_name);
+		PHALCON_CONCAT_VV(&last_key, &prefix, key_name);
 	}
 
 	if (!zend_is_true(&last_key)) {

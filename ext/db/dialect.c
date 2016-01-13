@@ -747,7 +747,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		 phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"), PH_NOISY);
+		 phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
 	}
 
 	if (Z_TYPE_P(&columns) == IS_ARRAY) { 
@@ -1116,7 +1116,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"), PH_NOISY);
+		phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
 	}
 
 	/**
@@ -1254,7 +1254,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"), PH_NOISY);
+		phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
 	}
 
 	/**

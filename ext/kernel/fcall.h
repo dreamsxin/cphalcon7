@@ -58,13 +58,6 @@ typedef enum _phalcon_call_type {
 		RETURN_ON_FAILURE(phalcon_call_func_aparams(return_value_ptr, func_name, PHALCON_FUNC_STRLEN(func_name), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
-#define PHALCON_CALL_FUNCTION(return_value_ptr, func_name, ...) \
-	do { \
-		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
-		PHALCON_OBSERVE_OR_NULLIFY_PPZV(return_value_ptr); \
-		RETURN_MM_ON_FAILURE(phalcon_call_func_aparams(return_value_ptr, func_name, PHALCON_FUNC_STRLEN(func_name), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
-	} while (0)
-
 #define PHALCON_CALL_ZVAL_FUNCTIONW(return_value_ptr, func_name, ...) \
 	do { \
 		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
@@ -349,6 +342,8 @@ static inline int phalcon_return_call_ce(zval **retval_ptr, zend_class_entry *ce
 		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
 		RETURN_MM_ON_FAILURE(phalcon_call_method_with_params(retval, obj, obj_ce, call_type, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
+
+#define PHALCON_CALL_FUNCTION(retval, method, ...) PHALCON_CALL_METHOD_WITH_PARAMS(retval, NULL, NULL, phalcon_fcall_function, method, __VA_ARGS__)
 
 #define PHALCON_CALL_METHOD(retval, object, method, ...) PHALCON_CALL_METHOD_WITH_PARAMS(retval, object, Z_OBJCE_P(object), phalcon_fcall_method, method, __VA_ARGS__)
 

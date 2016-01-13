@@ -40,7 +40,7 @@ void phalcon_throw_exception(zval *object){
  */
 void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line)
 {
-	zval *curline = NULL, exception;
+	zval curline, exception;
 	zend_class_entry *default_exception_ce;
 
 	PHALCON_MM_GROW();
@@ -52,11 +52,9 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 		ZVAL_COPY(&exception, object);
 	}
 
-	Z_TRY_ADDREF(exception);
-
 	if (line > 0) {
 		PHALCON_CALL_METHOD(&curline, &exception, "getline");
-		if (PHALCON_IS_LONG(curline, 0)) {
+		if (PHALCON_IS_LONG(&curline, 0)) {
 			default_exception_ce = zend_exception_get_default();
 			zend_update_property_string(default_exception_ce, &exception, "file", sizeof("file")-1, file);
 			zend_update_property_long(default_exception_ce, &exception, "line", sizeof("line")-1, line);

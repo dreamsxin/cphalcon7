@@ -381,6 +381,9 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		status = FAILURE;
 		if (!EG(exception)) {
 			switch (type) {
+				case phalcon_fcall_function:
+					zend_error(E_ERROR, "Call to undefined function %s()", method_name);
+					break;
 				case phalcon_fcall_parent:
 					zend_error(E_ERROR, "Call to undefined function parent::%s()", method_name);
 					break;

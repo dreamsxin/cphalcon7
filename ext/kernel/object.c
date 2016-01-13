@@ -1226,6 +1226,7 @@ int phalcon_check_property_access(zval *object, const char *property_name, uint3
 int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length)
 {
 	zval *value;
+	zend_class_entry *ce;
 
 	if (!phalcon_isset_property(object, property_name, property_length)) {
 		return 0;
@@ -1236,7 +1237,7 @@ int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *proper
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
-	value = zend_read_property(ce, object, property_name, property_length, silent, NULL);
+	value = zend_read_property(ce, object, property_name, property_length, 1, NULL);
 	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
 		value = Z_REFVAL_P(value);
 	}

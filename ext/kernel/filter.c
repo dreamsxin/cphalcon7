@@ -359,7 +359,7 @@ void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style,
 void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes){
 
 	zval document, ret, tmp, elements;
-	zval matched, regexp, joined_tags, *clean_str = NULL;
+	zval matched, regexp, joined_tags, clean_str;
 	zend_class_entry *ce0;
 	int i, element_length;
 
@@ -404,14 +404,14 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 	
 		PHALCON_CALL_METHOD(&element, &elements, "item", &t);
 
-		phalcon_return_property(&element_name, &element, SL("nodeName"), PH_NOISY);
+		phalcon_return_property(&element_name, &element, SL("nodeName"));
 
 		if (Z_TYPE_P(allow_tags) == IS_ARRAY && !phalcon_fast_in_array(&element_name, allow_tags)) {
 			continue;
 		}
 
-		phalcon_return_property(&element_attrs, &element, SL("attributes"), PH_NOISY);
-		phalcon_return_property(&tmp, &element_attrs, SL("length"), PH_NOISY);
+		phalcon_return_property(&element_attrs, &element, SL("attributes"));
+		phalcon_return_property(&tmp, &element_attrs, SL("length"));
 
 		element_attrs_length = Z_LVAL_P(&tmp);
 
@@ -421,11 +421,11 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 			PHALCON_CALL_METHOD(&element_attr, &element_attrs, "item", &t2);
 
-			phalcon_return_property(&element_attr_name, element_attr, SL("nodeName"));
+			phalcon_return_property(&element_attr_name, &element_attr, SL("nodeName"));
 			if (Z_TYPE_P(allow_attributes) == IS_ARRAY && !phalcon_fast_in_array(&element_attr_name, allow_attributes)) {
-				PHALCON_CALL_METHOD(NULL, &element, "removeattributenode", element_attr);
+				PHALCON_CALL_METHOD(NULL, &element, "removeattributenode", &element_attr);
 			} else if (phalcon_memnstr_str(&element_attr_name, SL("style"))) {
-				phalcon_return_property(&element_attr_value, element_attr, SL("nodeValue"));
+				phalcon_return_property(&element_attr_value, &element_attr, SL("nodeValue"));
 
 				RETURN_MM_ON_FAILURE(phalcon_preg_match(&matched, &regexp, &element_attr_value, NULL));
 
@@ -442,9 +442,9 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 	PHALCON_CALL_METHOD(&ret, &document, "savehtml");
 
-	PHALCON_CALL_FUNCTION(&clean_str, "strip_tags", ret, &joined_tags);
+	PHALCON_CALL_FUNCTION(&clean_str, "strip_tags", &ret, &joined_tags);
 
-	ZVAL_STR(return_value, phalcon_trim(clean_str, NULL, PHALCON_TRIM_BOTH));
+	ZVAL_STR(return_value, phalcon_trim(&clean_str, NULL, PHALCON_TRIM_BOTH));
 
 	PHALCON_MM_RESTORE();
 }

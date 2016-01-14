@@ -622,7 +622,7 @@ zval* phalcon_read_property(zval *object, const char *property_name, size_t prop
 
 	if (!phalcon_isset_property(object, property_name, property_length)) {
 		if (silent == PH_NOISY) {
-			php_error_docref(NULL, E_NOTICE, "Undefined property");
+			php_error_docref(NULL, E_NOTICE, "Undefined property: %s of class %s", property_name, ZSTR_VAL(Z_OBJCE_P(object)->name));
 		}
 		return &EG(uninitialized_zval);
 	}
@@ -632,7 +632,7 @@ zval* phalcon_read_property(zval *object, const char *property_name, size_t prop
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
-	value = zend_read_property(ce, object, property_name, property_length, silent, NULL);
+	value = zend_read_property(ce, object, property_name, property_length, 1, NULL);
 	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
 		value = Z_REFVAL_P(value);
 	}

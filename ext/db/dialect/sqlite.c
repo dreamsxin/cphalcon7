@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
 			break;
 	
 		case 5:
-			PHALCON_CONCAT_SVS(&column_sql, "CHARACTER(", size, ")");
+			PHALCON_CONCAT_SVS(&column_sql, "CHARACTER(", &size, ")");
 			break;
 	
 		case 6:
@@ -188,8 +188,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 
-	zval *table_name, *schema_name, *column, *sql = NULL, *name = NULL;
-	zval *column_definition = NULL, *is_not_null = NULL, *is_autoincrement = NULL;
+	zval *table_name, *schema_name, *column, sql, name;
+	zval column_definition, is_not_null, is_autoincrement;
 
 	PHALCON_MM_GROW();
 
@@ -197,32 +197,31 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 
 	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 1);
 
-	PHALCON_INIT_VAR(sql);
 	if (zend_is_true(schema_name)) {
-		PHALCON_CONCAT_SVSVS(sql, "ALTER TABLE \"", schema_name, "\".\"", table_name, "\" ADD COLUMN ");
+		PHALCON_CONCAT_SVSVS(&sql, "ALTER TABLE \"", schema_name, "\".\"", table_name, "\" ADD COLUMN ");
 	}
 	else {
-		PHALCON_CONCAT_SVS(sql, "ALTER TABLE \"", table_name, "\" ADD COLUMN ");
+		PHALCON_CONCAT_SVS(&sql, "ALTER TABLE \"", table_name, "\" ADD COLUMN ");
 	}
 
 	PHALCON_CALL_METHOD(&name, column, "getname");
 	PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
-	PHALCON_SCONCAT_SVSV(sql, "\"", name, "\" ", column_definition);
+	PHALCON_SCONCAT_SVSV(&sql, "\"", &name, "\" ", &column_definition);
 
 	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
-	if (zend_is_true(is_not_null)) {
-		phalcon_concat_self_str(sql, SL(" NOT NULL"));
+	if (zend_is_true(&is_not_null)) {
+		phalcon_concat_self_str(&sql, SL(" NOT NULL"));
 	}
 
 	PHALCON_CALL_METHOD(&is_autoincrement, column, "isautoincrement");
 	/*
 	 * See http://www.sqlite.org/syntaxdiagrams.html#column-constraint
 	 */
-	if (zend_is_true(is_autoincrement)) {
-		phalcon_concat_self_str(sql, SL(" PRIMARY KEY AUTOINCREMENT"));
+	if (zend_is_true(&is_autoincrement)) {
+		phalcon_concat_self_str(&sql, SL(" PRIMARY KEY AUTOINCREMENT"));
 	}
 
-	RETURN_CTOR(sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -261,9 +260,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropColumn){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addIndex){
 
-	zval *table_name, *schema_name, *index, *sql = NULL, *columns = NULL;
-	zval *quoted_column_list = NULL, *name = NULL;
-	zval *index_type = NULL;
+	zval *table_name, *schema_name, *index, name, index_type, sql, columns, quoted_column_list;
 
 	PHALCON_MM_GROW();
 
@@ -274,24 +271,23 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addIndex){
 	PHALCON_CALL_METHOD(&name, index, "getname");
 	PHALCON_CALL_METHOD(&index_type, index, "gettype");
 
-	PHALCON_INIT_VAR(sql);
 	if (zend_is_true(schema_name)) {
-		if (index_type && Z_TYPE_P(index_type) == IS_STRING && Z_STRLEN_P(index_type) > 0) {
-			PHALCON_CONCAT_SVSVSVSVS(sql, "CREATE ", index_type, " INDEX \"", schema_name, "\".\"", name, "\" ON \"", table_name, "\" (");
+		if (Z_TYPE(&index_type) == IS_STRING && Z_STRLEN(index_type) > 0) {
+			PHALCON_CONCAT_SVSVSVSVS(&sql, "CREATE ", &index_type, " INDEX \"", schema_name, "\".\"", &name, "\" ON \"", table_name, "\" (");
 		} else {
-			PHALCON_CONCAT_SVSVSVS(sql, "CREATE INDEX \"", schema_name, "\".\"", name, "\" ON \"", table_name, "\" (");
+			PHALCON_CONCAT_SVSVSVS(&sql, "CREATE INDEX \"", schema_name, "\".\"", &name, "\" ON \"", table_name, "\" (");
 		}
-	} else if (index_type && Z_TYPE_P(index_type) == IS_STRING && Z_STRLEN_P(index_type) > 0) {
-		PHALCON_CONCAT_SVSVSVS(sql, "CREATE ", index_type, " INDEX \"", name, "\" ON \"", table_name, "\" (");
+	} else if (Z_TYPE(index_type) == IS_STRING && Z_STRLEN(index_type) > 0) {
+		PHALCON_CONCAT_SVSVSVS(&sql, "CREATE ", &index_type, " INDEX \"", &name, "\" ON \"", table_name, "\" (");
 	} else {
-		PHALCON_CONCAT_SVSVS(sql, "CREATE INDEX \"", name, "\" ON \"", table_name, "\" (");
+		PHALCON_CONCAT_SVSVS(&sql, "CREATE INDEX \"", &name, "\" ON \"", table_name, "\" (");
 	}
 
 	PHALCON_CALL_METHOD(&columns, index, "getcolumns");
-	PHALCON_CALL_METHOD(&quoted_column_list, getThis(), "getcolumnlist", columns);
+	PHALCON_CALL_METHOD(&quoted_column_list, getThis(), "getcolumnlist", &columns);
 
-	PHALCON_SCONCAT_VS(sql, quoted_column_list, ")");
-	RETURN_CTOR(sql);
+	PHALCON_SCONCAT_VS(&sql, &quoted_column_list, ")");
+	RETURN_CTOR(&sql);
 }
 
 /**

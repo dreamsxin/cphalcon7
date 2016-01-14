@@ -400,7 +400,7 @@ PHP_METHOD(Phalcon_DI, get){
 	}
 
 	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name)) {
-		PHALCON_CALL_METHOD(&return_value, &service, "resolve", parameters, getThis());
+		PHALCON_CALL_METHOD(return_value, &service, "resolve", parameters, getThis());
 		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
 	} else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
@@ -634,16 +634,15 @@ PHP_METHOD(Phalcon_DI, setDefault){
  */
 PHP_METHOD(Phalcon_DI, getDefault){
 
-	zval *default_di, *dependency_injector;
+	zval *default_di, dependency_injector;
 
 	PHALCON_MM_GROW();
 
 	default_di = phalcon_read_static_property_ce(phalcon_di_ce, SL("_default"));
 	if (Z_TYPE_P(default_di) != IS_OBJECT) {
-		PHALCON_INIT_VAR(dependency_injector);
-		object_init_ex(dependency_injector, phalcon_di_factorydefault_ce);
-		PHALCON_CALL_METHOD(NULL, dependency_injector, "__construct");
-		RETURN_CTOR(dependency_injector);
+		object_init_ex(&dependency_injector, phalcon_di_factorydefault_ce);
+		PHALCON_CALL_METHOD(NULL, &dependency_injector, "__construct");
+		RETURN_CTOR(&dependency_injector);
 	}
 
 	RETURN_CTOR(default_di);

@@ -128,8 +128,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Oracle){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, getColumnDefinition){
 
-	zval *column, *size = NULL, *column_type = NULL, *column_sql = NULL;
-	zval *scale = NULL;
+	zval *column, size, column_type, column_sql, scale;
 
 	PHALCON_MM_GROW();
 
@@ -143,55 +142,46 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getColumnDefinition){
 	PHALCON_CALL_METHOD(&size, column, "getsize");
 	PHALCON_CALL_METHOD(&column_type, column, "gettype");
 	
-	switch (phalcon_get_intval(column_type)) {
+	switch (phalcon_get_intval(&column_type)) {
 	
 		case 0:
-			PHALCON_INIT_VAR(column_sql);
-			ZVAL_STRING(column_sql, "INTEGER");
+			ZVAL_STRING(&column_sql, "INTEGER");
 			break;
 	
 		case 1:
-			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "DATE");
+			ZVAL_STRING(&column_sql, "DATE");
 			break;
 	
 		case 2:
-			PHALCON_INIT_NVAR(column_sql);
-			PHALCON_CONCAT_SVS(column_sql, "VARCHAR2(", size, ")");
+			PHALCON_CONCAT_SVS(&column_sql, "VARCHAR2(", &size, ")");
 			break;
 	
 		case 3:
 			PHALCON_CALL_METHOD(&scale, column, "getscale");
-	
-			PHALCON_INIT_NVAR(column_sql);
-			PHALCON_CONCAT_SVSVS(column_sql, "NUMBER(", size, ",", scale, ")");
+
+			PHALCON_CONCAT_SVSVS(&column_sql, "NUMBER(", &size, ",", &scale, ")");
 			break;
 	
 		case 4:
-			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "TIMESTAMP");
+			ZVAL_STRING(&column_sql, "TIMESTAMP");
 			break;
 	
 		case 5:
-			PHALCON_INIT_NVAR(column_sql);
-			PHALCON_CONCAT_SVS(column_sql, "CHAR(", size, ")");
+			PHALCON_CONCAT_SVS(&column_sql, "CHAR(", &size, ")");
 			break;
 	
 		case 6:
-			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "TEXT");
+			ZVAL_STRING(&column_sql, "TEXT");
 			break;
 	
 		case 7:
 			PHALCON_CALL_METHOD(&scale, column, "getscale");
-	
-			PHALCON_INIT_NVAR(column_sql);
-			PHALCON_CONCAT_SVSVS(column_sql, "FLOAT(", size, ",", scale, ")");
+
+			PHALCON_CONCAT_SVSVS(&column_sql, "FLOAT(", &size, ",", &scale, ")");
 			break;
 	
 		case 8:
-			PHALCON_INIT_NVAR(column_sql);
-			ZVAL_STRING(column_sql, "TINYINT(1)");
+			ZVAL_STRING(&column_sql, "TINYINT(1)");
 			break;
 	
 		default:
@@ -199,8 +189,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getColumnDefinition){
 			return;
 	
 	}
-	
-	RETURN_CTOR(column_sql);
+
+	RETURN_CTOR(&column_sql);
 }
 
 /**
@@ -792,8 +782,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 
 	zval *definition, escape_char, tables, columns, selected_columns;
 	zval *column = NULL, columns_sql, selected_tables;
-	zval *table = NULL, tables_sql, distinct, sql, *joins, *join;
-	zval where_conditions, *where_expression = NULL, group_fields, group_items;
+	zval *table = NULL, tables_sql, distinct, sql, joins, *join;
+	zval where_conditions, where_expression, group_fields, group_items;
 	zval *group_field, group_sql;
 	zval group_clause, having_conditions, *having_expression = NULL;
 	zval order_fields, order_items, *order_item = NULL;
@@ -922,9 +912,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	/**
 	 * Check for joins
 	 */
-	if (phalcon_array_isset_str(definition, SL("joins"))) {
-		phalcon_array_fetch_str(&joins, definition, SL("joins"), PH_NOISY);
-
+	if (phalcon_array_isset_fetch_str(&joins, definition, SL("joins"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&joins), join) {
 			zval type, source, *sql_table = NULL, sql_join, join_conditions_array, join_expressions, join_conditions, *join_condition;
 
@@ -944,9 +932,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 					array_init(&join_expressions);
 
 					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&join_conditions_array), join_condition) {
-						zval *join_expression = NULL;
+						zval join_expression;
 						PHALCON_CALL_METHOD(&join_expression, getThis(), "getsqlexpression", join_condition, &escape_char);
-						phalcon_array_append(&join_expressions, join_expression, PH_COPY);
+						phalcon_array_append(&join_expressions, &join_expression, PH_COPY);
 					} ZEND_HASH_FOREACH_END();
 
 					phalcon_fast_join_str(&join_conditions, SL(" AND "), join_expressions);
@@ -964,7 +952,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
 		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) {
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
-			PHALCON_SCONCAT_SV(sql, " WHERE ", where_expression);
+			PHALCON_SCONCAT_SV(sql, " WHERE ", &where_expression);
 		} else {
 			PHALCON_SCONCAT_SV(sql, " WHERE ", &where_conditions);
 		}

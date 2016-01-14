@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	zval service, router, module_name;
 	zval status, *modules, exception_msg, module;
 	zval path, class_name, module_object;
-	zval *namespace_name = NULL, *task_name = NULL, *action_name = NULL, *params = NULL, *dispatcher = NULL;
+	zval namespace_name, task_name, action_name, params, dispatcher;
 
 	PHALCON_MM_GROW();
 
@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			ZVAL_STRING(&class_name, "Module");
 		}
 
-		PHALCON_CALL_METHOD(&module_object, dependency_injector, "get", class_name);
+		PHALCON_CALL_METHOD(&module_object, dependency_injector, "get", &class_name);
 		PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders");
 		PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", dependency_injector);
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
@@ -277,17 +277,17 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 
 			ZVAL_STRING(&event_name, "console:afterStartModule");
 
-			PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), &module_name);
+			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
 			if (PHALCON_IS_FALSE(&status)) {
 				RETURN_MM_FALSE;
 			}
 		}
 	}
 
-	PHALCON_CALL_METHOD(&namespace_name, router, "getnamespacename");
-	PHALCON_CALL_METHOD(&task_name, router, "gettaskname");
-	PHALCON_CALL_METHOD(&action_name, router, "getactionname");
-	PHALCON_CALL_METHOD(&params, router, "getparams");
+	PHALCON_CALL_METHOD(&namespace_name, &router, "getnamespacename");
+	PHALCON_CALL_METHOD(&task_name, &router, "gettaskname");
+	PHALCON_CALL_METHOD(&action_name, &router, "getactionname");
+	PHALCON_CALL_METHOD(&params, &router, "getparams");
 
 	ZVAL_STRING(&service, ISV(dispatcher));
 
@@ -314,5 +314,5 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &status);
 	}
 
-	RETURN_CTOR(status);
+	RETURN_CTOR(&status);
 }

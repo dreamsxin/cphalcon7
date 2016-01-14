@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskName){
 PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 
 	zval *message, *exception_code = NULL, exception, *events_manager;
-	zval event_name, *status = NULL;
+	zval event_name, status;
 
 	PHALCON_MM_GROW();
 
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), &exception);
-		if (PHALCON_IS_FALSE(status)) {
+		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_MM_FALSE;
 		}
 	}
@@ -208,8 +208,8 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
  */
 PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 
-	zval *exception, *events_manager, *event_name;
-	zval *status = NULL;
+	zval *exception, *events_manager, event_name;
+	zval status;
 
 	PHALCON_MM_GROW();
 
@@ -217,12 +217,10 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
-		PHALCON_INIT_VAR(event_name);
-		ZVAL_STRING(event_name, "dispatch:beforeException");
-
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", event_name, getThis(), exception);
-		if (PHALCON_IS_FALSE(status)) {
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), exception);
+		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_MM_FALSE;
 		}
 	}
@@ -262,4 +260,3 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, getActiveTask){
 
 	RETURN_MEMBER(getThis(), "_activeHandler");
 }
-

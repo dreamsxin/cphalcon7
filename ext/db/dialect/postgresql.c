@@ -111,8 +111,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Postgresql){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 
-	zval *column, *size = NULL, *column_type = NULL, *column_sql = NULL;
-	zval *scale = NULL;
+	zval *column, size, column_type, column_sql, scale;
 
 	PHALCON_MM_GROW();
 
@@ -126,44 +125,43 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 	PHALCON_CALL_METHOD(&size, column, "getsize");
 	PHALCON_CALL_METHOD(&column_type, column, "gettype");
 
-	PHALCON_INIT_VAR(column_sql);
-	switch (phalcon_get_intval(column_type)) {
+	switch (phalcon_get_intval(&column_type)) {
 	
 		case 0:
-			ZVAL_STRING(column_sql, "INT");
+			ZVAL_STRING(&column_sql, "INT");
 			break;
 	
 		case 1:
-			ZVAL_STRING(column_sql, "DATE");
+			ZVAL_STRING(&column_sql, "DATE");
 			break;
 	
 		case 2:
-			PHALCON_CONCAT_SVS(column_sql, "CHARACTER VARYING(", size, ")");
+			PHALCON_CONCAT_SVS(&column_sql, "CHARACTER VARYING(", &size, ")");
 			break;
 	
 		case 3:
 			PHALCON_CALL_METHOD(&scale, column, "getscale");
-			PHALCON_CONCAT_SVSVS(column_sql, "NUMERIC(", size, ",", scale, ")");
+			PHALCON_CONCAT_SVSVS(&column_sql, "NUMERIC(", &size, ",", &scale, ")");
 			break;
 	
 		case 4:
-			ZVAL_STRING(column_sql, "TIMESTAMP");
+			ZVAL_STRING(&column_sql, "TIMESTAMP");
 			break;
 	
 		case 5:
-			PHALCON_CONCAT_SVS(column_sql, "CHARACTER(", size, ")");
+			PHALCON_CONCAT_SVS(&column_sql, "CHARACTER(", &size, ")");
 			break;
 	
 		case 6:
-			ZVAL_STRING(column_sql, "TEXT");
+			ZVAL_STRING(&column_sql, "TEXT");
 			break;
 	
 		case 7:
-			ZVAL_STRING(column_sql, "FLOAT");
+			ZVAL_STRING(&column_sql, "FLOAT");
 			break;
 	
 		case 8:
-			ZVAL_STRING(column_sql, "SMALLINT(1)");
+			ZVAL_STRING(&column_sql, "SMALLINT(1)");
 			break;
 	
 		default:
@@ -172,7 +170,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 	
 	}
 	
-	RETURN_CTOR(column_sql);
+	RETURN_CTOR(&column_sql);
 }
 
 /**
@@ -450,8 +448,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createView){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 
-	zval *view_name, *schema_name, *if_exists = NULL, *view = NULL;
-	zval *sql = NULL;
+	zval *view_name, *schema_name, *if_exists = NULL, view, sql;
 
 	PHALCON_MM_GROW();
 
@@ -462,20 +459,17 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 	}
 	
 	if (zend_is_true(schema_name)) {
-		PHALCON_INIT_VAR(view);
-		PHALCON_CONCAT_VSV(view, view_name, ".", schema_name);
+		PHALCON_CONCAT_VSV(&view, view_name, ".", schema_name);
 	} else {
-		PHALCON_CPY_WRT(view, view_name);
+		ZVAL_COPY_VALUE(&view, view_name);
 	}
 	if (zend_is_true(if_exists)) {
-		PHALCON_INIT_VAR(sql);
-		PHALCON_CONCAT_SV(sql, "DROP VIEW IF EXISTS ", view);
+		PHALCON_CONCAT_SV(&sql, "DROP VIEW IF EXISTS ", &view);
 	} else {
-		PHALCON_INIT_NVAR(sql);
-		PHALCON_CONCAT_SV(sql, "DROP VIEW ", view);
+		PHALCON_CONCAT_SV(&sql, "DROP VIEW ", &view);
 	}
 	
-	RETURN_CTOR(sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -490,25 +484,17 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, tableExists){
 
-	zval *table_name, *schema_name = NULL, *sql = NULL;
+	zval *table_name, *schema_name = NULL, sql;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 1, &table_name, &schema_name);
 
-	phalcon_fetch_params(1, 1, 1, &table_name, &schema_name);
-	
-	if (!schema_name) {
-		PHALCON_INIT_VAR(schema_name);
-	}
-	
-	if (zend_is_true(schema_name)) {
-		PHALCON_INIT_VAR(sql);
-		PHALCON_CONCAT_SVSVS(sql, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM information_schema.tables WHERE table_schema = '", schema_name, "' AND table_name='", table_name, "'");
+	if (schema_name && zend_is_true(schema_name)) {
+		PHALCON_CONCAT_SVSVS(&sql, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM information_schema.tables WHERE table_schema = '", schema_name, "' AND table_name='", table_name, "'");
 	} else {
-		PHALCON_INIT_NVAR(sql);
-		PHALCON_CONCAT_SVS(sql, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM information_schema.tables WHERE table_schema = 'public' AND table_name='", table_name, "'");
+		PHALCON_CONCAT_SVS(&sql, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM information_schema.tables WHERE table_schema = 'public' AND table_name='", table_name, "'");
 	}
 	
-	RETURN_CTOR(sql);
+	RETURN_CTORW(&sql);
 }
 
 /**

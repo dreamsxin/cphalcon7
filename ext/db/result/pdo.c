@@ -278,14 +278,14 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 
-	zval row_count, *connection, *type = NULL, *pdo_statement = NULL;
+	zval row_count, *connection, type, *pdo_statement = NULL;
 	zval *sql_statement, *bind_params, *bind_types;
 	zval matches, pattern, match, else_clauses;
-	zval sql, *result = NULL, *row = NULL;
+	zval sql, result, row;
 
 	PHALCON_MM_GROW();
 
-	phalcon_return_property(row_count, getThis(), SL("_rowCount"));
+	phalcon_return_property(&row_count, getThis(), SL("_rowCount"));
 
 	if (PHALCON_IS_FALSE(&row_count)) {
 		connection = phalcon_read_property(getThis(), SL("_connection"), PH_NOISY);
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		/** 
 		 * MySQL/PostgreSQL library property returns the number of records
 		 */
-		if (PHALCON_IS_STRING(type, "mysql") || PHALCON_IS_STRING(type, "pgsql")) {
+		if (PHALCON_IS_STRING(&type, "mysql") || PHALCON_IS_STRING(&type, "pgsql")) {
 			pdo_statement = phalcon_read_property(getThis(), SL("_pdoStatement"), PH_NOISY);
 			PHALCON_CALL_METHOD(&row_count, pdo_statement, "rowcount");
 		}
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		/** 
 		 * We should get the count using a new statement :(
 		 */
-		if (PHALCON_IS_FALSE(row_count)) {
+		if (PHALCON_IS_FALSE(&row_count)) {
 			/** 
 			 * SQLite/Oracle/SQLServer returns resultsets that to the client eyes (PDO) has an
 			 * arbitrary number of rows, so we need to perform an extra count to know that
@@ -327,9 +327,9 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 					PHALCON_CONCAT_SVS(&sql, "SELECT COUNT(*) \"numrows\" FROM (SELECT ", &else_clauses, ")");
 	
 					PHALCON_CALL_METHOD(&result, connection, "query", &sql, bind_params, bind_types);
-					PHALCON_CALL_METHOD(&row, result, "fetch");
+					PHALCON_CALL_METHOD(&row, &result, "fetch");
 
-					phalcon_array_fetch_str(&row_count, row, SL("numrows"), PH_NOISY);
+					phalcon_array_fetch_str(&row_count, &row, SL("numrows"), PH_NOISY);
 				}
 			} else {
 				ZVAL_LONG(&row_count, 1);
@@ -359,9 +359,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
 	long number = 0, n;
-	zval *connection, *pdo = NULL, *sql_statement;
-	zval *bind_params, *bind_types, *statement = NULL;
-	zval *temp_statement = NULL;
+	zval *connection, pdo, *sql_statement;
+	zval *bind_params, *bind_types, statement, temp_statement;
 	pdo_stmt_t *stmt;
 
 	PHALCON_MM_GROW();
@@ -383,27 +382,26 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 	if (Z_TYPE_P(bind_params) == IS_ARRAY) {
 		bind_types = phalcon_read_property(getThis(), SL("_bindTypes"), PH_NOISY);
 
-		PHALCON_CALL_METHOD(&statement, pdo, "prepare", sql_statement);
-		if (Z_TYPE_P(statement) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(&temp_statement, connection, "executeprepared", statement, bind_params, bind_types);
-			PHALCON_CPY_WRT(statement, temp_statement);
+		PHALCON_CALL_METHOD(&statement, &pdo, "prepare", sql_statement);
+		if (Z_TYPE(statement) == IS_OBJECT) {
+			PHALCON_CALL_METHOD(&temp_statement, connection, "executeprepared", &statement, bind_params, bind_types);
+			ZVAL_COPY_VALUE(&statement, &temp_statement);
 		}
 
 	} else {
-		PHALCON_CALL_METHOD(&statement, pdo, "query", sql_statement);
+		PHALCON_CALL_METHOD(&statement, &pdo, "query", sql_statement);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_pdoStatement"), statement);
+	phalcon_update_property_zval(getThis(), SL("_pdoStatement"), &statement);
 
 	/**
 	 * This a fetch scroll to reach the desired position, however with a big number of records
 	 * maybe it may be very slow
 	 */
 
-	stmt = Z_PDO_STMT_P(statement);
+	stmt = Z_PDO_STMT_P(&statement);
 	if (!stmt->dbh) {
-		PHALCON_MM_RESTORE();
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
 	n = -1;
@@ -411,8 +409,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 	while (n != number) {
 
 		if(!stmt->methods->fetcher(stmt, PDO_FETCH_ORI_NEXT, 0)) {
-			PHALCON_MM_RESTORE();
-			RETURN_NULL();
+			RETURN_MM_NULL();
 		}
 
 		n++;

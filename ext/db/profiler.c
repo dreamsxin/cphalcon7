@@ -110,33 +110,31 @@ PHALCON_INIT_CLASS(Phalcon_Db_Profiler){
  */
 PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 
-	zval *sql_statement, *sql_variables = NULL, *sql_bindtypes = NULL, *active_profile;
-	zval *time = NULL;
+	zval *sql_statement, *sql_variables = NULL, *sql_bindtypes = NULL, active_profile, time;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 2, &sql_statement, &sql_variables, &sql_bindtypes);
-	
-	PHALCON_INIT_VAR(active_profile);
-	object_init_ex(active_profile, phalcon_db_profiler_item_ce);
-	PHALCON_CALL_METHOD(NULL, active_profile, "setsqlstatement", sql_statement);
+
+	object_init_ex(&active_profile, phalcon_db_profiler_item_ce);
+	PHALCON_CALL_METHOD(NULL, &active_profile, "setsqlstatement", sql_statement);
 
 	if (sql_variables) {
-	    PHALCON_CALL_METHOD(NULL, active_profile, "setsqlvariables", sql_variables);
+	    PHALCON_CALL_METHOD(NULL, &active_profile, "setsqlvariables", sql_variables);
 	}
 
 	if (sql_bindtypes) {
-	    PHALCON_CALL_METHOD(NULL, active_profile, "setsqlbindtypes", sql_bindtypes);
+	    PHALCON_CALL_METHOD(NULL, &active_profile, "setsqlbindtypes", sql_bindtypes);
 	}
 
 	PHALCON_CALL_FUNCTION(&time, "microtime", &PHALCON_GLOBAL(z_true));
-	PHALCON_CALL_METHOD(NULL, active_profile, "setinitialtime", time);
+	PHALCON_CALL_METHOD(NULL, &active_profile, "setinitialtime", &time);
 
 	if (phalcon_method_exists_ex(getThis(), SL("beforestartprofile")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "beforestartprofile", active_profile);
+		PHALCON_CALL_METHOD(NULL, getThis(), "beforestartprofile", &active_profile);
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_activeProfile"), active_profile);
+	phalcon_update_property_this(getThis(), SL("_activeProfile"), &active_profile);
 	
 	RETURN_THIS();
 }
@@ -148,27 +146,27 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
  */
 PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 
-	zval *final_time = NULL, *active_profile, *initial_time = NULL;
-	zval *difference, *total_seconds, *new_total_seconds;
+	zval *active_profile, final_time, initial_time;
+	zval difference, *total_seconds, new_total_seconds;
 
 	PHALCON_MM_GROW();
 
-	PHALCON_CALL_FUNCTION(&final_time, "microtime", &PHALCON_GLOBAL(z_true));
-	
 	active_profile = phalcon_read_property(getThis(), SL("_activeProfile"), PH_NOISY);
-	PHALCON_CALL_METHOD(NULL, active_profile, "setfinaltime", final_time);
+
+	PHALCON_CALL_FUNCTION(&final_time, "microtime", &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHOD(NULL, active_profile, "setfinaltime", &final_time);
 	
 	PHALCON_CALL_METHOD(&initial_time, active_profile, "getinitialtime");
-	
-	PHALCON_INIT_VAR(difference);
-	phalcon_sub_function(difference, final_time, initial_time);
+
+	phalcon_sub_function(&difference, &final_time, &initial_time);
 	
 	total_seconds = phalcon_read_property(getThis(), SL("_totalSeconds"), PH_NOISY);
-	
-	PHALCON_INIT_VAR(new_total_seconds);
-	phalcon_add_function(new_total_seconds, total_seconds, difference);
-	phalcon_update_property_this(getThis(), SL("_totalSeconds"), new_total_seconds);
+
+	phalcon_add_function(&new_total_seconds, total_seconds, &difference);
+
+	phalcon_update_property_this(getThis(), SL("_totalSeconds"), &new_total_seconds);
 	phalcon_update_property_array_append(getThis(), SL("_allProfiles"), active_profile);
+
 	if (phalcon_method_exists_ex(getThis(), SL("afterendprofile")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "afterendprofile", active_profile);
 	}

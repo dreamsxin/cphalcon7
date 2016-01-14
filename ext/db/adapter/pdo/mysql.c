@@ -85,25 +85,21 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Mysql){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
 
-	zval *identifier, *domain, *name;
+	zval *identifier, domain, name;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &identifier);
 
 	if (Z_TYPE_P(identifier) == IS_ARRAY) { 
-
-		PHALCON_OBS_VAR(domain);
 		phalcon_array_fetch_long(&domain, identifier, 0, PH_NOISY);
-
-		PHALCON_OBS_VAR(name);
 		phalcon_array_fetch_long(&name, identifier, 1, PH_NOISY);
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
-			PHALCON_CONCAT_SVSVS(return_value, "`", domain, "`.`", name, "`");
+			PHALCON_CONCAT_SVSVS(return_value, "`", &domain, "`.`", &name, "`");
 			RETURN_MM();
 		}
 
-		PHALCON_CONCAT_VSV(return_value, domain, ".", name);
+		PHALCON_CONCAT_VSV(return_value, domain, ".", &name);
 
 		RETURN_MM();
 	}

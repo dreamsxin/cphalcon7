@@ -785,7 +785,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	zval *table = NULL, tables_sql, distinct, sql, joins, *join;
 	zval where_conditions, where_expression, group_fields, group_items;
 	zval *group_field, group_sql;
-	zval group_clause, having_conditions, *having_expression = NULL;
+	zval group_clause, having_conditions, having_expression;
 	zval order_fields, order_items, *order_item = NULL;
 	zval order_sql, limit_value;
 	zval number, offset, tmp1, tmp2;
@@ -881,9 +881,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		array_init(&selected_tables);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
-			zval *sql_table = NULL;
+			zval sql_table;
 			PHALCON_CALL_METHOD(&sql_table, getThis(), "getsqltable", table, &escape_char);
-			phalcon_array_append(&selected_tables, sql_table, PH_COPY);
+			phalcon_array_append(&selected_tables, &sql_table, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&tables_sql, SL(", "), &selected_tables);
@@ -937,7 +937,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 						phalcon_array_append(&join_expressions, &join_expression, PH_COPY);
 					} ZEND_HASH_FOREACH_END();
 
-					phalcon_fast_join_str(&join_conditions, SL(" AND "), join_expressions);
+					phalcon_fast_join_str(&join_conditions, SL(" AND "), &join_expressions);
 					PHALCON_SCONCAT_SV(&sql_join, " ON ", &join_conditions);
 				}
 			}
@@ -952,9 +952,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
 		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) {
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
-			PHALCON_SCONCAT_SV(sql, " WHERE ", &where_expression);
+			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
-			PHALCON_SCONCAT_SV(sql, " WHERE ", &where_conditions);
+			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_conditions);
 		}
 	}
 
@@ -965,10 +965,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		array_init(&group_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&group_fields), group_field) {
-			zval *group_expression = NULL;
+			zval group_expression;
 
 			PHALCON_CALL_METHOD(&group_expression, getThis(), "getsqlexpression", group_field, &escape_char);
-			phalcon_array_append(&group_items, group_expression, PH_COPY);
+			phalcon_array_append(&group_items, &group_expression, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&group_sql, SL(", "), &group_items);
@@ -982,7 +982,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	 */
 	if (phalcon_array_isset_fetch_str(&having_conditions, definition, SL("having"))) {
 		PHALCON_CALL_METHOD(&having_expression, getThis(), "getsqlexpression", &having_conditions, &escape_char);
-		PHALCON_SCONCAT_SV(&sql, " HAVING ", having_expression);
+		PHALCON_SCONCAT_SV(&sql, " HAVING ", &having_expression);
 	}
 
 	/**
@@ -992,7 +992,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		array_init(&order_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&order_fields), order_item) {
-			zval order_expression, *order_sql_item = NULL, order_sql_item_type;
+			zval order_expression, order_sql_item, sql_order_type, order_sql_item_type;
 
 			phalcon_array_fetch_long(&order_expression, order_item, 0, PH_NOISY);
 
@@ -1002,9 +1002,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 			 * In the numeric 1 position could be a ASC/DESC clause
 			 */
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
-				PHALCON_CONCAT_VSV(&order_sql_item_type, order_sql_item, " ", &sql_order_type);
+				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				ZVAL_COPY_VALUE(&order_sql_item_type, order_sql_item);
+				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
 			}
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -1022,7 +1022,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	if (phalcon_array_isset_fetch_str(&limit_value, definition, SL("limit"))) {
 		if (likely(Z_TYPE_P(&limit_value) == IS_ARRAY)) {
 			if (likely(phalcon_array_isset_fetch_str(&number, &limit_value, SL("number")))) {
-				phalcon_array_fetch_str(&tmp1, number, SL("value"), PH_NOISY);
+				phalcon_array_fetch_str(&tmp1, &number, SL("value"), PH_NOISY);
 
 				if (phalcon_array_isset_fetch_str(&offset, &limit_value, SL("offset"))) {
 					phalcon_array_fetch_str(&tmp2, &offset, SL("value"), PH_NOISY);
@@ -1030,8 +1030,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 					ZVAL_LONG(&tmp2, 0);
 				}
 
-				phalcon_add_function(&ini_range, tmp2, &PHALCON_GLOBAL(z_one));
-				phalcon_add_function(&end_range, tmp2, tmp1);
+				phalcon_add_function(&ini_range, &tmp2, &PHALCON_GLOBAL(z_one));
+				phalcon_add_function(&end_range, &tmp2, &tmp1);
 
 				PHALCON_SCONCAT_SVSVSV(&sql_limit,"SELECT Z2.* FROM (SELECT Z1.*, ROWNUM DB_ROWNUM FROM ( ", &sql, " ) Z1 ) Z2 WHERE Z2.DB_ROWNUM BETWEEN ", &ini_range, " AND ",  &end_range);
 				ZVAL_COPY_VALUE(&sql, &sql_limit);

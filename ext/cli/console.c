@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		}
 	}
 
-	PHALCON_CALL_METHOD(&status, dispatcher, "dispatch");
+	PHALCON_CALL_METHOD(&status, &dispatcher, "dispatch");
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "console:afterHandleTask");

@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addIndex){
 	PHALCON_CALL_METHOD(&index_type, index, "gettype");
 
 	if (zend_is_true(schema_name)) {
-		if (Z_TYPE(&index_type) == IS_STRING && Z_STRLEN(index_type) > 0) {
+		if (Z_TYPE(index_type) == IS_STRING && Z_STRLEN(index_type) > 0) {
 			PHALCON_CONCAT_SVSVSVSVS(&sql, "CREATE ", &index_type, " INDEX \"", schema_name, "\".\"", &name, "\" ON \"", table_name, "\" (");
 		} else {
 			PHALCON_CONCAT_SVSVSVS(&sql, "CREATE INDEX \"", schema_name, "\".\"", &name, "\" ON \"", table_name, "\" (");

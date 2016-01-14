@@ -825,11 +825,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 			if (Z_TYPE_P(&column_item) == IS_ARRAY) {
 				PHALCON_CALL_METHOD(&column_sql, getThis(), "getsqlexpression", &column_item, &escape_char);
 			} else if (PHALCON_IS_STRING(&column_item, "*")) {
-				ZVAl_COPY_VALUE(&column_sql, &column_item);
+				ZVAL_COPY_VALUE(&column_sql, &column_item);
 			} else if (PHALCON_GLOBAL(db).escape_identifiers) {
 				PHALCON_CONCAT_VVV(&column_sql, &escape_char, &column_item, &escape_char);
 			} else {
-				ZVAl_COPY_VALUE(&column_sql, &column_item);
+				ZVAL_COPY_VALUE(&column_sql, &column_item);
 			}
 
 			/**
@@ -843,10 +843,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 						PHALCON_CONCAT_VSV(&column_domain_sql, &column_domain, ".", &column_sql);
 					}
 				} else {
-					ZVAl_COPY_VALUE(&column_domain_sql, &column_sql);
+					ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
 				}
 			} else {
-				ZVAl_COPY_VALUE(&column_domain_sql, &column_sql);
+				ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
 			}
 
 			/**
@@ -860,10 +860,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 						PHALCON_CONCAT_VSV(&column_alias_sql, &column_domain_sql, " ", &column_alias);
 					}
 				} else {
-					ZVAl_COPY_VALUE(&column_alias_sql, &column_domain_sql);
+					ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
 				}
 			} else {
-				ZVAl_COPY_VALUE(&column_alias_sql, &column_domain_sql);
+				ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
 			}
 
 			phalcon_array_append(&selected_columns, &column_alias_sql, PH_COPY);
@@ -871,7 +871,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 
 		phalcon_fast_join_str(&columns_sql, SL(", "), &selected_columns);
 	} else {
-		ZVAl_COPY_VALUE(&columns_sql, &columns);
+		ZVAL_COPY_VALUE(&columns_sql, &columns);
 	}
 
 	/**
@@ -914,7 +914,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	 */
 	if (phalcon_array_isset_fetch_str(&joins, definition, SL("joins"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&joins), join) {
-			zval type, source, *sql_table = NULL, sql_join, join_conditions_array, join_expressions, join_conditions, *join_condition;
+			zval type, source, sql_table, sql_join, join_conditions_array, join_expressions, join_conditions, *join_condition;
 
 			phalcon_array_fetch_str(&type, join, SL("type"), PH_NOISY);
 			phalcon_array_fetch_str(&source, join, SL("source"), PH_NOISY);

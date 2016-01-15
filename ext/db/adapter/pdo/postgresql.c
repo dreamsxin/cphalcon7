@@ -21,6 +21,7 @@
 #include "db/adapter/pdo/postgresql.h"
 #include "db/adapter/pdo.h"
 #include "db/adapterinterface.h"
+#include "db/exception.h"
 #include "db/column.h"
 #include "db/rawvalue.h"
 #include "db/reference.h"

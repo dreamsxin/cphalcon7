@@ -36,6 +36,7 @@
 #include "kernel/concat.h"
 #include "kernel/string.h"
 #include "kernel/operators.h"
+#include "kernel/exception.h"
 
 /**
  * Phalcon\Db\Adapter\Pdo\Postgresql
@@ -114,7 +115,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 
 	if (phalcon_array_isset_fetch_str(&schema, descriptor, SL("schema"))) {
 		// phalcon_array_unset_str(descriptor, SL("schema"), PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_schema"), schema);
+		phalcon_update_property_this(getThis(), SL("_schema"), &schema);
 	}
 
 	if (phalcon_array_isset_fetch_str(&password, descriptor, SL("password"))) {
@@ -125,7 +126,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		 *
 		 * To avoid this we set the password to null
 		 */
-		if (Z_TYPE_P(&password) == IS_STRING && Z_STRLEN_P(&password) == 0) {
+		if (Z_TYPE(password) == IS_STRING && Z_STRLEN(password) == 0) {
 			phalcon_array_update_str(descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
 	}
@@ -136,8 +137,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 	/** 
 	 * Execute the search path in the after connect
 	 */
-	if (Z_TYPE_P(schema) == IS_STRING) {
-		PHALCON_CONCAT_SVS(&sql, "SET search_path TO '", schema, "'");
+	if (Z_TYPE_P(&schema) == IS_STRING) {
+		PHALCON_CONCAT_SVS(&sql, "SET search_path TO '", &schema, "'");
 		PHALCON_CALL_METHOD(NULL, getThis(), "execute", &sql);
 	}
 
@@ -155,10 +156,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 
-	zval *table, *schema = NULL, columns, *dialect, *sql = NULL, fetch_num;
-	zval *describe = NULL, *old_column = NULL, *field = NULL;
-	zval *numeric_size = NULL, *numeric_scale = NULL, *column_type = NULL;
-	zval *attribute = NULL, *column_name = NULL, *column = NULL;
+	zval *table, *schema = NULL, columns, *dialect, sql, fetch_num;
+	zval describe, old_column, *field;
 
 	PHALCON_MM_GROW();
 
@@ -179,14 +178,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	 */
 	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
-	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", sql, &fetch_num);
+	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
 	/** 
 	 * 0:name, 1:type, 2:size, 3:numeric size, 4:numeric scale, 5: null, 6: key, 7: extra, 8: position, 9: element type
 	 */
-	PHALCON_INIT_VAR(old_column);
-
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), field) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
 		zval definition, char_size, numeric_size, numeric_scale, column_type, attribute, column_name, column;
 
 		array_init_size(&definition, 1);

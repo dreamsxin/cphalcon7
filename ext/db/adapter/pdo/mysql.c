@@ -421,7 +421,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 
 		phalcon_array_append(&columns, &column, PH_COPY);
 
-		ZVAI_COPY_VALUE(&old_column, &column_name);
+		ZVAL_COPY_VALUE(&old_column, &column_name);
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(&columns);

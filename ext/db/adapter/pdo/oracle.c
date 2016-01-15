@@ -324,7 +324,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 		 */
 		phalcon_array_fetch_long(&attribute, field, 7, PH_NOISY);
 		if (!PHALCON_IS_EMPTY(&attribute)) {
-			phalcon_array_update_str(definition, SL("default"), &attribute, PH_COPY);
+			phalcon_array_update_str(&definition, SL("default"), &attribute, PH_COPY);
 		}
 
 		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY);
@@ -339,7 +339,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 		ZVAL_COPY_VALUE(&old_column, &column_name);
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(columns);
+	RETURN_CTOR(&columns);
 }
 
 /**
@@ -362,7 +362,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, lastInsertId){
 
-	zval *sequence_name = NULL, *sql, *fetch_num, *ret = NULL, *insert_id;
+	zval *sequence_name = NULL, sql, fetch_num, ret, insert_id;
 
 	PHALCON_MM_GROW();
 
@@ -372,17 +372,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, lastInsertId){
 		sequence_name = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(sql);
-	PHALCON_CONCAT_SVS(sql, "SELECT ", sequence_name, ".CURRVAL FROM dual");
+	PHALCON_CONCAT_SVS(&sql, "SELECT ", sequence_name, ".CURRVAL FROM dual");
 
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
-	PHALCON_CALL_METHOD(&ret, getThis(), "fetchall", sql, fetch_num);
+	PHALCON_CALL_METHOD(&ret, getThis(), "fetchall", &sql, &fetch_num);
 
-	PHALCON_OBS_VAR(insert_id);
-	phalcon_array_fetch_long(&insert_id, ret, 0, PH_NOISY);
-	RETURN_CCTOR(insert_id);
+	phalcon_array_fetch_long(&insert_id, &ret, 0, PH_NOISY);
+	RETURN_CTOR(&insert_id);
 }
 
 /**
@@ -403,14 +400,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, useExplicitIdValue){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, getDefaultIdValue){
 
-	zval *null_value;
+	zval null_value;
 
 	PHALCON_MM_GROW();
 
-	PHALCON_INIT_VAR(null_value);
-	ZVAL_STRING(null_value, "default");
+	ZVAL_STRING(&null_value, "default");
+
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", null_value);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &null_value);
 
 	RETURN_MM();
 }

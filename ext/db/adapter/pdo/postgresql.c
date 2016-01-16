@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			 * Special type for datetime
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("date"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
 				phalcon_array_update_str_long(&definition, SL("size"), 0, 0);
 				break;
 			}
@@ -394,7 +394,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		 * Create a Phalcon\Db\Column to abstract the column
 		 */
 		object_init_ex(&column, phalcon_db_column_ce);
-		PHALCON_CALL_METHOD(NULL, &column, "__construct", column_name, definition);
+		PHALCON_CALL_METHOD(NULL, &column, "__construct", &column_name, &definition);
 
 		phalcon_array_append(&columns, &column, PH_COPY);
 		ZVAL_COPY_VALUE(&old_column, &column_name);

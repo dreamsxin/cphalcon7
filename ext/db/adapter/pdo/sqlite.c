@@ -167,18 +167,15 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 
 		if (phalcon_memnstr_str(&column_type, SL("("))) {
 			RETURN_MM_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches));
-
-			if (zend_is_true(pos)) {
-				if (phalcon_array_isset_long(matches, 1)) {
-					phalcon_array_fetch_long(&match_one, matches, 1, PH_NOISY);
+			if (zend_is_true(&pos)) {
+				if (phalcon_array_isset_fetch_long(&match_one, matches, 1)) {
 					convert_to_long(&match_one);
-					phalcon_array_update_str(definition, SL("size"), &match_one, PH_COPY);
-					phalcon_array_update_str(definition, SL("bytes"), &match_one, PH_COPY);
+					phalcon_array_update_str(&definition, SL("size"), &match_one, PH_COPY);
+					phalcon_array_update_str(&definition, SL("bytes"), &match_one, PH_COPY);
 				}
-				if (phalcon_array_isset_long(matches, 2)) {
-					phalcon_array_fetch_long(&match_two, matches, 2, PH_NOISY);
+				if (phalcon_array_isset_fetch_long(&match_two, matches, 2)) {
 					convert_to_long(&match_two);
-					phalcon_array_update_str(definition, SL("scale"), &match_two, PH_COPY);
+					phalcon_array_update_str(&definition, SL("scale"), &match_two, PH_COPY);
 				}
 			}
 		}

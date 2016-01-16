@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 
-	zval *table, *schema = NULL, *dialect, *fetch_num, sql, describe;
+	zval *table, *schema = NULL, *dialect, fetch_num, sql, describe;
 	zval indexes, *index, index_objects, *index_columns;
 	zend_string *str_key;
 	ulong idx;
@@ -475,7 +475,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 		PHALCON_CALL_METHOD(&sql_index_describe, dialect, "describeindex", &key_name);
 		PHALCON_CALL_METHOD(&describe_index, getThis(), "fetchall", &sql_index_describe, &fetch_num);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe_index), index_column) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe_index), index_column) {
 			zval column_name;
 
 			phalcon_array_fetch_long(&column_name, index_column, 2, PH_NOISY);
@@ -511,11 +511,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 
-	zval *table, *schema = NULL, *dialect, *sql = NULL, *fetch_num, *describe = NULL;
-	zval *reference_objects, *reference_describe = NULL;
-	zval *constraint_name = NULL, *referenced_table = NULL;
-	zval *from = NULL, *to = NULL, *columns = NULL, *referenced_columns = NULL;
-	zval *reference_array = NULL, *reference = NULL;
+	zval *table, *schema = NULL, *dialect, sql, fetch_num, describe;
+	zval reference_objects, *reference_describe;
 	zend_string *str_key;
 	ulong idx;
 
@@ -537,65 +534,52 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
 	 */
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	/** 
 	 * Execute the SQL describing the references
 	 */
-	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", sql, fetch_num);
+	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
 	/** 
 	 * Cryptic Guide: 2: table, 3: from, 4: to
 	 */
-	PHALCON_INIT_VAR(reference_objects);
-	array_init(reference_objects);
+	array_init(&reference_objects);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(describe), idx, str_key, reference_describe) {
-		zval number;
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(describe), idx, str_key, reference_describe) {
+		zval number, constraint_name, referenced_table, from, to, columns, referenced_columns, reference_array, reference;
 		if (str_key) {
 			ZVAL_STR(&number, str_key);
 		} else {
 			ZVAL_LONG(&number, idx);
 		}
 
-		PHALCON_INIT_NVAR(constraint_name);
-		PHALCON_CONCAT_SV(constraint_name, "foreign_key_", &number);
-
-		PHALCON_OBS_NVAR(referenced_table);
+		PHALCON_CONCAT_SV(&constraint_name, "foreign_key_", &number);
 		phalcon_array_fetch_long(&referenced_table, reference_describe, 2, PH_NOISY);
-
-		PHALCON_OBS_NVAR(from);
 		phalcon_array_fetch_long(&from, reference_describe, 3, PH_NOISY);
-
-		PHALCON_OBS_NVAR(to);
 		phalcon_array_fetch_long(&to, reference_describe, 4, PH_NOISY);
 
-		PHALCON_INIT_NVAR(columns);
-		array_init_size(columns, 1);
-		phalcon_array_append(columns, from, PH_COPY);
+		array_init_size(&columns, 1);
+		phalcon_array_append(&columns, &from, PH_COPY);
 
-		PHALCON_INIT_NVAR(referenced_columns);
-		array_init_size(referenced_columns, 1);
-		phalcon_array_append(referenced_columns, to, PH_COPY);
+		array_init_size(&referenced_columns, 1);
+		phalcon_array_append(&referenced_columns, &to, PH_COPY);
 
-		PHALCON_INIT_NVAR(reference_array);
-		array_init_size(reference_array, 4);
-		add_assoc_null_ex(reference_array, SL("referencedSchema"));
-		phalcon_array_update_str(reference_array, SL("referencedTable"), referenced_table, PH_COPY);
-		phalcon_array_update_str(reference_array, SL("columns"), columns, PH_COPY);
-		phalcon_array_update_str(reference_array, SL("referencedColumns"), referenced_columns, PH_COPY);
+		array_init_size(&reference_array, 4);
+		add_assoc_null_ex(&reference_array, SL("referencedSchema"));
+		phalcon_array_update_str(&reference_array, SL("referencedTable"), &referenced_table, PH_COPY);
+		phalcon_array_update_str(&reference_array, SL("columns"), &columns, PH_COPY);
+		phalcon_array_update_str(&reference_array, SL("referencedColumns"), &referenced_columns, PH_COPY);
 
 		/** 
 		 * Every route is abstracted as a Phalcon\Db\Reference instance
 		 */
-		PHALCON_INIT_NVAR(reference);
-		object_init_ex(reference, phalcon_db_reference_ce);
-		PHALCON_CALL_METHOD(NULL, reference, "__construct", constraint_name, reference_array);
-		phalcon_array_update_zval(reference_objects, constraint_name, reference, PH_COPY);
+		object_init_ex(&reference, phalcon_db_reference_ce);
+		PHALCON_CALL_METHOD(NULL, &reference, "__construct", &constraint_name, &reference_array);
+		phalcon_array_update_zval(&reference_objects, &constraint_name, &reference, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(reference_objects);
+	RETURN_CTOR(&reference_objects);
 }
 
 /**

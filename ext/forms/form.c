@@ -450,10 +450,7 @@ PHP_METHOD(Phalcon_Forms_Form, getElements){
  */
 PHP_METHOD(Phalcon_Forms_Form, bind){
 
-	zval *data, *entity, *whitelist = NULL, *elements, *service_name, *dependency_injector = NULL, *filter = NULL, *filter_data;
-	zval *value = NULL, *element = NULL, *filters = NULL;
-	zval *filtered_value = NULL;
-	zval *method = NULL;
+	zval *data, *entity, *whitelist = NULL, *elements, service_name, dependency_injector, filter, filter_data, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -485,27 +482,25 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		return;
 	}
 
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, ISV(filter));
+	ZVAL_STRING(&service_name, ISV(filter));
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-	PHALCON_VERIFY_INTERFACE(dependency_injector, phalcon_diinterface_ce);
+	PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
 
-	PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service_name);
-	PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
+	PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service_name);
+	PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
 
-	PHALCON_INIT_VAR(filter_data);
-	array_init(filter_data);
+	array_init(&filter_data);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
-		zval key;
+		zval key, element, filters, filtered_value, method;
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 		} else {
 			ZVAL_LONG(&key, idx);
 		}
 
-		if (!phalcon_array_isset(elements, &key)) {
+		if (!phalcon_array_isset_fetch(&element, elements, &key)) {
 			continue;
 		}
 
@@ -519,47 +514,40 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		}
 
 		/**
-		 * Get the element
-		 */
-		PHALCON_OBS_NVAR(element);
-		phalcon_array_fetch(&element, elements, &key, PH_NOISY);
-
-		/**
 		 * Check if the method has filters
 		 */
-		PHALCON_CALL_METHOD(&filters, element, "getfilters");
-		if (zend_is_true(filters)) {
+		PHALCON_CALL_METHOD(&filters, &element, "getfilters");
+		if (zend_is_true(&filters)) {
 			/**
 			 * Sanitize the filters
 			 */
-			PHALCON_CALL_METHOD(&filtered_value, filter, "sanitize", value, filters);
+			PHALCON_CALL_METHOD(&filtered_value, &filter, "sanitize", value, &filters);
 		} else {
-			PHALCON_CPY_WRT(filtered_value, value);
+			ZVAL_COPY_VALUE(&filtered_value, value);
 		}
 
 		if (Z_TYPE_P(entity) == IS_OBJECT) {
-			PHALCON_INIT_NVAR(method);
-			PHALCON_CONCAT_SV(method, "set", &key);
-			zend_str_tolower(Z_STRVAL_P(method), Z_STRLEN_P(method));
+			PHALCON_CONCAT_SV(&method, "set", &key);
+			zend_str_tolower(Z_STRVAL(method), Z_STRLEN(method));
 
 			/**
 			 * Use the setter if any available
 			 */
-			if (phalcon_method_exists(entity, method) == SUCCESS) {
-				PHALCON_CALL_METHOD(NULL, entity, Z_STRVAL_P(method), filtered_value);
+			if (phalcon_method_exists(entity, &method) == SUCCESS) {
+				PHALCON_CALL_METHOD(NULL, entity, Z_STRVAL(method), &filtered_value);
 				continue;
 			}
 
 			/**
 			 * Use the public property if it doesn't have a setter
 			 */
-			phalcon_update_property_zval_zval(entity, &key, filtered_value);
+			phalcon_update_property_zval_zval(entity, &key, &filtered_value);
 		} else {
-			phalcon_array_update_zval(filter_data, &key, filtered_value, PH_COPY);
+			phalcon_array_update_zval(&filter_data, &key, &filtered_value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_update_property_this(getThis(), SL("_filterData"), filter_data);
+	phalcon_update_property_this(getThis(), SL("_filterData"), &filter_data);
 	phalcon_update_property_this(getThis(), SL("_data"), data);
 
 	PHALCON_MM_RESTORE();
@@ -574,10 +562,8 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
  */
 PHP_METHOD(Phalcon_Forms_Form, isValid){
 
-	zval *data = NULL, *entity = NULL, *elements, *status = NULL, not_failed;
-	zval *messages, *element = NULL, *validators = NULL, *name = NULL, *prepared_validators = NULL;
-	zval *validator = NULL, *scope = NULL, *validation = NULL, *filters = NULL;
-	zval *element_messages = NULL;
+	zval *data = NULL, *entity = NULL, *elements, status, not_failed;
+	zval messages, *element;
 
 	PHALCON_MM_GROW();
 
@@ -607,20 +593,20 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 	 */
 	if (phalcon_method_exists_ex(getThis(), SL("beforevalidation")) == SUCCESS) {
 		PHALCON_CALL_METHOD(&status, getThis(), "beforevalidation", data, entity);
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_CTOR(status);
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_CTOR(&status);
 		}
 	}
 
 	ZVAL_TRUE(&not_failed);
 
-	PHALCON_INIT_VAR(messages);
-	array_init(messages);
+	array_init(&messages);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(elements), element) {
+		zval validators, name, prepared_validators, *validator, validation, filters, element_messages;
 		PHALCON_CALL_METHOD(&validators, element, "getvalidators");
-		if (Z_TYPE_P(validators) == IS_ARRAY) {
-			if (phalcon_fast_count_ev(validators)) {
+		if (Z_TYPE(validators) == IS_ARRAY) {
+			if (phalcon_fast_count_ev(&validators)) {
 
 				/**
 				 * Element's name
@@ -630,23 +616,21 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				/**
 				 * Prepare the validators
 				 */
-				PHALCON_INIT_NVAR(prepared_validators);
-				array_init(prepared_validators);
+				array_init(&prepared_validators);
 
-				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(validators), validator) {
-					PHALCON_INIT_NVAR(scope);
-					array_init_size(scope, 2);
-					phalcon_array_append(scope, name, PH_COPY);
-					phalcon_array_append(scope, validator, PH_COPY);
-					phalcon_array_append(prepared_validators, scope, PH_COPY);
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(validators), validator) {
+					zval scope;
+					array_init_size(&scope, 2);
+					phalcon_array_append(&scope, &name, PH_COPY);
+					phalcon_array_append(&scope, validator, PH_COPY);
+					phalcon_array_append(&prepared_validators, &scope, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 
 				/**
 				 * Create an implicit validation
 				 */
-				PHALCON_INIT_NVAR(validation);
-				object_init_ex(validation, phalcon_validation_ce);
-				PHALCON_CALL_METHOD(NULL, validation, "__construct", prepared_validators);
+				object_init_ex(&validation, phalcon_validation_ce);
+				PHALCON_CALL_METHOD(NULL, &validation, "__construct", &prepared_validators);
 
 				/**
 				 * Get filters in the element
@@ -656,18 +640,18 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				/**
 				 * Assign the filters to the validation
 				 */
-				if (Z_TYPE_P(filters) == IS_ARRAY) {
+				if (Z_TYPE(filters) == IS_ARRAY) {
 					PHALCON_CALL_METHOD(&name, element, "getname");
-					PHALCON_CALL_METHOD(NULL, validation, "setfilters", name, filters);
+					PHALCON_CALL_METHOD(NULL, &validation, "setfilters", &name, &filters);
 				}
 
 				/**
 				 * Perform the validation
 				 */
 				PHALCON_CALL_METHOD(&element_messages, validation, "validate", data, entity);
-				if (phalcon_fast_count_ev(element_messages)) {
+				if (phalcon_fast_count_ev(&element_messages)) {
 					PHALCON_CALL_METHOD(&name, element, "getname");
-					phalcon_array_update_zval(messages, name, element_messages, PH_COPY);
+					phalcon_array_update_zval(&messages, &name, &element_messages, PH_COPY);
 
 					ZVAL_FALSE(&not_failed);
 				}
@@ -686,7 +670,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 	 * Check if there is a method 'afterValidation'
 	 */
 	if (phalcon_method_exists_ex(getThis(), SL("aftervalidation")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "aftervalidation", messages);
+		PHALCON_CALL_METHOD(NULL, getThis(), "aftervalidation", &messages);
 	}
 
 	/**

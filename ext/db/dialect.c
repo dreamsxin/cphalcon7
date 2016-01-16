@@ -561,8 +561,8 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 
-	zval *expression, *escape_char = NULL, *name, *custom_functions = NULL, custom_function, *sql_arguments, arguments;
-	zval *argument = NULL, *argument_expression = NULL, *arguments_joined;
+	zval *expression, *escape_char = NULL, name, custom_functions, custom_function, sql_arguments, arguments;
+	zval *argument, argument_expression, arguments_joined;
 
 	PHALCON_MM_GROW();
 
@@ -570,42 +570,37 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 
 	if (!escape_char) {
 		PHALCON_INIT_VAR(escape_char);
-	} else {
-		PHALCON_SEPARATE_PARAM(escape_char);
 	}
 
-	PHALCON_OBS_VAR(name);
 	phalcon_array_fetch_str(&name, expression, SL("name"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&custom_functions, getThis(), "getcustomfunctions");
 
-	if (phalcon_array_isset_fetch(&custom_function, custom_functions, name)) {
+	if (phalcon_array_isset_fetch(&custom_function, &custom_functions, &name)) {
 		PHALCON_RETURN_CALL_ZVAL_FUNCTION(&custom_function, getThis(), expression, escape_char);
 		RETURN_MM();
 	}
 
-	PHALCON_INIT_VAR(sql_arguments);
-	array_init(sql_arguments);
-	if (phalcon_array_isset_str(expression, SL("arguments"))) {
-		phalcon_array_fetch_str(&arguments, expression, SL("arguments"), PH_NOISY);
+	array_init(&sql_arguments);
+	if (phalcon_array_isset_fetch_str(&arguments, expression, SL("arguments"))) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(arguments), argument) {
+			zval argument_expression;
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&arguments), argument) {
 			PHALCON_CALL_METHOD(&argument_expression, getThis(), "getsqlexpression", argument, escape_char);
-			phalcon_array_append(sql_arguments, argument_expression, PH_COPY);
+			phalcon_array_append(&sql_arguments, &argument_expression, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_INIT_VAR(arguments_joined);
-		phalcon_fast_join_str(arguments_joined, SL(", "), sql_arguments);
+		phalcon_fast_join_str(&arguments_joined, SL(", "), &sql_arguments);
 		if (phalcon_array_isset_str(expression, SL("distinct"))) {
-			PHALCON_CONCAT_VSVS(return_value, name, "(DISTINCT ", arguments_joined, ")");
+			PHALCON_CONCAT_VSVS(return_value, &name, "(DISTINCT ", &arguments_joined, ")");
 		} else {
-			PHALCON_CONCAT_VSVS(return_value, name, "(", arguments_joined, ")");
+			PHALCON_CONCAT_VSVS(return_value, &name, "(", &arguments_joined, ")");
 		}
 
 		RETURN_MM();
 	}
 
-	PHALCON_CONCAT_VS(return_value, name, "()");
+	PHALCON_CONCAT_VS(return_value, &name, "()");
 	RETURN_MM();
 }
 
@@ -618,73 +613,56 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 
-	zval *table, *escape_char = NULL, *table_name, *sql_table = NULL;
-	zval *schema_name, *sql_schema = NULL, *alias_name;
-	zval *sql_table_alias = NULL;
+	zval *table, *escape_char = NULL, table_name, sql_table;
+	zval schema_name, sql_schema, alias_name, sql_table_alias;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &table, &escape_char);
 
-	if (!escape_char) {
-		PHALCON_INIT_VAR(escape_char);
-	} else {
-		PHALCON_SEPARATE_PARAM(escape_char);
-	}
-
-	if (Z_TYPE_P(escape_char) == IS_NULL) {
+	if (!escape_char || Z_TYPE_P(escape_char) == IS_NULL) {
 		escape_char = phalcon_read_property(getThis(), SL("_escapeChar"), PH_NOISY);
 	}
-	if (Z_TYPE_P(table) == IS_ARRAY) { 
 
+	if (Z_TYPE_P(table) == IS_ARRAY) {
 		/**
 		 * The index '0' is the table name
 		 */
-		PHALCON_OBS_VAR(table_name);
 		phalcon_array_fetch_long(&table_name, table, 0, PH_NOISY);
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
-			PHALCON_INIT_VAR(sql_table);
-			PHALCON_CONCAT_VVV(sql_table, escape_char, table_name, escape_char);
+			PHALCON_CONCAT_VVV(&sql_table, escape_char, &table_name, escape_char);
 		} else {
-			PHALCON_CPY_WRT(sql_table, table_name);
+			ZVAL_COPY_VALUE(&sql_table, &table_name);
 		}
 
 		/**
 		 * The index '1' is the schema name
 		 */
-		PHALCON_OBS_VAR(schema_name);
 		phalcon_array_fetch_long(&schema_name, table, 1, PH_NOISY);
 		if (PHALCON_IS_NOT_EMPTY(schema_name)) {
 			if (PHALCON_GLOBAL(db).escape_identifiers) {
-				PHALCON_INIT_VAR(sql_schema);
-				PHALCON_CONCAT_VVVSV(sql_schema, escape_char, schema_name, escape_char, ".", sql_table);
+				PHALCON_CONCAT_VVVSV(&sql_schema, escape_char, &schema_name, escape_char, ".", &sql_table);
 			} else {
-				PHALCON_INIT_NVAR(sql_schema);
-				PHALCON_CONCAT_VSV(sql_schema, schema_name, ".", sql_table);
+				PHALCON_CONCAT_VSV(&sql_schema, &schema_name, ".", &sql_table);
 			}
 		} else {
-			PHALCON_CPY_WRT(sql_schema, sql_table);
+			ZVAL_COPY_VALUE(&sql_schema, &sql_table);
 		}
 
 		/**
 		 * The index '2' is the table alias
 		 */
-		if (phalcon_array_isset_long(table, 2)) {
-
-			PHALCON_OBS_VAR(alias_name);
-			phalcon_array_fetch_long(&alias_name, table, 2, PH_NOISY);
+		if (phalcon_array_isset_fetch_long(&alias_name, table, 2)) {
 			if (PHALCON_GLOBAL(db).escape_identifiers) {
-				PHALCON_INIT_VAR(sql_table_alias);
-				PHALCON_CONCAT_VSVVV(sql_table_alias, sql_schema, " AS ", escape_char, alias_name, escape_char);
+				PHALCON_CONCAT_VSVVV(&sql_table_alias, &sql_schema, " AS ", escape_char, &alias_name, escape_char);
 			} else {
-				PHALCON_INIT_NVAR(sql_table_alias);
-				PHALCON_CONCAT_VSV(sql_table_alias, sql_schema, " AS ", alias_name);
+				PHALCON_CONCAT_VSV(&sql_table_alias, &sql_schema, " AS ", &alias_name);
 			}
 		} else {
-			PHALCON_CPY_WRT(sql_table_alias, sql_schema);
+			ZVAL_COPY_VALUE(&sql_table_alias, &sql_schema);
 		}
 
-		RETURN_CTOR(sql_table_alias);
+		RETURN_CTOR(&sql_table_alias);
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {

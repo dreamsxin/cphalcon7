@@ -506,8 +506,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 
-	zval *expression, *escape_char = NULL, expr, expr_tmp, clauses, *clause = NULL;
-	zval *clause_expr = NULL, *clause_when = NULL, *clause_then = NULL;
+	zval *expression, *escape_char = NULL, expr, expr_tmp, clauses, *clause;
 
 	PHALCON_MM_GROW();
 

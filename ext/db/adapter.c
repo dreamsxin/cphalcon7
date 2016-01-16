@@ -368,7 +368,7 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchOne){
 				PHALCON_RETURN_CALL_METHOD(&result, "fetch");
 			}
 		} else {
-			PHALCON_RETURN_CALL_METHOD(result, "fetch");
+			PHALCON_RETURN_CALL_METHOD(&result, "fetch");
 		}
 		RETURN_MM();
 	}
@@ -573,7 +573,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 			} ZEND_HASH_FOREACH_END();
 
 		} else {
-			ZVAL_COPY_VALUE(&escaped_fields, &fields);
+			ZVAL_COPY_VALUE(&escaped_fields, fields);
 		}
 
 		phalcon_fast_join_str(&joined_fields, SL(", "), &escaped_fields);
@@ -678,11 +678,8 @@ PHP_METHOD(Phalcon_Db_Adapter, insertAsDict){
 PHP_METHOD(Phalcon_Db_Adapter, update){
 
 	zval *table, *fields, *values, *where_condition = NULL;
-	zval *data_types = NULL, *placeholders, *update_values;
-	zval *bind_data_types = NULL, *value = NULL, *field = NULL;
-	zval *escaped_field = NULL, *set_clause_part = NULL, *bind_type = NULL;
-	zval *escaped_table = NULL, *set_clause, *update_sql = NULL;
-	zval *conditions, *where_bind, *where_types;
+	zval *data_types = NULL, placeholders, update_values, bind_data_types, *value = NULL;
+	zval escaped_table, set_clause, update_sql, conditions, where_bind, where_types;
 	zend_string *str_key;
 	ulong idx;
 
@@ -698,16 +695,13 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 		data_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(placeholders);
-	array_init(placeholders);
+	array_init(&placeholders);
+	array_init(&update_values);
 
-	PHALCON_INIT_VAR(update_values);
-	array_init(update_values);
-	if (Z_TYPE_P(data_types) == IS_ARRAY) { 
-		PHALCON_INIT_VAR(bind_data_types);
-		array_init(bind_data_types);
+	if (Z_TYPE_P(data_types) == IS_ARRAY) {
+		array_init(&bind_data_types);
 	} else {
-		PHALCON_CPY_WRT(bind_data_types, data_types);
+		ZVAL_COPY_VALUE(&bind_data_types, data_types);
 	}
 
 	/** 
@@ -715,70 +709,60 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 	 * everything else is passed as '?'
 	 */
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(values), idx, str_key, value) {
-		zval position;
+		zval position, field, escaped_field, set_clause_part, bind_type;
 		if (str_key) {
 			ZVAL_STR(&position, str_key);
 		} else {
 			ZVAL_LONG(&position, idx);
 		}
-		if (!phalcon_array_isset(fields, &position)) {
+		if (!phalcon_array_isset_fetch(&field, fields, &position)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The number of values in the update is not the same as fields");
 			return;
 		}
 
-		PHALCON_OBS_NVAR(field);
-		phalcon_array_fetch(&field, fields, &position, PH_NOISY);
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
-			PHALCON_CALL_METHOD(&escaped_field, getThis(), "escapeidentifier", field);
+			PHALCON_CALL_METHOD(&escaped_field, getThis(), "escapeidentifier", &field);
 		} else {
-			PHALCON_CPY_WRT(escaped_field, field);
+			ZVAL_COPY_VALUE(&escaped_field, &field);
 		}
 
 		if (Z_TYPE_P(value) == IS_OBJECT) {
-			PHALCON_INIT_NVAR(set_clause_part);
-			PHALCON_CONCAT_VSV(set_clause_part, escaped_field, " = ", value);
-			phalcon_array_append(placeholders, set_clause_part, PH_COPY);
+			PHALCON_CONCAT_VSV(&set_clause_part, &escaped_field, " = ", value);
+			phalcon_array_append(&placeholders, &set_clause_part, PH_COPY);
 		} else {
 			if (Z_TYPE_P(value) == IS_NULL) {
-				PHALCON_INIT_NVAR(set_clause_part);
-				PHALCON_CONCAT_VS(set_clause_part, escaped_field, " = null");
+				PHALCON_CONCAT_VS(&set_clause_part, &escaped_field, " = null");
 			} else {
-				PHALCON_INIT_NVAR(set_clause_part);
-				PHALCON_CONCAT_VS(set_clause_part, escaped_field, " = ?");
-				phalcon_array_append(update_values, value, PH_COPY);
+				PHALCON_CONCAT_VS(&set_clause_part, &escaped_field, " = ?");
+				phalcon_array_append(&update_values, value, PH_COPY);
 				if (Z_TYPE_P(data_types) == IS_ARRAY) { 
-					if (!phalcon_array_isset(data_types, &position)) {
+					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position)) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Incomplete number of bind types");
 						return;
 					}
 
-					PHALCON_OBS_NVAR(bind_type);
-					phalcon_array_fetch(&bind_type, data_types, &position, PH_NOISY);
-					phalcon_array_append(bind_data_types, bind_type, PH_COPY);
+					phalcon_array_append(&bind_data_types, &bind_type, PH_COPY);
 				}
 			}
-			phalcon_array_append(placeholders, set_clause_part, PH_COPY);
+			phalcon_array_append(&placeholders, &set_clause_part, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, getThis(), "escapeidentifier", table);
 	} else {
-		PHALCON_CPY_WRT(escaped_table, table);
+		ZVAL_COPY_VALUE(&escaped_table, table);
 	}
 
-	PHALCON_INIT_VAR(set_clause);
-	phalcon_fast_join_str(set_clause, SL(", "), placeholders);
+	phalcon_fast_join_str(&set_clause, SL(", "), &placeholders);
 	if (Z_TYPE_P(where_condition) != IS_NULL) {
-
-		PHALCON_INIT_VAR(update_sql);
-		PHALCON_CONCAT_SVSVS(update_sql, "UPDATE ", escaped_table, " SET ", set_clause, " WHERE ");
+		PHALCON_CONCAT_SVSVS(&update_sql, "UPDATE ", &escaped_table, " SET ", &set_clause, " WHERE ");
 
 		/** 
 		 * String conditions are simply appended to the SQL
 		 */
 		if (Z_TYPE_P(where_condition) == IS_STRING) {
-			phalcon_concat_self(update_sql, where_condition);
+			phalcon_concat_self(&update_sql, where_condition);
 		} else {
 			/** 
 			 * Array conditions may have bound params and bound types
@@ -792,40 +776,33 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 			 * If an index 'conditions' is present it contains string where conditions that are
 			 * appended to the UPDATE sql
 			 */
-			if (phalcon_array_isset_str(where_condition, SL("conditions"))) {
-				PHALCON_OBS_VAR(conditions);
-				phalcon_array_fetch_str(&conditions, where_condition, SL("conditions"), PH_NOISY);
-				phalcon_concat_self(update_sql, conditions);
+			if (phalcon_array_isset_fetch_str(&conditions, where_condition, SL("conditions"))) {
+				phalcon_concat_self(&update_sql, &conditions);
 			}
 
 			/** 
 			 * Bound parameters are arbitrary values that are passed by separate
 			 */
-			if (phalcon_array_isset_str(where_condition, SL("bind"))) {
-				PHALCON_OBS_VAR(where_bind);
-				phalcon_array_fetch_str(&where_bind, where_condition, SL("bind"), PH_NOISY);
-				phalcon_merge_append(update_values, where_bind);
+			if (phalcon_array_isset_fetch_str(&where_bind, where_condition, SL("bind"))) {
+				phalcon_merge_append(&update_values, &where_bind);
 			}
 
 			/** 
 			 * Bind types is how the bound parameters must be casted before be sent to the
 			 * database system
 			 */
-			if (phalcon_array_isset_str(where_condition, SL("bindTypes"))) {
-				PHALCON_OBS_VAR(where_types);
-				phalcon_array_fetch_str(&where_types, where_condition, SL("bindTypes"), PH_NOISY);
-				phalcon_merge_append(bind_data_types, where_types);
+			if (phalcon_array_isset_fetch_str(&where_types, where_condition, SL("bindTypes"))) {
+				phalcon_merge_append(&bind_data_types, &where_types);
 			}
 		}
 	} else {
-		PHALCON_INIT_NVAR(update_sql);
-		PHALCON_CONCAT_SVSV(update_sql, "UPDATE ", escaped_table, " SET ", set_clause);
+		PHALCON_CONCAT_SVSV(&update_sql, "UPDATE ", &escaped_table, " SET ", &set_clause);
 	}
 
-	/** 
+	/**
 	 * Perform the update via execute
 	 */
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", update_sql, update_values, bind_data_types);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &update_sql, &update_values, &bind_data_types);
 	RETURN_MM();
 }
 
@@ -852,7 +829,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 PHP_METHOD(Phalcon_Db_Adapter, delete){
 
 	zval *table, *where_condition = NULL, *placeholders = NULL;
-	zval *data_types = NULL, *escaped_table = NULL, *sql = NULL;
+	zval *data_types = NULL, escaped_table, sql;
 
 	PHALCON_MM_GROW();
 
@@ -873,20 +850,19 @@ PHP_METHOD(Phalcon_Db_Adapter, delete){
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, getThis(), "escapeidentifier", table);
 	} else {
-		PHALCON_CPY_WRT(escaped_table, table);
+		ZVAL_COPY_VALUE(&escaped_table, table);
 	}
 
-	PHALCON_INIT_VAR(sql);
 	if (PHALCON_IS_NOT_EMPTY(where_condition)) {
-		PHALCON_CONCAT_SVSV(sql, "DELETE FROM ", escaped_table, " WHERE ", where_condition);
+		PHALCON_CONCAT_SVSV(&sql, "DELETE FROM ", &escaped_table, " WHERE ", where_condition);
 	} else {
-		PHALCON_CONCAT_SV(sql, "DELETE FROM ", escaped_table);
+		PHALCON_CONCAT_SV(&sql, "DELETE FROM ", &escaped_table);
 	}
 
 	/** 
 	 * Perform the update via execute
 	 */
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", sql, placeholders, data_types);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql, placeholders, data_types);
 	RETURN_MM();
 }
 
@@ -946,8 +922,7 @@ PHP_METHOD(Phalcon_Db_Adapter, limit){
  */
 PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 
-	zval *table_name, *schema_name = NULL, *dialect, *sql = NULL;
-	zval *fetch_num, *num = NULL, *first;
+	zval *table_name, *schema_name = NULL, *dialect, sql, fetch_num, num, first;
 
 	PHALCON_MM_GROW();
 
@@ -961,14 +936,12 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 
 	PHALCON_CALL_METHOD(&sql, dialect, "tableexists", table_name, schema_name);
 
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
-	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", sql, fetch_num);
+	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", &sql, &fetch_num);
 
-	PHALCON_OBS_VAR(first);
 	phalcon_array_fetch_long(&first, num, 0, PH_NOISY);
-	RETURN_CCTOR(first);
+	RETURN_CTOR(&first);
 }
 
 /**
@@ -984,8 +957,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
  */
 PHP_METHOD(Phalcon_Db_Adapter, viewExists){
 
-	zval *view_name, *schema_name = NULL, *dialect, *sql = NULL, *fetch_num;
-	zval *num = NULL, *first;
+	zval *view_name, *schema_name = NULL, *dialect, sql, fetch_num, num, first;
 
 	PHALCON_MM_GROW();
 
@@ -999,14 +971,12 @@ PHP_METHOD(Phalcon_Db_Adapter, viewExists){
 
 	PHALCON_CALL_METHOD(&sql, dialect, "viewexists", view_name, schema_name);
 
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
-	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", sql, fetch_num);
+	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", &sql, &fetch_num);
 
-	PHALCON_OBS_VAR(first);
-	phalcon_array_fetch_long(&first, num, 0, PH_NOISY);
-	RETURN_CCTOR(first);
+	phalcon_array_fetch_long(&first, &num, 0, PH_NOISY);
+	RETURN_CTOR(&first);
 }
 
 /**

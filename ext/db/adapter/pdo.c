@@ -519,8 +519,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 
 	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, *profiler;
-	zval *events_manager, event_name, *status = NULL, *affected_rows = NULL;
-	zval *pdo, *statement = NULL, *new_statement = NULL;
+	zval *events_manager, event_name, status, affected_rows;
+	zval *pdo, statement, new_statement;
 
 	PHALCON_MM_GROW();
 
@@ -545,7 +545,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 
 		ZVAL_STRING(&event_name, "db:beforeExecute");
 		PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), bind_params);
-		if (PHALCON_IS_FALSE(status)) {
+		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_MM_FALSE;
 		}
 	}
@@ -553,12 +553,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	if (Z_TYPE_P(bind_params) == IS_ARRAY) { 
 		PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
 		if (Z_TYPE_P(statement) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", statement, bind_params, bind_types);
-			PHALCON_CALL_METHOD(&affected_rows, new_statement, "rowcount");
+			PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
+			PHALCON_CALL_METHOD(&affected_rows, &new_statement, "rowcount");
 		}
 		else {
-			PHALCON_INIT_VAR(affected_rows);
-			ZVAL_LONG(affected_rows, 0);
+			ZVAL_LONG(&affected_rows, 0);
 		}
 	} else {
 		pdo = phalcon_read_property(getThis(), SL("_pdo"), PH_NOISY);
@@ -575,8 +574,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	/** 
 	 * Execute the afterQuery event if a EventsManager is available
 	 */
-	if (Z_TYPE_P(affected_rows) == IS_LONG) {
-		phalcon_update_property_this(getThis(), SL("_affectedRows"), affected_rows);
+	if (Z_TYPE(affected_rows) == IS_LONG) {
+		phalcon_update_property_this(getThis(), SL("_affectedRows"), &affected_rows);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "db:afterExecute");
 			PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), bind_params);

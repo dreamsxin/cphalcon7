@@ -355,7 +355,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		 */
 		if (phalcon_array_isset_fetch_str(&left, expression, SL("left"))) {
 			PHALCON_CALL_METHOD(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
-			PHALCON_CONCAT_VV(return_value, expression_left, &operator);
+			PHALCON_CONCAT_VV(return_value, &expression_left, &operator);
 			RETURN_MM();
 		}
 
@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		 */
 		if (phalcon_array_isset_fetch_str(&right, expression, SL("right"))) {
 			PHALCON_CALL_METHOD(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
-			PHALCON_CONCAT_VV(return_value, &operator, expression_right);
+			PHALCON_CONCAT_VV(return_value, &operator, &expression_right);
 			RETURN_MM();
 		}
 	}
@@ -398,19 +398,19 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	/**
 	 * Resolve parentheses
 	 */
-	if (PHALCON_IS_STRING(type, "parentheses")) {
+	if (PHALCON_IS_STRING(&type, "parentheses")) {
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
 
-		PHALCON_CONCAT_SVS(return_value, "(", expression_left, ")");
+		PHALCON_CONCAT_SVS(return_value, "(", &expression_left, ")");
 		RETURN_MM();
 	}
 
 	/**
 	 * Resolve function calls
 	 */
-	if (PHALCON_IS_STRING(type, "functionCall")) {
+	if (PHALCON_IS_STRING(&type, "functionCall")) {
 		PHALCON_RETURN_CALL_METHOD(getThis(), "getsqlexpressionfunctioncall", expression, escape_char);
 		RETURN_MM();
 	}
@@ -418,7 +418,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	/**
 	 * Resolve lists
 	 */
-	if (PHALCON_IS_STRING(type, "list")) {
+	if (PHALCON_IS_STRING(&type, "list")) {
 		array_init(&sql_items);
 
 		phalcon_array_fetch_long(&items, expression, 0, PH_NOISY);
@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	/**
 	 * Resolve *
 	 */
-	if (PHALCON_IS_STRING(type, "all")) {
+	if (PHALCON_IS_STRING(&type, "all")) {
 		RETURN_MM_STRING("*");
 	}
 
@@ -506,8 +506,8 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 
-	zval *expression, *escape_char = NULL, *expr = NULL, *clauses, *clause = NULL;
-	zval *clause_expr = NULL, *clause_when = NULL, *clause_then = NULL, *type = NULL, *tmp = NULL, *tmp1 = NULL;
+	zval *expression, *escape_char = NULL, expr, expr_tmp, clauses, *clause = NULL;
+	zval *clause_expr = NULL, *clause_when = NULL, *clause_then = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -521,40 +521,32 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 
 	ZVAL_STRING(return_value, "CASE ");
 
-	PHALCON_OBS_NVAR(expr);
 	phalcon_array_fetch_str(&expr, expression, SL("expr"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&tmp, getThis(), "getsqlexpression", expr, escape_char);
+	PHALCON_CALL_METHOD(&expr_tmp, getThis(), "getsqlexpression", &expr, escape_char);
 
-	PHALCON_CONCAT_SV(return_value, "CASE ", tmp);
+	PHALCON_CONCAT_SV(return_value, "CASE ", &expr_tmp);
 
-	PHALCON_OBS_VAR(clauses);
 	phalcon_array_fetch_str(&clauses, expression, SL("when-clauses"), PH_NOISY);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(clauses), clause) {
-		PHALCON_OBS_NVAR(type);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(clauses), clause) {
+		zval type, clause_when, clause_then, clause_expr, tmp, tmp1;
+
 		phalcon_array_fetch_str(&type, clause, ISL(type), PH_NOISY);
-
-		if (PHALCON_IS_STRING(type, "when")) {
-
-			PHALCON_OBS_NVAR(clause_when);
+		if (PHALCON_IS_STRING(&type, "when")) {
 			phalcon_array_fetch_str(&clause_when, clause, SL("when"), PH_NOISY);
-
-			PHALCON_CALL_METHOD(&tmp, getThis(), "getsqlexpression", clause_when, escape_char);
-
-			PHALCON_OBS_NVAR(clause_then);
 			phalcon_array_fetch_str(&clause_then, clause, SL("then"), PH_NOISY);
 
-			PHALCON_CALL_METHOD(&tmp1, getThis(), "getsqlexpression", clause_then, escape_char);
+			PHALCON_CALL_METHOD(&tmp, getThis(), "getsqlexpression", &clause_when, escape_char);
+			PHALCON_CALL_METHOD(&tmp1, getThis(), "getsqlexpression", &clause_then, escape_char);
 
-			PHALCON_SCONCAT_SVSV(return_value, " WHEN ", tmp, " THEN ", tmp1);
+			PHALCON_SCONCAT_SVSV(return_value, " WHEN ", &tmp, " THEN ", &tmp1);
 		} else {
-			PHALCON_OBS_NVAR(clause_expr);
 			phalcon_array_fetch_str(&clause_expr, clause, ISL(expr), PH_NOISY);
 
-			PHALCON_CALL_METHOD(&tmp, getThis(), "getsqlexpression", clause_expr, escape_char);
+			PHALCON_CALL_METHOD(&tmp, getThis(), "getsqlexpression", &clause_expr, escape_char);
 
-			PHALCON_SCONCAT_SV(return_value, " ELSE ", tmp);
+			PHALCON_SCONCAT_SV(return_value, " ELSE ", &tmp);
 		}
 	} ZEND_HASH_FOREACH_END();
 

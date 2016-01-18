@@ -1421,8 +1421,8 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 	 */
 	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", &sql, &fetch_num);
 
-	if (Z_TYPE_P(tables) == IS_ARRAY) {
-		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(tables)));
+	if (Z_TYPE(tables) == IS_ARRAY) {
+		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL(tables)));
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(tables), table) {
 			zval table_name;
 			if (phalcon_array_isset_fetch_long(&table_name, table, 0)) {
@@ -1474,9 +1474,9 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", &sql, &fetch_num);
 
 	if (Z_TYPE_P(tables) == IS_ARRAY) {
-		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(tables)));
+		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL(tables)));
 		
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(tables), table) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(tables), table) {
 			zval table_name;
 			if (phalcon_array_isset_fetch_long(&table_name, table, 0)) {
 				phalcon_array_append(return_value, &table_name, PH_COPY);
@@ -1500,7 +1500,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
  */
 PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 
-	zval *table, *schema = NULL, *dialect, fetch_num, sql, describe;
+	zval *table, *schema = NULL, *dialect, fetch_num, sql, describe, *index;
 	zval indexes, *index_columns;
 	zend_string *str_key;
 	ulong idx;
@@ -1528,7 +1528,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 	/** 
 	 * Cryptic Guide: 2: table, 3: from, 4: to
 	 */
-	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", sql, fetch_num);
+	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
 	array_init(&indexes);
 
@@ -1553,7 +1553,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 		 * Every index is abstracted using a Phalcon\Db\Index instance
 		 */
 		object_init_ex(&index, phalcon_db_index_ce);
-		PHALCON_CALL_METHOD(NULL, index, "__construct", &name, index_columns);
+		PHALCON_CALL_METHOD(NULL, &index, "__construct", &name, index_columns);
 
 		phalcon_array_update_zval(return_value, &name, &index, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
@@ -1574,12 +1574,8 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
  */
 PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
-	zval *table, *schema = NULL, *dialect, *fetch_num, *sql = NULL, *empty_arr;
-	zval *references, *describe = NULL, *reference = NULL, *constraint_name = NULL;
-	zval *referenced_schema = NULL, *referenced_table = NULL;
-	zval *reference_array = NULL, *column_name = NULL, *referenced_columns = NULL;
-	zval *array_reference = NULL;
-	zval *columns = NULL, *definition = NULL;
+	zval *table, *schema = NULL, *dialect, fetch_num, sql, empty_arr;
+	zval references, describe, *reference, *array_reference;
 	zend_string *str_key;
 	ulong idx;
 
@@ -1596,87 +1592,68 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
 	 */
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	/** 
 	 * Get the SQL required to describe the references from the Dialect
 	 */
 	PHALCON_CALL_METHOD(&sql, dialect, "describereferences", table, schema);
 
-	PHALCON_INIT_VAR(empty_arr);
-	array_init(empty_arr);
+	array_init(&empty_arr);
+	array_init(&references);
 
-	PHALCON_INIT_VAR(references);
-	array_init(references);
-
-	/** 
+	/**
 	 * Execute the SQL returning the 
 	 */
-	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", sql, fetch_num);
+	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), reference) {
-		PHALCON_OBS_NVAR(constraint_name);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), reference) {
+		zval constraint_name, referenced_schema, referenced_table, reference_array, column_name, referenced_columns;
 		phalcon_array_fetch_long(&constraint_name, reference, 2, PH_NOISY);
-		if (!phalcon_array_isset(references, constraint_name)) {
-			PHALCON_OBS_NVAR(referenced_schema);
+		if (!phalcon_array_isset(&references, constraint_name)) {
 			phalcon_array_fetch_long(&referenced_schema, reference, 3, PH_NOISY);
-
-			PHALCON_OBS_NVAR(referenced_table);
 			phalcon_array_fetch_long(&referenced_table, reference, 4, PH_NOISY);
 
-			PHALCON_INIT_NVAR(reference_array);
-			array_init_size(reference_array, 4);
-			phalcon_array_update_str(reference_array, SL("referencedSchema"), referenced_schema, PH_COPY);
-			phalcon_array_update_str(reference_array, SL("referencedTable"), referenced_table, PH_COPY);
-			phalcon_array_update_str(reference_array, SL("columns"), empty_arr, PH_COPY);
-			phalcon_array_update_str(reference_array, SL("referencedColumns"), empty_arr, PH_COPY);
-			phalcon_array_update_zval(references, constraint_name, reference_array, PH_COPY);
+			array_init_size(&reference_array, 4);
+			phalcon_array_update_str(&reference_array, SL("referencedSchema"), &referenced_schema, PH_COPY);
+			phalcon_array_update_str(&reference_array, SL("referencedTable"), &referenced_table, PH_COPY);
+			phalcon_array_update_str(&reference_array, SL("columns"), &empty_arr, PH_COPY);
+			phalcon_array_update_str(&reference_array, SL("referencedColumns"), &empty_arr, PH_COPY);
+			phalcon_array_update_zval(&references, &constraint_name, &reference_array, PH_COPY);
 		}
 
-		PHALCON_OBS_NVAR(column_name);
 		phalcon_array_fetch_long(&column_name, reference, 1, PH_NOISY);
-		phalcon_array_update_zval_str_append_multi_3(references, constraint_name, SL("columns"), column_name, 0);
+		phalcon_array_update_zval_str_append_multi_3(&references, &constraint_name, SL("columns"), &column_name, 0);
 
-		PHALCON_OBS_NVAR(referenced_columns);
 		phalcon_array_fetch_long(&referenced_columns, reference, 5, PH_NOISY);
-		phalcon_array_update_zval_str_append_multi_3(references, constraint_name, SL("referencedColumns"), referenced_columns, 0);
+		phalcon_array_update_zval_str_append_multi_3(&references, &constraint_name, SL("referencedColumns"), &referenced_columns, 0);
 	} ZEND_HASH_FOREACH_END();
 
 	array_init(return_value);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(references), idx, str_key, array_reference) {
-		zval name;
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(references), idx, str_key, array_reference) {
+		zval name, referenced_schema, referenced_table, columns, referenced_columns, definition, reference;
 		if (str_key) {
 			ZVAL_STR(&name, str_key);
 		} else {
 			ZVAL_LONG(&name, idx);
 		}
 
-		PHALCON_OBS_NVAR(referenced_schema);
 		phalcon_array_fetch_str(&referenced_schema, array_reference, SL("referencedSchema"), PH_NOISY);
-
-		PHALCON_OBS_NVAR(referenced_table);
 		phalcon_array_fetch_str(&referenced_table, array_reference, SL("referencedTable"), PH_NOISY);
-
-		PHALCON_OBS_NVAR(columns);
 		phalcon_array_fetch_str(&columns, array_reference, SL("columns"), PH_NOISY);
-
-		PHALCON_OBS_NVAR(referenced_columns);
 		phalcon_array_fetch_str(&referenced_columns, array_reference, SL("referencedColumns"), PH_NOISY);
 
-		PHALCON_INIT_NVAR(definition);
-		array_init_size(definition, 4);
-		phalcon_array_update_str(definition, SL("referencedSchema"), referenced_schema, PH_COPY);
-		phalcon_array_update_str(definition, SL("referencedTable"), referenced_table, PH_COPY);
-		phalcon_array_update_str(definition, SL("columns"), columns, PH_COPY );
-		phalcon_array_update_str(definition, SL("referencedColumns"), referenced_columns, PH_COPY);
+		array_init_size(&definition, 4);
+		phalcon_array_update_str(&definition, SL("referencedSchema"), &referenced_schema, PH_COPY);
+		phalcon_array_update_str(&definition, SL("referencedTable"), &referenced_table, PH_COPY);
+		phalcon_array_update_str(&definition, SL("columns"), &columns, PH_COPY );
+		phalcon_array_update_str(&definition, SL("referencedColumns"), &referenced_columns, PH_COPY);
 
-		PHALCON_INIT_NVAR(reference);
-		object_init_ex(reference, phalcon_db_reference_ce);
-		PHALCON_CALL_METHOD(NULL, reference, "__construct", &name, definition);
+		object_init_ex(&reference, phalcon_db_reference_ce);
+		PHALCON_CALL_METHOD(NULL, &reference, "__construct", &name, &definition);
 
-		phalcon_array_update_zval(return_value, &name, reference, PH_COPY);
+		phalcon_array_update_zval(return_value, &name, &reference, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_MM_RESTORE();
@@ -1695,8 +1672,8 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
  */
 PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
 
-	zval *table_name, *schema_name = NULL, *dialect, *sql = NULL;
-	zval *fetch_assoc, *describe = NULL, *first;
+	zval *table_name, *schema_name = NULL, *dialect, sql;
+	zval fetch_assoc, describe, first;
 
 	PHALCON_MM_GROW();
 
@@ -1709,15 +1686,13 @@ PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&sql, dialect, "tableoptions", table_name, schema_name);
-	if (zend_is_true(sql)) {
-		PHALCON_INIT_VAR(fetch_assoc);
-		ZVAL_LONG(fetch_assoc, PDO_FETCH_ASSOC);
+	if (zend_is_true(&sql)) {
+		ZVAL_LONG(&fetch_assoc, PDO_FETCH_ASSOC);
 
-		PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", sql, fetch_assoc);
+		PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_assoc);
 
-		PHALCON_OBS_VAR(first);
 		phalcon_array_fetch_long(&first, describe, 0, PH_NOISY);
-		RETURN_CCTOR(first);
+		RETURN_CTOR(&first);
 	}
 
 	RETURN_MM_EMPTY_ARRAY();
@@ -1731,7 +1706,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
  */
 PHP_METHOD(Phalcon_Db_Adapter, createSavepoint){
 
-	zval *name, *dialect, *supports_sp = NULL, *sql = NULL;
+	zval *name, *dialect, supports_sp, sql;
 
 	PHALCON_MM_GROW();
 
@@ -1740,13 +1715,13 @@ PHP_METHOD(Phalcon_Db_Adapter, createSavepoint){
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&supports_sp, dialect, "supportssavepoints");
-	if (!zend_is_true(supports_sp)) {
+	if (!zend_is_true(&supports_sp)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Savepoints are not supported by this database adapter.");
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&sql, dialect, "createsavepoint", name);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", sql);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
 	RETURN_MM();
 }
 
@@ -1758,8 +1733,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createSavepoint){
  */
 PHP_METHOD(Phalcon_Db_Adapter, releaseSavepoint){
 
-	zval *name, *dialect, *supports_sp = NULL, *supports_rsp = NULL;
-	zval *sql = NULL;
+	zval *name, *dialect, supports_sp, supports_rsp, sql;
 
 	PHALCON_MM_GROW();
 
@@ -1768,18 +1742,18 @@ PHP_METHOD(Phalcon_Db_Adapter, releaseSavepoint){
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&supports_sp, dialect, "supportssavepoints");
-	if (!zend_is_true(supports_sp)) {
+	if (!zend_is_true(&supports_sp)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Savepoints are not supported by this database adapter");
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&supports_rsp, dialect, "supportsreleasesavepoints");
-	if (!zend_is_true(supports_rsp)) {
+	if (!zend_is_true(&supports_rsp)) {
 		RETURN_MM_FALSE;
 	}
 
 	PHALCON_CALL_METHOD(&sql, dialect, "releasesavepoint", name);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", sql);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
 	RETURN_MM();
 }
 
@@ -1791,7 +1765,7 @@ PHP_METHOD(Phalcon_Db_Adapter, releaseSavepoint){
  */
 PHP_METHOD(Phalcon_Db_Adapter, rollbackSavepoint){
 
-	zval *name, *dialect, *supports_sp = NULL, *sql = NULL;
+	zval *name, *dialect, supports_sp, sql;
 
 	PHALCON_MM_GROW();
 
@@ -1800,13 +1774,13 @@ PHP_METHOD(Phalcon_Db_Adapter, rollbackSavepoint){
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&supports_sp, dialect, "supportssavepoints");
-	if (!zend_is_true(supports_sp)) {
+	if (!zend_is_true(&supports_sp)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Savepoints are not supported by this database adapter");
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&sql, dialect, "rollbacksavepoint", name);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", sql);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
 	RETURN_MM();
 }
 
@@ -1819,7 +1793,7 @@ PHP_METHOD(Phalcon_Db_Adapter, rollbackSavepoint){
 PHP_METHOD(Phalcon_Db_Adapter, setNestedTransactionsWithSavepoints){
 
 	zval *nested_transactions_with_savepoints;
-	zval *transaction_level, *dialect, *supports_sp = NULL;
+	zval *transaction_level, *dialect, supports_sp;
 
 	PHALCON_MM_GROW();
 
@@ -1834,7 +1808,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setNestedTransactionsWithSavepoints){
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHOD(&supports_sp, dialect, "supportssavepoints");
-	if (!zend_is_true(supports_sp)) {
+	if (!zend_is_true(&supports_sp)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Savepoints are not supported by this database adapter");
 		return;
 	}
@@ -1884,14 +1858,13 @@ PHP_METHOD(Phalcon_Db_Adapter, getNestedTransactionSavepointName){
  */
 PHP_METHOD(Phalcon_Db_Adapter, getDefaultIdValue){
 
-	zval *null_value;
+	zval null_value;
 
 	PHALCON_MM_GROW();
 
-	PHALCON_ALLOC_INIT_ZVAL(null_value);
-	ZVAL_STRING(null_value, "null");
+	ZVAL_STRING(&null_value, "null");
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", null_value);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &null_value);
 
 	RETURN_MM();
 }

@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
  */
 PHP_METHOD(Phalcon_Forms_Element_Select, render){
 
-	zval *attributes = NULL, *options, *widget_attributes = NULL;
+	zval *attributes = NULL, *options, widget_attributes;
 
 	PHALCON_MM_GROW();
 
@@ -184,6 +184,6 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 	 * Merged passed attributes with previously defined ones
 	 */
 	PHALCON_CALL_METHOD(&widget_attributes, getThis(), "prepareattributes", attributes);
-	PHALCON_RETURN_CALL_CE_STATIC(phalcon_tag_select_ce, "selectfield", widget_attributes, options);
+	PHALCON_RETURN_CALL_CE_STATIC(phalcon_tag_select_ce, "selectfield", &widget_attributes, options);
 	RETURN_MM();
 }

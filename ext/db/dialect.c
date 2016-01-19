@@ -684,8 +684,8 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	zval *column = NULL, columns_sql, tables, selected_tables, *table;
 	zval tables_sql, sql, joins;
 	zval *join = NULL, where_conditions;
-	zval *where_expression = NULL, *group_items, group_fields;
-	zval *group_field = NULL, group_sql, group_clause, having_conditions, *having_expression = NULL;
+	zval where_expression, group_items, group_fields;
+	zval *group_field = NULL, group_sql, group_clause, having_conditions, having_expression;
 	zval order_fields, order_items, *order_item = NULL;
 	zval order_sql, tmp1, tmp2, limit_value, number, offset;
 
@@ -797,7 +797,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	}
 
 	if (phalcon_array_isset_fetch_str(&distinct, definition, SL("distinct"))) {
-		if (Z_TYPE_P(distinct) == IS_LONG) {
+		if (Z_TYPE(distinct) == IS_LONG) {
 			if (Z_LVAL(distinct) == 0) {
 				ZVAL_STRING(&sql, "SELECT ALL ");
 			} else if (Z_LVAL(distinct) == 1) {
@@ -835,7 +835,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			 * Check if the join has conditions
 			 */
 			if (phalcon_array_isset_fetch_str(&join_conditions_array, join, SL("conditions"))) {
-				if (phalcon_fast_count_ev(join_conditions_array)) {
+				if (phalcon_fast_count_ev(&join_conditions_array)) {
 					array_init(&join_expressions);
 
 					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&join_conditions_array), join_condition) {
@@ -857,7 +857,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
 		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) { 
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
-			PHALCON_SCONCAT_SV(&sql, " WHERE ", where_expression);
+			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_conditions);
 		}

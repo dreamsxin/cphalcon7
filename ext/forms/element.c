@@ -359,8 +359,8 @@ PHP_METHOD(Phalcon_Forms_Element, getValidators){
 PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 
 	zval *attributes = NULL, *use_checked = NULL, *name, widget_attributes;
-	zval *default_attributes, *merged_attributes = NULL;
-	zval *value = NULL, current_value;
+	zval *default_attributes, merged_attributes;
+	zval value, current_value;
 
 	PHALCON_MM_GROW();
 
@@ -405,27 +405,27 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	/** 
 	 * If the widget has a value set it as default value
 	 */
-	if (Z_TYPE_P(value) != IS_NULL) {
+	if (Z_TYPE(value) != IS_NULL) {
 		if (zend_is_true(use_checked)) {
 			/**
 			 * Check if the element already has a default value, compare it with the one in the
 			 * attributes, if they are the same mark the element as checked
 			 */
 			if (phalcon_array_isset_fetch_str(&current_value, &merged_attributes, SL("value"))) {
-				if (PHALCON_IS_EQUAL(&current_value, value)) {
+				if (PHALCON_IS_EQUAL(&current_value, &value)) {
 					phalcon_array_update_str_str(&merged_attributes, SL("checked"), SL("checked"), PH_COPY);
 				}
 			} else {
 				/** 
 				 * Evaluate the current value and mark the check as checked
 				 */
-				if (zend_is_true(value)) {
+				if (zend_is_true(&value)) {
 					phalcon_array_update_str_str(&merged_attributes, SL("checked"), SL("checked"), PH_COPY);
 				}
-				phalcon_array_update_str(&merged_attributes, SL("value"), value, PH_COPY);
+				phalcon_array_update_str(&merged_attributes, SL("value"), &value, PH_COPY);
 			}
 		} else {
-			phalcon_array_update_str(&merged_attributes, SL("value"), value, PH_COPY);
+			phalcon_array_update_str(&merged_attributes, SL("value"), &value, PH_COPY);
 		}
 	}
 

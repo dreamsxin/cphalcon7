@@ -1473,7 +1473,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 	 */
 	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", &sql, &fetch_num);
 
-	if (Z_TYPE_P(tables) == IS_ARRAY) {
+	if (Z_TYPE(tables) == IS_ARRAY) {
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL(tables)));
 		
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(tables), table) {
@@ -1610,7 +1610,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), reference) {
 		zval constraint_name, referenced_schema, referenced_table, reference_array, column_name, referenced_columns;
 		phalcon_array_fetch_long(&constraint_name, reference, 2, PH_NOISY);
-		if (!phalcon_array_isset(&references, constraint_name)) {
+		if (!phalcon_array_isset(&references, &constraint_name)) {
 			phalcon_array_fetch_long(&referenced_schema, reference, 3, PH_NOISY);
 			phalcon_array_fetch_long(&referenced_table, reference, 4, PH_NOISY);
 
@@ -1691,7 +1691,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
 
 		PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_assoc);
 
-		phalcon_array_fetch_long(&first, describe, 0, PH_NOISY);
+		phalcon_array_fetch_long(&first, &describe, 0, PH_NOISY);
 		RETURN_CTOR(&first);
 	}
 

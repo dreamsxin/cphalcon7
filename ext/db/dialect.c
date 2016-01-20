@@ -1109,8 +1109,8 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 		}
 
 		phalcon_array_fetch_str(&column_name, column, SL("name"), PH_NOISY);
-		phalcon_array_fetch(&value_expr, values, &position, PH_NOISY);
-		phalcon_array_fetch_str(&value, value_expr, SL("value"), PH_NOISY);
+		phalcon_array_fetch(&value_expr, &values, &position, PH_NOISY);
+		phalcon_array_fetch_str(&value, &value_expr, SL("value"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&value_expression, getThis(), "getsqlexpression", &value, &escape_char, quoting);
 
@@ -1148,7 +1148,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 			 * In the numeric 1 position could be a ASC/DESC clause
 			 */
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
-				PHALCON_CONCAT_VSV(&order_sql_item_type, order_sql_item, " ", &sql_order_type);
+				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
 				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
 			}
@@ -1195,8 +1195,8 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 
 	zval *definition, tables, escape_char;
 	zval updated_tables, *table = NULL, tables_sql, sql;
-	zval where_conditions, *where_expression = NULL;
-	zval order_fields, *order_items, *order_item = NULL, order_sql;
+	zval where_conditions, where_expression;
+	zval order_fields, order_items, *order_item, order_sql;
 	zval limit_value, number, offset, tmp1, tmp2;
 
 	PHALCON_MM_GROW();
@@ -1219,12 +1219,12 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	/**
 	 * Check and escape tables
 	 */
-	array_init(updated_tables);
+	array_init(&updated_tables);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
-		zval *sql_table = NULL;
+		zval sql_table;
 		PHALCON_CALL_METHOD(&sql_table, getThis(), "getsqltable", table, &escape_char);
-		phalcon_array_append(&updated_tables, sql_table, PH_COPY);
+		phalcon_array_append(&updated_tables, &sql_table, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(&tables_sql, SL(", "), &updated_tables);
@@ -1235,7 +1235,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
 		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) { 
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
-			PHALCON_SCONCAT_SV(&sql, " WHERE ", where_expression);
+			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_conditions);
 		}
@@ -1245,8 +1245,8 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	if (phalcon_array_isset_fetch_str(&order_fields, definition, SL("order"))) {
 		array_init(&order_items);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(order_fields), order_item) {
-			zval order_expression, *order_sql_item = NULL, sql_order_type, order_sql_item_type;
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(order_fields), order_item) {
+			zval order_expression, order_sql_item, sql_order_type, order_sql_item_type;
 
 			phalcon_array_fetch_long(&order_expression, order_item, 0, PH_NOISY);
 
@@ -1255,17 +1255,16 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 			/**
 			 * In the numeric 1 position could be a ASC/DESC clause
 			 */
-			if (phalcon_array_isset_long(order_item, 1)) {
-				phalcon_array_fetch_long(&sql_order_type, order_item, 1, PH_NOISY);
-				PHALCON_CONCAT_VSV(&order_sql_item_type, order_sql_item, " ", &sql_order_type);
+			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
+				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				ZVAL_COPY_VALUE(&order_sql_item_type, order_sql_item);
+				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
 			}
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&order_sql, SL(", "), &order_items);
-		PHALCON_SCONCAT_SV(sql, " ORDER BY ", &order_sql);
+		PHALCON_SCONCAT_SV(&sql, " ORDER BY ", &order_sql);
 	}
 
 	/**

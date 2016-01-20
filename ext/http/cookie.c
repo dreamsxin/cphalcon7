@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 
 	zval *filters = NULL, *default_value = NULL, *restored, *dependency_injector = NULL;
 	zval *readed, *name, *_COOKIE, value, *encryption;
-	zval *service = NULL, *crypt = NULL, *decrypted_value = NULL, *filter = NULL;
+	zval service, crypt, decrypted_value, filter;
 
 	PHALCON_MM_GROW();
 
@@ -254,7 +254,12 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 		PHALCON_CALL_METHOD(NULL, getThis(), "restore");
 	}
 
-	PHALCON_INIT_VAR(dependency_injector);
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
+
+	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'filter' service");
+		return;
+	}
 
 	readed = phalcon_read_property(getThis(), SL("_readed"), PH_NOISY);
 	if (PHALCON_IS_FALSE(readed)) {
@@ -264,47 +269,34 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 		if (phalcon_array_isset_fetch(&value, _COOKIE, name)) {
 			encryption = phalcon_read_property(getThis(), SL("_useEncryption"), PH_NOISY);
 			if (zend_is_true(encryption) && PHALCON_IS_NOT_EMPTY(&value)) {
-				dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-				if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-					PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'filter' service");
-					return;
-				}
+				ZVAL_STRING(&service, "crypt");
 
-				PHALCON_INIT_VAR(service);
-				ZVAL_STRING(service, "crypt");
-
-				PHALCON_CALL_METHOD(&crypt, dependency_injector, "getshared", service);
-				PHALCON_VERIFY_INTERFACE(crypt, phalcon_cryptinterface_ce);
+				PHALCON_CALL_METHOD(&crypt, dependency_injector, "getshared", &service);
+				PHALCON_VERIFY_INTERFACE(&crypt, phalcon_cryptinterface_ce);
 
 				/** 
 				 * Decrypt the value also decoding it with base64
 				 */
-				PHALCON_CALL_METHOD(&decrypted_value, crypt, "decryptbase64", &value);
+				PHALCON_CALL_METHOD(&decrypted_value, &crypt, "decryptbase64", &value);
 			} else {
-				PHALCON_CPY_WRT(decrypted_value, &value);
+				ZVAL_COPY_VALUE(&decrypted_value, &value);
 			}
 
 			/** 
 			 * Update the decrypted value
 			 */
-			phalcon_update_property_this(getThis(), SL("_value"), decrypted_value);
+			phalcon_update_property_this(getThis(), SL("_value"), &decrypted_value);
 			if (Z_TYPE_P(filters) != IS_NULL) {
-				filter = phalcon_read_property(getThis(), SL("_filter"), PH_NOISY);
-				if (Z_TYPE_P(filter) != IS_OBJECT) {
-					if (Z_TYPE_P(dependency_injector) == IS_NULL) {
-						dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-						PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_http_cookie_exception_ce, 1);
-					}
+				phalcon_return_property(&filter, getThis(), SL("_filter"));
+				if (Z_TYPE(filter) != IS_OBJECT) {
+					ZVAL_STRING(&service, ISV(filter));
 
-					PHALCON_INIT_NVAR(service);
-					ZVAL_STRING(service, ISV(filter));
-
-					PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
-					PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
-					phalcon_update_property_this(getThis(), SL("_filter"), filter);
+					PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", &service);
+					PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+					phalcon_update_property_this(getThis(), SL("_filter"), &filter);
 				}
 
-				PHALCON_RETURN_CALL_METHOD(filter, "sanitize", decrypted_value, filters);
+				PHALCON_RETURN_CALL_METHOD(&filter, "sanitize", &decrypted_value, filters);
 				RETURN_MM();
 			}
 
@@ -312,13 +304,13 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 			 * Return the value without filtering
 			 */
 
-			RETURN_CTOR(decrypted_value);
+			RETURN_CTOR(&decrypted_value);
 		}
 
 		RETURN_CTOR(default_value);
 	}
 
-	value = phalcon_read_property(getThis(), SL("_value"), PH_NOISY);
+	phalcon_return_property(&value, getThis(), SL("_value"), PH_NOISY);
 
 	RETURN_CTOR(value);
 }

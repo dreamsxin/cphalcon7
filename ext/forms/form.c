@@ -780,6 +780,7 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 	if (!pos || Z_TYPE_P(pos) == IS_NULL) {
 		/* Append the element by its name */
 		phalcon_update_property_array(getThis(), SL("_elements"), &name, element);
+		elements = phalcon_read_property(getThis(), SL("_elements"), PH_NOISY);
 		phalcon_array_values(&elements_indexed, elements);
 		phalcon_update_property_this(getThis(), SL("_elementsIndexed"), &elements_indexed);
 	} else {
@@ -821,9 +822,9 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 
 		array_init(&new_elements);
 
-		phalcon_array_merge_recursive_n(&elements, &tmp0);
-		phalcon_array_merge_recursive_n(&elements, &values);
-		phalcon_array_merge_recursive_n(&elements, &tmp1);
+		phalcon_array_merge_recursive_n(&new_elements, &tmp0);
+		phalcon_array_merge_recursive_n(&new_elements, &values);
+		phalcon_array_merge_recursive_n(&new_elements, &tmp1);
 
 		phalcon_update_property_this(getThis(), SL("_elements"), &new_elements);
 		phalcon_array_values(&elements_indexed, &new_elements);
@@ -1025,9 +1026,8 @@ PHP_METHOD(Phalcon_Forms_Form, getValues){
 		/**
 		 * Check if the entity has a public property
 		 */
-		if (phalcon_isset_property_zval(entity, name)) {
-			value = phalcon_read_property_zval(entity, name, PH_NOISY);
-			RETURN_CTOR(value);
+		if (phalcon_property_isset_fetch_zval(&value, entity, name)) {
+			RETURN_CTOR(&value);
 		}
 	}
 
@@ -1094,7 +1094,7 @@ PHP_METHOD(Phalcon_Forms_Form, remove){
  */
 PHP_METHOD(Phalcon_Forms_Form, clear){
 
-	zval *fields = NULL, *elements, *element = NULL, *name = NULL;
+	zval *fields = NULL, *elements, *element, name;
 
 	PHALCON_MM_GROW();
 
@@ -1111,7 +1111,7 @@ PHP_METHOD(Phalcon_Forms_Form, clear){
 				PHALCON_CALL_METHOD(NULL, element, "clear");
 			} else {
 				PHALCON_CALL_METHOD(&name, element, "getname");
-				if (phalcon_fast_in_array(name, fields)) {
+				if (phalcon_fast_in_array(&name, fields)) {
 					PHALCON_CALL_METHOD(NULL, element, "clear");
 				}
 			}
@@ -1277,7 +1277,7 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 
 	if (!phalcon_array_isset_fetch(&element_messages, current_messages, filed)) {
 		object_init_ex(&element_messages, phalcon_validation_message_group_ce);
-		PHALCON_CALL_METHOD(NULL, element_messages, "__construct");
+		PHALCON_CALL_METHOD(NULL, &element_messages, "__construct");
 	}
 
 	PHALCON_CALL_METHOD(NULL, &element_messages, "appendmessages", messages);

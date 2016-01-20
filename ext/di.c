@@ -375,16 +375,20 @@ PHP_METHOD(Phalcon_DI, getService){
  */
 PHP_METHOD(Phalcon_DI, get){
 
-	zval *name, *parameters = NULL, *events_manager, event_name, event_data, service;
+	zval *name, *parameters = NULL, *noerror = NULL, *events_manager, event_name, event_data, service;
 	zend_class_entry *ce;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &name, &parameters);
+	phalcon_fetch_params(1, 1, 2, &name, &parameters, &noerror);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!noerror) {
+		noerror = &PHALCON_GLOBAL(z_false);
 	}
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
@@ -409,8 +413,10 @@ PHP_METHOD(Phalcon_DI, get){
 				RETURN_MM();
 			}
 		} else {
-			zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));
-			RETURN_MM();
+			if(!zend_is_true(noerror)) {
+				zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));
+			}
+			RETURN_MM_NULL();
 		}
 	}
 

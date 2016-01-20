@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Http_Response, getHeaders){
 		return;
 	}
 
-	RETURN_COTRW(&headers);
+	RETURN_CTORW(headers);
 }
 
 /**
@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Http_Response, setHeader){
  */
 PHP_METHOD(Phalcon_Http_Response, setRawHeader){
 
-	zval *header, *headers = NULL;
+	zval *header, headers;
 
 	phalcon_fetch_params(0, 1, 0, &header);
 
@@ -398,7 +398,7 @@ PHP_METHOD(Phalcon_Http_Response, setExpires){
 	ZVAL_STRING(&utc_zone, "UTC");
 
 	datetimezone_ce = php_date_get_timezone_ce();
-	object_init_ex(timezone, datetimezone_ce);
+	object_init_ex(&timezone, datetimezone_ce);
 
 	PHALCON_CALL_METHOD(NULL, &timezone, "__construct", &utc_zone);
 
@@ -407,7 +407,7 @@ PHP_METHOD(Phalcon_Http_Response, setExpires){
 	 */
 	PHALCON_CALL_METHOD(NULL, &date, "settimezone", &timezone);
 
-	ZVAL_STRING(&format, "D, d M Y H:i:s")
+	ZVAL_STRING(&format, "D, d M Y H:i:s");
 
 	PHALCON_CALL_METHOD(&utc_format, &date, "format", &format);
 
@@ -521,7 +521,7 @@ PHP_METHOD(Phalcon_Http_Response, setEtag){
 PHP_METHOD(Phalcon_Http_Response, redirect){
 
 	zval *location = NULL, *external_redirect = NULL, *status_code = NULL;
-	zval *header = NULL, matched, pattern, dependency_injector, service_name, has;
+	zval header, matched, pattern, dependency_injector, service_name;
 	zval url, view, status_text, header_name;
 
 	static const char* redirect_phrases[] = {
@@ -562,24 +562,22 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	}
 
 	if (Z_TYPE_P(location) == IS_STRING && zend_is_true(external_redirect)) {
-		header = location;
+		ZVAL_COPY(&header, location);
 	} else if (Z_TYPE_P(location) == IS_STRING && strstr(Z_STRVAL_P(location), "://")) {
 		ZVAL_STRING(&pattern, "/^[^:\\/?#]++:/");
 		RETURN_MM_ON_FAILURE(phalcon_preg_match(&matched, &pattern, location, NULL));
 		if (zend_is_true(&matched)) {
-			header = location;
+			ZVAL_COPY(&header, location);
+		} else {
+			ZVAL_NULL(&header);
 		}
-		else {
-			header = NULL;
-		}
-	}
-	else {
-		header = NULL;
+	} else {
+		ZVAL_NULL(&header);
 	}
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 
-	if (!header) {
+	if (Z_TYPE(header) < IS_NULL) {
 		ZVAL_STRING(&service_name, ISV(url));
 
 		PHALCON_CALL_METHOD(&url, &dependency_injector, "getshared", &service_name);
@@ -590,31 +588,28 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 
 	ZVAL_STRING(&service_name, ISV(view));
 
-	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", service_name);
-	if (zend_is_true(&has)) {
-		PHALCON_CALL_METHOD(&view, &dependency_injector, "get", service_name);
-		if (Z_TYPE(view) == IS_OBJECT && instanceof_function(Z_OBJCE(view), phalcon_mvc_viewinterface_ce)) {
-			PHALCON_CALL_METHOD(NULL, &view, "disable");
-		}
+	PHALCON_CALL_METHOD(&view, &dependency_injector, "get", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	if (Z_TYPE(view) == IS_OBJECT && instanceof_function(Z_OBJCE(view), phalcon_mvc_viewinterface_ce)) {
+		PHALCON_CALL_METHOD(NULL, &view, "disable");
 	}
 
 	/* The HTTP status is 302 by default, a temporary redirection */
-	if (Z_LVAL(status_code) < 300 || Z_LVAL(status_code) > 308) {
+	if (Z_LVAL_P(status_code) < 300 || Z_LVAL_P(status_code) > 308) {
 		ZVAL_STRING(&status_text, "Redirect");
-		if (!Z_LVAL(status_code)) {
-			ZVAL_LONG(&status_code, 302);
+		if (!Z_LVAL_P(status_code)) {
+			ZVAL_LONG(status_code, 302);
 		}
 	} else {
-		ZVAL_STRING(&status_text, redirect_phrases[Z_LVAL(status_code) - 300]);
+		ZVAL_STRING(&status_text, redirect_phrases[Z_LVAL_P(status_code) - 300]);
 	}
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "setstatuscode", &status_code, &status_text);
+	PHALCON_CALL_METHOD(NULL, getThis(), "setstatuscode", status_code, &status_text);
 
 	/** 
 	 * Change the current location using 'Location'
 	 */
 	ZVAL_STRING(&header_name, "Location");
-	PHALCON_CALL_METHOD(NULL, getThis(), "setheader", &header_name, header);
+	PHALCON_CALL_METHOD(NULL, getThis(), "setheader", &header_name, &header);
 
 	RETURN_THIS();
 }
@@ -836,9 +831,8 @@ PHP_METHOD(Phalcon_Http_Response, send){
  */
 PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 
-	zval *file_path, *attachment_name = NULL, *attachment = NULL, *base_path = NULL;
-	zval *headers = NULL, *content_description, *content_disposition;
-	zval *content_transfer;
+	zval *file_path, *attachment_name = NULL, *attachment = NULL, base_path;
+	zval headers, content_description, content_disposition, content_transfer;
 
 	PHALCON_MM_GROW();
 
@@ -853,27 +847,24 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 	}
 
 	if (Z_TYPE_P(attachment_name) != IS_STRING) {
-		PHALCON_INIT_VAR(base_path);
-		phalcon_basename(base_path, file_path);
+		phalcon_basename(&base_path, file_path);
 	} else {
-		PHALCON_CPY_WRT(base_path, attachment_name);
+		ZVAL_COPY_VALUE(&base_path, attachment_name);
 	}
 
 	if (zend_is_true(attachment)) {
 		PHALCON_CALL_METHOD(&headers, getThis(), "getheaders");
 
-		PHALCON_INIT_VAR(content_description);
-		ZVAL_STRING(content_description, "Content-Description: File Transfer");
-		PHALCON_CALL_METHOD(NULL, headers, "setraw", content_description);
+		ZVAL_STRING(&content_description, "Content-Description: File Transfer");
+		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_description);
 
-		PHALCON_INIT_VAR(content_disposition);
-		PHALCON_CONCAT_SV(content_disposition, "Content-Disposition: attachment; filename=", base_path);
-		PHALCON_CALL_METHOD(NULL, headers, "setraw", content_disposition);
+		PHALCON_CONCAT_SV(&content_disposition, "Content-Disposition: attachment; filename=", &base_path);
+		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_disposition);
 
-		PHALCON_INIT_VAR(content_transfer);
-		ZVAL_STRING(content_transfer, "Content-Transfer-Encoding: binary");
-		PHALCON_CALL_METHOD(NULL, headers, "setraw", content_transfer);
+		ZVAL_STRING(&content_transfer, "Content-Transfer-Encoding: binary");
+		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_transfer);
 	}
+
 	phalcon_update_property_this(getThis(), SL("_file"), file_path);
 
 	RETURN_THIS();

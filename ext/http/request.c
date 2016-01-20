@@ -206,50 +206,21 @@ PHALCON_INIT_CLASS(Phalcon_Http_Request){
 PHP_METHOD(Phalcon_Http_Request, _get){
 
 	zval *data, *name, *filters, *default_value, *not_allow_empty, *norecursive;
-	zval value, *filter = NULL, *dependency_injector;
-	zval *service, *filter_value = NULL;
+	zval value, *dependency_injector, service, filter, filter_value;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 6, 0, &data, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
 	if (Z_TYPE_P(name) != IS_NULL) {
-		if (phalcon_array_isset_fetch(&value, data, name)) {
-			if (Z_TYPE_P(filters) != IS_NULL) {
-				filter = phalcon_read_property(getThis(), SL("_filter"), PH_NOISY);
-				if (Z_TYPE_P(filter) != IS_OBJECT) {
-					dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-					if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-						PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
-						return;
-					}
-
-					PHALCON_INIT_VAR(service);
-					ZVAL_STRING(service, ISV(filter));
-
-					PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
-					PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
-					phalcon_update_property_this(getThis(), SL("_filter"), filter);
-				}
-
-				PHALCON_CALL_METHOD(&filter_value, filter, "sanitize", &value, filters, norecursive);
-
-				if ((PHALCON_IS_EMPTY(filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(filter_value)) {
-					RETURN_CTOR(default_value);
-				}
-
-				RETURN_CTOR(filter_value);
-			}
-
-			if (PHALCON_IS_EMPTY(&value) && zend_is_true(not_allow_empty)) {
-				RETURN_CTOR(default_value);
-			}
-
-			RETURN_CTOR(value);
+		if (!phalcon_array_isset_fetch(&value, data, name)) {
+			RETURN_CTOR(default_value);
 		}
+	} else {
+		ZVAL_COPY_VALUE(&value, data);
+	}
 
-		RETURN_CTOR(default_value);
-	} else if (Z_TYPE_P(filters) != IS_NULL) {
+	if (Z_TYPE_P(filters) != IS_NULL) {
 		filter = phalcon_read_property(getThis(), SL("_filter"), PH_NOISY);
 		if (Z_TYPE_P(filter) != IS_OBJECT) {
 			dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
@@ -258,24 +229,28 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 				return;
 			}
 
-			PHALCON_INIT_VAR(service);
-			ZVAL_STRING(service, ISV(filter));
+			ZVAL_STRING(&service, ISV(filter));
 
-			PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", service);
-			PHALCON_VERIFY_INTERFACE(filter, phalcon_filterinterface_ce);
-			phalcon_update_property_this(getThis(), SL("_filter"), filter);
+			PHALCON_CALL_METHOD(&filter, dependency_injector, "getshared", &service);
+			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+
+			phalcon_update_property_this(getThis(), SL("_filter"), &filter);
 		}
 
-		PHALCON_CALL_METHOD(&filter_value, filter, "sanitize", data, filters, norecursive);
+		PHALCON_CALL_METHOD(&filter_value, filter, "sanitize", &value, filters, norecursive);
 
-		if ((PHALCON_IS_EMPTY(filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(filter_value)) {
+		if ((PHALCON_IS_EMPTY(&filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(&filter_value)) {
 			RETURN_CTOR(default_value);
-		} else {
-			RETURN_CTOR(filter_value);
 		}
+
+		RETURN_CTOR(&filter_value);
 	}
 
-	RETURN_CTOR(data);
+	if (PHALCON_IS_EMPTY(&value) && zend_is_true(not_allow_empty)) {
+		RETURN_CTOR(default_value);
+	}
+
+	RETURN_CTOR(&value);
 }
 
 /**
@@ -905,7 +880,7 @@ PHP_METHOD(Phalcon_Http_Request, getServerName){
  */
 PHP_METHOD(Phalcon_Http_Request, getHttpHost){
 
-	zval *host, *http_host = NULL, *scheme = NULL, *server_name, *name = NULL;
+	zval host, http_host, *scheme = NULL, *server_name, *name = NULL;
 	zval *server_port, *port = NULL, *http, *standard_port;
 	zval *is_std_name, *is_std_port, *is_std_http;
 	zval *https, *secure_port, *is_secure_scheme;
@@ -913,89 +888,72 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost){
 
 	PHALCON_MM_GROW();
 
-	/** 
+	/**
 	 * Get the server name from _SERVER['HTTP_HOST']
 	 */
-	PHALCON_INIT_VAR(host);
-	ZVAL_STRING(host, "HTTP_HOST");
+	ZVAL_STRING(&host, "HTTP_HOST");
 
-	PHALCON_CALL_METHOD(&http_host, getThis(), "getserver", host);
-	if (zend_is_true(http_host)) {
-		RETURN_CTOR(http_host);
+	PHALCON_CALL_METHOD(&http_host, getThis(), "getserver", &host);
+
+	if (zend_is_true(&http_host)) {
+		RETURN_CTOR(&http_host);
 	}
 
-	/** 
+	/**
 	 * Get current scheme
 	 */
 	PHALCON_CALL_METHOD(&scheme, getThis(), "getscheme");
 
-	/** 
+	/**
 	 * Get the server name from _SERVER['SERVER_NAME']
 	 */
-	PHALCON_INIT_VAR(server_name);
-	ZVAL_STRING(server_name, "SERVER_NAME");
+	ZVAL_STRING(&server_name, "SERVER_NAME");
 
-	PHALCON_CALL_METHOD(&name, getThis(), "getserver", server_name);
+	PHALCON_CALL_METHOD(&name, getThis(), "getserver", &server_name);
 
-	/** 
+	/**
 	 * Get the server port from _SERVER['SERVER_PORT']
 	 */
-	PHALCON_INIT_VAR(server_port);
-	ZVAL_STRING(server_port, "SERVER_PORT");
+	ZVAL_STRING(&server_port, "SERVER_PORT");
 
-	PHALCON_CALL_METHOD(&port, getThis(), "getserver", server_port);
+	PHALCON_CALL_METHOD(&port, getThis(), "getserver", &server_port);
 
-	PHALCON_INIT_VAR(http);
-	ZVAL_STRING(http, "http");
-
-	PHALCON_INIT_VAR(standard_port);
-	ZVAL_LONG(standard_port, 80);
+	ZVAL_STRING(&http, "http");
+	ZVAL_LONG(&standard_port, 80);
 
 	/** 
 	 * Check if the request is a standard http
 	 */
-	PHALCON_INIT_VAR(is_std_name);
-	is_equal_function(is_std_name, scheme, http);
+	is_equal_function(&is_std_name, &scheme, &http);
+	is_equal_function(&is_std_port, &port, &standard_port);
 
-	PHALCON_INIT_VAR(is_std_port);
-	is_equal_function(is_std_port, port, standard_port);
+	phalcon_and_function(&is_std_http, &is_std_name, &is_std_port);
 
-	PHALCON_INIT_VAR(is_std_http);
-	phalcon_and_function(is_std_http, is_std_name, is_std_port);
-
-	PHALCON_INIT_VAR(https);
-	ZVAL_STRING(https, "https");
-
-	PHALCON_INIT_VAR(secure_port);
-	ZVAL_LONG(secure_port, 443);
+	ZVAL_STRING(&https, "https");
+	ZVAL_LONG(&secure_port, 443);
 
 	/** 
 	 * Check if the request is a secure http request
 	 */
-	PHALCON_INIT_VAR(is_secure_scheme);
-	is_equal_function(is_secure_scheme, scheme, https);
-
-	PHALCON_INIT_VAR(is_secure_port);
-	is_equal_function(is_secure_port, port, secure_port);
-
-	PHALCON_INIT_VAR(is_secure_http);
-	phalcon_and_function(is_secure_http, is_secure_scheme, is_secure_port);
+	is_equal_function(&is_secure_scheme, &scheme, &https);
+	is_equal_function(&is_secure_port, &port, &secure_port);
+	phalcon_and_function(&is_secure_http, &is_secure_scheme, &is_secure_port);
 
 	/** 
 	 * If is standard http we return the server name only
 	 */
-	if (PHALCON_IS_TRUE(is_std_http)) {
-		RETURN_CTOR(name);
+	if (PHALCON_IS_TRUE(&is_std_http)) {
+		RETURN_CTOR(&name);
 	}
 
 	/** 
 	 * If is standard secure http we return the server name only
 	 */
-	if (PHALCON_IS_TRUE(is_secure_http)) {
-		RETURN_CTOR(name);
+	if (PHALCON_IS_TRUE(&is_secure_http)) {
+		RETURN_CTOR(&name);
 	}
 
-	PHALCON_CONCAT_VSV(return_value, name, ":", port);
+	PHALCON_CONCAT_VSV(return_value, &name, ":", &port);
 
 	RETURN_MM();
 }
@@ -1008,8 +966,7 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost){
  */
 PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 
-	zval *trust_forwarded_header = NULL, *address = NULL, *_SERVER;
-	zval *addresses, *first;
+	zval *trust_forwarded_header = NULL, *_SERVER, address, addresses, first;
 
 	PHALCON_MM_GROW();
 
@@ -1019,40 +976,33 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 		trust_forwarded_header = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_INIT_VAR(address);
+	_SERVER = phalcon_get_global_str(SL("_SERVER"));
 
 	/** 
 	 * Proxies use this IP
 	 */
-	_SERVER = phalcon_get_global_str(SL("_SERVER"));
-	if (phalcon_array_isset_str(_SERVER, SL("HTTP_X_FORWARDED_FOR"))) {
-		if (zend_is_true(trust_forwarded_header)) {
-			PHALCON_OBS_NVAR(address);
-			phalcon_array_fetch_str(&address, _SERVER, SL("HTTP_X_FORWARDED_FOR"), PH_NOISY);
+	if (zend_is_true(trust_forwarded_header)) {
+		if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("HTTP_X_FORWARDED_FOR"))) {
+			if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"))) {
+				phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY);
+			}
 		}
+	} else if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"))) {
+		phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY);
 	}
 
-	if (Z_TYPE_P(address) == IS_NULL) {
-		if (phalcon_array_isset_str(_SERVER, SL("REMOTE_ADDR"))) {
-			PHALCON_OBS_NVAR(address);
-			phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY);
-		}
-	}
-
-	if (Z_TYPE_P(address) == IS_STRING) {
-		if (phalcon_memnstr_str(address, SL(","))) {
+	if (Z_TYPE(address) == IS_STRING) {
+		if (phalcon_memnstr_str(&address, SL(","))) {
 			/** 
 			 * The client address has multiples parts, only return the first part
 			 */
-			PHALCON_INIT_VAR(addresses);
-			phalcon_fast_explode_str(addresses, SL(","), address);
+			phalcon_fast_explode_str(&addresses, SL(","), &address);
 
-			PHALCON_OBS_VAR(first);
-			phalcon_array_fetch_long(&first, addresses, 0, PH_NOISY);
-			RETURN_CTOR(first);
+			phalcon_array_fetch_long(&first, &addresses, 0, PH_NOISY);
+			RETURN_CTOR(&first);
 		}
 
-		RETURN_CTOR(address);
+		RETURN_CTOR(&address);
 	}
 
 	RETURN_MM_FALSE;

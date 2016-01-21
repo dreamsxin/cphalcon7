@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 	method = phalcon_read_property(getThis(), SL("_method"), PH_NOISY);
 	useragent = phalcon_read_property(getThis(), SL("_useragent"), PH_NOISY);
-	phalcon_return_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_return_property(&data, getThis(), SL("_data"));
 	phalcon_return_property(&type, getThis(), SL("_type"), PH_NOISY);
 	files = phalcon_read_property(getThis(), SL("_files"), PH_NOISY);
 	timeout = phalcon_read_property(getThis(), SL("_timeout"), PH_NOISY);
@@ -209,10 +209,12 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		ZVAL_STRING(&key, "Content-Type");
 
 		if (PHALCON_IS_EMPTY(&type)) {
-			ZVAL_STRING(&type, "application/x-www-form-urlencoded");
+			ZVAL_STRING(&key_value, "application/x-www-form-urlencoded");
+		} else {
+			ZVAL_COPY(&key_value, &type);
 		}
 
-		PHALCON_CALL_METHOD(NULL, header, "set", &key, &type);
+		PHALCON_CALL_METHOD(NULL, header, "set", &key, &key_value);
 
 		if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
 			PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, &data);

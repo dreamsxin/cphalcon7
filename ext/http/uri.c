@@ -299,11 +299,11 @@ PHP_METHOD(Phalcon_Http_Uri, build){
 		}
 	}
 
-	if (phalcon_array_isset_fetch_str(&port, parts, SL("port")) && PHALCON_IS_NOT_EMPTY(port)) {
+	if (phalcon_array_isset_fetch_str(&port, parts, SL("port")) && PHALCON_IS_NOT_EMPTY(&port)) {
 		PHALCON_SCONCAT_SV(&uri, ":", &port);
 	}
 
-	if (phalcon_array_isset_fetch_str(&path, parts, SL("path")) && PHALCON_IS_NOT_EMPTY(path)) {
+	if (phalcon_array_isset_fetch_str(&path, parts, SL("path")) && PHALCON_IS_NOT_EMPTY(&path)) {
 		if (!phalcon_start_with_str(&path, SL("/"))) {
 			PHALCON_SCONCAT_SV(&uri, "/", &path);
 		} else {
@@ -312,12 +312,12 @@ PHP_METHOD(Phalcon_Http_Uri, build){
 		}
 	}
 
-	if (phalcon_array_isset_fetch_str(&query, parts, SL("query")) && PHALCON_IS_NOT_EMPTY(query)) {
+	if (phalcon_array_isset_fetch_str(&query, parts, SL("query")) && PHALCON_IS_NOT_EMPTY(&query)) {
 		phalcon_http_build_query(&tmp2, &query, "&");
 		PHALCON_SCONCAT_SV(&uri, "?", &tmp);
 	}
 
-	if (phalcon_array_isset_fetch_str(&fragment, parts, SL("fragment")) && PHALCON_IS_NOT_EMPTY(fragment)) {
+	if (phalcon_array_isset_fetch_str(&fragment, parts, SL("fragment")) && PHALCON_IS_NOT_EMPTY(&fragment)) {
 		PHALCON_SCONCAT_SV(&uri, "#", &fragment);
 	}
 
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Http_Uri, resolve){
 
 PHP_METHOD(Phalcon_Http_Uri, extend){
 
-	zval *uri, *self, *parts = NULL, *parts2 = NULL;
+	zval *uri, parts, self, parts2;
 
 	PHALCON_MM_GROW();
 
@@ -350,18 +350,17 @@ PHP_METHOD(Phalcon_Http_Uri, extend){
 	PHALCON_CALL_SELF(&parts, "getParts");
 
 	if (Z_TYPE_P(uri) != IS_OBJECT || Z_OBJCE_P(uri) != phalcon_http_uri_ce) {
-		PHALCON_INIT_VAR(self);
-		object_init_ex(self, phalcon_http_uri_ce);
-		PHALCON_CALL_METHOD(NULL, self, "__construct", uri);
+		object_init_ex(&self, phalcon_http_uri_ce);
+		PHALCON_CALL_METHOD(NULL, &self, "__construct", uri);
 
-		PHALCON_CALL_METHOD(&parts2, self, "getParts");
+		PHALCON_CALL_METHOD(&parts2, &self, "getParts");
 	} else {
-		PHALCON_CALL_METHOD(&parts2, self, "getParts");
+		PHALCON_CALL_METHOD(&parts2, &self, "getParts");
 	}
 
-	phalcon_array_merge_recursive_n(parts, parts2);
+	phalcon_array_merge_recursive_n(&parts, &parts2);
 
-	phalcon_update_property_this(getThis(), SL("_parts"), parts);
+	phalcon_update_property_this(getThis(), SL("_parts"), &parts);
 
 	RETURN_THIS();
 }

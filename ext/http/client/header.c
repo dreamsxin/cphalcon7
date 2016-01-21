@@ -236,18 +236,13 @@ PHP_METHOD(Phalcon_Http_Client_Header, addMultiple){
 
 PHP_METHOD(Phalcon_Http_Client_Header, get){
 
-	zval *name, *fields, *field;
+	zval *name, *fields;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	fields = phalcon_read_property(getThis(), SL("_fields"), PH_NOISY);
 
-	PHALCON_OBS_VAR(field);
-	phalcon_array_fetch(&field, fields, name, PH_NOISY);
-
-	RETURN_CTOR(field);
+	phalcon_array_fetch(return_value, fields, name, PH_NOISY);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Header, getStatusCode){
@@ -264,22 +259,18 @@ PHP_METHOD(Phalcon_Http_Client_Header, remove){
 
 	zval *name, *fields;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	fields = phalcon_read_property(getThis(), SL("_fields"), PH_NOISY);
 	
 	phalcon_array_unset(fields, name, 0);
 
 	phalcon_update_property_this(getThis(), SL("_fields"), fields);
-
-	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
-	zval *content, *content_parts = NULL, *header = NULL, *header_parts = NULL, *name = NULL, *value = NULL, *trimmed = NULL;
+	zval *content, content_parts, *header;
 
 	PHALCON_MM_GROW();
 
@@ -290,49 +281,36 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 	}
 	
 	if (Z_TYPE_P(content) == IS_STRING) {
-		PHALCON_INIT_VAR(content_parts);
-		phalcon_fast_explode_str(content_parts, SL("\r\n"), content);
+		phalcon_fast_explode_str(&content_parts, SL("\r\n"), content);
 	} else if (Z_TYPE_P(content) == IS_ARRAY) {
-		PHALCON_CPY_WRT_CTOR(content_parts, content);
+		ZVAL_COPY_VALUE(&content_parts, content);
 	} else {
 		RETURN_MM_FALSE;
 	}	
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(content_parts), header) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(content_parts), header) {
+		zval header_parts, val1, val2, trimmed;
+
 		if (Z_TYPE_P(header) == IS_STRING) {
-			PHALCON_INIT_NVAR(header_parts);
 			if (phalcon_memnstr_str(header , SL(":"))) {
-				phalcon_fast_explode_str(header_parts, SL(":"), header);
+				phalcon_fast_explode_str(&header_parts, SL(":"), header);
 			} else {
 				if (phalcon_start_with_str(header , SL("HTTP/"))) {
-					phalcon_fast_explode_str(header_parts, SL(" "), header);
-					if (Z_TYPE_P(header_parts) == IS_ARRAY && phalcon_array_isset_long(header_parts, 1) && phalcon_array_isset_long(header_parts, 2)) {
-						PHALCON_OBS_NVAR(value);
-						phalcon_array_fetch_long(&value, header_parts, 1, PH_NOISY);
-						phalcon_update_property_this(getThis(), SL("_status_code"), value);
-
-						PHALCON_OBS_NVAR(value);
-						phalcon_array_fetch_long(&value, header_parts, 2, PH_NOISY);
-						phalcon_update_property_this(getThis(), SL("_status_message"), value);
+					phalcon_fast_explode_str(&header_parts, SL(" "), header);
+					if (Z_TYPE(header_parts) == IS_ARRAY && phalcon_array_isset_fetch_long(&val1, &header_parts, 1) && phalcon_array_isset_fetch_long(&val2, &header_parts, 2)) {
+						phalcon_update_property_this(getThis(), SL("_status_code"), &val1);
+						phalcon_update_property_this(getThis(), SL("_status_message"), &val2);
 					}
 				}
 				continue;
 			}
 		} else {
-			PHALCON_CPY_WRT_CTOR(header_parts, header);
+			ZVAL_COPY_VALUE(&header_parts, header);
 		}
 
-		if (Z_TYPE_P(header_parts) == IS_ARRAY && phalcon_array_isset_long(header_parts, 0) && phalcon_array_isset_long(header_parts, 1)) {
-				PHALCON_OBS_NVAR(name);
-				phalcon_array_fetch_long(&name, header_parts, 0, PH_NOISY);
-
-				PHALCON_OBS_NVAR(value);
-				phalcon_array_fetch_long(&value, header_parts, 1, PH_NOISY);
-
-				PHALCON_INIT_NVAR(trimmed);
-				ZVAL_STR(trimmed, phalcon_trim(value, NULL, PHALCON_TRIM_BOTH));
-
-				PHALCON_CALL_METHOD(NULL, getThis(), "set", name, trimmed);
+		if (Z_TYPE(header_parts) == IS_ARRAY && phalcon_array_isset_fetch_long(&val1, &header_parts, 0) && phalcon_array_isset_fetch_long(&val2, &header_parts, 1)) {
+				ZVAL_STR(&trimmed, phalcon_trim(&val2, NULL, PHALCON_TRIM_BOTH));
+				PHALCON_CALL_METHOD(NULL, getThis(), "set", &val1, &trimmed);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -341,8 +319,8 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
 PHP_METHOD(Phalcon_Http_Client_Header, build){
 
-	zval *flags = NULL, *messages, *status_code, message, *version, *lines, *line = NULL;
-	zval *fields, *value = NULL, *join_filed;
+	zval *flags = NULL, *messages, *status_code, lines, message, *version, line;
+	zval *fields, *value, join_filed;
 	zend_string *str_key;
 	ulong idx;
 	int f = 0;
@@ -355,21 +333,19 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 		f = phalcon_get_intval(flags);
 	}
 
-	PHALCON_INIT_VAR(lines);
-	array_init(lines);
-
 	messages = phalcon_read_static_property_ce(phalcon_http_client_header_ce, SL("_messages"));
 
 	status_code = phalcon_read_property(getThis(), SL("_status_code"), PH_NOISY);
+
+	array_init(&lines);
 	
 	if ((f & PHALCON_HTTP_CLIENT_HEADER_BUILD_STATUS) && phalcon_array_isset_fetch(&message, messages, status_code)) {
 		version  = phalcon_read_property(getThis(), SL("_version "), PH_NOISY);
 
-		PHALCON_INIT_NVAR(line);
-		PHALCON_CONCAT_SVS(line, "HTTP/", version, " ");
-		PHALCON_SCONCAT_VSV(line, status_code, " ", &message);
+		PHALCON_CONCAT_SVS(&line, "HTTP/", version, " ");
+		PHALCON_SCONCAT_VSV(&line, status_code, " ", &message);
 
-		phalcon_merge_append(lines, line);
+		phalcon_merge_append(&lines, &line);
 
 	}
 
@@ -385,17 +361,16 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 
 		PHALCON_CONCAT_VSV(&tmp, &filed, ": ", value);
 
-		phalcon_merge_append(lines, &tmp);
+		phalcon_merge_append(&lines, &tmp);
 	} ZEND_HASH_FOREACH_END();
 
 	if (f & PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS) {
-		PHALCON_INIT_VAR(join_filed);
-		phalcon_fast_join_str(join_filed, SL("\r\n"), lines);
+		phalcon_fast_join_str(&join_filed, SL("\r\n"), &lines);
 
-		RETURN_CCTOR(join_filed);
+		RETURN_CTOR(&join_filed);
 	}
 
-	RETURN_CCTOR(lines);
+	RETURN_CTOR(&lines);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Header, count){

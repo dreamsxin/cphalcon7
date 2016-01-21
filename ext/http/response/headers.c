@@ -254,5 +254,5 @@ PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 		} ZEND_HASH_FOREACH_END();
 	}
 	
-	RETURN_CTOR(headers);
+	RETURN_CTOR(&headers);
 }

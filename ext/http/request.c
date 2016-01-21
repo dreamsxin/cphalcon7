@@ -222,7 +222,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 
 	if (Z_TYPE_P(filters) != IS_NULL) {
 		phalcon_return_property(&filter, getThis(), SL("_filter"));
-		if (Z_TYPE_P(filter) != IS_OBJECT) {
+		if (Z_TYPE(filter) != IS_OBJECT) {
 			dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 			if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
@@ -379,7 +379,7 @@ PHP_METHOD(Phalcon_Http_Request, getPost){
 PHP_METHOD(Phalcon_Http_Request, getPut){
 
 	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL;
-	zval *is_put = NULL, *put = NULL, *raw = NULL;
+	zval is_put, *put = NULL, raw, new_put;
 	char *tmp;
 
 	PHALCON_MM_GROW();
@@ -408,26 +408,28 @@ PHP_METHOD(Phalcon_Http_Request, getPut){
 
 	PHALCON_CALL_METHOD(&is_put, getThis(), "isput");
 
-	if (!zend_is_true(is_put)) {
+	if (!zend_is_true(&is_put)) {
 		put = phalcon_get_global_str(SL("_PUT"));
-	}
-	else {
+		ZVAL_COPY(&new_put, put);
+	} else {
 		put = phalcon_read_property(getThis(), SL("_put"), PH_NOISY);
 		if (Z_TYPE_P(put) != IS_ARRAY) {
 			PHALCON_CALL_METHOD(&raw, getThis(), "getrawbody");
 
-			PHALCON_INIT_NVAR(put);
-			array_init(put);
+			array_init(&new_put);
 
-			PHALCON_ENSURE_IS_STRING(raw);
-			tmp = estrndup(Z_STRVAL_P(raw), Z_STRLEN_P(raw));
-			sapi_module.treat_data(PARSE_STRING, tmp, put);
+			PHALCON_ENSURE_IS_STRING(&raw);
+			tmp = estrndup(Z_STRVAL(raw), Z_STRLEN(raw));
 
-			phalcon_update_property_this(getThis(), SL("_put"), put);
+			sapi_module.treat_data(PARSE_STRING, tmp, &new_put);
+
+			phalcon_update_property_this(getThis(), SL("_put"), &new_put);
+		} else {
+			ZVAL_COPY(&new_put, put);
 		}
 	}
 
-	PHALCON_RETURN_CALL_SELF("_get", put, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", &new_put, name, filters, default_value, not_allow_empty, norecursive);
 
 	RETURN_MM();
 }
@@ -497,7 +499,7 @@ PHP_METHOD(Phalcon_Http_Request, getQuery){
  */
 PHP_METHOD(Phalcon_Http_Request, getServer){
 
-	zval *name, *_SERVER, *server_value;
+	zval *name, *_SERVER;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 

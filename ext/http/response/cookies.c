@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 
 	zval *name, *value = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL;
 	zval *http_only = NULL, *cookies, *encryption, *dependency_injector = NULL;
-	zval *cookie = NULL, *registered, *service, *response = NULL;
+	zval cookie, *registered, service, response;
 
 	PHALCON_MM_GROW();
 
@@ -221,39 +221,36 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 	/** 
 	 * Check if the cookie needs to be updated or 
 	 */
-	if (!phalcon_array_isset(cookies, name)) {
+	if (!phalcon_array_isset_fetch(&cookie, cookies, name)) {
 		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
-		PHALCON_INIT_VAR(cookie);
-		object_init_ex(cookie, phalcon_http_cookie_ce);
-		PHALCON_CALL_METHOD(NULL, cookie, "__construct", name, value, expire, path, secure, domain, http_only);
+		object_init_ex(&cookie, phalcon_http_cookie_ce);
+
+		PHALCON_CALL_METHOD(NULL, &cookie, "__construct", name, value, expire, path, secure, domain, http_only);
 
 		/** 
 		 * Pass the DI to created cookies
 		 */
-		PHALCON_CALL_METHOD(NULL, cookie, "setdi", dependency_injector);
+		PHALCON_CALL_METHOD(NULL, &cookie, "setdi", dependency_injector);
 
 		/** 
 		 * Enable encryption in the cookie
 		 */
 		if (zend_is_true(encryption)) {
-			PHALCON_CALL_METHOD(NULL, cookie, "useencryption", encryption);
+			PHALCON_CALL_METHOD(NULL, &cookie, "useencryption", encryption);
 		}
 
-		phalcon_update_property_array(getThis(), SL("_cookies"), name, cookie);
+		phalcon_update_property_array(getThis(), SL("_cookies"), name, &cookie);
 	} else {
-		PHALCON_OBS_NVAR(cookie);
-		phalcon_array_fetch(&cookie, cookies, name, PH_NOISY);
-
 		/** 
 		 * Override any settings in the cookie
 		 */
-		PHALCON_CALL_METHOD(NULL, cookie, "setvalue", value);
-		PHALCON_CALL_METHOD(NULL, cookie, "setexpiration", expire);
-		PHALCON_CALL_METHOD(NULL, cookie, "setpath", path);
-		PHALCON_CALL_METHOD(NULL, cookie, "setsecure", secure);
-		PHALCON_CALL_METHOD(NULL, cookie, "setdomain", domain);
-		PHALCON_CALL_METHOD(NULL, cookie, "sethttponly", http_only);
+		PHALCON_CALL_METHOD(NULL, &cookie, "setvalue", value);
+		PHALCON_CALL_METHOD(NULL, &cookie, "setexpiration", expire);
+		PHALCON_CALL_METHOD(NULL, &cookie, "setpath", path);
+		PHALCON_CALL_METHOD(NULL, &cookie, "setsecure", secure);
+		PHALCON_CALL_METHOD(NULL, &cookie, "setdomain", domain);
+		PHALCON_CALL_METHOD(NULL, &cookie, "sethttponly", http_only);
 	}
 
 	/** 
@@ -267,17 +264,16 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 			return;
 		}
 
-		PHALCON_INIT_VAR(service);
-		ZVAL_STRING(service, ISV(response));
+		ZVAL_STRING(&service, ISV(response));
 
-		PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
-		PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);
+		PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 
 		/** 
 		 * Pass the cookies bag to the response so it can send the headers at the of the
 		 * request
 		 */
-		PHALCON_CALL_METHOD(NULL, response, "setcookies", getThis());
+		PHALCON_CALL_METHOD(NULL, &response, "setcookies", getThis());
 	}
 
 	RETURN_THIS();

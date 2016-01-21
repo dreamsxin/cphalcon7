@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, set){
  */
 PHP_METHOD(Phalcon_Http_Response_Headers, get){
 
-	zval *name, *headers, *header_value;
+	zval *name, *headers;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	
@@ -233,29 +233,24 @@ PHP_METHOD(Phalcon_Http_Response_Headers, toArray){
  */
 PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 
-	zval *data, *headers, *data_headers, *value = NULL;
+	zval *data, headers, data_headers, *value;
 	zend_string *str_key;
 	ulong idx;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &data);
-	
-	PHALCON_INIT_VAR(headers);
-	object_init_ex(headers, phalcon_http_response_headers_ce);
-	if (phalcon_array_isset_str(data, SL("_headers"))) {
-	
-		PHALCON_OBS_VAR(data_headers);
-		phalcon_array_fetch_str(&data_headers, data, SL("_headers"), PH_NOISY);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data_headers), idx, str_key, value) {
+	object_init_ex(&headers, phalcon_http_response_headers_ce);
+	if (phalcon_array_isset_fetch_str(&data_headers, data, SL("_headers"))) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data_headers), idx, str_key, value) {
 			zval key;
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
-			PHALCON_CALL_METHOD(NULL, headers, "set", &key, value);	
+			PHALCON_CALL_METHOD(NULL, &headers, "set", &key, value);	
 		} ZEND_HASH_FOREACH_END();
 	}
 	

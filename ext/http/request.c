@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 	}
 
 	if (Z_TYPE_P(filters) != IS_NULL) {
-		filter = phalcon_read_property(getThis(), SL("_filter"), PH_NOISY);
+		phalcon_return_property(&filter, getThis(), SL("_filter"));
 		if (Z_TYPE_P(filter) != IS_OBJECT) {
 			dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 			if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 			phalcon_update_property_this(getThis(), SL("_filter"), &filter);
 		}
 
-		PHALCON_CALL_METHOD(&filter_value, filter, "sanitize", &value, filters, norecursive);
+		PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", &value, filters, norecursive);
 
 		if ((PHALCON_IS_EMPTY(&filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(&filter_value)) {
 			RETURN_CTOR(default_value);

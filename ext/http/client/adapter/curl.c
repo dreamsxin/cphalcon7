@@ -249,8 +249,8 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 		PHALCON_CONCAT_SV(&boundary, "--------------", &uniqid);
 
-		if (Z_TYPE_P(data) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_key_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
+		if (Z_TYPE(data) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data), idx, str_key, value) {
 				zval name;
 				if (str_key) {
 					ZVAL_STR(&name, str_key);
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 			PHALCON_CONCAT_SV(&key_value, "multipart/form-data; &boundary=", &boundary);
 
-			PHALCON_CALL_METHOD(NULL, header, "set", &key, key_value);
+			PHALCON_CALL_METHOD(NULL, header, "set", &key, &key_value);
 
 			ZVAL_STRING(&key, "Content-Length");		
 

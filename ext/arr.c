@@ -366,7 +366,7 @@ end:
 PHP_METHOD(Phalcon_Arr, set_path){
 
 	zval *array, *path, *value, *delimiter = NULL;
-	zval *keys = NULL, *key = NULL, *is_digit = NULL, *cpy_array = NULL, *arr = NULL, v, *is_array = NULL, *joined_keys = NULL;
+	zval *keys = NULL, cpy_array, v, *is_array = NULL, *joined_keys = NULL;
 	int found = 1;
 
 	PHALCON_MM_GROW();
@@ -384,23 +384,22 @@ PHP_METHOD(Phalcon_Arr, set_path){
 		phalcon_fast_explode(keys, delimiter, path);
 	}
 
-	PHALCON_CPY_WRT(cpy_array, array);
+	ZVAL_COPY(&cpy_array, array);
 
 	// Set current $array to inner-most array  path
 	while ((int) zend_hash_num_elements(Z_ARRVAL_P(keys)) > 1) {
-		PHALCON_INIT_NVAR(key);
+		zval key, is_digit, *arr, is_array, joined_keys;
+
 		ZVAL_MAKE_REF(keys);
 		PHALCON_CALL_FUNCTION(&key, "array_shift", keys);
 		ZVAL_UNREF(keys);
 
-		if (PHALCON_IS_STRING(key, "*")) {
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(cpy_array), arr) {
-				PHALCON_INIT_NVAR(is_array);
+		if (PHALCON_IS_STRING(&key, "*")) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(cpy_array), arr) {
 				PHALCON_CALL_SELF(&is_array, "is_array", arr);
 
-				if (zend_is_true(is_array)) {
-					PHALCON_INIT_NVAR(joined_keys);
-					phalcon_fast_join_str(joined_keys, SL("."), keys);
+				if (zend_is_true(&is_array)) {
+					phalcon_fast_join_str(&joined_keys, SL("."), keys);
 
 					ZVAL_MAKE_REF(arr);
 					PHALCON_CALL_SELF(NULL, "set_path", arr, keys, value);
@@ -410,14 +409,13 @@ PHP_METHOD(Phalcon_Arr, set_path){
 			found = 0;
 			break;
 		} else {
-			PHALCON_INIT_NVAR(is_digit);
-			PHALCON_CALL_FUNCTION(&is_digit, "ctype_digit", key);
+			PHALCON_CALL_FUNCTION(&is_digit, "ctype_digit", &key);
 		
-			if (zend_is_true(is_digit)) {
-				convert_to_long(key);
+			if (zend_is_true(&is_digit)) {
+				convert_to_long(&key);
 			}
 
-			if (phalcon_array_isset_fetch(&v, cpy_array, key)) {
+			if (phalcon_array_isset_fetch(&v, cpy_array, &key)) {
 				PHALCON_CPY_WRT(cpy_array, &v);
 			} else {
 				PHALCON_INIT_NVAR(arr);

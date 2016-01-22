@@ -1516,47 +1516,39 @@ PHP_METHOD(Phalcon_Http_Request, getHTTPReferer){
  */
 PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 
-	zval *server_index, *name, *quality_one;
-	zval *http_server = NULL, *pattern, *parts = NULL, *part = NULL, *header_parts = NULL;
-	zval *quality_part = NULL, *quality = NULL, *header_name = NULL;
+	zval *server_index, *name, quality_one;
+	zval http_server, pattern, parts, *part;
+	zval *header_name = NULL;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 0, &server_index, &name);
 
-	PHALCON_INIT_VAR(quality_one);
-	ZVAL_DOUBLE(quality_one, 1);
+	ZVAL_DOUBLE(&quality_one, 1);
 
 	array_init(return_value);
 
 	PHALCON_CALL_METHOD(&http_server, getThis(), "getserver", server_index);
 
-	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "/,\\s*/");
-	PHALCON_CALL_FUNCTION(&parts, "preg_split", pattern, http_server);
+	ZVAL_STRING(&pattern, "/,\\s*/");
+	PHALCON_CALL_FUNCTION(&parts, "preg_split", &pattern, &http_server);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(parts), part) {
-		PHALCON_INIT_NVAR(header_parts);
-		phalcon_fast_explode_str(header_parts, SL(";"), part);
-		if (phalcon_array_isset_long(header_parts, 1)) {
-			PHALCON_OBS_NVAR(quality_part);
-			phalcon_array_fetch_long(&quality_part, header_parts, 1, PH_NOISY);
-
-			PHALCON_INIT_NVAR(quality);
-			phalcon_substr(quality, quality_part, 2, 0);
+		zval header_parts, quality_part, quality, header_name;
+		phalcon_fast_explode_str(&header_parts, SL(";"), part);
+		if (phalcon_array_isset_fetch_long(&quality_part, &header_parts, 1)) {
+			phalcon_substr(&quality, &quality_part, 2, 0);
 		} else {
-			PHALCON_CPY_WRT(quality, quality_one);
+			ZVAL_COPY_VALUE(&quality, &quality_one);
 		}
 
-		PHALCON_OBS_NVAR(header_name);
-		phalcon_array_fetch_long(&header_name, header_parts, 0, PH_NOISY);
+		phalcon_array_fetch_long(&header_name, &header_parts, 0, PH_NOISY);
 
-		PHALCON_INIT_NVAR(quality_part);
-		array_init_size(quality_part, 2);
-		phalcon_array_update_zval(quality_part, name, header_name, PH_COPY);
-		phalcon_array_update_str(quality_part, SL("quality"), quality, PH_COPY);
+		array_init_size(&quality_part, 2);
+		phalcon_array_update_zval(&quality_part, name, &header_name, PH_COPY);
+		phalcon_array_update_str(&quality_part, SL("quality"), &quality, PH_COPY);
 
-		phalcon_array_append(return_value, quality_part, PH_COPY);
+		phalcon_array_append(return_value, &quality_part, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_MM_RESTORE();

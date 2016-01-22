@@ -861,7 +861,7 @@ PHP_METHOD(Phalcon_Http_Request, getServerName){
 
 	server = phalcon_get_global_str(SL("_SERVER"));
 	if (phalcon_array_isset_fetch_str(&server_name, server, SL("SERVER_NAME"))) {
-		RETURN_CTORW(server_name);
+		RETURN_CTORW(&server_name);
 	}
 
 	RETURN_STRING("localhost");
@@ -874,11 +874,9 @@ PHP_METHOD(Phalcon_Http_Request, getServerName){
  */
 PHP_METHOD(Phalcon_Http_Request, getHttpHost){
 
-	zval host, http_host, *scheme = NULL, *server_name, *name = NULL;
-	zval *server_port, *port = NULL, *http, *standard_port;
-	zval *is_std_name, *is_std_port, *is_std_http;
-	zval *https, *secure_port, *is_secure_scheme;
-	zval *is_secure_port, *is_secure_http;
+	zval host, http_host, scheme, server_name, name;
+	zval server_port, port, http, standard_port, is_std_name, is_std_port, is_std_http;
+	zval https, secure_port, is_secure_scheme, is_secure_port, is_secure_http;
 
 	PHALCON_MM_GROW();
 

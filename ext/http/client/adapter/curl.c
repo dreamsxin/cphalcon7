@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	method = phalcon_read_property(getThis(), SL("_method"), PH_NOISY);
 	useragent = phalcon_read_property(getThis(), SL("_useragent"), PH_NOISY);
 	phalcon_return_property(&data, getThis(), SL("_data"));
-	phalcon_return_property(&type, getThis(), SL("_type"), PH_NOISY);
+	phalcon_return_property(&type, getThis(), SL("_type"));
 	files = phalcon_read_property(getThis(), SL("_files"), PH_NOISY);
 	timeout = phalcon_read_property(getThis(), SL("_timeout"), PH_NOISY);
 	curl = phalcon_read_property(getThis(), SL("_curl"), PH_NOISY);
@@ -220,8 +220,8 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 			PHALCON_CALL_FUNCTION(NULL, "curl_setopt", curl, constant, &data);
 		}
 	} else if (phalcon_class_str_exists(SL("CURLFile"), 0) != NULL) {
-		if (Z_TYPE_P(data) != IS_ARRAY) {
-			ZVAL_UDEF(&data);
+		if (Z_TYPE(data) != IS_ARRAY) {
+			ZVAL_UNDEF(&data);
 			array_init(&data);
 		}
 
@@ -247,10 +247,10 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	} else {
 		PHALCON_CALL_FUNCTION(&uniqid, "uniqid");
 
-		PHALCON_CONCAT_SV(&boundary, "--------------", uniqid);
+		PHALCON_CONCAT_SV(&boundary, "--------------", &uniqid);
 
 		if (Z_TYPE_P(data) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_&key_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
+			ZEND_HASH_FOREACH_key_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
 				zval name;
 				if (str_key) {
 					ZVAL_STR(&name, str_key);

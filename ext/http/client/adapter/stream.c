@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 	zval *stream, *header, *data, *type, *files, *username, *password, *authtype, *digest, *method, *entity_body;
-	zval key, key_value, realm, ha1_txt, ha1, qop, ha2_txt, ha2, nonce, nc, cnonce, qoc, *path = NULL, *md5_entity_body = NULL;
+	zval key, key_value, realm, ha1_txt, ha1, qop, ha2_txt, ha2, nonce, nc, cnonce, qoc, digest_value, path, md5_entity_body;
 	zval http, option, body, headers, uniqid, boundary, *value, *file;
 	zval *filename, *basename, *filedata = NULL, tmp;
 	zend_string *str_key;
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 			if (PHALCON_IS_EMPTY(&qop) || phalcon_memnstr_str(&qop, SL("auth"))) {
 				PHALCON_CALL_SELF(&path, "getpath");
 
-				PHALCON_CONCAT_VSV(&ha2_txt, method, ":", path);
+				PHALCON_CONCAT_VSV(&ha2_txt, method, ":", &path);
 
 				PHALCON_CALL_FUNCTION(&ha2, "md5", &ha2_txt);
 				
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 				PHALCON_CALL_FUNCTION(&md5_entity_body, "md5", entity_body);
 
-				PHALCON_CONCAT_VSVSV(&ha2_txt, method, ":", path, ":", md5_entity_body);
+				PHALCON_CONCAT_VSVSV(&ha2_txt, method, ":", &path, ":", &md5_entity_body);
 
 				PHALCON_CALL_FUNCTION(&ha2, "md5", &ha2_txt);
 			}
@@ -216,7 +216,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 				}
 
 				PHALCON_CONCAT_VSVSVS(&key_value, &ha1, ":", &nonce, ":", &nc, ":");
-				PHALCON_SCONCAT_VSVSV(&key_value, cnonce, ":", &qoc, ":", &ha2);
+				PHALCON_SCONCAT_VSVSV(&key_value, &cnonce, ":", &qoc, ":", &ha2);
 
 				PHALCON_CALL_FUNCTION(&digest_value, "md5", &key_value);
 

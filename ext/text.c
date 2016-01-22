@@ -188,38 +188,28 @@ PHP_METHOD(Phalcon_Text, uncamelize){
  */
 PHP_METHOD(Phalcon_Text, increment){
 
-	zval *str, *separator = NULL, *parts, *number = NULL, *first_part;
+	zval *str, *separator = NULL, sep, parts, number, first_part;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &str, &separator);
-	
-	if (!separator) {
-		PHALCON_INIT_VAR(separator);
+
+	if (!separator || Z_TYPE_P(separator) == IS_NULL) {
+		ZVAL_STRING(&sep, "_");
 	} else {
-		PHALCON_SEPARATE_PARAM(separator);
+		ZVAL_COPY_VALUE(&sep, separator);
 	}
-	
-	if (Z_TYPE_P(separator) == IS_NULL) {
-		PHALCON_INIT_NVAR(separator);
-		ZVAL_STRING(separator, "_");
-	}
-	
-	PHALCON_INIT_VAR(parts);
-	phalcon_fast_explode(parts, separator, str);
-	if (phalcon_array_isset_long(parts, 1)) {
-		PHALCON_OBS_VAR(number);
-		phalcon_array_fetch_long(&number, parts, 1, PH_NOISY);
-		SEPARATE_ZVAL(number);
-		phalcon_increment(number);
+
+	phalcon_fast_explode(&parts, separator, str);
+	if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
+		phalcon_increment(&number);
 	} else {
-		number = &PHALCON_GLOBAL(z_one);
+		ZVAL_COPY_VALUE(&number, &PHALCON_GLOBAL(z_one));
 	}
-	
-	PHALCON_OBS_VAR(first_part);
-	phalcon_array_fetch_long(&first_part, parts, 0, PH_NOISY);
-	PHALCON_CONCAT_VVV(return_value, first_part, separator, number);
-	
+
+	phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
+	PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
+
 	RETURN_MM();
 }
 
@@ -236,19 +226,18 @@ PHP_METHOD(Phalcon_Text, increment){
  */
 PHP_METHOD(Phalcon_Text, random){
 
-	zval *type, *length = NULL;
+	zval *type, *length = NULL, len;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &type, &length);
+	phalcon_fetch_params(0, 1, 1, &type, &length);
 	
 	if (!length) {
-		PHALCON_INIT_VAR(length);
-		ZVAL_LONG(length, 8);
+		ZVAL_LONG(&len, 8);
+		phalcon_random_string(return_value, type, &len);
+	} else {
+		phalcon_random_string(return_value, type, length);
 	}
 	
-	phalcon_random_string(return_value, type, length);
-	RETURN_MM();
+	
 }
 
 /**
@@ -500,48 +489,36 @@ PHP_METHOD(Phalcon_Text, reduceSlashes){
 PHP_METHOD(Phalcon_Text, concat){
 
 	zval *separator, *a, *b;
-	zval *arg_num = NULL, *arg_list = NULL, *offset, *args = NULL;
-	zval *c = NULL, *a_trimmed = NULL, *b_trimmed = NULL, *c_trimmed = NULL, *tmp = NULL;
+	zval arg_num, arg_list, offset, args, *c, str, a_trimmed, str_trimmed;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &separator, &a, &b);
+	phalcon_fetch_params(0, 3, 0, &separator, &a, &b);
 
 	PHALCON_CALL_FUNCTION(&arg_num, "func_num_args");
 
-	if (Z_LVAL_P(arg_num) > 3) {
+	if (Z_LVAL(arg_num) > 3) {
 		PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
-		PHALCON_INIT_VAR(offset);
-		ZVAL_LONG(offset, 3);
+		ZVAL_LONG(&offset, 3);
 
-		PHALCON_CALL_FUNCTION(&args, "array_slice", arg_list, offset);
+		PHALCON_CALL_FUNCTION(&args, "array_slice", &arg_list, &offset);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(args), c) {
-			PHALCON_INIT_NVAR(b_trimmed);
-			ZVAL_STR(b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_RIGHT));
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(args), c) {
+			zval b_trimmed, c_trimmed;
 
-			PHALCON_INIT_NVAR(c_trimmed);
-			ZVAL_STR(c_trimmed, phalcon_trim(c, separator, PHALCON_TRIM_LEFT));
+			ZVAL_STR(&b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_RIGHT));
+			ZVAL_STR(&c_trimmed, phalcon_trim(c, separator, PHALCON_TRIM_LEFT));
 
-			PHALCON_INIT_NVAR(tmp);
-			PHALCON_CONCAT_VVV(tmp, b_trimmed, separator, c_trimmed)
-
-			PHALCON_CPY_WRT(b, tmp);
+			PHALCON_CONCAT_VVV(&str, &b_trimmed, separator, &c_trimmed)
 
 		} ZEND_HASH_FOREACH_END();
+	} else {
+		ZVAL_COPY_VALUE(&str, b);
 	}
 
-	PHALCON_INIT_NVAR(a_trimmed);
-	ZVAL_STR(a_trimmed, phalcon_trim(a, separator, PHALCON_TRIM_RIGHT));
+	ZVAL_STR(&a_trimmed, phalcon_trim(a, separator, PHALCON_TRIM_RIGHT));
+	ZVAL_STR(&str_trimmed, phalcon_trim(&str, separator, PHALCON_TRIM_LEFT));
 
-	PHALCON_INIT_NVAR(b_trimmed);
-	ZVAL_STR(b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_LEFT));
-
-	PHALCON_INIT_NVAR(tmp);
-	PHALCON_CONCAT_VVV(tmp, a_trimmed, separator, b_trimmed)
-
-	RETURN_CTOR(tmp);
+	PHALCON_CONCAT_VVV(return_value, &a_trimmed, separator, &str_trimmed)
 }
 
 /**

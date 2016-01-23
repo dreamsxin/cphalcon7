@@ -935,59 +935,52 @@ PHP_METHOD(Phalcon_Date, fuzzy_span){
  * @return string
  */
 PHP_METHOD(Phalcon_Date, fuzzy_span2){
-	zval *timestamp, *output = NULL;
-	zval *span, *label = NULL;
+	zval *timestamp, *lables = NULL, output, label, span;
 	long offset, hours, minutes, seconds;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 1, &timestamp, &output);
+	phalcon_fetch_params(1, 1, 1, &timestamp, &lables);
+
+	if (!lables) {
+		array_init_size(&output, 7);
+		phalcon_array_append_string(&output, SL(" years"), 0);
+		phalcon_array_append_string(&output, SL(" months"), 0);
+		phalcon_array_append_string(&output, SL(" weeks"), 0);
+		phalcon_array_append_string(&output, SL(" days"), 0);
+		phalcon_array_append_string(&output, SL(" hours"), 0);
+		phalcon_array_append_string(&output, SL(" minutes"), 0);
+		phalcon_array_append_string(&output, SL(" seconds"), 0);
+	} else {
+		ZVAL_COPY_VALUE(&output, lables);
+	}
 
 	offset = phalcon_get_intval(timestamp);
 	if (offset < 0) {
 		offset *= -1;
 	}
 
-	if (!output) {
-		PHALCON_INIT_NVAR(output);
-		array_init_size(output, 7);
-		phalcon_array_append_string(output, SL(" years"), 0);
-		phalcon_array_append_string(output, SL(" months"), 0);
-		phalcon_array_append_string(output, SL(" weeks"), 0);
-		phalcon_array_append_string(output, SL(" days"), 0);
-		phalcon_array_append_string(output, SL(" hours"), 0);
-		phalcon_array_append_string(output, SL(" minutes"), 0);
-		phalcon_array_append_string(output, SL(" seconds"), 0);
-	}
-
 	hours = offset / PHALCON_DATE_HOUR;
 	minutes = (offset % PHALCON_DATE_HOUR) / PHALCON_DATE_MINUTE;
 	seconds = offset % PHALCON_DATE_MINUTE;
 
-	PHALCON_INIT_VAR(span);
-	if (hours > 0 && phalcon_array_isset_long(output, 4)) {
-		ZVAL_LONG(span, hours);
-
-		PHALCON_INIT_NVAR(label);
-		phalcon_array_fetch_long(&label, output, 4, PH_NOISY);
-
-		PHALCON_SCONCAT_VV(return_value, span, label);
+	if (hours > 0 && phalcon_array_isset_fetch_long(&label, &output, 4)) {
+		ZVAL_LONG(&span, hours);
+		PHALCON_SCONCAT_VV(return_value, &span, &label);
 	}
+
 	if (minutes > 0) {
-		ZVAL_LONG(span, minutes);
+		ZVAL_LONG(&span, minutes);
+		phalcon_array_fetch_long(&label, &output, 5, PH_NOISY);
 
-		PHALCON_INIT_NVAR(label);
-		phalcon_array_fetch_long(&label, output, 5, PH_NOISY);
-
-		PHALCON_SCONCAT_VV(return_value, span, label);
+		PHALCON_SCONCAT_VV(return_value, &span, &label);
 	}
+
 	if (seconds > 0) {
-		ZVAL_LONG(span, seconds);
+		ZVAL_LONG(&span, seconds);
+		phalcon_array_fetch_long(&label, &output, 6, PH_NOISY);
 
-		PHALCON_INIT_NVAR(label);
-		phalcon_array_fetch_long(&label, output, 6, PH_NOISY);
-
-		PHALCON_SCONCAT_VV(return_value, span, label);
+		PHALCON_SCONCAT_VV(return_value, &span, &label);
 	}
 
 	PHALCON_MM_RESTORE();
@@ -1005,7 +998,7 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2){
  */
 PHP_METHOD(Phalcon_Date, unix2dos){
 
-	zval *timestamp = NULL, *day = NULL, *year, *mon, *mday, *hours, *minutes, *seconds;
+	zval *timestamp = NULL, day, year, mon, mday, hours, minutes, seconds;
 	int y, m, d, h, min, sec;
 
 	PHALCON_MM_GROW();
@@ -1019,30 +1012,19 @@ PHP_METHOD(Phalcon_Date, unix2dos){
 		PHALCON_CALL_FUNCTION(&day, "getdate", timestamp);
 	}
 
-	PHALCON_OBS_VAR(year);
-	phalcon_array_fetch_str(&year, day, SL("year"), PH_NOISY);
+	phalcon_array_fetch_str(&year, &day, SL("year"), PH_NOISY);
+	phalcon_array_fetch_str(&mon, &day, SL("mon"), PH_NOISY);
+	phalcon_array_fetch_str(&mday, &day, SL("mday"), PH_NOISY);
+	phalcon_array_fetch_str(&hours, &day, SL("hours"), PH_NOISY);
+	phalcon_array_fetch_str(&minutes, &day, SL("minutes"), PH_NOISY);
+	phalcon_array_fetch_str(&seconds, &day, SL("seconds"), PH_NOISY);
 
-	PHALCON_OBS_VAR(mon);
-	phalcon_array_fetch_str(&mon, day, SL("mon"), PH_NOISY);
-
-	PHALCON_OBS_VAR(mday);
-	phalcon_array_fetch_str(&mday, day, SL("mday"), PH_NOISY);
-	
-	PHALCON_OBS_VAR(hours);
-	phalcon_array_fetch_str(&hours, day, SL("hours"), PH_NOISY);
-	
-	PHALCON_OBS_VAR(minutes);
-	phalcon_array_fetch_str(&minutes, day, SL("minutes"), PH_NOISY);
-	
-	PHALCON_OBS_VAR(seconds);
-	phalcon_array_fetch_str(&seconds, day, SL("seconds"), PH_NOISY);
-
-	y = phalcon_get_intval(year);
-	m = phalcon_get_intval(mon);
-	d = phalcon_get_intval(mday);
-	h = phalcon_get_intval(hours);
-	min = phalcon_get_intval(minutes);
-	sec = phalcon_get_intval(seconds);
+	y = phalcon_get_intval(&year);
+	m = phalcon_get_intval(&mon);
+	d = phalcon_get_intval(&mday);
+	h = phalcon_get_intval(&hours);
+	min = phalcon_get_intval(&minutes);
+	sec = phalcon_get_intval(&seconds);
 
 	if (y < 1980) {
 		ZVAL_LONG(return_value, (1 << 21 | 1 << 16));
@@ -1112,7 +1094,7 @@ PHP_METHOD(Phalcon_Date, dos2unix){
  */
 PHP_METHOD(Phalcon_Date, formatted_time){
 	
-	zval *datetime_str = NULL, *timestamp_format = NULL, *timezone = NULL, *tz, *dt, *tmp = NULL, *tmp1 = NULL;
+	zval *datetime_str = NULL, *timestamp_format = NULL, *timezone = NULL, tz, dt, tmp, tmp1;
 	zend_class_entry *ce0, *ce1;
 
 	PHALCON_MM_GROW();
@@ -1136,30 +1118,24 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 	}
 	
 	if (!zend_is_true(timezone)) {
-		PHALCON_CALL_FUNCTION(&timezone, "date_default_timezone_get");
+		PHALCON_CALL_FUNCTION(timezone, "date_default_timezone_get");
 	}
 
-	PHALCON_INIT_VAR(tz);
-	object_init_ex(tz, ce0);
-	if (phalcon_has_constructor(tz)) {
-		PHALCON_CALL_METHOD(NULL, tz, "__construct", timezone);
-	}
+	object_init_ex(&tz, ce0);
+	PHALCON_CALL_METHOD(NULL, &tz, "__construct", timezone);
 
-	PHALCON_INIT_VAR(dt);
-	object_init_ex(dt, ce1);
-	if (phalcon_has_constructor(dt)) {
-		PHALCON_CALL_METHOD(NULL, dt, "__construct", datetime_str, tz);
-	}
+	object_init_ex(&dt, ce1);
+	PHALCON_CALL_METHOD(NULL, &dt, "__construct", datetime_str, &tz);
 
 	PHALCON_CALL_METHOD(&tmp, dt, "getTimeZone");
 	PHALCON_CALL_METHOD(&tmp1, tmp, "getName");
 	PHALCON_CALL_METHOD(&tmp, tz, "getName");
 
-	if (PHALCON_IS_EQUAL(tmp1, tmp)) {
-		PHALCON_CALL_METHOD(NULL, dt, "setTimeZone", tz);
+	if (PHALCON_IS_EQUAL(&tmp1, &tmp)) {
+		PHALCON_CALL_METHOD(NULL, &dt, "setTimeZone", &tz);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(dt, "format", timestamp_format);
+	PHALCON_RETURN_CALL_METHOD(&dt, "format", timestamp_format);
 
 	PHALCON_MM_RESTORE();
 }

@@ -331,16 +331,16 @@ PHALCON_INIT_CLASS(Phalcon_Tag){
 	return SUCCESS;
 }
 
-static void phalcon_tag_get_escaper(zval **return_value, zval *params)
+static void phalcon_tag_get_escaper(zval *escaper, zval *params)
 {
 	zval autoescape;
 
 	if (!phalcon_array_isset_fetch_str(&autoescape, params, SL("escape"))) {
-		phalcon_return_static_property(&autoescape, phalcon_tag_ce, SL("_autoEscape"));
+		phalcon_return_static_property_ce(&autoescape, phalcon_tag_ce, SL("_autoEscape"));
 	}
 
 	if (zend_is_true(&autoescape)) {
-		if (FAILURE == phalcon_call_class_method_aparams(return_value, NULL, NULL, phalcon_fcall_self, SL("getescaperservice"), 0, NULL)) {
+		if (FAILURE == phalcon_call_method_with_params(escaper, NULL, NULL, phalcon_fcall_self, SL("getescaperservice"), 0, NULL)) {
 			;
 		}
 	}
@@ -348,7 +348,7 @@ static void phalcon_tag_get_escaper(zval **return_value, zval *params)
 
 PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 {
-	zval escaper, escaped, attrs, *value;
+	zval escaper, attrs, *value;
 	zend_string *key;
 	uint i;
 
@@ -392,14 +392,14 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 	}
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(&attrs), key, value) {
-		zval tmp;
+		zval tmp, escaped;
 		if (key && Z_TYPE_P(value) != IS_NULL) {
 			ZVAL_STR(&tmp, key);
 			if (Z_TYPE_P(&escaper) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&escaped, &escaper, "escapehtmlattr", value);
-				PHALCON_SCONCAT_SVSVS(&code, " ", &tmp, "=\"", &escaped, "\"");
+				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", &escaped, "\"");
 			} else {
-				PHALCON_SCONCAT_SVSVS(&code, " ", &tmp, "=\"", value, "\"");
+				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", value, "\"");
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
@@ -439,36 +439,32 @@ PHP_METHOD(Phalcon_Tag, getDI){
  */
 PHP_METHOD(Phalcon_Tag, getUrlService){
 
-	zval *url = NULL, *dependency_injector = NULL, *service;
+	zval url, dependency_injector, service;
 
 	PHALCON_MM_GROW();
 
-	url = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_urlService"));
-	if (Z_TYPE_P(url) != IS_OBJECT) {
-	
-		dependency_injector = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_dependencyInjector"));
-		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-			dependency_injector = NULL;
+	phalcon_return_static_property_ce(&url, phalcon_tag_ce, SL("_urlService"));
+	if (Z_TYPE(url) != IS_OBJECT) {
+		phalcon_return_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"));
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 			PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 		}
 	
-		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "A dependency injector container is required to obtain the \"url\" service");
 			return;
 		}
 
-		PHALCON_VERIFY_INTERFACE(dependency_injector, phalcon_diinterface_ce);
-	
-		PHALCON_INIT_VAR(service);
-		ZVAL_STRING(service, ISV(url));
-	
-		url = NULL;
-		PHALCON_CALL_METHOD(&url, dependency_injector, "getshared", service);
-		PHALCON_VERIFY_INTERFACE(url, phalcon_mvc_urlinterface_ce);
-		phalcon_update_static_property_ce(phalcon_tag_ce, SL("_urlService"), url);
+		PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
+
+		ZVAL_STRING(&service, ISV(url));
+
+		PHALCON_CALL_METHOD(&url, dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
+		phalcon_update_static_property_ce(phalcon_tag_ce, SL("_urlService"), &url);
 	}
 	
-	RETURN_CTOR(url);
+	RETURN_CTOR(&url);
 }
 
 /**

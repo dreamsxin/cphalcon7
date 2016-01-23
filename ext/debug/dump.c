@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Debug_Dump, all){
 
 	PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
-	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, &call_object, &arg_list);
+	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &call_object, &arg_list);
 
 	RETURN_MM();
 }

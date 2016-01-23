@@ -276,9 +276,9 @@ int phalcon_call_class_zval_method_array(zval **retval_ptr, zval *object, zval *
 	return status;
 }
 
-int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
+int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 {
-	zval retval, *arguments = NULL, *param;
+	zval ret, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;
 	int param_count = 0, i, status;
 
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
@@ -298,16 +298,9 @@ int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params)
 			arguments = (zval*)emalloc(sizeof(zval) * param_count);
 		}
 
-		if ((status = call_user_function(EG(function_table), NULL, handler, &retval, param_count, arguments)) == FAILURE || EG(exception)) {
+		if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
 			status = FAILURE;
 		}
-	}
-
-	if (retval_ptr) {
-		if (*retval_ptr == NULL) {
-			PHALCON_ALLOC_ZVAL(*retval_ptr);
-		}
-		ZVAL_COPY(*retval_ptr, &retval);
 	}
 
 	efree(arguments);

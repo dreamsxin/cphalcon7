@@ -730,8 +730,7 @@ PHP_METHOD(Phalcon_Arr, map){
 PHP_METHOD(Phalcon_Arr, merge){
 
 	zval *array1, *array2;
-	zval *value = NULL, *value1 = NULL, *arr = NULL;
-	zval *arg_num = NULL, *arg_list = NULL, *args = NULL, *tmp;
+	zval *value, arg_num, arg_list, args, tmp;
 	zend_string *str_key;
 	ulong idx;
 
@@ -741,20 +740,17 @@ PHP_METHOD(Phalcon_Arr, merge){
 
 	if (phalcon_array_is_associative(array2)) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array2), idx, str_key, value) {
-			zval tmp;
+			zval tmp, arr, value1;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
-			if (Z_TYPE_P(value) == IS_ARRAY && phalcon_array_isset(array1, &tmp)) {
-				PHALCON_INIT_NVAR(value1);
-				phalcon_array_fetch(&value1, array1, &tmp, PH_NOISY);
-				if (Z_TYPE_P(value1) == IS_ARRAY) {
-					PHALCON_INIT_NVAR(arr);
-					PHALCON_CALL_SELF(&arr, "merge", value1, value);
+			if (Z_TYPE_P(value) == IS_ARRAY && phalcon_array_isset_fetch(&value1, array1, &tmp)) {
+				if (Z_TYPE(value1) == IS_ARRAY) {
+					PHALCON_CALL_SELF(&arr, "merge", &value1, value);
 
-					phalcon_array_update_zval(array1, &tmp, arr, PH_COPY);
+					phalcon_array_update_zval(array1, &tmp, &arr, PH_COPY);
 				} else {
 					phalcon_array_update_zval(array1, &tmp, value, PH_COPY);
 				}
@@ -772,23 +768,22 @@ PHP_METHOD(Phalcon_Arr, merge){
 
 	PHALCON_CALL_FUNCTION(&arg_num, "func_num_args");
  
-	if (Z_LVAL_P(arg_num) > 2) {
+	if (Z_LVAL(arg_num) > 2) {
 		PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
-		PHALCON_INIT_VAR(tmp);
-		ZVAL_LONG(tmp, 2);
+		ZVAL_LONG(&tmp, 2);
 
-		PHALCON_CALL_FUNCTION(&args, "array_slice", arg_list, tmp);
+		PHALCON_CALL_FUNCTION(&args, "array_slice", &arg_list, &tmp);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(args), value) {
-			PHALCON_INIT_NVAR(arr);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(args), value) {
+			zval arr;
 			PHALCON_CALL_SELF(&arr, "merge", array1, value);
 
-			PHALCON_CPY_WRT(array1, arr);
+			ZVAL_COPY(array1, &arr);
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_CCTOR(array1);
+	RETURN_CTOR(array1);
 }
 
 /**
@@ -810,7 +805,7 @@ PHP_METHOD(Phalcon_Arr, merge){
  */
 PHP_METHOD(Phalcon_Arr, overwrite){
 
-	zval *array1, *array2, *array, *value = NULL, *arg_num, *arg_list, *args, *tmp;
+	zval *array1, *array2, array, *value, arg_num, arg_list, args, tmp;
 	zend_string *key;
 	ulong idx;
 
@@ -825,10 +820,9 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 		convert_to_array(array2);
 	}
 
-	PHALCON_INIT_VAR(array);
 	PHALCON_CALL_FUNCTION(&array, "array_intersect_key", array2, return_value);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, key, value) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(array), idx, key, value) {
 		if (key) {
 			phalcon_array_update_string(return_value, key, value, PH_COPY);
 		} else {
@@ -836,20 +830,16 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	PHALCON_INIT_VAR(arg_num);
 	PHALCON_CALL_FUNCTION(&arg_num, "func_num_args");
 
-	if (Z_LVAL_P(arg_num) > 2) {
-		PHALCON_INIT_VAR(arg_list);
+	if (Z_LVAL(arg_num) > 2) {
 		PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
-		PHALCON_INIT_VAR(tmp);
-		ZVAL_LONG(tmp, 2);
+		ZVAL_LONG(&tmp, 2);
 
-		PHALCON_INIT_VAR(args);
-		PHALCON_CALL_FUNCTION(&args, "array_slice", arg_list, tmp);
+		PHALCON_CALL_FUNCTION(&args, "array_slice", &arg_list, &tmp);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(args), value) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(args), value) {
 			PHALCON_CALL_SELF(&return_value, "overwrite", array1, value);
 		} ZEND_HASH_FOREACH_END();
 	}
@@ -872,46 +862,34 @@ PHP_METHOD(Phalcon_Arr, overwrite){
  */
 PHP_METHOD(Phalcon_Arr, callback){
 
-	zval *str, *pattern, *matches, *match, *command, *command_parts, *params, *search, *replace;
-	zval *ret, *tmp;
+	zval *str, pattern, matches, ret, command, match, search, replace, params, command_parts;
+	zval *tmp;
 	pcre_cache_entry *pce;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &str);
 
-	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "#^([^\\(]*+)\\((.*)\\)$#");
+	ZVAL_STRING(&pattern, "#^([^\\(]*+)\\((.*)\\)$#");
 
-	PHALCON_INIT_VAR(matches);
+	RETURN_MM_ON_FAILURE(phalcon_preg_match(&ret, &pattern, str, &matches));
 
-	PHALCON_INIT_VAR(ret);
-	RETURN_MM_ON_FAILURE(phalcon_preg_match(ret, pattern, str, matches));
-
-	if (zend_is_true(ret)) {
-		if (!phalcon_array_isset_fetch_long(&command, matches, 1)) {
+	if (zend_is_true(&ret)) {
+		if (!phalcon_array_isset_fetch_long(&command, &matches, 1)) {
 			ZVAL_EMPTY_STRING(&command);
 		}
 
-		if (phalcon_array_isset_long(matches, 2)) {
-			PHALCON_OBS_VAR(match);
-			phalcon_array_fetch_long(&match, matches, 2, PH_NOISY);
-
+		if (phalcon_array_isset_fetch_long(&match, matches, 2)) {
 			if ((pce = pcre_get_compiled_regex_cache(SSL("#(?<!\\\\\\\\),#"))) == NULL) {
 				RETURN_MM_FALSE;
 			}
 
-			PHALCON_INIT_VAR(tmp);
-			php_pcre_split_impl(pce, Z_STRVAL_P(match), Z_STRLEN_P(match), tmp, -1, 0);
+			php_pcre_split_impl(pce, Z_STRVAL(match), Z_STRLEN(match), &tmp, -1, 0);
 
-			PHALCON_INIT_VAR(search);
-			ZVAL_STRING(search, "\\,");
+			ZVAL_STRING(&search, "\\,");
+			ZVAL_STRING(&replace, ",");
 
-			PHALCON_INIT_VAR(replace);
-			ZVAL_STRING(replace, ",");
-
-			PHALCON_INIT_VAR(params);
-			PHALCON_CALL_FUNCTION(&params, "str_replace", search, replace, tmp);
+			PHALCON_CALL_FUNCTION(&params, "str_replace", &search, &replace, &tmp);
 		}
 	} else {
 		ZVAL_COPY_VALUE(&command, &str);
@@ -922,15 +900,14 @@ PHP_METHOD(Phalcon_Arr, callback){
 	array_init(return_value);
 
 	if (phalcon_memnstr_str(&command, SL("::"))) {
-		PHALCON_INIT_VAR(command_parts);
-		phalcon_fast_explode_str(command_parts, SL("::"), &command);
+		phalcon_fast_explode_str(&command_parts, SL("::"), &command);
 
-		phalcon_array_append(return_value, command_parts, PH_COPY);
+		phalcon_array_append(return_value, &command_parts, PH_COPY);
 	} else {
 		phalcon_array_append(return_value, &command, PH_COPY);
 	}
 
-	phalcon_array_append(return_value, params, PH_COPY);
+	phalcon_array_append(return_value, &params, PH_COPY);
 
 	PHALCON_MM_RESTORE();
 }

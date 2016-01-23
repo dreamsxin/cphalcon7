@@ -213,18 +213,17 @@ typedef enum _phalcon_call_type {
 	} while (0)
 
 /** Use these functions to call functions in the PHP userland using an arbitrary zval as callable */
-#define PHALCON_CALL_USER_FUNC(return_value_ptr, handler) PHALCON_CALL_USER_FUNC_ARRAY(return_value_ptr, handler, NULL)
-#define PHALCON_CALL_USER_FUNC_ARRAY(return_value_ptr, handler, params) \
+#define PHALCON_CALL_USER_FUNC_ARRAY(retval, handler, params) \
 	do { \
-		PHALCON_OBSERVE_OR_NULLIFY_PPZV(return_value_ptr); \
-		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array(return_value_ptr, handler, params)); \
+		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array(retval, handler, params)); \
 	} while (0)
 
-#define PHALCON_CALL_USER_FUNC_ARRAY_NOEX(return_value_ptr, handler, params) \
+#define PHALCON_CALL_USER_FUNC_ARRAY_NOEX(retval, handler, params) \
 	do { \
-		PHALCON_OBSERVE_OR_NULLIFY_PPZV(return_value_ptr); \
-		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array_noex(return_value_ptr, handler, params)); \
+		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array_noex(retval, handler, params)); \
 	} while (0)
+
+#define PHALCON_CALL_USER_FUNC(retval, handler) PHALCON_CALL_USER_FUNC_ARRAY(retval, handler, NULL)
 
 /**
  * @brief Checks if the class defines a constructor
@@ -252,13 +251,13 @@ static inline int phalcon_call_class_method_array(zval **retval_ptr, zval *objec
 /**
  * Replaces call_user_func_array avoiding function lookup
  */
-int phalcon_call_user_func_array(zval **retval_ptr, zval *handler, zval *params);
+int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params);
 
 /** Fast call_user_func_array/call_user_func */
-static inline int phalcon_call_user_func_array_noex(zval **retval_ptr, zval *handler, zval *params){
+static inline int phalcon_call_user_func_array_noex(zval *retval, zval *handler, zval *params){
 
 	if (zend_is_callable(handler, 0, NULL)) {
-		return phalcon_call_user_func_array(retval_ptr, handler, params);
+		return phalcon_call_user_func_array(retval, handler, params);
 	}
 
 	return FAILURE;

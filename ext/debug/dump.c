@@ -225,9 +225,8 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
  */
 PHP_METHOD(Phalcon_Debug_Dump, output){
 
-	zval *variable, *name = NULL, *tab = NULL, *space, *tmp = NULL, *new_tab = NULL;
-	zval *output = NULL, *str = NULL, *type = NULL, *style = NULL, *count = NULL, *value = NULL, *replace_pairs = NULL;
-	zval *class_name = NULL, *objects, *detailed = NULL, *properties = NULL, *methods = NULL, *method = NULL;
+	zval *variable, *name = NULL, *tab = NULL, space, str, type, style, count, replace_pairs, output, new_tab, tmp;
+	zval *value, class_name, *objects, *detailed, properties, *methods = NULL, *method = NULL;
 	zend_string *str_key;
 	ulong idx;
 
@@ -245,122 +244,97 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		tab = &PHALCON_GLOBAL(z_one);
 	}
 
-	PHALCON_INIT_VAR(space);
-	ZVAL_STRING(space, "  ");
+	ZVAL_LONG(&new_tab, Z_LVAL_P(tab) - 1);
+	ZVAL_STRING(&space, "  ");
 
 	if (Z_TYPE_P(variable) == IS_ARRAY) {
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "<b style =':style'>Array</b> (<span style =':style'>:count</span>) (\n");
+		ZVAL_STRING(&str, "<b style =':style'>Array</b> (<span style =':style'>:count</span>) (\n");
+		ZVAL_STRING(&type, "arr");
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "arr");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		ZVAL_LONG(&count, phalcon_fast_count_int(variable));
 
-		PHALCON_INIT_NVAR(count);
-		ZVAL_LONG(count, phalcon_fast_count_int(variable));
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+		phalcon_array_update_str(&replace_pairs, SL(":count"), &count, PH_COPY);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_str(replace_pairs, SL(":count"), count, PH_COPY);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-		phalcon_concat_self(return_value, output);
+		phalcon_concat_self(return_value, &output);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(variable), idx, str_key, value) {
-			zval key;
+			zval key, repeat;
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
 
-			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
+			PHALCON_CALL_FUNCTION(&repeat, "str_repeat", &space, tab);
 
-			phalcon_concat_self(return_value, tmp);
+			phalcon_concat_self(return_value, &repeat);
 
-			PHALCON_INIT_NVAR(str);
-			ZVAL_STRING(str, "[<span style=':style'>:key</span>] => ");
+			ZVAL_STRING(&str, "[<span style=':style'>:key</span>] => ");
 
-			PHALCON_INIT_NVAR(type);
-			ZVAL_STRING(type, "arr");
+			ZVAL_STRING(&type, "arr");
 
-			PHALCON_CALL_SELF(&style, "getstyle", type);
+			PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-			PHALCON_INIT_NVAR(replace_pairs);
-			array_init(replace_pairs);
+			array_init(&replace_pairs);
 
-			phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_str(replace_pairs, SL(":key"), &key, PH_COPY);
+			phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+			phalcon_array_update_str(&replace_pairs, SL(":key"), &key, PH_COPY);
 
-			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
+			PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-			phalcon_concat_self(return_value, output);
+			phalcon_concat_self(return_value, &output);
 
 			if (PHALCON_IS_LONG(tab, 1) && !PHALCON_IS_EMPTY(name) && !phalcon_is_numeric(&key) && PHALCON_IS_IDENTICAL(name, &key)) {
 				continue;
 			} else {
-				PHALCON_INIT_NVAR(new_tab);
-				ZVAL_LONG(new_tab, Z_LVAL_P(tab) + 1);
-
-				PHALCON_CALL_SELF(&tmp, "output", value, &PHALCON_GLOBAL(z_null), new_tab);
-				PHALCON_SCONCAT_VS(return_value, tmp, "\n");
+				PHALCON_CALL_SELF(&tmp, "output", value, &PHALCON_GLOBAL(z_null), &new_tab);
+				PHALCON_SCONCAT_VS(return_value, &tmp, "\n");
 			}
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_INIT_NVAR(new_tab);
-		ZVAL_LONG(new_tab, Z_LVAL_P(tab) - 1);
+		PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, &new_tab);
 
-		PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
-
-		PHALCON_SCONCAT(return_value, tmp);
+		PHALCON_SCONCAT(return_value, &tmp);
 	} else if (Z_TYPE_P(variable) == IS_OBJECT) {
+		ZVAL_STRING(&str, "<b style=':style'>Object</b> :class");
+		ZVAL_STRING(&type, "obj");
 
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "<b style=':style'>Object</b> :class");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "obj");
+		phalcon_get_class(&class_name, variable, 0);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(class_name);
-		phalcon_get_class(class_name, variable, 0);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+		phalcon_array_update_str(&replace_pairs, SL(":class"), &class_name, PH_COPY);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_str(replace_pairs, SL(":class"), class_name, PH_COPY);
+		PHALCON_SCONCAT(return_value, &output);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
+		phalcon_get_parent_class(&class_name, variable, 0);
 
-		PHALCON_SCONCAT(return_value, output);
+		if (zend_is_true(&class_name)) {
+			ZVAL_STRING(&str, " <b style=':style'>extends</b> :parent");
+			ZVAL_STRING(&type, "obj");
 
-		PHALCON_INIT_NVAR(class_name);
-		phalcon_get_parent_class(class_name, variable, 0);
+			PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		if (zend_is_true(class_name)) {
-			PHALCON_INIT_NVAR(str);
-			ZVAL_STRING(str, " <b style=':style'>extends</b> :parent");
+			array_init(&replace_pairs);
 
-			PHALCON_INIT_NVAR(type);
-			ZVAL_STRING(type, "obj");
+			phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+			phalcon_array_update_str(&replace_pairs, SL(":parent"), &class_name, PH_COPY);
 
-			PHALCON_CALL_SELF(&style, "getstyle", type);
+			PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-			PHALCON_INIT_NVAR(replace_pairs);
-			array_init(replace_pairs);
-
-			phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_str(replace_pairs, SL(":parent"), class_name, PH_COPY);
-
-			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-			PHALCON_SCONCAT(return_value, output);
+			PHALCON_SCONCAT(return_value, &output);
 		}
 
 		PHALCON_SCONCAT_STR(return_value, " (\n");
@@ -368,16 +342,12 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		objects  = phalcon_read_property(getThis(), SL("_objects"), PH_NOISY);
 
 		if (phalcon_fast_in_array(variable, objects)) {
-			
-			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
-			PHALCON_SCONCAT_VS(return_value, tmp, "[already listed]\n");
+			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", &space, tab);
+			PHALCON_SCONCAT_VS(return_value, &tmp, "[already listed]\n");
 
-			PHALCON_INIT_NVAR(new_tab);
-			ZVAL_LONG(new_tab, Z_LVAL_P(tab) - 1);
+			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", &space, tab);
 
-			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
-
-			PHALCON_SCONCAT_VS(return_value, tmp, ")");
+			PHALCON_SCONCAT_VS(return_value, &tmp, ")");
 
 			RETURN_MM();
 		}
@@ -386,10 +356,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		detailed  = phalcon_read_property(getThis(), SL("_detailed"), PH_NOISY);
 
-		PHALCON_INIT_NVAR(properties);
-		phalcon_get_object_vars(properties, variable, !zend_is_true(detailed));
+		phalcon_get_object_vars(&properties, variable, !zend_is_true(detailed));
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(properties), idx, str_key, value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(properties), idx, str_key, value) {
 			zval key;
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
@@ -401,240 +370,186 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			PHALCON_SCONCAT(return_value, tmp);
 
-			PHALCON_INIT_NVAR(str);
-			ZVAL_STRING(str, "-><span style=':style'>:key</span> (<span style=':style'>:type</span>) = ");
+			ZVAL_STRING(&str, "-><span style=':style'>:key</span> (<span style=':style'>:type</span>) = ");
+			ZVAL_STRING(&type, "obj");
 
-			PHALCON_INIT_NVAR(type);
-			ZVAL_STRING(type, "obj");
+			PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-			PHALCON_CALL_SELF(&style, "getstyle", type);
+			array_init(&replace_pairs);
 
-			PHALCON_INIT_NVAR(replace_pairs);
-			array_init(replace_pairs);
-
-			phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_str(replace_pairs, SL(":key"), &key, PH_COPY);
+			phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+			phalcon_array_update_str(&replace_pairs, SL(":key"), &key, PH_COPY);
 
 			if (PHALCON_PROPERTY_IS_PUBLIC_ZVAL(variable, &key)) {
-				phalcon_array_update_str_str(replace_pairs, SL(":type"), SL("public"), PH_COPY);
+				phalcon_array_update_str_str(&replace_pairs, SL(":type"), SL("public"), PH_COPY);
 			} else if (PHALCON_PROPERTY_IS_PRIVATE_ZVAL(variable, &key)) {
-				phalcon_array_update_str_str(replace_pairs, SL(":type"), SL("private"), PH_COPY);
+				phalcon_array_update_str_str(&replace_pairs, SL(":type"), SL("private"), PH_COPY);
 			} else if (PHALCON_PROPERTY_IS_PROTECTED_ZVAL(variable, &key)) {
-				phalcon_array_update_str_str(replace_pairs, SL(":type"), SL("protected"), PH_COPY);
+				phalcon_array_update_str_str(&replace_pairs, SL(":type"), SL("protected"), PH_COPY);
 			}
 
 			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
 
-			PHALCON_SCONCAT(return_value, output);
+			PHALCON_SCONCAT(return_value, &output);
 
-			PHALCON_INIT_NVAR(new_tab);
-			ZVAL_LONG(new_tab, Z_LVAL_P(tab) + 1);
-
-			PHALCON_CALL_SELF(&tmp, "output", value, &PHALCON_GLOBAL(z_null), new_tab);
-			PHALCON_SCONCAT_VS(return_value, tmp, ")\n");
+			PHALCON_CALL_SELF(&tmp, "output", value, &PHALCON_GLOBAL(z_null), &new_tab);
+			PHALCON_SCONCAT_VS(return_value, &tmp, ")\n");
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_INIT_NVAR(methods);
+		phalcon_get_class_methods(&methods, variable, !zend_is_true(detailed));
 
-		phalcon_get_class_methods(methods, variable, !zend_is_true(detailed));
+		PHALCON_CALL_FUNCTION(&tmp, "str_repeat", &space, tab);
 
-		PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
+		PHALCON_SCONCAT(return_value, &tmp);
 
-		PHALCON_SCONCAT(return_value, tmp);
+		ZVAL_STRING(&str, ":class <b style=':style'>methods</b>: (<span style=':style'>:count</span>) (\n");
+		ZVAL_STRING(&type, "obj");
 
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, ":class <b style=':style'>methods</b>: (<span style=':style'>:count</span>) (\n");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "obj");
+		phalcon_get_class(&class_name, variable, 0);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		ZVAL_LONG(&count, phalcon_fast_count_int(&methods));
 
-		PHALCON_INIT_NVAR(class_name);
-		phalcon_get_class(class_name, variable, 0);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(count);
-		ZVAL_LONG(count, phalcon_fast_count_int(methods));
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+		phalcon_array_update_str(&replace_pairs, SL(":class"), &class_name, PH_COPY);
+		phalcon_array_update_str(&replace_pairs, SL(":count"), &count, PH_COPY);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_str(replace_pairs, SL(":class"), class_name, PH_COPY);
-		phalcon_array_update_str(replace_pairs, SL(":count"), count, PH_COPY);
+		PHALCON_SCONCAT(return_value, &output);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(methods), method) {
+			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", &space, &new_tab);
 
-		PHALCON_SCONCAT(return_value, output);
+			PHALCON_SCONCAT(return_value, &tmp);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(methods), method) {
-			PHALCON_INIT_NVAR(new_tab);
-			ZVAL_LONG(new_tab, Z_LVAL_P(tab) + 1);
+			ZVAL_STRING(&str, "-><span style=':style'>:method</span>();\n");
+			ZVAL_STRING(&type, "obj");
 
-			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, new_tab);
+			PHALCON_CALL_SELF(&style, "getstyle", &type);
+			array_init(&replace_pairs);
 
-			PHALCON_SCONCAT(return_value, tmp);
+			phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+			phalcon_array_update_str(&replace_pairs, SL(":method"), method, PH_COPY);
 
-			PHALCON_INIT_NVAR(str);
-			ZVAL_STRING(str, "-><span style=':style'>:method</span>();\n");
+			PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-			PHALCON_INIT_NVAR(type);
-			ZVAL_STRING(type, "obj");
+			PHALCON_SCONCAT(return_value, &output);
 
-			PHALCON_CALL_SELF(&style, "getstyle", type);
+			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", &space, tab);
 
-			PHALCON_INIT_NVAR(replace_pairs);
-			array_init(replace_pairs);
-
-			phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-			phalcon_array_update_str(replace_pairs, SL(":method"), method, PH_COPY);
-
-			PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-			PHALCON_SCONCAT(return_value, output);
-
-			PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
-
-			PHALCON_SCONCAT_VS(return_value, tmp, "\n");
+			PHALCON_SCONCAT_VS(return_value, &tmp, "\n");
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_INIT_NVAR(new_tab);
-		ZVAL_LONG(new_tab, Z_LVAL_P(tab) - 1);
+		PHALCON_CALL_FUNCTION(&tmp, "str_repeat", &space, tab);
 
-		PHALCON_CALL_FUNCTION(&tmp, "str_repeat", space, tab);
-
-		PHALCON_SCONCAT_VS(return_value, tmp, ")");
+		PHALCON_SCONCAT_VS(return_value, &tmp, ")");
 	} else if (Z_TYPE_P(variable) == IS_LONG) {
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "<b style=':style'>Integer</b> (<span style=':style'>:var</span>)");
+		ZVAL_STRING(&str, "<b style=':style'>Integer</b> (<span style=':style'>:var</span>)");
+		ZVAL_STRING(&type, "int");
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "int");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+		phalcon_array_update_str(&replace_pairs, SL(":var"), variable, PH_COPY);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-		PHALCON_SCONCAT(return_value, output);
+		PHALCON_SCONCAT(return_value, &output);
 	} else if (Z_TYPE_P(variable) == IS_DOUBLE) {
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "<b style=':style'>Float</b> (<span style=':style'>:var</span>)");
+		ZVAL_STRING(&str, "<b style=':style'>Float</b> (<span style=':style'>:var</span>)");
+		ZVAL_STRING(&type, "float");
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "float");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+		phalcon_array_update_str(&replace_pairs, SL(":var"), &variable, PH_COPY);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-		PHALCON_SCONCAT(return_value, output);
+		PHALCON_SCONCAT(return_value, &output);
 	} else if (phalcon_is_numeric_ex(variable)) {
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "<b style=':style'>Numeric string</b> (<span style=':style'>:length</span>) \"<span style=':style'>:var</span>\"");
+		ZVAL_STRING(&str, "<b style=':style'>Numeric string</b> (<span style=':style'>:length</span>) \"<span style=':style'>:var</span>\"");
+		ZVAL_STRING(&type, "num");
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "num");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+		phalcon_array_update_str_long(&replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
+		phalcon_array_update_str(&replace_pairs, SL(":var"), variable, PH_COPY);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_str_long(replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
-		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-		PHALCON_SCONCAT(return_value, output);
+		PHALCON_SCONCAT(return_value, &output);
 	} else if (Z_TYPE_P(variable) == IS_STRING) {
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "<b style=':style'>String</b> (<span style=':style'>:length</span>) \"<span style=':style'>:var</span>\"");
+		ZVAL_STRING(&str, "<b style=':style'>String</b> (<span style=':style'>:length</span>) \"<span style=':style'>:var</span>\"");
+		ZVAL_STRING(&type, "str");
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "str");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+		phalcon_array_update_str_long(&replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
+		phalcon_array_update_str(&replace_pairs, SL(":var"), variable, PH_COPY);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_str_long(replace_pairs, SL(":length"), Z_STRLEN_P(variable), 0);
-		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-		PHALCON_SCONCAT(return_value, output);
+		PHALCON_SCONCAT(return_value, &output);
 	} else if (PHALCON_IS_BOOL(variable)) {
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "<b style=':style'>Boolean</b> (<span style=':style'>:var</span>)");
+		ZVAL_STRING(&str, "<b style=':style'>Boolean</b> (<span style=':style'>:var</span>)");
+		ZVAL_STRING(&type, "bool");
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "bool");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
-
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
 		if (zend_is_true(variable)) {
-			phalcon_array_update_str_str(replace_pairs, SL(":var"), SL("TRUE") , PH_COPY);
+			phalcon_array_update_str_str(&replace_pairs, SL(":var"), SL("TRUE") , PH_COPY);
 		} else {
-			phalcon_array_update_str_str(replace_pairs, SL(":var"), SL("FALSE") , PH_COPY);
+			phalcon_array_update_str_str(&replace_pairs, SL(":var"), SL("FALSE") , PH_COPY);
 		}
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		PHALCON_SCONCAT(return_value, output);
+		PHALCON_SCONCAT(return_value, &output);
 	} else if (Z_TYPE_P(variable) == IS_NULL) {
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "<b style=':style'>NULL</b>");
+		ZVAL_STRING(&str, "<b style=':style'>NULL</b>");
+		ZVAL_STRING(&type, "null");
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "null");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-		PHALCON_SCONCAT(return_value, output);
+		PHALCON_SCONCAT(return_value, &output);
 	} else {
-		PHALCON_INIT_NVAR(str);
-		ZVAL_STRING(str, "(<span style=':style'>:var</span>)");
+		ZVAL_STRING(&str, "(<span style=':style'>:var</span>)");
+		ZVAL_STRING(&type, "other");
 
-		PHALCON_INIT_NVAR(type);
-		ZVAL_STRING(type, "other");
+		PHALCON_CALL_SELF(&style, "getstyle", &type);
 
-		PHALCON_CALL_SELF(&style, "getstyle", type);
+		array_init(&replace_pairs);
 
-		PHALCON_INIT_NVAR(replace_pairs);
-		array_init(replace_pairs);
+		phalcon_array_update_str(&replace_pairs, SL(":style"), &style, PH_COPY);
+		phalcon_array_update_str(&replace_pairs, SL(":var"), variable, PH_COPY);
 
-		phalcon_array_update_str(replace_pairs, SL(":style"), style, PH_COPY);
-		phalcon_array_update_str(replace_pairs, SL(":var"), variable, PH_COPY);
+		PHALCON_CALL_FUNCTION(&output, "strtr", &str, &replace_pairs);
 
-		PHALCON_CALL_FUNCTION(&output, "strtr", str, replace_pairs);
-
-		PHALCON_SCONCAT(return_value, output);
+		PHALCON_SCONCAT(return_value, &output);
 	}
 
 	RETURN_MM();

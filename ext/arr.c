@@ -388,7 +388,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 	// Set current $array to inner-most array  path
 	while ((int) zend_hash_num_elements(Z_ARRVAL_P(keys)) > 1) {
-		zval is_digit, arr;
+		zval is_digit, *arr;
 
 		ZVAL_MAKE_REF(keys);
 		PHALCON_CALL_FUNCTION(&key, "array_shift", keys);

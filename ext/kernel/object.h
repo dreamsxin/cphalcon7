@@ -172,6 +172,21 @@ static inline int phalcon_return_static_property(zval *return_value, const char 
 }
 
 /**
+ * Return a static property
+ */
+static inline int phalcon_return_static_property_ce(zval *return_value, zend_class_entry *ce, const char *property, uint32_t len)
+{
+	zval *tmp = phalcon_read_static_property_ce(ce, property, len);
+	if (tmp) {
+		ZVAL_COPY_VALUE(return_value, tmp);
+		return SUCCESS;
+	}
+
+	ZVAL_NULL(return_value);
+	return FAILURE;
+}
+
+/**
  * Update a static property
  */
 static inline int phalcon_update_static_property(const char *class_name, uint32_t class_length, const char *name, uint32_t name_length, zval *value)

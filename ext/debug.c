@@ -423,8 +423,8 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 	phalcon_fast_count(&number_arguments, argument);
 
 	if (PHALCON_LT_LONG(n, 3)) {
-		if (PHALCON_GT_LONG(number_arguments, 0)) {
-			if (PHALCON_LT_LONG(number_arguments, 10)) {
+		if (PHALCON_GT_LONG(&number_arguments, 0)) {
+			if (PHALCON_LT_LONG(&number_arguments, 10)) {
 
 				array_init(&dump);
 
@@ -474,7 +474,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 					}
 				} ZEND_HASH_FOREACH_END();
 
-				phalcon_fast_join_str(&joined_dump, SL(", "), dump);
+				phalcon_fast_join_str(&joined_dump, SL(", "), &dump);
 
 				RETURN_CTOR(&joined_dump);
 			}
@@ -494,12 +494,11 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
  */
 PHP_METHOD(Phalcon_Debug, _getVarDump){
 
-	zval *variable, *class_name, *dumped_object = NULL;
-	zval *array_dump = NULL, *dump = NULL;
+	zval *variable, class_name, dumped_object, array_dump, dump;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 0, &variable);
+	phalcon_fetch_params(1, 1, 0, &variable);
 
 	if (PHALCON_IS_SCALAR(variable)) {
 
@@ -535,8 +534,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 	if (Z_TYPE_P(variable) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(variable);
 
-		PHALCON_INIT_VAR(class_name);
-		ZVAL_NEW_STR(class_name, ce->name);
+		ZVAL_NEW_STR(&class_name, ce->name);
 
 		/** 
 		 * Try to check for a 'dump' method, this surely produces a better printable
@@ -549,19 +547,17 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 			 * dump() must return an array, generate a recursive representation using
 			 * getArrayDump
 			 */
-			PHALCON_CALL_METHOD(&array_dump, getThis(), "_getarraydump", dumped_object);
+			PHALCON_CALL_METHOD(&array_dump, getThis(), "_getarraydump", &dumped_object);
 
-			PHALCON_INIT_VAR(dump);
-			PHALCON_CONCAT_SVSVS(dump, "Object(", class_name, ": ", array_dump, ")");
+			PHALCON_CONCAT_SVSVS(&dump, "Object(", &class_name, ": ", &array_dump, ")");
 		} else {
 			/** 
 			 * If dump() is not available just print the class name
 			 */
-			PHALCON_INIT_NVAR(dump);
-			PHALCON_CONCAT_SVS(dump, "Object(", class_name, ")</span>");
+			PHALCON_CONCAT_SVS(&dump, "Object(", &class_name, ")</span>");
 		}
 
-		RETURN_CTOR(dump);
+		RETURN_CTOR(&dump);
 	}
 
 	/** 
@@ -569,7 +565,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 	 */
 	if (Z_TYPE_P(variable) == IS_ARRAY) { 
 		PHALCON_CALL_METHOD(&array_dump, getThis(), "_getarraydump", variable);
-		PHALCON_CONCAT_SVS(return_value, "Array(", array_dump, ")");
+		PHALCON_CONCAT_SVS(return_value, "Array(", &array_dump, ")");
 		RETURN_MM();
 	}
 

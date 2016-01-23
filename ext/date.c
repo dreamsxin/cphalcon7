@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Date, adjust){
  */
 PHP_METHOD(Phalcon_Date, days){
 
-	zval *month, *year = NULL, year2, *months, year_months, format, total, tmp, tmp1;
+	zval *month, *year = NULL, year2, months, year_months, format, total, tmp, tmp1, tmp2;
 	char buf[2];
 	int y, m, i, t;
 
@@ -463,16 +463,16 @@ PHP_METHOD(Phalcon_Date, days){
 	if (!year || PHALCON_IS_FALSE(year)) {
 		ZVAL_STRING(&tmp, "Y");
 
-		PHALCON_CALL_FUNCTION(&year2, "date", tmp);
+		PHALCON_CALL_FUNCTION(&year2, "date", &tmp);
 
 		y = phalcon_get_intval(&year2);
 	} else {
 		ZVAL_COPY(&year2, year);
 	}
 
-	if (Z_TYPE(&months) == IS_ARRAY) {
+	if (Z_TYPE(months) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_long(&year_months, &months, y)) {
-			if (phalcon_array_isset_fetch_long(&return_value, &year_months, m)) {
+			if (phalcon_array_isset_fetch_long(return_value, &year_months, m)) {
 				RETURN_MM();
 			}
 		}
@@ -483,7 +483,7 @@ PHP_METHOD(Phalcon_Date, days){
 	ZVAL_LONG(&tmp1, 1);
 	ZVAL_LONG(&tmp2, 0);
 
-	PHALCON_CALL_FUNCTION(&tmp, "mktime", &tmp1, &tmp2, &tmp2, month, &tmp1, year2);	
+	PHALCON_CALL_FUNCTION(&tmp, "mktime", &tmp1, &tmp2, &tmp2, month, &tmp1, &year2);	
 
 	ZVAL_STRING(&format, "t");
 
@@ -532,7 +532,7 @@ PHP_METHOD(Phalcon_Date, days){
  */
 PHP_METHOD(Phalcon_Date, months){
 
-	zval *format = NULL, tmp, tmp1, tmp2, *value = NULL;
+	zval *format = NULL, tmp1, tmp2;
 	int i;
 
 	PHALCON_MM_GROW();
@@ -594,7 +594,7 @@ PHP_METHOD(Phalcon_Date, years){
 	if (!end || PHALCON_IS_FALSE(end)) {
 		ZVAL_STRING(&tmp, "Y");
 
-		PHALCON_CALL_FUNCTION(&year, "date", tmp);
+		PHALCON_CALL_FUNCTION(&year, "date", &tmp);
 
 		e = phalcon_get_intval(&year) + 5;
 	} else {
@@ -652,7 +652,7 @@ PHP_METHOD(Phalcon_Date, span){
 
 	ZVAL_LONG(&tmp1, 0);
 
-	phalcon_fast_count(count_output, &output_arr);
+	phalcon_fast_count(&count_output, &output_arr);
 
 	PHALCON_CALL_FUNCTION(&tmp, "array_fill", &tmp1, &count_output, &tmp1);
 
@@ -818,7 +818,7 @@ PHP_METHOD(Phalcon_Date, span2){
 
 	if (Z_LVAL(count_output) == 1) {
 		ZVAL_MAKE_REF(&output_arr);
-		PHALCON_CALL_FUNCTION(&return_value, "array_pop", &output_arr);
+		PHALCON_CALL_FUNCTION(return_value, "array_pop", &output_arr);
 		ZVAL_UNREF(&output_arr);
 		RETURN_MM();
 	}

@@ -417,8 +417,8 @@ PHP_METHOD(Phalcon_Arr, set_path){
 			if (phalcon_array_isset_fetch(&v, &cpy_array, &key)) {
 				ZVAL_COPY(&cpy_array, &v);
 			} else {
-				array_init(&arr);
-				phalcon_array_update_zval(&cpy_array, &key, &arr, PH_COPY);
+				array_init(&v);
+				phalcon_array_update_zval(&cpy_array, &key, &v, PH_COPY);
 			}
 		}
 	}
@@ -576,7 +576,7 @@ PHP_METHOD(Phalcon_Arr, extract){
 	array_init(return_value);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(paths), path) {
-		ZVAL value;
+		zval value;
 		PHALCON_CALL_SELF(&value, "path", array, path, default_value);
 
 		ZVAL_MAKE_REF(return_value);
@@ -609,7 +609,7 @@ PHP_METHOD(Phalcon_Arr, pluck){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(array), row) {
 		zval value;
-		if (phalcon_array_isset_fetch(&value, row, key)) 
+		if (phalcon_array_isset_fetch(&value, row, key)) {
 			phalcon_array_append(return_value, &value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
@@ -662,55 +662,49 @@ PHP_METHOD(Phalcon_Arr, unshift){
  */
 PHP_METHOD(Phalcon_Arr, map){
 
-	zval *callbacks, *array, *keys = NULL;
-	zval *val = NULL, *value = NULL, *callback = NULL, *params = NULL;
+	zval *callbacks, *array, *keys = NULL, *val;
 	zend_string *str_key;
 	ulong idx;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 1, &callbacks, &array, &keys);
-
 	PHALCON_SEPARATE_PARAM(array);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, str_key, val) {
-		zval tmp;
+		zval key, value, *callback, params;
 		if (str_key) {
-			ZVAL_STR(&tmp, str_key);
+			ZVAL_STR(&key, str_key);
 		} else {
-			ZVAL_LONG(&tmp, idx);
+			ZVAL_LONG(&key, idx);
 		}
 		if (Z_TYPE_P(val) == IS_ARRAY) {
 			PHALCON_CALL_SELF(&value, "map", callbacks, val);
-			phalcon_array_update_zval(array, &tmp, value, PH_COPY);
-		} else if (!keys || Z_TYPE_P(keys) != IS_ARRAY || phalcon_fast_in_array(&tmp, keys)) {
+			phalcon_array_update_zval(array, &key, &value, PH_COPY);
+		} else if (!keys || Z_TYPE_P(keys) != IS_ARRAY || phalcon_fast_in_array(&key, keys)) {
 			if (Z_TYPE_P(callbacks) == IS_ARRAY) {
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(callbacks), callback) {
-					PHALCON_INIT_NVAR(params);
-					array_init(params);
+					array_init(&params);
 
-					phalcon_array_update_long(params, 0, val, PH_COPY);
+					phalcon_array_update_long(&params, 0, val, PH_COPY);
 
-					PHALCON_CALL_USER_FUNC_ARRAY(&value, callback, params);
-					
-					PHALCON_CPY_WRT(val, value);
+					PHALCON_CALL_USER_FUNC_ARRAY(&value, callback, &params);
 
-					phalcon_array_update_zval(array, &tmp, value, PH_COPY);
+					phalcon_array_update_zval(array, &key, &value, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 			} else {
-				PHALCON_INIT_NVAR(params);
-				array_init(params);
+				array_init(&params);
 
-				phalcon_array_update_long(params, 0, val, PH_COPY);
+				phalcon_array_update_long(&params, 0, val, PH_COPY);
 
-				PHALCON_CALL_USER_FUNC_ARRAY(&value, callbacks, params);
+				PHALCON_CALL_USER_FUNC_ARRAY(&value, callbacks, &params);
 
-				phalcon_array_update_zval(array, &tmp, value, PH_COPY);
+				phalcon_array_update_zval(array, &key, &value, PH_COPY);
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CCTOR(array);
+	RETURN_CTOR(array);
 }
 
 /**

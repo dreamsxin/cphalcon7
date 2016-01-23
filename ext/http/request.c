@@ -1518,7 +1518,6 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 
 	zval *server_index, *name, quality_one;
 	zval http_server, pattern, parts, *part;
-	zval *header_name = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -1533,7 +1532,7 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 	ZVAL_STRING(&pattern, "/,\\s*/");
 	PHALCON_CALL_FUNCTION(&parts, "preg_split", &pattern, &http_server);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(parts), part) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(parts), part) {
 		zval header_parts, quality_part, quality, header_name;
 		phalcon_fast_explode_str(&header_parts, SL(";"), part);
 		if (phalcon_array_isset_fetch_long(&quality_part, &header_parts, 1)) {
@@ -1563,37 +1562,29 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
  */
 PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 
-	zval *quality_parts, *name, *quality = NULL, *selected_name = NULL;
-	zval *accept = NULL, *accept_quality = NULL, *best_quality = NULL;
+	zval *quality_parts, *name;
+	zval *accept = NULL, quality, selected_name;
 	long int i = 0;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 0, &quality_parts, &name);
 
-	PHALCON_INIT_VAR(quality);
-	ZVAL_LONG(quality, 0);
+	ZVAL_LONG(&quality, 0);
 
-	PHALCON_INIT_VAR(selected_name);
-	ZVAL_EMPTY_STRING(selected_name);
+	ZVAL_EMPTY_STRING(&selected_name);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(quality_parts), accept) {
+		zval selected_name, accept_quality, best_quality;
 		if (i == 0) {
-			PHALCON_OBS_NVAR(quality);
 			phalcon_array_fetch_str(&quality, accept, SL("quality"), PH_NOISY);
-
-			PHALCON_OBS_NVAR(selected_name);
 			phalcon_array_fetch(&selected_name, accept, name, PH_NOISY);
 		} else {
-			PHALCON_OBS_NVAR(accept_quality);
 			phalcon_array_fetch_str(&accept_quality, accept, SL("quality"), PH_NOISY);
 
-			PHALCON_INIT_NVAR(best_quality);
-			is_smaller_function(best_quality, quality, accept_quality);
-			if (PHALCON_IS_TRUE(best_quality)) {
-				PHALCON_CPY_WRT(quality, accept_quality);
-
-				PHALCON_OBS_NVAR(selected_name);
+			is_smaller_function(&best_quality, &quality, &accept_quality);
+			if (PHALCON_IS_TRUE(&best_quality)) {
+				ZVAL_COPY_VALUE(&quality, &accept_quality);
 				phalcon_array_fetch(&selected_name, accept, name, PH_NOISY);
 			}
 		}
@@ -1601,7 +1592,7 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 		++i;
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(selected_name);
+	RETURN_CTOR(&selected_name);
 }
 
 /**
@@ -1611,17 +1602,12 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
  */
 PHP_METHOD(Phalcon_Http_Request, getAcceptableContent){
 
-	zval *accept_header, *quality_index;
+	zval accept_header, quality_index;
 
-	PHALCON_MM_GROW();
+	ZVAL_STRING(&accept_header, "HTTP_ACCEPT");
+	ZVAL_STRING(&quality_index, "accept");
 
-	PHALCON_INIT_VAR(accept_header);
-	ZVAL_STRING(accept_header, "HTTP_ACCEPT");
-
-	PHALCON_INIT_VAR(quality_index);
-	ZVAL_STRING(quality_index, "accept");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", accept_header, quality_index);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &accept_header, &quality_index);
 }
 
 /**
@@ -1631,16 +1617,12 @@ PHP_METHOD(Phalcon_Http_Request, getAcceptableContent){
  */
 PHP_METHOD(Phalcon_Http_Request, getBestAccept){
 
-	zval *quality_index, *acceptable_content = NULL;
+	zval quality_index, acceptable_content;
 
-	PHALCON_MM_GROW();
-
-	PHALCON_INIT_VAR(quality_index);
-	ZVAL_STRING(quality_index, "accept");
+	ZVAL_STRING(&quality_index, "accept");
 
 	PHALCON_CALL_METHOD(&acceptable_content, getThis(), "getacceptablecontent");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", acceptable_content, quality_index);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &acceptable_content, &quality_index);
 }
 
 /**
@@ -1650,17 +1632,12 @@ PHP_METHOD(Phalcon_Http_Request, getBestAccept){
  */
 PHP_METHOD(Phalcon_Http_Request, getClientCharsets){
 
-	zval *charset_header, *quality_index;
+	zval charset_header, quality_index;
 
-	PHALCON_MM_GROW();
+	ZVAL_STRING(&charset_header, "HTTP_ACCEPT_CHARSET");
+	ZVAL_STRING(&quality_index, "charset");
 
-	PHALCON_INIT_VAR(charset_header);
-	ZVAL_STRING(charset_header, "HTTP_ACCEPT_CHARSET");
-
-	PHALCON_INIT_VAR(quality_index);
-	ZVAL_STRING(quality_index, "charset");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", charset_header, quality_index);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &charset_header, &quality_index);
 }
 
 /**
@@ -1670,16 +1647,12 @@ PHP_METHOD(Phalcon_Http_Request, getClientCharsets){
  */
 PHP_METHOD(Phalcon_Http_Request, getBestCharset){
 
-	zval *quality_index, *client_charsets = NULL;
+	zval quality_index, client_charsets;
 
-	PHALCON_MM_GROW();
-
-	PHALCON_INIT_VAR(quality_index);
-	ZVAL_STRING(quality_index, "charset");
+	ZVAL_STRING(&quality_index, "charset");
 
 	PHALCON_CALL_METHOD(&client_charsets, getThis(), "getclientcharsets");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", client_charsets, quality_index);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &client_charsets, &quality_index);
 }
 
 /**
@@ -1689,17 +1662,12 @@ PHP_METHOD(Phalcon_Http_Request, getBestCharset){
  */
 PHP_METHOD(Phalcon_Http_Request, getLanguages){
 
-	zval *language_header, *quality_index;
+	zval language_header, quality_index;
 
-	PHALCON_MM_GROW();
+	ZVAL_STRING(&language_header, "HTTP_ACCEPT_LANGUAGE");
+	ZVAL_STRING(&quality_index, "language");
 
-	PHALCON_INIT_VAR(language_header);
-	ZVAL_STRING(language_header, "HTTP_ACCEPT_LANGUAGE");
-
-	PHALCON_INIT_VAR(quality_index);
-	ZVAL_STRING(quality_index, "language");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", language_header, quality_index);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &language_header, &quality_index);
 }
 
 /**
@@ -1709,16 +1677,12 @@ PHP_METHOD(Phalcon_Http_Request, getLanguages){
  */
 PHP_METHOD(Phalcon_Http_Request, getBestLanguage){
 
-	zval *languages = NULL, *quality_index;
-
-	PHALCON_MM_GROW();
+	zval languages, quality_index;
 
 	PHALCON_CALL_METHOD(&languages, getThis(), "getlanguages");
 
-	PHALCON_INIT_VAR(quality_index);
-	ZVAL_STRING(quality_index, "language");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", languages, quality_index);
-	RETURN_MM();
+	ZVAL_STRING(&quality_index, "language");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &languages, &quality_index);
 }
 
 /**
@@ -1774,11 +1738,12 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
  */
 PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 
-	zval pattern, digest, set_order, matches, *match, *ret = NULL;
+	zval pattern, digest, set_order, matches, ret, *match;
+	const char *auth_digest = SG(request_info).auth_digest;
 
 	PHALCON_MM_GROW();
 
-	if (unlikely(!(SG(request_info).auth_digest))) {
+	if (unlikely(!auth_digest)) {
 		zval *_SERVER = phalcon_get_global_str(SL("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			zval key;
@@ -1799,13 +1764,13 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 		ZVAL_LONG(&set_order, 2);
 
 		ZVAL_MAKE_REF(&matches);
-		PHALCON_CALL_FUNCTION(&ret, "preg_match_all", &pattern, digest, &matches, &set_order);
+		PHALCON_CALL_FUNCTION(&ret, "preg_match_all", &pattern, &digest, &matches, &set_order);
 		ZVAL_UNREF(&matches);
 
-		if (zend_is_true(ret) && Z_TYPE_P(matches) == IS_ARRAY) {
+		if (zend_is_true(&ret) && Z_TYPE(matches) == IS_ARRAY) {
 			array_init(return_value);
 
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&matches), match) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(matches), match) {
 				zval tmp1, tmp2;
 				if (Z_TYPE_P(match) == IS_ARRAY && phalcon_array_isset_fetch_long(&tmp1, match, 1) && phalcon_array_isset_fetch_long(&tmp2, match, 3)) {
 					phalcon_array_update_zval(return_value, &tmp1, &tmp2, PH_COPY);

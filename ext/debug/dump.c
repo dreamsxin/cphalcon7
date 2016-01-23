@@ -162,21 +162,19 @@ PHP_METHOD(Phalcon_Debug_Dump, __construct){
  */
 PHP_METHOD(Phalcon_Debug_Dump, all){
 
-	zval *method_name, *call_object, *arg_list = NULL;
+	zval method_name, call_object, arg_list;
 
 	PHALCON_MM_GROW();
 
-	PHALCON_INIT_VAR(method_name);
-	ZVAL_STRING(method_name, "variables");
+	ZVAL_STRING(&method_name, "variables");
 
-	PHALCON_INIT_VAR(call_object);
-	array_init_size(call_object, 2);
-	phalcon_array_append(call_object, getThis(), PH_COPY);
-	phalcon_array_append(call_object, method_name, PH_COPY);
+	array_init_size(&call_object, 2);
+	phalcon_array_append(&call_object, getThis(), PH_COPY);
+	phalcon_array_append(&call_object, &method_name, PH_COPY);
 
 	PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
 
-	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_object, arg_list);
+	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, &call_object, &arg_list);
 
 	RETURN_MM();
 }
@@ -186,23 +184,15 @@ PHP_METHOD(Phalcon_Debug_Dump, all){
  */
 PHP_METHOD(Phalcon_Debug_Dump, getStyle){
 
-	zval *type, *styles, *style;
+	zval *type, *styles;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &type);
+	phalcon_fetch_params(0, 1, 0, &type);
 
 	styles  = phalcon_read_property(getThis(), SL("_styles"), PH_NOISY);
 
-	if (phalcon_array_isset(styles, type)) {
-		PHALCON_OBS_VAR(style);
-		phalcon_array_fetch(&style, styles, type, PH_NOISY);
-	} else {
-		PHALCON_INIT_VAR(style);
-		ZVAL_STRING(style, "color:gray");
+	if (!phalcon_array_isset_fetch(return_value, styles, type)) {
+		ZVAL_STRING(return_value, "color:gray");
 	}
-
-	RETURN_CTOR(style);
 }
 
 /**
@@ -210,7 +200,7 @@ PHP_METHOD(Phalcon_Debug_Dump, getStyle){
  */
 PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 
-	zval *styles, *default_styles, *new_styles;
+	zval *styles, *default_styles, new_styles;
 
 	PHALCON_MM_GROW();
 
@@ -223,10 +213,9 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 
 	default_styles  = phalcon_read_property(getThis(), SL("_styles"), PH_NOISY);
 
-	PHALCON_INIT_VAR(new_styles);
-	phalcon_fast_array_merge(new_styles, default_styles, styles);
+	phalcon_fast_array_merge(&new_styles, default_styles, styles);
 
-	phalcon_update_property_this(getThis(), SL("_styles"), new_styles);
+	phalcon_update_property_this(getThis(), SL("_styles"), &new_styles);
 
 	RETURN_THIS();
 }

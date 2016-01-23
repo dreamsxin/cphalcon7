@@ -197,7 +197,7 @@ PHALCON_INIT_CLASS(Phalcon_Date){
 PHP_METHOD(Phalcon_Date, offset){
 
 	zval *remote, *local = NULL, *date = NULL, new_date;
-	zval format, *tmp = NULL, zone_remote, time_remote, zone_local, time_local, offset_remote, offset_local;
+	zval format, zone_remote, time_remote, zone_local, time_local, offset_remote, offset_local;
 	zend_class_entry *ce0, *ce1;
 
 	PHALCON_MM_GROW();
@@ -209,10 +209,10 @@ PHP_METHOD(Phalcon_Date, offset){
 
 	if (!date) {
 		ZVAL_STRING(&new_date, "now");
-	} else if (Z_TYPE_P(now) == IS_LONG) {
+	} else if (Z_TYPE_P(date) == IS_LONG) {
 		phalcon_get_class_constant(&format, ce0, SL("RFC2822"));
 
-		PHALCON_CALL_FUNCTION(&new_date, "date", &format, now);
+		PHALCON_CALL_FUNCTION(&new_date, "date", &format, date);
 	} else {
 		ZVAL_COPY(&new_date, date);
 	}
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Date, minutes){
 
 	if (!step) {
 		ZVAL_LONG(&s, 5);
-		PHALCON_RETURN_CALL_SELF("seconds", s);
+		PHALCON_RETURN_CALL_SELF("seconds", &s);
 	} else {
 		PHALCON_RETURN_CALL_SELF("seconds", step);
 	}

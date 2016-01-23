@@ -408,32 +408,29 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
  */
 PHP_METHOD(Phalcon_Debug, _getArrayDump){
 
-	zval *argument, *n = NULL, *number_arguments, *dump;
-	zval *v = NULL, *var_dump = NULL, *escaped_string = NULL, *next = NULL, *array_dump = NULL;
-	zval *class_name = NULL, *joined_dump;
+	zval *argument, *n = NULL, number_arguments, dump, *v, joined_dump;
 	zend_string *str_key;
 	ulong idx;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(0, 1, 1, &argument, &n);
+	phalcon_fetch_params(1, 1, 1, &argument, &n);
 
 	if (!n) {
-		PHALCON_INIT_VAR(n);
-		ZVAL_LONG(n, 0);
+		n = &PHALCON_GLOBAL(z_zero);
 	}
 
-	PHALCON_INIT_VAR(number_arguments);
-	phalcon_fast_count(number_arguments, argument);
+	phalcon_fast_count(&number_arguments, argument);
+
 	if (PHALCON_LT_LONG(n, 3)) {
 		if (PHALCON_GT_LONG(number_arguments, 0)) {
 			if (PHALCON_LT_LONG(number_arguments, 10)) {
 
-				PHALCON_INIT_VAR(dump);
-				array_init(dump);
+				array_init(&dump);
 
 				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(argument), idx, str_key, v) {
-					zval tmp;
+					zval tmp, var_dump, escaped_string, next, array_dump, class_name;
+					zend_class_entry *ce;
 					if (str_key) {
 						ZVAL_STR(&tmp, str_key);
 					} else {
@@ -441,58 +438,48 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 					}
 					if (PHALCON_IS_SCALAR(v)) {
 						if (PHALCON_IS_STRING(v, "")) {
-							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVS(var_dump, "[", &tmp, "] =&gt; (empty string)");
+							PHALCON_CONCAT_SVS(&var_dump, "[", &tmp, "] =&gt; (empty string)");
 						} else {
 							PHALCON_CALL_METHOD(&escaped_string, getThis(), "_escapestring", v);
-
-							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVSV(var_dump, "[", &tmp, "] =&gt; ", escaped_string);
+							PHALCON_CONCAT_SVSV(&var_dump, "[", &tmp, "] =&gt; ", &escaped_string);
 						}
-						phalcon_array_append(dump, var_dump, PH_COPY);
+						phalcon_array_append(&dump, &var_dump, PH_COPY);
 					} else {
 						if (Z_TYPE_P(v) == IS_ARRAY) { 
-							PHALCON_INIT_NVAR(next);
-							phalcon_add_function(next, n, &PHALCON_GLOBAL(z_one));
+							phalcon_add_function(&next, n, &PHALCON_GLOBAL(z_one));
 
-							PHALCON_CALL_METHOD(&array_dump, getThis(), "_getarraydump", v, next);
+							PHALCON_CALL_METHOD(&array_dump, getThis(), "_getarraydump", v, &next);
 
-							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVSVS(var_dump, "[", &tmp, "] =&gt; Array(", array_dump, ")");
-							phalcon_array_append(dump, var_dump, PH_COPY);
+							PHALCON_CONCAT_SVSVS(&var_dump, "[", &tmp, "] =&gt; Array(", &array_dump, ")");
+							phalcon_array_append(&dump, &var_dump, PH_COPY);
 							continue;
 						}
 						if (Z_TYPE_P(v) == IS_OBJECT) {
-							zend_class_entry *ce = Z_OBJCE_P(v);
-							PHALCON_INIT_NVAR(class_name);
-							ZVAL_NEW_STR(class_name, ce->name);
+							ce = Z_OBJCE_P(v);
+							ZVAL_NEW_STR(&class_name, ce->name);
 
-							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVSVS(var_dump, "[", &tmp, "] =&gt; Object(", class_name, ")");
-							phalcon_array_append(dump, var_dump, PH_COPY);
+							PHALCON_CONCAT_SVSVS(&var_dump, "[", &tmp, "] =&gt; Object(", &class_name, ")");
+							phalcon_array_append(&dump, &var_dump, PH_COPY);
 							continue;
 						}
 
 						if (Z_TYPE_P(v) == IS_NULL) {
-							PHALCON_INIT_NVAR(var_dump);
-							PHALCON_CONCAT_SVS(var_dump, "[", &tmp, "] =&gt; null");
-							phalcon_array_append(dump, var_dump, PH_COPY);
+							PHALCON_CONCAT_SVS(&var_dump, "[", &tmp, "] =&gt; null");
+							phalcon_array_append(&dump, &var_dump, PH_COPY);
 							continue;
 						}
 
-						PHALCON_INIT_NVAR(var_dump);
-						PHALCON_CONCAT_SVSV(var_dump, "[", &tmp, "] =&gt; ", v);
-						phalcon_array_append(dump, var_dump, PH_COPY);
+						PHALCON_CONCAT_SVSV(&var_dump, "[", &tmp, "] =&gt; ", v);
+						phalcon_array_append(&dump, &var_dump, PH_COPY);
 					}
 				} ZEND_HASH_FOREACH_END();
 
-				PHALCON_INIT_VAR(joined_dump);
-				phalcon_fast_join_str(joined_dump, SL(", "), dump);
+				phalcon_fast_join_str(&joined_dump, SL(", "), dump);
 
-				RETURN_CTOR(joined_dump);
+				RETURN_CTOR(&joined_dump);
 			}
 
-			RETURN_CTOR(number_arguments);
+			RETURN_CTOR(&number_arguments);
 		}
 	}
 

@@ -1458,7 +1458,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRoutes){
  */
 PHP_METHOD(Phalcon_Mvc_Router, getRouteById){
 
-	zval *id, *routes, *route, *route_id = NULL;
+	zval *id, *routes, *route, route_id;
 
 	PHALCON_MM_GROW();
 
@@ -1468,7 +1468,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteById){
 	if (Z_TYPE_P(routes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(routes), route) {
 			PHALCON_CALL_METHOD(&route_id, route, "getrouteid");
-			if (phalcon_is_equal(route_id, id)) {
+			if (phalcon_is_equal(&route_id, id)) {
 				RETURN_CTOR(route);
 			}
 		} ZEND_HASH_FOREACH_END();

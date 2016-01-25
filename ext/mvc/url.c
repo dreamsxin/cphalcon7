@@ -256,11 +256,9 @@ PHP_METHOD(Phalcon_Mvc_Url, getBasePath){
  */
 PHP_METHOD(Phalcon_Mvc_Url, get){
 
-	zval *uri = NULL, *args = NULL, *local = NULL, *base_uri = NULL, *router = NULL, *dependency_injector;
-	zval service, route_name, hostname, *route = NULL, exception_message;
-	zval *pattern = NULL, *paths = NULL, processed_uri, query_string;
-	zval matched, regexp;
-	zval *generator = NULL, arguments;
+	zval *uri = NULL, *args = NULL, *local = NULL, base_uri, router, *dependency_injector;
+	zval service, route_name, hostname, route, exception_message;
+	zval pattern, paths, processed_uri, query_string, matched, regexp, generator, arguments;
 
 	PHALCON_MM_GROW();
 
@@ -293,7 +291,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 		}
 
 		if (Z_TYPE_P(local) == IS_NULL || zend_is_true(local)) {
-			PHALCON_CONCAT_VV(return_value, base_uri, uri);
+			PHALCON_CONCAT_VV(return_value, &base_uri, uri);
 		} else {
 			ZVAL_ZVAL(return_value, uri, 1, 0);
 		}
@@ -303,12 +301,12 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 			return;
 		}
 
-		router = phalcon_read_property(getThis(), SL("_router"), PH_NOISY);
+		phalcon_return_property(&router, getThis(), SL("_router"));
 
 		/**
 		 * Check if the router has not previously set
 		 */
-		if (Z_TYPE_P(router) != IS_OBJECT) {
+		if (Z_TYPE(router) != IS_OBJECT) {
 			dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 			if (!zend_is_true(dependency_injector)) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_url_exception_ce, "A dependency injector container is required to obtain the \"url\" service");
@@ -317,46 +315,44 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 
 			ZVAL_STRING(&service, ISV(router));
 
-			router = NULL;
 			PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", &service);
-			PHALCON_VERIFY_INTERFACE(router, phalcon_mvc_routerinterface_ce);
-			phalcon_update_property_this(getThis(), SL("_router"), router);
+			PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
+			phalcon_update_property_this(getThis(), SL("_router"), &router);
 		}
 
 		/**
 		 * Every route is uniquely identified by a name
 		 */
-		PHALCON_CALL_METHOD(&route, router, "getroutebyname", &route_name);
-		if (Z_TYPE_P(route) != IS_OBJECT) {
+		PHALCON_CALL_METHOD(&route, &router, "getroutebyname", &route_name);
+		if (Z_TYPE(route) != IS_OBJECT) {
 			PHALCON_CONCAT_SVS(&exception_message, "Cannot obtain a route using the name \"", &route_name, "\"");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_url_exception_ce, &exception_message);
 			return;
 		}
 
-		PHALCON_CALL_METHOD(&pattern, route, "getpattern");
+		PHALCON_CALL_METHOD(&pattern, &route, "getpattern");
 
 		/**
 		 * Return the reversed paths
 		 */
-		PHALCON_CALL_METHOD(&paths, route, "getreversedpaths");
+		PHALCON_CALL_METHOD(&paths, &route, "getreversedpaths");
 
 		/**
 		 * Return the Url Generator
 		 */
-		PHALCON_CALL_METHOD(&generator, route, "geturlgenerator");
+		PHALCON_CALL_METHOD(&generator, &route, "geturlgenerator");
 
-		if (phalcon_is_callable(generator) ||
-			(Z_TYPE_P(generator) == IS_OBJECT && instanceof_function(Z_OBJCE_P(generator), zend_ce_closure))) {
+		if (phalcon_is_callable(generator) || (Z_TYPE(generator) == IS_OBJECT && instanceof_function(Z_OBJCE(generator), zend_ce_closure))) {
 			array_init_size(&arguments, 3);
-			phalcon_array_append(&arguments, base_uri, PH_COPY);
-			phalcon_array_append(&arguments, paths, PH_COPY);
+			phalcon_array_append(&arguments, &base_uri, PH_COPY);
+			phalcon_array_append(&arguments, &paths, PH_COPY);
 			phalcon_array_append(&arguments, uri, PH_COPY);
-			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, generator, &arguments);
+			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, &generator, &arguments);
 		} else {
 			/**
 			 * Replace the patterns by its variables
 			 */
-			phalcon_replace_paths(&processed_uri, pattern, paths, uri);
+			phalcon_replace_paths(&processed_uri, &pattern, &paths, uri);
 
 			if (phalcon_array_isset_fetch_str(&hostname, uri, SL("hostname")) && zend_is_true(hostname)) {
 				PHALCON_CALL_METHOD(&hostname, route, "gethostname");

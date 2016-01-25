@@ -102,37 +102,32 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_GridFS){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 
-	zval *file, *metadata = NULL, *options = NULL, *isBytes = NULL;
-	zval *mongo_id = NULL, *source = NULL, *files_source;
-	zval *connection = NULL, *mongo_collection = NULL, *grid_fs = NULL;
-	zval *sha1, *md5, *criteria, *operation, *field, *value, *new_object;
-	zval *status = NULL, ok, exist;
+	zval *file, *meta = NULL, *opts = NULL, *isBytes = NULL;
+	zval metadata, options, mongo_id, source, files_source;
+	zval connection, mongo_collection, *sha1, *md5, criteria, operation, field, value, new_object, grid_fs;
+	zval status, ok, exist;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 3, &file, &metadata, &options, &isBytes);
+	phalcon_fetch_params(1, 1, 3, &file, &meta, &opts, &isBytes);
 
-	if (!metadata) {
-		PHALCON_INIT_VAR(metadata);
-		array_init_size(metadata, 1);
+	if (!meta) {
+		array_init_size(&metadata, 1);
 	} else {
-		PHALCON_SEPARATE_PARAM(metadata);
+		ZVAL_COPY_VALUE(&metadata, meta);
 
-		if (Z_TYPE_P(metadata) != IS_ARRAY) {
-			PHALCON_INIT_NVAR(metadata);
-			array_init_size(metadata, 1);
+		if (Z_TYPE(metadata) != IS_ARRAY) {
+			array_init_size(&metadata, 1);
 		}
 	}
 
-	if (!options) {
-		PHALCON_INIT_NVAR(options);
-		array_init_size(options, 1);
+	if (!opts) {
+		array_init_size(&options, 1);
 	} else {
-		PHALCON_SEPARATE_PARAM(options);
+		ZVAL_COPY_VALUE(&options, opts);
 
-		if (Z_TYPE_P(options) != IS_ARRAY) {
-			PHALCON_INIT_NVAR(options);
-			array_init_size(options, 1);
+		if (Z_TYPE(options) != IS_ARRAY) {
+			array_init_size(&options, 1);
 		}
 	}
 
@@ -140,23 +135,22 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 		isBytes = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_array_update_str_long(options, SL("w"), 0, 0);
+	phalcon_array_update_str_long(&options, SL("w"), 0, 0);
 
 	PHALCON_CALL_SELF(&mongo_id, "getid");
 
-	if (!zend_is_true(mongo_id)) {
+	if (!zend_is_true(&mongo_id)) {
 		RETURN_MM_FALSE;
 	}
 
 	PHALCON_CALL_METHOD(&source, getThis(), "getsource");
 
-	PHALCON_INIT_VAR(files_source);
-	PHALCON_CONCAT_VS(files_source, source, ".files");
+	PHALCON_CONCAT_VS(&files_source, &source, ".files");
 
 	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
+	PHALCON_CALL_METHOD(&mongo_collection, &connection, "selectcollection", &files_source);
 
-	PHALCON_CALL_METHOD(&mongo_collection, connection, "selectcollection", files_source);
-	if (Z_TYPE_P(mongo_collection) != IS_OBJECT) {
+	if (Z_TYPE(mongo_collection) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Couldn't select mongo collection");
 		return;
 	}
@@ -164,36 +158,28 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 	sha1 = phalcon_read_property(getThis(), SL("sha1"), PH_NOISY);
 	md5 = phalcon_read_property(getThis(), SL("md5"), PH_NOISY);
 
-	PHALCON_INIT_VAR(criteria);
-	array_init_size(criteria, 3);
+	array_init_size(&criteria, 3);
 
-	phalcon_array_update_str(criteria, SL("md5"), md5, PH_COPY);
-	phalcon_array_update_str(criteria, SL("sha1"), sha1, PH_COPY);
+	phalcon_array_update_str(&criteria, SL("md5"), md5, PH_COPY);
+	phalcon_array_update_str(&criteria, SL("sha1"), sha1, PH_COPY);
 
-	PHALCON_INIT_VAR(operation);
-	ZVAL_STRING(operation, "$gte");
+	ZVAL_STRING(&operation, "$gte");
+	ZVAL_STRING(&field, "use");
+	ZVAL_LONG(&value, 1)
 
-	PHALCON_INIT_VAR(field);
-	ZVAL_STRING(field, "use");
+	phalcon_array_update_multi_2(&criteria, &field, &operation, &value, PH_COPY);
 
-	PHALCON_INIT_VAR(value);
-	ZVAL_LONG(value, 1)
+	ZVAL_STRING(&operation, "$inc");
 
-	phalcon_array_update_multi_2(criteria, field, operation, value, PH_COPY);
+	array_init_size(&new_object, 1);
 
-	PHALCON_INIT_NVAR(operation);
-	ZVAL_STRING(operation, "$inc");
-
-	PHALCON_INIT_VAR(new_object);
-	array_init_size(new_object, 1);
-
-	phalcon_array_update_multi_2(new_object, operation, field, value, PH_COPY);
+	phalcon_array_update_multi_2(&new_object, &operation, &field, &value, PH_COPY);
 	
-	PHALCON_CALL_METHOD(&status, mongo_collection, "update", criteria, new_object);
+	PHALCON_CALL_METHOD(&status, &mongo_collection, "update", &criteria, &new_object);
 
-	if (phalcon_array_isset_fetch_str(&ok, status, SL("ok"))) {
+	if (phalcon_array_isset_fetch_str(&ok, &status, SL("ok"))) {
 		if (zend_is_true(&ok)) {
-			if (phalcon_array_isset_fetch_str(&exist, status, SL("updatedExisting"))) {
+			if (phalcon_array_isset_fetch_str(&exist, &status, SL("updatedExisting"))) {
 				if (zend_is_true(&exist)) {
 					RETURN_MM_TRUE;
 				}
@@ -203,22 +189,22 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 		}
 	}
 
-	PHALCON_CALL_METHOD(&grid_fs, connection, "getgridfs", source);
-	if (Z_TYPE_P(grid_fs) != IS_OBJECT) {
+	PHALCON_CALL_METHOD(&grid_fs, &connection, "getgridfs", &source);
+	if (Z_TYPE(grid_fs) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Couldn't select mongo GridFS");
 		return;
 	}
 
-	phalcon_array_update_str(metadata, SL("sha1"), sha1, PH_COPY);
-	phalcon_array_update_str(metadata, SL("use"), value, PH_COPY);
+	phalcon_array_update_str(&metadata, SL("sha1"), sha1, PH_COPY);
+	phalcon_array_update_str(&metadata, SL("use"), &value, PH_COPY);
 
 	if (zend_is_true(isBytes)) {
-		PHALCON_CALL_METHOD(&status, grid_fs, "storebytes", file, metadata, options);
+		PHALCON_CALL_METHOD(&status, &grid_fs, "storebytes", file, &metadata, &options);
 	} else {
-		PHALCON_CALL_METHOD(&status, grid_fs, "storefile", file, metadata, options);
+		PHALCON_CALL_METHOD(&status, &grid_fs, "storefile", file, &metadata, &options);
 	}
 
-	if (zend_is_true(status)) {
+	if (zend_is_true(&status)) {
 		RETURN_MM_TRUE;
 	}
 
@@ -227,10 +213,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 
-	zval *sha1 = NULL, *md5 = NULL, *source = NULL, files_source;
-	zval *connection = NULL, *mongo_collection = NULL;
-	zval criteria, operation, field, value, new_object;
-	zval *status = NULL, ok, exist, options, *grid_fs = NULL;
+	zval *sha1 = NULL, *md5 = NULL, source, files_source;
+	zval connection, mongo_collection, criteria, operation, field, value, new_object;
+	zval status, ok, exist, options, *grid_fs = NULL;
 
 	PHALCON_MM_GROW();
 
@@ -246,13 +231,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 
 	PHALCON_CALL_METHOD(&source, getThis(), "getsource");
 
-	PHALCON_CONCAT_VS(&files_source, source, ".files");
+	PHALCON_CONCAT_VS(&files_source, &source, ".files");
 
 	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
 
-	PHALCON_CALL_METHOD(&mongo_collection, connection, "selectcollection", &files_source);
+	PHALCON_CALL_METHOD(&mongo_collection, &connection, "selectcollection", &files_source);
 
-	if (Z_TYPE_P(mongo_collection) != IS_OBJECT) {
+	if (Z_TYPE(mongo_collection) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Couldn't select mongo collection");
 		return;
 	}
@@ -270,11 +255,11 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 
 	phalcon_array_update_multi_2(&new_object, &operation, &field, &value, PH_COPY);
 	
-	PHALCON_CALL_METHOD(&status, mongo_collection, "update", &criteria, &new_object);
+	PHALCON_CALL_METHOD(&status, &mongo_collection, "update", &criteria, &new_object);
 
-	if (phalcon_array_isset_fetch_str(&ok, status, SL("ok"))) {
+	if (phalcon_array_isset_fetch_str(&ok, &status, SL("ok"))) {
 		if (zend_is_true(&ok)) {
-			if (phalcon_array_isset_fetch_str(&exist, status, SL("updatedExisting"))) {
+			if (phalcon_array_isset_fetch_str(&exist, &status, SL("updatedExisting"))) {
 				if (!zend_is_true(&exist)) {
 					RETURN_MM_FALSE;
 				}
@@ -284,9 +269,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 		}
 	}
 
-	PHALCON_CALL_METHOD(&grid_fs, connection, "getgridfs", source);
+	PHALCON_CALL_METHOD(&grid_fs, &connection, "getgridfs", source);
 
-	if (Z_TYPE_P(grid_fs) != IS_OBJECT) {
+	if (Z_TYPE(grid_fs) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Couldn't select mongo GridFS");
 		return;
 	}
@@ -300,7 +285,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 
 	ZVAL_LONG(&value, 0)
 
-	phalcon_array_update_multi_2(&criteria, field, &operation, &value, PH_COPY);
+	phalcon_array_update_multi_2(&criteria, &field, &operation, &value, PH_COPY);
 
 	array_init_size(&options, 1);
 
@@ -567,22 +552,20 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, drop){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getFile){
 
-	zval *mongo_id = NULL, *source = NULL, *connection = NULL, *grid_fs = NULL;
-	zval *sha1, *md5, *criteria;
+	zval mongo_id, source, connection, grid_fs, *sha1, *md5, criteria;
 	PHALCON_MM_GROW();
 
 	PHALCON_CALL_SELF(&mongo_id, "getid");
 
-	if (!zend_is_true(mongo_id)) {
+	if (!zend_is_true(&mongo_id)) {
 		RETURN_MM_FALSE;
 	}
 
 	PHALCON_CALL_METHOD(&source, getThis(), "getsource");
-
 	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
-
 	PHALCON_CALL_METHOD(&grid_fs, connection, "getgridfs", source);
-	if (Z_TYPE_P(grid_fs) != IS_OBJECT) {
+
+	if (Z_TYPE(grid_fs) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Couldn't select mongo GridFS");
 		return;
 	}
@@ -590,48 +573,39 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getFile){
 	sha1 = phalcon_read_property(getThis(), SL("sha1"), PH_NOISY);
 	md5 = phalcon_read_property(getThis(), SL("md5"), PH_NOISY);
 
-	PHALCON_INIT_VAR(criteria);
-	array_init_size(criteria, 2);
+	array_init_size(&criteria, 2);
 
-	phalcon_array_update_str(criteria, SL("md5"), md5, PH_COPY);
-	phalcon_array_update_str(criteria, SL("sha1"), sha1, PH_COPY);
+	phalcon_array_update_str(&criteria, SL("md5"), md5, PH_COPY);
+	phalcon_array_update_str(&criteria, SL("sha1"), sha1, PH_COPY);
 
-	PHALCON_RETURN_CALL_METHOD(grid_fs, "findone", criteria);
+	PHALCON_RETURN_CALL_METHOD(&grid_fs, "findone", &criteria);
 	RETURN_MM();
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getBytes){
 
-	zval *file = NULL;
-
-	PHALCON_MM_GROW();
+	zval file;
 
 	PHALCON_CALL_METHOD(&file, getThis(), "getfile");
 
-	if (Z_TYPE_P(file) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHOD(file, "getbytes");
+	if (Z_TYPE(file) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHOD(&file, "getbytes");
 	} else {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
-
-	RETURN_MM();
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, write){
 
-	zval *filename, *file = NULL;
+	zval *filename, file;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &filename);
+	phalcon_fetch_params(0, 1, 0, &filename);
 
 	PHALCON_CALL_METHOD(&file, getThis(), "getfile");
 
-	if (Z_TYPE_P(file) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHOD(file, "write", filename);
+	if (Z_TYPE(file) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHOD(&file, "write", filename);
 	} else {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
-
-	RETURN_MM();
 }

@@ -155,7 +155,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_Resultset){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
 
-	zval *collection, *cursor, *row_count = NULL;
+	zval *collection, *cursor, row_count;
 
 	PHALCON_MM_GROW();
 
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
 
 	PHALCON_CALL_METHOD(&row_count, cursor, "count", &PHALCON_GLOBAL(z_true));
 
-	phalcon_update_property_this(getThis(), SL("_count"), row_count);
+	phalcon_update_property_this(getThis(), SL("_count"), &row_count);
 
 	PHALCON_MM_RESTORE();
 }
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 
-	zval *rows, *cursor = NULL, *row = NULL, *collection, *active_row = NULL;
+	zval *rows, *cursor = NULL, row, *collection, active_row;
 
 	PHALCON_MM_GROW();
 
@@ -192,32 +192,29 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 			PHALCON_CALL_METHOD(NULL, cursor, "next");
 			PHALCON_CALL_METHOD(&row, cursor, "current");
 		} else {
-			PHALCON_INIT_VAR(row);
-			ZVAL_FALSE(row);
+			ZVAL_FALSE(&row);
 		}
 	} else {
 		if (Z_TYPE_P(rows) == IS_ARRAY) { 
-			PHALCON_INIT_NVAR(row);
-			phalcon_array_get_current(row, rows);
-			if (PHALCON_IS_NOT_FALSE(row)) {
+			phalcon_array_get_current(&row, rows);
+			if (PHALCON_IS_NOT_FALSE(&row)) {
 				zend_hash_move_forward(Z_ARRVAL_P(rows));
 			}
 		} else {
-			PHALCON_INIT_NVAR(row);
-			ZVAL_BOOL(row, 0);
+			ZVAL_BOOL(&row, 0);
 		}
 	}
 
-	if (Z_TYPE_P(row) != IS_ARRAY) { 
+	if (Z_TYPE(row) != IS_ARRAY) { 
 		phalcon_update_property_bool(getThis(), SL("_activeRow"), 0);
 		RETURN_MM_FALSE;
 	}
 
 	collection = phalcon_read_property(getThis(), SL("_collection"), PH_NOISY);
 
-	PHALCON_CALL_CE_STATIC(&active_row, phalcon_mvc_collection_ce, "cloneresult", collection, row);
+	PHALCON_CALL_CE_STATIC(&active_row, phalcon_mvc_collection_ce, "cloneresult", collection, &row);
 
-	phalcon_update_property_this(getThis(), SL("_activeRow"), active_row);
+	phalcon_update_property_this(getThis(), SL("_activeRow"), &active_row);
 	RETURN_MM_TRUE;
 }
 
@@ -231,7 +228,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, toArray){
 
-	zval *rename_columns = NULL, *records, *valid = NULL, *current = NULL, *arr = NULL;
+	zval *rename_columns = NULL, records, valid, current, arr ;
 
 	PHALCON_MM_GROW();
 
@@ -241,24 +238,23 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, toArray){
 		rename_columns = &PHALCON_GLOBAL(z_true);
 	}
 
-	PHALCON_INIT_VAR(records);
-	array_init(records);
+	array_init(&records);
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "rewind");
 
 	while (1) {
 		PHALCON_CALL_METHOD(&valid, getThis(), "valid");
-		if (!PHALCON_IS_NOT_FALSE(valid)) {
+		if (!PHALCON_IS_NOT_FALSE(&valid)) {
 			break;
 		}
 
 		PHALCON_CALL_METHOD(&current, getThis(), "current");
-		PHALCON_CALL_METHOD(&arr, current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
-		phalcon_array_append(records, arr, PH_COPY);
+		PHALCON_CALL_METHOD(&arr, &current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
+		phalcon_array_append(&records, &arr, PH_COPY);
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 
-	RETURN_CCTOR(records);
+	RETURN_CTOR(&records);
 }
 
 /**
@@ -268,28 +264,23 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, serialize){
 
-	zval *rename_columns, *records = NULL, *collection, *data;
+	zval rename_columns, records, *collection, data;
 
-	PHALCON_MM_GROW();
+	ZVAL_FALSE(&rename_columns);
 
-	PHALCON_INIT_VAR(rename_columns);
-	ZVAL_BOOL(rename_columns, 0);
-
-	PHALCON_CALL_METHOD(&records, getThis(), "toarray", rename_columns);
+	PHALCON_CALL_METHOD(&records, getThis(), "toarray", &rename_columns);
 
 	collection = phalcon_read_property(getThis(), SL("_collection"), PH_NOISY);
 
-	PHALCON_INIT_VAR(data);
-	array_init_size(data, 3);
-	phalcon_array_update_str(data, SL("collection"), collection, PH_COPY);
-	phalcon_array_update_str(data, SL("rows"), records, PH_COPY);
+	array_init_size(&data, 3);
+	phalcon_array_update_str(&data, SL("collection"), collection, PH_COPY);
+	phalcon_array_update_str(&data, SL("rows"), &records, PH_COPY);
 	phalcon_update_property_bool(getThis(), SL("_activeRow"), 0);
 
 	/** 
 	 * Serialize the cache using the serialize function
 	 */
-	phalcon_serialize(return_value, data);
-	RETURN_MM();
+	phalcon_serialize(return_value, &data);
 }
 
 /**
@@ -299,28 +290,21 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, serialize){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, unserialize){
 
-	zval *data, *resultset, *collection, *rows;
+	zval *data, resultset, collection, rows;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &data);
 
-	phalcon_fetch_params(1, 1, 0, &data);
-
-	PHALCON_INIT_VAR(resultset);
-	phalcon_unserialize(resultset, data);
-	if (Z_TYPE_P(resultset) != IS_ARRAY) { 
+	phalcon_unserialize(&resultset, data);
+	if (Z_TYPE(resultset) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Invalid serialization data");
 		return;
 	}
 
-	PHALCON_OBS_VAR(collection);
-	phalcon_array_fetch_str(&collection, resultset, SL("collection"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_collection"), collection);
+	phalcon_array_fetch_str(&collection, &resultset, SL("collection"), PH_NOISY);
+	phalcon_update_property_this(getThis(), SL("_collection"), &collection);
 
-	PHALCON_OBS_VAR(rows);
-	phalcon_array_fetch_str(&rows, resultset, SL("rows"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_rows"), rows);
-
-	PHALCON_MM_RESTORE();
+	phalcon_array_fetch_str(&rows, &resultset, SL("rows"), PH_NOISY);
+	phalcon_update_property_this(getThis(), SL("_rows"), &rows);
 }
 
 /**
@@ -437,35 +421,28 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, count){
 
-	zval *count = NULL, *rows, *cursor = NULL, *number_rows = NULL;
+	zval count, *rows, *cursor, number_rows;
 
-	PHALCON_MM_GROW();
+	phalcon_return_property(&count, getThis(), SL("_count"));
 
-	count = phalcon_read_property(getThis(), SL("_count"), PH_NOISY);
-
-	if (Z_TYPE_P(count) == IS_NULL) {
-
-		PHALCON_INIT_NVAR(count);
-		ZVAL_LONG(count, 0);
+	if (Z_TYPE(count) == IS_NULL) {
+		ZVAL_LONG(&count, 0);
 
 		rows = phalcon_read_property(getThis(), SL("_rows"), PH_NOISY);
 		if (Z_TYPE_P(rows) == IS_NULL) {
 			cursor = phalcon_read_property(getThis(), SL("_cursor"), PH_NOISY);
 			if (Z_TYPE_P(cursor) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&number_rows, cursor, "count", &PHALCON_GLOBAL(z_true));
-
-				PHALCON_INIT_NVAR(count);
-				ZVAL_LONG(count, phalcon_get_intval(number_rows));
+				ZVAL_LONG(&count, phalcon_get_intval(&number_rows));
 			}
 		} else {
-			PHALCON_INIT_NVAR(count);
-			phalcon_fast_count(count, rows);
+			phalcon_fast_count(&count, rows);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_count"), count);
+		phalcon_update_property_this(getThis(), SL("_count"), &count);
 	}
 
-	RETURN_CCTOR(count);
+	RETURN_CTORW(&count);
 }
 
 /**

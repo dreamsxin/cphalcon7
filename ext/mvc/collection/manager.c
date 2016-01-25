@@ -559,10 +559,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 	phalcon_get_class(&entity_name, collection, 1);
 
 	sources = phalcon_read_property(getThis(), SL("_sources"), PH_NOISY);
-	if (Z_TYPE_P(sources) == IS_ARRAY) { 
-		if (phalcon_array_isset_fetch(&source, sources, entity_name)) {
-			RETURN_CTOR(&source);
-		}
+	if (Z_TYPE_P(sources) == IS_ARRAY && phalcon_array_isset_fetch(&source, sources, &entity_name)) {
+		RETURN_CTOR(&source);
 	}
 
 	phalcon_get_class_ns(&class_name, collection, 0);
@@ -626,7 +624,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 
 	column_maps = phalcon_read_property(getThis(), SL("_columnMaps"), PH_NOISY);
 	if (Z_TYPE_P(column_maps) == IS_ARRAY) { 
-		if (phalcon_array_isset_fetch(&column_map, column_maps, entity_name)) {
+		if (phalcon_array_isset_fetch(&column_map, column_maps, &entity_name)) {
 			RETURN_CTOR(&column_map);
 		}
 	}

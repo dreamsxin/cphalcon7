@@ -887,7 +887,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/** 
 				 * File fragments are cleaned, removing tabs and comments
 				 */
-				if (zend_is_true(show_file_fragment)) {
+				if (zend_is_true(&show_file_fragment)) {
 					if (PHALCON_IS_EQUAL(&i, &first_line)) {
 						ZVAL_STR(&trimmed, phalcon_trim(&current_line, NULL, PHALCON_TRIM_RIGHT));
 
@@ -995,7 +995,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	/** 
 	 * Use the exception info as document's title
 	 */
-	PHALCON_CONCAT_SVSVS(&html, "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>", class_name, ": ", escaped_message, "</title>");
+	PHALCON_CONCAT_SVSVS(&html, "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>", &class_name, ": ", &escaped_message, "</title>");
 	PHALCON_SCONCAT_VS(&html, &css_sources, "</head><body>");
 
 	/** 

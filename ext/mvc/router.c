@@ -683,7 +683,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			/**
 			 * Check if the current method is allowed by the route
 			 */
-			PHALCON_CALL_METHOD(&match_method, request, "ismethod", &methods);
+			PHALCON_CALL_METHOD(&match_method, &request, "ismethod", &methods);
 			if (PHALCON_IS_FALSE(&match_method)) {
 				continue;
 			}
@@ -697,7 +697,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			/**
 			 * No HTTP_HOST, maybe in CLI mode?
 			 */
-			if (Z_TYPE_P(current_host_name) == IS_NULL) {
+			if (Z_TYPE(current_host_name) == IS_NULL) {
 				continue;
 			}
 
@@ -815,7 +815,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 								/* Check if the part has a converter */
 								if (phalcon_array_isset_fetch(&converter, &converters, &tmp)) {
 									array_init_size(&parameters, 1);
-									phalcon_array_append(parameters, &match_position, PH_COPY);
+									phalcon_array_append(&parameters, &match_position, PH_COPY);
 
 									PHALCON_CALL_USER_FUNC_ARRAY(&converted_part, &converter, &parameters);
 									phalcon_array_update_zval(&parts, &tmp, &converted_part, PH_COPY);

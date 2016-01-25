@@ -282,35 +282,29 @@ PHP_METHOD(Phalcon_Mvc_Micro, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Micro, setDI){
 
-	zval *dependency_injector, *service, *exists = NULL;
+	zval *dependency_injector, service, exists;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &dependency_injector);
+	phalcon_fetch_params(0, 1, 0, &dependency_injector);
 	PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_micro_exception_ce, 1);
 
 	/** 
 	 * We automatically set ourselves as application service
 	 */
-	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "application");
+	ZVAL_STRING(&service, "application");
 
-	PHALCON_CALL_METHOD(&exists, dependency_injector, "has", service);
-	if (!zend_is_true(exists)) {
-		PHALCON_CALL_METHOD(NULL, dependency_injector, "set", service, getThis());
+	PHALCON_CALL_METHOD(&exists, dependency_injector, "has", &service);
+	if (!zend_is_true(&exists)) {
+		PHALCON_CALL_METHOD(NULL, dependency_injector, "set", &service, getThis());
 	}
 
 	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
-
-	PHALCON_MM_RESTORE();
 }
 
 static void phalcon_mvc_micro_generic_add(INTERNAL_FUNCTION_PARAMETERS, const char *method)
 {
-	zval *route_pattern, *handler, *router = NULL, *route_id = NULL;
+	zval *route_pattern, *handler, router, route_id;
 
 	phalcon_fetch_params(0, 2, 0, &route_pattern, &handler);
-	PHALCON_MM_GROW();
 
 	/**
 	 * We create a router even if there is no one in the DI
@@ -320,13 +314,14 @@ static void phalcon_mvc_micro_generic_add(INTERNAL_FUNCTION_PARAMETERS, const ch
 	/**
 	 * Routes are added to the router
 	 */
-	PHALCON_RETURN_CALL_METHOD(router, method, route_pattern);
+	PHALCON_RETURN_CALL_METHOD(&router, method, route_pattern);
 
 	/**
 	 * Using the id produced by the router we store the handler
 	 */
 	PHALCON_CALL_METHOD(&route_id, return_value, "getrouteid");
-	phalcon_update_property_array(getThis(), SL("_handlers"), route_id, handler);
+
+	phalcon_update_property_array(getThis(), SL("_handlers"), &route_id, handler);
 
 	/**
 	 * The route is returned, the developer can add more things on it
@@ -438,44 +433,39 @@ PHP_METHOD(Phalcon_Mvc_Micro, options){
  */
 PHP_METHOD(Phalcon_Mvc_Micro, mount){
 
-	zval *collection, *main_handler = NULL, *handlers = NULL, *lazy = NULL;
-	zval *lazy_handler = NULL, *prefix = NULL, *handler = NULL;
+	zval *collection, main_handler, handlers, lazy, lazy_handler, prefix, *handler;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &collection);
+	phalcon_fetch_params(0, 1, 0, &collection);
 	PHALCON_VERIFY_INTERFACE_EX(collection, phalcon_mvc_micro_collectioninterface_ce, phalcon_mvc_micro_exception_ce, 1);
 
 	/* Get the main handler */
 	PHALCON_CALL_METHOD(&main_handler, collection, "gethandler");
-	if (PHALCON_IS_EMPTY(main_handler)) {
+	if (PHALCON_IS_EMPTY(&main_handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "The collection requires a main handler");
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&handlers, collection, "gethandlers");
-	if (!phalcon_fast_count_ev(handlers)) {
+	if (!phalcon_fast_count_ev(&handlers)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "There are no handlers to mount");
 		return;
 	}
 
-	if (Z_TYPE_P(handlers) == IS_ARRAY) { 
-
+	if (Z_TYPE(handlers) == IS_ARRAY) { 
 		/* Check if handler is lazy */
 		PHALCON_CALL_METHOD(&lazy, collection, "islazy");
-		if (zend_is_true(lazy)) {
-			PHALCON_INIT_VAR(lazy_handler);
-			object_init_ex(lazy_handler, phalcon_mvc_micro_lazyloader_ce);
-			PHALCON_CALL_METHOD(NULL, lazy_handler, "__construct", main_handler);
+		if (zend_is_true(&lazy)) {
+			object_init_ex(&lazy_handler, phalcon_mvc_micro_lazyloader_ce);
+			PHALCON_CALL_METHOD(NULL, &lazy_handler, "__construct", &main_handler);
 
 		} else {
-			PHALCON_CPY_WRT(lazy_handler, main_handler);
+			ZVAL_COPY_VALUE(&lazy_handler, &main_handler);
 		}
 
 		/* Get the main prefix for the collection */
 		PHALCON_CALL_METHOD(&prefix, collection, "getprefix");
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(handlers), handler) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(handlers), handler) {
 			zval methods, pattern, sub_handler, name, real_handler, prefixed_pattern, route;
 			if (Z_TYPE_P(handler) != IS_ARRAY) { 
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "One of the registered handlers is invalid");
@@ -494,13 +484,13 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 
 			/* Create a real handler */
 			array_init_size(&real_handler, 2);
-			phalcon_array_append(&real_handler, lazy_handler, PH_COPY);
+			phalcon_array_append(&real_handler, &lazy_handler, PH_COPY);
 			phalcon_array_append(&real_handler, &sub_handler, PH_COPY);
-			if (PHALCON_IS_NOT_EMPTY(prefix)) {
-				if (PHALCON_IS_STRING(pattern, "/")) {
-					ZVAL_COPY_VALUE(&prefixed_pattern, prefix);
+			if (PHALCON_IS_NOT_EMPTY(&prefix)) {
+				if (PHALCON_IS_STRING(&pattern, "/")) {
+					ZVAL_COPY_VALUE(&prefixed_pattern, &prefix);
 				} else {
-					PHALCON_CONCAT_VV(&prefixed_pattern, prefix, &pattern);
+					PHALCON_CONCAT_VV(&prefixed_pattern, &prefix, &pattern);
 				}
 			} else {
 				ZVAL_COPY_VALUE(&prefixed_pattern, &pattern);
@@ -519,7 +509,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**

@@ -784,7 +784,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
  */
 PHP_METHOD(Phalcon_Tag, _inputField){
 
-	zval *type, *parameters, *as_value = NULL, params, *default_params, *value = NULL;
+	zval *type, *parameters, *as_value = NULL, params, *default_params, value;
 	zval id, name, code, *doctype;
 
 	PHALCON_MM_GROW();
@@ -904,7 +904,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 	if (!phalcon_array_isset_fetch_str(&name, params, SL("name"))) {
 		phalcon_array_update_string(params, IS(name), &id, PH_COPY);
 	} else {
-		if (!zend_is_true(name)) {
+		if (!zend_is_true(&name)) {
 			phalcon_array_update_string(params, IS(name), &id, PH_COPY);
 		}
 	}

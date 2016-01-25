@@ -417,53 +417,46 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 
-	zval *model, *service = NULL, *connection_services;
-	zval *entity_name, *dependency_injector, *connection = NULL;
+	zval *model, service, *connection_services, entity_name, *dependency_injector, connection;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	if (Z_TYPE_P(model) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
 		return;
 	}
 
-	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "mongo");
+	ZVAL_STRING(&service, "mongo");
 
 	connection_services = phalcon_read_property(getThis(), SL("_connectionServices"), PH_NOISY);
 	if (Z_TYPE_P(connection_services) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
+		phalcon_get_class(&entity_name, model, 1);
 
 		/** 
 		 * Check if the model has a custom connection service
 		 */
-		if (phalcon_array_isset(connection_services, entity_name)) {
-			PHALCON_OBS_NVAR(service);
-			phalcon_array_fetch(&service, connection_services, entity_name, PH_NOISY);
+		if (phalcon_array_isset(connection_services, &entity_name)) {
+			phalcon_array_fetch(&service, connection_services, &entity_name, PH_NOISY);
 		}
 	}
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 
 	/** 
 	 * Request the connection service from the DI
 	 */
-	PHALCON_CALL_METHOD(&connection, dependency_injector, "getshared", service);
-	if (Z_TYPE_P(connection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Invalid injected connection service");
+	PHALCON_CALL_METHOD(&connection, dependency_injector, "getshared", &service);
+	if (Z_TYPE(connection) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Invalid injected connection service");
 		return;
 	}
 
 	/* PHALCON_VERIFY_INTERFACE(connection, phalcon_db_adapterinterface_ce); */
-	RETURN_CCTOR(connection);
+	RETURN_CTORW(&connection);
 }
 
 /**
@@ -475,28 +468,23 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 
-	zval *eventname, *model, *status = NULL, *events_manager;
-	zval *fire_event_name = NULL, *custom_events_manager;
-	zval *entity_name;
+	zval *eventname, *model, status, *events_manager;
+	zval fire_event_name, *custom_events_manager, entity_name;
 
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 0, &eventname, &model);
-
-	PHALCON_INIT_VAR(status);
 
 	/** 
 	 * Dispatch events to the global events manager
 	 */
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+		PHALCON_CONCAT_SV(&fire_event_name, "collection:", eventname);
 
-		PHALCON_INIT_VAR(fire_event_name);
-		PHALCON_CONCAT_SV(fire_event_name, "collection:", eventname);
-
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", fire_event_name, model);
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_CCTOR(status);
+		PHALCON_CALL_METHOD(&status, events_manager, "fire", &fire_event_name, model);
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_CTOR(&status);
 		}
 	}
 
@@ -505,22 +493,18 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 	 */
 	custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
 	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
+		phalcon_get_class(&entity_name, model, 1);
+		if (phalcon_array_isset(custom_events_manager, &entity_name)) {
+			PHALCON_CONCAT_SV(&fire_event_name, "collection:", eventname);
 
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
-		if (phalcon_array_isset(custom_events_manager, entity_name)) {
-
-			PHALCON_INIT_NVAR(fire_event_name);
-			PHALCON_CONCAT_SV(fire_event_name, "collection:", eventname);
-
-			PHALCON_CALL_METHOD(&status, custom_events_manager, "fire", fire_event_name, model);
-			if (PHALCON_IS_FALSE(status)) {
-				RETURN_CCTOR(status);
+			PHALCON_CALL_METHOD(&status, custom_events_manager, "fire", &fire_event_name, model);
+			if (PHALCON_IS_FALSE(&status)) {
+				RETURN_CTOR(&status);
 			}
 		}
 	}
 
-	RETURN_CCTOR(status);
+	RETURN_CTOR(&status);
 }
 
 /**
@@ -531,7 +515,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, setSource){
 
-	zval *collection, *source, *entity_name;
+	zval *collection, *source, entity_name;
 
 	PHALCON_MM_GROW();
 
@@ -547,9 +531,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setSource){
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1);
-	phalcon_update_property_array(getThis(), SL("_sources"), entity_name, source);
+	phalcon_get_class(&entity_name, collection, 1);
+	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, source);
 
 	PHALCON_MM_RESTORE();
 }
@@ -562,7 +545,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setSource){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 
-	zval *collection, *entity_name, *sources, *source = NULL, *class_name;
+	zval *collection, entity_name, *sources, source, class_name;
 
 	PHALCON_MM_GROW();
 
@@ -573,26 +556,21 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1);
+	phalcon_get_class(&entity_name, collection, 1);
 
 	sources = phalcon_read_property(getThis(), SL("_sources"), PH_NOISY);
 	if (Z_TYPE_P(sources) == IS_ARRAY) { 
-		if (phalcon_array_isset(sources, entity_name)) {
-			PHALCON_OBS_VAR(source);
-			phalcon_array_fetch(&source, sources, entity_name, PH_NOISY);
-			RETURN_CTOR(source);
+		if (phalcon_array_isset_fetch(&source, sources, entity_name)) {
+			RETURN_CTOR(&source);
 		}
 	}
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class_ns(class_name, collection, 0);
+	phalcon_get_class_ns(&class_name, collection, 0);
 
-	PHALCON_INIT_NVAR(source);
-	phalcon_uncamelize(source, class_name);
-	phalcon_update_property_array(getThis(), SL("_sources"), entity_name, source);
+	phalcon_uncamelize(&source, &class_name);
+	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, &source);
 
-	RETURN_CTOR(source);
+	RETURN_CTOR(&source);
 }
 
 /**
@@ -603,7 +581,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, setColumnMap){
 
-	zval *collection, *column_map, *entity_name;
+	zval *collection, *column_map, entity_name;
 
 	PHALCON_MM_GROW();
 
@@ -619,9 +597,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setColumnMap){
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1);
-	phalcon_update_property_array(getThis(), SL("_columnMaps"), entity_name, column_map);
+	phalcon_get_class(&entity_name, collection, 1);
+	phalcon_update_property_array(getThis(), SL("_columnMaps"), &entity_name, column_map);
 
 	PHALCON_MM_RESTORE();
 }
@@ -634,7 +611,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 
-	zval *collection, *entity_name, *column_maps, *column_map = NULL;
+	zval *collection, entity_name, *column_maps, column_map;
 
 	PHALCON_MM_GROW();
 
@@ -645,15 +622,12 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, collection, 1);
+	phalcon_get_class(&entity_name, collection, 1);
 
 	column_maps = phalcon_read_property(getThis(), SL("_columnMaps"), PH_NOISY);
 	if (Z_TYPE_P(column_maps) == IS_ARRAY) { 
-		if (phalcon_array_isset(column_maps, entity_name)) {
-			PHALCON_OBS_VAR(column_map);
-			phalcon_array_fetch(&column_map, column_maps, entity_name, PH_NOISY);
-			RETURN_CTOR(column_map);
+		if (phalcon_array_isset_fetch(&column_map, column_maps, entity_name)) {
+			RETURN_CTOR(&column_map);
 		}
 	}
 

@@ -88,35 +88,29 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 
-	zval *method, *arguments, *handler = NULL, *definition;
-	zval *call_handler;
+	zval *method, *arguments, handler, *definition, call_handler;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &method, &arguments);
 
-	phalcon_fetch_params(1, 2, 0, &method, &arguments);
-
-	handler = phalcon_read_property(getThis(), SL("_handler"), PH_NOISY);
-	if (Z_TYPE_P(handler) != IS_OBJECT) {
+	phalcon_return_property(&handler, getThis(), SL("_handler"));
+	if (Z_TYPE(handler) != IS_OBJECT) {
 		definition = phalcon_read_property(getThis(), SL("_definition"), PH_NOISY);
 		ce0 = phalcon_fetch_class(definition);
 
-		PHALCON_INIT_NVAR(handler);
-		object_init_ex(handler, ce0);
-		if (phalcon_has_constructor(handler)) {
-			PHALCON_CALL_METHOD(NULL, handler, "__construct");
+		object_init_ex(&handler, ce0);
+		if (phalcon_has_constructor(&handler)) {
+			PHALCON_CALL_METHOD(NULL, &handler, "__construct");
 		}
-		phalcon_update_property_this(getThis(), SL("_handler"), handler);
+		phalcon_update_property_this(getThis(), SL("_handler"), &handler);
 	}
 
-	PHALCON_INIT_VAR(call_handler);
-	array_init_size(call_handler, 2);
-	phalcon_array_append(call_handler, handler, PH_COPY);
-	phalcon_array_append(call_handler, method, PH_COPY);
+	array_init_size(&call_handler, 2);
+	phalcon_array_append(&call_handler, &handler, PH_COPY);
+	phalcon_array_append(&call_handler, method, PH_COPY);
 
 	/** 
 	 * Call the handler
 	 */
-	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, call_handler, arguments);
-	RETURN_MM();
+	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &call_handler, arguments);
 }

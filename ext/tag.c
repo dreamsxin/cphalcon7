@@ -2003,7 +2003,7 @@ PHP_METHOD(Phalcon_Tag, friendlyTitle){
 	if (zend_is_true(lowercase)) {
 		phalcon_fast_strtolower(return_value, &friendly);
 	} else {
-		RETURN_CTORW(friendly);
+		RETURN_CTORW(&friendly);
 	}
 }
 

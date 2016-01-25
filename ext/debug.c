@@ -936,15 +936,11 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
  */
 PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
-	zval *exception, *is_active, message;
-	zval class_name, css_sources, escaped_message;
-	zval html, version, file, line, show_back_trace;
-	zval *data_vars, *trace = NULL, *trace_item = NULL, *html_item = NULL;
-	zval *_REQUEST, *value = NULL,*joined_value = NULL, *_SERVER;
-	zval *files = NULL, *memory, *data_var = NULL, *variable = NULL, *dumped_argument = NULL;
-	zval *js_sources = NULL, formatted_file;
+	zval *exception, *is_active, message, class_name, css_sources, escaped_message;
+	zval html, version, file, line, show_back_trace, *data_vars, trace, *trace_item;
+	zval *_REQUEST, *value = NULL, *_SERVER, files, memory, *data_var;
+	zval js_sources, formatted_file, z_link_format;
 	zend_bool ini_exists = 1;
-	zval z_link_format;
 	zend_class_entry *ce;
 	zend_string *str_key;
 	ulong idx;
@@ -1022,40 +1018,40 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	phalcon_concat_self_str(&html, SL("<div align=\"center\"><div class=\"error-main\">"));
 	PHALCON_SCONCAT_SVSVS(&html, "<h1>", &class_name, ": ", &escaped_message, "</h1>");
 	PHALCON_SCONCAT_SVSVS(&html, "<span class=\"error-file\">", &formatted_file, " (", &line, ")</span>");
-	phalcon_concat_self_str(html, SL("</div>"));
+	phalcon_concat_self_str(&html, SL("</div>"));
 
-	show_back_trace = phalcon_read_property(getThis(), SL("_showBackTrace"), PH_NOISY);
+	phalcon_return_property(&show_back_trace, getThis(), SL("_showBackTrace"));
 
-	/** 
+	/**
 	 * Check if the developer wants to show the backtrace or not
 	 */
-	if (zend_is_true(show_back_trace)) {
+	if (zend_is_true(&show_back_trace)) {
 		data_vars = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
 
 		/** 
 		 * Create the tabs in the page
 		 */
-		phalcon_concat_self_str(html, SL("<div class=\"error-info\"><div id=\"tabs\"><ul>"));
-		phalcon_concat_self_str(html, SL("<li><a href=\"#error-tabs-1\">Backtrace</a></li>"));
-		phalcon_concat_self_str(html, SL("<li><a href=\"#error-tabs-2\">Request</a></li>"));
-		phalcon_concat_self_str(html, SL("<li><a href=\"#error-tabs-3\">Server</a></li>"));
-		phalcon_concat_self_str(html, SL("<li><a href=\"#error-tabs-4\">Included Files</a></li>"));
-		phalcon_concat_self_str(html, SL("<li><a href=\"#error-tabs-5\">Memory</a></li>"));
+		phalcon_concat_self_str(&html, SL("<div class=\"error-info\"><div id=\"tabs\"><ul>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-1\">Backtrace</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-2\">Request</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-3\">Server</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-4\">Included Files</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-5\">Memory</a></li>"));
 		if (Z_TYPE_P(data_vars) == IS_ARRAY) { 
-			phalcon_concat_self_str(html, SL("<li><a href=\"#error-tabs-6\">Variables</a></li>"));
+			phalcon_concat_self_str(&html, SL("<li><a href=\"#error-tabs-6\">Variables</a></li>"));
 		}
 
-		phalcon_concat_self_str(html, SL("</ul>"));
+		phalcon_concat_self_str(&html, SL("</ul>"));
 
 		/** 
 		 * Print backtrace
 		 */
-		phalcon_concat_self_str(html, SL("<div id=\"error-tabs-1\"><table cellspacing=\"0\" align=\"center\" width=\"100%\">"));
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-1\"><table cellspacing=\"0\" align=\"center\" width=\"100%\">"));
 
 		PHALCON_CALL_METHOD(&trace, exception, "gettrace");
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(trace), idx, str_key, trace_item) {
-			zval tmp;
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(trace), idx, str_key, trace_item) {
+			zval tmp, html_item;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -1066,21 +1062,21 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 			 * Every line in the trace is rendered using 'showTraceItem'
 			 */
 			PHALCON_CALL_METHOD(&html_item, getThis(), "showtraceitem", &tmp, trace_item, &z_link_format);
-			phalcon_concat_self(html, html_item);
+			phalcon_concat_self(&html, &html_item);
 		} ZEND_HASH_FOREACH_END();
 
-		phalcon_concat_self_str(html, SL("</table></div>"));
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Print _REQUEST superglobal
 		 */
-		phalcon_concat_self_str(html, SL("<div id=\"error-tabs-2\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
-		phalcon_concat_self_str(html, SL("<tr><th>Key</th><th>Value</th></tr>"));
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-2\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+		phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>"));
 		_REQUEST = phalcon_get_global_str(SL("_REQUEST"));
 
 		if (Z_TYPE_P(_REQUEST) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(_REQUEST), idx, str_key, value) {
-				zval tmp;
+				zval tmp, joined_value;
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
@@ -1088,45 +1084,46 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 				}
 				if (Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_METHOD(&joined_value, getThis(), "_getvardump", value);
-					PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", &tmp, "</td><td>", joined_value, "</td></tr>");
+					PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &joined_value, "</td></tr>");
 				} else {
-					PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", &tmp, "</td><td>", value, "</td></tr>");
+					PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", value, "</td></tr>");
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
 
-		phalcon_concat_self_str(html, SL("</table></div>"));
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Print _SERVER superglobal
 		 */
-		phalcon_concat_self_str(html, SL("<div id=\"error-tabs-3\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
-		phalcon_concat_self_str(html, SL("<tr><th>Key</th><th>Value</th></tr>"));
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-3\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+		phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>"));
 		_SERVER = phalcon_get_global_str(SL("_SERVER"));
 
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(_SERVER), idx, str_key, value) {
-				zval tmp;
+				zval tmp, dumped_argument;
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
 					ZVAL_LONG(&tmp, idx);
 				}
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", value);
-				PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", &tmp, "</td><td>", dumped_argument, "</td></tr>");
+				PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &dumped_argument, "</td></tr>");
 			} ZEND_HASH_FOREACH_END();
 		}
 
-		phalcon_concat_self_str(html, SL("</table></div>"));
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Show included files
 		 */
 		PHALCON_CALL_FUNCTION(&files, "get_included_files");
-		phalcon_concat_self_str(html, SL("<div id=\"error-tabs-4\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
-		phalcon_concat_self_str(html, SL("<tr><th>#</th><th>Path</th></tr>"));
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(files), idx, str_key, value) {
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-4\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+		phalcon_concat_self_str(&html, SL("<tr><th>#</th><th>Path</th></tr>"));
+
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(files), idx, str_key, value) {
 			zval tmp;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
@@ -1134,58 +1131,56 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 				ZVAL_LONG(&tmp, idx);
 			}
 
-			PHALCON_SCONCAT_SVSVS(html, "<tr><td>", &tmp, "</th><td>", value, "</td></tr>");
+			PHALCON_SCONCAT_SVSVS(&html, "<tr><td>", &tmp, "</th><td>", value, "</td></tr>");
 		} ZEND_HASH_FOREACH_END();
 
-		phalcon_concat_self_str(html, SL("</table></div>"));
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Memory usage
 		 */
-		PHALCON_INIT_VAR(memory);
-		ZVAL_LONG(memory, zend_memory_usage(1));
-		phalcon_concat_self_str(html, SL("<div id=\"error-tabs-5\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
-		PHALCON_SCONCAT_SVS(html, "<tr><th colspan=\"2\">Memory</th></tr><tr><td>Usage</td><td>", memory, "</td></tr>");
-		phalcon_concat_self_str(html, SL("</table></div>"));
+		ZVAL_LONG(&memory, zend_memory_usage(1));
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-5\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+		PHALCON_SCONCAT_SVS(&html, "<tr><th colspan=\"2\">Memory</th></tr><tr><td>Usage</td><td>", &memory, "</td></tr>");
+		phalcon_concat_self_str(&html, SL("</table></div>"));
 
 		/** 
 		 * Print extra variables passed to the component
 		 */
 		if (Z_TYPE_P(data_vars) == IS_ARRAY) { 
-			phalcon_concat_self_str(html, SL("<div id=\"error-tabs-6\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
-			phalcon_concat_self_str(html, SL("<tr><th>Key</th><th>Value</th></tr>"));
+			phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-6\"><table cellspacing=\"0\" align=\"center\" class=\"superglobal-detail\">"));
+			phalcon_concat_self_str(&html, SL("<tr><th>Key</th><th>Value</th></tr>"));
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data_vars), idx, str_key, data_var) {
-				zval tmp;
+				zval tmp, variable, dumped_argument;
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
 					ZVAL_LONG(&tmp, idx);
 				}
 
-				PHALCON_OBS_NVAR(variable);
 				phalcon_array_fetch_long(&variable, data_var, 0, PH_NOISY);
 
-				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", variable);
-				PHALCON_SCONCAT_SVSVS(html, "<tr><td class=\"key\">", &tmp, "</td><td>", dumped_argument, "</td></tr>");
+				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", &variable);
+				PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &dumped_argument, "</td></tr>");
 			} ZEND_HASH_FOREACH_END();
 
-			phalcon_concat_self_str(html, SL("</table></div>"));
+			phalcon_concat_self_str(&html, SL("</table></div>"));
 		}
 
-		phalcon_concat_self_str(html, SL("</div>"));
+		phalcon_concat_self_str(&html, SL("</div>"));
 	}
 
 	/** 
 	 * Get Javascript sources
 	 */
 	PHALCON_CALL_METHOD(&js_sources, getThis(), "getjssources");
-	PHALCON_SCONCAT_VS(html, js_sources, "</div></body></html>");
+	PHALCON_SCONCAT_VS(&html, &js_sources, "</div></body></html>");
 
 	/** 
 	 * Print the HTML, @TODO, add an option to store the html
 	 */
-	zend_print_zval(html, 0);
+	zend_print_zval(&html, 0);
 
 	/** 
 	 * Unlock the exception renderer
@@ -1251,18 +1246,16 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
  */
 PHP_METHOD(Phalcon_Debug, onShutdown){
 
-	zval *error = NULL, message, type, file, line, exception;
+	zval error, message, type, file, line, exception;
 	zend_class_entry *default_exception_ce;
-
-	PHALCON_MM_GROW();
 
 	PHALCON_CALL_FUNCTION(&error, "error_get_last");
 
 	if (
-		!phalcon_array_isset_fetch_str(&message, error, SL("message")) ||
-		!phalcon_array_isset_fetch_str(&type, error, SL("type")) ||
-		!phalcon_array_isset_fetch_str(&file, error, SL("file")) ||
-		!phalcon_array_isset_fetch_str(&line, error, SL("line"))
+		!phalcon_array_isset_fetch_str(&message, &error, SL("message")) ||
+		!phalcon_array_isset_fetch_str(&type, &error, SL("type")) ||
+		!phalcon_array_isset_fetch_str(&file, &error, SL("file")) ||
+		!phalcon_array_isset_fetch_str(&line, &error, SL("line"))
 		
 	) {
 		default_exception_ce = zend_get_error_exception();
@@ -1273,8 +1266,6 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
 
 		zend_throw_exception_object(&exception);
 	}
-
-	RETURN_MM_TRUE;
 }
 
 /**

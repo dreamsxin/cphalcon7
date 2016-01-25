@@ -813,7 +813,7 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 
 	phalcon_fetch_params(1, 2, 0, &array1, &array2);
 
-	PHALCON_CPY_WRT_CTOR(return_value, array1);
+	ZVAL_COPY_VALUE(return_value, array1);
 
 	if (Z_TYPE_P(array2) != IS_ARRAY) {
 		PHALCON_SEPARATE_PARAM(array2);
@@ -840,7 +840,7 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 		PHALCON_CALL_FUNCTION(&args, "array_slice", &arg_list, &tmp);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(args), value) {
-			PHALCON_CALL_SELF(&return_value, "overwrite", array1, value);
+			PHALCON_CALL_SELF(return_value, "overwrite", return_value, value);
 		} ZEND_HASH_FOREACH_END();
 	}
 
@@ -862,8 +862,7 @@ PHP_METHOD(Phalcon_Arr, overwrite){
  */
 PHP_METHOD(Phalcon_Arr, callback){
 
-	zval *str, pattern, matches, ret, command, match, search, replace, params, command_parts;
-	zval *tmp;
+	zval *str, pattern, matches, ret, command, match, split, search, replace, params, command_parts;
 	pcre_cache_entry *pce;
 
 	PHALCON_MM_GROW();
@@ -879,22 +878,20 @@ PHP_METHOD(Phalcon_Arr, callback){
 			ZVAL_EMPTY_STRING(&command);
 		}
 
-		if (phalcon_array_isset_fetch_long(&match, matches, 2)) {
+		if (phalcon_array_isset_fetch_long(&match, &matches, 2)) {
 			if ((pce = pcre_get_compiled_regex_cache(SSL("#(?<!\\\\\\\\),#"))) == NULL) {
 				RETURN_MM_FALSE;
 			}
 
-			php_pcre_split_impl(pce, Z_STRVAL(match), Z_STRLEN(match), &tmp, -1, 0);
+			php_pcre_split_impl(pce, Z_STRVAL(match), Z_STRLEN(match), &split, -1, 0);
 
 			ZVAL_STRING(&search, "\\,");
 			ZVAL_STRING(&replace, ",");
 
-			PHALCON_CALL_FUNCTION(&params, "str_replace", &search, &replace, &tmp);
+			PHALCON_CALL_FUNCTION(&params, "str_replace", &search, &replace, &split);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&command, &str);
-
-		PHALCON_INIT_VAR(params);
+		ZVAL_COPY_VALUE(&command, str);
 	}
 
 	array_init(return_value);

@@ -859,7 +859,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				PHALCON_SCONCAT_SVSVSVS(&html, "<pre class='prettyprint highlight:", &first_line, ":", &line, " linenums:", &first_line, "'>");
 			} else {
 				ZVAL_COPY_VALUE(&first_line, &PHALCON_GLOBAL(z_one));
-				ZVAL_COPY_VALUE(&last_line, number_lines);
+				ZVAL_COPY_VALUE(&last_line, &number_lines);
 				PHALCON_SCONCAT_SVSVS(&html, "<pre class='prettyprint highlight:", &first_line, ":", &line, " linenums error-scroll'>");
 			}
 
@@ -877,24 +877,24 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/**
 				 * Current line in the file
 				 */
-				phalcon_sub_function(&line_position, i, &PHALCON_GLOBAL(z_one));
+				phalcon_sub_function(&line_position, &i, &PHALCON_GLOBAL(z_one));
 
 				/** 
 				 * Current line content in the piece of file
 				 */
-				phalcon_array_fetch(&current_line, lines, &line_position, PH_NOISY);
+				phalcon_array_fetch(&current_line, &lines, &line_position, PH_NOISY);
 
 				/** 
 				 * File fragments are cleaned, removing tabs and comments
 				 */
 				if (zend_is_true(show_file_fragment)) {
-					if (PHALCON_IS_EQUAL(i, first_line)) {
-						ZVAL_STR(&trimmed, phalcon_trim(current_line, NULL, PHALCON_TRIM_RIGHT));
+					if (PHALCON_IS_EQUAL(&i, &first_line)) {
+						ZVAL_STR(&trimmed, phalcon_trim(&current_line, NULL, PHALCON_TRIM_RIGHT));
 
-						RETURN_MM_ON_FAILURE(phalcon_preg_match(&is_comment, comment_pattern, &current_line, NULL));
+						RETURN_MM_ON_FAILURE(phalcon_preg_match(&is_comment, &comment_pattern, &current_line, NULL));
 
 						if (zend_is_true(&is_comment)) {
-							PHALCON_STR_REPLACE(&spaced_current_line, comment, space, &current_line);
+							PHALCON_STR_REPLACE(&spaced_current_line, &comment, &space, &current_line);
 							ZVAL_COPY_VALUE(&current_line, &spaced_current_line);
 						}
 					}
@@ -904,7 +904,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 * Print a non break space if the current line is a line break, this allows to show
 				 * the html zebra properly
 				 */
-				if (PHALCON_IS_STRING(current_line, "\n")) {
+				if (PHALCON_IS_STRING(&current_line, "\n")) {
 					phalcon_concat_self_str(&html, SL("&nbsp;\n"));
 				} else {
 					if (PHALCON_IS_STRING(&current_line, "\r\n")) {

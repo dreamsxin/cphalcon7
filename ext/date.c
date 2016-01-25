@@ -1094,48 +1094,49 @@ PHP_METHOD(Phalcon_Date, dos2unix){
  */
 PHP_METHOD(Phalcon_Date, formatted_time){
 	
-	zval *datetime_str = NULL, *timestamp_format = NULL, *timezone = NULL, tz, dt, tmp, tmp1;
+	zval *datetime = NULL, *format = NULL, *zone = NULL, datetime_str, timestamp_format, timezone, tz, dt, tmp, tmp1;
 	zend_class_entry *ce0, *ce1;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 3, &datetime_str, &timestamp_format, &timezone);
+	phalcon_fetch_params(1, 0, 3, &datetime, &format, &zone);
+
+	if (!datetime) {
+		ZVAL_STRING(&datetime_str, "now");
+	} else {
+		ZVAL_COPY(&datetime_str, datetime);
+	}
+
+	if (!format || Z_TYPE_P(format) == IS_NULL) {
+		 phalcon_return_static_property_ce(&timestamp_format, phalcon_date_ce, SL("timestamp_format"));
+	} else {
+		ZVAL_COPY(&timestamp_format, format);
+	}
+
+	if (!zone || Z_TYPE_P(zone) == IS_NULL) {
+		phalcon_return_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"));
+	} else {
+		PHALCON_CALL_FUNCTION(&timezone, "date_default_timezone_get");
+	}
 
 	ce0 = zend_fetch_class(SSL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
 	ce1 = zend_fetch_class(SSL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
-	if (!datetime_str) {
-		PHALCON_INIT_VAR(datetime_str);
-		ZVAL_STRING(datetime_str, "now");
-	}
-
-	if (!timestamp_format || Z_TYPE_P(timestamp_format) == IS_NULL) {
-		timestamp_format = phalcon_read_static_property_ce(phalcon_date_ce, SL("timestamp_format"));
-	}
-
-	if (!timezone || Z_TYPE_P(timezone) == IS_NULL) {
-		timezone = phalcon_read_static_property_ce(phalcon_date_ce, SL("timezone"));
-	}
-	
-	if (!zend_is_true(timezone)) {
-		PHALCON_CALL_FUNCTION(timezone, "date_default_timezone_get");
-	}
-
 	object_init_ex(&tz, ce0);
-	PHALCON_CALL_METHOD(NULL, &tz, "__construct", timezone);
+	PHALCON_CALL_METHOD(NULL, &tz, "__construct", &timezone);
 
 	object_init_ex(&dt, ce1);
-	PHALCON_CALL_METHOD(NULL, &dt, "__construct", datetime_str, &tz);
+	PHALCON_CALL_METHOD(NULL, &dt, "__construct", &datetime_str, &tz);
 
-	PHALCON_CALL_METHOD(&tmp, dt, "getTimeZone");
-	PHALCON_CALL_METHOD(&tmp1, tmp, "getName");
-	PHALCON_CALL_METHOD(&tmp, tz, "getName");
+	PHALCON_CALL_METHOD(&tmp, &dt, "getTimeZone");
+	PHALCON_CALL_METHOD(&tmp1, &tmp, "getName");
+	PHALCON_CALL_METHOD(&tmp, &tz, "getName");
 
 	if (PHALCON_IS_EQUAL(&tmp1, &tmp)) {
 		PHALCON_CALL_METHOD(NULL, &dt, "setTimeZone", &tz);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(&dt, "format", timestamp_format);
+	PHALCON_RETURN_CALL_METHOD(&dt, "format", &timestamp_format);
 
 	PHALCON_MM_RESTORE();
 }
@@ -1151,25 +1152,23 @@ PHP_METHOD(Phalcon_Date, formatted_time){
  * @return string
  */
 PHP_METHOD(Phalcon_Date, valid){
-	
-	zval *date = NULL, *format = NULL, *time = NULL, *format_date = NULL;
 
-	PHALCON_MM_GROW();
+	zval *date = NULL, *format = NULL, date_format, time, format_date;
 
-	phalcon_fetch_params(1, 1, 1, &date, &format);
+	phalcon_fetch_params(0, 1, 1, &date, &format);
 
 	if (!format) {
-		PHALCON_INIT_VAR(format);
-		ZVAL_STRING(format, "Y-m-d");
+		ZVAL_STRING(&date_format, "Y-m-d");
+	} else {
+		ZVAL_COPY(&date_format, format);
 	}
 
-	
 	PHALCON_CALL_FUNCTION(&time, "strtotime", date);
-	PHALCON_CALL_FUNCTION(&format_date, "date", format, time);
+	PHALCON_CALL_FUNCTION(&format_date, "date", &date_format, &time);
 
-	if (phalcon_is_equal(date, format_date)) {
-		RETURN_MM_TRUE;
+	if (phalcon_is_equal(date, &format_date)) {
+		RETURN_TRUE;
 	} else {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
 }

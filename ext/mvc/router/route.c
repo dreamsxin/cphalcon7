@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &params_pattern, &pattern_copy);
 			} else {
 				ZVAL_STRING(&id_pattern, "([0-9]++)");
-				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, pattern_copy);
+				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 		}
 	}
@@ -411,8 +411,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 
 	zval *pattern, *paths = NULL, *regex = NULL, module_name, controller_name;
 	zval action_name, parts, number_parts, route_paths;
-	zval real_class_name, namespace_name, lower_name;
-	zval *pcre_pattern = NULL, *compiled_pattern = NULL;
+	zval real_class_name, namespace_name, lower_name, pcre_pattern, compiled_pattern;
 
 	PHALCON_MM_GROW();
 
@@ -516,13 +515,13 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 			 * Process action name
 			 */
 			if (Z_TYPE_P(&action_name) != IS_NULL) {
-				phalcon_array_update_str(route_paths, SL("action"), &action_name, PH_COPY);
+				phalcon_array_update_str(&route_paths, SL("action"), &action_name, PH_COPY);
 			}
 		} else {
 			ZVAL_COPY_VALUE(&route_paths, paths);
-			if (Z_TYPE_P(route_paths) == IS_ARRAY) {
+			if (Z_TYPE(route_paths) == IS_ARRAY) {
 				if (phalcon_array_isset_fetch_str(&controller_name, &route_paths, SL("controller"))) {
-					if (Z_TYPE_P(&controller_name) == IS_STRING && !phalcon_is_numeric_ex(&controller_name)) {
+					if (Z_TYPE(controller_name) == IS_STRING && !phalcon_is_numeric_ex(&controller_name)) {
 						phalcon_uncamelize(&lower_name, &controller_name);
 						phalcon_array_update_str(&route_paths, SL("controller"), &lower_name, PH_COPY);
 					}
@@ -533,7 +532,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 		array_init(&route_paths);
 	}
 
-	if (Z_TYPE_P(&route_paths) != IS_ARRAY) { 
+	if (Z_TYPE(route_paths) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The route contains invalid paths");
 		return;
 	}
@@ -556,7 +555,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 		 */
 		PHALCON_CALL_METHOD(&compiled_pattern, getThis(), "compilepattern", &pcre_pattern, regex);
 	} else {
-		PHALCON_CPY_WRT_CTOR(compiled_pattern, pattern);
+		ZVAL_COPY_VALUE(&compiled_pattern, pattern);
 	}
 
 	/** 
@@ -567,7 +566,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	/** 
 	 * Update the compiled pattern
 	 */
-	phalcon_update_property_this(getThis(), SL("_compiledPattern"), compiled_pattern);
+	phalcon_update_property_this(getThis(), SL("_compiledPattern"), &compiled_pattern);
 
 	/** 
 	 * Update the route's paths

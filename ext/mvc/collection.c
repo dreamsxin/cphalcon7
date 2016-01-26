@@ -266,56 +266,50 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 
-	zval **dependency_injector = NULL, **collection_manager = NULL;
-	zval *di = NULL, *mm = NULL;
-	zval *service_name;
+	zval *dependency_injector = NULL, *collection_manager = NULL;
+	zval di, service_name, mm;
 
 	phalcon_fetch_params(0, 0, 2, &dependency_injector, &collection_manager);
-
-	PHALCON_MM_GROW();
 
 	/**
 	 * We use a default DI if the user doesn't define one
 	 */
-	if (!dependency_injector || Z_TYPE_P(*dependency_injector) != IS_OBJECT) {
+	if (!dependency_injector || Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault");
-	}
-	else {
-		di = *dependency_injector;
+	} else {
+		ZVAL_COPY(&di, dependency_injector);
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(di, phalcon_diinterface_ce, phalcon_mvc_collection_exception_ce, 1);
+	PHALCON_VERIFY_INTERFACE_EX(&di, phalcon_diinterface_ce, phalcon_mvc_collection_exception_ce, 1);
 
-	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), di);
+	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &di);
 
 	/**
 	 * Inject the manager service from the DI
 	 */
-	if (!collection_manager || Z_TYPE_P(*collection_manager) != IS_OBJECT) {
-		PHALCON_ALLOC_INIT_ZVAL(service_name);
-		ZVAL_STRING(service_name, "collectionManager");
+	if (!collection_manager || Z_TYPE_P(collection_manager) != IS_OBJECT) {
+		ZVAL_STRING(&service_name, "collectionManager");
 
-		PHALCON_CALL_METHOD(&mm, di, "getshared", service_name);
-		if (Z_TYPE_P(mm) != IS_OBJECT) {
+		PHALCON_CALL_METHOD(&mm, &di, "getshared", &service_name);
+		if (Z_TYPE(mm) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "The injected service 'collectionManager' is not valid");
 			return;
 		}
-	}
-	else {
-		mm = *collection_manager;
+	} else {
+		ZVAL_COPY(&mm, collection_manager);
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(mm, phalcon_mvc_collection_managerinterface_ce, phalcon_mvc_collection_exception_ce, 1);
+	PHALCON_VERIFY_INTERFACE_EX(&mm, phalcon_mvc_collection_managerinterface_ce, phalcon_mvc_collection_exception_ce, 1);
 
 	/**
 	 * Update the collection-manager
 	 */
-	phalcon_update_property_this(getThis(), SL("_collectionManager"), mm);
+	phalcon_update_property_this(getThis(), SL("_collectionManager"), &mm);
 
 	/**
 	 * The manager always initializes the object
 	 */
-	PHALCON_CALL_METHOD(NULL, mm, "initialize", getThis());
+	PHALCON_CALL_METHOD(NULL, &mm, "initialize", getThis());
 
 	/**
 	 * This allows the developer to execute initialization stuff every time an instance
@@ -324,8 +318,6 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	if (phalcon_method_exists_ex(getThis(), SL("onconstruct")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "onconstruct");
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

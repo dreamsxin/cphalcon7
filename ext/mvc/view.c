@@ -1110,11 +1110,10 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	 * Views are rendered in each engine
 	 */
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(engines), str_key, engine) {
-		zval extension;
+		zval extension, view_engine_path;
 		if (str_key) {
 			ZVAL_STR(&extension, str_key);
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(views_dir_paths), path) {
-				zval view_engine_path;
 				PHALCON_CONCAT_VV(&view_engine_path, path, &extension);
 
 				if (phalcon_file_exists(&view_engine_path) == SUCCESS) {
@@ -1181,8 +1180,8 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	/** 
 	 * Store the data in the cache
 	 */
-	if (Z_TYPE_P(cache) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, cache, "save");
+	if (Z_TYPE(cache) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(NULL, &cache, "save");
 	}
 
 	PHALCON_MM_RESTORE();

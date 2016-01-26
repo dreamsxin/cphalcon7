@@ -329,7 +329,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 
 	PHALCON_CALL_PARENT(&status, phalcon_mvc_collection_gridfs_ce, getThis(), "save", arr, white_list, mode);
 
-	if (PHALCON_IS_FALSE(status)) {
+	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_MM_FALSE;
 	}
 
@@ -486,12 +486,12 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, updateBytes){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, delete){
 
-	zval *status = NULL;
+	zval status;
 
 	PHALCON_MM_GROW();
 
 	PHALCON_CALL_PARENT(&status, phalcon_mvc_collection_gridfs_ce, getThis(), "delete");
-	if (PHALCON_IS_FALSE(status)) {
+	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_MM_FALSE;
 	}
 
@@ -501,53 +501,44 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, delete){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, drop){
 
-	zval *class_name, *collection, *source = NULL, *connection = NULL, *mongo_collection = NULL, *grid_fs = NULL;
-	zval *status = NULL, *ok = NULL;
+	zval class_name, collection, ok, source, connection, mongo_collection, status, grid_fs;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
+	phalcon_get_called_class(&class_name);
+	ce0 = phalcon_fetch_class(&class_name);
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name );
-	ce0 = phalcon_fetch_class(class_name);
-
-	PHALCON_INIT_VAR(collection);
-	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection)) {
-		PHALCON_CALL_METHOD(NULL, collection, "__construct");
+	object_init_ex(&collection, ce0);
+	if (phalcon_has_constructor(&collection)) {
+		PHALCON_CALL_METHOD(NULL, &collection, "__construct");
 	}
 
-	PHALCON_INIT_NVAR(ok);
-	ZVAL_BOOL(ok, 0);
+	ZVAL_FALSE(&ok);
 
-	PHALCON_CALL_METHOD(&source, collection, "getsource");
+	PHALCON_CALL_METHOD(&source, &collection, "getsource");
+	PHALCON_CALL_METHOD(&connection, &collection, "getconnection");
+	PHALCON_CALL_METHOD(&mongo_collection, &connection, "selectcollection", &source);
 
-	PHALCON_CALL_METHOD(&connection, collection, "getconnection");
+	if (Z_TYPE(mongo_collection) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(&status, &mongo_collection, "drop");
 
-	PHALCON_CALL_METHOD(&mongo_collection, connection, "selectcollection", source);
-	if (Z_TYPE_P(mongo_collection) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&status, mongo_collection, "drop");
-
-		if (phalcon_array_isset_str(status, SL("ok"))) {
-			PHALCON_OBS_NVAR(ok);
-			phalcon_array_fetch_str(&ok, status, SL("ok"), PH_NOISY);
+		if (phalcon_array_isset_str(&status, SL("ok"))) {
+			phalcon_array_fetch_str(&ok, &status, SL("ok"), PH_NOISY);
 		}
 	}
 
-	PHALCON_CALL_METHOD(&grid_fs, connection, "getgridfs", source);
-	if (Z_TYPE_P(grid_fs) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&status, grid_fs, "drop");
-		if (phalcon_array_isset_str(status, SL("ok"))) {
-			PHALCON_OBS_NVAR(ok);
-			phalcon_array_fetch_str(&ok, status, SL("ok"), PH_NOISY);
+	PHALCON_CALL_METHOD(&grid_fs, &connection, "getgridfs", &source);
+	if (Z_TYPE(grid_fs) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(&status, &grid_fs, "drop");
+		if (phalcon_array_isset_str(&status, SL("ok"))) {
+			phalcon_array_fetch_str(&ok, &status, SL("ok"), PH_NOISY);
 		}
 	}
 
-	if (zend_is_true(ok)) {
-		RETURN_MM_TRUE;
+	if (zend_is_true(&ok)) {
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getFile){
@@ -563,7 +554,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getFile){
 
 	PHALCON_CALL_METHOD(&source, getThis(), "getsource");
 	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
-	PHALCON_CALL_METHOD(&grid_fs, connection, "getgridfs", source);
+	PHALCON_CALL_METHOD(&grid_fs, &connection, "getgridfs", &source);
 
 	if (Z_TYPE(grid_fs) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Couldn't select mongo GridFS");

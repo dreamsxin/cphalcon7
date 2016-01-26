@@ -533,64 +533,45 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
  */
 PHP_METHOD(Phalcon_Mvc_Model, __construct){
 
-	zval *dependency_injector = NULL, *models_manager = NULL;
-	zval *service_name;
+	zval *di = NULL, *manger = NULL, dependency_injector, service_name, models_manager;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 2, &dependency_injector, &models_manager);
-
-	if (!dependency_injector) {
-		PHALCON_INIT_VAR(dependency_injector);
-	} else {
-		PHALCON_SEPARATE_PARAM(dependency_injector);
+	phalcon_fetch_params(0, 0, 2, &di, &manger);
+	
+	if (!di || Z_TYPE_P(di) != IS_OBJECT) {
+		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 	}
 
-	if (!models_manager) {
-		PHALCON_INIT_VAR(models_manager);
-	} else {
-		PHALCON_SEPARATE_PARAM(models_manager);
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		return;
+	}
+
+	if (!manger || Z_TYPE_P(manger) != IS_OBJECT) {
+		ZVAL_STRING(&service_name, "modelsManager");
+
+		PHALCON_CALL_METHOD(&models_manager, &dependency_injector, "getshared", &service_name);
+		if (Z_TYPE(models_manager) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not valid");
+			return;
+		}
+
+		PHALCON_VERIFY_INTERFACE(&models_manager, phalcon_mvc_model_managerinterface_ce);
 	}
 
 	/**
 	 * We use a default DI if the user doesn't define one
 	 */
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-	}
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
-		return;
-	}
-
-	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
-
-	/**
-	 * Inject the manager service from the DI
-	 */
-	if (Z_TYPE_P(models_manager) != IS_OBJECT) {
-
-		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, "modelsManager");
-
-		PHALCON_CALL_METHOD(&models_manager, dependency_injector, "getshared", service_name);
-		if (Z_TYPE_P(models_manager) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not valid");
-			return;
-		}
-
-		PHALCON_VERIFY_INTERFACE(models_manager, phalcon_mvc_model_managerinterface_ce);
-	}
-
+	
+	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
 	/**
 	 * Update the models-manager
 	 */
-	phalcon_update_property_this(getThis(), SL("_modelsManager"), models_manager);
+	phalcon_update_property_this(getThis(), SL("_modelsManager"), &models_manager);
 
 	/**
 	 * The manager always initializes the object
 	 */
-	PHALCON_CALL_METHOD(NULL, models_manager, "initialize", getThis());
+	PHALCON_CALL_METHOD(NULL, &models_manager, "initialize", getThis());
 
 	/**
 	 * This allows the developer to execute initialization stuff every time an instance
@@ -599,8 +580,6 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 	if (phalcon_method_exists_ex(getThis(), SL("onconstruct")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "onconstruct");
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -612,14 +591,10 @@ PHP_METHOD(Phalcon_Mvc_Model, setEventsManager){
 
 	zval *events_manager, *models_manager;
 
-	PHALCON_MM_GROW();
-
 	phalcon_fetch_params(1, 1, 0, &events_manager);
 
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, models_manager, "setcustomeventsmanager", getThis(), events_manager);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -631,11 +606,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getEventsManager){
 
 	zval *models_manager;
 
-	PHALCON_MM_GROW();
-
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(models_manager, "getcustomeventsmanager", getThis());
-	RETURN_MM();
 }
 
 /**
@@ -645,13 +617,13 @@ PHP_METHOD(Phalcon_Mvc_Model, getEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getModelsMetaData){
 
-	zval *meta_data = NULL, *dependency_injector, *service_name, *has = NULL, *service = NULL;
+	zval *meta_data, service, *dependency_injector, service_name, has;
 
 	PHALCON_MM_GROW();
 
 	meta_data = phalcon_read_property(getThis(), SL("_modelsMetaData"), PH_NOISY);
 	if (Z_TYPE_P(meta_data) == IS_OBJECT) {
-		PHALCON_CPY_WRT(service, meta_data);
+		ZVAL_COPY(&service, meta_data);
 	} else {
 		/**
 		 * Check if the DI is valid
@@ -662,33 +634,31 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsMetaData){
 			return;
 		}
 
-		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, "modelsMetadata");
+		ZVAL_STRING(&service_name, "modelsMetadata");
 
-		PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
-		if (zend_is_true(has)) {
+		PHALCON_CALL_METHOD(&has, dependency_injector, "has", &service_name);
+		if (zend_is_true(&has)) {
 			/**
 			 * Obtain the models-metadata service from the DI
 			 */
-			PHALCON_CALL_METHOD(&service, dependency_injector, "getshared", service_name);
-			if (Z_TYPE_P(service) != IS_OBJECT) {
+			PHALCON_CALL_METHOD(&service, dependency_injector, "getshared", &service_name);
+			if (Z_TYPE(service) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The injected service 'modelsMetadata' is not valid");
 				return;
 			}
 
-			PHALCON_VERIFY_INTERFACE(service, phalcon_mvc_model_metadatainterface_ce);
+			PHALCON_VERIFY_INTERFACE(&service, phalcon_mvc_model_metadatainterface_ce);
 		} else {
-			PHALCON_INIT_NVAR(service);
-			object_init_ex(service, phalcon_mvc_model_metadata_memory_ce);
+			object_init_ex(&service, phalcon_mvc_model_metadata_memory_ce);
 		}
 
 		/**
 		 * Update the models-metada property
 		 */
-		phalcon_update_property_this(getThis(), SL("_modelsMetaData"), service);
+		phalcon_update_property_this(getThis(), SL("_modelsMetaData"), &service);
 	}
 
-	RETURN_CTOR(service);
+	RETURN_CTOR(&service);
 }
 
 /**
@@ -828,11 +798,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getSchema){
 
 	zval *models_manager;
 
-	PHALCON_MM_GROW();
-
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(models_manager, "getmodelschema", getThis());
-	RETURN_MM();
 }
 
 /**
@@ -842,29 +809,23 @@ PHP_METHOD(Phalcon_Mvc_Model, getSchema){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getColumnMap){
 
-	zval *meta_data = NULL, *column_map = NULL, *tmp;
-
-	PHALCON_MM_GROW();
+	zval column_map, meta_data;
 
 	/**
 	 * Check if column renaming is globally activated
 	 */
 	if (likely(PHALCON_GLOBAL(orm).column_renaming)) {
-		tmp = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
+		phalcon_return_property(&column_map, getThis(), SL("_columnMap"));
 
-		if (!zend_is_true(tmp)) {
+		if (!zend_is_true(&column_map)) {
 			PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-			PHALCON_CALL_METHOD(&column_map, meta_data, "getcolumnmap", getThis());
+			PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", getThis());
 
-			phalcon_update_property_this(getThis(), SL("_columnMap"), column_map);
-		} else {
-			PHALCON_CPY_WRT(column_map, tmp);
+			phalcon_update_property_this(getThis(), SL("_columnMap"), &column_map);
 		}
-	} else {
-		PHALCON_INIT_NVAR(column_map);
 	}
 
-	RETURN_CTOR(column_map);
+	RETURN_CTORW(&column_map);
 }
 
 /**
@@ -874,18 +835,14 @@ PHP_METHOD(Phalcon_Mvc_Model, getColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getReverseColumnMap){
 
-	zval *meta_data = NULL, *column_map = NULL;
-
-	PHALCON_MM_GROW();
+	zval meta_data, column_map;
 
 	if (likely(PHALCON_GLOBAL(orm).column_renaming)) {
 		PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-		PHALCON_CALL_METHOD(&column_map, meta_data, "getreversecolumnmap", getThis());
-	} else {
-		PHALCON_INIT_NVAR(column_map);
+		PHALCON_CALL_METHOD(&column_map, &meta_data, "getreversecolumnmap", getThis());
 	}
 
-	RETURN_CTOR(column_map);
+	RETURN_CTORW(&column_map);
 }
 
 /**
@@ -895,14 +852,10 @@ PHP_METHOD(Phalcon_Mvc_Model, getReverseColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getColumns){
 
-	zval *meta_data = NULL;
-
-	PHALCON_MM_GROW();
+	zval meta_data;
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_RETURN_CALL_METHOD(meta_data, "getattributes", getThis());
-
-	PHALCON_MM_RESTORE();
+	PHALCON_RETURN_CALL_METHOD(&meta_data, "getattributes", getThis());
 }
 
 /**
@@ -912,14 +865,10 @@ PHP_METHOD(Phalcon_Mvc_Model, getColumns){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getDataTypes){
 
-	zval *meta_data = NULL;
-
-	PHALCON_MM_GROW();
+	zval meta_data;
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_RETURN_CALL_METHOD(meta_data, "getdatatypes", getThis());
-
-	PHALCON_MM_RESTORE();
+	PHALCON_RETURN_CALL_METHOD(&meta_data, "getdatatypes", getThis());
 }
 
 /**
@@ -932,13 +881,12 @@ PHP_METHOD(Phalcon_Mvc_Model, setConnectionService){
 
 	zval *connection_service, *models_manager;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &connection_service);
+	phalcon_fetch_params(0, 1, 0, &connection_service);
 
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, models_manager, "setconnectionservice", getThis(), connection_service);
-	RETURN_THIS();
+
+	RETURN_THISW();
 }
 
 /**
@@ -951,13 +899,12 @@ PHP_METHOD(Phalcon_Mvc_Model, setReadConnectionService){
 
 	zval *connection_service, *models_manager;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &connection_service);
+	phalcon_fetch_params(0, 1, 0, &connection_service);
 
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, models_manager, "setreadconnectionservice", getThis(), connection_service);
-	RETURN_THIS();
+
+	RETURN_THISW();
 }
 
 /**
@@ -970,13 +917,12 @@ PHP_METHOD(Phalcon_Mvc_Model, setWriteConnectionService){
 
 	zval *connection_service, *models_manager;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &connection_service);
+	phalcon_fetch_params(0, 1, 0, &connection_service);
 
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	PHALCON_CALL_METHOD(NULL, models_manager, "setwriteconnectionservice", getThis(), connection_service);
-	RETURN_THIS();
+
+	RETURN_THISW();
 }
 
 /**
@@ -988,11 +934,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnectionService){
 
 	zval *models_manager;
 
-	PHALCON_MM_GROW();
-
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(models_manager, "getreadconnectionservice", getThis());
-	RETURN_MM();
 }
 
 /**
@@ -1004,11 +947,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnectionService){
 
 	zval *models_manager;
 
-	PHALCON_MM_GROW();
-
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHOD(models_manager, "getwriteconnectionservice", getThis());
-	RETURN_MM();
 }
 
 /**
@@ -1024,6 +964,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setDirtyState){
 	phalcon_fetch_params(0, 1, 0, &dirty_state);
 
 	phalcon_update_property_this(getThis(), SL("_dirtyState"), dirty_state);
+
 	RETURN_THISW();
 }
 
@@ -1049,7 +990,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getDirtyState){
 PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 
 	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL;
-	zval *transaction, *connection = NULL, *models_manager;
+	zval transaction, connection, *models_manager;
 
 	PHALCON_MM_GROW();
 
@@ -1067,24 +1008,24 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	transaction = phalcon_read_property(getThis(), SL("_transaction"), PH_NOISY);
-	if (Z_TYPE_P(transaction) == IS_OBJECT) {
-		if (instanceof_function_ex(Z_OBJCE_P(transaction), phalcon_db_adapterinterface_ce, 1)) {
-			RETURN_CCTOR(transaction);
+	phalcon_return_property(&transaction, getThis(), SL("_transaction"));
+	if (Z_TYPE(transaction) == IS_OBJECT) {
+		if (instanceof_function_ex(Z_OBJCE(transaction), phalcon_db_adapterinterface_ce, 1)) {
+			RETURN_CTOR(&transaction);
 		}
 
-		PHALCON_RETURN_CALL_METHOD(transaction, "getconnection");
+		PHALCON_RETURN_CALL_METHOD(&transaction, "getconnection");
 		RETURN_MM();
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("selectreadconnection")) == SUCCESS) {
 		PHALCON_CALL_METHOD(&connection, getThis(), "selectreadconnection", intermediate, bind_params, bind_types);
-		if (Z_TYPE_P(connection) != IS_OBJECT) {
+		if (Z_TYPE(connection) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectReadConnection' didn't returned a valid connection");
 			return;
 		}
 
-		RETURN_CTOR(connection);
+		RETURN_CTOR(&connection);
 	}
 
 	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
@@ -1103,7 +1044,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 
 	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL;
-	zval *transaction, *connection = NULL, *models_manager;
+	zval transaction, connection, models_manager;
 
 	PHALCON_MM_GROW();
 
@@ -1121,14 +1062,14 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	transaction = phalcon_read_property(getThis(), SL("_transaction"), PH_NOISY);
+	phalcon_return_property(&transaction, getThis(), SL("_transaction"));
 
 	if (Z_TYPE_P(transaction) == IS_OBJECT) {
 		if (instanceof_function_ex(Z_OBJCE_P(transaction), phalcon_db_adapterinterface_ce, 1)) {
 			RETURN_CCTOR(transaction);
 		}
 
-		PHALCON_RETURN_CALL_METHOD(transaction, "getconnection");
+		PHALCON_RETURN_CALL_METHOD(&transaction, "getconnection");
 		RETURN_MM();
 	}
 
@@ -1139,12 +1080,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 			return;
 		}
 
-		RETURN_CTOR(connection);
+		RETURN_CTORW(&connection);
 	}
 
-	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHOD(models_manager, "getwriteconnection", getThis());
-	RETURN_MM();
+	phalcon_return_property(&models_manager, getThis(), SL("_modelsManager"));
+	PHALCON_RETURN_CALL_METHOD(&models_manager, "getwriteconnection", getThis());
 }
 
 /**

@@ -1490,7 +1490,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 
 		phalcon_array_append(&service_params, &params, PH_COPY);
 
-		PHALCON_CALL_METHOD(&builder, &dependency_injector, "get", service_name, &service_params);
+		PHALCON_CALL_METHOD(&builder, &dependency_injector, "get", &service_name, &service_params);
 	} else {
 		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
 		PHALCON_CALL_METHOD(NULL, &builder, "__construct", &params);
@@ -1509,7 +1509,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	/**
 	 * Pass the cache options to the query
 	 */
-	if (phalcon_array_isset_fetch_str(&cache, params, SL("cache"))) {
+	if (phalcon_array_isset_fetch_str(&cache, &params, SL("cache"))) {
 		PHALCON_CALL_METHOD(NULL, &query, "cache", &cache);
 	}
 
@@ -1521,9 +1521,9 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	/**
 	 * Define an hydration mode
 	 */
-	if (Z_TYPE_P(resultset) == IS_OBJECT) {
-		if (phalcon_array_isset_str(&hydration, params, SL("hydration"))) {
-			PHALCON_CALL_METHOD(NULL, resultset, "sethydratemode", &hydration);
+	if (Z_TYPE(resultset) == IS_OBJECT) {
+		if (phalcon_array_isset_fetch_str(&hydration, &params, SL("hydration"))) {
+			PHALCON_CALL_METHOD(NULL, &resultset, "sethydratemode", &hydration);
 		}
 
 		ZVAL_STRING(&event_name, "afterQuery");

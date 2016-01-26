@@ -1827,8 +1827,7 @@ PHP_METHOD(Phalcon_Mvc_View, finish){
  */
 PHP_METHOD(Phalcon_Mvc_View, _createCache){
 
-	zval *dependency_injector, *cache_service = NULL;
-	zval *view_options, *cache_options, *view_cache = NULL;
+	zval *dependency_injector, *view_options, cache_options, cache_service;
 
 	PHALCON_MM_GROW();
 
@@ -1838,20 +1837,13 @@ PHP_METHOD(Phalcon_Mvc_View, _createCache){
 		return;
 	}
 
-	PHALCON_INIT_VAR(cache_service);
-	ZVAL_STRING(cache_service, "viewCache");
+	ZVAL_STRING(&cache_service, "viewCache");
 
 	view_options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (Z_TYPE_P(view_options) == IS_ARRAY) { 
-		if (phalcon_array_isset_str(view_options, SL("cache"))) {
-
-			PHALCON_OBS_VAR(cache_options);
-			phalcon_array_fetch_str(&cache_options, view_options, SL("cache"), PH_NOISY);
-			if (Z_TYPE_P(cache_options) == IS_ARRAY) { 
-				if (phalcon_array_isset_str(cache_options, SL("service"))) {
-					PHALCON_OBS_NVAR(cache_service);
-					phalcon_array_fetch_str(&cache_service, cache_options, SL("service"), PH_NOISY);
-				}
+		if (phalcon_array_isset_fetch_str(&cache_options, view_options, SL("cache"))) {
+			if (Z_TYPE(cache_options) == IS_ARRAY && phalcon_array_isset_str(&cache_options, SL("service"))) {
+				phalcon_array_fetch_str(&cache_service, &cache_options, SL("service"), PH_NOISY);
 			}
 		}
 	}
@@ -1859,14 +1851,13 @@ PHP_METHOD(Phalcon_Mvc_View, _createCache){
 	/** 
 	 * The injected service must be an object
 	 */
-	PHALCON_CALL_METHOD(&view_cache, dependency_injector, "getshared", cache_service);
-	if (Z_TYPE_P(view_cache) != IS_OBJECT) {
+	PHALCON_CALL_METHOD(return_value, dependency_injector, "getshared", &cache_service);
+	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "The injected caching service is invalid");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE(view_cache, phalcon_cache_backendinterface_ce);
-	RETURN_CCTOR(view_cache);
+	PHALCON_VERIFY_INTERFACE(return_value, phalcon_cache_backendinterface_ce);
 }
 
 /**
@@ -1891,22 +1882,20 @@ PHP_METHOD(Phalcon_Mvc_View, isCaching){
  */
 PHP_METHOD(Phalcon_Mvc_View, getCache){
 
-	zval *cache = NULL;
+	zval cache;
 
-	PHALCON_MM_GROW();
-
-	cache = phalcon_read_property(getThis(), SL("_cache"), PH_NOISY);
-	if (zend_is_true(cache)) {
-		if (Z_TYPE_P(cache) != IS_OBJECT) {
+	phalcon_return_property(&cache, getThis(), SL("_cache"));
+	if (zend_is_true(&cache)) {
+		if (Z_TYPE(cache) != IS_OBJECT) {
 			PHALCON_CALL_METHOD(&cache, getThis(), "_createcache");
-			phalcon_update_property_this(getThis(), SL("_cache"), cache);
+			phalcon_update_property_this(getThis(), SL("_cache"), &cache);
 		}
 	} else {
 		PHALCON_CALL_METHOD(&cache, getThis(), "_createcache");
-		phalcon_update_property_this(getThis(), SL("_cache"), cache);
+		phalcon_update_property_this(getThis(), SL("_cache"), &cache);
 	}
 
-	RETURN_CCTOR(cache);
+	RETURN_CTORW(&cache);
 }
 
 /**
@@ -1921,8 +1910,7 @@ PHP_METHOD(Phalcon_Mvc_View, getCache){
  */
 PHP_METHOD(Phalcon_Mvc_View, cache){
 
-	zval *options = NULL, *view_options = NULL, *cache_options = NULL;
-	zval *value = NULL, *cache_level, *cache_mode;
+	zval *options = NULL, view_options, cache_options, *value, cache_level, cache_mode;
 	zend_string *str_key;
 	ulong idx;
 	PHALCON_MM_GROW();
@@ -1934,28 +1922,23 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 	}
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
-		view_options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-		if (Z_TYPE_P(view_options) != IS_ARRAY) { 
-			PHALCON_INIT_NVAR(view_options);
-			array_init(view_options);
+		phalcon_return_property(&view_options, getThis(), SL("_options"));
+		if (Z_TYPE(view_options) != IS_ARRAY) { 
+			array_init(&view_options);
 		}
 
 		/** 
 		 * Get the default cache options
 		 */
-		if (phalcon_array_isset_str(view_options, SL("cache"))) {
-			PHALCON_OBS_VAR(cache_options);
-			phalcon_array_fetch_str(&cache_options, view_options, SL("cache"), PH_NOISY);
-		} else {
-			PHALCON_INIT_NVAR(cache_options);
-			array_init(cache_options);
+		if (!phalcon_array_isset_fetch_str(&cache_options, &view_options, SL("cache"))) {
+			array_init(&cache_options);
 		}
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(options), idx, str_key, value) {
 			if (str_key) {
-				phalcon_array_update_string(cache_options, str_key, value, PH_COPY);
+				phalcon_array_update_string(&cache_options, str_key, value, PH_COPY);
 			} else {
-				phalcon_array_update_long(cache_options, idx, value, PH_COPY);
+				phalcon_array_update_long(&cache_options, idx, value, PH_COPY);
 			}
 
 		} ZEND_HASH_FOREACH_END();
@@ -1963,24 +1946,20 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 		/** 
 		 * Check if the user has defined a default cache level or use 5 as default
 		 */
-		if (phalcon_array_isset_str(cache_options, SL("level"))) {
-			PHALCON_OBS_VAR(cache_level);
-			phalcon_array_fetch_str(&cache_level, cache_options, SL("level"), PH_NOISY);
-			phalcon_update_property_this(getThis(), SL("_cacheLevel"), cache_level);
+		if (phalcon_array_isset_fetch_str(&cache_level, &cache_options, SL("level"))) {
+			phalcon_update_property_this(getThis(), SL("_cacheLevel"), &cache_level);
 		} else {
 			phalcon_update_property_long(getThis(), SL("_cacheLevel"), 5);
 		}
 
-		if (phalcon_array_isset_str(cache_options, SL("mode"))) {
-			PHALCON_OBS_VAR(cache_mode);
-			phalcon_array_fetch_str(&cache_mode, cache_options, SL("mode"), PH_NOISY);
-			phalcon_update_property_this(getThis(), SL("_cacheMode"), cache_mode);
+		if (phalcon_array_isset_fetch_str(&cache_mode, &cache_options, SL("mode"))) {
+			phalcon_update_property_this(getThis(), SL("_cacheMode"), &cache_mode);
 		} else {
 			phalcon_update_property_bool(getThis(), SL("_cacheMode"), 0);
 		}
 
-		phalcon_array_update_str(view_options, SL("cache"), cache_options, PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_options"), view_options);
+		phalcon_array_update_str(view_options, SL("cache"), &cache_options, PH_COPY);
+		phalcon_update_property_this(getThis(), SL("_options"), &view_options);
 	} else {
 		/** 
 		 * If 'options' isn't an array we enable the cache with the default options

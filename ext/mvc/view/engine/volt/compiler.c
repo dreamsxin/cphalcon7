@@ -670,7 +670,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, attributeReader){
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 
 	zval *expr, code, func_arguments, arguments, name_expr, name_type, name, *extensions;
-	zval event, fire_arguments, *functions, definition, parameters, line, file, exception_message, *macros;
+	zval event, fire_arguments, functions, definition, parameters, line, file, exception_message, *macros;
 	zval *extended_blocks, *current_block, *expr_level, block, escaped_code, camelized, method, class_name, array_helpers;
 
 	PHALCON_MM_GROW();
@@ -685,7 +685,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		return;
 	}
 
-	if (phalcon_array_isset_str_fetch_str(&func_arguments, expr, SL("arguments"))) {
+	if (phalcon_array_isset_fetch_str(&func_arguments, expr, SL("arguments"))) {
 		PHALCON_CALL_METHOD(&arguments, getThis(), "expression", &func_arguments);
 	}
 
@@ -719,8 +719,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 		/** 
 		 * Check if it's a user defined function
 		 */
-		functions = phalcon_read_property(getThis(), SL("_functions"), PH_NOISY);
-		if (Z_TYPE_P(functions) == IS_ARRAY) { 
+		phalcon_return_property(&functions, getThis(), SL("_functions"));
+		if (Z_TYPE(functions) == IS_ARRAY) { 
 			if (phalcon_array_isset_fetch(&definition, &functions, &name)) {
 				/** 
 				 * Use the string as function
@@ -934,8 +934,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 
-	zval *test, *left, *type, *name = NULL, *test_name, *test_arguments = NULL;
-	zval *arguments = NULL, *right_code = NULL;
+	zval *test, *left, type, name, test_name, test_arguments, arguments, right_code;
 
 	PHALCON_MM_GROW();
 
@@ -949,21 +948,18 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 		return;
 	}
 
-	PHALCON_OBS_VAR(type);
 	phalcon_array_fetch_str(&type, test, SL("type"), PH_NOISY);
 
 	/** 
 	 * Check if right part is a single identifier
 	 */
-	if (PHALCON_IS_LONG(type, PHVOLT_T_IDENTIFIER)) {
-
-		PHALCON_OBS_VAR(name);
+	if (PHALCON_IS_LONG(&type, PHVOLT_T_IDENTIFIER)) {
 		phalcon_array_fetch_str(&name, test, SL("value"), PH_NOISY);
 
 		/** 
 		 * Empty uses the PHP's empty operator
 		 */
-		if (PHALCON_IS_STRING(name, "empty")) {
+		if (PHALCON_IS_STRING(&name, "empty")) {
 			PHALCON_CONCAT_SVS(return_value, "empty(", left, ")");
 			RETURN_MM();
 		}
@@ -971,7 +967,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 		/** 
 		 * Check if a value is even
 		 */
-		if (PHALCON_IS_STRING(name, "even")) {
+		if (PHALCON_IS_STRING(&name, "even")) {
 			PHALCON_CONCAT_SVS(return_value, "(((", left, ") % 2) == 0)");
 			RETURN_MM();
 		}
@@ -979,7 +975,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 		/** 
 		 * Check if a value is odd
 		 */
-		if (PHALCON_IS_STRING(name, "odd")) {
+		if (PHALCON_IS_STRING(&name, "odd")) {
 			PHALCON_CONCAT_SVS(return_value, "(((", left, ") % 2) != 0)");
 			RETURN_MM();
 		}
@@ -987,7 +983,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 		/** 
 		 * Check if a value is numeric
 		 */
-		if (PHALCON_IS_STRING(name, "numeric")) {
+		if (PHALCON_IS_STRING(&name, "numeric")) {
 			PHALCON_CONCAT_SVS(return_value, "is_numeric(", left, ")");
 			RETURN_MM();
 		}
@@ -995,7 +991,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 		/** 
 		 * Check if a value is scalar
 		 */
-		if (PHALCON_IS_STRING(name, "scalar")) {
+		if (PHALCON_IS_STRING(&name, "scalar")) {
 			PHALCON_CONCAT_SVS(return_value, "is_scalar(", left, ")");
 			RETURN_MM();
 		}
@@ -1003,7 +999,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 		/** 
 		 * Check if a value is iterable
 		 */
-		if (PHALCON_IS_STRING(name, "iterable")) {
+		if (PHALCON_IS_STRING(&name, "iterable")) {
 			PHALCON_CONCAT_SVSVS(return_value, "(is_array(", left, ") || (", left, ") instanceof Traversable)");
 			RETURN_MM();
 		}
@@ -1012,47 +1008,40 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 	/** 
 	 * Check if right part is a function call
 	 */
-	if (PHALCON_IS_LONG(type, PHVOLT_T_FCALL)) {
-
-		PHALCON_OBS_VAR(test_name);
+	if (PHALCON_IS_LONG(&type, PHVOLT_T_FCALL)) {
 		phalcon_array_fetch_str(&test_name, test, SL("name"), PH_NOISY);
-		if (phalcon_array_isset_str(test_name, SL("value"))) {
+		if (phalcon_array_isset_fetch_str(&name, &test_name, SL("value"))) {
 
 			/** 
 			 * Checks if a value is divisible by other
 			 */
-			PHALCON_OBS_NVAR(name);
-			phalcon_array_fetch_str(&name, test_name, SL("value"), PH_NOISY);
-			if (PHALCON_IS_STRING(name, "divisibleby")) {
-				PHALCON_OBS_VAR(test_arguments);
+			if (PHALCON_IS_STRING(&name, "divisibleby")) {
 				phalcon_array_fetch_str(&test_arguments, test, SL("arguments"), PH_NOISY);
 
-				PHALCON_CALL_METHOD(&arguments, getThis(), "expression", test_arguments);
-				PHALCON_CONCAT_SVSVS(return_value, "(((", left, ") % (", arguments, ")) == 0)");
+				PHALCON_CALL_METHOD(&arguments, getThis(), "expression", &test_arguments);
+				PHALCON_CONCAT_SVSVS(return_value, "(((", left, ") % (", &arguments, ")) == 0)");
 				RETURN_MM();
 			}
 
 			/** 
 			 * Checks if a value is equals to other
 			 */
-			if (PHALCON_IS_STRING(name, "sameas")) {
-				PHALCON_OBS_NVAR(test_arguments);
+			if (PHALCON_IS_STRING(&name, "sameas")) {
 				phalcon_array_fetch_str(&test_arguments, test, SL("arguments"), PH_NOISY);
 
-				PHALCON_CALL_METHOD(&arguments, getThis(), "expression", test_arguments);
-				PHALCON_CONCAT_SVSVS(return_value, "(", left, ") === (", arguments, ")");
+				PHALCON_CALL_METHOD(&arguments, getThis(), "expression", &test_arguments);
+				PHALCON_CONCAT_SVSVS(return_value, "(", left, ") === (", &arguments, ")");
 				RETURN_MM();
 			}
 
 			/** 
 			 * Checks if a variable match a type
 			 */
-			if (PHALCON_IS_STRING(name, "type")) {
-				PHALCON_OBS_NVAR(test_arguments);
+			if (PHALCON_IS_STRING(&name, "type")) {
 				phalcon_array_fetch_str(&test_arguments, test, SL("arguments"), PH_NOISY);
 
-				PHALCON_CALL_METHOD(&arguments, getThis(), "expression", test_arguments);
-				PHALCON_CONCAT_SVSVS(return_value, "gettype(", left, ") === (", arguments, ")");
+				PHALCON_CALL_METHOD(&arguments, getThis(), "expression", &test_arguments);
+				PHALCON_CONCAT_SVSVS(return_value, "gettype(", left, ") === (", &arguments, ")");
 				RETURN_MM();
 			}
 		}
@@ -1062,7 +1051,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 	 * Fall back to the equals operator
 	 */
 	PHALCON_CALL_METHOD(&right_code, getThis(), "expression", test);
-	PHALCON_CONCAT_VSV(return_value, left, " == ", right_code);
+	PHALCON_CONCAT_VSV(return_value, left, " == ", &right_code);
 
 	RETURN_MM();
 }
@@ -1076,14 +1065,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 
-	zval *filter, *left, *code = NULL, *type, *name = NULL, *function_name;
-	zval *line = NULL, *file = NULL, exception_message, *func_arguments = NULL;
-	zval *arguments = NULL, *resolved_expr, *resolved_param;
-	zval *extensions, *event, *fire_arguments, *filters;
+	zval *filter, *left, code, type, name, function_name, line, file, exception_message, func_arguments;
+	zval arguments, resolved_expr, resolved_param, extensions, event, fire_arguments, filters, definition, parameters;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 0, &filter, &left);
+	phalcon_fetch_params(0, 2, 0, &filter, &left);
 
 	/** 
 	 * Valid filters are always arrays
@@ -1093,126 +1080,98 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 		return;
 	}
 
-	PHALCON_INIT_VAR(code);
-
-	PHALCON_OBS_VAR(type);
 	phalcon_array_fetch_str(&type, filter, SL("type"), PH_NOISY);
 
 	/** 
 	 * Check if the filter is a single identifier
 	 */
-	if (PHALCON_IS_LONG(type, PHVOLT_T_IDENTIFIER)) {
-		PHALCON_OBS_VAR(name);
+	if (PHALCON_IS_LONG(&type, PHVOLT_T_IDENTIFIER)) {
 		phalcon_array_fetch_str(&name, filter, SL("value"), PH_NOISY);
 	} else if (PHALCON_IS_LONG(type, PHVOLT_T_FCALL)) {
-		PHALCON_OBS_VAR(function_name);
 		phalcon_array_fetch_str(&function_name, filter, SL("name"), PH_NOISY);
-
-		PHALCON_OBS_NVAR(name);
-		phalcon_array_fetch_str(&name, function_name, SL("value"), PH_NOISY);
+		phalcon_array_fetch_str(&name, &function_name, SL("value"), PH_NOISY);
 	} else {
 		/**
 		 * Unknown filter throw an exception
 		 */
-		PHALCON_OBS_VAR(line);
 		phalcon_array_fetch_str(&line, filter, SL("line"), PH_NOISY);
-
-		PHALCON_OBS_VAR(file);
 		phalcon_array_fetch_str(&file, filter, SL("file"), PH_NOISY);
 
-		PHALCON_CONCAT_SVSV(&exception_message, "Unknown filter type in ", file, " on line ", line);
+		PHALCON_CONCAT_SVSV(&exception_message, "Unknown filter type in ", &file, " on line ", &line);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
-
-	PHALCON_INIT_VAR(func_arguments);
-
-	PHALCON_INIT_VAR(arguments);
 
 	/** 
 	 * Resolve arguments
 	 */
 	if (phalcon_array_isset_str(filter, SL("arguments"))) {
-
-		PHALCON_OBS_NVAR(file);
 		phalcon_array_fetch_str(&file, filter, SL("file"), PH_NOISY);
-
-		PHALCON_OBS_NVAR(line);
 		phalcon_array_fetch_str(&line, filter, SL("line"), PH_NOISY);
-
-		PHALCON_OBS_NVAR(func_arguments);
 		phalcon_array_fetch_str(&func_arguments, filter, SL("arguments"), PH_NOISY);
 
 		/** 
 		 * 'default' filter is not the first argument, improve this!
 		 */
-		if (!PHALCON_IS_STRING(name, "default")) {
-			PHALCON_INIT_VAR(resolved_expr);
-			array_init_size(resolved_expr, 4);
-			add_assoc_long_ex(resolved_expr, ISL(type), PHVOLT_T_RESOLVED_EXPR);
-			phalcon_array_update_string(resolved_expr, IS(value), left, PH_COPY);
-			phalcon_array_update_string(resolved_expr, IS(file), file, PH_COPY);
-			phalcon_array_update_string(resolved_expr, IS(line), line, PH_COPY);
+		if (!PHALCON_IS_STRING(&name, "default")) {
+			array_init_size(&resolved_expr, 4);
+			add_assoc_long_ex(&resolved_expr, ISL(type), PHVOLT_T_RESOLVED_EXPR);
+			phalcon_array_update_string(&resolved_expr, IS(value), left, PH_COPY);
+			phalcon_array_update_string(&resolved_expr, IS(file), &file, PH_COPY);
+			phalcon_array_update_string(&resolved_expr, IS(line), &line, PH_COPY);
 
-			PHALCON_INIT_VAR(resolved_param);
-			array_init_size(resolved_param, 3);
-			phalcon_array_update_string(resolved_param, IS(expr), resolved_expr, PH_COPY);
-			phalcon_array_update_string(resolved_param, IS(file), file, PH_COPY);
-			phalcon_array_update_string(resolved_param, IS(line), line, PH_COPY);
+			array_init_size(&resolved_param, 3);
+			phalcon_array_update_string(&resolved_param, IS(expr), &resolved_expr, PH_COPY);
+			phalcon_array_update_string(&resolved_param, IS(file), &file, PH_COPY);
+			phalcon_array_update_string(&resolved_param, IS(line), &line, PH_COPY);
 
-			ZVAL_MAKE_REF(func_arguments);
-			PHALCON_CALL_FUNCTION(NULL, "array_unshift", func_arguments, resolved_param);
-			ZVAL_UNREF(func_arguments);
+			ZVAL_MAKE_REF(&func_arguments);
+			PHALCON_CALL_FUNCTION(NULL, "array_unshift", &func_arguments, &resolved_param);
+			ZVAL_UNREF(&func_arguments);
 		}
 
-		PHALCON_CALL_METHOD(&arguments, getThis(), "expression", func_arguments);
+		PHALCON_CALL_METHOD(&arguments, getThis(), "expression", &func_arguments);
 	} else {
-		PHALCON_CPY_WRT(arguments, left);
+		ZVAL_COPY(&arguments, left);
 	}
 
 	/** 
 	 * Check if any of the registered extensions provide compilation for this filter
 	 */
-	extensions = phalcon_read_property(getThis(), SL("_extensions"), PH_NOISY);
-	if (Z_TYPE_P(extensions) == IS_ARRAY) { 
+	phalcon_return_property(&extensions, getThis(), SL("_extensions"));
+	if (Z_TYPE(extensions) == IS_ARRAY) {
+		ZVAL_STRING(&event, "compileFilter");
 
-		PHALCON_INIT_VAR(event);
-		ZVAL_STRING(event, "compileFilter");
+		array_init_size(&fire_arguments, 3);
+		phalcon_array_append(&fire_arguments, &name, PH_COPY);
+		phalcon_array_append(&fire_arguments, &arguments, PH_COPY);
+		phalcon_array_append(&fire_arguments, &func_arguments, PH_COPY);
 
-		PHALCON_INIT_VAR(fire_arguments);
-		array_init_size(fire_arguments, 3);
-		phalcon_array_append(fire_arguments, name, PH_COPY);
-		phalcon_array_append(fire_arguments, arguments, PH_COPY);
-		phalcon_array_append(fire_arguments, func_arguments, PH_COPY);
-
-		PHALCON_CALL_METHOD(&code, getThis(), "fireextensionevent", event, fire_arguments);
-		if (Z_TYPE_P(code) == IS_STRING) {
-			RETURN_CCTOR(code);
+		PHALCON_CALL_METHOD(&code, getThis(), "fireextensionevent", &event, &fire_arguments);
+		if (Z_TYPE(code) == IS_STRING) {
+			RETURN_CTOR(&code);
 		}
 	}
 
 	/** 
 	 * Check if it's a user defined filter
 	 */
-	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
-	if (Z_TYPE_P(filters) == IS_ARRAY) { 
-		zval definition;
-
-		if (phalcon_array_isset_fetch(&definition, filters, name)) {
+	phalcon_return_property(&filters, getThis(), SL("_filters"));
+	if (Z_TYPE(filters) == IS_ARRAY) { 
+		if (phalcon_array_isset_fetch(&definition, &filters, &name)) {
 			/** 
 			 * The definition is a string
 			 */
-			if (Z_TYPE_P(&definition) == IS_STRING) {
-				PHALCON_CONCAT_VSVS(return_value, &definition, "(", arguments, ")");
+			if (Z_TYPE(definition) == IS_STRING) {
+				PHALCON_CONCAT_VSVS(return_value, &definition, "(", &arguments, ")");
 				RETURN_MM();
 			}
 
 			/** 
 			 * The definition is a closure
 			 */
-			if (Z_TYPE_P(&definition) == IS_OBJECT) {
-				if (instanceof_function(Z_OBJCE_P(&definition), zend_ce_closure)) {
-					zval parameters;
+			if (Z_TYPE(definition) == IS_OBJECT) {
+				if (instanceof_function(Z_OBJCE(definition), zend_ce_closure)) {
 					array_init_size(&parameters, 2);
 					phalcon_array_append(&parameters, arguments, PH_COPY);
 					phalcon_array_append(&parameters, func_arguments, PH_COPY);
@@ -1224,13 +1183,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 			/** 
 			 * Invalid filter definition throw an exception
 			 */
-			PHALCON_OBS_NVAR(line);
 			phalcon_array_fetch_str(&line, filter, SL("line"), PH_NOISY);
-
-			PHALCON_OBS_NVAR(file);
 			phalcon_array_fetch_str(&file, filter, SL("file"), PH_NOISY);
 
-			PHALCON_CONCAT_SVSVSV(&exception_message, "Invalid definition for user filter '", name, "' in ", file, " on line ", line);
+			PHALCON_CONCAT_SVSVSV(&exception_message, "Invalid definition for user filter '", &name, "' in ", &file, " on line ", &line);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 			return;
 		}
@@ -1239,128 +1195,128 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	/** 
 	 * 'length' uses the length method implemented in the Volt adapter
 	 */
-	if (PHALCON_IS_STRING(name, "length")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->length(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "length")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->length(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'e' filter uses the escaper component
 	 */
-	if (PHALCON_IS_STRING(name, "e")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeHtml(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "e")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeHtml(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'escape' filter uses the escaper component
 	 */
-	if (PHALCON_IS_STRING(name, "escape")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeHtml(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "escape")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeHtml(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'escapecss' filter uses the escaper component to filter css
 	 */
-	if (PHALCON_IS_STRING(name, "escape_css")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeCss(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "escape_css")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeCss(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'escapejs' filter uses the escaper component to escape javascript
 	 */
-	if (PHALCON_IS_STRING(name, "escape_js")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeJs(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "escape_js")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeJs(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'escapeattr' filter uses the escaper component to escape html attributes
 	 */
-	if (PHALCON_IS_STRING(name, "escape_attr")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeHtmlAttr(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "escape_attr")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->escaper->escapeHtmlAttr(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'trim' calls the "trim" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "trim")) {
-		PHALCON_CONCAT_SVS(return_value, "trim(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "trim")) {
+		PHALCON_CONCAT_SVS(return_value, "trim(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'left_trim' calls the "ltrim" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "left_trim")) {
-		PHALCON_CONCAT_SVS(return_value, "ltrim(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "left_trim")) {
+		PHALCON_CONCAT_SVS(return_value, "ltrim(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'right_trim' calls the "rtrim" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "right_trim")) {
-		PHALCON_CONCAT_SVS(return_value, "rtrim(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "right_trim")) {
+		PHALCON_CONCAT_SVS(return_value, "rtrim(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'striptags' calls the "strip_tags" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "striptags")) {
-		PHALCON_CONCAT_SVS(return_value, "strip_tags(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "striptags")) {
+		PHALCON_CONCAT_SVS(return_value, "strip_tags(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'urlencode' calls the "urlencode" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "url_encode")) {
-		PHALCON_CONCAT_SVS(return_value, "urlencode(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "url_encode")) {
+		PHALCON_CONCAT_SVS(return_value, "urlencode(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'slashes' calls the "addslashes" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "slashes")) {
-		PHALCON_CONCAT_SVS(return_value, "addslashes(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "slashes")) {
+		PHALCON_CONCAT_SVS(return_value, "addslashes(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'stripslashes' calls the "stripslashes" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "stripslashes")) {
-		PHALCON_CONCAT_SVS(return_value, "stripslashes(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "stripslashes")) {
+		PHALCON_CONCAT_SVS(return_value, "stripslashes(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'nl2br' calls the "nl2br" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "nl2br")) {
-		PHALCON_CONCAT_SVS(return_value, "nl2br(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "nl2br")) {
+		PHALCON_CONCAT_SVS(return_value, "nl2br(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'keys' uses calls the "array_keys" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "keys")) {
-		PHALCON_CONCAT_SVS(return_value, "array_keys(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "keys")) {
+		PHALCON_CONCAT_SVS(return_value, "array_keys(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'join' uses calls the "join" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "join")) {
-		PHALCON_CONCAT_SVS(return_value, "join(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "join")) {
+		PHALCON_CONCAT_SVS(return_value, "join(", &arguments, ")");
 		RETURN_MM();
 	}
 
@@ -1368,8 +1324,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	 * 'lowercase' calls the "strtolower" function or "mb_strtolower" if the mbstring
 	 * extension is loaded
 	 */
-	if (PHALCON_IS_STRING(name, "lowercase")) {
-		PHALCON_CONCAT_SVS(return_value, "Phalcon\\Text::lower(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "lowercase")) {
+		PHALCON_CONCAT_SVS(return_value, "Phalcon\\Text::lower(", &arguments, ")");
 		RETURN_MM();
 	}
 
@@ -1377,8 +1333,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	 * 'lowercase' calls the "strtolower" function or "mb_strtolower" if the mbstring
 	 * extension is loaded
 	 */
-	if (PHALCON_IS_STRING(name, "lower")) {
-		PHALCON_CONCAT_SVS(return_value, "Phalcon\\Text::lower(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "lower")) {
+		PHALCON_CONCAT_SVS(return_value, "Phalcon\\Text::lower(", &arguments, ")");
 		RETURN_MM();
 	}
 
@@ -1386,8 +1342,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	 * 'uppercase' calls the "strtouppwer" function or "mb_strtoupper" if the mbstring
 	 * extension is loaded
 	 */
-	if (PHALCON_IS_STRING(name, "uppercase")) {
-		PHALCON_CONCAT_SVS(return_value, "Phalcon\\Text::upper(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "uppercase")) {
+		PHALCON_CONCAT_SVS(return_value, "Phalcon\\Text::upper(", &arguments, ")");
 		RETURN_MM();
 	}
 
@@ -1395,72 +1351,72 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	 * 'uppercase' calls the "strtouppwer" function or "mb_strtoupper" if the mbstring
 	 * extension is loaded
 	 */
-	if (PHALCON_IS_STRING(name, "upper")) {
-		PHALCON_CONCAT_SVS(return_value, "Phalcon\\Text::upper(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "upper")) {
+		PHALCON_CONCAT_SVS(return_value, "Phalcon\\Text::upper(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'capitalize' filter calls 'ucwords'
 	 */
-	if (PHALCON_IS_STRING(name, "capitalize")) {
-		PHALCON_CONCAT_SVS(return_value, "ucwords(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "capitalize")) {
+		PHALCON_CONCAT_SVS(return_value, "ucwords(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'sort' calls 'sort' method in the engine adapter
 	 */
-	if (PHALCON_IS_STRING(name, "sort")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->sort(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "sort")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->sort(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'json_encode' calls the "json_encode" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "json_encode")) {
-		PHALCON_CONCAT_SVS(return_value, "json_encode(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "json_encode")) {
+		PHALCON_CONCAT_SVS(return_value, "json_encode(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'json_decode' calls the "json_decode" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "json_decode")) {
-		PHALCON_CONCAT_SVS(return_value, "json_decode(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "json_decode")) {
+		PHALCON_CONCAT_SVS(return_value, "json_decode(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'format' calls the "sprintf" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "format")) {
-		PHALCON_CONCAT_SVS(return_value, "sprintf(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "format")) {
+		PHALCON_CONCAT_SVS(return_value, "sprintf(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'abs' calls the "abs" function in the PHP userland
 	 */
-	if (PHALCON_IS_STRING(name, "abs")) {
-		PHALCON_CONCAT_SVS(return_value, "abs(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "abs")) {
+		PHALCON_CONCAT_SVS(return_value, "abs(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'slice' slices string/arrays/traversable objects
 	 */
-	if (PHALCON_IS_STRING(name, "slice")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->slice(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "slice")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->slice(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * 'default' checks if a variable is empty
 	 */
-	if (PHALCON_IS_STRING(name, "default")) {
-		PHALCON_CONCAT_SVSVSVS(return_value, "(empty(", left, ") ? (", arguments, ") : (", left, "))");
+	if (PHALCON_IS_STRING(&name, "default")) {
+		PHALCON_CONCAT_SVSVSVS(return_value, "(empty(", left, ") ? (", &arguments, ") : (", left, "))");
 		RETURN_MM();
 	}
 
@@ -1468,21 +1424,18 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	 * This function uses mbstring or iconv to convert strings from one chartset to
 	 * another
 	 */
-	if (PHALCON_IS_STRING(name, "convert_encoding")) {
-		PHALCON_CONCAT_SVS(return_value, "$this->convertEncoding(", arguments, ")");
+	if (PHALCON_IS_STRING(&name, "convert_encoding")) {
+		PHALCON_CONCAT_SVS(return_value, "$this->convertEncoding(", &arguments, ")");
 		RETURN_MM();
 	}
 
 	/** 
 	 * Unknown filter throw an exception
 	 */
-	PHALCON_OBS_NVAR(line);
 	phalcon_array_fetch_str(&line, filter, SL("line"), PH_NOISY);
-
-	PHALCON_OBS_NVAR(file);
 	phalcon_array_fetch_str(&file, filter, SL("file"), PH_NOISY);
 
-	PHALCON_CONCAT_SVSVSV(&exception_message, "Unknown filter \"", name, "\" in ", file, " on line ", line);
+	PHALCON_CONCAT_SVSVSV(&exception_message, "Unknown filter \"", &name, "\" in ", &file, " on line ", &line);
 	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 	return;
 }

@@ -1460,7 +1460,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
@@ -1468,7 +1468,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	ZVAL_STRING(&service_name, "modelsManager");
 
 	PHALCON_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
-	PHALCON_CALL_METHOD(&model, manager, "load", model_name);
+	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
 
 	if (Z_TYPE_P(parameters) != IS_ARRAY) { 
 		array_init(&params);
@@ -1476,7 +1476,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 			phalcon_array_append(&params, parameters, PH_COPY);
 		}
 	} else {
-		ZVAl_COPY(&params, parameters);
+		ZVAL_COPY(&params, parameters);
 	}
 
 	/**
@@ -1484,20 +1484,19 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	 */
 	ZVAL_STRING(&service_name, "modelsQueryBuilder");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", &service_name);
+	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
-		PHALCON_INIT_VAR(service_params);
-		array_init(service_params);
+		array_init(&service_params);
 
-		phalcon_array_append(service_params, params, PH_COPY);
+		phalcon_array_append(&service_params, &params, PH_COPY);
 
-		PHALCON_CALL_METHOD(&builder, dependency_injector, "get", service_name, service_params);
+		PHALCON_CALL_METHOD(&builder, &dependency_injector, "get", service_name, &service_params);
 	} else {
 		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
 		PHALCON_CALL_METHOD(NULL, &builder, "__construct", &params);
 	}
 
-	PHALCON_CALL_METHOD(NULL, &builder, "from", model_name);
+	PHALCON_CALL_METHOD(NULL, &builder, "from", &model_name);
 
 	ZVAL_STRING(&event_name, "beforeQuery");
 

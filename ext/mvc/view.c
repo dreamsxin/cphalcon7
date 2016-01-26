@@ -1561,7 +1561,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 						PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
 					} ZEND_HASH_FOREACH_END();
 
-					ZVAL_TRUE(silence);
+					ZVAL_TRUE(&silence);
 				}
 			}
 		}
@@ -1613,34 +1613,25 @@ PHP_METHOD(Phalcon_Mvc_View, render){
  */
 PHP_METHOD(Phalcon_Mvc_View, pick){
 
-	zval *render_view, *pick_view = NULL, *layout = NULL, *parts;
+	zval *render_view, pick_view, parts, layout;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &render_view);
+	phalcon_fetch_params(0, 1, 0, &render_view);
 
 	if (Z_TYPE_P(render_view) == IS_ARRAY) { 
-		PHALCON_CPY_WRT(pick_view, render_view);
+		ZVAL_COPY(&pick_view, render_view);
 	} else {
-		PHALCON_INIT_VAR(layout);
+		array_init_size(&pick_view, 2);
+		phalcon_array_append(&pick_view, render_view, PH_COPY);
+
 		if (phalcon_memnstr_str(render_view, SL("/"))) {
-			PHALCON_INIT_VAR(parts);
-			phalcon_fast_explode_str(parts, SL("/"), render_view);
-
-			PHALCON_OBS_NVAR(layout);
-			phalcon_array_fetch_long(&layout, parts, 0, PH_NOISY);
-		}
-
-		PHALCON_INIT_NVAR(pick_view);
-		array_init_size(pick_view, 2);
-		phalcon_array_append(pick_view, render_view, PH_COPY);
-		if (Z_TYPE_P(layout) != IS_NULL) {
-			phalcon_array_append(pick_view, layout, PH_COPY);
+			phalcon_fast_explode_str(&parts, SL("/"), render_view);
+			phalcon_array_fetch_long(&layout, &parts, 0, PH_NOISY);
+			phalcon_array_append(&pick_view, &layout, PH_COPY);
 		}
 	}
-	phalcon_update_property_this(getThis(), SL("_pickView"), pick_view);
+	phalcon_update_property_this(getThis(), SL("_pickView"), &pick_view);
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -1662,8 +1653,8 @@ PHP_METHOD(Phalcon_Mvc_View, pick){
  */
 PHP_METHOD(Phalcon_Mvc_View, partial){
 
-	zval *partial_path, *params = NULL, *autorender = NULL, *view_params, *new_params = NULL;
-	zval *partials_dir, *enable_partials_absolute_path, *real_path, *engines = NULL;
+	zval *partial_path, *params = NULL, *autorender = NULL, *view_params, new_params;
+	zval *partials_dir, *enable_partials_absolute_path, real_path, engines;
 
 	PHALCON_MM_GROW();
 
@@ -1687,16 +1678,15 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 		 * Merge or assign the new params as parameters
 		 */
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(new_params);
-			phalcon_fast_array_merge(new_params, view_params, params);
+			phalcon_fast_array_merge(&new_params, view_params, params);
 		} else {
-			PHALCON_CPY_WRT(new_params, params);
+			ZVAL_COPY(&new_params, params);
 		}
 
 		/** 
 		 * Update the parameters with the new ones
 		 */
-		phalcon_update_property_this(getThis(), SL("_viewParams"), new_params);
+		phalcon_update_property_this(getThis(), SL("_viewParams"), &new_params);
 	}
 
 	partials_dir = phalcon_read_property(getThis(), SL("_partialsDir"), PH_NOISY);
@@ -1705,8 +1695,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 	/** 
 	 * Partials are looked up under the partials directory
 	 */
-	PHALCON_INIT_VAR(real_path);
-	PHALCON_CONCAT_VV(real_path, partials_dir, partial_path);
+	PHALCON_CONCAT_VV(&real_path, partials_dir, partial_path);
 
 	/** 
 	 * We need to check if the engines are loaded first, this method could be called
@@ -1717,7 +1706,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 	/** 
 	 * Call engine render, this checks in every registered engine for the partial
 	 */
-	PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", engines, real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), enable_partials_absolute_path);
+	PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), enable_partials_absolute_path);
 
 	/** 
 	 * Now we need to restore the original view parameters
@@ -1752,8 +1741,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
  */
 PHP_METHOD(Phalcon_Mvc_View, getRender){
 
-	zval *controller_name, *action_name, *params = NULL;
-	zval *config_callback = NULL, *view, *status;
+	zval *controller_name, *action_name, *params = NULL, *config_callback = NULL, view, params_tmp, status;
 
 	PHALCON_MM_GROW();
 
@@ -1772,43 +1760,41 @@ PHP_METHOD(Phalcon_Mvc_View, getRender){
 	/** 
 	 * We must to clone the current view to keep the old state
 	 */
-	PHALCON_INIT_VAR(view);
-	if (phalcon_clone(view, getThis()) == FAILURE) {
+	if (phalcon_clone(&view, getThis()) == FAILURE) {
 		RETURN_MM();
 	}
 
 	/** 
 	 * The component must be reset to its defaults
 	 */
-	PHALCON_CALL_METHOD(NULL, view, "reset");
+	PHALCON_CALL_METHOD(NULL, &view, "reset");
 
 	/** 
 	 * Set the render variables
 	 */
 	if (Z_TYPE_P(params) == IS_ARRAY) { 
-		PHALCON_CALL_METHOD(NULL, view, "setvars", params);
+		PHALCON_CALL_METHOD(NULL, &view, "setvars", params);
 	}
 
 	/** 
 	 * Perform extra configurations over the cloned object
 	 */
 	if (Z_TYPE_P(config_callback) == IS_OBJECT) {
-		PHALCON_INIT_NVAR(params);
-		array_init_size(params, 1);
-		phalcon_array_append(params, view, PH_COPY);
+		array_init_size(&params_tmp, 1);
+		phalcon_array_append(&params_tmp, &view, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAY(&status, config_callback, params);
+		PHALCON_CALL_USER_FUNC_ARRAY(&status, config_callback, &params_tmp);
 	}
 
 	/** 
 	 * Start the output buffering
 	 */
-	PHALCON_CALL_METHOD(NULL, view, "start");
+	PHALCON_CALL_METHOD(NULL, &view, "start");
 
 	/** 
 	 * Perform the render passing only the controller and action
 	 */
-	PHALCON_CALL_METHOD(NULL, view, "render", controller_name, action_name);
+	PHALCON_CALL_METHOD(NULL, &view, "render", controller_name, action_name);
 
 	/** 
 	 * Stop the output buffering
@@ -1818,7 +1804,7 @@ PHP_METHOD(Phalcon_Mvc_View, getRender){
 	/** 
 	 * Get the processed content
 	 */
-	PHALCON_RETURN_CALL_METHOD(view, "getcontent");
+	PHALCON_RETURN_CALL_METHOD(&view, "getcontent");
 
 	PHALCON_MM_RESTORE();
 }

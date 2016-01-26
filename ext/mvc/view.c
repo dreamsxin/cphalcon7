@@ -1293,14 +1293,10 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 PHP_METHOD(Phalcon_Mvc_View, render){
 
 	zval *controller_name, *action_name, *params = NULL, *namespace_name = NULL, *view_model = NULL;
-	zval *disabled, *contents = NULL, *model_content = NULL, *layouts_dir = NULL, *layout, *enable_namespace_view, *lower_case;
-	zval *layout_name = NULL, *layout_namespace = NULL, *engines = NULL, *pick_view, *render_view = NULL;
-	zval *pick_view_action, event_name, *status = NULL;
-	zval *silence = NULL, *disabled_levels, *render_level, *enable_layouts_absolute_path;
-	zval *templates_before, *template_before = NULL;
-	zval *view_temp_path = NULL, *templates_after, *template_after = NULL, *main_view;
-	zval *converter_key, *converter = NULL, *parameters = NULL, *lower_controller_name = NULL, *lower_action_name = NULL, *lower_namespace_name = NULL;
-	zval *ds, *namespace_separator, *ds_lower_namespace_name = NULL;
+	zval ds, namespace_separator, *disabled, contents, converter_key, converter, parameters, *lower_case;
+	zval lower_controller_name, lower_action_name, layouts_dir, *enable_namespace_view, lower_namespace_name, ds_lower_namespace_name, layout_namespace;
+	zval *layout, layout_name, engines, pick_view, render_view, pick_view_action, event_name, status, silence, *disabled_levels;
+	zval *render_level, enable_layouts_absolute_path, model_content, *templates_before, *tpl, view_tpl_path, *templates_after, *main_view;
 	char slash[2] = {DEFAULT_SLASH, 0};
 	int use_model = 0;
 
@@ -1322,11 +1318,8 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		use_model = 1;
 	}
 
-	PHALCON_INIT_VAR(ds);
-	ZVAL_STRING(ds, slash);
-
-	PHALCON_INIT_VAR(namespace_separator);
-	ZVAL_STRING(namespace_separator, "\\");
+	ZVAL_STRING(&ds, slash);
+	ZVAL_STRING(&namespace_separator, "\\");
 
 	phalcon_update_property_this(getThis(), SL("_currentRenderLevel"), &PHALCON_GLOBAL(z_zero));
 
@@ -1336,9 +1329,8 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	disabled = phalcon_read_property(getThis(), SL("_disabled"), PH_NOISY);
 	if (PHALCON_IS_NOT_FALSE(disabled)) {
-		PHALCON_INIT_VAR(contents);
-		phalcon_ob_get_contents(contents);
-		phalcon_update_property_this(getThis(), SL("_content"), contents);
+		phalcon_ob_get_contents(&contents);
+		phalcon_update_property_this(getThis(), SL("_content"), &contents);
 		RETURN_MM_FALSE;
 	}
 
@@ -1347,84 +1339,72 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	phalcon_update_property_this(getThis(), SL("_params"), params);
 	phalcon_update_property_this(getThis(), SL("_namespaceName"), namespace_name);
 
-	PHALCON_INIT_VAR(converter_key);
-	ZVAL_STRING(converter_key, "controller");
+	ZVAL_STRING(&converter_key, "controller");
 
-	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
+	PHALCON_CALL_SELF(&converter, "getconverter", &converter_key);
 
-	if (phalcon_is_callable(converter)) {
-		PHALCON_INIT_NVAR(parameters);
-		array_init_size(parameters, 1);
-		phalcon_array_append(parameters, controller_name, PH_COPY);
+	if (phalcon_is_callable(&converter)) {
+		array_init_size(&parameters, 1);
+		phalcon_array_append(&parameters, controller_name, PH_COPY);
 
 		PHALCON_SEPARATE_PARAM(controller_name);
-		PHALCON_CALL_USER_FUNC_ARRAY(&controller_name, converter, parameters);
+		PHALCON_CALL_USER_FUNC_ARRAY(controller_name, &converter, &parameters);
 	}
 
-	PHALCON_INIT_NVAR(converter_key);
-	ZVAL_STRING(converter_key, "action");
+	ZVAL_STRING(&converter_key, "action");
 
-	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
+	PHALCON_CALL_SELF(&converter, "getconverter", &converter_key);
 
-	if (phalcon_is_callable(converter)) {
-		PHALCON_INIT_NVAR(parameters);
-		array_init_size(parameters, 1);
-		phalcon_array_append(parameters, action_name, PH_COPY);
+	if (phalcon_is_callable(&converter)) {
+		array_init_size(&parameters, 1);
+		phalcon_array_append(&parameters, action_name, PH_COPY);
 
 		PHALCON_SEPARATE_PARAM(action_name);
-		PHALCON_CALL_USER_FUNC_ARRAY(&action_name, converter, parameters);
+		PHALCON_CALL_USER_FUNC_ARRAY(action_name, &converter, &parameters);
 	}
 
-	PHALCON_INIT_NVAR(converter_key);
-	ZVAL_STRING(converter_key, "namespace");
+	ZVAL_STRING(&converter_key, "namespace");
 
-	PHALCON_CALL_SELF(&converter, "getconverter", converter_key);
+	PHALCON_CALL_SELF(&converter, "getconverter", &converter_key);
 
-	if (phalcon_is_callable(converter)) {
-		PHALCON_INIT_NVAR(parameters);
-		array_init_size(parameters, 1);
-		phalcon_array_append(parameters, namespace_name, PH_COPY);
+	if (phalcon_is_callable(&converter)) {
+		array_init_size(&parameters, 1);
+		phalcon_array_append(&parameters, namespace_name, PH_COPY);
 
 		PHALCON_SEPARATE_PARAM(namespace_name);
-		PHALCON_CALL_USER_FUNC_ARRAY(&namespace_name, converter, parameters);
+		PHALCON_CALL_USER_FUNC_ARRAY(namespace_name, &converter, &parameters);
 	}
 
 	lower_case = phalcon_read_property(getThis(), SL("_lowerCase"), PH_NOISY);
 
 	if (zend_is_true(lower_case)) {
-		PHALCON_INIT_VAR(lower_controller_name);
-		phalcon_fast_strtolower(lower_controller_name, controller_name);
-
-		PHALCON_INIT_VAR(lower_action_name);
-		phalcon_fast_strtolower(lower_action_name, action_name);
+		phalcon_fast_strtolower(&lower_controller_name, controller_name);
+		phalcon_fast_strtolower(&lower_action_name, action_name);
 	} else {
-		PHALCON_CPY_WRT_CTOR(lower_controller_name, controller_name);
-		PHALCON_CPY_WRT_CTOR(lower_action_name, action_name);
+		ZVAL_COPY(&lower_controller_name, controller_name);
+		ZVAL_COPY(&lower_action_name, action_name);
 	}
 
 	/** 
 	 * Check if there is a layouts directory set
 	 */
-	layouts_dir = phalcon_read_property(getThis(), SL("_layoutsDir"), PH_NOISY);
-	if (!zend_is_true(layouts_dir)) {
-		PHALCON_INIT_NVAR(layouts_dir);
-		ZVAL_STRING(layouts_dir, "layouts/");
+	phalcon_return_property(&layouts_dir, getThis(), SL("_layoutsDir"), PH_NOISY);
+	if (!zend_is_true(&layouts_dir)) {
+		ZVAL_STRING(&layouts_dir, "layouts/");
 	}
 
 	enable_namespace_view = phalcon_read_property(getThis(), SL("_enableNamespaceView"), PH_NOISY);
 
 	if (zend_is_true(enable_namespace_view)) {
-		PHALCON_INIT_VAR(lower_namespace_name);
 		if (zend_is_true(lower_case)) {
-			phalcon_fast_strtolower(lower_namespace_name, namespace_name);
+			phalcon_fast_strtolower(&lower_namespace_name, namespace_name);
 		} else {
-			PHALCON_CPY_WRT_CTOR(lower_namespace_name, namespace_name);
+			ZVAL_COPY(&lower_namespace_name, namespace_name);
 		}
 
-		PHALCON_STR_REPLACE(&ds_lower_namespace_name, namespace_separator, ds, lower_namespace_name);
+		PHALCON_STR_REPLACE(&ds_lower_namespace_name, &namespace_separator, &ds, &lower_namespace_name);
 
-		PHALCON_INIT_VAR(layout_namespace);
-		PHALCON_CONCAT_SV(layout_namespace, "namespace/", ds_lower_namespace_name);
+		PHALCON_CONCAT_SV(&layout_namespace, "namespace/", &ds_lower_namespace_name);
 	}
 
 	/** 
@@ -1432,12 +1412,11 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	layout = phalcon_read_property(getThis(), SL("_layout"), PH_NOISY);
 	if (zend_is_true(layout)) {
-		PHALCON_CPY_WRT(layout_name, layout);
+		ZVAL_COPY(&layout_name, layout);
 	} else if (ds_lower_namespace_name) {
-		PHALCON_INIT_VAR(layout_name);
-		PHALCON_CONCAT_VSV(layout_name, ds_lower_namespace_name, "/", lower_controller_name);
+		PHALCON_CONCAT_VSV(&layout_name, &ds_lower_namespace_name, "/", &lower_controller_name);
 	} else {
-		PHALCON_CPY_WRT(layout_name, lower_controller_name);
+		ZVAL_COPY(&layout_name, &lower_controller_name);
 	}
 
 	/** 
@@ -1448,26 +1427,21 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/** 
 	 * Check if the user has picked a view diferent than the automatic
 	 */
-	pick_view = phalcon_read_property(getThis(), SL("_pickView"), PH_NOISY);
-	if (Z_TYPE_P(pick_view) == IS_NULL) {
-		PHALCON_INIT_VAR(render_view);
-
-		if (ds_lower_namespace_name) {
-			PHALCON_CONCAT_VSVSV(render_view, ds_lower_namespace_name, "/", lower_controller_name, "/", lower_action_name);
+	phalcon_return_property(&pick_view, getThis(), SL("_pickView"), PH_NOISY);
+	if (Z_TYPE(pick_view) == IS_NULL) {
+		if (PHALCON_IS_NOT_EMPTY(ds_lower_namespace_name)) {
+			PHALCON_CONCAT_VSVSV(&render_view, &ds_lower_namespace_name, "/", &lower_controller_name, "/", &lower_action_name);
 		} else {
-			PHALCON_CONCAT_VSV(render_view, lower_controller_name, "/", lower_action_name);
+			PHALCON_CONCAT_VSV(&render_view, &lower_controller_name, "/", &lower_action_name);
 		}
 	} else {
 		/** 
 		 * The 'picked' view is an array, where the first element is controller and the
 		 * second the action
 		 */
-		PHALCON_OBS_NVAR(render_view);
-		phalcon_array_fetch_long(&render_view, pick_view, 0, PH_NOISY);
-		if (phalcon_array_isset_long(pick_view, 1)) {
-			PHALCON_OBS_VAR(pick_view_action);
-			phalcon_array_fetch_long(&pick_view_action, pick_view, 1, PH_NOISY);
-			PHALCON_CPY_WRT(layout_name, pick_view_action);
+		phalcon_array_fetch_long(&render_view, &pick_view, 0, PH_NOISY);
+		if (phalcon_array_isset_fetch_long(&pick_view_action, &pick_view, 1)) {
+			ZVAL_COPY(&layout_name, &pick_view_action);
 		}
 	}
 
@@ -1477,19 +1451,17 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	ZVAL_STRING(&event_name, "view:beforeRender");
 
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
-	if (PHALCON_IS_FALSE(status)) {
+	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_MM_FALSE;
 	}
 
 	/** 
 	 * Get the current content in the buffer maybe some output from the controller
 	 */
-	PHALCON_INIT_NVAR(contents);
-	phalcon_ob_get_contents(contents);
-	phalcon_update_property_this(getThis(), SL("_content"), contents);
+	phalcon_ob_get_contents(&contents);
+	phalcon_update_property_this(getThis(), SL("_content"), &contents);
 
-	PHALCON_INIT_VAR(silence);
-	ZVAL_BOOL(silence, 1);
+	ZVAL_BOOL(&silence, 1);
 
 	/** 
 	 * Disabled levels allow to avoid an specific level of rendering
@@ -1501,13 +1473,12 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	render_level = phalcon_read_property(getThis(), SL("_renderLevel"), PH_NOISY);
 	if (zend_is_true(render_level)) {
-		PHALCON_OBS_VAR(enable_layouts_absolute_path);
-		enable_layouts_absolute_path = phalcon_read_property(getThis(), SL("_enableLayoutsAbsolutePath"), PH_NOISY);
+		phalcon_return_property(&enable_layouts_absolute_path, getThis(), SL("_enableLayoutsAbsolutePath"));
 
 		if (use_model) {
 			PHALCON_CALL_METHOD(NULL, view_model, "setview", getThis());
 			PHALCON_CALL_METHOD(&model_content, view_model, "render");
-			phalcon_update_property_this(getThis(), SL("_content"), model_content);
+			phalcon_update_property_this(getThis(), SL("_content"), &model_content);
 		}
 
 		if (PHALCON_GE_LONG(render_level, 1)) {
@@ -1516,7 +1487,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 			 */
 			if (!phalcon_array_isset_long(disabled_levels, 1)) {
 				phalcon_update_property_long(getThis(), SL("_currentRenderLevel"), 1);
-				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", engines, render_view, silence, &PHALCON_GLOBAL(z_true));
+				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &render_view, &silence, &PHALCON_GLOBAL(z_true));
 			}
 		}
 
@@ -1534,17 +1505,15 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 				 */
 				if (Z_TYPE_P(templates_before) == IS_ARRAY) { 
 
-					ZVAL_BOOL(silence, 0);
+					ZVAL_FALSE(&silence);
 
-					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(templates_before), template_before) {
-						PHALCON_INIT_NVAR(view_temp_path);
-						PHALCON_CONCAT_VV(view_temp_path, layouts_dir, template_before);
-						PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", engines, view_temp_path, silence, &PHALCON_GLOBAL(z_true), enable_layouts_absolute_path);
+					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(templates_before), tpl) {
+						PHALCON_CONCAT_VV(&view_tpl_path, &layouts_dir, tpl);
+						PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
 
 					} ZEND_HASH_FOREACH_END();
 
-					PHALCON_INIT_NVAR(silence);
-					ZVAL_BOOL(silence, 1);
+					ZVAL_TRUE(&silence);
 				}
 			}
 		}
@@ -1556,9 +1525,8 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 			if (!phalcon_array_isset_long(disabled_levels, 3)) {
 				phalcon_update_property_long(getThis(), SL("_currentRenderLevel"), 3);
 
-				PHALCON_INIT_NVAR(view_temp_path);
-				PHALCON_CONCAT_VV(view_temp_path, layouts_dir, layout_name);
-				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", engines, view_temp_path, silence, &PHALCON_GLOBAL(z_true), enable_layouts_absolute_path);
+				PHALCON_CONCAT_VV(&view_tpl_path, &layouts_dir, layout_name);
+				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
 			}
 		}
 
@@ -1569,9 +1537,8 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 			if (!phalcon_array_isset_long(disabled_levels, 4)) {
 				phalcon_update_property_long(getThis(), SL("_currentRenderLevel"), 4);
 
-				PHALCON_INIT_NVAR(view_temp_path);
-				PHALCON_CONCAT_VV(view_temp_path, layouts_dir, layout_namespace);
-				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", engines, view_temp_path, silence, &PHALCON_GLOBAL(z_true), enable_layouts_absolute_path);
+				PHALCON_CONCAT_VV(&view_tpl_path, &layouts_dir, layout_namespace);
+				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
 			}
 		}
 
@@ -1591,10 +1558,9 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 					PHALCON_INIT_NVAR(silence);
 					ZVAL_BOOL(silence, 0);
 
-					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(templates_after), template_after) {
-						PHALCON_INIT_NVAR(view_temp_path);
-						PHALCON_CONCAT_VV(view_temp_path, layouts_dir, template_after);
-						PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", engines, view_temp_path, silence, &PHALCON_GLOBAL(z_true), enable_layouts_absolute_path);
+					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(templates_after), tpl) {
+						PHALCON_CONCAT_VV(&view_tpl_path, layouts_dir, tpl);
+						PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
 					} ZEND_HASH_FOREACH_END();
 
 					PHALCON_INIT_NVAR(silence);
@@ -1611,7 +1577,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 				phalcon_update_property_long(getThis(), SL("_currentRenderLevel"), 6);
 
 				main_view = phalcon_read_property(getThis(), SL("_mainView"), PH_NOISY);
-				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", engines, main_view, silence, &PHALCON_GLOBAL(z_true));
+				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, main_view, &silence, &PHALCON_GLOBAL(z_true));
 			}
 		}
 

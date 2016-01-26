@@ -386,12 +386,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processControllerAnnotation){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 
-	zval *module, *namespace, *controller, *action;
-	zval *annotation, *methods = NULL, *name = NULL;
-	zval *empty_str, *real_action_name, *action_name;
-	zval *parameter = NULL, *paths = NULL, *position;
-	zval *value = NULL, *uri = NULL, *route = NULL, *converts = NULL, *convert = NULL;
-	zval *route_name = NULL;
+	zval *module, *namespace, *controller, *action, *annotation;
+	zval name, methods, *action_suffix, *route_prefix, empty_str, real_action_name, action_name;
+	zval parameter, paths, position, value, uri, route, converts, *convert, route_name;
 	zend_string *str_key;
 	ulong idx;
 	int is_route;
@@ -403,117 +400,106 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 	PHALCON_CALL_METHOD(&name, annotation, "getname");
 
 	/* Find if the route is for adding routes */
-	PHALCON_INIT_VAR(methods);
-	if (PHALCON_IS_STRING(name, "Route")) {
+	if (PHALCON_IS_STRING(&name, "Route")) {
 		is_route = 1;
-	} else if (PHALCON_IS_STRING(name, "Get")) {
+	} else if (PHALCON_IS_STRING(&name, "Get")) {
 		is_route = 1;
-		ZVAL_STRING(methods, ISV(GET));
-	} else if (PHALCON_IS_STRING(name, "Post")) {
+		ZVAL_STRING(&methods, ISV(GET));
+	} else if (PHALCON_IS_STRING(&name, "Post")) {
 		is_route = 1;
-		ZVAL_STRING(methods, ISV(POST));
-	} else if (PHALCON_IS_STRING(name, "Put")) {
+		ZVAL_STRING(&methods, ISV(POST));
+	} else if (PHALCON_IS_STRING(&name, "Put")) {
 		is_route = 1;
-		ZVAL_STRING(methods, ISV(PUT));
-	} else if (PHALCON_IS_STRING(name, "Delete")) {
+		ZVAL_STRING(&methods, ISV(PUT));
+	} else if (PHALCON_IS_STRING(&name, "Delete")) {
 		is_route = 1;
-		ZVAL_STRING(methods, ISV(DELETE));
-	} else if (PHALCON_IS_STRING(name, "Options")) {
+		ZVAL_STRING(&methods, ISV(DELETE));
+	} else if (PHALCON_IS_STRING(&name, "Options")) {
 		is_route = 1;
-		ZVAL_STRING(methods, ISV(OPTIONS));
+		ZVAL_STRING(&methods, ISV(OPTIONS));
 	} else {
 		is_route = 0;
 	}
 
 	if (is_route) {
-		zval *action_suffix = phalcon_read_property(getThis(), SL("_actionSuffix"), PH_NOISY);
-		zval *route_prefix  = phalcon_read_property(getThis(), SL("_routePrefix"), PH_NOISY);
+		action_suffix = phalcon_read_property(getThis(), SL("_actionSuffix"), PH_NOISY);
+		route_prefix = phalcon_read_property(getThis(), SL("_routePrefix"), PH_NOISY);
 
-		PHALCON_INIT_VAR(empty_str);
-		ZVAL_EMPTY_STRING(empty_str);
+		ZVAL_EMPTY_STRING(&empty_str);
 
-		PHALCON_STR_REPLACE(&real_action_name, action_suffix, empty_str, action);
+		PHALCON_STR_REPLACE(&real_action_name, action_suffix, &empty_str, action);
 
-		PHALCON_INIT_VAR(action_name);
-		phalcon_fast_strtolower(action_name, real_action_name);
+		phalcon_fast_strtolower(&action_name, &real_action_name);
 
-		PHALCON_INIT_VAR(parameter);
-		ZVAL_STR(parameter, IS(paths));
+		ZVAL_STR(&parameter, IS(paths));
 
 		/** 
 		 * Check for existing paths in the annotation
 		 */
-		PHALCON_CALL_METHOD(&paths, annotation, "getargument", parameter);
-		if (Z_TYPE_P(paths) != IS_ARRAY) { 
-			PHALCON_INIT_NVAR(paths);
-			array_init(paths);
+		PHALCON_CALL_METHOD(&paths, annotation, "getargument", &parameter);
+		if (Z_TYPE(paths) != IS_ARRAY) {
+			array_init(&paths);
 		}
 
 		/** 
 		 * Update the module if any
 		 */
 		if (Z_TYPE_P(module) == IS_STRING) {
-			phalcon_array_update_string(paths, IS(module), module, PH_COPY);
+			phalcon_array_update_string(&paths, IS(module), module, PH_COPY);
 		}
 
 		/** 
 		 * Update the namespace if any
 		 */
 		if (Z_TYPE_P(namespace) == IS_STRING) {
-			phalcon_array_update_string(paths, IS(namespace), namespace, PH_COPY);
+			phalcon_array_update_string(&paths, IS(namespace), namespace, PH_COPY);
 		}
 
-		phalcon_array_update_string(paths, IS(controller), controller, PH_COPY);
-		phalcon_array_update_string(paths, IS(action), real_action_name, PH_COPY);
-		phalcon_array_update_str(paths, SL("\0exact"), &PHALCON_GLOBAL(z_true), PH_COPY);
+		phalcon_array_update_string(&paths, IS(controller), controller, PH_COPY);
+		phalcon_array_update_string(&paths, IS(action), &real_action_name, PH_COPY);
+		phalcon_array_update_str(&paths, SL("\0exact"), &PHALCON_GLOBAL(z_true), PH_COPY);
 
-		PHALCON_INIT_VAR(position);
-		ZVAL_LONG(position, 0);
+		ZVAL_LONG(&position, 0);
 
-		PHALCON_CALL_METHOD(&value, annotation, "getargument", position);
+		PHALCON_CALL_METHOD(&value, annotation, "getargument", &position);
 
 		/** 
 		 * Create the route using the prefix
 		 */
-		if (Z_TYPE_P(value) != IS_NULL) {
-			if (!PHALCON_IS_STRING(value, "/")) {
-				PHALCON_INIT_VAR(uri);
-				PHALCON_CONCAT_VV(uri, route_prefix, value);
+		if (Z_TYPE(value) != IS_NULL) {
+			if (!PHALCON_IS_STRING(&value, "/")) {
+				PHALCON_CONCAT_VV(&uri, route_prefix, &value);
 			} else {
 				if (Z_TYPE_P(route_prefix) != IS_NULL) {
-					PHALCON_CPY_WRT(uri, route_prefix);
+					ZVAL_COPY(&uri, route_prefix);
 				} else {
-					PHALCON_CPY_WRT(uri, value);
+					ZVAL_COPY(&uri, &value);
 				}
 			}
 		} else {
-			PHALCON_INIT_NVAR(uri);
-			PHALCON_CONCAT_VV(uri, route_prefix, action_name);
+			PHALCON_CONCAT_VV(&uri, route_prefix, &action_name);
 		}
 
 		/** 
 		 * Add the route to the router
 		 */
-		PHALCON_CALL_METHOD(&route, getThis(), "add", uri, paths);
-		if (Z_TYPE_P(methods) == IS_NULL) {
+		PHALCON_CALL_METHOD(&route, getThis(), "add", &uri, &paths);
+		if (Z_TYPE(methods) == IS_NULL) {
+			ZVAL_STRING(&parameter, "methods");
 
-			PHALCON_INIT_NVAR(parameter);
-			ZVAL_STRING(parameter, "methods");
-
-			PHALCON_CALL_METHOD(&methods, annotation, "getargument", parameter);
-			if (Z_TYPE_P(methods) == IS_ARRAY || Z_TYPE_P(methods) == IS_STRING) {
-				PHALCON_CALL_METHOD(NULL, route, "via", methods);
+			PHALCON_CALL_METHOD(&methods, annotation, "getargument", &parameter);
+			if (Z_TYPE(methods) == IS_ARRAY || Z_TYPE(methods) == IS_STRING) {
+				PHALCON_CALL_METHOD(NULL, &route, "via", &methods);
 			}
 		} else {
-			PHALCON_CALL_METHOD(NULL, route, "via", methods);
+			PHALCON_CALL_METHOD(NULL, &route, "via", &methods);
 		}
 
-		PHALCON_INIT_NVAR(parameter);
-		ZVAL_STRING(parameter, "converts");
+		ZVAL_STRING(&parameter, "converts");
 
-		PHALCON_CALL_METHOD(&converts, annotation, "getargument", parameter);
-		if (Z_TYPE_P(converts) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(converts), idx, str_key, convert) {
+		PHALCON_CALL_METHOD(&converts, annotation, "getargument", &parameter);
+		if (Z_TYPE(converts) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(converts), idx, str_key, convert) {
 				zval param;
 				if (str_key) {
 					ZVAL_STR(&param, str_key);
@@ -524,12 +510,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 			} ZEND_HASH_FOREACH_END();
 		}
 
-		PHALCON_INIT_NVAR(parameter);
-		ZVAL_STRING(parameter, "conversors");
+		ZVAL_STRING(&parameter, "conversors");
 
-		PHALCON_CALL_METHOD(&converts, annotation, "getargument", parameter);
-		if (Z_TYPE_P(converts) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(converts), idx, str_key, convert) {
+		PHALCON_CALL_METHOD(&converts, annotation, "getargument", &parameter);
+		if (Z_TYPE(converts) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(converts), idx, str_key, convert) {
 				zval conversor_param;
 				if (str_key) {
 					ZVAL_STR(&conversor_param, str_key);
@@ -540,12 +525,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 			} ZEND_HASH_FOREACH_END();
 		}
 
-		PHALCON_INIT_NVAR(parameter);
-		ZVAL_STRING(parameter, ISV(name));
+		ZVAL_STRING(&parameter, ISV(name));
 
-		PHALCON_CALL_METHOD(&route_name, annotation, "getargument", parameter);
-		if (Z_TYPE_P(route_name) == IS_STRING) {
-			PHALCON_CALL_METHOD(NULL, route, "setname", route_name);
+		PHALCON_CALL_METHOD(&route_name, annotation, "getargument", &parameter);
+		if (Z_TYPE(route_name) == IS_STRING) {
+			PHALCON_CALL_METHOD(NULL, &route, "setname", &route_name);
 		}
 
 		RETURN_MM_TRUE;

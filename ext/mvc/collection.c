@@ -327,23 +327,18 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, setId){
 
-	zval *id, *id_name, *column_map = NULL, *collection_manager, *use_implicit_ids = NULL;
-	zval *mongo_id = NULL;
+	zval *id, id_name, column_map, *collection_manager, use_implicit_ids, mongo_id;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &id);
 
-	phalcon_fetch_params(1, 1, 0, &id);
-
-	PHALCON_INIT_VAR(id_name);
-	ZVAL_STRING(id_name, "_id");
+	ZVAL_STRING(&id_name, "_id");
 
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
-	if (Z_TYPE_P(column_map) == IS_ARRAY) {
-		if (phalcon_array_isset_str(column_map, SL("_id"))) {
-			PHALCON_OBS_NVAR(id_name);
-			phalcon_array_fetch_str(&id_name, column_map, SL("_id"), PH_NOISY);
+	if (Z_TYPE(column_map) == IS_ARRAY) {
+		if (phalcon_array_isset_str(&column_map, SL("_id"))) {
+			phalcon_array_fetch_str(&id_name, &column_map, SL("_id"), PH_NOISY);
 		}
 	}
 
@@ -354,22 +349,17 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 		 * Check if the collection use implicit ids
 		 */
 		PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", getThis());
-		if (zend_is_true(use_implicit_ids)) {
-			ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
-			PHALCON_INIT_VAR(mongo_id);
-			object_init_ex(mongo_id, ce0);
-			if (phalcon_has_constructor(mongo_id)) {
-				PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", id);
-			}
+		if (zend_is_true(&use_implicit_ids)) {
+			object_init_ex(&mongo_id, ce0);
+			PHALCON_CALL_METHOD(NULL, &mongo_id, "__construct", id);
 		} else {
-			mongo_id = id;
+			ZVAL_COPY(&mongo_id, id);
 		}
 	} else {
-		mongo_id = id;
+		ZVAL_COPY(&mongo_id, id);
 	}
 
-	phalcon_update_property_zval_zval(getThis(), id_name, mongo_id);
-	PHALCON_MM_RESTORE();
+	phalcon_update_property_zval_zval(getThis(), &id_name, &mongo_id);
 }
 
 /**
@@ -379,19 +369,17 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, getId){
 
-	zval *id_name, *column_map = NULL, *id, *mongo_id = NULL, *collection_manager, *use_implicit_ids = NULL;
+	zval id_name, column_map, *id, *mongo_id = NULL, *collection_manager, *use_implicit_ids = NULL;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
 
-	PHALCON_INIT_VAR(id_name);
-	ZVAL_STRING(id_name, "_id");
+	ZVAL_STRING(&id_name, "_id");
 
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
-	if (Z_TYPE_P(column_map) == IS_ARRAY) { 
+	if (Z_TYPE(column_map) == IS_ARRAY) { 
 		if (phalcon_array_isset_str(column_map, SL("_id"))) {
-			PHALCON_OBS_NVAR(id_name);
 			phalcon_array_fetch_str(&id_name, column_map, SL("_id"), PH_NOISY);
 		}
 	}
@@ -399,7 +387,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 	if (phalcon_isset_property_zval(getThis(), id_name)) {
 		id = phalcon_read_property_zval(getThis(), id_name, PH_NOISY);
 		if (Z_TYPE_P(id) == IS_OBJECT) {
-			mongo_id = id;
+			ZVAL_COPY(&mongo_id, id);
 		} else {
 			collection_manager = phalcon_read_property(getThis(), SL("_collectionManager"), PH_NOISY);
 

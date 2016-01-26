@@ -900,8 +900,7 @@ PHP_METHOD(Phalcon_Mvc_View, start){
 PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 
 	zval *engines = NULL, *dependency_injector, *registered_engines;
-	zval *php_engine, *arguments, *engine_service = NULL;
-	zval *engine_object = NULL, exception_message;
+	zval *php_engine, *arguments, *engine_service;
 	zend_string *str_key;
 
 	PHALCON_MM_GROW();
@@ -939,7 +938,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 			phalcon_array_append(arguments, dependency_injector, PH_COPY);
 
 			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(registered_engines), str_key, engine_service) {
-				zval extension;
+				zval extension, engine_object, exception_message;
 				if (str_key) {
 					ZVAL_STR(&extension, str_key);
 					if (Z_TYPE_P(engine_service) == IS_OBJECT) {
@@ -950,7 +949,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 						if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
 							PHALCON_CALL_USER_FUNC_ARRAY(&engine_object, engine_service, arguments);
 						} else {
-							PHALCON_CPY_WRT(engine_object, engine_service);
+							ZVAL_COPY(&engine_object, engine_service);
 						}
 					} else {
 						/** 
@@ -958,14 +957,14 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 						 */
 						if (Z_TYPE_P(engine_service) == IS_STRING) {
 							PHALCON_CALL_METHOD(&engine_object, dependency_injector, "getshared", engine_service, arguments);
-							PHALCON_VERIFY_INTERFACE(engine_object, phalcon_mvc_view_engineinterface_ce);
+							PHALCON_VERIFY_INTERFACE(&engine_object, phalcon_mvc_view_engineinterface_ce);
 						} else {
 							PHALCON_CONCAT_SV(&exception_message, "Invalid template engine registration for extension: ", &extension);
 							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 							return;
 						}
 					}
-					phalcon_array_update_zval(engines, &extension, engine_object, PH_COPY);
+					phalcon_array_update_zval(engines, &extension, &engine_object, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 
@@ -976,7 +975,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 		engines = phalcon_read_property(getThis(), SL("_engines"), PH_NOISY);
 	}
 
-	RETURN_CCTOR(engines);
+	RETURN_CTOR(engines);
 }
 
 /**
@@ -989,14 +988,10 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
  */
 PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
-	zval *engines, *view_path, *silence, *must_clean, *absolute_path = NULL, *debug_message = NULL;
-	zval *cache = NULL, *not_exists = NULL, *views_dir, *base_path;
-	zval *path = NULL, *dir = NULL, *views_dir_paths, *views_dir_path = NULL, *render_level, *cache_level, *cache_mode;
-	zval *key = NULL, *lifetime = NULL, *view_options;
-	zval *cache_options, *cached_view = NULL;
-	zval *view_params, *events_manager, *engine = NULL;
-	zval *view_engine_path = NULL, event_name;
-	zval *status = NULL, exception_message;
+	zval *engines, *view_path, *silence, *must_clean, *absolute_path = NULL, debug_message;
+	zval *render_level, *cache_level, *cache_mode, cache, not_exists, views_dir_paths, views_dir_path, *base_path, *views_dir, *path;
+	zval key, lifetime, view_options, cache_options, cached_view;
+	zval *view_params, *events_manager, *engine, event_name, status, exception_message;
 	zend_string *str_key;
 
 	PHALCON_MM_GROW();
@@ -1019,88 +1014,67 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		if (PHALCON_IS_TRUE(cache_mode)) {
 			if (PHALCON_LE(render_level, cache_level)) {
 				PHALCON_CALL_METHOD(&cache, getThis(), "getcache");
-			} else {
-				PHALCON_INIT_VAR(cache);
-			}	
+			}
 		} else {
 			if (PHALCON_GE(render_level, cache_level)) {
 				PHALCON_CALL_METHOD(&cache, getThis(), "getcache");
-			} else {
-				PHALCON_INIT_VAR(cache);
 			}
 		}
-	} else {
-		PHALCON_INIT_VAR(cache);
 	}
 
-	PHALCON_INIT_VAR(not_exists);
-	ZVAL_TRUE(not_exists);
-
-	PHALCON_INIT_VAR(views_dir_paths);
-	array_init(views_dir_paths);
+	ZVAL_TRUE(&not_exists);
+	array_init(&views_dir_paths);
 
 	if (zend_is_true(absolute_path)) {
-		phalcon_array_append(views_dir_paths, view_path, PH_COPY);
+		phalcon_array_append(&views_dir_paths, view_path, PH_COPY);
 	} else {
 		base_path = phalcon_read_property(getThis(), SL("_basePath"), PH_NOISY);
 		views_dir = phalcon_read_property(getThis(), SL("_viewsDir"), PH_NOISY);
 
 		if (Z_TYPE_P(base_path) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(base_path), path) {
+				zval *dir;
 				if (Z_TYPE_P(views_dir) == IS_ARRAY) {
 					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(views_dir), dir) {
-						PHALCON_INIT_NVAR(views_dir_path);
-						PHALCON_CONCAT_VVV(views_dir_path, path, dir, view_path);
-						phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+						PHALCON_CONCAT_VVV(&views_dir_path, path, dir, view_path);
+						phalcon_array_append(&views_dir_paths, &views_dir_path, PH_COPY);
 					} ZEND_HASH_FOREACH_END();
 				} else {
-						PHALCON_INIT_NVAR(views_dir_path);
-						PHALCON_CONCAT_VVV(views_dir_path, path, views_dir, view_path);
-						phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+						PHALCON_CONCAT_VVV(&views_dir_path, path, views_dir, view_path);
+						phalcon_array_append(&views_dir_paths, &views_dir_path, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		} else {
 			if (Z_TYPE_P(views_dir) == IS_ARRAY) {
-				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(views_dir), dir) {
-					PHALCON_INIT_NVAR(views_dir_path);
-					PHALCON_CONCAT_VVV(views_dir_path, base_path, dir, view_path);
-					phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(views_dir), path) {
+					PHALCON_CONCAT_VVV(&views_dir_path, base_path, path, view_path);
+					phalcon_array_append(&views_dir_paths, &views_dir_path, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 			} else {
-				PHALCON_INIT_VAR(views_dir_path);
-				PHALCON_CONCAT_VVV(views_dir_path, base_path, views_dir, view_path);
-				phalcon_array_append(views_dir_paths, views_dir_path, PH_COPY);
+				PHALCON_CONCAT_VVV(&views_dir_path, base_path, views_dir, view_path);
+				phalcon_array_append(&views_dir_paths, &views_dir_path, PH_COPY);
 			}
 		}
 	}
 
-	if (Z_TYPE_P(cache) == IS_OBJECT) {
-
+	if (Z_TYPE(cache) == IS_OBJECT) {
 		/** 
 		 * Check if the cache is started, the first time a cache is started we start the
 		 * cache
 		 */
-		PHALCON_INIT_VAR(key);
-		PHALCON_INIT_VAR(lifetime);
-
-		view_options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
+		phalcon_return_property(&view_options, getThis(), SL("_options"));
 
 		/** 
 		 * Check if the user has defined a different options to the default
 		 */
-		if (Z_TYPE_P(view_options) == IS_ARRAY) { 
-			if (phalcon_array_isset_str(view_options, SL("cache"))) {
-
-				PHALCON_OBS_VAR(cache_options);
-				phalcon_array_fetch_str(&cache_options, view_options, SL("cache"), PH_NOISY);
-				if (Z_TYPE_P(cache_options) == IS_ARRAY) { 
-					if (phalcon_array_isset_str(cache_options, SL("key"))) {
-						PHALCON_OBS_NVAR(key);
-						phalcon_array_fetch_str(&key, cache_options, SL("key"), PH_NOISY);
+		if (Z_TYPE(view_options) == IS_ARRAY) { 
+			if (phalcon_array_isset_fetch_str(&cache_options, &view_options, SL("cache"))) {
+				if (Z_TYPE(cache_options) == IS_ARRAY) { 
+					if (phalcon_array_isset_str(&cache_options, SL("key"))) {
+						phalcon_array_fetch_str(&key, &cache_options, SL("key"), PH_NOISY);
 					}
-					if (phalcon_array_isset_str(cache_options, SL("lifetime"))) {
-						PHALCON_OBS_NVAR(lifetime);
-						phalcon_array_fetch_str(&lifetime, cache_options, SL("lifetime"), PH_NOISY);
+					if (phalcon_array_isset_str(&cache_options, SL("lifetime"))) {
+						phalcon_array_fetch_str(&lifetime, &cache_options, SL("lifetime"), PH_NOISY);
 					}
 				}
 			}
@@ -1109,50 +1083,28 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		/** 
 		 * If a cache key is not set we create one using a md5
 		 */
-		if (Z_TYPE_P(key) == IS_NULL) {
-			PHALCON_INIT_NVAR(key);
-			phalcon_md5(key, view_path);
+		if (Z_TYPE(key) <= IS_NULL) {
+			phalcon_md5(&key, view_path);
 		}
 
 		/** 
 		 * We start the cache using the key set
 		 */
 		phalcon_ob_clean();
-		PHALCON_CALL_METHOD(&cached_view, cache, "start", key, lifetime);
-		if (Z_TYPE_P(cached_view) != IS_NULL) {
-			phalcon_update_property_this(getThis(), SL("_content"), cached_view);
-			RETURN_MM_NULL();
-		}
-
-		/** 
-		 * If a cache key is not set we create one using a md5
-		 */
-		if (Z_TYPE_P(key) == IS_NULL) {
-			PHALCON_INIT_NVAR(key);
-			phalcon_md5(key, view_path);
-		}
-
-		/** 
-		 * We start the cache using the key set
-		 */
-		phalcon_ob_clean();
-		PHALCON_CALL_METHOD(&cached_view, cache, "start", key, lifetime);
-		if (Z_TYPE_P(cached_view) != IS_NULL) {
-			phalcon_update_property_this(getThis(), SL("_content"), cached_view);
+		PHALCON_CALL_METHOD(&cached_view, &cache, "start", &key, &lifetime);
+		if (Z_TYPE(cached_view) != IS_NULL) {
+			phalcon_update_property_this(getThis(), SL("_content"), &cached_view);
 			RETURN_MM_NULL();
 		}
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_INIT_NVAR(debug_message);
-		PHALCON_CONCAT_SV(debug_message, "Render View: ", view_path);
-		phalcon_debug_print_r(debug_message);
+		PHALCON_CONCAT_SV(&debug_message, "Render View: ", view_path);
+		phalcon_debug_print_r(&debug_message);
 	}
 
 	view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
-
-	PHALCON_INIT_VAR(view_engine_path);
 
 	/** 
 	 * Views are rendered in each engine
@@ -1161,39 +1113,36 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		zval extension;
 		if (str_key) {
 			ZVAL_STR(&extension, str_key);
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(views_dir_paths), path) {
-				PHALCON_INIT_NVAR(view_engine_path);
-				PHALCON_CONCAT_VV(view_engine_path, path, &extension);
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(views_dir_paths), path) {
+				zval view_engine_path;
+				PHALCON_CONCAT_VV(&view_engine_path, path, &extension);
 
-				if (phalcon_file_exists(view_engine_path) == SUCCESS) {
-
+				if (phalcon_file_exists(&view_engine_path) == SUCCESS) {
 					if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-						PHALCON_INIT_NVAR(debug_message);
-						PHALCON_CONCAT_SV(debug_message, "--Found: ", view_engine_path);
-						phalcon_debug_print_r(debug_message);
+						PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
+						phalcon_debug_print_r(&debug_message);
 					}
 
 					/** 
 					 * Call beforeRenderView if there is a events manager available
 					 */
 					if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-						phalcon_update_property_this(getThis(), SL("_activeRenderPath"), view_engine_path);
+						phalcon_update_property_this(getThis(), SL("_activeRenderPath"), &view_engine_path);
 
 						ZVAL_STRING(&event_name, "view:beforeRenderView");			
-						PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), view_engine_path);
+						PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), &view_engine_path);
 
-						if (PHALCON_IS_FALSE(status)) {
+						if (PHALCON_IS_FALSE(&status)) {
 							continue;
 						}
 					}
 
-					PHALCON_CALL_METHOD(NULL, engine, "render", view_engine_path, view_params, must_clean);
+					PHALCON_CALL_METHOD(NULL, engine, "render", &view_engine_path, view_params, must_clean);
 			
 					/** 
 					 * Call afterRenderView if there is a events manager available
 					 */
-					PHALCON_INIT_NVAR(not_exists);
-					ZVAL_FALSE(not_exists);
+					ZVAL_FALSE(&not_exists);
 
 					if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 						ZVAL_STRING(&event_name, "view:afterRenderView");
@@ -1202,31 +1151,28 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 					break;
 				} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-					PHALCON_INIT_NVAR(debug_message);
-					PHALCON_CONCAT_SV(debug_message, "--Not Found: ", view_engine_path);
-					phalcon_debug_print_r(debug_message);
+					PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
+					phalcon_debug_print_r(&debug_message);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
 
-		if (!zend_is_true(not_exists)) {
+		if (!zend_is_true(&not_exists)) {
 			break;
 		}
-
+		phalcon_update_property_this(getThis(), SL("_activeRenderPath"), &view_engine_path);
 	} ZEND_HASH_FOREACH_END();
 
-	if (PHALCON_IS_TRUE(not_exists)) {
-
+	if (PHALCON_IS_TRUE(&not_exists)) {
 		/** 
 		 * Notify about not found views
 		 */
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-			phalcon_update_property_this(getThis(), SL("_activeRenderPath"), view_engine_path);
 			ZVAL_STRING(&event_name, "view:notFoundView");
 			PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis());
 		}
 		if (!zend_is_true(silence)) {
-			PHALCON_CONCAT_SVS(&exception_message, "View '", views_dir_path, "' was not found in the views directory");
+			PHALCON_CONCAT_SVS(&exception_message, "View '", view_path, "' was not found in the views directory");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 			return;
 		}

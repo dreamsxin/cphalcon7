@@ -1485,7 +1485,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteById){
  */
 PHP_METHOD(Phalcon_Mvc_Router, getRouteByName){
 
-	zval *name, *routes, *route, *routes_name_lookup, *route_name = NULL;
+	zval *name, *routes, *route, *routes_name_lookup;
 
 	PHALCON_MM_GROW();
 
@@ -1504,13 +1504,14 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteByName){
 	routes = phalcon_read_property(getThis(), SL("_routes"), PH_NOISY);
 	if (Z_TYPE_P(routes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(routes), route) {
+			zval route_name;
 			PHALCON_CALL_METHOD(&route_name, route, "getname");
-			convert_to_string(route_name);
-			if (PHALCON_IS_NOT_EMPTY(route_name)) {
-				phalcon_update_property_array_string(getThis(), SL("_routesNameLookup"), Z_STR_P(route_name), route);
+			convert_to_string(&route_name);
+			if (PHALCON_IS_NOT_EMPTY(&route_name)) {
+				phalcon_update_property_array_string(getThis(), SL("_routesNameLookup"), Z_STR(route_name), route);
 			}
 
-			if (phalcon_is_equal(route_name, name)) {
+			if (phalcon_is_equal(&route_name, name)) {
 				RETURN_CTOR(route);
 			}
 		} ZEND_HASH_FOREACH_END();

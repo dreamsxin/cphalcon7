@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 
 	zval *sha1 = NULL, *md5 = NULL, source, files_source;
 	zval connection, mongo_collection, criteria, operation, field, value, new_object;
-	zval status, ok, exist, options, *grid_fs = NULL;
+	zval status, ok, exist, options, grid_fs;
 
 	PHALCON_MM_GROW();
 
@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 		}
 	}
 
-	PHALCON_CALL_METHOD(&grid_fs, &connection, "getgridfs", source);
+	PHALCON_CALL_METHOD(&grid_fs, &connection, "getgridfs", &source);
 
 	if (Z_TYPE(grid_fs) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Couldn't select mongo GridFS");
@@ -291,14 +291,14 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 
 	phalcon_array_update_str_long(&options, SL("w"), 0, PH_COPY);
 
-	PHALCON_RETURN_CALL_METHOD(grid_fs, "remove", &criteria, &options);
+	PHALCON_RETURN_CALL_METHOD(&grid_fs, "remove", &criteria, &options);
 	RETURN_MM();
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 
 	zval *filename, *arr = NULL, *white_list = NULL, *mode = NULL;
-	zval *old_sha1, *old_md5, *sha1 = NULL, *md5 = NULL, *status = NULL;
+	zval *old_sha1, *old_md5, sha1, md5, status;
 
 	PHALCON_MM_GROW();
 
@@ -323,8 +323,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 		PHALCON_CALL_FUNCTION(&sha1, "sha1_file", filename);
 		PHALCON_CALL_FUNCTION(&md5, "md5_file", filename);
 
-		phalcon_update_property_this(getThis(), SL("sha1"), sha1);
-		phalcon_update_property_this(getThis(), SL("md5"), md5);
+		phalcon_update_property_this(getThis(), SL("sha1"), &sha1);
+		phalcon_update_property_this(getThis(), SL("md5"), &md5);
 	}
 
 	PHALCON_CALL_PARENT(&status, phalcon_mvc_collection_gridfs_ce, getThis(), "save", arr, white_list, mode);
@@ -338,13 +338,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 		PHALCON_CALL_SELF(NULL, "remove", old_sha1, old_md5);
 	}
 
-	RETURN_CTOR(status);
+	RETURN_CTOR(&status);
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, saveBytes){
 
 	zval *bytes, *arr = NULL, *white_list = NULL, *mode = NULL;
-	zval *old_sha1, *old_md5, *sha1 = NULL, *md5 = NULL, *status = NULL;
+	zval *old_sha1, *old_md5, sha1, md5, status;
 
 	PHALCON_MM_GROW();
 
@@ -369,13 +369,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, saveBytes){
 		PHALCON_CALL_FUNCTION(&sha1, "sha1", bytes);
 		PHALCON_CALL_FUNCTION(&md5, "md5", bytes);
 
-		phalcon_update_property_this(getThis(), SL("sha1"), sha1);
-		phalcon_update_property_this(getThis(), SL("md5"), md5);
+		phalcon_update_property_this(getThis(), SL("sha1"), &sha1);
+		phalcon_update_property_this(getThis(), SL("md5"), &md5);
 	}
 
 	PHALCON_CALL_PARENT(&status, phalcon_mvc_collection_gridfs_ce, getThis(), "save", arr, white_list, mode);
 
-	if (PHALCON_IS_FALSE(status)) {
+	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_MM_FALSE;
 	}
 
@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, saveBytes){
 		}
 	}
 
-	RETURN_CTOR(status);
+	RETURN_CTOR(&status);
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, create){

@@ -148,6 +148,21 @@ int phalcon_isset_property_array(zval *object, const char *property, uint32_t pr
 zval* phalcon_read_property_array(zval *object, const char *property_name, size_t property_length, const zval *index);
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index);
 
+/**
+ * Returns an object's Array properties
+ */
+static inline int phalcon_return_property_array(zval *return_value, zval *object, const char *property_name, uint32_t property_length, const zval *index)
+{
+	zval *tmp = phalcon_read_property_array(object, property_name, property_length, index);
+	if (tmp) {
+		ZVAL_COPY(return_value, tmp);
+		return SUCCESS;
+	}
+
+	ZVAL_NULL(return_value);
+	return FAILURE;
+}
+
 /** Static properties */
 zval* phalcon_read_static_property(const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length);
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);

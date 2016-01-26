@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, getId){
 
-	zval id_name, column_map, *id, *mongo_id = NULL, *collection_manager, *use_implicit_ids = NULL;
+	zval id_name, column_map, id, mongo_id, *collection_manager, use_implicit_ids;
 	zend_class_entry *ce0;
 
 	PHALCON_MM_GROW();
@@ -379,55 +379,48 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
 	if (Z_TYPE(column_map) == IS_ARRAY) { 
-		if (phalcon_array_isset_str(column_map, SL("_id"))) {
-			phalcon_array_fetch_str(&id_name, column_map, SL("_id"), PH_NOISY);
+		if (phalcon_array_isset_str(&column_map, SL("_id"))) {
+			phalcon_array_fetch_str(&id_name, &column_map, SL("_id"), PH_NOISY);
 		}
 	}
 
-	if (phalcon_isset_property_zval(getThis(), id_name)) {
-		id = phalcon_read_property_zval(getThis(), id_name, PH_NOISY);
-		if (Z_TYPE_P(id) == IS_OBJECT) {
-			ZVAL_COPY(&mongo_id, id);
-		} else {
+	if (phalcon_property_isset_fetch_zval(&id, getThis(), &id_name)) {
+		if (Z_TYPE(id) != IS_OBJECT) {
 			collection_manager = phalcon_read_property(getThis(), SL("_collectionManager"), PH_NOISY);
 
 			/**
 			 * Check if the collection use implicit ids
 			 */
 			PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", getThis());
-			if (zend_is_true(use_implicit_ids)) {
+			if (zend_is_true(&use_implicit_ids)) {
 				ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
-				PHALCON_INIT_NVAR(mongo_id);
-				object_init_ex(mongo_id, ce0);
-				if (phalcon_has_constructor(mongo_id)) {
-					PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", id);
+				object_init_ex(&mongo_id, ce0);
+				if (phalcon_has_constructor(&mongo_id)) {
+					PHALCON_CALL_METHOD(NULL, &mongo_id, "__construct", &id);
 				}
-				phalcon_update_property_zval_zval(getThis(), id_name, mongo_id);
+				phalcon_update_property_zval_zval(getThis(), &id_name, &mongo_id);
 			} else {
-				mongo_id = id;
+				ZVAL_COPY(&mongo_id, &id);
 			}
+		} else {
+			ZVAL_COPY(&mongo_id, &id);
 		}
-	} else {
-		mongo_id = &PHALCON_GLOBAL(z_null);
 	}
 
-	RETURN_CTOR(mongo_id);
+	RETURN_CTOR(&mongo_id);
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection, getIdString){
 
-	zval *id = NULL;
-
-	PHALCON_MM_GROW();
+	zval id;
 
 	PHALCON_CALL_SELF(&id, "getid");
 
-	if (Z_TYPE_P(id) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHOD(id, "__tostring");
-		RETURN_MM();
+	if (Z_TYPE(id) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHOD(&id, "__tostring");
 	}
 
-	RETURN_CTOR(id);
+	RETURN_CTORW(&id);
 }
 
 /**
@@ -508,26 +501,21 @@ PHP_METHOD(Phalcon_Mvc_Collection, getColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, getColumnName){
 
-	zval *column, *column_map = NULL, *name = NULL;
+	zval *column, column_map, name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &column);
+	phalcon_fetch_params(0, 1, 0, &column);
 	
-	PHALCON_CALL_SELF(&column_map, "getColumnMap");
+	PHALCON_CALL_SELFW(&column_map, "getColumnMap");
 
-	if (Z_TYPE_P(column_map) == IS_ARRAY) {
-		if (phalcon_array_isset(column_map, column)) {
-			PHALCON_OBS_VAR(name);
-			phalcon_array_fetch(&name, column_map, column, PH_NOISY);
-		} else {
-			PHALCON_CPY_WRT(name, column);
+	if (Z_TYPE(column_map) == IS_ARRAY) {
+		if (!phalcon_array_isset_fetch(&name, &column_map, column)) {
+			ZVAL_COPY(&name, column);
 		}
 	} else {
-		PHALCON_CPY_WRT(name, column);
+		ZVAL_COPY(&name, column);
 	}
 
-	RETURN_CTOR(name);
+	RETURN_CTORW(&name);
 }
 
 /**
@@ -665,19 +653,17 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
 
-	zval *connection = NULL, *collection_manager;
-
-	PHALCON_MM_GROW();
+	zval connection, *collection_manager;
 
 	connection = phalcon_read_property(getThis(), SL("_connection"), PH_NOISY);
-	if (Z_TYPE_P(connection) != IS_OBJECT) {
+	if (Z_TYPE(connection) != IS_OBJECT) {
 		collection_manager = phalcon_read_property(getThis(), SL("_collectionManager"), PH_NOISY);
 
 		PHALCON_CALL_METHOD(&connection, collection_manager, "getconnection", getThis());
-		phalcon_update_property_this(getThis(), SL("_connection"), connection);
+		phalcon_update_property_this(getThis(), SL("_connection"), &connection);
 	}
 
-	RETURN_CTOR(connection);
+	RETURN_CTORW(connection);
 }
 
 /**
@@ -697,33 +683,30 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, assign){
 
-	zval *data, *white_list = NULL, *column_map = NULL;
-	zval *value = NULL, *attribute = NULL;
-	zval exception_message;
+	zval *data, *white_list = NULL, column_map, *value;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &data, &white_list);
+	phalcon_fetch_params(0, 1, 1, &data, &white_list);
 	
 	if (!white_list) {
 		white_list = &PHALCON_GLOBAL(z_null);
 	}
 	
 	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Data to dump in the object must be an Array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Data to dump in the object must be an Array");
 		return;
 	}
 
-	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
+	PHALCON_CALL_SELFW(&column_map, "getcolumnmap");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
-		zval tmp;
+		zval key, attribute, exception_message;
+
 		if (str_key) {
-			ZVAL_STR(&tmp, str_key);
+			ZVAL_STR(&key, str_key);
 		} else {
-			ZVAL_LONG(&tmp, idx);
+			ZVAL_LONG(&key, idx);
 		}
 		/** 
 		 * Only string keys in the data are valid
@@ -738,22 +721,17 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 			/** 
 			 * Every field must be part of the column map
 			 */
-			if (phalcon_array_isset(column_map, &tmp)) {
-				PHALCON_OBS_NVAR(attribute);
-				phalcon_array_fetch(&attribute, column_map, &tmp, PH_NOISY);
-				phalcon_update_property_zval_zval(getThis(), attribute, value);
+			if (phalcon_array_isset_fetch(&attribute, &column_map, &key)) {
+				phalcon_update_property_zval_zval(getThis(), &attribute, value);
 			} else {
-				PHALCON_CONCAT_SVS(&exception_message, "Column \"", &tmp, "\" doesn't make part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_collection_exception_ce, &exception_message);
+				PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_collection_exception_ce, &exception_message);
 				return;
 			}
 		} else {
-			phalcon_update_property_zval_zval(getThis(), &tmp, value);
+			phalcon_update_property_zval_zval(getThis(), &key, value);
 		}
 	} ZEND_HASH_FOREACH_END();
-	
-	
-	PHALCON_MM_RESTORE();
 }
 
 /**

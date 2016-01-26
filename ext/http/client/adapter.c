@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getPath){
 
 	base_uri = phalcon_read_property(getThis(), SL("_base_uri"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(&return_value, base_uri, "getpath");
+	PHALCON_CALL_METHODW(return_value, base_uri, "getpath");
 }
 
 /**

@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Debug, clearVars){
  */
 PHP_METHOD(Phalcon_Debug, _escapeString){
 
-	zval *value, *charset, *replaced_value = NULL;
+	zval *value, *charset, replaced_value;
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
@@ -392,12 +392,12 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 		ZVAL_STRING(&escaped_line_break, "\\n");
 
 		PHALCON_STR_REPLACEW(&replaced_value, &line_break, &escaped_line_break, value);
-		phalcon_htmlentities(return_value, replaced_value, NULL, charset);
-		zval_ptr_dtor(replaced_value);
+		phalcon_htmlentities(return_value, &replaced_value, NULL, charset);
+		zval_ptr_dtor(&replaced_value);
 		return;
 	}
 
-	RETURN_ZVAL(value, 1, 0);
+	RETURN_CTORW(value);
 }
 
 /**

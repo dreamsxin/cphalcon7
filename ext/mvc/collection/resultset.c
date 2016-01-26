@@ -453,13 +453,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, count){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetExists){
 
-	zval *index, *count = NULL;
+	zval *index, count;
 
 	phalcon_fetch_params(0, 1, 0, &index);
 
 	PHALCON_CALL_METHODW(&count, getThis(), "count");
-	is_smaller_function(return_value, index, count);
-	zval_ptr_dtor(count);
+	is_smaller_function(return_value, index, &count);
+	zval_ptr_dtor(&count);
 }
 
 /**

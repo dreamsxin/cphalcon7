@@ -506,7 +506,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 				} else {
 					ZVAL_LONG(&param, idx);
 				}
-				PHALCON_CALL_METHOD(NULL, route, "convert", &param, convert);
+				PHALCON_CALL_METHOD(NULL, &route, "convert", &param, convert);
 			} ZEND_HASH_FOREACH_END();
 		}
 
@@ -521,7 +521,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 				} else {
 					ZVAL_LONG(&conversor_param, idx);
 				}
-				PHALCON_CALL_METHOD(NULL, route, "convert", &conversor_param, convert);
+				PHALCON_CALL_METHOD(NULL, &route, "convert", &conversor_param, convert);
 			} ZEND_HASH_FOREACH_END();
 		}
 

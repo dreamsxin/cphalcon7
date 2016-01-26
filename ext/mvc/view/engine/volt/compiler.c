@@ -390,48 +390,40 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getOptions){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, fireExtensionEvent){
 
-	zval *name, *arguments = NULL, *extensions;
-	zval *call_object = NULL, *status = NULL;
+	zval *name, *arguments = NULL, *extensions, *extension;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &name, &arguments);
+	phalcon_fetch_params(0, 1, 1, &name, &arguments);
 
 	if (!arguments) {
 		arguments = &PHALCON_GLOBAL(z_null);
 	}
 
 	extensions = phalcon_read_property(getThis(), SL("_extensions"), PH_NOISY);
-	if (Z_TYPE_P(extensions) == IS_ARRAY) { 
-		zval *extension;
-
+	if (Z_TYPE_P(extensions) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(extensions), extension) {
+			zval call_object, status;
 			/** 
 			 * Check if the extension implements the required event name
 			 */
 			if (phalcon_method_exists(extension, name) == SUCCESS) {
-				PHALCON_INIT_NVAR(status);
-				PHALCON_INIT_NVAR(call_object);
-				array_init_size(call_object, 2);
-				phalcon_array_append(call_object, extension, PH_COPY);
-				phalcon_array_append(call_object, name, PH_COPY);
+				array_init_size(&call_object, 2);
+				phalcon_array_append(&call_object, extension, PH_COPY);
+				phalcon_array_append(&call_object, name, PH_COPY);
 				if (Z_TYPE_P(arguments) == IS_ARRAY) { 
-					PHALCON_CALL_USER_FUNC_ARRAY(&status, call_object, arguments);
+					PHALCON_CALL_USER_FUNC_ARRAY(&status, &call_object, arguments);
 				} else {
-					PHALCON_CALL_USER_FUNC(&status, call_object);
+					PHALCON_CALL_USER_FUNC(&status, &call_object);
 				}
 
 				/** 
 				 * Only string statuses mean the extension processed something
 				 */
-				if (Z_TYPE_P(status) == IS_STRING) {
-					RETURN_CCTOR(status);
+				if (Z_TYPE(status) == IS_STRING) {
+					RETURN_CTORW(&status);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -556,45 +548,41 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, setUniquePrefix){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getUniquePrefix){
 
-	zval *prefix = NULL, *parameters, *calculated_prefix = NULL;
+	zval prefix, *current_path, parameters, calculated_prefix;
 
-	PHALCON_MM_GROW();
-
-	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	/** 
 	 * If the unique prefix is not set we use a hash using the modified Berstein
 	 * algotithm
 	 */
-	if (!zend_is_true(prefix)) {
-		zval *current_path = phalcon_read_property(getThis(), SL("_currentPath"), PH_NOISY);
+	if (!zend_is_true(&prefix)) {
+		current_path = phalcon_read_property(getThis(), SL("_currentPath"), PH_NOISY);
 
-		PHALCON_INIT_NVAR(prefix);
-		phalcon_unique_path_key(prefix, current_path);
-		phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
+		phalcon_unique_path_key(&prefix, current_path);
+		phalcon_update_property_this(getThis(), SL("_prefix"), &prefix);
 	}
 
 	/** 
 	 * The user could use a closure generator
 	 */
-	if (Z_TYPE_P(prefix) == IS_OBJECT) {
-		if (instanceof_function(Z_OBJCE_P(prefix), zend_ce_closure)) {
-			PHALCON_INIT_VAR(parameters);
-			array_init_size(parameters, 1);
-			phalcon_array_append(parameters, getThis(), 0);
+	if (Z_TYPE(prefix) == IS_OBJECT) {
+		if (instanceof_function(Z_OBJCE(prefix), zend_ce_closure)) {
+			array_init_size(&parameters, 1);
+			phalcon_array_append(&parameters, getThis(), PH_COPY);
 
-			PHALCON_CALL_FUNCTION(&calculated_prefix, "call_user_func_array", prefix, parameters);
-			phalcon_update_property_this(getThis(), SL("_prefix"), calculated_prefix);
-			PHALCON_CPY_WRT(prefix, calculated_prefix);
+			PHALCON_CALL_FUNCTION(&calculated_prefix, "call_user_func_array", &prefix, &parameters);
+			phalcon_update_property_this(getThis(), SL("_prefix"), &calculated_prefix);
+			ZVAL_COPY(&prefix, &calculated_prefix);
 		}
 	}
 
-	if (Z_TYPE_P(prefix) != IS_STRING) {
+	if (Z_TYPE(prefix) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "The unique compilation prefix is invalid");
 		return;
 	}
 
-	RETURN_CCTOR(prefix);
+	RETURN_CTORW(&prefix);
 }
 
 /**

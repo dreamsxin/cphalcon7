@@ -1930,7 +1930,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, find){
 		}
 	}
 
-	phalcon_get_called_class(&class_name );
+	phalcon_get_called_class(&class_name);
 	ce0 = phalcon_fetch_class(&class_name);
 
 	object_init_ex(&collection, ce0);

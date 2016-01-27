@@ -1828,8 +1828,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 
 			PHALCON_CALL_METHOD(&escaped_field, connection, "escapeidentifier", field);
 
-			if (Z_TYPE_P(v) == IS_OBJECT && instanceof_function(Z_OBJCE_P(v), phalcon_db_rawvalue_ce)) {
-				PHALCON_CONCAT_VSV(&pk_condition, &escaped_field, " = ", v);
+			if (Z_TYPE(v) == IS_OBJECT && instanceof_function(Z_OBJCE(v), phalcon_db_rawvalue_ce)) {
+				PHALCON_CONCAT_VSV(&pk_condition, &escaped_field, " = ", &v);
 				phalcon_update_property_long(getThis(), SL("_seenRawvalues"), 1);
 			} else {
 				PHALCON_CONCAT_VS(&pk_condition, &escaped_field, " = ?");

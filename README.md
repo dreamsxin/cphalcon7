@@ -1,4 +1,7 @@
-#[中文帮助](https://github.com/dreamsxin/cphalcon7/wiki)
+# [中文帮助](https://github.com/dreamsxin/cphalcon7/wiki)
+
+## [捐贈名單（Donation）](https://github.com/dreamsxin/cphalcon/blob/master/DONATE.md)
+
 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
 
 Phalcon7 Framework

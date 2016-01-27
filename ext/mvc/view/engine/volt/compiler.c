@@ -1087,7 +1087,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 	 */
 	if (PHALCON_IS_LONG(&type, PHVOLT_T_IDENTIFIER)) {
 		phalcon_array_fetch_str(&name, filter, SL("value"), PH_NOISY);
-	} else if (PHALCON_IS_LONG(type, PHVOLT_T_FCALL)) {
+	} else if (PHALCON_IS_LONG(&type, PHVOLT_T_FCALL)) {
 		phalcon_array_fetch_str(&function_name, filter, SL("name"), PH_NOISY);
 		phalcon_array_fetch_str(&name, &function_name, SL("value"), PH_NOISY);
 	} else {
@@ -1173,8 +1173,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 			if (Z_TYPE(definition) == IS_OBJECT) {
 				if (instanceof_function(Z_OBJCE(definition), zend_ce_closure)) {
 					array_init_size(&parameters, 2);
-					phalcon_array_append(&parameters, arguments, PH_COPY);
-					phalcon_array_append(&parameters, func_arguments, PH_COPY);
+					phalcon_array_append(&parameters, &arguments, PH_COPY);
+					phalcon_array_append(&parameters, &func_arguments, PH_COPY);
 					PHALCON_RETURN_CALL_FUNCTION("call_user_func_array", &definition, &parameters);
 					RETURN_MM();
 				}
@@ -1448,13 +1448,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 
-	zval *expr, expr_code = NULL, *extensions, *event = NULL, *fire_arguments = NULL;
-	zval *items = NULL, *single_expr = NULL, single_expr_expr;
-	zval *single_expr_code = NULL, *parameter = NULL, type;
-	zval left = NULL, left_code = NULL, right_code = NULL, right, value;
-	zval single_quote, escaped_quoute, *escaped_string = NULL;
-	zval *start_code = NULL, *end_code = NULL, *ternary = NULL;
-	zval *ternary_code = NULL, *line = NULL, *file = NULL, exception_message;
+	zval *expr, expr_code, *extensions;
 
 	PHALCON_MM_GROW();
 
@@ -1477,41 +1471,42 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 	extensions = phalcon_read_property(getThis(), SL("_extensions"), PH_NOISY);
 
 	while (1) {
+		zval event, fire_arguments, type, items, *single_expr;
+		zval left, left_code, right_code, right, value;
+		zval single_quote, escaped_quoute, escaped_string;
+		zval start_code, end_code, ternary, ternary_code, line, file, exception_message;
 
 		if (Z_TYPE_P(extensions) == IS_ARRAY) { 
+			ZVAL_STRING(&event, "resolveExpression");
 
-			PHALCON_INIT_NVAR(event);
-			ZVAL_STRING(event, "resolveExpression");
+			array_init_size(&fire_arguments, 1);
+			phalcon_array_append(&fire_arguments, expr, PH_COPY);
 
-			PHALCON_INIT_NVAR(fire_arguments);
-			array_init_size(fire_arguments, 1);
-			phalcon_array_append(fire_arguments, expr, PH_COPY);
-
-			PHALCON_CALL_METHOD(&expr_code, getThis(), "fireextensionevent", event, fire_arguments);
-			if (Z_TYPE_P(&expr_code) == IS_STRING) {
+			PHALCON_CALL_METHOD(&expr_code, getThis(), "fireextensionevent", &event, &fire_arguments);
+			if (Z_TYPE(expr_code) == IS_STRING) {
 				break;
 			}
 		}
 
 		if (!phalcon_array_isset_fetch_str(&type, expr, SL("type"))) {
-			PHALCON_INIT_NVAR(items);
-			array_init(items);
+			array_init(&items);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(expr), single_expr) {
-				zval name, parameter;
+				zval single_expr_expr, single_expr_code, name, parameter;
+
 				phalcon_array_fetch_str(&single_expr_expr, single_expr, SL("expr"), PH_NOISY);
 
 				PHALCON_CALL_METHOD(&single_expr_code, getThis(), "expression", &single_expr_expr);
 
 				if (phalcon_array_isset_fetch_str(&name, single_expr, SL("name"))) {
-					PHALCON_CONCAT_SVSV(&parameter, "'", &name, "' => ", single_expr_code);
-					phalcon_array_append(items, &parameter, PH_COPY);
+					PHALCON_CONCAT_SVSV(&parameter, "'", &name, "' => ", &single_expr_code);
+					phalcon_array_append(&items, &parameter, PH_COPY);
 				} else {
-					phalcon_array_append(items, single_expr_code, PH_COPY);
+					phalcon_array_append(&items, &single_expr_code, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 
-			phalcon_fast_join_str(&expr_code, SL(", "), items);
+			phalcon_fast_join_str(&expr_code, SL(", "), &items);
 			break;
 		}
 
@@ -1560,52 +1555,52 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 		switch (phalcon_get_intval(&type)) {
 
 			case PHVOLT_T_NOT:
-				PHALCON_CONCAT_SV(&expr_code, "!", right_code);
+				PHALCON_CONCAT_SV(&expr_code, "!", &right_code);
 				break;
 
 			case PHVOLT_T_MUL:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " * ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " * ", &right_code);
 				break;
 
 			case PHVOLT_T_ADD:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " + ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " + ", &right_code);
 				break;
 
 			case PHVOLT_T_SUB:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " - ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " - ", &right_code);
 				break;
 
 			case PHVOLT_T_DIV:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " / ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " / ", &right_code);
 				break;
 
 			case PHVOLT_T_MOD:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " % ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " % ", &right_code);
 				break;
 
 			case PHVOLT_T_LESS:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " < ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " < ", &right_code);
 				break;
 
 			case PHVOLT_T_ASSIGN:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " > ", right_code); /* FIXME really >? */
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " > ", &right_code); /* FIXME really >? */
 				break;
 
 			case PHVOLT_T_GREATER:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " > ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " > ", &right_code);
 				break;
 
 			case 126: /* FIXME no such constant*/
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " . ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " . ", &right_code);
 				break;
 
 			case PHVOLT_T_POW:
-				PHALCON_CONCAT_SVSVS(&expr_code, "pow(", left_code, ", ", right_code, ")");
+				PHALCON_CONCAT_SVSVS(&expr_code, "pow(", &left_code, ", ", &right_code, ")");
 				break;
 
 			case PHVOLT_T_ARRAY:
 				if (phalcon_array_isset_str(expr, SL("left"))) {
-					PHALCON_CONCAT_SVS(&expr_code, "array(", left_code, ")");
+					PHALCON_CONCAT_SVS(&expr_code, "array(", &left_code, ")");
 				} else {
 					ZVAL_STRING(&expr_code, "array()");
 				}
@@ -1625,7 +1620,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 
 				PHALCON_STR_REPLACE(&escaped_string, &single_quote, &escaped_quoute, &value);
 
-				PHALCON_CONCAT_SVS(&expr_code, "'", escaped_string, "'");
+				PHALCON_CONCAT_SVS(&expr_code, "'", &escaped_string, "'");
 				break;
 
 			case PHVOLT_T_NULL:
@@ -1647,39 +1642,39 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				break;
 
 			case PHVOLT_T_AND:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " && ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " && ", &right_code);
 				break;
 
 			case PHVOLT_T_OR:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " || ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " || ", &right_code);
 				break;
 
 			case PHVOLT_T_LESSEQUAL:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " <= ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " <= ", &right_code);
 				break;
 
 			case PHVOLT_T_GREATEREQUAL:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " >= ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " >= ", &right_code);
 				break;
 
 			case PHVOLT_T_EQUALS:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " == ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " == ", &right_code);
 				break;
 
 			case PHVOLT_T_NOTEQUALS:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " != ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " != ", &right_code);
 				break;
 
 			case PHVOLT_T_IDENTICAL:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " === ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " === ", &right_code);
 				break;
 
 			case PHVOLT_T_NOTIDENTICAL:
-				PHALCON_CONCAT_VSV(&expr_code, left_code, " !== ", right_code);
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " !== ", &right_code);
 				break;
 
 			case PHVOLT_T_RANGE:
-				PHALCON_CONCAT_SVSVS(&expr_code, "range(", left_code, ", ", right_code, ")");
+				PHALCON_CONCAT_SVSVS(&expr_code, "range(", &left_code, ", ", &right_code, ")");
 				break;
 
 			case PHVOLT_T_FCALL:
@@ -1687,118 +1682,115 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				break;
 
 			case PHVOLT_T_ENCLOSED:
-				PHALCON_CONCAT_SVS(&expr_code, "(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_ARRAYACCESS:
-				PHALCON_CONCAT_VSVS(&expr_code, left_code, "[", right_code, "]");
+				PHALCON_CONCAT_VSVS(&expr_code, &left_code, "[", &right_code, "]");
 				break;
 
 			case PHVOLT_T_SLICE: {
-				zval start, end;
+				zval tmp;
 				/** 
 				 * Evaluate the start part of the slice
 				 */
-				PHALCON_INIT_NVAR(start_code);
-				if (phalcon_array_isset_fetch_str(&start, expr, SL("start"))) {
-					PHALCON_CALL_METHOD(&start_code, getThis(), "expression", &start);
+				if (phalcon_array_isset_fetch_str(&tmp, expr, SL("start"))) {
+					PHALCON_CALL_METHOD(&start_code, getThis(), "expression", &tmp);
 				} else {
-					ZVAL_STRING(start_code, "null");
+					ZVAL_STRING(&start_code, "null");
 				}
 
 				/** 
 				 * Evaluate the end part of the slice
 				 */
-				PHALCON_INIT_NVAR(end_code);
-				if (phalcon_array_isset_fetch_str(&end, expr, SL("end"))) {
-					PHALCON_CALL_METHOD(&end_code, getThis(), "expression", &end);
+				if (phalcon_array_isset_fetch_str(&tmp, expr, SL("end"))) {
+					PHALCON_CALL_METHOD(&end_code, getThis(), "expression", &tmp);
 				} else {
-					ZVAL_STRING(end_code, "null");
+					ZVAL_STRING(&end_code, "null");
 				}
 
-				PHALCON_CONCAT_SVSVSVS(&expr_code, "$this->slice(", left_code, ", ", start_code, ", ", end_code, ")");
+				PHALCON_CONCAT_SVSVSVS(&expr_code, "$this->slice(", &left_code, ", ", &start_code, ", ", &end_code, ")");
 				break;
 			}
 
 			case PHVOLT_T_NOT_ISSET:
-				PHALCON_CONCAT_SVS(&expr_code, "!isset(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "!isset(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_ISSET:
-				PHALCON_CONCAT_SVS(&expr_code, "isset(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "isset(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_NOT_ISEMPTY:
-				PHALCON_CONCAT_SVS(&expr_code, "!empty(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "!empty(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_ISEMPTY:
-				PHALCON_CONCAT_SVS(&expr_code, "empty(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "empty(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_NOT_ISEVEN:
-				PHALCON_CONCAT_SVS(&expr_code, "!(((", left_code, ") % 2) == 0)");
+				PHALCON_CONCAT_SVS(&expr_code, "!(((", &left_code, ") % 2) == 0)");
 				break;
 
 			case PHVOLT_T_ISEVEN:
-				PHALCON_CONCAT_SVS(&expr_code, "(((", left_code, ") % 2) == 0)");
+				PHALCON_CONCAT_SVS(&expr_code, "(((", &left_code, ") % 2) == 0)");
 				break;
 
 			case PHVOLT_T_NOT_ISODD:
-				PHALCON_CONCAT_SVS(expr_code, "!(((", left_code, ") % 2) != 0)");
+				PHALCON_CONCAT_SVS(&expr_code, "!(((", &left_code, ") % 2) != 0)");
 				break;
 
 			case PHVOLT_T_ISODD:
-				PHALCON_CONCAT_SVS(&expr_code, "(((", left_code, ") % 2) != 0)");
+				PHALCON_CONCAT_SVS(&expr_code, "(((", &left_code, ") % 2) != 0)");
 				break;
 
 			case PHVOLT_T_NOT_ISNUMERIC:
-				PHALCON_CONCAT_SVS(&expr_code, "!is_numeric(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "!is_numeric(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_ISNUMERIC:
-				PHALCON_CONCAT_SVS(&expr_code, "is_numeric(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "is_numeric(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_NOT_ISSCALAR:
-				PHALCON_CONCAT_SVS(&expr_code, "!is_scalar(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "!is_scalar(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_ISSCALAR:
-				PHALCON_CONCAT_SVS(&expr_code, "is_scalar(", left_code, ")");
+				PHALCON_CONCAT_SVS(&expr_code, "is_scalar(", &left_code, ")");
 				break;
 
 			case PHVOLT_T_NOT_ISITERABLE:
-				PHALCON_CONCAT_SVSVS(&expr_code, "!(is_array(", left_code, ") || (", left_code, ") instanceof Traversable)");
+				PHALCON_CONCAT_SVSVS(&expr_code, "!(is_array(", &left_code, ") || (", &left_code, ") instanceof Traversable)");
 				break;
 
 			case PHVOLT_T_ISITERABLE:
-				PHALCON_CONCAT_SVSVS(&expr_code, "(is_array(", left_code, ") || (", left_code, ") instanceof Traversable)");
+				PHALCON_CONCAT_SVSVS(&expr_code, "(is_array(", &left_code, ") || (", &left_code, ") instanceof Traversable)");
 				break;
 
 			case PHVOLT_T_IN:
-				PHALCON_CONCAT_SVSVS(&expr_code, "$this->isIncluded(", left_code, ", ", right_code, ")");
+				PHALCON_CONCAT_SVSVS(&expr_code, "$this->isIncluded(", &left_code, ", ", &right_code, ")");
 				break;
 
 			case PHVOLT_T_NOT_IN:
-				PHALCON_CONCAT_SVSVS(&expr_code, "!$this->isIncluded(", left_code, ", ", right_code, ")");
+				PHALCON_CONCAT_SVSVS(&expr_code, "!$this->isIncluded(", &left_code, ", ", &right_code, ")");
 				break;
 
 			case PHVOLT_T_TERNARY:
-				PHALCON_OBS_NVAR(ternary);
 				phalcon_array_fetch_str(&ternary, expr, SL("ternary"), PH_NOISY);
 
-				PHALCON_CALL_METHOD(&ternary_code, getThis(), "expression", ternary);
+				PHALCON_CALL_METHOD(&ternary_code, getThis(), "expression", &ternary);
 
-				PHALCON_CONCAT_SVSVSVS(&expr_code, "(", ternary_code, " ? ", left_code, " : ", right_code, ")");
+				PHALCON_CONCAT_SVSVSVS(&expr_code, "(", &ternary_code, " ? ", &left_code, " : ", &right_code, ")");
 				break;
 
 			case PHVOLT_T_MINUS:
-				PHALCON_CONCAT_SV(&expr_code, "-", right_code);
+				PHALCON_CONCAT_SV(&expr_code, "-", &right_code);
 				break;
 
 			case PHVOLT_T_PLUS:
-				PHALCON_CONCAT_SV(&expr_code, "+", right_code);
+				PHALCON_CONCAT_SV(&expr_code, "+", &right_code);
 				break;
 
 			default:
@@ -1814,7 +1806,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 	}
 
 	phalcon_property_decr(getThis(), SL("_exprLevel"));
-	RETURN_CCTOR(&expr_code);
+	RETURN_CTOR(&expr_code);
 }
 
 /**

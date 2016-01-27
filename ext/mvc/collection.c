@@ -1498,8 +1498,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, appendMessage){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, save){
 
-	zval *dependency_injector, *arr = NULL, *white_list = NULL, *mode = NULL;
-	zval column_map, attributes, *reserved = NULL, *new_value;
+	zval *arr = NULL, *white_list = NULL, *mode = NULL, *dependency_injector;
+	zval column_map, attributes, reserved, *new_value;
 	zval source, connection, collection, exists, empty_array, *disable_events;
 	zval type, message, collection_message, *messages, status, data;
 	zval *value = NULL, success, options, ok, id;
@@ -1507,18 +1507,17 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	zend_string *str_key;
 	ulong idx;
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
-		return;
-	}
-
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 3, &arr, &white_list, &mode);
+	phalcon_fetch_params(0, 0, 3, &arr, &white_list, &mode);
 
 	if (!arr) {
 		arr = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (Z_TYPE_P(arr) != IS_NULL) {
+		if (Z_TYPE_P(arr) != IS_ARRAY) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Data passed to save() must be an array");
+			return;
+		}
 	}
 
 	if (!white_list) {
@@ -1529,11 +1528,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		mode = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (Z_TYPE_P(arr) != IS_NULL) {
-		if (Z_TYPE_P(arr) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Data passed to save() must be an array");
-			return;
-		}
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
+	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		return;
 	}
 
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap", getThis());
@@ -1542,6 +1540,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	} else {
 		ZVAL_COPY(&attributes, &column_map);
 	}
+
 	PHALCON_CALL_METHOD(&reserved, getThis(), "getreservedattributes");
 
 	if ( Z_TYPE_P(arr) == IS_ARRAY) {
@@ -1556,7 +1555,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 				ZVAL_LONG(&tmp, idx);
 			}
 
-			if (phalcon_array_isset(reserved, &tmp)) {
+			if (phalcon_array_isset(&reserved, &tmp)) {
 				continue;
 			}
 
@@ -1576,8 +1575,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 				} else if (phalcon_fast_in_array(&tmp, &column_map)) {
 					PHALCON_CONCAT_SV(&possible_setter, "set", &tmp);
 					zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
-					if (phalcon_method_exists(getThis(), possible_setter) == SUCCESS) {
-						PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(possible_setter), new_value);
+					if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
+						PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL(possible_setter), new_value);
 					} else {
 						phalcon_update_property_zval_zval(getThis(), &tmp, new_value);
 					}

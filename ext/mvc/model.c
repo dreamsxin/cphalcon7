@@ -1561,124 +1561,111 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
  */
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
-	zval *parameters = NULL, *auto_create = NULL, model_name, *params = NULL, *builder = NULL;
-	zval *query = NULL, cache, event_name;
-	zval *dependency_injector = NULL, service_name, *has = NULL, *service_params, *manager = NULL, *model = NULL;
-	zval *result = NULL, hydration;
+	zval *parameters = NULL, *auto_create = NULL, params, dependency_injector, model_name, service_name, has, manager;
+	zval model, service_params, builder, query, cache, event_name, result, hydration;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 0, 2, &parameters, &auto_create);
 
-	phalcon_fetch_params(1, 0, 2, &parameters, &auto_create);
-
-	if (!parameters) {
-		parameters = &PHALCON_GLOBAL(z_null);
+	if (!parameters || Z_TYPE_P(parameters) != IS_ARRAY) {
+		array_init(&params);
+		if (Z_TYPE_P(parameters) != IS_NULL) {
+			phalcon_array_append(&params, parameters, PH_COPY);
+		}
+	} else {
+		ZVAL_COPY(&params, parameters);
 	}
 
 	if (!auto_create) {
 		auto_create = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_get_called_class(&model_name);
+	PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 
-	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 
+	phalcon_get_called_class(&model_name);
+
 	ZVAL_STRING(&service_name, "modelsManager");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", &service_name);
-	if (zend_is_true(has)) {
-		PHALCON_CALL_METHOD(&manager, dependency_injector, "getshared", &service_name);
+	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {
+		PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service_name);
 	} else {
-		PHALCON_INIT_NVAR(manager);
-		object_init_ex(manager, phalcon_mvc_model_manager_ce);
+		object_init_ex(&manager, phalcon_mvc_model_manager_ce);
 	}
 
-	PHALCON_CALL_METHOD(&model, manager, "load", &model_name, &PHALCON_GLOBAL(z_true));
-
-	if (Z_TYPE_P(parameters) != IS_ARRAY) {
-		PHALCON_INIT_VAR(params);
-		array_init(params);
-		if (Z_TYPE_P(parameters) != IS_NULL) {
-			phalcon_array_append(params, parameters, PH_COPY);
-		}
-	} else {
-		PHALCON_CPY_WRT(params, parameters);
-	}
+	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name, &PHALCON_GLOBAL(z_true));
 
 	/**
 	 * Builds a query with the passed parameters
 	 */
 	ZVAL_STRING(&service_name, "modelsQueryBuilder");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", &service_name);
-	if (zend_is_true(has)) {
-		PHALCON_INIT_VAR(service_params);
-		array_init(service_params);
+	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {
+		array_init(&service_params);
+		phalcon_array_append(&service_params, &params, PH_COPY);
 
-		phalcon_array_append(service_params, params, PH_COPY);
-
-		PHALCON_CALL_METHOD(&builder, dependency_injector, "get", &service_name, service_params);
+		PHALCON_CALL_METHODW(&builder, &dependency_injector, "get", &service_name, &service_params);
 	} else {
-		PHALCON_INIT_NVAR(builder);
-		object_init_ex(builder, phalcon_mvc_model_query_builder_ce);
-		PHALCON_CALL_METHOD(NULL, builder, "__construct", params);
+		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
+		PHALCON_CALL_METHODW(NULL, &builder, "__construct", &params);
 	}
 
-	PHALCON_CALL_METHOD(NULL, builder, "from", &model_name);
+	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
 
 	ZVAL_STRING(&event_name, "beforeQuery");
 
-	ZVAL_MAKE_REF(builder);
-	PHALCON_CALL_METHOD(NULL, model, "fireevent", &event_name, builder);
-	ZVAL_UNREF(builder);
+	ZVAL_MAKE_REF(&builder);
+	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &builder);
+	ZVAL_UNREF(&builder);
 
 	/**
 	 * We only want the first record
 	 */
-	PHALCON_CALL_METHOD(NULL, builder, "limit", &PHALCON_GLOBAL(z_one));
-	PHALCON_CALL_METHOD(&query, builder, "getquery");
+	PHALCON_CALL_METHODW(NULL, &builder, "limit", &PHALCON_GLOBAL(z_one));
+	PHALCON_CALL_METHODW(&query, &builder, "getquery");
 
 	/**
 	 * Pass the cache options to the query
 	 */
-	if (phalcon_array_isset_fetch_str(&cache, params, SL("cache"))) {
-		PHALCON_CALL_METHOD(NULL, query, "cache", &cache);
+	if (phalcon_array_isset_fetch_str(&cache, &params, SL("cache"))) {
+		PHALCON_CALL_METHODW(NULL, &query, "cache", &cache);
 	}
 
 	/**
 	 * Return only the first row
 	 */
-	PHALCON_CALL_METHOD(NULL, query, "setuniquerow", &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHODW(NULL, &query, "setuniquerow", &PHALCON_GLOBAL(z_true));
 
 	/**
 	 * Execute the query passing the bind-params and casting-types
 	 */
-	PHALCON_CALL_METHOD(&result, query, "execute");
+	PHALCON_CALL_METHODW(&result, &query, "execute");
 
-	if (zend_is_true(result)) {
+	if (zend_is_true(&result)) {
 		ZVAL_STRING(&event_name, "afterQuery");
 
-		ZVAL_MAKE_REF(result);
-		PHALCON_CALL_METHOD(NULL, model, "fireevent", &event_name, result);
-		ZVAL_UNREF(result);
+		ZVAL_MAKE_REF(&result);
+		PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &result);
+		ZVAL_UNREF(&result);
 
 		/**
 		 * Define an hydration mode
 		 */
-		if (phalcon_array_isset_fetch_str(&hydration, params, SL("hydration"))) {
-			PHALCON_CALL_METHOD(NULL, result, "sethydratemode", &hydration);
+		if (phalcon_array_isset_fetch_str(&hydration, &params, SL("hydration"))) {
+			PHALCON_CALL_METHODW(NULL, &result, "sethydratemode", &hydration);
 		}
 
-		RETURN_CTOR(result);
+		RETURN_CTORW(&result);
 	} else if (zend_is_true(auto_create)) {
-		RETURN_CTOR(model);
+		RETURN_CTORW(&model);
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**

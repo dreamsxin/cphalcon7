@@ -1822,67 +1822,56 @@ PHP_METHOD(Phalcon_Mvc_Collection, findById){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 
-	zval *parameters = NULL, *params= NULL, *class_name, *collection, *collection_manager = NULL;
-	zval *use_implicit_ids = NULL, *mongo_id = NULL, *conditions, *connection = NULL;
-	zval *unique;
+	zval *parameters = NULL, class_name, collection, collection_manager;
+	zval use_implicit_ids, mongo_id, conditions, params, connection;
 	zend_class_entry *ce0, *ce1;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name );
-	ce0 = phalcon_fetch_class(class_name);
+	phalcon_get_called_class(&class_name );
+	ce0 = phalcon_fetch_class(&class_name);
 
-	PHALCON_INIT_VAR(collection);
-	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection)) {
-		PHALCON_CALL_METHOD(NULL, collection, "__construct");
+	object_init_ex(&collection, ce0);
+	if (phalcon_has_constructor(&collection)) {
+		PHALCON_CALL_METHODW(NULL, &collection, "__construct");
 	}
 
 	if (Z_TYPE_P(parameters) != IS_NULL && Z_TYPE_P(parameters) != IS_ARRAY) {
 		if (Z_TYPE_P(parameters) != IS_OBJECT) {
-			PHALCON_CALL_METHOD(&collection_manager, collection, "getcollectionmanager");
+			PHALCON_CALL_METHODW(&collection_manager, &collection, "getcollectionmanager");
 
 			/**
 			 * Check if the collection use implicit ids
 			 */
-			PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", collection);
-			if (zend_is_true(use_implicit_ids)) {
+			PHALCON_CALL_METHODW(&use_implicit_ids, &collection_manager, "isusingimplicitobjectids", &collection);
+			if (zend_is_true(&use_implicit_ids)) {
 				ce1 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
-				PHALCON_INIT_VAR(mongo_id);
-				object_init_ex(mongo_id, ce1);
-				if (phalcon_has_constructor(mongo_id)) {
-					PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", parameters);
-				}
+
+				object_init_ex(&mongo_id, ce1);
+				PHALCON_CALL_METHODW(NULL, &mongo_id, "__construct", parameters);
 			} else {
-				PHALCON_CPY_WRT(mongo_id, parameters);
+				ZVAL_COPY(&mongo_id, parameters);
 			}
 		} else {
-			PHALCON_CPY_WRT(mongo_id, parameters);
+			ZVAL_COPY(&mongo_id, parameters);
 		}
 
-		PHALCON_INIT_VAR(conditions);
-		array_init_size(conditions, 1);
-		phalcon_array_update_str(conditions, SL("_id"), mongo_id, PH_COPY);
+		array_init_size(&conditions, 1);
+		phalcon_array_update_str(&conditions, SL("_id"), &mongo_id, PH_COPY);
 
-		PHALCON_INIT_VAR(params);
-		array_init_size(params, 1);
-		phalcon_array_append(params, conditions, PH_COPY);
+		array_init_size(&params, 1);
+		phalcon_array_append(&params, &conditions, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT(params, parameters);
+		ZVAL_COPY(&params, parameters);
 	}
 
-	PHALCON_CALL_METHOD(&connection, collection, "getconnection");
+	PHALCON_CALL_METHODW(&connection, &collection, "getconnection");
 
-	unique = &PHALCON_GLOBAL(z_true);
-	PHALCON_RETURN_CALL_SELF("_getresultset", params, collection, connection, unique);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("_getresultset", &params, &collection, &connection, &PHALCON_GLOBAL(z_true));
 }
 
 /**
@@ -1925,13 +1914,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, find){
 
-	zval *parameters = NULL, *class_name, *collection, *connection = NULL;
-	zval *unique;
+	zval *parameters = NULL, class_name, collection, connection;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -1939,26 +1925,22 @@ PHP_METHOD(Phalcon_Mvc_Collection, find){
 
 	if (Z_TYPE_P(parameters) != IS_NULL) {
 		if (Z_TYPE_P(parameters) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Invalid parameters for find");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Invalid parameters for find");
 			return;
 		}
 	}
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name );
-	ce0 = phalcon_fetch_class(class_name);
+	phalcon_get_called_class(&class_name );
+	ce0 = phalcon_fetch_class(&class_name);
 
-	PHALCON_INIT_VAR(collection);
-	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection)) {
-		PHALCON_CALL_METHOD(NULL, collection, "__construct");
+	object_init_ex(&collection, ce0);
+	if (phalcon_has_constructor(&collection)) {
+		PHALCON_CALL_METHODW(NULL, &collection, "__construct");
 	}
 
-	PHALCON_CALL_METHOD(&connection, collection, "getconnection");
+	PHALCON_CALL_METHODW(&connection, &collection, "getconnection");
 
-	unique = &PHALCON_GLOBAL(z_false);
-	PHALCON_RETURN_CALL_SELF("_getresultset", parameters, collection, connection, unique);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("_getresultset", parameters, &collection, &connection, &PHALCON_GLOBAL(z_false));
 }
 
 /**

@@ -2118,7 +2118,7 @@ PHP_METHOD(Phalcon_Mvc_View, __get){
 
 	params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, params, key)) {
-		RETURN_CTORW(value);
+		RETURN_CTORW(&value);
 	}
 
 	RETURN_NULL();
@@ -2221,20 +2221,15 @@ PHP_METHOD(Phalcon_Mvc_View, setConverter){
  */
 PHP_METHOD(Phalcon_Mvc_View, getConverter) {
 
-	zval *name, *converters, *converter;
+	zval *name, *converters, converter;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	converters = phalcon_read_property(getThis(), SL("_converters"), PH_NOISY);
 
-	if (phalcon_array_isset(converters, name)) {
-		PHALCON_OBS_VAR(converter);
-		phalcon_array_fetch(&converter, converters, name, PH_NOISY);
-
-		RETURN_CTOR(converter);
+	if (phalcon_array_isset_fetch(&converter, converters, name)) {
+		RETURN_CTORW(&converter);
 	}
 
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }

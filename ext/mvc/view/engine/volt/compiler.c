@@ -2284,10 +2284,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileEcho){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 
-	zval *statement, *path_expr, *expr_type, *path = NULL;
-	zval *view, *views_dir = NULL, *final_path = NULL, *extended;
-	zval *sub_compiler, *compilation = NULL, *compiled_path = NULL;
-	zval *expr_params, *params = NULL;
+	zval *statement, path_expr, expr_type, path, *view, views_dir, final_path, extended;
+	zval sub_compiler, compilation, compiled_path, expr_params, params;
 
 	PHALCON_MM_GROW();
 
@@ -2304,20 +2302,17 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 	/** 
 	 * Include statement
 	 */
-	PHALCON_OBS_VAR(path_expr);
 	phalcon_array_fetch_str(&path_expr, statement, SL("path"), PH_NOISY);
 
 	/** 
 	 * Check if the expression is a string
 	 */
-	PHALCON_OBS_VAR(expr_type);
-	phalcon_array_fetch_str(&expr_type, path_expr, SL("type"), PH_NOISY);
+	phalcon_array_fetch_str(&expr_type, &path_expr, SL("type"), PH_NOISY);
 
 	/** 
 	 * If the path is an string try to make an static compilation
 	 */
-	if (PHALCON_IS_LONG(expr_type, 260)) {
-
+	if (PHALCON_IS_LONG(&expr_type, 260)) {
 		/** 
 		 * Static compilation cannot be performed if the user passed extra parameters
 		 */
@@ -2326,68 +2321,60 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 			/** 
 			 * Get the static path
 			 */
-			PHALCON_OBS_VAR(path);
-			phalcon_array_fetch_str(&path, path_expr, SL("value"), PH_NOISY);
+			phalcon_array_fetch_str(&path, &path_expr, SL("value"), PH_NOISY);
 
 			view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 			if (Z_TYPE_P(view) == IS_OBJECT) {
-				PHALCON_CALL_METHOD(&views_dir, view, "getviewsdir");
+				PHALCON_CALL_METHODW(&views_dir, view, "getviewsdir");
 
-				PHALCON_INIT_VAR(final_path);
-				PHALCON_CONCAT_VV(final_path, views_dir, path);
+				PHALCON_CONCAT_VV(&final_path, &views_dir, &path);
 			} else {
-				PHALCON_CPY_WRT(final_path, path);
+				ZVAL_COPY(&final_path, &path);
 			}
 
-			PHALCON_INIT_VAR(extended);
-			ZVAL_BOOL(extended, 0);
+			ZVAL_BOOL(&extended, 0);
 
 			/** 
 			 * Clone the original compiler
 			 */
-			PHALCON_INIT_VAR(sub_compiler);
-			if (phalcon_clone(sub_compiler, getThis()) == FAILURE) {
-				RETURN_MM();
+			if (phalcon_clone(&sub_compiler, getThis()) == FAILURE) {
+				return;
 			}
 
 			/** 
 			 * Perform a subcompilation of the included file
 			 */
-			PHALCON_CALL_METHOD(&compilation, sub_compiler, "compile", final_path, extended);
+			PHALCON_CALL_METHODW(&compilation, &sub_compiler, "compile", &final_path, &extended);
 
 			/** 
 			 * If the compilation doesn't return anything we include the compiled path
 			 */
-			if (Z_TYPE_P(&compilation) == IS_NULL) {
-				PHALCON_CALL_METHOD(&compiled_path, sub_compiler, "getcompiledtemplatepath");
+			if (Z_TYPE(compilation) == IS_NULL) {
+				PHALCON_CALL_METHODW(&compiled_path, &sub_compiler, "getcompiledtemplatepath");
 
 				/** 
 				 * Use file-get-contents to respect the openbase_dir directive
 				 */
-				PHALCON_INIT_NVAR(&compilation);
-				phalcon_file_get_contents(&compilation, compiled_path);
+				phalcon_file_get_contents(&compilation, &compiled_path);
 			}
 
-			RETURN_CCTOR(&compilation);
+			RETURN_CTORW(&compilation);
 		}
 	}
 
 	/** 
 	 * Resolve the path's expression
 	 */
-	PHALCON_CALL_METHOD(&path, getThis(), "expression", path_expr);
+	PHALCON_CALL_METHODW(&path, getThis(), "expression", &path_expr);
 	if (!phalcon_array_isset_str(statement, SL("params"))) {
-		PHALCON_CONCAT_SVS(return_value, "<?php $this->partial(", path, "); ?>");
-		RETURN_MM();
+		PHALCON_CONCAT_SVS(return_value, "<?php $this->partial(", &path, "); ?>");
+		return;
 	}
 
-	PHALCON_OBS_VAR(expr_params);
 	phalcon_array_fetch_str(&expr_params, statement, SL("params"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&params, getThis(), "expression", expr_params);
-	PHALCON_CONCAT_SVSVS(return_value, "<?php $this->partial(", path, ", ", params, "); ?>");
-
-	RETURN_MM();
+	PHALCON_CALL_METHODW(&params, getThis(), "expression", &expr_params);
+	PHALCON_CONCAT_SVSVS(return_value, "<?php $this->partial(", &path, ", ", &params, "); ?>");
 }
 
 /**
@@ -2398,54 +2385,47 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileSet){
 
-	zval *statement, *compilation, *assignments;
-	zval *assignment = NULL, *expr = NULL, *expr_code = NULL, *variable = NULL;
-	zval *op = NULL;
+	zval *statement, compilation, assignments, *assignment;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &statement);
+	phalcon_fetch_params(0, 1, 0, &statement);
 
 	/** 
 	 * A valid assigment list is required
 	 */
 	if (!phalcon_array_isset_str(statement, SL("assignments"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
 
-	PHALCON_INIT_VAR(&compilation);
 	ZVAL_STRING(&compilation, "<?php");
 
 	/** 
 	 * A single set can have several assigments
 	 */
-	PHALCON_OBS_VAR(assignments);
 	phalcon_array_fetch_str(&assignments, statement, SL("assignments"), PH_NOISY);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(assignments), assignment) {
-		PHALCON_OBS_NVAR(expr);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(assignments), assignment) {
+		zval expr, expr_code, variable, op;
+
 		phalcon_array_fetch_str(&expr, assignment, SL("expr"), PH_NOISY);
 
-		PHALCON_CALL_METHOD(&expr_code, getThis(), "expression", expr);
+		PHALCON_CALL_METHOD(&expr_code, getThis(), "expression", &expr);
 
 		/** 
 		 * Set statement
 		 */
-		PHALCON_OBS_NVAR(variable);
 		phalcon_array_fetch_str(&variable, assignment, SL("variable"), PH_NOISY);
 
 		/** 
 		 * Assignment operator
 		 */
-		PHALCON_OBS_NVAR(op);
 		phalcon_array_fetch_str(&op, assignment, SL("op"), PH_NOISY);
 
 		/** 
 		 * Generate the right operator
 		 */
 
-		switch (phalcon_get_intval(op)) {
+		switch (phalcon_get_intval(&op)) {
 
 			case 281:
 				PHALCON_SCONCAT_SVSVS(&compilation, " $", &variable, " += ", &expr_code, ";");
@@ -2472,7 +2452,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileSet){
 
 	phalcon_concat_self_str(&compilation, SL(" ?>"));
 
-	RETURN_CTOR(&compilation);
+	RETURN_CTORW(&compilation);
 }
 
 /**

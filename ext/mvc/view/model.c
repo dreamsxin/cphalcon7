@@ -243,35 +243,25 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getVars){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
 
-	zval *key, *value, *isappend = NULL, *view_params, *var, *var_append;
+	zval *key, *value, *isappend = NULL, *view_params, var, var_append;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 1, &key, &value, &isappend);
 
-	phalcon_fetch_params(1, 2, 1, &key, &value, &isappend);
-
-	if (!isappend) {
-		isappend = &PHALCON_GLOBAL(z_false);
-	}
-
-	if (zend_is_true(isappend)) {
+	if (isappend && zend_is_true(isappend)) {
 		view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 
-		if (Z_TYPE_P(view_params) == IS_ARRAY && phalcon_array_isset(view_params, key)) { 
-			PHALCON_OBS_VAR(var);
-			phalcon_array_fetch(&var, view_params, key, PH_NOISY);
-
-			PHALCON_INIT_VAR(var_append);
-			PHALCON_CONCAT_VV(var_append, var, value);
+		if (Z_TYPE_P(view_params) == IS_ARRAY && phalcon_array_isset_fetch(&var, view_params, key)) {
+			PHALCON_CONCAT_VV(&var_append, &var, value);
 		} else {
-			PHALCON_CPY_WRT(var_append, value);
+			ZVAL_COPY(&var_append, value);
 		}
 	} else {
-		PHALCON_CPY_WRT(var_append, value);
+		ZVAL_COPY(&var_append, value);
 	}
 
-	phalcon_update_property_array(getThis(), SL("_viewParams"), key, var_append);
+	phalcon_update_property_array(getThis(), SL("_viewParams"), key, &var_append);
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**

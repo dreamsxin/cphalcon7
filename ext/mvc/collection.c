@@ -1964,28 +1964,21 @@ PHP_METHOD(Phalcon_Mvc_Collection, count){
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
+	} else if (Z_TYPE_P(parameters) != IS_NULL && if (Z_TYPE_P(parameters) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Invalid parameters for count");
+		return;
 	}
 
-	if (Z_TYPE_P(parameters) != IS_NULL) {
-		if (Z_TYPE_P(parameters) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Invalid parameters for count");
-			return;
-		}
+	phalcon_get_called_class(&class_name );
+	ce0 = phalcon_fetch_class(&class_name);
+
+	object_init_ex(&collection, ce0);
+	if (phalcon_has_constructor(&collection)) {
+		PHALCON_CALL_METHODW(NULL, &collection, "__construct");
 	}
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name );
-	ce0 = phalcon_fetch_class(class_name);
-
-	PHALCON_INIT_VAR(collection);
-	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection)) {
-		PHALCON_CALL_METHOD(NULL, collection, "__construct");
-	}
-
-	PHALCON_CALL_METHOD(&connection, collection, "getconnection");
-	PHALCON_RETURN_CALL_SELF("_getgroupresultset", parameters, collection, connection);
-	RETURN_MM();
+	PHALCON_CALL_METHODW(&connection, &collection, "getconnection");
+	PHALCON_RETURN_CALL_SELF("_getgroupresultset", parameters, &collection, &connection);
 }
 
 /**

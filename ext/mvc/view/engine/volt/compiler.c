@@ -2493,27 +2493,22 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileDo){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileReturn){
 
-	zval *statement, *expr, *expr_code = NULL;
+	zval *statement, expr, expr_code;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &statement);
+	phalcon_fetch_params(0, 1, 0, &statement);
 
 	/** 
 	 * A valid expression is required
 	 */
-	if (!phalcon_array_isset_str(statement, SL("expr"))) {
+	if (!phalcon_array_isset_fetch_str(&expr, statement, SL("expr"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Corrupted statement");
 		return;
 	}
 
-	PHALCON_OBS_VAR(expr);
 	phalcon_array_fetch_str(&expr, statement, SL("expr"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&expr_code, getThis(), "expression", expr);
+	PHALCON_CALL_METHODW(&expr_code, getThis(), "expression", &expr);
 	PHALCON_CONCAT_SVS(return_value, "<?php return ", &expr_code, "; ?>");
-
-	RETURN_MM();
 }
 
 /**

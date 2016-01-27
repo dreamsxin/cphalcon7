@@ -1,6 +1,8 @@
 **支付宝账户**
 * dreamsxin@qq.com 朱**
 
+![docs/images/alipay.png](docs/images/alipay.png)
+
 **捐赠人**
 * 吴昊 10RMB
 * 文凯 30RMB

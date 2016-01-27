@@ -1501,9 +1501,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	zval *arr = NULL, *white_list = NULL, *mode = NULL, *dependency_injector;
 	zval column_map, attributes, reserved, *new_value;
 	zval source, connection, collection, exists, empty_array, *disable_events;
-	zval type, message, collection_message, *messages, status, data;
-	zval *value = NULL, success, options, ok, id;
-	zval func;
+	zval type, message, collection_message, messages, status, data, attribute_field;
+	zval *value = NULL, success, options, ok, id, func;
 	zend_string *str_key;
 	ulong idx;
 
@@ -1671,14 +1670,14 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 	if (Z_TYPE(attributes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL(attributes), idx, str_key) {
-			zval tmp, attribute_field;
+			zval tmp;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
 
-			if (phalcon_array_isset(reserved, &tmp)) {
+			if (phalcon_array_isset(&reserved, &tmp)) {
 				continue;
 			}
 
@@ -1702,7 +1701,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		ZVAL_STRING(&attribute_field, "_id");
 
 		PHALCON_CALL_SELF(&id, "getid");
-		phalcon_array_update_zval(data, &attribute_field, &id, PH_COPY);
+		phalcon_array_update_zval(&data, &attribute_field, &id, PH_COPY);
 		ZVAL_STRING(&func, "save");
 	} else {
 		ZVAL_STRING(&func, "insert");
@@ -1754,56 +1753,44 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, findById){
 
-	zval *id, *class_name, *collection, *collection_manager = NULL;
-	zval *use_implicit_ids = NULL, *mongo_id = NULL, *conditions;
-	zval *parameters;
+	zval *id, class_name, collection, collection_manager, use_implicit_ids, mongo_id, conditions, parameters;
 	zend_class_entry *ce0, *ce1;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &id);
+	phalcon_fetch_params(0, 1, 0, &id);
 
 	if (Z_TYPE_P(id) != IS_OBJECT) {
+		phalcon_get_called_class(&class_name );
+		ce0 = phalcon_fetch_class(&class_name);
 
-		PHALCON_INIT_VAR(class_name);
-		phalcon_get_called_class(class_name );
-		ce0 = phalcon_fetch_class(class_name);
-
-		PHALCON_INIT_VAR(collection);
-		object_init_ex(collection, ce0);
-		if (phalcon_has_constructor(collection)) {
-			PHALCON_CALL_METHOD(NULL, collection, "__construct");
+		object_init_ex(&collection, ce0);
+		if (phalcon_has_constructor(&collection)) {
+			PHALCON_CALL_METHODW(NULL, &collection, "__construct");
 		}
 
-		PHALCON_CALL_METHOD(&collection_manager, collection, "getcollectionmanager");
+		PHALCON_CALL_METHODW(&collection_manager, &collection, "getcollectionmanager");
 
 		/**
 		 * Check if the collection use implicit ids
 		 */
-		PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", collection);
-		if (zend_is_true(use_implicit_ids)) {
+		PHALCON_CALL_METHODW(&use_implicit_ids, &collection_manager, "isusingimplicitobjectids", &collection);
+		if (zend_is_true(&use_implicit_ids)) {
 			ce1 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
-			PHALCON_INIT_VAR(mongo_id);
-			object_init_ex(mongo_id, ce1);
-			if (phalcon_has_constructor(mongo_id)) {
-				PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", id);
-			}
+			object_init_ex(&mongo_id, ce1);
+			PHALCON_CALL_METHODW(NULL, &mongo_id, "__construct", id);
 		} else {
-			PHALCON_CPY_WRT(mongo_id, id);
+			ZVAL_COPY(&mongo_id, id);
 		}
 	} else {
-		PHALCON_CPY_WRT(mongo_id, id);
+		ZVAL_COPY(&mongo_id, id);
 	}
 
-	PHALCON_INIT_VAR(conditions);
-	array_init_size(conditions, 1);
-	phalcon_array_update_str(conditions, SL("_id"), mongo_id, PH_COPY);
+	array_init_size(&conditions, 1);
+	phalcon_array_update_str(&conditions, SL("_id"), &mongo_id, PH_COPY);
 
-	PHALCON_INIT_VAR(parameters);
-	array_init_size(parameters, 1);
-	phalcon_array_append(parameters, conditions, PH_COPY);
-	PHALCON_RETURN_CALL_SELF("findfirst", parameters);
-	RETURN_MM();
+	array_init_size(&parameters, 1);
+	phalcon_array_append(&parameters, &conditions, PH_COPY);
+
+	PHALCON_RETURN_CALL_SELFW("findfirst", &parameters);
 }
 
 /**

@@ -1676,48 +1676,41 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
  */
 PHP_METHOD(Phalcon_Mvc_Model, query){
 
-	zval *dependency_injector = NULL, *model_name, *service_name, *has = NULL, *criteria = NULL;
+	zval *di = NULL, dependency_injector, model_name, service_name, has, criteria;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 0, 1, &dependency_injector);
+	phalcon_fetch_params(1, 0, 1, &di);
 
-	if (!dependency_injector) {
-		PHALCON_INIT_VAR(dependency_injector);
-	} else {
-		PHALCON_SEPARATE_PARAM(dependency_injector);
-	}
-
-	/**
-	 * Use the global dependency injector if there is no one defined
-	 */
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+	if (!di || Z_TYPE_P(di) != IS_OBJECT) {
+		/**
+		 * Use the global dependency injector if there is no one defined
+		 */
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-	}
 
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
-		return;
-	}
-
-	PHALCON_INIT_VAR(model_name);
-	phalcon_get_called_class(model_name);
-
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsCriteria");
-
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
-	if (zend_is_true(has)) {
-		PHALCON_CALL_METHOD(&criteria, dependency_injector, "get", service_name);
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+			return;
+		}
 	} else {
-		PHALCON_INIT_NVAR(criteria);
-		object_init_ex(criteria, phalcon_mvc_model_criteria_ce);
+		ZVAL_COPY(&dependency_injector, di);
 	}
 
-	PHALCON_CALL_METHOD(NULL, criteria, "setdi", dependency_injector);
-	PHALCON_CALL_METHOD(NULL, criteria, "setmodelname", model_name);
+	phalcon_get_called_class(&model_name);
 
-	RETURN_CTOR(criteria);
+	ZVAL_STRING(&service_name, "modelsCriteria");
+
+	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {
+		PHALCON_CALL_METHOD(&criteria, &dependency_injector, "get", &service_name);
+	} else {
+		object_init_ex(&criteria, phalcon_mvc_model_criteria_ce);
+	}
+
+	PHALCON_CALL_METHOD(NULL, &criteria, "setdi", &dependency_injector);
+	PHALCON_CALL_METHOD(NULL, &criteria, "setmodelname", &model_name);
+
+	RETURN_CTOR(&criteria);
 }
 
 /**
@@ -1727,16 +1720,12 @@ PHP_METHOD(Phalcon_Mvc_Model, query){
  */
 PHP_METHOD(Phalcon_Mvc_Model, build){
 
-	zval *meta_data = NULL, *read_connection = NULL;
+	zval meta_data, read_connection;
 
-	PHALCON_MM_GROW();
+	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_CALL_METHODW(&read_connection, getThis(), "getreadconnection");
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(&read_connection, getThis(), "getreadconnection");
-
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_rebuild", meta_data, read_connection);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_rebuild", &meta_data, &read_connection);
 }
 
 /**
@@ -1768,13 +1757,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getUniqueParams){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 
-	zval *meta_data, *connection, *unique_params = NULL;
-	zval *unique_types = NULL, *unique_key = NULL, *primary_keys = NULL;
-	zval *bind_data_types = NULL, *number_primary, *column_map = NULL;
-	zval *null_value, *number_empty, *where_pk, *field = NULL;
-	zval *attribute_field = NULL, exception_message;
-	zval *value = NULL, *escaped_field = NULL, *pk_condition = NULL, *type = NULL;
-	zval *v, *join_where;
+	zval *meta_data, *connection, unique_params;
+	zval unique_key, primary_keys, bind_data_types, number_primary, column_map;
+	zval unique_types, number_empty, where_pk, *field, exception_message;
+	zval *type = NULL;
+	zval *join_where;
 
 	PHALCON_MM_GROW();
 
@@ -1785,116 +1772,100 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 	/**
 	 * Builds a unique primary key condition
 	 */
-	unique_key = phalcon_read_property(getThis(), SL("_uniqueKey"), PH_NOISY);
-	unique_params = phalcon_read_property(getThis(), SL("_uniqueParams"), PH_NOISY);
-	if (Z_TYPE_P(unique_key) == IS_NULL || Z_TYPE_P(unique_params) == IS_NULL) {
+	phalcon_return_property(&unique_params, getThis(), SL("_uniqueParams"));
+	phalcon_return_property(&unique_key, getThis(), SL("_uniqueKey"));
+
+	if (Z_TYPE(unique_key) == IS_NULL || Z_TYPE(unique_params) == IS_NULL) {
 		PHALCON_CALL_METHOD(&primary_keys, meta_data, "getprimarykeyattributes", getThis());
 		PHALCON_CALL_METHOD(&bind_data_types, meta_data, "getbindtypes", getThis());
 
-		PHALCON_INIT_VAR(number_primary);
-		phalcon_fast_count(number_primary, primary_keys);
-		if (!zend_is_true(number_primary)) {
+		phalcon_fast_count(&number_primary, &primary_keys);
+		if (!zend_is_true(&number_primary)) {
 			RETURN_MM_FALSE;
 		}
 
 		PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
-		PHALCON_INIT_VAR(null_value);
-
-		PHALCON_INIT_VAR(number_empty);
-		ZVAL_LONG(number_empty, 0);
-
-		PHALCON_INIT_VAR(where_pk);
-		array_init(where_pk);
-
-		PHALCON_INIT_NVAR(unique_params);
-		array_init(unique_params);
-
-		PHALCON_INIT_VAR(unique_types);
-		array_init(unique_types);
+		ZVAL_LONG(&number_empty, 0);
+		array_init(&where_pk);
+		array_init(&unique_params);
+		array_init(&unique_types);
 
 		/**
 		 * We need to create a primary key based on the current data
 		 */
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(primary_keys), field) {
-			if (Z_TYPE_P(column_map) == IS_ARRAY) { 
-				if (phalcon_array_isset(column_map, field)) {
-					PHALCON_OBS_NVAR(attribute_field);
-					phalcon_array_fetch(&attribute_field, column_map, field, PH_NOISY);
-				} else {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(primary_keys), field) {
+			zval attribute_field, *value, v, escaped_field, pk_condition;
+			if (Z_TYPE(column_map) == IS_ARRAY) { 
+				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, field)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
-				PHALCON_CPY_WRT(attribute_field, field);
+				ZVAL_COPY(&attribute_field, field);
 			}
 
 			/**
 			 * If the primary key attribute is set append it to the conditions
 			 */
-			if (phalcon_isset_property_zval(getThis(), attribute_field)) {
-				value = phalcon_read_property_zval(getThis(), attribute_field, PH_NOISY);
+			if (phalcon_isset_property_zval(getThis(), &attribute_field)) {
+				value = phalcon_read_property_zval(getThis(), &attribute_field, PH_NOISY);
 
 				/**
 				 * We count how many fields are empty, if all fields are empty we don't perform an
 				 * 'exist' check
 				 */
 				if (PHALCON_IS_EMPTY(value)) {
-					phalcon_increment(number_empty);
+					phalcon_increment(&number_empty);
 				}
 
-				v = value;
+				ZVAL_COPY(&v, value);
 			} else {
-				v = null_value;
-				phalcon_increment(number_empty);
+				phalcon_increment(&number_empty);
+				ZVAL_NULL(&v);
 			}
 
 			PHALCON_CALL_METHOD(&escaped_field, connection, "escapeidentifier", field);
 
-			PHALCON_INIT_NVAR(pk_condition);
-
 			if (Z_TYPE_P(v) == IS_OBJECT && instanceof_function(Z_OBJCE_P(v), phalcon_db_rawvalue_ce)) {
-				PHALCON_CONCAT_VSV(pk_condition, escaped_field, " = ", v);
+				PHALCON_CONCAT_VSV(&pk_condition, &escaped_field, " = ", v);
 				phalcon_update_property_long(getThis(), SL("_seenRawvalues"), 1);
-			}
-			else {
-				PHALCON_CONCAT_VS(pk_condition, escaped_field, " = ?");
-				phalcon_array_append(unique_params, v, PH_COPY);
-				v = NULL;
+			} else {
+				PHALCON_CONCAT_VS(&pk_condition, &escaped_field, " = ?");
+				phalcon_array_append(&unique_params, &v, PH_COPY);
+				ZVAL_UNDEF(&v);
 			}
 
-			if (!phalcon_array_isset(bind_data_types, field)) {
+			if (!phalcon_array_isset(&bind_data_types, field)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't a part of the table columns");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
-			if (v) {
-				PHALCON_OBS_NVAR(type);
-				phalcon_array_fetch(&type, bind_data_types, field, PH_NOISY);
-				phalcon_array_append(unique_types, type, PH_COPY);
+			if (Z_TYPE(v) > IS_NULL) {
+				phalcon_array_fetch(&type, &bind_data_types, field, PH_NOISY);
+				phalcon_array_append(&unique_types, &type, PH_COPY);
 			}
 
-			phalcon_array_append(where_pk, pk_condition, PH_COPY);
+			phalcon_array_append(&where_pk, &pk_condition, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		/**
 		 * There are no primary key fields defined, assume the record does not exist
 		 */
-		if (PHALCON_IS_EQUAL(number_primary, number_empty)) {
+		if (PHALCON_IS_EQUAL(&number_primary, &number_empty)) {
 			RETURN_MM_FALSE;
 		}
 
-		PHALCON_INIT_VAR(join_where);
-		phalcon_fast_join_str(join_where, SL(" AND "), where_pk);
+		phalcon_fast_join_str(&join_where, SL(" AND "), &where_pk);
 
 		/**
 		 * The unique key is composed of 3 parts _uniqueKey, uniqueParams, uniqueTypes
 		 */
-		phalcon_update_property_this(getThis(), SL("_uniqueKey"), join_where);
-		phalcon_update_property_this(getThis(), SL("_uniqueParams"), unique_params);
-		phalcon_update_property_this(getThis(), SL("_uniqueTypes"), unique_types);
+		phalcon_update_property_this(getThis(), SL("_uniqueKey"), &join_where);
+		phalcon_update_property_this(getThis(), SL("_uniqueParams"), &unique_params);
+		phalcon_update_property_this(getThis(), SL("_uniqueTypes"), &unique_types);
 	}
 
 	RETURN_MM_TRUE;

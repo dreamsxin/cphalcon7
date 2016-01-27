@@ -1958,7 +1958,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 			phalcon_update_property_bool(getThis(), SL("_cacheMode"), 0);
 		}
 
-		phalcon_array_update_str(view_options, SL("cache"), &cache_options, PH_COPY);
+		phalcon_array_update_str(&view_options, SL("cache"), &cache_options, PH_COPY);
 		phalcon_update_property_this(getThis(), SL("_options"), &view_options);
 	} else {
 		/** 

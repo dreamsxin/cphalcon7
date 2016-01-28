@@ -1878,21 +1878,12 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _exists){
 
-	zval *meta_data, *connection, *table = NULL;
-	zval *unique_key, *build = NULL, *unique_params, *unique_types;
-	zval *dirty_state, *schema = NULL, *source = NULL;
-	zval *escaped_table = NULL, *null_mode, *select;
-	zval *row = NULL, *column_map = NULL, *seen_rawvalues;
+	zval *meta_data, *connection, table, *dirty_state, *unique_key, build, *seen_rawvalues, *unique_params, *unique_types;
+	zval schema, source, escaped_table, select, row, column_map;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 1, &meta_data, &connection, &table);
-
-	if (!table) {
-		PHALCON_INIT_VAR(table);
-	} else {
-		PHALCON_SEPARATE_PARAM(table);
-	}
+	phalcon_fetch_params(1, 2, 0, &meta_data, &connection);
 
 	/**
 	 * If we already know if the record exists we don't check it
@@ -1909,7 +1900,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _exists){
 
 		PHALCON_CALL_METHOD(&build, getThis(), "_rebuild", meta_data, connection);
 
-		if (!PHALCON_IS_TRUE(build)) {
+		if (!PHALCON_IS_TRUE(&build)) {
 			RETURN_MM_FALSE;
 		}
 
@@ -1926,25 +1917,22 @@ PHP_METHOD(Phalcon_Mvc_Model, _exists){
 
 	PHALCON_CALL_METHOD(&schema, getThis(), "getschema");
 	PHALCON_CALL_METHOD(&source, getThis(), "getsource");
-	if (zend_is_true(schema)) {
-		PHALCON_INIT_NVAR(table);
-		array_init_size(table, 2);
-		phalcon_array_append(table, schema, PH_COPY);
-		phalcon_array_append(table, source, PH_COPY);
+
+	if (zend_is_true(&schema)) {
+		array_init_size(&table, 2);
+		phalcon_array_append(&table, &schema, PH_COPY);
+		phalcon_array_append(&table, &source, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT(table, source);
+		ZVAL_COPY(&table, &source);
 	}
 
-	PHALCON_CALL_METHOD(&escaped_table, connection, "escapeidentifier", table);
-
-	PHALCON_INIT_VAR(null_mode);
+	PHALCON_CALL_METHOD(&escaped_table, connection, "escapeidentifier", &table);
 
 	/**
 	 * Here we use a single COUNT(*) without PHQL to make the execution faster
 	 */
-	PHALCON_INIT_VAR(select);
-	PHALCON_CONCAT_SVSVS(select, "SELECT * FROM ", escaped_table, " WHERE ", unique_key, " LIMIT 1");
-	PHALCON_CALL_METHOD(&row, connection, "fetchone", select, null_mode, unique_params, unique_types);
+	PHALCON_CONCAT_SVSVS(&select, "SELECT * FROM ", &escaped_table, " WHERE ", unique_key, " LIMIT 1");
+	PHALCON_CALL_METHOD(&row, connection, "fetchone", &select, &PHALCON_GLOBAL(z_null), unique_params, unique_types);
 
 	if (zend_is_true(seen_rawvalues)) {
 		phalcon_update_property_this(getThis(), SL("_uniqueKey"), &PHALCON_GLOBAL(z_null));
@@ -1953,7 +1941,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _exists){
 	if (Z_TYPE_P(row) == IS_ARRAY && phalcon_fast_count_ev(row)) {
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), 0);
 		PHALCON_CALL_SELF(&column_map, "getcolumnmap");
-		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", row, column_map);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &row, &column_map);
 		RETURN_MM_TRUE;
 	}
 
@@ -5219,7 +5207,7 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 		/**
 		 * We need to check if the record exists
 		 */
-		PHALCON_CALL_METHOD(&exists, getThis(), "_exists", meta_data, read_connection, table);
+		PHALCON_CALL_METHOD(&exists, getThis(), "_exists", meta_data, read_connection);
 		if (!zend_is_true(exists)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The record cannot be refreshed because it does not exist or is deleted2");
 			return;

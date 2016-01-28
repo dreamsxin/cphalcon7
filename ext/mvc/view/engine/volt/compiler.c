@@ -2665,8 +2665,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileCall){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 
-	zval *statements, *extends_mode = NULL, *extended, block_mode, compilation, *extensions, *view, *statement;
-	zval *file = NULL, exception_message, *level;
+	zval *statements, *extends_mode = NULL, *extended, block_mode, compilation, *extensions, *view, *statement, *level;
 
 	phalcon_fetch_params(0, 1, 1, &statements, &extends_mode);
 
@@ -2697,7 +2696,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 	view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(statements), statement) {
-		zval line, file, event, fire_arguments, temp_compilation, type, block_name, block_statements, path, final_path, extended, sub_compiler, compiled_path;
+		zval line, file, event, fire_arguments, temp_compilation, type, block_name, block_statements, path, final_path;
+		zval blocks, extended, sub_compiler, compiled_path, exception_message;
 		/** 
 		 * All statements must be arrays
 		 */
@@ -2725,7 +2725,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 			ZVAL_STRING(&event, "compileStatement");
 
 			array_init_size(&fire_arguments, 1);
-			phalcon_array_append(fire_arguments, statement, PH_COPY);
+			phalcon_array_append(&fire_arguments, statement, PH_COPY);
 
 			PHALCON_CALL_METHODW(&temp_compilation, getThis(), "fireextensionevent", &event, &fire_arguments);
 			if (Z_TYPE(temp_compilation) == IS_STRING) {
@@ -2787,7 +2787,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 					phalcon_array_fetch_str(&block_statements, statement, SL("block_statements"), PH_NOISY);
 				}
 
-				phalcon_return_property(&blocks, getThis(), SL("_blocks"), PH_NOISY);
+				phalcon_return_property(&blocks, getThis(), SL("_blocks"));
 				if (zend_is_true(&block_mode)) {
 					if (Z_TYPE(blocks) != IS_ARRAY) { 
 						array_init(&blocks);
@@ -2808,7 +2808,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 					phalcon_update_property_this(getThis(), SL("_blocks"), &blocks);
 				} else {
 					if (Z_TYPE(block_statements) == IS_ARRAY) { 
-						PHALCON_CALL_METHODW(&code, getThis(), "_statementlist", block_statements, extends_mode);
+						PHALCON_CALL_METHODW(&code, getThis(), "_statementlist", &block_statements, extends_mode);
 						phalcon_concat_self(&compilation, &code);
 					}
 				}

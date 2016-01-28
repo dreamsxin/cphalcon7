@@ -155,9 +155,19 @@ typedef enum _phalcon_call_type {
 		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array(retval, handler, params)); \
 	} while (0)
 
+#define PHALCON_CALL_USER_FUNC_ARRAYW(retval, handler, params) \
+	do { \
+		RETURN_ON_FAILURE(phalcon_call_user_func_array(retval, handler, params)); \
+	} while (0)
+
 #define PHALCON_CALL_USER_FUNC_ARRAY_NOEX(retval, handler, params) \
 	do { \
 		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array_noex(retval, handler, params)); \
+	} while (0)
+
+#define PHALCON_CALL_USER_FUNC_ARRAY_NOEXW(retval, handler, params) \
+	do { \
+		RETURN_ON_FAILURE(phalcon_call_user_func_array_noex(retval, handler, params)); \
 	} while (0)
 
 #define PHALCON_CALL_USER_FUNC(retval, handler) PHALCON_CALL_USER_FUNC_ARRAY(retval, handler, NULL)

@@ -2182,7 +2182,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 		ZVAL_STRING(&event_name, "beforeDelete");
 
 		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
-		if (PHALCON_IS_FALSE(status)) {
+		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
 	}
@@ -2190,7 +2190,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 	PHALCON_CALL_METHODW(&connection, getThis(), "getconnection");
 
 	PHALCON_CALL_METHODW(&source, getThis(), "getsource");
-	if (PHALCON_IS_EMPTY(source)) {
+	if (PHALCON_IS_EMPTY(&source)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Method getSource() returns empty string");
 		return;
 	}
@@ -2198,7 +2198,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 	/**
 	 * Get the \MongoCollection
 	 */
-	PHALCON_CALL_METHODW(&mongo_collection, &connection, "selectcollection", source);
+	PHALCON_CALL_METHODW(&mongo_collection, &connection, "selectcollection", &source);
 
 	array_init_size(&id_condition, 1);
 	phalcon_array_update_str(&id_condition, SL("_id"), &mongo_id, PH_COPY);

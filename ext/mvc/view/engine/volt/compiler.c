@@ -2697,7 +2697,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(statements), statement) {
 		zval line, file, event, fire_arguments, temp_compilation, type, block_name, block_statements, path, final_path;
-		zval blocks, extended, sub_compiler, compiled_path, code, exception_message;
+		zval blocks, extended, views_dir, sub_compiler, compiled_path, code, exception_message;
 		/** 
 		 * All statements must be arrays
 		 */
@@ -2849,7 +2849,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 
 				phalcon_update_property_bool(getThis(), SL("_extended"), 1);
 				phalcon_update_property_this(getThis(), SL("_extendedBlocks"), &temp_compilation);
-				ZVAL_COPY(&block_mode, extended);
+				ZVAL_COPY(&block_mode, &extended);
 				break;
 
 			case 313:

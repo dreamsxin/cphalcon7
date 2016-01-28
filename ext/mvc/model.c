@@ -2020,7 +2020,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 
 		phalcon_array_append(&service_params, &params, PH_COPY);
 
-		PHALCON_CALL_METHODW(&builder, dependency_injector, "get", &service_name, &service_params);
+		PHALCON_CALL_METHODW(&builder, &dependency_injector, "get", &service_name, &service_params);
 	} else {
 		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
 		PHALCON_CALL_METHODW(NULL, &builder, "__construct", &params);

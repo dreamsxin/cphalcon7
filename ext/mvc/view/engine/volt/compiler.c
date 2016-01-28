@@ -2697,7 +2697,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(statements), statement) {
 		zval line, file, event, fire_arguments, temp_compilation, type, block_name, block_statements, path, final_path;
-		zval blocks, extended, sub_compiler, compiled_path, exception_message;
+		zval blocks, extended, sub_compiler, compiled_path, code, exception_message;
 		/** 
 		 * All statements must be arrays
 		 */

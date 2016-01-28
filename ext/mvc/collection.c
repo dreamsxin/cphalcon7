@@ -2168,16 +2168,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, update){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
-	zval *mongo_id = NULL, *disable_events, event_name, *status = NULL;
-	zval *connection = NULL, *source = NULL, *collection = NULL;
-	zval *id_condition, *success = NULL, *options, *ok;
-
-	PHALCON_MM_GROW();
+	zval mongo_id, *disable_events, event_name, status, connection, source, collection, mongo_collection, id_condition, success, options, ok;
 
 	PHALCON_CALL_SELF(&mongo_id, "getid");
 
-	if (!zend_is_true(mongo_id)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "The document cannot be deleted because it doesn't exist");
+	if (!zend_is_true(&mongo_id)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "The document cannot be deleted because it doesn't exist");
 		return;
 	}
 
@@ -2185,65 +2181,55 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 	if (!zend_is_true(disable_events)) {
 		ZVAL_STRING(&event_name, "beforeDelete");
 
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
+		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(status)) {
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 		}
 	}
 
-	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
+	PHALCON_CALL_METHODW(&connection, getThis(), "getconnection");
 
-	PHALCON_CALL_METHOD(&source, getThis(), "getsource");
+	PHALCON_CALL_METHODW(&source, getThis(), "getsource");
 	if (PHALCON_IS_EMPTY(source)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Method getSource() returns empty string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Method getSource() returns empty string");
 		return;
 	}
 
 	/**
 	 * Get the \MongoCollection
 	 */
-	PHALCON_CALL_METHOD(&collection, connection, "selectcollection", source);
+	PHALCON_CALL_METHODW(&mongo_collection, &connection, "selectcollection", source);
 
-	PHALCON_INIT_VAR(id_condition);
-	array_init_size(id_condition, 1);
-	phalcon_array_update_str(id_condition, SL("_id"), mongo_id, PH_COPY);
+	array_init_size(&id_condition, 1);
+	phalcon_array_update_str(&id_condition, SL("_id"), &mongo_id, PH_COPY);
 
-	PHALCON_INIT_VAR(success);
-	ZVAL_BOOL(success, 0);
+	ZVAL_FALSE(&success);
 
-	PHALCON_INIT_VAR(options);
-	array_init_size(options, 1);
-	phalcon_array_update_str_long(options, SL("w"), 1, 0);
+	array_init_size(&options, 1);
+	phalcon_array_update_str_long(&options, SL("w"), 1, 0);
 
 	/**
 	 * Remove the instance
 	 */
-	PHALCON_CALL_METHOD(&status, collection, "remove", id_condition, options);
-	if (Z_TYPE_P(status) != IS_ARRAY) {
-		RETURN_MM_FALSE;
+	PHALCON_CALL_METHODW(&status, mongo_collection, "remove", &id_condition, &options);
+	if (Z_TYPE(status) != IS_ARRAY) {
+		RETURN_FALSE;
 	}
 
 	/**
 	 * Check the operation status
 	 */
-	if (phalcon_array_isset_str(status, SL("ok"))) {
-
-		PHALCON_OBS_VAR(ok);
-		phalcon_array_fetch_str(&ok, status, SL("ok"), PH_NOISY);
-		if (zend_is_true(ok)) {
-
-			ZVAL_BOOL(success, 1);
+	if (phalcon_array_isset_fetch_str(&ok, &status, SL("ok"))) {
+		if (zend_is_true(&ok)) {
+			ZVAL_TRUE(&success);
 			if (!zend_is_true(disable_events)) {
 				ZVAL_STRING(&event_name, "afterDelete");
-				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+				PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 			}
 		}
-	} else {
-		PHALCON_INIT_NVAR(success);
-		ZVAL_BOOL(success, 0);
 	}
 
-	RETURN_CTOR(success);
+	RETURN_CTORW(&success);
 }
 
 /**

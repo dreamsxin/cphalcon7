@@ -1938,7 +1938,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _exists){
 		phalcon_update_property_this(getThis(), SL("_uniqueKey"), &PHALCON_GLOBAL(z_null));
 	}
 
-	if (Z_TYPE_P(row) == IS_ARRAY && phalcon_fast_count_ev(row)) {
+	if (Z_TYPE(row) == IS_ARRAY && phalcon_fast_count_ev(&row)) {
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), 0);
 		PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &row, &column_map);
@@ -1960,134 +1960,107 @@ PHP_METHOD(Phalcon_Mvc_Model, _exists){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 
-	zval *function, *alias, *parameters, *params = NULL, *group_column = NULL;
-	zval *distinct_column, *columns = NULL, *group_columns;
-	zval *model_name, *builder = NULL, *query = NULL;
-	zval *resultset = NULL, *cache, *number_rows, *first_row = NULL, *value;
-	zval *dependency_injector = NULL, *service_name, *has = NULL, *service_params, *manager = NULL, *model = NULL;
+	zval *function, *alias, *parameters, params, group_column, distinct_column, columns, group_columns;
+	zval model_name, dependency_injector, service_name, manager, model, has, service_params, builder, query;
+	zval cache, resultset, number_rows, first_row;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &function, &alias, &parameters);
+	phalcon_fetch_params(0, 3, 0, &function, &alias, &parameters);
 
 	if (Z_TYPE_P(parameters) != IS_ARRAY) {
-		PHALCON_INIT_VAR(params);
 		if (Z_TYPE_P(parameters) != IS_NULL) {
-			array_init_size(params, 1);
-			phalcon_array_append(params, parameters, PH_COPY);
+			array_init_size(&params, 1);
+			phalcon_array_append(&params, parameters, PH_COPY);
 		} else {
-			array_init(params);
+			array_init(&params);
 		}
 	} else {
-		PHALCON_CPY_WRT(params, parameters);
+		ZVAL_COPY(&params, parameters);
 	}
-	if (phalcon_array_isset_str(params, SL("column"))) {
-		PHALCON_OBS_VAR(group_column);
-		phalcon_array_fetch_str(&group_column, params, SL("column"), PH_NOISY);
-	} else {
-		PHALCON_INIT_NVAR(group_column);
-		ZVAL_STRING(group_column, "*");
+
+	if (!phalcon_array_isset_fetch_str(&group_column, &params, SL("column"))) {
+		ZVAL_STRING(&group_column, "*");
 	}
 
 	/**
 	 * Builds the columns to query according to the received parameters
 	 */
-	if (phalcon_array_isset_str(params, SL("distinct"))) {
-		PHALCON_OBS_VAR(distinct_column);
-		phalcon_array_fetch_str(&distinct_column, params, SL("distinct"), PH_NOISY);
-
-		PHALCON_INIT_VAR(columns);
-		PHALCON_CONCAT_VSVSV(columns, function, "(DISTINCT ", distinct_column, ") AS ", alias);
+	if (phalcon_array_isset_fetch_str(&distinct_column, &params, SL("distinct"))) {
+		PHALCON_CONCAT_VSVSV(&columns, function, "(DISTINCT ", &distinct_column, ") AS ", alias);
 	} else {
-		if (phalcon_array_isset_str(params, SL("group"))) {
-			PHALCON_OBS_VAR(group_columns);
-			phalcon_array_fetch_str(&group_columns, params, SL("group"), PH_NOISY);
-
-			PHALCON_INIT_NVAR(columns);
-			PHALCON_CONCAT_VSVSVSV(columns, group_columns, ", ", function, "(", group_column, ") AS ", alias);
+		if (phalcon_array_isset_fetch_str(&group_columns, &params, SL("group"))) {
+			PHALCON_CONCAT_VSVSVSV(&columns, &group_columns, ", ", function, "(", &group_column, ") AS ", alias);
 		} else {
-			PHALCON_INIT_NVAR(columns);
-			PHALCON_CONCAT_VSVSV(columns, function, "(", group_column, ") AS ", alias);
+			PHALCON_CONCAT_VSVSV(&columns, function, "(", &group_column, ") AS ", alias);
 		}
 	}
 
-	PHALCON_INIT_VAR(model_name);
-	phalcon_get_called_class(model_name );
+	phalcon_get_called_class(&model_name);
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsManager");
+	ZVAL_STRING(&service_name, "modelsManager");
 
-	PHALCON_CALL_METHOD(&manager, dependency_injector, "getshared", service_name);
+	PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service_name);
 
-	PHALCON_CALL_METHOD(&model, manager, "load", model_name);
+	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
 
 	/**
 	 * Builds a query with the passed parameters
 	 */
-	PHALCON_INIT_NVAR(service_name);
-	ZVAL_STRING(service_name, "modelsQueryBuilder");
+	ZVAL_STRING(&service_name, "modelsQueryBuilder");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
-	if (zend_is_true(has)) {
-		PHALCON_INIT_VAR(service_params);
-		array_init(service_params);
+	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {
+		array_init(&service_params);
 
-		phalcon_array_append(service_params, params, PH_COPY);
+		phalcon_array_append(&service_params, &params, PH_COPY);
 
-		PHALCON_CALL_METHOD(&builder, dependency_injector, "get", service_name, service_params);
+		PHALCON_CALL_METHODW(&builder, dependency_injector, "get", &service_name, &service_params);
 	} else {
-		PHALCON_INIT_NVAR(builder);
-		object_init_ex(builder, phalcon_mvc_model_query_builder_ce);
-		PHALCON_CALL_METHOD(NULL, builder, "__construct", params);
+		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
+		PHALCON_CALL_METHODW(NULL, &builder, "__construct", &params);
 	}
 
-	PHALCON_CALL_METHOD(NULL, builder, "columns", columns);
-	PHALCON_CALL_METHOD(NULL, builder, "from", model_name);
+	PHALCON_CALL_METHODW(NULL, &builder, "columns", &columns);
+	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
 
-	if (phalcon_method_exists_ex(model, SL("beforequery")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, model, "beforequery", builder);
+	if (phalcon_method_exists_ex(&model, SL("beforequery")) == SUCCESS) {
+		PHALCON_CALL_METHODW(NULL, &model, "beforequery", &builder);
 	}
 
-	PHALCON_CALL_METHOD(&query, builder, "getquery");
+	PHALCON_CALL_METHODW(&query, &builder, "getquery");
 
 	/**
 	 * Pass the cache options to the query
 	 */
-	if (phalcon_array_isset_str(params, SL("cache"))) {
-		PHALCON_OBS_VAR(cache);
-		phalcon_array_fetch_str(&cache, params, SL("cache"), PH_NOISY);
-		PHALCON_CALL_METHOD(NULL, query, "cache", cache);
+	if (phalcon_array_isset_fetch_str(&cache, &params, SL("cache"))) {
+		PHALCON_CALL_METHODW(NULL, &query, "cache", &cache);
 	}
 
 	/**
 	 * Execute the query
 	 */
-	PHALCON_CALL_METHOD(&resultset, query, "execute");
+	PHALCON_CALL_METHODW(&resultset, &query, "execute");
 
 	/**
 	 * Return the full resultset if the query is grouped
 	 */
-	if (phalcon_array_isset_str(params, SL("group"))) {
-		RETURN_CTOR(resultset);
+	if (phalcon_array_isset_str(&params, SL("group"))) {
+		RETURN_CTOR(&resultset);
 	}
 
 	/**
 	 * Return only the value in the first result
 	 */
-	PHALCON_INIT_VAR(number_rows);
-	phalcon_fast_count(number_rows, resultset);
-	PHALCON_CALL_METHOD(&first_row, resultset, "getfirst");
+	phalcon_fast_count(&number_rows, &resultset);
+	PHALCON_CALL_METHODW(&first_row, &resultset, "getfirst");
 
-	value = phalcon_read_property_zval(first_row, alias, PH_NOISY);
-
-	RETURN_CTOR(value);
+	phalcon_return_property_zval(return_value, &first_row, alias, PH_NOISY);
 }
 
 /**

@@ -1760,7 +1760,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 	zval *meta_data, *connection, unique_params;
 	zval unique_key, primary_keys, bind_data_types, number_primary, column_map;
 	zval unique_types, number_empty, where_pk, *field, exception_message;
-	zval *type = NULL;
 	zval *join_where;
 
 	PHALCON_MM_GROW();
@@ -1795,7 +1794,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 		 * We need to create a primary key based on the current data
 		 */
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(primary_keys), field) {
-			zval attribute_field, *value, v, escaped_field, pk_condition;
+			zval attribute_field, *value, v, escaped_field, pk_condition, type;
 			if (Z_TYPE(column_map) == IS_ARRAY) { 
 				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, field)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");

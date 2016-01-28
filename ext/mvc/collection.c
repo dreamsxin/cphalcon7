@@ -1987,42 +1987,36 @@ PHP_METHOD(Phalcon_Mvc_Collection, count){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, aggregate){
 
-	zval *parameters, *class_name, *connection = NULL;
-	zval *source = NULL, *collection = NULL;
+	zval *parameters, class_name, collection, connection, source;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &parameters);
+	phalcon_fetch_params(0, 1, 0, &parameters);
 
 	if (Z_TYPE_P(parameters) != IS_NULL) {
 		if (Z_TYPE_P(parameters) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Invalid parameters for aggregate");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Invalid parameters for aggregate");
 			return;
 		}
 	}
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name );
-	ce0 = phalcon_fetch_class(class_name);
+	phalcon_get_called_class(&class_name);
+	ce0 = phalcon_fetch_class(&class_name);
 
-	PHALCON_INIT_VAR(collection);
-	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection)) {
-		PHALCON_CALL_METHOD(NULL, collection, "__construct");
+	object_init_ex(&collection, ce0);
+	if (phalcon_has_constructor(&collection)) {
+		PHALCON_CALL_METHOD(NULL, &collection, "__construct");
 	}
 
-	PHALCON_CALL_METHOD(&connection, collection, "getconnection");
+	PHALCON_CALL_METHODW(&connection, &collection, "getconnection");
+	PHALCON_CALL_METHODW(&source, &collection, "getsource");
 
-	PHALCON_CALL_METHOD(&source, collection, "getsource");
-	if (PHALCON_IS_EMPTY(source)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Method getSource() returns empty string");
+	if (PHALCON_IS_EMPTY(&source)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Method getSource() returns empty string");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&collection, connection, "selectcollection", source);
-	PHALCON_RETURN_CALL_METHOD(collection, "aggregate", parameters);
-	RETURN_MM();
+	PHALCON_CALL_METHODW(&collection, &connection, "selectcollection", &source);
+	PHALCON_RETURN_CALL_METHODW(collection, "aggregate", parameters);
 }
 
 /**

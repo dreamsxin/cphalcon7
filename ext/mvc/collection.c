@@ -2168,7 +2168,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, update){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
-	zval mongo_id, *disable_events, event_name, status, connection, source, collection, mongo_collection, id_condition, success, options, ok;
+	zval mongo_id, *disable_events, event_name, status, connection, source, mongo_collection, id_condition, success, options, ok;
 
 	PHALCON_CALL_SELF(&mongo_id, "getid");
 
@@ -2211,7 +2211,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 	/**
 	 * Remove the instance
 	 */
-	PHALCON_CALL_METHODW(&status, mongo_collection, "remove", &id_condition, &options);
+	PHALCON_CALL_METHODW(&status, &mongo_collection, "remove", &id_condition, &options);
 	if (Z_TYPE(status) != IS_ARRAY) {
 		RETURN_FALSE;
 	}

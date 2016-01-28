@@ -1759,8 +1759,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 
 	zval *meta_data, *connection, unique_params;
 	zval unique_key, primary_keys, bind_data_types, number_primary, column_map;
-	zval unique_types, number_empty, where_pk, *field, exception_message;
-	zval *join_where;
+	zval unique_types, number_empty, where_pk, *field, exception_message, join_where;
 
 	PHALCON_MM_GROW();
 

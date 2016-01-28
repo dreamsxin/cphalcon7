@@ -1955,21 +1955,19 @@ PHP_METHOD(Phalcon_Mvc_Collection, find){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, count){
 
-	zval *parameters = NULL, *class_name, *collection, *connection = NULL;
+	zval *parameters = NULL, class_name, collection, connection;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
-	} else if (Z_TYPE_P(parameters) != IS_NULL && if (Z_TYPE_P(parameters) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Invalid parameters for count");
+	} else if (Z_TYPE_P(parameters) != IS_NULL && Z_TYPE_P(parameters) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Invalid parameters for count");
 		return;
 	}
 
-	phalcon_get_called_class(&class_name );
+	phalcon_get_called_class(&class_name);
 	ce0 = phalcon_fetch_class(&class_name);
 
 	object_init_ex(&collection, ce0);

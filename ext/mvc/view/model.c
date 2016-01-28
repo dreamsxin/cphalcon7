@@ -541,11 +541,9 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getView){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
-	zval child_contents, debug_message;
-	zval childs, *child, view, dependency_injector, service, events_manager, event_name;
-	zval status, not_exists, base_path, paths, *views_dir = NULL, *vars = NULL, *new_vars, *template = NULL;
-	zval *views_dir_path, *engines = NULL, *engine = NULL, *path = NULL;
-	zval *view_engine_path = NULL, exception_message, *contents;
+	zval child_contents, debug_message, childs, *child, view, dependency_injector, service, events_manager, event_name;
+	zval status, not_exists, base_path, paths, views_dir, vars, new_vars, tpl;
+	zval views_dir_path, engines, *engine, *path, exception_message, contents;
 	zend_string *str_key;
 	ulong idx;
 
@@ -590,7 +588,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 	PHALCON_VERIFY_INTERFACE(&view, phalcon_mvc_viewinterface_ce);
 
-	PHALCON_CALL_METHOD(&events_manager, view, "geteventsmanager");
+	PHALCON_CALL_METHOD(&events_manager, &view, "geteventsmanager");
 
 	/** 
 	 * Call beforeRender if there is an events manager
@@ -613,29 +611,25 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		ZVAL_COPY(&paths, &base_path);
 	}
 
-	PHALCON_CALL_METHOD(&views_dir, view, "getviewsdir");
-
-	PHALCON_CALL_SELF(&template, "gettemplate");
+	PHALCON_CALL_METHOD(&views_dir, &view, "getviewsdir");
 	PHALCON_CALL_SELF(&vars, "getVars");
+	PHALCON_CALL_SELF(&tpl, "gettemplate");
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_INIT_NVAR(debug_message);
-		PHALCON_CONCAT_SV(debug_message, "Render Model View: ", template);
-		phalcon_debug_print_r(debug_message);
+		PHALCON_CONCAT_SV(&debug_message, "Render Model View: ", &tpl);
+		phalcon_debug_print_r(&debug_message);
 	}
 
-	PHALCON_INIT_VAR(new_vars);
-	phalcon_fast_array_merge(new_vars, vars, child_contents);
+	phalcon_fast_array_merge(&new_vars, &vars, &child_contents);
 
-	PHALCON_INIT_VAR(views_dir_path);
-	PHALCON_CONCAT_VV(views_dir_path, views_dir, template);
+	PHALCON_CONCAT_VV(&views_dir_path, &views_dir, &tpl);
 
-	PHALCON_CALL_METHOD(&engines, view, "getEngines");
+	PHALCON_CALL_METHOD(&engines, &view, "getEngines");
 
 	/** 
 	 * Views are rendered in each engine
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(engines), idx, str_key, engine) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(engines), idx, str_key, engine) {
 		zval extension;
 		if (str_key) {
 			ZVAL_STR(&extension, str_key);
@@ -643,47 +637,45 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 			ZVAL_LONG(&extension, idx);
 		}
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(paths), path) {
-			PHALCON_INIT_NVAR(view_engine_path);
-			PHALCON_CONCAT_VVV(view_engine_path, path, views_dir_path, &extension);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(paths), path) {
+			zval view_engine_path;
 
-			if (phalcon_file_exists(view_engine_path) == SUCCESS) {
+			PHALCON_CONCAT_VVV(&view_engine_path, path, &views_dir_path, &extension);
+
+			if (phalcon_file_exists(&view_engine_path) == SUCCESS) {
 
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-					PHALCON_INIT_NVAR(debug_message);
-					PHALCON_CONCAT_SV(debug_message, "--Found: ", view_engine_path);
-					phalcon_debug_print_r(debug_message);
+					PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
+					phalcon_debug_print_r(&debug_message);
 				}
 
 				/** 
 				 * Call beforeRenderView if there is a events manager available
 				 */
-				if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+				if (Z_TYPE(events_manager) == IS_OBJECT) {
 					ZVAL_STRING(&event_name, "view:beforeRenderView");
 
-					PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), view_engine_path);
-					if (PHALCON_IS_FALSE(status)) {
+					PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
+					if (PHALCON_IS_FALSE(&status)) {
 						continue;
 					}
 				}
 
-				PHALCON_CALL_METHOD(NULL, engine, "render", view_engine_path, new_vars, &PHALCON_GLOBAL(z_true));
+				PHALCON_CALL_METHOD(NULL, engine, "render", &view_engine_path, &new_vars, &PHALCON_GLOBAL(z_true));
 
 				/** 
 				 * Call afterRenderView if there is a events manager available
 				 */
-				PHALCON_INIT_NVAR(not_exists);
-				ZVAL_FALSE(not_exists);
-				if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+				ZVAL_FALSE(&not_exists);
+				if (Z_TYPE(events_manager) == IS_OBJECT) {
 					ZVAL_STRING(&event_name, "view:afterRenderView");
-					PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis());
+					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 				}
 
 				break;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-				PHALCON_INIT_NVAR(debug_message);
-				PHALCON_CONCAT_SV(debug_message, "--Not Found: ", view_engine_path);
-				phalcon_debug_print_r(debug_message);
+				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
+				phalcon_debug_print_r(&debug_message);
 			}
 		} ZEND_HASH_FOREACH_END();
 	} ZEND_HASH_FOREACH_END();
@@ -691,8 +683,8 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	/** 
 	 * Always throw an exception if the view does not exist
 	 */
-	if (PHALCON_IS_TRUE(not_exists)) {
-		PHALCON_CONCAT_SVS(&exception_message, "View '", views_dir_path, "' was not found in the views directory");
+	if (PHALCON_IS_TRUE(&not_exists)) {
+		PHALCON_CONCAT_SVS(&exception_message, "View '", &views_dir_path, "' was not found in the views directory");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
@@ -700,17 +692,16 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	/** 
 	 * Call afterRender event
 	 */
-	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "view:afterRender");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis());
+		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 	}
 
-	PHALCON_INIT_VAR(contents);
-	phalcon_ob_get_contents(contents);
+	phalcon_ob_get_contents(&contents);
 
 	phalcon_ob_end_clean();
 
-	RETURN_CTOR(contents);
+	RETURN_CTOR(&contents);
 }
 
 /**

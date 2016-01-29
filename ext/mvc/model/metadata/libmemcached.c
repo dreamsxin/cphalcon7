@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHODW(NULL, frontend_data, "__construct", &option);
+	PHALCON_CALL_METHODW(NULL, &frontend_data, "__construct", &option);
 
 	array_init(&option);
 

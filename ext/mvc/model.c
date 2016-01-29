@@ -2060,7 +2060,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	phalcon_fast_count(&number_rows, &resultset);
 	PHALCON_CALL_METHODW(&first_row, &resultset, "getfirst");
 
-	phalcon_return_property_zval(return_value, &first_row, alias, PH_NOISY);
+	phalcon_return_property_zval(return_value, &first_row, alias);
 }
 
 /**
@@ -2083,23 +2083,18 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
  */
 PHP_METHOD(Phalcon_Mvc_Model, count){
 
-	zval *parameters = NULL, *function, *alias;
+	zval *parameters = NULL, function, alias;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(function);
-	ZVAL_STRING(function, "COUNT");
+	ZVAL_STRING(&function, "COUNT");
+	ZVAL_STRING(&alias, "rowcount");
 
-	PHALCON_INIT_VAR(alias);
-	ZVAL_STRING(alias, "rowcount");
-	PHALCON_RETURN_CALL_SELF("_groupresult", function, alias, parameters);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("_groupresult", &function, &alias, parameters);
 }
 
 /**
@@ -2122,23 +2117,18 @@ PHP_METHOD(Phalcon_Mvc_Model, count){
  */
 PHP_METHOD(Phalcon_Mvc_Model, sum){
 
-	zval *parameters = NULL, *function, *alias;
+	zval *parameters = NULL, function, alias;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(function);
-	ZVAL_STRING(function, "SUM");
+	ZVAL_STRING(&function, "SUM");
+	ZVAL_STRING(&alias, "sumatory");
 
-	PHALCON_INIT_VAR(alias);
-	ZVAL_STRING(alias, "sumatory");
-	PHALCON_RETURN_CALL_SELF("_groupresult", function, alias, parameters);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("_groupresult", &function, &alias, parameters);
 }
 
 /**
@@ -2161,23 +2151,18 @@ PHP_METHOD(Phalcon_Mvc_Model, sum){
  */
 PHP_METHOD(Phalcon_Mvc_Model, maximum){
 
-	zval *parameters = NULL, *function, *alias;
+	zval *parameters = NULL, function, alias;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(function);
-	ZVAL_STRING(function, "MAX");
+	ZVAL_STRING(&function, "MAX");
+	ZVAL_STRING(&alias, "maximum");
 
-	PHALCON_INIT_VAR(alias);
-	ZVAL_STRING(alias, "maximum");
-	PHALCON_RETURN_CALL_SELF("_groupresult", function, alias, parameters);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("_groupresult", function, alias, parameters);
 }
 
 /**
@@ -2200,23 +2185,18 @@ PHP_METHOD(Phalcon_Mvc_Model, maximum){
  */
 PHP_METHOD(Phalcon_Mvc_Model, minimum){
 
-	zval *parameters = NULL, *function, *alias;
+	zval *parameters = NULL, function, alias;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(function);
-	ZVAL_STRING(function, "MIN");
+	ZVAL_STRING(&function, "MIN");
+	ZVAL_STRING(&alias, "minimum");
 
-	PHALCON_INIT_VAR(alias);
-	ZVAL_STRING(alias, "minimum");
-	PHALCON_RETURN_CALL_SELF("_groupresult", function, alias, parameters);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("_groupresult", &function, &alias, parameters);
 }
 
 /**
@@ -2239,23 +2219,18 @@ PHP_METHOD(Phalcon_Mvc_Model, minimum){
  */
 PHP_METHOD(Phalcon_Mvc_Model, average){
 
-	zval *parameters = NULL, *function, *alias;
+	zval *parameters = NULL, function, alias;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(function);
-	ZVAL_STRING(function, "AVG");
+	ZVAL_STRING(&function, "AVG");
+	ZVAL_STRING(&alias, "average");
 
-	PHALCON_INIT_VAR(alias);
-	ZVAL_STRING(alias, "average");
-	PHALCON_RETURN_CALL_SELF("_groupresult", function, alias, parameters);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("_groupresult", &function, &alias, parameters);
 }
 
 /**
@@ -2266,12 +2241,9 @@ PHP_METHOD(Phalcon_Mvc_Model, average){
  */
 PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, *models_manager;
-	zval *lower;
+	zval *eventname, *data = NULL, *cancelable = NULL, *models_manager, lower;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
+	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(eventname);
 
 	if (!data) {
@@ -2283,14 +2255,13 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 	}
 
 	if (likely(PHALCON_GLOBAL(orm).events)) {
-		PHALCON_INIT_VAR(lower);
-		phalcon_fast_strtolower(lower, eventname);
+		phalcon_fast_strtolower(&lower, eventname);
 
 		/**
 		 * Check if there is a method with the same name of the event
 		 */
-		if (phalcon_method_exists(getThis(), lower) == SUCCESS) {
-			PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(lower), data);
+		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
+			PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(lower), data);
 		}
 
 		models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
@@ -2298,10 +2269,8 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_RETURN_CALL_METHOD(models_manager, "notifyevent", eventname, getThis());
+		PHALCON_RETURN_CALL_METHODW(models_manager, "notifyevent", eventname, getThis());
 	}
-
-	RETURN_MM();
 }
 
 /**
@@ -2313,12 +2282,9 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, *status = NULL, *models_manager;
-	zval *lower;
+	zval *eventname, *data = NULL, *cancelable = NULL, lower, status, *models_manager;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
+	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(eventname);
 
 	if (!data) {
@@ -2330,16 +2296,15 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 	}
 
 	if (likely(PHALCON_GLOBAL(orm).events)) {
-		PHALCON_INIT_VAR(lower);
-		phalcon_fast_strtolower(lower, eventname);
+		phalcon_fast_strtolower(&lower, eventname);
 
 		/**
 		 * Check if there is a method with the same name of the event
 		 */
-		if (phalcon_method_exists(getThis(), lower) == SUCCESS) {
-			PHALCON_CALL_METHOD(&status, getThis(), Z_STRVAL_P(lower), data);
-			if (PHALCON_IS_FALSE(status)) {
-				RETURN_MM_FALSE;
+		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
+			PHALCON_CALL_METHODW(&status, getThis(), Z_STRVAL(lower), data);
+			if (PHALCON_IS_FALSE(&status)) {
+				RETURN_FALSE;
 			}
 		}
 
@@ -2348,13 +2313,13 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(&status, models_manager, "notifyevent", eventname, getThis());
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(&status, models_manager, "notifyevent", eventname, getThis());
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_FALSE;
 		}
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**
@@ -2366,8 +2331,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _cancelOperation){
 
 	zval *operation_made, event_name;
 
-	PHALCON_MM_GROW();
-
 	operation_made = phalcon_read_property(getThis(), SL("_operationMade"), PH_NOISY);
 
 	if (PHALCON_IS_LONG(operation_made, 3)) {
@@ -2376,9 +2339,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _cancelOperation){
 		ZVAL_STRING(&event_name, "notSaved");
 	}
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 }
 
 /**

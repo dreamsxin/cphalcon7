@@ -2257,14 +2257,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, getOperationMade){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 
-	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, *data, *reserved = NULL;
-	zval *attributes = NULL, *column_map = NULL, *attribute_field = NULL, *value = NULL;
+	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, data, reserved;
+	zval attributes, column_map, *value;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 3, &columns, &rename_columns, &allow_empty);
+	phalcon_fetch_params(0, 0, 3, &columns, &rename_columns, &allow_empty);
 
 	if (!rename_columns) {
 		rename_columns = &PHALCON_GLOBAL(z_true);
@@ -2274,59 +2272,55 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 		allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_INIT_VAR(data);
-	array_init(data);
+	array_init(&data);
 
-	PHALCON_CALL_METHOD(&reserved, getThis(), "getreservedattributes");
+	PHALCON_CALL_METHODW(&reserved, getThis(), "getreservedattributes");
 
 	/**
 	 * Get an array with the values of the object
 	 */
-	PHALCON_CALL_SELF(&column_map, "getcolumnmap", getThis());
-	if (Z_TYPE_P(column_map) != IS_ARRAY) { 
-		PHALCON_CALL_FUNCTION(&attributes, "get_object_vars", getThis());
+	PHALCON_CALL_SELFW(&column_map, "getcolumnmap", getThis());
+	if (Z_TYPE(column_map) != IS_ARRAY) { 
+		PHALCON_CALL_FUNCTIONW(&attributes, "get_object_vars", getThis());
 	} else {
-		PHALCON_CPY_WRT(attributes, column_map);
+		ZVAL_COPY(&attributes, &column_map);
 	}
 
 	/**
 	 * We only assign values to the public properties
 	 */
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
-		zval tmp;
+		zval tmp, attribute_field, *field_value;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
 
-		if (phalcon_array_isset(reserved, &tmp)) {
+		if (phalcon_array_isset(&reserved, &tmp)) {
 			continue;
 		}
 
-		if (zend_is_true(rename_columns) && Z_TYPE_P(column_map) == IS_ARRAY) { 
-			if (phalcon_array_isset(column_map, &tmp)) {
-				PHALCON_OBS_NVAR(attribute_field);
-				phalcon_array_fetch(&attribute_field, column_map, &tmp, PH_NOISY);
-			} else {
-				PHALCON_CPY_WRT(attribute_field, &tmp);
+		if (zend_is_true(rename_columns) && Z_TYPE(column_map) == IS_ARRAY) { 
+			if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &tmp)) {
+				ZVAL_COPY(&attribute_field, &tmp);
 			}
 		} else {
-			PHALCON_CPY_WRT(attribute_field, &tmp);
+			ZVAL_COPY(&attribute_field, &tmp);
 		}
 
-		if (phalcon_isset_property_zval(getThis(), attribute_field)) {
-			value = phalcon_read_property_zval(getThis(), attribute_field, PH_NOISY);
+		if (phalcon_isset_property_zval(getThis(), &attribute_field)) {
+			field_value = phalcon_read_property_zval(getThis(), &attribute_field, PH_NOISY);
 
 			if (zend_is_true(allow_empty)) {
-				phalcon_array_update_zval(data, attribute_field, value, PH_COPY);
-			} else if (Z_TYPE_P(value) != IS_NULL) {
-				phalcon_array_update_zval(data, attribute_field, value, PH_COPY);
+				phalcon_array_update_zval(&data, attribute_field, field_value, PH_COPY);
+			} else if (Z_TYPE_P(field_value) != IS_NULL) {
+				phalcon_array_update_zval(&data, attribute_field, field_value, PH_COPY);
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(data);
+	RETURN_CTORW(&data);
 }
 
 /**

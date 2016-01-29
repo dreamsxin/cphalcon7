@@ -2961,7 +2961,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 
 	zval *view_code, *extends_mode = NULL, *current_path;
-	zval *intermediate, *compilation = NULL, *extended;
+	zval intermediate, compilation, *extended;
 	zval *final_compilation = NULL, *blocks = NULL, *extended_blocks;
 	zval *block = NULL, *local_block = NULL, *block_compilation = NULL;
 	zend_string *str_key;
@@ -2976,16 +2976,15 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 
 	current_path = phalcon_read_property(getThis(), SL("_currentPath"), PH_NOISY);
 
-	PHALCON_INIT_VAR(intermediate);
-	if (phvolt_parse_view(intermediate, view_code, current_path) == FAILURE) {
+	if (phvolt_parse_view(&intermediate, view_code, current_path) == FAILURE) {
 		RETURN_MM();
 	}
 
 	/** 
 	 * The parsing must return a valid array
 	 */
-	if (Z_TYPE_P(intermediate) == IS_ARRAY) { 
-		PHALCON_CALL_METHODW(&compilation, getThis(), "_statementlist", intermediate, extends_mode);
+	if (Z_TYPE(intermediate) == IS_ARRAY) { 
+		PHALCON_CALL_METHODW(&compilation, getThis(), "_statementlist", &intermediate, extends_mode);
 
 		/** 
 		 * Check if the template is extending another

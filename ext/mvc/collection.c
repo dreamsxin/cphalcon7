@@ -2257,8 +2257,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getOperationMade){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 
-	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, data, reserved;
-	zval attributes, column_map, *value;
+	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, data, reserved, attributes, column_map, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -2289,7 +2288,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 	/**
 	 * We only assign values to the public properties
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(attributes), idx, str_key, value) {
 		zval tmp, attribute_field, *field_value;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);

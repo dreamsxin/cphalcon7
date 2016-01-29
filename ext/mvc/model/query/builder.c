@@ -1739,7 +1739,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 	zval no_primary, primary_keys, first_primary_key, column_map, attribute_field, exception_message;
 	zend_class_entry *ce0;
 
-	phalcon_return_property(&conditions, getThis(), SL("_conditions"), PH_NOISY);
+	phalcon_return_property(&conditions, getThis(), SL("_conditions"));
 
 	if (phalcon_is_numeric(&conditions)) {
 		phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));

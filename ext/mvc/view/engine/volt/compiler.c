@@ -2960,15 +2960,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 
-	zval *view_code, *extends_mode = NULL, *current_path;
-	zval intermediate, compilation, *extended;
-	zval *final_compilation = NULL, *blocks = NULL, *extended_blocks;
-	zval *block = NULL, *local_block = NULL, *block_compilation = NULL;
+	zval *view_code, *extends_mode = NULL, *current_path, intermediate, compilation, *extended;
+	zval *blocks, *extended_blocks, *block, final_compilation;
 	zend_string *str_key;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &view_code, &extends_mode);
+	phalcon_fetch_params(0, 1, 1, &view_code, &extends_mode);
 
 	if (!extends_mode) {
 		extends_mode = &PHALCON_GLOBAL(z_false);
@@ -2977,7 +2973,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 	current_path = phalcon_read_property(getThis(), SL("_currentPath"), PH_NOISY);
 
 	if (phvolt_parse_view(&intermediate, view_code, current_path) == FAILURE) {
-		RETURN_MM();
+		return;
 	}
 
 	/** 
@@ -2991,22 +2987,17 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 		 */
 		extended = phalcon_read_property(getThis(), SL("_extended"), PH_NOISY);
 		if (PHALCON_IS_TRUE(extended)) {
-
+			blocks = phalcon_read_property(getThis(), SL("_blocks"), PH_NOISY);
+			extended_blocks = phalcon_read_property(getThis(), SL("_extendedBlocks"), PH_NOISY);
 			/** 
 			 * Multiple-Inheritance is allowed
 			 */
 			if (PHALCON_IS_TRUE(extends_mode)) {
-				PHALCON_INIT_VAR(final_compilation);
-				array_init(final_compilation);
-			} else {
-				PHALCON_INIT_NVAR(final_compilation);
+				array_init(&final_compilation);
 			}
 
-			blocks = phalcon_read_property(getThis(), SL("_blocks"), PH_NOISY);
-			extended_blocks = phalcon_read_property(getThis(), SL("_extendedBlocks"), PH_NOISY);
-
 			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(extended_blocks), str_key, block) {
-				zval tmp;
+				zval tmp, local_block, block_compilation;
 
 				/** 
 				 * If name is a string then is a block name
@@ -3014,15 +3005,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 					if (Z_TYPE_P(block) == IS_ARRAY) { 
-						if (phalcon_array_isset(blocks, &tmp)) {
+						if (phalcon_array_isset_fetch(&local_block, blocks, &tmp)) {
 							/** 
 							 * The block is set in the local template
 							 */
-							PHALCON_OBS_NVAR(local_block);
-							phalcon_array_fetch(&local_block, blocks, &tmp, PH_NOISY);
 							phalcon_update_property_this(getThis(), SL("_currentBlock"), &tmp);
 
-							PHALCON_CALL_METHODW(&block_compilation, getThis(), "_statementlist", local_block);
+							PHALCON_CALL_METHODW(&block_compilation, getThis(), "_statementlist", &local_block);
 						} else {
 							/** 
 							 * The block is not set local only in the extended template
@@ -3034,33 +3023,32 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 							/** 
 							 * The block is set in the local template
 							 */
-							PHALCON_OBS_NVAR(local_block);
 							phalcon_array_fetch(&local_block, blocks, &tmp, PH_NOISY);
 							phalcon_update_property_this(getThis(), SL("_currentBlock"), &tmp);
 
-							PHALCON_CALL_METHODW(&block_compilation, getThis(), "_statementlist", local_block);
+							PHALCON_CALL_METHODW(&block_compilation, getThis(), "_statementlist", &local_block);
 						} else {
-							PHALCON_CPY_WRT(block_compilation, block);
+							ZVAL_COPY(&block_compilation, block);
 						}
 					}
 					if (PHALCON_IS_TRUE(extends_mode)) {
-						phalcon_array_update_zval(final_compilation, &tmp, block_compilation, PH_COPY);
+						phalcon_array_update_zval(&final_compilation, &tmp, &block_compilation, PH_COPY);
 					} else {
-						phalcon_concat_self(final_compilation, block_compilation);
+						phalcon_concat_self(&final_compilation, &block_compilation);
 					}
 				} else {
 					/** 
 					 * Here the block is an already compiled text
 					 */
 					if (PHALCON_IS_TRUE(extends_mode)) {
-						phalcon_array_append(final_compilation, block, PH_COPY);
+						phalcon_array_append(&final_compilation, block, PH_COPY);
 					} else {
-						phalcon_concat_self(final_compilation, block);
+						phalcon_concat_self(&final_compilation, block);
 					}
 				}
 			} ZEND_HASH_FOREACH_END();
 
-			RETURN_CCTOR(final_compilation);
+			RETURN_CTOR(&final_compilation);
 		}
 
 		if (PHALCON_IS_TRUE(extends_mode)) {
@@ -3068,14 +3056,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 			 * In extends mode we return the template blocks instead of the compilation
 			 */
 			blocks = phalcon_read_property(getThis(), SL("_blocks"), PH_NOISY);
-			RETURN_CCTOR(blocks);
+			RETURN_CTOR(blocks);
 		}
 
-		RETURN_CCTOR(&compilation);
+		RETURN_CTOR(&compilation);
 	}
 
-	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Invalid intermediate representation");
-	return;
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Invalid intermediate representation");
 }
 
 /**
@@ -3106,6 +3093,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileString){
 
 	ZVAL_STRING(&current_path, "eval code");
 	phalcon_update_property_this(getThis(), SL("_currentPath"), &current_path);
+
 	PHALCON_RETURN_CALL_METHODW(getThis(), "_compilesource", view_code, extends_mode);
 }
 
@@ -3124,19 +3112,16 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileString){
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 
 	zval *path, *compiled_path, *extends_mode = NULL, exception_message;
-	zval *view_code, *compilation = NULL, *final_compilation = NULL;
-	zval *status;
+	zval view_code, compilation, final_compilation, status;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 1, &path, &compiled_path, &extends_mode);
+	phalcon_fetch_params(0, 2, 1, &path, &compiled_path, &extends_mode);
 
 	if (!extends_mode) {
 		extends_mode = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (PHALCON_IS_EQUAL(path, compiled_path)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Template path and compilation template path cannot be the same");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Template path and compilation template path cannot be the same");
 		return;
 	}
 
@@ -3145,7 +3130,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 	 */
 	if (phalcon_file_exists(path) == FAILURE) {
 		PHALCON_CONCAT_SVS(&exception_message, "Template file ", path, " does not exist");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
@@ -3153,40 +3138,37 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 	 * Always use file_get_contents instead of read the file directly, this respect the
 	 * open_basedir directive
 	 */
-	PHALCON_INIT_VAR(view_code);
-	phalcon_file_get_contents(view_code, path);
-	if (PHALCON_IS_FALSE(view_code)) {
+	phalcon_file_get_contents(&view_code, path);
+	if (PHALCON_IS_FALSE(&view_code)) {
 		PHALCON_CONCAT_SVS(&exception_message, "Template file ", path, " could not be opened");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
 	phalcon_update_property_this(getThis(), SL("_currentPath"), path);
 
-	PHALCON_CALL_METHODW(&compilation, getThis(), "_compilesource", view_code, extends_mode);
+	PHALCON_CALL_METHODW(&compilation, getThis(), "_compilesource", &view_code, extends_mode);
 
 	/** 
 	 * We store the file serialized if it's an array of blocks
 	 */
-	if (Z_TYPE_P(&compilation) == IS_ARRAY) { 
-		PHALCON_INIT_VAR(final_compilation);
-		phalcon_serialize(final_compilation, compilation);
+	if (Z_TYPE(compilation) == IS_ARRAY) {
+		phalcon_serialize(&final_compilation, &compilation);
 	} else {
-		PHALCON_CPY_WRT(final_compilation, compilation);
+		ZVAL_COPY(&final_compilation, &compilation);
 	}
 
 	/** 
 	 * Always use file_put_contents to write files instead of write the file directly,
 	 * this respect the open_basedir directive
 	 */
-	PHALCON_INIT_VAR(status);
-	phalcon_file_put_contents(status, compiled_path, final_compilation);
-	if (PHALCON_IS_FALSE(status)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Volt directory can't be written");
+	phalcon_file_put_contents(&status, compiled_path, &final_compilation);
+	if (PHALCON_IS_FALSE(&status)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Volt directory can't be written");
 		return;
 	}
 
-	RETURN_CCTOR(&compilation);
+	RETURN_CTORW(&compilation);
 }
 
 /**

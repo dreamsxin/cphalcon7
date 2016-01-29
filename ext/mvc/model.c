@@ -2162,7 +2162,7 @@ PHP_METHOD(Phalcon_Mvc_Model, maximum){
 	ZVAL_STRING(&function, "MAX");
 	ZVAL_STRING(&alias, "maximum");
 
-	PHALCON_RETURN_CALL_SELFW("_groupresult", function, alias, parameters);
+	PHALCON_RETURN_CALL_SELFW("_groupresult", &function, &alias, parameters);
 }
 
 /**

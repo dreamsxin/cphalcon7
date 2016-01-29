@@ -94,15 +94,13 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Redis){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 
-	zval *options = NULL;
-	zval host, port, auth, persistent, lifetime, prefix, frontend_data, redis, frontend_option, backend_option;
+	zval *options, host, port, auth, persistent, lifetime, prefix, frontend_data, redis, frontend_option, backend_option;
 
-	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 1, 0, &options);
+	phalcon_fetch_params(0, 1, 0, &options);
 	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
 
@@ -111,15 +109,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 	phalcon_array_update_str_str(&backend_option, SL("statsKey"), SL("$PMM$"), PH_COPY);
 
 	if (phalcon_array_isset_fetch_str(&host, options, SL("host"))) {
-		phalcon_array_update_str(&backend_option, SL("host"), host, PH_COPY);
+		phalcon_array_update_str(&backend_option, SL("host"), &host, PH_COPY);
 	}
 
 	if (phalcon_array_isset_fetch_str(&port, options, SL("port"))) {
-		phalcon_array_update_str(backend_option, SL("port"), &port, PH_COPY);
+		phalcon_array_update_str(&backend_option, SL("port"), &port, PH_COPY);
 	}
 
 	if (phalcon_array_isset_fetch_str(&auth, options, SL("auth"))) {
-		phalcon_array_update_str(backend_option, SL("auth"), &auth, PH_COPY);
+		phalcon_array_update_str(&backend_option, SL("auth"), &auth, PH_COPY);
 	}
 
 	if (phalcon_array_isset_fetch_str(&persistent, options, SL("persistent"))) {
@@ -136,7 +134,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 		ZVAL_EMPTY_STRING(&prefix);
 	}
 
-	phalcon_array_update_str(&backend_option, SL("prefix"), prefix, PH_COPY);
+	phalcon_array_update_str(&backend_option, SL("prefix"), &prefix, PH_COPY);
 
 	/* create redis instance */
 	array_init_size(&frontend_option, 1);
@@ -145,18 +143,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHOD(NULL, frontend_data, "__construct", &frontend_option);
-
+	PHALCON_CALL_METHODW(NULL, &frontend_data, "__construct", &frontend_option);
 
 	object_init_ex(&redis, phalcon_cache_backend_redis_ce);
 
-	PHALCON_CALL_METHOD(NULL, &redis, "__construct", frontend_data, &backend_option);
+	PHALCON_CALL_METHODW(NULL, &redis, "__construct", &frontend_data, &backend_option);
 
 	phalcon_update_property_this(getThis(), SL("_redis"), &redis);
-	
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

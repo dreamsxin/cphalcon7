@@ -637,7 +637,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCallArgument){
 	phalcon_array_fetch_string(&argument_type, argument, IS(type), PH_NOISY);
 	if (PHALCON_IS_LONG(&argument_type, PHQL_T_STARALL)) {
 		ZVAL_STRING(&s_all, ISV(all));
-		Z_ADDREF(s_all);
+		Z_TRY_ADDREF(s_all);
 		array_init_size(return_value, 1);
 		add_assoc_zval_ex(return_value, ISL(type), &s_all);
 		return;
@@ -1133,7 +1133,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				break;
 
 			case PHQL_T_NOT:
-				assert(right != NULL);
 				array_init_size(return_value, 3);
 				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
 				phalcon_array_update_string_str(return_value, IS(op), SL("NOT "), PH_COPY);
@@ -1141,7 +1140,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				break;
 
 			case PHQL_T_ISNULL:
-				assert(left != NULL);
 				array_init_size(return_value, 3);
 				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
 				phalcon_array_update_string_str(return_value, IS(op), SL(" IS NULL"), PH_COPY);
@@ -1149,7 +1147,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				break;
 
 			case PHQL_T_ISNOTNULL:
-				assert(left != NULL);
 				array_init_size(return_value, 3);
 				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
 				phalcon_array_update_string_str(return_value, IS(op), SL(" IS NOT NULL"), PH_COPY);
@@ -1173,7 +1170,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				break;
 
 			case PHQL_T_EXISTS:
-				assert(right != NULL);
 				array_init_size(return_value, 3);
 				phalcon_array_update_string_str(return_value, IS(type), SL("unary-op"), PH_COPY);
 				phalcon_array_update_string_str(return_value, IS(op), SL("EXISTS"), PH_COPY);
@@ -2426,12 +2422,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getGroupClause){
 }
 
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getLimitClause) {
-	zval *limit_clause, *tmp = NULL;
-	zval limit, offset;
 
-	PHALCON_MM_GROW();
+	zval *limit_clause, *tmp = NULL, limit, offset;
 
-	phalcon_fetch_params(1, 1, 0, &limit_clause);
+
+	phalcon_fetch_params(0, 1, 0, &limit_clause);
 	assert(Z_TYPE_P(limit_clause) == IS_ARRAY);
 
 	array_init(return_value);
@@ -2445,8 +2440,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getLimitClause) {
 		PHALCON_CALL_METHODW(&tmp, getThis(), "_getexpression", &offset);
 		phalcon_array_update_string(return_value, IS(offset), tmp, PH_COPY);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

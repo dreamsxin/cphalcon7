@@ -2288,7 +2288,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 	/**
 	 * We only assign values to the public properties
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(attributes), idx, str_key, value) {
+	ZEND_HASH_FOREACH_KEY(Z_ARRVAL(attributes), idx, str_key) {
 		zval tmp, attribute_field, *field_value;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
@@ -2312,9 +2312,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 			field_value = phalcon_read_property_zval(getThis(), &attribute_field, PH_NOISY);
 
 			if (zend_is_true(allow_empty)) {
-				phalcon_array_update_zval(&data, attribute_field, field_value, PH_COPY);
+				phalcon_array_update_zval(&data, &attribute_field, field_value, PH_COPY);
 			} else if (Z_TYPE_P(field_value) != IS_NULL) {
-				phalcon_array_update_zval(&data, attribute_field, field_value, PH_COPY);
+				phalcon_array_update_zval(&data, &attribute_field, field_value, PH_COPY);
 			}
 		}
 	} ZEND_HASH_FOREACH_END();

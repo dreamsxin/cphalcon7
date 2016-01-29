@@ -790,7 +790,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 		/** 
 		 * Try to update the record
 		 */
-		PHALCON_CALL_METHODW(&status, record, "save", data);
+		PHALCON_CALL_METHODW(&status, &record, "save", data);
 		if (!zend_is_true(&status)) {
 			/** 
 			 * Get the messages from the record that produce the error

@@ -1344,7 +1344,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	zval dependency_injector, *models, *model, model_instance, conditions, *distinct;
 	zval phql, *columns, selected_columns, *column, joined_columns;
-	zval selected_models, *selected_model, joined_models, *joins, *join, *group, group_items, *group_item;
+	zval selected_models, joined_models, *joins, *join, *group, group_items, *group_item;
 	zval joined_items, *having, *order, order_items, *order_item, *limit, number, offset, *for_update;
 	zend_string *str_key;
 	ulong idx;
@@ -1468,7 +1468,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 			phalcon_fast_join_str(&joined_columns, SL(", "), &selected_columns);
 			phalcon_concat_self(&phql, &joined_columns);
 		} else {
-			PHALCON_SCONCAT_SVS(phql, "[", models, "].*");
+			PHALCON_SCONCAT_SVS(&phql, "[", models, "].*");
 		}
 	}
 
@@ -1627,7 +1627,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 						phalcon_array_append(&order_items, order_item, PH_COPY);
 					} else {
 						PHALCON_CONCAT_SVS(&escaped_item, "[", order_item, "]");
-						phalcon_array_append(&order_items, escaped_item, PH_COPY);
+						phalcon_array_append(&order_items, &escaped_item, PH_COPY);
 					}
 				}
 			} ZEND_HASH_FOREACH_END();
@@ -1679,53 +1679,48 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 
-	zval *phql = NULL, *dependency_injector, *service_name, *has = NULL, *parameters, *query = NULL, *bind_params, *bind_types;
-
-	PHALCON_MM_GROW();
+	zval phql, *bind_params, *bind_types, *dependency_injector, service_name, has, parameters, query;
 
 	/** 
 	 * Process the PHQL
 	 */
-	PHALCON_CALL_METHOD(&phql, getThis(), "getphql");
+	PHALCON_CALL_METHODW(&phql, getThis(), "getphql");
 
 	bind_params = phalcon_read_property(getThis(), SL("_bindParams"), PH_NOISY);
 	bind_types = phalcon_read_property(getThis(), SL("_bindTypes"), PH_NOISY);
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery");
+	ZVAL_STRING(&service_name, "modelsQuery");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
-	if (zend_is_true(has)) {
-		PHALCON_INIT_VAR(parameters);
-		array_init(parameters);
+	PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {;
+		array_init(&parameters);
 
-		phalcon_array_append(parameters, phql, PH_COPY);
-		phalcon_array_append(parameters, dependency_injector, PH_COPY);
+		phalcon_array_append(&parameters, &phql, PH_COPY);
+		phalcon_array_append(&parameters, dependency_injector, PH_COPY);
 
-		PHALCON_CALL_METHOD(&query, dependency_injector, "get", service_name, parameters);
+		PHALCON_CALL_METHODW(&query, dependency_injector, "get", &service_name, &parameters);
 	} else {
-		PHALCON_INIT_NVAR(query);
-		object_init_ex(query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHOD(NULL, query, "__construct", phql, dependency_injector);
+		object_init_ex(&query, phalcon_mvc_model_query_ce);
+		PHALCON_CALL_METHODW(NULL, &query, "__construct", &phql, dependency_injector);
 	}
 
 	/** 
 	 * Set default bind params
 	 */
 	if (Z_TYPE_P(bind_params) == IS_ARRAY) { 
-		PHALCON_CALL_METHOD(NULL, query, "setbindparams", bind_params);
+		PHALCON_CALL_METHODW(NULL, &query, "setbindparams", bind_params);
 	}
 
 	/** 
 	 * Set default bind params
 	 */
 	if (Z_TYPE_P(bind_types) == IS_ARRAY) { 
-		PHALCON_CALL_METHOD(NULL, query, "setbindtypes", bind_types);
+		PHALCON_CALL_METHODW(NULL, &query, "setbindtypes", bind_types);
 	}
 
-	RETURN_CTOR(query);
+	RETURN_CTORW(&query);
 }
 
 /**
@@ -1740,34 +1735,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 
-	zval *conditions, *dependency_injector = NULL, *models;
-	zval *z_one, *number_models, *invalid_condition;
-	zval *model = NULL, *service_name, *has = NULL, *meta_data = NULL, *model_instance;
-	zval *no_primary = NULL, *primary_keys = NULL, *first_primary_key;
-	zval *column_map = NULL, *attribute_field = NULL, exception_message;
-	zval *primary_key_condition;
+	zval conditions, dependency_injector, *models, number_models, invalid_condition, model, service_name, has, meta_data, model_instance;
+	zval no_primary, primary_keys, first_primary_key, column_map, attribute_field, exception_message;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
+	phalcon_return_property(&conditions, getThis(), SL("_conditions"), PH_NOISY);
 
-	conditions = phalcon_read_property(getThis(), SL("_conditions"), PH_NOISY);
-
-	if (phalcon_is_numeric(conditions)) {
-		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-			dependency_injector = NULL;
-			PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-			phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
+	if (phalcon_is_numeric(&conditions)) {
+		phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+			PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
+			phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
 		}
 
 		models = phalcon_read_property(getThis(), SL("_models"), PH_NOISY);
 		if (Z_TYPE_P(models) == IS_ARRAY) { 
 			if (!phalcon_fast_count_ev(models)) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
 				return;
 			}
 		} else if (!zend_is_true(models)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "At least one model is required to build the query");
 			return;
 		}
 
@@ -1775,101 +1763,79 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 		 * If the conditions is a single numeric field. We internally create a condition
 		 * using the related primary key
 		 */
-		if (Z_TYPE_P(models) == IS_ARRAY) { 
-
-			z_one = &PHALCON_GLOBAL(z_one);
-
-			PHALCON_INIT_VAR(number_models);
-			phalcon_fast_count(number_models, models);
-
-			PHALCON_INIT_VAR(invalid_condition);
-			is_smaller_function(invalid_condition, z_one, number_models);
-			if (PHALCON_IS_TRUE(invalid_condition)) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Cannot build the query. Invalid condition");
+		if (Z_TYPE_P(models) == IS_ARRAY) {
+			phalcon_fast_count(&number_models, models);
+			is_smaller_function(&invalid_condition, &PHALCON_GLOBAL(z_one), &number_models);
+			if (PHALCON_IS_TRUE(&invalid_condition)) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Cannot build the query. Invalid condition");
 				return;
 			}
 
-			PHALCON_OBS_VAR(model);
 			phalcon_array_fetch_long(&model, models, 0, PH_NOISY);
 		} else {
-			PHALCON_CPY_WRT(model, models);
+			ZVAL_COPY(&model, models);
 		}
 
-		PHALCON_INIT_VAR(service_name);
-		ZVAL_STRING(service_name, ISV(modelsMetadata));
+		ZVAL_STRING(&service_name, ISV(modelsMetadata));
 
-		PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
-		if (zend_is_true(has)) {
+		PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
+		if (zend_is_true(&has)) {
 			/** 
 			 * Get the models metadata service to obtain the column names, column map and
 			 * primary key
 			 */
-			PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", service_name);
-			PHALCON_VERIFY_INTERFACE(meta_data, phalcon_mvc_model_metadatainterface_ce);
+			PHALCON_CALL_METHODW(&meta_data, &dependency_injector, "getshared", &service_name);
+			PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
 		} else {
-			PHALCON_INIT_NVAR(meta_data);
-			object_init_ex(meta_data, phalcon_mvc_model_metadata_memory_ce);
+			object_init_ex(&meta_data, phalcon_mvc_model_metadata_memory_ce);
 		}
 
-		ce0 = phalcon_fetch_class(model);
+		ce0 = phalcon_fetch_class(&model);
 
-		PHALCON_INIT_VAR(model_instance);
-		object_init_ex(model_instance, ce0);
-		if (phalcon_has_constructor(model_instance)) {
-			PHALCON_CALL_METHOD(NULL, model_instance, "__construct", dependency_injector);
+		object_init_ex(&model_instance, ce0);
+		if (phalcon_has_constructor(&model_instance)) {
+			PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &dependency_injector);
 		}
 
-		PHALCON_INIT_VAR(no_primary);
-		ZVAL_TRUE(no_primary);
+		ZVAL_TRUE(&no_primary);
 
-		PHALCON_CALL_METHOD(&primary_keys, meta_data, "getprimarykeyattributes", model_instance);
-		if (phalcon_fast_count_ev(primary_keys)) {
-			if (phalcon_array_isset_long(primary_keys, 0)) {
-
-				PHALCON_OBS_VAR(first_primary_key);
-				phalcon_array_fetch_long(&first_primary_key, primary_keys, 0, PH_NOISY);
-
+		PHALCON_CALL_METHODW(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
+		if (phalcon_fast_count_ev(&primary_keys)) {
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
 				/** 
 				 * The PHQL contains the renamed columns if available
 				 */
 				if (PHALCON_GLOBAL(orm).column_renaming) {
-					PHALCON_CALL_METHOD(&column_map, meta_data, "getcolumnmap", model_instance);
-				} else {
-					PHALCON_INIT_VAR(column_map);
+					PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &model_instance);
 				}
 
-				if (Z_TYPE_P(column_map) == IS_ARRAY) { 
-					if (phalcon_array_isset(column_map, first_primary_key)) {
-						PHALCON_OBS_VAR(attribute_field);
-						phalcon_array_fetch(&attribute_field, column_map, first_primary_key, PH_NOISY);
-					} else {
-						PHALCON_CONCAT_SVS(&exception_message, "Column '", first_primary_key, "\" isn't part of the column map");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+				if (Z_TYPE(column_map) == IS_ARRAY) { 
+					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key)) {
+						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
+						PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {
-					PHALCON_CPY_WRT(attribute_field, first_primary_key);
+					ZVAL_COPY(&attribute_field, &first_primary_key);
 				}
 
-				PHALCON_INIT_VAR(primary_key_condition);
-				PHALCON_CONCAT_SVSVSV(primary_key_condition, "[", model, "].[", attribute_field, "] = ", conditions);
-				PHALCON_CPY_WRT(conditions, primary_key_condition);
+				PHALCON_CONCAT_SVSVSV(&conditions, "[", &model, "].[", &attribute_field, "] = ", &conditions);
 
-				ZVAL_FALSE(no_primary);
+				ZVAL_FALSE(&no_primary);
 			}
 		}
 
 		/** 
 		 * A primary key is mandatory in these cases
 		 */
-		if (PHALCON_IS_TRUE(no_primary)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Source related to this model does not have a primary key defined");
+		if (PHALCON_IS_TRUE(&no_primary)) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Source related to this model does not have a primary key defined");
 			return;
 		}
 
-		phalcon_update_property_this(getThis(), SL("_conditions"), conditions);
+		phalcon_update_property_this(getThis(), SL("_conditions"), &conditions);
 	}
 
-	RETURN_CTOR(conditions);
+	RETURN_CTORW(&conditions);
 }
 

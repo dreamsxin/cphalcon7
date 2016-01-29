@@ -892,13 +892,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, orWhere){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, betweenWhere){
 
-	zval *expr, *minimum, *maximum, *use_orwhere = NULL, *hidden_param, *z_one;
-	zval *next_hidden_param, *minimum_key, *maximum_key;
-	zval *conditions, *bind_params;
+	zval *expr, *minimum, *maximum, *use_orwhere = NULL, *hidden_param;
+	zval next_hidden_param, minimum_key, maximum_key, conditions, bind_params;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 1, &expr, &minimum, &maximum, &use_orwhere);
+	phalcon_fetch_params(0, 3, 1, &expr, &minimum, &maximum, &use_orwhere);
 
 	if (!use_orwhere) {
 		use_orwhere = &PHALCON_GLOBAL(z_false);
@@ -906,46 +903,39 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, betweenWhere){
 
 	hidden_param = phalcon_read_property(getThis(), SL("_hiddenParamNumber"), PH_NOISY);
 
-	z_one = &PHALCON_GLOBAL(z_one);
-
-	PHALCON_INIT_VAR(next_hidden_param);
-	phalcon_add_function(next_hidden_param, hidden_param, z_one);
+	phalcon_add_function(&next_hidden_param, hidden_param, &PHALCON_GLOBAL(z_one));
 
 	/** 
 	 * Minimum key with auto bind-params
 	 */
-	PHALCON_INIT_VAR(minimum_key);
-	PHALCON_CONCAT_SV(minimum_key, "phb", hidden_param);
+	PHALCON_CONCAT_SV(&minimum_key, "phb", hidden_param);
 
 	/** 
 	 * Maximum key with auto bind-params
 	 */
-	PHALCON_INIT_VAR(maximum_key);
-	PHALCON_CONCAT_SV(maximum_key, "phb", next_hidden_param);
+	PHALCON_CONCAT_SV(&maximum_key, "phb", &next_hidden_param);
 
 	/** 
 	 * Create a standard BETWEEN condition with bind params
 	 */
-	PHALCON_INIT_VAR(conditions);
-	PHALCON_CONCAT_VSVSVS(conditions, expr, " BETWEEN :", minimum_key, ": AND :", maximum_key, ":");
+	PHALCON_CONCAT_VSVSVS(&conditions, expr, " BETWEEN :", &minimum_key, ": AND :", &maximum_key, ":");
 
-	PHALCON_INIT_VAR(bind_params);
-	array_init_size(bind_params, 2);
-	phalcon_array_update_zval(bind_params, minimum_key, minimum, PH_COPY);
-	phalcon_array_update_zval(bind_params, maximum_key, maximum, PH_COPY);
+	array_init_size(&bind_params, 2);
+	phalcon_array_update_zval(&bind_params, &minimum_key, minimum, PH_COPY);
+	phalcon_array_update_zval(&bind_params, &maximum_key, maximum, PH_COPY);
 
 	/** 
 	 * Append the BETWEEN to the current conditions using and 'and'
 	 */
 	if (zend_is_true(use_orwhere)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "orwhere", conditions, bind_params);
+		PHALCON_CALL_METHODW(NULL, getThis(), "orwhere", &conditions, &bind_params);
 	} else {
-		PHALCON_CALL_METHOD(NULL, getThis(), "andwhere", conditions, bind_params);
+		PHALCON_CALL_METHODW(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
 
-	phalcon_increment(next_hidden_param);
-	phalcon_update_property_this(getThis(), SL("_hiddenParamNumber"), next_hidden_param);
-	RETURN_THIS();
+	phalcon_increment(&next_hidden_param);
+	phalcon_update_property_this(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
+	RETURN_THISW();
 }
 
 /**

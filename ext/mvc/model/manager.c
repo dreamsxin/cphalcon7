@@ -821,7 +821,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 
-	zval *eventname, *model, entity_name, status, *behaviors, models_behaviors, *behavior, *events_manager, fire_event_name, *custom_events_manager;
+	zval *eventname, *model, entity_name, status, *behaviors, models_behaviors, *behavior, events_manager, fire_event_name, *custom_events_manager;
 
 	phalcon_fetch_params(0, 2, 0, &eventname, &model);
 
@@ -850,7 +850,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	/** 
 	 * Dispatch events to the global events manager
 	 */
-	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
+	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
 
@@ -890,34 +890,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 
-	zval *model, *eventname, *data, *behaviors, *entity_name;
-	zval *models_behaviors, *behavior = NULL, *result = NULL, *events_manager;
-	zval *fire_event_name;
+	zval *model, *eventname, *data, *behaviors, entity_name, models_behaviors, *behavior, result, *events_manager, fire_event_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &model, &eventname, &data);
+	phalcon_fetch_params(0, 3, 0, &model, &eventname, &data);
 
 	/** 
 	 * Dispatch events to the global events manager
 	 */
 	behaviors = phalcon_read_property(getThis(), SL("_behaviors"), PH_NOISY);
-	if (Z_TYPE_P(behaviors) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
-		if (phalcon_array_isset(behaviors, entity_name)) {
-
-			/** 
-			 * Notify all the events on the behavior
-			 */
-			PHALCON_OBS_VAR(models_behaviors);
-			phalcon_array_fetch(&models_behaviors, behaviors, entity_name, PH_NOISY);
-
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(models_behaviors), behavior) {
-				PHALCON_CALL_METHOD(&result, behavior, "missingmethod", model, eventname, data);
-				if (Z_TYPE_P(result) != IS_NULL) {
-					RETURN_CTOR(result);
+	if (Z_TYPE_P(behaviors) == IS_ARRAY) {
+		phalcon_get_class(&entity_name, model, 1);
+		/** 
+		 * Notify all the events on the behavior
+		 */
+		if (phalcon_array_isset_fetch(&models_behaviors, behaviors, &entity_name)) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models_behaviors), behavior) {
+				PHALCON_CALL_METHODW(&result, behavior, "missingmethod", model, eventname, data);
+				if (Z_TYPE(result) != IS_NULL) {
+					RETURN_CTORW(&result);
 				}
 			} ZEND_HASH_FOREACH_END();
 
@@ -929,13 +919,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 	 */
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_INIT_VAR(fire_event_name);
-		PHALCON_CONCAT_SV(fire_event_name, "model:", eventname);
-		PHALCON_RETURN_CALL_METHOD(events_manager, "fire", fire_event_name, model, data);
-		RETURN_MM();
+		PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
+		PHALCON_RETURN_CALL_METHODW(events_manager, "fire", &fire_event_name, model, data);
+		return;
 	}
 
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }
 
 /**
@@ -946,44 +935,34 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
 
-	zval *model, *behavior, *entity_name, *behaviors;
-	zval *models_behaviors = NULL;
+	zval *model, *behavior, entity_name, *behaviors, models_behaviors;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &behavior);
+	phalcon_fetch_params(0, 2, 0, &model, &behavior);
 
 	if (Z_TYPE_P(behavior) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The behavior is invalid");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The behavior is invalid");
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
+	phalcon_get_class(&entity_name, model, 1);
 
 	/** 
 	 * Get the current behaviors
 	 */
 	behaviors = phalcon_read_property(getThis(), SL("_behaviors"), PH_NOISY);
-	if (phalcon_array_isset(behaviors, entity_name)) {
-		PHALCON_OBS_VAR(models_behaviors);
-		phalcon_array_fetch(&models_behaviors, behaviors, entity_name, PH_NOISY);
-	} else {
-		PHALCON_INIT_NVAR(models_behaviors);
-		array_init(models_behaviors);
+	if (!phalcon_array_isset_fetch(&models_behaviors, behaviors, &entity_name)) {
+		array_init(&models_behaviors);
 	}
 
 	/** 
 	 * Append the behavior to the list of behaviors
 	 */
-	phalcon_array_append(models_behaviors, behavior, PH_COPY);
+	phalcon_array_append(&models_behaviors, behavior, PH_COPY);
 
 	/** 
 	 * Update the behaviors list
 	 */
-	phalcon_update_property_array(getThis(), SL("_behaviors"), entity_name, models_behaviors);
-
-	PHALCON_MM_RESTORE();
+	phalcon_update_property_array(getThis(), SL("_behaviors"), &entity_name, &models_behaviors);
 }
 
 /**
@@ -994,17 +973,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, keepSnapshots){
 
-	zval *model, *keep_snapshots, *entity_name;
+	zval *model, *keep_snapshots, entity_name;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &keep_snapshots);
 
-	phalcon_fetch_params(1, 2, 0, &model, &keep_snapshots);
-
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), entity_name, keep_snapshots);
-
-	PHALCON_MM_RESTORE();
+	phalcon_get_class(&entity_name, model, 1);
+	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), &entity_name, keep_snapshots);
 }
 
 /**
@@ -1014,25 +988,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, keepSnapshots){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isKeepingSnapshots){
 
-	zval *model, *keep_snapshots, *entity_name, *is_keeping;
+	zval *model, *keep_snapshots, entity_name, is_keeping;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	keep_snapshots = phalcon_read_property(getThis(), SL("_keepSnapshots"), PH_NOISY);
-	if (Z_TYPE_P(keep_snapshots) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
-		if (phalcon_array_isset(keep_snapshots, entity_name)) {
-			PHALCON_OBS_VAR(is_keeping);
-			phalcon_array_fetch(&is_keeping, keep_snapshots, entity_name, PH_NOISY);
-			RETURN_CTOR(is_keeping);
+	if (Z_TYPE_P(keep_snapshots) == IS_ARRAY) {
+		phalcon_get_class(&entity_name, model, 1);
+		if (phalcon_array_isset_fetch(&is_keeping, keep_snapshots, &entity_name)) {
+			RETURN_CTORW(&is_keeping);
 		}
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**
@@ -1043,18 +1011,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, isKeepingSnapshots){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
 
-	zval *model, *dynamic_update, *entity_name;
+	zval *model, *dynamic_update, entity_name;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &dynamic_update);
 
-	phalcon_fetch_params(1, 2, 0, &model, &dynamic_update);
-
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_dynamicUpdate"), entity_name, dynamic_update);
-	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), entity_name, dynamic_update);
-
-	PHALCON_MM_RESTORE();
+	phalcon_get_class(&entity_name, model, 1);
+	phalcon_update_property_array(getThis(), SL("_dynamicUpdate"), &entity_name, dynamic_update);
+	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), &entity_name, dynamic_update);
 }
 
 /**
@@ -1064,25 +1027,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate){
 
-	zval *model, *dynamic_update, *entity_name, *is_using;
+	zval *model, *dynamic_update, *ntity_name, is_using;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	dynamic_update = phalcon_read_property(getThis(), SL("_dynamicUpdate"), PH_NOISY);
 	if (Z_TYPE_P(dynamic_update) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
-		if (phalcon_array_isset(dynamic_update, entity_name)) {
-			PHALCON_OBS_VAR(is_using);
-			phalcon_array_fetch(&is_using, dynamic_update, entity_name, PH_NOISY);
-			RETURN_CTOR(is_using);
+		phalcon_get_class(&entity_name, model, 1);
+		if (phalcon_array_isset_fetch(&is_using, dynamic_update, &entity_name)) {
+			RETURN_CTORW(&is_using);
 		}
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**

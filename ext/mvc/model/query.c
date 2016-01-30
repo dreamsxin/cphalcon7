@@ -1327,146 +1327,128 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 
-	zval *column, *column_type;
-	zval *source = NULL, *sql_column = NULL;
-	zval *column_domain, exception_message;
-	zval *sql_column_alias = NULL, *model_name = NULL;
-	zval *prepared_alias = NULL;
-	zval *column_data, *sql_expr_column = NULL;
+	zval *column, column_type, *models, *model, sql_column, *sql_aliases, column_domain, source, *phql, exception_message;
+	zval sql_column_alias, *sql_aliases_models, model_name, prepared_alias, column_data, balias, sql_expr_column;
 	zend_string *str_key;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &column);
 
-	phalcon_fetch_params(1, 1, 0, &column);
-
-	if (!phalcon_array_isset_str(column, ISL(type))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+	if (!phalcon_array_isset_fetch_str(&column_type, column, ISL(type))) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
 		return;
 	}
 
 	/** 
 	 * Check for select * (all)
 	 */
-	PHALCON_OBS_VAR(column_type);
-	phalcon_array_fetch_string(&column_type, column, IS(type), PH_NOISY);
-	if (PHALCON_IS_LONG(column_type, PHQL_T_STARALL)) {
-		zval *models = phalcon_read_property(getThis(), SL("_models"), PH_NOISY);
+	if (PHALCON_IS_LONG(&column_type, PHQL_T_STARALL)) {
+		models = phalcon_read_property(getThis(), SL("_models"), PH_NOISY);
 
 		array_init(return_value);
 
-		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(models), str_key, source) {
+		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(models), str_key, model) {
 			if (str_key) {
-				PHALCON_INIT_NVAR(sql_column);
-				array_init_size(sql_column, 3);
-				phalcon_array_update_string_str(sql_column, IS(type), SL("object"), PH_COPY);
-				phalcon_array_update_string_string(sql_column, IS(model), str_key, PH_COPY);
-				phalcon_array_update_string(sql_column, IS(column), source, PH_COPY);
+				array_init_size(&sql_column, 3);
+				phalcon_array_update_string_str(&sql_column, IS(type), SL("object"), PH_COPY);
+				phalcon_array_update_string_string(&sql_column, IS(model), str_key, PH_COPY);
+				phalcon_array_update_string(&sql_column, IS(column), model, PH_COPY);
 
-				phalcon_array_append(return_value, sql_column, PH_COPY);
+				phalcon_array_append(return_value, &sql_column, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 
-		RETURN_MM();
+		return;
 	}
 
 	if (!phalcon_array_isset_str(column, SL("column"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
 		return;
 	}
 
 	/** 
 	 * Check if selected column is qualified.*
 	 */
-	if (PHALCON_IS_LONG(column_type, PHQL_T_DOMAINALL)) {
-		zval *source, *sql_aliases_models;
-		zval *sql_aliases = phalcon_read_property(getThis(), SL("_sqlAliases"), PH_NOISY);
+	if (PHALCON_IS_LONG(&column_type, PHQL_T_DOMAINALL)) {
+		sql_aliases = phalcon_read_property(getThis(), SL("_sqlAliases"), PH_NOISY);
 
 		/** 
 		 * We only allow the alias.*
 		 */
-		PHALCON_OBS_VAR(column_domain);
 		phalcon_array_fetch_str(&column_domain, column, SL("column"), PH_NOISY);
-		if (!phalcon_array_isset_fetch(&source, sql_aliases, column_domain)) {
-			zval *phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
+		if (!phalcon_array_isset_fetch(&source, sql_aliases, &column_domain)) {
+			phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
-			PHALCON_CONCAT_SVSV(&exception_message, "Unknown model or alias '", column_domain, "' (2), when preparing: ", phql);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_CONCAT_SVSV(&exception_message, "Unknown model or alias '", &column_domain, "' (2), when preparing: ", phql);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 		}
 
 		/** 
 		 * Get the SQL alias if any
 		 */
-		PHALCON_CPY_WRT(sql_column_alias, source);
+		ZVAL_COPY_VALUE(&sql_column_alias, &source);
 
 		/** 
 		 * Get the real source name
 		 */
 		sql_aliases_models = phalcon_read_property(getThis(), SL("_sqlAliasesModels"), PH_NOISY);
 
-		PHALCON_OBS_VAR(model_name);
-		phalcon_array_fetch(&model_name, sql_aliases_models, column_domain, PH_NOISY);
+		phalcon_array_fetch(&model_name, sql_aliases_models, &column_domain, PH_NOISY);
 
-		if (PHALCON_IS_EQUAL(column_domain, model_name)) {
-			PHALCON_INIT_VAR(prepared_alias);
-			phalcon_lcfirst(prepared_alias, model_name);
+		if (PHALCON_IS_EQUAL(&column_domain, &model_name)) {
+			phalcon_lcfirst(&prepared_alias, &model_name);
 		} else {
-			PHALCON_CPY_WRT(prepared_alias, column_domain);
+			ZVAL_COPY_VALUE(&prepared_alias, &column_domain);
 		}
 
 		/** 
 		 * The sql_column is a complex type returning a complete object
 		 */
-		PHALCON_INIT_VAR(sql_column);
-		array_init_size(sql_column, 4);
-		phalcon_array_update_string_str(sql_column, IS(type), SL("object"), PH_COPY);
-		phalcon_array_update_string(sql_column, IS(model), model_name, PH_COPY);
-		phalcon_array_update_string(sql_column, IS(column), sql_column_alias, PH_COPY);
-		phalcon_array_update_string(sql_column, IS(balias), prepared_alias, PH_COPY);
+		array_init_size(&sql_column, 4);
+		phalcon_array_update_string_str(&sql_column, IS(type), SL("object"), PH_COPY);
+		phalcon_array_update_string(&sql_column, IS(model), &model_name, PH_COPY);
+		phalcon_array_update_string(&sql_column, IS(column), &sql_column_alias, PH_COPY);
+		phalcon_array_update_string(&sql_column, IS(balias), &prepared_alias, PH_COPY);
 
 		array_init_size(return_value, 1);
-		phalcon_array_append(return_value, sql_column, PH_COPY);
+		phalcon_array_append(return_value, &sql_column, PH_COPY);
 
-		RETURN_MM();
+		return;
 	}
 
 	/** 
 	 * Check for columns qualified and not qualified
 	 */
-	if (PHALCON_IS_LONG(column_type, PHQL_T_EXPR)) {
+	if (PHALCON_IS_LONG(&column_type, PHQL_T_EXPR)) {
 		zval balias;
 
 		/** 
 		 * The sql_column is a scalar type returning a simple string
 		 */
-		PHALCON_INIT_NVAR(sql_column);
-		array_init_size(sql_column, 4);
-		phalcon_array_update_string_str(sql_column, IS(type), SL("scalar"), PH_COPY);
-
-		PHALCON_OBS_VAR(column_data);
+		array_init_size(&sql_column, 4);
+		phalcon_array_update_string_str(&sql_column, IS(type), SL("scalar"), PH_COPY);
 		phalcon_array_fetch_str(&column_data, column, SL("column"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(&sql_expr_column, getThis(), "_getexpression", column_data);
+		PHALCON_CALL_METHODW(&sql_expr_column, getThis(), "_getexpression", &column_data);
 
 		/** 
 		 * Create balias and sqlAlias
 		 */
-		if (phalcon_array_isset_fetch_str(&balias, sql_expr_column, SL("balias"))) {
-			phalcon_array_update_string(sql_column, IS(balias), &balias, PH_COPY);
-			phalcon_array_update_string(sql_column, IS(sqlAlias), &balias, PH_COPY);
+		if (phalcon_array_isset_fetch_str(&balias, &sql_expr_column, SL("balias"))) {
+			phalcon_array_update_string(&sql_column, IS(balias), &balias, PH_COPY);
+			phalcon_array_update_string(&sql_column, IS(sqlAlias), &balias, PH_COPY);
 		}
 
-		phalcon_array_update_string(sql_column, IS(column), sql_expr_column, PH_COPY);
+		phalcon_array_update_string(&sql_column, IS(column), &sql_expr_column, PH_COPY);
 
 		array_init_size(return_value, 1);
-		phalcon_array_append(return_value, sql_column, PH_COPY);
+		phalcon_array_append(return_value, &sql_column, PH_COPY);
 
-		RETURN_MM();
+		return;
 	}
 
-	PHALCON_CONCAT_SV(&exception_message, "Unknown type of column ", column_type);
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-	return;
+	PHALCON_CONCAT_SV(&exception_message, "Unknown type of column ", &column_type);
+	PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 }
 
 /**

@@ -2257,7 +2257,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getOperationMade){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 
-	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, data, reserved, attributes, column_map, *value;
+	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, data, reserved, attributes, column_map;
 	zend_string *str_key;
 	ulong idx;
 

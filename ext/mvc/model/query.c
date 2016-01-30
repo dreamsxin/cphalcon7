@@ -1306,7 +1306,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(expr), expr_list_item) {
 			zval expr_item;
 			PHALCON_CALL_METHODW(&expr_item, getThis(), "_getexpression", expr_list_item);
-			phalcon_array_append(&list_items, expr_item, PH_COPY);
+			phalcon_array_append(&list_items, &expr_item, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		array_init_size(return_value, 2);
@@ -1316,7 +1316,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 	}
 
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Unknown expression");
-	return;
 }
 
 /**

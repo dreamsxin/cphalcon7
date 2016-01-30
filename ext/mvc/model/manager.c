@@ -367,25 +367,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getCustomEventsManager){
 
-	zval *model, *custom_events_manager, *class_name;
-	zval *events_manager;
+	zval *model, *custom_events_manager, class_name, events_manager;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
 	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
-		PHALCON_INIT_VAR(class_name);
-		phalcon_get_class(class_name, model, 1);
-		if (phalcon_array_isset(custom_events_manager, class_name)) {
-			PHALCON_OBS_VAR(events_manager);
-			phalcon_array_fetch(&events_manager, custom_events_manager, class_name, PH_NOISY);
-			RETURN_CTOR(events_manager);
+		phalcon_get_class(&class_name, model, 1);
+		if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, &class_name)) {
+			RETURN_CTORW(&events_manager);
 		}
 	}
 
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }
 
 /**
@@ -396,35 +390,31 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 
-	zval *model, *class_name, *initialized, *events_manager;
-	zval event_name;
+	zval *model, class_name, *initialized, *events_manager, event_name;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
-
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 1);
+	phalcon_get_class(&class_name, model, 1);
 
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
 	/** 
 	 * Models are just initialized once per request
 	 */
-	if (phalcon_array_isset(initialized, class_name)) {
-		RETURN_MM_FALSE;
+	if (phalcon_array_isset(initialized, &class_name)) {
+		RETURN_FALSE;
 	}
 
 	/** 
 	 * Update the model as initialized, this avoid cyclic initializations
 	 */
-	phalcon_update_property_array(getThis(), SL("_initialized"), class_name, model);
+	phalcon_update_property_array(getThis(), SL("_initialized"), &class_name, model);
 
 	/** 
 	 * Call the 'initialize' method if it's implemented
 	 */
 	if (phalcon_method_exists_ex(model, SL("initialize")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, model, "initialize");
+		PHALCON_CALL_METHODW(NULL, model, "initialize");
 	}
 
 	/** 
@@ -439,10 +429,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "modelsManager:afterInitialize");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), model);
+		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), model);
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**
@@ -453,17 +443,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isInitialized){
 
-	zval *model_name, *initialized, *lowercased;
+	zval *model_name, *initialized, lowercased;
 
 	phalcon_fetch_params(0, 1, 0, &model_name);
 
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
-	PHALCON_ALLOC_INIT_ZVAL(lowercased);
-	phalcon_fast_strtolower(lowercased, model_name);
+	phalcon_fast_strtolower(&lowercased, model_name);
 
-	RETVAL_BOOL(phalcon_array_isset(initialized, lowercased));
-	zval_ptr_dtor(lowercased);
+	RETVAL_BOOL(phalcon_array_isset(initialized, &lowercased));
+	zval_ptr_dtor(&lowercased);
 }
 
 /**
@@ -486,13 +475,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getLastInitialized){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
-	zval *model_name, *new_instance = NULL, *initialized;
-	zval *lowercased, model, *dependency_injector;
+	zval *model_name, *new_instance = NULL, *initialized, lowercased, model, *dependency_injector;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &model_name, &new_instance);
+	phalcon_fetch_params(0, 1, 1, &model_name, &new_instance);
 	PHALCON_ENSURE_IS_STRING(model_name);
 
 	if (!new_instance) {
@@ -501,14 +487,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
-	PHALCON_INIT_VAR(lowercased);
-	ZVAL_STR(lowercased, zend_string_tolower(Z_STR_P(model_name)));
+	ZVAL_STR(&lowercased, zend_string_tolower(Z_STR_P(model_name)));
 
 	/** 
 	 * Check if a model with the same is already loaded
 	 */
-	if (!zend_is_true(new_instance) && phalcon_array_isset_fetch(&model, initialized, lowercased)) {
-		RETURN_CTOR(&model);
+	if (!zend_is_true(new_instance) && phalcon_array_isset_fetch(&model, initialized, &lowercased)) {
+		RETURN_CTORW(&model);
 	}
 
 	/** 
@@ -521,14 +506,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 		if (phalcon_has_constructor(return_value)) {
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", dependency_injector, getThis());
 		}
-		RETURN_MM();
+		return;
 	}
 
 	/** 
 	 * The model doesn't exist throw an exception
 	 */
 	zend_throw_exception_ex(phalcon_mvc_model_exception_ce, 0, "Model '%s' could not be loaded", Z_STRVAL_P(model_name));
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -540,26 +524,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSource){
 
-	zval *model, *source, *entity_name;
+	zval *model, *source, entity_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &source);
+	phalcon_fetch_params(0, 2, 0, &model, &source);
 
 	if (Z_TYPE_P(model) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Model is not an object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Model is not an object");
 		return;
 	}
 	if (Z_TYPE_P(source) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Source must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Source must be a string");
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_sources"), entity_name, source);
-
-	PHALCON_MM_RESTORE();
+	phalcon_get_class(&entity_name, model, 1);
+	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, source);
 }
 
 /**
@@ -570,37 +549,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSource){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSource){
 
-	zval *model, *entity_name, *sources, *source = NULL, *class_name;
+	zval *model, entity_name, *sources, source, class_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	if (Z_TYPE_P(model) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Model is not an object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Model is not an object");
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
+	phalcon_get_class(&entity_name, model, 1);
 
 	sources = phalcon_read_property(getThis(), SL("_sources"), PH_NOISY);
 	if (Z_TYPE_P(sources) == IS_ARRAY) { 
-		if (phalcon_array_isset(sources, entity_name)) {
-			PHALCON_OBS_VAR(source);
-			phalcon_array_fetch(&source, sources, entity_name, PH_NOISY);
-			RETURN_CTOR(source);
+		if (phalcon_array_isset_fetch(&source, sources, &entity_name)) {
+			RETURN_CTORW(&source);
 		}
 	}
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class_ns(class_name, model, 0);
+	phalcon_get_class_ns(&class_name, model, 0);
 
-	PHALCON_INIT_NVAR(source);
-	phalcon_uncamelize(source, class_name);
-	phalcon_update_property_array(getThis(), SL("_sources"), entity_name, source);
+	phalcon_uncamelize(&source, &class_name);
+	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, &source);
 
-	RETURN_CTOR(source);
+	RETURN_CTORW(&source);
 }
 
 /**
@@ -612,26 +584,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSource){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSchema){
 
-	zval *model, *schema, *entity_name;
+	zval *model, *schema, entity_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &schema);
+	phalcon_fetch_params(0, 2, 0, &model, &schema);
 
 	if (Z_TYPE_P(model) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Model is not an object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Model is not an object");
 		return;
 	}
 	if (Z_TYPE_P(schema) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Schema must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Schema must be a string");
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_schemas"), entity_name, schema);
-
-	PHALCON_MM_RESTORE();
+	phalcon_get_class(&entity_name, model, 1);
+	phalcon_update_property_array(getThis(), SL("_schemas"), &entity_name, schema);
 }
 
 /**
@@ -642,30 +609,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSchema){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSchema){
 
-	zval *model, *entity_name, *schemas, *schema;
+	zval *model, entity_name, *schemas, schema;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	if (Z_TYPE_P(model) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Model is not an object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Model is not an object");
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
+	phalcon_get_class(&entity_name, model, 1);
 
 	schemas = phalcon_read_property(getThis(), SL("_schemas"), PH_NOISY);
 	if (Z_TYPE_P(schemas) == IS_ARRAY) { 
-		if (phalcon_array_isset(schemas, entity_name)) {
-			PHALCON_OBS_VAR(schema);
-			phalcon_array_fetch(&schema, schemas, entity_name, PH_NOISY);
-			RETURN_CTOR(schema);
+		if (phalcon_array_isset_fetch(&schema, schemas, &entity_name)) {
+			RETURN_CTORW(&schema);
 		}
 	}
-
-	RETURN_MM_NULL();
 }
 
 /**
@@ -676,23 +636,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSchema){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setConnectionService){
 
-	zval *model, *connection_service, *entity_name;
+	zval *model, *connection_service, entity_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &connection_service);
+	phalcon_fetch_params(0, 2, 0, &model, &connection_service);
 
 	if (Z_TYPE_P(connection_service) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The connection service must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The connection service must be a string");
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_readConnectionServices"), entity_name, connection_service);
-	phalcon_update_property_array(getThis(), SL("_writeConnectionServices"), entity_name, connection_service);
-
-	PHALCON_MM_RESTORE();
+	phalcon_get_class(&entity_name, model, 1);
+	phalcon_update_property_array(getThis(), SL("_readConnectionServices"), &entity_name, connection_service);
+	phalcon_update_property_array(getThis(), SL("_writeConnectionServices"), &entity_name, connection_service);
 }
 
 /**
@@ -703,22 +658,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setWriteConnectionService){
 
-	zval *model, *connection_service, *entity_name;
+	zval *model, *connection_service, entity_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &connection_service);
+	phalcon_fetch_params(0, 2, 0, &model, &connection_service);
 
 	if (Z_TYPE_P(connection_service) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The connection service must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The connection service must be a string");
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_writeConnectionServices"), entity_name, connection_service);
-
-	PHALCON_MM_RESTORE();
+	phalcon_get_class(&entity_name, model, 1);
+	phalcon_update_property_array(getThis(), SL("_writeConnectionServices"), &entity_name, connection_service);
 }
 
 /**
@@ -729,22 +679,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setWriteConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService){
 
-	zval *model, *connection_service, *entity_name;
+	zval *model, *connection_service, entity_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &connection_service);
+	phalcon_fetch_params(0, 2, 0, &model, &connection_service);
 
 	if (Z_TYPE_P(connection_service) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The connection service must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The connection service must be a string");
 		return;
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_readConnectionServices"), entity_name, connection_service);
-
-	PHALCON_MM_RESTORE();
+	phalcon_get_class(&entity_name, model, 1);
+	phalcon_update_property_array(getThis(), SL("_readConnectionServices"), &entity_name, connection_service);
 }
 
 /**
@@ -755,32 +700,29 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
 
-	zval *model, *service = NULL;
-	zval *dependency_injector, *connection = NULL;
+	zval *model, service, *dependency_injector, connection;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
-
-	PHALCON_CALL_SELF(&service, "getwriteconnectionservice", model);
+	PHALCON_CALL_SELFW(&service, "getwriteconnectionservice", model);
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 
 	/** 
 	 * Request the connection service from the DI
 	 */
-	PHALCON_CALL_METHOD(&connection, dependency_injector, "getshared", service);
-	if (Z_TYPE_P(connection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid injected connection service");
+	PHALCON_CALL_METHODW(&connection, dependency_injector, "getshared", &service);
+	if (Z_TYPE(connection) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid injected connection service");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE(connection, phalcon_db_adapterinterface_ce);
-	RETURN_CTOR(connection);
+	PHALCON_VERIFY_INTERFACEW(&connection, phalcon_db_adapterinterface_ce);
+	RETURN_CTORW(&connection);
 }
 
 /**
@@ -791,32 +733,29 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection){
 
-	zval *model, *service = NULL;
-	zval *dependency_injector, *connection = NULL;
+	zval *model, service, *dependency_injector, connection;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
-
-	PHALCON_CALL_SELF(&service, "getreadconnectionservice", model);
+	PHALCON_CALL_SELFW(&service, "getreadconnectionservice", model);
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 
 	/** 
 	 * Request the connection service from the DI
 	 */
-	PHALCON_CALL_METHOD(&connection, dependency_injector, "getshared", service);
-	if (Z_TYPE_P(connection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid injected connection service");
+	PHALCON_CALL_METHODW(&connection, dependency_injector, "getshared", &service);
+	if (Z_TYPE(connection) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid injected connection service");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE(connection, phalcon_db_adapterinterface_ce);
-	RETURN_CTOR(connection);
+	PHALCON_VERIFY_INTERFACEW(&connection, phalcon_db_adapterinterface_ce);
+	RETURN_CTORW(&connection);
 }
 
 /**
@@ -827,30 +766,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnectionService){
 
-	zval *model, *connection_services, *entity_name;
-	zval *connection;
+	zval *model, *connection_services, entity_name, connection;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	connection_services = phalcon_read_property(getThis(), SL("_readConnectionServices"), PH_NOISY);
 	if (Z_TYPE_P(connection_services) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
+		phalcon_get_class(&entity_name, model, 1);
 
 		/** 
 		 * Check if there is a custom service connection name
 		 */
-		if (phalcon_array_isset(connection_services, entity_name)) {
-			PHALCON_OBS_VAR(connection);
-			phalcon_array_fetch(&connection, connection_services, entity_name, PH_NOISY);
-			RETURN_CTOR(connection);
+		if (phalcon_array_isset_fetch(&connection, connection_services, &entity_name)) {
+			RETURN_CTORW(&connection);
 		}
 	}
 
-	RETURN_MM_STRING("db");
+	RETURN_STRING("db");
 }
 
 /**
@@ -861,30 +793,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
 
-	zval *model, *connection_services, *entity_name;
-	zval *connection;
-
-	PHALCON_MM_GROW();
+	zval *model, *connection_services, entity_name, connection;
 
 	phalcon_fetch_params(1, 1, 0, &model);
 
 	connection_services = phalcon_read_property(getThis(), SL("_writeConnectionServices"), PH_NOISY);
-	if (Z_TYPE_P(connection_services) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
+	if (Z_TYPE_P(connection_services) == IS_ARRAY) {
+		phalcon_get_class(&entity_name, model, 1);
 
 		/** 
 		 * Check if there is a custom service connection name
 		 */
-		if (phalcon_array_isset(connection_services, entity_name)) {
-			PHALCON_OBS_VAR(connection);
-			phalcon_array_fetch(&connection, connection_services, entity_name, PH_NOISY);
-			RETURN_CTOR(connection);
+		if (phalcon_array_isset_fetch(&connection, connection_services, &entity_name)) {
+			RETURN_CTORW(&connection);
 		}
 	}
 
-	RETURN_MM_STRING("db");
+	RETURN_STRING("db");
 }
 
 /**
@@ -896,33 +821,26 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 
-	zval *eventname, *model, *status = NULL, *behaviors, *entity_name = NULL;
-	zval models_behaviors, *behavior = NULL, *events_manager;
-	zval *fire_event_name = NULL, *custom_events_manager;
+	zval *eventname, *model, entity_name, status, *behaviors, models_behaviors, *behavior, *events_manager, fire_event_name, *custom_events_manager;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &eventname, &model);
 
-	phalcon_fetch_params(1, 2, 0, &eventname, &model);
-
-	PHALCON_INIT_VAR(status);
+	phalcon_get_class(&entity_name, model, 1);
 
 	/** 
 	 * Dispatch events to the global events manager
 	 */
 	behaviors = phalcon_read_property(getThis(), SL("_behaviors"), PH_NOISY);
-	if (Z_TYPE_P(behaviors) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
-		if (phalcon_array_isset_fetch(&models_behaviors, behaviors, entity_name)) {
+	if (Z_TYPE_P(behaviors) == IS_ARRAY) {
+		if (phalcon_array_isset_fetch(&models_behaviors, behaviors, &entity_name)) {
 
 			/** 
 			 * Notify all the events on the behavior
 			 */
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&models_behaviors), behavior) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models_behaviors), behavior) {
 				PHALCON_CALL_METHOD(&status, behavior, "notify", eventname, model);
-				if (PHALCON_IS_FALSE(status)) {
-					RETURN_CTOR(status);
+				if (PHALCON_IS_FALSE(&status)) {
+					RETURN_CTORW(&status);
 				}
 			} ZEND_HASH_FOREACH_END();
 
@@ -932,15 +850,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	/** 
 	 * Dispatch events to the global events manager
 	 */
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
-	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
+		PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
 
-		PHALCON_INIT_VAR(fire_event_name);
-		PHALCON_CONCAT_SV(fire_event_name, "model:", eventname);
-
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", fire_event_name, model);
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_CTOR(status);
+		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_CTORW(&status);
 		}
 	}
 
@@ -948,24 +864,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	 * A model can has a specific events manager for it
 	 */
 	custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
-	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
-		zval mgr;
+	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) {
+		if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, &entity_name)) {
+			PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
 
-		PHALCON_INIT_NVAR(entity_name);
-		phalcon_get_class(entity_name, model, 1);
-		if (phalcon_array_isset_fetch(&mgr, custom_events_manager, entity_name)) {
-
-			PHALCON_INIT_NVAR(fire_event_name);
-			PHALCON_CONCAT_SV(fire_event_name, "model:", eventname);
-
-			PHALCON_CALL_METHOD(&status, &mgr, "fire", fire_event_name, model);
-			if (PHALCON_IS_FALSE(status)) {
-				RETURN_CTOR(status);
+			PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
+			if (PHALCON_IS_FALSE(&status)) {
+				RETURN_CTORW(&status);
 			}
 		}
 	}
 
-	RETURN_CTOR(status);
+	RETURN_CTORW(&status);
 }
 
 /**

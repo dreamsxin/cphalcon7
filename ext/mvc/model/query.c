@@ -2455,7 +2455,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 			/**
 			 * Get the real namespace alias
 			 */
-			PHALCON_CALL_METHODW(&real_namespace, manager, "getnamespacealias", &ns_alias);
+			PHALCON_CALL_METHODW(&real_namespace, &manager, "getnamespacealias", &ns_alias);
 
 			/**
 			 * Create the real namespaced name
@@ -2468,7 +2468,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 		/** 
 		 * Load a model instance from the models manager
 		 */
-		PHALCON_CALL_METHODW(&model, manager, "load", &real_model_name);
+		PHALCON_CALL_METHODW(&model, &manager, "load", &real_model_name);
 
 		/** 
 		 * Define a complete schema/source
@@ -2495,7 +2495,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 			/** 
 			 * Check that the alias hasn't been used before
 			 */
-			if (phalcon_array_isset(sql_aliases, &alias)) {
+			if (phalcon_array_isset(&sql_aliases, &alias)) {
 				phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
 				PHALCON_CONCAT_SVSV(&exception_message, "Alias \"", &alias, " is already used when preparing: ", phql);
@@ -2503,10 +2503,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 				return;
 			}
 
-			phalcon_array_update_zval(sql_aliases, &alias, &alias, PH_COPY);
-			phalcon_array_update_zval(sql_aliases_models, &alias, &model_name, PH_COPY);
-			phalcon_array_update_zval(sql_models_aliases, &model_name, &alias, PH_COPY);
-			phalcon_array_update_zval(sql_aliases_models_instances, &alias, model, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases, &alias, &alias, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases_models, &alias, &model_name, PH_COPY);
+			phalcon_array_update_zval(&sql_models_aliases, &model_name, &alias, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases_models_instances, &alias, model, PH_COPY);
 
 			/** 
 			 * Append or convert complete source to an array
@@ -2525,8 +2525,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 			phalcon_array_update_zval(&sql_aliases, &model_name, &source, PH_COPY);
 			phalcon_array_update_zval(&sql_aliases_models, &model_name, &model_name, PH_COPY);
 			phalcon_array_update_zval(&sql_models_aliases, &model_name, &model_name, PH_COPY);
-			phalcon_array_update_zval(&sql_aliases_models_instances, &model_name, model, PH_COPY);
-			phalcon_array_update_zval(&models, &model_name, source, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases_models_instances, &model_name, &model, PH_COPY);
+			phalcon_array_update_zval(&models, &model_name, &source, PH_COPY);
 		}
 
 		phalcon_array_append(&sql_models, &model_name, PH_COPY);

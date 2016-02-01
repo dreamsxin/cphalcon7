@@ -98,6 +98,14 @@ int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *in
 	return phalcon_array_isset_fetch(fetched, arr, &z_index);
 }
 
+int phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index)
+{
+	zval z_index;
+	ZVAL_STR(&z_index, index);
+
+	return phalcon_array_isset_fetch(fetched, arr, &z_index);
+}
+
 int ZEND_FASTCALL phalcon_array_isset(const zval *arr, const zval *index)
 {
 	HashTable *h;

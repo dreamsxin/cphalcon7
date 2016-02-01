@@ -1357,57 +1357,37 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 
-	zval *model, *fields, *intermediate_model, *intermediate_fields;
-	zval *intermediate_referenced_fields, *referenced_model;
-	zval *referenced_fields, *options = NULL, *entity_name;
-	zval *intermediate_entity, *referenced_entity;
-	zval *key_relation, *has_many_to_many, *relations = NULL;
-	zval *number_fields = NULL, *number_referenced = NULL, *type;
-	zval *relation, *alias, *lower_alias = NULL, *key_alias;
-	zval *has_many_to_many_single, *single_relations = NULL;
+	zval *model, *fields, *intermediate_model, *intermediate_fields, *intermediate_referenced_fields, *referenced_model, *referenced_fields, *options = NULL;
+	zval entity_name, intermediate_entity, referenced_entity, key_relation, *has_many_to_many, relations, number_fields, number_referenced, type;
+	zval relation, alias, lower_alias, key_alias, *has_many_to_many_single, single_relations;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 7, 1, &model, &fields, &intermediate_model, &intermediate_fields, &intermediate_referenced_fields, &referenced_model, &referenced_fields, &options);
+	phalcon_fetch_params(0, 7, 1, &model, &fields, &intermediate_model, &intermediate_fields, &intermediate_referenced_fields, &referenced_model, &referenced_fields, &options);
 
 	if (!options) {
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_get_class(entity_name, model, 1);
+	phalcon_get_class(&entity_name, model, 1);
 
-	PHALCON_INIT_VAR(intermediate_entity);
-	phalcon_fast_strtolower(intermediate_entity, intermediate_model);
+	phalcon_fast_strtolower(&intermediate_entity, intermediate_model);
+	phalcon_fast_strtolower(&referenced_entity, referenced_model);
 
-	PHALCON_INIT_VAR(referenced_entity);
-	phalcon_fast_strtolower(referenced_entity, referenced_model);
-
-	PHALCON_INIT_VAR(key_relation);
-	PHALCON_CONCAT_VSV(key_relation, entity_name, "$", referenced_entity);
+	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &referenced_entity);
 
 	has_many_to_many = phalcon_read_property(getThis(), SL("_hasManyToMany"), PH_NOISY);
-	if (!phalcon_array_isset(has_many_to_many, key_relation)) {
-		PHALCON_INIT_VAR(relations);
-		array_init(relations);
-	} else {
-		PHALCON_OBS_NVAR(relations);
-		phalcon_array_fetch(&relations, has_many_to_many, key_relation, PH_NOISY);
+	if (!phalcon_array_isset_fetch(&relations, has_many_to_many, key_relation)) {
+		array_init(&relations);
 	}
 
 	/** 
 	 * Check if the number of fields are the same from the model to the intermediate
 	 * model
 	 */
-	if (Z_TYPE_P(intermediate_fields) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(number_fields);
-		phalcon_fast_count(number_fields, fields);
-
-		PHALCON_INIT_VAR(number_referenced);
-		phalcon_fast_count(number_referenced, intermediate_fields);
-		if (!PHALCON_IS_EQUAL(number_fields, number_referenced)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Number of referenced fields are not the same");
+	if (Z_TYPE_P(intermediate_fields) == IS_ARRAY) {
+		phalcon_fast_count(&number_fields, fields);
+		phalcon_fast_count(&number_referenced, intermediate_fields);
+		if (!PHALCON_IS_EQUAL(&number_fields, &number_referenced)) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Number of referenced fields are not the same");
 			return;
 		}
 	}
@@ -1416,15 +1396,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	 * Check if the number of fields are the same from the intermediate model to the
 	 * referenced model
 	 */
-	if (Z_TYPE_P(intermediate_referenced_fields) == IS_ARRAY) { 
-
-		PHALCON_INIT_NVAR(number_fields);
-		phalcon_fast_count(number_fields, fields);
-
-		PHALCON_INIT_NVAR(number_referenced);
-		phalcon_fast_count(number_referenced, intermediate_fields);
-		if (!PHALCON_IS_EQUAL(number_fields, number_referenced)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Number of referenced fields are not the same");
+	if (Z_TYPE_P(intermediate_referenced_fields) == IS_ARRAY) {
+		phalcon_fast_count(&number_fields, fields);
+		phalcon_fast_count(&number_referenced, intermediate_fields);
+		if (!PHALCON_IS_EQUAL(&number_fields, &number_referenced)) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Number of referenced fields are not the same");
 			return;
 		}
 	}
@@ -1432,74 +1408,63 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	/** 
 	 * Type '4' is 'has many through'
 	 */
-	PHALCON_INIT_VAR(type);
-	ZVAL_LONG(type, 4);
+	ZVAL_LONG(&type, 4);
 
 	/** 
 	 * Create a relationship instance
 	 */
-	PHALCON_INIT_VAR(relation);
-	object_init_ex(relation, phalcon_mvc_model_relation_ce);
-	PHALCON_CALL_METHOD(NULL, relation, "__construct", type, referenced_model, fields, referenced_fields, options);
+	object_init_ex(&relation, phalcon_mvc_model_relation_ce);
+	PHALCON_CALL_METHODW(NULL, relation, "__construct", &type, referenced_model, fields, referenced_fields, options);
 
 	/** 
 	 * Set extended intermediate relation data
 	 */
-	PHALCON_CALL_METHOD(NULL, relation, "setintermediaterelation", intermediate_fields, intermediate_model, intermediate_referenced_fields);
+	PHALCON_CALL_METHODW(NULL, relation, "setintermediaterelation", intermediate_fields, intermediate_model, intermediate_referenced_fields);
 
 	/** 
 	 * Check an alias for the relation
 	 */
-	if (phalcon_array_isset_str(options, SL("alias"))) {
-		PHALCON_OBS_VAR(alias);
-		phalcon_array_fetch_str(&alias, options, SL("alias"), PH_NOISY);
-
-		PHALCON_INIT_VAR(lower_alias);
-		phalcon_fast_strtolower(lower_alias, alias);
+	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
+		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		PHALCON_CPY_WRT(lower_alias, referenced_entity);
+		ZVAL_COPY(&lower_alias, &referenced_entity);
 	}
 
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(relations, relation, PH_COPY);
+	phalcon_array_append(&relations, &relation, PH_COPY);
 
 	/** 
 	 * Update the global alias
 	 */
-	PHALCON_INIT_VAR(key_alias);
-	PHALCON_CONCAT_VSV(key_alias, entity_name, "$", lower_alias);
-	phalcon_update_property_array(getThis(), SL("_aliases"), key_alias, relation);
+	PHALCON_CONCAT_VSV(&key_alias, &entity_name, "$", &lower_alias);
+	phalcon_update_property_array(getThis(), SL("_aliases"), &key_alias, &relation);
 
 	/** 
 	 * Update the relations
 	 */
-	phalcon_update_property_array(getThis(), SL("_hasManyToMany"), key_relation, relations);
+	phalcon_update_property_array(getThis(), SL("_hasManyToMany"), &key_relation, &relations);
 
 	/** 
 	 * Get existing relations by model
 	 */
 	has_many_to_many_single = phalcon_read_property(getThis(), SL("_hasManyToManySingle"), PH_NOISY);
-	if (!phalcon_array_isset(has_many_to_many_single, entity_name)) {
-		PHALCON_INIT_VAR(single_relations);
-		array_init(single_relations);
-	} else {
-		PHALCON_OBS_NVAR(single_relations);
-		phalcon_array_fetch(&single_relations, has_many_to_many_single, entity_name, PH_NOISY);
+	if (!phalcon_array_isset_fetch(&single_relations, has_many_to_many_single, &entity_name)) {
+		array_init(&single_relations);
 	}
 
 	/** 
 	 * Append a new relationship
 	 */
-	phalcon_array_append(single_relations, relation, PH_COPY);
+	phalcon_array_append(&single_relations, &relation, PH_COPY);
 
 	/** 
 	 * Update relations by model
 	 */
-	phalcon_update_property_array(getThis(), SL("_hasManyToManySingle"), entity_name, single_relations);
+	phalcon_update_property_array(getThis(), SL("_hasManyToManySingle"), &entity_name, &single_relations);
 
-	RETURN_CTOR(relation);
+	RETURN_CTORW(&relation);
 }
 
 /**

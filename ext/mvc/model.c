@@ -2472,7 +2472,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 			return;
 		}
 
-		if (!phalcon_is_callable(handler)) {
+		if (!phalcon_is_callable(&handler)) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Validator must be an callable");
 			return;
 		}

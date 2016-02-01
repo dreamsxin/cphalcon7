@@ -1420,8 +1420,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 	 * Check for columns qualified and not qualified
 	 */
 	if (PHALCON_IS_LONG(&column_type, PHQL_T_EXPR)) {
-		zval balias;
-
 		/** 
 		 * The sql_column is a scalar type returning a simple string
 		 */
@@ -1460,28 +1458,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getTable){
 
-	zval *manager, *qualified_name, model_name;
-	zval *model = NULL, *source = NULL, *schema = NULL;
+	zval *manager, *qualified_name, model_name, model, source, schema;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &manager, &qualified_name);
+	phalcon_fetch_params(0, 2, 0, &manager, &qualified_name);
 
 	if (phalcon_array_isset_fetch_str(&model_name, qualified_name, SL("name"))) {
 		PHALCON_CALL_METHODW(&model, manager, "load", &model_name);
-		PHALCON_CALL_METHODW(&source, model, "getsource");
-		PHALCON_CALL_METHODW(&schema, model, "getschema");
-		if (zend_is_true(schema)) {
+		PHALCON_CALL_METHODW(&source, &model, "getsource");
+		PHALCON_CALL_METHODW(&schema, &model, "getschema");
+		if (zend_is_true(&schema)) {
 			array_init_size(return_value, 2);
-			phalcon_array_append(return_value, schema, PH_COPY);
-			phalcon_array_append(return_value, source, PH_COPY);
-			RETURN_MM();
+			phalcon_array_append(return_value, &schema, PH_COPY);
+			phalcon_array_append(return_value, &source, PH_COPY);
+			return;
 		}
 
-		RETURN_CTOR(source);
+		RETURN_CTORW(&source);
 	}
-	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
-	return;
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
 }
 
 /**
@@ -1493,33 +1487,28 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getTable){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
 
-	zval *manager, *join, qualified, qualified_type;
-	zval *model_name, *model = NULL, *source = NULL, *schema = NULL;
+	zval *manager, *join, qualified, qualified_type, model_name, model, source, schema;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &manager, &join);
+	phalcon_fetch_params(0, 2, 0, &manager, &join);
 
 	if (phalcon_array_isset_fetch_str(&qualified, join, SL("qualified"))) {
 		phalcon_array_fetch_string(&qualified_type, &qualified, IS(type), PH_NOISY);
 		if (PHALCON_IS_LONG(&qualified_type, PHQL_T_QUALIFIED)) {
-			PHALCON_OBS_VAR(model_name);
 			phalcon_array_fetch_string(&model_name, &qualified, IS(name), PH_NOISY);
 
-			PHALCON_CALL_METHODW(&model, manager, "load", model_name);
-			PHALCON_CALL_METHODW(&source, model, "getsource");
-			PHALCON_CALL_METHODW(&schema, model, "getschema");
+			PHALCON_CALL_METHODW(&model, manager, "load", &model_name);
+			PHALCON_CALL_METHODW(&source, &model, "getsource");
+			PHALCON_CALL_METHODW(&schema, &model, "getschema");
 
 			array_init_size(return_value, 4);
-			phalcon_array_update_str(return_value, SL("schema"), schema, PH_COPY);
-			phalcon_array_update_str(return_value, SL("source"), source, PH_COPY);
-			phalcon_array_update_str(return_value, SL("modelName"), model_name, PH_COPY);
-			phalcon_array_update_str(return_value, SL("model"), model, PH_COPY);
-			RETURN_MM();
+			phalcon_array_update_str(return_value, SL("schema"), &schema, PH_COPY);
+			phalcon_array_update_str(return_value, SL("source"), &source, PH_COPY);
+			phalcon_array_update_str(return_value, SL("modelName"), &model_name, PH_COPY);
+			phalcon_array_update_str(return_value, SL("model"), &model, PH_COPY);
+			return;
 		}
 	}
-	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
-	return;
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
 }
 
 /**
@@ -1530,21 +1519,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 
-	zval *join, *type, exception_message;
+	zval *join, type, *phql, exception_message;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &join);
 
-	phalcon_fetch_params(1, 1, 0, &join);
-
-	if (!phalcon_array_isset_str(join, ISL(type))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+	if (!phalcon_array_isset_fetch_string(&type, join, IS(type))) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
 		return;
 	}
 
-	PHALCON_OBS_VAR(type);
-	phalcon_array_fetch_string(&type, join, IS(type), PH_NOISY);
-
-	switch (phalcon_get_intval(type)) {
+	switch (phalcon_get_intval(&type)) {
 
 		case PHQL_T_INNERJOIN:
 			RETVAL_STRING("INNER");
@@ -1567,16 +1551,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 			break;
 
 		default: {
-			zval *phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
+			phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
-			PHALCON_CONCAT_SVSV(&exception_message, "Unknown join type ", type, ", when preparing: ", phql);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-			return;
+			PHALCON_CONCAT_SVSV(&exception_message, "Unknown join type ", &type, ", when preparing: ", phql);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 		}
-
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

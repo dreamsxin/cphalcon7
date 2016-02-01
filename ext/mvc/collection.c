@@ -2583,15 +2583,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, drop){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, parse){
 
-	zval *conditions, *column_map = NULL, *collection_manager = NULL, *use_implicit_ids = NULL, *mongo_id = NULL;
-	zval *value = NULL, *column = NULL, *value1 = NULL, *value2 = NULL;
+	zval *conditions, column_map, collection_manager, use_implicit_ids, *value;
 	zend_string *str_key;
 	ulong idx;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &conditions);
+	phalcon_fetch_params(0, 1, 1, &conditions);
 
 	if (Z_TYPE_P(conditions) != IS_ARRAY) {
 		RETURN_CTOR(conditions);
@@ -2599,15 +2596,14 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 
 	PHALCON_SEPARATE_PARAM(conditions);
 
-	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
-
-	PHALCON_CALL_SELF(&collection_manager, "getcollectionmanager");
-	PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", getThis());
+	PHALCON_CALL_SELFW(&column_map, "getcolumnmap");
+	PHALCON_CALL_SELFW(&collection_manager, "getcollectionmanager");
+	PHALCON_CALL_METHODW(&use_implicit_ids, &collection_manager, "isusingimplicitobjectids", getThis());
 
 	ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(conditions), idx, str_key, value) {
-		zval tmp;
+		zval tmp, value1, value2, column, mongo_id;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -2615,39 +2611,34 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 		}
 		if (Z_TYPE_P(value) == IS_ARRAY) {
 			PHALCON_CALL_SELF(&value1, "parse", value);
-			phalcon_array_update_zval(conditions, &tmp, value1, PH_COPY);
+			phalcon_array_update_zval(conditions, &tmp, &value1, PH_COPY);
 		}
 
-		PHALCON_OBS_NVAR(value2);
 		phalcon_array_fetch(&value2, conditions, &tmp, PH_NOISY);
 
-		if (phalcon_array_isset(column_map, &tmp)) {
-			PHALCON_OBS_NVAR(column);
-			phalcon_array_fetch(&column, column_map, &tmp, PH_NOISY);
-
-			if (!PHALCON_IS_EQUAL(column, &tmp)) {
+		if (phalcon_array_isset_fetch(&column, &column_map, &tmp)) {
+			if (!PHALCON_IS_EQUAL(&column, &tmp)) {
 				phalcon_array_unset(conditions, &tmp, 0);
-				phalcon_array_update_zval(conditions, column, value2, PH_COPY);
+				phalcon_array_update_zval(conditions, &column, &value2, PH_COPY);
 			}
 		} else {
-			PHALCON_CPY_WRT(column, &tmp);
+			ZVAL_COPY_VALUE(&column, &tmp);
 		}
 
-		if (PHALCON_IS_STRING(column, "_id")) {
-			if (Z_TYPE_P(value2) != IS_OBJECT && Z_TYPE_P(value2) != IS_ARRAY) {
-				if (zend_is_true(use_implicit_ids)) {
-					PHALCON_INIT_NVAR(mongo_id);
-					object_init_ex(mongo_id, ce0);
-					if (phalcon_has_constructor(mongo_id)) {
-						PHALCON_CALL_METHOD(NULL, mongo_id, "__construct", value2);
+		if (PHALCON_IS_STRING(&column, "_id")) {
+			if (Z_TYPE(value2) != IS_OBJECT && Z_TYPE(value2) != IS_ARRAY) {
+				if (zend_is_true(&use_implicit_ids)) {
+					object_init_ex(&mongo_id, ce0);
+					if (phalcon_has_constructor(&mongo_id)) {
+						PHALCON_CALL_METHOD(NULL, &mongo_id, "__construct", &value2);
 					}
-					phalcon_array_update_zval(conditions, column, mongo_id, PH_COPY);
+					phalcon_array_update_zval(conditions, &column, &mongo_id, PH_COPY);
 				}
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(conditions);
+	RETURN_CTORW(&conditions);
 }
 
 
@@ -2659,47 +2650,42 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, __set){
 
-	zval *property, *value, *possible_setter = NULL, *class_name, *method_exists = NULL;
+	zval *property, *value, possible_setter, class_name, method_exists;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &property, &value);
+	phalcon_fetch_params(0, 2, 0, &property, &value);
 
 	if (Z_TYPE_P(property) == IS_STRING) {
-		PHALCON_INIT_NVAR(possible_setter);
-		PHALCON_CONCAT_SV(possible_setter, "set", property);
-		zend_str_tolower(Z_STRVAL_P(possible_setter), Z_STRLEN_P(possible_setter));
+		PHALCON_CONCAT_SV(&possible_setter, "set", property);
+		phalcon_strtolower_inplace(&possible_setter);
 
-		PHALCON_INIT_VAR(class_name);
-		ZVAL_STRING(class_name, "Phalcon\\Mvc\\Collection");
+		ZVAL_STRING(&class_name, "Phalcon\\Mvc\\Collection");
 
-		PHALCON_CALL_FUNCTION(&method_exists, "method_exists", class_name, possible_setter);
-		if (!zend_is_true(method_exists)) {
-			if (phalcon_method_exists(getThis(), possible_setter) == SUCCESS) {
-				PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(possible_setter), value);
-				RETURN_CTOR(value);
+		PHALCON_CALL_FUNCTIONW(&method_exists, "method_exists", &class_name, &possible_setter);
+		if (!zend_is_true(&method_exists)) {
+			if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
+				PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL_P(possible_setter), value);
+				RETURN_CTORW(value);
 			}
 		}
 
 		if (phalcon_isset_property_zval(getThis(), property)) {
-			PHALCON_INIT_NVAR(class_name);
-			phalcon_get_class(class_name, getThis(), 0);
+			phalcon_get_class(&class_name, getThis(), 0);
 
 			if (PHALCON_PROPERTY_IS_PRIVATE_ZVAL(getThis(), property)) {
-				zend_error(E_ERROR, "Cannot access private property %s::%s", Z_STRVAL_P(class_name), Z_STRVAL_P(property));
-				RETURN_MM();
+				zend_error(E_ERROR, "Cannot access private property %s::%s", Z_STRVAL(class_name), Z_STRVAL_P(property));
+				return;
 			}
 
 			if (PHALCON_PROPERTY_IS_PROTECTED_ZVAL(getThis(), property)) {
-				zend_error(E_ERROR, "Cannot access protected property %s::%s", Z_STRVAL_P(class_name), Z_STRVAL_P(property));
-				RETURN_MM();
+				zend_error(E_ERROR, "Cannot access protected property %s::%s", Z_STRVAL(class_name), Z_STRVAL_P(property));
+				return;
 			}
 		}
 	}
 
 	phalcon_update_property_zval_zval(getThis(), property, value);
 
-	RETURN_CTOR(value);
+	RETURN_CTORW(value);
 }
 
 /**
@@ -2710,34 +2696,30 @@ PHP_METHOD(Phalcon_Mvc_Collection, __set){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, __get){
 
-	zval *property, *possible_getter = NULL, *class_name, *method_exists = NULL;
+	zval *property, possible_getter, class_name, method_exists;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &property);
+	phalcon_fetch_params(0, 1, 0, &property);
 
 	if (Z_TYPE_P(property) == IS_STRING) {
-		PHALCON_INIT_NVAR(possible_getter);
-		PHALCON_CONCAT_SV(possible_getter, "get", property);
-		zend_str_tolower(Z_STRVAL_P(possible_getter), Z_STRLEN_P(possible_getter));
+		PHALCON_CONCAT_SV(&possible_getter, "get", property);
+		phalcon_strtolower_inplace(&possible_getter);
 
-		PHALCON_INIT_VAR(class_name);
-		ZVAL_STRING(class_name, "Phalcon\\Mvc\\Collection");
+		ZVAL_STRING(&class_name, "Phalcon\\Mvc\\Collection");
 
-		PHALCON_CALL_FUNCTION(&method_exists, "method_exists", class_name, possible_getter);
-		if (!zend_is_true(method_exists)) {
-			if (phalcon_method_exists(getThis(), possible_getter) == SUCCESS) {
-				PHALCON_CALL_METHOD(&return_value, getThis(), Z_STRVAL_P(possible_getter));
-				RETURN_MM();
+		PHALCON_CALL_FUNCTIONW(&method_exists, "method_exists", &class_name, &possible_getter);
+		if (!zend_is_true(&method_exists)) {
+			if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
+				PHALCON_CALL_METHODW(&return_value, getThis(), &possible_getter);
+				return;
 			}
 		}
 
 		if (phalcon_isset_property_zval(getThis(), property)) {
-			RETURN_MM_NULL();
+			RETURN_NULL();
 		}
 	}
 
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }
 
 /**

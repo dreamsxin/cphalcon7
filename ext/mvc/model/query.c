@@ -2056,7 +2056,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			/** 
 			 * Update model => model
 			 */
-			phalcon_array_update_zval(&sql_models_aliases, &model_name, &model_name, PH_COPY);
+			phalcon_array_update_zval(sql_models_aliases, &model_name, &model_name, PH_COPY);
 
 			/** 
 			 * Update model => model

@@ -1984,57 +1984,46 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, clearReusableObjects){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getBelongsToRecords){
 
-	zval *method, *model_name, *model_relation, *record;
-	zval *parameters = NULL, *belongs_to, *entity_name;
-	zval *entity_relation, *key_relation, *relations;
-	zval *relation;
+	zval *method, *model_name, *model_relation, *record, *parameters = NULL, *belongs_to, entity_name;
+	zval entity_relation, key_relation, relations, relation;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 4, 1, &method, &model_name, &model_relation, &record, &parameters);
+	phalcon_fetch_params(0, 4, 1, &method, &model_name, &model_relation, &record, &parameters);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
 	belongs_to = phalcon_read_property(getThis(), SL("_belongsTo"), PH_NOISY);
-	if (Z_TYPE_P(belongs_to) == IS_ARRAY) { 
-
-		PHALCON_INIT_VAR(entity_name);
-		phalcon_fast_strtolower(entity_name, model_name);
-
-		PHALCON_INIT_VAR(entity_relation);
-		phalcon_fast_strtolower(entity_relation, model_relation);
+	if (Z_TYPE_P(belongs_to) == IS_ARRAY) {
+		phalcon_fast_strtolower(&entity_name, model_name);
+		phalcon_fast_strtolower(&entity_relation, model_relation);
 
 		/** 
 		 * Check if there is a relation between them
 		 */
-		PHALCON_INIT_VAR(key_relation);
-		PHALCON_CONCAT_VSV(key_relation, entity_name, "$", entity_relation);
-		if (!phalcon_array_isset(belongs_to, key_relation)) {
-			RETURN_MM_FALSE;
+		PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
+		if (!phalcon_array_isset(belongs_to, &key_relation)) {
+			RETURN_FALSE;
 		}
 
 		/** 
 		 * relations is an array with all the belongsTo relationships to that model
 		 */
-		PHALCON_OBS_VAR(relations);
-		phalcon_array_fetch(&relations, belongs_to, key_relation, PH_NOISY);
+		phalcon_array_fetch(&relations, belongs_to, &key_relation, PH_NOISY);
 
 		/** 
 		 * Get the first relation
 		 */
-		PHALCON_OBS_VAR(relation);
-		phalcon_array_fetch_long(&relation, relations, 0, PH_NOISY);
+		phalcon_array_fetch_long(&relation, &relations, 0, PH_NOISY);
 
 		/** 
 		 * Perform the query
 		 */
-		PHALCON_RETURN_CALL_METHOD(getThis(), "getrelationrecords", relation, method, record, parameters);
-		RETURN_MM();
+		PHALCON_RETURN_CALL_METHODW(getThis(), "getrelationrecords", &relation, method, record, parameters);
+		return;
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**

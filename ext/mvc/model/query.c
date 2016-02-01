@@ -1906,24 +1906,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
  * @return array
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
-	zval *select, *models, *sql_aliases, *sql_aliases_models;
-	zval *sql_models_aliases, *sql_aliases_models_instances;
-	zval *models_instances, from_models, sql_joins;
-	zval join_models, join_sources, join_types, join_pre_condition, join_prepared;
-	zval *manager = NULL, joins, select_joins, *join_item = NULL;
-	zval *join_data = NULL, *source = NULL, *schema = NULL, *model = NULL, *model_name = NULL;
-	zval *complete_source = NULL;
-	zval *alias = NULL, exception_message;
-	zval *join_model = NULL;
-	zval *relations = NULL;
-	zval *is_through = NULL;
-	zval *new_sql_joins = NULL;
+	zval *select, *models, *sql_aliases, *sql_aliases_models, *sql_models_aliases, *sql_aliases_models_instances, *models_instances;
+	zval from_models, sql_joins, join_models, join_sources, join_types, join_pre_condition, join_prepared;
+	zval manager, joins, select_joins, *join_item;
 	zend_string *str_key, *str_key2;
 	ulong idx, idx2;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &select);
+	phalcon_fetch_params(0, 1, 0, &select);
 
 	models = phalcon_read_property(getThis(), SL("_models"), PH_NOISY);
 	sql_aliases = phalcon_read_property(getThis(), SL("_sqlAliases"), PH_NOISY);
@@ -1941,7 +1930,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	array_init(&join_pre_condition);
 	array_init(&join_prepared);
 
-	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
+	PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
 
 	phalcon_array_fetch_str(&joins, select, SL("joins"), PH_NOISY);
 	if (!phalcon_array_isset_long(&joins, 0)) {
@@ -1952,16 +1941,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&select_joins), join_item) {
-		zval source, schema, model, model_name, complete_source, alias_expr, alias;
+		zval join_data, source, schema, model, model_name, complete_source, join_type, alias_expr, alias, *phql, exception_message;
 		/** 
 		 * Check join alias
 		 */
-		PHALCON_CALL_METHODW(&join_data, getThis(), "_getjoin", manager, join_item);
+		PHALCON_CALL_METHODW(&join_data, getThis(), "_getjoin", &manager, join_item);
 
-		phalcon_array_fetch_str(&source, join_data, SL("source"), PH_NOISY);
-		phalcon_array_fetch_str(&schema, join_data, SL("schema"), PH_NOISY);
-		phalcon_array_fetch_str(&model, join_data, SL("model"), PH_NOISY);
-		phalcon_array_fetch_str(&model_name, join_data, SL("modelName"), PH_NOISY);
+		phalcon_array_fetch_str(&source, &join_data, SL("source"), PH_NOISY);
+		phalcon_array_fetch_str(&schema, &join_data, SL("schema"), PH_NOISY);
+		phalcon_array_fetch_str(&model, &join_data, SL("model"), PH_NOISY);
+		phalcon_array_fetch_str(&model_name, &join_data, SL("modelName"), PH_NOISY);
 
 		array_init_size(&complete_source, 2);
 		phalcon_array_append(&complete_source, &source, PH_COPY);
@@ -1981,10 +1970,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			 * Check if alias is unique
 			 */
 			if (phalcon_array_isset(&join_models, &alias)) {
-				zval *phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
+				phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
-				PHALCON_CONCAT_SVSV(&exception_message, "Cannot use '", alias, "' as join alias because it was already used when preparing: ", phql);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_CONCAT_SVSV(&exception_message, "Cannot use '", &alias, "' as join alias because it was already used when preparing: ", phql);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
@@ -1996,7 +1985,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			/** 
 			 * Set the join type
 			 */
-			phalcon_array_update_zval(&join_types, &alias, join_type, PH_COPY);
+			phalcon_array_update_zval(&join_types, &alias, &join_type, PH_COPY);
 
 			/** 
 			 * Update alias => alias
@@ -2011,7 +2000,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			/** 
 			 * Update model => alias
 			 */
-			phalcon_array_update_zval(&sql_models_aliases, &model_name, &alias, PH_COPY);
+			phalcon_array_update_zval(sql_models_aliases, &model_name, &alias, PH_COPY);
 
 			/** 
 			 * Update alias => model
@@ -2042,17 +2031,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			 * Check if alias is unique
 			 */
 			if (phalcon_array_isset(&join_models, &model_name)) {
-				zval *phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
+				phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
-				PHALCON_CONCAT_SVSV(&exception_message, "Cannot use '", model_name, "' as join alias because it was already used when preparing: ", phql);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_CONCAT_SVSV(&exception_message, "Cannot use '", &model_name, "' as join alias because it was already used when preparing: ", phql);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
 			/** 
 			 * Set the join type
 			 */
-			phalcon_array_update_zval(&join_types, &model_name, join_type, PH_COPY);
+			phalcon_array_update_zval(&join_types, &model_name, &join_type, PH_COPY);
 
 			/** 
 			 * Update model => source
@@ -2131,7 +2120,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	 * Create join relationships dynamically
 	 */
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(&from_models), idx, str_key, source) {
-		zval tmp;
+		zval tmp, *join_model;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -2139,8 +2128,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 		}
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(&join_models), idx2, str_key2, join_model) {
-			zval tmp2, join_source, join_type, model_name_alias, relation, model_alias, *sql_join = NULL;
-			zval sql_join_conditions, pre_condition;
+			zval tmp2, join_source, join_type, model_name_alias, relation, relations, model_alias, *sql_join = NULL;
+			zval sql_join_conditions, pre_condition, is_through, new_sql_joins, *phql;
 			if (str_key2) {
 				ZVAL_STR(&tmp2, str_key2);
 			} else {
@@ -2177,30 +2166,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 					 * Check for relations between models
 					 */
 					PHALCON_CALL_METHODW(&relations, manager, "getrelationsbetween", &tmp, &model_name_alias);
-					if (Z_TYPE_P(relations) == IS_ARRAY) { 
+					if (Z_TYPE(relations) == IS_ARRAY) { 
 
 						/** 
 						 * More than one relation must throw an exception
 						 */
-						if (zend_hash_num_elements(Z_ARRVAL_P(relations)) != 1) {
-							zval *phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
+						if (zend_hash_num_elements(Z_ARRVAL(relations)) != 1) {
+							phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
 							PHALCON_CONCAT_SVSVSV(&exception_message, "There is more than one relation between models '", model_name, "' and '", join_model, "\", the join must be done using an alias when preparing: ", phql);
-							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+							PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 							return;
 						}
 
 						/** 
 						 * Get the first relationship
 						 */
-						phalcon_array_fetch_long(&relation, relations, 0, PH_NOISY);
+						phalcon_array_fetch_long(&relation, &relations, 0, PH_NOISY);
 					}
 				}
 
 				/** 
 				 * Valid relations are objects
 				 */
-				if (Z_TYPE_P(&relation) == IS_OBJECT) {
+				if (Z_TYPE(relation) == IS_OBJECT) {
 
 					/** 
 					 * Get the related model alias of the left part
@@ -2210,7 +2199,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 					/** 
 					 * Generate the conditions based on the type of join
 					 */
-					PHALCON_CALL_METHODW(&is_through, relation, "isthrough");
+					PHALCON_CALL_METHODW(&is_through, &relation, "isthrough");
 					if (!zend_is_true(is_through)) {
 						PHALCON_CALL_METHODW(&sql_join, getThis(), "_getsinglejoin", &join_type, &join_source, &model_alias, &tmp2, &relation);
 					} else {
@@ -2220,12 +2209,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 					/** 
 					 * Append or merge joins
 					 */
-					if (phalcon_array_isset_long(sql_join, 0)) {
-						PHALCON_INIT_NVAR(new_sql_joins);
-						phalcon_fast_array_merge(new_sql_joins, sql_joins, sql_join);
-						ZVAL_COPY_VALUE(&sql_joins, new_sql_joins);
+					if (phalcon_array_isset_long(&sql_join, 0)) {
+						phalcon_fast_array_merge(&new_sql_joins, &sql_joins, &sql_join);
+						ZVAL_COPY_VALUE(&sql_joins, &new_sql_joins);
 					} else {
-						phalcon_array_append(&sql_joins, sql_join, PH_COPY);
+						phalcon_array_append(&sql_joins, &sql_join, PH_COPY);
 					}
 				} else {
 					array_init(&sql_join_conditions);
@@ -2233,11 +2221,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 					/** 
 					 * Join without conditions because no relation has been found between the models
 					 */
-					PHALCON_INIT_NVAR(sql_join);
-					array_init_size(sql_join, 3);
-					phalcon_array_update_string(sql_join, IS(type), join_type, PH_COPY);
-					phalcon_array_update_string(sql_join, IS(source), &join_source, PH_COPY);
-					phalcon_array_update_string(sql_join, IS(conditions), &sql_join_conditions, PH_COPY);
+					array_init_size(&sql_join, 3);
+					phalcon_array_update_string(&sql_join, IS(type), &join_type, PH_COPY);
+					phalcon_array_update_string(&sql_join, IS(source), &join_source, PH_COPY);
+					phalcon_array_update_string(&sql_join, IS(conditions), &sql_join_conditions, PH_COPY);
 					phalcon_array_append(&sql_joins, &sql_join, PH_COPY);
 				}
 			} else {
@@ -2251,17 +2238,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 				/** 
 				 * Join with conditions stablished by the developer
 				 */
-				PHALCON_INIT_NVAR(sql_join);
-				array_init_size(sql_join, 3);
-				phalcon_array_update_string(sql_join, IS(type), &join_type, PH_COPY);
-				phalcon_array_update_string(sql_join, IS(source), &join_source, PH_COPY);
-				phalcon_array_update_string(sql_join, IS(conditions), &sql_join_conditions, PH_COPY);
-				phalcon_array_append(&sql_joins, sql_join, PH_COPY);
+				array_init_size(&sql_join, 3);
+				phalcon_array_update_string(&sql_join, IS(type), &join_type, PH_COPY);
+				phalcon_array_update_string(&sql_join, IS(source), &join_source, PH_COPY);
+				phalcon_array_update_string(&sql_join, IS(conditions), &sql_join_conditions, PH_COPY);
+				phalcon_array_append(&sql_joins, &sql_join, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(&sql_joins);
+	RETURN_CTORW(&sql_joins);
 }
 
 /**

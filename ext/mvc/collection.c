@@ -2467,7 +2467,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 		ZVAL_COPY(&value, v);
 	}
 
-	PHALCON_CALL_SELF(&mongo_id, "getid");
+	PHALCON_CALL_SELFW(&mongo_id, "getid");
 
 	if (!zend_is_true(&mongo_id)) {
 		RETURN_FALSE;
@@ -2475,7 +2475,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 
 	PHALCON_CALL_METHODW(&source, getThis(), "getsource");
 	PHALCON_CALL_METHODW(&connection, getThis(), "getconnection");
-	PHALCON_CALL_METHODW(&mongo_collection, connection, "selectcollection", source);
+	PHALCON_CALL_METHODW(&mongo_collection, &connection, "selectcollection", &source);
 
 	if (Z_TYPE(mongo_collection) == IS_OBJECT) {
 		array_init_size(&criteria, 1);

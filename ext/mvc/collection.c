@@ -2504,32 +2504,26 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 
 PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 
-	zval *mongo_id = NULL, *source = NULL, *connection = NULL, *mongo_collection = NULL; 
-	zval *criteria, *row = NULL, *value = NULL;
+	zval mongo_id, source, connection, mongo_collection, criteria, row, *value;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	PHALCON_CALL_SELF(&mongo_id, "getid");
+	PHALCON_CALL_SELFW(&mongo_id, "getid");
 
 	if (!zend_is_true(mongo_id)) {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
 
-	PHALCON_CALL_METHOD(&source, getThis(), "getsource");
-
-	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
-
-	PHALCON_CALL_METHOD(&mongo_collection, connection, "selectcollection", source);
+	PHALCON_CALL_METHODW(&source, getThis(), "getsource");
+	PHALCON_CALL_METHODW(&connection, getThis(), "getconnection");
+	PHALCON_CALL_METHODW(&mongo_collection, &connection, "selectcollection", &source);
 
 	if (Z_TYPE_P(mongo_collection) == IS_OBJECT) {
-		PHALCON_INIT_VAR(criteria);
-		array_init_size(criteria, 1);
+		array_init_size(&criteria, 1);
 
-		phalcon_array_update_str(criteria, SL("_id"), mongo_id, PH_COPY);
+		phalcon_array_update_str(&criteria, SL("_id"), mongo_id, PH_COPY);
 
-		PHALCON_CALL_METHOD(&row, mongo_collection, "findone", criteria);
+		PHALCON_CALL_METHODW(&row, &mongo_collection, "findone", &criteria);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(row), idx, str_key, value) {
 			zval tmp;
@@ -2541,52 +2535,44 @@ PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 			phalcon_update_property_zval_zval(getThis(), &tmp, value);
 		} ZEND_HASH_FOREACH_END();
 
-		RETURN_MM_TRUE;
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection, drop){
 
-	zval *class_name, *collection, *source = NULL, *connection = NULL, *mongo_collection = NULL;
-	zval *status = NULL, *ok = NULL;
+	zval class_name, collection, source, connection, mongo_collection, status, ok;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
+	phalcon_get_called_class(&class_name );
+	ce0 = phalcon_fetch_class(&class_name);
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name );
-	ce0 = phalcon_fetch_class(class_name);
-
-	PHALCON_INIT_VAR(collection);
-	object_init_ex(collection, ce0);
-	if (phalcon_has_constructor(collection)) {
-		PHALCON_CALL_METHOD(NULL, collection, "__construct");
+	object_init_ex(&collection, ce0);
+	if (phalcon_has_constructor(&collection)) {
+		PHALCON_CALL_METHODW(NULL, &collection, "__construct");
 	}
 
-	PHALCON_INIT_NVAR(ok);
-	ZVAL_BOOL(ok, 0);
+	ZVAL_FALSE(&ok);
 
-	PHALCON_CALL_METHOD(&source, collection, "getsource");
+	PHALCON_CALL_METHODW(&source, &collection, "getsource");
+	PHALCON_CALL_METHODW(&connection, &collection, "getconnection");
+	PHALCON_CALL_METHODW(&mongo_collection, &connection, "selectcollection", &source);
 
-	PHALCON_CALL_METHOD(&connection, collection, "getconnection");
-
-	PHALCON_CALL_METHOD(&mongo_collection, connection, "selectcollection", source);
 	if (Z_TYPE_P(mongo_collection) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&status, mongo_collection, "drop");
+		PHALCON_CALL_METHODW(&status, mongo_collection, "drop");
 
-		if (phalcon_array_isset_str(status, SL("ok"))) {
-			PHALCON_OBS_NVAR(ok);
-			phalcon_array_fetch_str(&ok, status, SL("ok"), PH_NOISY);
+		if (phalcon_array_isset_str(&status, SL("ok"))) {
+			phalcon_array_fetch_str(&ok, &status, SL("ok"), PH_NOISY);
 		}
 	}
 
-	if (zend_is_true(ok)) {
-		RETURN_MM_TRUE;
+	if (zend_is_true(&ok)) {
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**

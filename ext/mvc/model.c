@@ -2716,7 +2716,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 						 * Create a compound condition
 						 */
 						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
-							zval position, referenced_field;
+							zval position, referenced_field, condition;
 							if (str_key) {
 								ZVAL_STR(&position, str_key);
 							} else {
@@ -2737,7 +2737,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 						/**
 						 * Create a simple condition
 						 */
-						value = phalcon_read_property_zval(getThis(), fields, PH_NOISY);
+						value = phalcon_read_property_zval(getThis(), &fields, PH_NOISY);
 
 						PHALCON_CONCAT_SVS(&condition, "[", &referenced_fields, "] = ?0");
 						phalcon_array_append(&conditions, &condition, PH_COPY);

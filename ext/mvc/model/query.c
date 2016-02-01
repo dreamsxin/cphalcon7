@@ -1907,7 +1907,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	zval *select, *models, *sql_aliases, *sql_aliases_models, *sql_models_aliases, *sql_aliases_models_instances, *models_instances;
-	zval from_models, sql_joins, join_models, join_sources, join_types, join_pre_condition, join_prepared;
+	zval from_models, *form_model, sql_joins, join_models, join_sources, join_types, join_pre_condition, join_prepared;
 	zval manager, joins, select_joins, *join_item;
 	zend_string *str_key, *str_key2;
 	ulong idx, idx2;
@@ -2119,7 +2119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	/** 
 	 * Create join relationships dynamically
 	 */
-	ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(&from_models), idx, str_key) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(&from_models), idx, str_key, form_model) {
 		zval tmp, *join_model;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
@@ -2172,7 +2172,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 						if (zend_hash_num_elements(Z_ARRVAL(relations)) != 1) {
 							phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
-							PHALCON_CONCAT_SVSVSV(&exception_message, "There is more than one relation between models '", &model_name, "' and '", join_model, "\", the join must be done using an alias when preparing: ", phql);
+							PHALCON_CONCAT_SVSVSV(&exception_message, "There is more than one relation between models '", form_model, "' and '", join_model, "\", the join must be done using an alias when preparing: ", phql);
 							PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 							return;
 						}

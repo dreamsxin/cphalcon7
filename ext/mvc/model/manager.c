@@ -2338,7 +2338,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationsBetween){
 	 */
 	has_one = phalcon_read_property(getThis(), SL("_hasOne"), PH_NOISY);
 	if (Z_TYPE_P(has_one) == IS_ARRAY) { 
-		if (phalcon_array_isset_fetch(&relations, has_one, key_relation)) {
+		if (phalcon_array_isset_fetch(&relations, has_one, &key_relation)) {
 			RETURN_CTORW(&relations);
 		}
 	}

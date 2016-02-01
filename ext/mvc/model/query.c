@@ -2099,7 +2099,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	phalcon_update_property_this(getThis(), SL("_sqlAliasesModelsInstances"), sql_aliases_models_instances);
 	phalcon_update_property_this(getThis(), SL("_modelsInstances"), models_instances);
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(join_prepared), idx, str_key, join_item) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(join_prepared), idx, str_key, join_item) {
 		zval tmp, join_expr, pre_condition;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
@@ -2119,7 +2119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	/** 
 	 * Create join relationships dynamically
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(&from_models), idx, str_key, source) {
+	ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(&from_models), idx, str_key) {
 		zval tmp, *join_model;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
@@ -2127,9 +2127,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			ZVAL_LONG(&tmp, idx);
 		}
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(&join_models), idx2, str_key2, join_model) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(join_models), idx2, str_key2, join_model) {
 			zval tmp2, join_source, join_type, model_name_alias, relation, relations, model_alias, *sql_join = NULL;
-			zval sql_join_conditions, pre_condition, is_through, new_sql_joins, *phql;
+			zval sql_join_conditions, pre_condition, is_through, new_sql_joins, *phql, exception_message;
 			if (str_key2) {
 				ZVAL_STR(&tmp2, str_key2);
 			} else {
@@ -2139,12 +2139,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 			/** 
 			 * Real source name for joined model
 			 */
-			phalcon_array_fetch(&join_source, join_sources, &tmp2, PH_NOISY);
+			phalcon_array_fetch(&join_source, &join_sources, &tmp2, PH_NOISY);
 
 			/** 
 			 * Join type is: LEFT, RIGHT, INNER, etc
 			 */
-			phalcon_array_fetch(&join_type, join_types, &tmp2, PH_NOISY);
+			phalcon_array_fetch(&join_type, &join_types, &tmp2, PH_NOISY);
 
 			/** 
 			 * Check if the model already have pre-defined conditions
@@ -2159,22 +2159,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 				/** 
 				 * Check if the joined model is an alias
 				 */
-				PHALCON_CALL_METHODW(&relation, manager, "getrelationbyalias", &tmp, &model_name_alias);
+				PHALCON_CALL_METHODW(&relation, &manager, "getrelationbyalias", &tmp, &model_name_alias);
 				if (PHALCON_IS_FALSE(&relation)) {
-
 					/** 
 					 * Check for relations between models
 					 */
-					PHALCON_CALL_METHODW(&relations, manager, "getrelationsbetween", &tmp, &model_name_alias);
-					if (Z_TYPE(relations) == IS_ARRAY) { 
-
+					PHALCON_CALL_METHODW(&relations, &manager, "getrelationsbetween", &tmp, &model_name_alias);
+					if (Z_TYPE(relations) == IS_ARRAY) {
 						/** 
 						 * More than one relation must throw an exception
 						 */
 						if (zend_hash_num_elements(Z_ARRVAL(relations)) != 1) {
 							phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
 
-							PHALCON_CONCAT_SVSVSV(&exception_message, "There is more than one relation between models '", model_name, "' and '", join_model, "\", the join must be done using an alias when preparing: ", phql);
+							PHALCON_CONCAT_SVSVSV(&exception_message, "There is more than one relation between models '", &model_name, "' and '", join_model, "\", the join must be done using an alias when preparing: ", phql);
 							PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 							return;
 						}
@@ -2190,7 +2188,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 				 * Valid relations are objects
 				 */
 				if (Z_TYPE(relation) == IS_OBJECT) {
-
 					/** 
 					 * Get the related model alias of the left part
 					 */

@@ -2699,7 +2699,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 					/**
 					 * Load the referenced model if needed
 					 */
-					PHALCON_CALL_METHODW(&referenced_model, manager, "load", relation_class);
+					PHALCON_CALL_METHODW(&referenced_model, manager, "load", &relation_class);
 
 					/**
 					 * Since relations can have multiple columns or a single one, we need to build a
@@ -2725,7 +2725,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 
 							value = phalcon_read_property_zval(getThis(), field, PH_NOISY);
 
-							phalcon_array_fetch(&referenced_field, referenced_fields, &position, PH_NOISY);
+							phalcon_array_fetch(&referenced_field, &referenced_fields, &position, PH_NOISY);
 
 							PHALCON_CONCAT_SVSV(&condition, "[", &referenced_field, "] = ?", &position);
 							phalcon_array_append(&conditions, &condition, PH_COPY);

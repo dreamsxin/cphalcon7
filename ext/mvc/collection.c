@@ -2491,7 +2491,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 		array_init_size(&options, 1);
 
 		phalcon_array_update_str_long(&options, SL("w"), 0, 0);
-		PHALCON_CALL_METHODW(&status, mongo_collection, "update", &criteria, &new_object, &options);
+		PHALCON_CALL_METHODW(&status,& mongo_collection, "update", &criteria, &new_object, &options);
 
 		if (zend_is_true(&status)) {
 			PHALCON_CALL_SELFW(NULL, "refresh");

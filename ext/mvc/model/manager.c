@@ -2354,39 +2354,34 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationsBetween){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 
-	zval *phql, *dependency_injector, *service_name, *has = NULL, *parameters, *query = NULL;
+	zval *phql, *dependency_injector, service_name, has, parameters, query;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &phql);
+	phalcon_fetch_params(0, 1, 0, &phql);
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_model_exception_ce, 1);
+	PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_model_exception_ce, 0);
 
 	/** 
 	 * Create a query
 	 */
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery");
+	ZVAL_STRING(&service_name, "modelsQuery");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
-	if (zend_is_true(has)) {
-		PHALCON_INIT_VAR(parameters);
-		array_init(parameters);
+	PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {
+		array_init(&parameters);
 
-		phalcon_array_append(parameters, phql, PH_COPY);
-		phalcon_array_append(parameters, dependency_injector, PH_COPY);
+		phalcon_array_append(&parameters, phql, PH_COPY);
+		phalcon_array_append(&parameters, dependency_injector, PH_COPY);
 
-		PHALCON_CALL_METHOD(&query, dependency_injector, "get", service_name, parameters);
+		PHALCON_CALL_METHODW(&query, dependency_injector, "get", &service_name, &parameters);
 	} else {
-		PHALCON_INIT_NVAR(query);
-		object_init_ex(query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHOD(NULL, query, "__construct", phql, dependency_injector);
+		object_init_ex(&query, phalcon_mvc_model_query_ce);
+		PHALCON_CALL_METHODW(NULL, &query, "__construct", phql, dependency_injector);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_lastQuery"), query);
+	phalcon_update_property_this(getThis(), SL("_lastQuery"), &query);
 
-	RETURN_CTOR(query);
+	RETURN_CTORW(&query);
 }
 
 /**
@@ -2398,12 +2393,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 
-	zval *phql, *placeholders = NULL, *types = NULL, *dependency_injector;
-	zval *service_name, *has = NULL, *parameters, *query = NULL;
+	zval *phql, *placeholders = NULL, *types = NULL, *dependency_injector, service_name, has, parameters, query;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &phql, &placeholders, &types);
+	phalcon_fetch_params(0, 1, 2, &phql, &placeholders, &types);
 
 	if (!placeholders) {
 		placeholders = &PHALCON_GLOBAL(z_null);
@@ -2415,38 +2407,33 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (1)");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (1)");
 		return;
 	}
 
 	/** 
 	 * Create a query
 	 */
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery");
+	ZVAL_STRING(&service_name, "modelsQuery");
 
-	PHALCON_CALL_METHOD(&has, dependency_injector, "has", service_name);
-	if (zend_is_true(has)) {
-		PHALCON_INIT_VAR(parameters);
-		array_init(parameters);
+	PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {
+		array_init(&parameters);
+		phalcon_array_append(&parameters, phql, PH_COPY);
+		phalcon_array_append(&parameters, dependency_injector, PH_COPY);
 
-		phalcon_array_append(parameters, phql, PH_COPY);
-		phalcon_array_append(parameters, dependency_injector, PH_COPY);
-
-		PHALCON_CALL_METHOD(&query, dependency_injector, "get", service_name, parameters);
+		PHALCON_CALL_METHODW(&query, dependency_injector, "get", &service_name, &parameters);
 	} else {
-		PHALCON_INIT_NVAR(query);
-		object_init_ex(query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHOD(NULL, query, "__construct", phql, dependency_injector);
+		object_init_ex(&query, phalcon_mvc_model_query_ce);
+		PHALCON_CALL_METHODW(NULL, &query, "__construct", phql, dependency_injector);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_lastQuery"), query);
+	phalcon_update_property_this(getThis(), SL("_lastQuery"), &query);
 
 	/** 
 	 * Execute the query
 	 */
-	PHALCON_RETURN_CALL_METHOD(query, "execute", placeholders, types);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_METHODW(&query, "execute", placeholders, types);
 }
 
 /**
@@ -2457,11 +2444,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 
-	zval *params = NULL, *dependency_injector, *service, *service_params, *builder = NULL;
+	zval *params = NULL, *dependency_injector, service, service_params, builder;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &params);
+	phalcon_fetch_params(0, 0, 1, &params);
 
 	if (!params) {
 		params = &PHALCON_GLOBAL(z_null);
@@ -2469,25 +2454,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (2)");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (2)");
 		return;
 	}
 
 	/** 
 	 * Create a query builder
 	 */
-	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, "modelsQueryBuilder");
+	ZVAL_STRING(&service, "modelsQueryBuilder");
 
-	PHALCON_INIT_VAR(service_params);
-	array_init(service_params);
+	array_init(&service_params);
+	phalcon_array_append(&service_params, params, PH_COPY);
+	phalcon_array_append(&service_params, dependency_injector, PH_COPY);
 
-	phalcon_array_append(service_params, params, PH_COPY);
-	phalcon_array_append(service_params, dependency_injector, PH_COPY);
+	PHALCON_CALL_METHODW(&builder, dependency_injector, "get", &service, &service_params);
 
-	PHALCON_CALL_METHOD(&builder, dependency_injector, "get", service, service_params);
-
-	RETURN_CTOR(builder);
+	RETURN_CTORW(&builder);
 }
 
 /**
@@ -2534,23 +2516,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, registerNamespaceAlias){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getNamespaceAlias){
 
-	zval *alias, *namespace_aliases, *namespace;
-	zval exception_message;
+	zval *alias, *namespace_aliases, namespace, exception_message;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &alias);
+	phalcon_fetch_params(0, 1, 0, &alias);
 
 	namespace_aliases = phalcon_read_property(getThis(), SL("_namespaceAliases"), PH_NOISY);
-	if (phalcon_array_isset(namespace_aliases, alias)) {
-		PHALCON_OBS_VAR(namespace);
-		phalcon_array_fetch(&namespace, namespace_aliases, alias, PH_NOISY);
-		RETURN_CTOR(namespace);
+	if (phalcon_array_isset_fetch(&namespace, namespace_aliases, alias)) {
+		RETURN_CTORW(&namespace);
 	}
 
 	PHALCON_CONCAT_SVS(&exception_message, "Namespace alias '", alias, "' is not registered");
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-	return;
+	PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 }
 
 /**

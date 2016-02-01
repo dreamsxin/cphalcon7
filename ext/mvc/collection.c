@@ -334,7 +334,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 
 	ZVAL_STRING(&id_name, "_id");
 
-	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
+	PHALCON_CALL_SELFW(&column_map, "getcolumnmap");
 
 	if (Z_TYPE(column_map) == IS_ARRAY) {
 		if (phalcon_array_isset_str(&column_map, SL("_id"))) {
@@ -348,10 +348,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 		/**
 		 * Check if the collection use implicit ids
 		 */
-		PHALCON_CALL_METHOD(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", getThis());
+		PHALCON_CALL_METHODW(&use_implicit_ids, collection_manager, "isusingimplicitobjectids", getThis());
 		if (zend_is_true(&use_implicit_ids)) {
+			ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 			object_init_ex(&mongo_id, ce0);
-			PHALCON_CALL_METHOD(NULL, &mongo_id, "__construct", id);
+			PHALCON_CALL_METHODW(NULL, &mongo_id, "__construct", id);
 		} else {
 			ZVAL_COPY(&mongo_id, id);
 		}
@@ -2662,7 +2663,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __set){
 		PHALCON_CALL_FUNCTIONW(&method_exists, "method_exists", &class_name, &possible_setter);
 		if (!zend_is_true(&method_exists)) {
 			if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
-				PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL_P(possible_setter), value);
+				PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(possible_setter), value);
 				RETURN_CTORW(value);
 			}
 		}
@@ -2708,7 +2709,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __get){
 		PHALCON_CALL_FUNCTIONW(&method_exists, "method_exists", &class_name, &possible_getter);
 		if (!zend_is_true(&method_exists)) {
 			if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
-				PHALCON_CALL_METHODW(&return_value, getThis(), &possible_getter);
+				PHALCON_CALL_ZVAL_METHODW(return_value, getThis(), &possible_getter);
 				return;
 			}
 		}
@@ -2731,7 +2732,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __get){
 PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 
 	zval *method, *arguments = NULL, extra_method, class_name, exception_message;
-	zval collection, extra_method_first, field, value, *conditions, *params;
+	zval collection, extra_method_first, field, value, conditions, params;
 	zend_class_entry *ce0;
 	const char *func = NULL;
 
@@ -2771,7 +2772,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 
 	phalcon_get_called_class(&class_name);
 
-	if (!type) {
+	if (!func) {
 		PHALCON_CONCAT_SVSVS(&exception_message, "The static method \"", method, "\" doesn't exist on collection \"", &class_name, "\"");
 		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_collection_exception_ce, &exception_message);
 		return;

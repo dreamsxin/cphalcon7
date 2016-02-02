@@ -3182,7 +3182,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 			 */
 			phalcon_return_static_property(&ir_phql_cache, SL("phalcon\\mvc\\model\\query"), SL("_irPhqlCache"));
 
-			if (phalcon_array_isset_fetch(&ir_phql_cache2, ir_phql_cache, type) && phalcon_array_isset_fetch(&ir_phql, &ir_phql_cache2, &unique_id)) {
+			if (phalcon_array_isset_fetch(&ir_phql_cache2, &ir_phql_cache, &type) && phalcon_array_isset_fetch(&ir_phql, &ir_phql_cache2, &unique_id)) {
 				if (Z_TYPE(ir_phql) == IS_ARRAY) {
 					if (phalcon_array_isset_fetch_str(&model_names, &ir_phql, SL("models")) && phalcon_array_isset_fetch_str(&tables, &ir_phql, SL("tables"))) {
 						// Obtain the real source including the schema again

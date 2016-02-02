@@ -85,90 +85,64 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Url){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 
-	zval *record, *option = NULL, *field = NULL, *allow_empty = NULL, *value = NULL, *flag, *is_valid = NULL;
-	zval *message = NULL, *type, *is_set_code = NULL, *code;
+	zval *record, option, field, allow_empty, value, flag, is_valid, message, type, is_set_code, code;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &record);
 
-	phalcon_fetch_params(1, 1, 0, &record);
-	
-	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field");
-	
-	PHALCON_CALL_METHOD(&field, getThis(), "getoption", option);
-	if (Z_TYPE_P(field) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
+	ZVAL_STRING(&option, "field");
+
+	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
+	if (Z_TYPE(field) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}
-	
-	PHALCON_CALL_METHOD(&value, record, "readattribute", field);
+
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field);
 
 	/*
 	 * Allow empty
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
+	ZVAL_STRING(&option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
-	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
-		RETURN_MM_TRUE;
-	}
-	
-	/*
-	 * Allow empty
-	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
-
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
-
-	if (allow_empty && zend_is_true(allow_empty)) {
-		if (PHALCON_IS_EMPTY(value)) {
-			RETURN_MM_TRUE;
-		}
+	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
+		RETURN_TRUE;
 	}
 
-	PHALCON_INIT_VAR(flag);
-	ZVAL_LONG(flag, 273);
-	
+	ZVAL_LONG(&flag, 273);
+
 	/** 
 	 * Filters the format using FILTER_VALIDATE_URL
 	 */
-	PHALCON_CALL_FUNCTION(&is_valid, "filter_var", value, flag);
-	if (!zend_is_true(is_valid)) {
-	
+	PHALCON_CALL_FUNCTIONW(&is_valid, "filter_var", &value, &flag);
+	if (!zend_is_true(&is_valid)) {
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(message));
-	
-		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
-		if (!zend_is_true(message)) {
-			PHALCON_INIT_NVAR(message);
-			PHALCON_CONCAT_SVS(message, "'", field, "' does not have a valid url format");
+		ZVAL_STRING(&option, ISV(message));
+
+		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
+		if (!zend_is_true(&message)) {
+			PHALCON_CONCAT_SVS(&message, "'", &field, "' does not have a valid url format");
 		}
-	
-		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Url");
+
+		ZVAL_STRING(&type, "Url");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
-		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
+		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
+		if (zend_is_true(&is_set_code)) {
+			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
-			PHALCON_INIT_VAR(code);
-			ZVAL_LONG(code, 0);
+			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field, type, code);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field, &type, &code);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }

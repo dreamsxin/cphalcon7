@@ -87,112 +87,82 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Inclusionin){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 
-	zval *record, *field = NULL, *is_set = NULL, *domain = NULL;
-	zval *value = NULL, *option, *message = NULL, *joined_domain, *is_set_code = NULL, *code = NULL;
-	zval *type;
-	zval *allow_empty = NULL;
+	zval *record, option, field, is_set, domain, value, allow_empty, message, joined_domain, is_set_code, code, type;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &record);
 
-	phalcon_fetch_params(1, 1, 0, &record);
-	
-	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field");
-	
-	PHALCON_CALL_METHOD(&field, getThis(), "getoption", option);
-	if (Z_TYPE_P(field) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
+	ZVAL_STRING(&option, "field");
+
+	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
+	if (Z_TYPE(field) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}
-	
+
 	/** 
 	 * The 'domain' option must be a valid array of not allowed values
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "domain");
-	
-	PHALCON_CALL_METHOD(&is_set, getThis(), "issetoption", option);
-	if (PHALCON_IS_FALSE(is_set)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'domain' is required for this validator");
+	ZVAL_STRING(&option, "domain");
+
+	PHALCON_CALL_METHODW(&is_set, getThis(), "issetoption", &option);
+	if (PHALCON_IS_FALSE(&is_set)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The option 'domain' is required for this validator");
 		return;
 	}
-	
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "domain");
-	
-	PHALCON_CALL_METHOD(&domain, getThis(), "getoption", option);
-	if (Z_TYPE_P(domain) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Option 'domain' must be an array");
+
+	ZVAL_STRING(&option, "domain");
+
+	PHALCON_CALL_METHODW(&domain, getThis(), "getoption", &option);
+	if (Z_TYPE(&domain) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Option 'domain' must be an array");
 		return;
 	}
-	
-	PHALCON_CALL_METHOD(&value, record, "readattribute", field);
+
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field);
 
 	/*
 	 * Allow empty
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
+	ZVAL_STRING(&option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
-	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
-		RETURN_MM_TRUE;
+	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
+		RETURN_TRUE;
 	}
-	
-	/*
-	 * Allow empty
-	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
-
-	if (allow_empty && zend_is_true(allow_empty)) {
-		if (PHALCON_IS_EMPTY(value)) {
-			RETURN_MM_TRUE;
-		}
-	}
-	
 	/** 
 	 * Check if the value is contained in the array
 	 */
-	if (!phalcon_fast_in_array(value, domain)) {
-	
+	if (!phalcon_fast_in_array(&value, &domain)) {
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(message));
-	
-		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
-		if (!zend_is_true(message)) {
-			PHALCON_INIT_VAR(joined_domain);
-			phalcon_fast_join_str(joined_domain, SL(", "), domain);
-	
-			PHALCON_INIT_NVAR(message);
-			PHALCON_CONCAT_SVSV(message, "Value of field '", field, "' must be part of list: ", joined_domain);
+		ZVAL_STRING(&option, ISV(message));
+
+		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
+		if (!zend_is_true(&message)) {
+			phalcon_fast_join_str(&joined_domain, SL(", "), &domain);
+
+			PHALCON_CONCAT_SVSV(&message, "Value of field '", &field, "' must be part of list: ", &joined_domain);
 		}
-	
-		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Inclusion");
+
+		ZVAL_STRING(&type, "Inclusion");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
-		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
+		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
+		if (zend_is_true(&is_set_code)) {
+			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
-			PHALCON_INIT_VAR(code);
-			ZVAL_LONG(code, 0);
+			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field, type, code);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field, &type, &code);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }

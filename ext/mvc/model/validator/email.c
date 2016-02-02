@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Email, validate){
 	phalcon_fetch_params(0, 1, 0, &record);
 
 	ZVAL_STRING(&option, "field");
-	
+
 	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", &option);
 	if (Z_TYPE(field_name) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Email, validate){
 	}
 
 	ZVAL_FALSE(&invalid);
-	
+
 	PHALCON_CALL_METHOD(&value, record, "readattribute", &field_name);
 
 	/*
@@ -112,41 +112,28 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Email, validate){
 	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
 		RETURN_TRUE;
 	}
-	
-	/*
-	 * Allow empty
-	 */
-	ZVAL_STRING(&option, "allowEmpty");
 
-	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
-
-	if (zend_is_true(&allow_empty)) {
-		if (PHALCON_IS_EMPTY(&value)) {
-			RETURN_TRUE;
-		}
-	}
-	
 	/** 
 	 * We check if the email has a valid format using a regular expression
 	 */
 	ZVAL_STRING(&pattern, "/^([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x22([^\\x0d\\x22\\x5c\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x22))*\\x40([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d)(\\x2e([^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+|\\x5b([^\\x0d\\x5b-\\x5d\\x80-\\xff]|\\x5c[\\x00-\\x7f])*\\x5d))*$/");
 
 	RETURN_ON_FAILURE(phalcon_preg_match(&match_pattern, &pattern, &value, &regs));
-	
+
 	if (zend_is_true(&match_pattern)) {
 		phalcon_array_fetch_long(&match_zero, &regs, 0, PH_NOISY);
-	
+
 		is_not_equal_function(&invalid, &match_zero, &value);
 	} else {
 		ZVAL_TRUE(&invalid);
 	}
-	
+
 	if (PHALCON_IS_TRUE(&invalid)) {
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
 		ZVAL_STRING(&option, ISV(message));
-	
+
 		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 		if (!zend_is_true(&message)) {
 			PHALCON_CONCAT_SVS(&message, "Value of field '", &field_name, "' must have a valid e-mail format");
@@ -169,7 +156,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Email, validate){
 		PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field_name, &type, &code);
 		RETURN_FALSE;
 	}
-	
+
 	RETURN_TRUE;
 }
 

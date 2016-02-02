@@ -87,96 +87,77 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Json){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 
-	zval *record, *option = NULL, *field_name = NULL, *invalid = NULL;
-	zval *value = NULL, *keys = NULL, *assoc, *json = NULL, *constant, *ret = NULL;
-	zval *message = NULL, *type, *is_set_code = NULL, *code = NULL;
+	zval *record, option , field_name, invalid, value, keys, assoc, json, constant, ret, message, type, is_set_code, code;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &record);
 
-	phalcon_fetch_params(1, 1, 0, &record);
+	ZVAL_STRING(&option, "field");
 
-	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field");
-
-	PHALCON_CALL_METHOD(&field_name, getThis(), "getoption", option);
+	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", &option);
 	if (Z_TYPE_P(field_name) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}
 
-	PHALCON_INIT_VAR(invalid);
-	ZVAL_BOOL(invalid, 0);
-	
-	PHALCON_CALL_METHOD(&value, record, "readattribute", field_name);
+	ZVAL_FALSE(&invalid);
 
-	PHALCON_INIT_VAR(assoc);
-	ZVAL_TRUE(assoc);
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field_name);
 
-	PHALCON_CALL_FUNCTION(&json, "json_decode", value, assoc);
+	ZVAL_TRUE(&assoc);
 
-	if (Z_TYPE_P(json) == IS_NULL) {
+	PHALCON_CALL_FUNCTIONW(&json, "json_decode", &value, &assoc);
+
+	if (Z_TYPE(json) == IS_NULL) {
 		if ((constant = zend_get_constant_str(SL("JSON_ERROR_NONE"))) != NULL) {
-			PHALCON_INIT_NVAR(ret);
-			PHALCON_CALL_FUNCTION(&ret, "json_last_error");
+			PHALCON_CALL_FUNCTIONW(&ret, "json_last_error");
 
-			if (!PHALCON_IS_EQUAL(ret, constant)) {
-				PHALCON_INIT_NVAR(invalid);
-				ZVAL_BOOL(invalid, 1);
+			if (!PHALCON_IS_EQUAL(&ret, &constant)) {
+				ZVAL_TRUE(&invalid);
 			}
 		}
 	}
 
-	if (!PHALCON_IS_TRUE(invalid)) {
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "keys");
+	if (!PHALCON_IS_TRUE(&invalid)) {
+		ZVAL_STRING(&option, "keys");
 
-		PHALCON_CALL_METHOD(&keys, getThis(), "getoption", option);
+		PHALCON_CALL_METHODW(&keys, getThis(), "getoption", &option);
 
-		if (Z_TYPE_P(keys) != IS_NULL) {
-			PHALCON_INIT_NVAR(ret);
-			PHALCON_CALL_FUNCTION(&ret, "array_key_exists", keys, json);
-			if (!zend_is_true(ret)) {
-				PHALCON_INIT_NVAR(invalid);
-				ZVAL_BOOL(invalid, 1);
+		if (Z_TYPE(keys) != IS_NULL) {
+			PHALCON_CALL_FUNCTIONW(&ret, "array_key_exists", &keys, &json);
+			if (!zend_is_true(&ret)) {
+				ZVAL_TRUE(&invalid);
 			}
 		}
 	}
 
-	if (PHALCON_IS_TRUE(invalid)) {
-
+	if (PHALCON_IS_TRUE(&invalid)) {
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(message));
-	
-		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
-		if (!zend_is_true(message)) {
-			PHALCON_INIT_NVAR(message);
-			PHALCON_CONCAT_SVS(message, "Value of field '", field_name, "' must have a valid json format");
+		ZVAL_STRING(&option, ISV(message));
+
+		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
+		if (!zend_is_true(&message)) {
+			PHALCON_CONCAT_SVS(&message, "Value of field '", &field_name, "' must have a valid json format");
 		}
 
-		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Json");
+		ZVAL_STRING(&type, "Json");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
-		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
+		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
+		if (zend_is_true(&is_set_code)) {
+			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
-			PHALCON_INIT_VAR(code);
-			ZVAL_LONG(code, 0);
+			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field_name, type, code);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field_name, &type, &code);
+		RETURN_FALSE;
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
-

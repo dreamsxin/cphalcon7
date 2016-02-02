@@ -2882,7 +2882,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 		zval qualified_name, model_name, ns_alias, real_namespace, real_model_name, model, source, schema, complete_source, alias;
 
 		phalcon_array_fetch_str(&qualified_name, table, SL("qualifiedName"), PH_NOISY);
-		phalcon_array_fetch_string(&model_name, qualified_name, IS(name), PH_NOISY);
+		phalcon_array_fetch_string(&model_name, &qualified_name, IS(name), PH_NOISY);
 
 		/** 
 		 * Check if the table have a namespace alias
@@ -2891,7 +2891,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 			/** 
 			 * Get the real namespace alias
 			 */
-			PHALCON_CALL_METHODW(&real_namespace, manager, "getnamespacealias", &ns_alias);
+			PHALCON_CALL_METHODW(&real_namespace, &manager, "getnamespacealias", &ns_alias);
 
 			/** 
 			 * Create the real namespaced name
@@ -2961,7 +2961,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 
 	ZVAL_FALSE(&not_quoting);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(&update_values), update_value) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(update_values), update_value) {
 		zval column, sql_column, expr_column, expr_value, type, value;
 		phalcon_array_fetch_str(&column, update_value, SL("column"), PH_NOISY);
 

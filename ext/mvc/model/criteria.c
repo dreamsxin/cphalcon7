@@ -904,66 +904,56 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, notBetweenWhere) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, inWhere) {
 
-	zval *expr, *values, *use_orwhere = NULL, *hidden_param, *bind_params;
-	zval *bind_keys, *value = NULL, *key = NULL, *query_key = NULL, *joined_keys;
-	zval *conditions;
+	zval *expr, *values, *use_orwhere = NULL, hidden_param, bind_params, bind_keys, joined_keys, conditions;
 
-	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 1, &expr, &values, &use_orwhere);
+	phalcon_fetch_params(0, 2, 1, &expr, &values, &use_orwhere);
 
 	if (!use_orwhere) {
 		use_orwhere = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (Z_TYPE_P(values) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Values must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Values must be an array");
 		return;
 	}
 
-	hidden_param = phalcon_read_property(getThis(), SL("_hiddenParamNumber"), PH_NOISY);
-	SEPARATE_ZVAL(hidden_param);
+	phalcon_return_property(&hidden_param, getThis(), SL("_hiddenParamNumber"), PH_NOISY);
 
-	PHALCON_INIT_VAR(bind_params);
-	array_init(bind_params);
-
-	PHALCON_INIT_VAR(bind_keys);
-	array_init(bind_keys);
+	array_init(&bind_params);
+	array_init(&bind_keys);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(values), value) {
+		zval key, query_key;
 		/** 
 		 * Key with auto bind-params
 		 */
-		PHALCON_INIT_NVAR(key);
-		PHALCON_CONCAT_SV(key, "phi", hidden_param);
+		PHALCON_CONCAT_SV(&key, "phi", &hidden_param);
 
-		PHALCON_INIT_NVAR(query_key);
-		PHALCON_CONCAT_SVS(query_key, ":", key, ":");
-		phalcon_array_append(bind_keys, query_key, PH_COPY);
-		phalcon_array_update_zval(bind_params, key, value, PH_COPY);
-		phalcon_increment(hidden_param);
+		PHALCON_CONCAT_SVS(&query_key, ":", &key, ":");
+		phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+		phalcon_array_update_zval(&bind_params, &key, value, PH_COPY);
+		phalcon_increment(&hidden_param);
 	} ZEND_HASH_FOREACH_END();
 
-	PHALCON_INIT_VAR(joined_keys);
-	phalcon_fast_join_str(joined_keys, SL(", "), bind_keys);
+	phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 
 	/** 
 	 * Create a standard IN condition with bind params
 	 */
-	PHALCON_INIT_VAR(conditions);
-	PHALCON_CONCAT_VSVS(conditions, expr, " IN (", joined_keys, ")");
+	PHALCON_CONCAT_VSVS(&conditions, expr, " IN (", &joined_keys, ")");
 
 	/** 
 	 * Append the IN to the current conditions using and 'and'
 	 */
 	if (zend_is_true(use_orwhere)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "orwhere", conditions, bind_params);
+		PHALCON_CALL_METHODW(NULL, getThis(), "orwhere", &conditions, &bind_params);
 	} else {
-		PHALCON_CALL_METHOD(NULL, getThis(), "andwhere", conditions, bind_params);
+		PHALCON_CALL_METHODW(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
-	phalcon_update_property_this(getThis(), SL("_hiddenParamNumber"), hidden_param);
+	phalcon_update_property_this(getThis(), SL("_hiddenParamNumber"), &hidden_param);
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -1904,12 +1894,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 
-	zval *model, exception_message;
-	zval phql, *columns, *selected_columns, *joined_columns, *column = NULL;
-	zval *rows, *insert_sqls, *bind_params, *keys = NULL, *key = NULL, *row = NULL, *value = NULL;
-	zval *joined_keys = NULL, *insert_sql = NULL, *joined_insert_sqls;
-	zend_string *str_key, *str_key2;
-	ulong idx, idx2;
+	zval phql, *model, selected_columns, *columns, *column, joined_columns, *rows, *row, insert_sqls, bind_params, joined_insert_sqls;
+	zend_string *str_key;
+	ulong idx;
+
+	ZVAL_STRING(&phql, "INSERT INTO ");
 
 	model = phalcon_read_property(getThis(), SL("_model"), PH_NOISY);
 	if (!zend_is_true(model)) {
@@ -1917,46 +1906,39 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 		return;
 	}
 
-	ZVAL_STRING(&phql, "INSERT INTO ");
-
 	PHALCON_SCONCAT_SVS(&phql, "[", model, "] ");
+
+	array_init(&selected_columns);
 
 	columns = phalcon_read_property(getThis(), SL("_columns"), PH_NOISY);
 
-	PHALCON_INIT_VAR(selected_columns);
-	array_init(selected_columns);
-
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(columns), column) {
-		phalcon_array_append(selected_columns, column, PH_COPY);
+		phalcon_array_append(&selected_columns, column, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
-	PHALCON_INIT_VAR(joined_columns);
-	phalcon_fast_join_str(joined_columns, SL(", "), selected_columns);
+	phalcon_fast_join_str(&joined_columns, SL(", "), &selected_columns);
 
-	PHALCON_SCONCAT_SVS(phql, "(", joined_columns, ")");
+	PHALCON_SCONCAT_SVS(&phql, "(", &joined_columns, ")");
 
 	rows = phalcon_read_property(getThis(), SL("_values"), PH_NOISY);
 
-	PHALCON_INIT_VAR(insert_sqls);
-	array_init(insert_sqls);
-
-	PHALCON_INIT_VAR(bind_params);
-	array_init(bind_params);
+	array_init(&insert_sqls);
+	array_init(&bind_params);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(rows), idx, str_key, row) {
-		zval tmp;
+		zval tmp, keys, joined_keys, insert_sql;
+		zend_string *str_key2;
+		ulong idx2;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
 			ZVAL_LONG(&tmp, idx);
 		}
 
-		PHALCON_INIT_NVAR(keys);
-		array_init(keys);
-
+		array_init(&keys);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns), idx2, str_key2, column) {
-			zval tmp2;
+			zval tmp2, value, exception_message, key;
 			if (str_key2) {
 				ZVAL_STR(&tmp2, str_key2);
 			} else {
@@ -1964,10 +1946,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 			}
 
 			if (phalcon_array_isset(row, column)) {
-				PHALCON_OBS_NVAR(value);
 				phalcon_array_fetch(&value, row, column, PH_NOISY);
 			} else if (phalcon_array_isset(row, &tmp2)) {
-				PHALCON_OBS_NVAR(value);
 				phalcon_array_fetch(&value, row, &tmp2, PH_NOISY);
 			} else {
 				PHALCON_CONCAT_SVS(&exception_message, "Values can't find column '", column, "' value");
@@ -1975,33 +1955,29 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 				return;
 			}
 
-			PHALCON_INIT_NVAR(key);
-			PHALCON_CONCAT_VV(key, column, &tmp);
-			phalcon_array_update_zval(bind_params, key, value, PH_COPY);
+			PHALCON_CONCAT_VV(&key, column, &tmp);
+			phalcon_array_update_zval(&bind_params, &key, &value, PH_COPY);
 
-			PHALCON_CONCAT_SVVS(key, ":", column, &tmp, ":");
-			phalcon_array_append(keys, key, PH_COPY);
+			PHALCON_CONCAT_SVVS(&key, ":", column, &tmp, ":");
+			phalcon_array_append(&keys, &key, PH_COPY);
 
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_INIT_NVAR(joined_keys);
-		phalcon_fast_join_str(joined_keys, SL(", "), keys);
+		phalcon_fast_join_str(&joined_keys, SL(", "), &keys);
 
-		PHALCON_INIT_NVAR(insert_sql);
-		PHALCON_SCONCAT_SVS(insert_sql, "(", joined_keys, ")");
+		PHALCON_SCONCAT_SVS(&insert_sql, "(", &joined_keys, ")");
 
-		phalcon_array_append(insert_sqls, insert_sql, PH_COPY);
+		phalcon_array_append(&insert_sqls, &insert_sql, PH_COPY);
 
 	} ZEND_HASH_FOREACH_END();
 
-	PHALCON_CALL_SELF(NULL, "bind", bind_params);
+	PHALCON_CALL_SELFW(NULL, "bind", &bind_params);
 
-	PHALCON_INIT_VAR(joined_insert_sqls);
-	phalcon_fast_join_str(joined_insert_sqls, SL(", "), insert_sqls);
+	phalcon_fast_join_str(&joined_insert_sqls, SL(", "), &insert_sqls);
 
-	PHALCON_SCONCAT_SV(phql, " VALUES ", joined_insert_sqls);
+	PHALCON_SCONCAT_SV(&phql, " VALUES ", &joined_insert_sqls);
 
-	RETURN_CTOR(phql);
+	RETURN_CTORW(&phql);
 }
 
 /**

@@ -95,11 +95,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset_Complex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
 
-	zval *columns_types, *result, *cache = NULL, *source_model = NULL, *fetch_assoc;
+	zval *columns_types, *result, *cache = NULL, *source_model = NULL, fetch_assoc;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 2, &columns_types, &result, &cache, &source_model);
+	phalcon_fetch_params(0, 2, 2, &columns_types, &result, &cache, &source_model);
 
 	if (!cache) {
 		cache = &PHALCON_GLOBAL(z_null);
@@ -138,12 +136,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
 	 * If the database result is an object, change it to fetch assoc
 	 */
 	if (Z_TYPE_P(result) == IS_OBJECT) {
-		PHALCON_INIT_VAR(fetch_assoc);
-		ZVAL_LONG(fetch_assoc, PDO_FETCH_ASSOC);
-		PHALCON_CALL_METHOD(NULL, result, "setfetchmode", fetch_assoc);
+		ZVAL_LONG(&fetch_assoc, PDO_FETCH_ASSOC);
+		PHALCON_CALL_METHODW(NULL, result, "setfetchmode", &fetch_assoc);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

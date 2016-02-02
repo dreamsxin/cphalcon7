@@ -3202,12 +3202,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 							phalcon_array_fetch(&table, &tables, &tmp, PH_NOISY);
 
 							PHALCON_CALL_METHODW(&model, &manager, "load", model_name);
-							PHALCON_CALL_METHODW(&source, model, "getsource");
+							PHALCON_CALL_METHODW(&source, &model, "getsource");
 
 							if (Z_TYPE(table) == IS_ARRAY) {
 								phalcon_array_fetch(&old_schema, &table, &key_schema, PH_NOISY);
 
-								PHALCON_CALL_METHODW(&schema, model, "getschema");
+								PHALCON_CALL_METHODW(&schema, &model, "getschema");
 
 								if (!phalcon_is_equal(&old_schema, &schema)) {
 									i_cache = 0;

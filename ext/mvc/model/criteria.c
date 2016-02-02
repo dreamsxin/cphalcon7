@@ -2152,7 +2152,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 
 	zval dependency_injector, *model, conditions, service_name, meta_data, model_instance, no_primary, primary_keys, first_primary_key;
-	zval column_map, attribute_field, exception_message, *primary_key_condition, *phql, *order, order_items, *order_item, joined_items, *limit, offset, number;
+	zval column_map, attribute_field, exception_message, primary_key_condition, *phql, *order, order_items, *order_item, joined_items, *limit, offset, number;
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
@@ -2191,14 +2191,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 
 		ZVAL_TRUE(&no_primary);
 
-		PHALCON_CALL_METHODW(&primary_keys, meta_data, "getprimarykeyattributes", &model_instance);
+		PHALCON_CALL_METHODW(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
 			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
 				if (PHALCON_GLOBAL(orm).column_renaming) {
-					PHALCON_CALL_METHODW(&column_map, meta_data, "getcolumnmap", &model_instance);
+					PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &model_instance);
 				}
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {

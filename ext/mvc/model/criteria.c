@@ -1618,7 +1618,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, getPhql) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
-	zval dependency_injector, *model, *conditions, service_name, meta_data, model_instance, no_primary, primary_keys, first_primary_key;
+	zval dependency_injector, *model, conditions, service_name, meta_data, model_instance, no_primary, primary_keys, first_primary_key;
 	zval column_map, attribute_field, exception_message, primary_key_condition, phql, *columns, selected_columns, *column, joined_columns;
 	zval *joins, *join, *group, group_items, *group_item, joined_items, *having, *order, order_items, *order_item, *limit, offset, number, *for_update;
 	zend_string *str_key;
@@ -1637,8 +1637,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 		return;
 	}
 
-	conditions = phalcon_read_property(getThis(), SL("_conditions"), PH_NOISY);
-	if (phalcon_is_numeric(conditions)) {
+	phalcon_return_property(&conditions, getThis(), SL("_conditions"));
+	if (phalcon_is_numeric(&conditions)) {
 
 		/** 
 		 * If the conditions is a single numeric field. We internally create a condition
@@ -1681,7 +1681,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 					ZVAL_COPY(&attribute_field, &first_primary_key);
 				}
 
-				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", model, "].[", &attribute_field, "] = ", conditions);
+				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", model, "].[", &attribute_field, "] = ", &conditions);
 				ZVAL_COPY(&conditions, &primary_key_condition);
 
 				ZVAL_FALSE(&no_primary);
@@ -1778,9 +1778,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	/** 
 	 * Only append conditions if it's string
 	 */
-	if (Z_TYPE_P(conditions) == IS_STRING) {
-		if (PHALCON_IS_NOT_EMPTY(conditions)) {
-			PHALCON_SCONCAT_SV(&phql, " WHERE ", conditions);
+	if (Z_TYPE(conditions) == IS_STRING) {
+		if (PHALCON_IS_NOT_EMPTY(&conditions)) {
+			PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
 		}
 	}
 

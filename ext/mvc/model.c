@@ -2976,7 +2976,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 	if (phalcon_fast_count_ev(&relations)) {
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(relations), relation) {
-			zval foreign_key, action, relation_class, fields, referenced_fields, conditions, bind_params, *field;
+			zval foreign_key, action, relation_class, referenced_model, fields, referenced_fields, conditions, bind_params, *field;
 			zval value, condition, extra_conditions, join_conditions, parameters, resulset, status;
 			zend_string *str_key;
 			ulong idx;

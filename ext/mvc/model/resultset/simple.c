@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 
 		PHALCON_CALL_METHODW(&current, getThis(), "current");
 		if (Z_TYPE(current) == IS_OBJECT && phalcon_method_exists_ex(&current, SL("toarray")) == SUCCESS) {
-			PHALCON_CALL_METHODW(&arr, current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
+			PHALCON_CALL_METHODW(&arr, &current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
 			phalcon_array_append(&records, &arr, PH_COPY);
 		} else {
 			phalcon_array_append(&records, &current, PH_COPY);
@@ -378,18 +378,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, unserialize){
 		return;
 	}
 
-	phalcon_array_fetch_str(&model, resultset, SL("model"), PH_NOISY);
+	phalcon_array_fetch_str(&model, &resultset, SL("model"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_model"), &model);
 
-	phalcon_array_fetch_str(&rows, resultset, SL("rows"), PH_NOISY);
+	phalcon_array_fetch_str(&rows, &resultset, SL("rows"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_rows"), &rows);
 
-	phalcon_array_fetch_str(&cache, resultset, SL("cache"), PH_NOISY);
+	phalcon_array_fetch_str(&cache, &resultset, SL("cache"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_cache"), &cache);
 
-	phalcon_array_fetch_str(&column_map, resultset, SL("columnMap"), PH_NOISY);
+	phalcon_array_fetch_str(&column_map, &resultset, SL("columnMap"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_columnMap"), &column_map);
 
-	phalcon_array_fetch_str(&hydrate_mode, resultset, SL("hydrateMode"), PH_NOISY);
+	phalcon_array_fetch_str(&hydrate_mode, &resultset, SL("hydrateMode"), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_hydrateMode"), &hydrate_mode);
 }

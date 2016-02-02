@@ -87,14 +87,14 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Json){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 
-	zval *record, option , field_name, invalid, value, keys, assoc, json, constant, ret, message, type, is_set_code, code;
+	zval *record, option , field_name, invalid, value, keys, assoc, json, *constant, ret, message, type, is_set_code, code;
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
 	ZVAL_STRING(&option, "field");
 
 	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", &option);
-	if (Z_TYPE_P(field_name) != IS_STRING) {
+	if (Z_TYPE(field_name) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}
@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 		if ((constant = zend_get_constant_str(SL("JSON_ERROR_NONE"))) != NULL) {
 			PHALCON_CALL_FUNCTIONW(&ret, "json_last_error");
 
-			if (!PHALCON_IS_EQUAL(&ret, &constant)) {
+			if (!PHALCON_IS_EQUAL(&ret, constant)) {
 				ZVAL_TRUE(&invalid);
 			}
 		}

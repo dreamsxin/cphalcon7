@@ -2962,16 +2962,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 
-	zval *manager, *relations = NULL, *relation = NULL, *foreign_key = NULL;
-	zval *action = NULL, *relation_class = NULL, *referenced_model = NULL;
-	zval *fields = NULL, *referenced_fields = NULL, *conditions = NULL;
-	zval *bind_params = NULL, *field = NULL, *value = NULL, *referenced_field = NULL;
-	zval *condition = NULL, *extra_conditions = NULL, *join_conditions = NULL;
-	zval *parameters = NULL, *resulset = NULL, *status = NULL;
-	zend_string *str_key;
-	ulong idx;
-
-	PHALCON_MM_GROW();
+	zval *manager, relations, *relation;
 
 	/**
 	 * Get the models manager
@@ -2981,128 +2972,114 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 	/**
 	 * We check if some of the hasOne/hasMany relations is a foreign key
 	 */
-	PHALCON_CALL_METHOD(&relations, manager, "gethasoneandhasmany", getThis());
-	if (phalcon_fast_count_ev(relations)) {
+	PHALCON_CALL_METHODW(&relations, manager, "gethasoneandhasmany", getThis());
+	if (phalcon_fast_count_ev(&relations)) {
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(relations), relation) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(relations), relation) {
+			zval foreign_key, action, relation_class, fields, referenced_fields, conditions, bind_params, *field;
+			zval value, condition, extra_conditions, join_conditions, parameters, resulset, status;
+			zend_string *str_key;
+			ulong idx;
+
 			/**
 			 * Check if the relation has a virtual foreign key
 			 */
-			PHALCON_CALL_METHOD(&foreign_key, relation, "getforeignkey");
-			if (PHALCON_IS_NOT_FALSE(foreign_key)) {
-
+			PHALCON_CALL_METHODW(&foreign_key, relation, "getforeignkey");
+			if (PHALCON_IS_NOT_FALSE(&foreign_key)) {
 				/**
 				 * By default action is restrict
 				 */
-				PHALCON_INIT_NVAR(action);
-				ZVAL_LONG(action, 0);
+				ZVAL_LONG(&action, 0);
 
 				/**
 				 * Try to find a different action in the foreign key's options
 				 */
-				if (Z_TYPE_P(foreign_key) == IS_ARRAY) { 
-					if (phalcon_array_isset_str(foreign_key, SL("action"))) {
-						PHALCON_OBS_NVAR(action);
-						phalcon_array_fetch_str(&action, foreign_key, SL("action"), PH_NOISY);
+				if (Z_TYPE(foreign_key) == IS_ARRAY) { 
+					if (phalcon_array_isset_str(&foreign_key, SL("action"))) {
+						phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY);
 					}
 				}
 
 				/**
 				 * Check only if the operation is restrict
 				 */
-				if (PHALCON_IS_LONG(action, 2)) {
-
-					PHALCON_CALL_METHOD(&relation_class, relation, "getreferencedmodel");
+				if (PHALCON_IS_LONG(&action, 2)) {
+					PHALCON_CALL_METHODW(&relation_class, relation, "getreferencedmodel");
 
 					/**
 					 * Load a plain instance from the models manager
 					 */
-					PHALCON_CALL_METHOD(&referenced_model, manager, "load", relation_class);
-					PHALCON_CALL_METHOD(&fields, relation, "getfields");
-					PHALCON_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
+					PHALCON_CALL_METHODW(&referenced_model, manager, "load", &relation_class);
+					PHALCON_CALL_METHODW(&fields, relation, "getfields");
+					PHALCON_CALL_METHODW(&referenced_fields, relation, "getreferencedfields");
 
 					/**
 					 * Create the checking conditions. A relation can has many fields or a single one
 					 */
-					PHALCON_INIT_NVAR(conditions);
-					array_init(conditions);
-
-					PHALCON_INIT_NVAR(bind_params);
-					array_init(bind_params);
-					if (Z_TYPE_P(fields) == IS_ARRAY) { 
-
-						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, field) {
-							zval tmp;
+					array_init(&conditions);
+					array_init(&bind_params);
+					if (Z_TYPE(fields) == IS_ARRAY) {
+						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
+							zval tmp, referenced_field;
 							if (str_key) {
 								ZVAL_STR(&tmp, str_key);
 							} else {
 								ZVAL_LONG(&tmp, idx);
 							}
 
-							if (phalcon_isset_property_zval(getThis(), field)) {
-								value = phalcon_read_property_zval(getThis(), field, PH_NOISY);
-							} else {
-								PHALCON_INIT_NVAR(value);
+							if (phalcon_property_isset_fetch_zval(getThis(), field)) {
+								phalcon_return_property_zval(&value, getThis(), field);
 							}
 
-							PHALCON_OBS_NVAR(referenced_field);
-							phalcon_array_fetch(&referenced_field, referenced_fields, &tmp, PH_NOISY);
+							phalcon_array_fetch(&referenced_field, &referenced_fields, &tmp, PH_NOISY);
 
-							PHALCON_INIT_NVAR(condition);
-							PHALCON_CONCAT_SVSV(condition, "[", referenced_field, "] = ?", &tmp);
-							phalcon_array_append(conditions, condition, PH_COPY);
-							phalcon_array_append(bind_params, value, PH_COPY);
+							PHALCON_CONCAT_SVSV(&condition, "[", &referenced_field, "] = ?", &tmp);
+							phalcon_array_append(&conditions, &condition, PH_COPY);
+							phalcon_array_append(&bind_params, &value, PH_COPY);
 						} ZEND_HASH_FOREACH_END();
 
 					} else {
 						if (phalcon_isset_property_zval(getThis(), fields)) {
-							value = phalcon_read_property_zval(getThis(), fields, PH_NOISY);
-						} else {
-							PHALCON_INIT_NVAR(value);
+							phalcon_return_property_zval(&value, getThis(), field);
 						}
 
-						PHALCON_INIT_NVAR(condition);
-						PHALCON_CONCAT_SVS(condition, "[", referenced_fields, "] = ?0");
-						phalcon_array_append(conditions, condition, PH_COPY);
-						phalcon_array_append(bind_params, value, PH_COPY);
+						PHALCON_CONCAT_SVS(&condition, "[", &referenced_fields, "] = ?0");
+						phalcon_array_append(&conditions, &condition, PH_COPY);
+						phalcon_array_append(&bind_params, &value, PH_COPY);
 					}
 
 					/**
 					 * Check if the virtual foreign key has extra conditions
 					 */
-					if (phalcon_array_isset_str(foreign_key, SL("conditions"))) {
-						PHALCON_OBS_NVAR(extra_conditions);
-						phalcon_array_fetch_str(&extra_conditions, foreign_key, SL("conditions"), PH_NOISY);
-						phalcon_array_append(conditions, extra_conditions, PH_COPY);
+					if (phalcon_array_isset_fetch_str(&extra_conditions, foreign_key, SL("conditions"))) {
+						phalcon_array_append(&conditions, &extra_conditions, PH_COPY);
 					}
 
 					/**
 					 * We don't trust the actual values in the object and then we're passing the values
 					 * using bound parameters
 					 */
-					PHALCON_INIT_NVAR(join_conditions);
-					phalcon_fast_join_str(join_conditions, SL(" AND "), conditions);
+					phalcon_fast_join_str(&join_conditions, SL(" AND "), &conditions);
 
-					PHALCON_INIT_NVAR(parameters);
-					array_init_size(parameters, 2);
-					phalcon_array_append(parameters, join_conditions, PH_COPY);
-					phalcon_array_update_str(parameters, SL("bind"), bind_params, PH_COPY);
+					array_init_size(&parameters, 2);
+					phalcon_array_append(&parameters, &join_conditions, PH_COPY);
+					phalcon_array_update_str(&parameters, SL("bind"), &bind_params, PH_COPY);
 
 					/**
 					 * Let's make the checking
 					 */
-					PHALCON_CALL_METHOD(&resulset, referenced_model, "find", parameters);
+					PHALCON_CALL_METHODW(&resulset, &referenced_model, "find", &parameters);
 
 					/**
 					 * Delete the resultset
 					 */
-					PHALCON_CALL_METHOD(&status, resulset, "delete");
+					PHALCON_CALL_METHODW(&status, &resulset, "delete");
 
 					/**
 					 * Stop the operation
 					 */
-					if (PHALCON_IS_FALSE(status)) {
-						RETURN_MM_FALSE;
+					if (PHALCON_IS_FALSE(&status)) {
+						RETURN_FALSE;
 					}
 				}
 			}
@@ -3110,7 +3087,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**

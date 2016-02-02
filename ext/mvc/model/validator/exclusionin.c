@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&value, &record, "readattribute", &field_name);
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field_name);
 
 	/*
 	 * Allow empty
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 		ZVAL_STRING(&option, ISV(code));
 
 		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
-		if (zend_is_true(is_set_code)) {
+		if (zend_is_true(&is_set_code)) {
 			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
 			ZVAL_LONG(&code, 0);

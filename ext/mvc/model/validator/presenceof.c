@@ -92,8 +92,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 
 	ZVAL_STRING(&option, "field");
 
-	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", option);
-	if (Z_TYPE_P(field_name) != IS_STRING) {
+	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", &option);
+	if (Z_TYPE(field_name) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}

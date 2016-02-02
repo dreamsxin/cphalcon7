@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 	 */
 	ZVAL_STRING(&option, "pattern");
 
-	PHALCON_CALL_METHODW(&is_set, getThis(), "issetoption", option);
+	PHALCON_CALL_METHODW(&is_set, getThis(), "issetoption", &option);
 	if (!zend_is_true(&is_set)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Validator requires a perl-compatible regex pattern");
 		return;
@@ -119,21 +119,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 	ZVAL_STRING(&option, "allowEmpty");
 
 	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
-	if (zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
 		RETURN_TRUE;
-	}
-
-	/*
-	 * Allow empty
-	 */
-	ZVAL_STRING(&option, "allowEmpty");
-
-	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
-
-	if (zend_is_true(&allow_empty)) {
-		if (PHALCON_IS_EMPTY(&value)) {
-			RETURN_TRUE;
-		}
 	}
 
 	ZVAL_FALSE(&failed);
@@ -158,14 +145,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 		ZVAL_TRUE(&failed);
 	}
 
-	if (PHALCON_IS_TRUE(failed)) {
+	if (PHALCON_IS_TRUE(&failed)) {
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
 		ZVAL_STRING(&option, ISV(message));
 
 		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
-		if (!zend_is_true(message)) {
+		if (!zend_is_true(&message)) {
 			PHALCON_CONCAT_SVS(&message, "Value of field '", &field_name, "' doesn't match regular expression");
 		}
 

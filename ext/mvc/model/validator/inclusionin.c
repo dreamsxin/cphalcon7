@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	ZVAL_STRING(&option, "domain");
 
 	PHALCON_CALL_METHODW(&domain, getThis(), "getoption", &option);
-	if (Z_TYPE(&domain) != IS_ARRAY) { 
+	if (Z_TYPE(domain) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Option 'domain' must be an array");
 		return;
 	}

@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 	/** 
 	 * Minimum length
 	 */
-	if (zend_is_true(is_set_min)) {
+	if (zend_is_true(&is_set_min)) {
 		ZVAL_STRING(&option, "min");
 		PHALCON_CALL_METHODW(&minimum, getThis(), "getoption", &option);
 
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 			ZVAL_STRING(&option, "messageMinimum");
 
 			PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
-			if (!zend_is_true(message)) {
+			if (!zend_is_true(&message)) {
 				PHALCON_CONCAT_SVSVS(&message, "Value of field '", &field, "' is less than the minimum ", &minimum, " characters");
 			}
 

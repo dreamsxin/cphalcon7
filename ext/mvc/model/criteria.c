@@ -2152,7 +2152,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 
 	zval dependency_injector, *model, conditions, service_name, meta_data, model_instance, no_primary, primary_keys, first_primary_key;
-	zval column_map, attribute_field, exception_message, primary_key_condition, *phql, *order, order_items, *order_item, joined_items, *limit, offset, number;
+	zval column_map, attribute_field, exception_message, primary_key_condition, phql, *order, order_items, *order_item, joined_items, *limit, offset, number;
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
@@ -2232,9 +2232,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	/**
 	 * Only append conditions if it's string
 	 */
-	if (Z_TYPE_P(conditions) == IS_STRING) {
-		if (PHALCON_IS_NOT_EMPTY(conditions)) {
-			PHALCON_SCONCAT_SV(phql, " WHERE ", conditions);
+	if (Z_TYPE(conditions) == IS_STRING) {
+		if (PHALCON_IS_NOT_EMPTY(&conditions)) {
+			PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
 		}
 	}
 
@@ -2249,7 +2249,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(order), order_item) {
 				zval escaped_item;
 				if (phalcon_is_numeric(order_item)) {
-					phalcon_array_append(order_items, order_item, PH_COPY);
+					phalcon_array_append(&order_items, order_item, PH_COPY);
 				} else {
 					if (phalcon_memnstr_str(order_item, SL("."))) {
 						phalcon_array_append(&order_items, order_item, PH_COPY);

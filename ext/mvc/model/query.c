@@ -3192,7 +3192,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 						ZVAL_LONG(&key_source, 0);
 
 						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(model_names), idx, str_key, model_name) {
-							zval tmp, table, model, source, old_schema, old_source;
+							zval tmp, table, model, source, old_schema, schema, old_source;
 							if (str_key) {
 								ZVAL_STR(&tmp, str_key);
 							} else {

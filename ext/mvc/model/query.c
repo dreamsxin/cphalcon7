@@ -2506,7 +2506,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 			phalcon_array_update_zval(&sql_aliases, &alias, &alias, PH_COPY);
 			phalcon_array_update_zval(&sql_aliases_models, &alias, &model_name, PH_COPY);
 			phalcon_array_update_zval(&sql_models_aliases, &model_name, &alias, PH_COPY);
-			phalcon_array_update_zval(&sql_aliases_models_instances, &alias, model, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases_models_instances, &alias, &model, PH_COPY);
 
 			/** 
 			 * Append or convert complete source to an array

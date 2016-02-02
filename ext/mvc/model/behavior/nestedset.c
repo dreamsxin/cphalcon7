@@ -949,7 +949,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertBefore){
 
 	zval *target, *attributes = NULL, *left = NULL;
 
-	phalcon_fetch_params(1, 1, 1, &target, &attributes);
+	phalcon_fetch_params(0, 1, 1, &target, &attributes);
 
 	if (!attributes) {
 		attributes = &PHALCON_GLOBAL(z_null);
@@ -970,24 +970,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertBefore){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertAfter){
 
-	zval *target, *attributes = NULL, *right = NULL, *tmp = NULL;
+	zval *target, *attributes = NULL, right, tmp;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &target, &attributes);
+	phalcon_fetch_params(0, 1, 1, &target, &attributes);
 
 	if (!attributes) {
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_SELF(&right, "getrightattribute", target);
+	PHALCON_CALL_SELFW(&right, "getrightattribute", target);
 
-	PHALCON_INIT_NVAR(tmp);
-	phalcon_add_function(tmp, right, &PHALCON_GLOBAL(z_one));
+	phalcon_add_function(&tmp, right, &PHALCON_GLOBAL(z_one));
 
-	PHALCON_RETURN_CALL_SELF("addnode", target, tmp, &PHALCON_GLOBAL(z_zero), attributes);
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("addnode", target, &tmp, &PHALCON_GLOBAL(z_zero), attributes);
 }
 
 /**
@@ -999,17 +994,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertAfter){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveBefore){
 
-	zval *target, *left = NULL;
+	zval *target, left;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &target);
 
-	phalcon_fetch_params(1, 1, 0, &target);
+	PHALCON_CALL_SELFW(&left, "getleftattribute", target);
 
-	PHALCON_CALL_SELF(&left, "getleftattribute", target);
-
-	PHALCON_RETURN_CALL_SELF("movenode", target, left, &PHALCON_GLOBAL(z_zero));
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("movenode", target, &left, &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -1023,18 +1014,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAfter){
 
 	zval *target, *left = NULL, *tmp = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &target);
+	phalcon_fetch_params(0, 1, 0, &target);
 
 	PHALCON_CALL_SELF(&left, "getleftattribute", target);
 
-	PHALCON_INIT_NVAR(tmp);
-	phalcon_add_function(tmp, left, &PHALCON_GLOBAL(z_one));
+	phalcon_add_function(&tmp, &left, &PHALCON_GLOBAL(z_one));
 
-	PHALCON_RETURN_CALL_SELF("movenode", target, tmp, &PHALCON_GLOBAL(z_zero));
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("movenode", target, &tmp, &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -1046,20 +1032,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAfter){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsFirst){
 
-	zval *target, *left = NULL, *tmp = NULL;
+	zval *target, left, tmp;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &target);
 
-	phalcon_fetch_params(1, 1, 0, &target);
+	PHALCON_CALL_SELFW(&left, "getleftattribute", target);
 
-	PHALCON_CALL_SELF(&left, "getleftattribute", target);
+	phalcon_add_function(&tmp, &left, &PHALCON_GLOBAL(z_one));
 
-	PHALCON_INIT_NVAR(tmp);
-	phalcon_add_function(tmp, left, &PHALCON_GLOBAL(z_one));
-
-	PHALCON_RETURN_CALL_SELF("movenode", target, tmp, &PHALCON_GLOBAL(z_one));
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("movenode", target, &tmp, &PHALCON_GLOBAL(z_one));
 }
 
 /**
@@ -1071,17 +1052,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsFirst){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsLast){
 
-	zval *target, *right = NULL;
+	zval *target, right;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &target);
 
-	phalcon_fetch_params(1, 1, 0, &target);
+	PHALCON_CALL_SELFW(&right, "getrightattribute", target);
 
-	PHALCON_CALL_SELF(&right, "getrightattribute", target);
-
-	PHALCON_RETURN_CALL_SELF("movenode", target, right, &PHALCON_GLOBAL(z_one));
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_SELFW("movenode", target, &right, &PHALCON_GLOBAL(z_one));
 }
 
 /**

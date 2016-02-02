@@ -158,6 +158,7 @@ typedef enum _phalcon_call_type {
 	} while (0)
 
 #define PHALCON_CALL_USER_FUNC(retval, handler) PHALCON_CALL_USER_FUNC_ARRAY(retval, handler, NULL)
+#define PHALCON_CALL_USER_FUNCW(retval, handler) PHALCON_CALL_USER_FUNC_ARRAYW(retval, handler, NULL)
 
 /**
  * @brief Checks if the class defines a constructor

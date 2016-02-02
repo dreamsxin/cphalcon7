@@ -3027,7 +3027,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 								ZVAL_LONG(&tmp, idx);
 							}
 
-							if (phalcon_property_isset_fetch_zval(getThis(), field)) {
+							if (phalcon_isset_property_zval(getThis(), field)) {
 								phalcon_return_property_zval(&value, getThis(), field);
 							}
 
@@ -3039,7 +3039,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 						} ZEND_HASH_FOREACH_END();
 
 					} else {
-						if (phalcon_isset_property_zval(getThis(), fields)) {
+						if (phalcon_isset_property_zval(getThis(), &fields)) {
 							phalcon_return_property_zval(&value, getThis(), field);
 						}
 
@@ -3051,7 +3051,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 					/**
 					 * Check if the virtual foreign key has extra conditions
 					 */
-					if (phalcon_array_isset_fetch_str(&extra_conditions, foreign_key, SL("conditions"))) {
+					if (phalcon_array_isset_fetch_str(&extra_conditions, &foreign_key, SL("conditions"))) {
 						phalcon_array_append(&conditions, &extra_conditions, PH_COPY);
 					}
 

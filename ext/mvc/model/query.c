@@ -3006,25 +3006,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 
-	zval *ast, *delete_ast, *models, *models_instances;
-	zval *sql_tables, *sql_models, *sql_aliases;
-	zval *sql_aliases_models_instances, tables;
-	zval *delete_tables = NULL, *manager = NULL, *table = NULL;
-	zval *model = NULL, *source = NULL, *schema = NULL;
-	zval *complete_source = NULL, *alias = NULL, *not_quoting;
-	zval where, *where_expr = NULL, limit, *sql_limit = NULL;
-
-	PHALCON_MM_GROW();
+	zval *ast, delete_ast, tables, models, models_instances, sql_tables, sql_models, sql_aliases, sql_aliases_models_instances;
+	zval delete_tables, manager, *table, not_quoting, where, where_expr, limit, sql_limit;
 
 	ast = phalcon_read_property(getThis(), SL("_ast"), PH_NOISY);
-	if (!phalcon_array_isset_str(ast, SL("delete"))) {
+	if (!phalcon_array_isset_fetch_str(&delete_ast, ast, SL("delete"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted DELETE AST");
 		return;
 	}
 
-	phalcon_array_fetch_str(&delete_ast, ast, SL("delete"), PH_NOISY);
-	if (!phalcon_array_isset_str(&delete_ast, SL("tables"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted DELETE AST");
+	if (!phalcon_array_isset_fetch_str(&tables, &delete_ast, SL("tables"))) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted DELETE AST");
 		return;
 	}
 
@@ -3032,37 +3024,25 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 	 * We use these arrays to store info related to models, alias and its sources. With
 	 * them we can rename columns later
 	 */
-	PHALCON_INIT_VAR(models);
-	array_init(models);
+	array_init(&models);
+	array_init(&models_instances);
+	array_init(&sql_tables);
+	array_init(&sql_models);
+	array_init(&sql_aliases);
+	array_init(&sql_aliases_models_instances);
 
-	PHALCON_INIT_VAR(models_instances);
-	array_init(models_instances);
-
-	PHALCON_INIT_VAR(sql_tables);
-	array_init(sql_tables);
-
-	PHALCON_INIT_VAR(sql_models);
-	array_init(sql_models);
-
-	PHALCON_INIT_VAR(sql_aliases);
-	array_init(sql_aliases);
-
-	PHALCON_INIT_VAR(sql_aliases_models_instances);
-	array_init(sql_aliases_models_instances);
-
-	phalcon_array_fetch_str(&tables, &delete_ast, SL("tables"), PH_NOISY);
 	if (!phalcon_array_isset_long(&tables, 0)) {
-		PHALCON_INIT_VAR(delete_tables);
-		array_init_size(delete_tables, 1);
-		phalcon_array_append(delete_tables, &tables, PH_COPY);
+		array_init_size(&delete_tables, 1);
+		phalcon_array_append(&delete_tables, &tables, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT(delete_tables, &tables);
+		ZVAL_COPY(&delete_tables, &tables);
 	}
 
-	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
+	PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(delete_tables), table) {
-		zval qualified_name, model_name, ns_alias, *real_namespace = NULL, real_model_name;
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(delete_tables), table) {
+		zval qualified_name, model_name, ns_alias, real_namespace, real_model_name, model, source, schema;
+		zval complete_source, alias;
 
 		phalcon_array_fetch_str(&qualified_name, table, SL("qualifiedName"), PH_NOISY);
 		phalcon_array_fetch_string(&model_name, &qualified_name, IS(name), PH_NOISY);
@@ -3071,86 +3051,77 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 		 * Check if the table have a namespace alias
 		 */
 		if (phalcon_array_isset_str(&qualified_name, SL("ns-alias"))) {
-			phalcon_array_fetch_str(&ns_alias, qualified_name, SL("ns-alias"), PH_NOISY);
+			phalcon_array_fetch_str(&ns_alias, &qualified_name, SL("ns-alias"), PH_NOISY);
 
 			/** 
 			 * Get the real namespace alias
 			 */
-			PHALCON_CALL_METHODW(&real_namespace, manager, "getnamespacealias", &ns_alias);
+			PHALCON_CALL_METHODW(&real_namespace, &manager, "getnamespacealias", &ns_alias);
 
 			/** 
 			 * Create the real namespaced name
 			 */
-			PHALCON_CONCAT_VSV(&real_model_name, real_namespace, "\\", &model_name);
+			PHALCON_CONCAT_VSV(&real_model_name, &real_namespace, "\\", &model_name);
 		} else {
-			ZVAL_COPY_VALUE(real_model_name, &model_name);
+			ZVAL_COPY_VALUE(&real_model_name, &model_name);
 		}
 
 		/** 
 		 * Load a model instance from the models manager
 		 */
-		PHALCON_CALL_METHODW(&model, manager, "load", &real_model_name);
-		PHALCON_CALL_METHODW(&source, model, "getsource");
-		PHALCON_CALL_METHODW(&schema, model, "getschema");
-		if (zend_is_true(schema)) {
-			PHALCON_INIT_NVAR(complete_source);
-			array_init_size(complete_source, 2);
-			phalcon_array_append(complete_source, source, PH_COPY);
-			phalcon_array_append(complete_source, schema, PH_COPY);
+		PHALCON_CALL_METHODW(&model, &manager, "load", &real_model_name);
+		PHALCON_CALL_METHODW(&source, &model, "getsource");
+		PHALCON_CALL_METHODW(&schema, &model, "getschema");
+
+		array_init(&complete_source);
+		phalcon_array_append(&complete_source, &source, PH_COPY);
+		if (zend_is_true(&schema)) {
+			phalcon_array_append(&complete_source, &schema, PH_COPY);
 		} else {
-			PHALCON_INIT_NVAR(complete_source);
-			array_init_size(complete_source, 2);
-			phalcon_array_append(complete_source, source, PH_COPY);
-			add_next_index_null(complete_source);
+			add_next_index_null(&complete_source);
 		}
 
-		if (phalcon_array_isset_str(table, SL("alias"))) {
-			PHALCON_OBS_NVAR(alias);
-			phalcon_array_fetch_str(&alias, table, SL("alias"), PH_NOISY);
-			phalcon_array_update_zval(sql_aliases, alias, alias, PH_COPY);
-			phalcon_array_append(complete_source, alias, PH_COPY);
-			phalcon_array_append(sql_tables, complete_source, PH_COPY);
-			phalcon_array_update_zval(sql_aliases_models_instances, alias, model, PH_COPY);
-			phalcon_array_update_zval(models, alias, model_name, PH_COPY);
+		if (phalcon_array_isset_fetch_str(&alias, table, SL("alias"))) {
+			phalcon_array_append(&complete_source, &alias, PH_COPY);
+			phalcon_array_append(&sql_tables, &complete_source, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases, &alias, &alias, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases_models_instances, &alias, &model, PH_COPY);
+			phalcon_array_update_zval(&models, &alias, &model_name, PH_COPY);
 		} else {
-			phalcon_array_update_zval(sql_aliases, model_name, source, PH_COPY);
-			phalcon_array_update_zval(sql_aliases_models_instances, model_name, model, PH_COPY);
-			phalcon_array_append(sql_tables, source, PH_COPY);
-			phalcon_array_update_zval(models, model_name, source, PH_COPY);
+			phalcon_array_append(&sql_tables, &source, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases, &model_name, &source, PH_COPY);
+			phalcon_array_update_zval(&sql_aliases_models_instances, &model_name, &model, PH_COPY);
+			phalcon_array_update_zval(&models, &model_name, &source, PH_COPY);
 		}
 
-		phalcon_array_append(sql_models, model_name, PH_COPY);
-		phalcon_array_update_zval(models_instances, model_name, model, PH_COPY);
+		phalcon_array_append(&sql_models, &model_name, PH_COPY);
+		phalcon_array_update_zval(&models_instances, &model_name, &model, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	/** 
 	 * Update the models/alias/sources in the object
 	 */
-	phalcon_update_property_this(getThis(), SL("_currentModelsInstances"), models_instances);
-
-	phalcon_update_property_this(getThis(), SL("_models"), models);
-	phalcon_update_property_this(getThis(), SL("_modelsInstances"), models_instances);
-	phalcon_update_property_this(getThis(), SL("_sqlAliases"), sql_aliases);
-	phalcon_update_property_this(getThis(), SL("_sqlAliasesModelsInstances"), sql_aliases_models_instances);
+	phalcon_update_property_this(getThis(), SL("_currentModelsInstances"), &models_instances);
+	phalcon_update_property_this(getThis(), SL("_models"), &models);
+	phalcon_update_property_this(getThis(), SL("_modelsInstances"), &models_instances);
+	phalcon_update_property_this(getThis(), SL("_sqlAliases"), &sql_aliases);
+	phalcon_update_property_this(getThis(), SL("_sqlAliasesModelsInstances"), &sql_aliases_models_instances);
 
 	array_init_size(return_value, 4);
-	phalcon_array_update_string(return_value, IS(tables), sql_tables, PH_COPY);
-	phalcon_array_update_string(return_value, IS(models), sql_models, PH_COPY);
+	phalcon_array_update_string(return_value, IS(tables), &sql_tables, PH_COPY);
+	phalcon_array_update_string(return_value, IS(models), &sql_models, PH_COPY);
 
 	if (phalcon_array_isset_fetch_str(&where, ast, SL("where"))) {
-		PHALCON_INIT_VAR(not_quoting);
-		ZVAL_TRUE(not_quoting);
+		ZVAL_TRUE(&not_quoting);
 
-		PHALCON_CALL_METHODW(&where_expr, getThis(), "_getexpression", &where, not_quoting);
-		phalcon_array_update_string(return_value, IS(where), where_expr, PH_COPY);
+		PHALCON_CALL_METHODW(&where_expr, getThis(), "_getexpression", &where, &not_quoting);
+		phalcon_array_update_string(return_value, IS(where), &where_expr, PH_COPY);
 	}
 
 	if (phalcon_array_isset_fetch_str(&limit, ast, SL("limit"))) {
 		PHALCON_CALL_METHODW(&sql_limit, getThis(), "_getlimitclause", &limit);
-		phalcon_array_update_string(return_value, IS(limit), sql_limit, PH_COPY);
+		phalcon_array_update_string(return_value, IS(limit), &sql_limit, PH_COPY);
 	}
-
-	RETURN_MM();
 }
 
 /**
@@ -3161,15 +3132,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
-	zval event_name, *intermediate, *phql, *ast = NULL, ir_phql, *ir_phql_cache = NULL, ir_phql_cache2;
-	zval unique_id, *type = NULL, exception_message;
-	zval *manager = NULL, model_names, tables, *key_schema, *key_source, *model_name = NULL, *model = NULL;
-	zval *old_schema = NULL, *schema = NULL, *source = NULL;	
+	zval event_name, *intermediate, *phql, ast, type, unique_id, ir_phql_cache, ir_phql_cache2, ir_phql, model_names, exception_message;
+	zval manager, tables, key_schema, key_source, *model_name;
 	zend_string *str_key;
 	ulong idx;
 	int i_cache = 1;
-
-	PHALCON_MM_GROW();
 
 	ZVAL_STRING(&event_name, "query:beforeParse");
 
@@ -3177,7 +3144,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 	intermediate = phalcon_read_property(getThis(), SL("_intermediate"), PH_NOISY);
 	if (Z_TYPE_P(intermediate) == IS_ARRAY) {
-		RETURN_CTOR(intermediate);
+		RETURN_CTORW(intermediate);
 	}
 
 	phql = phalcon_read_property(getThis(), SL("_phql"), PH_NOISY);
@@ -3185,58 +3152,47 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	/** 
 	 * This function parses the PHQL statement
 	 */
-	PHALCON_INIT_NVAR(ast);
-	if (phql_parse_phql(ast, phql) == FAILURE) {
-		RETURN_MM();
+	if (phql_parse_phql(&ast, phql) == FAILURE) {
+		return;
 	}
 
 	/** 
 	 * A valid AST must have a type
 	 */
-	if (Z_TYPE_P(ast) == IS_ARRAY && phalcon_array_isset_str(ast, ISL(type))) {
-		phalcon_update_property_this(getThis(), SL("_ast"), ast);
+	if (Z_TYPE(ast) == IS_ARRAY && phalcon_array_isset_str(&ast, ISL(type))) {
+		phalcon_update_property_this(getThis(), SL("_ast"), &ast);
 
 		/** 
 		 * Produce an independent database system representation
 		 */
-		PHALCON_OBS_NVAR(type);
-		phalcon_array_fetch_string(&type, ast, IS(type), PH_NOISY);
-		phalcon_update_property_this(getThis(), SL("_type"), type);
+		phalcon_array_fetch_string(&type, &ast, IS(type), PH_NOISY);
+		phalcon_update_property_this(getThis(), SL("_type"), &type);
 	} else {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted AST");
 		return;
 	}
-
-	PHALCON_INIT_VAR(ir_phql_cache);
 
 	if (PHALCON_GLOBAL(orm).enable_ast_cache) {
 		/** 
 		 * Check if the prepared PHQL is already cached
 		 */
-		if (phalcon_array_isset_str(ast, SL("id"))) {
+		if (phalcon_array_isset_fetch_str(&unique_id, &ast, SL("id"))) {
 			/** 
 			 * Parsed ASTs have a unique id
 			 */
-			phalcon_array_fetch_str(&unique_id, ast, SL("id"), PH_NOISY);
+			phalcon_return_static_property(&ir_phql_cache, SL("phalcon\\mvc\\model\\query"), SL("_irPhqlCache"));
 
-			ir_phql_cache = phalcon_read_static_property(SL("phalcon\\mvc\\model\\query"), SL("_irPhqlCache"));
-
-			if (phalcon_array_isset_fetch(&ir_phql_cache2, ir_phql_cache, type) && phalcon_array_isset(&ir_phql_cache2, &unique_id)) {
-				phalcon_array_fetch(&ir_phql, &ir_phql_cache2, &unique_id, PH_NOISY);
-
-				if (Z_TYPE_P(&ir_phql) == IS_ARRAY) {
+			if (phalcon_array_isset_fetch(&ir_phql_cache2, ir_phql_cache, type) && phalcon_array_isset_fetch(&ir_phql, &ir_phql_cache2, &unique_id)) {
+				if (Z_TYPE(ir_phql) == IS_ARRAY) {
 					if (phalcon_array_isset_fetch_str(&model_names, &ir_phql, SL("models")) && phalcon_array_isset_fetch_str(&tables, &ir_phql, SL("tables"))) {
 						// Obtain the real source including the schema again
-						PHALCON_CALL_SELF(&manager, "getmodelsmanager");
+						PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
 
-						PHALCON_INIT_VAR(key_schema);
-						ZVAL_LONG(key_schema, 1);
+						ZVAL_LONG(&key_schema, 1);
+						ZVAL_LONG(&key_source, 0);
 
-						PHALCON_INIT_VAR(key_source);
-						ZVAL_LONG(key_source, 0);
-
-						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(&model_names), idx, str_key, model_name) {
-							zval tmp, table, old_source;
+						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(model_names), idx, str_key, model_name) {
+							zval tmp, table, model, source, old_schema, old_source;
 							if (str_key) {
 								ZVAL_STR(&tmp, str_key);
 							} else {
@@ -3245,28 +3201,26 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 							phalcon_array_fetch(&table, &tables, &tmp, PH_NOISY);
 
-							PHALCON_CALL_METHODW(&model, manager, "load", model_name);
-
+							PHALCON_CALL_METHODW(&model, &manager, "load", model_name);
 							PHALCON_CALL_METHODW(&source, model, "getsource");
 
-							if (Z_TYPE_P(table) == IS_ARRAY) {
-								PHALCON_OBS_NVAR(old_schema);
-								phalcon_array_fetch(&old_schema, &table, key_schema, PH_NOISY);
+							if (Z_TYPE(table) == IS_ARRAY) {
+								phalcon_array_fetch(&old_schema, &table, &key_schema, PH_NOISY);
 
 								PHALCON_CALL_METHODW(&schema, model, "getschema");
 
-								if (!phalcon_is_equal(old_schema, schema)) {
+								if (!phalcon_is_equal(&old_schema, &schema)) {
 									i_cache = 0;
 									break;
 								}
 
-								phalcon_array_fetch(&old_source, &table, key_source, PH_NOISY);
+								phalcon_array_fetch(&old_source, &table, &key_source, PH_NOISY);
 
-								if (!phalcon_is_equal(&old_source, source)) {
+								if (!phalcon_is_equal(&old_source, &source)) {
 									i_cache = 0;
 									break;
 								}
-							} else if (!phalcon_is_equal(&table, source)) {
+							} else if (!phalcon_is_equal(&table, &source)) {
 								i_cache = 0;
 								break;
 							}
@@ -3274,19 +3228,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 					}
 
 					if (i_cache) {
-						RETURN_CTOR(&ir_phql);
+						RETURN_CTORW(&ir_phql);
 					}
 				}
 			}
 		}
 	}
 
-	phalcon_update_property_this(getThis(), SL("_ast"), ast);
+	phalcon_update_property_this(getThis(), SL("_ast"), &ast);
 
 	/** 
 	 * Produce an independent database system representation
 	 */
-	phalcon_array_fetch_string(&type, ast, IS(type), PH_NOISY);
+	phalcon_array_fetch_string(&type, &ast, IS(type), PH_NOISY);
 	phalcon_update_property_this(getThis(), SL("_type"), &type);
 
 	switch (phalcon_get_intval(&type)) {
@@ -3308,13 +3262,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 			break;
 
 		default:
-			PHALCON_CONCAT_SVSV(&exception_message, "Unknown statement ", type, ", when preparing: ", phql);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_CONCAT_SVSV(&exception_message, "Unknown statement ", &type, ", when preparing: ", phql);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 	}
 
 	if (Z_TYPE_P(&ir_phql) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted AST");
 		return;
 	}
 
@@ -3322,14 +3276,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	 * Store the prepared AST in the cache
 	 */
 	if (PHALCON_GLOBAL(orm).enable_ast_cache) {
-		if (Z_TYPE_P(&unique_id) == IS_LONG) {
-			if (Z_TYPE_P(ir_phql_cache) != IS_ARRAY) { 
-				PHALCON_INIT_NVAR(ir_phql_cache);
-				array_init(ir_phql_cache);
+		if (Z_TYPE(unique_id) == IS_LONG) {
+			if (Z_TYPE(ir_phql_cache) != IS_ARRAY) { 
+				array_init(&ir_phql_cache);
 			}
 
-			phalcon_array_update_multi_2(ir_phql_cache, type, &unique_id, &ir_phql, PH_COPY);
-			phalcon_update_static_property_ce(phalcon_mvc_model_query_ce, SL("_irPhqlCache"), ir_phql_cache);
+			phalcon_array_update_multi_2(&ir_phql_cache, &type, &unique_id, &ir_phql, PH_COPY);
+			phalcon_update_static_property_ce(phalcon_mvc_model_query_ce, SL("_irPhqlCache"), &ir_phql_cache);
 		}
 	}
 
@@ -3339,7 +3292,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
-	RETURN_CTOR(&ir_phql);
+	RETURN_CTORW(&ir_phql);
 }
 
 /**

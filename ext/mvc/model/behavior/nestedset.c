@@ -757,7 +757,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, parent){
 	PHALCON_CALL_METHODW(NULL, &query, "where", &statement);
 
 	PHALCON_CONCAT_VSV(&statement, right_attribute, ">", &right);
-	PHALCON_CALL_METHODW(NULL, query, "andwhere", &statement);
+	PHALCON_CALL_METHODW(NULL, &query, "andwhere", &statement);
 
 	has_many_roots = phalcon_read_property(getThis(), SL("_hasManyRoots"), PH_NOISY);
 
@@ -783,17 +783,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, parent){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, prev){
 
-	zval *owner, *right_attribute, left, query, *statement, *has_many_roots, *root_attribute, *root = NULL, *tmp, result;
+	zval *owner, *right_attribute, left, query, statement, *has_many_roots, *root_attribute, root, tmp, result;
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
-
 	right_attribute = phalcon_read_property(getThis(), SL("_rightAttribute"), PH_NOISY);
 
 	PHALCON_CALL_SELFW(&left, "getleftattribute");
-
 	PHALCON_CALL_METHODW(&query, owner, "query");
 
-	phalcon_sub_function(&tmp, left, &PHALCON_GLOBAL(z_one));
+	phalcon_sub_function(&tmp, &left, &PHALCON_GLOBAL(z_one));
 
 	PHALCON_CONCAT_VSV(&statement, right_attribute, "=", &tmp);
 	PHALCON_CALL_METHODW(NULL, &query, "where", &statement);
@@ -832,7 +830,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, next){
 	phalcon_add_function(&tmp, &right, &PHALCON_GLOBAL(z_one));
 
 	PHALCON_CONCAT_VSV(&statement, left_attribute, "=", &tmp);
-	PHALCON_CALL_METHODW(NULL, query, "where", &statement);
+	PHALCON_CALL_METHODW(NULL, &query, "where", &statement);
 
 	has_many_roots = phalcon_read_property(getThis(), SL("_hasManyRoots"), PH_NOISY);
 
@@ -904,7 +902,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, prepend){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, appendTo){
 
-	zval *target, *attributes = NULL, *right = NULL;
+	zval *target, *attributes = NULL, right;
 
 	phalcon_fetch_params(0, 1, 1, &target, &attributes);
 
@@ -947,7 +945,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, append){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertBefore){
 
-	zval *target, *attributes = NULL, *left = NULL;
+	zval *target, *attributes = NULL, left;
 
 	phalcon_fetch_params(0, 1, 1, &target, &attributes);
 
@@ -980,7 +978,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertAfter){
 
 	PHALCON_CALL_SELFW(&right, "getrightattribute", target);
 
-	phalcon_add_function(&tmp, right, &PHALCON_GLOBAL(z_one));
+	phalcon_add_function(&tmp, &right, &PHALCON_GLOBAL(z_one));
 
 	PHALCON_RETURN_CALL_SELFW("addnode", target, &tmp, &PHALCON_GLOBAL(z_zero), attributes);
 }
@@ -1012,7 +1010,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveBefore){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAfter){
 
-	zval *target, *left = NULL, *tmp = NULL;
+	zval *target, left, tmp;
 
 	phalcon_fetch_params(0, 1, 0, &target);
 
@@ -1102,9 +1100,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 	}
 
 	PHALCON_CALL_METHODW(&connection, owner, "getwriteconnection");
-
 	PHALCON_CALL_METHODW(NULL, &connection, "begin");
-
 	PHALCON_CALL_SELFW(&left, "getleftattribute");
 	PHALCON_CALL_SELFW(&right, "getrightattribute");
 	PHALCON_CALL_SELFW(&level, "getlevelattribute");
@@ -1125,9 +1121,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 
 	phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 
-	PHALCON_CALL_METHODW(&childs, owner, "find", condition);
+	PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(childs), child) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(childs), child) {
 		zval child_left, child_right, child_level, values, ret;
 
 		PHALCON_CALL_SELFW(&child_left, "getleftattribute", child);
@@ -1225,15 +1221,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
 
 	PHALCON_CALL_METHODW(&connection, owner, "getwriteconnection");
 
-	PHALCON_CALL_METHODW(NULL, connection, "begin");
+	PHALCON_CALL_METHODW(NULL, &connection, "begin");
 
 	PHALCON_CALL_SELFW(&is_leaf, "isleaf");
 
 	if (zend_is_true(&is_leaf)) {
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 		PHALCON_CALL_METHODW(&ret, owner, "delete");
-		if (!zend_is_true(is_leaf)) {
-			PHALCON_CALL_METHODW(NULL, connection, "rollback");
+		if (!zend_is_true(&is_leaf)) {
+			PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 			phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 			RETURN_FALSE;
 		}
@@ -1261,7 +1257,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
 
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 
-		PHALCON_CALL_METHODW(&childs, owner, "find", condition);
+		PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 		
 		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
@@ -1303,11 +1299,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 
-	zval *target, *key, *level_up, *owner, *is_new = NULL, *is_deleted = NULL, *is_descendantof = NULL, *is_root = NULL;
-	zval *left_attribute, *right_attribute, *level_attribute, *root_attribute;
-	zval *connection = NULL, *left = NULL,  *right = NULL, *level = NULL, *level2 = NULL;
-	zval *root = NULL, *root2 = NULL, *level_delta, *has_many_roots, *condition = NULL, *childs = NULL, *valid = NULL, *child = NULL, *ret = NULL;
-	zval *values = NULL, *child_left = NULL, *child_right = NULL, *child_level = NULL, *delta = NULL, *tmp = NULL, *tmp1 = NULL, *tmp2 = NULL;
+	zval *target, *key, *level_up, *owner, is_new, is_deleted, is_descendantof, is_root, *left_attribute, *right_attribute, *level_attribute, *root_attribute;
+	zval connection, left,  right, level, level2, root, root2, level_delta, *has_many_roots, condition, childs, valid, child, ret;
+	zval values, child_left, child_right, child_level, delta, tmp, tmp1, tmp2;
 
 	phalcon_fetch_params(0, 3, 0, &target, &key, &level_up);
 

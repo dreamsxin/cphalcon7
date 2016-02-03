@@ -245,266 +245,222 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
-	zval *uri = NULL, *dependency_injector, *events_manager;
-	zval *status = NULL, *service = NULL, *request = NULL, *response = NULL;
-	zval *json = NULL, *data = NULL, *jsonrpc_message, *jsonrpc_error, *jsonrpc_result = NULL;
-	zval *jsonrpc_method, *jsonrpc_params, jsonrpc_id;
-	zval *url = NULL, *router = NULL, *module_name = NULL;
-	zval *module_object = NULL, *modules;
-	zval module, *class_name = NULL, *module_params;
-	zval *namespace_name = NULL;
-	zval *controller_name = NULL, *action_name = NULL, *params = NULL, *exact = NULL;
-	zval *dispatcher = NULL, *controller = NULL, *returned_response = NULL;
-	zval *path;
-
-	PHALCON_MM_GROW();
+	zval *dependency_injector, *events_manager, service, request, json, data, response, jsonrpc_message, jsonrpc_error, jsonrpc_method, jsonrpc_params;
+	zval url, uri, router, module_name, *modules, module, class_name, path, module_object, module_params, status, namespace_name, controller_name, action_name;
+	zval params, exact, dispatcher, controller, jsonrpc_result, jsonrpc_id;
 	
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 	
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) != IS_OBJECT) {
 		events_manager = NULL;
-	}
-	else {
-		PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_mvc_jsonrpc_exception_ce, 1);
+	} else {
+		PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_mvc_jsonrpc_exception_ce, 0);
 	}
 
 	/* Call boot event, this allows the developer to perform initialization actions */
 	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:boot", getThis(), NULL)) {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
 
 	/* Deserializer Json */
 
-	PHALCON_INIT_NVAR(service);
-	ZVAL_STRING(service, ISV(request));
+	ZVAL_STRING(&service, ISV(request));
 	
-	PHALCON_CALL_METHOD(&request, dependency_injector, "getshared", service);
-	PHALCON_VERIFY_INTERFACE(request, phalcon_http_requestinterface_ce);
+	PHALCON_CALL_METHODW(&request, dependency_injector, "getshared", &service);
+	PHALCON_VERIFY_INTERFACEW(&request, phalcon_http_requestinterface_ce);
 
-	PHALCON_CALL_METHOD(&json, request, "getrawbody");
-	PHALCON_CALL_FUNCTION(&data, "json_decode", json, &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHODW(&json, &request, "getrawbody");
+	PHALCON_CALL_FUNCTIONW(&data, "json_decode", &json, &PHALCON_GLOBAL(z_true));
 
+	ZVAL_STRING(&service, ISV(response));
 
-	PHALCON_INIT_NVAR(service);
-	ZVAL_STRING(service, ISV(response));
+	PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
+	PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 
-	PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
-	PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);
+	array_init(&jsonrpc_message);
+	array_init(&jsonrpc_error);
 
-	PHALCON_INIT_VAR(jsonrpc_message);
-	array_init(jsonrpc_message);
-	
-	PHALCON_INIT_VAR(jsonrpc_error);
-	array_init(jsonrpc_error);
-
-	if (PHALCON_IS_EMPTY(data)) {
-		phalcon_array_update_str_long(jsonrpc_error, SL("code"), __LINE__, 0);
-		phalcon_array_update_str_str(jsonrpc_error, SL("message"), SL("Parse error"), PH_COPY);
-	} else if (Z_TYPE_P(data) != IS_ARRAY) {
-		phalcon_array_update_str_long(jsonrpc_error, SL("code"), __LINE__, 0);
-		phalcon_array_update_str_str(jsonrpc_error, SL("message"), SL("Parse error"), PH_COPY);
-	} else if (!phalcon_array_isset_str(data, SL("jsonrpc"))) {		
-			phalcon_array_update_str_long(jsonrpc_error, SL("code"), __LINE__, 0);
-			phalcon_array_update_str_str(jsonrpc_error, SL("message"), SL("Invalid Request"), PH_COPY);
-	} else if (!phalcon_array_isset_str(data, SL("method"))) {
-			phalcon_array_update_str_long(jsonrpc_error, SL("code"), __LINE__, 0);
-			phalcon_array_update_str_str(jsonrpc_error, SL("message"), SL("Invalid Request"), PH_COPY);
+	if (PHALCON_IS_EMPTY(&data)) {
+		phalcon_array_update_str_long(&jsonrpc_error, SL("code"), __LINE__, 0);
+		phalcon_array_update_str_str(&jsonrpc_error, SL("message"), SL("Parse error"), PH_COPY);
+	} else if (Z_TYPE(data) != IS_ARRAY) {
+		phalcon_array_update_str_long(&jsonrpc_error, SL("code"), __LINE__, 0);
+		phalcon_array_update_str_str(&jsonrpc_error, SL("message"), SL("Parse error"), PH_COPY);
+	} else if (!phalcon_array_isset_str(&data, SL("jsonrpc"))) {		
+			phalcon_array_update_str_long(&jsonrpc_error, SL("code"), __LINE__, 0);
+			phalcon_array_update_str_str(&jsonrpc_error, SL("message"), SL("Invalid Request"), PH_COPY);
+	} else if (!phalcon_array_isset_fetch_str(&jsonrpc_method, &data, SL("method"))) {
+			phalcon_array_update_str_long(&jsonrpc_error, SL("code"), __LINE__, 0);
+			phalcon_array_update_str_str(&jsonrpc_error, SL("message"), SL("Invalid Request"), PH_COPY);
 	} else {
-		PHALCON_OBS_VAR(jsonrpc_method);
-		phalcon_array_fetch_str(&jsonrpc_method, data, SL("method"), PH_NOISY);
-
-		if (phalcon_array_isset_str(data, SL("params"))) {
-			PHALCON_OBS_VAR(jsonrpc_params);
-			phalcon_array_fetch_str(&jsonrpc_params, data, SL("params"), PH_NOISY);
-		} else {
-			PHALCON_INIT_VAR(jsonrpc_params);
-			array_init(jsonrpc_params);
+		if (!phalcon_array_isset_fetch_str(&jsonrpc_params, &data, SL("params"))) {
+			array_init(&jsonrpc_params);
 		}
 
-		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, ISV(url));
-		PHALCON_CALL_METHOD(&url, dependency_injector, "getshared", service);
-		PHALCON_VERIFY_INTERFACE(url, phalcon_mvc_urlinterface_ce);
+		ZVAL_STRING(&service, ISV(url));
+		PHALCON_CALL_METHODW(&url, dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACEW(&url, phalcon_mvc_urlinterface_ce);
 
-		PHALCON_CALL_METHOD(&uri, url, "get", jsonrpc_method);
+		PHALCON_CALL_METHODW(&uri, &url, "get", &jsonrpc_method);
 
-		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, ISV(router));
-		PHALCON_CALL_METHOD(&router, dependency_injector, "getshared", service);
-		PHALCON_VERIFY_INTERFACE(router, phalcon_mvc_routerinterface_ce);
+		ZVAL_STRING(&service, ISV(router));
+		PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
 
 		/* Handle the URI pattern (if any) */
-		PHALCON_CALL_METHOD(NULL, router, "handle", uri);
+		PHALCON_CALL_METHODW(NULL, &router, "handle", &uri);
 		
 		/* Load module config */
-		PHALCON_CALL_METHOD(&module_name, router, "getmodulename");
-
-		/* Load module config */
-		PHALCON_CALL_METHOD(&module_name, router, "getmodulename");
+		PHALCON_CALL_METHODW(&module_name, &router, "getmodulename");
 		
 		/* If the router doesn't return a valid module we use the default module */
-		if (!zend_is_true(module_name)) {
-			module_name = phalcon_read_property(getThis(), SL("_defaultModule"), PH_NOISY);
+		if (!zend_is_true(&module_name)) {
+			phalcon_return_property(&module_name, getThis(), SL("_defaultModule"));
 		}
 		
 		/** 
 		 * Process the module definition
 		 */
-		if (zend_is_true(module_name)) {
-			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeStartModule", getThis(), module_name)) {
-				RETURN_MM_FALSE;
+		if (zend_is_true(&module_name)) {
+			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeStartModule", getThis(), &module_name)) {
+				RETURN_FALSE;
 			}
 
 			/** 
 			 * Check if the module passed by the router is registered in the modules container
 			 */
 			modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
-			if (!phalcon_array_isset_fetch(&module, modules, module_name)) {
-				convert_to_string(module_name);
-				zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module %s is not registered in the jsonrpc container", Z_STRVAL_P(module_name));
-				RETURN_MM();
+			if (!phalcon_array_isset_fetch(&module, modules, &module_name)) {
+				convert_to_string(&module_name);
+				zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module %s is not registered in the jsonrpc container", Z_STRVAL(module_name));
+				return;
 			}
 		
 			/** 
 			 * A module definition must be an array or an object
 			 */
-			if (Z_TYPE_P(&module) != IS_ARRAY && Z_TYPE_P(&module) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
+			if (Z_TYPE(module) != IS_ARRAY && Z_TYPE_P(&module) != IS_OBJECT) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
 				return;
 			}
 		
 			/* An array module definition contains a path to a module definition class */
-			if (Z_TYPE_P(&module) == IS_ARRAY) { 
+			if (Z_TYPE(module) == IS_ARRAY) { 
 				/* Class name used to load the module definition */
-				if (phalcon_array_isset_str(&module, SL("className"))) {
-					PHALCON_OBS_VAR(class_name);
-					phalcon_array_fetch_str(&class_name, &module, SL("className"), PH_NOISY);
-				} else {
-					PHALCON_INIT_NVAR(class_name);
-					ZVAL_STRING(class_name, "Module");
+				if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
+					ZVAL_STRING(&class_name, "Module");
 				}
 		
 				/* If the developer has specified a path, try to include the file */
-				if (phalcon_array_isset_str(&module, SL("path"))) {
-		
-					PHALCON_OBS_VAR(path);
-					phalcon_array_fetch_str(&path, &module, SL("path"), PH_NOISY);
-					convert_to_string_ex(path);
-					if (Z_TYPE_P(class_name) != IS_STRING || phalcon_class_exists(class_name, 0) == NULL) {
-						if (phalcon_file_exists(path) == SUCCESS) {
-							RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(path)));
+				if (phalcon_array_isset_fetch_str(&path, &module, SL("path"))) {
+					convert_to_string_ex(&path);
+					if (Z_TYPE(class_name) != IS_STRING || phalcon_class_exists(&class_name, 0) == NULL) {
+						if (phalcon_file_exists(&path) == SUCCESS) {
+							RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(path)));
 						} else {
-							zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module definition path '%s' does not exist", Z_STRVAL_P(path));
-							RETURN_MM();
+							zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module definition path '%s' does not exist", Z_STRVAL(path));
+							return;
 						}
 					}
 				}
 		
-				PHALCON_CALL_METHOD(&module_object, dependency_injector, "get", class_name);
+				PHALCON_CALL_METHODW(&module_object, dependency_injector, "get", &class_name);
 		
 				/** 
 				 * 'registerAutoloaders' and 'registerServices' are automatically called
 				 */
-				PHALCON_CALL_METHOD(NULL, module_object, "registerautoloaders", dependency_injector);
-				PHALCON_CALL_METHOD(NULL, module_object, "registerservices", dependency_injector);
-			} else if (Z_TYPE_P(module) == IS_OBJECT && instanceof_function(Z_OBJCE_P(module), zend_ce_closure)) {
+				PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders", dependency_injector);
+				PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", dependency_injector);
+			} else if (Z_TYPE(module) == IS_OBJECT && instanceof_function(Z_OBJCE(module), zend_ce_closure)) {
 				/* A module definition object, can be a Closure instance */
-				PHALCON_INIT_VAR(module_params);
-				array_init_size(module_params, 1);
-				phalcon_array_append(module_params, dependency_injector, PH_COPY);
+				array_init_size(&module_params, 1);
+				phalcon_array_append(&module_params, dependency_injector, PH_COPY);
 
-				PHALCON_CALL_USER_FUNC_ARRAY(&status, &module, module_params);
+				PHALCON_CALL_USER_FUNC_ARRAYW(&status, &module, &module_params);
 			} else {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
 				return;
 			}
 		
 			/* Calling afterStartModule event */
 			if (events_manager) {
-				if (!module_object) {
-					module_object = &PHALCON_GLOBAL(z_null);
-				}
-
-				phalcon_update_property_this(getThis(), SL("_moduleObject"), module_object);
-				if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterStartModule", getThis(), module_name)) {
-					RETURN_MM_FALSE;
+				phalcon_update_property_this(getThis(), SL("_moduleObject"), &module_object);
+				if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterStartModule", getThis(), &module_name)) {
+					RETURN_FALSE;
 				}
 			}
 		}
 		
 		/* We get the parameters from the router and assign them to the dispatcher */
-		PHALCON_CALL_METHOD(&module_name, router, "getmodulename");
-		PHALCON_CALL_METHOD(&namespace_name, router, "getnamespacename");
-		PHALCON_CALL_METHOD(&controller_name, router, "getcontrollername");
-		PHALCON_CALL_METHOD(&action_name, router, "getactionname");
-		PHALCON_CALL_METHOD(&params, router, "getparams");
-		PHALCON_CALL_METHOD(&exact, router, "isexactcontrollername");
+		PHALCON_CALL_METHODW(&module_name, &router, "getmodulename");
+		PHALCON_CALL_METHODW(&namespace_name, &router, "getnamespacename");
+		PHALCON_CALL_METHODW(&controller_name, &router, "getcontrollername");
+		PHALCON_CALL_METHODW(&action_name, &router, "getactionname");
+		PHALCON_CALL_METHODW(&params, &router, "getparams");
+		PHALCON_CALL_METHODW(&exact, &router, "isexactcontrollername");
 
-		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, ISV(dispatcher));
+		ZVAL_STRING(&service, ISV(dispatcher));
 		
-		PHALCON_CALL_METHOD(&dispatcher, dependency_injector, "getshared", service);
-		PHALCON_VERIFY_INTERFACE(dispatcher, phalcon_dispatcherinterface_ce);
+		PHALCON_CALL_METHODW(&dispatcher, dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACEW(&dispatcher, phalcon_dispatcherinterface_ce);
 		
 		/* Assign the values passed from the router */
-		PHALCON_CALL_METHOD(NULL, dispatcher, "setmodulename", module_name);
-		PHALCON_CALL_METHOD(NULL, dispatcher, "setnamespacename", namespace_name);
-		PHALCON_CALL_METHOD(NULL, dispatcher, "setcontrollername", controller_name, exact);
-		PHALCON_CALL_METHOD(NULL, dispatcher, "setactionname", action_name);
-		PHALCON_CALL_METHOD(NULL, dispatcher, "setparams", jsonrpc_params);
+		PHALCON_CALL_METHODW(NULL, &dispatcher, "setmodulename", &module_name);
+		PHALCON_CALL_METHODW(NULL, &dispatcher, "setnamespacename", &namespace_name);
+		PHALCON_CALL_METHODW(NULL, &dispatcher, "setcontrollername", &controller_name, &exact);
+		PHALCON_CALL_METHODW(NULL, &dispatcher, "setactionname", &action_name);
+		PHALCON_CALL_METHODW(NULL, &dispatcher, "setparams", &jsonrpc_params);
 		
 		/* Calling beforeHandleRequest */
-		RETURN_MM_ON_FAILURE(phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeHandleRequest", getThis(), dispatcher));
+		RETURN_ON_FAILURE(phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeHandleRequest", getThis(), &dispatcher));
 		
 		/* The dispatcher must return an object */
-		PHALCON_CALL_METHOD(&controller, dispatcher, "dispatch");
-		
-		PHALCON_INIT_VAR(returned_response);
+		PHALCON_CALL_METHODW(&controller, &dispatcher, "dispatch");
 		
 		/* Get the latest value returned by an action */
-		PHALCON_CALL_METHOD(&jsonrpc_result, dispatcher, "getreturnedvalue");
+		PHALCON_CALL_METHODW(&jsonrpc_result, &dispatcher, "getreturnedvalue");
 	}
 		
 	/* Calling afterHandleRequest */
-	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterHandleRequest", getThis(), controller) && EG(exception)) {
-		RETURN_MM();
+	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterHandleRequest", getThis(), &controller) && EG(exception)) {
+		return;
 	}
 	
-	phalcon_array_update_str_str(jsonrpc_message, SL("jsonrpc"), SL("2.0"), PH_COPY);
+	phalcon_array_update_str_str(&jsonrpc_message, SL("jsonrpc"), SL("2.0"), PH_COPY);
 
-	if (PHALCON_IS_NOT_EMPTY(jsonrpc_error)) {
-		phalcon_array_update_str(jsonrpc_message, SL("error"), jsonrpc_error, PH_COPY);
+	if (PHALCON_IS_NOT_EMPTY(&jsonrpc_error)) {
+		phalcon_array_update_str(&jsonrpc_message, SL("error"), &jsonrpc_error, PH_COPY);
 	}
 
-	if (jsonrpc_result != NULL) {
-		phalcon_array_update_str(jsonrpc_message, SL("result"), jsonrpc_result, PH_COPY);
+	if (Z_TYPE(jsonrpc_result) > IS_NULL) {
+		phalcon_array_update_str(&jsonrpc_message, SL("result"), &jsonrpc_result, PH_COPY);
 	}
 	
-	if (phalcon_array_isset_fetch_str(&jsonrpc_id, data, SL("id"))) {
-		phalcon_array_update_str(jsonrpc_message, SL("id"), &jsonrpc_id, PH_COPY);
+	if (phalcon_array_isset_fetch_str(&jsonrpc_id, &data, SL("id"))) {
+		phalcon_array_update_str(&jsonrpc_message, SL("id"), &jsonrpc_id, PH_COPY);
 	} else {
-		phalcon_array_update_str(jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);
+		phalcon_array_update_str(&jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);
 	}
 
-	PHALCON_CALL_METHOD(NULL, response, "setjsoncontent", jsonrpc_message);
+	PHALCON_CALL_METHODW(NULL, &response, "setjsoncontent", &jsonrpc_message);
 	
 
 	/* Calling beforeSendResponse */
-	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeSendResponse", getThis(), response) && EG(exception)) {
-		RETURN_MM();
+	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeSendResponse", getThis(), &response) && EG(exception)) {
+		return;
 	}
 	
 	/* Headers are automatically sent */
-	PHALCON_CALL_METHOD(NULL, response, "sendheaders");
+	PHALCON_CALL_METHODW(NULL, &response, "sendheaders");
 	
 	/* Cookies are automatically sent */
-	PHALCON_CALL_METHOD(NULL, response, "sendcookies");
+	PHALCON_CALL_METHODW(NULL, &response, "sendcookies");
 	
 	/* Return the response */
-	RETURN_CCTOR(response);
+	RETURN_CTORW(&response);
 }

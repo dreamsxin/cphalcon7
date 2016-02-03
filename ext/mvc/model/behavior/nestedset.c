@@ -694,12 +694,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, ancestors){
 
 	if (Z_TYPE_P(depth) != IS_NULL) {
 		level_attribute = phalcon_read_property(getThis(), SL("_levelAttribute"), PH_NOISY);
-		PHALCON_CALL_SELF(&level, "getlevelattribute");
+		PHALCON_CALL_SELFW(&level, "getlevelattribute");
 
-		phalcon_sub_function(&tmp, level, depth);
+		phalcon_sub_function(&tmp, &level, depth);
 
 		PHALCON_CONCAT_VSV(&statement, level_attribute, ">=", &tmp);
-		PHALCON_CALL_METHODW(NULL, query, "andwhere", &statement);
+		PHALCON_CALL_METHODW(NULL, &query, "andwhere", &statement);
 	}
 
 	has_many_roots = phalcon_read_property(getThis(), SL("_hasManyRoots"), PH_NOISY);
@@ -1068,108 +1068,95 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsLast){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 
-	zval *has_many_roots, *owner, *is_new = NULL, *is_deleted = NULL, *is_root = NULL;
-	zval *connection = NULL, *left = NULL, *right = NULL, *level = NULL, *root = NULL, *primary_key = NULL, *delta, *level_delta;
-	zval *left_attribute, *right_attribute, *level_attribute, *root_attribute, *condition, *childs = NULL, *child = NULL;
-	zval *child_left = NULL, *child_right = NULL, *child_level = NULL, *values = NULL, *ret = NULL;
-	zval *tmp1, *tmp2;
-
-	PHALCON_MM_GROW();
+	zval *has_many_roots, *owner, is_new, is_deleted, is_root, connection, left, right, level, root, primary_key, delta, level_delta;
+	zval *left_attribute, *right_attribute, *level_attribute, *root_attribute, condition, childs, *child, tmp1, tmp2;
 
 	has_many_roots = phalcon_read_property(getThis(), SL("_hasManyRoots"), PH_NOISY);
 
 	if (!zend_is_true(has_many_roots)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Many roots mode is off");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Many roots mode is off");
 		return;
 	}
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&is_new, owner, "isnewrecord");
+	PHALCON_CALL_METHODW(&is_new, owner, "isnewrecord");
 
-	if (zend_is_true(is_new)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The node should not be new record");
+	if (zend_is_true(&is_new)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The node should not be new record");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&is_deleted, owner, "isdeletedrecord");
+	PHALCON_CALL_METHODW(&is_deleted, owner, "isdeletedrecord");
 
-	if (zend_is_true(is_deleted)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The node should not be deleted");
+	if (zend_is_true(&is_deleted)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The node should not be deleted");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&is_root, owner, "isroot");
+	PHALCON_CALL_METHODW(&is_root, owner, "isroot");
 
-	if (zend_is_true(is_root)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The node already is root node");
+	if (zend_is_true(&is_root)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The node already is root node");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&connection, owner, "getwriteconnection");
+	PHALCON_CALL_METHODW(&connection, owner, "getwriteconnection");
 
-	PHALCON_CALL_METHOD(NULL, connection, "begin");
+	PHALCON_CALL_METHODW(NULL, &connection, "begin");
 
-	PHALCON_CALL_SELF(&left, "getleftattribute");
-	PHALCON_CALL_SELF(&right, "getrightattribute");
-	PHALCON_CALL_SELF(&level, "getlevelattribute");
-	PHALCON_CALL_SELF(&root, "getrootattribute");
-	PHALCON_CALL_SELF(&primary_key, "getprimarykey");
+	PHALCON_CALL_SELFW(&left, "getleftattribute");
+	PHALCON_CALL_SELFW(&right, "getrightattribute");
+	PHALCON_CALL_SELFW(&level, "getlevelattribute");
+	PHALCON_CALL_SELFW(&root, "getrootattribute");
+	PHALCON_CALL_SELFW(&primary_key, "getprimarykey");
 
-	PHALCON_INIT_VAR(delta);
-	phalcon_sub_function(delta, &PHALCON_GLOBAL(z_one), left);
-
-	PHALCON_INIT_VAR(level_delta);
-	phalcon_sub_function(level_delta, &PHALCON_GLOBAL(z_one), level);
+	phalcon_sub_function(&delta, &PHALCON_GLOBAL(z_one), &left);
+	phalcon_sub_function(&level_delta, &PHALCON_GLOBAL(z_one), &level);
 
 	left_attribute = phalcon_read_property(getThis(), SL("_leftAttribute"), PH_NOISY);
 	right_attribute = phalcon_read_property(getThis(), SL("_rightAttribute"), PH_NOISY);
 	level_attribute = phalcon_read_property(getThis(), SL("_levelAttribute"), PH_NOISY);
 	root_attribute = phalcon_read_property(getThis(), SL("_rootAttribute"), PH_NOISY);
 
-	PHALCON_INIT_VAR(condition);
-	PHALCON_CONCAT_VSVS(condition, left_attribute, ">=", left, " AND ");
-	PHALCON_SCONCAT_VSVS(condition, right_attribute, "<=", right, " AND ");
-	PHALCON_SCONCAT_VSV(condition, root_attribute, "=", root);
+	PHALCON_CONCAT_VSVS(&condition, left_attribute, ">=", &left, " AND ");
+	PHALCON_SCONCAT_VSVS(&condition, right_attribute, "<=", &right, " AND ");
+	PHALCON_SCONCAT_VSV(&condition, root_attribute, "=", &root);
 
 	phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 
-	PHALCON_CALL_METHOD(&childs, owner, "find", condition);
+	PHALCON_CALL_METHODW(&childs, owner, "find", condition);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(childs), child) {
-		PHALCON_CALL_SELF(&child_left, "getleftattribute", child);
-		PHALCON_CALL_SELF(&child_right, "getrightattribute", right);
-		PHALCON_CALL_SELF(&child_level, "getlevelattribute", right);
+		zval child_left, child_right, child_level, values, ret;
 
-		PHALCON_INIT_NVAR(values);
-		array_init(values);
+		PHALCON_CALL_SELFW(&child_left, "getleftattribute", child);
+		PHALCON_CALL_SELFW(&child_right, "getrightattribute", &right);
+		PHALCON_CALL_SELFW(&child_level, "getlevelattribute", &right);
 
-		phalcon_array_update_zval_long(values, left_attribute, (phalcon_get_intval(child_left) + phalcon_get_intval(delta)), 0);
-		phalcon_array_update_zval_long(values, right_attribute, (phalcon_get_intval(child_right) + phalcon_get_intval(delta)), 0);
-		phalcon_array_update_zval_long(values, level_attribute, (phalcon_get_intval(child_level) + phalcon_get_intval(level_delta)), 0);
-		phalcon_array_update_zval(values, root_attribute, primary_key, PH_COPY);
+		array_init(&values);
 
-		PHALCON_CALL_METHOD(&ret, child, "update", values);
-		if (!zend_is_true(ret)) {
-			PHALCON_CALL_METHOD(NULL, connection, "rollback");
+		phalcon_array_update_zval_long(&values, left_attribute, (phalcon_get_intval(&child_left) + phalcon_get_intval(&delta)), 0);
+		phalcon_array_update_zval_long(&values, right_attribute, (phalcon_get_intval(&child_right) + phalcon_get_intval(&delta)), 0);
+		phalcon_array_update_zval_long(&values, level_attribute, (phalcon_get_intval(&child_level) + phalcon_get_intval(&level_delta)), 0);
+		phalcon_array_update_zval(&values, root_attribute, &primary_key, PH_COPY);
+
+		PHALCON_CALL_METHODW(&ret, child, "update", &values);
+		if (!zend_is_true(&ret)) {
+			PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 			phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 		}
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 
-	PHALCON_INIT_VAR(tmp1);
-	ZVAL_LONG(tmp1, phalcon_get_intval(right) + 1);
+	ZVAL_LONG(&tmp1, phalcon_get_intval(&right) + 1);
+	ZVAL_LONG(&tmp2, phalcon_get_intval(&left) - phalcon_get_intval(&right) - 1);
 
-	PHALCON_INIT_VAR(tmp2);
-	ZVAL_LONG(tmp2, phalcon_get_intval(left) - phalcon_get_intval(right) - 1);
+	PHALCON_CALL_SELFW(NULL, "shiftleftright", &tmp1, &tmp2);
 
-	PHALCON_CALL_SELF(NULL, "shiftleftright", tmp1, tmp2);
-
-	PHALCON_CALL_METHOD(NULL, connection, "commit");
-
-	RETURN_MM();
+	PHALCON_CALL_METHODW(NULL, &connection, "commit");
 }
 
 /**
@@ -1181,11 +1168,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, saveNode){
 
-	zval *attributes = NULL, *white_list = NULL, *primary_key = NULL, *owner;
+	zval *attributes = NULL, *white_list = NULL, primary_key, *owner;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 2, &attributes, &white_list);
+	phalcon_fetch_params(0, 0, 2, &attributes, &white_list);
 
 	if (!attributes) {
 		attributes = &PHALCON_GLOBAL(z_null);
@@ -1195,22 +1180,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, saveNode){
 		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_SELF(&primary_key, "getprimarykey");
+	PHALCON_CALL_SELFW(&primary_key, "getprimarykey");
 
-	if (!zend_is_true(primary_key)) {
-		PHALCON_RETURN_CALL_SELF("makeroot", attributes, white_list);
-		RETURN_MM();
+	if (!zend_is_true(&primary_key)) {
+		PHALCON_RETURN_CALL_SELFW("makeroot", attributes, white_list);
+		return;
 	}
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 
 	phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 
-	PHALCON_RETURN_CALL_METHOD(owner, "update", attributes, white_list);
+	PHALCON_RETURN_CALL_METHODW(owner, "update", attributes, white_list);
 
 	phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-
-	RETURN_MM();
 }
 
 /**
@@ -1221,105 +1204,93 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, saveNode){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
 
-	zval *owner, *is_new = NULL, *is_deleted = NULL, *connection = NULL, *is_leaf = NULL, *ret = NULL;
-	zval *left_attribute, *right_attribute, *root_attribute, *has_many_roots, *left = NULL, *right = NULL, *root = NULL, *condition;
-	zval *childs = NULL, *valid = NULL, *child = NULL, *tmp1 = NULL, *tmp2 = NULL;
-
-	PHALCON_MM_GROW();
+	zval *owner, is_new, is_deleted, connection, is_leaf, ret, *left_attribute, *right_attribute, *root_attribute, *has_many_roots;
+	zval left, right, root, condition, childs, valid, child, tmp1, tmp2;
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&is_new, owner, "isnewrecord");
+	PHALCON_CALL_METHODW(&is_new, owner, "isnewrecord");
 
-	if (zend_is_true(is_new)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The node cannot be deleted because it is new");
+	if (zend_is_true(&is_new)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The node cannot be deleted because it is new");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&is_deleted, owner, "isdeletedrecord");
+	PHALCON_CALL_METHODW(&is_deleted, owner, "isdeletedrecord");
 
-	if (zend_is_true(is_deleted)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The node cannot be deleted because it is already deleted");
+	if (zend_is_true(&is_deleted)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The node cannot be deleted because it is already deleted");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&connection, owner, "getwriteconnection");
+	PHALCON_CALL_METHODW(&connection, owner, "getwriteconnection");
 
-	PHALCON_CALL_METHOD(NULL, connection, "begin");
+	PHALCON_CALL_METHODW(NULL, connection, "begin");
 
-	PHALCON_CALL_SELF(&is_leaf, "isleaf");
+	PHALCON_CALL_SELFW(&is_leaf, "isleaf");
 
-	if (zend_is_true(is_leaf)) {
+	if (zend_is_true(&is_leaf)) {
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
-		PHALCON_CALL_METHOD(&ret, owner, "delete");
+		PHALCON_CALL_METHODW(&ret, owner, "delete");
 		if (!zend_is_true(is_leaf)) {
-			PHALCON_CALL_METHOD(NULL, connection, "rollback");
+			PHALCON_CALL_METHODW(NULL, connection, "rollback");
 			phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 		}
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
+
+		PHALCON_CALL_SELFW(&left, "getleftattribute");
+		PHALCON_CALL_SELFW(&right, "getrightattribute");
 	} else {
 		left_attribute = phalcon_read_property(getThis(), SL("_leftAttribute"), PH_NOISY);
 		right_attribute = phalcon_read_property(getThis(), SL("_rightAttribute"), PH_NOISY);
 
-		PHALCON_CALL_SELF(&left, "getleftattribute");
-		PHALCON_CALL_SELF(&right, "getrightattribute");
+		PHALCON_CALL_SELFW(&left, "getleftattribute");
+		PHALCON_CALL_SELFW(&right, "getrightattribute");
 
 		has_many_roots = phalcon_read_property(getThis(), SL("_hasManyRoots"), PH_NOISY);
 
-		PHALCON_INIT_VAR(condition);
-		PHALCON_CONCAT_VSVS(condition, left_attribute, ">=", left, " AND ");
-		PHALCON_SCONCAT_VSV(condition, right_attribute, "<=", right);
+		PHALCON_CONCAT_VSVS(&condition, left_attribute, ">=", &left, " AND ");
+		PHALCON_SCONCAT_VSV(&condition, right_attribute, "<=", &right);
 
 		if (zend_is_true(has_many_roots)) {
 			root_attribute = phalcon_read_property(getThis(), SL("_rootAttribute"), PH_NOISY);
-			PHALCON_CALL_SELF(&root, "getrootattribute");
-			PHALCON_SCONCAT_VSV(condition, root_attribute, "=", root);
+			PHALCON_CALL_SELFW(&root, "getrootattribute");
+			PHALCON_SCONCAT_VSV(&condition, root_attribute, "=", &root);
 		}
 
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 
-		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
+		PHALCON_CALL_METHODW(&childs, owner, "find", condition);
 		
-		PHALCON_CALL_METHOD(NULL, childs, "rewind");
+		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&valid, childs, "valid");
-			if (!PHALCON_IS_NOT_FALSE(valid)) {
+			PHALCON_CALL_METHODW(&valid, &childs, "valid");
+			if (!PHALCON_IS_NOT_FALSE(&valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, &childs, "current");
 
-			PHALCON_CALL_METHOD(&ret, child, "delete");
-			if (!zend_is_true(ret)) {
-				PHALCON_CALL_METHOD(NULL, connection, "rollback");
+			PHALCON_CALL_METHODW(&ret, &child, "delete");
+			if (!zend_is_true(&ret)) {
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 
-			PHALCON_CALL_METHOD(NULL, childs, "next");
+			PHALCON_CALL_METHODW(NULL, &childs, "next");
 		}
 
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 	}
 
-	if (!left || !right) {
-		PHALCON_CALL_SELF(&left, "getleftattribute");
-		PHALCON_CALL_SELF(&right, "getrightattribute");
-	}
+	ZVAL_LONG(&tmp1, phalcon_get_intval(&right) + 1);
+	ZVAL_LONG(&tmp2, phalcon_get_intval(&left) - phalcon_get_intval(&right) - 1);
 
-	PHALCON_INIT_VAR(tmp1);
-	ZVAL_LONG(tmp1, phalcon_get_intval(right) + 1);
-
-	PHALCON_INIT_VAR(tmp2);
-	ZVAL_LONG(tmp2, phalcon_get_intval(left) - phalcon_get_intval(right) - 1);
-
-	PHALCON_CALL_SELF(NULL, "shiftleftright", tmp1, tmp2);
-
-	PHALCON_CALL_METHOD(NULL, connection, "commit");
-
-	RETURN_MM_TRUE;
+	PHALCON_CALL_SELFW(NULL, "shiftleftright", &tmp1, &tmp2);
+	PHALCON_CALL_METHODW(NULL, &connection, "commit");
 }
 
 /**
@@ -1338,61 +1309,59 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 	zval *root = NULL, *root2 = NULL, *level_delta, *has_many_roots, *condition = NULL, *childs = NULL, *valid = NULL, *child = NULL, *ret = NULL;
 	zval *values = NULL, *child_left = NULL, *child_right = NULL, *child_level = NULL, *delta = NULL, *tmp = NULL, *tmp1 = NULL, *tmp2 = NULL;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 3, 0, &target, &key, &level_up);
 
-	phalcon_fetch_params(1, 3, 0, &target, &key, &level_up);
-
-	PHALCON_VERIFY_INTERFACE(target, phalcon_mvc_modelinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(target, phalcon_mvc_modelinterface_ce);
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 
 	if (PHALCON_IS_EQUAL(owner, target)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The target node should not be self");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The target node should not be self");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(NULL, owner, "refresh");
-	PHALCON_CALL_METHOD(NULL, target, "refresh");
+	PHALCON_CALL_METHODW(NULL, owner, "refresh");
+	PHALCON_CALL_METHODW(NULL, target, "refresh");
 
-	PHALCON_CALL_METHOD(&is_new, owner, "isnewrecord");
+	PHALCON_CALL_METHODW(&is_new, owner, "isnewrecord");
 
-	if (zend_is_true(is_new)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The node should not be new record");
+	if (zend_is_true(&is_new)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The node should not be new record");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&is_deleted, owner, "isdeletedrecord");
+	PHALCON_CALL_METHODW(&is_deleted, owner, "isdeletedrecord");
 
-	if (zend_is_true(is_deleted)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The node should not be deleted");
+	if (zend_is_true(&is_deleted)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The node should not be deleted");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&is_new, target, "isnewrecord");
+	PHALCON_CALL_METHODW(&is_new, target, "isnewrecord");
 
-	if (zend_is_true(is_new)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The target should not be new record");
+	if (zend_is_true(&is_new)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The target should not be new record");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&is_deleted, target, "isdeletedrecord");
+	PHALCON_CALL_METHODW(&is_deleted, target, "isdeletedrecord");
 
-	if (zend_is_true(is_deleted)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The target should not be deleted");
+	if (zend_is_true(&is_deleted)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The target should not be deleted");
 		return;
 	}
 
-	PHALCON_CALL_SELF(&is_descendantof, "isdescendantof", target);
+	PHALCON_CALL_SELFW(&is_descendantof, "isdescendantof", target);
 
-	if (zend_is_true(is_deleted)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The target node should not be descendant");
+	if (zend_is_true(&is_deleted)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The target node should not be descendant");
 		return;
 	}
 
-	PHALCON_CALL_SELF(&is_root, "isroot", target);
+	PHALCON_CALL_SELFW(&is_root, "isroot", target);
 
-	if (!zend_is_true(level_up) && zend_is_true(is_root)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The target node should not be root");
+	if (!zend_is_true(level_up) && zend_is_true(&is_root)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The target node should not be root");
 		return;
 	}
 
@@ -1401,293 +1370,257 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 	level_attribute = phalcon_read_property(getThis(), SL("_levelAttribute"), PH_NOISY);
 	root_attribute = phalcon_read_property(getThis(), SL("_rootAttribute"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&connection, owner, "getwriteconnection");
+	PHALCON_CALL_METHODW(&connection, owner, "getwriteconnection");
 
-	PHALCON_CALL_METHOD(NULL, connection, "begin");
+	PHALCON_CALL_METHODW(NULL, &connection, "begin");
 
-	PHALCON_CALL_SELF(&left, "getleftattribute");
-	PHALCON_CALL_SELF(&right, "getrightattribute");
-	PHALCON_CALL_SELF(&level, "getlevelattribute");
-	PHALCON_CALL_SELF(&root, "getrootattribute");
+	PHALCON_CALL_SELFW(&left, "getleftattribute");
+	PHALCON_CALL_SELFW(&right, "getrightattribute");
+	PHALCON_CALL_SELFW(&level, "getlevelattribute");
+	PHALCON_CALL_SELFW(&root, "getrootattribute");
 
-	PHALCON_CALL_SELF(&level2, "getlevelattribute", target);
-	PHALCON_CALL_SELF(&root2, "getrootattribute", target);
+	PHALCON_CALL_SELFW(&level2, "getlevelattribute", target);
+	PHALCON_CALL_SELFW(&root2, "getrootattribute", target);
 
-	PHALCON_INIT_VAR(level_delta);
-	ZVAL_LONG(level_delta, phalcon_get_intval(level2) - phalcon_get_intval(level) + phalcon_get_intval(level_up));
+	ZVAL_LONG(&level_delta, phalcon_get_intval(&level2) - phalcon_get_intval(&level) + phalcon_get_intval(level_up));
 
 	has_many_roots = phalcon_read_property(getThis(), SL("_hasManyRoots"), PH_NOISY);
 
-	if (zend_is_true(has_many_roots) && !PHALCON_IS_EQUAL(root, root2)) {
+	if (zend_is_true(has_many_roots) && !PHALCON_IS_EQUAL(&root, &root2)) {
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 
-		PHALCON_INIT_NVAR(condition);
-		PHALCON_CONCAT_VSVS(condition, left_attribute, ">=", key, " AND ");
-		PHALCON_SCONCAT_VSV(condition, root_attribute, "=", root2);
+		PHALCON_CONCAT_VSVS(&condition, left_attribute, ">=", key, " AND ");
+		PHALCON_SCONCAT_VSV(&condition, root_attribute, "=", &root2);
 
-		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
-
-		PHALCON_CALL_METHOD(NULL, childs, "rewind");
+		PHALCON_CALL_METHODW(&childs, owner, "find", condition);
+		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&valid, childs, "valid");
-			if (!PHALCON_IS_NOT_FALSE(valid)) {
+			PHALCON_CALL_METHODW(&valid, &childs, "valid");
+			if (!PHALCON_IS_NOT_FALSE(&valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, &childs, "current");
+			PHALCON_CALL_SELFW(&child_left, "getleftattribute", &child);
 
-			PHALCON_CALL_SELF(&child_left, "getleftattribute", child);
+			ZVAL_LONG(&tmp, phalcon_get_intval(&child_left) + phalcon_get_intval(&right) - phalcon_get_intval(&left) + 1);
 
-			PHALCON_INIT_NVAR(tmp);
-			ZVAL_LONG(tmp, phalcon_get_intval(child_left) + phalcon_get_intval(right) - phalcon_get_intval(left) + 1);
+			array_init(&values);
 
-			PHALCON_INIT_NVAR(values);
-			array_init(values);
+			phalcon_array_update_zval(&values, left_attribute, &tmp, PH_COPY);
 
-			phalcon_array_update_zval(values, left_attribute, tmp, PH_COPY);
-
-			PHALCON_CALL_METHOD(&ret, child, "update", values);
+			PHALCON_CALL_METHODW(&ret, &child, "update", &values);
 			if (!zend_is_true(ret)) {
-				PHALCON_CALL_METHOD(NULL, connection, "rollback");
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 
-			PHALCON_CALL_METHOD(NULL, childs, "next");
+			PHALCON_CALL_METHODW(NULL, &childs, "next");
 		}
 
-		PHALCON_INIT_NVAR(condition);
-		PHALCON_CONCAT_VSVS(condition, right_attribute, ">=", key, " AND ");
-		PHALCON_SCONCAT_VSV(condition, root_attribute, "=", root2);
+		PHALCON_CONCAT_VSVS(&condition, right_attribute, ">=", key, " AND ");
+		PHALCON_SCONCAT_VSV(&condition, root_attribute, "=", &root2);
 
-		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
+		PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 
-		PHALCON_CALL_METHOD(NULL, childs, "rewind");
+		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&valid, childs, "valid");
+			PHALCON_CALL_METHODW(&valid, childs, "valid");
 			if (!PHALCON_IS_NOT_FALSE(valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, childs, "current");
+			PHALCON_CALL_SELFW(&child_right, "getrightattribute", &child);
 
-			PHALCON_CALL_SELF(&child_right, "getrightattribute", child);
+			ZVAL_LONG(&tmp, phalcon_get_intval(&child_right) + phalcon_get_intval(&right) - phalcon_get_intval(&left) + 1);
 
-			PHALCON_INIT_NVAR(tmp);
-			ZVAL_LONG(tmp, phalcon_get_intval(child_right) + phalcon_get_intval(right) - phalcon_get_intval(left) + 1);
+			array_init(&values);
 
-			PHALCON_INIT_NVAR(values);
-			array_init(values);
+			phalcon_array_update_zval(&values, right_attribute, &tmp, PH_COPY);
 
-			phalcon_array_update_zval(values, right_attribute, tmp, PH_COPY);
-
-			PHALCON_CALL_METHOD(&ret, child, "update", values);
-			if (!zend_is_true(ret)) {
-				PHALCON_CALL_METHOD(NULL, connection, "rollback");
+			PHALCON_CALL_METHODW(&ret, &child, "update", &values);
+			if (!zend_is_true(&ret)) {
+				PHALCON_CALL_METHODW(NULL, connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 
-			PHALCON_CALL_METHOD(NULL, childs, "next");
+			PHALCON_CALL_METHODW(NULL, &childs, "next");
 		}
 
-		PHALCON_INIT_NVAR(delta);
-		ZVAL_LONG(delta, phalcon_get_intval(key) - phalcon_get_intval(left));
+		ZVAL_LONG(&delta, phalcon_get_intval(key) - phalcon_get_intval(&left));
 
-		PHALCON_INIT_NVAR(condition);
-		PHALCON_CONCAT_VSVS(condition, left_attribute, ">=", left, " AND ");
-		PHALCON_SCONCAT_VSVS(condition, right_attribute, "<=", right, " AND ");
-		PHALCON_SCONCAT_VSV(condition, root_attribute, "=", root);
+		PHALCON_CONCAT_VSVS(&condition, left_attribute, ">=", &left, " AND ");
+		PHALCON_SCONCAT_VSVS(&condition, right_attribute, "<=", &right, " AND ");
+		PHALCON_SCONCAT_VSV(&condition, root_attribute, "=", &root);
 
-		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
-
-		PHALCON_CALL_METHOD(NULL, childs, "rewind");
+		PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
+		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&valid, childs, "valid");
+			PHALCON_CALL_METHODW(&valid, childs, "valid");
 			if (!PHALCON_IS_NOT_FALSE(valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, childs, "current");
 
-			PHALCON_CALL_SELF(&child_left, "getleftattribute", child);
-			PHALCON_CALL_SELF(&child_right, "getrightattribute", child);
-			PHALCON_CALL_SELF(&child_level, "getlevelattribute", child);
+			PHALCON_CALL_SELFW(&child_left, "getleftattribute", &child);
+			PHALCON_CALL_SELFW(&child_right, "getrightattribute", &child);
+			PHALCON_CALL_SELFW(&child_level, "getlevelattribute", &child);
 
-			PHALCON_INIT_NVAR(values);
-			array_init(values);
+			array_init(&values);
 
-			phalcon_array_update_zval_long(values, left_attribute, (phalcon_get_intval(child_left) + phalcon_get_intval(delta)), 0);
-			phalcon_array_update_zval_long(values, right_attribute, (phalcon_get_intval(child_right) + phalcon_get_intval(delta)), 0);
-			phalcon_array_update_zval_long(values, level_attribute, (phalcon_get_intval(child_level) + phalcon_get_intval(level_delta)), 0);
+			phalcon_array_update_zval_long(&values, left_attribute, (phalcon_get_intval(&child_left) + phalcon_get_intval(&delta)), 0);
+			phalcon_array_update_zval_long(&values, right_attribute, (phalcon_get_intval(&child_right) + phalcon_get_intval(&delta)), 0);
+			phalcon_array_update_zval_long(&values, level_attribute, (phalcon_get_intval(&child_level) + phalcon_get_intval(&level_delta)), 0);
 			phalcon_array_update_zval(values, root_attribute, root2, PH_COPY);
 
-			PHALCON_CALL_METHOD(&ret, child, "update", values);
-			if (!zend_is_true(ret)) {
-				PHALCON_CALL_METHOD(NULL, connection, "rollback");
+			PHALCON_CALL_METHODW(&ret, &child, "update", &values);
+			if (!zend_is_true(&ret)) {
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 
-			PHALCON_CALL_METHOD(NULL, childs, "next");
+			PHALCON_CALL_METHODW(NULL, &childs, "next");
 		}
 
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 
-		PHALCON_INIT_NVAR(tmp1);
-		ZVAL_LONG(tmp1, phalcon_get_intval(right) + 1);
+		ZVAL_LONG(&tmp1, phalcon_get_intval(&right) + 1);
+		ZVAL_LONG(&tmp2, phalcon_get_intval(&left) - phalcon_get_intval(&right) - 1);
 
-		PHALCON_INIT_NVAR(tmp2);
-		ZVAL_LONG(tmp2, phalcon_get_intval(left) - phalcon_get_intval(right) - 1);
-
-		PHALCON_CALL_SELF(NULL, "shiftleftright", tmp1, tmp2);
-
-		PHALCON_CALL_METHOD(NULL, connection, "commit");
+		PHALCON_CALL_SELFW(NULL, "shiftleftright", &tmp1, &tmp2);
+		PHALCON_CALL_METHODW(NULL, connection, "commit");
 	} else {
-		PHALCON_INIT_NVAR(delta);
-		ZVAL_LONG(delta, phalcon_get_intval(right) - phalcon_get_intval(left) + 1);
+		ZVAL_LONG(&delta, phalcon_get_intval(&right) - phalcon_get_intval(&left) + 1);
 
-		PHALCON_CALL_SELF(NULL, "shiftleftright", key, delta);
+		PHALCON_CALL_SELFW(NULL, "shiftleftright", key, &delta);
 
-		PHALCON_INIT_NVAR(condition);
-		PHALCON_CONCAT_VSVS(condition, left_attribute, ">=", left, " AND ");
-		PHALCON_SCONCAT_VSV(condition, right_attribute, "<=", right);
+		PHALCON_CONCAT_VSVS(&condition, left_attribute, ">=", &left, " AND ");
+		PHALCON_SCONCAT_VSV(&condition, right_attribute, "<=", &right);
 
 		if (zend_is_true(has_many_roots)) {
-			PHALCON_SCONCAT_SVSV(condition, " AND ", root_attribute, "=", root);
+			PHALCON_SCONCAT_SVSV(condition, " AND ", root_attribute, "=", &root);
 		}
 		
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 
-		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
-
-		PHALCON_CALL_METHOD(NULL, childs, "rewind");
+		PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
+		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&valid, childs, "valid");
-			if (!PHALCON_IS_NOT_FALSE(valid)) {
+			PHALCON_CALL_METHODW(&valid, childs, "valid");
+			if (!PHALCON_IS_NOT_FALSE(&valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, &childs, "current");
 
-			PHALCON_CALL_SELF(&child_level, "getlevelattribute", child);
+			PHALCON_CALL_SELFW(&child_level, "getlevelattribute", &child);
 
-			PHALCON_INIT_NVAR(values);
-			array_init(values);
+			array_init(&values);
 
-			phalcon_array_update_zval_long(values, level_attribute, (phalcon_get_intval(level) + phalcon_get_intval(level_delta)), 0);
+			phalcon_array_update_zval_long(&values, level_attribute, (phalcon_get_intval(&level) + phalcon_get_intval(&level_delta)), 0);
 
-			PHALCON_CALL_METHOD(&ret, child, "update", values);
-			if (!zend_is_true(ret)) {
-				PHALCON_CALL_METHOD(NULL, connection, "rollback");
+			PHALCON_CALL_METHODW(&ret, &child, "update", &values);
+			if (!zend_is_true(&ret)) {
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 
-			PHALCON_CALL_METHOD(NULL, childs, "next");
+			PHALCON_CALL_METHODW(NULL, &childs, "next");
 		}
-		
-		PHALCON_INIT_NVAR(condition);
-		PHALCON_CONCAT_VSVS(condition, left_attribute, ">=", left, " AND ");
-		PHALCON_SCONCAT_VSV(condition, left_attribute, "<=", right);
+
+		PHALCON_CONCAT_VSVS(&condition, left_attribute, ">=", &left, " AND ");
+		PHALCON_SCONCAT_VSV(&condition, left_attribute, "<=", &right);
 
 		if (zend_is_true(has_many_roots)) {
-			PHALCON_SCONCAT_SVSV(condition, " AND ", root_attribute, "=", root);
+			PHALCON_SCONCAT_SVSV(&condition, " AND ", root_attribute, "=", &root);
 		}
 
-		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
+		PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 
-		PHALCON_CALL_METHOD(NULL, childs, "rewind");
+		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&valid, childs, "valid");
-			if (!PHALCON_IS_NOT_FALSE(valid)) {
+			PHALCON_CALL_METHODW(&valid, &childs, "valid");
+			if (!PHALCON_IS_NOT_FALSE(&valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, &childs, "current");
+			PHALCON_CALL_SELFW(&child_left, "getleftattribute", &child);
 
-			PHALCON_CALL_SELF(&child_left, "getleftattribute", child);
+			ZVAL_LONG(&tmp, phalcon_get_intval(&child_left) + phalcon_get_intval(&key) - phalcon_get_intval(&left));
 
-			PHALCON_INIT_NVAR(tmp);
-			ZVAL_LONG(tmp, phalcon_get_intval(child_left) + phalcon_get_intval(key) - phalcon_get_intval(left));
+			array_init(&values);
 
-			PHALCON_INIT_NVAR(values);
-			array_init(values);
+			phalcon_array_update_zval(&values, left_attribute, &tmp, PH_COPY);
 
-			phalcon_array_update_zval(values, left_attribute, tmp, PH_COPY);
-
-			PHALCON_CALL_METHOD(&ret, child, "update", values);
-			if (!zend_is_true(ret)) {
-				PHALCON_CALL_METHOD(NULL, connection, "rollback");
+			PHALCON_CALL_METHODW(&ret, child, "update", &values);
+			if (!zend_is_true(&ret)) {
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 
-			PHALCON_CALL_METHOD(NULL, childs, "next");
+			PHALCON_CALL_METHODW(NULL, &childs, "next");
 		}
-		
-		PHALCON_INIT_NVAR(condition);
-		PHALCON_CONCAT_VSVS(condition, right_attribute, ">=", left, " AND ");
-		PHALCON_SCONCAT_VSV(condition, right_attribute, "<=", right);
+
+		PHALCON_CONCAT_VSVS(&condition, right_attribute, ">=", &left, " AND ");
+		PHALCON_SCONCAT_VSV(&condition, right_attribute, "<=", &right);
 
 		if (zend_is_true(has_many_roots)) {
-			PHALCON_SCONCAT_SVSV(condition, " AND ", root_attribute, "=", root);
+			PHALCON_SCONCAT_SVSV(&condition, " AND ", root_attribute, "=", &root);
 		}
 
-		PHALCON_CALL_METHOD(&childs, owner, "find", condition);
+		PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 
-		PHALCON_CALL_METHOD(NULL, childs, "rewind");
+		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&valid, childs, "valid");
+			PHALCON_CALL_METHODW(&valid, &childs, "valid");
 			if (!PHALCON_IS_NOT_FALSE(valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, &childs, "current");
+			PHALCON_CALL_SELFW(&child_right, "getrightattribute", &child);
 
-			PHALCON_CALL_SELF(&child_right, "getrightattribute", child);
+			ZVAL_LONG(&tmp, phalcon_get_intval(&child_right) + phalcon_get_intval(key) - phalcon_get_intval(&left));
 
-			PHALCON_INIT_NVAR(tmp);
-			ZVAL_LONG(tmp, phalcon_get_intval(child_right) + phalcon_get_intval(key) - phalcon_get_intval(left));
-
-			PHALCON_INIT_NVAR(values);
-			array_init(values);
+			array_init(&values);
 
 			phalcon_array_update_zval(values, right_attribute, tmp, PH_COPY);
 
-			PHALCON_CALL_METHOD(&ret, child, "update", values);
-			if (!zend_is_true(ret)) {
-				PHALCON_CALL_METHOD(NULL, connection, "rollback");
+			PHALCON_CALL_METHODW(&ret, &child, "update", &values);
+			if (!zend_is_true(&ret)) {
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 
-			PHALCON_CALL_METHOD(NULL, childs, "next");
+			PHALCON_CALL_METHODW(NULL, &childs, "next");
 		}
 
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 
-		PHALCON_INIT_NVAR(tmp1);
-		ZVAL_LONG(tmp1, phalcon_get_intval(right) + 1);
+		ZVAL_LONG(&tmp1, phalcon_get_intval(&right) + 1);
+		ZVAL_LONG(&tmp2, 0 - phalcon_get_intval(&delta));
 
-		PHALCON_INIT_NVAR(tmp2);
-		ZVAL_LONG(tmp2, 0 - phalcon_get_intval(delta));
-
-		PHALCON_CALL_SELF(NULL, "shiftleftright", tmp1, tmp2);
-
-		PHALCON_CALL_METHOD(NULL, connection, "commit");
+		PHALCON_CALL_SELFW(NULL, "shiftleftright", &tmp1, &tmp2);
+		PHALCON_CALL_METHODW(NULL, &connection, "commit");
 	}
 
-	PHALCON_CALL_METHOD(NULL, owner, "refresh");
-	PHALCON_CALL_METHOD(NULL, target, "refresh");
-
-	RETURN_MM_TRUE;
+	PHALCON_CALL_METHODW(NULL, owner, "refresh");
+	PHALCON_CALL_METHODW(NULL, target, "refresh");
 }
 
 /**

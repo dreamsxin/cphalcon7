@@ -1386,7 +1386,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 		PHALCON_CONCAT_VSVS(&condition, left_attribute, ">=", key, " AND ");
 		PHALCON_SCONCAT_VSV(&condition, root_attribute, "=", &root2);
 
-		PHALCON_CALL_METHODW(&childs, owner, "find", condition);
+		PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
@@ -1405,7 +1405,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 			phalcon_array_update_zval(&values, left_attribute, &tmp, PH_COPY);
 
 			PHALCON_CALL_METHODW(&ret, &child, "update", &values);
-			if (!zend_is_true(ret)) {
+			if (!zend_is_true(&ret)) {
 				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 				RETURN_FALSE;
@@ -1422,12 +1422,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHODW(&valid, childs, "valid");
-			if (!PHALCON_IS_NOT_FALSE(valid)) {
+			PHALCON_CALL_METHODW(&valid, &childs, "valid");
+			if (!PHALCON_IS_NOT_FALSE(&valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHODW(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, &childs, "current");
 			PHALCON_CALL_SELFW(&child_right, "getrightattribute", &child);
 
 			ZVAL_LONG(&tmp, phalcon_get_intval(&child_right) + phalcon_get_intval(&right) - phalcon_get_intval(&left) + 1);
@@ -1438,7 +1438,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 
 			PHALCON_CALL_METHODW(&ret, &child, "update", &values);
 			if (!zend_is_true(&ret)) {
-				PHALCON_CALL_METHODW(NULL, connection, "rollback");
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 				RETURN_FALSE;
 			}
@@ -1456,12 +1456,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 		PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 		while (1) {
-			PHALCON_CALL_METHODW(&valid, childs, "valid");
+			PHALCON_CALL_METHODW(&valid, &childs, "valid");
 			if (!PHALCON_IS_NOT_FALSE(valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHODW(&child, childs, "current");
+			PHALCON_CALL_METHODW(&child, &childs, "current");
 
 			PHALCON_CALL_SELFW(&child_left, "getleftattribute", &child);
 			PHALCON_CALL_SELFW(&child_right, "getrightattribute", &child);

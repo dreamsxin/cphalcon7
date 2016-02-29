@@ -3350,7 +3350,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	zval service_name, has, service_params, resultset;
 	zend_string *str_key;
 	ulong idx;
-	int have_scalars = 0, have_objects = 0, is_complex = 0, is_simple_std = 0, size_t number_objects = 0;
+	int have_scalars = 0, have_objects = 0, is_complex = 0, is_simple_std = 0;
+	size_t number_objects = 0;
 
 	phalcon_fetch_params(0, 3, 0, &intermediate, &bind_params, &bind_types);
 	PHALCON_SEPARATE_PARAM(intermediate);
@@ -3411,7 +3412,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			/** 
 			 * Mark the type of connection in the connection flags
 			 */
-			phalcon_array_update_zval_bool(&connections, &type2, 1, PH_COPY);
+			phalcon_array_update_zval_bool(&connections, &type, 1, PH_COPY);
 
 			phalcon_fast_count(&connection_types, &connections);
 
@@ -3976,21 +3977,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
-	zval *model, *intermediate, *bind_params, *bind_types;
-	zval *selected_tables, *selected_models, *source = NULL;
+	zval *model, *intermediate, *bind_params, *bind_types, selected_tables, selected_models, source;
 	zval *model_name, *select_column, *selected_columns;
 	zval *select_ir, *where_conditions, *limit_conditions;
 	zval *type_select, *dependency_injector, *service_name, *has = NULL, *parameters, *query = NULL;
 	zval *a0 = NULL;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 4, 0, &model, &intermediate, &bind_params, &bind_types);
 
-	phalcon_fetch_params(1, 4, 0, &model, &intermediate, &bind_params, &bind_types);
-
-	PHALCON_OBS_VAR(selected_tables);
 	phalcon_array_fetch_str(&selected_tables, intermediate, SL("tables"), PH_NOISY);
-
-	PHALCON_OBS_VAR(selected_models);
 	phalcon_array_fetch_str(&selected_models, intermediate, SL("models"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&source, model, "getsource");

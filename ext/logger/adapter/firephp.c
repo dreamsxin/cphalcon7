@@ -102,8 +102,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 
-	zval *message, *type, *time, *context, *formatter = NULL, *applied_format = NULL;
-	zval *initialized, *index;
+	zval *message, *type, *time, *context, formatter, initialized, applied_format, index;
 	sapi_header_line h = { NULL, 0, 0 };
 	smart_str str      = { 0 };
 	int size, offset;
@@ -116,14 +115,12 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		RETURN_FALSE;
 	}
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
-	phalcon_fetch_params(1, 4, 0, &message, &type, &time, &context);
+	PHALCON_CALL_METHODW(&formatter, getThis(), "getformatter");
 
-	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
-
-	initialized = phalcon_read_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_initialized"));
-	if (!zend_is_true(initialized)) {
+	phalcon_return_static_property_ce(&initialized, phalcon_logger_adapter_firephp_ce, SL("_initialized"));
+	if (!zend_is_true(&initialized)) {
 		/**
 		 * Send the required initialization headers.
 		 * Use Zend API here so that the user can see the progress and because
@@ -142,16 +139,15 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		h.line_len = sizeof("X-Wf-1-Structure-1: http://meta.firephp.org/Wildfire/Structure/FirePHP/FirebugConsole/0.1")-1;
 		sapi_header_op(SAPI_HEADER_REPLACE, &h);
 
-		ZVAL_TRUE(initialized); /* This will also update the property because "initialized" was not separated */
+		ZVAL_TRUE(&initialized); /* This will also update the property because "initialized" was not separated */
 	}
 
-	PHALCON_CALL_METHOD(&applied_format, formatter, "format", message, type, time, context);
-	convert_to_string(applied_format);
+	PHALCON_CALL_METHODW(&applied_format, &formatter, "format", message, type, time, context);
+	convert_to_string(&applied_format);
 
-	index = phalcon_read_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"));
-	assert(Z_TYPE_P(index) == IS_LONG);
+	phalcon_return_static_property_ce(&index, phalcon_logger_adapter_firephp_ce, SL("_index"));
 
-	size   = Z_STRLEN_P(applied_format);
+	size   = Z_STRLEN(applied_format);
 	offset = 0;
 
 	/**
@@ -162,7 +158,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 
 	while (size > 0) {
 		smart_str_appends(&str, "X-Wf-1-1-1-");
-		smart_str_append_long(&str, Z_LVAL_P(index));
+		smart_str_append_long(&str, Z_LVAL(index));
 		smart_str_appends(&str, ": ");
 		num_bytes = size > chunk ? chunk : size;
 
@@ -172,7 +168,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		}
 
 		/* Grab the chunk from the encoded string */
-		smart_str_appendl(&str, Z_STRVAL_P(applied_format) + offset, num_bytes);
+		smart_str_appendl(&str, Z_STRVAL(applied_format) + offset, num_bytes);
 
 		size   -= num_bytes;
 		offset += num_bytes;
@@ -189,7 +185,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		h.line_len = str.s->len;
 		sapi_header_op(SAPI_HEADER_REPLACE, &h);
 
-		ZVAL_LONG(index, Z_LVAL_P(index)+1);
+		ZVAL_LONG(&index, Z_LVAL(index)+1);
 
 		/**
 		 * Do not free and then reallocate memory. Just pretend the string
@@ -199,13 +195,11 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	}
 
 	if (separate_index) {
-		phalcon_update_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"), index);
+		phalcon_update_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"), &index);
 	}
 
 	/* Deallocate the smnart string if it is not empty */
 	smart_str_free(&str);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

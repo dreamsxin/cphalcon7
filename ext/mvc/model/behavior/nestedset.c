@@ -1851,18 +1851,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, makeRoot){
 
 	PHALCON_CALL_SELFW(&primary_key, "getprimarykey", owner);
 
-	phalcon_update_property_zval_zval(owner, root_attribute, primary_key);
+	phalcon_update_property_zval_zval(owner, root_attribute, &primary_key);
 
 	PHALCON_CALL_METHODW(&ret, owner, "save");
 	if (!zend_is_true(&ret)) {
-		PHALCON_CALL_METHODW(NULL, connection, "rollback");
+		PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 		phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 		RETURN_FALSE;
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 0);
 
-	PHALCON_CALL_METHODW(NULL, connection, "commit");
+	PHALCON_CALL_METHODW(NULL, &connection, "commit");
 
 	RETURN_TRUE;
 }

@@ -3346,7 +3346,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	zval *intermediate, *bind_params, *bind_types, manager, models_instances, models, number_models;
 	zval model_name, model, connection, connections, *model_name2, columns, *column, select_columns;
 	zval simple_column_map, meta_data, dialect, sql_select, processed, *value, processed_types;
-	zval result, count, result_data, *dependency_injector, *cache, result_object;
+	zval result, count, result_data, *dependency_injector, *cache, result_object, is_keeping_snapshots;
 	zval service_name, has, service_params, resultset;
 	zend_string *str_key;
 	ulong idx;
@@ -3473,7 +3473,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	PHALCON_CALL_SELFW(&meta_data, "getmodelsmetadata");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(columns), idx, str_key, column) {
-		zval key, type, sql_column, model_name, instance, attributes, column_map, *attribute, is_keeping_snapshots, column_alias, sql_alias;
+		zval key, type, sql_column, model_name, instance, attributes, column_map, *attribute, column_alias, sql_alias;
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 		} else {
@@ -3608,7 +3608,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				SEPARATE_ZVAL(value);
 				convert_to_string(value);
 
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, value, sql_select);
+				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, value, &sql_select);
 
 				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
 			} else if (Z_TYPE(tmp) == IS_LONG) {
@@ -3652,7 +3652,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	/**
 	 * Execute the query
 	 */
-	PHALCON_CALL_METHODW(&result, connection, "query", &sql_select, &processed, &processed_types);
+	PHALCON_CALL_METHODW(&result, &connection, "query", &sql_select, &processed, &processed_types);
 
 	/** 
 	 * Check if the query has data

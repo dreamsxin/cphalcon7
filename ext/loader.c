@@ -584,25 +584,18 @@ PHP_METHOD(Phalcon_Loader, findFile){
  */
 PHP_METHOD(Phalcon_Loader, autoLoad){
 
-	zval *class_name, *events_manager, event_name;
-	zval *classes, *file_path, *extensions, ds, namespace_separator;
-	zval *empty_str, *namespaces, *directory = NULL;
-	zval *file_name = NULL;
-	zval *pseudo_separator, *prefixes;
-	zval *ds_class_name = NULL, *ns_class_name = NULL;
-	zval *directories, *found = NULL;
+	zval *class_name, events_manager, event_name, *classes, file_path, found, ds, namespace_separator, *extensions, empty_str;
+	zval namespaces, *directory, pseudo_separator, prefixes, ds_class_name, ns_class_name, directories;
 	zend_string *str_key;
 	ulong idx;
 	char slash[2] = {DEFAULT_SLASH, 0};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &class_name);
 
-	phalcon_fetch_params(1, 1, 0, &class_name);
-
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
-	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "loader:beforeCheckClass");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), class_name);
+		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
 	}
 
 	/** 
@@ -610,42 +603,36 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	 */
 	classes = phalcon_read_property(getThis(), SL("_classes"), PH_NOISY);
 	if (Z_TYPE_P(classes) == IS_ARRAY) { 
-		if (phalcon_array_isset(classes, class_name)) {
-
-			PHALCON_OBS_VAR(file_path);
-			phalcon_array_fetch(&file_path, classes, class_name, PH_NOISY);
-			convert_to_string_ex(file_path);
-			if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-				phalcon_update_property_this(getThis(), SL("_foundPath"), file_path);
+		if (phalcon_array_isset_fetch(&file_path, classes, class_name)) {
+			convert_to_string_ex(&file_path);
+			if (Z_TYPE(events_manager) == IS_OBJECT) {
+				phalcon_update_property_this(getThis(), SL("_foundPath"), &file_path);
 
 				ZVAL_STRING(&event_name, "loader:pathFound");
-				PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), file_path);
+				PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), &file_path);
 			}
 
-			RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL_P(file_path)));
+			RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
 
-			found = &PHALCON_GLOBAL(z_true);
+			ZVAL_TRUE(&found);
 		}
 	}
 
 	ZVAL_STRING(&ds, slash);
 	ZVAL_STRING(&namespace_separator, "\\");
 
-	if (found == NULL || !zend_is_true(found)) {
+	if (!zend_is_true(&found)) {
 		extensions = phalcon_read_property(getThis(), SL("_extensions"), PH_NOISY);
 
-
-		PHALCON_INIT_VAR(empty_str);
-		ZVAL_EMPTY_STRING(empty_str);
+		ZVAL_EMPTY_STRING(&empty_str);
 
 		/** 
 		 * Checking in namespaces
 		 */
-		namespaces = phalcon_read_property(getThis(), SL("_namespaces"), PH_NOISY);
-		if (Z_TYPE_P(namespaces) == IS_ARRAY) { 
-
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(namespaces), idx, str_key, directory) {
-				zval ns_prefix, ns_prefixed;
+		phalcon_return_property(&namespaces, getThis(), SL("_namespaces"));
+		if (Z_TYPE(namespaces) == IS_ARRAY) { 
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(namespaces), idx, str_key, directory) {
+				zval ns_prefix, ns_prefixed, file_name;
 				if (str_key) {
 					ZVAL_STR(&ns_prefix, str_key);
 				} else {
@@ -660,13 +647,11 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 					/** 
 					 * Get the possible file path
 					 */
-					PHALCON_INIT_NVAR(file_name);
-					phalcon_possible_autoload_filepath(file_name, &ns_prefix, class_name, &ds, NULL);
-					if (zend_is_true(file_name)) {
+					phalcon_possible_autoload_filepath(&file_name, &ns_prefix, class_name, &ds, NULL);
+					if (zend_is_true(&file_name)) {
+						PHALCON_CALL_METHODW(&found, getThis(), "findfile", &file_name, directory, extensions, &ds);
 
-						PHALCON_CALL_METHOD(&found, getThis(), "findfile", file_name, directory, extensions, &ds);
-
-						if (zend_is_true(found)) {
+						if (zend_is_true(&found)) {
 							break;
 						}
 					}
@@ -676,18 +661,16 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		}
 	}
 
-	if (found == NULL || !zend_is_true(found)) {
-		PHALCON_INIT_VAR(pseudo_separator);
-		ZVAL_STRING(pseudo_separator, "_");
+	if (!zend_is_true(&found)) {
+		ZVAL_STRING(&pseudo_separator, "_");
 
 		/** 
 		 * Checking in prefixes
 		 */
-		prefixes = phalcon_read_property(getThis(), SL("_prefixes"), PH_NOISY);
-		if (Z_TYPE_P(prefixes) == IS_ARRAY) { 
-
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(prefixes), idx, str_key, directory) {
-				zval prefix;
+		phalcon_return_property(&prefixes, getThis(), SL("_prefixes"));
+		if (Z_TYPE(prefixes) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(prefixes), idx, str_key, directory) {
+				zval prefix, file_name;
 				if (str_key) {
 					ZVAL_STR(&prefix, str_key);
 				} else {
@@ -702,13 +685,11 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 					/** 
 					 * Get the possible file path
 					 */
-					PHALCON_INIT_NVAR(file_name);
-					phalcon_possible_autoload_filepath(file_name, &prefix, class_name, &ds, pseudo_separator);
-					if (zend_is_true(file_name)) {
+					phalcon_possible_autoload_filepath(&file_name, &prefix, class_name, &ds, &pseudo_separator);
+					if (zend_is_true(&file_name)) {
+						PHALCON_CALL_METHODW(&found, getThis(), "findfile", &file_name, directory, extensions, &ds);
 
-						PHALCON_CALL_METHOD(&found, getThis(), "findfile", file_name, directory, extensions, &ds);
-
-						if (zend_is_true(found)) {
+						if (zend_is_true(&found)) {
 							break;
 						}
 					}
@@ -717,41 +698,41 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		}
 	}
 
-	if (found == NULL || !zend_is_true(found)) {
+	if (!zend_is_true(&found)) {
 		/** 
 		 * Change the pseudo-separator by the directory separator in the class name
 		 */
-		PHALCON_STR_REPLACE(&ds_class_name, pseudo_separator, &ds, class_name);
+		PHALCON_STR_REPLACE(&ds_class_name, &pseudo_separator, &ds, class_name);
 
 		/** 
 		 * And change the namespace separator by directory separator too
 		 */
-		PHALCON_STR_REPLACE(&ns_class_name, &namespace_separator, &ds, ds_class_name);
+		PHALCON_STR_REPLACE(&ns_class_name, &namespace_separator, &ds, &ds_class_name);
 
 		/** 
 		 * Checking in directories
 		 */
-		directories = phalcon_read_property(getThis(), SL("_directories"), PH_NOISY);
+		phalcon_return_property(&directories, getThis(), SL("_directories"));
 
-		PHALCON_CALL_METHOD(&found, getThis(), "findfile", ns_class_name, directories, extensions, &ds);
+		PHALCON_CALL_METHODW(&found, getThis(), "findfile", &ns_class_name, &directories, extensions, &ds);
 	}
 
 	/** 
 	 * Call 'afterCheckClass' event
 	 */
-	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "loader:afterCheckClass");
-		PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), class_name);
+		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
 	}
 
-	if (found != NULL && zend_is_true(found)) {
-		RETURN_MM_TRUE;
+	if (zend_is_true(&found)) {
+		RETURN_TRUE;
 	}
 
 	/** 
 	 * Cannot find the class return false
 	 */
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**

@@ -495,16 +495,15 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
  */
 PHP_METHOD(Phalcon_Assets_Manager, output){
 
-	zval *collection, *callback, *type = NULL, *args = NULL, z_type, output, use_implicit_output, exception_message;
+	zval *collection, *callback, *z_type = NULL, *args = NULL, type, output, use_implicit_output, exception_message;
 	zval resources, filters, prefix, type_css, source_base_path, target_base_path, options, collection_source_path;
-	zval complete_source_path, collection_target_path, complete_target_path, join, is_directory;
+	zval complete_source_path, collection_target_path, complete_target_path, join, is_directory, local;
 	zval *resource, target_uri, prefixed_path, attributes, parameters, filtered_joined_content, html;
 
 	phalcon_fetch_params(0, 2, 2, &collection, &callback, &type, &args);
 
-	if (!type) {
-		PHALCON_CALL_METHODW(&z_type, resource, "gettype");
-		type = &z_type;
+	if (z_type) {
+		ZVAL_COPY_VALUE(&type, z_type);
 	}
 
 	if (!args) {
@@ -615,9 +614,13 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(resources), resource) {
-		zval filter_needed, local, source_path, target_path, path, content, must_filter, *filter;
+		zval filter_needed, source_path, target_path, path, content, must_filter, *filter;
 
 		ZVAL_FALSE(&filter_needed);
+
+		if (Z_TYPE(type) <= IS_NULL) {
+			PHALCON_CALL_METHOD(&type, resource, "gettype");
+		}
 
 		/** 
 		 * Is the resource local?
@@ -771,7 +774,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				 * Update the joined filtered content
 				 */
 				if (zend_is_true(&join)) {
-					if (PHALCON_IS_EQUAL(type, &type_css)) {
+					if (PHALCON_IS_EQUAL(&type, &type_css)) {
 						if (Z_TYPE(filtered_joined_content) <= IS_NULL) {
 							PHALCON_CONCAT_VS(&filtered_joined_content, &content, "");
 						} else {
@@ -898,7 +901,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			}
 
 			phalcon_array_append(&parameters, &local, PH_COPY);
-			phalcon_array_append(&parameters, &args, PH_COPY);
+			phalcon_array_append(&parameters, args, PH_COPY);
 
 			/** 
 			 * Call the callback to generate the HTML
@@ -962,7 +965,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
  */
 PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 
-	zval *collection_name = NULL, *args = NULL, *collection = NULL, *callback, *type = NULL;
+	zval *collection_name = NULL, *args = NULL, collection, callback, type;
 
 	phalcon_fetch_params(0, 0, 2, &collection_name, &args);
 

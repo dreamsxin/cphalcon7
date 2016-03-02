@@ -3346,7 +3346,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	zval *intermediate, *bind_params, *bind_types, manager, models_instances, models, number_models;
 	zval model_name, model, connection, connections, *model_name2, columns, *column, select_columns;
 	zval simple_column_map, meta_data, dialect, sql_select, processed, *value, processed_types;
-	zval result, count, result_data, *dependency_injector, *cache, result_object, is_keeping_snapshots;
+	zval result, count, result_data, *dependency_injector, cache, result_object, is_keeping_snapshots;
 	zval service_name, has, service_params, resultset;
 	zend_string *str_key;
 	ulong idx;
@@ -3669,7 +3669,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	/** 
 	 * Choose a resultset type
 	 */
-	cache = phalcon_read_property(getThis(), SL("_cache"), PH_NOISY);
+	phalcon_return_property(&cache, getThis(), SL("_cache"));
 	if (!is_complex) {
 		/** 
 		 * Select the base object
@@ -3718,7 +3718,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			PHALCON_CALL_METHODW(&resultset, dependency_injector, "get", &service_name, &service_params);
 		} else {
 			object_init_ex(&resultset, phalcon_mvc_model_resultset_simple_ce);
-			PHALCON_CALL_METHODW(NULL, &resultset, "__construct", &simple_column_map, &result_object, &result_data, cache, &is_keeping_snapshots, &model);
+			PHALCON_CALL_METHODW(NULL, &resultset, "__construct", &simple_column_map, &result_object, &result_data, &cache, &is_keeping_snapshots, &model);
 		}
 
 		RETURN_CTORW(&resultset);
@@ -3733,13 +3733,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			array_init(&service_params);
 			phalcon_array_append(&service_params, &columns, PH_COPY);
 			phalcon_array_append(&service_params, &result_data, PH_COPY);
-			phalcon_array_append(&service_params, cache, PH_COPY);
+			phalcon_array_append(&service_params, &cache, PH_COPY);
 			phalcon_array_append(&service_params, &model, PH_COPY);
 
 			PHALCON_CALL_METHODW(&resultset, dependency_injector, "get", &service_name, &service_params);
 		} else {
 			object_init_ex(&resultset, phalcon_mvc_model_resultset_complex_ce);
-			PHALCON_CALL_METHODW(NULL, &resultset, "__construct", &columns, &result_data, cache, &model);
+			PHALCON_CALL_METHODW(NULL, &resultset, "__construct", &columns, &result_data, &cache, &model);
 		}
 	}
 
@@ -3770,7 +3770,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 	PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
 
-	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"), PH_NOISY);
+	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
 	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name)) {
 		PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
 	}
@@ -3813,7 +3813,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 	phalcon_fast_count(&number_rows, &rows);
 
-	i_rows = phalcon_get_intval(number_rows);
+	i_rows = phalcon_get_intval(&number_rows);
 	if (i_rows < 1) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The rows count must be greater than or equal to one");
 		return;

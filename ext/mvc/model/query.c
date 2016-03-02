@@ -3685,7 +3685,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			 */
 			ZVAL_FALSE(&is_keeping_snapshots);
 		} else {
-			ZVAL_COPY(&result_object, model);
+			ZVAL_COPY(&result_object, &model);
 
 			PHALCON_CALL_METHODW(NULL, &result_object, "reset");
 
@@ -3705,7 +3705,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		 */
 		ZVAL_STRING(&service_name, "modelsResultsetSimple");
 
-		PHALCON_CALL_METHODW(&has, dependency_injector, "has", service_name);
+		PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
 			array_init(&service_params);
 			phalcon_array_append(&service_params, &simple_column_map, PH_COPY);

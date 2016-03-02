@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 		transaction = phalcon_read_property(getThis(), SL("_transaction"), PH_NOISY);
 		if (zend_is_true(transaction)) {
 			object_init_ex(&queue_item, phalcon_logger_item_ce);
-			PHALCON_CALL_METHODW(NULL, queue_item, "__construct", message, &level, &timestamp, context);
+			PHALCON_CALL_METHODW(NULL, &queue_item, "__construct", message, &level, &timestamp, context);
 
 			phalcon_update_property_array_append(getThis(), SL("_queue"), &queue_item);
 		}

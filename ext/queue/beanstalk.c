@@ -684,15 +684,15 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, write){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, disconnect){
 
-	zval *connection;
+	zval connection;
 	php_stream *stream;
 
-	connection = phalcon_read_property(getThis(), SL("_connection"));
-	if (Z_TYPE_P(connection) != IS_RESOURCE) {
+	phalcon_return_property(&connection, getThis(), SL("_connection"));
+	if (Z_TYPE(connection) != IS_RESOURCE) {
 		RETURN_FALSE;
 	}
 
-	php_stream_from_zval_no_verify(stream, connection);
+	php_stream_from_zval_no_verify(stream, &connection);
 	if (!stream) {
 		RETURN_FALSE;
 	}

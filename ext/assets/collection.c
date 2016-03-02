@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_Assets_Collection, rewind){
  */
 PHP_METHOD(Phalcon_Assets_Collection, current){
 
-	zval *position, *resources, *resource;
+	zval *position, *resources;
 
 	position  = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
 	resources = phalcon_read_property(getThis(), SL("_resources"), PH_NOISY);

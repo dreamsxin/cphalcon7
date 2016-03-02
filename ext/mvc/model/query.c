@@ -3560,7 +3560,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				phalcon_array_append(&column_alias, &PHALCON_GLOBAL(z_null), PH_COPY);
 			} else {
 				array_init_size(&column_alias, 3);
-				phalcon_array_append(&column_alias, sql_column, PH_COPY);
+				phalcon_array_append(&column_alias, &sql_column, PH_COPY);
 				phalcon_array_append(&column_alias, &PHALCON_GLOBAL(z_null), PH_COPY);
 				phalcon_array_append(&column_alias, &key, PH_COPY);
 			}
@@ -3978,10 +3978,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
 	zval *model, *intermediate, *bind_params, *bind_types, selected_tables, selected_models, source;
-	zval *model_name, *select_column, *selected_columns;
-	zval *select_ir, *where_conditions, *limit_conditions;
-	zval *type_select, *dependency_injector, *service_name, *has = NULL, *parameters, *query = NULL;
-	zval *a0 = NULL;
+	zval model_name, select_column, a0, selected_columns, select_ir, where_conditions, limit_conditions;
+	zval type_select, dependency_injector, service_name, has, parameters, query;
 
 	phalcon_fetch_params(0, 4, 0, &model, &intermediate, &bind_params, &bind_types);
 
@@ -3990,83 +3988,69 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
 	PHALCON_CALL_METHODW(&source, model, "getsource");
 
-	PHALCON_INIT_VAR(model_name);
-	phalcon_get_class(model_name, model, 0);
+	phalcon_get_class(&model_name, model, 0);
 
-	PHALCON_INIT_VAR(select_column);
-	array_init_size(select_column, 1);
+	array_init_size(&select_column, 1);
 
-	PHALCON_INIT_VAR(a0);
-	array_init_size(a0, 3);
-	phalcon_array_update_string_str(a0, IS(type), SL("object"), PH_COPY);
-	phalcon_array_update_str(a0, SL("model"), model_name, PH_COPY);
-	phalcon_array_update_str(a0, SL("column"), source, PH_COPY);
-	phalcon_array_append(select_column, a0, PH_COPY);
+	array_init_size(&a0, 3);
+	phalcon_array_update_string_str(&a0, IS(type), SL("object"), PH_COPY);
+	phalcon_array_update_str(&a0, SL("model"), &model_name, PH_COPY);
+	phalcon_array_update_str(&a0, SL("column"), &source, PH_COPY);
+	phalcon_array_append(&select_column, &a0, PH_COPY);
 
-	PHALCON_INIT_VAR(selected_columns);
-	array_init_size(selected_columns, 1);
-	phalcon_array_append(selected_columns, select_column, PH_COPY);
+	array_init_size(&selected_columns, 1);
+	phalcon_array_append(&selected_columns, &select_column, PH_COPY);
 
 	/** 
 	 * Instead of create a PQHL string statement we manually create the IR
 	 * representation
 	 */
-	PHALCON_INIT_VAR(select_ir);
-	array_init_size(select_ir, 3);
-	phalcon_array_update_str(select_ir, SL("columns"), select_column, PH_COPY);
-	phalcon_array_update_str(select_ir, SL("models"), selected_models, PH_COPY);
-	phalcon_array_update_str(select_ir, SL("tables"), selected_tables, PH_COPY);
+	array_init_size(&select_ir, 3);
+	phalcon_array_update_str(&select_ir, SL("columns"), &select_column, PH_COPY);
+	phalcon_array_update_str(&select_ir, SL("models"), &selected_models, PH_COPY);
+	phalcon_array_update_str(&select_ir, SL("tables"), &selected_tables, PH_COPY);
 
 	/** 
 	 * Check if a WHERE clause was especified
 	 */
-	if (phalcon_array_isset_str(intermediate, SL("where"))) {
-		PHALCON_OBS_VAR(where_conditions);
-		phalcon_array_fetch_str(&where_conditions, intermediate, SL("where"), PH_NOISY);
-		phalcon_array_update_str(select_ir, SL("where"), where_conditions, PH_COPY);
+	if (phalcon_array_isset_fetch_str(&where_conditions, intermediate, SL("where"))) {
+		phalcon_array_update_str(&select_ir, SL("where"), &where_conditions, PH_COPY);
 	}
 
 	/** 
 	 * Check if a WHERE clause was especified
 	 */
-	if (phalcon_array_isset_str(intermediate, SL("limit"))) {
-		PHALCON_OBS_VAR(limit_conditions);
-		phalcon_array_fetch_str(&limit_conditions, intermediate, SL("limit"), PH_NOISY);
-		phalcon_array_update_str(select_ir, SL("limit"), limit_conditions, PH_COPY);
+	if (phalcon_array_isset_fetch_str(&limit_conditions, intermediate, SL("limit"))) {
+		phalcon_array_update_str(&select_ir, SL("limit"), &limit_conditions, PH_COPY);
 	}
 
-	PHALCON_INIT_VAR(type_select);
-	ZVAL_LONG(type_select, 309);
+	ZVAL_LONG(&type_select, 309);
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
+	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
 
 	/** 
 	 * We create another Phalcon\Mvc\Model\Query to get the related records
 	 */
-	PHALCON_INIT_VAR(service_name);
-	ZVAL_STRING(service_name, "modelsQuery");
+	ZVAL_STRING(&service_name, "modelsQuery");
 
-	PHALCON_CALL_METHODW(&has, dependency_injector, "has", service_name);
-	if (zend_is_true(has)) {
-		PHALCON_INIT_VAR(parameters);
-		array_init(parameters);
+	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {
+		array_init(&parameters);
 
-		phalcon_array_append(parameters, &PHALCON_GLOBAL(z_null), PH_COPY);
-		phalcon_array_append(parameters, dependency_injector, PH_COPY);
+		phalcon_array_append(&parameters, &PHALCON_GLOBAL(z_null), PH_COPY);
+		phalcon_array_append(&parameters, &dependency_injector, PH_COPY);
 
-		PHALCON_CALL_METHODW(&query, dependency_injector, "get", service_name, parameters);
+		PHALCON_CALL_METHODW(&query, &dependency_injector, "get", &service_name, &parameters);
 	} else {
-		PHALCON_INIT_NVAR(query);
-		object_init_ex(query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHODW(NULL, query, "__construct", &PHALCON_GLOBAL(z_null), dependency_injector);
+		object_init_ex(&query, phalcon_mvc_model_query_ce);
+		PHALCON_CALL_METHODW(NULL, &query, "__construct", &PHALCON_GLOBAL(z_null), &dependency_injector);
 	}
 
-	PHALCON_CALL_METHODW(NULL, query, "settype", type_select);
-	PHALCON_CALL_METHODW(NULL, query, "setintermediate", select_ir);
-	PHALCON_CALL_METHODW(NULL, query, "setbindparams", bind_params);
-	PHALCON_CALL_METHODW(NULL, query, "setbindtypes", bind_types);
-	PHALCON_RETURN_CALL_METHOD(query, "execute");
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_METHODW(NULL, &query, "settype", &type_select);
+	PHALCON_CALL_METHODW(NULL, &query, "setintermediate", &select_ir);
+	PHALCON_CALL_METHODW(NULL, &query, "setbindparams", bind_params);
+	PHALCON_CALL_METHODW(NULL, &query, "setbindtypes", bind_types);
+	PHALCON_RETURN_CALL_METHODW(&query, "execute");
 }
 
 /**
@@ -4080,136 +4064,102 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 	zval *intermediate, *bind_params, *bind_types, *use_rawsql = NULL;
-	zval *models, *model_name, *models_instances;
-	zval *model = NULL, *manager = NULL, *connection = NULL, *dialect = NULL, *double_colon;
-	zval *empty_string, *fields, *values, *update_values;
-	zval *select_bind_params = NULL, *select_bind_types = NULL;
-	zval *null_value, *field = NULL, *field_name = NULL;
-	zval *value = NULL, *type = NULL, *expr_value = NULL, *update_value = NULL;
-	zval *update_expr = NULL, *wildcard = NULL, exception_message;
-	zval *records = NULL, *success = NULL, *record = NULL;
-	zval *update_sql = NULL, *r0 = NULL;
-	zval *processed = NULL, *string_wildcard = NULL, *raw_value = NULL, *sql_tmp = NULL;
+	zval models, model_name, models_instances, model, manager, connection, dialect, double_colon;
+	zval empty_string, fields, values, update_values, select_bind_params, select_bind_types;
+	zval *field, records, success, update_sql, processed, *raw_value;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 1, &intermediate, &bind_params, &bind_types, &use_rawsql);
+	phalcon_fetch_params(0, 3, 1, &intermediate, &bind_params, &bind_types, &use_rawsql);
 
 	if (!use_rawsql) {
 		use_rawsql = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_OBS_VAR(models);
 	phalcon_array_fetch_str(&models, intermediate, SL("models"), PH_NOISY);
-	if (phalcon_array_isset_long(models, 1)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Updating several models at the same time is still not supported");
+	if (phalcon_array_isset_long(&models, 1)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Updating several models at the same time is still not supported");
 		return;
 	}
 
-	PHALCON_OBS_VAR(model_name);
-	phalcon_array_fetch_long(&model_name, models, 0, PH_NOISY);
+	phalcon_array_fetch_long(&model_name, &models, 0, PH_NOISY);
 
 	/** 
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
-	models_instances = phalcon_read_property(getThis(), SL("_modelsInstances"), PH_NOISY);
-	if (phalcon_array_isset(models_instances, model_name)) {
-		PHALCON_OBS_VAR(model);
-		phalcon_array_fetch(&model, models_instances, model_name, PH_NOISY);
-	} else {
-		PHALCON_CALL_SELF(&manager, "getmodelsmanager");
-		PHALCON_CALL_METHODW(&model, manager, "load", model_name);
+	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
+	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name)) {
+		PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
+		PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
 	}
 
-	PHALCON_CALL_METHODW(&connection, model, "getwriteconnection", intermediate, bind_params, bind_types);
-
-	PHALCON_CALL_METHODW(&dialect, connection, "getdialect");
-
-	PHALCON_INIT_VAR(null_value);
+	PHALCON_CALL_METHODW(&connection, &model, "getwriteconnection", intermediate, bind_params, bind_types);
+	PHALCON_CALL_METHODW(&dialect, &connection, "getdialect");
 
 	if (!zend_is_true(use_rawsql)) {
-		PHALCON_OBS_VAR(fields);
 		phalcon_array_fetch_str(&fields, intermediate, SL("fields"), PH_NOISY);
-
-		PHALCON_OBS_VAR(values);
 		phalcon_array_fetch_str(&values, intermediate, SL("values"), PH_NOISY);
 
-		PHALCON_INIT_VAR(double_colon);
-		ZVAL_STRING(double_colon, ":");
-
-		PHALCON_INIT_VAR(empty_string);
-		ZVAL_EMPTY_STRING(empty_string);
+		ZVAL_STRING(&double_colon, ":");
+		ZVAL_EMPTY_STRING(&empty_string);
 
 		/** 
 		 * update_values is applied to every record
 		 */
-		PHALCON_INIT_VAR(update_values);
-		array_init(update_values);
+		array_init(&update_values);
 
 		/** 
 		 * If a placeholder is unused in the update values, we assume that it's used in the
 		 * SELECT
 		 */
-		PHALCON_CPY_WRT(select_bind_params, bind_params);
-		PHALCON_CPY_WRT(select_bind_types, bind_types);
+		ZVAL_COPY_VALUE(&select_bind_params, bind_params);
+		ZVAL_COPY_VALUE(&select_bind_types, bind_types);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, field) {
-			zval tmp;
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
+			zval tmp, field_name, value, type, expr_value, update_value, wildcard, exception_message;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
 
-			PHALCON_OBS_NVAR(field_name);
-			if (phalcon_array_isset_string(field, IS(balias))) {
-				phalcon_array_fetch_string(&field_name, field, IS(balias), PH_NOISY);
-			} else {
+			if (!phalcon_array_isset_fetch_string(&field_name, field, IS(balias))) {
 				phalcon_array_fetch_string(&field_name, field, IS(name), PH_NOISY);
 			}
 
-			PHALCON_OBS_NVAR(value);
 			phalcon_array_fetch(&value, values, &tmp, PH_NOISY);
-
-			PHALCON_OBS_NVAR(type);
 			phalcon_array_fetch_string(&type, value, IS(type), PH_NOISY);
-
-			PHALCON_OBS_NVAR(expr_value);
 			phalcon_array_fetch_str(&expr_value, value, SL("value"), PH_NOISY);
 
-			switch (phalcon_get_intval(type)) {
+			switch (phalcon_get_intval(&type)) {
 
 				case PHQL_T_STRING:
 				case PHQL_T_DOUBLE:
 				case PHQL_T_INTEGER:
-					PHALCON_CALL_METHODW(&update_value, dialect, "getsqlexpression", expr_value);
+					PHALCON_CALL_METHODW(&update_value, &dialect, "getsqlexpression", &expr_value);
 					break;
 
 				case PHQL_T_NULL:
-					PHALCON_CPY_WRT(update_value, null_value);
+					ZVAL_NULL(&update_value);
 					break;
 
 				case PHQL_T_NPLACEHOLDER:
 				case PHQL_T_SPLACEHOLDER:
 				case PHQL_T_BPLACEHOLDER:
 					if (Z_TYPE_P(bind_params) != IS_ARRAY) {
-						PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Bound parameter cannot be replaced because placeholders is not an array");
+						PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bound parameter cannot be replaced because placeholders is not an array");
 						return;
 					}
 
-					PHALCON_CALL_METHODW(&update_expr, dialect, "getsqlexpression", expr_value);
+					PHALCON_CALL_METHODW(&update_expr, &dialect, "getsqlexpression", &expr_value);
 
-					PHALCON_STR_REPLACE(&wildcard, double_colon, empty_string, update_expr);
-					if (phalcon_array_isset(bind_params, wildcard)) {
-						PHALCON_OBS_NVAR(update_value);
-						phalcon_array_fetch(&update_value, bind_params, wildcard, PH_NOISY);
-						phalcon_array_unset(select_bind_params, wildcard, PH_COPY);
-						phalcon_array_unset(select_bind_types, wildcard, PH_COPY);
+					PHALCON_STR_REPLACE(&wildcard, &double_colon, &empty_string, &update_expr);
+					if (phalcon_array_isset_fetch(&update_value, bind_params, &wildcard)) {
+						phalcon_array_unset(&select_bind_params, &wildcard, PH_COPY);
+						phalcon_array_unset(&select_bind_types, &wildcard, PH_COPY);
 					} else {
-						PHALCON_CONCAT_SVS(&exception_message, "Bound parameter '", wildcard, "' cannot be replaced because it's not in the placeholders list");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+						PHALCON_CONCAT_SVS(&exception_message, "Bound parameter '", &wildcard, "' cannot be replaced because it's not in the placeholders list");
+						PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 
@@ -4218,122 +4168,112 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				default:
 					PHALCON_CALL_METHODW(&update_expr, dialect, "getsqlexpression", expr_value);
 
-					PHALCON_INIT_NVAR(update_value);
-					object_init_ex(update_value, phalcon_db_rawvalue_ce);
-					PHALCON_CALL_METHODW(NULL, update_value, "__construct", update_expr);
+					object_init_ex(&update_value, phalcon_db_rawvalue_ce);
+					PHALCON_CALL_METHODW(NULL, &update_value, "__construct", &update_expr);
 
 					break;
 			}
-			phalcon_array_update_zval(update_values, field_name, update_value, PH_COPY);
+			phalcon_array_update_zval(&update_values, &field_name, &update_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		/** 
 		 * We need to query the records related to the update
 		 */
-		PHALCON_CALL_METHODW(&records, getThis(), "_getrelatedrecords", model, intermediate, select_bind_params, select_bind_types);
+		PHALCON_CALL_METHODW(&records, getThis(), "_getrelatedrecords", &model, intermediate, &select_bind_params, &select_bind_types);
 
 		/** 
 		 * If there are no records to apply the update we return success
 		 */
-		if (!phalcon_fast_count_ev(records)) {
-			PHALCON_INIT_VAR(success);
-			ZVAL_TRUE(success);
+		if (!phalcon_fast_count_ev(&records)) {
+			ZVAL_TRUE(&success);
 			object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", success, null_value);
-
-			RETURN_MM();
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success);
+			return;
 		}
 
 		/** 
 		 * Create a transaction in the write connection
 		 */
-		PHALCON_CALL_METHODW(NULL, connection, "begin");
-		PHALCON_CALL_METHODW(NULL, records, "rewind");
+		PHALCON_CALL_METHODW(NULL, &connection, "begin");
+		PHALCON_CALL_METHODW(NULL, &records, "rewind");
 
 		while (1) {
+			zval r0, record;
 			PHALCON_CALL_METHODW(&r0, records, "valid");
-			if (!PHALCON_IS_NOT_FALSE(r0)) {
+			if (!PHALCON_IS_NOT_FALSE(&r0)) {
 				break;
 			}
 
 			/** 
 			 * Get the current record in the iterator
 			 */
-			PHALCON_CALL_METHODW(&record, records, "current");
-
-			PHALCON_CALL_METHODW(&success, record, "settransaction", connection);
+			PHALCON_CALL_METHODW(&record, &records, "current");
+			PHALCON_CALL_METHODW(&success, &record, "settransaction", &connection);
 
 			/** 
 			 * We apply the executed values to every record found
 			 */
-			PHALCON_CALL_METHODW(&success, record, "update", update_values);
-			if (!zend_is_true(success)) {
+			PHALCON_CALL_METHODW(&success, &record, "update", &update_values);
+			if (!zend_is_true(&success)) {
 				/** 
 				 * Rollback the transaction on failure
 				 */
 				PHALCON_CALL_METHODW(NULL, connection, "rollback");
 				object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
-				PHALCON_CALL_METHODW(NULL, return_value, "__construct", success, record);
-
-				RETURN_MM();
+				PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success, &record);
+				return;
 			}
 
 			/** 
 			 * Move the cursor to the next record
 			 */
-			PHALCON_CALL_METHODW(NULL, records, "next");
+			PHALCON_CALL_METHODW(NULL, &records, "next");
 		}
 
 		/** 
 		 * Commit transaction on success
 		 */
-		PHALCON_CALL_METHODW(NULL, connection, "commit");
+		PHALCON_CALL_METHODW(NULL, &connection, "commit");
 	} else {
 		PHALCON_SEPARATE_PARAM(bind_types);
 
 		PHALCON_CALL_METHODW(&update_sql, dialect, "update", intermediate);
 
 		if (Z_TYPE_P(bind_params) == IS_ARRAY) {
-
-			PHALCON_INIT_VAR(processed);
-			array_init(processed);
+			array_init(&processed);
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, raw_value) {
-				zval tmp;
+				zval wildcard, string_wildcard, sql_tmp;
 				if (str_key) {
-					ZVAL_STR(&tmp, str_key);
+					ZVAL_STR(&wildcard, str_key);
 				} else {
-					ZVAL_LONG(&tmp, idx);
+					ZVAL_LONG(&wildcard, idx);
 				}
 
 				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce)) {
-					PHALCON_INIT_NVAR(string_wildcard);
-					PHALCON_CONCAT_SV(string_wildcard, ":", &tmp);
+					PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 
 					SEPARATE_ZVAL(raw_value);
 					convert_to_string(raw_value);
 
-					PHALCON_STR_REPLACE(&sql_tmp, string_wildcard, raw_value, update_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, string_wildcard, raw_value, &update_sql);
 
-					PHALCON_INIT_NVAR(update_sql);
-					ZVAL_STRING(update_sql, Z_STRVAL_P(sql_tmp));
+					ZVAL_STRING(&update_sql, Z_STRVAL(sql_tmp));
 
-					phalcon_array_unset(bind_types, wildcard, PH_COPY);
+					phalcon_array_unset(bind_types, &wildcard, PH_COPY);
 				} else {
-					phalcon_array_update_zval(processed, &tmp, raw_value, PH_COPY);
+					phalcon_array_update_zval(processed, &wildcard, raw_value, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		} else {
-			PHALCON_CPY_WRT(processed, bind_params);
+			ZVAL_COPY(&processed, bind_params);
 		}
 
-		PHALCON_CALL_METHODW(&success, connection, "execute", update_sql, processed, bind_types);
+		PHALCON_CALL_METHODW(&success, &connection, "execute", &update_sql, &processed, bind_types);
 	}
 
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", success, null_value);
-
-	RETURN_MM();
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success);
 }
 
 /**

@@ -1644,7 +1644,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
 		PHALCON_SCONCAT_SVSV(&condition, " AND ", root_attribute, "=", &root);
 	}
 
-	PHALCON_CALL_METHODW(&childs, owner, "find", condition);
+	PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 
 	phalcon_update_property_bool(getThis(), SL("_ignoreEvent"), 1);
 
@@ -1681,12 +1681,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
 		PHALCON_SCONCAT_SVSV(&condition, " AND ", root_attribute, "=", &root);
 	}
 
-	PHALCON_CALL_METHODW(&childs, owner, "find", condition);
+	PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 
 	PHALCON_CALL_METHODW(NULL, &childs, "rewind");
 
 	while (1) {
-		PHALCON_CALL_METHODW(&valid, childs, "valid");
+		PHALCON_CALL_METHODW(&valid, &childs, "valid");
 		if (!PHALCON_IS_NOT_FALSE(&valid)) {
 			break;
 		}
@@ -1744,7 +1744,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, addNode){
 
 	PHALCON_CALL_METHODW(&is_new, owner, "isnewrecord");
 
-	if (!zend_is_true(is_new)) {
+	if (!zend_is_true(&is_new)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The node cannot be inserted because it is not new");
 		return;
 	}
@@ -1776,7 +1776,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, addNode){
 	level_attribute = phalcon_read_property(getThis(), SL("_levelAttribute"), PH_NOISY);
 
 	PHALCON_CALL_SELFW(&root2, "getrootattribute", target);
-	phalcon_update_property_zval_zval(owner, root_attribute, root2);
+	phalcon_update_property_zval_zval(owner, root_attribute, &root2);
 
 	PHALCON_CALL_SELFW(&ret, "shiftleftright", key, &PHALCON_GLOBAL(z_two));
 	if (!zend_is_true(&ret)) {

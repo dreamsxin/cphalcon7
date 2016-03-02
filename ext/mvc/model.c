@@ -3238,7 +3238,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 						PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
 
 						error = &PHALCON_GLOBAL(z_true);
-					} else if (!phalcon_is_equal_long(field_type, PHALCON_DB_COLUMN_TYPE_INTEGER)) {
+					} else if (!phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_INTEGER)) {
 						PHALCON_CALL_METHODW(&field_size, meta_data, "getdatasize", getThis(), field);
 						PHALCON_CALL_METHODW(&field_scale, meta_data, "getdatascale", getThis(), field);
 

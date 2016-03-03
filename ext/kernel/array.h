@@ -665,4 +665,7 @@ int phalcon_array_is_associative(zval *arr);
 void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
 int phalcon_array_update_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);
 
+void phalcon_array_append_multi_ex(zval *arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
+int phalcon_array_append_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);
+
 #endif /* PHALCON_KERNEL_ARRAY_H */

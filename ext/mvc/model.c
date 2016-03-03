@@ -3247,11 +3247,11 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 						phalcon_fast_strpos_str(&pos, &str_value, SL("."));
 
 						if (!phalcon_is_numeric(&pos)) {
-							ZVAL_LONG(&pos, Z_LVAL_P(length) - 1);
+							ZVAL_LONG(&pos, Z_LVAL(length) - 1);
 						}
 
 						if (phalcon_is_numeric(&field_scale) && PHALCON_LT_LONG(&field_scale, (Z_LVAL(length)-Z_LVAL(pos)-1))) {
-							PHALCON_CONCAT_SVSV(&message, "Value of field '", &field, "' scale is out of range for type ", &field_type);
+							PHALCON_CONCAT_SVSV(&message, "Value of field '", field, "' scale is out of range for type ", &field_type);
 
 							ZVAL_STRING(&type, "tooLarge");
 
@@ -3317,7 +3317,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 							ZVAL_STRING(&type, "TooLong");
 
-							PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", message, &attribute_field, &type);
+							PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
 
 							error = &PHALCON_GLOBAL(z_true);
 						}
@@ -3409,9 +3409,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSave){
 
 	zval *success, *exists, event_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &success, &exists);
+	phalcon_fetch_params(0, 2, 0, &success, &exists);
 
 	if (likely(PHALCON_GLOBAL(orm).events)) {
 		if (PHALCON_IS_TRUE(success)) {
@@ -3420,21 +3418,21 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSave){
 			} else {
 				ZVAL_STRING(&event_name, "afterCreate");
 			}
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 			ZVAL_STRING(&event_name, "afterSave");
-			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
-			RETURN_CTOR(success);
+			RETURN_CTORW(success);
 		}
 
 		ZVAL_STRING(&event_name, "notSave");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-		PHALCON_CALL_METHOD(NULL, getThis(), "_canceloperation");
-		RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+		PHALCON_CALL_METHODW(NULL, getThis(), "_canceloperation");
+		RETURN_FALSE;
 	}
 
-	RETURN_CTOR(success);
+	RETURN_CTORW(success);
 }
 
 /**

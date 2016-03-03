@@ -911,7 +911,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 {
 	long old_l[PHALCON_MAX_ARRAY_LEVELS], old_ll[PHALCON_MAX_ARRAY_LEVELS];
 	char *s, *old_s[PHALCON_MAX_ARRAY_LEVELS], old_type[PHALCON_MAX_ARRAY_LEVELS];
-	zval fetched, *tmp, *p, *item, *old_item[PHALCON_MAX_ARRAY_LEVELS], *old_p[PHALCON_MAX_ARRAY_LEVELS];
+	zval fetched, tmp, *p, *item, *old_item[PHALCON_MAX_ARRAY_LEVELS], *old_p[PHALCON_MAX_ARRAY_LEVELS];
 	int i, j, l, ll, re_update, must_continue, wrap_tmp;
 
 	assert(types_length < PHALCON_MAX_ARRAY_LEVELS);
@@ -950,13 +950,12 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (i == (types_length - 1)) {
 						phalcon_array_update_str(p, s, l, value, PH_COPY);
 					} else {
-						PHALCON_ALLOC_INIT_ZVAL(tmp);
-						array_init(tmp);
-						phalcon_array_update_str(p, s, l, tmp, PH_COPY);
+						array_init(&tmp);
+						phalcon_array_update_str(p, s, l, &tmp, PH_COPY);
 						if (re_update) {
 							wrap_tmp = 1;
 						} else {
-							p = tmp;
+							p = &tmp;
 						}
 					}
 				}
@@ -982,13 +981,12 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (i == (types_length - 1)) {
 						phalcon_array_update_long(p, ll, value, PH_COPY);
 					} else {
-						PHALCON_ALLOC_INIT_ZVAL(tmp);
-						array_init(tmp);
-						phalcon_array_update_long(p, ll, tmp, PH_COPY);
+						array_init(&tmp);
+						phalcon_array_update_long(p, ll, &tmp, PH_COPY);
 						if (re_update) {
 							wrap_tmp = 1;
 						} else {
-							p = tmp;
+							p = &tmp;
 						}
 					}
 				}
@@ -1014,13 +1012,12 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (i == (types_length - 1)) {
 						phalcon_array_update_zval(p, item, value, PH_COPY);
 					} else {
-						PHALCON_ALLOC_INIT_ZVAL(tmp);
-						array_init(tmp);
-						phalcon_array_update_zval(p, item, tmp, PH_COPY);
+						array_init(&tmp);
+						phalcon_array_update_zval(p, item, &tmp, PH_COPY);
 						if (re_update) {
 							wrap_tmp = 1;
 						} else {
-							p = tmp;
+							p = &tmp;
 						}
 					}
 				}
@@ -1050,7 +1047,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 							phalcon_array_update_str((old_p[j]), old_s[j], old_l[j], old_p[j+1], PH_COPY);
 						}
 						if (wrap_tmp) {
-							p = tmp;
+							p = &tmp;
 							wrap_tmp = 0;
 						}
 						break;
@@ -1062,7 +1059,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 							phalcon_array_update_long((old_p[j]), old_ll[j], old_p[j+1], PH_COPY);
 						}
 						if (wrap_tmp) {
-							p = tmp;
+							p = &tmp;
 							wrap_tmp = 0;
 						}
 						break;
@@ -1074,7 +1071,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 							phalcon_array_update_zval((old_p[j]), old_item[j], old_p[j+1], PH_COPY);
 						}
 						if (wrap_tmp) {
-							p = tmp;
+							p = &tmp;
 							wrap_tmp = 0;
 						}
 						break;

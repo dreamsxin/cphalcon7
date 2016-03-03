@@ -133,9 +133,8 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, getLifetime){
 
 	options = phalcon_read_property(getThis(), SL("_frontendOptions"), PH_NOISY);
 	if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
-		RTURN_CTORW(&lifetime);
-	}
-	else {
+		RETURN_CTORW(&lifetime);
+	} else {
 		RETURN_LONG(1);
 	}
 }

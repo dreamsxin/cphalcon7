@@ -4115,7 +4115,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 		ZVAL_COPY_VALUE(&select_bind_types, bind_types);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
-			zval tmp, field_name, value, type, expr_value, update_value, wildcard, exception_message;
+			zval tmp, field_name, value, type, expr_value, update_value, update_expr, wildcard, exception_message;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -4165,7 +4165,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 					break;
 
 				default:
-					PHALCON_CALL_METHODW(&update_expr, dialect, "getsqlexpression", expr_value);
+					PHALCON_CALL_METHODW(&update_expr, &dialect, "getsqlexpression", &expr_value);
 
 					object_init_ex(&update_value, phalcon_db_rawvalue_ce);
 					PHALCON_CALL_METHODW(NULL, &update_value, "__construct", &update_expr);
@@ -4198,7 +4198,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 		while (1) {
 			zval r0, record;
-			PHALCON_CALL_METHODW(&r0, records, "valid");
+			PHALCON_CALL_METHODW(&r0, &records, "valid");
 			if (!PHALCON_IS_NOT_FALSE(&r0)) {
 				break;
 			}
@@ -4217,7 +4217,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				/** 
 				 * Rollback the transaction on failure
 				 */
-				PHALCON_CALL_METHODW(NULL, connection, "rollback");
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
 				PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success, &record);
 				return;
@@ -4236,7 +4236,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	} else {
 		PHALCON_SEPARATE_PARAM(bind_types);
 
-		PHALCON_CALL_METHODW(&update_sql, dialect, "update", intermediate);
+		PHALCON_CALL_METHODW(&update_sql, &dialect, "update", intermediate);
 
 		if (Z_TYPE_P(bind_params) == IS_ARRAY) {
 			array_init(&processed);
@@ -4255,13 +4255,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 					SEPARATE_ZVAL(raw_value);
 					convert_to_string(raw_value);
 
-					PHALCON_STR_REPLACE(&sql_tmp, string_wildcard, raw_value, &update_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, raw_value, &update_sql);
 
 					ZVAL_STRING(&update_sql, Z_STRVAL(sql_tmp));
 
 					phalcon_array_unset(bind_types, &wildcard, PH_COPY);
 				} else {
-					phalcon_array_update_zval(processed, &wildcard, raw_value, PH_COPY);
+					phalcon_array_update_zval(&processed, &wildcard, raw_value, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		} else {
@@ -4286,47 +4286,36 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
 	zval *intermediate, *bind_params, *bind_types, *use_rawsql = NULL;
-	zval *models, *model_name, *models_instances;
-	zval *model = NULL, *manager = NULL, *records = NULL, *success = NULL, *null_value = NULL;
-	zval *connection = NULL, *record = NULL;
-	zval *dialect = NULL, *delete_sql = NULL, *r0 = NULL;
-	zval *processed = NULL, *string_wildcard = NULL, *raw_value = NULL, *sql_tmp = NULL;
+	zval models, model_name, models_instances, model, connection, manager, records, success;
+	zval record, dialect, delete_sql, processed, *raw_value;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 1, &intermediate, &bind_params, &bind_types, &use_rawsql);
+	phalcon_fetch_params(0, 3, 1, &intermediate, &bind_params, &bind_types, &use_rawsql);
 
 	PHALCON_SEPARATE_PARAM(bind_types);
 	if (!use_rawsql) {
 		use_rawsql = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_OBS_VAR(models);
 	phalcon_array_fetch_str(&models, intermediate, SL("models"), PH_NOISY);
-	if (phalcon_array_isset_long(models, 1)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Delete from several models at the same time is still not supported");
+	if (phalcon_array_isset_long(&models, 1)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Delete from several models at the same time is still not supported");
 		return;
 	}
 
-	PHALCON_OBS_VAR(model_name);
-	phalcon_array_fetch_long(&model_name, models, 0, PH_NOISY);
+	phalcon_array_fetch_long(&model_name, &models, 0, PH_NOISY);
 
 	/** 
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
-	PHALCON_OBS_VAR(models_instances);
 	models_instances = phalcon_read_property(getThis(), SL("_modelsInstances"), PH_NOISY);
-	if (phalcon_array_isset(models_instances, model_name)) {
-		PHALCON_OBS_VAR(model);
-		phalcon_array_fetch(&model, models_instances, model_name, PH_NOISY);
-	} else {
-		PHALCON_CALL_SELF(&manager, "getmodelsmanager");
-		PHALCON_CALL_METHODW(&model, manager, "load", model_name);
+	if (!phalcon_array_isset_fetch(&model, models_instances, &model_name)) {
+		PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
+		PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
 	}
 
-	PHALCON_CALL_METHODW(&connection, model, "getwriteconnection", intermediate, bind_params, bind_types);
+	PHALCON_CALL_METHODW(&connection, &model, "getwriteconnection", intermediate, bind_params, bind_types);
 
 	if (!zend_is_true(use_rawsql)) {
 		/** 
@@ -4337,48 +4326,43 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 		/** 
 		 * If there are no records to delete we return success
 		 */
-		if (!phalcon_fast_count_ev(records)) {
-			PHALCON_INIT_VAR(success);
-			ZVAL_TRUE(success);
+		if (!phalcon_fast_count_ev(&records)) {
+			ZVAL_TRUE(&success);
 
-			PHALCON_INIT_VAR(null_value);
 			object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", success, null_value);
-
-			RETURN_MM();
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", success);
+			return;
 		}
 
 		/** 
 		 * Create a transaction in the write connection
 		 */
-		PHALCON_CALL_METHODW(NULL, connection, "begin");
-		PHALCON_CALL_METHODW(NULL, records, "rewind");
+		PHALCON_CALL_METHODW(NULL, &connection, "begin");
+		PHALCON_CALL_METHODW(NULL, &records, "rewind");
 
 		while (1) {
-
-			PHALCON_CALL_METHODW(&r0, records, "valid");
-			if (PHALCON_IS_NOT_FALSE(r0)) {
-			} else {
+			zval r0;
+			PHALCON_CALL_METHODW(&r0, &records, "valid");
+			if (PHALCON_IS_FALSE(&r0)) {
 				break;
 			}
 
-			PHALCON_CALL_METHODW(&record, records, "current");
-
-			PHALCON_CALL_METHODW(&success, record, "settransaction", connection);
+			PHALCON_CALL_METHODW(&record, &records, "current");
+			PHALCON_CALL_METHODW(&success, &record, "settransaction", &connection);
 
 			/** 
 			 * We delete every record found
 			 */
-			PHALCON_CALL_METHODW(&success, record, "delete");
-			if (!zend_is_true(success)) {
+			PHALCON_CALL_METHODW(&success, &record, "delete");
+			if (!zend_is_true(&success)) {
 				/** 
 				 * Rollback the transaction
 				 */
 				PHALCON_CALL_METHODW(NULL, connection, "rollback");
 				object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
-				PHALCON_CALL_METHODW(NULL, return_value, "__construct", success, record);
+				PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success, &record);
 
-				RETURN_MM();
+				return;
 			}
 
 			/** 
@@ -4394,17 +4378,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	} else {
 		PHALCON_SEPARATE_PARAM(bind_types);
 
-		PHALCON_CALL_METHODW(&dialect, connection, "getdialect");
+		PHALCON_CALL_METHODW(&dialect, &connection, "getdialect");
+		PHALCON_CALL_METHODW(&delete_sql, &dialect, "delete", intermediate);
 
-		PHALCON_CALL_METHODW(&delete_sql, dialect, "delete", intermediate);
-
-		if (Z_TYPE_P(bind_params) == IS_ARRAY) { 
-
-			PHALCON_INIT_VAR(processed);
-			array_init(processed);
+		if (Z_TYPE_P(bind_params) == IS_ARRAY) {
+			array_init(&processed);
 	
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, raw_value) {
-				zval tmp;
+				zval tmp, string_wildcard, sql_tmp;
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
@@ -4412,39 +4393,32 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 				}
 
 				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce)) {
-					PHALCON_INIT_NVAR(string_wildcard);
-					PHALCON_CONCAT_SV(string_wildcard, ":", &tmp);
+					PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
 
 					SEPARATE_ZVAL(raw_value);
 					convert_to_string(raw_value);
 
-					PHALCON_STR_REPLACE(&sql_tmp, string_wildcard, raw_value, delete_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, raw_value, &delete_sql);
 
-					PHALCON_INIT_NVAR(delete_sql);
-					ZVAL_STRING(delete_sql, Z_STRVAL_P(sql_tmp));
+					ZVAL_STRING(&delete_sql, Z_STRVAL(sql_tmp));
 
 					phalcon_array_unset(bind_types, &tmp, PH_COPY);
 				} else {
-					phalcon_array_update_zval(processed, &tmp, raw_value, PH_COPY);
+					phalcon_array_update_zval(&processed, &tmp, raw_value, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		} else {
-			PHALCON_CPY_WRT(processed, bind_params);
+			ZVAL_COPY(&processed, bind_params);
 		}
 
-		PHALCON_CALL_METHODW(&success, connection, "execute", delete_sql, processed, bind_types);
+		PHALCON_CALL_METHODW(&success, &connection, "execute", &delete_sql, &processed, bind_types);
 	}
-
-	PHALCON_INIT_NVAR(null_value);
-	ZVAL_TRUE(null_value);
 
 	/** 
 	 * Create a status to report the deletion status
 	 */
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", success, null_value);
-
-	RETURN_MM();
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", success);
 }
 
 /**

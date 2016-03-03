@@ -3686,7 +3686,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	 * We only make the update based on the non-primary attributes, values in primary
 	 * key attributes are ignored
 	 */
-	HashTable *ht;
 	if (PHALCON_GLOBAL(orm).allow_update_primary) {
 		PHALCON_CALL_SELFW(&columns, "getcolumns");
 	} else {
@@ -3699,7 +3698,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			/**
 			 * Check a bind type for field to update
 			 */
-			if (!phalcon_array_isset(bind_data_types, field)) {
+			if (!phalcon_array_isset(&bind_data_types, field)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' have not defined a bind data type");
 				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
@@ -3715,7 +3714,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 					return;
 				}
 			} else {
-				ZVAL_COPY(&attribute_field, &field);
+				ZVAL_COPY(&attribute_field, field);
 			}
 
 			/**
@@ -3746,13 +3745,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 					/**
 					 * If the field is not part of the snapshot we add them as changed
 					 */
-					if (!phalcon_array_isset_fetch(&snapshot_value, &snapshot, attribute_field)) {
+					if (!phalcon_array_isset_fetch(&snapshot_value, &snapshot, &attribute_field)) {
 						ZVAL_TRUE(&changed);
 					} else {
 						if (!PHALCON_IS_EQUAL(&convert_value, &snapshot_value)) {
-							ZVAL_TRUE(&changed, 1);
+							ZVAL_TRUE(&changed);
 						} else {
-							ZVAL_FALSE(changed);
+							ZVAL_FALSE(&changed);
 						}
 					}
 
@@ -3778,7 +3777,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	/**
 	 * If there is no fields to update we return true
 	 */
-	if (!phalcon_fast_count_ev(fields)) {
+	if (!phalcon_fast_count_ev(&fields)) {
 		if (PHALCON_GLOBAL(orm).enable_strict) {
 			RETURN_FALSE;
 		}
@@ -3818,7 +3817,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			} else {
 				ZVAL_COPY(&attribute_field, field);
 			}
-			if (phalcon_property_isset_fetch_zval(&value, getThis(), attribute_field)) {
+			if (phalcon_property_isset_fetch_zval(&value, getThis(), &attribute_field)) {
 				phalcon_array_append(&unique_params, &value, PH_COPY);
 			} else {
 				phalcon_array_append(&unique_params, &PHALCON_GLOBAL(z_null), PH_COPY);
@@ -3829,15 +3828,15 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	/**
 	 * We build the conditions as an array
 	 */
-	array_init_size(conditions, 3);
-	phalcon_array_update_string(conditions, IS(conditions), unique_key, PH_COPY);
-	phalcon_array_update_str(conditions, SL("bind"), unique_params, PH_COPY);
-	phalcon_array_update_str(conditions, SL("bindTypes"), unique_types, PH_COPY);
+	array_init_size(&conditions, 3);
+	phalcon_array_update_string(&conditions, IS(conditions), &unique_key, PH_COPY);
+	phalcon_array_update_str(&conditions, SL("bind"), &unique_params, PH_COPY);
+	phalcon_array_update_str(&conditions, SL("bindTypes"), &unique_types, PH_COPY);
 
 	/**
 	 * Perform the low level update
 	 */
-	PHALCON_CALL_METHODW(&ret, connection, "update", table, fields, values, conditions, bind_types);
+	PHALCON_CALL_METHODW(&ret, connection, "update", table, &fields, &values, &conditions, &bind_types);
 	if (zend_is_true(&ret)) {
 		PHALCON_CALL_METHODW(&ret, connection, "affectedrows");
 		if (zend_is_true(&ret)) {

@@ -323,4 +323,14 @@ static inline int phalcon_return_call_method(zval *retval, zval *object, const c
 	return phalcon_call_method_with_params(retval, object, Z_OBJCE_P(object), phalcon_fcall_method, method, strlen(method), nparams, params);
 }
 
+static inline int phalcon_call_function_with_params(zval *retval, const char *func_name, uint func_len, uint param_count, zval *params[])
+{
+	return phalcon_call_method_with_params(retval, NULL, NULL, phalcon_fcall_function, func_name, func_len, param_count, params);
+}
+
+static inline int phalcon_return_call_function(zval *retval, zval *object, const char *func, uint nparams, zval **params)
+{
+	return phalcon_call_function_with_params(retval, func, strlen(func), nparams, params);
+}
+
 #endif /* PHALCON_KERNEL_FCALL_H */

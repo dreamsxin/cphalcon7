@@ -615,8 +615,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		return;
 	}
 
-	phalcon_substr(&iv, text, 0, Z_LVAL_P(iv_size));
-
+	phalcon_substr(&iv, text, 0, Z_LVAL(iv_size));
 	phalcon_substr(&text_to_decipher, text, Z_LVAL(iv_size), 0);
 
 	PHALCON_CALL_FUNCTIONW(&decrypted, "mcrypt_decrypt", cipher, key, &text_to_decipher, mode, &iv);
@@ -646,7 +645,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 		PHALCON_CALL_USER_FUNC_ARRAYW(&value, handler, &arguments);
 
-		RETURN_CTORW(value);
+		RETURN_CTORW(&value);
 	}
 }
 

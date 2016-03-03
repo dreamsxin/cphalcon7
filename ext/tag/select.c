@@ -158,22 +158,20 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 		PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &empty_value, "\">", &empty_text, &close_option);
 	}
 
-	if (phalcon_array_isset_fetch_long(&params, 1)) {
-		phalcon_array_long(&options, &params, 1, PH_NOISY);
-	} else {
+	if (!phalcon_array_isset_fetch_long(&options, &params, 1)) {
 		ZVAL_COPY_VALUE(&options, data);
 	}
 
-	if (Z_TYPE_P(&options) == IS_OBJECT) {
+	if (Z_TYPE(options) == IS_OBJECT) {
 		/** 
 		 * The options is a resultset
 		 */
-		if (using == NULL) {
+		if (Z_TYPE(using) < IS_NULL) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_tag_exception_ce, "The 'using' parameter is required");
 			return;
 		}
 
-		if (Z_TYPE_P(using) != IS_ARRAY && Z_TYPE_P(using) != IS_OBJECT) {
+		if (Z_TYPE(using) != IS_ARRAY && Z_TYPE(using) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_tag_exception_ce, "The 'using' parameter should be an Array");
 			return;
 		}
@@ -183,7 +181,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 		 */
 		PHALCON_CALL_SELFW(&resultset_options, "_optionsfromresultset", &options, &using, &value, &close_option);
 		phalcon_concat_self(&code, &resultset_options);
-	} else if (Z_TYPE_P(&options) == IS_ARRAY) {
+	} else if (Z_TYPE(options) == IS_ARRAY) {
 		/**
 		 * Create the SELECT's option from an array
 		 */
@@ -280,7 +278,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
 			 */
 			phalcon_htmlspecialchars(&escaped, &option_value, NULL, NULL);
 			if (Z_TYPE_P(value) == IS_ARRAY) { 
-				if (phalcon_fast_in_array(option_value, value)) {
+				if (phalcon_fast_in_array(&option_value, value)) {
 					PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", &option_text, close_option);
 				} else {
 					PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &escaped, "\">", &option_text, close_option);
@@ -354,9 +352,9 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 		
 			if (Z_TYPE_P(value) == IS_ARRAY) { 
 				if (phalcon_fast_in_array(&option_value, value)) {
-					PHALCON_SCONCAT_SVSVV(code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", option_text, close_option);
+					PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", option_text, close_option);
 				} else {
-					PHALCON_SCONCAT_SVSVV(code, "\t<option value=\"", &escaped, "\">", option_text, close_option);
+					PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &escaped, "\">", option_text, close_option);
 				}
 			} else {
 				convert_to_string(&option_value);

@@ -3823,13 +3823,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		/** 
 		 * Create a transaction in the write connection
 		 */
-		PHALCON_CALL_METHODW(NULL, connection, "begin");
+		PHALCON_CALL_METHODW(NULL, &connection, "begin");
 	}
 
 	/** 
 	 * Get a base model from the Models Manager
 	 */
-	PHALCON_CALL_METHODW(&base_model, manager, "load", model_name);
+	PHALCON_CALL_METHODW(&base_model, &manager, "load", &model_name);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&rows), rows_values) {
 		zval number_values, insert_values, *value, exception_message;
@@ -3842,7 +3842,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		 */
 		if (!PHALCON_IS_EQUAL(&number_fields, &number_values)) {
 			if (i_rows > 1) {
-				PHALCON_CALL_METHODW(NULL, connection, "rollback");
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 			}
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The column count does not match the values count");
 			return;
@@ -3866,7 +3866,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 				case PHQL_T_STRING:
 				case PHQL_T_INTEGER:
 				case PHQL_T_DOUBLE:
-					PHALCON_CALL_METHODW(&insert_value, dialect, "getsqlexpression", &expr_value);
+					PHALCON_CALL_METHODW(&insert_value, &dialect, "getsqlexpression", &expr_value);
 					break;
 
 				case PHQL_T_NULL:
@@ -3881,11 +3881,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 						return;
 					}
 
-					PHALCON_CALL_METHODW(&insert_expr, dialect, "getsqlexpression", &expr_value);
-
-					PHALCON_STR_REPLACE(&wildcard, &double_colon, &empty_string, insert_expr);
-					if (!phalcon_array_isset(bind_params, wildcard)) {
-						PHALCON_CONCAT_SVS(&exception_message, "Bound parameter '", wildcard, "' cannot be replaced because it isn't in the placeholders list");
+					PHALCON_CALL_METHODW(&insert_expr, &dialect, "getsqlexpression", &expr_value);
+					PHALCON_STR_REPLACE(&wildcard, &double_colon, &empty_string, &insert_expr);
+					if (!phalcon_array_isset(bind_params, &wildcard)) {
+						PHALCON_CONCAT_SVS(&exception_message, "Bound parameter '", &wildcard, "' cannot be replaced because it isn't in the placeholders list");
 						PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
@@ -3910,7 +3909,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 			 */
 			if (PHALCON_IS_TRUE(&automatic_fields)) {
 				if (Z_TYPE(column_map) == IS_ARRAY) { 
-					if (!phalcon_array_isset_fetch(&attribute_name, &column_map, field_name)) {
+					if (!phalcon_array_isset_fetch(&attribute_name, &column_map, &field_name)) {
 						PHALCON_CONCAT_SVS(&exception_message, "Column '", &field_name, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
@@ -3928,7 +3927,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		/** 
 		 * Clone the base model
 		 */
-		if (phalcon_clone(&insert_model, base_model) == FAILURE) {
+		if (phalcon_clone(&insert_model, &base_model) == FAILURE) {
 			ZVAL_FALSE(&success);
 		} else {
 			/** 
@@ -4026,7 +4025,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
 	ZVAL_LONG(&type_select, 309);
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 
 	/** 
 	 * We create another Phalcon\Mvc\Model\Query to get the related records
@@ -4127,9 +4126,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				phalcon_array_fetch_string(&field_name, field, IS(name), PH_NOISY);
 			}
 
-			phalcon_array_fetch(&value, values, &tmp, PH_NOISY);
-			phalcon_array_fetch_string(&type, value, IS(type), PH_NOISY);
-			phalcon_array_fetch_str(&expr_value, value, SL("value"), PH_NOISY);
+			phalcon_array_fetch(&value, &values, &tmp, PH_NOISY);
+			phalcon_array_fetch_string(&type, &value, IS(type), PH_NOISY);
+			phalcon_array_fetch_str(&expr_value, &value, SL("value"), PH_NOISY);
 
 			switch (phalcon_get_intval(&type)) {
 

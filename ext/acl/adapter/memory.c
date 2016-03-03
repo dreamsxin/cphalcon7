@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addRole){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 
-	zval *role_name, *role_to_inherit, *roles_names, exception_message, role_inherit_name, *roles_inherits, empty_arr, *_roleInherits;
+	zval *role_name, *role_to_inherit, *roles_names, exception_message, role_inherit_name, *roles_inherits;
 
 	phalcon_fetch_params(0, 2, 0, &role_name, &role_to_inherit);
 
@@ -262,8 +262,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 	}
 
 	roles_inherits = phalcon_read_property(getThis(), SL("_roleInherits"), PH_NOISY);
-	phalcon_array_append_multi_2(_roleInherits, role_name, role_inherit_name, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_roleInherits"), _roleInherits);
+	phalcon_array_append_multi_2(roles_inherits, role_name, &role_inherit_name, PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_roleInherits"), roles_inherits);
 	RETURN_TRUE;
 }
 
@@ -417,8 +417,6 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, dropResourceAccess){
 		PHALCON_CONCAT_VSV(&access_key, resource_name, "!", access_list);
 		phalcon_unset_property_array(getThis(), SL("_accessList"), &access_key);
 	}
-
-	PHALCON_RESTORE();
 }
 
 /**
@@ -622,11 +620,11 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 	assert(Z_TYPE_P(access) == IS_STRING);
 	assert(Z_TYPE_P(access_list) == IS_ARRAY);
 
-	if (!phalcon_array_isset_fetch(&inherited_roles, role_inherits, role) || Z_TYPE_P(inherited_roles) != IS_ARRAY) {
+	if (!phalcon_array_isset_fetch(&inherited_roles, role_inherits, role) || Z_TYPE(inherited_roles) != IS_ARRAY) {
 		return PHALCON_ACL_DUNNO;
 	}
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&inherited_roles), parent_role) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(inherited_roles), parent_role) {
 		int found;
 		zval have_access;
 
@@ -704,7 +702,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	/** 
 	 * Check if there is a direct combination for role-resource-access
 	 */
-	if (phalcon_array_isset_fetch(&have_access, access_list, access_key)) {
+	if (phalcon_array_isset_fetch(&have_access, access_list, &access_key)) {
 		allow_access = zend_is_true(&have_access) ? PHALCON_ACL_YES : PHALCON_ACL_NO;
 	} else {
 		allow_access = PHALCON_ACL_DUNNO;

@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_DI_Injectable, getDI)
 		return;
 	}
 
-	RETURN_ZVAL(dependency_injector, 1, 0);
+	RETURN_CTORW(dependency_injector);
 }
 
 /**

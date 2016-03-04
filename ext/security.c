@@ -579,8 +579,7 @@ PHP_METHOD(Phalcon_Security, hash)
  */
 PHP_METHOD(Phalcon_Security, checkHash){
 
-	zval *password, *password_hash, *max_pass_length = NULL, *hash = NULL;
-	zval *params[2];
+	zval *password, *password_hash, *max_pass_length = NULL, hash;
 	int check = 0;
 
 	phalcon_fetch_params(0, 2, 1, &password, &password_hash, &max_pass_length);
@@ -594,18 +593,16 @@ PHP_METHOD(Phalcon_Security, checkHash){
 		}
 	}
 
-	params[0] = password;
-	params[1] = password_hash;
-	RETURN_ON_FAILURE(phalcon_call_func_aparams(&hash, SL("crypt"), 2, params));
+	PHALCON_CALL_FUNCTIONW(&hash, SL("crypt"), password, password_hash);
 
-	if (UNEXPECTED(Z_TYPE_P(hash) != IS_STRING)) {
-		convert_to_string(hash);
+	if (UNEXPECTED(Z_TYPE(hash) != IS_STRING)) {
+		convert_to_string(&hash);
 	}
 
-	if (Z_STRLEN_P(hash) == Z_STRLEN_P(password_hash)) {
-		int n    = Z_STRLEN_P(hash);
-		char *h1 = Z_STRVAL_P(hash);
-		char *h2 = Z_STRVAL_P(password_hash);
+	if (Z_STRLEN(hash) == Z_STRLEN_P(password_hash)) {
+		int n    = Z_STRLEN(hash);
+		char *h1 = Z_STRVAL(hash);
+		char *h2 = Z_STRVAL(password_hash);
 
 		while (n) {
 			check |= ((unsigned int)*h1) ^ ((unsigned int)*h2);
@@ -614,11 +611,11 @@ PHP_METHOD(Phalcon_Security, checkHash){
 			--n;
 		}
 
-		zval_ptr_dtor(hash);
+		zval_ptr_dtor(&hash);
 		RETURN_BOOL(check == 0);
 	}
 
-	zval_ptr_dtor(hash);
+	zval_ptr_dtor(&hash);
 	RETURN_FALSE;
 }
 
@@ -1067,12 +1064,12 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
  */
 PHP_METHOD(Phalcon_Security, deriveKey)
 {
-	zval *password, *salt, *hash = NULL, *iterations = NULL, *size = NULL;
+	zval *password, *salt, *hash = NULL, *iterations = NULL, *size = NULL, algo, iter, len;
 	char* s_hash;
 	int i_iterations = 0, i_size = 0;
 
-	phalcon_fetch_params(0, 2, 3, &password, &salt, &hash, &iterations, &size);
 
+	phalcon_fetch_params(0, 2, 3, &password, &salt, &hash, &iterations, &size);
 	PHALCON_ENSURE_IS_STRING(password);
 	PHALCON_ENSURE_IS_STRING(salt);
 
@@ -1101,27 +1098,11 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 		i_size = 0;
 	}
 
-	zval *algo, *iter, *len;
+	ZVAL_STRING(&algo, s_hash);
+	ZVAL_LONG(&iter, i_iterations);
+	ZVAL_LONG(&len, i_size);
 
-	PHALCON_ALLOC_INIT_ZVAL(algo);
-	ZVAL_STRING(algo, s_hash);
-
-	PHALCON_ALLOC_INIT_ZVAL(iter);
-	ZVAL_LONG(iter, i_iterations);
-
-	PHALCON_ALLOC_INIT_ZVAL(len);
-	ZVAL_LONG(len, i_size);
-
-	{
-		zval *params[] = { algo, password, salt, iter, len, &PHALCON_GLOBAL(z_true) };
-		if (FAILURE == phalcon_call_func_aparams(&return_value, SL("hash_pbkdf2"), 6, params)) {
-			;
-		}
-	}
-
-	zval_ptr_dtor(algo);
-	zval_ptr_dtor(iter);
-	zval_ptr_dtor(len);
+	PHALCON_CALL_FUNCTIONW(return_value, "hash_pbkdf2", algo, password, salt, iter, len, &PHALCON_GLOBAL(z_true));
 }
 
 /**

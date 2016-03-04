@@ -563,21 +563,19 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 
 	zval *expression, *escape_char = NULL, name, custom_functions, custom_function, sql_arguments, arguments, *argument, arguments_joined;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &expression, &escape_char);
+	phalcon_fetch_params(0, 1, 1, &expression, &escape_char);
 
 	if (!escape_char) {
-		PHALCON_INIT_VAR(escape_char);
+		escape_char = &PHALCON_GLOBAL(z_null);
 	}
 
 	phalcon_array_fetch_str(&name, expression, SL("name"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&custom_functions, getThis(), "getcustomfunctions");
+	PHALCON_CALL_METHODW(&custom_functions, getThis(), "getcustomfunctions");
 
 	if (phalcon_array_isset_fetch(&custom_function, &custom_functions, &name)) {
-		PHALCON_RETURN_CALL_ZVAL_FUNCTION(&custom_function, getThis(), expression, escape_char);
-		RETURN_MM();
+		PHALCON_CALL_ZVAL_FUNCTIONW(return_value, &custom_function, getThis(), expression, escape_char);
+		return;
 	}
 
 	array_init(&sql_arguments);
@@ -585,7 +583,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(arguments), argument) {
 			zval argument_expression;
 
-			PHALCON_CALL_METHOD(&argument_expression, getThis(), "getsqlexpression", argument, escape_char);
+			PHALCON_CALL_METHODW(&argument_expression, getThis(), "getsqlexpression", argument, escape_char);
 			phalcon_array_append(&sql_arguments, &argument_expression, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
@@ -596,11 +594,10 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 			PHALCON_CONCAT_VSVS(return_value, &name, "(", &arguments_joined, ")");
 		}
 
-		RETURN_MM();
+		return;
 	}
 
 	PHALCON_CONCAT_VS(return_value, &name, "()");
-	RETURN_MM();
 }
 
 /**

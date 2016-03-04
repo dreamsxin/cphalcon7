@@ -770,15 +770,14 @@ PHP_METHOD(Phalcon_Http_Cookie, getHttpOnly){
  */
 PHP_METHOD(Phalcon_Http_Cookie, __toString){
 
-	zval *value;
+	zval *value, e, *m;
 
 	value = phalcon_read_property(getThis(), SL("_value"), PH_NOISY);
 	if (Z_TYPE_P(value) == IS_NULL) {
-		if (FAILURE == phalcon_call_class_method_aparams(&return_value, getThis(), Z_OBJCE_P(getThis()), phalcon_fcall_method, "getvalue", 8, 0, NULL)) {
+		if (FAILURE == phalcon_call_method(return_value, getThis(), "getvalue", 0, NULL)) {
 			if (EG(exception)) {
-				zval e;
 				ZVAL_OBJ(&e, EG(exception));
-				zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
+				m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
 
 				Z_TRY_ADDREF_P(m);
 				if (Z_TYPE_P(m) != IS_STRING) {
@@ -795,5 +794,5 @@ PHP_METHOD(Phalcon_Http_Cookie, __toString){
 		return;
 	}
 
-	RETURN_ZVAL(value, 1, 0);
+	RETURN_CTORW(value);
 }

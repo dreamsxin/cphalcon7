@@ -88,27 +88,22 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Message){
 	return SUCCESS;
 }
 
-zval* phalcon_validation_message_construct_helper(zval *message, zval *field, const char *type, zval *code)
+void phalcon_validation_message_construct_helper(zval *result, zval *message, zval *field, const char *type, zval *code)
 {
-	zval *result, *params[4], *tmp;
+	zval *params[4], tmp;
 
-	PHALCON_ALLOC_INIT_ZVAL(result);
-	object_init_ex(result, phalcon_validation_message_ce);
+	object_init_ex(&result, phalcon_validation_message_ce);
 
-	PHALCON_ALLOC_INIT_ZVAL(tmp);
-	ZVAL_STRING(tmp, type);
+	ZVAL_STRING(&tmp, type);
 
 	params[0] = message;
 	params[1] = field;
-	params[2] = tmp;
+	params[2] = &tmp;
 	params[3] = code;
 
-	if (FAILURE == phalcon_call_class_method_aparams(NULL, result, Z_OBJCE_P(result), phalcon_fcall_method, SL("__construct"), 4, params)) {
-		PHALCON_ALLOC_INIT_ZVAL(result);
+	if (FAILURE == phalcon_call_method(NULL, result, "__construct", 4, params)) {
 		ZVAL_NULL(result);
 	}
-
-	return result;
 }
 
 /**

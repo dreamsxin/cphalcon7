@@ -169,17 +169,14 @@ PHP_METHOD(Phalcon_Config_Adapter, getBasePath){
  */
 PHP_METHOD(Phalcon_Config_Adapter, load){
 
-	zval *file_path = NULL, *absolute_path = NULL, *class_name;
+	zval *file_path = NULL, *absolute_path = NULL, class_name;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 0, 2, &file_path, &absolute_path);
 
-	phalcon_fetch_params(1, 0, 2, &file_path, &absolute_path);
+	phalcon_get_called_class(&class_name);
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_called_class(class_name);
-
-	ce0 = phalcon_fetch_class(class_name);
+	ce0 = phalcon_fetch_class(&class_name);
 
 	object_init_ex(return_value, ce0);
 
@@ -188,10 +185,8 @@ PHP_METHOD(Phalcon_Config_Adapter, load){
 			absolute_path = &PHALCON_GLOBAL(z_false);
 		}
 
-		PHALCON_RETURN_CALL_STATIC("factory", file_path, absolute_path);
+		PHALCON_RETURN_CALL_STATICW("factory", file_path, absolute_path);
 	} else {
-		PHALCON_RETURN_CALL_STATIC("factory");
+		PHALCON_RETURN_CALL_STATICW("factory");
 	}
-
-	RETURN_MM();
 }

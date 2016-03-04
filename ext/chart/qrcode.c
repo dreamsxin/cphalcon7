@@ -739,10 +739,8 @@ static zbar_image_t *_php_zbarcode_get_page(MagickWand *wand)
 
 static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t *image, zend_bool extended, zval *return_array)
 {
-	zval *params[3], *fromtext = NULL, *totext = NULL, *from = NULL, *to = NULL, *symbol_array = NULL, *loc_array = NULL, *coords = NULL;
 	const zbar_symbol_t *symbol;
-
-	PHALCON_MM_GROW();
+	int flag;
 
 	array_init(return_array);
 
@@ -754,14 +752,14 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 
 	/* Loop through all all symbols */
 	for(; symbol; symbol = zbar_symbol_next(symbol)) {
+		zval symbol_array, fromtext, totext, from, to
 		zbar_symbol_type_t symbol_type;
 		const char *data;
 		const char *type;
 		int quality;
 		unsigned int loc_size;
 
-		PHALCON_INIT_NVAR(symbol_array);
-		array_init(symbol_array);
+		array_init(&symbol_array);
 
 		/* Get symbol type and data in it */
 		symbol_type = zbar_symbol_get_type(symbol);
@@ -770,53 +768,39 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 		quality = zbar_symbol_get_quality(symbol);
 
         if (phalcon_function_exists_ex(SL("mb_convert_encoding")) == SUCCESS) {
-			PHALCON_INIT_NVAR(fromtext);
-			ZVAL_STRING(fromtext, data);
-
-			PHALCON_INIT_NVAR(from);
+			ZVAL_STRING(&fromtext, data);
 			ZVAL_STRING(from, "shift-jis");
+			ZVAL_STRING(&to, "utf-8");
 
-			PHALCON_INIT_NVAR(to);
-			ZVAL_STRING(to, "utf-8");
-
-			PHALCON_INIT_NVAR(fromtext);
-			ZVAL_STRING(fromtext, data);
-
-			params[0] = fromtext;
-			params[1] = from;
-			params[2] = to;
-			uint32_t result = phalcon_call_func_aparams(&totext, SL("mb_convert_encoding"), 3, params);
-			if (result) {
-				RETURN_MM();
+			PHALCON_CALL_FUNCTION_FLAG(flag, &totext, "mb_convert_encoding", &fromtext, &from, &to);
+			if (flag) {
+				return;
 			}
-			phalcon_array_update_str(symbol_array, SL("data"), totext, PH_COPY);                
+			phalcon_array_update_str(&symbol_array, SL("data"), &totext, PH_COPY);                
         } else {
-			phalcon_array_update_str_str(symbol_array, SL("data"), (char *)data, strlen(data), PH_COPY);
+			phalcon_array_update_str_str(&symbol_array, SL("data"), (char *)data, strlen(data), PH_COPY);
 		}
-		phalcon_array_update_str_str(symbol_array, SL("type"), (char *)type, strlen(type), PH_COPY);
-		phalcon_array_update_str_long(symbol_array, SL("quality"), quality, 0);
+		phalcon_array_update_str_str(&symbol_array, SL("type"), (char *)type, strlen(type), PH_COPY);
+		phalcon_array_update_str_long(&symbol_array, SL("quality"), quality, 0);
 
 		if (extended) {
+			zval loc_array;
 			unsigned int i;
-
-			PHALCON_INIT_NVAR(loc_array);
-			array_init(loc_array);
+			array_init(&loc_array);
 			loc_size = zbar_symbol_get_loc_size(symbol);
 
 			for (i = 0; i < loc_size; i++) {	
-				PHALCON_INIT_NVAR(coords);
-				array_init(coords);
-				phalcon_array_update_str_long(coords, SL("x"), zbar_symbol_get_loc_x(symbol, i), 0);
-				phalcon_array_update_str_long(coords, SL("y"), zbar_symbol_get_loc_y(symbol, i), 0);
+				zval coords;
+				array_init(&coords);
+				phalcon_array_update_str_long(&coords, SL("x"), zbar_symbol_get_loc_x(symbol, i), 0);
+				phalcon_array_update_str_long(&coords, SL("y"), zbar_symbol_get_loc_y(symbol, i), 0);
 
-				phalcon_array_append(loc_array, coords, PH_COPY);	
+				phalcon_array_append(&loc_array, &coords, PH_COPY);	
 			}
-			phalcon_array_update_str(symbol_array, SL("location"), loc_array, PH_COPY);
+			phalcon_array_update_str(&symbol_array, SL("location"), &loc_array, PH_COPY);
 		}
-		phalcon_array_append(return_array, symbol_array, PH_COPY);
+		phalcon_array_append(return_array, &symbol_array, PH_COPY);
 	}
-
-	RETURN_MM();
 }
 #endif
 

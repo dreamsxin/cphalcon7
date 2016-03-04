@@ -856,10 +856,10 @@ PHP_METHOD(Phalcon_Forms_Element, clear)
  */
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
-	
-	if (FAILURE == phalcon_call_class_method_aparams(&return_value, getThis(), Z_OBJCE_P(getThis()), phalcon_fcall_method, "render", 6, 0, NULL)) {
-		if (EG(exception)) {			
-			zval e;
+	zval e;
+
+	if (FAILURE == phalcon_call_method(return_value, getThis(), "render", 0, NULL)) {
+		if (EG(exception)) {
 			ZVAL_OBJ(&e, EG(exception));
 
 			zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);

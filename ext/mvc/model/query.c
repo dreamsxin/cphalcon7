@@ -4309,8 +4309,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	/** 
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
-	models_instances = phalcon_read_property(getThis(), SL("_modelsInstances"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(&model, models_instances, &model_name)) {
+	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
+	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name)) {
 		PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
 		PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
 	}
@@ -4321,7 +4321,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 		/** 
 		 * Get the records to be deleted
 		 */
-		PHALCON_CALL_METHODW(&records, getThis(), "_getrelatedrecords", model, intermediate, bind_params, bind_types);
+		PHALCON_CALL_METHODW(&records, getThis(), "_getrelatedrecords", &model, intermediate, bind_params, bind_types);
 
 		/** 
 		 * If there are no records to delete we return success
@@ -4330,7 +4330,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 			ZVAL_TRUE(&success);
 
 			object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", success);
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success);
 			return;
 		}
 
@@ -4358,23 +4358,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 				/** 
 				 * Rollback the transaction
 				 */
-				PHALCON_CALL_METHODW(NULL, connection, "rollback");
+				PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 				object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
 				PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success, &record);
-
 				return;
 			}
 
 			/** 
 			 * Move the cursor to the next record
 			 */
-			PHALCON_CALL_METHODW(NULL, records, "next");
+			PHALCON_CALL_METHODW(NULL, &records, "next");
 		}
 
 		/** 
 		 * Commit the transaction
 		 */
-		PHALCON_CALL_METHODW(NULL, connection, "commit");	
+		PHALCON_CALL_METHODW(NULL, &connection, "commit");	
 	} else {
 		PHALCON_SEPARATE_PARAM(bind_types);
 
@@ -4418,7 +4417,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	 * Create a status to report the deletion status
 	 */
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", success);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success);
 }
 
 /**
@@ -4432,7 +4431,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
 	zval *bind_params = NULL, *bind_types = NULL, *use_rawsql = NULL, event_name, *unique_row, intermediate, *type;
-	zval *cache_options, cache_key, lifetime, cache_service, *dependency_injector, cache, *frontend = NULL, result, is_fresh;
+	zval *cache_options, cache_key, lifetime, cache_service, *dependency_injector, cache, frontend, result, is_fresh;
 	zval prepared_result, *default_bind_params;
 	zval merged_params, *default_bind_types;
 	zval merged_types, exception_message;
@@ -4503,23 +4502,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				return;
 			}
 
-			PHALCON_VERIFY_INTERFACEW(cache, phalcon_cache_backendinterface_ce);
+			PHALCON_VERIFY_INTERFACEW(&cache, phalcon_cache_backendinterface_ce);
 
 			/**
 			 * By defaut use use 3600 seconds (1 hour) as cache lifetime
 			 */
 			if (!phalcon_array_isset_fetch_str(&lifetime, cache_options, SL("lifetime"))) {
-				PHALCON_CALL_METHODW(&frontend, cache, "getfrontend");
+				PHALCON_CALL_METHODW(&frontend, &cache, "getfrontend");
 
-				if (Z_TYPE_P(frontend) == IS_OBJECT) {
-					PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_cache_frontendinterface_ce, phalcon_mvc_model_exception_ce, 0);
-					PHALCON_CALL_METHODW(&lifetime, frontend, "getlifetime");
+				if (Z_TYPE(frontend) == IS_OBJECT) {
+					PHALCON_VERIFY_INTERFACE_EX(&frontend, phalcon_cache_frontendinterface_ce, phalcon_mvc_model_exception_ce, 0);
+					PHALCON_CALL_METHODW(&lifetime, &frontend, "getlifetime");
 				} else {
 					ZVAL_LONG(&lifetime, 3600);
 				}
 			}
 
-			PHALCON_CALL_METHODW(&result, cache, "get", &cache_key, &lifetime);
+			PHALCON_CALL_METHODW(&result, &cache, "get", &cache_key, &lifetime);
 			if (Z_TYPE(result) != IS_NULL) {
 				if (Z_TYPE(result) != IS_OBJECT) {
 					PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The cache didn't return a valid resultset");
@@ -4636,7 +4635,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			return;
 		}
 
-		PHALCON_CALL_METHODW(NULL, cache, "save", &cache_key, &result, &lifetime);
+		PHALCON_CALL_METHODW(NULL, &cache, "save", &cache_key, &result, &lifetime);
 	}
 
 	/** 
@@ -4659,7 +4658,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getSingleResult){
 
-	zval *bind_params = NULL, *bind_types = NULL, *unique_row, *first_result = NULL, *result = NULL;
+	zval *bind_params = NULL, *bind_types = NULL, *unique_row, first_result, result;
 
 	phalcon_fetch_params(0, 0, 2, &bind_params, &bind_types);
 
@@ -4921,7 +4920,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models), model_key) {
 			if (!phalcon_array_isset_fetch(&model, &models_instances, model_key)) {
-				PHALCON_CALL_METHODW(&model, manager, "load", model_key);
+				PHALCON_CALL_METHODW(&model, &manager, "load", model_key);
 				phalcon_array_update_zval(&models_instances, model_key, &model, PH_COPY);
 			}
 
@@ -4954,9 +4953,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getSql){
 
-	zval *intermediate = NULL, *type, exception_message;
-
-	PHALCON_MM_GROW();
+	zval intermediate, *type, exception_message;
 
 	PHALCON_CALL_METHODW(&intermediate, getThis(), "parse");
 
@@ -4965,19 +4962,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getSql){
 	switch (phalcon_get_intval(type)) {
 
 		case PHQL_T_SELECT:
-			PHALCON_RETURN_CALL_METHOD(getThis(), "_getsqlselect", intermediate);
+			PHALCON_RETURN_CALL_METHODW(getThis(), "_getsqlselect", &intermediate);
 			break;
 
 		case PHQL_T_INSERT:
-			PHALCON_RETURN_CALL_METHOD(getThis(), "_getsqlinsert", intermediate);
+			PHALCON_RETURN_CALL_METHODW(getThis(), "_getsqlinsert", &intermediate);
 			break;
 
 		case PHQL_T_UPDATE:
-			PHALCON_RETURN_CALL_METHOD(getThis(), "_getsqlupdate", intermediate);
+			PHALCON_RETURN_CALL_METHODW(getThis(), "_getsqlupdate", &intermediate);
 			break;
 
 		case PHQL_T_DELETE:
-			PHALCON_RETURN_CALL_METHOD(getThis(), "_getsqldelete", intermediate);
+			PHALCON_RETURN_CALL_METHODW(getThis(), "_getsqldelete", &intermediate);
 			break;
 
 		default:
@@ -4986,8 +4983,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getSql){
 			return;
 
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

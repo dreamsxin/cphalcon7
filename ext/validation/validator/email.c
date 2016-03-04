@@ -77,59 +77,53 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Email){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Email, validate){
 
-	zval *validator, *attribute, *value = NULL, allow_empty;
-	zval *valid = NULL, label, message_str, *message, code;
-	zval pairs, *prepared = NULL;
+	zval *validator, *attribute, value, allow_empty, valid, label, message_str, message, code, pairs, prepared;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &validator, &attribute);
-	
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 1);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
 
-	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
-		RETURN_MM_TRUE;
+		RETURN_TRUE;
 	}
-	
-	PHALCON_CALL_SELF(&valid, "valid", value);
-	
-	if (PHALCON_IS_FALSE(valid)) {
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
-		if (!zend_is_true(label)) {
-			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
+
+	PHALCON_CALL_SELFW(&valid, "valid", &value);
+
+	if (PHALCON_IS_FALSE(&valid)) {
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
+		if (!zend_is_true(&label)) {
+			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				ZVAL_COPY_VALUE(&label, attribute);
 			}
 		}
 
 		array_init_size(&pairs, 1);
-		Z_TRY_ADDREF_P(&label);
-		add_assoc_zval_ex(&pairs, SL(":field"), &label);
+		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
 
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Email"));
+			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Email"));
 		}
 
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
-		if (Z_TYPE_P(&code) == IS_NULL) {
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
+		if (Z_TYPE(code) == IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 
-		message = phalcon_validation_message_construct_helper(prepared, attribute, "Email", &code);
-		Z_TRY_DELREF_P(message);
-	
-		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
-		RETURN_MM_FALSE;
+		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Email", &code);
+
+		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }
 
 /**
@@ -140,19 +134,16 @@ PHP_METHOD(Phalcon_Validation_Validator_Email, validate){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Email, valid){
 
-	zval *value, *validate_email, *valid = NULL;
+	zval *value, validate_email, valid;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_fetch_params(1, 1, 0, &value);
+	ZVAL_LONG(&validate_email, 274);
 
-	PHALCON_ALLOC_INIT_ZVAL(validate_email);
-	ZVAL_LONG(validate_email, 274);
-	
-	PHALCON_CALL_FUNCTION(&valid, "filter_var", value, validate_email);
-	if (PHALCON_IS_FALSE(valid)) {
-		RETURN_MM_FALSE;
+	PHALCON_CALL_FUNCTIONW(&valid, "filter_var", value, validate_email);
+	if (PHALCON_IS_FALSE(&valid)) {
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }

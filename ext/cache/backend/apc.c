@@ -446,7 +446,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 		it->funcs->get_current_key(&it, &itkey);
 		if (likely(Z_TYPE(itkey) == IS_STRING)) {
 			ZVAL_NEW_STR(&key, Z_STR(itkey));
-			if (FAILURE == phalcon_return_call_function(NULL, "apc_delete", 1, params)) {
+			if (FAILURE == phalcon_call_function(NULL, "apc_delete", 1, params)) {
 				break;
 			}
 		}

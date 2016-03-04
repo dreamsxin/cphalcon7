@@ -167,7 +167,7 @@ int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_e
 		ZVAL_STRING(&t, type);
 		params[0] = &t;
 
-		return phalcon_return_call_method(&return_value, this_ptr, "getdefaultmessage", 1, params);
+		return phalcon_call_method(&return_value, this_ptr, "getdefaultmessage", 1, params);
 	}
 }
 

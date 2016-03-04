@@ -185,12 +185,12 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 			ttl = phalcon_get_intval(lifetime);
 		}
 
-		phalcon_filemtime(&modified_time, cache_file);
-		if (unlikely(Z_TYPE_P(&modified_time) != IS_LONG)) {
+		phalcon_filemtime(&modified_time, &cache_file);
+		if (unlikely(Z_TYPE(modified_time) != IS_LONG)) {
 			convert_to_long(&modified_time);
 		}
 
-		mtime   = Z_LVAL_P(&modified_time);
+		mtime   = Z_LVAL(modified_time);
 		diff    = now - ttl;
 		expired = diff > mtime;
 
@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 			/**
 			 * Use file-get-contents to control that the openbase_dir can't be skipped
 			 */
-			phalcon_file_get_contents(&cached_content, cache_file);
+			phalcon_file_get_contents(&cached_content, &cache_file);
 			if (PHALCON_IS_FALSE(&cached_content)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Cache file ", &cache_file, " could not be opened");
 				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_cache_exception_ce, &exception_message);

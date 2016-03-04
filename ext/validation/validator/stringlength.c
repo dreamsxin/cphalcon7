@@ -84,79 +84,73 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_StringLength){
  */
 PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 
-	zval *validator, *attribute, *value = NULL, allow_empty;
-	zval *valid = NULL, *type, maximum, minimum, label;
+	zval *validator, *attribute, value, allow_empty, valid, type, maximum, minimum, label;
 	zval code, pairs, message_str = NULL, *prepared = NULL, *message;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &validator, &attribute);
-	
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 1);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
 
-	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
-		RETURN_MM_TRUE;
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&maximum, ce, getThis(), "max"));
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&minimum, ce, getThis(), "min"));
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&maximum, ce, getThis(), "max"));
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&minimum, ce, getThis(), "min"));
 
-	PHALCON_CALL_SELF(&valid, "valid", value, &minimum, &maximum);
+	PHALCON_CALL_SELFW(&valid, "valid", &value, &minimum, &maximum);
 
 	if (PHALCON_IS_FALSE(valid)) {
 		type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
 
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
-		if (!zend_is_true(label)) {
-			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
+		if (!zend_is_true(&label)) {
+			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				ZVAL_COPY_VALUE(&label, attribute);
 			}
 		}
 
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
 		if (Z_TYPE_P(&code) == IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 		
 		array_init_size(&pairs);
-		Z_TRY_ADDREF_P(&label);
-		add_assoc_zval_ex(&pairs, SL(":field"), &label);
+		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
 		if (phalcon_compare_strict_string(type, SL("TooLong"))) {
-			Z_TRY_ADDREF_P(&maximum);
-			add_assoc_zval_ex(&pairs, SL(":max"), &maximum);
+			phalcon_array_update_str(&pairs, SL(":max"), &maximum, PH_COPY);
 
-			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), "messageMaximum"));
+			RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), "messageMaximum"));
 			if (!zend_is_true(&message_str)) {
-				RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "TooLong"));
+				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "TooLong"));
 			}
 
-			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 
-			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooLong", &code);
+			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooLong", &code);
 		} else {
-			Z_TRY_ADDREF_P(&minimum);
-			add_assoc_zval_ex(pairs, SL(":min"), &minimum);
+			phalcon_array_update_str(&pairs, SL(":min"), &minimum);
 
-			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), "messageMinimum"));
-			if (!zend_is_true(message_str)) {
-				RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "TooShort"));
+			RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), "messageMinimum"));
+			if (!zend_is_true(&message_str)) {
+				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "TooShort"));
 			}
 
-			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 
-			message = phalcon_validation_message_construct_helper(prepared, attribute, "TooShort", &code);
+			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooShort", &code);
 		}
 
-		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }
 
 /**
@@ -169,12 +163,9 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
  */
 PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 
-	zval *value, *minimum = NULL, *maximum = NULL;
-	zval *length = NULL, *valid = NULL;
+	zval *value, *minimum = NULL, *maximum = NULL, length, valid;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &value, &minimum, &maximum);
+	phalcon_fetch_params(0, 1, 2, &value, &minimum, &maximum);
 
 	if (!minimum) {
 		minimum = &PHALCON_GLOBAL(z_null);
@@ -186,38 +177,35 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 
 	/* At least one of 'min' or 'max' must be set */
 	if (Z_TYPE_P(minimum) == IS_NULL && Z_TYPE_P(maximum) == IS_NULL) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "A minimum or maximum must be set");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "A minimum or maximum must be set");
 		return;
 	}
 
 	/* Check if mbstring is available to calculate the correct length */
 	if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
-		PHALCON_CALL_FUNCTION(&length, "mb_strlen", value);
+		PHALCON_CALL_FUNCTIONW(&length, "mb_strlen", value);
 	} else {
 		convert_to_string(value);
-		PHALCON_INIT_VAR(length);
-		ZVAL_LONG(length, Z_STRLEN_P(value));
+		ZVAL_LONG(&length, Z_STRLEN_P(value));
 	}
 
 	/* Maximum length */
 	if (Z_TYPE_P(maximum) != IS_NULL) {
-		PHALCON_INIT_NVAR(valid);
-		is_smaller_function(valid, maximum, length);
-		if (PHALCON_IS_TRUE(valid)) {
+		is_smaller_function(&valid, maximum, length);
+		if (PHALCON_IS_TRUE(&valid)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("TooLong"));
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 		}
 	}
 
 	/* Minimum length */
 	if (Z_TYPE_P(minimum) != IS_NULL) {
-		PHALCON_INIT_NVAR(valid);
-		is_smaller_function(valid, length, minimum);
-		if (PHALCON_IS_TRUE(valid)) {
+		is_smaller_function(&valid, length, minimum);
+		if (PHALCON_IS_TRUE(&valid)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("TooShort"));
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 		}
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }

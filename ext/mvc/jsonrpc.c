@@ -215,11 +215,11 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, getDefaultModule){
 
 static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *this_ptr, zval *params)
 {
+	zval event_name;
+	zval status;
+	uint params_cnt = 2 + (params != NULL ? 1 : 0);
+	zval *p[3];
 	if (mgr) {
-		zval event_name;
-		zval *status = NULL;
-		uint params_cnt = 2 + (params != NULL ? 1 : 0);
-		zval *p[3];
 
 		ZVAL_STRING(&event_name, event);
 
@@ -231,7 +231,7 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
 			return FAILURE;
 		}
 
-		return zend_is_true(status) ? SUCCESS : FAILURE;
+		return zend_is_true(&status) ? SUCCESS : FAILURE;
 	}
 
 	return SUCCESS;

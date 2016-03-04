@@ -41,7 +41,7 @@ static inline void phalcon_forms_element_render_helper(const char *method, int u
 	PHALCON_CALL_METHODW(&widget_attributes, getThis(), "prepareattributes", attributes, uc);
 
 	params[0] = &widget_attributes;
-	if (FAILURE == phalcon_call_class_method_aparams(&return_value, NULL, phalcon_tag_ce, phalcon_fcall_ce, method, strlen(method), 1, params)) {
+	if (FAILURE == phalcon_call_ce(return_value, phalcon_tag_ce, method, 1, params)) {
 		;
 	}
 

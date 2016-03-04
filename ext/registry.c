@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_Registry, __call){
 
 	if (phalcon_isset_property_array(getThis(), SL("_data"), name)) {
 		callback = phalcon_read_property_array(getThis(), SL("_data"), name);
-		PHALCON_RETURN_CALL_ZVAL_FUNCTIONW(callback, arguments);
+		PHALCON_CALL_ZVAL_FUNCTIONW(return_value, callback, arguments);
 	} else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_P(name));
 	}

@@ -1127,7 +1127,7 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 			params_ptr = NULL;
 		}
 
-		outcome = phalcon_call_class_method_aparams(NULL, return_value, Z_OBJCE_P(return_value), phalcon_fcall_method, "__construct", 11, param_count, params_ptr);
+		outcome = phalcon_call_method(NULL, return_value, "__construct", param_count, params_ptr);
 
 		if (unlikely(params_arr != NULL)) {
 			efree(params_arr);

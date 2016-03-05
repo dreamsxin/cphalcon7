@@ -411,17 +411,17 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
 	} else {
 		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
-		PHALCON_CONCAT_VV(&last_key, prefix, key_name);
+		PHALCON_CONCAT_VV(&last_key, &prefix, key_name);
 	}
 
 	if (zend_is_true(&last_key)) {
 		phalcon_return_property(&options, getThis(), SL("_options"));
-		phalcon_array_fetch_str(&cache_dir, options, SL("cacheDir"), PH_NOISY);
+		phalcon_array_fetch_str(&cache_dir, &options, SL("cacheDir"), PH_NOISY);
 
 		PHALCON_CONCAT_VV(&cache_file, &cache_dir, &last_key);
 
 		if (phalcon_file_exists(&cache_file) == SUCCESS) {
-			phalcon_return_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+			phalcon_return_property(&frontend, getThis(), SL("_frontend"));
 
 			/**
 			 * Check if the file has expired
@@ -568,7 +568,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 
 	phalcon_array_fetch_str(&cache_dir, options, SL("cacheDir"), PH_NOISY);
 
-	PHALCON_CONCAT_VV(&cache_file, cache_dir, prefixed_key);
+	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
 	assert(Z_TYPE(cache_file) == IS_STRING);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {

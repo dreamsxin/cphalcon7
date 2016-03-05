@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save){
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"), PH_NOISY);
+		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
 	} else {
 		prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save){
 	}
 
 	if (!phalcon_is_numeric(&cached_content)) {
-		PHALCON_CALL_METHODW(&prepared_content, frontend, "beforestore", cached_content);
+		PHALCON_CALL_METHODW(&prepared_content, frontend, "beforestore", &cached_content);
 	} else {
 		ZVAL_COPY(&prepared_content, &cached_content);
 	}
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Apc, decrement){
 
-	zval *key_name, *value = NULL, *prefix, *prefixed_key, cached_content;
+	zval *key_name, *value = NULL, *prefix, prefixed_key, cached_content;
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -355,7 +355,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
 		zval key, itkey;
 
-		it->funcs->get_current_key(&it, &itkey);
+		it->funcs->get_current_key(it, &itkey);
 		if (likely(Z_TYPE(itkey) == IS_STRING)) {
 			ZVAL_STRINGL(&key, Z_STRVAL(itkey) + 5, Z_STRLEN(itkey) - 5);
 			phalcon_array_append(return_value, &key, PH_COPY);
@@ -405,7 +405,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, exists){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 
-	zval *type, prefix_pattern, iterator, type;
+	zval prefix_pattern, iterator, type;
 	zend_class_entry *apciterator_ce;
 	zend_object_iterator *it;
 
@@ -426,7 +426,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 	/* APCIterator implements Iterator */
 	assert(instanceof_function_ex(apciterator_ce, zend_ce_iterator, 1));
 
-	it = apciterator_ce->get_iterator(apciterator_ce, iterator, 0);
+	it = apciterator_ce->get_iterator(apciterator_ce, &iterator, 0);
 
 	/* APCIterator is an iterator */
 	assert(it != NULL);
@@ -439,14 +439,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 
 	it->funcs->rewind(it);
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
-		zval key, itkey, params[1];;
-
-		params[0] = &key;
+		zval key, itkey;
+		int flag;
 
 		it->funcs->get_current_key(&it, &itkey);
 		if (likely(Z_TYPE(itkey) == IS_STRING)) {
 			ZVAL_NEW_STR(&key, Z_STR(itkey));
-			if (FAILURE == phalcon_call_function(NULL, "apc_delete", 1, params)) {
+			PHALCON_CALL_FUNCTION_FLAG(flag, NULL, "apc_delete", &key);
+			if (FAILURE == flag) {
 				break;
 			}
 		}

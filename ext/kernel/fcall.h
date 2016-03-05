@@ -170,7 +170,6 @@ static inline int phalcon_has_constructor(const zval *object)
 #define PHALCON_RETURN_CALL_STATIC(method, ...) PHALCON_CALL_METHOD_WITH_PARAMS(return_value, NULL, NULL, phalcon_fcall_static, method, __VA_ARGS__)
 #define PHALCON_RETURN_CALL_CE_STATIC(obj_ce, method, ...) PHALCON_CALL_METHOD_WITH_PARAMS(return_value, NULL, obj_ce, phalcon_fcall_static, method, __VA_ARGS__)
 
-
 #define PHALCON_CALL_FUNCTION_FLAG(flag, retval, method, ...) PHALCON_CALL_METHOD_WITH_FLAG(flag, retval, NULL, NULL, phalcon_fcall_function, method, __VA_ARGS__)
 #define PHALCON_CALL_METHOD_FLAG(flag, retval, object, method, ...) PHALCON_CALL_METHOD_WITH_FLAG(flag, retval, object, Z_OBJCE_P(object), phalcon_fcall_method, method, __VA_ARGS__)
 #define PHALCON_CALL_SELF_FLAG(flag, retval, method, ...) PHALCON_CALL_METHOD_WITH_FLAG(flag, retval, NULL, NULL, phalcon_fcall_self, method, __VA_ARGS__)

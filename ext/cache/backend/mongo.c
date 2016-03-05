@@ -423,8 +423,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(documents_array), document) {
 		zval key;
 		if (likely(phalcon_array_isset_fetch_str(&key, document, SL("key")))) {
-			Z_TRY_ADDREF_P(key);
-			add_next_index_zval(return_value, &key);
+			phalcon_array_append(return_value, &key, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 }
@@ -438,7 +437,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 
-	zval *key_name = NULL, *lifetime = NULL, collection, last_key, conditions, number, time_condition;
+	zval *key_name = NULL, *lifetime = NULL, collection, last_key, prefix, conditions, number, time_condition;
 	long int n;
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
@@ -462,7 +461,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 
 		PHALCON_CALL_METHODW(&number, &collection, "count", &conditions);
 
-		n = phalcon_get_intval(number);
+		n = phalcon_get_intval(&number);
 
 		RETVAL_BOOL(n > 0);
 	} else {
@@ -494,7 +493,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, gc) {
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 
 	zval *key_name, *value = NULL, lifetime, frontend, prefix, prefixed_key, collection, conditions, document, timestamp;
-	zval ttl, modified_time, difference, not_expired, cached_content;
+	zval modified_time, difference, not_expired, cached_content;
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -521,10 +520,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 	ZVAL_LONG(&timestamp, (long) time(NULL));
 
 	phalcon_return_property(&lifetime, getThis(), SL("_lastLifetime"));
-	if (Z_TYPE_P(lifetime) == IS_NULL) {
-		PHALCON_CALL_METHODW(&ttl, &frontend, "getlifetime");
-	} else {
-		ZVAL_COPY(&ttl, lifetime);
+	if (Z_TYPE(lifetime) == IS_NULL) {
+		PHALCON_CALL_METHODW(&lifetime, &frontend, "getlifetime");
 	}
 
 	if (!phalcon_array_isset_str(&document, SL("time"))) {
@@ -533,7 +530,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 	}
 
 	phalcon_array_fetch_str(&modified_time, &document, SL("time"), PH_NOISY);
-	phalcon_sub_function(&difference, &timestamp, &ttl);
+	phalcon_sub_function(&difference, &timestamp, &lifetime);
 	is_smaller_function(&not_expired, &difference, &modified_time);
 
 	/** 

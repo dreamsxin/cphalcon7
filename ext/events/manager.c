@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Events_Manager, getResponses){
  */
 PHP_METHOD(Phalcon_Events_Manager, detach){
 
-	zval *type, *handler, events, queue, priority_queue, priority, *listener;
+	zval *type, *handler, events, queue, priority_queue, *listener;
 	zend_string *str_key;
 	ulong idx;
 
@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 				break;
 			}
 
-			PHALCON_CALL_METHODW(&listener0, queue, "current");
+			PHALCON_CALL_METHODW(&listener0, &queue, "current");
 			PHALCON_CALL_METHODW(&handler_embeded, &listener0, "getlistener");
 
 			if (!phalcon_is_equal(&handler_embeded, handler)) {
@@ -318,7 +318,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHODW(NULL, &queue, "next");
 		}
 	} else {
-		ZVAL_COPY_VALUE(&priority_queue, &queue));
+		ZVAL_COPY_VALUE(&priority_queue, &queue);
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(queue), idx, str_key, listener) {
 			zval key, handler_embeded;
 			if (str_key) {
@@ -372,7 +372,7 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
  */
 PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
-	zval *queue, *event, event_name, source, data, cancelable, collect, iterator, listener;
+	zval *queue, *event, event_name, source, data, cancelable, collect, iterator, *listener, status;
 	zend_class_entry *ce, *weakref_ce;
 
 	phalcon_fetch_params(0, 2, 0, &queue, &event);
@@ -436,7 +436,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 		PHALCON_CALL_METHODW(NULL, &iterator, "top");
 
 		while (1) {
-			zval r0, listener0, handler_embeded, handler_referenced, handler, arguments, status, is_stopped;
+			zval r0, listener0, handler_embeded, handler_referenced, handler, arguments, is_stopped;
 
 			PHALCON_CALL_METHODW(&r0, &iterator, "valid");
 			if (!zend_is_true(&r0)) {
@@ -446,8 +446,8 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 			/** 
 			 * Get the current data
 			 */
-			PHALCON_CALL_METHODW(&listener, &iterator, "current");
-			PHALCON_CALL_METHODW(&handler_embeded, &listener, "getlistener");
+			PHALCON_CALL_METHODW(&listener0, &iterator, "current");
+			PHALCON_CALL_METHODW(&handler_embeded, &listener0, "getlistener");
 
 			/** 
 			 * Only handler objects are valid
@@ -550,7 +550,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 		}
 	} else {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), listener) {
-			zval handler_embeded, handler_referenced, handler, arguments, status, is_stopped;
+			zval handler_embeded, handler_referenced, handler, arguments, is_stopped;
 
 			PHALCON_CALL_METHODW(&handler_embeded, listener, "getlistener");
 			/** 
@@ -585,7 +585,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/** 
 					 * Create the closure arguments
 					 */
-					if (Z_TYPE_P(arguments) <= IS_NULL) {
+					if (Z_TYPE(arguments) <= IS_NULL) {
 						array_init_size(&arguments, 3);
 						phalcon_array_append(&arguments, event, PH_COPY);
 						phalcon_array_append(&arguments, &source, PH_COPY);
@@ -628,11 +628,10 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 						 * Collect the response
 						 */
 						if (zend_is_true(&collect)) {
-							phalcon_update_property_array_append(getThis(), SL("_responses"), status);
+							phalcon_update_property_array_append(getThis(), SL("_responses"), &status);
 						}
 
 						if (zend_is_true(&cancelable)) {
-
 							/** 
 							 * Check if the event was stopped by the user
 							 */
@@ -842,8 +841,8 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
  */
 PHP_METHOD(Phalcon_Events_Manager, getEvents){
 
-	zval *events;
+	zval events;
 
 	phalcon_return_property(&events, getThis(), SL("_events"));
-	phalcon_array_keys(return_value, events);
+	phalcon_array_keys(return_value, &events);
 }

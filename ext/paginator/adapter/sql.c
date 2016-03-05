@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 		phalcon_update_property_empty_array(getThis(), SL("_bind"));
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
 
 	phalcon_update_property_this(getThis(), SL("_db"), &db);
 	phalcon_update_property_this(getThis(), SL("_sql"), &sql);
@@ -260,25 +260,20 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getDb){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
-	zval *db, *sql, *total_sql, *bind;
-	zval *limit, *number_page;
-	zval fetch_mode, *items = NULL;
-	zval *row = NULL, *rowcount;
+	zval db, sql, total_sql, bind, limit, number_page, number, fetch_mode, items, row, rowcount;
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 	ldiv_t tp;
 
-	PHALCON_MM_GROW();
+	phalcon_return_property(&db, getThis(), SL("_db"));
+	phalcon_return_property(&sql, getThis(), SL("_sql"));
+	phalcon_return_property(&total_sql, getThis(), SL("_total_sql"));
+	phalcon_return_property(&bind, getThis(), SL("_bind"));
+	phalcon_return_property(&limit, getThis(), SL("_limitRows"));
+	phalcon_return_property(&number_page, getThis(), SL("_page"));
 
-	db = phalcon_read_property(getThis(), SL("_db"), PH_NOISY);
-	sql = phalcon_read_property(getThis(), SL("_sql"), PH_NOISY);
-	total_sql = phalcon_read_property(getThis(), SL("_total_sql"), PH_NOISY);
-	bind = phalcon_read_property(getThis(), SL("_bind"), PH_NOISY);
-
-	limit         = phalcon_read_property(getThis(), SL("_limitRows"), PH_NOISY);
-	number_page   = phalcon_read_property(getThis(), SL("_page"), PH_NOISY);
-	i_limit       = phalcon_get_intval(limit);
-	i_number_page = phalcon_get_intval(number_page);
+	i_limit       = phalcon_get_intval(&limit);
+	i_number_page = phalcon_get_intval(&number_page);
 
 	if (i_limit < 1) {
 		/* This should never happen unless someone deliberately modified the properties of the object */
@@ -294,31 +289,29 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
 	ZVAL_LONG(&fetch_mode, PDO_FETCH_OBJ);
 
-	PHALCON_CALL_METHOD(&row, db, "fetchone", total_sql, &fetch_mode, bind);
-	
-	rowcount = phalcon_read_property(row, SL("rowcount"), PH_NOISY);
+	PHALCON_CALL_METHODW(&row, &db, "fetchone", &total_sql, &fetch_mode, &bind);
+
+	phalcon_return_property(&rowcount, &row, SL("rowcount"));
 
 	/* Set the limit clause avoiding negative offsets */
 	if (i_number < i_limit) {
-		phalcon_array_update_str(bind, SL("limit"), limit, PH_COPY);
-		phalcon_array_update_str_long(bind, SL("offset"), 0, 0);
+		phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);
+		phalcon_array_update_str_long(&bind, SL("offset"), 0, 0);
 	} else {
-		zval *number;
-		PHALCON_ALLOC_INIT_ZVAL(number);
-		ZVAL_LONG(number, i_number);
-		phalcon_array_update_str(bind, SL("limit"), limit, PH_COPY);
-		phalcon_array_update_str(bind, SL("offset"), number, PH_COPY);
+		ZVAL_LONG(&number, i_number);
+		phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);
+		phalcon_array_update_str(&bind, SL("offset"), &number, PH_COPY);
 	}
 
-	PHALCON_CALL_METHOD(&items, db, "fetchall", sql, &fetch_mode, bind);
+	PHALCON_CALL_METHODW(&items, &db, "fetchall", &sql, &fetch_mode, &bind);
 	
-	i_rowcount    = phalcon_get_intval(rowcount);
+	i_rowcount    = phalcon_get_intval(&rowcount);
 	tp            = ldiv(i_rowcount, i_limit);
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);
 	i_next        = (i_number_page < i_total_pages) ? (i_number_page + 1) : i_total_pages;
 
 	object_init(return_value);
-	phalcon_update_property_zval(return_value, SL("items"),       items);
+	phalcon_update_property_zval(return_value, SL("items"),       &items);
 	phalcon_update_property_long(return_value, SL("before"),      i_before);
 	phalcon_update_property_long(return_value, SL("first"),       1);
 	phalcon_update_property_long(return_value, SL("next"),        i_next);
@@ -326,6 +319,4 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	phalcon_update_property_long(return_value, SL("current"),     i_number_page);
 	phalcon_update_property_long(return_value, SL("total_pages"), i_total_pages);
 	phalcon_update_property_long(return_value, SL("total_items"), i_rowcount);
-	
-	PHALCON_MM_RESTORE();
 }

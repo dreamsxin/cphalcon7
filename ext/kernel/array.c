@@ -254,6 +254,7 @@ int phalcon_array_append(zval *arr, zval *value, int flags) {
 
 int phalcon_array_update_zval(zval *arr, const zval *index, zval *value, int flags)
 {
+	zval new_value;
 	HashTable *ht;
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
@@ -262,12 +263,8 @@ int phalcon_array_update_zval(zval *arr, const zval *index, zval *value, int fla
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		zval *new_zv;
-		Z_TRY_DELREF_P(value);
-		PHALCON_ALLOC_INIT_ZVAL(new_zv);
-		INIT_PZVAL_COPY(new_zv, value);
-		value = new_zv;
-		zval_copy_ctor(new_zv);
+		ZVAL_COPY_VALUE(&new_value, value);
+		value = &new_value;
 	}
 
 	if ((flags & PH_SEPARATE) == PH_SEPARATE) {

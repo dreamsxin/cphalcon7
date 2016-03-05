@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, get){
 		RETURN_NULL();
 	}
 
-	if (phalcon_is_numeric(cached_content)) {
+	if (phalcon_is_numeric(&cached_content)) {
 		RETURN_CTORW(&cached_content);
 	} else {
 		PHALCON_RETURN_CALL_METHODW(&frontend, "afterretrieve", &cached_content);
@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, get){
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, cached_content, keys, last_key, frontend;
-	zval prepared_content, ttl, success, is_buffering, prefix, options, special_key, z_zero;
+	zval prepared_content, ttl, success, is_buffering, prefix, options, special_key;
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
@@ -215,10 +215,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 		ZVAL_COPY(&ttl, lifetime);
 	}
 
-	if (!prepared_content) {
-		PHALCON_CALL_FUNCTIONW(&success, "xcache_set", &last_key, &cached_content, &ttl);
-	} else {
+	if (Z_TYPE(prepared_content) > IS_NULL) {
 		PHALCON_CALL_FUNCTIONW(&success, "xcache_set", &last_key, &prepared_content, &ttl);
+	} else {
+		PHALCON_CALL_FUNCTIONW(&success, "xcache_set", &last_key, &cached_content, &ttl);
 	}
 
 	PHALCON_CALL_METHODW(&is_buffering, &frontend, "isbuffering");
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 	PHALCON_CALL_FUNCTIONW(&keys, "xcache_get", &special_key);
 	if (Z_TYPE(keys) == IS_ARRAY) { 
 		phalcon_array_unset(&keys, &prefixed_key, 0);
-		PHALCON_CALL_FUNCTIONW(NULL, "xcache_set", &special_key, keys, &PHALCON_GLOBAL(z_zero));
+		PHALCON_CALL_FUNCTIONW(NULL, "xcache_set", &special_key, &keys, &PHALCON_GLOBAL(z_zero));
 	}
 }
 
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, exists){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, increment){
 
-	zval *key_name = NULL, *value = NULL, last_key, orig_val;
+	zval *key_name = NULL, *value = NULL, last_key, prefix, orig_val;
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -405,7 +405,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, decrement){
 
-	zval *key_name = NULL, *value = NULL, last_key, orig_val;
+	zval *key_name = NULL, *value = NULL, last_key, prefix, orig_val;
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, decrement){
 	if (phalcon_function_exists_ex(SL("xcache_inc")) == SUCCESS) {
 		PHALCON_RETURN_CALL_FUNCTIONW("xcache_inc", &last_key, value);
 	} else {
-		PHALCON_CALL_FUNCTIONW(&orig_val, "xcache_get", last_key);
+		PHALCON_CALL_FUNCTIONW(&orig_val, "xcache_get", &last_key);
 		phalcon_sub_function(return_value, &orig_val, value);
 		PHALCON_CALL_METHODW(NULL, getThis(), "save", key_name, return_value);
 	}

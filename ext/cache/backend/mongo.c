@@ -549,7 +549,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 		}
 
 		phalcon_add_function(return_value, &cached_content, value);
-		phalcon_add_function(&ttl, &lifetime, &timestamp);
 		PHALCON_CALL_METHODW(NULL, getThis(), "save", &prefixed_key, return_value);
 		return;
 	}
@@ -625,7 +624,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 		}
 
 		phalcon_sub_function(return_value, &cached_content, value);
-		phalcon_add_function(&ttl, &lifetime, &timestamp);
 		PHALCON_CALL_METHODW(NULL, getThis(), "save", &prefixed_key, return_value);
 		return;
 	}

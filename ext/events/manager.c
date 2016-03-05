@@ -123,40 +123,39 @@ PHALCON_INIT_CLASS(Phalcon_Events_Manager){
  */
 PHP_METHOD(Phalcon_Events_Manager, attach){
 
-	zval *event_type, *handler, *priority = NULL, *events = NULL;
-	zval *listener = NULL, *enable_priorities, *priority_queue = NULL;
-	zval _priority;
+	zval *event_type, *handler, *_priority = NULL, priority, events;
+	zval listener, enable_priorities, priority_queue;
 
 	PHALCON_MM_GROW();
 
-	phalcon_fetch_params(1, 2, 1, &event_type, &handler, &priority);
+	phalcon_fetch_params(1, 2, 1, &event_type, &handler, &_priority);
 
-	if (!priority) {
-		ZVAL_LONG(&_priority, 100);
-		priority = &_priority;
+	if (!_priority) {
+		ZVAL_LONG(&priority, 100);
+	} else {
+		ZVAL_COPY(&priority, _priority);
 	}
 
 	if (unlikely(Z_TYPE_P(event_type) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event type must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Event type must be a string");
 		return;
 	}
 
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event handler must be an object or callable");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Event handler must be an object or callable");
 		return;
 	}
 
 	if (phalcon_instance_of_ev(handler, phalcon_events_listener_ce)) {
-		PHALCON_CPY_WRT(listener, handler);
-		PHALCON_CALL_METHOD(NULL, listener, "setpriority", priority);
-		PHALCON_CALL_METHOD(NULL, listener, "setevent", event_type);
+		ZVAL_COPY(&listener, handler);
+		PHALCON_CALL_METHODW(NULL, &listener, "setpriority", &priority);
+		PHALCON_CALL_METHODW(NULL, &listener, "setevent", event_type);
 	} else {
-		PHALCON_INIT_VAR(listener);
-		object_init_ex(listener, phalcon_events_listener_ce);
-		PHALCON_CALL_METHOD(NULL, listener, "__construct", handler, priority, event_type);
+		object_init_ex(&listener, phalcon_events_listener_ce);
+		PHALCON_CALL_METHODW(NULL, &listener, "__construct", handler, &priority, event_type);
 	}
 
-	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
+	phalcon_return_property(&events, getThis(), SL("_events"));
 	if (Z_TYPE_P(events) != IS_ARRAY) {
 		PHALCON_INIT_VAR(events);
 		array_init(events);

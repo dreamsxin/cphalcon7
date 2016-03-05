@@ -566,7 +566,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
 	zval *key_name, *value = NULL, lifetime, frontend, prefix, prefixed_key, collection, conditions, document, timestamp;
-	zval ttl, modified_time, difference, not_expired, cached_content;
+	zval modified_time, difference, not_expired, cached_content;
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -593,10 +593,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 	ZVAL_LONG(&timestamp, (long) time(NULL));
 
 	phalcon_return_property(&lifetime, getThis(), SL("_lastLifetime"));
-	if (Z_TYPE_P(lifetime) == IS_NULL) {
-		PHALCON_CALL_METHODW(&ttl, &frontend, "getlifetime");
-	} else {
-		ZVAL_COPY(&ttl, lifetime);
+	if (Z_TYPE(lifetime) == IS_NULL) {
+		PHALCON_CALL_METHODW(&lifetime, &frontend, "getlifetime");
 	}
 
 	if (!phalcon_array_isset_str(&document, SL("time"))) {
@@ -605,7 +603,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 	}
 
 	phalcon_array_fetch_str(&modified_time, &document, SL("time"), PH_NOISY);
-	phalcon_sub_function(&difference, &timestamp, &ttl);
+	phalcon_sub_function(&difference, &timestamp, &lifetime);
 	is_smaller_function(&not_expired, &difference, &modified_time);
 
 	/** 

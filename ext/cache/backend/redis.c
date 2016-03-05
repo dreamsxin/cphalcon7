@@ -197,15 +197,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 		PHALCON_CALL_METHODW(&success, &redis, "connect", &host, &port);
 	}
 	
-	if (!zend_is_true(success)) {
+	if (!zend_is_true(&success)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Cannot connect to Redisd server");
 		return;
 	}
 	
-	if (phalcon_array_isset_fetch_str(&auth, options, SL("auth"))) {
+	if (phalcon_array_isset_fetch_str(&auth, &options, SL("auth"))) {
 		PHALCON_CALL_METHODW(&success, &redis, "auth", &auth);
-
-		if (!zend_is_true(success)) {
+		if (!zend_is_true(&success)) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Redisd server is authentication failed");
 			return;
 		}
@@ -239,7 +238,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, get){
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCR", &prefix, key_name);
 	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
 	
-	PHALCON_CALL_METHODW(&cached_content, redis, "get", &prefixed_key);
+	PHALCON_CALL_METHODW(&cached_content, &redis, "get", &prefixed_key);
 	if (PHALCON_IS_FALSE(&cached_content)) {
 		RETURN_NULL();
 	}
@@ -262,7 +261,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, get){
 PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, last_key, prefix, cached_content, prepared_content, success;
-	zval ttl, is_buffering, prefixed_key, last_key, frontend, redis, options, special_key;
+	zval ttl, is_buffering, prefixed_key, frontend, redis, options, special_key;
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 	
@@ -320,9 +319,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 		PHALCON_CALL_METHODW(&success, &redis, "set", &last_key, &prepared_content);
 	}
 
-	PHALCON_CALL_METHODW(&success, redis, "settimeout", &last_key, &ttl);
+	PHALCON_CALL_METHODW(&success, &redis, "settimeout", &last_key, &ttl);
 
-	if (!zend_is_true(success)) {
+	if (!zend_is_true(&success)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Failed to store data in redisd");
 		return;
 	}
@@ -335,7 +334,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 	}
 
 	if (Z_TYPE(special_key) != IS_NULL) {
-		PHALCON_CALL_METHODW(NULL, redis, "sadd", &special_key, &prefixed_key);
+		PHALCON_CALL_METHODW(NULL, &redis, "sadd", &special_key, &prefixed_key);
 	}
 	
 	PHALCON_CALL_METHODW(&is_buffering, &frontend, "isbuffering");
@@ -359,7 +358,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Redis, delete){
 
-	zval *key_name, *redis, *prefix, prefixed_key, last_key, options, special_key, ret;
+	zval *key_name, redis, prefix, prefixed_key, last_key, options, special_key, ret;
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 	
@@ -499,7 +498,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, increment){
 		PHALCON_CALL_METHODW(&redis, getThis(), "_connect");
 	}
 
-	PHALCON_RETURN_CALL_METHODW(redis, "incrby", &last_key, value);
+	PHALCON_RETURN_CALL_METHODW(&redis, "incrby", &last_key, value);
 }
 
 /**
@@ -534,7 +533,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, decrement){
 		PHALCON_CALL_METHODW(&redis, getThis(), "_connect");
 	}
 
-	PHALCON_RETURN_CALL_METHODW(redis, "decrby", &last_key, value);
+	PHALCON_RETURN_CALL_METHODW(&redis, "decrby", &last_key, value);
 }
 
 /**
@@ -544,7 +543,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, decrement){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 
-	zval redis, options, special_key, keys, value;
+	zval redis, options, special_key, keys, *value;
 
 	phalcon_return_property(&options, getThis(), SL("_options"));
 	
@@ -583,10 +582,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 
 PHP_METHOD(Phalcon_Cache_Backend_Redis, getTrackingKey)
 {
-	zval stats_key;
-	zval *phalcon_return_property(&options, getThis(), SL("_options"));
+	zval options, stats_key;
 
-	if (!phalcon_array_isset_fetch_str(&stats_key, options, SL("statsKey"))) {
+	phalcon_return_property(&options, getThis(), SL("_options"));
+
+	if (!phalcon_array_isset_fetch_str(&stats_key, &options, SL("statsKey"))) {
 		RETURN_NULL();
 	}
 

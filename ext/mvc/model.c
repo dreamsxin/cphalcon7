@@ -6671,7 +6671,7 @@ PHP_METHOD(Phalcon_Mvc_Model, filter){
 			phalcon_return_property(&filter, getThis(), SL("_filter"));
 
 			if (Z_TYPE(filter) != IS_OBJECT) {
-				phalcon_return_property_zval(&dependency_injector, getThis(), SL("_dependencyInjector"));
+				phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 
 				if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 					PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access the 'filter' service");

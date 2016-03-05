@@ -595,7 +595,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, getTrackingKey)
 
 PHP_METHOD(Phalcon_Cache_Backend_Redis, setTrackingKey)
 {
-	zval *key, options;
+	zval *key;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 

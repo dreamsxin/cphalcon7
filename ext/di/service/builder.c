@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 	/** 
 	 * The definition has calls?
 	 */
-	if (phalcon_array_isset_str_fetch_str(&param_calls, definition, SL("calls"))) {
+	if (phalcon_array_isset_fetch_str(&param_calls, definition, SL("calls"))) {
 		if (Z_TYPE(instance) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_di_exception_ce, "The definition has setter injection parameters but the constructor didn't return an instance");
 			return;

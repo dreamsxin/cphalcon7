@@ -322,21 +322,21 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
  */
 PHP_METHOD(Phalcon_DI_Service, getParameter){
 
-	zval *position, *definition, arguments;
+	zval *position, definition, arguments;
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	PHALCON_ENSURE_IS_LONG(position);
 
-	definition = phalcon_return_property(getThis(), SL("_definition"), PH_NOISY);
-	if (Z_TYPE_P(definition) != IS_ARRAY) {
+	phalcon_return_property(&definition, getThis(), SL("_definition"));
+	if (Z_TYPE(definition) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_di_exception_ce, "Definition must be an array to obtain its parameters");
 		return;
 	}
 
 	/* Update the parameter */
 	if (
-		!phalcon_array_isset_fetch_str(&arguments, definition, SL("arguments")) ||
-		!phalcon_array_isset_fetch(return_value, arguments, position)
+		!phalcon_array_isset_fetch_str(&arguments, &definition, SL("arguments")) ||
+		!phalcon_array_isset_fetch(return_value, &arguments, position)
 	) {
 		RETURN_NULL();
 	}

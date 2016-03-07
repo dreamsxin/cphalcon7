@@ -53,6 +53,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setEventsManager);
 PHP_METHOD(Phalcon_DI_Injectable, getEventsManager);
 PHP_METHOD(Phalcon_DI_Injectable, fireEvent);
 PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel);
+PHP_METHOD(Phalcon_DI_Injectable, getResolveService);
 PHP_METHOD(Phalcon_DI_Injectable, __get);
 
 static const zend_function_entry phalcon_di_injectable_method_entry[] = {
@@ -62,6 +63,7 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_DI_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -253,6 +255,42 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 	}
 
 	RETURN_TRUE;
+}
+
+/**
+ * Magic method __get
+ *
+ * @param string $propertyName
+ */
+PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
+
+	zval *name, *args = NULL, *noerror = NULL, *shared = NULL, dependency_injector;
+
+	phalcon_fetch_params(0, 1, 3, &name, &args, &noerror, &shared);
+
+	if (!args) {
+		args = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!noerror) {
+		noerror = &PHALCON_GLOBAL(z_false);
+	}
+
+	if (!shared) {
+		shared = &PHALCON_GLOBAL(z_false);
+	}
+
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_di_exception_ce, "A dependency injection container is required to access the '%s' service", Z_STRVAL_P(name));
+		return;
+	}
+
+	if (zend_is_true(shared)) {
+		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "getshared");
+	} else {
+		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "get", name, args, noerror);
+	}
 }
 
 /**

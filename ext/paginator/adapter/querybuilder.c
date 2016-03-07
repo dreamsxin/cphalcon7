@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	zval original_builder, builder, total_builder, limit, number_page, number, query, items, total_query, result, row, rowcount, dependency_injector;
 	zval service_name, models_manager, models, model_name, model, connection, bind_params, bind_types, processed, *value, processed_types;
-	zval intermediate, columns, *column, dialect, sql_select, sql, sql_tmp, paginate;
+	zval intermediate, columns, *column, dialect, sql_select, sql, paginate;
 	zend_string *str_key;
 	ulong idx;
 	ldiv_t tp;
@@ -388,7 +388,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	if (Z_TYPE(bind_types) == IS_ARRAY) { 
 		array_init(&processed_types);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_types), idx, str_key, value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_types), idx, str_key, value) {
 			zval wildcard, string_wildcard;
 			if (str_key) {
 				ZVAL_STR(&wildcard, str_key);
@@ -413,7 +413,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	phalcon_array_fetch_str(&rowcount, &row, SL("rowcount"), PH_NOISY);
 
-	i_rowcount    = phalcon_get_intval(rowcount);
+	i_rowcount    = phalcon_get_intval(&rowcount);
 	tp            = ldiv(i_rowcount, i_limit);
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);
 	i_next        = (i_number_page < i_total_pages) ? (i_number_page + 1) : i_total_pages;

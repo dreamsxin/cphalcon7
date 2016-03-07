@@ -195,12 +195,10 @@ PHALCON_INIT_CLASS(Phalcon_Security_Random){
  */
 PHP_METHOD(Phalcon_Security_Random, bytes){
 
-	zval *len_param = NULL, *len, *file_path, *mode, *handle = NULL, *buffer, *ret = NULL;
+	zval *len_param = NULL, len, file_path, mode, handle, buffer, ret;
 	int l;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &len_param);
+	phalcon_fetch_params(0, 0, 1, &len_param);
 
 	if (!len_param) {
 		l = 16;
@@ -213,45 +211,40 @@ PHP_METHOD(Phalcon_Security_Random, bytes){
 		l = 16;
 	}
 
-	PHALCON_INIT_VAR(len);
-	ZVAL_LONG(len, l);
+	ZVAL_LONG(&len, l);
 
-	if ((phalcon_function_exists_ex(SS("\\sodium\\randombytes_buf") TSRMLS_CC) == SUCCESS)) {
-		PHALCON_RETURN_CALL_FUNCTION("\\sodium\\randombytes_buf", len);
-		RETURN_MM();
+	if ((phalcon_function_exists_ex(SS("\\sodium\\randombytes_buf")) == SUCCESS)) {
+		PHALCON_RETURN_CALL_FUNCTIONW("\\sodium\\randombytes_buf", &len);
+		return;
 	}
-	if ((phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes") TSRMLS_CC) == SUCCESS)) {
-		PHALCON_RETURN_CALL_FUNCTION("openssl_random_pseudo_bytes", len);
-		RETURN_MM();
+	if ((phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes")) == SUCCESS)) {
+		PHALCON_RETURN_CALL_FUNCTIONW("openssl_random_pseudo_bytes", &len);
+		return;
 	}
 
-	PHALCON_INIT_VAR(file_path);
-	ZVAL_STRING(file_path, "/dev/urandom");
+	ZVAL_STRING(&file_path, "/dev/urandom");
 
-	if (phalcon_file_exists(file_path TSRMLS_CC) == SUCCESS) {
-		PHALCON_INIT_VAR(mode);
-		ZVAL_STRING(mode, "rb");
+	if (phalcon_file_exists(file_path) == SUCCESS) {
+		ZVAL_STRING(&mode, "rb");
 
-		PHALCON_CALL_FUNCTION(&handle, "fopen", file_path, mode);
+		PHALCON_CALL_FUNCTIONW(&handle, "fopen", &file_path, &mode);
 
-		if (!PHALCON_IS_FALSE(handle)) {
-			PHALCON_INIT_VAR(buffer);
-			ZVAL_LONG(buffer, 0);
+		if (!PHALCON_IS_FALSE(&handle)) {
+			ZVAL_LONG(&buffer, 0);
 
-			PHALCON_CALL_FUNCTION(NULL, "stream_set_read_buffer", handle, buffer);
-			PHALCON_CALL_FUNCTION(&ret, "fread", handle, len);
+			PHALCON_CALL_FUNCTIONW(NULL, "stream_set_read_buffer", &handle, &buffer);
+			PHALCON_CALL_FUNCTIONW(&ret, "fread", &handle, &len);
 
-			phalcon_fclose(handle TSRMLS_CC);
-			if (phalcon_fast_strlen_ev(ret) != l) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Unexpected partial read from random device");
+			phalcon_fclose(&handle);
+			if (phalcon_fast_strlen_ev(&ret) != l) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "Unexpected partial read from random device");
 				return;
 			}
-			RETURN_CCTOR(ret);
+			RETURN_CTORW(&ret);
 		}
 	}
 
-	PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "No random device");
-	return;
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "No random device");
 }
 
 /**
@@ -270,28 +263,23 @@ PHP_METHOD(Phalcon_Security_Random, bytes){
  */
 PHP_METHOD(Phalcon_Security_Random, hex){
 
-	zval *len_param = NULL, *data = NULL, *format, *ret = NULL;
+	zval *len_param = NULL, data, format, ret;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &len_param);
+	phalcon_fetch_params(0, 0, 1, &len_param);
 
 	if (!len_param) {
 		len_param = &PHALCON_GLOBAL(z_zero);
 	}
 
-	PHALCON_CALL_SELF(&data, "bytes", len_param);
+	PHALCON_CALL_SELFW(&data, "bytes", len_param);
 
-	PHALCON_INIT_VAR(format);
-	ZVAL_STRING(format, "H*");
+	ZVAL_STRING(&format, "H*");
 
-	PHALCON_CALL_FUNCTION(&ret, "unpack", format, data);
+	PHALCON_CALL_FUNCTIONW(&ret, "unpack", &format, &data);
 
-	ZVAL_MAKE_REF(ret);
-	PHALCON_RETURN_CALL_FUNCTION("array_shift", ret);
-	ZVAL_UNREF(ret);
-
-	RETURN_MM();
+	ZVAL_MAKE_REF(&ret);
+	PHALCON_RETURN_CALL_FUNCTIONW("array_shift", &ret);
+	ZVAL_UNREF(&ret);
 }
 
 /**

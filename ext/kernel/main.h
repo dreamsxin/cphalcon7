@@ -91,6 +91,8 @@ static inline int is_phalcon_class(const zend_class_entry *ce)
 /* Fetch Parameters */
 int phalcon_fetch_parameters(int num_args, int required_args, int optional_args, ...);
 
+int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
+
 /* Compatibility macros for PHP 5.3 */
 #ifndef INIT_PZVAL_COPY
  #define INIT_PZVAL_COPY(z, v) ZVAL_COPY_VALUE(z, v);\

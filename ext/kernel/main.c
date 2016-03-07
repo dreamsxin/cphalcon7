@@ -334,3 +334,14 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table)
 		*(++EG(symtable_cache_ptr)) = symbol_table;
 	}
 }
+
+int phalcon_get_constant(zval *retval, const char *name, size_t name_len)
+{
+	zval *constant;
+	if ((constant = zend_get_constant_str(name, name_len)) == NULL) {
+		return 0;
+	}
+
+	ZVAL_COPY_VALUE(retval, constant);
+	return 1;
+}

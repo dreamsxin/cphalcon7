@@ -32,6 +32,7 @@
 #include "kernel/string.h"
 #include "kernel/exception.h"
 #include "kernel/object.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 

@@ -707,7 +707,7 @@ PHP_METHOD(Phalcon_Security, getToken){
  */
 PHP_METHOD(Phalcon_Security, checkToken){
 
-	zval *name = NULL, *token_key = NULL, *token_value = NULL, service, session, key, request, token, session_token;
+	zval *name = NULL, *_token_key = NULL, *token_value = NULL, token_key, service, session, key, request, token, session_token;
 
 	phalcon_fetch_params(0, 0, 3, &name, &token_key, &token_value);
 
@@ -728,7 +728,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
-	if (Z_TYPE_P(token_key) == IS_NULL) {
+	if (Z_TYPE(token_key) == IS_NULL) {
 		ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
 
 		if (!PHALCON_IS_EMPTY(name)) {
@@ -747,7 +747,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 		/**
 		 * We always check if the value is correct in post
 		 */
-		PHALCON_CALL_METHODW(&token, &request, "getpost", token_key);
+		PHALCON_CALL_METHODW(&token, &request, "getpost", &token_key);
 	} else {
 		ZVAL_COPY(&token, token_value);
 	}
@@ -883,7 +883,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		return;
 	}
 
-	salt_len = Z_STRLEN_P(salt)
+	salt_len = Z_STRLEN_P(salt);
 
 	s_hash = (!hash || Z_TYPE_P(hash) != IS_STRING) ? "sha512" : Z_STRVAL_P(hash);
 
@@ -942,7 +942,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		for (j = 1; j < i_iterations; ++j) {
 			char *k1, *k2;
 
-			PHALCON_CALL_FUNCTIONW(&tmp, "hash_hmac", algo, K1, password, &PHALCON_GLOBAL(z_true));
+			PHALCON_CALL_FUNCTIONW(&tmp, "hash_hmac", &algo, &K1, password, &PHALCON_GLOBAL(z_true));
 			if (Z_TYPE(tmp) != IS_STRING) {
 				RETURN_FALSE;
 			}
@@ -1017,7 +1017,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	ZVAL_LONG(&iter, i_iterations);
 	ZVAL_LONG(&len, i_size);
 
-	PHALCON_CALL_FUNCTIONW(return_value, "hash_pbkdf2", algo, password, salt, iter, len, &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_FUNCTIONW(return_value, "hash_pbkdf2", &algo, password, salt, &iter, &len, &PHALCON_GLOBAL(z_true));
 }
 
 /**

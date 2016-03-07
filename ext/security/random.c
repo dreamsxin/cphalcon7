@@ -529,7 +529,7 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 	ZVAL_LONG(&mask, phalcon_get_numberval(&tmp));
 
 	do {
-		ZVAL_LONG(&tmp, phalcon_fast_strlen_ev(bin));
+		ZVAL_LONG(&tmp, phalcon_fast_strlen_ev(&bin));
 
 		PHALCON_CALL_SELFW(&bytes, "bytes", &tmp);
 
@@ -549,7 +549,7 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 
 	ZVAL_STRING(&format, "H*");
 
-	PHALCON_CALL_FUNCTIONW(&ret, "unpack", format, rnd);
+	PHALCON_CALL_FUNCTIONW(&ret, "unpack", &format, &rnd);
 
 	ZVAL_MAKE_REF(&ret);
 	PHALCON_CALL_FUNCTIONW(&data, "array_shift", &ret);

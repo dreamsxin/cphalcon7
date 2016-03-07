@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooLong", &code);
 		} else {
-			phalcon_array_update_str(&pairs, SL(":min"), &minimum);
+			phalcon_array_update_str(&pairs, SL(":min"), &minimum, PH_COPY);
 
 			RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), "messageMinimum"));
 			if (!zend_is_true(&message_str)) {
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 
 	/* Maximum length */
 	if (Z_TYPE_P(maximum) != IS_NULL) {
-		is_smaller_function(&valid, maximum, length);
+		is_smaller_function(&valid, maximum, &length);
 		if (PHALCON_IS_TRUE(&valid)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("TooLong"));
 			RETURN_FALSE;
@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 
 	/* Minimum length */
 	if (Z_TYPE_P(minimum) != IS_NULL) {
-		is_smaller_function(&valid, length, minimum);
+		is_smaller_function(&valid, &length, minimum);
 		if (PHALCON_IS_TRUE(&valid)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("TooShort"));
 			RETURN_FALSE;

@@ -80,7 +80,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Regex){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Regex, validate){
 
-	zval *validator, *attribute, value, allow_empty, pattern, *valid = NULL, label, pairs, message_str, code, prepared, message;
+	zval *validator, *attribute, value, allow_empty, pattern, valid, label, pairs, message_str, code, prepared, message;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Regex, validate){
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
 		RETURN_TRUE;
 	}
 
@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Regex, validate){
 		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
-				ZVAL_COPAY_VALUE(&label, attribute);
+				ZVAL_COPY_VALUE(&label, attribute);
 			}
 		}
 
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Regex, valid){
 	phalcon_fetch_params(0, 2, 0, &value, &pattern);
 
 	/* Check if the value match using preg_match in the PHP userland */
-	RETURN_ON_FAILURE(phalcon_preg_match(&match_pattern, pattern, &value, &matches));
+	RETURN_ON_FAILURE(phalcon_preg_match(&match_pattern, pattern, value, &matches));
 
 	if (zend_is_true(&match_pattern)) {
 		phalcon_array_fetch_long(&match_zero, &matches, 0, PH_NOISY);

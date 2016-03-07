@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -86,11 +87,11 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
-	PHALCON_CALL_SELFW(&valid, "valid", value);
+	PHALCON_CALL_SELFW(&valid, "valid", &value);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
-		if (!zend_is_true(label)) {
+		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				ZVAL_COPY_VALUE(&label, attribute);
@@ -112,10 +113,9 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 
 		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 
-		 = phalcon_validation_message_construct_helper(&message, &prepared, attribute, "PresenceOf", &code);
-		Z_TRY_DELREF_P(message);
+		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "PresenceOf", &code);
 
-		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", message);
+		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 

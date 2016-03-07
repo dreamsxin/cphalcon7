@@ -85,7 +85,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_StringLength){
 PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 
 	zval *validator, *attribute, value, allow_empty, valid, type, maximum, minimum, label;
-	zval code, pairs, message_str = NULL, *prepared = NULL, *message;
+	zval code, pairs, message_str, prepared, message;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
 		RETURN_TRUE;
 	}
 
@@ -104,8 +104,8 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 
 	PHALCON_CALL_SELFW(&valid, "valid", &value, &minimum, &maximum);
 
-	if (PHALCON_IS_FALSE(valid)) {
-		type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
+	if (PHALCON_IS_FALSE(&valid)) {
+		phalcon_return_property(&type, getThis(), SL("_type"));
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
@@ -116,13 +116,13 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
-		if (Z_TYPE_P(&code) == IS_NULL) {
+		if (Z_TYPE(code) <= IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 		
-		array_init_size(&pairs);
+		array_init(&pairs);
 		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-		if (phalcon_compare_strict_string(type, SL("TooLong"))) {
+		if (phalcon_compare_strict_string(&type, SL("TooLong"))) {
 			phalcon_array_update_str(&pairs, SL(":max"), &maximum, PH_COPY);
 
 			RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), "messageMaximum"));

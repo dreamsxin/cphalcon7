@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -89,7 +90,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Between, validate){
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
 		RETURN_TRUE;
 	}
 
@@ -126,7 +127,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Between, validate){
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Between", &code);
 
-		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", message);
+		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 

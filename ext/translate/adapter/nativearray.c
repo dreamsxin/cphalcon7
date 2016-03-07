@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_CTORW(translation);
+	RETURN_CTORW(&translation);
 }
 
 /**

@@ -91,7 +91,7 @@ int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class
 	ZVAL_STRING(&opt, option);
 	params[0] = &opt;
 
-	return phalcon_call_method(result, this_ptr, "getoption", 1, params);
+	return phalcon_call_method(retval, this_ptr, "getoption", 1, params);
 }
 
 /**

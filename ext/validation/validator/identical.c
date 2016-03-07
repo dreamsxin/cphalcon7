@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -88,7 +89,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Identical, validate){
 
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
-	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &identical_value, getThis(), ISV(value)));
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&identical_value, ce, getThis(), ISV(value)));
 
 	PHALCON_CALL_SELFW(&valid, "valid", &value, &identical_value);
 

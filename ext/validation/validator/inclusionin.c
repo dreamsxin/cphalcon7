@@ -104,11 +104,11 @@ PHP_METHOD(Phalcon_Validation_Validator_InclusionIn, validate){
 
 	PHALCON_CALL_SELFW(&valid, "valid", &value, &domain);
 
-	if (PHALCON_IS_FALSE(valid)) {
+	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
-			if (!zend_is_true(label)) {
+			if (!zend_is_true(&label)) {
 				ZVAL_COPY_VALUE(&label, attribute);
 			}
 		}

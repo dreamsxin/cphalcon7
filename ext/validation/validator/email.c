@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/concat.h"
 #include "kernel/operators.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -87,7 +88,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Email, validate){
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
 		RETURN_TRUE;
 	}
 
@@ -140,7 +141,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Email, valid){
 
 	ZVAL_LONG(&validate_email, 274);
 
-	PHALCON_CALL_FUNCTIONW(&valid, "filter_var", value, validate_email);
+	PHALCON_CALL_FUNCTIONW(&valid, "filter_var", value, &validate_email);
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_FALSE;
 	}

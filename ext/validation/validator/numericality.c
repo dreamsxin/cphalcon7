@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/concat.h"
 #include "kernel/operators.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -87,7 +88,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Numericality, validate){
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
 		RETURN_TRUE;
 	}
 
@@ -103,22 +104,21 @@ PHP_METHOD(Phalcon_Validation_Validator_Numericality, validate){
 		}
 
 		array_init_size(&pairs, 1);
-		phalcon_array_update_str(pairs, SL(":field"), &label, PH_COPY);
+		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
-		if (!zend_is_true(message_str)) {
+		if (!zend_is_true(&message_str)) {
 			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Numericality"));
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
-		if (Z_TYPE_P(&code) == IS_NULL) {
+		if (Z_TYPE(code) == IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 
 		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Numericality", &code);
-		Z_TRY_DELREF_P(message);
 
 		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;

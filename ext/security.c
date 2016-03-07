@@ -695,7 +695,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 
 	PHALCON_CALL_METHODW(NULL, &session, "set", &key, &token);
 
-	RETURN_CTORW(token);
+	RETURN_CTORW(&token);
 }
 
 /**
@@ -709,14 +709,16 @@ PHP_METHOD(Phalcon_Security, checkToken){
 
 	zval *name = NULL, *_token_key = NULL, *token_value = NULL, token_key, service, session, key, request, token, session_token;
 
-	phalcon_fetch_params(0, 0, 3, &name, &token_key, &token_value);
+	phalcon_fetch_params(0, 0, 3, &name, &_token_key, &token_value);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!token_key) {
-		token_key = &PHALCON_GLOBAL(z_null);
+	if (!_token_key) {
+		ZVAL_NULL(&token_key);
+	} else {
+		ZVAL_COPY_VALUE(&token_key, _token_key);
 	}
 
 	if (!token_value) {

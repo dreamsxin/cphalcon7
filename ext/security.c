@@ -473,7 +473,7 @@ PHP_METHOD(Phalcon_Security, hash)
 
 			ZVAL_LONG(&n_bytes, 4);
 			PHALCON_CALL_METHODW(&salt_bytes, getThis(), "getsaltbytes", &n_bytes);
-			if (Z_TYPE_P(salt_bytes) != IS_STRING) {
+			if (Z_TYPE(salt_bytes) != IS_STRING) {
 				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
 				return;
 			}
@@ -566,7 +566,7 @@ PHP_METHOD(Phalcon_Security, checkHash){
 		}
 	}
 
-	PHALCON_CALL_FUNCTIONW(&hash, SL("crypt"), password, password_hash);
+	PHALCON_CALL_FUNCTIONW(&hash, "crypt", password, password_hash);
 
 	if (UNEXPECTED(Z_TYPE(hash) != IS_STRING)) {
 		convert_to_string(&hash);
@@ -575,7 +575,7 @@ PHP_METHOD(Phalcon_Security, checkHash){
 	if (Z_STRLEN(hash) == Z_STRLEN_P(password_hash)) {
 		int n    = Z_STRLEN(hash);
 		char *h1 = Z_STRVAL(hash);
-		char *h2 = Z_STRVAL(password_hash);
+		char *h2 = Z_STRVAL_P(password_hash);
 
 		while (n) {
 			check |= ((unsigned int)*h1) ^ ((unsigned int)*h2);
@@ -905,67 +905,65 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 		i_size = 0;
 	}
 
+	ZVAL_STRING(&algo, s_hash);
 
-		ZVAL_STRING(&algo, s_hash);
+	PHALCON_CALL_FUNCTIONW(&tmp, "hash", &algo, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	if (PHALCON_IS_FALSE(&tmp) || Z_TYPE(tmp) != IS_STRING) {
+		RETURN_FALSE;
+	}
 
-		PHALCON_CALL_FUNCTIONW(&tmp, "hash", &algo, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
-		if (PHALCON_IS_FALSE(&tmp) || Z_TYPE(tmp) != IS_STRING) {
+	i_hash_len = Z_STRLEN(tmp);
+	if (!i_size) {
+		i_size = i_hash_len;
+	}
+
+	s = safe_emalloc(salt_len, 1, 5);
+	s[salt_len + 4] = 0;
+	memcpy(s, Z_STRVAL_P(salt), salt_len);
+	ZVAL_STRINGL(&computed_salt, s, salt_len + 4);
+
+	d           = div(i_size, i_hash_len);
+	block_count = d.quot + (d.rem ? 1 : 0);
+
+	for (i = 1; i <= block_count; ++i) {
+		zval K1,  K2;
+		s[salt_len+0] = (unsigned char)(i >> 24);
+		s[salt_len+1] = (unsigned char)(i >> 16);
+		s[salt_len+2] = (unsigned char)(i >> 8);
+		s[salt_len+3] = (unsigned char)(i);
+
+		PHALCON_CALL_FUNCTIONW(&K1, "hash_hmac", &algo, &computed_salt, password, &PHALCON_GLOBAL(z_true));
+		if (Z_TYPE(K1) != IS_STRING) {
 			RETURN_FALSE;
 		}
 
-		i_hash_len = Z_STRLEN(tmp);
-		if (!i_size) {
-			i_size = i_hash_len;
-		}
+		ZVAL_COPY_VALUE(&K2, &K1);
 
-		s = safe_emalloc(salt_len, 1, 5);
-		s[salt_len + 4] = 0;
-		memcpy(s, Z_STRVAL_P(salt), salt_len);
-		ZVAL_STRINGL(&computed_salt, s, salt_len + 4);
+		for (j = 1; j < i_iterations; ++j) {
+			char *k1, *k2;
 
-		d           = div(i_size, i_hash_len);
-		block_count = d.quot + (d.rem ? 1 : 0);
-
-		for (i = 1; i <= block_count; ++i) {
-			zval K1,  K2;
-			s[salt_len+0] = (unsigned char)(i >> 24);
-			s[salt_len+1] = (unsigned char)(i >> 16);
-			s[salt_len+2] = (unsigned char)(i >> 8);
-			s[salt_len+3] = (unsigned char)(i);
-
-			PHALCON_CALL_FUNCTIONW(&K1, "hash_hmac", &algo, &computed_salt, password, &PHALCON_GLOBAL(z_true));
-            if (Z_TYPE(K1) != IS_STRING) {
-                RETURN_FALSE;
-            }
-
-			ZVAL_COPY_VALUE(&K2, &K1);
-
-			for (j = 1; j < i_iterations; ++j) {
-				char *k1, *k2;
-
-				PHALCON_CALL_FUNCTIONW(&tmp, "hash_hmac", algo, K1, password, &PHALCON_GLOBAL(z_true));
-                if (Z_TYPE(tmp) != IS_STRING) {
-                    RETURN_FALSE;
-                }
-
-				ZVAL_COPY_VALUE(&K1, &tmp);
-
-				k1 = Z_STRVAL(K1);
-				k2 = Z_STRVAL(K2);
-				for (k = 0; k < Z_STRLEN(K2); ++k) {
-					k2[k] ^= k1[k];
-				}
+			PHALCON_CALL_FUNCTIONW(&tmp, "hash_hmac", algo, K1, password, &PHALCON_GLOBAL(z_true));
+			if (Z_TYPE(tmp) != IS_STRING) {
+				RETURN_FALSE;
 			}
 
-			phalcon_concat_self(&result, &K2);
+			ZVAL_COPY_VALUE(&K1, &tmp);
+
+			k1 = Z_STRVAL(K1);
+			k2 = Z_STRVAL(K2);
+			for (k = 0; k < Z_STRLEN(K2); ++k) {
+				k2[k] ^= k1[k];
+			}
 		}
 
-		if (i_size == i_hash_len) {
-			RETVAL_STRINGL(Z_STRVAL(result), Z_STRLEN(result));
-			ZVAL_NULL(&result);
-		} else {
-			phalcon_substr(return_value, &result, 0, i_size);
-		}
+		phalcon_concat_self(&result, &K2);
+	}
+
+	if (i_size == i_hash_len) {
+		RETVAL_STRINGL(Z_STRVAL(result), Z_STRLEN(result));
+		ZVAL_NULL(&result);
+	} else {
+		phalcon_substr(return_value, &result, 0, i_size);
 	}
 }
 

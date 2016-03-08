@@ -84,11 +84,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 
 #define PHALCON_CPY_WRT(d, v) ZVAL_COPY(d, v)
 
-#define PHALCON_CPY_WRT_CTOR(d, v) \
-	do { \
-		zval_ptr_dtor(d); \
-		ZVAL_DUP(d, v); \
-	} while (0)
+#define PHALCON_CPY_WRT_CTOR(d, v) ZVAL_DUP(d, v)
 
 /* */
 #define PHALCON_OBS_VAR(z) \
@@ -126,7 +122,6 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 #define PHALCON_SEPARATE_ARRAY(a) SEPARATE_ARRAY(a)
 
 #define PHALCON_SEPARATE(z) SEPARATE_ZVAL(z)
-#define PHALCON_SEPARATE_PARAM(z) \
-	SEPARATE_ZVAL_IF_NOT_REF(z)
+#define PHALCON_SEPARATE_PARAM(z) SEPARATE_ZVAL_IF_NOT_REF(z)
 
 #endif /* PHALCON_KERNEL_MEMORY_H */

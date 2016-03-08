@@ -85,51 +85,58 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 	HashTable *function_table;
 	int i, status;
 
-	if (type != phalcon_fcall_function && object == NULL) {
-		object = execute_data && Z_OBJ(execute_data->This) ? &execute_data->This : NULL;
-	}
-
-	if (object != NULL) {
-		if (Z_TYPE_P(object) != IS_OBJECT) {
-			phalcon_throw_exception_format(spl_ce_RuntimeException, "Trying to call method %s on a non-object", method_name);
-			return FAILURE;
+	if (type != phalcon_fcall_function) {
+		if ( object == NULL) {
+			object = execute_data && Z_OBJ(execute_data->This) ? &execute_data->This : NULL;
 		}
+
+		if (object != NULL) {
+			if (Z_TYPE_P(object) != IS_OBJECT) {
+				phalcon_throw_exception_format(spl_ce_RuntimeException, "Trying to call method %s on a non-object", method_name);
+				return FAILURE;
+			}
+		}
+
+		array_init(&func_name);
+		switch (type) {
+			case phalcon_fcall_function:
+				break;
+			case phalcon_fcall_parent:
+				add_next_index_string(&func_name, ISV(parent));
+				break;
+			case phalcon_fcall_self:
+				//assert(!ce);
+				add_next_index_string(&func_name, ISV(self));
+				break;
+			case phalcon_fcall_static:
+				//assert(!ce);
+				add_next_index_string(&func_name, ISV(static));
+				break;
+
+			case phalcon_fcall_ce:
+				assert(ce != NULL);
+				add_next_index_string(&func_name, ce->name->val);
+				break;
+
+			case phalcon_fcall_method:
+			default:
+				assert(object != NULL);
+				Z_TRY_ADDREF_P(object);
+				add_next_index_zval(&func_name, object);
+				break;
+		}
+
+		add_next_index_string(&func_name, method_name);
+
+		if (!ce && object) {
+			ce = Z_OBJCE_P(object);
+		}
+
+		function_table = ce ? &ce->function_table : EG(function_table);
+	} else {
+		ZVAL_STRINGL(&func_name, method_name, method_len);
+		function_table = EG(function_table);
 	}
-
-	array_init_size(&func_name, 2);
-	switch (type) {
-		case phalcon_fcall_parent:
-			add_next_index_string(&func_name, ISV(parent));
-			break;
-		case phalcon_fcall_self:
-			//assert(!ce);
-			add_next_index_string(&func_name, ISV(self));
-			break;
-		case phalcon_fcall_static:
-			//assert(!ce);
-			add_next_index_string(&func_name, ISV(static));
-			break;
-
-		case phalcon_fcall_ce:
-			assert(ce != NULL);
-			add_next_index_string(&func_name, ce->name->val);
-			break;
-
-		case phalcon_fcall_method:
-		default:
-			assert(object != NULL);
-			Z_TRY_ADDREF_P(object);
-			add_next_index_zval(&func_name, object);
-			break;
-	}
-
-	add_next_index_string(&func_name, method_name);
-
-	if (!ce && object) {
-		ce = Z_OBJCE_P(object);
-	}
-
-	function_table = ce ? &ce->function_table : EG(function_table);
 
 	arguments = safe_emalloc(sizeof(zval), param_count, 0);
 

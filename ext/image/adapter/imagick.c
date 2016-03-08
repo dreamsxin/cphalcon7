@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, check){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
 
-	zval *file, *w = NULL, *h = NULL, *checked, width, height, realpath, format, type, mime, &im, ret, mode, imagickpixel, color;
+	zval *file, *w = NULL, *h = NULL, *checked, width, height, realpath, format, type, mime, im, ret, mode, imagickpixel, color;
 	zend_class_entry *imagick_ce, *ce1;
 
 	phalcon_fetch_params(0, 1, 2, &file, &w, &h);
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
 		phalcon_update_property_this(getThis(), SL("_width"), &width);
 
 		PHALCON_CALL_METHODW(&height, &im, "getImageHeight");
-		phalcon_update_property_this(getThis(), SL("_height"), height);
+		phalcon_update_property_this(getThis(), SL("_height"), &height);
 
 		PHALCON_CALL_METHODW(&type, &im, "getImageType");
 		phalcon_update_property_this(getThis(), SL("_type"), &type);
@@ -340,7 +340,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _resize) {
 
-	zval *width, *height, &im, w, h, next;
+	zval *width, *height, im, w, h, next;
 
 	phalcon_fetch_params(0, 2, 0, &width, &height);
 
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _resize) {
 	do {
 		PHALCON_CALL_METHODW(NULL, &im, "scaleImage", width, height);
 		PHALCON_CALL_METHODW(&next, &im, "nextImage");
-	} while (zend_is_true(next));
+	} while (zend_is_true(&next));
 
 	PHALCON_CALL_METHODW(&w, &im, "getImageWidth");
 	PHALCON_CALL_METHODW(&h, &im, "getImageHeight");
@@ -434,7 +434,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _crop) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _rotate) {
 
-	zval *degrees, im, background, color, ret, w, h, , next;
+	zval *degrees, im, background, color, ret, w, h, next;
 	zend_class_entry *imagick_pixel_ce;
 
 	phalcon_fetch_params(0, 1, 0, &degrees);
@@ -459,13 +459,12 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _rotate) {
 			return;
 		}
 
-		if (!w) {
+		if (Z_TYPE(w) <= IS_NULL) {
 			PHALCON_CALL_METHODW(&w, &im, "getImageWidth");
 			PHALCON_CALL_METHODW(&h, &im, "getImageHeight");
 		}
 
 		PHALCON_CALL_METHODW(NULL, &im, "setImagePage", &w, &h, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
-
 		PHALCON_CALL_METHODW(&next, &im, "nextImage");
 	} while (zend_is_true(&next));
 
@@ -781,11 +780,11 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _text) {
 	imagick_pixel_ce = zend_fetch_class(SSL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
 
 	if (ofs_x) {
-		ZVAL_COPY(&offset_x, ofs_x);
+		PHALCON_CPY_WRT(&offset_x, ofs_x);
 	}
 
 	if (ofs_y) {
-		ZVAL_COPY(&offset_y, ofs_y);
+		PHALCON_CPY_WRT(&offset_y, ofs_y);
 	}
 
 	if (!r) {
@@ -1313,31 +1312,31 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, shadow)
 	if (!_color) {
 		ZVAL_STRING(&color, "black");
 	} else {
-		ZVAL_COPY(&color, _color);
+		PHALCON_CPY_WRT(&color, _color);
 	}
 
 	if (!_opacity) {
 		ZVAL_LONG(&opacity, 80);
 	} else {
-		ZVAL_COPY(&opacity, _opacity);
+		PHALCON_CPY_WRT(&opacity, _opacity);
 	}
 
 	if (!_sigma) {
 		ZVAL_LONG(&sigma, 3);
 	} else {
-		ZVAL_COPY(&sigma, _sigma);
+		PHALCON_CPY_WRT(&sigma, _sigma);
 	}
 
 	if (!_x) {
 		ZVAL_LONG(&x, 5);
 	} else {
-		ZVAL_COPY(&x, _x);
+		PHALCON_CPY_WRT(&x, _x);
 	}
 
 	if (!_y) {
 		ZVAL_LONG(&y, 5);
 	} else {
-		ZVAL_COPY(&y, _y);
+		PHALCON_CPY_WRT(&y, _y);
 	}
 
 	phalcon_return_property(&im, getThis(), SL("_image"));
@@ -1410,7 +1409,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, colorize)
 	if (!_composition) {
 		phalcon_get_class_constant(&composition, imagick_ce, SL("COMPOSITE_MULTIPLY"));
 	} else {
-		ZVAL_COPY(&composition, _composition);
+		PHALCON_CPY_WRT(&composition, _composition);
 	}
 
 	PHALCON_CONCAT_SV(&pseudo_string, "canvas:", color);
@@ -1451,7 +1450,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, gamma)
 	if (!_channel) {
 		phalcon_get_class_constant(&channel, imagick_ce, SL("CHANNEL_ALL"));
 	} else {
-		ZVAL_COPY(&channel, _channel);
+		PHALCON_CPY_WRT(&channel, _channel);
 	}
 
 	phalcon_return_property(&im, getThis(), SL("_image"));
@@ -1486,37 +1485,37 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, levels)
 	if (!_gamma) {
 		ZVAL_LONG(&gamma, 1);
 	} else {
-		ZVAL_COPY(&gamma, _gamma);
+		PHALCON_CPY_WRT(&gamma, _gamma);
 	}
 
 	if (!_input_min) {
 		ZVAL_LONG(&input_min, 0);
 	} else {
-		ZVAL_COPY(&input_min, _input_min);
+		PHALCON_CPY_WRT(&input_min, _input_min);
 	}
 
 	if (!_input_max) {
 		ZVAL_LONG(&input_max, 255);
 	} else {
-		ZVAL_COPY(&input_max, _input_max);
+		PHALCON_CPY_WRT(&input_max, _input_max);
 	}
 
 	if (!_output_min) {
 		ZVAL_LONG(&output_min, 0);
 	} else {
-		ZVAL_COPY(&output_min, _output_min);
+		PHALCON_CPY_WRT(&output_min, _output_min);
 	}
 
 	if (!_output_max) {
 		ZVAL_LONG(&output_max, 255);
 	} else {
-		ZVAL_COPY(&output_max, _output_max);
+		PHALCON_CPY_WRT(&output_max, _output_max);
 	}
 
 	if (!_channel) {
 		phalcon_get_class_constant(&channel, imagick_ce, SL("CHANNEL_ALL"));
 	} else {
-		ZVAL_COPY(&channel, _channel);
+		PHALCON_CPY_WRT(&channel, _channel);
 	}
 
 	phalcon_return_property(&im, getThis(), SL("_image"));
@@ -1695,13 +1694,13 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, vignette)
 	if (!_composition) {
 		phalcon_get_class_constant(&composition, imagick_ce, SL("COMPOSITE_DEFAULT"));
 	} else {
-		ZVAL_COPY(&composition, _composition);
+		PHALCON_CPY_WRT(&composition, _composition);
 	}
 
 	if (!_crop_factor) {
 		ZVAL_DOUBLE(&crop_factor, 1.5);
 	} else {
-		ZVAL_COPY(&crop_factor, _crop_factor);
+		PHALCON_CPY_WRT(&crop_factor, _crop_factor);
 	}
 
 	phalcon_return_property(&im, getThis(), SL("_image"));

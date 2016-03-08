@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 		PHALCON_CALL_METHODW(&real_property, &column_annotation, "getargument", &column_map_name);
 
 		if (PHALCON_IS_EMPTY(&real_property)) {
-			ZVAL_COPY(&real_property, &property);
+			PHALCON_CPY_WRT(&real_property, &property);
 		}
 
 		/** 
@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 		 */
 		PHALCON_CALL_METHODW(&has_annotation, prop_annotations, "has", &id_annot_name);
 		if (zend_is_true(&has_annotation)) {
-			ZVAL_COPY(&identity_field, &real_property);
+			PHALCON_CPY_WRT(&identity_field, &real_property);
 		}
 
 		/** 

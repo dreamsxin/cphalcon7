@@ -97,6 +97,34 @@ int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const ch
 }
 
 /**
+ * Increments an object property
+ */
+int phalcon_static_property_incr_ce(zend_class_entry *ce, const char *property, uint32_t len){
+
+	zval *value = phalcon_read_static_property_ce(ce, property, len);
+
+	phalcon_increment(value);
+
+	phalcon_update_static_property_ce(ce, property, len, value);
+
+	return SUCCESS;
+}
+
+/**
+ * Decrements an object property
+ */
+int phalcon_static_property_decr_ce(zend_class_entry *ce, const char *property, uint32_t len){
+
+	zval *value = phalcon_read_static_property_ce(ce, property, len);
+	
+	phalcon_decrement(value);
+
+	phalcon_update_static_property_ce(ce, property, len, value);
+
+	return SUCCESS;
+}
+
+/**
  * Returns a class name into a zval result
  */
 void phalcon_get_class(zval *result, const zval *object, int lower) {
@@ -1242,7 +1270,7 @@ int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *proper
 		value = Z_REFVAL_P(value);
 	}
 
-	ZVAL_COPY(fetched, value);
+	PHALCON_CPY_WRT(fetched, value);
 	return 1;
 }
 

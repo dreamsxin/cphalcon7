@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 		phalcon_array_append(&params, parameters, PH_COPY);
 		phalcon_array_append(&params, data, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	phalcon_return_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"));
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 	}
 
 	if (!phalcon_array_isset_fetch_long(&options, &params, 1)) {
-		ZVAL_COPY_VALUE(&options, data);
+		PHALCON_CPY_WRT_CTOR(&options, data);
 	}
 
 	if (Z_TYPE(options) == IS_OBJECT) {

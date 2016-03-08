@@ -94,7 +94,7 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
-				ZVAL_COPY_VALUE(&label, attribute);
+				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
 		}
 

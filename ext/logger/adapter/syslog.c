@@ -152,8 +152,8 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
 	PHALCON_CALL_METHODW(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHODW(&applied_format, &formatter, "format", message, type, time, context);
 	if (Z_TYPE(applied_format) != IS_ARRAY) { 
-		ZVAL_COPY(&syslog_type, type);
-		ZVAL_COPY(&syslog_message, &applied_format);
+		PHALCON_CPY_WRT(&syslog_type, type);
+		PHALCON_CPY_WRT(&syslog_message, &applied_format);
 	} else {
 		phalcon_array_fetch_long(&syslog_type, &applied_format, 0, PH_NOISY);
 		phalcon_array_fetch_long(&syslog_message, &applied_format, 1, PH_NOISY);

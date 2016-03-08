@@ -75,7 +75,7 @@ int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index)
 	val = phalcon_array_return_fetch(arr, index);
 
 	if (val) {		
-		ZVAL_COPY(fetched, val);
+		PHALCON_CPY_WRT(fetched, val);
 		return 1;
 	}
 
@@ -263,7 +263,8 @@ int phalcon_array_update_zval(zval *arr, const zval *index, zval *value, int fla
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		ZVAL_COPY_VALUE(&new_value, value);
+		PHALCON_CPY_WRT_CTOR(&new_value, value);
+		Z_TRY_ADDREF_P(&new_value);
 		value = &new_value;
 	}
 
@@ -327,7 +328,9 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 	return status;
 }
 
-int phalcon_array_update_str(zval *arr, const char *index, uint index_length, zval *value, int flags){
+int phalcon_array_update_str(zval *arr, const char *index, uint index_length, zval *value, int flags)
+{
+	zval new_value;
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
 		zend_error(E_WARNING, "Cannot use a scalar value as an array (3)");
@@ -335,12 +338,9 @@ int phalcon_array_update_str(zval *arr, const char *index, uint index_length, zv
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		zval *new_zv;
-		Z_TRY_DELREF_P(value);
-		PHALCON_ALLOC_INIT_ZVAL(new_zv);
-		INIT_PZVAL_COPY(new_zv, value);
-		value = new_zv;
-		zval_copy_ctor(new_zv);
+		PHALCON_CPY_WRT_CTOR(&new_value, value);
+		Z_TRY_ADDREF_P(&new_value);
+		value = &new_value;
 	}
 
 	if ((flags & PH_SEPARATE) == PH_SEPARATE) {
@@ -354,7 +354,9 @@ int phalcon_array_update_str(zval *arr, const char *index, uint index_length, zv
 	return zend_hash_update(Z_ARRVAL_P(arr), zend_string_init(index, index_length, 0), value) ? SUCCESS : FAILURE;
 }
 
-int phalcon_array_update_string(zval *arr, zend_string *index, zval *value, int flags){
+int phalcon_array_update_string(zval *arr, zend_string *index, zval *value, int flags)
+{
+	zval new_value;
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
 		zend_error(E_WARNING, "Cannot use a scalar value as an array (3)");
@@ -362,12 +364,9 @@ int phalcon_array_update_string(zval *arr, zend_string *index, zval *value, int 
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		zval *new_zv;
-		Z_TRY_DELREF_P(value);
-		PHALCON_ALLOC_INIT_ZVAL(new_zv);
-		INIT_PZVAL_COPY(new_zv, value);
-		value = new_zv;
-		zval_copy_ctor(new_zv);
+		PHALCON_CPY_WRT_CTOR(&new_value, value);
+		Z_TRY_ADDREF_P(&new_value);
+		value = &new_value;
 	}
 
 	if ((flags & PH_SEPARATE) == PH_SEPARATE) {
@@ -381,7 +380,9 @@ int phalcon_array_update_string(zval *arr, zend_string *index, zval *value, int 
 	return zend_hash_update(Z_ARRVAL_P(arr), index, value) ? SUCCESS : FAILURE;
 }
 
-int phalcon_array_update_long(zval *arr, ulong index, zval *value, int flags){
+int phalcon_array_update_long(zval *arr, ulong index, zval *value, int flags)
+{
+	zval new_value;
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
 		zend_error(E_WARNING, "Cannot use a scalar value as an array");
@@ -389,12 +390,9 @@ int phalcon_array_update_long(zval *arr, ulong index, zval *value, int flags){
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		zval *new_zv;
-		Z_TRY_DELREF_P(value);
-		PHALCON_ALLOC_INIT_ZVAL(new_zv);
-		INIT_PZVAL_COPY(new_zv, value);
-		value = new_zv;
-		zval_copy_ctor(new_zv);
+		PHALCON_CPY_WRT_CTOR(&new_value, value);
+		Z_TRY_ADDREF_P(&new_value);
+		value = &new_value;
 	}
 
 	if ((flags & PH_SEPARATE) == PH_SEPARATE) {
@@ -457,7 +455,7 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 		}
 
 		if (result) {
-			ZVAL_COPY(return_value, zv);
+			PHALCON_CPY_WRT(return_value, zv);
 			return 1;
 		}
 
@@ -481,7 +479,7 @@ int phalcon_array_fetch_str(zval *return_value, const zval *arr, const char *ind
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
-			ZVAL_COPY(return_value, zv);
+			PHALCON_CPY_WRT(return_value, zv);
 			return SUCCESS;
 		}
 
@@ -505,7 +503,7 @@ int phalcon_array_fetch_string(zval *return_value, const zval *arr, zend_string 
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			ZVAL_COPY(return_value, zv);
+			PHALCON_CPY_WRT(return_value, zv);
 			return SUCCESS;
 		}
 
@@ -529,7 +527,7 @@ int phalcon_array_fetch_long(zval *return_value, const zval *arr, ulong index, i
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			ZVAL_COPY(return_value, zv);
+			PHALCON_CPY_WRT(return_value, zv);
 			return SUCCESS;
 		}
 

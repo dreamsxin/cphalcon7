@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, __construct){
 	phalcon_fetch_params(0, 1, 1, &frontend, &opts);
 
 	if (opts) {
-		ZVAL_COPY_VALUE(&options, opts);
+		PHALCON_CPY_WRT_CTOR(&options, opts);
 	}
 
 	if (Z_TYPE(options) != IS_ARRAY) {
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHODW(&cached_content, &frontend, "getcontent");
 	} else {
-		ZVAL_COPY(&cached_content, content);
+		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
 	/** 
@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 			PHALCON_CALL_METHODW(&ttl, &frontend, "getlifetime");
 		}
 	} else {
-		ZVAL_COPY(&ttl, lifetime);
+		PHALCON_CPY_WRT(&ttl, lifetime);
 	}
 
 	if (Z_TYPE(prepared_content) > IS_NULL) {

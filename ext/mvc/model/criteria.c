@@ -1341,7 +1341,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 			}
 
 			if (Z_TYPE(column_map) != IS_ARRAY || !phalcon_array_isset_fetch(&real_field, &column_map, &field)) {
-				ZVAL_COPY(&real_field, &field);
+				PHALCON_CPY_WRT(&real_field, &field);
 			}
 
 			if (phalcon_array_isset_fetch(&type, &data_types, &real_field)) {
@@ -1657,11 +1657,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 						return;
 					}
 				} else {
-					ZVAL_COPY(&attribute_field, &first_primary_key);
+					PHALCON_CPY_WRT(&attribute_field, &first_primary_key);
 				}
 
 				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", model, "].[", &attribute_field, "] = ", &conditions);
-				ZVAL_COPY(&conditions, &primary_key_condition);
+				PHALCON_CPY_WRT(&conditions, &primary_key_condition);
 
 				ZVAL_FALSE(&no_primary);
 			}
@@ -2030,11 +2030,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 						return;
 					}
 				} else {
-					ZVAL_COPY(&attribute_field, &first_primary_key);
+					PHALCON_CPY_WRT(&attribute_field, &first_primary_key);
 				}
 
 				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", model, "].[", &attribute_field, "] = ", &conditions);
-				ZVAL_COPY(&conditions, &primary_key_condition);
+				PHALCON_CPY_WRT(&conditions, &primary_key_condition);
 
 				ZVAL_FALSE(&no_primary);
 			}
@@ -2208,11 +2208,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 						return;
 					}
 				} else {
-					ZVAL_COPY(&attribute_field, &first_primary_key);
+					PHALCON_CPY_WRT(&attribute_field, &first_primary_key);
 				}
 
 				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", model, "].[", &attribute_field, "] = ", &conditions);
-				ZVAL_COPY(&conditions, &primary_key_condition);
+				PHALCON_CPY_WRT(&conditions, &primary_key_condition);
 
 				ZVAL_FALSE(&no_primary);
 			}

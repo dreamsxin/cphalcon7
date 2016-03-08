@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 		PHALCON_STR_REPLACE(&new_format, &date_wildcard, &date, &format);
 	} else {
-		ZVAL_COPY(&new_format, &format);
+		PHALCON_CPY_WRT(&new_format, &format);
 	}
 
 	/** 
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 		PHALCON_STR_REPLACE(&format, &type_wildcard, &type_string, &new_format);
 	} else {
-		ZVAL_COPY(&format, &new_format);
+		PHALCON_CPY_WRT(&format, &new_format);
 	}
 
 	ZVAL_STRING(&message_wildcard, "%message%");
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 		PHALCON_CALL_METHODW(&format, getThis(), "interpolate", &new_format, context);
 	}
 	else {
-		ZVAL_COPY(&format, &new_format);
+		PHALCON_CPY_WRT(&format, &new_format);
 	}
 
 	PHALCON_CONCAT_VS(return_value, &format, PHP_EOL);

@@ -503,7 +503,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	phalcon_fetch_params(0, 2, 2, &collection, &callback, &type, &args);
 
 	if (z_type) {
-		ZVAL_COPY_VALUE(&type, z_type);
+		PHALCON_CPY_WRT_CTOR(&type, z_type);
 	}
 
 	if (!args) {
@@ -565,7 +565,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		if (PHALCON_IS_NOT_EMPTY(&collection_source_path)) {
 			PHALCON_CONCAT_VV(&complete_source_path, &source_base_path, &collection_source_path);
 		} else {
-			ZVAL_COPY(&complete_source_path, &source_base_path);
+			PHALCON_CPY_WRT(&complete_source_path, &source_base_path);
 		}
 
 		/** 
@@ -579,7 +579,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		if (PHALCON_IS_NOT_EMPTY(&collection_target_path)) {
 			PHALCON_CONCAT_VV(&complete_target_path, &target_base_path, &collection_target_path);
 		} else {
-			ZVAL_COPY(&complete_target_path, &target_base_path);
+			PHALCON_CPY_WRT(&complete_target_path, &target_base_path);
 		}
 
 		/** 
@@ -698,7 +698,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (Z_TYPE(prefix) != IS_NULL) {
 				PHALCON_CONCAT_VV(&prefixed_path, &prefix, &path);
 			} else {
-				ZVAL_COPY(&prefixed_path, &path);
+				PHALCON_CPY_WRT(&prefixed_path, &path);
 			}
 
 			/** 
@@ -767,7 +767,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 					 * Calls the method 'filter' which must return a filtered version of the content
 					 */
 					PHALCON_CALL_METHODW(&filtered_content, filter, "filter", &content);
-					ZVAL_COPY_VALUE(&content, &filtered_content);
+					PHALCON_CPY_WRT_CTOR(&content, &filtered_content);
 				} ZEND_HASH_FOREACH_END();
 
 				/**
@@ -794,12 +794,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				 */
 				if (zend_is_true(&join)) {
 					if (Z_TYPE(filtered_joined_content) <= IS_NULL) {
-						ZVAL_COPY_VALUE(&filtered_joined_content, &content);
+						PHALCON_CPY_WRT_CTOR(&filtered_joined_content, &content);
 					} else {
 						phalcon_concat_self(&filtered_joined_content, &content);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&filtered_joined_content, &content);
+					PHALCON_CPY_WRT_CTOR(&filtered_joined_content, &content);
 				}
 			}
 
@@ -820,7 +820,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (Z_TYPE(prefix) != IS_NULL) {
 				PHALCON_CONCAT_VV(&prefixed_path, &prefix, &path);
 			} else {
-				ZVAL_COPY_VALUE(&prefixed_path, &path);
+				PHALCON_CPY_WRT_CTOR(&prefixed_path, &path);
 			}
 
 			/** 
@@ -879,7 +879,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (Z_TYPE(prefix) != IS_NULL) {
 				PHALCON_CONCAT_VV(&prefixed_path, &prefix, &target_uri);
 			} else {
-				ZVAL_COPY_VALUE(&prefixed_path, &target_uri);
+				PHALCON_CPY_WRT_CTOR(&prefixed_path, &target_uri);
 			}
 
 			/** 

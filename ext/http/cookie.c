@@ -279,7 +279,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 				 */
 				PHALCON_CALL_METHOD(&decrypted_value, &crypt, "decryptbase64", &value);
 			} else {
-				ZVAL_COPY_VALUE(&decrypted_value, &value);
+				PHALCON_CPY_WRT_CTOR(&decrypted_value, &value);
 			}
 
 			/** 
@@ -396,7 +396,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 		 */
 		PHALCON_CALL_METHOD(&encrypt_value, &crypt, "encryptbase64", value);
 	} else {
-		ZVAL_COPY_VALUE(&encrypt_value, value);
+		PHALCON_CPY_WRT_CTOR(&encrypt_value, value);
 	}
 
 	/** 

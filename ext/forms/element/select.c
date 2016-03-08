@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 	values = phalcon_read_property(getThis(), SL("_optionsValues"), PH_NOISY);
 
 	if (Z_TYPE_P(values) != IS_ARRAY) {
-		ZVAL_COPY_VALUE(&tmp, option);
+		PHALCON_CPY_WRT_CTOR(&tmp, option);
 	} else {
 		add_function(&tmp, option, values);
 	}

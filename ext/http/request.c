@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Http_Request, _get){
 			RETURN_CTOR(default_value);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&value, data);
+		PHALCON_CPY_WRT_CTOR(&value, data);
 	}
 
 	if (Z_TYPE_P(filters) != IS_NULL) {
@@ -410,7 +410,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut){
 
 	if (!zend_is_true(&is_put)) {
 		put = phalcon_get_global_str(SL("_PUT"));
-		ZVAL_COPY(&new_put, put);
+		PHALCON_CPY_WRT(&new_put, put);
 	} else {
 		put = phalcon_read_property(getThis(), SL("_put"), PH_NOISY);
 		if (Z_TYPE_P(put) != IS_ARRAY) {
@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut){
 
 			phalcon_update_property_this(getThis(), SL("_put"), &new_put);
 		} else {
-			ZVAL_COPY(&new_put, put);
+			PHALCON_CPY_WRT(&new_put, put);
 		}
 	}
 
@@ -560,7 +560,7 @@ PHP_METHOD(Phalcon_Http_Request, hasPut){
 
 	if (!zend_is_true(&is_put)) {
 		put = phalcon_get_global_str(SL("_PUT"));
-		ZVAL_COPY(&new_put, put);
+		PHALCON_CPY_WRT(&new_put, put);
 	} else {
 		put = phalcon_read_property(getThis(), SL("_put"), PH_NOISY);
 		if (Z_TYPE_P(put) != IS_ARRAY) {
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Http_Request, hasPut){
 
 			phalcon_update_property_this(getThis(), SL("_put"), &new_put);
 		} else {
-			ZVAL_COPY(&new_put, put);
+			PHALCON_CPY_WRT(&new_put, put);
 		}
 	}
 
@@ -1538,7 +1538,7 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 		if (phalcon_array_isset_fetch_long(&quality_part, &header_parts, 1)) {
 			phalcon_substr(&quality, &quality_part, 2, 0);
 		} else {
-			ZVAL_COPY_VALUE(&quality, &quality_one);
+			PHALCON_CPY_WRT_CTOR(&quality, &quality_one);
 		}
 
 		phalcon_array_fetch_long(&header_name, &header_parts, 0, PH_NOISY);
@@ -1584,7 +1584,7 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 
 			is_smaller_function(&best_quality, &quality, &accept_quality);
 			if (PHALCON_IS_TRUE(&best_quality)) {
-				ZVAL_COPY_VALUE(&quality, &accept_quality);
+				PHALCON_CPY_WRT_CTOR(&quality, &accept_quality);
 				phalcon_array_fetch(&selected_name, accept, name, PH_NOISY);
 			}
 		}

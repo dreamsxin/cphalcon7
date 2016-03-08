@@ -450,7 +450,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, createView){
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_VSV(&view, view_name, ".", schema_name);
 	} else {
-		ZVAL_COPY_VALUE(&view, view_name);
+		PHALCON_CPY_WRT_CTOR(&view, view_name);
 	}
 	
 	PHALCON_CONCAT_SVSV(return_value, "CREATE VIEW ", &view, " AS ", &view_sql);
@@ -696,7 +696,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getSqlTable){
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CONCAT_VVV(&sql_table, escape_char, &table_name, escape_char);
 		} else {
-			ZVAL_COPY_VALUE(&sql_table, &table_name);
+			PHALCON_CPY_WRT_CTOR(&sql_table, &table_name);
 		}
 	
 		/** 
@@ -710,7 +710,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getSqlTable){
 				PHALCON_CONCAT_VSV(&sql_schema, &schema_name, ".", &sql_table);
 			}
 		} else {
-			ZVAL_COPY_VALUE(&sql_schema, &sql_table);
+			PHALCON_CPY_WRT_CTOR(&sql_schema, &sql_table);
 		}
 	
 		/** 
@@ -723,7 +723,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getSqlTable){
 				PHALCON_CONCAT_VSV(&sql_table_alias, &sql_schema, " ", &alias_name);
 			}
 		} else {
-			ZVAL_COPY_VALUE(&sql_table_alias, &sql_schema);
+			PHALCON_CPY_WRT_CTOR(&sql_table_alias, &sql_schema);
 		}
 	
 		RETURN_CTOR(&sql_table_alias);
@@ -825,11 +825,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 			if (Z_TYPE_P(&column_item) == IS_ARRAY) {
 				PHALCON_CALL_METHOD(&column_sql, getThis(), "getsqlexpression", &column_item, &escape_char);
 			} else if (PHALCON_IS_STRING(&column_item, "*")) {
-				ZVAL_COPY_VALUE(&column_sql, &column_item);
+				PHALCON_CPY_WRT_CTOR(&column_sql, &column_item);
 			} else if (PHALCON_GLOBAL(db).escape_identifiers) {
 				PHALCON_CONCAT_VVV(&column_sql, &escape_char, &column_item, &escape_char);
 			} else {
-				ZVAL_COPY_VALUE(&column_sql, &column_item);
+				PHALCON_CPY_WRT_CTOR(&column_sql, &column_item);
 			}
 
 			/**
@@ -843,10 +843,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 						PHALCON_CONCAT_VSV(&column_domain_sql, &column_domain, ".", &column_sql);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
+					PHALCON_CPY_WRT_CTOR(&column_domain_sql, &column_sql);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
+				PHALCON_CPY_WRT_CTOR(&column_domain_sql, &column_sql);
 			}
 
 			/**
@@ -860,10 +860,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 						PHALCON_CONCAT_VSV(&column_alias_sql, &column_domain_sql, " ", &column_alias);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
+					PHALCON_CPY_WRT_CTOR(&column_alias_sql, &column_domain_sql);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
+				PHALCON_CPY_WRT_CTOR(&column_alias_sql, &column_domain_sql);
 			}
 
 			phalcon_array_append(&selected_columns, &column_alias_sql, PH_COPY);
@@ -871,7 +871,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 
 		phalcon_fast_join_str(&columns_sql, SL(", "), &selected_columns);
 	} else {
-		ZVAL_COPY_VALUE(&columns_sql, &columns);
+		PHALCON_CPY_WRT_CTOR(&columns_sql, &columns);
 	}
 
 	/**
@@ -888,7 +888,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 
 		phalcon_fast_join_str(&tables_sql, SL(", "), &selected_tables);
 	} else {
-		ZVAL_COPY_VALUE(&tables_sql, &tables);
+		PHALCON_CPY_WRT_CTOR(&tables_sql, &tables);
 	}
 
 	if (phalcon_array_isset_fetch_str(&distinct, definition, SL("distinct"))) {
@@ -1004,7 +1004,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
 				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
+				PHALCON_CPY_WRT_CTOR(&order_sql_item_type, &order_sql_item);
 			}
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -1034,15 +1034,15 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 				phalcon_add_function(&end_range, &tmp2, &tmp1);
 
 				PHALCON_SCONCAT_SVSVSV(&sql_limit,"SELECT Z2.* FROM (SELECT Z1.*, ROWNUM DB_ROWNUM FROM ( ", &sql, " ) Z1 ) Z2 WHERE Z2.DB_ROWNUM BETWEEN ", &ini_range, " AND ",  &end_range);
-				ZVAL_COPY_VALUE(&sql, &sql_limit);
+				PHALCON_CPY_WRT_CTOR(&sql, &sql_limit);
 			}
 		} else {
 			ZVAL_LONG(&ini_range, 1);
 
-			ZVAL_COPY_VALUE(&end_range, &limit_value);
+			PHALCON_CPY_WRT_CTOR(&end_range, &limit_value);
 
 			PHALCON_SCONCAT_SVSVSV(&sql_limit,"SELECT Z2.* FROM (SELECT Z1.*, ROWNUM DB_ROWNUM FROM ( ", &sql, " ) Z1 ) Z2 WHERE Z2.DB_ROWNUM BETWEEN ", &ini_range, " AND ", &end_range);
-			ZVAL_COPY_VALUE(&sql, &sql_limit);
+			PHALCON_CPY_WRT_CTOR(&sql, &sql_limit);
 		}
 	}
 

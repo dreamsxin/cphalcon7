@@ -823,9 +823,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 	zend_bool ext = 0;
 	long i = 1, e = 0, image_count = 0;
 
-    PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 3, &filename, &enhance, &extended);
+	phalcon_fetch_params(0, 1, 3, &filename, &enhance, &extended);
 
 	if (enhance && Z_TYPE_P(enhance) == IS_LONG) {
 		e = Z_LVAL_P(enhance);
@@ -844,7 +842,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 	if (MagickReadImage(magick_wand, Z_STRVAL_P(filename)) == MagickFalse) {
 		ClearMagickWand(magick_wand);
 		DestroyMagickWand(magick_wand);
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
 
 	if (e & 2) {
@@ -858,7 +856,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 	image_count = MagickGetNumberImages(magick_wand);
 
 	if (image_count == 0) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "The image object does not contain images");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "The image object does not contain images");
 		return;
 	}
 
@@ -868,7 +866,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 		if (MagickSetIteratorIndex(magick_wand, 0) == MagickFalse) {
 			zbar_image_scanner_destroy(zbar_scanner);
 			DestroyMagickWand(magick_wand);
-			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to set the page number");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to set the page number");
 			return;
 		}
 
@@ -878,7 +876,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 		if (!zbar_page) {
 			zbar_image_scanner_destroy(zbar_scanner);
 			DestroyMagickWand(magick_wand);
-			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to get the page");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to get the page");
 			return;
 		}
 
@@ -889,7 +887,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
 		MagickResetIterator(magick_wand);
 		while (MagickNextImage(magick_wand) != MagickFalse) {
-			zval *page_array;
+			zval page_array;
 
 			/* Read the current page */
 			zbar_page = _php_zbarcode_get_page(magick_wand);
@@ -900,17 +898,14 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 				continue;
 			}
 			/* Scan the page for barcodes */
-			PHALCON_ALLOC_INIT_ZVAL(page_array);
-
-			_php_zbarcode_scan_page(zbar_scanner, zbar_page, ext, page_array);
-			add_index_zval(return_value, i++, page_array);
+			_php_zbarcode_scan_page(zbar_scanner, zbar_page, ext, &page_array);
+			Z_TRY_ADDREF_P(&new_zv);
+			add_index_zval(return_value, i++, &page_array);
 		}
 	}
 
 	zbar_image_scanner_destroy(zbar_scanner);	
 	DestroyMagickWand(magick_wand);
-
-	RETURN_MM();
 #else
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "libzbar is not installed, check your configuration");
 	return;

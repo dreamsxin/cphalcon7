@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 		}
 
 		if (!zend_is_true(&uri)) {
-			ZVAL_COPY_VALUE(base_uri, &slash);
+			PHALCON_CPY_WRT_CTOR(base_uri, &slash);
 		} else {
 			PHALCON_CONCAT_VVV(base_uri, &slash, &uri, &slash);
 		}

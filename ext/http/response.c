@@ -562,12 +562,12 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	}
 
 	if (Z_TYPE_P(location) == IS_STRING && zend_is_true(external_redirect)) {
-		ZVAL_COPY(&header, location);
+		PHALCON_CPY_WRT(&header, location);
 	} else if (Z_TYPE_P(location) == IS_STRING && strstr(Z_STRVAL_P(location), "://")) {
 		ZVAL_STRING(&pattern, "/^[^:\\/?#]++:/");
 		RETURN_MM_ON_FAILURE(phalcon_preg_match(&matched, &pattern, location, NULL));
 		if (zend_is_true(&matched)) {
-			ZVAL_COPY(&header, location);
+			PHALCON_CPY_WRT(&header, location);
 		} else {
 			ZVAL_NULL(&header);
 		}
@@ -849,7 +849,7 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 	if (Z_TYPE_P(attachment_name) != IS_STRING) {
 		phalcon_basename(&base_path, file_path);
 	} else {
-		ZVAL_COPY_VALUE(&base_path, attachment_name);
+		PHALCON_CPY_WRT_CTOR(&base_path, attachment_name);
 	}
 
 	if (zend_is_true(attachment)) {

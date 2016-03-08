@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
-				ZVAL_COPY_VALUE(&label, attribute);
+				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
 		}
 
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid){
 			PHALCON_CALL_METHODW(NULL, &file, "__construct", value);
 		}
 	} else if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(value), spl_ce_SplFileInfo, 0)) {
-		ZVAL_COPY(&file, value);
+		PHALCON_CPY_WRT(&file, value);
 	}
 
 	if (Z_TYPE(file) <= IS_NULL) {

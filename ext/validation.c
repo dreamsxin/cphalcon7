@@ -632,7 +632,7 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 	}
 
 	if (Z_TYPE_P(field_param) == IS_STRING) {
-		ZVAL_COPY(&field, field_param);
+		PHALCON_CPY_WRT(&field, field_param);
 	} else {
 		ZVAL_EMPTY_STRING(&field);
 	}

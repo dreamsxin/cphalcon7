@@ -139,19 +139,17 @@ static int phalcon_logger_adapter_string_level_to_int(const zval *level)
  */
 PHP_METHOD(Phalcon_Logger_Adapter, setLogLevel){
 
-	zval *level, *lvl;
+	zval *level, lvl;
 
 	phalcon_fetch_params(0, 1, 0, &level);
 	if (Z_TYPE_P(level) == IS_STRING) {
-		PHALCON_ALLOC_INIT_ZVAL(lvl);
-		ZVAL_LONG(lvl, phalcon_logger_adapter_string_level_to_int(level));
-	} else if (Z_TYPE_P(level) != IS_LONG) {
-		lvl = level;
+		ZVAL_LONG(&lvl, phalcon_logger_adapter_string_level_to_int(level));
 	} else {
-		lvl = level;
+		PHALCON_CPY_WRT_CTOR(&lvl, level);
+		convert_to_long_ex(&lvl);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_logLevel"), lvl);
+	phalcon_update_property_this(getThis(), SL("_logLevel"), &lvl);
 	RETURN_THISW();
 }
 

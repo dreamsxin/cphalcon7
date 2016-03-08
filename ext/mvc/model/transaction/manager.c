@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, __construct){
 	if (!di || Z_TYPE_P(di) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 	} else {
-		ZVAL_COPY(&dependency_injector, di);
+		PHALCON_CPY_WRT(&dependency_injector, di);
 	}
 
 	PHALCON_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_mvc_model_transaction_exception_ce, 0);

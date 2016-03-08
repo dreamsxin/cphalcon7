@@ -121,7 +121,7 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
  */
 zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 {
-	zval *ret = NULL;
+	zval *ret = NULL, value;
 
 	switch (Z_TYPE_P(key)) {
 		case IS_RESOURCE:
@@ -156,9 +156,8 @@ zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 						zend_error(E_NOTICE, "Undefined offset: %ld", index);
 						/* no break */
 					case BP_VAR_W: {
-						zval *value;
-						PHALCON_ALLOC_INIT_ZVAL(value);
-						zend_hash_index_update(ht, index, value);
+						ZVAL_NULL(&value);
+						zend_hash_index_update(ht, index, &value);
 						break;
 					}
 				}
@@ -184,9 +183,8 @@ zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 						zend_error(E_NOTICE, "Undefined offset: %s", Z_STRVAL_P(key));
 						/* no break */
 					case BP_VAR_W: {
-						zval *value;
-						PHALCON_ALLOC_INIT_ZVAL(value);
-						zend_symtable_update(ht, Z_STR_P(key), value);
+						ZVAL_NULL(&value);
+						zend_symtable_update(ht, Z_STR_P(key), &value);
 						break;
 					}
 				}

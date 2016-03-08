@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
-				ZVAL_COPY_VALUE(&label, attribute);
+				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
 		}
 
@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 		if (!zend_is_true(&with_label)) {
 			PHALCON_CALL_METHODW(&with_label, validator, "getlabel", &with_attribute);
 			if (!zend_is_true(&with_label)) {
-				ZVAL_COPY_VALUE(&with_label, &with_attribute);
+				PHALCON_CPY_WRT_CTOR(&with_label, &with_attribute);
 			}
 		}
 

@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 		if (Z_TYPE_P(end) == IS_NULL) {
 			phalcon_fast_count(&length, value);
 		} else {
-			ZVAL_COPY(&length, end);
+			PHALCON_CPY_WRT(&length, end);
 		}
 
 		ZVAL_LONG(&position, 0);

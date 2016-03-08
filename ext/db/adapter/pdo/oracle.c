@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 		PHALCON_CALL_METHOD(NULL, &column, "__construct", &column_name, &definition);
 
 		phalcon_array_append(&columns, &column, PH_COPY);
-		ZVAL_COPY_VALUE(&old_column, &column_name);
+		PHALCON_CPY_WRT_CTOR(&old_column, &column_name);
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(&columns);

@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Date, offset){
 
 		PHALCON_CALL_FUNCTION(&new_date, "date", &format, date);
 	} else {
-		ZVAL_COPY(&new_date, date);
+		PHALCON_CPY_WRT(&new_date, date);
 	}
 
 	object_init_ex(&zone_remote, ce1);
@@ -467,7 +467,7 @@ PHP_METHOD(Phalcon_Date, days){
 
 		y = phalcon_get_intval(&year2);
 	} else {
-		ZVAL_COPY(&year2, year);
+		PHALCON_CPY_WRT(&year2, year);
 	}
 
 	if (Z_TYPE(months) == IS_ARRAY) {
@@ -656,7 +656,7 @@ PHP_METHOD(Phalcon_Date, span){
 
 	PHALCON_CALL_FUNCTION(&tmp, "array_fill", &tmp1, &count_output, &tmp1);
 
-	ZVAL_COPY_VALUE(&tmp1, &output_arr);
+	PHALCON_CPY_WRT_CTOR(&tmp1, &output_arr);
 
 	PHALCON_CALL_FUNCTION(&output_arr, "array_combine", &tmp1, &tmp);
 
@@ -766,7 +766,7 @@ PHP_METHOD(Phalcon_Date, span2){
 
 	PHALCON_CALL_FUNCTION(&tmp, "array_fill", &tmp1, &count_output, &tmp1);
 
-	ZVAL_COPY_VALUE(&tmp1, &output_arr);
+	PHALCON_CPY_WRT_CTOR(&tmp1, &output_arr);
 
 	PHALCON_CALL_FUNCTION(&output_arr, "array_combine", &tmp1, &tmp);
 
@@ -952,7 +952,7 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2){
 		phalcon_array_append_string(&output, SL(" minutes"), 0);
 		phalcon_array_append_string(&output, SL(" seconds"), 0);
 	} else {
-		ZVAL_COPY_VALUE(&output, lables);
+		PHALCON_CPY_WRT_CTOR(&output, lables);
 	}
 
 	offset = phalcon_get_intval(timestamp);
@@ -1104,13 +1104,13 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 	if (!datetime) {
 		ZVAL_STRING(&datetime_str, "now");
 	} else {
-		ZVAL_COPY(&datetime_str, datetime);
+		PHALCON_CPY_WRT(&datetime_str, datetime);
 	}
 
 	if (!format || Z_TYPE_P(format) == IS_NULL) {
 		 phalcon_return_static_property_ce(&timestamp_format, phalcon_date_ce, SL("timestamp_format"));
 	} else {
-		ZVAL_COPY(&timestamp_format, format);
+		PHALCON_CPY_WRT(&timestamp_format, format);
 	}
 
 	if (!zone || Z_TYPE_P(zone) == IS_NULL) {
@@ -1160,7 +1160,7 @@ PHP_METHOD(Phalcon_Date, valid){
 	if (!format) {
 		ZVAL_STRING(&date_format, "Y-m-d");
 	} else {
-		ZVAL_COPY(&date_format, format);
+		PHALCON_CPY_WRT(&date_format, format);
 	}
 
 	PHALCON_CALL_FUNCTION(&time, "strtotime", date);

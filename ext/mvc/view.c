@@ -949,7 +949,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 						if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
 							PHALCON_CALL_USER_FUNC_ARRAY(&engine_object, engine_service, arguments);
 						} else {
-							ZVAL_COPY(&engine_object, engine_service);
+							PHALCON_CPY_WRT(&engine_object, engine_service);
 						}
 					} else {
 						/** 
@@ -1238,8 +1238,7 @@ PHP_METHOD(Phalcon_Mvc_View, getEngines) {
 
 PHP_METHOD(Phalcon_Mvc_View, exists) {
 
-	zval *view, *base_dir, *view_dir, *engines;
-	zval path;
+	zval *view, *base_dir, *view_dir, engines, path;
 	zend_string *str_key;
 	int exists = 0;
 
@@ -1248,17 +1247,16 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 
 	base_dir = phalcon_read_property(getThis(), SL("_basePath"), PH_NOISY);
 	view_dir = phalcon_read_property(getThis(), SL("_viewsDir"), PH_NOISY);
-	engines  = phalcon_read_property(getThis(), SL("_registeredEngines"), PH_NOISY);
+	phalcon_return_property(&engines, getThis(), SL("_registeredEngines"));
 
-	if (Z_TYPE_P(engines) != IS_ARRAY) {
-		PHALCON_ALLOC_INIT_ZVAL(engines);
-		array_init_size(engines, 1);
-		phalcon_array_update_str_string(engines, SL(".phtml"), phalcon_mvc_view_engine_php_ce->name, PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_registeredEngines"), engines);
-		zval_ptr_dtor(engines);
+	if (Z_TYPE(engines) != IS_ARRAY) {
+		array_init_size(&engines, 1);
+		phalcon_array_update_str_string(&engines, SL(".phtml"), phalcon_mvc_view_engine_php_ce->name, PH_COPY);
+		phalcon_update_property_this(getThis(), SL("_registeredEngines"), &engines);
+		zval_ptr_dtor(&engines);
 	}
 
-	ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL_P(engines), str_key) {
+	ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL(engines), str_key) {
 		zval ext;
 		if (str_key) {
 			ZVAL_STR(&ext, str_key);
@@ -1381,8 +1379,8 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		phalcon_fast_strtolower(&lower_controller_name, controller_name);
 		phalcon_fast_strtolower(&lower_action_name, action_name);
 	} else {
-		ZVAL_COPY(&lower_controller_name, controller_name);
-		ZVAL_COPY(&lower_action_name, action_name);
+		PHALCON_CPY_WRT(&lower_controller_name, controller_name);
+		PHALCON_CPY_WRT(&lower_action_name, action_name);
 	}
 
 	/** 
@@ -1399,7 +1397,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		if (zend_is_true(lower_case)) {
 			phalcon_fast_strtolower(&lower_namespace_name, namespace_name);
 		} else {
-			ZVAL_COPY(&lower_namespace_name, namespace_name);
+			PHALCON_CPY_WRT(&lower_namespace_name, namespace_name);
 		}
 
 		PHALCON_STR_REPLACE(&ds_lower_namespace_name, &namespace_separator, &ds, &lower_namespace_name);
@@ -1412,11 +1410,11 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	layout = phalcon_read_property(getThis(), SL("_layout"), PH_NOISY);
 	if (zend_is_true(layout)) {
-		ZVAL_COPY(&layout_name, layout);
+		PHALCON_CPY_WRT(&layout_name, layout);
 	} else if (PHALCON_IS_NOT_EMPTY(&ds_lower_namespace_name)) {
 		PHALCON_CONCAT_VSV(&layout_name, &ds_lower_namespace_name, "/", &lower_controller_name);
 	} else {
-		ZVAL_COPY(&layout_name, &lower_controller_name);
+		PHALCON_CPY_WRT(&layout_name, &lower_controller_name);
 	}
 
 	/** 
@@ -1441,7 +1439,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		 */
 		phalcon_array_fetch_long(&render_view, &pick_view, 0, PH_NOISY);
 		if (phalcon_array_isset_fetch_long(&pick_view_action, &pick_view, 1)) {
-			ZVAL_COPY(&layout_name, &pick_view_action);
+			PHALCON_CPY_WRT(&layout_name, &pick_view_action);
 		}
 	}
 
@@ -1618,7 +1616,7 @@ PHP_METHOD(Phalcon_Mvc_View, pick){
 	phalcon_fetch_params(0, 1, 0, &render_view);
 
 	if (Z_TYPE_P(render_view) == IS_ARRAY) { 
-		ZVAL_COPY(&pick_view, render_view);
+		PHALCON_CPY_WRT(&pick_view, render_view);
 	} else {
 		array_init_size(&pick_view, 2);
 		phalcon_array_append(&pick_view, render_view, PH_COPY);
@@ -1680,7 +1678,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
 			phalcon_fast_array_merge(&new_params, view_params, params);
 		} else {
-			ZVAL_COPY(&new_params, params);
+			PHALCON_CPY_WRT(&new_params, params);
 		}
 
 		/** 

@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Flash_Session, getMessages){
 	if (Z_TYPE_P(type) != IS_NULL) {
 		ZVAL_FALSE(&do_remove);
 	} else {
-		ZVAL_COPY(&do_remove, remove);
+		PHALCON_CPY_WRT(&do_remove, remove);
 	}
 
 	PHALCON_CALL_METHODW(&messages, getThis(), "_getsessionmessages", &do_remove);

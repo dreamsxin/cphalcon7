@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	if (Z_TYPE(models) == IS_ARRAY) {
 		phalcon_array_get_current(&model_name, &models);
 	} else {
-		ZVAL_COPY_VALUE(&model_name, &models);
+		PHALCON_CPY_WRT_CTOR(&model_name, &models);
 	}
 
 	PHALCON_CALL_METHODW(&model, &models_manager, "load", &model_name);
@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 
-				ZVAL_COPY_VALUE(&sql_tmp, &sql);
+				PHALCON_CPY_WRT_CTOR(&sql_tmp, &sql);
 				PHALCON_STR_REPLACE(&sql, &string_wildcard, value, &sql_tmp);
 
 				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
@@ -379,7 +379,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		ZVAL_COPY(&processed, &bind_params);
+		PHALCON_CPY_WRT(&processed, &bind_params);
 	}
 
 	/**
@@ -405,7 +405,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		ZVAL_COPY(&processed_types, &bind_types);
+		PHALCON_CPY_WRT(&processed_types, &bind_types);
 	}
 
 	PHALCON_CALL_METHODW(&result, &connection, "query", &sql, &processed, &processed_types);

@@ -67,7 +67,7 @@ int phalcon_require_ret(zval *return_value, const char *require_path)
 			return FAILURE;
         }
 		if (return_value) {
-			ZVAL_COPY(return_value, &ret);
+			PHALCON_CPY_WRT(return_value, &ret);
 		}
 
 	    return SUCCESS;

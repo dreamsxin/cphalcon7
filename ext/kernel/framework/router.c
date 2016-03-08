@@ -267,8 +267,9 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
  * Extracts parameters from a string
  * An initialized zval array must be passed as second parameter
  */
-void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches){
-
+void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches)
+{
+	zval tmp;
 	int i, k;
 	uint j, bracket_count = 0, parentheses_count = 0, ch;
 	uint intermediate = 0, length, number_matches = 0, found_pattern;
@@ -336,50 +337,46 @@ void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches){
 							}
 
 							if (!not_valid) {
-								{
-									zval *tmp;
-									PHALCON_ALLOC_INIT_ZVAL(tmp);
-									ZVAL_LONG(tmp, number_matches);
+								ZVAL_LONG(&tmp, number_matches);
 
-									if (variable) {
-										if (regexp_length > 0) {
-											ASSUME(regexp != NULL);
+								if (variable) {
+									if (regexp_length > 0) {
+										ASSUME(regexp != NULL);
 
-											/**
-											 * Check if we need to add parentheses to the expression
-											 */
-											found_pattern = 0;
-											for (k = 0; k < regexp_length; k++) {
-												if (regexp[k] == '\0') {
+										/**
+										 * Check if we need to add parentheses to the expression
+										 */
+										found_pattern = 0;
+										for (k = 0; k < regexp_length; k++) {
+											if (regexp[k] == '\0') {
+												break;
+											}
+											if (!found_pattern) {
+												if (regexp[k] == '(') {
+													found_pattern = 1;
+												}
+											} else {
+												if (regexp[k] == ')') {
+													found_pattern = 2;
 													break;
 												}
-												if (!found_pattern) {
-													if (regexp[k] == '(') {
-														found_pattern = 1;
-													}
-												} else {
-													if (regexp[k] == ')') {
-														found_pattern = 2;
-														break;
-													}
-												}
 											}
-
-											if (found_pattern != 2) {
-												smart_str_appendc(&route_str, '(');
-												smart_str_appendl(&route_str, regexp, regexp_length);
-												smart_str_appendc(&route_str, ')');
-											} else {
-												smart_str_appendl(&route_str, regexp, regexp_length);
-											}
-											zend_hash_str_update(Z_ARRVAL_P(matches), variable, variable_length, tmp);
 										}
-										efree(regexp);
-										efree(variable);
-									} else {
-										smart_str_appendl(&route_str, "([^/]*)", strlen("([^/]*)"));
-										zend_hash_str_update(Z_ARRVAL_P(matches), item, length, tmp);
+
+										if (found_pattern != 2) {
+											smart_str_appendc(&route_str, '(');
+											smart_str_appendl(&route_str, regexp, regexp_length);
+											smart_str_appendc(&route_str, ')');
+										} else {
+											smart_str_appendl(&route_str, regexp, regexp_length);
+										}
+										zend_hash_str_update(Z_ARRVAL_P(matches), variable, variable_length, &tmp);
 									}
+									efree(regexp);
+									efree(variable);
+								} else {
+									smart_str_appendl(&route_str, "([^/]*)", strlen("([^/]*)"));
+									zend_hash_str_update(Z_ARRVAL_P(matches), item, length, &tmp);
 								}
 							} else {
 								smart_str_appendc(&route_str, '{');

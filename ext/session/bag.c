@@ -102,9 +102,7 @@ static int phalcon_session_bag_maybe_initialize(zval *this_ptr)
 
 static zend_object_iterator* phalcon_session_bag_get_iterator(zend_class_entry *ce, zval *object, int by_ref)
 {
-	zval *iterator;
-	zval *data;
-	zval *params[1];
+	zval iterator, *data, *params[1];
 	zend_object_iterator *ret;
 
 	if (FAILURE == phalcon_session_bag_maybe_initialize(object)) {
@@ -113,20 +111,17 @@ static zend_object_iterator* phalcon_session_bag_get_iterator(zend_class_entry *
 
 	data = phalcon_read_property(object, SL("_data"), PH_NOISY);
 
-	PHALCON_ALLOC_INIT_ZVAL(iterator);
-	object_init_ex(iterator, spl_ce_ArrayIterator);
+	object_init_ex(&iterator, spl_ce_ArrayIterator);
 	params[0] = data;
-	if (FAILURE == phalcon_call_method(NULL, iterator, "__construct", 1, params)) {
+	if (FAILURE == phalcon_call_method(NULL, &iterator, "__construct", 1, params)) {
 		ret = NULL;
 	}
-	else if (Z_TYPE_P(iterator) == IS_OBJECT) {
-		ret = spl_ce_ArrayIterator->get_iterator(spl_ce_ArrayIterator, iterator, by_ref);
-	}
-	else {
+	else if (Z_TYPE(iterator) == IS_OBJECT) {
+		ret = spl_ce_ArrayIterator->get_iterator(spl_ce_ArrayIterator, &iterator, by_ref);
+	} else {
 		ret = NULL;
 	}
 
-	zval_ptr_dtor(iterator);
 	return ret;
 }
 

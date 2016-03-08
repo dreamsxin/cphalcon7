@@ -167,13 +167,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save){
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHODW(&cached_content, frontend, "getcontent");
 	} else {
-		ZVAL_COPY(&cached_content, content);
+		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
 	if (!phalcon_is_numeric(&cached_content)) {
 		PHALCON_CALL_METHODW(&prepared_content, frontend, "beforestore", &cached_content);
 	} else {
-		ZVAL_COPY(&prepared_content, &cached_content);
+		PHALCON_CPY_WRT(&prepared_content, &cached_content);
 	}
 
 	/** 
@@ -185,10 +185,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save){
 		if (Z_TYPE_P(last_lifetime) == IS_NULL) {
 			PHALCON_CALL_METHODW(&ttl, frontend, "getlifetime");
 		} else {
-			ZVAL_COPY(&ttl, last_lifetime);
+			PHALCON_CPY_WRT(&ttl, last_lifetime);
 		}
 	} else {
-		ZVAL_COPY(&ttl, lifetime);
+		PHALCON_CPY_WRT(&ttl, lifetime);
 	}
 
 	/** 

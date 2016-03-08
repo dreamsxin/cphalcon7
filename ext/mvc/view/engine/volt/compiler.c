@@ -573,7 +573,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getUniquePrefix){
 
 			PHALCON_CALL_FUNCTION(&calculated_prefix, "call_user_func_array", &prefix, &parameters);
 			phalcon_update_property_this(getThis(), SL("_prefix"), &calculated_prefix);
-			ZVAL_COPY(&prefix, &calculated_prefix);
+			PHALCON_CPY_WRT(&prefix, &calculated_prefix);
 		}
 	}
 
@@ -791,13 +791,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 					if (Z_TYPE(block) == IS_ARRAY) { 
 						PHALCON_CALL_METHOD(&code, getThis(), "_statementlistorextends", &block);
 						if (PHALCON_IS_LONG(expr_level, 1)) {
-							ZVAL_COPY(&escaped_code, &code);
+							PHALCON_CPY_WRT(&escaped_code, &code);
 						} else {
 							phalcon_addslashes(&escaped_code, &code);
 						}
 					} else {
 						if (PHALCON_IS_LONG(expr_level, 1)) {
-							ZVAL_COPY(&escaped_code, &block);
+							PHALCON_CPY_WRT(&escaped_code, &block);
 						} else {
 							phalcon_addslashes(&escaped_code, &block);
 						}
@@ -1132,7 +1132,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 
 		PHALCON_CALL_METHOD(&arguments, getThis(), "expression", &func_arguments);
 	} else {
-		ZVAL_COPY(&arguments, left);
+		PHALCON_CPY_WRT(&arguments, left);
 	}
 
 	/** 
@@ -1929,7 +1929,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 
 			if (PHALCON_IS_LONG(&type, PHVOLT_T_ELSEFOR)) {
 				PHALCON_SCONCAT_SVS(&compilation, "<?php $", &prefix_level, "iterated = false; ?>");
-				ZVAL_COPY(&for_else, &prefix_level);
+				PHALCON_CPY_WRT(&for_else, &prefix_level);
 				phalcon_update_property_array(getThis(), SL("_forElsePointers"), level, &for_else);
 				break;
 			}
@@ -1959,7 +1959,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 
 		PHALCON_CONCAT_SVS(&iterator, "$", &prefix_level, "iterator");
 	} else {
-		ZVAL_COPY(&iterator, &expr_code);
+		PHALCON_CPY_WRT(&iterator, &expr_code);
 	}
 
 	/** 
@@ -2329,7 +2329,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 
 				PHALCON_CONCAT_VV(&final_path, &views_dir, &path);
 			} else {
-				ZVAL_COPY(&final_path, &path);
+				PHALCON_CPY_WRT(&final_path, &path);
 			}
 
 			ZVAL_BOOL(&extended, 0);
@@ -2825,7 +2825,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 					PHALCON_CALL_METHODW(&views_dir, view, "getviewsdir");
 					PHALCON_CONCAT_VV(&final_path, &views_dir, &path);
 				} else {
-					ZVAL_COPY(&final_path, &path);
+					PHALCON_CPY_WRT(&final_path, &path);
 				}
 
 				ZVAL_BOOL(&extended, 1);
@@ -2849,7 +2849,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 
 				phalcon_update_property_bool(getThis(), SL("_extended"), 1);
 				phalcon_update_property_this(getThis(), SL("_extendedBlocks"), &temp_compilation);
-				ZVAL_COPY(&block_mode, &extended);
+				PHALCON_CPY_WRT(&block_mode, &extended);
 				break;
 
 			case 313:
@@ -3028,7 +3028,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 
 							PHALCON_CALL_METHODW(&block_compilation, getThis(), "_statementlist", &local_block);
 						} else {
-							ZVAL_COPY(&block_compilation, block);
+							PHALCON_CPY_WRT(&block_compilation, block);
 						}
 					}
 					if (PHALCON_IS_TRUE(extends_mode)) {
@@ -3155,7 +3155,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileFile){
 	if (Z_TYPE(compilation) == IS_ARRAY) {
 		phalcon_serialize(&final_compilation, &compilation);
 	} else {
-		ZVAL_COPY(&final_compilation, &compilation);
+		PHALCON_CPY_WRT(&final_compilation, &compilation);
 	}
 
 	/** 
@@ -3288,7 +3288,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 			 */
 			phalcon_prepare_virtual_path(&template_sep_path, &real_template_path, &compiled_separator);
 		} else {
-			ZVAL_COPY(&template_sep_path, template_path);
+			PHALCON_CPY_WRT(&template_sep_path, template_path);
 		}
 
 		/** 
@@ -3329,7 +3329,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compile){
 	/** 
 	 * Use the real path to avoid collisions
 	 */
-	ZVAL_COPY(&real_compiled_path, &compiled_template_path);
+	PHALCON_CPY_WRT(&real_compiled_path, &compiled_template_path);
 	if (zend_is_true(&compile_always)) {
 		/** 
 		 * Compile always must be used only in the development stage

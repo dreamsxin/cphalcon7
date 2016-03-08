@@ -185,12 +185,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	phalcon_fetch_params(1, 1, 1, &method, &arguments);
 
-	ZVAL_COPY(&method_name, method);
+	PHALCON_CPY_WRT(&method_name, method);
 
 	if (!args) {
 		array_init(&arguments);
 	} else {
-		ZVAL_COPY(&arguments, args);
+		PHALCON_CPY_WRT(&arguments, args);
 	}
 
 	methods = phalcon_read_property(getThis(), SL("_methods"), PH_NOISY);

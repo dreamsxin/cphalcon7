@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 	
 	translate = phalcon_read_property(getThis(), SL("_translate"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&translation, translate, index)) {
-		ZVAL_COPY_VALUE(&translation, index);
+		PHALCON_CPY_WRT_CTOR(&translation, index);
 	}
 
 	if (Z_TYPE_P(placeholders) == IS_ARRAY) {
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
 			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, &translation);
 
-			ZVAL_COPY_VALUE(&translation, &replaced);
+			PHALCON_CPY_WRT_CTOR(&translation, &replaced);
 		} ZEND_HASH_FOREACH_END();
 	}
 

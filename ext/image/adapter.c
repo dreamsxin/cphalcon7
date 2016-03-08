@@ -216,14 +216,14 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 	phalcon_fetch_params(0, 0, 3, &_width, &_height, &_master);
 
 	if (_width) {
-		ZVAL_COPY_VALUE(&width, _width);
+		PHALCON_CPY_WRT_CTOR(&width, _width);
 		if (Z_TYPE(width) != IS_LONG && Z_TYPE(width) != IS_NULL) {
 			convert_to_long(&width);
 		}
 	}
 
 	if (_height) {
-		ZVAL_COPY_VALUE(&height, _height);
+		PHALCON_CPY_WRT_CTOR(&height, _height);
 		if (Z_TYPE(height) != IS_LONG && Z_TYPE(height) != IS_NULL) {
 			convert_to_long(&height);
 		}
@@ -405,8 +405,8 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 
 	tmp_width        = Z_LVAL_P(w);
 	tmp_height       = Z_LVAL_P(h);
-	tmp_image_width  = phalcon_get_intval(image_width);
-	tmp_image_height = phalcon_get_intval(image_height);
+	tmp_image_width  = phalcon_get_intval(&image_width);
+	tmp_image_height = phalcon_get_intval(&image_height);
 
 	if (tmp_width > tmp_image_width) {
 		tmp_width = tmp_image_width;
@@ -564,12 +564,12 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
 	phalcon_fetch_params(0, 0, 3, &h, &op, &fade_in);
 
 	phalcon_return_property(&image_height, getThis(), SL("_height"));
-	tmp_image_height = phalcon_get_intval(image_height);
+	tmp_image_height = phalcon_get_intval(&image_height);
 
 	if (!h || Z_TYPE_P(h) != IS_LONG || Z_LVAL_P(h) > tmp_image_height) {
 		ZVAL_LONG(&height, tmp_image_height);
 	} else {
-		ZVAL_COPY_VALUE(&height, h);
+		PHALCON_CPY_WRT_CTOR(&height, h);
 	}
 
 	if (!op) {
@@ -582,7 +582,7 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
 		} else if (Z_LVAL_P(op) < 0) {
 			ZVAL_LONG(&opacity, 0);
 		} else {
-			ZVAL_COPY_VALUE(&opacity, op);
+			PHALCON_CPY_WRT_CTOR(&opacity, op);
 		}
 	}
 
@@ -696,13 +696,13 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 	if (!ofs_x) {
 		ZVAL_NULL(&offset_x);
 	} else {
-		ZVAL_COPY_VALUE(&offset_x, ofs_x);
+		PHALCON_CPY_WRT_CTOR(&offset_x, ofs_x);
 	}
 
 	if (!ofs_y) {
 		ZVAL_NULL(&offset_x);
 	} else {
-		ZVAL_COPY_VALUE(&offset_y, ofs_y);
+		PHALCON_CPY_WRT_CTOR(&offset_y, ofs_y);
 	}
 
 	if (!op || Z_TYPE_P(op) == IS_NULL) {
@@ -804,10 +804,10 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
 
 	phalcon_fetch_params(0, 1, 1, &bcolor, &_opacity);
 
-	if (!opacity) {
+	if (!_opacity) {
 		ZVAL_LONG(&opacity, 100);
 	} else {
-		ZVAL_COPY_VALUE(&opacity, _opacity);
+		PHALCON_CPY_WRT_CTOR(&opacity, _opacity);
 	}
 
 	if (Z_TYPE_P(bcolor) == IS_NULL) {
@@ -844,7 +844,7 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
 	phalcon_substr(&tmp, &color, 0, 2);
 	_php_math_basetozval(&tmp, 16, &r);
 
-	phalcon_substr(&tmp, color, 2, 2);
+	phalcon_substr(&tmp, &color, 2, 2);
 	_php_math_basetozval(&tmp, 16, &g);
 
 	phalcon_substr(&tmp, &color, 4, 2);
@@ -878,7 +878,7 @@ PHP_METHOD(Phalcon_Image_Adapter, blur){
 
 	if (!_radius) {
 		ZVAL_LONG(&radius, 1);
-	} else if (Z_TYPE(_radius) != IS_LONG) {
+	} else if (Z_TYPE_P(_radius) != IS_LONG) {
 		ZVAL_LONG(&radius, 1);
 	} else {
 		r = phalcon_get_intval(_radius);
@@ -887,11 +887,11 @@ PHP_METHOD(Phalcon_Image_Adapter, blur){
 		} else if (r > 100) {
 			ZVAL_LONG(&radius, 100);
 		} else {
-			ZVAL_COPY(&radius, _radius);
+			PHALCON_CPY_WRT(&radius, _radius);
 		}
 	}
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "_blur", radius);
+	PHALCON_CALL_METHODW(NULL, getThis(), "_blur", &radius);
 
 	RETURN_THISW();
 }
@@ -941,7 +941,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 	if (!fname) {
 		phalcon_return_property(&file, getThis(), SL("_realpath"));
 	} else {
-		ZVAL_COPY_VALUE(&file, fname);
+		PHALCON_CPY_WRT_CTOR(&file, fname);
 	}
 
 	if (Z_TYPE(file) != IS_STRING) {
@@ -962,7 +962,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 
 	if (zend_is_true(&ret)) {
 		PHALCON_CALL_FUNCTIONW(&ret, "is_writable", &file);
-		if (!zend_is_true(ret)) {
+		if (!zend_is_true(&ret)) {
 			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "File must be writable: '%s'", Z_STRVAL(file));
 			return;
 		}
@@ -1013,13 +1013,13 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 			ZVAL_STRING(&format, "png");
 		} 
 	} else {
-		ZVAL_COPY(&format, ext);
+		PHALCON_CPY_WRT(&format, ext);
 	}
 
 	if (!_quality) {
 		ZVAL_LONG(&quality, 100);
 	} else {
-		ZVAL_COPY(&quality, _quality);
+		PHALCON_CPY_WRT(&quality, _quality);
         if (Z_TYPE(quality) != IS_LONG) {
             convert_to_long(&quality);
         }

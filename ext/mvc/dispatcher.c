@@ -140,19 +140,16 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setDefaultController){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 
-	zval *controller_name, *is_exact = NULL;
+	zval *controller_name, *is_exact = NULL, name;
 
 	phalcon_fetch_params(0, 1, 1, &controller_name, &is_exact);
 
 	if (is_exact && zend_is_true(is_exact)) {
-		zval *name;
-		PHALCON_ALLOC_INIT_ZVAL(name);
-		PHALCON_CONCAT_SV(name, "\\", controller_name);
-		phalcon_update_property_this(getThis(), SL("_handlerName"), name);
-		zval_ptr_dtor(name);
+		PHALCON_CONCAT_SV(&name, "\\", controller_name);
+		phalcon_update_property_this(getThis(), SL("_handlerName"), &name);
+		zval_ptr_dtor(&name);
 		phalcon_update_property_this(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_true));
-	}
-	else {
+	} else {
 		phalcon_update_property_this(getThis(), SL("_handlerName"), controller_name);
 		phalcon_update_property_this(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_false));
 	}

@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 			phalcon_add_function(&parameter, &wildcard, z_one);
 		} else {
 			if (Z_TYPE(wildcard) == IS_STRING) {
-				ZVAL_COPY_VALUE(&parameter, &wildcard);
+				PHALCON_CPY_WRT_CTOR(&parameter, &wildcard);
 			} else {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid bind parameter");
 				return;
@@ -469,7 +469,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
 		if (Z_TYPE(statement) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
-			ZVAL_COPY_VALUE(&statement, &new_statement);
+			PHALCON_CPY_WRT_CTOR(&statement, &new_statement);
 		}
 	} else {
 		pdo = phalcon_read_property(getThis(), SL("_pdo"), PH_NOISY);
@@ -728,7 +728,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 
 		PHALCON_CALL_FUNCTION(&bound_sql, "preg_replace", &bind_pattern, &question, sql);
 	} else {
-		ZVAL_COPY_VALUE(&bound_sql, sql);
+		PHALCON_CPY_WRT_CTOR(&bound_sql, sql);
 	}
 
 	/** 

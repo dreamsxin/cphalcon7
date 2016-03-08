@@ -1103,7 +1103,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		ZVAL_COPY(&lower_alias, &referenced_entity);
+		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
 	}
 
 	/** 
@@ -1203,7 +1203,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		ZVAL_COPY(&lower_alias, &referenced_entity);
+		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
 	}
 
 	/** 
@@ -1303,7 +1303,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		ZVAL_COPY(&lower_alias, &referenced_entity);
+		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
 	}
 
 	/** 
@@ -1427,7 +1427,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		ZVAL_COPY(&lower_alias, &referenced_entity);
+		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
 	}
 
 	/** 
@@ -1674,7 +1674,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	phalcon_fetch_params(0, 3, 1, &relation, &method, &record, &p);
 
 	if (p) {
-		ZVAL_COPY(&parameters, p);
+		PHALCON_CPY_WRT(&parameters, p);
 	}
 
 	if (Z_TYPE(parameters) == IS_ARRAY) {
@@ -1699,7 +1699,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		}
 	} else {
 		if (Z_TYPE(parameters) == IS_STRING) {
-			ZVAL_COPY(&pre_conditions, &parameters);
+			PHALCON_CPY_WRT(&pre_conditions, &parameters);
 		}
 		
 		array_init(&placeholders);
@@ -1848,7 +1848,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	if (Z_TYPE(parameters) == IS_ARRAY) { 
 		phalcon_fast_array_merge(&find_arguments, &find_params, &parameters);
 	} else {
-		ZVAL_COPY(&find_arguments, &find_params);
+		PHALCON_CPY_WRT(&find_arguments, &find_params);
 	}
 
 	array_init_size(&arguments, 1);
@@ -1876,7 +1876,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
 		}
 	} else {
-		ZVAL_COPY(&retrieve_method, method);
+		PHALCON_CPY_WRT(&retrieve_method, method);
 	}
 
 	/** 

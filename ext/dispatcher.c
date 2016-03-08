@@ -612,14 +612,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (!phalcon_memnstr_str(&handler_name, SL("\\"))) {
 			phalcon_return_property(&camelize, getThis(), SL("_camelizeController"));
 			if (!zend_is_true(&camelize)) {
-				ZVAL_COPY(&camelized_class, &handler_name);
+				PHALCON_CPY_WRT(&camelized_class, &handler_name);
 			} else {
 				phalcon_camelize(&camelized_class, &handler_name);
 			}
 		} else if (phalcon_start_with_str(&handler_name, SL("\\"))) {
 			ZVAL_STRINGL(&camelized_class, Z_STRVAL(handler_name)+1, Z_STRLEN(handler_name)-1);
 		} else {
-			ZVAL_COPY(&camelized_class, &handler_name);
+			PHALCON_CPY_WRT(&camelized_class, &handler_name);
 		}
 
 		/**
@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (zend_is_true(&namespace_name)) {			
 			phalcon_return_property(&camelize, getThis(), SL("_camelizeNamespace"));
 			if (!zend_is_true(&camelize)) {
-				ZVAL_COPY(&camelized_namespace, &namespace_name);
+				PHALCON_CPY_WRT(&camelized_namespace, &namespace_name);
 			} else {
 				phalcon_camelize(&camelized_namespace, &namespace_name);
 			}
@@ -843,7 +843,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			ZVAL_OBJ(&e, EG(exception));
 
 			/* Copy the exception to rethrow it later if needed */
-			ZVAL_COPY(&exception, &e);
+			PHALCON_CPY_WRT(&exception, &e);
 
 			/* Clear the exception  */
 			zend_clear_exception();
@@ -970,7 +970,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 					phalcon_array_update_str(&forward_parts, SL("namespace"), &real_namespace_name, PH_COPY);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&real_controller_name, &controller_part);
+				PHALCON_CPY_WRT_CTOR(&real_controller_name, &controller_part);
 			}
 
 			phalcon_uncamelize(&controller_part, &real_controller_name);
@@ -981,7 +981,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 			}
 		}
 	} else {
-		ZVAL_COPY_VALUE(&forward_parts, forward);
+		PHALCON_CPY_WRT_CTOR(&forward_parts, forward);
 	}
 
 	if (Z_TYPE(forward_parts) != IS_ARRAY) {
@@ -1088,7 +1088,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	} else if (phalcon_start_with_str(handler_name, SL("\\"))) {
 		ZVAL_STRINGL(&camelized_class, Z_STRVAL_P(handler_name)+1, Z_STRLEN_P(handler_name)-1);
 	} else {
-		ZVAL_COPY(&camelized_class, handler_name);
+		PHALCON_CPY_WRT(&camelized_class, handler_name);
 	}
 
 	/**
@@ -1097,7 +1097,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	if (zend_is_true(namespace_name)) {
 		camelize = phalcon_read_property(getThis(), SL("_camelizeNamespace"), PH_NOISY);
 		if (!zend_is_true(camelize)) {
-			ZVAL_COPY(&camelized_namespace, namespace_name);
+			PHALCON_CPY_WRT(&camelized_namespace, namespace_name);
 		} else {
 			phalcon_camelize(&camelized_namespace, namespace_name);
 		}

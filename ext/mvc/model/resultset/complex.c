@@ -335,7 +335,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					 */
 					if (!phalcon_array_isset_str(column, SL("balias"))) {
 						PHALCON_STR_REPLACE(&n_alias, &underscore, &empty_str, &alias);
-						ZVAL_COPY_VALUE(&alias, &n_alias);
+						PHALCON_CPY_WRT_CTOR(&alias, &n_alias);
 					}
 				}
 

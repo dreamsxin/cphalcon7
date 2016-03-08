@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, save){
 	if (Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
-		ZVAL_COPY(&cached_content, content);
+		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
 	if (phalcon_is_numeric(&cached_content))	{

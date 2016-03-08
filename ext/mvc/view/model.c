@@ -251,10 +251,10 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
 		view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 
 		if (Z_TYPE_P(view_params) != IS_ARRAY || !phalcon_array_isset_fetch(&var, view_params, key)) {
-			ZVAL_COPY(&var_append, value);
+			PHALCON_CPY_WRT(&var_append, value);
 		}
 	} else {
-		ZVAL_COPY(&var_append, value);
+		PHALCON_CPY_WRT(&var_append, value);
 	}
 
 	phalcon_update_property_array(getThis(), SL("_viewParams"), key, &var_append);
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getVar){
 	view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
 
 	if (Z_TYPE_P(view_params) != IS_ARRAY || !phalcon_array_isset_fetch(&var, view_params, key)) {
-		ZVAL_COPY(&var, default_value);
+		PHALCON_CPY_WRT(&var, default_value);
 	}
 
 	RETURN_CTORW(&var);
@@ -608,7 +608,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		array_init(&paths);
 		phalcon_array_append(&paths, &base_path, PH_COPY);
 	} else {
-		ZVAL_COPY(&paths, &base_path);
+		PHALCON_CPY_WRT(&paths, &base_path);
 	}
 
 	PHALCON_CALL_METHOD(&views_dir, &view, "getviewsdir");

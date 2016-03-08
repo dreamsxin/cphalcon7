@@ -523,7 +523,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 			 */
 			PHALCON_CALL_METHOD(&filtered_value, &filter, "sanitize", value, &filters);
 		} else {
-			ZVAL_COPY_VALUE(&filtered_value, value);
+			PHALCON_CPY_WRT_CTOR(&filtered_value, value);
 		}
 
 		if (Z_TYPE_P(entity) == IS_OBJECT) {

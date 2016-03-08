@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 
 			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, &translation);
 
-			ZVAL_COPY(&translation, &replaced);
+			PHALCON_CPY_WRT(&translation, &replaced);
 		} ZEND_HASH_FOREACH_END();
 	}
 

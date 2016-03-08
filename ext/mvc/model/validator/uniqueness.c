@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 					return;
 				}
 			} else {
-				ZVAL_COPY(&column_field, compose_field);
+				PHALCON_CPY_WRT(&column_field, compose_field);
 			}
 
 			/** 
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 				return;
 			}
 		} else {
-			ZVAL_COPY(&column_field, &field);
+			PHALCON_CPY_WRT(&column_field, &field);
 		}
 
 		/** 
@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 					return;
 				}
 			} else {
-				ZVAL_COPY(&attribute_field, primary_field);
+				PHALCON_CPY_WRT(&attribute_field, primary_field);
 			}
 
 			/** 

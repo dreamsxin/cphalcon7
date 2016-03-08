@@ -197,14 +197,14 @@ PHP_METHOD(Phalcon_Text, increment){
 	if (!separator || Z_TYPE_P(separator) == IS_NULL) {
 		ZVAL_STRING(&sep, "_");
 	} else {
-		ZVAL_COPY_VALUE(&sep, separator);
+		PHALCON_CPY_WRT_CTOR(&sep, separator);
 	}
 
 	phalcon_fast_explode(&parts, separator, str);
 	if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
 		phalcon_increment(&number);
 	} else {
-		ZVAL_COPY_VALUE(&number, &PHALCON_GLOBAL(z_one));
+		PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
 	}
 
 	phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
@@ -512,7 +512,7 @@ PHP_METHOD(Phalcon_Text, concat){
 
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		ZVAL_COPY_VALUE(&str, b);
+		PHALCON_CPY_WRT_CTOR(&str, b);
 	}
 
 	ZVAL_STR(&a_trimmed, phalcon_trim(a, separator, PHALCON_TRIM_RIGHT));

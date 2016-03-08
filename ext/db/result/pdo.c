@@ -385,7 +385,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 		PHALCON_CALL_METHOD(&statement, &pdo, "prepare", sql_statement);
 		if (Z_TYPE(statement) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(&temp_statement, connection, "executeprepared", &statement, bind_params, bind_types);
-			ZVAL_COPY_VALUE(&statement, &temp_statement);
+			PHALCON_CPY_WRT_CTOR(&statement, &temp_statement);
 		}
 
 	} else {

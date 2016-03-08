@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 	if (!meta) {
 		array_init_size(&metadata, 1);
 	} else {
-		ZVAL_COPY_VALUE(&metadata, meta);
+		PHALCON_CPY_WRT_CTOR(&metadata, meta);
 
 		if (Z_TYPE(metadata) != IS_ARRAY) {
 			array_init_size(&metadata, 1);
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 	if (!opts) {
 		array_init_size(&options, 1);
 	} else {
-		ZVAL_COPY_VALUE(&options, opts);
+		PHALCON_CPY_WRT_CTOR(&options, opts);
 
 		if (Z_TYPE(options) != IS_ARRAY) {
 			array_init_size(&options, 1);

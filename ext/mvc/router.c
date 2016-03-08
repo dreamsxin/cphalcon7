@@ -621,7 +621,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		PHALCON_CALL_METHOD(&real_uri, getThis(), "getrewriteuri");
 	} else {
-		ZVAL_COPY(&real_uri, uri);
+		PHALCON_CPY_WRT(&real_uri, uri);
 	}
 
 	/**
@@ -630,7 +630,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	if (zend_is_true(phalcon_read_property(getThis(), SL("_removeExtraSlashes"), PH_NOISY))) {
 		phalcon_remove_extra_slashes(&handled_uri, &real_uri);
 	} else {
-		ZVAL_COPY(&handled_uri, &real_uri);
+		PHALCON_CPY_WRT(&handled_uri, &real_uri);
 	}
 
 	ZVAL_FALSE(&route_found);
@@ -709,7 +709,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 					/* FIXME: handle mixed case */
 					PHALCON_CONCAT_SVS(&regex_host_name, "#^", &hostname, "$#");
 				} else {
-					ZVAL_COPY(&regex_host_name, &hostname);
+					PHALCON_CPY_WRT(&regex_host_name, &hostname);
 				}
 
 				RETURN_MM_ON_FAILURE(phalcon_preg_match(&matched, &regex_host_name, &current_host_name, NULL));
@@ -792,7 +792,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				 * Start from the default paths
 				 */
 				PHALCON_CALL_METHOD(&paths, route, "getpaths");
-				ZVAL_COPY_VALUE(&parts, &paths);
+				PHALCON_CPY_WRT_CTOR(&parts, &paths);
 
 				/**
 				 * Check if the matches has variables
@@ -961,7 +961,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		if (zend_hash_num_elements(Z_ARRVAL(params))) {
 			phalcon_fast_array_merge(&params_merge, &params, &parts);
 		} else {
-			ZVAL_COPY_VALUE(&params_merge, &parts);
+			PHALCON_CPY_WRT_CTOR(&params_merge, &parts);
 		}
 
 		if (PHALCON_IS_EMPTY(&params_merge) || (Z_TYPE(params_merge) == IS_ARRAY && !zend_hash_num_elements(Z_ARRVAL(params_merge)))) {

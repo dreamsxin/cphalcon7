@@ -159,19 +159,10 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
-	/*
-	 * We intentionally do not use Phalcon's MM for better performance.
-	 * All variables allocated with PHALCON_ALLOC_INIT_ZVAL() will have
-	 * their reference count set to 1 and therefore they can be nicely
-	 * put into the result array; when that array will be destroyed,
-	 * all inserted variables will be automatically destroyed, too
-	 * and we will just save some time by not using Z_TRY_ADDREF_P and Z_TRY_DELREF_P
-	 */
-
 	if (Z_TYPE_P(context) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
 	} else {
-		ZVAL_COPY(&interpolated, message);
+		PHALCON_CPY_WRT(&interpolated, message);
 	}
 
 	PHALCON_CALL_METHODW(&type_str, getThis(), "gettypestring", type);
@@ -256,7 +247,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	}
 
 	if (!i_enable_labels && !i_show_backtrace) {
-		ZVAL_COPY(&body, &interpolated);
+		PHALCON_CPY_WRT(&body, &interpolated);
 	} else if (i_enable_labels && !i_show_backtrace) {
 		ZVAL_EMPTY_STRING(&body);
 	} else {

@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 			c[len-9]       = 0;
 		}
 	} else {
-		ZVAL_COPY(&t, type);
+		PHALCON_CPY_WRT(&t, type);
 	}
 
 	object_init_ex(&model_message, phalcon_mvc_model_message_ce);

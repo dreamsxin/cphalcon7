@@ -59,7 +59,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 			arguments = (zval*)emalloc(sizeof(zval) * param_count);
 			i = 0;
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
-				ZVAL_COPY(&arguments[i], param);
+				PHALCON_CPY_WRT(&arguments[i], param);
 				i++;
 			} ZEND_HASH_FOREACH_END();
 		} else {
@@ -135,7 +135,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 	i = 0;
 	while(i < param_count) {
-		ZVAL_COPY_VALUE(&arguments[i], params[i]);
+		PHALCON_CPY_WRT_CTOR(&arguments[i], params[i]);
 		i++;
 	}
 

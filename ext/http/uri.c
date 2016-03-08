@@ -308,7 +308,7 @@ PHP_METHOD(Phalcon_Http_Uri, build){
 			PHALCON_SCONCAT_SV(&uri, "/", &path);
 		} else {
 			PHALCON_CONCAT_VV(&tmp, &uri, &path);
-			ZVAL_COPY_VALUE(&uri, &tmp);
+			PHALCON_CPY_WRT_CTOR(&uri, &tmp);
 		}
 	}
 

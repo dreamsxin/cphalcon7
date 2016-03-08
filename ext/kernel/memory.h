@@ -87,7 +87,7 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 #define PHALCON_CPY_WRT_CTOR(d, v) \
 	do { \
 		zval_ptr_dtor(d); \
-		ZVAL_COPY(d, v); \
+		ZVAL_DUP(d, v); \
 	} while (0)
 
 /* */

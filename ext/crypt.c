@@ -478,7 +478,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	if (Z_TYPE_P(source) != IS_STRING) {
 		phalcon_cast(&text, source, IS_STRING);
 	} else {
-		ZVAL_COPY(&text, source);
+		PHALCON_CPY_WRT(&text, source);
 	}
 
 	if (phalcon_function_exists_ex(SL("mcrypt_get_iv_size")) == FAILURE) {
@@ -489,7 +489,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
 		phalcon_return_property(&encrypt_key, getThis(), SL("_key"));
 	} else {
-		ZVAL_COPY_VALUE(&encrypt_key, key);
+		PHALCON_CPY_WRT_CTOR(&encrypt_key, key);
 		if (Z_TYPE(encrypt_key) != IS_STRING) {
 			convert_to_string(&encrypt_key);
 		}

@@ -342,6 +342,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len)
 		return 0;
 	}
 
-	ZVAL_COPY_VALUE(retval, constant);
+	PHALCON_CPY_WRT_CTOR(retval, constant);
 	return 1;
 }

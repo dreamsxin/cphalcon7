@@ -831,7 +831,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, dropView){
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_VSV(&view, schema_name, ".", view_name);
 	} else {
-		ZVAL_COPY_VALUE(&view, view_name);
+		PHALCON_CPY_WRT_CTOR(&view, view_name);
 	}
 
 	if (zend_is_true(if_exists)) {

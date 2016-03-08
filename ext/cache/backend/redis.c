@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHODW(&cached_content, &frontend, "getcontent");
 	} else {
-		ZVAL_COPY(&cached_content, content);
+		PHALCON_CPY_WRT(&cached_content, content);
 	}
 	
 	/** 
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 			PHALCON_CALL_METHODW(&ttl, &frontend, "getlifetime");
 		}
 	} else {
-		ZVAL_COPY(&ttl, lifetime);
+		PHALCON_CPY_WRT(&ttl, lifetime);
 	}
 	
 	if (phalcon_is_numeric(&cached_content)) {
@@ -567,7 +567,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(keys), value) {
 			zval real_key, last_key;
 
-			ZVAL_COPY_VALUE(&real_key, value);
+			PHALCON_CPY_WRT_CTOR(&real_key, value);
 			PHALCON_CONCAT_SV(&last_key, "_PHCR", &real_key);
 
 			PHALCON_CALL_METHODW(NULL, &redis, "delete", &last_key);	

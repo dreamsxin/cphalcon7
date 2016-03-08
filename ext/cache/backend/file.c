@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 	if (!content || !zend_is_true(content)) {
 		PHALCON_CALL_METHODW(&cached_content, frontend, "getcontent");
 	} else {
-		ZVAL_COPY(&cached_content, content);
+		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
 	PHALCON_CALL_METHODW(&prepared_content, frontend, "beforestore", &cached_content);

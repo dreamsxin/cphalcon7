@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Flash, __construct){
 	if (!_css_classes) {
 		array_init(&css_classes);
 	} else {
-		ZVAL_COPY_VALUE(&css_classes, _css_classes);
+		PHALCON_CPY_WRT_CTOR(&css_classes, _css_classes);
 	}
 
 	if (Z_TYPE(css_classes) != IS_ARRAY) {
@@ -309,7 +309,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 			if (flag_automatic_html) {
 				PHALCON_CONCAT_SVSVS(&html_message0, "<div", &css_classes, ">", msg, "</div>" PHP_EOL);
 			} else {
-				ZVAL_COPY(&html_message0, msg);
+				PHALCON_CPY_WRT(&html_message0, msg);
 			}
 
 			if (flag_implicit_flush) {
@@ -332,7 +332,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		if (flag_automatic_html) {
 			PHALCON_CONCAT_SVSVS(&html_message, "<div", &css_classes, ">", message, "</div>" PHP_EOL);
 		} else {
-			ZVAL_COPY(&html_message, message);
+			PHALCON_CPY_WRT(&html_message, message);
 		}
 
 		/**

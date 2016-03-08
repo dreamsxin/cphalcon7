@@ -476,7 +476,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		/* Check if the returned object is already a response */
 		if (Z_TYPE(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE(possible_response), phalcon_http_responseinterface_ce, 1)) {
-			ZVAL_COPY(&response, &possible_response);
+			PHALCON_CPY_WRT(&response, &possible_response);
 			ZVAL_TRUE(&returned_response);
 		} else {
 			ZVAL_STRING(&service, ISV(response));

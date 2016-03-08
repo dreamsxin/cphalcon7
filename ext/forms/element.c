@@ -382,7 +382,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	if (Z_TYPE_P(attributes) != IS_ARRAY) { 
 		array_init(&widget_attributes);
 	} else {
-		ZVAL_COPY_VALUE(&widget_attributes, attributes);
+		PHALCON_CPY_WRT_CTOR(&widget_attributes, attributes);
 	}
 
 	phalcon_array_update_long(&widget_attributes, 0, name, PH_COPY);
@@ -394,7 +394,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	if (Z_TYPE_P(default_attributes) == IS_ARRAY) {
 		phalcon_fast_array_merge(&merged_attributes, default_attributes, &widget_attributes);
 	} else {
-		ZVAL_COPY_VALUE(&merged_attributes, &widget_attributes);
+		PHALCON_CPY_WRT_CTOR(&merged_attributes, &widget_attributes);
 	}
 
 	/** 

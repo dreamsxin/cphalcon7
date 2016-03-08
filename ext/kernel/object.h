@@ -169,6 +169,8 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len);
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);
 int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len);
+int phalcon_static_property_incr_ce(zend_class_entry *ce, const char *property, uint32_t len);
+int phalcon_static_property_decr_ce(zend_class_entry *ce, const char *property, uint32_t len);
 
 
 /**

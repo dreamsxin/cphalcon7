@@ -72,7 +72,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Json, format){
 	if (Z_TYPE_P(context) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
 	} else {
-		ZVAL_COPY(&interpolated, message);
+		PHALCON_CPY_WRT(&interpolated, message);
 	}
 
 	PHALCON_CALL_METHODW(&type_str, getThis(), "gettypestring", type);

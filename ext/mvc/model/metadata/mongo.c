@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	ZVAL_COPY_VALUE(&backend_options, options);
+	PHALCON_CPY_WRT_CTOR(&backend_options, options);
 	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");

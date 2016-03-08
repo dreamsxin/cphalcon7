@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	if (!dependency_injector || Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault");
 	} else {
-		ZVAL_COPY(&di, dependency_injector);
+		PHALCON_CPY_WRT(&di, dependency_injector);
 	}
 
 	PHALCON_VERIFY_INTERFACE_EX(&di, phalcon_diinterface_ce, phalcon_mvc_collection_exception_ce, 1);
@@ -296,7 +296,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 			return;
 		}
 	} else {
-		ZVAL_COPY(&mm, collection_manager);
+		PHALCON_CPY_WRT(&mm, collection_manager);
 	}
 
 	PHALCON_VERIFY_INTERFACE_EX(&mm, phalcon_mvc_collection_managerinterface_ce, phalcon_mvc_collection_exception_ce, 1);
@@ -354,10 +354,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 			object_init_ex(&mongo_id, ce0);
 			PHALCON_CALL_METHODW(NULL, &mongo_id, "__construct", id);
 		} else {
-			ZVAL_COPY(&mongo_id, id);
+			PHALCON_CPY_WRT(&mongo_id, id);
 		}
 	} else {
-		ZVAL_COPY(&mongo_id, id);
+		PHALCON_CPY_WRT(&mongo_id, id);
 	}
 
 	phalcon_update_property_zval_zval(getThis(), &id_name, &mongo_id);
@@ -401,10 +401,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 				}
 				phalcon_update_property_zval_zval(getThis(), &id_name, &mongo_id);
 			} else {
-				ZVAL_COPY(&mongo_id, &id);
+				PHALCON_CPY_WRT(&mongo_id, &id);
 			}
 		} else {
-			ZVAL_COPY(&mongo_id, &id);
+			PHALCON_CPY_WRT(&mongo_id, &id);
 		}
 	}
 
@@ -510,10 +510,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, getColumnName){
 
 	if (Z_TYPE(column_map) == IS_ARRAY) {
 		if (!phalcon_array_isset_fetch(&name, &column_map, column)) {
-			ZVAL_COPY(&name, column);
+			PHALCON_CPY_WRT(&name, column);
 		}
 	} else {
-		ZVAL_COPY(&name, column);
+		PHALCON_CPY_WRT(&name, column);
 	}
 
 	RETURN_CTORW(&name);
@@ -824,10 +824,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, cloneResult){
 			if (phalcon_array_isset(&column_map, &tmp)) {
 				phalcon_array_fetch(&attribute_field, &column_map, &tmp, PH_NOISY);
 			} else {
-				ZVAL_COPY(&attribute_field, &tmp);
+				PHALCON_CPY_WRT(&attribute_field, &tmp);
 			}
 		} else {
-			ZVAL_COPY(&attribute_field, &tmp);
+			PHALCON_CPY_WRT(&attribute_field, &tmp);
 		}
 
 		PHALCON_CALL_METHOD(NULL, &cloned_collection, "writeattribute", &attribute_field, value);
@@ -938,7 +938,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
 			object_init_ex(&base, phalcon_mvc_collection_document_ce);
 		}
 	} else {
-		ZVAL_COPY(&base, collection);
+		PHALCON_CPY_WRT(&base, collection);
 	}
 
 	if (PHALCON_IS_TRUE(unique)) {
@@ -1526,7 +1526,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	if (!m) {
 		ZVAL_NULL(&mode);
 	} else {
-		ZVAL_COPY_VALUE(&mode, m);
+		PHALCON_CPY_WRT_CTOR(&mode, m);
 	}
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
@@ -1539,7 +1539,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	if (Z_TYPE(column_map) != IS_ARRAY) {
 		PHALCON_CALL_FUNCTION(&attributes, "get_object_vars", getThis());
 	} else {
-		ZVAL_COPY(&attributes, &column_map);
+		PHALCON_CPY_WRT(&attributes, &column_map);
 	}
 
 	PHALCON_CALL_METHOD(&reserved, getThis(), "getreservedattributes");
@@ -1683,10 +1683,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 			if (Z_TYPE(column_map) == IS_ARRAY) { 
 				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &tmp)) {
-					ZVAL_COPY(&attribute_field, &tmp);
+					PHALCON_CPY_WRT(&attribute_field, &tmp);
 				}
 			} else {
-				ZVAL_COPY(&attribute_field, &tmp);
+				PHALCON_CPY_WRT(&attribute_field, &tmp);
 			}
 
 			if (phalcon_isset_property_zval(getThis(), &attribute_field)) {
@@ -1778,10 +1778,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, findById){
 			object_init_ex(&mongo_id, ce1);
 			PHALCON_CALL_METHODW(NULL, &mongo_id, "__construct", id);
 		} else {
-			ZVAL_COPY(&mongo_id, id);
+			PHALCON_CPY_WRT(&mongo_id, id);
 		}
 	} else {
-		ZVAL_COPY(&mongo_id, id);
+		PHALCON_CPY_WRT(&mongo_id, id);
 	}
 
 	array_init_size(&conditions, 1);
@@ -1854,10 +1854,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 				object_init_ex(&mongo_id, ce1);
 				PHALCON_CALL_METHODW(NULL, &mongo_id, "__construct", parameters);
 			} else {
-				ZVAL_COPY(&mongo_id, parameters);
+				PHALCON_CPY_WRT(&mongo_id, parameters);
 			}
 		} else {
-			ZVAL_COPY(&mongo_id, parameters);
+			PHALCON_CPY_WRT(&mongo_id, parameters);
 		}
 
 		array_init_size(&conditions, 1);
@@ -1866,7 +1866,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 		array_init_size(&params, 1);
 		phalcon_array_append(&params, &conditions, PH_COPY);
 	} else {
-		ZVAL_COPY(&params, parameters);
+		PHALCON_CPY_WRT(&params, parameters);
 	}
 
 	PHALCON_CALL_METHODW(&connection, &collection, "getconnection");
@@ -2283,7 +2283,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 	if (Z_TYPE(column_map) != IS_ARRAY) { 
 		PHALCON_CALL_FUNCTIONW(&attributes, "get_object_vars", getThis());
 	} else {
-		ZVAL_COPY(&attributes, &column_map);
+		PHALCON_CPY_WRT(&attributes, &column_map);
 	}
 
 	/**
@@ -2303,10 +2303,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 
 		if (zend_is_true(rename_columns) && Z_TYPE(column_map) == IS_ARRAY) { 
 			if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &tmp)) {
-				ZVAL_COPY(&attribute_field, &tmp);
+				PHALCON_CPY_WRT(&attribute_field, &tmp);
 			}
 		} else {
-			ZVAL_COPY(&attribute_field, &tmp);
+			PHALCON_CPY_WRT(&attribute_field, &tmp);
 		}
 
 		if (phalcon_isset_property_zval(getThis(), &attribute_field)) {
@@ -2465,7 +2465,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 	if (!v) {
 		ZVAL_LONG(&value, 1);
 	} else {
-		ZVAL_COPY(&value, v);
+		PHALCON_CPY_WRT(&value, v);
 	}
 
 	PHALCON_CALL_SELFW(&mongo_id, "getid");
@@ -2622,7 +2622,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 				phalcon_array_update_zval(conditions, &column, &value2, PH_COPY);
 			}
 		} else {
-			ZVAL_COPY_VALUE(&column, &tmp);
+			PHALCON_CPY_WRT_CTOR(&column, &tmp);
 		}
 
 		if (PHALCON_IS_STRING(&column, "_id")) {
@@ -2794,7 +2794,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 	if (!phalcon_isset_property_zval(&collection, &extra_method)) {
 		phalcon_lcfirst(&extra_method_first, &extra_method);
 		if (phalcon_isset_property_zval(&collection, &extra_method_first)) {
-			ZVAL_COPY(&field, &extra_method_first);
+			PHALCON_CPY_WRT(&field, &extra_method_first);
 		} else {
 			phalcon_uncamelize(&field, &extra_method);
 			if (!phalcon_isset_property_zval(&collection, &field)) {
@@ -2804,7 +2804,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 			}
 		}
 	} else {
-		ZVAL_COPY(&field, &extra_method);
+		PHALCON_CPY_WRT(&field, &extra_method);
 	}
 
 	phalcon_array_fetch_long(&value, arguments, 0, PH_NOISY);	

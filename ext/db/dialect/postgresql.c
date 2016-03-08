@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createView){
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_VSV(&view, view_name, ".", schema_name);
 	} else {
-		ZVAL_COPY_VALUE(&view, view_name);
+		PHALCON_CPY_WRT_CTOR(&view, view_name);
 	}
 
 	PHALCON_CONCAT_SVSV(&sql, "CREATE VIEW ", &view, " AS ", &view_sql);
@@ -461,7 +461,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_VSV(&view, view_name, ".", schema_name);
 	} else {
-		ZVAL_COPY_VALUE(&view, view_name);
+		PHALCON_CPY_WRT_CTOR(&view, view_name);
 	}
 	if (zend_is_true(if_exists)) {
 		PHALCON_CONCAT_SV(&sql, "DROP VIEW IF EXISTS ", &view);

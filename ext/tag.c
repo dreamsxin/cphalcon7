@@ -719,7 +719,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 		phalcon_array_append(&params, text, PH_COPY);
 		phalcon_array_append(&params, local, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));
@@ -795,7 +795,7 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 		array_init_size(&params, 1);
 		phalcon_array_append(&params, parameters, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 	
 	if (!as_value) {
@@ -887,7 +887,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 		array_init_size(&params, 1);
 		phalcon_array_append(&params, parameters, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));
@@ -969,30 +969,27 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 
 static void phalcon_tag_generic_field(INTERNAL_FUNCTION_PARAMETERS, const char* type, int as_value)
 {
-	zval *parameters, *field_type;
+	zval *parameters, field_type;
 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
-	PHALCON_ALLOC_INIT_ZVAL(field_type);
-	ZVAL_STRING(field_type, type);
+	ZVAL_STRING(&field_type, type);
 
 	if (as_value) {
-		PHALCON_RETURN_CALL_SELFW("_inputfield", field_type, parameters, &PHALCON_GLOBAL(z_true));
-	}
-	else {
-		PHALCON_RETURN_CALL_SELFW("_inputfield", field_type, parameters);
+		PHALCON_RETURN_CALL_SELFW("_inputfield", &field_type, parameters, &PHALCON_GLOBAL(z_true));
+	} else {
+		PHALCON_RETURN_CALL_SELFW("_inputfield", &field_type, parameters);
 	}
 }
 
 static void phalcon_tag_generic_field_checked(INTERNAL_FUNCTION_PARAMETERS, const char* type)
 {
-	zval *parameters, *field_type;
+	zval *parameters, field_type;
 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
-	PHALCON_ALLOC_INIT_ZVAL(field_type);
-	ZVAL_STRING(field_type, type);
-	PHALCON_RETURN_CALL_SELFW("_inputfieldchecked", field_type, parameters);
+	ZVAL_STRING(&field_type, type);
+	PHALCON_RETURN_CALL_SELFW("_inputfieldchecked", &field_type, parameters);
 }
 
 /**
@@ -1375,7 +1372,7 @@ PHP_METHOD(Phalcon_Tag, textArea){
 		array_init_size(&params, 1);
 		phalcon_array_append(&params, parameters, PH_COPY);
 	} else {
-		ZVAL_COPY(&params, parameters);
+		PHALCON_CPY_WRT(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));
@@ -1459,7 +1456,7 @@ PHP_METHOD(Phalcon_Tag, form){
 			array_init_size(&params, 1);
 			phalcon_array_append(&params, args, PH_COPY);
 		} else {
-			ZVAL_COPY_VALUE(&params, args);
+			PHALCON_CPY_WRT_CTOR(&params, args);
 		}
 	} else {
 		array_init(&params);
@@ -1692,7 +1689,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 		phalcon_array_append(&params, local, PH_COPY);
 		phalcon_array_append(&params, args, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));
@@ -1813,7 +1810,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 		phalcon_array_append(&params, local, PH_COPY);
 		phalcon_array_append(&params, args, PH_COPY);
 	} else {
-		ZVAL_COPY(&params, parameters);
+		PHALCON_CPY_WRT(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));
@@ -1990,7 +1987,7 @@ PHP_METHOD(Phalcon_Tag, friendlyTitle){
 	if (!separator) {
 		ZVAL_STRING(&sep, "-");
 	} else {
-		ZVAL_COPY(&sep, separator);
+		PHALCON_CPY_WRT(&sep, separator);
 	}
 
 	if (!lowercase) {

@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHODW(&cached_content, &frontend, "getcontent");
 	} else {
-		ZVAL_COPY(&cached_content, content);
+		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
 	if (!phalcon_is_numeric(&cached_content)) {
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 			PHALCON_CALL_METHODW(&ttl, &frontend, "getlifetime");
 		}
 	} else {
-		ZVAL_COPY(&ttl, lifetime);
+		PHALCON_CPY_WRT(&ttl, lifetime);
 	}
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");

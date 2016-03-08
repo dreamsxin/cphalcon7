@@ -459,7 +459,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 			PHALCON_CALL_METHOD(NULL, &lazy_handler, "__construct", &main_handler);
 
 		} else {
-			ZVAL_COPY_VALUE(&lazy_handler, &main_handler);
+			PHALCON_CPY_WRT_CTOR(&lazy_handler, &main_handler);
 		}
 
 		/* Get the main prefix for the collection */
@@ -488,12 +488,12 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 			phalcon_array_append(&real_handler, &sub_handler, PH_COPY);
 			if (PHALCON_IS_NOT_EMPTY(&prefix)) {
 				if (PHALCON_IS_STRING(&pattern, "/")) {
-					ZVAL_COPY_VALUE(&prefixed_pattern, &prefix);
+					PHALCON_CPY_WRT_CTOR(&prefixed_pattern, &prefix);
 				} else {
 					PHALCON_CONCAT_VV(&prefixed_pattern, &prefix, &pattern);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&prefixed_pattern, &pattern);
+				PHALCON_CPY_WRT_CTOR(&prefixed_pattern, &pattern);
 			}
 
 			/* Map the route manually */

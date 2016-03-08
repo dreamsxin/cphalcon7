@@ -626,7 +626,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 	if (!_number_bytes) {
 		ZVAL_LONG(&number_bytes, 12);
 	} else {
-		ZVAL_COPY(&number_bytes, _number_bytes);
+		PHALCON_CPY_WRT(&number_bytes, _number_bytes);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
@@ -670,7 +670,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 	if (!_number_bytes) {
 		ZVAL_LONG(&number_bytes, 12);
 	} else {
-		ZVAL_COPY(&number_bytes, _number_bytes);
+		PHALCON_CPY_WRT(&number_bytes, _number_bytes);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF$");
@@ -718,7 +718,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	if (!_token_key) {
 		ZVAL_NULL(&token_key);
 	} else {
-		ZVAL_COPY_VALUE(&token_key, _token_key);
+		PHALCON_CPY_WRT_CTOR(&token_key, _token_key);
 	}
 
 	if (!token_value) {
@@ -751,7 +751,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 		 */
 		PHALCON_CALL_METHODW(&token, &request, "getpost", &token_key);
 	} else {
-		ZVAL_COPY(&token, token_value);
+		PHALCON_CPY_WRT(&token, token_value);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF$");
@@ -939,7 +939,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 			RETURN_FALSE;
 		}
 
-		ZVAL_COPY_VALUE(&K2, &K1);
+		PHALCON_CPY_WRT_CTOR(&K2, &K1);
 
 		for (j = 1; j < i_iterations; ++j) {
 			char *k1, *k2;
@@ -949,7 +949,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 				RETURN_FALSE;
 			}
 
-			ZVAL_COPY_VALUE(&K1, &tmp);
+			PHALCON_CPY_WRT_CTOR(&K1, &tmp);
 
 			k1 = Z_STRVAL(K1);
 			k2 = Z_STRVAL(K2);

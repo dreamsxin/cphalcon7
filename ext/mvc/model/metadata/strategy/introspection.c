@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		if (zend_is_true(&schema)) {
 			PHALCON_CONCAT_VSV(&complete_table, &schema, "\".\"", &table);
 		} else {
-			ZVAL_COPY(&complete_table, &table);
+			PHALCON_CPY_WRT(&complete_table, &table);
 		}
 
 		/** 
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		if (zend_is_true(&schema)) {
 			PHALCON_CONCAT_VSV(&complete_table, &schema, "\".\"", &table);
 		} else {
-			ZVAL_COPY(&complete_table, &table);
+			PHALCON_CPY_WRT(&complete_table, &table);
 		}
 
 		/** 
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CALL_METHODW(&feature, column, "isautoincrement");
 		if (PHALCON_IS_TRUE(&feature)) {
-			ZVAL_COPY(&identity_field, &field_name);
+			PHALCON_CPY_WRT(&identity_field, &field_name);
 		}
 
 		/** 

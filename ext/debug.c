@@ -835,9 +835,9 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 * Check for overflows
 				 */
 				if (PHALCON_LT_LONG(&before_line, 1)) {
-					ZVAL_COPY_VALUE(&first_line, &PHALCON_GLOBAL(z_one));
+					PHALCON_CPY_WRT_CTOR(&first_line, &PHALCON_GLOBAL(z_one));
 				} else {
-					ZVAL_COPY_VALUE(&first_line, &before_line);
+					PHALCON_CPY_WRT_CTOR(&first_line, &before_line);
 				}
 
 				/** 
@@ -851,15 +851,15 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 * Check for overflows
 				 */
 				if (PHALCON_GT(&after_line, &number_lines)) {
-					ZVAL_COPY_VALUE(&last_line, &number_lines);
+					PHALCON_CPY_WRT_CTOR(&last_line, &number_lines);
 				} else {
-					ZVAL_COPY_VALUE(&last_line, &after_line);
+					PHALCON_CPY_WRT_CTOR(&last_line, &after_line);
 				}
 
 				PHALCON_SCONCAT_SVSVSVS(&html, "<pre class='prettyprint highlight:", &first_line, ":", &line, " linenums:", &first_line, "'>");
 			} else {
-				ZVAL_COPY_VALUE(&first_line, &PHALCON_GLOBAL(z_one));
-				ZVAL_COPY_VALUE(&last_line, &number_lines);
+				PHALCON_CPY_WRT_CTOR(&first_line, &PHALCON_GLOBAL(z_one));
+				PHALCON_CPY_WRT_CTOR(&last_line, &number_lines);
 				PHALCON_SCONCAT_SVSVS(&html, "<pre class='prettyprint highlight:", &first_line, ":", &line, " linenums error-scroll'>");
 			}
 
@@ -870,7 +870,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			ZVAL_STRING(&tab, "\t");
 			ZVAL_STRING(&comment, "* /");
 
-			ZVAL_COPY_VALUE(&i, &first_line);
+			PHALCON_CPY_WRT_CTOR(&i, &first_line);
 
 			while (PHALCON_LE(&i, &last_line)) {
 				zval line_position, current_line, trimmed, is_comment, spaced_current_line, escaped_line;
@@ -895,7 +895,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 						if (zend_is_true(&is_comment)) {
 							PHALCON_STR_REPLACE(&spaced_current_line, &comment, &space, &current_line);
-							ZVAL_COPY_VALUE(&current_line, &spaced_current_line);
+							PHALCON_CPY_WRT_CTOR(&current_line, &spaced_current_line);
 						}
 					}
 				}
@@ -986,7 +986,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	/** 
 	 * Escape the exception's message avoiding possible XSS injections?
 	 */
-	ZVAL_COPY_VALUE(&escaped_message, &message);
+	PHALCON_CPY_WRT_CTOR(&escaped_message, &message);
 
 	/** 
 	 * Use the exception info as document's title

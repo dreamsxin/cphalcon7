@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 				PHALCON_CALL_USER_FUNCW(&instance, &definition);
 			}
 		} else {
-			ZVAL_COPY(&instance, &definition);
+			PHALCON_CPY_WRT(&instance, &definition);
 		}
 	} else if (Z_TYPE(definition) == IS_ARRAY) {
 		/* Array definitions require a 'className' parameter */

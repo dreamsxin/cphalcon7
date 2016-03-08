@@ -194,9 +194,9 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addRole){
 
 	if (Z_TYPE_P(role) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(&role_name, role, "getname");
-		ZVAL_COPY(&object, role);
+		PHALCON_CPY_WRT(&object, role);
 	} else {
-		ZVAL_COPY(&role_name, role);
+		PHALCON_CPY_WRT(&role_name, role);
 
 		object_init_ex(&object, phalcon_acl_role_ce);
 		PHALCON_CALL_METHOD(NULL, &object, "__construct", role);
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 	if (Z_TYPE_P(role_to_inherit) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(&role_inherit_name, role_to_inherit, "getname");
 	} else {
-		ZVAL_COPY(&role_inherit_name, role_to_inherit);
+		PHALCON_CPY_WRT(&role_inherit_name, role_to_inherit);
 	}
 
 	/** 
@@ -340,9 +340,9 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResource){
 
 	if (Z_TYPE_P(resource) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(&resource_name, resource, "getname");
-		ZVAL_COPY(&object, resource);
+		PHALCON_CPY_WRT(&object, resource);
 	} else {
-		ZVAL_COPY(&resource_name, resource);
+		PHALCON_CPY_WRT(&resource_name, resource);
 
 		object_init_ex(&object, phalcon_acl_resource_ce);
 		PHALCON_CALL_METHODW(NULL, &object, "__construct", &resource_name);

@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 		ce = Z_OBJCE_P(class_name);
 		ZVAL_NEW_STR(&real_class_name, ce->name);
 	} else {
-		ZVAL_COPY(&real_class_name, class_name);
+		PHALCON_CPY_WRT(&real_class_name, class_name);
 	}
 
 	phalcon_return_property(&annotations, getThis(), SL("_annotations"));

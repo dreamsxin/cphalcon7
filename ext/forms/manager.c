@@ -130,11 +130,10 @@ PHALCON_INIT_CLASS(Phalcon_Forms_Manager){
 
 PHP_METHOD(Phalcon_Forms_Manager, __construct)
 {
-	zval *z;
+	zval z;
 
-	PHALCON_ALLOC_INIT_ZVAL(z);
-	array_init(z);
-	phalcon_update_property_this(getThis(), SL("_forms"), z);
+	array_init(&z);
+	phalcon_update_property_this(getThis(), SL("_forms"), &z);
 
 	Z_OBJ_HT_P(getThis()) = &phalcon_forms_manager_object_handlers;
 }

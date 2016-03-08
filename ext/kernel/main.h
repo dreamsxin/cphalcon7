@@ -257,8 +257,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 #define PHALCON_DOC_METHOD(class_name, method)
 
 /** Low overhead parse/fetch parameters */
-#ifndef PHALCON_RELEASE
-
 #define phalcon_fetch_params(memory_grow, required_params, optional_params, ...) \
 	if (memory_grow) { \
 		zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL; \
@@ -279,19 +277,7 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 			RETURN_MM_NULL(); \
 		} \
 		RETURN_NULL(); \
-	} \
-
-#else
-
-#define phalcon_fetch_params(memory_grow, required_params, optional_params, ...) \
-	if (phalcon_fetch_parameters(ZEND_NUM_ARGS(), required_params, optional_params, __VA_ARGS__) == FAILURE) { \
-		if (memory_grow) { \
-			RETURN_MM_NULL(); \
-		} \
-		RETURN_NULL(); \
 	}
-
-#endif
 
 #define PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce, restore_stack) \
 	if (Z_TYPE_P(instance) != IS_OBJECT) { \

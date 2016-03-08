@@ -89,8 +89,7 @@ PHALCON_INIT_CLASS(Phalcon_Async){
  */
 PHP_METHOD(Phalcon_Async, call){
 
-	zval *callable, *_arguments = NULL, arguments, pid, child_num, filename, proj, key, seg;
-	zval result, sig;
+	zval *callable, *_arguments = NULL, arguments, pid, filename, proj, key, seg, result, *sig;
 
 	phalcon_fetch_params(0, 1, 1, &callable, &_arguments);
 
@@ -131,7 +130,7 @@ PHP_METHOD(Phalcon_Async, call){
 	PHALCON_CALL_FUNCTIONW(NULL, "msg_send", &seg, &pid, &result);
 
 	if ((sig = zend_get_constant_str(SL("SIGKILL"))) != NULL ) {
-		PHALCON_CALL_FUNCTIONW(NULL, "posix_kill", &pid, &sig);
+		PHALCON_CALL_FUNCTIONW(NULL, "posix_kill", &pid, sig);
 	}
 }
 
@@ -166,7 +165,7 @@ PHP_METHOD(Phalcon_Async, recv){
 		ZVAL_LONG(&flag, 0);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&flag, _flag);
-		convert_to_long_ex(flag);
+		convert_to_long_ex(&flag);
 	}
 
 	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
@@ -209,7 +208,7 @@ PHP_METHOD(Phalcon_Async, recvAll){
 		ZVAL_LONG(&flag, 0);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&flag, _flag);
-		convert_to_long_ex(flag);
+		convert_to_long_ex(&flag);
 	}
 
 	phalcon_return_static_property_ce(&num, phalcon_async_ce, SL("_num"));

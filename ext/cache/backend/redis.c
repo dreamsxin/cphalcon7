@@ -128,42 +128,37 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Redis)
  */
 PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
-	zval *frontend, *options = NULL;
+	zval *frontend, *_options = NULL, options;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(1, 1, 1, &frontend, &_options);
 
-	phalcon_fetch_params(1, 1, 1, &frontend, &options);
-
-	if (!options) {
-		PHALCON_INIT_VAR(options);
+	if (!_options) {
+		array_init_size(&options, 4);
 	} else {
-		PHALCON_SEPARATE_PARAM(options);
+		if (Z_TYPE_P(_options) != IS_ARRAY) {
+			array_init_size(&options, 4);
+		} else {
+			PHALCON_CPY_WRT(&options, _options);
+		}
 	}
 
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_INIT_NVAR(options);
-		array_init_size(options, 4);
+	if (!phalcon_array_isset_str(&options, SL("host"))) {
+		phalcon_array_update_str_str(&options, SL("host"), SL("127.0.0.1"), PH_COPY);
 	}
 
-	if (!phalcon_array_isset_str(options, SL("host"))) {
-		phalcon_array_update_str_str(options, SL("host"), SL("127.0.0.1"), PH_COPY);
+	if (!phalcon_array_isset_str(&options, SL("port"))) {
+		phalcon_array_update_str_long(&options, SL("port"), 6379, 0);
 	}
 
-	if (!phalcon_array_isset_str(options, SL("port"))) {
-		phalcon_array_update_str_long(options, SL("port"), 6379, 0);
+	if (!phalcon_array_isset_str(&options, SL("persistent"))) {
+		phalcon_array_update_str_bool(&options, SL("persistent"), 0, 0);
 	}
 
-	if (!phalcon_array_isset_str(options, SL("persistent"))) {
-		phalcon_array_update_str_bool(options, SL("persistent"), 0, 0);
+	if (!phalcon_array_isset_str(&options, SL("statsKey"))) {
+		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), PH_COPY);
 	}
 
-	if (!phalcon_array_isset_str(options, SL("statsKey"))) {
-		phalcon_array_update_str_str(options, SL("statsKey"), SL("_PHCR"), PH_COPY);
-	}
-
-	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, options);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_PARENTW(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, &options);
 }
 
 /**
@@ -477,7 +472,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, increment){
 
 	zval *key_name = NULL, *value = NULL, redis, last_key, prefix;
 
-	phalcon_fetch_params(1, 0, 2, &key_name, &value);
+	phalcon_fetch_params(0, 0, 2, &key_name, &value);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));

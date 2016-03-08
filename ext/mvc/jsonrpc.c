@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
 	zval *dependency_injector = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
-	
+
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_jsonrpc_exception_ce, 0);
 		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
@@ -149,13 +149,13 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 1, &modules, &merge);
-	
+
 	if (!merge) {
 		merge = &PHALCON_GLOBAL(z_false);
 	}
-	
+
 	if (Z_TYPE_P(modules) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "Modules must be an Array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "Modules must be an Array");
 		return;
 	}
 	if (PHALCON_IS_FALSE(merge)) {
@@ -168,11 +168,11 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 		} else {
 			PHALCON_CPY_WRT(merged_modules, modules);
 		}
-	
+
 		phalcon_update_property_this(getThis(), SL("_modules"), merged_modules);
 	}
-	
-	RETURN_THIS();
+
+	RETURN_THISW();
 }
 
 /**
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, setDefaultModule){
 	zval *default_module;
 
 	phalcon_fetch_params(0, 1, 0, &default_module);
-	
+
 	phalcon_update_property_this(getThis(), SL("_defaultModule"), default_module);
 	RETURN_THISW();
 }
@@ -248,13 +248,13 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	zval *dependency_injector, *events_manager, service, request, json, data, response, jsonrpc_message, jsonrpc_error, jsonrpc_method, jsonrpc_params;
 	zval url, uri, router, module_name, *modules, module, class_name, path, module_object, module_params, status, namespace_name, controller_name, action_name;
 	zval params, exact, dispatcher, controller, jsonrpc_result, jsonrpc_id;
-	
+
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
-	
+
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) != IS_OBJECT) {
 		events_manager = NULL;
@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	/* Deserializer Json */
 
 	ZVAL_STRING(&service, ISV(request));
-	
+
 	PHALCON_CALL_METHODW(&request, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&request, phalcon_http_requestinterface_ce);
 
@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterHandleRequest", getThis(), &controller) && EG(exception)) {
 		return;
 	}
-	
+
 	phalcon_array_update_str_str(&jsonrpc_message, SL("jsonrpc"), SL("2.0"), PH_COPY);
 
 	if (PHALCON_IS_NOT_EMPTY(&jsonrpc_error)) {
@@ -440,7 +440,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	if (Z_TYPE(jsonrpc_result) > IS_NULL) {
 		phalcon_array_update_str(&jsonrpc_message, SL("result"), &jsonrpc_result, PH_COPY);
 	}
-	
+
 	if (phalcon_array_isset_fetch_str(&jsonrpc_id, &data, SL("id"))) {
 		phalcon_array_update_str(&jsonrpc_message, SL("id"), &jsonrpc_id, PH_COPY);
 	} else {
@@ -448,19 +448,19 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	}
 
 	PHALCON_CALL_METHODW(NULL, &response, "setjsoncontent", &jsonrpc_message);
-	
+
 
 	/* Calling beforeSendResponse */
 	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeSendResponse", getThis(), &response) && EG(exception)) {
 		return;
 	}
-	
+
 	/* Headers are automatically sent */
 	PHALCON_CALL_METHODW(NULL, &response, "sendheaders");
-	
+
 	/* Cookies are automatically sent */
 	PHALCON_CALL_METHODW(NULL, &response, "sendcookies");
-	
+
 	/* Return the response */
 	RETURN_CTORW(&response);
 }

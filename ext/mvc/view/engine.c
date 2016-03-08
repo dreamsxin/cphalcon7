@@ -91,11 +91,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 	zval *view, *dependency_injector = NULL;
 
 	phalcon_fetch_params(0, 1, 1, &view, &dependency_injector);
-	
+
 	if (!dependency_injector) {
 		dependency_injector = &PHALCON_GLOBAL(z_null);
 	}
-	
+
 	phalcon_update_property_this(getThis(), SL("_view"), view);
 	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
 }
@@ -123,11 +123,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, partial){
 	zval *partial_path, *params = NULL, *view;
 
 	phalcon_fetch_params(0, 1, 1, &partial_path, &params);
-	
+
 	if (!params) {
 		params = &PHALCON_GLOBAL(z_null);
 	}
-	
+
 	view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(view, "partial", partial_path, params);
 }
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (Z_TYPE_P(method_callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(method_callable), zend_ce_closure)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Method must be an closure object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Method must be an closure object");
 		return;
 	}
 
@@ -196,12 +196,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	methods = phalcon_read_property(getThis(), SL("_methods"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&func, methods, &method_name)) {
 			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &func, &arguments);
-			RETURN_MM();
+			return;
 	}
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "A dependency injection object is required to access internal services");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
@@ -218,17 +218,17 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		ZVAL_STRING(&service_name, ISV(dispatcher));
 	}
 
-	PHALCON_CALL_METHOD(&service, dependency_injector, "getshared", &service_name);
+	PHALCON_CALL_METHODW(&service, dependency_injector, "getshared", &service_name);
 
 	if (Z_TYPE(service) != IS_OBJECT) {
 		PHALCON_CONCAT_SVS(&exception_message, "The injected service '", &service_name, "' is not valid");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
 	if (!phalcon_method_exists(&service, &method_name) == FAILURE) {
 		PHALCON_CONCAT_SVS(&exception_message, "The method \"", &method_name, "\" doesn't exist on view");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
@@ -239,5 +239,5 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &callback, &arguments);
 
-	RETURN_MM();
+	return;
 }

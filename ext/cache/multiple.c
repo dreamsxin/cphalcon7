@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, delete){
 
 	zval *key_name, *backends, *backend;
 
-	phalcon_fetch_params(1, 1, 0, &key_name);
+	phalcon_fetch_params(0, 1, 0, &key_name);
 
 	backends = phalcon_read_property(getThis(), SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {

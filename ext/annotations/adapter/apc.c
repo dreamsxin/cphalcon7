@@ -81,9 +81,9 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read){
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	PHALCON_CONCAT_SV(&prefixed_key, "_PHAN", key);
-	
+
 	phalcon_strtolower_inplace(&prefixed_key);
-	
+
 	PHALCON_RETURN_CALL_FUNCTIONW("apc_fetch", &prefixed_key);
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		RETURN_NULL();
@@ -100,10 +100,10 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, write){
 
 	zval *key, *data, prefixed_key;
 
-	phalcon_fetch_params(1, 2, 0, &key, &data);
+	phalcon_fetch_params(0, 2, 0, &key, &data);
 
 	PHALCON_CONCAT_SV(&prefixed_key, "_PHAN", key);
-	
+
 	phalcon_strtolower_inplace(&prefixed_key);
 	PHALCON_CALL_FUNCTIONW(NULL, "apc_store", &prefixed_key, data);
 }

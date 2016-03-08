@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, setOptions){
 	zval *options, *compiler;
 
 	phalcon_fetch_params(0, 1, 0, &options);
-	
+
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Options parameter must be an array");
 		return;
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, setOptions){
 	}
 
 	phalcon_update_property_this(getThis(), SL("_options"), options);
-	
+
 }
 
 /**
@@ -162,29 +162,29 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getCompiler){
 		view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 		options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	
+
 		PHALCON_INIT_NVAR(compiler);
 		object_init_ex(compiler, phalcon_mvc_view_engine_volt_compiler_ce);
-		PHALCON_CALL_METHOD(NULL, compiler, "__construct", view);
-	
+		PHALCON_CALL_METHODW(NULL, compiler, "__construct", view);
+
 		/** 
 		 * Pass the IoC to the compiler only of it's an object
 		 */
 		if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(NULL, compiler, "setdi", dependency_injector);
+			PHALCON_CALL_METHODW(NULL, compiler, "setdi", dependency_injector);
 		}
-	
+
 		/** 
 		 * Pass the options to the compiler only if they're an array
 		 */
 		if (Z_TYPE_P(options) == IS_ARRAY) { 
-			PHALCON_CALL_METHOD(NULL, compiler, "setoptions", options);
+			PHALCON_CALL_METHODW(NULL, compiler, "setoptions", options);
 		}
-	
+
 		phalcon_update_property_this(getThis(), SL("_compiler"), compiler);
 	}
-	
-	RETURN_CCTOR(compiler);
+
+	RETURN_CTORW(compiler);
 }
 
 /**
@@ -201,13 +201,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 
 	phalcon_fetch_params(0, 2, 1, &template_path, &params, &must_clean);
 	PHALCON_ENSURE_IS_STRING(template_path);
-	
+
 	if (!must_clean) {
 		clean = 0;
 	} else {
 		clean = PHALCON_IS_TRUE(must_clean);
 	}
-	
+
 	if (clean) {
 		phalcon_ob_clean();
 	}
@@ -219,22 +219,22 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 	PHALCON_CALL_METHODW(NULL, &compiler, "compile", template_path);
 	PHALCON_CALL_METHODW(&compiled_template_path, &compiler, "getcompiledtemplatepath");
 	convert_to_string(&compiled_template_path);
-	
+
 	/** 
 	 * Export the variables into the current symbol table
 	 */
 	if (Z_TYPE_P(params) == IS_ARRAY) {
 		zend_hash_merge(&EG(symbol_table), Z_ARRVAL_P(params), (copy_ctor_func_t)zval_add_ref, 0);
 	}
-	
+
 	if (phalcon_require(Z_STRVAL(compiled_template_path)) == FAILURE) {
 		RETVAL_FALSE;
-		RETURN_MM();
+		return;
 	}
 
 	if (clean) {
 		phalcon_ob_get_contents(&contents);
-	
+
 		view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHODW(NULL, view, "setcontent", &contents);
 	}
@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, length){
 	zval *item;
 
 	phalcon_fetch_params(0, 1, 0, &item);
-	
+
 	if (Z_TYPE_P(item) == IS_OBJECT || Z_TYPE_P(item) == IS_ARRAY) {
 		phalcon_fast_count(return_value, item);
 	} else if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, isIncluded){
 	zval *needle, *haystack;
 
 	phalcon_fetch_params(0, 2, 0, &needle, &haystack);
-	
+
 	if (Z_TYPE_P(haystack) == IS_ARRAY) { 
 		RETURN_BOOL(phalcon_fast_in_array(needle, haystack));
 	}
@@ -288,7 +288,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, isIncluded){
 
 		phalcon_fast_strpos(return_value, haystack, needle);
 	}
-	
+
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Invalid haystack");
 }
 
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
 	zval *text, *from, *to;
 
 	phalcon_fetch_params(0, 3, 0, &text, &from, &to);
-	
+
 	/** 
 	 * Try to use utf8_encode if conversion is 'latin1' to 'utf8'
 	 */
@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
 			return;
 		}
 	}
-	
+
 	/** 
 	 * Try to use utf8_decode if conversion is 'utf8' to 'latin1'
 	 */
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
 			return;
 		}
 	}
-	
+
 	/** 
 	 * Fallback to mb_convert_encoding
 	 */
@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
 		PHALCON_RETURN_CALL_FUNCTIONW("mb_convert_encoding", text, from, to);
 		return;
 	}
-	
+
 	/** 
 	 * Fallback to iconv
 	 */
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
 		PHALCON_RETURN_CALL_FUNCTIONW("iconv", from, to, text);
 		return;
 	}
-	
+
 	/** 
 	 * There are no enough extensions available
 	 */
@@ -358,11 +358,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 	zval *value, *start, *end = NULL, slice, length, position, current, range, r0;
 
 	phalcon_fetch_params(0, 2, 1, &value, &start, &end);
-	
+
 	if (!end) {
 		end = &PHALCON_GLOBAL(z_null);
 	}
-	
+
 	/** 
 	 * Objects must implement a Traversable interface
 	 */
@@ -377,13 +377,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 		ZVAL_LONG(&position, 0);
 
 		PHALCON_CALL_METHODW(NULL, value, "rewind");
-	
+
 		while (1) {
 			PHALCON_CALL_METHODW(&r0, value, "valid");
 			if (!zend_is_true(&r0)) {
 				break;
 			}
-	
+
 			if (PHALCON_GE(&position, start)) {
 				if (PHALCON_LE(&position, &length)) {
 					PHALCON_CALL_METHODW(&current, value, "current");
@@ -393,10 +393,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 			PHALCON_CALL_METHODW(NULL, value, "next");
 			phalcon_increment(&position);
 		}
-	
+
 		RETURN_CTORW(&slice);
 	}
-	
+
 	/** 
 	 * Calculate the slice length
 	 */
@@ -404,7 +404,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 		phalcon_sub_function(&range, end, start);	
 		phalcon_add_function(&length, &range, &PHALCON_GLOBAL(z_one));
 	}
-	
+
 	/** 
 	 * Use array_slice on arrays
 	 */
@@ -412,7 +412,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 		PHALCON_RETURN_CALL_FUNCTIONW("array_slice", value, start, &length);
 		return;
 	}
-	
+
 	/** 
 	 * Use mb_substr if available
 	 */
@@ -446,7 +446,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, sort){
 
 	phalcon_fetch_params(1, 1, 0, &value);
 	PHALCON_SEPARATE_PARAM(value);
-	
+
 	ZVAL_MAKE_REF(value);
 	PHALCON_CALL_FUNCTIONW(NULL, "asort", value);
 	ZVAL_UNREF(value);

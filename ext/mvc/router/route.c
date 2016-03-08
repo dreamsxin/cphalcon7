@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	/** 
 	 * Configure the route (extract parameters, paths, etc)
 	 */
-	PHALCON_CALL_METHOD(NULL, getThis(), "reconfigure", pattern, paths, regex);
+	PHALCON_CALL_METHODW(NULL, getThis(), "reconfigure", pattern, paths, regex);
 
 	/** 
 	 * Update the HTTP method constraints
@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 	 */
 	if (phalcon_memnstr_str(&compiled_pattern, SL("("))) {
 		PHALCON_CONCAT_SVS(return_value, "#^", &compiled_pattern, "$#");
-		RETURN_MM();
+		return;
 	}
 
 	/** 
@@ -374,10 +374,10 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 	 */
 	if (phalcon_memnstr_str(&compiled_pattern, SL("["))) {
 		PHALCON_CONCAT_SVS(return_value, "#^", &compiled_pattern, "$#");
-		RETURN_MM();
+		return;
 	}
 
-	RETURN_CTOR(&compiled_pattern);
+	RETURN_CTORW(&compiled_pattern);
 }
 
 /**
@@ -418,7 +418,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	phalcon_fetch_params(1, 1, 2, &pattern, &paths, &regex);
 
 	if (Z_TYPE_P(pattern) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The pattern must be string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "The pattern must be string");
 		return;
 	}
 
@@ -533,7 +533,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	}
 
 	if (Z_TYPE(route_paths) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The route contains invalid paths");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "The route contains invalid paths");
 		return;
 	}
 
@@ -553,7 +553,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 		/** 
 		 * Transform the route's pattern to a regular expression
 		 */
-		PHALCON_CALL_METHOD(&compiled_pattern, getThis(), "compilepattern", &pcre_pattern, regex);
+		PHALCON_CALL_METHODW(&compiled_pattern, getThis(), "compilepattern", &pcre_pattern, regex);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&compiled_pattern, pattern);
 	}
@@ -709,7 +709,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 		phalcon_array_update_zval(return_value, position, &path, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_MM();
+	return;
 }
 
 /**

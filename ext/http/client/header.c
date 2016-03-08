@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 	phalcon_fetch_params(1, 1, 0, &content);
 
 	if (PHALCON_IS_EMPTY(content)) {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
 	
 	if (Z_TYPE_P(content) == IS_STRING) {
@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 	} else if (Z_TYPE_P(content) == IS_ARRAY) {
 		PHALCON_CPY_WRT_CTOR(&content_parts, content);
 	} else {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}	
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(content_parts), header) {
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
 		if (Z_TYPE(header_parts) == IS_ARRAY && phalcon_array_isset_fetch_long(&val1, &header_parts, 0) && phalcon_array_isset_fetch_long(&val2, &header_parts, 1)) {
 				ZVAL_STR(&trimmed, phalcon_trim(&val2, NULL, PHALCON_TRIM_BOTH));
-				PHALCON_CALL_METHOD(NULL, getThis(), "set", &val1, &trimmed);
+				PHALCON_CALL_METHODW(NULL, getThis(), "set", &val1, &trimmed);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -319,22 +319,18 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
 PHP_METHOD(Phalcon_Http_Client_Header, build){
 
-	zval *flags = NULL, *messages, *status_code, lines, message, *version, line;
-	zval *fields, *value, join_filed;
+	zval *flags = NULL, *messages, *status_code, lines, message, *version, line, *fields, *value, join_filed;
 	zend_string *str_key;
 	ulong idx;
 	int f = 0;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &flags);
+	phalcon_fetch_params(0, 0, 1, &flags);
 
 	if (flags) {
 		f = phalcon_get_intval(flags);
 	}
 
 	messages = phalcon_read_static_property_ce(phalcon_http_client_header_ce, SL("_messages"));
-
 	status_code = phalcon_read_property(getThis(), SL("_status_code"), PH_NOISY);
 
 	array_init(&lines);
@@ -367,10 +363,10 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 	if (f & PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS) {
 		phalcon_fast_join_str(&join_filed, SL("\r\n"), &lines);
 
-		RETURN_CTOR(&join_filed);
+		RETURN_CTORW(&join_filed);
 	}
 
-	RETURN_CTOR(&lines);
+	RETURN_CTORW(&lines);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Header, count){
@@ -380,4 +376,3 @@ PHP_METHOD(Phalcon_Http_Client_Header, count){
 	fields = phalcon_read_property(getThis(), SL("_fields"), PH_NOISY);
 	phalcon_fast_count(return_value, fields);
 }
-

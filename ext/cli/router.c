@@ -201,12 +201,10 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 
 	zval *arguments = NULL, module_name, namespace_name, task_name, action_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &arguments);
+	phalcon_fetch_params(0, 0, 1, &arguments);
 
 	if (!arguments || Z_TYPE_P(arguments) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cli_router_exception_ce, "Arguments must be an Array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_router_exception_ce, "Arguments must be an Array");
 		return;
 	}
 
@@ -245,8 +243,6 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	phalcon_update_property_this(getThis(), SL("_task"), &task_name);
 	phalcon_update_property_this(getThis(), SL("_action"), &action_name);
 	phalcon_update_property_this(getThis(), SL("_params"), arguments);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

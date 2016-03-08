@@ -239,33 +239,29 @@ PHP_METHOD(Phalcon_Loader, getExtensions){
  */
 PHP_METHOD(Phalcon_Loader, registerNamespaces){
 
-	zval *namespaces, *merge = NULL, *current_namespaces;
-	zval *merged_namespaces = NULL;
+	zval *namespaces, *merge = NULL, *current_namespaces, merged_namespaces;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &namespaces, &merge);
+	phalcon_fetch_params(0, 1, 1, &namespaces, &merge);
 
 	if (Z_TYPE_P(namespaces) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_loader_exception_ce, "Parameter namespaces must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_loader_exception_ce, "Parameter namespaces must be an array");
 		return;
 	}
-	if (merge && zend_is_true(merge)) {
 
+	if (merge && zend_is_true(merge)) {
 		current_namespaces = phalcon_read_property(getThis(), SL("_namespaces"), PH_NOISY);
 		if (Z_TYPE_P(current_namespaces) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(merged_namespaces);
-			phalcon_fast_array_merge(merged_namespaces, current_namespaces, namespaces);
+			phalcon_fast_array_merge(&merged_namespaces, current_namespaces, namespaces);
 		} else {
-			merged_namespaces = namespaces;
+			PHALCON_CPY_WRT(&merged_namespaces, namespaces);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_namespaces"), merged_namespaces);
+		phalcon_update_property_this(getThis(), SL("_namespaces"), &merged_namespaces);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_namespaces"), namespaces);
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -288,32 +284,29 @@ PHP_METHOD(Phalcon_Loader, getNamespaces){
  */
 PHP_METHOD(Phalcon_Loader, registerPrefixes){
 
-	zval *prefixes, *merge = NULL, *current_prefixes, *merged_prefixes = NULL;
+	zval *prefixes, *merge = NULL, *current_prefixes, merged_prefixes;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &prefixes, &merge);
+	phalcon_fetch_params(0, 1, 1, &prefixes, &merge);
 
 	if (Z_TYPE_P(prefixes) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_loader_exception_ce, "Parameter prefixes must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_loader_exception_ce, "Parameter prefixes must be an array");
 		return;
 	}
 
 	if (merge && zend_is_true(merge)) {
 		current_prefixes = phalcon_read_property(getThis(), SL("_prefixes"), PH_NOISY);
-		if (Z_TYPE_P(current_prefixes) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(merged_prefixes);
-			phalcon_fast_array_merge(merged_prefixes, current_prefixes, prefixes);
+		if (Z_TYPE_P(current_prefixes) == IS_ARRAY) {
+			phalcon_fast_array_merge(&merged_prefixes, current_prefixes, prefixes);
 		} else {
-			merged_prefixes = prefixes;
+			PHALCON_CPY_WRT(&merged_prefixes, prefixes);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_prefixes"), merged_prefixes);
+		phalcon_update_property_this(getThis(), SL("_prefixes"), &merged_prefixes);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_prefixes"), prefixes);
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -336,33 +329,29 @@ PHP_METHOD(Phalcon_Loader, getPrefixes){
  */
 PHP_METHOD(Phalcon_Loader, registerDirs){
 
-	zval *directories, *merge = NULL, *current_directories;
-	zval *merged_directories = NULL;
+	zval *directories, *merge = NULL, *current_directories, merged_directories;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &directories, &merge);
+	phalcon_fetch_params(0, 1, 1, &directories, &merge);
 
 	if (Z_TYPE_P(directories) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_loader_exception_ce, "Parameter directories must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_loader_exception_ce, "Parameter directories must be an array");
 		return;
 	}
 
 	if (merge && zend_is_true(merge)) {
 		current_directories = phalcon_read_property(getThis(), SL("_directories"), PH_NOISY);
 		if (Z_TYPE_P(current_directories) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(merged_directories);
-			phalcon_fast_array_merge(merged_directories, current_directories, directories);
+			phalcon_fast_array_merge(&merged_directories, current_directories, directories);
 		} else {
-			merged_directories = directories;
+			PHALCON_CPY_WRT(&merged_directories, directories);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_directories"), merged_directories);
+		phalcon_update_property_this(getThis(), SL("_directories"), &merged_directories);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_directories"), directories);
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -385,32 +374,29 @@ PHP_METHOD(Phalcon_Loader, getDirs){
  */
 PHP_METHOD(Phalcon_Loader, registerClasses){
 
-	zval *classes, *merge = NULL, *current_classes, *merged_classes = NULL;
+	zval *classes, *merge = NULL, *current_classes, merged_classes;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &classes, &merge);
+	phalcon_fetch_params(0, 1, 1, &classes, &merge);
 
 	if (Z_TYPE_P(classes) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_loader_exception_ce, "Parameter classes must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_loader_exception_ce, "Parameter classes must be an array");
 		return;
 	}
 
 	if (merge && zend_is_true(merge)) {
 		current_classes = phalcon_read_property(getThis(), SL("_classes"), PH_NOISY);
 		if (Z_TYPE_P(current_classes) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(merged_classes);
-			phalcon_fast_array_merge(merged_classes, current_classes, classes);
+			phalcon_fast_array_merge(&merged_classes, current_classes, classes);
 		} else {
-			merged_classes = classes;
+			PHALCON_CPY_WRT(&merged_classes, classes);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_classes"), merged_classes);
+		phalcon_update_property_this(getThis(), SL("_classes"), &merged_classes);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_classes"), classes);
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -431,21 +417,18 @@ PHP_METHOD(Phalcon_Loader, getClasses){
  */
 PHP_METHOD(Phalcon_Loader, register){
 
-	zval *registered, *autoloader;
-
-	PHALCON_MM_GROW();
+	zval *registered, autoloader;
 
 	registered = phalcon_read_property(getThis(), SL("_registered"), PH_NOISY);
 	if (PHALCON_IS_FALSE(registered)) {
-		PHALCON_INIT_VAR(autoloader);
-		array_init_size(autoloader, 2);
-		phalcon_array_append(autoloader, getThis(), 0);
-		add_next_index_stringl(autoloader, SL("autoLoad"));
-		PHALCON_CALL_FUNCTION(NULL, "spl_autoload_register", autoloader);
+		array_init_size(&autoloader, 2);
+		phalcon_array_append(&autoloader, getThis(), 0);
+		add_next_index_stringl(&autoloader, SL("autoLoad"));
+		PHALCON_CALL_FUNCTIONW(NULL, "spl_autoload_register", &autoloader);
 		phalcon_update_property_this(getThis(), SL("_registered"), &PHALCON_GLOBAL(z_true));
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -455,21 +438,18 @@ PHP_METHOD(Phalcon_Loader, register){
  */
 PHP_METHOD(Phalcon_Loader, unregister){
 
-	zval *registered, *autoloader;
-
-	PHALCON_MM_GROW();
+	zval *registered, autoloader;
 
 	registered = phalcon_read_property(getThis(), SL("_registered"), PH_NOISY);
 	if (PHALCON_IS_TRUE(registered)) {
-		PHALCON_INIT_VAR(autoloader);
-		array_init_size(autoloader, 2);
-		phalcon_array_append(autoloader, getThis(), 0);
-		add_next_index_stringl(autoloader, SL("autoLoad"));
-		PHALCON_CALL_FUNCTION(NULL, "spl_autoload_unregister", autoloader);
+		array_init_size(&autoloader, 2);
+		phalcon_array_append(&autoloader, getThis(), 0);
+		add_next_index_stringl(&autoloader, SL("autoLoad"));
+		PHALCON_CALL_FUNCTIONW(NULL, "spl_autoload_unregister", &autoloader);
 		phalcon_update_property_this(getThis(), SL("_registered"), &PHALCON_GLOBAL(z_false));
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -483,14 +463,10 @@ PHP_METHOD(Phalcon_Loader, unregister){
  */
 PHP_METHOD(Phalcon_Loader, findFile){
 
-	zval *class_name, *directory, *extensions, *ds = NULL, ds_slash;
-	zval *events_manager, event_name, directories, *dir = NULL;
-	zval *extension = NULL, debug_message;
+	zval *class_name, *directory, *extensions, *ds = NULL, ds_slash, *events_manager, event_name, directories, *dir, *extension, debug_message;
 	char slash[2] = {DEFAULT_SLASH, 0};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 1, &class_name, &directory, &extensions, &ds);
+	phalcon_fetch_params(0, 3, 1, &class_name, &directory, &extensions, &ds);
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 
@@ -508,7 +484,8 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 	if (ds == NULL) {
 		ZVAL_STRING(&ds_slash, slash);
-		ds = &ds_slash;
+	} else {
+		PHALCON_CPY_WRT(&ds_slash, ds);
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
@@ -521,10 +498,9 @@ PHP_METHOD(Phalcon_Loader, findFile){
 		 * Add a trailing directory separator if the user forgot to do that
 		 */
 		zval fixed_dir;
-		phalcon_fix_path(&fixed_dir, dir, ds);
+		phalcon_fix_path(&fixed_dir, dir, &ds_slash);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(extensions), extension) {
-
 			zval file_path;
 			PHALCON_CONCAT_VVSV(&file_path, &fixed_dir, class_name, ".", extension);
 
@@ -535,7 +511,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				phalcon_update_property_this(getThis(), SL("_checkedPath"), &file_path);
 
 				ZVAL_STRING(&event_name, "loader:beforeCheckPath");
-				PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis());
+				PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
 			}
 
 			/** 
@@ -551,19 +527,19 @@ PHP_METHOD(Phalcon_Loader, findFile){
 					phalcon_update_property_this(getThis(), SL("_foundPath"), &file_path);
 
 					ZVAL_STRING(&event_name, "loader:pathFound");
-					PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis(), &file_path);
+					PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), &file_path);
 				}
 
 				/** 
 				 * Simulate a require
 				 */
 				assert(Z_TYPE(file_path) == IS_STRING);
-				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
+				RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
 
 				/** 
 				 * Return true mean success
 				 */
-				RETURN_MM_TRUE;
+				RETURN_TRUE;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &file_path);
 				phalcon_debug_print_r(&debug_message);
@@ -573,7 +549,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**

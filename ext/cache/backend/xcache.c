@@ -107,30 +107,25 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Xcache){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, __construct){
 
-	zval *frontend, *options = NULL;
+	zval *frontend, *_options = NULL, options;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 1, &frontend, &_options);
 
-	phalcon_fetch_params(1, 1, 1, &frontend, &options);
-
-	if (!options) {
-		PHALCON_INIT_VAR(options);
+	if (!_options) {
+		array_init(&options);
 	} else {
-		PHALCON_SEPARATE_PARAM(options);
-	}
-
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_INIT_NVAR(options);
-		array_init(options);
+		if (Z_TYPE_P(_options) != IS_ARRAY) {
+			array_init(&options);
+		} else {
+			PHALCON_CPY_WRT(&options, _options);
+		}
 	}
 
 	if (!phalcon_array_isset_str(options, SL("statsKey"))) {
 		phalcon_array_update_str_str(options, SL("statsKey"), SL("_PHCX"), PH_COPY);
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_xcache_ce, getThis(), "__construct", frontend, options);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_PARENTW(NULL, phalcon_cache_backend_xcache_ce, getThis(), "__construct", frontend, options);
 }
 
 /**

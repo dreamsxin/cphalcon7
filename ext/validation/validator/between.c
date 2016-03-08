@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Between, valid){
 
 	zval *value, *minimum = NULL, *maximum = NULL, valid;
 
-	phalcon_fetch_params(1, 3, 0, &value, &minimum, &maximum);
+	phalcon_fetch_params(0, 3, 0, &value, &minimum, &maximum);
 
 	is_smaller_or_equal_function(&valid, minimum, value);
 	if (zend_is_true(&valid)) {

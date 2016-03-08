@@ -123,12 +123,9 @@ PHALCON_INIT_CLASS(Phalcon_Events_Manager){
  */
 PHP_METHOD(Phalcon_Events_Manager, attach){
 
-	zval *event_type, *handler, *_priority = NULL, priority, events;
-	zval listener, enable_priorities, priority_queue;
+	zval *event_type, *handler, *_priority = NULL, priority, events, listener, enable_priorities, priority_queue;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 1, &event_type, &handler, &_priority);
+	phalcon_fetch_params(0, 2, 1, &event_type, &handler, &_priority);
 
 	if (!_priority) {
 		ZVAL_LONG(&priority, 100);
@@ -828,7 +825,7 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 	} else {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(queue), listener) {
 			zval handler_embeded;
-			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
+			PHALCON_CALL_METHODW(&handler_embeded, listener, "getlistener");
 			phalcon_array_append(return_value, &handler_embeded, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	}

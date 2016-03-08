@@ -80,14 +80,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Lang, parsePHQL){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &phql);
-	
+
 	if (Z_TYPE_P(phql) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "PHQL statement must be string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "PHQL statement must be string");
 		return;
 	}
 	if (phql_parse_phql(return_value, phql) == FAILURE) {
-		RETURN_MM();
+		return;
 	}
-	RETURN_MM();
+	return;
 }
 

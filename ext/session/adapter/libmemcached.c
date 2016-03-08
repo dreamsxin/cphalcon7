@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct){
 	zval callable_open, callable_close, callable_read , callable_write, callable_destroy, callable_gc;
 
 	phalcon_fetch_params(0, 1, 0, &options);
-	
+
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "The options must be an array");
 		return;

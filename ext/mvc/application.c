@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 	}
 
 	if (Z_TYPE_P(modules) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "Modules must be an Array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "Modules must be an Array");
 		return;
 	}
 	if (PHALCON_IS_FALSE(merge)) {
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 		phalcon_update_property_this(getThis(), SL("_modules"), merged_modules);
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "A dependency injection object is required to access internal services");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_STRING(&event_name, "application:boot");
 	PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
 
 	ZVAL_STRING(&service, ISV(router));
@@ -485,7 +485,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 
 			if (PHALCON_IS_FALSE(&possible_response)) {
-				RETURN_CTOR(&response);
+				RETURN_CTORW(&response);
 			}
 
 			ZVAL_FALSE(&returned_response);

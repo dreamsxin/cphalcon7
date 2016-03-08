@@ -177,11 +177,11 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
 		PHALCON_INIT_VAR(class_name);
 		phalcon_get_class(class_name, model, 1);
 		if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, class_name)) {
-			RETURN_CTOR(&events_manager);
+			RETURN_CTORW(&events_manager);
 		}
 	}
 
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }
 
 /**
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		 * Call the 'initialize' method if it's implemented
 		 */
 		if (phalcon_method_exists_ex(model, SL("initialize")) == SUCCESS) {
-			PHALCON_CALL_METHOD(NULL, model, "initialize");
+			PHALCON_CALL_METHODW(NULL, model, "initialize");
 		}
 
 		/** 
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "collectionManager:afterInitialize");
-			PHALCON_CALL_METHOD(NULL, events_manager, "fire", &event_name, getThis());
+			PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
 		}
 
 		phalcon_update_property_array(getThis(), SL("_initialized"), class_name, model);
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setConnectionService){
 	phalcon_fetch_params(1, 2, 0, &model, &connection_service);
 
 	if (Z_TYPE_P(model) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
 		return;
 	}
 
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, useImplicitObjectIds){
 	phalcon_fetch_params(1, 2, 0, &model, &use_implicit_object_ids);
 
 	if (Z_TYPE_P(model) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
 		return;
 	}
 
@@ -329,7 +329,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 	phalcon_fetch_params(1, 1, 0, &model);
 
 	if (Z_TYPE_P(model) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
 		return;
 	}
 
@@ -341,10 +341,10 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 	 */
 	implicit_objects_ids = phalcon_read_property(getThis(), SL("_implicitObjectsIds"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&implicit, implicit_objects_ids, entity_name)) {
-		RETURN_CTOR(&implicit);
+		RETURN_CTORW(&implicit);
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**
@@ -362,7 +362,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setStrictMode){
 	phalcon_fetch_params(1, 2, 0, &collection, &strict_mode);
 
 	if (Z_TYPE_P(collection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
 		return;
 	}
 
@@ -389,7 +389,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 	phalcon_fetch_params(1, 1, 0, &collection);
 
 	if (Z_TYPE_P(collection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
 		return;
 	}
 
@@ -401,10 +401,10 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 	 */
 	strict_modes = phalcon_read_property(getThis(), SL("_strictModes"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&strict_mode, strict_modes, entity_name)) {
-		RETURN_CTOR(&strict_mode);
+		RETURN_CTORW(&strict_mode);
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 	/** 
 	 * Request the connection service from the DI
 	 */
-	PHALCON_CALL_METHOD(&connection, dependency_injector, "getshared", &service);
+	PHALCON_CALL_METHODW(&connection, dependency_injector, "getshared", &service);
 	if (Z_TYPE(connection) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Invalid injected connection service");
 		return;
@@ -480,9 +480,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		PHALCON_CONCAT_SV(&fire_event_name, "collection:", eventname);
 
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", &fire_event_name, model);
+		PHALCON_CALL_METHODW(&status, events_manager, "fire", &fire_event_name, model);
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_CTOR(&status);
+			RETURN_CTORW(&status);
 		}
 	}
 
@@ -495,14 +495,14 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 		if (phalcon_array_isset(custom_events_manager, &entity_name)) {
 			PHALCON_CONCAT_SV(&fire_event_name, "collection:", eventname);
 
-			PHALCON_CALL_METHOD(&status, custom_events_manager, "fire", &fire_event_name, model);
+			PHALCON_CALL_METHODW(&status, custom_events_manager, "fire", &fire_event_name, model);
 			if (PHALCON_IS_FALSE(&status)) {
-				RETURN_CTOR(&status);
+				RETURN_CTORW(&status);
 			}
 		}
 	}
 
-	RETURN_CTOR(&status);
+	RETURN_CTORW(&status);
 }
 
 /**
@@ -520,12 +520,12 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setSource){
 	phalcon_fetch_params(1, 2, 0, &collection, &source);
 
 	if (Z_TYPE_P(collection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Collection is not an object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Collection is not an object");
 		return;
 	}
 
 	if (Z_TYPE_P(source) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Source must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Source must be a string");
 		return;
 	}
 
@@ -550,7 +550,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 	phalcon_fetch_params(1, 1, 0, &collection);
 
 	if (Z_TYPE_P(collection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Collection is not an object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Collection is not an object");
 		return;
 	}
 
@@ -558,7 +558,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 
 	sources = phalcon_read_property(getThis(), SL("_sources"), PH_NOISY);
 	if (Z_TYPE_P(sources) == IS_ARRAY && phalcon_array_isset_fetch(&source, sources, &entity_name)) {
-		RETURN_CTOR(&source);
+		RETURN_CTORW(&source);
 	}
 
 	phalcon_get_class_ns(&class_name, collection, 0);
@@ -566,7 +566,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 	phalcon_uncamelize(&source, &class_name);
 	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, &source);
 
-	RETURN_CTOR(&source);
+	RETURN_CTORW(&source);
 }
 
 /**
@@ -584,12 +584,12 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setColumnMap){
 	phalcon_fetch_params(1, 2, 0, &collection, &column_map);
 
 	if (Z_TYPE_P(collection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Collection is not an object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Collection is not an object");
 		return;
 	}
 
 	if (Z_TYPE_P(column_map) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "ColumnMap must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "ColumnMap must be an array");
 		return;
 	}
 
@@ -614,7 +614,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 	phalcon_fetch_params(1, 1, 0, &collection);
 
 	if (Z_TYPE_P(collection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_collection_exception_ce, "Collection is not an object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "Collection is not an object");
 		return;
 	}
 
@@ -623,9 +623,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 	column_maps = phalcon_read_property(getThis(), SL("_columnMaps"), PH_NOISY);
 	if (Z_TYPE_P(column_maps) == IS_ARRAY) { 
 		if (phalcon_array_isset_fetch(&column_map, column_maps, &entity_name)) {
-			RETURN_CTOR(&column_map);
+			RETURN_CTORW(&column_map);
 		}
 	}
 
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }

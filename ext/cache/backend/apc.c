@@ -109,13 +109,11 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Apc){
  * @param   long $lifetime
  * @return  mixed
  */
-PHP_METHOD(Phalcon_Cache_Backend_Apc, get){
-
+PHP_METHOD(Phalcon_Cache_Backend_Apc, get)
+{
 	zval *key_name, *lifetime = NULL, prefixed_key, *frontend, *prefix, cached_content;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
 	frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
 	prefix   = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
@@ -143,8 +141,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, get){
  * @param long $lifetime
  * @param boolean $stopBuffer
  */
-PHP_METHOD(Phalcon_Cache_Backend_Apc, save){
-
+PHP_METHOD(Phalcon_Cache_Backend_Apc, save)
+{
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL;
 	zval *prefix, *frontend, last_key, cached_content, prepared_content, *last_lifetime, ttl, is_buffering;
 

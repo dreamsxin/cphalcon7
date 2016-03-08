@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, write){
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	PHALCON_CALL_METHOD(&cache, getThis(), "_getcache");
+	PHALCON_CALL_METHODW(&cache, getThis(), "_getcache");
 
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 

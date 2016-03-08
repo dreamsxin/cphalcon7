@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 
 
 	phalcon_fetch_params(0, 1, 0, &options);
-	
+
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
@@ -166,17 +166,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, read){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &key);
-	
+
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHOD(redis, "get", key, lifetime);
+		PHALCON_RETURN_CALL_METHODW(redis, "get", key, lifetime);
 
-		RETURN_MM();
+		return;
 	}
-	
-	RETURN_MM_NULL();
+
+	RETURN_NULL();
 }
 
 /**
@@ -192,14 +192,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, write){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
-	
+
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, redis, "save", key, data, lifetime);	
+		PHALCON_CALL_METHODW(NULL, redis, "save", key, data, lifetime);	
 	}
-	
+
 	PHALCON_MM_RESTORE();
 }
 
@@ -212,10 +212,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, reset)
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, redis, "flush");	
+		PHALCON_CALL_METHODW(NULL, redis, "flush");	
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_redis_ce, getThis(), "reset");
+	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_redis_ce, getThis(), "reset");
 
 	PHALCON_MM_RESTORE();
 }

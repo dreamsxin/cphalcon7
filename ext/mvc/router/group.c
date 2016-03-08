@@ -425,8 +425,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	 * Every route is internally stored as a Phalcon\Mvc\Router\Route
 	 */
 	object_init_ex(return_value, phalcon_mvc_router_route_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", prefix_pattern, merged_paths, http_methods);
-	PHALCON_CALL_METHOD(NULL, return_value, "setgroup", getThis());
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", prefix_pattern, merged_paths, http_methods);
+	PHALCON_CALL_METHODW(NULL, return_value, "setgroup", getThis());
 
 	phalcon_update_property_array_append(getThis(), SL("_routes"), return_value);
 
@@ -461,8 +461,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, add){
 		http_methods = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_addroute", pattern, paths, http_methods);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_addroute", pattern, paths, http_methods);
+	return;
 }
 
 static void phalcon_mvc_router_group_add_helper(INTERNAL_FUNCTION_PARAMETERS, zend_string *method)

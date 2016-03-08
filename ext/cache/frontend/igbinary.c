@@ -93,16 +93,13 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Frontend_Igbinary){
  * @param mixed $data
  * @return string
  */
-PHP_METHOD(Phalcon_Cache_Frontend_Igbinary, beforeStore){
-
+PHP_METHOD(Phalcon_Cache_Frontend_Igbinary, beforeStore)
+{
 	zval *data;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &data);
+	phalcon_fetch_params(0, 1, 0, &data);
 	
-	PHALCON_RETURN_CALL_FUNCTION("igbinary_serialize", data);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_FUNCTIONW("igbinary_serialize", data);
 }
 
 /**
@@ -111,14 +108,11 @@ PHP_METHOD(Phalcon_Cache_Frontend_Igbinary, beforeStore){
  * @param mixed $data
  * @return mixed
  */
-PHP_METHOD(Phalcon_Cache_Frontend_Igbinary, afterRetrieve){
-
+PHP_METHOD(Phalcon_Cache_Frontend_Igbinary, afterRetrieve)
+{
 	zval *data;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &data);
+	phalcon_fetch_params(0, 1, 0, &data);
 	
-	PHALCON_RETURN_CALL_FUNCTION("igbinary_unserialize", data);
-	RETURN_MM();
+	PHALCON_RETURN_CALL_FUNCTIONW("igbinary_unserialize", data);
 }

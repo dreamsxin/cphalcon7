@@ -267,10 +267,10 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 		if (remove && zend_is_true(remove)) {
 			phalcon_array_unset(_SESSION, key, 0);
 		}
-		RETURN_CTOR(&value);
+		RETURN_CTORW(&value);
 	}
 
-	RETURN_CTOR(default_value);
+	RETURN_CTORW(default_value);
 }
 
 /**
@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
 				ZVAL_LONG(&index, idx);
 			}
 
-			PHALCON_CALL_SELF(NULL, "set", &index, value);
+			PHALCON_CALL_SELFW(NULL, "set", &index, value);
 		} ZEND_HASH_FOREACH_END();
 	}
 
@@ -356,10 +356,10 @@ PHP_METHOD(Phalcon_Session_Adapter, has){
 	PHALCON_CONCAT_VV(&key, unique_id, index);
 
 	if(phalcon_session_get(&key)) {
-		RETURN_MM_TRUE;
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**
@@ -379,14 +379,14 @@ PHP_METHOD(Phalcon_Session_Adapter, remove){
 
 	phalcon_fetch_params(1, 1, 0, &index);
 	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
-	
+
 	PHALCON_INIT_VAR(key);
 	PHALCON_CONCAT_VV(key, unique_id, index);
 
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
 	phalcon_array_unset(_SESSION, key, 0);
 
-	RETURN_MM();
+	return;
 }
 
 /**
@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __get)
 	zval *property;
 
 	phalcon_fetch_params(0, 1, 0, &property);
-	
+
 	PHALCON_RETURN_CALL_SELFW("get", property);
 }
 

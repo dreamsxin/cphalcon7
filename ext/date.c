@@ -212,31 +212,31 @@ PHP_METHOD(Phalcon_Date, offset){
 	} else if (Z_TYPE_P(date) == IS_LONG) {
 		phalcon_get_class_constant(&format, ce0, SL("RFC2822"));
 
-		PHALCON_CALL_FUNCTION(&new_date, "date", &format, date);
+		PHALCON_CALL_FUNCTIONW(&new_date, "date", &format, date);
 	} else {
 		PHALCON_CPY_WRT(&new_date, date);
 	}
 
 	object_init_ex(&zone_remote, ce1);
-	PHALCON_CALL_METHOD(NULL, &zone_remote, "__construct", remote);
+	PHALCON_CALL_METHODW(NULL, &zone_remote, "__construct", remote);
 
 	object_init_ex(&time_remote, ce0);
-	PHALCON_CALL_METHOD(NULL, &time_remote, "__construct", &new_date, &zone_remote);
+	PHALCON_CALL_METHODW(NULL, &time_remote, "__construct", &new_date, &zone_remote);
 
 	if (local) {
 		object_init_ex(&zone_local, ce1);
-		PHALCON_CALL_METHOD(NULL, &zone_local, "__construct", local);
+		PHALCON_CALL_METHODW(NULL, &zone_local, "__construct", local);
 
 		object_init_ex(&time_local, ce0);
-		PHALCON_CALL_METHOD(NULL, &time_local, "__construct", &new_date, &zone_local);
+		PHALCON_CALL_METHODW(NULL, &time_local, "__construct", &new_date, &zone_local);
 	} else {
 		object_init_ex(&time_local, ce0);
-		PHALCON_CALL_METHOD(NULL, &time_local, "__construct", &new_date);
+		PHALCON_CALL_METHODW(NULL, &time_local, "__construct", &new_date);
 	}
 
-	PHALCON_CALL_METHOD(&offset_remote, &zone_remote, "getOffset", &time_remote);
+	PHALCON_CALL_METHODW(&offset_remote, &zone_remote, "getOffset", &time_remote);
 
-	PHALCON_CALL_METHOD(&offset_local, &zone_local, "getOffset", &time_local);
+	PHALCON_CALL_METHODW(&offset_local, &zone_local, "getOffset", &time_local);
 
 	ZVAL_LONG(return_value, phalcon_get_intval(&offset_remote)-phalcon_get_intval(&offset_local));
 
@@ -314,12 +314,12 @@ PHP_METHOD(Phalcon_Date, minutes){
 
 	if (!step) {
 		ZVAL_LONG(&s, 5);
-		PHALCON_RETURN_CALL_SELF("seconds", &s);
+		PHALCON_RETURN_CALL_SELFW("seconds", &s);
 	} else {
-		PHALCON_RETURN_CALL_SELF("seconds", step);
+		PHALCON_RETURN_CALL_SELFW("seconds", step);
 	}
 
-	RETURN_MM();
+	return;
 }
 
 /**
@@ -407,7 +407,7 @@ PHP_METHOD(Phalcon_Date, ampm){
  * @return string
  */
 PHP_METHOD(Phalcon_Date, adjust){	
-	
+
 	zval *hour, *ampm, lower_ampm;
 	char buf[2];
 	int h;
@@ -463,7 +463,7 @@ PHP_METHOD(Phalcon_Date, days){
 	if (!year || PHALCON_IS_FALSE(year)) {
 		ZVAL_STRING(&tmp, "Y");
 
-		PHALCON_CALL_FUNCTION(&year2, "date", &tmp);
+		PHALCON_CALL_FUNCTIONW(&year2, "date", &tmp);
 
 		y = phalcon_get_intval(&year2);
 	} else {
@@ -473,7 +473,7 @@ PHP_METHOD(Phalcon_Date, days){
 	if (Z_TYPE(months) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_long(&year_months, &months, y)) {
 			if (phalcon_array_isset_fetch_long(return_value, &year_months, m)) {
-				RETURN_MM();
+				return;
 			}
 		}
 	} else {
@@ -483,11 +483,11 @@ PHP_METHOD(Phalcon_Date, days){
 	ZVAL_LONG(&tmp1, 1);
 	ZVAL_LONG(&tmp2, 0);
 
-	PHALCON_CALL_FUNCTION(&tmp, "mktime", &tmp1, &tmp2, &tmp2, month, &tmp1, &year2);	
+	PHALCON_CALL_FUNCTIONW(&tmp, "mktime", &tmp1, &tmp2, &tmp2, month, &tmp1, &year2);	
 
 	ZVAL_STRING(&format, "t");
 
-	PHALCON_CALL_FUNCTION(&total, "date", &format, &tmp);
+	PHALCON_CALL_FUNCTIONW(&total, "date", &format, &tmp);
 
 	t = phalcon_get_intval(&total) + 1;
 
@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Date, days){
 
 	phalcon_update_static_property_ce(phalcon_date_ce, SL("_months"), &months);
 
-	RETURN_CTOR(&tmp);
+	RETURN_CTORW(&tmp);
 }
 
 /**
@@ -549,16 +549,16 @@ PHP_METHOD(Phalcon_Date, months){
 			zval tmp3, time, strftime;
 			ZVAL_LONG(&tmp3, i);
 
-			PHALCON_CALL_FUNCTION(&time, "mktime", &tmp1, &tmp1, &tmp1, &tmp3, &tmp2);
-			PHALCON_CALL_FUNCTION(&strftime, "strftime", format, &time);
+			PHALCON_CALL_FUNCTIONW(&time, "mktime", &tmp1, &tmp1, &tmp1, &tmp3, &tmp2);
+			PHALCON_CALL_FUNCTIONW(&strftime, "strftime", format, &time);
 
 			phalcon_array_update_long(return_value, i, &strftime, PH_COPY);
 		}
 	} else {
-		PHALCON_RETURN_CALL_SELF("hours");
+		PHALCON_RETURN_CALL_SELFW("hours");
 	}
 
-	RETURN_MM();
+	return;
 }
 
 /**
@@ -584,7 +584,7 @@ PHP_METHOD(Phalcon_Date, years){
 	if (!start || PHALCON_IS_FALSE(start)) {
 		ZVAL_STRING(&tmp, "Y");
 
-		PHALCON_CALL_FUNCTION(&year, "date", &tmp);
+		PHALCON_CALL_FUNCTIONW(&year, "date", &tmp);
 
 		s = phalcon_get_intval(&year) - 5;
 	} else {
@@ -594,13 +594,13 @@ PHP_METHOD(Phalcon_Date, years){
 	if (!end || PHALCON_IS_FALSE(end)) {
 		ZVAL_STRING(&tmp, "Y");
 
-		PHALCON_CALL_FUNCTION(&year, "date", &tmp);
+		PHALCON_CALL_FUNCTIONW(&year, "date", &tmp);
 
 		e = phalcon_get_intval(&year) + 5;
 	} else {
 		e = phalcon_get_intval(end);
 	}
-	
+
 	array_init(return_value);
 
 	for (i = s; i <= e; i++) {
@@ -642,26 +642,26 @@ PHP_METHOD(Phalcon_Date, span){
 		phalcon_fast_strtolower(&lowercased_output, &tmp);
 
 		if (PHALCON_IS_EMPTY(&lowercased_output)) {
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 		}
 	}
 
 	ZVAL_STRING(&pattern, "/[^a-z]+/");
 
-	PHALCON_CALL_FUNCTION(&output_arr, "preg_split", &pattern, &lowercased_output);
+	PHALCON_CALL_FUNCTIONW(&output_arr, "preg_split", &pattern, &lowercased_output);
 
 	ZVAL_LONG(&tmp1, 0);
 
 	phalcon_fast_count(&count_output, &output_arr);
 
-	PHALCON_CALL_FUNCTION(&tmp, "array_fill", &tmp1, &count_output, &tmp1);
+	PHALCON_CALL_FUNCTIONW(&tmp, "array_fill", &tmp1, &count_output, &tmp1);
 
 	PHALCON_CPY_WRT_CTOR(&tmp1, &output_arr);
 
-	PHALCON_CALL_FUNCTION(&output_arr, "array_combine", &tmp1, &tmp);
+	PHALCON_CALL_FUNCTIONW(&output_arr, "array_combine", &tmp1, &tmp);
 
 	remote_time = phalcon_get_intval(remote);
-	
+
 	if (!local || Z_TYPE_P(local) == IS_NULL) {
 		local_time = (long) time(NULL);
 	} else {
@@ -715,11 +715,11 @@ PHP_METHOD(Phalcon_Date, span){
 	}
 
 	if (Z_LVAL(count_output) == 1) {
-		PHALCON_RETURN_CALL_FUNCTION("array_pop", &output_arr);
-		RETURN_MM();
+		PHALCON_RETURN_CALL_FUNCTIONW("array_pop", &output_arr);
+		return;
 	}
 
-	RETURN_CTOR(&output_arr);
+	RETURN_CTORW(&output_arr);
 }
 
 /**
@@ -752,23 +752,23 @@ PHP_METHOD(Phalcon_Date, span2){
 		phalcon_fast_strtolower(&lower_output, &tmp);
 
 		if (PHALCON_IS_EMPTY(&lower_output)) {
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 		}
 	}
 
 	ZVAL_STRING(&pattern, "/[^a-z]+/");
 
-	PHALCON_CALL_FUNCTION(&output_arr, "preg_split", &pattern, &lower_output);
+	PHALCON_CALL_FUNCTIONW(&output_arr, "preg_split", &pattern, &lower_output);
 
 	ZVAL_LONG(&tmp1, 0);
 
 	phalcon_fast_count(&count_output, &output_arr);
 
-	PHALCON_CALL_FUNCTION(&tmp, "array_fill", &tmp1, &count_output, &tmp1);
+	PHALCON_CALL_FUNCTIONW(&tmp, "array_fill", &tmp1, &count_output, &tmp1);
 
 	PHALCON_CPY_WRT_CTOR(&tmp1, &output_arr);
 
-	PHALCON_CALL_FUNCTION(&output_arr, "array_combine", &tmp1, &tmp);
+	PHALCON_CALL_FUNCTIONW(&output_arr, "array_combine", &tmp1, &tmp);
 
 	timespan = phalcon_get_intval(time);
 
@@ -818,12 +818,12 @@ PHP_METHOD(Phalcon_Date, span2){
 
 	if (Z_LVAL(count_output) == 1) {
 		ZVAL_MAKE_REF(&output_arr);
-		PHALCON_CALL_FUNCTION(return_value, "array_pop", &output_arr);
+		PHALCON_CALL_FUNCTIONW(return_value, "array_pop", &output_arr);
 		ZVAL_UNREF(&output_arr);
-		RETURN_MM();
+		return;
 	}
 
-	RETURN_CTOR(&output_arr);
+	RETURN_CTORW(&output_arr);
 }
 
 /**
@@ -1005,11 +1005,11 @@ PHP_METHOD(Phalcon_Date, unix2dos){
 
 	phalcon_fetch_params(1, 0, 1, &timestamp);
 
-	
+
 	if (!timestamp || PHALCON_IS_FALSE(timestamp)) {
-		PHALCON_CALL_FUNCTION(&day, "getdate");
+		PHALCON_CALL_FUNCTIONW(&day, "getdate");
 	} else {
-		PHALCON_CALL_FUNCTION(&day, "getdate", timestamp);
+		PHALCON_CALL_FUNCTIONW(&day, "getdate", timestamp);
 	}
 
 	phalcon_array_fetch_str(&year, &day, SL("year"), PH_NOISY);
@@ -1046,7 +1046,7 @@ PHP_METHOD(Phalcon_Date, unix2dos){
  * @return int
  */
 PHP_METHOD(Phalcon_Date, dos2unix){
-	
+
 	zval *timestamp = NULL;
 	zval *hrs, *min, *sec, *mon, *day, *year;
 	long t = 0;
@@ -1077,7 +1077,7 @@ PHP_METHOD(Phalcon_Date, dos2unix){
 	PHALCON_INIT_VAR(year);
 	ZVAL_LONG(year, (((t >> 25) & 0x7f)+1980));
 
-	PHALCON_RETURN_CALL_FUNCTION("mktime", hrs, min, sec, mon, day, year);
+	PHALCON_RETURN_CALL_FUNCTIONW("mktime", hrs, min, sec, mon, day, year);
 
 	PHALCON_MM_RESTORE();
 }
@@ -1093,7 +1093,7 @@ PHP_METHOD(Phalcon_Date, dos2unix){
  * @return string
  */
 PHP_METHOD(Phalcon_Date, formatted_time){
-	
+
 	zval *datetime = NULL, *format = NULL, *zone = NULL, datetime_str, timestamp_format, timezone, tz, dt, tmp, tmp1;
 	zend_class_entry *ce0, *ce1;
 
@@ -1116,27 +1116,27 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 	if (!zone || Z_TYPE_P(zone) == IS_NULL) {
 		phalcon_return_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"));
 	} else {
-		PHALCON_CALL_FUNCTION(&timezone, "date_default_timezone_get");
+		PHALCON_CALL_FUNCTIONW(&timezone, "date_default_timezone_get");
 	}
 
 	ce0 = zend_fetch_class(SSL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
 	ce1 = zend_fetch_class(SSL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&tz, ce0);
-	PHALCON_CALL_METHOD(NULL, &tz, "__construct", &timezone);
+	PHALCON_CALL_METHODW(NULL, &tz, "__construct", &timezone);
 
 	object_init_ex(&dt, ce1);
-	PHALCON_CALL_METHOD(NULL, &dt, "__construct", &datetime_str, &tz);
+	PHALCON_CALL_METHODW(NULL, &dt, "__construct", &datetime_str, &tz);
 
-	PHALCON_CALL_METHOD(&tmp, &dt, "getTimeZone");
-	PHALCON_CALL_METHOD(&tmp1, &tmp, "getName");
-	PHALCON_CALL_METHOD(&tmp, &tz, "getName");
+	PHALCON_CALL_METHODW(&tmp, &dt, "getTimeZone");
+	PHALCON_CALL_METHODW(&tmp1, &tmp, "getName");
+	PHALCON_CALL_METHODW(&tmp, &tz, "getName");
 
 	if (PHALCON_IS_EQUAL(&tmp1, &tmp)) {
-		PHALCON_CALL_METHOD(NULL, &dt, "setTimeZone", &tz);
+		PHALCON_CALL_METHODW(NULL, &dt, "setTimeZone", &tz);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(&dt, "format", &timestamp_format);
+	PHALCON_RETURN_CALL_METHODW(&dt, "format", &timestamp_format);
 
 	PHALCON_MM_RESTORE();
 }
@@ -1163,8 +1163,8 @@ PHP_METHOD(Phalcon_Date, valid){
 		PHALCON_CPY_WRT(&date_format, format);
 	}
 
-	PHALCON_CALL_FUNCTION(&time, "strtotime", date);
-	PHALCON_CALL_FUNCTION(&format_date, "date", &date_format, &time);
+	PHALCON_CALL_FUNCTIONW(&time, "strtotime", date);
+	PHALCON_CALL_FUNCTIONW(&format_date, "date", &date_format, &time);
 
 	if (phalcon_is_equal(date, &format_date)) {
 		RETURN_TRUE;

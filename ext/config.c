@@ -314,9 +314,9 @@ PHP_METHOD(Phalcon_Config, merge){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &config);
-	
+
 	if (Z_TYPE_P(config) != IS_OBJECT && Z_TYPE_P(config) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_config_exception_ce, "Configuration must be an object or array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_config_exception_ce, "Configuration must be an object or array");
 		return;
 	}
 
@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Config, merge){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**

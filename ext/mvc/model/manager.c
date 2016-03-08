@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
 		object_init_ex(return_value, ce0);
 		if (phalcon_has_constructor(return_value)) {
-			PHALCON_CALL_METHOD(NULL, return_value, "__construct", dependency_injector, getThis());
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", dependency_injector, getThis());
 		}
 		return;
 	}
@@ -838,7 +838,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 			 * Notify all the events on the behavior
 			 */
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models_behaviors), behavior) {
-				PHALCON_CALL_METHOD(&status, behavior, "notify", eventname, model);
+				PHALCON_CALL_METHODW(&status, behavior, "notify", eventname, model);
 				if (PHALCON_IS_FALSE(&status)) {
 					RETURN_CTORW(&status);
 				}
@@ -1295,7 +1295,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	 * Create a relationship instance
 	 */
 	object_init_ex(&relation, phalcon_mvc_model_relation_ce);
-	PHALCON_CALL_METHOD(NULL, &relation, "__construct", &type, referenced_model, fields, referenced_fields, options);
+	PHALCON_CALL_METHODW(NULL, &relation, "__construct", &type, referenced_model, fields, referenced_fields, options);
 
 	/** 
 	 * Check an alias for the relation
@@ -1502,15 +1502,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsBelongsTo){
 	 * Initialize the model first
 	 */
 	if (!phalcon_array_isset(initialized, entity_name)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "load", model_name);
+		PHALCON_CALL_METHODW(NULL, getThis(), "load", model_name);
 	}
 
 	belongs_to = phalcon_read_property(getThis(), SL("_belongsTo"), PH_NOISY);
 	if (phalcon_array_isset(belongs_to, key_relation)) {
-		RETURN_MM_TRUE;
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**
@@ -2243,8 +2243,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneAndHasMany){
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
-	PHALCON_CALL_METHOD(&has_one, getThis(), "gethasone", model);
-	PHALCON_CALL_METHOD(&has_many, getThis(), "gethasmany", model);
+	PHALCON_CALL_METHODW(&has_one, getThis(), "gethasone", model);
+	PHALCON_CALL_METHODW(&has_many, getThis(), "gethasmany", model);
 	phalcon_fast_array_merge(return_value, &has_one, &has_many);
 }
 

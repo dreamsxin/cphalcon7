@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		if (Z_TYPE(meta_data) != IS_ARRAY) { 
 			array_init(&meta_data);
 		}
-	
+
 		if (!phalcon_array_isset(&meta_data, key)) {
 			PHALCON_CONCAT_SV(&prefix_key, "meta-", key);
 
@@ -950,7 +950,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getIdentityField){
 
 	ZVAL_LONG(&index, 8);
 
-	PHALCON_CALL_METHOD(return_value, getThis(), "readmetadataindex", model, &index);
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
 }
 
 /**

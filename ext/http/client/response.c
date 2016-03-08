@@ -89,27 +89,22 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Response){
 
 PHP_METHOD(Phalcon_Http_Client_Response, __construct){
 
-	zval *header, *headers = NULL, *body = NULL;
+	zval *headers = NULL, *body = NULL, header;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 0, 2, &headers, &body);
 
-	phalcon_fetch_params(1, 0, 2, &headers, &body);
+	object_init_ex(&header, phalcon_http_client_header_ce);
+	PHALCON_CALL_METHODW(NULL, &header, "__construct");
 
-	PHALCON_INIT_VAR(header);
-	object_init_ex(header, phalcon_http_client_header_ce);
-	PHALCON_CALL_METHOD(NULL, header, "__construct");
-
-	phalcon_update_property_this(getThis(), SL("_header"), header);
+	phalcon_update_property_this(getThis(), SL("_header"), &header);
 
 	if (headers) {
-		PHALCON_CALL_SELF(NULL, "setheader", headers);
+		PHALCON_CALL_SELFW(NULL, "setheader", headers);
 	}
 
 	if (body) {
-		PHALCON_CALL_SELF(NULL, "setbody", body);
+		PHALCON_CALL_SELFW(NULL, "setbody", body);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, setHeader){
@@ -166,4 +161,3 @@ PHP_METHOD(Phalcon_Http_Client_Response, getStatusCode){
 
 	PHALCON_RETURN_CALL_METHODW(header, "getstatuscode");
 }
-

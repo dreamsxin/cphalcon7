@@ -100,12 +100,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 	phalcon_fetch_params(0, 1, 0, &options);
 
 	PHALCON_CPY_WRT_CTOR(&backend_options, options);
-	
+
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
-	
+
 	if (!phalcon_array_isset_str(options, SL("mongo"))) {
 		if (!phalcon_array_isset_str(options, SL("server"))) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The parameter 'server' is required");
@@ -164,17 +164,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, read){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 1, 0, &key);
-	
+
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
 
 	if (Z_TYPE_P(mongo) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHOD(mongo, "get", key, lifetime);
+		PHALCON_RETURN_CALL_METHODW(mongo, "get", key, lifetime);
 
-		RETURN_MM();
+		return;
 	}
-	
-	RETURN_MM_NULL();
+
+	RETURN_NULL();
 }
 
 /**
@@ -190,14 +190,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, write){
 	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(1, 2, 0, &key, &data);
-	
+
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
 
 	if (Z_TYPE_P(mongo) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, mongo, "save", key, data, lifetime);	
+		PHALCON_CALL_METHODW(NULL, mongo, "save", key, data, lifetime);	
 	}
-	
+
 	PHALCON_MM_RESTORE();
 }
 
@@ -210,10 +210,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, reset)
 	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
 
 	if (Z_TYPE_P(mongo) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, mongo, "flush");	
+		PHALCON_CALL_METHODW(NULL, mongo, "flush");	
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_mongo_ce, getThis(), "reset");
+	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_mongo_ce, getThis(), "reset");
 
 	PHALCON_MM_RESTORE();
 }

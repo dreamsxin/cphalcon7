@@ -118,18 +118,14 @@ PHP_METHOD(Phalcon_Cache_Backend_File, __construct){
 
 	zval *frontend, *options = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &frontend, &options);
+	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 
 	if (!options || !phalcon_array_isset_str(options, SL("cacheDir"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory must be specified with the option cacheDir");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Cache directory must be specified with the option cacheDir");
 		return;
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_file_ce, getThis(), "__construct", frontend, options);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_PARENTW(NULL, phalcon_cache_backend_file_ce, getThis(), "__construct", frontend, options);
 }
 
 /**
@@ -248,7 +244,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 	}
 
 	if (!zend_is_true(&last_key)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache must be started first");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The cache must be started first");
 		return;
 	}
 

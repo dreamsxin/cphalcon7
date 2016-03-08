@@ -87,28 +87,26 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
 
 	zval *identifier, domain, name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &identifier);
+	phalcon_fetch_params(0, 1, 0, &identifier);
 
 	if (Z_TYPE_P(identifier) == IS_ARRAY) { 
 		phalcon_array_fetch_long(&domain, identifier, 0, PH_NOISY);
 		phalcon_array_fetch_long(&name, identifier, 1, PH_NOISY);
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CONCAT_SVSVS(return_value, "`", &domain, "`.`", &name, "`");
-			RETURN_MM();
+			return;
 		}
 
 		PHALCON_CONCAT_VSV(return_value, &domain, ".", &name);
 
-		RETURN_MM();
+		return;
 	}
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CONCAT_SVS(return_value, "`", identifier, "`");
-		RETURN_MM();
+		return;
 	}
 
-	RETURN_CTOR(identifier);
+	RETURN_CTORW(identifier);
 }
 
 /**
@@ -124,12 +122,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 
-	zval *table, *schema = NULL, *dialect, sql, fetch_num;
-	zval describe, columns, size_pattern, *field = NULL, old_column;
+	zval *table, *schema = NULL, *dialect, sql, fetch_num, describe, columns, size_pattern, *field, old_column;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &table, &schema);
+	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
 	if (!schema) {
 		schema = &PHALCON_GLOBAL(z_null);
@@ -140,7 +135,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	/** 
 	 * Get the SQL to describe a table
 	 */
-	PHALCON_CALL_METHOD(&sql, dialect, "describecolumns", table, schema);
+	PHALCON_CALL_METHODW(&sql, dialect, "describecolumns", table, schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
@@ -150,7 +145,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	/** 
 	 * Get the describe
 	 */
-	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	PHALCON_CALL_METHODW(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
 	array_init(&columns);
 
@@ -178,7 +173,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		 */
 		if (phalcon_memnstr_str(&column_type, SL("("))) {
 
-			RETURN_MM_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches));
+			RETURN_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches));
 
 			if (zend_is_true(&pos)) {
 				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1)) {
@@ -417,12 +412,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		 * Every route is stored as a Phalcon\Db\Column
 		 */
 		object_init_ex(&column, phalcon_db_column_ce);
-		PHALCON_CALL_METHOD(NULL, &column, "__construct", &column_name, &definition);
+		PHALCON_CALL_METHODW(NULL, &column, "__construct", &column_name, &definition);
 
 		phalcon_array_append(&columns, &column, PH_COPY);
 
 		PHALCON_CPY_WRT_CTOR(&old_column, &column_name);
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(&columns);
+	RETURN_CTORW(&columns);
 }

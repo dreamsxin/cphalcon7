@@ -157,9 +157,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
 
 	zval *collection, *cursor, row_count;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &collection, &cursor);
+	phalcon_fetch_params(0, 2, 0, &collection, &cursor);
 
 	phalcon_update_property_this(getThis(), SL("_collection"), collection);
 	phalcon_update_property_this(getThis(), SL("_cursor"), cursor);
@@ -170,8 +168,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
 	PHALCON_CALL_METHODW(&row_count, cursor, "count", &PHALCON_GLOBAL(z_true));
 
 	phalcon_update_property_this(getThis(), SL("_count"), &row_count);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -182,8 +178,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 
 	zval *rows, *cursor = NULL, row, *collection, active_row;
-
-	PHALCON_MM_GROW();
 
 	rows = phalcon_read_property(getThis(), SL("_rows"), PH_NOISY);
 	if (Z_TYPE_P(rows) == IS_NULL) {
@@ -212,7 +206,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 
 	collection = phalcon_read_property(getThis(), SL("_collection"), PH_NOISY);
 
-	PHALCON_CALL_CE_STATIC(&active_row, phalcon_mvc_collection_ce, "cloneresult", collection, &row);
+	PHALCON_CALL_CE_STATICW(&active_row, phalcon_mvc_collection_ce, "cloneresult", collection, &row);
 
 	phalcon_update_property_this(getThis(), SL("_activeRow"), &active_row);
 	RETURN_TRUE;
@@ -230,9 +224,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, toArray){
 
 	zval *rename_columns = NULL, records, valid, current, arr ;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &rename_columns);
+	phalcon_fetch_params(0, 0, 1, &rename_columns);
 
 	if (!rename_columns) {
 		rename_columns = &PHALCON_GLOBAL(z_true);
@@ -337,8 +329,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
 
 	zval *z_zero, *cursor, *active_row, *rows;
 
-	PHALCON_MM_GROW();
-
 	z_zero = &PHALCON_GLOBAL(z_zero);
 
 	rows = phalcon_read_property(getThis(), SL("_rows"), PH_NOISY);
@@ -356,8 +346,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
 	}
 
 	phalcon_update_property_this(getThis(), SL("_pointer"), z_zero);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -367,15 +355,11 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
 
-	zval *position, *rows, *cursor, *pointer, *is_different;
+	zval *position, *rows, *cursor, *pointer, is_different;
 	HashTable *ah0;
 	long i;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &position) == FAILURE) {
-		RETURN_NULL();
-	}
-
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &position);
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "rewind");
 
@@ -383,9 +367,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
 
 	pointer = phalcon_read_property(getThis(), SL("_pointer"), PH_NOISY);
 
-	PHALCON_INIT_VAR(is_different);
-	is_not_equal_function(is_different, pointer, position);
-	if (PHALCON_IS_TRUE(is_different)) {
+	is_not_equal_function(&is_different, pointer, position);
+	if (PHALCON_IS_TRUE(&is_different)) {
 		phalcon_update_property_zval(getThis(), SL("_pointer"), position);
 		rows = phalcon_read_property(getThis(), SL("_rows"), PH_NOISY);
 		if (Z_TYPE_P(rows) == IS_NULL) {
@@ -410,8 +393,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
 			}
 		}
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -472,9 +453,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetGet){
 
 	zval *index, count, *pointer, valid;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &index);
+	phalcon_fetch_params(0, 1, 0, &index);
 
 	PHALCON_CALL_METHODW(&count, getThis(), "count");
 	if (PHALCON_LT(index, &count)) {
@@ -546,8 +525,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetUnset){
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, getFirst){
 
 	zval *pointer, valid;
-
-	PHALCON_MM_GROW();
 
 	/** 
 	 * Check if the last record returned is the current requested
@@ -627,9 +604,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 
 	zval *condition_callback = NULL, transaction, connection, parameters;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &condition_callback);
+	phalcon_fetch_params(0, 0, 1, &condition_callback);
 
 	if (!condition_callback) {
 		condition_callback = &PHALCON_GLOBAL(z_null);
@@ -727,9 +702,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, filter){
 
 	zval *filter, records, parameters;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &filter);
+	phalcon_fetch_params(0, 1, 0, &filter);
 
 	array_init(&records);
 	array_init_size(&parameters, 1);
@@ -774,9 +747,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 
 	zval *data, *condition_callback = NULL, transaction, connection, parameters;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &data, &condition_callback);
+	phalcon_fetch_params(0, 1, 1, &data, &condition_callback);
 
 	if (!condition_callback) {
 		condition_callback = &PHALCON_GLOBAL(z_null);

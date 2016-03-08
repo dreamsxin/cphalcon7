@@ -1352,7 +1352,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
 	}
 

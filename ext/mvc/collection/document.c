@@ -116,16 +116,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, offsetGet){
 
 	zval *index, *value;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &index);
+	phalcon_fetch_params(0, 1, 0, &index);
 
 	if (phalcon_isset_property_zval(getThis(), index)) {
 		value = phalcon_read_property_zval(getThis(), index, PH_NOISY);
 		RETURN_CTORW(value);
 	}
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "The index does not exist in the row");
-	return;
 }
 
 /**
@@ -173,14 +170,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_Document, readAttribute){
 
 	zval *attribute, *attribute_value;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &attribute);
+	phalcon_fetch_params(0, 1, 0, &attribute);
 
 	if (phalcon_isset_property_zval(getThis(), attribute)) {
 		attribute_value = phalcon_read_property_zval(getThis(), attribute, PH_NOISY);
 		RETURN_CTORW(attribute_value);
 	}
+
 	RETURN_NULL();
 }
 

@@ -112,9 +112,7 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 
 	zval *sql_statement, *sql_variables = NULL, *sql_bindtypes = NULL, active_profile, time;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &sql_statement, &sql_variables, &sql_bindtypes);
+	phalcon_fetch_params(0, 1, 2, &sql_statement, &sql_variables, &sql_bindtypes);
 
 	object_init_ex(&active_profile, phalcon_db_profiler_item_ce);
 	PHALCON_CALL_METHODW(NULL, &active_profile, "setsqlstatement", sql_statement);
@@ -146,10 +144,7 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
  */
 PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 
-	zval *active_profile, final_time, initial_time;
-	zval difference, *total_seconds, new_total_seconds;
-
-	PHALCON_MM_GROW();
+	zval *active_profile, final_time, initial_time, difference, *total_seconds, new_total_seconds;
 
 	active_profile = phalcon_read_property(getThis(), SL("_activeProfile"), PH_NOISY);
 

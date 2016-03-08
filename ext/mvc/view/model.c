@@ -579,7 +579,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	phalcon_return_property(&view, getThis(), SL("_view"));
 
 	if (Z_TYPE(view) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 
 		ZVAL_STRING(&service, "view");
 

@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, destroy){
 
 	zval *_sid, sid, *libmemcached;
 
-	phalcon_fetch_params(1, 0, 1, &_sid);
+	phalcon_fetch_params(0, 0, 1, &_sid);
 
 	if (!_sid) {
 		PHALCON_CALL_SELFW(&sid, "getid");

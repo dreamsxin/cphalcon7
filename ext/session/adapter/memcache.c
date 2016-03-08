@@ -204,7 +204,6 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 	phalcon_array_append_string(&callable_gc, SL("gc"), 0);
 
 	PHALCON_CALL_FUNCTIONW(NULL, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
-
 	PHALCON_CALL_PARENTW(NULL, phalcon_session_adapter_memcache_ce, getThis(), "__construct", options);
 }
 
@@ -258,7 +257,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, write){
 
 	zval *sid, *data, *lifetime, *memcache;
 
-	phalcon_fetch_params(1, 2, 0, &sid, &data);
+	phalcon_fetch_params(0, 2, 0, &sid, &data);
 
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
@@ -277,8 +276,6 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, write){
 PHP_METHOD(Phalcon_Session_Adapter_Memcache, destroy){
 
 	zval *_sid = NULL, sid, *memcache;
-
-	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(0, 0, 1, &_sid);
 

@@ -156,8 +156,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Column){
  */
 PHP_METHOD(Phalcon_Db_Column, __construct){
 
-	zval *column_name, *definition, type, not_null;
-	zval primary, size, bytes, scale, dunsigned, is_numeric;
+	zval *column_name, *definition, type, not_null, primary, size, bytes, scale, dunsigned, is_numeric;
 	zval auto_increment, first, after, bind_type, default_value;
 
 	phalcon_fetch_params(0, 2, 0, &column_name, &definition);
@@ -437,13 +436,9 @@ PHP_METHOD(Phalcon_Db_Column, getDefaultValue){
  */
 PHP_METHOD(Phalcon_Db_Column, __set_state){
 
-	zval *data, definition, column_name, column_type;
-	zval not_null, primary, size, bytes, scale, dunsigned, after;
-	zval is_numeric, first, bind_type, default_value;
+	zval *data, definition, column_name, column_type, not_null, primary, size, bytes, scale, dunsigned, after, is_numeric, first, bind_type, default_value;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &data);
+	phalcon_fetch_params(0, 1, 0, &data);
 
 	if (Z_TYPE_P(data) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column state must be an array");
@@ -508,6 +503,4 @@ PHP_METHOD(Phalcon_Db_Column, __set_state){
 
 	object_init_ex(return_value, phalcon_db_column_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &column_name, &definition);
-
-	return;
 }

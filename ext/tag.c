@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Tag, getUrlService){
 	if (Z_TYPE(url) != IS_OBJECT) {
 		phalcon_return_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"));
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+			PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 		}
 
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -482,7 +482,7 @@ PHP_METHOD(Phalcon_Tag, getEscaperService){
 	if (Z_TYPE(escaper) != IS_OBJECT) {
 		phalcon_return_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"));
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+			PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 		}
 
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {

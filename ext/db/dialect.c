@@ -142,19 +142,17 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect){
  */
 PHP_METHOD(Phalcon_Db_Dialect, limit){
 
-	zval *sql_query, *number, *limit;
+	zval *sql_query, *number, limit;
 
-	phalcon_fetch_params(1, 2, 0, &sql_query, &number);
+	phalcon_fetch_params(0, 2, 0, &sql_query, &number);
 
 	if (phalcon_is_numeric(number)) {
-		PHALCON_MM_GROW();
-		PHALCON_INIT_VAR(limit);
-		ZVAL_LONG(limit, phalcon_get_intval(number));
-		PHALCON_CONCAT_VSV(return_value, sql_query, " LIMIT ", limit);
+		ZVAL_LONG(&limit, phalcon_get_intval(number));
+		PHALCON_CONCAT_VSV(return_value, sql_query, " LIMIT ", &limit);
 		return;
 	}
 
-	RETURN_ZVAL(sql_query, 1, 0);
+	RETURN_CTORW(sql_query);
 }
 
 /**
@@ -175,7 +173,6 @@ PHP_METHOD(Phalcon_Db_Dialect, forUpdate){
 	phalcon_fetch_params(0, 1, 0, &sql_query);
 
 	PHALCON_CONCAT_VS(return_value, sql_query, " FOR UPDATE");
-	return;
 }
 
 /**
@@ -196,7 +193,6 @@ PHP_METHOD(Phalcon_Db_Dialect, sharedLock){
 	phalcon_fetch_params(0, 1, 0, &sql_query);
 
 	PHALCON_CONCAT_VS(return_value, sql_query, " LOCK IN SHARE MODE");
-	return;
 }
 
 /**
@@ -211,26 +207,21 @@ PHP_METHOD(Phalcon_Db_Dialect, sharedLock){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getColumnList){
 
-	zval *column_list, *str_list, *escape_char, *column = NULL;
-	zval *column_quoted = NULL;
+	zval *column_list, str_list, *escape_char, *column;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &column_list);
 
-	phalcon_fetch_params(1, 1, 0, &column_list);
-
-	PHALCON_INIT_VAR(str_list);
-	array_init(str_list);
+	array_init(&str_list);
 
 	escape_char = phalcon_read_property(getThis(), SL("_escapeChar"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(column_list), column) {
-		PHALCON_INIT_NVAR(column_quoted);
-		PHALCON_CONCAT_VVV(column_quoted, escape_char, column, escape_char);
-		phalcon_array_append(str_list, column_quoted, PH_COPY);
+		zval column_quoted;
+		PHALCON_CONCAT_VVV(&column_quoted, escape_char, column, escape_char);
+		phalcon_array_append(&str_list, &column_quoted, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_fast_join_str(return_value, SL(", "), str_list);
-	return;
+	phalcon_fast_join_str(return_value, SL(", "), &str_list);
 }
 
 /**
@@ -251,16 +242,11 @@ PHP_METHOD(Phalcon_Db_Dialect, getEscapeChar){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 
-	zval *expression, *escape_char = NULL, *quoting = NULL, type, name, escaped_name;
-	zval domain, value, expression_value, operator;
-	zval times, placeholders, left, right, expression_left, expression_right;
-	zval sql_items, items, *item;
-	zval list_expression, exception_message;
+	zval *expression, *escape_char = NULL, *quoting = NULL, type, name, escaped_name,  domain, value, expression_value, operator;
+	zval times, placeholders, left, right, expression_left, expression_right, sql_items, items, *item, list_expression, exception_message;
 	int t, i;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &expression, &escape_char, &quoting);
+	phalcon_fetch_params(0, 1, 2, &expression, &escape_char, &quoting);
 
 	if (Z_TYPE_P(expression) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SQL expression");
@@ -496,7 +482,6 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 */
 	PHALCON_CONCAT_SVS(&exception_message, "Invalid SQL expression type '", &type, "'");
 	PHALCON_THROW_EXCEPTION_ZVALW(phalcon_db_exception_ce, &exception_message);
-	return;
 }
 
 /**
@@ -508,14 +493,10 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 
 	zval *expression, *escape_char = NULL, expr, expr_tmp, clauses, *clause;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &expression, &escape_char);
+	phalcon_fetch_params(0, 1, 1, &expression, &escape_char);
 
 	if (!escape_char) {
-		PHALCON_INIT_VAR(escape_char);
-	} else {
-		PHALCON_SEPARATE_PARAM(escape_char);
+		escape_char = &PHALCON_GLOBAL(z_null);
 	}
 
 	ZVAL_STRING(return_value, "CASE ");
@@ -550,8 +531,6 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_SCONCAT_STR(return_value, " END");
-
-	return;
 }
 
 /**
@@ -609,12 +588,9 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 
-	zval *table, *escape_char = NULL, table_name, sql_table;
-	zval schema_name, sql_schema, alias_name, sql_table_alias;
+	zval *table, *escape_char = NULL, table_name, sql_table, schema_name, sql_schema, alias_name, sql_table_alias;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &table, &escape_char);
+	phalcon_fetch_params(0, 1, 1, &table, &escape_char);
 
 	if (!escape_char || Z_TYPE_P(escape_char) == IS_NULL) {
 		escape_char = phalcon_read_property(getThis(), SL("_escapeChar"), PH_NOISY);
@@ -677,18 +653,12 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect, select){
 
-	zval *definition, escape_char, columns, selected_columns, distinct;
-	zval *column = NULL, columns_sql, tables, selected_tables, *table;
-	zval tables_sql, sql, joins;
-	zval *join = NULL, where_conditions;
-	zval where_expression, group_items, group_fields;
-	zval *group_field = NULL, group_sql, group_clause, having_conditions, having_expression;
-	zval order_fields, order_items, *order_item = NULL;
+	zval *definition, escape_char, columns, selected_columns, distinct, *column, columns_sql, tables, selected_tables, *table;
+	zval tables_sql, sql, joins, *join = NULL, where_conditions, where_expression, group_items, group_fields;
+	zval *group_field = NULL, group_sql, group_clause, having_conditions, having_expression, order_fields, order_items, *order_item;
 	zval order_sql, tmp1, tmp2, limit_value, number, offset;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &definition);
+	phalcon_fetch_params(0, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SELECT definition");
@@ -943,22 +913,17 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	RETURN_CTORW(&sql);
 }
 
-
-
 /**
  * Builds a INSERT statement
  *
  * @param array $definition
  * @return string
  */
-PHP_METHOD(Phalcon_Db_Dialect, insert){
-	zval *definition, table, fields, values, exception_message;
-	zval escaped_table, escape_char, joined_values, escaped_fields;
-	zval *field = NULL, joined_fields;
+PHP_METHOD(Phalcon_Db_Dialect, insert)
+{
+	zval *definition, table, fields, values, exception_message, escaped_table, escape_char, joined_values, escaped_fields, *field, joined_fields;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &definition);
+	phalcon_fetch_params(0, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid INSERT definition");
@@ -994,7 +959,6 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 	}
 
 	PHALCON_CALL_METHODW(&escaped_table, getThis(), "getsqltable", &table);
-
 	PHALCON_CALL_METHODW(&escape_char, getThis(), "getescapechar");
 
 	/**
@@ -1022,8 +986,6 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 	} else {
 		PHALCON_CONCAT_SVSVS(return_value, "INSERT INTO ", &escaped_table, " VALUES (", &joined_values, ")");
 	}
-
-	return;
 }
 
 /**
@@ -1034,18 +996,13 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
  */
 PHP_METHOD(Phalcon_Db_Dialect, update){
 
-	zval *definition, *quoting = NULL, tables, fields, values, escape_char;
-	zval updated_tables, *table, tables_sql, sql;
-	zval updated_fields, *column, columns_sql;
-	zval where_conditions, where_expression;
-	zval order_fields, order_items, *order_item, order_sql;
-	zval limit_value, number, offset, tmp1, tmp2;
+	zval *definition, *quoting = NULL, tables, fields, values, escape_char, updated_tables, *table, tables_sql, sql;
+	zval updated_fields, *column, columns_sql, where_conditions, where_expression;
+	zval order_fields, order_items, *order_item, order_sql, limit_value, number, offset, tmp1, tmp2;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &definition, &quoting);
+	phalcon_fetch_params(0, 1, 1, &definition, &quoting);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid Update definition");
@@ -1190,15 +1147,10 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
  */
 PHP_METHOD(Phalcon_Db_Dialect, delete){
 
-	zval *definition, tables, escape_char;
-	zval updated_tables, *table = NULL, tables_sql, sql;
-	zval where_conditions, where_expression;
-	zval order_fields, order_items, *order_item, order_sql;
-	zval limit_value, number, offset, tmp1, tmp2;
+	zval *definition, tables, escape_char, updated_tables, *table, tables_sql, sql, where_conditions, where_expression;
+	zval order_fields, order_items, *order_item, order_sql, limit_value, number, offset, tmp1, tmp2;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &definition);
+	phalcon_fetch_params(0, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid Update definition");

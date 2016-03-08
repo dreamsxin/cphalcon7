@@ -93,9 +93,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 
 	zval *options = NULL, service, lifetime;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &options);
+	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) != IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&service, options, SL("service"))) {
@@ -108,8 +106,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 	}
 
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
-
-	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){

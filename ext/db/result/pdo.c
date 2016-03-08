@@ -111,8 +111,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Result_Pdo){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, __construct){
 
-	zval *connection, *result, *sql_statement = NULL, *bind_params = NULL;
-	zval *bind_types = NULL;
+	zval *connection, *result, *sql_statement = NULL, *bind_params = NULL, *bind_types = NULL;
 
 	phalcon_fetch_params(0, 2, 3, &connection, &result, &sql_statement, &bind_params, &bind_types);
 
@@ -157,11 +156,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, execute){
 
 	zval *pdo_statement;
 
-	PHALCON_MM_GROW();
-
 	pdo_statement = phalcon_read_property(getThis(), SL("_pdoStatement"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(pdo_statement, "execute");
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -182,11 +178,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetch){
 
 	zval *pdo_statement;
 
-	PHALCON_MM_GROW();
-
 	pdo_statement = phalcon_read_property(getThis(), SL("_pdoStatement"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(pdo_statement, "fetch");
-	return;
 }
 
 /**
@@ -207,11 +200,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchArray){
 
 	zval *pdo_statement;
 
-	PHALCON_MM_GROW();
-
 	pdo_statement = phalcon_read_property(getThis(), SL("_pdoStatement"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(pdo_statement, "fetch");
-	return;
 }
 
 /**
@@ -232,9 +222,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
 
 	zval *pdo_statement, *fetch_mode = NULL, *fetch_argument = NULL, *ctor_args = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 3, &fetch_mode, &fetch_argument, &ctor_args);
+	phalcon_fetch_params(0, 0, 3, &fetch_mode, &fetch_argument, &ctor_args);
 
 	if (!fetch_mode) {
 		fetch_mode = &PHALCON_GLOBAL(z_null);
@@ -263,7 +251,6 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
 	} else {
 		PHALCON_RETURN_CALL_METHODW(pdo_statement, "fetchall");
 	}
-	return;
 }
 
 /**
@@ -278,12 +265,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 
-	zval row_count, *connection, type, *pdo_statement = NULL;
-	zval *sql_statement, *bind_params, *bind_types;
-	zval matches, pattern, match, else_clauses;
-	zval sql, result, row;
-
-	PHALCON_MM_GROW();
+	zval row_count, *connection, type, *pdo_statement = NULL, *sql_statement, *bind_params, *bind_types;
+	zval matches, pattern, match, else_clauses, sql, result, row;
 
 	phalcon_return_property(&row_count, getThis(), SL("_rowCount"));
 
@@ -358,17 +341,13 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
-	long number = 0, n;
-	zval *connection, pdo, *sql_statement;
-	zval *bind_params, *bind_types, statement, temp_statement;
+	zval *num, *connection, pdo, *sql_statement, *bind_params, *bind_types, statement, temp_statement;
 	pdo_stmt_t *stmt;
+	long number = 0, n;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &num);
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "l", &number) == FAILURE) {
-		RETURN_NULL();
-	}
-
+	number = phalcon_get_intval(num);
 	connection = phalcon_read_property(getThis(), SL("_connection"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&pdo, connection, "getinternalhandler");
@@ -414,8 +393,6 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
 		n++;
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -439,14 +416,11 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, setFetchMode){
 
-	zval *fetch_mode, *fetch_arg1 = NULL, *fetch_arg2 = NULL;
-	zval *pdo_statement;
+	zval *fetch_mode, *fetch_arg1 = NULL, *fetch_arg2 = NULL, *pdo_statement;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &fetch_mode, &fetch_arg1, &fetch_arg2);
-
+	phalcon_fetch_params(0, 1, 2, &fetch_mode, &fetch_arg1, &fetch_arg2);
 	PHALCON_SEPARATE_PARAM(fetch_mode);
+
 	if (Z_TYPE_P(fetch_mode) != IS_LONG) {
 		convert_to_long(fetch_mode);
 	}
@@ -490,10 +464,6 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, nextRowset){
 
 	zval *pdo_statement;
 
-	PHALCON_MM_GROW();
-
 	pdo_statement = phalcon_read_property(getThis(), SL("_pdoStatement"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(pdo_statement, "nextrowset");
-
-	return;
 }

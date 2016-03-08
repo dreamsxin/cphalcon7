@@ -88,9 +88,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, __construct){
 
 	zval *name, *options = NULL, *attributes = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &name, &options, &attributes);
+	phalcon_fetch_params(0, 1, 2, &name, &options, &attributes);
 
 	if (!options) {
 		options = &PHALCON_GLOBAL(z_null);
@@ -103,8 +101,6 @@ PHP_METHOD(Phalcon_Forms_Element_Select, __construct){
 	phalcon_update_property_this(getThis(), SL("_optionsValues"), options);
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_forms_element_select_ce, getThis(), "__construct", name, attributes);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

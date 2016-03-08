@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	 * We use a default DI if the user doesn't define one
 	 */
 	if (!dependency_injector || Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault");
+		PHALCON_CALL_CE_STATICW(&di, phalcon_di_ce, "getdefault");
 	} else {
 		PHALCON_CPY_WRT(&di, dependency_injector);
 	}

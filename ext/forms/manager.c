@@ -147,11 +147,9 @@ PHP_METHOD(Phalcon_Forms_Manager, __construct)
  */
 PHP_METHOD(Phalcon_Forms_Manager, create){
 
-	zval *name = NULL, *entity = NULL, *form;
+	zval *name = NULL, *entity = NULL, form;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 2, &name, &entity);
+	phalcon_fetch_params(0, 0, 2, &name, &entity);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -166,13 +164,12 @@ PHP_METHOD(Phalcon_Forms_Manager, create){
 		return;
 	}
 
-	PHALCON_INIT_VAR(form);
-	object_init_ex(form, phalcon_forms_form_ce);
-	PHALCON_CALL_METHODW(NULL, form, "__construct", entity);
+	object_init_ex(&form, phalcon_forms_form_ce);
+	PHALCON_CALL_METHODW(NULL, &form, "__construct", entity);
 
-	phalcon_update_property_array(getThis(), SL("_forms"), name, form);
+	phalcon_update_property_array(getThis(), SL("_forms"), name, &form);
 
-	RETURN_CTORW(form);
+	RETURN_CTORW(&form);
 }
 
 /**

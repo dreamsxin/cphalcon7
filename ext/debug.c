@@ -585,7 +585,7 @@ PHP_METHOD(Phalcon_Debug, getMajorVersion){
 
 	zval version, parts;
 
-	PHALCON_CALL_CE_STATIC(&version, phalcon_version_ce, "get");
+	PHALCON_CALL_CE_STATICW(&version, phalcon_version_ce, "get");
 
 	phalcon_fast_explode_str(&parts, SL(" "), &version);
 

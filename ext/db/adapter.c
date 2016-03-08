@@ -204,14 +204,10 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter){
  */
 PHP_METHOD(Phalcon_Db_Adapter, __construct){
 
-	zval *descriptor, *connection_consecutive;
-	zval next_consecutive, *dialect_type, dialect_class;
-	zval dialect_object;
+	zval *descriptor, *connection_consecutive, next_consecutive, *dialect_type, dialect_class, dialect_object;
 	zend_class_entry *ce0;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &descriptor);
+	phalcon_fetch_params(0, 1, 0, &descriptor);
 
 	/** 
 	 * Every new connection created obtain a consecutive number from the static
@@ -248,8 +244,6 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	}
 
 	phalcon_update_property_this(getThis(), SL("_descriptor"), descriptor);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -326,12 +320,9 @@ PHP_METHOD(Phalcon_Db_Adapter, getDialect){
  */
 PHP_METHOD(Phalcon_Db_Adapter, fetchOne){
 
-	zval *sql_query, *fetch_mode = NULL, *bind_params = NULL, *bind_types = NULL, *fetch_argument = NULL, *ctor_args = NULL;
-	zval result;
+	zval *sql_query, *fetch_mode = NULL, *bind_params = NULL, *bind_types = NULL, *fetch_argument = NULL, *ctor_args = NULL, result;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 5, &sql_query, &fetch_mode, &bind_params, &bind_types, &fetch_argument, &ctor_args);
+	phalcon_fetch_params(0, 1, 5, &sql_query, &fetch_mode, &bind_params, &bind_types, &fetch_argument, &ctor_args);
 
 	if (!fetch_mode) {
 		PHALCON_INIT_VAR(fetch_mode);
@@ -406,12 +397,9 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchOne){
  */
 PHP_METHOD(Phalcon_Db_Adapter, fetchAll){
 
-	zval *sql_query, *fetch_mode = NULL, *bind_params = NULL, *bind_types = NULL, *fetch_argument = NULL, *ctor_args = NULL;
-	zval result;
+	zval *sql_query, *fetch_mode = NULL, *bind_params = NULL, *bind_types = NULL, *fetch_argument = NULL, *ctor_args = NULL, result;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 5, &sql_query, &fetch_mode, &bind_params, &bind_types, &fetch_argument, &ctor_args);
+	phalcon_fetch_params(0, 1, 5, &sql_query, &fetch_mode, &bind_params, &bind_types, &fetch_argument, &ctor_args);
 
 	if (!fetch_mode) {
 		PHALCON_INIT_VAR(fetch_mode);
@@ -451,8 +439,6 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchAll){
 			PHALCON_RETURN_CALL_METHODW(&result, "fetchall");
 		}
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -478,16 +464,12 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchAll){
  */
 PHP_METHOD(Phalcon_Db_Adapter, insert){
 
-	zval *table, *values, *fields = NULL, *data_types = NULL, exception_message;
-	zval placeholders, insert_values, bind_data_types, *value;
-	zval escaped_table, joined_values, escaped_fields;
-	zval *field = NULL, joined_fields, insert_sql;
+	zval *table, *values, *fields = NULL, *data_types = NULL, exception_message,placeholders, insert_values, bind_data_types, *value;
+	zval escaped_table, joined_values, escaped_fields, *field, joined_fields, insert_sql;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 2, &table, &values, &fields, &data_types);
+	phalcon_fetch_params(0, 2, 2, &table, &values, &fields, &data_types);
 
 	if (!fields) {
 		fields = &PHALCON_GLOBAL(z_null);
@@ -587,7 +569,6 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	 * Perform the execution via execute
 	 */
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &insert_sql, &insert_values, &bind_data_types);
-	return;
 }
 
 /**
@@ -619,9 +600,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insertAsDict){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 1, &table, &data, &data_types);
+	phalcon_fetch_params(0, 2, 1, &table, &data, &data_types);
 
 	if (!data_types) {
 		data_types = &PHALCON_GLOBAL(z_null);
@@ -649,7 +628,6 @@ PHP_METHOD(Phalcon_Db_Adapter, insertAsDict){
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "insert", table, values, fields, data_types);
-	return;
 }
 
 /**
@@ -677,15 +655,12 @@ PHP_METHOD(Phalcon_Db_Adapter, insertAsDict){
  */
 PHP_METHOD(Phalcon_Db_Adapter, update){
 
-	zval *table, *fields, *values, *where_condition = NULL;
-	zval *data_types = NULL, placeholders, update_values, bind_data_types, *value = NULL;
+	zval *table, *fields, *values, *where_condition = NULL, *data_types = NULL, placeholders, update_values, bind_data_types, *value;
 	zval escaped_table, set_clause, update_sql, conditions, where_bind, where_types;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 2, &table, &fields, &values, &where_condition, &data_types);
+	phalcon_fetch_params(0, 3, 2, &table, &fields, &values, &where_condition, &data_types);
 
 	if (!where_condition) {
 		where_condition = &PHALCON_GLOBAL(z_null);
@@ -803,7 +778,6 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 	 * Perform the update via execute
 	 */
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &update_sql, &update_values, &bind_data_types);
-	return;
 }
 
 /**
@@ -828,12 +802,9 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
  */
 PHP_METHOD(Phalcon_Db_Adapter, delete){
 
-	zval *table, *where_condition = NULL, *placeholders = NULL;
-	zval *data_types = NULL, escaped_table, sql;
+	zval *table, *where_condition = NULL, *placeholders = NULL, *data_types = NULL, escaped_table, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 3, &table, &where_condition, &placeholders, &data_types);
+	phalcon_fetch_params(0, 1, 3, &table, &where_condition, &placeholders, &data_types);
 
 	if (!where_condition) {
 		where_condition = &PHALCON_GLOBAL(z_null);
@@ -863,7 +834,6 @@ PHP_METHOD(Phalcon_Db_Adapter, delete){
 	 * Perform the update via execute
 	 */
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql, placeholders, data_types);
-	return;
 }
 
 /**
@@ -876,13 +846,10 @@ PHP_METHOD(Phalcon_Db_Adapter, getColumnList){
 
 	zval *column_list, *dialect;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &column_list);
+	phalcon_fetch_params(0, 1, 0, &column_list);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(dialect, "getcolumnlist", column_list);
-	return;
 }
 
 /**
@@ -900,13 +867,10 @@ PHP_METHOD(Phalcon_Db_Adapter, limit){
 
 	zval *sql_query, *number, *dialect;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &sql_query, &number);
+	phalcon_fetch_params(0, 2, 0, &sql_query, &number);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(dialect, "limit", sql_query, number);
-	return;
 }
 
 /**
@@ -924,9 +888,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 
 	zval *table_name, *schema_name = NULL, *dialect, sql, fetch_num, num, first;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &table_name, &schema_name);
+	phalcon_fetch_params(0, 1, 1, &table_name, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -959,9 +921,7 @@ PHP_METHOD(Phalcon_Db_Adapter, viewExists){
 
 	zval *view_name, *schema_name = NULL, *dialect, sql, fetch_num, num, first;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &view_name, &schema_name);
+	phalcon_fetch_params(0, 1, 1, &view_name, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -989,13 +949,10 @@ PHP_METHOD(Phalcon_Db_Adapter, forUpdate){
 
 	zval *sql_query, *dialect;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &sql_query);
+	phalcon_fetch_params(0, 1, 0, &sql_query);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(dialect, "forupdate", sql_query);
-	return;
 }
 
 /**
@@ -1008,13 +965,10 @@ PHP_METHOD(Phalcon_Db_Adapter, sharedLock){
 
 	zval *sql_query, *dialect;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &sql_query);
+	phalcon_fetch_params(0, 1, 0, &sql_query);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(dialect, "sharedlock", sql_query);
-	return;
 }
 
 /**
@@ -1027,12 +981,9 @@ PHP_METHOD(Phalcon_Db_Adapter, sharedLock){
  */
 PHP_METHOD(Phalcon_Db_Adapter, createTable){
 
-	zval *table_name, *schema_name, *definition;
-	zval exception_message, columns, *dialect, sql;
+	zval *table_name, *schema_name, *definition, exception_message, columns, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &definition);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) {
 		PHALCON_CONCAT_SVS(&exception_message, "Invalid definition to create the table '", table_name, "'");
@@ -1054,7 +1005,6 @@ PHP_METHOD(Phalcon_Db_Adapter, createTable){
 
 	PHALCON_CALL_METHODW(&sql, dialect, "createtable", table_name, schema_name, definition);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1069,9 +1019,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropTable){
 
 	zval *table_name, *schema_name = NULL, *if_exists = NULL, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &table_name, &schema_name, &if_exists);
+	phalcon_fetch_params(0, 1, 2, &table_name, &schema_name, &if_exists);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -1085,7 +1033,6 @@ PHP_METHOD(Phalcon_Db_Adapter, dropTable){
 
 	PHALCON_CALL_METHODW(&sql, dialect, "droptable", table_name, schema_name, if_exists);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1100,9 +1047,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createView){
 
 	zval *view_name, *definition, *schema_name = NULL, exception_message, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 1, &view_name, &definition, &schema_name);
+	phalcon_fetch_params(0, 2, 1, &view_name, &definition, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -1123,7 +1068,6 @@ PHP_METHOD(Phalcon_Db_Adapter, createView){
 
 	PHALCON_CALL_METHODW(&sql, dialect, "createview", view_name, definition, schema_name);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1138,9 +1082,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropView){
 
 	zval *view_name, *schema_name = NULL, *if_exists = NULL, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &view_name, &schema_name, &if_exists);
+	phalcon_fetch_params(0, 1, 2, &view_name, &schema_name, &if_exists);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -1154,7 +1096,6 @@ PHP_METHOD(Phalcon_Db_Adapter, dropView){
 
 	PHALCON_CALL_METHODW(&sql, dialect, "dropview", view_name, schema_name, if_exists);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1169,15 +1110,12 @@ PHP_METHOD(Phalcon_Db_Adapter, addColumn){
 
 	zval *table_name, *schema_name, *column, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &column);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "addcolumn", table_name, schema_name, column);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1192,15 +1130,12 @@ PHP_METHOD(Phalcon_Db_Adapter, modifyColumn){
 
 	zval *table_name, *schema_name, *column, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &column);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "modifycolumn", table_name, schema_name, column);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1215,15 +1150,12 @@ PHP_METHOD(Phalcon_Db_Adapter, dropColumn){
 
 	zval *table_name, *schema_name, *column_name, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &column_name);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column_name);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "dropcolumn", table_name, schema_name, column_name);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1238,15 +1170,12 @@ PHP_METHOD(Phalcon_Db_Adapter, addIndex){
 
 	zval *table_name, *schema_name, *index, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &index);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "addindex", table_name, schema_name, index);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1261,15 +1190,12 @@ PHP_METHOD(Phalcon_Db_Adapter, dropIndex){
 
 	zval *table_name, *schema_name, *index_name, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &index_name);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index_name);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "dropindex", table_name, schema_name, index_name);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1284,15 +1210,12 @@ PHP_METHOD(Phalcon_Db_Adapter, addPrimaryKey){
 
 	zval *table_name, *schema_name, *index, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &index);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "addprimarykey", table_name, schema_name, index);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1306,15 +1229,12 @@ PHP_METHOD(Phalcon_Db_Adapter, dropPrimaryKey){
 
 	zval *table_name, *schema_name, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &table_name, &schema_name);
+	phalcon_fetch_params(0, 2, 0, &table_name, &schema_name);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "dropprimarykey", table_name, schema_name);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1329,15 +1249,12 @@ PHP_METHOD(Phalcon_Db_Adapter, addForeignKey){
 
 	zval *table_name, *schema_name, *reference, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &reference);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &reference);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "addforeignkey", table_name, schema_name, reference);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1352,15 +1269,12 @@ PHP_METHOD(Phalcon_Db_Adapter, dropForeignKey){
 
 	zval *table_name, *schema_name, *reference_name, *dialect, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &table_name, &schema_name, &reference_name);
+	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &reference_name);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(&sql, dialect, "dropforeignkey", table_name, schema_name, reference_name);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1373,13 +1287,10 @@ PHP_METHOD(Phalcon_Db_Adapter, getColumnDefinition){
 
 	zval *column, *dialect;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &column);
+	phalcon_fetch_params(0, 1, 0, &column);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(dialect, "getcolumndefinition", column);
-	return;
 }
 
 /**
@@ -1396,9 +1307,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 
 	zval *schema_name = NULL, *dialect, sql, fetch_num, tables, *table;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &schema_name);
+	phalcon_fetch_params(0, 0, 1, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -1430,8 +1339,6 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -1448,9 +1355,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 
 	zval *schema_name = NULL, *dialect, sql, fetch_num, tables, *table;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &schema_name);
+	phalcon_fetch_params(0, 0, 1, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -1483,8 +1388,6 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -1500,14 +1403,11 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
  */
 PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 
-	zval *table, *schema = NULL, *dialect, fetch_num, sql, describe, *index;
-	zval indexes, *index_columns;
+	zval *table, *schema = NULL, *dialect, fetch_num, sql, describe, *index, indexes, *index_columns;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &table, &schema);
+	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
 	if (!schema) {
 		schema = &PHALCON_GLOBAL(z_null);
@@ -1557,8 +1457,6 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 
 		phalcon_array_update_zval(return_value, &name, &index, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -1574,14 +1472,11 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
  */
 PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
-	zval *table, *schema = NULL, *dialect, fetch_num, sql, empty_arr;
-	zval references, describe, *reference, *array_reference;
+	zval *table, *schema = NULL, *dialect, fetch_num, sql, empty_arr, references, describe, *reference, *array_reference;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &table, &schema);
+	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
 	if (!schema) {
 		schema = &PHALCON_GLOBAL(z_null);
@@ -1655,8 +1550,6 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
 		phalcon_array_update_zval(return_value, &name, &reference, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -1672,12 +1565,9 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
  */
 PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
 
-	zval *table_name, *schema_name = NULL, *dialect, sql;
-	zval fetch_assoc, describe, first;
+	zval *table_name, *schema_name = NULL, *dialect, sql, fetch_assoc, describe, first;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &table_name, &schema_name);
+	phalcon_fetch_params(0, 1, 1, &table_name, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -1708,9 +1598,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createSavepoint){
 
 	zval *name, *dialect, supports_sp, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
@@ -1722,7 +1610,6 @@ PHP_METHOD(Phalcon_Db_Adapter, createSavepoint){
 
 	PHALCON_CALL_METHODW(&sql, dialect, "createsavepoint", name);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1735,9 +1622,7 @@ PHP_METHOD(Phalcon_Db_Adapter, releaseSavepoint){
 
 	zval *name, *dialect, supports_sp, supports_rsp, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
@@ -1754,7 +1639,6 @@ PHP_METHOD(Phalcon_Db_Adapter, releaseSavepoint){
 
 	PHALCON_CALL_METHODW(&sql, dialect, "releasesavepoint", name);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1767,9 +1651,7 @@ PHP_METHOD(Phalcon_Db_Adapter, rollbackSavepoint){
 
 	zval *name, *dialect, supports_sp, sql;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
@@ -1781,7 +1663,6 @@ PHP_METHOD(Phalcon_Db_Adapter, rollbackSavepoint){
 
 	PHALCON_CALL_METHODW(&sql, dialect, "rollbacksavepoint", name);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "execute", &sql);
-	return;
 }
 
 /**
@@ -1792,12 +1673,9 @@ PHP_METHOD(Phalcon_Db_Adapter, rollbackSavepoint){
  */
 PHP_METHOD(Phalcon_Db_Adapter, setNestedTransactionsWithSavepoints){
 
-	zval *nested_transactions_with_savepoints;
-	zval *transaction_level, *dialect, supports_sp;
+	zval *nested_transactions_with_savepoints, *transaction_level, *dialect, supports_sp;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &nested_transactions_with_savepoints);
+	phalcon_fetch_params(0, 1, 0, &nested_transactions_with_savepoints);
 
 	transaction_level = phalcon_read_property(getThis(), SL("_transactionLevel"), PH_NOISY);
 	if (PHALCON_GT_LONG(transaction_level, 0)) {
@@ -1859,8 +1737,6 @@ PHP_METHOD(Phalcon_Db_Adapter, getNestedTransactionSavepointName){
 PHP_METHOD(Phalcon_Db_Adapter, getDefaultIdValue){
 
 	zval null_value;
-
-	PHALCON_MM_GROW();
 
 	ZVAL_STRING(&null_value, "null");
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);

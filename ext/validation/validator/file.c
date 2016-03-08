@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&minheight, ce, getThis(), "minheight"));
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&maxheight, ce, getThis(), "maxheight"));
 
-	PHALCON_CALL_SELF(&valid, "valid", &value, &minsize, &maxsize, &mimes, &minwidth, &maxwidth, &minheight, &maxheight);
+	PHALCON_CALL_SELFW(&valid, "valid", &value, &minsize, &maxsize, &mimes, &minwidth, &maxwidth, &minheight, &maxheight);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		phalcon_return_property(&type, getThis(), SL("_type"));

@@ -179,11 +179,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
-	zval *method, *args = NULL, method_name, arguments, *methods, func, *dependency_injector, exception_message, service_name, service, callback;
+	zval *method, *args = NULL, method_name, arguments, *methods, func, exception_message, service_name, service, callback;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &method, &arguments);
+	phalcon_fetch_params(0, 1, 1, &method, &arguments);
 
 	PHALCON_CPY_WRT(&method_name, method);
 
@@ -195,14 +193,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	methods = phalcon_read_property(getThis(), SL("_methods"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&func, methods, &method_name)) {
-			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &func, &arguments);
+			PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &func, &arguments);
 			return;
-	}
-
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "A dependency injection object is required to access internal services");
-		return;
 	}
 
 	if (phalcon_compare_strict_string(&method_name, SL("get")) 
@@ -218,7 +210,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		ZVAL_STRING(&service_name, ISV(dispatcher));
 	}
 
-	PHALCON_CALL_METHODW(&service, dependency_injector, "getshared", &service_name);
+	PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name);
 
 	if (Z_TYPE(service) != IS_OBJECT) {
 		PHALCON_CONCAT_SVS(&exception_message, "The injected service '", &service_name, "' is not valid");
@@ -233,11 +225,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	}
 
 	array_init(&callback);
-
 	phalcon_array_append(&callback, &service, PH_COPY);
 	phalcon_array_append(&callback, &method_name, PH_COPY);
 
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &callback, &arguments);
-
-	return;
+	PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &callback, &arguments);
 }

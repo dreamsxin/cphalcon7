@@ -127,19 +127,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetExists){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Row, offsetGet){
 
-	zval *index, *value;
+	zval *index, value;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &index);
 
-	phalcon_fetch_params(1, 1, 0, &index);
-
-	if (phalcon_isset_property_zval(getThis(), index)) {
-		value = phalcon_read_property_zval(getThis(), index, PH_NOISY);
-		RETURN_CTORW(value);
+	if (phalcon_property_isset_fetch_zval(&value, getThis(), index)) {
+		RETURN_CTORW(&value);
 	}
 
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The index does not exist in the row");
-	return;
 }
 
 /**
@@ -169,7 +165,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetUnset){
 	phalcon_fetch_params(0, 1, 0, &offset);
 
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The index does not exist in the row");
-	return;
 }
 
 /**
@@ -196,7 +191,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
  *
  * @return int
  */
-PHP_METHOD(Phalcon_Mvc_Model_Row, count){
+PHP_METHOD(Phalcon_Mvc_Model_Row, count)
+{
 	HashTable *properties;
 	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());	
 	if (properties) {

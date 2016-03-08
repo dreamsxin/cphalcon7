@@ -419,7 +419,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	 * Every route is internally stored as a Phalcon\Mvc\Router\Route
 	 */
 	object_init_ex(return_value, phalcon_mvc_router_route_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", prefix_pattern, &merged_paths, http_methods);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &prefix_pattern, &merged_paths, http_methods);
 	PHALCON_CALL_METHODW(NULL, return_value, "setgroup", getThis());
 
 	phalcon_update_property_array_append(getThis(), SL("_routes"), return_value);

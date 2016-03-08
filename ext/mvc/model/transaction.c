@@ -260,10 +260,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 
-	zval *rollback_on_abort, *message;
-	zval *connection;
-
-	PHALCON_MM_GROW();
+	zval *rollback_on_abort, *message, *connection;
 
 	rollback_on_abort = phalcon_read_property(getThis(), SL("_rollbackOnAbort"), PH_NOISY);
 	if (zend_is_true(rollback_on_abort)) {

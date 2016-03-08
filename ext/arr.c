@@ -381,7 +381,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 	PHALCON_CPY_WRT(&cpy_array, array);
 
 	// Set current $array to inner-most array  path
-	while ((int) zend_hash_num_elements(Z_ARRVAL_P(keys)) > 1) {
+	while ((int) zend_hash_num_elements(Z_ARRVAL(keys)) > 1) {
 		zval is_digit, *arr;
 
 		ZVAL_MAKE_REF(&keys);
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 				if (zend_is_true(&is_array)) {
 					ZVAL_MAKE_REF(arr);
-					PHALCON_CALL_SELFW(NULL, "set_path", arr, keys, value);
+					PHALCON_CALL_SELFW(NULL, "set_path", arr, &keys, value);
 					ZVAL_UNREF(arr);
 				}
 			} ZEND_HASH_FOREACH_END();
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Arr, range){
  */
 PHP_METHOD(Phalcon_Arr, get){
 
-	zval *array, *keys, *default_value = NULL, *key;
+	zval *array, *keys, *default_value = NULL, *key, value;
 
 	phalcon_fetch_params(0, 2, 1, &array, &keys, &default_value);
 
@@ -500,9 +500,9 @@ PHP_METHOD(Phalcon_Arr, get){
 		array_init(return_value);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
-			zval value;
-			if (phalcon_array_isset_fetch(&value, array, key)) {
-				phalcon_array_update_zval(return_value, key, &value, PH_COPY);
+			zval value0;
+			if (phalcon_array_isset_fetch(&value0, array, key)) {
+				phalcon_array_update_zval(return_value, key, &value0, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	} else if (phalcon_array_isset_fetch(&value, array, keys)) {
@@ -658,7 +658,7 @@ PHP_METHOD(Phalcon_Arr, map){
 
 					phalcon_array_update_long(&params, 0, val, PH_COPY);
 
-					PHALCON_CALL_USER_FUNC_ARRAY(&value, callback, &params);
+					PHALCON_CALL_USER_FUNC_ARRAYW(&value, callback, &params);
 
 					phalcon_array_update_zval(array, &key, &value, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
@@ -667,7 +667,7 @@ PHP_METHOD(Phalcon_Arr, map){
 
 				phalcon_array_update_long(&params, 0, val, PH_COPY);
 
-				PHALCON_CALL_USER_FUNC_ARRAY(&value, callbacks, &params);
+				PHALCON_CALL_USER_FUNC_ARRAYW(&value, callbacks, &params);
 
 				phalcon_array_update_zval(array, &key, &value, PH_COPY);
 			}
@@ -966,7 +966,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 	ZVAL_STRING(&service, ISV(filter));
 
 	PHALCON_CALL_METHODW(&filter, &dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(&filter, phalcon_filterinterface_ce);
 
 	array_init(return_value);
 

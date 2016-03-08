@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 			ZVAL_STRING(&service, ISV(filter));
 
 			PHALCON_CALL_METHODW(&filter, dependency_injector, "getshared", &service);
-			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+			PHALCON_VERIFY_INTERFACEW(&filter, phalcon_filterinterface_ce);
 
 			phalcon_update_property_this(getThis(), SL("_filter"), &filter);
 		}
@@ -1678,17 +1678,12 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth){
  */
 PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 
-	zval pattern, digest, set_order, matches, ret, *match;
+	zval *_SERVER, key, *value, pattern, digest, set_order, matches, ret, *match;
 	const char *auth_digest = SG(request_info).auth_digest;
 
-	PHALCON_MM_GROW();
-
 	if (unlikely(!auth_digest)) {
-		zval *_SERVER = phalcon_get_global_str(SL("_SERVER"));
+		_SERVER = phalcon_get_global_str(SL("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
-			zval key;
-			zval *value;
-
 			ZVAL_STRING(&key, "PHP_AUTH_DIGEST");
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_UNSET);

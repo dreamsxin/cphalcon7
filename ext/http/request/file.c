@@ -318,9 +318,7 @@ PHP_METHOD(Phalcon_Http_Request_File, __set_state) {
 
 	object_init_ex(return_value, phalcon_http_request_file_ce);
 
-	PHALCON_MM_GROW();
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", data);
-	PHALCON_MM_RESTORE();
 }
 
 /**

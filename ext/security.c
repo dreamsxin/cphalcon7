@@ -804,8 +804,6 @@ PHP_METHOD(Phalcon_Security, destroyToken){
 
 	zval *name = NULL, *token_key = NULL, service, session, key;
 
-	PHALCON_MM_GROW();
-
 	phalcon_fetch_params(0, 0, 2, &name, &token_key);
 
 	if (!name) {

@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_CLI_Console, getModules){
  */
 PHP_METHOD(Phalcon_CLI_Console, handle){
 
-	zval *_arguments = NULL, arguments, *dependency_injector, events_manager, event_name;
+	zval *_arguments = NULL, arguments, dependency_injector, events_manager, event_name;
 	zval service, router, module_name;
 	zval status, *modules, exception_msg, module;
 	zval path, class_name, module_object;
@@ -213,10 +213,16 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 
 	ZVAL_STRING(&service, ISV(router));
 
-	PHALCON_CALL_METHODW(&router, getThis(), "getResolveService", &service);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_cli_console_exception_ce, "A dependency injection container is required to access the '%s' service", Z_STRVAL(service));
+		return;
+	}
+
+	PHALCON_CALL_METHODW(&router, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_CLASSW(&router, phalcon_cli_router_ce);
 
-	PHALCON_CALL_METHODW(NULL, &router, "handle", arguments);
+	PHALCON_CALL_METHODW(NULL, &router, "handle", &arguments);
 	PHALCON_CALL_METHODW(&module_name, &router, "getmodulename");
 	if (zend_is_true(&module_name)) {
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
@@ -247,7 +253,6 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 				RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(path)));
 			} else {
 				zend_throw_exception_ex(phalcon_cli_console_exception_ce, 0, "Modules definition path '%s' does not exist", Z_STRVAL(path));
-				PHALCON_MM_RESTORE();
 				return;
 			}
 		}
@@ -256,9 +261,9 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			ZVAL_STRING(&class_name, "Module");
 		}
 
-		PHALCON_CALL_METHODW(&module_object, dependency_injector, "get", &class_name);
+		PHALCON_CALL_METHODW(&module_object, &dependency_injector, "getshared", &class_name);
 		PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders");
-		PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", dependency_injector);
+		PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", &dependency_injector);
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			phalcon_update_property_this(getThis(), SL("_moduleObject"), &module_object);
 
@@ -278,8 +283,8 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 
 	ZVAL_STRING(&service, ISV(dispatcher));
 
-	PHALCON_CALL_METHODW(&dispatcher, dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);
+	PHALCON_CALL_METHODW(&dispatcher, &dependency_injector, "getshared", &service);
+	PHALCON_VERIFY_INTERFACEW(&dispatcher, phalcon_dispatcherinterface_ce);
 
 	PHALCON_CALL_METHODW(NULL, &dispatcher, "setnamespacename", &namespace_name);
 	PHALCON_CALL_METHODW(NULL, &dispatcher, "settaskname", &task_name);

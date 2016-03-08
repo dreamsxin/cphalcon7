@@ -307,13 +307,11 @@ PHP_METHOD(Phalcon_Config, offsetUnset){
  */
 PHP_METHOD(Phalcon_Config, merge){
 
-	zval *config, *array_config = NULL, *value, *active_value = NULL;
+	zval *config, array_config, *value;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &config);
+	phalcon_fetch_params(0, 1, 0, &config);
 
 	if (Z_TYPE_P(config) != IS_OBJECT && Z_TYPE_P(config) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_config_exception_ce, "Configuration must be an object or array");
@@ -321,15 +319,14 @@ PHP_METHOD(Phalcon_Config, merge){
 	}
 
 	if (Z_TYPE_P(config) == IS_OBJECT) {
-		PHALCON_INIT_NVAR(array_config);
-		phalcon_get_object_vars(array_config, config, 0);
+		phalcon_get_object_vars(&array_config, config, 0);
 	} else {
-		array_config = config;
+		PHALCON_CPY_WRT(&array_config, config);
 	}
 
-	if (Z_TYPE_P(array_config) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array_config), idx, str_key, value) {
-			zval tmp;
+	if (Z_TYPE(array_config) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(array_config), idx, str_key, value) {
+			zval tmp, *active_value;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {

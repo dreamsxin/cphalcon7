@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 				ZVAL_STRING(&service, "crypt");
 
 				PHALCON_CALL_METHODW(&crypt, dependency_injector, "getshared", &service);
-				PHALCON_VERIFY_INTERFACE(&crypt, phalcon_cryptinterface_ce);
+				PHALCON_VERIFY_INTERFACEW(&crypt, phalcon_cryptinterface_ce);
 
 				/** 
 				 * Decrypt the value also decoding it with base64
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 					ZVAL_STRING(&service, ISV(filter));
 
 					PHALCON_CALL_METHODW(&filter, dependency_injector, "getshared", &service);
-					PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+					PHALCON_VERIFY_INTERFACEW(&filter, phalcon_filterinterface_ce);
 					phalcon_update_property_this(getThis(), SL("_filter"), &filter);
 				}
 
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 				PHALCON_CALL_METHODW(&session, dependency_injector, "getshared", &service);
 
 				if (Z_TYPE(session) != IS_NULL) {
-					PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+					PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
 					PHALCON_CONCAT_SV(&key, "_PHCOOKIE_", name);
 					PHALCON_CALL_METHODW(NULL, &session, "set", &key, &definition);
@@ -384,7 +384,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 		ZVAL_STRING(&service, "crypt");
 
 		PHALCON_CALL_METHODW(&crypt, dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACE(&crypt, phalcon_cryptinterface_ce);
+		PHALCON_VERIFY_INTERFACEW(&crypt, phalcon_cryptinterface_ce);
 
 		/**
 		 * Encrypt the value also coding it with base64
@@ -427,7 +427,7 @@ PHP_METHOD(Phalcon_Http_Cookie, restore){
 			ZVAL_STRING(&service, ISV(session));
 
 			PHALCON_CALL_METHODW(&session, dependency_injector, "getshared", &service);
-			PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+			PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
 			phalcon_return_property(&name, getThis(), SL("_name"));
 
@@ -476,15 +476,13 @@ PHP_METHOD(Phalcon_Http_Cookie, delete){
 	secure = phalcon_read_property(getThis(), SL("_secure"), PH_NOISY);
 	http_only = phalcon_read_property(getThis(), SL("_httpOnly"), PH_NOISY);
 
-	if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-		ZVAL_STRING(&service, ISV(session));
+	ZVAL_STRING(&service, ISV(session));
 
-		PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
-		PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
+	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
+	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
-		PHALCON_CONCAT_SV(&key, "_PHCOOKIE_", name);
-		PHALCON_CALL_METHODW(NULL, &session, "remove", &key);
-	}
+	PHALCON_CONCAT_SV(&key, "_PHCOOKIE_", name);
+	PHALCON_CALL_METHODW(NULL, &session, "remove", &key);
 
 	phalcon_update_property_null(getThis(), SL("_value"));
 
@@ -657,7 +655,7 @@ PHP_METHOD(Phalcon_Http_Cookie, setSecure){
 
 	zval *secure, *restored;
 
-	phalcon_fetch_params(1, 1, 0, &secure);
+	phalcon_fetch_params(0, 1, 0, &secure);
 
 	restored = phalcon_read_property(getThis(), SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {

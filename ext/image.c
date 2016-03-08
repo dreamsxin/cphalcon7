@@ -80,12 +80,11 @@ PHALCON_INIT_CLASS(Phalcon_Image){
 	return SUCCESS;
 }
 
-PHP_METHOD(Phalcon_Image, factory){
+PHP_METHOD(Phalcon_Image, factory)
+{
 	zval *file, *width = NULL, *height = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &file, &width, &height);
+	phalcon_fetch_params(0, 1, 2, &file, &width, &height);
 
 	if (!width) {
 		width = &PHALCON_GLOBAL(z_null);
@@ -102,6 +101,4 @@ PHP_METHOD(Phalcon_Image, factory){
 		object_init_ex(return_value, phalcon_image_adapter_gd_ce);
 		PHALCON_CALL_METHODW(NULL, return_value, "__construct", file, width, height);
 	}
-
-	PHALCON_MM_RESTORE();
 }

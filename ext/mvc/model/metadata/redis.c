@@ -163,16 +163,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, read){
 
 	zval *key, *lifetime, *redis;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &key);
+	phalcon_fetch_params(0, 1, 0, &key);
 
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHODW(redis, "get", key, lifetime);
-
 		return;
 	}
 
@@ -189,9 +186,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, write){
 
 	zval *key, *data, *lifetime, *redis;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &key, &data);
+	phalcon_fetch_params(0, 2, 0, &key, &data);
 
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
@@ -199,15 +194,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, write){
 	if (Z_TYPE_P(redis) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, redis, "save", key, data, lifetime);	
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, reset)
 {
 	zval *redis;
-
-	PHALCON_MM_GROW();
 
 	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
 
@@ -216,6 +207,4 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, reset)
 	}
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_redis_ce, getThis(), "reset");
-
-	PHALCON_MM_RESTORE();
 }

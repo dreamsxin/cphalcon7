@@ -170,9 +170,7 @@ PHP_METHOD(Phalcon_Http_Response, __construct){
 	}
 
 	if (code && Z_TYPE_P(code) != IS_NULL) {
-		PHALCON_MM_GROW();
 		PHALCON_CALL_METHODW(NULL, getThis(), "setstatuscode", code, status);
-		PHALCON_MM_RESTORE();
 	}
 }
 
@@ -192,9 +190,7 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode){
 	zval *code, *message, headers, current_headers_raw, header_value, status_value, status_header;
 	zend_string *str_key;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &code, &message);
+	phalcon_fetch_params(0, 2, 0, &code, &message);
 
 	PHALCON_CALL_METHODW(&headers, getThis(), "getheaders");
 
@@ -375,13 +371,10 @@ PHP_METHOD(Phalcon_Http_Response, resetHeaders){
  */
 PHP_METHOD(Phalcon_Http_Response, setExpires){
 
-	zval *datetime, headers, date, utc_zone, timezone;
-	zval format, utc_format, utc_date, expires_header;
+	zval *datetime, headers, date, utc_zone, timezone, format, utc_format, utc_date, expires_header;
 	zend_class_entry *datetime_ce, *datetimezone_ce;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &datetime);
+	phalcon_fetch_params(0, 1, 0, &datetime);
 
 	datetime_ce = php_date_get_date_ce();
 	PHALCON_VERIFY_CLASS_EX(datetime, datetime_ce, phalcon_http_response_exception_ce, 1);
@@ -520,8 +513,7 @@ PHP_METHOD(Phalcon_Http_Response, setEtag){
  */
 PHP_METHOD(Phalcon_Http_Response, redirect){
 
-	zval *location = NULL, *external_redirect = NULL, *status_code = NULL;
-	zval header, matched, pattern, dependency_injector, service_name;
+	zval *location = NULL, *external_redirect = NULL, *_status_code = NULL, status_code, header, matched, pattern, dependency_injector, service_name;
 	zval url, view, status_text, header_name;
 
 	static const char* redirect_phrases[] = {
@@ -536,9 +528,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 		/* 308 */ "Permanent Redirect"
 	};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 3, &location, &external_redirect, &status_code);
+	phalcon_fetch_params(0, 0, 3, &location, &external_redirect, &_status_code);
 
 	if (!location) {
 		location = &PHALCON_GLOBAL(z_null);
@@ -551,13 +541,12 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 		external_redirect = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!status_code) {
-		PHALCON_INIT_VAR(status_code);
-		ZVAL_LONG(status_code, 302);
+	if (!_status_code) {
+		ZVAL_LONG(&status_code, 302);
 	} else {
-		if (unlikely(Z_TYPE_P(status_code) != IS_LONG)) {
-			PHALCON_SEPARATE_PARAM(status_code);
-			convert_to_long(status_code);			
+		PHALCON_CPY_WRT_CTOR(&status_code, _status_code);
+		if (unlikely(Z_TYPE(status_code) != IS_LONG)) {
+			convert_to_long(&status_code);			
 		}
 	}
 
@@ -581,7 +570,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 		ZVAL_STRING(&service_name, ISV(url));
 
 		PHALCON_CALL_METHODW(&url, &dependency_injector, "getshared", &service_name);
-		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
+		PHALCON_VERIFY_INTERFACEW(&url, phalcon_mvc_urlinterface_ce);
 
 		PHALCON_CALL_METHODW(&header, &url, "get", location);
 	}
@@ -594,16 +583,16 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	}
 
 	/* The HTTP status is 302 by default, a temporary redirection */
-	if (Z_LVAL_P(status_code) < 300 || Z_LVAL_P(status_code) > 308) {
+	if (Z_LVAL(status_code) < 300 || Z_LVAL(status_code) > 308) {
 		ZVAL_STRING(&status_text, "Redirect");
-		if (!Z_LVAL_P(status_code)) {
-			ZVAL_LONG(status_code, 302);
+		if (!Z_LVAL(status_code)) {
+			ZVAL_LONG(&status_code, 302);
 		}
 	} else {
-		ZVAL_STRING(&status_text, redirect_phrases[Z_LVAL_P(status_code) - 300]);
+		ZVAL_STRING(&status_text, redirect_phrases[Z_LVAL(status_code) - 300]);
 	}
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "setstatuscode", status_code, &status_text);
+	PHALCON_CALL_METHODW(NULL, getThis(), "setstatuscode", &status_code, &status_text);
 
 	/** 
 	 * Change the current location using 'Location'
@@ -651,9 +640,7 @@ PHP_METHOD(Phalcon_Http_Response, setJsonContent){
 	zval *content, *json_options = NULL, json_content;
 	int options = 0;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &content, &json_options);
+	phalcon_fetch_params(0, 1, 1, &content, &json_options);
 
 	if (json_options) {
 		options = phalcon_get_intval(json_options);
@@ -678,9 +665,7 @@ PHP_METHOD(Phalcon_Http_Response, setBsonContent){
 
 	zval *content, content_type, bson_content;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &content);
+	phalcon_fetch_params(0, 1, 0, &content);
 
 	ZVAL_STRING(&content_type, "application/bson");
 	PHALCON_CALL_METHODW(NULL, getThis(), "setContentType", &content_type);
@@ -698,12 +683,9 @@ PHP_METHOD(Phalcon_Http_Response, setBsonContent){
  */
 PHP_METHOD(Phalcon_Http_Response, appendContent){
 
-	zval *content, *_content;
-	zval temp_content;
+	zval *content, *_content, temp_content;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &content);
+	phalcon_fetch_params(0, 1, 0, &content);
 
 	_content = phalcon_read_property(getThis(), SL("_content"), PH_NOISY);
 
@@ -763,9 +745,7 @@ PHP_METHOD(Phalcon_Http_Response, sendCookies){
 
 	cookies = phalcon_read_property(getThis(), SL("_cookies"), PH_NOISY);
 	if (Z_TYPE_P(cookies) == IS_OBJECT) {
-		PHALCON_MM_GROW();
 		PHALCON_CALL_METHODW(NULL, cookies, "send");
-		PHALCON_MM_RESTORE();
 	}
 
 	RETURN_THISW();
@@ -779,8 +759,6 @@ PHP_METHOD(Phalcon_Http_Response, sendCookies){
 PHP_METHOD(Phalcon_Http_Response, send){
 
 	zval *sent, *headers, *cookies, *content, *file;
-
-	PHALCON_MM_GROW();
 
 	sent = phalcon_read_property(getThis(), SL("_sent"), PH_NOISY);
 	if (PHALCON_IS_FALSE(sent)) {
@@ -820,7 +798,6 @@ PHP_METHOD(Phalcon_Http_Response, send){
 	}
 
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_http_response_exception_ce, "Response was already sent");
-	return;
 }
 
 /**

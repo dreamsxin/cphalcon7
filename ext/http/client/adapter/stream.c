@@ -81,7 +81,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	zval *uri = NULL, *method = NULL, upper_method, header, stream, http, option, value;
 
-	phalcon_fetch_params(1, 0, 2, &uri, &method);
+	phalcon_fetch_params(0, 0, 2, &uri, &method);
 
 	if (uri) {
 		PHALCON_CALL_SELFW(NULL, "setbaseuri", uri);

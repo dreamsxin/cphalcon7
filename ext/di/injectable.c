@@ -109,13 +109,25 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
  */
 PHP_METHOD(Phalcon_DI_Injectable, getDI)
 {
-	zval *dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_RETURN_CALL_CE_STATICW(phalcon_di_ce, "getdefault");
+	zval *error = NULL, dependency_injector;
+
+	phalcon_fetch_params(0, 0, 1, &error);
+
+	if (!error) {
+		error = &PHALCON_GLOBAL(z_false);
+	}
+
+	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 		return;
 	}
 
-	RETURN_CTORW(dependency_injector);
+	if (Z_TYPE(dependency_injector) != IS_OBJECT && zend_is_true(error)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_di_exception_ce, "A dependency injection container is not object");
+		return;
+	}
+	RETURN_CTORW(&dependency_injector);
 }
 
 /**

@@ -144,11 +144,9 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 
-	zval *modules, *merge = NULL, *registered_modules, *merged_modules = NULL;
+	zval *modules, *merge = NULL, *registered_modules, merged_modules;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &modules, &merge);
+	phalcon_fetch_params(0, 1, 1, &modules, &merge);
 
 	if (!merge) {
 		merge = &PHALCON_GLOBAL(z_false);
@@ -162,14 +160,13 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 		phalcon_update_property_this(getThis(), SL("_modules"), modules);
 	} else {
 		registered_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
-		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(merged_modules);
-			phalcon_fast_array_merge(merged_modules, registered_modules, modules);
+		if (Z_TYPE_P(registered_modules) == IS_ARRAY) {
+			phalcon_fast_array_merge(&merged_modules, registered_modules, modules);
 		} else {
-			PHALCON_CPY_WRT(merged_modules, modules);
+			PHALCON_CPY_WRT(&merged_modules, modules);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_modules"), merged_modules);
+		phalcon_update_property_this(getThis(), SL("_modules"), &merged_modules);
 	}
 
 	RETURN_THISW();

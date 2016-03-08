@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 
 	zval *formatter, *loggers, *logger;
 
-	phalcon_fetch_params(, 1, 0, &formatter);
+	phalcon_fetch_params(0, 1, 0, &formatter);
 
 	loggers = phalcon_read_property(getThis(), SL("_loggers"), PH_NOISY);
 	if (Z_TYPE_P(loggers) == IS_ARRAY) {

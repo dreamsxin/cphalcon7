@@ -43,17 +43,15 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 	zval curline, exception;
 	zend_class_entry *default_exception_ce;
 
-	PHALCON_MM_GROW();
-
 	if (Z_TYPE_P(object) != IS_OBJECT) {
 		object_init_ex(&exception, zend_exception_get_default());
-		PHALCON_CALL_METHOD(NULL, &exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
+		PHALCON_CALL_METHODW(NULL, &exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
 	} else {
 		PHALCON_CPY_WRT(&exception, object);
 	}
 
 	if (line > 0) {
-		PHALCON_CALL_METHOD(&curline, &exception, "getline");
+		PHALCON_CALL_METHODW(&curline, &exception, "getline");
 		if (PHALCON_IS_LONG(&curline, 0)) {
 			default_exception_ce = zend_exception_get_default();
 			zend_update_property_string(default_exception_ce, &exception, "file", sizeof("file")-1, file);
@@ -62,7 +60,6 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 	}
 
 	zend_throw_exception_object(&exception);
-	PHALCON_MM_RESTORE();
 }
 
 /**

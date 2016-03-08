@@ -129,64 +129,59 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Header){
  */
 PHP_METHOD(Phalcon_Http_Client_Header, __construct){
 
-	zval *messages;
+	zval messages;
 
-	PHALCON_MM_GROW();
+	array_init(&messages);
 
-	PHALCON_INIT_VAR(messages);
-	array_init(messages);
+	phalcon_array_update_long_string(&messages, 100, SL("Continue"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 101, SL("Switching Protocols"), PH_COPY);
 
-	phalcon_array_update_long_string(messages, 100, SL("Continue"), PH_COPY);
-	phalcon_array_update_long_string(messages, 101, SL("Switching Protocols"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 200, SL("OK"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 201, SL("Created"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 202, SL("Accepted"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 203, SL("Non-Authoritative Information"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 204, SL("No Content"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 205, SL("Reset Content"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 206, SL("Partial Content"), PH_COPY);
 
-	phalcon_array_update_long_string(messages, 200, SL("OK"), PH_COPY);
-	phalcon_array_update_long_string(messages, 201, SL("Created"), PH_COPY);
-	phalcon_array_update_long_string(messages, 202, SL("Accepted"), PH_COPY);
-	phalcon_array_update_long_string(messages, 203, SL("Non-Authoritative Information"), PH_COPY);
-	phalcon_array_update_long_string(messages, 204, SL("No Content"), PH_COPY);
-	phalcon_array_update_long_string(messages, 205, SL("Reset Content"), PH_COPY);
-	phalcon_array_update_long_string(messages, 206, SL("Partial Content"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 300, SL("Multiple Choices"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 301, SL("Moved Permanently"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 302, SL("Found"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 303, SL("See Other"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 304, SL("Not Modified"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 305, SL("Use Proxy"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 306, SL("(Unused)"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 307, SL("Temporary Redirect"), PH_COPY);
 
-	phalcon_array_update_long_string(messages, 300, SL("Multiple Choices"), PH_COPY);
-	phalcon_array_update_long_string(messages, 301, SL("Moved Permanently"), PH_COPY);
-	phalcon_array_update_long_string(messages, 302, SL("Found"), PH_COPY);
-	phalcon_array_update_long_string(messages, 303, SL("See Other"), PH_COPY);
-	phalcon_array_update_long_string(messages, 304, SL("Not Modified"), PH_COPY);
-	phalcon_array_update_long_string(messages, 305, SL("Use Proxy"), PH_COPY);
-	phalcon_array_update_long_string(messages, 306, SL("(Unused)"), PH_COPY);
-	phalcon_array_update_long_string(messages, 307, SL("Temporary Redirect"), PH_COPY);
-
-	phalcon_array_update_long_string(messages, 400, SL("Bad Request"), PH_COPY);
-	phalcon_array_update_long_string(messages, 401, SL("Unauthorized"), PH_COPY);
-	phalcon_array_update_long_string(messages, 402, SL("Payment Required"), PH_COPY);
-	phalcon_array_update_long_string(messages, 403, SL("Forbidden"), PH_COPY);
-	phalcon_array_update_long_string(messages, 404, SL("Not Found"), PH_COPY);
-	phalcon_array_update_long_string(messages, 405, SL("Method Not Allowed"), PH_COPY);
-	phalcon_array_update_long_string(messages, 406, SL("Not Acceptable"), PH_COPY);
-	phalcon_array_update_long_string(messages, 407, SL("Proxy Authentication Required"), PH_COPY);
-	phalcon_array_update_long_string(messages, 408, SL("Request Timeout"), PH_COPY);
-	phalcon_array_update_long_string(messages, 409, SL("Conflict"), PH_COPY);
-	phalcon_array_update_long_string(messages, 410, SL("Gone"), PH_COPY);
-	phalcon_array_update_long_string(messages, 411, SL("Length Required"), PH_COPY);
-	phalcon_array_update_long_string(messages, 412, SL("Precondition Failed"), PH_COPY);
-	phalcon_array_update_long_string(messages, 413, SL("Request Entity Too Large"), PH_COPY);
-	phalcon_array_update_long_string(messages, 414, SL("Request-URI Too Long"), PH_COPY);
-	phalcon_array_update_long_string(messages, 415, SL("Unsupported Media Type"), PH_COPY);
-	phalcon_array_update_long_string(messages, 416, SL("Requested Range Not Satisfiable"), PH_COPY);
-	phalcon_array_update_long_string(messages, 417, SL("Expectation Failed"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 400, SL("Bad Request"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 401, SL("Unauthorized"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 402, SL("Payment Required"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 403, SL("Forbidden"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 404, SL("Not Found"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 405, SL("Method Not Allowed"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 406, SL("Not Acceptable"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 407, SL("Proxy Authentication Required"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 408, SL("Request Timeout"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 409, SL("Conflict"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 410, SL("Gone"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 411, SL("Length Required"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 412, SL("Precondition Failed"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 413, SL("Request Entity Too Large"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 414, SL("Request-URI Too Long"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 415, SL("Unsupported Media Type"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 416, SL("Requested Range Not Satisfiable"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 417, SL("Expectation Failed"), PH_COPY);
 	
-	phalcon_array_update_long_string(messages, 500, SL("Internal Server Error"), PH_COPY);
-	phalcon_array_update_long_string(messages, 501, SL("Not Implemented"), PH_COPY);
-	phalcon_array_update_long_string(messages, 502, SL("Bad Gateway"), PH_COPY);
-	phalcon_array_update_long_string(messages, 503, SL("Service Unavailable"), PH_COPY);
-	phalcon_array_update_long_string(messages, 504, SL("Gateway Timeout"), PH_COPY);
-	phalcon_array_update_long_string(messages, 505, SL("HTTP Version Not Supported"), PH_COPY);
-	phalcon_array_update_long_string(messages, 506, SL("Bandwidth Limit Exceeded"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 500, SL("Internal Server Error"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 501, SL("Not Implemented"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 502, SL("Bad Gateway"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 503, SL("Service Unavailable"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 504, SL("Gateway Timeout"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 505, SL("HTTP Version Not Supported"), PH_COPY);
+	phalcon_array_update_long_string(&messages, 506, SL("Bandwidth Limit Exceeded"), PH_COPY);
 
-	phalcon_update_static_property_ce(phalcon_http_client_header_ce, SL("_messages"), messages);
+	phalcon_update_static_property_ce(phalcon_http_client_header_ce, SL("_messages"), &messages);
 	phalcon_update_property_empty_array(getThis(), SL("_fields"));
-
-	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Header, set){
@@ -221,17 +216,13 @@ PHP_METHOD(Phalcon_Http_Client_Header, addMultiple){
 
 	zval *values, *fields;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &values);
+	phalcon_fetch_params(0, 1, 0, &values);
 
 	fields = phalcon_read_property(getThis(), SL("_fields"), PH_NOISY);
 
 	phalcon_array_merge_recursive_n(fields, values);
 
 	phalcon_update_property_this(getThis(), SL("_fields"), fields);
-
-	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Header, get){
@@ -272,9 +263,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
 	zval *content, content_parts, *header;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &content);
+	phalcon_fetch_params(0, 1, 0, &content);
 
 	if (PHALCON_IS_EMPTY(content)) {
 		RETURN_FALSE;
@@ -313,8 +302,6 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 				PHALCON_CALL_METHODW(NULL, getThis(), "set", &val1, &trimmed);
 		}
 	} ZEND_HASH_FOREACH_END();
-
-	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Header, build){

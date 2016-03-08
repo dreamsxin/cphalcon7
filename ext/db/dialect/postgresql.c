@@ -520,8 +520,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeColumns){
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
-	if (!schema_name) {
-		schema_name = &PHALCON_GLOBAL(z_null);
+	if (!schema) {
+		schema = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (zend_is_true(schema)) {
@@ -625,7 +625,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeReferences){
 		schema = &PHALCON_GLOBAL(z_null);
 	}
 
-	ZVAL_STRING(sql, "SELECT tc.table_name as TABLE_NAME, kcu.column_name as COLUMN_NAME, tc.constraint_name as CONSTRAINT_NAME, tc.table_catalog as REFERENCED_TABLE_SCHEMA, ccu.table_name AS REFERENCED_TABLE_NAME, ccu.column_name AS REFERENCED_COLUMN_NAME FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND ");
+	ZVAL_STRING(&sql, "SELECT tc.table_name as TABLE_NAME, kcu.column_name as COLUMN_NAME, tc.constraint_name as CONSTRAINT_NAME, tc.table_catalog as REFERENCED_TABLE_SCHEMA, ccu.table_name AS REFERENCED_TABLE_NAME, ccu.column_name AS REFERENCED_COLUMN_NAME FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND ");
 	if (zend_is_true(schema)) {
 		PHALCON_SCONCAT_SVSVS(&sql, "tc.table_schema = '", schema, "' AND tc.table_name='", table, "'");
 	} else {

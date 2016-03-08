@@ -430,12 +430,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 
-	zval *model, *index, *data, *replace, table, schema, class_name;
-	zval key, *meta_data, arr, value, *v;
+	zval *model, *index, *data, *replace, table, schema, class_name, key, *meta_data, arr, value, *v;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(1, 4, 0, &model, &index, &data, &replace);
+	phalcon_fetch_params(0, 4, 0, &model, &index, &data, &replace);
 	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
 
 	if (Z_TYPE_P(index) != IS_LONG) {
@@ -815,9 +814,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataBytes){
 
 	zval *model, *attribute, index, data;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &attribute);
+	phalcon_fetch_params(0, 2, 0, &model, &attribute);
 
 	ZVAL_LONG(&index, 15);
 
@@ -1017,9 +1014,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAutomaticCreateAttributes){
 
 	zval *model, index;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	ZVAL_LONG(&index, 10);
 
@@ -1109,9 +1104,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getColumnMap){
 
 	zval *model, index;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	ZVAL_LONG(&index, 0);
 

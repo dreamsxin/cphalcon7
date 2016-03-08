@@ -263,16 +263,12 @@ PHP_METHOD(Phalcon_Mvc_Micro, __construct){
 
 	zval *dependency_injector = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &dependency_injector);
+	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-		PHALCON_VERIFY_INTERFACE(dependency_injector, phalcon_diinterface_ce);
+		PHALCON_VERIFY_INTERFACEW(dependency_injector, phalcon_diinterface_ce);
 		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -326,7 +322,6 @@ static void phalcon_mvc_micro_generic_add(INTERNAL_FUNCTION_PARAMETERS, const ch
 	/**
 	 * The route is returned, the developer can add more things on it
 	 */
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -436,7 +431,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 	zval *collection, main_handler, handlers, lazy, lazy_handler, prefix, *handler;
 
 	phalcon_fetch_params(0, 1, 0, &collection);
-	PHALCON_VERIFY_INTERFACE_EX(collection, phalcon_mvc_micro_collectioninterface_ce, phalcon_mvc_micro_exception_ce, 1);
+	PHALCON_VERIFY_INTERFACE_EX(collection, phalcon_mvc_micro_collectioninterface_ce, phalcon_mvc_micro_exception_ce, 0);
 
 	/* Get the main handler */
 	PHALCON_CALL_METHODW(&main_handler, collection, "gethandler");
@@ -542,7 +537,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, getRouter){
 		ZVAL_STRING(&service_name, ISV(router));
 
 		PHALCON_CALL_METHODW(&router, getThis(), "getsharedservice", &service_name);
-		PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
+		PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
 
 		/** 
 		 * Clear the set routes if any
@@ -669,14 +664,11 @@ PHP_METHOD(Phalcon_Mvc_Micro, getSharedService){
  */
 PHP_METHOD(Phalcon_Mvc_Micro, handle){
 
-	zval *uri = NULL, *dependency_injector, error_message;
-	zval event_name, status, service, router, matched_route;
+	zval *uri = NULL, *dependency_injector, error_message, event_name, status, service, router, matched_route;
 	zval *handlers, route_id, handler, before_handlers, *before, *stopped, params;
 	zval *after_handlers, *after, *not_found_handler, *finish_handlers, *finish, returned_response_sent;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &uri);
+	phalcon_fetch_params(0, 0, 1, &uri);
 
 	if (!uri) {
 		uri = &PHALCON_GLOBAL(z_null);
@@ -703,7 +695,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	ZVAL_STR(&service, IS(router));
 
 	PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
 
 	/** 
 	 * Handle the URI as normal
@@ -806,7 +798,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 */
 		PHALCON_CALL_METHODW(&params, &router, "getparams");
 
-		PHALCON_CALL_USER_FUNC_ARRAY(return_value, &handler, &params);
+		PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &handler, &params);
 
 		/** 
 		 * Update the returned value
@@ -951,7 +943,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			/** 
 			 * Call the 'finish' middleware
 			 */
-			PHALCON_CALL_USER_FUNC_ARRAY(&status, finish, &params);
+			PHALCON_CALL_USER_FUNC_ARRAYW(&status, finish, &params);
 
 			/** 
 			 * Reload the status
@@ -985,8 +977,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			}
 		}
 	}
-
-	return;
 }
 
 /**
@@ -1186,7 +1176,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, _throwException){
 	array_init_size(&arguments, 1);
 	phalcon_array_append(&arguments, &object, PH_COPY);
 
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, handler, &arguments);
+	PHALCON_CALL_USER_FUNC_ARRAYW(return_value, handler, &arguments);
 
 	if (Z_TYPE_P(return_value) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(return_value), phalcon_http_responseinterface_ce, 1)) {
 		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_micro_exception_ce, message);

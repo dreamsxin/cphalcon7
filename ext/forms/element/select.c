@@ -166,8 +166,6 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 
 	zval *attributes = NULL, *options, widget_attributes;
 
-	PHALCON_MM_GROW();
-
 	phalcon_fetch_params(0, 1, 0, &attributes);
 
 	if (!attributes) {

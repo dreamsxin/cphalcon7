@@ -1010,8 +1010,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, isUnderTransaction){
 
 	zval *pdo;
 
-	PHALCON_MM_GROW();
-
 	pdo = phalcon_read_property(getThis(), SL("_pdo"), PH_NOISY);
 	if (likely(Z_TYPE_P(pdo) == IS_OBJECT)) {
 		PHALCON_RETURN_CALL_METHODW(pdo, "intransaction");

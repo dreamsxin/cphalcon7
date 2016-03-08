@@ -286,7 +286,7 @@ static void phalcon_crypt_pad_text(zval *return_value, zval *text, zval *mode, u
 
 		padding_size = block_size - (Z_STRLEN_P(text) % block_size);
 		if (padding_size >= 256) {
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 		}
 
 		switch (padding_type) {

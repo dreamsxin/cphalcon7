@@ -645,7 +645,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 		if (Z_TYPE_P(condition_callback) == IS_OBJECT) {
 			phalcon_array_update_long(&parameters, 0, &record, PH_COPY);
 
-			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, &parameters);
+			PHALCON_CALL_USER_FUNC_ARRAYW(&status, condition_callback, &parameters);
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
 			}
@@ -720,7 +720,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, filter){
 		PHALCON_CALL_METHODW(&record, getThis(), "current");
 		phalcon_array_update_long(&parameters, 0, &record, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAY(&processed_record, filter, &parameters);
+		PHALCON_CALL_USER_FUNC_ARRAYW(&processed_record, filter, &parameters);
 
 		/** 
 		 * Only add processed records to 'records' if the returned value is an array/object
@@ -788,7 +788,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 		if (Z_TYPE_P(condition_callback) == IS_OBJECT) {
 			phalcon_array_update_long(&parameters, 0, &record, PH_COPY);
 
-			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, &parameters);
+			PHALCON_CALL_USER_FUNC_ARRAYW(&status, condition_callback, &parameters);
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
 			}

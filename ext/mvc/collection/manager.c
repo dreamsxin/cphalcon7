@@ -348,9 +348,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 
 	zval *collection, entity_name, *strict_modes, strict_mode;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &collection);
+	phalcon_fetch_params(0, 1, 0, &collection);
 
 	if (Z_TYPE_P(collection) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A valid collection instance is required");
@@ -416,7 +414,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 		return;
 	}
 
-	/* PHALCON_VERIFY_INTERFACE(connection, phalcon_db_adapterinterface_ce); */
+	/* PHALCON_VERIFY_INTERFACEW(connection, phalcon_db_adapterinterface_ce); */
 	RETURN_CTORW(&connection);
 }
 

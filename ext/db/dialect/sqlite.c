@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
 
-	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 1);
+	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
 
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_SVSVS(&sql, "ALTER TABLE \"", schema_name, "\".\"", table_name, "\" ADD COLUMN ");
@@ -410,7 +410,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropTable){
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_VSV(&table, schema_name, "\".\"", table_name);
 	} else {
-		PHALCON_CPY_WRT(table, table_name);
+		PHALCON_CPY_WRT(&table, table_name);
 	}
 
 	if (zend_is_true(if_exists)) {
@@ -478,8 +478,6 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropView){
 	} else {
 		PHALCON_CONCAT_SVS(return_value, "DROP VIEW \"", &view, "\"");
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

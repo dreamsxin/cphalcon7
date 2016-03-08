@@ -121,11 +121,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, __construct){
 		}
 	}
 
-	if (!phalcon_array_isset_str(options, SL("statsKey"))) {
-		phalcon_array_update_str_str(options, SL("statsKey"), SL("_PHCX"), PH_COPY);
+	if (!phalcon_array_isset_str(&options, SL("statsKey"))) {
+		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCX"), PH_COPY);
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_cache_backend_xcache_ce, getThis(), "__construct", frontend, options);
+	PHALCON_CALL_PARENTW(NULL, phalcon_cache_backend_xcache_ce, getThis(), "__construct", frontend, &options);
 }
 
 /**

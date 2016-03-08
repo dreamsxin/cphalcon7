@@ -184,9 +184,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 	zval *http_only = NULL, *cookies, *encryption, *dependency_injector = NULL;
 	zval cookie, *registered, service, response;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 6, &name, &value, &expire, &path, &secure, &domain, &http_only);
+	phalcon_fetch_params(0, 1, 6, &name, &value, &expire, &path, &secure, &domain, &http_only);
 
 	if (Z_TYPE_P(name) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_http_cookie_exception_ce, "The cookie name must be string");
@@ -269,7 +267,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 		ZVAL_STRING(&service, ISV(response));
 
 		PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
+		PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 
 		/** 
 		 * Pass the cookies bag to the response so it can send the headers at the of the
@@ -289,12 +287,9 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
  */
 PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 
-	zval *name, *cookies, *dependency_injector;
-	zval *encryption;
+	zval *name, *cookies, *dependency_injector, *encryption;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &name);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	if (Z_TYPE_P(name) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_http_cookie_exception_ce, "The cookie name must be string");
@@ -321,8 +316,6 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 
 		phalcon_update_property_array(getThis(), SL("_cookies"), name, return_value);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

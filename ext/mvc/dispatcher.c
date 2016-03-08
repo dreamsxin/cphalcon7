@@ -195,9 +195,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	zval exception_code, exception_message, exception, service, response, status_code, status_message;
 	zval *events_manager, event_name, status;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &code);
+	phalcon_fetch_params(0, 1, 1, &message, &code);
 
 	if (!code) {
 		code = &PHALCON_GLOBAL(z_zero);
@@ -247,7 +245,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	ZVAL_STRING(&service, ISV(response));
 
 	PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 
 	/**
 	 * Dispatcher exceptions automatically send 404 status
@@ -277,7 +275,6 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	 * Throw the exception if it wasn't handled
 	 */
 	phalcon_throw_exception(&exception);
-	return;
 }
 
 /**
@@ -288,20 +285,17 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
  * @warning If any additional logic is to be implemented here, please check
  * phalcon_dispatcher_fire_event() first
  */
-PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException){
+PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException)
+{
 	zval *exception, event_name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &exception);
+	phalcon_fetch_params(0, 1, 0, &exception);
 
 	ZVAL_STRING(&event_name, "dispatch:beforeException");
 
 	ZVAL_MAKE_REF(exception);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "fireevent", &event_name, exception);
 	ZVAL_UNREF(exception);
-
-	return;
 }
 
 /**

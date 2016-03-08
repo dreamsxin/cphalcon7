@@ -200,11 +200,9 @@ PHP_METHOD(Phalcon_Mvc_Application, useImplicitView){
  */
 PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 
-	zval *modules, *merge = NULL, *registered_modules, *merged_modules = NULL;
+	zval *modules, *merge = NULL, *registered_modules, merged_modules;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &modules, &merge);
+	phalcon_fetch_params(0, 1, 1, &modules, &merge);
 
 	if (!merge) {
 		merge = &PHALCON_GLOBAL(z_false);
@@ -219,13 +217,12 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 	} else {
 		registered_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(merged_modules);
-			phalcon_fast_array_merge(merged_modules, registered_modules, modules);
+			phalcon_fast_array_merge(&merged_modules, registered_modules, modules);
 		} else {
-			PHALCON_CPY_WRT(merged_modules, modules);
+			PHALCON_CPY_WRT(&merged_modules, modules);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_modules"), merged_modules);
+		phalcon_update_property_this(getThis(), SL("_modules"), &merged_modules);
 	}
 
 	RETURN_THISW();
@@ -304,7 +301,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	ZVAL_STRING(&service, ISV(router));
 	PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
 
 	/* Handle the URI pattern (if any) */
 	PHALCON_CALL_METHODW(NULL, &router, "handle", uri);
@@ -415,7 +412,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		ZVAL_STRING(&service, "view");
 
 		PHALCON_CALL_METHODW(&view, dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACE(&view, phalcon_mvc_viewinterface_ce);
+		PHALCON_VERIFY_INTERFACEW(&view, phalcon_mvc_viewinterface_ce);
 	}
 
 	/* We get the parameters from the router and assign them to the dispatcher */
@@ -429,7 +426,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_STRING(&service, ISV(dispatcher));
 
 	PHALCON_CALL_METHODW(&dispatcher, dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(&dispatcher, phalcon_dispatcherinterface_ce);
 
 	/* Assign the values passed from the router */
 	PHALCON_CALL_METHODW(NULL, &dispatcher, "setmodulename", &module_name);
@@ -482,7 +479,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			ZVAL_STRING(&service, ISV(response));
 
 			PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
-			PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
+			PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 
 			if (PHALCON_IS_FALSE(&possible_response)) {
 				RETURN_CTORW(&response);
@@ -532,7 +529,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		ZVAL_STRING(&service, ISV(response));
 
 		PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
+		PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 	}
 
 	/* Calling beforeSendResponse */

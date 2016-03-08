@@ -274,8 +274,6 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
 	phalcon_return_property(&engines, getThis(), SL("_engines"));
 
 	/** 
@@ -324,7 +322,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 					 * Engine can be a closure
 					 */
 					if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
-						PHALCON_CALL_USER_FUNC_ARRAY(&engine_object, engine_service, &arguments);
+						PHALCON_CALL_USER_FUNC_ARRAYW(&engine_object, engine_service, &arguments);
 					} else {
 						PHALCON_CPY_WRT(&engine_object, engine_service);
 					}
@@ -333,7 +331,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 					 * Engine can be a string representing a service in the DI
 					 */
 					PHALCON_CALL_METHODW(&engine_object, dependency_injector, "getshared", engine_service, &arguments);
-					PHALCON_VERIFY_INTERFACE(&engine_object, phalcon_mvc_view_engineinterface_ce);
+					PHALCON_VERIFY_INTERFACEW(&engine_object, phalcon_mvc_view_engineinterface_ce);
 				} else {
 					PHALCON_CONCAT_SV(&exception_message, "Invalid template engine registration for extension: ", &extension);
 					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
@@ -363,9 +361,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &path, &params);
+	phalcon_fetch_params(0, 2, 0, &path, &params);
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
@@ -464,8 +460,6 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 		ZVAL_STRING(&event_name, "view:afterRender");
 		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -477,12 +471,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 
-	zval *path, *params = NULL, cache, is_started, key, lifetime;
-	zval *cache_options, content, *view_params, merged_params, is_fresh;
+	zval *path, *params = NULL, cache, is_started, key, lifetime, *cache_options, content, *view_params, merged_params, is_fresh;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &path, &params);
+	phalcon_fetch_params(0, 1, 1, &path, &params);
 
 	if (!params) {
 		params = &PHALCON_GLOBAL(z_null);
@@ -596,12 +587,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 
-	zval *partial_path, *params = NULL, *view_params, merged_params;
-	zval *content;
+	zval *partial_path, *params = NULL, *view_params, merged_params, *content;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &partial_path, &params);
+	phalcon_fetch_params(0, 1, 1, &partial_path, &params);
 
 	if (!params) {
 		params = &PHALCON_GLOBAL(z_null);
@@ -653,8 +641,6 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 	 * Content is output to the parent view
 	 */
 	zend_print_zval(content, 0);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -714,7 +700,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE(return_value, phalcon_cache_backendinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(return_value, phalcon_cache_backendinterface_ce);
 }
 
 /**

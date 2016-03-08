@@ -515,8 +515,6 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 
 		RETURN_TRUE;
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

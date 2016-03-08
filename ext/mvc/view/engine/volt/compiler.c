@@ -410,7 +410,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, fireExtensionEvent){
 				phalcon_array_append(&call_object, extension, PH_COPY);
 				phalcon_array_append(&call_object, name, PH_COPY);
 				if (Z_TYPE_P(arguments) == IS_ARRAY) { 
-					PHALCON_CALL_USER_FUNC_ARRAY(&status, &call_object, arguments);
+					PHALCON_CALL_USER_FUNC_ARRAYW(&status, &call_object, arguments);
 				} else {
 					PHALCON_CALL_USER_FUNC(&status, &call_object);
 				}
@@ -447,9 +447,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, addExtension){
 	 * Initialize the extension
 	 */
 	if (phalcon_method_exists_ex(extension, SL("initialize")) == SUCCESS) {
-		PHALCON_MM_GROW();
 		PHALCON_CALL_METHODW(NULL, extension, "initialize", getThis());
-		PHALCON_MM_RESTORE();
 	}
 
 	phalcon_update_property_array_append(getThis(), SL("_extensions"), extension);
@@ -596,9 +594,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, attributeReader){
 	zval *expr, expr_code, left, left_type, variable, *level, prefix, *dependency_injector;
 	zval is_service, left_code, right, right_type, member, right_code;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &expr);
+	phalcon_fetch_params(0, 1, 0, &expr);
 
 	ZVAL_NULL(&expr_code);
 
@@ -673,9 +669,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 	zval event, fire_arguments, functions, definition, parameters, line, file, exception_message, *macros;
 	zval *extended_blocks, *current_block, *expr_level, block, escaped_code, camelized, method, class_name, array_helpers;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &expr);
+	phalcon_fetch_params(0, 1, 0, &expr);
 
 	/** 
 	 * Valid filters are always arrays
@@ -921,8 +915,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 
 	PHALCON_CALL_METHODW(&name, getThis(), "expression", &name_expr);
 	PHALCON_CONCAT_VSVS(return_value, &name, "(", &arguments, ")");
-
-	return;
 }
 
 /**
@@ -936,9 +928,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 
 	zval *test, *left, type, name, test_name, test_arguments, arguments, right_code;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &test, &left);
+	phalcon_fetch_params(0, 2, 0, &test, &left);
 
 	/** 
 	 * Valid tests are always arrays
@@ -1052,8 +1042,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveTest){
 	 */
 	PHALCON_CALL_METHODW(&right_code, getThis(), "expression", test);
 	PHALCON_CONCAT_VSV(return_value, left, " == ", &right_code);
-
-	return;
 }
 
 /**
@@ -1067,8 +1055,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, resolveFilter){
 
 	zval *filter, *left, code, type, name, function_name, line, file, exception_message, func_arguments;
 	zval arguments, resolved_expr, resolved_param, extensions, event, fire_arguments, filters, definition, parameters;
-
-	PHALCON_MM_GROW();
 
 	phalcon_fetch_params(0, 2, 0, &filter, &left);
 
@@ -1450,9 +1436,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 
 	zval *expr, expr_code, *extensions;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &expr);
+	phalcon_fetch_params(0, 1, 0, &expr);
 
 	/** 
 	 * Valid expressions are always arrays
@@ -1815,13 +1799,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
  * @param array $statements
  * @return string|array
  */
-PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends){
+PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends)
+{
+	zval *statements, *is_statement_list = NULL, *statement;
 
-	zval *statements, *is_statement_list = NULL, *statement = NULL;
-
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &statements);
+	phalcon_fetch_params(0, 1, 0, &statements);
 
 	/** 
 	 * Resolve the statement list as normal
@@ -1869,13 +1851,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 
-	zval *statement, *extends_mode = NULL, expr, prefix, *level, compilation;
-	zval prefix_level, expr_code, block_statements, for_else, *bstatement;
+	zval *statement, *extends_mode = NULL, expr, prefix, *level, compilation, prefix_level, expr_code, block_statements, for_else, *bstatement;
 	zval code, *loop_context, iterator, variable, key, if_expr, if_expr_code;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &statement, &extends_mode);
+	phalcon_fetch_params(0, 1, 1, &statement, &extends_mode);
 
 	if (!extends_mode) {
 		extends_mode = &PHALCON_GLOBAL(z_false);
@@ -2287,9 +2266,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileInclude){
 	zval *statement, path_expr, expr_type, path, *view, views_dir, final_path, extended;
 	zval sub_compiler, compilation, compiled_path, expr_params, params;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &statement);
+	phalcon_fetch_params(0, 1, 0, &statement);
 
 	/** 
 	 * A valid expression is required
@@ -3424,16 +3401,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getCompiledTemplatePath){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, parse){
 
-	zval *view_code, *current_path;
+	zval *view_code, current_path;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &view_code);
 
-	phalcon_fetch_params(1, 1, 0, &view_code);
-
-	PHALCON_INIT_VAR(current_path);
-	ZVAL_STRING(current_path, "eval code");
-	if (phvolt_parse_view(return_value, view_code, current_path) == FAILURE) {
+	ZVAL_STRING(&current_path, "eval code");
+	if (phvolt_parse_view(return_value, view_code, &current_path) == FAILURE) {
 		return;
 	}
-	return;
 }

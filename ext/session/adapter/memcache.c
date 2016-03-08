@@ -234,7 +234,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, read){
 
 	zval *sid, *lifetime, *memcache;
 
-	phalcon_fetch_params(1, 1, 0, &sid);
+	phalcon_fetch_params(0, 1, 0, &sid);
 
 	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
 	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);

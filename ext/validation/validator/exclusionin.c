@@ -96,7 +96,7 @@ PHP_METHOD(Phalcon_Validation_Validator_ExclusionIn, validate){
 	}
 
 	/* A domain is an array with a list of valid values */
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&domain, ce, getThis(), ISV(domain)));
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&domain, ce, getThis(), ISV(domain)));
 	if (Z_TYPE_P(&domain) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Option 'domain' must be an array");
 		return;

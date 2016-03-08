@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 	phalcon_update_property_this(getThis(), SL("_username"), username);
 	phalcon_update_property_this(getThis(), SL("_password"), password);
 
-	if (!authtype) {
+	if (!_authtype) {
 		ZVAL_STRING(&authtype, "any");
 	} else {
 		PHALCON_CPY_WRT(&authtype, _authtype);
@@ -487,7 +487,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setBaseUri){
 	}
 
 	object_init_ex(&base_uri, phalcon_http_uri_ce);
-	PHALCON_CALL_METHODW(NULL, base_uri, "__construct", uri);
+	PHALCON_CALL_METHODW(NULL, &base_uri, "__construct", uri);
 
 	phalcon_update_property_this(getThis(), SL("_base_uri"), &base_uri);
 

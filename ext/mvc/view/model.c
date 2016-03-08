@@ -192,11 +192,9 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getTemplate){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 
-	zval *params, *merge = NULL, *view_params, *merged_params = NULL;
+	zval *params, *merge = NULL, *view_params, merged_params;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &params, &merge);
+	phalcon_fetch_params(0, 1, 1, &params, &merge);
 
 	if (!merge) {
 		merge = &PHALCON_GLOBAL(z_true);
@@ -209,14 +207,13 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 
 	if (zend_is_true(merge)) {
 		view_params = phalcon_read_property(getThis(), SL("_viewParams"), PH_NOISY);
-		if (Z_TYPE_P(view_params) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(merged_params);
-			phalcon_fast_array_merge(merged_params, view_params, params);
+		if (Z_TYPE_P(view_params) == IS_ARRAY) {
+			phalcon_fast_array_merge(&merged_params, view_params, params);
 		} else {
-			PHALCON_CPY_WRT(merged_params, params);
+			PHALCON_CPY_WRT(&merged_params, params);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_viewParams"), merged_params);
+		phalcon_update_property_this(getThis(), SL("_viewParams"), &merged_params);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_viewParams"), params);
 	}
@@ -299,9 +296,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, addChild){
 
 	zval *child, *capture_to = NULL, *append = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &child, &capture_to, &append);
+	phalcon_fetch_params(0, 1, 2, &child, &capture_to, &append);
 
 	if (capture_to && !PHALCON_IS_EMPTY(capture_to)) {
 		PHALCON_CALL_METHODW(NULL, child, "setcaptureto", capture_to);
@@ -327,9 +322,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, appendChild){
 
 	zval *child, *capture_to = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &child, &capture_to);
+	phalcon_fetch_params(0, 1, 1, &child, &capture_to);
 
 	if (!capture_to) {
 		capture_to = &PHALCON_GLOBAL(z_null);
@@ -350,9 +343,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 
 	zval *capture_to = NULL, *childs, *child;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &capture_to);
+	phalcon_fetch_params(0, 0, 1, &capture_to);
 
 	if (capture_to) {
 		array_init(return_value);
@@ -547,8 +538,6 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
 	array_init(&child_contents);
 
 	PHALCON_CALL_SELFW(&childs, "getchild");
@@ -586,7 +575,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		PHALCON_CALL_METHODW(&view, &dependency_injector, "getshared", &service);
 	}
 
-	PHALCON_VERIFY_INTERFACE(&view, phalcon_mvc_viewinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(&view, phalcon_mvc_viewinterface_ce);
 
 	PHALCON_CALL_METHODW(&events_manager, &view, "geteventsmanager");
 

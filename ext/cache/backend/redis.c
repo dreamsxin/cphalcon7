@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
 	zval *frontend, *_options = NULL, options;
 
-	phalcon_fetch_params(1, 1, 1, &frontend, &_options);
+	phalcon_fetch_params(0, 1, 1, &frontend, &_options);
 
 	if (!_options) {
 		array_init_size(&options, 4);

@@ -112,5 +112,5 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 	/** 
 	 * Call the handler
 	 */
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &call_handler, arguments);
+	PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &call_handler, arguments);
 }

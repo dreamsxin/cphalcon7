@@ -712,22 +712,17 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getSqlTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, limit){
 
-	zval *sql_query, *number, *limit, *sql_limit;
-
-	PHALCON_MM_GROW();
+	zval *sql_query, *number, limit, sql_limit;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "zz", &sql_query, &number) == FAILURE) {
 		RETURN_NULL();
 	}
 
 	if (phalcon_is_numeric(number)) {
+		ZVAL_LONG(&limit, phalcon_get_intval(number));
 
-		PHALCON_INIT_VAR(limit);
-		ZVAL_LONG(limit, phalcon_get_intval(number));
-
-		PHALCON_INIT_VAR(sql_limit);
-		PHALCON_CONCAT_VSV(sql_limit, sql_query, " LIMIT ", limit);
-		RETURN_CTORW(sql_limit);
+		PHALCON_CONCAT_VSV(&sql_limit, sql_query, " LIMIT ", &limit);
+		RETURN_CTORW(&sql_limit);
 	}
 
 	RETURN_CTORW(sql_query);

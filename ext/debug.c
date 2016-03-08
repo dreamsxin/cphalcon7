@@ -256,8 +256,6 @@ PHP_METHOD(Phalcon_Debug, listen){
 
 	zval *exceptions = NULL, *low_severity = NULL;
 
-	PHALCON_MM_GROW();
-
 	phalcon_fetch_params(0, 0, 2, &exceptions, &low_severity);
 
 	if (!exceptions || zend_is_true(exceptions)) {
@@ -278,15 +276,12 @@ PHP_METHOD(Phalcon_Debug, listen){
  */
 PHP_METHOD(Phalcon_Debug, listenExceptions){
 
-	zval *handler;
+	zval handler;
 
-	PHALCON_MM_GROW();
-
-	PHALCON_INIT_VAR(handler);
-	array_init_size(handler, 2);
-	phalcon_array_append(handler, getThis(), PH_COPY);
-	add_next_index_stringl(handler, SL("onUncaughtException"));
-	PHALCON_CALL_FUNCTIONW(NULL, "set_exception_handler", handler);
+	array_init_size(&handler, 2);
+	phalcon_array_append(&handler, getThis(), PH_COPY);
+	add_next_index_stringl(&handler, SL("onUncaughtException"));
+	PHALCON_CALL_FUNCTIONW(NULL, "set_exception_handler", &handler);
 	RETURN_THISW();
 }
 
@@ -295,23 +290,19 @@ PHP_METHOD(Phalcon_Debug, listenExceptions){
  *
  * @return Phalcon\Debug
  */
-PHP_METHOD(Phalcon_Debug, listenLowSeverity){
+PHP_METHOD(Phalcon_Debug, listenLowSeverity)
+{
+	zval handler;
 
-	zval *handler;
+	array_init_size(&handler, 2);
+	phalcon_array_append(&handler, getThis(), PH_COPY);
+	add_next_index_stringl(&handler, SL("onUserDefinedError"));
+	PHALCON_CALL_FUNCTIONW(NULL, "set_error_handler", &handler);
 
-	PHALCON_MM_GROW();
-
-	PHALCON_INIT_VAR(handler);
-	array_init_size(handler, 2);
-	phalcon_array_append(handler, getThis(), PH_COPY);
-	add_next_index_stringl(handler, SL("onUserDefinedError"));
-	PHALCON_CALL_FUNCTIONW(NULL, "set_error_handler", handler);
-
-	PHALCON_INIT_NVAR(handler);
-	array_init_size(handler, 2);
-	phalcon_array_append(handler, getThis(), PH_COPY);
-	add_next_index_stringl(handler, SL("onShutdown"));
-	PHALCON_CALL_FUNCTIONW(NULL, "register_shutdown_function", handler);
+	array_init_size(&handler, 2);
+	phalcon_array_append(&handler, getThis(), PH_COPY);
+	add_next_index_stringl(&handler, SL("onShutdown"));
+	PHALCON_CALL_FUNCTIONW(NULL, "register_shutdown_function", &handler);
 
 	RETURN_THISW();
 }
@@ -333,9 +324,7 @@ PHP_METHOD(Phalcon_Debug, halt){
  */
 PHP_METHOD(Phalcon_Debug, debugVar){
 
-	zval *var, *key = NULL, *ztime, *backtrace, *data;
-
-	PHALCON_MM_GROW();
+	zval *var, *key = NULL, ztime, backtrace, data;
 
 	phalcon_fetch_params(0, 1, 1, &var, &key);
 
@@ -343,18 +332,15 @@ PHP_METHOD(Phalcon_Debug, debugVar){
 		key = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(ztime);
-	ZVAL_LONG(ztime, (long) time(NULL));
+	ZVAL_LONG(&ztime, (long) time(NULL));
 
-	PHALCON_INIT_VAR(backtrace);
-	zend_fetch_debug_backtrace(backtrace, 0, DEBUG_BACKTRACE_PROVIDE_OBJECT, 0);
+	zend_fetch_debug_backtrace(&backtrace, 0, DEBUG_BACKTRACE_PROVIDE_OBJECT, 0);
 
-	PHALCON_INIT_VAR(data);
-	array_init_size(data, 3);
-	phalcon_array_append(data, var, PH_COPY);
-	phalcon_array_append(data, backtrace, PH_COPY);
-	phalcon_array_append(data, ztime, PH_COPY);
-	phalcon_update_property_array_append(getThis(), SL("_data"), data);
+	array_init_size(&data, 3);
+	phalcon_array_append(&data, var, PH_COPY);
+	phalcon_array_append(&data, &backtrace, PH_COPY);
+	phalcon_array_append(&data, &ztime, PH_COPY);
+	phalcon_update_property_array_append(getThis(), SL("_data"), &data);
 	RETURN_THISW();
 }
 
@@ -412,9 +398,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &argument, &n);
+	phalcon_fetch_params(0, 1, 1, &argument, &n);
 
 	if (!n) {
 		n = &PHALCON_GLOBAL(z_zero);
@@ -496,12 +480,9 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 
 	zval *variable, class_name, dumped_object, array_dump, dump;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &variable);
+	phalcon_fetch_params(0, 1, 0, &variable);
 
 	if (PHALCON_IS_SCALAR(variable)) {
-
 		/** 
 		 * Boolean variables are represented as 'true'/'false'
 		 */
@@ -524,7 +505,6 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 		/** 
 		 * Other scalar variables are just converted to strings
 		 */
-
 		RETURN_CTORW(variable);
 	}
 
@@ -672,20 +652,12 @@ PHP_METHOD(Phalcon_Debug, getFileLink) {
  */
 PHP_METHOD(Phalcon_Debug, showTraceItem){
 
-	zval *n, *trace, *link_format, space, two_spaces, underscore, minus, html, class_name;
-	zval namespace_separator, prepare_uri_class, lower_class_name, prepared_function_name;
-	zval prepare_internal_class, type, function_name;
-	zval trace_args, arguments, *argument, joined_arguments;
-	zval file, line, show_files, lines, number_lines;
-	zval show_file_fragment, before_context, before_line;
-	zval first_line, after_context, after_line, last_line;
-	zval comment_pattern, charset, tab;
-	zval comment, i, formatted_file;
+	zval *n, *trace, *link_format, space, two_spaces, underscore, minus, html, class_name, namespace_separator, prepare_uri_class, lower_class_name, prepared_function_name;
+	zval prepare_internal_class, type, function_name, trace_args, arguments, *argument, joined_arguments, file, line, show_files, lines, number_lines;
+	zval show_file_fragment, before_context, before_line, first_line, after_context, after_line, last_line, comment_pattern, charset, tab, comment, i, formatted_file;
 	zend_class_entry *class_ce;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 3, 0, &n, &trace, &link_format);
+	phalcon_fetch_params(0, 3, 0, &n, &trace, &link_format);
 
 	ZVAL_STRING(&space, " ");
 	ZVAL_STRING(&two_spaces, "  ");
@@ -936,20 +908,16 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
  */
 PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
-	zval *exception, *is_active, message, class_name, css_sources, escaped_message;
-	zval html, version, file, line, show_back_trace, *data_vars, trace, *trace_item;
-	zval *_REQUEST, *value = NULL, *_SERVER, files, memory, *data_var;
-	zval js_sources, formatted_file, z_link_format;
+	zval *exception, *is_active, message, class_name, css_sources, escaped_message, html, version, file, line, show_back_trace, *data_vars, trace, *trace_item;
+	zval *_REQUEST, *value = NULL, *_SERVER, files, memory, *data_var, js_sources, formatted_file, z_link_format;
 	zend_bool ini_exists = 1;
 	zend_class_entry *ce;
 	zend_string *str_key;
 	ulong idx;
 	char* link_format;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &exception);
-	PHALCON_VERIFY_CLASS_EX(exception, zend_exception_get_default(), phalcon_exception_ce, 1);
+	phalcon_fetch_params(0, 1, 0, &exception);
+	PHALCON_VERIFY_CLASS_EX(exception, zend_exception_get_default(), phalcon_exception_ce, 0);
 
 	/** 
 	 * Cancel the output buffer if active
@@ -1204,9 +1172,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 	zval *severity, *message, *file = NULL, *line = NULL, *context = NULL, previous, exception;
 	zend_class_entry *default_exception_ce;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 3, &severity, &message, &file, &line, &context);
+	phalcon_fetch_params(0, 2, 3, &severity, &message, &file, &line, &context);
 
 	if (!file) {
 		file = &PHALCON_GLOBAL(z_null);

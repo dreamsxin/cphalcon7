@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Session_Adapter, set){
 
 	zval *index, *value, *unique_id, key;
 
-	phalcon_fetch_params(&, 2, 0, &index, &value);
+	phalcon_fetch_params(0, 2, 0, &index, &value);
 
 	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
 

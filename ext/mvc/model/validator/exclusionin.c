@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 
 	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
 	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
-		RETURN_MM_TRUE;
+		RETURN_TRUE;
 	}
 
 	/** 

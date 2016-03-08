@@ -1014,7 +1014,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAfter){
 
 	phalcon_fetch_params(0, 1, 0, &target);
 
-	PHALCON_CALL_SELF(&left, "getleftattribute", target);
+	PHALCON_CALL_SELFW(&left, "getleftattribute", target);
 
 	phalcon_add_function(&tmp, &left, &PHALCON_GLOBAL(z_one));
 

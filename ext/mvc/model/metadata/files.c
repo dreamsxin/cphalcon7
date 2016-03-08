@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 
 	PHALCON_CONCAT_VVS(&path, meta_data_dir, &virtual_key, ".php");
 
-	if (phalcon_file_exists(path) == SUCCESS) {
+	if (phalcon_file_exists(&path) == SUCCESS) {
 		RETURN_ON_FAILURE(phalcon_require_ret(&data, Z_STRVAL(path)));
 		RETURN_CTORW(&data);
 	}
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 	zval *key, *data, *meta_data_dir, virtual_key, path, php_export, status;
 	smart_str exp = { 0 };
 
-	phalcon_fetch_params(, 2, 0, &key, &data);
+	phalcon_fetch_params(0, 2, 0, &key, &data);
 
 	meta_data_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
 
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 	object_init_ex(&iterator, spl_ce_GlobIterator);
 	PHALCON_CALL_METHODW(NULL, &iterator, "__construct", &pattern);
 
-	it = spl_ce_GlobIterator->get_iterator(spl_ce_GlobIterator, iterator, 0);
+	it = spl_ce_GlobIterator->get_iterator(spl_ce_GlobIterator, &iterator, 0);
 	it->funcs->rewind(it);
 	while (SUCCESS == it->funcs->valid(it) && !EG(exception)) {
 		zval itkey, dummy;

@@ -153,38 +153,35 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getOptions){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getCompiler){
 
-	zval *compiler = NULL, *view, *options, *dependency_injector;
+	zval compiler, *view, *options, *dependency_injector;
 
-	PHALCON_MM_GROW();
-
-	compiler = phalcon_read_property(getThis(), SL("_compiler"), PH_NOISY);
-	if (Z_TYPE_P(compiler) != IS_OBJECT) {
+	phalcon_return_property(&compiler, getThis(), SL("_compiler"));
+	if (Z_TYPE(compiler) != IS_OBJECT) {
 		view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 		options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
-		PHALCON_INIT_NVAR(compiler);
-		object_init_ex(compiler, phalcon_mvc_view_engine_volt_compiler_ce);
-		PHALCON_CALL_METHODW(NULL, compiler, "__construct", view);
+		object_init_ex(&compiler, phalcon_mvc_view_engine_volt_compiler_ce);
+		PHALCON_CALL_METHODW(NULL, &compiler, "__construct", view);
 
 		/** 
 		 * Pass the IoC to the compiler only of it's an object
 		 */
 		if (Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-			PHALCON_CALL_METHODW(NULL, compiler, "setdi", dependency_injector);
+			PHALCON_CALL_METHODW(NULL, &compiler, "setdi", dependency_injector);
 		}
 
 		/** 
 		 * Pass the options to the compiler only if they're an array
 		 */
 		if (Z_TYPE_P(options) == IS_ARRAY) { 
-			PHALCON_CALL_METHODW(NULL, compiler, "setoptions", options);
+			PHALCON_CALL_METHODW(NULL, &compiler, "setoptions", options);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_compiler"), compiler);
+		phalcon_update_property_this(getThis(), SL("_compiler"), &compiler);
 	}
 
-	RETURN_CTORW(compiler);
+	RETURN_CTORW(&compiler);
 }
 
 /**
@@ -444,7 +441,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, sort){
 
 	zval *value;
 
-	phalcon_fetch_params(1, 1, 0, &value);
+	phalcon_fetch_params(0, 1, 0, &value);
 	PHALCON_SEPARATE_PARAM(value);
 
 	ZVAL_MAKE_REF(value);

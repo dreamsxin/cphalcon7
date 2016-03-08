@@ -37,6 +37,7 @@
 #include "kernel/concat.h"
 #include "kernel/operators.h"
 #include "kernel/file.h"
+#include "kernel/string.h"
 
 #include "interned-strings.h"
 
@@ -290,8 +291,6 @@ PHP_METHOD(Phalcon_Forms_Form, __construct){
 	if (phalcon_method_exists_ex(getThis(), SL("initialize")) == SUCCESS) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "initialize", entity, user_options);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -481,10 +480,10 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 	ZVAL_STRING(&service_name, ISV(filter));
 
 	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
-	PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(&dependency_injector, phalcon_diinterface_ce);
 
 	PHALCON_CALL_METHODW(&filter, &dependency_injector, "getshared", &service_name);
-	PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+	PHALCON_VERIFY_INTERFACEW(&filter, phalcon_filterinterface_ce);
 
 	array_init(&filter_data);
 
@@ -916,7 +915,6 @@ PHP_METHOD(Phalcon_Forms_Form, getLabel){
 		return;
 	}
 
-	PHALCON_MM_GROW();
 	PHALCON_CALL_METHODW(&label, &element, "getlabel");
 
 	/* Use the element's name as label if the label is not available */

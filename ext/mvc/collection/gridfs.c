@@ -400,9 +400,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, createBytes){
 
 	zval *bytes = NULL, *data = NULL, *white_list = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 3, &bytes, &data, &white_list);
+	phalcon_fetch_params(0, 0, 3, &bytes, &data, &white_list);
 
 	if (!bytes) {
 		bytes = &PHALCON_GLOBAL(z_null);
@@ -417,7 +415,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, createBytes){
 	}
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "savebytes", bytes, data, white_list, &PHALCON_GLOBAL(z_true));
-	return;
 }
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, update){

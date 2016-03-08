@@ -346,17 +346,12 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Manager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setCustomEventsManager){
 
-	zval *model, *events_manager, *class_name;
+	zval *model, *events_manager, class_name;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &events_manager);
 
-	phalcon_fetch_params(1, 2, 0, &model, &events_manager);
-
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_customEventsManager"), class_name, events_manager);
-
-	PHALCON_MM_RESTORE();
+	phalcon_get_class(&class_name, model, 1);
+	phalcon_update_property_array(getThis(), SL("_customEventsManager"), &class_name, events_manager);
 }
 
 /**
@@ -795,7 +790,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
 
 	zval *model, *connection_services, entity_name, connection;
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	connection_services = phalcon_read_property(getThis(), SL("_writeConnectionServices"), PH_NOISY);
 	if (Z_TYPE_P(connection_services) == IS_ARRAY) {
@@ -1476,37 +1471,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, existsBelongsTo){
 
-	zval *model_name, *model_relation, *initialized;
-	zval *entity_name, *entity_relation, *key_relation;
-	zval *belongs_to;
+	zval *model_name, *model_relation, *initialized, entity_name, entity_relation, key_relation, *belongs_to;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model_name, &model_relation);
+	phalcon_fetch_params(0, 2, 0, &model_name, &model_relation);
 
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
-	PHALCON_INIT_VAR(entity_name);
-	phalcon_fast_strtolower(entity_name, model_name);
+	phalcon_fast_strtolower(&entity_name, model_name);
 
-	PHALCON_INIT_VAR(entity_relation);
-	phalcon_fast_strtolower(entity_relation, model_relation);
+	phalcon_fast_strtolower(&entity_relation, model_relation);
 
 	/** 
 	 * Relationship unique key
 	 */
-	PHALCON_INIT_VAR(key_relation);
-	PHALCON_CONCAT_VSV(key_relation, entity_name, "$", entity_relation);
+	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
 
 	/** 
 	 * Initialize the model first
 	 */
-	if (!phalcon_array_isset(initialized, entity_name)) {
+	if (!phalcon_array_isset(initialized, &entity_name)) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "load", model_name);
 	}
 
 	belongs_to = phalcon_read_property(getThis(), SL("_belongsTo"), PH_NOISY);
-	if (phalcon_array_isset(belongs_to, key_relation)) {
+	if (phalcon_array_isset(belongs_to, &key_relation)) {
 		RETURN_TRUE;
 	}
 
@@ -1932,11 +1920,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReusableRecords){
 
 	zval *model_name, *key, *reusable, records;
 
-	phalcon_fetch_params(1, 2, 0, &model_name, &key);
+	phalcon_fetch_params(0, 2, 0, &model_name, &key);
 
 	reusable = phalcon_read_property(getThis(), SL("_reusable"), PH_NOISY);
-	if (phalcon_array_isset(reusable, key)) {
-		phalcon_array_fetch(&records, reusable, key, PH_NOISY);
+	if (phalcon_array_isset_fetch(&records, reusable, key)) {
 		RETURN_CTORW(&records);
 	}
 

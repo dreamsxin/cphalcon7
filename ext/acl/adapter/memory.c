@@ -152,21 +152,15 @@ PHALCON_INIT_CLASS(Phalcon_Acl_Adapter_Memory){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, __construct){
 
-	zval *resources_names, *access_list;
+	zval resources_names, access_list;
 
-	PHALCON_MM_GROW();
+	array_init_size(&resources_names, 1);
+	phalcon_array_update_str(&resources_names, SL("*"), &PHALCON_GLOBAL(z_true), PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_resourcesNames"), &resources_names);
 
-	PHALCON_INIT_VAR(resources_names);
-	array_init_size(resources_names, 1);
-	phalcon_array_update_str(resources_names, SL("*"), &PHALCON_GLOBAL(z_true), PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_resourcesNames"), resources_names);
-
-	PHALCON_INIT_VAR(access_list);
-	array_init_size(access_list, 1);
-	phalcon_array_update_str(access_list, SL("*!*"), &PHALCON_GLOBAL(z_true), PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_accessList"), access_list);
-
-	PHALCON_MM_RESTORE();
+	array_init_size(&access_list, 1);
+	phalcon_array_update_str(&access_list, SL("*!*"), &PHALCON_GLOBAL(z_true), PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_accessList"), &access_list);
 }
 
 /**

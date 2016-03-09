@@ -63,37 +63,25 @@ PHALCON_INIT_CLASS(Phalcon_DI_FactoryDefault_CLI){
  */
 PHP_METHOD(Phalcon_DI_FactoryDefault_CLI, __construct){
 
-	zval *shared, *name = NULL, *definition = NULL, *router, *dispatcher;
+	zval *shared, name, definition, router, dispatcher;
 
-	PHALCON_MM_GROW();
-
-	PHALCON_CALL_PARENT(NULL, phalcon_di_factorydefault_cli_ce, getThis(), "__construct");
+	PHALCON_CALL_PARENTW(NULL, phalcon_di_factorydefault_cli_ce, getThis(), "__construct");
 
 	shared = &PHALCON_GLOBAL(z_true);
 
-	PHALCON_INIT_VAR(name);
-	ZVAL_STRING(name, ISV(router));
+	PHALCON_STR(&name, ISV(router));
+	PHALCON_STR(&definition, "Phalcon\\CLI\\Router");
 
-	PHALCON_INIT_VAR(definition);
-	ZVAL_STRING(definition, "Phalcon\\CLI\\Router");
+	object_init_ex(&router, phalcon_di_service_ce);
+	PHALCON_CALL_METHOD(NULL, &router, "__construct", &name, &definition, shared);
 
-	PHALCON_INIT_VAR(router);
-	object_init_ex(router, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, router, "__construct", name, definition, shared);
+	phalcon_di_set_service(getThis(), &name, &router, PH_COPY);
 
-	phalcon_di_set_service(getThis(), name, router, PH_COPY);
+	PHALCON_STR(&name, ISV(dispatcher));
+	PHALCON_STR(&definition, "Phalcon\\CLI\\Dispatcher");
 
-	PHALCON_INIT_NVAR(name);
-	ZVAL_STRING(name, ISV(dispatcher));
+	object_init_ex(&dispatcher, phalcon_di_service_ce);
+	PHALCON_CALL_METHODW(NULL, &dispatcher, "__construct", &name, &definition, shared);
 
-	PHALCON_INIT_NVAR(definition);
-	ZVAL_STRING(definition, "Phalcon\\CLI\\Dispatcher");
-
-	PHALCON_INIT_VAR(dispatcher);
-	object_init_ex(dispatcher, phalcon_di_service_ce);
-	PHALCON_CALL_METHOD(NULL, dispatcher, "__construct", name, definition, shared);
-
-	phalcon_di_set_service(getThis(), name, dispatcher, PH_COPY);
-
-	PHALCON_MM_RESTORE();
+	phalcon_di_set_service(getThis(), &name, &dispatcher, PH_COPY);
 }

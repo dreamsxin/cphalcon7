@@ -53,6 +53,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setEventsManager);
 PHP_METHOD(Phalcon_DI_Injectable, getEventsManager);
 PHP_METHOD(Phalcon_DI_Injectable, fireEvent);
 PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel);
+PHP_METHOD(Phalcon_DI_Injectable, getResolveService);
 PHP_METHOD(Phalcon_DI_Injectable, __get);
 
 static const zend_function_entry phalcon_di_injectable_method_entry[] = {
@@ -62,6 +63,7 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_DI_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -107,13 +109,25 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
  */
 PHP_METHOD(Phalcon_DI_Injectable, getDI)
 {
-	zval *dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_RETURN_CALL_CE_STATICW(phalcon_di_ce, "getdefault");
+	zval *error = NULL, dependency_injector;
+
+	phalcon_fetch_params(0, 0, 1, &error);
+
+	if (!error) {
+		error = &PHALCON_GLOBAL(z_false);
+	}
+
+	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 		return;
 	}
 
-	RETURN_ZVAL(dependency_injector, 1, 0);
+	if (Z_TYPE(dependency_injector) != IS_OBJECT && zend_is_true(error)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_di_exception_ce, "A dependency injection container is not object");
+		return;
+	}
+	RETURN_CTORW(&dependency_injector);
 }
 
 /**
@@ -152,12 +166,9 @@ PHP_METHOD(Phalcon_DI_Injectable, getEventsManager){
  */
 PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, *events_manager;
-	zval *lower, *event_parts, *name = NULL, *status = NULL;
+	zval *eventname, *data = NULL, *cancelable = NULL, events_manager, lower, event_parts, name, status;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
+	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(eventname);
 
 	if (!data) {
@@ -168,41 +179,37 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 		cancelable = &PHALCON_GLOBAL(z_true);
 	}
 
-	PHALCON_INIT_VAR(lower);
-	phalcon_fast_strtolower(lower, eventname);
+	phalcon_fast_strtolower(&lower, eventname);
 
-	if (phalcon_memnstr_str(lower, SL(":"))) {
-		PHALCON_INIT_VAR(event_parts);
-		phalcon_fast_explode_str(event_parts, SL(":"), lower);
-
-		PHALCON_OBS_VAR(name);
-		phalcon_array_fetch_long(&name, event_parts, 1, PH_NOISY);
+	if (phalcon_memnstr_str(&lower, SL(":"))) {
+		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
+		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(name, lower);
+		PHALCON_CPY_WRT(&name, &lower);
 	}
 
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
-	if (phalcon_method_exists(getThis(), name) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL_P(name), data);
+	if (phalcon_method_exists(getThis(), &name) == SUCCESS) {
+		PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(name), data);
 	}
 
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
+	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 
-	if (Z_TYPE_P(events_manager) != IS_NULL) {
-		PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 1);
+	if (Z_TYPE(events_manager) != IS_NULL) {
+		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", eventname, getThis(), data, cancelable);
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_FALSE;
 		}
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**
@@ -214,12 +221,9 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
  */
 PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, *status = NULL, *events_manager;
-	zval *lower, *event_parts, *name = NULL;
+	zval *eventname, *data = NULL, *cancelable = NULL, status, events_manager, lower, event_parts, name;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
+	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(eventname);
 
 	if (!data) {
@@ -230,43 +234,75 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 		cancelable = &PHALCON_GLOBAL(z_true);
 	}
 
-	PHALCON_INIT_VAR(lower);
-	phalcon_fast_strtolower(lower, eventname);
+	phalcon_fast_strtolower(&lower, eventname);
 
-	if (phalcon_memnstr_str(lower, SL(":"))) {
-		PHALCON_INIT_VAR(event_parts);
-		phalcon_fast_explode_str(event_parts, SL(":"), lower);
-
-		PHALCON_OBS_VAR(name);
-		phalcon_array_fetch_long(&name, event_parts, 1, PH_NOISY);
+	if (phalcon_memnstr_str(&lower, SL(":"))) {
+		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
+		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(name, lower);
+		PHALCON_CPY_WRT(&name, &lower);
 	}
 
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
-	if (phalcon_method_exists(getThis(), name) == SUCCESS) {
-		PHALCON_CALL_METHOD(&status, getThis(), Z_STRVAL_P(name), data);
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_MM_FALSE;
+	if (phalcon_method_exists(getThis(), &name) == SUCCESS) {
+		PHALCON_CALL_METHODW(&status, getThis(), Z_STRVAL(name), data);
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_FALSE;
 		}
 	}
 
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
-	if (Z_TYPE_P(events_manager) != IS_NULL) {
-		PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 1);
+	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+	if (Z_TYPE(events_manager) != IS_NULL) {
+		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", eventname, getThis(), data, cancelable);
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_FALSE;
 		}
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
+}
+
+/**
+ * Magic method __get
+ *
+ * @param string $propertyName
+ */
+PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
+
+	zval *name, *args = NULL, *noerror = NULL, *shared = NULL, dependency_injector;
+
+	phalcon_fetch_params(0, 1, 3, &name, &args, &noerror, &shared);
+
+	if (!args) {
+		args = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!noerror) {
+		noerror = &PHALCON_GLOBAL(z_false);
+	}
+
+	if (!shared) {
+		shared = &PHALCON_GLOBAL(z_false);
+	}
+
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_di_exception_ce, "A dependency injection container is required to access the '%s' service", Z_STRVAL_P(name));
+		return;
+	}
+
+	if (zend_is_true(shared)) {
+		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "getshared", name, args, noerror);
+	} else {
+		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "get", name, args, noerror);
+	}
 }
 
 /**
@@ -276,28 +312,23 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
  */
 PHP_METHOD(Phalcon_DI_Injectable, __get){
 
-	zval *property_name, *dependency_injector = NULL;
-	zval *has_service = NULL, *service = NULL, *class_name, *arguments, *result = NULL;
+	zval *property_name, dependency_injector, has_service, service, class_name, arguments, result;
 
 	phalcon_fetch_params(0, 1, 0, &property_name);
 	PHALCON_ENSURE_IS_STRING(property_name);
 
-	PHALCON_MM_GROW();
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	PHALCON_CALL_METHODW(&has_service, &dependency_injector, "has", property_name);
 
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-
-	PHALCON_CALL_METHOD(&has_service, dependency_injector, "has", property_name);
-	if (zend_is_true(has_service)) {
-		PHALCON_CALL_METHOD(&result, dependency_injector, "getshared", property_name);
-		phalcon_update_property_zval(getThis(), Z_STRVAL_P(property_name), Z_STRLEN_P(property_name), result);
-		RETURN_CTOR(result);
+	if (zend_is_true(&has_service)) {
+		PHALCON_CALL_METHODW(&result, &dependency_injector, "getshared", property_name);
+		phalcon_update_property_zval(getThis(), Z_STRVAL_P(property_name), Z_STRLEN_P(property_name), &result);
+		RETURN_CTORW(&result);
 	}
 
-	assert(Z_TYPE_P(property_name) == IS_STRING);
-
 	if (Z_STRLEN_P(property_name) == sizeof("di")-1 && !memcmp(Z_STRVAL_P(property_name), "di", sizeof("di")-1)) {
-		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("di"), dependency_injector);
-		RETURN_CTOR(dependency_injector);
+		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("di"), &dependency_injector);
+		RETURN_CTORW(&dependency_injector);
 	}
 
 	/**
@@ -306,24 +337,21 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	if (Z_STRLEN_P(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(property_name), "persistent", sizeof("persistent")-1)) {
 		const char *cn = Z_OBJCE_P(getThis())->name->val;
 
-		PHALCON_ALLOC_INIT_ZVAL(class_name);
-		ZVAL_STRING(class_name, cn);
+		PHALCON_STR(&class_name, cn);
 
-		PHALCON_INIT_VAR(arguments);
-		array_init_size(arguments, 1);
-		add_next_index_zval(arguments, class_name);
+		array_init_size(&arguments, 1);
+		add_next_index_zval(&arguments, &class_name);
 
-		PHALCON_INIT_NVAR(service);
-		ZVAL_STRING(service, "sessionBag");
+		PHALCON_STR(&service, "sessionBag");
 
-		PHALCON_CALL_METHOD(&result, dependency_injector, "get", service, arguments);
-		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), result);
-		RETURN_CTOR(result);
+		PHALCON_CALL_METHODW(&result, &dependency_injector, "get", &service, &arguments);
+		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), &result);
+		RETURN_CTORW(&result);
 	}
 
 	/**
 	 * A notice is shown if the property is not defined or is not a valid service
 	 */
 	php_error_docref(NULL, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name->val, Z_STRVAL_P(property_name));
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }

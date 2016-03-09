@@ -70,9 +70,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Failed, __construct){
 
 	zval *message, *record, *code = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 1, &message, &record, &code);
+	phalcon_fetch_params(0, 2, 1, &message, &record, &code);
 
 	if (!code) {
 		code = &PHALCON_GLOBAL(z_zero);
@@ -80,9 +78,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Failed, __construct){
 
 	phalcon_update_property_this(getThis(), SL("_record"), record);
 
-	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_transaction_failed_ce, getThis(), "__construct", message, code);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_transaction_failed_ce, getThis(), "__construct", message, code);
 }
 
 /**
@@ -96,7 +92,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Failed, getRecordMessages)
 	if (Z_TYPE_P(record) != IS_NULL) {
 		PHALCON_RETURN_CALL_METHODW(record, "getmessages");
 	}
-	
+
 	PHALCON_RETURN_CALL_METHODW(getThis(), "getmessage");
 }
 

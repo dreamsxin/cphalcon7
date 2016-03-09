@@ -34,6 +34,7 @@
 #include "kernel/array.h"
 #include "kernel/concat.h"
 #include "kernel/operators.h"
+#include "kernel/string.h"
 
 #include "interned-strings.h"
 
@@ -150,29 +151,22 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 	return SUCCESS;
 }
 
-int phalcon_validation_getdefaultmessage_helper(const zend_class_entry *ce, zval *return_value, zval *this_ptr, const char *type)
+int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *type)
 {
+	zval *messages, t, *params[1];
 	if (is_phalcon_class(ce)) {
-		zval *msg;
-		zval *messages = phalcon_read_property(this_ptr, SL("_defaultMessages"), PH_NOISY);
+		messages = phalcon_read_property(this_ptr, SL("_defaultMessages"), PH_NOISY);
 
-		PHALCON_ALLOC_INIT_ZVAL(return_value);
-		if (phalcon_array_isset_str_fetch(&msg, messages, type, strlen(type))) {
-			ZVAL_ZVAL(return_value, msg, 1, 0);
-		}
-		else {
-			ZVAL_NULL(return_value);
+		if (!phalcon_array_isset_fetch_str(retval, messages, type, strlen(type))) {
+			ZVAL_NULL(retval);
 		}
 
 		return SUCCESS;
 	} else {
-		zval t;
-		zval *params[1];
-
-		ZVAL_STRING(&t, type);
+		PHALCON_STR(&t, type);
 		params[0] = &t;
 
-		return phalcon_return_call_method(&return_value, this_ptr, "getdefaultmessage", 1, params);
+		return phalcon_call_method(retval, this_ptr, "getdefaultmessage", 1, params);
 	}
 }
 
@@ -216,11 +210,7 @@ PHP_METHOD(Phalcon_Validation, __construct){
  */
 PHP_METHOD(Phalcon_Validation, validate){
 
-	zval *data = NULL, *entity = NULL, *validators, *messages = NULL, *status = NULL;
-	zval *scope = NULL, *attribute = NULL, *validator = NULL;
-	zval *must_cancel = NULL;
-
-	PHALCON_MM_GROW();
+	zval *data = NULL, *entity = NULL, validators, messages, status, *scope;
 
 	phalcon_fetch_params(0, 0, 2, &data, &entity);
 	
@@ -232,9 +222,9 @@ PHP_METHOD(Phalcon_Validation, validate){
 		entity = &PHALCON_GLOBAL(z_null);
 	}
 	
-	validators = phalcon_read_property(getThis(), SL("_validators"), PH_NOISY);
-	if (Z_TYPE_P(validators) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no validators to validate");
+	phalcon_return_property(&validators, getThis(), SL("_validators"));
+	if (Z_TYPE(validators) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "There are no validators to validate");
 		return;
 	}
 	
@@ -246,51 +236,47 @@ PHP_METHOD(Phalcon_Validation, validate){
 	/** 
 	 * Implicitly creates a Phalcon\Validation\Message\Group object
 	 */
-	PHALCON_INIT_VAR(messages);
-	object_init_ex(messages, phalcon_validation_message_group_ce);
-	PHALCON_CALL_METHOD(NULL, messages, "__construct");
+	object_init_ex(&messages, phalcon_validation_message_group_ce);
+	PHALCON_CALL_METHODW(NULL, &messages, "__construct");
 	
 	/** 
 	 * Validation classes can implement the 'beforeValidation' callback
 	 */
 	if (phalcon_method_exists_ex(getThis(), SL("beforevalidation")) == SUCCESS) {
-		PHALCON_CALL_METHOD(&status, getThis(), "beforevalidation", data, entity, messages);
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_CCTOR(status);
+		PHALCON_CALL_METHODW(&status, getThis(), "beforevalidation", data, entity, &messages);
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_CTORW(&status);
 		}
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_messages"), messages);
+	phalcon_update_property_this(getThis(), SL("_messages"), &messages);
 	if (Z_TYPE_P(data) == IS_ARRAY || Z_TYPE_P(data) == IS_OBJECT) {
 		phalcon_update_property_this(getThis(), SL("_data"), data);
 	}
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(validators), scope) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(validators), scope) {
+		zval attribute, validator, must_cancel;
 		if (Z_TYPE_P(scope) != IS_ARRAY) { 
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The validator scope is not valid");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "The validator scope is not valid");
 			return;
 		}
 	
-		PHALCON_OBS_NVAR(attribute);
 		phalcon_array_fetch_long(&attribute, scope, 0, PH_NOISY);
-	
-		PHALCON_OBS_NVAR(validator);
 		phalcon_array_fetch_long(&validator, scope, 1, PH_NOISY);
-		if (Z_TYPE_P(validator) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "One of the validators is not valid");
+		if (Z_TYPE(validator) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "One of the validators is not valid");
 			return;
 		}
 	
-		PHALCON_CALL_METHOD(&status, validator, "validate", getThis(), attribute);
+		PHALCON_CALL_METHODW(&status, &validator, "validate", getThis(), &attribute);
 	
 		/** 
 		 * Check if the validation must be canceled if this validator fails
 		 */
-		if (PHALCON_IS_FALSE(status)) {
-			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&must_cancel);
-			RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(Z_OBJCE_P(validator), &must_cancel, validator, "cancelOnFail"));
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&must_cancel, Z_OBJCE(validator), &validator, "cancelOnFail"));
 
-			if (zend_is_true(must_cancel)) {
+			if (zend_is_true(&must_cancel)) {
 				break;
 			}
 		}
@@ -299,12 +285,12 @@ PHP_METHOD(Phalcon_Validation, validate){
 	/** 
 	 * Get the messages generated by the validators
 	 */
-	messages = phalcon_read_property(getThis(),  SL("_messages"), PH_NOISY);
+	phalcon_return_property(&messages, getThis(),  SL("_messages"));
 	if (phalcon_method_exists_ex(getThis(), SL("aftervalidation")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "aftervalidation", data, entity, messages);
+		PHALCON_CALL_METHODW(NULL, getThis(), "aftervalidation", data, entity, &messages);
 	}
 	
-	RETURN_CCTOR(messages);
+	RETURN_CTORW(&messages);
 }
 
 /**
@@ -316,18 +302,16 @@ PHP_METHOD(Phalcon_Validation, validate){
  */
 PHP_METHOD(Phalcon_Validation, add){
 
-	zval *attribute, *validator, *scope;
+	zval *attribute, *validator, scope;
 
 	phalcon_fetch_params(0, 2, 0, &attribute, &validator);
-
 	PHALCON_ENSURE_IS_STRING(attribute);
 	PHALCON_VERIFY_INTERFACE_EX(validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce, 0);
-	
-	PHALCON_ALLOC_INIT_ZVAL(scope);
-	array_init_size(scope, 2);
-	phalcon_array_append(scope, attribute, PH_COPY);
-	phalcon_array_append(scope, validator, PH_COPY);
-	phalcon_update_property_array_append(getThis(), SL("_validators"), scope);
+
+	array_init_size(&scope, 2);
+	phalcon_array_append(&scope, attribute, PH_COPY);
+	phalcon_array_append(&scope, validator, PH_COPY);
+	phalcon_update_property_array_append(getThis(), SL("_validators"), &scope);
 	
 	RETURN_THISW();
 }
@@ -357,20 +341,20 @@ PHP_METHOD(Phalcon_Validation, setFilters){
  */
 PHP_METHOD(Phalcon_Validation, getFilters){
 
-	zval *attribute = NULL, *filters, *attribute_filters;
+	zval *attribute = NULL, filters, attribute_filters;
 
 	phalcon_fetch_params(0, 0, 1, &attribute);
 	
-	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
+	phalcon_return_property(&filters, getThis(), SL("_filters"));
 	if (attribute && Z_TYPE_P(attribute) == IS_STRING) {
-		if (phalcon_array_isset_fetch(&attribute_filters, filters, attribute)) {
-			RETURN_ZVAL(attribute_filters, 1, 0);
+		if (phalcon_array_isset_fetch(&attribute_filters, &filters, attribute)) {
+			RETURN_CTORW(&attribute_filters);
 		}
 
 		RETURN_NULL();
 	}
 	
-	RETURN_ZVAL(filters, 1, 0);
+	RETURN_CTORW(&filters);
 }
 
 /**
@@ -416,15 +400,13 @@ PHP_METHOD(Phalcon_Validation, appendMessage){
 
 	zval *message, *messages;
 
-	PHALCON_MM_GROW();
-
 	phalcon_fetch_params(0, 1, 0, &message);
 	
 	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, messages, "appendmessage", message);
+		PHALCON_CALL_METHODW(NULL, messages, "appendmessage", message);
 	}
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -466,39 +448,33 @@ PHP_METHOD(Phalcon_Validation, bind){
  */
 PHP_METHOD(Phalcon_Validation, getValue){
 
-	zval *attribute, *entity, *method, *value = NULL, *data, *values;
-	zval *filters, *field_filters, *service_name;
-	zval *dependency_injector = NULL, *filter_service = NULL;
-
-	PHALCON_MM_GROW();
+	zval *attribute, entity, method, value, data, values, filters, field_filters, service_name, dependency_injector, filter_service;
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
-	entity = phalcon_read_property(getThis(), SL("_entity"), PH_NOISY);
-	
+	phalcon_return_property(&entity, getThis(), SL("_entity"));
+
 	/** 
 	 * If the entity is an object use it to retrieve the values
 	 */
-	if (Z_TYPE_P(entity) == IS_OBJECT) {
-	
-		PHALCON_INIT_VAR(method);
-		PHALCON_CONCAT_SV(method, "get", attribute);
-		zend_str_tolower(Z_STRVAL_P(method), Z_STRLEN_P(method));
-		if (phalcon_method_exists_ex(entity, Z_STRVAL_P(method), Z_STRLEN_P(method)) == SUCCESS) {
-			PHALCON_CALL_METHOD(&value, entity, Z_STRVAL_P(method));
-		} else if (phalcon_method_exists_ex(entity, SL("readattribute")) == SUCCESS) {
-			PHALCON_CALL_METHOD(&value, entity, "readattribute", attribute);
+	if (Z_TYPE(entity) == IS_OBJECT) {
+		PHALCON_CONCAT_SV(&method, "get", attribute);
+		phalcon_strtolower_inplace(&method);
+		if (phalcon_method_exists_ex(&entity, Z_STRVAL(method), Z_STRLEN(method)) == SUCCESS) {
+			PHALCON_CALL_METHODW(&value, &entity, Z_STRVAL(method));
+		} else if (phalcon_method_exists_ex(&entity, SL("readattribute")) == SUCCESS) {
+			PHALCON_CALL_METHODW(&value, &entity, "readattribute", attribute);
 		} else {
-			value = phalcon_read_property_zval(entity, attribute, PH_NOISY);
+			phalcon_return_property_zval(&value, &entity, attribute);
 		}
 	
-		RETURN_CCTOR(value);
+		RETURN_CTORW(&value);
 	}
 
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		if (Z_TYPE_P(data) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no data to validate");
+	phalcon_return_property(&data, getThis(), SL("_data"));
+	if (Z_TYPE(data) != IS_ARRAY) { 
+		if (Z_TYPE(data) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "There are no data to validate");
 			return;
 		}
 	}
@@ -506,59 +482,43 @@ PHP_METHOD(Phalcon_Validation, getValue){
 	/** 
 	 * Check if there is a calculated value
 	 */
-	values = phalcon_read_property(getThis(), SL("_values"), PH_NOISY);
-	if (phalcon_array_isset(values, attribute)) {
-		PHALCON_OBS_NVAR(value);
-		phalcon_array_fetch(&value, values, attribute, PH_NOISY);
-		RETURN_CCTOR(value);
+	phalcon_return_property(&values, getThis(), SL("_values"));
+	if (phalcon_array_isset_fetch(&value, &values, attribute)) {
+		RETURN_CTORW(&value);
 	}
 	
-	PHALCON_INIT_NVAR(value);
-	
-	if (Z_TYPE_P(data) == IS_ARRAY) { 
-		if (phalcon_array_isset(data, attribute)) {
-			PHALCON_OBS_NVAR(value);
-			phalcon_array_fetch(&value, data, attribute, PH_NOISY);
+	if (Z_TYPE(data) == IS_ARRAY) { 
+		if (phalcon_array_isset(&data, attribute)) {
+			phalcon_array_fetch(&value, &data, attribute, PH_NOISY);
 		}
-	} else {
-		if (Z_TYPE_P(data) == IS_OBJECT) {
-			if (phalcon_isset_property_zval(data, attribute)) {
-				value = phalcon_read_property_zval(data, attribute, PH_NOISY);
-			}
+	} else if (Z_TYPE(data) == IS_OBJECT) {
+		if (phalcon_isset_property_zval(&data, attribute)) {
+			phalcon_return_property_zval(&value, &data, attribute);
 		}
 	}
 	
-	if (Z_TYPE_P(value) != IS_NULL) {
-		filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
-		if (Z_TYPE_P(filters) == IS_ARRAY) { 
-			if (phalcon_array_isset(filters, attribute)) {
+	if (Z_TYPE(value) != IS_NULL) {
+		phalcon_return_property(&filters, getThis(), SL("_filters"));
+		if (Z_TYPE(filters) == IS_ARRAY) { 
+			if (phalcon_array_isset_fetch(&field_filters, &filters, attribute)) {
+				if (zend_is_true(&field_filters)) {
+					PHALCON_STR(&service_name, ISV(filter));
 	
-				PHALCON_OBS_VAR(field_filters);
-				phalcon_array_fetch(&field_filters, filters, attribute, PH_NOISY);
-				if (zend_is_true(field_filters)) {
-	
-					PHALCON_INIT_VAR(service_name);
-					ZVAL_STRING(service_name, ISV(filter));
-	
-					PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-					if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-						PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-	
-						if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-							PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "A dependency injector is required to obtain the 'filter' service");
-							return;
-						}
-					}
-	
-					PHALCON_CALL_METHOD(&filter_service, dependency_injector, "getshared", service_name);
-					if (Z_TYPE_P(filter_service) != IS_OBJECT) {
-						PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Returned 'filter' service is invalid");
+					PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+					if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+						PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "A dependency injector is required to obtain the 'filter' service");
 						return;
 					}
 	
-					PHALCON_VERIFY_INTERFACE(filter_service, phalcon_filterinterface_ce);
-					PHALCON_RETURN_CALL_METHOD(filter_service, "sanitize", value, field_filters);
-					RETURN_MM();
+					PHALCON_CALL_METHODW(&filter_service, &dependency_injector, "getshared", &service_name);
+					if (Z_TYPE(filter_service) != IS_OBJECT) {
+						PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Returned 'filter' service is invalid");
+						return;
+					}
+	
+					PHALCON_VERIFY_INTERFACEW(&filter_service, phalcon_filterinterface_ce);
+					PHALCON_RETURN_CALL_METHODW(&filter_service, "sanitize", &value, &field_filters);
+					return;
 				}
 			}
 		}
@@ -566,79 +526,71 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		/** 
 		 * Cache the calculated value
 		 */
-		phalcon_update_property_array(getThis(), SL("_values"), attribute, value);
+		phalcon_update_property_array(getThis(), SL("_values"), attribute, &value);
 	
-		RETURN_CCTOR(value);
+		RETURN_CTORW(&value);
 	}
-	
-	RETURN_MM_NULL();
 }
 
 PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 {
-	zval *messages = NULL, *m, *default_messages;
+	zval *messages = NULL, default_messages, m;
 
-	PHALCON_MM_GROW();
 	phalcon_fetch_params(0, 0, 1, &messages);
 
 	if (messages && Z_TYPE_P(messages) != IS_NULL && Z_TYPE_P(messages) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Messages must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Messages must be an array");
 		return;
 	}
 
-	PHALCON_INIT_VAR(default_messages);
-	array_init_size(default_messages, 22);
+	array_init_size(&default_messages, 22);
 
-	phalcon_array_update_str_str(default_messages, SL("Alnum"),             SL("Field :field must contain only letters and numbers"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Alpha"),             SL("Field :field must contain only letters"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Between"),           SL("Field :field must be within the range of :min to :max"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Confirmation"),      SL("Field :field must be the same as :with"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Digit"),             SL("Field :field must be numeric"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Email"),             SL("Field :field must be an email address"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("ExclusionIn"),       SL("Field :field must not be a part of list: :domain"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileEmpty"),         SL("Field :field must not be empty"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileIniSize"),       SL("File :field exceeds the maximum file size"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileMaxResolution"), SL("File :field must not exceed :max resolution"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileMinResolution"), SL("File :field must be at least :min resolution"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileSize"),          SL("File :field exceeds the size of :max"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileMaxSize"),       SL("File :field the size must not exceed :max"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileMinSize"),       SL("File :field the size must be at least :min"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileType"),          SL("File :field must be of type: :types"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("FileValid"),         SL("Field :field is not valid"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("ImageMaxWidth"),     SL("Image :field the width must not exceed :max"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("ImageMinWidth"),     SL("Image :field the width must be at least :min"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("ImageMaxHeight"),    SL("Image :field the height must not exceed :max"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("ImageMinHeight"),    SL("Image :field the height must be at least :min"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Identical"),         SL("Field :field does not have the expected value"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("InclusionIn"),       SL("Field :field must be a part of list: :domain"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("PresenceOf"),        SL("Field :field is required"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Regex"),             SL("Field :field does not match the required format"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("TooLong"),           SL("Field :field must not exceed :max characters long"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("TooShort"),          SL("Field :field must be at least :min characters long"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Uniqueness"),        SL("Field :field must be unique"), PH_COPY);
-	phalcon_array_update_str_str(default_messages, SL("Url"),               SL("Field :field must be a url"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Alnum"),             SL("Field :field must contain only letters and numbers"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Alpha"),             SL("Field :field must contain only letters"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Between"),           SL("Field :field must be within the range of :min to :max"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Confirmation"),      SL("Field :field must be the same as :with"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Digit"),             SL("Field :field must be numeric"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Email"),             SL("Field :field must be an email address"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("ExclusionIn"),       SL("Field :field must not be a part of list: :domain"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileEmpty"),         SL("Field :field must not be empty"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileIniSize"),       SL("File :field exceeds the maximum file size"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileMaxResolution"), SL("File :field must not exceed :max resolution"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileMinResolution"), SL("File :field must be at least :min resolution"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileSize"),          SL("File :field exceeds the size of :max"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileMaxSize"),       SL("File :field the size must not exceed :max"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileMinSize"),       SL("File :field the size must be at least :min"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileType"),          SL("File :field must be of type: :types"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("FileValid"),         SL("Field :field is not valid"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("ImageMaxWidth"),     SL("Image :field the width must not exceed :max"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("ImageMinWidth"),     SL("Image :field the width must be at least :min"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("ImageMaxHeight"),    SL("Image :field the height must not exceed :max"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("ImageMinHeight"),    SL("Image :field the height must be at least :min"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Identical"),         SL("Field :field does not have the expected value"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("InclusionIn"),       SL("Field :field must be a part of list: :domain"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("PresenceOf"),        SL("Field :field is required"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Regex"),             SL("Field :field does not match the required format"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("TooLong"),           SL("Field :field must not exceed :max characters long"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("TooShort"),          SL("Field :field must be at least :min characters long"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Uniqueness"),        SL("Field :field must be unique"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Url"),               SL("Field :field must be a url"), PH_COPY);
 
 	if (!messages || Z_TYPE_P(messages) == IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_defaultMessages"), default_messages);
+		phalcon_update_property_this(getThis(), SL("_defaultMessages"), &default_messages);
+	} else {
+		phalcon_fast_array_merge(&m, &default_messages, messages);
+		phalcon_update_property_this(getThis(), SL("_defaultMessages"), &m);
 	}
-	else {
-		PHALCON_INIT_VAR(m);
-		phalcon_fast_array_merge(m, default_messages, messages);
-		phalcon_update_property_this(getThis(), SL("_defaultMessages"), m);
-	}
-
-	PHALCON_MM_RESTORE();
 }
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 {
-	zval *type, *messages, *msg;
+	zval *type, *messages, msg;
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
 	messages = phalcon_read_property(getThis(), SL("_defaultMessages"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&msg, messages, type)) {
-		RETURN_ZVAL(msg, 1, 0);
+		RETURN_CTORW(&msg);
 	}
 
 	RETURN_NULL();
@@ -670,30 +622,27 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, *labels, *value;
-	zval *field = NULL;
+	zval *field_param = NULL, labels, field, value;
 
-	PHALCON_MM_GROW();
 	phalcon_fetch_params(0, 1, 0, &field_param);
 
 	if (Z_TYPE_P(field_param) != IS_STRING && Z_TYPE_P(field_param) != IS_NULL) {
 		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Parameter 'field' must be a string");
-		RETURN_MM_NULL();
+		RETURN_NULL();
 	}
 
 	if (Z_TYPE_P(field_param) == IS_STRING) {
-		field = field_param;
+		PHALCON_CPY_WRT(&field, field_param);
 	} else {
-		PHALCON_INIT_VAR(field);
-		ZVAL_EMPTY_STRING(field);
+		ZVAL_EMPTY_STRING(&field);
 	}
 
-	labels = phalcon_read_property(getThis(), SL("_labels"), PH_NOISY);
-	if (Z_TYPE_P(labels) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&value, labels, field)) {
-			RETURN_CTOR(value);
+	phalcon_return_property(&labels, getThis(), SL("_labels"));
+	if (Z_TYPE(labels) == IS_ARRAY) {
+		if (phalcon_array_isset_fetch(&value, &labels, &field)) {
+			RETURN_CTORW(&value);
 		}
 	}
 
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }

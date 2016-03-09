@@ -152,11 +152,10 @@ PHP_METHOD(Phalcon_Validation_Message_Group, __construct){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, offsetGet){
 
-	zval *index, *ret;
+	zval *index;
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	ret = phalcon_read_property_array(getThis(), SL("_messages"), index);
-	RETURN_ZVAL(ret, 1, 0);
+	phalcon_return_property_array(return_value, getThis(), SL("_messages"), index);
 }
 
 /**
@@ -231,7 +230,6 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessage){
 	zval *message;
 
 	phalcon_fetch_params(0, 1, 0, &message);
-
 	PHALCON_VERIFY_INTERFACE_EX(message, phalcon_validation_messageinterface_ce, phalcon_validation_exception_ce, 0);
 	phalcon_update_property_array_append(getThis(), SL("_messages"), message);
 }
@@ -247,15 +245,13 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessage){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
 
-	zval *messages, *message = NULL;
+	zval *messages, *message;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &messages);
+	phalcon_fetch_params(0, 1, 0, &messages);
 
 	if (Z_TYPE_P(messages) != IS_ARRAY) { 
 		if (Z_TYPE_P(messages) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The messages must be array or object");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "The messages must be array or object");
 			return;
 		}
 	}
@@ -265,13 +261,12 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
 		 * An array of messages is simply merged into the current one
 		 */
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), message) {
-			PHALCON_CALL_SELF(NULL, "appendmessage", message);
+			PHALCON_CALL_SELFW(NULL, "appendmessage", message);
 		} ZEND_HASH_FOREACH_END();
 	} else {
+		PHALCON_VERIFY_INTERFACE_EX(messages, zend_ce_iterator, phalcon_validation_exception_ce, 0);
 		zend_class_entry *ce     = Z_OBJCE_P(messages);
 		zend_object_iterator *it = ce->get_iterator(ce, messages, 0);
-
-		PHALCON_VERIFY_INTERFACE_EX(messages, zend_ce_iterator, phalcon_validation_exception_ce, 1);
 
 		assert(it != NULL);
 		assert(it->funcs->rewind != NULL);
@@ -302,8 +297,6 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
 
 		it->funcs->dtor(it);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -314,36 +307,33 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 
-	zval *field_name, *filtered, *messages, *message = NULL;
-	zval *field = NULL;
+	zval *field_name, filtered, messages, *message;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &field_name);
 
-	phalcon_fetch_params(1, 1, 0, &field_name);
+	array_init(&filtered);
 
-	PHALCON_INIT_VAR(filtered);
-	array_init(filtered);
-
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	if (Z_TYPE_P(messages) == IS_ARRAY) {
+	phalcon_return_property(&messages, getThis(), SL("_messages"));
+	if (Z_TYPE(messages) == IS_ARRAY) {
 		/** 
 		 * A group of messages is iterated and appended one-by-one to the current list
 		 */
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), message) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), message) {
+			zval field;
 			/** 
 			 * Get the field name
 			 */
 			if (phalcon_method_exists_ex(message, SL("getfield")) == SUCCESS) {
-				PHALCON_CALL_METHOD(&field, message, "getfield");
-				if (PHALCON_IS_EQUAL(field_name, field)) {
-					phalcon_array_append(filtered, message, PH_COPY);
+				PHALCON_CALL_METHODW(&field, message, "getfield");
+				if (PHALCON_IS_EQUAL(field_name, &field)) {
+					phalcon_array_append(&filtered, message, PH_COPY);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
 
 	}
 
-	RETURN_CTOR(filtered);
+	RETURN_CTORW(&filtered);
 }
 
 /**
@@ -382,7 +372,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, current){
 
 	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
 	if ((message = zend_hash_get_current_data(Z_ARRVAL_P(messages))) != NULL) {
-		RETURN_ZVAL(message, 1, 0);
+		RETURN_CTORW(message);
 	}
 
 	RETURN_NULL();
@@ -435,15 +425,14 @@ PHP_METHOD(Phalcon_Validation_Message_Group, valid){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, __set_state){
 
-	zval *group, *messages;
+	zval *group, messages;
 
 	phalcon_fetch_params(0, 1, 0, &group);
 
-	if (phalcon_array_isset_str_fetch(&messages, group, SL("_messages"))) {
+	if (phalcon_array_isset_fetch_str(&messages, group, SL("_messages"))) {
 		object_init_ex(return_value, phalcon_validation_message_group_ce);
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct", messages);
-	}
-	else {
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct", &messages);
+	} else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Invalid arguments passed to %s", "Phalcon\\Mvc\\Model\\Message\\Group::__set_state()");
 	}
 }

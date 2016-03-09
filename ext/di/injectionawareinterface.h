@@ -27,6 +27,7 @@ extern zend_class_entry *phalcon_di_injectionawareinterface_ce;
 PHALCON_INIT_CLASS(Phalcon_DI_InjectionAwareInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectionawareinterface_getdi, 0, 0, 0)
+	ZEND_ARG_INFO(0, error)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectionawareinterface_setdi, 0, 0, 1)

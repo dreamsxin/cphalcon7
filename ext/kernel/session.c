@@ -28,28 +28,28 @@
 
 int phalcon_session_start()
 {
-	return phalcon_call_func_aparams(NULL, SL("session_start"), 0, NULL);
+	return phalcon_call_function_with_params(NULL, SL("session_start"), 0, NULL);
 }
 
 int phalcon_session_destroy()
 {
-	return phalcon_call_func_aparams(NULL, SL("session_destroy"), 0, NULL);
+	return phalcon_call_function_with_params(NULL, SL("session_destroy"), 0, NULL);
 }
 
-int phalcon_get_session_id(zval *return_value)
+int phalcon_get_session_id(zval *retval)
 {
-	return phalcon_call_func_aparams(&return_value, SL("session_id"), 0, NULL);
+	return phalcon_call_function_with_params(retval, SL("session_id"), 0, NULL);
 }
 
 int phalcon_set_session_id(zval *sid)
 {
 	zval *params[] = { sid };
-	return phalcon_call_func_aparams(NULL, SL("session_id"), 1, params);
+	return phalcon_call_function_with_params(NULL, SL("session_id"), 1, params);
 }
 
 int phalcon_session_write_close()
 {
-	return phalcon_call_func_aparams(NULL, SL("session_write_close"), 0, NULL);
+	return phalcon_call_function_with_params(NULL, SL("session_write_close"), 0, NULL);
 }
 
 zval* phalcon_session_set(zval *name, zval *val)

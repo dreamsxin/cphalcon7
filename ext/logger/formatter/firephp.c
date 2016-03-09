@@ -151,41 +151,25 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getTypeString) {
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
-	zval *message, *type, *type_str = NULL, *timestamp, *context, *interpolated = NULL;
-	zval *payload, *body, *backtrace = NULL, *meta, *encoded;
-	zval *show_backtrace, *enable_labels;
-	int i_show_backtrace, i_enable_labels;
+	zval *message, *type, *timestamp, *context, interpolated, type_str, *show_backtrace, *enable_labels;
+	zval backtrace, *pzval, payload, meta, *file, *line, body, encoded;
+	int i_show_backtrace, i_enable_labels, found = 0;
+	ulong idx;
 	smart_str result = { 0 };
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
-	/*
-	 * We intentionally do not use Phalcon's MM for better performance.
-	 * All variables allocated with PHALCON_ALLOC_INIT_ZVAL() will have
-	 * their reference count set to 1 and therefore they can be nicely
-	 * put into the result array; when that array will be destroyed,
-	 * all inserted variables will be automatically destroyed, too
-	 * and we will just save some time by not using Z_TRY_ADDREF_P and Z_TRY_DELREF_P
-	 */
-
 	if (Z_TYPE_P(context) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
-	}
-	else {
-		interpolated = message;
-		Z_TRY_ADDREF_P(interpolated);
+	} else {
+		PHALCON_CPY_WRT(&interpolated, message);
 	}
 
-	{
-		zval *params[] = { type };
-		if (FAILURE == phalcon_call_method(&type_str, getThis(), "gettypestring", 1, params)) {
-			zval_ptr_dtor(interpolated);
-			return;
-		}
-	}
+	PHALCON_CALL_METHODW(&type_str, getThis(), "gettypestring", type);
 
 	show_backtrace   = phalcon_read_property(getThis(), SL("_showBacktrace"), PH_NOISY);
 	enable_labels    = phalcon_read_property(getThis(), SL("_enableLabels"), PH_NOISY);
+
 	i_show_backtrace = zend_is_true(show_backtrace);
 	i_enable_labels  = zend_is_true(enable_labels);
 
@@ -195,23 +179,16 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 * For 5.4+ there is an extra argument.
 	 */
 	if (i_show_backtrace) {
-		PHALCON_ALLOC_INIT_ZVAL(backtrace);
+		zend_fetch_debug_backtrace(&backtrace, 1, DEBUG_BACKTRACE_IGNORE_ARGS, 0);
 
-		zend_fetch_debug_backtrace(backtrace, 1, DEBUG_BACKTRACE_IGNORE_ARGS, 0);
-
-		if (Z_TYPE_P(backtrace) == IS_ARRAY) {
-			HashTable *ht = Z_ARRVAL_P(backtrace);
-			zval *pzval;
-			int found = 0;
-			ulong idx;
-
+		if (Z_TYPE(backtrace) == IS_ARRAY) {
 			/*
 			 * At this point we know that the backtrace is the array.
 			 * Again, we intentionally do not use Phalcon's API because we know
 			 * that we are working with the array / hash table and thus we can
 			 * save some time by omitting Z_TYPE_P(x) == IS_ARRAY checks
 			 */
-			ZEND_HASH_FOREACH_NUM_KEY_VAL(ht, idx, pzval) {
+			ZEND_HASH_FOREACH_NUM_KEY_VAL(Z_ARRVAL(backtrace), idx, pzval) {
 				if (Z_TYPE_P(pzval) == IS_ARRAY) {
 					/*
 					 * Here we need to skip the latest calls into Phalcon's core.
@@ -219,7 +196,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 					 * We remove these entries from the array.
 					 */
 					if (!found && !zend_hash_str_exists(Z_ARRVAL_P(pzval), SL("file"))) {
-						zend_hash_index_del(ht, idx);
+						zend_hash_index_del(Z_ARRVAL(backtrace), idx);
 					} else {
 						/*
 						 * Remove args and object indices. They usually give
@@ -243,71 +220,55 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 *     array('backtrace' => array(backtrace goes here)
 	 * )
 	 */
-	PHALCON_ALLOC_INIT_ZVAL(payload);
-	array_init_size(payload, 2);
+	array_init_size(&payload, 2);
 
-	PHALCON_ALLOC_INIT_ZVAL(meta);
-	array_init_size(meta, 4);
-	add_assoc_zval_ex(meta, SL("Type"), type_str);
+	array_init_size(&meta, 4);
+	add_assoc_zval_ex(&meta, SL("Type"), &type_str);
 
-	if (i_show_backtrace && Z_TYPE_P(backtrace) == IS_ARRAY) {
-		zval *pzval;
-
-		if (likely((pzval = zend_hash_index_find(Z_ARRVAL_P(backtrace), 0)) != NULL) && likely(Z_TYPE_P(pzval) == IS_ARRAY)) {
-			zval *file, *line;
-
+	if (i_show_backtrace && Z_TYPE(backtrace) == IS_ARRAY) {
+		if (likely((pzval = zend_hash_index_find(Z_ARRVAL(backtrace), 0)) != NULL) && likely(Z_TYPE_P(pzval) == IS_ARRAY)) {
 			file = zend_hash_str_find(Z_ARRVAL_P(pzval), SL("file"));
 			line = zend_hash_str_find(Z_ARRVAL_P(pzval), SL("line"));
 
 			if (likely(file != NULL)) {
 				Z_TRY_ADDREF_P(file);
-				add_assoc_zval_ex(meta, SL("File"), file);
+				add_assoc_zval_ex(&meta, SL("File"), file);
 			}
 
 			if (likely(line != NULL)) {
 				Z_TRY_ADDREF_P(line);
-				add_assoc_zval_ex(meta, SL("Line"), line);
+				add_assoc_zval_ex(&meta, SL("Line"), line);
 			}
 		}
 	}
 
 	if (i_enable_labels) {
-		add_assoc_zval_ex(meta, SL("Label"), interpolated);
+		add_assoc_zval_ex(&meta, SL("Label"), &interpolated);
 	}
 
 	if (!i_enable_labels && !i_show_backtrace) {
-		body = interpolated;
-	}
-	else if (i_enable_labels && !i_show_backtrace) {
-		PHALCON_ALLOC_INIT_ZVAL(body);
-		ZVAL_EMPTY_STRING(body);
-	}
-	else {
-		PHALCON_ALLOC_INIT_ZVAL(body);
-		array_init_size(body, 2);
+		PHALCON_CPY_WRT(&body, &interpolated);
+	} else if (i_enable_labels && !i_show_backtrace) {
+		ZVAL_EMPTY_STRING(&body);
+	} else {
+		array_init_size(&body, 2);
 
 		if (i_show_backtrace) {
-			add_assoc_zval_ex(body, SL("backtrace"), backtrace);
+			add_assoc_zval_ex(&body, SL("backtrace"), &backtrace);
 		}
 
 		if (!i_enable_labels) {
-			add_assoc_zval_ex(body, SL("message"), interpolated);
+			add_assoc_zval_ex(&body, SL("message"), &interpolated);
 		}
 	}
 
-	add_next_index_zval(payload, meta);
-	add_next_index_zval(payload, body);
+	add_next_index_zval(&payload, &meta);
+	add_next_index_zval(&payload, &body);
 
 	/* Convert everything to JSON */
-	PHALCON_ALLOC_INIT_ZVAL(encoded);
-	if (FAILURE == phalcon_json_encode(encoded, payload, 0)) {
-		zval_ptr_dtor(payload);
-		zval_ptr_dtor(encoded);
+	if (FAILURE == phalcon_json_encode(&encoded, &payload, 0)) {
 		return;
 	}
-
-	/* As promised, kill the payload and all associated elements */
-	zval_ptr_dtor(payload);
 
 	/*
 	 * We don't want to use Phalcon's concatenation API because it
@@ -316,8 +277,8 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	 * in one go and this allows us to avoid performance penalties due to
 	 * memory reallocations.
 	 */
-	if (Z_TYPE_P(encoded) == IS_STRING && Z_STRVAL_P(encoded) != NULL) {
-		smart_str_alloc(&result, (uint)(Z_STRLEN_P(encoded) + 2 + 5), 0);
+	if (Z_TYPE(encoded) == IS_STRING && Z_STRVAL(encoded) != NULL) {
+		smart_str_alloc(&result, (uint)(Z_STRLEN(encoded) + 2 + 5), 0);
 
 		/*
 		 * The format is:
@@ -328,15 +289,15 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 		 * by the protocol specification
 		 * @see http://www.firephp.org/Wiki/Reference/Protocol
 		 */
-		smart_str_append_long(&result, Z_STRLEN_P(encoded));
+		smart_str_append_long(&result, Z_STRLEN(encoded));
 		smart_str_appendc(&result, '|');
-		smart_str_appendl(&result, Z_STRVAL_P(encoded), Z_STRLEN_P(encoded));
+		smart_str_appendl(&result, Z_STRVAL(encoded), Z_STRLEN(encoded));
 		smart_str_appendc(&result, '|');
 		smart_str_0(&result);
 	}
 
 	/* We don't need the JSON message anymore */
-	zval_ptr_dtor(encoded);
+	zval_ptr_dtor(&encoded);
 	/* Do not free the smart string because we steal its data for zval */
 	RETURN_STR(result.s);
 }

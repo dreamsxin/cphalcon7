@@ -86,19 +86,17 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Apc){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, __construct){
 
-	zval *options = NULL;
+	zval *options = NULL, prefix, lifetime;
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		zval *prefix, *ttl;
-
-		if (phalcon_array_isset_str_fetch(&prefix, options, SL("prefix"))) {
-			phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
+		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+			phalcon_update_property_this(getThis(), SL("_prefix"), &prefix);
 		}
 
-		if (phalcon_array_isset_str_fetch(&ttl, options, SL("lifetime"))) {
-			phalcon_update_property_this(getThis(), SL("_ttl"), ttl);
+		if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+			phalcon_update_property_this(getThis(), SL("_ttl"), &lifetime);
 		}
 	}
 
@@ -113,23 +111,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, read)
 {
-	zval *key, *prefix, *apc_key, *data = NULL;
+	zval *key, *prefix, apc_key;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &key);
+	phalcon_fetch_params(0, 1, 0, &key);
 
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
-	PHALCON_INIT_VAR(apc_key);
-	PHALCON_CONCAT_SVV(apc_key, "$PMM$", prefix, key);
+	PHALCON_CONCAT_SVV(&apc_key, "$PMM$", prefix, key);
 
-	PHALCON_CALL_FUNCTION(&data, "apc_fetch", apc_key);
-	if (Z_TYPE_P(data) == IS_ARRAY) { 
-		RETURN_CCTOR(data);
-	}
-
-	RETURN_MM_NULL();
+	PHALCON_CALL_FUNCTIONW(return_value, "apc_fetch", &apc_key);
 }
 
 /**
@@ -140,50 +130,41 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, read)
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, write){
 
-	zval *key, *data, *prefix, *apc_key, *ttl;
+	zval *key, *data, *prefix, apc_key, *ttl;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &key, &data);
+	phalcon_fetch_params(0, 2, 0, &key, &data);
 
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
-	PHALCON_INIT_VAR(apc_key);
-	PHALCON_CONCAT_SVV(apc_key, "$PMM$", prefix, key);
+	PHALCON_CONCAT_SVV(&apc_key, "$PMM$", prefix, key);
 
 	ttl = phalcon_read_property(getThis(), SL("_ttl"), PH_NOISY);
-	PHALCON_CALL_FUNCTION(NULL, "apc_store", apc_key, data, ttl);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_FUNCTIONW(NULL, "apc_store", &apc_key, data, ttl);
 }
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset)
 {
-	zval *real_key = NULL, *meta;
+	zval *meta, *prefix;
 	zend_string *str_key;
 	ulong idx;
-
-	PHALCON_MM_GROW();
 
 	meta = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 
 	if (Z_TYPE_P(meta) == IS_ARRAY) {
-		zval *prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+		prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(meta), idx, str_key) {
-			zval key;
+			zval key, real_key;
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
 
-			PHALCON_INIT_NVAR(real_key);
-			phalcon_concat_svsv(real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0);
-			PHALCON_CALL_FUNCTION(NULL, "apc_delete", real_key);
+			phalcon_concat_svsv(&real_key, SL("$PMM$"), prefix, SL("meta-"), &key, 0);
+			PHALCON_CALL_FUNCTION(NULL, "apc_delete", &real_key);
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_apc_ce, getThis(), "reset");
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_apc_ce, getThis(), "reset");
 }

@@ -188,13 +188,9 @@ PHP_METHOD(Phalcon_Cache_Multiple, push){
  */
 PHP_METHOD(Phalcon_Cache_Multiple, get){
 
-	zval *key_name, *lifetime = NULL, *backends;
-	zval *content = NULL;
-	zval *backend;
+	zval *key_name, *lifetime = NULL, *backends, *backend;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 	
 	if (!lifetime) {
 		lifetime = &PHALCON_GLOBAL(z_null);
@@ -203,14 +199,15 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
 	backends = phalcon_read_property(getThis(), SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
-			PHALCON_CALL_METHOD(&content, backend, "get", key_name, lifetime);
-			if (Z_TYPE_P(content) != IS_NULL) {
-				RETURN_CCTOR(content);
+			zval content;
+			PHALCON_CALL_METHODW(&content, backend, "get", key_name, lifetime);
+			if (Z_TYPE(content) > IS_NULL) {
+				RETURN_CTORW(&content);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
 	
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }
 
 /**
@@ -222,12 +219,9 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
  */
 PHP_METHOD(Phalcon_Cache_Multiple, start){
 
-	zval *key_name, *lifetime = NULL, *backends;
-	zval *backend;
+	zval *key_name, *lifetime = NULL, *backends, *backend;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
 	if (!lifetime) {
 		lifetime = &PHALCON_GLOBAL(z_null);
@@ -236,11 +230,9 @@ PHP_METHOD(Phalcon_Cache_Multiple, start){
 	backends = phalcon_read_property(getThis(), SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
-			PHALCON_CALL_METHOD(NULL, backend, "start", key_name, lifetime);
+			PHALCON_CALL_METHODW(NULL, backend, "start", key_name, lifetime);
 		} ZEND_HASH_FOREACH_END();
 	}
-	
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -253,13 +245,9 @@ PHP_METHOD(Phalcon_Cache_Multiple, start){
  */
 PHP_METHOD(Phalcon_Cache_Multiple, save){
 
-	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL;
-	zval *backends;
-	zval *backend;
+	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, *backends, *backend;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
+	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 	
 	if (!key_name) {
 		key_name = &PHALCON_GLOBAL(z_null);
@@ -280,11 +268,9 @@ PHP_METHOD(Phalcon_Cache_Multiple, save){
 	backends = phalcon_read_property(getThis(), SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
-			PHALCON_CALL_METHOD(NULL, backend, "save", key_name, content, lifetime, stop_buffer);
+			PHALCON_CALL_METHODW(NULL, backend, "save", key_name, content, lifetime, stop_buffer);
 		} ZEND_HASH_FOREACH_END();
 	}
-	
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -295,20 +281,16 @@ PHP_METHOD(Phalcon_Cache_Multiple, save){
  */
 PHP_METHOD(Phalcon_Cache_Multiple, delete){
 
-	zval *key_name, *backends;
-	zval *backend;
+	zval *key_name, *backends, *backend;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_fetch_params(1, 1, 0, &key_name);
 	backends = phalcon_read_property(getThis(), SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
-			PHALCON_CALL_METHOD(NULL, backend, "delete", key_name);
+			PHALCON_CALL_METHODW(NULL, backend, "delete", key_name);
 		} ZEND_HASH_FOREACH_END();
 	}
-	
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -320,13 +302,9 @@ PHP_METHOD(Phalcon_Cache_Multiple, delete){
  */
 PHP_METHOD(Phalcon_Cache_Multiple, exists){
 
-	zval *key_name = NULL, *lifetime = NULL, *backends;
-	zval *exists = NULL;
-	zval *backend;
+	zval *key_name = NULL, *lifetime = NULL, *backends, *backend;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 2, &key_name, &lifetime);
+	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
 	
 	if (!key_name) {
 		key_name = &PHALCON_GLOBAL(z_null);
@@ -339,12 +317,13 @@ PHP_METHOD(Phalcon_Cache_Multiple, exists){
 	backends = phalcon_read_property(getThis(), SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
-			PHALCON_CALL_METHOD(&exists, backend, "exists", key_name, lifetime);
-			if (zend_is_true(exists)) {
-				RETURN_MM_TRUE;
+			zval exists;
+			PHALCON_CALL_METHODW(&exists, backend, "exists", key_name, lifetime);
+			if (zend_is_true(&exists)) {
+				RETURN_TRUE;
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }

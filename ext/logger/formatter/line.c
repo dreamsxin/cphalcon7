@@ -166,59 +166,50 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, getDateFormat){
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
-	zval *message, *type, *timestamp, *context, *format = NULL, *date_format;
-	zval *date, *date_wildcard, *new_format = NULL, *type_string = NULL;
-	zval *type_wildcard, *message_wildcard;
+	zval *message, *type, *timestamp, *context, format, date_format, date, date_wildcard, new_format, type_string, type_wildcard, message_wildcard;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
-	phalcon_fetch_params(1, 4, 0, &message, &type, &timestamp, &context);
-
-	format = phalcon_read_property(getThis(), SL("_format"), PH_NOISY);
+	phalcon_return_property(&format, getThis(), SL("_format"));
 
 	/** 
 	 * Check if the format has the %date% placeholder
 	 */
-	if (phalcon_memnstr_str(format, SL("%date%"))) {
-		date_format = phalcon_read_property(getThis(), SL("_dateFormat"), PH_NOISY);
+	if (phalcon_memnstr_str(&format, SL("%date%"))) {
+		phalcon_return_property(&date_format, getThis(), SL("_dateFormat"));
 
-		PHALCON_INIT_VAR(date);
-		phalcon_date(date, date_format, timestamp);
+		phalcon_date(&date, &date_format, timestamp);
 
-		PHALCON_INIT_VAR(date_wildcard);
-		ZVAL_STRING(date_wildcard, "%date%");
+		PHALCON_STR(&date_wildcard, "%date%");
 
-		PHALCON_STR_REPLACE(&new_format, date_wildcard, date, format);
+		PHALCON_STR_REPLACE(&new_format, &date_wildcard, &date, &format);
 	} else {
-		PHALCON_CPY_WRT(new_format, format);
+		PHALCON_CPY_WRT(&new_format, &format);
 	}
 
 	/** 
 	 * Check if the format has the %type% placeholder
 	 */
-	if (phalcon_memnstr_str(format, SL("%type%"))) {
-		PHALCON_CALL_METHOD(&type_string, getThis(), "gettypestring", type);
+	if (phalcon_memnstr_str(&format, SL("%type%"))) {
+		PHALCON_CALL_METHODW(&type_string, getThis(), "gettypestring", type);
 
-		PHALCON_INIT_VAR(type_wildcard);
-		ZVAL_STRING(type_wildcard, "%type%");
+		PHALCON_STR(&type_wildcard, "%type%");
 
-		PHALCON_STR_REPLACE(&format, type_wildcard, type_string, new_format);
+		PHALCON_STR_REPLACE(&format, &type_wildcard, &type_string, &new_format);
 	} else {
-		PHALCON_CPY_WRT(format, new_format);
+		PHALCON_CPY_WRT(&format, &new_format);
 	}
 
-	PHALCON_INIT_VAR(message_wildcard);
-	ZVAL_STRING(message_wildcard, "%message%");
+	PHALCON_STR(&message_wildcard, "%message%");
 
-	PHALCON_STR_REPLACE(&new_format, message_wildcard, message, format);
+	PHALCON_STR_REPLACE(&new_format, &message_wildcard, message, &format);
 
 	if (Z_TYPE_P(context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(context)) > 0) {
-		PHALCON_CALL_METHOD(&format, getThis(), "interpolate", new_format, context);
+		PHALCON_CALL_METHODW(&format, getThis(), "interpolate", &new_format, context);
 	}
 	else {
-		PHALCON_CPY_WRT(format, new_format);
+		PHALCON_CPY_WRT(&format, &new_format);
 	}
 
-	PHALCON_CONCAT_VS(return_value, format, PHP_EOL);
-	RETURN_MM();
+	PHALCON_CONCAT_VS(return_value, &format, PHP_EOL);
 }

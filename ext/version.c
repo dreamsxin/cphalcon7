@@ -86,54 +86,39 @@ PHP_METHOD(Phalcon_Version, _getVersion){
  */
 PHP_METHOD(Phalcon_Version, get){
 
-	zval *version = NULL, *major, *medium, *minor, *special, *special_number;
-	zval *result, *suffix;
+	zval version, major, medium, minor, special, special_number, result, suffix;
 
-	PHALCON_MM_GROW();
+	PHALCON_CALL_SELFW(&version, "_getversion");
 
-	PHALCON_CALL_SELF(&version, "_getversion");
+	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY);
+	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY);
+	phalcon_array_fetch_long(&minor, &version, 2, PH_NOISY);
+	phalcon_array_fetch_long(&special, &version, 3, PH_NOISY);
+	phalcon_array_fetch_long(&special_number, &version, 4, PH_NOISY);
 
-	PHALCON_OBS_VAR(major);
-	phalcon_array_fetch_long(&major, version, 0, PH_NOISY);
+	PHALCON_CONCAT_VSVSVS(&result, &major, ".", &medium, ".", &minor, " ");
 
-	PHALCON_OBS_VAR(medium);
-	phalcon_array_fetch_long(&medium, version, 1, PH_NOISY);
-
-	PHALCON_OBS_VAR(minor);
-	phalcon_array_fetch_long(&minor, version, 2, PH_NOISY);
-
-	PHALCON_OBS_VAR(special);
-	phalcon_array_fetch_long(&special, version, 3, PH_NOISY);
-
-	PHALCON_OBS_VAR(special_number);
-	phalcon_array_fetch_long(&special_number, version, 4, PH_NOISY);
-
-	PHALCON_INIT_VAR(result);
-	PHALCON_CONCAT_VSVSVS(result, major, ".", medium, ".", minor, " ");
-
-	PHALCON_INIT_VAR(suffix);
-	switch (phalcon_get_intval(special)) {
+	switch (phalcon_get_intval(&special)) {
 
 		case PHALCON_VERSION_ALPHA:
-			PHALCON_CONCAT_SV(suffix, "ALPHA ", special_number);
+			PHALCON_CONCAT_SV(&suffix, "ALPHA ", &special_number);
 			break;
 
 		case PHALCON_VERSION_BETA:
-			PHALCON_CONCAT_SV(suffix, "BETA ", special_number);
+			PHALCON_CONCAT_SV(&suffix, "BETA ", &special_number);
 			break;
 
 		case PHALCON_VERSION_RC:
-			PHALCON_CONCAT_SV(suffix, "RC ", special_number);
+			PHALCON_CONCAT_SV(&suffix, "RC ", &special_number);
 			break;
 
 		default:
-			ZVAL_EMPTY_STRING(suffix);
+			ZVAL_EMPTY_STRING(&suffix);
 			break;
 
 	}
-	phalcon_concat_self(result, suffix);
-	ZVAL_STR(return_value, phalcon_trim(result, NULL, PHALCON_TRIM_BOTH));
-	RETURN_MM();
+	phalcon_concat_self(&result, &suffix);
+	ZVAL_STR(return_value, phalcon_trim(&result, NULL, PHALCON_TRIM_BOTH));
 }
 
 /**
@@ -147,34 +132,18 @@ PHP_METHOD(Phalcon_Version, get){
  */
 PHP_METHOD(Phalcon_Version, getId){
 
-	zval *version = NULL, *major, *medium, *minor, *special, *special_number;
-	zval *format, *real_medium = NULL, *real_minor = NULL;
+	zval version, major, medium, minor, special, special_number, format, real_medium, real_minor;
 
-	PHALCON_MM_GROW();
+	PHALCON_CALL_SELFW(&version, "_getversion");
+	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY);
+	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY);
+	phalcon_array_fetch_long(&minor, &version, 2, PH_NOISY);
+	phalcon_array_fetch_long(&special, &version, 3, PH_NOISY);
+	phalcon_array_fetch_long(&special_number, &version, 4, PH_NOISY);
 
-	PHALCON_CALL_SELF(&version, "_getversion");
+	PHALCON_STR(&format, "%02s");
 
-	PHALCON_OBS_VAR(major);
-	phalcon_array_fetch_long(&major, version, 0, PH_NOISY);
-
-	PHALCON_OBS_VAR(medium);
-	phalcon_array_fetch_long(&medium, version, 1, PH_NOISY);
-
-	PHALCON_OBS_VAR(minor);
-	phalcon_array_fetch_long(&minor, version, 2, PH_NOISY);
-
-	PHALCON_OBS_VAR(special);
-	phalcon_array_fetch_long(&special, version, 3, PH_NOISY);
-
-	PHALCON_OBS_VAR(special_number);
-	phalcon_array_fetch_long(&special_number, version, 4, PH_NOISY);
-
-	PHALCON_INIT_VAR(format);
-	ZVAL_STRING(format, "%02s");
-
-	PHALCON_CALL_FUNCTION(&real_medium, "sprintf", format, medium);
-
-	PHALCON_CALL_FUNCTION(&real_minor, "sprintf", format, minor);
-	PHALCON_CONCAT_VVVVV(return_value, major, real_medium, real_minor, special, special_number);
-	RETURN_MM();
+	PHALCON_CALL_FUNCTIONW(&real_medium, "sprintf", &format, &medium);
+	PHALCON_CALL_FUNCTIONW(&real_minor, "sprintf", &format, &minor);
+	PHALCON_CONCAT_VVVVV(return_value, &major, &real_medium, &real_minor, &special, &special_number);
 }

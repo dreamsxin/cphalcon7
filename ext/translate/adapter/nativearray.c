@@ -75,7 +75,7 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_NativeArray){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 
-	zval *options, *data;
+	zval *options, data;
 
 	phalcon_fetch_params(0, 1, 0, &options);
 	
@@ -84,17 +84,17 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_str_fetch(&data, options, SL("content"))) {
+	if (!phalcon_array_isset_fetch_str(&data, options, SL("content"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Translation content was not provided");
 		return;
 	}
 
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
+	if (Z_TYPE_P(&data) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Translation data must be an array");
 		return;
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_translate"), data);
+	phalcon_update_property_this(getThis(), SL("_translate"), &data);
 }
 
 /**
@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
-	zval *index, *placeholders = NULL, *translate, *translation = NULL;
+	zval *index, *placeholders = NULL, *translate, translation;
 	zval *value;
 	zend_string *str_key;
 	ulong idx;
@@ -119,12 +119,12 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 	
 	translate = phalcon_read_property(getThis(), SL("_translate"), PH_NOISY);
 	if (!phalcon_array_isset_fetch(&translation, translate, index)) {
-		translation = index;
+		PHALCON_CPY_WRT_CTOR(&translation, index);
 	}
 
 	if (Z_TYPE_P(placeholders) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
-			zval key, key_placeholder, *replaced = NULL;
+			zval key, key_placeholder, replaced;
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -133,13 +133,13 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
 			PHALCON_CONCAT_SVS(&key_placeholder, "%", &key, "%");
 
-			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, translation);
+			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, &translation);
 
-			translation = replaced;
+			PHALCON_CPY_WRT_CTOR(&translation, &replaced);
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_ZVAL(translation, 1, 0);
+	RETURN_CTORW(&translation);
 }
 
 /**

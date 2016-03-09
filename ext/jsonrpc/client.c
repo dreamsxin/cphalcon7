@@ -82,15 +82,11 @@ PHP_METHOD(Phalcon_JsonRpc_Client, __construct){
 
 	zval *httpclient;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &httpclient);
 
-	phalcon_fetch_params(1, 1, 0, &httpclient);
-
-	PHALCON_VERIFY_INTERFACE_EX(httpclient, phalcon_http_client_adapterinterface_ce, phalcon_jsonrpc_client_exception_ce, 1);
+	PHALCON_VERIFY_INTERFACE_EX(httpclient, phalcon_http_client_adapterinterface_ce, phalcon_jsonrpc_client_exception_ce, 0);
 
 	phalcon_update_property_this(getThis(), SL("_httpclient"), httpclient);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -102,76 +98,62 @@ PHP_METHOD(Phalcon_JsonRpc_Client, __construct){
  */
 PHP_METHOD(Phalcon_JsonRpc_Client, call){
 
-	zval *method = NULL, *data = NULL, *httpclient, *id, *jsonrpc_message, *json_message = NULL, *response = NULL;
-	zval *code = NULL, *body = NULL, *json = NULL, *jsonrpc_response, *result, *error;
+	zval *method = NULL, *data = NULL, *httpclient, id, jsonrpc_message, json_message, response;
+	zval code, body, json, jsonrpc_response, result, error;
 	int i;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &method, &data);
+	phalcon_fetch_params(0, 1, 1, &method, &data);
 
 	httpclient = phalcon_read_property(getThis(), SL("_httpclient"), PH_NOISY);
-	id = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
-	i = Z_LVAL_P(id) + 1;
-	ZVAL_LONG(id, i);
+	phalcon_return_property(&id, getThis(), SL("_id"));
 
-	phalcon_update_property_this(getThis(), SL("_id"), id);
+	i = Z_LVAL(id) + 1;
+	ZVAL_LONG(&id, i);
 
-	PHALCON_INIT_VAR(jsonrpc_message);
-	array_init(jsonrpc_message);
+	phalcon_update_property_this(getThis(), SL("_id"), &id);
 
-	phalcon_array_update_str_str(jsonrpc_message, SL("jsonrpc"), SL("2.0"), PH_COPY);
-	phalcon_array_update_str(jsonrpc_message, SL("method"), method, PH_COPY);
+	array_init(&jsonrpc_message);
+
+	phalcon_array_update_str_str(&jsonrpc_message, SL("jsonrpc"), SL("2.0"), PH_COPY);
+	phalcon_array_update_str(&jsonrpc_message, SL("method"), method, PH_COPY);
 	
 	if (data) {
-		phalcon_array_update_str(jsonrpc_message, SL("params"), data, PH_COPY);
+		phalcon_array_update_str(&jsonrpc_message, SL("params"), data, PH_COPY);
 	}
 	
-	phalcon_array_update_str(jsonrpc_message, SL("id"), id, PH_COPY);
+	phalcon_array_update_str(&jsonrpc_message, SL("id"), &id, PH_COPY);
 
-	PHALCON_CALL_FUNCTION(&json_message, "json_encode", jsonrpc_message);
+	PHALCON_CALL_FUNCTIONW(&json_message, "json_encode", &jsonrpc_message);
+	PHALCON_CALL_METHODW(NULL, httpclient, "setdata", &json_message);
+	PHALCON_CALL_METHODW(&response, httpclient, "post");
 
-	PHALCON_CALL_METHOD(NULL, httpclient, "setdata", json_message);
-	PHALCON_CALL_METHOD(&response, httpclient, "post");
+	PHALCON_VERIFY_CLASS_EX(&response, phalcon_http_client_response_ce, phalcon_jsonrpc_client_exception_ce, 0);
 
-	PHALCON_VERIFY_CLASS_EX(response, phalcon_http_client_response_ce, phalcon_jsonrpc_client_exception_ce, 1);
+	PHALCON_CALL_METHODW(&code, &response, "getstatuscode");
+	PHALCON_CALL_METHODW(&body, &response, "getbody");
 
-	PHALCON_CALL_METHOD(&code, response, "getstatuscode");
-	PHALCON_CALL_METHOD(&body, response, "getbody");
+	object_init_ex(&jsonrpc_response, phalcon_jsonrpc_client_response_ce);
 
-	PHALCON_INIT_VAR(jsonrpc_response);
-	object_init_ex(jsonrpc_response, phalcon_jsonrpc_client_response_ce);
-	PHALCON_CALL_METHOD(NULL, jsonrpc_response, "__construct", body);
+	PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "__construct", &body);
+	PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "setcode", &code);
 
-	PHALCON_CALL_METHOD(NULL, jsonrpc_response, "setcode", code);
+	if (PHALCON_IS_NOT_EMPTY(&body)) {
+		PHALCON_CALL_FUNCTIONW(&json, "json_decode", &body, &PHALCON_GLOBAL(z_true));
 
-	if (PHALCON_IS_NOT_EMPTY(body)) {
-		PHALCON_CALL_FUNCTION(&json, "json_decode", body, &PHALCON_GLOBAL(z_true));
-
-		if (Z_TYPE_P(json) == IS_ARRAY) {
-			if (phalcon_array_isset_str(json, SL("id"))) {
-				PHALCON_OBS_VAR(id);
-				phalcon_array_fetch_str(&id, json, SL("id"), PH_NOISY);
-
-				PHALCON_CALL_METHOD(NULL, jsonrpc_response, "setid", id);
+		if (Z_TYPE(json) == IS_ARRAY) {
+			if (phalcon_array_isset_fetch_str(&id, &json, SL("id"))) {
+				PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "setid", &id);
 			}
 
-			if (phalcon_array_isset_str(json, SL("result"))) {
-				PHALCON_OBS_VAR(result);
-				phalcon_array_fetch_str(&result, json, SL("result"), PH_NOISY);
-
-				PHALCON_CALL_METHOD(NULL, jsonrpc_response, "setresult", result);
+			if (phalcon_array_isset_fetch_str(&result, &json, SL("result"))) {
+				PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "setresult", &result);
 			}
 
-			if (phalcon_array_isset_str(json, SL("error"))) {
-				PHALCON_OBS_VAR(error);
-				phalcon_array_fetch_str(&error, json, SL("error"), PH_NOISY);
-
-				PHALCON_CALL_METHOD(NULL, jsonrpc_response, "seterror", error);
+			if (phalcon_array_isset_fetch_str(&error, &json, SL("error"))) {
+				PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "seterror", &error);
 			}
 		}
 	}
 
-	RETURN_CTOR(jsonrpc_response);
+	RETURN_CTORW(&jsonrpc_response);
 }
-

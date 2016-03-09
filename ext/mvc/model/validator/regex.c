@@ -88,125 +88,91 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Regex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Regex, validate){
 
-	zval *record, *option = NULL, *field_name = NULL, *allow_empty = NULL, *is_set = NULL, *value = NULL;
-	zval *failed = NULL, *matches, *pattern = NULL, *match_pattern;
-	zval *match_zero, *message = NULL, *type, *is_set_code = NULL, *code = NULL;
+	zval *record, option, field_name, allow_empty, is_set, value, failed, matches, pattern, match_pattern, match_zero, message, type, is_set_code, code;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &record);
 
-	phalcon_fetch_params(1, 1, 0, &record);
-	
-	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field");
-	
-	PHALCON_CALL_METHOD(&field_name, getThis(), "getoption", option);
-	if (Z_TYPE_P(field_name) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
+	PHALCON_STR(&option, "field");
+
+	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", &option);
+	if (Z_TYPE(field_name) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}
-	
+
 	/** 
 	 * The 'pattern' option must be a valid regular expression
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "pattern");
-	
-	PHALCON_CALL_METHOD(&is_set, getThis(), "issetoption", option);
-	if (!zend_is_true(is_set)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Validator requires a perl-compatible regex pattern");
+	PHALCON_STR(&option, "pattern");
+
+	PHALCON_CALL_METHODW(&is_set, getThis(), "issetoption", &option);
+	if (!zend_is_true(&is_set)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Validator requires a perl-compatible regex pattern");
 		return;
 	}
-	
-	PHALCON_CALL_METHOD(&value, record, "readattribute", field_name);
+
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field_name);
 
 	/*
 	 * Allow empty
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
+	PHALCON_STR(&option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
-	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
-		RETURN_MM_TRUE;
+	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
+		RETURN_TRUE;
 	}
-	
-	/*
-	 * Allow empty
-	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
+	ZVAL_FALSE(&failed);
 
-	if (allow_empty && zend_is_true(allow_empty)) {
-		if (PHALCON_IS_EMPTY(value)) {
-			RETURN_MM_TRUE;
-		}
-	}
-	
-	PHALCON_INIT_VAR(failed);
-	ZVAL_BOOL(failed, 0);
-	
-	PHALCON_INIT_VAR(matches);
-	
 	/** 
 	 * The regular expression is set in the option 'pattern'
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "pattern");
+	PHALCON_STR(&option, "pattern");
 
-	PHALCON_CALL_METHOD(&pattern, getThis(), "getoption", option);
-	
+	PHALCON_CALL_METHODW(&pattern, getThis(), "getoption", &option);
+
 	/** 
 	 * Check if the value matches using preg_match
 	 */
-	PHALCON_INIT_VAR(match_pattern);
-	RETURN_MM_ON_FAILURE(phalcon_preg_match(match_pattern, pattern, value, matches));
-	
-	if (zend_is_true(match_pattern)) {
-		PHALCON_OBS_VAR(match_zero);
-		phalcon_array_fetch_long(&match_zero, matches, 0, PH_NOISY);
-	
-		is_not_equal_function(failed, match_zero, value);
+	RETURN_ON_FAILURE(phalcon_preg_match(&match_pattern, &pattern, &value, &matches));
+
+	if (zend_is_true(&match_pattern)) {
+		phalcon_array_fetch_long(&match_zero, &matches, 0, PH_NOISY);
+
+		is_not_equal_function(&failed, &match_zero, &value);
 	} else {
-		PHALCON_INIT_NVAR(failed);
-		ZVAL_BOOL(failed, 1);
+		ZVAL_TRUE(&failed);
 	}
-	
-	if (PHALCON_IS_TRUE(failed)) {
-	
+
+	if (PHALCON_IS_TRUE(&failed)) {
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(message));
-	
-		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
-		if (!zend_is_true(message)) {
-			PHALCON_INIT_NVAR(message);
-			PHALCON_CONCAT_SVS(message, "Value of field '", field_name, "' doesn't match regular expression");
+		PHALCON_STR(&option, ISV(message));
+
+		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
+		if (!zend_is_true(&message)) {
+			PHALCON_CONCAT_SVS(&message, "Value of field '", &field_name, "' doesn't match regular expression");
 		}
-	
-		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Regex");
+
+		PHALCON_STR(&type, "Regex");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(code));
+		PHALCON_STR(&option, ISV(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
-		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
+		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
+		if (zend_is_true(&is_set_code)) {
+			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
-			PHALCON_INIT_VAR(code);
-			ZVAL_LONG(code, 0);
+			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field_name, type, code);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field_name, &type, &code);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }

@@ -76,24 +76,18 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Apc){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read){
 
-	zval *key, *prefixed_key;
+	zval *key, prefixed_key;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_fetch_params(1, 1, 0, &key);
-	
-	PHALCON_INIT_VAR(prefixed_key);
-	PHALCON_CONCAT_SV(prefixed_key, "_PHAN", key);
-	
-	phalcon_strtolower_inplace(prefixed_key);
-	
-	PHALCON_RETURN_CALL_FUNCTION("apc_fetch", prefixed_key);
+	PHALCON_CONCAT_SV(&prefixed_key, "_PHAN", key);
+
+	phalcon_strtolower_inplace(&prefixed_key);
+
+	PHALCON_RETURN_CALL_FUNCTIONW("apc_fetch", &prefixed_key);
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
-		zval_dtor(return_value);
-		ZVAL_NULL(return_value);
+		RETURN_NULL();
 	}
-	
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -104,17 +98,12 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Apc, write){
 
-	zval *key, *data, *prefixed_key;
+	zval *key, *data, prefixed_key;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	phalcon_fetch_params(1, 2, 0, &key, &data);
-	
-	PHALCON_INIT_VAR(prefixed_key);
-	PHALCON_CONCAT_SV(prefixed_key, "_PHAN", key);
-	
-	phalcon_strtolower_inplace(prefixed_key);
-	PHALCON_CALL_FUNCTION(NULL, "apc_store", prefixed_key, data);
-	
-	PHALCON_MM_RESTORE();
+	PHALCON_CONCAT_SV(&prefixed_key, "_PHAN", key);
+
+	phalcon_strtolower_inplace(&prefixed_key);
+	PHALCON_CALL_FUNCTIONW(NULL, "apc_store", &prefixed_key, data);
 }

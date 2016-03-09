@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -79,61 +80,50 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Identical){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Identical, validate){
 
-	zval *validator, *attribute, *value = NULL, *identical_value, *valid = NULL;
-	zval *message_str, *message, *code;
-	zval *label, *pairs, *prepared = NULL;
+	zval *validator, *attribute, value, identical_value, valid, label, pairs, message_str, code, prepared, message;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &validator, &attribute);
-	
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 1);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
 
-	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
-	
-	PHALCON_OBS_VAR(identical_value);
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &identical_value, getThis(), ISV(value)));
+	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
-	PHALCON_CALL_SELF(&valid, "valid", value, identical_value);
-	
-	if (PHALCON_IS_FALSE(valid)) {
-		PHALCON_OBS_VAR(label);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &label, getThis(), ISV(label)));
-		if (!zend_is_true(label)) {
-			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
-			if (!zend_is_true(label)) {
-				PHALCON_CPY_WRT(label, attribute);
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&identical_value, ce, getThis(), ISV(value)));
+
+	PHALCON_CALL_SELFW(&valid, "valid", &value, &identical_value);
+
+	if (PHALCON_IS_FALSE(&valid)) {
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
+		if (!zend_is_true(&label)) {
+			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
+			if (!zend_is_true(&label)) {
+				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
 		}
 
-		PHALCON_ALLOC_INIT_ZVAL(pairs);
-		array_init_size(pairs, 1);
-		Z_TRY_ADDREF_P(label); add_assoc_zval_ex(pairs, SL(":field"), label);
+		array_init_size(&pairs, 1);
+		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
 
-		PHALCON_OBS_VAR(message_str);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &message_str, getThis(), ISV(message)));
-		if (!zend_is_true(message_str)) {
-			PHALCON_OBSERVE_OR_NULLIFY_PPZV(&message_str);
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(Z_OBJCE_P(validator), message_str, validator, "Identical"));
-		}
-	
-		PHALCON_OBS_VAR(code);
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(ce, &code, getThis(), ISV(code)));
-		if (Z_TYPE_P(code) == IS_NULL) {
-			ZVAL_LONG(code, 0);
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
+		if (!zend_is_true(&message_str)) {
+			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Identical"));
 		}
 
-		PHALCON_CALL_FUNCTION(&prepared, "strtr", message_str, pairs);
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
+		if (Z_TYPE_P(&code) == IS_NULL) {
+			ZVAL_LONG(&code, 0);
+		}
 
-		message = phalcon_validation_message_construct_helper(prepared, attribute, "Identical", code);
-		Z_TRY_DELREF_P(message);
-	
-		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+
+		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Identical", &code);
+
+		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }
 
 /**
@@ -146,13 +136,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Identical, valid){
 
 	zval *value, *identical_value;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &value, &identical_value);
+	phalcon_fetch_params(0, 2, 0, &value, &identical_value);
 
 	if (!PHALCON_IS_EQUAL(value, identical_value)) {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }

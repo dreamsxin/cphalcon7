@@ -62,20 +62,17 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter_Syslog){
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Syslog, format){
 
-	zval *message, *type, *timestamp, *context, *interpolated = NULL;
+	zval *message, *type, *timestamp, *context, interpolated;
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 	
 	if (Z_TYPE_P(context) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
-	}
-	else {
-		interpolated = message;
-		Z_TRY_ADDREF_P(interpolated);
+	} else {
+		PHALCON_CPY_WRT(&interpolated, message);
 	}
 
 	array_init_size(return_value, 2);
 	phalcon_array_append(return_value, type, PH_COPY);
-	add_next_index_zval(return_value, interpolated);
-	return;
+	phalcon_array_append(return_value, &interpolated, PH_COPY);
 }

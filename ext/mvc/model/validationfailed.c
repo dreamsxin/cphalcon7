@@ -72,35 +72,28 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_ValidationFailed){
  */
 PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 
-	zval *model, *validation_messages, *message;
-	zval *message_str = NULL;
+	zval *model, *validation_messages, message, message_str;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &validation_messages);
 
-	phalcon_fetch_params(1, 2, 0, &model, &validation_messages);
-	
 	if (phalcon_fast_count_ev(validation_messages)) {
-		/** 
+		/**
 		 * Get the first message in the array
 		 */
-		PHALCON_OBS_VAR(message);
 		phalcon_array_fetch_long(&message, validation_messages, 0, PH_NOISY);
-	
+
 		/** 
 		 * Get the message to use it in the exception
 		 */
-		PHALCON_CALL_METHOD(&message_str, message, "getmessage");
+		PHALCON_CALL_METHODW(&message_str, &message, "getmessage");
 	} else {
-		PHALCON_INIT_VAR(message_str);
-		ZVAL_STRING(message_str, "Validation failed");
+		PHALCON_STR(&message_str, "Validation failed");
 	}
 
 	phalcon_update_property_this(getThis(), SL("_model"), model);
 	phalcon_update_property_this(getThis(), SL("_messages"), validation_messages);
 
-	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_validationfailed_ce, getThis(), "__construct", message_str);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_validationfailed_ce, getThis(), "__construct", &message_str);
 }
 
 /**

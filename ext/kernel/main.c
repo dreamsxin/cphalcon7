@@ -296,12 +296,12 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 	arg_count = ZEND_CALL_NUM_ARGS(EG(current_execute_data));
 
 	if (num_args < required_args) {
-		phalcon_throw_exception_string(spl_ce_BadMethodCallException, "Wrong number of parameters");
+		phalcon_throw_exception_format(spl_ce_BadMethodCallException, "Wrong number of parameters, num:%d, required:%d", num_args, required_args);
 		return FAILURE;
 	}
 
 	if (num_args > arg_count) {
-		phalcon_throw_exception_string(spl_ce_BadMethodCallException, "Could not obtain parameters for parsing");
+		phalcon_throw_exception_format(spl_ce_BadMethodCallException, "Could not obtain parameters for parsing, num:%d, count:%d", num_args, arg_count);
 		return FAILURE;
 	}
 
@@ -333,4 +333,15 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table)
 		zend_symtable_clean(symbol_table);
 		*(++EG(symtable_cache_ptr)) = symbol_table;
 	}
+}
+
+int phalcon_get_constant(zval *retval, const char *name, size_t name_len)
+{
+	zval *constant;
+	if ((constant = zend_get_constant_str(name, name_len)) == NULL) {
+		return 0;
+	}
+
+	PHALCON_CPY_WRT_CTOR(retval, constant);
+	return 1;
 }

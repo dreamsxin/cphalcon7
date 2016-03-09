@@ -54,7 +54,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getModel);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getMessages);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, success);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_status___construct, 0, 0, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_status___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, success)
 	ZEND_ARG_INFO(0, model)
 ZEND_END_ARG_INFO()
@@ -90,12 +90,15 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Status){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, __construct){
 
-	zval *success, *model;
+	zval *success, *model = NULL;
 
-	phalcon_fetch_params(0, 2, 0, &success, &model);
+	phalcon_fetch_params(0, 1, 0, &success, &model);
 	
 	phalcon_update_property_this(getThis(), SL("_success"), success);
-	phalcon_update_property_this(getThis(), SL("_model"), model);
+
+	if (model) {
+		phalcon_update_property_this(getThis(), SL("_model"), model);
+	}
 	
 }
 

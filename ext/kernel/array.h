@@ -27,6 +27,8 @@
 #include "php_phalcon.h"
 #include "kernel/memory.h"
 
+zval* phalcon_array_return_fetch(const zval *arr, const zval *index);
+
 /**
  * @brief Fetches @a index if it exists from the array @a arr
  * @param[out] fetched <code>&$arr[$index]</code>; @a fetched is modified only when the function returns 1
@@ -39,7 +41,7 @@
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  * @throw E_WARNING if @a offset is not a scalar
  */
-int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index);
+int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index);
 
 /**
  * @brief Fetches @a index if it exists from the array @a arr
@@ -51,7 +53,7 @@ int phalcon_array_isset_fetch(zval **fetched, const zval *arr, const zval *index
  * @retval 1 Exists
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  */
-int phalcon_array_isset_long_fetch(zval **fetched, const zval *arr, ulong index);
+int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index);
 
 /**
  * @brief Fetches @a index if it exists from the array @a arr
@@ -64,7 +66,8 @@ int phalcon_array_isset_long_fetch(zval **fetched, const zval *arr, ulong index)
  * @retval 1 Exists
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  */
-int ZEND_FASTCALL phalcon_array_isset_str_fetch(zval **fetched, const zval *arr, const char *index, uint index_length);
+int ZEND_FASTCALL phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length);
+int ZEND_FASTCALL phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index);
 
 
 /**
@@ -546,12 +549,12 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 /**
  * $x[$a][$b]["str"] = $v
  */
-void phalcon_array_update_str_zval_zval_multi_3(zval *arr, const zval *index1, const zval *index2, const char *index3, uint index3_length, zval *value, int flags);
+void phalcon_array_update_zval_zval_str_multi_3(zval *arr, const zval *index1, const zval *index2, const char *index3, uint index3_length, zval *value, int flags);
 
 /**
  * $x[$a]["a-str"]["str"] = 1
  */
-void phalcon_array_update_zval_str_string_multi_3(zval *arr, const zval *index1, const char *index2, uint index2_length, const char *index3, uint index3_length, zval *value, int flags);
+void phalcon_array_update_zval_str_str_multi_3(zval *arr, const zval *index1, const char *index2, uint index2_length, const char *index3, uint index3_length, zval *value, int flags);
 
 /**
  * @brief Reads an item from @a arr at position @a index and stores it to @a return_value
@@ -568,7 +571,7 @@ void phalcon_array_update_zval_str_string_multi_3(zval *arr, const zval *index1,
  * @warning @c *return_value should be either @c NULL (preferred) or point to not initialized memory; if @c *return_value points to a valid variable, mmemory leak is possible
  * @note @c index will be handled as follows: @c NULL is treated as an empty string, @c double values are cast to @c integer, @c bool or @c resource are treated as @c integer
  */
-int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index, int silent);
+int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, int silent);
 
 /**
  * @brief Reads an item from @a arr at position @a index and stores it to @a return_value
@@ -583,7 +586,7 @@ int phalcon_array_fetch(zval **return_value, const zval *arr, const zval *index,
  * @throw @c E_NOTICE if @c index does not exist and @c silent = @c PH_NOISY
  * @warning @c *return_value should be either @c NULL (preferred) or point to not initialized memory; if @c *return_value points to a valid variable, mmemory leak is possible
  */
-int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, int silent);
+int phalcon_array_fetch_long(zval *return_value, const zval *arr, ulong index, int silent);
 
 /**
  * @brief Reads an item from @a arr at position @a index using the precomputed hash @c key and stores it to @a return_value
@@ -599,8 +602,8 @@ int phalcon_array_fetch_long(zval **return_value, const zval *arr, ulong index, 
  * @throw @c E_NOTICE if @c index does not exist and @c silent = @c PH_NOISY
  * @warning @c *return_value should be either @c NULL (preferred) or point to not initialized memory; if @c *return_value points to a valid variable, mmemory leak is possible
  */
-int phalcon_array_fetch_str(zval **return_value, const zval *arr, const char *index, uint index_length, int silent);
-int phalcon_array_fetch_string(zval **return_value, const zval *arr, zend_string *index, int silent);
+int phalcon_array_fetch_str(zval *return_value, const zval *arr, const char *index, uint index_length, int silent);
+int phalcon_array_fetch_string(zval *return_value, const zval *arr, zend_string *index, int silent);
 
 
 /**
@@ -661,5 +664,8 @@ int phalcon_array_is_associative(zval *arr);
 
 void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
 int phalcon_array_update_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);
+
+void phalcon_array_append_multi_ex(zval *arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
+int phalcon_array_append_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);
 
 #endif /* PHALCON_KERNEL_ARRAY_H */

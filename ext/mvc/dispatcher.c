@@ -140,19 +140,16 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setDefaultController){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 
-	zval *controller_name, *is_exact = NULL;
+	zval *controller_name, *is_exact = NULL, name;
 
 	phalcon_fetch_params(0, 1, 1, &controller_name, &is_exact);
 
 	if (is_exact && zend_is_true(is_exact)) {
-		zval *name;
-		PHALCON_ALLOC_INIT_ZVAL(name);
-		PHALCON_CONCAT_SV(name, "\\", controller_name);
-		phalcon_update_property_this(getThis(), SL("_handlerName"), name);
-		zval_ptr_dtor(name);
+		PHALCON_CONCAT_SV(&name, "\\", controller_name);
+		phalcon_update_property_this(getThis(), SL("_handlerName"), &name);
+		zval_ptr_dtor(&name);
 		phalcon_update_property_this(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_true));
-	}
-	else {
+	} else {
 		phalcon_update_property_this(getThis(), SL("_handlerName"), controller_name);
 		phalcon_update_property_this(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_false));
 	}
@@ -192,20 +189,16 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
-	zval *message, *code = NULL, *error_handlers, *error_handler = NULL;
+	zval *message, *code = NULL, *error_handlers, error_handler;
 	zval *previous_namespace_name, *previous_controller_name, *previous_action_name, *previous_params;
 	zval *namespace_name, *controller_name, *action_name, *params, *dependency_injector;
-	zval exception_code, exception_message, *exception = NULL, *service;
-	zval *response = NULL, *status_code, *status_message;
-	zval *events_manager, event_name, *status = NULL;
+	zval exception_code, exception_message, exception, service, response, status_code, status_message;
+	zval *events_manager, event_name, status;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &code);
+	phalcon_fetch_params(0, 1, 1, &message, &code);
 
 	if (!code) {
-		PHALCON_INIT_VAR(code);
-		ZVAL_LONG(code, 0);
+		code = &PHALCON_GLOBAL(z_zero);
 	} else {
 		PHALCON_SEPARATE_PARAM(code);
 	}
@@ -214,7 +207,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
 	if (Z_TYPE_P(error_handlers) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&error_handler, error_handlers, code)) {
-			PHALCON_CALL_SELF(NULL, "forward", error_handler);
+			PHALCON_CALL_SELFW(NULL, "forward", &error_handler);
 			previous_namespace_name = phalcon_read_property(getThis(), SL("_previousNamespaceName"), PH_NOISY);
 			previous_controller_name = phalcon_read_property(getThis(), SL("_previousHandlerName"), PH_NOISY);
 			previous_action_name = phalcon_read_property(getThis(), SL("_previousActionName"), PH_NOISY);
@@ -231,7 +224,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 				!PHALCON_IS_EQUAL(previous_action_name, action_name) ||
 				!PHALCON_IS_EQUAL(previous_params, params)
 			) {
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 			
 		}
@@ -240,55 +233,48 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		ZVAL_LONG(&exception_code, 0);
+		PHALCON_STR(&exception_message, "A dependency injection container is required to access the 'response' service");
 
-		ZVAL_STRING(&exception_message, "A dependency injection container is required to access the 'response' service");
+		object_init_ex(&exception, phalcon_mvc_dispatcher_exception_ce);
+		PHALCON_CALL_METHODW(NULL, &exception, "__construct", &exception_message, &exception_code);
 
-		PHALCON_INIT_VAR(exception);
-		object_init_ex(exception, phalcon_mvc_dispatcher_exception_ce);
-		PHALCON_CALL_METHOD(NULL, exception, "__construct", &exception_message, &exception_code);
-
-		phalcon_throw_exception(exception);
-		RETURN_MM();
+		phalcon_throw_exception(&exception);
+		return;
 	}
 
-	PHALCON_INIT_VAR(service);
-	ZVAL_STRING(service, ISV(response));
+	PHALCON_STR(&service, ISV(response));
 
-	PHALCON_CALL_METHOD(&response, dependency_injector, "getshared", service);
-	PHALCON_VERIFY_INTERFACE(response, phalcon_http_responseinterface_ce);
+	PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
+	PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 
 	/**
 	 * Dispatcher exceptions automatically send 404 status
 	 */
-	PHALCON_INIT_VAR(status_code);
-	ZVAL_LONG(status_code, 404);
+	ZVAL_LONG(&status_code, 404);
+	PHALCON_STR(&status_message, "Not Found");
 
-	PHALCON_INIT_VAR(status_message);
-	ZVAL_STRING(status_message, "Not Found");
-	PHALCON_CALL_METHOD(NULL, response, "setstatuscode", status_code, status_message);
+	PHALCON_CALL_METHODW(NULL, &response, "setstatuscode", &status_code, &status_message);
 
 	/**
 	 * Create the real exception
 	 */
-	PHALCON_INIT_NVAR(exception);
-	object_init_ex(exception, phalcon_mvc_dispatcher_exception_ce);
-	PHALCON_CALL_METHOD(NULL, exception, "__construct", message, code);
+	object_init_ex(&exception, phalcon_mvc_dispatcher_exception_ce);
+	PHALCON_CALL_METHODW(NULL, &exception, "__construct", message, code);
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "dispatch:beforeException");
+		PHALCON_STR(&event_name, "dispatch:beforeException");
 
-		PHALCON_CALL_METHOD(&status, events_manager, "fire", &event_name, getThis(), exception);
-		if (PHALCON_IS_FALSE(status)) {
-			RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), &exception);
+		if (PHALCON_IS_FALSE(&status)) {
+			RETURN_FALSE;
 		}
 	}
 
 	/**
 	 * Throw the exception if it wasn't handled
 	 */
-	phalcon_throw_exception(exception);
-	RETURN_MM();
+	phalcon_throw_exception(&exception);
 }
 
 /**
@@ -299,20 +285,17 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
  * @warning If any additional logic is to be implemented here, please check
  * phalcon_dispatcher_fire_event() first
  */
-PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException){
+PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException)
+{
 	zval *exception, event_name;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &exception);
 
-	phalcon_fetch_params(1, 1, 0, &exception);
-
-	ZVAL_STRING(&event_name, "dispatch:beforeException");
+	PHALCON_STR(&event_name, "dispatch:beforeException");
 
 	ZVAL_MAKE_REF(exception);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "fireevent", &event_name, exception);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "fireevent", &event_name, exception);
 	ZVAL_UNREF(exception);
-
-	RETURN_MM();
 }
 
 /**

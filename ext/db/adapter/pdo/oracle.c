@@ -95,44 +95,29 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Oracle){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
 
-	zval *descriptor = NULL, *startup, *value = NULL;
+	zval *descriptor = NULL, startup, *value = NULL;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 0, 1, &descriptor);
 
-	phalcon_fetch_params(1, 0, 1, &descriptor);
-
-	if (!descriptor) {
-		PHALCON_INIT_VAR(descriptor);
-	} else {
-		PHALCON_SEPARATE_PARAM(descriptor);
-	}
-
-	if (!zend_is_true(descriptor)) {
+	if (!descriptor || !zend_is_true(descriptor)) {
 		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
 	}
 
 	/** 
 	 * Connect
 	 */
-	PHALCON_CALL_PARENT(NULL, phalcon_db_adapter_pdo_oracle_ce, getThis(), "connect", descriptor);
+	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_oracle_ce, getThis(), "connect", descriptor);
 
 	/** 
 	 * Database session settings initiated with each HTTP request. Oracle behaviour
 	 * depends on particular NLS* parameter. Check if the developer has defined custom
 	 * startup or create one from scratch
 	 */
-	if (phalcon_array_isset_str(descriptor, SL("startup"))) {
-
-		PHALCON_OBS_VAR(startup);
-		phalcon_array_fetch_str(&startup, descriptor, SL("startup"), PH_NOISY);
-		if (Z_TYPE_P(startup) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(startup), value) {
-				PHALCON_CALL_METHOD(NULL, getThis(), "execute", value);
-			} ZEND_HASH_FOREACH_END();
-		}
+	if (phalcon_array_isset_fetch_str(&startup, descriptor, SL("startup")) && Z_TYPE(startup) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(startup), value) {
+			PHALCON_CALL_METHODW(NULL, getThis(), "execute", value);
+		} ZEND_HASH_FOREACH_END();
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -146,56 +131,39 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 
-	zval *table, *schema = NULL, *columns, *dialect, *sql = NULL, *fetch_num;
-	zval *describe = NULL, *old_column = NULL, *field = NULL, *definition = NULL;
-	zval *column_size = NULL, *column_precision = NULL, *column_scale = NULL;
-	zval *column_type = NULL, *attribute = NULL, *column_name = NULL;
-	zval *column = NULL;
+	zval *table, *schema = NULL, columns, *dialect, sql, fetch_num, describe, old_column, *field;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &table, &schema);
+	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
 	if (!schema) {
 		schema = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(columns);
-	array_init(columns);
+	array_init(&columns);
 
 	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&sql, dialect, "describecolumns", table, schema);
+	PHALCON_CALL_METHODW(&sql, dialect, "describecolumns", table, schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
 	 */
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
-	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", sql, fetch_num);
+	PHALCON_CALL_METHODW(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
 	/** 
-	 *  0:column_name, 1:data_type, 2:data_length, 3:data_precision, 4:data_scale,
-	 * 5:nullable, 6:constraint_type, 7:default, 8:position;
+	 *  0:column_name, 1:data_type, 2:data_length, 3:data_precision, 4:data_scale, 5:nullable, 6:constraint_type, 7:default, 8:position;
 	 */
-	PHALCON_INIT_VAR(old_column);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
+		zval definition, column_size, column_precision, column_scale, column_type, attribute, column_name, column;
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(describe), field) {
-		PHALCON_INIT_NVAR(definition);
-		array_init_size(definition, 1);
-		add_assoc_long_ex(definition, SL("bindType"), 2);
+		array_init_size(&definition, 1);
+		add_assoc_long_ex(&definition, SL("bindType"), 2);
 
-		PHALCON_OBS_NVAR(column_size);
 		phalcon_array_fetch_long(&column_size, field, 2, PH_NOISY);
-
-		PHALCON_OBS_NVAR(column_precision);
 		phalcon_array_fetch_long(&column_precision, field, 3, PH_NOISY);
-
-		PHALCON_OBS_NVAR(column_scale);
 		phalcon_array_fetch_long(&column_scale, field, 4, PH_NOISY);
-
-		PHALCON_OBS_NVAR(column_type);
 		phalcon_array_fetch_long(&column_type, field, 1, PH_NOISY);
 
 		/** 
@@ -205,21 +173,21 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 			/**
 			 * Integer
 			 */
-			if (phalcon_memnstr_str(column_type, SL("NUMBER"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DECIMAL, 0);
-				phalcon_array_update_str_bool(definition, SL("isNumeric"), 1, 0);
-				phalcon_array_update_str(definition, SL("size"), column_precision, PH_COPY);
-				phalcon_array_update_str_long(definition, SL("bindType"), 32, 0);
-				if (phalcon_is_numeric(column_precision)) {
-					phalcon_array_update_str_long(definition, SL("bytes"), Z_LVAL_P(column_precision) * 8, 0);
+			if (phalcon_memnstr_str(&column_type, SL("NUMBER"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DECIMAL, 0);
+				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
+				phalcon_array_update_str(&definition, SL("size"), &column_precision, PH_COPY);
+				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
+				if (phalcon_is_numeric(&column_precision)) {
+					phalcon_array_update_str_long(&definition, SL("bytes"), Z_LVAL(column_precision) * 8, 0);
 				} else {
-					phalcon_array_update_str_long(definition, SL("size"), 30, 0);
-					phalcon_array_update_str_long(definition, SL("bytes"), 80, 0);
+					phalcon_array_update_str_long(&definition, SL("size"), 30, 0);
+					phalcon_array_update_str_long(&definition, SL("bytes"), 80, 0);
 				}
-				if (phalcon_is_numeric(column_scale)) {
-					phalcon_array_update_str(definition, SL("scale"), column_scale, PH_COPY);
+				if (phalcon_is_numeric(&column_scale)) {
+					phalcon_array_update_str(&definition, SL("scale"), &column_scale, PH_COPY);
 				} else {
-					phalcon_array_update_str_long(definition, SL("scale"), 6, 0);
+					phalcon_array_update_str_long(&definition, SL("scale"), 6, 0);
 				}
 				break;
 			}
@@ -227,149 +195,144 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 			/**
 			 * Tinyint(1) is boolean
 			 */
-			if (phalcon_memnstr_str(column_type, SL("TINYINT(1)"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_BOOLEAN, 0);
-				phalcon_array_update_str_long(definition, SL("bindType"), 5, 0);
+			if (phalcon_memnstr_str(&column_type, SL("TINYINT(1)"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_BOOLEAN, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), 5, 0);
 				break;
 			}
 
 			/**
 			 * Smallint/Bigint/Integers/Int are int
 			 */
-			if (phalcon_memnstr_str(column_type, SL("INTEGER"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
-				phalcon_array_update_str_bool(definition, SL("isNumeric"), 1, 0);
-				phalcon_array_update_str(definition, SL("size"), column_precision, PH_COPY);
-				phalcon_array_update_str_long(definition, SL("bindType"), 1, 0);
-				phalcon_array_update_str_long(definition, SL("bytes"), 32, 0);
+			if (phalcon_memnstr_str(&column_type, SL("INTEGER"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
+				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
+				phalcon_array_update_str(&definition, SL("size"), &column_precision, PH_COPY);
+				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 32, 0);
 				break;
 			}
 
 			/**
 			 * Float/Smallfloats/Decimals are float
 			 */
-			if (phalcon_memnstr_str(column_type, SL("FLOAT"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
-				phalcon_array_update_str_bool(definition, SL("isNumeric"), 1, 0);
-				phalcon_array_update_str(definition, SL("size"), column_size, PH_COPY);
-				phalcon_array_update_str(definition, SL("scale"), column_scale, PH_COPY);
-				phalcon_array_update_str_long(definition, SL("bindType"), 32, 0);
+			if (phalcon_memnstr_str(&column_type, SL("FLOAT"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
+				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
+				phalcon_array_update_str(&definition, SL("size"), &column_size, PH_COPY);
+				phalcon_array_update_str(&definition, SL("scale"), &column_scale, PH_COPY);
+				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
 				break;
 			}
 
 			/**
 			 * Date
 			 */
-			if (phalcon_memnstr_str(column_type, SL("TIMESTAMP"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
+			if (phalcon_memnstr_str(&column_type, SL("TIMESTAMP"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
 				break;
 			}
 
 			/**
 			 * Text
 			 */
-			if (phalcon_memnstr_str(column_type, SL("RAW"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
+			if (phalcon_memnstr_str(&column_type, SL("RAW"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
 				break;
 			}
 
 			/**
 			 * Text
 			 */
-			if (phalcon_memnstr_str(column_type, SL("BLOB"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
+			if (phalcon_memnstr_str(&column_type, SL("BLOB"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
 				break;
 			}
 
 			/**
 			 * Text
 			 */
-			if (phalcon_memnstr_str(column_type, SL("CLOB"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
+			if (phalcon_memnstr_str(&column_type, SL("CLOB"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
 				break;
 			}
 
 			/**
 			 * Chars2 are string
 			 */
-			if (phalcon_memnstr_str(column_type, SL("VARCHAR2"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
-				phalcon_array_update_str(definition, SL("size"), column_size, PH_COPY);
+			if (phalcon_memnstr_str(&column_type, SL("VARCHAR2"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
+				phalcon_array_update_str(&definition, SL("size"), &column_size, PH_COPY);
 				break;
 			}
 
 			/**
 			 * Chars are chars
 			 */
-			if (phalcon_memnstr_str(column_type, SL("CHAR"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_CHAR, 0);
-				phalcon_array_update_str(definition, SL("size"), column_size, PH_COPY);
+			if (phalcon_memnstr_str(&column_type, SL("CHAR"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_CHAR, 0);
+				phalcon_array_update_str(&definition, SL("size"), &column_size, PH_COPY);
 				break;
 			}
 
 			/**
 			 * Text are varchars
 			 */
-			if (phalcon_memnstr_str(column_type, SL("text"))) {
-				phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
+			if (phalcon_memnstr_str(&column_type, SL("text"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
 				break;
 			}
 
 			/**
 			 * By default is string
 			 */
-			phalcon_array_update_str_long(definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
+			phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
 			break;
 		}
 
-		if (Z_TYPE_P(old_column) == IS_NULL) {
-			phalcon_array_update_str_bool(definition, SL("first"), 1, 0);
+		if (!zend_is_true(&old_column)) {
+			phalcon_array_update_str_bool(&definition, SL("first"), 1, 0);
 		} else {
-			phalcon_array_update_str(definition, SL("after"), old_column, PH_COPY);
+			phalcon_array_update_str(&definition, SL("after"), &old_column, PH_COPY);
 		}
 
 		/** 
 		 * Check if the field is primary key
 		 */
-		PHALCON_OBS_NVAR(attribute);
 		phalcon_array_fetch_long(&attribute, field, 6, PH_NOISY);
-		if (PHALCON_IS_STRING(attribute, "P")) {
-			phalcon_array_update_str_bool(definition, SL("primary"), 1, 0);
+		if (PHALCON_IS_STRING(&attribute, "P")) {
+			phalcon_array_update_str_bool(&definition, SL("primary"), 1, 0);
 		}
 
 		/** 
 		 * Check if the column allows null values
 		 */
-		PHALCON_OBS_NVAR(attribute);
 		phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
-		if (PHALCON_IS_STRING(attribute, "N")) {
-			phalcon_array_update_str_bool(definition, SL("notNull"), 1, 0);
+		if (PHALCON_IS_STRING(&attribute, "N")) {
+			phalcon_array_update_str_bool(&definition, SL("notNull"), 1, 0);
 		}
-
-		PHALCON_OBS_NVAR(column_name);
-		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY);
 
 		/** 
 		 * If the column set the default values, get it
 		 */
-		PHALCON_OBS_NVAR(attribute);
 		phalcon_array_fetch_long(&attribute, field, 7, PH_NOISY);
-		if (!PHALCON_IS_EMPTY(attribute)) {
-			phalcon_array_update_str(definition, SL("default"), attribute, PH_COPY);
+		if (!PHALCON_IS_EMPTY(&attribute)) {
+			phalcon_array_update_str(&definition, SL("default"), &attribute, PH_COPY);
 		}
+
+		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY);
 
 		/** 
 		 * Create a Phalcon\Db\Column to abstract the column
 		 */
-		PHALCON_INIT_NVAR(column);
-		object_init_ex(column, phalcon_db_column_ce);
-		PHALCON_CALL_METHOD(NULL, column, "__construct", column_name, definition);
+		object_init_ex(&column, phalcon_db_column_ce);
+		PHALCON_CALL_METHODW(NULL, &column, "__construct", &column_name, &definition);
 
-		phalcon_array_append(columns, column, PH_COPY);
-		PHALCON_CPY_WRT(old_column, column_name);
+		phalcon_array_append(&columns, &column, PH_COPY);
+		PHALCON_CPY_WRT_CTOR(&old_column, &column_name);
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(columns);
+	RETURN_CTORW(&columns);
 }
 
 /**
@@ -392,27 +355,22 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, lastInsertId){
 
-	zval *sequence_name = NULL, *sql, *fetch_num, *ret = NULL, *insert_id;
+	zval *sequence_name = NULL, sql, fetch_num, ret, insert_id;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &sequence_name);
+	phalcon_fetch_params(0, 0, 1, &sequence_name);
 
 	if (!sequence_name) {
 		sequence_name = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(sql);
-	PHALCON_CONCAT_SVS(sql, "SELECT ", sequence_name, ".CURRVAL FROM dual");
+	PHALCON_CONCAT_SVS(&sql, "SELECT ", sequence_name, ".CURRVAL FROM dual");
 
-	PHALCON_INIT_VAR(fetch_num);
-	ZVAL_LONG(fetch_num, PDO_FETCH_NUM);
+	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
-	PHALCON_CALL_METHOD(&ret, getThis(), "fetchall", sql, fetch_num);
+	PHALCON_CALL_METHODW(&ret, getThis(), "fetchall", &sql, &fetch_num);
 
-	PHALCON_OBS_VAR(insert_id);
-	phalcon_array_fetch_long(&insert_id, ret, 0, PH_NOISY);
-	RETURN_CCTOR(insert_id);
+	phalcon_array_fetch_long(&insert_id, &ret, 0, PH_NOISY);
+	RETURN_CTORW(&insert_id);
 }
 
 /**
@@ -433,16 +391,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, useExplicitIdValue){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, getDefaultIdValue){
 
-	zval *null_value;
+	zval null_value;
 
-	PHALCON_MM_GROW();
+	PHALCON_STR(&null_value, "default");
 
-	PHALCON_INIT_VAR(null_value);
-	ZVAL_STRING(null_value, "default");
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", null_value);
-
-	RETURN_MM();
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &null_value);
 }
 
 /**

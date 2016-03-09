@@ -136,37 +136,32 @@ PHALCON_INIT_CLASS(Phalcon_Http_Uri){
  *
  * @param mixed $uri
  */
-PHP_METHOD(Phalcon_Http_Uri, __construct){
+PHP_METHOD(Phalcon_Http_Uri, __construct)
+{
+	zval *uri = NULL, parts, query, params;
 
-	zval *uri = NULL, *parts = NULL, *query, *params;
-
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &uri);
+	phalcon_fetch_params(0, 0, 1, &uri);
 
 	if (!uri || PHALCON_IS_EMPTY(uri)) {
 		phalcon_update_property_empty_array(getThis(), SL("_parts"));
 	} else if (Z_TYPE_P(uri) == IS_STRING) {
-		PHALCON_CALL_FUNCTION(&parts, "parse_url", uri);
-		if (phalcon_array_isset_str_fetch(&query, parts, SL("query"))) {
-			PHALCON_INIT_VAR(params);
-			ZVAL_MAKE_REF(params);
-			PHALCON_CALL_FUNCTION(NULL, "parse_str", query, params);
-			ZVAL_UNREF(params);
-			phalcon_array_update_str(parts, SL("query"), params, PH_COPY);
+		PHALCON_CALL_FUNCTIONW(&parts, "parse_url", uri);
+		if (phalcon_array_isset_fetch_str(&query, &parts, SL("query"))) {
+			ZVAL_MAKE_REF(&params);
+			PHALCON_CALL_FUNCTIONW(NULL, "parse_str", &query, &params);
+			ZVAL_UNREF(&params);
+			phalcon_array_update_str(&parts, SL("query"), &params, PH_COPY);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_parts"), parts);
+		phalcon_update_property_this(getThis(), SL("_parts"), &parts);
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
 		phalcon_update_property_this(getThis(), SL("_parts"), uri);
 	} else if (Z_TYPE_P(uri) == IS_OBJECT && Z_OBJCE_P(uri) == phalcon_http_uri_ce) {
-		parts = phalcon_read_property(uri, SL("_parts"), PH_NOISY);
-		phalcon_update_property_this(getThis(), SL("_parts"), parts);
+		phalcon_return_property(&parts, uri, SL("_parts"));
+		phalcon_update_property_this(getThis(), SL("_parts"), &parts);
 	} else {
 		phalcon_update_property_empty_array(getThis(), SL("_parts"));
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -215,17 +210,15 @@ PHP_METHOD(Phalcon_Http_Uri, __set){
  */
 PHP_METHOD(Phalcon_Http_Uri, __get){
 
-	zval *key, *parts, *value = NULL;
+	zval *key, *parts;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
 
-	if (!phalcon_array_isset_fetch(&value, parts, key)) {
+	if (!phalcon_array_isset_fetch(return_value, parts, key)) {
 		 RETURN_NULL();
 	}
-
-	RETURN_ZVAL(value, 1, 0);
 }
 
 /**
@@ -262,15 +255,15 @@ PHP_METHOD(Phalcon_Http_Uri, getParts){
  */
 PHP_METHOD(Phalcon_Http_Uri, getPath){
 
-	zval *parts, *value;
+	zval *parts, value;
 
 	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
 
-	if (!phalcon_array_isset_str_fetch(&value, parts, SL("path"))) {
+	if (!phalcon_array_isset_fetch_str(&value, parts, SL("path"))) {
 		 RETURN_NULL();
 	}
 
-	RETURN_ZVAL(value, 1, 0);
+	RETURN_CTORW(&value);
 }
 
 /**
@@ -278,122 +271,106 @@ PHP_METHOD(Phalcon_Http_Uri, getPath){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_Http_Uri, build){
-
-	zval *parts, *uri, *scheme, *host, *user, *pass, *port, *path, *query, *fragment, *tmp = NULL;
-
-	PHALCON_MM_GROW();
+PHP_METHOD(Phalcon_Http_Uri, build)
+{
+	zval *parts, uri, scheme, host, user, pass, port, path, query, fragment, tmp, tmp2;
 
 	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
 
-	PHALCON_INIT_VAR(uri);
-
-	if (phalcon_array_isset_str_fetch(&scheme, parts, SL("scheme")) && PHALCON_IS_NOT_EMPTY(scheme)) {
-		if (phalcon_array_isset_str_fetch(&host, parts, SL("host")) && PHALCON_IS_NOT_EMPTY(host)) {
-			if (phalcon_array_isset_str_fetch(&user, parts, SL("user")) && PHALCON_IS_NOT_EMPTY(user)) {
-				if (phalcon_array_isset_str_fetch(&pass, parts, SL("pass")) && PHALCON_IS_NOT_EMPTY(pass)) {
-					PHALCON_CONCAT_VSVSVSV(uri, scheme, "://", user, ":", pass, "@", host);
+	if (phalcon_array_isset_fetch_str(&scheme, parts, SL("scheme")) && PHALCON_IS_NOT_EMPTY(&scheme)) {
+		if (phalcon_array_isset_fetch_str(&host, parts, SL("host")) && PHALCON_IS_NOT_EMPTY(&host)) {
+			if (phalcon_array_isset_fetch_str(&user, parts, SL("user")) && PHALCON_IS_NOT_EMPTY(&user)) {
+				if (phalcon_array_isset_fetch_str(&pass, parts, SL("pass")) && PHALCON_IS_NOT_EMPTY(&pass)) {
+					PHALCON_CONCAT_VSVSVSV(&uri, &scheme, "://", &user, ":", &pass, "@", &host);
 				} else {
-					PHALCON_CONCAT_VSVSV(uri, scheme, "://", user, "@", host);
+					PHALCON_CONCAT_VSVSV(&uri, &scheme, "://", &user, "@", &host);
 				}
 			} else {
-				PHALCON_CONCAT_VSV(uri, scheme, "://", host);
+				PHALCON_CONCAT_VSV(&uri, &scheme, "://", &host);
 			}
 		} else {
-			PHALCON_CONCAT_VS(uri, scheme, ":");
+			PHALCON_CONCAT_VS(&uri, &scheme, ":");
 		}
 	}
 
-	if (phalcon_array_isset_str_fetch(&port, parts, SL("port")) && PHALCON_IS_NOT_EMPTY(port)) {
-		PHALCON_SCONCAT_SV(uri, ":", port);
+	if (phalcon_array_isset_fetch_str(&port, parts, SL("port")) && PHALCON_IS_NOT_EMPTY(&port)) {
+		PHALCON_SCONCAT_SV(&uri, ":", &port);
 	}
 
-	if (phalcon_array_isset_str_fetch(&path, parts, SL("path")) && PHALCON_IS_NOT_EMPTY(path)) {
-		if (!phalcon_start_with_str(path, SL("/"))) {
-			PHALCON_SCONCAT_SV(uri, "/", path);
+	if (phalcon_array_isset_fetch_str(&path, parts, SL("path")) && PHALCON_IS_NOT_EMPTY(&path)) {
+		if (!phalcon_start_with_str(&path, SL("/"))) {
+			PHALCON_SCONCAT_SV(&uri, "/", &path);
 		} else {
-			PHALCON_INIT_NVAR(tmp);
-			PHALCON_CONCAT_VV(tmp, uri, path);
-			PHALCON_CPY_WRT(uri, tmp);
+			PHALCON_CONCAT_VV(&tmp, &uri, &path);
+			PHALCON_CPY_WRT_CTOR(&uri, &tmp);
 		}
 	}
 
-	if (phalcon_array_isset_str_fetch(&query, parts, SL("query")) && PHALCON_IS_NOT_EMPTY(query)) {
-		PHALCON_INIT_NVAR(tmp);
-		phalcon_http_build_query(tmp, query, "&");
-		PHALCON_SCONCAT_SV(uri, "?", tmp);
+	if (phalcon_array_isset_fetch_str(&query, parts, SL("query")) && PHALCON_IS_NOT_EMPTY(&query)) {
+		phalcon_http_build_query(&tmp2, &query, "&");
+		PHALCON_SCONCAT_SV(&uri, "?", &tmp);
 	}
 
-	if (phalcon_array_isset_str_fetch(&fragment, parts, SL("fragment")) && PHALCON_IS_NOT_EMPTY(fragment)) {
-		PHALCON_SCONCAT_SV(uri, "#", fragment);
+	if (phalcon_array_isset_fetch_str(&fragment, parts, SL("fragment")) && PHALCON_IS_NOT_EMPTY(&fragment)) {
+		PHALCON_SCONCAT_SV(&uri, "#", &fragment);
 	}
 
-	RETURN_CTOR(uri);
+	RETURN_CTORW(&uri);
 }
 
-PHP_METHOD(Phalcon_Http_Uri, resolve){
+PHP_METHOD(Phalcon_Http_Uri, resolve)
+{
+	zval *uri, self;
 
-	zval *uri, *self;
+	phalcon_fetch_params(0, 1, 0, &uri);
 
-	PHALCON_MM_GROW();
+	object_init_ex(&self, phalcon_http_uri_ce);
+	PHALCON_CALL_METHODW(NULL, &self, "__construct", getThis());
+	PHALCON_CALL_METHODW(NULL, &self, "extend", uri);
 
-	phalcon_fetch_params(1, 1, 0, &uri);
-
-	PHALCON_INIT_VAR(self);
-	object_init_ex(self, phalcon_http_uri_ce);
-	PHALCON_CALL_METHOD(NULL, self, "__construct", getThis());
-	PHALCON_CALL_METHOD(NULL, self, "extend", uri);
-
-	RETURN_CTOR(self);
+	RETURN_CTORW(&self);
 }
 
-PHP_METHOD(Phalcon_Http_Uri, extend){
+PHP_METHOD(Phalcon_Http_Uri, extend)
+{
+	zval *uri, parts, self, parts2;
 
-	zval *uri, *self, *parts = NULL, *parts2 = NULL;
+	phalcon_fetch_params(0, 1, 0, &uri);
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &uri);
-
-	PHALCON_CALL_SELF(&parts, "getParts");
+	PHALCON_CALL_SELFW(&parts, "getParts");
 
 	if (Z_TYPE_P(uri) != IS_OBJECT || Z_OBJCE_P(uri) != phalcon_http_uri_ce) {
-		PHALCON_INIT_VAR(self);
-		object_init_ex(self, phalcon_http_uri_ce);
-		PHALCON_CALL_METHOD(NULL, self, "__construct", uri);
+		object_init_ex(&self, phalcon_http_uri_ce);
+		PHALCON_CALL_METHODW(NULL, &self, "__construct", uri);
 
-		PHALCON_CALL_METHOD(&parts2, self, "getParts");
+		PHALCON_CALL_METHODW(&parts2, &self, "getParts");
 	} else {
-		PHALCON_CALL_METHOD(&parts2, self, "getParts");
+		PHALCON_CALL_METHODW(&parts2, &self, "getParts");
 	}
 
-	phalcon_array_merge_recursive_n(parts, parts2);
+	phalcon_array_merge_recursive_n(&parts, &parts2);
 
-	phalcon_update_property_this(getThis(), SL("_parts"), parts);
+	phalcon_update_property_this(getThis(), SL("_parts"), &parts);
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 PHP_METHOD(Phalcon_Http_Uri, extendQuery){
 
 	zval *params;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &params);
+	phalcon_fetch_params(0, 1, 0, &params);
 
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 PHP_METHOD(Phalcon_Http_Uri, extendPath){
 
 	zval *path;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &path);
+	phalcon_fetch_params(0, 1, 0, &path);
 
 
-	RETURN_THIS();
+	RETURN_THISW();
 }

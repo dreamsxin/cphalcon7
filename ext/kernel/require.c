@@ -27,50 +27,43 @@
 /**
  * Do an internal require to a plain php file taking care of the value returned by the file
  */
-int phalcon_require_ret(zval *return_value, const char *require_path)
+int phalcon_require_ret(zval *result, const char *require_path)
 {
-	zval ret;
+	zval retval;
 	zend_file_handle file_handle;
-	zend_op_array *op_array;
-	char realpath[MAXPATHLEN];
+	zend_op_array *new_op_array = NULL;
+	int ret, dtor = 0;
 
-	if (!VCWD_REALPATH(require_path, realpath)) {
-		return FAILURE;
+	if (!result) {
+		dtor = 1;
+		result = &retval;
 	}
 
-	file_handle.filename = require_path;
-	file_handle.free_filename = FAILURE;
-	file_handle.type = ZEND_HANDLE_FILENAME;
-	file_handle.opened_path = NULL;
-	file_handle.handle.fp = NULL;
+	ret = php_stream_open_for_zend_ex(require_path, &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
 
-	op_array = zend_compile_file(&file_handle, ZEND_INCLUDE);
-
-	if (op_array && file_handle.handle.stream.handle) {
+	if (ret == SUCCESS) {
 		if (!file_handle.opened_path) {
 			file_handle.opened_path = zend_string_init(require_path, strlen(require_path), 0);
 		}
 
-		zend_hash_add_empty_element(&EG(included_files), file_handle.opened_path);
-	}
-	zend_destroy_file_handle(&file_handle);
-
-	if (op_array) {
-		ZVAL_UNDEF(&ret);
-		zend_execute(op_array, &ret);
-		zend_exception_restore();
-		destroy_op_array(op_array);
-		efree(op_array);
-
-        if (EG(exception)) {
-            zval_ptr_dtor(&ret);
-			return FAILURE;
-        }
-		if (return_value) {
-			ZVAL_COPY(return_value, &ret);
+		new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
+		if (file_handle.opened_path) {
+			zend_hash_add_empty_element(&EG(included_files), file_handle.opened_path);
 		}
 
-	    return SUCCESS;
+		zend_string_release(file_handle.opened_path);
+		zend_destroy_file_handle(&file_handle);
+		if (new_op_array) {
+			ZVAL_UNDEF(result);
+			zend_execute(new_op_array, result);
+			destroy_op_array(new_op_array);
+			efree_size(new_op_array, sizeof(zend_op_array));
+			if (!EG(exception) && dtor) {
+				zval_ptr_dtor(result);
+			}
+
+			return SUCCESS;
+		}
 	}
 
 	return FAILURE;

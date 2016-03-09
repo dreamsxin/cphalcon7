@@ -68,34 +68,34 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Reader){
  */
 PHP_METHOD(Phalcon_Annotations_Reader, parse){
 
-	zval *class_name, *annotations;
-	zval *class_annotations, *annotations_properties, *annotations_methods;
+	zval *class_name, annotations, class_annotations, annotations_properties, annotations_methods;
+	zend_property_info *property;
 	zend_class_entry *class_ce;
+	zend_function *method;
+	zend_string *cmt;
+	HashTable *props, *methods;
 	const char *file;
 	uint32_t line;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &class_name);
+	phalcon_fetch_params(0, 1, 0, &class_name);
 
 	if (unlikely(Z_TYPE_P(class_name) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The class name must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "The class name must be a string");
 		return;
 	}
 
 	class_ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT);
 	if (!class_ce) {
-		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_annotations_exception_ce, "Class %s does not exist", Z_STRVAL_P(class_name));
+		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_annotations_exception_ce, "Class %s does not exist", Z_STRVAL_P(class_name));
 		return;
 	}
 
 	if (class_ce->type != ZEND_USER_CLASS) {
 		array_init(return_value);
-		RETURN_MM();
+		return;
 	}
 
-	PHALCON_INIT_VAR(annotations);
-	array_init(annotations);
+	array_init(&annotations);
 
 	file = ZSTR_VAL(phalcon_get_class_filename(class_ce));
 	if (!file) {
@@ -103,97 +103,72 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	}
 
 	/* Class info */
-	{
-		zend_string *cmt;
+	if ((cmt = phalcon_get_class_doc_comment(class_ce)) != NULL) {
+		line = phalcon_get_class_startline(class_ce);
 
-		if ((cmt = phalcon_get_class_doc_comment(class_ce)) != NULL) {
-			line = phalcon_get_class_startline(class_ce);
+		RETURN_ON_FAILURE(phannot_parse_annotations(&class_annotations, cmt, file, line));
 
-			PHALCON_INIT_VAR(class_annotations);
-			RETURN_MM_ON_FAILURE(phannot_parse_annotations(class_annotations, cmt, file, line));
-
-			if (Z_TYPE_P(class_annotations) == IS_ARRAY) {
-				phalcon_array_update_str(annotations, SL("class"), class_annotations, PH_COPY);
-			}
+		if (Z_TYPE(class_annotations) == IS_ARRAY) {
+			phalcon_array_update_str(&annotations, SL("class"), &class_annotations, PH_COPY);
 		}
 	}
 
 	/* Get class properties */
-	{
-		HashTable *props = &class_ce->properties_info;
-		if (zend_hash_num_elements(props) > 0) {
-			zend_property_info *property;
+	props = &class_ce->properties_info;
+	if (zend_hash_num_elements(props) > 0) {
+		array_init_size(&annotations_properties, zend_hash_num_elements(props));
 
-			PHALCON_INIT_VAR(annotations_properties);
-			array_init_size(annotations_properties, zend_hash_num_elements(props));
+		ZEND_HASH_FOREACH_PTR(props, property) {
+			zval property_annotations;
+			zend_string *cmt;
+			const char *prop_name, *class_name;
 
-			ZEND_HASH_FOREACH_PTR(props, property) {
-				zend_string *cmt;
+			if ((cmt = phalcon_get_property_doc_comment(property)) != NULL) {
+				if (FAILURE == phannot_parse_annotations(&property_annotations, cmt, file, 0)) {
+					return;
+				}
 
-				if ((cmt = phalcon_get_property_doc_comment(property)) != NULL) {
-					zval *property_annotations;
-
-					PHALCON_ALLOC_INIT_ZVAL(property_annotations);
-					if (FAILURE == phannot_parse_annotations(property_annotations, cmt, file, 0)) {
-						zval_ptr_dtor(property_annotations);
-						RETURN_MM();
-					}
-
-					if (Z_TYPE_P(property_annotations) == IS_ARRAY) {
-						const char *prop_name, *class_name;
-						if (zend_unmangle_property_name(property->name, &class_name, &prop_name) == SUCCESS) {
-							add_assoc_zval_ex(annotations_properties, prop_name, strlen(prop_name), property_annotations);
-						}
-					} else {
-						zval_ptr_dtor(property_annotations);
+				if (Z_TYPE(property_annotations) == IS_ARRAY) {
+					if (zend_unmangle_property_name(property->name, &class_name, &prop_name) == SUCCESS) {
+						add_assoc_zval_ex(&annotations_properties, prop_name, strlen(prop_name), &property_annotations);
 					}
 				}
-			} ZEND_HASH_FOREACH_END();
-
-			if (zend_hash_num_elements(Z_ARRVAL_P(annotations_properties))) {
-				phalcon_array_update_str(annotations, SL("properties"), annotations_properties, PH_COPY);
 			}
+		} ZEND_HASH_FOREACH_END();
+
+		if (zend_hash_num_elements(Z_ARRVAL(annotations_properties))) {
+			phalcon_array_update_str(&annotations, SL("properties"), &annotations_properties, PH_COPY);
 		}
 	}
 
 	/* Get class methods */
-	{
-		HashTable *methods = &class_ce->function_table;
-		if (zend_hash_num_elements(methods) > 0) {
-			zend_function *method;
+	methods = &class_ce->function_table;
+	if (zend_hash_num_elements(methods) > 0) {
+		array_init_size(&annotations_methods, zend_hash_num_elements(methods));
 
-			PHALCON_INIT_VAR(annotations_methods);
-			array_init_size(annotations_methods, zend_hash_num_elements(methods));
+		ZEND_HASH_FOREACH_PTR(methods, method) {
+			zval method_annotations;
+			zend_string *cmt;
 
-			ZEND_HASH_FOREACH_PTR(methods, method) {
-				zend_string *cmt;
+			if ((cmt = phalcon_get_function_doc_comment(method)) != NULL) {
+				line = phalcon_get_function_startline(method);
 
-				if ((cmt = phalcon_get_function_doc_comment(method)) != NULL) {
-					zval *method_annotations;
-
-					line = phalcon_get_function_startline(method);
-
-					PHALCON_ALLOC_INIT_ZVAL(method_annotations);
-					if (FAILURE == phannot_parse_annotations(method_annotations, cmt, file, line)) {
-						zval_ptr_dtor(method_annotations);
-						RETURN_MM();
-					}
-
-					if (Z_TYPE_P(method_annotations) == IS_ARRAY) {
-						zend_hash_add(Z_ARRVAL_P(annotations_methods), method->common.function_name, method_annotations);
-					} else {
-						zval_ptr_dtor(method_annotations);
-					}
+				if (FAILURE == phannot_parse_annotations(&method_annotations, cmt, file, line)) {
+					return;
 				}
-			} ZEND_HASH_FOREACH_END();
 
-			if (zend_hash_num_elements(Z_ARRVAL_P(annotations_methods))) {
-				phalcon_array_update_str(annotations, SL("methods"), annotations_methods, PH_COPY);
+				if (Z_TYPE(method_annotations) == IS_ARRAY) {
+					zend_hash_add(Z_ARRVAL(annotations_methods), method->common.function_name, &method_annotations);
+				}
 			}
+		} ZEND_HASH_FOREACH_END();
+
+		if (zend_hash_num_elements(Z_ARRVAL(annotations_methods))) {
+			phalcon_array_update_str(&annotations, SL("methods"), &annotations_methods, PH_COPY);
 		}
 	}
 
-	RETURN_CTOR(annotations);
+	RETURN_CTORW(&annotations);
 }
 
 /**

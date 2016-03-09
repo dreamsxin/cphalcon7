@@ -86,39 +86,33 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_Stream){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 
-	zval *name, *options = NULL, *mode = NULL, *stream = NULL;
+	zval *name, *options = NULL, mode, stream;
 
 	phalcon_fetch_params(0, 1, 1, &name, &options);
 	PHALCON_ENSURE_IS_STRING(name);
-
-	PHALCON_MM_GROW();
 
 	if (!options) {
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_array_isset_str_fetch(&mode, options, SL("mode"))) {
-		if (phalcon_memnstr_str(mode, SL("r"))) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Stream must be opened in append or write mode");
+	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"))) {
+		if (phalcon_memnstr_str(&mode, SL("r"))) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Stream must be opened in append or write mode");
 			return;
 		}
 	} else {
-		PHALCON_INIT_VAR(mode);
-		ZVAL_STRING(mode, "ab");
+		PHALCON_STR(&mode, "ab");
 	}
 
 	/** 
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
-	PHALCON_CALL_FUNCTION(&stream, "fopen", name, mode);
-	if (Z_TYPE_P(stream) != IS_RESOURCE) {
+	PHALCON_CALL_FUNCTIONW(&stream, "fopen", name, &mode);
+	if (Z_TYPE(stream) != IS_RESOURCE) {
 		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open stream '%s'", Z_STRVAL_P(name));
+	} else {
+		phalcon_update_property_this(getThis(), SL("_stream"), &stream);
 	}
-	else {
-		phalcon_update_property_this(getThis(), SL("_stream"), stream);
-	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -128,20 +122,17 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter){
 
-	zval *formatter = NULL;
+	zval formatter;
 
-	PHALCON_MM_GROW();
+	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
+	if (Z_TYPE(formatter) != IS_OBJECT) {
+		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
+		PHALCON_CALL_METHODW(NULL, &formatter, "__construct");
 
-	formatter = phalcon_read_property(getThis(), SL("_formatter"), PH_NOISY);
-	if (Z_TYPE_P(formatter) != IS_OBJECT) {
-		PHALCON_INIT_NVAR(formatter);
-		object_init_ex(formatter, phalcon_logger_formatter_line_ce);
-		PHALCON_CALL_METHOD(NULL, formatter, "__construct");
-
-		phalcon_update_property_this(getThis(), SL("_formatter"), formatter);
+		phalcon_update_property_this(getThis(), SL("_formatter"), &formatter);
 	}
 
-	RETURN_CTOR(formatter);
+	RETURN_CTORW(&formatter);
 }
 
 /**
@@ -154,23 +145,19 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
 
-	zval *message, *type, *time, *context, *stream, *formatter = NULL, *applied_format = NULL;
+	zval *message, *type, *time, *context, *stream, formatter, applied_format;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 4, 0, &message, &type, &time, &context);
+	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
 	stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
 	if (Z_TYPE_P(stream) != IS_RESOURCE) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
-	PHALCON_CALL_METHOD(&applied_format, formatter, "format", message, type, time, context);
-	PHALCON_CALL_FUNCTION(NULL, "fwrite", stream, applied_format);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_METHODW(&formatter, getThis(), "getformatter");
+	PHALCON_CALL_METHODW(&applied_format, &formatter, "format", message, type, time, context);
+	PHALCON_CALL_FUNCTIONW(NULL, "fwrite", stream, &applied_format);
 }
 
 /**

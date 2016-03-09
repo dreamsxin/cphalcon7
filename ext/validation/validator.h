@@ -26,7 +26,7 @@ extern zend_class_entry *phalcon_validation_validator_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Validation_Validator);
 
-PHALCON_STATIC int phalcon_validation_validator_getoption_helper(const zend_class_entry *ce, zval **result, zval *this_ptr, const char *option);
+PHALCON_STATIC int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *option);
 
 static inline int phalcon_validation_validator_isempty_helper(const zval *v)
 {

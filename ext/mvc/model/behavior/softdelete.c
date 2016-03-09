@@ -65,84 +65,70 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Behavior_SoftDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 
-	zval *type, *model, *options = NULL, *value, *field, *actual_value = NULL;
-	zval *update_model, *status = NULL, *messages = NULL, *message = NULL;
+	zval *type, *model, options, value, field, actual_value, update_model, status, messages, *message;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &type, &model);
+	phalcon_fetch_params(0, 2, 0, &type, &model);
 	
 	if (PHALCON_IS_STRING(type, "beforeDelete")) {
-		PHALCON_CALL_METHOD(&options, getThis(), "getoptions");
-		if (!phalcon_array_isset_str(options, SL("value"))) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'value' is required");
-			return;
-		}
-	
-		if (!phalcon_array_isset_str(options, SL("field"))) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'field' is required");
-			return;
-		}
-	
-		/** 
-		 * Skip the current operation
-		 */
-		PHALCON_CALL_METHOD(NULL, model, "skipoperation", &PHALCON_GLOBAL(z_true));
-	
+		PHALCON_CALL_METHODW(&options, getThis(), "getoptions");
+
 		/** 
 		 * 'value' is the value to be updated instead of delete the record
 		 */
-		PHALCON_OBS_VAR(value);
-		phalcon_array_fetch_str(&value, options, SL("value"), PH_NOISY);
-	
+		if (!phalcon_array_isset_fetch_str(&value, &options, SL("value"))) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The option 'value' is required");
+			return;
+		}
+
 		/** 
 		 * 'field' is the attribute to be updated instead of delete the record
 		 */
-		PHALCON_OBS_VAR(field);
-		phalcon_array_fetch_str(&field, options, SL("field"), PH_NOISY);
-	
-		PHALCON_CALL_METHOD(&actual_value, model, "readattribute", field);
+		if (!phalcon_array_isset_fetch_str(&field, &options, SL("field"))) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The option 'field' is required");
+			return;
+		}
+
+		/** 
+		 * Skip the current operation
+		 */
+		PHALCON_CALL_METHODW(NULL, model, "skipoperation", &PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_METHODW(&actual_value, model, "readattribute", &field);
 	
 		/** 
 		 * If the record is already flagged as 'deleted' we don't delete it again
 		 */
-		if (!PHALCON_IS_EQUAL(actual_value, value)) {
-	
+		if (!PHALCON_IS_EQUAL(&actual_value, &value)) {
 			/** 
 			 * Clone the current model to make a clean new operation
 			 */
-			PHALCON_INIT_VAR(update_model);
-			if (phalcon_clone(update_model, model) == FAILURE) {
-				RETURN_MM();
+			if (phalcon_clone(&update_model, model) == FAILURE) {
+				return;
 			}
 
-			PHALCON_CALL_METHOD(NULL, update_model, "writeattribute", field, value);
+			PHALCON_CALL_METHODW(NULL, &update_model, "writeattribute", &field, &value);
 	
 			/** 
 			 * Update the cloned model
 			 */
-			PHALCON_CALL_METHOD(&status, update_model, "save");
-			if (!zend_is_true(status)) {
-	
+			PHALCON_CALL_METHODW(&status, &update_model, "save");
+			if (!zend_is_true(&status)) {
 				/** 
 				 * Transfer the messages from the cloned model to the original model
 				 */
-				PHALCON_CALL_METHOD(&messages, update_model, "getmessages");
+				PHALCON_CALL_METHODW(&messages, &update_model, "getmessages");
 
-				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(messages), message) {
-					PHALCON_CALL_METHOD(NULL, model, "appendmessage", message);
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), message) {
+					PHALCON_CALL_METHODW(NULL, model, "appendmessage", message);
 				} ZEND_HASH_FOREACH_END();
 	
-				RETURN_MM_FALSE;
+				RETURN_FALSE;
 			}
 	
 			/** 
 			 * Update the original model too
 			 */
-			PHALCON_CALL_METHOD(NULL, model, "writeattribute", field, value);
+			PHALCON_CALL_METHODW(NULL, model, "writeattribute", &field, &value);
 		}
 	}
-	
-	PHALCON_MM_RESTORE();
 }
 

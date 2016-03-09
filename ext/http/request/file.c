@@ -122,66 +122,51 @@ PHALCON_INIT_CLASS(Phalcon_Http_Request_File){
  */
 PHP_METHOD(Phalcon_Http_Request_File, __construct){
 
-	zval *file, *key = NULL, *name, *temp_name, *size, *type, *error;
-	zval *constant, *extension = NULL;
+	zval *file, *key = NULL, name, temp_name, size, type, error, *constant, extension;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &file, &key);
+	phalcon_fetch_params(0, 1, 1, &file, &key);
 	
 	if (Z_TYPE_P(file) != IS_ARRAY) {
 		if (phalcon_file_exists(file) == FAILURE) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "Phalcon\\Http\\Request\\File requires a valid uploaded file");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_http_request_exception_ce, "Phalcon\\Http\\Request\\File requires a valid uploaded file");
 			return;
 		}
 
 		phalcon_update_property_this(getThis(), SL("_tmp"), file);
 
-		PHALCON_CALL_PARENT(NULL, phalcon_http_request_file_ce, getThis(), "__construct", file);
+		PHALCON_CALL_PARENTW(NULL, phalcon_http_request_file_ce, getThis(), "__construct", file);
 	} else {
-		if (phalcon_array_isset_str(file, SL("name"))) {
-			PHALCON_OBS_VAR(name);
-			phalcon_array_fetch_str(&name, file, SL("name"), PH_NOISY);
-			phalcon_update_property_this(getThis(), SL("_name"), name);
+		if (phalcon_array_isset_fetch_str(&name, file, SL("name"))) {
+			phalcon_update_property_this(getThis(), SL("_name"), &name);
 
 			if ((constant = zend_get_constant_str(SL("PATHINFO_EXTENSION"))) != NULL) {
-				PHALCON_CALL_FUNCTION(&extension, "pathinfo", name, constant);
-				phalcon_update_property_this(getThis(), SL("_extension"), extension);
+				PHALCON_CALL_FUNCTIONW(&extension, "pathinfo", &name, constant);
+				phalcon_update_property_this(getThis(), SL("_extension"), &extension);
 			}
 		}
 		
-		if (phalcon_array_isset_str(file, SL("tmp_name"))) {
-			PHALCON_OBS_VAR(temp_name);
-			phalcon_array_fetch_str(&temp_name, file, SL("tmp_name"), PH_NOISY);
-			phalcon_update_property_this(getThis(), SL("_tmp"), temp_name);
+		if (phalcon_array_isset_fetch_str(&temp_name, file, SL("tmp_name"))) {
+			phalcon_update_property_this(getThis(), SL("_tmp"), &temp_name);
 		}
 		
-		if (phalcon_array_isset_str(file, SL("size"))) {
-			PHALCON_OBS_VAR(size);
-			phalcon_array_fetch_str(&size, file, SL("size"), PH_NOISY);
-			phalcon_update_property_this(getThis(), SL("_size"), size);
+		if (phalcon_array_isset_fetch_str(&size, file, SL("size"))) {
+			phalcon_update_property_this(getThis(), SL("_size"), &size);
 		}
 		
-		if (phalcon_array_isset_str(file, SL("type"))) {
-			PHALCON_OBS_VAR(type);
-			phalcon_array_fetch_str(&type, file, SL("type"), PH_NOISY);
-			phalcon_update_property_this(getThis(), SL("_type"), type);
+		if (phalcon_array_isset_fetch_str(&type, file, SL("type"))) {
+			phalcon_update_property_this(getThis(), SL("_type"), &type);
 		}
 
-		if (phalcon_array_isset_str(file, SL("error"))) {
-			PHALCON_OBS_VAR(error);
-			phalcon_array_fetch_str(&error, file, SL("error"), PH_NOISY);
-			phalcon_update_property_this(getThis(), SL("_error"), error);
+		if (phalcon_array_isset_fetch_str(&error, file, SL("error"))) {
+			phalcon_update_property_this(getThis(), SL("_error"), &error);
 		}
 
-		PHALCON_CALL_PARENT(NULL, phalcon_http_request_file_ce, getThis(), "__construct", temp_name);
+		PHALCON_CALL_PARENTW(NULL, phalcon_http_request_file_ce, getThis(), "__construct", &temp_name);
 	}
 
 	if (key) {
 		phalcon_update_property_this(getThis(), SL("_key"), key);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -236,37 +221,35 @@ PHP_METHOD(Phalcon_Http_Request_File, getType){
  */
 PHP_METHOD(Phalcon_Http_Request_File, getRealType){
 
-	zval *mime, *constant, *finfo = NULL, *temp_file, *ret = NULL;
-
-	PHALCON_MM_GROW();
+	zval *mime, *constant, finfo, *temp_file, ret;
 
 	mime = phalcon_read_property(getThis(), SL("_real_type"), PH_NOISY);
 
 	if (Z_TYPE_P(mime) == IS_STRING) {
-		RETURN_CTOR(mime);
+		RETURN_CTORW(mime);
 	}
 
 	if ((constant = zend_get_constant_str(SL("FILEINFO_MIME_TYPE"))) == NULL) {
-		RETURN_MM_NULL();
+		RETURN_NULL();
 	}
 
-	PHALCON_CALL_FUNCTION(&finfo, "finfo_open", constant);
+	PHALCON_CALL_FUNCTIONW(&finfo, "finfo_open", constant);
 
-	if (Z_TYPE_P(finfo) != IS_RESOURCE) {
-		RETURN_MM_NULL();
+	if (Z_TYPE(finfo) != IS_RESOURCE) {
+		RETURN_NULL();
 	}
 
 	temp_file = phalcon_read_property(getThis(), SL("_tmp"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTION(&ret, "finfo_file", finfo, temp_file);
-	PHALCON_CALL_FUNCTION(NULL, "finfo_close", finfo);
+	PHALCON_CALL_FUNCTIONW(&ret, "finfo_file", &finfo, temp_file);
+	PHALCON_CALL_FUNCTIONW(NULL, "finfo_close", &finfo);
 
-	if (zend_is_true(ret)) {
-		phalcon_update_property_this(getThis(), SL("_real_type"), ret);
-		RETURN_CTOR(ret);
+	if (zend_is_true(&ret)) {
+		phalcon_update_property_this(getThis(), SL("_real_type"), &ret);
+		RETURN_CTORW(&ret);
 	}
 
-	RETURN_MM_NULL();
+	RETURN_NULL();
 }
 
 /**
@@ -297,22 +280,18 @@ PHP_METHOD(Phalcon_Http_Request_File, getKey){
  */
 PHP_METHOD(Phalcon_Http_Request_File, isUploadedFile) {
 
-	zval *tmp_name = NULL;
+	zval tmp_name;
 
 	if (!SG(rfc1867_uploaded_files)) {
 		RETURN_FALSE;
 	}
 
-	if (phalcon_call_method(&tmp_name, getThis(), "gettempname", 0, NULL) == SUCCESS) {
-		if (Z_TYPE_P(tmp_name) == IS_STRING && zend_hash_exists(SG(rfc1867_uploaded_files), Z_STR_P(tmp_name))) {
-			RETVAL_TRUE;
-		}
-		else {
-			RETVAL_FALSE;
-		}
+	PHALCON_CALL_SELFW(&tmp_name, "gettempname");
+	if (Z_TYPE(tmp_name) == IS_STRING && zend_hash_exists(SG(rfc1867_uploaded_files), Z_STR(tmp_name))) {
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	zval_ptr_dtor(tmp_name);
 }
 
 /**
@@ -339,9 +318,7 @@ PHP_METHOD(Phalcon_Http_Request_File, __set_state) {
 
 	object_init_ex(return_value, phalcon_http_request_file_ce);
 
-	PHALCON_MM_GROW();
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", data);
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", data);
 }
 
 /**

@@ -386,8 +386,8 @@ PHP_METHOD(Phalcon_Config, toArray){
 			if (Z_TYPE_P(value) == IS_OBJECT && phalcon_method_exists_ex(value, SL("toarray")) == SUCCESS) {
 				if (SUCCESS == phalcon_call_method(&array_value, value, "toarray", 0, NULL)) {
 					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);
+					zval_ptr_dtor(&array_value);
 				}
-
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

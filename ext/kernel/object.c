@@ -54,24 +54,22 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...)
 {
 
-	zval *tmp_arr, arr;
+	zval arr;
 	va_list ap;
 
-	tmp_arr = phalcon_read_static_property_ce(ce, property, property_length);
+	phalcon_return_static_property_ce(&arr, ce, property, property_length);
 
 	/** Convert the value to array if not is an array */
-	if (Z_TYPE_P(tmp_arr) != IS_ARRAY) {
+	if (Z_TYPE(arr) != IS_ARRAY) {
 		array_init(&arr);
-		tmp_arr = &arr;
-		Z_TRY_ADDREF_P(tmp_arr);
 	}
 
 	va_start(ap, types_count);
-	phalcon_array_update_multi_ex(tmp_arr, value, types, types_length, types_count, ap);
+	phalcon_array_update_multi_ex(&arr, value, types, types_length, types_count, ap);
 	va_end(ap);
 
-	phalcon_update_static_property_ce(ce, property, property_length, tmp_arr);
-
+	phalcon_update_static_property_ce(ce, property, property_length, &arr);
+	zval_ptr_dtor(&arr);
 	return SUCCESS;
 }
 
@@ -791,7 +789,6 @@ int phalcon_update_property_zval_long(zval *object, const zval *property, int va
  */
 int phalcon_update_property_zval_zval(zval *object, const zval *property, zval *value)
 {
-
 	if (Z_TYPE_P(property) != IS_STRING) {
 		php_error_docref(NULL, E_WARNING, "Property should be string");
 		return FAILURE;

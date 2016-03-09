@@ -272,10 +272,6 @@ int phalcon_array_update_zval(zval *arr, const zval *index, zval *value, int fla
 		SEPARATE_ZVAL_IF_NOT_REF(arr);
 	}
 
-	if ((flags & PH_COPY) == PH_COPY) {
-		Z_TRY_ADDREF_P(value);
-	}
-
 	ht = Z_ARRVAL_P(arr);
 
 	return phalcon_array_update_hash(ht, index, value, flags);

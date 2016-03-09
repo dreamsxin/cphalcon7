@@ -79,6 +79,9 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 		i++;
 	}
 	efree(arguments);
+	if (retval == NULL) {
+		zval_ptr_dtor(retval_ptr);
+	}
 
 	return status;
 }
@@ -187,6 +190,9 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		i++;
 	}
 	efree(arguments);
+	if (retval == NULL) {
+		zval_ptr_dtor(retval_ptr);
+	}
 
 	return status;
 }

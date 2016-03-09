@@ -105,6 +105,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 	phalcon_get_called_class(&class_name);
 	ce0 = phalcon_fetch_class(&class_name);
 	object_init_ex(return_value, ce0);
+	zval_ptr_dtor(&class_name);
 
 	if (!file_path || PHALCON_IS_EMPTY(file_path)) {
 		PHALCON_CALL_METHODW(NULL, return_value, "__construct");

@@ -200,10 +200,10 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	}
 
 	if (Z_TYPE(data) == IS_STRING && PHALCON_IS_NOT_EMPTY(&data)) {
-		PHALCON_STR(&key, "Content-Type");
+		ZVAL_STRING(&key, "Content-Type");
 
 		if (PHALCON_IS_EMPTY(&type)) {
-			PHALCON_STR(&key_value, "application/x-www-form-urlencoded");
+			ZVAL_STRING(&key_value, "application/x-www-form-urlencoded");
 		} else {
 			PHALCON_CPY_WRT(&key_value, &type);
 		}
@@ -276,13 +276,13 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		if (!PHALCON_IS_EMPTY(&body)) {
 			PHALCON_SCONCAT_SVS(&body, "--", &boundary, "--\r\n");
 
-			PHALCON_STR(&key, "Content-Type");
+			ZVAL_STRING(&key, "Content-Type");
 
 			PHALCON_CONCAT_SV(&key_value, "multipart/form-data; &boundary=", &boundary);
 
 			PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
 
-			PHALCON_STR(&key, "Content-Length");		
+			ZVAL_STRING(&key, "Content-Length");		
 			ZVAL_LONG(&key_value, Z_STRLEN_P(&body));
 
 			PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);

@@ -163,7 +163,7 @@ int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_e
 
 		return SUCCESS;
 	} else {
-		PHALCON_STR(&t, type);
+		ZVAL_STRING(&t, type);
 		params[0] = &t;
 
 		return phalcon_call_method(retval, this_ptr, "getdefaultmessage", 1, params);
@@ -502,7 +502,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		if (Z_TYPE(filters) == IS_ARRAY) { 
 			if (phalcon_array_isset_fetch(&field_filters, &filters, attribute)) {
 				if (zend_is_true(&field_filters)) {
-					PHALCON_STR(&service_name, ISV(filter));
+					ZVAL_STRING(&service_name, ISV(filter));
 	
 					PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 					if (Z_TYPE(dependency_injector) != IS_OBJECT) {

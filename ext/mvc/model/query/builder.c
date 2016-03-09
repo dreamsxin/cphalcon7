@@ -589,7 +589,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, innerJoin){
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "INNER");
+	ZVAL_STRING(&type, "INNER");
 
 	array_init_size(&join, 4);
 	phalcon_array_append(&join, model, PH_COPY);
@@ -626,7 +626,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, leftJoin){
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "LEFT");
+	ZVAL_STRING(&type, "LEFT");
 
 	array_init_size(&join, 4);
 	phalcon_array_append(&join, model, PH_COPY);
@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, rightJoin){
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "RIGHT");
+	ZVAL_STRING(&type, "RIGHT");
 
 	array_init_size(&join, 4);
 	phalcon_array_append(&join, model, PH_COPY);
@@ -1352,12 +1352,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	distinct = phalcon_read_property(getThis(), SL("_distinct"), PH_NOISY);
 	if (PHALCON_IS_BOOL(distinct)) {
 		if (Z_TYPE_P(distinct) == IS_TRUE) {
-			PHALCON_STR(&phql, "SELECT DISTINCT ");
+			ZVAL_STRING(&phql, "SELECT DISTINCT ");
 		} else {
-			PHALCON_STR(&phql, "SELECT ALL ");
+			ZVAL_STRING(&phql, "SELECT ALL ");
 		}
 	} else {
-		PHALCON_STR(&phql, "SELECT ");
+		ZVAL_STRING(&phql, "SELECT ");
 	}
 
 	columns = phalcon_read_property(getThis(), SL("_columns"), PH_NOISY);
@@ -1639,7 +1639,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
-	PHALCON_STR(&service_name, "modelsQuery");
+	ZVAL_STRING(&service_name, "modelsQuery");
 
 	PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {;
@@ -1724,7 +1724,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 			PHALCON_CPY_WRT(&model, models);
 		}
 
-		PHALCON_STR(&service_name, ISV(modelsMetadata));
+		ZVAL_STRING(&service_name, ISV(modelsMetadata));
 
 		PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {

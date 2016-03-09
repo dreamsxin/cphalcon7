@@ -94,7 +94,7 @@ void phalcon_validation_message_construct_helper(zval *result, zval *message, zv
 
 	object_init_ex(result, phalcon_validation_message_ce);
 
-	PHALCON_STR(&tmp, type);
+	ZVAL_STRING(&tmp, type);
 
 	params[0] = message;
 	params[1] = field;

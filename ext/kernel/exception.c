@@ -80,7 +80,7 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
 
 	object_init_ex(&object, ce);
 
-	PHALCON_STRL(&msg, message, message_len);
+	ZVAL_STRINGL(&msg, message, message_len);
 
 	PHALCON_CALL_METHODW(NULL, &object, "__construct", &PHALCON_GLOBAL(z_null), &msg);
 
@@ -145,7 +145,7 @@ void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ..
 	len = vspprintf(&buffer, 0, format, args);
 	va_end(args);
 
-	PHALCON_STRL(&msg, buffer, len);
+	ZVAL_STRINGL(&msg, buffer, len);
 
 	PHALCON_CALL_METHODW(NULL, &object, "__construct", &msg);
 

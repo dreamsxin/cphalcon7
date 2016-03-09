@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
-	PHALCON_STR(&option, "field");
+	ZVAL_STRING(&option, "field");
 
 	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
 	if (Z_TYPE(field) != IS_STRING) {
@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 	/*
 	 * Allow empty
 	 */
-	PHALCON_STR(&option, "allowEmpty");
+	ZVAL_STRING(&option, "allowEmpty");
 
 	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
 	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
@@ -119,19 +119,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_STR(&option, ISV(message));
+		ZVAL_STRING(&option, ISV(message));
 
 		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 		if (!zend_is_true(&message)) {
 			PHALCON_CONCAT_SVS(&message, "'", &field, "' does not have a valid url format");
 		}
 
-		PHALCON_STR(&type, "Url");
+		ZVAL_STRING(&type, "Url");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_STR(&option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
 		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
 		if (zend_is_true(&is_set_code)) {

@@ -374,8 +374,8 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 
 		charset = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_charset"));
 
-		PHALCON_STR(&line_break, "\n");
-		PHALCON_STR(&escaped_line_break, "\\n");
+		ZVAL_STRING(&line_break, "\n");
+		ZVAL_STRING(&escaped_line_break, "\\n");
 
 		PHALCON_STR_REPLACEW(&replaced_value, &line_break, &escaped_line_break, value);
 		phalcon_htmlentities(return_value, &replaced_value, NULL, charset);
@@ -659,10 +659,10 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 	phalcon_fetch_params(0, 3, 0, &n, &trace, &link_format);
 
-	PHALCON_STR(&space, " ");
-	PHALCON_STR(&two_spaces, "  ");
-	PHALCON_STR(&underscore, "_");
-	PHALCON_STR(&minus, "-");
+	ZVAL_STRING(&space, " ");
+	ZVAL_STRING(&two_spaces, "  ");
+	ZVAL_STRING(&underscore, "_");
+	ZVAL_STRING(&minus, "-");
 
 	/** 
 	 * Every trace in the backtrace have a unique number
@@ -674,7 +674,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		if (!class_ce) {
 			/* Unable to load the class, should never happen */
 		} else if (is_phalcon_class(class_ce)) {
-			PHALCON_STR(&namespace_separator, "\\");
+			ZVAL_STRING(&namespace_separator, "\\");
 
 			/* Prepare the class name according to the Phalcon's conventions */
 			PHALCON_STR_REPLACE(&prepare_uri_class, &namespace_separator, &underscore, &class_name);
@@ -835,12 +835,12 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				PHALCON_SCONCAT_SVSVS(&html, "<pre class='prettyprint highlight:", &first_line, ":", &line, " linenums error-scroll'>");
 			}
 
-			PHALCON_STR(&comment_pattern, "#\\*\\/$#");
+			ZVAL_STRING(&comment_pattern, "#\\*\\/$#");
 
 			phalcon_return_static_property_ce(&charset, phalcon_debug_ce, SL("_charset"));
 
-			PHALCON_STR(&tab, "\t");
-			PHALCON_STR(&comment, "* /");
+			ZVAL_STRING(&tab, "\t");
+			ZVAL_STRING(&comment, "* /");
 
 			PHALCON_CPY_WRT_CTOR(&i, &first_line);
 
@@ -976,7 +976,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		link_format = "file://%f#%l";
 	}
 
-	PHALCON_STR(&z_link_format, link_format);
+	ZVAL_STRING(&z_link_format, link_format);
 
 	PHALCON_CALL_METHODW(&formatted_file, getThis(), "getfilelink", &file, &line, &z_link_format);
 

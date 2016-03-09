@@ -499,7 +499,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 		escape_char = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(return_value, "CASE ");
+	ZVAL_STRING(return_value, "CASE ");
 
 	phalcon_array_fetch_str(&expr, expression, SL("expr"), PH_NOISY);
 
@@ -766,17 +766,17 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	if (phalcon_array_isset_fetch_str(&distinct, definition, SL("distinct"))) {
 		if (Z_TYPE(distinct) == IS_LONG) {
 			if (Z_LVAL(distinct) == 0) {
-				PHALCON_STR(&sql, "SELECT ALL ");
+				ZVAL_STRING(&sql, "SELECT ALL ");
 			} else if (Z_LVAL(distinct) == 1) {
-				PHALCON_STR(&sql, "SELECT DISTINCT ");
+				ZVAL_STRING(&sql, "SELECT DISTINCT ");
 			} else {
-				PHALCON_STR(&sql, "SELECT ");
+				ZVAL_STRING(&sql, "SELECT ");
 			}
 		} else {
-			PHALCON_STR(&sql, "SELECT ");
+			ZVAL_STRING(&sql, "SELECT ");
 		}
 	} else {
-		PHALCON_STR(&sql, "SELECT ");
+		ZVAL_STRING(&sql, "SELECT ");
 	}
 
 	PHALCON_SCONCAT_VSV(&sql, &columns_sql, " FROM ", &tables_sql);

@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 
 	array_init(&columns);
 
-	PHALCON_STR(&size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#");
+	ZVAL_STRING(&size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#");
 
 	/** 
 	 * Field Indexes: 0:name, 1:type, 2:not null, 3:key, 4:default, 5:extra

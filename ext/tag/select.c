@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 			phalcon_array_unset_str(&params, SL("emptyValue"), PH_COPY);
 		}
 		if (!phalcon_array_isset_fetch_str(&empty_text, &params, SL("emptyText"))) {
-			PHALCON_STR(&empty_text, "Choose...");
+			ZVAL_STRING(&empty_text, "Choose...");
 		} else {
 			phalcon_array_unset_str(&params, SL("emptyText"), PH_COPY);
 		}
@@ -143,13 +143,13 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 		phalcon_array_unset_str(&params, SL("using"), PH_COPY);
 	}
 
-	PHALCON_STR(&code, "<select");
+	ZVAL_STRING(&code, "<select");
 
 	phalcon_tag_render_attributes(&code, &params);
 
 	phalcon_concat_self_str(&code, SL(">" PHP_EOL));
 
-	PHALCON_STR(&close_option, "</option>" PHP_EOL);
+	ZVAL_STRING(&close_option, "</option>" PHP_EOL);
 
 	if (zend_is_true(&use_empty)) {
 		/** 

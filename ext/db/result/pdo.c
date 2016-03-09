@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 				bind_params = phalcon_read_property(getThis(), SL("_bindParams"), PH_NOISY);
 				bind_types = phalcon_read_property(getThis(), SL("_bindTypes"), PH_NOISY);
 
-				PHALCON_STR(&pattern, "/^SELECT\\s+(.*)$/i");
+				ZVAL_STRING(&pattern, "/^SELECT\\s+(.*)$/i");
 
 				RETURN_ON_FAILURE(phalcon_preg_match(&match, &pattern, sql_statement, &matches));
 

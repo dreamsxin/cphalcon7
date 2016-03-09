@@ -416,7 +416,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, getDefaultIdValue){
 
 	zval null_value, default_value;
 
-	PHALCON_STR(&null_value, "default");
+	ZVAL_STRING(&null_value, "default");
 
 	object_init_ex(&default_value, phalcon_db_rawvalue_ce);
 	PHALCON_CALL_METHODW(NULL, &default_value, "__construct", &null_value);

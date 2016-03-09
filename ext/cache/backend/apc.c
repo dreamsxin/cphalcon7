@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
 	if (!prefix) {
-		PHALCON_STR(&prefix_pattern, "/^_PHCA/");
+		ZVAL_STRING(&prefix_pattern, "/^_PHCA/");
 	} else {
 		PHALCON_CONCAT_SVS(&prefix_pattern, "/^_PHCA", prefix, "/");
 	}
@@ -329,7 +329,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	object_init_ex(&iterator, apciterator_ce);
 	assert(phalcon_has_constructor(&iterator));
 	if (!phalcon_cache_backend_is_old_apcu) {
-		PHALCON_STR(&type, "user");
+		ZVAL_STRING(&type, "user");
 		PHALCON_CALL_METHODW(NULL, &iterator, "__construct", &type, &prefix_pattern);
 	}else {
 		PHALCON_CALL_METHODW(NULL, &iterator, "__construct", &prefix_pattern);
@@ -355,7 +355,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 
 		it->funcs->get_current_key(it, &itkey);
 		if (likely(Z_TYPE(itkey) == IS_STRING)) {
-			PHALCON_STRL(&key, Z_STRVAL(itkey) + 5, Z_STRLEN(itkey) - 5);
+			ZVAL_STRINGL(&key, Z_STRVAL(itkey) + 5, Z_STRLEN(itkey) - 5);
 			phalcon_array_append(return_value, &key, PH_COPY);
 		}
 
@@ -407,14 +407,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 	zend_class_entry *apciterator_ce;
 	zend_object_iterator *it;
 
-	PHALCON_STR(&prefix_pattern, "/^_PHCA/");	
+	ZVAL_STRING(&prefix_pattern, "/^_PHCA/");	
 
 	apciterator_ce = zend_fetch_class(SSL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&iterator, apciterator_ce);
 	assert(phalcon_has_constructor(&iterator));
 	if (!phalcon_cache_backend_is_old_apcu) {
-		PHALCON_STR(&type, "user");
+		ZVAL_STRING(&type, "user");
 		PHALCON_CALL_METHODW(NULL, &iterator, "__construct", &type, &prefix_pattern);
 	}
 	else {

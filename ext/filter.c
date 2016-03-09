@@ -276,8 +276,8 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		 * The 'email' filter uses the filter extension
 		 */
 		ZVAL_LONG(&type, 517); /* FILTER_SANITIZE_EMAIL */
-		PHALCON_STR(&quote, "'");
-		PHALCON_STR(&empty_str, "");
+		ZVAL_STRING(&quote, "'");
+		ZVAL_STRING(&empty_str, "");
 
 		PHALCON_STR_REPLACE(&escaped, &quote, &empty_str, value);
 

@@ -222,10 +222,10 @@ PHP_METHOD(Phalcon_Security_Random, bytes){
 		return;
 	}
 
-	PHALCON_STR(&file_path, "/dev/urandom");
+	ZVAL_STRING(&file_path, "/dev/urandom");
 
 	if (phalcon_file_exists(&file_path) == SUCCESS) {
-		PHALCON_STR(&mode, "rb");
+		ZVAL_STRING(&mode, "rb");
 
 		PHALCON_CALL_FUNCTIONW(&handle, "fopen", &file_path, &mode);
 
@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Security_Random, hex){
 
 	PHALCON_CALL_SELFW(&data, "bytes", len_param);
 
-	PHALCON_STR(&format, "H*");
+	ZVAL_STRING(&format, "H*");
 
 	PHALCON_CALL_FUNCTIONW(&ret, "unpack", &format, &data);
 
@@ -310,9 +310,9 @@ PHP_METHOD(Phalcon_Security_Random, base58){
 		len_param = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&byte_string, "");
-	PHALCON_STR(&alphabet, "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
-	PHALCON_STR(&format, "C*");
+	ZVAL_STRING(&byte_string, "");
+	ZVAL_STRING(&alphabet, "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+	ZVAL_STRING(&format, "C*");
 
 	PHALCON_CALL_SELFW(&data, "bytes", len_param);
 
@@ -404,13 +404,13 @@ PHP_METHOD(Phalcon_Security_Random, base64Safe) {
 
 	PHALCON_CALL_SELFW(&data, "base64", len_param);
 
-	PHALCON_STR(&pattern, "#[^a-z0-9_=-]+#i");
-	PHALCON_STR(&replacement, "");
+	ZVAL_STRING(&pattern, "#[^a-z0-9_=-]+#i");
+	ZVAL_STRING(&replacement, "");
 
 	PHALCON_CALL_FUNCTIONW(&s, "preg_replace", &pattern, &replacement, &data);
 
 	if (!zend_is_true(padding_param)) {
-		PHALCON_STR(&charlist, "=");
+		ZVAL_STRING(&charlist, "=");
 
 		ZVAL_STR(return_value, phalcon_trim(&s, &charlist, PHALCON_TRIM_BOTH));
 		return;
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Security_Random, uuid) {
 
 	PHALCON_CALL_SELFW(&bytes, "bytes", &len);
 
-	PHALCON_STR(&format, "N1a/n1b/n1c/n1d/n1e/N1f");
+	ZVAL_STRING(&format, "N1a/n1b/n1c/n1d/n1e/N1f");
 
 	PHALCON_CALL_FUNCTIONW(&data, "unpack", &format, &bytes);
 	PHALCON_CALL_FUNCTIONW(&arr, "array_values", &data);
@@ -458,13 +458,13 @@ PHP_METHOD(Phalcon_Security_Random, uuid) {
 	phalcon_array_fetch_long(&a3, &arr, 3, PH_NOISY | PH_READONLY);
 	phalcon_array_update_long_long(&arr, 3, ((((int) (phalcon_get_numberval(&a3)) & 0x3fff)) | 0x8000), PH_COPY | PH_SEPARATE);
 
-	PHALCON_STR(&str, "%08x-%04x-%04x-%04x-%04x%08x");
+	ZVAL_STRING(&str, "%08x-%04x-%04x-%04x-%04x%08x");
 
 	ZVAL_MAKE_REF(&arr);
 	PHALCON_CALL_FUNCTIONW(NULL, "array_unshift", &arr, &str);
 	ZVAL_UNREF(&arr);
 
-	PHALCON_STR(&str, "sprintf");
+	ZVAL_STRING(&str, "sprintf");
 
 	PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &str, &arr);
 }
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 
 	phalcon_fetch_params(0, 1, 0, &len_param);
 
-	PHALCON_STR(&bin, "");
+	ZVAL_STRING(&bin, "");
 
 	if (phalcon_get_intval(len_param) <= 0) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "Require a positive integer > 0");
@@ -507,7 +507,7 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 		PHALCON_CPY_WRT_CTOR(&hex, &hex_tmp);
 	}
 
-	PHALCON_STR(&format, "H*");
+	ZVAL_STRING(&format, "H*");
 
 	PHALCON_CALL_FUNCTIONW(&pack, "pack", &format, &hex);
 
@@ -547,7 +547,7 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 		PHALCON_CALL_FUNCTIONW(&rnd, "substr_replace", &bytes, &chr, &tmp, &tmp1);
 	} while (PHALCON_LT(&bin, &rnd));
 
-	PHALCON_STR(&format, "H*");
+	ZVAL_STRING(&format, "H*");
 
 	PHALCON_CALL_FUNCTIONW(&ret, "unpack", &format, &rnd);
 

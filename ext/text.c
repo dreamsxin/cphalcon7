@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Text, increment){
 	phalcon_fetch_params(0, 1, 1, &str, &separator);
 
 	if (!separator || Z_TYPE_P(separator) == IS_NULL) {
-		PHALCON_STR(&sep, "_");
+		ZVAL_STRING(&sep, "_");
 	} else {
 		PHALCON_CPY_WRT_CTOR(&sep, separator);
 	}
@@ -377,7 +377,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 	}
 		
 	if (PHALCON_IS_EMPTY(&format)) {
-		PHALCON_STR(&format, "%01.2f %s");
+		ZVAL_STRING(&format, "%01.2f %s");
 	}
 
 	if (!si) {
@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 	}
 
 	ZVAL_DOUBLE(&z_size, size);
-	PHALCON_STR(&z_force_unit, units[power]);
+	ZVAL_STRING(&z_force_unit, units[power]);
 
 	PHALCON_RETURN_CALL_FUNCTIONW("sprintf", &format, &z_size, &z_force_unit);
 }
@@ -436,8 +436,8 @@ PHP_METHOD(Phalcon_Text, reduceSlashes){
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
-	PHALCON_STR(&pattern, "#(?<!:)//+#");
-	PHALCON_STR(&replacement, "/");
+	ZVAL_STRING(&pattern, "#(?<!:)//+#");
+	ZVAL_STRING(&replacement, "/");
 
 	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, str);
 }
@@ -504,8 +504,8 @@ PHP_METHOD(Phalcon_Text, underscore)
 	phalcon_fetch_params(0, 1, 0, &str);
 
 	ZVAL_STR(&trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
-	PHALCON_STR(&pattern, "#\\s+#");
-	PHALCON_STR(&replacement, "_");
+	ZVAL_STRING(&pattern, "#\\s+#");
+	ZVAL_STRING(&replacement, "_");
 
 	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, &trimmed);
 }
@@ -525,8 +525,8 @@ PHP_METHOD(Phalcon_Text, humanize)
 	phalcon_fetch_params(0, 1, 0, &str);
 
 	ZVAL_STR(&trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
-	PHALCON_STR(&pattern, "#[_-]+#");
-	PHALCON_STR(&replacement, " ");
+	ZVAL_STRING(&pattern, "#[_-]+#");
+	ZVAL_STRING(&replacement, " ");
 
 	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, &trimmed);
 }

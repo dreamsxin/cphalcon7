@@ -126,11 +126,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 	switch (phalcon_get_intval(&column_type)) {
 
 		case 0:
-			PHALCON_STR(&column_sql, "INT");
+			ZVAL_STRING(&column_sql, "INT");
 			break;
 
 		case 1:
-			PHALCON_STR(&column_sql, "DATE");
+			ZVAL_STRING(&column_sql, "DATE");
 			break;
 
 		case 2:
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 			break;
 
 		case 4:
-			PHALCON_STR(&column_sql, "TIMESTAMP");
+			ZVAL_STRING(&column_sql, "TIMESTAMP");
 			break;
 
 		case 5:
@@ -151,15 +151,15 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 			break;
 
 		case 6:
-			PHALCON_STR(&column_sql, "TEXT");
+			ZVAL_STRING(&column_sql, "TEXT");
 			break;
 
 		case 7:
-			PHALCON_STR(&column_sql, "FLOAT");
+			ZVAL_STRING(&column_sql, "FLOAT");
 			break;
 
 		case 8:
-			PHALCON_STR(&column_sql, "SMALLINT(1)");
+			ZVAL_STRING(&column_sql, "SMALLINT(1)");
 			break;
 
 		default:
@@ -556,7 +556,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listTables){
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_SVS(&sql, "SELECT table_name FROM information_schema.tables WHERE table_schema = '", schema_name, "' ORDER BY table_name");
 	} else {
-		PHALCON_STR(&sql, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name");
+		ZVAL_STRING(&sql, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name");
 	}
 
 	RETURN_CTORW(&sql);
@@ -581,7 +581,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listViews){
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_SVS(&sql, "SELECT viewname AS view_name FROM pg_views WHERE schemaname = '", schema_name, "' ORDER BY view_name");
 	} else {
-		PHALCON_STR(&sql, "SELECT viewname AS view_name FROM pg_views WHERE schemaname = 'public' ORDER BY view_name");
+		ZVAL_STRING(&sql, "SELECT viewname AS view_name FROM pg_views WHERE schemaname = 'public' ORDER BY view_name");
 	}
 
 	RETURN_CTORW(&sql);
@@ -625,7 +625,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeReferences){
 		schema = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&sql, "SELECT tc.table_name as TABLE_NAME, kcu.column_name as COLUMN_NAME, tc.constraint_name as CONSTRAINT_NAME, tc.table_catalog as REFERENCED_TABLE_SCHEMA, ccu.table_name AS REFERENCED_TABLE_NAME, ccu.column_name AS REFERENCED_COLUMN_NAME FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND ");
+	ZVAL_STRING(&sql, "SELECT tc.table_name as TABLE_NAME, kcu.column_name as COLUMN_NAME, tc.constraint_name as CONSTRAINT_NAME, tc.table_catalog as REFERENCED_TABLE_SCHEMA, ccu.table_name AS REFERENCED_TABLE_NAME, ccu.column_name AS REFERENCED_COLUMN_NAME FROM information_schema.table_constraints AS tc JOIN information_schema.key_column_usage AS kcu ON tc.constraint_name = kcu.constraint_name JOIN information_schema.constraint_column_usage AS ccu ON ccu.constraint_name = tc.constraint_name WHERE constraint_type = 'FOREIGN KEY' AND ");
 	if (zend_is_true(schema)) {
 		PHALCON_SCONCAT_SVSVS(&sql, "tc.table_schema = '", schema, "' AND tc.table_name='", table, "'");
 	} else {

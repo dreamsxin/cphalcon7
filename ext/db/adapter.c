@@ -1738,7 +1738,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getDefaultIdValue){
 
 	zval null_value;
 
-	PHALCON_STR(&null_value, "null");
+	ZVAL_STRING(&null_value, "null");
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &null_value);
 

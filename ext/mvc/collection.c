@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	 * Inject the manager service from the DI
 	 */
 	if (!collection_manager || Z_TYPE_P(collection_manager) != IS_OBJECT) {
-		PHALCON_STR(&service_name, "collectionManager");
+		ZVAL_STRING(&service_name, "collectionManager");
 
 		PHALCON_CALL_METHODW(&mm, &di, "getshared", &service_name);
 		if (Z_TYPE(mm) != IS_OBJECT) {
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
 
 	phalcon_fetch_params(0, 1, 0, &id);
 
-	PHALCON_STR(&id_name, "_id");
+	ZVAL_STRING(&id_name, "_id");
 
 	PHALCON_CALL_SELFW(&column_map, "getcolumnmap");
 
@@ -372,7 +372,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 	zval id_name, column_map, id, mongo_id, *collection_manager, use_implicit_ids;
 	zend_class_entry *ce0;
 
-	PHALCON_STR(&id_name, "_id");
+	ZVAL_STRING(&id_name, "_id");
 
 	PHALCON_CALL_SELFW(&column_map, "getcolumnmap");
 
@@ -1041,7 +1041,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 	 * Run Validation Callbacks Before
 	 */
 	if (!zend_is_true(disable_events)) {
-		PHALCON_STR(&event_name, "beforeValidation");
+		ZVAL_STRING(&event_name, "beforeValidation");
 
 		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
@@ -1049,9 +1049,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 		}
 
 		if (!zend_is_true(exists)) {
-			PHALCON_STR(&event_name, "beforeValidationOnCreate");
+			ZVAL_STRING(&event_name, "beforeValidationOnCreate");
 		} else {
-			PHALCON_STR(&event_name, "beforeValidationOnUpdate");
+			ZVAL_STRING(&event_name, "beforeValidationOnUpdate");
 		}
 
 		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
@@ -1063,11 +1063,11 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 	/**
 	 * Run validation
 	 */
-	PHALCON_STR(&event_name, "validation");
+	ZVAL_STRING(&event_name, "validation");
 	PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		if (!zend_is_true(disable_events)) {
-			PHALCON_STR(&event_name, "onValidationFails");
+			ZVAL_STRING(&event_name, "onValidationFails");
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 		}
 		RETURN_FALSE;
@@ -1079,9 +1079,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 		 * Run Validation Callbacks After
 		 */
 		if (!zend_is_true(exists)) {
-			PHALCON_STR(&event_name, "afterValidationOnCreate");
+			ZVAL_STRING(&event_name, "afterValidationOnCreate");
 		} else {
-			PHALCON_STR(&event_name, "afterValidationOnUpdate");
+			ZVAL_STRING(&event_name, "afterValidationOnUpdate");
 		}
 
 		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
@@ -1089,7 +1089,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 			RETURN_FALSE;
 		}
 
-		PHALCON_STR(&event_name, "afterValidation");
+		ZVAL_STRING(&event_name, "afterValidation");
 
 		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
@@ -1099,7 +1099,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 		/**
 		 * Run Before Callbacks
 		 */
-		PHALCON_STR(&event_name, "beforeSave");
+		ZVAL_STRING(&event_name, "beforeSave");
 
 		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
@@ -1107,9 +1107,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 		}
 
 		if (zend_is_true(exists)) {
-			PHALCON_STR(&event_name, "beforeUpdate");
+			ZVAL_STRING(&event_name, "beforeUpdate");
 		} else {
-			PHALCON_STR(&event_name, "beforeCreate");
+			ZVAL_STRING(&event_name, "beforeCreate");
 		}
 
 		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
@@ -1138,20 +1138,20 @@ PHP_METHOD(Phalcon_Mvc_Collection, _postSave){
 	if (PHALCON_IS_TRUE(success)) {
 		if (!zend_is_true(disable_events)) {
 			if (PHALCON_IS_TRUE(exists)) {
-				PHALCON_STR(&event_name, "afterUpdate");
+				ZVAL_STRING(&event_name, "afterUpdate");
 			} else {
-				PHALCON_STR(&event_name, "afterCreate");
+				ZVAL_STRING(&event_name, "afterCreate");
 			}
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
-			PHALCON_STR(&event_name, "afterSave");
+			ZVAL_STRING(&event_name, "afterSave");
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 		}
 
 		RETURN_CTORW(success);
 	}
 	if (!zend_is_true(disable_events)) {
-		PHALCON_STR(&event_name, "notSave");
+		ZVAL_STRING(&event_name, "notSave");
 		PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 	}
 
@@ -1324,9 +1324,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, _cancelOperation){
 	if (!zend_is_true(disable_events)) {
 		operation_made = phalcon_read_property(getThis(), SL("_operationMade"), PH_NOISY);
 		if (PHALCON_IS_LONG(operation_made, 3)) {
-			PHALCON_STR(&event_name, "notDeleted");
+			ZVAL_STRING(&event_name, "notDeleted");
 		} else {
-			PHALCON_STR(&event_name, "notSaved");
+			ZVAL_STRING(&event_name, "notSaved");
 		}
 
 		PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
@@ -1569,8 +1569,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		PHALCON_CALL_METHODW(&exists, getThis(), "_exists", &mongo_collection);
 		if (PHALCON_IS_FALSE(&mode)) {
 			if (!zend_is_true(&exists)) {
-				PHALCON_STR(&type, "InvalidUpdateAttempt");
-				PHALCON_STR(&message, "Document cannot be updated because it does not exist");
+				ZVAL_STRING(&type, "InvalidUpdateAttempt");
+				ZVAL_STRING(&message, "Document cannot be updated because it does not exist");
 
 				object_init_ex(&collection_message, phalcon_mvc_collection_message_ce);
 				PHALCON_CALL_METHODW(NULL, &collection_message, "__construct", &message, &PHALCON_GLOBAL(z_null), &type);
@@ -1582,8 +1582,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 			}
 		} else {
 			if (zend_is_true(&exists)) {
-				PHALCON_STR(&type, "InvalidCreateAttempt");
-				PHALCON_STR(&message, "Document cannot be created because it already exist");
+				ZVAL_STRING(&type, "InvalidCreateAttempt");
+				ZVAL_STRING(&message, "Document cannot be created because it already exist");
 
 				object_init_ex(&collection_message, phalcon_mvc_collection_message_ce);
 				PHALCON_CALL_METHODW(NULL, &collection_message, "__construct", &message, &PHALCON_GLOBAL(z_null), &type);
@@ -1647,13 +1647,13 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	}
 
 	if (PHALCON_IS_FALSE(&mode)){
-		PHALCON_STR(&attribute_field, "_id");
+		ZVAL_STRING(&attribute_field, "_id");
 
 		PHALCON_CALL_SELFW(&id, "getid");
 		phalcon_array_update_zval(&data, &attribute_field, &id, PH_COPY);
-		PHALCON_STR(&func, "save");
+		ZVAL_STRING(&func, "save");
 	} else {
-		PHALCON_STR(&func, "insert");
+		ZVAL_STRING(&func, "insert");
 	}
 
 	/**
@@ -1674,7 +1674,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		if (zend_is_true(&ok)) {
 			ZVAL_TRUE(&success);
 			if (PHALCON_IS_FALSE(&exists) && phalcon_array_isset_fetch_str(&id, &data, SL("_id"))) {
-				PHALCON_STR(&attribute_field, "_id");
+				ZVAL_STRING(&attribute_field, "_id");
 
 				if (Z_TYPE(column_map) == IS_ARRAY) { 
 					if (phalcon_array_isset_str(&column_map, SL("_id"))) {
@@ -2035,7 +2035,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 	 * Uses a javascript hash to group the results, however this is slow with larger
 	 * datasets
 	 */
-	PHALCON_STR(&reduce, "function (curr, result) { for (var key in result.summatory) {if (typeof curr[key] !== \"undefined\") { if (typeof curr[key] === \"string\") {result.summatory[key] += curr[key].trim().length > 0 ? parseFloat(curr[key].trim()) : 0;} else {result.summatory[key] += curr[key];} } }}");
+	ZVAL_STRING(&reduce, "function (curr, result) { for (var key in result.summatory) {if (typeof curr[key] !== \"undefined\") { if (typeof curr[key] === \"string\") {result.summatory[key] += curr[key].trim().length > 0 ? parseFloat(curr[key].trim()) : 0;} else {result.summatory[key] += curr[key];} } }}");
 
 	PHALCON_CALL_METHODW(&group, &mongo_collection, "group", &keys, &initial, &reduce, &options);
 	if (phalcon_array_isset_str(&group, SL("retval"))) {
@@ -2124,7 +2124,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
 	disable_events = phalcon_read_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
 	if (!zend_is_true(disable_events)) {
-		PHALCON_STR(&event_name, "beforeDelete");
+		ZVAL_STRING(&event_name, "beforeDelete");
 
 		PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
@@ -2168,7 +2168,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, delete){
 		if (zend_is_true(&ok)) {
 			ZVAL_TRUE(&success);
 			if (!zend_is_true(disable_events)) {
-				PHALCON_STR(&event_name, "afterDelete");
+				ZVAL_STRING(&event_name, "afterDelete");
 				PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 			}
 		}
@@ -2318,7 +2318,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 			/**
 			 * Gets the default collectionManager service
 			 */
-			PHALCON_STR(&service, "collectionManager");
+			ZVAL_STRING(&service, "collectionManager");
 
 			PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service);
 			if (Z_TYPE(manager) != IS_OBJECT) {
@@ -2427,7 +2427,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 
 		phalcon_array_update_str(&criteria, SL("_id"), &mongo_id, PH_COPY);
 
-		PHALCON_STR(&key, "$inc");
+		ZVAL_STRING(&key, "$inc");
 
 		array_init_size(&new_object, 1);
 
@@ -2602,7 +2602,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __set){
 		PHALCON_CONCAT_SV(&possible_setter, "set", property);
 		phalcon_strtolower_inplace(&possible_setter);
 
-		PHALCON_STR(&class_name, "Phalcon\\Mvc\\Collection");
+		ZVAL_STRING(&class_name, "Phalcon\\Mvc\\Collection");
 
 		PHALCON_CALL_FUNCTIONW(&method_exists, "method_exists", &class_name, &possible_setter);
 		if (!zend_is_true(&method_exists)) {
@@ -2648,7 +2648,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __get){
 		PHALCON_CONCAT_SV(&possible_getter, "get", property);
 		phalcon_strtolower_inplace(&possible_getter);
 
-		PHALCON_STR(&class_name, "Phalcon\\Mvc\\Collection");
+		ZVAL_STRING(&class_name, "Phalcon\\Mvc\\Collection");
 
 		PHALCON_CALL_FUNCTIONW(&method_exists, "method_exists", &class_name, &possible_getter);
 		if (!zend_is_true(&method_exists)) {

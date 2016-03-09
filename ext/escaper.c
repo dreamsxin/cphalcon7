@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	 * Strict encoding detection with fallback to non-strict detection.
 	 */
 	ZVAL_TRUE(&strict_check);
-	PHALCON_STR(&charset, "UTF-32");
+	ZVAL_STRING(&charset, "UTF-32");
 
 	/**
 	 * Check for UTF-32 encoding
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 		RETURN_CTORW(&charset);
 	}
 
-	PHALCON_STR(&charset, "UTF-16");
+	ZVAL_STRING(&charset, "UTF-16");
 
 	/**
 	 * Check for UTF-16 encoding
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 		RETURN_CTORW(&charset);
 	}
 
-	PHALCON_STR(&charset, "UTF-8");
+	ZVAL_STRING(&charset, "UTF-8");
 
 	/**
 	 * Check for UTF-8 encoding
@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 		RETURN_CTORW(&charset);
 	}
 
-	PHALCON_STR(&charset, "ISO-8859-1");
+	ZVAL_STRING(&charset, "ISO-8859-1");
 
 	/**
 	 * Check for ISO-8859-1 encoding
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 		RETURN_CTORW(&charset);
 	}
 
-	PHALCON_STR(&charset, "ASCII");
+	ZVAL_STRING(&charset, "ASCII");
 
 	/**
 	 * Check for ASCII encoding
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Escaper, normalizeEncoding){
 
 	PHALCON_CALL_METHODW(&encoding, getThis(), "detectencoding", getThis());
 
-	PHALCON_STR(&charset, "UTF-32");
+	ZVAL_STRING(&charset, "UTF-32");
 
 	/**
 	 * Convert to UTF-32 (4 byte characters, regardless of actual number of bytes in

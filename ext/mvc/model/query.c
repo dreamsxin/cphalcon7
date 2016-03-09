@@ -332,7 +332,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 			return;
 		}
 
-		PHALCON_STR(&service_name, "modelsManager");
+		ZVAL_STRING(&service_name, "modelsManager");
 
 		PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
@@ -381,7 +381,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 			return;
 		}
 
-		PHALCON_STR(&service_name, "modelsMetadata");
+		ZVAL_STRING(&service_name, "modelsMetadata");
 
 		PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
@@ -459,7 +459,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	 */
 	if (phalcon_array_isset(sql_column_aliases, &column_name)) {
 		array_init_size(return_value, 2);
-		PHALCON_STR(&s_qualified, ISV(qualified));
+		ZVAL_STRING(&s_qualified, ISV(qualified));
 		add_assoc_zval_ex(return_value, ISL(type), &s_qualified);
 		phalcon_array_update_string(return_value, IS(name), &column_name, PH_COPY);
 		return;
@@ -614,7 +614,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	/** 
 	 * Create an array with the qualified info
 	 */
-	PHALCON_STR(&s_qualified, ISV(qualified));
+	ZVAL_STRING(&s_qualified, ISV(qualified));
 	array_init_size(return_value, 4);
 	add_assoc_zval_ex(return_value, ISL(type), &s_qualified);
 	phalcon_array_update_string(return_value, IS(domain), &source, PH_COPY);
@@ -636,7 +636,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCallArgument){
 
 	phalcon_array_fetch_string(&argument_type, argument, IS(type), PH_NOISY);
 	if (PHALCON_IS_LONG(&argument_type, PHQL_T_STARALL)) {
-		PHALCON_STR(&s_all, ISV(all));
+		ZVAL_STRING(&s_all, ISV(all));
 		Z_TRY_ADDREF(s_all);
 		array_init_size(return_value, 1);
 		add_assoc_zval_ex(return_value, ISL(type), &s_all);
@@ -1006,8 +1006,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
 				phalcon_array_fetch_str(&value, expr, SL("value"), PH_NOISY);
 
-				PHALCON_STR(&question_mark, "?");
-				PHALCON_STR(&colon, ":");
+				ZVAL_STRING(&question_mark, "?");
+				ZVAL_STRING(&colon, ":");
 
 				PHALCON_STR_REPLACE(&placeholder, &question_mark, &colon, &value);
 
@@ -3135,7 +3135,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	ulong idx;
 	int i_cache = 1;
 
-	PHALCON_STR(&event_name, "query:beforeParse");
+	ZVAL_STRING(&event_name, "query:beforeParse");
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
@@ -3285,7 +3285,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 	phalcon_update_property_this(getThis(), SL("_intermediate"), &ir_phql);
 
-	PHALCON_STR(&event_name, "query:afterParse");
+	ZVAL_STRING(&event_name, "query:afterParse");
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
@@ -3607,7 +3607,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, value, &sql_select);
 
-				PHALCON_STR(&sql_select, Z_STRVAL(sql_tmp));
+				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
 			} else if (Z_TYPE(tmp) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
 				phalcon_array_update_zval(&processed, &string_wildcard, value, PH_COPY);
@@ -3700,7 +3700,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		/** 
 		 * Simple resultsets contains only complete objects
 		 */
-		PHALCON_STR(&service_name, "modelsResultsetSimple");
+		ZVAL_STRING(&service_name, "modelsResultsetSimple");
 
 		PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
@@ -3723,7 +3723,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		/** 
 		 * Complex resultsets may contain complete objects and scalars
 		 */
-		PHALCON_STR(&service_name, "modelsResultsetComplex");
+		ZVAL_STRING(&service_name, "modelsResultsetComplex");
 
 		PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
@@ -3796,7 +3796,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 	PHALCON_CALL_METHODW(&dialect, &connection, "getdialect");
 
-	PHALCON_STR(&double_colon, ":");
+	ZVAL_STRING(&double_colon, ":");
 	ZVAL_EMPTY_STRING(&empty_string);
 
 	phalcon_fast_count(&number_fields, &fields);
@@ -4027,7 +4027,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 	/** 
 	 * We create another Phalcon\Mvc\Model\Query to get the related records
 	 */
-	PHALCON_STR(&service_name, "modelsQuery");
+	ZVAL_STRING(&service_name, "modelsQuery");
 
 	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -4096,7 +4096,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 		phalcon_array_fetch_str(&fields, intermediate, SL("fields"), PH_NOISY);
 		phalcon_array_fetch_str(&values, intermediate, SL("values"), PH_NOISY);
 
-		PHALCON_STR(&double_colon, ":");
+		ZVAL_STRING(&double_colon, ":");
 		ZVAL_EMPTY_STRING(&empty_string);
 
 		/** 
@@ -4254,7 +4254,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, raw_value, &update_sql);
 
-					PHALCON_STR(&update_sql, Z_STRVAL(sql_tmp));
+					ZVAL_STRING(&update_sql, Z_STRVAL(sql_tmp));
 
 					phalcon_array_unset(bind_types, &wildcard, PH_COPY);
 				} else {
@@ -4396,7 +4396,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
 					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, raw_value, &delete_sql);
 
-					PHALCON_STR(&delete_sql, Z_STRVAL(sql_tmp));
+					ZVAL_STRING(&delete_sql, Z_STRVAL(sql_tmp));
 
 					phalcon_array_unset(bind_types, &tmp, PH_COPY);
 				} else {
@@ -4451,7 +4451,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 		use_rawsql = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_STR(&event_name, "query:beforeExecute");
+	ZVAL_STRING(&event_name, "query:beforeExecute");
 
 	ZVAL_MAKE_REF(bind_params);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, bind_params);
@@ -4488,7 +4488,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			 * 'modelsCache' is the default name for the models cache service
 			 */
 			if (!phalcon_array_isset_fetch_str(&cache_service, cache_options, SL("service"))) {
-				PHALCON_STR(&cache_service, ISV(modelsCache));
+				ZVAL_STRING(&cache_service, ISV(modelsCache));
 			}
 
 			dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
@@ -4614,7 +4614,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
 	}
 
-	PHALCON_STR(&event_name, "query:afterExecute");
+	ZVAL_STRING(&event_name, "query:afterExecute");
 
 	ZVAL_MAKE_REF(&result);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &result);

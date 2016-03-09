@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 
 	base_uri = phalcon_read_property(getThis(), SL("_baseUri"), PH_NOISY);
 	if (Z_TYPE_P(base_uri) == IS_NULL) {
-		PHALCON_STR(&slash, "/");
+		ZVAL_STRING(&slash, "/");
 		_SERVER = phalcon_get_global_str(SL("_SERVER"));
 		if (phalcon_array_isset_fetch_str(&php_self, _SERVER, SL("PHP_SELF"))) {
 			phalcon_get_uri(&uri, &php_self);
@@ -271,7 +271,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 
 	if (Z_TYPE_P(uri) == IS_STRING) {
 		if (strstr(Z_STRVAL_P(uri), ":")) {
-			PHALCON_STR(&regexp, "/^[^:\\/?#]++:/");
+			ZVAL_STRING(&regexp, "/^[^:\\/?#]++:/");
 			RETURN_ON_FAILURE(phalcon_preg_match(&matched, &regexp, uri, NULL));
 			if (zend_is_true(&matched)) {
 				ZVAL_FALSE(&local);
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 				return;
 			}
 
-			PHALCON_STR(&service, ISV(router));
+			ZVAL_STRING(&service, ISV(router));
 
 			PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);
 			PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 		PHALCON_ENSURE_IS_STRING(uri);
 
 		if (strstr(Z_STRVAL_P(uri), "://")) {
-			PHALCON_STR(&pattern, "/^[^:\\/?#]++:/");
+			ZVAL_STRING(&pattern, "/^[^:\\/?#]++:/");
 			RETURN_ON_FAILURE(phalcon_preg_match(&matched, &pattern, uri, NULL));
 			if (zend_is_true(&matched)) {
 				RETURN_CTORW(uri);

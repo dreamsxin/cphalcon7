@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addCss){
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "css");
+	ZVAL_STRING(&type, "css");
 
 	object_init_ex(&resource, phalcon_assets_resource_css_ce);
 
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addJs){
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "js");
+	ZVAL_STRING(&type, "js");
 
 	object_init_ex(&resource, phalcon_assets_resource_js_ce);
 
@@ -527,7 +527,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	 */
 	PHALCON_CALL_METHODW(&prefix, collection, "getprefix");
 
-	PHALCON_STR(&type_css, "css");
+	ZVAL_STRING(&type_css, "css");
 
 	/** 
 	 * Prepare options if the collection must be filtered
@@ -952,7 +952,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 	add_next_index_stringl(&callback, SL("Phalcon\\Tag"));
 	add_next_index_stringl(&callback, SL("stylesheetLink"));
 
-	PHALCON_STR(&type, "css");
+	ZVAL_STRING(&type, "css");
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "output", &collection, &callback, &type, args);
 }
@@ -987,7 +987,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 	add_next_index_stringl(&callback, SL("Phalcon\\Tag"));
 	add_next_index_stringl(&callback, SL("javascriptInclude"));
 
-	PHALCON_STR(&type, "js");
+	ZVAL_STRING(&type, "js");
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "output", &collection, &callback, &type, args);
 }

@@ -318,7 +318,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, notify){
 
 	ignore_event = phalcon_read_property(getThis(), SL("_ignoreEvent"), PH_NOISY);
 	if (!zend_is_true(ignore_event)) {
-		PHALCON_STR(&message, "You should not use this method when NestedSetBehavior attached. Use the methods of behavior");
+		ZVAL_STRING(&message, "You should not use this method when NestedSetBehavior attached. Use the methods of behavior");
 
 		if (PHALCON_IS_STRING(type, "beforeCreate") || PHALCON_IS_STRING(type, "beforeUpdate") || PHALCON_IS_STRING(type, "beforeDelete")) {
 			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &message);

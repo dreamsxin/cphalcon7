@@ -91,7 +91,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
-	PHALCON_STR(&option, "field");
+	ZVAL_STRING(&option, "field");
 
 	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
 	if (Z_TYPE(field) != IS_STRING) {
@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	/** 
 	 * The 'domain' option must be a valid array of not allowed values
 	 */
-	PHALCON_STR(&option, "domain");
+	ZVAL_STRING(&option, "domain");
 
 	PHALCON_CALL_METHODW(&is_set, getThis(), "issetoption", &option);
 	if (PHALCON_IS_FALSE(&is_set)) {
@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 		return;
 	}
 
-	PHALCON_STR(&option, "domain");
+	ZVAL_STRING(&option, "domain");
 
 	PHALCON_CALL_METHODW(&domain, getThis(), "getoption", &option);
 	if (Z_TYPE(domain) != IS_ARRAY) { 
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 	/*
 	 * Allow empty
 	 */
-	PHALCON_STR(&option, "allowEmpty");
+	ZVAL_STRING(&option, "allowEmpty");
 
 	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
 	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_STR(&option, ISV(message));
+		ZVAL_STRING(&option, ISV(message));
 
 		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 		if (!zend_is_true(&message)) {
@@ -146,12 +146,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 			PHALCON_CONCAT_SVSV(&message, "Value of field '", &field, "' must be part of list: ", &joined_domain);
 		}
 
-		PHALCON_STR(&type, "Inclusion");
+		ZVAL_STRING(&type, "Inclusion");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_STR(&option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
 		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
 		if (zend_is_true(&is_set_code)) {

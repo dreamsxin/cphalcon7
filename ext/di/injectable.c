@@ -337,12 +337,12 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	if (Z_STRLEN_P(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(property_name), "persistent", sizeof("persistent")-1)) {
 		const char *cn = Z_OBJCE_P(getThis())->name->val;
 
-		PHALCON_STR(&class_name, cn);
+		ZVAL_STRING(&class_name, cn);
 
 		array_init_size(&arguments, 1);
 		add_next_index_zval(&arguments, &class_name);
 
-		PHALCON_STR(&service, "sessionBag");
+		ZVAL_STRING(&service, "sessionBag");
 
 		PHALCON_CALL_METHODW(&result, &dependency_injector, "get", &service, &arguments);
 		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), &result);

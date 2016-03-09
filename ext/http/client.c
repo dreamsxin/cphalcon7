@@ -71,7 +71,7 @@ PHP_METHOD(Phalcon_Http_Client, factory)
 	}
 
 	if (!_method) {
-		PHALCON_STR(&method, "GET");
+		ZVAL_STRING(&method, "GET");
 	} else {
 		PHALCON_CPY_WRT(&method, _method);
 	}

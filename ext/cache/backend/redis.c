@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 	
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
-		PHALCON_STRL(&prefixed_key, Z_STRVAL(last_key)+5, Z_STRLEN(last_key)-5);
+		ZVAL_STRINGL(&prefixed_key, Z_STRVAL(last_key)+5, Z_STRLEN(last_key)-5);
 	} else {
 		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 

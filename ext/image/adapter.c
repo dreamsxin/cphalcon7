@@ -719,7 +719,7 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 	}
 
 	if (!fontcolor || Z_TYPE_P(fontcolor) == IS_NULL) {
-		PHALCON_STR(&color, "000000");
+		ZVAL_STRING(&color, "000000");
 	} else {
 		PHALCON_ENSURE_IS_STRING(fontcolor);
 		if (Z_STRLEN_P(fontcolor) > 1 && Z_STRVAL_P(fontcolor)[0] == '#') {
@@ -811,7 +811,7 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
 	}
 
 	if (Z_TYPE_P(bcolor) == IS_NULL) {
-		PHALCON_STR(&color, "000000");
+		ZVAL_STRING(&color, "000000");
 	} else {
 		PHALCON_ENSURE_IS_STRING(bcolor);
 		if (Z_STRLEN_P(bcolor) > 1 && Z_STRVAL_P(bcolor)[0] == '#') {
@@ -1010,7 +1010,7 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 		phalcon_return_property(&format, getThis(), SL("_format"));
 
 		if (PHALCON_IS_EMPTY(&format)) {
-			PHALCON_STR(&format, "png");
+			ZVAL_STRING(&format, "png");
 		} 
 	} else {
 		PHALCON_CPY_WRT(&format, ext);

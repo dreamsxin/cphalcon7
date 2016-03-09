@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		ZVAL_LONG(&exception_code, 0);
-		PHALCON_STR(&exception_message, "A dependency injection container is required to access the 'response' service");
+		ZVAL_STRING(&exception_message, "A dependency injection container is required to access the 'response' service");
 
 		object_init_ex(&exception, phalcon_mvc_dispatcher_exception_ce);
 		PHALCON_CALL_METHODW(NULL, &exception, "__construct", &exception_message, &exception_code);
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 		return;
 	}
 
-	PHALCON_STR(&service, ISV(response));
+	ZVAL_STRING(&service, ISV(response));
 
 	PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	 * Dispatcher exceptions automatically send 404 status
 	 */
 	ZVAL_LONG(&status_code, 404);
-	PHALCON_STR(&status_message, "Not Found");
+	ZVAL_STRING(&status_message, "Not Found");
 
 	PHALCON_CALL_METHODW(NULL, &response, "setstatuscode", &status_code, &status_message);
 
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "dispatch:beforeException");
+		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
 		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), &exception);
 		if (PHALCON_IS_FALSE(&status)) {
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException)
 
 	phalcon_fetch_params(0, 1, 0, &exception);
 
-	PHALCON_STR(&event_name, "dispatch:beforeException");
+	ZVAL_STRING(&event_name, "dispatch:beforeException");
 
 	ZVAL_MAKE_REF(exception);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "fireevent", &event_name, exception);

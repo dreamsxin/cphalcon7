@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
-	PHALCON_STR(&option, "field");
+	ZVAL_STRING(&option, "field");
 
 	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
 	if (Z_TYPE(field) != IS_STRING) {
@@ -106,10 +106,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 	/** 
 	 * At least one of 'min' or 'max' must be set
 	 */
-	PHALCON_STR(&option, "min");
+	ZVAL_STRING(&option, "min");
 	PHALCON_CALL_METHODW(&is_set_min, getThis(), "issetoption", &option);
 
-	PHALCON_STR(&option, "max");
+	ZVAL_STRING(&option, "max");
 	PHALCON_CALL_METHODW(&is_set_max, getThis(), "issetoption", &option);
 	if (!zend_is_true(&is_set_min)) {
 		if (!zend_is_true(&is_set_max)) {
@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 	/*
 	 * Allow empty
 	 */
-	PHALCON_STR(&option, "allowEmpty");
+	ZVAL_STRING(&option, "allowEmpty");
 
 	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
 
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 	 * Maximum length
 	 */
 	if (zend_is_true(&is_set_max)) {
-		PHALCON_STR(&option, "max");
+		ZVAL_STRING(&option, "max");
 
 		PHALCON_CALL_METHODW(&maximum, getThis(), "getoption", &option);
 
@@ -156,19 +156,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 			/** 
 			 * Check if the developer has defined a custom message
 			 */
-			PHALCON_STR(&option, "messageMaximum");
+			ZVAL_STRING(&option, "messageMaximum");
 
 			PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 			if (!zend_is_true(&message)) {
 				PHALCON_CONCAT_SVSVS(&message, "Value of field '", &field, "' exceeds the maximum ", &maximum, " characters");
 			}
 
-			PHALCON_STR(&type, "TooLong");
+			ZVAL_STRING(&type, "TooLong");
 
 			/*
 			 * Is code set
 			 */
-			PHALCON_STR(&option, ISV(code));
+			ZVAL_STRING(&option, ISV(code));
 
 			PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
 			if (zend_is_true(&is_set_code)) {
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 	 * Minimum length
 	 */
 	if (zend_is_true(&is_set_min)) {
-		PHALCON_STR(&option, "min");
+		ZVAL_STRING(&option, "min");
 		PHALCON_CALL_METHODW(&minimum, getThis(), "getoption", &option);
 
 		is_smaller_function(&invalid_minimum, &length, &minimum);
@@ -194,19 +194,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 			/** 
 			 * Check if the developer has defined a custom message
 			 */
-			PHALCON_STR(&option, "messageMinimum");
+			ZVAL_STRING(&option, "messageMinimum");
 
 			PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 			if (!zend_is_true(&message)) {
 				PHALCON_CONCAT_SVSVS(&message, "Value of field '", &field, "' is less than the minimum ", &minimum, " characters");
 			}
 
-			PHALCON_STR(&type, "TooShort");
+			ZVAL_STRING(&type, "TooShort");
 
 			/*
 			 * Is code set
 			 */
-			PHALCON_STR(&option, ISV(code));
+			ZVAL_STRING(&option, ISV(code));
 
 			PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
 			if (zend_is_true(&is_set_code)) {

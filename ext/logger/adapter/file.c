@@ -108,7 +108,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 			return;
 		}
 	} else {
-		PHALCON_STR(&mode, "ab");
+		ZVAL_STRING(&mode, "ab");
 	}
 
 	/** 
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 			return;
 		}
 	} else {
-		PHALCON_STR(&mode, "ab");
+		ZVAL_STRING(&mode, "ab");
 	}
 
 	/**

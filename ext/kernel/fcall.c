@@ -106,10 +106,8 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 			}
 		}
 
-		array_init(&func_name);
+		array_init_size(&func_name, 2);
 		switch (type) {
-			case phalcon_fcall_function:
-				break;
 			case phalcon_fcall_parent:
 				add_next_index_string(&func_name, ISV(parent));
 				break;
@@ -135,7 +133,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				break;
 		}
 
-		add_next_index_string(&func_name, method_name);
+		add_next_index_stringl(&func_name, method_name, method_len);
 
 		if (!ce && object) {
 			ce = Z_OBJCE_P(object);
@@ -143,7 +141,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 		function_table = ce ? &ce->function_table : EG(function_table);
 	} else {
-		PHALCON_STRL(&func_name, method_name, method_len);
+		ZVAL_STRINGL(&func_name, method_name, method_len);
 		function_table = EG(function_table);
 	}
 

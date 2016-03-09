@@ -236,17 +236,17 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	}
 
 	if (!_foreground) {
-		PHALCON_STR(&foreground, "#ffffff");
+		ZVAL_STRING(&foreground, "#ffffff");
 	} else if (Z_TYPE_P(_foreground) == IS_NULL) {
-		PHALCON_STR(&foreground, "#ffffff");
+		ZVAL_STRING(&foreground, "#ffffff");
 	} else {
 		PHALCON_CPY_WRT(&foreground, _foreground);
 	}
 
 	if (!_background) {
-		PHALCON_STR(&background, "#000000");
+		ZVAL_STRING(&background, "#000000");
 	} else if (Z_TYPE_P(_background) == IS_NULL) {
-		PHALCON_STR(&background, "#000000");
+		ZVAL_STRING(&background, "#000000");
 	} else {
 		PHALCON_CPY_WRT(&background, _background);
 	}
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	PHALCON_CALL_METHODW(NULL, &imagick, "swirlimage", &corner2);
 	PHALCON_CALL_METHODW(NULL, &imagick, "rollimage", &roll1,  &PHALCON_GLOBAL(z_zero));
 
-	PHALCON_STR(&format, "png");
+	ZVAL_STRING(&format, "png");
 
 	PHALCON_CALL_METHODW(NULL, &imagick, "setImageFormat", &format);
 	PHALCON_CALL_METHODW(NULL, &imagick, "stripImage");

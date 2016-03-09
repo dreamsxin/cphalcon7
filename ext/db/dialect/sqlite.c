@@ -135,11 +135,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
 	switch (phalcon_get_intval(&column_type)) {
 
 		case 0:
-			PHALCON_STR(&column_sql, "INT");
+			ZVAL_STRING(&column_sql, "INT");
 			break;
 
 		case 1:
-			PHALCON_STR(&column_sql, "DATE");
+			ZVAL_STRING(&column_sql, "DATE");
 			break;
 
 		case 2:
@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
 			break;
 
 		case 4:
-			PHALCON_STR(&column_sql, "TIMESTAMP");
+			ZVAL_STRING(&column_sql, "TIMESTAMP");
 			break;
 
 		case 5:
@@ -160,11 +160,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
 			break;
 
 		case 6:
-			PHALCON_STR(&column_sql, "TEXT");
+			ZVAL_STRING(&column_sql, "TEXT");
 			break;
 
 		case 7:
-			PHALCON_STR(&column_sql, "FLOAT");
+			ZVAL_STRING(&column_sql, "FLOAT");
 			break;
 
 		default:

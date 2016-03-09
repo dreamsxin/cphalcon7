@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 	phalcon_update_property_this(getThis(), SL("_password"), password);
 
 	if (!_authtype) {
-		PHALCON_STR(&authtype, "any");
+		ZVAL_STRING(&authtype, "any");
 	} else {
 		PHALCON_CPY_WRT(&authtype, _authtype);
 	}

@@ -829,7 +829,7 @@ PHP_METHOD(Phalcon_Arr, callback){
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
-	PHALCON_STR(&pattern, "#^([^\\(]*+)\\((.*)\\)$#");
+	ZVAL_STRING(&pattern, "#^([^\\(]*+)\\((.*)\\)$#");
 
 	RETURN_ON_FAILURE(phalcon_preg_match(&ret, &pattern, str, &matches));
 
@@ -845,8 +845,8 @@ PHP_METHOD(Phalcon_Arr, callback){
 
 			php_pcre_split_impl(pce, Z_STRVAL(match), Z_STRLEN(match), &split, -1, 0);
 
-			PHALCON_STR(&search, "\\,");
-			PHALCON_STR(&replace, ",");
+			ZVAL_STRING(&search, "\\,");
+			ZVAL_STRING(&replace, ",");
 
 			PHALCON_CALL_FUNCTIONW(&params, "str_replace", &search, &replace, &split);
 		}
@@ -963,7 +963,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
-	PHALCON_STR(&service, ISV(filter));
+	ZVAL_STRING(&service, ISV(filter));
 
 	PHALCON_CALL_METHODW(&filter, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&filter, phalcon_filterinterface_ce);

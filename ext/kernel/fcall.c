@@ -53,25 +53,31 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
 		status = FAILURE;
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
-	} else {
-		if (params && Z_TYPE_P(params) == IS_ARRAY) {
-			param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
-			arguments = (zval*)emalloc(sizeof(zval) * param_count);
-			i = 0;
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
-				PHALCON_CPY_WRT(&arguments[i], param);
-				i++;
-			} ZEND_HASH_FOREACH_END();
-		} else {
-			param_count = 0;
-			arguments = (zval*)emalloc(sizeof(zval) * param_count);
-		}
-
-		if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
-			status = FAILURE;
-		}
+		return status;
 	}
 
+	if (params && Z_TYPE_P(params) == IS_ARRAY) {
+		param_count = zend_hash_num_elements(Z_ARRVAL_P(params));
+		arguments = (zval*)emalloc(sizeof(zval) * param_count);
+		i = 0;
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
+			PHALCON_CPY_WRT(&arguments[i], param);
+			i++;
+		} ZEND_HASH_FOREACH_END();
+	} else {
+		param_count = 0;
+		arguments = (zval*)emalloc(sizeof(zval) * param_count);
+	}
+
+	if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+		status = FAILURE;
+	}
+
+	i = 0;
+	while(i < param_count) {
+		zval_ptr_dtor(&arguments[i]);
+		i++;
+	}
 	efree(arguments);
 
 	return status;
@@ -142,7 +148,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 	i = 0;
 	while(i < param_count) {
-		PHALCON_CPY_WRT_CTOR(&arguments[i], params[i]);
+		PHALCON_CPY_WRT(&arguments[i], params[i]);
 		i++;
 	}
 
@@ -175,6 +181,11 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 	}
 
 	zval_ptr_dtor(&func_name);
+	i = 0;
+	while(i < param_count) {
+		zval_ptr_dtor(&arguments[i]);
+		i++;
+	}
 	efree(arguments);
 
 	return status;

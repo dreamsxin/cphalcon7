@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Version, getId){
 	phalcon_array_fetch_long(&special, &version, 3, PH_NOISY);
 	phalcon_array_fetch_long(&special_number, &version, 4, PH_NOISY);
 
-	ZVAL_STRING(&format, "%02s");
+	PHALCON_STR(&format, "%02s");
 
 	PHALCON_CALL_FUNCTIONW(&real_medium, "sprintf", &format, &medium);
 	PHALCON_CALL_FUNCTIONW(&real_minor, "sprintf", &format, &minor);

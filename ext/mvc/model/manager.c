@@ -423,7 +423,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 */
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "modelsManager:afterInitialize");
+		PHALCON_STR(&event_name, "modelsManager:afterInitialize");
 		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), model);
 	}
 
@@ -1851,15 +1851,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		switch (phalcon_get_intval(&type)) {
 
 			case 0:
-				ZVAL_STRING(&retrieve_method, "findFirst");
+				PHALCON_STR(&retrieve_method, "findFirst");
 				break;
 
 			case 1:
-				ZVAL_STRING(&retrieve_method, "findFirst");
+				PHALCON_STR(&retrieve_method, "findFirst");
 				break;
 
 			case 2:
-				ZVAL_STRING(&retrieve_method, "find");
+				PHALCON_STR(&retrieve_method, "find");
 				break;
 
 		}
@@ -2351,7 +2351,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 	/** 
 	 * Create a query
 	 */
-	ZVAL_STRING(&service_name, "modelsQuery");
+	PHALCON_STR(&service_name, "modelsQuery");
 
 	PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -2401,7 +2401,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 	/** 
 	 * Create a query
 	 */
-	ZVAL_STRING(&service_name, "modelsQuery");
+	PHALCON_STR(&service_name, "modelsQuery");
 
 	PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -2448,7 +2448,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 	/** 
 	 * Create a query builder
 	 */
-	ZVAL_STRING(&service, "modelsQueryBuilder");
+	PHALCON_STR(&service, "modelsQueryBuilder");
 
 	array_init(&service_params);
 	phalcon_array_append(&service_params, params, PH_COPY);

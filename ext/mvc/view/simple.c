@@ -372,7 +372,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	 * Call beforeRender if there is an events manager
 	 */
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "view:beforeRender");
+		PHALCON_STR(&event_name, "view:beforeRender");
 
 		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis());
 		if (PHALCON_IS_FALSE(&status)) {
@@ -419,7 +419,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 			 * Call beforeRenderView if there is a events manager available
 			 */
 			if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-				ZVAL_STRING(&event_name, "view:beforeRenderView");
+				PHALCON_STR(&event_name, "view:beforeRenderView");
 				PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), &view_engine_path);
 				if (PHALCON_IS_FALSE(&status)) {
 					continue;
@@ -433,7 +433,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 			 */
 			ZVAL_FALSE(&not_exists);
 			if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-				ZVAL_STRING(&event_name, "view:afterRenderView");
+				PHALCON_STR(&event_name, "view:afterRenderView");
 				PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
 			}
 
@@ -457,7 +457,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	 * Call afterRender event
 	 */
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "view:afterRender");
+		PHALCON_STR(&event_name, "view:afterRender");
 		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
 	}
 }
@@ -687,7 +687,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 
 	cache_options = phalcon_read_property(getThis(), SL("_cacheOptions"), PH_NOISY);
 	if (Z_TYPE_P(cache_options) != IS_ARRAY || !phalcon_array_isset_fetch_str(&cache_service, cache_options, SL("service"))) {
-		ZVAL_STRING(&cache_service, "viewCache");
+		PHALCON_STR(&cache_service, "viewCache");
 	}
 
 	/** 

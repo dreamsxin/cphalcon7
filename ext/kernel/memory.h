@@ -83,8 +83,23 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 	} while (0)
 
 #define PHALCON_CPY_WRT(d, v) ZVAL_COPY(d, v)
-
 #define PHALCON_CPY_WRT_CTOR(d, v) ZVAL_DUP(d, v)
+
+#define PHALCON_STR(z, str) \
+	do { \
+		if (Z_TYPE_P(z) > IS_NULL) { \
+			zval_dtor(z); \
+		} \
+		ZVAL_STRING(z, str); \
+	} while (0)
+
+#define PHALCON_STRL(z, str, len) \
+	do { \
+		if (Z_TYPE_P(z) > IS_NULL) { \
+			zval_dtor(z); \
+		} \
+		ZVAL_STRINGL(z, str, len); \
+	} while (0)
 
 /* */
 #define PHALCON_OBS_VAR(z) \
@@ -120,7 +135,6 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 
 
 #define PHALCON_SEPARATE_ARRAY(a) SEPARATE_ARRAY(a)
-
 #define PHALCON_SEPARATE(z) SEPARATE_ZVAL(z)
 #define PHALCON_SEPARATE_PARAM(z) SEPARATE_ZVAL_IF_NOT_REF(z)
 

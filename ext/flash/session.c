@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Flash_Session, _getSessionMessages){
 	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_true));
 	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
-	ZVAL_STRING(&index_name, "_flashMessages");
+	PHALCON_STR(&index_name, "_flashMessages");
 	
 	PHALCON_RETURN_CALL_METHODW(&session, "get", &index_name);
 	if (PHALCON_IS_TRUE(remove)) {
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Flash_Session, _setSessionMessages){
 	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_true));
 	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
-	ZVAL_STRING(&index_name, "_flashMessages");
+	PHALCON_STR(&index_name, "_flashMessages");
 	PHALCON_CALL_METHODW(NULL, &session, "set", &index_name, messages);
 
 	RETURN_CTORW(messages);

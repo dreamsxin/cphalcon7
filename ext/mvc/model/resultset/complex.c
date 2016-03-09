@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			columns_types = phalcon_read_property(getThis(), SL("_columnTypes"), PH_NOISY);
 			i_hydrate_mode  = phalcon_get_intval(hydrate_mode);
 
-			ZVAL_STRING(&underscore, "_");
+			PHALCON_STR(&underscore, "_");
 			ZVAL_EMPTY_STRING(&empty_str);
 
 			/** 

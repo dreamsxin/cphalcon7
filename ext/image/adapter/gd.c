@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 		PHALCON_CALL_FUNCTIONW(&gd_info, "gd_info");
 
 		if (phalcon_array_isset_fetch_str(&gd_version, &gd_info, SL("GD Version"))) {
-			ZVAL_STRING(&pattern, "#\\d+\\.\\d+(?:\\.\\d+)?#");
+			PHALCON_STR(&pattern, "#\\d+\\.\\d+(?:\\.\\d+)?#");
 			RETURN_ON_FAILURE(phalcon_preg_match(&ret, &pattern, &gd_version, &matches));
 
 			if (zend_is_true(&ret)) {
@@ -224,17 +224,17 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
 		switch (Z_LVAL(type)) {
 			case 1: // GIF
-				ZVAL_STRING(&format, "gif");
+				PHALCON_STR(&format, "gif");
 				PHALCON_CALL_FUNCTIONW(&image, "imagecreatefromgif", &realpath);
 				break;
 
 			case 2: // JPEG
-				ZVAL_STRING(&format, "jpg");
+				PHALCON_STR(&format, "jpg");
 				PHALCON_CALL_FUNCTIONW(&image, "imagecreatefromjpeg", &realpath);
 				break;
 
 			case 3: // PNG
-				ZVAL_STRING(&format, "png");
+				PHALCON_STR(&format, "png");
 				PHALCON_CALL_FUNCTIONW(&image, "imagecreatefrompng", &realpath);
 				break;
 
@@ -280,11 +280,11 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
 		phalcon_update_property_this(getThis(), SL("_type"), &type);
 
-		ZVAL_STRING(&format, "png");
+		PHALCON_STR(&format, "png");
 
 		phalcon_update_property_this(getThis(), SL("_format"), &format);
 
-		ZVAL_STRING(&mime, "image/png");
+		PHALCON_STR(&mime, "image/png");
 
 		phalcon_update_property_this(getThis(), SL("_mime"), &mime);
 	} else {

@@ -754,9 +754,9 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 		quality = zbar_symbol_get_quality(symbol);
 
         if (phalcon_function_exists_ex(SL("mb_convert_encoding")) == SUCCESS) {
-			ZVAL_STRING(&fromtext, data);
-			ZVAL_STRING(from, "shift-jis");
-			ZVAL_STRING(&to, "utf-8");
+			PHALCON_STR(&fromtext, data);
+			PHALCON_STR(from, "shift-jis");
+			PHALCON_STR(&to, "utf-8");
 
 			PHALCON_CALL_FUNCTION_FLAG(flag, &totext, "mb_convert_encoding", &fromtext, &from, &to);
 			if (flag) {

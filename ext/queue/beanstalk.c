@@ -236,15 +236,15 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	 * Priority is 100 by default
 	 */
 	if (!phalcon_array_isset_fetch_str(&priority, options, SL("priority"))) {
-		ZVAL_STRING(&priority, "100");
+		PHALCON_STR(&priority, "100");
 	}
 
 	if (!phalcon_array_isset_fetch_str(&delay, options, SL("delay"))) {
-		ZVAL_STRING(&delay, "0");
+		PHALCON_STR(&delay, "0");
 	}
 
 	if (!phalcon_array_isset_fetch_str(&ttr, options, SL("ttr"))) {
-		ZVAL_STRING(&ttr, "86400");
+		PHALCON_STR(&ttr, "86400");
 	}
 
 	/** 
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, reserve){
 	if (zend_is_true(timeout)) {
 		PHALCON_CONCAT_SV(&command, "reserve-with-timeout ", timeout);
 	} else {
-		ZVAL_STRING(&command, "reserve");
+		PHALCON_STR(&command, "reserve");
 	}
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, stats){
 
 	zval command, response, status, stats;
 
-	ZVAL_STRING(&command, "stats ");
+	PHALCON_STR(&command, "stats ");
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
 	PHALCON_CALL_METHODW(&response, getThis(), "readyaml");
@@ -463,7 +463,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekReady){
 
 	zval command, response, status;
 
-	ZVAL_STRING(&command, "peek-ready");
+	PHALCON_STR(&command, "peek-ready");
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
 	PHALCON_CALL_METHODW(&response, getThis(), "readstatus");
 
@@ -485,7 +485,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekDelayed){
 
 	zval command, response, status;
 
-	ZVAL_STRING(&command, "peek-delayed");
+	PHALCON_STR(&command, "peek-delayed");
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
 	PHALCON_CALL_METHODW(&response, getThis(), "readstatus");
 
@@ -507,7 +507,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekBuried){
 
 	zval command, response, status;
 
-	ZVAL_STRING(&command, "peek-buried");
+	PHALCON_STR(&command, "peek-buried");
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
 	PHALCON_CALL_METHODW(&response, getThis(), "readstatus");
 
@@ -605,7 +605,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		buf = ecalloc(1, total_length + 1);
 		len = php_stream_read(stream, buf, total_length);
 
-		ZVAL_STRINGL(return_value, buf, len);
+		PHALCON_STRL(return_value, buf, len);
 
 		array_init_size(&meta, 4);
 		if (php_stream_populate_meta_data(stream, &meta)) {
@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 				buf = erealloc(buf, line_len + 1);
 			}
 
-			ZVAL_STRINGL(return_value, buf, line_len);
+			PHALCON_STRL(return_value, buf, line_len);
 		} else {
 			efree(buf);
 			ZVAL_FALSE(return_value);

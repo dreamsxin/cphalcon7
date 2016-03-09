@@ -85,7 +85,6 @@ zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property
 
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value)
 {
-	Z_TRY_ADDREF_P(value);
 	return zend_update_static_property(ce, name, len, value);
 }
 
@@ -102,11 +101,8 @@ int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const ch
 int phalcon_static_property_incr_ce(zend_class_entry *ce, const char *property, uint32_t len){
 
 	zval *value = phalcon_read_static_property_ce(ce, property, len);
-
 	phalcon_increment(value);
-
 	phalcon_update_static_property_ce(ce, property, len, value);
-
 	return SUCCESS;
 }
 
@@ -190,7 +186,7 @@ void phalcon_get_class_ns(zval *result, const zval *object, int lower) {
 	if (found) {
 		ZVAL_NEW_STR(result, zend_string_init(class_name + i, class_length - i + 1, 0));
 	} else {
-		ZVAL_STRINGL(result, class_name, class_length);
+		PHALCON_STRL(result, class_name, class_length);
 	}
 
 	if (lower) {
@@ -248,7 +244,7 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower) {
 	if (j > 0) {
 
 		if (found) {
-			ZVAL_STRINGL(result, class_name, class_length - j - 1);
+			PHALCON_STRL(result, class_name, class_length - j - 1);
 		} else {
 			ZVAL_EMPTY_STRING(result);
 		}
@@ -684,7 +680,7 @@ int phalcon_update_property_long(zval *object, const char *property_name, uint32
 int phalcon_update_property_str(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length)
 {
 	zval value;
-	ZVAL_STRINGL(&value, str, str_length);
+	PHALCON_STRL(&value, str, str_length);
 	return phalcon_update_property_zval(object, property_name, property_length, &value);
 }
 
@@ -867,7 +863,7 @@ int phalcon_update_property_array_str(zval *object, const char *property, uint32
 {
 	zval tmp;
 
-	ZVAL_STRINGL(&tmp, index, index_length);
+	PHALCON_STRL(&tmp, index, index_length);
 	return phalcon_update_property_array(object, property, property_length, &tmp, value);
 }
 

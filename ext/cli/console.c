@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 
-	ZVAL_STRING(&service, ISV(router));
+	PHALCON_STR(&service, ISV(router));
 
 	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	PHALCON_CALL_METHODW(&module_name, &router, "getmodulename");
 	if (zend_is_true(&module_name)) {
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			ZVAL_STRING(&event_name, "console:beforeStartModule");
+			PHALCON_STR(&event_name, "console:beforeStartModule");
 
 			PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
 			if (PHALCON_IS_FALSE(&status)) {
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		}
 
 		if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
-			ZVAL_STRING(&class_name, "Module");
+			PHALCON_STR(&class_name, "Module");
 		}
 
 		PHALCON_CALL_METHODW(&module_object, &dependency_injector, "getshared", &class_name);
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			phalcon_update_property_this(getThis(), SL("_moduleObject"), &module_object);
 
-			ZVAL_STRING(&event_name, "console:afterStartModule");
+			PHALCON_STR(&event_name, "console:afterStartModule");
 
 			PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
 			if (PHALCON_IS_FALSE(&status)) {
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	PHALCON_CALL_METHODW(&action_name, &router, "getactionname");
 	PHALCON_CALL_METHODW(&params, &router, "getparams");
 
-	ZVAL_STRING(&service, ISV(dispatcher));
+	PHALCON_STR(&service, ISV(dispatcher));
 
 	PHALCON_CALL_METHODW(&dispatcher, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&dispatcher, phalcon_dispatcherinterface_ce);
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	PHALCON_CALL_METHODW(NULL, &dispatcher, "setactionname", &action_name);
 	PHALCON_CALL_METHODW(NULL, &dispatcher, "setparams", &params);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "console:beforeHandleTask");
+		PHALCON_STR(&event_name, "console:beforeHandleTask");
 
 		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), &dispatcher);
 		if (PHALCON_IS_FALSE(&status)) {
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 	PHALCON_CALL_METHODW(&status, &dispatcher, "dispatch");
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "console:afterHandleTask");
+		PHALCON_STR(&event_name, "console:afterHandleTask");
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), &status);
 	}
 

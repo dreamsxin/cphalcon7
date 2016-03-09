@@ -294,7 +294,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
 	if (!prefix) {
-		ZVAL_STRING(&prefixed, "_PHCX");
+		PHALCON_STR(&prefixed, "_PHCX");
 	} else {
 		PHALCON_CONCAT_SV(&prefixed, "_PHCX", prefix);
 	}
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 	zend_string *str_key;
 	ulong idx;
 
-	ZVAL_STRING(&prefixed, "_PHCX");
+	PHALCON_STR(&prefixed, "_PHCX");
 
 	phalcon_return_property(&options, getThis(), SL("_options"));
 

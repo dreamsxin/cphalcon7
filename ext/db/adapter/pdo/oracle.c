@@ -393,7 +393,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, getDefaultIdValue){
 
 	zval null_value;
 
-	ZVAL_STRING(&null_value, "default");
+	PHALCON_STR(&null_value, "default");
 
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &null_value);

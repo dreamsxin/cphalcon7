@@ -202,12 +202,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		|| phalcon_compare_strict_string(&method_name, SL("getPut"))
 		|| phalcon_compare_strict_string(&method_name, SL("getQuery"))
 		|| phalcon_compare_strict_string(&method_name, SL("getServer"))) {
-		ZVAL_STRING(&service_name, ISV(request));
+		PHALCON_STR(&service_name, ISV(request));
 	} else if (phalcon_compare_strict_string(&method_name, SL("getSession"))) {
-		ZVAL_STRING(&method_name, "get");
-		ZVAL_STRING(&service_name, ISV(session));
+		PHALCON_STR(&method_name, "get");
+		PHALCON_STR(&service_name, ISV(session));
 	} else if (phalcon_compare_strict_string(&method_name, SL("getParam"))) {
-		ZVAL_STRING(&service_name, ISV(dispatcher));
+		PHALCON_STR(&service_name, ISV(dispatcher));
 	}
 
 	PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name);

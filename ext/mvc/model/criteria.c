@@ -432,7 +432,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, innerJoin) {
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	ZVAL_STRING(&type, "INNER");
+	PHALCON_STR(&type, "INNER");
 
 	PHALCON_CALL_SELFW(NULL, "join", model, conditions, alias, &type);
 
@@ -465,7 +465,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, leftJoin) {
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	ZVAL_STRING(&type, "LEFT");
+	PHALCON_STR(&type, "LEFT");
 
 	PHALCON_CALL_SELFW(NULL, "join", model, conditions, alias, &type);
 
@@ -498,7 +498,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, rightJoin) {
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	ZVAL_STRING(&type, "RIGHT");
+	PHALCON_STR(&type, "RIGHT");
 
 	PHALCON_CALL_SELFW(NULL, "join", model, conditions, alias, &type);
 
@@ -1242,7 +1242,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 	object_init_ex(return_value, phalcon_mvc_model_criteria_ce);
 
 	if (zend_hash_num_elements(Z_ARRVAL_P(data))) {
-		ZVAL_STRING(&service, ISV(modelsMetadata));
+		PHALCON_STR(&service, ISV(modelsMetadata));
 
 		PHALCON_CALL_METHODW(&meta_data, dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
@@ -1558,7 +1558,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 		 * If the conditions is a single numeric field. We internally create a condition
 		 * using the related primary key
 		 */
-		ZVAL_STRING(&service_name, ISV(modelsMetadata));
+		PHALCON_STR(&service_name, ISV(modelsMetadata));
 
 		/** 
 		 * Get the models metadata service to obtain the column names, column map and
@@ -1611,7 +1611,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 		}
 	}
 
-	ZVAL_STRING(&phql, "SELECT ");
+	PHALCON_STR(&phql, "SELECT ");
 
 	columns = phalcon_read_property(getThis(), SL("_columns"), PH_NOISY);
 	if (Z_TYPE_P(columns) != IS_NULL) {
@@ -1822,7 +1822,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateInsert) {
 	zend_string *str_key;
 	ulong idx;
 
-	ZVAL_STRING(&phql, "INSERT INTO ");
+	PHALCON_STR(&phql, "INSERT INTO ");
 
 	model = phalcon_read_property(getThis(), SL("_model"), PH_NOISY);
 	if (!zend_is_true(model)) {
@@ -1931,7 +1931,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 		return;
 	}
 
-	ZVAL_STRING(&service_name, ISV(modelsMetadata));
+	PHALCON_STR(&service_name, ISV(modelsMetadata));
 
 	PHALCON_CALL_METHODW(&meta_data, &dependency_injector, "getshared", &service_name);
 	PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
@@ -2109,7 +2109,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 		 * If the conditions is a single numeric field. We internally create a condition
 		 * using the related primary key
 		 */
-		ZVAL_STRING(&service_name, ISV(modelsMetadata));
+		PHALCON_STR(&service_name, ISV(modelsMetadata));
 
 		/**
 		 * Get the models metadata service to obtain the column names, column map and

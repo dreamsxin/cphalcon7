@@ -563,7 +563,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 			PHALCON_CALL_METHODW(NULL, &memcache, "set", &special_key, &keys);
 		}
 	} else {
-		ZVAL_STRING(&param, "slabs");
+		PHALCON_STR(&param, "slabs");
 
 		PHALCON_CALL_METHODW(&all_slabs, &memcache, "getextendedstats", &param);
 

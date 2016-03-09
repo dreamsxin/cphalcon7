@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	phalcon_fetch_params(0, 3, 0, &role, &resource, &access);
 
-	ZVAL_STRING(&star, "*");
+	PHALCON_STR(&star, "*");
 
 	phalcon_update_property_this(getThis(), SL("_activeRole"), role);
 	phalcon_update_property_this(getThis(), SL("_activeResource"), resource);
@@ -671,7 +671,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "acl:beforeCheckAccess");
+		PHALCON_STR(&event_name, "acl:beforeCheckAccess");
 
 		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis());
 		if (PHALCON_IS_FALSE(&status)) {
@@ -746,7 +746,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	phalcon_update_property_this(getThis(), SL("_accessGranted"), return_value);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "acl:afterCheckAccess");
+		PHALCON_STR(&event_name, "acl:afterCheckAccess");
 		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), return_value);
 	}
 }

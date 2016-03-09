@@ -483,7 +483,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	}
 
 	if (ds == NULL) {
-		ZVAL_STRING(&ds_slash, slash);
+		PHALCON_STR(&ds_slash, slash);
 	} else {
 		PHALCON_CPY_WRT(&ds_slash, ds);
 	}
@@ -510,7 +510,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 			if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 				phalcon_update_property_this(getThis(), SL("_checkedPath"), &file_path);
 
-				ZVAL_STRING(&event_name, "loader:beforeCheckPath");
+				PHALCON_STR(&event_name, "loader:beforeCheckPath");
 				PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
 			}
 
@@ -526,7 +526,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 					phalcon_update_property_this(getThis(), SL("_foundPath"), &file_path);
 
-					ZVAL_STRING(&event_name, "loader:pathFound");
+					PHALCON_STR(&event_name, "loader:pathFound");
 					PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), &file_path);
 				}
 
@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "loader:beforeCheckClass");
+		PHALCON_STR(&event_name, "loader:beforeCheckClass");
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
 	}
 
@@ -584,7 +584,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 			if (Z_TYPE(events_manager) == IS_OBJECT) {
 				phalcon_update_property_this(getThis(), SL("_foundPath"), &file_path);
 
-				ZVAL_STRING(&event_name, "loader:pathFound");
+				PHALCON_STR(&event_name, "loader:pathFound");
 				PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), &file_path);
 			}
 
@@ -594,8 +594,8 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		}
 	}
 
-	ZVAL_STRING(&ds, slash);
-	ZVAL_STRING(&namespace_separator, "\\");
+	PHALCON_STR(&ds, slash);
+	PHALCON_STR(&namespace_separator, "\\");
 
 	if (!zend_is_true(&found)) {
 		extensions = phalcon_read_property(getThis(), SL("_extensions"), PH_NOISY);
@@ -638,7 +638,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	}
 
 	if (!zend_is_true(&found)) {
-		ZVAL_STRING(&pseudo_separator, "_");
+		PHALCON_STR(&pseudo_separator, "_");
 
 		/** 
 		 * Checking in prefixes
@@ -697,7 +697,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	 * Call 'afterCheckClass' event
 	 */
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "loader:afterCheckClass");
+		PHALCON_STR(&event_name, "loader:afterCheckClass");
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
 	}
 

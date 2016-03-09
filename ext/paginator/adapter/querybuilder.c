@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	}
 
 	/* Get the connection through the model */
-	ZVAL_STRING(&service_name, "modelsManager");
+	PHALCON_STR(&service_name, "modelsManager");
 
 	PHALCON_CALL_METHODW(&models_manager, &dependency_injector, "getshared", &service_name);
 	if (Z_TYPE(models_manager) != IS_OBJECT) {
@@ -334,7 +334,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		 * Complete objects are treated in a different way
 		 */
 		if (PHALCON_IS_STRING(&type, "object")) {
-			ZVAL_STRING(&select_columns, "*");
+			PHALCON_STR(&select_columns, "*");
 
 			phalcon_array_update_string(&intermediate, IS(columns), &select_columns, PH_COPY);
 			break;

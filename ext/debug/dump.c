@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Debug_Dump, all)
 {
 	zval method_name, call_object, arg_list;
 
-	ZVAL_STRING(&method_name, "variables");
+	PHALCON_STR(&method_name, "variables");
 
 	array_init_size(&call_object, 2);
 	phalcon_array_append(&call_object, getThis(), PH_COPY);
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Debug_Dump, getStyle){
 	styles  = phalcon_read_property(getThis(), SL("_styles"), PH_NOISY);
 
 	if (!phalcon_array_isset_fetch(return_value, styles, type)) {
-		ZVAL_STRING(return_value, "color:gray");
+		PHALCON_STR(return_value, "color:gray");
 	}
 }
 
@@ -232,11 +232,11 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 	}
 
 	ZVAL_LONG(&new_tab, Z_LVAL_P(tab) - 1);
-	ZVAL_STRING(&space, "  ");
+	PHALCON_STR(&space, "  ");
 
 	if (Z_TYPE_P(variable) == IS_ARRAY) {
-		ZVAL_STRING(&str, "<b style =':style'>Array</b> (<span style =':style'>:count</span>) (\n");
-		ZVAL_STRING(&type, "arr");
+		PHALCON_STR(&str, "<b style =':style'>Array</b> (<span style =':style'>:count</span>) (\n");
+		PHALCON_STR(&type, "arr");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -263,9 +263,9 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			phalcon_concat_self(return_value, &repeat);
 
-			ZVAL_STRING(&str, "[<span style=':style'>:key</span>] => ");
+			PHALCON_STR(&str, "[<span style=':style'>:key</span>] => ");
 
-			ZVAL_STRING(&type, "arr");
+			PHALCON_STR(&type, "arr");
 
 			PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -290,8 +290,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, &tmp);
 	} else if (Z_TYPE_P(variable) == IS_OBJECT) {
-		ZVAL_STRING(&str, "<b style=':style'>Object</b> :class");
-		ZVAL_STRING(&type, "obj");
+		PHALCON_STR(&str, "<b style=':style'>Object</b> :class");
+		PHALCON_STR(&type, "obj");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -309,8 +309,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_get_parent_class(&class_name, variable, 0);
 
 		if (zend_is_true(&class_name)) {
-			ZVAL_STRING(&str, " <b style=':style'>extends</b> :parent");
-			ZVAL_STRING(&type, "obj");
+			PHALCON_STR(&str, " <b style=':style'>extends</b> :parent");
+			PHALCON_STR(&type, "obj");
 
 			PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -357,8 +357,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			PHALCON_SCONCAT(return_value, &tmp);
 
-			ZVAL_STRING(&str, "-><span style=':style'>:key</span> (<span style=':style'>:type</span>) = ");
-			ZVAL_STRING(&type, "obj");
+			PHALCON_STR(&str, "-><span style=':style'>:key</span> (<span style=':style'>:type</span>) = ");
+			PHALCON_STR(&type, "obj");
 
 			PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -389,8 +389,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, &tmp);
 
-		ZVAL_STRING(&str, ":class <b style=':style'>methods</b>: (<span style=':style'>:count</span>) (\n");
-		ZVAL_STRING(&type, "obj");
+		PHALCON_STR(&str, ":class <b style=':style'>methods</b>: (<span style=':style'>:count</span>) (\n");
+		PHALCON_STR(&type, "obj");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -413,8 +413,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 			PHALCON_SCONCAT(return_value, &tmp);
 
-			ZVAL_STRING(&str, "-><span style=':style'>:method</span>();\n");
-			ZVAL_STRING(&type, "obj");
+			PHALCON_STR(&str, "-><span style=':style'>:method</span>();\n");
+			PHALCON_STR(&type, "obj");
 
 			PHALCON_CALL_SELFW(&style, "getstyle", &type);
 			array_init(&replace_pairs);
@@ -435,8 +435,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT_VS(return_value, &tmp, ")");
 	} else if (Z_TYPE_P(variable) == IS_LONG) {
-		ZVAL_STRING(&str, "<b style=':style'>Integer</b> (<span style=':style'>:var</span>)");
-		ZVAL_STRING(&type, "int");
+		PHALCON_STR(&str, "<b style=':style'>Integer</b> (<span style=':style'>:var</span>)");
+		PHALCON_STR(&type, "int");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -449,8 +449,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, &output);
 	} else if (Z_TYPE_P(variable) == IS_DOUBLE) {
-		ZVAL_STRING(&str, "<b style=':style'>Float</b> (<span style=':style'>:var</span>)");
-		ZVAL_STRING(&type, "float");
+		PHALCON_STR(&str, "<b style=':style'>Float</b> (<span style=':style'>:var</span>)");
+		PHALCON_STR(&type, "float");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -463,8 +463,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, &output);
 	} else if (phalcon_is_numeric_ex(variable)) {
-		ZVAL_STRING(&str, "<b style=':style'>Numeric string</b> (<span style=':style'>:length</span>) \"<span style=':style'>:var</span>\"");
-		ZVAL_STRING(&type, "num");
+		PHALCON_STR(&str, "<b style=':style'>Numeric string</b> (<span style=':style'>:length</span>) \"<span style=':style'>:var</span>\"");
+		PHALCON_STR(&type, "num");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -478,8 +478,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, &output);
 	} else if (Z_TYPE_P(variable) == IS_STRING) {
-		ZVAL_STRING(&str, "<b style=':style'>String</b> (<span style=':style'>:length</span>) \"<span style=':style'>:var</span>\"");
-		ZVAL_STRING(&type, "str");
+		PHALCON_STR(&str, "<b style=':style'>String</b> (<span style=':style'>:length</span>) \"<span style=':style'>:var</span>\"");
+		PHALCON_STR(&type, "str");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -493,8 +493,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, &output);
 	} else if (PHALCON_IS_BOOL(variable)) {
-		ZVAL_STRING(&str, "<b style=':style'>Boolean</b> (<span style=':style'>:var</span>)");
-		ZVAL_STRING(&type, "bool");
+		PHALCON_STR(&str, "<b style=':style'>Boolean</b> (<span style=':style'>:var</span>)");
+		PHALCON_STR(&type, "bool");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -511,8 +511,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, &output);
 	} else if (Z_TYPE_P(variable) == IS_NULL) {
-		ZVAL_STRING(&str, "<b style=':style'>NULL</b>");
-		ZVAL_STRING(&type, "null");
+		PHALCON_STR(&str, "<b style=':style'>NULL</b>");
+		PHALCON_STR(&type, "null");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -524,8 +524,8 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 
 		PHALCON_SCONCAT(return_value, &output);
 	} else {
-		ZVAL_STRING(&str, "(<span style=':style'>:var</span>)");
-		ZVAL_STRING(&type, "other");
+		PHALCON_STR(&str, "(<span style=':style'>:var</span>)");
+		PHALCON_STR(&type, "other");
 
 		PHALCON_CALL_SELFW(&style, "getstyle", &type);
 
@@ -557,8 +557,8 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
 		name = &PHALCON_GLOBAL(z_null);
 	}
 
-	ZVAL_STRING(&str, "<pre style=':style'>:output</pre>");
-	ZVAL_STRING(&type, "pre");
+	PHALCON_STR(&str, "<pre style=':style'>:output</pre>");
+	PHALCON_STR(&type, "pre");
 
 	PHALCON_CALL_SELFW(&style, "getstyle", &type);
 	PHALCON_CALL_SELFW(&output, "output", variable, name);

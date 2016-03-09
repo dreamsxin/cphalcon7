@@ -134,7 +134,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 		function_table = ce ? &ce->function_table : EG(function_table);
 	} else {
-		ZVAL_STRINGL(&func_name, method_name, method_len);
+		PHALCON_STRL(&func_name, method_name, method_len);
 		function_table = EG(function_table);
 	}
 

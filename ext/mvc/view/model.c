@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (Z_TYPE(view) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 
-		ZVAL_STRING(&service, "view");
+		PHALCON_STR(&service, "view");
 
 		PHALCON_CALL_METHODW(&view, &dependency_injector, "getshared", &service);
 	}
@@ -583,7 +583,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	 * Call beforeRender if there is an events manager
 	 */
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "view:beforeRender");
+		PHALCON_STR(&event_name, "view:beforeRender");
 		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis());
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_NULL();
@@ -642,7 +642,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				 * Call beforeRenderView if there is a events manager available
 				 */
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					ZVAL_STRING(&event_name, "view:beforeRenderView");
+					PHALCON_STR(&event_name, "view:beforeRenderView");
 
 					PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
 					if (PHALCON_IS_FALSE(&status)) {
@@ -657,7 +657,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				 */
 				ZVAL_FALSE(&not_exists);
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					ZVAL_STRING(&event_name, "view:afterRenderView");
+					PHALCON_STR(&event_name, "view:afterRenderView");
 					PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis());
 				}
 
@@ -682,7 +682,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	 * Call afterRender event
 	 */
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "view:afterRender");
+		PHALCON_STR(&event_name, "view:afterRender");
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis());
 	}
 

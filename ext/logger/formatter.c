@@ -105,10 +105,10 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 
 			if (str_key) {;
 				str_length = spprintf(&tmp, 0, "{%s}", str_key->val);
-				ZVAL_STRINGL(&index, tmp, str_length);
+				PHALCON_STRL(&index, tmp, str_length);
 			} else {
 				str_length = spprintf(&tmp, 0, "{%ld}", idx);
-				ZVAL_STRINGL(&index, tmp, str_length);
+				PHALCON_STRL(&index, tmp, str_length);
 			}
 
 			Z_TRY_ADDREF_P(val);

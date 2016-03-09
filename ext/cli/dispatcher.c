@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "dispatch:beforeException");
+		PHALCON_STR(&event_name, "dispatch:beforeException");
 
 		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), &exception);
 		if (PHALCON_IS_FALSE(&status)) {
@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "dispatch:beforeException");
+		PHALCON_STR(&event_name, "dispatch:beforeException");
 
 		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), exception);
 		if (PHALCON_IS_FALSE(&status)) {

@@ -175,7 +175,7 @@ void phalcon_prepare_virtual_path_ex(zval *return_value, const char *path, size_
 		}
 	}
 
-	ZVAL_STRINGL(return_value, copy, path_len);
+	PHALCON_STRL(return_value, copy, path_len);
 }
 
 /**

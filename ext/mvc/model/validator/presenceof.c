@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
-	ZVAL_STRING(&option, "field");
+	PHALCON_STR(&option, "field");
 
 	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", &option);
 	if (Z_TYPE(field_name) != IS_STRING) {
@@ -106,19 +106,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		ZVAL_STRING(&option, ISV(message));
+		PHALCON_STR(&option, ISV(message));
 
 		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 		if (!zend_is_true(&message)) {
 			PHALCON_CONCAT_SVS(&message, "'", &field_name, "' is required");
 		}
 
-		ZVAL_STRING(&type, "PresenceOf");
+		PHALCON_STR(&type, "PresenceOf");
 
 		/*
 		 * Is code set
 		 */
-		ZVAL_STRING(&option, ISV(code));
+		PHALCON_STR(&option, ISV(code));
 
 		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
 		if (zend_is_true(&is_set_code)) {

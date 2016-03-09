@@ -69,7 +69,7 @@ PHP_METHOD(Phalcon_Assets_Resource_Js, __construct){
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
 
-	ZVAL_STRING(&type, "js");
+	PHALCON_STR(&type, "js");
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_assets_resource_js_ce, getThis(), "__construct",	&type, path,
 		(local ? local : &PHALCON_GLOBAL(z_true)),

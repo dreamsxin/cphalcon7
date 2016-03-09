@@ -455,7 +455,7 @@ PHP_METHOD(Phalcon_Tag, getUrlService){
 
 		PHALCON_VERIFY_INTERFACEW(&dependency_injector, phalcon_diinterface_ce);
 
-		ZVAL_STRING(&service, ISV(url));
+		PHALCON_STR(&service, ISV(url));
 
 		PHALCON_CALL_METHODW(&url, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&url, phalcon_mvc_urlinterface_ce);
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Tag, getEscaperService){
 
 		PHALCON_VERIFY_INTERFACEW(&dependency_injector, phalcon_diinterface_ce);
 
-		ZVAL_STRING(&service, ISV(escaper));
+		PHALCON_STR(&service, ISV(escaper));
 
 		PHALCON_CALL_METHODW(&escaper, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&escaper, phalcon_escaperinterface_ce);
@@ -750,7 +750,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 	PHALCON_CALL_METHODW(&internal_url, &url, "get", &action, &query, &z_local);
 	phalcon_array_update_str(&params, SL("href"), &internal_url, PH_COPY);
 
-	ZVAL_STRING(&code, "<a");
+	PHALCON_STR(&code, "<a");
 
 	phalcon_tag_render_attributes(&code, &params);
 	if (EG(exception)) {
@@ -828,7 +828,7 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 
 	phalcon_array_update_string(&params, IS(type), type, PH_COPY);
 
-	ZVAL_STRING(&code, "<input");
+	PHALCON_STR(&code, "<input");
 
 	phalcon_tag_render_attributes(&code, &params);
 	if (EG(exception)) {
@@ -922,7 +922,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 
 	phalcon_array_update_string(&params, IS(type), type, PH_COPY);
 
-	ZVAL_STRING(&code, "<input");
+	PHALCON_STR(&code, "<input");
 
 	phalcon_tag_render_attributes(&code, &params);
 	if (EG(exception)) {
@@ -947,7 +947,7 @@ static void phalcon_tag_generic_field(INTERNAL_FUNCTION_PARAMETERS, const char* 
 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
-	ZVAL_STRING(&field_type, type);
+	PHALCON_STR(&field_type, type);
 
 	if (as_value) {
 		PHALCON_RETURN_CALL_SELFW("_inputfield", &field_type, parameters, &PHALCON_GLOBAL(z_true));
@@ -962,7 +962,7 @@ static void phalcon_tag_generic_field_checked(INTERNAL_FUNCTION_PARAMETERS, cons
 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
-	ZVAL_STRING(&field_type, type);
+	PHALCON_STR(&field_type, type);
 	PHALCON_RETURN_CALL_SELFW("_inputfieldchecked", &field_type, parameters);
 }
 
@@ -1377,7 +1377,7 @@ PHP_METHOD(Phalcon_Tag, textArea){
 		escaped = content;
 	}
 
-	ZVAL_STRING(&code, "<textarea");
+	PHALCON_STR(&code, "<textarea");
 
 	phalcon_tag_render_attributes(&code, &params);
 	if (EG(exception)) {
@@ -1455,7 +1455,7 @@ PHP_METHOD(Phalcon_Tag, form){
 		phalcon_array_update_str(&params, SL("action"), &action, PH_COPY);
 	}
 
-	ZVAL_STRING(&code, "<form");
+	PHALCON_STR(&code, "<form");
 
 	phalcon_tag_render_attributes(&code, &params);
 	if (EG(exception)) {
@@ -1694,7 +1694,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 		phalcon_array_unset_str(&params, SL("rel"), PH_COPY);
 		PHALCON_CONCAT_SVS(&code, "<link rel=\"", &rel, "\"");
 	} else {
-		ZVAL_STRING(&code, "<link rel=\"stylesheet\"");
+		PHALCON_STR(&code, "<link rel=\"stylesheet\"");
 	}
 
 	phalcon_tag_render_attributes(&code, &params);
@@ -1806,7 +1806,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 		phalcon_array_update_str(&params, SL("src"), &src, PH_COPY);
 	}
 
-	ZVAL_STRING(&code, "<script");
+	PHALCON_STR(&code, "<script");
 
 	phalcon_tag_render_attributes(&code, &params);
 	if (EG(exception)) {
@@ -1887,7 +1887,7 @@ PHP_METHOD(Phalcon_Tag, image){
 		phalcon_array_update_str(&params, SL("src"), &src, PH_COPY);
 	}
 
-	ZVAL_STRING(&code, "<img");
+	PHALCON_STR(&code, "<img");
 
 	phalcon_tag_render_attributes(&code, &params);
 	if (EG(exception)) {
@@ -1925,7 +1925,7 @@ PHP_METHOD(Phalcon_Tag, friendlyTitle){
 	phalcon_fetch_params(0, 1, 2, &text, &separator, &lowercase);
 
 	if (!separator) {
-		ZVAL_STRING(&sep, "-");
+		PHALCON_STR(&sep, "-");
 	} else {
 		PHALCON_CPY_WRT(&sep, separator);
 	}
@@ -1934,7 +1934,7 @@ PHP_METHOD(Phalcon_Tag, friendlyTitle){
 		lowercase = &PHALCON_GLOBAL(z_true);
 	}
 
-	ZVAL_STRING(&pattern, "~[^a-z0-9A-Z]+~");
+	PHALCON_STR(&pattern, "~[^a-z0-9A-Z]+~");
 
 	PHALCON_CALL_FUNCTIONW(&friendly, "preg_replace", &pattern, &sep, text);
 	if (zend_is_true(lowercase)) {

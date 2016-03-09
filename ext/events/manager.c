@@ -373,6 +373,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 	zend_class_entry *ce, *weakref_ce;
 
 	phalcon_fetch_params(0, 2, 0, &queue, &event);
+	ZVAL_NULL(&status);
 
 	if (unlikely(Z_TYPE_P(queue) != IS_ARRAY)) {
 		if (Z_TYPE_P(queue) == IS_OBJECT) {
@@ -665,6 +666,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	zval event_name, status, collect, event, fire_events;
 
 	phalcon_fetch_params(0, 2, 2, &event_type, &source, &data, &cancelable);
+	ZVAL_NULL(&status);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);

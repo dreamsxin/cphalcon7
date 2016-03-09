@@ -103,15 +103,17 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 	}
 
 	for (i = 0; i < n - 1; i++) {
-		phalcon_array_fetch_long(&index, directive, i, PH_NOISY);
+		zval index1;
+		phalcon_array_fetch_long(&index1, directive, i, PH_NOISY);
 		if (!phalcon_array_isset_fetch(&t2, tmp1, &index)) {
-			phalcon_array_update_zval(tmp1, &index, &t2, PH_COPY);
+			array_init(&t2);
+			phalcon_array_update_zval(tmp1, &index1, &t2, PH_COPY);
 		} else if (Z_TYPE_P(&t2) != IS_ARRAY) {
 			convert_to_array_ex(&t2);
 		}
 
 		tmp1 = &t2;
-		zval_ptr_dtor(&index);
+		zval_ptr_dtor(&index1);
 	}
 
 	phalcon_array_fetch_long(&index, directive, n - 1, PH_NOISY);

@@ -914,7 +914,6 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 	p = arr;
 
 	for (i = 0; i < types_length; ++i) {
-
 		re_update = 0;
 		must_continue = 0;
 		wrap_tmp = 0;

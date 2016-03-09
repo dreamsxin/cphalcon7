@@ -137,16 +137,12 @@ PHP_METHOD(Phalcon_Config, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &array_config);
 
-	/** 
-	 * Throw exceptions if bad parameters are passed
-	 */
-	if (array_config && Z_TYPE_P(array_config) != IS_ARRAY && Z_TYPE_P(array_config) != IS_NULL) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_config_exception_ce, "The configuration must be an Array");
-		return;
-	}
-
-	if (array_config && Z_TYPE_P(array_config) == IS_ARRAY) {
-		PHALCON_CALL_SELFW(NULL, "val", array_config);
+	if (array_config) {
+		if (Z_TYPE_P(array_config) == IS_ARRAY) {
+			PHALCON_CALL_SELFW(NULL, "val", array_config);
+		} else if (Z_TYPE_P(array_config) != IS_NULL) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_config_exception_ce, "The configuration must be an Array");
+		}
 	}
 }
 
@@ -183,9 +179,11 @@ PHP_METHOD(Phalcon_Config, val){
 			object_init_ex(&instance, phalcon_config_ce);
 			PHALCON_CALL_METHODW(NULL, &instance, "__construct", value);
 			PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, &instance);
+			zval_ptr_dtor(&instance);
 		} else {
 			PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, value);
 		}
+		zval_ptr_dtor(&key);
 	} ZEND_HASH_FOREACH_END();
 }
 

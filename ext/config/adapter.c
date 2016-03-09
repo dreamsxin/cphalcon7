@@ -27,6 +27,7 @@
 #include "kernel/string.h"
 #include "kernel/fcall.h"
 #include "kernel/array.h"
+#include "kernel/operators.h"
 
 /**
  * Phalcon\Config\Adapter
@@ -101,22 +102,24 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 
 	phalcon_fetch_params(0, 0, 2, &file_path, &absolute_path);
 
-	instances = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));
-	if (!phalcon_array_isset_fetch(return_value, instances, file_path)) {
-		phalcon_get_called_class(&class_name);
-		ce0 = phalcon_fetch_class(&class_name);
+	phalcon_get_called_class(&class_name);
+	ce0 = phalcon_fetch_class(&class_name);
+	object_init_ex(return_value, ce0);
 
-		object_init_ex(return_value, ce0);
+	if (!file_path || PHALCON_IS_EMPTY(file_path)) {
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+	} else {
+		instances = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));		
 
-		if (file_path) {
-			if (absolute_path == NULL) {
-				absolute_path = &PHALCON_GLOBAL(z_false);
-			}
-
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", file_path, absolute_path);
-		} else {
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+		if (phalcon_array_isset_fetch(return_value, instances, file_path)) {
+			return;
 		}
+
+		if (absolute_path == NULL) {
+			absolute_path = &PHALCON_GLOBAL(z_false);
+		}
+
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct", file_path, absolute_path);
 
 		phalcon_update_static_property_array_multi_ce(phalcon_config_adapter_ce, SL("_instances"), return_value, SL("z"), 1, file_path);
 	}

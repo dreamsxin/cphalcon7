@@ -34,7 +34,8 @@
 /**
  * Reads class constant from string name and returns its value
  */
-int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, const char *constant_name, uint32_t constant_length) {
+int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, const char *constant_name, uint32_t constant_length)
+{
 
 	zval *result;
 
@@ -50,7 +51,8 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 /*
  * Multiple array-offset update
  */
-int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...) {
+int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...)
+{
 
 	zval *tmp_arr, arr;
 	va_list ap;

@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
 	}
 
 	if (zend_is_true(shared)) {
-		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "getshared");
+		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "getshared", name, args, noerror);
 	} else {
 		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "get", name, args, noerror);
 	}

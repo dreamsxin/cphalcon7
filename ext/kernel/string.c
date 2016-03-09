@@ -1413,6 +1413,7 @@ int phalcon_preg_match(zval *retval, zval *regex, zval *subject, zval *matches)
 	int result;
 
 	if (matches) {
+		ZVAL_UNDEF(matches);
 		ZVAL_MAKE_REF(matches);
 		PHALCON_CALL_FUNCTION_FLAG(result, retval, "preg_match", regex, subject, matches);
 		ZVAL_UNREF(matches);

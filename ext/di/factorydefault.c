@@ -237,4 +237,7 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_STR(&name, ISV(assets));
 	PHALCON_STR(&definition, "Phalcon\\Assets\\Manager");
 	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
+
+	zval_ptr_dtor(&name);
+	zval_ptr_dtor(&definition);
 }

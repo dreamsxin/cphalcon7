@@ -76,7 +76,6 @@ int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index)
 
 	if (zv) {		
 		PHALCON_CPY_WRT(fetched, zv);
-		zval_ptr_dtor(zv);
 		return 1;
 	}
 
@@ -458,7 +457,6 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 
 		if (result) {
 			PHALCON_CPY_WRT(return_value, zv);
-			zval_ptr_dtor(zv);
 			return 1;
 		}
 
@@ -483,7 +481,6 @@ int phalcon_array_fetch_str(zval *return_value, const zval *arr, const char *ind
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
 			PHALCON_CPY_WRT(return_value, zv);
-			zval_ptr_dtor(zv);
 			return SUCCESS;
 		}
 
@@ -508,7 +505,6 @@ int phalcon_array_fetch_string(zval *return_value, const zval *arr, zend_string 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_find(Z_ARRVAL_P(arr), index)) != NULL) {
 			PHALCON_CPY_WRT(return_value, zv);
-			zval_ptr_dtor(zv);
 			return SUCCESS;
 		}
 
@@ -533,7 +529,6 @@ int phalcon_array_fetch_long(zval *return_value, const zval *arr, ulong index, i
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
 			PHALCON_CPY_WRT(return_value, zv);
-			zval_ptr_dtor(zv);
 			return SUCCESS;
 		}
 

@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 	PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_cache_frontendinterface_ce, phalcon_cache_exception_ce, 0);
 
-	if (options || Z_TYPE_P(options) == IS_ARRAY) {
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		/**
 		 * A common option is the prefix
 		 */

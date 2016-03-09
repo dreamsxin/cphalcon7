@@ -501,7 +501,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	zval *resource, target_uri, prefixed_path, attributes, parameters, filtered_joined_content, html;
 
 	phalcon_fetch_params(0, 2, 2, &collection, &callback, &type, &args);
-
+	ZVAL_NULL(&source_base_path);
+	ZVAL_NULL(&target_base_path);
 	if (z_type) {
 		PHALCON_CPY_WRT_CTOR(&type, z_type);
 	}
@@ -613,6 +614,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		}
 	}
 
+	ZVAL_NULL(&output);
+	ZVAL_NULL(&filtered_joined_content);
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(resources), resource) {
 		zval filter_needed, source_path, target_path, path, content, must_filter, *filter;
 

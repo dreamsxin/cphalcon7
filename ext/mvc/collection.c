@@ -273,15 +273,12 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	/**
 	 * We use a default DI if the user doesn't define one
 	 */
-	if (!dependency_injector || Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATICW(&di, phalcon_di_ce, "getdefault");
+	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
+		PHALCON_VERIFY_INTERFACE_EX(&di, phalcon_diinterface_ce, phalcon_mvc_collection_exception_ce, 0);
+		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
 	} else {
-		PHALCON_CPY_WRT(&di, dependency_injector);
+		PHALCON_CALL_CE_STATICW(&di, phalcon_di_ce, "getdefault");
 	}
-
-	PHALCON_VERIFY_INTERFACE_EX(&di, phalcon_diinterface_ce, phalcon_mvc_collection_exception_ce, 0);
-
-	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &di);
 
 	/**
 	 * Inject the manager service from the DI

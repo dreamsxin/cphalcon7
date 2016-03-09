@@ -22,7 +22,7 @@ class AysncTest extends PHPUnit_Framework_TestCase
 {
 	public function test()
 	{
-		if (!function_exists('ftok') || !function_exists('pcntl_fork')) {
+		if (!function_exists('ftok') || !function_exists('pcntl_fork') || !function_exists('msg_get_queue')) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}

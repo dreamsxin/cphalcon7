@@ -877,8 +877,8 @@ int phalcon_update_property_array_string(zval *object, const char *property, uin
 /**
  * Appends a zval value to an array property
  */
-int phalcon_update_property_array_append(zval *object, const char *property, uint32_t property_length, zval *value) {
-
+int phalcon_update_property_array_append(zval *object, const char *property, uint32_t property_length, zval *value)
+{
 	zval *tmp;
 
 	if (!object) {
@@ -904,8 +904,8 @@ int phalcon_update_property_array_append(zval *object, const char *property, uin
 	return SUCCESS;
 }
 
-int phalcon_update_property_array_merge(zval *object, const char *property, uint32_t property_length, zval *values) {
-
+int phalcon_update_property_array_merge(zval *object, const char *property, uint32_t property_length, zval *values)
+{
 	zval *tmp;
 
 	if (!object) {

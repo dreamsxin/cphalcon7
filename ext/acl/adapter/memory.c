@@ -196,7 +196,6 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addRole){
 
 		object_init_ex(&object, phalcon_acl_role_ce);
 		PHALCON_CALL_METHOD(NULL, &object, "__construct", role);
-
 	}
 
 	phalcon_return_property(&roles_names, getThis(), SL("_rolesNames"));

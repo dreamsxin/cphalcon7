@@ -202,7 +202,7 @@ void phalcon_unique_path_key(zval *return_value, zval *path) {
  * Returns the realpath of a zval filename
  *
  */
-void phalcon_realpath(zval *return_value, zval *filename) {
+void phalcon_file_realpath(zval *return_value, zval *filename) {
 
 	char resolved_path_buff[MAXPATHLEN];
 

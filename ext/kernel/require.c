@@ -29,37 +29,37 @@
  */
 int phalcon_require_ret(zval *result, const char *require_path)
 {
-	zval retval, dummy;
+	zval retval;
 	zend_file_handle file_handle;
-	zend_op_array *new_op_array;
-	int ret;
+	zend_op_array *new_op_array = NULL;
+	int ret, dtor = 0;
 
-	result = result ? result : &retval;
+	if (!result) {
+		dtor = 1;
+		result = &retval;
+	}
+
 	ret = php_stream_open_for_zend_ex(require_path, &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
 
 	if (ret == SUCCESS) {
-		zend_string *opened_path;
 		if (!file_handle.opened_path) {
 			file_handle.opened_path = zend_string_init(require_path, strlen(require_path), 0);
 		}
-		opened_path = zend_string_copy(file_handle.opened_path);
-		ZVAL_NULL(&dummy);
-		if (zend_hash_add(&EG(included_files), opened_path, &dummy)) {
-			new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
-			zend_destroy_file_handle(&file_handle);
-		} else {
-			new_op_array = NULL;
-			zend_file_handle_dtor(&file_handle);
+
+		new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
+		if (file_handle.opened_path) {
+			zend_hash_add_empty_element(&EG(included_files), file_handle.opened_path);
 		}
-		zend_string_release(opened_path);
+
+		zend_string_release(file_handle.opened_path);
+		zend_destroy_file_handle(&file_handle);
 		if (new_op_array) {
 			ZVAL_UNDEF(result);
 			zend_execute(new_op_array, result);
-
 			destroy_op_array(new_op_array);
-			efree(new_op_array);
-			if (!EG(exception)) {
-				//zval_ptr_dtor(result);
+			efree_size(new_op_array, sizeof(zend_op_array));
+			if (!EG(exception) && dtor) {
+				zval_ptr_dtor(result);
 			}
 
 			return SUCCESS;

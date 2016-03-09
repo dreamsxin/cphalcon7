@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 	}
 
 	if (zend_is_true(absolute_path)) {
-		PHALCON_CPY_WRT_CTOR(&config_dir_path, file_path);
+		PHALCON_CPY_WRT(&config_dir_path, file_path);
 	} else {
 		base_path = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
@@ -112,12 +112,14 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 
 	if (phalcon_require_ret(&config, Z_STRVAL(config_dir_path)) == FAILURE) {
 		zend_throw_exception_ex(phalcon_config_exception_ce, 0, "Configuration file '%s' cannot be read", Z_STRVAL(config_dir_path));
+		zval_ptr_dtor(&config_dir_path);
 		return;
 	}
+	zval_ptr_dtor(&config_dir_path);
 
 	if (Z_TYPE(config) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "val", &config);
 	}
-
+	zval_ptr_dtor(&config);
 	RETURN_THISW();
 }

@@ -58,7 +58,7 @@ Follow these instructions to generate a binary extension for your platform:
 
 ```bash
 git clone git://github.com/dreamsxin/cphalcon7.git
-cd cphalcon/ext
+cd cphalcon7/ext
 phpize
 make -j4
 sudo make install

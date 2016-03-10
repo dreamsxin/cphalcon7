@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		/** 
 		 * All columns marked with the 'Column' annotation are considered columns
 		 */
-		PHALCON_CALL_METHOD(&has_annotation, prop_annotations, "has", &column_annot_name);
+		PHALCON_CALL_METHODW(&has_annotation, prop_annotations, "has", &column_annot_name);
 		if (!zend_is_true(&has_annotation)) {
 			continue;
 		}
@@ -349,12 +349,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		/** 
 		 * Fetch the 'column' annotation
 		 */
-		PHALCON_CALL_METHOD(&column_annotation, prop_annotations, "get", &column_annot_name);
+		PHALCON_CALL_METHODW(&column_annotation, prop_annotations, "get", &column_annot_name);
 
 		/** 
 		 * Check column map
 		 */
-		PHALCON_CALL_METHOD(&real_property, &column_annotation, "getargument", &column_map_name);
+		PHALCON_CALL_METHODW(&real_property, &column_annotation, "getargument", &column_map_name);
 		if (!PHALCON_IS_EMPTY(&real_property)) {
 			phalcon_array_update_zval(&ordered_column_map, &real_property, &property, PH_COPY);
 			phalcon_array_update_zval(&reversed_column_map, &property, &real_property, PH_COPY);

@@ -244,7 +244,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
 					/** 
 					 * Read the text attribute from the model
 					 */
-					PHALCON_CALL_METHOD(&option_text, &option, "readattribute", &using_one);
+					PHALCON_CALL_METHODW(&option_text, &option, "readattribute", &using_one);
 				} else {
 					/** 
 					 * Read the variable directly from the model/object

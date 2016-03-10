@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Email, validate){
 
 	ZVAL_FALSE(&invalid);
 
-	PHALCON_CALL_METHOD(&value, record, "readattribute", &field_name);
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field_name);
 
 	/*
 	 * Allow empty

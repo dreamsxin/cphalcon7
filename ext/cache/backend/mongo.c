@@ -370,7 +370,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 
 	array_init_size(&conditions, 1);
 	phalcon_array_update_str(&conditions, SL("key"), &prefixed_key, PH_COPY);
-	PHALCON_CALL_METHOD(NULL, &collection, "remove", &conditions);
+	PHALCON_CALL_METHODW(NULL, &collection, "remove", &conditions);
 
 	if ((php_rand() % 100) == 0) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "gc");
@@ -405,7 +405,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
 		object_init_ex(&regex, ce0);
 		assert(phalcon_has_constructor(&regex));
-		PHALCON_CALL_METHOD(NULL, &regex, "__construct", &pattern);
+		PHALCON_CALL_METHODW(NULL, &regex, "__construct", &pattern);
 
 		phalcon_array_update_str(&conditions, SL("key"), &regex, PH_COPY);
 	}

@@ -294,7 +294,7 @@ PHP_METHOD(Phalcon_DI, attempt){
 		}
 
 		object_init_ex(return_value, phalcon_di_service_ce);
-		PHALCON_CALL_METHOD(NULL, return_value, "__construct", name, definition, shared);
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, shared);
 	
 		phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
 	}

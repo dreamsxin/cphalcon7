@@ -622,7 +622,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		ZVAL_FALSE(&filter_needed);
 
 		if (Z_TYPE(type) <= IS_NULL) {
-			PHALCON_CALL_METHOD(&type, resource, "gettype");
+			PHALCON_CALL_METHODW(&type, resource, "gettype");
 		}
 
 		/** 
@@ -829,7 +829,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/** 
 			 * Gets extra HTML attributes in the resource
 			 */
-			PHALCON_CALL_METHOD(&attributes, resource, "getattributes");
+			PHALCON_CALL_METHODW(&attributes, resource, "getattributes");
 
 			/** 
 			 * Filtered resources are always local

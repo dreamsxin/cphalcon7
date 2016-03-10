@@ -700,7 +700,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
 	while (1) {
 		zval r0, record, parameters, processed_record;
 
-		PHALCON_CALL_METHOD(&r0, getThis(), "valid");
+		PHALCON_CALL_METHODW(&r0, getThis(), "valid");
 		if (!zend_is_true(&r0)) {
 			break;
 		}
@@ -800,7 +800,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			/** 
 			 * Rollback the transaction
 			 */
-			PHALCON_CALL_METHOD(NULL, &connection, "rollback");
+			PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 
 			ZVAL_FALSE(&transaction);
 			break;

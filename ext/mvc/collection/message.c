@@ -324,6 +324,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Message, __set_state){
 	phalcon_array_fetch_str(&code, message, SL("_code"), PH_NOISY);
 
 	object_init_ex(return_value, phalcon_mvc_collection_message_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &message_text, &field, &type, &code);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &message_text, &field, &type, &code);
 }
 

@@ -34,40 +34,40 @@
 #define PHQL_T_IDENTIFIER 265
 
 /* Operators */
-#define PHQL_T_ADD '+'
-#define PHQL_T_SUB '-'
-#define PHQL_T_MUL '*'
-#define PHQL_T_DIV '/'
-#define PHQL_T_MOD '%'
-#define PHQL_T_BITWISE_AND '&'
-#define PHQL_T_BITWISE_OR '|'
-#define PHQL_T_BITWISE_XOR '^'
-#define PHQL_T_BITWISE_NOT '~'
-#define PHQL_T_AND 266
-#define PHQL_T_OR 267
-#define PHQL_T_LIKE 268
-#define PHQL_T_ILIKE 269
-#define PHQL_T_AGAINST 270
+#define PHQL_T_ADD 266
+#define PHQL_T_SUB 267
+#define PHQL_T_MUL 268
+#define PHQL_T_DIV 269
+#define PHQL_T_MOD 270
+#define PHQL_T_BITWISE_AND 271
+#define PHQL_T_BITWISE_OR 272
+#define PHQL_T_BITWISE_XOR 273
+#define PHQL_T_BITWISE_NOT 274
+#define PHQL_T_AND 275
+#define PHQL_T_OR 276
+#define PHQL_T_LIKE 277
+#define PHQL_T_ILIKE 278
+#define PHQL_T_AGAINST 279
 
-#define PHQL_T_DOT '.'
-#define PHQL_T_COMMA 271
-#define PHQL_T_COLON ':'
+#define PHQL_T_DOT 280
+#define PHQL_T_COMMA 281
+#define PHQL_T_COLON 282
 
-#define PHQL_T_EQUALS '='
-#define PHQL_T_NOTEQUALS 272
-#define PHQL_T_NOT '!'
-#define PHQL_T_LESS '<'
-#define PHQL_T_LESSEQUAL 273
-#define PHQL_T_GREATER '>'
-#define PHQL_T_GREATEREQUAL 274
+#define PHQL_T_EQUALS 283
+#define PHQL_T_NOTEQUALS 284
+#define PHQL_T_NOT 285
+#define PHQL_T_LESS 286
+#define PHQL_T_LESSEQUAL 287
+#define PHQL_T_GREATER 288
+#define PHQL_T_GREATEREQUAL 289
 
-#define PHQL_T_PARENTHESES_OPEN '('
-#define PHQL_T_PARENTHESES_CLOSE ')'
+#define PHQL_T_PARENTHESES_OPEN 290
+#define PHQL_T_PARENTHESES_CLOSE 291
 
 /** Placeholders */
-#define PHQL_T_NPLACEHOLDER 275
-#define PHQL_T_SPLACEHOLDER 276
-#define PHQL_T_BPLACEHOLDER 277
+#define PHQL_T_NPLACEHOLDER 292
+#define PHQL_T_SPLACEHOLDER 293
+#define PHQL_T_BPLACEHOLDER 294
 
 /** Reserved words */
 #define PHQL_T_UPDATE 300

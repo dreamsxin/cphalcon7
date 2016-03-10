@@ -6737,4 +6737,4 @@ PHP_METHOD(Phalcon_Mvc_Model, isDeletedRecord){
 	}
 
 	RETURN_FALSE;
-}
+}	

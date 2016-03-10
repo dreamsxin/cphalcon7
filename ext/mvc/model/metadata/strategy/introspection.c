@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		/** 
 		 * To mark how the fields must be escaped
 		 */
-		PHALCON_CALL_METHODW(&bind_type, column, "getbind&type");
+		PHALCON_CALL_METHODW(&bind_type, column, "getbindtype");
 		phalcon_array_update_zval(&field_bind_types, &field_name, &bind_type, PH_COPY);
 
 		PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
@@ -293,6 +293,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 			}
 			phalcon_array_update_zval(&reversed_column_map, user_name, &name, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
+	} else {
+		ZVAL_NULL(&ordered_column_map);
+		ZVAL_NULL(&reversed_column_map);
 	}
 	
 	/** 

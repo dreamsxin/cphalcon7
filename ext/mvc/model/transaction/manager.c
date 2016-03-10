@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, get){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 
-	zval *auto_begin = NULL, *dependency_injector, *number, *transactions, *transaction, *service, trans;
+	zval *auto_begin = NULL, dependency_injector, *number, *transactions, *transaction, *service, trans;
 
 	phalcon_fetch_params(0, 0, 1, &auto_begin);
 
@@ -288,8 +288,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 		auto_begin = &PHALCON_GLOBAL(z_true);
 	}
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_transaction_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
@@ -312,7 +312,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 	service = phalcon_read_property(getThis(), SL("_service"), PH_NOISY);
 
 	object_init_ex(&trans, phalcon_mvc_model_transaction_ce);
-	PHALCON_CALL_METHODW(NULL, &trans, "__construct", dependency_injector, auto_begin, service);
+	PHALCON_CALL_METHODW(NULL, &trans, "__construct", &dependency_injector, auto_begin, service);
 
 	PHALCON_CALL_METHODW(NULL, &trans, "settransactionmanager", getThis());
 	phalcon_update_property_array_append(getThis(), SL("_transactions"), &trans);

@@ -127,18 +127,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!phalcon_array_isset_str(options, SL("mongo"))) {
-		if (!phalcon_array_isset_str(options, SL("server"))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The parameter 'server' is required");
-			return;
-		}
-	}
-
-	if (!phalcon_array_isset_str(options, SL("db"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The parameter 'db' is required");
-		return;
-	}
-
 	if (!phalcon_array_isset_str(options, SL("collection"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The parameter 'collection' is required");
 		return;
@@ -154,57 +142,69 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 
-	zval mongo_collection, options, mongo, server, database, collection;
+	zval mongo_collection, options, mongo, class_name, server, database, collection, service_name;
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&mongo_collection, getThis(), SL("_collection"));
 	if (Z_TYPE(mongo_collection) != IS_OBJECT) {
 		phalcon_return_property(&options, getThis(), SL("_options"));
 
-		/** 
-		 * If mongo is defined a valid Mongo object must be passed
-		 */
 		if (phalcon_array_isset_fetch_str(&mongo, &options, SL("mongo"))) {
 			if (Z_TYPE(mongo) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The 'mongo' parameter must be a valid Mongo instance");
 				return;
 			}
-		} else {
-			/** 
-			 * Server must be defined otherwise
-			 */
-			if (!phalcon_array_isset_fetch_str(&server, &options, SL("server")) || Z_TYPE(server) != IS_STRING) {
+
+			if (!phalcon_array_isset_fetch_str(&database, &options, SL("db")) || Z_TYPE(database) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
+				return;
+			}
+
+			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
+				return;
+			}
+
+			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &database, &collection);
+		} else if (phalcon_array_isset_fetch_str(&server, &options, SL("server"))) {
+			if (Z_TYPE(server) != IS_STRING) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB connection string");
 				return;
 			}
 
-			ce0 = zend_fetch_class(SSL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
+			ZVAL_STRING(&class_name, "MongoClient");
+			if (phalcon_class_exists(&class_name, 0) != NULL) {
+				ce0 = zend_fetch_class(SSL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
+			} else {
+				ce0 = zend_fetch_class(SSL("Mongo"), ZEND_FETCH_CLASS_AUTO);
+			}
 
 			object_init_ex(&mongo, ce0);
 			assert(phalcon_has_constructor(&mongo));
 			PHALCON_CALL_METHODW(NULL, &mongo, "__construct", &server);
-		}
 
-		/** 
-		 * Check if the database name is a string
-		 */
-		if (!phalcon_array_isset_fetch_str(&database, &options, SL("db")) || Z_TYPE(database) != IS_STRING) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
-			return;
-		}
+			if (!phalcon_array_isset_fetch_str(&database, &options, SL("db")) || Z_TYPE(database) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
+				return;
+			}
 
-		/** 
-		 * Retrieve the connection name
-		 */
-		if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
-			return;
-		}
+			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
+				return;
+			}
 
-		/** 
-		 * Make the connection and get the collection
-		 */
-		PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &database, &collection);
+			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &database, &collection);
+		} else {
+			ZVAL_STRING(&service_name, "mongo");
+			PHALCON_CALL_METHODW(&mongo, getThis(), "getresolveservice", &service_name);
+
+			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
+				return;
+			}
+
+			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &collection);
+		}
 	} else {
 		RETURN_CTORW(&mongo_collection);
 	}

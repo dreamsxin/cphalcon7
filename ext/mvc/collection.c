@@ -1445,7 +1445,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, appendMessage){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, save){
 
-	zval *arr = NULL, *white_list = NULL, *m = NULL, mode, *dependency_injector, column_map, attributes, reserved, *new_value;
+	zval *arr = NULL, *white_list = NULL, *m = NULL, mode, dependency_injector, column_map, attributes, reserved, *new_value;
 	zval source, connection, mongo_collection, exists, empty_array, *disable_events;
 	zval type, message, collection_message, messages, status, data, attribute_field;
 	zval *value = NULL, success, options, ok, id, func;
@@ -1475,8 +1475,9 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		PHALCON_CPY_WRT_CTOR(&mode, m);
 	}
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+	PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
+
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
@@ -1607,7 +1608,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	/**
 	 * Execute the preSave hook
 	 */
-	PHALCON_CALL_METHODW(&status, getThis(), "_presave", dependency_injector, disable_events, &exists);
+	PHALCON_CALL_METHODW(&status, getThis(), "_presave", &dependency_injector, disable_events, &exists);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}

@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getPhql){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 
-	zval *manager, *dependency_injector, service_name, has, service;
+	zval *manager, dependency_injector, service_name, has, service;
 
 	manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	if (Z_TYPE_P(manager) == IS_OBJECT) {
@@ -326,20 +326,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 		/**
 		 * Check if the DI is valid
 		 */
-		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 			return;
 		}
 
 		ZVAL_STRING(&service_name, "modelsManager");
-
-		PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
+		PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
 			/**
 			 * Obtain the models-metadata service from the DI
 			 */
-			PHALCON_CALL_METHODW(&service, dependency_injector, "getshared", &service_name);
+			PHALCON_CALL_METHODW(&service, &dependency_injector, "getshared", &service_name);
 			if (Z_TYPE(service) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsMetadata' is not valid");
 				return;
@@ -366,7 +365,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 
-	zval *meta_data, *dependency_injector, service_name, has, service;
+	zval *meta_data, dependency_injector, service_name, has, service;
 
 	meta_data = phalcon_read_property(getThis(), SL("_modelsMetaData"), PH_NOISY);
 	if (Z_TYPE_P(meta_data) == IS_OBJECT) {
@@ -375,20 +374,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 		/**
 		 * Check if the DI is valid
 		 */
-		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-		if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 			return;
 		}
 
 		ZVAL_STRING(&service_name, "modelsMetadata");
 
-		PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
+		PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
 			/**
 			 * Obtain the models-metadata service from the DI
 			 */
-			PHALCON_CALL_METHODW(&service, dependency_injector, "getshared", &service_name);
+			PHALCON_CALL_METHODW(&service, &dependency_injector, "getshared", &service_name);
 			if (Z_TYPE(service) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsMetadata' is not valid");
 				return;
@@ -864,11 +863,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				break;
 
 			case PHQL_T_QUALIFIED:
-				PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualified", expr);
+				PHALCON_RETURN_CALL_METHODW(getThis(), "_getqualified", expr);
 				break;
 
 			case 359: /** @todo Is this code returned anywhere? */
-				PHALCON_RETURN_CALL_METHOD(getThis(), "_getaliased", expr);
+				PHALCON_RETURN_CALL_METHODW(getThis(), "_getaliased", expr);
 				break;
 
 			case PHQL_T_ADD:
@@ -1175,7 +1174,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
 			case PHQL_T_DISTINCT:
 				assert(0);
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Unexpected PHQL_T_DISTINCT - this should not happen");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Unexpected PHQL_T_DISTINCT - this should not happen");
 				return;
 
 			case PHQL_T_BETWEEN:
@@ -1209,11 +1208,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				break;
 
 			case PHQL_T_FCALL:
-				PHALCON_RETURN_CALL_METHOD(getThis(), "_getfunctioncall", expr);
+				PHALCON_RETURN_CALL_METHODW(getThis(), "_getfunctioncall", expr);
 				break;
 
 			case PHQL_T_CASE:
-				PHALCON_RETURN_CALL_METHOD(getThis(), "_getcaseexpression", expr);
+				PHALCON_RETURN_CALL_METHODW(getThis(), "_getcaseexpression", expr);
 				break;
 
 			case PHQL_T_TS_MATCHES:
@@ -3008,7 +3007,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 
 	ast = phalcon_read_property(getThis(), SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_fetch_str(&delete_ast, ast, SL("delete"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Corrupted DELETE AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted DELETE AST");
 		return;
 	}
 
@@ -3812,7 +3811,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 	i_rows = phalcon_get_intval(&number_rows);
 	if (i_rows < 1) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The rows count must be greater than or equal to one");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The rows count must be greater than or equal to one");
 		return;
 	}
 

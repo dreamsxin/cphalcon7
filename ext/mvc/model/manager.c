@@ -694,14 +694,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
 
-	zval *model, service, *dependency_injector, connection;
+	zval *model, service, dependency_injector, connection;
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
 	PHALCON_CALL_SELFW(&service, "getwriteconnectionservice", model);
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
@@ -709,7 +709,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
 	/** 
 	 * Request the connection service from the DI
 	 */
-	PHALCON_CALL_METHODW(&connection, dependency_injector, "getshared", &service);
+	PHALCON_CALL_METHODW(&connection, &dependency_injector, "getshared", &service);
 	if (Z_TYPE(connection) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid injected connection service");
 		return;
@@ -727,14 +727,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection){
 
-	zval *model, service, *dependency_injector, connection;
+	zval *model, service, dependency_injector, connection;
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
 	PHALCON_CALL_SELFW(&service, "getreadconnectionservice", model);
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
@@ -742,7 +742,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection){
 	/** 
 	 * Request the connection service from the DI
 	 */
-	PHALCON_CALL_METHODW(&connection, dependency_injector, "getshared", &service);
+	PHALCON_CALL_METHODW(&connection, &dependency_injector, "getshared", &service);
 	if (Z_TYPE(connection) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid injected connection service");
 		return;

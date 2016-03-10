@@ -21,6 +21,7 @@
 #include "cache/backendinterface.h"
 #include "cache/frontendinterface.h"
 #include "cache/exception.h"
+#include "di/injectable.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -71,7 +72,7 @@ static const zend_function_entry phalcon_cache_backend_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Cache_Backend){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Cache, Backend, cache_backend, phalcon_cache_backend_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache, Backend, cache_backend, phalcon_di_injectable_ce, phalcon_cache_backend_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_property_null(phalcon_cache_backend_ce, SL("_frontend"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cache_backend_ce, SL("_options"), ZEND_ACC_PROTECTED);

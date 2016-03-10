@@ -645,7 +645,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 
 	ZVAL_STRING(&service, ISV(session));
 
-	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
 	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
 	PHALCON_CALL_METHODW(NULL, &session, "set", &key, &safe_bytes);
@@ -688,7 +688,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 
 	ZVAL_STRING(&service, ISV(session));
 
-	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
 	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
 	PHALCON_CALL_METHODW(NULL, &session, "set", &key, &token);
@@ -725,7 +725,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 
 	ZVAL_STRING(&service, ISV(session));
 
-	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
 	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
 	if (Z_TYPE(token_key) == IS_NULL) {
@@ -741,7 +741,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	if (Z_TYPE_P(token_value) == IS_NULL) {
 		ZVAL_STRING(&service, ISV(request));
 
-		PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
 		PHALCON_VERIFY_INTERFACEW(&request, phalcon_http_requestinterface_ce);
 
 		/**
@@ -789,7 +789,7 @@ PHP_METHOD(Phalcon_Security, getSessionToken){
 
 	ZVAL_STRING(&service, ISV(session));
 
-	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
 	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
 	PHALCON_RETURN_CALL_METHODW(&session, "get", &key);
@@ -814,7 +814,7 @@ PHP_METHOD(Phalcon_Security, destroyToken){
 
 	ZVAL_STRING(&service, ISV(session));
 
-	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
 	PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF$");

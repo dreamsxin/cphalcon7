@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_DI_Injectable, getDI)
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-		return;
+		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
 	}
 
 	if (Z_TYPE(dependency_injector) != IS_OBJECT && zend_is_true(error)) {
@@ -276,9 +276,9 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
  */
 PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
 
-	zval *name, *args = NULL, *noerror = NULL, *shared = NULL, dependency_injector;
+	zval *name, *args = NULL, *noerror = NULL, *noshared = NULL, dependency_injector;
 
-	phalcon_fetch_params(0, 1, 3, &name, &args, &noerror, &shared);
+	phalcon_fetch_params(0, 1, 3, &name, &args, &noerror, &noshared);
 
 	if (!args) {
 		args = &PHALCON_GLOBAL(z_null);
@@ -288,20 +288,19 @@ PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
 		noerror = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!shared) {
-		shared = &PHALCON_GLOBAL(z_false);
+	if (!noshared) {
+		noshared = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_di_exception_ce, "A dependency injection container is required to access the '%s' service", Z_STRVAL_P(name));
-		return;
-	}
+	ZVAL_NULL(return_value);
 
-	if (zend_is_true(shared)) {
-		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "getshared", name, args, noerror);
-	} else {
-		PHALCON_RETURN_CALL_METHODW(&dependency_injector, "get", name, args, noerror);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi", noerror);
+	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
+		if (zend_is_true(noshared)) {
+			PHALCON_RETURN_CALL_METHODW(&dependency_injector, "get", name, args, noerror);
+		} else {
+			PHALCON_RETURN_CALL_METHODW(&dependency_injector, "getshared", name, args, noerror);
+		}
 	}
 }
 

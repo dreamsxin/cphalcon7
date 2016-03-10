@@ -106,18 +106,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_str(options, SL("mongo"))) {
-		if (!phalcon_array_isset_str(options, SL("server"))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The parameter 'server' is required");
-			return;
-		}
-	}
-
-	if (!phalcon_array_isset_str(options, SL("db"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The parameter 'db' is required");
-		return;
-	}
-
 	if (!phalcon_array_isset_str(options, SL("collection"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The parameter 'collection' is required");
 		return;

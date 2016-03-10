@@ -90,7 +90,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Message){
 
 void phalcon_validation_message_construct_helper(zval *result, zval *message, zval *field, const char *type, zval *code)
 {
-	zval *params[4], tmp;
+	zval *params[4], tmp = {};
 
 	object_init_ex(result, phalcon_validation_message_ce);
 
@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Validation_Message, __toString){
  */
 PHP_METHOD(Phalcon_Validation_Message, __set_state){
 
-	zval *message, message_text, field, type, code;
+	zval *message, message_text = {}, field = {}, type = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &message);
 

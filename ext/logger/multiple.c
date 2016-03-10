@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, log){
 
-	zval *message, *_type = NULL, *context = NULL, type, *loggers, *logger;
+	zval *message, *_type = NULL, *context = NULL, type = {}, *loggers, *logger;
 
 	phalcon_fetch_params(0, 1, 2, &message, &type, &context);
 
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, log){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, emergency){
 
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 
@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, emergency){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, debug){
 
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, debug){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, error){
 
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 
@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, error){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, info){
 
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 
@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, info){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, notice){
 
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, notice){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, warning){
 
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, warning){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, alert){
 
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 
@@ -321,7 +321,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, alert){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, critical){
 
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 

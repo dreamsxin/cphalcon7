@@ -83,10 +83,10 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_StringLength){
  * @param string $attribute
  * @return boolean
  */
-PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate){
-
-	zval *validator, *attribute, value, allow_empty, valid, type, maximum, minimum, label;
-	zval code, pairs, message_str, prepared, message;
+PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate)
+{
+	zval *validator, *attribute, value = {}, allow_empty = {}, valid = {}, type = {}, maximum = {}, minimum = {}, label = {};
+	zval code = {}, pairs = {}, message_str = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);

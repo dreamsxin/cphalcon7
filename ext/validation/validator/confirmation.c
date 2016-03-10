@@ -79,7 +79,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Confirmation){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 
-	zval *validator, *attribute, with_attribute, value, with_value, valid, message_str, message, code, label, with_label, pairs, prepared;
+	zval *validator, *attribute, with_attribute = {}, value = {}, with_value = {}, valid = {}, message_str = {}, message = {}, code = {}, label = {}, with_label = {}, pairs = {}, prepared = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);

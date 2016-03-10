@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, getDateFormat){
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
-	zval *message, *type, *timestamp, *context, format, date_format, date, date_wildcard, new_format, type_string, type_wildcard, message_wildcard;
+	zval *message, *type, *timestamp, *context, format = {}, date_format = {}, date = {}, date_wildcard = {}, new_format = {}, type_string = {}, type_wildcard = {}, message_wildcard = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 

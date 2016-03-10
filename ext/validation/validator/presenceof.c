@@ -78,15 +78,13 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_PresenceOf){
  */
 PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 
-	zval *validator, *attribute, value, valid, code, message_str, message, label, pairs, prepared;
+	zval *validator, *attribute, value = {}, valid = {}, code = {}, message_str = {}, message = {}, label = {}, pairs = {}, prepared = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
-
 	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
 
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
-
 	PHALCON_CALL_SELFW(&valid, "valid", &value);
 
 	if (PHALCON_IS_FALSE(&valid)) {

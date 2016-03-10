@@ -80,7 +80,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Between){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Between, validate){
 
-	zval *validator, *attribute, value, allow_empty, minimum, maximum, label, pairs, valid, message_str, code, prepared, message;
+	zval *validator, *attribute, value = {}, allow_empty = {}, minimum = {}, maximum = {}, label = {}, pairs = {}, valid = {}, message_str = {}, code = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Between, validate){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Between, valid){
 
-	zval *value, *minimum = NULL, *maximum = NULL, valid;
+	zval *value, *minimum = NULL, *maximum = NULL, valid = {};
 
 	phalcon_fetch_params(0, 3, 0, &value, &minimum, &maximum);
 

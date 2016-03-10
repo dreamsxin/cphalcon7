@@ -79,9 +79,9 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_InclusionIn){
  * @param string $attribute
  * @return boolean
  */
-PHP_METHOD(Phalcon_Validation_Validator_InclusionIn, validate){
-
-	zval *validator, *attribute, value, allow_empty, valid, label, domain, joined_domain, pairs, message_str, message, code, prepared;
+PHP_METHOD(Phalcon_Validation_Validator_InclusionIn, validate)
+{
+	zval *validator, *attribute, value = {}, allow_empty = {}, valid = {}, label = {}, domain = {}, joined_domain = {}, pairs = {}, message_str = {}, message = {}, code = {}, prepared = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);

@@ -62,7 +62,7 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter_Syslog){
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Syslog, format){
 
-	zval *message, *type, *timestamp, *context, interpolated;
+	zval *message, *type, *timestamp, *context, interpolated = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 	

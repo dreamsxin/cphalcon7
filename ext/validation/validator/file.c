@@ -85,10 +85,10 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_File){
  * @param string $attribute
  * @return boolean
  */
-PHP_METHOD(Phalcon_Validation_Validator_File, validate){
-
-	zval *validator, *attribute, value, allow_empty, mimes, minsize, maxsize, minwidth, maxwidth, minheight, maxheight;
-	zval valid, type, code, message_str, message, join_mimes, label, pairs, prepared;
+PHP_METHOD(Phalcon_Validation_Validator_File, validate)
+{
+	zval *validator, *attribute, value = {}, allow_empty = {}, mimes = {}, minsize = {}, maxsize = {}, minwidth = {}, maxwidth = {}, minheight = {}, maxheight = {};
+	zval valid = {}, type = {}, code = {}, message_str = {}, message = {}, join_mimes = {}, label = {}, pairs = {}, prepared = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
@@ -251,10 +251,10 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate){
  * @param int $maxheight
  * @return boolean
  */
-PHP_METHOD(Phalcon_Validation_Validator_File, valid){
-
+PHP_METHOD(Phalcon_Validation_Validator_File, valid)
+{
 	zval *value, *minsize = NULL, *maxsize = NULL, *mimes = NULL, *minwidth = NULL, *maxwidth = NULL, *minheight = NULL, *maxheight = NULL;
-	zval file, size, *constant, finfo, pathname, mime, image, imageinfo, width, height, valid;
+	zval file = {}, size = {}, *constant, finfo = {}, pathname = {}, mime = {}, image = {}, imageinfo = {}, width = {}, height = {}, valid = {};
 	zend_class_entry *imagick_ce;
 
 	phalcon_fetch_params(0, 1, 7, &value, &minsize, &maxsize, &mimes, &minwidth, &maxwidth, &minheight, &maxheight);

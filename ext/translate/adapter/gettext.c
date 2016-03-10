@@ -79,7 +79,7 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_Gettext){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 
-	zval *options, locale, default_domain, directory, setting, *constant, *value;
+	zval *options, locale, default_domain = {}, directory = {}, setting = {}, *constant, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 
 	if (Z_TYPE(directory) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(directory), idx, str_key, value) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 
-	zval *index, *placeholders = NULL, *domain = NULL, translation, *value;
+	zval *index, *placeholders = NULL, *domain = NULL, translation = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -157,8 +157,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 
 	if (placeholders && Z_TYPE_P(placeholders) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(placeholders))) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
-			zval key_placeholder, replaced;
-			zval key;
+			zval key_placeholder = {}, replaced = {}, key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -184,7 +183,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, exists){
 
-	zval *index, *domain = NULL, translation;
+	zval *index, *domain = NULL, translation = {};
 
 	phalcon_fetch_params(0, 1, 1, &index, &domain);
 

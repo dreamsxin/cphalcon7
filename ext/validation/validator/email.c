@@ -78,7 +78,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Email){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Email, validate){
 
-	zval *validator, *attribute, value, allow_empty, valid, label, message_str, message, code, pairs, prepared;
+	zval *validator, *attribute, value = {}, allow_empty = {}, valid = {}, label = {}, message_str = {}, message = {}, code = {}, pairs = {}, prepared = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Email, validate){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Email, valid){
 
-	zval *value, validate_email, valid;
+	zval *value, validate_email = {}, valid = {};
 
 	phalcon_fetch_params(0, 1, 0, &value);
 

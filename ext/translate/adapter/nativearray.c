@@ -75,7 +75,7 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_NativeArray){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 
-	zval *options, data;
+	zval *options, data = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 	
@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
-	zval *index, *placeholders = NULL, *translate, translation;
+	zval *index, *placeholders = NULL, *translate, translation = {};
 	zval *value;
 	zend_string *str_key;
 	ulong idx;
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
 	if (Z_TYPE_P(placeholders) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
-			zval key, key_placeholder, replaced;
+			zval key = {}, key_placeholder = {}, replaced = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {

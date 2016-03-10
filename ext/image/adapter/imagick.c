@@ -225,8 +225,6 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, check){
 		zend_update_static_property_long(phalcon_image_adapter_imagick_ce, SL("_version"), phalcon_get_intval(version));
 	}
 
-	zval_ptr_dtor(version);
-
 	zend_update_static_property_bool(phalcon_image_adapter_imagick_ce, SL("_checked"), 1);
 	RETURN_TRUE;
 }
@@ -1385,8 +1383,6 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, setResourceLimit)
 		if (FAILURE == phalcon_call_method(NULL, &im, "setresourcelimit", 2, params)) {
 			;
 		}
-
-		zval_ptr_dtor(&im);
 	}
 }
 

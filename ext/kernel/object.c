@@ -44,7 +44,7 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 		return FAILURE;
 	}
 
-	ZVAL_ZVAL(return_value, result, 1, 0);
+	PHALCON_CPY_WRT(return_value, result);
 	return SUCCESS;
 }
 

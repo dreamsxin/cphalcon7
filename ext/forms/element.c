@@ -692,6 +692,7 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 	zval *name, *form, has_default_value, value;
 
 	name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
+	ZVAL_UNDEF(&value);
 
 	/** 
 	 * Get the related form
@@ -701,7 +702,7 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 		/** 
 		 * Check if the tag has a default value
 		 */
-		PHALCON_CALL_CE_STATIC(&has_default_value, phalcon_tag_ce, "hasvalue", name);
+		PHALCON_CALL_CE_STATICW(&has_default_value, phalcon_tag_ce, "hasvalue", name);
 		if (!zend_is_true(&has_default_value)) {
 			/** 
 			 * Gets the possible value for the widget
@@ -831,22 +832,18 @@ PHP_METHOD(Phalcon_Forms_Element, clear)
  */
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
-	zval e;
+	zval e, *m;
 
 	if (FAILURE == phalcon_call_method(return_value, getThis(), "render", 0, NULL)) {
 		if (EG(exception)) {
 			ZVAL_OBJ(&e, EG(exception));
-
-			zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
-
-			Z_TRY_ADDREF_P(m);
+			m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
 			if (Z_TYPE_P(m) != IS_STRING) {
 				convert_to_string_ex(m);
 			}
 
 			zend_clear_exception();
 			zend_error(E_ERROR, "%s", Z_STRVAL_P(m));
-			zval_ptr_dtor(m);
 		}
 	}
 }

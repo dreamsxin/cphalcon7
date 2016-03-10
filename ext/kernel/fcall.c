@@ -71,6 +71,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 
 	if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
 		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
 	}
 
 	i = 0;
@@ -155,6 +156,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 	if ((status = call_user_function_ex(function_table, object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
 		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
 		if (!EG(exception)) {
 			switch (type) {
 				case phalcon_fcall_function:

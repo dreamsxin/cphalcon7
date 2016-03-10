@@ -169,7 +169,6 @@ PHP_METHOD(Phalcon_Loader, __construct){
 	array_init_size(&extensions, 1);
 	add_next_index_stringl(&extensions, SL("php"));
 	phalcon_update_property_this(getThis(), SL("_extensions"), &extensions);
-	zval_ptr_dtor(&extensions);
 }
 
 /**
@@ -258,7 +257,6 @@ PHP_METHOD(Phalcon_Loader, registerNamespaces){
 		}
 
 		phalcon_update_property_this(getThis(), SL("_namespaces"), &merged_namespaces);
-		zval_ptr_dtor(&merged_namespaces);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_namespaces"), namespaces);
 	}
@@ -304,7 +302,6 @@ PHP_METHOD(Phalcon_Loader, registerPrefixes){
 		}
 
 		phalcon_update_property_this(getThis(), SL("_prefixes"), &merged_prefixes);
-		zval_ptr_dtor(&merged_prefixes);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_prefixes"), prefixes);
 	}
@@ -350,7 +347,6 @@ PHP_METHOD(Phalcon_Loader, registerDirs){
 		}
 
 		phalcon_update_property_this(getThis(), SL("_directories"), &merged_directories);
-		zval_ptr_dtor(&merged_directories);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_directories"), directories);
 	}
@@ -396,7 +392,6 @@ PHP_METHOD(Phalcon_Loader, registerClasses){
 		}
 
 		phalcon_update_property_this(getThis(), SL("_classes"), &merged_classes);
-		zval_ptr_dtor(&merged_classes);
 	} else {
 		phalcon_update_property_this(getThis(), SL("_classes"), classes);
 	}
@@ -431,7 +426,6 @@ PHP_METHOD(Phalcon_Loader, register){
 		add_next_index_stringl(&autoloader, SL("autoLoad"));
 		PHALCON_CALL_FUNCTIONW(NULL, "spl_autoload_register", &autoloader);
 		phalcon_update_property_this(getThis(), SL("_registered"), &PHALCON_GLOBAL(z_true));
-		zval_ptr_dtor(&autoloader);
 	}
 
 	RETURN_THISW();

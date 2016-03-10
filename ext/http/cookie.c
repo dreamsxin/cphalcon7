@@ -750,7 +750,6 @@ PHP_METHOD(Phalcon_Http_Cookie, __toString){
 
 				zend_clear_exception();
 				zend_error(E_ERROR, "%s", Z_STRVAL_P(m));
-				zval_ptr_dtor(m);
 			}
 		}
 

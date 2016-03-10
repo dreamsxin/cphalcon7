@@ -341,14 +341,14 @@ static void phalcon_tag_get_escaper(zval *escaper, zval *params)
 
 	if (zend_is_true(&autoescape)) {
 		if (FAILURE == phalcon_call_method_with_params(escaper, NULL, NULL, phalcon_fcall_self, SL("getescaperservice"), 0, NULL)) {
-			;
+			assert(escaper == NULL);
 		}
 	}
 }
 
 PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 {
-	zval escaper, attrs, *value;
+	zval escaper, attrs, v, *value;
 	zend_string *key;
 	uint i;
 
@@ -376,24 +376,17 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 		return;
 	}
 
-	array_init_size(&attrs, zend_hash_num_elements(Z_ARRVAL_P(attributes)));
+	array_init(&attrs);
 
 	for (i=0; i<sizeof(order)/sizeof(order[0]); ++i) {
-		if ((value = zend_hash_str_find(Z_ARRVAL_P(attributes), order[i].str, order[i].size)) != NULL) {
-			Z_TRY_ADDREF_P(value);
-			add_assoc_zval_ex(&attrs, order[i].str, order[i].size, value);
+		if (phalcon_array_isset_fetch_str(&v, attributes, order[i].str, order[i].size)) {
+			phalcon_array_update_str(&attrs, order[i].str, order[i].size, &v, PH_COPY);
 		}
 	}
 
-	zend_hash_merge(Z_ARRVAL_P(&attrs), Z_ARRVAL_P(attributes), (copy_ctor_func_t)zval_add_ref, 1);
-
-	if (phalcon_array_isset_str(&attrs, SL("escape"))) {
-		phalcon_array_unset_str(&attrs, SL("escape"), 0);
-	}
-
-	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(&attrs), key, value) {
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(attrs), key, value) {
 		zval tmp, escaped;
-		if (key && Z_TYPE_P(value) != IS_NULL) {
+		if (key && Z_TYPE_P(value) > IS_NULL) {
 			ZVAL_STR(&tmp, key);
 			if (Z_TYPE_P(&escaper) == IS_OBJECT) {
 				PHALCON_CALL_METHODW(&escaped, &escaper, "escapehtmlattr", value);
@@ -948,7 +941,6 @@ static void phalcon_tag_generic_field(INTERNAL_FUNCTION_PARAMETERS, const char* 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
 	ZVAL_STRING(&field_type, type);
-
 	if (as_value) {
 		PHALCON_RETURN_CALL_SELFW("_inputfield", &field_type, parameters, &PHALCON_GLOBAL(z_true));
 	} else {

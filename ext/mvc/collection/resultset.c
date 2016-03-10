@@ -440,7 +440,6 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetExists){
 
 	PHALCON_CALL_METHODW(&count, getThis(), "count");
 	is_smaller_function(return_value, index, &count);
-	zval_ptr_dtor(&count);
 }
 
 /**

@@ -79,6 +79,7 @@ int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index)
 		return 1;
 	}
 
+	ZVAL_NULL(fetched);
 	return 0;
 }
 

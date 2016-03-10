@@ -379,7 +379,6 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 
 		PHALCON_STR_REPLACEW(&replaced_value, &line_break, &escaped_line_break, value);
 		phalcon_htmlentities(return_value, &replaced_value, NULL, charset);
-		zval_ptr_dtor(&replaced_value);
 		return;
 	}
 

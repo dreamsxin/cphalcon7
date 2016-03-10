@@ -447,7 +447,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, isInitialized){
 	phalcon_fast_strtolower(&lowercased, model_name);
 
 	RETVAL_BOOL(phalcon_array_isset(initialized, &lowercased));
-	zval_ptr_dtor(&lowercased);
 }
 
 /**

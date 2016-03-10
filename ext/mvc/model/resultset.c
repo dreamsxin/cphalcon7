@@ -212,7 +212,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 				}
 
 				phalcon_update_property_this(getThis(), SL("_rows"), &r);
-				zval_ptr_dtor(&r);
 			}
 		}
 		else if (Z_TYPE_P(rows) == IS_ARRAY) {

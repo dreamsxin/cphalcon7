@@ -1322,9 +1322,6 @@ static void phalcon_http_request_getuploadedfiles_helper(zval *retval, zval *nam
 
 					res = phalcon_call_method(NULL, &file, "__construct", 2, params);
 
-					zval_ptr_dtor(&arr);
-					zval_ptr_dtor(&key);
-
 					if (res != FAILURE) {
 						add_next_index_zval(retval, &file);
 					} else {

@@ -637,7 +637,6 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	zval_dtor(&access_key);
 	return result;
 }
 

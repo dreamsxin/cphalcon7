@@ -584,11 +584,9 @@ PHP_METHOD(Phalcon_Security, checkHash){
 			--n;
 		}
 
-		zval_ptr_dtor(&hash);
 		RETURN_BOOL(check == 0);
 	}
 
-	zval_ptr_dtor(&hash);
 	RETURN_FALSE;
 }
 

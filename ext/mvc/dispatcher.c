@@ -147,7 +147,6 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 	if (is_exact && zend_is_true(is_exact)) {
 		PHALCON_CONCAT_SV(&name, "\\", controller_name);
 		phalcon_update_property_this(getThis(), SL("_handlerName"), &name);
-		zval_ptr_dtor(&name);
 		phalcon_update_property_this(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_true));
 	} else {
 		phalcon_update_property_this(getThis(), SL("_handlerName"), controller_name);

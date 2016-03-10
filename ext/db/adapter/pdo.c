@@ -215,6 +215,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect){
 	 */
 	if (phalcon_array_isset_fetch_str(&options, descriptor, SL("options"))) {
 		phalcon_array_unset_str(descriptor, SL("options"), PH_COPY);
+	} else {
+		array_init(&options);
 	}
 
 	/**

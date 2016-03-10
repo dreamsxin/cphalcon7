@@ -109,6 +109,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 
 	if (Z_TYPE_P(descriptor) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid CONNECT definition");
+		return;
 	}
 
 	if (phalcon_array_isset_fetch_str(&schema, descriptor, SL("schema"))) {

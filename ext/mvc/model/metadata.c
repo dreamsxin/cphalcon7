@@ -1156,7 +1156,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute){
 	}
 
 	PHALCON_CALL_METHODW(&column_map, getThis(), "getreversecolumnmap", model);
-	if (Z_TYPE(column_map) == IS_ARRAY) { 
+	if (Z_TYPE(column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&column_map)) { 
 		if (phalcon_array_isset(&column_map, attribute)) {
 			RETURN_TRUE;
 		}

@@ -1269,30 +1269,6 @@ void phalcon_unique_key(zval *return_value, zval *prefix, zval *value) {
 }
 
 /**
- * Returns the PHP_EOL (if the passed parameter is TRUE)
- */
-zval *phalcon_eol(int eol) {
-
-	zval *local_eol;
-
-	/**
-	 * Initialize local var
-	 */
-	PHALCON_INIT_VAR(local_eol);
-
-	/**
-	 * Check if the eol is true and return PHP_EOL or empty string
-	 */
-	if (eol) {
-		ZVAL_STRING(local_eol, PHP_EOL);
-	} else {
-		ZVAL_EMPTY_STRING(local_eol);
-	}
-
-	return local_eol;
-}
-
-/**
  * Base 64 encode
  */
 void phalcon_base64_encode(zval *return_value, zval *data) {

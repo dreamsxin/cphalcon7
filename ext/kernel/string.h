@@ -88,8 +88,6 @@ int phalcon_spprintf(char **message, int max_len, char *format, ...);
 void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned long length);
 void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, unsigned long length);
 
-/** EOL */
-zval *phalcon_eol(int eol);
 /** Preg-Match */
 int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches) PHALCON_ATTR_WARN_UNUSED_RESULT;
 

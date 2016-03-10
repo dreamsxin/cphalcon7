@@ -260,21 +260,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 
-	zval *rollback_on_abort, *message, *connection;
+	zval *rollback_on_abort, message, *connection;
 
 	rollback_on_abort = phalcon_read_property(getThis(), SL("_rollbackOnAbort"), PH_NOISY);
 	if (zend_is_true(rollback_on_abort)) {
 
 		if (PG(connection_status) & PHP_CONNECTION_ABORTED) {
-			PHALCON_INIT_VAR(message);
-			ZVAL_STRING(message, "The request was aborted");
-			PHALCON_CALL_METHOD(NULL, getThis(), "rollback", message);
+			ZVAL_STRING(&message, "The request was aborted");
+			PHALCON_CALL_METHODW(NULL, getThis(), "rollback", &message);
 		}
 	}
 
 	connection = phalcon_read_property(getThis(), SL("_connection"), PH_NOISY);
 
-	RETURN_CCTOR(connection);
+	RETURN_CTORW(connection);
 }
 
 /**

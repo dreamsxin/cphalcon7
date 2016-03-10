@@ -1203,25 +1203,24 @@ PHP_METHOD(Phalcon_Forms_Form, valid){
  */
 PHP_METHOD(Phalcon_Forms_Form, appendMessage){
 
-	zval *filed, *message, *current_messages, element_messages;
+	zval *filed, *message, current_messages, element_messages;
 
 	phalcon_fetch_params(0, 2, 0, &filed, &message);
 
-	current_messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);	
-	if (Z_TYPE_P(current_messages) != IS_ARRAY) {
-		PHALCON_INIT_VAR(current_messages);
-		array_init(current_messages);
+	phalcon_return_property(&current_messages, getThis(), SL("_messages"));	
+	if (Z_TYPE(current_messages) != IS_ARRAY) {
+		array_init(&current_messages);
 	}
 
-	if (!phalcon_array_isset_fetch(&element_messages, current_messages, filed)) {
+	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed)) {
 		object_init_ex(&element_messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHODW(NULL, &element_messages, "__construct");
 	}
 
 	PHALCON_CALL_METHODW(NULL, &element_messages, "appendmessage", message);
 
-	phalcon_array_update_zval(current_messages, filed, &element_messages, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_messages"), current_messages);
+	phalcon_array_update_zval(&current_messages, filed, &element_messages, PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_messages"), &current_messages);
 
 	RETURN_THISW();
 }
@@ -1239,24 +1238,24 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessage){
  */
 PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 
-	zval *filed, *messages, *current_messages, element_messages;
+	zval *filed, *messages, current_messages, element_messages;
 
 	phalcon_fetch_params(0, 2, 0, &filed, &messages);
 
-	current_messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);	
-	if (Z_TYPE_P(current_messages) != IS_ARRAY) {
-		array_init(current_messages);
+	phalcon_return_property(&current_messages, getThis(), SL("_messages"));	
+	if (Z_TYPE(current_messages) != IS_ARRAY) {
+		array_init(&current_messages);
 	}
 
-	if (!phalcon_array_isset_fetch(&element_messages, current_messages, filed)) {
+	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed)) {
 		object_init_ex(&element_messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHODW(NULL, &element_messages, "__construct");
 	}
 
 	PHALCON_CALL_METHODW(NULL, &element_messages, "appendmessages", messages);
 
-	phalcon_array_update_zval(current_messages, filed, &element_messages, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_messages"), current_messages);
+	phalcon_array_update_zval(&current_messages, filed, &element_messages, PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_messages"), &current_messages);
 
 	RETURN_THISW();
 }

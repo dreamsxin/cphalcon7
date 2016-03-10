@@ -242,31 +242,29 @@ PHP_METHOD(Phalcon_Db_Dialect, getEscapeChar){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 
-	zval *expression, *escape_char = NULL, *quoting = NULL, type, name, escaped_name,  domain, value, expression_value, operator;
+	zval *expression, *_escape_char = NULL, *quoting = NULL, escape_char, type, name, escaped_name,  domain, value, expression_value, operator;
 	zval times, placeholders, left, right, expression_left, expression_right, sql_items, items, *item, list_expression, exception_message;
 	int t, i;
 
-	phalcon_fetch_params(0, 1, 2, &expression, &escape_char, &quoting);
+	phalcon_fetch_params(0, 1, 2, &expression, &_escape_char, &quoting);
 
 	if (Z_TYPE_P(expression) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SQL expression");
 		return;
 	}
 
-	if (!escape_char) {
-		PHALCON_INIT_VAR(escape_char);
+	if (PHALCON_GLOBAL(db).escape_identifiers) {
+		if (!_escape_char) {
+			 phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
+		} else {
+			PHALCON_CPY_WRT(&escape_char, _escape_char);
+		}
 	} else {
-		PHALCON_SEPARATE_PARAM(escape_char);
+		ZVAL_NULL(&escape_char);
 	}
 
 	if (!quoting) {
 		quoting = &PHALCON_GLOBAL(z_false);
-	}
-
-	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		if (Z_TYPE_P(escape_char) == IS_NULL) {
-			escape_char = phalcon_read_property(getThis(), SL("_escapeChar"), PH_NOISY);
-		}
 	}
 
 	if (!phalcon_array_isset_fetch_str(&type, expression, SL("type"))) {
@@ -279,22 +277,14 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 */
 	if (PHALCON_IS_STRING(&type, "qualified")) {
 		phalcon_array_fetch_str(&name, expression, SL("name"), PH_NOISY);
-		if (PHALCON_GLOBAL(db).escape_identifiers) {
-			PHALCON_CONCAT_VVV(&escaped_name, escape_char, &name, escape_char);
-		} else {
-			PHALCON_CPY_WRT_CTOR(&escaped_name, &name);
-		}
+
+		PHALCON_CONCAT_VVV(&escaped_name, &escape_char, &name, &escape_char);
 
 		/**
 		 * A domain could be a table/schema
 		 */
 		if (phalcon_array_isset_fetch_str(&domain, expression, SL("domain"))) {
-			if (PHALCON_GLOBAL(db).escape_identifiers) {
-				PHALCON_CONCAT_VVVSV(return_value, escape_char, &domain, escape_char, ".", &escaped_name);
-			} else {
-				PHALCON_CONCAT_VSV(return_value, &domain, ".", &escaped_name);
-			}
-
+			PHALCON_CONCAT_VVVSV(return_value, &escape_char, &domain, &escape_char, ".", &escaped_name);
 			return;
 		}
 
@@ -323,8 +313,8 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 		phalcon_array_fetch_str(&right, expression, SL("right"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
-		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
+		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
+		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, &escape_char);
 
 		PHALCON_CONCAT_VSVSV(return_value, &expression_left, " ", &operator, " ", &expression_right);
 		return;
@@ -340,7 +330,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		 * Some unary operators uses the left operand...
 		 */
 		if (phalcon_array_isset_fetch_str(&left, expression, SL("left"))) {
-			PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
+			PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
 			PHALCON_CONCAT_VV(return_value, &expression_left, &operator);
 			return;
 		}
@@ -349,7 +339,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		 * ...Others uses the right operand
 		 */
 		if (phalcon_array_isset_fetch_str(&right, expression, SL("right"))) {
-			PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
+			PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, &escape_char);
 			PHALCON_CONCAT_VV(return_value, &operator, &expression_right);
 			return;
 		}
@@ -387,7 +377,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	if (PHALCON_IS_STRING(&type, "parentheses")) {
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
+		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
 
 		PHALCON_CONCAT_SVS(return_value, "(", &expression_left, ")");
 		return;
@@ -397,7 +387,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 * Resolve function calls
 	 */
 	if (PHALCON_IS_STRING(&type, "functionCall")) {
-		PHALCON_RETURN_CALL_METHODW(getThis(), "getsqlexpressionfunctioncall", expression, escape_char);
+		PHALCON_RETURN_CALL_METHODW(getThis(), "getsqlexpressionfunctioncall", expression, &escape_char);
 		return;
 	}
 
@@ -412,7 +402,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(items), item) {
 			zval item_expression;
 
-			PHALCON_CALL_METHODW(&item_expression, getThis(), "getsqlexpression", item, escape_char);
+			PHALCON_CALL_METHODW(&item_expression, getThis(), "getsqlexpression", item, &escape_char);
 			phalcon_array_append(&sql_items, &item_expression, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
@@ -436,8 +426,8 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 		phalcon_array_fetch_str(&right, expression, SL("right"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
-		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
+		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
+		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, &escape_char);
 
 		PHALCON_CONCAT_SVSVS(return_value, "CAST(", &expression_left, " AS ", &expression_right, ")");
 		return;
@@ -447,7 +437,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 * Resolve CASE of values 
 	 */
 	if (PHALCON_IS_STRING(&type, "case")) {
-		PHALCON_RETURN_CALL_METHODW(getThis(), "getsqlexpressioncase", expression, escape_char);
+		PHALCON_RETURN_CALL_METHODW(getThis(), "getsqlexpressioncase", expression, &escape_char);
 		return;
 	}
 
@@ -457,10 +447,8 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	if (PHALCON_IS_STRING(&type, "convert")) {
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 		phalcon_array_fetch_str(&right, expression, SL("right"), PH_NOISY);
-
-		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
-		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
-
+		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
+		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, &escape_char);
 		PHALCON_CONCAT_SVSVS(return_value, "CONVERT(", &expression_left, " USING ", &expression_right, ")");
 		return;
 	}
@@ -470,9 +458,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 */
 	if (PHALCON_IS_STRING(&type, "select")) {
 		phalcon_array_fetch_str(&value, expression, SL("value"), PH_NOISY);
-
 		PHALCON_CALL_METHODW(&expression_value, getThis(), "select", &value);
-
 		PHALCON_CONCAT_SVS(return_value, "(", &expression_value, ")");
 		return;
 	}

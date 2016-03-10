@@ -1801,7 +1801,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends)
 {
-	zval *statements, *is_statement_list = NULL, *statement;
+	zval *statements, is_statement_list, *statement;
 
 	phalcon_fetch_params(0, 1, 0, &statements);
 
@@ -1816,13 +1816,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends)
 	 * If all elements in the statement list are arrays we resolve this as a
 	 * statementList
 	 */
-	PHALCON_INIT_VAR(is_statement_list);
-	ZVAL_TRUE(is_statement_list);
+	ZVAL_TRUE(&is_statement_list);
 
 	if (!phalcon_array_isset_str(statements, SL("type"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(statements), statement) {
 			if (Z_TYPE_P(statement) != IS_ARRAY) { 
-				ZVAL_FALSE(is_statement_list);
+				ZVAL_FALSE(&is_statement_list);
 				break;
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -1831,7 +1830,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementListOrExtends)
 	/** 
 	 * Resolve the statement list as normal
 	 */
-	if (PHALCON_IS_TRUE(is_statement_list)) {
+	if (PHALCON_IS_TRUE(&is_statement_list)) {
 		PHALCON_RETURN_CALL_METHODW(getThis(), "_statementlist", statements);
 		return;
 	}

@@ -1839,11 +1839,11 @@ PHP_METHOD(Phalcon_Tag, image){
 	}
 
 	if (!local) {
-		PHALCON_INIT_VAR(local);
+		local = &PHALCON_GLOBAL(z_true);
 		if (Z_TYPE_P(parameters) == IS_ARRAY && phalcon_array_isset_fetch_long(&second_param, parameters, 1)) {
-			ZVAL_BOOL(local, zend_is_true(&second_param));
-		} else {
-			ZVAL_TRUE(local);
+			if (!zend_is_true(&second_param)) {
+				local = &PHALCON_GLOBAL(z_false);
+			}
 		}
 	}
 

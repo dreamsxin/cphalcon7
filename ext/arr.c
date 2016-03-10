@@ -266,8 +266,7 @@ PHP_METHOD(Phalcon_Arr, is_array){
  */
 PHP_METHOD(Phalcon_Arr, path){
 
-	zval *array, *path, *default_value = NULL, *delimiter = NULL;
-	zval is_array, keys, key, values, *arr = NULL, value;
+	zval *array, *path, *default_value = NULL, *delimiter = NULL, is_array = {}, keys = {}, key = {}, values = {}, *arr = NULL, value = {};
 
 	phalcon_fetch_params(0, 2, 2, &array, &path, &default_value, &delimiter);
 
@@ -382,7 +381,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 	// Set current $array to inner-most array  path
 	while ((int) zend_hash_num_elements(Z_ARRVAL(keys)) > 1) {
-		zval is_digit, *arr;
+		zval is_digit = {}, *arr;
 
 		ZVAL_MAKE_REF(&keys);
 		PHALCON_CALL_FUNCTIONW(&key, "array_shift", &keys);

@@ -120,9 +120,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
-	zval uri, url, *method, *useragent, data, type, *files, *timeout, *curl, *username, *password, *authtype;
-	zval *constant, *header, *constant1, userpwd, *file, body, uniqid, boundary, *value, key, key_value, headers;
-	zval content, errorno, error, headersize, httpcode, headerstr, bodystr, response;
+	zval uri = {}, url = {}, *method, *useragent, data = {}, type = {}, *files, *timeout, *curl, *username, *password, *authtype;
+	zval *constant, *header, *constant1, userpwd = {}, *file, body = {}, uniqid = {}, boundary = {}, *value, key = {}, key_value = {}, headers = {};
+	zval content = {}, errorno = {}, error = {}, headersize = {}, httpcode = {}, headerstr = {}, bodystr = {}, response = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -215,7 +215,6 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		}
 	} else if (phalcon_class_str_exists(SL("CURLFile"), 0) != NULL) {
 		if (Z_TYPE(data) != IS_ARRAY) {
-			ZVAL_UNDEF(&data);
 			array_init(&data);
 		}
 

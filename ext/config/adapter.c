@@ -97,7 +97,7 @@ PHP_METHOD(Phalcon_Config_Adapter, __construct){
  */
 PHP_METHOD(Phalcon_Config_Adapter, factory){
 
-	zval *file_path = NULL, *absolute_path = NULL, *instances, class_name;
+	zval *file_path = NULL, *absolute_path = NULL, *instances, class_name = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 0, 2, &file_path, &absolute_path);
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Config_Adapter, getBasePath){
  */
 PHP_METHOD(Phalcon_Config_Adapter, load){
 
-	zval *file_path = NULL, *absolute_path = NULL, class_name;
+	zval *file_path = NULL, *absolute_path = NULL, class_name = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 0, 2, &file_path, &absolute_path);

@@ -1713,8 +1713,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getUniqueParams){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 
-	zval *meta_data, *connection, unique_params, unique_key, primary_keys, bind_data_types, number_primary, column_map;
-	zval unique_types, number_empty, where_pk, *field, exception_message, join_where;
+	zval *meta_data, *connection, unique_params = {}, unique_key = {}, primary_keys = {}, bind_data_types = {}, number_primary = {}, column_map = {};
+	zval unique_types = {}, number_empty = {}, where_pk = {}, *field, exception_message = {}, join_where = {};
 
 	phalcon_fetch_params(0, 2, 0, &meta_data, &connection);
 
@@ -1785,7 +1785,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 			} else {
 				PHALCON_CONCAT_VS(&pk_condition, &escaped_field, " = ?");
 				phalcon_array_append(&unique_params, &v, PH_COPY);
-				ZVAL_UNDEF(&v);
+				ZVAL_NULL(&v);
 			}
 
 			if (!phalcon_array_isset(&bind_data_types, field)) {

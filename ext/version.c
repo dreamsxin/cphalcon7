@@ -86,7 +86,7 @@ PHP_METHOD(Phalcon_Version, _getVersion){
  */
 PHP_METHOD(Phalcon_Version, get){
 
-	zval version, major, medium, minor, special, special_number, result, suffix;
+	zval version = {}, major = {}, medium = {}, minor = {}, special = {}, special_number = {}, result = {}, suffix = {};
 
 	PHALCON_CALL_SELFW(&version, "_getversion");
 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Version, get){
  */
 PHP_METHOD(Phalcon_Version, getId){
 
-	zval version, major, medium, minor, special, special_number, format, real_medium, real_minor;
+	zval version = {}, major = {}, medium = {}, minor = {}, special = {}, special_number = {}, format = {}, real_medium = {}, real_minor = {};
 
 	PHALCON_CALL_SELFW(&version, "_getversion");
 	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY);

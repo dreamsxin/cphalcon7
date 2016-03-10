@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Text, uncamelize){
  */
 PHP_METHOD(Phalcon_Text, increment){
 
-	zval *str, *separator = NULL, sep, parts, number, first_part;
+	zval *str, *separator = NULL, sep = {}, parts = {}, number = {}, first_part = {};
 
 	phalcon_fetch_params(0, 1, 1, &str, &separator);
 
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Text, increment){
  */
 PHP_METHOD(Phalcon_Text, random){
 
-	zval *type, *length = NULL, len;
+	zval *type, *length = NULL, len = {};
 
 	phalcon_fetch_params(0, 1, 1, &type, &length);
 
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Text, upper){
  */
 PHP_METHOD(Phalcon_Text, bytes){
 
-	zval *_z_size, *_z_force_unit = NULL, *_format = NULL, z_size, z_force_unit, format, *si = NULL;
+	zval *_z_size, *_z_force_unit = NULL, *_format = NULL, z_size = {}, z_force_unit = {}, format = {}, *si = NULL;
 	char *force_unit;
 	const char **units;
 	const char *units1[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
@@ -432,7 +432,7 @@ PHP_METHOD(Phalcon_Text, bytes){
  */
 PHP_METHOD(Phalcon_Text, reduceSlashes){
 
-	zval *str, pattern, replacement;
+	zval *str, pattern = {}, replacement = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
@@ -457,7 +457,7 @@ PHP_METHOD(Phalcon_Text, reduceSlashes){
  */
 PHP_METHOD(Phalcon_Text, concat){
 
-	zval *separator, *a, *b, arg_num, arg_list, offset, args, *c, str, a_trimmed, str_trimmed;
+	zval *separator, *a, *b, arg_num = {}, arg_list = {}, offset = {}, args = {}, *c, str = {}, a_trimmed = {}, str_trimmed = {};
 
 	phalcon_fetch_params(0, 3, 0, &separator, &a, &b);
 
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Text, concat){
 		PHALCON_CALL_FUNCTIONW(&args, "array_slice", &arg_list, &offset);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(args), c) {
-			zval b_trimmed, c_trimmed;
+			zval b_trimmed = {}, c_trimmed = {};
 
 			ZVAL_STR(&b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_RIGHT));
 			ZVAL_STR(&c_trimmed, phalcon_trim(c, separator, PHALCON_TRIM_LEFT));
@@ -499,7 +499,7 @@ PHP_METHOD(Phalcon_Text, concat){
  */
 PHP_METHOD(Phalcon_Text, underscore)
 {
-	zval *str, trimmed, pattern, replacement;
+	zval *str, trimmed = {}, pattern = {}, replacement = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Text, underscore)
  */
 PHP_METHOD(Phalcon_Text, humanize)
 {
-	zval *str, trimmed, pattern, replacement;
+	zval *str, trimmed = {}, pattern = {}, replacement = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 

@@ -591,12 +591,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, getUniquePrefix){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, attributeReader){
 
-	zval *expr, expr_code, left, left_type, variable, *level, prefix, *dependency_injector;
-	zval is_service, left_code, right, right_type, member, right_code;
+	zval *expr, expr_code = {}, left = {}, left_type = {}, variable = {}, *level, prefix = {}, *dependency_injector;
+	zval is_service = {}, left_code = {}, right = {}, right_type = {}, member = {}, right_code = {};
 
 	phalcon_fetch_params(0, 1, 0, &expr);
-
-	ZVAL_NULL(&expr_code);
 
 	phalcon_array_fetch_str(&left, expr, SL("left"), PH_NOISY);
 	phalcon_array_fetch_str(&left_type, &left, SL("type"), PH_NOISY);

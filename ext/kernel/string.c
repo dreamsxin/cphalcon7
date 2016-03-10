@@ -197,7 +197,7 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 
 	zval         *tmp;
 	HashTable      *arr;
-	smart_str      implstr = {0};
+	smart_str      implstr = {};
 	unsigned int   numelems, i = 0;
 
 	if (Z_TYPE_P(pieces) != IS_ARRAY) {
@@ -235,7 +235,7 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 void phalcon_camelize(zval *return_value, const zval *str){
 
 	int i, len;
-	smart_str camelize_str = {0};
+	smart_str camelize_str = {};
 	char *marker, ch;
 
 	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
@@ -282,7 +282,7 @@ void phalcon_camelize(zval *return_value, const zval *str){
 void phalcon_uncamelize(zval *return_value, const zval *str){
 
 	int i;
-	smart_str uncamelize_str = {0};
+	smart_str uncamelize_str = {};
 	char *marker, ch;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
@@ -463,7 +463,7 @@ static void php_strtr_array(zval *return_value, zend_string *input, HashTable *p
 	HashTable str_hash;
 	zval *entry;
 	char *key;
-	smart_str result = {0};
+	smart_str result = {};
 	zend_ulong bitset[256/sizeof(zend_ulong)];
 	zend_ulong *num_bitset;
 
@@ -1011,7 +1011,7 @@ int phalcon_comparestr_str(const zval *str, char *compared, unsigned int compare
 void phalcon_random_string(zval *return_value, const zval *type, const zval *length) {
 
 	long i, rand_type, ch;
-	smart_str random_str = {0};
+	smart_str random_str = {};
 
 	if (Z_TYPE_P(type) != IS_LONG) {
 		return;
@@ -1248,7 +1248,7 @@ void phalcon_append_printable_array(smart_str *implstr, zval *value) {
  */
 void phalcon_unique_key(zval *return_value, zval *prefix, zval *value) {
 
-	smart_str implstr = {0};
+	smart_str implstr = {};
 
 	if (Z_TYPE_P(prefix) == IS_STRING) {
 		smart_str_appendl(&implstr, Z_STRVAL_P(prefix), Z_STRLEN_P(prefix));
@@ -1388,7 +1388,7 @@ int phalcon_preg_match(zval *retval, zval *regex, zval *subject, zval *matches)
 	int result;
 
 	if (matches) {
-		ZVAL_UNDEF(matches);
+		ZVAL_NULL(matches);
 		ZVAL_MAKE_REF(matches);
 		PHALCON_CALL_FUNCTION_FLAG(result, retval, "preg_match", regex, subject, matches);
 		ZVAL_UNREF(matches);

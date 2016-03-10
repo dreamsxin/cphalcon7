@@ -689,10 +689,9 @@ PHP_METHOD(Phalcon_Forms_Element, getDefault){
  */
 PHP_METHOD(Phalcon_Forms_Element, getValue){
 
-	zval *name, *form, has_default_value, value;
+	zval *name, *form, has_default_value = {}, value = {};
 
 	name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
-	ZVAL_UNDEF(&value);
 
 	/** 
 	 * Get the related form

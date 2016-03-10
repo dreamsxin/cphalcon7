@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Validation, __construct){
  */
 PHP_METHOD(Phalcon_Validation, validate){
 
-	zval *data = NULL, *entity = NULL, validators, messages, status, *scope;
+	zval *data = NULL, *entity = NULL, validators = {}, messages = {}, status = {}, *scope;
 
 	phalcon_fetch_params(0, 0, 2, &data, &entity);
 	
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(validators), scope) {
-		zval attribute, validator, must_cancel;
+		zval attribute = {}, validator = {}, must_cancel = {};
 		if (Z_TYPE_P(scope) != IS_ARRAY) { 
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "The validator scope is not valid");
 			return;
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Validation, validate){
  */
 PHP_METHOD(Phalcon_Validation, add){
 
-	zval *attribute, *validator, scope;
+	zval *attribute, *validator, scope = {};
 
 	phalcon_fetch_params(0, 2, 0, &attribute, &validator);
 	PHALCON_ENSURE_IS_STRING(attribute);
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Validation, setFilters){
  */
 PHP_METHOD(Phalcon_Validation, getFilters){
 
-	zval *attribute = NULL, filters, attribute_filters;
+	zval *attribute = NULL, filters = {}, attribute_filters = {};
 
 	phalcon_fetch_params(0, 0, 1, &attribute);
 	
@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Validation, bind){
  */
 PHP_METHOD(Phalcon_Validation, getValue){
 
-	zval *attribute, entity, method, value, data, values, filters, field_filters, service_name, dependency_injector, filter_service;
+	zval *attribute, entity = {}, method = {}, value = {}, data = {}, values = {}, filters = {}, field_filters = {}, service_name = {}, dependency_injector = {}, filter_service = {};
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
@@ -534,7 +534,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 
 PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 {
-	zval *messages = NULL, default_messages, m;
+	zval *messages = NULL, default_messages = {}, m = {};
 
 	phalcon_fetch_params(0, 0, 1, &messages);
 
@@ -584,7 +584,7 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 {
-	zval *type, *messages, msg;
+	zval *type, *messages, msg = {};
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
@@ -622,7 +622,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, labels, field, value;
+	zval *field_param = NULL, labels = {}, field = {}, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &field_param);
 

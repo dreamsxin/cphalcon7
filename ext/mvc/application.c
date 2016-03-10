@@ -274,10 +274,10 @@ PHP_METHOD(Phalcon_Mvc_Application, getDefaultModule){
  */
 PHP_METHOD(Phalcon_Mvc_Application, handle){
 
-	zval *uri = NULL, *dependency_injector, event_name, status, service, router, module_name;
-	zval *modules, module, class_name, path, module_object, module_params;
-	zval *implicit_view, view, namespace_name, controller_name, action_name, params, exact;
-	zval dispatcher, controller, possible_response, returned_response, response, content;
+	zval *uri = NULL, *dependency_injector, event_name = {}, status = {}, service = {}, router = {}, module_name = {};
+	zval *modules, module = {}, class_name = {}, path = {}, module_object = {}, module_params = {};
+	zval *implicit_view, view = {}, namespace_name = {}, controller_name = {}, action_name = {}, params = {}, exact = {};
+	zval dispatcher = {}, controller = {}, possible_response = {}, returned_response = {}, response = {}, content = {};
 	int f_implicit_view;
 
 	phalcon_fetch_params(0, 0, 1, &uri);
@@ -285,9 +285,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	if (!uri) {
 		uri = &PHALCON_GLOBAL(z_null);
 	}
-
-	ZVAL_UNDEF(&event_name);
-	ZVAL_UNDEF(&service);
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {

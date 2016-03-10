@@ -93,7 +93,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Php){
  */
 PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 
-	zval *file_path, *absolute_path = NULL, config_dir_path, *base_path, config;
+	zval *file_path, *absolute_path = NULL, config_dir_path = {}, *base_path, config = {};
 
 	phalcon_fetch_params(0, 1, 1, &file_path, &absolute_path);
 	PHALCON_ENSURE_IS_STRING(file_path);

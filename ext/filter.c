@@ -88,7 +88,7 @@ PHALCON_INIT_CLASS(Phalcon_Filter){
  */
 PHP_METHOD(Phalcon_Filter, __construct){
 
-	zval allow_tags, allow_attributes;
+	zval allow_tags = {}, allow_attributes = {};
 
 	array_init(&allow_tags);
 
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Filter, add){
  */
 PHP_METHOD(Phalcon_Filter, sanitize){
 
-	zval *value, *filters, *norecursive = NULL, new_value, *item_value, *filter, filter_value, sanizited_value;
+	zval *value, *filters, *norecursive = NULL, new_value, *item_value, *filter, filter_value = {}, sanizited_value = {};
 	zend_string *item_key;
 	ulong item_idx;
 
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		PHALCON_CPY_WRT_CTOR(&new_value, value);
 		if (Z_TYPE_P(value) != IS_NULL) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(filters), filter) {
-				zval array_value;
+				zval array_value = {};
 				/** 
 				 * If the value to filter is an array we apply the filters recursively
 				 */
@@ -250,8 +250,8 @@ PHP_METHOD(Phalcon_Filter, sanitize){
  */
 PHP_METHOD(Phalcon_Filter, _sanitize){
 
-	zval *value, *filter, *filters, filter_object, arguments, type, quote, empty_str, escaped, filtered;
-	zval allow_fraction, options, allow_tags, allow_attributes, exception_message;
+	zval *value, *filter, *filters, filter_object = {}, arguments = {}, type = {}, quote = {}, empty_str = {}, escaped = {}, filtered = {};
+	zval allow_fraction = {}, options = {}, allow_tags = {}, allow_attributes = {}, exception_message = {};
 
 	phalcon_fetch_params(0, 2, 0, &value, &filter);
 

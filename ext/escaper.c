@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Escaper, setHtmlQuoteType){
  */
 PHP_METHOD(Phalcon_Escaper, detectEncoding){
 
-	zval *str, charset, strict_check, detected;
+	zval *str, charset = {}, strict_check = {}, detected = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
  */
 PHP_METHOD(Phalcon_Escaper, normalizeEncoding){
 
-	zval *str, encoding, charset;
+	zval *str, encoding = {}, charset = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Escaper, escapeHtml){
  */
 PHP_METHOD(Phalcon_Escaper, escapeHtmlAttr){
 
-	zval *attribute, quoting, *encoding;
+	zval *attribute, quoting = {}, *encoding;
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Escaper, escapeHtmlAttr){
  */
 PHP_METHOD(Phalcon_Escaper, escapeCss){
 
-	zval *css, normalized;
+	zval *css, normalized = {};
 
 	phalcon_fetch_params(0, 1, 0, &css);
 
@@ -347,7 +347,7 @@ PHP_METHOD(Phalcon_Escaper, escapeCss){
  */
 PHP_METHOD(Phalcon_Escaper, escapeJs){
 
-	zval *js, normalized;
+	zval *js, normalized = {};
 
 	phalcon_fetch_params(0, 1, 0, &js);
 

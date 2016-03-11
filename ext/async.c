@@ -89,7 +89,7 @@ PHALCON_INIT_CLASS(Phalcon_Async){
  */
 PHP_METHOD(Phalcon_Async, call){
 
-	zval *callable, *_arguments = NULL, arguments, pid, filename, proj, key, seg, result, *sig;
+	zval *callable, *_arguments = NULL, arguments = {}, pid = {}, filename = {}, proj = {}, key = {}, seg = {}, result = {}, *sig;
 
 	phalcon_fetch_params(0, 1, 1, &callable, &_arguments);
 
@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Async, call){
  */
 PHP_METHOD(Phalcon_Async, recv){
 
-	zval *_pid = NULL, *_flag = NULL, pid, flag, filename, proj, key, seg, type, size, message, result;
+	zval *_pid = NULL, *_flag = NULL, pid = {}, flag = {}, filename = {}, proj = {}, key = {}, seg = {}, type = {}, size = {}, message = {}, result = {};
 
 	phalcon_fetch_params(0, 0, 2, &_pid, &_flag);
 
@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Async, recv){
  */
 PHP_METHOD(Phalcon_Async, recvAll){
 
-	zval *_flag = NULL, flag, num, filename, proj, key, seg, pid, size;
+	zval *_flag = NULL, flag = {}, num = {}, filename = {}, proj = {}, key = {}, seg = {}, pid = {}, size = {};
 	int i = 0;
 
 	phalcon_fetch_params(0, 0, 1, &_flag);
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Async, recvAll){
 	array_init(return_value);
 
 	while(i--) {
-		zval type, message, result;
+		zval type = {}, message = {}, result = {};
 
 		PHALCON_CALL_FUNCTIONW(&result, "msg_receive", &seg, &pid, &type, &size, &message, &PHALCON_GLOBAL(z_true), &flag);
 		if (zend_is_true(&result)) {
@@ -249,7 +249,7 @@ PHP_METHOD(Phalcon_Async, recvAll){
  */
 PHP_METHOD(Phalcon_Async, count){
 
-	zval filename, proj, key, seg, result, num;
+	zval filename = {}, proj = {}, key = {}, seg = {}, result = {}, num = {};
 
 	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Async, count){
  */
 PHP_METHOD(Phalcon_Async, clear){
 
-	zval filename, proj, key, seg;
+	zval filename = {}, proj = {}, key = {}, seg = {};
 
 	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));

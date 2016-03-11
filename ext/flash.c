@@ -109,7 +109,7 @@ PHALCON_INIT_CLASS(Phalcon_Flash){
  */
 PHP_METHOD(Phalcon_Flash, __construct){
 
-	zval *_css_classes, css_classes;
+	zval *_css_classes, css_classes = {};
 
 	phalcon_fetch_params(0, 0, 1, &_css_classes);
 
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 
 static void phalcon_flash_message_helper(INTERNAL_FUNCTION_PARAMETERS, const char *stype)
 {
-	zval *msg, type;
+	zval *msg, type = {};
 
 	phalcon_fetch_params(0, 1, 0, &msg);
 
@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Flash, warning)
  */
 PHP_METHOD(Phalcon_Flash, outputMessage){
 
-	zval *type, *message, automatic_html, classes, type_classes, joined_classes, css_classes, implicit_flush, content, *msg, html_message;
+	zval *type, *message, automatic_html = {}, classes = {}, type_classes = {}, joined_classes = {}, css_classes = {}, implicit_flush = {}, content = {}, *msg, html_message = {};
 	int flag_automatic_html;
 	int flag_implicit_flush;
 
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		 * We create the message with implicit flush or other
 		 */
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(message), msg) {
-			zval html_message0;
+			zval html_message0 = {};
 			/**
 			 * We create the applying formatting or not
 			 */

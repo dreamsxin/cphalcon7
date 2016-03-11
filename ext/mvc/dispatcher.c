@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setDefaultController){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 
-	zval *controller_name, *is_exact = NULL, name;
+	zval *controller_name, *is_exact = NULL, name = {};
 
 	phalcon_fetch_params(0, 1, 1, &controller_name, &is_exact);
 
@@ -188,11 +188,10 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
-	zval *message, *code = NULL, *error_handlers, error_handler;
-	zval *previous_namespace_name, *previous_controller_name, *previous_action_name, *previous_params;
+	zval *message, *code = NULL, *error_handlers, error_handler = {}, *previous_namespace_name, *previous_controller_name, *previous_action_name, *previous_params;
 	zval *namespace_name, *controller_name, *action_name, *params, *dependency_injector;
-	zval exception_code, exception_message, exception, service, response, status_code, status_message;
-	zval *events_manager, event_name, status;
+	zval exception_code = {}, exception_message = {}, exception = {}, service = {}, response = {}, status_code = {}, status_message = {};
+	zval *events_manager, event_name = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &code);
 
@@ -286,7 +285,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException)
 {
-	zval *exception, event_name;
+	zval *exception, event_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &exception);
 

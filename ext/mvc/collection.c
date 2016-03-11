@@ -266,7 +266,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 
-	zval *dependency_injector = NULL, *collection_manager = NULL, di, service_name, mm;
+	zval *dependency_injector = NULL, *collection_manager = NULL, di = {}, service_name = {}, mm = {};
 
 	phalcon_fetch_params(0, 0, 2, &dependency_injector, &collection_manager);
 
@@ -323,7 +323,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, setId){
 
-	zval *id, id_name, column_map, *collection_manager, use_implicit_ids, mongo_id;
+	zval *id, id_name = {}, column_map = {}, *collection_manager, use_implicit_ids = {}, mongo_id = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 0, &id);
@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, setId){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, getId){
 
-	zval id_name, column_map, id, mongo_id, *collection_manager, use_implicit_ids;
+	zval id_name = {}, column_map = {}, id = {}, mongo_id = {}, *collection_manager, use_implicit_ids = {};
 	zend_class_entry *ce0;
 
 	ZVAL_STRING(&id_name, "_id");
@@ -407,7 +407,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getId){
 
 PHP_METHOD(Phalcon_Mvc_Collection, getIdString){
 
-	zval id;
+	zval id = {};
 
 	PHALCON_CALL_SELFW(&id, "getid");
 
@@ -496,7 +496,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, getColumnName){
 
-	zval *column, column_map, name;
+	zval *column, column_map = {}, name = {};
 
 	phalcon_fetch_params(0, 1, 0, &column);
 
@@ -636,7 +636,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
 
-	zval connection, *collection_manager;
+	zval connection = {}, *collection_manager;
 
 	phalcon_return_property(&connection, getThis(), SL("_connection"));
 	if (Z_TYPE(connection) != IS_OBJECT) {
@@ -666,7 +666,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, assign){
 
-	zval *data, *white_list = NULL, column_map, *value;
+	zval *data, *white_list = NULL, column_map = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -684,7 +684,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, assign){
 	PHALCON_CALL_SELFW(&column_map, "getcolumnmap");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
-		zval key, attribute, exception_message;
+		zval key = {}, attribute = {}, exception_message = {};
 
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
@@ -769,7 +769,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, writeAttribute){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, cloneResult){
 
-	zval *collection, *document, cloned_collection, column_map, *value;
+	zval *collection, *document, cloned_collection = {}, column_map = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -791,7 +791,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, cloneResult){
 	PHALCON_CALL_METHODW(&column_map, collection, "getcolumnmap");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(document), idx, str_key, value) {
-		zval tmp, attribute_field;
+		zval tmp = {}, attribute_field = {};
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -829,8 +829,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, cloneResult){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
 
-	zval *params, *collection, *connection, *unique, source, mongo_collection, conditions, new_conditions;
-	zval fields, documents_cursor, limit, sort, order, skip, class_name, base, document, exception_message;
+	zval *params, *collection, *connection, *unique, source = {}, mongo_collection = {}, conditions = {}, new_conditions = {};
+	zval fields = {}, documents_cursor = {}, limit = {}, sort = {}, order = {}, skip = {}, class_name = {}, base = {}, document = {}, exception_message = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 4, 0, &params, &collection, &connection, &unique);
@@ -947,7 +947,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getResultset){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, _getGroupResultset){
 
-	zval *params, *collection, *connection, source, mongo_collection, conditions, new_conditions, simple, documents_cursor, limit, sort, skip;
+	zval *params, *collection, *connection, source = {}, mongo_collection = {}, conditions = {}, new_conditions = {}, simple = {}, documents_cursor = {}, limit = {}, sort = {}, skip = {};
 
 	phalcon_fetch_params(0, 3, 0, &params, &collection, &connection);
 
@@ -1030,7 +1030,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _getGroupResultset){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
 
-	zval *dependency_injector, *disable_events, *exists, event_name, status;
+	zval *dependency_injector, *disable_events, *exists, event_name = {}, status = {};
 
 	phalcon_fetch_params(0, 3, 0, &dependency_injector, &disable_events, &exists);
 
@@ -1128,7 +1128,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _preSave){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, _postSave){
 
-	zval *disable_events, *success, *exists, event_name;
+	zval *disable_events, *success, *exists, event_name = {};
 
 	phalcon_fetch_params(0, 3, 0, &disable_events, &success, &exists);
 
@@ -1183,7 +1183,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _postSave){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, validate){
 
-	zval *validator, status, messages, *message;
+	zval *validator, status = {}, messages = {}, *message;
 
 	phalcon_fetch_params(0, 1, 0, &validator);
 
@@ -1249,7 +1249,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, validationHasFailed){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
 
-	zval *eventname, *collection_manager, lower;
+	zval *eventname, *collection_manager, lower = {};
 
 	phalcon_fetch_params(0, 1, 0, &eventname);
 	PHALCON_ENSURE_IS_STRING(eventname);
@@ -1278,7 +1278,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
 
-	zval *eventname, lower, status, *collection_manager;
+	zval *eventname, lower = {}, status = {}, *collection_manager;
 
 	phalcon_fetch_params(0, 1, 0, &eventname);
 
@@ -1314,7 +1314,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, fireEventCancel){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, _cancelOperation){
 
-	zval *disable_events, *operation_made, event_name;
+	zval *disable_events, *operation_made, event_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &disable_events);
 
@@ -1338,7 +1338,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, _cancelOperation){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, _exists){
 
-	zval *collection, mongo_id, parameters, document_count;
+	zval *collection, mongo_id = {}, parameters = {}, document_count = {};
 
 	phalcon_fetch_params(0, 1, 0, &collection);
 
@@ -1409,7 +1409,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getMessages){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, appendMessage){
 
-	zval *message, *field = NULL, *type = NULL, *code = NULL, collection_message;
+	zval *message, *field = NULL, *type = NULL, *code = NULL, collection_message = {};
 
 	phalcon_fetch_params(0, 1, 3, &message, &field, &type, &code);
 
@@ -1445,10 +1445,10 @@ PHP_METHOD(Phalcon_Mvc_Collection, appendMessage){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, save){
 
-	zval *arr = NULL, *white_list = NULL, *m = NULL, mode, dependency_injector, column_map, attributes, reserved, *new_value;
-	zval source, connection, mongo_collection, exists, empty_array, *disable_events;
-	zval type, message, collection_message, messages, status, data, attribute_field;
-	zval *value = NULL, success, options, ok, id, func;
+	zval *arr = NULL, *white_list = NULL, *m = NULL, mode = {}, dependency_injector = {}, column_map = {}, attributes = {}, reserved = {}, *new_value;
+	zval source = {}, connection = {}, mongo_collection = {}, exists = {}, empty_array = {}, *disable_events;
+	zval type = {}, message = {}, collection_message = {}, messages = {}, status = {}, data = {}, attribute_field = {};
+	zval *value = NULL, success = {}, options = {}, ok = {}, id = {}, func = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -1496,7 +1496,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 		 * We only assign values to the public properties
 		 */
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(arr), idx, str_key, new_value) {
-			zval tmp, attribute_field, possible_setter;
+			zval tmp = {}, attribute_field = {}, possible_setter = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -1617,7 +1617,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 	if (Z_TYPE(attributes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL(attributes), idx, str_key) {
-			zval tmp;
+			zval tmp = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -1699,7 +1699,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, findById){
 
-	zval *id, class_name, collection, collection_manager, use_implicit_ids, mongo_id, conditions, parameters;
+	zval *id, class_name = {}, collection = {}, collection_manager = {}, use_implicit_ids = {}, mongo_id = {}, conditions = {}, parameters = {};
 	zend_class_entry *ce0, *ce1;
 
 	phalcon_fetch_params(0, 1, 0, &id);
@@ -1768,8 +1768,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findById){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
 
-	zval *parameters = NULL, class_name, collection, collection_manager;
-	zval use_implicit_ids, mongo_id, conditions, params, connection;
+	zval *parameters = NULL, class_name = {}, collection = {}, collection_manager = {}, use_implicit_ids = {}, mongo_id = {}, conditions = {}, params = {}, connection = {};
 	zend_class_entry *ce0, *ce1;
 
 	phalcon_fetch_params(0, 0, 1, &parameters);
@@ -1860,7 +1859,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, findFirst){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, find){
 
-	zval *parameters = NULL, class_name, collection, connection;
+	zval *parameters = NULL, class_name = {}, collection = {}, connection = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 0, 1, &parameters);
@@ -1901,7 +1900,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, find){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, count){
 
-	zval *parameters = NULL, class_name, collection, connection;
+	zval *parameters = NULL, class_name = {}, collection = {}, connection = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 0, 1, &parameters);
@@ -1933,7 +1932,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, count){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, aggregate){
 
-	zval *parameters, class_name, collection, connection, source, mongo_collection;
+	zval *parameters, class_name = {}, collection = {}, connection = {}, source = {}, mongo_collection = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 0, &parameters);
@@ -1975,8 +1974,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, aggregate){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, summatory){
 
-	zval *fields, *condition = NULL, *finalize = NULL, class_name, collection, connection, source, mongo_collection;
-	zval keys, options, initial, reduce, group, retval, first_retval, summatory;
+	zval *fields, *condition = NULL, *finalize = NULL, class_name = {}, collection = {}, connection = {}, source = {}, mongo_collection = {};
+	zval keys = {}, options = {}, initial = {}, reduce = {}, group = {}, retval = {}, first_retval = {}, summatory = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 2, &fields, &condition, &finalize);
@@ -2111,7 +2110,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, update){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, delete){
 
-	zval mongo_id, *disable_events, event_name, status, connection, source, mongo_collection, id_condition, success, options, ok;
+	zval mongo_id, *disable_events, event_name = {}, status = {}, connection = {}, source = {}, mongo_collection = {}, id_condition = {}, success = {}, options = {}, ok = {};
 
 	PHALCON_CALL_SELFW(&mongo_id, "getid");
 
@@ -2200,7 +2199,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getOperationMade){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 
-	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, data, reserved, attributes, column_map;
+	zval *columns = NULL, *rename_columns = NULL, *allow_empty = NULL, data = {}, reserved = {}, attributes = {}, column_map = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -2232,7 +2231,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
 	 * We only assign values to the public properties
 	 */
 	ZEND_HASH_FOREACH_KEY(Z_ARRVAL(attributes), idx, str_key) {
-		zval tmp, attribute_field, *field_value;
+		zval tmp = {}, attribute_field = {}, *field_value;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -2272,7 +2271,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, serialize){
 
-	zval data;
+	zval data = {};
 
 	PHALCON_CALL_METHODW(&data, getThis(), "toarray");
 
@@ -2289,7 +2288,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, serialize){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 
-	zval *data, attributes, dependency_injector, service, manager, *value;
+	zval *data, attributes = {}, dependency_injector = {}, service = {}, manager = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -2335,7 +2334,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 			 * Update the objects attributes
 			 */
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(attributes), idx, str_key, value) {
-				zval tmp;
+				zval tmp = {};
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
@@ -2366,7 +2365,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, execute){
 
-	zval *code, *args = NULL, class_name, collection, connection;
+	zval *code, *args = NULL, class_name = {}, collection = {}, connection = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 1, &code, &args);
@@ -2395,8 +2394,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, execute){
 
 PHP_METHOD(Phalcon_Mvc_Collection, incr){
 
-	zval *field, *v = NULL, value, mongo_id, source, connection, mongo_collection; 
-	zval criteria, new_object, key, options, status;
+	zval *field, *v = NULL, value = {}, mongo_id = {}, source = {}, connection = {}, mongo_collection = {},  criteria = {}, new_object = {}, key = {}, options = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 1, &field, &v);
 
@@ -2447,7 +2445,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, incr){
 
 PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 
-	zval mongo_id, source, connection, mongo_collection, criteria, row, *value;
+	zval mongo_id = {}, source = {}, connection = {}, mongo_collection = {}, criteria = {}, row = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -2468,7 +2466,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 		PHALCON_CALL_METHODW(&row, &mongo_collection, "findone", &criteria);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(row), idx, str_key, value) {
-			zval tmp;
+			zval tmp = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -2485,7 +2483,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, refresh){
 
 PHP_METHOD(Phalcon_Mvc_Collection, drop){
 
-	zval class_name, collection, source, connection, mongo_collection, status, ok;
+	zval class_name = {}, collection = {}, source = {}, connection = {}, mongo_collection = {}, status = {}, ok = {};
 	zend_class_entry *ce0;
 
 	phalcon_get_called_class(&class_name );
@@ -2525,7 +2523,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, drop){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, parse){
 
-	zval *conditions, column_map, collection_manager, use_implicit_ids, *value;
+	zval *conditions, column_map = {}, collection_manager = {}, use_implicit_ids = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 	zend_class_entry *ce0;
@@ -2545,7 +2543,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
 	ce0 = zend_fetch_class(SSL("MongoId"), ZEND_FETCH_CLASS_AUTO);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(conditions), idx, str_key, value) {
-		zval tmp, value1, value2, column, mongo_id;
+		zval tmp = {}, value1 = {}, value2 = {}, column = {}, mongo_id = {};
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -2592,7 +2590,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, parse){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, __set){
 
-	zval *property, *value, possible_setter, class_name, method_exists;
+	zval *property, *value, possible_setter = {}, class_name = {}, method_exists = {};
 
 	phalcon_fetch_params(0, 2, 0, &property, &value);
 
@@ -2638,7 +2636,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __set){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, __get){
 
-	zval *property, possible_getter, class_name, method_exists;
+	zval *property, possible_getter = {}, class_name = {}, method_exists = {};
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
@@ -2673,8 +2671,8 @@ PHP_METHOD(Phalcon_Mvc_Collection, __get){
  */
 PHP_METHOD(Phalcon_Mvc_Collection, __callStatic){
 
-	zval *method, *arguments = NULL, extra_method, class_name, exception_message;
-	zval collection, extra_method_first, field, value, conditions, params;
+	zval *method, *arguments = NULL, extra_method = {}, class_name = {}, exception_message = {};
+	zval collection = {}, extra_method_first = {}, field = {}, value = {}, conditions = {}, params = {};
 	zend_class_entry *ce0;
 	const char *func = NULL;
 

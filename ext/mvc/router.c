@@ -245,7 +245,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Router){
  */
 PHP_METHOD(Phalcon_Mvc_Router, __construct){
 
-	zval *default_routes = NULL, routes, paths, action_pattern, route, params_pattern;
+	zval *default_routes = NULL, routes = {}, paths = {}, action_pattern = {}, route = {}, params_pattern = {};
 
 	phalcon_fetch_params(0, 0, 1, &default_routes);
 
@@ -321,7 +321,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getDI){
  */
 PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 
-	zval *uri_source, *_GET, url, *_SERVER, url_parts, real_uri;
+	zval *uri_source, *_GET, url = {}, *_SERVER, url_parts = {}, real_uri = {};
 
 	/**
 	 * The developer can change the URI source
@@ -512,7 +512,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaultAction){
  */
 PHP_METHOD(Phalcon_Mvc_Router, setDefaults){
 
-	zval *defaults, namespace_name, module_name, controller_name, action_name, params;
+	zval *defaults, namespace_name = {}, module_name = {}, controller_name = {}, action_name = {}, params = {};
 
 	phalcon_fetch_params(0, 1, 0, &defaults);
 
@@ -556,8 +556,7 @@ PHP_METHOD(Phalcon_Mvc_Router, setDefaults){
  */
 PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
 
-	zval *namespace_name, *module_name;
-	zval *controller_name, *action_name, *params;
+	zval *namespace_name, *module_name, *controller_name, *action_name, *params;
 
 	namespace_name  = phalcon_read_property(getThis(), SL("_defaultNamespace"), PH_NOISY);
 	module_name     = phalcon_read_property(getThis(), SL("_defaultModule"), PH_NOISY);
@@ -589,9 +588,9 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
  */
 PHP_METHOD(Phalcon_Mvc_Router, handle){
 
-	zval *uri = NULL, real_uri, handled_uri, route_found, params, service, *dependency_injector, request, debug_message, event_name;
-	zval current_host_name, *routes, *route, matches, parts, namespace_name, default_namespace, module, default_module, exact;
-	zval controller, default_controller, action, default_action, params_str, str_params, params_merge, default_params;
+	zval *uri = NULL, real_uri = {}, handled_uri = {}, route_found = {}, params = {}, service = {}, *dependency_injector, request = {}, debug_message = {}, event_name = {};
+	zval current_host_name = {}, *routes, *route, matches = {}, parts = {}, namespace_name = {}, default_namespace = {}, module = {}, default_module = {}, exact = {};
+	zval controller = {}, default_controller = {}, action = {}, default_action = {}, params_str = {}, str_params = {}, params_merge = {}, default_params = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -652,8 +651,8 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	routes = phalcon_read_property(getThis(), SL("_routes"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(routes), route) {
-		zval case_sensitive, methods, match_method, hostname, regex_host_name, matched, pattern, case_pattern, before_match, before_match_params, paths;
-		zval converters, *position;
+		zval case_sensitive = {}, methods = {}, match_method = {}, hostname = {}, regex_host_name = {}, matched = {}, pattern = {}, case_pattern = {}, before_match = {}, before_match_params = {}, paths = {};
+		zval converters = {}, *position;
 
 		PHALCON_CALL_METHODW(&case_sensitive, route, "getcasesensitive");
 
@@ -786,7 +785,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 					PHALCON_CALL_METHODW(&converters, route, "getconverters");
 
 					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(paths), idx, str_key, position) {
-						zval tmp, match_position, converter, parameters, converted_part;
+						zval tmp = {}, match_position = {}, converter = {}, parameters = {}, converted_part = {};
 						if (str_key) {
 							ZVAL_STR(&tmp, str_key);
 						} else {
@@ -928,7 +927,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				}
 
 				if (zend_is_true(&str_params)) {
-					zval slash;
+					zval slash = {};
 					ZVAL_STRINGL(&slash, "/", 1);
 
 					phalcon_fast_explode(&params, &slash, &str_params);
@@ -1028,7 +1027,7 @@ PHP_METHOD(Phalcon_Mvc_Router, add){
 
 static void phalcon_mvc_router_add_helper(INTERNAL_FUNCTION_PARAMETERS, zend_string *method)
 {
-	zval *pattern, *paths = NULL, http_method;
+	zval *pattern, *paths = NULL, http_method = {};
 
 	phalcon_fetch_params(0, 1, 1, &pattern, &paths);
 
@@ -1126,8 +1125,7 @@ PHP_METHOD(Phalcon_Mvc_Router, addHead){
 
 static int phalcon_router_call_convert(zval *pDest, int num_args, va_list args, zend_hash_key *hash_key)
 {
-	zval *route, key;
-	zval *params[2];
+	zval *route, key = {}, *params[2];
 
 	assert(num_args == 1);
 
@@ -1157,7 +1155,7 @@ static int phalcon_router_call_convert(zval *pDest, int num_args, va_list args, 
  */
 PHP_METHOD(Phalcon_Mvc_Router, mount){
 
-	zval *group, group_routes, before_match, hostname, converters, *route, *routes, new_routes;
+	zval *group, group_routes = {}, before_match = {}, hostname = {}, converters = {}, *route, *routes, new_routes = {};
 
 	phalcon_fetch_params(0, 1, 0, &group);
 	PHALCON_VERIFY_CLASS_EX(group, phalcon_mvc_router_group_ce, phalcon_mvc_router_exception_ce, 0);
@@ -1428,7 +1426,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRoutes){
  */
 PHP_METHOD(Phalcon_Mvc_Router, getRouteById){
 
-	zval *id, *routes, *route, route_id;
+	zval *id, *routes, *route, route_id = {};
 
 	phalcon_fetch_params(0, 1, 0, &id);
 
@@ -1470,7 +1468,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteByName){
 	routes = phalcon_read_property(getThis(), SL("_routes"), PH_NOISY);
 	if (Z_TYPE_P(routes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(routes), route) {
-			zval route_name;
+			zval route_name = {};
 			PHALCON_CALL_METHODW(&route_name, route, "getname");
 			convert_to_string(&route_name);
 			if (PHALCON_IS_NOT_EMPTY(&route_name)) {

@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, getRegisteredEngines) {
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 
-	zval engines, *dependency_injector, *registered_engines, php_engine, arguments, *engine_service;
+	zval engines = {}, *dependency_injector, *registered_engines, php_engine = {}, arguments = {}, *engine_service;
 	zend_string *str_key;
 	ulong idx;
 
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 			phalcon_array_append(&arguments, dependency_injector, PH_COPY);
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(registered_engines), idx, str_key, engine_service) {
-				zval extension, engine_object, exception_message;
+				zval extension = {}, engine_object = {}, exception_message = {};
 				if (str_key) {
 					ZVAL_STR(&extension, str_key);
 				} else {
@@ -356,8 +356,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
-	zval *path, *params, *events_manager, event_name, status, debug_message;
-	zval not_exists, *views_dir, views_dir_path, engines, *engine, exception_message;
+	zval *path, *params, *events_manager, event_name = {}, status = {}, debug_message = {};
+	zval not_exists = {}, *views_dir, views_dir_path = {}, engines = {}, *engine, exception_message = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -400,7 +400,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	 * Views are rendered in each engine
 	 */
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(engines), idx, str_key, engine) {
-		zval extension, view_engine_path;
+		zval extension = {}, view_engine_path = {};
 		if (str_key) {
 			ZVAL_STR(&extension, str_key);
 		} else {
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 
-	zval *path, *params = NULL, cache, is_started, key, lifetime, *cache_options, content, *view_params, merged_params, is_fresh;
+	zval *path, *params = NULL, cache = {}, is_started = {}, key = {}, lifetime = {}, *cache_options, content = {}, *view_params, merged_params = {}, is_fresh = {};
 
 	phalcon_fetch_params(0, 1, 1, &path, &params);
 
@@ -587,7 +587,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 
-	zval *partial_path, *params = NULL, *view_params, merged_params, *content;
+	zval *partial_path, *params = NULL, *view_params, merged_params = {}, *content;
 
 	phalcon_fetch_params(0, 1, 1, &partial_path, &params);
 
@@ -677,7 +677,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, getCacheOptions){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 
-	zval *dependency_injector, cache_service, *cache_options;
+	zval *dependency_injector, cache_service = {}, *cache_options;
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
@@ -710,7 +710,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, getCache){
 
-	zval cache;
+	zval cache = {};
 
 	phalcon_return_property(&cache, getThis(), SL("_cache"));
 	if (zend_is_true(&cache)) {
@@ -791,7 +791,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setParamToView){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, setVars){
 
-	zval *params, *merge = NULL, *view_params, merged_params;
+	zval *params, *merge = NULL, *view_params, merged_params = {};
 
 	phalcon_fetch_params(0, 1, 1, &params, &merge);
 

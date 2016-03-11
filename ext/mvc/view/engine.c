@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, getView){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
 
-	zval *name, *method_callable, class_name, method;
+	zval *name, *method_callable, class_name = {}, method = {};
 
 	phalcon_fetch_params(0, 2, 0, &name, &method_callable);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
-	zval *method, *args = NULL, method_name, arguments, *methods, func, exception_message, service_name, service, callback;
+	zval *method, *args = NULL, method_name = {}, arguments = {}, *methods, func = {}, exception_message = {}, service_name = {}, service = {}, callback = {};
 
 	phalcon_fetch_params(0, 1, 1, &method, &arguments);
 

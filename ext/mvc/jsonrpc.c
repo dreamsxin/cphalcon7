@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 
-	zval *modules, *merge = NULL, *registered_modules, merged_modules;
+	zval *modules, *merge = NULL, *registered_modules, merged_modules = {};
 
 	phalcon_fetch_params(0, 1, 1, &modules, &merge);
 
@@ -212,8 +212,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, getDefaultModule){
 
 static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *this_ptr, zval *params)
 {
-	zval event_name;
-	zval status;
+	zval event_name = {}, status = {};
 	uint params_cnt = 2 + (params != NULL ? 1 : 0);
 	zval *p[3];
 	if (mgr) {
@@ -242,9 +241,9 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
-	zval *dependency_injector, *events_manager, service, request, json, data, response, jsonrpc_message, jsonrpc_error, jsonrpc_method, jsonrpc_params;
-	zval url, uri, router, module_name, *modules, module, class_name, path, module_object, module_params, status, namespace_name, controller_name, action_name;
-	zval params, exact, dispatcher, controller, jsonrpc_result, jsonrpc_id;
+	zval *dependency_injector, *events_manager, service = {}, request = {}, json = {}, data = {}, response = {}, jsonrpc_message = {}, jsonrpc_error = {}, jsonrpc_method = {}, jsonrpc_params = {};
+	zval url = {}, uri = {}, router = {}, module_name = {}, *modules, module = {}, class_name = {}, path = {}, module_object = {}, module_params = {}, status = {}, namespace_name = {}, controller_name = {}, action_name = {};
+	zval params = {}, exact = {}, dispatcher = {}, controller = {}, jsonrpc_result = {}, jsonrpc_id = {};
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {

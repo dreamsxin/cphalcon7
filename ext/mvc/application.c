@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_Mvc_Application, useImplicitView){
  */
 PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 
-	zval *modules, *merge = NULL, *registered_modules, merged_modules;
+	zval *modules, *merge = NULL, *registered_modules, merged_modules = {};
 
 	phalcon_fetch_params(0, 1, 1, &modules, &merge);
 

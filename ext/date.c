@@ -196,7 +196,7 @@ PHALCON_INIT_CLASS(Phalcon_Date){
  */
 PHP_METHOD(Phalcon_Date, offset){
 
-	zval *remote, *local = NULL, *date = NULL, new_date, format, zone_remote, time_remote, zone_local, time_local, offset_remote, offset_local;
+	zval *remote, *local = NULL, *date = NULL, new_date = {}, format = {}, zone_remote = {}, time_remote = {}, zone_local = {}, time_local = {}, offset_remote = {}, offset_local = {};
 	zend_class_entry *ce0, *ce1;
 
 	phalcon_fetch_params(0, 1, 2, &remote, &local, &date);
@@ -296,7 +296,7 @@ PHP_METHOD(Phalcon_Date, seconds){
  */
 PHP_METHOD(Phalcon_Date, minutes){
 
-	zval *step = NULL, s;
+	zval *step = NULL, s = {};
 
 	phalcon_fetch_params(0, 0, 1, &step);
 
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Date, ampm){
  */
 PHP_METHOD(Phalcon_Date, adjust){	
 
-	zval *hour, *ampm, lower_ampm;
+	zval *hour, *ampm, lower_ampm = {};
 	char buf[2];
 	int h;
 
@@ -426,7 +426,7 @@ PHP_METHOD(Phalcon_Date, adjust){
  */
 PHP_METHOD(Phalcon_Date, days){
 
-	zval *month, *year = NULL, year2, months, year_months, format, total, tmp, tmp1, tmp2;
+	zval *month, *year = NULL, year2 = {}, months = {}, year_months = {}, format = {}, total = {}, tmp = {}, tmp1 = {}, tmp2 = {};
 	char buf[2];
 	int y, m, i, t;
 
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Date, days){
  */
 PHP_METHOD(Phalcon_Date, months){
 
-	zval *format = NULL, tmp1, tmp2;
+	zval *format = NULL, tmp1 = {}, tmp2 = {};
 	int i;
 
 	phalcon_fetch_params(0, 0, 1, &format);
@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Date, months){
 		ZVAL_LONG(&tmp2, 1);
 
 		for (i = 1; i <= 12; ++i) {
-			zval tmp3, time, strftime;
+			zval tmp3 = {}, time = {}, strftime = {};
 			ZVAL_LONG(&tmp3, i);
 
 			PHALCON_CALL_FUNCTIONW(&time, "mktime", &tmp1, &tmp1, &tmp1, &tmp3, &tmp2);
@@ -546,7 +546,7 @@ PHP_METHOD(Phalcon_Date, months){
  */
 PHP_METHOD(Phalcon_Date, years){
 
-	zval *start = NULL, *end = NULL, year, tmp;
+	zval *start = NULL, *end = NULL, year = {}, tmp = {};
 	int i, s, e;
 
 	phalcon_fetch_params(0, 0, 2, &start, &end);
@@ -593,7 +593,7 @@ PHP_METHOD(Phalcon_Date, years){
  */
 PHP_METHOD(Phalcon_Date, span){
 
-	zval *remote, *local = NULL, *output = NULL, lowercased_output, pattern, output_arr, count_output, tmp, tmp1;
+	zval *remote, *local = NULL, *output = NULL, lowercased_output = {}, pattern = {}, output_arr = {}, count_output = {}, tmp = {}, tmp1 = {};
 	long remote_time, local_time, timespan;
 	int i;
 
@@ -700,8 +700,7 @@ PHP_METHOD(Phalcon_Date, span){
  */
 PHP_METHOD(Phalcon_Date, span2){
 
-	zval *time, *output = NULL;
-	zval lower_output, pattern, output_arr, count_output, tmp, tmp1;
+	zval *time, *output = NULL, lower_output = {}, pattern = {}, output_arr = {}, count_output = {}, tmp = {}, tmp1 = {};
 	long timespan;
 	int i;
 
@@ -806,7 +805,7 @@ PHP_METHOD(Phalcon_Date, span2){
  */
 PHP_METHOD(Phalcon_Date, fuzzy_span)
 {
-	zval *timestamp, *local_timestamp = NULL, span;
+	zval *timestamp, *local_timestamp = NULL, span = {};
 	long now_time, local_time, offset;
 
 	phalcon_fetch_params(0, 1, 1, &timestamp, &local_timestamp);
@@ -893,7 +892,7 @@ PHP_METHOD(Phalcon_Date, fuzzy_span)
  */
 PHP_METHOD(Phalcon_Date, fuzzy_span2)
 {
-	zval *timestamp, *lables = NULL, output, label, span;
+	zval *timestamp, *lables = NULL, output = {}, label = {}, span = {};
 	long offset, hours, minutes, seconds;
 
 	phalcon_fetch_params(0, 1, 1, &timestamp, &lables);
@@ -952,7 +951,7 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2)
  */
 PHP_METHOD(Phalcon_Date, unix2dos){
 
-	zval *timestamp = NULL, day, year, mon, mday, hours, minutes, seconds;
+	zval *timestamp = NULL, day = {}, year = {}, mon = {}, mday = {}, hours = {}, minutes = {}, seconds = {};
 	int y, m, d, h, min, sec;
 
 	phalcon_fetch_params(0, 0, 1, &timestamp);
@@ -996,7 +995,7 @@ PHP_METHOD(Phalcon_Date, unix2dos){
  */
 PHP_METHOD(Phalcon_Date, dos2unix){
 
-	zval *timestamp = NULL, hrs, min, sec, mon, day, year;
+	zval *timestamp = NULL, hrs = {}, min = {}, sec = {}, mon = {}, day = {}, year = {};
 	long t = 0;
 
 	phalcon_fetch_params(0, 0, 1, &timestamp);
@@ -1027,7 +1026,7 @@ PHP_METHOD(Phalcon_Date, dos2unix){
  */
 PHP_METHOD(Phalcon_Date, formatted_time){
 
-	zval *datetime = NULL, *format = NULL, *zone = NULL, datetime_str, timestamp_format, timezone, tz, dt, tmp, tmp1;
+	zval *datetime = NULL, *format = NULL, *zone = NULL, datetime_str = {}, timestamp_format = {}, timezone = {}, tz = {}, dt = {}, tmp = {}, tmp1 = {};
 	zend_class_entry *ce0, *ce1;
 
 	phalcon_fetch_params(0, 0, 3, &datetime, &format, &zone);
@@ -1082,7 +1081,7 @@ PHP_METHOD(Phalcon_Date, formatted_time){
  */
 PHP_METHOD(Phalcon_Date, valid){
 
-	zval *date = NULL, *format = NULL, date_format, time, format_date;
+	zval *date = NULL, *format = NULL, date_format = {}, time = {}, format_date = {};
 
 	phalcon_fetch_params(0, 1, 1, &date, &format);
 

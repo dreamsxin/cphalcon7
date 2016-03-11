@@ -173,7 +173,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
-	zval *model, *key, *table, *schema, *dependency_injector, class_name, meta_data, prefix_key, model_metadata, strategy, exception_message, column_map, model_column_map;
+	zval *model, *key, *table, *schema, *dependency_injector, class_name = {}, meta_data = {}, prefix_key = {}, model_metadata = {}, strategy = {}, exception_message = {}, column_map = {}, model_column_map = {};
 
 	phalcon_fetch_params(0, 4, 0, &model, &key, &table, &schema);
 	ZVAL_NULL(&strategy);

@@ -153,7 +153,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 
 int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *type)
 {
-	zval *messages, t, *params[1];
+	zval *messages, t = {}, *params[1];
 	if (is_phalcon_class(ce)) {
 		messages = phalcon_read_property(this_ptr, SL("_defaultMessages"), PH_NOISY);
 

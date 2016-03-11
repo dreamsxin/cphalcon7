@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Config, val){
 	}
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array_config), idx, str_key, value) {
-		zval key, instance;
+		zval key = {}, instance = {};
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 		} else {
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Config, offsetUnset){
  */
 PHP_METHOD(Phalcon_Config, merge){
 
-	zval *config, array_config, *value;
+	zval *config, array_config = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_Config, merge){
 
 	if (Z_TYPE(array_config) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(array_config), idx, str_key, value) {
-			zval tmp, *active_value;
+			zval tmp = {}, *active_value;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -375,7 +375,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 
 	if (!recursive || zend_is_true(recursive)) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, key, value) {
-			zval tmp, array_value;
+			zval tmp = {}, array_value = {};
 			if (key) {
 				ZVAL_STR(&tmp, key);
 			} else {
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 
 PHP_METHOD(Phalcon_Config, count)
 {
-	zval arr;
+	zval arr = {};
 
 	phalcon_get_object_vars(&arr, getThis(), 0);
 	RETURN_LONG(phalcon_fast_count_int(&arr));

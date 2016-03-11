@@ -193,7 +193,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, getCompiler){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, render){
 
-	zval *template_path, *params, *must_clean = NULL, compiler, compiled_template_path, contents, *view;
+	zval *template_path, *params, *must_clean = NULL, compiler = {}, compiled_template_path = {}, contents = {}, *view;
 	int clean;
 
 	phalcon_fetch_params(0, 2, 1, &template_path, &params, &must_clean);
@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, convertEncoding){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Volt, slice){
 
-	zval *value, *start, *end = NULL, slice, length, position, current, range, r0;
+	zval *value, *start, *end = NULL, slice = {}, length = {}, position = {}, current = {}, range = {}, r0 = {};
 
 	phalcon_fetch_params(0, 2, 1, &value, &start, &end);
 

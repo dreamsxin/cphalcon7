@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Security, getWorkFactor){
  */
 PHP_METHOD(Phalcon_Security, getSaltBytes)
 {
-	zval *number_bytes = NULL, *b64 = NULL, tmp, n;
+	zval *number_bytes = NULL, *b64 = NULL, tmp = {}, n = {};
 	zend_string *encoded;
 	int i_bytes, encode, fd;
 	char *result = NULL;
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
  */
 PHP_METHOD(Phalcon_Security, hash)
 {
-	zval *password, *work_factor = NULL, n_bytes, salt_bytes, default_hash, z_salt;
+	zval *password, *work_factor = NULL, n_bytes = {}, salt_bytes = {}, default_hash = {}, z_salt = {};
 	char variant, *salt;
 	int salt_len, i_factor, i_hash;
 
@@ -552,7 +552,7 @@ PHP_METHOD(Phalcon_Security, hash)
  */
 PHP_METHOD(Phalcon_Security, checkHash){
 
-	zval *password, *password_hash, *max_pass_length = NULL, hash;
+	zval *password, *password_hash, *max_pass_length = NULL, hash = {};
 	int check = 0;
 
 	phalcon_fetch_params(0, 2, 1, &password, &password_hash, &max_pass_length);
@@ -617,7 +617,7 @@ PHP_METHOD(Phalcon_Security, isLegacyHash){
  */
 PHP_METHOD(Phalcon_Security, getTokenKey){
 
-	zval *name = NULL, *_number_bytes = NULL, number_bytes, key, random_bytes, base64bytes, safe_bytes, service, session;
+	zval *name = NULL, *_number_bytes = NULL, number_bytes = {}, key = {}, random_bytes = {}, base64bytes = {}, safe_bytes = {}, service = {}, session = {};
 
 	phalcon_fetch_params(0, 0, 2, &name, &number_bytes);
 
@@ -661,7 +661,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
  */
 PHP_METHOD(Phalcon_Security, getToken){
 
-	zval *name = NULL, *_number_bytes = NULL, number_bytes, key, random_bytes, token, service, session;
+	zval *name = NULL, *_number_bytes = NULL, number_bytes = {}, key = {}, random_bytes = {}, token = {}, service = {}, session = {};
 
 	phalcon_fetch_params(0, 0, 2, &name, &number_bytes);
 
@@ -705,7 +705,7 @@ PHP_METHOD(Phalcon_Security, getToken){
  */
 PHP_METHOD(Phalcon_Security, checkToken){
 
-	zval *name = NULL, *_token_key = NULL, *token_value = NULL, token_key, service, session, key, request, token, session_token;
+	zval *name = NULL, *_token_key = NULL, *token_value = NULL, token_key = {}, service = {}, session = {}, key = {}, request = {}, token = {}, session_token = {};
 
 	phalcon_fetch_params(0, 0, 3, &name, &_token_key, &token_value);
 
@@ -773,7 +773,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
  */
 PHP_METHOD(Phalcon_Security, getSessionToken){
 
-	zval *name = NULL, service, session, key;
+	zval *name = NULL, service = {}, session = {}, key = {};
 
 	phalcon_fetch_params(0, 0, 1, &name);
 
@@ -800,7 +800,7 @@ PHP_METHOD(Phalcon_Security, getSessionToken){
  */
 PHP_METHOD(Phalcon_Security, destroyToken){
 
-	zval *name = NULL, *token_key = NULL, service, session, key;
+	zval *name = NULL, *token_key = NULL, service = {}, session = {}, key = {};
 
 	phalcon_fetch_params(0, 0, 2, &name, &token_key);
 
@@ -865,7 +865,7 @@ PHP_METHOD(Phalcon_Security, computeHmac)
  */
 PHP_METHOD(Phalcon_Security, pbkdf2)
 {
-	zval *password, *salt, *hash = NULL, *iterations = NULL, *size = NULL, algo, tmp, computed_salt, result;
+	zval *password, *salt, *hash = NULL, *iterations = NULL, *size = NULL, algo = {}, tmp = {}, computed_salt = {}, result = {};
 	div_t d;
 	char *s_hash, *s;
 	int i_iterations = 0, i_size = 0;
@@ -924,7 +924,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 	block_count = d.quot + (d.rem ? 1 : 0);
 
 	for (i = 1; i <= block_count; ++i) {
-		zval K1,  K2;
+		zval K1 = {},  K2 = {};
 		s[salt_len+0] = (unsigned char)(i >> 24);
 		s[salt_len+1] = (unsigned char)(i >> 16);
 		s[salt_len+2] = (unsigned char)(i >> 8);
@@ -977,7 +977,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
  */
 PHP_METHOD(Phalcon_Security, deriveKey)
 {
-	zval *password, *salt, *hash = NULL, *iterations = NULL, *size = NULL, algo, iter, len;
+	zval *password, *salt, *hash = NULL, *iterations = NULL, *size = NULL, algo = {}, iter = {}, len = {};
 	char* s_hash;
 	int i_iterations = 0, i_size = 0;
 

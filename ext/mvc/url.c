@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Mvc_Url, setStaticBaseUri){
  */
 PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 
-	zval *base_uri, slash, *_SERVER, php_self, uri;
+	zval *base_uri, slash = {}, *_SERVER, php_self = {}, uri = {};
 
 	base_uri = phalcon_read_property(getThis(), SL("_baseUri"), PH_NOISY);
 	if (Z_TYPE_P(base_uri) == IS_NULL) {
@@ -249,9 +249,9 @@ PHP_METHOD(Phalcon_Mvc_Url, getBasePath){
  */
 PHP_METHOD(Phalcon_Mvc_Url, get){
 
-	zval *uri = NULL, *args = NULL, *_local = NULL, local, base_uri, router, *dependency_injector;
-	zval service, route_name, hostname, route, exception_message;
-	zval pattern, paths, processed_uri, query_string, matched, regexp, generator, arguments;
+	zval *uri = NULL, *args = NULL, *_local = NULL, local = {}, base_uri = {}, router = {}, *dependency_injector;
+	zval service = {}, route_name = {}, hostname = {}, route = {}, exception_message = {};
+	zval pattern = {}, paths = {}, processed_uri = {}, query_string = {}, matched = {}, regexp = {}, generator = {}, arguments = {};
 
 	phalcon_fetch_params(0, 0, 3, &uri, &args, &local);
 
@@ -373,7 +373,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
  */
 PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 
-	zval *uri = NULL, *args = NULL, *static_base_uri, base_uri, matched, pattern, query_string;
+	zval *uri = NULL, *args = NULL, *static_base_uri, base_uri = {}, matched = {}, pattern = {}, query_string = {};
 
 	phalcon_fetch_params(0, 0, 2, &uri, &args);
 

@@ -546,7 +546,7 @@ static zval *phvolt_ret_macro_call_statement(zval *expr, zval *arguments, zval *
 }
 
 
-/* #line 563 "parser.c" */
+/* #line 550 "parser.c" */
 /* Next is all token values, in a form suitable for use by makeheaders.
 ** This section will be null unless lemon is run with the -m switch.
 */
@@ -1627,7 +1627,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 80:
     case 81:
     case 82:
-/* #line 695 "parser.y" */
+/* #line 682 "parser.y" */
 {
 	if ((yypminor->yy0)) {
 		if ((yypminor->yy0)->free_flag) {
@@ -1636,7 +1636,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
 		efree((yypminor->yy0));
 	}
 }
-/* #line 1653 "parser.c" */
+/* #line 1640 "parser.c" */
       break;
     case 86:
     case 87:
@@ -1671,9 +1671,9 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 117:
     case 118:
     case 119:
-/* #line 712 "parser.y" */
+/* #line 699 "parser.y" */
 { zval_ptr_dtor((yypminor->yy168)); }
-/* #line 1690 "parser.c" */
+/* #line 1677 "parser.c" */
       break;
     default:  break;   /* If no destructor action specified: do nothing */
   }
@@ -2033,11 +2033,11 @@ static void yy_reduce(
   **     break;
   */
       case 0:
-/* #line 704 "parser.y" */
+/* #line 691 "parser.y" */
 {
 	status->ret = yymsp[0].minor.yy168;
 }
-/* #line 2054 "parser.c" */
+/* #line 2041 "parser.c" */
         break;
       case 1:
       case 4:
@@ -2060,32 +2060,32 @@ static void yy_reduce(
       case 21:
       case 22:
       case 133:
-/* #line 708 "parser.y" */
+/* #line 695 "parser.y" */
 {
 	yygotominor.yy168 = yymsp[0].minor.yy168;
 }
-/* #line 2081 "parser.c" */
+/* #line 2068 "parser.c" */
         break;
       case 2:
-/* #line 714 "parser.y" */
+/* #line 701 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_zval_list(yymsp[-1].minor.yy168, yymsp[0].minor.yy168);
 }
-/* #line 2088 "parser.c" */
+/* #line 2075 "parser.c" */
         break;
       case 3:
       case 36:
       case 45:
       case 130:
       case 137:
-/* #line 718 "parser.y" */
+/* #line 705 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_zval_list(NULL, yymsp[0].minor.yy168);
 }
-/* #line 2099 "parser.c" */
+/* #line 2086 "parser.c" */
         break;
       case 23:
-/* #line 802 "parser.y" */
+/* #line 789 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_if_statement(yymsp[-5].minor.yy168, yymsp[-3].minor.yy168, NULL, status->scanner_state);
   yy_destructor(1,&yymsp[-7].minor);
@@ -2095,10 +2095,10 @@ static void yy_reduce(
   yy_destructor(33,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2112 "parser.c" */
+/* #line 2099 "parser.c" */
         break;
       case 24:
-/* #line 806 "parser.y" */
+/* #line 793 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_if_statement(yymsp[-4].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(1,&yymsp[-6].minor);
@@ -2108,10 +2108,10 @@ static void yy_reduce(
   yy_destructor(33,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2125 "parser.c" */
+/* #line 2112 "parser.c" */
         break;
       case 25:
-/* #line 810 "parser.y" */
+/* #line 797 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_if_statement(yymsp[-9].minor.yy168, yymsp[-7].minor.yy168, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-11].minor);
@@ -2124,10 +2124,10 @@ static void yy_reduce(
   yy_destructor(33,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2141 "parser.c" */
+/* #line 2128 "parser.c" */
         break;
       case 26:
-/* #line 814 "parser.y" */
+/* #line 801 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_if_statement(yymsp[-8].minor.yy168, yymsp[-6].minor.yy168, NULL, status->scanner_state);
   yy_destructor(1,&yymsp[-10].minor);
@@ -2140,10 +2140,10 @@ static void yy_reduce(
   yy_destructor(33,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2157 "parser.c" */
+/* #line 2144 "parser.c" */
         break;
       case 27:
-/* #line 818 "parser.y" */
+/* #line 805 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_if_statement(yymsp[-7].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(1,&yymsp[-9].minor);
@@ -2156,30 +2156,30 @@ static void yy_reduce(
   yy_destructor(33,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2173 "parser.c" */
+/* #line 2160 "parser.c" */
         break;
       case 28:
-/* #line 824 "parser.y" */
+/* #line 811 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_elseif_statement(yymsp[-1].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-3].minor);
   yy_destructor(35,&yymsp[-2].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2183 "parser.c" */
+/* #line 2170 "parser.c" */
         break;
       case 29:
-/* #line 830 "parser.y" */
+/* #line 817 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_elsefor_statement(status->scanner_state);
   yy_destructor(1,&yymsp[-2].minor);
   yy_destructor(36,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2193 "parser.c" */
+/* #line 2180 "parser.c" */
         break;
       case 30:
-/* #line 836 "parser.y" */
+/* #line 823 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_for_statement(yymsp[-7].minor.yy0, NULL, yymsp[-5].minor.yy168, NULL, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-9].minor);
@@ -2190,10 +2190,10 @@ static void yy_reduce(
   yy_destructor(39,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2207 "parser.c" */
+/* #line 2194 "parser.c" */
         break;
       case 31:
-/* #line 840 "parser.y" */
+/* #line 827 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_for_statement(yymsp[-9].minor.yy0, NULL, yymsp[-7].minor.yy168, yymsp[-5].minor.yy168, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-11].minor);
@@ -2205,10 +2205,10 @@ static void yy_reduce(
   yy_destructor(39,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2222 "parser.c" */
+/* #line 2209 "parser.c" */
         break;
       case 32:
-/* #line 844 "parser.y" */
+/* #line 831 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_for_statement(yymsp[-7].minor.yy0, yymsp[-9].minor.yy0, yymsp[-5].minor.yy168, NULL, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-11].minor);
@@ -2220,10 +2220,10 @@ static void yy_reduce(
   yy_destructor(39,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2237 "parser.c" */
+/* #line 2224 "parser.c" */
         break;
       case 33:
-/* #line 848 "parser.y" */
+/* #line 835 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_for_statement(yymsp[-9].minor.yy0, yymsp[-11].minor.yy0, yymsp[-7].minor.yy168, yymsp[-5].minor.yy168, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-13].minor);
@@ -2236,71 +2236,71 @@ static void yy_reduce(
   yy_destructor(39,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2253 "parser.c" */
+/* #line 2240 "parser.c" */
         break;
       case 34:
-/* #line 854 "parser.y" */
+/* #line 841 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_set_statement(yymsp[-1].minor.yy168);
   yy_destructor(1,&yymsp[-3].minor);
   yy_destructor(40,&yymsp[-2].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2263 "parser.c" */
+/* #line 2250 "parser.c" */
         break;
       case 35:
       case 44:
       case 129:
       case 136:
-/* #line 860 "parser.y" */
+/* #line 847 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_zval_list(yymsp[-2].minor.yy168, yymsp[0].minor.yy168);
   yy_destructor(2,&yymsp[-1].minor);
 }
-/* #line 2274 "parser.c" */
+/* #line 2261 "parser.c" */
         break;
       case 37:
-/* #line 870 "parser.y" */
+/* #line 857 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_set_assignment(yymsp[-2].minor.yy0, PHVOLT_T_ASSIGN, yymsp[0].minor.yy168, status->scanner_state);
   yy_destructor(41,&yymsp[-1].minor);
 }
-/* #line 2282 "parser.c" */
+/* #line 2269 "parser.c" */
         break;
       case 38:
-/* #line 874 "parser.y" */
+/* #line 861 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_set_assignment(yymsp[-2].minor.yy0, PHVOLT_T_ADD_ASSIGN, yymsp[0].minor.yy168, status->scanner_state);
   yy_destructor(42,&yymsp[-1].minor);
 }
-/* #line 2290 "parser.c" */
+/* #line 2277 "parser.c" */
         break;
       case 39:
-/* #line 878 "parser.y" */
+/* #line 865 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_set_assignment(yymsp[-2].minor.yy0, PHVOLT_T_SUB_ASSIGN, yymsp[0].minor.yy168, status->scanner_state);
   yy_destructor(43,&yymsp[-1].minor);
 }
-/* #line 2298 "parser.c" */
+/* #line 2285 "parser.c" */
         break;
       case 40:
-/* #line 882 "parser.y" */
+/* #line 869 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_set_assignment(yymsp[-2].minor.yy0, PHVOLT_T_MUL_ASSIGN, yymsp[0].minor.yy168, status->scanner_state);
   yy_destructor(44,&yymsp[-1].minor);
 }
-/* #line 2306 "parser.c" */
+/* #line 2293 "parser.c" */
         break;
       case 41:
-/* #line 886 "parser.y" */
+/* #line 873 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_set_assignment(yymsp[-2].minor.yy0, PHVOLT_T_DIV_ASSIGN, yymsp[0].minor.yy168, status->scanner_state);
   yy_destructor(45,&yymsp[-1].minor);
 }
-/* #line 2314 "parser.c" */
+/* #line 2301 "parser.c" */
         break;
       case 42:
-/* #line 892 "parser.y" */
+/* #line 879 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_macro_statement(yymsp[-7].minor.yy0, NULL, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-9].minor);
@@ -2312,10 +2312,10 @@ static void yy_reduce(
   yy_destructor(48,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2329 "parser.c" */
+/* #line 2316 "parser.c" */
         break;
       case 43:
-/* #line 896 "parser.y" */
+/* #line 883 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_macro_statement(yymsp[-8].minor.yy0, yymsp[-6].minor.yy168, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-10].minor);
@@ -2327,78 +2327,78 @@ static void yy_reduce(
   yy_destructor(48,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2344 "parser.c" */
+/* #line 2331 "parser.c" */
         break;
       case 46:
-/* #line 912 "parser.y" */
+/* #line 899 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_macro_parameter(yymsp[0].minor.yy0, NULL, status->scanner_state);
 }
-/* #line 2351 "parser.c" */
+/* #line 2338 "parser.c" */
         break;
       case 47:
-/* #line 916 "parser.y" */
+/* #line 903 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_macro_parameter(yymsp[-2].minor.yy0, yymsp[0].minor.yy168, status->scanner_state);
   yy_destructor(41,&yymsp[-1].minor);
 }
-/* #line 2359 "parser.c" */
+/* #line 2346 "parser.c" */
         break;
       case 48:
       case 62:
       case 127:
       case 141:
-/* #line 920 "parser.y" */
+/* #line 907 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_literal_zval(PHVOLT_T_INTEGER, yymsp[0].minor.yy0, status->scanner_state);
 }
-/* #line 2369 "parser.c" */
+/* #line 2356 "parser.c" */
         break;
       case 49:
       case 142:
-/* #line 924 "parser.y" */
+/* #line 911 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_literal_zval(PHVOLT_T_STRING, yymsp[0].minor.yy0, status->scanner_state);
 }
-/* #line 2377 "parser.c" */
+/* #line 2364 "parser.c" */
         break;
       case 50:
       case 143:
-/* #line 928 "parser.y" */
+/* #line 915 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_literal_zval(PHVOLT_T_DOUBLE, yymsp[0].minor.yy0, status->scanner_state);
 }
-/* #line 2385 "parser.c" */
+/* #line 2372 "parser.c" */
         break;
       case 51:
       case 144:
-/* #line 932 "parser.y" */
+/* #line 919 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_literal_zval(PHVOLT_T_NULL, NULL, status->scanner_state);
   yy_destructor(52,&yymsp[0].minor);
 }
-/* #line 2394 "parser.c" */
+/* #line 2381 "parser.c" */
         break;
       case 52:
       case 145:
-/* #line 936 "parser.y" */
+/* #line 923 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_literal_zval(PHVOLT_T_FALSE, NULL, status->scanner_state);
   yy_destructor(53,&yymsp[0].minor);
 }
-/* #line 2403 "parser.c" */
+/* #line 2390 "parser.c" */
         break;
       case 53:
       case 146:
-/* #line 940 "parser.y" */
+/* #line 927 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_literal_zval(PHVOLT_T_TRUE, NULL, status->scanner_state);
   yy_destructor(54,&yymsp[0].minor);
 }
-/* #line 2412 "parser.c" */
+/* #line 2399 "parser.c" */
         break;
       case 54:
-/* #line 946 "parser.y" */
+/* #line 933 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_macro_call_statement(yymsp[-8].minor.yy168, yymsp[-6].minor.yy168, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-10].minor);
@@ -2410,10 +2410,10 @@ static void yy_reduce(
   yy_destructor(56,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2427 "parser.c" */
+/* #line 2414 "parser.c" */
         break;
       case 55:
-/* #line 950 "parser.y" */
+/* #line 937 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_macro_call_statement(yymsp[-6].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(1,&yymsp[-8].minor);
@@ -2425,28 +2425,28 @@ static void yy_reduce(
   yy_destructor(56,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2442 "parser.c" */
+/* #line 2429 "parser.c" */
         break;
       case 56:
-/* #line 956 "parser.y" */
+/* #line 943 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_empty_statement(status->scanner_state);
   yy_destructor(1,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2451 "parser.c" */
+/* #line 2438 "parser.c" */
         break;
       case 57:
-/* #line 962 "parser.y" */
+/* #line 949 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_echo_statement(yymsp[-1].minor.yy168, status->scanner_state);
   yy_destructor(57,&yymsp[-2].minor);
   yy_destructor(58,&yymsp[0].minor);
 }
-/* #line 2460 "parser.c" */
+/* #line 2447 "parser.c" */
         break;
       case 58:
-/* #line 968 "parser.y" */
+/* #line 955 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_block_statement(yymsp[-5].minor.yy0, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-7].minor);
@@ -2456,10 +2456,10 @@ static void yy_reduce(
   yy_destructor(60,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2473 "parser.c" */
+/* #line 2460 "parser.c" */
         break;
       case 59:
-/* #line 972 "parser.y" */
+/* #line 959 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_block_statement(yymsp[-4].minor.yy0, NULL, status->scanner_state);
   yy_destructor(1,&yymsp[-6].minor);
@@ -2469,10 +2469,10 @@ static void yy_reduce(
   yy_destructor(60,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2486 "parser.c" */
+/* #line 2473 "parser.c" */
         break;
       case 60:
-/* #line 978 "parser.y" */
+/* #line 965 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_cache_statement(yymsp[-5].minor.yy168, NULL, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-7].minor);
@@ -2482,10 +2482,10 @@ static void yy_reduce(
   yy_destructor(62,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2499 "parser.c" */
+/* #line 2486 "parser.c" */
         break;
       case 61:
-/* #line 982 "parser.y" */
+/* #line 969 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_cache_statement(yymsp[-6].minor.yy168, yymsp[-5].minor.yy168, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-8].minor);
@@ -2495,39 +2495,39 @@ static void yy_reduce(
   yy_destructor(62,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2512 "parser.c" */
+/* #line 2499 "parser.c" */
         break;
       case 63:
       case 128:
       case 140:
-/* #line 992 "parser.y" */
+/* #line 979 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_literal_zval(PHVOLT_T_IDENTIFIER, yymsp[0].minor.yy0, status->scanner_state);
 }
-/* #line 2521 "parser.c" */
+/* #line 2508 "parser.c" */
         break;
       case 64:
-/* #line 998 "parser.y" */
+/* #line 985 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_extends_statement(yymsp[-1].minor.yy0, status->scanner_state);
   yy_destructor(1,&yymsp[-3].minor);
   yy_destructor(63,&yymsp[-2].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2531 "parser.c" */
+/* #line 2518 "parser.c" */
         break;
       case 65:
-/* #line 1004 "parser.y" */
+/* #line 991 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_include_statement(yymsp[-1].minor.yy168, NULL, status->scanner_state);
   yy_destructor(1,&yymsp[-3].minor);
   yy_destructor(64,&yymsp[-2].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2541 "parser.c" */
+/* #line 2528 "parser.c" */
         break;
       case 66:
-/* #line 1008 "parser.y" */
+/* #line 995 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_include_statement(yymsp[-3].minor.yy168, yymsp[-1].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-5].minor);
@@ -2535,30 +2535,30 @@ static void yy_reduce(
   yy_destructor(65,&yymsp[-2].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2552 "parser.c" */
+/* #line 2539 "parser.c" */
         break;
       case 67:
-/* #line 1014 "parser.y" */
+/* #line 1001 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_do_statement(yymsp[-1].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-3].minor);
   yy_destructor(66,&yymsp[-2].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2562 "parser.c" */
+/* #line 2549 "parser.c" */
         break;
       case 68:
-/* #line 1020 "parser.y" */
+/* #line 1007 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_return_statement(yymsp[-1].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-3].minor);
   yy_destructor(67,&yymsp[-2].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2572 "parser.c" */
+/* #line 2559 "parser.c" */
         break;
       case 69:
-/* #line 1026 "parser.y" */
+/* #line 1013 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_autoescape_statement(0, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-7].minor);
@@ -2569,10 +2569,10 @@ static void yy_reduce(
   yy_destructor(69,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2586 "parser.c" */
+/* #line 2573 "parser.c" */
         break;
       case 70:
-/* #line 1030 "parser.y" */
+/* #line 1017 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_autoescape_statement(1, yymsp[-3].minor.yy168, status->scanner_state);
   yy_destructor(1,&yymsp[-7].minor);
@@ -2583,523 +2583,523 @@ static void yy_reduce(
   yy_destructor(69,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2600 "parser.c" */
+/* #line 2587 "parser.c" */
         break;
       case 71:
-/* #line 1036 "parser.y" */
+/* #line 1023 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_break_statement(status->scanner_state);
   yy_destructor(1,&yymsp[-2].minor);
   yy_destructor(70,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2610 "parser.c" */
+/* #line 2597 "parser.c" */
         break;
       case 72:
-/* #line 1042 "parser.y" */
+/* #line 1029 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_continue_statement(status->scanner_state);
   yy_destructor(1,&yymsp[-2].minor);
   yy_destructor(71,&yymsp[-1].minor);
   yy_destructor(32,&yymsp[0].minor);
 }
-/* #line 2620 "parser.c" */
+/* #line 2607 "parser.c" */
         break;
       case 73:
-/* #line 1048 "parser.y" */
+/* #line 1035 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_literal_zval(PHVOLT_T_RAW_FRAGMENT, yymsp[0].minor.yy0, status->scanner_state);
 }
-/* #line 2627 "parser.c" */
+/* #line 2614 "parser.c" */
         break;
       case 74:
-/* #line 1054 "parser.y" */
+/* #line 1041 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_MINUS, NULL, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(22,&yymsp[-1].minor);
 }
-/* #line 2635 "parser.c" */
+/* #line 2622 "parser.c" */
         break;
       case 75:
-/* #line 1058 "parser.y" */
+/* #line 1045 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_PLUS, NULL, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(21,&yymsp[-1].minor);
 }
-/* #line 2643 "parser.c" */
+/* #line 2630 "parser.c" */
         break;
       case 76:
-/* #line 1062 "parser.y" */
+/* #line 1049 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_SUB, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(22,&yymsp[-1].minor);
 }
-/* #line 2651 "parser.c" */
+/* #line 2638 "parser.c" */
         break;
       case 77:
-/* #line 1066 "parser.y" */
+/* #line 1053 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ADD, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(21,&yymsp[-1].minor);
 }
-/* #line 2659 "parser.c" */
+/* #line 2646 "parser.c" */
         break;
       case 78:
-/* #line 1070 "parser.y" */
+/* #line 1057 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_MUL, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(19,&yymsp[-1].minor);
 }
-/* #line 2667 "parser.c" */
+/* #line 2654 "parser.c" */
         break;
       case 79:
-/* #line 1074 "parser.y" */
+/* #line 1061 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_POW, yymsp[-3].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(19,&yymsp[-2].minor);
   yy_destructor(19,&yymsp[-1].minor);
 }
-/* #line 2676 "parser.c" */
+/* #line 2663 "parser.c" */
         break;
       case 80:
-/* #line 1078 "parser.y" */
+/* #line 1065 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_DIV, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(18,&yymsp[-1].minor);
 }
-/* #line 2684 "parser.c" */
+/* #line 2671 "parser.c" */
         break;
       case 81:
-/* #line 1082 "parser.y" */
+/* #line 1069 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_MOD, yymsp[-3].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(18,&yymsp[-2].minor);
   yy_destructor(18,&yymsp[-1].minor);
 }
-/* #line 2693 "parser.c" */
+/* #line 2680 "parser.c" */
         break;
       case 82:
-/* #line 1086 "parser.y" */
+/* #line 1073 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_MOD, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(20,&yymsp[-1].minor);
 }
-/* #line 2701 "parser.c" */
+/* #line 2688 "parser.c" */
         break;
       case 83:
-/* #line 1090 "parser.y" */
+/* #line 1077 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_AND, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(7,&yymsp[-1].minor);
 }
-/* #line 2709 "parser.c" */
+/* #line 2696 "parser.c" */
         break;
       case 84:
-/* #line 1094 "parser.y" */
+/* #line 1081 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_OR, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(8,&yymsp[-1].minor);
 }
-/* #line 2717 "parser.c" */
+/* #line 2704 "parser.c" */
         break;
       case 85:
-/* #line 1098 "parser.y" */
+/* #line 1085 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_CONCAT, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(23,&yymsp[-1].minor);
 }
-/* #line 2725 "parser.c" */
+/* #line 2712 "parser.c" */
         break;
       case 86:
-/* #line 1102 "parser.y" */
+/* #line 1089 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_PIPE, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(25,&yymsp[-1].minor);
 }
-/* #line 2733 "parser.c" */
+/* #line 2720 "parser.c" */
         break;
       case 87:
-/* #line 1106 "parser.y" */
+/* #line 1093 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_RANGE, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(6,&yymsp[-1].minor);
 }
-/* #line 2741 "parser.c" */
+/* #line 2728 "parser.c" */
         break;
       case 88:
-/* #line 1110 "parser.y" */
+/* #line 1097 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_EQUALS, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(10,&yymsp[-1].minor);
 }
-/* #line 2749 "parser.c" */
+/* #line 2736 "parser.c" */
         break;
       case 89:
-/* #line 1114 "parser.y" */
+/* #line 1101 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT_ISSET, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(11,&yymsp[-1].minor);
   yy_destructor(73,&yymsp[0].minor);
 }
-/* #line 2758 "parser.c" */
+/* #line 2745 "parser.c" */
         break;
       case 90:
-/* #line 1118 "parser.y" */
+/* #line 1105 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ISSET, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(9,&yymsp[-1].minor);
   yy_destructor(73,&yymsp[0].minor);
 }
-/* #line 2767 "parser.c" */
+/* #line 2754 "parser.c" */
         break;
       case 91:
-/* #line 1122 "parser.y" */
+/* #line 1109 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT_ISEMPTY, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(11,&yymsp[-1].minor);
   yy_destructor(74,&yymsp[0].minor);
 }
-/* #line 2776 "parser.c" */
+/* #line 2763 "parser.c" */
         break;
       case 92:
-/* #line 1126 "parser.y" */
+/* #line 1113 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ISEMPTY, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(9,&yymsp[-1].minor);
   yy_destructor(74,&yymsp[0].minor);
 }
-/* #line 2785 "parser.c" */
+/* #line 2772 "parser.c" */
         break;
       case 93:
-/* #line 1130 "parser.y" */
+/* #line 1117 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT_ISEVEN, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(11,&yymsp[-1].minor);
   yy_destructor(75,&yymsp[0].minor);
 }
-/* #line 2794 "parser.c" */
+/* #line 2781 "parser.c" */
         break;
       case 94:
-/* #line 1134 "parser.y" */
+/* #line 1121 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ISEVEN, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(9,&yymsp[-1].minor);
   yy_destructor(75,&yymsp[0].minor);
 }
-/* #line 2803 "parser.c" */
+/* #line 2790 "parser.c" */
         break;
       case 95:
-/* #line 1138 "parser.y" */
+/* #line 1125 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT_ISODD, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(11,&yymsp[-1].minor);
   yy_destructor(76,&yymsp[0].minor);
 }
-/* #line 2812 "parser.c" */
+/* #line 2799 "parser.c" */
         break;
       case 96:
-/* #line 1142 "parser.y" */
+/* #line 1129 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ISODD, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(9,&yymsp[-1].minor);
   yy_destructor(76,&yymsp[0].minor);
 }
-/* #line 2821 "parser.c" */
+/* #line 2808 "parser.c" */
         break;
       case 97:
-/* #line 1146 "parser.y" */
+/* #line 1133 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT_ISNUMERIC, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(11,&yymsp[-1].minor);
   yy_destructor(77,&yymsp[0].minor);
 }
-/* #line 2830 "parser.c" */
+/* #line 2817 "parser.c" */
         break;
       case 98:
-/* #line 1150 "parser.y" */
+/* #line 1137 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ISNUMERIC, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(9,&yymsp[-1].minor);
   yy_destructor(77,&yymsp[0].minor);
 }
-/* #line 2839 "parser.c" */
+/* #line 2826 "parser.c" */
         break;
       case 99:
-/* #line 1154 "parser.y" */
+/* #line 1141 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT_ISSCALAR, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(11,&yymsp[-1].minor);
   yy_destructor(78,&yymsp[0].minor);
 }
-/* #line 2848 "parser.c" */
+/* #line 2835 "parser.c" */
         break;
       case 100:
-/* #line 1158 "parser.y" */
+/* #line 1145 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ISSCALAR, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(9,&yymsp[-1].minor);
   yy_destructor(78,&yymsp[0].minor);
 }
-/* #line 2857 "parser.c" */
+/* #line 2844 "parser.c" */
         break;
       case 101:
-/* #line 1162 "parser.y" */
+/* #line 1149 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT_ISITERABLE, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(11,&yymsp[-1].minor);
   yy_destructor(79,&yymsp[0].minor);
 }
-/* #line 2866 "parser.c" */
+/* #line 2853 "parser.c" */
         break;
       case 102:
-/* #line 1166 "parser.y" */
+/* #line 1153 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ISITERABLE, yymsp[-2].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(9,&yymsp[-1].minor);
   yy_destructor(79,&yymsp[0].minor);
 }
-/* #line 2875 "parser.c" */
+/* #line 2862 "parser.c" */
         break;
       case 103:
-/* #line 1170 "parser.y" */
+/* #line 1157 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_IS, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(9,&yymsp[-1].minor);
 }
-/* #line 2883 "parser.c" */
+/* #line 2870 "parser.c" */
         break;
       case 104:
-/* #line 1174 "parser.y" */
+/* #line 1161 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOTEQUALS, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(11,&yymsp[-1].minor);
 }
-/* #line 2891 "parser.c" */
+/* #line 2878 "parser.c" */
         break;
       case 105:
-/* #line 1178 "parser.y" */
+/* #line 1165 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_IDENTICAL, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(16,&yymsp[-1].minor);
 }
-/* #line 2899 "parser.c" */
+/* #line 2886 "parser.c" */
         break;
       case 106:
-/* #line 1182 "parser.y" */
+/* #line 1169 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOTIDENTICAL, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(17,&yymsp[-1].minor);
 }
-/* #line 2907 "parser.c" */
+/* #line 2894 "parser.c" */
         break;
       case 107:
-/* #line 1186 "parser.y" */
+/* #line 1173 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_LESS, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(12,&yymsp[-1].minor);
 }
-/* #line 2915 "parser.c" */
+/* #line 2902 "parser.c" */
         break;
       case 108:
-/* #line 1190 "parser.y" */
+/* #line 1177 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_GREATER, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(13,&yymsp[-1].minor);
 }
-/* #line 2923 "parser.c" */
+/* #line 2910 "parser.c" */
         break;
       case 109:
-/* #line 1194 "parser.y" */
+/* #line 1181 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_GREATEREQUAL, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(14,&yymsp[-1].minor);
 }
-/* #line 2931 "parser.c" */
+/* #line 2918 "parser.c" */
         break;
       case 110:
-/* #line 1198 "parser.y" */
+/* #line 1185 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_LESSEQUAL, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(15,&yymsp[-1].minor);
 }
-/* #line 2939 "parser.c" */
+/* #line 2926 "parser.c" */
         break;
       case 111:
-/* #line 1202 "parser.y" */
+/* #line 1189 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_DOT, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(30,&yymsp[-1].minor);
 }
-/* #line 2947 "parser.c" */
+/* #line 2934 "parser.c" */
         break;
       case 112:
-/* #line 1206 "parser.y" */
+/* #line 1193 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_IN, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(3,&yymsp[-1].minor);
 }
-/* #line 2955 "parser.c" */
+/* #line 2942 "parser.c" */
         break;
       case 113:
-/* #line 1210 "parser.y" */
+/* #line 1197 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT_IN, yymsp[-3].minor.yy168, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(26,&yymsp[-2].minor);
   yy_destructor(3,&yymsp[-1].minor);
 }
-/* #line 2964 "parser.c" */
+/* #line 2951 "parser.c" */
         break;
       case 114:
-/* #line 1214 "parser.y" */
+/* #line 1201 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_NOT, NULL, yymsp[0].minor.yy168, NULL, status->scanner_state);
   yy_destructor(26,&yymsp[-1].minor);
 }
-/* #line 2972 "parser.c" */
+/* #line 2959 "parser.c" */
         break;
       case 115:
-/* #line 1218 "parser.y" */
+/* #line 1205 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_INCR, yymsp[-1].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(27,&yymsp[0].minor);
 }
-/* #line 2980 "parser.c" */
+/* #line 2967 "parser.c" */
         break;
       case 116:
-/* #line 1222 "parser.y" */
+/* #line 1209 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_DECR, yymsp[-1].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(28,&yymsp[0].minor);
 }
-/* #line 2988 "parser.c" */
+/* #line 2975 "parser.c" */
         break;
       case 117:
-/* #line 1226 "parser.y" */
+/* #line 1213 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ENCLOSED, yymsp[-1].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(29,&yymsp[-2].minor);
   yy_destructor(47,&yymsp[0].minor);
 }
-/* #line 2997 "parser.c" */
+/* #line 2984 "parser.c" */
         break;
       case 118:
-/* #line 1230 "parser.y" */
+/* #line 1217 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ARRAY, NULL, NULL, NULL, status->scanner_state);
   yy_destructor(24,&yymsp[-1].minor);
   yy_destructor(80,&yymsp[0].minor);
 }
-/* #line 3006 "parser.c" */
+/* #line 2993 "parser.c" */
         break;
       case 119:
-/* #line 1234 "parser.y" */
+/* #line 1221 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ARRAY, yymsp[-1].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(24,&yymsp[-2].minor);
   yy_destructor(80,&yymsp[0].minor);
 }
-/* #line 3015 "parser.c" */
+/* #line 3002 "parser.c" */
         break;
       case 120:
-/* #line 1238 "parser.y" */
+/* #line 1225 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ARRAY, NULL, NULL, NULL, status->scanner_state);
   yy_destructor(81,&yymsp[-1].minor);
   yy_destructor(82,&yymsp[0].minor);
 }
-/* #line 3024 "parser.c" */
+/* #line 3011 "parser.c" */
         break;
       case 121:
-/* #line 1242 "parser.y" */
+/* #line 1229 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ARRAY, yymsp[-1].minor.yy168, NULL, NULL, status->scanner_state);
   yy_destructor(81,&yymsp[-2].minor);
   yy_destructor(82,&yymsp[0].minor);
 }
-/* #line 3033 "parser.c" */
+/* #line 3020 "parser.c" */
         break;
       case 122:
-/* #line 1246 "parser.y" */
+/* #line 1233 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_ARRAYACCESS, yymsp[-3].minor.yy168, yymsp[-1].minor.yy168, NULL, status->scanner_state);
   yy_destructor(24,&yymsp[-2].minor);
   yy_destructor(80,&yymsp[0].minor);
 }
-/* #line 3042 "parser.c" */
+/* #line 3029 "parser.c" */
         break;
       case 123:
-/* #line 1250 "parser.y" */
+/* #line 1237 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_expr(PHVOLT_T_TERNARY, yymsp[-2].minor.yy168, yymsp[0].minor.yy168, yymsp[-4].minor.yy168, status->scanner_state);
   yy_destructor(4,&yymsp[-3].minor);
   yy_destructor(5,&yymsp[-1].minor);
 }
-/* #line 3051 "parser.c" */
+/* #line 3038 "parser.c" */
         break;
       case 124:
-/* #line 1254 "parser.y" */
+/* #line 1241 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_slice(yymsp[-4].minor.yy168, NULL, yymsp[-1].minor.yy168, status->scanner_state);
   yy_destructor(24,&yymsp[-3].minor);
   yy_destructor(5,&yymsp[-2].minor);
   yy_destructor(80,&yymsp[0].minor);
 }
-/* #line 3061 "parser.c" */
+/* #line 3048 "parser.c" */
         break;
       case 125:
-/* #line 1258 "parser.y" */
+/* #line 1245 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_slice(yymsp[-4].minor.yy168, yymsp[-2].minor.yy168, NULL, status->scanner_state);
   yy_destructor(24,&yymsp[-3].minor);
   yy_destructor(5,&yymsp[-1].minor);
   yy_destructor(80,&yymsp[0].minor);
 }
-/* #line 3071 "parser.c" */
+/* #line 3058 "parser.c" */
         break;
       case 126:
-/* #line 1262 "parser.y" */
+/* #line 1249 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_slice(yymsp[-5].minor.yy168, yymsp[-3].minor.yy168, yymsp[-1].minor.yy168, status->scanner_state);
   yy_destructor(24,&yymsp[-4].minor);
   yy_destructor(5,&yymsp[-2].minor);
   yy_destructor(80,&yymsp[0].minor);
 }
-/* #line 3081 "parser.c" */
+/* #line 3068 "parser.c" */
         break;
       case 131:
       case 139:
-/* #line 1288 "parser.y" */
+/* #line 1275 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_named_item(yymsp[-2].minor.yy0, yymsp[0].minor.yy168, status->scanner_state);
   yy_destructor(5,&yymsp[-1].minor);
 }
-/* #line 3090 "parser.c" */
+/* #line 3077 "parser.c" */
         break;
       case 132:
       case 138:
-/* #line 1292 "parser.y" */
+/* #line 1279 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_named_item(NULL, yymsp[0].minor.yy168, status->scanner_state);
 }
-/* #line 3098 "parser.c" */
+/* #line 3085 "parser.c" */
         break;
       case 134:
-/* #line 1302 "parser.y" */
+/* #line 1289 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_func_call(yymsp[-3].minor.yy168, yymsp[-1].minor.yy168, status->scanner_state);
   yy_destructor(29,&yymsp[-2].minor);
   yy_destructor(47,&yymsp[0].minor);
 }
-/* #line 3107 "parser.c" */
+/* #line 3094 "parser.c" */
         break;
       case 135:
-/* #line 1306 "parser.y" */
+/* #line 1293 "parser.y" */
 {
 	yygotominor.yy168 = phvolt_ret_func_call(yymsp[-2].minor.yy168, NULL, status->scanner_state);
   yy_destructor(29,&yymsp[-1].minor);
   yy_destructor(47,&yymsp[0].minor);
 }
-/* #line 3116 "parser.c" */
+/* #line 3103 "parser.c" */
         break;
   };
   yygoto = yyRuleInfo[yyruleno].lhs;
@@ -3141,7 +3141,7 @@ static void yy_syntax_error(
 ){
   phvolt_ARG_FETCH;
 #define TOKEN (yyminor.yy0)
-/* #line 597 "parser.y" */
+/* #line 584 "parser.y" */
 
 	{
 
@@ -3239,7 +3239,7 @@ static void yy_syntax_error(
 
 	status->status = PHVOLT_PARSING_FAILED;
 
-/* #line 3256 "parser.c" */
+/* #line 3243 "parser.c" */
   phvolt_ARG_STORE; /* Suppress warning about unused %extra_argument variable */
 }
 
@@ -3558,20 +3558,18 @@ static void phvolt_create_error_msg(phvolt_parser_status *parser_status, char *m
 	snprintf(str, length, "%s in %s on line %d", message, Z_STRVAL_P(parser_status->scanner_state->active_file), parser_status->scanner_state->active_line);
 	str[length - 1] = '\0';
 
-	parser_status->syntax_error = estrndup(str, strlen(str));
-	efree(str);
+	parser_status->syntax_error = str;
 }
 
 /**
  * Creates an error message when it's triggered by the scanner
  */
-static void phvolt_scanner_error_msg(phvolt_parser_status *parser_status, zval **error_msg){
+static void phvolt_scanner_error_msg(phvolt_parser_status *parser_status, zval *error_msg){
 
 	char *error, *error_part;
 	int length;
 	phvolt_scanner_state *state = parser_status->scanner_state;
 
-	PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 	if (state->start) {
 		error = emalloc(sizeof(char) * 72 + state->start_length +  Z_STRLEN_P(state->active_file));
 		if (state->start_length > 16) {
@@ -3590,7 +3588,7 @@ static void phvolt_scanner_error_msg(phvolt_parser_status *parser_status, zval *
 	}
 
 	error[length - 1] = '\0';
-	ZVAL_STRING(*error_msg, error);
+	ZVAL_STRING(error_msg, error);
 	efree(error);
 }
 
@@ -3599,7 +3597,7 @@ static void phvolt_scanner_error_msg(phvolt_parser_status *parser_status, zval *
  */
 int phvolt_parse_view(zval *result, zval *view_code, zval *template_path){
 
-	zval *error_msg = NULL;
+	zval error_msg = {};
 
 	ZVAL_NULL(result);
 
@@ -3608,10 +3606,10 @@ int phvolt_parse_view(zval *result, zval *view_code, zval *template_path){
 		return FAILURE;
 	}
 
-	if (phvolt_internal_parse_view(&result, view_code, template_path, &error_msg) == FAILURE) {
-		if (likely(error_msg != NULL)) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, Z_STRVAL_P(error_msg));
-			zval_ptr_dtor(error_msg);
+	if (phvolt_internal_parse_view(result, view_code, template_path, &error_msg) == FAILURE) {
+		if (likely(Z_TYPE(error_msg) > IS_NULL)) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, Z_STRVAL(error_msg));
+			zval_ptr_dtor(&error_msg);
 		}
 		else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Error parsing the view");
@@ -3645,7 +3643,7 @@ int phvolt_is_blank_string(phvolt_scanner_token *token){
 /**
  * Parses a volt template returning an intermediate array representation
  */
-int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_path, zval **error_msg) {
+int phvolt_internal_parse_view(zval *result, zval *view_code, zval *template_path, zval *error_msg) {
 
 	char *error;
 	phvolt_scanner_state *state;
@@ -3656,21 +3654,19 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 
 	/** Check if the view has code */
 	if (!Z_STRVAL_P(view_code)) {
-		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-		ZVAL_STRING(*error_msg, "View code cannot be null");
+		ZVAL_STRING(error_msg, "View code cannot be null");
 		return FAILURE;
 	}
 
 	if (!Z_STRLEN_P(view_code)) {
-		array_init(*result);
+		array_init(result);
 		return SUCCESS;
 	}
 
 	/** Start the reentrant parser */
 	phvolt_parser = phvolt_Alloc(phvolt_wrapper_alloc);
 	if (unlikely(!phvolt_parser)) {
-		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-		ZVAL_STRING(*error_msg, "Memory allocation error");
+		ZVAL_STRING(error_msg, "Memory allocation error");
 		return FAILURE;
 	}
 
@@ -4083,11 +4079,10 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 
 			default:
 				parser_status->status = PHVOLT_PARSING_FAILED;
-				if (!*error_msg) {
+				if (Z_TYPE_P(error_msg) <= IS_NULL) {
 					error = emalloc(sizeof(char) * (48 + Z_STRLEN_P(state->active_file)));
 					snprintf(error, 48 + Z_STRLEN_P(state->active_file) + state->active_line, "Scanner: unknown opcode %d on in %s line %d", token.opcode, Z_STRVAL_P(state->active_file), state->active_line);
-					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, error);
+					ZVAL_STRING(error_msg, error);
 					efree(error);
 				}
 				break;
@@ -4105,7 +4100,7 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 		switch (scanner_status) {
 			case PHVOLT_SCANNER_RETCODE_ERR:
 			case PHVOLT_SCANNER_RETCODE_IMPOSSIBLE:
-				if (!*error_msg) {
+				if (Z_TYPE_P(error_msg) <= IS_NULL) {
 					phvolt_scanner_error_msg(parser_status, error_msg);
 				}
 				status = FAILURE;
@@ -4122,11 +4117,10 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 	if (parser_status->status != PHVOLT_PARSING_OK) {
 		status = FAILURE;
 		if (parser_status->syntax_error) {
-			if (!*error_msg) {
-				PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-				ZVAL_STRING(*error_msg, parser_status->syntax_error);
+			if (Z_TYPE_P(error_msg) <= IS_NULL) {
+				ZVAL_STRING(error_msg, parser_status->syntax_error);
 			}
-			efree(parser_status->syntax_error);
+			//efree(parser_status->syntax_error);
 		}
 	}
 
@@ -4135,11 +4129,11 @@ int phvolt_internal_parse_view(zval **result, zval *view_code, zval *template_pa
 	if (status != FAILURE) {
 		if (parser_status->status == PHVOLT_PARSING_OK) {
 			if (parser_status->ret) {
-				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
+				ZVAL_ZVAL(result, parser_status->ret, 0, 0);
 				ZVAL_NULL(parser_status->ret);
 				zval_ptr_dtor(parser_status->ret);
 			} else {
-				array_init(*result);
+				array_init(result);
 			}
 		}
 	}

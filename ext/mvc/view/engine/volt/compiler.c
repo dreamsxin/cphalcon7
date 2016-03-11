@@ -2951,7 +2951,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 	/** 
 	 * The parsing must return a valid array
 	 */
-	if (Z_TYPE(intermediate) == IS_ARRAY) { 
+	if (Z_TYPE(intermediate) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(&compilation, getThis(), "_statementlist", &intermediate, extends_mode);
 
 		/** 

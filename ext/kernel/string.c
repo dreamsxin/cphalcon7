@@ -235,7 +235,7 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 void phalcon_camelize(zval *return_value, const zval *str){
 
 	int i, len;
-	smart_str camelize_str = {};
+	smart_str camelize_str = {0};
 	char *marker, ch;
 
 	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
@@ -260,8 +260,7 @@ void phalcon_camelize(zval *return_value, const zval *str){
 			if (i < len) {
 				smart_str_appendc(&camelize_str, toupper(marker[i]));
 			}
-		}
-		else {
+		} else {
 			smart_str_appendc(&camelize_str, tolower(marker[i]));
 		}
 	}
@@ -269,7 +268,7 @@ void phalcon_camelize(zval *return_value, const zval *str){
 	smart_str_0(&camelize_str);
 
 	if (camelize_str.s) {
-		RETURN_STR(camelize_str.s);
+		RETURN_NEW_STR(camelize_str.s);
 	} else {
 		RETURN_EMPTY_STRING();
 	}

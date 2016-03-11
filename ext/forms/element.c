@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Forms_Element, setFilters){
  */
 PHP_METHOD(Phalcon_Forms_Element, addFilter){
 
-	zval *filter, *filters, new_filters;
+	zval *filter, *filters, new_filters = {};
 
 	phalcon_fetch_params(0, 1, 0, &filter);
 
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Forms_Element, getFilters){
  */
 PHP_METHOD(Phalcon_Forms_Element, addValidators){
 
-	zval *validators, *merge = NULL, *current_validators, merged_validators;
+	zval *validators, *merge = NULL, *current_validators, merged_validators = {};
 
 	phalcon_fetch_params(0, 1, 1, &validators, &merge);
 
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Forms_Element, getValidators){
  */
 PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 
-	zval *attributes = NULL, *use_checked = NULL, *name, widget_attributes, *default_attributes, merged_attributes, value, current_value;
+	zval *attributes = NULL, *use_checked = NULL, *name, widget_attributes = {}, *default_attributes, merged_attributes = {}, value = {}, current_value = {};
 
 	phalcon_fetch_params(0, 0, 2, &attributes, &use_checked);
 
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Forms_Element, setAttribute){
  */
 PHP_METHOD(Phalcon_Forms_Element, getAttribute){
 
-	zval *attribute, *default_value = NULL, *attributes, value;
+	zval *attribute, *default_value = NULL, *attributes, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &attribute, &default_value);
 
@@ -528,7 +528,7 @@ PHP_METHOD(Phalcon_Forms_Element, setUserOption){
  */
 PHP_METHOD(Phalcon_Forms_Element, getUserOption){
 
-	zval *option, *default_value = NULL, *options, value;
+	zval *option, *default_value = NULL, *options, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &option, &default_value);
 
@@ -631,7 +631,7 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 
 	if (attributes && Z_TYPE_P(attributes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {

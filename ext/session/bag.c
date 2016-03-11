@@ -102,7 +102,7 @@ static int phalcon_session_bag_maybe_initialize(zval *this_ptr)
 
 static zend_object_iterator* phalcon_session_bag_get_iterator(zend_class_entry *ce, zval *object, int by_ref)
 {
-	zval iterator, *data, *params[1];
+	zval iterator = {}, *data, *params[1];
 	zend_object_iterator *ret;
 
 	if (FAILURE == phalcon_session_bag_maybe_initialize(object)) {
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Session_Bag, __construct){
  */
 PHP_METHOD(Phalcon_Session_Bag, initialize){
 
-	zval session, dependency_injector, service, name, data;
+	zval session = {}, dependency_injector = {}, service = {}, name = {}, data = {};
 
 	phalcon_return_property(&session, getThis(), SL("_session"));
 	if (Z_TYPE(session) != IS_OBJECT) {
@@ -271,8 +271,7 @@ PHALCON_DOC_METHOD(Phalcon_Session_Bag, __set);
  */
 PHP_METHOD(Phalcon_Session_Bag, get){
 
-	zval *property, *default_value = NULL;
-	zval *data, value;
+	zval *property, *default_value = NULL, *data, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &property, &default_value);
 
@@ -304,7 +303,7 @@ PHP_METHOD(Phalcon_Session_Bag, get){
  */
 PHP_METHOD(Phalcon_Session_Bag, __get)
 {
-	zval *property, *data, value;
+	zval *property, *data, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &property);
 

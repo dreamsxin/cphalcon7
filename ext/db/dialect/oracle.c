@@ -128,7 +128,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Oracle){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, getColumnDefinition){
 
-	zval *column, size, column_type, column_sql, scale;
+	zval *column, size = {}, column_type = {}, column_sql = {}, scale = {};
 
 	phalcon_fetch_params(0, 1, 0, &column);
 
@@ -349,7 +349,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, dropForeignKey){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, _getTableOptions){
 
-	zval *definition, empty_array;
+	zval *definition, empty_array = {};
 
 	phalcon_fetch_params(0, 1, 0, &definition);
 
@@ -384,7 +384,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, createTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, dropTable){
 
-	zval *table_name, *schema_name, *if_exists = NULL, table;
+	zval *table_name, *schema_name, *if_exists = NULL, table = {};
 
 	phalcon_fetch_params(0, 2, 1, &table_name, &schema_name, &if_exists);
 
@@ -414,7 +414,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, dropTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, createView){
 
-	zval *view_name, *definition, *schema_name, view_sql, view;
+	zval *view_name, *definition, *schema_name, view_sql = {}, view = {};
 
 	phalcon_fetch_params(0, 3, 0, &view_name, &definition, &schema_name);
 
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, createView){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, dropView){
 
-	zval *view_name, *schema_name, *if_exists = NULL, view;
+	zval *view_name, *schema_name, *if_exists = NULL, view = {};
 
 	phalcon_fetch_params(0, 2, 1, &view_name, &schema_name, &if_exists);
 
@@ -602,7 +602,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, describeIndexes){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, describeReferences){
 
-	zval *table, *schema = NULL, sql;
+	zval *table, *schema = NULL, sql = {};
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -641,7 +641,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, tableOptions){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, getSqlTable){
 
-	zval *table, *escape_char = NULL, table_name, sql_table, schema_name, sql_schema, alias_name, sql_table_alias;
+	zval *table, *escape_char = NULL, table_name = {}, sql_table = {}, schema_name = {}, sql_schema = {}, alias_name = {}, sql_table_alias = {};
 
 	phalcon_fetch_params(0, 1, 1, &table, &escape_char);
 
@@ -712,7 +712,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, getSqlTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, limit){
 
-	zval *sql_query, *number, limit, sql_limit;
+	zval *sql_query, *number, limit = {}, sql_limit = {};
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "zz", &sql_query, &number) == FAILURE) {
 		RETURN_NULL();
@@ -736,11 +736,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, limit){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 
-	zval *definition, escape_char, tables, columns, selected_columns, *column, columns_sql, selected_tables;
-	zval *table, tables_sql, distinct, sql, joins, *join, where_conditions, where_expression, group_fields, group_items;
-	zval *group_field, group_sql, group_clause, having_conditions, having_expression;
-	zval order_fields, order_items, *order_item, order_sql, limit_value;
-	zval number, offset, tmp1, tmp2, ini_range, end_range, sql_limit;
+	zval *definition, escape_char = {}, tables = {}, columns = {}, selected_columns = {}, *column, columns_sql = {}, selected_tables = {};
+	zval *table, tables_sql = {}, distinct = {}, sql = {}, joins = {}, *join, where_conditions = {}, where_expression = {}, group_fields = {}, group_items = {};
+	zval *group_field, group_sql = {}, group_clause = {}, having_conditions = {}, having_expression = {};
+	zval order_fields = {}, order_items = {}, *order_item, order_sql = {}, limit_value = {};
+	zval number = {}, offset = {}, tmp1 = {}, tmp2 = {}, ini_range = {}, end_range = {}, sql_limit = {};
 
 	phalcon_fetch_params(0, 1, 0, &definition)
 
@@ -766,7 +766,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		array_init(&selected_columns);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&columns), column) {
-			zval column_item, column_sql, column_domain, column_domain_sql, column_alias, column_alias_sql;
+			zval column_item = {}, column_sql = {}, column_domain = {}, column_domain_sql = {}, column_alias = {}, column_alias_sql = {};
 			/**
 			 * Escape column name
 			 */
@@ -830,7 +830,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		array_init(&selected_tables);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
-			zval sql_table;
+			zval sql_table = {};
 			PHALCON_CALL_METHODW(&sql_table, getThis(), "getsqltable", table, &escape_char);
 			phalcon_array_append(&selected_tables, &sql_table, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -863,7 +863,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 	 */
 	if (phalcon_array_isset_fetch_str(&joins, definition, SL("joins"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&joins), join) {
-			zval type, source, sql_table, sql_join, join_conditions_array, join_expressions, join_conditions, *join_condition;
+			zval type = {}, source = {}, sql_table = {}, sql_join = {}, join_conditions_array = {}, join_expressions = {}, join_conditions = {}, *join_condition;
 
 			phalcon_array_fetch_str(&type, join, SL("type"), PH_NOISY);
 			phalcon_array_fetch_str(&source, join, SL("source"), PH_NOISY);
@@ -881,7 +881,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 					array_init(&join_expressions);
 
 					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&join_conditions_array), join_condition) {
-						zval join_expression;
+						zval join_expression = {};
 						PHALCON_CALL_METHODW(&join_expression, getThis(), "getsqlexpression", join_condition, &escape_char);
 						phalcon_array_append(&join_expressions, &join_expression, PH_COPY);
 					} ZEND_HASH_FOREACH_END();
@@ -914,7 +914,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		array_init(&group_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&group_fields), group_field) {
-			zval group_expression;
+			zval group_expression = {};
 
 			PHALCON_CALL_METHODW(&group_expression, getThis(), "getsqlexpression", group_field, &escape_char);
 			phalcon_array_append(&group_items, &group_expression, PH_COPY);
@@ -941,7 +941,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, select){
 		array_init(&order_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&order_fields), order_item) {
-			zval order_expression, order_sql_item, sql_order_type, order_sql_item_type;
+			zval order_expression = {}, order_sql_item = {}, sql_order_type = {}, order_sql_item_type = {};
 
 			phalcon_array_fetch_long(&order_expression, order_item, 0, PH_NOISY);
 

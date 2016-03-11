@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, getOptions){
  */
 PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 
-	zval *option, *values, tmp;
+	zval *option, *values, tmp = {};
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	PHALCON_ENSURE_IS_ARRAY(option);
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
  */
 PHP_METHOD(Phalcon_Forms_Element_Select, render){
 
-	zval *attributes = NULL, *options, widget_attributes;
+	zval *attributes = NULL, *options, widget_attributes = {};
 
 	phalcon_fetch_params(0, 1, 0, &attributes);
 

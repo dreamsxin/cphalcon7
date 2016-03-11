@@ -94,7 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Sqlite){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
 
-	zval *descriptor = NULL, dbname;
+	zval *descriptor = NULL, dbname = {};
 
 	phalcon_fetch_params(0, 0, 1, &descriptor);
 
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 
-	zval *table, *schema = NULL, columns, *dialect, size_pattern, sql, fetch_num, describe, old_column, *field;
+	zval *table, *schema = NULL, columns, *dialect, size_pattern = {}, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 	PHALCON_CALL_METHODW(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
-		zval definition, column_type, matches, pos, match_one, match_two, attribute, column_name, column;
+		zval definition = {}, column_type = {}, matches = {}, pos = {}, match_one = {}, match_two = {}, attribute = {}, column_name = {}, column = {};
 
 		array_init_size(&definition, 1);
 		add_assoc_long_ex(&definition, SL("bindType"), 2);
@@ -432,7 +432,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 
-	zval *table, *schema = NULL, *dialect, fetch_num, sql, describe, indexes, *index, index_objects, *index_columns;
+	zval *table, *schema = NULL, *dialect, fetch_num = {}, sql = {}, describe = {}, indexes = {}, *index, index_objects = {}, *index_columns;
 	zend_string *str_key;
 	ulong idx;
 
@@ -458,7 +458,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 	array_init(&indexes);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), index) {
-		zval key_name, sql_index_describe, describe_index, *index_column;
+		zval key_name = {}, sql_index_describe = {}, describe_index = {}, *index_column;
 
 		phalcon_array_fetch_long(&key_name, index, 1, PH_NOISY);
 
@@ -466,8 +466,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 		PHALCON_CALL_METHODW(&describe_index, getThis(), "fetchall", &sql_index_describe, &fetch_num);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe_index), index_column) {
-			zval column_name;
-
+			zval column_name = {};
 			phalcon_array_fetch_long(&column_name, index_column, 2, PH_NOISY);
 			phalcon_array_append_multi_2(&indexes, &key_name, &column_name, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -476,7 +475,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 	array_init(&index_objects);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(indexes), idx, str_key, index_columns) {
-		zval name, index;
+		zval name = {}, index = {};
 		if (str_key) {
 			ZVAL_STR(&name, str_key);
 		} else {
@@ -534,7 +533,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 	array_init(&reference_objects);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(describe), idx, str_key, reference_describe) {
-		zval number, constraint_name, referenced_table, from, to, columns, referenced_columns, reference_array, reference;
+		zval number = {}, constraint_name = {}, referenced_table = {}, from = {}, to = {}, columns = {}, referenced_columns = {}, reference_array = {}, reference = {};
 		if (str_key) {
 			ZVAL_STR(&number, str_key);
 		} else {

@@ -599,7 +599,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _reflection) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _watermark) {
 
-	zval *watermark, *offset_x = NULL, *offset_y = NULL, *opacity = NULL, op, image, overlay, blob, saveflag, width, height, color, tmp, effect, blendmode, ret;
+	zval *watermark, *offset_x = NULL, *offset_y = NULL, *opacity = NULL, op = {}, image = {}, overlay = {}, blob = {}, saveflag = {}, width = {}, height = {}, color = {}, tmp = {}, effect = {}, blendmode = {}, ret = {};
 	int int_opacity;
 	double num;
 

@@ -121,8 +121,8 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Libmemcached){
  */
 PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct){
 
-	zval *options, servers, client, lifetime, prefix, backend_option, frontend_option, frontend_data, libmemcached;
-	zval callable_open, callable_close, callable_read , callable_write, callable_destroy, callable_gc;
+	zval *options, servers = {}, client = {}, lifetime = {}, prefix = {}, backend_option = {}, frontend_option = {}, frontend_data = {}, libmemcached = {};
+	zval callable_open = {}, callable_close = {}, callable_read  = {}, callable_write = {}, callable_destroy = {}, callable_gc = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 

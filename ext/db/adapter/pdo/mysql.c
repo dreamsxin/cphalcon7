@@ -85,7 +85,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Mysql){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
 
-	zval *identifier, domain, name;
+	zval *identifier, domain = {}, name = {};
 
 	phalcon_fetch_params(0, 1, 0, &identifier);
 
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 
-	zval *table, *schema = NULL, *dialect, sql, fetch_num, describe, columns, size_pattern, *field, old_column;
+	zval *table, *schema = NULL, *dialect, sql = {}, fetch_num = {}, describe = {}, columns = {}, size_pattern = {}, *field, old_column = {};
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	 * Field Indexes: 0:name, 1:type, 2:not null, 3:key, 4:default, 5:extra
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
-		zval definition, column_type, pos, matches, match_one, match_two, attribute, column_name, column;
+		zval definition = {}, column_type = {}, pos = {}, matches = {}, match_one = {}, match_two = {}, attribute = {}, column_name = {}, column = {};
 
 		/**
 		 * By default the bind types is two

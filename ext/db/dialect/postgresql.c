@@ -111,7 +111,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Postgresql){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 
-	zval *column, size, column_type, column_sql, scale;
+	zval *column, size = {}, column_type = {}, column_sql = {}, scale = {};
 
 	phalcon_fetch_params(0, 1, 0, &column);
 
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropTable){
 
-	zval *table_name, *schema_name, *if_exists = NULL, table, sql;
+	zval *table_name, *schema_name, *if_exists = NULL, table = {}, sql = {};
 
 	phalcon_fetch_params(0, 2, 1, &table_name, &schema_name, &if_exists);
 
@@ -398,7 +398,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createView){
 
-	zval *view_name, *definition, *schema_name, view_sql, view, sql;
+	zval *view_name, *definition, *schema_name, view_sql = {}, view = {}, sql = {};
 
 	phalcon_fetch_params(0, 3, 0, &view_name, &definition, &schema_name);
 
@@ -428,7 +428,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createView){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 
-	zval *view_name, *schema_name, *if_exists = NULL, view, sql;
+	zval *view_name, *schema_name, *if_exists = NULL, view = {}, sql = {};
 
 	phalcon_fetch_params(0, 2, 1, &view_name, &schema_name, &if_exists);
 
@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, tableExists){
 
-	zval *table_name, *schema_name = NULL, sql;
+	zval *table_name, *schema_name = NULL, sql = {};
 
 	phalcon_fetch_params(0, 1, 1, &table_name, &schema_name);
 
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, tableExists){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, viewExists){
 
-	zval *view_name, *schema_name = NULL, sql;
+	zval *view_name, *schema_name = NULL, sql = {};
 
 	phalcon_fetch_params(0, 1, 1, &view_name, &schema_name);
 
@@ -516,7 +516,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, viewExists){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeColumns){
 
-	zval *table, *schema = NULL, sql;
+	zval *table, *schema = NULL, sql = {};
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -545,7 +545,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeColumns){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listTables){
 
-	zval *schema_name = NULL, sql;
+	zval *schema_name = NULL, sql = {};
 
 	phalcon_fetch_params(0, 0, 1, &schema_name);
 
@@ -570,7 +570,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listTables){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listViews){
 
-	zval *schema_name = NULL, sql;
+	zval *schema_name = NULL, sql = {};
 
 	phalcon_fetch_params(0, 0, 1, &schema_name);
 
@@ -596,7 +596,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listViews){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeIndexes){
 
-	zval *table, *schema = NULL, sql;
+	zval *table, *schema = NULL, sql = {};
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -617,7 +617,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeIndexes){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeReferences){
 
-	zval *table, *schema = NULL, sql;
+	zval *table, *schema = NULL, sql = {};
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 

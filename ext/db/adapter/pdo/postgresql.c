@@ -99,7 +99,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Postgresql){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 
-	zval *descriptor = NULL, schema, password, sql;
+	zval *descriptor = NULL, schema = {}, password = {}, sql = {};
 
 	phalcon_fetch_params(0, 0, 1, &descriptor);
 
@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 
-	zval *table, *schema = NULL, columns, *dialect, sql, fetch_num, describe, old_column, *field;
+	zval *table, *schema = NULL, columns = {}, *dialect, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -178,7 +178,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	 * 0:name, 1:type, 2:size, 3:numeric size, 4:numeric scale, 5: null, 6: key, 7: extra, 8: position, 9: element type
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
-		zval definition, char_size, numeric_size, numeric_scale, column_type, attribute, column_name, column;
+		zval definition = {}, char_size = {}, numeric_size = {}, numeric_scale = {}, column_type = {}, attribute = {}, column_name = {}, column = {};
 
 		array_init_size(&definition, 1);
 		add_assoc_long_ex(&definition, SL("bindType"), 2);
@@ -415,14 +415,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, useExplicitIdValue){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, getDefaultIdValue){
 
-	zval null_value, default_value;
+	zval default_value = {};
 
-	ZVAL_STRING(&null_value, "default");
+	ZVAL_STRING(&default_value, "default");
 
-	object_init_ex(&default_value, phalcon_db_rawvalue_ce);
-	PHALCON_CALL_METHODW(NULL, &default_value, "__construct", &null_value);
-
-	RETURN_CTORW(&default_value);
+	object_init_ex(return_value, phalcon_db_rawvalue_ce);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &default_value);
 }
 
 /**

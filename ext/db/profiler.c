@@ -110,7 +110,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Profiler){
  */
 PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 
-	zval *sql_statement, *sql_variables = NULL, *sql_bindtypes = NULL, active_profile, time;
+	zval *sql_statement, *sql_variables = NULL, *sql_bindtypes = NULL, active_profile = {}, time = {};
 
 	phalcon_fetch_params(0, 1, 2, &sql_statement, &sql_variables, &sql_bindtypes);
 
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
  */
 PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 
-	zval *active_profile, final_time, initial_time, difference, *total_seconds, new_total_seconds;
+	zval *active_profile, final_time = {}, initial_time = {}, difference = {}, *total_seconds, new_total_seconds = {};
 
 	active_profile = phalcon_read_property(getThis(), SL("_activeProfile"), PH_NOISY);
 

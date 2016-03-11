@@ -75,7 +75,7 @@ static zend_object_handlers phalcon_forms_manager_object_handlers;
 
 static zval* phalcon_forms_manager_read_dimension(zval *object, zval *offset, int type, zval *rv)
 {
-	zval *forms, *res, tmp;
+	zval *forms, *res, tmp = {};
 
 	if (UNEXPECTED(!offset)) {
 		return &EG(uninitialized_zval);
@@ -130,7 +130,7 @@ PHALCON_INIT_CLASS(Phalcon_Forms_Manager){
 
 PHP_METHOD(Phalcon_Forms_Manager, __construct)
 {
-	zval z;
+	zval z = {};
 
 	array_init(&z);
 	phalcon_update_property_this(getThis(), SL("_forms"), &z);
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Forms_Manager, __construct)
  */
 PHP_METHOD(Phalcon_Forms_Manager, create){
 
-	zval *name = NULL, *entity = NULL, form;
+	zval *name = NULL, *entity = NULL, form = {};
 
 	phalcon_fetch_params(0, 0, 2, &name, &entity);
 
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Forms_Manager, create){
  */
 PHP_METHOD(Phalcon_Forms_Manager, get){
 
-	zval *name, *forms, form;
+	zval *name, *forms, form = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);

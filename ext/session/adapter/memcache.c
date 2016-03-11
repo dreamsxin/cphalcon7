@@ -117,9 +117,9 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Memcache){
  */
 PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 
-	zval *options, host, port, lifetime, persistent, prefix;
-	zval frontend_option, backend_option, frontend_data, memcache;
-	zval callable_open, callable_close, callable_read, callable_write, callable_destroy, callable_gc;
+	zval *options, host = {}, port = {}, lifetime = {}, persistent = {}, prefix = {};
+	zval frontend_option = {}, backend_option = {}, frontend_data = {}, memcache = {};
+	zval callable_open = {}, callable_close = {}, callable_read = {}, callable_write = {}, callable_destroy = {}, callable_gc = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, write){
  */
 PHP_METHOD(Phalcon_Session_Adapter_Memcache, destroy){
 
-	zval *_sid = NULL, sid, *memcache;
+	zval *_sid = NULL, sid = {}, *memcache;
 
 	phalcon_fetch_params(0, 0, 1, &_sid);
 

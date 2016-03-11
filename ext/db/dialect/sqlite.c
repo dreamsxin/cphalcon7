@@ -120,7 +120,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Sqlite){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
 
-	zval *column, size, column_type, column_sql, scale;
+	zval *column, size = {}, column_type = {}, column_sql = {}, scale = {};
 
 	phalcon_fetch_params(0, 1, 0, &column);
 
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 
-	zval *table_name, *schema_name, *column, sql, name, column_definition, is_not_null, is_autoincrement;
+	zval *table_name, *schema_name, *column, sql = {}, name = {}, column_definition = {}, is_not_null = {}, is_autoincrement = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
 
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropColumn){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addIndex){
 
-	zval *table_name, *schema_name, *index, name, index_type, sql, columns, quoted_column_list;
+	zval *table_name, *schema_name, *index, name, index_type = {}, sql = {}, columns = {}, quoted_column_list = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
 	PHALCON_VERIFY_INTERFACE_EX(index, phalcon_db_indexinterface_ce, phalcon_db_exception_ce, 0);
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addIndex){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropIndex){
 
-	zval *table_name, *schema_name, *index_name, sql;
+	zval *table_name, *schema_name, *index_name, sql = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index_name);
 
@@ -399,7 +399,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropTable){
 
-	zval *table_name, *schema_name, *if_exists = NULL, table;
+	zval *table_name, *schema_name, *if_exists = NULL, table = {};
 
 	phalcon_fetch_params(0, 2, 1, &table_name, &schema_name, &if_exists);
 
@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createView){
 
-	zval *view_name, *definition, *schema_name, view_sql, view, sql;
+	zval *view_name, *definition, *schema_name, view_sql = {}, view = {}, sql = {};
 
 	phalcon_fetch_params(0, 3, 0, &view_name, &definition, &schema_name);
 
@@ -460,7 +460,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createView){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropView){
 
-	zval *view_name, *schema_name, *if_exists = NULL, view;
+	zval *view_name, *schema_name, *if_exists = NULL, view = {};
 
 	phalcon_fetch_params(0, 2, 1, &view_name, &schema_name, &if_exists);
 

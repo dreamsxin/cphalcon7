@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __construct){
  */
 PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 
-	zval annotations, reflection_data, reflection_class;
+	zval annotations = {}, reflection_data = {}, reflection_class = {};
 
 	phalcon_return_property(&annotations, getThis(), SL("_classAnnotations"));
 	if (Z_TYPE(annotations) != IS_OBJECT) {
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
  */
 PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 
-	zval annotations, reflection_data, reflection_methods, *reflection_method;
+	zval annotations = {}, reflection_data = {}, reflection_methods = {}, *reflection_method;
 	zend_string *str_key;
 	ulong idx;
 
@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 				array_init(return_value);
 
 				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(reflection_methods), idx, str_key, reflection_method) {
-					zval method_name, collection;
+					zval method_name = {}, collection = {};
 					if (str_key) {
 						ZVAL_STR(&method_name, str_key);
 					} else {
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
  */
 PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 
-	zval annotations, reflection_data, reflection_properties, *reflection_property;
+	zval annotations = {}, reflection_data = {}, reflection_properties = {}, *reflection_property;
 	zend_string *str_key;
 	ulong idx;
 
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 				array_init(return_value);
 
 				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(reflection_properties), idx, str_key, reflection_property) {
-					zval property, collection;
+					zval property = {}, collection = {};
 					if (str_key) {
 						ZVAL_STR(&property, str_key);
 					} else {
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getReflectionData){
  */
 PHP_METHOD(Phalcon_Annotations_Reflection, __set_state){
 
-	zval *data, reflection_data;
+	zval *data, reflection_data = {};
 
 	phalcon_fetch_params(0, 1, 0, &data);
 

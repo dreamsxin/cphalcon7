@@ -47,7 +47,7 @@ int phalcon_has_constructor_ce(const zend_class_entry *ce)
 
 int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 {
-	zval ret, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;
+	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;
 	int param_count = 0, i, status;
 
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
@@ -89,7 +89,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 
 int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry *ce, phalcon_call_type type, const char *method_name, uint method_len, uint param_count, zval *params[])
 {
-	zval func_name, ret, *retval_ptr = (retval != NULL) ? retval : &ret;
+	zval func_name = {}, ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret;
 	zend_execute_data *execute_data  = EG(current_execute_data);
 	zval *arguments;
 	HashTable *function_table;

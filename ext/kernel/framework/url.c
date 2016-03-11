@@ -54,9 +54,9 @@ void phalcon_get_uri(zval *return_value, zval *path) {
 	RETURN_EMPTY_STRING();
 }
 
-void phalcon_raw_url_encode(zval *return_value, zval *url) {
-
-	zval copy;
+void phalcon_raw_url_encode(zval *return_value, zval *url)
+{
+	zval copy = {};
 	zend_string *escaped;
 	int use_copy = 0;
 

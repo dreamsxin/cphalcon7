@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
  */
 PHP_METHOD(Phalcon_DI_Injectable, getDI)
 {
-	zval *error = NULL, dependency_injector;
+	zval *error = NULL, dependency_injector = {};
 
 	phalcon_fetch_params(0, 0, 1, &error);
 
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_DI_Injectable, getEventsManager){
  */
 PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, events_manager, lower, event_parts, name, status;
+	zval *eventname, *data = NULL, *cancelable = NULL, events_manager = {}, lower = {}, event_parts = {}, name = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(eventname);
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
  */
 PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, status, events_manager, lower, event_parts, name;
+	zval *eventname, *data = NULL, *cancelable = NULL, status = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(eventname);
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
  */
 PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
 
-	zval *name, *args = NULL, *noerror = NULL, *noshared = NULL, dependency_injector;
+	zval *name, *args = NULL, *noerror = NULL, *noshared = NULL, dependency_injector = {};
 
 	phalcon_fetch_params(0, 1, 3, &name, &args, &noerror, &noshared);
 
@@ -311,7 +311,7 @@ PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
  */
 PHP_METHOD(Phalcon_DI_Injectable, __get){
 
-	zval *property_name, dependency_injector, has_service, service, class_name, arguments, result;
+	zval *property_name, dependency_injector = {}, has_service = {}, service = {}, class_name = {}, arguments = {}, result = {};
 
 	phalcon_fetch_params(0, 1, 0, &property_name);
 	PHALCON_ENSURE_IS_STRING(property_name);

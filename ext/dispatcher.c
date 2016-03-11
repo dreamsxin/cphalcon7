@@ -343,7 +343,7 @@ PHP_METHOD(Phalcon_Dispatcher, getActionName){
  */
 PHP_METHOD(Phalcon_Dispatcher, setParams){
 
-	zval *params, exception_code, exception_message;
+	zval *params, exception_code = {}, exception_message = {};
 
 	phalcon_fetch_params(0, 1, 0, &params);
 
@@ -394,7 +394,7 @@ PHP_METHOD(Phalcon_Dispatcher, setParam){
  */
 PHP_METHOD(Phalcon_Dispatcher, getParam){
 
-	zval *param, *filters = NULL, *default_value = NULL, *params, param_value, dependency_injector, exception_code, exception_message, service, filter;
+	zval *param, *filters = NULL, *default_value = NULL, *params, param_value = {}, dependency_injector = {}, exception_code = {}, exception_message = {}, service = {}, filter = {};
 
 	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
 
@@ -504,8 +504,7 @@ PHP_METHOD(Phalcon_Dispatcher, getReturnedValue){
  */
 PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
-	zval dependency_injector, events_manager, event_name, exception_code, exception_message;
-	zval status, handler, *handler_suffix, *action_suffix;
+	zval dependency_injector = {}, events_manager = {}, event_name = {}, exception_code = {}, exception_message = {}, status = {}, handler = {}, *handler_suffix, *action_suffix;
 	int number_dispatches = 0, max_dispatches = 256;
 
 	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
@@ -536,8 +535,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	phalcon_update_property_this(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false));
 
 	do {
-		zval finished, namespace_name, handler_name, action_name, camelize, camelized_class, camelized_namespace, handler_class;
-		zval has_service, was_fresh, action_method, params, call_object, value, e, exception;
+		zval finished = {}, namespace_name = {}, handler_name = {}, action_name = {}, camelize = {}, camelized_class = {}, camelized_namespace = {}, handler_class = {};
+		zval has_service = {}, was_fresh = {}, action_method = {}, params = {}, call_object = {}, value = {}, e = {}, exception = {};
 		/**
 		 * Loop until finished is false
 		 */
@@ -927,8 +926,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
  */
 PHP_METHOD(Phalcon_Dispatcher, forward){
 
-	zval *forward, forward_parts, parts, number_parts, controller_part, real_namespace_name, real_controller_name, action_part, exception_code, exception_message;
-	zval namespace_name, controller_name, task_name, action_name, params, previous_namespace_name, previous_controller_name, previous_action_name, previous_params;
+	zval *forward, forward_parts = {}, parts = {}, number_parts = {}, controller_part = {}, real_namespace_name = {}, real_controller_name = {}, action_part = {}, exception_code = {}, exception_message = {};
+	zval namespace_name = {}, controller_name = {}, task_name = {}, action_name = {}, params = {}, previous_namespace_name = {}, previous_controller_name = {}, previous_action_name = {}, previous_params = {};
 	int num = 0;
 
 	phalcon_fetch_params(0, 1, 0, &forward);
@@ -1055,7 +1054,7 @@ PHP_METHOD(Phalcon_Dispatcher, wasForwarded){
  */
 PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 
-	zval *handler_suffix, *namespace_name, *handler_name, camelized_class, *camelize, camelized_namespace;
+	zval *handler_suffix, *namespace_name, *handler_name, camelized_class = {}, *camelize, camelized_namespace = {};
 
 	/**
 	 * The handler suffix
@@ -1187,7 +1186,7 @@ PHP_METHOD(Phalcon_Dispatcher, setErrorHandler){
  */
 PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 
-	zval *exception_code = NULL, *error_handlers, error_handler;
+	zval *exception_code = NULL, *error_handlers, error_handler = {};
 
 	phalcon_fetch_params(0, 0, 1, &exception_code);
 
@@ -1216,7 +1215,7 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
  */
 PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, event_name, status;
+	zval *eventname, *data = NULL, *cancelable = NULL, event_name = {}, status = {}, exception = {};
 	int ret, ret2;
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
@@ -1236,7 +1235,6 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 	ZVAL_UNREF(data);
 
 	if (EG(exception)) {
-		zval exception;
 		ZVAL_OBJ(&exception, EG(exception));
 
 		zend_clear_exception();

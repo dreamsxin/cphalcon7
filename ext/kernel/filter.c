@@ -42,7 +42,7 @@ void phalcon_filter_alphanum(zval *return_value, zval *param){
 	int i;
 	char ch;
 	smart_str filtered_str = {0};
-	zval copy;
+	zval copy = {};
 	int use_copy = 0;
 
 	if (Z_TYPE_P(param) != IS_STRING) {
@@ -82,7 +82,7 @@ void phalcon_filter_identifier(zval *return_value, zval *param){
 
 	int i;
 	char ch;
-	zval copy;
+	zval copy = {};
 	smart_str filtered_str = {0};
 	int use_copy = 0;
 
@@ -184,15 +184,12 @@ static inline char *phalcon_longtohex(unsigned long value) {
 /**
  * Perform escaping of non-alphanumeric characters to different formats
  */
-void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_char, unsigned int escape_length, char escape_extra, int use_whitelist) {
-
-	int i;
-	zval copy;
+void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_char, unsigned int escape_length, char escape_extra, int use_whitelist)
+{
+	zval copy = {};
 	smart_str escaped_str = {0};
 	char *hex;
-	int big_endian_long_map[4];
-	int use_copy = 0;
-	int issigned = 0;
+	int i, big_endian_long_map[4], use_copy = 0, issigned = 0;
 	long int value;
 
 	if (Z_TYPE_P(param) != IS_STRING) {
@@ -358,8 +355,7 @@ void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style,
  */
 void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes)
 {
-	zval document, ret, tmp, elements;
-	zval matched, regexp, joined_tags, clean_str;
+	zval document = {}, ret = {}, tmp = {}, elements = {}, matched = {}, regexp = {}, joined_tags = {}, clean_str = {};
 	zend_class_entry *ce0;
 	int i, element_length;
 
@@ -395,7 +391,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 	element_length = Z_LVAL_P(&tmp);
 
 	for (i = 0; i < element_length; i++) {
-		zval t, element, element_name, element_attrs;
+		zval t = {}, element = {}, element_name = {}, element_attrs = {};
 		int element_attrs_length, j;
 
 		ZVAL_LONG(&t, i);
@@ -414,7 +410,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		element_attrs_length = Z_LVAL_P(&tmp);
 
 		for (j = 0; j < element_attrs_length; j++) {
-			zval t2, element_attr, element_attr_name, element_attr_value;
+			zval t2 = {}, element_attr = {}, element_attr_name = {}, element_attr_value = {};
 			ZVAL_LONG(&t2, j);
 
 			PHALCON_CALL_METHODW(&element_attr, &element_attrs, "item", &t2);

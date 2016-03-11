@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_CLI_Console, registerModules){
  */
 PHP_METHOD(Phalcon_CLI_Console, addModules){
 
-	zval *modules, *original_modules, register_modules;
+	zval *modules, *original_modules, register_modules = {};
 
 	phalcon_fetch_params(0, 1, 0, &modules);
 
@@ -195,11 +195,9 @@ PHP_METHOD(Phalcon_CLI_Console, getModules){
  */
 PHP_METHOD(Phalcon_CLI_Console, handle){
 
-	zval *_arguments = NULL, arguments, dependency_injector, events_manager, event_name;
-	zval service, router, module_name;
-	zval status, *modules, exception_msg, module;
-	zval path, class_name, module_object;
-	zval namespace_name, task_name, action_name, params, dispatcher;
+	zval *_arguments = NULL, arguments = {}, dependency_injector = {}, events_manager = {}, event_name = {}, service = {}, router = {}, module_name = {};
+	zval status = {}, *modules, exception_msg = {}, module = {}, path = {}, class_name = {}, module_object = {};
+	zval namespace_name = {}, task_name = {}, action_name = {}, params = {}, dispatcher = {};
 
 	phalcon_fetch_params(0, 0, 1, &_arguments);
 

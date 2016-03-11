@@ -93,7 +93,7 @@ PHALCON_INIT_CLASS(Phalcon_Flash_Session){
  */
 PHP_METHOD(Phalcon_Flash_Session, _getSessionMessages){
 
-	zval *remove, service, session, index_name;
+	zval *remove, service = {}, session = {}, index_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &remove);
 
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Flash_Session, _getSessionMessages){
  */
 PHP_METHOD(Phalcon_Flash_Session, _setSessionMessages){
 
-	zval *messages, service, session, index_name;
+	zval *messages, service = {}, session = {}, index_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &messages);
 
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Flash_Session, _setSessionMessages){
  */
 PHP_METHOD(Phalcon_Flash_Session, message){
 
-	zval *type, *message, messages;
+	zval *type, *message, messages = {};
 
 	phalcon_fetch_params(0, 2, 0, &type, &message);
 
@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Flash_Session, message){
  */
 PHP_METHOD(Phalcon_Flash_Session, getMessages){
 
-	zval *type = NULL, *remove = NULL, messages, return_messages, do_remove;
+	zval *type = NULL, *remove = NULL, messages = {}, return_messages = {}, do_remove = {};
 
 	phalcon_fetch_params(0, 0, 2, &type, &remove);
 
@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Flash_Session, getMessages){
  */
 PHP_METHOD(Phalcon_Flash_Session, output){
 
-	zval *type = NULL, *remove = NULL, messages, *message;
+	zval *type = NULL, *remove = NULL, messages = {}, *message;
 	zend_string *str_key;
 	ulong idx;
 
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Flash_Session, output){
 	PHALCON_CALL_METHODW(&messages, getThis(), "getmessages", type, remove);
 	if (Z_TYPE(messages) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(messages), idx, str_key, message) {
-			zval message_type;
+			zval message_type = {};
 			if (str_key) {
 				ZVAL_STR(&message_type, str_key);
 			} else {
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Flash_Session, output){
  */
 PHP_METHOD(Phalcon_Flash_Session, has) {
 
-	zval *type, messages;
+	zval *type, messages = {};
 
 	phalcon_fetch_params(0, 0, 1, &type);
 

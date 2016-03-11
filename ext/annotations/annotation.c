@@ -99,7 +99,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Annotation){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 
-	zval *reflection_data, name, arguments, expr_arguments, *argument;
+	zval *reflection_data, name = {}, arguments = {}, expr_arguments = {}, *argument;
 
 	phalcon_fetch_params(0, 1, 0, &reflection_data);
 
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 		array_init(&arguments);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(expr_arguments), argument) {
-			zval expr, resolved_argument, name;
+			zval expr = {}, resolved_argument = {}, name = {};
 
 			phalcon_array_fetch_str(&expr, argument, SL("expr"), PH_NOISY);
 	
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getName){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
-	zval *expr, type, items, *item, exception_message;
+	zval *expr, type = {}, items = {}, *item, exception_message = {};
 
 	phalcon_fetch_params(0, 1, 0, &expr);	
 	PHALCON_SEPARATE_PARAM(expr);
@@ -193,7 +193,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 			array_init(return_value);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(items), item) {
-				zval name, item_expr, resolved_item;
+				zval name = {}, item_expr = {}, resolved_item = {};
 
 				phalcon_array_fetch_str(&item_expr, item, SL("expr"), PH_NOISY);
 

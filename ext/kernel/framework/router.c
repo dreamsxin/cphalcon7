@@ -104,13 +104,13 @@ zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigne
  */
 void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval *replacements){
 
+	zval *replace, replace_copy = {};
 	char *cursor, *marker = NULL;
 	unsigned int bracket_count = 0, parentheses_count = 0, intermediate = 0;
 	unsigned char ch;
 	smart_str route_str = {0};
 	ulong position = 1;
 	int i;
-	zval *replace, replace_copy;
 	int use_copy, looking_placeholder = 0;
 
 	if (Z_TYPE_P(pattern) != IS_STRING || Z_TYPE_P(replacements) != IS_ARRAY || Z_TYPE_P(paths) != IS_ARRAY) {
@@ -269,7 +269,7 @@ void phalcon_replace_paths(zval *return_value, zval *pattern, zval *paths, zval 
  */
 void phalcon_extract_named_params(zval *return_value, zval *str, zval *matches)
 {
-	zval tmp;
+	zval tmp = {};
 	int i, k;
 	uint j, bracket_count = 0, parentheses_count = 0, ch;
 	uint intermediate = 0, length, number_matches = 0, found_pattern;

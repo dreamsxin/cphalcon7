@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskName){
  */
 PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 
-	zval *message, *exception_code = NULL, exception, *events_manager, event_name, status;
+	zval *message, *exception_code = NULL, exception = {}, *events_manager, event_name = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &exception_code);
 
@@ -204,8 +204,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
  */
 PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 
-	zval *exception, *events_manager, event_name;
-	zval status;
+	zval *exception, *events_manager, event_name = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 0, &exception);
 

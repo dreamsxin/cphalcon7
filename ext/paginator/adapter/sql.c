@@ -116,7 +116,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 
-	zval *config, db, sql, total_sql, bind, limit, page;
+	zval *config, db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, page = {};
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getDb){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
-	zval db, sql, total_sql, bind, limit, number_page, number, fetch_mode, items, row, rowcount;
+	zval db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, number_page = {}, number = {}, fetch_mode = {}, items = {}, row = {}, rowcount = {};
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 	ldiv_t tp;

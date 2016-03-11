@@ -114,7 +114,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_QueryBuilder){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
-	zval *config, builder, limit, page;
+	zval *config, builder = {}, limit = {}, page = {};
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
@@ -236,9 +236,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getQueryBuilder){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
-	zval original_builder, builder, total_builder, limit, number_page, number, query, items, total_query, result, row, rowcount, dependency_injector;
-	zval service_name, models_manager, models, model_name, model, connection, bind_params, bind_types, processed, *value, processed_types;
-	zval intermediate, columns, *column, dialect, sql_select, sql, paginate;
+	zval original_builder = {}, builder = {}, total_builder = {}, limit = {}, number_page = {}, number = {}, query = {}, items = {}, total_query = {}, result = {}, row = {}, rowcount = {}, dependency_injector = {};
+	zval service_name = {}, models_manager = {}, models = {}, model_name = {}, model = {}, connection = {}, bind_params = {}, bind_types = {}, processed = {}, *value, processed_types = {};
+	zval intermediate = {}, columns = {}, *column, dialect = {}, sql_select = {}, sql = {}, paginate = {};
 	zend_string *str_key;
 	ulong idx;
 	ldiv_t tp;
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	phalcon_array_fetch_string(&columns, &intermediate, IS(columns), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column) {
-		zval type, sql_column, select_columns;
+		zval type = {}, sql_column = {}, select_columns = {};
 
 		phalcon_array_fetch_string(&type, column, IS(type), PH_NOISY);
 		phalcon_array_fetch_string(&sql_column, column, IS(column), PH_NOISY);
@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		array_init(&processed);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {
-			zval wildcard, string_wildcard, sql_tmp;
+			zval wildcard = {}, string_wildcard = {}, sql_tmp = {};
 			if (str_key) {
 				ZVAL_STR(&wildcard, str_key);
 			} else {
@@ -389,7 +389,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		array_init(&processed_types);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_types), idx, str_key, value) {
-			zval wildcard, string_wildcard;
+			zval wildcard = {}, string_wildcard = {};
 			if (str_key) {
 				ZVAL_STR(&wildcard, str_key);
 			} else {

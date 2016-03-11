@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, setReader){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getReader){
 
-	zval reader;
+	zval reader = {};
 
 	phalcon_return_property(&reader, getThis(), SL("_reader"));
 	if (Z_TYPE(reader) != IS_OBJECT) {
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getReader){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, get){
 
-	zval *class_name, real_class_name, annotations, class_annotations, reader, parsed_annotations;
+	zval *class_name, real_class_name = {}, annotations = {}, class_annotations = {}, reader = {}, parsed_annotations = {};
 	zend_class_entry *ce;
 
 	phalcon_fetch_params(0, 1, 0, &class_name);
@@ -202,7 +202,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getMethods){
 
-	zval *class_name, class_annotations;
+	zval *class_name, class_annotations = {};
 
 	phalcon_fetch_params(0, 1, 0, &class_name);
 
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getMethods){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getMethod){
 
-	zval *class_name, *method_name, class_annotations, methods, *method;
+	zval *class_name, *method_name, class_annotations = {}, methods = {}, *method;
 	zend_string *str_key;
 	ulong idx;
 
@@ -249,7 +249,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getMethod){
 		PHALCON_CALL_METHODW(&methods, &class_annotations, "getmethodsannotations");
 		if (Z_TYPE(methods) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(methods), idx, str_key, method) {
-				zval name;
+				zval name = {};
 				if (str_key) {
 					ZVAL_STR(&name, str_key);
 				} else {
@@ -278,7 +278,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getMethod){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getProperties){
 
-	zval *class_name, class_annotations;
+	zval *class_name, class_annotations = {};
 
 	phalcon_fetch_params(0, 1, 0, &class_name);
 
@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getProperties){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getProperty){
 
-	zval *class_name, *property_name, class_annotations, properties, *property;
+	zval *class_name, *property_name, class_annotations = {}, properties = {}, *property;
 	zend_string *str_key;
 	ulong idx;
 
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getProperty){
 		PHALCON_CALL_METHODW(&properties, &class_annotations, "getpropertiesannotations");
 		if (Z_TYPE(properties) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(properties), idx, str_key, property) {
-				zval name;
+				zval name = {};
 				if (str_key) {
 					ZVAL_STR(&name, str_key);
 				} else {

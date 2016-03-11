@@ -63,7 +63,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_FactoryDefault_CLI){
  */
 PHP_METHOD(Phalcon_DI_FactoryDefault_CLI, __construct){
 
-	zval *shared, name, definition;
+	zval *shared, name = {}, definition = {};
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_di_factorydefault_cli_ce, getThis(), "__construct");
 

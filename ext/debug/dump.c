@@ -118,7 +118,7 @@ PHALCON_INIT_CLASS(Phalcon_Debug_Dump){
  */
 PHP_METHOD(Phalcon_Debug_Dump, __construct){
 
-	zval *styles = NULL, *detailed = NULL, default_styles;
+	zval *styles = NULL, *detailed = NULL, default_styles = {};
 
 	phalcon_fetch_params(0, 0, 2, &styles, &detailed);
 
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Debug_Dump, __construct){
  */
 PHP_METHOD(Phalcon_Debug_Dump, all)
 {
-	zval method_name, call_object, arg_list;
+	zval method_name = {}, call_object = {}, arg_list = {};
 
 	ZVAL_STRING(&method_name, "variables");
 
@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Debug_Dump, getStyle){
  */
 PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 
-	zval *styles, *default_styles, new_styles;
+	zval *styles, *default_styles, new_styles = {};
 
 	phalcon_fetch_params(0, 1, 0, &styles);
 
@@ -214,8 +214,8 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
  */
 PHP_METHOD(Phalcon_Debug_Dump, output){
 
-	zval *variable, *name = NULL, *tab = NULL, space, str, type, style, count, replace_pairs, output, new_tab, tmp;
-	zval *value, class_name, *objects, *detailed, properties, methods, *method;
+	zval *variable, *name = NULL, *tab = NULL, space = {}, str = {}, type = {}, style = {}, count = {}, replace_pairs = {}, output = {}, new_tab = {}, tmp = {};
+	zval *value, class_name = {}, *objects, *detailed, properties = {}, methods = {}, *method;
 	zend_string *str_key;
 	ulong idx;
 
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_concat_self(return_value, &output);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(variable), idx, str_key, value) {
-			zval key, repeat;
+			zval key = {}, repeat = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -346,7 +346,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 		phalcon_get_object_vars(&properties, variable, !zend_is_true(detailed));
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(properties), idx, str_key, value) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -549,7 +549,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
  */
 PHP_METHOD(Phalcon_Debug_Dump, variable){
 
-	zval *variable, *name = NULL, str, type, style, output, replace_pairs;
+	zval *variable, *name = NULL, str = {}, type = {}, style = {}, output = {}, replace_pairs = {};
 
 	phalcon_fetch_params(0, 1, 1, &variable, &name);
 
@@ -587,12 +587,12 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
  */
 PHP_METHOD(Phalcon_Debug_Dump, variables){
 
-	zval arg_list, *variable;
+	zval arg_list = {}, *variable;
 
 	PHALCON_CALL_FUNCTIONW(&arg_list, "func_get_args");
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(arg_list), variable) {
-		zval output;
+		zval output = {};
 
 		PHALCON_CALL_SELFW(&output, "variable", variable);
 		PHALCON_SCONCAT(return_value, &output);

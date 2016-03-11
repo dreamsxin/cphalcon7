@@ -75,7 +75,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Memory){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
 
-	zval *key, data, lowercased_key;
+	zval *key, data = {}, lowercased_key = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Memory, write){
 
-	zval *key, *data, lowercased_key;
+	zval *key, *data, lowercased_key = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 

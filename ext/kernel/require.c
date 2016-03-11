@@ -29,7 +29,7 @@
  */
 int phalcon_require_ret(zval *result, const char *require_path)
 {
-	zval retval;
+	zval retval = {};
 	zend_file_handle file_handle;
 	zend_op_array *new_op_array = NULL;
 	int ret, dtor = 0;

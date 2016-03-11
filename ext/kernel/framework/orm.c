@@ -63,7 +63,7 @@ void phalcon_orm_get_prepared_ast(zval **return_value, zval *unique_id) {
 void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast) {
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
-	zval copy_ast;
+	zval copy_ast = {};
 
 	if (Z_TYPE_P(unique_id) == IS_LONG) {
 		if (phalcon_globals_ptr->orm.cache_level >= 0) {

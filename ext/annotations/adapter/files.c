@@ -94,7 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Files){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Files, __construct){
 
-	zval *options = NULL, annotations_dir;
+	zval *options = NULL, annotations_dir = {};
 
 	phalcon_fetch_params(0, 0, 1, &options);
 	
@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, __construct){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 
-	zval *key, annotations_dir, virtual_key, path;
+	zval *key, annotations_dir = {}, virtual_key = {}, path = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 
-	zval *key, *data, annotations_dir, virtual_key, path, php_export, status;
+	zval *key, *data, annotations_dir = {}, virtual_key = {}, path = {}, php_export = {}, status = {};
 	smart_str exp = { 0 };
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);

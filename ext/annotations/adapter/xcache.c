@@ -79,7 +79,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Xcache){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Xcache, read){
 
-	zval *key, prefixed_key, serialized;
+	zval *key, prefixed_key = {}, serialized = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Xcache, read){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Xcache, write){
 
-	zval *key, *data, prefixed_key, serialized;
+	zval *key, *data, prefixed_key = {}, serialized = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 

@@ -53,8 +53,7 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
  */
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...)
 {
-
-	zval arr;
+	zval arr = {};
 	va_list ap;
 
 	phalcon_return_static_property_ce(&arr, ce, property, property_length);
@@ -90,7 +89,7 @@ int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, ui
 
 int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len)
 {
-	zval empty_array;
+	zval empty_array = {};
 	array_init(&empty_array);
 	return zend_update_static_property(ce, name, len, &empty_array);
 }
@@ -350,7 +349,7 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
  */
 void phalcon_get_class_methods(zval *return_value, zval *object, int check_access) {
 
-	zval method_name;
+	zval method_name = {};
 	zend_class_entry *ce = NULL, *pce;
 	zend_function *mptr;
 	zend_string *key;
@@ -669,7 +668,7 @@ zval* phalcon_read_property(zval *object, const char *property_name, size_t prop
  */
 int phalcon_update_property_long(zval *object, const char *property_name, uint32_t property_length, long value)
 {
-	zval v;
+	zval v = {};
 	ZVAL_LONG(&v, value);
 	return phalcon_update_property_zval(object, property_name, property_length, &v);
 }
@@ -679,7 +678,7 @@ int phalcon_update_property_long(zval *object, const char *property_name, uint32
  */
 int phalcon_update_property_str(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length)
 {
-	zval value;
+	zval value = {};
 	ZVAL_STRINGL(&value, str, str_length);
 	return phalcon_update_property_zval(object, property_name, property_length, &value);
 }
@@ -688,7 +687,7 @@ int phalcon_update_property_str(zval *object, const char *property_name, uint32_
  * Checks whether obj is an object and updates property with bool value
  */
 int phalcon_update_property_bool(zval *object, const char *property_name, uint32_t property_length, int value) {
-	zval v;
+	zval v = {};
 	ZVAL_BOOL(&v, value);
 	return phalcon_update_property_zval(object, property_name, property_length, &v);
 }
@@ -697,7 +696,7 @@ int phalcon_update_property_bool(zval *object, const char *property_name, uint32
  * Checks whether obj is an object and updates property with null value
  */
 int phalcon_update_property_null(zval *object, const char *property_name, uint32_t property_length) {
-	zval value;
+	zval value = {};
 	ZVAL_NULL(&value);
 	return phalcon_update_property_zval(object, property_name, property_length, &value);
 }
@@ -766,7 +765,7 @@ int phalcon_update_property_this(zval *object, const char *property_name, uint32
 
 int phalcon_update_property_zval_null(zval *object, const zval *property)
 {
-	zval v;
+	zval v = {};
 	ZVAL_NULL(&v);
 	return phalcon_update_property_zval(object, Z_STRVAL_P(property), Z_STRLEN_P(property), &v);
 }
@@ -860,16 +859,14 @@ int phalcon_update_property_array_multi(zval *object, const char *property, uint
  */
 int phalcon_update_property_array_str(zval *object, const char *property, uint32_t property_length, const char *index, uint32_t index_length, zval *value)
 {
-	zval tmp;
-
+	zval tmp = {};
 	ZVAL_STRINGL(&tmp, index, index_length);
 	return phalcon_update_property_array(object, property, property_length, &tmp, value);
 }
 
 int phalcon_update_property_array_string(zval *object, const char *property, uint32_t property_length, zend_string *index, zval *value)
 {
-	zval tmp;
-
+	zval tmp = {};
 	ZVAL_STR(&tmp, index);
 	return phalcon_update_property_array(object, property, property_length, &tmp, value);
 }
@@ -967,7 +964,7 @@ int phalcon_update_property_array_merge_append(zval *object, const char *propert
  */
 int phalcon_update_property_empty_array(zval *object, const char *property_name, uint32_t property_length) {
 
-	zval empty_array;
+	zval empty_array = {};
 	array_init(&empty_array);
 
 	return phalcon_update_property_zval(object, property_name, property_length, &empty_array);
@@ -1271,7 +1268,7 @@ int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *proper
 
 int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *property, size_t property_length, const zval *index)
 {
-	zval property_value;
+	zval property_value = {};
 
 	if (!phalcon_property_isset_fetch(&property_value, object, property, property_length)) {
 		return 0;

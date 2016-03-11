@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultAction){
  */
 PHP_METHOD(Phalcon_CLI_Router, handle){
 
-	zval *arguments = NULL, module_name, namespace_name, task_name, action_name;
+	zval *arguments = NULL, module_name = {}, namespace_name = {}, task_name = {}, action_name = {};
 
 	phalcon_fetch_params(0, 0, 1, &arguments);
 

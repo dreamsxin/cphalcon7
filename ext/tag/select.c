@@ -71,12 +71,10 @@ PHALCON_INIT_CLASS(Phalcon_Tag_Select){
  * @param array $parameters
  * @param array $data
  */
-PHP_METHOD(Phalcon_Tag_Select, selectField){
-
-	zval *parameters, *data = NULL, params, default_params, id, name, value;
-	zval use_empty, empty_value, empty_text, code;
-	zval close_option, options, using;
-	zval resultset_options, array_options;
+PHP_METHOD(Phalcon_Tag_Select, selectField)
+{
+	zval *parameters, *data = NULL, params = {}, default_params = {}, id = {}, name = {}, value = {}, use_empty = {}, empty_value = {};
+	zval empty_text = {}, code = {}, close_option = {}, options = {}, using = {}, resultset_options = {}, array_options = {};
 
 	phalcon_fetch_params(0, 1, 1, &parameters, &data);
 
@@ -205,9 +203,9 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
  * @param mixed value
  * @param string $closeOption
  */
-PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
-
-	zval *resultset, *using, *value, *close_option, code;
+PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
+{
+	zval *resultset, *using, *value, *close_option, code = {};
 
 	phalcon_fetch_params(0, 4, 0, &resultset, &using, &value, &close_option);
 
@@ -219,7 +217,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
 	PHALCON_CALL_METHODW(NULL, resultset, "rewind");
 
 	while (1) {
-		zval r0, option, using_zero, using_one, option_value, option_text, escaped, params, code_option;
+		zval r0 = {}, option = {}, using_zero = {}, using_one = {}, option_value = {}, option_text = {}, escaped = {}, params = {}, code_option = {};
 
 		PHALCON_CALL_METHODW(&r0, resultset, "valid");
 		if (PHALCON_IS_NOT_FALSE(&r0)) {
@@ -322,7 +320,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
  */
 PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 
-	zval *data, *value, *close_option, code, *option_text;
+	zval *data, *value, *close_option, code = {}, *option_text;
 	zend_string *str_key;
 	ulong idx;
 
@@ -334,7 +332,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 	}
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, option_text) {
-		zval option_value, escaped, array_options;
+		zval option_value = {}, escaped = {}, array_options = {};
 		if (str_key) {
 			ZVAL_STR(&option_value, str_key);
 		} else {

@@ -74,14 +74,13 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Apc){
  * @param string $key
  * @return Phalcon\Annotations\Reflection
  */
-PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read){
-
-	zval *key, prefixed_key;
+PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read)
+{
+	zval *key, prefixed_key = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	PHALCON_CONCAT_SV(&prefixed_key, "_PHAN", key);
-
 	phalcon_strtolower_inplace(&prefixed_key);
 
 	PHALCON_RETURN_CALL_FUNCTIONW("apc_fetch", &prefixed_key);
@@ -98,7 +97,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Apc, read){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Apc, write){
 
-	zval *key, *data, prefixed_key;
+	zval *key, *data, prefixed_key = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 

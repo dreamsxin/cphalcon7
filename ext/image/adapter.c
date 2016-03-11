@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Image_Adapter, getImage){
  */
 PHP_METHOD(Phalcon_Image_Adapter, resize){
 
-	zval *_width = NULL, *_height = NULL, *_master = NULL, width, height, image_width, image_height;
+	zval *_width = NULL, *_height = NULL, *_master = NULL, width = {}, height = {}, image_width = {}, image_height = {};
 	long tmp_image_width, tmp_image_height, tmp_width = 0, tmp_height = 0, master;
 
 	phalcon_fetch_params(0, 0, 3, &_width, &_height, &_master);
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Image_Adapter, liquidRescale){
  */
 PHP_METHOD(Phalcon_Image_Adapter, crop){
 
-	zval *w, *h, *ofs_x = NULL, *ofs_y = NULL, image_width, image_height, width, height, offset_x, offset_y;
+	zval *w, *h, *ofs_x = NULL, *ofs_y = NULL, image_width = {}, image_height = {}, width = {}, height = {}, offset_x = {}, offset_y = {};
 	long tmp_max_width, tmp_max_height, tmp_width, tmp_height, tmp_image_width, tmp_image_height, tmp_offset_x, tmp_offset_y;
 
 	phalcon_fetch_params(0, 2, 2, &w, &h, &ofs_x, &ofs_y);
@@ -473,7 +473,7 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
  */
 PHP_METHOD(Phalcon_Image_Adapter, rotate){
 
-	zval *degrees, d;
+	zval *degrees, d = {};
 	long tmp_degrees;
 
 	phalcon_fetch_params(0, 1, 0, &degrees);
@@ -506,7 +506,7 @@ PHP_METHOD(Phalcon_Image_Adapter, rotate){
  */
 PHP_METHOD(Phalcon_Image_Adapter, flip){
 
-	zval *direction, dir;
+	zval *direction, dir = {};
 
 	phalcon_fetch_params(0, 1, 0, &direction);
 	PHALCON_ENSURE_IS_LONG(direction);
@@ -558,7 +558,7 @@ PHP_METHOD(Phalcon_Image_Adapter, sharpen){
  */
 PHP_METHOD(Phalcon_Image_Adapter, reflection){
 
-	zval *h = NULL, *op = NULL, *fade_in = NULL, image_height, height, opacity;
+	zval *h = NULL, *op = NULL, *fade_in = NULL, image_height = {}, height = {}, opacity = {};
 	long tmp_image_height;
 
 	phalcon_fetch_params(0, 0, 3, &h, &op, &fade_in);
@@ -606,8 +606,8 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
  */
 PHP_METHOD(Phalcon_Image_Adapter, watermark){
 
-	zval *watermark, *ofs_x = NULL, *ofs_y = NULL, *op = NULL;
-	zval offset_x, offset_y, opacity, image_width, image_height, watermark_width, watermark_height;
+	zval *watermark, *ofs_x = NULL, *ofs_y = NULL, *op = NULL, offset_x = {}, offset_y = {}, opacity = {}, image_width = {}, image_height = {};
+	zval watermark_width = {}, watermark_height = {};
 	long tmp_image_width, tmp_image_height, tmp_watermark_width, tmp_watermark_height, tmp_offset_x, tmp_offset_y;
 
 	phalcon_fetch_params(0, 1, 3, &watermark, &ofs_x, &ofs_y, &op);
@@ -688,7 +688,7 @@ PHP_METHOD(Phalcon_Image_Adapter, watermark){
 PHP_METHOD(Phalcon_Image_Adapter, text){
 
 	zval *text, *ofs_x = NULL, *ofs_y = NULL, *op = NULL, *fontcolor = NULL, *fontsize = NULL, *fontfile = NULL;
-	zval offset_x, offset_y, opacity, color, size, tmp, r, g, b;
+	zval offset_x = {}, offset_y = {}, opacity = {}, color = {}, size = {}, tmp = {}, r = {}, g = {}, b = {};
 	zend_string *c;
 
 	phalcon_fetch_params(0, 1, 6, &text, &ofs_x, &ofs_y, &op, &fontcolor, &fontsize, &fontfile);
@@ -798,7 +798,7 @@ PHP_METHOD(Phalcon_Image_Adapter, mask){
  */
 PHP_METHOD(Phalcon_Image_Adapter, background){
 
-	zval *bcolor, *_opacity = NULL, opacity, color, tmp, r, g, b;
+	zval *bcolor, *_opacity = NULL, opacity = {}, color = {}, tmp = {}, r = {}, g = {}, b = {};
 	zend_string *c;
 	long i;
 
@@ -871,7 +871,7 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
  */
 PHP_METHOD(Phalcon_Image_Adapter, blur){
 
-	zval *_radius = NULL, radius;
+	zval *_radius = NULL, radius = {};
 	long r;
 
 	phalcon_fetch_params(0, 0, 1, &_radius);
@@ -904,7 +904,7 @@ PHP_METHOD(Phalcon_Image_Adapter, blur){
  */
 PHP_METHOD(Phalcon_Image_Adapter, pixelate){
 
-	zval *amount = NULL, amt;
+	zval *amount = NULL, amt = {};
 
 	phalcon_fetch_params(0, 0, 1, &amount);
 
@@ -934,7 +934,7 @@ PHP_METHOD(Phalcon_Image_Adapter, pixelate){
  */
 PHP_METHOD(Phalcon_Image_Adapter, save){
 
-	zval *fname = NULL, *q = NULL, file, quality, ret, dir, *constant;
+	zval *fname = NULL, *q = NULL, file = {}, quality = {}, ret = {}, dir = {}, *constant;
 
 	phalcon_fetch_params(0, 0, 2, &fname, &q);
 
@@ -1002,7 +1002,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
  */
 PHP_METHOD(Phalcon_Image_Adapter, render){
 
-	zval *ext = NULL, *_quality = NULL, format, quality;
+	zval *ext = NULL, *_quality = NULL, format = {}, quality = {};
 
 	phalcon_fetch_params(0, 0, 2, &ext, &_quality);
 

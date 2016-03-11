@@ -39,7 +39,7 @@
  */
 int phalcon_file_exists(zval *filename){
 
-	zval exists_flag;
+	zval exists_flag = {};
 
 	if (Z_TYPE_P(filename) != IS_STRING) {
 		return FAILURE;
@@ -344,7 +344,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 	php_stream *stream;
 	int numbytes = 0, use_copy = 0;
 	zval *zcontext = NULL;
-	zval copy;
+	zval copy = {};
 	php_stream_context *context = NULL;
 
 	if (Z_TYPE_P(filename) != IS_STRING) {

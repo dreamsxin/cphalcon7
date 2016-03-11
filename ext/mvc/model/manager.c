@@ -346,7 +346,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Manager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setCustomEventsManager){
 
-	zval *model, *events_manager, class_name;
+	zval *model, *events_manager, class_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &events_manager);
 
@@ -362,7 +362,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getCustomEventsManager){
 
-	zval *model, *custom_events_manager, class_name, events_manager;
+	zval *model, *custom_events_manager, class_name = {}, events_manager = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -385,7 +385,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 
-	zval *model, class_name, *initialized, *events_manager, event_name;
+	zval *model, class_name = {}, *initialized, *events_manager, event_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -438,7 +438,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isInitialized){
 
-	zval *model_name, *initialized, lowercased;
+	zval *model_name, *initialized, lowercased = {};
 
 	phalcon_fetch_params(0, 1, 0, &model_name);
 
@@ -469,7 +469,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getLastInitialized){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
-	zval *model_name, *new_instance = NULL, *initialized, lowercased, model, *dependency_injector;
+	zval *model_name, *new_instance = NULL, *initialized, lowercased = {}, model = {}, *dependency_injector;
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 1, &model_name, &new_instance);
@@ -518,7 +518,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSource){
 
-	zval *model, *source, entity_name;
+	zval *model, *source, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &source);
 
@@ -543,7 +543,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSource){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSource){
 
-	zval *model, entity_name, *sources, source, class_name;
+	zval *model, entity_name = {}, *sources, source = {}, class_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -578,7 +578,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSource){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSchema){
 
-	zval *model, *schema, entity_name;
+	zval *model, *schema, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &schema);
 
@@ -603,7 +603,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSchema){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSchema){
 
-	zval *model, entity_name, *schemas, schema;
+	zval *model, entity_name = {}, *schemas, schema = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -630,7 +630,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSchema){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setConnectionService){
 
-	zval *model, *connection_service, entity_name;
+	zval *model, *connection_service, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &connection_service);
 
@@ -652,7 +652,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setWriteConnectionService){
 
-	zval *model, *connection_service, entity_name;
+	zval *model, *connection_service, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &connection_service);
 
@@ -673,7 +673,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setWriteConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService){
 
-	zval *model, *connection_service, entity_name;
+	zval *model, *connection_service, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &connection_service);
 
@@ -694,7 +694,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
 
-	zval *model, service, dependency_injector, connection;
+	zval *model, service = {}, dependency_injector = {}, connection = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -727,7 +727,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection){
 
-	zval *model, service, dependency_injector, connection;
+	zval *model, service = {}, dependency_injector = {}, connection = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -760,7 +760,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnectionService){
 
-	zval *model, *connection_services, entity_name, connection;
+	zval *model, *connection_services, entity_name = {}, connection = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -787,7 +787,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
 
-	zval *model, *connection_services, entity_name, connection;
+	zval *model, *connection_services, entity_name = {}, connection = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -815,7 +815,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 
-	zval *eventname, *model, entity_name, status, *behaviors, models_behaviors, *behavior, events_manager, fire_event_name, *custom_events_manager;
+	zval *eventname, *model, entity_name = {}, status = {}, *behaviors, models_behaviors = {}, *behavior, events_manager = {}, fire_event_name = {}, *custom_events_manager;
 
 	phalcon_fetch_params(0, 2, 0, &eventname, &model);
 
@@ -884,7 +884,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 
-	zval *model, *eventname, *data, *behaviors, entity_name, models_behaviors, *behavior, result, *events_manager, fire_event_name;
+	zval *model, *eventname, *data, *behaviors, entity_name = {}, models_behaviors = {}, *behavior, result = {}, *events_manager, fire_event_name = {};
 
 	phalcon_fetch_params(0, 3, 0, &model, &eventname, &data);
 
@@ -929,7 +929,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
 
-	zval *model, *behavior, entity_name, *behaviors, models_behaviors;
+	zval *model, *behavior, entity_name = {}, *behaviors, models_behaviors = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &behavior);
 
@@ -967,7 +967,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, keepSnapshots){
 
-	zval *model, *keep_snapshots, entity_name;
+	zval *model, *keep_snapshots, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &keep_snapshots);
 
@@ -982,7 +982,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, keepSnapshots){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isKeepingSnapshots){
 
-	zval *model, *keep_snapshots, entity_name, is_keeping;
+	zval *model, *keep_snapshots, entity_name = {}, is_keeping = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -1005,7 +1005,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, isKeepingSnapshots){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
 
-	zval *model, *dynamic_update, entity_name;
+	zval *model, *dynamic_update, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &dynamic_update);
 
@@ -1021,7 +1021,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate){
 
-	zval *model, *dynamic_update, entity_name, is_using;
+	zval *model, *dynamic_update, entity_name = {}, is_using = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -1048,9 +1048,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 
-	zval *model, *fields, *referenced_model, *referenced_fields, *options = NULL, entity_name, referenced_entity;
-	zval key_relation, *has_one, relations, number_fields, number_referenced, type, relation, alias;
-	zval lower_alias, key_alias, *has_one_single, single_relations;
+	zval *model, *fields, *referenced_model, *referenced_fields, *options = NULL, entity_name = {}, referenced_entity = {};
+	zval key_relation = {}, *has_one, relations = {}, number_fields = {}, number_referenced = {}, type = {}, relation = {}, alias = {};
+	zval lower_alias = {}, key_alias = {}, *has_one_single, single_relations = {};
 
 	phalcon_fetch_params(0, 4, 1, &model, &fields, &referenced_model, &referenced_fields, &options);
 
@@ -1149,8 +1149,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 
-	zval *model, *fields, *referenced_model, *referenced_fields, *options = NULL, entity_name, referenced_entity, key_relation, *belongs_to;
-	zval relations, number_fields, number_referenced, type, relation, alias, lower_alias, key_alias, *belongs_to_single, single_relations;
+	zval *model, *fields, *referenced_model, *referenced_fields, *options = NULL, entity_name = {}, referenced_entity = {}, key_relation = {}, *belongs_to;
+	zval relations = {}, number_fields = {}, number_referenced = {}, type = {}, relation = {}, alias = {}, lower_alias = {}, key_alias = {}, *belongs_to_single, single_relations = {};
 
 	phalcon_fetch_params(0, 4, 1, &model, &fields, &referenced_model, &referenced_fields, &options);
 
@@ -1248,9 +1248,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 
-	zval *model, *fields, *referenced_model, *referenced_fields, *options = NULL, entity_name, referenced_entity;
-	zval key_relation, *has_many, relations, number_fields, number_referenced, type, relation, alias;
-	zval lower_alias, key_alias, *has_many_single, single_relations;
+	zval *model, *fields, *referenced_model, *referenced_fields, *options = NULL, entity_name = {}, referenced_entity = {};
+	zval key_relation = {}, *has_many, relations = {}, number_fields = {}, number_referenced = {}, type = {}, relation = {}, alias = {};
+	zval lower_alias = {}, key_alias = {}, *has_many_single, single_relations = {};
 
 	phalcon_fetch_params(0, 4, 1, &model, &fields, &referenced_model, &referenced_fields, &options);
 
@@ -1352,8 +1352,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 
 	zval *model, *fields, *intermediate_model, *intermediate_fields, *intermediate_referenced_fields, *referenced_model, *referenced_fields, *options = NULL;
-	zval entity_name, intermediate_entity, referenced_entity, key_relation, *has_many_to_many, relations, number_fields, number_referenced, type;
-	zval relation, alias, lower_alias, key_alias, *has_many_to_many_single, single_relations;
+	zval entity_name = {}, intermediate_entity = {}, referenced_entity = {}, key_relation = {}, *has_many_to_many, relations = {}, number_fields = {}, number_referenced = {}, type = {};
+	zval relation = {}, alias = {}, lower_alias = {}, key_alias = {}, *has_many_to_many_single, single_relations = {};
 
 	phalcon_fetch_params(0, 7, 1, &model, &fields, &intermediate_model, &intermediate_fields, &intermediate_referenced_fields, &referenced_model, &referenced_fields, &options);
 
@@ -1470,7 +1470,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, existsBelongsTo){
 
-	zval *model_name, *model_relation, *initialized, entity_name, entity_relation, key_relation, *belongs_to;
+	zval *model_name, *model_relation, *initialized, entity_name = {}, entity_relation = {}, key_relation = {}, *belongs_to;
 
 	phalcon_fetch_params(0, 2, 0, &model_name, &model_relation);
 
@@ -1509,7 +1509,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsBelongsTo){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasMany){
 
-	zval *model_name, *model_relation, *initialized, entity_name, entity_relation, key_relation, *has_many;
+	zval *model_name, *model_relation, *initialized, entity_name = {}, entity_relation = {}, key_relation = {}, *has_many;
 
 	phalcon_fetch_params(0, 2, 0, &model_name, &model_relation);
 
@@ -1547,7 +1547,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasOne){
 
-	zval *model_name, *model_relation, *initialized, entity_name, entity_relation, key_relation, *has_one;
+	zval *model_name, *model_relation, *initialized, entity_name = {}, entity_relation = {}, key_relation = {}, *has_one;
 
 	phalcon_fetch_params(0, 2, 0, &model_name, &model_relation);
 
@@ -1585,7 +1585,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasOne){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasManyToMany){
 
-	zval *model_name, *model_relation, *initialized, entity_name, entity_relation, key_relation, *has_many_to_many;
+	zval *model_name, *model_relation, *initialized, entity_name = {}, entity_relation = {}, key_relation = {}, *has_many_to_many;
 
 	phalcon_fetch_params(0, 2, 0, &model_name, &model_relation);
 
@@ -1623,7 +1623,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasManyToMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationByAlias){
 
-	zval *model_name, *alias, *aliases, key_alias, key_lower, relation;
+	zval *model_name, *alias, *aliases, key_alias = {}, key_lower = {}, relation = {};
 
 	phalcon_fetch_params(0, 2, 0, &model_name, &alias);
 
@@ -1650,10 +1650,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationByAlias){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
-	zval *relation, *method, *record, *p = NULL, parameters, pre_conditions, placeholders, referenced_model, is_through, conditions;
-	zval intermediate_model, intermediate_fields, fields, value, condition, join_conditions, referenced_fields, joined_join_conditions;
-	zval joined_conditions, builder, query, referenced_field, *field, dependency_injector, find_params, find_arguments, arguments;
-	zval type, retrieve_method, reusable, unique_key, records, referenced_entity, call_object;
+	zval *relation, *method, *record, *p = NULL, parameters = {}, pre_conditions = {}, placeholders = {}, referenced_model = {}, is_through = {}, conditions = {};
+	zval intermediate_model = {}, intermediate_fields = {}, fields = {}, value = {}, condition = {}, join_conditions = {}, referenced_fields = {}, joined_join_conditions = {};
+	zval joined_conditions = {}, builder = {}, query = {}, referenced_field = {}, *field, dependency_injector = {}, find_params = {}, find_arguments = {}, arguments = {};
+	zval type = {}, retrieve_method = {}, reusable = {}, unique_key = {}, records = {}, referenced_entity = {}, call_object = {};
 	zend_string *str_key;
 	ulong idx;
 	int f_reusable;
@@ -1801,7 +1801,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		PHALCON_CALL_METHODW(&referenced_fields, relation, "getreferencedfields");
 		
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
-			zval tmp;
+			zval tmp = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -1917,7 +1917,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReusableRecords){
 
-	zval *model_name, *key, *reusable, records;
+	zval *model_name, *key, *reusable, records = {};
 
 	phalcon_fetch_params(0, 2, 0, &model_name, &key);
 
@@ -1970,8 +1970,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, clearReusableObjects){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getBelongsToRecords){
 
-	zval *method, *model_name, *model_relation, *record, *parameters = NULL, *belongs_to, entity_name;
-	zval entity_relation, key_relation, relations, relation;
+	zval *method, *model_name, *model_relation, *record, *parameters = NULL, *belongs_to, entity_name = {};
+	zval entity_relation = {}, key_relation = {}, relations = {}, relation = {};
 
 	phalcon_fetch_params(0, 4, 1, &method, &model_name, &model_relation, &record, &parameters);
 
@@ -2024,8 +2024,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getBelongsToRecords){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasManyRecords){
 
-	zval *method, *model_name, *model_relation, *record, *parameters = NULL, *has_many, entity_name, entity_relation;
-	zval key_relation, relations, relation;
+	zval *method, *model_name, *model_relation, *record, *parameters = NULL, *has_many, entity_name = {}, entity_relation = {};
+	zval key_relation = {}, relations = {}, relation = {};
 
 	phalcon_fetch_params(0, 4, 1, &method, &model_name, &model_relation, &record, &parameters);
 
@@ -2078,8 +2078,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasManyRecords){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneRecords){
 
-	zval *method, *model_name, *model_relation, *record, *parameters = NULL, *has_one, entity_name, entity_relation;
-	zval key_relation, relations, relation;
+	zval *method, *model_name, *model_relation, *record, *parameters = NULL, *has_one, entity_name = {}, entity_relation = {};
+	zval key_relation = {}, relations = {}, relation = {};
 
 	phalcon_fetch_params(0, 4, 1, &method, &model_name, &model_relation, &record, &parameters);
 
@@ -2132,7 +2132,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneRecords){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getBelongsTo){
 
-	zval *model, *belongs_to_single, lower_name, relations;
+	zval *model, *belongs_to_single, lower_name = {}, relations = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -2155,7 +2155,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getBelongsTo){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasMany){
 
-	zval *model, *has_many_single, lower_name, relations;
+	zval *model, *has_many_single, lower_name = {}, relations = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -2178,7 +2178,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOne){
 
-	zval *model, *has_one_single, lower_name, relations;
+	zval *model, *has_one_single, lower_name = {}, relations = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -2201,7 +2201,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOne){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasManyToMany){
 
-	zval *model, *has_many_to_many_single, lower_name, relations;
+	zval *model, *has_many_to_many_single, lower_name = {}, relations = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -2225,7 +2225,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasManyToMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneAndHasMany){
 
-	zval *model, has_one, has_many;
+	zval *model, has_one = {}, has_many = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -2242,7 +2242,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneAndHasMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 
-	zval *model_name, entity_name, all_relations, *belongs_to, relations, *relation, *has_many, *has_one;
+	zval *model_name, entity_name = {}, all_relations = {}, *belongs_to, relations = {}, *relation, *has_many, *has_one;
 
 	phalcon_fetch_params(0, 1, 0, &model_name);
 
@@ -2292,7 +2292,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationsBetween){
 
-	zval *first, *second, first_name, second_name, key_relation, *belongs_to, relations, *has_many, *has_one;
+	zval *first, *second, first_name = {}, second_name = {}, key_relation = {}, *belongs_to, relations = {}, *has_many, *has_one;
 
 	phalcon_fetch_params(0, 2, 0, &first, &second);
 
@@ -2340,7 +2340,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationsBetween){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 
-	zval *phql, *dependency_injector, service_name, has, parameters, query;
+	zval *phql, *dependency_injector, service_name = {}, has = {}, parameters = {}, query = {};
 
 	phalcon_fetch_params(0, 1, 0, &phql);
 
@@ -2379,7 +2379,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 
-	zval *phql, *placeholders = NULL, *types = NULL, *dependency_injector, service_name, has, parameters, query;
+	zval *phql, *placeholders = NULL, *types = NULL, *dependency_injector, service_name = {}, has = {}, parameters = {}, query = {};
 
 	phalcon_fetch_params(0, 1, 2, &phql, &placeholders, &types);
 
@@ -2430,7 +2430,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 
-	zval *params = NULL, *dependency_injector, service, service_params, builder;
+	zval *params = NULL, *dependency_injector, service = {}, service_params = {}, builder = {};
 
 	phalcon_fetch_params(0, 0, 1, &params);
 
@@ -2502,7 +2502,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, registerNamespaceAlias){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getNamespaceAlias){
 
-	zval *alias, *namespace_aliases, namespace, exception_message;
+	zval *alias, *namespace_aliases, namespace = {}, exception_message = {};
 
 	phalcon_fetch_params(0, 1, 0, &alias);
 

@@ -90,9 +90,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Uniqueness){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 
-	zval *record, option, field, dependency_injector, service, meta_data, bind_types, bind_data_types, column_map, conditions, bind_params;
-	zval number, *compose_field, column_field, exception_message, value, compose_condition, bind_type, condition, operation_made;
-	zval primary_fields, *primary_field, join_conditions, params, message, join_fields, type, is_set_code, code;
+	zval *record, option = {}, field = {}, dependency_injector = {}, service = {}, meta_data = {}, bind_types = {}, bind_data_types = {}, column_map = {}, conditions = {}, bind_params = {};
+	zval number = {}, *compose_field, column_field = {}, exception_message = {}, value = {}, compose_condition = {}, bind_type = {}, condition = {}, operation_made = {};
+	zval primary_fields = {}, *primary_field, join_conditions = {}, params = {}, message = {}, join_fields = {}, type = {}, is_set_code = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		PHALCON_CALL_METHODW(&primary_fields, &meta_data, "getprimarykeyattributes", record);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(primary_fields), primary_field) {
-			zval attribute_field;
+			zval attribute_field = {};
 
 			if (!phalcon_array_isset(&bind_data_types, primary_field)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_field, "\" isn't part of the table columns");

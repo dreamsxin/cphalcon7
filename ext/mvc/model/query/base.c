@@ -192,7 +192,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	phql_scanner_token token;
 	void* phql_parser;
 	char *error;
-	zval unique_id;
+	zval unique_id = {};
 
 	if (!phql) {
 		PHALCON_ALLOC_INIT_ZVAL(*error_msg);

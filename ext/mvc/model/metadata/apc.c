@@ -86,7 +86,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Apc){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, __construct){
 
-	zval *options = NULL, prefix, lifetime;
+	zval *options = NULL, prefix = {}, lifetime = {};
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, read)
 {
-	zval *key, *prefix, apc_key;
+	zval *key, *prefix, apc_key = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, read)
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, write){
 
-	zval *key, *data, *prefix, apc_key, *ttl;
+	zval *key, *data, *prefix, apc_key = {}, *ttl;
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset)
 		prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(meta), idx, str_key) {
-			zval key, real_key;
+			zval key = {}, real_key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {

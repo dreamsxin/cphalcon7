@@ -88,7 +88,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Files){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
 
-	zval *options = NULL, meta_data_dir;
+	zval *options = NULL, meta_data_dir = {};
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 
-	zval *key, *meta_data_dir, virtual_key, path, data;
+	zval *key, *meta_data_dir, virtual_key = {}, path = {}, data = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
@@ -134,7 +134,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 
-	zval *key, *data, *meta_data_dir, virtual_key, path, php_export, status;
+	zval *key, *data, *meta_data_dir, virtual_key = {}, path = {}, php_export = {}, status = {};
 	smart_str exp = { 0 };
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 {
-	zval *metadata_dir, pattern, iterator;
+	zval *metadata_dir, pattern = {}, iterator = {};
 	zend_object_iterator *it;
 
 	metadata_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
@@ -174,11 +174,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 	it = spl_ce_GlobIterator->get_iterator(spl_ce_GlobIterator, &iterator, 0);
 	it->funcs->rewind(it);
 	while (SUCCESS == it->funcs->valid(it) && !EG(exception)) {
-		zval itkey, dummy;
-
+		zval itkey = {}, dummy = {};
 		it->funcs->get_current_key(it, &itkey);
 		phalcon_unlink(&dummy, &itkey);
-
 		it->funcs->move_forward(it);
 	}
 

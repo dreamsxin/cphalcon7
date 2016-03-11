@@ -87,7 +87,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Inclusionin){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Inclusionin, validate){
 
-	zval *record, option, field, is_set, domain, value, allow_empty, message, joined_domain, is_set_code, code, type;
+	zval *record, option = {}, field = {}, is_set = {}, domain = {}, value = {}, allow_empty = {}, message = {}, joined_domain = {}, is_set_code = {}, code = {}, type = {};
 
 	phalcon_fetch_params(0, 1, 0, &record);
 

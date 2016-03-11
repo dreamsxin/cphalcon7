@@ -91,7 +91,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_StringLength){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 
-	zval *record, option, field, allow_empty, is_set_min, is_set_max, value, length, invalid_maximum, invalid_minimum, maximum, message, type, minimum, is_set_code, code;
+	zval *record, option = {}, field = {}, allow_empty = {}, is_set_min = {}, is_set_max = {}, value = {}, length = {}, invalid_maximum = {}, invalid_minimum = {}, maximum = {}, message = {}, type = {}, minimum = {}, is_set_code = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &record);
 

@@ -91,7 +91,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Cache){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 
-	zval *options = NULL, service, lifetime;
+	zval *options = NULL, service = {}, lifetime = {};
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 
-	zval cache, *dependency_injector, tmp;
+	zval cache = {}, *dependency_injector, tmp = {};
 
 	phalcon_return_property(&cache, getThis(), SL("_cache"));
 
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, read){
 
-	zval *key, cache, *lifetime;
+	zval *key, cache = {}, *lifetime;
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, write){
 
-	zval *key, *data, cache, *lifetime;
+	zval *key, *data, cache = {}, *lifetime;
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, write){
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, reset)
 {
-	zval cache;
+	zval cache = {};
 
 	PHALCON_CALL_METHODW(&cache, getThis(), "_getcache");
 

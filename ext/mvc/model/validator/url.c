@@ -85,7 +85,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Url){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Url, validate){
 
-	zval *record, option, field, allow_empty, value, flag, is_valid, message, type, is_set_code, code;
+	zval *record, option = {}, field = {}, allow_empty = {}, value = {}, flag = {}, is_valid = {}, message = {}, type = {}, is_set_code = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &record);
 

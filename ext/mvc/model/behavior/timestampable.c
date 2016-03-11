@@ -68,7 +68,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Behavior_Timestampable){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 
-	zval *type, *model, take_action, options, field, format, timestamp, generator, *single_field;
+	zval *type, *model, take_action = {}, options = {}, field = {}, format = {}, timestamp = {}, generator = {}, *single_field;
 
 	phalcon_fetch_params(0, 2, 0, &type, &model);
 	

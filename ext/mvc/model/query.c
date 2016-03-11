@@ -1622,7 +1622,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 		 * Resolve the compound operation
 		 */		
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
-			zval tmp, referenced_field, *phql;
+			zval tmp = {}, referenced_field = {}, *phql;
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -1691,10 +1691,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 
-	zval *join_type, *join_source, *model_alias, *join_alias, *relation, fields, referenced_fields, intermediate_model_name, manager;
-	zval intermediate_model, intermediate_source, intermediate_schema, intermediate_full_source, intermediate_fields, intermediate_referenced_fields;
-	zval referenced_model_name, *field, left, left_expr, right, right_expr, exception_message;
-	zval sql_join_condition_first, sql_join_conditions_first, sql_join_first, sql_join_condition_second, sql_join_conditions_second, sql_join_second;
+	zval *join_type, *join_source, *model_alias, *join_alias, *relation, fields = {}, referenced_fields = {}, intermediate_model_name = {}, manager = {};
+	zval intermediate_model = {}, intermediate_source = {}, intermediate_schema = {}, intermediate_full_source = {}, intermediate_fields = {}, intermediate_referenced_fields = {};
+	zval referenced_model_name = {}, *field, left = {}, left_expr = {}, right = {}, right_expr = {}, exception_message = {};
+	zval sql_join_condition_first = {}, sql_join_conditions_first = {}, sql_join_first = {}, sql_join_condition_second = {}, sql_join_conditions_second = {}, sql_join_second = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -1765,7 +1765,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 	if (Z_TYPE(fields) == IS_ARRAY) { 
 		/** @todo The code seems dead - the empty array will be returned */
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
-			zval tmp, *phql, sql_equals_join_condition;
+			zval tmp = {}, *phql, sql_equals_join_condition = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -1903,8 +1903,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	zval *select, *models, *sql_aliases, *sql_aliases_models, *sql_models_aliases, *sql_aliases_models_instances, *models_instances;
-	zval from_models, *form_model, sql_joins, join_models, join_sources, join_types, join_pre_condition, join_prepared;
-	zval manager, joins, select_joins, *join_item;
+	zval from_models = {}, *form_model, sql_joins = {}, join_models = {}, join_sources = {}, join_types = {}, join_pre_condition = {}, join_prepared = {};
+	zval manager = {}, joins = {}, select_joins = {}, *join_item;
 	zend_string *str_key, *str_key2;
 	ulong idx, idx2;
 
@@ -1937,7 +1937,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&select_joins), join_item) {
-		zval join_data, source, schema, model, model_name, complete_source, join_type, alias_expr, alias, *phql, exception_message;
+		zval join_data = {}, source = {}, schema = {}, model = {}, model_name = {}, complete_source = {}, join_type = {}, alias_expr = {}, alias = {}, *phql, exception_message = {};
 		/** 
 		 * Check join alias
 		 */
@@ -2096,7 +2096,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	phalcon_update_property_this(getThis(), SL("_modelsInstances"), models_instances);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(join_prepared), idx, str_key, join_item) {
-		zval tmp, join_expr, pre_condition;
+		zval tmp = {}, join_expr = {}, pre_condition = {};
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -2116,7 +2116,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	 * Create join relationships dynamically
 	 */
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(&from_models), idx, str_key, form_model) {
-		zval tmp, *join_model;
+		zval tmp = {}, *join_model;
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -2124,8 +2124,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 		}
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(join_models), idx2, str_key2, join_model) {
-			zval tmp2, join_source, join_type, model_name_alias, relation, relations, model_alias, sql_join;
-			zval sql_join_conditions, pre_condition, is_through, new_sql_joins, *phql, exception_message;
+			zval tmp2 = {}, join_source = {}, join_type = {}, model_name_alias = {}, relation = {}, relations = {}, model_alias = {}, sql_join = {};
+			zval sql_join_conditions = {}, pre_condition = {}, is_through = {}, new_sql_joins = {}, *phql, exception_message = {};
 			if (str_key2) {
 				ZVAL_STR(&tmp2, str_key2);
 			} else {
@@ -2251,7 +2251,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getOrderClause){
 
-	zval *order, order_columns, *order_item;
+	zval *order, order_columns = {}, *order_item;
 
 	phalcon_fetch_params(0, 1, 0, &order);
 
@@ -2265,7 +2265,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getOrderClause){
 	array_init(return_value);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(order_columns), order_item) {
-		zval order_column, order_sort, order_part_expr, order_part_sort;
+		zval order_column = {}, order_sort = {}, order_part_expr = {}, order_part_sort = {};
 
 		phalcon_array_fetch_str(&order_column, order_item, SL("column"), PH_NOISY);
 
@@ -2298,7 +2298,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getOrderClause){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getGroupClause){
 
-	zval *group, *group_item, group_part_expr;
+	zval *group, *group_item, group_part_expr = {};
 
 	phalcon_fetch_params(0, 1, 0, &group);
 
@@ -2324,7 +2324,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getGroupClause){
 
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getLimitClause) {
 
-	zval *limit_clause, tmp, limit, offset;
+	zval *limit_clause, tmp = {}, limit = {}, offset = {};
 
 	phalcon_fetch_params(0, 1, 0, &limit_clause);
 	assert(Z_TYPE_P(limit_clause) == IS_ARRAY);
@@ -2349,11 +2349,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getLimitClause) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 
-	zval *ast = NULL, *merge = NULL, select, tables, columns, distinct, sql_models, sql_tables, sql_aliases, sql_columns, sql_aliases_models;
-	zval sql_models_aliases, sql_aliases_models_instances, models, models_instances, selected_models, manager, *selected_model;
+	zval *ast = NULL, *merge = NULL, select = {}, tables = {}, columns = {}, distinct = {}, sql_models = {}, sql_tables = {}, sql_aliases = {}, sql_columns = {}, sql_aliases_models = {};
+	zval sql_models_aliases = {}, sql_aliases_models_instances = {}, models = {}, models_instances = {}, selected_models = {}, manager = {}, *selected_model;
 	zval *tmp_models, *tmp_models_instances, *tmp_sql_aliases, *tmp_sql_aliases_models, *tmp_sql_models_aliases, *tmp_sql_aliases_models_instances;
-	zval joins, sql_joins, select_columns, position, sql_column_aliases, *column, sql_select, where, where_expr, group_by, sql_group;
-	zval having, having_expr, order, sql_order, limit, sql_limit, forupdate;
+	zval joins = {}, sql_joins = {}, select_columns = {}, position = {}, sql_column_aliases = {}, *column, sql_select = {}, where = {}, where_expr = {}, group_by = {}, sql_group = {};
+	zval having = {}, having_expr = {}, order = {}, sql_order = {}, limit = {}, sql_limit = {}, forupdate = {};
 
 	phalcon_fetch_params(0, 0, 2, &ast, &merge);
 
@@ -2434,7 +2434,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	 * Processing selected columns
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(selected_models), selected_model) {
-		zval qualified_name, model_name, ns_alias, real_namespace, real_model_name, model, schema, source, complete_source, alias, *phql, exception_message;
+		zval qualified_name = {}, model_name = {}, ns_alias = {}, real_namespace = {}, real_model_name = {}, model = {}, schema = {}, source = {}, complete_source = {}, alias = {}, *phql, exception_message = {};
 
 		phalcon_array_fetch_str(&qualified_name, selected_model, SL("qualifiedName"), PH_NOISY);
 		phalcon_array_fetch_string(&model_name, &qualified_name, IS(name), PH_NOISY);
@@ -2584,12 +2584,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	array_init(&sql_column_aliases);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(select_columns), column) {
-		zval sql_column_group, *sql_column;
+		zval sql_column_group = {}, *sql_column;
 
 		PHALCON_CALL_METHODW(&sql_column_group, getThis(), "_getselectcolumn", column);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(sql_column_group), sql_column) {
-			zval alias, type;
+			zval alias = {}, type = {};
 			/** 
 			 * If 'alias' is set, the user had defined a alias for the column
 			 */
@@ -2708,8 +2708,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
-	zval *ast, qualified_name, values, model_name, manager, model, source, schema, table, not_quoting, sql_aliases, expr_rows;
-	zval rows, number_rows, expr_values, *row, sql_insert, meta_data, sql_fields, fields, *field, exception_message;
+	zval *ast, qualified_name = {}, values = {}, model_name = {}, manager = {}, model = {}, source = {}, schema = {}, table = {}, not_quoting = {}, sql_aliases = {}, expr_rows = {};
+	zval rows = {}, number_rows = {}, expr_values = {}, *row, sql_insert = {}, meta_data = {}, sql_fields = {}, fields = {}, *field, exception_message = {};
 	int i_rows = 0;
 
 	ast = phalcon_read_property(getThis(), SL("_ast"), PH_NOISY);
@@ -2765,7 +2765,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 		zval *expr_value;
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(row), expr_value) {
-			zval expr_insert, expr_type, value;
+			zval expr_insert = {}, expr_type = {}, value = {};
 			/** 
 			 * Resolve every expression in the 'values' clause
 			 */
@@ -2793,7 +2793,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 		array_init(&sql_fields);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(fields), field) {
-			zval name, has_attribute, *phql;
+			zval name = {}, has_attribute = {}, *phql;
 			phalcon_array_fetch_string(&name, field, IS(name), PH_NOISY);
 
 			/** 
@@ -2834,9 +2834,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 
-	zval *ast, update, tables, values, models, models_instances, sql_tables, sql_models, sql_aliases, sql_aliases_models_instances;
-	zval update_tables, manager, *table, sql_fields, sql_values, update_values, not_quoting, *update_value;
-	zval where, where_expr, limit, sql_limit;
+	zval *ast, update = {}, tables = {}, values = {}, models = {}, models_instances = {}, sql_tables = {}, sql_models = {}, sql_aliases = {}, sql_aliases_models_instances = {};
+	zval update_tables = {}, manager = {}, *table, sql_fields = {}, sql_values = {}, update_values = {}, not_quoting = {}, *update_value;
+	zval where = {}, where_expr = {}, limit = {}, sql_limit = {};
 
 	ast = phalcon_read_property(getThis(), SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_fetch_str(&update, ast, SL("update"))) {
@@ -2875,7 +2875,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 	PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(update_tables), table) {
-		zval qualified_name, model_name, ns_alias, real_namespace, real_model_name, model, source, schema, complete_source, alias;
+		zval qualified_name = {}, model_name = {}, ns_alias = {}, real_namespace = {}, real_model_name = {}, model = {}, source = {}, schema = {}, complete_source = {}, alias = {};
 
 		phalcon_array_fetch_str(&qualified_name, table, SL("qualifiedName"), PH_NOISY);
 		phalcon_array_fetch_string(&model_name, &qualified_name, IS(name), PH_NOISY);
@@ -2958,14 +2958,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 	ZVAL_FALSE(&not_quoting);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(update_values), update_value) {
-		zval column, sql_column, expr_column, expr_value, type, value;
+		zval column = {}, sql_column = {}, expr_column = {}, expr_value = {}, type = {}, value = {};
+
 		phalcon_array_fetch_str(&column, update_value, SL("column"), PH_NOISY);
 
 		PHALCON_CALL_METHODW(&sql_column, getThis(), "_getexpression", &column, &not_quoting);
 		phalcon_array_append(&sql_fields, &sql_column, PH_COPY);
 
 		phalcon_array_fetch_str(&expr_column, update_value, SL("expr"), PH_NOISY);
-
 		PHALCON_CALL_METHODW(&expr_value, getThis(), "_getexpression", &expr_column, &not_quoting);
 
 		phalcon_array_fetch_string(&type, &expr_column, IS(type), PH_NOISY);
@@ -3002,8 +3002,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 
-	zval *ast, delete_ast, tables, models, models_instances, sql_tables, sql_models, sql_aliases, sql_aliases_models_instances;
-	zval delete_tables, manager, *table, not_quoting, where, where_expr, limit, sql_limit;
+	zval *ast, delete_ast = {}, tables = {}, models = {}, models_instances = {}, sql_tables = {}, sql_models = {}, sql_aliases = {}, sql_aliases_models_instances = {};
+	zval delete_tables = {}, manager = {}, *table, not_quoting = {}, where = {}, where_expr = {}, limit = {}, sql_limit = {};
 
 	ast = phalcon_read_property(getThis(), SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_fetch_str(&delete_ast, ast, SL("delete"))) {
@@ -3037,8 +3037,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 	PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(delete_tables), table) {
-		zval qualified_name, model_name, ns_alias, real_namespace, real_model_name, model, source, schema;
-		zval complete_source, alias;
+		zval qualified_name = {}, model_name = {}, ns_alias = {}, real_namespace = {}, real_model_name = {}, model = {}, source = {}, schema = {}, complete_source = {}, alias = {};
 
 		phalcon_array_fetch_str(&qualified_name, table, SL("qualifiedName"), PH_NOISY);
 		phalcon_array_fetch_string(&model_name, &qualified_name, IS(name), PH_NOISY);
@@ -3128,8 +3127,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
-	zval event_name, *intermediate, *phql, ast, type, unique_id, ir_phql_cache, ir_phql_cache2, ir_phql, model_names, exception_message;
-	zval manager, tables, key_schema, key_source, *model_name;
+	zval event_name = {}, *intermediate, *phql, ast = {}, type = {}, unique_id = {}, ir_phql_cache = {}, ir_phql_cache2 = {}, ir_phql = {}, model_names = {}, exception_message = {};
+	zval manager = {}, tables = {}, key_schema = {}, key_source = {}, *model_name;
 	zend_string *str_key;
 	ulong idx;
 	int i_cache = 1;
@@ -3188,7 +3187,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 						ZVAL_LONG(&key_source, 0);
 
 						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(model_names), idx, str_key, model_name) {
-							zval tmp, table, model, source, old_schema, schema, old_source;
+							zval tmp = {}, table = {}, model = {}, source = {}, old_schema = {}, schema = {}, old_source = {};
 							if (str_key) {
 								ZVAL_STR(&tmp, str_key);
 							} else {
@@ -3339,11 +3338,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getCache){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
-	zval *intermediate, *bind_params, *bind_types, manager, models_instances, models, number_models;
-	zval model_name, model, connection, connections, *model_name2, columns, *column, select_columns;
-	zval simple_column_map, meta_data, dialect, sql_select, processed, *value, processed_types;
-	zval result, count, result_data, *dependency_injector, cache, result_object, is_keeping_snapshots;
-	zval service_name, has, service_params, resultset;
+	zval *intermediate, *bind_params, *bind_types, manager = {}, models_instances = {}, models = {}, number_models = {};
+	zval model_name = {}, model = {}, connection = {}, connections = {}, *model_name2, columns = {}, *column, select_columns = {};
+	zval simple_column_map = {}, meta_data = {}, dialect = {}, sql_select = {}, processed = {}, *value, processed_types = {};
+	zval result = {}, count = {}, result_data = {}, *dependency_injector, cache = {}, result_object = {}, is_keeping_snapshots = {};
+	zval service_name = {}, has = {}, service_params = {}, resultset = {};
 	zend_string *str_key;
 	ulong idx;
 	int have_scalars = 0, have_objects = 0, is_complex = 0, is_simple_std = 0;
@@ -3389,7 +3388,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		array_init(&connections);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models), model_name2) {
-			zval model2, connection2, type, connection_types;
+			zval model2 = {}, connection2 = {}, type = {}, connection_types = {};
 			if (!phalcon_array_isset_fetch(&model2, &models_instances, model_name2)) {
 				PHALCON_CALL_METHODW(&model, &manager, "load", model_name2);
 				phalcon_array_update_zval(&models_instances, model_name2, &model2, PH_COPY);
@@ -3429,7 +3428,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	 * Check if the resultset have objects and how many of them have
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column) {
-		zval column_type;
+		zval column_type = {};
 		phalcon_array_fetch_string(&column_type, column, IS(type), PH_NOISY);
 		if (PHALCON_IS_STRING(&column_type, "scalar")) {
 			if (!phalcon_array_isset_str(column, SL("balias"))) {
@@ -3469,7 +3468,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	PHALCON_CALL_SELFW(&meta_data, "getmodelsmetadata");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(columns), idx, str_key, column) {
-		zval key, type, sql_column, model_name, instance, attributes, column_map, *attribute, column_alias, sql_alias;
+		zval key = {}, type = {}, sql_column = {}, model_name = {}, instance = {}, attributes = {}, column_map = {}, *attribute, column_alias = {}, sql_alias = {};
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 		} else {
@@ -3508,7 +3507,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				 * Add every attribute in the model to the generated select
 				 */
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), attribute) {
-					zval hidden_alias, column_alias;
+					zval hidden_alias = {}, column_alias = {};
 
 					PHALCON_CONCAT_SVSV(&hidden_alias, "_", &sql_column, "_", attribute);
 
@@ -3538,7 +3537,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				 * Query only the columns that are registered as attributes in the metaData
 				 */
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), attribute) {
-					zval column_alias;
+					zval column_alias = {};
 					array_init_size(&column_alias, 3);
 					phalcon_array_append(&column_alias, attribute, PH_COPY);
 					phalcon_array_append(&column_alias, &sql_column, PH_COPY);
@@ -3591,7 +3590,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		array_init(&processed);
 		
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, value) {
-			zval tmp, string_wildcard, sql_tmp;
+			zval tmp = {}, string_wildcard = {}, sql_tmp = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -3625,7 +3624,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	if (Z_TYPE_P(bind_types) == IS_ARRAY) {
 		array_init(&processed_types);
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_types), idx, str_key, value) {
-			zval tmp, string_wildcard;
+			zval tmp = {}, string_wildcard = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -3752,10 +3751,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
-	zval *intermediate, *bind_params, *bind_types, *use_rawsql = NULL;
-	zval model_name, manager, models_instances, model, connection, meta_data, attributes, automatic_fields, fields, column_map;
-	zval rows, values, number_rows, *rows_values, number_fields, dialect, double_colon, empty_string;
-	zval base_model, insert_model, success;
+	zval *intermediate, *bind_params, *bind_types, *use_rawsql = NULL, model_name = {}, manager = {}, models_instances = {}, model = {}, connection = {};
+	zval meta_data = {}, attributes = {}, automatic_fields = {}, fields = {}, column_map = {}, rows = {}, values = {}, number_rows = {}, *rows_values;
+	zval number_fields = {}, dialect = {}, double_colon = {}, empty_string = {}, base_model = {}, insert_model = {}, success = {};
 	zend_string *str_key;
 	ulong idx;
 	int i_rows = 0;
@@ -3828,7 +3826,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	PHALCON_CALL_METHODW(&base_model, &manager, "load", &model_name);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&rows), rows_values) {
-		zval number_values, insert_values, *value, exception_message;
+		zval number_values = {}, insert_values = {}, *value, exception_message;
 
 		phalcon_fast_count(&number_values, rows_values);
 
@@ -3847,7 +3845,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		array_init(&insert_values);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(rows_values), idx, str_key, value) {
-			zval tmp, type, expr_value, insert_value, insert_expr, wildcard, field_name, attribute_name;
+			zval tmp = {}, type = {}, expr_value = {}, insert_value = {}, insert_expr = {}, wildcard = {}, field_name = {}, attribute_name = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -3972,9 +3970,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
-	zval *model, *intermediate, *bind_params, *bind_types, selected_tables, selected_models, source;
-	zval model_name, select_column, a0, selected_columns, select_ir, where_conditions, limit_conditions;
-	zval type_select, dependency_injector, service_name, has, parameters, query;
+	zval *model, *intermediate, *bind_params, *bind_types, selected_tables = {}, selected_models = {}, source = {};
+	zval model_name = {}, select_column = {}, a0 = {}, selected_columns = {}, select_ir = {}, where_conditions = {}, limit_conditions = {};
+	zval type_select = {}, dependency_injector = {}, service_name = {}, has = {}, parameters = {}, query = {};
 
 	phalcon_fetch_params(0, 4, 0, &model, &intermediate, &bind_params, &bind_types);
 
@@ -4058,10 +4056,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
-	zval *intermediate, *bind_params, *bind_types, *use_rawsql = NULL;
-	zval models, model_name, models_instances, model, manager, connection, dialect, double_colon;
-	zval empty_string, fields, values, update_values, select_bind_params, select_bind_types;
-	zval *field, records, success, update_sql, processed, *raw_value;
+	zval *intermediate, *bind_params, *bind_types, *use_rawsql = NULL, models = {}, model_name = {}, models_instances = {}, model = {}, manager = {};
+	zval connection = {}, dialect = {}, double_colon = {}, empty_string = {}, fields = {}, values = {}, update_values = {}, select_bind_params = {}, select_bind_types = {};
+	zval *field, records = {}, success = {}, update_sql = {}, processed = {}, *raw_value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -4111,7 +4108,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 		PHALCON_CPY_WRT_CTOR(&select_bind_types, bind_types);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
-			zval tmp, field_name, value, type, expr_value, update_value, update_expr, wildcard, exception_message;
+			zval tmp = {}, field_name = {}, value = {}, type = {}, expr_value = {}, update_value = {}, update_expr = {}, wildcard = {}, exception_message = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -4193,7 +4190,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 		PHALCON_CALL_METHODW(NULL, &records, "rewind");
 
 		while (1) {
-			zval r0, record;
+			zval r0 = {}, record = {};
 			PHALCON_CALL_METHODW(&r0, &records, "valid");
 			if (!PHALCON_IS_NOT_FALSE(&r0)) {
 				break;
@@ -4238,7 +4235,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 			array_init(&processed);
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, raw_value) {
-				zval wildcard, string_wildcard, sql_tmp;
+				zval wildcard = {}, string_wildcard = {}, sql_tmp = {};
 				if (str_key) {
 					ZVAL_STR(&wildcard, str_key);
 				} else {
@@ -4281,9 +4278,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
-	zval *intermediate, *bind_params, *bind_types, *use_rawsql = NULL;
-	zval models, model_name, models_instances, model, connection, manager, records, success;
-	zval record, dialect, delete_sql, processed, *raw_value;
+	zval *intermediate, *bind_params, *bind_types, *use_rawsql = NULL, models = {}, model_name = {}, models_instances = {};
+	zval model = {}, connection = {}, manager = {}, records = {}, success = {}, record = {}, dialect = {}, delete_sql = {}, processed = {}, *raw_value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -4337,7 +4333,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 		PHALCON_CALL_METHODW(NULL, &records, "rewind");
 
 		while (1) {
-			zval r0;
+			zval r0 = {};
 			PHALCON_CALL_METHODW(&r0, &records, "valid");
 			if (PHALCON_IS_FALSE(&r0)) {
 				break;
@@ -4380,7 +4376,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 			array_init(&processed);
 	
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, raw_value) {
-				zval tmp, string_wildcard, sql_tmp;
+				zval tmp = {}, string_wildcard = {}, sql_tmp = {};
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
@@ -4426,12 +4422,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
-	zval *bind_params = NULL, *bind_types = NULL, *use_rawsql = NULL, event_name, *unique_row, intermediate, *type;
-	zval *cache_options, cache_key, lifetime, cache_service, *dependency_injector, cache, frontend, result, is_fresh;
-	zval prepared_result, *default_bind_params;
-	zval merged_params, *default_bind_types;
-	zval merged_types, exception_message;
-	zval *value = NULL;
+	zval *bind_params = NULL, *bind_types = NULL, *use_rawsql = NULL, event_name = {}, *unique_row, intermediate = {}, *type;
+	zval *cache_options, cache_key = {}, lifetime = {}, cache_service = {}, *dependency_injector, cache = {}, frontend = {}, result = {}, is_fresh = {};
+	zval prepared_result = {}, *default_bind_params, merged_params = {}, *default_bind_types, merged_types = {}, exception_message = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 	int cache_options_is_not_null;
@@ -4549,7 +4542,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			array_init(&merged_params);
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(default_bind_params), idx, str_key, value) {
-				zval tmp;
+				zval tmp = {};
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
@@ -4559,7 +4552,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			} ZEND_HASH_FOREACH_END();
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, value) {
-				zval tmp;
+				zval tmp = {};
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
@@ -4654,7 +4647,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getSingleResult){
 
-	zval *bind_params = NULL, *bind_types = NULL, *unique_row, first_result, result;
+	zval *bind_params = NULL, *bind_types = NULL, *unique_row, first_result = {}, result = {};
 
 	phalcon_fetch_params(0, 0, 2, &bind_params, &bind_types);
 
@@ -4855,8 +4848,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModels){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 
-	zval *bind_params = NULL, *bind_types = NULL, intermediate, *type, manager, models_instances, models, number_models;
-	zval model_name, model, connection, connections, *model_key, connection_type, connection_types;
+	zval *bind_params = NULL, *bind_types = NULL, intermediate = {}, *type, manager = {}, models_instances = {}, models = {}, number_models = {};
+	zval model_name = {}, model = {}, connection = {}, connections = {}, *model_key, connection_type = {}, connection_types = {};
 
 	phalcon_fetch_params(0, 0, 2, &bind_params, &bind_types);
 
@@ -4949,7 +4942,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getSql){
 
-	zval intermediate, *type, exception_message;
+	zval intermediate = {}, *type, exception_message = {};
 
 	PHALCON_CALL_METHODW(&intermediate, getThis(), "parse");
 
@@ -4987,7 +4980,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getSql){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
 
-	zval *intermediate, manager, models_instances, columns, *column, select_columns, meta_data, connection, dialect;
+	zval *intermediate, manager = {}, models_instances = {}, columns = {}, *column, select_columns = {}, meta_data = {}, connection = {}, dialect = {};
 	zend_string *str_key;
 	ulong idx;
 	int have_scalars = 0, have_objects = 0, is_complex = 0;
@@ -5012,7 +5005,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
 	 * Check if the resultset have objects and how many of them have
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column) {
-		zval column_type;
+		zval column_type = {};
 		phalcon_array_fetch_string(&column_type, column, IS(type), PH_NOISY);
 		if (PHALCON_IS_STRING(&column_type, "scalar")) {
 			if (!phalcon_array_isset_str(column, SL("balias"))) {
@@ -5048,7 +5041,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
 	PHALCON_CALL_SELFW(&meta_data, "getmodelsmetadata");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(columns), idx, str_key, column) {
-		zval tmp, column_type, sql_column, model_name, instance, attributes, column_map, *attribute, column_alias;
+		zval tmp = {}, column_type = {}, sql_column = {}, model_name = {}, instance = {}, attributes = {}, column_map = {}, *attribute, column_alias = {};
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 		} else {
@@ -5087,7 +5080,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
 				 * Add every attribute in the model to the generated select
 				 */
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), attribute) {
-					zval hidden_alias, column_alias2;
+					zval hidden_alias = {}, column_alias2 = {};
 
 					PHALCON_CONCAT_SVSV(&hidden_alias, "_", &sql_column, "_", attribute);
 
@@ -5109,7 +5102,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
 				 * Query only the columns that are registered as attributes in the metaData
 				 */
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), attribute) {
-					zval column_alias2;
+					zval column_alias2 = {};
 					array_init_size(&column_alias2, 2);
 					phalcon_array_append(&column_alias2, attribute, PH_COPY);
 					phalcon_array_append(&column_alias2, &sql_column, PH_COPY);
@@ -5150,9 +5143,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlSelect){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlInsert){
 
-	zval *intermediate, manager, models_instances, model_name, instance, reverse_column_map, fields, *field, insert_fields;
-	zval connection, dialect;
-	zval values, *value, insert_values;
+	zval *intermediate, manager = {}, models_instances = {}, model_name = {}, instance = {}, reverse_column_map = {}, fields = {}, *field, insert_fields = {};
+	zval connection = {}, dialect = {}, values = {}, *value, insert_values = {};
 
 	phalcon_fetch_params(0, 1, 0, &intermediate);
 	PHALCON_SEPARATE_PARAM(intermediate);
@@ -5181,7 +5173,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlInsert){
 	array_init(&insert_fields);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(fields), field) {
-		zval attribute_field;
+		zval attribute_field = {};
 		if (Z_TYPE(reverse_column_map) == IS_ARRAY && phalcon_array_isset_fetch(&attribute_field, &reverse_column_map, field)) {
 			phalcon_array_append(&insert_fields, &attribute_field, PH_COPY);
 		} else {
@@ -5199,7 +5191,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlInsert){
 	array_init(&insert_values);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(values), value) {
-		zval type, expr_value, insert_value;
+		zval type = {}, expr_value = {}, insert_value = {};
 		phalcon_array_fetch_string(&type, value, IS(type), PH_NOISY);
 		phalcon_array_fetch_str(&expr_value, value, SL("value"), PH_NOISY);
 
@@ -5238,7 +5230,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlUpdate){
 
-	zval *intermediate, models, model_name, models_instances, model, manager, connection, dialect, update_sql;
+	zval *intermediate, models = {}, model_name = {}, models_instances = {}, model = {}, manager = {}, connection = {}, dialect = {}, update_sql = {};
 
 	phalcon_fetch_params(0, 1, 0, &intermediate);
 
@@ -5274,7 +5266,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSqlDelete){
 
-	zval *intermediate, models, model_name, models_instances, model, manager, connection, dialect, delete_sql;
+	zval *intermediate, models = {}, model_name = {}, models_instances = {}, model = {}, manager = {}, connection = {}, dialect = {}, delete_sql = {};
 
 	phalcon_fetch_params(0, 1, 0, &intermediate);
 

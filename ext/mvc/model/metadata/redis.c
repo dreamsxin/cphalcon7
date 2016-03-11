@@ -94,7 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Redis){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 
-	zval *options, host, port, auth, persistent, lifetime, prefix, frontend_data, redis, frontend_option, backend_option;
+	zval *options, host = {}, port = {}, auth = {}, persistent = {}, lifetime = {}, prefix = {}, frontend_data = {}, redis = {}, frontend_option = {}, backend_option = {};
 
 
 	phalcon_fetch_params(0, 1, 0, &options);

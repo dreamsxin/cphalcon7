@@ -77,9 +77,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Strategy_Introspection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 
-	zval *model, *dependency_injector, class_name, schema, table, read_connection, exists, complete_table, exception_message;
-	zval columns, attributes, primary_keys, non_primary_keys, numeric_typed, not_null, field_types, field_sizes, field_bytes, field_scales;
-	zval field_bind_types, automatic_create_attributes, automatic_update_attributes, field_default_values, identity_field, *column;
+	zval *model, *dependency_injector, class_name = {}, schema = {}, table = {}, read_connection = {}, exists = {}, complete_table = {}, exception_message = {};
+	zval columns = {}, attributes = {}, primary_keys = {}, non_primary_keys = {}, numeric_typed = {}, not_null = {}, field_types = {}, field_sizes = {}, field_bytes = {}, field_scales = {};
+	zval field_bind_types = {}, automatic_create_attributes = {}, automatic_update_attributes = {}, field_default_values = {}, identity_field = {}, *column;
 
 	phalcon_fetch_params(0, 2, 0, &model, &dependency_injector);
 
@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	ZVAL_FALSE(&identity_field);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column) {
-		zval field_name, feature, type, size, bytes, scale, bind_type, default_value;
+		zval field_name = {}, feature = {}, type = {}, size = {}, bytes = {}, scale = {}, bind_type = {}, default_value = {};
 
 		PHALCON_CALL_METHODW(&field_name, column, "getname");
 		phalcon_array_append(&attributes, &field_name, PH_COPY);
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 
-	zval *model, *dependency_injector, ordered_column_map, columns, *column_name, reversed_column_map, *user_name;
+	zval *model, *dependency_injector, ordered_column_map = {}, columns = {}, *column_name, reversed_column_map = {}, *user_name;
 	zend_string *str_key;
 	ulong idx;
 
@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 		array_init(&reversed_column_map);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, user_name) {
-			zval name;
+			zval name = {};
 			if (str_key) {
 				ZVAL_STR(&name, str_key);
 			} else {

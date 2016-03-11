@@ -87,7 +87,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Exclusionin){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Exclusionin, validate){
 
-	zval *record, option, field_name, allow_empty, is_set, domain, value, message, joined_domain, type, is_set_code, code;
+	zval *record, option = {}, field_name = {}, allow_empty = {}, is_set = {}, domain = {}, value = {}, message = {}, joined_domain = {}, type = {}, is_set_code = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &record);
 

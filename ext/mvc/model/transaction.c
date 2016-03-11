@@ -133,7 +133,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 
-	zval *dependency_injector, *auto_begin = NULL, *s = NULL, service, connection;
+	zval *dependency_injector, *auto_begin = NULL, *s = NULL, service = {}, connection = {};
 
 	phalcon_fetch_params(0, 1, 2, &dependency_injector, &auto_begin, &service);
 
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, commit){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 
-	zval *message = NULL, *rollback_record = NULL, *rollback_code = NULL, rollback_message, *manager, *connection, success, i0;
+	zval *message = NULL, *rollback_record = NULL, *rollback_code = NULL, rollback_message = {}, *manager, *connection, success = {}, i0 = {};
 
 	phalcon_fetch_params(0, 0, 4, &message, &rollback_record, &rollback_code);
 
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 
-	zval *rollback_on_abort, message, *connection;
+	zval *rollback_on_abort, message = {}, *connection;
 
 	rollback_on_abort = phalcon_read_property(getThis(), SL("_rollbackOnAbort"), PH_NOISY);
 	if (zend_is_true(rollback_on_abort)) {

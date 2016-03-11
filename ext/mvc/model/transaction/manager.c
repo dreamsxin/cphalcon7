@@ -156,7 +156,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction_Manager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, __construct){
 
-	zval *di = NULL, dependency_injector;
+	zval *di = NULL, dependency_injector = {};
 
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, has){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, get){
 
-	zval *auto_begin = NULL, *initialized, rollback_pendent;
+	zval *auto_begin = NULL, *initialized, rollback_pendent = {};
 
 	phalcon_fetch_params(0, 0, 1, &auto_begin);
 
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, get){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 
-	zval *auto_begin = NULL, dependency_injector, *number, *transactions, *transaction, *service, trans;
+	zval *auto_begin = NULL, dependency_injector = {}, *number, *transactions, *transaction, *service, trans = {};
 
 	phalcon_fetch_params(0, 0, 1, &auto_begin);
 
@@ -337,7 +337,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, rollbackPendent){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, commit){
 
-	zval *transactions, *transaction, connection, is_under_transaction;
+	zval *transactions, *transaction, connection = {}, is_under_transaction = {};
 
 	transactions = phalcon_read_property(getThis(), SL("_transactions"), PH_NOISY);
 	if (Z_TYPE_P(transactions) == IS_ARRAY) {
@@ -360,7 +360,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, commit){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, rollback){
 
-	zval *collect = NULL, *transactions, *transaction, connection, is_under_transaction;
+	zval *collect = NULL, *transactions, *transaction, connection = {}, is_under_transaction = {};
 
 	phalcon_fetch_params(0, 0, 1, &collect);
 
@@ -421,7 +421,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, notifyCommit){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, _collectTransaction){
 
-	zval *transaction, *transactions, new_transactions, *managed_transaction;
+	zval *transaction, *transactions, new_transactions = {}, *managed_transaction;
 
 	phalcon_fetch_params(0, 1, 0, &transaction);
 

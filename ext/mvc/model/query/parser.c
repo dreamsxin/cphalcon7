@@ -228,7 +228,7 @@ static zval *phql_ret_insert_statement(zval *Q, zval *F, zval *V)
 
 static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 {
-	zval key1, key2, rows, values;
+	zval key1 = {}, key2 = {}, rows = {}, values = {};
 
 	ZVAL_STR(&key1, IS(rows));
 
@@ -3137,7 +3137,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	phql_scanner_token token;
 	void* phql_parser;
 	char *error;
-	zval unique_id;
+	zval unique_id = {};
 
 	if (!phql) {
 		PHALCON_ALLOC_INIT_ZVAL(*error_msg);

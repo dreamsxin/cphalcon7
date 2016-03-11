@@ -95,7 +95,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Mongo){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
-	zval *options, backend_options, lifetime, prefix, frontend_data, mongo, option;
+	zval *options, backend_options = {}, lifetime = {}, prefix = {}, frontend_data = {}, mongo = {}, option = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 

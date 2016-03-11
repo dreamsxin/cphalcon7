@@ -86,7 +86,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_PresenceOf){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 
-	zval *record, option, field_name, value, message, type, is_set_code, code;
+	zval *record, option = {}, field_name = {}, value = {}, message = {}, type = {}, is_set_code = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &record);
 

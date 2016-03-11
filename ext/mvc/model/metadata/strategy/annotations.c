@@ -74,11 +74,11 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Strategy_Annotations){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 
-	zval *model, *dependency_injector, service, class_name, annotations, reflection, exception_message, properties_annotations;
-	zval attributes, primary_keys, non_primary_keys, numeric_typed, not_null, field_types, field_sizes, field_bytes, field_scales;
-	zval field_bind_types, automatic_create_attributes, automatic_update_attributes, field_default_values, identity_field;
-	zval column_annot_name, primary_annot_name, id_annot_name, column_map_name, column_type_name, column_size_name, column_bytes_name;
-	zval column_scale_name, column_default_name, column_nullable_name, *prop_annotations;
+	zval *model, *dependency_injector, service = {}, class_name = {}, annotations = {}, reflection = {}, exception_message = {}, properties_annotations = {};
+	zval attributes = {}, primary_keys = {}, non_primary_keys = {}, numeric_typed = {}, not_null = {}, field_types = {}, field_sizes = {}, field_bytes = {}, field_scales = {};
+	zval field_bind_types = {}, automatic_create_attributes = {}, automatic_update_attributes = {}, field_default_values = {}, identity_field = {};
+	zval column_annot_name = {}, primary_annot_name = {}, id_annot_name = {}, column_map_name = {}, column_type_name = {}, column_size_name = {}, column_bytes_name = {};
+	zval column_scale_name = {}, column_default_name = {}, column_nullable_name = {}, *prop_annotations;
 	zend_string *str_key;
 	ulong idx;
 
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	ZVAL_STRING(&column_nullable_name, "nullable");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(properties_annotations), idx, str_key, prop_annotations) {
-		zval property, has_annotation, column_annotation, real_property, feature;
+		zval property = {}, has_annotation = {}, column_annotation = {}, real_property = {}, feature = {};
 
 		if (str_key) {
 			ZVAL_STR(&property, str_key);
@@ -281,8 +281,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 
-	zval *model, *dependency_injector, service, annotations, class_name, reflection, properties_annotations, exception_message;
-	zval ordered_column_map, reversed_column_map, column_annot_name, column_map_name, *prop_annotations;
+	zval *model, *dependency_injector, service = {}, annotations = {}, class_name = {}, reflection = {}, properties_annotations = {}, exception_message = {};
+	zval ordered_column_map = {}, reversed_column_map = {}, column_annot_name = {}, column_map_name = {}, *prop_annotations;
 	zend_string *str_key;
 	ulong idx;
 
@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	ZVAL_STRING(&column_map_name, "column");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(properties_annotations), idx, str_key, prop_annotations) {
-		zval property, has_annotation, column_annotation, real_property;
+		zval property = {}, has_annotation = {}, column_annotation = {}, real_property = {};
 
 		if (str_key) {
 			ZVAL_STR(&property, str_key);

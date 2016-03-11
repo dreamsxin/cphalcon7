@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	password = phalcon_read_property(getThis(), SL("_password"), PH_NOISY);
 	authtype = phalcon_read_property(getThis(), SL("_authtype"), PH_NOISY);
 
-	if ((constant = zend_get_constant_str(SL("CURLOPT_URL"))) != NULL) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_URL"))) == NULL) {
 		RETURN_FALSE;
 	}
 
@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		phalcon_substr(&bodystr, &content, Z_LVAL(headersize) , Z_STRLEN(content));
 
 		PHALCON_CALL_METHODW(NULL, &response, "setheader", &headerstr);
-		PHALCON_CALL_METHODW(NULL, &response, "set&body", &bodystr);
+		PHALCON_CALL_METHODW(NULL, &response, "setbody", &bodystr);
 	}
 
 	RETURN_CTORW(&response);

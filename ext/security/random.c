@@ -195,7 +195,7 @@ PHALCON_INIT_CLASS(Phalcon_Security_Random){
  */
 PHP_METHOD(Phalcon_Security_Random, bytes){
 
-	zval *len_param = NULL, len, file_path, mode, handle, buffer, ret;
+	zval *len_param = NULL, len = {}, file_path = {}, mode = {}, handle = {}, buffer = {}, ret = {};
 	int l;
 
 	phalcon_fetch_params(0, 0, 1, &len_param);
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Security_Random, bytes){
  */
 PHP_METHOD(Phalcon_Security_Random, hex){
 
-	zval *len_param = NULL, data, format, ret;
+	zval *len_param = NULL, data = {}, format = {}, ret = {};
 
 	phalcon_fetch_params(0, 0, 1, &len_param);
 
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Security_Random, hex){
  */
 PHP_METHOD(Phalcon_Security_Random, base58){
 
-	zval *len_param = NULL, byte_string, alphabet, format, data, bytes, *byte;
+	zval *len_param = NULL, byte_string = {}, alphabet = {}, format = {}, data = {}, bytes = {}, *byte;
 
 	phalcon_fetch_params(0, 0, 1, &len_param);
 
@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Security_Random, base58){
 	PHALCON_CALL_FUNCTIONW(&bytes, "unpack", &format, &data);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(bytes), byte) {
-		zval idx, tmp;
+		zval idx = {}, tmp = {};
 		double d;
 		unsigned char c;
 		
@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Security_Random, base58){
  */
 PHP_METHOD(Phalcon_Security_Random, base64) {
 
-	zval *len_param = NULL, data;
+	zval *len_param = NULL, data = {};
 
 	phalcon_fetch_params(0, 0, 1, &len_param);
 
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Security_Random, base64) {
  */
 PHP_METHOD(Phalcon_Security_Random, base64Safe) {
 
-	zval *len_param = NULL, *padding_param = NULL, data, pattern, replacement, s, charlist;
+	zval *len_param = NULL, *padding_param = NULL, data = {}, pattern = {}, replacement = {}, s = {}, charlist = {};
 
 	phalcon_fetch_params(0, 0, 2, &len_param, &padding_param);
 
@@ -441,7 +441,7 @@ PHP_METHOD(Phalcon_Security_Random, base64Safe) {
  */
 PHP_METHOD(Phalcon_Security_Random, uuid) {
 
-	zval len, bytes, data, format, arr, a2, a3, str;
+	zval len = {}, bytes = {}, data = {}, format = {}, arr = {}, a2 = {}, a3 = {}, str = {};
 
 	ZVAL_LONG(&len, 16);
 
@@ -483,7 +483,7 @@ PHP_METHOD(Phalcon_Security_Random, uuid) {
  */
 PHP_METHOD(Phalcon_Security_Random, number) {
 
-	zval *len_param, bin, hex, hex_tmp, format, pack, mask, bytes, chr, rnd, ret, data, tmp, tmp1;
+	zval *len_param, bin = {}, hex = {}, hex_tmp = {}, format = {}, pack = {}, mask = {}, bytes = {}, chr = {}, rnd = {}, ret = {}, data = {}, tmp = {}, tmp1 = {};
 	unsigned char c;
 
 	phalcon_fetch_params(0, 1, 0, &len_param);

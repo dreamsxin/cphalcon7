@@ -79,7 +79,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Adapter_Stream){
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
-	zval *uri = NULL, *method = NULL, upper_method, header, stream, http, option, value;
+	zval *uri = NULL, *method = NULL, upper_method = {}, header = {}, stream = {}, http = {}, option = {}, value = {};
 
 	phalcon_fetch_params(0, 0, 2, &uri, &method);
 
@@ -128,8 +128,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 	zval *stream, *header, *data, *type, *files, *username, *password, *authtype, *digest, *method, *entity_body;
-	zval key, key_value, realm, ha1_txt, ha1, qop, ha2_txt, ha2, nonce, nc, cnonce, qoc, digest_value, path, md5_entity_body;
-	zval http, option, body, headers, uniqid, boundary, *value, *file;
+	zval key = {}, key_value = {}, realm = {}, ha1_txt = {}, ha1 = {}, qop = {}, ha2_txt = {}, ha2 = {}, nonce = {};
+	zval nc = {}, cnonce = {}, qoc = {}, digest_value = {}, path = {}, md5_entity_body = {};
+	zval http = {}, option = {}, body = {}, headers = {}, uniqid = {}, boundary = {}, *value, *file;
 	zend_string *str_key;
 	ulong idx;
 
@@ -259,7 +260,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 	if (Z_TYPE_P(data) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -273,7 +274,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 	if (Z_TYPE_P(files) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
-			zval path_parts, filename, basename, filedata;
+			zval path_parts = {}, filename = {}, basename = {}, filedata = {};
 			if (PHALCON_IS_NOT_EMPTY(file)) {
 				PHALCON_CALL_FUNCTIONW(&path_parts, "pathinfo", file);
 
@@ -310,8 +311,8 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 	}
 }
 
-PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, errorHandler){
-
+PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, errorHandler)
+{
 	zval *no, *message, *file, *line, *data;
 
 	phalcon_fetch_params(0, 5, 0, &no, &message, &file, &line, &data);
@@ -321,8 +322,8 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, errorHandler){
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal)
 {
-	zval *stream, *header, *method, *useragent, *timeout, uri, url, http, option, handler;
-	zval fp, meta, wrapper_data, bodystr, response;
+	zval *stream, *header, *method, *useragent, *timeout, uri = {}, url = {}, http = {}, option = {}, handler = {};
+	zval fp = {}, meta = {}, wrapper_data = {}, bodystr = {}, response = {};
 
 	stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
 	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);

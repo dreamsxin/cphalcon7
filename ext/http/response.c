@@ -185,9 +185,9 @@ PHP_METHOD(Phalcon_Http_Response, __construct){
  * @param string $message
  * @return Phalcon\Http\ResponseInterface
  */
-PHP_METHOD(Phalcon_Http_Response, setStatusCode){
-
-	zval *code, *message, headers, current_headers_raw, header_value, status_value, status_header;
+PHP_METHOD(Phalcon_Http_Response, setStatusCode)
+{
+	zval *code, *message, headers = {}, current_headers_raw = {}, header_value = {}, status_value = {}, status_header = {};
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 2, 0, &code, &message);
@@ -203,7 +203,7 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode){
 
 	if (Z_TYPE(current_headers_raw) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL(current_headers_raw), str_key) {
-			zval header_name;
+			zval header_name = {};
 			if (str_key) {
 				ZVAL_STR(&header_name, str_key);
 				if ((size_t)(Z_STRLEN(header_name)) > sizeof("HTTP/x.y ")-1 && !memcmp(Z_STRVAL(header_name), "HTTP/", 5)) {
@@ -309,10 +309,9 @@ PHP_METHOD(Phalcon_Http_Response, getCookies){
  * @param string $value
  * @return Phalcon\Http\ResponseInterface
  */
-PHP_METHOD(Phalcon_Http_Response, setHeader){
-
-	zval *name, *value, headers;
-
+PHP_METHOD(Phalcon_Http_Response, setHeader)
+{
+	zval *name, *value, headers = {};
 
 	phalcon_fetch_params(0, 2, 0, &name, &value);
 
@@ -332,9 +331,9 @@ PHP_METHOD(Phalcon_Http_Response, setHeader){
  * @param string $header
  * @return Phalcon\Http\ResponseInterface
  */
-PHP_METHOD(Phalcon_Http_Response, setRawHeader){
-
-	zval *header, headers;
+PHP_METHOD(Phalcon_Http_Response, setRawHeader)
+{
+	zval *header, headers = {};
 
 	phalcon_fetch_params(0, 1, 0, &header);
 
@@ -349,9 +348,9 @@ PHP_METHOD(Phalcon_Http_Response, setRawHeader){
  *
  * @return Phalcon\Http\ResponseInterface
  */
-PHP_METHOD(Phalcon_Http_Response, resetHeaders){
-
-	zval headers;
+PHP_METHOD(Phalcon_Http_Response, resetHeaders)
+{
+	zval headers = {};
 
 	PHALCON_CALL_METHODW(&headers, getThis(), "getheaders");
 	PHALCON_CALL_METHODW(NULL, &headers, "reset");
@@ -369,9 +368,9 @@ PHP_METHOD(Phalcon_Http_Response, resetHeaders){
  * @param \DateTime $datetime
  * @return \Phalcon\Http\ResponseInterface
  */
-PHP_METHOD(Phalcon_Http_Response, setExpires){
-
-	zval *datetime, headers, date, utc_zone, timezone, format, utc_format, utc_date, expires_header;
+PHP_METHOD(Phalcon_Http_Response, setExpires)
+{
+	zval *datetime, headers = {}, date = {}, utc_zone = {}, timezone = {}, format = {}, utc_format = {}, utc_date = {}, expires_header = {};
 	zend_class_entry *datetime_ce, *datetimezone_ce;
 
 	phalcon_fetch_params(0, 1, 0, &datetime);
@@ -421,9 +420,9 @@ PHP_METHOD(Phalcon_Http_Response, setExpires){
  *
  * @return Phalcon\Http\ResponseInterface
  */
-PHP_METHOD(Phalcon_Http_Response, setNotModified){
-
-	zval code, status;
+PHP_METHOD(Phalcon_Http_Response, setNotModified)
+{
+	zval code = {}, status = {};
 
 	ZVAL_LONG(&code, 304);
 	ZVAL_STRING(&status, "Not modified");
@@ -447,7 +446,7 @@ PHP_METHOD(Phalcon_Http_Response, setNotModified){
  */
 PHP_METHOD(Phalcon_Http_Response, setContentType){
 
-	zval *content_type, *charset = NULL, headers, name, header_value;
+	zval *content_type, *charset = NULL, headers = {}, name = {}, header_value = {};
 
 	phalcon_fetch_params(0, 1, 1, &content_type, &charset);
 
@@ -477,7 +476,7 @@ PHP_METHOD(Phalcon_Http_Response, setContentType){
  */
 PHP_METHOD(Phalcon_Http_Response, setEtag){
 
-	zval *etag, name, headers;
+	zval *etag, name = {}, headers = {};
 
 	phalcon_fetch_params(0, 1, 0, &etag);
 
@@ -513,8 +512,8 @@ PHP_METHOD(Phalcon_Http_Response, setEtag){
  */
 PHP_METHOD(Phalcon_Http_Response, redirect){
 
-	zval *location = NULL, *external_redirect = NULL, *_status_code = NULL, status_code, header, matched, pattern, dependency_injector, service_name;
-	zval url, view, status_text, header_name;
+	zval *location = NULL, *external_redirect = NULL, *_status_code = NULL, status_code = {}, header = {}, matched = {}, pattern = {}, dependency_injector = {}, service_name = {};
+	zval url = {}, view = {}, status_text = {}, header_name = {};
 
 	static const char* redirect_phrases[] = {
 		/* 300 */ "Multiple Choices",
@@ -637,7 +636,7 @@ PHP_METHOD(Phalcon_Http_Response, setContent){
  */
 PHP_METHOD(Phalcon_Http_Response, setJsonContent){
 
-	zval *content, *json_options = NULL, json_content;
+	zval *content, *json_options = NULL, json_content = {};
 	int options = 0;
 
 	phalcon_fetch_params(0, 1, 1, &content, &json_options);
@@ -663,7 +662,7 @@ PHP_METHOD(Phalcon_Http_Response, setJsonContent){
  */
 PHP_METHOD(Phalcon_Http_Response, setBsonContent){
 
-	zval *content, content_type, bson_content;
+	zval *content, content_type = {}, bson_content = {};
 
 	phalcon_fetch_params(0, 1, 0, &content);
 
@@ -683,7 +682,7 @@ PHP_METHOD(Phalcon_Http_Response, setBsonContent){
  */
 PHP_METHOD(Phalcon_Http_Response, appendContent){
 
-	zval *content, *_content, temp_content;
+	zval *content, *_content, temp_content = {};
 
 	phalcon_fetch_params(0, 1, 0, &content);
 
@@ -808,7 +807,7 @@ PHP_METHOD(Phalcon_Http_Response, send){
  */
 PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 
-	zval *file_path, *attachment_name = NULL, *attachment = NULL, base_path, headers, content_description, content_disposition, content_transfer;
+	zval *file_path, *attachment_name = NULL, *attachment = NULL, base_path = {}, headers = {}, content_description = {}, content_disposition = {}, content_transfer = {};
 
 	phalcon_fetch_params(0, 1, 2, &file_path, &attachment_name, &attachment);
 

@@ -67,7 +67,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Adapter_Curl){
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 
-	zval *uri = NULL, *method = NULL, upper_method, header, curl, options, *constant;
+	zval *uri = NULL, *method = NULL, upper_method = {}, header = {}, curl = {}, options = {}, *constant;
 
 	phalcon_fetch_params(0, 0, 2, &uri, &method);
 
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 		if (Z_TYPE_P(files) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
-				zval curlfile;
+				zval curlfile = {};
 				zend_class_entry *curlfile_ce;
 
 				if (PHALCON_IS_NOT_EMPTY(file)) {
@@ -244,7 +244,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 		if (Z_TYPE(data) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data), idx, str_key, value) {
-				zval name;
+				zval name = {};
 				if (str_key) {
 					ZVAL_STR(&name, str_key);
 				} else {
@@ -257,7 +257,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 		if (Z_TYPE_P(files) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
-				zval path_parts, filename, basename, filedata;
+				zval path_parts = {}, filename = {}, basename = {}, filedata = {};
 				if (PHALCON_IS_NOT_EMPTY(file)) {
 					PHALCON_CALL_FUNCTIONW(&path_parts, "pathinfo", file);
 

@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate)
  */
 PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 
-	zval *value, *minimum = NULL, *maximum = NULL, length, valid;
+	zval *value, *minimum = NULL, *maximum = NULL, length = {}, valid = {};
 
 	phalcon_fetch_params(0, 1, 2, &value, &minimum, &maximum);
 

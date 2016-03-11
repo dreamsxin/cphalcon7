@@ -115,7 +115,7 @@ PHALCON_INIT_CLASS(Phalcon_Chart_Captcha){
  */
 PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 
-	zval *word = NULL, *font = NULL, *font_size = NULL, *width = NULL, *height = NULL, imagick, draw;
+	zval *word = NULL, *font = NULL, *font_size = NULL, *width = NULL, *height = NULL, imagick = {}, draw = {};
 	zend_class_entry *imagick_ce, *draw_ce;
 
 	phalcon_fetch_params(0, 0, 5, &word, &font, &font_size, &width, &height);
@@ -215,8 +215,8 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
  */
 PHP_METHOD(Phalcon_Chart_Captcha, render){
 
-	zval *word = NULL, *offset_x = NULL, *offset_y = NULL, *_foreground = NULL, *_background = NULL, *width = NULL, *height = NULL, foreground, background;
-	zval imagick, draw, imagickpixel, gravity, min, max, roll1, roll2, corner1, corner2, format;
+	zval *word = NULL, *offset_x = NULL, *offset_y = NULL, *_foreground = NULL, *_background = NULL, *width = NULL, *height = NULL, foreground = {}, background = {};
+	zval imagick = {}, draw = {}, imagickpixel = {}, gravity = {}, min = {}, max = {}, roll1 = {}, roll2 = {}, corner1 = {}, corner2 = {}, format = {};
 	zend_class_entry  *imagick_ce, *imagickpixel_ce;
 
 	phalcon_fetch_params(0, 0, 6, &word, &offset_x, &offset_y, &_foreground, &background, &width, &height);

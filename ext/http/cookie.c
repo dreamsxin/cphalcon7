@@ -167,8 +167,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Cookie){
  */
 PHP_METHOD(Phalcon_Http_Cookie, __construct){
 
-	zval *name, *value = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL;
-	zval *http_only = NULL;
+	zval *name, *value = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL, *http_only = NULL, tmp = {};
 
 	phalcon_fetch_params(0, 1, 6, &name, &value, &expire, &path, &secure, &domain, &http_only);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -189,7 +188,6 @@ PHP_METHOD(Phalcon_Http_Cookie, __construct){
 	if (path && Z_TYPE_P(path) != IS_NULL) {
 		phalcon_update_property_this(getThis(), SL("_path"), path);
 	} else {
-		zval tmp;
 		ZVAL_STRINGL(&tmp, "/", 1);
 		phalcon_update_property_this(getThis(), SL("_path"), &tmp);
 	}
@@ -231,10 +229,10 @@ PHP_METHOD(Phalcon_Http_Cookie, setValue){
  * @param string $defaultValue
  * @return mixed
  */
-PHP_METHOD(Phalcon_Http_Cookie, getValue){
-
-	zval *filters = NULL, *default_value = NULL, *restored, *dependency_injector = NULL, *readed, *name, *_COOKIE, value, *encryption;
-	zval service, crypt, decrypted_value, filter;
+PHP_METHOD(Phalcon_Http_Cookie, getValue)
+{
+	zval *filters = NULL, *default_value = NULL, *restored, *dependency_injector = NULL, *readed, *name, *_COOKIE, value = {}, *encryption;
+	zval service = {}, crypt = {}, decrypted_value = {}, filter = {};
 
 	phalcon_fetch_params(0, 0, 2, &filters, &default_value);
 
@@ -321,7 +319,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue){
 PHP_METHOD(Phalcon_Http_Cookie, send){
 
 	zval *name, *value, *expire, *domain, *path, *secure, *http_only, *dependency_injector;
-	zval service, has_session, definition, session, key, encryption, crypt, encrypt_value;
+	zval service = {}, has_session = {}, definition = {}, session = {}, key = {}, encryption = {}, crypt = {}, encrypt_value = {};
 
 	name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
 	value = phalcon_read_property(getThis(), SL("_value"), PH_NOISY);
@@ -416,9 +414,9 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
  *
  * @return Phalcon\Http\Cookie
  */
-PHP_METHOD(Phalcon_Http_Cookie, restore){
-
-	zval *restored, *dependency_injector, service, session, name, key, definition, expire, domain, path, secure, http_only;
+PHP_METHOD(Phalcon_Http_Cookie, restore)
+{
+	zval *restored, *dependency_injector, service = {}, session = {}, name = {}, key = {}, definition = {}, expire = {}, domain = {}, path = {}, secure = {}, http_only = {};
 
 	restored = phalcon_read_property(getThis(), SL("_restored"), PH_NOISY);
 	if (!zend_is_true(restored)) {
@@ -466,9 +464,9 @@ PHP_METHOD(Phalcon_Http_Cookie, restore){
  * Deletes the cookie by setting an expire time in the past
  *
  */
-PHP_METHOD(Phalcon_Http_Cookie, delete){
-
-	zval *name, *domain, *path, *secure, *http_only, service, session, key;
+PHP_METHOD(Phalcon_Http_Cookie, delete)
+{
+	zval *name, *domain, *path, *secure, *http_only, service = {}, session = {}, key = {};
 
 	name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
 	domain = phalcon_read_property(getThis(), SL("_domain"), PH_NOISY);
@@ -734,7 +732,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getHttpOnly){
  */
 PHP_METHOD(Phalcon_Http_Cookie, __toString){
 
-	zval *value, e, *m;
+	zval *value, e = {}, *m;
 
 	value = phalcon_read_property(getThis(), SL("_value"), PH_NOISY);
 	if (Z_TYPE_P(value) == IS_NULL) {

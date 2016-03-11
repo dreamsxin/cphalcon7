@@ -138,7 +138,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Uri){
  */
 PHP_METHOD(Phalcon_Http_Uri, __construct)
 {
-	zval *uri = NULL, parts, query, params;
+	zval *uri = NULL, parts = {}, query = {}, params = {};
 
 	phalcon_fetch_params(0, 0, 1, &uri);
 
@@ -253,9 +253,9 @@ PHP_METHOD(Phalcon_Http_Uri, getParts){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_Http_Uri, getPath){
-
-	zval *parts, value;
+PHP_METHOD(Phalcon_Http_Uri, getPath)
+{
+	zval *parts, value = {};
 
 	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
 
@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Http_Uri, getPath){
  */
 PHP_METHOD(Phalcon_Http_Uri, build)
 {
-	zval *parts, uri, scheme, host, user, pass, port, path, query, fragment, tmp, tmp2;
+	zval *parts, uri = {}, scheme = {}, host = {}, user = {}, pass = {}, port = {}, path = {}, query = {}, fragment = {}, tmp = {}, tmp2 = {};
 
 	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
 
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 
 PHP_METHOD(Phalcon_Http_Uri, resolve)
 {
-	zval *uri, self;
+	zval *uri, self = {};
 
 	phalcon_fetch_params(0, 1, 0, &uri);
 
@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Http_Uri, resolve)
 
 PHP_METHOD(Phalcon_Http_Uri, extend)
 {
-	zval *uri, parts, self, parts2;
+	zval *uri, parts = {}, self = {}, parts2 = {};
 
 	phalcon_fetch_params(0, 1, 0, &uri);
 

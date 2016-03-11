@@ -95,7 +95,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend){
  */
 PHP_METHOD(Phalcon_Cache_Backend, __construct){
 
-	zval *frontend, *options = NULL, prefix;
+	zval *frontend, *options = NULL, prefix = {};
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 	PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_cache_frontendinterface_ce, phalcon_cache_exception_ce, 0);

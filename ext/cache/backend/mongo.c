@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 
-	zval mongo_collection, options, mongo, class_name, server, database, collection, service_name;
+	zval mongo_collection = {}, options = {}, mongo = {}, class_name = {}, server = {}, database = {}, collection = {}, service_name = {};
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&mongo_collection, getThis(), SL("_collection"));
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
-	zval *key_name, *lifetime = NULL, frontend, prefix, prefixed_key, collection, conditions, document , time_condition, cached_content;
+	zval *key_name, *lifetime = NULL, frontend = {}, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, time_condition = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
@@ -267,8 +267,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 
-	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, last_key, prefix, frontend, cached_content;
-	zval prepared_content, ttl, collection, timestamp, conditions, document, data, is_buffering;
+	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, last_key = {}, prefix = {}, frontend = {}, cached_content = {};
+	zval prepared_content = {}, ttl = {}, collection = {}, timestamp = {}, conditions = {}, document = {}, data = {}, is_buffering = {};
 
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 
-	zval *key_name, prefix, prefixed_key, collection, conditions;
+	zval *key_name, prefix = {}, prefixed_key = {}, collection = {}, conditions = {};
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
@@ -387,7 +387,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
-	zval *prefix = NULL, collection, fields, pattern, regex, conditions, documents, *document, documents_array, time_condition;
+	zval *prefix = NULL, collection = {}, fields = {}, pattern = {}, regex = {}, conditions = {}, documents = {}, *document, documents_array = {}, time_condition = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 0, 1, &prefix);
@@ -421,7 +421,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 	PHALCON_CALL_FUNCTIONW(&documents_array, "iterator_to_array", &documents);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(documents_array), document) {
-		zval key;
+		zval key = {};
 		if (likely(phalcon_array_isset_fetch_str(&key, document, SL("key")))) {
 			phalcon_array_append(return_value, &key, PH_COPY);
 		}
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 
-	zval *key_name = NULL, *lifetime = NULL, collection, last_key, prefix, conditions, number, time_condition;
+	zval *key_name = NULL, *lifetime = NULL, collection = {}, last_key = {}, prefix = {}, conditions = {}, number = {}, time_condition = {};
 	long int n;
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, gc) {
 
-	zval conditions, time_condition, collection;
+	zval conditions = {}, time_condition = {}, collection = {};
 
 	array_init_size(&time_condition, 1);
 	add_assoc_long_ex(&time_condition, SL("$gt"), (long int)time(NULL));
@@ -492,8 +492,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, gc) {
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 
-	zval *key_name, *value = NULL, lifetime, frontend, prefix, prefixed_key, collection, conditions, document, timestamp;
-	zval modified_time, difference, not_expired, cached_content;
+	zval *key_name, *value = NULL, lifetime = {}, frontend = {}, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, timestamp = {};
+	zval modified_time = {}, difference = {}, not_expired = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -565,8 +565,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
-	zval *key_name, *value = NULL, lifetime, frontend, prefix, prefixed_key, collection, conditions, document, timestamp;
-	zval modified_time, difference, not_expired, cached_content;
+	zval *key_name, *value = NULL, lifetime = {}, frontend, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, timestamp = {};
+	zval modified_time = {}, difference = {}, not_expired = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -636,7 +636,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, flush){
 
-	zval collection;
+	zval collection = {};
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
 	PHALCON_CALL_METHODW(NULL, &collection, "remove");

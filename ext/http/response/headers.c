@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send)
 		}
 	
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(headers), idx, str_key, value) {
-			zval header, http_header, tmp;
+			zval header = {}, http_header = {}, tmp = {};
 			if (str_key) {
 				ZVAL_STR(&header, str_key);
 			} else {
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, toArray){
  */
 PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 
-	zval *data, headers, data_headers, *value;
+	zval *data, headers = {}, data_headers = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 	object_init_ex(&headers, phalcon_http_response_headers_ce);
 	if (phalcon_array_isset_fetch_str(&data_headers, data, SL("_headers"))) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data_headers), idx, str_key, value) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {

@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Assets_Collection, add){
  */
 PHP_METHOD(Phalcon_Assets_Collection, addCss){
 
-	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, *collection_local, *collection_attributes, resource;
+	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, *collection_local, *collection_attributes, resource = {};
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
 
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addCss){
  */
 PHP_METHOD(Phalcon_Assets_Collection, addJs){
 
-	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, *collection_local, *collection_attributes, resource;
+	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, *collection_local, *collection_attributes, resource = {};
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
 
@@ -652,7 +652,7 @@ PHP_METHOD(Phalcon_Assets_Collection, getJoin){
  */
 PHP_METHOD(Phalcon_Assets_Collection, getRealTargetPath){
 
-	zval *base_path = NULL, *target_path, complete_path;
+	zval *base_path = NULL, *target_path, complete_path = {};
 
 	phalcon_fetch_params(0, 0, 1, &base_path);
 

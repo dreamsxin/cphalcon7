@@ -129,7 +129,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Header){
  */
 PHP_METHOD(Phalcon_Http_Client_Header, __construct){
 
-	zval messages;
+	zval messages = {};
 
 	array_init(&messages);
 
@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, remove){
 
 PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
-	zval *content, content_parts, *header;
+	zval *content, content_parts = {}, *header;
 
 	phalcon_fetch_params(0, 1, 0, &content);
 
@@ -278,7 +278,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 	}	
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(content_parts), header) {
-		zval header_parts, val1, val2, trimmed;
+		zval header_parts = {}, val1 = {}, val2 = {}, trimmed = {};
 
 		if (Z_TYPE_P(header) == IS_STRING) {
 			if (phalcon_memnstr_str(header , SL(":"))) {
@@ -304,9 +304,9 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 	} ZEND_HASH_FOREACH_END();
 }
 
-PHP_METHOD(Phalcon_Http_Client_Header, build){
-
-	zval *flags = NULL, *messages, *status_code, lines, message, *version, line, *fields, *value, join_filed;
+PHP_METHOD(Phalcon_Http_Client_Header, build)
+{
+	zval *flags = NULL, *messages, *status_code, lines = {}, message = {}, *version, line = {}, *fields, *value, join_filed = {};
 	zend_string *str_key;
 	ulong idx;
 	int f = 0;
@@ -335,7 +335,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, build){
 	fields = phalcon_read_property(getThis(), SL("_fields"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(fields), idx, str_key, value) {
-		zval filed, tmp;
+		zval filed = {}, tmp = {};
 		if (str_key) {
 			ZVAL_STR(&filed, str_key);
 		} else {

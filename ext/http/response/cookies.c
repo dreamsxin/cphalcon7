@@ -180,9 +180,8 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, isUsingEncryption){
  */
 PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 
-	zval *name, *value = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL;
-	zval *http_only = NULL, *cookies, *encryption, *dependency_injector = NULL;
-	zval cookie, *registered, service, response;
+	zval *name, *value = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL, *http_only = NULL, *cookies, *encryption, *dependency_injector;
+	zval cookie = {}, *registered, service = {}, response = {};
 
 	phalcon_fetch_params(0, 1, 6, &name, &value, &expire, &path, &secure, &domain, &http_only);
 
@@ -351,7 +350,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, has){
  */
 PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 
-	zval *name, *cookies, cookie, *_COOKIE, *dependency_injector;
+	zval *name, *cookies, cookie = {}, *_COOKIE, *dependency_injector;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 

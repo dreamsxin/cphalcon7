@@ -178,6 +178,6 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 	 * Merged passed attributes with previously defined ones
 	 */
 	PHALCON_CALL_METHODW(&widget_attributes, getThis(), "prepareattributes", attributes);
-	PHALCON_RETURN_CALL_CE_STATIC(phalcon_tag_select_ce, "selectfield", &widget_attributes, options);
+	PHALCON_RETURN_CALL_CE_STATICW(phalcon_tag_select_ce, "selectfield", &widget_attributes, options);
 	return;
 }

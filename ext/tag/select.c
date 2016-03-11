@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 	}
 
 	if (!phalcon_array_isset_fetch_str(&value, &params, SL("value"))) {
-		PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
+		PHALCON_CALL_CE_STATICW(&value, phalcon_tag_ce, "getvalue", &id, &params);
 	} else {
 		phalcon_array_unset_str(&params, SL("value"), PH_COPY);
 	}
@@ -177,13 +177,13 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		/** 
 		 * Create the SELECT's option from a resultset
 		 */
-		PHALCON_CALL_SELFW(&resultset_options, "_optionsfromresultset", &options, &using, &value, &close_option);
+		PHALCON_CALL_CE_STATICW(&resultset_options, phalcon_tag_select_ce, "_optionsfromresultset", &options, &using, &value, &close_option);
 		phalcon_concat_self(&code, &resultset_options);
 	} else if (Z_TYPE(options) == IS_ARRAY) {
 		/**
 		 * Create the SELECT's option from an array
 		 */
-		PHALCON_CALL_SELFW(&array_options, "_optionsfromarray", &options, &value, &close_option);
+		PHALCON_CALL_CE_STATICW(&array_options, phalcon_tag_select_ce, "_optionsfromarray",  &options, &value, &close_option);
 		phalcon_concat_self(&code, &array_options);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_tag_exception_ce, "Invalid data provided to SELECT helper");

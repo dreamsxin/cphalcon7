@@ -959,7 +959,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 		return;
 	}
 
-	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+	PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 
 	ZVAL_STRING(&service, ISV(filter));
 

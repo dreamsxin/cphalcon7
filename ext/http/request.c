@@ -1316,7 +1316,7 @@ static void phalcon_http_request_getuploadedfiles_helper(zval *retval, zval *nam
 					object_init_ex(&file, phalcon_http_request_file_ce);
 
 					params[0] = &arr;
-					params[0] = &key;
+					params[1] = &key;
 
 					res = phalcon_call_method(NULL, &file, "__construct", 2, params);
 

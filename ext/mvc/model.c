@@ -1522,13 +1522,17 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	phalcon_fetch_params(0, 0, 2, &parameters, &auto_create);
 
-	if (!parameters || Z_TYPE_P(parameters) != IS_ARRAY) {
-		array_init(&params);
-		if (Z_TYPE_P(parameters) != IS_NULL) {
-			phalcon_array_append(&params, parameters, PH_COPY);
+	if (parameters) {
+		if (Z_TYPE_P(parameters) != IS_ARRAY) {
+			array_init(&params);
+			if (Z_TYPE_P(parameters) != IS_NULL) {
+				phalcon_array_append(&params, parameters, PH_COPY);
+			}
+		} else {
+			PHALCON_CPY_WRT(&params, parameters);
 		}
 	} else {
-		PHALCON_CPY_WRT(&params, parameters);
+		ZVAL_NULL(&params);
 	}
 
 	if (!auto_create) {

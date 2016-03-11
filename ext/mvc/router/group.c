@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, getRoutes){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 
-	zval *pattern, *paths = NULL, *http_methods = NULL, *prefix, prefix_pattern, *default_paths, merged_paths;
+	zval *pattern, *paths = NULL, *http_methods = NULL, *prefix, prefix_pattern = {}, *default_paths, merged_paths = {};
 
 	phalcon_fetch_params(0, 1, 2, &pattern, &paths, &http_methods);
 	PHALCON_ENSURE_IS_STRING(pattern);
@@ -456,7 +456,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, add){
 
 static void phalcon_mvc_router_group_add_helper(INTERNAL_FUNCTION_PARAMETERS, zend_string *method)
 {
-	zval *pattern, *paths = NULL, http_method;
+	zval *pattern, *paths = NULL, http_method = {};
 
 	phalcon_fetch_params(0, 1, 1, &pattern, &paths);
 
@@ -572,11 +572,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, clear){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Group, convert){
 
-	zval **name, **converter;
+	zval *name, *converter;
 
 	phalcon_fetch_params(0, 2, 0, &name, &converter);
 
-	phalcon_update_property_array(getThis(), SL("_converters"), *name, *converter);
+	phalcon_update_property_array(getThis(), SL("_converters"), name, converter);
 	RETURN_THISW();
 }
 
@@ -598,11 +598,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, getConverters) {
  */
 PHP_METHOD(Phalcon_Mvc_Router_Group, setName){
 
-	zval **name;
+	zval *name;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_update_property_this(getThis(), SL("_name"), *name);
+	phalcon_update_property_this(getThis(), SL("_name"), name);
 	RETURN_THISW();
 }
 

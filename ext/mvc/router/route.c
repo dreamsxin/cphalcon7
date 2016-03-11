@@ -187,7 +187,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Router_Route){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 
-	zval *pattern, *paths = NULL, *http_methods = NULL, *regex = NULL, *unique_id = NULL, route_id;
+	zval *pattern, *paths = NULL, *http_methods = NULL, *regex = NULL, *unique_id = NULL, route_id = {};
 
 	phalcon_fetch_params(0, 1, 3, &pattern, &paths, &http_methods, &regex);
 
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
-	zval *pattern, *regex = NULL, compiled_pattern, id_pattern, wildcard, pattern_copy, params_pattern;
+	zval *pattern, *regex = NULL, compiled_pattern = {}, id_pattern = {}, wildcard = {}, pattern_copy = {}, params_pattern = {};
 
 	phalcon_fetch_params(0, 1, 1, &pattern, &regex);
 
@@ -401,8 +401,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, via){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 
-	zval *pattern, *paths = NULL, *regex = NULL, module_name, controller_name, action_name, parts, number_parts, route_paths;
-	zval real_class_name, namespace_name, lower_name, pcre_pattern, compiled_pattern;
+	zval *pattern, *paths = NULL, *regex = NULL, module_name = {}, controller_name = {}, action_name = {}, parts = {}, number_parts = {}, route_paths = {};
+	zval real_class_name = {}, namespace_name = {}, lower_name = {}, pcre_pattern = {}, compiled_pattern = {};
 
 	phalcon_fetch_params(0, 1, 2, &pattern, &paths, &regex);
 
@@ -676,7 +676,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getPaths){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 
-	zval *paths, *position = NULL;
+	zval *paths, *position;
 	zend_string *str_key;
 	ulong idx;
 
@@ -685,7 +685,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 	array_init(return_value);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(paths), idx, str_key, position) {
-		zval path;
+		zval path = {};
 		if (str_key) {
 			ZVAL_STR(&path, str_key);
 		} else {
@@ -829,7 +829,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reset){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 
-	zval *defaults, namespace_name, module_name, controller_name, action_name, params;
+	zval *defaults, namespace_name = {}, module_name = {}, controller_name = {}, action_name = {}, params = {};
 
 	phalcon_fetch_params(0, 1, 0, &defaults);
 

@@ -95,7 +95,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset_Complex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
 
-	zval *columns_types, *result, *cache = NULL, *source_model = NULL, fetch_assoc;
+	zval *columns_types, *result, *cache = NULL, *source_model = NULL, fetch_assoc = {};
 
 	phalcon_fetch_params(0, 2, 2, &columns_types, &result, &cache, &source_model);
 
@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 
-	zval *source_model = NULL, *type, *result, row, rows, *hydrate_mode, *columns_types, underscore, empty_str, active_row, dirty_state, *column;
+	zval *source_model = NULL, *type, *result, row = {}, rows = {}, *hydrate_mode, *columns_types, underscore = {}, empty_str = {}, active_row = {}, dirty_state = {}, *column;
 	zend_class_entry *ce;
 	zend_string *str_key;
 	ulong idx;
@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			ZVAL_LONG(&dirty_state, 0);
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(columns_types), idx, str_key, column) {
-				zval alias, n_alias, column_type, source, attributes, column_map, row_model, *attribute, sql_alias, value;
+				zval alias = {}, n_alias = {}, column_type = {}, source = {}, attributes = {}, column_map = {}, row_model = {}, *attribute, sql_alias = {}, value = {};
 
 				phalcon_array_fetch_str(&column_type, column, SL("type"), PH_NOISY);
 
@@ -257,7 +257,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					array_init(&row_model);
 
 					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&attributes), attribute) {
-						zval column_alias, column_value;
+						zval column_alias = {}, column_value = {};
 						/** 
 						 * Columns are supposed to be in the form _table_field
 						 */
@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					switch (phalcon_get_intval(hydrate_mode)) {
 
 						case 0: {
-							zval keep_snapshots, instance;
+							zval keep_snapshots = {}, instance = {};
 							
 							/** 
 							 * Get the base instance
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, toArray){
 	PHALCON_CALL_METHODW(NULL, getThis(), "rewind");
 
 	while (1) {
-		zval valid, current, arr;
+		zval valid = {}, current = {}, arr = {};
 
 		PHALCON_CALL_METHODW(&valid, getThis(), "valid");
 		if (!PHALCON_IS_NOT_FALSE(&valid)) {
@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 
-	zval records, *cache, *column_types, *hydrate_mode, data, serialized;
+	zval records = {}, *cache, *column_types, *hydrate_mode, data = {}, serialized = {};
 
 	/** 
 	 * Obtain the records as an array
@@ -453,7 +453,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, unserialize){
 
-	zval *data, resultset, rows, cache, column_types, hydrate_mode;
+	zval *data, resultset = {}, rows = {}, cache = {}, column_types = {}, hydrate_mode = {};
 
 	phalcon_fetch_params(0, 1, 0, &data);
 

@@ -102,9 +102,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_GridFS){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 
-	zval *file, *meta = NULL, *opts = NULL, *isBytes = NULL, metadata, options, mongo_id, source, files_source;
-	zval connection, mongo_collection, *sha1, *md5, criteria, operation, field, value, new_object, grid_fs;
-	zval status, ok, exist;
+	zval *file, *meta = NULL, *opts = NULL, *isBytes = NULL, metadata = {}, options = {}, mongo_id = {}, source = {}, files_source = {}, connection = {};
+	zval mongo_collection = {}, *sha1, *md5, criteria = {}, operation = {}, field = {}, value = {}, new_object = {}, grid_fs = {}, status = {}, ok = {}, exist = {};
 
 	phalcon_fetch_params(0, 1, 3, &file, &meta, &opts, &isBytes);
 
@@ -210,8 +209,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, store){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 
-	zval *sha1 = NULL, *md5 = NULL, source, files_source, connection, mongo_collection, criteria, operation, field, value, new_object;
-	zval status, ok, exist, options, grid_fs;
+	zval *sha1 = NULL, *md5 = NULL, source = {}, files_source = {}, connection = {}, mongo_collection = {}, criteria = {}, operation = {}, field = {}, value = {}, new_object = {};
+	zval status = {}, ok = {}, exist = {}, options = {}, grid_fs = {};
 
 	phalcon_fetch_params(0, 0, 2, &sha1, &md5);
 
@@ -289,7 +288,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, remove){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 
-	zval *filename, *arr = NULL, *white_list = NULL, *mode = NULL, *old_sha1, *old_md5, sha1, md5, status;
+	zval *filename, *arr = NULL, *white_list = NULL, *mode = NULL, *old_sha1, *old_md5, sha1 = {}, md5 = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 3, &filename, &arr, &white_list, &mode);
 
@@ -332,7 +331,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, saveBytes){
 
-	zval *bytes, *arr = NULL, *white_list = NULL, *mode = NULL, *old_sha1, *old_md5, sha1, md5, status;
+	zval *bytes, *arr = NULL, *white_list = NULL, *mode = NULL, *old_sha1, *old_md5, sha1 = {}, md5 = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 3, &bytes, &arr, &white_list, &mode);
 
@@ -461,7 +460,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, updateBytes){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, delete){
 
-	zval status;
+	zval status = {};
 
 	PHALCON_CALL_PARENTW(&status, phalcon_mvc_collection_gridfs_ce, getThis(), "delete");
 	if (PHALCON_IS_FALSE(&status)) {
@@ -473,7 +472,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, delete){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, drop){
 
-	zval class_name, collection, ok, source, connection, mongo_collection, status, grid_fs;
+	zval class_name = {}, collection = {}, ok = {}, source = {}, connection = {}, mongo_collection = {}, status = {}, grid_fs = {};
 	zend_class_entry *ce0;
 
 	phalcon_get_called_class(&class_name);
@@ -515,7 +514,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, drop){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getFile){
 
-	zval mongo_id, source, connection, grid_fs, *sha1, *md5, criteria;
+	zval mongo_id = {}, source = {}, connection = {}, grid_fs = {}, *sha1, *md5, criteria = {};
 
 	PHALCON_CALL_SELFW(&mongo_id, "getid");
 
@@ -545,7 +544,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getFile){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getBytes){
 
-	zval file;
+	zval file = {};
 
 	PHALCON_CALL_METHODW(&file, getThis(), "getfile");
 
@@ -558,7 +557,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, getBytes){
 
 PHP_METHOD(Phalcon_Mvc_Collection_GridFS, write){
 
-	zval *filename, file;
+	zval *filename, file = {};
 
 	phalcon_fetch_params(0, 1, 0, &filename);
 

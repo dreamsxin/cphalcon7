@@ -141,7 +141,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Collection_Manager){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, setCustomEventsManager){
 
-	zval *model, *events_manager, class_name;
+	zval *model, *events_manager, class_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &events_manager);
 	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_collectioninterface_ce, phalcon_mvc_collection_exception_ce, 0);
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
 
-	zval *model, *custom_events_manager, class_name, events_manager;
+	zval *model, *custom_events_manager, class_name = {}, events_manager = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 
-	zval *model, class_name, *initialized, *events_manager, event_name;
+	zval *model, class_name = {}, *initialized, *events_manager, event_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, isInitialized){
 
-	zval *model_name, *initialized, lowercased;
+	zval *model_name, *initialized, lowercased = {};
 
 	phalcon_fetch_params(0, 1, 0, &model_name);
 
@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getLastInitialized){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, setConnectionService){
 
-	zval *model, *connection_service, entity_name;
+	zval *model, *connection_service, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &connection_service);
 
@@ -274,7 +274,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, useImplicitObjectIds){
 
-	zval *model, *use_implicit_object_ids, entity_name;
+	zval *model, *use_implicit_object_ids, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &use_implicit_object_ids);
 
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, useImplicitObjectIds){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 
-	zval *model, entity_name, *implicit_objects_ids, implicit;
+	zval *model, entity_name = {}, *implicit_objects_ids, implicit = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, setStrictMode){
 
-	zval *collection, *strict_mode, entity_name;
+	zval *collection, *strict_mode, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &collection, &strict_mode);
 
@@ -346,7 +346,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setStrictMode){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 
-	zval *collection, entity_name, *strict_modes, strict_mode;
+	zval *collection, entity_name = {}, *strict_modes, strict_mode = {};
 
 	phalcon_fetch_params(0, 1, 0, &collection);
 
@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 
-	zval *model, service, *connection_services, entity_name, dependency_injector, connection;
+	zval *model, service = {}, *connection_services, entity_name = {}, dependency_injector = {}, connection = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -427,7 +427,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 
-	zval *eventname, *model, status, *events_manager, fire_event_name, *custom_events_manager, entity_name;
+	zval *eventname, *model, status = {}, *events_manager, fire_event_name = {}, *custom_events_manager, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &eventname, &model);
 
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, setSource){
 
-	zval *collection, *source, entity_name;
+	zval *collection, *source, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &collection, &source);
 
@@ -497,7 +497,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setSource){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 
-	zval *collection, entity_name, *sources, source, class_name;
+	zval *collection, entity_name = {}, *sources, source = {}, class_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &collection);
 
@@ -529,7 +529,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, setColumnMap){
 
-	zval *collection, *column_map, entity_name;
+	zval *collection, *column_map, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &collection, &column_map);
 
@@ -555,7 +555,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 
-	zval *collection, entity_name, *column_maps, column_map;
+	zval *collection, entity_name = {}, *column_maps, column_map = {};
 
 	phalcon_fetch_params(0, 1, 0, &collection);
 

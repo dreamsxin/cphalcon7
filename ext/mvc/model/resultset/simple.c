@@ -103,8 +103,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset_Simple){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 
-	zval *column_map, *model, *result, *cache = NULL, *keep_snapshots = NULL, *source_model = NULL;
-	zval fetch_assoc, limit, row_count, big_resultset;
+	zval *column_map, *model, *result, *cache = NULL, *keep_snapshots = NULL, *source_model = NULL, fetch_assoc = {}, limit = {}, row_count = {}, big_resultset = {};
 
 	phalcon_fetch_params(0, 3, 3, &column_map, &model, &result, &cache, &keep_snapshots, &source_model);
 
@@ -171,8 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
-	zval *type, *result, row, rows, dirty_state, *hydrate_mode;
-	zval *keep_snapshots, *column_map, key, *source_model, *model, active_row, *rows_objects;
+	zval *type, *result, row = {}, rows = {}, dirty_state = {}, *hydrate_mode, *keep_snapshots, *column_map, key = {}, *source_model, *model, active_row, *rows_objects;
 	zend_class_entry *ce;
 
 	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
@@ -292,7 +290,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 
-	zval *rename_columns = NULL, records;
+	zval *rename_columns = NULL, records = {};
 
 	phalcon_fetch_params(0, 0, 1, &rename_columns);
 
@@ -305,7 +303,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 	PHALCON_CALL_METHODW(NULL, getThis(), "rewind");
 
 	while (1) {
-		zval valid, current, arr;
+		zval valid = {}, current = {}, arr = {};
 
 		PHALCON_CALL_METHODW(&valid, getThis(), "valid");
 		if (!PHALCON_IS_NOT_FALSE(&valid)) {
@@ -332,7 +330,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, serialize){
 
-	zval records, *model, *cache, *column_map, *hydrate_mode, data;
+	zval records = {}, *model, *cache, *column_map, *hydrate_mode, data = {};
 
 	PHALCON_CALL_METHODW(&records, getThis(), "toarray", &PHALCON_GLOBAL(z_false));
 
@@ -366,7 +364,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, serialize){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, unserialize){
 
-	zval *data, resultset, model, rows, cache, column_map, hydrate_mode;
+	zval *data, resultset = {}, model = {}, rows = {}, cache = {}, column_map = {}, hydrate_mode = {};
 
 	phalcon_fetch_params(0, 1, 0, &data);
 

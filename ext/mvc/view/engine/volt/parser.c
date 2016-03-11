@@ -4120,7 +4120,7 @@ int phvolt_internal_parse_view(zval *result, zval *view_code, zval *template_pat
 			if (Z_TYPE_P(error_msg) <= IS_NULL) {
 				ZVAL_STRING(error_msg, parser_status->syntax_error);
 			}
-			//efree(parser_status->syntax_error);
+			efree(parser_status->syntax_error);
 		}
 	}
 
@@ -4130,8 +4130,6 @@ int phvolt_internal_parse_view(zval *result, zval *view_code, zval *template_pat
 		if (parser_status->status == PHVOLT_PARSING_OK) {
 			if (parser_status->ret) {
 				ZVAL_ZVAL(result, parser_status->ret, 0, 0);
-				ZVAL_NULL(parser_status->ret);
-				zval_ptr_dtor(parser_status->ret);
 			} else {
 				array_init(result);
 			}

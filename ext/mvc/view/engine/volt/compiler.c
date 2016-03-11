@@ -813,6 +813,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 
 		phalcon_camelize(&camelized, &name);
 		phalcon_lcfirst(&method, &camelized);
+		zval_ptr_dtor(&camelized);
 
 		ZVAL_STRING(&class_name, "Phalcon\\Tag");
 

@@ -1422,27 +1422,21 @@ int phalcon_json_decode(zval *retval, zval *v, zend_bool assoc)
 
 void phalcon_lcfirst(zval *return_value, zval *s)
 {
-	zval copy = {};
 	char *c;
 	int use_copy = 0;
 
 	if (unlikely(Z_TYPE_P(s) != IS_STRING)) {
-		use_copy = zend_make_printable_zval(s, &copy);
-		if (use_copy) {
-			s = &copy;
+		use_copy = zend_make_printable_zval(s, return_value);
+		if (!use_copy) {
+			PHALCON_CPY_WRT_CTOR(return_value, s);
 		}
+	} else {
+		PHALCON_CPY_WRT_CTOR(return_value, s);
 	}
 
-	if (!Z_STRLEN_P(s)) {
-		ZVAL_EMPTY_STRING(return_value);
-	} else {
-		ZVAL_DUP(return_value, s);
+	if (Z_STRLEN_P(s)) {
 		c = Z_STRVAL_P(return_value);
 		*c = tolower((unsigned char)*c);
-	}
-
-	if (unlikely(use_copy)) {
-		zval_dtor(&copy);
 	}
 }
 

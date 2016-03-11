@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getPhql){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 
-	zval *manager, dependency_injector, service_name, has, service;
+	zval *manager, dependency_injector = {}, service_name = {}, has = {}, service = {};
 
 	manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 	if (Z_TYPE_P(manager) == IS_OBJECT) {
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 
-	zval *meta_data, dependency_injector, service_name, has, service;
+	zval *meta_data, dependency_injector = {}, service_name = {}, has = {}, service = {};
 
 	meta_data = phalcon_read_property(getThis(), SL("_modelsMetaData"), PH_NOISY);
 	if (Z_TYPE_P(meta_data) == IS_OBJECT) {
@@ -442,9 +442,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getUniqueRow){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 
-	zval *expr, column_name, *sql_column_aliases, s_qualified, meta_data, *sql_aliases, column_domain, *phql;
-	zval source, exception_message, *sql_aliases_models_instances, model, column_map, real_column_name;
-	zval has_model, *models_instances, *model_instance, *models, class_name;
+	zval *expr, column_name = {}, *sql_column_aliases, s_qualified = {}, meta_data = {}, *sql_aliases, column_domain = {}, *phql;
+	zval source = {}, exception_message = {}, *sql_aliases_models_instances, model = {}, column_map = {}, real_column_name = {};
+	zval has_model = {}, *models_instances, *model_instance, *models, class_name = {};
 	long int number = 0;
 
 	phalcon_fetch_params(0, 1, 0, &expr);
@@ -532,7 +532,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		models_instances = phalcon_read_property(getThis(), SL("_currentModelsInstances"), PH_NOISY);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(models_instances), model_instance) {
-			zval has_attribute;
+			zval has_attribute = {};
 			/** 
 			 * Check if the atribute belongs to the current model
 			 */
@@ -629,7 +629,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getCallArgument){
 
-	zval *argument, argument_type, s_all;
+	zval *argument, argument_type = {}, s_all = {};
 
 	phalcon_fetch_params(0, 1, 0, &argument);
 
@@ -653,7 +653,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCallArgument){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 
-	zval *expr, when_clauses, left, right, *when_expr, tmp;
+	zval *expr, when_clauses, left = {}, right = {}, *when_expr, tmp;
 
 	phalcon_fetch_params(0, 1, 0, &expr);
 
@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 	phalcon_array_fetch_string(&right, expr, IS(right), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(right), when_expr) {
-		zval when_left, when_right, expr_left, expr_right, tmp1;
+		zval when_left = {}, when_right = {}, expr_left = {}, expr_right = {}, tmp1 = {};
 
 		/** 
 		 * Resolving left part of the expression if any
@@ -708,7 +708,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 
-	zval *expr, name, arguments, function_args, *argument, argument_expr;
+	zval *expr, name = {}, arguments = {}, function_args = {}, *argument, argument_expr = {};
 	int distinct;
 
 	phalcon_fetch_params(0, 1, 0, &expr);
@@ -761,8 +761,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
-	zval *expr, *quoting = NULL, expr_left, expr_right, temp_not_quoting, left, right, expr_type, expr_value, value, escaped_value;
-	zval value_parts, value_name, value_type, value_param, placeholder, exception_message, list_items, *expr_list_item, *models_instances;
+	zval *expr, *quoting = NULL, expr_left = {}, expr_right = {}, temp_not_quoting = {}, left = {}, right = {}, expr_type = {}, expr_value = {}, value = {}, escaped_value = {};
+	zval value_parts = {}, value_name = {}, value_type = {}, value_param = {}, placeholder = {}, exception_message = {}, list_items = {}, *expr_list_item, *models_instances;
 	int type, value_times;
 
 	phalcon_fetch_params(0, 1, 1, &expr, &quoting);
@@ -1001,7 +1001,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				break;
 
 			case PHQL_T_NPLACEHOLDER: {
-				zval question_mark, colon;
+				zval question_mark = {}, colon = {};
 
 				phalcon_array_fetch_str(&value, expr, SL("value"), PH_NOISY);
 
@@ -1028,7 +1028,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
 			case PHQL_T_BPLACEHOLDER:
 			{
-				zval tmp_type;
+				zval tmp_type = {};
 				phalcon_array_fetch_str(&value, expr, SL("value"), PH_NOISY);
 
 				if (phalcon_memnstr_str(&value, SL(":"))) {
@@ -1300,7 +1300,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 		array_init(&list_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(expr), expr_list_item) {
-			zval expr_item;
+			zval expr_item = {};
 			PHALCON_CALL_METHODW(&expr_item, getThis(), "_getexpression", expr_list_item);
 			phalcon_array_append(&list_items, &expr_item, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -1323,8 +1323,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 
-	zval *column, column_type, *models, *model, sql_column, *sql_aliases, column_domain, source, *phql, exception_message;
-	zval sql_column_alias, *sql_aliases_models, model_name, prepared_alias, column_data, balias, sql_expr_column;
+	zval *column, column_type = {}, *models, *model, sql_column = {}, *sql_aliases, column_domain = {}, source = {}, *phql, exception_message = {};
+	zval sql_column_alias = {}, *sql_aliases_models, model_name = {}, prepared_alias = {}, column_data = {}, balias = {}, sql_expr_column = {};
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 1, 0, &column);
@@ -1454,7 +1454,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getTable){
 
-	zval *manager, *qualified_name, model_name, model, source, schema;
+	zval *manager, *qualified_name, model_name = {}, model = {}, source = {}, schema = {};
 
 	phalcon_fetch_params(0, 2, 0, &manager, &qualified_name);
 
@@ -1483,7 +1483,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getTable){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
 
-	zval *manager, *join, qualified, qualified_type, model_name, model, source, schema;
+	zval *manager, *join, qualified = {}, qualified_type = {}, model_name = {}, model = {}, source = {}, schema = {};
 
 	phalcon_fetch_params(0, 2, 0, &manager, &join);
 
@@ -1515,7 +1515,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 
-	zval *join, type, *phql, exception_message;
+	zval *join, type, *phql, exception_message = {};
 
 	phalcon_fetch_params(0, 1, 0, &join);
 
@@ -1567,8 +1567,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 
-	zval *join_type, *join_source, *model_alias, *join_alias, *relation, fields, referenced_fields, sql_join_conditions;
-	zval left, left_expr, right, right_expr, sql_join_condition, *field, exception_message;
+	zval *join_type, *join_source, *model_alias, *join_alias, *relation, fields = {}, referenced_fields = {}, sql_join_conditions = {};
+	zval left = {}, left_expr = {}, right = {}, right_expr = {}, sql_join_condition = {}, *field, exception_message = {};
 	zend_string *str_key;
 	ulong idx;
 

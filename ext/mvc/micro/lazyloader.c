@@ -88,7 +88,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 
-	zval *method, *arguments, handler, *definition, call_handler;
+	zval *method, *arguments, handler = {}, *definition, call_handler = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 2, 0, &method, &arguments);

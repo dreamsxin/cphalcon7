@@ -95,7 +95,7 @@ static inline int phalcon_return_property(zval *return_value, zval *object, cons
 {
 	zval *tmp = phalcon_read_property(object, property_name, property_length, PH_NOISY);
 	if (tmp) {
-		ZVAL_COPY(return_value, tmp);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 
@@ -107,7 +107,7 @@ static inline int phalcon_return_property_zval(zval *return_value, zval *object,
 {
 	zval *tmp = phalcon_read_property_zval(object, property, PH_NOISY);
 	if (tmp) {
-		ZVAL_COPY(return_value, tmp);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 
@@ -155,7 +155,7 @@ static inline int phalcon_return_property_array(zval *return_value, zval *object
 {
 	zval *tmp = phalcon_read_property_array(object, property_name, property_length, index);
 	if (tmp) {
-		ZVAL_COPY(return_value, tmp);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 
@@ -180,7 +180,7 @@ static inline int phalcon_return_static_property(zval *return_value, const char 
 {
 	zval *tmp = phalcon_read_static_property(class_name, class_length, property_name, property_length);
 	if (tmp) {
-		ZVAL_COPY_VALUE(return_value, tmp);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 
@@ -195,7 +195,7 @@ static inline int phalcon_return_static_property_ce(zval *return_value, zend_cla
 {
 	zval *tmp = phalcon_read_static_property_ce(ce, property, len);
 	if (tmp) {
-		ZVAL_COPY_VALUE(return_value, tmp);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 

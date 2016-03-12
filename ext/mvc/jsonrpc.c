@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 
-	zval *modules, *merge = NULL, *registered_modules, merged_modules;
+	zval *modules, *merge = NULL, *registered_modules, merged_modules = {};
 
 	phalcon_fetch_params(0, 1, 1, &modules, &merge);
 
@@ -212,13 +212,12 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, getDefaultModule){
 
 static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *this_ptr, zval *params)
 {
-	zval event_name;
-	zval status;
+	zval event_name = {}, status = {};
 	uint params_cnt = 2 + (params != NULL ? 1 : 0);
 	zval *p[3];
 	if (mgr) {
 
-		PHALCON_STR(&event_name, event);
+		ZVAL_STRING(&event_name, event);
 
 		p[0] = &event_name;
 		p[1] = this_ptr;
@@ -242,9 +241,9 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
-	zval *dependency_injector, *events_manager, service, request, json, data, response, jsonrpc_message, jsonrpc_error, jsonrpc_method, jsonrpc_params;
-	zval url, uri, router, module_name, *modules, module, class_name, path, module_object, module_params, status, namespace_name, controller_name, action_name;
-	zval params, exact, dispatcher, controller, jsonrpc_result, jsonrpc_id;
+	zval *dependency_injector, *events_manager, service = {}, request = {}, json = {}, data = {}, response = {}, jsonrpc_message = {}, jsonrpc_error = {}, jsonrpc_method = {}, jsonrpc_params = {};
+	zval url = {}, uri = {}, router = {}, module_name = {}, *modules, module = {}, class_name = {}, path = {}, module_object = {}, module_params = {}, status = {}, namespace_name = {}, controller_name = {}, action_name = {};
+	zval params = {}, exact = {}, dispatcher = {}, controller = {}, jsonrpc_result = {}, jsonrpc_id = {};
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
@@ -266,7 +265,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 	/* Deserializer Json */
 
-	PHALCON_STR(&service, ISV(request));
+	ZVAL_STRING(&service, ISV(request));
 
 	PHALCON_CALL_METHODW(&request, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&request, phalcon_http_requestinterface_ce);
@@ -274,7 +273,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	PHALCON_CALL_METHODW(&json, &request, "getrawbody");
 	PHALCON_CALL_FUNCTIONW(&data, "json_decode", &json, &PHALCON_GLOBAL(z_true));
 
-	PHALCON_STR(&service, ISV(response));
+	ZVAL_STRING(&service, ISV(response));
 
 	PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
@@ -299,13 +298,13 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			array_init(&jsonrpc_params);
 		}
 
-		PHALCON_STR(&service, ISV(url));
+		ZVAL_STRING(&service, ISV(url));
 		PHALCON_CALL_METHODW(&url, dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&url, phalcon_mvc_urlinterface_ce);
 
 		PHALCON_CALL_METHODW(&uri, &url, "get", &jsonrpc_method);
 
-		PHALCON_STR(&service, ISV(router));
+		ZVAL_STRING(&service, ISV(router));
 		PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
 
@@ -350,7 +349,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			if (Z_TYPE(module) == IS_ARRAY) { 
 				/* Class name used to load the module definition */
 				if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
-					PHALCON_STR(&class_name, "Module");
+					ZVAL_STRING(&class_name, "Module");
 				}
 		
 				/* If the developer has specified a path, try to include the file */
@@ -401,7 +400,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		PHALCON_CALL_METHODW(&params, &router, "getparams");
 		PHALCON_CALL_METHODW(&exact, &router, "isexactcontrollername");
 
-		PHALCON_STR(&service, ISV(dispatcher));
+		ZVAL_STRING(&service, ISV(dispatcher));
 		
 		PHALCON_CALL_METHODW(&dispatcher, dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&dispatcher, phalcon_dispatcherinterface_ce);

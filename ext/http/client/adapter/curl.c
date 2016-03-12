@@ -67,7 +67,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Adapter_Curl){
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 
-	zval *uri = NULL, *method = NULL, upper_method, header, curl, options, *constant;
+	zval *uri = NULL, *method = NULL, upper_method = {}, header = {}, curl = {}, options = {}, *constant;
 
 	phalcon_fetch_params(0, 0, 2, &uri, &method);
 
@@ -120,9 +120,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
-	zval uri, url, *method, *useragent, data, type, *files, *timeout, *curl, *username, *password, *authtype;
-	zval *constant, *header, *constant1, userpwd, *file, body, uniqid, boundary, *value, key, key_value, headers;
-	zval content, errorno, error, headersize, httpcode, headerstr, bodystr, response;
+	zval uri = {}, url = {}, *method, *useragent, data = {}, type = {}, *files, *timeout, *curl, *username, *password, *authtype;
+	zval *constant, *header, *constant1, userpwd = {}, *file, body = {}, uniqid = {}, boundary = {}, *value, key = {}, key_value = {}, headers = {};
+	zval content = {}, errorno = {}, error = {}, headersize = {}, httpcode = {}, headerstr = {}, bodystr = {}, response = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	password = phalcon_read_property(getThis(), SL("_password"), PH_NOISY);
 	authtype = phalcon_read_property(getThis(), SL("_authtype"), PH_NOISY);
 
-	if ((constant = zend_get_constant_str(SL("CURLOPT_URL"))) != NULL) {
+	if ((constant = zend_get_constant_str(SL("CURLOPT_URL"))) == NULL) {
 		RETURN_FALSE;
 	}
 
@@ -200,10 +200,10 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	}
 
 	if (Z_TYPE(data) == IS_STRING && PHALCON_IS_NOT_EMPTY(&data)) {
-		PHALCON_STR(&key, "Content-Type");
+		ZVAL_STRING(&key, "Content-Type");
 
 		if (PHALCON_IS_EMPTY(&type)) {
-			PHALCON_STR(&key_value, "application/x-www-form-urlencoded");
+			ZVAL_STRING(&key_value, "application/x-www-form-urlencoded");
 		} else {
 			PHALCON_CPY_WRT(&key_value, &type);
 		}
@@ -215,13 +215,12 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		}
 	} else if (phalcon_class_str_exists(SL("CURLFile"), 0) != NULL) {
 		if (Z_TYPE(data) != IS_ARRAY) {
-			ZVAL_UNDEF(&data);
 			array_init(&data);
 		}
 
 		if (Z_TYPE_P(files) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
-				zval curlfile;
+				zval curlfile = {};
 				zend_class_entry *curlfile_ce;
 
 				if (PHALCON_IS_NOT_EMPTY(file)) {
@@ -245,7 +244,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 		if (Z_TYPE(data) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data), idx, str_key, value) {
-				zval name;
+				zval name = {};
 				if (str_key) {
 					ZVAL_STR(&name, str_key);
 				} else {
@@ -258,7 +257,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 		if (Z_TYPE_P(files) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
-				zval path_parts, filename, basename, filedata;
+				zval path_parts = {}, filename = {}, basename = {}, filedata = {};
 				if (PHALCON_IS_NOT_EMPTY(file)) {
 					PHALCON_CALL_FUNCTIONW(&path_parts, "pathinfo", file);
 
@@ -276,13 +275,13 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		if (!PHALCON_IS_EMPTY(&body)) {
 			PHALCON_SCONCAT_SVS(&body, "--", &boundary, "--\r\n");
 
-			PHALCON_STR(&key, "Content-Type");
+			ZVAL_STRING(&key, "Content-Type");
 
 			PHALCON_CONCAT_SV(&key_value, "multipart/form-data; &boundary=", &boundary);
 
 			PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
 
-			PHALCON_STR(&key, "Content-Length");		
+			ZVAL_STRING(&key, "Content-Length");		
 			ZVAL_LONG(&key_value, Z_STRLEN_P(&body));
 
 			PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
@@ -323,7 +322,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		phalcon_substr(&bodystr, &content, Z_LVAL(headersize) , Z_STRLEN(content));
 
 		PHALCON_CALL_METHODW(NULL, &response, "setheader", &headerstr);
-		PHALCON_CALL_METHODW(NULL, &response, "set&body", &bodystr);
+		PHALCON_CALL_METHODW(NULL, &response, "setbody", &bodystr);
 	}
 
 	RETURN_CTORW(&response);

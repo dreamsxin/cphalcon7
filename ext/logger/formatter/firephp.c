@@ -151,8 +151,8 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getTypeString) {
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
-	zval *message, *type, *timestamp, *context, interpolated, type_str, *show_backtrace, *enable_labels;
-	zval backtrace, *pzval, payload, meta, *file, *line, body, encoded;
+	zval *message, *type, *timestamp, *context, interpolated = {}, type_str = {}, *show_backtrace, *enable_labels;
+	zval backtrace = {}, *pzval, payload = {}, meta = {}, *file, *line, body = {}, encoded = {};
 	int i_show_backtrace, i_enable_labels, found = 0;
 	ulong idx;
 	smart_str result = { 0 };
@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	}
 
 	/* We don't need the JSON message anymore */
-	zval_ptr_dtor(&encoded);
+	PHALCON_PTR_DTOR(&encoded);
 	/* Do not free the smart string because we steal its data for zval */
 	RETURN_STR(result.s);
 }

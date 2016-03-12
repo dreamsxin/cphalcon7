@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getTemplate){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 
-	zval *params, *merge = NULL, *view_params, merged_params;
+	zval *params, *merge = NULL, *view_params, merged_params = {};
 
 	phalcon_fetch_params(0, 1, 1, &params, &merge);
 
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getVars){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
 
-	zval *key, *value, *isappend = NULL, *view_params, var, var_append;
+	zval *key, *value, *isappend = NULL, *view_params, var = {}, var_append = {};
 
 	phalcon_fetch_params(0, 2, 1, &key, &value, &isappend);
 
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, getVar){
 
-	zval *key, *default_value = NULL, *view_params, var;
+	zval *key, *default_value = NULL, *view_params, var = {};
 
 	phalcon_fetch_params(0, 1, 1, &key, &default_value);
 
@@ -355,10 +355,9 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 		}
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(childs), child) {
-			zval child_capture_to;
+			zval child_capture_to = {};
 
 			PHALCON_CALL_METHODW(&child_capture_to, child, "getcaptureto");
-
 			if (phalcon_memnstr(capture_to, &child_capture_to)) {
 				phalcon_array_append(return_value, child, PH_COPY);
 			}
@@ -393,10 +392,9 @@ PHP_METHOD(Phalcon_Mvc_View_Model, hasChild){
 
 	if (capture_to) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(childs), child) {
-			zval child_capture_to;
+			zval child_capture_to = {};
 
 			PHALCON_CALL_METHODW(&child_capture_to, child, "getcaptureto");
-
 			if (phalcon_memnstr(capture_to, &child_capture_to)) {
 				RETURN_TRUE;
 			}
@@ -532,9 +530,9 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getView){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
-	zval child_contents, debug_message, childs, *child, view, dependency_injector, service, events_manager, event_name;
-	zval status, not_exists, base_path, paths, views_dir, vars, new_vars, tpl;
-	zval views_dir_path, engines, *engine, *path, exception_message, contents;
+	zval child_contents = {}, debug_message = {}, childs = {}, *child, view = {}, dependency_injector = {}, service = {}, events_manager = {}, event_name = {};
+	zval status = {}, not_exists = {}, base_path = {}, paths = {}, views_dir = {}, vars = {}, new_vars = {}, tpl = {};
+	zval views_dir_path = {}, engines = {}, *engine, *path, exception_message = {}, contents = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -544,7 +542,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 	if (Z_TYPE(childs) == IS_ARRAY && phalcon_fast_count_ev(&childs)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(childs), child) {
-			zval isappend, capture, content, child_content, content_append;
+			zval isappend = {}, capture = {}, content = {}, child_content = {}, content_append = {};
 
 			PHALCON_CALL_METHODW(&isappend, child, "isappend");
 			PHALCON_CALL_METHODW(&capture, child, "getcaptureto");
@@ -570,7 +568,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (Z_TYPE(view) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 
-		PHALCON_STR(&service, "view");
+		ZVAL_STRING(&service, "view");
 
 		PHALCON_CALL_METHODW(&view, &dependency_injector, "getshared", &service);
 	}
@@ -583,7 +581,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	 * Call beforeRender if there is an events manager
 	 */
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "view:beforeRender");
+		ZVAL_STRING(&event_name, "view:beforeRender");
 		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis());
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_NULL();
@@ -619,7 +617,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	 * Views are rendered in each engine
 	 */
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(engines), idx, str_key, engine) {
-		zval extension;
+		zval extension = {};
 		if (str_key) {
 			ZVAL_STR(&extension, str_key);
 		} else {
@@ -627,7 +625,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		}
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(paths), path) {
-			zval view_engine_path;
+			zval view_engine_path = {};
 
 			PHALCON_CONCAT_VVV(&view_engine_path, path, &views_dir_path, &extension);
 
@@ -642,7 +640,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				 * Call beforeRenderView if there is a events manager available
 				 */
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					PHALCON_STR(&event_name, "view:beforeRenderView");
+					ZVAL_STRING(&event_name, "view:beforeRenderView");
 
 					PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
 					if (PHALCON_IS_FALSE(&status)) {
@@ -657,7 +655,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				 */
 				ZVAL_FALSE(&not_exists);
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					PHALCON_STR(&event_name, "view:afterRenderView");
+					ZVAL_STRING(&event_name, "view:afterRenderView");
 					PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis());
 				}
 
@@ -682,7 +680,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	 * Call afterRender event
 	 */
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "view:afterRender");
+		ZVAL_STRING(&event_name, "view:afterRender");
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis());
 	}
 
@@ -717,7 +715,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __set){
  */
 PHP_METHOD(Phalcon_Mvc_View_Model, __get){
 
-	zval *key, *params, value;
+	zval *key, *params, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 

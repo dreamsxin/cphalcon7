@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isForeignKey){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getForeignKey){
 
-	zval *options, foreign_key;
+	zval *options, foreign_key = {};
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 
@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isThrough){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Relation, isReusable){
 
-	zval *options, reusable;
+	zval *options, reusable = {};
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 

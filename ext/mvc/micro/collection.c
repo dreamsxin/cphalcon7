@@ -112,14 +112,13 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Micro_Collection){
  */
 void phalcon_mvc_collection_addmap(zval *this_ptr, zend_string *method, zval *route_pattern, zval *handler, zval *name)
 {
-	zval handler_definition;
+	zval handler_definition = {}, zmethod = {};
 
 	Z_TRY_ADDREF_P(route_pattern);
 	Z_TRY_ADDREF_P(handler);
 
 	array_init_size(&handler_definition, 3 + (name != NULL ? 1 : 0));
 	if (method) {
-		zval zmethod;
 		ZVAL_STR(&zmethod, method);
 		Z_ADDREF(zmethod);
 		add_next_index_zval(&handler_definition, &zmethod);

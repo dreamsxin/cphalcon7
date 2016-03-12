@@ -152,15 +152,17 @@ PHALCON_INIT_CLASS(Phalcon_Acl_Adapter_Memory){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, __construct){
 
-	zval resources_names, access_list;
+	zval resources_names = {}, access_list = {};
 
 	array_init_size(&resources_names, 1);
 	phalcon_array_update_str(&resources_names, SL("*"), &PHALCON_GLOBAL(z_true), PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_resourcesNames"), &resources_names);
+	PHALCON_PTR_DTOR(&resources_names);
 
 	array_init_size(&access_list, 1);
 	phalcon_array_update_str(&access_list, SL("*!*"), &PHALCON_GLOBAL(z_true), PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_accessList"), &access_list);
+	PHALCON_PTR_DTOR(&access_list);
 }
 
 /**
@@ -178,7 +180,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, __construct){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, addRole){
 
-	zval *role, *access_inherits = NULL, role_name, object, roles_names, default_access, key;
+	zval *role, *access_inherits = NULL, role_name = {}, object = {}, roles_names = {}, default_access = {}, key = {};
 
 	phalcon_fetch_params(0, 1, 1, &role, &access_inherits);
 
@@ -193,8 +195,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addRole){
 		PHALCON_CPY_WRT(&role_name, role);
 
 		object_init_ex(&object, phalcon_acl_role_ce);
-		PHALCON_CALL_METHOD(NULL, &object, "__construct", role);
-
+		PHALCON_CALL_METHODW(NULL, &object, "__construct", role);
 	}
 
 	phalcon_return_property(&roles_names, getThis(), SL("_rolesNames"));
@@ -225,7 +226,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addRole){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 
-	zval *role_name, *role_to_inherit, *roles_names, exception_message, role_inherit_name, *roles_inherits;
+	zval *role_name, *role_to_inherit, *roles_names, exception_message = {}, role_inherit_name = {}, *roles_inherits;
 
 	phalcon_fetch_params(0, 2, 0, &role_name, &role_to_inherit);
 
@@ -324,7 +325,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isResource){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResource){
 
-	zval *resource, *access_list = NULL, resource_name, object, *resources_names;
+	zval *resource, *access_list = NULL, resource_name = {}, object = {}, *resources_names;
 
 	phalcon_fetch_params(0, 1, 1, &resource, &access_list);
 
@@ -359,7 +360,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResource){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResourceAccess){
 
-	zval *resource_name, *access_list, *resources_names, exception_message, *internal_access_list, *access_name, access_key;
+	zval *resource_name, *access_list, *resources_names, exception_message = {}, *internal_access_list, *access_name, access_key = {};
 
 	phalcon_fetch_params(0, 2, 0, &resource_name, &access_list);
 
@@ -398,7 +399,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResourceAccess){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, dropResourceAccess){
 
-	zval *resource_name, *access_list, *access_name = NULL, access_key;
+	zval *resource_name, *access_list, *access_name = NULL, access_key = {};
 
 	phalcon_fetch_params(0, 2, 0, &resource_name, &access_list);
 
@@ -423,8 +424,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, dropResourceAccess){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 
-	zval *role_name, *resource_name, *access, *action, *roles_names, exception_message, *resources_names;
-	zval *default_access, *access_list, *internal_access, *access_name, access_key;
+	zval *role_name, *resource_name, *access, *action, *roles_names, exception_message = {}, *resources_names;
+	zval *default_access, *access_list, *internal_access, *access_name, access_key = {};
 
 	phalcon_fetch_params(0, 4, 0, &role_name, &resource_name, &access, &action);
 
@@ -456,7 +457,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 		} ZEND_HASH_FOREACH_END();
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(access), access_name) {
-			zval access_key_all;
+			zval access_key_all = {};
 			PHALCON_CONCAT_VSVSV(&access_key, role_name, "!", resource_name, "!", access_name);
 			phalcon_update_property_array(getThis(), SL("_access"), &access_key, action);
 			if (!PHALCON_IS_STRING(access_name, "*")) {
@@ -522,7 +523,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, allow){
 
-	zval *role_name, *resource_name, *access, action, *roles_names;
+	zval *role_name, *resource_name, *access, action = {}, *roles_names;
 	zend_string *str_key;
 	ulong idx;
 
@@ -536,7 +537,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, allow){
 		roles_names = phalcon_read_property(getThis(), SL("_rolesNames"), PH_NOISY);
 
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(roles_names), idx, str_key) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -574,7 +575,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, allow){
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, deny){
 
-	zval *role_name, *resource_name, *access, action, *roles_names;
+	zval *role_name, *resource_name, *access, action = {}, *roles_names;
 	zend_string *str_key;
 	ulong idx;
 
@@ -588,7 +589,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, deny){
 		roles_names = phalcon_read_property(getThis(), SL("_rolesNames"), PH_NOISY);
 
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(roles_names), idx, str_key) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -605,7 +606,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, deny){
 
 static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resource, zval *access, zval *access_list, zval* role_inherits)
 {
-	zval inherited_roles, access_key;
+	zval inherited_roles = {}, access_key = {};
 	zval *parent_role;
 	int result = PHALCON_ACL_DUNNO;
 
@@ -619,8 +620,8 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(inherited_roles), parent_role) {
+		zval have_access = {};
 		int found;
-		zval have_access;
 
 		phalcon_concat_vsvsv(&access_key, parent_role, SL("!"), resource, SL("!"), access, 0);
 		found = phalcon_array_isset_fetch(&have_access, access_list, &access_key);
@@ -636,7 +637,6 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	zval_dtor(&access_key);
 	return result;
 }
 
@@ -658,12 +658,12 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
-	zval *role, *resource, *access, star, *events_manager, event_name, status, *default_access, *roles_names, *access_list, access_key, have_access, *role_inherits;
+	zval *role, *resource, *access, star = {}, *events_manager, event_name = {}, status = {}, *default_access, *roles_names, *access_list, access_key = {}, have_access = {}, *role_inherits;
 	int allow_access;
 
 	phalcon_fetch_params(0, 3, 0, &role, &resource, &access);
 
-	PHALCON_STR(&star, "*");
+	ZVAL_STRING(&star, "*");
 
 	phalcon_update_property_this(getThis(), SL("_activeRole"), role);
 	phalcon_update_property_this(getThis(), SL("_activeResource"), resource);
@@ -671,7 +671,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "acl:beforeCheckAccess");
+		ZVAL_STRING(&event_name, "acl:beforeCheckAccess");
 
 		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis());
 		if (PHALCON_IS_FALSE(&status)) {
@@ -746,7 +746,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	phalcon_update_property_this(getThis(), SL("_accessGranted"), return_value);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "acl:afterCheckAccess");
+		ZVAL_STRING(&event_name, "acl:afterCheckAccess");
 		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), return_value);
 	}
 }

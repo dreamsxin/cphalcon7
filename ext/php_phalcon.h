@@ -151,7 +151,6 @@ extern zend_module_entry phalcon_module_entry;
 
 #define PHALCON_ALLOC_INIT_ZVAL(z) \
 	PHALCON_ALLOC_ZVAL(z); \
-	INIT_ZVAL(*z);
 
 #ifndef INIT_PZVAL
 #	define INIT_PZVAL(z) \

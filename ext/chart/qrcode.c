@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, __construct){
 PHP_METHOD(Phalcon_Chart_QRcode, generate){
 
 #ifdef PHALCON_USE_QRENCODE
-	zval *text = NULL, *version = NULL, *level = NULL, *mode = NULL, *casesensitive = NULL, zid;
+	zval *text = NULL, *version = NULL, *level = NULL, *mode = NULL, *casesensitive = NULL, zid = {};
 	php_qrcode *qr = NULL;
 
 	phalcon_fetch_params(0, 1, 4, &text, &version, &level, &mode, &casesensitive);
@@ -312,7 +312,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 PHP_METHOD(Phalcon_Chart_QRcode, render){
 
 #ifdef PHALCON_USE_QRENCODE
-	zval *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL, zid;
+	zval *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL, zid = {};
 	FILE *fp = NULL;
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 PHP_METHOD(Phalcon_Chart_QRcode, save){
 
 #ifdef PHALCON_USE_QRENCODE
-	zval *filename, *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL, zid, exception_message;
+	zval *filename, *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL, zid = {}, exception_message = {};
 	png_structp png_ptr;
 	png_infop info_ptr;
 	png_colorp palette;
@@ -738,7 +738,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 
 	/* Loop through all all symbols */
 	for(; symbol; symbol = zbar_symbol_next(symbol)) {
-		zval symbol_array, fromtext, totext, from, to
+		zval symbol_array = {}, fromtext = {}, totext = {}, from = {}, to = {};
 		zbar_symbol_type_t symbol_type;
 		const char *data;
 		const char *type;
@@ -754,9 +754,9 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 		quality = zbar_symbol_get_quality(symbol);
 
         if (phalcon_function_exists_ex(SL("mb_convert_encoding")) == SUCCESS) {
-			PHALCON_STR(&fromtext, data);
-			PHALCON_STR(from, "shift-jis");
-			PHALCON_STR(&to, "utf-8");
+			ZVAL_STRING(&fromtext, data);
+			ZVAL_STRING(from, "shift-jis");
+			ZVAL_STRING(&to, "utf-8");
 
 			PHALCON_CALL_FUNCTION_FLAG(flag, &totext, "mb_convert_encoding", &fromtext, &from, &to);
 			if (flag) {
@@ -770,13 +770,13 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 		phalcon_array_update_str_long(&symbol_array, SL("quality"), quality, 0);
 
 		if (extended) {
-			zval loc_array;
+			zval loc_array = {};
 			unsigned int i;
 			array_init(&loc_array);
 			loc_size = zbar_symbol_get_loc_size(symbol);
 
 			for (i = 0; i < loc_size; i++) {	
-				zval coords;
+				zval coords = {};
 				array_init(&coords);
 				phalcon_array_update_str_long(&coords, SL("x"), zbar_symbol_get_loc_x(symbol, i), 0);
 				phalcon_array_update_str_long(&coords, SL("y"), zbar_symbol_get_loc_y(symbol, i), 0);
@@ -873,7 +873,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
 		MagickResetIterator(magick_wand);
 		while (MagickNextImage(magick_wand) != MagickFalse) {
-			zval page_array;
+			zval page_array = {};
 
 			/* Read the current page */
 			zbar_page = _php_zbarcode_get_page(magick_wand);

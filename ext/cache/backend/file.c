@@ -137,8 +137,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, get){
 
-	zval *key_name, *lifetime = NULL, *options, *prefix, prefixed_key, cache_dir, cache_file, frontend, *last_lifetime, tmp;
-	zval modified_time, cached_content, exception_message;
+	zval *key_name, *lifetime = NULL, *options, *prefix, prefixed_key = {}, cache_dir = {}, cache_file = {}, frontend = {}, *last_lifetime, tmp = {};
+	zval modified_time = {}, cached_content = {}, exception_message = {};
 	long int now, ttl, mtime, diff;
 	int expired;
 
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 PHP_METHOD(Phalcon_Cache_Backend_File, save){
 
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, *frontend, *options;
-	zval last_key, *prefix, cache_dir, cache_file, cached_content, prepared_content, status, is_buffering;
+	zval last_key = {}, *prefix, cache_dir = {}, cache_file = {}, cached_content = {}, prepared_content = {}, status = {}, is_buffering = {};
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, delete){
 
-	zval *key_name, *options, *prefix, prefixed_key, cache_dir, cache_file;
+	zval *key_name, *options, *prefix, prefixed_key = {}, cache_dir = {}, cache_file = {};
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, delete){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 
-	zval *prefix = NULL, *options, cache_dir, iterator;
+	zval *prefix = NULL, *options, cache_dir = {}, iterator = {};
 	zend_object_iterator *it;
 
 	phalcon_fetch_params(0, 0, 1, &prefix);
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 
 	it->funcs->rewind(it);
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
-		zval *item, is_directory, key;
+		zval *item, is_directory = {}, key = {};
 
 		item = it->funcs->get_current_data(it);
 
@@ -398,7 +398,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 
-	zval *key_name = NULL, *lifetime = NULL, prefix, last_key, options, cache_dir, cache_file, frontend, tmp, modified_time;
+	zval *key_name = NULL, *lifetime = NULL, prefix = {}, last_key = {}, options = {}, cache_dir = {}, cache_file = {}, frontend = {}, tmp = {}, modified_time = {};
 	long int mtime, ttl;
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
@@ -451,8 +451,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 
-	zval *key_name, *value = NULL, *lifetime = NULL, *options, *prefix, prefixed_key, status;
-	zval cache_dir, cache_file, *frontend, *last_lifetime, modified_time, cached_content, tmp;
+	zval *key_name, *value = NULL, *lifetime = NULL, *options, *prefix, prefixed_key = {}, status = {};
+	zval cache_dir = {}, cache_file = {}, *frontend, *last_lifetime, modified_time = {}, cached_content = {}, tmp = {};
 	long int now, ttl, mtime, diff;
 	int expired;
 
@@ -544,8 +544,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 
-	zval *key_name, *value = NULL, *lifetime = NULL, *options, *prefix, prefixed_key, status;
-	zval cache_dir, cache_file, *frontend, *last_lifetime, modified_time, cached_content, tmp;
+	zval *key_name, *value = NULL, *lifetime = NULL, *options, *prefix, prefixed_key = {}, status = {};
+	zval cache_dir = {}, cache_file = {}, *frontend, *last_lifetime, modified_time = {}, cached_content = {}, tmp = {};
 	long int now, ttl, mtime, diff;
 	int expired;
 
@@ -635,7 +635,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 
-	zval *options, *prefix, cache_dir, iterator;
+	zval *options, *prefix, cache_dir = {}, iterator = {};
 	zend_object_iterator *it;
 
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 
 	it->funcs->rewind(it);
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
-		zval *item, is_file, key, cache_file;
+		zval *item, is_file = {}, key = {}, cache_file = {};
 		item = it->funcs->get_current_data(it);
 
 		if (FAILURE == phalcon_call_method(&is_file, item, "isfile", 0, NULL)) {

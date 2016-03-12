@@ -62,7 +62,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client){
 
 PHP_METHOD(Phalcon_Http_Client, factory)
 {
-	zval *uri = NULL, *_method = NULL, method;
+	zval *uri = NULL, *_method = NULL, method = {};
 
 	phalcon_fetch_params(0, 0, 2, &uri, &method);
 
@@ -71,7 +71,7 @@ PHP_METHOD(Phalcon_Http_Client, factory)
 	}
 
 	if (!_method) {
-		PHALCON_STR(&method, "GET");
+		ZVAL_STRING(&method, "GET");
 	} else {
 		PHALCON_CPY_WRT(&method, _method);
 	}

@@ -457,7 +457,8 @@ static void phalcon_crypt_unpad_text(zval *return_value, zval *text, zval *mode,
  */
 PHP_METHOD(Phalcon_Crypt, encrypt){
 
-	zval *source, *key = NULL, *handler, arguments, value, text, encrypt_key, *cipher, *mode, iv_size, rand, iv, block_size, *padding_type, padded, encrypt;
+	zval *source, *key = NULL, *handler, arguments = {}, value = {}, text = {}, encrypt_key = {}, *cipher, *mode, iv_size = {}, rand = {}, iv = {}, block_size = {};
+	zval *padding_type, padded = {}, encrypt = {};
 
 	phalcon_fetch_params(0, 1, 1, &source, &key);
 
@@ -564,7 +565,8 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
  */
 PHP_METHOD(Phalcon_Crypt, decrypt){
 
-	zval *text, *key = NULL, *handler, arguments, value, *cipher, *mode, iv_size, key_size, text_size, iv, text_to_decipher, decrypted, block_size, *padding_type;
+	zval *text, *key = NULL, *handler, arguments = {}, value = {}, *cipher, *mode, iv_size = {}, key_size = {}, text_size = {}, iv = {}, text_to_decipher = {};
+	zval decrypted = {}, block_size = {}, *padding_type;
 
 	phalcon_fetch_params(0, 1, 1, &text, &key);
 
@@ -658,7 +660,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
  */
 PHP_METHOD(Phalcon_Crypt, encryptBase64){
 
-	zval *text, *key = NULL, *safe = NULL, encrypted;
+	zval *text, *key = NULL, *safe = NULL, encrypted = {};
 
 	phalcon_fetch_params(0, 1, 2, &text, &key, &safe);
 
@@ -687,7 +689,7 @@ PHP_METHOD(Phalcon_Crypt, encryptBase64){
  */
 PHP_METHOD(Phalcon_Crypt, decryptBase64){
 
-	zval *text, *key = NULL, *safe = NULL, decrypt_text;
+	zval *text, *key = NULL, *safe = NULL, decrypt_text = {};
 	zend_string *decoded;
 	char *tmp;
 

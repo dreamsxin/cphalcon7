@@ -81,7 +81,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_ExclusionIn){
  */
 PHP_METHOD(Phalcon_Validation_Validator_ExclusionIn, validate){
 
-	zval *validator, *attribute, value, allow_empty, domain, valid, label, joined_domain, pairs, message_str, code, prepared, message;
+	zval *validator, *attribute, value = {}, allow_empty = {}, domain = {}, valid = {}, label = {}, joined_domain = {}, pairs = {}, message_str = {}, code = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);

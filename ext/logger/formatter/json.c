@@ -65,7 +65,7 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter_Json){
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Json, format){
 
-	zval *message, *type, *timestamp, *context, interpolated, type_str, log, json;
+	zval *message, *type, *timestamp, *context, interpolated = {}, type_str = {}, log = {}, json = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 	

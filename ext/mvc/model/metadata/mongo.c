@@ -95,7 +95,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Mongo){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
-	zval *options, backend_options, lifetime, prefix, frontend_data, mongo, option;
+	zval *options, backend_options = {}, lifetime = {}, prefix = {}, frontend_data = {}, mongo = {}, option = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
@@ -103,18 +103,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");
-		return;
-	}
-
-	if (!phalcon_array_isset_str(options, SL("mongo"))) {
-		if (!phalcon_array_isset_str(options, SL("server"))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The parameter 'server' is required");
-			return;
-		}
-	}
-
-	if (!phalcon_array_isset_str(options, SL("db"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The parameter 'db' is required");
 		return;
 	}
 

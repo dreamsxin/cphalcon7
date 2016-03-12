@@ -95,9 +95,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Libmemcached){
  *
  * @param array $options
  */
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct){
-
-	zval *options = NULL, servers, client, lifetime, prefix, frontend_data, libmemcached, option;
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
+{
+	zval *options = NULL, servers = {}, client = {}, lifetime = {}, prefix = {}, frontend_data = {}, libmemcached = {}, option = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 	

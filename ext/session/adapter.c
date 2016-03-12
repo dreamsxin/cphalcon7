@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Session_Adapter, start){
  */
 PHP_METHOD(Phalcon_Session_Adapter, setOptions){
 
-	zval *options, unique_id;
+	zval *options, unique_id = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Session_Adapter, getOptions){
  */
 PHP_METHOD(Phalcon_Session_Adapter, get){
 
-	zval *index, *default_value = NULL, *remove = NULL, *unique_id, key, *_SESSION, value;
+	zval *index, *default_value = NULL, *remove = NULL, *unique_id, key = {}, *_SESSION, value = {};
 
 	phalcon_fetch_params(0, 1, 2, &index, &default_value, &remove);
 
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
  */
 PHP_METHOD(Phalcon_Session_Adapter, set){
 
-	zval *index, *value, *unique_id, key;
+	zval *index, *value, *unique_id, key = {};
 
 	phalcon_fetch_params(0, 2, 0, &index, &value);
 
@@ -311,7 +311,7 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
 
 	if (Z_TYPE_P(data) == IS_ARRAY) { 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
-			zval index;
+			zval index = {};
 			if (str_key) {
 				ZVAL_STR(&index, str_key);
 			} else {
@@ -335,7 +335,7 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
  */
 PHP_METHOD(Phalcon_Session_Adapter, has){
 
-	zval *index, *unique_id, key;
+	zval *index, *unique_id, key = {};
 
 	phalcon_fetch_params(0, 1, 0, &index);
 	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
@@ -360,7 +360,7 @@ PHP_METHOD(Phalcon_Session_Adapter, has){
  */
 PHP_METHOD(Phalcon_Session_Adapter, remove){
 
-	zval *index, *unique_id, key, *_SESSION;
+	zval *index, *unique_id, key = {}, *_SESSION;
 
 	phalcon_fetch_params(0, 1, 0, &index);
 	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);

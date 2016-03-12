@@ -68,7 +68,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Reader){
  */
 PHP_METHOD(Phalcon_Annotations_Reader, parse){
 
-	zval *class_name, annotations, class_annotations, annotations_properties, annotations_methods;
+	zval *class_name, annotations = {}, class_annotations = {}, annotations_properties = {}, annotations_methods = {};
 	zend_property_info *property;
 	zend_class_entry *class_ce;
 	zend_function *method;
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		array_init_size(&annotations_properties, zend_hash_num_elements(props));
 
 		ZEND_HASH_FOREACH_PTR(props, property) {
-			zval property_annotations;
+			zval property_annotations = {};
 			zend_string *cmt;
 			const char *prop_name, *class_name;
 
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		array_init_size(&annotations_methods, zend_hash_num_elements(methods));
 
 		ZEND_HASH_FOREACH_PTR(methods, method) {
-			zval method_annotations;
+			zval method_annotations = {};
 			zend_string *cmt;
 
 			if ((cmt = phalcon_get_function_doc_comment(method)) != NULL) {

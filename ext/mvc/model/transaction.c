@@ -133,7 +133,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 
-	zval *dependency_injector, *auto_begin = NULL, *s = NULL, service, connection;
+	zval *dependency_injector, *auto_begin = NULL, *s = NULL, service = {}, connection = {};
 
 	phalcon_fetch_params(0, 1, 2, &dependency_injector, &auto_begin, &service);
 
@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	}
 
 	if (!s || Z_TYPE_P(s) != IS_STRING) {
-		PHALCON_STR(&service, "db");
+		ZVAL_STRING(&service, "db");
 	} else {
 		PHALCON_CPY_WRT(&service, s);
 	}
@@ -215,12 +215,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, commit){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 
-	zval *message = NULL, *rollback_record = NULL, *rollback_code = NULL, rollback_message, *manager, *connection, success, i0;
+	zval *message = NULL, *rollback_record = NULL, *rollback_code = NULL, rollback_message = {}, *manager, *connection, success = {}, i0 = {};
 
 	phalcon_fetch_params(0, 0, 4, &message, &rollback_record, &rollback_code);
 
 	if (!message || !zend_is_true(message)) {
-		PHALCON_STR(&rollback_message, "Transaction aborted");
+		ZVAL_STRING(&rollback_message, "Transaction aborted");
 	} else {
 		PHALCON_CPY_WRT(&rollback_message, message);
 	}
@@ -260,21 +260,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 
-	zval *rollback_on_abort, *message, *connection;
+	zval *rollback_on_abort, message = {}, *connection;
 
 	rollback_on_abort = phalcon_read_property(getThis(), SL("_rollbackOnAbort"), PH_NOISY);
 	if (zend_is_true(rollback_on_abort)) {
 
 		if (PG(connection_status) & PHP_CONNECTION_ABORTED) {
-			PHALCON_INIT_VAR(message);
-			PHALCON_STR(message, "The request was aborted");
-			PHALCON_CALL_METHOD(NULL, getThis(), "rollback", message);
+			ZVAL_STRING(&message, "The request was aborted");
+			PHALCON_CALL_METHODW(NULL, getThis(), "rollback", &message);
 		}
 	}
 
 	connection = phalcon_read_property(getThis(), SL("_connection"), PH_NOISY);
 
-	RETURN_CCTOR(connection);
+	RETURN_CTORW(connection);
 }
 
 /**

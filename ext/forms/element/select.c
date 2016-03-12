@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, getOptions){
  */
 PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 
-	zval *option, *values, tmp;
+	zval *option, *values, tmp = {};
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	PHALCON_ENSURE_IS_ARRAY(option);
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
  */
 PHP_METHOD(Phalcon_Forms_Element_Select, render){
 
-	zval *attributes = NULL, *options, widget_attributes;
+	zval *attributes = NULL, *options, widget_attributes = {};
 
 	phalcon_fetch_params(0, 1, 0, &attributes);
 
@@ -178,6 +178,6 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 	 * Merged passed attributes with previously defined ones
 	 */
 	PHALCON_CALL_METHODW(&widget_attributes, getThis(), "prepareattributes", attributes);
-	PHALCON_RETURN_CALL_CE_STATIC(phalcon_tag_select_ce, "selectfield", &widget_attributes, options);
+	PHALCON_RETURN_CALL_CE_STATICW(phalcon_tag_select_ce, "selectfield", &widget_attributes, options);
 	return;
 }

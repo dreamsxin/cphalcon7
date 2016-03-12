@@ -96,7 +96,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Memory){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 
-	zval *key_name, *lifetime = NULL, data, cached_content, frontend, last_key, prefix;
+	zval *key_name, *lifetime = NULL, data = {}, cached_content = {}, frontend = {}, last_key = {}, prefix = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, save){
 
-	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, cached_content, prepared_content, is_buffering, last_key, prefix, frontend;
+	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, cached_content = {}, prepared_content = {}, is_buffering = {}, last_key = {}, prefix = {}, frontend = {};
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, save){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, delete){
 
-	zval *key_name, prefix, key, data;
+	zval *key_name, prefix = {}, key = {}, data = {};
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, delete){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 
-	zval *prefix = NULL, data;
+	zval *prefix = NULL, data = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, exists){
 
-	zval *key_name = NULL, *lifetime = NULL, last_key, prefix, data;
+	zval *key_name = NULL, *lifetime = NULL, last_key = {}, prefix = {}, data = {};
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
 
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, exists){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 
-	zval *key_name, *value = NULL, last_key, prefix, data, cached_content;
+	zval *key_name, *value = NULL, last_key = {}, prefix = {}, data = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -318,7 +318,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memory, decrement){
 
-	zval *key_name, *value = NULL, last_key, prefix, data, cached_content;
+	zval *key_name, *value = NULL, last_key = {}, prefix = {}, data = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 

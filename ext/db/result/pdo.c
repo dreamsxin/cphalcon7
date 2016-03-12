@@ -265,8 +265,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 
-	zval row_count, *connection, type, *pdo_statement = NULL, *sql_statement, *bind_params, *bind_types;
-	zval matches, pattern, match, else_clauses, sql, result, row;
+	zval row_count = {}, *connection, type = {}, *pdo_statement = NULL, *sql_statement, *bind_params, *bind_types;
+	zval matches = {}, pattern = {}, match = {}, else_clauses = {}, sql = {}, result = {}, row = {};
 
 	phalcon_return_property(&row_count, getThis(), SL("_rowCount"));
 
@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 				bind_params = phalcon_read_property(getThis(), SL("_bindParams"), PH_NOISY);
 				bind_types = phalcon_read_property(getThis(), SL("_bindTypes"), PH_NOISY);
 
-				PHALCON_STR(&pattern, "/^SELECT\\s+(.*)$/i");
+				ZVAL_STRING(&pattern, "/^SELECT\\s+(.*)$/i");
 
 				RETURN_ON_FAILURE(phalcon_preg_match(&match, &pattern, sql_statement, &matches));
 
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
-	zval *num, *connection, pdo, *sql_statement, *bind_params, *bind_types, statement, temp_statement;
+	zval *num, *connection, pdo = {}, *sql_statement, *bind_params, *bind_types, statement = {}, temp_statement = {};
 	pdo_stmt_t *stmt;
 	long number = 0, n;
 

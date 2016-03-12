@@ -88,7 +88,7 @@ int phalcon_compare_strict_long(zval *op1, long op2){
 		case IS_FALSE:
 			return 0 == op2;
 		default: {
-			zval result, op2_tmp;
+			zval result = {}, op2_tmp = {};
 			ZVAL_LONG(&op2_tmp, op2);
 			is_equal_function(&result, op1, &op2_tmp);
 			return Z_TYPE(result) == IS_TRUE ? 1 : 0;
@@ -116,7 +116,7 @@ int phalcon_compare_strict_double(zval *op1, double op2) {
 			return 0 == op2;
 		default:
 			{
-				zval result, op2_tmp;
+				zval result = {}, op2_tmp = {};
 				ZVAL_DOUBLE(&op2_tmp, op2);
 				is_equal_function(&result, op1, &op2_tmp);
 				return Z_TYPE(result) == IS_TRUE ? 1 : 0;
@@ -142,7 +142,7 @@ int phalcon_compare_strict_bool(zval *op1, zend_bool op2) {
 			return 1 == op2;
 		default:
 			{
-				zval result, op2_tmp;
+				zval result = {}, op2_tmp = {};
 				ZVAL_BOOL(&op2_tmp, op2);
 				is_equal_function(&result, op1, &op2_tmp);
 				return Z_TYPE(result) == IS_TRUE ? 1 : 0;
@@ -368,7 +368,7 @@ int phalcon_is_numeric_ex(const zval *op) {
  * Check if two zvals are equal
  */
 int phalcon_is_equal(zval *op1, zval *op2) {
-	zval result;
+	zval result = {};
 	is_equal_function(&result, op1, op2);
 	return Z_TYPE(result) == IS_TRUE ? 1 : 0;
 }
@@ -377,7 +377,7 @@ int phalcon_is_equal(zval *op1, zval *op2) {
  * Check if a zval is equal than a long value
  */
 int phalcon_is_equal_long(zval *op1, long op2) {
-	zval op2_zval;
+	zval op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	return phalcon_is_equal(op1, &op2_zval);
 }
@@ -403,7 +403,7 @@ int phalcon_is_equal_object(zval *obj1, zval *obj2) {
  * Check if a zval is less than other
  */
 int phalcon_less(zval *op1, zval *op2) {
-	zval result;
+	zval result = {};
 	is_smaller_function(&result, op1, op2);
 	return Z_TYPE(result) == IS_TRUE ? 1 : 0;
 }
@@ -412,7 +412,7 @@ int phalcon_less(zval *op1, zval *op2) {
  * Check if a zval is less/equal than other
  */
 int phalcon_less_equal(zval *op1, zval *op2) {
-	zval result;
+	zval result = {};
 	is_smaller_or_equal_function(&result, op1, op2);
 	return Z_TYPE(result) == IS_TRUE ? 1 : 0;
 }
@@ -421,14 +421,14 @@ int phalcon_less_equal(zval *op1, zval *op2) {
  * Check if a zval is less than a long value
  */
 int phalcon_less_long(zval *op1, long op2) {
-	zval result, op2_zval;
+	zval result = {}, op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	is_smaller_function(&result, op1, &op2_zval);
 	return Z_TYPE(result) == IS_TRUE ? 1 : 0;
 }
 
 int phalcon_less_equal_long(zval *op1, long op2) {
-	zval result, op2_zval;
+	zval result = {}, op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	is_smaller_or_equal_function(&result, op1, &op2_zval);
 	return Z_TYPE(result) == IS_TRUE ? 1 : 0;
@@ -438,7 +438,7 @@ int phalcon_less_equal_long(zval *op1, long op2) {
  * Check if a zval is greater than other
  */
 int phalcon_greater(zval *op1, zval *op2) {
-	zval result;
+	zval result = {};
 	is_smaller_or_equal_function(&result, op1, op2);
 	return Z_TYPE(result) == IS_FALSE ? 1 : 0;
 }
@@ -447,7 +447,7 @@ int phalcon_greater(zval *op1, zval *op2) {
  * Check if a zval is greater than a long value
  */
 int phalcon_greater_long(zval *op1, long op2) {
-	zval result, op2_zval;
+	zval result = {}, op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	is_smaller_or_equal_function(&result, op1, &op2_zval);
 	return Z_TYPE(result) == IS_FALSE ? 1 : 0;
@@ -457,7 +457,7 @@ int phalcon_greater_long(zval *op1, long op2) {
  * Check if a zval is greater/equal than other
  */
 int phalcon_greater_equal(zval *op1, zval *op2) {
-	zval result;
+	zval result = {};
 	is_smaller_function(&result, op1, op2);
 	return Z_TYPE(result) == IS_FALSE ? 1 : 0;
 }
@@ -466,7 +466,7 @@ int phalcon_greater_equal(zval *op1, zval *op2) {
  * Check for greater/equal
  */
 int phalcon_greater_equal_long(zval *op1, long op2) {
-	zval result, op2_zval;
+	zval result = {}, op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	is_smaller_function(&result, op1, &op2_zval);
 	return Z_TYPE(result) == IS_FALSE ? 1 : 0;
@@ -476,7 +476,7 @@ int phalcon_greater_equal_long(zval *op1, long op2) {
  * Check if two zvals are identical
  */
 int phalcon_is_identical(zval *op1, zval *op2) {
-	zval result;
+	zval result = {};
 	is_identical_function(&result, op1, op2);
 	return Z_TYPE(result) == IS_TRUE ? 1 : 0;
 }

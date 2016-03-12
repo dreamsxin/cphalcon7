@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 
-	zval *field_name, filtered, messages, *message;
+	zval *field_name, filtered = {}, messages = {}, *message;
 
 	phalcon_fetch_params(0, 1, 0, &field_name);
 
@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 		 * A group of messages is iterated and appended one-by-one to the current list
 		 */
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), message) {
-			zval field;
+			zval field = {};
 			/** 
 			 * Get the field name
 			 */
@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, valid){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, __set_state){
 
-	zval *group, messages;
+	zval *group, messages = {};
 
 	phalcon_fetch_params(0, 1, 0, &group);
 

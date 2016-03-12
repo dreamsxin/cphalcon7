@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Registry, serialize){
  * @brief Phalcon\Registry Phalcon\Registry::unserialize(string $str)
  */
 PHP_METHOD(Phalcon_Registry, unserialize){
-	zval *data, *str, zv;
+	zval *data, *str, zv = {};
 	php_unserialize_data_t var_hash;
 	const unsigned char *buf, *max;
 

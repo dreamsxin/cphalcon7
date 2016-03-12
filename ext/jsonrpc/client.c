@@ -96,10 +96,10 @@ PHP_METHOD(Phalcon_JsonRpc_Client, __construct){
  * @param string $data
  * @return Phalcon\JsonRpc\Response
  */
-PHP_METHOD(Phalcon_JsonRpc_Client, call){
-
-	zval *method = NULL, *data = NULL, *httpclient, id, jsonrpc_message, json_message, response;
-	zval code, body, json, jsonrpc_response, result, error;
+PHP_METHOD(Phalcon_JsonRpc_Client, call)
+{
+	zval *method = NULL, *data = NULL, *httpclient, id = {}, jsonrpc_message = {}, json_message = {}, response = {};
+	zval code = {}, body = {}, json = {}, jsonrpc_response = {}, result = {}, error = {};
 	int i;
 
 	phalcon_fetch_params(0, 1, 1, &method, &data);

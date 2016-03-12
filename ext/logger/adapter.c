@@ -139,7 +139,7 @@ static int phalcon_logger_adapter_string_level_to_int(const zval *level)
  */
 PHP_METHOD(Phalcon_Logger_Adapter, setLogLevel){
 
-	zval *level, lvl;
+	zval *level, lvl = {};
 
 	phalcon_fetch_params(0, 1, 0, &level);
 	if (Z_TYPE_P(level) == IS_STRING) {
@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, begin){
  */
 PHP_METHOD(Phalcon_Logger_Adapter, commit){
 
-	zval *transaction, *queue, *message, message_str, type, time, context;
+	zval *transaction, *queue, *message, message_str = {}, type = {}, time = {}, context = {};
 
 	transaction = phalcon_read_property(getThis(), SL("_transaction"), PH_NOISY);
 	if (!zend_is_true(transaction)) {
@@ -244,7 +244,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
  */
 PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 
-	zval *transaction, queue;
+	zval *transaction, queue = {};
 
 	transaction = phalcon_read_property(getThis(), SL("_transaction"), PH_NOISY);
 	if (!zend_is_true(transaction)) {
@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 
 static void phalcon_logger_adapter_log_helper(INTERNAL_FUNCTION_PARAMETERS, int level)
 {
-	zval *message, *context = NULL, type;
+	zval *message, *context = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &context);
 	PHALCON_ENSURE_IS_STRING(message);
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, critical){
  */
 PHP_METHOD(Phalcon_Logger_Adapter, log){
 
-	zval *message = NULL, *type, *context = NULL, *log_level, timestamp, level, *transaction, queue_item;
+	zval *message = NULL, *type, *context = NULL, *log_level, timestamp = {}, level = {}, *transaction, queue_item = {};
 	int i_level;
 
 	phalcon_fetch_params(0, 1, 2, &type, &message, &context);

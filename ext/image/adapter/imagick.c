@@ -225,8 +225,6 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, check){
 		zend_update_static_property_long(phalcon_image_adapter_imagick_ce, SL("_version"), phalcon_get_intval(version));
 	}
 
-	zval_ptr_dtor(version);
-
 	zend_update_static_property_bool(phalcon_image_adapter_imagick_ce, SL("_checked"), 1);
 	RETURN_TRUE;
 }
@@ -238,7 +236,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, check){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
 
-	zval *file, *w = NULL, *h = NULL, *checked, width, height, realpath, format, type, mime, im, ret, mode, imagickpixel, color;
+	zval *file, *w = NULL, *h = NULL, *checked, width = {}, height = {}, realpath = {}, format = {}, type = {}, mime = {}, im = {}, ret = {}, mode = {}, imagickpixel = {}, color = {};
 	zend_class_entry *imagick_ce, *ce1;
 
 	phalcon_fetch_params(0, 1, 2, &file, &w, &h);
@@ -302,13 +300,13 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
 		object_init_ex(&imagickpixel, ce1);
 
 		if (phalcon_has_constructor(&imagickpixel)) {
-			PHALCON_STR(&color, "transparent");
+			ZVAL_STRING(&color, "transparent");
 			PHALCON_CALL_METHODW(NULL, &imagickpixel, "__construct", &color);
 		}
 
 		PHALCON_CALL_METHODW(NULL, &im, "newImage", w, h, &imagickpixel);
 
-		PHALCON_STR(&format, "png");
+		ZVAL_STRING(&format, "png");
 
 		phalcon_update_property_this(getThis(), SL("_format"), &format);
 
@@ -324,7 +322,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
 
 		phalcon_update_property_this(getThis(), SL("_type"), &type);
 
-		PHALCON_STR(&mime, "image/png");
+		ZVAL_STRING(&mime, "image/png");
 
 		phalcon_update_property_this(getThis(), SL("_mime"), &mime);
 	} else {
@@ -340,7 +338,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __construct){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _resize) {
 
-	zval *width, *height, im, w, h, next;
+	zval *width, *height, im = {}, w = {}, h = {}, next = {};
 
 	phalcon_fetch_params(0, 2, 0, &width, &height);
 
@@ -370,7 +368,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _resize) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _liquidRescale){
 
-	zval *width, *height, *delta_x = NULL, *rigidity = NULL, im, ret, w, h, next;
+	zval *width, *height, *delta_x = NULL, *rigidity = NULL, im = {}, ret = {}, w = {}, h = {}, next = {};
 
 	phalcon_fetch_params(0, 4, 0, &width, &height, &delta_x, &rigidity);
 
@@ -406,7 +404,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _liquidRescale){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _crop) {
 
-	zval *width, *height, *offset_x, *offset_y, w, h, im, next;
+	zval *width, *height, *offset_x, *offset_y, w = {}, h = {}, im = {}, next = {};
 
 	phalcon_fetch_params(0, 4, 0, &width, &height, &offset_x, &offset_y);
 
@@ -434,7 +432,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _crop) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _rotate) {
 
-	zval *degrees, im, background, color, ret, w, h, next;
+	zval *degrees, im = {}, background = {}, color = {}, ret = {}, w = {}, h = {}, next = {};
 	zend_class_entry *imagick_pixel_ce;
 
 	phalcon_fetch_params(0, 1, 0, &degrees);
@@ -445,7 +443,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _rotate) {
 
 	object_init_ex(&background, imagick_pixel_ce);
 
-	PHALCON_STR(&color, "transparent");
+	ZVAL_STRING(&color, "transparent");
 
 	PHALCON_CALL_METHODW(NULL, &background, "__construct", &color);
 
@@ -477,9 +475,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _rotate) {
  *
  * @param int $direction
  */
-PHP_METHOD(Phalcon_Image_Adapter_Imagick, _flip) {
-
-	zval *direction, im, next;
+PHP_METHOD(Phalcon_Image_Adapter_Imagick, _flip)
+{
+	zval *direction, im = {}, next = {};
 	char *method;
 
 	phalcon_fetch_params(0, 1, 0, &direction);
@@ -503,7 +501,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _flip) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _sharpen) {
 
-	zval *amount, a, ret, im, next;
+	zval *amount, a = {}, ret = {}, im = {}, next = {};
 	int int_amount;
 
 	phalcon_fetch_params(0, 1, 0, &amount);
@@ -538,9 +536,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _sharpen) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _reflection) {
 
-	zval *height, *opacity, *fade_in,  im, image_width, image_height, version, reflection, reflection_width, reflection_height;
-	zval fade, pseudoString, composite, constant, o, channel, image;
-	zval background, mode, ret, w, h, delay, h0, colorspace, next;
+	zval *height, *opacity, *fade_in, im = {}, image_width = {}, image_height = {}, version = {}, reflection = {}, reflection_width = {}, reflection_height = {};
+	zval fade = {}, pseudoString = {}, composite = {}, constant = {}, o = {}, channel = {}, image = {};
+	zval background = {}, mode = {}, ret = {}, w = {}, h = {}, delay = {}, h0 = {}, colorspace = {}, next = {};
 	zend_class_entry *imagick_ce, *imagick_pixel_ce;
 
 	phalcon_fetch_params(0, 3, 0, &height, &opacity, &fade_in);
@@ -575,7 +573,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _reflection) {
 		PHALCON_CALL_METHODW(NULL, &fade, "__construct");
 	}
 
-	PHALCON_STR(&pseudoString, (zend_is_true(fade_in) ? "gradient:black-transparent" : "gradient:transparent-black"));
+	ZVAL_STRING(&pseudoString, (zend_is_true(fade_in) ? "gradient:black-transparent" : "gradient:transparent-black"));
 
 	PHALCON_CALL_METHODW(&reflection_width, &reflection, "getImageWidth");
 	PHALCON_CALL_METHODW(&reflection_height, &reflection, "getImageHeight");
@@ -685,8 +683,8 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _reflection) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _watermark) {
 
-	zval *watermark_image, *offset_x, *offset_y, *opacity, op, im, watermark, realpath, blob, ret, channel;
-	zval op_constant, composite, index, next, type;
+	zval *watermark_image, *offset_x, *offset_y, *opacity, op = {}, im = {}, watermark = {}, realpath = {}, blob = {}, ret = {}, channel = {};
+	zval op_constant = {}, composite = {}, index = {}, next = {}, type = {};
 	zend_class_entry *ce0;
 	double num;
 
@@ -769,7 +767,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _watermark) {
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _text) {
 
 	zval *text, *ofs_x = NULL, *ofs_y = NULL, *opacity = NULL, *r = NULL, *g = NULL, *b = NULL, *size = NULL, *fontfile = NULL;
-	zval im, draw, pixel, format, color, op, gravity, tmp_a, offset_x, offset_y;
+	zval im = {}, draw = {}, pixel = {}, format = {}, color = {}, op = {}, gravity = {}, tmp_a = {}, offset_x = {}, offset_y = {};
 	zend_class_entry *imagick_ce, *imagick_draw_ce, *imagick_pixel_ce;
 	int x, y;
 
@@ -812,7 +810,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _text) {
 		PHALCON_CALL_METHODW(NULL, &draw, "__construct");
 	}
 
-	PHALCON_STR(&format, "rgb(%d, %d, %d)");
+	ZVAL_STRING(&format, "rgb(%d, %d, %d)");
 	PHALCON_CALL_FUNCTIONW(&color, "sprintf", &format, r, g, b);
 
 	object_init_ex(&pixel, imagick_pixel_ce);
@@ -970,7 +968,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _text) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _mask){
 
-	zval *mask, im, mask_im, realpath, blob, matte, composite, next;
+	zval *mask, im = {}, mask_im = {}, realpath = {}, blob = {}, matte = {}, composite = {}, next = {};
 	zend_class_entry *imagick_ce;
 
 	phalcon_fetch_params(0, 1, 0, &mask);
@@ -1014,8 +1012,8 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _mask){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _background) {
 
-	zval *r, *g, *b, *opacity, op, im, color, format, background, imagickpixel, width, height, ret;
-	zval mode, op_constant, channel, composite, next;
+	zval *r, *g, *b, *opacity, op = {}, im = {}, color = {}, format = {}, background = {}, imagickpixel = {}, width = {}, height = {}, ret = {};
+	zval mode = {}, op_constant = {}, channel = {}, composite = {}, next = {};
 	zend_class_entry *imagick_ce, *imagick_pixel_ce;
 
 	phalcon_fetch_params(0, 4, 0, &r, &g, &b, &opacity);
@@ -1027,7 +1025,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _background) {
 	phalcon_return_property(&width, getThis(), SL("_width"));
 	phalcon_return_property(&height, getThis(), SL("_height"));
 
-	PHALCON_STR(&format, "rgb(%d, %d, %d)");
+	ZVAL_STRING(&format, "rgb(%d, %d, %d)");
 	PHALCON_CALL_FUNCTIONW(&color, "sprintf", &format, r, g, b);
 
 	object_init_ex(&background, imagick_ce);
@@ -1047,7 +1045,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _background) {
 
 	object_init_ex(&imagickpixel, imagick_pixel_ce);
 
-	PHALCON_STR(&color, "transparent");
+	ZVAL_STRING(&color, "transparent");
 
 	PHALCON_CALL_METHODW(NULL, &imagickpixel, "__construct", &color);
 	PHALCON_CALL_METHODW(NULL, &background, "setImageBackgroundColor", &imagickpixel);
@@ -1087,7 +1085,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _background) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _blur){
 
-	zval *radius, im, sigma, next;
+	zval *radius, im = {}, sigma = {}, next = {};
 
 	phalcon_fetch_params(0, 1, 0, &radius);
 
@@ -1110,7 +1108,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _blur){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _pixelate){
 
-	zval *amount, im, width, height, tmp_width, tmp_height, next;
+	zval *amount, im = {}, width = {}, height = {}, tmp_width = {}, tmp_height = {}, next = {};
 	int w, h;
 
 	phalcon_fetch_params(0, 1, 0, &amount);
@@ -1148,7 +1146,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _pixelate){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 
-	zval *file, *quality, *constant, ret, format, type, mime, im, fp, mode, compression;
+	zval *file, *quality, *constant, ret = {}, format = {}, type = {}, mime = {}, im = {}, fp = {}, mode = {}, compression = {};
 	zend_class_entry *imagick_ce;
 	char *ext;
 
@@ -1196,7 +1194,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 	if (phalcon_get_intval(&type) == 1) {
 		PHALCON_CALL_METHODW(NULL, &im, "optimizeImageLayers");
 
-		PHALCON_STR(&mode, "w");
+		ZVAL_STRING(&mode, "w");
 
 		PHALCON_CALL_FUNCTIONW(&fp, "fopen", file, &mode);
 		if (Z_TYPE(fp) != IS_RESOURCE) {
@@ -1232,7 +1230,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _render) {
 
-	zval *extension, *quality, mime, format, type, im, image_string, compression;
+	zval *extension, *quality, mime = {}, format = {}, type = {}, im = {}, image_string = {}, compression = {};
 	zend_class_entry *imagick_ce;
 	char *ext;
 
@@ -1290,7 +1288,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _render) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, __destruct){
 
-	zval im;
+	zval im = {};
 
 	phalcon_return_property(&im, getThis(), SL("_image"));
 
@@ -1301,7 +1299,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __destruct){
 
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, shadow)
 {
-	zval *_color = NULL, *_opacity = NULL, *_sigma = NULL, *_x = NULL, *_y = NULL, color, opacity, sigma, x, y, im, version, shadow, imagickpixel, composite;
+	zval *_color = NULL, *_opacity = NULL, *_sigma = NULL, *_x = NULL, *_y = NULL, color = {}, opacity = {}, sigma = {}, x = {}, y = {}, im = {}, version = {}, shadow = {}, imagickpixel = {}, composite = {};
 	zend_class_entry *imagickpixel_ce, *imagick_ce;
 
 	phalcon_fetch_params(0, 0, 5, &color, &opacity, &_sigma, &_x, &_y);
@@ -1310,7 +1308,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, shadow)
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
 	if (!_color) {
-		PHALCON_STR(&color, "black");
+		ZVAL_STRING(&color, "black");
 	} else {
 		PHALCON_CPY_WRT(&color, _color);
 	}
@@ -1372,7 +1370,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, getInternalImInstance)
 
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, setResourceLimit)
 {
-	zval *resource, *limit, im;
+	zval *resource, *limit, im = {};
 	zend_class_entry *imagick_ce;
 
 	phalcon_fetch_params(0, 2, 0, &resource, &limit);
@@ -1385,8 +1383,6 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, setResourceLimit)
 		if (FAILURE == phalcon_call_method(NULL, &im, "setresourcelimit", 2, params)) {
 			;
 		}
-
-		zval_ptr_dtor(&im);
 	}
 }
 
@@ -1399,7 +1395,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, setResourceLimit)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, colorize)
 {
-	zval *color, *_composition = NULL, composition, pseudo_string, im, width, height, overlay;
+	zval *color, *_composition = NULL, composition = {}, pseudo_string = {}, im = {}, width = {}, height = {}, overlay = {};
 	zend_class_entry *imagick_ce;
 
 	phalcon_fetch_params(0, 1, 1, &color, &_composition);
@@ -1440,7 +1436,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, colorize)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, gamma)
 {
-	zval *gamma, *_channel = NULL, channel, im;
+	zval *gamma, *_channel = NULL, channel = {}, im = {};
 	zend_class_entry *imagick_ce;
 
 	phalcon_fetch_params(0, 1, 1, &gamma, &channel);
@@ -1473,8 +1469,8 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, gamma)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, levels)
 {
-	zval *_gamma = NULL, *_input_min = NULL, *_input_max = NULL, *_output_min = NULL, *_output_max = NULL, *_channel = NULL;
-	zval gamma, input_min, input_max, output_min, output_max, channel, im, range, quantum_range_long;
+	zval *_gamma = NULL, *_input_min = NULL, *_input_max = NULL, *_output_min = NULL, *_output_max = NULL, *_channel = NULL, gamma = {}, input_min = {};
+	zval input_max = {}, output_min = {}, output_max = {}, channel = {}, im = {}, range = {}, quantum_range_long = {};
 	zend_class_entry *imagick_ce;
 	long tmp_input_min, tmp_input_max, tmp_output_min, tmp_output_max;
 
@@ -1555,7 +1551,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, levels)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, brightness_contrast)
 {
-	zval *brightness, *contrast, brightness_normalised, contrast_normalised, overlay, columns, rows, pseudo_string, background, degrees, alpha, im;
+	zval *brightness, *contrast, brightness_normalised = {}, contrast_normalised = {}, overlay = {}, columns = {}, rows = {}, pseudo_string = {}, background = {}, degrees = {}, alpha = {}, im = {};
 	zend_class_entry *imagick_ce;
 	double tmp_brightness, tmp_contrast;
 
@@ -1577,11 +1573,11 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, brightness_contrast)
 
 		ZVAL_LONG(&columns, 1);
 		ZVAL_LONG(&rows, 1000);
-		PHALCON_STR(&pseudo_string, "gradient:");
+		ZVAL_STRING(&pseudo_string, "gradient:");
 
 		PHALCON_CALL_METHODW(NULL, &overlay, "newpseudoimage", &columns, &rows, &pseudo_string);
 
-		PHALCON_STR(&background, "#fff");
+		ZVAL_STRING(&background, "#fff");
 		ZVAL_LONG(&degrees, 90);
 
 		PHALCON_CALL_METHODW(NULL, &overlay, "rotateimage", &background, &degrees);
@@ -1621,7 +1617,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, brightness_contrast)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, hsl)
 {
-	zval *_hue = NULL, *_saturation = NULL, *_lightness = NULL, hue, saturation, lightness, im;
+	zval *_hue = NULL, *_saturation = NULL, *_lightness = NULL, hue = {}, saturation = {}, lightness = {}, im = {};
 	long tmp_hue, tmp_saturation, tmp_lightness;
 
 	phalcon_fetch_params(0, 0, 3, &hue, &saturation, &lightness);
@@ -1662,7 +1658,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, hsl)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, curves_graph)
 {
-	zval *fx, im;
+	zval *fx, im = {};
 
 	phalcon_fetch_params(0, 1, 0, &fx);
 
@@ -1683,7 +1679,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, curves_graph)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, vignette)
 {
-	zval *color, *_composition = NULL, *_crop_factor = NULL, composition, crop_factor, im, width, height, x1, y1, x2, y2, pseudo_string, overlay;
+	zval *color, *_composition = NULL, *_crop_factor = NULL, composition = {}, crop_factor = {}, im = {}, width = {}, height = {}, x1 = {}, y1 = {}, x2 = {}, y2 = {}, pseudo_string = {}, overlay = {};
 	zend_class_entry *imagick_ce;
 
 	phalcon_fetch_params(0, 1, 2, &color, &composition, &crop_factor);
@@ -1735,7 +1731,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, vignette)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, earlybird)
 {
-	zval tmp0, tmp1, tmp2, tmp3;
+	zval tmp0 = {}, tmp1 = {}, tmp2 = {}, tmp3 = {};
 	zend_class_entry *imagick_ce;
 
 	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
@@ -1769,17 +1765,17 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, earlybird)
 
 	PHALCON_CALL_SELFW(NULL, "levels", &tmp0, &PHALCON_GLOBAL(z_zero), &tmp1);
 
-	PHALCON_STR(&tmp0, "rgb(251,243,220)");
+	ZVAL_STRING(&tmp0, "rgb(251,243,220)");
 
 	PHALCON_CALL_SELFW(NULL, "colorize", &tmp0);
 
-	PHALCON_STR(&tmp0, "rgb(184,184,184)");
+	ZVAL_STRING(&tmp0, "rgb(184,184,184)");
 
 	phalcon_get_class_constant(&tmp1, imagick_ce, SL("COMPOSITE_COLORBURN"));
 
 	PHALCON_CALL_SELFW(NULL, "vignette", &tmp0, &tmp1);
 
-	PHALCON_STR(&tmp0, "rgb(251,243,220)");
+	ZVAL_STRING(&tmp0, "rgb(251,243,220)");
 
 	phalcon_get_class_constant(&tmp1, imagick_ce, SL("COMPOSITE_MULTIPLY"));
 
@@ -1795,13 +1791,13 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, earlybird)
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, inkwell)
 {
-	zval tmp0, tmp1;
+	zval tmp0 = {}, tmp1 = {};
 
 	ZVAL_LONG(&tmp0, -100);
 
 	PHALCON_CALL_SELFW(NULL, "hsl", &PHALCON_GLOBAL(z_zero), &tmp0, &PHALCON_GLOBAL(z_zero));
 
-	PHALCON_STR(&tmp0, "-0.062*u^3-0.104*u^2+1.601*u-0.175");
+	ZVAL_STRING(&tmp0, "-0.062*u^3-0.104*u^2+1.601*u-0.175");
 
 	PHALCON_CALL_SELFW(NULL, "curves_graph", &tmp0);
 
@@ -1816,7 +1812,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, inkwell)
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, convert)
 {
 #ifdef PHALCON_USE_MAGICKWAND
-	zval *command, command_parts, *value;
+	zval *command, command_parts = {}, *value;
 	char **argv;
 	int argc, i = 0;
 

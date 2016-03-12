@@ -95,7 +95,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Oracle){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
 
-	zval *descriptor = NULL, startup, *value = NULL;
+	zval *descriptor = NULL, startup = {}, *value = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &descriptor);
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 
-	zval *table, *schema = NULL, columns, *dialect, sql, fetch_num, describe, old_column, *field;
+	zval *table, *schema = NULL, columns = {}, *dialect, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 	 *  0:column_name, 1:data_type, 2:data_length, 3:data_precision, 4:data_scale, 5:nullable, 6:constraint_type, 7:default, 8:position;
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
-		zval definition, column_size, column_precision, column_scale, column_type, attribute, column_name, column;
+		zval definition = {}, column_size = {}, column_precision = {}, column_scale = {}, column_type = {}, attribute = {}, column_name = {}, column = {};
 
 		array_init_size(&definition, 1);
 		add_assoc_long_ex(&definition, SL("bindType"), 2);
@@ -355,7 +355,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, lastInsertId){
 
-	zval *sequence_name = NULL, sql, fetch_num, ret, insert_id;
+	zval *sequence_name = NULL, sql = {}, fetch_num = {}, ret = {}, insert_id = {};
 
 	phalcon_fetch_params(0, 0, 1, &sequence_name);
 
@@ -391,12 +391,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, useExplicitIdValue){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, getDefaultIdValue){
 
-	zval null_value;
+	zval defalut_value = {};
 
-	PHALCON_STR(&null_value, "default");
+	ZVAL_STRING(&defalut_value, "default");
 
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &null_value);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &defalut_value);
 }
 
 /**

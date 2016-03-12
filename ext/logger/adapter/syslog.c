@@ -87,7 +87,7 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_Syslog){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 
-	zval *name, *options = NULL, option, facility;
+	zval *name, *options = NULL, option = {}, facility = {};
 
 	phalcon_fetch_params(0, 1, 1, &name, &options);
 
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
 
-	zval formatter ;
+	zval formatter = {};
 
 	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
 	if (Z_TYPE(formatter) != IS_OBJECT) {
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
 
-	zval *message, *type, *time, *context, formatter , applied_format, syslog_type, syslog_message;
+	zval *message, *type, *time, *context, formatter = {}, applied_format = {}, syslog_type = {}, syslog_message = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 

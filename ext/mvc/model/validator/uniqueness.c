@@ -90,18 +90,18 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Uniqueness){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 
-	zval *record, option, field, dependency_injector, service, meta_data, bind_types, bind_data_types, column_map, conditions, bind_params;
-	zval number, *compose_field, column_field, exception_message, value, compose_condition, bind_type, condition, operation_made;
-	zval primary_fields, *primary_field, join_conditions, params, message, join_fields, type, is_set_code, code;
+	zval *record, option = {}, field = {}, dependency_injector = {}, service = {}, meta_data = {}, bind_types = {}, bind_data_types = {}, column_map = {}, conditions = {}, bind_params = {};
+	zval number = {}, *compose_field, column_field = {}, exception_message = {}, value = {}, compose_condition = {}, bind_type = {}, condition = {}, operation_made = {};
+	zval primary_fields = {}, *primary_field, join_conditions = {}, params = {}, message = {}, join_fields = {}, type = {}, is_set_code = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
-	PHALCON_STR(&option, "field");
+	ZVAL_STRING(&option, "field");
 
 	PHALCON_CALL_METHODW(&field, getThis(), "get&option", &option);
 	PHALCON_CALL_METHODW(&dependency_injector, record, "getdi");
 
-	PHALCON_STR(&service, "modelsMetadata");
+	ZVAL_STRING(&service, "modelsMetadata");
 
 	PHALCON_CALL_METHODW(&meta_data, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		PHALCON_CALL_METHODW(&primary_fields, &meta_data, "getprimarykeyattributes", record);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(primary_fields), primary_field) {
-			zval attribute_field;
+			zval attribute_field = {};
 
 			if (!phalcon_array_isset(&bind_data_types, primary_field)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_field, "\" isn't part of the table columns");
@@ -265,13 +265,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	/** 
 	 * Check using a standard count
 	 */
-	PHALCON_CALL_CE_STATIC(&number, Z_OBJCE_P(record), "count", &params);
+	PHALCON_CALL_CE_STATICW(&number, Z_OBJCE_P(record), "count", &params);
 	if (!PHALCON_IS_LONG(&number, 0)) {
 
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_STR(&option, ISV(message));
+		ZVAL_STRING(&option, ISV(message));
 
 		PHALCON_CALL_METHODW(&message, getThis(), "get&option", &option);
 		if (!zend_is_true(&message)) {
@@ -287,12 +287,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		/** 
 		 * Append the message to the validator
 		 */
-		PHALCON_STR(&type, "Unique");
+		ZVAL_STRING(&type, "Unique");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_STR(&option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
 		PHALCON_CALL_METHODW(&is_set_code, getThis(), "isset&option", &option);
 		if (zend_is_true(&is_set_code)) {

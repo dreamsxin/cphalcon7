@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
 	backends = phalcon_read_property(getThis(), SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
-			zval content;
+			zval content = {};
 			PHALCON_CALL_METHODW(&content, backend, "get", key_name, lifetime);
 			if (Z_TYPE(content) > IS_NULL) {
 				RETURN_CTORW(&content);
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, exists){
 	backends = phalcon_read_property(getThis(), SL("_backends"), PH_NOISY);
 	if (Z_TYPE_P(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(backends), backend) {
-			zval exists;
+			zval exists = {};
 			PHALCON_CALL_METHODW(&exists, backend, "exists", key_name, lifetime);
 			if (zend_is_true(&exists)) {
 				RETURN_TRUE;

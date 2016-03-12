@@ -138,7 +138,10 @@ zval* phalcon_get_global(zend_string *name) {
 /**
  * Makes fast count on implicit array types
  */
-long int phalcon_fast_count_int(zval *value) {
+long int phalcon_fast_count_int(zval *value)
+{
+	zval retval = {};
+	long int result = 0;
 
 	if (Z_TYPE_P(value) == IS_ARRAY) {
 		return zend_hash_num_elements(Z_ARRVAL_P(value));
@@ -153,9 +156,6 @@ long int phalcon_fast_count_int(zval *value) {
 		}
 
 		if (instanceof_function_ex(Z_OBJCE_P(value), spl_ce_Countable, 1)) {
-			zval retval;
-			long int result = 0;
-
 			zend_call_method_with_0_params(value, Z_OBJCE_P(value), NULL, "count", &retval);
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
@@ -179,7 +179,9 @@ long int phalcon_fast_count_int(zval *value) {
 /**
  * Makes fast count on implicit array types
  */
-void phalcon_fast_count(zval *result, zval *value) {
+void phalcon_fast_count(zval *result, zval *value)
+{
+	zval retval = {};
 
 	if (Z_TYPE_P(value) == IS_ARRAY) {
 		ZVAL_LONG(result, zend_hash_num_elements(Z_ARRVAL_P(value)));
@@ -187,8 +189,6 @@ void phalcon_fast_count(zval *result, zval *value) {
 	}
 
 	if (Z_TYPE_P(value) == IS_OBJECT) {
-		zval retval;
-
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			ZVAL_LONG(result, 1);
 			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &Z_LVAL_P(result))) {
@@ -221,8 +221,9 @@ void phalcon_fast_count(zval *result, zval *value) {
 /**
  * Makes fast count on implicit array types without creating a return zval value
  */
-int phalcon_fast_count_ev(zval *value) {
-
+int phalcon_fast_count_ev(zval *value)
+{
+	zval retval = {};
 	long count = 0;
 
 	if (Z_TYPE_P(value) == IS_ARRAY) {
@@ -230,8 +231,6 @@ int phalcon_fast_count_ev(zval *value) {
 	}
 
 	if (Z_TYPE_P(value) == IS_OBJECT) {
-		zval retval;
-
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			Z_OBJ_HT(*value)->count_elements(value, &count);
 			return (int) count > 0;

@@ -127,18 +127,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!phalcon_array_isset_str(options, SL("mongo"))) {
-		if (!phalcon_array_isset_str(options, SL("server"))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The parameter 'server' is required");
-			return;
-		}
-	}
-
-	if (!phalcon_array_isset_str(options, SL("db"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The parameter 'db' is required");
-		return;
-	}
-
 	if (!phalcon_array_isset_str(options, SL("collection"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The parameter 'collection' is required");
 		return;
@@ -154,57 +142,69 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 
-	zval mongo_collection, options, mongo, server, database, collection;
+	zval mongo_collection = {}, options = {}, mongo = {}, class_name = {}, server = {}, database = {}, collection = {}, service_name = {};
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&mongo_collection, getThis(), SL("_collection"));
 	if (Z_TYPE(mongo_collection) != IS_OBJECT) {
 		phalcon_return_property(&options, getThis(), SL("_options"));
 
-		/** 
-		 * If mongo is defined a valid Mongo object must be passed
-		 */
 		if (phalcon_array_isset_fetch_str(&mongo, &options, SL("mongo"))) {
 			if (Z_TYPE(mongo) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The 'mongo' parameter must be a valid Mongo instance");
 				return;
 			}
-		} else {
-			/** 
-			 * Server must be defined otherwise
-			 */
-			if (!phalcon_array_isset_fetch_str(&server, &options, SL("server")) || Z_TYPE(server) != IS_STRING) {
+
+			if (!phalcon_array_isset_fetch_str(&database, &options, SL("db")) || Z_TYPE(database) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
+				return;
+			}
+
+			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
+				return;
+			}
+
+			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &database, &collection);
+		} else if (phalcon_array_isset_fetch_str(&server, &options, SL("server"))) {
+			if (Z_TYPE(server) != IS_STRING) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB connection string");
 				return;
 			}
 
-			ce0 = zend_fetch_class(SSL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
+			ZVAL_STRING(&class_name, "MongoClient");
+			if (phalcon_class_exists(&class_name, 0) != NULL) {
+				ce0 = zend_fetch_class(SSL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
+			} else {
+				ce0 = zend_fetch_class(SSL("Mongo"), ZEND_FETCH_CLASS_AUTO);
+			}
 
 			object_init_ex(&mongo, ce0);
 			assert(phalcon_has_constructor(&mongo));
 			PHALCON_CALL_METHODW(NULL, &mongo, "__construct", &server);
-		}
 
-		/** 
-		 * Check if the database name is a string
-		 */
-		if (!phalcon_array_isset_fetch_str(&database, &options, SL("db")) || Z_TYPE(database) != IS_STRING) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
-			return;
-		}
+			if (!phalcon_array_isset_fetch_str(&database, &options, SL("db")) || Z_TYPE(database) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
+				return;
+			}
 
-		/** 
-		 * Retrieve the connection name
-		 */
-		if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
-			return;
-		}
+			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
+				return;
+			}
 
-		/** 
-		 * Make the connection and get the collection
-		 */
-		PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &database, &collection);
+			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &database, &collection);
+		} else {
+			ZVAL_STRING(&service_name, "mongo");
+			PHALCON_CALL_METHODW(&mongo, getThis(), "getresolveservice", &service_name);
+
+			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
+				return;
+			}
+
+			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &collection);
+		}
 	} else {
 		RETURN_CTORW(&mongo_collection);
 	}
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
-	zval *key_name, *lifetime = NULL, frontend, prefix, prefixed_key, collection, conditions, document , time_condition, cached_content;
+	zval *key_name, *lifetime = NULL, frontend = {}, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, time_condition = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
@@ -267,8 +267,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 
-	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, last_key, prefix, frontend, cached_content;
-	zval prepared_content, ttl, collection, timestamp, conditions, document, data, is_buffering;
+	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, last_key = {}, prefix = {}, frontend = {}, cached_content = {};
+	zval prepared_content = {}, ttl = {}, collection = {}, timestamp = {}, conditions = {}, document = {}, data = {}, is_buffering = {};
 
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 
-	zval *key_name, prefix, prefixed_key, collection, conditions;
+	zval *key_name, prefix = {}, prefixed_key = {}, collection = {}, conditions = {};
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
@@ -370,7 +370,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 
 	array_init_size(&conditions, 1);
 	phalcon_array_update_str(&conditions, SL("key"), &prefixed_key, PH_COPY);
-	PHALCON_CALL_METHOD(NULL, &collection, "remove", &conditions);
+	PHALCON_CALL_METHODW(NULL, &collection, "remove", &conditions);
 
 	if ((php_rand() % 100) == 0) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "gc");
@@ -387,7 +387,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
-	zval *prefix = NULL, collection, fields, pattern, regex, conditions, documents, *document, documents_array, time_condition;
+	zval *prefix = NULL, collection = {}, fields = {}, pattern = {}, regex = {}, conditions = {}, documents = {}, *document, documents_array = {}, time_condition = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 0, 1, &prefix);
@@ -405,7 +405,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
 		object_init_ex(&regex, ce0);
 		assert(phalcon_has_constructor(&regex));
-		PHALCON_CALL_METHOD(NULL, &regex, "__construct", &pattern);
+		PHALCON_CALL_METHODW(NULL, &regex, "__construct", &pattern);
 
 		phalcon_array_update_str(&conditions, SL("key"), &regex, PH_COPY);
 	}
@@ -421,7 +421,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 	PHALCON_CALL_FUNCTIONW(&documents_array, "iterator_to_array", &documents);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(documents_array), document) {
-		zval key;
+		zval key = {};
 		if (likely(phalcon_array_isset_fetch_str(&key, document, SL("key")))) {
 			phalcon_array_append(return_value, &key, PH_COPY);
 		}
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 
-	zval *key_name = NULL, *lifetime = NULL, collection, last_key, prefix, conditions, number, time_condition;
+	zval *key_name = NULL, *lifetime = NULL, collection = {}, last_key = {}, prefix = {}, conditions = {}, number = {}, time_condition = {};
 	long int n;
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, gc) {
 
-	zval conditions, time_condition, collection;
+	zval conditions = {}, time_condition = {}, collection = {};
 
 	array_init_size(&time_condition, 1);
 	add_assoc_long_ex(&time_condition, SL("$gt"), (long int)time(NULL));
@@ -492,8 +492,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, gc) {
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 
-	zval *key_name, *value = NULL, lifetime, frontend, prefix, prefixed_key, collection, conditions, document, timestamp;
-	zval modified_time, difference, not_expired, cached_content;
+	zval *key_name, *value = NULL, lifetime = {}, frontend = {}, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, timestamp = {};
+	zval modified_time = {}, difference = {}, not_expired = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -565,8 +565,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
-	zval *key_name, *value = NULL, lifetime, frontend, prefix, prefixed_key, collection, conditions, document, timestamp;
-	zval modified_time, difference, not_expired, cached_content;
+	zval *key_name, *value = NULL, lifetime = {}, frontend, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, timestamp = {};
+	zval modified_time = {}, difference = {}, not_expired = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
@@ -636,7 +636,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, flush){
 
-	zval collection;
+	zval collection = {};
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
 	PHALCON_CALL_METHODW(NULL, &collection, "remove");

@@ -420,7 +420,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getTargetPath){
  */
 PHP_METHOD(Phalcon_Assets_Resource, getContent){
 
-	zval *base_path = NULL, *source_path, complete_path, *local, exception_message;
+	zval *base_path = NULL, *source_path, complete_path = {}, *local, exception_message = {};
 
 	phalcon_fetch_params(0, 0, 1, &base_path);
 
@@ -491,7 +491,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetUri){
  */
 PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
 
-	zval *base_path = NULL, *source_path, *local, complete_path;
+	zval *base_path = NULL, *source_path, *local, complete_path = {};
 
 	phalcon_fetch_params(0, 0, 1, &base_path);
 
@@ -529,7 +529,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
  */
 PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 
-	zval *base_path = NULL, *target_path, *local, complete_path;
+	zval *base_path = NULL, *target_path, *local, complete_path = {};
 
 	phalcon_fetch_params(0, 0, 1, &base_path);
 

@@ -123,7 +123,7 @@ PHALCON_INIT_CLASS(Phalcon_Events_Manager){
  */
 PHP_METHOD(Phalcon_Events_Manager, attach){
 
-	zval *event_type, *handler, *_priority = NULL, priority, events, listener, enable_priorities, priority_queue;
+	zval *event_type, *handler, *_priority = NULL, priority = {}, events = {}, listener = {}, enable_priorities = {}, priority_queue = {};
 
 	phalcon_fetch_params(0, 2, 1, &event_type, &handler, &_priority);
 
@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_Events_Manager, getResponses){
  */
 PHP_METHOD(Phalcon_Events_Manager, detach){
 
-	zval *type, *handler, events, queue, priority_queue, *listener;
+	zval *type, *handler, events = {}, queue = {}, priority_queue = {}, *listener;
 	zend_string *str_key;
 	ulong idx;
 
@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 		PHALCON_CALL_METHODW(NULL, &queue, "top");
 
 		while (1) {
-			zval r0, listener0, handler_embeded, priority;
+			zval r0 = {}, listener0 = {}, handler_embeded = {}, priority = {};
 			PHALCON_CALL_METHODW(&r0, &queue, "valid");
 			if (!zend_is_true(&r0)) {
 				break;
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 	} else {
 		PHALCON_CPY_WRT_CTOR(&priority_queue, &queue);
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(queue), idx, str_key, listener) {
-			zval key, handler_embeded;
+			zval key = {}, handler_embeded = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -344,7 +344,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
  */
 PHP_METHOD(Phalcon_Events_Manager, detachAll){
 
-	zval *type = NULL, events;
+	zval *type = NULL, events = {};
 
 	phalcon_fetch_params(0, 0, 1, &type);
 
@@ -369,10 +369,11 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
  */
 PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
-	zval *queue, *event, event_name, source, data, cancelable, collect, iterator, *listener, status;
+	zval *queue, *event, event_name = {}, source = {}, data = {}, cancelable = {}, collect = {}, iterator = {}, *listener, status = {};
 	zend_class_entry *ce, *weakref_ce;
 
 	phalcon_fetch_params(0, 2, 0, &queue, &event);
+	ZVAL_NULL(&status);
 
 	if (unlikely(Z_TYPE_P(queue) != IS_ARRAY)) {
 		if (Z_TYPE_P(queue) == IS_OBJECT) {
@@ -433,7 +434,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 		PHALCON_CALL_METHODW(NULL, &iterator, "top");
 
 		while (1) {
-			zval r0, listener0, handler_embeded, handler_referenced, handler, arguments, is_stopped;
+			zval r0 = {}, listener0 = {}, handler_embeded = {}, handler_referenced = {}, handler = {}, arguments = {}, is_stopped = {};
 
 			PHALCON_CALL_METHODW(&r0, &iterator, "valid");
 			if (!zend_is_true(&r0)) {
@@ -547,7 +548,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 		}
 	} else {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), listener) {
-			zval handler_embeded, handler_referenced, handler, arguments, is_stopped;
+			zval handler_embeded = {}, handler_referenced = {}, handler = {}, arguments = {}, is_stopped = {};
 
 			PHALCON_CALL_METHODW(&handler_embeded, listener, "getlistener");
 			/** 
@@ -661,8 +662,8 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
  */
 PHP_METHOD(Phalcon_Events_Manager, fire){
 
-	zval *event_type, *source, *data = NULL, *cancelable = NULL, events, exception_message, event_parts, type;
-	zval event_name, status, collect, event, fire_events;
+	zval *event_type, *source, *data = NULL, *cancelable = NULL, events = {}, exception_message = {}, event_parts = {}, type = {};
+	zval event_name = {}, status = {}, collect = {}, event = {}, fire_events = {};
 
 	phalcon_fetch_params(0, 2, 2, &event_type, &source, &data, &cancelable);
 
@@ -755,7 +756,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
  */
 PHP_METHOD(Phalcon_Events_Manager, hasListeners){
 
-	zval *type, events;
+	zval *type, events = {};
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
@@ -775,7 +776,7 @@ PHP_METHOD(Phalcon_Events_Manager, hasListeners){
  */
 PHP_METHOD(Phalcon_Events_Manager, getListeners){
 
-	zval *type, *full = NULL, events, queue, iterator, *listener;
+	zval *type, *full = NULL, events = {}, queue = {}, iterator = {}, *listener;
 
 	phalcon_fetch_params(0, 1, 1, &type, &full);
 
@@ -808,7 +809,7 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 		PHALCON_CALL_METHODW(NULL, &iterator, "top");
 
 		while (1) {
-			zval r0, listener0, handler_embeded;
+			zval r0 = {}, listener0 = {}, handler_embeded = {};
 
 			PHALCON_CALL_METHODW(&r0, &iterator, "valid");
 			if (!zend_is_true(&r0)) {
@@ -824,7 +825,7 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 		}
 	} else {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(queue), listener) {
-			zval handler_embeded;
+			zval handler_embeded = {};
 			PHALCON_CALL_METHODW(&handler_embeded, listener, "getlistener");
 			phalcon_array_append(return_value, &handler_embeded, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -838,7 +839,7 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
  */
 PHP_METHOD(Phalcon_Events_Manager, getEvents){
 
-	zval events;
+	zval events = {};
 
 	phalcon_return_property(&events, getThis(), SL("_events"));
 	phalcon_array_keys(return_value, &events);

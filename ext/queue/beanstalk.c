@@ -134,7 +134,7 @@ PHALCON_INIT_CLASS(Phalcon_Queue_Beanstalk){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 
-	zval *options = NULL, parameters;
+	zval *options = NULL, parameters = {};
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 
 PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 
-	zval *connection = NULL, *parameters, host, port, new_connection;
+	zval *connection = NULL, *parameters, host = {}, port = {}, new_connection = {};
 
 	connection = phalcon_read_property(getThis(), SL("_connection"), PH_NOISY);
 	if (Z_TYPE_P(connection) == IS_RESOURCE) {
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 
-	zval *data, *options = NULL, priority, delay, ttr, serialized, serialized_length, command, response, status, job_id;
+	zval *data, *options = NULL, priority = {}, delay = {}, ttr = {}, serialized = {}, serialized_length = {}, command = {}, response = {}, status = {}, job_id = {};
 
 	phalcon_fetch_params(0, 1, 1, &data, &options);
 
@@ -236,15 +236,15 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	 * Priority is 100 by default
 	 */
 	if (!phalcon_array_isset_fetch_str(&priority, options, SL("priority"))) {
-		PHALCON_STR(&priority, "100");
+		ZVAL_STRING(&priority, "100");
 	}
 
 	if (!phalcon_array_isset_fetch_str(&delay, options, SL("delay"))) {
-		PHALCON_STR(&delay, "0");
+		ZVAL_STRING(&delay, "0");
 	}
 
 	if (!phalcon_array_isset_fetch_str(&ttr, options, SL("ttr"))) {
-		PHALCON_STR(&ttr, "86400");
+		ZVAL_STRING(&ttr, "86400");
 	}
 
 	/** 
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, reserve){
 
-	zval *timeout = NULL, command, response, status, job_id, length, serialized_body, body;
+	zval *timeout = NULL, command = {}, response = {}, status = {}, job_id = {}, length = {}, serialized_body = {}, body = {};
 
 	phalcon_fetch_params(0, 0, 1, &timeout);
 
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, reserve){
 	if (zend_is_true(timeout)) {
 		PHALCON_CONCAT_SV(&command, "reserve-with-timeout ", timeout);
 	} else {
-		PHALCON_STR(&command, "reserve");
+		ZVAL_STRING(&command, "reserve");
 	}
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
@@ -344,7 +344,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, reserve){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, choose){
 
-	zval *tube, command, response, status, using_tube;
+	zval *tube, command = {}, response = {}, status = {}, using_tube = {};
 
 	phalcon_fetch_params(0, 1, 0, &tube);
 
@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, choose){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, watch){
 
-	zval *tube, command, response, status, watching_tube;
+	zval *tube, command = {}, response = {}, status = {}, watching_tube = {};
 
 	phalcon_fetch_params(0, 1, 0, &tube);
 
@@ -393,9 +393,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, watch){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, stats){
 
-	zval command, response, status, stats;
+	zval command = {}, response = {}, status = {}, stats = {};
 
-	PHALCON_STR(&command, "stats ");
+	ZVAL_STRING(&command, "stats ");
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
 	PHALCON_CALL_METHODW(&response, getThis(), "readyaml");
@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, stats){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, statsTube){
 
-	zval *tube, command, response, status, stats_tube;
+	zval *tube, command = {}, response = {}, status = {}, stats_tube = {};
 
 	phalcon_fetch_params(0, 1, 0, &tube);
 
@@ -436,7 +436,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, statsTube){
 
 static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_ptr, zval *response)
 {
-	zval job_id, length, serialized, body;
+	zval job_id = {}, length = {}, serialized = {}, body = {};
 
 	if (!phalcon_array_isset_fetch_long(&job_id, response, 1)) {
 		ZVAL_NULL(&job_id);
@@ -461,9 +461,9 @@ static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_p
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, peekReady){
 
-	zval command, response, status;
+	zval command = {}, response = {}, status = {};
 
-	PHALCON_STR(&command, "peek-ready");
+	ZVAL_STRING(&command, "peek-ready");
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
 	PHALCON_CALL_METHODW(&response, getThis(), "readstatus");
 
@@ -483,9 +483,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekReady){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, peekDelayed){
 
-	zval command, response, status;
+	zval command = {}, response = {}, status = {};
 
-	PHALCON_STR(&command, "peek-delayed");
+	ZVAL_STRING(&command, "peek-delayed");
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
 	PHALCON_CALL_METHODW(&response, getThis(), "readstatus");
 
@@ -505,9 +505,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekDelayed){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, peekBuried){
 
-	zval command, response, status;
+	zval command = {}, response = {}, status = {};
 
-	PHALCON_STR(&command, "peek-buried");
+	ZVAL_STRING(&command, "peek-buried");
 	PHALCON_CALL_METHODW(NULL, getThis(), "write", &command);
 	PHALCON_CALL_METHODW(&response, getThis(), "readstatus");
 
@@ -527,7 +527,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, peekBuried){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, readStatus){
 
-	zval response;
+	zval response = {};
 
 	PHALCON_CALL_METHODW(&response, getThis(), "read");
 	phalcon_fast_explode_str(return_value, SL(" "), &response);
@@ -538,7 +538,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, readStatus){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, readYaml){
 
-	zval response, status, num_bytes, yaml_data, data;
+	zval response = {}, status = {}, num_bytes = {}, yaml_data = {}, data = {};
 
 	PHALCON_CALL_METHODW(&response, getThis(), "readstatus");
 
@@ -567,7 +567,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, readYaml){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 
-	zval *length = NULL, connection, meta, timed_out;
+	zval *length = NULL, connection = {}, meta = {}, timed_out = {};
 	zend_bool timeout = 0;
 	php_stream *stream;
 	long int total_length;
@@ -605,7 +605,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		buf = ecalloc(1, total_length + 1);
 		len = php_stream_read(stream, buf, total_length);
 
-		PHALCON_STRL(return_value, buf, len);
+		ZVAL_STRINGL(return_value, buf, len);
 
 		array_init_size(&meta, 4);
 		if (php_stream_populate_meta_data(stream, &meta)) {
@@ -654,7 +654,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, write){
 
-	zval *data, connection, packet;
+	zval *data, connection = {}, packet = {};
 	php_stream *stream;
 
 	phalcon_fetch_params(0, 1, 0, &data);
@@ -684,7 +684,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, write){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk, disconnect){
 
-	zval connection;
+	zval connection = {};
 	php_stream *stream;
 
 	phalcon_return_property(&connection, getThis(), SL("_connection"));
@@ -717,7 +717,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __sleep){
 
 PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 
-	zval *params, host, port;
+	zval *params, host = {}, port = {};
 	int fail;
 
 	zend_update_property_null(phalcon_queue_beanstalk_ce, getThis(), SL("_connection"));

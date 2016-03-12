@@ -39,7 +39,7 @@
  */
 int phalcon_file_exists(zval *filename){
 
-	zval exists_flag;
+	zval exists_flag = {};
 
 	if (Z_TYPE_P(filename) != IS_STRING) {
 		return FAILURE;
@@ -152,6 +152,7 @@ void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_
 	if (virtual_str.s) {
 		RETURN_STR(virtual_str.s);
 	} else {
+		smart_str_free(&virtual_str);
 		RETURN_EMPTY_STRING();
 	}
 }
@@ -175,7 +176,7 @@ void phalcon_prepare_virtual_path_ex(zval *return_value, const char *path, size_
 		}
 	}
 
-	PHALCON_STRL(return_value, copy, path_len);
+	ZVAL_STRINGL(return_value, copy, path_len);
 }
 
 /**
@@ -202,7 +203,7 @@ void phalcon_unique_path_key(zval *return_value, zval *path) {
  * Returns the realpath of a zval filename
  *
  */
-void phalcon_realpath(zval *return_value, zval *filename) {
+void phalcon_file_realpath(zval *return_value, zval *filename) {
 
 	char resolved_path_buff[MAXPATHLEN];
 
@@ -344,7 +345,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 	php_stream *stream;
 	int numbytes = 0, use_copy = 0;
 	zval *zcontext = NULL;
-	zval copy;
+	zval copy = {};
 	php_stream_context *context = NULL;
 
 	if (Z_TYPE_P(filename) != IS_STRING) {
@@ -396,7 +397,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 	php_stream_close(stream);
 
 	if (use_copy) {
-		zval_ptr_dtor(data);
+		PHALCON_PTR_DTOR(data);
 	}
 
 	if (numbytes < 0) {

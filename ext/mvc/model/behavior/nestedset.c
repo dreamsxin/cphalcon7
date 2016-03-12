@@ -273,7 +273,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Behavior_NestedSet){
 
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, __construct){
 
-	zval *options = NULL, option;
+	zval *options = NULL, option = {};
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
@@ -312,13 +312,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, notify){
 
-	zval *type, *model, *ignore_event, message;
+	zval *type, *model, *ignore_event, message = {};
 
 	phalcon_fetch_params(0, 2, 0, &type, &model);
 
 	ignore_event = phalcon_read_property(getThis(), SL("_ignoreEvent"), PH_NOISY);
 	if (!zend_is_true(ignore_event)) {
-		PHALCON_STR(&message, "You should not use this method when NestedSetBehavior attached. Use the methods of behavior");
+		ZVAL_STRING(&message, "You should not use this method when NestedSetBehavior attached. Use the methods of behavior");
 
 		if (PHALCON_IS_STRING(type, "beforeCreate") || PHALCON_IS_STRING(type, "beforeUpdate") || PHALCON_IS_STRING(type, "beforeDelete")) {
 			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &message);
@@ -329,7 +329,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, notify){
 
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, missingMethod){
 
-	zval *owner, *method, *arguments = NULL, call_object;
+	zval *owner, *method, *arguments = NULL, call_object = {};
 
 	phalcon_fetch_params(0, 2, 1, &owner, &method, &arguments);
 
@@ -512,7 +512,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, isDeletedRecord){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, isLeaf){
 
-	zval left, right;
+	zval left = {}, right = {};
 
 	PHALCON_CALL_SELFW(&left, "getleftattribute");
 	PHALCON_CALL_SELFW(&right, "getrightattribute");
@@ -531,7 +531,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, isLeaf){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, isRoot){
 
-	zval left;
+	zval left = {};
 
 	PHALCON_CALL_SELFW(&left, "getleftattribute");
 
@@ -551,7 +551,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, isRoot){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, isDescendantOf){
 
-	zval *subj, left, right, left2, right2, *has_many_roots, root, root2;
+	zval *subj, left = {}, right = {}, left2 = {}, right2 = {}, *has_many_roots, root = {}, root2 = {};
 	int result;
 
 	phalcon_fetch_params(0, 1, 0, &subj);
@@ -588,10 +588,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, isDescendantOf){
  *
  * @return \Phalcon\Mvc\Model\ResultsetInterface
  */
-PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, descendants){
-
-	zval *depth, *owner, *left_attribute, *right_attribute, left, right, query;
-	zval statement, *level_attribute, level, tmp, *has_many_roots, *root_attribute, root;
+PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, descendants)
+{
+	zval *depth, *owner, *left_attribute, *right_attribute, left = {}, right = {}, query = {};
+	zval statement = {}, *level_attribute, level = {}, tmp = {}, *has_many_roots, *root_attribute, root = {};
 
 	phalcon_fetch_params(0, 0, 1, &depth);
 
@@ -665,7 +665,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, children){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, ancestors){
 
-	zval *depth, *owner, *left_attribute, *right_attribute, left, right, *has_many_roots, query, statement, *level_attribute, level, *root_attribute, root, tmp;
+	zval *depth, *owner, *left_attribute, *right_attribute, left = {}, right = {}, *has_many_roots, query = {}, statement = {}, *level_attribute, level = {}, *root_attribute, root = {}, tmp = {};
 
 	phalcon_fetch_params(0, 0, 1, &depth);
 
@@ -724,7 +724,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, ancestors){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, roots){
 
-	zval *owner, *left_attribute, statement;
+	zval *owner, *left_attribute, statement = {};
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 
@@ -741,7 +741,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, roots){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, parent){
 
-	zval *owner, *left_attribute, *right_attribute, left, right, query, statement, *has_many_roots, *root_attribute, root, result;
+	zval *owner, *left_attribute, *right_attribute, left = {}, right = {}, query = {}, statement = {}, *has_many_roots, *root_attribute, root = {}, result = {};
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 
@@ -783,7 +783,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, parent){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, prev){
 
-	zval *owner, *right_attribute, left, query, statement, *has_many_roots, *root_attribute, root, tmp, result;
+	zval *owner, *right_attribute, left = {}, query = {}, statement = {}, *has_many_roots, *root_attribute, root = {}, tmp = {}, result = {};
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 	right_attribute = phalcon_read_property(getThis(), SL("_rightAttribute"), PH_NOISY);
@@ -817,7 +817,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, prev){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, next){
 
-	zval *owner, *left_attribute, right, query, statement, *has_many_roots, *root_attribute, root, tmp;
+	zval *owner, *left_attribute, right = {}, query = {}, statement = {}, *has_many_roots, *root_attribute, root = {}, tmp = {};
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 
@@ -856,7 +856,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, next){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, prependTo){
 
-	zval *target, *attributes = NULL, left, tmp;
+	zval *target, *attributes = NULL, left = {}, tmp = {};
 
 	phalcon_fetch_params(0, 1, 1, &target, &attributes);
 
@@ -902,7 +902,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, prepend){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, appendTo){
 
-	zval *target, *attributes = NULL, right;
+	zval *target, *attributes = NULL, right = {};
 
 	phalcon_fetch_params(0, 1, 1, &target, &attributes);
 
@@ -945,7 +945,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, append){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertBefore){
 
-	zval *target, *attributes = NULL, left;
+	zval *target, *attributes = NULL, left = {};
 
 	phalcon_fetch_params(0, 1, 1, &target, &attributes);
 
@@ -968,7 +968,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertBefore){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertAfter){
 
-	zval *target, *attributes = NULL, right, tmp;
+	zval *target, *attributes = NULL, right = {}, tmp = {};
 
 	phalcon_fetch_params(0, 1, 1, &target, &attributes);
 
@@ -992,7 +992,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, insertAfter){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveBefore){
 
-	zval *target, left;
+	zval *target, left = {};
 
 	phalcon_fetch_params(0, 1, 0, &target);
 
@@ -1010,7 +1010,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveBefore){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAfter){
 
-	zval *target, left, tmp;
+	zval *target, left = {}, tmp = {};
 
 	phalcon_fetch_params(0, 1, 0, &target);
 
@@ -1030,7 +1030,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAfter){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsFirst){
 
-	zval *target, left, tmp;
+	zval *target, left = {}, tmp = {};
 
 	phalcon_fetch_params(0, 1, 0, &target);
 
@@ -1050,7 +1050,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsFirst){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsLast){
 
-	zval *target, right;
+	zval *target, right = {};
 
 	phalcon_fetch_params(0, 1, 0, &target);
 
@@ -1066,8 +1066,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsLast){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 
-	zval *has_many_roots, *owner, is_new, is_deleted, is_root, connection, left, right, level, root, primary_key, delta, level_delta;
-	zval *left_attribute, *right_attribute, *level_attribute, *root_attribute, condition, childs, *child, tmp1, tmp2;
+	zval *has_many_roots, *owner, is_new = {}, is_deleted = {}, is_root = {}, connection = {}, left = {}, right = {}, level = {}, root = {}, primary_key = {}, delta = {}, level_delta = {};
+	zval *left_attribute, *right_attribute, *level_attribute, *root_attribute, condition = {}, childs = {}, *child, tmp1 = {}, tmp2 = {};
 
 	has_many_roots = phalcon_read_property(getThis(), SL("_hasManyRoots"), PH_NOISY);
 
@@ -1124,7 +1124,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
 	PHALCON_CALL_METHODW(&childs, owner, "find", &condition);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(childs), child) {
-		zval child_left, child_right, child_level, values, ret;
+		zval child_left = {}, child_right = {}, child_level = {}, values = {}, ret = {};
 
 		PHALCON_CALL_SELFW(&child_left, "getleftattribute", child);
 		PHALCON_CALL_SELFW(&child_right, "getrightattribute", &right);
@@ -1164,7 +1164,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveAsRoot){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, saveNode){
 
-	zval *attributes = NULL, *white_list = NULL, primary_key, *owner;
+	zval *attributes = NULL, *white_list = NULL, primary_key = {}, *owner;
 
 	phalcon_fetch_params(0, 0, 2, &attributes, &white_list);
 
@@ -1200,8 +1200,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, saveNode){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
 
-	zval *owner, is_new, is_deleted, connection, is_leaf, ret, *left_attribute, *right_attribute, *root_attribute, *has_many_roots;
-	zval left, right, root, condition, childs, valid, child, tmp1, tmp2;
+	zval *owner, is_new = {}, is_deleted = {}, connection = {}, is_leaf = {}, ret = {}, *left_attribute, *right_attribute, *root_attribute, *has_many_roots;
+	zval left = {}, right = {}, root = {}, condition = {}, childs = {}, valid = {}, child = {}, tmp1 = {}, tmp2 = {};
 
 	owner = phalcon_read_property(getThis(), SL("_owner"), PH_NOISY);
 
@@ -1299,9 +1299,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, deleteNode){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 
-	zval *target, *key, *level_up, *owner, is_new, is_deleted, is_descendantof, is_root, *left_attribute, *right_attribute, *level_attribute, *root_attribute;
-	zval connection, left,  right, level, level2, root, root2, level_delta, *has_many_roots, condition, childs, valid, child, ret;
-	zval values, child_left, child_right, child_level, delta, tmp, tmp1, tmp2;
+	zval *target, *key, *level_up, *owner, is_new = {}, is_deleted = {}, is_descendantof = {}, is_root = {}, *left_attribute, *right_attribute, *level_attribute, *root_attribute;
+	zval connection = {}, left = {},  right = {}, level = {}, level2 = {}, root = {}, root2 = {}, level_delta = {}, *has_many_roots, condition = {}, childs = {}, valid = {}, child = {}, ret = {};
+	zval values = {}, child_left = {}, child_right = {}, child_level = {}, delta = {}, tmp = {}, tmp1 = {}, tmp2 = {};
 
 	phalcon_fetch_params(0, 3, 0, &target, &key, &level_up);
 
@@ -1624,7 +1624,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, moveNode){
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
 
 	zval *key, *delta, *left_attribute, *right_attribute, *root_attribute, *has_many_roots, *owner;
-	zval root, connection, condition, childs, valid, child, child_left, child_right, values, tmp, ret;
+	zval root = {}, connection = {}, condition = {}, childs = {}, valid = {}, child = {}, child_left = {}, child_right = {}, values = {}, tmp = {}, ret = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &delta);
 
@@ -1728,8 +1728,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, shiftLeftRight){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, addNode){
 
-	zval *target, *key, *level_up, *attributes, *owner, is_new, is_deleted, is_root, *left_attribute, *right_attribute, *level_attribute, *root_attribute;
-	zval level2, root2, tmp, ret;
+	zval *target, *key, *level_up, *attributes, *owner, is_new = {}, is_deleted = {}, is_root = {}, *left_attribute, *right_attribute, *level_attribute, *root_attribute;
+	zval level2 = {}, root2 = {}, tmp = {}, ret = {};
 
 	phalcon_fetch_params(0, 4, 0, &target, &key, &level_up, &attributes);
 
@@ -1812,7 +1812,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, addNode){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, makeRoot){
 
-	zval *attributes, *white_list, *owner, *left_attribute, *right_attribute, *level_attribute, *root_attribute, *has_many_roots, connection, primary_key, ret;
+	zval *attributes, *white_list, *owner, *left_attribute, *right_attribute, *level_attribute, *root_attribute, *has_many_roots, connection = {}, primary_key = {}, ret = {};
 
 	phalcon_fetch_params(0, 2, 0, &attributes, &white_list);
 

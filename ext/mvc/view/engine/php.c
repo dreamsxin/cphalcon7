@@ -65,7 +65,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Php){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
-	zval *path, *params, *must_clean = NULL, contents;
+	zval *path, *params, *must_clean = NULL, contents = {};
 	zval *view;
 	int clean;
 

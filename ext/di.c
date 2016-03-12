@@ -294,7 +294,7 @@ PHP_METHOD(Phalcon_DI, attempt){
 		}
 
 		object_init_ex(return_value, phalcon_di_service_ce);
-		PHALCON_CALL_METHOD(NULL, return_value, "__construct", name, definition, shared);
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, shared);
 	
 		phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
 	}
@@ -370,7 +370,7 @@ PHP_METHOD(Phalcon_DI, getService){
  */
 PHP_METHOD(Phalcon_DI, get){
 
-	zval *name, *parameters = NULL, *noerror = NULL, events_manager, event_name, event_data, service;
+	zval *name, *parameters = NULL, *noerror = NULL, events_manager = {}, event_name = {}, event_data = {}, service = {};
 	zend_class_entry *ce;
 
 	phalcon_fetch_params(0, 1, 2, &name, &parameters, &noerror);
@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_DI, get){
 
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "di:beforeServiceResolve");
+		ZVAL_STRING(&event_name, "di:beforeServiceResolve");
 
 		array_init(&event_data);
 
@@ -419,7 +419,7 @@ PHP_METHOD(Phalcon_DI, get){
 	}
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "di:afterServiceResolve");
+		ZVAL_STRING(&event_name, "di:afterServiceResolve");
 
 		array_init(&event_data);
 
@@ -440,7 +440,7 @@ PHP_METHOD(Phalcon_DI, get){
  */
 PHP_METHOD(Phalcon_DI, getShared){
 
-	zval *name, *parameters = NULL, *noerror = NULL, instance;
+	zval *name, *parameters = NULL, *noerror = NULL, instance = {};
 
 	phalcon_fetch_params(0, 1, 2, &name, &parameters, &noerror);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -560,7 +560,7 @@ PHALCON_DOC_METHOD(Phalcon_DI, offsetUnset);
  */
 PHP_METHOD(Phalcon_DI, __call){
 
-	zval *method, *arguments = NULL, possible_service, name, definition;
+	zval *method, *arguments = NULL, possible_service = {}, name = {}, definition = {};
 
 	phalcon_fetch_params(0, 1, 1, &method, &arguments);
 	PHALCON_ENSURE_IS_STRING(method);
@@ -620,7 +620,7 @@ PHP_METHOD(Phalcon_DI, setDefault){
  */
 PHP_METHOD(Phalcon_DI, getDefault){
 
-	zval default_di, dependency_injector;
+	zval default_di = {}, dependency_injector = {};
 
 	phalcon_return_static_property_ce(&default_di, phalcon_di_ce, SL("_default"));
 	if (Z_TYPE(default_di) != IS_OBJECT) {

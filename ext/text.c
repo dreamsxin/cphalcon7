@@ -186,12 +186,12 @@ PHP_METHOD(Phalcon_Text, uncamelize){
  */
 PHP_METHOD(Phalcon_Text, increment){
 
-	zval *str, *separator = NULL, sep, parts, number, first_part;
+	zval *str, *separator = NULL, sep = {}, parts = {}, number = {}, first_part = {};
 
 	phalcon_fetch_params(0, 1, 1, &str, &separator);
 
 	if (!separator || Z_TYPE_P(separator) == IS_NULL) {
-		PHALCON_STR(&sep, "_");
+		ZVAL_STRING(&sep, "_");
 	} else {
 		PHALCON_CPY_WRT_CTOR(&sep, separator);
 	}
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Text, increment){
  */
 PHP_METHOD(Phalcon_Text, random){
 
-	zval *type, *length = NULL, len;
+	zval *type, *length = NULL, len = {};
 
 	phalcon_fetch_params(0, 1, 1, &type, &length);
 
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Text, upper){
  */
 PHP_METHOD(Phalcon_Text, bytes){
 
-	zval *_z_size, *_z_force_unit = NULL, *_format = NULL, z_size, z_force_unit, format, *si = NULL;
+	zval *_z_size, *_z_force_unit = NULL, *_format = NULL, z_size = {}, z_force_unit = {}, format = {}, *si = NULL;
 	char *force_unit;
 	const char **units;
 	const char *units1[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
@@ -377,7 +377,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 	}
 		
 	if (PHALCON_IS_EMPTY(&format)) {
-		PHALCON_STR(&format, "%01.2f %s");
+		ZVAL_STRING(&format, "%01.2f %s");
 	}
 
 	if (!si) {
@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 	}
 
 	ZVAL_DOUBLE(&z_size, size);
-	PHALCON_STR(&z_force_unit, units[power]);
+	ZVAL_STRING(&z_force_unit, units[power]);
 
 	PHALCON_RETURN_CALL_FUNCTIONW("sprintf", &format, &z_size, &z_force_unit);
 }
@@ -432,12 +432,12 @@ PHP_METHOD(Phalcon_Text, bytes){
  */
 PHP_METHOD(Phalcon_Text, reduceSlashes){
 
-	zval *str, pattern, replacement;
+	zval *str, pattern = {}, replacement = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
-	PHALCON_STR(&pattern, "#(?<!:)//+#");
-	PHALCON_STR(&replacement, "/");
+	ZVAL_STRING(&pattern, "#(?<!:)//+#");
+	ZVAL_STRING(&replacement, "/");
 
 	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, str);
 }
@@ -457,7 +457,7 @@ PHP_METHOD(Phalcon_Text, reduceSlashes){
  */
 PHP_METHOD(Phalcon_Text, concat){
 
-	zval *separator, *a, *b, arg_num, arg_list, offset, args, *c, str, a_trimmed, str_trimmed;
+	zval *separator, *a, *b, arg_num = {}, arg_list = {}, offset = {}, args = {}, *c, str = {}, a_trimmed = {}, str_trimmed = {};
 
 	phalcon_fetch_params(0, 3, 0, &separator, &a, &b);
 
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Text, concat){
 		PHALCON_CALL_FUNCTIONW(&args, "array_slice", &arg_list, &offset);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(args), c) {
-			zval b_trimmed, c_trimmed;
+			zval b_trimmed = {}, c_trimmed = {};
 
 			ZVAL_STR(&b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_RIGHT));
 			ZVAL_STR(&c_trimmed, phalcon_trim(c, separator, PHALCON_TRIM_LEFT));
@@ -499,13 +499,13 @@ PHP_METHOD(Phalcon_Text, concat){
  */
 PHP_METHOD(Phalcon_Text, underscore)
 {
-	zval *str, trimmed, pattern, replacement;
+	zval *str, trimmed = {}, pattern = {}, replacement = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
 	ZVAL_STR(&trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
-	PHALCON_STR(&pattern, "#\\s+#");
-	PHALCON_STR(&replacement, "_");
+	ZVAL_STRING(&pattern, "#\\s+#");
+	ZVAL_STRING(&replacement, "_");
 
 	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, &trimmed);
 }
@@ -520,13 +520,13 @@ PHP_METHOD(Phalcon_Text, underscore)
  */
 PHP_METHOD(Phalcon_Text, humanize)
 {
-	zval *str, trimmed, pattern, replacement;
+	zval *str, trimmed = {}, pattern = {}, replacement = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
 	ZVAL_STR(&trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
-	PHALCON_STR(&pattern, "#[_-]+#");
-	PHALCON_STR(&replacement, " ");
+	ZVAL_STRING(&pattern, "#[_-]+#");
+	ZVAL_STRING(&replacement, " ");
 
 	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, &trimmed);
 }

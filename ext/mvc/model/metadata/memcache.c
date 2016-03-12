@@ -93,7 +93,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Memcache){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 
-	zval *options, host, port, lifetime, persistent, prefix, frontend_data, memcache, option;
+	zval *options, host = {}, port = {}, lifetime = {}, persistent = {}, prefix = {}, frontend_data = {}, memcache = {}, option = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 	

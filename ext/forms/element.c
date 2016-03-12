@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Forms_Element, setFilters){
  */
 PHP_METHOD(Phalcon_Forms_Element, addFilter){
 
-	zval *filter, *filters, new_filters;
+	zval *filter, *filters, new_filters = {};
 
 	phalcon_fetch_params(0, 1, 0, &filter);
 
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Forms_Element, getFilters){
  */
 PHP_METHOD(Phalcon_Forms_Element, addValidators){
 
-	zval *validators, *merge = NULL, *current_validators, merged_validators;
+	zval *validators, *merge = NULL, *current_validators, merged_validators = {};
 
 	phalcon_fetch_params(0, 1, 1, &validators, &merge);
 
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Forms_Element, getValidators){
  */
 PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 
-	zval *attributes = NULL, *use_checked = NULL, *name, widget_attributes, *default_attributes, merged_attributes, value, current_value;
+	zval *attributes = NULL, *use_checked = NULL, *name, widget_attributes = {}, *default_attributes, merged_attributes = {}, value = {}, current_value = {};
 
 	phalcon_fetch_params(0, 0, 2, &attributes, &use_checked);
 
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Forms_Element, setAttribute){
  */
 PHP_METHOD(Phalcon_Forms_Element, getAttribute){
 
-	zval *attribute, *default_value = NULL, *attributes, value;
+	zval *attribute, *default_value = NULL, *attributes, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &attribute, &default_value);
 
@@ -528,7 +528,7 @@ PHP_METHOD(Phalcon_Forms_Element, setUserOption){
  */
 PHP_METHOD(Phalcon_Forms_Element, getUserOption){
 
-	zval *option, *default_value = NULL, *options, value;
+	zval *option, *default_value = NULL, *options, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &option, &default_value);
 
@@ -631,7 +631,7 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 
 	if (attributes && Z_TYPE_P(attributes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -689,7 +689,7 @@ PHP_METHOD(Phalcon_Forms_Element, getDefault){
  */
 PHP_METHOD(Phalcon_Forms_Element, getValue){
 
-	zval *name, *form, has_default_value, value;
+	zval *name, *form, has_default_value = {}, value = {};
 
 	name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
 
@@ -701,7 +701,7 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 		/** 
 		 * Check if the tag has a default value
 		 */
-		PHALCON_CALL_CE_STATIC(&has_default_value, phalcon_tag_ce, "hasvalue", name);
+		PHALCON_CALL_CE_STATICW(&has_default_value, phalcon_tag_ce, "hasvalue", name);
 		if (!zend_is_true(&has_default_value)) {
 			/** 
 			 * Gets the possible value for the widget
@@ -831,22 +831,18 @@ PHP_METHOD(Phalcon_Forms_Element, clear)
  */
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
-	zval e;
+	zval e, *m;
 
 	if (FAILURE == phalcon_call_method(return_value, getThis(), "render", 0, NULL)) {
 		if (EG(exception)) {
 			ZVAL_OBJ(&e, EG(exception));
-
-			zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
-
-			Z_TRY_ADDREF_P(m);
+			m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
 			if (Z_TYPE_P(m) != IS_STRING) {
 				convert_to_string_ex(m);
 			}
 
 			zend_clear_exception();
 			zend_error(E_ERROR, "%s", Z_STRVAL_P(m));
-			zval_ptr_dtor(m);
 		}
 	}
 }

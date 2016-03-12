@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior, mustTakeAction){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior, getOptions){
 
-	zval *eventname = NULL, *options, event_options;
+	zval *eventname = NULL, *options, event_options = {};
 
 	phalcon_fetch_params(0, 0, 1, &eventname);
 	

@@ -87,11 +87,11 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Json){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 
-	zval *record, option , field_name, invalid, value, keys, assoc, json, *constant, ret, message, type, is_set_code, code;
+	zval *record, option  = {}, field_name = {}, invalid = {}, value = {}, keys = {}, assoc = {}, json = {}, *constant, ret = {}, message = {}, type = {}, is_set_code = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
-	PHALCON_STR(&option, "field");
+	ZVAL_STRING(&option, "field");
 
 	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", &option);
 	if (Z_TYPE(field_name) != IS_STRING) {
@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 	}
 
 	if (!PHALCON_IS_TRUE(&invalid)) {
-		PHALCON_STR(&option, "keys");
+		ZVAL_STRING(&option, "keys");
 
 		PHALCON_CALL_METHODW(&keys, getThis(), "getoption", &option);
 
@@ -134,19 +134,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Json, validate){
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_STR(&option, ISV(message));
+		ZVAL_STRING(&option, ISV(message));
 
 		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 		if (!zend_is_true(&message)) {
 			PHALCON_CONCAT_SVS(&message, "Value of field '", &field_name, "' must have a valid json format");
 		}
 
-		PHALCON_STR(&type, "Json");
+		ZVAL_STRING(&type, "Json");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_STR(&option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
 		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
 		if (zend_is_true(&is_set_code)) {

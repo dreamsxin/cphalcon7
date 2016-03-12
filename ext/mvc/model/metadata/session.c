@@ -80,9 +80,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Session){
  *
  * @param array $options
  */
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct){
-
-	zval *options = NULL, prefix;
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct)
+{
+	zval *options = NULL, prefix = {};
 
 	phalcon_fetch_params(0, 0, 1, &options);
 
@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
 
-	zval *key, *session, *prefix, prefix_key, r0, r1, meta_data;
+	zval *key, *session, *prefix, prefix_key = {}, r0 = {}, r1 = {}, meta_data = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, write){
 
-	zval *key, *data, *prefix, *_SESSION, prefix_key;
+	zval *key, *data, *prefix, *_SESSION, prefix_key = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, write){
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, reset)
 {
-	zval *prefix, *_SESSION, prefix_key;
+	zval *prefix, *_SESSION, prefix_key = {};
 
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));

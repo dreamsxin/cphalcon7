@@ -420,7 +420,7 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 			if (parser_status->ret) {
 				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
 				ZVAL_NULL(parser_status->ret);
-				zval_ptr_dtor(parser_status->ret);
+				PHALCON_PTR_DTOR(parser_status->ret);
 			} else {
 				array_init(*result);
 			}

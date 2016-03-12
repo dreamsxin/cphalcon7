@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 
-	zval *message, *type, *time, *context, formatter, initialized, applied_format, index;
+	zval *message, *type, *time, *context, formatter = {}, initialized = {}, applied_format = {}, index = {};
 	sapi_header_line h = { NULL, 0, 0 };
 	smart_str str      = { 0 };
 	int size, offset;

@@ -126,7 +126,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Memcache)
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, __construct){
 
-	zval *frontend, *opts = NULL, options;
+	zval *frontend, *opts = NULL, options = {};
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &opts);
 
@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, _connect)
 {
-	zval options, memcache, host, port, persistent, success;
+	zval options = {}, memcache = {}, host = {}, port = {}, persistent = {}, success = {};
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&options, getThis(), SL("_options"));
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, _connect)
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, get){
 
-	zval *key_name, *lifetime = NULL, memcache, frontend, prefix, prefixed_key, cached_content;
+	zval *key_name, *lifetime = NULL, memcache = {}, frontend = {}, prefix = {}, prefixed_key = {}, cached_content = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
@@ -243,8 +243,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, get){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, save){
 
-	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, last_key, prefix, cached_content, prepared_content, ttl, flags, success;
-	zval keys, is_buffering, frontend, memcache, options, special_key;
+	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, last_key = {}, prefix = {}, cached_content = {}, prepared_content = {}, ttl = {}, flags = {}, success = {};
+	zval keys = {}, is_buffering = {}, frontend = {}, memcache = {}, options = {}, special_key = {};
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, save){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, delete){
 
-	zval *key_name, memcache, prefix, prefixed_key, options, special_key, keys;
+	zval *key_name, memcache = {}, prefix = {}, prefixed_key = {}, options = {}, special_key = {}, keys = {};
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
@@ -388,7 +388,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, delete){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, queryKeys){
 
-	zval *prefix = NULL, memcache, options, special_key, keys;
+	zval *prefix = NULL, memcache = {}, options = {}, special_key = {}, keys = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -414,7 +414,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, queryKeys){
 	PHALCON_CALL_METHODW(&keys, &memcache, "get", &special_key);
 	if (Z_TYPE(keys) == IS_ARRAY) { 
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL(keys), idx, str_key) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -434,7 +434,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, queryKeys){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, exists){
 
-	zval *key_name = NULL, *lifetime = NULL, value, last_key, prefix, memcache;
+	zval *key_name = NULL, *lifetime = NULL, value = {}, last_key = {}, prefix = {}, memcache = {};
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
 
@@ -467,7 +467,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, exists){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, increment){
 
-	zval *key_name = NULL, *value = NULL, memcache;
+	zval *key_name = NULL, *value = NULL, memcache = {};
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &value);
 
@@ -499,7 +499,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, decrement){
 
-	zval *key_name = NULL, *value = NULL, memcache;
+	zval *key_name = NULL, *value = NULL, memcache = {};
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &value);
 
@@ -529,7 +529,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, decrement){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 
-	zval memcache, options, special_key, keys, param, all_slabs, *slabs, cachedump;
+	zval memcache = {}, options = {}, special_key = {}, keys = {}, param = {}, all_slabs = {}, *slabs, cachedump = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -550,7 +550,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 		PHALCON_CALL_METHODW(&keys, &memcache, "get", &special_key);
 		if (Z_TYPE(keys) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY(Z_ARRVAL(keys), idx, str_key) {
-				zval key;
+				zval key = {};
 				if (str_key) {
 					ZVAL_STR(&key, str_key);
 				} else {
@@ -563,7 +563,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 			PHALCON_CALL_METHODW(NULL, &memcache, "set", &special_key, &keys);
 		}
 	} else {
-		PHALCON_STR(&param, "slabs");
+		ZVAL_STRING(&param, "slabs");
 
 		PHALCON_CALL_METHODW(&all_slabs, &memcache, "getextendedstats", &param);
 
@@ -573,7 +573,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(all_slabs), slabs) {
 			ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(slabs), idx, str_key) {
-				zval slabid, *tmp_keys;
+				zval slabid = {}, *tmp_keys;
 				if (str_key) {
 					ZVAL_STR(&slabid, str_key);
 				} else {
@@ -588,7 +588,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 						ulong idx2;
 						if (Z_TYPE_P(tmp_keys) == IS_ARRAY) {
 							ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(tmp_keys), idx2, str_key2) {
-								zval key;
+								zval key = {};
 								if (str_key) {
 									ZVAL_STR(&key, str_key2);
 								} else {
@@ -608,7 +608,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, getTrackingKey)
 {
-	zval stats_key, options;
+	zval stats_key = {}, options = {};
 
 	phalcon_return_property(&options, getThis(), SL("_options"));
 

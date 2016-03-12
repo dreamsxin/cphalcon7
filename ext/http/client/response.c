@@ -89,7 +89,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Response){
 
 PHP_METHOD(Phalcon_Http_Client_Response, __construct){
 
-	zval *headers = NULL, *body = NULL, header;
+	zval *headers = NULL, *body = NULL, header = {};
 
 	phalcon_fetch_params(0, 0, 2, &headers, &body);
 

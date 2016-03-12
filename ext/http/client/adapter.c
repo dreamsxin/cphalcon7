@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUserAgent){
  */
 PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 
-	zval *username, *password, *_authtype = NULL, *digest = NULL, *entity_body = NULL, authtype;
+	zval *username, *password, *_authtype = NULL, *digest = NULL, *entity_body = NULL, authtype = {};
 
 	phalcon_fetch_params(0, 2, 3, &username, &password, &_authtype, &digest, &entity_body);
 
@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 	phalcon_update_property_this(getThis(), SL("_password"), password);
 
 	if (!_authtype) {
-		PHALCON_STR(&authtype, "any");
+		ZVAL_STRING(&authtype, "any");
 	} else {
 		PHALCON_CPY_WRT(&authtype, _authtype);
 	}
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFile){
  */
 PHP_METHOD(Phalcon_Http_Client_Adapter, setFiles){
 
-	zval *files, arr;
+	zval *files, arr = {};
 
 	phalcon_fetch_params(0, 1, 0, &files);
 
@@ -478,7 +478,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getUri){
  */
 PHP_METHOD(Phalcon_Http_Client_Adapter, setBaseUri){
 
-	zval *uri = NULL, base_uri;
+	zval *uri = NULL, base_uri = {};
 
 	phalcon_fetch_params(0, 0, 1, &uri);
 

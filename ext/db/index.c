@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Db_Index, getType){
  */
 PHP_METHOD(Phalcon_Db_Index, __set_state){
 
-	zval *data, index_name, columns;
+	zval *data, index_name = {}, columns = {};
 
 	phalcon_fetch_params(0, 1, 0, &data);
 

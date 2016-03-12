@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_DI_Service, getDefinition)
  */
 PHP_METHOD(Phalcon_DI_Service, resolve){
 
-	zval *parameters = NULL, *dependency_injector = NULL, name, shared, shared_instance, instance, definition, builder;
+	zval *parameters = NULL, *dependency_injector = NULL, name = {}, shared = {}, shared_instance = {}, instance = {}, definition = {}, builder = {};
 	int found;
 
 	phalcon_fetch_params(0, 0, 2, &parameters, &dependency_injector);
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
  */
 PHP_METHOD(Phalcon_DI_Service, setParameter){
 
-	zval *position, *parameter, definition, arguments;
+	zval *position, *parameter, definition = {}, arguments = {};
 
 	phalcon_fetch_params(0, 2, 0, &position, &parameter);
 	PHALCON_ENSURE_IS_LONG(position);
@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
  */
 PHP_METHOD(Phalcon_DI_Service, getParameter){
 
-	zval *position, definition, arguments;
+	zval *position, definition = {}, arguments = {};
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	PHALCON_ENSURE_IS_LONG(position);
@@ -360,7 +360,7 @@ PHP_METHOD(Phalcon_DI_Service, isResolved)
  */
 PHP_METHOD(Phalcon_DI_Service, __set_state){
 
-	zval *attributes, name, definition, shared;
+	zval *attributes, name = {}, definition = {}, shared = {};
 
 	phalcon_fetch_params(0, 1, 0, &attributes);
 

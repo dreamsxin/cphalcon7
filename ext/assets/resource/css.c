@@ -65,11 +65,11 @@ PHALCON_INIT_CLASS(Phalcon_Assets_Resource_Css){
  */
 PHP_METHOD(Phalcon_Assets_Resource_Css, __construct){
 
-	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, type;
+	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, type = {};
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
 
-	PHALCON_STR(&type, "css");
+	ZVAL_STRING(&type, "css");
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_assets_resource_css_ce, getThis(), "__construct", &type, path,
 		(local ? local : &PHALCON_GLOBAL(z_true)),

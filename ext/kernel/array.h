@@ -27,7 +27,7 @@
 #include "php_phalcon.h"
 #include "kernel/memory.h"
 
-zval* phalcon_array_return_fetch(const zval *arr, const zval *index);
+zval* phalcon_array_read_fetch(const zval *arr, const zval *index);
 
 /**
  * @brief Fetches @a index if it exists from the array @a arr

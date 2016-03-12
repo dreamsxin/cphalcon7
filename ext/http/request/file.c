@@ -122,7 +122,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Request_File){
  */
 PHP_METHOD(Phalcon_Http_Request_File, __construct){
 
-	zval *file, *key = NULL, name, temp_name, size, type, error, *constant, extension;
+	zval *file, *key = NULL, name = {}, temp_name = {}, size = {}, type = {}, error = {}, *constant, extension = {};
 
 	phalcon_fetch_params(0, 1, 1, &file, &key);
 	
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Http_Request_File, getType){
  */
 PHP_METHOD(Phalcon_Http_Request_File, getRealType){
 
-	zval *mime, *constant, finfo, *temp_file, ret;
+	zval *mime, *constant, finfo = {}, *temp_file, ret = {};
 
 	mime = phalcon_read_property(getThis(), SL("_real_type"), PH_NOISY);
 
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Http_Request_File, getKey){
  */
 PHP_METHOD(Phalcon_Http_Request_File, isUploadedFile) {
 
-	zval tmp_name;
+	zval tmp_name = {};
 
 	if (!SG(rfc1867_uploaded_files)) {
 		RETURN_FALSE;

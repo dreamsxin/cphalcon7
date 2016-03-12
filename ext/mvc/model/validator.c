@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 
-	zval *message, *field = NULL, *type = NULL, *code = NULL, t, model_message;
+	zval *message, *field = NULL, *type = NULL, *code = NULL, t = {}, model_message = {};
 	char *c;
 	int len;
 
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, getOptions){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator, getOption){
 
-	zval *option, *options, value;
+	zval *option, *options, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	

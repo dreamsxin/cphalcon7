@@ -65,7 +65,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Behavior_SoftDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 
-	zval *type, *model, options, value, field, actual_value, update_model, status, messages, *message;
+	zval *type, *model, options = {}, value = {}, field = {}, actual_value = {}, update_model = {}, status = {}, messages = {}, *message;
 
 	phalcon_fetch_params(0, 2, 0, &type, &model);
 	

@@ -87,7 +87,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Ini){
 
 static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *section, zval *directive, zval *value)
 {
-	zval t1, *tmp1 = &t1, t2, index;
+	zval t1 = {}, *tmp1 = &t1, t2 = {}, index = {};
 	int i, n;
 
 	assert(Z_TYPE_P(arr) == IS_ARRAY);
@@ -103,21 +103,23 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 	}
 
 	for (i = 0; i < n - 1; i++) {
-		phalcon_array_fetch_long(&index, directive, i, PH_NOISY);
+		zval index1 = {};
+		phalcon_array_fetch_long(&index1, directive, i, PH_NOISY);
 		if (!phalcon_array_isset_fetch(&t2, tmp1, &index)) {
-			phalcon_array_update_zval(tmp1, &index, &t2, PH_COPY);
+			array_init(&t2);
+			phalcon_array_update_zval(tmp1, &index1, &t2, PH_COPY);
 		} else if (Z_TYPE_P(&t2) != IS_ARRAY) {
 			convert_to_array_ex(&t2);
 		}
 
 		tmp1 = &t2;
-		zval_ptr_dtor(&index);
+		PHALCON_PTR_DTOR(&index1);
 	}
 
 	phalcon_array_fetch_long(&index, directive, n - 1, PH_NOISY);
 	phalcon_array_update_zval(&t1, &index, value, PH_COPY);
 	phalcon_array_update_zval(arr, section, &t1, PH_COPY);
-	zval_ptr_dtor(&index);
+	PHALCON_PTR_DTOR(&index);
 }
 
 /**
@@ -127,8 +129,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
  */
 PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 
-	zval *file_path, *absolute_path = NULL, config_dir_path, base_path;
-	zval ini_config, config, *directives;
+	zval *file_path, *absolute_path = NULL, config_dir_path = {}, base_path = {}, ini_config = {}, config = {}, *directives;
 	zend_string *str_key;
 	ulong idx;
 
@@ -163,7 +164,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	array_init(&config);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ini_config), idx, str_key, directives) {
-		zval section, *value;
+		zval section = {}, *value;
 		if (str_key) {
 			ZVAL_STR(&section, str_key);
 		} else {
@@ -174,7 +175,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 			phalcon_array_update_zval(&config, &section, directives, PH_COPY);
 		} else {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(directives), idx, str_key, value) {
-				zval key, directive_parts;
+				zval key = {}, directive_parts = {};
 				if (str_key) {
 					ZVAL_STR(&key, str_key);
 				} else {

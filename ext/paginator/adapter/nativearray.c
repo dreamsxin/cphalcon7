@@ -91,7 +91,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_NativeArray){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 
-	zval *config, limit, page, data;
+	zval *config, limit = {}, page = {}, data = {};
 
 	phalcon_fetch_params(0, 1, 0, &config);
 	
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 
-	zval *items, *limit, *number_page, start, lim, slice;
+	zval *items, *limit, *number_page, start = {}, lim = {}, slice = {};
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 	ldiv_t tp;

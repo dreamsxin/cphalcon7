@@ -79,7 +79,7 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Json){
  */
 PHP_METHOD(Phalcon_Config_Adapter_Json, read){
 
-	zval *file_path, *absolute_path = NULL, config_dir_path, base_path, contents, config;
+	zval *file_path, *absolute_path = NULL, config_dir_path = {}, base_path = {}, contents = {}, config = {};
 
 	phalcon_fetch_params(0, 1, 1, &file_path, &absolute_path);
 	PHALCON_ENSURE_IS_STRING(file_path);

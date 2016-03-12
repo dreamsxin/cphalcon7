@@ -27,8 +27,7 @@
 
 static inline void phalcon_forms_element_render_helper(const char *method, int use_checked, INTERNAL_FUNCTION_PARAMETERS)
 {
-	zval *attributes = NULL, widget_attributes, *uc;
-	zval *params[1];
+	zval *attributes = NULL, widget_attributes, *uc, *params[1];
 
 	phalcon_fetch_params(0, 0, 1, &attributes);
 
@@ -44,8 +43,6 @@ static inline void phalcon_forms_element_render_helper(const char *method, int u
 	if (FAILURE == phalcon_call_ce(return_value, phalcon_tag_ce, method, 1, params)) {
 		;
 	}
-
-	zval_ptr_dtor(&widget_attributes);
 }
 
 #endif /* PHALCON_FORMS_ELEMENT_HELPERS_H */

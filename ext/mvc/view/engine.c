@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, getView){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
 
-	zval *name, *method_callable, class_name, method;
+	zval *name, *method_callable, class_name = {}, method = {};
 
 	phalcon_fetch_params(0, 2, 0, &name, &method_callable);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
-	zval *method, *args = NULL, method_name, arguments, *methods, func, exception_message, service_name, service, callback;
+	zval *method, *args = NULL, method_name = {}, arguments = {}, *methods, func = {}, exception_message = {}, service_name = {}, service = {}, callback = {};
 
 	phalcon_fetch_params(0, 1, 1, &method, &arguments);
 
@@ -202,12 +202,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		|| phalcon_compare_strict_string(&method_name, SL("getPut"))
 		|| phalcon_compare_strict_string(&method_name, SL("getQuery"))
 		|| phalcon_compare_strict_string(&method_name, SL("getServer"))) {
-		PHALCON_STR(&service_name, ISV(request));
+		ZVAL_STRING(&service_name, ISV(request));
 	} else if (phalcon_compare_strict_string(&method_name, SL("getSession"))) {
-		PHALCON_STR(&method_name, "get");
-		PHALCON_STR(&service_name, ISV(session));
+		ZVAL_STRING(&method_name, "get");
+		ZVAL_STRING(&service_name, ISV(session));
 	} else if (phalcon_compare_strict_string(&method_name, SL("getParam"))) {
-		PHALCON_STR(&service_name, ISV(dispatcher));
+		ZVAL_STRING(&service_name, ISV(dispatcher));
 	}
 
 	PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name);

@@ -88,8 +88,7 @@ PHP_METHOD(Phalcon_Logger_Formatter, getTypeString){
  */
 PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 {
-	zval *message, *context;
-	zval replace, *val;
+	zval *message, *context, replace = {}, *val;
 	zend_string *str_key;
 	ulong idx;
 
@@ -99,16 +98,16 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 		array_init(&replace);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(context), idx, str_key, val) {
-			zval index;
+			zval index = {};
 			char *tmp;
 			uint str_length;
 
 			if (str_key) {;
 				str_length = spprintf(&tmp, 0, "{%s}", str_key->val);
-				PHALCON_STRL(&index, tmp, str_length);
+				ZVAL_STRINGL(&index, tmp, str_length);
 			} else {
 				str_length = spprintf(&tmp, 0, "{%ld}", idx);
-				PHALCON_STRL(&index, tmp, str_length);
+				ZVAL_STRINGL(&index, tmp, str_length);
 			}
 
 			Z_TRY_ADDREF_P(val);

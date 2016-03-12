@@ -121,7 +121,7 @@ int phalcon_hash_update_or_insert(HashTable *ht, const zval *key, zval *value)
  */
 zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 {
-	zval *ret = NULL, value;
+	zval *ret = NULL, value = {};
 
 	switch (Z_TYPE_P(key)) {
 		case IS_RESOURCE:

@@ -86,7 +86,7 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_Stream){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 
-	zval *name, *options = NULL, mode, stream;
+	zval *name, *options = NULL, mode = {}, stream = {};
 
 	phalcon_fetch_params(0, 1, 1, &name, &options);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 			return;
 		}
 	} else {
-		PHALCON_STR(&mode, "ab");
+		ZVAL_STRING(&mode, "ab");
 	}
 
 	/** 
@@ -120,9 +120,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
  *
  * @return Phalcon\Logger\Formatter\Line
  */
-PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter){
-
-	zval formatter;
+PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter)
+{
+	zval formatter = {};
 
 	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
 	if (Z_TYPE(formatter) != IS_OBJECT) {
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
 
-	zval *message, *type, *time, *context, *stream, formatter, applied_format;
+	zval *message, *type, *time, *context, *stream, formatter = {}, applied_format = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 

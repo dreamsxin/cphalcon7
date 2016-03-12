@@ -47,7 +47,7 @@ int phalcon_has_constructor_ce(const zend_class_entry *ce)
 
 int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 {
-	zval ret, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;
+	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;
 	int param_count = 0, i, status;
 
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
@@ -61,7 +61,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 		arguments = (zval*)emalloc(sizeof(zval) * param_count);
 		i = 0;
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
-			PHALCON_CPY_WRT(&arguments[i], param);
+			PHALCON_CPY_WRT_CTOR(&arguments[i], param);
 			i++;
 		} ZEND_HASH_FOREACH_END();
 	} else {
@@ -71,21 +71,25 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 
 	if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
 		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
 	}
 
 	i = 0;
 	while(i < param_count) {
-		zval_ptr_dtor(&arguments[i]);
+		PHALCON_PTR_DTOR(&arguments[i]);
 		i++;
 	}
 	efree(arguments);
+	if (retval == NULL) {
+		PHALCON_PTR_DTOR(retval_ptr);
+	}
 
 	return status;
 }
 
 int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry *ce, phalcon_call_type type, const char *method_name, uint method_len, uint param_count, zval *params[])
 {
-	zval func_name, ret, *retval_ptr = (retval != NULL) ? retval : &ret;
+	zval func_name = {}, ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret;
 	zend_execute_data *execute_data  = EG(current_execute_data);
 	zval *arguments;
 	HashTable *function_table;
@@ -103,10 +107,8 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 			}
 		}
 
-		array_init(&func_name);
+		array_init_size(&func_name, 2);
 		switch (type) {
-			case phalcon_fcall_function:
-				break;
 			case phalcon_fcall_parent:
 				add_next_index_string(&func_name, ISV(parent));
 				break;
@@ -132,7 +134,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				break;
 		}
 
-		add_next_index_string(&func_name, method_name);
+		add_next_index_stringl(&func_name, method_name, method_len);
 
 		if (!ce && object) {
 			ce = Z_OBJCE_P(object);
@@ -140,7 +142,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 		function_table = ce ? &ce->function_table : EG(function_table);
 	} else {
-		PHALCON_STRL(&func_name, method_name, method_len);
+		ZVAL_STRINGL(&func_name, method_name, method_len);
 		function_table = EG(function_table);
 	}
 
@@ -148,12 +150,13 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 	i = 0;
 	while(i < param_count) {
-		PHALCON_CPY_WRT(&arguments[i], params[i]);
+		PHALCON_CPY_WRT_CTOR(&arguments[i], params[i]);
 		i++;
 	}
 
 	if ((status = call_user_function_ex(function_table, object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
 		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
 		if (!EG(exception)) {
 			switch (type) {
 				case phalcon_fcall_function:
@@ -180,13 +183,16 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		}
 	}
 
-	zval_ptr_dtor(&func_name);
+	PHALCON_PTR_DTOR(&func_name);
 	i = 0;
 	while(i < param_count) {
-		zval_ptr_dtor(&arguments[i]);
+		PHALCON_PTR_DTOR(&arguments[i]);
 		i++;
 	}
 	efree(arguments);
+	if (retval == NULL) {
+		PHALCON_PTR_DTOR(retval_ptr);
+	}
 
 	return status;
 }

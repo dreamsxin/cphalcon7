@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, key){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 
-	zval *type, *result, *active_row, *rows, r;
+	zval *type, *result, *active_row, *rows, r = {};
 
 	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
 	if (zend_is_true(type)) {
@@ -212,7 +212,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 				}
 
 				phalcon_update_property_this(getThis(), SL("_rows"), &r);
-				zval_ptr_dtor(&r);
 			}
 		}
 		else if (Z_TYPE_P(rows) == IS_ARRAY) {
@@ -230,7 +229,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 
-	zval *type, *result, rows, *position, *pointer, is_different;
+	zval *type, *result, rows = {}, *position, *pointer, is_different = {};
 	HashTable *ah0;
 	long i;
 
@@ -299,7 +298,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 
-	zval count, *type, *result, number_rows, rows;
+	zval count = {}, *type, *result, number_rows = {}, rows = {};
 
 	phalcon_return_property(&count, getThis(), SL("_count"));
 
@@ -350,7 +349,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetExists){
 
-	zval *index, count;
+	zval *index, count = {};
 
 	phalcon_fetch_params(0, 1, 0, &index);
 
@@ -366,7 +365,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetExists){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetGet){
 
-	zval *index, count, *pointer, valid;
+	zval *index, count = {}, *pointer, valid = {};
 
 	phalcon_fetch_params(0, 1, 0, &index);
 
@@ -448,7 +447,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, getType){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, getFirst){
 
-	zval *pointer, valid;
+	zval *pointer, valid = {};
 
 	/** 
 	 * Check if the last record returned is the current requested
@@ -480,7 +479,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, getFirst){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, getLast){
 
-	zval count, pre_count, valid;
+	zval count = {}, pre_count = {}, valid = {};
 
 	PHALCON_CALL_METHODW(&count, getThis(), "count");
 
@@ -591,7 +590,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, getMessages){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 
-	zval *condition_callback = NULL, transaction, connection;
+	zval *condition_callback = NULL, transaction = {}, connection = {};
 
 	phalcon_fetch_params(0, 0, 1, &condition_callback);
 
@@ -603,7 +602,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 	PHALCON_CALL_METHODW(NULL, getThis(), "rewind");
 
 	while (1) {
-		zval r0, record, parameters, status, messages;
+		zval r0 = {}, record = {}, parameters = {}, status = {}, messages = {};
 
 		PHALCON_CALL_METHODW(&r0, getThis(), "valid");
 		if (zend_is_true(&r0)) {
@@ -690,7 +689,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
 
-	zval *filter, records;
+	zval *filter, records = {};
 
 	phalcon_fetch_params(0, 1, 0, &filter);
 
@@ -699,9 +698,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
 	array_init(&records);
 
 	while (1) {
-		zval r0, record, parameters, processed_record;
+		zval r0 = {}, record = {}, parameters = {}, processed_record = {};
 
-		PHALCON_CALL_METHOD(&r0, getThis(), "valid");
+		PHALCON_CALL_METHODW(&r0, getThis(), "valid");
 		if (!zend_is_true(&r0)) {
 			break;
 		}
@@ -738,7 +737,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 
-	zval *data, *condition_callback = NULL, transaction, connection;
+	zval *data, *condition_callback = NULL, transaction = {}, connection = {};
 	
 	phalcon_fetch_params(0, 1, 1, &data, &condition_callback);
 
@@ -750,7 +749,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 	PHALCON_CALL_METHODW(NULL, getThis(), "rewind");
 
 	while (1) {
-		zval r0, record, parameters, status, messages;
+		zval r0 = {}, record = {}, parameters = {}, status = {}, messages = {};
 
 		PHALCON_CALL_METHODW(&r0, getThis(), "valid");
 		if (!zend_is_true(&r0)) {
@@ -801,7 +800,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			/** 
 			 * Rollback the transaction
 			 */
-			PHALCON_CALL_METHOD(NULL, &connection, "rollback");
+			PHALCON_CALL_METHODW(NULL, &connection, "rollback");
 
 			ZVAL_FALSE(&transaction);
 			break;

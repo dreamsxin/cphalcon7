@@ -93,7 +93,7 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_File){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 
-	zval *name, *options = NULL, mode, handler;
+	zval *name, *options = NULL, mode = {}, handler = {};
 
 	phalcon_fetch_params(0, 1, 1, &name, &options);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -108,7 +108,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 			return;
 		}
 	} else {
-		PHALCON_STR(&mode, "ab");
+		ZVAL_STRING(&mode, "ab");
 	}
 
 	/** 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
 
-	zval formatter;
+	zval formatter = {};
 
 	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
 	if (Z_TYPE(formatter) != IS_OBJECT) {
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_File, logInternal){
 
-	zval *message, *type, *time, *context, *file_handler, formatter, applied_format;
+	zval *message, *type, *time, *context, *file_handler, formatter = {}, applied_format = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getPath) {
  */
 PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 
-	zval *path, *options, mode, file_handler;
+	zval *path, *options, mode = {}, file_handler = {};
 
 	path = phalcon_read_property(getThis(), SL("_path"), PH_NOISY);
 	if (Z_TYPE_P(path) != IS_STRING) {
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 			return;
 		}
 	} else {
-		PHALCON_STR(&mode, "ab");
+		ZVAL_STRING(&mode, "ab");
 	}
 
 	/**

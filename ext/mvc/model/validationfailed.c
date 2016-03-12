@@ -72,7 +72,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_ValidationFailed){
  */
 PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 
-	zval *model, *validation_messages, message, message_str;
+	zval *model, *validation_messages, message = {}, message_str = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &validation_messages);
 
@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 		 */
 		PHALCON_CALL_METHODW(&message_str, &message, "getmessage");
 	} else {
-		PHALCON_STR(&message_str, "Validation failed");
+		ZVAL_STRING(&message_str, "Validation failed");
 	}
 
 	phalcon_update_property_this(getThis(), SL("_model"), model);

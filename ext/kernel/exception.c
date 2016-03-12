@@ -40,7 +40,7 @@ void phalcon_throw_exception(zval *object){
  */
 void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line)
 {
-	zval curline, exception;
+	zval curline = {}, exception = {};
 	zend_class_entry *default_exception_ce;
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
@@ -73,14 +73,14 @@ void phalcon_throw_exception_string(zend_class_entry *ce, const char *message){
 /**
  * Throws an exception with a single string parameter + debug info
  */
-void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *message, uint32_t message_len, const char *file, uint32_t line) {
-
-	zval object, msg;
+void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *message, uint32_t message_len, const char *file, uint32_t line)
+{
+	zval object = {}, msg = {};
 	zend_class_entry *default_exception_ce;
 
 	object_init_ex(&object, ce);
 
-	PHALCON_STRL(&msg, message, message_len);
+	ZVAL_STRINGL(&msg, message, message_len);
 
 	PHALCON_CALL_METHODW(NULL, &object, "__construct", &PHALCON_GLOBAL(z_null), &msg);
 
@@ -100,8 +100,7 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
  */
 void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message){
 
-	zval object;
-
+	zval object = {};
 	object_init_ex(&object, ce);
 
 	PHALCON_CALL_METHODW(NULL, &object, "__construct", message);
@@ -113,7 +112,7 @@ void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message){
  */
 void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, const char *file, uint32_t line){
 
-	zval object;
+	zval object = {};
 	zend_class_entry *default_exception_ce;
 
 	object_init_ex(&object, ce);
@@ -134,7 +133,7 @@ void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, con
  */
 void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ...) {
 
-	zval object, msg;
+	zval object = {}, msg = {};
 	int len;
 	char *buffer;
 	va_list args;
@@ -145,7 +144,7 @@ void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ..
 	len = vspprintf(&buffer, 0, format, args);
 	va_end(args);
 
-	PHALCON_STRL(&msg, buffer, len);
+	ZVAL_STRINGL(&msg, buffer, len);
 
 	PHALCON_CALL_METHODW(NULL, &object, "__construct", &msg);
 

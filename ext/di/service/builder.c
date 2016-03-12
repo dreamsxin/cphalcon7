@@ -69,7 +69,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_Service_Builder){
  */
 PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
 
-	zval *dependency_injector, *position, *argument, exception_message, type, name, value, instance_arguments;
+	zval *dependency_injector, *position, *argument, exception_message = {}, type = {}, name = {}, value = {}, instance_arguments = {};
 
 	phalcon_fetch_params(0, 3, 0, &dependency_injector, &position, &argument);
 
@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
  */
 PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters){
 
-	zval *dependency_injector, *arguments, build_arguments, *argument;
+	zval *dependency_injector, *arguments, build_arguments = {}, *argument;
 	zend_string *str_key;
 	ulong idx;
 
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters){
 	array_init(&build_arguments);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(arguments), idx, str_key, argument) {
-		zval position, value;
+		zval position = {}, value = {};
 		if (str_key) {
 			ZVAL_STR(&position, str_key);
 		} else {
@@ -207,8 +207,8 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters){
  */
 PHP_METHOD(Phalcon_DI_Service_Builder, build){
 
-	zval *dependency_injector, *definition, *parameters = NULL, class_name, instance, arguments, build_arguments;
-	zval param_calls, *method, exception_message, *property;
+	zval *dependency_injector, *definition, *parameters = NULL, class_name = {}, instance = {}, arguments = {}, build_arguments = {};
+	zval param_calls = {}, *method, exception_message = {}, *property;
 	zend_string *str_key;
 	ulong idx;
 
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 		 * The method call has parameters
 		 */
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(param_calls), idx, str_key, method) {
-			zval method_position, method_name, method_call, method_args, build_arguments, status;
+			zval method_position = {}, method_name = {}, method_call = {}, method_args = {}, build_arguments = {}, status = {};
 			if (str_key) {
 				ZVAL_STR(&method_position, str_key);
 			} else {
@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, build){
 		 * The method call has parameters
 		 */
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(param_calls), idx, str_key, property) {
-			zval property_position, property_name, property_value, value;
+			zval property_position = {}, property_name = {}, property_value = {}, value = {};
 			if (str_key) {
 				ZVAL_STR(&property_position, str_key);
 			} else {

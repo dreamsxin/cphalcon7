@@ -27,6 +27,7 @@
 #include "kernel/string.h"
 #include "kernel/fcall.h"
 #include "kernel/array.h"
+#include "kernel/operators.h"
 
 /**
  * Phalcon\Config\Adapter
@@ -96,27 +97,30 @@ PHP_METHOD(Phalcon_Config_Adapter, __construct){
  */
 PHP_METHOD(Phalcon_Config_Adapter, factory){
 
-	zval *file_path = NULL, *absolute_path = NULL, *instances, class_name;
+	zval *file_path = NULL, *absolute_path = NULL, *instances, class_name = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 0, 2, &file_path, &absolute_path);
 
-	instances = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));
-	if (!phalcon_array_isset_fetch(return_value, instances, file_path)) {
-		phalcon_get_called_class(&class_name);
-		ce0 = phalcon_fetch_class(&class_name);
+	phalcon_get_called_class(&class_name);
+	ce0 = phalcon_fetch_class(&class_name);
 
+	if (!file_path || PHALCON_IS_EMPTY(file_path)) {
+		object_init_ex(return_value, ce0);
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+	} else {
+		instances = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));		
+
+		if (phalcon_array_isset_fetch(return_value, instances, file_path)) {
+			return;
+		}
 		object_init_ex(return_value, ce0);
 
-		if (file_path) {
-			if (absolute_path == NULL) {
-				absolute_path = &PHALCON_GLOBAL(z_false);
-			}
-
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", file_path, absolute_path);
-		} else {
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+		if (absolute_path == NULL) {
+			absolute_path = &PHALCON_GLOBAL(z_false);
 		}
+
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct", file_path, absolute_path);
 
 		phalcon_update_static_property_array_multi_ce(phalcon_config_adapter_ce, SL("_instances"), return_value, SL("z"), 1, file_path);
 	}
@@ -160,7 +164,7 @@ PHP_METHOD(Phalcon_Config_Adapter, getBasePath){
  */
 PHP_METHOD(Phalcon_Config_Adapter, load){
 
-	zval *file_path = NULL, *absolute_path = NULL, class_name;
+	zval *file_path = NULL, *absolute_path = NULL, class_name = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 0, 2, &file_path, &absolute_path);

@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Message, __toString){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Message, __set_state){
 
-	zval *message, message_text, field, type, code;
+	zval *message, message_text = {}, field = {}, type = {}, code = {};
 
 	phalcon_fetch_params(0, 1, 0, &message);
 

@@ -196,7 +196,7 @@ PHALCON_INIT_CLASS(Phalcon_Date){
  */
 PHP_METHOD(Phalcon_Date, offset){
 
-	zval *remote, *local = NULL, *date = NULL, new_date, format, zone_remote, time_remote, zone_local, time_local, offset_remote, offset_local;
+	zval *remote, *local = NULL, *date = NULL, new_date = {}, format = {}, zone_remote = {}, time_remote = {}, zone_local = {}, time_local = {}, offset_remote = {}, offset_local = {};
 	zend_class_entry *ce0, *ce1;
 
 	phalcon_fetch_params(0, 1, 2, &remote, &local, &date);
@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Date, offset){
 	ce1 = zend_fetch_class(SSL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
 
 	if (!date) {
-		PHALCON_STR(&new_date, "now");
+		ZVAL_STRING(&new_date, "now");
 	} else if (Z_TYPE_P(date) == IS_LONG) {
 		phalcon_get_class_constant(&format, ce0, SL("RFC2822"));
 
@@ -296,7 +296,7 @@ PHP_METHOD(Phalcon_Date, seconds){
  */
 PHP_METHOD(Phalcon_Date, minutes){
 
-	zval *step = NULL, s;
+	zval *step = NULL, s = {};
 
 	phalcon_fetch_params(0, 0, 1, &step);
 
@@ -373,9 +373,9 @@ PHP_METHOD(Phalcon_Date, ampm){
 	phalcon_fetch_params(0, 1, 0, &hour);
 
 	if (phalcon_get_intval(hour) > 11) {
-		PHALCON_STR(return_value, "PM");
+		ZVAL_STRING(return_value, "PM");
 	} else {
-		PHALCON_STR(return_value, "AM");
+		ZVAL_STRING(return_value, "AM");
 	}
 }
 
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Date, ampm){
  */
 PHP_METHOD(Phalcon_Date, adjust){	
 
-	zval *hour, *ampm, lower_ampm;
+	zval *hour, *ampm, lower_ampm = {};
 	char buf[2];
 	int h;
 
@@ -411,7 +411,7 @@ PHP_METHOD(Phalcon_Date, adjust){
 
 	sprintf(buf, "%02d", h);
 
-	PHALCON_STR(return_value, buf);
+	ZVAL_STRING(return_value, buf);
 }
 
 /**
@@ -426,7 +426,7 @@ PHP_METHOD(Phalcon_Date, adjust){
  */
 PHP_METHOD(Phalcon_Date, days){
 
-	zval *month, *year = NULL, year2, months, year_months, format, total, tmp, tmp1, tmp2;
+	zval *month, *year = NULL, year2 = {}, months = {}, year_months = {}, format = {}, total = {}, tmp = {}, tmp1 = {}, tmp2 = {};
 	char buf[2];
 	int y, m, i, t;
 
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Date, days){
 	m = phalcon_get_intval(month);
 
 	if (!year || PHALCON_IS_FALSE(year)) {
-		PHALCON_STR(&tmp, "Y");
+		ZVAL_STRING(&tmp, "Y");
 
 		PHALCON_CALL_FUNCTIONW(&year2, "date", &tmp);
 
@@ -461,7 +461,7 @@ PHP_METHOD(Phalcon_Date, days){
 
 	PHALCON_CALL_FUNCTIONW(&tmp, "mktime", &tmp1, &tmp2, &tmp2, month, &tmp1, &year2);	
 
-	PHALCON_STR(&format, "t");
+	ZVAL_STRING(&format, "t");
 
 	PHALCON_CALL_FUNCTIONW(&total, "date", &format, &tmp);
 
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Date, days){
  */
 PHP_METHOD(Phalcon_Date, months){
 
-	zval *format = NULL, tmp1, tmp2;
+	zval *format = NULL, tmp1 = {}, tmp2 = {};
 	int i;
 
 	phalcon_fetch_params(0, 0, 1, &format);
@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Date, months){
 		ZVAL_LONG(&tmp2, 1);
 
 		for (i = 1; i <= 12; ++i) {
-			zval tmp3, time, strftime;
+			zval tmp3 = {}, time = {}, strftime = {};
 			ZVAL_LONG(&tmp3, i);
 
 			PHALCON_CALL_FUNCTIONW(&time, "mktime", &tmp1, &tmp1, &tmp1, &tmp3, &tmp2);
@@ -546,13 +546,13 @@ PHP_METHOD(Phalcon_Date, months){
  */
 PHP_METHOD(Phalcon_Date, years){
 
-	zval *start = NULL, *end = NULL, year, tmp;
+	zval *start = NULL, *end = NULL, year = {}, tmp = {};
 	int i, s, e;
 
 	phalcon_fetch_params(0, 0, 2, &start, &end);
 
 	if (!start || PHALCON_IS_FALSE(start)) {
-		PHALCON_STR(&tmp, "Y");
+		ZVAL_STRING(&tmp, "Y");
 
 		PHALCON_CALL_FUNCTIONW(&year, "date", &tmp);
 
@@ -562,7 +562,7 @@ PHP_METHOD(Phalcon_Date, years){
 	}
 
 	if (!end || PHALCON_IS_FALSE(end)) {
-		PHALCON_STR(&tmp, "Y");
+		ZVAL_STRING(&tmp, "Y");
 
 		PHALCON_CALL_FUNCTIONW(&year, "date", &tmp);
 
@@ -593,14 +593,14 @@ PHP_METHOD(Phalcon_Date, years){
  */
 PHP_METHOD(Phalcon_Date, span){
 
-	zval *remote, *local = NULL, *output = NULL, lowercased_output, pattern, output_arr, count_output, tmp, tmp1;
+	zval *remote, *local = NULL, *output = NULL, lowercased_output = {}, pattern = {}, output_arr = {}, count_output = {}, tmp = {}, tmp1 = {};
 	long remote_time, local_time, timespan;
 	int i;
 
 	phalcon_fetch_params(0, 1, 2, &remote, &local, &output);
 
 	if (!output) {
-		PHALCON_STR(&lowercased_output, "years,months,weeks,days,hours,minutes,seconds");
+		ZVAL_STRING(&lowercased_output, "years,months,weeks,days,hours,minutes,seconds");
 	} else {
 		ZVAL_STR(&tmp, phalcon_trim(output, NULL, PHALCON_TRIM_BOTH));
 
@@ -611,7 +611,7 @@ PHP_METHOD(Phalcon_Date, span){
 		}
 	}
 
-	PHALCON_STR(&pattern, "/[^a-z]+/");
+	ZVAL_STRING(&pattern, "/[^a-z]+/");
 
 	PHALCON_CALL_FUNCTIONW(&output_arr, "preg_split", &pattern, &lowercased_output);
 
@@ -700,15 +700,14 @@ PHP_METHOD(Phalcon_Date, span){
  */
 PHP_METHOD(Phalcon_Date, span2){
 
-	zval *time, *output = NULL;
-	zval lower_output, pattern, output_arr, count_output, tmp, tmp1;
+	zval *time, *output = NULL, lower_output = {}, pattern = {}, output_arr = {}, count_output = {}, tmp = {}, tmp1 = {};
 	long timespan;
 	int i;
 
 	phalcon_fetch_params(0, 1, 1, &time, &output);
 
 	if (!output) {
-		PHALCON_STR(&lower_output, "years,months,weeks,days,hours,minutes,seconds");
+		ZVAL_STRING(&lower_output, "years,months,weeks,days,hours,minutes,seconds");
 	} else {
 		ZVAL_STR(&tmp, phalcon_trim(output, NULL, PHALCON_TRIM_BOTH));
 
@@ -719,7 +718,7 @@ PHP_METHOD(Phalcon_Date, span2){
 		}
 	}
 
-	PHALCON_STR(&pattern, "/[^a-z]+/");
+	ZVAL_STRING(&pattern, "/[^a-z]+/");
 
 	PHALCON_CALL_FUNCTIONW(&output_arr, "preg_split", &pattern, &lower_output);
 
@@ -806,7 +805,7 @@ PHP_METHOD(Phalcon_Date, span2){
  */
 PHP_METHOD(Phalcon_Date, fuzzy_span)
 {
-	zval *timestamp, *local_timestamp = NULL, span;
+	zval *timestamp, *local_timestamp = NULL, span = {};
 	long now_time, local_time, offset;
 
 	phalcon_fetch_params(0, 1, 1, &timestamp, &local_timestamp);
@@ -826,45 +825,45 @@ PHP_METHOD(Phalcon_Date, fuzzy_span)
 	}
 
 	if (offset <= PHALCON_DATE_MINUTE) {
-		PHALCON_STR(&span, "moments");
+		ZVAL_STRING(&span, "moments");
 	} else if (offset < (PHALCON_DATE_MINUTE * 20)) {
-		PHALCON_STR(&span, "a few minutes");
+		ZVAL_STRING(&span, "a few minutes");
 	} else if (offset <  PHALCON_DATE_HOUR) {
-		PHALCON_STR(&span, "less than an hour");
+		ZVAL_STRING(&span, "less than an hour");
 	} else if (offset < (PHALCON_DATE_HOUR * 4)) {
-		PHALCON_STR(&span, "a couple of hours");
+		ZVAL_STRING(&span, "a couple of hours");
 	} else if (offset < PHALCON_DATE_DAY) {
-		PHALCON_STR(&span, "less than a day");
+		ZVAL_STRING(&span, "less than a day");
 	} else if (offset < (PHALCON_DATE_DAY * 2)) {
-		PHALCON_STR(&span, "about a day");
+		ZVAL_STRING(&span, "about a day");
 	} else if (offset < (PHALCON_DATE_DAY * 4)) {
-		PHALCON_STR(&span, "a couple of days");
+		ZVAL_STRING(&span, "a couple of days");
 	} else if (offset < PHALCON_DATE_WEEK) {
-		PHALCON_STR(&span, "less than a week");
+		ZVAL_STRING(&span, "less than a week");
 	} else if (offset < (PHALCON_DATE_WEEK * 2)) {
-		PHALCON_STR(&span, "about a week");
+		ZVAL_STRING(&span, "about a week");
 	} else if (offset < PHALCON_DATE_MONTH) {
-		PHALCON_STR(&span, "less than a month");
+		ZVAL_STRING(&span, "less than a month");
 	} else if (offset < (PHALCON_DATE_MONTH * 2)) {
-		PHALCON_STR(&span, "about a month");
+		ZVAL_STRING(&span, "about a month");
 	} else if (offset < (PHALCON_DATE_MONTH * 4)) {
-		PHALCON_STR(&span, "a couple of months");
+		ZVAL_STRING(&span, "a couple of months");
 	} else if (offset < PHALCON_DATE_YEAR) {
-		PHALCON_STR(&span, "less than a year");
+		ZVAL_STRING(&span, "less than a year");
 	} else if (offset < (PHALCON_DATE_YEAR * 2)) {
-		PHALCON_STR(&span, "about a year");
+		ZVAL_STRING(&span, "about a year");
 	} else if (offset < (PHALCON_DATE_YEAR * 4)) {
-		PHALCON_STR(&span, "a couple of years");
+		ZVAL_STRING(&span, "a couple of years");
 	} else if (offset < (PHALCON_DATE_YEAR * 8)) {
-		PHALCON_STR(&span, "a few years");
+		ZVAL_STRING(&span, "a few years");
 	} else if (offset < (PHALCON_DATE_YEAR * 12)) {
-		PHALCON_STR(&span, "about a decade");
+		ZVAL_STRING(&span, "about a decade");
 	} else if (offset < (PHALCON_DATE_YEAR * 24)) {
-		PHALCON_STR(&span, "a couple of decades");
+		ZVAL_STRING(&span, "a couple of decades");
 	} else if (offset < (PHALCON_DATE_YEAR * 64)) {
-		PHALCON_STR(&span, "several decades");
+		ZVAL_STRING(&span, "several decades");
 	} else {
-		PHALCON_STR(&span, "a long time");
+		ZVAL_STRING(&span, "a long time");
 	}
 
 	if (now_time <= local_time) {
@@ -893,7 +892,7 @@ PHP_METHOD(Phalcon_Date, fuzzy_span)
  */
 PHP_METHOD(Phalcon_Date, fuzzy_span2)
 {
-	zval *timestamp, *lables = NULL, output, label, span;
+	zval *timestamp, *lables = NULL, output = {}, label = {}, span = {};
 	long offset, hours, minutes, seconds;
 
 	phalcon_fetch_params(0, 1, 1, &timestamp, &lables);
@@ -952,7 +951,7 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2)
  */
 PHP_METHOD(Phalcon_Date, unix2dos){
 
-	zval *timestamp = NULL, day, year, mon, mday, hours, minutes, seconds;
+	zval *timestamp = NULL, day = {}, year = {}, mon = {}, mday = {}, hours = {}, minutes = {}, seconds = {};
 	int y, m, d, h, min, sec;
 
 	phalcon_fetch_params(0, 0, 1, &timestamp);
@@ -996,7 +995,7 @@ PHP_METHOD(Phalcon_Date, unix2dos){
  */
 PHP_METHOD(Phalcon_Date, dos2unix){
 
-	zval *timestamp = NULL, hrs, min, sec, mon, day, year;
+	zval *timestamp = NULL, hrs = {}, min = {}, sec = {}, mon = {}, day = {}, year = {};
 	long t = 0;
 
 	phalcon_fetch_params(0, 0, 1, &timestamp);
@@ -1027,13 +1026,13 @@ PHP_METHOD(Phalcon_Date, dos2unix){
  */
 PHP_METHOD(Phalcon_Date, formatted_time){
 
-	zval *datetime = NULL, *format = NULL, *zone = NULL, datetime_str, timestamp_format, timezone, tz, dt, tmp, tmp1;
+	zval *datetime = NULL, *format = NULL, *zone = NULL, datetime_str = {}, timestamp_format = {}, timezone = {}, tz = {}, dt = {}, tmp = {}, tmp1 = {};
 	zend_class_entry *ce0, *ce1;
 
 	phalcon_fetch_params(0, 0, 3, &datetime, &format, &zone);
 
 	if (!datetime) {
-		PHALCON_STR(&datetime_str, "now");
+		ZVAL_STRING(&datetime_str, "now");
 	} else {
 		PHALCON_CPY_WRT(&datetime_str, datetime);
 	}
@@ -1082,12 +1081,12 @@ PHP_METHOD(Phalcon_Date, formatted_time){
  */
 PHP_METHOD(Phalcon_Date, valid){
 
-	zval *date = NULL, *format = NULL, date_format, time, format_date;
+	zval *date = NULL, *format = NULL, date_format = {}, time = {}, format_date = {};
 
 	phalcon_fetch_params(0, 1, 1, &date, &format);
 
 	if (!format) {
-		PHALCON_STR(&date_format, "Y-m-d");
+		ZVAL_STRING(&date_format, "Y-m-d");
 	} else {
 		PHALCON_CPY_WRT(&date_format, format);
 	}

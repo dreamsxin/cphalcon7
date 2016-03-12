@@ -74,9 +74,9 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Model){
  *
  * @param array $config
  */
-PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct){
-
-	zval *config, limit, page;
+PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct)
+{
+	zval *config, limit = {}, page = {};
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
@@ -113,8 +113,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, setCurrentPage){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 
-	zval show, config, items, page_number, rowcount, page, last_show_page, start, possible_pages, total_pages, page_items;
-	zval maximum_pages, next, additional_page, before, remainder, pages_total;
+	zval show = {}, config = {}, items = {}, page_number = {}, rowcount = {}, page = {}, last_show_page = {}, start = {}, possible_pages = {}, total_pages = {};
+	zval page_items = {}, maximum_pages = {}, next = {}, additional_page = {}, before = {}, remainder = {}, pages_total = {};
 	long int i, i_show;
 
 	phalcon_return_property(&show, getThis(), SL("_limitRows"));
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		 * The record must be iterable
 		 */
 		for (i=1; ; ++i) {
-			zval valid, current;
+			zval valid = {}, current = {};
 			PHALCON_CALL_METHODW(&valid, &items, "valid");
 			if (!PHALCON_IS_NOT_FALSE(&valid)) {
 				break;

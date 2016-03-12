@@ -88,7 +88,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 
-	zval *method, *arguments, handler, *definition, call_handler;
+	zval *method, *arguments, handler = {}, *definition, call_handler = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 2, 0, &method, &arguments);
@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 
 		object_init_ex(&handler, ce0);
 		if (phalcon_has_constructor(&handler)) {
-			PHALCON_CALL_METHOD(NULL, &handler, "__construct");
+			PHALCON_CALL_METHODW(NULL, &handler, "__construct");
 		}
 		phalcon_update_property_this(getThis(), SL("_handler"), &handler);
 	}

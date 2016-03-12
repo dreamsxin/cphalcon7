@@ -100,8 +100,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Reference){
  */
 PHP_METHOD(Phalcon_Db_Reference, __construct){
 
-	zval *reference_name, *definition, referenced_table;
-	zval columns, referenced_columns, schema, referenced_schema;
+	zval *reference_name, *definition, referenced_table = {}, columns = {}, referenced_columns = {}, schema = {}, referenced_schema = {};
 	long int number_columns, number_referenced_columns;
 
 	phalcon_fetch_params(0, 2, 0, &reference_name, &definition);
@@ -220,8 +219,7 @@ PHP_METHOD(Phalcon_Db_Reference, getReferencedColumns){
  */
 PHP_METHOD(Phalcon_Db_Reference, __set_state){
 
-	zval *data;
-	zval constraint_name, referenced_schema, referenced_table, columns, referenced_columns, definition;
+	zval *data, constraint_name = {}, referenced_schema = {}, referenced_table = {}, columns = {}, referenced_columns = {}, definition = {};
 
 	phalcon_fetch_params(0, 1, 0, &data);
 	

@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, getDateFormat){
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
-	zval *message, *type, *timestamp, *context, format, date_format, date, date_wildcard, new_format, type_string, type_wildcard, message_wildcard;
+	zval *message, *type, *timestamp, *context, format = {}, date_format = {}, date = {}, date_wildcard = {}, new_format = {}, type_string = {}, type_wildcard = {}, message_wildcard = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 		phalcon_date(&date, &date_format, timestamp);
 
-		PHALCON_STR(&date_wildcard, "%date%");
+		ZVAL_STRING(&date_wildcard, "%date%");
 
 		PHALCON_STR_REPLACE(&new_format, &date_wildcard, &date, &format);
 	} else {
@@ -193,14 +193,14 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 	if (phalcon_memnstr_str(&format, SL("%type%"))) {
 		PHALCON_CALL_METHODW(&type_string, getThis(), "gettypestring", type);
 
-		PHALCON_STR(&type_wildcard, "%type%");
+		ZVAL_STRING(&type_wildcard, "%type%");
 
 		PHALCON_STR_REPLACE(&format, &type_wildcard, &type_string, &new_format);
 	} else {
 		PHALCON_CPY_WRT(&format, &new_format);
 	}
 
-	PHALCON_STR(&message_wildcard, "%message%");
+	ZVAL_STRING(&message_wildcard, "%message%");
 
 	PHALCON_STR_REPLACE(&new_format, &message_wildcard, message, &format);
 

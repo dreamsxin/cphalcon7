@@ -346,7 +346,7 @@ PHP_METHOD(Phalcon_Forms_Form, setUserOption){
  */
 PHP_METHOD(Phalcon_Forms_Form, getUserOption){
 
-	zval *option, *default_value = NULL, *options, value;
+	zval *option, *default_value = NULL, *options, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &option, &default_value);
 
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Forms_Form, getElements){
  */
 PHP_METHOD(Phalcon_Forms_Form, bind){
 
-	zval *data, *entity, *whitelist = NULL, *elements, service_name, dependency_injector, filter, filter_data, *value;
+	zval *data, *entity, *whitelist = NULL, *elements, service_name = {}, dependency_injector = {}, filter = {}, filter_data = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		return;
 	}
 
-	PHALCON_STR(&service_name, ISV(filter));
+	ZVAL_STRING(&service_name, ISV(filter));
 
 	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	PHALCON_VERIFY_INTERFACEW(&dependency_injector, phalcon_diinterface_ce);
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 	array_init(&filter_data);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
-		zval key, element, filters, filtered_value, method;
+		zval key = {}, element = {}, filters = {}, filtered_value = {}, method = {};
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 		} else {
@@ -555,7 +555,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
  */
 PHP_METHOD(Phalcon_Forms_Form, isValid){
 
-	zval *data = NULL, *entity = NULL, *elements, status, not_failed, messages, *element;
+	zval *data = NULL, *entity = NULL, *elements, status = {}, not_failed = {}, messages = {}, *element;
 
 	phalcon_fetch_params(0, 0, 2, &data, &entity);
 
@@ -593,7 +593,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 	array_init(&messages);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(elements), element) {
-		zval validators, name, prepared_validators, *validator, validation, filters, element_messages;
+		zval validators = {}, name = {}, prepared_validators = {}, *validator, validation = {}, filters = {}, element_messages = {};
 		PHALCON_CALL_METHODW(&validators, element, "getvalidators");
 		if (Z_TYPE(validators) == IS_ARRAY) {
 			if (phalcon_fast_count_ev(&validators)) {
@@ -609,7 +609,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 				array_init(&prepared_validators);
 
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(validators), validator) {
-					zval scope;
+					zval scope = {};
 					array_init_size(&scope, 2);
 					phalcon_array_append(&scope, &name, PH_COPY);
 					phalcon_array_append(&scope, validator, PH_COPY);
@@ -678,12 +678,12 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
  */
 PHP_METHOD(Phalcon_Forms_Form, getMessages){
 
-	zval **by_item_name = NULL, *messages;
+	zval *by_item_name = NULL, *messages;
 
 	phalcon_fetch_params(0, 0, 1, &by_item_name);
 
 	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	if (by_item_name && zend_is_true(*by_item_name)) {
+	if (by_item_name && zend_is_true(by_item_name)) {
 		if (Z_TYPE_P(messages) != IS_ARRAY) {
 			object_init_ex(return_value, phalcon_validation_message_group_ce);
 		} else {
@@ -708,12 +708,12 @@ PHP_METHOD(Phalcon_Forms_Form, getMessages){
  */
 PHP_METHOD(Phalcon_Forms_Form, getMessagesFor){
 
-	zval **name, *messages, element_messages;
+	zval *name, *messages, element_messages = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&element_messages, messages, *name)) {
+	if (phalcon_array_isset_fetch(&element_messages, messages, name)) {
 		RETURN_CTORW(&element_messages);
 	}
 
@@ -727,12 +727,12 @@ PHP_METHOD(Phalcon_Forms_Form, getMessagesFor){
  */
 PHP_METHOD(Phalcon_Forms_Form, hasMessagesFor){
 
-	zval **name, *messages;
+	zval *name, *messages;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	RETURN_BOOL(phalcon_array_isset(messages, *name));
+	RETURN_BOOL(phalcon_array_isset(messages, name));
 }
 
 /**
@@ -745,7 +745,7 @@ PHP_METHOD(Phalcon_Forms_Form, hasMessagesFor){
  */
 PHP_METHOD(Phalcon_Forms_Form, add){
 
-	zval *element, *pos = NULL, *type = NULL, name, values, *elements, elements_indexed, tmp0, tmp1, offset, new_elements;
+	zval *element, *pos = NULL, *type = NULL, name = {}, values = {}, *elements, elements_indexed = {}, tmp0 = {}, tmp1 = {}, offset = {}, new_elements = {};
 	zend_string *str_key;
 	ulong idx;
 	int found = 0, i = 0;
@@ -782,7 +782,7 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 
 		if (Z_TYPE_P(elements) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(elements), idx, str_key) {
-				zval key;
+				zval key = {};
 				if (str_key) {
 					ZVAL_STR(&key, str_key);
 				} else {
@@ -829,7 +829,7 @@ PHP_METHOD(Phalcon_Forms_Form, add){
  */
 PHP_METHOD(Phalcon_Forms_Form, render){
 
-	zval *name, *attributes = NULL, *elements, element;
+	zval *name, *attributes = NULL, *elements, element = {};
 
 	phalcon_fetch_params(0, 1, 1, &name, &attributes);
 
@@ -856,7 +856,7 @@ PHP_METHOD(Phalcon_Forms_Form, render){
  */
 PHP_METHOD(Phalcon_Forms_Form, get){
 
-	zval *name, *elements, element;
+	zval *name, *elements, element = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
@@ -878,7 +878,7 @@ PHP_METHOD(Phalcon_Forms_Form, get){
  */
 PHP_METHOD(Phalcon_Forms_Form, label){
 
-	zval *name, *attributes = NULL, *elements, element;
+	zval *name, *attributes = NULL, *elements, element = {};
 
 	phalcon_fetch_params(0, 1, 1, &name, &attributes);
 
@@ -904,7 +904,7 @@ PHP_METHOD(Phalcon_Forms_Form, label){
  */
 PHP_METHOD(Phalcon_Forms_Form, getLabel){
 
-	zval *name, *elements, element, label;
+	zval *name, *elements, element = {}, label = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
@@ -952,7 +952,7 @@ PHP_METHOD(Phalcon_Forms_Form, getValue){
  */
 PHP_METHOD(Phalcon_Forms_Form, getValues){
 
-	zval *name = NULL, *flag = NULL, *data, *entity, method, value, *filter_data;
+	zval *name = NULL, *flag = NULL, *data, *entity, method = {}, value = {}, *filter_data;
 	int f = 0;
 
 	phalcon_fetch_params(0, 0, 2, &name, &flag);
@@ -1049,7 +1049,7 @@ PHP_METHOD(Phalcon_Forms_Form, has){
  */
 PHP_METHOD(Phalcon_Forms_Form, remove){
 
-	zval *name, *elements, elements_indexed;
+	zval *name, *elements, elements_indexed = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
@@ -1075,7 +1075,7 @@ PHP_METHOD(Phalcon_Forms_Form, remove){
  */
 PHP_METHOD(Phalcon_Forms_Form, clear){
 
-	zval *fields = NULL, *elements, *element, name;
+	zval *fields = NULL, *elements, *element, name = {};
 
 	phalcon_fetch_params(0, 0, 1, &fields);
 
@@ -1122,11 +1122,10 @@ PHP_METHOD(Phalcon_Forms_Form, count){
  */
 PHP_METHOD(Phalcon_Forms_Form, rewind){
 
-	zval *elements, elements_indexed;
+	zval *elements, elements_indexed = {};
+
 	elements = phalcon_read_property(getThis(), SL("_elements"), PH_NOISY);
-
 	phalcon_update_property_long(getThis(), SL("_position"), 0);
-
 	phalcon_array_values(&elements_indexed, elements);
 	phalcon_update_property_this(getThis(), SL("_elementsIndexed"), &elements_indexed);
 }
@@ -1203,25 +1202,24 @@ PHP_METHOD(Phalcon_Forms_Form, valid){
  */
 PHP_METHOD(Phalcon_Forms_Form, appendMessage){
 
-	zval *filed, *message, *current_messages, element_messages;
+	zval *filed, *message, current_messages = {}, element_messages = {};
 
 	phalcon_fetch_params(0, 2, 0, &filed, &message);
 
-	current_messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);	
-	if (Z_TYPE_P(current_messages) != IS_ARRAY) {
-		PHALCON_INIT_VAR(current_messages);
-		array_init(current_messages);
+	phalcon_return_property(&current_messages, getThis(), SL("_messages"));	
+	if (Z_TYPE(current_messages) != IS_ARRAY) {
+		array_init(&current_messages);
 	}
 
-	if (!phalcon_array_isset_fetch(&element_messages, current_messages, filed)) {
+	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed)) {
 		object_init_ex(&element_messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHODW(NULL, &element_messages, "__construct");
 	}
 
 	PHALCON_CALL_METHODW(NULL, &element_messages, "appendmessage", message);
 
-	phalcon_array_update_zval(current_messages, filed, &element_messages, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_messages"), current_messages);
+	phalcon_array_update_zval(&current_messages, filed, &element_messages, PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_messages"), &current_messages);
 
 	RETURN_THISW();
 }
@@ -1239,24 +1237,24 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessage){
  */
 PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 
-	zval *filed, *messages, *current_messages, element_messages;
+	zval *filed, *messages, current_messages = {}, element_messages = {};
 
 	phalcon_fetch_params(0, 2, 0, &filed, &messages);
 
-	current_messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);	
-	if (Z_TYPE_P(current_messages) != IS_ARRAY) {
-		array_init(current_messages);
+	phalcon_return_property(&current_messages, getThis(), SL("_messages"));	
+	if (Z_TYPE(current_messages) != IS_ARRAY) {
+		array_init(&current_messages);
 	}
 
-	if (!phalcon_array_isset_fetch(&element_messages, current_messages, filed)) {
+	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed)) {
 		object_init_ex(&element_messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHODW(NULL, &element_messages, "__construct");
 	}
 
 	PHALCON_CALL_METHODW(NULL, &element_messages, "appendmessages", messages);
 
-	phalcon_array_update_zval(current_messages, filed, &element_messages, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_messages"), current_messages);
+	phalcon_array_update_zval(&current_messages, filed, &element_messages, PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_messages"), &current_messages);
 
 	RETURN_THISW();
 }

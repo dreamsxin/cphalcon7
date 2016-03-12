@@ -237,7 +237,7 @@ PHP_METHOD(Phalcon_Assets_Manager, useImplicitOutput){
  */
 PHP_METHOD(Phalcon_Assets_Manager, addCss){
 
-	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, type, resource;
+	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, type = {}, resource = {};
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
 
@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addCss){
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "css");
+	ZVAL_STRING(&type, "css");
 
 	object_init_ex(&resource, phalcon_assets_resource_css_ce);
 
@@ -279,7 +279,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addCss){
  */
 PHP_METHOD(Phalcon_Assets_Manager, addJs){
 
-	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, type, resource;
+	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, type = {}, resource = {};
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
 
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addJs){
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "js");
+	ZVAL_STRING(&type, "js");
 
 	object_init_ex(&resource, phalcon_assets_resource_js_ce);
 
@@ -318,7 +318,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addJs){
  */
 PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 
-	zval *type, *resource, *collections, collection;
+	zval *type, *resource, *collections, collection = {};
 
 	phalcon_fetch_params(0, 2, 0, &type, &resource);
 
@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
  */
 PHP_METHOD(Phalcon_Assets_Manager, addResource){
 
-	zval *resource, type;
+	zval *resource, type = {};
 
 	phalcon_fetch_params(0, 1, 0, &resource);
 	PHALCON_VERIFY_CLASS_EX(resource, phalcon_assets_resource_ce, phalcon_assets_exception_ce, 0);
@@ -429,7 +429,7 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
  */
 PHP_METHOD(Phalcon_Assets_Manager, getCss){
 
-	zval *collections, collection;
+	zval *collections, collection = {};
 
 	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
 
@@ -451,7 +451,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
  */
 PHP_METHOD(Phalcon_Assets_Manager, getJs){
 
-	zval *collections, collection;
+	zval *collections, collection = {};
 
 	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
 
@@ -495,10 +495,10 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
  */
 PHP_METHOD(Phalcon_Assets_Manager, output){
 
-	zval *collection, *callback, *z_type = NULL, *args = NULL, type, output, use_implicit_output, exception_message;
-	zval resources, filters, prefix, type_css, source_base_path, target_base_path, options, collection_source_path;
-	zval complete_source_path, collection_target_path, complete_target_path, join, is_directory, local;
-	zval *resource, target_uri, prefixed_path, attributes, parameters, filtered_joined_content, html;
+	zval *collection, *callback, *z_type = NULL, *args = NULL, type = {}, output = {}, use_implicit_output = {}, exception_message = {};
+	zval resources = {}, filters = {}, prefix = {}, type_css = {}, source_base_path = {}, target_base_path = {}, options = {}, collection_source_path = {};
+	zval complete_source_path = {}, collection_target_path = {}, complete_target_path = {}, join = {}, is_directory = {}, local = {};
+	zval *resource, target_uri = {}, prefixed_path = {}, attributes = {}, parameters = {}, filtered_joined_content = {}, html = {};
 
 	phalcon_fetch_params(0, 2, 2, &collection, &callback, &type, &args);
 
@@ -527,7 +527,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	 */
 	PHALCON_CALL_METHODW(&prefix, collection, "getprefix");
 
-	PHALCON_STR(&type_css, "css");
+	ZVAL_STRING(&type_css, "css");
 
 	/** 
 	 * Prepare options if the collection must be filtered
@@ -614,12 +614,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(resources), resource) {
-		zval filter_needed, source_path, target_path, path, content, must_filter, *filter;
+		zval filter_needed = {}, source_path = {}, target_path = {}, path = {}, content = {}, must_filter = {}, *filter;
 
 		ZVAL_FALSE(&filter_needed);
 
 		if (Z_TYPE(type) <= IS_NULL) {
-			PHALCON_CALL_METHOD(&type, resource, "gettype");
+			PHALCON_CALL_METHODW(&type, resource, "gettype");
 		}
 
 		/** 
@@ -754,7 +754,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 */
 			if (zend_is_true(&must_filter)) {
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(filters), filter) {
-					zval filtered_content;
+					zval filtered_content = {};
 					/** 
 					 * Filters must be valid objects
 					 */
@@ -826,7 +826,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/** 
 			 * Gets extra HTML attributes in the resource
 			 */
-			PHALCON_CALL_METHOD(&attributes, resource, "getattributes");
+			PHALCON_CALL_METHODW(&attributes, resource, "getattributes");
 
 			/** 
 			 * Filtered resources are always local
@@ -930,7 +930,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
  */
 PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 
-	zval *collection_name = NULL, *args = NULL, collection, callback, type;
+	zval *collection_name = NULL, *args = NULL, collection = {}, callback = {}, type = {};
 
 	phalcon_fetch_params(0, 0, 2, &collection_name, &args);
 
@@ -952,7 +952,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 	add_next_index_stringl(&callback, SL("Phalcon\\Tag"));
 	add_next_index_stringl(&callback, SL("stylesheetLink"));
 
-	PHALCON_STR(&type, "css");
+	ZVAL_STRING(&type, "css");
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "output", &collection, &callback, &type, args);
 }
@@ -965,7 +965,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
  */
 PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 
-	zval *collection_name = NULL, *args = NULL, collection, callback, type;
+	zval *collection_name = NULL, *args = NULL, collection = {}, callback = {}, type = {};
 
 	phalcon_fetch_params(0, 0, 2, &collection_name, &args);
 
@@ -987,7 +987,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 	add_next_index_stringl(&callback, SL("Phalcon\\Tag"));
 	add_next_index_stringl(&callback, SL("javascriptInclude"));
 
-	PHALCON_STR(&type, "js");
+	ZVAL_STRING(&type, "js");
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "output", &collection, &callback, &type, args);
 }

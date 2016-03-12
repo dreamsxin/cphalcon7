@@ -71,12 +71,10 @@ PHALCON_INIT_CLASS(Phalcon_Tag_Select){
  * @param array $parameters
  * @param array $data
  */
-PHP_METHOD(Phalcon_Tag_Select, selectField){
-
-	zval *parameters, *data = NULL, params, default_params, id, name, value;
-	zval use_empty, empty_value, empty_text, code;
-	zval close_option, options, using;
-	zval resultset_options, array_options;
+PHP_METHOD(Phalcon_Tag_Select, selectField)
+{
+	zval *parameters, *data = NULL, params = {}, default_params = {}, id = {}, name = {}, value = {}, use_empty = {}, empty_value = {};
+	zval empty_text = {}, code = {}, close_option = {}, options = {}, using = {}, resultset_options = {}, array_options = {};
 
 	phalcon_fetch_params(0, 1, 1, &parameters, &data);
 
@@ -119,7 +117,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 	}
 
 	if (!phalcon_array_isset_fetch_str(&value, &params, SL("value"))) {
-		PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
+		PHALCON_CALL_CE_STATICW(&value, phalcon_tag_ce, "getvalue", &id, &params);
 	} else {
 		phalcon_array_unset_str(&params, SL("value"), PH_COPY);
 	}
@@ -131,7 +129,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 			phalcon_array_unset_str(&params, SL("emptyValue"), PH_COPY);
 		}
 		if (!phalcon_array_isset_fetch_str(&empty_text, &params, SL("emptyText"))) {
-			PHALCON_STR(&empty_text, "Choose...");
+			ZVAL_STRING(&empty_text, "Choose...");
 		} else {
 			phalcon_array_unset_str(&params, SL("emptyText"), PH_COPY);
 		}
@@ -143,13 +141,13 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 		phalcon_array_unset_str(&params, SL("using"), PH_COPY);
 	}
 
-	PHALCON_STR(&code, "<select");
+	ZVAL_STRING(&code, "<select");
 
 	phalcon_tag_render_attributes(&code, &params);
 
 	phalcon_concat_self_str(&code, SL(">" PHP_EOL));
 
-	PHALCON_STR(&close_option, "</option>" PHP_EOL);
+	ZVAL_STRING(&close_option, "</option>" PHP_EOL);
 
 	if (zend_is_true(&use_empty)) {
 		/** 
@@ -179,13 +177,13 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
 		/** 
 		 * Create the SELECT's option from a resultset
 		 */
-		PHALCON_CALL_SELFW(&resultset_options, "_optionsfromresultset", &options, &using, &value, &close_option);
+		PHALCON_CALL_CE_STATICW(&resultset_options, phalcon_tag_select_ce, "_optionsfromresultset", &options, &using, &value, &close_option);
 		phalcon_concat_self(&code, &resultset_options);
 	} else if (Z_TYPE(options) == IS_ARRAY) {
 		/**
 		 * Create the SELECT's option from an array
 		 */
-		PHALCON_CALL_SELFW(&array_options, "_optionsfromarray", &options, &value, &close_option);
+		PHALCON_CALL_CE_STATICW(&array_options, phalcon_tag_select_ce, "_optionsfromarray",  &options, &value, &close_option);
 		phalcon_concat_self(&code, &array_options);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_tag_exception_ce, "Invalid data provided to SELECT helper");
@@ -205,9 +203,9 @@ PHP_METHOD(Phalcon_Tag_Select, selectField){
  * @param mixed value
  * @param string $closeOption
  */
-PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
-
-	zval *resultset, *using, *value, *close_option, code;
+PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
+{
+	zval *resultset, *using, *value, *close_option, code = {};
 
 	phalcon_fetch_params(0, 4, 0, &resultset, &using, &value, &close_option);
 
@@ -219,7 +217,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
 	PHALCON_CALL_METHODW(NULL, resultset, "rewind");
 
 	while (1) {
-		zval r0, option, using_zero, using_one, option_value, option_text, escaped, params, code_option;
+		zval r0 = {}, option = {}, using_zero = {}, using_one = {}, option_value = {}, option_text = {}, escaped = {}, params = {}, code_option = {};
 
 		PHALCON_CALL_METHODW(&r0, resultset, "valid");
 		if (PHALCON_IS_NOT_FALSE(&r0)) {
@@ -244,7 +242,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
 					/** 
 					 * Read the text attribute from the model
 					 */
-					PHALCON_CALL_METHOD(&option_text, &option, "readattribute", &using_one);
+					PHALCON_CALL_METHODW(&option_text, &option, "readattribute", &using_one);
 				} else {
 					/** 
 					 * Read the variable directly from the model/object
@@ -322,7 +320,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset){
  */
 PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 
-	zval *data, *value, *close_option, code, *option_text;
+	zval *data, *value, *close_option, code = {}, *option_text;
 	zend_string *str_key;
 	ulong idx;
 
@@ -334,7 +332,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 	}
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, option_text) {
-		zval option_value, escaped, array_options;
+		zval option_value = {}, escaped = {}, array_options = {};
 		if (str_key) {
 			ZVAL_STR(&option_value, str_key);
 		} else {

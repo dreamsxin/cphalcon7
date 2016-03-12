@@ -129,7 +129,7 @@ PHALCON_INIT_CLASS(Phalcon_Image_Adapter_GD){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 
-	zval gd_version, ret, gd_info, version, exception_message, pattern, matches;
+	zval gd_version = {}, ret = {}, gd_info = {}, version = {}, exception_message = {}, pattern = {}, matches = {};
 
 	if (phalcon_function_exists_ex(SL("gd_info")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_image_exception_ce, "GD is either not installed or not enabled, check your configuration");
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 		PHALCON_CALL_FUNCTIONW(&gd_info, "gd_info");
 
 		if (phalcon_array_isset_fetch_str(&gd_version, &gd_info, SL("GD Version"))) {
-			PHALCON_STR(&pattern, "#\\d+\\.\\d+(?:\\.\\d+)?#");
+			ZVAL_STRING(&pattern, "#\\d+\\.\\d+(?:\\.\\d+)?#");
 			RETURN_ON_FAILURE(phalcon_preg_match(&ret, &pattern, &gd_version, &matches));
 
 			if (zend_is_true(&ret)) {
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
-	zval *file, *width = NULL, *height = NULL, exception_message, checked, realpath, img_width, img_height, type, mime, format, image, imageinfo, saveflag, blendmode;
+	zval *file, *width = NULL, *height = NULL, exception_message = {}, checked = {}, realpath = {}, img_width = {}, img_height = {}, type = {}, mime = {}, format = {}, image = {}, imageinfo = {}, saveflag = {}, blendmode = {};
 
 	phalcon_fetch_params(0, 1, 2, &file, &width, &height);
 
@@ -224,17 +224,17 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
 		switch (Z_LVAL(type)) {
 			case 1: // GIF
-				PHALCON_STR(&format, "gif");
+				ZVAL_STRING(&format, "gif");
 				PHALCON_CALL_FUNCTIONW(&image, "imagecreatefromgif", &realpath);
 				break;
 
 			case 2: // JPEG
-				PHALCON_STR(&format, "jpg");
+				ZVAL_STRING(&format, "jpg");
 				PHALCON_CALL_FUNCTIONW(&image, "imagecreatefromjpeg", &realpath);
 				break;
 
 			case 3: // PNG
-				PHALCON_STR(&format, "png");
+				ZVAL_STRING(&format, "png");
 				PHALCON_CALL_FUNCTIONW(&image, "imagecreatefrompng", &realpath);
 				break;
 
@@ -280,11 +280,11 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
 		phalcon_update_property_this(getThis(), SL("_type"), &type);
 
-		PHALCON_STR(&format, "png");
+		ZVAL_STRING(&format, "png");
 
 		phalcon_update_property_this(getThis(), SL("_format"), &format);
 
-		PHALCON_STR(&mime, "image/png");
+		ZVAL_STRING(&mime, "image/png");
 
 		phalcon_update_property_this(getThis(), SL("_mime"), &mime);
 	} else {
@@ -304,7 +304,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _resize) {
 
-	zval *width, *height, image, tmp_image;
+	zval *width, *height, image = {}, tmp_image = {};
 
 	phalcon_fetch_params(0, 2, 0, &width, &height);
 
@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _liquidRescale){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _crop)
 {
-	zval *width, *height, *offset_x, *offset_y, image, tmp_image, rect;
+	zval *width, *height, *offset_x, *offset_y, image = {}, tmp_image = {}, rect = {};
 
 	phalcon_fetch_params(0, 4, 0, &width, &height, &offset_x, &offset_y);
 
@@ -374,7 +374,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _crop)
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _rotate) {
 
-	zval *_degrees, degrees, image, tmp_image, color, alpha, transparent, ignore_transparent, saveflag, w, h;
+	zval *_degrees, degrees = {}, image = {}, tmp_image = {}, color = {}, alpha = {}, transparent = {}, ignore_transparent = {}, saveflag = {}, w = {}, h = {};
 	int tmp_degrees;
 
 	phalcon_fetch_params(0, 1, 0, &_degrees);
@@ -412,7 +412,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _rotate) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _flip) {
 
-	zval *direction, image, mode;
+	zval *direction, image = {}, mode = {};
 
 	phalcon_fetch_params(0, 1, 0, &direction);
 
@@ -438,7 +438,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _flip) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _sharpen) {
 
-	zval *amount, tmp, tmp_amount, matrix, item, image, ret, width, height;
+	zval *amount, tmp = {}, tmp_amount = {}, matrix = {}, item = {}, image = {}, ret = {}, width = {}, height = {};
 	int a;
 	double b;
 
@@ -513,7 +513,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _sharpen) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _reflection) {
 
-	zval *_height, *opacity, *fade_in, height, tmp, reflection , line, image, image_width, image_height, dst, filtertype;
+	zval *_height, *opacity, *fade_in, height = {}, tmp = {}, reflection  = {}, line = {}, image = {}, image_width = {}, image_height = {}, dst = {}, filtertype = {};
 	int h0, h1, tmp_opacity, int_opacity, offset;
 	double stepping;
 
@@ -561,7 +561,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _reflection) {
 	ZVAL_LONG(&tmp, 1);
 
 	for (offset = 0; h0 >= offset; offset++) {
-		zval src_y, dst_y, dst_opacity;
+		zval src_y = {}, dst_y = {}, dst_opacity = {};
 		ZVAL_LONG(&src_y, h1 - offset - 1);
 		ZVAL_LONG(&dst_y, h1 + offset);
 
@@ -599,7 +599,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _reflection) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _watermark) {
 
-	zval *watermark, *offset_x = NULL, *offset_y = NULL, *opacity = NULL, op, image, overlay, blob, saveflag, width, height, color, tmp, effect, blendmode, ret;
+	zval *watermark, *offset_x = NULL, *offset_y = NULL, *opacity = NULL, op = {}, image = {}, overlay = {}, blob = {}, saveflag = {}, width = {}, height = {}, color = {}, tmp = {}, effect = {}, blendmode = {}, ret = {};
 	int int_opacity;
 	double num;
 
@@ -666,8 +666,8 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _watermark) {
  * @param string $fontfile
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _text) {
-	zval *text, *offset_x, *offset_y, *opacity, *r, *g, *b, *size, *fontfile = NULL;
-	zval image, image_width, image_height, tmp, space,  s0, s1, s4, s5, width, height, color;
+	zval *text, *offset_x, *offset_y, *opacity, *r, *g, *b, *size, *fontfile = NULL, image = {}, image_width = {};
+	zval image_height = {}, tmp = {}, space = {}, s0 = {}, s1 = {}, s4 = {}, s5 = {}, width = {}, height = {}, color = {};
 	int w, h, w1, h1, x, y, i;
 
 	phalcon_fetch_params(0, 9, 0, &text, &offset_x, &offset_y, &opacity, &r, &g, &b, &size, &fontfile);
@@ -801,7 +801,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _text) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 
-	zval *mask, image, mask_image, blob, mask_image_width, mask_image_height, newimage, image_width, image_height, saveflag, color, c, alpha, temp_image;
+	zval *mask, image = {}, mask_image = {}, blob = {}, mask_image_width = {}, mask_image_height = {}, newimage = {}, image_width = {}, image_height = {}, saveflag = {}, color = {}, c = {}, alpha = {}, temp_image = {};
 	int x, y, w, h, i;
 
 	phalcon_fetch_params(0, 1, 0, &mask);
@@ -843,10 +843,10 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 	h = phalcon_get_intval(&image_height);
 
 	for (x=0; x < w; x++) {
-		zval zx;
+		zval zx = {};
 		ZVAL_LONG(&zx, x);
 		for (y=0; y < h; y++) {
-			zval zy, index, red, index2, color, r, g, b;
+			zval zy = {}, index = {}, red = {}, index2 = {}, color = {}, r = {}, g = {}, b = {};
 			ZVAL_LONG(&zy, y);
 
 			PHALCON_CALL_FUNCTIONW(&index, "imagecolorat", &mask_image, &zx, &zy);
@@ -885,7 +885,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _background) {
 
-	zval *r, *g, *b, *opacity, op, image, background, width, height, color, tmp, blendmode, ret;
+	zval *r, *g, *b, *opacity, op = {}, image = {}, background = {}, width = {}, height = {}, color = {}, tmp = {}, blendmode = {}, ret = {};
 	int int_opacity;
 	double num;
 
@@ -933,7 +933,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _background) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _blur){
 
-	zval *radius, image, constant;
+	zval *radius, image = {}, constant = {};
 	int r, i;
 
 	phalcon_fetch_params(0, 1, 0, &radius);	
@@ -958,7 +958,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _blur){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _pixelate){
 
-	zval *amount, image, width, height, color;
+	zval *amount, image = {}, width = {}, height = {}, color = {};
 	int a, x, y, x1, y1, w, h;
 
 	phalcon_fetch_params(0, 1, 0, &amount);
@@ -973,7 +973,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _pixelate){
 
 	for(x = 0; x < w; x += a) {
 		for (y = 0; y < h; y += a) {
-			zval tmp1, tmp2, tmp3, tmp4;
+			zval tmp1 = {}, tmp2 = {}, tmp3 = {}, tmp4 = {};
 			x1 = (int)(x + a/2 + 0.5);
 			y1 = (int)(y + a/2 + 0.5);
 
@@ -1005,7 +1005,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _pixelate){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
 
-	zval *file = NULL, *quality = NULL, q, ret, extension, type, mime, constant, image;
+	zval *file = NULL, *quality = NULL, q = {}, ret = {}, extension = {}, type = {}, mime = {}, constant = {}, image = {};
 	const char *func_name = "imagegif";
 	char *ext;
 
@@ -1065,7 +1065,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 
-	zval *extension = NULL, *quality = NULL, q, file, ret, type, mime, image;
+	zval *extension = NULL, *quality = NULL, q = {}, file = {}, ret = {}, type = {}, mime = {}, image = {};
 	const char *func_name = "imagegif";
 	char *ext;
 
@@ -1122,7 +1122,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _create) {
 
-	zval *width, *height, image, blendmode, saveflag;
+	zval *width, *height, image = {}, blendmode = {}, saveflag = {};
 
 	phalcon_fetch_params(0, 2, 0, &width, &height);
 
@@ -1147,7 +1147,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _create) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, __destruct){
 
-	zval image;
+	zval image = {};
 
 	phalcon_return_property(&image, getThis(), SL("_image"));
 

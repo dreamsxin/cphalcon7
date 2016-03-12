@@ -676,6 +676,11 @@ int phvolt_internal_parse_view(zval *result, zval *view_code, zval *template_pat
 				break;
 		}
 
+		if (token.value != NULL) {
+			efree(token.value);
+			token.value = NULL;
+		}
+
 		if (parser_status->status != PHVOLT_PARSING_OK) {
 			status = FAILURE;
 			break;
@@ -718,7 +723,7 @@ int phvolt_internal_parse_view(zval *result, zval *view_code, zval *template_pat
 		if (parser_status->status == PHVOLT_PARSING_OK) {
 			if (parser_status->ret) {
 				ZVAL_COPY(result, parser_status->ret);
-				PHALCON_PTR_DTOR(parser_status->ret);
+				efree(parser_status->ret);
 				parser_status->ret = NULL;
 			} else {
 				array_init(result);

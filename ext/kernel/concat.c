@@ -203,7 +203,7 @@ void phalcon_concat_vvvv(zval *result, zval *op1, zval *op2, zval *op3, zval *op
 void phalcon_concat_vvvvsvv(zval *result, zval *op1, zval *op2, zval *op3, zval *op4, const char *op5, uint32_t op5_len, zval *op6, zval *op7, int self_var){
 	phalcon_concat_vvv(result, op1, op2, op3, self_var);
 	phalcon_concat_vs(result, op4, op5, op5_len, 1);
-	phalcon_concat_vv(result, op3, op4, 1);
+	phalcon_concat_vv(result, op6, op7, 1);
 }
 
 /**

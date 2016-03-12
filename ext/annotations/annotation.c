@@ -99,15 +99,12 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Annotation){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 
-	zval *reflection_data, name, arguments, expr_arguments;
-	zval *argument;
+	zval *reflection_data, name = {}, arguments = {}, expr_arguments = {}, *argument;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &reflection_data);
+	phalcon_fetch_params(0, 1, 0, &reflection_data);
 
 	if (Z_TYPE_P(reflection_data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Reflection data must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "Reflection data must be an array");
 		return;
 	}
 
@@ -120,24 +117,22 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	if (phalcon_array_isset_fetch_str(&expr_arguments, reflection_data, SL("arguments"))) {
 		array_init(&arguments);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&expr_arguments), argument) {
-			zval expr, *resolved_argument = NULL, name;
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(expr_arguments), argument) {
+			zval expr = {}, resolved_argument = {}, name = {};
 
 			phalcon_array_fetch_str(&expr, argument, SL("expr"), PH_NOISY);
 	
-			PHALCON_CALL_METHOD(&resolved_argument, getThis(), "getexpression", &expr);
+			PHALCON_CALL_METHODW(&resolved_argument, getThis(), "getexpression", &expr);
 			if (phalcon_array_isset_fetch_str(&name, argument, SL("name"))) {
-				phalcon_array_update_zval(&arguments, &name, resolved_argument, PH_COPY);
+				phalcon_array_update_zval(&arguments, &name, &resolved_argument, PH_COPY);
 			} else {
-				phalcon_array_append(&arguments, resolved_argument, PH_COPY);
+				phalcon_array_append(&arguments, &resolved_argument, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	
 		phalcon_update_property_this(getThis(), SL("_arguments"), &arguments);
 		phalcon_update_property_this(getThis(), SL("_exprArguments"), &expr_arguments);
 	}
-	
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -159,41 +154,37 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getName){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
-	zval *expr, type, items, *item = NULL;
-	zval exception_message;
+	zval *expr, type = {}, items = {}, *item, exception_message = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &expr);	
+	phalcon_fetch_params(0, 1, 0, &expr);	
 	PHALCON_SEPARATE_PARAM(expr);
 	
 	if (Z_TYPE_P(expr) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The expression is not valid");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "The expression is not valid");
 		return;
 	}
 
 	phalcon_array_fetch_str(&type, expr, SL("type"), PH_NOISY);
 	
 	switch (phalcon_get_intval(&type)) {
-	
 		case PHANNOT_T_INTEGER:
 		case PHANNOT_T_DOUBLE:
 		case PHANNOT_T_STRING:
 		case PHANNOT_T_IDENTIFIER:
 			phalcon_array_fetch_str(&items, expr, SL("value"), PH_NOISY);
-			RETURN_CTOR(&items);
+			RETURN_CTORW(&items);
 			/* no break because of implicit return */
 	
 		case PHANNOT_T_NULL:
-			RETURN_MM_NULL();
+			RETURN_NULL();
 			/* no break because of implicit return */
 	
 		case PHANNOT_T_FALSE:
-			RETURN_MM_FALSE;
+			RETURN_FALSE;
 			/* no break because of implicit return */
 	
 		case PHANNOT_T_TRUE:
-			RETURN_MM_TRUE;
+			RETURN_TRUE;
 			/* no break because of implicit return */
 	
 		case PHANNOT_T_ARRAY:
@@ -201,36 +192,33 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
 			array_init(return_value);
 
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&items), item) {
-				zval name, item_expr, *resolved_item = NULL;
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(items), item) {
+				zval name = {}, item_expr = {}, resolved_item = {};
 
 				phalcon_array_fetch_str(&item_expr, item, SL("expr"), PH_NOISY);
 
-				PHALCON_CALL_METHOD(&resolved_item, getThis(), "getexpression", &item_expr);
+				PHALCON_CALL_METHODW(&resolved_item, getThis(), "getexpression", &item_expr);
 				if (phalcon_array_isset_fetch_str(&name, item, SL("name"))) {
-					phalcon_array_update_zval(return_value, &name, resolved_item, PH_COPY);
+					phalcon_array_update_zval(return_value, &name, &resolved_item, PH_COPY);
 				} else {
-					phalcon_array_append(return_value, resolved_item, PH_COPY);
+					phalcon_array_append(return_value, &resolved_item, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 	
-			RETURN_MM();
+			return;
 			/* no break because of implicit return */
 	
 		case PHANNOT_T_ANNOTATION:
 			object_init_ex(return_value, phalcon_annotations_annotation_ce);
-			PHALCON_CALL_METHOD(NULL, return_value, "__construct", expr);
-			RETURN_MM();
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", expr);
+			return;
 			/* no break because of implicit return */
 	
 		default:
 			PHALCON_CONCAT_SVS(&exception_message, "The expression ", &type, " is unknown");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_annotations_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_annotations_exception_ce, &exception_message);
 			return;
-	
 	}
-	
-	PHALCON_MM_RESTORE();
 }
 
 /**

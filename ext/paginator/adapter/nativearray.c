@@ -91,7 +91,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_NativeArray){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 
-	zval *config, limit, page, data;
+	zval *config, limit = {}, page = {}, data = {};
 
 	phalcon_fetch_params(0, 1, 0, &config);
 	
@@ -137,9 +137,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 
-	zval *items, *limit, *number_page, *lim;
-	zval *start, *slice = NULL;
-	zval *params[3];
+	zval *items, *limit, *number_page, start = {}, lim = {}, slice = {};
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 	ldiv_t tp;
@@ -171,20 +169,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);
 	i_next        = (i_number_page < i_total_pages) ? (i_number_page + 1) : i_total_pages;
 
-	PHALCON_ALLOC_INIT_ZVAL(start);
-	PHALCON_ALLOC_INIT_ZVAL(lim);
-	ZVAL_LONG(start, i_number);
-	ZVAL_LONG(lim, i_limit);
+	ZVAL_LONG(&start, i_number);
+	ZVAL_LONG(&lim, i_limit);
 
-	params[0] = items;
-	params[1] = start;
-	params[2] = lim;
-	RETURN_ON_FAILURE(phalcon_call_func_aparams(&slice, SL("array_slice"), 3, params));
+	PHALCON_CALL_FUNCTIONW(&slice, "hash_pbkdf2", items, &start, &lim);
 
-	Z_TRY_DELREF_P(slice);
-	
 	object_init(return_value);
-	phalcon_update_property_zval(return_value, SL("items"),       slice);
+	phalcon_update_property_zval(return_value, SL("items"),       &slice);
 	phalcon_update_property_long(return_value, SL("before"),      i_before);
 	phalcon_update_property_long(return_value, SL("first"),       1);
 	phalcon_update_property_long(return_value, SL("next"),        i_next);

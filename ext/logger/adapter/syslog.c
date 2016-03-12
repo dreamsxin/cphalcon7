@@ -87,11 +87,9 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_Syslog){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 
-	zval *name, *options = NULL, *option = NULL, *facility = NULL;
+	zval *name, *options = NULL, option = {}, facility = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &name, &options);
+	phalcon_fetch_params(0, 1, 1, &name, &options);
 
 	if (!options) {
 		options = &PHALCON_GLOBAL(z_null);
@@ -101,32 +99,22 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
 	if (zend_is_true(name)) {
-		if (phalcon_array_isset_str(options, SL("option"))) {
-			PHALCON_OBS_VAR(option);
-			phalcon_array_fetch_str(&option, options, SL("option"), PH_NOISY);
-		} else {
+		if (!phalcon_array_isset_fetch_str(&option, options, SL("option"))) {
 			/** 
 			 * Open the log in LOG_ODELAY mode
 			 */
-			PHALCON_INIT_NVAR(option);
-			ZVAL_LONG(option, 4);
+			ZVAL_LONG(&option, 4);
 		}
-		if (phalcon_array_isset_str(options, SL("facility"))) {
-			PHALCON_OBS_VAR(facility);
-			phalcon_array_fetch_str(&facility, options, SL("facility"), PH_NOISY);
-		} else {
+		if (!phalcon_array_isset_fetch_str(&facility, options, SL("facility"))) {
 			/** 
 			 * By default the facility is LOG_USER
 			 */
-			PHALCON_INIT_NVAR(facility);
-			ZVAL_LONG(facility, 8);
+			ZVAL_LONG(&facility, 8);
 		}
 
-		PHALCON_CALL_FUNCTION(NULL, "openlog", name, option, facility);
+		PHALCON_CALL_FUNCTIONW(NULL, "openlog", name, &option, &facility);
 		phalcon_update_property_bool(getThis(), SL("_opened"), 1);
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -136,18 +124,15 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
 
-	zval *formatter = NULL;
+	zval formatter = {};
 
-	PHALCON_MM_GROW();
-
-	formatter = phalcon_read_property(getThis(), SL("_formatter"), PH_NOISY);
-	if (Z_TYPE_P(formatter) != IS_OBJECT) {
-		PHALCON_INIT_NVAR(formatter);
-		object_init_ex(formatter, phalcon_logger_formatter_syslog_ce);
-		phalcon_update_property_this(getThis(), SL("_formatter"), formatter);
+	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
+	if (Z_TYPE(formatter) != IS_OBJECT) {
+		object_init_ex(&formatter, phalcon_logger_formatter_syslog_ce);
+		phalcon_update_property_this(getThis(), SL("_formatter"), &formatter);
 	}
 
-	RETURN_CTOR(formatter);
+	RETURN_CTORW(&formatter);
 }
 
 /**
@@ -160,29 +145,21 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
 
-	zval *message, *type, *time, *context, *formatter = NULL, *applied_format = NULL;
-	zval *syslog_type, *syslog_message;
+	zval *message, *type, *time, *context, formatter = {}, applied_format = {}, syslog_type = {}, syslog_message = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
-	phalcon_fetch_params(1, 4, 0, &message, &type, &time, &context);
-
-	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
-	PHALCON_CALL_METHOD(&applied_format, formatter, "format", message, type, time, context);
-	if (Z_TYPE_P(applied_format) != IS_ARRAY) { 
-		syslog_type    = type;
-		syslog_message = applied_format;
-	}
-	else {
-		PHALCON_OBS_VAR(syslog_type);
-		phalcon_array_fetch_long(&syslog_type, applied_format, 0, PH_NOISY);
-
-		PHALCON_OBS_VAR(syslog_message);
-		phalcon_array_fetch_long(&syslog_message, applied_format, 1, PH_NOISY);
+	PHALCON_CALL_METHODW(&formatter, getThis(), "getformatter");
+	PHALCON_CALL_METHODW(&applied_format, &formatter, "format", message, type, time, context);
+	if (Z_TYPE(applied_format) != IS_ARRAY) { 
+		PHALCON_CPY_WRT(&syslog_type, type);
+		PHALCON_CPY_WRT(&syslog_message, &applied_format);
+	} else {
+		phalcon_array_fetch_long(&syslog_type, &applied_format, 0, PH_NOISY);
+		phalcon_array_fetch_long(&syslog_message, &applied_format, 1, PH_NOISY);
 	}
 
-	PHALCON_CALL_FUNCTION(NULL, "syslog", syslog_type, syslog_message);
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_FUNCTIONW(NULL, "syslog", &syslog_type, &syslog_message);
 }
 
 /**

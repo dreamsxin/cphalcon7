@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -77,53 +78,46 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_PresenceOf){
  */
 PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 
-	zval *validator, *attribute, *value = NULL, *valid = NULL, code, message_str, *message;
-	zval label, pairs, *prepared = NULL;
+	zval *validator, *attribute, value = {}, valid = {}, code = {}, message_str = {}, message = {}, label = {}, pairs = {}, prepared = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
 
-	phalcon_fetch_params(1, 2, 0, &validator, &attribute);
-	
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 1);
+	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_SELFW(&valid, "valid", &value);
 
-	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
-
-	PHALCON_CALL_SELF(&valid, "valid", value);
-
-	if (PHALCON_IS_FALSE(valid)) {
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
-		if (!zend_is_true(label)) {
-			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
+	if (PHALCON_IS_FALSE(&valid)) {
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
+		if (!zend_is_true(&label)) {
+			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
-				ZVAL_COPY_VALUE(&label, attribute);
+				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
 		}
 
 		array_init_size(&pairs, 1);
-		Z_TRY_ADDREF_P(&label);
-		add_assoc_zval_ex(&pairs, SL(":field"), &label);
+		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
 
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "PresenceOf"));
+			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "PresenceOf"));
 		}
 
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
 		if (Z_TYPE_P(&code) == IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 
-		message = phalcon_validation_message_construct_helper(prepared, attribute, "PresenceOf", &code);
-		Z_TRY_DELREF_P(message);
-	
-		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
-		RETURN_MM_FALSE;
+		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "PresenceOf", &code);
+
+		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }
 
 /**
@@ -136,13 +130,11 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, valid){
 
 	zval *value;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &value);
+	phalcon_fetch_params(0, 1, 0, &value);
 
 	if (PHALCON_IS_EMPTY(value)) {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }

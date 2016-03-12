@@ -75,18 +75,15 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Adapter_Memory){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
 
-	zval *key, *data, *lowercased_key;
+	zval *key, data = {}, lowercased_key = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_fetch_params(1, 1, 0, &key);
-	
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	
-	PHALCON_INIT_VAR(lowercased_key);
-	phalcon_fast_strtolower(lowercased_key, key);
-	if (!phalcon_array_isset_fetch(return_value, data, lowercased_key)) {
-		RETURN_MM_NULL();
+	phalcon_return_property(&data, getThis(), SL("_data"));
+
+	phalcon_fast_strtolower(&lowercased_key, key);
+	if (!phalcon_array_isset_fetch(return_value, &data, &lowercased_key)) {
+		RETURN_NULL();
 	}
 }
 
@@ -98,12 +95,10 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter_Memory, write){
 
-	zval *key, *data, *lowercased_key;
+	zval *key, *data, lowercased_key = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
-	
-	PHALCON_ALLOC_INIT_ZVAL(lowercased_key);
-	phalcon_fast_strtolower(lowercased_key, key);
-	phalcon_update_property_array(getThis(), SL("_data"), lowercased_key, data);
-	zval_ptr_dtor(lowercased_key);
+
+	phalcon_fast_strtolower(&lowercased_key, key);
+	phalcon_update_property_array(getThis(), SL("_data"), &lowercased_key, data);
 }

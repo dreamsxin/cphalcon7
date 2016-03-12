@@ -123,95 +123,80 @@ PHALCON_INIT_CLASS(Phalcon_Events_Manager){
  */
 PHP_METHOD(Phalcon_Events_Manager, attach){
 
-	zval *event_type, *handler, *priority = NULL, *events = NULL;
-	zval *listener = NULL, *enable_priorities, *priority_queue = NULL;
-	zval _priority;
+	zval *event_type, *handler, *_priority = NULL, priority = {}, events = {}, listener = {}, enable_priorities = {}, priority_queue = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 1, &event_type, &handler, &_priority);
 
-	phalcon_fetch_params(1, 2, 1, &event_type, &handler, &priority);
-
-	if (!priority) {
-		ZVAL_LONG(&_priority, 100);
-		priority = &_priority;
+	if (!_priority) {
+		ZVAL_LONG(&priority, 100);
+	} else {
+		PHALCON_CPY_WRT(&priority, _priority);
 	}
 
 	if (unlikely(Z_TYPE_P(event_type) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event type must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Event type must be a string");
 		return;
 	}
 
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event handler must be an object or callable");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Event handler must be an object or callable");
 		return;
 	}
 
 	if (phalcon_instance_of_ev(handler, phalcon_events_listener_ce)) {
-		PHALCON_CPY_WRT(listener, handler);
-		PHALCON_CALL_METHOD(NULL, listener, "setpriority", priority);
-		PHALCON_CALL_METHOD(NULL, listener, "setevent", event_type);
+		PHALCON_CPY_WRT(&listener, handler);
+		PHALCON_CALL_METHODW(NULL, &listener, "setpriority", &priority);
+		PHALCON_CALL_METHODW(NULL, &listener, "setevent", event_type);
 	} else {
-		PHALCON_INIT_VAR(listener);
-		object_init_ex(listener, phalcon_events_listener_ce);
-		PHALCON_CALL_METHOD(NULL, listener, "__construct", handler, priority, event_type);
+		object_init_ex(&listener, phalcon_events_listener_ce);
+		PHALCON_CALL_METHODW(NULL, &listener, "__construct", handler, &priority, event_type);
 	}
 
-	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
-	if (Z_TYPE_P(events) != IS_ARRAY) {
-		PHALCON_INIT_VAR(events);
-		array_init(events);
+	phalcon_return_property(&events, getThis(), SL("_events"));
+	if (Z_TYPE(events) != IS_ARRAY) {
+		array_init(&events);
 	}
 
-	if (!phalcon_array_isset(events, event_type)) {
-		enable_priorities = phalcon_read_property(getThis(), SL("_enablePriorities"), PH_NOISY);
-		if (zend_is_true(enable_priorities)) {
+	if (!phalcon_array_isset_fetch(&priority_queue, &events, event_type)) {
+		phalcon_return_property(&enable_priorities, getThis(), SL("_enablePriorities"));
+		if (zend_is_true(&enable_priorities)) {
 			/** 
 			 * Create a SplPriorityQueue to store the events with priorities
 			 */
-			PHALCON_INIT_VAR(priority_queue);
-			object_init_ex(priority_queue, spl_ce_SplPriorityQueue);
-			if (phalcon_has_constructor(priority_queue)) {
-				PHALCON_CALL_METHOD(NULL, priority_queue, "__construct");
+			object_init_ex(&priority_queue, spl_ce_SplPriorityQueue);
+			if (phalcon_has_constructor(&priority_queue)) {
+				PHALCON_CALL_METHODW(NULL, &priority_queue, "__construct");
 			}
 
 			/** 
 			 * Extract only the Data, Set extraction flags
 			 */
-			PHALCON_CALL_METHOD(NULL, priority_queue, "setextractflags", &PHALCON_GLOBAL(z_one));
+			PHALCON_CALL_METHODW(NULL, &priority_queue, "setextractflags", &PHALCON_GLOBAL(z_one));
 
 			/** 
 			 * Append the events to the queue
 			 */
-			phalcon_array_update_zval(events, event_type, priority_queue, PH_COPY);
-			phalcon_update_property_this(getThis(), SL("_events"), events);
+			phalcon_array_update_zval(&events, event_type, &priority_queue, PH_COPY);
+			phalcon_update_property_this(getThis(), SL("_events"), &events);
 		} else {
-			PHALCON_INIT_NVAR(priority_queue);
-			array_init(priority_queue);
+			array_init(&priority_queue);
 		}
-	} else {
-		/** 
-		 * Get the current SplPriorityQueue
-		 */
-		PHALCON_INIT_VAR(priority_queue);
-		phalcon_array_fetch(&priority_queue, events, event_type, PH_NOISY);
 	}
 
 	/** 
 	 * Insert the handler in the queue
 	 */
-	if (unlikely(Z_TYPE_P(priority_queue) == IS_OBJECT)) {
-		PHALCON_CALL_METHOD(NULL, priority_queue, "insert", listener, priority);
+	if (unlikely(Z_TYPE(priority_queue) == IS_OBJECT)) {
+		PHALCON_CALL_METHODW(NULL, &priority_queue, "insert", &listener, &priority);
 	} else {
-		phalcon_array_append(priority_queue, listener, PH_COPY);
+		phalcon_array_append(&priority_queue, &listener, PH_COPY);
 	}
 
 	/** 
 	 * Append the events to the queue
 	 */
-	phalcon_array_update_zval(events, event_type, priority_queue, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_events"), events);
-
-	PHALCON_MM_RESTORE();
+	phalcon_array_update_zval(&events, event_type, &priority_queue, PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_events"), &events);
 }
 
 /**
@@ -284,80 +269,72 @@ PHP_METHOD(Phalcon_Events_Manager, getResponses){
  */
 PHP_METHOD(Phalcon_Events_Manager, detach){
 
-	zval *type, *handler, *events = NULL, *queue, priority_queue;
-	zval *listener = NULL, *handler_embeded = NULL, *priority = NULL;
-	zval *r0 = NULL;
+	zval *type, *handler, events = {}, queue = {}, priority_queue = {}, *listener;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &type, &handler);
+	phalcon_fetch_params(0, 2, 0, &type, &handler);
 
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event handler must be an object or callable");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Event handler must be an object or callable");
 		return;
 	}
 
-	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
-	if (Z_TYPE_P(events) != IS_ARRAY) {
-		RETURN_MM_FALSE;
+	phalcon_return_property(&events, getThis(), SL("_events"));
+	if (Z_TYPE(events) != IS_ARRAY) {
+		RETURN_FALSE;
 	}
 
-	if (!phalcon_array_isset(events, type)) {
-		RETURN_MM_FALSE;
+	if (!phalcon_array_isset_fetch(&queue, &events, type)) {
+		RETURN_FALSE;
 	}
 
-	PHALCON_INIT_VAR(queue);
-	phalcon_array_fetch(&queue, events, type, PH_NOISY);
-
-	if (Z_TYPE_P(queue) == IS_OBJECT) {
+	if (Z_TYPE(queue) == IS_OBJECT) {
 		object_init_ex(&priority_queue, spl_ce_SplPriorityQueue);
 		if (phalcon_has_constructor(&priority_queue)) {
-			PHALCON_CALL_METHOD(NULL, &priority_queue, "__construct");
+			PHALCON_CALL_METHODW(NULL, &priority_queue, "__construct");
 		}
 
-		PHALCON_CALL_METHOD(NULL, queue, "top");
+		PHALCON_CALL_METHODW(NULL, &queue, "top");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&r0, queue, "valid");
-			if (!zend_is_true(r0)) {
+			zval r0 = {}, listener0 = {}, handler_embeded = {}, priority = {};
+			PHALCON_CALL_METHODW(&r0, &queue, "valid");
+			if (!zend_is_true(&r0)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&listener, queue, "current");
-			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
+			PHALCON_CALL_METHODW(&listener0, &queue, "current");
+			PHALCON_CALL_METHODW(&handler_embeded, &listener0, "getlistener");
 
-			if (!phalcon_is_equal(handler_embeded, handler)) {
-				PHALCON_CALL_METHOD(&priority, listener, "getpriority");
-				PHALCON_CALL_METHOD(NULL, &priority_queue, "insert", listener, priority);
+			if (!phalcon_is_equal(&handler_embeded, handler)) {
+				PHALCON_CALL_METHODW(&priority, &listener0, "getpriority");
+				PHALCON_CALL_METHODW(NULL, &priority_queue, "insert", &listener0, &priority);
 			}
 			
-			PHALCON_CALL_METHOD(NULL, queue, "next");
+			PHALCON_CALL_METHODW(NULL, &queue, "next");
 		}
 	} else {
-		ZVAL_ARR(&priority_queue, zend_array_dup(Z_ARRVAL_P(queue)));
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(queue), idx, str_key, listener) {
-			zval key;
+		PHALCON_CPY_WRT_CTOR(&priority_queue, &queue);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(queue), idx, str_key, listener) {
+			zval key = {}, handler_embeded = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
 
-			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
+			PHALCON_CALL_METHODW(&handler_embeded, listener, "getlistener");
 
-			if (phalcon_is_equal_object(handler_embeded, handler)) {
+			if (phalcon_is_equal_object(&handler_embeded, handler)) {
 				phalcon_array_unset(&priority_queue, &key, PH_COPY);
 			}
 
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_array_update_zval(events, type, &priority_queue, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_events"), events);
-
-	PHALCON_MM_RESTORE();
+	phalcon_array_update_zval(&events, type, &priority_queue, PH_COPY);
+	phalcon_update_property_this(getThis(), SL("_events"), &events);
 }
 
 /**
@@ -367,26 +344,20 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
  */
 PHP_METHOD(Phalcon_Events_Manager, detachAll){
 
-	zval *type = NULL, *events = NULL;
+	zval *type = NULL, events = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &type);
+	phalcon_fetch_params(0, 0, 1, &type);
 
 	if (!type) {
 		type = &PHALCON_GLOBAL(z_null);
 	}
 
-	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
-	if (Z_TYPE_P(type) == IS_NULL) {
-		PHALCON_INIT_NVAR(events);
-	} else if (phalcon_array_isset(events, type)) {
-		phalcon_array_unset(events, type, PH_COPY);
+	phalcon_return_property(&events, getThis(), SL("_events"));
+	if (Z_TYPE_P(type) != IS_NULL && phalcon_array_isset(&events, type)) {
+		phalcon_array_unset(&events, type, PH_COPY);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_events"), events);
-
-	PHALCON_MM_RESTORE();
+	phalcon_update_property_this(getThis(), SL("_events"), &events);
 }
 
 /**
@@ -398,28 +369,21 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
  */
 PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
-	zval *queue, *event, *status = NULL, *arguments = NULL, *event_name = NULL;
-	zval *source = NULL, *data = NULL, *cancelable = NULL, *collect, *iterator;
-	zval *handler = NULL, *is_stopped = NULL, *handler_referenced = NULL, *listener = NULL, *handler_embeded = NULL;
-	zval *r0 = NULL;
-	zend_class_entry *weakref_ce;
+	zval *queue, *event, event_name = {}, source = {}, data = {}, cancelable = {}, collect = {}, iterator = {}, *listener, status = {};
+	zend_class_entry *ce, *weakref_ce;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &queue, &event);
+	phalcon_fetch_params(0, 2, 0, &queue, &event);
+	ZVAL_NULL(&status);
 
 	if (unlikely(Z_TYPE_P(queue) != IS_ARRAY)) {
 		if (Z_TYPE_P(queue) == IS_OBJECT) {
-			zend_class_entry *ce = Z_OBJCE_P(queue);
-			if (
-				   !instanceof_function_ex(ce, phalcon_events_event_ce, 0)
-				&& !instanceof_function_ex(ce, spl_ce_SplPriorityQueue, 0)
-			) {
-				PHALCON_THROW_EXCEPTION_FORMAT(phalcon_events_exception_ce, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", ce->name->val);
+			ce = Z_OBJCE_P(queue);
+			if (!instanceof_function_ex(ce, phalcon_events_event_ce, 0) && !instanceof_function_ex(ce, spl_ce_SplPriorityQueue, 0)) {
+				PHALCON_THROW_EXCEPTION_FORMATW(phalcon_events_exception_ce, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", ce->name->val);
 				return;
 			}
 		} else {
-			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_events_exception_ce, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", zend_zval_type_name(queue));
+			PHALCON_THROW_EXCEPTION_FORMATW(phalcon_events_exception_ce, "Unexpected value type: expected object of type Phalcon\\Events\\Event or SplPriorityQueue, %s given", zend_zval_type_name(queue));
 			return;
 		}
 	}
@@ -428,128 +392,121 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
 	weakref_ce = zend_lookup_class_ex(zend_string_init(SL("WeakRef"), 0), NULL, 0);
 
-
-	PHALCON_INIT_VAR(status);
-
 	/** 
 	 * Get the event type
 	 */
-	PHALCON_CALL_METHOD(&event_name, event, "gettype");
-	if (unlikely(Z_TYPE_P(event_name) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "The event type not valid");
+	PHALCON_CALL_METHODW(&event_name, event, "gettype");
+	if (unlikely(Z_TYPE(event_name) != IS_STRING)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "The event type not valid");
 		return;
 	}
 
 	/** 
 	 * Get the object who triggered the event
 	 */
-	PHALCON_CALL_METHOD(&source, event, "getsource");
+	PHALCON_CALL_METHODW(&source, event, "getsource");
 
 	/** 
 	 * Get extra data passed to the event
 	 */
-	PHALCON_CALL_METHOD(&data, event, "getdata");
+	PHALCON_CALL_METHODW(&data, event, "getdata");
 
 	/** 
 	 * Tell if the event is cancelable
 	 */
-	PHALCON_CALL_METHOD(&cancelable, event, "getcancelable");
+	PHALCON_CALL_METHODW(&cancelable, event, "getcancelable");
 
 	/** 
 	 * Responses need to be traced?
 	 */
-	collect = phalcon_read_property(getThis(), SL("_collect"), PH_NOISY);
+	phalcon_return_property(&collect, getThis(), SL("_collect"));
 	if (Z_TYPE_P(queue) == IS_OBJECT) {
-
 		/** 
 		 * We need to clone the queue before iterate over it
 		 */
-		PHALCON_INIT_VAR(iterator);
-		if (phalcon_clone(iterator, queue) == FAILURE) {
-			RETURN_MM();
+		if (phalcon_clone(&iterator, queue) == FAILURE) {
+			return;
 		}
 
 		/** 
 		 * Move the queue to the top
 		 */
-		PHALCON_CALL_METHOD(NULL, iterator, "top");
+		PHALCON_CALL_METHODW(NULL, &iterator, "top");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&r0, iterator, "valid");
-			if (!zend_is_true(r0)) {
+			zval r0 = {}, listener0 = {}, handler_embeded = {}, handler_referenced = {}, handler = {}, arguments = {}, is_stopped = {};
+
+			PHALCON_CALL_METHODW(&r0, &iterator, "valid");
+			if (!zend_is_true(&r0)) {
 				break;
 			}
 
 			/** 
 			 * Get the current data
 			 */
-			PHALCON_CALL_METHOD(&listener, iterator, "current");
-			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
+			PHALCON_CALL_METHODW(&listener0, &iterator, "current");
+			PHALCON_CALL_METHODW(&handler_embeded, &listener0, "getlistener");
 
 			/** 
 			 * Only handler objects are valid
 			 */
-			if (Z_TYPE_P(handler_embeded) == IS_OBJECT) {
-
+			if (Z_TYPE(handler_embeded) == IS_OBJECT) {
 				/**
 				 * Check if the event is a weak reference.
 				 */
-				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), weakref_ce)) {
+				if (weakref_ce && instanceof_function(Z_OBJCE(handler_embeded), weakref_ce)) {
 					/**
 					 * Checks whether the object referenced still exists.
 					 */
-					PHALCON_CALL_METHOD(&handler_referenced, handler_embeded, "valid");
+					PHALCON_CALL_METHODW(&handler_referenced, &handler_embeded, "valid");
 
-					if (zend_is_true(handler_referenced)) {
-						PHALCON_CALL_METHOD(&handler, handler_embeded, "get");
+					if (zend_is_true(&handler_referenced)) {
+						PHALCON_CALL_METHODW(&handler, &handler_embeded, "get");
 					} else {
 						/**
 						 * Move the queue to the next handler
 						 */
-						PHALCON_CALL_METHOD(NULL, iterator, "next");
+						PHALCON_CALL_METHODW(NULL, &iterator, "next");
 						continue;
 					}
 
 				} else {
-					PHALCON_CPY_WRT(handler, handler_embeded);
+					PHALCON_CPY_WRT(&handler, &handler_embeded);
 				}
 
 				/** 
 				 * Check if the event is a closure
 				 */
-				assert(Z_TYPE_P(handler) == IS_OBJECT);
-				if (instanceof_function(Z_OBJCE_P(handler), zend_ce_closure)) {
-
+				assert(Z_TYPE(handler) == IS_OBJECT);
+				if (instanceof_function(Z_OBJCE(handler), zend_ce_closure)) {
 					/** 
 					 * Create the closure arguments
 					 */
-					if (!arguments || Z_TYPE_P(arguments) == IS_NULL) {
-						PHALCON_INIT_NVAR(arguments);
-						array_init_size(arguments, 3);
-						phalcon_array_append(arguments, event, PH_COPY);
-						phalcon_array_append(arguments, source, PH_COPY);
-						phalcon_array_append(arguments, data, PH_COPY);
+					if (Z_TYPE(arguments) <= IS_NULL) {
+						array_init_size(&arguments, 3);
+						phalcon_array_append(&arguments, event, PH_COPY);
+						phalcon_array_append(&arguments, &source, PH_COPY);
+						phalcon_array_append(&arguments, &data, PH_COPY);
 					}
 
 					/** 
 					 * Call the function in the PHP userland
 					 */
-					PHALCON_CALL_USER_FUNC_ARRAY(&status, handler, arguments);
+					PHALCON_CALL_USER_FUNC_ARRAYW(&status, &handler, &arguments);
 
 					/** 
 					 * Trace the response
 					 */
-					if (zend_is_true(collect)) {
-						phalcon_update_property_array_append(getThis(), SL("_responses"), status);
+					if (zend_is_true(&collect)) {
+						phalcon_update_property_array_append(getThis(), SL("_responses"), &status);
 					}
 
-					if (zend_is_true(cancelable)) {
-
+					if (zend_is_true(&cancelable)) {
 						/** 
 						 * Check if the event was stopped by the user
 						 */
-						PHALCON_CALL_METHOD(&is_stopped, event, "isstopped");
-						if (zend_is_true(is_stopped)) {
+						PHALCON_CALL_METHODW(&is_stopped, event, "isstopped");
+						if (zend_is_true(&is_stopped)) {
 							break;
 						}
 					}
@@ -557,27 +514,26 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/** 
 					 * Check if the listener has implemented an event with the same name
 					 */
-					if (phalcon_method_exists(handler, event_name) == SUCCESS) {
-
+					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
 						/** 
 						 * Call the function in the PHP userland
 						 */
-						PHALCON_CALL_METHOD(&status, handler, Z_STRVAL_P(event_name), event, source, data);
+						PHALCON_CALL_METHODW(&status, &handler, Z_STRVAL(event_name), event, &source, &data);
 
 						/** 
 						 * Collect the response
 						 */
-						if (zend_is_true(collect)) {
-							phalcon_update_property_array_append(getThis(), SL("_responses"), status);
+						if (zend_is_true(&collect)) {
+							phalcon_update_property_array_append(getThis(), SL("_responses"), &status);
 						}
 
-						if (zend_is_true(cancelable)) {
+						if (zend_is_true(&cancelable)) {
 
 							/** 
 							 * Check if the event was stopped by the user
 							 */
-							PHALCON_CALL_METHOD(&is_stopped, event, "isstopped");
-							if (zend_is_true(is_stopped)) {
+							PHALCON_CALL_METHODW(&is_stopped, event, "isstopped");
+							if (zend_is_true(&is_stopped)) {
 								break;
 							}
 						}
@@ -588,71 +544,71 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 			/** 
 			 * Move the queue to the next handler
 			 */
-			PHALCON_CALL_METHOD(NULL, iterator, "next");
+			PHALCON_CALL_METHODW(NULL, &iterator, "next");
 		}
 	} else {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), listener) {
-			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
+			zval handler_embeded = {}, handler_referenced = {}, handler = {}, arguments = {}, is_stopped = {};
+
+			PHALCON_CALL_METHODW(&handler_embeded, listener, "getlistener");
 			/** 
 			 * Only handler objects are valid
 			 */
-			if (Z_TYPE_P(handler_embeded) == IS_OBJECT) {
+			if (Z_TYPE(handler_embeded) == IS_OBJECT) {
 
 				/**
 				  * Check if the event is a weak reference.
 				  */
-				if (weakref_ce && instanceof_function(Z_OBJCE_P(handler_embeded), weakref_ce)) {
+				if (weakref_ce && instanceof_function(Z_OBJCE(handler_embeded), weakref_ce)) {
 					/**
 					 * Checks whether the object referenced still exists.
 					 */
-					PHALCON_CALL_METHOD(&handler_referenced, handler_embeded, "valid");
+					PHALCON_CALL_METHODW(&handler_referenced, &handler_embeded, "valid");
 
-					if (zend_is_true(handler_referenced)) {
-						PHALCON_CALL_METHOD(&handler, handler_embeded, "get");
+					if (zend_is_true(&handler_referenced)) {
+						PHALCON_CALL_METHODW(&handler, &handler_embeded, "get");
 					} else {
 						continue;
 					}
 
 				} else {
-					PHALCON_CPY_WRT(handler, handler_embeded);
+					PHALCON_CPY_WRT(&handler, &handler_embeded);
 				}
 
 				/** 
 				 * Check if the event is a closure
 				 */
-				assert(Z_TYPE_P(handler) == IS_OBJECT);
-				if (instanceof_function(Z_OBJCE_P(handler), zend_ce_closure)) {
-
+				assert(Z_TYPE(handler) == IS_OBJECT);
+				if (instanceof_function(Z_OBJCE(handler), zend_ce_closure)) {
 					/** 
 					 * Create the closure arguments
 					 */
-					if (!arguments || Z_TYPE_P(arguments) == IS_NULL) {
-						PHALCON_INIT_NVAR(arguments);
-						array_init_size(arguments, 3);
-						phalcon_array_append(arguments, event, PH_COPY);
-						phalcon_array_append(arguments, source, PH_COPY);
-						phalcon_array_append(arguments, data, PH_COPY);
+					if (Z_TYPE(arguments) <= IS_NULL) {
+						array_init_size(&arguments, 3);
+						phalcon_array_append(&arguments, event, PH_COPY);
+						phalcon_array_append(&arguments, &source, PH_COPY);
+						phalcon_array_append(&arguments, &data, PH_COPY);
 					}
 
 					/** 
 					 * Call the function in the PHP userland
 					 */
-					PHALCON_CALL_USER_FUNC_ARRAY(&status, handler, arguments);
+					PHALCON_CALL_USER_FUNC_ARRAYW(&status, &handler, &arguments);
 
 					/** 
 					 * Trace the response
 					 */
-					if (zend_is_true(collect)) {
-						phalcon_update_property_array_append(getThis(), SL("_responses"), status);
+					if (zend_is_true(&collect)) {
+						phalcon_update_property_array_append(getThis(), SL("_responses"), &status);
 					}
 
-					if (zend_is_true(cancelable)) {
+					if (zend_is_true(&cancelable)) {
 
 						/** 
 						 * Check if the event was stopped by the user
 						 */
-						PHALCON_CALL_METHOD(&is_stopped, event, "isstopped");
-						if (zend_is_true(is_stopped)) {
+						PHALCON_CALL_METHODW(&is_stopped, event, "isstopped");
+						if (zend_is_true(&is_stopped)) {
 							break;
 						}
 					}
@@ -660,27 +616,25 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/** 
 					 * Check if the listener has implemented an event with the same name
 					 */
-					if (phalcon_method_exists(handler, event_name) == SUCCESS) {
-
+					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
 						/** 
 						 * Call the function in the PHP userland
 						 */
-						PHALCON_CALL_METHOD(&status, handler, Z_STRVAL_P(event_name), event, source, data);
+						PHALCON_CALL_METHODW(&status, &handler, Z_STRVAL(event_name), event, &source, &data);
 
 						/** 
 						 * Collect the response
 						 */
-						if (zend_is_true(collect)) {
-							phalcon_update_property_array_append(getThis(), SL("_responses"), status);
+						if (zend_is_true(&collect)) {
+							phalcon_update_property_array_append(getThis(), SL("_responses"), &status);
 						}
 
-						if (zend_is_true(cancelable)) {
-
+						if (zend_is_true(&cancelable)) {
 							/** 
 							 * Check if the event was stopped by the user
 							 */
-							PHALCON_CALL_METHOD(&is_stopped, event, "isstopped");
-							if (zend_is_true(is_stopped)) {
+							PHALCON_CALL_METHODW(&is_stopped, event, "isstopped");
+							if (zend_is_true(&is_stopped)) {
 								break;
 							}
 						}
@@ -690,7 +644,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_CCTOR(status);
+	RETURN_CTORW(&status);
 }
 
 /**
@@ -708,13 +662,10 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
  */
 PHP_METHOD(Phalcon_Events_Manager, fire){
 
-	zval *event_type, *source, *data = NULL, *cancelable = NULL, *events;
-	zval exception_message, event_parts, *type;
-	zval *event_name, *status = NULL, *collect, *event = NULL, fire_events;
+	zval *event_type, *source, *data = NULL, *cancelable = NULL, events = {}, exception_message = {}, event_parts = {}, type = {};
+	zval event_name = {}, status = {}, collect = {}, event = {}, fire_events = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 2, &event_type, &source, &data, &cancelable);
+	phalcon_fetch_params(0, 2, 2, &event_type, &source, &data, &cancelable);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -725,13 +676,13 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	}
 
 	if (unlikely(Z_TYPE_P(event_type) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event type must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Event type must be a string");
 		return;
 	}
 
-	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
-	if (Z_TYPE_P(events) != IS_ARRAY) { 
-		RETURN_MM_NULL();
+	phalcon_return_property(&events, getThis(), SL("_events"));
+	if (Z_TYPE(events) != IS_ARRAY) { 
+		RETURN_NULL();
 	}
 
 	/** 
@@ -739,71 +690,62 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	 */
 	if (!phalcon_memnstr_str(event_type, SL(":"))) {
 		PHALCON_CONCAT_SV(&exception_message, "Invalid event type ", event_type);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_events_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_events_exception_ce, &exception_message);
 		return;
 	}
 
 	phalcon_fast_explode_str(&event_parts, SL(":"), event_type);
-
-	PHALCON_OBS_VAR(type);
 	phalcon_array_fetch_long(&type, &event_parts, 0, PH_NOISY);
-
-	PHALCON_OBS_VAR(event_name);
 	phalcon_array_fetch_long(&event_name, &event_parts, 1, PH_NOISY);
-
-	PHALCON_INIT_VAR(status);
 
 	/** 
 	 * Should responses be traced?
 	 */
-	collect = phalcon_read_property(getThis(), SL("_collect"), PH_NOISY);
-	if (zend_is_true(collect)) {
+	phalcon_return_property(&collect, getThis(), SL("_collect"));
+	if (zend_is_true(&collect)) {
 		phalcon_update_property_null(getThis(), SL("_responses"));
 	}
-
-	PHALCON_INIT_VAR(event);
 
 	/** 
 	 * Check if events are grouped by type
 	 */
-	if (phalcon_array_isset_fetch(&fire_events, events, type)) {
-		if (Z_TYPE_P(&fire_events) == IS_ARRAY || Z_TYPE_P(&fire_events) == IS_OBJECT) {
+	if (phalcon_array_isset_fetch(&fire_events, &events, &type)) {
+		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
 			/** 
 			 * Create the event context
 			 */
-			object_init_ex(event, phalcon_events_event_ce);
-			PHALCON_CALL_METHOD(NULL, event, "__construct", event_name, source, data, cancelable);
+			object_init_ex(&event, phalcon_events_event_ce);
+			PHALCON_CALL_METHODW(NULL, &event, "__construct", &event_name, source, data, cancelable);
 
 			/** 
 			 * Call the events queue
 			 */
-			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, event);
+			PHALCON_CALL_METHODW(&status, getThis(), "firequeue", &fire_events, &event);
 		}
 	}
 
 	/** 
 	 * Check if there are listeners for the event type itself
 	 */
-	if (phalcon_array_isset_fetch(&fire_events, events, event_type)) {
-		if (Z_TYPE_P(&fire_events) == IS_ARRAY || Z_TYPE_P(&fire_events) == IS_OBJECT) {
+	if (phalcon_array_isset_fetch(&fire_events, &events, event_type)) {
+		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
 			/** 
 			 * Create the event if it wasn't created before
 			 */
-			if (Z_TYPE_P(event) == IS_NULL) {
-				PHALCON_INIT_NVAR(event);
-				object_init_ex(event, phalcon_events_event_ce);
-				PHALCON_CALL_METHOD(NULL, event, "__construct", event_name, source, data, cancelable);
+			if (Z_TYPE(event) == IS_NULL) {
+				object_init_ex(&event, phalcon_events_event_ce);
+				PHALCON_CALL_METHODW(NULL, &event, "__construct", &event_name, source, data, cancelable);
 
 			}
 
 			/** 
 			 * Call the events queue
 			 */
-			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, event);
+			PHALCON_CALL_METHODW(&status, getThis(), "firequeue", &fire_events, &event);
 		}
 	}
 
-	RETURN_CCTOR(status);
+	RETURN_CTORW(&status);
 }
 
 /**
@@ -814,12 +756,12 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
  */
 PHP_METHOD(Phalcon_Events_Manager, hasListeners){
 
-	zval *type, *events;
+	zval *type, events = {};
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
-	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
-	if (phalcon_array_isset(events, type)) {
+	phalcon_return_property(&events, getThis(), SL("_events"));
+	if (phalcon_array_isset(&events, type)) {
 		RETURN_TRUE;
 	}
 
@@ -834,66 +776,60 @@ PHP_METHOD(Phalcon_Events_Manager, hasListeners){
  */
 PHP_METHOD(Phalcon_Events_Manager, getListeners){
 
-	zval *type, *full = NULL, *events = NULL, *queue, *iterator;
-	zval *listener = NULL, *handler_embeded = NULL;
-	zval *r0 = NULL;
+	zval *type, *full = NULL, events = {}, queue = {}, iterator = {}, *listener;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &type, &full);
+	phalcon_fetch_params(0, 1, 1, &type, &full);
 
 	if (!full) {
 		full = &PHALCON_GLOBAL(z_false);
 	}
 
-	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
-	if (Z_TYPE_P(events) != IS_ARRAY) {
-		RETURN_MM_EMPTY_ARRAY();
+	phalcon_return_property(&events, getThis(), SL("_events"));
+	if (Z_TYPE(events) != IS_ARRAY) {
+		RETURN_EMPTY_ARRAY();
 	}
 
-	if (!phalcon_array_isset(events, type)) {
-		RETURN_MM_EMPTY_ARRAY();
+	if (!phalcon_array_isset(&events, type)) {
+		RETURN_EMPTY_ARRAY();
 	}
 
 	array_init(return_value);
 
-	PHALCON_OBS_VAR(queue);
-	phalcon_array_fetch(&queue, events, type, PH_NOISY);
+	phalcon_array_fetch(&queue, &events, type, PH_NOISY);
 
 	if (zend_is_true(full)) {
-		RETURN_CCTOR(queue);
+		RETURN_CTORW(&queue);
 	}
 
-	if (Z_TYPE_P(queue) == IS_OBJECT) {
-		
-		PHALCON_INIT_VAR(iterator);
-		if (phalcon_clone(iterator, queue) == FAILURE) {
-			RETURN_MM();
+	if (Z_TYPE(queue) == IS_OBJECT) {
+		if (phalcon_clone(&iterator, &queue) == FAILURE) {
+			return;
 		}
 
-		PHALCON_CALL_METHOD(NULL, iterator, "top");
+		PHALCON_CALL_METHODW(NULL, &iterator, "top");
 
 		while (1) {
-			PHALCON_CALL_METHOD(&r0, iterator, "valid");
-			if (!zend_is_true(r0)) {
+			zval r0 = {}, listener0 = {}, handler_embeded = {};
+
+			PHALCON_CALL_METHODW(&r0, &iterator, "valid");
+			if (!zend_is_true(&r0)) {
 				break;
 			}
 
-			PHALCON_CALL_METHOD(&listener, iterator, "current");
-			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
+			PHALCON_CALL_METHODW(&listener0, &iterator, "current");
+			PHALCON_CALL_METHODW(&handler_embeded, &listener0, "getlistener");
 
-			phalcon_array_append(return_value, handler_embeded, PH_COPY);
+			phalcon_array_append(return_value, &handler_embeded, PH_COPY);
 
-			PHALCON_CALL_METHOD(NULL, iterator, "next");
+			PHALCON_CALL_METHODW(NULL, &iterator, "next");
 		}
 	} else {
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), listener) {
-			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
-			phalcon_array_append(return_value, handler_embeded, PH_COPY);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(queue), listener) {
+			zval handler_embeded = {};
+			PHALCON_CALL_METHODW(&handler_embeded, listener, "getlistener");
+			phalcon_array_append(return_value, &handler_embeded, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	}
-
-	RETURN_MM();
 }
 
 /**
@@ -903,8 +839,8 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
  */
 PHP_METHOD(Phalcon_Events_Manager, getEvents){
 
-	zval *events;
+	zval events = {};
 
-	events = phalcon_read_property(getThis(), SL("_events"), PH_NOISY);
-	phalcon_array_keys(return_value, events);
+	phalcon_return_property(&events, getThis(), SL("_events"));
+	phalcon_array_keys(return_value, &events);
 }

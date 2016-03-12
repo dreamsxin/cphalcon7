@@ -142,19 +142,17 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect){
  */
 PHP_METHOD(Phalcon_Db_Dialect, limit){
 
-	zval *sql_query, *number, *limit;
+	zval *sql_query, *number, limit = {};
 
-	phalcon_fetch_params(1, 2, 0, &sql_query, &number);
+	phalcon_fetch_params(0, 2, 0, &sql_query, &number);
 
 	if (phalcon_is_numeric(number)) {
-		PHALCON_MM_GROW();
-		PHALCON_INIT_VAR(limit);
-		ZVAL_LONG(limit, phalcon_get_intval(number));
-		PHALCON_CONCAT_VSV(return_value, sql_query, " LIMIT ", limit);
-		RETURN_MM();
+		ZVAL_LONG(&limit, phalcon_get_intval(number));
+		PHALCON_CONCAT_VSV(return_value, sql_query, " LIMIT ", &limit);
+		return;
 	}
 
-	RETURN_ZVAL(sql_query, 1, 0);
+	RETURN_CTORW(sql_query);
 }
 
 /**
@@ -175,7 +173,6 @@ PHP_METHOD(Phalcon_Db_Dialect, forUpdate){
 	phalcon_fetch_params(0, 1, 0, &sql_query);
 
 	PHALCON_CONCAT_VS(return_value, sql_query, " FOR UPDATE");
-	return;
 }
 
 /**
@@ -196,7 +193,6 @@ PHP_METHOD(Phalcon_Db_Dialect, sharedLock){
 	phalcon_fetch_params(0, 1, 0, &sql_query);
 
 	PHALCON_CONCAT_VS(return_value, sql_query, " LOCK IN SHARE MODE");
-	return;
 }
 
 /**
@@ -211,26 +207,21 @@ PHP_METHOD(Phalcon_Db_Dialect, sharedLock){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getColumnList){
 
-	zval *column_list, *str_list, *escape_char, *column = NULL;
-	zval *column_quoted = NULL;
+	zval *column_list, str_list = {}, *escape_char, *column;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &column_list);
 
-	phalcon_fetch_params(1, 1, 0, &column_list);
-
-	PHALCON_INIT_VAR(str_list);
-	array_init(str_list);
+	array_init(&str_list);
 
 	escape_char = phalcon_read_property(getThis(), SL("_escapeChar"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(column_list), column) {
-		PHALCON_INIT_NVAR(column_quoted);
-		PHALCON_CONCAT_VVV(column_quoted, escape_char, column, escape_char);
-		phalcon_array_append(str_list, column_quoted, PH_COPY);
+		zval column_quoted = {};
+		PHALCON_CONCAT_VVV(&column_quoted, escape_char, column, escape_char);
+		phalcon_array_append(&str_list, &column_quoted, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_fast_join_str(return_value, SL(", "), str_list);
-	RETURN_MM();
+	phalcon_fast_join_str(return_value, SL(", "), &str_list);
 }
 
 /**
@@ -251,40 +242,33 @@ PHP_METHOD(Phalcon_Db_Dialect, getEscapeChar){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 
-	zval *expression, *escape_char = NULL, *quoting = NULL, type, name, escaped_name;
-	zval domain, value, expression_value, operator;
-	zval times, placeholders, left, right, expression_left, expression_right;
-	zval sql_items, items, *item;
-	zval list_expression, exception_message;
+	zval *expression, *_escape_char = NULL, *quoting = NULL, escape_char = {}, type = {}, name = {}, escaped_name = {},  domain = {}, value = {}, expression_value = {}, operator = {};
+	zval times = {}, placeholders = {}, left = {}, right = {}, expression_left = {}, expression_right = {}, sql_items = {}, items = {}, *item, list_expression = {}, exception_message = {};
 	int t, i;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 2, &expression, &escape_char, &quoting);
+	phalcon_fetch_params(0, 1, 2, &expression, &_escape_char, &quoting);
 
 	if (Z_TYPE_P(expression) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SQL expression");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SQL expression");
 		return;
 	}
 
-	if (!escape_char) {
-		PHALCON_INIT_VAR(escape_char);
+	if (PHALCON_GLOBAL(db).escape_identifiers) {
+		if (!_escape_char) {
+			 phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
+		} else {
+			PHALCON_CPY_WRT(&escape_char, _escape_char);
+		}
 	} else {
-		PHALCON_SEPARATE_PARAM(escape_char);
+		ZVAL_NULL(&escape_char);
 	}
 
 	if (!quoting) {
 		quoting = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		if (Z_TYPE_P(escape_char) == IS_NULL) {
-			escape_char = phalcon_read_property(getThis(), SL("_escapeChar"), PH_NOISY);
-		}
-	}
-
 	if (!phalcon_array_isset_fetch_str(&type, expression, SL("type"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SQL expression");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SQL expression");
 		return;
 	}
 
@@ -293,26 +277,18 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 */
 	if (PHALCON_IS_STRING(&type, "qualified")) {
 		phalcon_array_fetch_str(&name, expression, SL("name"), PH_NOISY);
-		if (PHALCON_GLOBAL(db).escape_identifiers) {
-			PHALCON_CONCAT_VVV(&escaped_name, escape_char, &name, escape_char);
-		} else {
-			ZVAL_COPY_VALUE(&escaped_name, &name);
-		}
+
+		PHALCON_CONCAT_VVV(&escaped_name, &escape_char, &name, &escape_char);
 
 		/**
 		 * A domain could be a table/schema
 		 */
 		if (phalcon_array_isset_fetch_str(&domain, expression, SL("domain"))) {
-			if (PHALCON_GLOBAL(db).escape_identifiers) {
-				PHALCON_CONCAT_VVVSV(return_value, escape_char, &domain, escape_char, ".", &escaped_name);
-			} else {
-				PHALCON_CONCAT_VSV(return_value, &domain, ".", &escaped_name);
-			}
-
-			RETURN_MM();
+			PHALCON_CONCAT_VVVSV(return_value, &escape_char, &domain, &escape_char, ".", &escaped_name);
+			return;
 		}
 
-		RETURN_CTOR(&escaped_name);
+		RETURN_CTORW(&escaped_name);
 	}
 
 	/**
@@ -323,10 +299,10 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 
 		if (zend_is_true(quoting)) {
 			PHALCON_CONCAT_SVS(return_value, "'", &value, "'");
-			RETURN_MM();
+			return;
 		}
 
-		RETURN_CTOR(&value);
+		RETURN_CTORW(&value);
 	}
 
 	/**
@@ -337,11 +313,11 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 		phalcon_array_fetch_str(&right, expression, SL("right"), PH_NOISY);
 
-		PHALCON_CALL_METHOD(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
-		PHALCON_CALL_METHOD(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
+		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
+		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, &escape_char);
 
 		PHALCON_CONCAT_VSVSV(return_value, &expression_left, " ", &operator, " ", &expression_right);
-		RETURN_MM();
+		return;
 	}
 
 	/**
@@ -354,18 +330,18 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		 * Some unary operators uses the left operand...
 		 */
 		if (phalcon_array_isset_fetch_str(&left, expression, SL("left"))) {
-			PHALCON_CALL_METHOD(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
+			PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
 			PHALCON_CONCAT_VV(return_value, &expression_left, &operator);
-			RETURN_MM();
+			return;
 		}
 
 		/**
 		 * ...Others uses the right operand
 		 */
 		if (phalcon_array_isset_fetch_str(&right, expression, SL("right"))) {
-			PHALCON_CALL_METHOD(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
+			PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, &escape_char);
 			PHALCON_CONCAT_VV(return_value, &operator, &expression_right);
-			RETURN_MM();
+			return;
 		}
 	}
 
@@ -381,7 +357,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 			t = phalcon_get_intval(&times);
 			i = 0;
 			while (i++ < t) {
-				zval index, placeholder;
+				zval index = {}, placeholder = {};
 				ZVAL_LONG(&index, t);
 
 				PHALCON_CONCAT_VV(&placeholder, &value, &index);
@@ -392,7 +368,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 			phalcon_fast_join_str(&value, SL(", "), &placeholders);
 		}
 		
-		RETURN_CTOR(&value);
+		RETURN_CTORW(&value);
 	}
 
 	/**
@@ -401,18 +377,18 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	if (PHALCON_IS_STRING(&type, "parentheses")) {
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 
-		PHALCON_CALL_METHOD(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
+		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
 
 		PHALCON_CONCAT_SVS(return_value, "(", &expression_left, ")");
-		RETURN_MM();
+		return;
 	}
 
 	/**
 	 * Resolve function calls
 	 */
 	if (PHALCON_IS_STRING(&type, "functionCall")) {
-		PHALCON_RETURN_CALL_METHOD(getThis(), "getsqlexpressionfunctioncall", expression, escape_char);
-		RETURN_MM();
+		PHALCON_RETURN_CALL_METHODW(getThis(), "getsqlexpressionfunctioncall", expression, &escape_char);
+		return;
 	}
 
 	/**
@@ -424,23 +400,22 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		phalcon_array_fetch_long(&items, expression, 0, PH_NOISY);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(items), item) {
-			zval item_expression;
-
-			PHALCON_CALL_METHOD(&item_expression, getThis(), "getsqlexpression", item, escape_char);
+			zval item_expression = {};
+			PHALCON_CALL_METHODW(&item_expression, getThis(), "getsqlexpression", item, &escape_char);
 			phalcon_array_append(&sql_items, &item_expression, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&list_expression, SL(", "), &sql_items);
 		PHALCON_CONCAT_SVS(return_value, "(", &list_expression, ")");
 
-		RETURN_MM();
+		return;
 	}
 
 	/**
 	 * Resolve *
 	 */
 	if (PHALCON_IS_STRING(&type, "all")) {
-		RETURN_MM_STRING("*");
+		RETURN_STRING("*");
 	}
 
 	/**
@@ -450,19 +425,19 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 		phalcon_array_fetch_str(&right, expression, SL("right"), PH_NOISY);
 
-		PHALCON_CALL_METHOD(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
-		PHALCON_CALL_METHOD(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
+		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
+		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, &escape_char);
 
 		PHALCON_CONCAT_SVSVS(return_value, "CAST(", &expression_left, " AS ", &expression_right, ")");
-		RETURN_MM();
+		return;
 	}
 
 	/**
 	 * Resolve CASE of values 
 	 */
 	if (PHALCON_IS_STRING(&type, "case")) {
-		PHALCON_RETURN_CALL_METHOD(getThis(), "getsqlexpressioncase", expression, escape_char);
-		RETURN_MM();
+		PHALCON_RETURN_CALL_METHODW(getThis(), "getsqlexpressioncase", expression, &escape_char);
+		return;
 	}
 
 	/**
@@ -471,12 +446,10 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	if (PHALCON_IS_STRING(&type, "convert")) {
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
 		phalcon_array_fetch_str(&right, expression, SL("right"), PH_NOISY);
-
-		PHALCON_CALL_METHOD(&expression_left, getThis(), "getsqlexpression", &left, escape_char);
-		PHALCON_CALL_METHOD(&expression_right, getThis(), "getsqlexpression", &right, escape_char);
-
+		PHALCON_CALL_METHODW(&expression_left, getThis(), "getsqlexpression", &left, &escape_char);
+		PHALCON_CALL_METHODW(&expression_right, getThis(), "getsqlexpression", &right, &escape_char);
 		PHALCON_CONCAT_SVSVS(return_value, "CONVERT(", &expression_left, " USING ", &expression_right, ")");
-		RETURN_MM();
+		return;
 	}
 
 	/**
@@ -484,19 +457,16 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 */
 	if (PHALCON_IS_STRING(&type, "select")) {
 		phalcon_array_fetch_str(&value, expression, SL("value"), PH_NOISY);
-
-		PHALCON_CALL_METHOD(&expression_value, getThis(), "select", &value);
-
+		PHALCON_CALL_METHODW(&expression_value, getThis(), "select", &value);
 		PHALCON_CONCAT_SVS(return_value, "(", &expression_value, ")");
-		RETURN_MM();
+		return;
 	}
 
 	/**
 	 * Expression type wasn't found
 	 */
 	PHALCON_CONCAT_SVS(&exception_message, "Invalid SQL expression type '", &type, "'");
-	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
-	return;
+	PHALCON_THROW_EXCEPTION_ZVALW(phalcon_db_exception_ce, &exception_message);
 }
 
 /**
@@ -506,52 +476,46 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 
-	zval *expression, *escape_char = NULL, expr, expr_tmp, clauses, *clause;
+	zval *expression, *escape_char = NULL, expr = {}, expr_tmp = {}, clauses = {},  *clause;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &expression, &escape_char);
+	phalcon_fetch_params(0, 1, 1, &expression, &escape_char);
 
 	if (!escape_char) {
-		PHALCON_INIT_VAR(escape_char);
-	} else {
-		PHALCON_SEPARATE_PARAM(escape_char);
+		escape_char = &PHALCON_GLOBAL(z_null);
 	}
 
 	ZVAL_STRING(return_value, "CASE ");
 
 	phalcon_array_fetch_str(&expr, expression, SL("expr"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&expr_tmp, getThis(), "getsqlexpression", &expr, escape_char);
+	PHALCON_CALL_METHODW(&expr_tmp, getThis(), "getsqlexpression", &expr, escape_char);
 
 	PHALCON_CONCAT_SV(return_value, "CASE ", &expr_tmp);
 
 	phalcon_array_fetch_str(&clauses, expression, SL("when-clauses"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(clauses), clause) {
-		zval type, clause_when, clause_then, clause_expr, tmp, tmp1;
+		zval type = {}, clause_when = {}, clause_then = {}, clause_expr = {}, tmp = {}, tmp1 = {};
 
 		phalcon_array_fetch_str(&type, clause, ISL(type), PH_NOISY);
 		if (PHALCON_IS_STRING(&type, "when")) {
 			phalcon_array_fetch_str(&clause_when, clause, SL("when"), PH_NOISY);
 			phalcon_array_fetch_str(&clause_then, clause, SL("then"), PH_NOISY);
 
-			PHALCON_CALL_METHOD(&tmp, getThis(), "getsqlexpression", &clause_when, escape_char);
-			PHALCON_CALL_METHOD(&tmp1, getThis(), "getsqlexpression", &clause_then, escape_char);
+			PHALCON_CALL_METHODW(&tmp, getThis(), "getsqlexpression", &clause_when, escape_char);
+			PHALCON_CALL_METHODW(&tmp1, getThis(), "getsqlexpression", &clause_then, escape_char);
 
 			PHALCON_SCONCAT_SVSV(return_value, " WHEN ", &tmp, " THEN ", &tmp1);
 		} else {
 			phalcon_array_fetch_str(&clause_expr, clause, ISL(expr), PH_NOISY);
 
-			PHALCON_CALL_METHOD(&tmp, getThis(), "getsqlexpression", &clause_expr, escape_char);
+			PHALCON_CALL_METHODW(&tmp, getThis(), "getsqlexpression", &clause_expr, escape_char);
 
 			PHALCON_SCONCAT_SV(return_value, " ELSE ", &tmp);
 		}
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_SCONCAT_STR(return_value, " END");
-
-	RETURN_MM();
 }
 
 /**
@@ -561,31 +525,28 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 
-	zval *expression, *escape_char = NULL, name, custom_functions, custom_function, sql_arguments, arguments, *argument, arguments_joined;
+	zval *expression, *escape_char = NULL, name = {}, custom_functions = {}, custom_function = {}, sql_arguments = {}, arguments = {}, *argument, arguments_joined = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &expression, &escape_char);
+	phalcon_fetch_params(0, 1, 1, &expression, &escape_char);
 
 	if (!escape_char) {
-		PHALCON_INIT_VAR(escape_char);
+		escape_char = &PHALCON_GLOBAL(z_null);
 	}
 
 	phalcon_array_fetch_str(&name, expression, SL("name"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(&custom_functions, getThis(), "getcustomfunctions");
+	PHALCON_CALL_METHODW(&custom_functions, getThis(), "getcustomfunctions");
 
 	if (phalcon_array_isset_fetch(&custom_function, &custom_functions, &name)) {
-		PHALCON_RETURN_CALL_ZVAL_FUNCTION(&custom_function, getThis(), expression, escape_char);
-		RETURN_MM();
+		PHALCON_CALL_ZVAL_FUNCTIONW(return_value, &custom_function, getThis(), expression, escape_char);
+		return;
 	}
 
 	array_init(&sql_arguments);
 	if (phalcon_array_isset_fetch_str(&arguments, expression, SL("arguments"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(arguments), argument) {
-			zval argument_expression;
-
-			PHALCON_CALL_METHOD(&argument_expression, getThis(), "getsqlexpression", argument, escape_char);
+			zval argument_expression = {};
+			PHALCON_CALL_METHODW(&argument_expression, getThis(), "getsqlexpression", argument, escape_char);
 			phalcon_array_append(&sql_arguments, &argument_expression, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
@@ -596,11 +557,10 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
 			PHALCON_CONCAT_VSVS(return_value, &name, "(", &arguments_joined, ")");
 		}
 
-		RETURN_MM();
+		return;
 	}
 
 	PHALCON_CONCAT_VS(return_value, &name, "()");
-	RETURN_MM();
 }
 
 /**
@@ -612,12 +572,9 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 
-	zval *table, *escape_char = NULL, table_name, sql_table;
-	zval schema_name, sql_schema, alias_name, sql_table_alias;
+	zval *table, *escape_char = NULL, table_name = {}, sql_table = {}, schema_name = {}, sql_schema = {}, alias_name = {}, sql_table_alias = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &table, &escape_char);
+	phalcon_fetch_params(0, 1, 1, &table, &escape_char);
 
 	if (!escape_char || Z_TYPE_P(escape_char) == IS_NULL) {
 		escape_char = phalcon_read_property(getThis(), SL("_escapeChar"), PH_NOISY);
@@ -631,7 +588,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CONCAT_VVV(&sql_table, escape_char, &table_name, escape_char);
 		} else {
-			ZVAL_COPY_VALUE(&sql_table, &table_name);
+			PHALCON_CPY_WRT_CTOR(&sql_table, &table_name);
 		}
 
 		/**
@@ -645,7 +602,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 				PHALCON_CONCAT_VSV(&sql_schema, &schema_name, ".", &sql_table);
 			}
 		} else {
-			ZVAL_COPY_VALUE(&sql_schema, &sql_table);
+			PHALCON_CPY_WRT_CTOR(&sql_schema, &sql_table);
 		}
 
 		/**
@@ -658,18 +615,18 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 				PHALCON_CONCAT_VSV(&sql_table_alias, &sql_schema, " AS ", &alias_name);
 			}
 		} else {
-			ZVAL_COPY_VALUE(&sql_table_alias, &sql_schema);
+			PHALCON_CPY_WRT_CTOR(&sql_table_alias, &sql_schema);
 		}
 
-		RETURN_CTOR(&sql_table_alias);
+		RETURN_CTORW(&sql_table_alias);
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CONCAT_VVV(return_value, escape_char, table, escape_char);
-		RETURN_MM();
+		return;
 	}
 
-	RETURN_CTOR(table);
+	RETURN_CTORW(table);
 }
 
 /**
@@ -680,30 +637,24 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect, select){
 
-	zval *definition, escape_char, columns, selected_columns, distinct;
-	zval *column = NULL, columns_sql, tables, selected_tables, *table;
-	zval tables_sql, sql, joins;
-	zval *join = NULL, where_conditions;
-	zval where_expression, group_items, group_fields;
-	zval *group_field = NULL, group_sql, group_clause, having_conditions, having_expression;
-	zval order_fields, order_items, *order_item = NULL;
-	zval order_sql, tmp1, tmp2, limit_value, number, offset;
+	zval *definition, escape_char = {}, columns = {}, selected_columns = {}, distinct = {}, *column, columns_sql = {}, tables = {}, selected_tables = {}, *table;
+	zval tables_sql = {}, sql = {}, joins = {}, *join = NULL, where_conditions = {}, where_expression = {}, group_items = {}, group_fields = {};
+	zval *group_field = NULL, group_sql = {}, group_clause = {}, having_conditions = {}, having_expression = {}, order_fields = {}, order_items = {}, *order_item;
+	zval order_sql = {}, tmp1 = {}, tmp2 = {}, limit_value = {}, number = {}, offset = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &definition);
+	phalcon_fetch_params(0, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SELECT definition");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SELECT definition");
 		return;
 	}
 	if (!phalcon_array_isset_fetch_str(&tables, definition, SL("tables"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
 		return;
 	}
 
@@ -715,7 +666,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		array_init(&selected_columns);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&columns), column) {
-			zval column_item, column_sql, column_domain, column_domain_sql, column_alias, column_alias_sql;
+			zval column_item = {}, column_sql = {}, column_domain = {}, column_domain_sql = {}, column_alias = {}, column_alias_sql = {};
 			/**
 			 * Escape column name
 			 */
@@ -724,16 +675,16 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 				 || phalcon_array_isset_fetch_str(&column_item, column, SL("column"))
 			) {
 				if (Z_TYPE_P(&column_item) == IS_ARRAY) {
-					PHALCON_CALL_METHOD(&column_sql, getThis(), "getsqlexpression", &column_item, &escape_char);
+					PHALCON_CALL_METHODW(&column_sql, getThis(), "getsqlexpression", &column_item, &escape_char);
 				} else if (PHALCON_IS_STRING(&column_item, "*")) {
-					ZVAL_COPY_VALUE(&column_sql, &column_item);
+					PHALCON_CPY_WRT_CTOR(&column_sql, &column_item);
 				} else if (PHALCON_GLOBAL(db).escape_identifiers) {
 					PHALCON_CONCAT_VVV(&column_sql, &escape_char, &column_item, &escape_char);
 				} else {
-					ZVAL_COPY_VALUE(&column_sql, &column_item);
+					PHALCON_CPY_WRT_CTOR(&column_sql, &column_item);
 				}
 			} else {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SELECT definition");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SELECT definition");
 				return;
 			}
 
@@ -748,10 +699,10 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 						PHALCON_CONCAT_VSV(&column_domain_sql, &column_domain, ".", &column_sql);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
+					PHALCON_CPY_WRT_CTOR(&column_domain_sql, &column_sql);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
+				PHALCON_CPY_WRT_CTOR(&column_domain_sql, &column_sql);
 			}
 
 			/**
@@ -765,10 +716,10 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 						PHALCON_CONCAT_VSV(&column_alias_sql, &column_domain_sql, " AS ", &column_alias);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
+					PHALCON_CPY_WRT_CTOR(&column_alias_sql, &column_domain_sql);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
+				PHALCON_CPY_WRT_CTOR(&column_alias_sql, &column_domain_sql);
 			}
 
 			phalcon_array_append(&selected_columns, &column_alias_sql, PH_COPY);
@@ -776,7 +727,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 		phalcon_fast_join_str(&columns_sql, SL(", "), &selected_columns);
 	} else {
-		ZVAL_COPY_VALUE(&columns_sql, &columns);
+		PHALCON_CPY_WRT_CTOR(&columns_sql, &columns);
 	}
 
 	/**
@@ -786,14 +737,14 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		array_init(&selected_tables);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
-			zval sql_table;
-			PHALCON_CALL_METHOD(&sql_table, getThis(), "getsqltable", table, &escape_char);
+			zval sql_table = {};
+			PHALCON_CALL_METHODW(&sql_table, getThis(), "getsqltable", table, &escape_char);
 			phalcon_array_append(&selected_tables, &sql_table, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&tables_sql, SL(", "), &selected_tables);
 	} else {
-		ZVAL_COPY_VALUE(&tables_sql, &tables);
+		PHALCON_CPY_WRT_CTOR(&tables_sql, &tables);
 	}
 
 	if (phalcon_array_isset_fetch_str(&distinct, definition, SL("distinct"))) {
@@ -819,13 +770,13 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	 */
 	if (phalcon_array_isset_fetch_str(&joins, definition, SL("joins"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(joins), join) {
-			zval type, source, sql_table, sql_join, join_conditions_array;
-			zval *join_condition, join_expressions, join_conditions;
+			zval type = {}, source = {}, sql_table = {}, sql_join = {}, join_conditions_array = {};
+			zval *join_condition, join_expressions = {}, join_conditions = {};
 
 			phalcon_array_fetch_str(&type, join, SL("type"), PH_NOISY);
 			phalcon_array_fetch_str(&source, join, SL("source"), PH_NOISY);
 
-			PHALCON_CALL_METHOD(&sql_table, getThis(), "getsqltable", &source, &escape_char);
+			PHALCON_CALL_METHODW(&sql_table, getThis(), "getsqltable", &source, &escape_char);
 
 			phalcon_array_append(&selected_tables, &sql_table, PH_COPY);
 
@@ -839,8 +790,8 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 					array_init(&join_expressions);
 
 					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&join_conditions_array), join_condition) {
-						zval join_expression;
-						PHALCON_CALL_METHOD(&join_expression, getThis(), "getsqlexpression", join_condition, &escape_char);
+						zval join_expression = {};
+						PHALCON_CALL_METHODW(&join_expression, getThis(), "getsqlexpression", join_condition, &escape_char);
 						phalcon_array_append(&join_expressions, &join_expression, PH_COPY);
 					} ZEND_HASH_FOREACH_END();
 
@@ -856,7 +807,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
 		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) { 
-			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
+			PHALCON_CALL_METHODW(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_conditions);
@@ -868,8 +819,8 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		array_init(&group_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(group_fields), group_field) {
-			zval group_expression;
-			PHALCON_CALL_METHOD(&group_expression, getThis(), "getsqlexpression", group_field, &escape_char);
+			zval group_expression = {};
+			PHALCON_CALL_METHODW(&group_expression, getThis(), "getsqlexpression", group_field, &escape_char);
 			phalcon_array_append(&group_items, &group_expression, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
@@ -881,7 +832,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	/* Check for a HAVING clause */
 	if (phalcon_array_isset_fetch_str(&having_conditions, definition, SL("having"))) {
-		PHALCON_CALL_METHOD(&having_expression, getThis(), "getsqlexpression", &having_conditions, &escape_char);
+		PHALCON_CALL_METHODW(&having_expression, getThis(), "getsqlexpression", &having_conditions, &escape_char);
 		PHALCON_SCONCAT_SV(&sql, " HAVING ", &having_expression);
 	}
 
@@ -890,11 +841,10 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		array_init(&order_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(order_fields), order_item) {
-			zval order_expression, order_sql_item, sql_order_type, order_sql_item_type;
+			zval order_expression = {}, order_sql_item = {}, sql_order_type = {}, order_sql_item_type = {};
 
 			phalcon_array_fetch_long(&order_expression, order_item, 0, PH_NOISY);
-
-			PHALCON_CALL_METHOD(&order_sql_item, getThis(), "getsqlexpression", &order_expression, &escape_char);
+			PHALCON_CALL_METHODW(&order_sql_item, getThis(), "getsqlexpression", &order_expression, &escape_char);
 
 			/**
 			 * In the numeric 1 position could be a ASC/DESC clause
@@ -902,7 +852,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
 				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
+				PHALCON_CPY_WRT_CTOR(&order_sql_item_type, &order_sql_item);
 			}
 
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
@@ -939,14 +889,12 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	 * Check for a FOR UPDATE clause
 	 */
 	if (phalcon_array_isset_str(definition, SL("forupdate"))) {
-		PHALCON_RETURN_CALL_METHOD(getThis(), "forupdate", &sql);
-		RETURN_MM();
+		PHALCON_RETURN_CALL_METHODW(getThis(), "forupdate", &sql);
+		return;
 	}
 
-	RETURN_CTOR(&sql);
+	RETURN_CTORW(&sql);
 }
-
-
 
 /**
  * Builds a INSERT statement
@@ -954,36 +902,33 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
  * @param array $definition
  * @return string
  */
-PHP_METHOD(Phalcon_Db_Dialect, insert){
-	zval *definition, table, fields, values, exception_message;
-	zval escaped_table, escape_char, joined_values, escaped_fields;
-	zval *field = NULL, joined_fields;
+PHP_METHOD(Phalcon_Db_Dialect, insert)
+{
+	zval *definition, table = {}, fields = {}, values = {}, exception_message = {}, escaped_table = {}, escape_char = {}, joined_values = {}, escaped_fields = {}, *field, joined_fields = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &definition);
+	phalcon_fetch_params(0, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid INSERT definition");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid INSERT definition");
 		return;
 	}
 	if (!phalcon_array_isset_fetch_str(&table, definition, SL("table"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'table' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'table' is required in the definition array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&fields, definition, SL("fields"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&values, definition, SL("values"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'values' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'values' is required in the definition array");
 		return;
 	}
 
 	if (unlikely(Z_TYPE(values) != IS_ARRAY)) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The second parameter for insert isn't an Array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The second parameter for insert isn't an Array");
 		return;
 	}
 
@@ -992,13 +937,12 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 	 */
 	if (!phalcon_fast_count_ev(&values)) {
 		PHALCON_CONCAT_SVS(&exception_message, "Unable to insert into ", &table, " without data");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_db_exception_ce, &exception_message);
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&escaped_table, getThis(), "getsqltable", &table);
-
-	PHALCON_CALL_METHOD(&escape_char, getThis(), "getescapechar");
+	PHALCON_CALL_METHODW(&escaped_table, getThis(), "getsqltable", &table);
+	PHALCON_CALL_METHODW(&escape_char, getThis(), "getescapechar");
 
 	/**
 	 * Build the final SQL INSERT statement
@@ -1009,14 +953,13 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 			array_init(&escaped_fields);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(fields), field) {
-				zval escaped_field;
-
+				zval escaped_field = {};
 				PHALCON_CONCAT_VVV(&escaped_field, &escape_char, field, &escape_char);
 				phalcon_array_append(&escaped_fields, &escaped_field, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 
 		} else {
-			ZVAL_COPY_VALUE(&escaped_fields, &fields);
+			PHALCON_CPY_WRT_CTOR(&escaped_fields, &fields);
 		}
 
 		phalcon_fast_join_str(&joined_fields, SL(", "), &escaped_fields);
@@ -1025,8 +968,6 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
 	} else {
 		PHALCON_CONCAT_SVSVS(return_value, "INSERT INTO ", &escaped_table, " VALUES (", &joined_values, ")");
 	}
-
-	RETURN_MM();
 }
 
 /**
@@ -1037,21 +978,16 @@ PHP_METHOD(Phalcon_Db_Dialect, insert){
  */
 PHP_METHOD(Phalcon_Db_Dialect, update){
 
-	zval *definition, *quoting = NULL, tables, fields, values, escape_char;
-	zval updated_tables, *table, tables_sql, sql;
-	zval updated_fields, *column, columns_sql;
-	zval where_conditions, where_expression;
-	zval order_fields, order_items, *order_item, order_sql;
-	zval limit_value, number, offset, tmp1, tmp2;
+	zval *definition, *quoting = NULL, tables = {}, fields = {}, values = {}, escape_char = {}, updated_tables = {}, *table, tables_sql = {}, sql = {};
+	zval updated_fields = {}, *column, columns_sql = {}, where_conditions = {}, where_expression = {};
+	zval order_fields = {}, order_items = {}, *order_item, order_sql = {}, limit_value = {}, number = {}, offset = {}, tmp1 = {}, tmp2 = {};
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &definition, &quoting);
+	phalcon_fetch_params(0, 1, 1, &definition, &quoting);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid Update definition");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid Update definition");
 		return;
 	}
 
@@ -1060,17 +996,17 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	if (!phalcon_array_isset_fetch_str(&tables, definition, SL("tables"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&fields, definition, SL("fields"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&values, definition, SL("values"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
 		return;
 	}
 
@@ -1084,8 +1020,8 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	array_init(&updated_tables);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(tables), table) {
-		zval table_expression;
-		PHALCON_CALL_METHOD(&table_expression, getThis(), "getsqltable", table, &escape_char);
+		zval table_expression = {};
+		PHALCON_CALL_METHODW(&table_expression, getThis(), "getsqltable", table, &escape_char);
 		phalcon_array_append(&updated_tables, &table_expression, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
@@ -1096,7 +1032,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	array_init(&updated_fields);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, column) {
-		zval position, column_name, value_expr, value, value_expression, column_expression;
+		zval position = {}, column_name = {}, value_expr = {}, value = {}, value_expression = {}, column_expression = {};
 
 		if (str_key) {
 			ZVAL_STR(&position, str_key);
@@ -1104,7 +1040,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 			ZVAL_LONG(&position, idx);
 		}
 		if (Z_TYPE_P(column) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid UPDATE definition");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid UPDATE definition");
 			return;
 		}
 
@@ -1112,7 +1048,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 		phalcon_array_fetch(&value_expr, &values, &position, PH_NOISY);
 		phalcon_array_fetch_str(&value, &value_expr, SL("value"), PH_NOISY);
 
-		PHALCON_CALL_METHOD(&value_expression, getThis(), "getsqlexpression", &value, &escape_char, quoting);
+		PHALCON_CALL_METHODW(&value_expression, getThis(), "getsqlexpression", &value, &escape_char, quoting);
 
 		PHALCON_CONCAT_VSV(&column_expression, &column_name, " = ", &value_expression);
 
@@ -1126,7 +1062,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
 		if (Z_TYPE(where_conditions) == IS_ARRAY) { 
-			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
+			PHALCON_CALL_METHODW(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_conditions);
@@ -1138,11 +1074,11 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 		array_init(&order_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(order_fields), order_item) {
-			zval order_expression, order_sql_item, sql_order_type, order_sql_item_type;
+			zval order_expression = {}, order_sql_item = {}, sql_order_type = {}, order_sql_item_type = {};
 
 			phalcon_array_fetch_long(&order_expression, order_item, 0, PH_NOISY);
 
-			PHALCON_CALL_METHOD(&order_sql_item, getThis(), "getsqlexpression", &order_expression, &escape_char);
+			PHALCON_CALL_METHODW(&order_sql_item, getThis(), "getsqlexpression", &order_expression, &escape_char);
 
 			/**
 			 * In the numeric 1 position could be a ASC/DESC clause
@@ -1150,7 +1086,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
 				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
+				PHALCON_CPY_WRT_CTOR(&order_sql_item_type, &order_sql_item);
 			}
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -1182,7 +1118,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 		}
 	}
 
-	RETURN_CTOR(&sql);
+	RETURN_CTORW(&sql);
 }
 
 /**
@@ -1193,22 +1129,17 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
  */
 PHP_METHOD(Phalcon_Db_Dialect, delete){
 
-	zval *definition, tables, escape_char;
-	zval updated_tables, *table = NULL, tables_sql, sql;
-	zval where_conditions, where_expression;
-	zval order_fields, order_items, *order_item, order_sql;
-	zval limit_value, number, offset, tmp1, tmp2;
+	zval *definition, tables = {}, escape_char = {}, updated_tables = {}, *table, tables_sql = {}, sql = {}, where_conditions = {}, where_expression = {};
+	zval order_fields = {}, order_items = {}, *order_item, order_sql = {}, limit_value = {}, number = {}, offset = {}, tmp1 = {}, tmp2 = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &definition);
+	phalcon_fetch_params(0, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid Update definition");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid Update definition");
 		return;
 	}
 	if (!phalcon_array_isset_fetch_str(&tables, definition, SL("tables"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
 		return;
 	}
 
@@ -1222,8 +1153,8 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	array_init(&updated_tables);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
-		zval sql_table;
-		PHALCON_CALL_METHOD(&sql_table, getThis(), "getsqltable", table, &escape_char);
+		zval sql_table = {};
+		PHALCON_CALL_METHODW(&sql_table, getThis(), "getsqltable", table, &escape_char);
 		phalcon_array_append(&updated_tables, &sql_table, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
@@ -1234,7 +1165,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
 		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) { 
-			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
+			PHALCON_CALL_METHODW(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_conditions);
@@ -1246,11 +1177,11 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 		array_init(&order_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(order_fields), order_item) {
-			zval order_expression, order_sql_item, sql_order_type, order_sql_item_type;
+			zval order_expression = {}, order_sql_item = {}, sql_order_type = {}, order_sql_item_type = {};
 
 			phalcon_array_fetch_long(&order_expression, order_item, 0, PH_NOISY);
 
-			PHALCON_CALL_METHOD(&order_sql_item, getThis(), "getsqlexpression", &order_expression, &escape_char);
+			PHALCON_CALL_METHODW(&order_sql_item, getThis(), "getsqlexpression", &order_expression, &escape_char);
 
 			/**
 			 * In the numeric 1 position could be a ASC/DESC clause
@@ -1258,7 +1189,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
 				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
+				PHALCON_CPY_WRT_CTOR(&order_sql_item_type, &order_sql_item);
 			}
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -1290,7 +1221,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 		}
 	}
 
-	RETURN_CTOR(&sql);
+	RETURN_CTORW(&sql);
 }
 
 /**

@@ -149,9 +149,8 @@ PHP_METHOD(Phalcon_Text, camelize){
 	zval *str;
 
 	phalcon_fetch_params(0, 1, 0, &str);
-	
+
 	phalcon_camelize(return_value, str);
-	return;
 }
 
 /**
@@ -169,9 +168,8 @@ PHP_METHOD(Phalcon_Text, uncamelize){
 	zval *str;
 
 	phalcon_fetch_params(0, 1, 0, &str);
-	
+
 	phalcon_uncamelize(return_value, str);
-	return;
 }
 
 /**
@@ -188,29 +186,25 @@ PHP_METHOD(Phalcon_Text, uncamelize){
  */
 PHP_METHOD(Phalcon_Text, increment){
 
-	zval *str, *separator = NULL, sep, parts, number, first_part;
+	zval *str, *separator = NULL, sep = {}, parts = {}, number = {}, first_part = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &str, &separator);
+	phalcon_fetch_params(0, 1, 1, &str, &separator);
 
 	if (!separator || Z_TYPE_P(separator) == IS_NULL) {
 		ZVAL_STRING(&sep, "_");
 	} else {
-		ZVAL_COPY_VALUE(&sep, separator);
+		PHALCON_CPY_WRT_CTOR(&sep, separator);
 	}
 
 	phalcon_fast_explode(&parts, separator, str);
 	if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
 		phalcon_increment(&number);
 	} else {
-		ZVAL_COPY_VALUE(&number, &PHALCON_GLOBAL(z_one));
+		PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
 	}
 
 	phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
 	PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
-
-	RETURN_MM();
 }
 
 /**
@@ -226,18 +220,16 @@ PHP_METHOD(Phalcon_Text, increment){
  */
 PHP_METHOD(Phalcon_Text, random){
 
-	zval *type, *length = NULL, len;
+	zval *type, *length = NULL, len = {};
 
 	phalcon_fetch_params(0, 1, 1, &type, &length);
-	
+
 	if (!length) {
 		ZVAL_LONG(&len, 8);
 		phalcon_random_string(return_value, type, &len);
 	} else {
 		phalcon_random_string(return_value, type, length);
 	}
-	
-	
 }
 
 /**
@@ -256,11 +248,10 @@ PHP_METHOD(Phalcon_Text, random){
  */
 PHP_METHOD(Phalcon_Text, startsWith){
 
-	zval *str, *start, *ignore_case = NULL;
-	zval *case_sensitive;
+	zval *str, *start, *ignore_case = NULL, *case_sensitive;
 
 	phalcon_fetch_params(0, 2, 1, &str, &start, &ignore_case);
-	
+
 	if (!ignore_case) {
 		case_sensitive = &PHALCON_GLOBAL(z_false);
 	}
@@ -287,11 +278,10 @@ PHP_METHOD(Phalcon_Text, startsWith){
  */
 PHP_METHOD(Phalcon_Text, endsWith){
 
-	zval *str, *end, *ignore_case = NULL;
-	zval *case_sensitive;
+	zval *str, *end, *ignore_case = NULL, *case_sensitive;
 
 	phalcon_fetch_params(0, 2, 1, &str, &end, &ignore_case);
-	
+
 	if (!ignore_case) {
 		case_sensitive = &PHALCON_GLOBAL(z_false);
 	}
@@ -313,15 +303,14 @@ PHP_METHOD(Phalcon_Text, lower){
 	zval *str;
 
 	phalcon_fetch_params(0, 1, 0, &str);
-	
+
 	/** 
 	 * 'lower' checks for the mbstring extension to make a correct lowercase
 	 * transformation
 	 */
 	if (phalcon_function_exists_ex(SL("mb_strtolower")) == SUCCESS) {
-		PHALCON_MM_GROW();
-		PHALCON_RETURN_CALL_FUNCTION("mb_strtolower", str);
-		RETURN_MM();
+		PHALCON_RETURN_CALL_FUNCTIONW("mb_strtolower", str);
+		return;
 	}
 
 	phalcon_fast_strtolower(return_value, str);
@@ -338,15 +327,14 @@ PHP_METHOD(Phalcon_Text, upper){
 	zval *str;
 
 	phalcon_fetch_params(0, 1, 0, &str);
-	
+
 	/** 
 	 * 'upper' checks for the mbstring extension to make a correct lowercase
 	 * transformation
 	 */
 	if (phalcon_function_exists_ex(SL("mb_strtoupper")) == SUCCESS) {
-		PHALCON_MM_GROW();
-		PHALCON_RETURN_CALL_FUNCTION("mb_strtoupper", str);
-		RETURN_MM();
+		PHALCON_RETURN_CALL_FUNCTIONW("mb_strtoupper", str);
+		return;
 	}
 
 	phalcon_fast_strtoupper(return_value, str);
@@ -363,7 +351,7 @@ PHP_METHOD(Phalcon_Text, upper){
  */
 PHP_METHOD(Phalcon_Text, bytes){
 
-	zval *z_size, *z_force_unit = NULL, *format = NULL, *si = NULL;
+	zval *_z_size, *_z_force_unit = NULL, *_format = NULL, z_size = {}, z_force_unit = {}, format = {}, *si = NULL;
 	char *force_unit;
 	const char **units;
 	const char *units1[] = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"};
@@ -371,39 +359,32 @@ PHP_METHOD(Phalcon_Text, bytes){
 	double size;
 	int mod, power = 0, found = 0, i, j = 0;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 3, &_z_size, &_z_force_unit, &_format, &si);
 
-	phalcon_fetch_params(1, 1, 3, &z_size, &z_force_unit, &format, &si);
+	PHALCON_CPY_WRT_CTOR(&z_size, _z_size);
+	convert_to_double(&z_size);
 
-	PHALCON_SEPARATE_PARAM(z_size);
-	convert_to_double(z_size);
+	size = Z_DVAL(z_size);
 
-	size = Z_DVAL_P(z_size);
-
-	if (!z_force_unit) {
-		PHALCON_INIT_VAR(z_force_unit);
-	} else {
-		PHALCON_SEPARATE_PARAM(z_force_unit);
-		convert_to_string(z_force_unit);
+	if (_z_force_unit) {
+		PHALCON_CPY_WRT_CTOR(&z_force_unit, _z_force_unit);
+		convert_to_string(&z_force_unit);
 	}
 
-	if (!format) {
-		PHALCON_INIT_VAR(format);
-	} else {
-		PHALCON_SEPARATE_PARAM(format);
-		convert_to_string(format);
+	if (_format) {
+		PHALCON_CPY_WRT_CTOR(&format, _format);
+		convert_to_string(&format);
 	}
 		
-	if (PHALCON_IS_EMPTY(format)) {
-		PHALCON_INIT_NVAR(format);
-		ZVAL_STRING(format, "%01.2f %s");
+	if (PHALCON_IS_EMPTY(&format)) {
+		ZVAL_STRING(&format, "%01.2f %s");
 	}
 
 	if (!si) {
 		si = &PHALCON_GLOBAL(z_true);
 	}
 
-	if (!zend_is_true(si) || (!PHALCON_IS_EMPTY(z_force_unit) && phalcon_memnstr_str(z_force_unit, SL("i")))) {
+	if (!zend_is_true(si) || (!PHALCON_IS_EMPTY(&z_force_unit) && phalcon_memnstr_str(&z_force_unit, SL("i")))) {
 		units = units2;
 		mod = 1024;
 	} else {
@@ -411,8 +392,8 @@ PHP_METHOD(Phalcon_Text, bytes){
 		mod = 1000;
 	}
 
-	if (!PHALCON_IS_EMPTY(z_force_unit)) {
-		force_unit = Z_STRVAL_P(z_force_unit);
+	if (!PHALCON_IS_EMPTY(&z_force_unit)) {
+		force_unit = Z_STRVAL(z_force_unit);
 		for (i = 0; i < sizeof(units); i++)
 		{
 			if (strcasecmp(force_unit, units[i]) == 0) {
@@ -435,15 +416,10 @@ PHP_METHOD(Phalcon_Text, bytes){
 		}
 	}
 
-	PHALCON_INIT_NVAR(z_size);
-	ZVAL_DOUBLE(z_size, size);
+	ZVAL_DOUBLE(&z_size, size);
+	ZVAL_STRING(&z_force_unit, units[power]);
 
-	PHALCON_INIT_NVAR(z_force_unit);
-	ZVAL_STRING(z_force_unit, units[power]);
-
-	PHALCON_RETURN_CALL_FUNCTION("sprintf", format, z_size, z_force_unit);
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_FUNCTIONW("sprintf", &format, &z_size, &z_force_unit);
 }
 
 /**
@@ -456,21 +432,14 @@ PHP_METHOD(Phalcon_Text, bytes){
  */
 PHP_METHOD(Phalcon_Text, reduceSlashes){
 
-	zval *str, *pattern, *replacement;
+	zval *str, pattern = {}, replacement = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &str);
 
-	phalcon_fetch_params(1, 1, 0, &str);
+	ZVAL_STRING(&pattern, "#(?<!:)//+#");
+	ZVAL_STRING(&replacement, "/");
 
-	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "#(?<!:)//+#");
-
-	PHALCON_INIT_VAR(replacement);
-	ZVAL_STRING(replacement, "/");
-
-	PHALCON_RETURN_CALL_FUNCTION("preg_replace", pattern, replacement, str);
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, str);
 }
 
 /**
@@ -488,22 +457,21 @@ PHP_METHOD(Phalcon_Text, reduceSlashes){
  */
 PHP_METHOD(Phalcon_Text, concat){
 
-	zval *separator, *a, *b;
-	zval arg_num, arg_list, offset, args, *c, str, a_trimmed, str_trimmed;
+	zval *separator, *a, *b, arg_num = {}, arg_list = {}, offset = {}, args = {}, *c, str = {}, a_trimmed = {}, str_trimmed = {};
 
 	phalcon_fetch_params(0, 3, 0, &separator, &a, &b);
 
-	PHALCON_CALL_FUNCTION(&arg_num, "func_num_args");
+	PHALCON_CALL_FUNCTIONW(&arg_num, "func_num_args");
 
 	if (Z_LVAL(arg_num) > 3) {
-		PHALCON_CALL_FUNCTION(&arg_list, "func_get_args");
+		PHALCON_CALL_FUNCTIONW(&arg_list, "func_get_args");
 
 		ZVAL_LONG(&offset, 3);
 
-		PHALCON_CALL_FUNCTION(&args, "array_slice", &arg_list, &offset);
+		PHALCON_CALL_FUNCTIONW(&args, "array_slice", &arg_list, &offset);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(args), c) {
-			zval b_trimmed, c_trimmed;
+			zval b_trimmed = {}, c_trimmed = {};
 
 			ZVAL_STR(&b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_RIGHT));
 			ZVAL_STR(&c_trimmed, phalcon_trim(c, separator, PHALCON_TRIM_LEFT));
@@ -512,7 +480,7 @@ PHP_METHOD(Phalcon_Text, concat){
 
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		ZVAL_COPY_VALUE(&str, b);
+		PHALCON_CPY_WRT_CTOR(&str, b);
 	}
 
 	ZVAL_STR(&a_trimmed, phalcon_trim(a, separator, PHALCON_TRIM_RIGHT));
@@ -529,26 +497,17 @@ PHP_METHOD(Phalcon_Text, concat){
  *   echo Phalcon\Text::underscore('Awesome Phalcon'); // 'Awesome_Phalcon'
  * </code>
  */
-PHP_METHOD(Phalcon_Text, underscore){
+PHP_METHOD(Phalcon_Text, underscore)
+{
+	zval *str, trimmed = {}, pattern = {}, replacement = {};
 
-	zval *str, *trimmed, *pattern, *replacement;
+	phalcon_fetch_params(0, 1, 0, &str);
 
-	PHALCON_MM_GROW();
+	ZVAL_STR(&trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
+	ZVAL_STRING(&pattern, "#\\s+#");
+	ZVAL_STRING(&replacement, "_");
 
-	phalcon_fetch_params(1, 1, 0, &str);
-
-	PHALCON_INIT_VAR(trimmed);
-	ZVAL_STR(trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
-
-	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "#\\s+#");
-
-	PHALCON_INIT_VAR(replacement);
-	ZVAL_STRING(replacement, "_");
-
-	PHALCON_RETURN_CALL_FUNCTION("preg_replace", pattern, replacement, trimmed);
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, &trimmed);
 }
 
 /**
@@ -559,24 +518,15 @@ PHP_METHOD(Phalcon_Text, underscore){
  *   echo Phalcon\Text::humanize('five_cats'); // 'five cats'
  * </code>
  */
-PHP_METHOD(Phalcon_Text, humanize){
+PHP_METHOD(Phalcon_Text, humanize)
+{
+	zval *str, trimmed = {}, pattern = {}, replacement = {};
 
-	zval *str, *trimmed, *pattern, *replacement;
+	phalcon_fetch_params(0, 1, 0, &str);
 
-	PHALCON_MM_GROW();
+	ZVAL_STR(&trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
+	ZVAL_STRING(&pattern, "#[_-]+#");
+	ZVAL_STRING(&replacement, " ");
 
-	phalcon_fetch_params(1, 1, 0, &str);
-
-	PHALCON_INIT_VAR(trimmed);
-	ZVAL_STR(trimmed, phalcon_trim(str, NULL, PHALCON_TRIM_BOTH));
-
-	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "#[_-]+#");
-
-	PHALCON_INIT_VAR(replacement);
-	ZVAL_STRING(replacement, " ");
-
-	PHALCON_RETURN_CALL_FUNCTION("preg_replace", pattern, replacement, trimmed);
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, &trimmed);
 }

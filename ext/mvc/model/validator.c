@@ -98,12 +98,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 
-	zval *message, *field = NULL, *type = NULL, *code = NULL;
-	zval *model_message, *t;
+	zval *message, *field = NULL, *type = NULL, *code = NULL, t = {}, model_message = {};
+	char *c;
+	int len;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 3, &message, &field, &type, &code);
+	phalcon_fetch_params(0, 1, 3, &message, &field, &type, &code);
 	
 	if (!field) {
 		field = &PHALCON_GLOBAL(z_null);
@@ -118,33 +117,26 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, appendMessage){
 	}
 	
 	if (!zend_is_true(type)) {
-		char *c;
-		int len;
 
-		PHALCON_INIT_VAR(t);
-		phalcon_get_class(t, getThis(), 0);
+		phalcon_get_class(&t, getThis(), 0);
 
-		assert(Z_TYPE_P(t) == IS_STRING);
+		assert(Z_TYPE(t) == IS_STRING);
 
-		c   = Z_STRVAL_P(t);
-		len = Z_STRLEN_P(t);
+		c   = Z_STRVAL(t);
+		len = Z_STRLEN(t);
 
 		if (len > 9 && !memcmp(c + len - 9, "Validator", 9)) {
-			Z_STRLEN_P(t) -= 9;
+			Z_STRLEN(t) -= 9;
 			c[len-9]       = 0;
 		}
+	} else {
+		PHALCON_CPY_WRT(&t, type);
 	}
-	else {
-		t = type;
-	}
+
+	object_init_ex(&model_message, phalcon_mvc_model_message_ce);
+	PHALCON_CALL_METHODW(NULL, &model_message, "__construct", message, field, &t, code);
 	
-	PHALCON_INIT_VAR(model_message);
-	object_init_ex(model_message, phalcon_mvc_model_message_ce);
-	PHALCON_CALL_METHOD(NULL, model_message, "__construct", message, field, t, code);
-	
-	phalcon_update_property_array_append(getThis(), SL("_messages"), model_message);
-	
-	PHALCON_MM_RESTORE();
+	phalcon_update_property_array_append(getThis(), SL("_messages"), &model_message);
 }
 
 /**
@@ -177,13 +169,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, getOptions){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator, getOption){
 
-	zval *option, *options, value;
+	zval *option, *options, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	
 	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, options, option)) {
-		RETURN_CTORW(value);
+		RETURN_CTORW(&value);
 	}
 	
 	RETURN_NULL();

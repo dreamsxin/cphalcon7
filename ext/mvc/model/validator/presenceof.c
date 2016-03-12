@@ -86,61 +86,50 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_PresenceOf){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_PresenceOf, validate){
 
-	zval *record, *option = NULL, *field_name = NULL, *value = NULL, *message = NULL;
-	zval *type, *is_set_code = NULL, *code = NULL;
+	zval *record, option = {}, field_name = {}, value = {}, message = {}, type = {}, is_set_code = {}, code = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &record);
 
-	phalcon_fetch_params(1, 1, 0, &record);
-	
-	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field");
-	
-	PHALCON_CALL_METHOD(&field_name, getThis(), "getoption", option);
-	if (Z_TYPE_P(field_name) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
+	ZVAL_STRING(&option, "field");
+
+	PHALCON_CALL_METHODW(&field_name, getThis(), "getoption", &option);
+	if (Z_TYPE(field_name) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}
-	
+
 	/** 
 	 * A value is null when it is identical to null or a empty string
 	 */
-	PHALCON_CALL_METHOD(&value, record, "readattribute", field_name);
-	if (PHALCON_IS_EMPTY(value)) {
-	
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field_name);
+	if (PHALCON_IS_EMPTY(&value)) {
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(message));
-	
-		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
-		if (!zend_is_true(message)) {
-			PHALCON_INIT_NVAR(message);
-			PHALCON_CONCAT_SVS(message, "'", field_name, "' is required");
+		ZVAL_STRING(&option, ISV(message));
+
+		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
+		if (!zend_is_true(&message)) {
+			PHALCON_CONCAT_SVS(&message, "'", &field_name, "' is required");
 		}
-	
-		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "PresenceOf");
+
+		ZVAL_STRING(&type, "PresenceOf");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
-		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
+		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
+		if (zend_is_true(&is_set_code)) {
+			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
-			PHALCON_INIT_VAR(code);
-			ZVAL_LONG(code, 0);
+			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field_name, type, code);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field_name, &type, &code);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
-}
 
+	RETURN_TRUE;
+}

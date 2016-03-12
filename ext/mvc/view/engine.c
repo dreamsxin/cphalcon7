@@ -91,11 +91,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 	zval *view, *dependency_injector = NULL;
 
 	phalcon_fetch_params(0, 1, 1, &view, &dependency_injector);
-	
+
 	if (!dependency_injector) {
 		dependency_injector = &PHALCON_GLOBAL(z_null);
 	}
-	
+
 	phalcon_update_property_this(getThis(), SL("_view"), view);
 	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
 }
@@ -123,11 +123,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, partial){
 	zval *partial_path, *params = NULL, *view;
 
 	phalcon_fetch_params(0, 1, 1, &partial_path, &params);
-	
+
 	if (!params) {
 		params = &PHALCON_GLOBAL(z_null);
 	}
-	
+
 	view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(view, "partial", partial_path, params);
 }
@@ -152,26 +152,22 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, getView){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
 
-	zval *name, *method_callable, *class_name, *method = NULL;
+	zval *name, *method_callable, class_name = {}, method = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &name, &method_callable);
-
+	phalcon_fetch_params(0, 2, 0, &name, &method_callable);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (Z_TYPE_P(method_callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(method_callable), zend_ce_closure)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Method must be an closure object");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Method must be an closure object");
 		return;
 	}
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, getThis(), 0);
+	phalcon_get_class(&class_name, getThis(), 0);
 
-	PHALCON_CALL_CE_STATIC(&method, zend_ce_closure, "bind", method_callable, getThis(), class_name);
+	PHALCON_CALL_CE_STATICW(&method, zend_ce_closure, "bind", method_callable, getThis(), &class_name);
 
-	phalcon_update_property_array(getThis(), SL("_methods"), name, method);
-	RETURN_THIS();
+	phalcon_update_property_array(getThis(), SL("_methods"), name, &method);
+	RETURN_THISW();
 }
 
 /**
@@ -183,68 +179,54 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
-	zval *method_name, *arguments = NULL, *methods, method, *dependency_injector, exception_message;
-	zval *service_name, *service = NULL, *callback;
+	zval *method, *args = NULL, method_name = {}, arguments = {}, *methods, func = {}, exception_message = {}, service_name = {}, service = {}, callback = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 1, &method, &arguments);
 
-	phalcon_fetch_params(1, 1, 1, &method_name, &arguments);
-	
-	if (!arguments) {
-		PHALCON_INIT_VAR(arguments);
-		array_init(arguments);
+	PHALCON_CPY_WRT(&method_name, method);
+
+	if (!args) {
+		array_init(&arguments);
+	} else {
+		PHALCON_CPY_WRT(&arguments, args);
 	}
 
 	methods = phalcon_read_property(getThis(), SL("_methods"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&method, methods, method_name)) {
-			PHALCON_CALL_USER_FUNC_ARRAY(&return_value, &method, arguments);
-			RETURN_MM();
+	if (phalcon_array_isset_fetch(&func, methods, &method_name)) {
+			PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &func, &arguments);
+			return;
 	}
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "A dependency injection object is required to access internal services");
+	if (phalcon_compare_strict_string(&method_name, SL("get")) 
+		|| phalcon_compare_strict_string(&method_name, SL("getPost"))
+		|| phalcon_compare_strict_string(&method_name, SL("getPut"))
+		|| phalcon_compare_strict_string(&method_name, SL("getQuery"))
+		|| phalcon_compare_strict_string(&method_name, SL("getServer"))) {
+		ZVAL_STRING(&service_name, ISV(request));
+	} else if (phalcon_compare_strict_string(&method_name, SL("getSession"))) {
+		ZVAL_STRING(&method_name, "get");
+		ZVAL_STRING(&service_name, ISV(session));
+	} else if (phalcon_compare_strict_string(&method_name, SL("getParam"))) {
+		ZVAL_STRING(&service_name, ISV(dispatcher));
+	}
+
+	PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name);
+
+	if (Z_TYPE(service) != IS_OBJECT) {
+		PHALCON_CONCAT_SVS(&exception_message, "The injected service '", &service_name, "' is not valid");
+		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
-	PHALCON_INIT_VAR(service_name);
-	if (phalcon_compare_strict_string(method_name, SL("get")) 
-		|| phalcon_compare_strict_string(method_name, SL("getPost"))
-		|| phalcon_compare_strict_string(method_name, SL("getPut"))
-		|| phalcon_compare_strict_string(method_name, SL("getQuery"))
-		|| phalcon_compare_strict_string(method_name, SL("getServer"))) {
-		ZVAL_STRING(service_name, ISV(request));
-	} else if (phalcon_compare_strict_string(method_name, SL("getSession"))) {
-		PHALCON_SEPARATE_PARAM(method_name);
-		PHALCON_INIT_NVAR(method_name);
-		ZVAL_STRING(method_name, "get");
-
-		ZVAL_STRING(service_name, ISV(session));
-	} else if (phalcon_compare_strict_string(method_name, SL("getParam"))) {
-		ZVAL_STRING(service_name, ISV(dispatcher));
-	}
-
-	PHALCON_CALL_METHOD(&service, dependency_injector, "getshared", service_name);
-
-	if (Z_TYPE_P(service) != IS_OBJECT) {
-		PHALCON_CONCAT_SVS(&exception_message, "The injected service '", service_name, "' is not valid");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
+	if (!phalcon_method_exists(&service, &method_name) == FAILURE) {
+		PHALCON_CONCAT_SVS(&exception_message, "The method \"", &method_name, "\" doesn't exist on view");
+		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
-	if (!phalcon_method_exists(service, method_name) == FAILURE) {
-		PHALCON_CONCAT_SVS(&exception_message, "The method \"", method_name, "\" doesn't exist on view");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
-		return;
-	}
+	array_init(&callback);
+	phalcon_array_append(&callback, &service, PH_COPY);
+	phalcon_array_append(&callback, &method_name, PH_COPY);
 
-	PHALCON_INIT_VAR(callback);
-	array_init(callback);
-
-	phalcon_array_append(callback, service, PH_COPY);
-	phalcon_array_append(callback, method_name, PH_COPY);
-
-	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, callback, arguments);
-
-	RETURN_MM();
+	PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &callback, &arguments);
 }

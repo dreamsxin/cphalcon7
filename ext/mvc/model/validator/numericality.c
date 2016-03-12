@@ -85,87 +85,61 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Numericality){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_Numericality, validate){
 
-	zval *record, *option = NULL, *field = NULL, *allow_empty = NULL, *value = NULL, *message = NULL;
-	zval *type, *is_set_code = NULL, *code = NULL;
+	zval *record, option = {}, field = {}, allow_empty = {}, value = {}, message = {}, type = {}, is_set_code = {}, code = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &record);
 
-	phalcon_fetch_params(1, 1, 0, &record);
-	
-	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field");
-	
-	PHALCON_CALL_METHOD(&field, getThis(), "getoption", option);
-	if (Z_TYPE_P(field) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
+	ZVAL_STRING(&option, "field");
+
+	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
+	if (Z_TYPE(field) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}
-	
-	PHALCON_CALL_METHOD(&value, record, "readattribute", field);
+
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field);
 
 	/*
 	 * Allow empty
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
+	ZVAL_STRING(&option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
-	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
-		RETURN_MM_TRUE;
+	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
+		RETURN_TRUE;
 	}
-	
-	/*
-	 * Allow empty
-	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
-
-	if (allow_empty && zend_is_true(allow_empty)) {
-		if (PHALCON_IS_EMPTY(value)) {
-			RETURN_MM_TRUE;
-		}
-	}
-	
 	/** 
 	 * Check if the value is numeric using is_numeric in the PHP userland
 	 */
-	if (!phalcon_is_numeric(value)) {
-	
+	if (!phalcon_is_numeric(&value)) {
 		/** 
 		 * Check if the developer has defined a custom message
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(message));
-	
-		PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
-		if (!zend_is_true(message)) {
-			PHALCON_INIT_NVAR(message);
-			PHALCON_CONCAT_SVS(message, "Value of field '", field, "' must be numeric");
+		ZVAL_STRING(&option, ISV(message));
+
+		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
+		if (!zend_is_true(&message)) {
+			PHALCON_CONCAT_SVS(&message, "Value of field '", &field, "' must be numeric");
 		}
-	
-		PHALCON_INIT_VAR(type);
-		ZVAL_STRING(type, "Numericality");
+
+		ZVAL_STRING(&type, "Numericality");
 
 		/*
 		 * Is code set
 		 */
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, ISV(code));
+		ZVAL_STRING(&option, ISV(code));
 
-		PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
-		if (zend_is_true(is_set_code)) {
-			PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
+		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
+		if (zend_is_true(&is_set_code)) {
+			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
-			PHALCON_INIT_VAR(code);
-			ZVAL_LONG(code, 0);
+			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field, type, code);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field, &type, &code);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
-}
 
+	RETURN_TRUE;
+}

@@ -260,28 +260,24 @@ static zval *phql_ret_insert_statement(zval *Q, zval *F, zval *V)
 
 static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 {
-	zval *key1, *key2, *rows, *values;
+	zval key1, key2, rows, values;
 
-	PHALCON_ALLOC_INIT_ZVAL(key1);
-	ZVAL_STR(key1, IS(rows));
+	ZVAL_STR(&key1, IS(rows));
 
-	PHALCON_ALLOC_INIT_ZVAL(rows);
-	if (!phalcon_array_isset_fetch(&rows, ret, key1)) {
-		array_init_size(rows, 1);		
+	if (!phalcon_array_isset_fetch(&rows, ret, &key1)) {
+		array_init_size(&rows, 1);		
 
-		PHALCON_ALLOC_INIT_ZVAL(key2);
-		ZVAL_STR(key2, IS(values));
+		ZVAL_STR(&key2, IS(values));
 
-		PHALCON_ALLOC_INIT_ZVAL(values);
-		if (phalcon_array_isset_fetch(&values, ret, key2)) {
-			Z_TRY_ADDREF_P(values);
-			add_next_index_zval(rows, values);	
+		if (phalcon_array_isset_fetch(&values, ret, &key2)) {
+			Z_TRY_ADDREF_P(&values);
+			add_next_index_zval(&rows, &values);	
 		}
 	}
 
-	add_next_index_zval(rows, V);
-	Z_TRY_ADDREF_P(rows);
-	add_assoc_zval(ret, ISV(rows), rows);
+	add_next_index_zval(&rows, V);
+	Z_TRY_ADDREF(rows);
+	add_assoc_zval(ret, ISV(rows), &rows);
 
 	return ret;
 }

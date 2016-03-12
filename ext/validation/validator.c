@@ -72,7 +72,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator){
 
 int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *option)
 {
-	zval opt, *options, value;
+	zval opt = {}, *options, value = {};
 	zval *params[1];
 
 	if (is_phalcon_class(ce)) {
@@ -91,7 +91,7 @@ int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class
 	ZVAL_STRING(&opt, option);
 	params[0] = &opt;
 
-	return phalcon_return_call_method(result, this_ptr, "getoption", 1, params);
+	return phalcon_call_method(retval, this_ptr, "getoption", 1, params);
 }
 
 /**

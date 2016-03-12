@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_Registry, __call){
 
 	if (phalcon_isset_property_array(getThis(), SL("_data"), name)) {
 		callback = phalcon_read_property_array(getThis(), SL("_data"), name);
-		PHALCON_RETURN_CALL_ZVAL_FUNCTIONW(callback, arguments);
+		PHALCON_CALL_ZVAL_FUNCTIONW(return_value, callback, arguments);
 	} else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_P(name));
 	}
@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Registry, serialize){
  * @brief Phalcon\Registry Phalcon\Registry::unserialize(string $str)
  */
 PHP_METHOD(Phalcon_Registry, unserialize){
-	zval *data, *str, zv;
+	zval *data, *str, zv = {};
 	php_unserialize_data_t var_hash;
 	const unsigned char *buf, *max;
 

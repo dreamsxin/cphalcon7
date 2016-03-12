@@ -91,165 +91,134 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_StringLength){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator_StringLength, validate){
 
-	zval *record, *option = NULL, *field = NULL, *allow_empty = NULL, *is_set_min = NULL, *is_set_max = NULL;
-	zval *value = NULL, *length = NULL, *invalid_maximum = NULL, *invalid_minimum = NULL;
-	zval *maximum = NULL, *message = NULL, *type = NULL, *minimum = NULL, *is_set_code = NULL, *code = NULL;
+	zval *record, option = {}, field = {}, allow_empty = {}, is_set_min = {}, is_set_max = {}, value = {}, length = {}, invalid_maximum = {}, invalid_minimum = {}, maximum = {}, message = {}, type = {}, minimum = {}, is_set_code = {}, code = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &record);
 
-	phalcon_fetch_params(1, 1, 0, &record);
-	
-	PHALCON_INIT_VAR(option);
-	ZVAL_STRING(option, "field");
-	
-	PHALCON_CALL_METHOD(&field, getThis(), "getoption", option);
-	if (Z_TYPE_P(field) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Field name must be a string");
+	ZVAL_STRING(&option, "field");
+
+	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
+	if (Z_TYPE(field) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Field name must be a string");
 		return;
 	}
-	
+
 	/** 
 	 * At least one of 'min' or 'max' must be set
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "min");
-	
-	PHALCON_CALL_METHOD(&is_set_min, getThis(), "issetoption", option);
-	
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "max");
-	
-	PHALCON_CALL_METHOD(&is_set_max, getThis(), "issetoption", option);
-	if (!zend_is_true(is_set_min)) {
-		if (!zend_is_true(is_set_max)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A minimum or maximum must be set");
+	ZVAL_STRING(&option, "min");
+	PHALCON_CALL_METHODW(&is_set_min, getThis(), "issetoption", &option);
+
+	ZVAL_STRING(&option, "max");
+	PHALCON_CALL_METHODW(&is_set_max, getThis(), "issetoption", &option);
+	if (!zend_is_true(&is_set_min)) {
+		if (!zend_is_true(&is_set_max)) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A minimum or maximum must be set");
 			return;
 		}
 	}
-	
-	PHALCON_CALL_METHOD(&value, record, "readattribute", field);
+
+	PHALCON_CALL_METHODW(&value, record, "readattribute", &field);
 
 	/*
 	 * Allow empty
 	 */
-	PHALCON_INIT_NVAR(option);
-	ZVAL_STRING(option, "allowEmpty");
+	ZVAL_STRING(&option, "allowEmpty");
 
-	PHALCON_CALL_METHOD(&allow_empty, getThis(), "getoption", option);
+	PHALCON_CALL_METHODW(&allow_empty, getThis(), "getoption", &option);
 
-	if (allow_empty && zend_is_true(allow_empty) && PHALCON_IS_EMPTY(value)) {
-		RETURN_MM_TRUE;
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&value)) {
+		RETURN_TRUE;
 	}
-	
+
 	/** 
 	 * Check if mbstring is available to calculate the correct length
 	 */
 	if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
-		PHALCON_CALL_FUNCTION(&length, "mb_strlen", value);
+		PHALCON_CALL_FUNCTIONW(&length, "mb_strlen", &value);
 	} else {
-		PHALCON_INIT_VAR(length);
-		phalcon_fast_strlen(length, value);
+		phalcon_fast_strlen(&length, &value);
 	}
-	
-	PHALCON_INIT_VAR(invalid_maximum);
-	ZVAL_BOOL(invalid_maximum, 0);
-	
-	PHALCON_INIT_VAR(invalid_minimum);
-	ZVAL_BOOL(invalid_minimum, 0);
-	
+
+	ZVAL_FALSE(&invalid_maximum);
+	ZVAL_FALSE(&invalid_minimum);
+
 	/** 
 	 * Maximum length
 	 */
-	if (zend_is_true(is_set_max)) {
-	
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "max");
-	
-		PHALCON_CALL_METHOD(&maximum, getThis(), "getoption", option);
-	
-		is_smaller_function(invalid_maximum, maximum, length);
-		if (PHALCON_IS_TRUE(invalid_maximum)) {
-	
+	if (zend_is_true(&is_set_max)) {
+		ZVAL_STRING(&option, "max");
+
+		PHALCON_CALL_METHODW(&maximum, getThis(), "getoption", &option);
+
+		is_smaller_function(&invalid_maximum, &maximum, &length);
+		if (PHALCON_IS_TRUE(&invalid_maximum)) {
 			/** 
 			 * Check if the developer has defined a custom message
 			 */
-			PHALCON_INIT_NVAR(option);
-			ZVAL_STRING(option, "messageMaximum");
-	
-			PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
-			if (!zend_is_true(message)) {
-				PHALCON_INIT_NVAR(message);
-				PHALCON_CONCAT_SVSVS(message, "Value of field '", field, "' exceeds the maximum ", maximum, " characters");
+			ZVAL_STRING(&option, "messageMaximum");
+
+			PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
+			if (!zend_is_true(&message)) {
+				PHALCON_CONCAT_SVSVS(&message, "Value of field '", &field, "' exceeds the maximum ", &maximum, " characters");
 			}
-	
-			PHALCON_INIT_VAR(type);
-			ZVAL_STRING(type, "TooLong");
+
+			ZVAL_STRING(&type, "TooLong");
 
 			/*
 			 * Is code set
 			 */
-			PHALCON_INIT_NVAR(option);
-			ZVAL_STRING(option, ISV(code));
+			ZVAL_STRING(&option, ISV(code));
 
-			PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
-			if (zend_is_true(is_set_code)) {
-				PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
+			PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
+			if (zend_is_true(&is_set_code)) {
+				PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 			} else {
-				PHALCON_INIT_VAR(code);
-				ZVAL_LONG(code, 0);
+				ZVAL_LONG(&code, 0);
 			}
 
-			PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field, type, code);
-			RETURN_MM_FALSE;
+			PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field, &type, &code);
+			RETURN_FALSE;
 		}
 	}
-	
+
 	/** 
 	 * Minimum length
 	 */
-	if (zend_is_true(is_set_min)) {
-	
-		PHALCON_INIT_NVAR(option);
-		ZVAL_STRING(option, "min");
-	
-		PHALCON_CALL_METHOD(&minimum, getThis(), "getoption", option);
-	
-		is_smaller_function(invalid_minimum, length, minimum);
-		if (PHALCON_IS_TRUE(invalid_minimum)) {
-	
+	if (zend_is_true(&is_set_min)) {
+		ZVAL_STRING(&option, "min");
+		PHALCON_CALL_METHODW(&minimum, getThis(), "getoption", &option);
+
+		is_smaller_function(&invalid_minimum, &length, &minimum);
+		if (PHALCON_IS_TRUE(&invalid_minimum)) {
 			/** 
 			 * Check if the developer has defined a custom message
 			 */
-			PHALCON_INIT_NVAR(option);
-			ZVAL_STRING(option, "messageMinimum");
-	
-			PHALCON_CALL_METHOD(&message, getThis(), "getoption", option);
-			if (!zend_is_true(message)) {
-				PHALCON_INIT_NVAR(message);
-				PHALCON_CONCAT_SVSVS(message, "Value of field '", field, "' is less than the minimum ", minimum, " characters");
+			ZVAL_STRING(&option, "messageMinimum");
+
+			PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
+			if (!zend_is_true(&message)) {
+				PHALCON_CONCAT_SVSVS(&message, "Value of field '", &field, "' is less than the minimum ", &minimum, " characters");
 			}
-	
-			PHALCON_INIT_NVAR(type);
-			ZVAL_STRING(type, "TooShort");
+
+			ZVAL_STRING(&type, "TooShort");
 
 			/*
 			 * Is code set
 			 */
-			PHALCON_INIT_NVAR(option);
-			ZVAL_STRING(option, ISV(code));
+			ZVAL_STRING(&option, ISV(code));
 
-			PHALCON_CALL_METHOD(&is_set_code, getThis(), "issetoption", option);
-			if (zend_is_true(is_set_code)) {
-				PHALCON_CALL_METHOD(&code, getThis(), "getoption", option);
+			PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
+			if (zend_is_true(&is_set_code)) {
+				PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 			} else {
-				PHALCON_INIT_VAR(code);
-				ZVAL_LONG(code, 0);
+				ZVAL_LONG(&code, 0);
 			}
 
-			PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", message, field, type, code);
-			RETURN_MM_FALSE;
+			PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field, &type, &code);
+			RETURN_FALSE;
 		}
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }

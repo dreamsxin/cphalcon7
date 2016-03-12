@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -79,65 +80,58 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Between){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Between, validate){
 
-	zval *validator, *attribute, *value = NULL, allow_empty, minimum, maximum, label;
-	zval pairs, *valid = NULL, message_str, code, *prepared = NULL, *message;
+	zval *validator, *attribute, value = {}, allow_empty = {}, minimum = {}, maximum = {}, label = {}, pairs = {}, valid = {}, message_str = {}, code = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &validator, &attribute);
-	
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 1);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
 
-	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(value)) {
-		RETURN_MM_TRUE;
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&minimum, ce, getThis(), "minimum"));
-	RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&maximum, ce, getThis(), "maximum"));
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&minimum, ce, getThis(), "minimum"));
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&maximum, ce, getThis(), "maximum"));
 
-	PHALCON_CALL_SELF(&valid, "valid", value, &minimum, &maximum);
+	PHALCON_CALL_SELFW(&valid, "valid", &value, &minimum, &maximum);
 
-	if (PHALCON_IS_FALSE(valid)) {
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
+	if (PHALCON_IS_FALSE(&valid)) {
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
+			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
-				ZVAL_COPY_VALUE(&label, attribute);
+				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
 		}
 
 		array_init_size(&pairs, 3);
-		Z_TRY_ADDREF_P(&label);
-		add_assoc_zval_ex(&pairs, SL(":field"), &label);
-		Z_TRY_ADDREF_P(&minimum);
-		add_assoc_zval_ex(&pairs, SL(":min"), &minimum);
-		Z_TRY_ADDREF_P(&maximum);
-		add_assoc_zval_ex(&pairs, SL(":max"), &maximum);
+		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+		phalcon_array_update_str(&pairs, SL(":min"), &minimum, PH_COPY);
+		phalcon_array_update_str(&pairs, SL(":max"), &maximum, PH_COPY);
 
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
-			RETURN_MM_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Between"));
+			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Between"));
 		}
 
-		RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
 		if (Z_TYPE_P(&code) == IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
-	
-		message = phalcon_validation_message_construct_helper(prepared, attribute, "Between", &code);
-		Z_TRY_DELREF_P(message);
-	
-		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", message);
-		RETURN_MM_FALSE;
+		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+
+		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Between", &code);
+
+		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }
 
 /**
@@ -148,20 +142,18 @@ PHP_METHOD(Phalcon_Validation_Validator_Between, validate){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Between, valid){
 
-	zval *value, *minimum = NULL, *maximum = NULL, *valid;
-	PHALCON_MM_GROW();
+	zval *value, *minimum = NULL, *maximum = NULL, valid = {};
 
-	phalcon_fetch_params(1, 3, 0, &value, &minimum, &maximum);
+	phalcon_fetch_params(0, 3, 0, &value, &minimum, &maximum);
 
-	PHALCON_INIT_VAR(valid);
-	is_smaller_or_equal_function(valid, minimum, value);
-	if (zend_is_true(valid)) {
-		is_smaller_or_equal_function(valid, value, maximum);
+	is_smaller_or_equal_function(&valid, minimum, value);
+	if (zend_is_true(&valid)) {
+		is_smaller_or_equal_function(&valid, value, maximum);
 	}
-	
-	if (PHALCON_IS_FALSE(valid)) {
-		RETURN_MM_FALSE;
+
+	if (PHALCON_IS_FALSE(&valid)) {
+		RETURN_FALSE;
 	}
-	
-	RETURN_MM_TRUE;
+
+	RETURN_TRUE;
 }

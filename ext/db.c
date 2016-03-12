@@ -114,7 +114,7 @@ PHALCON_INIT_CLASS(Phalcon_Db){
  */
 PHP_METHOD(Phalcon_Db, setup){
 
-	zval *options, escape_identifiers;
+	zval *options, escape_identifiers = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 

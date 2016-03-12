@@ -67,7 +67,7 @@ void phalcon_unserialize(zval *return_value, zval *var) {
 	PHP_VAR_UNSERIALIZE_INIT(var_hash);
 	if (!php_var_unserialize(return_value, &p, p + Z_STRLEN_P(var), &var_hash)) {
 		PHP_VAR_UNSERIALIZE_DESTROY(var_hash);
-		zval_ptr_dtor(return_value);
+		PHALCON_PTR_DTOR(return_value);
 		ZVAL_NULL(return_value);
 		if (!EG(exception)) {
 			php_error_docref(NULL, E_NOTICE, "Error at offset %ld of %d bytes", (long)((char*)p - Z_STRVAL_P(var)), Z_STRLEN_P(var));

@@ -65,30 +65,24 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter_Json){
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Json, format){
 
-	zval *message, *type, *timestamp, *context, *interpolated = NULL, *type_str = NULL, *log, *json;
+	zval *message, *type, *timestamp, *context, interpolated = {}, type_str = {}, log = {}, json = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 4, 0, &message, &type, &timestamp, &context);
+	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 	
 	if (Z_TYPE_P(context) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(&interpolated, getThis(), "interpolate", message, context);
+		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
+	} else {
+		PHALCON_CPY_WRT(&interpolated, message);
 	}
-	else {
-		interpolated = message;
-	}
 
-	PHALCON_CALL_METHOD(&type_str, getThis(), "gettypestring", type);
-	
-	PHALCON_INIT_VAR(log);
-	array_init_size(log, 3);
-	phalcon_array_update_str(log, SL("type"), type_str, PH_COPY);
-	phalcon_array_update_str(log, SL("message"), interpolated, PH_COPY);
-	phalcon_array_update_str(log, SL("timestamp"), timestamp, PH_COPY);
+	PHALCON_CALL_METHODW(&type_str, getThis(), "gettypestring", type);
 
-	PHALCON_INIT_VAR(json);
-	RETURN_MM_ON_FAILURE(phalcon_json_encode(json, log, 0));
+	array_init_size(&log, 3);
+	phalcon_array_update_str(&log, SL("type"), &type_str, PH_COPY);
+	phalcon_array_update_str(&log, SL("message"), &interpolated, PH_COPY);
+	phalcon_array_update_str(&log, SL("timestamp"), timestamp, PH_COPY);
 
-	PHALCON_CONCAT_VS(return_value, json, PHP_EOL);
-	RETURN_MM();
+	RETURN_ON_FAILURE(phalcon_json_encode(&json, &log, 0));
+
+	PHALCON_CONCAT_VS(return_value, &json, PHP_EOL);
 }

@@ -111,13 +111,13 @@ PHP_METHOD(Phalcon_Annotations_Adapter, setReader){
 	zval *reader;
 
 	phalcon_fetch_params(0, 1, 0, &reader);
-	
+
 	if (Z_TYPE_P(reader) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "Invalid annotations reader");
 		return;
 	}
 	phalcon_update_property_this(getThis(), SL("_reader"), reader);
-	
+
 }
 
 /**
@@ -127,16 +127,16 @@ PHP_METHOD(Phalcon_Annotations_Adapter, setReader){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getReader){
 
-	zval *reader;
+	zval reader = {};
 
-	reader = phalcon_read_property(getThis(), SL("_reader"), PH_NOISY);
-	if (Z_TYPE_P(reader) != IS_OBJECT) {
+	phalcon_return_property(&reader, getThis(), SL("_reader"));
+	if (Z_TYPE(reader) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_annotations_reader_ce);
 		phalcon_update_property_this(getThis(), SL("_reader"), return_value);
 		return;
 	}
-	
-	RETURN_ZVAL(reader, 1, 0);
+
+	RETURN_CTORW(&reader);
 }
 
 /**
@@ -147,56 +147,51 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getReader){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, get){
 
-	zval *class_name, *real_class_name = NULL, *annotations;
-	zval class_annotations, *reader = NULL, *parsed_annotations = NULL;
+	zval *class_name, real_class_name = {}, annotations = {}, class_annotations = {}, reader = {}, parsed_annotations = {};
+	zend_class_entry *ce;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &class_name);
 
-	phalcon_fetch_params(1, 1, 0, &class_name);
-	
 	/** 
 	 * Get the class name if it's an object
 	 */
 	if (Z_TYPE_P(class_name) == IS_OBJECT) {
-		const zend_class_entry *ce = Z_OBJCE_P(class_name);
-		PHALCON_INIT_VAR(real_class_name);
-		ZVAL_NEW_STR(real_class_name, ce->name);
+		ce = Z_OBJCE_P(class_name);
+		ZVAL_NEW_STR(&real_class_name, ce->name);
 	} else {
-		PHALCON_CPY_WRT(real_class_name, class_name);
+		PHALCON_CPY_WRT(&real_class_name, class_name);
 	}
 
-	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&class_annotations, annotations, real_class_name)) {
-		RETURN_CTOR(&class_annotations);
+	phalcon_return_property(&annotations, getThis(), SL("_annotations"));
+	if (phalcon_array_isset_fetch(&class_annotations, &annotations, &real_class_name)) {
+		RETURN_CTORW(&class_annotations);
 	}
 
 	/** 
 	 * Try to read the annotations from the adapter
 	 */
-	PHALCON_CALL_METHOD(&class_annotations, getThis(), "read", real_class_name);
-	if (Z_TYPE_P(&class_annotations) == IS_NULL) {
-
+	PHALCON_CALL_METHODW(&class_annotations, getThis(), "read", &real_class_name);
+	if (Z_TYPE(class_annotations) == IS_NULL) {
 		/** 
 		 * Get the annotations reader
 		 */
-		PHALCON_CALL_METHOD(&reader, getThis(), "getreader");
-		PHALCON_CALL_METHOD(&parsed_annotations, reader, "parse", real_class_name);
+		PHALCON_CALL_METHODW(&reader, getThis(), "getreader");
+		PHALCON_CALL_METHODW(&parsed_annotations, &reader, "parse", &real_class_name);
 
 		/** 
 		 * If the reader returns a 
 		 */
-		if (Z_TYPE_P(parsed_annotations) == IS_ARRAY) { 
-			PHALCON_INIT_NVAR(class_annotations);
-			object_init_ex(class_annotations, phalcon_annotations_reflection_ce);
-			PHALCON_CALL_METHOD(NULL, class_annotations, "__construct", parsed_annotations);
-	
-			phalcon_update_property_array(getThis(), SL("_annotations"), real_class_name, class_annotations);
+		if (Z_TYPE(parsed_annotations) == IS_ARRAY) {
+			object_init_ex(&class_annotations, phalcon_annotations_reflection_ce);
+			PHALCON_CALL_METHODW(NULL, &class_annotations, "__construct", &parsed_annotations);
 
-			PHALCON_CALL_METHOD(NULL, getThis(), "write", real_class_name, class_annotations);
+			phalcon_update_property_array(getThis(), SL("_annotations"), &real_class_name, &class_annotations);
+
+			PHALCON_CALL_METHODW(NULL, getThis(), "write", &real_class_name, &class_annotations);
 		}
 	}
 
-	RETURN_CTOR(&class_annotations);
+	RETURN_CTORW(&class_annotations);
 }
 
 /**
@@ -207,26 +202,24 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getMethods){
 
-	zval *class_name, *class_annotations = NULL;
+	zval *class_name, class_annotations = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &class_name);
 
-	phalcon_fetch_params(1, 1, 0, &class_name);
-	
 	/** 
 	 * Get the full annotations from the class
 	 */
-	PHALCON_CALL_METHOD(&class_annotations, getThis(), "get", class_name);
-	
+	PHALCON_CALL_METHODW(&class_annotations, getThis(), "get", class_name);
+
 	/** 
 	 * A valid annotations reflection is an object
 	 */
-	if (Z_TYPE_P(class_annotations) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHOD(class_annotations, "getmethodsannotations");
-		RETURN_MM();
+	if (Z_TYPE(class_annotations) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHODW(&class_annotations, "getmethodsannotations");
+		return;
 	}
-	
-	RETURN_MM_EMPTY_ARRAY();
+
+	RETURN_EMPTY_ARRAY();
 }
 
 /**
@@ -238,49 +231,43 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getMethods){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getMethod){
 
-	zval *class_name, *method_name, *class_annotations = NULL;
-	zval *methods = NULL, *method = NULL;
+	zval *class_name, *method_name, class_annotations = {}, methods = {}, *method;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &class_name, &method_name);
 
-	phalcon_fetch_params(1, 2, 0, &class_name, &method_name);
-	
 	/** 
 	 * Get the full annotations from the class
 	 */
-	PHALCON_CALL_METHOD(&class_annotations, getThis(), "get", class_name);
-	
+	PHALCON_CALL_METHODW(&class_annotations, getThis(), "get", class_name);
+
 	/** 
 	 * A valid annotations reflection is an object
 	 */
-	if (Z_TYPE_P(class_annotations) == IS_OBJECT) {
-	
-		PHALCON_CALL_METHOD(&methods, class_annotations, "getmethodsannotations");
-		if (Z_TYPE_P(methods) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(methods), idx, str_key, method) {
-				zval name;
+	if (Z_TYPE(class_annotations) == IS_OBJECT) {	
+		PHALCON_CALL_METHODW(&methods, &class_annotations, "getmethodsannotations");
+		if (Z_TYPE(methods) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(methods), idx, str_key, method) {
+				zval name = {};
 				if (str_key) {
 					ZVAL_STR(&name, str_key);
 				} else {
 					ZVAL_LONG(&name, idx);
 				}
-	
+
 				if (PHALCON_IS_EQUAL(&name, method_name)) {
-					RETURN_CTOR(method);
+					RETURN_CTORW(method);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
 	}
-	
+
 	/** 
 	 * Returns a collection anyways
 	 */
 	object_init_ex(return_value, phalcon_annotations_collection_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct");
-	
-	RETURN_MM();
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct");
 }
 
 /**
@@ -291,26 +278,24 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getMethod){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getProperties){
 
-	zval *class_name, *class_annotations = NULL;
+	zval *class_name, class_annotations = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &class_name);
 
-	phalcon_fetch_params(1, 1, 0, &class_name);
-	
 	/** 
 	 * Get the full annotations from the class
 	 */
-	PHALCON_CALL_METHOD(&class_annotations, getThis(), "get", class_name);
-	
+	PHALCON_CALL_METHODW(&class_annotations, getThis(), "get", class_name);
+
 	/** 
 	 * A valid annotations reflection is an object
 	 */
-	if (Z_TYPE_P(class_annotations) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHOD(class_annotations, "getpropertiesannotations");
-		RETURN_MM();
+	if (Z_TYPE(class_annotations) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHODW(&class_annotations, "getpropertiesannotations");
+		return;
 	}
-	
-	RETURN_MM_EMPTY_ARRAY();
+
+	RETURN_EMPTY_ARRAY();
 }
 
 /**
@@ -322,29 +307,25 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getProperties){
  */
 PHP_METHOD(Phalcon_Annotations_Adapter, getProperty){
 
-	zval *class_name, *property_name, *class_annotations = NULL;
-	zval *properties = NULL, *property = NULL;
+	zval *class_name, *property_name, class_annotations = {}, properties = {}, *property;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &class_name, &property_name);
 
-	phalcon_fetch_params(1, 2, 0, &class_name, &property_name);
-	
 	/** 
 	 * Get the full annotations from the class
 	 */
-	PHALCON_CALL_METHOD(&class_annotations, getThis(), "get", class_name);
-	
+	PHALCON_CALL_METHODW(&class_annotations, getThis(), "get", class_name);
+
 	/** 
 	 * A valid annotations reflection is an object
 	 */
-	if (Z_TYPE_P(class_annotations) == IS_OBJECT) {
-	
-		PHALCON_CALL_METHOD(&properties, class_annotations, "getpropertiesannotations");
-		if (Z_TYPE_P(properties) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(properties), idx, str_key, property) {
-				zval name;
+	if (Z_TYPE(class_annotations) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(&properties, &class_annotations, "getpropertiesannotations");
+		if (Z_TYPE(properties) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(properties), idx, str_key, property) {
+				zval name = {};
 				if (str_key) {
 					ZVAL_STR(&name, str_key);
 				} else {
@@ -352,18 +333,16 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getProperty){
 				}
 
 				if (PHALCON_IS_EQUAL(&name, property_name)) {
-					RETURN_CTOR(property);
+					RETURN_CTORW(property);
 				}
 			} ZEND_HASH_FOREACH_END();
-	
+
 		}
 	}
-	
+
 	/** 
 	 * Returns a collection anyways
 	 */
 	object_init_ex(return_value, phalcon_annotations_collection_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct");
-	
-	RETURN_MM();
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct");
 }

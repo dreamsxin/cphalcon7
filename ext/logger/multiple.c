@@ -116,23 +116,19 @@ PHP_METHOD(Phalcon_Logger_Multiple, getLoggers){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 
-	zval *formatter, *loggers, *logger = NULL;
+	zval *formatter, *loggers, *logger;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &formatter);
+	phalcon_fetch_params(0, 1, 0, &formatter);
 
 	loggers = phalcon_read_property(getThis(), SL("_loggers"), PH_NOISY);
 	if (Z_TYPE_P(loggers) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(loggers), logger) {
-			PHALCON_CALL_METHOD(NULL, logger, "setformatter", formatter);
+			PHALCON_CALL_METHODW(NULL, logger, "setformatter", formatter);
 		} ZEND_HASH_FOREACH_END();
 
 	}
 
 	phalcon_update_property_this(getThis(), SL("_formatter"), formatter);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -155,15 +151,14 @@ PHP_METHOD(Phalcon_Logger_Multiple, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, log){
 
-	zval *message, *type = NULL, *context = NULL, *loggers, *logger = NULL;
+	zval *message, *_type = NULL, *context = NULL, type = {}, *loggers, *logger;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 2, &message, &type, &context);
 
-	phalcon_fetch_params(1, 1, 2, &message, &type, &context);
-
-	if (!type) {
-		PHALCON_INIT_VAR(type);
-		ZVAL_LONG(type, PHALCON_LOGGER_DEBUG);
+	if (!_type) {
+		ZVAL_LONG(&type, PHALCON_LOGGER_DEBUG);
+	} else {
+		PHALCON_CPY_WRT(&type, _type);
 	}
 
 	if (!context) {
@@ -173,11 +168,9 @@ PHP_METHOD(Phalcon_Logger_Multiple, log){
 	loggers = phalcon_read_property(getThis(), SL("_loggers"), PH_NOISY);
 	if (Z_TYPE_P(loggers) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(loggers), logger) {
-			PHALCON_CALL_METHOD(NULL, logger, "log", message, type, context);
+			PHALCON_CALL_METHODW(NULL, logger, "log", message, &type, context);
 		} ZEND_HASH_FOREACH_END();
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -188,21 +181,16 @@ PHP_METHOD(Phalcon_Logger_Multiple, log){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, emergency){
 
-	zval *message, *type, *context = NULL;
+	zval *message, *context = NULL, type = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 
 	if (!context) {
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_LONG(type, PHALCON_LOGGER_EMERGENCY);
-	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&type, PHALCON_LOGGER_EMERGENCY);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", message, &type, context);
 }
 
 /**
@@ -213,21 +201,16 @@ PHP_METHOD(Phalcon_Logger_Multiple, emergency){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, debug){
 
-	zval *message, *type, *context = NULL;
+	zval *message, *context = NULL, type = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 
 	if (!context) {
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_LONG(type, PHALCON_LOGGER_DEBUG);
-	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&type, PHALCON_LOGGER_DEBUG);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", message, &type, context);
 }
 
 /**
@@ -238,21 +221,16 @@ PHP_METHOD(Phalcon_Logger_Multiple, debug){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, error){
 
-	zval *message, *type, *context = NULL;
+	zval *message, *context = NULL, type = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 
 	if (!context) {
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_LONG(type, PHALCON_LOGGER_ERROR);
-	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&type, PHALCON_LOGGER_ERROR);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", message, &type, context);
 }
 
 /**
@@ -263,21 +241,16 @@ PHP_METHOD(Phalcon_Logger_Multiple, error){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, info){
 
-	zval *message, *type, *context = NULL;
+	zval *message, *context = NULL, type = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 
 	if (!context) {
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_LONG(type, PHALCON_LOGGER_INFO);
-	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&type, PHALCON_LOGGER_INFO);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", message, &type, context);
 }
 
 /**
@@ -288,21 +261,16 @@ PHP_METHOD(Phalcon_Logger_Multiple, info){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, notice){
 
-	zval *message, *type, *context = NULL;
+	zval *message, *context = NULL, type = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 
 	if (!context) {
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_LONG(type, PHALCON_LOGGER_NOTICE);
-	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&type, PHALCON_LOGGER_NOTICE);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", message, &type, context);
 }
 
 /**
@@ -313,21 +281,16 @@ PHP_METHOD(Phalcon_Logger_Multiple, notice){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, warning){
 
-	zval *message, *type, *context = NULL;
+	zval *message, *context = NULL, type = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 
 	if (!context) {
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_LONG(type, PHALCON_LOGGER_WARNING);
-	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&type, PHALCON_LOGGER_WARNING);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", message, &type, context);
 }
 
 /**
@@ -338,21 +301,16 @@ PHP_METHOD(Phalcon_Logger_Multiple, warning){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, alert){
 
-	zval *message, *type, *context = NULL;
+	zval *message, *context = NULL, type = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 
 	if (!context) {
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_LONG(type, PHALCON_LOGGER_ALERT);
-	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&type, PHALCON_LOGGER_ALERT);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", message, &type, context);
 }
 
 /**
@@ -363,19 +321,14 @@ PHP_METHOD(Phalcon_Logger_Multiple, alert){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, critical){
 
-	zval *message, *type, *context = NULL;
+	zval *message, *context = NULL, type = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &message, &context);
+	phalcon_fetch_params(0, 1, 1, &message, &context);
 
 	if (!context) {
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_ALLOC_INIT_ZVAL(type);
-	ZVAL_LONG(type, PHALCON_LOGGER_CRITICAL);
-	PHALCON_CALL_METHOD(NULL, getThis(), "log", message, type, context);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&type, PHALCON_LOGGER_CRITICAL);
+	PHALCON_CALL_METHODW(NULL, getThis(), "log", message, &type, context);
 }

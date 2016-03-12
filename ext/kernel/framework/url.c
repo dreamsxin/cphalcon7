@@ -54,9 +54,9 @@ void phalcon_get_uri(zval *return_value, zval *path) {
 	RETURN_EMPTY_STRING();
 }
 
-void phalcon_raw_url_encode(zval *return_value, zval *url) {
-
-	zval copy;
+void phalcon_raw_url_encode(zval *return_value, zval *url)
+{
+	zval copy = {};
 	zend_string *escaped;
 	int use_copy = 0;
 
@@ -70,7 +70,7 @@ void phalcon_raw_url_encode(zval *return_value, zval *url) {
 	escaped = php_raw_url_encode(Z_STRVAL_P(url), Z_STRLEN_P(url));
 
 	if (use_copy) {
-		zval_ptr_dtor(url);
+		PHALCON_PTR_DTOR(url);
 	}
 
 	if (escaped->len) {

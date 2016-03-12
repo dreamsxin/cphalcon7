@@ -88,27 +88,22 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Message){
 	return SUCCESS;
 }
 
-zval* phalcon_validation_message_construct_helper(zval *message, zval *field, const char *type, zval *code)
+void phalcon_validation_message_construct_helper(zval *result, zval *message, zval *field, const char *type, zval *code)
 {
-	zval *result, *params[4], *tmp;
+	zval *params[4], tmp = {};
 
-	PHALCON_ALLOC_INIT_ZVAL(result);
 	object_init_ex(result, phalcon_validation_message_ce);
 
-	PHALCON_ALLOC_INIT_ZVAL(tmp);
-	ZVAL_STRING(tmp, type);
+	ZVAL_STRING(&tmp, type);
 
 	params[0] = message;
 	params[1] = field;
-	params[2] = tmp;
+	params[2] = &tmp;
 	params[3] = code;
 
-	if (FAILURE == phalcon_call_class_method_aparams(NULL, result, Z_OBJCE_P(result), phalcon_fcall_method, SL("__construct"), 4, params)) {
-		PHALCON_ALLOC_INIT_ZVAL(result);
+	if (FAILURE == phalcon_call_method(NULL, result, "__construct", 4, params)) {
 		ZVAL_NULL(result);
 	}
-
-	return result;
 }
 
 /**
@@ -269,26 +264,15 @@ PHP_METHOD(Phalcon_Validation_Message, __toString){
  */
 PHP_METHOD(Phalcon_Validation_Message, __set_state){
 
-	zval *message, *message_text, *field, *type, *code;
+	zval *message, message_text = {}, field = {}, type = {}, code = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &message);
 
-	phalcon_fetch_params(1, 1, 0, &message);
-	
-	PHALCON_OBS_VAR(message_text);
 	phalcon_array_fetch_str(&message_text, message, SL("_message"), PH_NOISY);
-	
-	PHALCON_OBS_VAR(field);
 	phalcon_array_fetch_str(&field, message, SL("_field"), PH_NOISY);
-	
-	PHALCON_OBS_VAR(type);
 	phalcon_array_fetch_str(&type, message, SL("_type"), PH_NOISY);
-
-	PHALCON_OBS_VAR(code);
 	phalcon_array_fetch_str(&code, message, SL("_code"), PH_NOISY);
 
 	object_init_ex(return_value, phalcon_validation_message_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", message_text, field, type, code);
-	
-	RETURN_MM();
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &message_text, &field, &type, &code);
 }

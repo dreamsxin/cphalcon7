@@ -79,32 +79,30 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_Gettext){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 
-	zval *options, locale, default_domain, directory, setting, *constant, *value = NULL;
+	zval *options, locale, default_domain = {}, directory = {}, setting = {}, *constant, *value;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &options);
 
-	phalcon_fetch_params(1, 1, 0, &options);
-	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Invalid options");
-		RETURN_MM();
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Invalid options");
+		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Parameter \"locale\" is required");
-		RETURN_MM();
+		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&default_domain, options, SL("defaultDomain"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Parameter \"defaultDomain\" is required");
-		RETURN_MM();
+		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&directory, options, SL("directory"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Parameter \"directory\" is required");
-		RETURN_MM();
+		return;
 	}
 
 	phalcon_update_property_this(getThis(), SL("_locale"), &locale);
@@ -112,29 +110,27 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 	phalcon_update_property_this(getThis(), SL("_directory"), &directory);
 
 	PHALCON_CONCAT_SV(&setting, "LC_ALL=", &locale);
-	PHALCON_CALL_FUNCTION(NULL, "putenv", &setting);
+	PHALCON_CALL_FUNCTIONW(NULL, "putenv", &setting);
 
 	if ((constant = zend_get_constant_str(SL("LC_ALL"))) != NULL) {
-		PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, locale);
+		PHALCON_CALL_FUNCTIONW(NULL, "setlocale", constant, &locale);
 	}
-	
-	if (Z_TYPE_P(directory) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(directory), idx, str_key, value) {
-			zval key;
+
+	if (Z_TYPE(directory) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(directory), idx, str_key, value) {
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
-			PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", &key, value);
+			PHALCON_CALL_FUNCTIONW(NULL, "bindtextdomain", &key, value);
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", &default_domain, &directory);
+		PHALCON_CALL_FUNCTIONW(NULL, "bindtextdomain", &default_domain, &directory);
 	}
 
-	PHALCON_CALL_FUNCTION(NULL, "textdomain", &default_domain);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_FUNCTIONW(NULL, "textdomain", &default_domain);
 }
 
 /**
@@ -147,39 +143,36 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 
-	zval *index, *placeholders = NULL, *domain = NULL;
-	zval *translation = NULL, *value = NULL, *key_placeholder = NULL, *replaced = NULL;
+	zval *index, *placeholders = NULL, *domain = NULL, translation = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 2, &index, &placeholders, &domain);
 
-	phalcon_fetch_params(1, 1, 2, &index, &placeholders, &domain);
-	
 	if (!domain) {
-		PHALCON_CALL_FUNCTION(&translation, "gettext", index);
+		PHALCON_CALL_FUNCTIONW(&translation, "gettext", index);
 	} else {
-		PHALCON_CALL_FUNCTION(&translation, "dgettext", domain, index);
+		PHALCON_CALL_FUNCTIONW(&translation, "dgettext", domain, index);
 	}
 
 	if (placeholders && Z_TYPE_P(placeholders) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(placeholders))) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
-			zval key;
+			zval key_placeholder = {}, replaced = {}, key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
-			PHALCON_INIT_NVAR(key_placeholder);
-			PHALCON_CONCAT_SVS(key_placeholder, "%", &key, "%");
 
-			PHALCON_STR_REPLACE(&replaced, key_placeholder, value, translation);
+			PHALCON_CONCAT_SVS(&key_placeholder, "%", &key, "%");
 
-			PHALCON_CPY_WRT(translation, replaced);
+			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, &translation);
+
+			PHALCON_CPY_WRT(&translation, &replaced);
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_CTOR(translation);
+	RETURN_CTORW(&translation);
 }
 
 /**
@@ -190,7 +183,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, exists){
 
-	zval *index, *domain = NULL, *translation = NULL;
+	zval *index, *domain = NULL, translation = {};
 
 	phalcon_fetch_params(0, 1, 1, &index, &domain);
 
@@ -200,11 +193,9 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, exists){
 		PHALCON_CALL_FUNCTIONW(&translation, "dgettext", domain, index);
 	}
 
-	if (Z_STRLEN_P(translation) > 0) {
-		zval_ptr_dtor(translation);
+	if (Z_STRLEN(translation) > 0) {
 		RETURN_TRUE;
 	}
 	
-	zval_ptr_dtor(translation);		
 	RETURN_FALSE;
 }

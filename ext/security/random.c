@@ -195,12 +195,10 @@ PHALCON_INIT_CLASS(Phalcon_Security_Random){
  */
 PHP_METHOD(Phalcon_Security_Random, bytes){
 
-	zval *len_param = NULL, *len, *file_path, *mode, *handle = NULL, *buffer, *ret = NULL;
+	zval *len_param = NULL, len = {}, file_path = {}, mode = {}, handle = {}, buffer = {}, ret = {};
 	int l;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &len_param);
+	phalcon_fetch_params(0, 0, 1, &len_param);
 
 	if (!len_param) {
 		l = 16;
@@ -213,45 +211,40 @@ PHP_METHOD(Phalcon_Security_Random, bytes){
 		l = 16;
 	}
 
-	PHALCON_INIT_VAR(len);
-	ZVAL_LONG(len, l);
+	ZVAL_LONG(&len, l);
 
-	if ((phalcon_function_exists_ex(SS("\\sodium\\randombytes_buf") TSRMLS_CC) == SUCCESS)) {
-		PHALCON_RETURN_CALL_FUNCTION("\\sodium\\randombytes_buf", len);
-		RETURN_MM();
+	if ((phalcon_function_exists_ex(SS("\\sodium\\randombytes_buf")) == SUCCESS)) {
+		PHALCON_RETURN_CALL_FUNCTIONW("\\sodium\\randombytes_buf", &len);
+		return;
 	}
-	if ((phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes") TSRMLS_CC) == SUCCESS)) {
-		PHALCON_RETURN_CALL_FUNCTION("openssl_random_pseudo_bytes", len);
-		RETURN_MM();
+	if ((phalcon_function_exists_ex(SS("openssl_random_pseudo_bytes")) == SUCCESS)) {
+		PHALCON_RETURN_CALL_FUNCTIONW("openssl_random_pseudo_bytes", &len);
+		return;
 	}
 
-	PHALCON_INIT_VAR(file_path);
-	ZVAL_STRING(file_path, "/dev/urandom");
+	ZVAL_STRING(&file_path, "/dev/urandom");
 
-	if (phalcon_file_exists(file_path TSRMLS_CC) == SUCCESS) {
-		PHALCON_INIT_VAR(mode);
-		ZVAL_STRING(mode, "rb");
+	if (phalcon_file_exists(&file_path) == SUCCESS) {
+		ZVAL_STRING(&mode, "rb");
 
-		PHALCON_CALL_FUNCTION(&handle, "fopen", file_path, mode);
+		PHALCON_CALL_FUNCTIONW(&handle, "fopen", &file_path, &mode);
 
-		if (!PHALCON_IS_FALSE(handle)) {
-			PHALCON_INIT_VAR(buffer);
-			ZVAL_LONG(buffer, 0);
+		if (!PHALCON_IS_FALSE(&handle)) {
+			ZVAL_LONG(&buffer, 0);
 
-			PHALCON_CALL_FUNCTION(NULL, "stream_set_read_buffer", handle, buffer);
-			PHALCON_CALL_FUNCTION(&ret, "fread", handle, len);
+			PHALCON_CALL_FUNCTIONW(NULL, "stream_set_read_buffer", &handle, &buffer);
+			PHALCON_CALL_FUNCTIONW(&ret, "fread", &handle, &len);
 
-			phalcon_fclose(handle TSRMLS_CC);
-			if (phalcon_fast_strlen_ev(ret) != l) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Unexpected partial read from random device");
+			phalcon_fclose(&handle);
+			if (phalcon_fast_strlen_ev(&ret) != l) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "Unexpected partial read from random device");
 				return;
 			}
-			RETURN_CCTOR(ret);
+			RETURN_CTORW(&ret);
 		}
 	}
 
-	PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "No random device");
-	return;
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "No random device");
 }
 
 /**
@@ -270,28 +263,23 @@ PHP_METHOD(Phalcon_Security_Random, bytes){
  */
 PHP_METHOD(Phalcon_Security_Random, hex){
 
-	zval *len_param = NULL, *data = NULL, *format, *ret = NULL;
+	zval *len_param = NULL, data = {}, format = {}, ret = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &len_param);
+	phalcon_fetch_params(0, 0, 1, &len_param);
 
 	if (!len_param) {
 		len_param = &PHALCON_GLOBAL(z_zero);
 	}
 
-	PHALCON_CALL_SELF(&data, "bytes", len_param);
+	PHALCON_CALL_SELFW(&data, "bytes", len_param);
 
-	PHALCON_INIT_VAR(format);
-	ZVAL_STRING(format, "H*");
+	ZVAL_STRING(&format, "H*");
 
-	PHALCON_CALL_FUNCTION(&ret, "unpack", format, data);
+	PHALCON_CALL_FUNCTIONW(&ret, "unpack", &format, &data);
 
-	ZVAL_MAKE_REF(ret);
-	PHALCON_RETURN_CALL_FUNCTION("array_shift", ret);
-	ZVAL_UNREF(ret);
-
-	RETURN_MM();
+	ZVAL_MAKE_REF(&ret);
+	PHALCON_RETURN_CALL_FUNCTIONW("array_shift", &ret);
+	ZVAL_UNREF(&ret);
 }
 
 /**
@@ -314,49 +302,41 @@ PHP_METHOD(Phalcon_Security_Random, hex){
  */
 PHP_METHOD(Phalcon_Security_Random, base58){
 
-	zval *len_param = NULL, *byte_string, *alphabet, *data = NULL, *format, *bytes = NULL, *idx = NULL, *tmp = NULL;
-	unsigned char c;
-	double d;
+	zval *len_param = NULL, byte_string = {}, alphabet = {}, format = {}, data = {}, bytes = {}, *byte;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &len_param);
+	phalcon_fetch_params(0, 0, 1, &len_param);
 
 	if (!len_param) {
 		len_param = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_INIT_VAR(byte_string);
-	ZVAL_STRING(byte_string, "");
+	ZVAL_STRING(&byte_string, "");
+	ZVAL_STRING(&alphabet, "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+	ZVAL_STRING(&format, "C*");
 
-	PHALCON_INIT_VAR(alphabet);
-	ZVAL_STRING(alphabet, "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz");
+	PHALCON_CALL_SELFW(&data, "bytes", len_param);
 
-	PHALCON_CALL_SELF(&data, "bytes", len_param);
+	PHALCON_CALL_FUNCTIONW(&bytes, "unpack", &format, &data);
 
-	PHALCON_INIT_VAR(format);
-	ZVAL_STRING(format, "C*");
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(bytes), byte) {
+		zval idx = {}, tmp = {};
+		double d;
+		unsigned char c;
+		
+		d = phalcon_safe_mod_zval_long(byte, 64);
 
-	PHALCON_CALL_FUNCTION(&bytes, "unpack", format, data);
+		ZVAL_DOUBLE(&idx, d);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(bytes), idx) {
-		d = phalcon_safe_mod_zval_long(idx, 64);
-
-		PHALCON_INIT_NVAR(idx);
-		ZVAL_DOUBLE(idx, d);
-
-		if (PHALCON_GE_LONG(idx, 58)) {
-			PHALCON_INIT_NVAR(tmp);
-			ZVAL_LONG(tmp, 57);
-
-			PHALCON_CALL_SELF(&idx, "number", tmp);
+		if (d >= 58) {;
+			ZVAL_LONG(&tmp, 57);
+			PHALCON_CALL_SELFW(&idx, "number", &tmp);
 		}
 
-		c = PHALCON_STRING_OFFSET(alphabet, phalcon_get_intval(idx));
-		phalcon_concat_self_char(byte_string, c);
+		c = PHALCON_STRING_OFFSET(&alphabet, phalcon_get_intval(&idx));
+		phalcon_concat_self_char(&byte_string, c);
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(byte_string);
+	RETURN_CTORW(&byte_string);
 }
 
 /**
@@ -376,21 +356,17 @@ PHP_METHOD(Phalcon_Security_Random, base58){
  */
 PHP_METHOD(Phalcon_Security_Random, base64) {
 
-	zval *len_param = NULL, *data = NULL;
+	zval *len_param = NULL, data = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &len_param);
+	phalcon_fetch_params(0, 0, 1, &len_param);
 
 	if (!len_param) {
 		len_param = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_SELF(&data, "bytes", len_param);
+	PHALCON_CALL_SELFW(&data, "bytes", len_param);
 
-	PHALCON_RETURN_CALL_FUNCTION("base64_encode", data);
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_FUNCTIONW("base64_encode", &data);
 }
 
 /**
@@ -414,11 +390,9 @@ PHP_METHOD(Phalcon_Security_Random, base64) {
  */
 PHP_METHOD(Phalcon_Security_Random, base64Safe) {
 
-	zval *len_param = NULL, *padding_param = NULL, *data = NULL, *pattern, *replacement, *s = NULL, *charlist;
+	zval *len_param = NULL, *padding_param = NULL, data = {}, pattern = {}, replacement = {}, s = {}, charlist = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 2, &len_param, &padding_param);
+	phalcon_fetch_params(0, 0, 2, &len_param, &padding_param);
 
 	if (!len_param) {
 		len_param = &PHALCON_GLOBAL(z_null);
@@ -428,25 +402,21 @@ PHP_METHOD(Phalcon_Security_Random, base64Safe) {
 		padding_param = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_CALL_SELF(&data, "base64", len_param);
+	PHALCON_CALL_SELFW(&data, "base64", len_param);
 
-	PHALCON_INIT_VAR(pattern);
-	ZVAL_STRING(pattern, "#[^a-z0-9_=-]+#i");
+	ZVAL_STRING(&pattern, "#[^a-z0-9_=-]+#i");
+	ZVAL_STRING(&replacement, "");
 
-	PHALCON_INIT_VAR(replacement);
-	ZVAL_STRING(replacement, "");
-
-	PHALCON_CALL_FUNCTION(&s, "preg_replace", pattern, replacement, data);
+	PHALCON_CALL_FUNCTIONW(&s, "preg_replace", &pattern, &replacement, &data);
 
 	if (!zend_is_true(padding_param)) {
-		PHALCON_INIT_VAR(charlist);
-		ZVAL_STRING(charlist, "=");
+		ZVAL_STRING(&charlist, "=");
 
-		ZVAL_STR(return_value, phalcon_trim(s, charlist, PHALCON_TRIM_BOTH));
-		RETURN_MM();
+		ZVAL_STR(return_value, phalcon_trim(&s, &charlist, PHALCON_TRIM_BOTH));
+		return;
 	}
 
-	RETURN_CCTOR(s);
+	RETURN_CTORW(&s);
 }
 
 /**
@@ -471,44 +441,32 @@ PHP_METHOD(Phalcon_Security_Random, base64Safe) {
  */
 PHP_METHOD(Phalcon_Security_Random, uuid) {
 
-	zval *len, *bytes = NULL, *data = NULL, *format, *arr = NULL, *a2, *a3, *str;
+	zval len = {}, bytes = {}, data = {}, format = {}, arr = {}, a2 = {}, a3 = {}, str = {};
 
-	PHALCON_MM_GROW();
+	ZVAL_LONG(&len, 16);
 
-	PHALCON_INIT_VAR(len);
-	ZVAL_LONG(len, 16);
+	PHALCON_CALL_SELFW(&bytes, "bytes", &len);
 
-	PHALCON_CALL_SELF(&bytes, "bytes", len);
+	ZVAL_STRING(&format, "N1a/n1b/n1c/n1d/n1e/N1f");
 
-	PHALCON_INIT_VAR(format);
-	ZVAL_STRING(format, "N1a/n1b/n1c/n1d/n1e/N1f");
+	PHALCON_CALL_FUNCTIONW(&data, "unpack", &format, &bytes);
+	PHALCON_CALL_FUNCTIONW(&arr, "array_values", &data);
 
-	PHALCON_CALL_FUNCTION(&data, "unpack", format, bytes);
+	phalcon_array_fetch_long(&a2, &arr, 2, PH_NOISY | PH_READONLY);
+	phalcon_array_update_long_long(&arr, 2, ((((int) (phalcon_get_numberval(&a2)) & 0x0fff)) | 0x4000), PH_COPY | PH_SEPARATE);
 
-	PHALCON_CALL_FUNCTION(&arr, "array_values", data);
+	phalcon_array_fetch_long(&a3, &arr, 3, PH_NOISY | PH_READONLY);
+	phalcon_array_update_long_long(&arr, 3, ((((int) (phalcon_get_numberval(&a3)) & 0x3fff)) | 0x8000), PH_COPY | PH_SEPARATE);
 
-	PHALCON_OBS_VAR(a2);
-	phalcon_array_fetch_long(&a2, arr, 2, PH_NOISY | PH_READONLY);
+	ZVAL_STRING(&str, "%08x-%04x-%04x-%04x-%04x%08x");
 
-	phalcon_array_update_long_long(arr, 2, ((((int) (phalcon_get_numberval(a2)) & 0x0fff)) | 0x4000), PH_COPY | PH_SEPARATE);
+	ZVAL_MAKE_REF(&arr);
+	PHALCON_CALL_FUNCTIONW(NULL, "array_unshift", &arr, &str);
+	ZVAL_UNREF(&arr);
 
-	PHALCON_OBS_VAR(a3);
-	phalcon_array_fetch_long(&a3, arr, 3, PH_NOISY | PH_READONLY);
+	ZVAL_STRING(&str, "sprintf");
 
-	phalcon_array_update_long_long(arr, 3, ((((int) (phalcon_get_numberval(a3)) & 0x3fff)) | 0x8000), PH_COPY | PH_SEPARATE);
-
-	PHALCON_INIT_VAR(str);
-	ZVAL_STRING(str, "%08x-%04x-%04x-%04x-%04x%08x");
-
-	ZVAL_MAKE_REF(arr);
-	PHALCON_CALL_FUNCTION(NULL, "array_unshift", arr, str);
-	ZVAL_UNREF(arr);
-
-	PHALCON_INIT_NVAR(str);
-	ZVAL_STRING(str, "sprintf");
-
-	PHALCON_CALL_USER_FUNC_ARRAY(&return_value, str, arr);
-	RETURN_MM();
+	PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &str, &arr);
 }
 
 /**
@@ -525,98 +483,77 @@ PHP_METHOD(Phalcon_Security_Random, uuid) {
  */
 PHP_METHOD(Phalcon_Security_Random, number) {
 
-	zval *len_param = NULL, *bin, *hex = NULL, *hex_tmp, *format, *pack = NULL, *mask = NULL, *bytes, *chr = NULL, *rnd = NULL, *ret = NULL, *data = NULL, *tmp = NULL, *tmp1 = NULL;
+	zval *len_param, bin = {}, hex = {}, hex_tmp = {}, format = {}, pack = {}, mask = {}, bytes = {}, chr = {}, rnd = {}, ret = {}, data = {}, tmp = {}, tmp1 = {};
 	unsigned char c;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &len_param);
 
-	phalcon_fetch_params(1, 1, 0, &len_param);
-
-	PHALCON_INIT_VAR(bin);
-	ZVAL_STRING(bin, "");
+	ZVAL_STRING(&bin, "");
 
 	if (phalcon_get_intval(len_param) <= 0) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Require a positive integer > 0");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "Require a positive integer > 0");
 		return;
 	}
 
-	if ((phalcon_function_exists_ex(SS("\\sodium\\randombytes_uniform") TSRMLS_CC) == SUCCESS)) {
-		PHALCON_RETURN_CALL_FUNCTION("\\sodium\\randombytes_uniform", len_param);
-		RETURN_MM();
+	if ((phalcon_function_exists_ex(SS("\\sodium\\randombytes_uniform")) == SUCCESS)) {
+		PHALCON_RETURN_CALL_FUNCTIONW("\\sodium\\randombytes_uniform", len_param);
+		return;
 	}
 
-	PHALCON_CALL_FUNCTION(&hex, "dechex", len_param);
+	PHALCON_CALL_FUNCTIONW(&hex, "dechex", len_param);
 
-	if (((phalcon_fast_strlen_ev(hex) & 1)) == 1) {
-		PHALCON_INIT_VAR(hex_tmp);
-		PHALCON_CONCAT_SV(hex_tmp, "0", hex);
-		PHALCON_CPY_WRT(hex, hex_tmp);
+	if (((phalcon_fast_strlen_ev(&hex) & 1)) == 1) {
+		PHALCON_CONCAT_SV(&hex_tmp, "0", &hex);
+		PHALCON_CPY_WRT_CTOR(&hex, &hex_tmp);
 	}
 
-	PHALCON_INIT_VAR(format);
-	ZVAL_STRING(format, "H*");
+	ZVAL_STRING(&format, "H*");
 
-	PHALCON_CALL_FUNCTION(&pack, "pack", format, hex);
+	PHALCON_CALL_FUNCTIONW(&pack, "pack", &format, &hex);
 
-	phalcon_concat_self(bin, pack);
+	phalcon_concat_self(&bin, &pack);
 
-	c = PHALCON_STRING_OFFSET(bin, 0);
+	c = PHALCON_STRING_OFFSET(&bin, 0);
 
-	PHALCON_INIT_NVAR(tmp);
-	ZVAL_LONG(tmp, c);
+	ZVAL_LONG(&tmp, c);
 
-	PHALCON_CALL_FUNCTION(&mask, "ord", tmp);
+	PHALCON_CALL_FUNCTIONW(&mask, "ord", &tmp);
 
-	PHALCON_INIT_NVAR(tmp);
-	ZVAL_LONG(tmp, ((int) (phalcon_get_numberval(mask)) | (((int) (phalcon_get_numberval(mask)) >> 1))));
+	ZVAL_LONG(&tmp, ((int) (phalcon_get_numberval(&mask)) | (((int) (phalcon_get_numberval(&mask)) >> 1))));
+	ZVAL_LONG(&mask, phalcon_get_numberval(&tmp));
 
-	ZVAL_LONG(mask, phalcon_get_numberval(tmp));
+	ZVAL_LONG(&tmp, ((int) (phalcon_get_numberval(&mask)) | (((int) (phalcon_get_numberval(&mask)) >> 2))));
+	ZVAL_LONG(&mask, phalcon_get_numberval(&tmp));
 
-	PHALCON_INIT_NVAR(tmp);
-	ZVAL_LONG(tmp, ((int) (phalcon_get_numberval(mask)) | (((int) (phalcon_get_numberval(mask)) >> 2))));
-
-	ZVAL_LONG(mask, phalcon_get_numberval(tmp));
-
-	PHALCON_INIT_NVAR(tmp);
-	ZVAL_LONG(tmp, ((int) (phalcon_get_numberval(mask)) | (((int) (phalcon_get_numberval(mask)) >> 4))));
-
-	ZVAL_LONG(mask, phalcon_get_numberval(tmp));
+	ZVAL_LONG(&tmp, ((int) (phalcon_get_numberval(&mask)) | (((int) (phalcon_get_numberval(&mask)) >> 4))));
+	ZVAL_LONG(&mask, phalcon_get_numberval(&tmp));
 
 	do {
-		PHALCON_INIT_NVAR(tmp);
-		ZVAL_LONG(tmp, phalcon_fast_strlen_ev(bin));
+		ZVAL_LONG(&tmp, phalcon_fast_strlen_ev(&bin));
 
-		PHALCON_CALL_SELF(&bytes, "bytes", tmp);
+		PHALCON_CALL_SELFW(&bytes, "bytes", &tmp);
 
-		PHALCON_INIT_NVAR(tmp);
-		phalcon_substr(tmp, bytes, 0, 1);
+		phalcon_substr(&tmp, &bytes, 0, 1);
 
-		PHALCON_CALL_FUNCTION(&tmp1, "ord", tmp);
+		PHALCON_CALL_FUNCTIONW(&tmp1, "ord", &tmp);
 
-		PHALCON_INIT_NVAR(tmp);
-		phalcon_bitwise_and_function(tmp, tmp1, mask TSRMLS_CC);
+		phalcon_bitwise_and_function(&tmp, &tmp1, &mask TSRMLS_CC);
 
-		PHALCON_CALL_FUNCTION(&chr, "chr", tmp);
+		PHALCON_CALL_FUNCTIONW(&chr, "chr", &tmp);
 
-		PHALCON_INIT_NVAR(tmp);
-		ZVAL_LONG(tmp, 0);
+		ZVAL_LONG(&tmp, 0);
+		ZVAL_LONG(&tmp1, 1);
 
-		PHALCON_INIT_NVAR(tmp1);
-		ZVAL_LONG(tmp1, 1);
+		PHALCON_CALL_FUNCTIONW(&rnd, "substr_replace", &bytes, &chr, &tmp, &tmp1);
+	} while (PHALCON_LT(&bin, &rnd));
 
-		PHALCON_CALL_FUNCTION(&rnd, "substr_replace", bytes, chr, tmp, tmp1);
-	} while (PHALCON_LT(bin, rnd));
+	ZVAL_STRING(&format, "H*");
 
-	PHALCON_INIT_NVAR(format);
-	ZVAL_STRING(format, "H*");
+	PHALCON_CALL_FUNCTIONW(&ret, "unpack", &format, &rnd);
 
-	PHALCON_CALL_FUNCTION(&ret, "unpack", format, rnd);
+	ZVAL_MAKE_REF(&ret);
+	PHALCON_CALL_FUNCTIONW(&data, "array_shift", &ret);
+	ZVAL_UNREF(&ret);
 
-	ZVAL_MAKE_REF(ret);
-	PHALCON_CALL_FUNCTION(&data, "array_shift", ret);
-	ZVAL_UNREF(ret);
-
-	PHALCON_RETURN_CALL_FUNCTION("hexdec", data);
-
-	RETURN_MM();
+	PHALCON_RETURN_CALL_FUNCTIONW("hexdec", &data);
 }

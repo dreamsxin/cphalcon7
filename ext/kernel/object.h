@@ -95,7 +95,7 @@ static inline int phalcon_return_property(zval *return_value, zval *object, cons
 {
 	zval *tmp = phalcon_read_property(object, property_name, property_length, PH_NOISY);
 	if (tmp) {
-		ZVAL_ZVAL(return_value, tmp, 1, 0);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 
@@ -107,7 +107,7 @@ static inline int phalcon_return_property_zval(zval *return_value, zval *object,
 {
 	zval *tmp = phalcon_read_property_zval(object, property, PH_NOISY);
 	if (tmp) {
-		ZVAL_ZVAL(return_value, tmp, 1, 0);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 
@@ -148,12 +148,29 @@ int phalcon_isset_property_array(zval *object, const char *property, uint32_t pr
 zval* phalcon_read_property_array(zval *object, const char *property_name, size_t property_length, const zval *index);
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index);
 
+/**
+ * Returns an object's Array properties
+ */
+static inline int phalcon_return_property_array(zval *return_value, zval *object, const char *property_name, uint32_t property_length, const zval *index)
+{
+	zval *tmp = phalcon_read_property_array(object, property_name, property_length, index);
+	if (tmp) {
+		PHALCON_CPY_WRT(return_value, tmp);
+		return SUCCESS;
+	}
+
+	ZVAL_NULL(return_value);
+	return FAILURE;
+}
+
 /** Static properties */
 zval* phalcon_read_static_property(const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length);
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);
 zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len);
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);
 int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len);
+int phalcon_static_property_incr_ce(zend_class_entry *ce, const char *property, uint32_t len);
+int phalcon_static_property_decr_ce(zend_class_entry *ce, const char *property, uint32_t len);
 
 
 /**
@@ -163,7 +180,7 @@ static inline int phalcon_return_static_property(zval *return_value, const char 
 {
 	zval *tmp = phalcon_read_static_property(class_name, class_length, property_name, property_length);
 	if (tmp) {
-		ZVAL_COPY_VALUE(return_value, tmp);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 
@@ -178,7 +195,7 @@ static inline int phalcon_return_static_property_ce(zval *return_value, zend_cla
 {
 	zval *tmp = phalcon_read_static_property_ce(ce, property, len);
 	if (tmp) {
-		ZVAL_COPY_VALUE(return_value, tmp);
+		PHALCON_CPY_WRT(return_value, tmp);
 		return SUCCESS;
 	}
 

@@ -40,20 +40,18 @@ void phalcon_throw_exception(zval *object){
  */
 void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line)
 {
-	zval curline, exception;
+	zval curline = {}, exception = {};
 	zend_class_entry *default_exception_ce;
-
-	PHALCON_MM_GROW();
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
 		object_init_ex(&exception, zend_exception_get_default());
-		PHALCON_CALL_METHOD(NULL, &exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
+		PHALCON_CALL_METHODW(NULL, &exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
 	} else {
-		ZVAL_COPY(&exception, object);
+		PHALCON_CPY_WRT(&exception, object);
 	}
 
 	if (line > 0) {
-		PHALCON_CALL_METHOD(&curline, &exception, "getline");
+		PHALCON_CALL_METHODW(&curline, &exception, "getline");
 		if (PHALCON_IS_LONG(&curline, 0)) {
 			default_exception_ce = zend_exception_get_default();
 			zend_update_property_string(default_exception_ce, &exception, "file", sizeof("file")-1, file);
@@ -62,7 +60,6 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 	}
 
 	zend_throw_exception_object(&exception);
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -76,25 +73,24 @@ void phalcon_throw_exception_string(zend_class_entry *ce, const char *message){
 /**
  * Throws an exception with a single string parameter + debug info
  */
-void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *message, uint32_t message_len, const char *file, uint32_t line) {
-
-	zval *object, msg;
+void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *message, uint32_t message_len, const char *file, uint32_t line)
+{
+	zval object = {}, msg = {};
 	zend_class_entry *default_exception_ce;
 
-	PHALCON_ALLOC_INIT_ZVAL(object);
-	object_init_ex(object, ce);
+	object_init_ex(&object, ce);
 
 	ZVAL_STRINGL(&msg, message, message_len);
 
-	PHALCON_CALL_METHODW(NULL, object, "__construct", &PHALCON_GLOBAL(z_null), &msg);
+	PHALCON_CALL_METHODW(NULL, &object, "__construct", &PHALCON_GLOBAL(z_null), &msg);
 
 	if (line > 0) {
 		default_exception_ce = zend_exception_get_default();
-		zend_update_property_string(default_exception_ce, object, "file", sizeof("file")-1, file);
-		zend_update_property_long(default_exception_ce, object, "line", sizeof("line")-1, line);
+		zend_update_property_string(default_exception_ce, &object, "file", sizeof("file")-1, file);
+		zend_update_property_long(default_exception_ce, &object, "line", sizeof("line")-1, line);
 	}
 
-	zend_throw_exception_object(object);
+	zend_throw_exception_object(&object);
 
 	zval_dtor(&msg);
 }
@@ -104,8 +100,7 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
  */
 void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message){
 
-	zval object;
-
+	zval object = {};
 	object_init_ex(&object, ce);
 
 	PHALCON_CALL_METHODW(NULL, &object, "__construct", message);
@@ -117,7 +112,7 @@ void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message){
  */
 void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, const char *file, uint32_t line){
 
-	zval object;
+	zval object = {};
 	zend_class_entry *default_exception_ce;
 
 	object_init_ex(&object, ce);
@@ -138,7 +133,7 @@ void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, con
  */
 void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ...) {
 
-	zval object, msg;
+	zval object = {}, msg = {};
 	int len;
 	char *buffer;
 	va_list args;

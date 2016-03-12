@@ -84,12 +84,9 @@ PHALCON_INIT_CLASS(Phalcon_Db_Index){
  */
 PHP_METHOD(Phalcon_Db_Index, __construct){
 
-	zval *index_name, *columns;
-	zval *type = NULL;
+	zval *index_name, *columns, *type = NULL;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 1, &index_name, &columns, &type);
+	phalcon_fetch_params(0, 2, 1, &index_name, &columns, &type);
 
 	if (!type) {
 		type = &PHALCON_GLOBAL(z_null);
@@ -98,8 +95,6 @@ PHP_METHOD(Phalcon_Db_Index, __construct){
 	phalcon_update_property_this(getThis(), SL("_indexName"), index_name);
 	phalcon_update_property_this(getThis(), SL("_columns"), columns);
 	phalcon_update_property_this(getThis(), SL("_type"), type);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -133,17 +128,13 @@ PHP_METHOD(Phalcon_Db_Index, getType){
 
 	zval *type = NULL;
 
-	PHALCON_MM_GROW();
-
 	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
 
 	if (Z_TYPE_P(type) == IS_STRING) {
-		RETVAL_ZVAL(type, 1, 0);
+		RETURN_CTORW(type);
 	} else {
 		RETVAL_EMPTY_STRING();
 	}
-
-	RETURN_MM();
 }
 
 /**
@@ -154,10 +145,10 @@ PHP_METHOD(Phalcon_Db_Index, getType){
  */
 PHP_METHOD(Phalcon_Db_Index, __set_state){
 
-	zval *data, index_name, columns;
+	zval *data, index_name = {}, columns = {};
 
 	phalcon_fetch_params(0, 1, 0, &data);
-	
+
 	if (!phalcon_array_isset_fetch_str(&index_name, data, SL("_indexName"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "_indexName parameter is required");
 		return;
@@ -167,7 +158,7 @@ PHP_METHOD(Phalcon_Db_Index, __set_state){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "_columns parameter is required");
 		return;
 	}
-	
+
 	/** 
 	 * Return a Phalcon\Db\Index as part of the returning state
 	 */

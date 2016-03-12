@@ -199,14 +199,12 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultAction){
  */
 PHP_METHOD(Phalcon_CLI_Router, handle){
 
-	zval *arguments = NULL, module_name, namespace_name, task_name, action_name;
+	zval *arguments = NULL, module_name = {}, namespace_name = {}, task_name = {}, action_name = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &arguments);
+	phalcon_fetch_params(0, 0, 1, &arguments);
 
 	if (!arguments || Z_TYPE_P(arguments) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cli_router_exception_ce, "Arguments must be an Array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_router_exception_ce, "Arguments must be an Array");
 		return;
 	}
 
@@ -217,6 +215,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 */
 	if (phalcon_array_isset_fetch_str(&module_name, arguments, SL("module"))) {
 		phalcon_array_unset_str(arguments, SL("module"), PH_COPY);
+		phalcon_update_property_this(getThis(), SL("_module"), &module_name);
 	}
 
 	/**
@@ -224,6 +223,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 */
 	if (phalcon_array_isset_fetch_str(&namespace_name, arguments, SL("namespace"))) {
 		phalcon_array_unset_str(arguments, SL("namespace"), PH_COPY);
+		phalcon_update_property_this(getThis(), SL("_namespace"), &namespace_name);
 	}
 
 	/** 
@@ -231,6 +231,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 */
 	if (phalcon_array_isset_fetch_str(&task_name, arguments, SL("task"))) {
 		phalcon_array_unset_str(arguments, SL("task"), PH_COPY);
+		phalcon_update_property_this(getThis(), SL("_task"), &task_name);
 	}
 
 	/** 
@@ -238,15 +239,10 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 */
 	if (phalcon_array_isset_fetch_str(&action_name, arguments, SL("action"))) {
 		phalcon_array_unset_str(arguments, SL("action"), PH_COPY);
+		phalcon_update_property_this(getThis(), SL("_action"), &action_name);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_module"), &module_name);
-	phalcon_update_property_this(getThis(), SL("_namespace"), &namespace_name);
-	phalcon_update_property_this(getThis(), SL("_task"), &task_name);
-	phalcon_update_property_this(getThis(), SL("_action"), &action_name);
 	phalcon_update_property_this(getThis(), SL("_params"), arguments);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**

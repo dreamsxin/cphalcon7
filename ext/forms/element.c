@@ -243,27 +243,24 @@ PHP_METHOD(Phalcon_Forms_Element, setFilters){
  */
 PHP_METHOD(Phalcon_Forms_Element, addFilter){
 
-	zval *filter, *filters, *new_filters;
+	zval *filter, *filters, new_filters = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &filter);
+	phalcon_fetch_params(0, 1, 0, &filter);
 
 	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
 	if (Z_TYPE_P(filters) == IS_ARRAY) { 
 		phalcon_update_property_array_append(getThis(), SL("_filters"), filter);
 	} else {
-		PHALCON_INIT_VAR(new_filters);
-		array_init_size(new_filters, 2);
+		array_init_size(&new_filters, 2);
 		if (Z_TYPE_P(filters) == IS_STRING) {
-			phalcon_array_append(new_filters, filters, PH_COPY);
+			phalcon_array_append(&new_filters, filters, PH_COPY);
 		}
 
-		phalcon_array_append(new_filters, filter, PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_filters"), new_filters);
+		phalcon_array_append(&new_filters, filter, PH_COPY);
+		phalcon_update_property_this(getThis(), SL("_filters"), &new_filters);
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -285,35 +282,31 @@ PHP_METHOD(Phalcon_Forms_Element, getFilters){
  */
 PHP_METHOD(Phalcon_Forms_Element, addValidators){
 
-	zval *validators, *merge = NULL, *current_validators;
-	zval *merged_validators = NULL;
+	zval *validators, *merge = NULL, *current_validators, merged_validators = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &validators, &merge);
+	phalcon_fetch_params(0, 1, 1, &validators, &merge);
 
 	if (!merge) {
 		merge = &PHALCON_GLOBAL(z_true);
 	}
 
 	if (Z_TYPE_P(validators) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_forms_exception_ce, "The validators parameter must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_forms_exception_ce, "The validators parameter must be an array");
 		return;
 	}
 
 	if (zend_is_true(merge)) {
 		current_validators = phalcon_read_property(getThis(), SL("_validators"), PH_NOISY);
-		if (Z_TYPE_P(current_validators) == IS_ARRAY) { 
-			PHALCON_INIT_VAR(merged_validators);
-			phalcon_fast_array_merge(merged_validators, current_validators, validators);
+		if (Z_TYPE_P(current_validators) == IS_ARRAY) {
+			phalcon_fast_array_merge(&merged_validators, current_validators, validators);
 		} else {
-			merged_validators = validators;
+			PHALCON_CPY_WRT(&merged_validators, validators);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_validators"), merged_validators);
+		phalcon_update_property_this(getThis(), SL("_validators"), &merged_validators);
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -358,13 +351,9 @@ PHP_METHOD(Phalcon_Forms_Element, getValidators){
  */
 PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 
-	zval *attributes = NULL, *use_checked = NULL, *name, widget_attributes;
-	zval *default_attributes, merged_attributes;
-	zval value, current_value;
+	zval *attributes = NULL, *use_checked = NULL, *name, widget_attributes = {}, *default_attributes, merged_attributes = {}, value = {}, current_value = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 2, &attributes, &use_checked);
+	phalcon_fetch_params(0, 0, 2, &attributes, &use_checked);
 
 	if (!attributes) {
 		attributes = &PHALCON_GLOBAL(z_null);
@@ -382,7 +371,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	if (Z_TYPE_P(attributes) != IS_ARRAY) { 
 		array_init(&widget_attributes);
 	} else {
-		ZVAL_COPY_VALUE(&widget_attributes, attributes);
+		PHALCON_CPY_WRT_CTOR(&widget_attributes, attributes);
 	}
 
 	phalcon_array_update_long(&widget_attributes, 0, name, PH_COPY);
@@ -394,13 +383,13 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	if (Z_TYPE_P(default_attributes) == IS_ARRAY) {
 		phalcon_fast_array_merge(&merged_attributes, default_attributes, &widget_attributes);
 	} else {
-		ZVAL_COPY_VALUE(&merged_attributes, &widget_attributes);
+		PHALCON_CPY_WRT_CTOR(&merged_attributes, &widget_attributes);
 	}
 
 	/** 
 	 * Get the current element's value
 	 */
-	PHALCON_CALL_METHOD(&value, getThis(), "getvalue");
+	PHALCON_CALL_METHODW(&value, getThis(), "getvalue");
 
 	/** 
 	 * If the widget has a value set it as default value
@@ -429,7 +418,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 		}
 	}
 
-	RETURN_CTOR(&merged_attributes);
+	RETURN_CTORW(&merged_attributes);
 }
 
 /**
@@ -458,8 +447,7 @@ PHP_METHOD(Phalcon_Forms_Element, setAttribute){
  */
 PHP_METHOD(Phalcon_Forms_Element, getAttribute){
 
-	zval *attribute, *default_value = NULL, *attributes;
-	zval value;
+	zval *attribute, *default_value = NULL, *attributes, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &attribute, &default_value);
 
@@ -540,7 +528,7 @@ PHP_METHOD(Phalcon_Forms_Element, setUserOption){
  */
 PHP_METHOD(Phalcon_Forms_Element, getUserOption){
 
-	zval *option, *default_value = NULL, *options, value;
+	zval *option, *default_value = NULL, *options, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &option, &default_value);
 
@@ -626,9 +614,7 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 1, &attributes);
+	phalcon_fetch_params(0, 0, 1, &attributes);
 
 	phalcon_return_property(&label, getThis(), SL("_label"));
 
@@ -645,7 +631,7 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 
 	if (attributes && Z_TYPE_P(attributes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
-			zval key;
+			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
@@ -666,8 +652,6 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 	} else {
 		PHALCON_CONCAT_VSVS(return_value, &html, ">", &name, "</label>");
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -705,9 +689,7 @@ PHP_METHOD(Phalcon_Forms_Element, getDefault){
  */
 PHP_METHOD(Phalcon_Forms_Element, getValue){
 
-	zval *name, *form, has_default_value, value;
-
-	PHALCON_MM_GROW();
+	zval *name, *form, has_default_value = {}, value = {};
 
 	name = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
 
@@ -719,12 +701,12 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 		/** 
 		 * Check if the tag has a default value
 		 */
-		PHALCON_CALL_CE_STATIC(&has_default_value, phalcon_tag_ce, "hasvalue", name);
+		PHALCON_CALL_CE_STATICW(&has_default_value, phalcon_tag_ce, "hasvalue", name);
 		if (!zend_is_true(&has_default_value)) {
 			/** 
 			 * Gets the possible value for the widget
 			 */
-			PHALCON_CALL_METHOD(&value, form, "getvalue", name);
+			PHALCON_CALL_METHODW(&value, form, "getvalue", name);
 		}
 	}
 
@@ -735,7 +717,7 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 		 phalcon_return_property(&value, getThis(), SL("_value"));
 	}
 
-	RETURN_CTOR(&value);
+	RETURN_CTORW(&value);
 }
 
 /**
@@ -748,22 +730,18 @@ PHP_METHOD(Phalcon_Forms_Element, getMessages){
 
 	zval *messages;
 
-	PHALCON_MM_GROW();
-
 	/** 
 	 * Get the related form
 	 */
 	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
 	if (Z_TYPE_P(messages) == IS_OBJECT) {
-		RETURN_CTOR(messages);
+		RETURN_CTORW(messages);
 	}
 
 	object_init_ex(return_value, phalcon_validation_message_group_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct");
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct");
 
 	phalcon_update_property_this(getThis(), SL("_messages"), return_value);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -817,24 +795,21 @@ PHP_METHOD(Phalcon_Forms_Element, setMessages){
  */
 PHP_METHOD(Phalcon_Forms_Element, appendMessage){
 
-	zval *message, *messages = NULL;
+	zval *message, messages;
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &message);
 
-	phalcon_fetch_params(1, 1, 0, &message);
+	phalcon_return_property(&messages, getThis(), SL("_messages"));
+	if (Z_TYPE(messages) != IS_OBJECT) {
+		object_init_ex(&messages, phalcon_validation_message_group_ce);
+		PHALCON_CALL_METHODW(NULL, &messages, "__construct");
 
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	if (Z_TYPE_P(messages) != IS_OBJECT) {
-		PHALCON_INIT_NVAR(messages);
-		object_init_ex(messages, phalcon_validation_message_group_ce);
-		PHALCON_CALL_METHOD(NULL, messages, "__construct");
-
-		phalcon_update_property_this(getThis(), SL("_messages"), messages);
+		phalcon_update_property_this(getThis(), SL("_messages"), &messages);
 	}
 
-	PHALCON_CALL_METHOD(NULL, messages, "appendmessage", message);
+	PHALCON_CALL_METHODW(NULL, &messages, "appendmessage", message);
 
-	RETURN_THIS();
+	RETURN_THISW();
 }
 
 /**
@@ -856,22 +831,18 @@ PHP_METHOD(Phalcon_Forms_Element, clear)
  */
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
-	
-	if (FAILURE == phalcon_call_class_method_aparams(&return_value, getThis(), Z_OBJCE_P(getThis()), phalcon_fcall_method, "render", 6, 0, NULL)) {
-		if (EG(exception)) {			
-			zval e;
+	zval e, *m;
+
+	if (FAILURE == phalcon_call_method(return_value, getThis(), "render", 0, NULL)) {
+		if (EG(exception)) {
 			ZVAL_OBJ(&e, EG(exception));
-
-			zval *m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
-
-			Z_TRY_ADDREF_P(m);
+			m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
 			if (Z_TYPE_P(m) != IS_STRING) {
 				convert_to_string_ex(m);
 			}
 
 			zend_clear_exception();
 			zend_error(E_ERROR, "%s", Z_STRVAL_P(m));
-			zval_ptr_dtor(m);
 		}
 	}
 }

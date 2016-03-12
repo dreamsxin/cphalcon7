@@ -65,7 +65,7 @@ static zval *phannot_ret_zval_list(zval *list_left, zval *right_list)
 				Z_TRY_ADDREF_P(item);
 				add_next_index_zval(ret, item);
 			} ZEND_HASH_FOREACH_END();
-			zval_ptr_dtor(list_left);
+			PHALCON_PTR_DTOR(list_left);
 		} else {
 			add_next_index_zval(ret, list_left);
 		}
@@ -493,7 +493,7 @@ static void jj_destructor(JJCODETYPE jjmajor, JJMINORTYPE *jjpminor){
     case 24:
     case 25:
 /* #line 211 "parser.y" */
-{ zval_ptr_dtor((jjpminor->jj36)); }
+{ PHALCON_PTR_DTOR((jjpminor->jj36)); }
 /* #line 511 "parser.c" */
       break;
     default:  break;   /* If no destructor action specified: do nothing */
@@ -1571,7 +1571,7 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 			if (parser_status->ret) {
 				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
 				ZVAL_NULL(parser_status->ret);
-				zval_ptr_dtor(parser_status->ret);
+				PHALCON_PTR_DTOR(parser_status->ret);
 			} else {
 				array_init(*result);
 			}

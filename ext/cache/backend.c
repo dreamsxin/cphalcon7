@@ -21,6 +21,7 @@
 #include "cache/backendinterface.h"
 #include "cache/frontendinterface.h"
 #include "cache/exception.h"
+#include "di/injectable.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -71,7 +72,7 @@ static const zend_function_entry phalcon_cache_backend_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Cache_Backend){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Cache, Backend, cache_backend, phalcon_cache_backend_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache, Backend, cache_backend, phalcon_di_injectable_ce, phalcon_cache_backend_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_property_null(phalcon_cache_backend_ce, SL("_frontend"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cache_backend_ce, SL("_options"), ZEND_ACC_PROTECTED);
@@ -94,13 +95,12 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend){
  */
 PHP_METHOD(Phalcon_Cache_Backend, __construct){
 
-	zval *frontend, *options = NULL, prefix;
+	zval *frontend, *options = NULL, prefix = {};
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
-	
 	PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_cache_frontendinterface_ce, phalcon_cache_exception_ce, 0);
 
-	if (options || Z_TYPE_P(options) == IS_ARRAY) {
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		/**
 		 * A common option is the prefix
 		 */
@@ -108,10 +108,10 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 			phalcon_update_property_this(getThis(), SL("_prefix"), &prefix);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_options"), &options);
+		phalcon_update_property_this(getThis(), SL("_options"), options);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_frontend"), &frontend);
+	phalcon_update_property_this(getThis(), SL("_frontend"), frontend);
 }
 
 /**
@@ -123,12 +123,9 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend, start){
 
-	zval *key_name, *lifetime = NULL, *fresh = NULL;
-	zval *frontend;
+	zval *key_name, *lifetime = NULL, *fresh = NULL, *frontend;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 	
 	if (!lifetime) {
 		lifetime = &PHALCON_GLOBAL(z_null);
@@ -137,12 +134,12 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	/** 
 	 * Get the cache content verifying if it was expired
 	 */
-	PHALCON_RETURN_CALL_METHOD(getThis(), "get", key_name, lifetime);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "get", key_name, lifetime);
 	if (Z_TYPE_P(return_value) == IS_NULL) {
 		fresh = &PHALCON_GLOBAL(z_true);
 	
 		frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
-		PHALCON_CALL_METHOD(NULL, frontend, "start");
+		PHALCON_CALL_METHODW(NULL, frontend, "start");
 	} else {
 		fresh = &PHALCON_GLOBAL(z_false);
 	}
@@ -156,8 +153,6 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	if (Z_TYPE_P(lifetime) != IS_NULL) {
 		phalcon_update_property_this(getThis(), SL("_lastLifetime"), lifetime);
 	}
-
-	RETURN_MM();
 }
 
 /**
@@ -172,10 +167,8 @@ PHP_METHOD(Phalcon_Cache_Backend, stop){
 	phalcon_fetch_params(0, 0, 1, &stop_buffer);
 	
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
-		PHALCON_MM_GROW();
 		frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
-		PHALCON_CALL_METHOD(NULL, frontend, "stop");
-		PHALCON_MM_RESTORE();
+		PHALCON_CALL_METHODW(NULL, frontend, "stop");
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);

@@ -60,29 +60,27 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client){
 	return SUCCESS;
 }
 
-PHP_METHOD(Phalcon_Http_Client, factory){
-	zval *uri = NULL, *method = NULL;
+PHP_METHOD(Phalcon_Http_Client, factory)
+{
+	zval *uri = NULL, *_method = NULL, method = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 0, 2, &uri, &method);
+	phalcon_fetch_params(0, 0, 2, &uri, &method);
 
 	if (!uri) {
 		uri = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!method) {
-		PHALCON_INIT_NVAR(method);
-		ZVAL_STRING(method, "GET");
+	if (!_method) {
+		ZVAL_STRING(&method, "GET");
+	} else {
+		PHALCON_CPY_WRT(&method, _method);
 	}
 
 	if (phalcon_function_exists_ex(SL("curl_init")) != FAILURE) {
 		object_init_ex(return_value, phalcon_http_client_adapter_curl_ce);
-		PHALCON_CALL_METHOD(NULL, return_value, "__construct", uri, method);
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct", uri, &method);
 	} else {
 		object_init_ex(return_value, phalcon_http_client_adapter_stream_ce);
-		PHALCON_CALL_METHOD(NULL, return_value, "__construct", uri, method);
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct", uri, &method);
 	}
-
-	PHALCON_MM_RESTORE();
 }

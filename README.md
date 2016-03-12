@@ -1,4 +1,7 @@
-#[中文帮助](https://github.com/dreamsxin/cphalcon7/wiki)
+# [中文帮助](https://github.com/dreamsxin/cphalcon7/wiki)
+
+## [捐贈名單（Donation）](https://github.com/dreamsxin/cphalcon/blob/master/DONATE.md)
+
 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
 
 Phalcon7 Framework
@@ -55,7 +58,7 @@ Follow these instructions to generate a binary extension for your platform:
 
 ```bash
 git clone git://github.com/dreamsxin/cphalcon7.git
-cd cphalcon/ext
+cd cphalcon7/ext
 phpize
 make -j4
 sudo make install

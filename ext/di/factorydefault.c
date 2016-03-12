@@ -63,12 +63,9 @@ PHALCON_INIT_CLASS(Phalcon_DI_FactoryDefault){
  */
 PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 
-	zval *shared, name, definition;
+	zval *shared, name = {}, definition = {};
 
-	PHALCON_MM_GROW();
-
-	//  PHALCON_CALL_PARENT(NULL, phalcon_di_factorydefault_ce, getThis(), "__construct");
-	PHALCON_CALL_METHOD_WITH_PARAMS(NULL, getThis(), phalcon_di_factorydefault_ce, phalcon_fcall_parent, "__construct");
+	PHALCON_CALL_PARENTW(NULL, phalcon_di_factorydefault_ce, getThis(), "__construct");
 
 	shared = &PHALCON_GLOBAL(z_true);
 
@@ -77,72 +74,63 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 */
 	ZVAL_STRING(&name, ISV(router));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Router");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Mvc Dispatcher
 	 */
 	ZVAL_STRING(&name, ISV(dispatcher));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Dispatcher");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Mvc Url
 	 */
 	ZVAL_STRING(&name, ISV(url));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Url");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Models manager for ORM
 	 */
 	ZVAL_STRING(&name, ISV(modelsManager));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\Manager");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Models meta-data using the Memory adapter
 	 */
 	ZVAL_STRING(&name, ISV(modelsMetadata));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\MetaData\\Memory");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Models Query for ORM
 	 */
 	ZVAL_STRING(&name, ISV(modelsQuery));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\Query");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, &PHALCON_GLOBAL(z_false));
 
 	/**
 	 * Models Query Builder for ORM
 	 */
 	ZVAL_STRING(&name, ISV(modelsQueryBuilder));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\Query\\Builder");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, &PHALCON_GLOBAL(z_false));
 
 	/**
 	 * Models Criteria for ORM
 	 */
 	ZVAL_STRING(&name, ISV(modelsCriteria));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\Criteria");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, &PHALCON_GLOBAL(z_false));
 
 	/**
 	 * Request/Response are always shared
 	 */
 	ZVAL_STRING(&name, ISV(response));
 	ZVAL_STRING(&definition, "Phalcon\\Http\\Response");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Http Response Cookies
@@ -150,78 +138,69 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	ZVAL_STRING(&name, ISV(cookies));
 	ZVAL_STRING(&definition, "Phalcon\\Http\\Response\\Cookies");
 
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 	/**
 	 * Http Request
 	 */
 	ZVAL_STRING(&name, ISV(request));
 	ZVAL_STRING(&definition, "Phalcon\\Http\\Request");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Filter/Escaper services are always shared
 	 */
 	ZVAL_STRING(&name, ISV(filter));
 	ZVAL_STRING(&definition, "Phalcon\\Filter");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Escaper
 	 */
 	ZVAL_STRING(&name, ISV(escaper));
 	ZVAL_STRING(&definition, "Phalcon\\Escaper");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Default annotations service
 	 */
 	ZVAL_STRING(&name, ISV(annotations));
 	ZVAL_STRING(&definition, "Phalcon\\Annotations\\Adapter\\Memory");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Security doesn't need to be shared, but anyways we register it as shared
 	 */
 	ZVAL_STRING(&name, ISV(security));
 	ZVAL_STRING(&definition, "Phalcon\\Security");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Crypt Service
 	 */
 	ZVAL_STRING(&name, ISV(crypt));
 	ZVAL_STRING(&definition, "Phalcon\\Crypt");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Flash services are always shared
 	 */
 	ZVAL_STRING(&name, ISV(flash));
 	ZVAL_STRING(&definition, "Phalcon\\Flash\\Direct");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Flash Session
 	 */
 	ZVAL_STRING(&name, ISV(flashSession));
 	ZVAL_STRING(&definition, "Phalcon\\Flash\\Session");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Tag/Helpers
 	 */
 	ZVAL_STRING(&name, ISV(tag));
 	ZVAL_STRING(&definition, "Phalcon\\Tag");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Session is always shared
@@ -229,39 +208,33 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	ZVAL_STRING(&name, ISV(session));
 	ZVAL_STRING(&definition, "Phalcon\\Session\\Adapter\\Files");
 
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Session/Bag
 	 */
 	ZVAL_STRING(&name, ISV(sessionBag));
 	ZVAL_STRING(&definition, "Phalcon\\Session\\Bag");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Events Manager is always shared
 	 */
 	ZVAL_STRING(&name, ISV(eventsManager));
 	ZVAL_STRING(&definition, "Phalcon\\Events\\Manager");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Model Transaction Manager
 	 */
 	ZVAL_STRING(&name, ISV(transactionManager));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\Transaction\\Manager");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 
 	/**
 	 * Assets Manager
 	 */
 	ZVAL_STRING(&name, ISV(assets));
 	ZVAL_STRING(&definition, "Phalcon\\Assets\\Manager");
-
-	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
-
-	PHALCON_MM_RESTORE();
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
 }

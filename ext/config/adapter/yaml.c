@@ -80,11 +80,9 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Yaml){
  */
 PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 
-	zval *file_path, *absolute_path = NULL, *config_dir_path, *base_path = NULL, *config = NULL;
+	zval *file_path, *absolute_path = NULL, config_dir_path = {}, *base_path = NULL, config = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 1, &file_path, &absolute_path);
+	phalcon_fetch_params(0, 1, 1, &file_path, &absolute_path);
 	PHALCON_ENSURE_IS_STRING(file_path);
 
 	if (absolute_path == NULL) {
@@ -92,19 +90,18 @@ PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 	}
 
 	if (zend_is_true(absolute_path)) {
-		PHALCON_CPY_WRT(config_dir_path, file_path);
+		PHALCON_CPY_WRT_CTOR(&config_dir_path, file_path);
 	} else {
 		base_path = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
-		PHALCON_INIT_VAR(config_dir_path);
-		PHALCON_CONCAT_VV(config_dir_path, base_path, file_path);
+		PHALCON_CONCAT_VV(&config_dir_path, base_path, file_path);
 	}
 
-	PHALCON_CALL_FUNCTION(&config, "yaml_parse_file", config_dir_path);
+	PHALCON_CALL_FUNCTIONW(&config, "yaml_parse_file", &config_dir_path);
 
-	if (Z_TYPE_P(config) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "val", config);
+	if (Z_TYPE(config) == IS_ARRAY) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "val", &config);
 	}
 
-	RETURN_THIS();
+	RETURN_THISW();
 }

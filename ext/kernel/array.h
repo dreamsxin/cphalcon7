@@ -27,7 +27,7 @@
 #include "php_phalcon.h"
 #include "kernel/memory.h"
 
-zval* phalcon_array_return_fetch(const zval *arr, const zval *index);
+zval* phalcon_array_read_fetch(const zval *arr, const zval *index);
 
 /**
  * @brief Fetches @a index if it exists from the array @a arr
@@ -67,6 +67,7 @@ int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index);
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  */
 int ZEND_FASTCALL phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length);
+int ZEND_FASTCALL phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index);
 
 
 /**
@@ -663,5 +664,8 @@ int phalcon_array_is_associative(zval *arr);
 
 void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
 int phalcon_array_update_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);
+
+void phalcon_array_append_multi_ex(zval *arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
+int phalcon_array_append_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);
 
 #endif /* PHALCON_KERNEL_ARRAY_H */

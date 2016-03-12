@@ -54,6 +54,8 @@
 		PHALCON_MM_RESTORE(); \
 	} while (0)
 
+#define PHALCON_THROW_EXCEPTION_FORMATW(class_entry, format, ...) phalcon_throw_exception_format(class_entry, format, __VA_ARGS__);
+
 
 /** Throw Exceptions */
 void phalcon_throw_exception(zval *object) PHALCON_ATTR_NONNULL;

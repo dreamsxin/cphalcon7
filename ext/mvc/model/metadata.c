@@ -173,141 +173,119 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
-	zval *model, *key, *table, *schema, *read_meta = NULL, *strategy = NULL, *class_name;
-	zval *meta_data = NULL, *prefix_key = NULL, *data = NULL, *model_metadata = NULL;
-	zval exception_message, *dependency_injector;
-	zval *column_map = NULL, *model_column_map = NULL;
+	zval *model, *key, *table, *schema, *dependency_injector, class_name = {}, meta_data = {}, prefix_key = {}, model_metadata = {}, strategy = {}, exception_message = {}, column_map = {}, model_column_map = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 4, 0, &model, &key, &table, &schema);
+	ZVAL_NULL(&strategy);
 
-	phalcon_fetch_params(1, 4, 1, &model, &key, &table, &schema, &read_meta);
-
-	if (!read_meta) {
-		read_meta = &PHALCON_GLOBAL(z_false);
-	}
-
-	if (Z_TYPE_P(key) == IS_NULL) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The key is not valid");
+	if (PHALCON_IS_EMPTY(key)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The key is not valid");
 		return;
 	}
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 
-	PHALCON_INIT_VAR(strategy);
+	phalcon_get_class(&class_name, model, 0);
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 0);
-	if (zend_is_true(read_meta)) {
-		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
-		if (!phalcon_array_isset(meta_data, key)) {
+	phalcon_return_property(&meta_data, getThis(), SL("_metaData"));
+	if (Z_TYPE(meta_data) != IS_ARRAY) { 
+		array_init(&meta_data);
+	}
 
-			PHALCON_INIT_VAR(prefix_key);
-			PHALCON_CONCAT_SV(prefix_key, "meta-", key);
+	if (!phalcon_array_isset(&meta_data, key)) {
+		PHALCON_CONCAT_SV(&prefix_key, "meta-", key);
 
+		/** 
+		 * The meta-data is read from the cache adapter always
+		 */
+		PHALCON_CALL_METHODW(&model_metadata, getThis(), "read", &prefix_key);
+
+		if (Z_TYPE(model_metadata) != IS_NULL) {
+			phalcon_update_property_array(getThis(), SL("_metaData"), key, &model_metadata);
+		} else {
 			/** 
-			 * The meta-data is read from the adapter always
+			 * Check if there is a method 'metaData' in the model to retrieve meta-data from it
 			 */
-			PHALCON_CALL_METHOD(&data, getThis(), "read", prefix_key);
-			if (Z_TYPE_P(data) != IS_NULL) {
-				if (Z_TYPE_P(meta_data) != IS_ARRAY) { 
-					PHALCON_INIT_NVAR(meta_data);
-					array_init(meta_data);
+			if (phalcon_method_exists_ex(model, SL("metadata")) == SUCCESS) {
+				PHALCON_CALL_METHODW(&model_metadata, model, "metadata");
+				if (Z_TYPE(model_metadata) != IS_ARRAY) {
+					PHALCON_CONCAT_SV(&exception_message, "Invalid meta-data for model ", &class_name);
+					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+					return;
 				}
-				phalcon_array_update_zval(meta_data, key, data, PH_COPY);
-				phalcon_update_property_this(getThis(), SL("_metaData"), meta_data);
 			} else {
 				/** 
-				 * Check if there is a method 'metaData' in the model to retrieve meta-data from it
+				 * Get the meta-data extraction strategy
 				 */
-				if (phalcon_method_exists_ex(model, SL("metadata")) == SUCCESS) {
-					PHALCON_CALL_METHOD(&model_metadata, model, "metadata");
-					if (Z_TYPE_P(model_metadata) != IS_ARRAY) {
-						PHALCON_CONCAT_SV(&exception_message, "Invalid meta-data for model ", class_name);
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-						return;
-					}
-				} else {
-
-					/** 
-					 * Get the meta-data extraction strategy
-					 */
-					PHALCON_CALL_METHOD(&strategy, getThis(), "getstrategy");
-
-					/** 
-					 * Get the meta-data
-					 */
-					PHALCON_CALL_METHOD(&model_metadata, strategy, "getmetadata", model, dependency_injector);
-				}
+				PHALCON_CALL_METHODW(&strategy, getThis(), "getstrategy");
 
 				/** 
-				 * Store the meta-data locally
+				 * Get the meta-data
 				 */
-				phalcon_update_property_array(getThis(), SL("_metaData"), key, model_metadata);
-
-				/** 
-				 * Store the meta-data in the adapter
-				 */
-				PHALCON_CALL_METHOD(NULL, getThis(), "write", prefix_key, model_metadata);
+				PHALCON_CALL_METHODW(&model_metadata, &strategy, "getmetadata", model, dependency_injector);
 			}
+
+			/** 
+			 * Store the meta-data locally
+			 */
+			phalcon_update_property_array(getThis(), SL("_metaData"), key, &model_metadata);
+
+			/** 
+			 * Store the meta-data in the adapter
+			 */
+			PHALCON_CALL_METHODW(NULL, getThis(), "write", &prefix_key, &model_metadata);
 		}
+
+		/** 
+		 * Check for a column map, store in _columnMap in order and reversed order
+		 */
+		if (!PHALCON_GLOBAL(orm).column_renaming) {
+			return;
+		}
+
+		phalcon_return_property(&column_map, getThis(), SL("_columnMap"));
+
+		if (Z_TYPE(column_map) != IS_ARRAY) { 
+			array_init(&column_map);
+		} else if (phalcon_array_isset_fetch(&model_column_map, &column_map, key) && Z_TYPE(model_column_map) != IS_NULL) {
+			return;
+		}
+
+		PHALCON_CONCAT_SV(&prefix_key, "map-", key);
+	
+		/** 
+		 * Check if the meta-data is already in the adapter
+		 */
+		PHALCON_CALL_METHODW(&model_column_map, getThis(), "read", &prefix_key);
+		if (Z_TYPE(model_column_map) != IS_NULL) {
+			phalcon_array_update_zval(&column_map, key, &model_column_map, PH_COPY);
+			phalcon_update_property_this(getThis(), SL("_columnMap"), &column_map);
+			RETURN_NULL();
+		}
+
+		/** 
+		 * Get the meta-data extraction strategy
+		 */
+		if (Z_TYPE(strategy) != IS_OBJECT) {
+			PHALCON_CALL_METHODW(&strategy, getThis(), "getstrategy");
+		}
+
+		/** 
+		 * Get the meta-data
+		 */
+		PHALCON_CALL_METHODW(&model_column_map, &strategy, "getcolumnmaps", model, dependency_injector);
+
+		/** 
+		 * Update the column map locally
+		 */
+		phalcon_update_property_array(getThis(), SL("_columnMap"), key, &model_column_map);
+
+		/** 
+		 * Write the data to the adapter
+		 */
+		PHALCON_CALL_METHODW(NULL, getThis(), "write", &prefix_key, &model_column_map);
+	
 	}
-
-	/** 
-	 * Check for a column map, store in _columnMap in order and reversed order
-	 */
-	if (!PHALCON_GLOBAL(orm).column_renaming) {
-		RETURN_MM_NULL();
-	}
-
-	column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
-	if (phalcon_array_isset(column_map, key)) {
-		RETURN_MM_NULL();
-	}
-
-	if (Z_TYPE_P(column_map) != IS_ARRAY) { 
-		PHALCON_INIT_NVAR(column_map);
-		array_init(column_map);
-	}
-
-	/** 
-	 * Create the map key name
-	 */
-	PHALCON_INIT_NVAR(prefix_key);
-	PHALCON_CONCAT_SV(prefix_key, "map-", key);
-
-	/** 
-	 * Check if the meta-data is already in the adapter
-	 */
-	PHALCON_CALL_METHOD(&data, getThis(), "read", prefix_key);
-	if (Z_TYPE_P(data) != IS_NULL) {
-		phalcon_array_update_zval(column_map, key, data, PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_columnMap"), column_map);
-		RETURN_MM_NULL();
-	}
-
-	/** 
-	 * Get the meta-data extraction strategy
-	 */
-	if (Z_TYPE_P(strategy) != IS_OBJECT) {
-		PHALCON_CALL_METHOD(&strategy, getThis(), "getstrategy");
-	}
-
-	/** 
-	 * Get the meta-data
-	 */
-	PHALCON_CALL_METHOD(&model_column_map, strategy, "getcolumnmaps", model, dependency_injector);
-
-	/** 
-	 * Update the column map locally
-	 */
-	phalcon_update_property_array(getThis(), SL("_columnMap"), key, model_column_map);
-
-	/** 
-	 * Write the data to the adapter
-	 */
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", prefix_key, model_column_map);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -336,16 +314,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setStrategy){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
 
-	zval *strategy, s;
+	zval *strategy, s = {};
 
 	strategy = phalcon_read_property(getThis(), SL("_strategy"), PH_NOISY);
 	if (Z_TYPE_P(strategy) == IS_NULL) {
 		object_init_ex(&s, phalcon_mvc_model_metadata_strategy_introspection_ce);
 		phalcon_update_property_this(getThis(), SL("_strategy"), &s);
-		RETURN_ZVAL(&s, 1, 0);
+		RETURN_CTORW(&s);
 	}
 
-	RETURN_ZVAL(strategy, 1, 0);
+	RETURN_CTORW(strategy);
 }
 
 /**
@@ -360,36 +338,30 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 
-	zval *model, *table = NULL, *schema = NULL, *class_name, *key, *meta_data = NULL;
-	zval *data;
+	zval *model, table = {}, schema = {}, class_name = {}, key = {}, *meta_data, data = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
+	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
 
-	phalcon_fetch_params(1, 1, 0, &model);
-	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 1);
+	PHALCON_CALL_METHODW(&table, model, "getsource");
+	PHALCON_CALL_METHODW(&schema, model, "getschema");
 
-	PHALCON_CALL_METHOD(&table, model, "getsource");
-	PHALCON_CALL_METHOD(&schema, model, "getschema");
-
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 1);
+	phalcon_get_class(&class_name, model, 1);
 
 	/** 
 	 * Unique key for meta-data is created using class-name-schema-table
 	 */
-	PHALCON_INIT_VAR(key);
-	PHALCON_CONCAT_VSVV(key, class_name, "-", schema, table);
+	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
 	meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
-	if (!phalcon_array_isset(meta_data, key)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema, &PHALCON_GLOBAL(z_true));
+	if (!phalcon_array_isset(meta_data, &key)) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "_initialize", model, &key, &table, &schema);
 		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	}
 
-	PHALCON_OBS_VAR(data);
-	phalcon_array_fetch(&data, meta_data, key, PH_NOISY);
+	phalcon_array_fetch(&data, meta_data, &key, PH_NOISY);
 
-	RETURN_CTOR(data);
+	RETURN_CTORW(&data);
 }
 
 /**
@@ -405,39 +377,33 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 
-	zval *model, *index, *table = NULL, *schema = NULL, class_name;
-	zval key, *meta_data = NULL, *meta_data_index, *attributes;
+	zval *model, *index, table = {}, schema = {}, class_name = {}, key = {}, *meta_data, meta_data_index = {}, attributes = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &index);
+	phalcon_fetch_params(0, 2, 0, &model, &index);
 	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
 	PHALCON_ENSURE_IS_LONG(index);
 
-	PHALCON_CALL_METHOD(&table, model, "getsource");
-	PHALCON_CALL_METHOD(&schema, model, "getschema");
+	PHALCON_CALL_METHODW(&table, model, "getsource");
+	PHALCON_CALL_METHODW(&schema, model, "getschema");
 
 	phalcon_get_class(&class_name, model, 1);
 
 	/** 
 	 * Unique key for meta-data is created using class-name-schema-table
 	 */
-	PHALCON_CONCAT_VSVV(&key, &class_name, "-", schema, table);
+	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
 	meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 
 	if (!phalcon_array_isset(meta_data, &key)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, &key, table, schema, &PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_METHODW(NULL, getThis(), "_initialize", model, &key, &table, &schema);
 		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	}
 
-	PHALCON_OBS_VAR(meta_data_index);
 	phalcon_array_fetch(&meta_data_index, meta_data, &key, PH_NOISY);
+	phalcon_array_fetch(&attributes, &meta_data_index, index, PH_NOISY);
 
-	PHALCON_OBS_VAR(attributes);
-	phalcon_array_fetch(&attributes, meta_data_index, index, PH_NOISY);
-
-	RETURN_CTOR(attributes);
+	RETURN_CTORW(&attributes);
 }
 
 /**
@@ -453,53 +419,45 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 
-	zval *model, *index, *data, *replace, *table = NULL, *schema = NULL, *class_name;
-	zval *key, *meta_data = NULL, *arr, *value, *v;
+	zval *model, *index, *data, *replace, table = {}, schema = {}, class_name = {}, key = {}, *meta_data, arr = {}, value = {}, *v;
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 4, 0, &model, &index, &data, &replace);
-	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 1);
+	phalcon_fetch_params(0, 4, 0, &model, &index, &data, &replace);
+	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
 
 	if (Z_TYPE_P(index) != IS_LONG) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Index must be a valid integer constant");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Index must be a valid integer constant");
 		return;
 	}
 
 	if (Z_TYPE_P(data) != IS_ARRAY && Z_TYPE_P(data) != IS_STRING && !PHALCON_IS_BOOL(data)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid data for index");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid data for index");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&table, model, "getsource");
-	PHALCON_CALL_METHOD(&schema, model, "getschema");
+	PHALCON_CALL_METHODW(&table, model, "getsource");
+	PHALCON_CALL_METHODW(&schema, model, "getschema");
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 1);
+	phalcon_get_class(&class_name, model, 1);
 
 	/** 
 	 * Unique key for meta-data is created using class-name-schema-table
 	 */
-	PHALCON_INIT_VAR(key);
-	PHALCON_CONCAT_VSVV(key, class_name, "-", schema, table);
+	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
 	meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
-	if (!phalcon_array_isset(meta_data, key)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema, &PHALCON_GLOBAL(z_true));
+	if (!phalcon_array_isset(meta_data, &key)) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "_initialize", model, &key, &table, &schema);
 		meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	} else if (!zend_is_true(replace)) {
-		PHALCON_OBS_VAR(arr);
-		phalcon_array_fetch(&arr, meta_data, key, PH_NOISY);
-
-		PHALCON_OBS_VAR(value);
-		phalcon_array_fetch(&value, arr, index, PH_NOISY);
+		phalcon_array_fetch(&arr, meta_data, &key, PH_NOISY);
+		phalcon_array_fetch(&value, &arr, index, PH_NOISY);
 
 		PHALCON_SEPARATE_PARAM(data);
 
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), idx, str_key, v) {
-			zval tmp;
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(value), idx, str_key, v) {
+			zval tmp = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -512,10 +470,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_array_update_multi_2(meta_data, key, index, data, PH_COPY);
+	phalcon_array_update_multi_2(meta_data, &key, index, data, PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_metaData"), meta_data);
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -530,41 +486,34 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 
-	zval *model, *table = NULL, *schema = NULL, *class_name, *key, *column_map = NULL;
-	zval *data;
+	zval *model, table = {}, schema = {}, class_name = {}, key = {}, *column_map, data = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
-	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 1);
+	phalcon_fetch_params(0, 1, 0, &model);
+	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
 
 	if (!PHALCON_GLOBAL(orm).column_renaming) {
-		RETURN_MM();
+		return;
 	}
 
-	PHALCON_CALL_METHOD(&table, model, "getsource");
-	PHALCON_CALL_METHOD(&schema, model, "getschema");
+	PHALCON_CALL_METHODW(&table, model, "getsource");
+	PHALCON_CALL_METHODW(&schema, model, "getschema");
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 1 TSRMLS_CC);
+	phalcon_get_class(&class_name, model, 1 TSRMLS_CC);
 
 	/** 
 	 * Unique key for map is created using class-name-schema-table
 	 */
-	PHALCON_INIT_VAR(key);
-	PHALCON_CONCAT_VSVV(key, class_name, "-", schema, table);
+	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
 	column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
-	if (!phalcon_array_isset(column_map, key)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, key, table, schema);
-
+	if (!phalcon_array_isset(column_map, &key)) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "_initialize", model, &key, &table, &schema);
 		column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
 	}
 
-	PHALCON_OBS_VAR(data);
-	phalcon_array_fetch(&data, column_map, key, PH_NOISY);
+	phalcon_array_fetch(&data, column_map, &key, PH_NOISY);
 
-	RETURN_CTOR(data);
+	RETURN_CTORW(&data);
 }
 
 /**
@@ -579,45 +528,37 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 
-	zval *model, *index, *table = NULL, *schema = NULL, *class_name, *key, *column_map = NULL;
-	zval *column_map_model, *attributes;
+	zval *model, *index, table = {}, schema = {}, class_name = {}, key = {}, *column_map, column_map_model = {}, attributes = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &index);
-	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 1);
+	phalcon_fetch_params(0, 2, 0, &model, &index);
+	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
 	PHALCON_ENSURE_IS_LONG(index);
 
 	if (!PHALCON_GLOBAL(orm).column_renaming) {
-		RETURN_MM();
+		return;
 	}
 
-	PHALCON_CALL_METHOD(&table, model, "getsource");
-	PHALCON_CALL_METHOD(&schema, model, "getschema");
+	PHALCON_CALL_METHODW(&table, model, "getsource");
+	PHALCON_CALL_METHODW(&schema, model, "getschema");
 
-	PHALCON_INIT_VAR(class_name);
-	phalcon_get_class(class_name, model, 1 TSRMLS_CC);
+	phalcon_get_class(&class_name, model, 1 TSRMLS_CC);
 
 	/** 
 	 * Unique key for map is created using class-name-schema-table
 	 */
-	PHALCON_INIT_VAR(key);
-	PHALCON_CONCAT_VSVV(key, class_name, "-", schema, table);
+	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
 	column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
-	if (!phalcon_array_isset(column_map, key)) {
-		PHALCON_CALL_SELF(NULL, "_initialize", model, key, table, schema);
+	if (!phalcon_array_isset(column_map, &key)) {
+		PHALCON_CALL_SELFW(NULL, "_initialize", model, &key, &table, &schema);
 
 		column_map = phalcon_read_property(getThis(), SL("_columnMap"), PH_NOISY);
 	}
 
-	PHALCON_OBS_VAR(column_map_model);
-	phalcon_array_fetch(&column_map_model, column_map, key, PH_NOISY);
+	phalcon_array_fetch(&column_map_model, column_map, &key, PH_NOISY);
+	phalcon_array_fetch(&attributes, &column_map_model, index, PH_NOISY);
 
-	PHALCON_OBS_VAR(attributes);
-	phalcon_array_fetch(&attributes, column_map_model, index, PH_NOISY);
-
-	RETURN_CTOR(attributes);
+	RETURN_CTORW(&attributes);
 }
 
 /**
@@ -632,21 +573,18 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttributes){
 
-	zval *model, what;
+	zval *model, what = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	ZVAL_LONG(&what, PHALCON_MVC_MODEL_METADATA_MODELS_ATTRIBUTES);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "readmetadataindex", model, &what);
+
+	PHALCON_RETURN_CALL_METHODW(getThis(), "readmetadataindex", model, &what);
 
 	if (Z_TYPE_P(return_value) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupted");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupted");
 		return;
 	}
-
-	PHALCON_MM_RESTORE();
 }
 
 /**
@@ -661,22 +599,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getPrimaryKeyAttributes){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 1);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 1);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -691,22 +624,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getPrimaryKeyAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getNonPrimaryKeyAttributes){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 2);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 2);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -721,22 +649,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getNonPrimaryKeyAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getNotNullAttributes){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 3);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 3);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -752,19 +675,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getNotNullAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, isNotNull){
 
-	zval *model, *attribute, *data = NULL;
+	zval *model, *attribute, data = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &model, &attribute);
+	PHALCON_CALL_METHODW(&data, getThis(), "getnotnullattributes", model);
 
-	PHALCON_CALL_METHOD(&data, getThis(), "getnotnullattributes", model);
-
-	if (phalcon_fast_in_array(attribute, data)) {
-		RETURN_MM_TRUE;
+	if (phalcon_fast_in_array(attribute, &data)) {
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**
@@ -779,22 +700,18 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isNotNull){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataTypes){
 
-	zval *model, index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 1, 0, &model);
+	phalcon_fetch_params(0, 1, 0, &model);
 
 	ZVAL_LONG(&index, 4);
 
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, &index);
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
 
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -810,22 +727,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataTypes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataType){
 
-	zval *model, *attribute, *data = NULL, *type;
+	zval *model, *attribute, data = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &model, &attribute);
+	PHALCON_CALL_METHODW(&data, getThis(), "getdatatypes", model);
 
-	PHALCON_CALL_METHOD(&data, getThis(), "getdatatypes", model);
-
-	if (phalcon_array_isset(data, attribute)) {
-		PHALCON_OBS_VAR(type);
-		phalcon_array_fetch(&type, data, attribute, PH_NOISY);
-	} else {
-		PHALCON_INIT_VAR(type);
+	if (phalcon_array_isset(&data, attribute)) {
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
 	}
-
-	RETURN_CTOR(type);
 }
 
 /**
@@ -840,22 +750,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataType){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSizes){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 13);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 13);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -871,22 +776,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSizes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSize){
 
-	zval *model, *attribute, *data = NULL, *size;
+	zval *model, *attribute, data = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &model, &attribute);
+	PHALCON_CALL_METHODW(&data, getThis(), "getdatasizes", model);
 
-	PHALCON_CALL_METHOD(&data, getThis(), "getdatasizes", model);
-
-	if (phalcon_array_isset(data, attribute)) {
-		PHALCON_OBS_VAR(size);
-		phalcon_array_fetch(&size, data, attribute, PH_NOISY);
-	} else {
-		PHALCON_INIT_VAR(size);
+	if (phalcon_array_isset(&data, attribute)) {
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
 	}
-
-	RETURN_CTOR(size);
 }
 
 /**
@@ -902,29 +800,21 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSize){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataBytes){
 
-	zval *model, *attribute, *index, *data = NULL, *bytes;
+	zval *model, *attribute, index = {}, data = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &model, &attribute);
+	ZVAL_LONG(&index, 15);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 15);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(&data, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE(data) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
 
-	if (phalcon_array_isset(data, attribute)) {
-		PHALCON_OBS_VAR(bytes);
-		phalcon_array_fetch(&bytes, data, attribute, PH_NOISY);
-	} else {
-		PHALCON_INIT_VAR(bytes);
+	if (phalcon_array_isset(&data, attribute)) {
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
 	}
-
-	RETURN_CTOR(bytes);
 }
 
 /**
@@ -939,22 +829,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataBytes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScales){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 14);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 14);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -970,22 +855,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScales){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScale){
 
-	zval *model, *attribute, *data = NULL, *scale;
+	zval *model, *attribute, data = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 2, 0, &model, &attribute);
 
-	phalcon_fetch_params(1, 2, 0, &model, &attribute);
+	PHALCON_CALL_METHODW(&data, getThis(), "getdatascales", model);
 
-	PHALCON_CALL_METHOD(&data, getThis(), "getdatascales", model);
-
-	if (phalcon_array_isset(data, attribute)) {
-		PHALCON_OBS_VAR(scale);
-		phalcon_array_fetch(&scale, data, attribute, PH_NOISY);
-	} else {
-		PHALCON_INIT_VAR(scale);
+	if (phalcon_array_isset(&data, attribute)) {
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
 	}
-
-	RETURN_CTOR(scale);
 }
 
 /**
@@ -1000,22 +878,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScale){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataTypesNumeric){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 5);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 5);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -1031,19 +904,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataTypesNumeric){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, isNumeric){
 
-	zval *model, *attribute, *data = NULL;
+	zval *model, *attribute, data = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model, &attribute);
 
-	phalcon_fetch_params(1, 1, 0, &model, &attribute);
+	PHALCON_CALL_METHODW(&data, getThis(), "getdatatypesnumeric", model);
 
-	PHALCON_CALL_METHOD(&data, getThis(), "getdatatypesnumeric", model);
-
-	if (phalcon_array_isset(data, attribute)) {
-		RETURN_MM_TRUE;
+	if (phalcon_array_isset(&data, attribute)) {
+		RETURN_TRUE;
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**
@@ -1058,17 +929,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isNumeric){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getIdentityField){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 8);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 8);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	RETURN_CTOR(data);
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
 }
 
 /**
@@ -1083,22 +950,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getIdentityField){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getBindTypes){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 9);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 9);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -1113,22 +975,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getBindTypes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDefaultValues){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 12);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 12);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -1143,22 +1000,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDefaultValues){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAutomaticCreateAttributes){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 10);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 10);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -1173,22 +1025,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAutomaticCreateAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAutomaticUpdateAttributes){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 11);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 11);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readmetadataindex", model, index);
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readmetadataindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 		return;
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -1203,17 +1050,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAutomaticUpdateAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, setAutomaticCreateAttributes){
 
-	zval *model, *attributes, *replace, *create_index;
+	zval *model, *attributes, *replace, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 3, 0, &model, &attributes, &replace);
 
-	phalcon_fetch_params(1, 3, 0, &model, &attributes, &replace);
-
-	PHALCON_INIT_VAR(create_index);
-	ZVAL_LONG(create_index, 10);
-	PHALCON_CALL_METHOD(NULL, getThis(), "writemetadataindex", model, create_index, attributes, replace);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&index, 10);
+	PHALCON_CALL_METHODW(NULL, getThis(), "writemetadataindex", model, &index, attributes, replace);
 }
 
 /**
@@ -1228,17 +1070,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setAutomaticCreateAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, setAutomaticUpdateAttributes){
 
-	zval *model, *attributes, *replace, *create_index;
+	zval *model, *attributes, *replace, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 3, 0, &model, &attributes, &replace);
 
-	phalcon_fetch_params(1, 3, 0, &model, &attributes, &replace);
-
-	PHALCON_INIT_VAR(create_index);
-	ZVAL_LONG(create_index, 11);
-	PHALCON_CALL_METHOD(NULL, getThis(), "writemetadataindex", model, create_index, attributes, replace);
-
-	PHALCON_MM_RESTORE();
+	ZVAL_LONG(&index, 11);
+	PHALCON_CALL_METHODW(NULL, getThis(), "writemetadataindex", model, &index, attributes, replace);
 }
 
 /**
@@ -1253,24 +1090,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setAutomaticUpdateAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getColumnMap){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 0);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 0);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readcolumnmapindex", model, index);
-	if (Z_TYPE_P(data) != IS_NULL) {
-		if (Z_TYPE_P(data) != IS_ARRAY) { 
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readcolumnmapindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_NULL) {
+		if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 			return;
 		}
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -1285,24 +1117,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getReverseColumnMap){
 
-	zval *model, *index, *data = NULL;
+	zval *model, index = {};
 
-	PHALCON_MM_GROW();
+	phalcon_fetch_params(0, 1, 0, &model);
 
-	phalcon_fetch_params(1, 1, 0, &model);
+	ZVAL_LONG(&index, 1);
 
-	PHALCON_INIT_VAR(index);
-	ZVAL_LONG(index, 1);
-
-	PHALCON_CALL_METHOD(&data, getThis(), "readcolumnmapindex", model, index);
-	if (Z_TYPE_P(data) != IS_NULL) {
-		if (Z_TYPE_P(data) != IS_ARRAY) { 
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
+	PHALCON_CALL_METHODW(return_value, getThis(), "readcolumnmapindex", model, &index);
+	if (Z_TYPE_P(return_value) != IS_NULL) {
+		if (Z_TYPE_P(return_value) != IS_ARRAY) { 
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data is invalid or is corrupt");
 			return;
 		}
 	}
-
-	RETURN_CTOR(data);
 }
 
 /**
@@ -1318,34 +1145,30 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getReverseColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute){
 
-	zval *model, *attribute, *column_map = NULL, *meta_data = NULL;
-	zval *data_types;
+	zval *model, *attribute, column_map = {}, meta_data = {}, data_types = {};
 
-	PHALCON_MM_GROW();
-
-	phalcon_fetch_params(1, 2, 0, &model, &attribute);
+	phalcon_fetch_params(0, 2, 0, &model, &attribute);
 
 	if (Z_TYPE_P(attribute) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Attribute must be a string");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Attribute must be a string");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&column_map, getThis(), "getreversecolumnmap", model);
-	if (Z_TYPE_P(column_map) == IS_ARRAY) { 
-		if (phalcon_array_isset(column_map, attribute)) {
-			RETURN_MM_TRUE;
+	PHALCON_CALL_METHODW(&column_map, getThis(), "getreversecolumnmap", model);
+	if (Z_TYPE(column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&column_map)) { 
+		if (phalcon_array_isset(&column_map, attribute)) {
+			RETURN_TRUE;
 		}
 	} else {
-		PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
+		PHALCON_CALL_METHODW(&meta_data, getThis(), "readmetadata", model);
 
-		PHALCON_OBS_VAR(data_types);
-		phalcon_array_fetch_long(&data_types, meta_data, 4, PH_NOISY);
-		if (phalcon_array_isset(data_types, attribute)) {
-			RETURN_MM_TRUE;
+		phalcon_array_fetch_long(&data_types, &meta_data, 4, PH_NOISY);
+		if (phalcon_array_isset(&data_types, attribute)) {
+			RETURN_TRUE;
 		}
 	}
 
-	RETURN_MM_FALSE;
+	RETURN_FALSE;
 }
 
 /**
@@ -1361,14 +1184,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isEmpty){
 
 	zval *meta_data;
 
-	PHALCON_MM_GROW();
-
 	meta_data = phalcon_read_property(getThis(), SL("_metaData"), PH_NOISY);
 	if (phalcon_fast_count_ev(meta_data)) {
-		RETURN_MM_FALSE;
+		RETURN_FALSE;
 	}
 
-	RETURN_MM_TRUE;
+	RETURN_TRUE;
 }
 
 /**

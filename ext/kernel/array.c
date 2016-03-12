@@ -286,10 +286,6 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 {
 	int status;
 
-	if ((flags & PH_COPY) == PH_COPY) {
-		Z_TRY_ADDREF_P(value);
-	}
-
 	switch (Z_TYPE_P(index)) {
 		case IS_NULL:
 			status = zend_hash_update(ht, zend_string_init("", 1, 0), value) ? SUCCESS : FAILURE;
@@ -320,10 +316,6 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 			zend_error(E_WARNING, "Illegal offset type");
 			status = FAILURE;
 			break;
-	}
-
-	if (status == FAILURE && ((flags & PH_COPY) == PH_COPY)) {
-		Z_TRY_DELREF_P(value);
 	}
 
 	return status;

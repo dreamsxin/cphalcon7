@@ -1680,8 +1680,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 
-	zval conditions = {}, dependency_injector = {}, *models, number_models = {}, invalid_condition = {}, model = {}, service_name = {}, has = {}, meta_data = {}, model_instance = {};
-	zval no_primary = {}, primary_keys = {}, first_primary_key = {}, column_map = {}, attribute_field = {}, exception_message = {};
+	zval conditions = {}, dependency_injector = {}, *models, number_models = {}, invalid_condition = {}, model = {}, service_name = {}, has = {}, meta_data = {};
+	zval model_instance = {}, primary_keys = {}, first_primary_key = {}, column_map = {}, attribute_field = {}, exception_message = {};
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&conditions, getThis(), SL("_conditions"));
@@ -1742,8 +1742,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 			PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &dependency_injector);
 		}
 
-		ZVAL_TRUE(&no_primary);
-
 		PHALCON_CALL_METHODW(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
 			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
@@ -1764,21 +1762,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 					PHALCON_CPY_WRT(&attribute_field, &first_primary_key);
 				}
 
-				PHALCON_CONCAT_SVSVSV(&conditions, "[", &model, "].[", &attribute_field, "] = ", &conditions);
-
-				ZVAL_FALSE(&no_primary);
+				PHALCON_CONCAT_SVSVSV(return_value, "[", &model, "].[", &attribute_field, "] = ", &conditions);
+				phalcon_update_property_this(getThis(), SL("_conditions"), return_value);
+				return;
 			}
 		}
 
 		/** 
 		 * A primary key is mandatory in these cases
 		 */
-		if (PHALCON_IS_TRUE(&no_primary)) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Source related to this model does not have a primary key defined");
-			return;
-		}
-
-		phalcon_update_property_this(getThis(), SL("_conditions"), &conditions);
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Source related to this model does not have a primary key defined");
+		return;
 	}
 
 	RETURN_CTORW(&conditions);

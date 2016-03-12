@@ -288,7 +288,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 
 		PHALCON_CALL_METHODW(&mm, &di, "getshared", &service_name);
 		if (Z_TYPE(mm) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "The injected service 'collectionManager' is not valid");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "The injected service 'collectionManager' is not object (1)");
 			return;
 		}
 	} else {
@@ -2319,7 +2319,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 
 			PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service);
 			if (Z_TYPE(manager) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "The injected service 'collectionManager' is not valid");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_collection_exception_ce, "The injected service 'collectionManager' is not object (2)");
 				return;
 			}
 

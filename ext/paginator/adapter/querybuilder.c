@@ -304,7 +304,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	PHALCON_CALL_METHODW(&models_manager, &dependency_injector, "getshared", &service_name);
 	if (Z_TYPE(models_manager) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "The injected service 'modelsManager' is not valid");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "The injected service 'modelsManager' is not object");
 		return;
 	}
 

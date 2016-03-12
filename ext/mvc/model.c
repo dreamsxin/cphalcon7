@@ -537,27 +537,22 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 			return;
 		}
-
+		PHALCON_VERIFY_INTERFACEW(di, phalcon_diinterface_ce);
 		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), di);
 	}
 
 	if (_models_manager) {
-		PHALCON_CPY_WRT(&models_manager, _models_manager);
-	} else {
-		PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+		PHALCON_VERIFY_INTERFACEW(_models_manager, phalcon_mvc_model_managerinterface_ce);
+		phalcon_update_property_this(getThis(), SL("_modelsManager"), _models_manager);
 	}
 
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+
 	if (Z_TYPE(models_manager) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not valid");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not object (1)");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACEW(&models_manager, phalcon_mvc_model_managerinterface_ce);
-
-	/**
-	 * Update the models-manager
-	 */
-	phalcon_update_property_this(getThis(), SL("_modelsManager"), &models_manager);
 
 	/**
 	 * The manager always initializes the object
@@ -646,6 +641,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsManager){
 	if (Z_TYPE(models_manager) != IS_OBJECT) {
 		ZVAL_STRING(&service_name, "modelsManager");
 		PHALCON_RETURN_CALL_METHODW(getThis(), "getresolveservice", &service_name);
+		return;
 	}
 
 	RETURN_CTORW(&models_manager);
@@ -722,12 +718,12 @@ PHP_METHOD(Phalcon_Mvc_Model, getTransaction){
  */
 PHP_METHOD(Phalcon_Mvc_Model, setSource){
 
-	zval *source, *models_manager;
+	zval *source, models_manager;
 
 	phalcon_fetch_params(0, 1, 0, &source);
 
-	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, models_manager, "setmodelsource", getThis(), source);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_CALL_METHODW(NULL, &models_manager, "setmodelsource", getThis(), source);
 	RETURN_THISW();
 }
 
@@ -738,10 +734,10 @@ PHP_METHOD(Phalcon_Mvc_Model, setSource){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getSource){
 
-	zval *models_manager;
+	zval models_manager;
 
-	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(models_manager, "getmodelsource", getThis());
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "getmodelsource", getThis());
 }
 
 /**
@@ -752,12 +748,12 @@ PHP_METHOD(Phalcon_Mvc_Model, getSource){
  */
 PHP_METHOD(Phalcon_Mvc_Model, setSchema){
 
-	zval *schema, *models_manager;
+	zval *schema, models_manager;
 
 	phalcon_fetch_params(0, 1, 0, &schema);
 
-	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, models_manager, "setmodelschema", getThis(), schema);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_CALL_METHODW(NULL, &models_manager, "setmodelschema", getThis(), schema);
 	RETURN_THISW();
 }
 
@@ -768,10 +764,10 @@ PHP_METHOD(Phalcon_Mvc_Model, setSchema){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getSchema){
 
-	zval *models_manager;
+	zval models_manager;
 
-	models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHOD(models_manager, "getmodelschema", getThis());
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_RETURN_CALL_METHOD(&models_manager, "getmodelschema", getThis());
 }
 
 /**
@@ -6232,7 +6228,7 @@ PHP_METHOD(Phalcon_Mvc_Model, unserialize){
 
 			PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service);
 			if (Z_TYPE(manager) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not valid");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not object (2)");
 				return;
 			}
 

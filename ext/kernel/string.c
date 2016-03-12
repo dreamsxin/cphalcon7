@@ -179,8 +179,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval *tmp)
 		}
 
 		default:
-			tmp_val = *tmp;
-			zval_copy_ctor(&tmp_val);
+			PHALCON_CPY_WRT_CTOR(&tmp_val, tmp);
 			convert_to_string(&tmp_val);
 			smart_str_appendl(implstr, Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));
 			zval_dtor(&tmp_val);
@@ -196,8 +195,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval *tmp)
 void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_length, zval *pieces){
 
 	zval *tmp;
-	HashTable *arr;
-	smart_str implstr = {};
+	smart_str implstr = {0};
 	unsigned int numelems, i = 0;
 
 	if (Z_TYPE_P(pieces) != IS_ARRAY) {
@@ -205,14 +203,13 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 		RETURN_EMPTY_STRING();
 	}
 
-	arr = Z_ARRVAL_P(pieces);
-	numelems = zend_hash_num_elements(arr);
+	numelems = zend_hash_num_elements(Z_ARRVAL_P(pieces));
 
 	if (numelems == 0) {
 		RETURN_EMPTY_STRING();
 	}
 
-	ZEND_HASH_FOREACH_VAL(arr, tmp) {
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(pieces), tmp) {
 		phalcon_append_printable_zval(&implstr, tmp);
 		if (++i != numelems) {
 			smart_str_appendl(&implstr, glue, glue_length);
@@ -222,7 +219,7 @@ void phalcon_fast_join_str(zval *return_value, char *glue, unsigned int glue_len
 	smart_str_0(&implstr);
 
 	if (implstr.s) {
-		RETURN_STR(implstr.s);
+		RETURN_NEW_STR(implstr.s);
 	} else {
 		smart_str_free(&implstr);
 		RETURN_EMPTY_STRING();
@@ -281,7 +278,7 @@ void phalcon_camelize(zval *return_value, const zval *str){
 void phalcon_uncamelize(zval *return_value, const zval *str){
 
 	int i;
-	smart_str uncamelize_str = {};
+	smart_str uncamelize_str = {0};
 	char *marker, ch;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
@@ -308,7 +305,7 @@ void phalcon_uncamelize(zval *return_value, const zval *str){
 	smart_str_0(&uncamelize_str);
 
 	if (uncamelize_str.s) {
-		RETURN_STR(uncamelize_str.s);
+		RETURN_NEW_STR(uncamelize_str.s);
 	} else {
 		RETURN_EMPTY_STRING();
 	}
@@ -462,7 +459,7 @@ static void php_strtr_array(zval *return_value, zend_string *input, HashTable *p
 	HashTable str_hash;
 	zval *entry;
 	char *key;
-	smart_str result = {};
+	smart_str result = {0};
 	zend_ulong bitset[256/sizeof(zend_ulong)];
 	zend_ulong *num_bitset;
 
@@ -1012,7 +1009,7 @@ int phalcon_comparestr_str(const zval *str, char *compared, unsigned int compare
 void phalcon_random_string(zval *return_value, const zval *type, const zval *length) {
 
 	long i, rand_type, ch;
-	smart_str random_str = {};
+	smart_str random_str = {0};
 
 	if (Z_TYPE_P(type) != IS_LONG) {
 		return;
@@ -1088,7 +1085,7 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 	smart_str_0(&random_str);
 
 	if (random_str.s) {
-		RETURN_STR(random_str.s);
+		RETURN_NEW_STR(random_str.s);
 	} else {
 		smart_str_free(&random_str);
 		RETURN_EMPTY_STRING();
@@ -1123,11 +1120,9 @@ void phalcon_remove_extra_slashes(zval *return_value, const zval *str) {
 	}
 
     if (i <= Z_STRLEN_P(str)) {
-
     	removed_str = emalloc(i + 1);
     	memcpy(removed_str, Z_STRVAL_P(str), i);
     	removed_str[i] = '\0';
-
     	RETURN_STRINGL(removed_str, i);
     }
 
@@ -1249,7 +1244,7 @@ void phalcon_append_printable_array(smart_str *implstr, zval *value) {
  */
 void phalcon_unique_key(zval *return_value, zval *prefix, zval *value) {
 
-	smart_str implstr = {};
+	smart_str implstr = {0};
 
 	if (Z_TYPE_P(prefix) == IS_STRING) {
 		smart_str_appendl(&implstr, Z_STRVAL_P(prefix), Z_STRLEN_P(prefix));
@@ -1264,7 +1259,7 @@ void phalcon_unique_key(zval *return_value, zval *prefix, zval *value) {
 	smart_str_0(&implstr);
 
 	if (implstr.s) {
-		RETURN_STR(implstr.s);
+		RETURN_NEW_STR(implstr.s);
 	} else {
 		smart_str_free(&implstr);
 		RETURN_NULL();
@@ -1294,7 +1289,7 @@ void phalcon_base64_encode(zval *return_value, zval *data)
 	}
 
 	if (encoded) {
-		RETURN_STR(encoded);
+		RETURN_NEW_STR(encoded);
 	} else {
 		RETURN_NULL();
 	}
@@ -1323,7 +1318,7 @@ void phalcon_base64_decode(zval *return_value, zval *data)
 	}
 
 	if (decoded) {
-		RETURN_STR(decoded);
+		RETURN_NEW_STR(decoded);
 	} else {
 		RETURN_NULL();
 	}

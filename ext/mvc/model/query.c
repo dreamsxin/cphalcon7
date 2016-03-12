@@ -264,10 +264,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query){
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_bindTypes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_irPhqlCache"), ZEND_ACC_STATIC|ZEND_ACC_PROTECTED);
 
-	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_SELECT"), 309);
-	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_INSERT"), 306);
-	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_UPDATE"), 300);
-	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_DELETE"), 303);
+	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_SELECT"), PHQL_T_SELECT);
+	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_INSERT"), PHQL_T_INSERT);
+	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_UPDATE"), PHQL_T_UPDATE);
+	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_DELETE"), PHQL_T_DELETE);
 
 	zend_class_implements(phalcon_mvc_model_query_ce, 1, phalcon_mvc_model_queryinterface_ce);
 
@@ -864,10 +864,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
 			case PHQL_T_QUALIFIED:
 				PHALCON_RETURN_CALL_METHODW(getThis(), "_getqualified", expr);
-				break;
-
-			case 359: /** @todo Is this code returned anywhere? */
-				PHALCON_RETURN_CALL_METHODW(getThis(), "_getaliased", expr);
 				break;
 
 			case PHQL_T_ADD:
@@ -4017,7 +4013,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 		phalcon_array_update_str(&select_ir, SL("limit"), &limit_conditions, PH_COPY);
 	}
 
-	ZVAL_LONG(&type_select, 309);
+	ZVAL_LONG(&type_select, PHQL_T_SELECT);
 
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 

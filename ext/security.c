@@ -307,7 +307,9 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		}
 
 		if (UNEXPECTED(read_bytes != i_bytes)) {
-			efree(result);
+			if (result) {
+				efree(result);
+			}
 			RETURN_FALSE;
 		}
 	} else {
@@ -335,8 +337,6 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 		} else {
 			RETVAL_FALSE;
 		}
-
-		efree(result);
 	} else {
 		RETURN_STRINGL(result, i_bytes);
 	}

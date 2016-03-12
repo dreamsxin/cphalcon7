@@ -152,6 +152,7 @@ void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_
 	if (virtual_str.s) {
 		RETURN_STR(virtual_str.s);
 	} else {
+		smart_str_free(&virtual_str);
 		RETURN_EMPTY_STRING();
 	}
 }

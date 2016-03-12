@@ -76,12 +76,12 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 
 	i = 0;
 	while(i < param_count) {
-		zval_ptr_dtor(&arguments[i]);
+		PHALCON_PTR_DTOR(&arguments[i]);
 		i++;
 	}
 	efree(arguments);
 	if (retval == NULL) {
-		zval_ptr_dtor(retval_ptr);
+		PHALCON_PTR_DTOR(retval_ptr);
 	}
 
 	return status;
@@ -183,15 +183,15 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		}
 	}
 
-	zval_ptr_dtor(&func_name);
+	PHALCON_PTR_DTOR(&func_name);
 	i = 0;
 	while(i < param_count) {
-		zval_ptr_dtor(&arguments[i]);
+		PHALCON_PTR_DTOR(&arguments[i]);
 		i++;
 	}
 	efree(arguments);
 	if (retval == NULL) {
-		zval_ptr_dtor(retval_ptr);
+		PHALCON_PTR_DTOR(retval_ptr);
 	}
 
 	return status;

@@ -804,6 +804,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 
 					PHALCON_CONCAT_SVS(return_value, "'", &escaped_code, "'");
 
+					PHALCON_PTR_DTOR(&escaped_code);
 					return;
 				}
 			}
@@ -813,7 +814,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, functionCall){
 
 		phalcon_camelize(&camelized, &name);
 		phalcon_lcfirst(&method, &camelized);
-		zval_ptr_dtor(&camelized);
+		PHALCON_PTR_DTOR(&camelized);
 
 		ZVAL_STRING(&class_name, "Phalcon\\Tag");
 
@@ -1467,7 +1468,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 			if (Z_TYPE(expr_code) == IS_STRING) {
 				break;
 			}
-			zval_ptr_dtor(&expr_code);
+			PHALCON_PTR_DTOR(&expr_code);
 		}
 
 		if (!phalcon_array_isset_fetch_str(&type, expr, SL("type"))) {
@@ -1489,7 +1490,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 			} ZEND_HASH_FOREACH_END();
 
 			phalcon_fast_join_str(&expr_code, SL(", "), &items);
-			zval_ptr_dtor(&items);
+			PHALCON_PTR_DTOR(&items);
 			break;
 		}
 
@@ -1774,10 +1775,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				return;
 
 		}
-		zval_ptr_dtor(&left_code);
-		zval_ptr_dtor(&right_code);
-		zval_ptr_dtor(&start_code);
-		zval_ptr_dtor(&end_code);
+		PHALCON_PTR_DTOR(&left_code);
+		PHALCON_PTR_DTOR(&right_code);
+		PHALCON_PTR_DTOR(&start_code);
+		PHALCON_PTR_DTOR(&end_code);
 		break;
 	}
 
@@ -1979,7 +1980,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, compileForeach){
 	 * Append the internal block compilation
 	 */
 	phalcon_concat_self(&compilation, &code);
-	zval_ptr_dtor(&code);
+	PHALCON_PTR_DTOR(&code);
 	if (phalcon_array_isset_str(statement, SL("if_expr"))) {
 		phalcon_concat_self_str(&compilation, SL("<?php } ?>"));
 	}
@@ -2698,7 +2699,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 			PHALCON_CALL_METHODW(&temp_compilation, getThis(), "fireextensionevent", &event, &fire_arguments);
 			if (Z_TYPE(temp_compilation) == IS_STRING) {
 				phalcon_concat_self(&compilation, &temp_compilation);
-				zval_ptr_dtor(&temp_compilation);
+				PHALCON_PTR_DTOR(&temp_compilation);
 				continue;
 			}
 		}
@@ -2776,7 +2777,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 					if (Z_TYPE(block_statements) == IS_ARRAY) { 
 						PHALCON_CALL_METHODW(&code, getThis(), "_statementlist", &block_statements, extends_mode);
 						phalcon_concat_self(&compilation, &code);
-						zval_ptr_dtor(&code);
+						PHALCON_PTR_DTOR(&code);
 					}
 				}
 
@@ -2879,7 +2880,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 				return;
 
 		}
-		zval_ptr_dtor(&temp_compilation);
+		PHALCON_PTR_DTOR(&temp_compilation);
 	} ZEND_HASH_FOREACH_END();
 
 	/** 

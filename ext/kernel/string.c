@@ -67,7 +67,7 @@ void phalcon_fast_strlen(zval *return_value, zval *str)
 	ZVAL_LONG(return_value, Z_STRLEN_P(str));
 
 	if (use_copy) {
-		zval_ptr_dtor(str);
+		PHALCON_PTR_DTOR(str);
 	}
 }
 
@@ -88,7 +88,7 @@ int phalcon_fast_strlen_ev(zval *str)
 
 	length = Z_STRLEN_P(str);
 	if (use_copy) {
-		zval_ptr_dtor(str);
+		PHALCON_PTR_DTOR(str);
 	}
 
 	return length;
@@ -173,7 +173,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval *tmp)
 			int copy = zend_make_printable_zval(tmp, &expr);
 			smart_str_appendl(implstr, Z_STRVAL(expr), Z_STRLEN(expr));
 			if (copy) {
-				zval_dtor(&expr);
+				PHALCON_PTR_DTOR(&expr);
 			}
 			break;
 		}
@@ -182,7 +182,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval *tmp)
 			PHALCON_CPY_WRT_CTOR(&tmp_val, tmp);
 			convert_to_string(&tmp_val);
 			smart_str_appendl(implstr, Z_STRVAL(tmp_val), Z_STRLEN(tmp_val));
-			zval_dtor(&tmp_val);
+			PHALCON_PTR_DTOR(&tmp_val);
 			break;
 	}
 }
@@ -751,7 +751,7 @@ void phalcon_fast_strtoupper(zval *return_value, zval *str)
 	php_strtoupper(lower_str, length);
 
 	if (use_copy) {
-		zval_ptr_dtor(str);
+		PHALCON_PTR_DTOR(str);
 	}
 
 	ZVAL_STRINGL(return_value, lower_str, length);
@@ -832,11 +832,11 @@ void phalcon_fast_str_replace(zval *retval, zval *search, zval *replace, zval *s
 			Z_STRLEN_P(replace)));
 
 	if (copy_replace) {
-		zval_dtor(replace);
+		PHALCON_PTR_DTOR(replace);
 	}
 
 	if (copy_search) {
-		zval_dtor(search);
+		PHALCON_PTR_DTOR(search);
 	}
 }
 
@@ -1285,7 +1285,7 @@ void phalcon_base64_encode(zval *return_value, zval *data)
 	encoded = php_base64_encode((unsigned char *)(Z_STRVAL_P(data)), Z_STRLEN_P(data));
 
 	if (use_copy) {
-		zval_ptr_dtor(data);
+		PHALCON_PTR_DTOR(data);
 	}
 
 	if (encoded) {
@@ -1314,7 +1314,7 @@ void phalcon_base64_decode(zval *return_value, zval *data)
 	decoded = php_base64_decode((unsigned char *)(Z_STRVAL_P(data)), Z_STRLEN_P(data));
 
 	if (use_copy) {
-		zval_ptr_dtor(data);
+		PHALCON_PTR_DTOR(data);
 	}
 
 	if (decoded) {
@@ -1373,7 +1373,7 @@ void phalcon_crc32(zval *return_value, zval *str)
 	}
 
 	if (use_copy) {
-		zval_ptr_dtor(str);
+		PHALCON_PTR_DTOR(str);
 	}
 
 	RETVAL_LONG(crc ^ 0xFFFFFFFF);
@@ -1458,7 +1458,7 @@ void phalcon_ucfirst(zval *return_value, zval *s)
 	}
 
 	if (unlikely(use_copy)) {
-		zval_dtor(&copy);
+		PHALCON_PTR_DTOR(&copy);
 	}
 }
 
@@ -1512,7 +1512,7 @@ void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, z
 	ZVAL_STR(return_value, escaped);
 
 	if (unlikely(use_copy)) {
-		zval_dtor(&copy);
+		PHALCON_PTR_DTOR(&copy);
 	}
 }
 
@@ -1537,7 +1537,7 @@ void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval 
 	ZVAL_STR(return_value, escaped);
 
 	if (unlikely(use_copy)) {
-		zval_dtor(&copy);
+		PHALCON_PTR_DTOR(&copy);
 	}
 }
 
@@ -1576,7 +1576,7 @@ void phalcon_date(zval *return_value, zval *format, zval *timestamp)
 	ZVAL_STR(return_value, formatted);
 
 	if (unlikely(use_copy)) {
-		zval_dtor(&copy);
+		PHALCON_PTR_DTOR(&copy);
 	}
 }
 
@@ -1595,7 +1595,7 @@ void phalcon_addslashes(zval *return_value, zval *str)
 	ZVAL_STR(return_value, php_addslashes(Z_STR_P(str), 0));
 
 	if (unlikely(use_copy)) {
-		zval_dtor(&copy);
+		PHALCON_PTR_DTOR(&copy);
 	}
 }
 
@@ -1651,7 +1651,7 @@ void phalcon_stripslashes(zval *return_value, zval *str)
 	php_stripslashes(Z_STR_P(return_value));
 
 	if (unlikely(use_copy)) {
-		zval_dtor(&copy);
+		PHALCON_PTR_DTOR(&copy);
 	}
 }
 
@@ -1671,6 +1671,6 @@ void phalcon_stripcslashes(zval *return_value, zval *str)
 	php_stripcslashes(Z_STR_P(return_value));
 
 	if (unlikely(use_copy)) {
-		zval_dtor(&copy);
+		PHALCON_PTR_DTOR(&copy);
 	}
 }

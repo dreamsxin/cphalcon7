@@ -339,7 +339,7 @@ static zval *phql_ret_zval_list(zval *list_left, zval *right_list)
 			add_next_index_zval(ret, item);
 		} ZEND_HASH_FOREACH_END();
 
-		zval_ptr_dtor(list_left);
+		PHALCON_PTR_DTOR(list_left);
 	} else {
 		add_next_index_zval(ret, list_left);
 	}
@@ -1326,7 +1326,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 133:
     case 136:
 /* #line 576 "parser.y" */
-{ zval_ptr_dtor((yypminor->yy68)); }
+{ PHALCON_PTR_DTOR((yypminor->yy68)); }
 /* #line 1331 "parser.c" */
       break;
     case 93:
@@ -1342,7 +1342,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 134:
     case 135:
 /* #line 868 "parser.y" */
-{ phalcon_safe_zval_ptr_dtor((yypminor->yy68)); }
+{ phalcon_safe_PHALCON_PTR_DTOR((yypminor->yy68)); }
 /* #line 1347 "parser.c" */
       break;
     default:  break;   /* If no destructor action specified: do nothing */
@@ -3113,7 +3113,7 @@ int phql_parse_phql(zval *result, zval *phql) {
 	if (phql_internal_parse_phql(&result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg) == FAILURE) {
 		if (likely(error_msg != NULL)) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, Z_STRVAL_P(error_msg));
-			zval_ptr_dtor(error_msg);
+			PHALCON_PTR_DTOR(error_msg);
 		}
 		else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "There was an error parsing PHQL");
@@ -3150,7 +3150,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	phalcon_orm_get_prepared_ast(result, &unique_id);
 
 	if (Z_TYPE_P(*result) == IS_ARRAY) {
-		zval_ptr_dtor(&unique_id);
+		PHALCON_PTR_DTOR(&unique_id);
 		return SUCCESS;
 	}
 
@@ -3544,7 +3544,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
 				ZVAL_NULL(parser_status->ret);
-				zval_ptr_dtor(parser_status->ret);
+				PHALCON_PTR_DTOR(parser_status->ret);
 
 				/**
 				 * Store the parsed definition in the cache
@@ -3557,7 +3557,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 		}
 	}
 
-	zval_ptr_dtor(&unique_id);
+	PHALCON_PTR_DTOR(&unique_id);
 
 	efree(parser_status);
 	efree(state);

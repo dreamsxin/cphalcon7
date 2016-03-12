@@ -168,7 +168,7 @@ int phql_parse_phql(zval *result, zval *phql) {
 	if (phql_internal_parse_phql(&result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg) == FAILURE) {
 		if (likely(error_msg != NULL)) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, Z_STRVAL_P(error_msg));
-			zval_ptr_dtor(error_msg);
+			PHALCON_PTR_DTOR(error_msg);
 		}
 		else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "There was an error parsing PHQL");
@@ -205,7 +205,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	phalcon_orm_get_prepared_ast(result, &unique_id);
 
 	if (Z_TYPE_P(*result) == IS_ARRAY) {
-		zval_ptr_dtor(&unique_id);
+		PHALCON_PTR_DTOR(&unique_id);
 		return SUCCESS;
 	}
 
@@ -599,7 +599,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
 				ZVAL_NULL(parser_status->ret);
-				zval_ptr_dtor(parser_status->ret);
+				PHALCON_PTR_DTOR(parser_status->ret);
 
 				/**
 				 * Store the parsed definition in the cache
@@ -612,7 +612,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 		}
 	}
 
-	zval_ptr_dtor(&unique_id);
+	PHALCON_PTR_DTOR(&unique_id);
 
 	efree(parser_status);
 	efree(state);

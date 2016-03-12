@@ -418,7 +418,7 @@ static zval *phvolt_ret_zval_list(zval *list_left, zval *right_list)
 				Z_TRY_ADDREF_P(item);
 				add_next_index_zval(ret, item);
 			} ZEND_HASH_FOREACH_END();
-			zval_ptr_dtor(list_left);
+			PHALCON_PTR_DTOR(list_left);
 		} else {
 			add_next_index_zval(ret, list_left);
 		}
@@ -1672,7 +1672,7 @@ static void yy_destructor(YYCODETYPE yymajor, YYMINORTYPE *yypminor){
     case 118:
     case 119:
 /* #line 699 "parser.y" */
-{ zval_ptr_dtor((yypminor->yy168)); }
+{ PHALCON_PTR_DTOR((yypminor->yy168)); }
 /* #line 1677 "parser.c" */
       break;
     default:  break;   /* If no destructor action specified: do nothing */
@@ -3609,7 +3609,7 @@ int phvolt_parse_view(zval *result, zval *view_code, zval *template_path){
 	if (phvolt_internal_parse_view(result, view_code, template_path, &error_msg) == FAILURE) {
 		if (likely(Z_TYPE(error_msg) > IS_NULL)) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, Z_STRVAL(error_msg));
-			zval_ptr_dtor(&error_msg);
+			PHALCON_PTR_DTOR(&error_msg);
 		}
 		else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Error parsing the view");
@@ -4130,7 +4130,7 @@ int phvolt_internal_parse_view(zval *result, zval *view_code, zval *template_pat
 		if (parser_status->status == PHVOLT_PARSING_OK) {
 			if (parser_status->ret) {
 				ZVAL_COPY(result, parser_status->ret);
-				zval_ptr_dtor(parser_status->ret);
+				PHALCON_PTR_DTOR(parser_status->ret);
 				parser_status->ret = NULL;
 			} else {
 				array_init(result);

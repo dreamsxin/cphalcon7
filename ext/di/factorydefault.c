@@ -109,21 +109,21 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	 */
 	ZVAL_STRING(&name, ISV(modelsQuery));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\Query");
-	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, &PHALCON_GLOBAL(z_false));
 
 	/**
 	 * Models Query Builder for ORM
 	 */
 	ZVAL_STRING(&name, ISV(modelsQueryBuilder));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\Query\\Builder");
-	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, &PHALCON_GLOBAL(z_false));
 
 	/**
 	 * Models Criteria for ORM
 	 */
 	ZVAL_STRING(&name, ISV(modelsCriteria));
 	ZVAL_STRING(&definition, "Phalcon\\Mvc\\Model\\Criteria");
-	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, &PHALCON_GLOBAL(z_false));
 
 	/**
 	 * Request/Response are always shared

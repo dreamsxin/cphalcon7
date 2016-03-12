@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	}
 
 	/* We don't need the JSON message anymore */
-	zval_ptr_dtor(&encoded);
+	PHALCON_PTR_DTOR(&encoded);
 	/* Do not free the smart string because we steal its data for zval */
 	RETURN_STR(result.s);
 }

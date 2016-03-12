@@ -68,7 +68,7 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 	va_end(ap);
 
 	phalcon_update_static_property_ce(ce, property, property_length, &arr);
-	zval_ptr_dtor(&arr);
+	PHALCON_PTR_DTOR(&arr);
 	return SUCCESS;
 }
 
@@ -500,7 +500,7 @@ int phalcon_clone(zval *destination, zval *obj) {
 			if (!EG(exception)) {
 				ZVAL_OBJ(destination, clone_call(obj));
 				if (EG(exception)) {
-					zval_ptr_dtor(destination);
+					PHALCON_PTR_DTOR(destination);
 					ZVAL_NULL(destination);
 				}
 			}

@@ -157,12 +157,12 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, __construct){
 	array_init_size(&resources_names, 1);
 	phalcon_array_update_str(&resources_names, SL("*"), &PHALCON_GLOBAL(z_true), PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_resourcesNames"), &resources_names);
-	zval_ptr_dtor(&resources_names);
+	PHALCON_PTR_DTOR(&resources_names);
 
 	array_init_size(&access_list, 1);
 	phalcon_array_update_str(&access_list, SL("*!*"), &PHALCON_GLOBAL(z_true), PH_COPY);
 	phalcon_update_property_this(getThis(), SL("_accessList"), &access_list);
-	zval_ptr_dtor(&access_list);
+	PHALCON_PTR_DTOR(&access_list);
 }
 
 /**

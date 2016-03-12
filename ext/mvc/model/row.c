@@ -94,7 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Row){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Row, setDirtyState){
 
-	zval **dirty_state;
+	zval *dirty_state;
 
 	phalcon_fetch_params(0, 1, 0, &dirty_state);
 

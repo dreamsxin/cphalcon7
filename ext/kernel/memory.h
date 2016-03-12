@@ -82,21 +82,9 @@ static inline void phalcon_safe_zval_ptr_dtor(zval *pzval)
 		} \
 	} while (0)
 
-#define PHALCON_CPY_WRT(d, v) \
-	do { \
-		if (Z_TYPE_P(d) > IS_NULL) { \
-			zval_ptr_dtor(d); \
-		} \
-		ZVAL_COPY(d, v); \
-	} while (0)
+#define PHALCON_CPY_WRT(d, v) ZVAL_COPY(d, v);
 
-#define PHALCON_CPY_WRT_CTOR(d, v) \
-	do { \
-		if (Z_TYPE_P(d) > IS_NULL) { \
-			zval_ptr_dtor(d); \
-		} \
-		ZVAL_DUP(d, v); \
-	} while (0)
+#define PHALCON_CPY_WRT_CTOR(d, v) ZVAL_DUP(d, v);
 
 #define PHALCON_STR(z, str) \
 	do { \

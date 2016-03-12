@@ -1631,6 +1631,10 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, expression){
 				PHALCON_CONCAT_VSV(&expr_code, &left_code, " || ", &right_code);
 				break;
 
+			case PHVOLT_T_CONCAT:
+				PHALCON_CONCAT_VSV(&expr_code, &left_code, " . ", &right_code);
+				break;
+
 			case PHVOLT_T_LESSEQUAL:
 				PHALCON_CONCAT_VSV(&expr_code, &left_code, " <= ", &right_code);
 				break;

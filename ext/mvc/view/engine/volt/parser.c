@@ -4129,7 +4129,9 @@ int phvolt_internal_parse_view(zval *result, zval *view_code, zval *template_pat
 	if (status != FAILURE) {
 		if (parser_status->status == PHVOLT_PARSING_OK) {
 			if (parser_status->ret) {
-				ZVAL_ZVAL(result, parser_status->ret, 0, 0);
+				ZVAL_COPY(result, parser_status->ret);
+				zval_ptr_dtor(parser_status->ret);
+				parser_status->ret = NULL;
 			} else {
 				array_init(result);
 			}

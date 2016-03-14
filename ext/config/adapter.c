@@ -164,16 +164,9 @@ PHP_METHOD(Phalcon_Config_Adapter, getBasePath){
  */
 PHP_METHOD(Phalcon_Config_Adapter, load){
 
-	zval *file_path = NULL, *absolute_path = NULL, class_name = {};
-	zend_class_entry *ce0;
+	zval *file_path = NULL, *absolute_path = NULL;
 
 	phalcon_fetch_params(0, 0, 2, &file_path, &absolute_path);
-
-	phalcon_get_called_class(&class_name);
-
-	ce0 = phalcon_fetch_class(&class_name);
-
-	object_init_ex(return_value, ce0);
 
 	if (file_path) {
 		if (absolute_path == NULL) {

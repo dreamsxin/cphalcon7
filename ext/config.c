@@ -226,9 +226,9 @@ PHP_METHOD(Phalcon_Config, get){
 
 	zval *tmp = phalcon_read_property_zval(getThis(), index, PH_NOISY);
 	if (tmp) {
-		RETURN_ZVAL(tmp, 1, 0);
+		RETURN_CTORW(tmp);
 	} else if (default_value) {
-		RETURN_ZVAL(default_value, 1, 0);
+		RETURN_CTORW(default_value);
 	} else {
 		RETURN_NULL();
 	}
@@ -348,8 +348,11 @@ PHP_METHOD(Phalcon_Config, merge){
 			} else {
 				phalcon_update_property_zval_zval(getThis(), &tmp, value);
 			}
+			PHALCON_PTR_DTOR(&tmp);
 		} ZEND_HASH_FOREACH_END();
 	}
+
+	PHALCON_PTR_DTOR(&array_config);
 
 	RETURN_THISW();
 }

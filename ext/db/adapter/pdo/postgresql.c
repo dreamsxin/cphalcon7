@@ -113,21 +113,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 	}
 
 	if (phalcon_array_isset_fetch_str(&schema, descriptor, SL("schema"))) {
-		// phalcon_array_unset_str(descriptor, SL("schema"), PH_COPY);
 		phalcon_update_property_this(getThis(), SL("_schema"), &schema);
 	}
 
 	if (phalcon_array_isset_fetch_str(&password, descriptor, SL("password"))) {
-		/* There is a bug in pdo_pgsql driver when the password is empty,
-		 * the driver tries to access invalid memory:
-		 *
-		 * if (dbh->password[0] != '\'' && dbh->password[strlen(dbh->password) - 1] != '\'')
-		 *
-		 * To avoid this we set the password to null
-		 */
 		if (Z_TYPE(password) == IS_STRING && Z_STRLEN(password) == 0) {
 			phalcon_array_update_str(descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
+		PHALCON_PTR_DTOR(&password);
 	}
 
 
@@ -136,10 +129,13 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 	/** 
 	 * Execute the search path in the after connect
 	 */
-	if (Z_TYPE_P(&schema) == IS_STRING) {
+	if (Z_TYPE(schema) == IS_STRING) {
 		PHALCON_CONCAT_SVS(&sql, "SET search_path TO '", &schema, "'");
 		PHALCON_CALL_METHODW(NULL, getThis(), "execute", &sql);
+		PHALCON_PTR_DTOR(&sql);
 	}
+
+	PHALCON_PTR_DTOR(&schema);
 }
 
 /**

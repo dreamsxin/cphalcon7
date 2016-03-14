@@ -35,6 +35,7 @@ void phalcon_get_called_class(zval *return_value);
 void phalcon_get_parent_class(zval *result, const zval *object, int lower);
 void phalcon_get_object_vars(zval *result, zval *object, int check_access);
 void phalcon_get_class_methods(zval *result, zval *object, int check_access);
+zend_class_entry* phalcon_fetch_str_class(const char *class_name, uint32_t class_len);
 zend_class_entry* phalcon_fetch_class(const zval *class_name);
 zend_class_entry* phalcon_fetch_self_class();
 zend_class_entry* phalcon_fetch_parent_class();

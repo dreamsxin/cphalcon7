@@ -199,8 +199,8 @@ PHP_METHOD(Phalcon_DI_Service, getDefinition)
  */
 PHP_METHOD(Phalcon_DI_Service, resolve){
 
-	zval *parameters = NULL, *dependency_injector = NULL, name = {}, shared = {}, shared_instance = {}, instance = {}, definition = {}, builder = {};
-	int found;
+	zval *parameters = NULL, *dependency_injector = NULL, name = {}, shared = {}, shared_instance = {}, definition = {}, builder = {};
+	int found = 0, ishared = 0;
 
 	phalcon_fetch_params(0, 0, 2, &parameters, &dependency_injector);
 
@@ -212,25 +212,29 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 		dependency_injector = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_return_property(&name, getThis(), SL("_name"));
 	phalcon_return_property(&shared, getThis(), SL("_shared"));
 	phalcon_return_property(&shared_instance, getThis(), SL("_sharedInstance"));
 
+	ishared = zend_is_true(&shared);
+	PHALCON_PTR_DTOR(&shared);
+
 	/* Check if the service is shared */
-	if (Z_TYPE(shared) != IS_NULL && Z_TYPE(shared_instance) != IS_NULL) {
+	if (ishared && Z_TYPE(shared_instance) != IS_NULL) {
 		RETURN_CTORW(&shared_instance);
 	}
 
+	PHALCON_PTR_DTOR(&shared_instance);
+
 	phalcon_return_property(&definition, getThis(), SL("_definition"));
-	found = 0;
+
 	if (Z_TYPE(definition) == IS_STRING) {
 		/* String definitions can be class names without implicit parameters */
 		if (phalcon_class_exists(&definition, 1) != NULL) {
 			found = 1;
 			if (Z_TYPE_P(parameters) == IS_ARRAY) {
-				RETURN_ON_FAILURE(phalcon_create_instance_params(&instance, &definition, parameters));
+				RETURN_ON_FAILURE(phalcon_create_instance_params(return_value, &definition, parameters));
 			} else {
-				RETURN_ON_FAILURE(phalcon_create_instance(&instance, &definition));
+				RETURN_ON_FAILURE(phalcon_create_instance(return_value, &definition));
 			}
 		}
 	} else if (likely(Z_TYPE(definition) == IS_OBJECT)) {
@@ -238,39 +242,37 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 		found = 1;
 		if (instanceof_function_ex(Z_OBJCE(definition), zend_ce_closure, 0)) {
 			if (Z_TYPE_P(parameters) == IS_ARRAY) {
-				PHALCON_CALL_USER_FUNC_ARRAYW(&instance, &definition, parameters);
+				PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &definition, parameters);
 			} else {
-				PHALCON_CALL_USER_FUNCW(&instance, &definition);
+				PHALCON_CALL_USER_FUNCW(return_value, &definition);
 			}
 		} else {
-			PHALCON_CPY_WRT(&instance, &definition);
+			PHALCON_CPY_WRT(return_value, &definition);
 		}
 	} else if (Z_TYPE(definition) == IS_ARRAY) {
+		found = 1;
 		/* Array definitions require a 'className' parameter */
 		object_init_ex(&builder, phalcon_di_service_builder_ce);
 
-		PHALCON_CALL_METHODW(&instance, &builder, "build", dependency_injector, &definition, parameters);
-		found = 1;
+		PHALCON_CALL_METHODW(return_value, &builder, "build", dependency_injector, &definition, parameters);
+		PHALCON_PTR_DTOR(&builder);
 	}
 
-	if (EG(exception)) {
-		return;
+	PHALCON_PTR_DTOR(&definition);
+
+	if (!EG(exception)) {
+		if (found) {
+			if (ishared) {
+				phalcon_update_property_this(getThis(), SL("_sharedInstance"), return_value);
+			}
+			/* Update the shared instance if the service is shared */
+			phalcon_update_property_bool(getThis(), SL("_resolved"), 1);
+		} else {
+			phalcon_return_property(&name, getThis(), SL("_name"));
+			PHALCON_THROW_EXCEPTION_FORMATW(phalcon_di_exception_ce, "Service '%s' cannot be resolved", Z_STRVAL(name));
+			PHALCON_PTR_DTOR(&name);
+		}
 	}
-
-	/* If the service can't be built, we must throw an exception */
-	if (!found) {
-		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_di_exception_ce, "Service '%s' cannot be resolved", Z_STRVAL(name));
-		return;
-	}
-
-	/* Update the shared instance if the service is shared */
-	if (zend_is_true(&shared)) {
-		phalcon_update_property_this(getThis(), SL("_sharedInstance"), &instance);
-	}
-
-	phalcon_update_property_bool(getThis(), SL("_resolved"), 1);
-
-	RETURN_CTORW(&instance);
 }
 
 /**

@@ -189,7 +189,7 @@ void phalcon_get_class_ns(zval *result, const zval *object, int lower) {
 	}
 
 	if (lower) {
-		ZVAL_STR(result, zend_string_tolower(Z_STR_P(result)));
+		phalcon_strtolower_inplace(result);
 	}
 
 }
@@ -394,6 +394,20 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
+}
+
+/**
+ * Fetches a zend class entry from a zval value
+ */
+zend_class_entry* phalcon_fetch_str_class(const char *class_name, uint32_t class_len) {
+
+	zend_class_entry* ce;
+	zend_string *str = zend_string_init(class_name, class_len, 0);
+
+	ce = zend_fetch_class(str, ZEND_FETCH_CLASS_DEFAULT);
+	zend_string_release(str);
+
+	return ce;
 }
 
 /**
@@ -679,8 +693,12 @@ int phalcon_update_property_long(zval *object, const char *property_name, uint32
 int phalcon_update_property_str(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length)
 {
 	zval value = {};
+	int status = 0;
+
 	ZVAL_STRINGL(&value, str, str_length);
-	return phalcon_update_property_zval(object, property_name, property_length, &value);
+	status = phalcon_update_property_zval(object, property_name, property_length, &value);
+	PHALCON_PTR_DTOR(&value);
+	return status;
 }
 
 /**
@@ -860,8 +878,12 @@ int phalcon_update_property_array_multi(zval *object, const char *property, uint
 int phalcon_update_property_array_str(zval *object, const char *property, uint32_t property_length, const char *index, uint32_t index_length, zval *value)
 {
 	zval tmp = {};
+	int status = 0;
+
 	ZVAL_STRINGL(&tmp, index, index_length);
-	return phalcon_update_property_array(object, property, property_length, &tmp, value);
+	status = phalcon_update_property_array(object, property, property_length, &tmp, value);
+	PHALCON_PTR_DTOR(&tmp);
+	return status;
 }
 
 int phalcon_update_property_array_string(zval *object, const char *property, uint32_t property_length, zend_string *index, zval *value)
@@ -1275,8 +1297,10 @@ int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *
 	}
 
 	if (!phalcon_array_isset_fetch(fetched, &property_value, index)) {
+		PHALCON_PTR_DTOR(&property_value);
 		return 0;
 	}
 
+	PHALCON_PTR_DTOR(&property_value);
 	return 1;
 }

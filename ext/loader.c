@@ -169,6 +169,7 @@ PHP_METHOD(Phalcon_Loader, __construct){
 	array_init_size(&extensions, 1);
 	add_next_index_stringl(&extensions, SL("php"));
 	phalcon_update_property_this(getThis(), SL("_extensions"), &extensions);
+	PHALCON_PTR_DTOR(&extensions);
 }
 
 /**
@@ -426,6 +427,7 @@ PHP_METHOD(Phalcon_Loader, register){
 		add_next_index_stringl(&autoloader, SL("autoLoad"));
 		PHALCON_CALL_FUNCTIONW(NULL, "spl_autoload_register", &autoloader);
 		phalcon_update_property_this(getThis(), SL("_registered"), &PHALCON_GLOBAL(z_true));
+		PHALCON_PTR_DTOR(&autoloader);
 	}
 
 	RETURN_THISW();

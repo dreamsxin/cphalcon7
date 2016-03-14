@@ -386,19 +386,20 @@ PHP_METHOD(Phalcon_DI, get){
 
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "di:beforeServiceResolve");
+		PHALCON_STR(&event_name, "di:beforeServiceResolve");
 
 		array_init(&event_data);
-
 		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
+		PHALCON_PTR_DTOR(&event_data);
 	}
 
 	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name)) {
 		PHALCON_CALL_METHODW(return_value, &service, "resolve", parameters, getThis());
 		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
+		PHALCON_PTR_DTOR(&service);
 	} else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
 		if ((ce = phalcon_class_exists_ex(name, 1)) != NULL) {
@@ -419,16 +420,18 @@ PHP_METHOD(Phalcon_DI, get){
 	}
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "di:afterServiceResolve");
+		PHALCON_STR(&event_name, "di:afterServiceResolve");
 
 		array_init(&event_data);
-
 		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("instance"), return_value, PH_COPY);
 
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
+		PHALCON_PTR_DTOR(&event_data);
 	}
+	PHALCON_PTR_DTOR(&event_name);
+	PHALCON_PTR_DTOR(&events_manager);
 }
 
 /**

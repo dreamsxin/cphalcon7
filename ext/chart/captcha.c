@@ -129,8 +129,8 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 		font_size  = phalcon_read_property(getThis(), SL("_fontSize"), PH_NOISY);
 	}
 
-	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
-	draw_ce = zend_fetch_class(SSL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
+	imagick_ce = phalcon_fetch_str_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO);
+	draw_ce = phalcon_fetch_str_class(SL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&imagick, imagick_ce);
 	if (phalcon_has_constructor(&imagick)) {
@@ -266,8 +266,8 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	phalcon_return_property(&imagick, getThis(), SL("_imagick"));
 	phalcon_return_property(&draw, getThis(), SL("_draw"));
 
-	imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
-	imagickpixel_ce = zend_fetch_class(SSL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
+	imagick_ce = phalcon_fetch_str_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO);
+	imagickpixel_ce = phalcon_fetch_str_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&imagickpixel, imagickpixel_ce);
 	PHALCON_CALL_METHODW(NULL, &imagickpixel, "__construct", &foreground);

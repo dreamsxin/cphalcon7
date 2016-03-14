@@ -5798,7 +5798,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 	}
 
 	phalcon_array_fetch_long(&value, arguments, 0, PH_NOISY);
-	ce0 = phalcon_fetch_class(&model_name);
+	ce0 = phalcon_fetch_class(&model_name, ZEND_FETCH_CLASS_DEFAULT);
 
 	object_init_ex(&model, ce0);
 	if (phalcon_has_constructor(&model)) {

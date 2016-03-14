@@ -96,7 +96,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 	phalcon_return_property(&handler, getThis(), SL("_handler"));
 	if (Z_TYPE(handler) != IS_OBJECT) {
 		definition = phalcon_read_property(getThis(), SL("_definition"), PH_NOISY);
-		ce0 = phalcon_fetch_class(definition);
+		ce0 = phalcon_fetch_class(definition, ZEND_FETCH_CLASS_DEFAULT);
 
 		object_init_ex(&handler, ce0);
 		if (phalcon_has_constructor(&handler)) {

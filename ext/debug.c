@@ -666,7 +666,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 	 */
 	PHALCON_CONCAT_SVS(&html, "<tr><td align=\"right\" valign=\"top\" class=\"error-number\">#", n, "</td><td>");
 	if (phalcon_array_isset_fetch_str(&class_name, trace, SL("class"))) {
-		class_ce = zend_fetch_class(Z_STR(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT);
+		class_ce = phalcon_fetch_class(&class_name, ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT);
 
 		if (!class_ce) {
 			/* Unable to load the class, should never happen */

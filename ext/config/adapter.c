@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 	phalcon_fetch_params(0, 0, 2, &file_path, &absolute_path);
 
 	phalcon_get_called_class(&class_name);
-	ce0 = phalcon_fetch_class(&class_name);
+	ce0 = phalcon_fetch_class(&class_name, ZEND_FETCH_CLASS_DEFAULT);
 
 	if (!file_path || PHALCON_IS_EMPTY(file_path)) {
 		object_init_ex(return_value, ce0);

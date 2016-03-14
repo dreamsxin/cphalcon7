@@ -324,7 +324,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 
 	array_init(return_value);
 
-	apciterator_ce = zend_fetch_class(SSL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
+	apciterator_ce = phalcon_fetch_str_class(SL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&iterator, apciterator_ce);
 	assert(phalcon_has_constructor(&iterator));
@@ -409,7 +409,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 
 	ZVAL_STRING(&prefix_pattern, "/^_PHCA/");	
 
-	apciterator_ce = zend_fetch_class(SSL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
+	apciterator_ce = phalcon_fetch_str_class(SL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&iterator, apciterator_ce);
 	assert(phalcon_has_constructor(&iterator));

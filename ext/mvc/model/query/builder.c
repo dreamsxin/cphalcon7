@@ -1321,7 +1321,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 				ZVAL_LONG(&model_alias, idx);
 			}
 
-			ce0 = phalcon_fetch_class(model TSRMLS_CC);
+			ce0 = phalcon_fetch_class(model TSRMLS_CC, ZEND_FETCH_CLASS_DEFAULT);
 
 			if (phalcon_method_exists_ce_ex(ce0, SS("beforequery") TSRMLS_CC) == SUCCESS) {
 				object_init_ex(&model_instance, ce0);
@@ -1333,7 +1333,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 			}
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		ce0 = phalcon_fetch_class(models TSRMLS_CC);
+		ce0 = phalcon_fetch_class(models TSRMLS_CC, ZEND_FETCH_CLASS_DEFAULT);
 		if (phalcon_method_exists_ce_ex(ce0, SS("beforequery") TSRMLS_CC) == SUCCESS) {
 			object_init_ex(&model_instance, ce0);
 			if (phalcon_has_constructor(&model_instance TSRMLS_CC)) {
@@ -1735,7 +1735,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getConditions){
 			object_init_ex(&meta_data, phalcon_mvc_model_metadata_memory_ce);
 		}
 
-		ce0 = phalcon_fetch_class(&model);
+		ce0 = phalcon_fetch_class(&model, ZEND_FETCH_CLASS_DEFAULT);
 
 		object_init_ex(&model_instance, ce0);
 		if (phalcon_has_constructor(&model_instance)) {

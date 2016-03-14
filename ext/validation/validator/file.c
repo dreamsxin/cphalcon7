@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid)
 	}
 
 	if (phalcon_class_str_exists(SL("imagick"), 0) != NULL) {
-		imagick_ce = zend_fetch_class(SSL("Imagick"), ZEND_FETCH_CLASS_AUTO);
+		imagick_ce = phalcon_fetch_str_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
 		object_init_ex(&image, imagick_ce);
 		PHALCON_CALL_METHODW(NULL, &image, "__construct", &pathname);

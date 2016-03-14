@@ -399,12 +399,12 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 /**
  * Fetches a zend class entry from a zval value
  */
-zend_class_entry* phalcon_fetch_str_class(const char *class_name, uint32_t class_len) {
+zend_class_entry* phalcon_fetch_str_class(const char *class_name, uint32_t class_len, int fetch_type) {
 
 	zend_class_entry* ce;
 	zend_string *str = zend_string_init(class_name, class_len, 0);
 
-	ce = zend_fetch_class(str, ZEND_FETCH_CLASS_DEFAULT);
+	ce = zend_fetch_class(str, fetch_type);
 	zend_string_release(str);
 
 	return ce;
@@ -413,14 +413,14 @@ zend_class_entry* phalcon_fetch_str_class(const char *class_name, uint32_t class
 /**
  * Fetches a zend class entry from a zval value
  */
-zend_class_entry *phalcon_fetch_class(const zval *class_name) {
+zend_class_entry *phalcon_fetch_class(const zval *class_name, int fetch_type) {
 
 	if (Z_TYPE_P(class_name) == IS_STRING) {
-		return zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_DEFAULT);
+		return zend_fetch_class(Z_STR_P(class_name), fetch_type);
 	}
 
 	php_error_docref(NULL, E_WARNING, "class name must be a string");
-	return zend_fetch_class(SSL("stdclass"), ZEND_FETCH_CLASS_DEFAULT);
+	return phalcon_fetch_str_class(SL("stdclass"), fetch_type);
 }
 
 zend_class_entry* phalcon_fetch_self_class() {
@@ -562,7 +562,7 @@ int phalcon_is_instance_of(zval *object, const char *class_name, unsigned int cl
 			}
 		}
 
-		temp_ce = zend_fetch_class(zend_string_init(class_name, class_length, 0), ZEND_FETCH_CLASS_DEFAULT);
+		temp_ce = phalcon_fetch_str_class(class_name, class_length, ZEND_FETCH_CLASS_DEFAULT);
 		if (temp_ce) {
 			return instanceof_function(ce, temp_ce);
 		}

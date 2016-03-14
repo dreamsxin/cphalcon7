@@ -476,7 +476,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, drop){
 	zend_class_entry *ce0;
 
 	phalcon_get_called_class(&class_name);
-	ce0 = phalcon_fetch_class(&class_name);
+	ce0 = phalcon_fetch_class(&class_name, ZEND_FETCH_CLASS_DEFAULT);
 
 	object_init_ex(&collection, ce0);
 	if (phalcon_has_constructor(&collection)) {

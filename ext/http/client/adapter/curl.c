@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 				zend_class_entry *curlfile_ce;
 
 				if (PHALCON_IS_NOT_EMPTY(file)) {
-					curlfile_ce = zend_fetch_class(SSL("CURLFile"), ZEND_FETCH_CLASS_AUTO);
+					curlfile_ce = phalcon_fetch_str_class(SL("CURLFile"), ZEND_FETCH_CLASS_AUTO);
 
 					object_init_ex(&curlfile, curlfile_ce);
 					PHALCON_CALL_METHODW(NULL, &curlfile, "__construct", file);

@@ -380,11 +380,11 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		return;
 	}
 
-	ZVAL_STRING(&tmp, "*");
+	PHALCON_STR(&tmp, "*");
 
 	PHALCON_CALL_METHODW(&elements, &document, "getelementsbytagname", &tmp);
 
-	ZVAL_STRING(&regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
+	PHALCON_STR(&regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
 
 	phalcon_return_property(&tmp, &elements, SL("length"));
 

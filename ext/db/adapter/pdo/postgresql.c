@@ -417,6 +417,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, getDefaultIdValue){
 
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &default_value);
+	PHALCON_PTR_DTOR(&default_value);
 }
 
 /**

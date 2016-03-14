@@ -334,16 +334,16 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	 * Accessing the persistent property will create a session bag in any class
 	 */
 	if (Z_STRLEN_P(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(property_name), "persistent", sizeof("persistent")-1)) {
-		const char *cn = Z_OBJCE_P(getThis())->name->val;
-
-		ZVAL_STRING(&class_name, cn);
+		PHALCON_STR(&class_name, Z_OBJCE_P(getThis())->name->val);
 
 		array_init_size(&arguments, 1);
 		add_next_index_zval(&arguments, &class_name);
 
-		ZVAL_STRING(&service, "sessionBag");
-
+		PHALCON_STR(&service, "sessionBag");
 		PHALCON_CALL_METHODW(&result, &dependency_injector, "get", &service, &arguments);
+		PHALCON_PTR_DTOR(&service);
+		PHALCON_PTR_DTOR(&arguments);
+	
 		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), &result);
 		RETURN_CTORW(&result);
 	}

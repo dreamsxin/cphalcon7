@@ -391,12 +391,13 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, useExplicitIdValue){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, getDefaultIdValue){
 
-	zval defalut_value = {};
+	zval default_value = {};
 
-	ZVAL_STRING(&defalut_value, "default");
+	ZVAL_STRING(&default_value, "default");
 
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &defalut_value);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &default_value);
+	PHALCON_PTR_DTOR(&default_value);
 }
 
 /**

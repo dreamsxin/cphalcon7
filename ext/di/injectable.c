@@ -184,6 +184,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
+		PHALCON_PTR_DTOR(&event_parts);
 	} else {
 		PHALCON_CPY_WRT(&name, &lower);
 	}
@@ -195,6 +196,9 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 		PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(name), data);
 	}
 
+	PHALCON_PTR_DTOR(&name);
+	PHALCON_PTR_DTOR(&lower);
+
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 
 	if (Z_TYPE(events_manager) != IS_NULL) {
@@ -205,8 +209,11 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 		 */
 		PHALCON_CALL_METHODW(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
 		if (PHALCON_IS_FALSE(&status)) {
+			PHALCON_PTR_DTOR(&events_manager);
 			RETURN_FALSE;
 		}
+		PHALCON_PTR_DTOR(&status);
+		PHALCON_PTR_DTOR(&events_manager);
 	}
 
 	RETURN_TRUE;

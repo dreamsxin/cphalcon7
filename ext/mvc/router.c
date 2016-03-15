@@ -642,6 +642,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		PHALCON_CONCAT_SV(&debug_message, "Handle the URI pattern: ", &real_uri);
 		phalcon_debug_print_r(&debug_message);
 	}
+	
 
 	PHALCON_STR(&event_name, "router:beforeCheckRoutes");
 
@@ -657,7 +658,8 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	routes = phalcon_read_property(getThis(), SL("_routes"), PH_NOISY);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(routes), route) {
-		zval case_sensitive = {}, methods = {}, match_method = {}, hostname = {}, regex_host_name = {}, matched = {}, pattern = {}, case_pattern = {}, before_match = {}, before_match_params = {}, paths = {};
+		zval case_sensitive = {}, methods = {}, match_method = {}, hostname = {}, regex_host_name = {}, matched = {};
+		zval pattern = {}, case_pattern = {}, before_match = {}, before_match_params = {}, paths = {};
 		zval converters = {}, *position;
 
 		PHALCON_CALL_METHODW(&case_sensitive, route, "getcasesensitive");

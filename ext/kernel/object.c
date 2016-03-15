@@ -819,8 +819,7 @@ int phalcon_update_property_zval_zval(zval *object, const zval *property, zval *
  */
 int phalcon_update_property_array(zval *object, const char *property, uint32_t property_length, const zval *index, zval *value)
 {
-
-	zval *property_value;
+	zval property_value;
 
 	if (!object) {
 		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (1)");
@@ -832,17 +831,17 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 		return FAILURE;
 	}
 
-	property_value = phalcon_read_property(object, property, property_length, PH_NOISY);
+	phalcon_return_property(&property_value, object, property, property_length);
 
 	/** Convert the value to array if not is an array */
-	if (Z_TYPE_P(property_value) != IS_ARRAY) {
-		convert_to_array(property_value);
+	if (Z_TYPE(property_value) != IS_ARRAY) {
+		PHALCON_PTR_DTOR(&property_value);
+		convert_to_array(&property_value);
 	}
 
-	phalcon_array_update_zval(property_value, index, value, PH_COPY);
-
-	phalcon_update_property_zval(object, property, property_length, property_value);
-
+	phalcon_array_update_zval(&property_value, index, value, PH_COPY);
+	phalcon_update_property_zval(object, property, property_length, &property_value);
+	PHALCON_PTR_DTOR(&property_value);
 	return SUCCESS;
 }
 
@@ -987,9 +986,13 @@ int phalcon_update_property_array_merge_append(zval *object, const char *propert
 int phalcon_update_property_empty_array(zval *object, const char *property_name, uint32_t property_length) {
 
 	zval empty_array = {};
+	int status;
+
 	array_init(&empty_array);
 
-	return phalcon_update_property_zval(object, property_name, property_length, &empty_array);
+	status = phalcon_update_property_zval(object, property_name, property_length, &empty_array);
+	PHALCON_PTR_DTOR(&empty_array);
+	return status;
 }
 
 /**

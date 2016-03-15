@@ -443,7 +443,7 @@ PHP_METHOD(Phalcon_DI, get){
  */
 PHP_METHOD(Phalcon_DI, getShared){
 
-	zval *name, *parameters = NULL, *noerror = NULL, instance = {};
+	zval *name, *parameters = NULL, *noerror = NULL;
 
 	phalcon_fetch_params(0, 1, 2, &name, &parameters, &noerror);
 	PHALCON_ENSURE_IS_STRING(name);
@@ -456,18 +456,15 @@ PHP_METHOD(Phalcon_DI, getShared){
 		noerror = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_isset_property_array(getThis(), SL("_sharedInstances"), name)) {
-		phalcon_return_property_array(&instance, getThis(), SL("_sharedInstances"), name);
+	if (phalcon_property_array_isset_fetch(return_value, getThis(), SL("_sharedInstances"), name)) {
 		phalcon_update_property_bool(getThis(), SL("_freshInstance"), 0);
 	} else {
-		PHALCON_CALL_SELFW(&instance, "get", name, parameters, noerror);
-		if (zend_is_true(&instance)) {
+		PHALCON_CALL_SELFW(return_value, "get", name, parameters, noerror);
+		if (zend_is_true(return_value)) {
 			phalcon_update_property_bool(getThis(), SL("_freshInstance"), 1);
-			phalcon_update_property_array(getThis(), SL("_sharedInstances"), name, &instance);
+			phalcon_update_property_array(getThis(), SL("_sharedInstances"), name, return_value);
 		}
 	}
-
-	RETURN_CTORW(&instance);
 }
 
 /**

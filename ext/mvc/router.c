@@ -245,7 +245,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Router){
  */
 PHP_METHOD(Phalcon_Mvc_Router, __construct){
 
-	zval *default_routes = NULL, routes = {}, paths = {}, action_pattern = {}, route = {}, params_pattern = {};
+	zval *default_routes = NULL, routes = {}, paths = {}, route = {}, params_pattern = {};
 
 	phalcon_fetch_params(0, 0, 1, &default_routes);
 
@@ -264,29 +264,35 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		array_init_size(&paths, 1);
 		add_assoc_long_ex(&paths, ISL(controller), 1);
 
-		ZVAL_STRING(&action_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
+		PHALCON_STR(&params_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
 
 		object_init_ex(&route, phalcon_mvc_router_route_ce);
-		PHALCON_CALL_METHODW(NULL, &route, "__construct", &action_pattern, &paths);
-
+		PHALCON_CALL_METHODW(NULL, &route, "__construct", &params_pattern, &paths);
 		phalcon_array_append(&routes, &route, PH_COPY);
+
+		PHALCON_PTR_DTOR(&route);
+		PHALCON_PTR_DTOR(&paths);
 
 		array_init_size(&paths, 3);
 		add_assoc_long_ex(&paths, ISL(controller), 1);
 		add_assoc_long_ex(&paths, ISL(action), 2);
 		add_assoc_long_ex(&paths, ISL(params), 3);
 
-		ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
+		PHALCON_STR(&params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
 
 		object_init_ex(&route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHODW(NULL, &route, "__construct", &params_pattern, &paths);
-
 		phalcon_array_append(&routes, &route, PH_COPY);
+
+		PHALCON_PTR_DTOR(&params_pattern);
+		PHALCON_PTR_DTOR(&route);
+		PHALCON_PTR_DTOR(&paths);
 	}
 
 	phalcon_update_property_empty_array(getThis(), SL("_params"));
 	phalcon_update_property_this(getThis(), SL("_routes"), &routes);
 	phalcon_update_property_empty_array(getThis(), SL("_routesNameLookup"));
+	PHALCON_PTR_DTOR(&routes);
 }
 
 /**
@@ -621,7 +627,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	/**
 	 * Retrieve the request service from the container
 	 */
-	ZVAL_STRING(&service, ISV(request));
+	PHALCON_STR(&service, ISV(request));
 
 	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
 	PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_router_exception_ce, 0);
@@ -637,7 +643,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		phalcon_debug_print_r(&debug_message);
 	}
 
-	ZVAL_STRING(&event_name, "router:beforeCheckRoutes");
+	PHALCON_STR(&event_name, "router:beforeCheckRoutes");
 
 	ZVAL_MAKE_REF(&handled_uri);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &handled_uri);
@@ -708,7 +714,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			}
 		}
 
-		ZVAL_STRING(&event_name, "router:beforeCheckRoute");
+		PHALCON_STR(&event_name, "router:beforeCheckRoute");
 
 		PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
@@ -732,7 +738,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 * Check for beforeMatch conditions
 		 */
 		if (zend_is_true(&route_found)) {
-			ZVAL_STRING(&event_name, "router:matchedRoute");
+			PHALCON_STR(&event_name, "router:matchedRoute");
 
 			ZVAL_MAKE_REF(route);
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, route);
@@ -827,7 +833,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				phalcon_debug_print_r(&debug_message);
 			}
 		} else {
-			ZVAL_STRING(&event_name, "router:notMatchedRoute");
+			PHALCON_STR(&event_name, "router:notMatchedRoute");
 
 			ZVAL_MAKE_REF(route);
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, route);
@@ -928,7 +934,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 				if (zend_is_true(&str_params)) {
 					zval slash = {};
-					ZVAL_STRINGL(&slash, "/", 1);
+					PHALCON_STRL(&slash, "/", 1);
 
 					phalcon_fast_explode(&params, &slash, &str_params);
 				} else if (!PHALCON_IS_EMPTY(&str_params)) {
@@ -957,7 +963,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		}
 	} else {
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			ZVAL_STRING(&debug_message, "--Use Debug");
+			PHALCON_STR(&debug_message, "--Use Debug");
 			phalcon_debug_print_r(&debug_message);
 		}
 
@@ -980,7 +986,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		PHALCON_CALL_METHODW(NULL, getThis(), "setparams", &default_params);
 	}
 
-	ZVAL_STRING(&event_name, "router:afterCheckRoutes");
+	PHALCON_STR(&event_name, "router:afterCheckRoutes");
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 }

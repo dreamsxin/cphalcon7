@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	}
 
 	PHALCON_STR(&service, ISV(router));
-	PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);
+	PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);PHALCON_PTR_DTOR(&event_name);
 	PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
 
 	/* Handle the URI pattern (if any) */

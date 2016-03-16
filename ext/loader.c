@@ -470,14 +470,10 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	char slash[2] = {DEFAULT_SLASH, 0};
 
 	phalcon_fetch_params(0, 3, 1, &class_name, &directory, &extensions, &ds);
+
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 
 	if (Z_TYPE_P(directory) != IS_ARRAY) {
-		if (Z_TYPE_P(directory) != IS_STRING) {
-			PHALCON_SEPARATE_PARAM(directory);
-			convert_to_string_ex(directory);
-		}
-
 		array_init(&directories);
 		phalcon_array_append(&directories, directory, PH_COPY);
 	} else {
@@ -497,8 +493,12 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 	RETVAL_FALSE;
 
+
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(directories), dir) {
 		zval fixed_dir = {};
+		if (Z_TYPE_P(dir) != IS_STRING) {
+			convert_to_string_ex(dir);
+		}
 		/** 
 		 * Add a trailing directory separator if the user forgot to do that
 		 */
@@ -540,6 +540,8 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				assert(Z_TYPE(file_path) == IS_STRING);
 				RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
 
+				PHALCON_PTR_DTOR(&file_path);
+
 				/** 
 				 * Return true mean success
 				 */
@@ -553,8 +555,11 @@ PHP_METHOD(Phalcon_Loader, findFile){
 			PHALCON_PTR_DTOR(&file_path);
 		} ZEND_HASH_FOREACH_END();
 
+		PHALCON_PTR_DTOR(&fixed_dir);
+
 	} ZEND_HASH_FOREACH_END();
 
+	PHALCON_PTR_DTOR(&ds_slash);
 	PHALCON_PTR_DTOR(&event_name);
 	PHALCON_PTR_DTOR(&debug_message);
 	PHALCON_PTR_DTOR(&directories);

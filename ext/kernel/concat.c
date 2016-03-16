@@ -32,6 +32,7 @@ void phalcon_concat_sv(zval *result, const char *op1, uint32_t op1_len, zval *op
 		concat_function(result, result, &zop1);
 		concat_function(result, result, op2);
 	} else {
+		PHALCON_PTR_DTOR(result);
 		concat_function(result, &zop1, op2);
 	}
 	PHALCON_PTR_DTOR(&zop1);
@@ -46,6 +47,7 @@ void phalcon_concat_svs(zval *result, const char *op1, uint32_t op1_len, zval *o
 		concat_function(result, result, &zop1);
 		concat_function(result, result, op2);
 	} else {
+		PHALCON_PTR_DTOR(result);
 		concat_function(result, &zop1, op2);
 	}
 	concat_function(result, result, &zop3);
@@ -92,6 +94,7 @@ void phalcon_concat_svv(zval *result, const char *op1, uint32_t op1_len, zval *o
 		concat_function(result, result, &zop1);
 		concat_function(result, result, op2);
 	} else {
+		PHALCON_PTR_DTOR(result);
 		concat_function(result, &zop1, op2);
 	}
 	concat_function(result, result, op3);
@@ -110,6 +113,7 @@ void phalcon_concat_vs(zval *result, zval *op1, const char *op2, uint32_t op2_le
 		concat_function(result, result, op1);
 		concat_function(result, result, &zop2);
 	} else {
+		PHALCON_PTR_DTOR(result);
 		concat_function(result, op1, &zop2);
 	}
 	PHALCON_PTR_DTOR(&zop2);
@@ -122,6 +126,7 @@ void phalcon_concat_vsv(zval *result, zval *op1, const char *op2, uint32_t op2_l
 		concat_function(result, result, op1);
 		concat_function(result, result, &zop2);
 	} else {
+		PHALCON_PTR_DTOR(result);
 		concat_function(result, op1, &zop2);
 	}
 	concat_function(result, result, op3);
@@ -164,6 +169,7 @@ void phalcon_concat_vv(zval *result, zval *op1, zval *op2, int self_var){
 		concat_function(result, result, op1);
 		concat_function(result, result, op2);
 	} else {
+		PHALCON_PTR_DTOR(result);
 		concat_function(result, op1, op2);
 	}
 }
@@ -176,6 +182,7 @@ void phalcon_concat_vvs(zval *result, zval *op1, zval *op2, const char *op3, uin
 		concat_function(result, result, op1);
 		concat_function(result, result, op2);
 	} else {
+		PHALCON_PTR_DTOR(result);
 		concat_function(result, op1, op2);
 	}
 	concat_function(result, result, &zop3);
@@ -192,6 +199,7 @@ void phalcon_concat_vvv(zval *result, zval *op1, zval *op2, zval *op3, int self_
 		concat_function(result, result, op1);
 		concat_function(result, result, op2);
 	} else {
+		PHALCON_PTR_DTOR(result);
 		concat_function(result, op1, op2);
 	}
 	concat_function(result, result, op3);

@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
 		case 0:
 			rows_objects = phalcon_read_property(getThis(), SL("_rowsModels"), PH_NOISY);
-			if (!phalcon_array_isset(rows_objects, &key)) {
+			if (!phalcon_array_isset_fetch(&active_row, rows_objects, &key)) {
 				/** 
 				 * this_ptr->model is the base entity
 				 */
@@ -255,8 +255,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 				PHALCON_CALL_CE_STATICW(&active_row, ce, "cloneresultmap", model, &row, column_map, &dirty_state, keep_snapshots, source_model);
 
 				phalcon_update_property_array(getThis(), SL("_rowsModels"), &key, &active_row);
-			} else {
-				phalcon_array_fetch(&active_row, rows_objects, &key, PH_NOISY);
 			}
 			break;
 
@@ -269,14 +267,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 				PHALCON_CALL_CE_STATICW(&active_row, ce, "cloneresultmaphydrate", &row, column_map, hydrate_mode, source_model);
 
 				phalcon_update_property_array(getThis(), SL("_rowsModels"), &key, &active_row);
-			} else {
-				phalcon_array_fetch(&active_row, rows_objects, &key, PH_NOISY);
 			}
 			break;
-
 	}
 
+	PHALCON_PTR_DTOR(&row);
+	PHALCON_PTR_DTOR(&key);
+
 	phalcon_update_property_this(getThis(), SL("_activeRow"), &active_row);
+	PHALCON_PTR_DTOR(&active_row);
 	RETURN_TRUE;
 }
 

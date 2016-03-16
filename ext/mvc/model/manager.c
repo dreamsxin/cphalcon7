@@ -487,8 +487,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	 * Check if a model with the same is already loaded
 	 */
 	if (!zend_is_true(new_instance) && phalcon_array_isset_fetch(&model, initialized, &lowercased)) {
+		PHALCON_PTR_DTOR(&lowercased);
 		RETURN_CTORW(&model);
 	}
+
+	PHALCON_PTR_DTOR(&lowercased);
 
 	/** 
 	 * Load it using an autoloader

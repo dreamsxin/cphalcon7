@@ -296,11 +296,12 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_STR(&event_name, "application:boot");
 	PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
+		PHALCON_PTR_DTOR(&event_name);
 		RETURN_FALSE;
 	}
 
 	PHALCON_STR(&service, ISV(router));
-	PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);PHALCON_PTR_DTOR(&event_name);
+	PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
 
 	/* Handle the URI pattern (if any) */

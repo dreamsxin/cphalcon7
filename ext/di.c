@@ -620,16 +620,11 @@ PHP_METHOD(Phalcon_DI, setDefault){
  */
 PHP_METHOD(Phalcon_DI, getDefault){
 
-	zval default_di = {}, dependency_injector = {};
-
-	phalcon_return_static_property_ce(&default_di, phalcon_di_ce, SL("_default"));
-	if (Z_TYPE(default_di) != IS_OBJECT) {
-		object_init_ex(&dependency_injector, phalcon_di_factorydefault_ce);
-		PHALCON_CALL_METHODW(NULL, &dependency_injector, "__construct");
-		RETURN_CTORW(&dependency_injector);
+	phalcon_return_static_property_ce(return_value, phalcon_di_ce, SL("_default"));
+	if (Z_TYPE_P(return_value) != IS_OBJECT) {
+		object_init_ex(return_value, phalcon_di_factorydefault_ce);
+		PHALCON_CALL_METHODW(NULL, return_value, "__construct");
 	}
-
-	RETURN_CTORW(&default_di);
 }
 
 /**

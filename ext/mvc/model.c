@@ -531,7 +531,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 	zval *di = NULL, *_models_manager = NULL, models_manager = {};
 
 	phalcon_fetch_params(0, 0, 2, &di, &_models_manager);
-	
+
 	if (di) {
 		if (Z_TYPE_P(di) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
@@ -553,11 +553,11 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 		return;
 	}
 
-
 	/**
 	 * The manager always initializes the object
 	 */
 	PHALCON_CALL_METHODW(NULL, &models_manager, "initialize", getThis());
+	PHALCON_PTR_DTOR(&models_manager);
 
 	/**
 	 * This allows the developer to execute initialization stuff every time an instance
@@ -1535,6 +1535,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		auto_create = &PHALCON_GLOBAL(z_false);
 	}
 
+
 	PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -1574,6 +1575,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		PHALCON_CALL_METHODW(NULL, &builder, "__construct", &params);
 	}
 
+	PHALCON_PTR_DTOR(&dependency_injector);
 	PHALCON_PTR_DTOR(&service_name);
 	PHALCON_PTR_DTOR(&params);
 

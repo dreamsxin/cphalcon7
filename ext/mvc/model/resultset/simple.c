@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
-	zval *type, *result, row = {}, rows = {}, dirty_state = {}, *hydrate_mode, *keep_snapshots, *column_map, key = {}, *source_model, *model, active_row, *rows_objects;
+	zval *type, *result, row = {}, rows = {}, dirty_state = {}, *hydrate_mode, *keep_snapshots, *column_map, key = {}, *source_model, *model, active_row = {}, *rows_objects;
 	zend_class_entry *ce;
 
 	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);

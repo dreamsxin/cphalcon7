@@ -734,7 +734,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setSource){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getSource){
 
-	zval models_manager;
+	zval models_manager = {};
 
 	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getmodelsource", getThis());
@@ -764,7 +764,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setSchema){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getSchema){
 
-	zval models_manager;
+	zval models_manager = {};
 
 	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHOD(&models_manager, "getmodelschema", getThis());

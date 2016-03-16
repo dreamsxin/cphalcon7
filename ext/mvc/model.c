@@ -634,17 +634,15 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsMetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getModelsManager){
 
-	zval models_manager = {}, service_name = {};
+	zval service_name = {};
 
-	phalcon_return_property(&models_manager, getThis(), SL("_modelsManager"));
+	phalcon_return_property(return_value, getThis(), SL("_modelsManager"));
 
-	if (Z_TYPE(models_manager) != IS_OBJECT) {
+	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		PHALCON_STR(&service_name, "modelsManager");
 		PHALCON_RETURN_CALL_METHODW(getThis(), "getresolveservice", &service_name);
-		return;
+		PHALCON_PTR_DTOR(&service_name);
 	}
-
-	RETURN_CTORW(&models_manager);
 }
 
 /**

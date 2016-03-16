@@ -490,7 +490,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
-	ZVAL_STR(&lowercased, zend_string_tolower(Z_STR_P(model_name)));
+	phalcon_fast_strtolower(&lowercased, model_name);
 
 	/** 
 	 * Check if a model with the same is already loaded
@@ -1024,6 +1024,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_dynamicUpdate"), &entity_name, dynamic_update);
 	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), &entity_name, dynamic_update);
+	PHALCON_PTR_DTOR(&entity_name);
 }
 
 /**
@@ -1033,16 +1034,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate){
 
-	zval *model, *dynamic_update, entity_name = {}, is_using = {};
+	zval *model, *dynamic_update, entity_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
 	dynamic_update = phalcon_read_property(getThis(), SL("_dynamicUpdate"), PH_NOISY);
 	if (Z_TYPE_P(dynamic_update) == IS_ARRAY) { 
 		phalcon_get_class(&entity_name, model, 1);
-		if (phalcon_array_isset_fetch(&is_using, dynamic_update, &entity_name)) {
-			RETURN_CTORW(&is_using);
+		if (phalcon_array_isset_fetch(return_value, dynamic_update, &entity_name)) {
+			PHALCON_PTR_DTOR(&entity_name);
+			return;
 		}
+		PHALCON_PTR_DTOR(&entity_name);
 	}
 
 	RETURN_TRUE;
@@ -1208,9 +1211,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 */
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
+		PHALCON_PTR_DTOR(&alias);
 	} else {
 		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
 	}
+	PHALCON_PTR_DTOR(&referenced_entity);
 
 	/** 
 	 * Append a new relationship
@@ -1222,11 +1227,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 */
 	PHALCON_CONCAT_VSV(&key_alias, &entity_name, "$", &lower_alias);
 	phalcon_update_property_array(getThis(), SL("_aliases"), &key_alias, &relation);
+	PHALCON_PTR_DTOR(&key_alias);
+	PHALCON_PTR_DTOR(&lower_alias);
 
 	/** 
 	 * Update the relations
 	 */
 	phalcon_update_property_array(getThis(), SL("_belongsTo"), &key_relation, &relations);
+	PHALCON_PTR_DTOR(&relations);
+	PHALCON_PTR_DTOR(&key_relation);
 
 	/** 
 	 * Get existing relations by model
@@ -1246,7 +1255,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 */
 	phalcon_update_property_array(getThis(), SL("_belongsToSingle"), &entity_name, &single_relations);
 
-	RETURN_CTORW(&relation);
+	PHALCON_PTR_DTOR(&single_relations);
+	PHALCON_PTR_DTOR(&entity_name);
+
+	RETURN_CTOR_DTORW(&relation);
 }
 
 /**

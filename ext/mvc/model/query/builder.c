@@ -255,6 +255,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 							phalcon_array_update_zval(&merged_bind_params, &single_condition_key, single_condition_array, PH_COPY);
 						}
 					}
+					PHALCON_PTR_DTOR(&tmp_bind_types);
+					PHALCON_PTR_DTOR(&tmp_bind_params);
+					PHALCON_PTR_DTOR(&condition_string);
+					PHALCON_PTR_DTOR(&single_condition_key);
 				} ZEND_HASH_FOREACH_END();
 
 				phalcon_fast_join_str(&new_condition_string, SL(" AND "), &merged_conditions);
@@ -262,9 +266,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 				phalcon_update_property_this(getThis(), SL("_conditions"), &new_condition_string);
 				phalcon_update_property_this(getThis(), SL("_bindParams"), &merged_bind_params);
 				phalcon_update_property_this(getThis(), SL("_bindTypes"), &merged_bind_types);
+				PHALCON_PTR_DTOR(&new_condition_string);
+				PHALCON_PTR_DTOR(&merged_conditions);
+				PHALCON_PTR_DTOR(&merged_bind_params);
+				PHALCON_PTR_DTOR(&merged_bind_types);
 			} else {
 				phalcon_update_property_this(getThis(), SL("_conditions"), &conditions);		
-			}	
+			}
+			PHALCON_PTR_DTOR(&conditions);
 		}
 
 		if (phalcon_array_isset_fetch_str(&bind_params, params, SL("bind"))) {
@@ -273,10 +282,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 				if (Z_TYPE_P(current_bind_params) == IS_ARRAY) {
 					phalcon_add_function(&merged_bind_params, &bind_params, current_bind_params);
 					phalcon_update_property_this(getThis(), SL("_bindParams"), &merged_bind_params);
+					PHALCON_PTR_DTOR(&merged_bind_params);
 				} else {
 					phalcon_update_property_this(getThis(), SL("_bindParams"), &bind_params);
 				}
 			}
+			PHALCON_PTR_DTOR(&bind_params);
 		}
 
 		if (phalcon_array_isset_fetch_str(&bind_types, params, SL("bindTypes"))) {
@@ -285,10 +296,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 				if (Z_TYPE_P(current_bind_types) == IS_ARRAY) {
 					phalcon_add_function(&merged_bind_types, &bind_types, current_bind_types);
 					phalcon_update_property_this(getThis(), SL("_bindTypes"), &merged_bind_types);
+					PHALCON_PTR_DTOR(&merged_bind_types);
 				} else {
 					phalcon_update_property_this(getThis(), SL("_bindTypes"), &bind_types);
 				}
 			}
+			PHALCON_PTR_DTOR(&bind_types);
 		}
 
 		/** 
@@ -296,6 +309,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&models, params, SL("models"))) {
 			phalcon_update_property_this(getThis(), SL("_models"), &models);
+			PHALCON_PTR_DTOR(&models);
 		}
 
 		/** 
@@ -303,6 +317,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&columns, params, SL("columns"))) {
 			phalcon_update_property_this(getThis(), SL("_columns"), &columns);
+			PHALCON_PTR_DTOR(&columns);
 		}
 
 		/**
@@ -310,6 +325,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&joins, params, SL("joins"))) {
 			phalcon_update_property_this(getThis(), SL("_joins"), &joins);
+			PHALCON_PTR_DTOR(&joins);
 		}
 
 		/** 
@@ -317,6 +333,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&group_clause, params, SL("group"))) {
 			phalcon_update_property_this(getThis(), SL("_group"), &group_clause);
+			PHALCON_PTR_DTOR(&group_clause);
 		}
 
 		/** 
@@ -324,6 +341,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&having_clause, params, SL("having"))) {
 			phalcon_update_property_this(getThis(), SL("_having"), &having_clause);
+			PHALCON_PTR_DTOR(&having_clause);
 		}
 
 		/** 
@@ -343,9 +361,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 			) {
 				phalcon_update_property_this(getThis(), SL("_limit"), &limit);
 				phalcon_update_property_this(getThis(), SL("_offset"), &offset);
+				PHALCON_PTR_DTOR(&limit);
+				PHALCON_PTR_DTOR(&offset);
 			} else {
 				phalcon_update_property_this(getThis(), SL("_limit"), &limit_clause);
 			}
+			PHALCON_PTR_DTOR(&limit_clause);
 		}
 
 		/** 
@@ -353,6 +374,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&offset_clause, params, SL("offset"))) {
 			phalcon_update_property_this(getThis(), SL("_offset"), &offset_clause);
+			PHALCON_PTR_DTOR(&offset_clause);
 		}
 
 		/** 
@@ -360,6 +382,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&for_update, params, SL("for_update"))) {
 			phalcon_update_property_this(getThis(), SL("_forUpdate"), &for_update);
+			PHALCON_PTR_DTOR(&for_update);
 		}
 
 		/** 
@@ -367,6 +390,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&shared_lock, params, SL("shared_lock"))) {
 			phalcon_update_property_this(getThis(), SL("_sharedLock"), &shared_lock);
+			PHALCON_PTR_DTOR(&shared_lock);
 		}
 	}
 

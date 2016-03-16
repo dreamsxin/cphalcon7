@@ -129,7 +129,7 @@ void phalcon_get_class(zval *result, const zval *object, int lower) {
 		ZVAL_STR(result, zend_string_copy(ce->name));
 
 		if (lower) {
-			ZVAL_STR(result, zend_string_tolower(Z_STR_P(result)));
+			phalcon_strtolower_inplace(result);
 		}
 
 	} else {

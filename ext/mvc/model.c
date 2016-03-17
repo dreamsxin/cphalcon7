@@ -1555,7 +1555,6 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name, &PHALCON_GLOBAL(z_true));
 	PHALCON_PTR_DTOR(&manager);
-	PHALCON_PTR_DTOR(&model_name);
 
 	/**
 	 * Builds a query with the passed parameters
@@ -2232,6 +2231,8 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
 			PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(lower), data);
 		}
+
+		PHALCON_PTR_DTOR(&lower);
 
 		models_manager = phalcon_read_property(getThis(), SL("_modelsManager"), PH_NOISY);
 

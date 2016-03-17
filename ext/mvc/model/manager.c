@@ -846,40 +846,40 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models_behaviors), behavior) {
 				PHALCON_CALL_METHODW(&status, behavior, "notify", eventname, model);
 				if (PHALCON_IS_FALSE(&status)) {
-					RETURN_CTORW(&status);
+					break;
 				}
 			} ZEND_HASH_FOREACH_END();
-
+			PHALCON_PTR_DTOR(&models_behaviors);
 		}
 	}
 
-	/** 
-	 * Dispatch events to the global events manager
-	 */
-	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
-
-		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
-		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_CTORW(&status);
-		}
-	}
-
-	/** 
-	 * A model can has a specific events manager for it
-	 */
-	custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
-	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, &entity_name)) {
+	if (!PHALCON_IS_FALSE(&status)) {
+		/** 
+		 * Dispatch events to the global events manager
+		 */
+		phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
-
 			PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
-			if (PHALCON_IS_FALSE(&status)) {
-				RETURN_CTORW(&status);
+		}
+	}
+
+	if (!PHALCON_IS_FALSE(&status)) {
+		/** 
+		 * A model can has a specific events manager for it
+		 */
+		custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
+		if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) {
+			if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, &entity_name)) {
+				PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
+				PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
 			}
 		}
 	}
+
+	PHALCON_PTR_DTOR(&fire_event_name);
+	PHALCON_PTR_DTOR(&events_manager);
+	PHALCON_PTR_DTOR(&entity_name);
 
 	RETURN_CTORW(&status);
 }

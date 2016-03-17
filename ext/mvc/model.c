@@ -1574,7 +1574,6 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	PHALCON_PTR_DTOR(&dependency_injector);
 	PHALCON_PTR_DTOR(&service_name);
-	PHALCON_PTR_DTOR(&params);
 
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
 

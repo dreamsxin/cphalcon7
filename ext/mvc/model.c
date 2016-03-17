@@ -6324,6 +6324,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	 * Original attributes
 	 */
 	PHALCON_CALL_METHODW(&attributes, &meta_data, "getattributes", getThis());
+	PHALCON_PTR_DTOR(&meta_data);
 
 	/**
 	 * Reverse column map
@@ -6359,17 +6360,24 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 			if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
 				PHALCON_CALL_ZVAL_METHODW(&possible_value, getThis(), &possible_getter);
 				phalcon_array_update_zval(&data, &attribute_field, &possible_value, PH_COPY);
+				PHALCON_PTR_DTOR(&possible_value);
 			} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), &attribute_field)) {
 				phalcon_array_update_zval(&data, &attribute_field, &attribute_value, PH_COPY);
+				PHALCON_PTR_DTOR(&attribute_value);
 			} else {
 				phalcon_array_update_zval(&data, &attribute_field, &PHALCON_GLOBAL(z_null), PH_COPY);
 			}
+			PHALCON_PTR_DTOR(&possible_getter);
 		} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), &attribute_field)) {
 			phalcon_array_update_zval(&data, &attribute_field, &attribute_value, PH_COPY);
 		} else {
 			phalcon_array_update_zval(&data, &attribute_field, &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
+		PHALCON_PTR_DTOR(&attribute_field);
 	} ZEND_HASH_FOREACH_END();
+
+	PHALCON_PTR_DTOR(&attributes);
+	PHALCON_PTR_DTOR(&column_map);
 
 	PHALCON_STR(&event_name, "afterToArray");
 
@@ -6377,7 +6385,8 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &data);
 	ZVAL_UNREF(&data);
 
-	RETURN_CTORW(&data);
+	PHALCON_PTR_DTOR(&event_name);
+	RETURN_CTOR_DTORW(&data);
 }
 
 /**

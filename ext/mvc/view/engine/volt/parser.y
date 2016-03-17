@@ -64,6 +64,7 @@ static zval *phvolt_ret_literal_zval(int type, phvolt_parser_token *T, phvolt_sc
 	add_assoc_long(ret, "type", type);
 	if (T) {
 		add_assoc_stringl(ret, "value", T->token, T->token_len);
+		efree(T->token);
 		efree(T);
 	}
 
@@ -82,6 +83,7 @@ static zval *phvolt_ret_if_statement(zval *expr, zval *true_statements, zval *fa
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_IF);
 	add_assoc_zval(ret, "expr", expr);
+	efree(expr);
 
 	if (true_statements) {
 		add_assoc_zval(ret, "true_statements", true_statements);
@@ -107,6 +109,7 @@ static zval *phvolt_ret_elseif_statement(zval *expr, phvolt_scanner_state *state
 	array_init(ret);
 	add_assoc_long(ret, "type", PHVOLT_T_ELSEIF);
 	add_assoc_zval(ret, "expr", expr);
+	efree(expr);
 
 	Z_TRY_ADDREF_P(state->active_file);
 	add_assoc_zval(ret, "file", state->active_file);
@@ -139,10 +142,12 @@ static zval *phvolt_ret_for_statement(phvolt_parser_token *variable, phvolt_pars
 	add_assoc_long(ret, "type", PHVOLT_T_FOR);
 
 	add_assoc_stringl(ret, "variable", variable->token, variable->token_len);
+	efree(variable->token);
 	efree(variable);
 
 	if (key) {
 		add_assoc_stringl(ret, "key", key->token, key->token_len);
+		efree(key->token);
 		efree(key);
 	}
 
@@ -151,6 +156,7 @@ static zval *phvolt_ret_for_statement(phvolt_parser_token *variable, phvolt_pars
 
 	if (if_expr) {
 		add_assoc_zval(ret, "if_expr", if_expr);
+		efree(if_expr);
 	}
 
 	add_assoc_zval(ret, "block_statements", block_statements);
@@ -209,6 +215,7 @@ static zval *phvolt_ret_set_assignment(phvolt_parser_token *variable, int operat
 	array_init_size(ret, 5);
 
 	add_assoc_stringl(ret, "variable", variable->token, variable->token_len);
+	efree(variable->token);
 	efree(variable);
 
 	add_assoc_long(ret, "op", operator);
@@ -249,6 +256,7 @@ static zval *phvolt_ret_block_statement(phvolt_parser_token *name, zval *block_s
 	add_assoc_long(ret, "type", PHVOLT_T_BLOCK);
 
 	add_assoc_stringl(ret, "name", name->token, name->token_len);
+	efree(name->token);
 	efree(name);
 
 	if (block_statements) {
@@ -272,6 +280,7 @@ static zval *phvolt_ret_macro_statement(phvolt_parser_token *macro_name, zval *p
 	add_assoc_long(ret, "type", PHVOLT_T_MACRO);
 
 	add_assoc_stringl(ret, "name", macro_name->token, macro_name->token_len);
+	efree(macro_name->token);
 	efree(macro_name);
 
 	if (parameters) {
@@ -299,6 +308,7 @@ static zval *phvolt_ret_macro_parameter(phvolt_parser_token *variable, zval *def
 	array_init_size(ret, 5);
 
 	add_assoc_stringl(ret, "variable", variable->token, variable->token_len);
+	efree(variable->token);
 	efree(variable);
 
 	if (default_value) {
@@ -322,6 +332,7 @@ static zval *phvolt_ret_extends_statement(phvolt_parser_token *P, phvolt_scanner
 
 	add_assoc_long(ret, "type", PHVOLT_T_EXTENDS);
 	add_assoc_stringl(ret, "path", P->token, P->token_len);
+	efree(P->token);
 	efree(P);
 
 	Z_TRY_ADDREF_P(state->active_file);
@@ -339,8 +350,9 @@ static zval *phvolt_ret_include_statement(zval *path, zval *params, phvolt_scann
 	array_init_size(ret, 4);
 
 	add_assoc_long(ret, "type", PHVOLT_T_INCLUDE);
-
 	add_assoc_zval(ret, "path", path);
+	efree(path);
+
 	if (params) {
 		add_assoc_zval(ret, "params", params);
 		efree(params);
@@ -461,7 +473,6 @@ static zval *phvolt_ret_zval_list(zval *list_left, zval *right_list)
 	if (list_left) {
 		if (zend_hash_index_exists(Z_ARRVAL_P(list_left), 0)) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(list_left), item) {
-				Z_TRY_ADDREF_P(item);
 				add_next_index_zval(ret, item);
 			} ZEND_HASH_FOREACH_END();
 			zval_ptr_dtor(list_left);
@@ -487,6 +498,7 @@ static zval *phvolt_ret_named_item(phvolt_parser_token *name, zval *expr, phvolt
 	efree(expr);
 	if (name != NULL) {
 		add_assoc_stringl(ret, "name", name->token, name->token_len);
+		efree(name->token);
 		efree(name);
 	}
 

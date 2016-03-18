@@ -449,7 +449,6 @@ PHP_METHOD(Phalcon_Loader, unregister){
 		add_next_index_stringl(&autoloader, SL("autoLoad"));
 		PHALCON_CALL_FUNCTIONW(NULL, "spl_autoload_unregister", &autoloader);
 		phalcon_update_property_this(getThis(), SL("_registered"), &PHALCON_GLOBAL(z_false));
-		PHALCON_PTR_DTOR(&autoloader);
 	}
 
 	RETURN_THISW();

@@ -532,11 +532,6 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 				break;
 		}
 
-		if (token.value != NULL) {
-			efree(token.value);
-			token.value = NULL;
-		}
-
 		if (parser_status->status != PHQL_PARSING_OK) {
 			status = FAILURE;
 			break;

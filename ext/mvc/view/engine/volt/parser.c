@@ -4423,11 +4423,6 @@ int phvolt_internal_parse_view(zval *result, zval *view_code, zval *template_pat
 				break;
 		}
 
-		if (token.value != NULL) {
-			efree(token.value);
-			token.value = NULL;
-		}
-
 		if (parser_status->status != PHVOLT_PARSING_OK) {
 			status = FAILURE;
 			break;

@@ -2721,7 +2721,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 		phalcon_update_property_this(getThis(), SL("_sqlAliasesModelsInstances"), tmp_sql_aliases_models_instances);
 	}
 
-	RETURN_CTOR_DTORW(&sql_select);
+	RETURN_CTORW(&sql_select);
 }
 
 /**
@@ -3271,7 +3271,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 					if (i_cache) {
 						PHALCON_PTR_DTOR(&ast);
 						PHALCON_PTR_DTOR(&event_name);
-						RETURN_CTOR_DTORW(&ir_phql);
+						RETURN_CTORW(&ir_phql);
 					}
 				}
 			}
@@ -3345,7 +3345,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 	PHALCON_PTR_DTOR(&event_name);
 
-	RETURN_CTOR_DTORW(&ir_phql);
+	RETURN_CTORW(&ir_phql);
 }
 
 /**
@@ -3819,7 +3819,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	PHALCON_PTR_DTOR(&model);
 	PHALCON_PTR_DTOR(&columns);
 
-	RETURN_CTOR_DTORW(&resultset);
+	RETURN_CTORW(&resultset);
 }
 
 /**
@@ -4609,7 +4609,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 					PHALCON_CPY_WRT(&prepared_result, &result);
 				}
 
-				RETURN_CTOR_DTORW(&prepared_result);
+				RETURN_CTORW(&prepared_result);
 			}
 
 			phalcon_update_property_this(getThis(), SL("_cache"), &cache);
@@ -4709,7 +4709,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	PHALCON_PTR_DTOR(&event_name);
 
 	if (Z_TYPE(result) != IS_OBJECT) {
-		RETURN_CTOR_DTORW(&result);
+		RETURN_CTORW(&result);
 	}
 	/** 
 	 * We store the resultset in the cache if any
@@ -4739,7 +4739,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 		return;
 	}
 
-	RETURN_CTOR_DTORW(&result);
+	RETURN_CTORW(&result);
 }
 
 /**

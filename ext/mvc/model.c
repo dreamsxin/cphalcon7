@@ -6386,7 +6386,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	ZVAL_UNREF(&data);
 
 	PHALCON_PTR_DTOR(&event_name);
-	RETURN_CTOR_DTORW(&data);
+	RETURN_CTORW(&data);
 }
 
 /**

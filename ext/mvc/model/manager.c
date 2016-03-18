@@ -1258,7 +1258,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	PHALCON_PTR_DTOR(&single_relations);
 	PHALCON_PTR_DTOR(&entity_name);
 
-	RETURN_CTOR_DTORW(&relation);
+	RETURN_CTORW(&relation);
 }
 
 /**

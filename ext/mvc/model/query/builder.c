@@ -1670,7 +1670,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 		phalcon_concat_self_str(&phql, SL(" FOR UPDATE"));
 	}
 
-	RETURN_CTOR_DTORW(&phql);
+	RETURN_CTORW(&phql);
 }
 
 /**
@@ -1724,7 +1724,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 		PHALCON_CALL_METHODW(NULL, &query, "setbindtypes", bind_types);
 	}
 
-	RETURN_CTOR_DTORW(&query);
+	RETURN_CTORW(&query);
 }
 
 /**

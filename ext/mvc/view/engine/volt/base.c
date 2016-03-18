@@ -198,8 +198,7 @@ int phvolt_parse_view(zval *result, zval *view_code, zval *template_path){
 		if (likely(Z_TYPE(error_msg) > IS_NULL)) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, Z_STRVAL(error_msg));
 			PHALCON_PTR_DTOR(&error_msg);
-		}
-		else {
+		} else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Error parsing the view");
 		}
 

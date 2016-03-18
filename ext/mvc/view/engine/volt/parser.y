@@ -19,7 +19,22 @@
 
 %token_prefix PHVOLT_
 %token_type {phvolt_parser_token*}
+%token_destructor {
+	if ($$) {
+		if ($$->free_flag) {
+			efree($$->token);
+		}
+		efree($$);
+	}
+}
 %default_type {zval*}
+%default_destructor {
+	if (status) {
+		// TODO:
+	}
+	zval_ptr_dtor($$);
+	efree($$);
+}
 %extra_argument {phvolt_parser_status *status}
 %name phvolt_
 
@@ -475,7 +490,6 @@ static zval *phvolt_ret_zval_list(zval *list_left, zval *right_list)
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(list_left), item) {
 				add_next_index_zval(ret, item);
 			} ZEND_HASH_FOREACH_END();
-			zval_ptr_dtor(list_left);
 		} else {
 			add_next_index_zval(ret, list_left);
 		}
@@ -704,24 +718,16 @@ static zval *phvolt_ret_macro_call_statement(zval *expr, zval *arguments, zval *
 		smart_str_0(&error_str);
 
 		if (error_str.s) {
-			status->syntax_error = error_str.s->val;
+			status->syntax_error = estrndup(error_str.s->val, error_str.s->len);
 			status->syntax_error_len = error_str.s->len;
 		} else {
 			status->syntax_error = NULL;
 		}
+		smart_str_free(&error_str);
 
 	}
 
 	status->status = PHVOLT_PARSING_FAILED;
-}
-
-%token_destructor {
-	if ($$) {
-		if ($$->free_flag) {
-			efree($$->token);
-		}
-		efree($$);
-	}
 }
 
 program ::= volt_language(Q) . {
@@ -732,8 +738,6 @@ volt_language(R) ::= statement_list(L) . {
 	R = L;
 }
 
-%destructor statement_list { zval_ptr_dtor($$); efree($$); }
-
 statement_list(R) ::= statement_list(L) statement(S) . {
 	R = phvolt_ret_zval_list(L, S);
 }
@@ -741,8 +745,6 @@ statement_list(R) ::= statement_list(L) statement(S) . {
 statement_list(R) ::= statement(S) . {
 	R = phvolt_ret_zval_list(NULL, S);
 }
-
-%destructor statement { zval_ptr_dtor($$); efree($$); }
 
 statement(R) ::= raw_fragment(F) . {
 	R = F;
@@ -820,8 +822,6 @@ statement(R) ::= macro_call_statement(E) . {
 	R = E;
 }
 
-%destructor if_statement { zval_ptr_dtor($$); efree($$); }
-
 if_statement(R) ::= OPEN_DELIMITER IF expr(E) CLOSE_DELIMITER statement_list(T) OPEN_DELIMITER ENDIF CLOSE_DELIMITER . {
 	R = phvolt_ret_if_statement(E, T, NULL, status->scanner_state);
 }
@@ -842,19 +842,13 @@ if_statement(R) ::= OPEN_DELIMITER IF expr(E) CLOSE_DELIMITER OPEN_DELIMITER ELS
 	R = phvolt_ret_if_statement(E, NULL, NULL, status->scanner_state);
 }
 
-%destructor elseif_statement { zval_ptr_dtor($$); efree($$); }
-
 elseif_statement(R) ::= OPEN_DELIMITER ELSEIF expr(E) CLOSE_DELIMITER . {
 	R = phvolt_ret_elseif_statement(E, status->scanner_state);
 }
 
-%destructor elsefor_statement { zval_ptr_dtor($$); efree($$); }
-
 elsefor_statement(R) ::= OPEN_DELIMITER ELSEFOR CLOSE_DELIMITER . {
 	R = phvolt_ret_elsefor_statement(status->scanner_state);
 }
-
-%destructor for_statement { zval_ptr_dtor($$); efree($$); }
 
 for_statement(R) ::= OPEN_DELIMITER FOR IDENTIFIER(I) IN expr(E) CLOSE_DELIMITER statement_list(T) OPEN_DELIMITER ENDFOR CLOSE_DELIMITER . {
 	R = phvolt_ret_for_statement(I, NULL, E, NULL, T, status->scanner_state);
@@ -872,13 +866,9 @@ for_statement(R) ::= OPEN_DELIMITER FOR IDENTIFIER(K) COMMA IDENTIFIER(V) IN exp
 	R = phvolt_ret_for_statement(V, K, E, IE, T, status->scanner_state);
 }
 
-%destructor set_statement { zval_ptr_dtor($$); efree($$); }
-
 set_statement(R) ::= OPEN_DELIMITER SET set_assignments(L) CLOSE_DELIMITER . {
 	R = phvolt_ret_set_statement(L);
 }
-
-%destructor set_assignments { zval_ptr_dtor($$); efree($$); }
 
 set_assignments(R) ::= set_assignments(L) COMMA set_assignment(S) . {
 	R = phvolt_ret_zval_list(L, S);
@@ -887,8 +877,6 @@ set_assignments(R) ::= set_assignments(L) COMMA set_assignment(S) . {
 set_assignments(R) ::= set_assignment(S) . {
 	R = phvolt_ret_zval_list(NULL, S);
 }
-
-%destructor set_assignment { zval_ptr_dtor($$); efree($$); }
 
 set_assignment(R) ::= IDENTIFIER(I) ASSIGN expr(E) . {
 	R = phvolt_ret_set_assignment(I, PHVOLT_T_ASSIGN, E, status->scanner_state);
@@ -910,8 +898,6 @@ set_assignment(R) ::= IDENTIFIER(I) DIV_ASSIGN expr(E) . {
 	R = phvolt_ret_set_assignment(I, PHVOLT_T_DIV_ASSIGN, E, status->scanner_state);
 }
 
-%destructor macro_statement { zval_ptr_dtor($$); efree($$); }
-
 macro_statement(R) ::= OPEN_DELIMITER MACRO IDENTIFIER(I) PARENTHESES_OPEN PARENTHESES_CLOSE CLOSE_DELIMITER statement_list(T) OPEN_DELIMITER ENDMACRO CLOSE_DELIMITER . {
 	R = phvolt_ret_macro_statement(I, NULL, T, status->scanner_state);
 }
@@ -920,8 +906,6 @@ macro_statement(R) ::= OPEN_DELIMITER MACRO IDENTIFIER(I) PARENTHESES_OPEN macro
 	R = phvolt_ret_macro_statement(I, P, T, status->scanner_state);
 }
 
-%destructor macro_parameters { zval_ptr_dtor($$); efree($$); }
-
 macro_parameters(R) ::= macro_parameters(L) COMMA macro_parameter(I) . {
 	R = phvolt_ret_zval_list(L, I);
 }
@@ -929,8 +913,6 @@ macro_parameters(R) ::= macro_parameters(L) COMMA macro_parameter(I) . {
 macro_parameters(R) ::= macro_parameter(I) . {
 	R = phvolt_ret_zval_list(NULL, I);
 }
-
-%destructor macro_parameter { zval_ptr_dtor($$); efree($$); }
 
 macro_parameter(R) ::= IDENTIFIER(I) . {
 	R = phvolt_ret_macro_parameter(I, NULL, status->scanner_state);
@@ -964,8 +946,6 @@ macro_parameter_default(R) ::= TRUE . {
 	R = phvolt_ret_literal_zval(PHVOLT_T_TRUE, NULL, status->scanner_state);
 }
 
-%destructor macro_call_statement { zval_ptr_dtor($$); efree($$); }
-
 macro_call_statement(R) ::= OPEN_DELIMITER CALL expr(E) PARENTHESES_OPEN argument_list(L) PARENTHESES_CLOSE CLOSE_DELIMITER statement_list(C) OPEN_DELIMITER ENDCALL CLOSE_DELIMITER . {
 	R = phvolt_ret_macro_call_statement(E, L, C, status->scanner_state);
 }
@@ -974,19 +954,13 @@ macro_call_statement(R) ::= OPEN_DELIMITER CALL expr(E) PARENTHESES_OPEN PARENTH
 	R = phvolt_ret_macro_call_statement(E, NULL, NULL, status->scanner_state);
 }
 
-%destructor empty_statement { zval_ptr_dtor($$); efree($$); }
-
 empty_statement(R) ::= OPEN_DELIMITER CLOSE_DELIMITER . {
 	R = phvolt_ret_empty_statement(status->scanner_state);
 }
 
-%destructor echo_statement { zval_ptr_dtor($$); efree($$); }
-
 echo_statement(R) ::= OPEN_EDELIMITER expr(E) CLOSE_EDELIMITER . {
 	R = phvolt_ret_echo_statement(E, status->scanner_state);
 }
-
-%destructor block_statement { zval_ptr_dtor($$); efree($$); }
 
 block_statement(R) ::= OPEN_DELIMITER BLOCK IDENTIFIER(I) CLOSE_DELIMITER statement_list(T) OPEN_DELIMITER ENDBLOCK CLOSE_DELIMITER . {
 	R = phvolt_ret_block_statement(I, T, status->scanner_state);
@@ -996,8 +970,6 @@ block_statement(R) ::= OPEN_DELIMITER BLOCK IDENTIFIER(I) CLOSE_DELIMITER OPEN_D
 	R = phvolt_ret_block_statement(I, NULL, status->scanner_state);
 }
 
-%destructor cache_statement { zval_ptr_dtor($$); efree($$); }
-
 cache_statement(R) ::= OPEN_DELIMITER CACHE expr(E) CLOSE_DELIMITER statement_list(T) OPEN_DELIMITER ENDCACHE CLOSE_DELIMITER . {
 	R = phvolt_ret_cache_statement(E, NULL, T, status->scanner_state);
 }
@@ -1005,8 +977,6 @@ cache_statement(R) ::= OPEN_DELIMITER CACHE expr(E) CLOSE_DELIMITER statement_li
 cache_statement(R) ::= OPEN_DELIMITER CACHE expr(E) cache_lifetime(N) CLOSE_DELIMITER statement_list(T) OPEN_DELIMITER ENDCACHE CLOSE_DELIMITER . {
 	R = phvolt_ret_cache_statement(E, N, T, status->scanner_state);
 }
-
-%destructor cache_lifetime { zval_ptr_dtor($$); efree($$); }
 
 cache_lifetime(R) ::= INTEGER(I) . {
 	R = phvolt_ret_literal_zval(PHVOLT_T_INTEGER, I, status->scanner_state);
@@ -1016,13 +986,9 @@ cache_lifetime(R) ::= IDENTIFIER(I) . {
 	R = phvolt_ret_literal_zval(PHVOLT_T_IDENTIFIER, I, status->scanner_state);
 }
 
-%destructor extends_statement { zval_ptr_dtor($$); efree($$); }
-
 extends_statement(R) ::= OPEN_DELIMITER EXTENDS STRING(S) CLOSE_DELIMITER . {
 	R = phvolt_ret_extends_statement(S, status->scanner_state);
 }
-
-%destructor include_statement { zval_ptr_dtor($$); efree($$); }
 
 include_statement(R) ::= OPEN_DELIMITER INCLUDE expr(E) CLOSE_DELIMITER . {
 	R = phvolt_ret_include_statement(E, NULL, status->scanner_state);
@@ -1032,19 +998,13 @@ include_statement(R) ::= OPEN_DELIMITER INCLUDE expr(E) WITH expr(P) CLOSE_DELIM
 	R = phvolt_ret_include_statement(E, P, status->scanner_state);
 }
 
-%destructor do_statement { zval_ptr_dtor($$); efree($$); }
-
 do_statement(R) ::= OPEN_DELIMITER DO expr(E) CLOSE_DELIMITER . {
 	R = phvolt_ret_do_statement(E, status->scanner_state);
 }
 
-%destructor return_statement { zval_ptr_dtor($$); efree($$); }
-
 return_statement(R) ::= OPEN_DELIMITER RETURN expr(E) CLOSE_DELIMITER . {
 	R = phvolt_ret_return_statement(E, status->scanner_state);
 }
-
-%destructor autoescape_statement { zval_ptr_dtor($$); efree($$); }
 
 autoescape_statement(R) ::= OPEN_DELIMITER AUTOESCAPE FALSE CLOSE_DELIMITER statement_list(T) OPEN_DELIMITER ENDAUTOESCAPE CLOSE_DELIMITER . {
 	R = phvolt_ret_autoescape_statement(0, T, status->scanner_state);
@@ -1054,25 +1014,17 @@ autoescape_statement(R) ::= OPEN_DELIMITER AUTOESCAPE TRUE CLOSE_DELIMITER state
 	R = phvolt_ret_autoescape_statement(1, T, status->scanner_state);
 }
 
-%destructor break_statement { zval_ptr_dtor($$); efree($$); }
-
 break_statement(R) ::= OPEN_DELIMITER BREAK CLOSE_DELIMITER . {
 	R = phvolt_ret_break_statement(status->scanner_state);
 }
-
-%destructor continue_statement { zval_ptr_dtor($$); efree($$); }
 
 continue_statement(R) ::= OPEN_DELIMITER CONTINUE CLOSE_DELIMITER . {
 	R = phvolt_ret_continue_statement(status->scanner_state);
 }
 
-%destructor raw_fragment { zval_ptr_dtor($$); efree($$); }
-
 raw_fragment(R) ::= RAW_FRAGMENT(F) . {
 	R = phvolt_ret_literal_zval(PHVOLT_T_RAW_FRAGMENT, F, status->scanner_state);
 }
-
-%destructor expr { zval_ptr_dtor($$); efree($$); }
 
 expr(R) ::= MINUS expr(E) . {
 	R = phvolt_ret_expr(PHVOLT_T_MINUS, NULL, E, NULL, status->scanner_state);
@@ -1286,8 +1238,6 @@ expr(R) ::= expr(E) SBRACKET_OPEN slice_offset(S) COLON slice_offset(N) SBRACKET
 	R = phvolt_ret_slice(E, S, N, status->scanner_state);
 }
 
-%destructor slice_offset { zval_ptr_dtor($$); efree($$); }
-
 slice_offset(R) ::= INTEGER(I) . {
 	R = phvolt_ret_literal_zval(PHVOLT_T_INTEGER, I, status->scanner_state);
 }
@@ -1296,8 +1246,6 @@ slice_offset(R) ::= IDENTIFIER(I) . {
 	R = phvolt_ret_literal_zval(PHVOLT_T_IDENTIFIER, I, status->scanner_state);
 }
 
-%destructor array_list { zval_ptr_dtor($$); efree($$); }
-
 array_list(R) ::= array_list(L) COMMA array_item(I) . {
 	R = phvolt_ret_zval_list(L, I);
 }
@@ -1305,8 +1253,6 @@ array_list(R) ::= array_list(L) COMMA array_item(I) . {
 array_list(R) ::= array_item(I) . {
 	R = phvolt_ret_zval_list(NULL, I);
 }
-
-%destructor array_item { zval_ptr_dtor($$); efree($$); }
 
 array_item(R) ::= STRING(S) COLON expr(E) . {
 	R = phvolt_ret_named_item(S, E, status->scanner_state);
@@ -1320,8 +1266,6 @@ expr(R) ::= function_call(F) . {
 	R = F;
 }
 
-%destructor function_call { zval_ptr_dtor($$); efree($$); }
-
 function_call(R) ::= expr(E) PARENTHESES_OPEN argument_list(L) PARENTHESES_CLOSE . {
 	R = phvolt_ret_func_call(E, L, status->scanner_state);
 }
@@ -1330,8 +1274,6 @@ function_call(R) ::= expr(E) PARENTHESES_OPEN PARENTHESES_CLOSE . {
 	R = phvolt_ret_func_call(E, NULL, status->scanner_state);
 }
 
-%destructor argument_list { zval_ptr_dtor($$); efree($$); }
-
 argument_list(R) ::= argument_list(L) COMMA argument_item(I) . {
 	R = phvolt_ret_zval_list(L, I);
 }
@@ -1339,8 +1281,6 @@ argument_list(R) ::= argument_list(L) COMMA argument_item(I) . {
 argument_list(R) ::= argument_item(I) . {
 	R = phvolt_ret_zval_list(NULL, I);
 }
-
-%destructor argument_item { zval_ptr_dtor($$); efree($$); }
 
 argument_item(R) ::= expr(E) . {
 	R = phvolt_ret_named_item(NULL, E, status->scanner_state);

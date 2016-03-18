@@ -2778,8 +2778,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _statementList){
 
 			case PHVOLT_T_BLOCK:
 				phalcon_array_fetch_str(&block_name, statement, SL("name"), PH_NOISY);
-				if (phalcon_array_isset_str(statement, SL("block_statements"))) {
-					phalcon_array_fetch_str(&block_statements, statement, SL("block_statements"), PH_NOISY);
+				if (!phalcon_array_isset_fetch_str(&block_statements, statement, SL("block_statements"))) {
+					ZVAL_NULL(&block_statements);
 				}
 
 				phalcon_return_property(&blocks, getThis(), SL("_blocks"));
@@ -2962,12 +2962,15 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 	 * The parsing must return a valid array
 	 */
 	if (Z_TYPE(intermediate) == IS_ARRAY) {
+		PHALCON_CALL_METHODW(&compilation, getThis(), "_statementlist", &intermediate, extends_mode);
+
 		/** 
 		 * Check if the template is extending another
 		 */
 		extended = phalcon_read_property(getThis(), SL("_extended"), PH_NOISY);
 		if (PHALCON_IS_TRUE(extended)) {
 			blocks = phalcon_read_property(getThis(), SL("_blocks"), PH_NOISY);
+
 			extended_blocks = phalcon_read_property(getThis(), SL("_extendedBlocks"), PH_NOISY);
 			/** 
 			 * Multiple-Inheritance is allowed
@@ -3019,7 +3022,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 						phalcon_concat_self(&final_compilation, &block_compilation);
 					}
 					PHALCON_PTR_DTOR(&block_compilation);
-					PHALCON_PTR_DTOR(&tmp);
 				} else {
 					/** 
 					 * Here the block is an already compiled text
@@ -3041,7 +3043,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Volt_Compiler, _compileSource){
 			 * In extends mode we return the template blocks instead of the compilation
 			 */
 			blocks = phalcon_read_property(getThis(), SL("_blocks"), PH_NOISY);
-
 			PHALCON_PTR_DTOR(&intermediate);
 			RETURN_CTORW(blocks);
 		}

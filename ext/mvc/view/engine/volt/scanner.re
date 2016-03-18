@@ -44,15 +44,15 @@ void phvolt_rtrim(phvolt_scanner_token *token) {
 			break;
 		}
 
-        if (i >= 0) {
-    		removed_str = emalloc(i + 1);
-    		memcpy(removed_str, token->value, i);
-    		removed_str[i] = '\0';
+		if (i >= 0) {
+			removed_str = emalloc(i + 1);
+			memcpy(removed_str, token->value, i);
+			removed_str[i] = '\0';
 
-    		efree(token->value);
-    		token->value = removed_str;
-    		token->len = i;
-        }
+			efree(token->value);
+			token->value = removed_str;
+			token->len = i;
+		}
 	}
 
 }

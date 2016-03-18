@@ -641,14 +641,10 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 						PHALCON_CALL_METHODW(&found, getThis(), "findfile", &file_name, directory, extensions, &ds);
 						PHALCON_PTR_DTOR(&file_name);
 						if (zend_is_true(&found)) {
-							PHALCON_PTR_DTOR(&ns_prefixed);
-							PHALCON_PTR_DTOR(&ns_prefix);
 							break;
 						}
 					}
 				}
-				PHALCON_PTR_DTOR(&ns_prefixed);
-				PHALCON_PTR_DTOR(&ns_prefix);
 			} ZEND_HASH_FOREACH_END();
 			PHALCON_PTR_DTOR(&namespaces);
 		}

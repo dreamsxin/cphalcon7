@@ -19,7 +19,22 @@
 
 %token_prefix PHQL_
 %token_type {phql_parser_token*}
+%token_destructor {
+	if ($$) {
+		if ($$->free_flag) {
+			efree($$->token);
+		}
+		efree($$);
+	}
+}
 %default_type {zval*}
+%default_destructor {
+	if (status) {
+		// TODO:
+	}
+	zval_ptr_dtor($$);
+	efree($$);
+}
 %extra_argument {phql_parser_status *status}
 %name phql_
 
@@ -611,20 +626,9 @@ static zval *phql_ret_func_call(phql_parser_token *name, zval *arguments, zval *
 	status->status = PHQL_PARSING_FAILED;
 }
 
-%token_destructor {
-	if ($$) {
-		if ($$->free_flag) {
-			efree($$->token);
-		}
-		efree($$);
-	}
-}
-
 program ::= query_language(Q) . {
 	status->ret = Q;
 }
-
-%destructor query_language { zval_ptr_dtor($$); efree($$);  }
 
 query_language(R) ::= select_statement(S) . {
 	R = S;
@@ -642,19 +646,13 @@ query_language(R) ::= delete_statement(D) . {
 	R = D;
 }
 
-%destructor select_statement { zval_ptr_dtor($$); efree($$);  }
-
 select_statement(R) ::= select_clause(S) where_clause(W) group_clause(G) having_clause(H) order_clause(O) select_limit_clause(L) for_update_clause(F) . {
 	R = phql_ret_select_statement(S, W, O, G, H, L, F);
 }
 
-%destructor select_clause { zval_ptr_dtor($$); efree($$);  }
-
 select_clause(R) ::= SELECT distinct_all(D) column_list(C) FROM associated_name_list(A) join_list_or_null(J) . {
 	R = phql_ret_select_clause(D, C, A, J);
 }
-
-%destructor distinct_all { zval_ptr_dtor($$); efree($$);  }
 
 distinct_all(R) ::= DISTINCT . {
 	R = phql_ret_distinct_all(1);
@@ -668,8 +666,6 @@ distinct_all(R) ::= . {
 	R = NULL;
 }
 
-%destructor column_list { zval_ptr_dtor($$); efree($$);  }
-
 column_list(R) ::= column_list(L) COMMA column_item(C) . {
 	R = phql_ret_zval_list(L, C);
 }
@@ -677,8 +673,6 @@ column_list(R) ::= column_list(L) COMMA column_item(C) . {
 column_list(R) ::= column_item(I) . {
 	R = phql_ret_zval_list(I, NULL);
 }
-
-%destructor column_item { zval_ptr_dtor($$); efree($$);  }
 
 column_item(R) ::= TIMES . {
 	R = phql_ret_column_item(PHQL_T_STARALL, NULL, NULL, NULL);
@@ -700,8 +694,6 @@ column_item(R) ::= expr(E) . {
 	R = phql_ret_column_item(PHQL_T_EXPR, E, NULL, NULL);
 }
 
-%destructor associated_name_list { zval_ptr_dtor($$); efree($$);  }
-
 associated_name_list(R) ::= associated_name_list(L) COMMA associated_name(A) . {
 	R = phql_ret_zval_list(L, A);
 }
@@ -709,8 +701,6 @@ associated_name_list(R) ::= associated_name_list(L) COMMA associated_name(A) . {
 associated_name_list(R) ::= associated_name(L) . {
 	R = L;
 }
-
-%destructor join_list_or_null { zval_ptr_dtor($$); efree($$);  }
 
 join_list_or_null(R) ::= join_list(L) . {
 	R = L;
@@ -720,8 +710,6 @@ join_list_or_null(R) ::= . {
 	R = NULL;
 }
 
-%destructor join_list { zval_ptr_dtor($$); efree($$);  }
-
 join_list(R) ::= join_list(L) join_item(I) . {
 	R = phql_ret_zval_list(L, I);
 }
@@ -730,20 +718,14 @@ join_list(R) ::= join_item(I) . {
 	R = I;
 }
 
-%destructor join_item { zval_ptr_dtor($$); efree($$);  }
-
 join_item(R) ::= join_clause(C) . {
 	R = C;
 }
-
-%destructor join_clause { zval_ptr_dtor($$); efree($$);  }
 
 /** Join + conditions + alias */
 join_clause(R) ::= join_type(T) aliased_or_qualified_name(Q) join_associated_name(A) join_conditions(C) . {
 	R = phql_ret_join_item(T, Q, A, C);
 }
-
-%destructor join_associated_name { zval_ptr_dtor($$); efree($$);  }
 
 join_associated_name(R) ::= AS IDENTIFIER(I) . {
 	R = phql_ret_qualified_name(NULL, NULL, I);
@@ -756,8 +738,6 @@ join_associated_name(R) ::= IDENTIFIER(I) . {
 join_associated_name(R) ::= . {
 	R = NULL;
 }
-
-%destructor join_type { zval_ptr_dtor($$); efree($$);  }
 
 join_type(R) ::= INNER JOIN . {
 	R = phql_ret_join_type(PHQL_T_INNERJOIN);
@@ -795,8 +775,6 @@ join_type(R) ::= JOIN . {
 	R = phql_ret_join_type(PHQL_T_INNERJOIN);
 }
 
-%destructor join_conditions { zval_ptr_dtor($$); efree($$);  }
-
 join_conditions(R) ::= ON expr(E) . {
 	R = E;
 }
@@ -804,8 +782,6 @@ join_conditions(R) ::= ON expr(E) . {
 join_conditions(R) ::= . {
 	R = NULL;
 }
-
-%destructor insert_statement { zval_ptr_dtor($$); efree($$);  }
 
 /* Insert */
 insert_statement(R) ::= insert_statement(Q) COMMA PARENTHESES_OPEN values_list(V) PARENTHESES_CLOSE . {
@@ -820,8 +796,6 @@ insert_statement(R) ::= INSERT INTO aliased_or_qualified_name(Q) PARENTHESES_OPE
 	R = phql_ret_insert_statement(Q, F, V);
 }
 
-%destructor value_list { zval_ptr_dtor($$); efree($$);  }
-
 values_list(R) ::= values_list(L) COMMA value_item(I) . {
 	R = phql_ret_zval_list(L, I);
 }
@@ -830,13 +804,9 @@ values_list(R) ::= value_item(I) . {
 	R = phql_ret_zval_list(I, NULL);
 }
 
-%destructor value_item { zval_ptr_dtor($$); efree($$);  }
-
 value_item(R) ::= expr(E) . {
 	R = E;
 }
-
-%destructor field_list { zval_ptr_dtor($$); efree($$);  }
 
 field_list(R) ::= field_list(L) COMMA field_item(I) . {
 	R = phql_ret_zval_list(L, I);
@@ -846,27 +816,19 @@ field_list(R) ::= field_item(I) . {
 	R = phql_ret_zval_list(I, NULL);
 }
 
-%destructor field_item { zval_ptr_dtor($$); efree($$);  }
-
 field_item(R) ::= IDENTIFIER(I) . {
 	R = phql_ret_qualified_name(NULL, NULL, I);
 }
 
 /* Update */
 
-%destructor update_statement { zval_ptr_dtor($$); efree($$);  }
-
 update_statement(R) ::= update_clause(U) where_clause(W) limit_clause(L) . {
 	R = phql_ret_update_statement(U, W, L);
 }
 
-%destructor update_clause { zval_ptr_dtor($$); efree($$);  }
-
 update_clause(R) ::= UPDATE associated_name(A) SET update_item_list(U) . {
 	R = phql_ret_update_clause(A, U);
 }
-
-%destructor update_item_list { zval_ptr_dtor($$); efree($$);  }
 
 update_item_list(R) ::= update_item_list(L) COMMA update_item(I) . {
 	R = phql_ret_zval_list(L, I);
@@ -876,13 +838,9 @@ update_item_list(R) ::= update_item(I) . {
 	R = I;
 }
 
-%destructor update_item { zval_ptr_dtor($$); efree($$);  }
-
 update_item(R) ::= qualified_name(Q) EQUALS new_value(N) . {
 	R = phql_ret_update_item(Q, N);
 }
-
-%destructor new_value { zval_ptr_dtor($$); efree($$);  }
 
 new_value(R) ::= expr(E) . {
 	R = E;
@@ -890,19 +848,13 @@ new_value(R) ::= expr(E) . {
 
 /* Delete */
 
-%destructor delete_statement { zval_ptr_dtor($$); efree($$);  }
-
 delete_statement(R) ::= delete_clause(D) where_clause(W) limit_clause(L) . {
 	R = phql_ret_delete_statement(D, W, L);
 }
 
-%destructor delete_clause { zval_ptr_dtor($$); efree($$);  }
-
 delete_clause(R) ::= DELETE FROM associated_name(A) . {
 	R = phql_ret_delete_clause(A);
 }
-
-%destructor associated_name { zval_ptr_dtor($$); efree($$);  }
 
 associated_name(R) ::= aliased_or_qualified_name(Q) AS IDENTIFIER(I) . {
 	R = phql_ret_assoc_name(Q, I);
@@ -916,13 +868,9 @@ associated_name(R) ::= aliased_or_qualified_name(Q) . {
 	R = phql_ret_assoc_name(Q, NULL);
 }
 
-%destructor aliased_or_qualified_name { zval_ptr_dtor($$); efree($$);  }
-
 aliased_or_qualified_name(R) ::= qualified_name(Q) . {
 	R = Q;
 }
-
-%destructor where_clause { zval_ptr_dtor($$); efree($$);  }
 
 where_clause(R) ::= WHERE expr(E) . {
 	R = E;
@@ -932,8 +880,6 @@ where_clause(R) ::= . {
 	R = NULL;
 }
 
-%destructor order_clause { zval_ptr_dtor($$); efree($$);  } 
-
 order_clause(R) ::= ORDER BY order_list(O) . {
 	R = O;
 }
@@ -942,8 +888,6 @@ order_clause(R) ::= . {
 	R = NULL;
 }
 
-%destructor order_list { zval_ptr_dtor($$); efree($$);  }
-
 order_list(R) ::= order_list(L) COMMA order_item(I) . {
 	R = phql_ret_zval_list(L, I);
 }
@@ -951,8 +895,6 @@ order_list(R) ::= order_list(L) COMMA order_item(I) . {
 order_list(R) ::= order_item(I) . {
 	R = I;
 }
-
-%destructor order_item { zval_ptr_dtor($$); efree($$);  }
 
 order_item(R) ::= expr(O) . {
 	R = phql_ret_order_item(O, 0);
@@ -966,8 +908,6 @@ order_item(R) ::= expr(O) DESC . {
 	R = phql_ret_order_item(O, PHQL_T_DESC);
 }
 
-%destructor group_clause { zval_ptr_dtor($$); efree($$);  }
-
 group_clause(R) ::= GROUP BY group_list(G) . {
 	R = G;
 }
@@ -975,8 +915,6 @@ group_clause(R) ::= GROUP BY group_list(G) . {
 group_clause(R) ::= . {
 	R = NULL;
 }
-
-%destructor group_list { zval_ptr_dtor($$); efree($$);  }
 
 group_list(R) ::= group_list(L) COMMA group_item(I) . {
 	R = phql_ret_zval_list(L, I);
@@ -986,13 +924,9 @@ group_list(R) ::= group_item(I) . {
 	R = I;
 }
 
-%destructor group_item { zval_ptr_dtor($$); efree($$);  }
-
 group_item(R) ::= expr(E) . {
 	R = E;
 }
-
-%destructor having_clause { zval_ptr_dtor($$); efree($$);  }
 
 having_clause(R) ::= HAVING expr(E) . {
 	R = E;
@@ -1002,8 +936,6 @@ having_clause(R) ::= . {
 	R = NULL;
 }
 
-%destructor for_update_clause { zval_ptr_dtor($$); efree($$);  }
-
 for_update_clause(R) ::= FOR UPDATE . {
 	R = phql_ret_for_update_clause();
 }
@@ -1011,8 +943,6 @@ for_update_clause(R) ::= FOR UPDATE . {
 for_update_clause(R) ::= . {
 	R = NULL;
 }
-
-%destructor select_limit_clause { zval_ptr_dtor($$); efree($$);  }
 
 select_limit_clause(R) ::= LIMIT integer_or_placeholder(I) . {
 	R = phql_ret_limit_clause(I, NULL);
@@ -1030,8 +960,6 @@ select_limit_clause(R) ::= . {
 	R = NULL;
 }
 
-%destructor limit_clause { zval_ptr_dtor($$); efree($$);  }
-
 limit_clause(R) ::= LIMIT integer_or_placeholder(I) . {
 	R = phql_ret_limit_clause(I, NULL);
 }
@@ -1039,8 +967,6 @@ limit_clause(R) ::= LIMIT integer_or_placeholder(I) . {
 limit_clause(R) ::= . {
 	R = NULL;
 }
-
-%destructor integer_or_placeholder { zval_ptr_dtor($$); efree($$);  }
 
 integer_or_placeholder(R) ::= INTEGER(I) . {
 	R = phql_ret_literal_zval(PHQL_T_INTEGER, I);
@@ -1057,8 +983,6 @@ integer_or_placeholder(R) ::= NPLACEHOLDER(P) . {
 integer_or_placeholder(R) ::= SPLACEHOLDER(P) . {
 	R = phql_ret_placeholder_zval(PHQL_T_SPLACEHOLDER, P);
 }
-
-%destructor expr { zval_ptr_dtor($$); efree($$);  }
 
 expr(R) ::= MINUS expr(E) . {
 	R = phql_ret_expr(PHQL_T_MINUS, NULL, E);
@@ -1208,8 +1132,6 @@ expr(R) ::= CASE expr(E) when_clauses(W) END . {
 	R = phql_ret_expr(PHQL_T_CASE, E, W);
 }
 
-%destructor when_clauses { zval_ptr_dtor($$); efree($$);  }
-
 when_clauses(R) ::= when_clauses(L) when_clause(W) . {
 	R = phql_ret_zval_list(L, W);
 }
@@ -1226,8 +1148,6 @@ when_clause(R) ::= ELSE expr(E) . {
 	R = phql_ret_expr(PHQL_T_ELSE, E, NULL);
 }
 
-%destructor function_call { zval_ptr_dtor($$); efree($$);  }
-
 expr(R) ::= function_call(F) . {
 	R = F;
 }
@@ -1235,8 +1155,6 @@ expr(R) ::= function_call(F) . {
 function_call(R) ::= IDENTIFIER(I) PARENTHESES_OPEN distinct_or_null(D) argument_list_or_null(L) PARENTHESES_CLOSE . {
 	R = phql_ret_func_call(I, L, D);
 }
-
-%destructor distinct_or_null { zval_ptr_dtor($$); efree($$);  }
 
 distinct_or_null(R) ::= DISTINCT . {
 	R = phql_ret_distinct();
@@ -1246,8 +1164,6 @@ distinct_or_null(R) ::=  . {
 	R = NULL;
 }
 
-%destructor argument_list_or_null { zval_ptr_dtor($$); efree($$);  }
-
 argument_list_or_null(R) ::= argument_list(L) . {
 	R = L;
 }
@@ -1256,8 +1172,6 @@ argument_list_or_null(R) ::= . {
 	R = NULL;
 }
 
-%destructor argument_list { zval_ptr_dtor($$); efree($$);  }
-
 argument_list(R) ::= argument_list(L) COMMA argument_item(I) . {
 	R = phql_ret_zval_list(L, I);
 }
@@ -1265,8 +1179,6 @@ argument_list(R) ::= argument_list(L) COMMA argument_item(I) . {
 argument_list(R) ::= argument_item(I) . {
 	R = phql_ret_zval_list(I, NULL);
 }
-
-%destructor argument_item { zval_ptr_dtor($$); efree($$);  }
 
 argument_item(R) ::= TIMES . {
 	R = phql_ret_column_item(PHQL_T_STARALL, NULL, NULL, NULL);
@@ -1346,8 +1258,6 @@ expr(R) ::= SPLACEHOLDER(P) . {
 expr(R) ::= BPLACEHOLDER(P) . {
 	R = phql_ret_placeholder_zval(PHQL_T_BPLACEHOLDER, P);
 }
-
-%destructor qualified_name { zval_ptr_dtor($$); efree($$);  }
 
 qualified_name(R) ::= IDENTIFIER(A) COLON IDENTIFIER(B) DOT IDENTIFIER(C) . {
 	R = phql_ret_qualified_name(A, B, C);

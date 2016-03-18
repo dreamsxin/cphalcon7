@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 					PHALCON_CPY_WRT_CTOR(&new_value, &array_value);
 				} else {
 					PHALCON_CALL_METHODW(&filter_value, getThis(), "_sanitize", &new_value, filter);
-					PHALCON_CPY_WRT_CTOR(&new_value, &array_value);
+					PHALCON_CPY_WRT_CTOR(&new_value, &filter_value);
 				}
 			} ZEND_HASH_FOREACH_END();
 

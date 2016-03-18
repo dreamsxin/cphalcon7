@@ -1307,7 +1307,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getColumnDefinition){
  */
 PHP_METHOD(Phalcon_Db_Adapter, listTables){
 
-	zval *schema_name = NULL, *dialect, sql, fetch_num, tables, *table;
+	zval *schema_name = NULL, *dialect, sql = {}, fetch_num = {}, tables = {}, *table;
 
 	phalcon_fetch_params(0, 0, 1, &schema_name);
 

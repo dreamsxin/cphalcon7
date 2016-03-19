@@ -104,10 +104,10 @@ void phalcon_fast_strtolower(zval *return_value, zval *str)
 	if (Z_TYPE_P(str) != IS_STRING) {
 		use_copy = zend_make_printable_zval(str, return_value);
 		if (!use_copy) {
-			PHALCON_CPY_WRT(return_value, str);
+			PHALCON_CPY_WRT_CTOR(return_value, str);
 		}
 	} else {
-		PHALCON_CPY_WRT(return_value, str);
+		PHALCON_CPY_WRT_CTOR(return_value, str);
 	}
 
 	zend_str_tolower(Z_STRVAL_P(return_value), Z_STRLEN_P(return_value));

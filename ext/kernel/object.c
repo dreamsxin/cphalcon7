@@ -126,7 +126,7 @@ void phalcon_get_class(zval *result, const zval *object, int lower) {
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(object);
-		ZVAL_STR(result, zend_string_copy(ce->name));
+		ZVAL_STR(result, zend_string_dup(ce->name, 0));
 
 		if (lower) {
 			phalcon_strtolower_inplace(result);
@@ -265,7 +265,7 @@ void phalcon_get_called_class(zval *return_value)
 	zend_execute_data *ex = EG(current_execute_data);
 	zend_class_entry *called_scope = ex->called_scope;
 	if (called_scope) {
-		ZVAL_STR(return_value, zend_string_copy(called_scope->name));
+		ZVAL_STR(return_value, zend_string_dup(called_scope->name, 0));
 	}
 
 	if (!EG(scope))  {
@@ -282,7 +282,7 @@ void phalcon_get_parent_class(zval *result, const zval *object, int lower) {
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(object);
 		if (ce && ce->parent) {
-			ZVAL_STR(result, zend_string_copy(ce->parent->name));
+			ZVAL_STR(result, zend_string_dup(ce->parent->name, 0));
 
 			if (lower) {
 				zend_str_tolower(Z_STRVAL_P(result), Z_STRLEN_P(result));

@@ -63,14 +63,15 @@ void phalcon_filter_alphanum(zval *return_value, zval *param){
 	}
 
 	if (use_copy) {
-		PHALCON_PTR_DTOR(param);
+		zval_ptr_dtor(param);
 	}
 
 	smart_str_0(&filtered_str);
 
 	if (filtered_str.s) {
-		RETURN_STR(filtered_str.s);
+		RETURN_NEW_STR(filtered_str.s);
 	} else {
+		smart_str_free(&filtered_str);
 		RETURN_EMPTY_STRING();
 	}
 }
@@ -104,14 +105,15 @@ void phalcon_filter_identifier(zval *return_value, zval *param){
 	}
 
 	if (use_copy) {
-		PHALCON_PTR_DTOR(param);
+		zval_ptr_dtor(param);
 	}
 
 	smart_str_0(&filtered_str);
 
 	if (filtered_str.s) {
-		RETURN_STR(filtered_str.s);
+		RETURN_NEW_STR(filtered_str.s);
 	} else {
+		smart_str_free(&filtered_str);
 		RETURN_EMPTY_STRING();
 	}
 
@@ -310,14 +312,15 @@ void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_ch
 	}
 
 	if (use_copy) {
-		PHALCON_PTR_DTOR(param);
+		zval_ptr_dtor(param);
 	}
 
 	smart_str_0(&escaped_str);
 
 	if (escaped_str.s) {
-		RETURN_STR(escaped_str.s);
+		RETURN_NEW_STR(escaped_str.s);
 	} else {
+		smart_str_free(&escaped_str);
 		RETURN_EMPTY_STRING();
 	}
 

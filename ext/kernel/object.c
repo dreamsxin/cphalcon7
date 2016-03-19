@@ -68,7 +68,6 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 	va_end(ap);
 
 	phalcon_update_static_property_ce(ce, property, property_length, &arr);
-	PHALCON_PTR_DTOR(&arr);
 	return SUCCESS;
 }
 
@@ -514,7 +513,6 @@ int phalcon_clone(zval *destination, zval *obj) {
 			if (!EG(exception)) {
 				ZVAL_OBJ(destination, clone_call(obj));
 				if (EG(exception)) {
-					PHALCON_PTR_DTOR(destination);
 					ZVAL_NULL(destination);
 				}
 			}
@@ -697,7 +695,6 @@ int phalcon_update_property_str(zval *object, const char *property_name, uint32_
 
 	ZVAL_STRINGL(&value, str, str_length);
 	status = phalcon_update_property_zval(object, property_name, property_length, &value);
-	PHALCON_PTR_DTOR(&value);
 	return status;
 }
 
@@ -835,13 +832,11 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 
 	/** Convert the value to array if not is an array */
 	if (Z_TYPE(property_value) != IS_ARRAY) {
-		PHALCON_PTR_DTOR(&property_value);
 		convert_to_array(&property_value);
 	}
 
 	phalcon_array_update_zval(&property_value, index, value, PH_COPY);
 	phalcon_update_property_zval(object, property, property_length, &property_value);
-	PHALCON_PTR_DTOR(&property_value);
 	return SUCCESS;
 }
 
@@ -881,7 +876,6 @@ int phalcon_update_property_array_str(zval *object, const char *property, uint32
 
 	ZVAL_STRINGL(&tmp, index, index_length);
 	status = phalcon_update_property_array(object, property, property_length, &tmp, value);
-	PHALCON_PTR_DTOR(&tmp);
 	return status;
 }
 
@@ -991,7 +985,6 @@ int phalcon_update_property_empty_array(zval *object, const char *property_name,
 	array_init(&empty_array);
 
 	status = phalcon_update_property_zval(object, property_name, property_length, &empty_array);
-	PHALCON_PTR_DTOR(&empty_array);
 	return status;
 }
 
@@ -1300,10 +1293,7 @@ int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *
 	}
 
 	if (!phalcon_array_isset_fetch(fetched, &property_value, index)) {
-		PHALCON_PTR_DTOR(&property_value);
 		return 0;
 	}
-
-	PHALCON_PTR_DTOR(&property_value);
 	return 1;
 }

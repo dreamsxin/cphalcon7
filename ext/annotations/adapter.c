@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 	 */
 	if (Z_TYPE_P(class_name) == IS_OBJECT) {
 		ce = Z_OBJCE_P(class_name);
-		ZVAL_NEW_STR(&real_class_name, ce->name);
+		ZVAL_STR(&real_class_name, zend_string_dup(ce->name, 0));
 	} else {
 		PHALCON_CPY_WRT(&real_class_name, class_name);
 	}

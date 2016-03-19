@@ -184,7 +184,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 						if (!Z_ISREF_P(*ptr) || Z_TYPE_P(*ptr) == IS_OBJECT) {
 							Z_DELREF_P(*ptr);
 						} else {
-							PHALCON_PTR_DTOR(*ptr);
+							zval_ptr_dtor(*ptr);
 							efree(*ptr);
 							*ptr = NULL;
 						}
@@ -192,7 +192,7 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 						Z_DELREF_P(*ptr);
 					}
 				} else {
-					PHALCON_PTR_DTOR(*ptr);
+					zval_ptr_dtor(*ptr);
 					efree(*ptr);
 					*ptr = NULL;
 				}

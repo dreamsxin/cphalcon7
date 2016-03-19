@@ -59,7 +59,7 @@ int phalcon_require_ret(zval *result, const char *require_path)
 			destroy_op_array(new_op_array);
 			efree_size(new_op_array, sizeof(zend_op_array));
 			if (dtor) {
-				PHALCON_PTR_DTOR(result);
+				zval_ptr_dtor(result);
 			}
 
 			return SUCCESS;

@@ -846,9 +846,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				}
 
 				phalcon_update_property_this(getThis(), SL("_matchedRoute"), route);
-
 				PHALCON_PTR_DTOR(&pattern);
-				PHALCON_PTR_DTOR(&matches);
 				PHALCON_PTR_DTOR(&paths);
 				break;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
@@ -862,15 +860,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, route);
 			ZVAL_UNREF(route);
 		}
-
-		PHALCON_PTR_DTOR(&pattern);
-		PHALCON_PTR_DTOR(&matches);
-		PHALCON_PTR_DTOR(&paths);
 	} ZEND_HASH_FOREACH_END();
-
-	PHALCON_PTR_DTOR(&handled_uri);
-	PHALCON_PTR_DTOR(&current_host_name);
-	PHALCON_PTR_DTOR(&request);
 
 	/**
 	 * Update the wasMatched property indicating if the route was matched
@@ -1191,7 +1181,7 @@ static int phalcon_router_call_convert(zval *pDest, int num_args, va_list args, 
 
 	route = va_arg(args, zval*);
 	if (hash_key->key->len) {
-		ZVAL_NEW_STR(&key, hash_key->key);
+		ZVAL_STR(&key, zend_string_dup(hash_key->key, 0));
 	}
 	else {
 		ZVAL_LONG(&key, hash_key->h);

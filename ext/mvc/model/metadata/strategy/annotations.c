@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 		return;
 	}
 
-	ZVAL_STRING(&service, "annotations");
+	PHALCON_STR(&service, "annotations");
 
 	phalcon_get_class(&class_name, model, 0);
 
@@ -132,15 +132,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 
 	ZVAL_FALSE(&identity_field);
 
-	ZVAL_STRING(&column_annot_name, "Column");
-	ZVAL_STRING(&primary_annot_name, "Primary");
-	ZVAL_STRING(&id_annot_name, "Identity");
-	ZVAL_STRING(&column_map_name, "column");
-	ZVAL_STRING(&column_type_name, "type");
-	ZVAL_STRING(&column_bytes_name, "bytes");
-	ZVAL_STRING(&column_scale_name, "scale");
-	ZVAL_STRING(&column_default_name, "default");
-	ZVAL_STRING(&column_nullable_name, "nullable");
+	PHALCON_STR(&column_annot_name, "Column");
+	PHALCON_STR(&primary_annot_name, "Primary");
+	PHALCON_STR(&id_annot_name, "Identity");
+	PHALCON_STR(&column_map_name, "column");
+	PHALCON_STR(&column_type_name, "type");
+	PHALCON_STR(&column_bytes_name, "bytes");
+	PHALCON_STR(&column_scale_name, "scale");
+	PHALCON_STR(&column_default_name, "default");
+	PHALCON_STR(&column_nullable_name, "nullable");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(properties_annotations), idx, str_key, prop_annotations) {
 		zval property = {}, has_annotation = {}, column_annotation = {}, real_property = {}, feature = {};
@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		return;
 	}
 
-	ZVAL_STRING(&service, "annotations");
+	PHALCON_STR(&service, "annotations");
 
 	PHALCON_CALL_METHODW(&annotations, dependency_injector, "get", &service);
 
@@ -326,8 +326,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	array_init(&ordered_column_map);
 	array_init(&reversed_column_map);
 
-	ZVAL_STRING(&column_annot_name, "Column");
-	ZVAL_STRING(&column_map_name, "column");
+	PHALCON_STR(&column_annot_name, "Column");
+	PHALCON_STR(&column_map_name, "column");
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(properties_annotations), idx, str_key, prop_annotations) {
 		zval property = {}, has_annotation = {}, column_annotation = {}, real_property = {};

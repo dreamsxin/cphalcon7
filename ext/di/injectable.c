@@ -184,6 +184,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
+		PHALCON_PTR_DTOR(&event_parts);
 	} else {
 		PHALCON_CPY_WRT(&name, &lower);
 	}
@@ -195,6 +196,9 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 		PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(name), data);
 	}
 
+	PHALCON_PTR_DTOR(&name);
+	PHALCON_PTR_DTOR(&lower);
+
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 
 	if (Z_TYPE(events_manager) != IS_NULL) {
@@ -205,8 +209,11 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
 		 */
 		PHALCON_CALL_METHODW(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
 		if (PHALCON_IS_FALSE(&status)) {
+			PHALCON_PTR_DTOR(&events_manager);
 			RETURN_FALSE;
 		}
+		PHALCON_PTR_DTOR(&status);
+		PHALCON_PTR_DTOR(&events_manager);
 	}
 
 	RETURN_TRUE;
@@ -239,6 +246,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
+		PHALCON_PTR_DTOR(&event_parts);
 	} else {
 		PHALCON_CPY_WRT(&name, &lower);
 	}
@@ -253,6 +261,9 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 		}
 	}
 
+	PHALCON_PTR_DTOR(&name);
+	PHALCON_PTR_DTOR(&lower);
+
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 	if (Z_TYPE(events_manager) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
@@ -262,9 +273,13 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 		 */
 		PHALCON_CALL_METHODW(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
 		if (PHALCON_IS_FALSE(&status)) {
+			PHALCON_PTR_DTOR(&events_manager);
 			RETURN_FALSE;
 		}
+		PHALCON_PTR_DTOR(&events_manager);
 	}
+
+	PHALCON_PTR_DTOR(&status);
 
 	RETURN_TRUE;
 }
@@ -334,16 +349,16 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	 * Accessing the persistent property will create a session bag in any class
 	 */
 	if (Z_STRLEN_P(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(property_name), "persistent", sizeof("persistent")-1)) {
-		const char *cn = Z_OBJCE_P(getThis())->name->val;
-
-		ZVAL_STRING(&class_name, cn);
+		PHALCON_STR(&class_name, Z_OBJCE_P(getThis())->name->val);
 
 		array_init_size(&arguments, 1);
 		add_next_index_zval(&arguments, &class_name);
 
-		ZVAL_STRING(&service, "sessionBag");
-
+		PHALCON_STR(&service, "sessionBag");
 		PHALCON_CALL_METHODW(&result, &dependency_injector, "get", &service, &arguments);
+		PHALCON_PTR_DTOR(&service);
+		PHALCON_PTR_DTOR(&arguments);
+	
 		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), &result);
 		RETURN_CTORW(&result);
 	}

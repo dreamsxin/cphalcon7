@@ -429,6 +429,7 @@ PHP_METHOD(Phalcon_Mvc_View, setBasePath){
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_update_property_this(getThis(), SL("_basePath"), &paths);
+		PHALCON_PTR_DTOR(&paths);
 	} else {
 		phalcon_add_trailing_slash(base_path);
 		phalcon_update_property_this(getThis(), SL("_basePath"), base_path);

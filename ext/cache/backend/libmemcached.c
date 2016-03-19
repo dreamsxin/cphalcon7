@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, _connect){
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&options, getThis(), SL("_options"));
-	ce0 = zend_fetch_class(SSL("Memcached"), ZEND_FETCH_CLASS_AUTO);
+	ce0 = phalcon_fetch_str_class(SL("Memcached"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&memcache, ce0);
 	if (phalcon_has_constructor(&memcache)) {

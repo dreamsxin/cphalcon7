@@ -1513,7 +1513,7 @@ PHP_METHOD(Phalcon_Tag, setTitleSeparator){
  */
 PHP_METHOD(Phalcon_Tag, appendTitle){
 
-	zval *title, *document_title, *document_title_separator, s;
+	zval *title, *document_title, *document_title_separator, s = {};
 
 	phalcon_fetch_params(0, 1, 0, &title);
 
@@ -1531,7 +1531,7 @@ PHP_METHOD(Phalcon_Tag, appendTitle){
  */
 PHP_METHOD(Phalcon_Tag, prependTitle){
 
-	zval *title, *document_title, *document_title_separator, s;
+	zval *title, *document_title, *document_title_separator, s = {};
 
 	phalcon_fetch_params(0, 1, 0, &title);
 

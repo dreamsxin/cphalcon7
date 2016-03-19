@@ -324,7 +324,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 
 	array_init(return_value);
 
-	apciterator_ce = zend_fetch_class(SSL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
+	apciterator_ce = phalcon_fetch_str_class(SL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&iterator, apciterator_ce);
 	assert(phalcon_has_constructor(&iterator));
@@ -409,7 +409,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 
 	ZVAL_STRING(&prefix_pattern, "/^_PHCA/");	
 
-	apciterator_ce = zend_fetch_class(SSL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
+	apciterator_ce = phalcon_fetch_str_class(SL("APCIterator"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&iterator, apciterator_ce);
 	assert(phalcon_has_constructor(&iterator));
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 
 		it->funcs->get_current_key(it, &itkey);
 		if (likely(Z_TYPE(itkey) == IS_STRING)) {
-			ZVAL_NEW_STR(&key, Z_STR(itkey));
+			ZVAL_STR(&key, Z_STR(itkey));
 			PHALCON_CALL_FUNCTION_FLAG(flag, NULL, "apc_delete", &key);
 			if (FAILURE == flag) {
 				break;

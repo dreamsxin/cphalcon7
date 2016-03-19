@@ -484,7 +484,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 		escape_char = &PHALCON_GLOBAL(z_null);
 	}
 
-	ZVAL_STRING(return_value, "CASE ");
+	PHALCON_STR(return_value, "CASE ");
 
 	phalcon_array_fetch_str(&expr, expression, SL("expr"), PH_NOISY);
 
@@ -723,9 +723,11 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			}
 
 			phalcon_array_append(&selected_columns, &column_alias_sql, PH_COPY);
+			PHALCON_PTR_DTOR(&column_alias_sql);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&columns_sql, SL(", "), &selected_columns);
+		PHALCON_PTR_DTOR(&selected_columns);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&columns_sql, &columns);
 	}
@@ -740,9 +742,11 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			zval sql_table = {};
 			PHALCON_CALL_METHODW(&sql_table, getThis(), "getsqltable", table, &escape_char);
 			phalcon_array_append(&selected_tables, &sql_table, PH_COPY);
+			PHALCON_PTR_DTOR(&sql_table);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&tables_sql, SL(", "), &selected_tables);
+		PHALCON_PTR_DTOR(&selected_tables);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&tables_sql, &tables);
 	}
@@ -750,17 +754,17 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	if (phalcon_array_isset_fetch_str(&distinct, definition, SL("distinct"))) {
 		if (Z_TYPE(distinct) == IS_LONG) {
 			if (Z_LVAL(distinct) == 0) {
-				ZVAL_STRING(&sql, "SELECT ALL ");
+				PHALCON_STR(&sql, "SELECT ALL ");
 			} else if (Z_LVAL(distinct) == 1) {
-				ZVAL_STRING(&sql, "SELECT DISTINCT ");
+				PHALCON_STR(&sql, "SELECT DISTINCT ");
 			} else {
-				ZVAL_STRING(&sql, "SELECT ");
+				PHALCON_STR(&sql, "SELECT ");
 			}
 		} else {
-			ZVAL_STRING(&sql, "SELECT ");
+			PHALCON_STR(&sql, "SELECT ");
 		}
 	} else {
-		ZVAL_STRING(&sql, "SELECT ");
+		PHALCON_STR(&sql, "SELECT ");
 	}
 
 	PHALCON_SCONCAT_VSV(&sql, &columns_sql, " FROM ", &tables_sql);
@@ -778,8 +782,6 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 			PHALCON_CALL_METHODW(&sql_table, getThis(), "getsqltable", &source, &escape_char);
 
-			phalcon_array_append(&selected_tables, &sql_table, PH_COPY);
-
 			PHALCON_CONCAT_SVSV(&sql_join, " ", &type, " JOIN ", &sql_table);
 
 			/**
@@ -793,13 +795,18 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 						zval join_expression = {};
 						PHALCON_CALL_METHODW(&join_expression, getThis(), "getsqlexpression", join_condition, &escape_char);
 						phalcon_array_append(&join_expressions, &join_expression, PH_COPY);
+						PHALCON_PTR_DTOR(&join_expression);
 					} ZEND_HASH_FOREACH_END();
 
 					phalcon_fast_join_str(&join_conditions, SL(" AND "), &join_expressions);
 					PHALCON_SCONCAT_SVS(&sql_join, " ON ", &join_conditions, " ");
+					PHALCON_PTR_DTOR(&join_conditions);
+					PHALCON_PTR_DTOR(&join_expressions);
 				}
+				PHALCON_PTR_DTOR(&join_conditions_array);
 			}
 			phalcon_concat_self(&sql, &sql_join);
+			PHALCON_PTR_DTOR(&sql_join);
 		} ZEND_HASH_FOREACH_END();
 
 	}
@@ -834,6 +841,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	if (phalcon_array_isset_fetch_str(&having_conditions, definition, SL("having"))) {
 		PHALCON_CALL_METHODW(&having_expression, getThis(), "getsqlexpression", &having_conditions, &escape_char);
 		PHALCON_SCONCAT_SV(&sql, " HAVING ", &having_expression);
+		PHALCON_PTR_DTOR(&having_expression);
 	}
 
 	/* Check for a ORDER clause */

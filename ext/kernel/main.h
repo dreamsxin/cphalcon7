@@ -132,6 +132,17 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 	} \
 	return;
 
+#define RETURN_CTOR_DTOR(var) { \
+		RETVAL_ZVAL(var, 1, 1); \
+	} \
+	PHALCON_MM_RESTORE(); \
+	return;
+
+#define RETURN_CTOR_DTORW(var) { \
+		RETVAL_ZVAL(var, 1, 1); \
+	} \
+	return;
+
 /** Return this pointer */
 #define RETURN_THIS() { \
 		RETVAL_ZVAL(getThis(), 1, 0); \

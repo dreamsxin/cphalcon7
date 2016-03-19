@@ -119,6 +119,7 @@ static void phql_parse_with_token(void* phql_parser, int opcode, int parsercode,
 	pToken->token = token->value;
 	pToken->token_len = token->len;
 	pToken->free_flag = 1;
+
 	phql_(phql_parser, parsercode, pToken, parser_status);
 
 	token->value = NULL;
@@ -128,13 +129,12 @@ static void phql_parse_with_token(void* phql_parser, int opcode, int parsercode,
 /**
  * Creates an error message when it's triggered by the scanner
  */
-static void phql_scanner_error_msg(phql_parser_status *parser_status, zval **error_msg){
+static void phql_scanner_error_msg(phql_parser_status *parser_status, zval *error_msg){
 
 	char *error = NULL, *error_part;
 	unsigned int length;
 	phql_scanner_state *state = parser_status->scanner_state;
 
-	PHALCON_ALLOC_INIT_ZVAL(*error_msg);
 	if (state->start) {
 		length = 64 + state->start_length + parser_status->phql_length;
 		error = emalloc(sizeof(char) * length);
@@ -146,9 +146,9 @@ static void phql_scanner_error_msg(phql_parser_status *parser_status, zval **err
 			snprintf(error, length, "Scanning error before '%s' when parsing: %s (%d)", state->start, parser_status->phql, parser_status->phql_length);
 		}
 		error[length - 1] = '\0';
-		ZVAL_STRING(*error_msg, error);
+		PHALCON_STR(error_msg, error);
 	} else {
-		ZVAL_STRING(*error_msg, "Scanning error near to EOF");
+		PHALCON_STR(error_msg, "Scanning error near to EOF");
 	}
 
 	if (error) {
@@ -161,14 +161,12 @@ static void phql_scanner_error_msg(phql_parser_status *parser_status, zval **err
  */
 int phql_parse_phql(zval *result, zval *phql) {
 
-	zval *error_msg = NULL;
+	zval error_msg;
 
-	ZVAL_NULL(result);
-
-	if (phql_internal_parse_phql(&result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg) == FAILURE) {
-		if (likely(error_msg != NULL)) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, Z_STRVAL_P(error_msg));
-			PHALCON_PTR_DTOR(error_msg);
+	if (phql_internal_parse_phql(result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg) == FAILURE) {
+		if (Z_TYPE(error_msg) > IS_NULL) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, Z_STRVAL(error_msg));
+			PHALCON_PTR_DTOR(&error_msg);
 		}
 		else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "There was an error parsing PHQL");
@@ -183,7 +181,7 @@ int phql_parse_phql(zval *result, zval *phql) {
 /**
  * Executes a PHQL parser/tokenizer
  */
-int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length, zval **error_msg) {
+int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length, zval *error_msg) {
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 	phql_parser_status *parser_status = NULL;
@@ -195,8 +193,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	zval unique_id = {};
 
 	if (!phql) {
-		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-		ZVAL_STRING(*error_msg, "PHQL statement cannot be NULL");
+		PHALCON_STR(error_msg, "PHQL statement cannot be NULL");
 		return FAILURE;
 	}
 
@@ -204,15 +201,14 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 	phalcon_orm_get_prepared_ast(result, &unique_id);
 
-	if (Z_TYPE_P(*result) == IS_ARRAY) {
+	if (Z_TYPE_P(result) == IS_ARRAY) {
 		PHALCON_PTR_DTOR(&unique_id);
 		return SUCCESS;
 	}
 
 	phql_parser = phql_Alloc(phql_wrapper_alloc);
 	if (unlikely(!phql_parser)) {
-		PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-		ZVAL_STRING(*error_msg, "Memory allocation error");
+		PHALCON_STR(error_msg, "Memory allocation error");
 		return FAILURE;
 	}
 
@@ -240,12 +236,10 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 
 		/* Calculate the 'start' length */
 		state->start_length = (phql + phql_length - state->start);
-
 		state->active_token = token.opcode;
 
 		/* Parse the token found */
 		switch (token.opcode) {
-
 			case PHQL_T_IGNORE:
 				break;
 
@@ -351,8 +345,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_INTEGER, PHQL_INTEGER, &token, parser_status);
 				} else {
-					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
+					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -360,8 +353,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_DOUBLE, PHQL_DOUBLE, &token, parser_status);
 				} else {
-					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
+					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -369,8 +361,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_STRING, PHQL_STRING, &token, parser_status);
 				} else {
-					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
+					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -378,8 +369,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_(phql_parser, PHQL_TRUE, NULL, parser_status);
 				} else {
-					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
+					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -387,8 +377,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				if (parser_status->enable_literals) {
 					phql_(phql_parser, PHQL_FALSE, NULL, parser_status);
 				} else {
-					PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-					ZVAL_STRING(*error_msg, "Literals are disabled in PHQL statements");
+					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -538,8 +527,7 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 				error = emalloc(error_length);
 				snprintf(error, error_length, "Scanner: Unknown opcode %c", token.opcode);
 				error[error_length - 1] = '\0';
-				PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-				ZVAL_STRING(*error_msg, error);
+				PHALCON_STR(error_msg, error);
 				efree(error);
 				break;
 		}
@@ -556,10 +544,8 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 		switch (scanner_status) {
 			case PHQL_SCANNER_RETCODE_ERR:
 			case PHQL_SCANNER_RETCODE_IMPOSSIBLE:
-				if (!*error_msg) {
-					if (!*error_msg) {
-						phql_scanner_error_msg(parser_status, error_msg);
-					}
+				if (Z_TYPE_P(error_msg) > IS_NULL) {
+					phql_scanner_error_msg(parser_status, error_msg);
 				}
 				status = FAILURE;
 				break;
@@ -574,9 +560,8 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 	if (parser_status->status != PHQL_PARSING_OK) {
 		status = FAILURE;
 		if (parser_status->syntax_error) {
-			if (!*error_msg) {
-				PHALCON_ALLOC_INIT_ZVAL(*error_msg);
-				ZVAL_STRING(*error_msg, parser_status->syntax_error);
+			if (Z_TYPE_P(error_msg) <= IS_NULL) {
+				PHALCON_STR(error_msg, parser_status->syntax_error);
 			}
 			efree(parser_status->syntax_error);
 		}
@@ -597,17 +582,17 @@ int phql_internal_parse_phql(zval **result, char *phql, unsigned int phql_length
 					}
 				}
 
-				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
-				ZVAL_NULL(parser_status->ret);
-				PHALCON_PTR_DTOR(parser_status->ret);
+				ZVAL_COPY(result, parser_status->ret);
+				efree(parser_status->ret);
+				parser_status->ret = NULL;
 
 				/**
 				 * Store the parsed definition in the cache
 				 */
-				phalcon_orm_set_prepared_ast(&unique_id, *result);
+				phalcon_orm_set_prepared_ast(&unique_id, result);
 
 			} else {
-				efree(parser_status->ret);
+				array_init(result);
 			}
 		}
 	}

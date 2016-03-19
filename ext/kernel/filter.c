@@ -63,14 +63,15 @@ void phalcon_filter_alphanum(zval *return_value, zval *param){
 	}
 
 	if (use_copy) {
-		PHALCON_PTR_DTOR(param);
+		zval_ptr_dtor(param);
 	}
 
 	smart_str_0(&filtered_str);
 
 	if (filtered_str.s) {
-		RETURN_STR(filtered_str.s);
+		RETURN_NEW_STR(filtered_str.s);
 	} else {
+		smart_str_free(&filtered_str);
 		RETURN_EMPTY_STRING();
 	}
 }
@@ -104,14 +105,15 @@ void phalcon_filter_identifier(zval *return_value, zval *param){
 	}
 
 	if (use_copy) {
-		PHALCON_PTR_DTOR(param);
+		zval_ptr_dtor(param);
 	}
 
 	smart_str_0(&filtered_str);
 
 	if (filtered_str.s) {
-		RETURN_STR(filtered_str.s);
+		RETURN_NEW_STR(filtered_str.s);
 	} else {
+		smart_str_free(&filtered_str);
 		RETURN_EMPTY_STRING();
 	}
 
@@ -310,14 +312,15 @@ void phalcon_escape_multi(zval *return_value, zval *param, const char *escape_ch
 	}
 
 	if (use_copy) {
-		PHALCON_PTR_DTOR(param);
+		zval_ptr_dtor(param);
 	}
 
 	smart_str_0(&escaped_str);
 
 	if (escaped_str.s) {
-		RETURN_STR(escaped_str.s);
+		RETURN_NEW_STR(escaped_str.s);
 	} else {
+		smart_str_free(&escaped_str);
 		RETURN_EMPTY_STRING();
 	}
 
@@ -359,7 +362,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 	zend_class_entry *ce0;
 	int i, element_length;
 
-	ce0 = zend_fetch_class(SSL("DOMDocument"), ZEND_FETCH_CLASS_AUTO);
+	ce0 = phalcon_fetch_str_class(SL("DOMDocument"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&document, ce0);
 	PHALCON_CALL_METHODW(NULL, &document, "__construct");
@@ -380,11 +383,11 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		return;
 	}
 
-	ZVAL_STRING(&tmp, "*");
+	PHALCON_STR(&tmp, "*");
 
 	PHALCON_CALL_METHODW(&elements, &document, "getelementsbytagname", &tmp);
 
-	ZVAL_STRING(&regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
+	PHALCON_STR(&regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
 
 	phalcon_return_property(&tmp, &elements, SL("length"));
 

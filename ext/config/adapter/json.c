@@ -93,17 +93,21 @@ PHP_METHOD(Phalcon_Config_Adapter_Json, read){
 	} else {
 		phalcon_return_static_property_ce(&base_path, phalcon_config_adapter_ce, SL("_basePath"));
 		PHALCON_CONCAT_VV(&config_dir_path, &base_path, file_path);
+		PHALCON_PTR_DTOR(&base_path);
 	}
 
 	phalcon_file_get_contents(&contents, &config_dir_path);
+	PHALCON_PTR_DTOR(&config_dir_path);
 
 	if (Z_TYPE(contents) == IS_STRING) {
 		if (phalcon_json_decode(&config, &contents, 1) != FAILURE) {
 			if (Z_TYPE(config) == IS_ARRAY) {
 				PHALCON_CALL_METHODW(NULL, getThis(), "val", &config);
+				PHALCON_PTR_DTOR(&config);
 			}
 		}
 	}
+	PHALCON_PTR_DTOR(&contents);
 
 	RETURN_THISW();
 }

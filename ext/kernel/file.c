@@ -331,7 +331,7 @@ void phalcon_file_get_contents(zval *return_value, zval *filename)
 	if ((contents = php_stream_copy_to_mem(stream, maxlen, 0)) != NULL) {
 		RETVAL_STR(contents);
 	} else {
-		RETVAL_FALSE;
+		RETVAL_EMPTY_STRING();
 	}
 
 	php_stream_close(stream);
@@ -397,7 +397,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 	php_stream_close(stream);
 
 	if (use_copy) {
-		PHALCON_PTR_DTOR(data);
+		zval_ptr_dtor(data);
 	}
 
 	if (numbytes < 0) {

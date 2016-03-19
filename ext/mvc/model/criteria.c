@@ -1245,7 +1245,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 
 		PHALCON_CALL_METHODW(&meta_data, dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
-		ce0 = phalcon_fetch_class(model_name);
+		ce0 = phalcon_fetch_class(model_name, ZEND_FETCH_CLASS_DEFAULT);
 
 		object_init_ex(&model, ce0);
 		if (phalcon_has_constructor(&model)) {
@@ -1565,7 +1565,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 		 */
 		PHALCON_CALL_METHODW(&meta_data, &dependency_injector, "getshared", &service_name);
 		PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
-		ce0 = phalcon_fetch_class(model);
+		ce0 = phalcon_fetch_class(model, ZEND_FETCH_CLASS_DEFAULT);
 
 		object_init_ex(&model_instance, ce0);
 		if (phalcon_has_constructor(&model_instance)) {
@@ -1934,7 +1934,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 
 	PHALCON_CALL_METHODW(&meta_data, &dependency_injector, "getshared", &service_name);
 	PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
-	ce0 = phalcon_fetch_class(model);
+	ce0 = phalcon_fetch_class(model, ZEND_FETCH_CLASS_DEFAULT);
 
 	object_init_ex(&model_instance, ce0);
 	if (phalcon_has_constructor(&model_instance)) {
@@ -2116,7 +2116,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 		 */
 		PHALCON_CALL_METHODW(&meta_data, &dependency_injector, "getshared", &service_name);
 		PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
-		ce0 = phalcon_fetch_class(model);
+		ce0 = phalcon_fetch_class(model, ZEND_FETCH_CLASS_DEFAULT);
 
 		object_init_ex(&model_instance, ce0);
 		if (phalcon_has_constructor(&model_instance)) {

@@ -70,11 +70,11 @@ void phalcon_raw_url_encode(zval *return_value, zval *url)
 	escaped = php_raw_url_encode(Z_STRVAL_P(url), Z_STRLEN_P(url));
 
 	if (use_copy) {
-		PHALCON_PTR_DTOR(url);
+		zval_ptr_dtor(url);
 	}
 
 	if (escaped->len) {
-		RETURN_STR(escaped);
+		RETURN_NEW_STR(escaped);
 	} else {
 		RETURN_NULL();
 	}

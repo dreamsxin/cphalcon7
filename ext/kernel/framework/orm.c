@@ -40,7 +40,7 @@ void phalcon_orm_destroy_cache() {
 /**
  * Obtains a prepared ast in the phalcon's superglobals
  */
-void phalcon_orm_get_prepared_ast(zval **return_value, zval *unique_id) {
+void phalcon_orm_get_prepared_ast(zval *return_value, zval *unique_id) {
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 	zval *temp_ast;
@@ -49,7 +49,7 @@ void phalcon_orm_get_prepared_ast(zval **return_value, zval *unique_id) {
 		if (phalcon_globals_ptr->orm.cache_level >= 0) {
 			if (phalcon_globals_ptr->orm.ast_cache != NULL) {
 				if ((temp_ast = zend_hash_index_find(phalcon_globals_ptr->orm.ast_cache, Z_LVAL_P(unique_id))) != NULL) {
-					ZVAL_ZVAL(*return_value, temp_ast, 1, 0);
+					ZVAL_ZVAL(return_value, temp_ast, 1, 0);
 					return;
 				}
 			}

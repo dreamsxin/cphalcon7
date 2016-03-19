@@ -47,20 +47,8 @@ void phalcon_dump_all_frames();
 
 int ZEND_FASTCALL phalcon_clean_restore_stack();
 
-
 #define PHALCON_PTR_DTOR(z) zval_ptr_dtor(z);
 #define PHALCON_DTOR(z) zval_dtor(z);
-
-/**
- * @brief destroys @c pzval if it is not @c NULL
- * @param pzval
- */
-static inline void phalcon_safe_PHALCON_PTR_DTOR(zval *pzval)
-{
-	if (pzval) {
-		PHALCON_PTR_DTOR(pzval);
-	}
-}
 
 #define PHALCON_INIT_ZVAL_NREF(z) \
 	PHALCON_ALLOC_ZVAL(z); \
@@ -87,7 +75,6 @@ static inline void phalcon_safe_PHALCON_PTR_DTOR(zval *pzval)
 	} while (0)
 
 #define PHALCON_CPY_WRT(d, v) ZVAL_COPY(d, v);
-
 #define PHALCON_CPY_WRT_CTOR(d, v) ZVAL_DUP(d, v);
 
 #define PHALCON_STR(z, str) \

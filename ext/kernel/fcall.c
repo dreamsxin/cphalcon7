@@ -50,6 +50,10 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;
 	int param_count = 0, i, status;
 
+	if (retval != NULL) {
+		PHALCON_PTR_DTOR(retval);
+	}
+
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
 		status = FAILURE;
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
@@ -94,6 +98,10 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 	zval *arguments;
 	HashTable *function_table;
 	int i, status;
+
+	if (retval != NULL) {
+		PHALCON_PTR_DTOR(retval);
+	}
 
 	if (type != phalcon_fcall_function) {
 		if ( object == NULL) {

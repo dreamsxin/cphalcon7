@@ -219,6 +219,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 
 	phalcon_update_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"), &next_consecutive);
 	phalcon_update_property_this(getThis(), SL("_connectionId"), connection_consecutive);
+	PHALCON_PTR_DTOR(&next_consecutive);
 
 	/** 
 	 * Dialect class can override the default dialect
@@ -233,15 +234,17 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	 * Create the instance only if the dialect is a string
 	 */
 	if (likely(Z_TYPE_P(&dialect_class) == IS_STRING)) {
-		ce0 = phalcon_fetch_class(&dialect_class);
+		ce0 = phalcon_fetch_class(&dialect_class, ZEND_FETCH_CLASS_DEFAULT);
 		object_init_ex(&dialect_object, ce0);
 		if (phalcon_has_constructor(&dialect_object)) {
 			PHALCON_CALL_METHODW(NULL, &dialect_object, "__construct");
 		}
 		PHALCON_CALL_SELFW(NULL, "setdialect", &dialect_object);
+		PHALCON_PTR_DTOR(&dialect_object);
 	} else if (Z_TYPE_P(&dialect_class) == IS_OBJECT) {
 		PHALCON_CALL_SELFW(NULL, "setdialect", &dialect_class);
 	}
+	PHALCON_PTR_DTOR(&dialect_class);
 
 	phalcon_update_property_this(getThis(), SL("_descriptor"), descriptor);
 }
@@ -1304,7 +1307,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getColumnDefinition){
  */
 PHP_METHOD(Phalcon_Db_Adapter, listTables){
 
-	zval *schema_name = NULL, *dialect, sql, fetch_num, tables, *table;
+	zval *schema_name = NULL, *dialect, sql = {}, fetch_num = {}, tables = {}, *table;
 
 	phalcon_fetch_params(0, 0, 1, &schema_name);
 

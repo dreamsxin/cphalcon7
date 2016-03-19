@@ -397,13 +397,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 * Models are just initialized once per request
 	 */
 	if (phalcon_array_isset(initialized, &class_name)) {
-		RETURN_FALSE;
+		PHALCON_PTR_DTOR(&class_name);
+		RETURN_TRUE;
+	}
+
+	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
+	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+		PHALCON_STR(&event_name, "modelsManager:beforeInitialize");
+		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), model);
 	}
 
 	/** 
 	 * Update the model as initialized, this avoid cyclic initializations
 	 */
 	phalcon_update_property_array(getThis(), SL("_initialized"), &class_name, model);
+	PHALCON_PTR_DTOR(&class_name);
 
 	/** 
 	 * Call the 'initialize' method if it's implemented
@@ -421,11 +429,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	/** 
 	 * If an EventsManager is available we pass to it every initialized model
 	 */
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "modelsManager:afterInitialize");
+		PHALCON_STR(&event_name, "modelsManager:afterInitialize");
 		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), model);
 	}
+
+	PHALCON_PTR_DTOR(&event_name);
 
 	RETURN_TRUE;
 }
@@ -469,7 +478,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getLastInitialized){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
-	zval *model_name, *new_instance = NULL, *initialized, lowercased = {}, model = {}, *dependency_injector;
+	zval *model_name, *new_instance = NULL, *initialized, lowercased = {}, *dependency_injector;
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 1, &model_name, &new_instance);
@@ -481,14 +490,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 
 	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
 
-	ZVAL_STR(&lowercased, zend_string_tolower(Z_STR_P(model_name)));
+	phalcon_fast_strtolower(&lowercased, model_name);
 
 	/** 
 	 * Check if a model with the same is already loaded
 	 */
-	if (!zend_is_true(new_instance) && phalcon_array_isset_fetch(&model, initialized, &lowercased)) {
-		RETURN_CTORW(&model);
+	if (!zend_is_true(new_instance) && phalcon_array_isset_fetch(return_value, initialized, &lowercased)) {
+		PHALCON_PTR_DTOR(&lowercased);
+		return;
 	}
+
+	PHALCON_PTR_DTOR(&lowercased);
 
 	/** 
 	 * Load it using an autoloader
@@ -834,40 +846,40 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models_behaviors), behavior) {
 				PHALCON_CALL_METHODW(&status, behavior, "notify", eventname, model);
 				if (PHALCON_IS_FALSE(&status)) {
-					RETURN_CTORW(&status);
+					break;
 				}
 			} ZEND_HASH_FOREACH_END();
-
+			PHALCON_PTR_DTOR(&models_behaviors);
 		}
 	}
 
-	/** 
-	 * Dispatch events to the global events manager
-	 */
-	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
-
-		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
-		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_CTORW(&status);
-		}
-	}
-
-	/** 
-	 * A model can has a specific events manager for it
-	 */
-	custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
-	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, &entity_name)) {
+	if (!PHALCON_IS_FALSE(&status)) {
+		/** 
+		 * Dispatch events to the global events manager
+		 */
+		phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
-
 			PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
-			if (PHALCON_IS_FALSE(&status)) {
-				RETURN_CTORW(&status);
+		}
+	}
+
+	if (!PHALCON_IS_FALSE(&status)) {
+		/** 
+		 * A model can has a specific events manager for it
+		 */
+		custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
+		if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) {
+			if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, &entity_name)) {
+				PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
+				PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
 			}
 		}
 	}
+
+	PHALCON_PTR_DTOR(&fire_event_name);
+	PHALCON_PTR_DTOR(&events_manager);
+	PHALCON_PTR_DTOR(&entity_name);
 
 	RETURN_CTORW(&status);
 }
@@ -1012,6 +1024,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_dynamicUpdate"), &entity_name, dynamic_update);
 	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), &entity_name, dynamic_update);
+	PHALCON_PTR_DTOR(&entity_name);
 }
 
 /**
@@ -1021,16 +1034,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate){
 
-	zval *model, *dynamic_update, entity_name = {}, is_using = {};
+	zval *model, *dynamic_update, entity_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
 	dynamic_update = phalcon_read_property(getThis(), SL("_dynamicUpdate"), PH_NOISY);
 	if (Z_TYPE_P(dynamic_update) == IS_ARRAY) { 
 		phalcon_get_class(&entity_name, model, 1);
-		if (phalcon_array_isset_fetch(&is_using, dynamic_update, &entity_name)) {
-			RETURN_CTORW(&is_using);
+		if (phalcon_array_isset_fetch(return_value, dynamic_update, &entity_name)) {
+			PHALCON_PTR_DTOR(&entity_name);
+			return;
 		}
+		PHALCON_PTR_DTOR(&entity_name);
 	}
 
 	RETURN_TRUE;
@@ -1196,9 +1211,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 */
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
+		PHALCON_PTR_DTOR(&alias);
 	} else {
 		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
 	}
+	PHALCON_PTR_DTOR(&referenced_entity);
 
 	/** 
 	 * Append a new relationship
@@ -1210,11 +1227,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 */
 	PHALCON_CONCAT_VSV(&key_alias, &entity_name, "$", &lower_alias);
 	phalcon_update_property_array(getThis(), SL("_aliases"), &key_alias, &relation);
+	PHALCON_PTR_DTOR(&key_alias);
+	PHALCON_PTR_DTOR(&lower_alias);
 
 	/** 
 	 * Update the relations
 	 */
 	phalcon_update_property_array(getThis(), SL("_belongsTo"), &key_relation, &relations);
+	PHALCON_PTR_DTOR(&relations);
+	PHALCON_PTR_DTOR(&key_relation);
 
 	/** 
 	 * Get existing relations by model
@@ -1233,6 +1254,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 * Update relations by model
 	 */
 	phalcon_update_property_array(getThis(), SL("_belongsToSingle"), &entity_name, &single_relations);
+
+	PHALCON_PTR_DTOR(&single_relations);
+	PHALCON_PTR_DTOR(&entity_name);
 
 	RETURN_CTORW(&relation);
 }
@@ -1850,15 +1874,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		switch (phalcon_get_intval(&type)) {
 
 			case 0:
-				ZVAL_STRING(&retrieve_method, "findFirst");
+				PHALCON_STR(&retrieve_method, "findFirst");
 				break;
 
 			case 1:
-				ZVAL_STRING(&retrieve_method, "findFirst");
+				PHALCON_STR(&retrieve_method, "findFirst");
 				break;
 
 			case 2:
-				ZVAL_STRING(&retrieve_method, "find");
+				PHALCON_STR(&retrieve_method, "find");
 				break;
 
 		}
@@ -2350,7 +2374,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 	/** 
 	 * Create a query
 	 */
-	ZVAL_STRING(&service_name, "modelsQuery");
+	PHALCON_STR(&service_name, "modelsQuery");
 
 	PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -2400,7 +2424,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 	/** 
 	 * Create a query
 	 */
-	ZVAL_STRING(&service_name, "modelsQuery");
+	PHALCON_STR(&service_name, "modelsQuery");
 
 	PHALCON_CALL_METHODW(&has, dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -2447,7 +2471,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 	/** 
 	 * Create a query builder
 	 */
-	ZVAL_STRING(&service, "modelsQueryBuilder");
+	PHALCON_STR(&service, "modelsQueryBuilder");
 
 	array_init(&service_params);
 	phalcon_array_append(&service_params, params, PH_COPY);

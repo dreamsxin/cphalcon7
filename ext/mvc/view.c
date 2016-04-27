@@ -1230,7 +1230,6 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 		array_init_size(&engines, 1);
 		phalcon_array_update_str_string(&engines, SL(".phtml"), phalcon_mvc_view_engine_php_ce->name, PH_COPY);
 		phalcon_update_property_this(getThis(), SL("_registeredEngines"), &engines);
-		PHALCON_PTR_DTOR(&engines);
 	}
 
 	ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL(engines), str_key) {
@@ -1245,6 +1244,7 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
 		}
 	} ZEND_HASH_FOREACH_END();
 
+	PHALCON_PTR_DTOR(&engines);
 	PHALCON_PTR_DTOR(&path);
 
 	RETURN_BOOL(exists);

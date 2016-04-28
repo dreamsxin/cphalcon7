@@ -1107,7 +1107,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 					if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 						phalcon_update_property_this(getThis(), SL("_activeRenderPath"), &view_engine_path);
 
-						ZVAL_STRING(&event_name, "view:beforeRenderView");			
+						PHALCON_STR(&event_name, "view:beforeRenderView");			
 						PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), &view_engine_path);
 
 						if (PHALCON_IS_FALSE(&status)) {
@@ -1123,7 +1123,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 					ZVAL_FALSE(&not_exists);
 
 					if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-						ZVAL_STRING(&event_name, "view:afterRenderView");
+						PHALCON_STR(&event_name, "view:afterRenderView");
 						PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
 					}
 
@@ -1146,7 +1146,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		 * Notify about not found views
 		 */
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-			ZVAL_STRING(&event_name, "view:notFoundView");
+			PHALCON_STR(&event_name, "view:notFoundView");
 			PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
 		}
 		if (!zend_is_true(silence)) {
@@ -1291,8 +1291,8 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		use_model = 1;
 	}
 
-	ZVAL_STRING(&ds, slash);
-	ZVAL_STRING(&namespace_separator, "\\");
+	PHALCON_STR(&ds, slash);
+	PHALCON_STR(&namespace_separator, "\\");
 
 	phalcon_update_property_this(getThis(), SL("_currentRenderLevel"), &PHALCON_GLOBAL(z_zero));
 
@@ -1312,7 +1312,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	phalcon_update_property_this(getThis(), SL("_params"), params);
 	phalcon_update_property_this(getThis(), SL("_namespaceName"), namespace_name);
 
-	ZVAL_STRING(&converter_key, "controller");
+	PHALCON_STR(&converter_key, "controller");
 
 	PHALCON_CALL_SELFW(&converter, "getconverter", &converter_key);
 
@@ -1324,7 +1324,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		PHALCON_CALL_USER_FUNC_ARRAYW(controller_name, &converter, &parameters);
 	}
 
-	ZVAL_STRING(&converter_key, "action");
+	PHALCON_STR(&converter_key, "action");
 
 	PHALCON_CALL_SELFW(&converter, "getconverter", &converter_key);
 
@@ -1336,7 +1336,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		PHALCON_CALL_USER_FUNC_ARRAYW(action_name, &converter, &parameters);
 	}
 
-	ZVAL_STRING(&converter_key, "namespace");
+	PHALCON_STR(&converter_key, "namespace");
 
 	PHALCON_CALL_SELFW(&converter, "getconverter", &converter_key);
 
@@ -1363,7 +1363,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	phalcon_return_property(&layouts_dir, getThis(), SL("_layoutsDir"));
 	if (!zend_is_true(&layouts_dir)) {
-		ZVAL_STRING(&layouts_dir, "layouts/");
+		PHALCON_STR(&layouts_dir, "layouts/");
 	}
 
 	enable_namespace_view = phalcon_read_property(getThis(), SL("_enableNamespaceView"), PH_NOISY);
@@ -1421,7 +1421,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/** 
 	 * Call beforeRender if there is an events manager
 	 */
-	ZVAL_STRING(&event_name, "view:beforeRender");
+	PHALCON_STR(&event_name, "view:beforeRender");
 
 	PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
@@ -1557,7 +1557,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/** 
 	 * Call afterRender event
 	 */
-	ZVAL_STRING(&event_name, "view:afterRender");
+	PHALCON_STR(&event_name, "view:afterRender");
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	RETURN_THISW();
@@ -1797,7 +1797,7 @@ PHP_METHOD(Phalcon_Mvc_View, _createCache){
 		return;
 	}
 
-	ZVAL_STRING(&cache_service, "viewCache");
+	PHALCON_STR(&cache_service, "viewCache");
 
 	view_options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
 	if (Z_TYPE_P(view_options) == IS_ARRAY) { 

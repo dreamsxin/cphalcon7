@@ -835,7 +835,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		phalcon_array_append(&call_object, &action_method, PH_COPY);
 
 		/* Call the method allowing exceptions */
-		PHALCON_CALL_USER_FUNC_ARRAY_NOEXW(&value, &call_object, &params);
+		phalcon_call_user_func_array_noex(&value, &call_object, &params);
 
 		/* Check if an exception has ocurred */
 		if (EG(exception)) {
@@ -1242,9 +1242,10 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 		/* Shortcut, save one method call */
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
+		ZVAL_MAKE_REF(&exception);
 		zval *params[] = {&event_name, &exception};
 		ret2 = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 2, params);
-
+		ZVAL_UNREF(&exception);
 		if (ret2 == SUCCESS && PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}

@@ -93,8 +93,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 
 int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry *ce, phalcon_call_type type, const char *method_name, uint method_len, uint param_count, zval *params[])
 {
-	zval func_name = {}, ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret;
-	zend_execute_data *execute_data  = EG(current_execute_data);
+	zval func_name = {}, ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, obj = {};
 	zval *arguments;
 	int i, status;
 
@@ -103,15 +102,23 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 	}
 
 	if (type != phalcon_fcall_function) {
-		if ( object == NULL) {
-			object = execute_data && Z_OBJ(execute_data->This) ? &execute_data->This : NULL;
+		if (object == NULL) {
+			if (zend_get_this_object(EG(current_execute_data))){
+				ZVAL_OBJ(&obj, zend_get_this_object(EG(current_execute_data)));
+			} else {
+				ZVAL_NULL(&obj);
+			}
+		} else {
+			ZVAL_ZVAL(&obj, object, 1, 0);
 		}
 
-		if (object != NULL) {
-			if (Z_TYPE_P(object) != IS_OBJECT) {
-				phalcon_throw_exception_format(spl_ce_RuntimeException, "Trying to call method %s on a non-object", method_name);
-				return FAILURE;
-			}
+		if (Z_TYPE(obj) != IS_NULL && Z_TYPE(obj) != IS_OBJECT) {
+			phalcon_throw_exception_format(spl_ce_RuntimeException, "Trying to call method %s on a non-object", method_name);
+			return FAILURE;
+		}
+		
+		if (!ce && Z_TYPE(obj) == IS_OBJECT) {
+			ce = Z_OBJCE(obj);
 		}
 
 		array_init_size(&func_name, 2);
@@ -136,16 +143,12 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 			case phalcon_fcall_method:
 			default:
 				assert(object != NULL);
-				Z_TRY_ADDREF_P(object);
-				add_next_index_zval(&func_name, object);
+				Z_TRY_ADDREF(obj);
+				add_next_index_zval(&func_name, &obj);
 				break;
 		}
 
 		add_next_index_stringl(&func_name, method_name, method_len);
-
-		if (!ce && object) {
-			ce = Z_OBJCE_P(object);
-		}
 	} else {
 		ZVAL_STRINGL(&func_name, method_name, method_len);
 	}
@@ -158,7 +161,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		i++;
 	}
 
-	if ((status = call_user_function_ex(ce ? &(ce)->function_table : EG(function_table), object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
+	if ((status = call_user_function_ex(ce ? &(ce)->function_table : EG(function_table), &obj, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 		ZVAL_NULL(retval_ptr);
 		if (!EG(exception)) {

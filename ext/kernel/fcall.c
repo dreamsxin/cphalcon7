@@ -96,7 +96,6 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 	zval func_name = {}, ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret;
 	zend_execute_data *execute_data  = EG(current_execute_data);
 	zval *arguments;
-	HashTable *function_table;
 	int i, status;
 
 	if (retval != NULL) {
@@ -147,11 +146,8 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		if (!ce && object) {
 			ce = Z_OBJCE_P(object);
 		}
-
-		function_table = ce ? &ce->function_table : EG(function_table);
 	} else {
 		ZVAL_STRINGL(&func_name, method_name, method_len);
-		function_table = EG(function_table);
 	}
 
 	arguments = safe_emalloc(sizeof(zval), param_count, 0);
@@ -162,7 +158,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		i++;
 	}
 
-	if ((status = call_user_function_ex(function_table, object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
+	if ((status = call_user_function_ex(CG(function_table), object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 		ZVAL_NULL(retval_ptr);
 		if (!EG(exception)) {

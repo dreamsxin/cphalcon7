@@ -261,16 +261,14 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower) {
  */
 void phalcon_get_called_class(zval *return_value)
 {
-	zend_execute_data *ex = EG(current_execute_data);
-	zend_class_entry *called_scope = ex->called_scope;
+	zend_class_entry *called_scope = zend_get_called_scope(EG(current_execute_data));
 	if (called_scope) {
 		ZVAL_STR(return_value, zend_string_dup(called_scope->name, 0));
 	}
 
-	if (!EG(scope))  {
+	if (!zend_get_executed_scope())  {
 		php_error_docref(NULL, E_WARNING, "phalcon_get_called_class() called from outside a class");
 	}
-
 }
 
 /**

@@ -120,11 +120,11 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				add_next_index_string(&func_name, ISV(parent));
 				break;
 			case phalcon_fcall_self:
-				//assert(!ce);
+				assert(!ce);
 				add_next_index_string(&func_name, ISV(self));
 				break;
 			case phalcon_fcall_static:
-				//assert(!ce);
+				assert(!ce);
 				add_next_index_string(&func_name, ISV(static));
 				break;
 
@@ -154,11 +154,11 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 	i = 0;
 	while(i < param_count) {
-		PHALCON_CPY_WRT(&arguments[i], params[i]);
+		ZVAL_COPY_VALUE(&arguments[i], params[i]);
 		i++;
 	}
 
-	if ((status = call_user_function_ex(CG(function_table), object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
+	if ((status = call_user_function_ex(ce ? &(ce)->function_table : EG(function_table), object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 		ZVAL_NULL(retval_ptr);
 		if (!EG(exception)) {
@@ -167,35 +167,33 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 					zend_error(E_ERROR, "Call to undefined function %s()", method_name);
 					break;
 				case phalcon_fcall_parent:
-					zend_error(E_ERROR, "Call to undefined function parent::%s()", method_name);
+					zend_error(E_ERROR, "Call to undefined method parent::%s()", method_name);
 					break;
 				case phalcon_fcall_self:
-					zend_error(E_ERROR, "Call to undefined function self::%s()", method_name);
+					zend_error(E_ERROR, "Call to undefined method self::%s()", method_name);
 					break;
 				case phalcon_fcall_static:
 					zend_error(E_ERROR, "Call to undefined function static::%s()", method_name);
 					break;
 				case phalcon_fcall_ce:
-					zend_error(E_ERROR, "Call to undefined function %s::%s()", ce->name->val, method_name);
+					zend_error(E_ERROR, "Call to undefined method %s::%s()", ce->name->val, method_name);
 					break;
 				case phalcon_fcall_method:
-					zend_error(E_ERROR, "Call to undefined function %s::%s()", Z_OBJCE_P(object)->name->val, method_name);
+					zend_error(E_ERROR, "Call to undefined method %s::%s()", Z_OBJCE_P(object)->name->val, method_name);
 					break;
 				default:
-					zend_error(E_ERROR, "Call to undefined function ?::%s()", method_name);
+					zend_error(E_ERROR, "Call to undefined method ?::%s()", method_name);
 			}
 		}
 	}
 
-	PHALCON_PTR_DTOR(&func_name);
-	i = 0;
-	while(i < param_count) {
-		PHALCON_PTR_DTOR(&arguments[i]);
-		i++;
-	}
+	zval_ptr_dtor(&func_name);
+
 	efree(arguments);
 	if (retval == NULL) {
-		PHALCON_PTR_DTOR(retval_ptr);
+		if (!Z_ISUNDEF(ret)) {
+			zval_ptr_dtor(&ret);
+		}
 	}
 
 	return status;

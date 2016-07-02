@@ -194,8 +194,6 @@ mvc/collection.c \
 mvc/dispatcher.c \
 mvc/collectioninterface.c \
 mvc/view/engine/php.c \
-mvc/view/engine/volt/compiler.c \
-mvc/view/engine/volt.c \
 mvc/view/exception.c \
 mvc/view/engineinterface.c \
 mvc/view/simple.c \
@@ -422,8 +420,6 @@ validation/validator/numericality.c \
 validation/validator.c \
 mvc/model/query/parser.c \
 mvc/model/query/scanner.c \
-mvc/view/engine/volt/parser.c \
-mvc/view/engine/volt/scanner.c \
 annotations/parser.c \
 annotations/scanner.c \
 image.c \

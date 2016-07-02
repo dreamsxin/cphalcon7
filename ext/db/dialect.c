@@ -222,6 +222,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getColumnList){
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(return_value, SL(", "), &str_list);
+	zval_ptr_dtor(&str_list);
 }
 
 /**

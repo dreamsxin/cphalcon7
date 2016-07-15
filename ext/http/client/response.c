@@ -43,6 +43,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, setHeader);
 PHP_METHOD(Phalcon_Http_Client_Response, getHeader);
 PHP_METHOD(Phalcon_Http_Client_Response, setBody);
 PHP_METHOD(Phalcon_Http_Client_Response, getBody);
+PHP_METHOD(Phalcon_Http_Client_Response, getJsonBody);
 PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode);
 PHP_METHOD(Phalcon_Http_Client_Response, getStatusCode);
 
@@ -69,6 +70,7 @@ static const zend_function_entry phalcon_http_client_response_method_entry[] = {
 	PHP_ME(Phalcon_Http_Client_Response, getHeader, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Response, setBody, arginfo_phalcon_http_client_response_setbody, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Response, getBody, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Response, getJsonBody, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Response, setStatusCode, arginfo_phalcon_http_client_response_setstatuscode, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Response, getStatusCode, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -138,6 +140,23 @@ PHP_METHOD(Phalcon_Http_Client_Response, setBody){
 PHP_METHOD(Phalcon_Http_Client_Response, getBody){
 
 	RETURN_MEMBER(getThis(), "_body");
+}
+
+PHP_METHOD(Phalcon_Http_Client_Response, getJsonBody){
+
+	zval *assoc = NULL, body = {};
+	int ac = 0;
+
+	phalcon_fetch_params(0, 0, 1, &assoc);
+
+	if (assoc && zend_is_true(assoc)) {
+		ac = 1;
+	}
+
+	PHALCON_CALL_METHOD(&body, this_ptr, "getbody");
+	if (Z_TYPE(body) == IS_STRING) {
+		RETURN_ON_FAILURE(phalcon_json_decode(return_value, body, ac TSRMLS_CC));
+	}
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode){

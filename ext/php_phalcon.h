@@ -51,7 +51,7 @@ typedef struct _phalcon_memory_entry {
 /** Virtual Symbol Table */
 typedef struct _phalcon_symbol_table {
 	struct _phalcon_memory_entry *scope;
-	HashTable *symbol_table;
+	zend_array *symbol_table;
 	struct _phalcon_symbol_table *prev;
 } phalcon_symbol_table;
 

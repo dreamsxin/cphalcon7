@@ -153,9 +153,11 @@ PHP_METHOD(Phalcon_Http_Client_Response, getJsonBody){
 		ac = 1;
 	}
 
-	PHALCON_CALL_METHOD(&body, this_ptr, "getbody");
+	PHALCON_CALL_METHOD(&body, getThis(), "getbody");
 	if (Z_TYPE(body) == IS_STRING) {
-		RETURN_ON_FAILURE(phalcon_json_decode(return_value, body, ac TSRMLS_CC));
+		RETURN_ON_FAILURE(phalcon_json_decode(return_value, &body, ac));
+	} else {
+		ZVAL_NULL(return_value);
 	}
 }
 

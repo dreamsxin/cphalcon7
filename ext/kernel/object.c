@@ -1157,8 +1157,7 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 			}
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), item) {
-				params_ptr[i] = item;
-				++i;
+				params_ptr[i++] = item;
 			} ZEND_HASH_FOREACH_END();
 		} else {
 			params_ptr = NULL;
@@ -1208,6 +1207,7 @@ int phalcon_create_instance_params(zval *return_value, const zval *class_name, z
 
 	ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_DEFAULT);
 	if (!ce) {
+		ZVAL_NULL(return_value);
 		return FAILURE;
 	}
 

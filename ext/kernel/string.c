@@ -310,6 +310,113 @@ void phalcon_uncamelize(zval *return_value, const zval *str){
 	}
 }
 
+void phalcon_camelize_delim(zval *return_value, const zval *str, const zval *delimiter){
+
+	int i, len, first = 0;
+	smart_str camelize_str = {0};
+	char *marker, ch, delim;
+
+	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
+		zend_error(E_WARNING, "Invalid arguments supplied for camelize()");
+		RETURN_EMPTY_STRING();
+	}
+
+	if (delimiter == NULL || Z_TYPE_P(delimiter) == IS_NULL) {
+		delim = '_';
+	} else if (Z_TYPE_P(delimiter) == IS_STRING && Z_STRLEN_P(delimiter) == 1) {
+		delim = *(Z_STRVAL_P(delimiter));
+	} else {
+		zend_error(E_WARNING, "Second argument passed to the camelize() must be a string of one character");
+		RETURN_EMPTY_STRING();
+	}
+
+	marker = Z_STRVAL_P(str);
+	len    = Z_STRLEN_P(str);
+
+	for (i = 0; i < len; i++) {
+
+		ch = marker[i];
+
+		if (first == 0) {
+
+			if (ch == delim) {
+				continue;
+			}
+
+			first = 1;
+			smart_str_appendc(&camelize_str, toupper(ch));
+			continue;
+		}
+
+		if (ch == delim) {
+			if (i != (len - 1)) {
+				i++;
+				ch = marker[i];
+				smart_str_appendc(&camelize_str, toupper(ch));
+			}
+			continue;
+		}
+
+		smart_str_appendc(&camelize_str, tolower(ch));
+	}
+
+	smart_str_0(&camelize_str);
+
+	if (camelize_str.s) {
+		RETURN_STR(camelize_str.s);
+	} else {
+		RETURN_EMPTY_STRING();
+	}
+}
+
+/**
+ * Convert a camelized to a dash/underscored texts (an optional delimiter can be specified)
+ */
+void phalcon_uncamelize_delim(zval *return_value, const zval *str, const zval *delimiter){
+
+	unsigned int i;
+	smart_str uncamelize_str = {0};
+	char *marker, ch, delim;
+
+	if (Z_TYPE_P(str) != IS_STRING) {
+		zend_error(E_WARNING, "Invalid arguments supplied for uncamelize()");
+		RETURN_EMPTY_STRING();
+	}
+
+	if (delimiter == NULL || Z_TYPE_P(delimiter) == IS_NULL) {
+		delim = '_';
+	} else if (Z_TYPE_P(delimiter) == IS_STRING && Z_STRLEN_P(delimiter) == 1) {
+		delim = *(Z_STRVAL_P(delimiter));
+	} else {
+		zend_error(E_WARNING, "Second argument passed to the uncamelize() must be a string of one character");
+		RETURN_EMPTY_STRING();
+	}
+
+	marker = Z_STRVAL_P(str);
+	for (i = 0; i < Z_STRLEN_P(str); i++) {
+		ch = *marker;
+		if (ch == '\0') {
+			break;
+		}
+		if (ch >= 'A' && ch <= 'Z') {
+			if (i > 0) {
+				smart_str_appendc(&uncamelize_str, delim);
+			}
+			smart_str_appendc(&uncamelize_str, (*marker) + 32);
+		} else {
+			smart_str_appendc(&uncamelize_str, (*marker));
+		}
+		marker++;
+	}
+	smart_str_0(&uncamelize_str);
+
+	if (uncamelize_str.s) {
+		RETURN_STR(uncamelize_str.s);
+	} else {
+		RETURN_EMPTY_STRING();
+	}
+}
+
 /**
  * Fast call to explode php function
  */

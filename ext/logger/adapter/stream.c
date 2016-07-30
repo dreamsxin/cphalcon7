@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 	if (Z_TYPE(stream) != IS_RESOURCE) {
 		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open stream '%s'", Z_STRVAL_P(name));
 	} else {
-		phalcon_update_property_this(getThis(), SL("_stream"), &stream);
+		phalcon_update_property_zval(getThis(), SL("_stream"), &stream);
 	}
 }
 
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter)
 		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHODW(NULL, &formatter, "__construct");
 
-		phalcon_update_property_this(getThis(), SL("_formatter"), &formatter);
+		phalcon_update_property_zval(getThis(), SL("_formatter"), &formatter);
 	}
 
 	RETURN_CTORW(&formatter);

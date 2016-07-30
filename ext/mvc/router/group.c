@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, __construct){
 	}
 
 	if (Z_TYPE_P(paths) == IS_ARRAY || Z_TYPE_P(paths) == IS_STRING) {
-		phalcon_update_property_this(getThis(), SL("_paths"), paths);
+		phalcon_update_property_zval(getThis(), SL("_paths"), paths);
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("initialize")) == SUCCESS) {
@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setHostname){
 
 	phalcon_fetch_params(0, 1, 0, &hostname);
 
-	phalcon_update_property_this(getThis(), SL("_hostname"), hostname);
+	phalcon_update_property_zval(getThis(), SL("_hostname"), hostname);
 	RETURN_THISW();
 }
 
@@ -274,7 +274,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setPrefix){
 
 	phalcon_fetch_params(0, 1, 0, &prefix);
 
-	phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
+	phalcon_update_property_zval(getThis(), SL("_prefix"), prefix);
 	RETURN_THISW();
 }
 
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, beforeMatch){
 
 	phalcon_fetch_params(0, 1, 0, &before_match);
 
-	phalcon_update_property_this(getThis(), SL("_beforeMatch"), before_match);
+	phalcon_update_property_zval(getThis(), SL("_beforeMatch"), before_match);
 	RETURN_THISW();
 }
 
@@ -328,7 +328,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setPaths){
 
 	phalcon_fetch_params(0, 1, 0, &paths);
 
-	phalcon_update_property_this(getThis(), SL("_paths"), paths);
+	phalcon_update_property_zval(getThis(), SL("_paths"), paths);
 
 }
 
@@ -560,7 +560,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, clear){
 	zval empty_routes;
 
 	array_init(&empty_routes);
-	phalcon_update_property_this(getThis(), SL("_routes"), &empty_routes);
+	phalcon_update_property_zval(getThis(), SL("_routes"), &empty_routes);
 }
 
 /**
@@ -602,7 +602,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setName){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_update_property_this(getThis(), SL("_name"), name);
+	phalcon_update_property_zval(getThis(), SL("_name"), name);
 	RETURN_THISW();
 }
 

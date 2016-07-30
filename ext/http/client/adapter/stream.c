@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	if (method) {
 		phalcon_fast_strtoupper(&upper_method, method);
-		phalcon_update_property_this(getThis(), SL("_method"), &upper_method);
+		phalcon_update_property_zval(getThis(), SL("_method"), &upper_method);
 	}
 
 	object_init_ex(&header, phalcon_http_client_header_ce);
@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	PHALCON_CALL_METHODW(NULL, &header, "set", &option, &value);
 
-	phalcon_update_property_this(getThis(), SL("_header"), &header);
+	phalcon_update_property_zval(getThis(), SL("_header"), &header);
 
 	ZVAL_STRING(&option, "follow_location");
 	ZVAL_LONG(&value, 1);
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &value);
 
-	phalcon_update_property_this(getThis(), SL("_stream"), &stream);
+	phalcon_update_property_zval(getThis(), SL("_stream"), &stream);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){

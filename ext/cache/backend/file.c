@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 	prefix  = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	if (unlikely(!phalcon_array_isset_fetch_str(&cache_dir, options, SL("cacheDir")))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
@@ -467,7 +467,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 	prefix  = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	phalcon_array_fetch_str(&cache_dir, options, SL("cacheDir"), PH_NOISY);
 
@@ -560,7 +560,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 	prefix  = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	phalcon_array_fetch_str(&cache_dir, options, SL("cacheDir"), PH_NOISY);
 

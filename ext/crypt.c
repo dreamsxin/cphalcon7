@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Crypt, setCipher){
 
 	phalcon_fetch_params(0, 1, 0, &cipher);
 
-	phalcon_update_property_this(getThis(), SL("_cipher"), cipher);
+	phalcon_update_property_zval(getThis(), SL("_cipher"), cipher);
 	RETURN_THISW();
 }
 
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Crypt, setMode){
 	phalcon_fetch_params(0, 1, 0, &mode);
 	PHALCON_ENSURE_IS_STRING(mode);
 
-	phalcon_update_property_this(getThis(), SL("_mode"), mode);
+	phalcon_update_property_zval(getThis(), SL("_mode"), mode);
 	RETURN_THISW();
 }
 
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Crypt, setKey){
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	phalcon_update_property_this(getThis(), SL("_key"), key);
+	phalcon_update_property_zval(getThis(), SL("_key"), key);
 	RETURN_THISW();
 }
 
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Crypt, setPadding) {
 	phalcon_fetch_params(0, 1, 0, &scheme);
 	PHALCON_ENSURE_IS_LONG(scheme);
 
-	phalcon_update_property_this(getThis(), SL("_padding"), scheme);
+	phalcon_update_property_zval(getThis(), SL("_padding"), scheme);
 	RETURN_THISW();
 }
 
@@ -757,7 +757,7 @@ PHP_METHOD(Phalcon_Crypt, beforeEncrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_beforeEncrypt"), handler);
+	phalcon_update_property_zval(getThis(), SL("_beforeEncrypt"), handler);
 	RETURN_THISW();
 }
 
@@ -777,7 +777,7 @@ PHP_METHOD(Phalcon_Crypt, afterEncrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_afterEncrypt"), handler);
+	phalcon_update_property_zval(getThis(), SL("_afterEncrypt"), handler);
 	RETURN_THISW();
 }
 
@@ -797,7 +797,7 @@ PHP_METHOD(Phalcon_Crypt, beforeDecrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_beforeDecrypt"), handler);
+	phalcon_update_property_zval(getThis(), SL("_beforeDecrypt"), handler);
 	RETURN_THISW();
 }
 
@@ -817,6 +817,6 @@ PHP_METHOD(Phalcon_Crypt, afterDecrypt){
 		return;
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_afterDecrypt"), handler);
+	phalcon_update_property_zval(getThis(), SL("_afterDecrypt"), handler);
 	RETURN_THISW();
 }

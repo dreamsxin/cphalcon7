@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_CLI_Console, __construct){
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 	}
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_CLI_Console, registerModules){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_console_exception_ce, "Modules must be an Array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_modules"), modules);
+	phalcon_update_property_zval(getThis(), SL("_modules"), modules);
 
 }
 
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_CLI_Console, addModules){
 	original_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 
 	phalcon_fast_array_merge(&register_modules, modules, original_modules);
-	phalcon_update_property_this(getThis(), SL("_modules"), &register_modules);
+	phalcon_update_property_zval(getThis(), SL("_modules"), &register_modules);
 }
 
 /**
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders");
 		PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", &dependency_injector);
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			phalcon_update_property_this(getThis(), SL("_moduleObject"), &module_object);
+			phalcon_update_property_zval(getThis(), SL("_moduleObject"), &module_object);
 
 			ZVAL_STRING(&event_name, "console:afterStartModule");
 

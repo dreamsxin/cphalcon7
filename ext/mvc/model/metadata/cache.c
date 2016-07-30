@@ -97,11 +97,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 
 	if (options && Z_TYPE_P(options) != IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&service, options, SL("service"))) {
-			phalcon_update_property_this(getThis(), SL("_cache"), &service);
+			phalcon_update_property_zval(getThis(), SL("_cache"), &service);
 		}
 
 		if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
-			phalcon_update_property_this(getThis(), SL("_lifetime"), &lifetime);
+			phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
 		}
 	}
 
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 
 		PHALCON_CALL_METHODW(&tmp, dependency_injector, "getshared", &cache);
 
-		phalcon_update_property_this(getThis(), SL("_cache"), &tmp);
+		phalcon_update_property_zval(getThis(), SL("_cache"), &tmp);
 
 		RETURN_CTORW(&tmp);
 	}

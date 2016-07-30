@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, setReader){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "Invalid annotations reader");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_reader"), reader);
+	phalcon_update_property_zval(getThis(), SL("_reader"), reader);
 
 }
 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getReader){
 	phalcon_return_property(&reader, getThis(), SL("_reader"));
 	if (Z_TYPE(reader) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_annotations_reader_ce);
-		phalcon_update_property_this(getThis(), SL("_reader"), return_value);
+		phalcon_update_property_zval(getThis(), SL("_reader"), return_value);
 		return;
 	}
 

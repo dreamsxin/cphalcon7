@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 		ZVAL_LONG(&lifetime, 8600);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_lifetime"), &lifetime);
+	phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
 
 	if (!phalcon_array_isset_fetch_str(&persistent, options, SL("persistent"))) {
 		ZVAL_FALSE(&persistent);
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 
 	PHALCON_CALL_METHODW(NULL, &memcache, "__construct", &frontend_data, &option);
 
-	phalcon_update_property_this(getThis(), SL("_memcache"), &memcache);
+	phalcon_update_property_zval(getThis(), SL("_memcache"), &memcache);
 	
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 }

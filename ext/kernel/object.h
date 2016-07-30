@@ -80,13 +80,20 @@ static inline int phalcon_isset_property_zval(zval *object, const zval *property
 }
 
 /** Reading properties */
-zval* phalcon_read_property(zval *object, const char *property_name, size_t property_length, int silent);
-/**
- * Reads a property from an object
- */
-static inline zval* phalcon_read_property_zval(zval *object, const zval *property, int silent)
+int phalcon_read_property(zval *result, zval *object, const char *property_name, zend_uint property_length, int flags);
+
+static inline int phalcon_read_property_zval(zval *result, zval *object, zval *property, int flags)
 {
-	return phalcon_read_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property), silent);
+	if (unlikely(Z_TYPE_P(property) != IS_STRING)) {
+		if ((flags & PH_NOISY) == PH_NOISY) {
+			php_error_docref(NULL, E_NOTICE, "Cannot access empty property %d", Z_TYPE_P(property));
+		}
+
+		ZVAL_NULL(result);
+		return FAILURE;
+	}
+
+	return phalcon_read_property(result, object, Z_STRVAL_P(property), Z_STRLEN_P(property), flags);
 }
 
 /**
@@ -94,13 +101,8 @@ static inline zval* phalcon_read_property_zval(zval *object, const zval *propert
  */
 static inline int phalcon_return_property(zval *return_value, zval *object, const char *property_name, uint32_t property_length)
 {
-	zval *tmp = phalcon_read_property(object, property_name, property_length, PH_NOISY);
-	if (tmp) {
-		PHALCON_CPY_WRT(return_value, tmp);
-		return SUCCESS;
-	}
-
 	ZVAL_NULL(return_value);
+	phalcon_read_property(return_value, object, property_name, property_length, 0);
 	return FAILURE;
 }
 
@@ -116,20 +118,51 @@ static inline int phalcon_return_property_zval(zval *return_value, zval *object,
 	return FAILURE;
 }
 
+/**
+ * Fetches a property using a const char
+ */
+static int phalcon_fetch_property(zval *result, zval *object, const char *property_name, zend_uint property_length, int silent)
+{
+	if (phalcon_isset_property(object, property_name, property_length)) {
+		phalcon_read_property(result, object, property_name, property_length, 0);
+		return 1;
+	}
+
+	//zval_ptr_dtor(result);
+	ZVAL_NULL(result);
+	return 0;
+}
+
+/**
+ * Fetches a property using a zval property
+ */
+static int phalcon_fetch_property_zval(zval *result, zval *object, zval *property, int silent)
+{
+
+	ZVAL_NULL(result);
+	if (unlikely(Z_TYPE_P(property) != IS_STRING)) {
+		return 0;
+	}
+
+	if (phalcon_isset_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property))) {
+		phalcon_read_property(result, object, Z_STRVAL_P(property), Z_STRLEN_P(property), 0);
+		return 1;
+	}
+	return 0;
+}
+
 
 /** Updating properties */
+int phalcon_update_property_zval(zval *obj, const char *property_name, uint32_t property_length, zval *value);
 int phalcon_update_property_long(zval *obj, const char *property_name, uint32_t property_length, long value);
 int phalcon_update_property_str(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length);
 int phalcon_update_property_bool(zval *obj, const char *property_name, uint32_t property_length, int value);
 int phalcon_update_property_null(zval *obj, const char *property_name, uint32_t property_length);
-int phalcon_update_property_zval(zval *obj, const char *property_name, uint32_t property_length, zval *value);
 int phalcon_update_property_string_zval(zval *obj, zend_string *property, zval *value);
 int phalcon_update_property_zval_null(zval *obj, const zval *property);
 int phalcon_update_property_zval_long(zval *obj, const zval *property, int value);
 int phalcon_update_property_zval_zval(zval *obj, const zval *property, zval *value);
 int phalcon_update_property_empty_array(zval *object, const char *property, uint32_t property_length);
-
-int phalcon_update_property_this(zval *object, const char *property_name, uint32_t property_length, zval *value);
 
 /** Updating array properties */
 int phalcon_update_property_array(zval *object, const char *property, uint32_t property_length, const zval *index, zval *value);

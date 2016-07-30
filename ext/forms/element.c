@@ -159,9 +159,9 @@ PHP_METHOD(Phalcon_Forms_Element, __construct){
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_name"), name);
+	phalcon_update_property_zval(getThis(), SL("_name"), name);
 	if (attributes && Z_TYPE_P(attributes) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_attributes"), attributes);
+		phalcon_update_property_zval(getThis(), SL("_attributes"), attributes);
 	}
 }
 
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Forms_Element, setForm){
 
 	phalcon_fetch_params(0, 1, 0, &form);
 
-	phalcon_update_property_this(getThis(), SL("_form"), form);
+	phalcon_update_property_zval(getThis(), SL("_form"), form);
 	RETURN_THISW();
 }
 
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Forms_Element, setName){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_update_property_this(getThis(), SL("_name"), name);
+	phalcon_update_property_zval(getThis(), SL("_name"), name);
 	RETURN_THISW();
 }
 
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Forms_Element, setFilters){
 
 	phalcon_fetch_params(0, 1, 0, &filters);
 
-	phalcon_update_property_this(getThis(), SL("_filters"), filters);
+	phalcon_update_property_zval(getThis(), SL("_filters"), filters);
 	RETURN_THISW();
 }
 
@@ -257,7 +257,7 @@ PHP_METHOD(Phalcon_Forms_Element, addFilter){
 		}
 
 		phalcon_array_append(&new_filters, filter, PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_filters"), &new_filters);
+		phalcon_update_property_zval(getThis(), SL("_filters"), &new_filters);
 	}
 
 	RETURN_THISW();
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Forms_Element, addValidators){
 			PHALCON_CPY_WRT(&merged_validators, validators);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_validators"), &merged_validators);
+		phalcon_update_property_zval(getThis(), SL("_validators"), &merged_validators);
 	}
 
 	RETURN_THISW();
@@ -479,7 +479,7 @@ PHP_METHOD(Phalcon_Forms_Element, setAttributes){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_forms_exception_ce, "Parameter 'attributes' must be an array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_attributes"), attributes);
+	phalcon_update_property_zval(getThis(), SL("_attributes"), attributes);
 
 	RETURN_THISW();
 }
@@ -560,7 +560,7 @@ PHP_METHOD(Phalcon_Forms_Element, setUserOptions){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_forms_exception_ce, "Parameter 'options' must be an array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_options"), options);
+	phalcon_update_property_zval(getThis(), SL("_options"), options);
 
 	RETURN_THISW();
 }
@@ -588,7 +588,7 @@ PHP_METHOD(Phalcon_Forms_Element, setLabel){
 
 	phalcon_fetch_params(0, 1, 0, &label);
 
-	phalcon_update_property_this(getThis(), SL("_label"), label);
+	phalcon_update_property_zval(getThis(), SL("_label"), label);
 	RETURN_THISW();
 }
 
@@ -667,7 +667,7 @@ PHP_METHOD(Phalcon_Forms_Element, setDefault){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_update_property_this(getThis(), SL("_value"), value);
+	phalcon_update_property_zval(getThis(), SL("_value"), value);
 	RETURN_THISW();
 }
 
@@ -741,7 +741,7 @@ PHP_METHOD(Phalcon_Forms_Element, getMessages){
 	object_init_ex(return_value, phalcon_validation_message_group_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct");
 
-	phalcon_update_property_this(getThis(), SL("_messages"), return_value);
+	phalcon_update_property_zval(getThis(), SL("_messages"), return_value);
 }
 
 /**
@@ -782,7 +782,7 @@ PHP_METHOD(Phalcon_Forms_Element, setMessages){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_forms_exception_ce, "The message group is not valid");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_messages"), group);
+	phalcon_update_property_zval(getThis(), SL("_messages"), group);
 
 	RETURN_THISW();
 }
@@ -804,7 +804,7 @@ PHP_METHOD(Phalcon_Forms_Element, appendMessage){
 		object_init_ex(&messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHODW(NULL, &messages, "__construct");
 
-		phalcon_update_property_this(getThis(), SL("_messages"), &messages);
+		phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
 	}
 
 	PHALCON_CALL_METHODW(NULL, &messages, "appendmessage", message);

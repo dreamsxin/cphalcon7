@@ -641,23 +641,23 @@ static inline zend_class_entry *phalcon_lookup_str_class_ce(zend_class_entry *ce
 /**
  * Reads a property from an object
  */
-zval* phalcon_read_property(zval *object, const char *property_name, size_t property_length, int silent)
+int phalcon_read_property(zval *result, zval *object, const char *property_name, zend_uint property_length, int flags)
 {
-	zval *value;
-	zend_class_entry *ce;
+	zval property;
+	zend_class_entry *ce, *old_scope;
+	zval tmp;
+	zval *res;
+
+	ZVAL_UNDEF(&tmp);
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
-		if (silent == PH_NOISY) {
-			php_error_docref(NULL, E_NOTICE, "Trying to get property of non-object");
-		}
-		return &EG(uninitialized_zval);
-	}
 
-	if (!phalcon_isset_property(object, property_name, property_length)) {
-		if (silent == PH_NOISY) {
-			php_error_docref(NULL, E_NOTICE, "Undefined property: %s of class %s", property_name, ZSTR_VAL(Z_OBJCE_P(object)->name));
+		if ((flags & PH_NOISY) == PH_NOISY) {
+			php_error_docref(NULL, E_NOTICE, "Trying to get property \"%s\" of non-object", property_name);
 		}
-		return &EG(uninitialized_zval);
+
+		ZVAL_NULL(result);
+		return FAILURE;
 	}
 
 	ce = Z_OBJCE_P(object);
@@ -665,12 +665,66 @@ zval* phalcon_read_property(zval *object, const char *property_name, size_t prop
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
-	value = zend_read_property(ce, object, property_name, property_length, 1, NULL);
-	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
-		value = Z_REFVAL_P(value);
+	old_scope = EG(scope);
+	EG(scope) = ce;
+
+	if (!Z_OBJ_HT_P(object)->read_property) {
+		const char *class_name;
+
+		class_name = Z_OBJ_P(object) ? ZSTR_VAL(Z_OBJCE_P(object)->name) : "";
+		zend_error(E_CORE_ERROR, "Property %s of class %s cannot be read", property_name, class_name);
 	}
 
-	return value;
+	ZVAL_STRINGL(&property, property_name, property_length);
+
+	res = Z_OBJ_HT_P(object)->read_property(object, &property, flags ? BP_VAR_IS : BP_VAR_R, NULL, &tmp);
+	if ((flags & PH_READONLY) == PH_READONLY) {
+		ZVAL_COPY_VALUE(result, res);
+	} else {
+		ZVAL_COPY(result, res);
+	}
+
+	zval_ptr_dtor(&property);
+
+	EG(scope) = old_scope;
+	return SUCCESS;
+}
+
+/**
+ * Checks whether obj is an object and updates property with another zval
+ */
+int phalcon_update_property_zval(zval *object, const char *property_name, uint32_t property_length, zval *value){
+	zend_class_entry *ce, *old_scope;
+	zval property;
+
+	old_scope = EG(scope);
+	if (Z_TYPE_P(object) != IS_OBJECT) {
+		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object");
+		return FAILURE;
+	}
+
+	ce = Z_OBJCE_P(object);
+	if (ce->parent) {
+		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
+	}
+
+	EG(scope) = ce;
+
+	if (!Z_OBJ_HT_P(object)->write_property) {
+		const char *class_name;
+
+		class_name = Z_OBJ_P(object) ? ZSTR_VAL(Z_OBJCE_P(object)->name) : "";
+		zend_error(E_CORE_ERROR, "Property %s of class %s cannot be updated", property_name, class_name);
+	}
+
+	ZVAL_STRINGL(&property, property_name, property_length);
+
+	/* write_property will add 1 to refcount, so no Z_TRY_ADDREF_P(value); is necessary */
+	Z_OBJ_HT_P(object)->write_property(object, &property, value, 0);
+	zval_ptr_dtor(&property);
+
+	EG(scope) = old_scope;
+	return SUCCESS;
 }
 
 /**
@@ -714,31 +768,6 @@ int phalcon_update_property_null(zval *object, const char *property_name, uint32
 	return phalcon_update_property_zval(object, property_name, property_length, &value);
 }
 
-/**
- * Checks whether obj is an object and updates property with another zval
- */
-int phalcon_update_property_zval(zval *object, const char *property_name, uint32_t property_length, zval *value){
-	zend_class_entry *ce;
-
-	if (!object) {
-		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (1)");
-		return FAILURE;
-	}
-
-	if (Z_TYPE_P(object) != IS_OBJECT) {
-		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (2)");
-		return FAILURE;
-	}
-
-	ce = Z_OBJCE_P(object);
-	if (ce->parent) {
-		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
-	}
-
-	zend_update_property(ce, object, property_name, property_length, value);
-	return SUCCESS;
-}
-
 int phalcon_update_property_string_zval(zval *object, zend_string *property, zval *value){
 	zend_class_entry *ce;
 
@@ -762,20 +791,6 @@ int phalcon_update_property_string_zval(zval *object, zend_string *property, zva
 	return SUCCESS;
 }
 
-/**
- * Updates properties on this_ptr (quick)
- * Variables must be defined in the class definition. This function ignores magic methods or dynamic properties
- */
-int phalcon_update_property_this(zval *object, const char *property_name, uint32_t property_length, zval *value)
-{
-	if (unlikely(Z_TYPE_P(object) != IS_OBJECT)) {
-		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object");
-		return FAILURE;
-	}
-
-	return phalcon_update_property_zval(object, property_name, property_length, value);
-}
-
 int phalcon_update_property_zval_null(zval *object, const zval *property)
 {
 	zval v = {};
@@ -788,25 +803,22 @@ int phalcon_update_property_zval_null(zval *object, const zval *property)
  */
 int phalcon_update_property_zval_long(zval *object, const zval *property, int value)
 {
-	if (Z_TYPE_P(property) != IS_STRING) {
-		php_error_docref(NULL, E_WARNING, "Property should be string");
-		return FAILURE;
-	}
-
-	return phalcon_update_property_long(object, Z_STRVAL_P(property), Z_STRLEN_P(property), value);
+	zval v = {};
+	ZVAL_LONG(&v, value);
+	return phalcon_update_property_zval(object, Z_STRVAL_P(property), Z_STRLEN_P(property), v);
 }
 
 /**
  * Checks whether obj is an object and updates zval property with another zval
  */
-int phalcon_update_property_zval_zval(zval *object, const zval *property, zval *value)
+int phalcon_update_property_zval_zval(zval *object, zval *property, zval *value)
 {
 	if (Z_TYPE_P(property) != IS_STRING) {
 		php_error_docref(NULL, E_WARNING, "Property should be string");
 		return FAILURE;
 	}
 
-	return phalcon_update_property_string_zval(object, Z_STR_P(property), value);
+	return phalcon_update_property_zval(object, Z_STRVAL_P(property), Z_STRLEN_P(property), value);
 }
 
 /**

@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	phalcon_add_function(&next_consecutive, connection_consecutive, &PHALCON_GLOBAL(z_one));
 
 	phalcon_update_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"), &next_consecutive);
-	phalcon_update_property_this(getThis(), SL("_connectionId"), connection_consecutive);
+	phalcon_update_property_zval(getThis(), SL("_connectionId"), connection_consecutive);
 	PHALCON_PTR_DTOR(&next_consecutive);
 
 	/** 
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	}
 	PHALCON_PTR_DTOR(&dialect_class);
 
-	phalcon_update_property_this(getThis(), SL("_descriptor"), descriptor);
+	phalcon_update_property_zval(getThis(), SL("_descriptor"), descriptor);
 }
 
 /**
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setProfiler){
 
 	phalcon_fetch_params(0, 1, 0, &profiler);
 
-	phalcon_update_property_this(getThis(), SL("_profiler"), profiler);
+	phalcon_update_property_zval(getThis(), SL("_profiler"), profiler);
 
 }
 
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setDialect){
 
 	phalcon_fetch_params(0, 1, 0, &dialect);
 	PHALCON_VERIFY_INTERFACE_EX(dialect, phalcon_db_dialectinterface_ce, phalcon_db_exception_ce, 0);
-	phalcon_update_property_this(getThis(), SL("_dialect"), dialect);
+	phalcon_update_property_zval(getThis(), SL("_dialect"), dialect);
 }
 
 /**
@@ -1693,7 +1693,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setNestedTransactionsWithSavepoints){
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_transactionsWithSavepoints"), nested_transactions_with_savepoints);
+	phalcon_update_property_zval(getThis(), SL("_transactionsWithSavepoints"), nested_transactions_with_savepoints);
 
 	RETURN_THISW();
 }

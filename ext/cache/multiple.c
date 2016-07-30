@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, __construct){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backends must be an array");
 			return;
 		}
-		phalcon_update_property_this(getThis(), SL("_backends"), backends);
+		phalcon_update_property_zval(getThis(), SL("_backends"), backends);
 	}
 }
 

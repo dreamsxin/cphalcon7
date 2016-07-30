@@ -118,9 +118,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 	if (Z_TYPE(handler) != IS_RESOURCE) {
 		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open log file '%s'", Z_STRVAL_P(name));
 	} else {
-		phalcon_update_property_this(getThis(), SL("_path"), name);
-		phalcon_update_property_this(getThis(), SL("_options"), options);
-		phalcon_update_property_this(getThis(), SL("_fileHandler"), &handler);
+		phalcon_update_property_zval(getThis(), SL("_path"), name);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
+		phalcon_update_property_zval(getThis(), SL("_fileHandler"), &handler);
 	}
 }
 
@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
 		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHODW(NULL, &formatter, "__construct");
 
-		phalcon_update_property_this(getThis(), SL("_formatter"), &formatter);
+		phalcon_update_property_zval(getThis(), SL("_formatter"), &formatter);
 	}
 
 	RETURN_CTORW(&formatter);
@@ -219,5 +219,5 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 	 * Re-open the file handler if the logger was serialized
 	 */
 	PHALCON_CALL_FUNCTIONW(&file_handler, "fopen", path, &mode);
-	phalcon_update_property_this(getThis(), SL("_fileHandler"), &file_handler);
+	phalcon_update_property_zval(getThis(), SL("_fileHandler"), &file_handler);
 }

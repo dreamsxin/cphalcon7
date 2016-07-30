@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
 		ZVAL_LONG(&lifetime, 8600);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_lifetime"), &lifetime);
+	phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
 
 	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
 		ZVAL_EMPTY_STRING(&prefix);
@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
 
 	PHALCON_CALL_METHODW(NULL, &libmemcached, "__construct", &frontend_data, &option);
 
-	phalcon_update_property_this(getThis(), SL("_libmemcached"), &libmemcached);
+	phalcon_update_property_zval(getThis(), SL("_libmemcached"), &libmemcached);
 	
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 }

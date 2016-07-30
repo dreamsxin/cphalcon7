@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	 */
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_VERIFY_INTERFACE_EX(&di, phalcon_diinterface_ce, phalcon_mvc_collection_exception_ce, 0);
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 	} else {
 		PHALCON_CALL_CE_STATICW(&di, phalcon_di_ce, "getdefault");
 	}
@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, __construct){
 	/**
 	 * Update the collection-manager
 	 */
-	phalcon_update_property_this(getThis(), SL("_collectionManager"), &mm);
+	phalcon_update_property_zval(getThis(), SL("_collectionManager"), &mm);
 
 	/**
 	 * The manager always initializes the object
@@ -643,7 +643,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, getConnection){
 		collection_manager = phalcon_read_property(getThis(), SL("_collectionManager"), PH_NOISY);
 
 		PHALCON_CALL_METHODW(&connection, collection_manager, "getconnection", getThis());
-		phalcon_update_property_this(getThis(), SL("_connection"), &connection);
+		phalcon_update_property_zval(getThis(), SL("_connection"), &connection);
 	}
 
 	RETURN_CTORW(&connection);
@@ -1575,7 +1575,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 				array_init_size(&messages, 1);
 				phalcon_array_append(&messages, &collection_message, PH_COPY);
-				phalcon_update_property_this(getThis(), SL("_errorMessages"), &messages);
+				phalcon_update_property_zval(getThis(), SL("_errorMessages"), &messages);
 				RETURN_FALSE;
 			}
 		} else {
@@ -1588,7 +1588,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 
 				array_init_size(&messages, 1);
 				phalcon_array_append(&messages, &collection_message, PH_COPY);
-				phalcon_update_property_this(getThis(), SL("_errorMessages"), &messages);
+				phalcon_update_property_zval(getThis(), SL("_errorMessages"), &messages);
 				RETURN_FALSE;
 			}
 		}
@@ -1601,7 +1601,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, save){
 	/**
 	 * The messages added to the validator are reset here
 	 */
-	phalcon_update_property_this(getThis(), SL("_errorMessages"), &empty_array);
+	phalcon_update_property_zval(getThis(), SL("_errorMessages"), &empty_array);
 
 	disable_events = phalcon_read_static_property_ce(phalcon_mvc_collection_ce, SL("_disableEvents"));
 
@@ -2310,7 +2310,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 			/**
 			 * Update the dependency injector
 			 */
-			phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
+			phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
 
 			/**
 			 * Gets the default collectionManager service
@@ -2328,7 +2328,7 @@ PHP_METHOD(Phalcon_Mvc_Collection, unserialize){
 			/**
 			 * Update the collection manager
 			 */
-			phalcon_update_property_this(getThis(), SL("_collectionManager"), &manager);
+			phalcon_update_property_zval(getThis(), SL("_collectionManager"), &manager);
 
 			/**
 			 * Update the objects attributes

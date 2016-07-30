@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	}
 
 	phalcon_array_fetch_str(&name, reflection_data, SL("name"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_name"), &name);
+	phalcon_update_property_zval(getThis(), SL("_name"), &name);
 	
 	/** 
 	 * Process annotation arguments
@@ -130,8 +130,8 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 			}
 		} ZEND_HASH_FOREACH_END();
 	
-		phalcon_update_property_this(getThis(), SL("_arguments"), &arguments);
-		phalcon_update_property_this(getThis(), SL("_exprArguments"), &expr_arguments);
+		phalcon_update_property_zval(getThis(), SL("_arguments"), &arguments);
+		phalcon_update_property_zval(getThis(), SL("_exprArguments"), &expr_arguments);
 	}
 }
 

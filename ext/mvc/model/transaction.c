@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 
 	PHALCON_CALL_METHODW(&connection, dependency_injector, "get", &service);
 
-	phalcon_update_property_this(getThis(), SL("_connection"), &connection);
+	phalcon_update_property_zval(getThis(), SL("_connection"), &connection);
 	if (zend_is_true(auto_begin)) {
 		PHALCON_CALL_METHODW(NULL, &connection, "begin");
 	}
@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setTransactionManager){
 	phalcon_fetch_params(0, 1, 0, &manager);
 	PHALCON_VERIFY_INTERFACE_EX(manager, phalcon_mvc_model_transaction_managerinterface_ce, phalcon_mvc_model_transaction_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_manager"), manager);
+	phalcon_update_property_zval(getThis(), SL("_manager"), manager);
 }
 
 /**
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 	if (!rollback_record || Z_TYPE_P(rollback_record) != IS_OBJECT) {
 		rollback_record = phalcon_read_property(getThis(), SL("_rollbackRecord"), PH_NOISY);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_rollbackRecord"), rollback_record);
+		phalcon_update_property_zval(getThis(), SL("_rollbackRecord"), rollback_record);
 	}
 
 	if (!rollback_code) {
@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setIsNewTransaction){
 
 	phalcon_fetch_params(0, 1, 0, &is_new);
 
-	phalcon_update_property_this(getThis(), SL("_isNewTransaction"), is_new);
+	phalcon_update_property_zval(getThis(), SL("_isNewTransaction"), is_new);
 
 }
 
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setRollbackOnAbort){
 
 	phalcon_fetch_params(0, 1, 0, &rollback_on_abort);
 
-	phalcon_update_property_this(getThis(), SL("_rollbackOnAbort"), rollback_on_abort);
+	phalcon_update_property_zval(getThis(), SL("_rollbackOnAbort"), rollback_on_abort);
 
 }
 
@@ -354,6 +354,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setRollbackedRecord){
 
 	phalcon_fetch_params(0, 1, 0, &record);
 
-	phalcon_update_property_this(getThis(), SL("_rollbackRecord"), record);
+	phalcon_update_property_zval(getThis(), SL("_rollbackRecord"), record);
 
 }

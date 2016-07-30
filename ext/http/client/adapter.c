@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUserAgent){
 
 	phalcon_fetch_params(0, 1, 0, &useragent);
 
-	phalcon_update_property_this(getThis(), SL("_useragent"), useragent);
+	phalcon_update_property_zval(getThis(), SL("_useragent"), useragent);
 
 	RETURN_THISW();
 }
@@ -148,8 +148,8 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 
 	phalcon_fetch_params(0, 2, 3, &username, &password, &_authtype, &digest, &entity_body);
 
-	phalcon_update_property_this(getThis(), SL("_username"), username);
-	phalcon_update_property_this(getThis(), SL("_password"), password);
+	phalcon_update_property_zval(getThis(), SL("_username"), username);
+	phalcon_update_property_zval(getThis(), SL("_password"), password);
 
 	if (!_authtype) {
 		ZVAL_STRING(&authtype, "any");
@@ -157,14 +157,14 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 		PHALCON_CPY_WRT(&authtype, _authtype);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_authtype"), &authtype);
+	phalcon_update_property_zval(getThis(), SL("_authtype"), &authtype);
 
 	if (digest && Z_TYPE_P(digest) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_digest"), digest);
+		phalcon_update_property_zval(getThis(), SL("_digest"), digest);
 	}
 
 	if (entity_body) {
-		phalcon_update_property_this(getThis(), SL("_entity_body"), entity_body);
+		phalcon_update_property_zval(getThis(), SL("_entity_body"), entity_body);
 	}
 
 	RETURN_THISW();
@@ -227,11 +227,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setData){
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_data"), data);
+	phalcon_update_property_zval(getThis(), SL("_data"), data);
 
 	if (type) {
 		convert_to_string(type);
-		phalcon_update_property_this(getThis(), SL("_type"), type);
+		phalcon_update_property_zval(getThis(), SL("_type"), type);
 	}
 
 	RETURN_THISW();
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFile){
 	if (Z_TYPE_P(file) != IS_ARRAY) {
 		phalcon_update_property_array_append(getThis(), SL("_files"), file);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_files"), file);
+		phalcon_update_property_zval(getThis(), SL("_files"), file);
 	}
 
 	// zend_error_noreturn(E_DEPRECATED, "Method Phalcon\\Http\\Client\\Adapter::setFile is deprecated, please use Phalcon\\Http\\Client\\Adapter::setFiles instead");
@@ -275,9 +275,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFiles){
 	if (Z_TYPE_P(files) != IS_ARRAY) {
 		array_init(&arr);
 		phalcon_array_append(&arr, files, PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_files"), &arr);
+		phalcon_update_property_zval(getThis(), SL("_files"), &arr);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_files"), files);
+		phalcon_update_property_zval(getThis(), SL("_files"), files);
 	}
 
 	RETURN_THISW();
@@ -443,7 +443,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUri){
 
 	if (Z_TYPE_P(base_uri) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(NULL, base_uri, "extend", uri);
-		phalcon_update_property_this(getThis(), SL("_base_uri"), base_uri);
+		phalcon_update_property_zval(getThis(), SL("_base_uri"), base_uri);
 	} else {
 		PHALCON_CALL_SELFW(NULL, "setbaseuri", uri);
 	}
@@ -489,7 +489,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setBaseUri){
 	object_init_ex(&base_uri, phalcon_http_uri_ce);
 	PHALCON_CALL_METHODW(NULL, &base_uri, "__construct", uri);
 
-	phalcon_update_property_this(getThis(), SL("_base_uri"), &base_uri);
+	phalcon_update_property_zval(getThis(), SL("_base_uri"), &base_uri);
 
 	RETURN_THISW();
 }
@@ -506,7 +506,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setMethod){
 
 	phalcon_fetch_params(0, 1, 0, &method);
 
-	phalcon_update_property_this(getThis(), SL("_method"), method);
+	phalcon_update_property_zval(getThis(), SL("_method"), method);
 
 	RETURN_THISW();
 }
@@ -523,7 +523,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setTimeOut){
 
 	phalcon_fetch_params(0, 1, 0, &time);
 
-	phalcon_update_property_this(getThis(), SL("_timeout"), time);
+	phalcon_update_property_zval(getThis(), SL("_timeout"), time);
 
 	RETURN_THISW();
 }

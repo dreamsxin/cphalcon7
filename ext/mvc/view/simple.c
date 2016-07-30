@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_options"), options);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
 }
 
@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setViewsDir){
 
 	phalcon_fetch_params(0, 1, 0, &views_dir);
 
-	phalcon_update_property_this(getThis(), SL("_viewsDir"), views_dir);
+	phalcon_update_property_zval(getThis(), SL("_viewsDir"), views_dir);
 
 }
 
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, registerEngines){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Engines to register must be an array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_registeredEngines"), engines);
+	phalcon_update_property_zval(getThis(), SL("_registeredEngines"), engines);
 
 }
 
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 
 		}
 
-		phalcon_update_property_this(getThis(), SL("_engines"), &engines);
+		phalcon_update_property_zval(getThis(), SL("_engines"), &engines);
 	}
 
 	RETURN_CTORW(&engines);
@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		phalcon_update_property_this(getThis(), SL("_activeRenderPath"), path);
+		phalcon_update_property_zval(getThis(), SL("_activeRenderPath"), path);
 	}
 
 	/** 
@@ -516,7 +516,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			 */
 			PHALCON_CALL_METHODW(&content, &cache, "start", &key, &lifetime);
 			if (Z_TYPE(content) != IS_NULL) {
-				phalcon_update_property_this(getThis(), SL("_content"), &content);
+				phalcon_update_property_zval(getThis(), SL("_content"), &content);
 				RETURN_CTORW(&content);
 			}
 		}
@@ -629,7 +629,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 		/** 
 		 * Restore the original view params
 		 */
-		phalcon_update_property_this(getThis(), SL("_viewParams"), view_params);
+		phalcon_update_property_zval(getThis(), SL("_viewParams"), view_params);
 	}
 
 	phalcon_ob_end_clean();
@@ -654,7 +654,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setCacheOptions){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	phalcon_update_property_this(getThis(), SL("_cacheOptions"), options);
+	phalcon_update_property_zval(getThis(), SL("_cacheOptions"), options);
 	RETURN_THISW();
 }
 
@@ -715,7 +715,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, getCache){
 	if (zend_is_true(&cache)) {
 		if (Z_TYPE(cache) != IS_OBJECT) {
 			PHALCON_CALL_METHODW(&cache, getThis(), "_createcache");
-			phalcon_update_property_this(getThis(), SL("_cache"), &cache);
+			phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
 		}
 	}
 
@@ -743,13 +743,13 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, cache){
 	}
 
 	if (Z_TYPE_P(options) == IS_ARRAY) { 
-		phalcon_update_property_this(getThis(), SL("_cache"), &PHALCON_GLOBAL(z_true));
-		phalcon_update_property_this(getThis(), SL("_cacheOptions"), options);
+		phalcon_update_property_zval(getThis(), SL("_cache"), &PHALCON_GLOBAL(z_true));
+		phalcon_update_property_zval(getThis(), SL("_cacheOptions"), options);
 	} else {
 		if (zend_is_true(options)) {
-			phalcon_update_property_this(getThis(), SL("_cache"), &PHALCON_GLOBAL(z_true));
+			phalcon_update_property_zval(getThis(), SL("_cache"), &PHALCON_GLOBAL(z_true));
 		} else {
-			phalcon_update_property_this(getThis(), SL("_cache"), &PHALCON_GLOBAL(z_false));
+			phalcon_update_property_zval(getThis(), SL("_cache"), &PHALCON_GLOBAL(z_false));
 		}
 	}
 
@@ -811,9 +811,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setVars){
 			PHALCON_CPY_WRT(&merged_params, params);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_viewParams"), &merged_params);
+		phalcon_update_property_zval(getThis(), SL("_viewParams"), &merged_params);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_viewParams"), params);
+		phalcon_update_property_zval(getThis(), SL("_viewParams"), params);
 	}
 
 	RETURN_THISW();
@@ -880,7 +880,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setContent){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Content must be a string");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_content"), content);
+	phalcon_update_property_zval(getThis(), SL("_content"), content);
 
 	RETURN_THISW();
 }

@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
 
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
 
@@ -581,7 +581,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
 

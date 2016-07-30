@@ -110,22 +110,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
 	/** 
 	 * Column types, tell the resultset how to build the result
 	 */
-	phalcon_update_property_this(getThis(), SL("_columnTypes"), columns_types);
+	phalcon_update_property_zval(getThis(), SL("_columnTypes"), columns_types);
 
 	/** 
 	 * Valid resultsets are Phalcon\Db\ResultInterface instances
 	 * FIXME: or Phalcon\Db\Result\Pdo?
 	 */
-	phalcon_update_property_this(getThis(), SL("_result"), result);
+	phalcon_update_property_zval(getThis(), SL("_result"), result);
 
 	/** 
 	 * Update the related cache if any
 	 */
 	if (Z_TYPE_P(cache) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_cache"), cache);
+		phalcon_update_property_zval(getThis(), SL("_cache"), cache);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_sourceModel"), source_model);
+	phalcon_update_property_zval(getThis(), SL("_sourceModel"), source_model);
 
 	/** 
 	 * Resultsets type 1 are traversed one-by-one
@@ -363,12 +363,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			/** 
 			 * Store the generated row in this_ptr->activeRow to be retrieved by 'current'
 			 */
-			phalcon_update_property_this(getThis(), SL("_activeRow"), &active_row);
+			phalcon_update_property_zval(getThis(), SL("_activeRow"), &active_row);
 		} else {
 			/** 
 			 * The row is already built so we just assign it to the activeRow
 			 */
-			phalcon_update_property_this(getThis(), SL("_activeRow"), &row);
+			phalcon_update_property_zval(getThis(), SL("_activeRow"), &row);
 		}
 		RETURN_TRUE;
 	}
@@ -466,14 +466,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, unserialize){
 	}
 
 	phalcon_array_fetch_str(&rows, &resultset, SL("rows"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_rows"), &rows);
+	phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
 
 	phalcon_array_fetch_str(&cache, &resultset, SL("cache"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_cache"), &cache);
+	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
 
 	phalcon_array_fetch_str(&column_types, &resultset, SL("columnTypes"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_columnTypes"), &column_types);
+	phalcon_update_property_zval(getThis(), SL("_columnTypes"), &column_types);
 
 	phalcon_array_fetch_str(&hydrate_mode, &resultset, SL("hydrateMode"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_hydrateMode"), &hydrate_mode);
+	phalcon_update_property_zval(getThis(), SL("_hydrateMode"), &hydrate_mode);
 }

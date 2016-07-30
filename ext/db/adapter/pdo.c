@@ -304,7 +304,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, prepare){
 
 	phalcon_fetch_params(0, 1, 0, &sql_statement);
 
-	phalcon_update_property_this(getThis(), SL("_sqlStatement"), sql_statement);
+	phalcon_update_property_zval(getThis(), SL("_sqlStatement"), sql_statement);
 
 	pdo = phalcon_read_property(getThis(), SL("_pdo"), PH_NOISY);
 	PHALCON_RETURN_CALL_METHODW(pdo, "prepare", sql_statement);
@@ -445,9 +445,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 	 * Execute the beforeQuery event if a EventsManager is available
 	 */
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		phalcon_update_property_this(getThis(), SL("_sqlStatement"), sql_statement);
-		phalcon_update_property_this(getThis(), SL("_sqlVariables"), bind_params);
-		phalcon_update_property_this(getThis(), SL("_sqlBindTypes"), bind_types);
+		phalcon_update_property_zval(getThis(), SL("_sqlStatement"), sql_statement);
+		phalcon_update_property_zval(getThis(), SL("_sqlVariables"), bind_params);
+		phalcon_update_property_zval(getThis(), SL("_sqlBindTypes"), bind_types);
 
 		PHALCON_STR(&event_name, "db:beforeQuery");
 		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), bind_params);
@@ -527,9 +527,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	 */
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-		phalcon_update_property_this(getThis(), SL("_sqlStatement"), sql_statement);
-		phalcon_update_property_this(getThis(), SL("_sqlVariables"), bind_params);
-		phalcon_update_property_this(getThis(), SL("_sqlBindTypes"), bind_types);
+		phalcon_update_property_zval(getThis(), SL("_sqlStatement"), sql_statement);
+		phalcon_update_property_zval(getThis(), SL("_sqlVariables"), bind_params);
+		phalcon_update_property_zval(getThis(), SL("_sqlBindTypes"), bind_types);
 
 		PHALCON_STR(&event_name, "db:beforeExecute");
 		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), bind_params);
@@ -565,7 +565,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	 * Execute the afterQuery event if a EventsManager is available
 	 */
 	if (Z_TYPE(affected_rows) == IS_LONG) {
-		phalcon_update_property_this(getThis(), SL("_affectedRows"), &affected_rows);
+		phalcon_update_property_zval(getThis(), SL("_affectedRows"), &affected_rows);
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 			PHALCON_STR(&event_name, "db:afterExecute");
 			PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), bind_params);
@@ -606,7 +606,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, close){
 
 	pdo = phalcon_read_property(getThis(), SL("_pdo"), PH_NOISY);
 	if (likely(Z_TYPE_P(pdo) == IS_OBJECT)) {
-		phalcon_update_property_this(getThis(), SL("_pdo"), &PHALCON_GLOBAL(z_null));
+		phalcon_update_property_zval(getThis(), SL("_pdo"), &PHALCON_GLOBAL(z_null));
 		RETURN_TRUE;
 	}
 

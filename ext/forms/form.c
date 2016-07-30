@@ -275,14 +275,14 @@ PHP_METHOD(Phalcon_Forms_Form, __construct){
 			return;
 		}
 
-		phalcon_update_property_this(getThis(), SL("_entity"), entity);
+		phalcon_update_property_zval(getThis(), SL("_entity"), entity);
 	}
 
 	/**
 	 * Update the user options
 	 */
 	if (Z_TYPE_P(user_options) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_options"), user_options);
+		phalcon_update_property_zval(getThis(), SL("_options"), user_options);
 	}
 
 	/**
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Forms_Form, setAction){
 
 	phalcon_fetch_params(0, 1, 0, &action);
 
-	phalcon_update_property_this(getThis(), SL("_action"), action);
+	phalcon_update_property_zval(getThis(), SL("_action"), action);
 	RETURN_THISW();
 }
 
@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Forms_Form, setUserOptions){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_forms_exception_ce, "Parameter 'options' must be an array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_options"), options);
+	phalcon_update_property_zval(getThis(), SL("_options"), options);
 
 	RETURN_THISW();
 }
@@ -411,7 +411,7 @@ PHP_METHOD(Phalcon_Forms_Form, setEntity){
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_entity"), entity);
+	phalcon_update_property_zval(getThis(), SL("_entity"), entity);
 	RETURN_THISW();
 }
 
@@ -542,8 +542,8 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_update_property_this(getThis(), SL("_filterData"), &filter_data);
-	phalcon_update_property_this(getThis(), SL("_data"), data);
+	phalcon_update_property_zval(getThis(), SL("_filterData"), &filter_data);
+	phalcon_update_property_zval(getThis(), SL("_data"), data);
 }
 
 /**
@@ -653,7 +653,7 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 	 * If the validation fails update the messages
 	 */
 	if (!zend_is_true(&not_failed)) {
-		phalcon_update_property_this(getThis(), SL("_messages"), &messages);
+		phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
 	}
 
 	/**
@@ -768,7 +768,7 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 		phalcon_update_property_array(getThis(), SL("_elements"), &name, element);
 		elements = phalcon_read_property(getThis(), SL("_elements"), PH_NOISY);
 		phalcon_array_values(&elements_indexed, elements);
-		phalcon_update_property_this(getThis(), SL("_elementsIndexed"), &elements_indexed);
+		phalcon_update_property_zval(getThis(), SL("_elementsIndexed"), &elements_indexed);
 	} else {
 		if (type && zend_is_true(type)) {
 			i = -1;
@@ -812,9 +812,9 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 		phalcon_array_merge_recursive_n(&new_elements, &values);
 		phalcon_array_merge_recursive_n(&new_elements, &tmp1);
 
-		phalcon_update_property_this(getThis(), SL("_elements"), &new_elements);
+		phalcon_update_property_zval(getThis(), SL("_elements"), &new_elements);
 		phalcon_array_values(&elements_indexed, &new_elements);
-		phalcon_update_property_this(getThis(), SL("_elementsIndexed"), &elements_indexed);
+		phalcon_update_property_zval(getThis(), SL("_elementsIndexed"), &elements_indexed);
 	}
 
 	RETURN_THISW();
@@ -1060,7 +1060,7 @@ PHP_METHOD(Phalcon_Forms_Form, remove){
 
 		elements = phalcon_read_property(getThis(), SL("_elements"), PH_NOISY);
 		phalcon_array_values(&elements_indexed, elements);
-		phalcon_update_property_this(getThis(), SL("_elementsIndexed"), &elements_indexed);
+		phalcon_update_property_zval(getThis(), SL("_elementsIndexed"), &elements_indexed);
 		RETURN_TRUE;
 	}
 
@@ -1127,7 +1127,7 @@ PHP_METHOD(Phalcon_Forms_Form, rewind){
 	elements = phalcon_read_property(getThis(), SL("_elements"), PH_NOISY);
 	phalcon_update_property_long(getThis(), SL("_position"), 0);
 	phalcon_array_values(&elements_indexed, elements);
-	phalcon_update_property_this(getThis(), SL("_elementsIndexed"), &elements_indexed);
+	phalcon_update_property_zval(getThis(), SL("_elementsIndexed"), &elements_indexed);
 }
 
 /**
@@ -1219,7 +1219,7 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessage){
 	PHALCON_CALL_METHODW(NULL, &element_messages, "appendmessage", message);
 
 	phalcon_array_update_zval(&current_messages, filed, &element_messages, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_messages"), &current_messages);
+	phalcon_update_property_zval(getThis(), SL("_messages"), &current_messages);
 
 	RETURN_THISW();
 }
@@ -1254,7 +1254,7 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 	PHALCON_CALL_METHODW(NULL, &element_messages, "appendmessages", messages);
 
 	phalcon_array_update_zval(&current_messages, filed, &element_messages, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_messages"), &current_messages);
+	phalcon_update_property_zval(getThis(), SL("_messages"), &current_messages);
 
 	RETURN_THISW();
 }

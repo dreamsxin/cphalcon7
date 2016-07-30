@@ -259,7 +259,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		PHALCON_CALL_METHODW(&model_column_map, getThis(), "read", &prefix_key);
 		if (Z_TYPE(model_column_map) != IS_NULL) {
 			phalcon_array_update_zval(&column_map, key, &model_column_map, PH_COPY);
-			phalcon_update_property_this(getThis(), SL("_columnMap"), &column_map);
+			phalcon_update_property_zval(getThis(), SL("_columnMap"), &column_map);
 			RETURN_NULL();
 		}
 
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setStrategy){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The meta-data extraction strategy is not valid");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_strategy"), strategy);
+	phalcon_update_property_zval(getThis(), SL("_strategy"), strategy);
 
 }
 
@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
 	strategy = phalcon_read_property(getThis(), SL("_strategy"), PH_NOISY);
 	if (Z_TYPE_P(strategy) == IS_NULL) {
 		object_init_ex(&s, phalcon_mvc_model_metadata_strategy_introspection_ce);
-		phalcon_update_property_this(getThis(), SL("_strategy"), &s);
+		phalcon_update_property_zval(getThis(), SL("_strategy"), &s);
 		RETURN_CTORW(&s);
 	}
 
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 	}
 
 	phalcon_array_update_multi_2(meta_data, &key, index, data, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_metaData"), meta_data);
+	phalcon_update_property_zval(getThis(), SL("_metaData"), meta_data);
 }
 
 /**

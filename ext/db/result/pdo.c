@@ -131,18 +131,18 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, __construct){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid PDOStatement supplied to Phalcon\\Db\\Result\\Pdo");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_connection"), connection);
-	phalcon_update_property_this(getThis(), SL("_pdoStatement"), result);
+	phalcon_update_property_zval(getThis(), SL("_connection"), connection);
+	phalcon_update_property_zval(getThis(), SL("_pdoStatement"), result);
 	if (Z_TYPE_P(sql_statement) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_sqlStatement"), sql_statement);
+		phalcon_update_property_zval(getThis(), SL("_sqlStatement"), sql_statement);
 	}
 
 	if (Z_TYPE_P(bind_params) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_bindParams"), bind_params);
+		phalcon_update_property_zval(getThis(), SL("_bindParams"), bind_params);
 	}
 
 	if (Z_TYPE_P(bind_types) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_bindTypes"), bind_types);
+		phalcon_update_property_zval(getThis(), SL("_bindTypes"), bind_types);
 	}
 }
 
@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		/** 
 		 * Update the value to avoid further calculations
 		 */
-		phalcon_update_property_this(getThis(), SL("_rowCount"), &row_count);
+		phalcon_update_property_zval(getThis(), SL("_rowCount"), &row_count);
 	}
 
 	RETURN_CTORW(&row_count);

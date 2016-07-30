@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &module_name);
 
-	phalcon_update_property_this(getThis(), SL("_defaultModule"), module_name);
+	phalcon_update_property_zval(getThis(), SL("_defaultModule"), module_name);
 
 }
 
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultNamespace){
 
 	phalcon_fetch_params(0, 1, 0, &namespace_name);
 
-	phalcon_update_property_this(getThis(), SL("_defaultNamespace"), namespace_name);
+	phalcon_update_property_zval(getThis(), SL("_defaultNamespace"), namespace_name);
 
 }
 
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultTask){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 
-	phalcon_update_property_this(getThis(), SL("_defaultTask"), task_name);
+	phalcon_update_property_zval(getThis(), SL("_defaultTask"), task_name);
 
 }
 
@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultAction){
 
 	phalcon_fetch_params(0, 1, 0, &action_name);
 
-	phalcon_update_property_this(getThis(), SL("_defaultAction"), action_name);
+	phalcon_update_property_zval(getThis(), SL("_defaultAction"), action_name);
 
 }
 
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 */
 	if (phalcon_array_isset_fetch_str(&module_name, arguments, SL("module"))) {
 		phalcon_array_unset_str(arguments, SL("module"), PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_module"), &module_name);
+		phalcon_update_property_zval(getThis(), SL("_module"), &module_name);
 	}
 
 	/**
@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 */
 	if (phalcon_array_isset_fetch_str(&namespace_name, arguments, SL("namespace"))) {
 		phalcon_array_unset_str(arguments, SL("namespace"), PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_namespace"), &namespace_name);
+		phalcon_update_property_zval(getThis(), SL("_namespace"), &namespace_name);
 	}
 
 	/** 
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 */
 	if (phalcon_array_isset_fetch_str(&task_name, arguments, SL("task"))) {
 		phalcon_array_unset_str(arguments, SL("task"), PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_task"), &task_name);
+		phalcon_update_property_zval(getThis(), SL("_task"), &task_name);
 	}
 
 	/** 
@@ -239,10 +239,10 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 */
 	if (phalcon_array_isset_fetch_str(&action_name, arguments, SL("action"))) {
 		phalcon_array_unset_str(arguments, SL("action"), PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_action"), &action_name);
+		phalcon_update_property_zval(getThis(), SL("_action"), &action_name);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_params"), arguments);
+	phalcon_update_property_zval(getThis(), SL("_params"), arguments);
 }
 
 /**

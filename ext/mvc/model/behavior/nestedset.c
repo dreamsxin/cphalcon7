@@ -279,27 +279,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, __construct){
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&option, options, SL("hasManyRoots"))) {
-			phalcon_update_property_this(getThis(), SL("_hasManyRoots"), &option);
+			phalcon_update_property_zval(getThis(), SL("_hasManyRoots"), &option);
 		}
 
 		if (phalcon_array_isset_fetch_str(&option, options, SL("rootAttribute"))) {
-			phalcon_update_property_this(getThis(), SL("_rootAttribute"), &option);
+			phalcon_update_property_zval(getThis(), SL("_rootAttribute"), &option);
 		}
 
 		if (phalcon_array_isset_fetch_str(&option, options, SL("leftAttribute"))) {
-			phalcon_update_property_this(getThis(), SL("_leftAttribute"), &option);
+			phalcon_update_property_zval(getThis(), SL("_leftAttribute"), &option);
 		}
 
 		if (phalcon_array_isset_fetch_str(&option, options, SL("rightAttribute"))) {
-			phalcon_update_property_this(getThis(), SL("_rightAttribute"), &option);
+			phalcon_update_property_zval(getThis(), SL("_rightAttribute"), &option);
 		}
 
 		if (phalcon_array_isset_fetch_str(&option, options, SL("levelAttribute"))) {
-			phalcon_update_property_this(getThis(), SL("_levelAttribute"), &option);
+			phalcon_update_property_zval(getThis(), SL("_levelAttribute"), &option);
 		}
 
 		if (phalcon_array_isset_fetch_str(&option, options, SL("primaryKey"))) {
-			phalcon_update_property_this(getThis(), SL("_primaryKey"), &option);
+			phalcon_update_property_zval(getThis(), SL("_primaryKey"), &option);
 		}
 	}
 }
@@ -359,7 +359,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, setOwner){
 
 	PHALCON_VERIFY_INTERFACEW(owner, phalcon_mvc_modelinterface_ce);
 
-	phalcon_update_property_this(getThis(), SL("_owner"), owner);
+	phalcon_update_property_zval(getThis(), SL("_owner"), owner);
 }
 
 PHP_METHOD(Phalcon_Mvc_Model_Behavior_NestedSet, getOwner){

@@ -137,14 +137,14 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 		PHALCON_CALL_METHODW(NULL, &imagick, "__construct");
 	}
 
-	phalcon_update_property_this(getThis(), SL("_imagick"), &imagick);
+	phalcon_update_property_zval(getThis(), SL("_imagick"), &imagick);
 
 	object_init_ex(&draw, draw_ce);
 	if (phalcon_has_constructor(&draw)) {
 		PHALCON_CALL_METHODW(NULL, &draw, "__construct");
 	}
 
-	phalcon_update_property_this(getThis(), SL("_draw"), &draw);
+	phalcon_update_property_zval(getThis(), SL("_draw"), &draw);
 
 	if (font && Z_TYPE_P(font) != IS_NULL) {
 		PHALCON_CALL_METHODW(NULL, &draw, "setfont", font);
@@ -153,11 +153,11 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 	PHALCON_CALL_METHODW(NULL, &draw, "setfontsize", font_size);
 
 	if (width && Z_TYPE_P(width) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_width"), width);
+		phalcon_update_property_zval(getThis(), SL("_width"), width);
 	}
 
 	if (height && Z_TYPE_P(height) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_height"), height);
+		phalcon_update_property_zval(getThis(), SL("_height"), height);
 	}
 }
 
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFont){
 
 	PHALCON_CALL_METHODW(NULL, draw, "setfont", font);
 	
-	phalcon_update_property_this(getThis(), SL("_font"), font);
+	phalcon_update_property_zval(getThis(), SL("_font"), font);
 	RETURN_THISW();
 }
 
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
 
 	PHALCON_CALL_METHODW(NULL, draw, "setfontsize", font_size);
 	
-	phalcon_update_property_this(getThis(), SL("_fontSize"), font_size);
+	phalcon_update_property_zval(getThis(), SL("_fontSize"), font_size);
 	RETURN_THISW();
 }
 
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (!word) {
 		word  = phalcon_read_property(getThis(), SL("_word"), PH_NOISY);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_word"), word);
+		phalcon_update_property_zval(getThis(), SL("_word"), word);
 	}
 
 	if (!offset_x) {
@@ -254,13 +254,13 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (!width) {
 		width  = phalcon_read_property(getThis(), SL("_width"), PH_NOISY);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_width"), width);
+		phalcon_update_property_zval(getThis(), SL("_width"), width);
 	}
 
 	if (!height) {
 		height  = phalcon_read_property(getThis(), SL("_height"), PH_NOISY);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_height"), height);
+		phalcon_update_property_zval(getThis(), SL("_height"), height);
 	}
 
 	phalcon_return_property(&imagick, getThis(), SL("_imagick"));

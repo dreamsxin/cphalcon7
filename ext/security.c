@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Security, setRandomBytes){
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_numberBytes"), random_bytes);
+	phalcon_update_property_zval(getThis(), SL("_numberBytes"), random_bytes);
 }
 
 /**
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Security, setWorkFactor){
 	phalcon_fetch_params(0, 1, 0, &work_factor);
 
 	PHALCON_ENSURE_IS_LONG(work_factor);
-	phalcon_update_property_this(getThis(), SL("_workFactor"), work_factor);
+	phalcon_update_property_zval(getThis(), SL("_workFactor"), work_factor);
 }
 
 /**
@@ -1028,7 +1028,7 @@ PHP_METHOD(Phalcon_Security, setDefaultHash)
 	phalcon_fetch_params(0, 1, 0, &default_hash);
 	PHALCON_ENSURE_IS_LONG(default_hash);
 
-	phalcon_update_property_this(getThis(), SL("_defaultHash"), default_hash);
+	phalcon_update_property_zval(getThis(), SL("_defaultHash"), default_hash);
 }
 
 /**

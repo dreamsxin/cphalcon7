@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Debug, setUri){
 
 	phalcon_fetch_params(0, 1, 0, &uri);
 
-	phalcon_update_property_this(getThis(), SL("_uri"), uri);
+	phalcon_update_property_zval(getThis(), SL("_uri"), uri);
 	RETURN_THISW();
 }
 
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Debug, setShowBackTrace){
 
 	phalcon_fetch_params(0, 1, 0, &show_back_trace);
 
-	phalcon_update_property_this(getThis(), SL("_showBackTrace"), show_back_trace);
+	phalcon_update_property_zval(getThis(), SL("_showBackTrace"), show_back_trace);
 	RETURN_THISW();
 }
 
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Debug, setShowFiles){
 
 	phalcon_fetch_params(0, 1, 0, &show_files);
 
-	phalcon_update_property_this(getThis(), SL("_showFiles"), show_files);
+	phalcon_update_property_zval(getThis(), SL("_showFiles"), show_files);
 	RETURN_THISW();
 }
 
@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Debug, setShowFileFragment){
 
 	phalcon_fetch_params(0, 1, 0, &show_file_fragment);
 
-	phalcon_update_property_this(getThis(), SL("_showFileFragment"), show_file_fragment);
+	phalcon_update_property_zval(getThis(), SL("_showFileFragment"), show_file_fragment);
 	RETURN_THISW();
 }
 
@@ -1284,7 +1284,7 @@ PHP_METHOD(Phalcon_Debug, setLinesBeforeContext) {
 	phalcon_fetch_params(0, 1, 0, &lines);
 	PHALCON_ENSURE_IS_LONG(lines);
 
-	phalcon_update_property_this(getThis(), SL("_beforeContext"), lines);
+	phalcon_update_property_zval(getThis(), SL("_beforeContext"), lines);
 	RETURN_THISW();
 }
 
@@ -1312,7 +1312,7 @@ PHP_METHOD(Phalcon_Debug, setLinesAfterContext) {
 	phalcon_fetch_params(0, 1, 0, &lines);
 	PHALCON_ENSURE_IS_LONG(lines);
 
-	phalcon_update_property_this(getThis(), SL("_afterContext"), lines);
+	phalcon_update_property_zval(getThis(), SL("_afterContext"), lines);
 	RETURN_THISW();
 }
 

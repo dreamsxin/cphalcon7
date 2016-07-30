@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_DI, setEventsManager){
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 	PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_eventsManager"), events_manager);
+	phalcon_update_property_zval(getThis(), SL("_eventsManager"), events_manager);
 }
 
 /**

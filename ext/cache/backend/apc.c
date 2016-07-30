@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, get)
 	prefix   = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_FUNCTIONW(&cached_content, "apc_fetch", &prefixed_key);
 	if (PHALCON_IS_FALSE(&cached_content)) {
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, increment){
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	if (SUCCESS == phalcon_function_exists_ex(SL("apc_inc"))) {
 		PHALCON_RETURN_CALL_FUNCTIONW("apc_inc", &prefixed_key, value);
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, decrement){
 	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	if (SUCCESS == phalcon_function_exists_ex(SL("apc_dec"))) {
 		PHALCON_RETURN_CALL_FUNCTIONW("apc_dec", &prefixed_key, value);

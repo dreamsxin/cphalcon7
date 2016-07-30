@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, setModelName) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Model name must be string");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_model"), model_name);
+	phalcon_update_property_zval(getThis(), SL("_model"), model_name);
 
 	RETURN_THISW();
 }
@@ -280,9 +280,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, bind) {
 			PHALCON_CPY_WRT(&merged_params, bind_params);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_bindParams"), &merged_params);
+		phalcon_update_property_zval(getThis(), SL("_bindParams"), &merged_params);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_bindParams"), bind_params);
+		phalcon_update_property_zval(getThis(), SL("_bindParams"), bind_params);
 	}
 
 	RETURN_THISW();
@@ -318,9 +318,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, bindTypes) {
 			PHALCON_CPY_WRT(&merged_types, bind_types);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_bindTypes"), &merged_types);
+		phalcon_update_property_zval(getThis(), SL("_bindTypes"), &merged_types);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_bindTypes"), bind_types);
+		phalcon_update_property_zval(getThis(), SL("_bindTypes"), bind_types);
 	}
 
 	RETURN_THISW();
@@ -344,8 +344,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, columns) {
 
 	ZVAL_LONG(&type, PHQL_T_SELECT);
 
-	phalcon_update_property_this(getThis(), SL("_type"), &type);
-	phalcon_update_property_this(getThis(), SL("_columns"), columns);
+	phalcon_update_property_zval(getThis(), SL("_type"), &type);
+	phalcon_update_property_zval(getThis(), SL("_columns"), columns);
 	RETURN_THISW();
 }
 
@@ -398,7 +398,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, join) {
 
 	phalcon_array_append(&joins, &new_join, PH_COPY);
 
-	phalcon_update_property_this(getThis(), SL("_joins"), &joins);
+	phalcon_update_property_zval(getThis(), SL("_joins"), &joins);
 
 	RETURN_THISW();
 }
@@ -531,7 +531,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, where) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Conditions must be string");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_conditions"), conditions);
+	phalcon_update_property_zval(getThis(), SL("_conditions"), conditions);
 
 	/** 
 	 * Update or merge existing bound parameters
@@ -544,7 +544,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, where) {
 			PHALCON_CPY_WRT(&merged_params, bind_params);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_bindParams"), &merged_params);
+		phalcon_update_property_zval(getThis(), SL("_bindParams"), &merged_params);
 	}
 
 	/** 
@@ -558,7 +558,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, where) {
 			PHALCON_CPY_WRT(&merged_params_types, bind_types);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_bindTypes"), &merged_params_types);
+		phalcon_update_property_zval(getThis(), SL("_bindTypes"), &merged_params_types);
 	}
 
 	RETURN_THISW();
@@ -611,7 +611,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 		PHALCON_CPY_WRT(&new_conditions, conditions);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_conditions"), &new_conditions);
+	phalcon_update_property_zval(getThis(), SL("_conditions"), &new_conditions);
 
 	/** 
 	 * Update or merge existing bound parameters
@@ -624,7 +624,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 			PHALCON_CPY_WRT(&merged_params, bind_params);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_bindParams"), &merged_params);
+		phalcon_update_property_zval(getThis(), SL("_bindParams"), &merged_params);
 	}
 
 	/** 
@@ -638,7 +638,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 			PHALCON_CPY_WRT(&merged_params_types, bind_types);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_bindTypes"), &merged_params_types);
+		phalcon_update_property_zval(getThis(), SL("_bindTypes"), &merged_params_types);
 	}
 
 	RETURN_THISW();
@@ -679,7 +679,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 		PHALCON_CPY_WRT(&new_conditions, conditions);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_conditions"), &new_conditions);
+	phalcon_update_property_zval(getThis(), SL("_conditions"), &new_conditions);
 
 	/** 
 	 * Update or merge existing bound parameters
@@ -692,7 +692,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 			PHALCON_CPY_WRT(&merged_params, bind_params);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_bindParams"), &merged_params);
+		phalcon_update_property_zval(getThis(), SL("_bindParams"), &merged_params);
 	}
 
 	/** 
@@ -706,7 +706,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 			PHALCON_CPY_WRT(&merged_params_types, bind_types);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_bindTypes"), &merged_params_types);
+		phalcon_update_property_zval(getThis(), SL("_bindTypes"), &merged_params_types);
 	}
 
 	RETURN_THISW();
@@ -767,7 +767,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, betweenWhere) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
 	phalcon_increment(&next_hidden_param);
-	phalcon_update_property_this(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
+	phalcon_update_property_zval(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
 	RETURN_THISW();
 }
 
@@ -826,7 +826,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, notBetweenWhere) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
 	phalcon_increment(&next_hidden_param);
-	phalcon_update_property_this(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
+	phalcon_update_property_zval(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
 	RETURN_THISW();
 }
 
@@ -890,7 +890,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, inWhere) {
 	} else {
 		PHALCON_CALL_METHODW(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
-	phalcon_update_property_this(getThis(), SL("_hiddenParamNumber"), &hidden_param);
+	phalcon_update_property_zval(getThis(), SL("_hiddenParamNumber"), &hidden_param);
 
 	RETURN_THISW();
 }
@@ -955,7 +955,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, notInWhere) {
 	} else {
 		PHALCON_CALL_METHODW(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
-	phalcon_update_property_this(getThis(), SL("_hiddenParamNumber"), &hidden_param);
+	phalcon_update_property_zval(getThis(), SL("_hiddenParamNumber"), &hidden_param);
 
 	RETURN_THISW();
 }
@@ -976,7 +976,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, conditions) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Conditions must be string");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_conditions"), conditions);
+	phalcon_update_property_zval(getThis(), SL("_conditions"), conditions);
 
 	RETURN_THISW();
 }
@@ -1007,7 +1007,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orderBy) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Order columns must be string");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_order"), order_columns);
+	phalcon_update_property_zval(getThis(), SL("_order"), order_columns);
 
 	RETURN_THISW();
 }
@@ -1034,8 +1034,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, limit) {
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_limit"), limit);
-	phalcon_update_property_this(getThis(), SL("_offset"), offset);
+	phalcon_update_property_zval(getThis(), SL("_limit"), limit);
+	phalcon_update_property_zval(getThis(), SL("_offset"), offset);
 
 	RETURN_THISW();
 }
@@ -1052,7 +1052,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, setUniqueRow) {
 
 	phalcon_fetch_params(0, 1, 0, &unique_row);
 
-	phalcon_update_property_this(getThis(), SL("_uniqueRow"), unique_row);
+	phalcon_update_property_zval(getThis(), SL("_uniqueRow"), unique_row);
 	RETURN_THISW();
 }
 
@@ -1083,7 +1083,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, forUpdate) {
 		for_update = &PHALCON_GLOBAL(z_true);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_forUpdate"), for_update);
+	phalcon_update_property_zval(getThis(), SL("_forUpdate"), for_update);
 	RETURN_THISW();
 }
 
@@ -1103,7 +1103,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, sharedLock) {
 		shared_lock = &PHALCON_GLOBAL(z_true);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_sharedLock"), shared_lock);
+	phalcon_update_property_zval(getThis(), SL("_sharedLock"), shared_lock);
 	RETURN_THISW();
 }
 
@@ -1322,7 +1322,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, groupBy) {
 
 	phalcon_fetch_params(0, 1, 0, &group);
 
-	phalcon_update_property_this(getThis(), SL("_group"), group);
+	phalcon_update_property_zval(getThis(), SL("_group"), group);
 	RETURN_THISW();
 }
 
@@ -1338,7 +1338,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, having) {
 
 	phalcon_fetch_params(0, 1, 0, &having);
 
-	phalcon_update_property_this(getThis(), SL("_having"), having);
+	phalcon_update_property_zval(getThis(), SL("_having"), having);
 	RETURN_THISW();
 }
 
@@ -1413,7 +1413,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, cache) {
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_cacheOptions"), options);
+	phalcon_update_property_zval(getThis(), SL("_cacheOptions"), options);
 
 	RETURN_THISW();
 }
@@ -1433,7 +1433,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, insert) {
 
 	ZVAL_LONG(&type, PHQL_T_INSERT);
 
-	phalcon_update_property_this(getThis(), SL("_type"), &type);
+	phalcon_update_property_zval(getThis(), SL("_type"), &type);
 
 	if (Z_TYPE_P(columns) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Columns must be an array");
@@ -1445,8 +1445,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, insert) {
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_columns"), columns);
-	phalcon_update_property_this(getThis(), SL("_values"), values);
+	phalcon_update_property_zval(getThis(), SL("_columns"), columns);
+	phalcon_update_property_zval(getThis(), SL("_values"), values);
 
 	RETURN_THISW();
 }
@@ -1465,14 +1465,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, update) {
 
 	ZVAL_LONG(&type, PHQL_T_UPDATE);
 
-	phalcon_update_property_this(getThis(), SL("_type"), &type);
+	phalcon_update_property_zval(getThis(), SL("_type"), &type);
 
 	if (columns && Z_TYPE_P(columns) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Columns must be an array");
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_columns"), columns);
+	phalcon_update_property_zval(getThis(), SL("_columns"), columns);
 
 	RETURN_THISW();
 }
@@ -1488,7 +1488,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, delete) {
 
 	ZVAL_LONG(&type, PHQL_T_DELETE);
 
-	phalcon_update_property_this(getThis(), SL("_type"), &type);
+	phalcon_update_property_zval(getThis(), SL("_type"), &type);
 
 	RETURN_THISW();
 }
@@ -1541,7 +1541,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
 	}
 
 	model = phalcon_read_property(getThis(), SL("_model"), PH_NOISY);
@@ -1921,7 +1921,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
 	}
 
 	model = phalcon_read_property(getThis(), SL("_model"), PH_NOISY);
@@ -2092,7 +2092,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
 	}
 
 	model = phalcon_read_property(getThis(), SL("_model"), PH_NOISY);

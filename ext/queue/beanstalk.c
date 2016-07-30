@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 		phalcon_array_update_str_long(&parameters, SL("port"), 11300, 0);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_parameters"), &parameters);
+	phalcon_update_property_zval(getThis(), SL("_parameters"), &parameters);
 }
 
 PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 		php_stream_set_option(stream, PHP_STREAM_OPTION_READ_TIMEOUT, 0, &tv);
 
 		php_stream_to_zval(stream, &new_connection);
-		phalcon_update_property_this(getThis(), SL("_connection"), &new_connection);
+		phalcon_update_property_zval(getThis(), SL("_connection"), &new_connection);
 		RETVAL_ZVAL(connection, 1, 1);
 	}
 }

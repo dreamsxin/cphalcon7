@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, __construct){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "$options argument must be an Array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_options"), options);
+	phalcon_update_property_zval(getThis(), SL("_options"), options);
 	
 }
 

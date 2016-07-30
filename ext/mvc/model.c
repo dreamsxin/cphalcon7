@@ -538,12 +538,12 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 			return;
 		}
 		PHALCON_VERIFY_INTERFACEW(di, phalcon_diinterface_ce);
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), di);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), di);
 	}
 
 	if (_models_manager) {
 		PHALCON_VERIFY_INTERFACEW(_models_manager, phalcon_mvc_model_managerinterface_ce);
-		phalcon_update_property_this(getThis(), SL("_modelsManager"), _models_manager);
+		phalcon_update_property_zval(getThis(), SL("_modelsManager"), _models_manager);
 	}
 
 	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
@@ -621,7 +621,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsMetaData){
 		/**
 		 * Update the models-metada property
 		 */
-		phalcon_update_property_this(getThis(), SL("_modelsMetaData"), &service);
+		phalcon_update_property_zval(getThis(), SL("_modelsMetaData"), &service);
 	}
 
 	RETURN_CTORW(&service);
@@ -691,7 +691,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setTransaction){
 	phalcon_fetch_params(0, 1, 0, &transaction);
 
 	if (Z_TYPE_P(transaction) == IS_OBJECT) {
-		phalcon_update_property_this(getThis(), SL("_transaction"), transaction);
+		phalcon_update_property_zval(getThis(), SL("_transaction"), transaction);
 		RETURN_THISW();
 	}
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Transaction should be an object");
@@ -787,7 +787,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getColumnMap){
 			PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
 			PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", getThis());
 
-			phalcon_update_property_this(getThis(), SL("_columnMap"), &column_map);
+			phalcon_update_property_zval(getThis(), SL("_columnMap"), &column_map);
 		}
 	}
 
@@ -929,7 +929,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setDirtyState){
 
 	phalcon_fetch_params(0, 1, 0, &dirty_state);
 
-	phalcon_update_property_this(getThis(), SL("_dirtyState"), dirty_state);
+	phalcon_update_property_zval(getThis(), SL("_dirtyState"), dirty_state);
 
 	RETURN_THISW();
 }
@@ -1830,9 +1830,9 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 		/**
 		 * The unique key is composed of 3 parts _uniqueKey, uniqueParams, uniqueTypes
 		 */
-		phalcon_update_property_this(getThis(), SL("_uniqueKey"), &join_where);
-		phalcon_update_property_this(getThis(), SL("_uniqueParams"), &unique_params);
-		phalcon_update_property_this(getThis(), SL("_uniqueTypes"), &unique_types);
+		phalcon_update_property_zval(getThis(), SL("_uniqueKey"), &join_where);
+		phalcon_update_property_zval(getThis(), SL("_uniqueParams"), &unique_params);
+		phalcon_update_property_zval(getThis(), SL("_uniqueTypes"), &unique_types);
 	}
 
 	RETURN_TRUE;
@@ -1902,7 +1902,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _exists){
 	PHALCON_CALL_METHODW(&row, connection, "fetchone", &select, &PHALCON_GLOBAL(z_null), unique_params, unique_types);
 
 	if (zend_is_true(seen_rawvalues)) {
-		phalcon_update_property_this(getThis(), SL("_uniqueKey"), &PHALCON_GLOBAL(z_null));
+		phalcon_update_property_zval(getThis(), SL("_uniqueKey"), &PHALCON_GLOBAL(z_null));
 	}
 
 	if (Z_TYPE(row) == IS_ARRAY && phalcon_fast_count_ev(&row)) {
@@ -2518,9 +2518,9 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 			errors = phalcon_read_property(getThis(), SL("_errorMessages"), PH_NOISY);
 			if (Z_TYPE_P(errors) == IS_ARRAY) {
 				phalcon_fast_array_merge(&new_errors, errors, &messages);
-				phalcon_update_property_this(getThis(), SL("_errorMessages"), &new_errors);
+				phalcon_update_property_zval(getThis(), SL("_errorMessages"), &new_errors);
 			} else {
-				phalcon_update_property_this(getThis(), SL("_errorMessages"), &messages);
+				phalcon_update_property_zval(getThis(), SL("_errorMessages"), &messages);
 			}
 
 			if (zend_is_true(ex)) {
@@ -4809,7 +4809,7 @@ PHP_METHOD(Phalcon_Mvc_Model, skipOperation){
 
 	phalcon_fetch_params(0, 1, 0, &skip);
 
-	phalcon_update_property_this(getThis(), SL("_skipped"), skip);
+	phalcon_update_property_zval(getThis(), SL("_skipped"), skip);
 
 }
 
@@ -5292,11 +5292,11 @@ PHP_METHOD(Phalcon_Mvc_Model, setSnapshotData){
 			}
 		} ZEND_HASH_FOREACH_END();
 
-		phalcon_update_property_this(getThis(), SL("_snapshot"), &snapshot);
+		phalcon_update_property_zval(getThis(), SL("_snapshot"), &snapshot);
 		RETURN_NULL();
 	}
 
-	phalcon_update_property_this(getThis(), SL("_snapshot"), data);
+	phalcon_update_property_zval(getThis(), SL("_snapshot"), data);
 }
 
 /**
@@ -6257,7 +6257,7 @@ PHP_METHOD(Phalcon_Mvc_Model, unserialize){
 			/**
 			 * Update the models manager
 			 */
-			phalcon_update_property_this(getThis(), SL("_modelsManager"), &manager);
+			phalcon_update_property_zval(getThis(), SL("_modelsManager"), &manager);
 
 			/**
 			 * Try to initialize the model
@@ -6689,7 +6689,7 @@ PHP_METHOD(Phalcon_Mvc_Model, filter){
 
 				PHALCON_CALL_METHODW(&filter, &dependency_injector, "getshared", &service);
 				PHALCON_VERIFY_INTERFACEW(&filter, phalcon_filterinterface_ce);
-				phalcon_update_property_this(getThis(), SL("_filter"), &filter);
+				phalcon_update_property_zval(getThis(), SL("_filter"), &filter);
 			}
 
 			PHALCON_CALL_METHODW(&filterd_value, &filter, "sanitize", &value, filters, norecursive);

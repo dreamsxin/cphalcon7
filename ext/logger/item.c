@@ -83,12 +83,12 @@ PHP_METHOD(Phalcon_Logger_Item, __construct){
 		time = &PHALCON_GLOBAL(z_zero);
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_message"), message);
-	phalcon_update_property_this(getThis(), SL("_type"), type);
-	phalcon_update_property_this(getThis(), SL("_time"), time);
+	phalcon_update_property_zval(getThis(), SL("_message"), message);
+	phalcon_update_property_zval(getThis(), SL("_type"), type);
+	phalcon_update_property_zval(getThis(), SL("_time"), time);
 
 	if (context && Z_TYPE_P(context) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_context"), context);
+		phalcon_update_property_zval(getThis(), SL("_context"), context);
 	}
 }
 

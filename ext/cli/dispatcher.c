@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &task_suffix);
 
-	phalcon_update_property_this(getThis(), SL("_handlerSuffix"), task_suffix);
+	phalcon_update_property_zval(getThis(), SL("_handlerSuffix"), task_suffix);
 
 }
 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setDefaultTask){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 
-	phalcon_update_property_this(getThis(), SL("_defaultHandler"), task_name);
+	phalcon_update_property_zval(getThis(), SL("_defaultHandler"), task_name);
 
 }
 
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskName){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 
-	phalcon_update_property_this(getThis(), SL("_handlerName"), task_name);
+	phalcon_update_property_zval(getThis(), SL("_handlerName"), task_name);
 
 }
 

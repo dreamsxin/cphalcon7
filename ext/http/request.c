@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 			PHALCON_CALL_METHODW(&filter, dependency_injector, "getshared", &service);
 			PHALCON_VERIFY_INTERFACEW(&filter, phalcon_filterinterface_ce);
 
-			phalcon_update_property_this(getThis(), SL("_filter"), &filter);
+			phalcon_update_property_zval(getThis(), SL("_filter"), &filter);
 		}
 
 		PHALCON_CALL_METHODW(&filter_value, &filter, "sanitize", &value, filters, norecursive);
@@ -410,7 +410,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 
 			sapi_module.treat_data(PARSE_STRING, tmp, &new_put);
 
-			phalcon_update_property_this(getThis(), SL("_put"), &new_put);
+			phalcon_update_property_zval(getThis(), SL("_put"), &new_put);
 		} else {
 			PHALCON_CPY_WRT(&new_put, put);
 		}
@@ -551,7 +551,7 @@ PHP_METHOD(Phalcon_Http_Request, hasPut)
 			tmp = estrndup(Z_STRVAL(raw), Z_STRLEN(raw));
 			sapi_module.treat_data(PARSE_STRING, tmp, &new_put);
 
-			phalcon_update_property_this(getThis(), SL("_put"), &new_put);
+			phalcon_update_property_zval(getThis(), SL("_put"), &new_put);
 		} else {
 			PHALCON_CPY_WRT(&new_put, put);
 		}
@@ -747,7 +747,7 @@ PHP_METHOD(Phalcon_Http_Request, getRawBody)
 	content = php_stream_copy_to_mem(stream, maxlen, 0);
 	if (content != NULL) {
 		RETVAL_STR(content);
-		phalcon_update_property_this(getThis(), SL("_rawBody"), return_value);
+		phalcon_update_property_zval(getThis(), SL("_rawBody"), return_value);
 	} else {
 		RETVAL_FALSE;
 	}

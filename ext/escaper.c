@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Escaper, setEncoding){
 
 	phalcon_fetch_params(0, 1, 0, &encoding);
 	PHALCON_ENSURE_IS_STRING(encoding);
-	phalcon_update_property_this(getThis(), SL("_encoding"), encoding);
+	phalcon_update_property_zval(getThis(), SL("_encoding"), encoding);
 }
 
 /**
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Escaper, setHtmlQuoteType){
 
 	phalcon_fetch_params(0, 1, 0, &quote_type);
 	PHALCON_ENSURE_IS_LONG(quote_type);
-	phalcon_update_property_this(getThis(), SL("_htmlQuoteType"), quote_type);
+	phalcon_update_property_zval(getThis(), SL("_htmlQuoteType"), quote_type);
 }
 
 /**

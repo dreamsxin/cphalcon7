@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Validation, __construct){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Validators must be an array");
 			return;
 		}
-		phalcon_update_property_this(getThis(), SL("_validators"), validators);
+		phalcon_update_property_zval(getThis(), SL("_validators"), validators);
 	}
 	
 	PHALCON_CALL_METHODW(NULL, getThis(), "setdefaultmessages");
@@ -249,9 +249,9 @@ PHP_METHOD(Phalcon_Validation, validate){
 		}
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_messages"), &messages);
+	phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
 	if (Z_TYPE_P(data) == IS_ARRAY || Z_TYPE_P(data) == IS_OBJECT) {
-		phalcon_update_property_this(getThis(), SL("_data"), data);
+		phalcon_update_property_zval(getThis(), SL("_data"), data);
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(validators), scope) {
@@ -434,8 +434,8 @@ PHP_METHOD(Phalcon_Validation, bind){
 		}
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_entity"), entity);
-	phalcon_update_property_this(getThis(), SL("_data"), data);
+	phalcon_update_property_zval(getThis(), SL("_entity"), entity);
+	phalcon_update_property_zval(getThis(), SL("_data"), data);
 	
 	RETURN_THISW();
 }
@@ -575,10 +575,10 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 	phalcon_array_update_str_str(&default_messages, SL("Url"),               SL("Field :field must be a url"), PH_COPY);
 
 	if (!messages || Z_TYPE_P(messages) == IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_defaultMessages"), &default_messages);
+		phalcon_update_property_zval(getThis(), SL("_defaultMessages"), &default_messages);
 	} else {
 		phalcon_fast_array_merge(&m, &default_messages, messages);
-		phalcon_update_property_this(getThis(), SL("_defaultMessages"), &m);
+		phalcon_update_property_zval(getThis(), SL("_defaultMessages"), &m);
 	}
 }
 
@@ -611,7 +611,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
 		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Labels must be an array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_labels"), labels);
+	phalcon_update_property_zval(getThis(), SL("_labels"), labels);
 }
 
 /**

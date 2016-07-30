@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, setLogLevel){
 		convert_to_long_ex(&lvl);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_logLevel"), &lvl);
+	phalcon_update_property_zval(getThis(), SL("_logLevel"), &lvl);
 	RETURN_THISW();
 }
 
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, setFormatter){
 	phalcon_fetch_params(0, 1, 0, &formatter);
 	PHALCON_VERIFY_INTERFACE_EX(formatter, phalcon_logger_formatterinterface_ce, phalcon_logger_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_formatter"), formatter);
+	phalcon_update_property_zval(getThis(), SL("_formatter"), formatter);
 	RETURN_THISW();
 }
 
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 	phalcon_update_property_bool(getThis(), SL("_transaction"), 0);
 
 	array_init_size(&queue, 0);
-	phalcon_update_property_this(getThis(), SL("_queue"), &queue);
+	phalcon_update_property_zval(getThis(), SL("_queue"), &queue);
 	
 	RETURN_THISW();
 }

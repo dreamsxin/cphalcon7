@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Filter, __construct){
 	phalcon_array_append_string(&allow_tags, SL("th"), 0);
 	phalcon_array_append_string(&allow_tags, SL("td"), 0);
 
-	phalcon_update_property_this(getThis(), SL("_allowTags"), &allow_tags);
+	phalcon_update_property_zval(getThis(), SL("_allowTags"), &allow_tags);
 
 	array_init(&allow_attributes);
 
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Filter, __construct){
 	phalcon_array_append_string(&allow_attributes, SL("target"), 0);
 	phalcon_array_append_string(&allow_attributes, SL("align"), 0);
 
-	phalcon_update_property_this(getThis(), SL("_allowAttributes"), &allow_attributes);
+	phalcon_update_property_zval(getThis(), SL("_allowAttributes"), &allow_attributes);
 }
 
 /**

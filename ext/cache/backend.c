@@ -105,13 +105,13 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 		 * A common option is the prefix
 		 */
 		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
-			phalcon_update_property_this(getThis(), SL("_prefix"), &prefix);
+			phalcon_update_property_zval(getThis(), SL("_prefix"), &prefix);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_options"), options);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_frontend"), frontend);
+	phalcon_update_property_zval(getThis(), SL("_frontend"), frontend);
 }
 
 /**
@@ -144,14 +144,14 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 		fresh = &PHALCON_GLOBAL(z_false);
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_fresh"), fresh);
-	phalcon_update_property_this(getThis(), SL("_started"), &PHALCON_GLOBAL(z_true));
+	phalcon_update_property_zval(getThis(), SL("_fresh"), fresh);
+	phalcon_update_property_zval(getThis(), SL("_started"), &PHALCON_GLOBAL(z_true));
 	
 	/** 
 	 * Update the last lifetime to be used in save()
 	 */
 	if (Z_TYPE_P(lifetime) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_lastLifetime"), lifetime);
+		phalcon_update_property_zval(getThis(), SL("_lastLifetime"), lifetime);
 	}
 }
 
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Cache_Backend, setLastKey){
 
 	phalcon_fetch_params(0, 1, 0, &last_key);
 	
-	phalcon_update_property_this(getThis(), SL("_lastKey"), last_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), last_key);
 	
 }
 

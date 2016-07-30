@@ -156,12 +156,12 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, __construct){
 
 	array_init_size(&resources_names, 1);
 	phalcon_array_update_str(&resources_names, SL("*"), &PHALCON_GLOBAL(z_true), PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_resourcesNames"), &resources_names);
+	phalcon_update_property_zval(getThis(), SL("_resourcesNames"), &resources_names);
 	PHALCON_PTR_DTOR(&resources_names);
 
 	array_init_size(&access_list, 1);
 	phalcon_array_update_str(&access_list, SL("*!*"), &PHALCON_GLOBAL(z_true), PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_accessList"), &access_list);
+	phalcon_update_property_zval(getThis(), SL("_accessList"), &access_list);
 	PHALCON_PTR_DTOR(&access_list);
 }
 
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 
 	roles_inherits = phalcon_read_property(getThis(), SL("_roleInherits"), PH_NOISY);
 	phalcon_array_append_multi_2(roles_inherits, role_name, &role_inherit_name, PH_COPY);
-	phalcon_update_property_this(getThis(), SL("_roleInherits"), roles_inherits);
+	phalcon_update_property_zval(getThis(), SL("_roleInherits"), roles_inherits);
 	RETURN_TRUE;
 }
 
@@ -665,9 +665,9 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	ZVAL_STRING(&star, "*");
 
-	phalcon_update_property_this(getThis(), SL("_activeRole"), role);
-	phalcon_update_property_this(getThis(), SL("_activeResource"), resource);
-	phalcon_update_property_this(getThis(), SL("_activeAccess"), access);
+	phalcon_update_property_zval(getThis(), SL("_activeRole"), role);
+	phalcon_update_property_zval(getThis(), SL("_activeResource"), resource);
+	phalcon_update_property_zval(getThis(), SL("_activeAccess"), access);
 
 	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
@@ -744,7 +744,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	ZVAL_BOOL(return_value, PHALCON_ACL_YES == allow_access);
 
-	phalcon_update_property_this(getThis(), SL("_accessGranted"), return_value);
+	phalcon_update_property_zval(getThis(), SL("_accessGranted"), return_value);
 	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "acl:afterCheckAccess");
 		PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), return_value);

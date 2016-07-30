@@ -94,9 +94,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, __construct){
 	PHALCON_VERIFY_CLASS_EX(queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
 	PHALCON_ENSURE_IS_STRING(id);
 
-	phalcon_update_property_this(getThis(), SL("_queue"), queue);
-	phalcon_update_property_this(getThis(), SL("_id"),    id   );
-	phalcon_update_property_this(getThis(), SL("_body"),  body );
+	phalcon_update_property_zval(getThis(), SL("_queue"), queue);
+	phalcon_update_property_zval(getThis(), SL("_id"),    id   );
+	phalcon_update_property_zval(getThis(), SL("_body"),  body );
 }
 
 /**

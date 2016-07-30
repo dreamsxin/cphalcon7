@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Mvc_Application, __construct){
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
 		PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_application_exception_ce, 0);
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 	}
 }
 
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Mvc_Application, useImplicitView){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_view);
 
-	phalcon_update_property_this(getThis(), SL("_implicitView"), implicit_view);
+	phalcon_update_property_zval(getThis(), SL("_implicitView"), implicit_view);
 	RETURN_THISW();
 }
 
@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 		return;
 	}
 	if (PHALCON_IS_FALSE(merge)) {
-		phalcon_update_property_this(getThis(), SL("_modules"), modules);
+		phalcon_update_property_zval(getThis(), SL("_modules"), modules);
 	} else {
 		registered_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
 		if (Z_TYPE_P(registered_modules) == IS_ARRAY) { 
@@ -222,7 +222,7 @@ PHP_METHOD(Phalcon_Mvc_Application, registerModules){
 			PHALCON_CPY_WRT(&merged_modules, modules);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_modules"), &merged_modules);
+		phalcon_update_property_zval(getThis(), SL("_modules"), &merged_modules);
 	}
 
 	RETURN_THISW();
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Mvc_Application, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &default_module);
 
-	phalcon_update_property_this(getThis(), SL("_defaultModule"), default_module);
+	phalcon_update_property_zval(getThis(), SL("_defaultModule"), default_module);
 	RETURN_THISW();
 }
 

@@ -159,15 +159,15 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &collection, &cursor);
 
-	phalcon_update_property_this(getThis(), SL("_collection"), collection);
-	phalcon_update_property_this(getThis(), SL("_cursor"), cursor);
+	phalcon_update_property_zval(getThis(), SL("_collection"), collection);
+	phalcon_update_property_zval(getThis(), SL("_cursor"), cursor);
 	if (Z_TYPE_P(cursor) != IS_OBJECT) {
 		RETURN_NULL();
 	}
 
 	PHALCON_CALL_METHODW(&row_count, cursor, "count", &PHALCON_GLOBAL(z_true));
 
-	phalcon_update_property_this(getThis(), SL("_count"), &row_count);
+	phalcon_update_property_zval(getThis(), SL("_count"), &row_count);
 }
 
 /**
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 
 	PHALCON_CALL_CE_STATICW(&active_row, phalcon_mvc_collection_ce, "cloneresult", collection, &row);
 
-	phalcon_update_property_this(getThis(), SL("_activeRow"), &active_row);
+	phalcon_update_property_zval(getThis(), SL("_activeRow"), &active_row);
 	RETURN_TRUE;
 }
 
@@ -293,10 +293,10 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, unserialize){
 	}
 
 	phalcon_array_fetch_str(&collection, &resultset, SL("collection"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_collection"), &collection);
+	phalcon_update_property_zval(getThis(), SL("_collection"), &collection);
 
 	phalcon_array_fetch_str(&rows, &resultset, SL("rows"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_rows"), &rows);
+	phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
 }
 
 /**
@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
 		zend_hash_internal_pointer_reset(Z_ARRVAL_P(rows));
 	}
 
-	phalcon_update_property_this(getThis(), SL("_pointer"), z_zero);
+	phalcon_update_property_zval(getThis(), SL("_pointer"), z_zero);
 }
 
 /**
@@ -420,7 +420,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, count){
 			phalcon_fast_count(&count, rows);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_count"), &count);
+		phalcon_update_property_zval(getThis(), SL("_count"), &count);
 	}
 
 	RETURN_CTORW(&count);
@@ -659,7 +659,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, delete){
 			 * Get the messages from the record that produce the error
 			 */
 			PHALCON_CALL_METHODW(&messages, &record, "getmessages");
-			phalcon_update_property_this(getThis(), SL("_errorMessages"), &messages);
+			phalcon_update_property_zval(getThis(), SL("_errorMessages"), &messages);
 
 			/** 
 			 * Rollback the transaction
@@ -803,7 +803,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, update){
 			 * Get the messages from the record that produce the error
 			 */
 			PHALCON_CALL_METHODW(&messages, &record, "getmessages");
-			phalcon_update_property_this(getThis(), SL("_errorMessages"), &messages);
+			phalcon_update_property_zval(getThis(), SL("_errorMessages"), &messages);
 
 			/** 
 			 * Rollback the transaction

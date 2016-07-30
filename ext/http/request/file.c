@@ -132,40 +132,40 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 			return;
 		}
 
-		phalcon_update_property_this(getThis(), SL("_tmp"), file);
+		phalcon_update_property_zval(getThis(), SL("_tmp"), file);
 
 		PHALCON_CALL_PARENTW(NULL, phalcon_http_request_file_ce, getThis(), "__construct", file);
 	} else {
 		if (phalcon_array_isset_fetch_str(&name, file, SL("name"))) {
-			phalcon_update_property_this(getThis(), SL("_name"), &name);
+			phalcon_update_property_zval(getThis(), SL("_name"), &name);
 
 			if ((constant = zend_get_constant_str(SL("PATHINFO_EXTENSION"))) != NULL) {
 				PHALCON_CALL_FUNCTIONW(&extension, "pathinfo", &name, constant);
-				phalcon_update_property_this(getThis(), SL("_extension"), &extension);
+				phalcon_update_property_zval(getThis(), SL("_extension"), &extension);
 			}
 		}
 		
 		if (phalcon_array_isset_fetch_str(&temp_name, file, SL("tmp_name"))) {
-			phalcon_update_property_this(getThis(), SL("_tmp"), &temp_name);
+			phalcon_update_property_zval(getThis(), SL("_tmp"), &temp_name);
 		}
 		
 		if (phalcon_array_isset_fetch_str(&size, file, SL("size"))) {
-			phalcon_update_property_this(getThis(), SL("_size"), &size);
+			phalcon_update_property_zval(getThis(), SL("_size"), &size);
 		}
 		
 		if (phalcon_array_isset_fetch_str(&type, file, SL("type"))) {
-			phalcon_update_property_this(getThis(), SL("_type"), &type);
+			phalcon_update_property_zval(getThis(), SL("_type"), &type);
 		}
 
 		if (phalcon_array_isset_fetch_str(&error, file, SL("error"))) {
-			phalcon_update_property_this(getThis(), SL("_error"), &error);
+			phalcon_update_property_zval(getThis(), SL("_error"), &error);
 		}
 
 		PHALCON_CALL_PARENTW(NULL, phalcon_http_request_file_ce, getThis(), "__construct", &temp_name);
 	}
 
 	if (key) {
-		phalcon_update_property_this(getThis(), SL("_key"), key);
+		phalcon_update_property_zval(getThis(), SL("_key"), key);
 	}
 }
 
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Http_Request_File, getRealType){
 	PHALCON_CALL_FUNCTIONW(NULL, "finfo_close", &finfo);
 
 	if (zend_is_true(&ret)) {
-		phalcon_update_property_this(getThis(), SL("_real_type"), &ret);
+		phalcon_update_property_zval(getThis(), SL("_real_type"), &ret);
 		RETURN_CTORW(&ret);
 	}
 

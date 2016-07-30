@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 			phalcon_array_append(&annotations, &annotation, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
-		phalcon_update_property_this(getThis(), SL("_annotations"), &annotations);
+		phalcon_update_property_zval(getThis(), SL("_annotations"), &annotations);
 	}
 }
 

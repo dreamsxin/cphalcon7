@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 	if (!phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
 		ZVAL_LONG(&lifetime, 8600);
 	} else {
-		phalcon_update_property_this(getThis(), SL("_lifetime"), &lifetime);
+		phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&persistent, options, SL("persistent"))) {
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, __construct){
 
 	PHALCON_CALL_METHODW(NULL, &memcache, "__construct", &frontend_data, &backend_option);
 
-	phalcon_update_property_this(getThis(), SL("_memcache"), &memcache);
+	phalcon_update_property_zval(getThis(), SL("_memcache"), &memcache);
 
 	/* open callback */
 	array_init_size(&callable_open, 2);

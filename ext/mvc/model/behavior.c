@@ -80,7 +80,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_options"), options);
+	phalcon_update_property_zval(getThis(), SL("_options"), options);
 }
 
 /**

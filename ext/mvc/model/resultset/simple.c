@@ -119,11 +119,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 		source_model = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_model"), model);
-	phalcon_update_property_this(getThis(), SL("_result"), result);
-	phalcon_update_property_this(getThis(), SL("_cache"), cache);
-	phalcon_update_property_this(getThis(), SL("_columnMap"), column_map);
-	phalcon_update_property_this(getThis(), SL("_sourceModel"), source_model);
+	phalcon_update_property_zval(getThis(), SL("_model"), model);
+	phalcon_update_property_zval(getThis(), SL("_result"), result);
+	phalcon_update_property_zval(getThis(), SL("_cache"), cache);
+	phalcon_update_property_zval(getThis(), SL("_columnMap"), column_map);
+	phalcon_update_property_zval(getThis(), SL("_sourceModel"), source_model);
 
 	if (Z_TYPE_P(result) != IS_OBJECT) {
 		RETURN_NULL();
@@ -152,12 +152,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 	/** 
 	 * Update the row-count
 	 */
-	phalcon_update_property_this(getThis(), SL("_count"), &row_count);
+	phalcon_update_property_zval(getThis(), SL("_count"), &row_count);
 
 	/** 
 	 * Set if the returned resultset must keep the record snapshots
 	 */
-	phalcon_update_property_this(getThis(), SL("_keepSnapshots"), keep_snapshots);
+	phalcon_update_property_zval(getThis(), SL("_keepSnapshots"), keep_snapshots);
 
 	phalcon_update_property_empty_array(getThis(), SL("_models"));
 	phalcon_update_property_empty_array(getThis(), SL("_others"));
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			result = phalcon_read_property(getThis(), SL("_result"), PH_NOISY);
 			if (Z_TYPE_P(result) == IS_OBJECT) {
 				PHALCON_CALL_METHODW(&rows, result, "fetchall");
-				phalcon_update_property_this(getThis(), SL("_rows"), &rows);
+				phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
 			}
 		}
 
@@ -274,7 +274,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 	PHALCON_PTR_DTOR(&row);
 	PHALCON_PTR_DTOR(&key);
 
-	phalcon_update_property_this(getThis(), SL("_activeRow"), &active_row);
+	phalcon_update_property_zval(getThis(), SL("_activeRow"), &active_row);
 	PHALCON_PTR_DTOR(&active_row);
 	RETURN_TRUE;
 }
@@ -376,17 +376,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, unserialize){
 	}
 
 	phalcon_array_fetch_str(&model, &resultset, SL("model"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_model"), &model);
+	phalcon_update_property_zval(getThis(), SL("_model"), &model);
 
 	phalcon_array_fetch_str(&rows, &resultset, SL("rows"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_rows"), &rows);
+	phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
 
 	phalcon_array_fetch_str(&cache, &resultset, SL("cache"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_cache"), &cache);
+	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
 
 	phalcon_array_fetch_str(&column_map, &resultset, SL("columnMap"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_columnMap"), &column_map);
+	phalcon_update_property_zval(getThis(), SL("_columnMap"), &column_map);
 
 	phalcon_array_fetch_str(&hydrate_mode, &resultset, SL("hydrateMode"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_hydrateMode"), &hydrate_mode);
+	phalcon_update_property_zval(getThis(), SL("_hydrateMode"), &hydrate_mode);
 }

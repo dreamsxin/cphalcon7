@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Assets_Manager, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_options"), options);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
 }
 
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Assets_Manager, setOptions){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Options must be an array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_options"), options);
+	phalcon_update_property_zval(getThis(), SL("_options"), options);
 
 	RETURN_THISW();
 }
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Assets_Manager, useImplicitOutput){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_output);
 
-	phalcon_update_property_this(getThis(), SL("_implicitOutput"), implicit_output);
+	phalcon_update_property_zval(getThis(), SL("_implicitOutput"), implicit_output);
 	RETURN_THISW();
 }
 

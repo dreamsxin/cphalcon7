@@ -311,8 +311,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, save){
 		PHALCON_CALL_FUNCTIONW(&sha1, "sha1_file", filename);
 		PHALCON_CALL_FUNCTIONW(&md5, "md5_file", filename);
 
-		phalcon_update_property_this(getThis(), SL("sha1"), &sha1);
-		phalcon_update_property_this(getThis(), SL("md5"), &md5);
+		phalcon_update_property_zval(getThis(), SL("sha1"), &sha1);
+		phalcon_update_property_zval(getThis(), SL("md5"), &md5);
 	}
 
 	PHALCON_CALL_PARENTW(&status, phalcon_mvc_collection_gridfs_ce, getThis(), "save", arr, white_list, mode);
@@ -354,8 +354,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_GridFS, saveBytes){
 		PHALCON_CALL_FUNCTIONW(&sha1, "sha1", bytes);
 		PHALCON_CALL_FUNCTIONW(&md5, "md5", bytes);
 
-		phalcon_update_property_this(getThis(), SL("sha1"), &sha1);
-		phalcon_update_property_this(getThis(), SL("md5"), &md5);
+		phalcon_update_property_zval(getThis(), SL("sha1"), &sha1);
+		phalcon_update_property_zval(getThis(), SL("md5"), &md5);
 	}
 
 	PHALCON_CALL_PARENTW(&status, phalcon_mvc_collection_gridfs_ce, getThis(), "save", arr, white_list, mode);

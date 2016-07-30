@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Debug_Dump, __construct){
 	phalcon_array_update_str_str(&default_styles, SL("res"), SL("color:lime"), PH_COPY);
 	phalcon_array_update_str_str(&default_styles, SL("str"), SL("color:teal"), PH_COPY);
 
-	phalcon_update_property_this(getThis(), SL("_styles"), &default_styles);
+	phalcon_update_property_zval(getThis(), SL("_styles"), &default_styles);
 
 	if (styles && Z_TYPE_P(styles) != IS_NULL) {
 		PHALCON_CALL_SELFW(NULL, "setstyles", styles);
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 
 	phalcon_fast_array_merge(&new_styles, default_styles, styles);
 
-	phalcon_update_property_this(getThis(), SL("_styles"), &new_styles);
+	phalcon_update_property_zval(getThis(), SL("_styles"), &new_styles);
 
 	RETURN_THISW();
 }

@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 					zend_hash_internal_pointer_reset(Z_ARRVAL(r));
 				}
 
-				phalcon_update_property_this(getThis(), SL("_rows"), &r);
+				phalcon_update_property_zval(getThis(), SL("_rows"), &r);
 			}
 		}
 		else if (Z_TYPE_P(rows) == IS_ARRAY) {
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 		}
 	}
 
-	phalcon_update_property_this(getThis(), SL("_pointer"), &PHALCON_GLOBAL(z_zero));
+	phalcon_update_property_zval(getThis(), SL("_pointer"), &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -328,14 +328,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 				result = phalcon_read_property(getThis(), SL("_result"), PH_NOISY);
 				if (Z_TYPE_P(result) == IS_OBJECT) {
 					PHALCON_CALL_METHODW(&rows, result, "fetchall");
-					phalcon_update_property_this(getThis(), SL("_rows"), &rows);
+					phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
 				}
 			}
 
 			phalcon_fast_count(&count, &rows);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_count"), &count);
+		phalcon_update_property_zval(getThis(), SL("_count"), &count);
 	}
 
 	RETURN_CTORW(&count);
@@ -507,7 +507,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, setIsFresh){
 
 	phalcon_fetch_params(0, 1, 0, &is_fresh);
 
-	phalcon_update_property_this(getThis(), SL("_isFresh"), is_fresh);
+	phalcon_update_property_zval(getThis(), SL("_isFresh"), is_fresh);
 	RETURN_THISW();
 }
 
@@ -534,7 +534,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, setHydrateMode){
 
 	phalcon_fetch_params(0, 1, 0, &hydrate_mode);
 
-	phalcon_update_property_this(getThis(), SL("_hydrateMode"), hydrate_mode);
+	phalcon_update_property_zval(getThis(), SL("_hydrateMode"), hydrate_mode);
 	RETURN_THISW();
 }
 
@@ -649,7 +649,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 			 * Get the messages from the record that produce the error
 			 */
 			PHALCON_CALL_METHODW(&messages, &record, "getmessages");
-			phalcon_update_property_this(getThis(), SL("_errorMessages"), &messages);
+			phalcon_update_property_zval(getThis(), SL("_errorMessages"), &messages);
 
 			/** 
 			 * Rollback the transaction
@@ -795,7 +795,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			 * Get the messages from the record that produce the error
 			 */
 			PHALCON_CALL_METHODW(&messages, &record, "getmessages");
-			phalcon_update_property_this(getThis(), SL("_errorMessages"), &messages);
+			phalcon_update_property_zval(getThis(), SL("_errorMessages"), &messages);
 
 			/** 
 			 * Rollback the transaction

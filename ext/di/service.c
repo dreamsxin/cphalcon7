@@ -117,11 +117,11 @@ PHP_METHOD(Phalcon_DI_Service, __construct){
 	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	phalcon_update_property_this(getThis(), SL("_name"), name);
-	phalcon_update_property_this(getThis(), SL("_definition"), definition);
+	phalcon_update_property_zval(getThis(), SL("_name"), name);
+	phalcon_update_property_zval(getThis(), SL("_definition"), definition);
 	if (shared) {
 		PHALCON_ENSURE_IS_BOOL(shared);
-		phalcon_update_property_this(getThis(), SL("_shared"), shared);
+		phalcon_update_property_zval(getThis(), SL("_shared"), shared);
 	}
 }
 
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_DI_Service, setShared){
 
 	zval *shared;
 	phalcon_fetch_params(0, 1, 0, &shared);
-	phalcon_update_property_this(getThis(), SL("_shared"), shared);
+	phalcon_update_property_zval(getThis(), SL("_shared"), shared);
 }
 
 /**
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_DI_Service, isShared){
 PHP_METHOD(Phalcon_DI_Service, setSharedInstance){
 	zval *shared_instance;
 	phalcon_fetch_params(0, 1, 0, &shared_instance);
-	phalcon_update_property_this(getThis(), SL("_sharedInstance"), shared_instance);
+	phalcon_update_property_zval(getThis(), SL("_sharedInstance"), shared_instance);
 }
 
 /**
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_DI_Service, setDefinition)
 {
 	zval *definition;
 	phalcon_fetch_params(0, 1, 0, &definition);
-	phalcon_update_property_this(getThis(), SL("_definition"), definition);
+	phalcon_update_property_zval(getThis(), SL("_definition"), definition);
 }
 
 /**
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 	if (!EG(exception)) {
 		if (found) {
 			if (ishared) {
-				phalcon_update_property_this(getThis(), SL("_sharedInstance"), return_value);
+				phalcon_update_property_zval(getThis(), SL("_sharedInstance"), return_value);
 			}
 			/* Update the shared instance if the service is shared */
 			phalcon_update_property_bool(getThis(), SL("_resolved"), 1);
@@ -311,7 +311,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 
 	phalcon_array_update_str(&definition, SL("arguments"), &arguments, PH_COPY);
 
-	phalcon_update_property_this(getThis(), SL("_definition"), &definition);
+	phalcon_update_property_zval(getThis(), SL("_definition"), &definition);
 
 	RETURN_THISW();
 }

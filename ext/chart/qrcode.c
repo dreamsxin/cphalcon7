@@ -222,7 +222,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	PHALCON_SEPARATE_PARAM(text);
 	convert_to_string(text);
 
-	phalcon_update_property_this(getThis(), SL("_text"), text);
+	phalcon_update_property_zval(getThis(), SL("_text"), text);
 
 	if (version) {
 		PHALCON_SEPARATE_PARAM(version);
@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "version must be within the range of 1 to 40");
 			return;
 		}
-		phalcon_update_property_this(getThis(), SL("_version"), version);
+		phalcon_update_property_zval(getThis(), SL("_version"), version);
 	} else {
 		version = phalcon_read_property(getThis(), SL("_version"), PH_NOISY);
 	}
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Error level. there are 4 values: LEVEL_L, LEVEL_M, LEVEL_Q, LEVEL_H");
 			return;
 		}
-		phalcon_update_property_this(getThis(), SL("_level"), level);
+		phalcon_update_property_zval(getThis(), SL("_level"), level);
 	} else {
 		level = phalcon_read_property(getThis(), SL("_level"), PH_NOISY);
 	}
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Error mode. there are 4 values: MODE_NUL, MODE_NUM, MODE_8, MODE_KANJI");
 			return;
 		}
-		phalcon_update_property_this(getThis(), SL("_mode"), mode);
+		phalcon_update_property_zval(getThis(), SL("_mode"), mode);
 	} else {
 		mode = phalcon_read_property(getThis(), SL("_mode"), PH_NOISY);
 	}
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "casesensitive parameter must be bool");
 			return;
 		}
-		phalcon_update_property_this(getThis(), SL("_casesensitive"), casesensitive);
+		phalcon_update_property_zval(getThis(), SL("_casesensitive"), casesensitive);
 	} else {
 		casesensitive = phalcon_read_property(getThis(), SL("_casesensitive"), PH_NOISY);
 	}
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	} else {
 		ZVAL_RES(&zid, zend_register_resource(qr, phalcon_list_qrcode));
 
-		phalcon_update_property_this(getThis(), SL("_qr"), &zid);
+		phalcon_update_property_zval(getThis(), SL("_qr"), &zid);
 		RETURN_TRUE;
 	}
 

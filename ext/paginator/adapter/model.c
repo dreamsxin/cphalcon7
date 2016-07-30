@@ -80,14 +80,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct)
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	phalcon_update_property_this(getThis(), SL("_config"), config);
+	phalcon_update_property_zval(getThis(), SL("_config"), config);
 
 	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
-		phalcon_update_property_this(getThis(), SL("_limitRows"), &limit);
+		phalcon_update_property_zval(getThis(), SL("_limitRows"), &limit);
 	}
 
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
-		phalcon_update_property_this(getThis(), SL("_page"), &page);
+		phalcon_update_property_zval(getThis(), SL("_page"), &page);
 	}
 }
 
@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, setCurrentPage){
 
 	phalcon_fetch_params(0, 1, 0, &page);
 
-	phalcon_update_property_this(getThis(), SL("_page"), page);
+	phalcon_update_property_zval(getThis(), SL("_page"), page);
 	RETURN_THISW();
 }
 

@@ -124,11 +124,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 	
-	phalcon_update_property_this(getThis(), SL("_type"), type);
-	phalcon_update_property_this(getThis(), SL("_referencedModel"), referenced_model);
-	phalcon_update_property_this(getThis(), SL("_fields"), fields);
-	phalcon_update_property_this(getThis(), SL("_referencedFields"), referenced_fields);
-	phalcon_update_property_this(getThis(), SL("_options"), options);
+	phalcon_update_property_zval(getThis(), SL("_type"), type);
+	phalcon_update_property_zval(getThis(), SL("_referencedModel"), referenced_model);
+	phalcon_update_property_zval(getThis(), SL("_fields"), fields);
+	phalcon_update_property_zval(getThis(), SL("_referencedFields"), referenced_fields);
+	phalcon_update_property_zval(getThis(), SL("_options"), options);
 }
 
 /**
@@ -145,9 +145,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, setIntermediateRelation){
 
 	phalcon_fetch_params(0, 3, 0, &intermediate_fields, &intermediate_model, &intermediate_referenced_fields);
 	
-	phalcon_update_property_this(getThis(), SL("_intermediateFields"), intermediate_fields);
-	phalcon_update_property_this(getThis(), SL("_intermediateModel"), intermediate_model);
-	phalcon_update_property_this(getThis(), SL("_intermediateReferencedFields"), intermediate_referenced_fields);
+	phalcon_update_property_zval(getThis(), SL("_intermediateFields"), intermediate_fields);
+	phalcon_update_property_zval(getThis(), SL("_intermediateModel"), intermediate_model);
+	phalcon_update_property_zval(getThis(), SL("_intermediateReferencedFields"), intermediate_referenced_fields);
 	
 }
 

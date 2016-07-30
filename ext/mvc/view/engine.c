@@ -96,8 +96,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 		dependency_injector = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_view"), view);
-	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
+	phalcon_update_property_zval(getThis(), SL("_view"), view);
+	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 }
 
 /**

@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		}
 
 		phalcon_update_property_array(getThis(), SL("_initialized"), &class_name, model);
-		phalcon_update_property_this(getThis(), SL("_lastInitialized"), model);
+		phalcon_update_property_zval(getThis(), SL("_lastInitialized"), model);
 	}
 }
 

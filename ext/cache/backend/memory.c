@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 	} else {
 		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 		PHALCON_CONCAT_VV(&last_key, &prefix, key_name);
-		phalcon_update_property_this(getThis(), SL("_lastKey"), &last_key);
+		phalcon_update_property_zval(getThis(), SL("_lastKey"), &last_key);
 	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));

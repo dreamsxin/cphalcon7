@@ -424,7 +424,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 * Update the last initialized model, so it can be used in
 	 * modelsManager:afterInitialize
 	 */
-	phalcon_update_property_this(getThis(), SL("_lastInitialized"), model);
+	phalcon_update_property_zval(getThis(), SL("_lastInitialized"), model);
 
 	/** 
 	 * If an EventsManager is available we pass to it every initialized model
@@ -2389,7 +2389,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 		PHALCON_CALL_METHODW(NULL, &query, "__construct", phql, dependency_injector);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_lastQuery"), &query);
+	phalcon_update_property_zval(getThis(), SL("_lastQuery"), &query);
 
 	RETURN_CTORW(&query);
 }
@@ -2438,7 +2438,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 		PHALCON_CALL_METHODW(NULL, &query, "__construct", phql, dependency_injector);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_lastQuery"), &query);
+	phalcon_update_property_zval(getThis(), SL("_lastQuery"), &query);
 
 	/** 
 	 * Execute the query

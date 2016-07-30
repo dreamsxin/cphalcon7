@@ -179,7 +179,7 @@ int phalcon_property_decr(zval *object, const char *property_name, uint32_t prop
 
 /** Unset Array properties */
 int phalcon_isset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index);
-zval* phalcon_read_property_array(zval *object, const char *property_name, size_t property_length, const zval *index);
+int phalcon_read_property_array(zval *return_value, zval *object, const char *property_name, size_t property_length, const zval *index);
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index);
 
 /**

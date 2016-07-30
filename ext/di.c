@@ -326,13 +326,13 @@ PHP_METHOD(Phalcon_DI, setService)
  */
 PHP_METHOD(Phalcon_DI, getRaw){
 
-	zval *name, *service;
+	zval *name, service = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
-		service = phalcon_read_property_array(getThis(), SL("_services"), name);
+		phalcon_read_property_array(&service, getThis(), SL("_services"), name);
 		PHALCON_RETURN_CALL_METHODW(service, "getdefinition");
 		return;
 	}
@@ -348,14 +348,14 @@ PHP_METHOD(Phalcon_DI, getRaw){
  */
 PHP_METHOD(Phalcon_DI, getService){
 
-	zval *name, *service;
+	zval *name;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
-		service = phalcon_read_property_array(getThis(), SL("_services"), name);
-		RETURN_ZVAL(service, 1, 0);
+		phalcon_read_property_array(return_value, getThis(), SL("_services"), name);
+		return;
 	}
 
 	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));

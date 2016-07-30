@@ -826,27 +826,56 @@ int phalcon_update_property_zval_zval(zval *object, zval *property, zval *value)
  */
 int phalcon_update_property_array(zval *object, const char *property, uint32_t property_length, const zval *index, zval *value)
 {
-	zval property_value;
+	zval tmp;
+	int separated = 0;
 
-	if (!object) {
-		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (1)");
-		return FAILURE;
+	if (Z_TYPE_P(object) == IS_OBJECT) {
+		phalcon_read_property(&tmp, object, property, property_length, PH_NOISY | PH_READONLY);
+
+		/** Separation only when refcount > 1 */
+		if (Z_REFCOUNTED(tmp)) {
+			if (Z_REFCOUNT(tmp) > 1) {
+				if (!Z_ISREF(tmp)) {
+					zval new_zv;
+					ZVAL_DUP(&new_zv, &tmp);
+					ZVAL_COPY_VALUE(&tmp, &new_zv);
+					Z_TRY_DELREF(new_zv);
+					separated = 1;
+				}
+			}
+		} else {
+			zval new_zv;
+			ZVAL_DUP(&new_zv, &tmp);
+			ZVAL_COPY_VALUE(&tmp, &new_zv);
+			Z_TRY_DELREF(new_zv);
+			separated = 1;
+		}
+
+		/** Convert the value to array if not is an array */
+		if (Z_TYPE(tmp) != IS_ARRAY) {
+			if (separated) {
+				convert_to_array(&tmp);
+			} else {
+				array_init(&tmp);
+				separated = 1;
+			}
+			Z_DELREF(tmp);
+		}
+		Z_TRY_ADDREF_P(value);
+
+		if (Z_TYPE_P(index) == IS_STRING) {
+			zend_symtable_str_update(Z_ARRVAL(tmp), Z_STRVAL_P(index), Z_STRLEN_P(index), value);
+		} else if (Z_TYPE_P(index) == IS_LONG) {
+			zend_hash_index_update(Z_ARRVAL(tmp), Z_LVAL_P(index), value);
+		} else if (Z_TYPE_P(index) == IS_NULL) {
+			zend_hash_next_index_insert(Z_ARRVAL(tmp), value);
+		}
+
+		if (separated) {
+			phalcon_update_property_zval(object, property, property_length, &tmp);
+		}
 	}
 
-	if (Z_TYPE_P(object) != IS_OBJECT) {
-		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (2)");
-		return FAILURE;
-	}
-
-	phalcon_return_property(&property_value, object, property, property_length);
-
-	/** Convert the value to array if not is an array */
-	if (Z_TYPE(property_value) != IS_ARRAY) {
-		convert_to_array(&property_value);
-	}
-
-	phalcon_array_update_zval(&property_value, index, value, PH_COPY);
-	phalcon_update_property_zval(object, property, property_length, &property_value);
 	return SUCCESS;
 }
 
@@ -855,22 +884,50 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
  */
 int phalcon_update_property_array_multi(zval *object, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...)
 {
-	zval *property_value;
 	va_list ap;
+	zval tmp_arr;
+	int separated = 0;
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
-		property_value = phalcon_read_property(object, property, property_length, PH_NOISY);
+		phalcon_read_property(&tmp_arr, object, property, property_length, PH_NOISY | PH_READONLY);
+
+		/** Separation only when refcount > 1 */
+		if (Z_REFCOUNTED(tmp_arr)) {
+			if (Z_REFCOUNT(tmp_arr) > 1) {
+				if (!Z_ISREF(tmp_arr)) {
+					zval new_zv;
+					ZVAL_DUP(&new_zv, &tmp_arr);
+					ZVAL_COPY_VALUE(&tmp_arr, &new_zv);
+					Z_TRY_DELREF(new_zv);
+					separated = 1;
+				}
+			}
+		} else {
+			zval new_zv;
+			ZVAL_DUP(&new_zv, &tmp_arr);
+			ZVAL_COPY_VALUE(&tmp_arr, &new_zv);
+			Z_TRY_DELREF(new_zv);
+			separated = 1;
+		}
 
 		/** Convert the value to array if not is an array */
-		if (Z_TYPE_P(property_value) != IS_ARRAY) {
-			convert_to_array(property_value);
+		if (Z_TYPE(tmp_arr) != IS_ARRAY) {
+			if (separated) {
+				convert_to_array(&tmp_arr);
+			} else {
+				array_init(&tmp_arr);
+				separated = 1;
+			}
+			Z_DELREF(tmp_arr);
 		}
 
 		va_start(ap, types_count);
-		phalcon_array_update_multi_ex(property_value, value, types, types_length, types_count, ap);
+		phalcon_array_update_multi_ex(&tmp_arr, value, types, types_length, types_count, ap);
 		va_end(ap);
 
-		phalcon_update_property_zval(object, property, property_length, property_value);
+		if (separated) {
+			phalcon_update_property_zval(object, property, property_length, &tmp_arr);
+		}
 	}
 
 	return SUCCESS;
@@ -1017,15 +1074,15 @@ int phalcon_isset_property_array(zval *object, const char *property, uint32_t pr
 /**
  * Reads a array property from an object
  */
-zval *phalcon_read_property_array(zval *object, const char *property, size_t property_length, const zval *index) {
+int phalcon_read_property_array(zval *return_value, zval *object, const char *property, size_t property_length, const zval *index) {
 
-	zval *tmp, *retval;
+	zval tmp = {};
 
-	if ((tmp = phalcon_read_property(object, property, property_length, PH_NOISY)) == NULL || (retval = phalcon_array_read_fetch(tmp, index)) == NULL) {
-		return &EG(uninitialized_zval);
+	if (phalcon_read_property(&tmp, object, property, property_length, PH_NOISY) == FAILURE || !phalcon_array_isset_fetch(return_value, &tmp, index)) {
+		return 0;
 	}
 
-	return retval;
+	return 1;
 }
 
 /**
@@ -1033,10 +1090,10 @@ zval *phalcon_read_property_array(zval *object, const char *property, size_t pro
  */
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index) {
 
-	zval *tmp;
+	zval tmp = {};
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
-		tmp = phalcon_read_property(object, property, property_length, PH_NOISY);
+		phalcon_read_property(&tmp, object, property, property_length, PH_NOISY);
 
 		if (Z_TYPE_P(tmp) != IS_ARRAY) {
 			convert_to_array(tmp);

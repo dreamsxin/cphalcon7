@@ -457,20 +457,20 @@ static void phalcon_crypt_unpad_text(zval *return_value, zval *text, zval *mode,
  */
 PHP_METHOD(Phalcon_Crypt, encrypt){
 
-	zval *source, *key = NULL, *handler, arguments = {}, value = {}, text = {}, encrypt_key = {}, *cipher, *mode, iv_size = {}, rand = {}, iv = {}, block_size = {};
-	zval *padding_type, padded = {}, encrypt = {};
+	zval *source, *key = NULL, handler = {}, arguments = {}, value = {}, text = {}, encrypt_key = {}, cipher = {}, mode = {}, iv_size = {}, rand = {}, iv = {}, block_size = {};
+	zval padding_type = {}, padded = {}, encrypt = {};
 
 	phalcon_fetch_params(0, 1, 1, &source, &key);
 
-	handler = phalcon_read_property(getThis(), SL("_beforeEncrypt"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_beforeEncrypt"), PH_NOISY);
 
-	if (phalcon_is_callable(handler)) {
+	if (phalcon_is_callable(&handler)) {
 		PHALCON_SEPARATE_PARAM(source);
 
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, source, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAYW(&value, handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAYW(&value, &handler, &arguments);
 
 		source = &value;
 	}
@@ -501,10 +501,10 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		return;
 	}
 
-	cipher = phalcon_read_property(getThis(), SL("_cipher"), PH_NOISY);
-	mode   = phalcon_read_property(getThis(), SL("_mode"), PH_NOISY);
+	phalcon_read_property(&cipher, getThis(), SL("_cipher"), PH_NOISY);
+	phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(&iv_size, "mcrypt_get_iv_size", cipher, mode);
+	PHALCON_CALL_FUNCTIONW(&iv_size, "mcrypt_get_iv_size", &cipher, &mode);
 	if (unlikely(Z_TYPE(iv_size) != IS_LONG)) {
 		convert_to_long(&iv_size);
 	}
@@ -526,27 +526,27 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		convert_to_long(&block_size);
 	}
 
-	padding_type = phalcon_read_property(getThis(), SL("_padding"), PH_NOISY);
+	phalcon_read_property(&padding_type, getThis(), SL("_padding"), PH_NOISY);
 
-	assert(Z_TYPE_P(padding_type) == IS_LONG);
+	assert(Z_TYPE(padding_type) == IS_LONG);
 	assert(Z_TYPE(block_size) == IS_LONG);
-	assert(Z_TYPE_P(mode) == IS_STRING);
+	assert(Z_TYPE(mode) == IS_STRING);
 	assert(Z_TYPE(text) == IS_STRING);
 
-	phalcon_crypt_pad_text(&padded, &text, mode, Z_LVAL(block_size), Z_LVAL_P(padding_type));
+	phalcon_crypt_pad_text(&padded, &text, mode, Z_LVAL(block_size), Z_LVAL(padding_type));
 	assert(Z_TYPE(padded) == IS_STRING);
 
-	PHALCON_CALL_FUNCTIONW(&encrypt, "mcrypt_encrypt", cipher, &encrypt_key, &padded, mode, &iv);
+	PHALCON_CALL_FUNCTIONW(&encrypt, "mcrypt_encrypt", &cipher, &encrypt_key, &padded, &mode, &iv);
 
 	PHALCON_CONCAT_VV(return_value, &iv, &encrypt);
 
-	handler = phalcon_read_property(getThis(), SL("_afterEncrypt"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_afterEncrypt"), PH_NOISY);
 
-	if (phalcon_is_callable(handler)) {
+	if (phalcon_is_callable(&handler)) {
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, return_value, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAYW(&value, handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAYW(&value, &handler, &arguments);
 
 		RETURN_CTORW(&value);
 	}
@@ -565,8 +565,8 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
  */
 PHP_METHOD(Phalcon_Crypt, decrypt){
 
-	zval *text, *key = NULL, *handler, arguments = {}, value = {}, *cipher, *mode, iv_size = {}, key_size = {}, text_size = {}, iv = {}, text_to_decipher = {};
-	zval decrypted = {}, block_size = {}, *padding_type;
+	zval *text, *key = NULL, _key = {}, handler = {}, arguments = {}, value = {}, cipher = {}, mode = {}, iv_size = {}, key_size = {}, text_size = {}, iv = {}, text_to_decipher = {};
+	zval decrypted = {}, block_size = {}, padding_type = {};
 
 	phalcon_fetch_params(0, 1, 1, &text, &key);
 
@@ -576,7 +576,8 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
-		key = phalcon_read_property(getThis(), SL("_key"), PH_NOISY);
+		phalcon_read_property(&_key, getThis(), SL("_key"), PH_NOISY);
+		key = &_key;
 	}
 
 	if (PHALCON_IS_EMPTY(key)) {
@@ -584,23 +585,23 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		return;
 	}
 
-	handler = phalcon_read_property(getThis(), SL("_beforeDecrypt"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_beforeDecrypt"), PH_NOISY);
 
-	if (phalcon_is_callable(handler)) {
+	if (phalcon_is_callable(&handler)) {
 		PHALCON_SEPARATE_PARAM(text);
 
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, text, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAYW(&value, handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAYW(&value, &handler, &arguments);
 
 		text = &value;
 	}
 
-	cipher = phalcon_read_property(getThis(), SL("_cipher"), PH_NOISY);
-	mode   = phalcon_read_property(getThis(), SL("_mode"), PH_NOISY);
+	phalcon_read_property(&cipher, getThis(), SL("_cipher"), PH_NOISY);
+	phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(&iv_size, "mcrypt_get_iv_size", cipher, mode);
+	PHALCON_CALL_FUNCTIONW(&iv_size, "mcrypt_get_iv_size", &cipher, &mode);
 	if (unlikely(Z_TYPE(iv_size) != IS_LONG)) {
 		convert_to_long(&iv_size);
 	}
@@ -620,32 +621,32 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	phalcon_substr(&iv, text, 0, Z_LVAL(iv_size));
 	phalcon_substr(&text_to_decipher, text, Z_LVAL(iv_size), 0);
 
-	PHALCON_CALL_FUNCTIONW(&decrypted, "mcrypt_decrypt", cipher, key, &text_to_decipher, mode, &iv);
+	PHALCON_CALL_FUNCTIONW(&decrypted, "mcrypt_decrypt", &cipher, key, &text_to_decipher, &mode, &iv);
 	if (unlikely(Z_TYPE(decrypted) != IS_STRING)) {
 		convert_to_string(&decrypted);
 	}
 
-	PHALCON_CALL_FUNCTIONW(&block_size, "mcrypt_get_block_size", cipher, mode);
+	PHALCON_CALL_FUNCTIONW(&block_size, "mcrypt_get_block_size", &cipher, &mode);
 	if (unlikely(Z_TYPE(block_size) != IS_LONG)) {
 		convert_to_long(&block_size);
 	}
 
-	padding_type = phalcon_read_property(getThis(), SL("_padding"), PH_NOISY);
+	phalcon_read_property(&padding_type, getThis(), SL("_padding"), PH_NOISY);
 
-	assert(Z_TYPE_P(padding_type) == IS_LONG);
+	assert(Z_TYPE(padding_type) == IS_LONG);
 	assert(Z_TYPE(block_size) == IS_LONG);
-	assert(Z_TYPE_P(mode) == IS_STRING);
+	assert(Z_TYPE(mode) == IS_STRING);
 	assert(Z_TYPE(decrypted) == IS_STRING);
 
-	phalcon_crypt_unpad_text(return_value, &decrypted, mode, Z_LVAL(block_size), Z_LVAL_P(padding_type));
+	phalcon_crypt_unpad_text(return_value, &decrypted, &mode, Z_LVAL(block_size), Z_LVAL(padding_type));
 
-	handler = phalcon_read_property(getThis(), SL("_afterDecrypt"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_afterDecrypt"), PH_NOISY);
 
-	if (phalcon_is_callable(handler)) {
+	if (phalcon_is_callable(&handler)) {
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, return_value, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAYW(&value, handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAYW(&value, &handler, &arguments);
 
 		RETURN_CTORW(&value);
 	}

@@ -153,11 +153,11 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 
 int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *type)
 {
-	zval *messages, t = {}, *params[1];
+	zval messages = {}, t = {}, *params[1];
 	if (is_phalcon_class(ce)) {
-		messages = phalcon_read_property(this_ptr, SL("_defaultMessages"), PH_NOISY);
+		phalcon_read_property(&messages, this_ptr, SL("_defaultMessages"), PH_NOISY);
 
-		if (!phalcon_array_isset_fetch_str(retval, messages, type, strlen(type))) {
+		if (!phalcon_array_isset_fetch_str(retval, &messages, type, strlen(type))) {
 			ZVAL_NULL(retval);
 		}
 
@@ -398,13 +398,13 @@ PHP_METHOD(Phalcon_Validation, getMessages){
  */
 PHP_METHOD(Phalcon_Validation, appendMessage){
 
-	zval *message, *messages;
+	zval *message, messages = {};
 
 	phalcon_fetch_params(0, 1, 0, &message);
 	
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	if (Z_TYPE_P(messages) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, messages, "appendmessage", message);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	if (Z_TYPE(messages) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &messages, "appendmessage", message);
 	}
 	RETURN_THISW();
 }
@@ -584,12 +584,12 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 {
-	zval *type, *messages, msg = {};
+	zval *type, messages = {}, msg = {};
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
-	messages = phalcon_read_property(getThis(), SL("_defaultMessages"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&msg, messages, type)) {
+	phalcon_read_property(&messages, getThis(), SL("_defaultMessages"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&msg, &messages, type)) {
 		RETURN_CTORW(&msg);
 	}
 

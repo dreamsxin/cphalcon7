@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Security, hash)
 
 	i_factor = phalcon_get_intval(work_factor);
 
-	phalcon_read_property(&default_hash, getThis(), SL("_defaultHash"));
+	phalcon_return_property(&default_hash, getThis(), SL("_defaultHash"));
 
 	switch (i_hash) {
 		default:

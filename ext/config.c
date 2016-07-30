@@ -224,13 +224,12 @@ PHP_METHOD(Phalcon_Config, get){
 
 	phalcon_fetch_params(0, 1, 1, &index, &default_value);
 
-	zval *tmp = phalcon_read_property_zval(getThis(), index, PH_NOISY);
-	if (tmp) {
-		RETURN_CTORW(tmp);
-	} else if (default_value) {
-		RETURN_CTORW(default_value);
-	} else {
-		RETURN_NULL();
+	if (phalcon_read_property_zval(return_value, getThis(), index, PH_NOISY) == FAILURE) {
+		if (default_value) {
+			RETURN_CTORW(default_value);
+		} else {
+			RETURN_NULL();
+		}
 	}
 }
 
@@ -324,19 +323,18 @@ PHP_METHOD(Phalcon_Config, merge){
 
 	if (Z_TYPE(array_config) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(array_config), idx, str_key, value) {
-			zval tmp = {}, *active_value;
+			zval tmp = {}, active_value = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
 
-			if (phalcon_isset_property_zval(getThis(), &tmp)) {
-				active_value = phalcon_read_property_zval(getThis(), &tmp, PH_NOISY);
-				if ((Z_TYPE_P(value)  == IS_OBJECT || Z_TYPE_P(value) == IS_ARRAY) && Z_TYPE_P(active_value) == IS_OBJECT) {
+			if (phalcon_fetch_property_zval(&active_value, getThis(), &tmp, PH_NOISY)) {
+				if ((Z_TYPE_P(value)  == IS_OBJECT || Z_TYPE_P(value) == IS_ARRAY) && Z_TYPE(active_value) == IS_OBJECT) {
 					if (phalcon_method_exists_ex(active_value, SL("merge")) == SUCCESS) { /* Path AAA in the test */
 						zval *params[] = { value };
-						if (FAILURE == phalcon_call_method(NULL, active_value, "merge", 1, params)) {
+						if (FAILURE == phalcon_call_method(NULL, &active_value, "merge", 1, params)) {
 							break;
 						}
 					} else {

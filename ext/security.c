@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
  */
 PHP_METHOD(Phalcon_Security, hash)
 {
-	zval *password, *work_factor = NULL, n_bytes = {}, salt_bytes = {}, default_hash = {}, z_salt = {};
+	zval *password, *work_factor = NULL, _work_factor = {}, n_bytes = {}, salt_bytes = {}, default_hash = {}, z_salt = {};
 	char variant, *salt;
 	int salt_len, i_factor, i_hash;
 
@@ -359,13 +359,13 @@ PHP_METHOD(Phalcon_Security, hash)
 	PHALCON_ENSURE_IS_STRING(password);
 
 	if (!work_factor || Z_TYPE_P(work_factor) == IS_NULL) {
-		work_factor = phalcon_read_property(getThis(), SL("_workFactor"), PH_NOISY);
+		phalcon_read_property(&_work_factor, getThis(), SL("_workFactor"), PH_NOISY);
+		work_factor = &_work_factor;
 	}
 
 	i_factor = phalcon_get_intval(work_factor);
 
-	phalcon_return_property(&default_hash, getThis(), SL("_defaultHash"));
-	i_hash = phalcon_get_intval(&default_hash);
+	phalcon_read_property(&default_hash, getThis(), SL("_defaultHash"));
 
 	switch (i_hash) {
 		default:

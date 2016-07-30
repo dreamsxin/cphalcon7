@@ -250,13 +250,13 @@ PHP_METHOD(Phalcon_Filter, sanitize){
  */
 PHP_METHOD(Phalcon_Filter, _sanitize){
 
-	zval *value, *filter, *filters, filter_object = {}, arguments = {}, type = {}, quote = {}, empty_str = {}, escaped = {}, filtered = {};
+	zval *value, *filter, filters = {}, filter_object = {}, arguments = {}, type = {}, quote = {}, empty_str = {}, escaped = {}, filtered = {};
 	zval allow_fraction = {}, options = {}, allow_tags = {}, allow_attributes = {}, exception_message = {};
 
 	phalcon_fetch_params(0, 2, 0, &value, &filter);
 
-	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&filter_object, filters, filter) && (Z_TYPE(filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
+	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&filter_object, &filters, filter) && (Z_TYPE(filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
 		/** 
 		 * If the filter is a closure we call it in the PHP userland
 		 */

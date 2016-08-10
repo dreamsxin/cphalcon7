@@ -1079,6 +1079,7 @@ int phalcon_read_property_array(zval *return_value, zval *object, const char *pr
 	zval tmp = {};
 
 	if (phalcon_read_property(&tmp, object, property, property_length, PH_NOISY) == FAILURE || !phalcon_array_isset_fetch(return_value, &tmp, index)) {
+		ZVAL_NULL(return_value);
 		return 0;
 	}
 

@@ -187,14 +187,14 @@ PHP_METHOD(Phalcon_Registry, __unset){
  * @brief void Phalcon\Registry::__call(string $name, array $arguments)
  */
 PHP_METHOD(Phalcon_Registry, __call){
-	zval *name, *arguments, *callback;
+	zval *name, *arguments, callback = {};
 
 	phalcon_fetch_params(0, 2, 0, &name, &arguments);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (phalcon_isset_property_array(getThis(), SL("_data"), name)) {
-		callback = phalcon_read_property_array(getThis(), SL("_data"), name);
-		PHALCON_CALL_ZVAL_FUNCTIONW(return_value, callback, arguments);
+		phalcon_read_property_array(&callback, getThis(), SL("_data"), name);
+		PHALCON_CALL_ZVAL_FUNCTIONW(return_value, &callback, arguments);
 	} else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_P(name));
 	}
@@ -204,27 +204,24 @@ PHP_METHOD(Phalcon_Registry, __call){
  * @brief int Phalcon\Registry::count()
  */
 PHP_METHOD(Phalcon_Registry, count){
-	zval *data;
+	zval data = {};
 
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
+	data = phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
 
-	phalcon_fast_count(return_value, data);
+	phalcon_fast_count(return_value, &data);
 }
 
 /**
  * @brief mixed& Phalcon\Registry::offsetGet(mixed $offset)
  */
 PHP_METHOD(Phalcon_Registry, offsetGet){
-	zval *property, *callback;
+	zval *property;
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
-	if (phalcon_isset_property_array(getThis(), SL("_data"), property)) {
-		callback = phalcon_read_property_array(getThis(), SL("_data"), property);
-		RETURN_ZVAL(callback, 1, 0);
+	if (!phalcon_read_property_array(return_value, getThis(), SL("_data"), property)) {
+		RETURN_NULL();
 	}
-
-	RETURN_NULL();
 }
 
 /**

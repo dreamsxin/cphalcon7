@@ -112,6 +112,9 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 	PHALCON_CONCAT_SV(&setting, "LC_ALL=", &locale);
 	PHALCON_CALL_FUNCTIONW(NULL, "putenv", &setting);
 
+	PHALCON_CONCAT_SV(setting, "LANGUAGE=", locale);
+	PHALCON_CALL_FUNCTIONW(NULL, "putenv", setting);
+
 	if ((constant = zend_get_constant_str(SL("LC_ALL"))) != NULL) {
 		PHALCON_CALL_FUNCTIONW(NULL, "setlocale", constant, &locale);
 	}

@@ -286,18 +286,18 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		uri = &PHALCON_GLOBAL(z_null);
 	}
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "A dependency injection object is required to access internal services");
-		return;
-	}
-
 	/* Call boot event, this allows the developer to perform initialization actions */
 	PHALCON_STR(&event_name, "application:boot");
 	PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		PHALCON_PTR_DTOR(&event_name);
 		RETURN_FALSE;
+	}
+
+	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
+	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "A dependency injection object is required to access internal services");
+		return;
 	}
 
 	PHALCON_STR(&service, ISV(router));

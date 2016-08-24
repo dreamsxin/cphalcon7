@@ -143,6 +143,15 @@ int phalcon_isset_property_array(zval *object, const char *property, uint32_t pr
 int phalcon_read_property_array(zval *return_value, zval *object, const char *property_name, size_t property_length, const zval *index);
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index);
 
+static inline int phalcon_isset_property_zval_array(zval *object, const zval *property, const zval *index)
+{
+	if (Z_TYPE_P(property) == IS_STRING) {
+		return phalcon_isset_property_array(object, Z_STRVAL_P(property), Z_STRLEN_P(property), index);
+	}
+
+	return 0;
+}
+
 /**
  * Returns an object's Array properties
  */
@@ -230,6 +239,11 @@ int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *
 static inline int phalcon_property_isset_fetch_zval(zval *fetched, zval *object, zval *property)
 {
 	return phalcon_property_isset_fetch(fetched, object, Z_STRVAL_P(property), Z_STRLEN_P(property));
+}
+
+static inline int phalcon_property_array_isset_fetch_zval(zval *fetched, zval *object, zval *property, const zval *index)
+{
+	return phalcon_property_array_isset_fetch(fetched, object, Z_STRVAL_P(property), Z_STRLEN_P(property), index);
 }
 
 #define PHALCON_PROPERTY_IS_PUBLIC(object, property) \

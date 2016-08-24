@@ -202,12 +202,12 @@ PHP_METHOD(Phalcon_Forms_Manager, get){
  */
 PHP_METHOD(Phalcon_Forms_Manager, has){
 
-	zval *name, *forms;
+	zval *name, forms = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	forms = phalcon_read_property(getThis(), SL("_forms"), PH_NOISY);
-	RETURN_BOOL(phalcon_array_isset(forms, name));
+	phalcon_read_property(&forms, getThis(), SL("_forms"), PH_NOISY);
+	RETURN_BOOL(phalcon_array_isset(&forms, name));
 }
 
 /**

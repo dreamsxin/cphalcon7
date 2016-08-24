@@ -250,10 +250,10 @@ PHP_METHOD(Phalcon_Http_Response, setHeaders){
  */
 PHP_METHOD(Phalcon_Http_Response, getHeaders){
 
-	zval *headers;
+	zval headers = {};
 
-	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
-	if (Z_TYPE_P(headers) == IS_NULL) {
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+	if (Z_TYPE(headers) == IS_NULL) {
 		/** 
 		 * A Phalcon\Http\Response\Headers bag is temporary used to manage the headers
 		 * before sending them to the client
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Http_Response, getHeaders){
 		return;
 	}
 
-	RETURN_CTORW(headers);
+	RETURN_CTORW(&headers);
 }
 
 /**
@@ -682,13 +682,13 @@ PHP_METHOD(Phalcon_Http_Response, setBsonContent){
  */
 PHP_METHOD(Phalcon_Http_Response, appendContent){
 
-	zval *content, *_content, temp_content = {};
+	zval *_content, content = {}, temp_content = {};
 
-	phalcon_fetch_params(0, 1, 0, &content);
+	phalcon_fetch_params(0, 1, 0, &_content);
 
-	_content = phalcon_read_property(getThis(), SL("_content"), PH_NOISY);
+	phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY);
 
-	concat_function(&temp_content, _content, content);
+	concat_function(&temp_content, &content, _content);
 
 	phalcon_update_property_zval(getThis(), SL("_content"), &temp_content);
 	RETURN_THISW();
@@ -723,11 +723,11 @@ PHP_METHOD(Phalcon_Http_Response, isSent){
  */
 PHP_METHOD(Phalcon_Http_Response, sendHeaders){
 
-	zval *headers;
+	zval headers = {};
 
-	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
-	if (Z_TYPE_P(headers) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, headers, "send");
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+	if (Z_TYPE(headers) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &headers, "send");
 	}
 
 	RETURN_THISW();
@@ -740,11 +740,11 @@ PHP_METHOD(Phalcon_Http_Response, sendHeaders){
  */
 PHP_METHOD(Phalcon_Http_Response, sendCookies){
 
-	zval *cookies;
+	zval cookies = {};
 
-	cookies = phalcon_read_property(getThis(), SL("_cookies"), PH_NOISY);
-	if (Z_TYPE_P(cookies) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, cookies, "send");
+	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
+	if (Z_TYPE(cookies) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &cookies, "send");
 	}
 
 	RETURN_THISW();
@@ -757,33 +757,32 @@ PHP_METHOD(Phalcon_Http_Response, sendCookies){
  */
 PHP_METHOD(Phalcon_Http_Response, send){
 
-	zval *sent, *headers, *cookies, *content, *file;
+	zval sent = {}, headers = {}, cookies = {}, content = {}, file = {};
 
-	sent = phalcon_read_property(getThis(), SL("_sent"), PH_NOISY);
-	if (PHALCON_IS_FALSE(sent)) {
+	phalcon_read_property(&sent, getThis(), SL("_sent"), PH_NOISY);
+	if (PHALCON_IS_FALSE(&sent)) {
 		/* Send headers */
-		headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
-		if (Z_TYPE_P(headers) == IS_OBJECT) {
-			PHALCON_CALL_METHODW(NULL, headers, "send");
+		phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+		if (Z_TYPE(headers) == IS_OBJECT) {
+			PHALCON_CALL_METHODW(NULL, &headers, "send");
 		}
 
-		cookies = phalcon_read_property(getThis(), SL("_cookies"), PH_NOISY);
-		if (Z_TYPE_P(cookies) == IS_OBJECT) {
-			PHALCON_CALL_METHODW(NULL, cookies, "send");
+		phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
+		if (Z_TYPE(cookies) == IS_OBJECT) {
+			PHALCON_CALL_METHODW(NULL, &cookies, "send");
 		}
 
 		/* Output the response body */
-		content = phalcon_read_property(getThis(), SL("_content"), PH_NOISY);
-		if (Z_TYPE_P(content) != IS_NULL) {
-			zend_print_zval(content, 0);
-		}
-		else {
-			file = phalcon_read_property(getThis(), SL("_file"), PH_NOISY);
+		phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY);
+		if (Z_TYPE(content) != IS_NULL) {
+			zend_print_zval(&content, 0);
+		} else {
+			phalcon_read_property(&file, getThis(), SL("_file"), PH_NOISY);
 
-			if (Z_TYPE_P(file) == IS_STRING && Z_STRLEN_P(file)) {
+			if (Z_TYPE(file) == IS_STRING && Z_STRLEN(file)) {
 				php_stream *stream;
 
-				stream = php_stream_open_wrapper(Z_STRVAL_P(file), "rb", REPORT_ERRORS, NULL);
+				stream = php_stream_open_wrapper(Z_STRVAL(file), "rb", REPORT_ERRORS, NULL);
 				if (stream != NULL) {
 					php_stream_passthru(stream);
 					php_stream_close(stream);

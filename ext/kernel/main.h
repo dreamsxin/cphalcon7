@@ -60,6 +60,7 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals);
 zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_ce, zend_class_entry *parent_ce);
 
 /* Globals functions */
+int phalcon_read_global_str(zval *return_value, const char *global, unsigned int global_length);
 zval* phalcon_get_global_str(const char *global, unsigned int global_length);
 zval* phalcon_get_global(zend_string *name);
 

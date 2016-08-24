@@ -26,7 +26,7 @@
 #include "kernel/fcall.h"
 #include "kernel/hash.h"
 
-int phalcon_array_isset_fetch(zval *fetched, const zval *arr, zval *index, int readonly)
+int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index, int readonly)
 {
 	return phalcon_array_fetch(fetched, arr, index, readonly) == SUCCESS ? 1 : 0;
 }
@@ -530,7 +530,7 @@ void phalcon_array_update_multi_2(zval *arr, const zval *index1, const zval *ind
 	zval tmp = {};
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&tmp, arr, index1)) {
+		if (phalcon_array_isset_fetch(&tmp, arr, index1, 0)) {
 			SEPARATE_ZVAL_IF_NOT_REF(&tmp);
 
 			if (Z_TYPE(tmp) != IS_ARRAY) {
@@ -577,7 +577,7 @@ void phalcon_array_update_zval_str_append_multi_3(zval *arr, const zval *index1,
 	zval tmp1 = {}, tmp2 = {};
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {		
-		if (phalcon_array_isset_fetch(&tmp1, arr, index1)) {
+		if (phalcon_array_isset_fetch(&tmp1, arr, index1, flags)) {
 			SEPARATE_ZVAL_IF_NOT_REF(&tmp1);
 
 			if (Z_TYPE(tmp1) != IS_ARRAY) {
@@ -608,7 +608,7 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 	zval tmp1 = {}, tmp2 = {};
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&tmp1, arr, index1)) {
+		if (phalcon_array_isset_fetch(&tmp1, arr, index1, flags)) {
 			SEPARATE_ZVAL_IF_NOT_REF(&tmp1);
 
 			if (Z_TYPE(tmp1) != IS_ARRAY) {
@@ -618,7 +618,7 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 			array_init(&tmp1);
 		}
 
-		if (phalcon_array_isset_fetch(&tmp2, &tmp1, index2)) {
+		if (phalcon_array_isset_fetch(&tmp2, &tmp1, index2, flags)) {
 			SEPARATE_ZVAL_IF_NOT_REF(&tmp2);
 
 			if (Z_TYPE(tmp2) != IS_ARRAY) {
@@ -753,7 +753,7 @@ void phalcon_array_merge_recursive_n(zval *a1, zval *a2)
 			ZVAL_LONG(&key, idx);
 		}
 
-		if (!phalcon_array_isset_fetch(&tmp, a1, &key) || Z_TYPE_P(value) != IS_ARRAY) {
+		if (!phalcon_array_isset_fetch(&tmp, a1, &key, 0) || Z_TYPE_P(value) != IS_ARRAY) {
 			phalcon_array_update_zval(a1, &key, value, PH_COPY);
 		} else {
 			phalcon_array_merge_recursive_n(&tmp, value);
@@ -778,7 +778,7 @@ void phalcon_array_merge_recursive_n2(zval *a1, zval *a2)
 			ZVAL_LONG(&key, idx);
 		}
 
-		if (!phalcon_array_isset_fetch(&tmp, a1, &key)) {
+		if (!phalcon_array_isset_fetch(&tmp, a1, &key, 0)) {
 			phalcon_array_update_zval(a1, &key, value, PH_COPY);
 		} else if (Z_TYPE_P(value) == IS_ARRAY) {
 			phalcon_array_merge_recursive_n2(&tmp, value);

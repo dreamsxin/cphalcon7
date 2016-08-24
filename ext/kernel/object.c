@@ -811,7 +811,7 @@ int phalcon_update_property_zval_long(zval *object, const zval *property, int va
 /**
  * Checks whether obj is an object and updates zval property with another zval
  */
-int phalcon_update_property_zval_zval(zval *object, zval *property, zval *value)
+int phalcon_update_property_zval_zval(zval *object, const zval *property, zval *value)
 {
 	if (Z_TYPE_P(property) != IS_STRING) {
 		php_error_docref(NULL, E_WARNING, "Property should be string");
@@ -1078,7 +1078,7 @@ int phalcon_read_property_array(zval *return_value, zval *object, const char *pr
 
 	zval tmp = {};
 
-	if (phalcon_read_property(&tmp, object, property, property_length, PH_NOISY) == FAILURE || !phalcon_array_isset_fetch(return_value, &tmp, index)) {
+	if (phalcon_read_property(&tmp, object, property, property_length, PH_NOISY) == FAILURE || !phalcon_array_isset_fetch(return_value, &tmp, index, PH_NOISY)) {
 		ZVAL_NULL(return_value);
 		return 0;
 	}
@@ -1096,13 +1096,13 @@ int phalcon_unset_property_array(zval *object, const char *property, uint32_t pr
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		phalcon_read_property(&tmp, object, property, property_length, PH_NOISY);
 
-		if (Z_TYPE_P(tmp) != IS_ARRAY) {
-			convert_to_array(tmp);
+		if (Z_TYPE(tmp) != IS_ARRAY) {
+			convert_to_array(&tmp);
 		}
 
-		phalcon_array_unset(tmp, index, PH_COPY);
+		phalcon_array_unset(&tmp, index, PH_COPY);
 
-		phalcon_update_property_zval(object, property, property_length, tmp);
+		phalcon_update_property_zval(object, property, property_length, &tmp);
 	}
 
 	return SUCCESS;
@@ -1289,11 +1289,11 @@ int phalcon_create_instance_params(zval *return_value, const zval *class_name, z
  */
 int phalcon_property_incr(zval *object, const char *property_name, uint32_t property_length){
 
-	zval *value = phalcon_read_property(object, property_name, property_length, 0);
+	zval value = {};
 
-	phalcon_increment(value);
-
-	phalcon_update_property_zval(object, property_name, property_length, value);
+	phalcon_read_property(&value, object, property_name, property_length, 0);
+	phalcon_increment(&value);
+	phalcon_update_property_zval(object, property_name, property_length, &value);
 
 	return SUCCESS;
 }
@@ -1303,11 +1303,11 @@ int phalcon_property_incr(zval *object, const char *property_name, uint32_t prop
  */
 int phalcon_property_decr(zval *object, const char *property_name, uint32_t property_length){
 
-	zval *value = phalcon_read_property(object, property_name, property_length, 0);
-	
-	phalcon_decrement(value);
+	zval value = {};
 
-	phalcon_update_property_zval(object, property_name, property_length, value);
+	phalcon_read_property(&value, object, property_name, property_length, 0);
+	phalcon_decrement(&value);
+	phalcon_update_property_zval(object, property_name, property_length, &value);
 
 	return SUCCESS;
 }
@@ -1361,7 +1361,7 @@ int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *
 		return 0;
 	}
 
-	if (!phalcon_array_isset_fetch(fetched, &property_value, index)) {
+	if (!phalcon_array_isset_fetch(fetched, &property_value, index, 0)) {
 		return 0;
 	}
 	return 1;

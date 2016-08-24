@@ -126,12 +126,12 @@ PHP_METHOD(Phalcon_Db_Index, getColumns){
  */
 PHP_METHOD(Phalcon_Db_Index, getType){
 
-	zval *type = NULL;
+	zval type = {};
 
-	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
 
-	if (Z_TYPE_P(type) == IS_STRING) {
-		RETURN_CTORW(type);
+	if (Z_TYPE(type) == IS_STRING) {
+		RETURN_CTORW(&type);
 	} else {
 		RETVAL_EMPTY_STRING();
 	}

@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_CLI_Console, getModules){
 PHP_METHOD(Phalcon_CLI_Console, handle){
 
 	zval *_arguments = NULL, arguments = {}, dependency_injector = {}, events_manager = {}, event_name = {}, service = {}, router = {}, module_name = {};
-	zval status = {}, *modules, exception_msg = {}, module = {}, path = {}, class_name = {}, module_object = {};
+	zval status = {}, modules = {}, exception_msg = {}, module = {}, path = {}, class_name = {}, module_object = {};
 	zval namespace_name = {}, task_name = {}, action_name = {}, params = {}, dispatcher = {};
 
 	phalcon_fetch_params(0, 0, 1, &_arguments);
@@ -232,8 +232,8 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			}
 		}
 
-		modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
-		if (!phalcon_array_isset_fetch(&module, modules, &module_name)) {
+		phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY);
+		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, 0)) {
 			PHALCON_CONCAT_SVS(&exception_msg, "Module '", &module_name, "' isn't registered in the console container");
 			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_cli_console_exception_ce, &exception_msg);
 			return;

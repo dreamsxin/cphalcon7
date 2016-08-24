@@ -39,7 +39,7 @@
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  * @throw E_WARNING if @a offset is not a scalar
  */
-int phalcon_array_isset_fetch(zval *fetched, const zval *arr, zval *index, int readonly);
+int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index, int readonly);
 
 /**
  * @brief Fetches @a index if it exists from the array @a arr

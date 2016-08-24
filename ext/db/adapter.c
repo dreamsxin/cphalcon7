@@ -204,7 +204,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter){
  */
 PHP_METHOD(Phalcon_Db_Adapter, __construct){
 
-	zval *descriptor, *connection_consecutive, next_consecutive = {}, *dialect_type, dialect_class = {}, dialect_object = {};
+	zval *descriptor, *connection_consecutive, next_consecutive = {}, dialect_type = {}, dialect_class = {}, dialect_object = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 0, &descriptor);
@@ -225,9 +225,9 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	 * Dialect class can override the default dialect
 	 */
 	if (!phalcon_array_isset_fetch_str(&dialect_class, descriptor, SL("dialectClass"))) {
-		dialect_type = phalcon_read_property(getThis(), SL("_dialectType"), PH_NOISY);
+		phalcon_read_property(&dialect_type, getThis(), SL("_dialectType"), PH_NOISY);
 
-		PHALCON_CONCAT_SV(&dialect_class, "phalcon\\db\\dialect\\", dialect_type);
+		PHALCON_CONCAT_SV(&dialect_class, "phalcon\\db\\dialect\\", &dialect_type);
 	}
 
 	/** 
@@ -528,7 +528,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 				phalcon_array_append_string(&placeholders, SL("?"), PH_COPY);
 				phalcon_array_append(&insert_values, value, PH_COPY);
 				if (Z_TYPE_P(data_types) == IS_ARRAY) { 
-					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position)) {
+					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position, 0)) {
 						PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Incomplete number of bind types");
 						return;
 					}

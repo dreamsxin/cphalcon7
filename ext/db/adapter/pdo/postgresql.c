@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		PHALCON_CPY_WRT(&descriptor, desc);
 	}
 
-	if (Z_TYPE_P(descriptor) != IS_ARRAY) {
+	if (Z_TYPE(descriptor) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid CONNECT definition");
 		return;
 	}
@@ -151,19 +151,21 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 
-	zval *table, *schema = NULL, columns = {}, *dialect, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
+	zval *table, *_schema = NULL, schema = {}, columns = {}, dialect = {}, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
 
-	phalcon_fetch_params(0, 1, 1, &table, &schema);
+	phalcon_fetch_params(0, 1, 1, &table, &_schema);
 
-	if (!schema || !zend_is_true(schema)) {
-		schema = phalcon_read_property(getThis(), SL("_schema"), PH_NOISY);
+	if (!_schema || !zend_is_true(_schema)) {
+		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&schema, _schema);
 	}
 
 	array_init(&columns);
 
-	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(&sql, dialect, "describecolumns", table, schema);
+	PHALCON_CALL_METHODW(&sql, &dialect, "describecolumns", table, &schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns

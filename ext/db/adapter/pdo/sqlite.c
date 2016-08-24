@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 
 	ZVAL_STRING(&size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#");
 
-	PHALCON_CALL_METHODW(&sql, dialect, "describecolumns", table, schema);
+	PHALCON_CALL_METHODW(&sql, &dialect, "describecolumns", table, schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
@@ -434,24 +434,26 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 
-	zval *table, *schema = NULL, *dialect, fetch_num = {}, sql = {}, describe = {}, indexes = {}, *index, index_objects = {}, *index_columns;
+	zval *table, *_schema = NULL, schema = {}, dialect = {}, fetch_num = {}, sql = {}, describe = {}, indexes = {}, *index, index_objects = {}, *index_columns;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 1, &table, &schema);
+	phalcon_fetch_params(0, 1, 1, &table, &_schema);
 
-	if (!schema) {
-		schema = &PHALCON_GLOBAL(z_null);
+	if (!_schema || !zend_is_true(_schema)) {
+		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&schema, _schema);
 	}
 
-	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
 	 */
 	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
-	PHALCON_CALL_METHODW(&sql, dialect, "describeindexes", table, schema);
+	PHALCON_CALL_METHODW(&sql, &dialect, "describeindexes", table, &schema);
 	PHALCON_CALL_METHODW(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
 	/** 
@@ -464,7 +466,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 
 		phalcon_array_fetch_long(&key_name, index, 1, PH_NOISY);
 
-		PHALCON_CALL_METHODW(&sql_index_describe, dialect, "describeindex", &key_name);
+		PHALCON_CALL_METHODW(&sql_index_describe, &dialect, "describeindex", &key_name);
 		PHALCON_CALL_METHODW(&describe_index, getThis(), "fetchall", &sql_index_describe, &fetch_num);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe_index), index_column) {
@@ -502,7 +504,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 
-	zval *table, *schema = NULL, *dialect, sql, fetch_num, describe, reference_objects, *reference_describe;
+	zval *table, *schema = NULL, dialect = {}, sql, fetch_num, describe, reference_objects, *reference_describe;
 	zend_string *str_key;
 	ulong idx;
 
@@ -512,12 +514,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 		schema = &PHALCON_GLOBAL(z_null);
 	}
 
-	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
 
 	/** 
 	 * Get the SQL to describe the references
 	 */
-	PHALCON_CALL_METHODW(&sql, dialect, "describereferences", table, schema);
+	PHALCON_CALL_METHODW(&sql, &dialect, "describereferences", table, schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns

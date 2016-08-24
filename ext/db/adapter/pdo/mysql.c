@@ -122,20 +122,22 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 
-	zval *table, *schema = NULL, *dialect, sql = {}, fetch_num = {}, describe = {}, columns = {}, size_pattern = {}, *field, old_column = {};
+	zval *table, *_schema = NULL, schema = {}, dialect = {}, sql = {}, fetch_num = {}, describe = {}, columns = {}, size_pattern = {}, *field, old_column = {};
 
-	phalcon_fetch_params(0, 1, 1, &table, &schema);
+	phalcon_fetch_params(0, 1, 1, &table, &_schema);
 
-	if (!schema) {
-		schema = &PHALCON_GLOBAL(z_null);
+	if (!_schema || !zend_is_true(_schema)) {
+		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&schema, _schema);
 	}
 
-	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
 
 	/** 
 	 * Get the SQL to describe a table
 	 */
-	PHALCON_CALL_METHODW(&sql, dialect, "describecolumns", table, schema);
+	PHALCON_CALL_METHODW(&sql, &dialect, "describecolumns", table, &schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns

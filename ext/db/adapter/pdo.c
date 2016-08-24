@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, __construct){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 {
-	zval *_descriptor = NULL, descriptor = {}, username = {}, password = {}, options = {}, dsn_parts = {}, *value, dsn_attributes = {}, *pdo_type, dsn = {}, persistent = {}, pdo = {};
+	zval *_descriptor = NULL, descriptor = {}, username = {}, password = {}, options = {}, dsn_parts = {}, *value, dsn_attributes = {}, pdo_type = {}, dsn = {}, persistent = {}, pdo = {};
 	zend_class_entry *ce;
 	zend_string *str_key;
 	ulong idx;
@@ -250,9 +250,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 		PHALCON_PTR_DTOR(&dsn_parts);
 	}
 
-	pdo_type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
+	phalcon_read_property(&pdo_type, getThis(), SL("_type"), PH_NOISY);
 
-	PHALCON_CONCAT_VSV(&dsn, pdo_type, ":", &dsn_attributes);
+	PHALCON_CONCAT_VSV(&dsn, &pdo_type, ":", &dsn_attributes);
 	PHALCON_PTR_DTOR(&dsn_attributes);
 
 	/**
@@ -300,14 +300,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, prepare){
 
-	zval *sql_statement, *pdo;
+	zval *sql_statement, pdo = {};
 
 	phalcon_fetch_params(0, 1, 0, &sql_statement);
 
 	phalcon_update_property_zval(getThis(), SL("_sqlStatement"), sql_statement);
 
-	pdo = phalcon_read_property(getThis(), SL("_pdo"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(pdo, "prepare", sql_statement);
+	phalcon_read_property(&pdo, getThis(), SL("_pdo"), PH_NOISY);
+	PHALCON_RETURN_CALL_METHODW(&pdo, "prepare", sql_statement);
 }
 
 /**
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, prepare){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 
-	zval *statement, *placeholders, *data_types, *z_one, *value = NULL, *profiler, *sql_statement;
+	zval *statement, *placeholders, *data_types, *z_one, *value = NULL, profiler = {}, sql_statement = {};
 	zend_string *str_key;
 	ulong idx;
 	int is_array;
@@ -355,7 +355,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 		}
 
 		if (is_array) {
-			if (likely(phalcon_array_isset_fetch(&type, data_types, &wildcard))) {
+			if (likely(phalcon_array_isset_fetch(&type, data_types, &wildcard, 0))) {
 				/**
 				 * The bind type is double so we try to get the double value
 				 */
@@ -394,15 +394,15 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	profiler = phalcon_read_property(getThis(), SL("_profiler"), PH_NOISY);
+	phalcon_read_property(&profiler, getThis(), SL("_profiler"), PH_NOISY);
 
-	if (Z_TYPE_P(profiler) == IS_OBJECT) {
-		sql_statement = phalcon_read_property(getThis(), SL("_sqlStatement"), PH_NOISY);
-		PHALCON_CALL_METHODW(NULL, profiler, "startprofile", sql_statement, placeholders, data_types);
+	if (Z_TYPE(profiler) == IS_OBJECT) {
+		phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY);
+		PHALCON_CALL_METHODW(NULL, &profiler, "startprofile", &sql_statement, placeholders, data_types);
 
 		PHALCON_CALL_METHODW(NULL, statement, "execute");
 
-		PHALCON_CALL_METHODW(NULL, profiler, "stopprofile");
+		PHALCON_CALL_METHODW(NULL, &profiler, "stopprofile");
 	} else {
 		PHALCON_CALL_METHODW(NULL, statement, "execute");
 	}
@@ -427,7 +427,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 
-	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, *profiler, *events_manager, event_name = {}, status = {}, *pdo, statement = {}, new_statement = {};
+	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, events_manager = {}, event_name = {}, status = {}, pdo = {}, profiler = {};
+	zval statement = {}, new_statement = {};
 
 	phalcon_fetch_params(0, 1, 2, &sql_statement, &bind_params, &bind_types);
 
@@ -439,7 +440,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
 
 	/** 
 	 * Execute the beforeQuery event if a EventsManager is available
@@ -450,7 +451,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		phalcon_update_property_zval(getThis(), SL("_sqlBindTypes"), bind_types);
 
 		PHALCON_STR(&event_name, "db:beforeQuery");
-		PHALCON_CALL_METHODW(&status, events_manager, "fire", &event_name, getThis(), bind_params);
+		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), bind_params);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -463,14 +464,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 			PHALCON_CPY_WRT_CTOR(&statement, &new_statement);
 		}
 	} else {
-		pdo = phalcon_read_property(getThis(), SL("_pdo"), PH_NOISY);
-		profiler = phalcon_read_property(getThis(), SL("_profiler"), PH_NOISY);
-		if (Z_TYPE_P(profiler) == IS_OBJECT) {
-			PHALCON_CALL_METHODW(NULL, profiler, "startprofile", sql_statement, bind_params, bind_types);
-			PHALCON_CALL_METHODW(&statement, pdo, "query", sql_statement);
-			PHALCON_CALL_METHODW(NULL, profiler, "stopprofile");
+		phalcon_read_property(&pdo, getThis(), SL("_pdo"), PH_NOISY);
+		phalcon_read_property(&profiler, getThis(), SL("_profiler"), PH_NOISY);
+		if (Z_TYPE(profiler) == IS_OBJECT) {
+			PHALCON_CALL_METHODW(NULL, &profiler, "startprofile", sql_statement, bind_params, bind_types);
+			PHALCON_CALL_METHODW(&statement, &pdo, "query", sql_statement);
+			PHALCON_CALL_METHODW(NULL, &profiler, "stopprofile");
 		} else {
-			PHALCON_CALL_METHODW(&statement, pdo, "query", sql_statement);
+			PHALCON_CALL_METHODW(&statement, &pdo, "query", sql_statement);
 		}
 	}
 
@@ -480,7 +481,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 	if (likely(Z_TYPE(statement) == IS_OBJECT)) {
 		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
 			PHALCON_STR(&event_name, "db:afterQuery");
-			PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis(), bind_params);
+			PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
 		}
 
 		object_init_ex(return_value, phalcon_db_result_pdo_ce);

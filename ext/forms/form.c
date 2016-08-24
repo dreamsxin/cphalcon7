@@ -346,7 +346,7 @@ PHP_METHOD(Phalcon_Forms_Form, setUserOption){
  */
 PHP_METHOD(Phalcon_Forms_Form, getUserOption){
 
-	zval *option, *default_value = NULL, *options, value = {};
+	zval *option, *default_value = NULL, options = {}, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &option, &default_value);
 
@@ -354,8 +354,8 @@ PHP_METHOD(Phalcon_Forms_Form, getUserOption){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&value, options, option)) {
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&value, &options, option)) {
 		RETURN_CTORW(&value);
 	}
 

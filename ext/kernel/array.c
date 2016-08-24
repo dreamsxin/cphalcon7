@@ -939,7 +939,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					if (Z_TYPE(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							re_update = !Z_REFCOUNTED(pzv) || (Z_REFCOUNT(pzv) > 1 && !Z_ISREF(pzv));
-							phalcon_array_update_long(&pzv, ll, value, PH_COPY | PH_SEPARATE PHALCON_DEBUG_PARAMS_DUMMY);
+							phalcon_array_update_long(&pzv, ll, value, PH_COPY | PH_SEPARATE);
 							p = Z_ARRVAL(pzv);
 						} else {
 							p = Z_ARRVAL(fetched);
@@ -953,11 +953,11 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 					ZVAL_ARR(&pzv, p);
 					re_update = !Z_REFCOUNTED(pzv) || (Z_REFCOUNT(pzv) > 1 && !Z_ISREF(pzv));
 					if (i == (types_length - 1)) {
-						phalcon_array_update_long(&pzv, ll, value, PH_COPY | PH_SEPARATE PHALCON_DEBUG_PARAMS_DUMMY);
+						phalcon_array_update_long(&pzv, ll, value, PH_COPY | PH_SEPARATE);
 						p = Z_ARRVAL(pzv);
 					} else {
 						array_init(&tmp);
-						phalcon_array_update_long(&pzv, ll, &tmp, PH_SEPARATE PHALCON_DEBUG_PARAMS_DUMMY);
+						phalcon_array_update_long(&pzv, ll, &tmp, PH_SEPARATE);
 						p = Z_ARRVAL(pzv);
 						if (re_update) {
 							wrap_tmp = 1;
@@ -1006,7 +1006,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 
 			case 'a':
 				re_update = !Z_REFCOUNTED(pzv) || (Z_REFCOUNT(pzv) > 1 && !Z_ISREF(pzv));
-				phalcon_array_append(&pzv, value, PH_SEPARATE PHALCON_DEBUG_PARAMS_DUMMY);
+				phalcon_array_append(&pzv, value, PH_SEPARATE);
 				p = Z_ARRVAL(pzv);
 				break;
 		}
@@ -1031,10 +1031,10 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 				switch (old_type[j])
 				{
 					case 's':
-						phalcon_array_update_string(&pzv, old_s[j], old_l[j], &old_pzv, PH_SEPARATE);
+						phalcon_array_update_str(&pzv, old_s[j], old_l[j], &old_pzv, PH_SEPARATE);
 						break;
 					case 'l':
-						phalcon_array_update_long(&pzv, old_ll[j], &old_pzv, PH_SEPARATE PHALCON_DEBUG_PARAMS_DUMMY);
+						phalcon_array_update_long(&pzv, old_ll[j], &old_pzv, PH_SEPARATE);
 						break;
 					case 'z':
 						phalcon_array_update_zval(&pzv, old_item[j], &old_pzv, PH_SEPARATE);

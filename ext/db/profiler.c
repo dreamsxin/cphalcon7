@@ -144,26 +144,26 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
  */
 PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 
-	zval *active_profile, final_time = {}, initial_time = {}, difference = {}, *total_seconds, new_total_seconds = {};
+	zval active_profile = {}, final_time = {}, initial_time = {}, difference = {}, total_seconds = {}, new_total_seconds = {};
 
-	active_profile = phalcon_read_property(getThis(), SL("_activeProfile"), PH_NOISY);
+	phalcon_read_property(&active_profile, getThis(), SL("_activeProfile"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTIONW(&final_time, "microtime", &PHALCON_GLOBAL(z_true));
-	PHALCON_CALL_METHODW(NULL, active_profile, "setfinaltime", &final_time);
+	PHALCON_CALL_METHODW(NULL, &active_profile, "setfinaltime", &final_time);
 
-	PHALCON_CALL_METHODW(&initial_time, active_profile, "getinitialtime");
+	PHALCON_CALL_METHODW(&initial_time, &active_profile, "getinitialtime");
 
 	phalcon_sub_function(&difference, &final_time, &initial_time);
 
-	total_seconds = phalcon_read_property(getThis(), SL("_totalSeconds"), PH_NOISY);
+	phalcon_read_property(&total_seconds, getThis(), SL("_totalSeconds"), PH_NOISY);
 
-	phalcon_add_function(&new_total_seconds, total_seconds, &difference);
+	phalcon_add_function(&new_total_seconds, &total_seconds, &difference);
 
 	phalcon_update_property_zval(getThis(), SL("_totalSeconds"), &new_total_seconds);
-	phalcon_update_property_array_append(getThis(), SL("_allProfiles"), active_profile);
+	phalcon_update_property_array_append(getThis(), SL("_allProfiles"), &active_profile);
 
 	if (phalcon_method_exists_ex(getThis(), SL("afterendprofile")) == SUCCESS) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "afterendprofile", active_profile);
+		PHALCON_CALL_METHODW(NULL, getThis(), "afterendprofile", &active_profile);
 	}
 
 	RETURN_THISW();
@@ -176,10 +176,9 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
  */
 PHP_METHOD(Phalcon_Db_Profiler, getNumberTotalStatements){
 
-	zval *all_profiles;
-
-	all_profiles = phalcon_read_property(getThis(), SL("_allProfiles"), PH_NOISY);
-	phalcon_fast_count(return_value, all_profiles);
+	zval all_profiles = {};
+	phalcon_read_property(&all_profiles, getThis(), SL("_allProfiles"), PH_NOISY);
+	phalcon_fast_count(return_value, &all_profiles);
 }
 
 /**

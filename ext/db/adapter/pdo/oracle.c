@@ -95,25 +95,27 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Oracle){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
 
-	zval *descriptor = NULL, startup = {}, *value = NULL;
+	zval *desc = NULL, descriptor = {}, startup = {}, *value = NULL;
 
-	phalcon_fetch_params(0, 0, 1, &descriptor);
+	phalcon_fetch_params(0, 0, 1, &desc);
 
-	if (!descriptor || !zend_is_true(descriptor)) {
-		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
+	if (!desc || !zend_is_true(desc)) {
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&descriptor, desc);
 	}
 
 	/** 
 	 * Connect
 	 */
-	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_oracle_ce, getThis(), "connect", descriptor);
+	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_oracle_ce, getThis(), "connect", &descriptor);
 
 	/** 
 	 * Database session settings initiated with each HTTP request. Oracle behaviour
 	 * depends on particular NLS* parameter. Check if the developer has defined custom
 	 * startup or create one from scratch
 	 */
-	if (phalcon_array_isset_fetch_str(&startup, descriptor, SL("startup")) && Z_TYPE(startup) == IS_ARRAY) {
+	if (phalcon_array_isset_fetch_str(&startup, &descriptor, SL("startup")) && Z_TYPE(startup) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(startup), value) {
 			PHALCON_CALL_METHODW(NULL, getThis(), "execute", value);
 		} ZEND_HASH_FOREACH_END();
@@ -131,7 +133,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 
-	zval *table, *schema = NULL, columns = {}, *dialect, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
+	zval *table, *schema = NULL, columns = {}, dialect = {}, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -141,9 +143,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 
 	array_init(&columns);
 
-	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(&sql, dialect, "describecolumns", table, schema);
+	PHALCON_CALL_METHODW(&sql, &dialect, "describecolumns", table, schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns

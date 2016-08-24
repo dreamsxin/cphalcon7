@@ -99,12 +99,14 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Postgresql){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 
-	zval *descriptor = NULL, schema = {}, password = {}, sql = {};
+	zval *desc = NULL, descriptor = {}, schema = {}, password = {}, sql = {};
 
-	phalcon_fetch_params(0, 0, 1, &descriptor);
+	phalcon_fetch_params(0, 0, 1, &desc);
 
-	if (!descriptor || !zend_is_true(descriptor)) {
-		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
+	if (!desc || !zend_is_true(desc)) {
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&descriptor, desc);
 	}
 
 	if (Z_TYPE_P(descriptor) != IS_ARRAY) {
@@ -112,19 +114,19 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		return;
 	}
 
-	if (phalcon_array_isset_fetch_str(&schema, descriptor, SL("schema"))) {
+	if (phalcon_array_isset_fetch_str(&schema, &descriptor, SL("schema"))) {
 		phalcon_update_property_zval(getThis(), SL("_schema"), &schema);
 	}
 
-	if (phalcon_array_isset_fetch_str(&password, descriptor, SL("password"))) {
+	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"))) {
 		if (Z_TYPE(password) == IS_STRING && Z_STRLEN(password) == 0) {
-			phalcon_array_update_str(descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_COPY);
+			phalcon_array_update_str(&descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
 		PHALCON_PTR_DTOR(&password);
 	}
 
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_postgresql_ce, getThis(), "connect", descriptor);
+	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_postgresql_ce, getThis(), "connect", &descriptor);
 
 	/** 
 	 * Execute the search path in the after connect

@@ -349,8 +349,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
 	PHALCON_CALL_METHODW(&pdo, &connection, "getinternalhandler");
 
-	 = phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY);
-	 = phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY);
+	 phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY);
+	 phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY);
 
 	/**
 	 * PDO doesn't support scrollable cursors, so we need to re-execute the statement again

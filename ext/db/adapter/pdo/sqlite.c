@@ -94,23 +94,25 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Sqlite){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
 
-	zval *descriptor = NULL, dbname = {};
+	zval *desc = NULL, descriptor = {}, dbname = {};
 
-	phalcon_fetch_params(0, 0, 1, &descriptor);
+	phalcon_fetch_params(0, 0, 1, &desc);
 
-	if (!descriptor || !zend_is_true(descriptor)) {
-		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
+	if (!desc || !zend_is_true(desc)) {
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&descriptor, desc);
 	}
 
-	if (!phalcon_array_isset_str(descriptor, SL("dbname"))) {
+	if (!phalcon_array_isset_str(&descriptor, SL("dbname"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "dbname must be specified");
 		return;
 	} else {
-		phalcon_array_fetch_str(&dbname, descriptor, SL("dbname"), PH_NOISY);
-		phalcon_array_update_str(descriptor, SL("dsn"), &dbname, PH_COPY);
+		phalcon_array_fetch_str(&dbname, &descriptor, SL("dbname"), PH_NOISY);
+		phalcon_array_update_str(&descriptor, SL("dsn"), &dbname, PH_COPY);
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_sqlite_ce, getThis(), "connect", descriptor);
+	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_sqlite_ce, getThis(), "connect", &descriptor);
 }
 
 /**
@@ -126,7 +128,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 
-	zval *table, *schema = NULL, columns, *dialect, size_pattern = {}, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
+	zval *table, *schema = NULL, columns = {}, dialect = {}, size_pattern = {}, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
 
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
@@ -136,7 +138,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 
 	array_init(&columns);
 
-	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
 
 	ZVAL_STRING(&size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#");
 

@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 	if (flag_automatic_html) {
 		phalcon_return_property(&classes, getThis(), SL("_cssClasses"));
 
-		if (phalcon_array_isset_fetch(&type_classes, &classes, type)) {
+		if (phalcon_array_isset_fetch(&type_classes, &classes, type, 0)) {
 			if (Z_TYPE(type_classes) == IS_ARRAY) {
 				phalcon_fast_join_str(&joined_classes, SL(" "), &type_classes);
 

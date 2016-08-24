@@ -26,78 +26,6 @@
 #include "kernel/fcall.h"
 #include "kernel/hash.h"
 
-int phalcon_array_fetch(zval *return_value, zval *arr, zval *index, int flags)
-{
-	zval *zv;
-	HashTable *ht;
-	int result = SUCCESS, found = 0;
-	ulong uidx = 0;
-	char *sidx = NULL;
-
-	if (Z_TYPE_P(arr) == IS_ARRAY) {
-		ht = Z_ARRVAL_P(arr);
-		switch (Z_TYPE_P(index)) {
-			case IS_NULL:
-				found = (zv = zend_hash_str_find(ht, SL(""))) != NULL;
-				sidx   = "";
-				break;
-
-			case IS_DOUBLE:
-				uidx   = (ulong)Z_DVAL_P(index);
-				found  = (zv = zend_hash_index_find(ht, uidx)) != NULL;
-				break;
-
-			case IS_LONG:
-			case IS_RESOURCE:
-				uidx   = Z_LVAL_P(index);
-				found  = (zv = zend_hash_index_find(ht, uidx)) != NULL;
-				break;
-
-			case IS_FALSE:
-				uidx = 0;
-				found  = (zv = zend_hash_index_find(ht, uidx)) != NULL;
-				break;
-
-			case IS_TRUE:
-				uidx = 1;
-				found  = (zv = zend_hash_index_find(ht, uidx)) != NULL;
-				break;
-
-			case IS_STRING:
-				sidx   = Z_STRLEN_P(index) ? Z_STRVAL_P(index) : "";
-				found  = (zv = zend_symtable_str_find(ht, Z_STRVAL_P(index), Z_STRLEN_P(index))) != NULL;
-				break;
-
-			default:
-				if ((flags & PH_NOISY) == PH_NOISY) {
-					zend_error(E_WARNING, "Illegal offset type");
-				}
-				result = FAILURE;
-				break;
-		}
-
-		if (result != FAILURE && found == 1) {
-			if ((flags & PH_READONLY) == PH_READONLY) {
-				ZVAL_COPY_VALUE(return_value, zv);
-			} else {
-				ZVAL_COPY(return_value, zv);
-			}
-			return SUCCESS;
-		}
-
-		if ((flags & PH_NOISY) == PH_NOISY) {
-			if (sidx == NULL) {
-				zend_error(E_NOTICE, "Undefined index: %ld", uidx);
-			} else {
-				zend_error(E_NOTICE, "Undefined index: %s", sidx);
-			}
-		}
-	}
-
-	ZVAL_NULL(return_value);
-	return FAILURE;
-}
-
 int phalcon_array_isset_fetch(zval *fetched, const zval *arr, zval *index, int readonly)
 {
 	return phalcon_array_fetch(fetched, arr, index, readonly) == SUCCESS ? 1 : 0;
@@ -437,7 +365,7 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 
 	zval *zv;
 	HashTable *ht;
-	int result = 0;
+	int result = SUCCESS, found = 0;
 	ulong uidx = 0;
 	char *sidx = NULL;
 
@@ -445,45 +373,51 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 		ht = Z_ARRVAL_P(arr);
 		switch (Z_TYPE_P(index)) {
 			case IS_NULL:
-				result = (zv = zend_hash_str_find(ht, SL(""))) != NULL;
+				found = (zv = zend_hash_str_find(ht, SL(""))) != NULL;
 				sidx   = "";
 				break;
 
 			case IS_DOUBLE:
 				uidx   = (ulong)Z_DVAL_P(index);
-				result = (zv = zend_hash_index_find(ht, uidx)) != NULL;
-				break;
-
-			case IS_TRUE:
-				result = (zv = zend_hash_index_find(ht, 1)) != NULL;
-				break;
-
-			case IS_FALSE:
-				result = (zv = zend_hash_index_find(ht, 0)) != NULL;
+				found  = (zv = zend_hash_index_find(ht, uidx)) != NULL;
 				break;
 
 			case IS_LONG:
 			case IS_RESOURCE:
-				result = (zv = zend_hash_index_find(ht, Z_LVAL_P(index))) != NULL;
+				uidx   = Z_LVAL_P(index);
+				found  = (zv = zend_hash_index_find(ht, uidx)) != NULL;
+				break;
+
+			case IS_FALSE:
+				uidx = 0;
+				found  = (zv = zend_hash_index_find(ht, uidx)) != NULL;
+				break;
+
+			case IS_TRUE:
+				uidx = 1;
+				found  = (zv = zend_hash_index_find(ht, uidx)) != NULL;
 				break;
 
 			case IS_STRING:
 				sidx   = Z_STRLEN_P(index) ? Z_STRVAL_P(index) : "";
-				result = (zv = zend_symtable_find(ht, Z_STR_P(index))) != NULL;
+				found  = (zv = zend_symtable_str_find(ht, Z_STRVAL_P(index), Z_STRLEN_P(index))) != NULL;
 				break;
 
 			default:
 				if ((flags & PH_NOISY) == PH_NOISY) {
 					zend_error(E_WARNING, "Illegal offset type");
 				}
-
-				result = 0;
+				result = FAILURE;
 				break;
 		}
 
-		if (result) {
-			PHALCON_CPY_WRT(return_value, zv);
-			return 1;
+		if (result != FAILURE && found == 1) {
+			if ((flags & PH_READONLY) == PH_READONLY) {
+				ZVAL_COPY_VALUE(return_value, zv);
+			} else {
+				ZVAL_COPY(return_value, zv);
+			}
+			return SUCCESS;
 		}
 
 		if ((flags & PH_NOISY) == PH_NOISY) {
@@ -496,8 +430,7 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 	}
 
 	ZVAL_NULL(return_value);
-
-	return 0;
+	return FAILURE;
 }
 
 int phalcon_array_fetch_str(zval *return_value, const zval *arr, const char *index, uint index_length, int flags){
@@ -572,12 +505,12 @@ int phalcon_array_fetch_long(zval *return_value, const zval *arr, ulong index, i
 	return FAILURE;
 }
 
-void phalcon_array_append_multi_2(zval *arr, const zval *index, zval *value, int flags)
+void phalcon_array_append_multi_2(zval *arr, zval *index, zval *value, int flags)
 {
 	zval tmp = {};
 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&tmp, arr, index)) {
+		if (phalcon_array_isset_fetch(&tmp, arr, index, 0)) {
 			SEPARATE_ZVAL_IF_NOT_REF(&tmp);
 
 			if (Z_TYPE(tmp) != IS_ARRAY) {

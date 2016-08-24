@@ -80,7 +80,7 @@ static inline int phalcon_isset_property_zval(zval *object, const zval *property
 }
 
 /** Reading properties */
-int phalcon_read_property(zval *result, zval *object, const char *property_name, zend_uint property_length, int flags);
+int phalcon_read_property(zval *result, zval *object, const char *property_name, uint32_t property_length, int flags);
 
 static inline int phalcon_read_property_zval(zval *result, zval *object, zval *property, int flags)
 {
@@ -108,49 +108,10 @@ static inline int phalcon_return_property(zval *return_value, zval *object, cons
 
 static inline int phalcon_return_property_zval(zval *return_value, zval *object, zval *property)
 {
-	zval *tmp = phalcon_read_property_zval(object, property, PH_NOISY);
-	if (tmp) {
-		PHALCON_CPY_WRT(return_value, tmp);
-		return SUCCESS;
-	}
-
 	ZVAL_NULL(return_value);
+	phalcon_read_property_zval(return_value, object, property, PH_NOISY);
 	return FAILURE;
 }
-
-/**
- * Fetches a property using a const char
- */
-static int phalcon_fetch_property(zval *result, zval *object, const char *property_name, zend_uint property_length, int silent)
-{
-	if (phalcon_isset_property(object, property_name, property_length)) {
-		phalcon_read_property(result, object, property_name, property_length, 0);
-		return 1;
-	}
-
-	//zval_ptr_dtor(result);
-	ZVAL_NULL(result);
-	return 0;
-}
-
-/**
- * Fetches a property using a zval property
- */
-static int phalcon_fetch_property_zval(zval *result, zval *object, zval *property, int silent)
-{
-
-	ZVAL_NULL(result);
-	if (unlikely(Z_TYPE_P(property) != IS_STRING)) {
-		return 0;
-	}
-
-	if (phalcon_isset_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property))) {
-		phalcon_read_property(result, object, Z_STRVAL_P(property), Z_STRLEN_P(property), 0);
-		return 1;
-	}
-	return 0;
-}
-
 
 /** Updating properties */
 int phalcon_update_property_zval(zval *obj, const char *property_name, uint32_t property_length, zval *value);
@@ -187,13 +148,8 @@ int phalcon_unset_property_array(zval *object, const char *property, uint32_t pr
  */
 static inline int phalcon_return_property_array(zval *return_value, zval *object, const char *property_name, uint32_t property_length, const zval *index)
 {
-	zval *tmp = phalcon_read_property_array(object, property_name, property_length, index);
-	if (tmp) {
-		PHALCON_CPY_WRT(return_value, tmp);
-		return SUCCESS;
-	}
-
 	ZVAL_NULL(return_value);
+	phalcon_read_property_array(return_value, object, property_name, property_length, index);
 	return FAILURE;
 }
 

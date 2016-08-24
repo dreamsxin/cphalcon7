@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_CLI_Console, registerModules){
  */
 PHP_METHOD(Phalcon_CLI_Console, addModules){
 
-	zval *modules, *original_modules, register_modules = {};
+	zval *modules, original_modules = {}, register_modules = {};
 
 	phalcon_fetch_params(0, 1, 0, &modules);
 
@@ -160,9 +160,9 @@ PHP_METHOD(Phalcon_CLI_Console, addModules){
 		return;
 	}
 
-	original_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
+	phalcon_read_property(&original_modules, getThis(), SL("_modules"), PH_NOISY);
 
-	phalcon_fast_array_merge(&register_modules, modules, original_modules);
+	phalcon_fast_array_merge(&register_modules, modules, &original_modules);
 	phalcon_update_property_zval(getThis(), SL("_modules"), &register_modules);
 }
 

@@ -27,8 +27,6 @@
 #include "php_phalcon.h"
 #include "kernel/memory.h"
 
-int phalcon_array_fetch(zval *return_value, zval *arr, zval *index, int flags);
-
 /**
  * @brief Fetches @a index if it exists from the array @a arr
  * @param[out] fetched <code>&$arr[$index]</code>; @a fetched is modified only when the function returns 1
@@ -510,7 +508,7 @@ static inline int phalcon_array_update_long_bool(zval *arr, ulong index, int val
  *
  * $arr[$index][] = $value
  */
-void phalcon_array_append_multi_2(zval *arr, const zval *index, zval *value, int flags);
+void phalcon_array_append_multi_2(zval *arr, zval *index, zval *value, int flags);
 
 /**
  * Updates multi-dimensional array with two zval indexes

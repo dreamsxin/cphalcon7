@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, getRoutes){
  */
 PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 
-	zval *pattern, *paths = NULL, *http_methods = NULL, *prefix, prefix_pattern = {}, *default_paths, merged_paths = {};
+	zval *pattern, *paths = NULL, *http_methods = NULL, prefix = {}, prefix_pattern = {}, default_paths = {}, merged_paths = {};
 
 	phalcon_fetch_params(0, 1, 2, &pattern, &paths, &http_methods);
 	PHALCON_ENSURE_IS_STRING(pattern);
@@ -377,10 +377,10 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 		http_methods = &PHALCON_GLOBAL(z_null);
 	}
 
-	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
-	if (Z_TYPE_P(prefix) != IS_STRING) {
-		convert_to_string_ex(prefix);
+	if (Z_TYPE(prefix) != IS_STRING) {
+		convert_to_string_ex(&prefix);
 	}
 
 	/**
@@ -388,29 +388,29 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	 */
 	{
 		const char *s_pattern = Z_STRVAL_P(pattern); /* NUL-terminated */
-		const char *s_prefix  = Z_STRVAL_P(prefix);   /* NUL-terminated */
+		const char *s_prefix  = Z_STRVAL(prefix);   /* NUL-terminated */
 		int pattern_len       = Z_STRLEN_P(pattern);
-		int prefix_len        = Z_STRLEN_P(prefix);
+		int prefix_len        = Z_STRLEN(prefix);
 		if (prefix_len && *s_pattern == '/' && s_prefix[prefix_len-1] == '/') {
 			char *new_pattern = safe_emalloc(prefix_len - 1 /* slash */ + 1 /* \0 */, 1, pattern_len);
 			memcpy(new_pattern, s_prefix, prefix_len - 1);
 			memcpy(new_pattern + prefix_len - 1, s_pattern, pattern_len + 1);
 			ZVAL_STRINGL(&prefix_pattern, new_pattern, prefix_len + pattern_len - 1);
 		} else {
-			PHALCON_CONCAT_VV(&prefix_pattern, prefix, pattern);
+			PHALCON_CONCAT_VV(&prefix_pattern, &prefix, pattern);
 		}
 	}
 
-	default_paths = phalcon_read_property(getThis(), SL("_paths"), PH_NOISY);
+	phalcon_read_property(&default_paths, getThis(), SL("_paths"), PH_NOISY);
 
 	/**
 	 * Check if the paths need to be merged with current paths
 	 */
-	if (Z_TYPE_P(default_paths) == IS_ARRAY && Z_TYPE_P(paths) == IS_ARRAY) {
+	if (Z_TYPE(default_paths) == IS_ARRAY && Z_TYPE_P(paths) == IS_ARRAY) {
 		/**
 		 * Merge the paths with the default paths
 		 */
-		phalcon_fast_array_merge(&merged_paths, default_paths, paths);
+		phalcon_fast_array_merge(&merged_paths, &default_paths, paths);
 	} else {
 		PHALCON_CPY_WRT(&merged_paths, paths);
 	}

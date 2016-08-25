@@ -210,13 +210,13 @@ PHP_METHOD(Phalcon_Http_Uri, __set){
  */
 PHP_METHOD(Phalcon_Http_Uri, __get){
 
-	zval *key, *parts;
+	zval *key, parts = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
 
-	if (!phalcon_array_isset_fetch(return_value, parts, key)) {
+	if (!phalcon_array_isset_fetch(return_value, &parts, key, 0)) {
 		 RETURN_NULL();
 	}
 }
@@ -229,13 +229,13 @@ PHP_METHOD(Phalcon_Http_Uri, __get){
  */
 PHP_METHOD(Phalcon_Http_Uri, __isset){
 
-	zval *key, *parts;
+	zval *key, parts = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
 
-	RETURN_BOOL(phalcon_array_isset(parts, key));
+	RETURN_BOOL(phalcon_array_isset(&parts, key));
 }
 
 /**
@@ -255,11 +255,11 @@ PHP_METHOD(Phalcon_Http_Uri, getParts){
  */
 PHP_METHOD(Phalcon_Http_Uri, getPath)
 {
-	zval *parts, value = {};
+	zval parts = {}, value = {};
 
-	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
 
-	if (!phalcon_array_isset_fetch_str(&value, parts, SL("path"))) {
+	if (!phalcon_array_isset_fetch_str(&value, &parts, SL("path"))) {
 		 RETURN_NULL();
 	}
 
@@ -273,14 +273,14 @@ PHP_METHOD(Phalcon_Http_Uri, getPath)
  */
 PHP_METHOD(Phalcon_Http_Uri, build)
 {
-	zval *parts, uri = {}, scheme = {}, host = {}, user = {}, pass = {}, port = {}, path = {}, query = {}, fragment = {}, tmp = {}, tmp2 = {};
+	zval parts = {}, uri = {}, scheme = {}, host = {}, user = {}, pass = {}, port = {}, path = {}, query = {}, fragment = {}, tmp = {}, tmp2 = {};
 
-	parts = phalcon_read_property(getThis(), SL("_parts"), PH_NOISY);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
 
-	if (phalcon_array_isset_fetch_str(&scheme, parts, SL("scheme")) && PHALCON_IS_NOT_EMPTY(&scheme)) {
-		if (phalcon_array_isset_fetch_str(&host, parts, SL("host")) && PHALCON_IS_NOT_EMPTY(&host)) {
-			if (phalcon_array_isset_fetch_str(&user, parts, SL("user")) && PHALCON_IS_NOT_EMPTY(&user)) {
-				if (phalcon_array_isset_fetch_str(&pass, parts, SL("pass")) && PHALCON_IS_NOT_EMPTY(&pass)) {
+	if (phalcon_array_isset_fetch_str(&scheme, &parts, SL("scheme")) && PHALCON_IS_NOT_EMPTY(&scheme)) {
+		if (phalcon_array_isset_fetch_str(&host, &parts, SL("host")) && PHALCON_IS_NOT_EMPTY(&host)) {
+			if (phalcon_array_isset_fetch_str(&user, &parts, SL("user")) && PHALCON_IS_NOT_EMPTY(&user)) {
+				if (phalcon_array_isset_fetch_str(&pass, &parts, SL("pass")) && PHALCON_IS_NOT_EMPTY(&pass)) {
 					PHALCON_CONCAT_VSVSVSV(&uri, &scheme, "://", &user, ":", &pass, "@", &host);
 				} else {
 					PHALCON_CONCAT_VSVSV(&uri, &scheme, "://", &user, "@", &host);
@@ -293,11 +293,11 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 		}
 	}
 
-	if (phalcon_array_isset_fetch_str(&port, parts, SL("port")) && PHALCON_IS_NOT_EMPTY(&port)) {
+	if (phalcon_array_isset_fetch_str(&port, &parts, SL("port")) && PHALCON_IS_NOT_EMPTY(&port)) {
 		PHALCON_SCONCAT_SV(&uri, ":", &port);
 	}
 
-	if (phalcon_array_isset_fetch_str(&path, parts, SL("path")) && PHALCON_IS_NOT_EMPTY(&path)) {
+	if (phalcon_array_isset_fetch_str(&path, &parts, SL("path")) && PHALCON_IS_NOT_EMPTY(&path)) {
 		if (!phalcon_start_with_str(&path, SL("/"))) {
 			PHALCON_SCONCAT_SV(&uri, "/", &path);
 		} else {
@@ -306,12 +306,12 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 		}
 	}
 
-	if (phalcon_array_isset_fetch_str(&query, parts, SL("query")) && PHALCON_IS_NOT_EMPTY(&query)) {
+	if (phalcon_array_isset_fetch_str(&query, &parts, SL("query")) && PHALCON_IS_NOT_EMPTY(&query)) {
 		phalcon_http_build_query(&tmp2, &query, "&");
 		PHALCON_SCONCAT_SV(&uri, "?", &tmp);
 	}
 
-	if (phalcon_array_isset_fetch_str(&fragment, parts, SL("fragment")) && PHALCON_IS_NOT_EMPTY(&fragment)) {
+	if (phalcon_array_isset_fetch_str(&fragment, &parts, SL("fragment")) && PHALCON_IS_NOT_EMPTY(&fragment)) {
 		PHALCON_SCONCAT_SV(&uri, "#", &fragment);
 	}
 

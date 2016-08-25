@@ -100,12 +100,12 @@ PHP_METHOD(Phalcon_Http_Response_Headers, set){
  */
 PHP_METHOD(Phalcon_Http_Response_Headers, get){
 
-	zval *name, *headers;
+	zval *name, headers = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	
-	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(return_value, headers, name)) {
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &headers, name, 0)) {
 		RETURN_FALSE;
 	}
 }
@@ -131,15 +131,15 @@ PHP_METHOD(Phalcon_Http_Response_Headers, setRaw){
  */
 PHP_METHOD(Phalcon_Http_Response_Headers, remove){
 
-	zval *header_index, *headers;
+	zval *header_index, headers = {};
 
 	phalcon_fetch_params(0, 1, 0, &header_index);
 
-	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
 
-	phalcon_array_unset(headers, header_index, 0);
+	phalcon_array_unset(&headers, header_index, 0);
 
-	phalcon_update_property_zval(getThis(), SL("_headers"), headers);
+	phalcon_update_property_zval(getThis(), SL("_headers"), &headers);
 }
 
 /**
@@ -149,20 +149,20 @@ PHP_METHOD(Phalcon_Http_Response_Headers, remove){
  */
 PHP_METHOD(Phalcon_Http_Response_Headers, send)
 {
-	zval *headers, *value;
+	zval headers = {}, *value;
 	sapi_header_line ctr = { NULL, 0, 0 };
 	zend_string *str_key;
 	ulong idx;
 
 	if (!SG(headers_sent)) {
-		headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
+		phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
 
-		if (Z_TYPE_P(headers) != IS_ARRAY) {
+		if (Z_TYPE(headers) != IS_ARRAY) {
 			/* No headers to send */
 			RETURN_TRUE;
 		}
 	
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(headers), idx, str_key, value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(headers), idx, str_key, value) {
 			zval header = {}, http_header = {}, tmp = {};
 			if (str_key) {
 				ZVAL_STR(&header, str_key);

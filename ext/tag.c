@@ -643,11 +643,11 @@ PHP_METHOD(Phalcon_Tag, getValue){
 		/**
 		 * Check if there is a predefined value for it
 		 */
-		if (!phalcon_array_isset_fetch(&value, display_values, name)) {
+		if (!phalcon_array_isset_fetch(&value, display_values, name, 0)) {
 
 			/* Check if there is a post value for the item */
 			_POST = phalcon_get_global_str(SL("_POST"));
-			if (!phalcon_array_isset_fetch(&value, _POST, name)) {
+			if (!phalcon_array_isset_fetch(&value, _POST, name, 0)) {
 				RETURN_NULL();
 			}
 		}
@@ -2112,7 +2112,7 @@ PHP_METHOD(Phalcon_Tag, getDefault){
 
 	display_values = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_displayValues"));
 
-	if (!phalcon_array_isset_fetch(&value, display_values, name)) {
+	if (!phalcon_array_isset_fetch(&value, display_values, name, 0)) {
 		RETURN_NULL();
 	}
 

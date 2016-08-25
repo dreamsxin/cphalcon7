@@ -166,14 +166,6 @@ mvc/micro/exception.c \
 mvc/micro/collection.c \
 mvc/micro/collectioninterface.c \
 mvc/dispatcherinterface.c \
-mvc/collection/managerinterface.c \
-mvc/collection/manager.c \
-mvc/collection/exception.c \
-mvc/collection/document.c \
-mvc/collection/messageinterface.c \
-mvc/collection/message.c \
-mvc/collection/gridfs.c \
-mvc/collection/resultset.c \
 mvc/routerinterface.c \
 mvc/urlinterface.c \
 mvc/user/component.c \
@@ -190,9 +182,7 @@ mvc/router/exception.c \
 mvc/router/routeinterface.c \
 mvc/url/exception.c \
 mvc/viewinterface.c \
-mvc/collection.c \
 mvc/dispatcher.c \
-mvc/collectioninterface.c \
 mvc/view/engine/php.c \
 mvc/view/exception.c \
 mvc/view/engineinterface.c \

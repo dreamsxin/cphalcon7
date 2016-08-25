@@ -90,7 +90,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Http_Client_Exception);
 	PHALCON_INIT(Phalcon_Image_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Application_Exception);
-	PHALCON_INIT(Phalcon_Mvc_Collection_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Dispatcher_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Model_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Model_Transaction_Exception);
@@ -149,9 +148,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Image_AdapterInterface);
 	PHALCON_INIT(Phalcon_Logger_AdapterInterface);
 	PHALCON_INIT(Phalcon_Logger_FormatterInterface);
-	PHALCON_INIT(Phalcon_Mvc_CollectionInterface);
-	PHALCON_INIT(Phalcon_Mvc_Collection_ManagerInterface);
-	PHALCON_INIT(Phalcon_Mvc_Collection_MessageInterface);
 	PHALCON_INIT(Phalcon_Mvc_ControllerInterface);
 	PHALCON_INIT(Phalcon_Mvc_DispatcherInterface);
 	PHALCON_INIT(Phalcon_Mvc_Micro_CollectionInterface);
@@ -358,13 +354,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Url);
 	PHALCON_INIT(Phalcon_Mvc_Micro);
 	PHALCON_INIT(Phalcon_Mvc_Application);
-	PHALCON_INIT(Phalcon_Mvc_Collection);
 	PHALCON_INIT(Phalcon_Mvc_Controller);
-	PHALCON_INIT(Phalcon_Mvc_Collection_Document);
-	PHALCON_INIT(Phalcon_Mvc_Collection_Manager);
-	PHALCON_INIT(Phalcon_Mvc_Collection_Message);
-	PHALCON_INIT(Phalcon_Mvc_Collection_GridFS);
-	PHALCON_INIT(Phalcon_Mvc_Collection_Resultset);
 	PHALCON_INIT(Phalcon_Mvc_Dispatcher);
 	PHALCON_INIT(Phalcon_Mvc_Model);
 	PHALCON_INIT(Phalcon_Mvc_Model_Resultset);

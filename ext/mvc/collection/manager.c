@@ -159,14 +159,14 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
 
-	zval *model, *custom_events_manager, class_name = {}, events_manager = {};
+	zval *model, custom_events_manager = {}, class_name = {}, events_manager = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
-	custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
-	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
+	phalcon_read_property(&custom_events_manager, getThis(), SL("_customEventsManager"), PH_NOISY);
+	if (Z_TYPE(custom_events_manager) == IS_ARRAY) { 
 		phalcon_get_class(&class_name, model, 1);
-		if (phalcon_array_isset_fetch(&events_manager, custom_events_manager, &class_name)) {
+		if (phalcon_array_isset_fetch(&events_manager, &custom_events_manager, &class_name, 0)) {
 			RETURN_CTORW(&events_manager);
 		}
 	}
@@ -181,18 +181,18 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 
-	zval *model, class_name = {}, *initialized, *events_manager, event_name = {};
+	zval *model, class_name = {}, initialized = {}, event_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
 	phalcon_get_class(&class_name, model, 1);
 
-	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
+	phalcon_read_property(&initialized, getThis(), SL("_initialized"), PH_NOISY);
 
 	/** 
 	 * Models are just initialized once per request
 	 */
-	if (!phalcon_array_isset(initialized, &class_name)) {
+	if (!phalcon_array_isset(&initialized, &class_name)) {
 
 		/** 
 		 * Call the 'initialize' method if it's implemented
@@ -204,11 +204,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
 		/** 
 		 * If an EventsManager is available we pass to it every initialized model
 		 */
-		events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
-		if (Z_TYPE_P(events_manager) == IS_OBJECT) {
-			ZVAL_STRING(&event_name, "collectionManager:afterInitialize");
-			PHALCON_CALL_METHODW(NULL, events_manager, "fire", &event_name, getThis());
-		}
+		ZVAL_STRING(&event_name, "collectionManager:afterInitialize");
+		PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
 
 		phalcon_update_property_array(getThis(), SL("_initialized"), &class_name, model);
 		phalcon_update_property_zval(getThis(), SL("_lastInitialized"), model);
@@ -223,15 +221,15 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, initialize){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, isInitialized){
 
-	zval *model_name, *initialized, lowercased = {};
+	zval *model_name, initialized = {}, lowercased = {};
 
 	phalcon_fetch_params(0, 1, 0, &model_name);
 
-	initialized = phalcon_read_property(getThis(), SL("_initialized"), PH_NOISY);
+	phalcon_read_property(&initialized, getThis(), SL("_initialized"), PH_NOISY);
 
 	phalcon_fast_strtolower(&lowercased, model_name);
 
-	RETVAL_BOOL(phalcon_array_isset(initialized, &lowercased));
+	RETVAL_BOOL(phalcon_array_isset(&initialized, &lowercased));
 }
 
 /**
@@ -295,7 +293,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, useImplicitObjectIds){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 
-	zval *model, entity_name = {}, *implicit_objects_ids, implicit = {};
+	zval *model, entity_name = {}, implicit_objects_ids = {}, implicit = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -309,8 +307,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isUsingImplicitObjectIds){
 	/** 
 	 * All collections use by default are using implicit object ids
 	 */
-	implicit_objects_ids = phalcon_read_property(getThis(), SL("_implicitObjectsIds"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&implicit, implicit_objects_ids, &entity_name)) {
+	phalcon_read_property(&implicit_objects_ids, getThis(), SL("_implicitObjectsIds"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&implicit, &implicit_objects_ids, &entity_name, 0)) {
 		RETURN_CTORW(&implicit);
 	}
 
@@ -346,7 +344,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setStrictMode){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 
-	zval *collection, entity_name = {}, *strict_modes, strict_mode = {};
+	zval *collection, entity_name = {}, strict_modes = {}, strict_mode = {};
 
 	phalcon_fetch_params(0, 1, 0, &collection);
 
@@ -360,8 +358,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
 	/** 
 	 * All collections use by default are using implicit object ids
 	 */
-	strict_modes = phalcon_read_property(getThis(), SL("_strictModes"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&strict_mode, strict_modes, &entity_name)) {
+	phalcon_read_property(&strict_modes, getThis(), SL("_strictModes"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&strict_mode, &strict_modes, &entity_name, 0)) {
 		RETURN_CTORW(&strict_mode);
 	}
 
@@ -376,7 +374,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, isStrictMode){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 
-	zval *model, service = {}, *connection_services, entity_name = {}, dependency_injector = {}, connection = {};
+	zval *model, service = {}, connection_services = {}, entity_name = {}, dependency_injector = {}, connection = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -387,15 +385,15 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
 
 	ZVAL_STRING(&service, "mongo");
 
-	connection_services = phalcon_read_property(getThis(), SL("_connectionServices"), PH_NOISY);
-	if (Z_TYPE_P(connection_services) == IS_ARRAY) { 
+	phalcon_read_property(&connection_services, getThis(), SL("_connectionServices"), PH_NOISY);
+	if (Z_TYPE(connection_services) == IS_ARRAY) { 
 		phalcon_get_class(&entity_name, model, 1);
 
 		/** 
 		 * Check if the model has a custom connection service
 		 */
-		if (phalcon_array_isset(connection_services, &entity_name)) {
-			phalcon_array_fetch(&service, connection_services, &entity_name, PH_NOISY);
+		if (phalcon_array_isset(&connection_services, &entity_name)) {
+			phalcon_array_fetch(&service, &connection_services, &entity_name, PH_NOISY);
 		}
 	}
 
@@ -427,18 +425,18 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 
-	zval *eventname, *model, status = {}, *events_manager, fire_event_name = {}, *custom_events_manager, entity_name = {};
+	zval *eventname, *model, status = {}, events_manager = {}, fire_event_name = {}, custom_events_manager = {}, entity_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &eventname, &model);
 
 	/** 
 	 * Dispatch events to the global events manager
 	 */
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
-	if (Z_TYPE_P(events_manager) == IS_OBJECT) {
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		PHALCON_CONCAT_SV(&fire_event_name, "collection:", eventname);
 
-		PHALCON_CALL_METHODW(&status, events_manager, "fire", &fire_event_name, model);
+		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &fire_event_name, model);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_CTORW(&status);
 		}
@@ -447,13 +445,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, notifyEvent){
 	/** 
 	 * A model can has a specific events manager for it
 	 */
-	custom_events_manager = phalcon_read_property(getThis(), SL("_customEventsManager"), PH_NOISY);
-	if (Z_TYPE_P(custom_events_manager) == IS_ARRAY) { 
+	phalcon_read_property(&custom_events_manager, getThis(), SL("_customEventsManager"), PH_NOISY);
+	if (Z_TYPE(custom_events_manager) == IS_ARRAY) { 
 		phalcon_get_class(&entity_name, model, 1);
-		if (phalcon_array_isset(custom_events_manager, &entity_name)) {
+		if (phalcon_array_isset(&custom_events_manager, &entity_name)) {
 			PHALCON_CONCAT_SV(&fire_event_name, "collection:", eventname);
 
-			PHALCON_CALL_METHODW(&status, custom_events_manager, "fire", &fire_event_name, model);
+			PHALCON_CALL_METHODW(&status, &custom_events_manager, "fire", &fire_event_name, model);
 			if (PHALCON_IS_FALSE(&status)) {
 				RETURN_CTORW(&status);
 			}
@@ -497,7 +495,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setSource){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 
-	zval *collection, entity_name = {}, *sources, source = {}, class_name = {};
+	zval *collection, entity_name = {}, sources = {}, source = {}, class_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &collection);
 
@@ -508,8 +506,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getSource){
 
 	phalcon_get_class(&entity_name, collection, 1);
 
-	sources = phalcon_read_property(getThis(), SL("_sources"), PH_NOISY);
-	if (Z_TYPE_P(sources) == IS_ARRAY && phalcon_array_isset_fetch(&source, sources, &entity_name)) {
+	phalcon_read_property(&sources, getThis(), SL("_sources"), PH_NOISY);
+	if (Z_TYPE(sources) == IS_ARRAY && phalcon_array_isset_fetch(&source, &sources, &entity_name, 0)) {
 		RETURN_CTORW(&source);
 	}
 
@@ -555,7 +553,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, setColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 
-	zval *collection, entity_name = {}, *column_maps, column_map = {};
+	zval *collection, entity_name = {}, column_maps = {}, column_map = {};
 
 	phalcon_fetch_params(0, 1, 0, &collection);
 
@@ -566,9 +564,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_Manager, getColumnMap){
 
 	phalcon_get_class(&entity_name, collection, 1);
 
-	column_maps = phalcon_read_property(getThis(), SL("_columnMaps"), PH_NOISY);
-	if (Z_TYPE_P(column_maps) == IS_ARRAY) { 
-		if (phalcon_array_isset_fetch(&column_map, column_maps, &entity_name)) {
+	phalcon_read_property(&column_maps, getThis(), SL("_columnMaps"), PH_NOISY);
+	if (Z_TYPE(column_maps) == IS_ARRAY) { 
+		if (phalcon_array_isset_fetch(&column_map, &column_maps, &entity_name, 0)) {
 			RETURN_CTORW(&column_map);
 		}
 	}

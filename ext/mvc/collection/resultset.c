@@ -177,22 +177,22 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 
-	zval *rows, *cursor = NULL, row = {}, *collection, active_row = {};
+	zval rows = {}, cursor = {}, row = {}, collection = {}, active_row = {};
 
-	rows = phalcon_read_property(getThis(), SL("_rows"), PH_NOISY);
-	if (Z_TYPE_P(rows) == IS_NULL) {
-		cursor = phalcon_read_property(getThis(), SL("_cursor"), PH_NOISY);
-		if (Z_TYPE_P(cursor) == IS_OBJECT) {
-			PHALCON_CALL_METHODW(NULL, cursor, "next");
-			PHALCON_CALL_METHODW(&row, cursor, "current");
+	phalcon_read_property(&rows, getThis(), SL("_rows"), PH_NOISY);
+	if (Z_TYPE(rows) == IS_NULL) {
+		phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_NOISY);
+		if (Z_TYPE(cursor) == IS_OBJECT) {
+			PHALCON_CALL_METHODW(NULL, &cursor, "next");
+			PHALCON_CALL_METHODW(&row, &cursor, "current");
 		} else {
 			ZVAL_FALSE(&row);
 		}
 	} else {
-		if (Z_TYPE_P(rows) == IS_ARRAY) { 
-			phalcon_array_get_current(&row, rows);
+		if (Z_TYPE(rows) == IS_ARRAY) { 
+			phalcon_array_get_current(&row, &rows);
 			if (PHALCON_IS_NOT_FALSE(&row)) {
-				zend_hash_move_forward(Z_ARRVAL_P(rows));
+				zend_hash_move_forward(Z_ARRVAL(rows));
 			}
 		} else {
 			ZVAL_BOOL(&row, 0);
@@ -204,9 +204,9 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, valid){
 		RETURN_FALSE;
 	}
 
-	collection = phalcon_read_property(getThis(), SL("_collection"), PH_NOISY);
+	phalcon_read_property(&collection, getThis(), SL("_collection"), PH_NOISY);
 
-	PHALCON_CALL_CE_STATICW(&active_row, phalcon_mvc_collection_ce, "cloneresult", collection, &row);
+	PHALCON_CALL_CE_STATICW(&active_row, phalcon_mvc_collection_ce, "cloneresult", &collection, &row);
 
 	phalcon_update_property_zval(getThis(), SL("_activeRow"), &active_row);
 	RETURN_TRUE;
@@ -256,16 +256,16 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, serialize){
 
-	zval rename_columns = {}, records = {}, *collection, data = {};
+	zval rename_columns = {}, records = {}, collection = {}, data = {};
 
 	ZVAL_FALSE(&rename_columns);
 
 	PHALCON_CALL_METHODW(&records, getThis(), "toarray", &rename_columns);
 
-	collection = phalcon_read_property(getThis(), SL("_collection"), PH_NOISY);
+	phalcon_read_property(&collection, getThis(), SL("_collection"), PH_NOISY);
 
 	array_init_size(&data, 3);
-	phalcon_array_update_str(&data, SL("collection"), collection, PH_COPY);
+	phalcon_array_update_str(&data, SL("collection"), &collection, PH_COPY);
 	phalcon_array_update_str(&data, SL("rows"), &records, PH_COPY);
 	phalcon_update_property_bool(getThis(), SL("_activeRow"), 0);
 
@@ -327,22 +327,21 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, key){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
 
-	zval *z_zero, *cursor, *active_row, *rows;
+	zval *z_zero, cursor = {}, active_row = {}, rows = {};
 
 	z_zero = &PHALCON_GLOBAL(z_zero);
 
-	rows = phalcon_read_property(getThis(), SL("_rows"), PH_NOISY);
-	if (Z_TYPE_P(rows) == IS_NULL) {
-		cursor = phalcon_read_property(getThis(), SL("_cursor"), PH_NOISY);
-		if (Z_TYPE_P(cursor) == IS_OBJECT) {
-			active_row = phalcon_read_property(getThis(), SL("_activeRow"), PH_NOISY);
-			if (Z_TYPE_P(active_row) != IS_NULL) {
-				
-				PHALCON_CALL_METHODW(NULL, cursor, "reset");
+	phalcon_read_property(&rows, getThis(), SL("_rows"), PH_NOISY);
+	if (Z_TYPE(rows) == IS_NULL) {
+		phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_NOISY);
+		if (Z_TYPE(cursor) == IS_OBJECT) {
+			phalcon_read_property(&active_row, getThis(), SL("_activeRow"), PH_NOISY);
+			if (Z_TYPE(active_row) != IS_NULL) {
+				PHALCON_CALL_METHODW(NULL, &cursor, "reset");
 			}
 		}
-	} else if (Z_TYPE_P(rows) == IS_ARRAY) {
-		zend_hash_internal_pointer_reset(Z_ARRVAL_P(rows));
+	} else if (Z_TYPE(rows) == IS_ARRAY) {
+		zend_hash_internal_pointer_reset(Z_ARRVAL(rows));
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_pointer"), z_zero);
@@ -355,7 +354,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, rewind){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
 
-	zval *position, *rows, *cursor, *pointer, is_different = {};
+	zval *position, rows = {}, cursor = {}, pointer = {}, is_different = {};
 	HashTable *ah0;
 	long i;
 
@@ -365,20 +364,20 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
 
 	convert_to_long(position);
 
-	pointer = phalcon_read_property(getThis(), SL("_pointer"), PH_NOISY);
+	phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY);
 
-	is_not_equal_function(&is_different, pointer, position);
+	is_not_equal_function(&is_different, &pointer, position);
 	if (PHALCON_IS_TRUE(&is_different)) {
 		phalcon_update_property_zval(getThis(), SL("_pointer"), position);
-		rows = phalcon_read_property(getThis(), SL("_rows"), PH_NOISY);
-		if (Z_TYPE_P(rows) == IS_NULL) {
-			cursor = phalcon_read_property(getThis(), SL("_cursor"), PH_NOISY);
-			if (Z_TYPE_P(cursor) == IS_OBJECT) {
-				PHALCON_CALL_METHODW(NULL, cursor, "skip", position);
+		phalcon_read_property(&rows, getThis(), SL("_rows"), PH_NOISY);
+		if (Z_TYPE(rows) == IS_NULL) {
+			phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_NOISY);
+			if (Z_TYPE(cursor) == IS_OBJECT) {
+				PHALCON_CALL_METHODW(NULL, &cursor, "skip", position);
 			}
 		} else {
-			if (Z_TYPE_P(rows) == IS_ARRAY) { 
-				ah0 = Z_ARRVAL_P(rows);
+			if (Z_TYPE(rows) == IS_ARRAY) { 
+				ah0 = Z_ARRVAL(rows);
 				zend_hash_internal_pointer_reset(ah0);
 
 				i = 0;
@@ -402,22 +401,22 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, seek){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, count){
 
-	zval count = {}, *rows, *cursor, number_rows = {};
+	zval count = {}, rows = {}, cursor = {}, number_rows = {};
 
 	phalcon_return_property(&count, getThis(), SL("_count"));
 
 	if (Z_TYPE(count) == IS_NULL) {
 		ZVAL_LONG(&count, 0);
 
-		rows = phalcon_read_property(getThis(), SL("_rows"), PH_NOISY);
-		if (Z_TYPE_P(rows) == IS_NULL) {
-			cursor = phalcon_read_property(getThis(), SL("_cursor"), PH_NOISY);
-			if (Z_TYPE_P(cursor) == IS_OBJECT) {
-				PHALCON_CALL_METHODW(&number_rows, cursor, "count", &PHALCON_GLOBAL(z_true));
+		phalcon_read_property(&rows, getThis(), SL("_rows"), PH_NOISY);
+		if (Z_TYPE(rows) == IS_NULL) {
+			phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_NOISY);
+			if (Z_TYPE(cursor) == IS_OBJECT) {
+				PHALCON_CALL_METHODW(&number_rows, &cursor, "count", &PHALCON_GLOBAL(z_true));
 				ZVAL_LONG(&count, phalcon_get_intval(&number_rows));
 			}
 		} else {
-			phalcon_fast_count(&count, rows);
+			phalcon_fast_count(&count, &rows);
 		}
 
 		phalcon_update_property_zval(getThis(), SL("_count"), &count);
@@ -450,7 +449,7 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetExists){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetGet){
 
-	zval *index, count = {}, *pointer, valid = {};
+	zval *index, count = {}, pointer = {}, valid = {};
 
 	phalcon_fetch_params(0, 1, 0, &index);
 
@@ -459,8 +458,8 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetGet){
 		/**
 		 * Check if the last record returned is the current requested
 		 */
-		pointer = phalcon_read_property(getThis(), SL("_pointer"), PH_NOISY);
-		if (PHALCON_IS_EQUAL(pointer, index)) {
+		phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY);
+		if (PHALCON_IS_EQUAL(&pointer, index)) {
 			PHALCON_RETURN_CALL_METHODW(getThis(), "current");
 			return;
 		}
@@ -523,13 +522,13 @@ PHP_METHOD(Phalcon_Mvc_Collection_Resultset, offsetUnset){
  */
 PHP_METHOD(Phalcon_Mvc_Collection_Resultset, getFirst){
 
-	zval *pointer, valid = {};
+	zval pointer = {}, valid = {};
 
 	/** 
 	 * Check if the last record returned is the current requested
 	 */
-	pointer = phalcon_read_property(getThis(), SL("_pointer"), PH_NOISY);
-	if (PHALCON_IS_LONG(pointer, 0)) {
+	phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY);
+	if (PHALCON_IS_LONG(&pointer, 0)) {
 		PHALCON_RETURN_CALL_METHODW(getThis(), "current");
 		return;
 	}

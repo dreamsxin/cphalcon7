@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_DI, getRaw){
 
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
 		phalcon_read_property_array(&service, getThis(), SL("_services"), name);
-		PHALCON_RETURN_CALL_METHODW(service, "getdefinition");
+		PHALCON_RETURN_CALL_METHODW(&service, "getdefinition");
 		return;
 	}
 

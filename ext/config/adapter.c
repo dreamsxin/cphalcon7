@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 	} else {
 		instances = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));		
 
-		if (phalcon_array_isset_fetch(return_value, instances, file_path)) {
+		if (phalcon_array_isset_fetch(return_value, instances, file_path, 0)) {
 			return;
 		}
 		object_init_ex(return_value, ce0);

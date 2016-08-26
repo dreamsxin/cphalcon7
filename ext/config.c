@@ -330,9 +330,9 @@ PHP_METHOD(Phalcon_Config, merge){
 				ZVAL_LONG(&tmp, idx);
 			}
 
-			if (phalcon_fetch_property_zval(&active_value, getThis(), &tmp, PH_NOISY)) {
+			if (phalcon_property_isset_fetch_zval(&active_value, getThis(), &tmp)) {
 				if ((Z_TYPE_P(value)  == IS_OBJECT || Z_TYPE_P(value) == IS_ARRAY) && Z_TYPE(active_value) == IS_OBJECT) {
-					if (phalcon_method_exists_ex(active_value, SL("merge")) == SUCCESS) { /* Path AAA in the test */
+					if (phalcon_method_exists_ex(&active_value, SL("merge")) == SUCCESS) { /* Path AAA in the test */
 						zval *params[] = { value };
 						if (FAILURE == phalcon_call_method(NULL, &active_value, "merge", 1, params)) {
 							break;

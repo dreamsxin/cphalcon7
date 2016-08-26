@@ -96,7 +96,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 	n = zend_hash_num_elements(Z_ARRVAL_P(directive));
 	assert(n > 1);
 
-	if (!phalcon_array_isset_fetch(&t1, arr, section)) {
+	if (!phalcon_array_isset_fetch(&t1, arr, section, 0)) {
 		array_init(&t1);
 	} else if (Z_TYPE_P(&t1) != IS_ARRAY) {
 		convert_to_array_ex(&t1);
@@ -105,7 +105,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 	for (i = 0; i < n - 1; i++) {
 		zval index1 = {};
 		phalcon_array_fetch_long(&index1, directive, i, PH_NOISY);
-		if (!phalcon_array_isset_fetch(&t2, tmp1, &index)) {
+		if (!phalcon_array_isset_fetch(&t2, tmp1, &index, 0)) {
 			array_init(&t2);
 			phalcon_array_update_zval(tmp1, &index1, &t2, PH_COPY);
 		} else if (Z_TYPE_P(&t2) != IS_ARRAY) {

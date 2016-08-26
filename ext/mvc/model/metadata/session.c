@@ -103,16 +103,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct)
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
 
-	zval *key, *session, *prefix, prefix_key = {}, r0 = {}, r1 = {}, meta_data = {};
+	zval *key, *session, prefix = {}, prefix_key = {}, r0 = {}, r1 = {}, meta_data = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	session = phalcon_get_global_str(SL("_SESSION"));
-	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
-	PHALCON_CONCAT_SV(&prefix_key, "$PMM$", prefix);
+	PHALCON_CONCAT_SV(&prefix_key, "$PMM$", &prefix);
 
-	if (phalcon_array_isset_fetch(&r0, session, &prefix_key)) {
+	if (phalcon_array_isset_fetch(&r0, session, &prefix_key, 0)) {
 		if (phalcon_array_isset(&r0, key)) {
 			phalcon_array_fetch(&r1, session, &prefix_key, PH_NOISY);
 			phalcon_array_fetch(&meta_data, &r1, key, PH_NOISY);
@@ -129,26 +129,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, write){
 
-	zval *key, *data, *prefix, *_SESSION, prefix_key = {};
+	zval *key, *data, *_SESSION, prefix = {}, prefix_key = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
-	PHALCON_CONCAT_SV(&prefix_key, "$PMM$", prefix);
+	PHALCON_CONCAT_SV(&prefix_key, "$PMM$", &prefix);
 
 	phalcon_array_update_multi_2(_SESSION, &prefix_key, key, data, PH_COPY);
 }
 
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, reset)
-{
-	zval *prefix, *_SESSION, prefix_key = {};
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, reset){
 
-	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+	zval *_SESSION, prefix = {}, prefix_key = {};
+
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
-	phalcon_concat_sv(&prefix_key, SL("$PMM$"), prefix, 0);
+	phalcon_concat_sv(&prefix_key, SL("$PMM$"), &prefix, 0);
 	phalcon_array_unset(_SESSION, &prefix_key, 0);
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_session_ce, getThis(), "reset");

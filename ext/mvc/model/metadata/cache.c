@@ -110,14 +110,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 
-	zval cache = {}, *dependency_injector, tmp = {};
+	zval cache = {}, dependency_injector = {}, tmp = {};
 
 	phalcon_return_property(&cache, getThis(), SL("_cache"));
 
 	if (Z_TYPE(cache) == IS_STRING) {
-		dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
+		phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(&tmp, dependency_injector, "getshared", &cache);
+		PHALCON_CALL_METHODW(&tmp, &dependency_injector, "getshared", &cache);
 
 		phalcon_update_property_zval(getThis(), SL("_cache"), &tmp);
 
@@ -135,16 +135,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, read){
 
-	zval *key, cache = {}, *lifetime;
+	zval *key, cache = {}, lifetime = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	PHALCON_CALL_METHODW(&cache, getThis(), "_getcache");
 
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-
 	if (Z_TYPE(cache) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(&cache, "get", key, lifetime);
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		PHALCON_RETURN_CALL_METHODW(&cache, "get", key, &lifetime);
 	} else {
 		RETURN_NULL();
 	}
@@ -158,16 +157,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, write){
 
-	zval *key, *data, cache = {}, *lifetime;
+	zval *key, *data, cache = {}, lifetime = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
 	PHALCON_CALL_METHODW(&cache, getThis(), "_getcache");
 
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-
 	if (Z_TYPE(cache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &cache, "save", key, data, lifetime);	
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		PHALCON_CALL_METHODW(NULL, &cache, "save", key, data, &lifetime);	
 	}
 }
 

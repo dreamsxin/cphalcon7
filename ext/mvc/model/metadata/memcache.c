@@ -160,15 +160,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, read){
 
-	zval *key, *lifetime, *memcache;
+	zval *key, lifetime = {}, memcache = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
-	
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
 
-	if (Z_TYPE_P(memcache) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(memcache, "get", key, lifetime);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
+
+	if (Z_TYPE(memcache) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHODW(&memcache, "get", key, &lifetime);
 	} else {
 		RETURN_NULL();
 	}
@@ -182,26 +182,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, write){
 
-	zval *key, *data, *lifetime, *memcache;
+	zval *key, *data, lifetime = {}, memcache = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
-	
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
 
-	if (Z_TYPE_P(memcache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, memcache, "save", key, data, lifetime);	
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
+
+	if (Z_TYPE(memcache) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &memcache, "save", key, data, &lifetime);	
 	}
 }
 
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, reset)
-{
-	zval *memcache;
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, reset){
 
-	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
+	zval memcache = {};
 
-	if (Z_TYPE_P(memcache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, memcache, "flush");	
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
+
+	if (Z_TYPE(memcache) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &memcache, "flush");	
 	}
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_memcache_ce, getThis(), "reset");

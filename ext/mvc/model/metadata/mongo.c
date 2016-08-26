@@ -147,15 +147,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, read){
 
-	zval *key, *lifetime, *mongo;
+	zval *key, mongo = {}, lifetime = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
+	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY);
 
-	if (Z_TYPE_P(mongo) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(mongo, "get", key, lifetime);
+	if (Z_TYPE(mongo) == IS_OBJECT) {
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		PHALCON_RETURN_CALL_METHODW(&mongo, "get", key, &lifetime);
 
 		return;
 	}
@@ -171,26 +171,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, write){
 
-	zval *key, *data, *lifetime, *mongo;
+	zval *key, *data, mongo = {}, lifetime = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
+	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY);
 
-	if (Z_TYPE_P(mongo) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, mongo, "save", key, data, lifetime);	
+	if (Z_TYPE(mongo) == IS_OBJECT) {
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		PHALCON_CALL_METHODW(NULL, &mongo, "save", key, data, &lifetime);	
 	}
 }
 
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, reset)
-{
-	zval *mongo;
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, reset){
 
-	mongo = phalcon_read_property(getThis(), SL("_mongo"), PH_NOISY);
+	zval mongo;
 
-	if (Z_TYPE_P(mongo) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, mongo, "flush");	
+	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY);
+
+	if (Z_TYPE(mongo) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &mongo, "flush");	
 	}
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_mongo_ce, getThis(), "reset");

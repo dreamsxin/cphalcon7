@@ -162,15 +162,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, read){
 
-	zval *key, *lifetime, *libmemcached;
+	zval *key, lifetime = {}, libmemcached = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
-	
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	libmemcached = phalcon_read_property(getThis(), SL("_libmemcached"), PH_NOISY);
 
-	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(libmemcached, "get", key, lifetime);
+	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+
+	if (Z_TYPE(libmemcached) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHODW(&libmemcached, "get", key, &lifetime);
 	} else {
 		RETURN_NULL();
 	}
@@ -184,26 +184,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, write){
 
-	zval *key, *data, *lifetime, *libmemcached;
+	zval *key, *data, lifetime = {}, libmemcached = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
-	
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	libmemcached = phalcon_read_property(getThis(), SL("_libmemcached"), PH_NOISY);
 
-	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, libmemcached, "save", key, data, lifetime);	
+	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+
+	if (Z_TYPE(libmemcached) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &libmemcached, "save", key, data, &lifetime);	
 	}
 }
 
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, reset)
-{
-	zval *libmemcached;
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, reset){
 
-	libmemcached = phalcon_read_property(getThis(), SL("_libmemcached"), PH_NOISY);
+	zval libmemcached = {};
 
-	if (Z_TYPE_P(libmemcached) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, libmemcached, "flush");	
+	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
+
+	if (Z_TYPE(libmemcached) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &libmemcached, "flush");	
 	}
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_libmemcached_ce, getThis(), "reset");

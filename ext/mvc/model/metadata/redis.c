@@ -161,15 +161,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, read){
 
-	zval *key, *lifetime, *redis;
+	zval *key, redis = {}, lifetime = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
+	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_NOISY);
 
-	if (Z_TYPE_P(redis) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(redis, "get", key, lifetime);
+	if (Z_TYPE(redis) == IS_OBJECT) {
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		PHALCON_RETURN_CALL_METHODW(&redis, "get", key, &lifetime);
 		return;
 	}
 
@@ -184,26 +184,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, write){
 
-	zval *key, *data, *lifetime, *redis;
+	zval *key, *data, redis = {}, lifetime = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
+	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_NOISY);
 
-	if (Z_TYPE_P(redis) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, redis, "save", key, data, lifetime);	
+	if (Z_TYPE(redis) == IS_OBJECT) {
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		PHALCON_CALL_METHODW(NULL, &redis, "save", key, data, &lifetime);	
 	}
 }
 
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, reset)
-{
-	zval *redis;
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, reset){
 
-	redis = phalcon_read_property(getThis(), SL("_redis"), PH_NOISY);
+	zval redis = {};
 
-	if (Z_TYPE_P(redis) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, redis, "flush");	
+	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_NOISY);
+
+	if (Z_TYPE(redis) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &redis, "flush");	
 	}
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_redis_ce, getThis(), "reset");

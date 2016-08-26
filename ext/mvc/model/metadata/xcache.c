@@ -112,13 +112,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, read){
 
-	zval *key, *prefix, xc_key = {};
+	zval *key, prefix = {}, xc_key = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
-	PHALCON_CONCAT_SVV(&xc_key, "$PMM$", prefix, key);
+	PHALCON_CONCAT_SVV(&xc_key, "$PMM$", &prefix, key);
 
 	PHALCON_CALL_FUNCTIONW(return_value, "xcache_get", &xc_key);
 }
@@ -131,25 +131,25 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, write){
 
-	zval *key, *data, *prefix, xc_key = {}, *ttl;
+	zval *key, *data, prefix = {}, xc_key = {}, ttl = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
-	PHALCON_CONCAT_SVV(&xc_key, "$PMM$", prefix, key);
+	PHALCON_CONCAT_SVV(&xc_key, "$PMM$", &prefix, key);
 
-	ttl = phalcon_read_property(getThis(), SL("_ttl"), PH_NOISY);
-	PHALCON_CALL_FUNCTIONW(NULL, "xcache_set", &xc_key, data, ttl);
+	phalcon_read_property(&ttl, getThis(), SL("_ttl"), PH_NOISY);
+	PHALCON_CALL_FUNCTIONW(NULL, "xcache_set", &xc_key, data, &ttl);
 }
 
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, reset)
-{
-	zval *prefix, real_key = {};
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Xcache, reset){
 
-	prefix = phalcon_read_property(getThis(), SL("_prefix"), PH_NOISY);
+	zval prefix = {}, real_key = {};
 
-	phalcon_concat_svs(&real_key, SL("$PMM$"), prefix, SL("meta-"), 0);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+
+	phalcon_concat_svs(&real_key, SL("$PMM$"), &prefix, SL("meta-"), 0);
 	PHALCON_CALL_FUNCTIONW(NULL, "xcache_unset_by_prefix", &real_key);
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_xcache_ce, getThis(), "reset");

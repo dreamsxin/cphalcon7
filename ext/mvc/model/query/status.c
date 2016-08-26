@@ -120,11 +120,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getModel){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getMessages){
 
-	zval *model;
+	zval model = {};
 
-	model = phalcon_read_property(getThis(), SL("_model"), PH_NOISY);
-	if (Z_TYPE_P(model) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(model, "getmessages");
+	phalcon_read_property(&model, getThis(), SL("_model"), PH_NOISY);
+	if (Z_TYPE(model) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHODW(&model, "getmessages");
 		return;
 	}
 	

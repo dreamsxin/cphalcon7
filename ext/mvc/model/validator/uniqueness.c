@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 			 * The reversed column map is used in the case to get real column name
 			 */
 			if (Z_TYPE(column_map) == IS_ARRAY) { 
-				if (!phalcon_array_isset_fetch(&column_field, &column_map, compose_field)) {
+				if (!phalcon_array_isset_fetch(&column_field, &column_map, compose_field, 0)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", compose_field, "\" isn't part of the column map");
 					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 * The reversed column map is used in the case to get real column name
 		 */
 		if (Z_TYPE(column_map) == IS_ARRAY) { 
-			if (!phalcon_array_isset_fetch(&column_field, &column_map, &field)) {
+			if (!phalcon_array_isset_fetch(&column_field, &column_map, &field, 0)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Column '", &field, "\" isn't part of the column map");
 				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 			 * Rename the column if there is a column map
 			 */
 			if (Z_TYPE(column_map) == IS_ARRAY) { 
-				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, primary_field)) {
+				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, primary_field, 0)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_field, "\" isn't part of the column map");
 					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 					return;

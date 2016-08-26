@@ -20,6 +20,10 @@
 #include "php_phalcon.h"
 
 #include "kernel/memory.h"
+#include "kernel/operators.h"
+#include "kernel/string.h"
+#include "kernel/concat.h"
+#include "kernel/array.h"
 
 #include <Zend/zend_smart_str.h>
 
@@ -122,5 +126,97 @@ void phalcon_orm_singlequotes(zval *return_value, zval *str) {
 	} else {
 		smart_str_free(&escaped_str);
 		RETURN_EMPTY_STRING();
+	}
+}
+
+void phalcon_orm_phql_build_group(zval *return_value, zval *group) {
+
+	zval group_items = {}, joined_items = {}, *group_item = NULL;
+
+	if (PHALCON_IS_NOT_EMPTY(group)) {
+		if (Z_TYPE_P(group) == IS_ARRAY) {
+			array_init(&group_items);
+
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(group), group_item) {
+				zval escaped_item = {};
+				if (phalcon_is_numeric(group_item)) {
+					phalcon_array_append(&group_items, group_item, PH_COPY);
+				} else {
+					if (phalcon_memnstr_str(group_item, SL("."))) {
+						phalcon_array_append(&group_items, group_item, PH_COPY);
+					} else {
+						PHALCON_CONCAT_SVS(&escaped_item, "[", group_item, "]");
+						phalcon_array_append(&group_items, &escaped_item, PH_COPY);
+					}
+				}
+			} ZEND_HASH_FOREACH_END();
+
+			phalcon_fast_join_str(&joined_items, SL(", "), &group_items);
+			PHALCON_SCONCAT_SV(return_value, " GROUP BY ", &joined_items);
+		} else {
+			if (phalcon_is_numeric(group)) {
+				PHALCON_SCONCAT_SV(return_value, " GROUP BY ", group);
+			} else {
+				if (phalcon_memnstr_str(group, SL("."))) {
+					PHALCON_SCONCAT_SV(return_value, " GROUP BY ", group);
+				} else if (phalcon_memnstr_str(group, SL(","))) {
+					phalcon_fast_explode_str(&group_items, SL(", "), group);
+
+					phalcon_fast_join_str(&joined_items, SL("], ["), &group_items);
+
+					PHALCON_SCONCAT_SVS(return_value, " GROUP BY [", &joined_items, "]");
+				} else {
+					PHALCON_SCONCAT_SVS(return_value, " GROUP BY [", group, "]");
+				}
+			}
+		}
+	}
+}
+
+void phalcon_orm_phql_build_order(zval *return_value, zval *order) {
+
+	zval order_items = {}, joined_items = {}, *order_item = NULL;
+
+	if (PHALCON_IS_NOT_EMPTY(order)) {
+		if (Z_TYPE_P(order) == IS_ARRAY) {
+			array_init(&order_items);
+
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(order), order_item) {
+				zval escaped_item = {};
+				if (phalcon_is_numeric(order_item)) {
+					phalcon_array_append(&order_items, order_item, PH_COPY);
+				} else {
+					if (phalcon_memnstr_str(order_item, SL("."))) {
+						phalcon_array_append(&order_items, order_item, PH_COPY);
+					} else {
+						PHALCON_CONCAT_SVS(&escaped_item, "[", order_item, "]");
+						phalcon_array_append(&order_items, &escaped_item, PH_COPY);
+					}
+				}
+			} ZEND_HASH_FOREACH_END();
+
+			phalcon_fast_join_str(&joined_items, SL(", "), &order_items);
+			PHALCON_SCONCAT_SV(return_value, " ORDER BY ", &joined_items);
+		} else {
+			PHALCON_SCONCAT_SV(return_value, " ORDER BY ", order);
+		}
+	}
+}
+
+void phalcon_orm_phql_build_limit(zval *return_value, zval *limit) {
+
+	zval number = {}, offset = {};
+
+	if (PHALCON_IS_NOT_EMPTY(limit)) {
+		if (Z_TYPE_P(limit) == IS_ARRAY) {
+			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
+			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset")) && Z_TYPE_P(&offset) != IS_NULL) {
+				PHALCON_SCONCAT_SVSV(return_value, " LIMIT ", &number, " OFFSET ", &offset);
+			} else {
+				PHALCON_SCONCAT_SV(return_value, " LIMIT ", &number);
+			}
+		} else {
+			PHALCON_SCONCAT_SV(return_value, " LIMIT ", limit);
+		}
 	}
 }

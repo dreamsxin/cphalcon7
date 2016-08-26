@@ -38,6 +38,7 @@
 #include "kernel/string.h"
 #include "kernel/file.h"
 #include "kernel/hash.h"
+#include "kernel/framework/orm.h"
 
 #include "interned-strings.h"
 
@@ -1311,8 +1312,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getGroupBy){
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	zval dependency_injector = {}, models = {}, *model, model_instance = {}, conditions = {}, distinct = {}, phql = {}, columns = {}, selected_columns = {};
-	zval *column, joined_columns = {}, selected_models = {}, joined_models = {}, joins = {}, *join, group = {}, group_items = {}, *group_item;
-	zval joined_items = {}, having = {}, order = {}, order_items = {}, *order_item, limit = {}, number = {}, offset = {}, for_update = {};
+	zval *column, joined_columns = {}, selected_models = {}, joined_models = {}, joins = {}, *join, group = {};
+	zval having = {}, order = {}, limit = {}, offset = {}, for_update = {};
 	zend_string *str_key;
 	ulong idx;
 	zend_class_entry *ce0;
@@ -1553,48 +1554,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	 * Process group parameters
 	 */
 	phalcon_read_property(&group, getThis(), SL("_group"), PH_NOISY);
-	if (Z_TYPE(group) != IS_NULL) {
-		if (Z_TYPE(group) == IS_ARRAY) { 
-			array_init(&group_items);
-
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(group), group_item) {
-				zval escaped_item = {};
-				if (phalcon_is_numeric(group_item)) {
-					phalcon_array_append(&group_items, group_item, PH_COPY);
-				} else {
-					if (phalcon_memnstr_str(group_item, SL("."))) {
-						phalcon_array_append(&group_items, group_item, PH_COPY);
-					} else {
-						PHALCON_CONCAT_SVS(&escaped_item, "[", group_item, "]");
-						phalcon_array_append(&group_items, &escaped_item, PH_COPY);
-					}
-				}
-				PHALCON_PTR_DTOR(&escaped_item);
-			} ZEND_HASH_FOREACH_END();
-
-			phalcon_fast_join_str(&joined_items, SL(", "), &group_items);
-			PHALCON_SCONCAT_SV(&phql, " GROUP BY ", &joined_items);
-			PHALCON_PTR_DTOR(&joined_items);
-			PHALCON_PTR_DTOR(&group_items);
-		} else {
-			if (phalcon_is_numeric(&group)) {
-				PHALCON_SCONCAT_SV(&phql, " GROUP BY ", &group);
-			} else {
-				if (phalcon_memnstr_str(&group, SL("."))) {
-					PHALCON_SCONCAT_SV(&phql, " GROUP BY ", &group);
-				} else if (phalcon_memnstr_str(&group, SL(","))) {
-					phalcon_fast_explode_str(&group_items, SL(", "), &group);
-					phalcon_fast_join_str(&joined_items, SL("], ["), &group_items);
-
-					PHALCON_SCONCAT_SVS(&phql, " GROUP BY [", &joined_items, "]");
-					PHALCON_PTR_DTOR(&joined_items);
-					PHALCON_PTR_DTOR(&group_items);
-				} else {
-					PHALCON_SCONCAT_SVS(&phql, " GROUP BY [", &group, "]");
-				}
-			}
-		}
-	}
+	phalcon_orm_phql_build_group(&phql, &group);
 
 	/* Process HAVING clause */
 	phalcon_read_property(&having, getThis(), SL("_having"), PH_NOISY);
@@ -1608,57 +1568,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 	 * Process order clause
 	 */
 	phalcon_read_property(&order, getThis(), SL("_order"), PH_NOISY);
-	if (PHALCON_IS_NOT_EMPTY(&order)) {
-		if (Z_TYPE(order) == IS_ARRAY) {
-			array_init(&order_items);
-
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(order), order_item) {
-				zval escaped_item = {};
-				if (phalcon_is_numeric(order_item)) {
-					phalcon_array_append(&order_items, order_item, PH_COPY);
-				} else {
-					if (phalcon_memnstr_str(order_item, SL("."))) {
-						phalcon_array_append(&order_items, order_item, PH_COPY);
-					} else {
-						PHALCON_CONCAT_SVS(&escaped_item, "[", order_item, "]");
-						phalcon_array_append(&order_items, &escaped_item, PH_COPY);
-					}
-				}
-				PHALCON_PTR_DTOR(&escaped_item);
-			} ZEND_HASH_FOREACH_END();
-
-			phalcon_fast_join_str(&joined_items, SL(", "), &order_items);
-			PHALCON_SCONCAT_SV(&phql, " ORDER BY ", &joined_items);
-			PHALCON_PTR_DTOR(&joined_items);
-			PHALCON_PTR_DTOR(&order_items);
-		} else {
-			PHALCON_SCONCAT_SV(&phql, " ORDER BY ", &order);
-		}
-	}
+	phalcon_orm_phql_build_order(&phql, &order);
 
 	/** 
 	 * Process limit parameters
 	 */
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY);
-	if (Z_TYPE(limit) != IS_NULL) {
-		if (Z_TYPE(limit) == IS_ARRAY) {
-			phalcon_array_fetch_str(&number, &limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_fetch_str(&offset, &limit, SL("offset")) && Z_TYPE(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SVSV(&phql, " LIMIT ", &number, " OFFSET ", &offset);
-				PHALCON_PTR_DTOR(&offset);
-			} else {
-				PHALCON_SCONCAT_SV(&phql, " LIMIT ", &number);
-			}
-			PHALCON_PTR_DTOR(&number);
-		} else {
-			PHALCON_SCONCAT_SV(&phql, " LIMIT ", &limit);
-
-			phalcon_return_property(&offset, getThis(), SL("_offset"));
-			if (Z_TYPE(offset) != IS_NULL) {
-				PHALCON_SCONCAT_SV(&phql, " OFFSET ", &offset);
-			}
+	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
+		phalcon_return_property(&offset, getThis(), SL("_offset"));
+		if (PHALCON_IS_NOT_EMPTY(&limit)) {
+			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
 		}
 	}
+
+	phalcon_orm_phql_build_limit(&phql, &limit);
 
 	/** 
 	 * Process FOR UPDATE clause

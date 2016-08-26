@@ -21,3 +21,7 @@ void phalcon_orm_destroy_cache();
 void phalcon_orm_get_prepared_ast(zval *return_value, zval *unique_id);
 void phalcon_orm_set_prepared_ast(zval *unique_id, zval *prepared_ast);
 void phalcon_orm_singlequotes(zval *return_value, zval *str);
+
+void phalcon_orm_phql_build_group(zval *return_value, zval *group);
+void phalcon_orm_phql_build_order(zval *return_value, zval *order);
+void phalcon_orm_phql_build_limit(zval *return_value, zval *limit);

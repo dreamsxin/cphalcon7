@@ -213,11 +213,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getOptions){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Relation, isForeignKey){
 
-	zval *options;
+	zval options = {};
 
-	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-	if (Z_TYPE_P(options) == IS_ARRAY) { 
-		if (phalcon_array_isset_str(options, SL("foreignKey"))) {
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	if (Z_TYPE(options) == IS_ARRAY) { 
+		if (phalcon_array_isset_str(&options, SL("foreignKey"))) {
 			RETURN_TRUE;
 		}
 	}
@@ -232,11 +232,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isForeignKey){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Relation, getForeignKey){
 
-	zval *options, foreign_key = {};
+	zval options = {}, foreign_key = {};
 
-	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 
-	if (phalcon_array_isset_fetch_str(&foreign_key, options, SL("foreignKey"))) {
+	if (phalcon_array_isset_fetch_str(&foreign_key, &options, SL("foreignKey"))) {
 		if (zend_is_true(&foreign_key)) {
 			RETURN_CTORW(&foreign_key);
 		}
@@ -252,10 +252,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getForeignKey){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Relation, isThrough){
 
-	zval *type;
+	zval type = {};
 
-	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
-	if (PHALCON_IS_LONG(type, 3) || PHALCON_IS_LONG(type, 4)) {
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+	if (PHALCON_IS_LONG(&type, 3) || PHALCON_IS_LONG(&type, 4)) {
 		RETURN_TRUE;
 	}
 	
@@ -269,11 +269,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isThrough){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Relation, isReusable){
 
-	zval *options, reusable = {};
+	zval options = {}, reusable = {};
 
-	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 
-	if (phalcon_array_isset_fetch_str(&reusable, options, SL("reusable"))) {
+	if (phalcon_array_isset_fetch_str(&reusable, &options, SL("reusable"))) {
 		RETURN_CTORW(&reusable);
 	}
 	

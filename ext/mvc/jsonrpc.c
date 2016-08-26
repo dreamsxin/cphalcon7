@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 
-	zval *modules, *merge = NULL, *registered_modules, merged_modules = {};
+	zval *modules, *merge = NULL, registered_modules = {}, merged_modules = {};
 
 	phalcon_fetch_params(0, 1, 1, &modules, &merge);
 
@@ -159,9 +159,9 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 	if (PHALCON_IS_FALSE(merge)) {
 		phalcon_update_property_zval(getThis(), SL("_modules"), modules);
 	} else {
-		registered_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
-		if (Z_TYPE_P(registered_modules) == IS_ARRAY) {
-			phalcon_fast_array_merge(&merged_modules, registered_modules, modules);
+		phalcon_read_property(&registered_modules, getThis(), SL("_modules"), PH_NOISY);
+		if (Z_TYPE(registered_modules) == IS_ARRAY) {
+			phalcon_fast_array_merge(&merged_modules, &registered_modules, modules);
 		} else {
 			PHALCON_CPY_WRT(&merged_modules, modules);
 		}
@@ -215,7 +215,7 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
 	zval event_name = {}, status = {};
 	uint params_cnt = 2 + (params != NULL ? 1 : 0);
 	zval *p[3];
-	if (mgr) {
+	if (mgr && Z_TYPE_P(mgr) == IS_OBJECT) {
 
 		ZVAL_STRING(&event_name, event);
 
@@ -241,25 +241,21 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
-	zval *dependency_injector, *events_manager, service = {}, request = {}, json = {}, data = {}, response = {}, jsonrpc_message = {}, jsonrpc_error = {}, jsonrpc_method = {}, jsonrpc_params = {};
-	zval url = {}, uri = {}, router = {}, module_name = {}, *modules, module = {}, class_name = {}, path = {}, module_object = {}, module_params = {}, status = {}, namespace_name = {}, controller_name = {}, action_name = {};
+	zval dependency_injector = {}, events_manager = {}, service = {}, request = {}, json = {}, data = {}, response = {}, jsonrpc_message = {}, jsonrpc_error = {}, jsonrpc_method = {}, jsonrpc_params = {};
+	zval url = {}, uri = {}, router = {}, module_name = {}, modules = {}, module = {}, class_name = {}, path = {}, module_object = {}, module_params = {}, status = {}, namespace_name = {}, controller_name = {}, action_name = {};
 	zval params = {}, exact = {}, dispatcher = {}, controller = {}, jsonrpc_result = {}, jsonrpc_id = {};
 
-	dependency_injector = phalcon_read_property(getThis(), SL("_dependencyInjector"), PH_NOISY);
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
+	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
-	events_manager = phalcon_read_property(getThis(), SL("_eventsManager"), PH_NOISY);
-	if (Z_TYPE_P(events_manager) != IS_OBJECT) {
-		events_manager = NULL;
-	} else {
-		PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_mvc_jsonrpc_exception_ce, 0);
-	}
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
+	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_mvc_jsonrpc_exception_ce, 0);
 
 	/* Call boot event, this allows the developer to perform initialization actions */
-	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:boot", getThis(), NULL)) {
+	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:boot", getThis(), NULL)) {
 		RETURN_FALSE;
 	}
 
@@ -267,7 +263,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 	ZVAL_STRING(&service, ISV(request));
 
-	PHALCON_CALL_METHODW(&request, dependency_injector, "getshared", &service);
+	PHALCON_CALL_METHODW(&request, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&request, phalcon_http_requestinterface_ce);
 
 	PHALCON_CALL_METHODW(&json, &request, "getrawbody");
@@ -275,7 +271,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 	ZVAL_STRING(&service, ISV(response));
 
-	PHALCON_CALL_METHODW(&response, dependency_injector, "getshared", &service);
+	PHALCON_CALL_METHODW(&response, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 
 	array_init(&jsonrpc_message);
@@ -299,13 +295,13 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		}
 
 		ZVAL_STRING(&service, ISV(url));
-		PHALCON_CALL_METHODW(&url, dependency_injector, "getshared", &service);
+		PHALCON_CALL_METHODW(&url, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&url, phalcon_mvc_urlinterface_ce);
 
 		PHALCON_CALL_METHODW(&uri, &url, "get", &jsonrpc_method);
 
 		ZVAL_STRING(&service, ISV(router));
-		PHALCON_CALL_METHODW(&router, dependency_injector, "getshared", &service);
+		PHALCON_CALL_METHODW(&router, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
 
 		/* Handle the URI pattern (if any) */
@@ -323,15 +319,15 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		 * Process the module definition
 		 */
 		if (zend_is_true(&module_name)) {
-			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeStartModule", getThis(), &module_name)) {
+			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:beforeStartModule", getThis(), &module_name)) {
 				RETURN_FALSE;
 			}
 
 			/** 
 			 * Check if the module passed by the router is registered in the modules container
 			 */
-			modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
-			if (!phalcon_array_isset_fetch(&module, modules, &module_name)) {
+			phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY);
+			if (!phalcon_array_isset_fetch(&module, &modules, &module_name, 0)) {
 				convert_to_string(&module_name);
 				zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module %s is not registered in the jsonrpc container", Z_STRVAL(module_name));
 				return;
@@ -340,7 +336,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			/** 
 			 * A module definition must be an array or an object
 			 */
-			if (Z_TYPE(module) != IS_ARRAY && Z_TYPE_P(&module) != IS_OBJECT) {
+			if (Z_TYPE(module) != IS_ARRAY && Z_TYPE(module) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
 				return;
 			}
@@ -365,17 +361,17 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 					}
 				}
 		
-				PHALCON_CALL_METHODW(&module_object, dependency_injector, "get", &class_name);
+				PHALCON_CALL_METHODW(&module_object, &dependency_injector, "get", &class_name);
 		
 				/** 
 				 * 'registerAutoloaders' and 'registerServices' are automatically called
 				 */
-				PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders", dependency_injector);
-				PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", dependency_injector);
+				PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders", &dependency_injector);
+				PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", &dependency_injector);
 			} else if (Z_TYPE(module) == IS_OBJECT && instanceof_function(Z_OBJCE(module), zend_ce_closure)) {
 				/* A module definition object, can be a Closure instance */
 				array_init_size(&module_params, 1);
-				phalcon_array_append(&module_params, dependency_injector, PH_COPY);
+				phalcon_array_append(&module_params, &dependency_injector, PH_COPY);
 
 				PHALCON_CALL_USER_FUNC_ARRAYW(&status, &module, &module_params);
 			} else {
@@ -384,11 +380,9 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			}
 		
 			/* Calling afterStartModule event */
-			if (events_manager) {
-				phalcon_update_property_zval(getThis(), SL("_moduleObject"), &module_object);
-				if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterStartModule", getThis(), &module_name)) {
-					RETURN_FALSE;
-				}
+			phalcon_update_property_zval(getThis(), SL("_moduleObject"), &module_object);
+			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:afterStartModule", getThis(), &module_name)) {
+				RETURN_FALSE;
 			}
 		}
 		
@@ -402,7 +396,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 		ZVAL_STRING(&service, ISV(dispatcher));
 		
-		PHALCON_CALL_METHODW(&dispatcher, dependency_injector, "getshared", &service);
+		PHALCON_CALL_METHODW(&dispatcher, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACEW(&dispatcher, phalcon_dispatcherinterface_ce);
 		
 		/* Assign the values passed from the router */
@@ -413,7 +407,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		PHALCON_CALL_METHODW(NULL, &dispatcher, "setparams", &jsonrpc_params);
 		
 		/* Calling beforeHandleRequest */
-		RETURN_ON_FAILURE(phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeHandleRequest", getThis(), &dispatcher));
+		RETURN_ON_FAILURE(phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:beforeHandleRequest", getThis(), &dispatcher));
 		
 		/* The dispatcher must return an object */
 		PHALCON_CALL_METHODW(&controller, &dispatcher, "dispatch");
@@ -423,7 +417,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	}
 		
 	/* Calling afterHandleRequest */
-	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:afterHandleRequest", getThis(), &controller) && EG(exception)) {
+	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:afterHandleRequest", getThis(), &controller) && EG(exception)) {
 		return;
 	}
 
@@ -447,7 +441,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 
 	/* Calling beforeSendResponse */
-	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(events_manager, "jsonrpc:beforeSendResponse", getThis(), &response) && EG(exception)) {
+	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:beforeSendResponse", getThis(), &response) && EG(exception)) {
 		return;
 	}
 

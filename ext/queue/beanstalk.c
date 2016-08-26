@@ -161,16 +161,16 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 
 PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 
-	zval *connection = NULL, *parameters, host = {}, port = {}, new_connection = {};
+	zval connection = {}, parameters = {}, host = {}, port = {}, new_connection = {};
 
-	connection = phalcon_read_property(getThis(), SL("_connection"), PH_NOISY);
-	if (Z_TYPE_P(connection) == IS_RESOURCE) {
+	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY);
+	if (Z_TYPE(connection) == IS_RESOURCE) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "disconnect");
 	}
 
-	parameters = phalcon_read_property(getThis(), SL("_parameters"), PH_NOISY);
+	phalcon_read_property(&parameters, getThis(), SL("_parameters"), PH_NOISY);
 
-	if (!phalcon_array_isset_fetch_str(&host, parameters, SL("host")) || !phalcon_array_isset_fetch_str(&port, parameters, SL("port"))) {
+	if (!phalcon_array_isset_fetch_str(&host, &parameters, SL("host")) || !phalcon_array_isset_fetch_str(&port, &parameters, SL("port"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 
 		php_stream_to_zval(stream, &new_connection);
 		phalcon_update_property_zval(getThis(), SL("_connection"), &new_connection);
-		RETVAL_ZVAL(connection, 1, 1);
+		RETVAL_ZVAL(&connection, 1, 1);
 	}
 }
 
@@ -717,16 +717,16 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __sleep){
 
 PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 
-	zval *params, host = {}, port = {};
+	zval params = {}, host = {}, port = {};
 	int fail;
 
 	zend_update_property_null(phalcon_queue_beanstalk_ce, getThis(), SL("_connection"));
 
-	params = phalcon_read_property(getThis(), SL("_parameters"), PH_NOISY);
+	phalcon_read_property(&params, getThis(), SL("_parameters"), PH_NOISY);
 	if (
-			Z_TYPE_P(params) != IS_ARRAY
-		 || !phalcon_array_isset_fetch_str(&host, params, SL("host"))
-		 || !phalcon_array_isset_fetch_str(&port, params, SL("port"))
+			Z_TYPE(params) != IS_ARRAY
+		 || !phalcon_array_isset_fetch_str(&host, &params, SL("host"))
+		 || !phalcon_array_isset_fetch_str(&port, &params, SL("port"))
 	) {
 		fail = 1;
 	} else if (Z_TYPE(host) != IS_STRING || Z_TYPE(port) != IS_LONG) {

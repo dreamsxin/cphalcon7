@@ -169,10 +169,10 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Syslog, close){
 
-	zval *opened;
+	zval opened = {};
 
-	opened = phalcon_read_property(getThis(), SL("_opened"), PH_NOISY);
-	if (zend_is_true(opened)) {
+	phalcon_read_property(&opened, getThis(), SL("_opened"), PH_NOISY);
+	if (zend_is_true(&opened)) {
 		PHALCON_CALL_FUNCTIONW(NULL, "closelog");
 	}
 

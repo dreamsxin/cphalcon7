@@ -127,10 +127,12 @@ PHP_METHOD(Phalcon_Logger_Item, getTime){
 
 PHP_METHOD(Phalcon_Logger_Item, getContext) {
 
-	zval *context = phalcon_read_property(getThis(), SL("_context"), PH_NOISY);
+	zval context = {};
+	
+	phalcon_read_property(&context, getThis(), SL("_context"), PH_NOISY);
 
-	if (Z_TYPE_P(context) == IS_ARRAY) {
-		RETURN_ZVAL(context, 1, 0);
+	if (Z_TYPE(context) == IS_ARRAY) {
+		RETURN_ZVAL(&context, 1, 0);
 	}
 
 	array_init(return_value);

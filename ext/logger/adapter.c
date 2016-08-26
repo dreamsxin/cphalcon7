@@ -210,10 +210,10 @@ PHP_METHOD(Phalcon_Logger_Adapter, begin){
  */
 PHP_METHOD(Phalcon_Logger_Adapter, commit){
 
-	zval *transaction, *queue, *message, message_str = {}, type = {}, time = {}, context = {};
+	zval transaction = {}, queue = {}, *message, message_str = {}, type = {}, time = {}, context = {};
 
-	transaction = phalcon_read_property(getThis(), SL("_transaction"), PH_NOISY);
-	if (!zend_is_true(transaction)) {
+	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
+	if (!zend_is_true(&transaction)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "There is no active transaction");
 		return;
 	}
@@ -221,9 +221,9 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 	phalcon_update_property_bool(getThis(), SL("_transaction"), 0);
 	
 	/* Check if the queue has something to log */
-	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
-	if (Z_TYPE_P(queue) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(queue), message) {
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
+	if (Z_TYPE(queue) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(queue), message) {
 			PHALCON_CALL_METHODW(&message_str, message, "getmessage");
 			PHALCON_CALL_METHODW(&type, message, "gettype");
 			PHALCON_CALL_METHODW(&time, message, "gettime");
@@ -244,10 +244,10 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
  */
 PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 
-	zval *transaction, queue = {};
+	zval transaction = {}, queue = {};
 
-	transaction = phalcon_read_property(getThis(), SL("_transaction"), PH_NOISY);
-	if (!zend_is_true(transaction)) {
+	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
+	if (!zend_is_true(&transaction)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "There is no active transaction");
 		return;
 	}
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, critical){
  */
 PHP_METHOD(Phalcon_Logger_Adapter, log){
 
-	zval *message = NULL, *type, *context = NULL, *log_level, timestamp = {}, level = {}, *transaction, queue_item = {};
+	zval *message = NULL, *type, *context = NULL, log_level = {}, timestamp = {}, level = {}, transaction = {}, queue_item = {};
 	int i_level;
 
 	phalcon_fetch_params(0, 1, 2, &type, &message, &context);
@@ -427,15 +427,15 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 		i_level = Z_LVAL_P(type);
 	}
 
-	log_level = phalcon_read_property(getThis(), SL("_logLevel"), PH_NOISY);
+	phalcon_read_property(&log_level, getThis(), SL("_logLevel"), PH_NOISY);
 
 	/* Only log the message if this is allowed by the current log level */
-	if (phalcon_get_intval(log_level) >= i_level) {
+	if (phalcon_get_intval(&log_level) >= i_level) {
 		ZVAL_LONG(&timestamp, (long)time(NULL));
 		ZVAL_LONG(&level, i_level);
 
-		transaction = phalcon_read_property(getThis(), SL("_transaction"), PH_NOISY);
-		if (zend_is_true(transaction)) {
+		phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
+		if (zend_is_true(&transaction)) {
 			object_init_ex(&queue_item, phalcon_logger_item_ce);
 			PHALCON_CALL_METHODW(NULL, &queue_item, "__construct", message, &level, &timestamp, context);
 

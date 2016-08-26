@@ -116,13 +116,13 @@ PHP_METHOD(Phalcon_Logger_Multiple, getLoggers){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 
-	zval *formatter, *loggers, *logger;
+	zval *formatter, loggers = {}, *logger;
 
 	phalcon_fetch_params(0, 1, 0, &formatter);
 
-	loggers = phalcon_read_property(getThis(), SL("_loggers"), PH_NOISY);
-	if (Z_TYPE_P(loggers) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(loggers), logger) {
+	phalcon_read_property(&loggers, getThis(), SL("_loggers"), PH_NOISY);
+	if (Z_TYPE(loggers) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(loggers), logger) {
 			PHALCON_CALL_METHODW(NULL, logger, "setformatter", formatter);
 		} ZEND_HASH_FOREACH_END();
 
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Multiple, log){
 
-	zval *message, *_type = NULL, *context = NULL, type = {}, *loggers, *logger;
+	zval *message, *_type = NULL, *context = NULL, type = {}, loggers = {}, *logger;
 
 	phalcon_fetch_params(0, 1, 2, &message, &type, &context);
 
@@ -165,9 +165,9 @@ PHP_METHOD(Phalcon_Logger_Multiple, log){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	loggers = phalcon_read_property(getThis(), SL("_loggers"), PH_NOISY);
-	if (Z_TYPE_P(loggers) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(loggers), logger) {
+	phalcon_read_property(&loggers, getThis(), SL("_loggers"), PH_NOISY);
+	if (Z_TYPE(loggers) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(loggers), logger) {
 			PHALCON_CALL_METHODW(NULL, logger, "log", message, &type, context);
 		} ZEND_HASH_FOREACH_END();
 	}

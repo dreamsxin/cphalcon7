@@ -161,11 +161,11 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
 
-	zval *is_exact;
+	zval is_exact = {};
 
-	is_exact = phalcon_read_property(getThis(), SL("_isExactHandler"), PH_NOISY);
+	phalcon_read_property(&is_exact, getThis(), SL("_isExactHandler"), PH_NOISY);
 
-	if (!zend_is_true(is_exact)) {
+	if (!zend_is_true(&is_exact)) {
 		RETURN_MEMBER(getThis(), "_handlerName");
 	}
 

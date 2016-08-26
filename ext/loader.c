@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Loader, getPrefixes){
  */
 PHP_METHOD(Phalcon_Loader, registerDirs){
 
-	zval *directories, *merge = NULL, current_directories = (), merged_directories = {};
+	zval *directories, *merge = NULL, current_directories = {}, merged_directories = {};
 
 	phalcon_fetch_params(0, 1, 1, &directories, &merge);
 
@@ -591,7 +591,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	 */
 	phalcon_read_property(&classes, getThis(), SL("_classes"), PH_NOISY);
 	if (Z_TYPE(classes) == IS_ARRAY) { 
-		if (phalcon_array_isset_fetch(&file_path, &classes, class_name)) {
+		if (phalcon_array_isset_fetch(&file_path, &classes, class_name, 0)) {
 			convert_to_string_ex(&file_path);
 			if (Z_TYPE(events_manager) == IS_OBJECT) {
 				phalcon_update_property_zval(getThis(), SL("_foundPath"), &file_path);

@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		array_init(&events);
 	}
 
-	if (!phalcon_array_isset_fetch(&priority_queue, &events, event_type)) {
+	if (!phalcon_array_isset_fetch(&priority_queue, &events, event_type, 0)) {
 		phalcon_return_property(&enable_priorities, getThis(), SL("_enablePriorities"));
 		if (zend_is_true(&enable_priorities)) {
 			/** 
@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 		RETURN_FALSE;
 	}
 
-	if (!phalcon_array_isset_fetch(&queue, &events, type)) {
+	if (!phalcon_array_isset_fetch(&queue, &events, type, 0)) {
 		RETURN_FALSE;
 	}
 
@@ -709,7 +709,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	/** 
 	 * Check if events are grouped by type
 	 */
-	if (phalcon_array_isset_fetch(&fire_events, &events, &type)) {
+	if (phalcon_array_isset_fetch(&fire_events, &events, &type, 0)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
 			/** 
 			 * Create the event context
@@ -727,7 +727,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	/** 
 	 * Check if there are listeners for the event type itself
 	 */
-	if (phalcon_array_isset_fetch(&fire_events, &events, event_type)) {
+	if (phalcon_array_isset_fetch(&fire_events, &events, event_type, 0)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
 			/** 
 			 * Create the event if it wasn't created before

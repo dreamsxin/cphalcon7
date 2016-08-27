@@ -232,15 +232,15 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, close){
  */
 PHP_METHOD(Phalcon_Session_Adapter_Memcache, read){
 
-	zval *sid, *lifetime, *memcache;
+	zval *sid, lifetime = {}, memcache = {};
 
 	phalcon_fetch_params(0, 1, 0, &sid);
 
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
-	if (Z_TYPE_P(memcache) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(memcache, "get", sid, lifetime);
+	if (Z_TYPE(memcache) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHODW(&memcache, "get", sid, &lifetime);
 		return;	
 	} else {
 		RETURN_FALSE;
@@ -255,15 +255,15 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, read){
  */
 PHP_METHOD(Phalcon_Session_Adapter_Memcache, write){
 
-	zval *sid, *data, *lifetime, *memcache;
+	zval *sid, *data, lifetime = {}, memcache = {};
 
 	phalcon_fetch_params(0, 2, 0, &sid, &data);
 
-	lifetime = phalcon_read_property(getThis(), SL("_lifetime"), PH_NOISY);
-	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
-	if (Z_TYPE_P(memcache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, memcache, "save", sid, data, lifetime);
+	if (Z_TYPE(memcache) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &memcache, "save", sid, data, &lifetime);
 	}
 }
 
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, write){
  */
 PHP_METHOD(Phalcon_Session_Adapter_Memcache, destroy){
 
-	zval *_sid = NULL, sid = {}, *memcache;
+	zval *_sid = NULL, sid = {}, memcache = {};
 
 	phalcon_fetch_params(0, 0, 1, &_sid);
 
@@ -285,10 +285,10 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, destroy){
 		PHALCON_CPY_WRT(&sid, _sid);
 	}
 
-	memcache = phalcon_read_property(getThis(), SL("_memcache"), PH_NOISY);
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
-	if (Z_TYPE_P(memcache) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(memcache, "delete", &sid);
+	if (Z_TYPE(memcache) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHODW(&memcache, "delete", &sid);
 		return;
 	} else {
 		RETURN_FALSE;

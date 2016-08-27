@@ -90,10 +90,10 @@ static const zend_function_entry phalcon_session_bag_method_entry[] = {
 
 static int phalcon_session_bag_maybe_initialize(zval *this_ptr)
 {
-	zval *initialized;
+	zval initialized = {};
 
-	initialized = phalcon_read_property(this_ptr, SL("_initialized"), PH_NOISY);
-	if (PHALCON_IS_FALSE(initialized)) {
+	phalcon_read_property(&initialized, this_ptr, SL("_initialized"), PH_NOISY);
+	if (PHALCON_IS_FALSE(&initialized)) {
 		return phalcon_call_method(NULL, this_ptr, "initialize", 0, NULL);
 	}
 
@@ -102,17 +102,17 @@ static int phalcon_session_bag_maybe_initialize(zval *this_ptr)
 
 static zend_object_iterator* phalcon_session_bag_get_iterator(zend_class_entry *ce, zval *object, int by_ref)
 {
-	zval iterator = {}, *data, *params[1];
+	zval iterator = {}, data = {}, *params[1];
 	zend_object_iterator *ret;
 
 	if (FAILURE == phalcon_session_bag_maybe_initialize(object)) {
 		return NULL;
 	}
 
-	data = phalcon_read_property(object, SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, object, SL("_data"), PH_NOISY);
 
 	object_init_ex(&iterator, spl_ce_ArrayIterator);
-	params[0] = data;
+	params[0] = &data;
 	if (FAILURE == phalcon_call_method(NULL, &iterator, "__construct", 1, params)) {
 		ret = NULL;
 	}
@@ -208,14 +208,14 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
  */
 PHP_METHOD(Phalcon_Session_Bag, destroy){
 
-	zval *name, *session;
+	zval name = {}, session = {};
 
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(getThis()));
 
-	name    = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
-	session = phalcon_read_property(getThis(), SL("_session"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
+	phalcon_read_property(&session, getThis(), SL("_session"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(NULL, session, "__unset", name);
+	PHALCON_CALL_METHODW(NULL, &session, "__unset", &name);
 }
 
 /**
@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Session_Bag, destroy){
  */
 PHP_METHOD(Phalcon_Session_Bag, set){
 
-	zval *property, *value, *session, *name, *data;
+	zval *property, *value, session = {}, name = {}, data = {};
 
 	phalcon_fetch_params(0, 2, 0, &property, &value);
 
@@ -238,11 +238,12 @@ PHP_METHOD(Phalcon_Session_Bag, set){
 
 	phalcon_update_property_array(getThis(), SL("_data"), property, value);
 
-	name    = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
-	data    = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	session = phalcon_read_property(getThis(), SL("_session"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
+	phalcon_read_property(&session, getThis(), SL("_session"), PH_NOISY);
+
+	PHALCON_CALL_METHODW(NULL, &session, "__set", &name, &data);
 }
 
 /**
@@ -271,7 +272,7 @@ PHALCON_DOC_METHOD(Phalcon_Session_Bag, __set);
  */
 PHP_METHOD(Phalcon_Session_Bag, get){
 
-	zval *property, *default_value = NULL, *data, value = {};
+	zval *property, *default_value = NULL, data = {}, value = {};
 
 	phalcon_fetch_params(0, 1, 1, &property, &default_value);
 
@@ -283,8 +284,8 @@ PHP_METHOD(Phalcon_Session_Bag, get){
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(getThis()));
 
 	/* Retrieve the data */
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&value, data, property)) {
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&value, &data, property, 0)) {
 		RETURN_CTORW(&value);
 	}
 
@@ -303,7 +304,7 @@ PHP_METHOD(Phalcon_Session_Bag, get){
  */
 PHP_METHOD(Phalcon_Session_Bag, __get)
 {
-	zval *property, *data, value = {};
+	zval *property, data = {}, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
@@ -311,9 +312,9 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(getThis()));
 
 	/* Retrieve the data */
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
 
-	if (phalcon_array_isset_fetch(&value, data, property)) {
+	if (phalcon_array_isset_fetch(&value, &data, property, 0)) {
 		RETURN_CTORW(&value);
 	}
 
@@ -333,14 +334,14 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
  */
 PHP_METHOD(Phalcon_Session_Bag, has){
 
-	zval *property, *data;
+	zval *property, data = {};
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(getThis()));
 
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	RETURN_BOOL(phalcon_array_isset(data, property));
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	RETURN_BOOL(phalcon_array_isset(&data, property));
 }
 
 /**
@@ -368,21 +369,21 @@ PHALCON_DOC_METHOD(Phalcon_Session_Bag, __isset);
  */
 PHP_METHOD(Phalcon_Session_Bag, remove){
 
-	zval *property, *data = NULL, *name, *session;
+	zval *property, data = {}, name = {}, session = {};
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(getThis()));
 
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	if (phalcon_array_isset(data, property)) {
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	if (phalcon_array_isset(&data, property)) {
 		phalcon_unset_property_array(getThis(), SL("_data"), property);
 
-		data    = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-		name    = phalcon_read_property(getThis(), SL("_name"), PH_NOISY);
-		session = phalcon_read_property(getThis(), SL("_session"), PH_NOISY);
+		phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+		phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
+		phalcon_read_property(&session, getThis(), SL("_session"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(NULL, session, "__set", name, data);
+		PHALCON_CALL_METHODW(NULL, &session, "__set", &name, &data);
 
 		RETURN_TRUE;
 	}
@@ -405,23 +406,23 @@ PHALCON_DOC_METHOD(Phalcon_Session_Bag, __unset);
 
 PHP_METHOD(Phalcon_Session_Bag, getIterator)
 {
-	zval *data;
+	zval data = {};
 
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(getThis()));
 
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
 	object_init_ex(return_value, spl_ce_ArrayIterator);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", data);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &data);
 }
 
 PHP_METHOD(Phalcon_Session_Bag, count)
 {
-	zval *data;
+	zval data = {};
 	long int count;
 
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(getThis()));
 
-	data  = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	count = (Z_TYPE_P(data) == IS_ARRAY) ? zend_hash_num_elements(Z_ARRVAL_P(data)) : 0;
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	count = (Z_TYPE(data) == IS_ARRAY) ? zend_hash_num_elements(Z_ARRVAL(data)) : 0;
 	RETURN_LONG(count);
 }

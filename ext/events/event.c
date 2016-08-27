@@ -220,10 +220,10 @@ PHP_METHOD(Phalcon_Events_Event, getCancelable){
  */
 PHP_METHOD(Phalcon_Events_Event, stop){
 
-	zval *cancelable;
+	zval cancelable = {};
 
-	cancelable = phalcon_read_property(getThis(), SL("_cancelable"), PH_NOISY);
-	if (zend_is_true(cancelable)) {
+	phalcon_read_property(&cancelable, getThis(), SL("_cancelable"), PH_NOISY);
+	if (zend_is_true(&cancelable)) {
 		phalcon_update_property_bool(getThis(), SL("_stopped"), 1);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Trying to cancel a non-cancelable event");

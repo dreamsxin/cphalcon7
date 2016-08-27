@@ -272,11 +272,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			break;
 	}
 
-	PHALCON_PTR_DTOR(&row);
-	PHALCON_PTR_DTOR(&key);
-
 	phalcon_update_property_zval(getThis(), SL("_activeRow"), &active_row);
-	PHALCON_PTR_DTOR(&active_row);
+
 	RETURN_TRUE;
 }
 

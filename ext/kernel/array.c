@@ -38,7 +38,6 @@ int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index)
 	ZVAL_LONG(&z_index, index);
 
 	status = phalcon_array_isset_fetch(fetched, arr, &z_index, 0);
-	PHALCON_PTR_DTOR(&z_index);
 	return status;
 }
 
@@ -49,7 +48,6 @@ int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *in
 	ZVAL_STRINGL(&z_index, index, index_length);
 
 	status = phalcon_array_isset_fetch(fetched, arr, &z_index, 0);
-	PHALCON_PTR_DTOR(&z_index);
 	return status;
 }
 
@@ -60,7 +58,6 @@ int phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string
 	ZVAL_STR(&z_index, index);
 
 	status = phalcon_array_isset_fetch(fetched, arr, &z_index, 0);
-	PHALCON_PTR_DTOR(&z_index);
 	return status;
 }
 

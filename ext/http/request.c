@@ -650,7 +650,6 @@ PHP_METHOD(Phalcon_Http_Request, getScheme){
 	PHALCON_STR(&https_header, "HTTPS");
 
 	PHALCON_CALL_METHODW(&https, getThis(), "getserver", &https_header);
-	PHALCON_PTR_DTOR(&https_header);
 
 	if (zend_is_true(&https)) {
 		if (PHALCON_IS_STRING(&https, "off")) {
@@ -844,7 +843,6 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	PHALCON_STR(&host, "HTTP_HOST");
 
 	PHALCON_CALL_METHODW(&http_host, getThis(), "getserver", &host);
-	PHALCON_PTR_DTOR(&host);
 
 	if (zend_is_true(&http_host)) {
 		RETURN_CTORW(&http_host);
@@ -862,7 +860,6 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	PHALCON_STR(&server_name, "SERVER_NAME");
 
 	PHALCON_CALL_METHODW(&name, getThis(), "getserver", &server_name);
-	PHALCON_PTR_DTOR(&server_name);
 
 	/**
 	 * Get the server port from _SERVER['SERVER_PORT']
@@ -870,7 +867,6 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	PHALCON_STR(&server_port, "SERVER_PORT");
 
 	PHALCON_CALL_METHODW(&port, getThis(), "getserver", &server_port);
-	PHALCON_PTR_DTOR(&server_port);
 
 	PHALCON_STR(&http, "http");
 	ZVAL_LONG(&standard_port, 80);
@@ -879,7 +875,6 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	 * Check if the request is a standard http
 	 */
 	is_equal_function(&is_std_name, &scheme, &http);
-	PHALCON_PTR_DTOR(&http);
 
 	is_equal_function(&is_std_port, &port, &standard_port);
 
@@ -892,8 +887,6 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	 * Check if the request is a secure http request
 	 */
 	is_equal_function(&is_secure_scheme, &scheme, &https);
-	PHALCON_PTR_DTOR(&https);
-	PHALCON_PTR_DTOR(&scheme);
 
 	is_equal_function(&is_secure_port, &port, &secure_port);
 	phalcon_and_function(&is_secure_http, &is_secure_scheme, &is_secure_port);
@@ -913,7 +906,6 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	}
 
 	PHALCON_CONCAT_VSV(return_value, &name, ":", &port);
-	PHALCON_PTR_DTOR(&name);
 }
 
 /**

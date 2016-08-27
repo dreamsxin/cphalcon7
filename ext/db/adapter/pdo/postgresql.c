@@ -122,7 +122,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		if (Z_TYPE(password) == IS_STRING && Z_STRLEN(password) == 0) {
 			phalcon_array_update_str(&descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
-		PHALCON_PTR_DTOR(&password);
 	}
 
 
@@ -134,10 +133,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 	if (Z_TYPE(schema) == IS_STRING) {
 		PHALCON_CONCAT_SVS(&sql, "SET search_path TO '", &schema, "'");
 		PHALCON_CALL_METHODW(NULL, getThis(), "execute", &sql);
-		PHALCON_PTR_DTOR(&sql);
 	}
-
-	PHALCON_PTR_DTOR(&schema);
 }
 
 /**
@@ -421,7 +417,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, getDefaultIdValue){
 
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &default_value);
-	PHALCON_PTR_DTOR(&default_value);
 }
 
 /**

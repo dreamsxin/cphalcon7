@@ -1054,7 +1054,6 @@ int phalcon_update_property_empty_array(zval *object, const char *property_name,
 	array_init(&empty_array);
 
 	status = phalcon_update_property_zval(object, property_name, property_length, &empty_array);
-	PHALCON_PTR_DTOR(&empty_array);
 	return status;
 }
 

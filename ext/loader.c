@@ -169,7 +169,6 @@ PHP_METHOD(Phalcon_Loader, __construct){
 	array_init_size(&extensions, 1);
 	add_next_index_stringl(&extensions, SL("php"));
 	phalcon_update_property_zval(getThis(), SL("_extensions"), &extensions);
-	PHALCON_PTR_DTOR(&extensions);
 }
 
 /**
@@ -427,7 +426,6 @@ PHP_METHOD(Phalcon_Loader, register){
 		add_next_index_stringl(&autoloader, SL("autoLoad"));
 		PHALCON_CALL_FUNCTIONW(NULL, "spl_autoload_register", &autoloader);
 		phalcon_update_property_zval(getThis(), SL("_registered"), &PHALCON_GLOBAL(z_true));
-		PHALCON_PTR_DTOR(&autoloader);
 	}
 
 	RETURN_THISW();
@@ -539,8 +537,6 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				assert(Z_TYPE(file_path) == IS_STRING);
 				RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
 
-				PHALCON_PTR_DTOR(&file_path);
-
 				/** 
 				 * Return true mean success
 				 */
@@ -550,18 +546,9 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &file_path);
 				phalcon_debug_print_r(&debug_message);
 			}
-
-			PHALCON_PTR_DTOR(&file_path);
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_PTR_DTOR(&fixed_dir);
-
 	} ZEND_HASH_FOREACH_END();
-
-	PHALCON_PTR_DTOR(&ds_slash);
-	PHALCON_PTR_DTOR(&event_name);
-	PHALCON_PTR_DTOR(&debug_message);
-	PHALCON_PTR_DTOR(&directories);
 }
 
 /**
@@ -602,7 +589,6 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 
 			RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
 
-			PHALCON_PTR_DTOR(&file_path);
 			ZVAL_TRUE(&found);
 		}
 	}
@@ -639,14 +625,13 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 					phalcon_possible_autoload_filepath(&file_name, &ns_prefix, class_name, &ds, NULL);
 					if (zend_is_true(&file_name)) {
 						PHALCON_CALL_METHODW(&found, getThis(), "findfile", &file_name, directory, &extensions, &ds);
-						PHALCON_PTR_DTOR(&file_name);
+
 						if (zend_is_true(&found)) {
 							break;
 						}
 					}
 				}
 			} ZEND_HASH_FOREACH_END();
-			PHALCON_PTR_DTOR(&namespaces);
 		}
 	}
 
@@ -677,16 +662,12 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 					if (zend_is_true(&file_name)) {
 						PHALCON_CALL_METHODW(&found, getThis(), "findfile", &file_name, directory, &extensions, &ds);
 
-						PHALCON_PTR_DTOR(&file_name);
 						if (zend_is_true(&found)) {
-							PHALCON_PTR_DTOR(&prefix);
 							break;
 						}
 					}
 				}
-				PHALCON_PTR_DTOR(&prefix);
 			} ZEND_HASH_FOREACH_END();
-			PHALCON_PTR_DTOR(&prefixes);
 		}
 	}
 
@@ -700,7 +681,6 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		 * And change the namespace separator by directory separator too
 		 */
 		PHALCON_STR_REPLACE(&ns_class_name, &namespace_separator, &ds, &ds_class_name);
-		PHALCON_PTR_DTOR(&ds_class_name);
 
 		/** 
 		 * Checking in directories
@@ -708,13 +688,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		phalcon_return_property(&directories, getThis(), SL("_directories"));
 
 		PHALCON_CALL_METHODW(&found, getThis(), "findfile", &ns_class_name, &directories, &extensions, &ds);
-		PHALCON_PTR_DTOR(&directories);
-		PHALCON_PTR_DTOR(&ns_class_name);
 	}
-
-	PHALCON_PTR_DTOR(&pseudo_separator);
-	PHALCON_PTR_DTOR(&ds);
-	PHALCON_PTR_DTOR(&namespace_separator);
 
 	/** 
 	 * Call 'afterCheckClass' event
@@ -723,9 +697,6 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		PHALCON_STR(&event_name, "loader:afterCheckClass");
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
 	}
-
-	PHALCON_PTR_DTOR(&events_manager);
-	PHALCON_PTR_DTOR(&event_name);
 
 	if (zend_is_true(&found)) {
 		RETURN_TRUE;

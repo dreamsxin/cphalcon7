@@ -113,13 +113,11 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 		}
 
 		tmp1 = &t2;
-		PHALCON_PTR_DTOR(&index1);
 	}
 
 	phalcon_array_fetch_long(&index, directive, n - 1, PH_NOISY);
 	phalcon_array_update_zval(&t1, &index, value, PH_COPY);
 	phalcon_array_update_zval(arr, section, &t1, PH_COPY);
-	PHALCON_PTR_DTOR(&index);
 }
 
 /**

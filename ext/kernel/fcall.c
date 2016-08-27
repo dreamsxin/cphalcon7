@@ -50,10 +50,6 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;
 	int param_count = 0, i, status;
 
-	if (retval != NULL) {
-		PHALCON_PTR_DTOR(retval);
-	}
-
 	if (params && Z_TYPE_P(params) != IS_ARRAY) {
 		status = FAILURE;
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
@@ -65,7 +61,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 		arguments = (zval*)emalloc(sizeof(zval) * param_count);
 		i = 0;
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(params), param) {
-			PHALCON_CPY_WRT(&arguments[i], param);
+			ZVAL_COPY_VALUE(&arguments[i], param);
 			i++;
 		} ZEND_HASH_FOREACH_END();
 	} else {
@@ -78,15 +74,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 		ZVAL_NULL(retval_ptr);
 	}
 
-	i = 0;
-	while(i < param_count) {
-		PHALCON_PTR_DTOR(&arguments[i]);
-		i++;
-	}
 	efree(arguments);
-	if (retval == NULL) {
-		PHALCON_PTR_DTOR(retval_ptr);
-	}
 
 	return status;
 }
@@ -96,10 +84,6 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 	zval func_name = {}, ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, obj = {};
 	zval *arguments;
 	int i, status;
-
-	if (retval != NULL) {
-		PHALCON_PTR_DTOR(retval);
-	}
 
 	if (type != phalcon_fcall_function) {
 		if (object == NULL) {
@@ -189,8 +173,6 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 			}
 		}
 	}
-
-	zval_ptr_dtor(&func_name);
 
 	efree(arguments);
 	if (retval == NULL) {

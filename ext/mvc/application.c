@@ -290,7 +290,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_STR(&event_name, "application:boot");
 	PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_PTR_DTOR(&event_name);
 		RETURN_FALSE;
 	}
 
@@ -325,7 +324,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		ZVAL_UNREF(&module_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
-			PHALCON_PTR_DTOR(&module_name);
 			RETURN_FALSE;
 		}
 
@@ -336,7 +334,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, 0)) {
 			convert_to_string(&module_name);
 			zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module %s is not registered in the application container", Z_STRVAL(module_name));
-			PHALCON_PTR_DTOR(&module_name);
 			return;
 		}
 
@@ -344,7 +341,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		 * A module definition must be an array or an object
 		 */
 		if (Z_TYPE(module) != IS_ARRAY && Z_TYPE(module) != IS_OBJECT) {
-			PHALCON_PTR_DTOR(&module);
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "Invalid module definition");
 			return;
 		}
@@ -367,32 +363,25 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 						return;
 					}
 				}
-				PHALCON_PTR_DTOR(&path);
 			}
 
 			PHALCON_CALL_METHODW(&module_object, &dependency_injector, "get", &class_name);
-			PHALCON_PTR_DTOR(&class_name);
 
 			/** 
 			 * 'registerAutoloaders' and 'registerServices' are automatically called
 			 */
 			PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders", &dependency_injector);
 			PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", &dependency_injector);
-			PHALCON_PTR_DTOR(&module_object);
 		} else if (Z_TYPE(module) == IS_OBJECT && instanceof_function(Z_OBJCE(module), zend_ce_closure)) {
 			/* A module definition object, can be a Closure instance */
 			array_init_size(&module_params, 1);
 			phalcon_array_append(&module_params, &dependency_injector, PH_COPY);
 
 			PHALCON_CALL_USER_FUNC_ARRAYW(&status, &module, &module_params);
-
-			PHALCON_PTR_DTOR(&module_params);
 		} else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "Invalid module definition");
 			return;
 		}
-
-		PHALCON_PTR_DTOR(&module);
 
 		/* Calling afterStartModule event */
 		PHALCON_STR(&event_name, "application:afterStartModule");
@@ -402,8 +391,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		ZVAL_UNREF(&module_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
-			PHALCON_PTR_DTOR(&event_name);
-			PHALCON_PTR_DTOR(&module_name);
 			RETURN_FALSE;
 		}
 	}
@@ -434,8 +421,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHODW(&action_name, &router, "getactionname");
 	PHALCON_CALL_METHODW(&params, &router, "getparams");
 	PHALCON_CALL_METHODW(&exact, &router, "isexactcontrollername");
-	
-	PHALCON_PTR_DTOR(&router);
 
 	PHALCON_STR(&service, ISV(dispatcher));
 
@@ -448,13 +433,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHODW(NULL, &dispatcher, "setcontrollername", &controller_name, &exact);
 	PHALCON_CALL_METHODW(NULL, &dispatcher, "setactionname", &action_name);
 	PHALCON_CALL_METHODW(NULL, &dispatcher, "setparams", &params);
-
-	PHALCON_PTR_DTOR(&module_name);
-	PHALCON_PTR_DTOR(&namespace_name);
-	PHALCON_PTR_DTOR(&controller_name);
-	PHALCON_PTR_DTOR(&action_name);
-	PHALCON_PTR_DTOR(&params);
-	PHALCON_PTR_DTOR(&exact);
 
 	if (f_implicit_view) {
 		/** 
@@ -471,10 +449,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_UNREF(&dispatcher);
 
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_PTR_DTOR(&dispatcher);
-		PHALCON_PTR_DTOR(&status);
-		PHALCON_PTR_DTOR(&event_name);
-		PHALCON_PTR_DTOR(&service);
 		RETURN_FALSE;
 	}
 
@@ -489,11 +463,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_UNREF(&controller);
 
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_PTR_DTOR(&controller);
-		PHALCON_PTR_DTOR(&dispatcher);
-		PHALCON_PTR_DTOR(&status);
-		PHALCON_PTR_DTOR(&event_name);
-		PHALCON_PTR_DTOR(&service);
 		RETURN_FALSE;
 	}
 
@@ -505,7 +474,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		if (Z_TYPE(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE(possible_response), phalcon_http_responseinterface_ce, 1)) {
 			PHALCON_CPY_WRT(&response, &possible_response);
 			ZVAL_TRUE(&returned_response);
-			PHALCON_PTR_DTOR(&possible_response);
 		} else {
 			PHALCON_STR(&service, ISV(response));
 
@@ -515,9 +483,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			if (PHALCON_IS_FALSE(&possible_response)) {
 				RETURN_CTORW(&response);
 			}
-
-			PHALCON_PTR_DTOR(&possible_response);
-
 			ZVAL_FALSE(&returned_response);
 		}
 

@@ -344,11 +344,8 @@ PHP_METHOD(Phalcon_Config, merge){
 			} else {
 				phalcon_update_property_zval_zval(getThis(), &tmp, value);
 			}
-			PHALCON_PTR_DTOR(&tmp);
 		} ZEND_HASH_FOREACH_END();
 	}
-
-	PHALCON_PTR_DTOR(&array_config);
 
 	RETURN_THISW();
 }
@@ -385,10 +382,8 @@ PHP_METHOD(Phalcon_Config, toArray){
 			if (Z_TYPE_P(value) == IS_OBJECT && phalcon_method_exists_ex(value, SL("toarray")) == SUCCESS) {
 				if (SUCCESS == phalcon_call_method(&array_value, value, "toarray", 0, NULL)) {
 					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);
-					PHALCON_PTR_DTOR(&array_value);
 				}
 			}
-			PHALCON_PTR_DTOR(&tmp);
 		} ZEND_HASH_FOREACH_END();
 	}
 }

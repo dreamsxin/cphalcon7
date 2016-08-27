@@ -99,18 +99,28 @@ int phalcon_fast_strlen_ev(zval *str)
  */
 void phalcon_fast_strtolower(zval *return_value, zval *str)
 {
+	zval copy;
 	int use_copy = 0;
+	char *lower_str;
+	unsigned int length;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
-		use_copy = zend_make_printable_zval(str, return_value);
-		if (!use_copy) {
-			PHALCON_CPY_WRT_CTOR(return_value, str);
+		use_copy = zend_make_printable_zval(str, &copy);
+		if (use_copy) {
+			str = &copy;
 		}
-	} else {
-		PHALCON_CPY_WRT_CTOR(return_value, str);
 	}
 
-	zend_str_tolower(Z_STRVAL_P(return_value), Z_STRLEN_P(return_value));
+	length = Z_STRLEN_P(str);
+	lower_str = estrndup(Z_STRVAL_P(str), length);
+	php_strtolower(lower_str, length);
+
+	if (use_copy) {
+		zval_dtor(str);
+	}
+
+	ZVAL_STRINGL(return_value, lower_str, length);
+	efree(lower_str);
 }
 
 void phalcon_strtolower_inplace(zval *s) {

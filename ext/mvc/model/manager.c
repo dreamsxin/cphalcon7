@@ -397,7 +397,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 * Models are just initialized once per request
 	 */
 	if (phalcon_array_isset(&initialized, &class_name)) {
-		PHALCON_PTR_DTOR(&class_name);
 		RETURN_TRUE;
 	}
 
@@ -411,7 +410,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 * Update the model as initialized, this avoid cyclic initializations
 	 */
 	phalcon_update_property_array(getThis(), SL("_initialized"), &class_name, model);
-	PHALCON_PTR_DTOR(&class_name);
 
 	/** 
 	 * Call the 'initialize' method if it's implemented
@@ -434,7 +432,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), model);
 	}
 
-	PHALCON_PTR_DTOR(&event_name);
 
 	RETURN_TRUE;
 }
@@ -496,11 +493,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	 * Check if a model with the same is already loaded
 	 */
 	if (!zend_is_true(new_instance) && phalcon_array_isset_fetch(return_value, &initialized, &lowercased, 0)) {
-		PHALCON_PTR_DTOR(&lowercased);
 		return;
 	}
 
-	PHALCON_PTR_DTOR(&lowercased);
 
 	/** 
 	 * Load it using an autoloader
@@ -849,7 +844,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 					break;
 				}
 			} ZEND_HASH_FOREACH_END();
-			PHALCON_PTR_DTOR(&models_behaviors);
 		}
 	}
 
@@ -877,9 +871,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 		}
 	}
 
-	PHALCON_PTR_DTOR(&fire_event_name);
-	PHALCON_PTR_DTOR(&events_manager);
-	PHALCON_PTR_DTOR(&entity_name);
 
 	RETURN_CTORW(&status);
 }
@@ -1024,7 +1015,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_dynamicUpdate"), &entity_name, dynamic_update);
 	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), &entity_name, dynamic_update);
-	PHALCON_PTR_DTOR(&entity_name);
 }
 
 /**
@@ -1042,10 +1032,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate){
 	if (Z_TYPE(dynamic_update) == IS_ARRAY) { 
 		phalcon_get_class(&entity_name, model, 1);
 		if (phalcon_array_isset_fetch(return_value, &dynamic_update, &entity_name, 0)) {
-			PHALCON_PTR_DTOR(&entity_name);
 			return;
 		}
-		PHALCON_PTR_DTOR(&entity_name);
 	}
 
 	RETURN_TRUE;
@@ -1211,11 +1199,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 */
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
-		PHALCON_PTR_DTOR(&alias);
 	} else {
 		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
 	}
-	PHALCON_PTR_DTOR(&referenced_entity);
 
 	/** 
 	 * Append a new relationship
@@ -1227,15 +1213,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 */
 	PHALCON_CONCAT_VSV(&key_alias, &entity_name, "$", &lower_alias);
 	phalcon_update_property_array(getThis(), SL("_aliases"), &key_alias, &relation);
-	PHALCON_PTR_DTOR(&key_alias);
-	PHALCON_PTR_DTOR(&lower_alias);
 
 	/** 
 	 * Update the relations
 	 */
 	phalcon_update_property_array(getThis(), SL("_belongsTo"), &key_relation, &relations);
-	PHALCON_PTR_DTOR(&relations);
-	PHALCON_PTR_DTOR(&key_relation);
 
 	/** 
 	 * Get existing relations by model
@@ -1255,8 +1237,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 */
 	phalcon_update_property_array(getThis(), SL("_belongsToSingle"), &entity_name, &single_relations);
 
-	PHALCON_PTR_DTOR(&single_relations);
-	PHALCON_PTR_DTOR(&entity_name);
 
 	RETURN_CTORW(&relation);
 }

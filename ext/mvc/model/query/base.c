@@ -166,7 +166,6 @@ int phql_parse_phql(zval *result, zval *phql) {
 	if (phql_internal_parse_phql(result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg) == FAILURE) {
 		if (Z_TYPE(error_msg) > IS_NULL) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, Z_STRVAL(error_msg));
-			PHALCON_PTR_DTOR(&error_msg);
 		}
 		else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "There was an error parsing PHQL");
@@ -202,7 +201,6 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 	phalcon_orm_get_prepared_ast(result, &unique_id);
 
 	if (Z_TYPE_P(result) == IS_ARRAY) {
-		PHALCON_PTR_DTOR(&unique_id);
 		return SUCCESS;
 	}
 
@@ -596,8 +594,6 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 			}
 		}
 	}
-
-	PHALCON_PTR_DTOR(&unique_id);
 
 	efree(parser_status);
 	efree(state);

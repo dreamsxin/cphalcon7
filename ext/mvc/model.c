@@ -557,7 +557,6 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 	 * The manager always initializes the object
 	 */
 	PHALCON_CALL_METHODW(NULL, &models_manager, "initialize", getThis());
-	PHALCON_PTR_DTOR(&models_manager);
 
 	/**
 	 * This allows the developer to execute initialization stuff every time an instance
@@ -1537,7 +1536,6 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
 
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_PTR_DTOR(&params);
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
@@ -1565,18 +1563,12 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		array_init(&service_params);
 		phalcon_array_append(&service_params, &params, PH_COPY);
 		PHALCON_CALL_METHODW(&builder, &dependency_injector, "get", &service_name, &service_params);
-		PHALCON_PTR_DTOR(&service_params);
 	} else {
 		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
 		PHALCON_CALL_METHODW(NULL, &builder, "__construct", &params);
 	}
 
-	PHALCON_PTR_DTOR(&dependency_injector);
-	PHALCON_PTR_DTOR(&service_name);
-
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
-
-	PHALCON_PTR_DTOR(&model_name);
 
 	PHALCON_STR(&event_name, "beforeQuery");
 
@@ -1589,14 +1581,12 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	 */
 	PHALCON_CALL_METHODW(NULL, &builder, "limit", &PHALCON_GLOBAL(z_one));
 	PHALCON_CALL_METHODW(&query, &builder, "getquery");
-	PHALCON_PTR_DTOR(&builder);
 
 	/**
 	 * Pass the cache options to the query
 	 */
 	if (phalcon_array_isset_fetch_str(&cache, &params, SL("cache"))) {
 		PHALCON_CALL_METHODW(NULL, &query, "cache", &cache);
-		PHALCON_PTR_DTOR(&cache);
 	}
 
 	/**
@@ -1608,7 +1598,6 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	 * Execute the query passing the bind-params and casting-types
 	 */
 	PHALCON_CALL_METHODW(&result, &query, "execute");
-	PHALCON_PTR_DTOR(&query);
 
 	if (zend_is_true(&result)) {
 		PHALCON_STR(&event_name, "afterQuery");
@@ -1622,22 +1611,13 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		 */
 		if (phalcon_array_isset_fetch_str(&hydration, &params, SL("hydration"))) {
 			PHALCON_CALL_METHODW(NULL, &result, "sethydratemode", &hydration);
-			PHALCON_PTR_DTOR(&hydration);
 		}
 
-		PHALCON_PTR_DTOR(&event_name);
-		PHALCON_PTR_DTOR(&params);
-		PHALCON_PTR_DTOR(&model);
 		RETURN_CTORW(&result);
 	} else if (zend_is_true(auto_create)) {
-		PHALCON_PTR_DTOR(&event_name);
-		PHALCON_PTR_DTOR(&params);
 		RETURN_CTORW(&model);
 	}
 
-	PHALCON_PTR_DTOR(&event_name);
-	PHALCON_PTR_DTOR(&params);
-	PHALCON_PTR_DTOR(&model);
 	RETURN_FALSE;
 }
 
@@ -2230,7 +2210,6 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 			PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(lower), data);
 		}
 
-		PHALCON_PTR_DTOR(&lower);
 
 		phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
 
@@ -6322,7 +6301,6 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	 * Original attributes
 	 */
 	PHALCON_CALL_METHODW(&attributes, &meta_data, "getattributes", getThis());
-	PHALCON_PTR_DTOR(&meta_data);
 
 	/**
 	 * Reverse column map
@@ -6358,24 +6336,18 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 			if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
 				PHALCON_CALL_ZVAL_METHODW(&possible_value, getThis(), &possible_getter);
 				phalcon_array_update_zval(&data, &attribute_field, &possible_value, PH_COPY);
-				PHALCON_PTR_DTOR(&possible_value);
 			} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), &attribute_field)) {
 				phalcon_array_update_zval(&data, &attribute_field, &attribute_value, PH_COPY);
-				PHALCON_PTR_DTOR(&attribute_value);
 			} else {
 				phalcon_array_update_zval(&data, &attribute_field, &PHALCON_GLOBAL(z_null), PH_COPY);
 			}
-			PHALCON_PTR_DTOR(&possible_getter);
 		} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), &attribute_field)) {
 			phalcon_array_update_zval(&data, &attribute_field, &attribute_value, PH_COPY);
 		} else {
 			phalcon_array_update_zval(&data, &attribute_field, &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
-		PHALCON_PTR_DTOR(&attribute_field);
 	} ZEND_HASH_FOREACH_END();
 
-	PHALCON_PTR_DTOR(&attributes);
-	PHALCON_PTR_DTOR(&column_map);
 
 	PHALCON_STR(&event_name, "afterToArray");
 
@@ -6383,7 +6355,6 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &data);
 	ZVAL_UNREF(&data);
 
-	PHALCON_PTR_DTOR(&event_name);
 	RETURN_CTORW(&data);
 }
 

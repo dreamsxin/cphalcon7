@@ -112,14 +112,12 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 
 	if (phalcon_require_ret(&config, Z_STRVAL(config_dir_path)) == FAILURE) {
 		zend_throw_exception_ex(phalcon_config_exception_ce, 0, "Configuration file '%s' cannot be read", Z_STRVAL(config_dir_path));
-		PHALCON_PTR_DTOR(&config_dir_path);
 		return;
 	}
-	PHALCON_PTR_DTOR(&config_dir_path);
 
 	if (Z_TYPE(config) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "val", &config);
 	}
-	PHALCON_PTR_DTOR(&config);
+
 	RETURN_THISW();
 }

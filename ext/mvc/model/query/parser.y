@@ -311,10 +311,8 @@ static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 		if (phalcon_array_isset_fetch(&values, ret, &key2, 0)) {
 			add_next_index_zval(&rows, &values);	
 		}
-		PHALCON_PTR_DTOR(&key2);
 	}
 
-	PHALCON_PTR_DTOR(&key1);
 	add_next_index_zval(&rows, V);
 	efree(V);
 

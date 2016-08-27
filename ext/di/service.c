@@ -216,14 +216,11 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 	phalcon_return_property(&shared_instance, getThis(), SL("_sharedInstance"));
 
 	ishared = zend_is_true(&shared);
-	PHALCON_PTR_DTOR(&shared);
 
 	/* Check if the service is shared */
 	if (ishared && Z_TYPE(shared_instance) != IS_NULL) {
 		RETURN_CTORW(&shared_instance);
 	}
-
-	PHALCON_PTR_DTOR(&shared_instance);
 
 	phalcon_return_property(&definition, getThis(), SL("_definition"));
 
@@ -255,10 +252,7 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 		object_init_ex(&builder, phalcon_di_service_builder_ce);
 
 		PHALCON_CALL_METHODW(return_value, &builder, "build", dependency_injector, &definition, parameters);
-		PHALCON_PTR_DTOR(&builder);
 	}
-
-	PHALCON_PTR_DTOR(&definition);
 
 	if (!EG(exception)) {
 		if (found) {
@@ -270,7 +264,6 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 		} else {
 			phalcon_return_property(&name, getThis(), SL("_name"));
 			PHALCON_THROW_EXCEPTION_FORMATW(phalcon_di_exception_ce, "Service '%s' cannot be resolved", Z_STRVAL(name));
-			PHALCON_PTR_DTOR(&name);
 		}
 	}
 }

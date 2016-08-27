@@ -193,7 +193,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	}
 
 	if (Z_TYPE(descriptor) != IS_ARRAY) {
-		PHALCON_PTR_DTOR(&descriptor);
 		RETURN_FALSE;
 	}
 
@@ -242,18 +241,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 			}
 			PHALCON_CONCAT_VSV(&dsn_attribute, &key, "=", value);
 			phalcon_array_append(&dsn_parts, &dsn_attribute, PH_COPY);
-			PHALCON_PTR_DTOR(&key);
-			PHALCON_PTR_DTOR(&dsn_attribute);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&dsn_attributes, SL(";"), &dsn_parts);
-		PHALCON_PTR_DTOR(&dsn_parts);
 	}
 
 	phalcon_read_property(&pdo_type, getThis(), SL("_type"), PH_NOISY);
 
 	PHALCON_CONCAT_VSV(&dsn, &pdo_type, ":", &dsn_attributes);
-	PHALCON_PTR_DTOR(&dsn_attributes);
 
 	/**
 	 * Default options
@@ -267,9 +262,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 		if (zend_is_true(&persistent)) {
 			phalcon_array_update_long_bool(&options, PDO_ATTR_PERSISTENT, 1, PH_COPY);
 		}
-		PHALCON_PTR_DTOR(&persistent);
 	}
-	PHALCON_PTR_DTOR(&descriptor);
 
 	/**
 	 * Create the connection using PDO
@@ -278,13 +271,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 
 	object_init_ex(&pdo, ce);
 	PHALCON_CALL_METHODW(NULL, &pdo, "__construct", &dsn, &username, &password, &options);
-	PHALCON_PTR_DTOR(&dsn);
-	PHALCON_PTR_DTOR(&username);
-	PHALCON_PTR_DTOR(&password);
-	PHALCON_PTR_DTOR(&options);
 
 	phalcon_update_property_zval(getThis(), SL("_pdo"), &pdo);
-	PHALCON_PTR_DTOR(&pdo);
 }
 
 /**
@@ -535,7 +523,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		PHALCON_STR(&event_name, "db:beforeExecute");
 		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), bind_params);
 		if (PHALCON_IS_FALSE(&status)) {
-			PHALCON_PTR_DTOR(&event_name);
 			RETURN_FALSE;
 		}
 	}
@@ -545,11 +532,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		if (Z_TYPE(statement) == IS_OBJECT) {
 			PHALCON_CALL_METHODW(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
 			PHALCON_CALL_METHODW(&affected_rows, &new_statement, "rowcount");
-			PHALCON_PTR_DTOR(&new_statement);
 		} else {
 			ZVAL_LONG(&affected_rows, 0);
 		}
-		PHALCON_PTR_DTOR(&statement);
 	} else {
 		phalcon_read_property(&pdo, getThis(), SL("_pdo"), PH_NOISY);
 		phalcon_read_property(&profiler, getThis(), SL("_profiler"), PH_NOISY);
@@ -572,9 +557,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 			PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
 		}
 	}
-
-	PHALCON_PTR_DTOR(&affected_rows);
-	PHALCON_PTR_DTOR(&event_name);
 
 	RETURN_TRUE;
 }

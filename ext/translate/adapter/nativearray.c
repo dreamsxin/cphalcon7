@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
-	zval *index, *placeholders = NULL, *translate, translation = {};
+	zval *index, *placeholders = NULL, translate = {}, translation = {};
 	zval *value;
 	zend_string *str_key;
 	ulong idx;
@@ -117,8 +117,8 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 		placeholders = &PHALCON_GLOBAL(z_null);
 	}
 	
-	translate = phalcon_read_property(getThis(), SL("_translate"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(&translation, translate, index)) {
+	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY);
+	if (!phalcon_array_isset_fetch(&translation, &translate, index, 0)) {
 		PHALCON_CPY_WRT_CTOR(&translation, index);
 	}
 
@@ -150,12 +150,12 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, exists){
 
-	zval *index, *translate;
+	zval *index, translate = {};
 
 	phalcon_fetch_params(0, 1, 0, &index);
 
-	translate = phalcon_read_property(getThis(), SL("_translate"), PH_NOISY);
-	if (phalcon_array_isset(translate, index)) {
+	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY);
+	if (phalcon_array_isset(&translate, index)) {
 		RETURN_TRUE;
 	}
 

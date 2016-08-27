@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, get){
 	}
 
 	phalcon_return_property(&annotations, getThis(), SL("_annotations"));
-	if (phalcon_array_isset_fetch(&class_annotations, &annotations, &real_class_name)) {
+	if (phalcon_array_isset_fetch(&class_annotations, &annotations, &real_class_name, 0)) {
 		RETURN_CTORW(&class_annotations);
 	}
 

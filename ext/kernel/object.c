@@ -671,9 +671,13 @@ int phalcon_read_property(zval *result, zval *object, const char *property_name,
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
+#if PHP_VERSION_ID >= 70100
 	old_scope = EG(fake_scope);
 	EG(fake_scope) = ce;
-
+#else
+	old_scope = EG(scope);
+	EG(scope) = ce;
+#endif
 	if (!Z_OBJ_HT_P(object)->read_property) {
 		const char *class_name;
 
@@ -692,7 +696,11 @@ int phalcon_read_property(zval *result, zval *object, const char *property_name,
 
 	zval_ptr_dtor(&property);
 
+#if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = old_scope;
+#else
+	EG(scope) = old_scope;
+#endif
 	return SUCCESS;
 }
 
@@ -700,10 +708,16 @@ int phalcon_read_property(zval *result, zval *object, const char *property_name,
  * Checks whether obj is an object and updates property with another zval
  */
 int phalcon_update_property_zval(zval *object, const char *property_name, uint32_t property_length, zval *value){
+
 	zend_class_entry *ce, *old_scope;
 	zval property;
 
+#if PHP_VERSION_ID >= 70100
 	old_scope = EG(fake_scope);
+#else
+	old_scope = EG(scope);
+#endif
+
 	if (Z_TYPE_P(object) != IS_OBJECT) {
 		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object");
 		return FAILURE;
@@ -714,7 +728,11 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
+#if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = ce;
+#else
+	EG(scope) = ce;
+#endif
 
 	if (!Z_OBJ_HT_P(object)->write_property) {
 		const char *class_name;
@@ -729,7 +747,12 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 	Z_OBJ_HT_P(object)->write_property(object, &property, value, 0);
 	zval_ptr_dtor(&property);
 
+#if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = old_scope;
+#else
+	EG(scope) = old_scope;
+#endif
+
 	return SUCCESS;
 }
 

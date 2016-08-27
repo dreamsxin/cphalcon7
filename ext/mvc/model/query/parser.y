@@ -303,12 +303,12 @@ static zval *phql_ret_insert_statement2(zval *ret, zval *F, zval *V)
 
 	ZVAL_STR(&key1, IS(rows));
 
-	if (!phalcon_array_isset_fetch(&rows, ret, &key1)) {
+	if (!phalcon_array_isset_fetch(&rows, ret, &key1, 0)) {
 		array_init_size(&rows, 1);		
 
 		ZVAL_STR(&key2, IS(values));
 
-		if (phalcon_array_isset_fetch(&values, ret, &key2)) {
+		if (phalcon_array_isset_fetch(&values, ret, &key2, 0)) {
 			add_next_index_zval(&rows, &values);	
 		}
 		PHALCON_PTR_DTOR(&key2);

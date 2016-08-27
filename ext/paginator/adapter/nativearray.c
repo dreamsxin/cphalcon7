@@ -137,21 +137,21 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 
-	zval *items, *limit, *number_page, start = {}, lim = {}, slice = {};
+	zval items = {}, limit = {}, number_page = {}, start = {}, lim = {}, slice = {};
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 	ldiv_t tp;
 
-	items = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	if (UNEXPECTED(Z_TYPE_P(items) != IS_ARRAY)) {
+	phalcon_read_property(&items, getThis(), SL("_data"), PH_NOISY);
+	if (UNEXPECTED(Z_TYPE(items) != IS_ARRAY)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Invalid data for paginator");
 		return;
 	}
 
-	limit         = phalcon_read_property(getThis(), SL("_limitRows"), PH_NOISY);
-	number_page   = phalcon_read_property(getThis(), SL("_page"), PH_NOISY);
-	i_limit       = phalcon_get_intval(limit);
-	i_number_page = phalcon_get_intval(number_page);
+	phalcon_read_property(&limit, getThis(), SL("_limitRows"), PH_NOISY);
+	phalcon_read_property(&number_page, getThis(), SL("_page"), PH_NOISY);
+	i_limit       = phalcon_get_intval(&limit);
+	i_number_page = phalcon_get_intval(&number_page);
 
 	if (i_limit < 1) {
 		/* This should never happen unless someone deliberately modified the properties of the object */
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 
 	i_number      = (i_number_page - 1) * i_limit;
 	i_before      = (i_number_page == 1) ? 1 : (i_number_page - 1);
-	i_rowcount    = zend_hash_num_elements(Z_ARRVAL_P(items));
+	i_rowcount    = zend_hash_num_elements(Z_ARRVAL(items));
 	tp            = ldiv(i_rowcount, i_limit);
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);
 	i_next        = (i_number_page < i_total_pages) ? (i_number_page + 1) : i_total_pages;
@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 	ZVAL_LONG(&start, i_number);
 	ZVAL_LONG(&lim, i_limit);
 
-	PHALCON_CALL_FUNCTIONW(&slice, "hash_pbkdf2", items, &start, &lim);
+	PHALCON_CALL_FUNCTIONW(&slice, "hash_pbkdf2", &items, &start, &lim);
 
 	object_init(return_value);
 	phalcon_update_property_zval(return_value, SL("items"),       &slice);

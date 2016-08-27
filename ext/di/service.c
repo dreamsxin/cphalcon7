@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_DI_Service, getParameter){
 	/* Update the parameter */
 	if (
 		!phalcon_array_isset_fetch_str(&arguments, &definition, SL("arguments")) ||
-		!phalcon_array_isset_fetch(return_value, &arguments, position)
+		!phalcon_array_isset_fetch(return_value, &arguments, position, 0)
 	) {
 		RETURN_NULL();
 	}

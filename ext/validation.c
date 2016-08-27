@@ -347,7 +347,7 @@ PHP_METHOD(Phalcon_Validation, getFilters){
 	
 	phalcon_return_property(&filters, getThis(), SL("_filters"));
 	if (attribute && Z_TYPE_P(attribute) == IS_STRING) {
-		if (phalcon_array_isset_fetch(&attribute_filters, &filters, attribute)) {
+		if (phalcon_array_isset_fetch(&attribute_filters, &filters, attribute, 0)) {
 			RETURN_CTORW(&attribute_filters);
 		}
 
@@ -483,7 +483,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 	 * Check if there is a calculated value
 	 */
 	phalcon_return_property(&values, getThis(), SL("_values"));
-	if (phalcon_array_isset_fetch(&value, &values, attribute)) {
+	if (phalcon_array_isset_fetch(&value, &values, attribute, 0)) {
 		RETURN_CTORW(&value);
 	}
 	
@@ -500,7 +500,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 	if (Z_TYPE(value) != IS_NULL) {
 		phalcon_return_property(&filters, getThis(), SL("_filters"));
 		if (Z_TYPE(filters) == IS_ARRAY) { 
-			if (phalcon_array_isset_fetch(&field_filters, &filters, attribute)) {
+			if (phalcon_array_isset_fetch(&field_filters, &filters, attribute, 0)) {
 				if (zend_is_true(&field_filters)) {
 					ZVAL_STRING(&service_name, ISV(filter));
 	
@@ -589,7 +589,7 @@ PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 	phalcon_fetch_params(0, 1, 0, &type);
 
 	phalcon_read_property(&messages, getThis(), SL("_defaultMessages"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&msg, &messages, type)) {
+	if (phalcon_array_isset_fetch(&msg, &messages, type, 0)) {
 		RETURN_CTORW(&msg);
 	}
 
@@ -639,7 +639,7 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 
 	phalcon_return_property(&labels, getThis(), SL("_labels"));
 	if (Z_TYPE(labels) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&value, &labels, &field)) {
+		if (phalcon_array_isset_fetch(&value, &labels, &field, 0)) {
 			RETURN_CTORW(&value);
 		}
 	}

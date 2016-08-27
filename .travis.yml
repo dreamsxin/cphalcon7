@@ -12,7 +12,14 @@ git:
   depth: 1
 
 cache:
-    - apt
+  apt: true
+  ccache: true
+  timeout: 691200
+  directories:
+    - .temp
+    #- vendor
+    - $HOME/.ccache
+    - $HOME/.composer/cache
 
 services:
   - mongodb
@@ -28,10 +35,12 @@ before_install:
 before_script:
  - git submodule --quiet update --init --recursive
  - (cd ext; export CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --silent --enable-phalcon && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/phalcon.ini)
- - ulimit -c unlimited || true
+ - ulimit -c unlimited -S || true
+ - php --ri phalcon
+ - echo '/tmp/core_%e.%p' | sudo tee /proc/sys/kernel/core_pattern &> /dev/null
 
 script:
- - ZEND_DONT_UNLOAD_MODULES=1 $(phpenv which php) ./unit-tests/ci/phpunit.php --debug -c unit-tests/phpunit.xml
+ - vendor/bin/phpunit --bootstrap unit-tests/ci/phpunit.php --debug unit-tests/
 
 after_failure:
  - ./unit-tests/ci/after_failure.sh
@@ -46,5 +55,3 @@ addons:
       - gdb
       - re2c
       - libpng12-dev
-      - libqrencode-dev
-      - libzbar-dev

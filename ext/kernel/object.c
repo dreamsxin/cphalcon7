@@ -123,9 +123,13 @@ int phalcon_static_property_decr_ce(zend_class_entry *ce, const char *property, 
  */
 void phalcon_get_class(zval *result, const zval *object, int lower) {
 
+	zend_class_entry *ce;
+	zend_string *class_name;
+
 	if (Z_TYPE_P(object) == IS_OBJECT) {
-		const zend_class_entry *ce = Z_OBJCE_P(object);
-		ZVAL_STR(result, zend_string_dup(ce->name, 0));
+		ce = Z_OBJCE_P(object);
+		class_name = zend_string_init(ZSTR_VAL(ce->name), ZSTR_LEN(ce->name), 0);
+		ZVAL_STR(result, class_name);
 
 		if (lower) {
 			phalcon_strtolower_inplace(result);

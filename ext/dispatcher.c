@@ -394,12 +394,13 @@ PHP_METHOD(Phalcon_Dispatcher, setParam){
  */
 PHP_METHOD(Phalcon_Dispatcher, getParam){
 
-	zval *param, *filters = NULL, *default_value = NULL, *params, param_value = {}, dependency_injector = {}, exception_code = {}, exception_message = {}, service = {}, filter = {};
+	zval *param, *filters = NULL, *default_value = NULL, params = {}, param_value = {}, dependency_injector = {}, exception_code = {}, exception_message = {};
+	zval service = {}, filter = {};
 
 	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
 
-	params = phalcon_read_property(getThis(), SL("_params"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&param_value, params, param)) {
+	phalcon_read_property(&params, getThis(), SL("_params"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&param_value, &params, param, 0)) {
 		if (filters && Z_TYPE_P(filters) != IS_NULL) {
 			PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -434,12 +435,12 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
  */
 PHP_METHOD(Phalcon_Dispatcher, getActiveMethod){
 
-	zval *suffix, *action_name;
+	zval suffix = {}, action_name = {};
 
-	suffix      = phalcon_read_property(getThis(), SL("_actionSuffix"), PH_NOISY);
-	action_name = phalcon_read_property(getThis(), SL("_actionName"), PH_NOISY);
+	phalcon_read_property(&suffix, getThis(), SL("_actionSuffix"), PH_NOISY);
+	phalcon_read_property(&action_name, getThis(), SL("_actionName"), PH_NOISY);
 
-	PHALCON_CONCAT_VV(return_value, action_name, suffix);
+	PHALCON_CONCAT_VV(return_value, &action_name, &suffix);
 }
 
 /**
@@ -504,7 +505,8 @@ PHP_METHOD(Phalcon_Dispatcher, getReturnedValue){
  */
 PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
-	zval dependency_injector = {}, events_manager = {}, event_name = {}, exception_code = {}, exception_message = {}, status = {}, handler = {}, *handler_suffix, *action_suffix;
+	zval dependency_injector = {}, events_manager = {}, event_name = {}, exception_code = {}, exception_message = {}, status = {}, handler = {};
+	zval handler_suffix = {}, action_suffix = {};
 	int number_dispatches = 0, max_dispatches = 256;
 
 	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
@@ -526,8 +528,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		RETURN_FALSE;
 	}
 
-	handler_suffix = phalcon_read_property(getThis(), SL("_handlerSuffix"), PH_NOISY);
-	action_suffix  = phalcon_read_property(getThis(), SL("_actionSuffix"), PH_NOISY);
+	phalcon_read_property(&handler_suffix, getThis(), SL("_handlerSuffix"), PH_NOISY);
+	phalcon_read_property(&action_suffix, getThis(), SL("_actionSuffix"), PH_NOISY);
 
 	/**
 	 * Do at least one dispatch
@@ -632,12 +634,12 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				phalcon_camelize(&camelized_namespace, &namespace_name);
 			}
 			if (phalcon_end_with_str(&camelized_namespace, SL("\\"))) {
-				PHALCON_CONCAT_VVV(&handler_class, &camelized_namespace, &camelized_class, handler_suffix);
+				PHALCON_CONCAT_VVV(&handler_class, &camelized_namespace, &camelized_class, &handler_suffix);
 			} else {
-				PHALCON_CONCAT_VSVV(&handler_class, &camelized_namespace, "\\", &camelized_class, handler_suffix);
+				PHALCON_CONCAT_VSVV(&handler_class, &camelized_namespace, "\\", &camelized_class, &handler_suffix);
 			}
 		} else {
-			PHALCON_CONCAT_VV(&handler_class, &camelized_class, handler_suffix);
+			PHALCON_CONCAT_VV(&handler_class, &camelized_class, &handler_suffix);
 		}
 
 		/**
@@ -706,7 +708,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Check if the method exists in the handler
 		 */
-		PHALCON_CONCAT_VV(&action_method, &action_name, action_suffix);
+		PHALCON_CONCAT_VV(&action_method, &action_name, &action_suffix);
 		if (phalcon_method_exists(&handler, &action_method) == FAILURE) {
 
 			/**
@@ -1054,59 +1056,59 @@ PHP_METHOD(Phalcon_Dispatcher, wasForwarded){
  */
 PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 
-	zval *handler_suffix, *namespace_name, *handler_name, camelized_class = {}, *camelize, camelized_namespace = {};
+	zval handler_suffix = {}, namespace_name = {}, handler_name = {}, camelized_class = {}, camelize = {}, camelized_namespace = {};
 
 	/**
 	 * The handler suffix
 	 */
-	handler_suffix = phalcon_read_property(getThis(), SL("_handlerSuffix"), PH_NOISY);
+	phalcon_read_property(&handler_suffix, getThis(), SL("_handlerSuffix"), PH_NOISY);
 
 	/**
 	 * If the current namespace is null we used the set in this_ptr::_defaultNamespace
 	 */
-	namespace_name = phalcon_read_property(getThis(), SL("_namespaceName"), PH_NOISY);
-	if (!zend_is_true(namespace_name)) {
-		namespace_name = phalcon_read_property(getThis(), SL("_defaultNamespace"), PH_NOISY);
-		phalcon_update_property_zval(getThis(), SL("_namespaceName"), namespace_name);
+	phalcon_read_property(&namespace_name, getThis(), SL("_namespaceName"), PH_NOISY);
+	if (!zend_is_true(&namespace_name)) {
+		phalcon_read_property(&namespace_name, getThis(), SL("_defaultNamespace"), PH_NOISY);
+		phalcon_update_property_zval(getThis(), SL("_namespaceName"), &namespace_name);
 	}
 
 	/**
 	 * If the handler is null we use the set in this_ptr::_defaultHandler
 	 */
-	handler_name = phalcon_read_property(getThis(), SL("_handlerName"), PH_NOISY);
-	if (!zend_is_true(handler_name)) {
-		handler_name = phalcon_read_property(getThis(), SL("_defaultHandler"), PH_NOISY);
-		phalcon_update_property_zval(getThis(), SL("_handlerName"), handler_name);
+	phalcon_read_property(&handler_name, getThis(), SL("_handlerName"), PH_NOISY);
+	if (!zend_is_true(&handler_name)) {
+		phalcon_read_property(&handler_name, getThis(), SL("_defaultHandler"), PH_NOISY);
+		phalcon_update_property_zval(getThis(), SL("_handlerName"), &handler_name);
 	}
 
 	/**
 	 * We don't camelize the classes if they are in namespaces
 	 */
-	if (!phalcon_memnstr_str(handler_name, SL("\\"))) {
-		phalcon_camelize(&camelized_class, handler_name);
-	} else if (phalcon_start_with_str(handler_name, SL("\\"))) {
-		ZVAL_STRINGL(&camelized_class, Z_STRVAL_P(handler_name)+1, Z_STRLEN_P(handler_name)-1);
+	if (!phalcon_memnstr_str(&handler_name, SL("\\"))) {
+		phalcon_camelize(&camelized_class, &handler_name);
+	} else if (phalcon_start_with_str(&handler_name, SL("\\"))) {
+		ZVAL_STRINGL(&camelized_class, Z_STRVAL(handler_name)+1, Z_STRLEN(handler_name)-1);
 	} else {
-		PHALCON_CPY_WRT(&camelized_class, handler_name);
+		PHALCON_CPY_WRT(&camelized_class, &handler_name);
 	}
 
 	/**
 	 * Create the complete controller class name prepending the namespace
 	 */
-	if (zend_is_true(namespace_name)) {
-		camelize = phalcon_read_property(getThis(), SL("_camelizeNamespace"), PH_NOISY);
-		if (!zend_is_true(camelize)) {
-			PHALCON_CPY_WRT(&camelized_namespace, namespace_name);
+	if (zend_is_true(&namespace_name)) {
+		phalcon_read_property(&camelize, getThis(), SL("_camelizeNamespace"), PH_NOISY);
+		if (!zend_is_true(&camelize)) {
+			PHALCON_CPY_WRT(&camelized_namespace, &namespace_name);
 		} else {
-			phalcon_camelize(&camelized_namespace, namespace_name);
+			phalcon_camelize(&camelized_namespace, &namespace_name);
 		}
 		if (phalcon_end_with_str(&camelized_namespace, SL("\\"))) {
-			PHALCON_CONCAT_VVV(return_value, &camelized_namespace, &camelized_class, handler_suffix);
+			PHALCON_CONCAT_VVV(return_value, &camelized_namespace, &camelized_class, &handler_suffix);
 		} else {
-			PHALCON_CONCAT_VSVV(return_value, &camelized_namespace, "\\", &camelized_class, handler_suffix);
+			PHALCON_CONCAT_VSVV(return_value, &camelized_namespace, "\\", &camelized_class, &handler_suffix);
 		}
 	} else {
-		PHALCON_CONCAT_VV(return_value, &camelized_class, handler_suffix);
+		PHALCON_CONCAT_VV(return_value, &camelized_class, &handler_suffix);
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_false));
@@ -1186,7 +1188,7 @@ PHP_METHOD(Phalcon_Dispatcher, setErrorHandler){
  */
 PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 
-	zval *exception_code = NULL, *error_handlers, error_handler = {};
+	zval *exception_code = NULL, error_handlers = {}, error_handler = {};
 
 	phalcon_fetch_params(0, 0, 1, &exception_code);
 
@@ -1194,10 +1196,10 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 		exception_code = &PHALCON_GLOBAL(z_zero);
 	}
 
-	error_handlers = phalcon_read_property(getThis(), SL("_errorHandlers"), PH_NOISY);
+	phalcon_read_property(&error_handlers, getThis(), SL("_errorHandlers"), PH_NOISY);
 
-	if (Z_TYPE_P(error_handlers) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&error_handler, error_handlers, exception_code)) {
+	if (Z_TYPE(error_handlers) == IS_ARRAY) {
+		if (phalcon_array_isset_fetch(&error_handler, &error_handlers, exception_code, 0)) {
 			RETURN_CTORW(&error_handler);
 		}
 	}

@@ -521,7 +521,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		convert_to_string(&iv);
 	}
 
-	PHALCON_CALL_FUNCTIONW(&block_size, "mcrypt_get_block_size", cipher, mode);
+	PHALCON_CALL_FUNCTIONW(&block_size, "mcrypt_get_block_size", &cipher, &mode);
 	if (unlikely(Z_TYPE(block_size) != IS_LONG)) {
 		convert_to_long(&block_size);
 	}
@@ -533,7 +533,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	assert(Z_TYPE(mode) == IS_STRING);
 	assert(Z_TYPE(text) == IS_STRING);
 
-	phalcon_crypt_pad_text(&padded, &text, mode, Z_LVAL(block_size), Z_LVAL(padding_type));
+	phalcon_crypt_pad_text(&padded, &text, &mode, Z_LVAL(block_size), Z_LVAL(padding_type));
 	assert(Z_TYPE(padded) == IS_STRING);
 
 	PHALCON_CALL_FUNCTIONW(&encrypt, "mcrypt_encrypt", &cipher, &encrypt_key, &padded, &mode, &iv);

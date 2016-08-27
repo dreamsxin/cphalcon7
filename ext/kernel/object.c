@@ -265,6 +265,7 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower) {
  */
 void phalcon_get_called_class(zval *return_value)
 {
+#if PHP_VERSION_ID >= 70100
 	zend_class_entry *called_scope = zend_get_called_scope(EG(current_execute_data));
 	if (called_scope) {
 		ZVAL_STR(return_value, zend_string_dup(called_scope->name, 0));
@@ -273,6 +274,17 @@ void phalcon_get_called_class(zval *return_value)
 	if (!zend_get_executed_scope())  {
 		php_error_docref(NULL, E_WARNING, "phalcon_get_called_class() called from outside a class");
 	}
+#else
+	if (EG(current_execute_data)->called_scope) {
+		zend_string *ret = EG(current_execute_data)->called_scope->name;
+		zend_string_addref(ret);
+		RETURN_STR(ret);
+	}
+
+	if (!EG(scope))  {
+		php_error_docref(NULL, E_WARNING, "zephir_get_called_class() called from outside a class");
+	}
+#endif
 }
 
 /**

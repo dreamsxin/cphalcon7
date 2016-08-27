@@ -109,7 +109,7 @@ PHALCON_INIT_CLASS(Phalcon_Flash){
  */
 PHP_METHOD(Phalcon_Flash, __construct){
 
-	zval *_css_classes, css_classes = {};
+	zval *_css_classes = NULL, css_classes = {};
 
 	phalcon_fetch_params(0, 0, 1, &_css_classes);
 

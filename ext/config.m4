@@ -417,7 +417,6 @@ image/adapterinterface.c \
 image/exception.c \
 image/adapter/gd.c \
 image/adapter/imagick.c \
-chart/qrcode.c \
 chart/captcha.c \
 chart/exception.c \
 async.c \
@@ -528,27 +527,6 @@ registry.c"
 			break
 		fi
 	done
-
-	if test -n "$PNG_CFLAGS"; then
-		for i in /usr/local /usr; do
-			if test -r $i/include/qrencode.h; then
-				QR_CFLAGS=`pkg-config --cflags libqrencode`
-				QR_LDFLAGS=`pkg-config --libs libqrencode`
-
-				PHP_ADD_INCLUDE($i/include)
-
-				CPPFLAGS="${CPPFLAGS} ${QR_CFLAGS}"
-				EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${QR_LDFLAGS}"
-
-				AC_MSG_RESULT("libqrencode found")
-
-				AC_DEFINE([PHALCON_USE_QRENCODE], [1], [Have libqrencode support])
-				break
-			fi
-		done
-	else
-		AC_MSG_RESULT([libpng not found])
-	fi
 
 	for i in /usr/local /usr; do
 		if test -r $i/bin/MagickWand-config; then

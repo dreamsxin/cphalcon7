@@ -1,9 +1,15 @@
 language: php
-sudo: false
+
+sudo: required
+dist: precise
 
 php:
+  - 7.0
   - 7.1
   - nightly
+
+git:
+  depth: 1
 
 cache:
     - apt

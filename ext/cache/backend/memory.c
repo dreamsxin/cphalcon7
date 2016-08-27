@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));
-	if (phalcon_array_isset_fetch(&cached_content, &data, &last_key)) {
+	if (phalcon_array_isset_fetch(&cached_content, &data, &last_key, 0)) {
 		if (Z_TYPE(cached_content) != IS_NULL) {
 			if (phalcon_is_numeric(&cached_content)) {
 				RETURN_CTORW(&cached_content);
@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));
-	if (!phalcon_array_isset_fetch(&cached_content, &data, &last_key)) {
+	if (!phalcon_array_isset_fetch(&cached_content, &data, &last_key, 0)) {
 		RETURN_FALSE;
 	}
 
@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, decrement){
 	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));
-	if (!phalcon_array_isset_fetch(&cached_content, &data, &last_key)) {
+	if (!phalcon_array_isset_fetch(&cached_content, &data, &last_key, 0)) {
 		RETURN_FALSE;
 	}
 

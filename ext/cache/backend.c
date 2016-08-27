@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend, start){
 
-	zval *key_name, *lifetime = NULL, *fresh = NULL, *frontend;
+	zval *key_name, *lifetime = NULL, *fresh = NULL, frontend = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 	
@@ -138,8 +138,8 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	if (Z_TYPE_P(return_value) == IS_NULL) {
 		fresh = &PHALCON_GLOBAL(z_true);
 	
-		frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
-		PHALCON_CALL_METHODW(NULL, frontend, "start");
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		PHALCON_CALL_METHODW(NULL, &frontend, "start");
 	} else {
 		fresh = &PHALCON_GLOBAL(z_false);
 	}
@@ -162,13 +162,13 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
  */
 PHP_METHOD(Phalcon_Cache_Backend, stop){
 
-	zval *stop_buffer = NULL, *frontend;
+	zval *stop_buffer = NULL, frontend = {};
 
 	phalcon_fetch_params(0, 0, 1, &stop_buffer);
 	
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
-		frontend = phalcon_read_property(getThis(), SL("_frontend"), PH_NOISY);
-		PHALCON_CALL_METHODW(NULL, frontend, "stop");
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		PHALCON_CALL_METHODW(NULL, &frontend, "stop");
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);

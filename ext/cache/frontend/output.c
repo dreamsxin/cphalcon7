@@ -137,10 +137,10 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Output, getLifetime){
 
-	zval *options, lifetime = {};
+	zval options = {}, lifetime = {};
 
-	options = phalcon_read_property(getThis(), SL("_frontendOptions"), PH_NOISY);
-	if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+	phalcon_read_property(&options, getThis(), SL("_frontendOptions"), PH_NOISY);
+	if (phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"))) {
 		RETURN_CTORW(&lifetime);
 	}
 	else {
@@ -175,10 +175,10 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, start){
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Output, getContent){
 
-	zval *buffering;
+	zval buffering = {};
 
-	buffering = phalcon_read_property(getThis(), SL("_buffering"), PH_NOISY);
-	if (zend_is_true(buffering)) {
+	phalcon_read_property(&buffering, getThis(), SL("_buffering"), PH_NOISY);
+	if (zend_is_true(&buffering)) {
 		phalcon_ob_get_contents(return_value);
 	}
 }
@@ -188,10 +188,10 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, getContent){
  */
 PHP_METHOD(Phalcon_Cache_Frontend_Output, stop){
 
-	zval *buffering;
+	zval buffering = {};
 
-	buffering = phalcon_read_property(getThis(), SL("_buffering"), PH_NOISY);
-	if (zend_is_true(buffering)) {
+	phalcon_read_property(&buffering, getThis(), SL("_buffering"), PH_NOISY);
+	if (zend_is_true(&buffering)) {
 		phalcon_ob_end_clean();
 	}
 	

@@ -22,7 +22,7 @@
 
 #include "php_phalcon.h"
 
-int phalcon_require_ret(zval *return_value, const char *require_path) PHALCON_ATTR_NONNULL1(2);
+int phalcon_require_ret(zval *return_value_ptr, const char *require_path) PHALCON_ATTR_NONNULL1(2);
 
 PHALCON_ATTR_NONNULL static inline int phalcon_require(const char *require_path)
 {

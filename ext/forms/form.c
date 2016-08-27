@@ -559,15 +559,15 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 
 	phalcon_fetch_params(0, 0, 2, &_data, &entity);
 
+	if (!entity) {
+		entity = &PHALCON_GLOBAL(z_null);
+	}
+
 	if (_data && !PHALCON_IS_EMPTY(_data)) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "bind", _data, entity);
 	}
 
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
-
-	if (!entity) {
-		entity = &PHALCON_GLOBAL(z_null);
-	}
 
 	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
 	if (Z_TYPE(elements) != IS_ARRAY) {

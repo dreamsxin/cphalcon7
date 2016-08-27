@@ -101,16 +101,12 @@ static inline int phalcon_read_property_zval(zval *result, zval *object, zval *p
  */
 static inline int phalcon_return_property(zval *return_value, zval *object, const char *property_name, uint32_t property_length)
 {
-	ZVAL_NULL(return_value);
-	phalcon_read_property(return_value, object, property_name, property_length, 0);
-	return FAILURE;
+	return phalcon_read_property(return_value, object, property_name, property_length, 0);
 }
 
 static inline int phalcon_return_property_zval(zval *return_value, zval *object, zval *property)
 {
-	ZVAL_NULL(return_value);
-	phalcon_read_property_zval(return_value, object, property, PH_NOISY);
-	return FAILURE;
+	return phalcon_read_property_zval(return_value, object, property, PH_NOISY);
 }
 
 /** Updating properties */

@@ -81,17 +81,15 @@ int ZEND_FASTCALL phalcon_array_isset(const zval *arr, const zval *index)
 			return zend_hash_index_exists(h, (ulong)Z_DVAL_P(index));
 
 		case IS_TRUE:
-			return zend_hash_index_exists(h, 1);
-
 		case IS_FALSE:
-			return zend_hash_index_exists(h, 0);
+			return zend_hash_index_exists(h, Z_TYPE_P(index) == IS_TRUE ? 1 : 0);
 
 		case IS_LONG:
 		case IS_RESOURCE:
 			return zend_hash_index_exists(h, Z_LVAL_P(index));
 
 		case IS_STRING:
-			return zend_hash_exists(h, Z_STR_P(index));
+			return zend_symtable_exists(h, Z_STR_P(index));
 
 		default:
 			zend_error(E_WARNING, "Illegal offset type");

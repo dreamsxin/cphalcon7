@@ -154,7 +154,7 @@ static const zend_function_entry phalcon_debug_method_entry[] = {
 	PHP_ME(Phalcon_Debug, getLinesAfterContext, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug, setLinesAfterContext, arginfo_phalcon_debug_setlines, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug, getFileLink, arginfo_phalcon_debug_getfilelink, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Debug, enable, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Debug, enable, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 

@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	 */
 	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(routes), route) {
+	ZEND_HASH_REVERSE_FOREACH_VAL(Z_ARRVAL(routes), route) {
 		zval case_sensitive = {}, methods = {}, match_method = {}, hostname = {}, regex_host_name = {}, matched = {};
 		zval pattern = {}, case_pattern = {}, before_match = {}, before_match_params = {}, paths = {};
 		zval converters = {}, *position;

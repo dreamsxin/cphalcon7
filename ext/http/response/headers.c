@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, set){
 	zval *name, *value;
 
 	phalcon_fetch_params(0, 2, 0, &name, &value);
-	
+
 	phalcon_update_property_array(getThis(), SL("_headers"), name, value);
 	
 }

@@ -640,8 +640,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsManager){
 
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		PHALCON_STR(&service_name, "modelsManager");
-		PHALCON_RETURN_CALL_METHODW(getThis(), "getresolveservice", &service_name);
-		PHALCON_PTR_DTOR(&service_name);
+		PHALCON_CALL_METHODW(return_value, getThis(), "getresolveservice", &service_name);
+		phalcon_update_property_zval(getThis(), SL("_modelsManager"), return_value);
 	}
 }
 
@@ -1554,7 +1554,6 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	}
 
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name, &PHALCON_GLOBAL(z_true));
-	PHALCON_PTR_DTOR(&manager);
 
 	/**
 	 * Builds a query with the passed parameters

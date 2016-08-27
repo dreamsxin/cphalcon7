@@ -264,9 +264,9 @@ void phalcon_camelize(zval *return_value, const zval *str){
 	smart_str_0(&camelize_str);
 
 	if (camelize_str.s) {
-		RETURN_NEW_STR(camelize_str.s);
+		ZVAL_NEW_STR(return_value, camelize_str.s);
 	} else {
-		RETURN_EMPTY_STRING();
+		ZVAL_EMPTY_STRING(return_value);
 	}
 
 }

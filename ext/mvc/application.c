@@ -513,13 +513,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 
 			if (PHALCON_IS_FALSE(&possible_response)) {
-				PHALCON_PTR_DTOR(&possible_response);
-				PHALCON_PTR_DTOR(&controller);
-				PHALCON_PTR_DTOR(&dispatcher);
-				PHALCON_PTR_DTOR(&status);
-				PHALCON_PTR_DTOR(&event_name);
-				PHALCON_PTR_DTOR(&service);
-
 				RETURN_CTORW(&response);
 			}
 
@@ -556,10 +549,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 						/* Automatic render based on the latest controller executed */
 						PHALCON_CALL_METHODW(NULL, &view, "render", &controller_name, &action_name, &params, &namespace_name);
 					}
-					PHALCON_PTR_DTOR(&namespace_name);
-					PHALCON_PTR_DTOR(&controller_name);
-					PHALCON_PTR_DTOR(&action_name);
-					PHALCON_PTR_DTOR(&params);
 				}
 
 				PHALCON_STR(&event_name, "application:afterRenderView");
@@ -576,8 +565,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
 	}
 
-	PHALCON_PTR_DTOR(&service);
-
 	/* Calling beforeSendResponse */
 	PHALCON_STR(&event_name, "application:beforeSendResponse");
 
@@ -586,12 +573,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_UNREF(&response);
 
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_PTR_DTOR(&possible_response);
-		PHALCON_PTR_DTOR(&controller);
-		PHALCON_PTR_DTOR(&dispatcher);
-		PHALCON_PTR_DTOR(&response);
-		PHALCON_PTR_DTOR(&status);
-		PHALCON_PTR_DTOR(&event_name);
 		RETURN_FALSE;
 	}
 
@@ -602,9 +583,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			/* The content returned by the view is passed to the response service */
 			PHALCON_CALL_METHODW(&content, &view, "getcontent");
 			PHALCON_CALL_METHODW(NULL, &response, "setcontent", &content);
-			PHALCON_PTR_DTOR(&content);
 		}
-		PHALCON_PTR_DTOR(&view);
 	}
 
 	/* Headers & Cookies are automatically sent */
@@ -616,12 +595,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_MAKE_REF(&response);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &response);
 	ZVAL_UNREF(&response);
-
-	PHALCON_PTR_DTOR(&possible_response);
-	PHALCON_PTR_DTOR(&controller);
-	PHALCON_PTR_DTOR(&dispatcher);
-	PHALCON_PTR_DTOR(&status);
-	PHALCON_PTR_DTOR(&event_name);
 
 	/* Return the response */
 	RETURN_CTORW(&response);

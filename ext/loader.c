@@ -572,8 +572,8 @@ PHP_METHOD(Phalcon_Loader, findFile){
  */
 PHP_METHOD(Phalcon_Loader, autoLoad){
 
-	zval *class_name, events_manager = {}, event_name = {}, classes = {}, file_path = {}, found = {}, ds = {}, namespace_separator = {}, extensions = {}, empty_str = {};
-	zval namespaces = {}, *directory, pseudo_separator = {}, prefixes = {}, ds_class_name = {}, ns_class_name = {}, directories = {};
+	zval *class_name, events_manager = {}, event_name = {}, classes = {}, file_path = {}, found = {}, ds = {}, namespace_separator = {};
+	zval extensions = {}, empty_str = {}, namespaces = {}, *directory, pseudo_separator = {}, prefixes = {}, ds_class_name = {}, ns_class_name = {}, directories = {};
 	zend_string *str_key;
 	ulong idx;
 	char slash[2] = {DEFAULT_SLASH, 0};

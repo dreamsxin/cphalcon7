@@ -265,6 +265,8 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 
 	if (_local) {
 		PHALCON_CPY_WRT_CTOR(&local, _local);
+	} else {
+		ZVAL_TRUE(&local);
 	}
 
 	PHALCON_CALL_METHODW(&base_uri, getThis(), "getbaseuri");

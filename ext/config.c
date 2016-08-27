@@ -179,11 +179,9 @@ PHP_METHOD(Phalcon_Config, val){
 			object_init_ex(&instance, phalcon_config_ce);
 			PHALCON_CALL_METHODW(NULL, &instance, "__construct", value);
 			PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, &instance);
-			PHALCON_PTR_DTOR(&instance);
 		} else {
 			PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, value);
 		}
-		PHALCON_PTR_DTOR(&key);
 	} ZEND_HASH_FOREACH_END();
 }
 

@@ -565,7 +565,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 
 	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
-	if (Z_TYPE(header) < IS_NULL) {
+	if (Z_TYPE(header) <= IS_NULL) {
 		ZVAL_STRING(&service_name, ISV(url));
 
 		PHALCON_CALL_METHODW(&url, &dependency_injector, "getshared", &service_name);

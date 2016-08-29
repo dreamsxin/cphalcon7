@@ -215,7 +215,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 
 	parser_status->status = PHQL_PARSING_OK;
 	parser_status->scanner_state = state;
-	parser_status->ret = NULL;
+	ZVAL_UNDEF(&parser_status->ret);
 	parser_status->syntax_error = NULL;
 	parser_status->token = &token;
 	parser_status->enable_literals = phalcon_globals_ptr->orm.enable_literals;
@@ -569,20 +569,16 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 
 	if (status != FAILURE) {
 		if (parser_status->status == PHQL_PARSING_OK) {
-			if (parser_status->ret) {
+			if (Z_TYPE_P(&parser_status->ret) == IS_ARRAY) {
 
 				/**
 				 * Set a unique id for the parsed ast
 				 */
 				if (phalcon_globals_ptr->orm.cache_level >= 1) {
-					if (Z_TYPE_P(parser_status->ret) == IS_ARRAY) {
-						add_assoc_long(parser_status->ret, "id", Z_LVAL(unique_id));
-					}
+					add_assoc_long(&parser_status->ret, "id", Z_LVAL(unique_id));
 				}
 
-				ZVAL_COPY(result, parser_status->ret);
-				efree(parser_status->ret);
-				parser_status->ret = NULL;
+				ZVAL_COPY(result, &parser_status->ret);
 
 				/**
 				 * Store the parsed definition in the cache

@@ -31,7 +31,7 @@ typedef struct _phql_parser_token {
 } phql_parser_token;
 
 typedef struct _phql_parser_status {
-	zval *ret;
+	zval ret;
 	char* phql;
 	unsigned int phql_length;
 	int status;

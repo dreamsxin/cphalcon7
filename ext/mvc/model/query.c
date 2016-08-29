@@ -50,6 +50,7 @@
 #include "kernel/framework/orm.h"
 #include "kernel/hash.h"
 #include "kernel/file.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -3123,7 +3124,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
-	zval event_name = {}, intermediate, phql = {}, ast = {}, type = {}, unique_id = {}, ir_phql_cache = {}, ir_phql_cache2 = {}, ir_phql = {}, model_names = {}, exception_message = {};
+	zval event_name = {}, intermediate, phql = {}, ast = {}, type = {}, unique_id = {}, ir_phql_cache = {}, ir_phql_cache2 = {}, ir_phql = {};
+	zval model_names = {}, exception_message = {}, debug_message = {};
 	zval manager = {}, tables = {}, key_schema = {}, key_source = {}, *model_name;
 	zend_string *str_key;
 	ulong idx;
@@ -3139,6 +3141,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "Parse PHQL: ", &phql);
+		phalcon_debug_print_r(&debug_message);
+	}
 
 	/** 
 	 * This function parses the PHQL statement

@@ -34,6 +34,7 @@
 #include "kernel/array.h"
 #include "kernel/framework/router.h"
 #include "kernel/hash.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -400,7 +401,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, via){
 PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 
 	zval *pattern, *paths = NULL, *regex = NULL, module_name = {}, controller_name = {}, action_name = {}, parts = {}, number_parts = {}, route_paths = {};
-	zval real_class_name = {}, namespace_name = {}, lower_name = {}, pcre_pattern = {}, compiled_pattern = {};
+	zval real_class_name = {}, namespace_name = {}, lower_name = {}, pcre_pattern = {}, compiled_pattern = {}, debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &pattern, &paths, &regex);
 
@@ -506,6 +507,12 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 				phalcon_array_update_str(&route_paths, SL("action"), &action_name, PH_COPY);
 			}
 		} else {
+			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+				PHALCON_STR(&debug_message, "Add Route paths: ");
+				phalcon_debug_print_r(&debug_message);
+				phalcon_debug_print_r(paths);
+			}
+
 			PHALCON_CPY_WRT_CTOR(&route_paths, paths);
 			if (Z_TYPE(route_paths) == IS_ARRAY) {
 				if (phalcon_array_isset_fetch_str(&controller_name, &route_paths, SL("controller"))) {

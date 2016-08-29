@@ -540,8 +540,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				/** 
 				 * Return true mean success
 				 */
-				RETVAL_TRUE;
-				break;
+				RETURN_TRUE;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &file_path);
 				phalcon_debug_print_r(&debug_message);

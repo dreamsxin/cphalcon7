@@ -634,7 +634,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	phalcon_update_property_null(getThis(), SL("_matchedRoute"));
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_CONCAT_SV(&debug_message, "Handle the URI pattern: ", &real_uri);
+		PHALCON_CONCAT_SV(&debug_message, "Handle the URI: ", &real_uri);
 		phalcon_debug_print_r(&debug_message);
 	}
 
@@ -772,8 +772,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 			if (zend_is_true(&route_found)) {
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-					PHALCON_CONCAT_SV(&debug_message, "--Found Route: ", &pattern);
+					PHALCON_STR(&debug_message, "--Found matches: ");
 					phalcon_debug_print_r(&debug_message);
+					phalcon_debug_print_r(&matches);
 				}
 
 				/**
@@ -781,6 +782,12 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				 */
 				PHALCON_CALL_METHODW(&paths, route, "getpaths");
 				PHALCON_CPY_WRT_CTOR(&parts, &paths);
+
+				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+					PHALCON_STR(&debug_message, "--Route paths: ");
+					phalcon_debug_print_r(&debug_message);
+					phalcon_debug_print_r(&paths);
+				}
 
 				/**
 				 * Check if the matches has variables
@@ -858,6 +865,12 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	}
 
 	if (zend_is_true(&route_found)) {
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+				PHALCON_STR(&debug_message, "--Route Parts: ");
+				phalcon_debug_print_r(&debug_message);
+				phalcon_debug_print_r(&parts);
+		}
+
 		/**
 		 * Check for a namespace
 		 */

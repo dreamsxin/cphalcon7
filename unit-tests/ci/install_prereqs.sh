@@ -60,10 +60,10 @@ install_extension imagick
 enable_extension memcached
 
 # See https://pear.php.net/bugs/bug.php?id=21007
-printf "\n" | pecl install apcu
-printf "\n" | pecl install apcu_bc-beta
-echo "apc.enable_cli=On" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-printf "\n" | pecl install yaml-2.0.0RC8
-install_igbinary_php7
+# printf "\n" | pecl install apcu
+# printf "\n" | pecl install apcu_bc-beta
+# echo "apc.enable_cli=On" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+# printf "\n" | pecl install yaml-2.0.0RC8
+# install_igbinary_php7
 
 wait

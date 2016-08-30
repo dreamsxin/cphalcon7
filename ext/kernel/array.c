@@ -434,7 +434,11 @@ int phalcon_array_fetch_str(zval *return_value, const zval *arr, const char *ind
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
-			PHALCON_CPY_WRT(return_value, zv);
+			if ((flags & PH_READONLY) == PH_READONLY) {
+				ZVAL_COPY_VALUE(return_value, zv);
+			} else {
+				ZVAL_COPY(return_value, zv);
+			}
 			return SUCCESS;
 		}
 
@@ -458,7 +462,11 @@ int phalcon_array_fetch_string(zval *return_value, const zval *arr, zend_string 
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			PHALCON_CPY_WRT(return_value, zv);
+			if ((flags & PH_READONLY) == PH_READONLY) {
+				ZVAL_COPY_VALUE(return_value, zv);
+			} else {
+				ZVAL_COPY(return_value, zv);
+			}
 			return SUCCESS;
 		}
 
@@ -476,21 +484,25 @@ int phalcon_array_fetch_string(zval *return_value, const zval *arr, zend_string 
 	return FAILURE;
 }
 
-int phalcon_array_fetch_long(zval *return_value, const zval *arr, ulong index, int silent)
+int phalcon_array_fetch_long(zval *return_value, const zval *arr, ulong index, int flags)
 {
 	zval *zv;
 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
-			PHALCON_CPY_WRT(return_value, zv);
+			if ((flags & PH_READONLY) == PH_READONLY) {
+				ZVAL_COPY_VALUE(return_value, zv);
+			} else {
+				ZVAL_COPY(return_value, zv);
+			}
 			return SUCCESS;
 		}
 
-		if (silent == PH_NOISY) {
+		if (flags == PH_NOISY) {
 			zend_error(E_NOTICE, "Undefined index: %lu", index);
 		}
 	} else {
-		if (silent == PH_NOISY) {
+		if (flags == PH_NOISY) {
 			zend_error(E_NOTICE, "Cannot use a scalar value as an array");
 		}
 	}

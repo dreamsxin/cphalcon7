@@ -5669,6 +5669,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _getRelatedRecords){
 	 * If the relation was found perform the query via the models manager
 	 */
 	if (Z_TYPE(relation) == IS_OBJECT) {
+		ZVAL_NULL(&query_method);
 		if (Z_TYPE_P(arguments) != IS_ARRAY || !phalcon_array_isset_fetch_long(&extra_args, arguments, 0)) {
 			ZVAL_NULL(&extra_args);
 		}

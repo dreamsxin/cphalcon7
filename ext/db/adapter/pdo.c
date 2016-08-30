@@ -36,6 +36,7 @@
 #include "kernel/concat.h"
 #include "kernel/string.h"
 #include "kernel/operators.h"
+#include "kernel/debug.h"
 
 /**
  * Phalcon\Db\Adapter\Pdo
@@ -415,10 +416,15 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 
-	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, events_manager = {}, event_name = {}, status = {}, pdo = {}, profiler = {};
+	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, debug_message = {}, events_manager = {}, event_name = {}, status = {}, pdo = {}, profiler = {};
 	zval statement = {}, new_statement = {};
 
 	phalcon_fetch_params(0, 1, 2, &sql_statement, &bind_params, &bind_types);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
+		phalcon_debug_print_r(&debug_message);
+	}
 
 	if (!bind_params) {
 		bind_params = &PHALCON_GLOBAL(z_null);
@@ -498,10 +504,15 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 
-	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, events_manager = {}, event_name = {}, status = {}, affected_rows = {};
+	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, debug_message = {}, events_manager = {}, event_name = {}, status = {}, affected_rows = {};
 	zval pdo = {}, profiler = {}, statement = {}, new_statement = {};
 
 	phalcon_fetch_params(0, 1, 2, &sql_statement, &bind_params, &bind_types);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
+		phalcon_debug_print_r(&debug_message);
+	}
 
 	if (!bind_params) {
 		bind_params = &PHALCON_GLOBAL(z_null);

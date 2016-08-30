@@ -847,7 +847,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			PHALCON_CPY_WRT(&exception, &e);
 
 			/* Clear the exception  */
-			zend_clear_exception();
+			//zend_clear_exception();
 
 			/* Try to handle the exception */
 			PHALCON_CALL_METHODW(&status, getThis(), "_handleexception", &exception);

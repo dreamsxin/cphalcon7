@@ -32,7 +32,7 @@
 	if (status) {
 		// TODO:
 	}
-	efree(&$$);
+	zval_ptr_dtor(&$$);
 }
 %extra_argument {phql_parser_status *status}
 %name phql_
@@ -283,7 +283,6 @@ static void phql_ret_delete_statement(zval *ret, zval *D, zval *W, zval *L)
 	}
 	if (L && Z_TYPE_P(L) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(limit), L);
-		efree(L);
 	}
 }
 
@@ -339,7 +338,7 @@ static void phql_ret_assoc_name(zval *ret, zval *qualified_name, phql_parser_tok
 {
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, ISV(qualifiedName), qualified_name);
-	efree(qualified_name);
+
 	if (alias) {
 		add_assoc_stringl(ret, ISV(alias), alias->token, alias->token_len);
 		efree(alias->token);
@@ -356,21 +355,17 @@ static void phql_ret_join_item(zval *ret, zval *type, zval *qualified, zval *ali
 {
 	array_init_size(ret, 4);
 	add_assoc_zval(ret, ISV(type), type);
-	efree(type);
 
-	if (qualified) {
+	if (qualified && Z_TYPE_P(qualified) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(qualified), qualified);
-		efree(qualified);
 	}
 
-	if (alias) {
+	if (alias && Z_TYPE_P(alias) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(alias), alias);
-		efree(alias);
 	}
 
-	if (conditions) {
+	if (conditions && Z_TYPE_P(conditions) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(conditions), conditions);
-		efree(conditions);
 	}
 }
 
@@ -378,13 +373,11 @@ static void phql_ret_expr(zval *ret, int type, zval *left, zval *right)
 {
 	array_init_size(ret, 2);
 	add_assoc_long(ret, ISV(type), type);
-	if (left) {
+	if (left && Z_TYPE_P(left) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(left), left);
-		efree(left);
 	}
-	if (right) {
+	if (right && Z_TYPE_P(right) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(right), right);
-		efree(right);
 	}
 }
 
@@ -396,14 +389,12 @@ static void phql_ret_func_call(zval *ret, phql_parser_token *name, zval *argumen
 	efree(name->token);
 	efree(name);
 
-	if (arguments) {
+	if (arguments && Z_TYPE_P(arguments) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(arguments), arguments);
-		efree(arguments);
 	}
 	
-	if (distinct) {
+	if (distinct && Z_TYPE_P(distinct) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(distinct), distinct);
-		efree(distinct);
 	}
 }
 

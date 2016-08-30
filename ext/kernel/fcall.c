@@ -66,7 +66,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 		} ZEND_HASH_FOREACH_END();
 	} else {
 		param_count = 0;
-		arguments = (zval*)emalloc(sizeof(zval) * param_count);
+		arguments = NULL;
 	}
 
 	if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
@@ -137,7 +137,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		ZVAL_STRINGL(&func_name, method_name, method_len);
 	}
 
-	arguments = safe_emalloc(sizeof(zval), param_count, 0);
+	arguments = param_count ? safe_emalloc(sizeof(zval), param_count, 0) : NULL;
 
 	i = 0;
 	while(i < param_count) {

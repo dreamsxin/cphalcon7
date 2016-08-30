@@ -3141,6 +3141,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
+			} else {
+				PHALCON_CPY_WRT(&attribute_field, field);
 			}
 
 			if (phalcon_isset_property_zval(getThis(), &attribute_field)) {
@@ -4192,28 +4194,32 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	/**
 	 * We need to check if the record exists
 	 */
-	if (zend_is_true(exists_check)) {		
-		if (!zend_is_true(&exists)) {
-			PHALCON_CALL_METHODW(&exists, getThis(), "_exists", &meta_data, &read_connection);
-			if (zend_is_true(&exists)) {
-				PHALCON_STR(&type, "InvalidCreateAttempt");
-				PHALCON_STR(&message, "Record cannot be created because it already exists");
+	if (!_exists) {
+		PHALCON_CALL_METHODW(&exists, getThis(), "_exists", &meta_data, &read_connection);
+	} else {
+		if (zend_is_true(exists_check)) {		
+			if (!zend_is_true(&exists)) {
+				PHALCON_CALL_METHODW(&exists, getThis(), "_exists", &meta_data, &read_connection);
+				if (zend_is_true(&exists)) {
+					PHALCON_STR(&type, "InvalidCreateAttempt");
+					PHALCON_STR(&message, "Record cannot be created because it already exists");
 
-				PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
-				RETURN_FALSE;
+					PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
+					RETURN_FALSE;
+				}
+			} else {
+				PHALCON_CALL_METHODW(&exists, getThis(), "_exists", &meta_data, &read_connection);
+				if (!zend_is_true(&exists)) {
+					PHALCON_STR(&type, "InvalidUpdateAttempt");
+					PHALCON_STR(&message, "Record cannot be updated because it does not exist");
+
+					PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
+					RETURN_FALSE;
+				}
 			}
 		} else {
-			PHALCON_CALL_METHODW(&exists, getThis(), "_exists", &meta_data, &read_connection);
-			if (!zend_is_true(&exists)) {
-				PHALCON_STR(&type, "InvalidUpdateAttempt");
-				PHALCON_STR(&message, "Record cannot be updated because it does not exist");
-
-				PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
-				RETURN_FALSE;
-			}
+			PHALCON_CALL_METHODW(NULL, getThis(), "_rebuild", &meta_data, &read_connection);
 		}
-	} else {
-		PHALCON_CALL_METHODW(NULL, getThis(), "_rebuild", &meta_data, &read_connection);
 	}
 
 	if (zend_is_true(&exists)) {

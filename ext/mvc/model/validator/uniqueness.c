@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 
 	ZVAL_STRING(&option, "field");
 
-	PHALCON_CALL_METHODW(&field, getThis(), "get&option", &option);
+	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
 	PHALCON_CALL_METHODW(&dependency_injector, record, "getdi");
 
 	ZVAL_STRING(&service, "modelsMetadata");
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	 */
 	array_init_size(&params, 4);
 	phalcon_array_update_str(&params, SL("di"), &dependency_injector, PH_COPY);
-	phalcon_array_update_str(&params, SL("&conditions"), &join_conditions, PH_COPY);
+	phalcon_array_update_str(&params, SL("conditions"), &join_conditions, PH_COPY);
 	phalcon_array_update_str(&params, SL("bind"), &bind_params, PH_COPY);
 	phalcon_array_update_str(&params, SL("bindTypes"), &bind_types, PH_COPY);
 
@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 */
 		ZVAL_STRING(&option, ISV(message));
 
-		PHALCON_CALL_METHODW(&message, getThis(), "get&option", &option);
+		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 		if (!zend_is_true(&message)) {
 			if (Z_TYPE(field) == IS_ARRAY) { 
 				phalcon_fast_join_str(&join_fields, SL(", "), &field);
@@ -294,9 +294,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 */
 		ZVAL_STRING(&option, ISV(code));
 
-		PHALCON_CALL_METHODW(&is_set_code, getThis(), "isset&option", &option);
+		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
 		if (zend_is_true(&is_set_code)) {
-			PHALCON_CALL_METHODW(&code, getThis(), "get&option", &option);
+			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
 			ZVAL_LONG(&code, 0);
 		}

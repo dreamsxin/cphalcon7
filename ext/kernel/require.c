@@ -30,9 +30,9 @@
 int phalcon_require_ret(zval *return_value_ptr, const char *require_path)
 {
 	zend_file_handle file_handle;
-	int ret;
 	zend_op_array *new_op_array;
 	zval dummy, local_retval;
+	int ret;
 
 	ZVAL_UNDEF(&local_retval);
 

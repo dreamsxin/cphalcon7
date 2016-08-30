@@ -718,7 +718,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 	phalcon_array_update_string(return_value, IS(name), &name, PH_COPY);
 
 	if (phalcon_array_isset_fetch_str(&arguments, expr, SL("arguments"))) {
-		distinct = phalcon_array_isset_str(expr, SL("distinct")) ? 1 : 0;
+		distinct = phalcon_array_isset_str(expr, SS("distinct")) ? 1 : 0;
 
 		if (phalcon_array_isset_long(&arguments, 0)) {
 			/** 
@@ -1323,7 +1323,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 	phalcon_fetch_params(0, 1, 0, &column);
 
 	if (!phalcon_array_isset_fetch_str(&column_type, column, ISL(type))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 1");
 		return;
 	}
 
@@ -1350,7 +1350,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 	}
 
 	if (!phalcon_array_isset_str(column, SL("column"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 2");
 		return;
 	}
 
@@ -1464,7 +1464,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getTable){
 
 		RETURN_CTORW(&source);
 	}
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 3");
 }
 
 /**
@@ -1497,7 +1497,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
 			return;
 		}
 	}
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 4");
 }
 
 /**
@@ -1513,7 +1513,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 	phalcon_fetch_params(0, 1, 0, &join);
 
 	if (!phalcon_array_isset_fetch_string(&type, join, IS(type))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 5");
 		return;
 	}
 
@@ -2366,12 +2366,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	}
 
 	if (!phalcon_array_isset_fetch_str(&tables, &select, SL("tables"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 6");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&columns, &select, SL("columns"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 7");
 		return;
 	}
 

@@ -1543,7 +1543,7 @@ PHP_METHOD(Phalcon_Http_Request, getAcceptableContent)
 	PHALCON_STR(&accept_header, "HTTP_ACCEPT");
 	PHALCON_STR(&quality_index, "accept");
 
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &accept_header, &quality_index);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_getqualityheader", &accept_header, &quality_index);
 }
 
 /**
@@ -1558,7 +1558,7 @@ PHP_METHOD(Phalcon_Http_Request, getBestAccept)
 	PHALCON_STR(&quality_index, "accept");
 
 	PHALCON_CALL_METHODW(&acceptable_content, getThis(), "getacceptablecontent");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &acceptable_content, &quality_index);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_getbestquality", &acceptable_content, &quality_index);
 }
 
 /**
@@ -1573,7 +1573,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientCharsets)
 	PHALCON_STR(&charset_header, "HTTP_ACCEPT_CHARSET");
 	PHALCON_STR(&quality_index, "charset");
 
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &charset_header, &quality_index);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_getqualityheader", &charset_header, &quality_index);
 }
 
 /**
@@ -1588,7 +1588,7 @@ PHP_METHOD(Phalcon_Http_Request, getBestCharset)
 	PHALCON_STR(&quality_index, "charset");
 
 	PHALCON_CALL_METHODW(&client_charsets, getThis(), "getclientcharsets");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &client_charsets, &quality_index);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_getbestquality", &client_charsets, &quality_index);
 }
 
 /**
@@ -1603,7 +1603,7 @@ PHP_METHOD(Phalcon_Http_Request, getLanguages)
 	PHALCON_STR(&language_header, "HTTP_ACCEPT_LANGUAGE");
 	PHALCON_STR(&quality_index, "language");
 
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &language_header, &quality_index);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_getqualityheader", &language_header, &quality_index);
 }
 
 /**
@@ -1618,7 +1618,7 @@ PHP_METHOD(Phalcon_Http_Request, getBestLanguage)
 	PHALCON_CALL_METHODW(&languages, getThis(), "getlanguages");
 
 	PHALCON_STR(&quality_index, "language");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &languages, &quality_index);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_getbestquality", &languages, &quality_index);
 }
 
 /**

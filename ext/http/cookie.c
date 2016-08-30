@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue)
 					phalcon_update_property_zval(getThis(), SL("_filter"), &filter);
 				}
 
-				PHALCON_RETURN_CALL_METHOD(&filter, "sanitize", &decrypted_value, filters);
+				PHALCON_RETURN_CALL_METHODW(&filter, "sanitize", &decrypted_value, filters);
 				return;
 			}
 

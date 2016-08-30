@@ -592,7 +592,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getEventsManager){
 	zval models_manager = {};
 
 	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHOD(&models_manager, "getcustomeventsmanager", getThis());
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "getcustomeventsmanager", getThis());
 }
 
 /**
@@ -764,7 +764,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getSchema){
 	zval models_manager = {};
 
 	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
-	PHALCON_RETURN_CALL_METHOD(&models_manager, "getmodelschema", getThis());
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "getmodelschema", getThis());
 }
 
 /**
@@ -820,7 +820,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getColumns){
 	zval meta_data = {};
 
 	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_RETURN_CALL_METHOD(&meta_data, "getattributes", getThis());
+	PHALCON_RETURN_CALL_METHODW(&meta_data, "getattributes", getThis());
 }
 
 /**
@@ -833,7 +833,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getDataTypes){
 	zval meta_data = {};
 
 	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_RETURN_CALL_METHOD(&meta_data, "getdatatypes", getThis());
+	PHALCON_RETURN_CALL_METHODW(&meta_data, "getdatatypes", getThis());
 }
 
 /**
@@ -900,7 +900,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnectionService){
 	zval models_manager = {};
 
 	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHOD(&models_manager, "getreadconnectionservice", getThis());
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "getreadconnectionservice", getThis());
 }
 
 /**
@@ -913,7 +913,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnectionService){
 	zval models_manager = {};
 
 	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHOD(&models_manager, "getwriteconnectionservice", getThis());
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "getwriteconnectionservice", getThis());
 }
 
 /**

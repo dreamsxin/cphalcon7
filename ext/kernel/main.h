@@ -111,7 +111,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 #define RETURN_CCTOR(var) { \
 		ZVAL_DUP(return_value, var); \
 	} \
-	PHALCON_MM_RESTORE(); \
 	return;
 
 /** Return zval checking if it's needed to ctor, without restoring the memory stack  */
@@ -124,7 +123,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 #define RETURN_CTOR(var) { \
 		RETVAL_ZVAL(var, 1, 0); \
 	} \
-	PHALCON_MM_RESTORE(); \
 	return;
 
 /** Return zval with always ctor, without restoring the memory stack */
@@ -136,7 +134,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 #define RETURN_CTOR_DTOR(var) { \
 		RETVAL_ZVAL(var, 1, 1); \
 	} \
-	PHALCON_MM_RESTORE(); \
 	return;
 
 #define RETURN_CTOR_DTORW(var) { \
@@ -148,7 +145,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 #define RETURN_THIS() { \
 		RETVAL_ZVAL(getThis(), 1, 0); \
 	} \
-	PHALCON_MM_RESTORE(); \
 	return;
 
 /** Return zval with always ctor, without restoring the memory stack */
@@ -162,50 +158,13 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 	phalcon_return_property(return_value, object, SL(member_name)); \
 	return;
 
-/**
- * Returns a zval in an object member
- */
-#define RETURN_MM_MEMBER(object, member_name) \
-	phalcon_return_property(return_value, object, SL(member_name)); \
-	RETURN_MM();
-
 #define RETURN_ON_FAILURE(what) \
 	if (FAILURE == what) { \
 		return;            \
 	}
 
-#define RETURN_MM_ON_FAILURE(what) \
-	if (FAILURE == what) {    \
-		PHALCON_MM_RESTORE(); \
-		return;               \
-	}
-
-/** Return without change return_value */
-#define RETURN_MM() PHALCON_MM_RESTORE(); return;
-
-/** Return bool restoring memory frame */
-#define RETURN_MM_BOOL(value) RETVAL_BOOL(value); RETURN_MM();
-
-/** Return null restoring memory frame */
-#define RETURN_MM_NULL() PHALCON_MM_RESTORE(); RETURN_NULL();
-
-/** Return bool restoring memory frame */
-#define RETURN_MM_FALSE PHALCON_MM_RESTORE(); RETURN_FALSE;
-#define RETURN_MM_TRUE PHALCON_MM_RESTORE(); RETURN_TRUE;
-
-/** Return string restoring memory frame */
-#define RETURN_MM_STRING(str) PHALCON_MM_RESTORE(); RETURN_STRING(str);
-#define RETURN_MM_EMPTY_STRING() PHALCON_MM_RESTORE(); RETURN_EMPTY_STRING();
-
-/* Return long */
-#define RETURN_MM_LONG(value) RETVAL_LONG(value); RETURN_MM();
-
-/* Return double */
-#define RETURN_MM_DOUBLE(value) RETVAL_DOUBLE(value); RETURN_MM();
-
 /** Return empty array */
 #define RETURN_EMPTY_ARRAY() array_init(return_value); return;
-#define RETURN_MM_EMPTY_ARRAY() PHALCON_MM_RESTORE(); RETURN_EMPTY_ARRAY();
 
 /** Get the current hash key without copying the hash key */
 #define PHALCON_GET_HKEY(var, hash, hash_position) \
@@ -285,18 +244,12 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		} \
 	} \
 	if (phalcon_fetch_parameters(ZEND_NUM_ARGS(), required_params, optional_params, __VA_ARGS__) == FAILURE) { \
-		if (memory_grow) { \
-			RETURN_MM_NULL(); \
-		} \
 		RETURN_NULL(); \
 	}
 
 #define PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce, restore_stack) \
 	if (Z_TYPE_P(instance) != IS_OBJECT) { \
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name->val, zend_zval_type_name(instance)); \
-		if (restore_stack) { \
-			PHALCON_MM_RESTORE(); \
-		} \
 		return; \
 	} else { \
 		if (!instanceof_function_ex(Z_OBJCE_P(instance), interface_ce, 1)) { \
@@ -305,9 +258,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 			} \
 			else { \
 				zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, Z_OBJCE_P(instance)->name->val); \
-			} \
-			if (restore_stack) { \
-				PHALCON_MM_RESTORE(); \
 			} \
 			return; \
 		} \
@@ -321,9 +271,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		else { \
 			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s or NULL, object of type %s given", interface_ce->name->val, Z_OBJCE_P(pzv)->name->val); \
 		} \
-		if (restore_stack) { \
-			PHALCON_MM_RESTORE(); \
-		} \
 		return; \
 	}
 
@@ -335,9 +282,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		else { \
 			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, object of type %s given", class_ce->name->val, Z_OBJCE_P(instance)->name->val); \
 		} \
-		if (restore_stack) { \
-			PHALCON_MM_RESTORE(); \
-		} \
 		return; \
 	}
 
@@ -348,9 +292,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		} \
 		else { \
 			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, object of type %s given", class_ce->name->val, Z_OBJCE_P(pzv)->name->val); \
-		} \
-		if (restore_stack) { \
-			PHALCON_MM_RESTORE(); \
 		} \
 		return; \
 	}

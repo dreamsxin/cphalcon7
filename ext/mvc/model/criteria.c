@@ -1718,7 +1718,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY);
 	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
 		phalcon_return_property(&offset, getThis(), SL("_offset"));
-		if (PHALCON_IS_NOT_EMPTY(&limit)) {
+		if (PHALCON_IS_NOT_EMPTY(&offset)) {
 			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
 		}
 	}
@@ -1962,7 +1962,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY);
 	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
 		phalcon_return_property(&offset, getThis(), SL("_offset"));
-		if (PHALCON_IS_NOT_EMPTY(&limit)) {
+		if (PHALCON_IS_NOT_EMPTY(&offset)) {
 			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
 		}
 	}
@@ -2078,7 +2078,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY);
 	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
 		phalcon_return_property(&offset, getThis(), SL("_offset"));
-		if (PHALCON_IS_NOT_EMPTY(&limit)) {
+		if (PHALCON_IS_NOT_EMPTY(&offset)) {
 			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
 		}
 	}

@@ -1059,6 +1059,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 			old_type[i] = types[i];
 		}
 	}
+	ZVAL_COPY_VALUE(arr, &pzv);
 }
 
 int phalcon_array_update_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...)

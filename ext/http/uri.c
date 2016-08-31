@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Http_Uri, getPath)
  */
 PHP_METHOD(Phalcon_Http_Uri, build)
 {
-	zval parts = {}, uri = {}, scheme = {}, host = {}, user = {}, pass = {}, port = {}, path = {}, query = {}, fragment = {}, tmp = {}, tmp2 = {};
+	zval parts = {}, uri = {}, scheme = {}, host = {}, user = {}, pass = {}, port = {}, path = {}, query = {}, fragment = {}, tmp = {};
 
 	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
 
@@ -301,13 +301,12 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 		if (!phalcon_start_with_str(&path, SL("/"))) {
 			PHALCON_SCONCAT_SV(&uri, "/", &path);
 		} else {
-			PHALCON_CONCAT_VV(&tmp, &uri, &path);
-			PHALCON_CPY_WRT_CTOR(&uri, &tmp);
+			PHALCON_SCONCAT(&uri, &path);
 		}
 	}
 
 	if (phalcon_array_isset_fetch_str(&query, &parts, SL("query")) && PHALCON_IS_NOT_EMPTY(&query)) {
-		phalcon_http_build_query(&tmp2, &query, "&");
+		phalcon_http_build_query(&tmp, &query, "&");
 		PHALCON_SCONCAT_SV(&uri, "?", &tmp);
 	}
 

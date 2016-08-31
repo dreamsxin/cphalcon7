@@ -134,6 +134,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo){
 	zend_declare_property_null(phalcon_db_adapter_pdo_ce, SL("_pdo"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_adapter_pdo_ce, SL("_affectedRows"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_db_adapter_pdo_ce, SL("_transactionLevel"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_adapter_pdo_ce, SL("_schema"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }

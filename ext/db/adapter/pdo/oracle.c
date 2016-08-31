@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Oracle, describeColumns){
 			break;
 		}
 
-		if (!zend_is_true(&old_column)) {
+		if (Z_TYPE(old_column) <= IS_NULL) {
 			phalcon_array_update_str_bool(&definition, SL("first"), 1, 0);
 		} else {
 			phalcon_array_update_str(&definition, SL("after"), &old_column, PH_COPY);

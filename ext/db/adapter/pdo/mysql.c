@@ -370,7 +370,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		/** 
 		 * Positions
 		 */
-		if (!zend_is_true(&old_column)) {
+		if (Z_TYPE(old_column) <= IS_NULL) {
 			phalcon_array_update_str(&definition, SL("first"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		} else {
 			phalcon_array_update_str(&definition, SL("after"), &old_column, PH_COPY);

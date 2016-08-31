@@ -349,13 +349,13 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _crop)
 
 	phalcon_fetch_params(0, 4, 0, &width, &height, &offset_x, &offset_y);
 
-	phalcon_return_property(&image, getThis(), SL("_image"));
+	phalcon_read_property(&image, getThis(), SL("_image"), 0);
 
 	array_init_size(&rect, 4);
-	phalcon_array_update_str(&rect, SL("x"), offset_x, PH_COPY);
-	phalcon_array_update_str(&rect, SL("y"), offset_y, PH_COPY);
-	phalcon_array_update_str(&rect, SL("width"), width, PH_COPY);
-	phalcon_array_update_str(&rect, SL("height"), height, PH_COPY);
+	phalcon_array_update_str(&rect, SL("x"), offset_x, 0);
+	phalcon_array_update_str(&rect, SL("y"), offset_y, 0);
+	phalcon_array_update_str(&rect, SL("width"), width, 0);
+	phalcon_array_update_str(&rect, SL("height"), height, 0);
 
 	PHALCON_CALL_FUNCTIONW(&tmp_image, "imagecrop", &image, &rect);
 
@@ -1065,7 +1065,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 
-	zval *extension = NULL, *quality = NULL, q = {}, file = {}, ret = {}, type = {}, mime = {}, image = {};
+	zval *extension = NULL, *quality = NULL, q = {}, ret = {}, type = {}, mime = {}, image = {};
 	const char *func_name = "imagegif";
 	char *ext;
 
@@ -1095,9 +1095,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 	phalcon_ob_start();
 
 	if (Z_TYPE(q) == IS_LONG) {
-		PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, &file, &q);
+		PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, &PHALCON_GLOBAL(z_null), &q);
 	} else {
-		PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, &file);
+		PHALCON_CALL_FUNCTIONW(&ret, func_name, &image);
 	}
 
 	phalcon_ob_get_contents(return_value);

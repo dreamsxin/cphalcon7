@@ -217,14 +217,14 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 
 	if (_width) {
 		PHALCON_CPY_WRT_CTOR(&width, _width);
-		if (Z_TYPE(width) != IS_LONG && Z_TYPE(width) != IS_NULL) {
+		if (Z_TYPE(width) != IS_LONG && Z_TYPE(width) > IS_NULL) {
 			convert_to_long(&width);
 		}
 	}
 
 	if (_height) {
 		PHALCON_CPY_WRT_CTOR(&height, _height);
-		if (Z_TYPE(height) != IS_LONG && Z_TYPE(height) != IS_NULL) {
+		if (Z_TYPE(height) != IS_LONG && Z_TYPE(height) > IS_NULL) {
 			convert_to_long(&height);
 		}
 	}
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 		}
 	} else {
 		phalcon_return_property(&image_width, getThis(), SL("_width"));
-		phalcon_return_property(&height, getThis(), SL("_height"));
+		phalcon_return_property(&image_height, getThis(), SL("_height"));
 
 		tmp_image_width  = phalcon_get_intval(&image_width);
 		tmp_image_height = phalcon_get_intval(&image_height);
@@ -391,14 +391,14 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 	PHALCON_ENSURE_IS_LONG(h);
 
 	phalcon_return_property(&image_width, getThis(), SL("_width"));
-	phalcon_return_property(&height, getThis(), SL("_height"));
+	phalcon_return_property(&image_height, getThis(), SL("_height"));
 
-	if (ofs_x && Z_TYPE_P(ofs_x) != IS_NULL && !PHALCON_IS_BOOL(ofs_x) && Z_TYPE_P(ofs_x) != IS_LONG) {
+	if (ofs_x && Z_TYPE_P(ofs_x) > IS_NULL && !PHALCON_IS_BOOL(ofs_x) && Z_TYPE_P(ofs_x) != IS_LONG) {
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_x);
 		convert_to_long(ofs_x);
 	}
 		
-	if (ofs_y && Z_TYPE_P(ofs_y) != IS_NULL && !PHALCON_IS_BOOL(ofs_y) && Z_TYPE_P(ofs_x) != IS_LONG) {
+	if (ofs_y && Z_TYPE_P(ofs_y) > IS_NULL && !PHALCON_IS_BOOL(ofs_y) && Z_TYPE_P(ofs_x) != IS_LONG) {
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_y);
 		convert_to_long(ofs_y);
 	}

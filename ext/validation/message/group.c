@@ -397,10 +397,16 @@ PHP_METHOD(Phalcon_Validation_Message_Group, key){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, next){
 
-	zval messages = {};
+	zval messages = {}, *message;
 
 	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
 	zend_hash_move_forward(Z_ARRVAL(messages));
+
+	if ((message = zend_hash_get_current_data(Z_ARRVAL(messages))) != NULL) {
+		RETURN_CTORW(message);
+	}
+
+	RETURN_NULL();
 }
 
 /**
@@ -414,7 +420,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, valid){
 
 	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
 
-	RETURN_BOOL(zend_hash_has_more_elements(Z_ARRVAL(messages)));
+	RETURN_BOOL(zend_hash_has_more_elements(Z_ARRVAL(messages)) == SUCCESS);
 }
 
 /**

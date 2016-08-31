@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
 	}
 
 	if (PHALCON_IS_BOOL(local)) {
-		PHALCON_CPY_WRT(&collection_attributes, local);
+		PHALCON_CPY_WRT(&collection_local, local);
 	} else {
 		phalcon_read_property(&collection_local, getThis(), SL("_local"), PH_NOISY);
 	}

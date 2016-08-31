@@ -119,8 +119,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 			}
 		}
 	}
-
-	RETURN_NULL();
 }
 
 /**
@@ -150,7 +148,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, save){
 	}
 
 	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
-	if (Z_TYPE_P(content) == IS_NULL) {
+	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHODW(&cached_content, &frontend, "getcontent");
 	} else {
 		PHALCON_CPY_WRT(&cached_content, content);

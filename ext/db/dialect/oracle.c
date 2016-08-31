@@ -716,9 +716,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Oracle, limit){
 
 	zval *sql_query, *number, limit = {}, sql_limit = {};
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "zz", &sql_query, &number) == FAILURE) {
-		RETURN_NULL();
-	}
+	phalcon_fetch_params(0, 2, 0, &sql_query, &number);
 
 	if (phalcon_is_numeric(number)) {
 		ZVAL_LONG(&limit, phalcon_get_intval(number));

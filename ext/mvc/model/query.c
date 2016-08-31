@@ -718,7 +718,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 	phalcon_array_update_string(return_value, IS(name), &name, PH_COPY);
 
 	if (phalcon_array_isset_fetch_str(&arguments, expr, SL("arguments"))) {
-		distinct = phalcon_array_isset_str(expr, SS("distinct")) ? 1 : 0;
+		distinct = phalcon_array_isset_str(expr, SL("distinct")) ? 1 : 0;
 
 		if (phalcon_array_isset_long(&arguments, 0)) {
 			/** 

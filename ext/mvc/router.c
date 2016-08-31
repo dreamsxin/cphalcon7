@@ -624,7 +624,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	 */
 	PHALCON_STR(&service, ISV(request));
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	PHALCON_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_mvc_router_exception_ce, 0);
 
 	PHALCON_CALL_METHODW(&request, &dependency_injector, "getshared", &service);

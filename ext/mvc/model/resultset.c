@@ -228,28 +228,28 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 
-	zval type = {}, result = {}, rows = {}, position = {}, pointer = {}, is_different = {};
+	zval *position, type = {}, result = {}, rows = {}, pointer = {}, is_different = {};
 	HashTable *ah0;
 	long i;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &position) == FAILURE) {
-		RETURN_NULL();
-	}
+	phalcon_fetch_params(0, 1, 0, &position);
 
 	phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY);
 
 	/**
 	 * We only seek the records if the current position is diferent than the passed one
 	 */
-	is_not_equal_function(&is_different, &pointer, &position);
+	is_not_equal_function(&is_different, &pointer, position);
+
 	if (PHALCON_IS_TRUE(&is_different)) {
+		
 		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
 		if (zend_is_true(&type)) {
 			/**
 			 * Here, the resultset is fetched one by one because is large
 			 */
 			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY);
-			PHALCON_CALL_METHODW(NULL, &result, "dataseek", &position);
+			PHALCON_CALL_METHODW(NULL, &result, "dataseek", position);
 		} else {
 			/**
 			 * Here, the resultset is a small array
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 				}
 			}
 
-			convert_to_long(&position);
+			convert_to_long(position);
 
 			if(Z_TYPE(rows) == IS_ARRAY){
 				ah0 = Z_ARRVAL(rows);
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 				i = 0;
 				while (1) {
 
-					if (i >= Z_LVAL(position)) {
+					if (i >= Z_LVAL_P(position)) {
 						break;
 					}
 
@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 				}
 			}
 
-			phalcon_update_property_zval(getThis(), SL("_pointer"), &position);
+			phalcon_update_property_zval(getThis(), SL("_pointer"), position);
 		}
 	}
 }

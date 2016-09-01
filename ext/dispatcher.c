@@ -848,6 +848,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
 			/* Clear the exception  */
 			zend_clear_exception();
+			/*
+			if (EG(prev_exception)) {
+				OBJ_RELEASE(EG(prev_exception));
+				EG(prev_exception) = NULL;
+			}
+			EG(exception) = NULL;
+			EG(current_execute_data)->opline = EG(opline_before_exception);
+			*/
 
 			/* Try to handle the exception */
 			PHALCON_CALL_METHODW(&status, getThis(), "_handleexception", &exception);

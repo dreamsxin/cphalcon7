@@ -2207,7 +2207,9 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 		 * Check if there is a method with the same name of the event
 		 */
 		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
+			PHALCON_MAKE_REF(data);
 			PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(lower), data);
+			PHALCON_UNREF(data);
 		}
 
 
@@ -2249,7 +2251,9 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 		 * Check if there is a method with the same name of the event
 		 */
 		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
+			PHALCON_MAKE_REF(data);
 			PHALCON_CALL_METHODW(&status, getThis(), Z_STRVAL(lower), data);
+			PHALCON_UNREF(data);
 			if (PHALCON_IS_FALSE(&status)) {
 				RETURN_FALSE;
 			}

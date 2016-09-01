@@ -331,4 +331,8 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table);
 
 #define phalcon_is_php_version(id) (PHP_VERSION_ID / 10 == id / 10 ?  1 : 0)
 
+/** When type is the ref should also */
+#define PHALCON_MAKE_REF(obj) ZVAL_NEW_REF(obj, obj);
+#define PHALCON_UNREF(obj) ZVAL_UNREF(obj);
+
 #endif /* PHALCON_KERNEL_MAIN_H */

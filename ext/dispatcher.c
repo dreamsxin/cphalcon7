@@ -1230,10 +1230,10 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 		cancelable = &PHALCON_GLOBAL(z_null);
 	}
 
-	ZVAL_MAKE_REF(data);
+	PHALCON_MAKE_REF(data);
 	zval *params[] = {eventname, data, cancelable};
 	ret = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 3, params);
-	ZVAL_UNREF(data);
+	PHALCON_UNREF(data);
 
 	if (EG(exception)) {
 		ZVAL_OBJ(&e, EG(exception));
@@ -1244,10 +1244,10 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 		/* Shortcut, save one method call */
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
-		ZVAL_MAKE_REF(&exception);
+		PHALCON_MAKE_REF(&exception);
 		zval *params[] = {&event_name, &exception};
 		ret2 = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 2, params);
-		ZVAL_UNREF(&exception);
+		PHALCON_UNREF(&exception);
 		if (ret2 == SUCCESS && PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}

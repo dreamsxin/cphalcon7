@@ -303,6 +303,87 @@ int phalcon_is_callable(zval *var) {
 }
 
 /**
+ * Checks whether a variable has a scalar type
+ */
+int phalcon_is_scalar(zval *var)
+{
+	switch (Z_TYPE_P(var)) {
+		case IS_TRUE:
+		case IS_FALSE:
+		case IS_DOUBLE:
+		case IS_LONG:
+		case IS_STRING:
+			return 1;
+			break;
+	}
+
+	return 0;
+}
+
+/**
+ * Returns the type of a variable as a string
+ */
+void phalcon_gettype(zval *return_value, zval *arg)
+{
+	switch (Z_TYPE_P(arg)) {
+
+		case IS_NULL:
+			RETVAL_STRING("NULL");
+			break;
+
+		case IS_TRUE:
+		case IS_FALSE:
+			RETVAL_STRING("boolean");
+			break;
+
+		case IS_LONG:
+			RETVAL_STRING("integer");
+			break;
+
+		case IS_DOUBLE:
+			RETVAL_STRING("double");
+			break;
+
+		case IS_STRING:
+			RETVAL_STRING("string");
+			break;
+
+		case IS_ARRAY:
+			RETVAL_STRING("array");
+			break;
+
+		case IS_OBJECT:
+			RETVAL_STRING("object");
+			break;
+
+		case IS_RESOURCE:
+			{
+				const char *type_name = zend_rsrc_list_get_rsrc_type(Z_RES_P(arg));
+
+				if (type_name) {
+					RETVAL_STRING("resource");
+					break;
+				}
+			}
+
+		default:
+			RETVAL_STRING("unknown type");
+	}
+}
+
+zend_class_entry* phalcon_get_internal_ce(const char *class_name, unsigned int class_name_len)
+{
+    zend_class_entry* temp_ce;
+
+    if ((temp_ce = zend_hash_str_find_ptr(CG(class_table), class_name, class_name_len)) == NULL) {
+        zend_error(E_WARNING, "Class '%s' not found", class_name);
+        return NULL;
+    }
+
+    return temp_ce;
+}
+
+/**
  * Parses method parameters with minimum overhead
  */
 int phalcon_fetch_parameters(int num_args, int required_args, int optional_args, ...)

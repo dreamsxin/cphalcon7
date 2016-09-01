@@ -55,6 +55,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent);
 PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel);
 PHP_METHOD(Phalcon_DI_Injectable, getResolveService);
 PHP_METHOD(Phalcon_DI_Injectable, __get);
+PHP_METHOD(Phalcon_DI_Injectable, __sleep);
 
 static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, setDI, arginfo_phalcon_di_injectionawareinterface_setdi, ZEND_ACC_PUBLIC)
@@ -65,6 +66,7 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_DI_Injectable, __sleep, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -351,4 +353,9 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	 */
 	php_error_docref(NULL, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name->val, Z_STRVAL_P(property_name));
 	RETURN_NULL();
+}
+
+PHP_METHOD(Phalcon_DI_Injectable, __sleep){
+
+	RETURN_EMPTY_ARRAY();
 }

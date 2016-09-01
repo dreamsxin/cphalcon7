@@ -3124,23 +3124,29 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
-	zval event_name = {}, intermediate, phql = {}, ast = {}, type = {}, unique_id = {}, ir_phql_cache = {}, ir_phql_cache2 = {}, ir_phql = {};
+	zval *_phql = NULL, event_name = {}, intermediate, phql = {}, ast = {}, type = {}, unique_id = {}, ir_phql_cache = {}, ir_phql_cache2 = {}, ir_phql = {};
 	zval model_names = {}, exception_message = {}, debug_message = {};
 	zval manager = {}, tables = {}, key_schema = {}, key_source = {}, *model_name;
 	zend_string *str_key;
 	ulong idx;
 	int i_cache = 1;
 
-	phalcon_read_property(&intermediate, getThis(), SL("_intermediate"), PH_NOISY);
-	if (Z_TYPE(intermediate) == IS_ARRAY) {
-		RETURN_CTORW(&intermediate);
+	phalcon_fetch_params(0, 0, 1, &_phql);
+
+	if (!_phql) {
+		phalcon_read_property(&intermediate, getThis(), SL("_intermediate"), PH_NOISY);
+		if (Z_TYPE(intermediate) == IS_ARRAY) {
+			RETURN_CTORW(&intermediate);
+		}
+
+		phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&phql, _phql);
 	}
 
 	PHALCON_STR(&event_name, "query:beforeParse");
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
-
-	phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Parse PHQL: ", &phql);

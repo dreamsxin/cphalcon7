@@ -32,7 +32,9 @@
 	if (status) {
 		// TODO:
 	}
-	zval_ptr_dtor(&$$);
+	if (&$$) {
+		zval_ptr_dtor(&$$);
+	}
 }
 %extra_argument {phql_parser_status *status}
 %name phql_
@@ -246,6 +248,8 @@ static void phql_ret_insert_statement2(zval *ret, zval *Q, zval *F, zval *V)
 
 static void phql_ret_update_statement(zval *ret, zval *U, zval *W, zval *L)
 {
+	array_init(ret);
+
 	add_assoc_long(ret, ISV(type), PHQL_T_UPDATE);
 	add_assoc_zval(ret, ISV(update), U);
 
@@ -997,10 +1001,6 @@ when_clause(R) ::= ELSE expr(E) . {
 	phql_ret_expr(&R, PHQL_T_ELSE, &E, NULL);
 }
 
-%destructor function_call {
-	zval_ptr_dtor(&$$);
-}
-
 expr(R) ::= function_call(F) . {
 	R = F;
 }
@@ -1009,24 +1009,12 @@ function_call(R) ::= IDENTIFIER(I) PARENTHESES_OPEN distinct_or_null(D) argument
 	phql_ret_func_call(&R, I, &L, &D);
 }
 
-%destructor distinct_or_null  {
-	if (&$$) {
-		zval_ptr_dtor(&$$);
-	}
-}
-
 distinct_or_null(R) ::= DISTINCT . {
 	phql_ret_distinct(&R);
 }
 
 distinct_or_null(R) ::=  . {
 	ZVAL_UNDEF(&R);
-}
-
-%destructor argument_list_or_null  {
-	if (&$$) {
-		zval_ptr_dtor(&$$);
-	}
 }
 
 argument_list_or_null(R) ::= argument_list(L) . {
@@ -1122,10 +1110,6 @@ expr(R) ::= SPLACEHOLDER(P) . {
 /* {placeholder} */
 expr(R) ::= BPLACEHOLDER(P) . {
 	phql_ret_placeholder_zval(&R, PHQL_T_BPLACEHOLDER, P);
-}
-
-%destructor qualified_name {
-	zval_ptr_dtor(&$$);
 }
 
 qualified_name(R) ::= IDENTIFIER(A) COLON IDENTIFIER(B) DOT IDENTIFIER(C) . {

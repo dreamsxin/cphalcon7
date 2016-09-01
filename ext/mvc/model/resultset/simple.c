@@ -87,8 +87,6 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset_Simple){
 	zend_declare_property_null(phalcon_mvc_model_resultset_simple_ce, SL("_rowsModels"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_resultset_simple_ce, SL("_rowsObjects"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_resultset_simple_ce, 5, zend_ce_iterator, spl_ce_SeekableIterator, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_serializable);
-
 	return SUCCESS;
 }
 

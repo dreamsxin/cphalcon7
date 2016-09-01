@@ -82,6 +82,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, getMessages);
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete);
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter);
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, update);
+PHP_METHOD(Phalcon_Mvc_Model_Resultset, jsonSerialize);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_resultset_sethydratemode, 0, 0, 1)
 	ZEND_ARG_INFO(0, hydrateMode)
@@ -123,6 +124,7 @@ static const zend_function_entry phalcon_mvc_model_resultset_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Resultset, delete, arginfo_phalcon_mvc_model_resultset_delete, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Resultset, filter, arginfo_phalcon_mvc_model_resultset_filter, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Resultset, update, arginfo_phalcon_mvc_model_resultset_update, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Resultset, jsonSerialize, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -152,6 +154,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset){
 
 	zend_class_implements(phalcon_mvc_model_resultset_ce, 6, phalcon_mvc_model_resultsetinterface_ce, zend_ce_iterator, spl_ce_SeekableIterator, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_serializable);
 
+	zend_class_entry *ce = phalcon_get_internal_ce(SS("jsonserializable"));
+	if (ce) {
+		zend_class_implements(phalcon_mvc_model_resultset_ce, 1, ce);
+	}
 	return SUCCESS;
 }
 
@@ -737,7 +743,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 
 	zval *data, *condition_callback = NULL, transaction = {}, connection = {};
-	
+
 	phalcon_fetch_params(0, 1, 1, &data, &condition_callback);
 
 	if (!condition_callback) {
@@ -816,4 +822,52 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 	}
 
 	RETURN_TRUE;
+}
+
+/**
+ * Returns serialised model objects as array for json_encode.
+ * Calls jsonSerialize on each object if present
+ *
+ *<code>
+ * $robots = Robots::find();
+ * echo json_encode($robots);
+ *</code>
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Resultset, jsonSerialize) {
+
+	zval records = {};
+
+	array_init(&records);
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "rewind");
+
+	while (1) {
+		zval r0, current = {}, jsondata = {};
+		zend_bool status;
+
+		PHALCON_CALL_METHODW(&r0, getThis(), "valid");
+
+		if (!(zend_is_true(&r0))) {
+			break;
+		}
+		PHALCON_CALL_METHODW(&current, getThis(), "current");
+
+		status = Z_TYPE(current) == IS_OBJECT;
+		if (status) {
+			status = (phalcon_method_exists_ex(&current, SS("jsonserialize")) == SUCCESS);
+		}
+
+		if (status) {
+			PHALCON_CALL_METHODW(&jsondata, &current, "jsonserialize");
+
+			phalcon_array_append(&records, &jsondata, PH_SEPARATE);
+		} else {
+			phalcon_array_append(&records, &current, PH_SEPARATE);
+		}
+		PHALCON_CALL_METHODW(NULL, getThis(), "next");
+	}
+
+	RETURN_CCTORW(&records);
 }

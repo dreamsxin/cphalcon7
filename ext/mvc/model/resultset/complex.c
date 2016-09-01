@@ -80,8 +80,6 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset_Complex){
 	zend_declare_property_null(phalcon_mvc_model_resultset_complex_ce, SL("_sourceModel"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_resultset_complex_ce, SL("_columnTypes"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_resultset_complex_ce, 1, phalcon_mvc_model_resultsetinterface_ce);
-
 	return SUCCESS;
 }
 

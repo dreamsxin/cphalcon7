@@ -161,7 +161,12 @@ static void phql_scanner_error_msg(phql_parser_status *parser_status, zval *erro
  */
 int phql_parse_phql(zval *result, zval *phql) {
 
-	zval error_msg;
+	zval error_msg = {};
+
+	if (Z_TYPE_P(phql) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "PHQL is must be string");
+		return FAILURE;
+	}
 
 	if (phql_internal_parse_phql(result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg) == FAILURE) {
 		if (Z_TYPE(error_msg) > IS_NULL) {

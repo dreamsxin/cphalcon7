@@ -89,6 +89,13 @@ static inline int is_phalcon_class(const zend_class_entry *ce)
 		 && ce->info.internal.module->module_number == phalcon_module_entry.module_number;
 }
 
+int phalcon_is_scalar(zval *var);
+
+/* types */
+void phalcon_gettype(zval *return_value, zval *arg);
+
+zend_class_entry* phalcon_get_internal_ce(const char *class_name, unsigned int class_name_len);
+
 /* Fetch Parameters */
 int phalcon_fetch_parameters(int num_args, int required_args, int optional_args, ...);
 

@@ -56,6 +56,8 @@ install_igbinary_php7() {
     fi
 }
 
+phpenv config-rm xdebug.ini
+
 install_extension imagick
 enable_extension memcached
 

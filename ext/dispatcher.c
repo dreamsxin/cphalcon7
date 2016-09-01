@@ -842,20 +842,10 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/* Check if an exception has ocurred */
 		if (EG(exception)) {
 			ZVAL_OBJ(&e, EG(exception));
-
-			/* Copy the exception to rethrow it later if needed */
-			ZVAL_COPY(&exception, &e);
+			ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
 
 			/* Clear the exception  */
 			zend_clear_exception();
-			/*
-			if (EG(prev_exception)) {
-				OBJ_RELEASE(EG(prev_exception));
-				EG(prev_exception) = NULL;
-			}
-			EG(exception) = NULL;
-			EG(current_execute_data)->opline = EG(opline_before_exception);
-			*/
 
 			/* Try to handle the exception */
 			PHALCON_CALL_METHODW(&status, getThis(), "_handleexception", &exception);
@@ -1226,7 +1216,7 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
  */
 PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, event_name = {}, status = {}, exception = {};
+	zval *eventname, *data = NULL, *cancelable = NULL, event_name = {}, status = {}, e = {}, exception = {};
 	int ret, ret2;
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
@@ -1246,7 +1236,8 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 	ZVAL_UNREF(data);
 
 	if (EG(exception)) {
-		ZVAL_OBJ(&exception, EG(exception));
+		ZVAL_OBJ(&e, EG(exception));
+		ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
 
 		zend_clear_exception();
 

@@ -685,6 +685,8 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 		RETURN_NULL();
 	}
 
+	ZVAL_NULL(&status);
+
 	/** 
 	 * All valid events must have a colon separator
 	 */

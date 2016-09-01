@@ -62,7 +62,6 @@ before_script:
   - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --silent --enable-phalcon && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/phalcon.ini)
   - ulimit -c unlimited -S || true
   - echo '/tmp/core_%e.%p' | sudo tee /proc/sys/kernel/core_pattern &> /dev/null
-  - phpenv config-rm xdebug.ini
 
 script:
   - vendor/bin/phpunit --bootstrap unit-tests/ci/phpunit.php --debug unit-tests/

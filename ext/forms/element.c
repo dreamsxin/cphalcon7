@@ -832,12 +832,13 @@ PHP_METHOD(Phalcon_Forms_Element, clear)
  */
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
-	zval e, *m;
+	zval e = {}, exception = {}, *m;
 
 	if (FAILURE == phalcon_call_method(return_value, getThis(), "render", 0, NULL)) {
 		if (EG(exception)) {
 			ZVAL_OBJ(&e, EG(exception));
-			m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
+			ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
+			m = zend_read_property(Z_OBJCE(exception), &exception, SL("message"), 1, NULL);
 			if (Z_TYPE_P(m) != IS_STRING) {
 				convert_to_string_ex(m);
 			}

@@ -844,13 +844,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			ZVAL_OBJ(&e, EG(exception));
 
 			/* Copy the exception to rethrow it later if needed */
-			PHALCON_CPY_WRT(&exception, &e);
+			ZVAL_COPY(&exception, &e);
 
 			/* Clear the exception  */
-			//zend_clear_exception();
+			zend_clear_exception();
 
 			/* Try to handle the exception */
 			PHALCON_CALL_METHODW(&status, getThis(), "_handleexception", &exception);
+
 			if (PHALCON_IS_FALSE(&status)) {
 				phalcon_return_property(&finished, getThis(), SL("_finished"));
 				if (PHALCON_IS_FALSE(&finished)) {

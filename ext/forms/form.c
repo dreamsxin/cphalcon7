@@ -563,16 +563,17 @@ PHP_METHOD(Phalcon_Forms_Form, isValid){
 		entity = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (_data && !PHALCON_IS_EMPTY(_data)) {
+	if (_data) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "bind", _data, entity);
 	}
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
-
 	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
+
 	if (Z_TYPE(elements) != IS_ARRAY) {
 		RETURN_TRUE;
 	}
+
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
 
 	/**
 	 * Check if there is a method 'beforeValidation'

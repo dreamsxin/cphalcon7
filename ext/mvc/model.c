@@ -55,6 +55,7 @@
 #include "kernel/string.h"
 #include "kernel/file.h"
 #include "kernel/variables.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -2320,7 +2321,7 @@ PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
 	zval *message, *field = NULL, *t = NULL, *code = NULL, type = {}, custom_message = {}, exception_message = {}, model_message = {};
 	zval message_message = {}, message_field = {}, message_type = {}, message_code = {}; 
 
-	phalcon_fetch_params(0, 1, 3, &message, &field, &type, &code);
+	phalcon_fetch_params(0, 1, 3, &message, &field, &t, &code);
 
 	if (!field) {
 		field = &PHALCON_GLOBAL(z_null);
@@ -2338,7 +2339,7 @@ PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
 		if (PHALCON_IS_EMPTY(field) || PHALCON_IS_EMPTY(&type)) {
 			PHALCON_STR(&type, zend_zval_type_name(message));
 
-			PHALCON_CONCAT_SVS(&exception_message, "Invalid message format '", &type, "'");
+			PHALCON_CONCAT_SVSVS(&exception_message, "Invalid message format '", &type, "', message: '", message, "'");
 			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 			return;
 		}
@@ -4647,7 +4648,7 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 	}
 
-	RETURN_FALSE;
+	RETURN_CTORW(&success);
 }
 
 /**

@@ -118,9 +118,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 	if (Z_TYPE(handler) != IS_RESOURCE) {
 		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open log file '%s'", Z_STRVAL_P(name));
 	} else {
-		phalcon_update_property_this(getThis(), SL("_path"), name);
-		phalcon_update_property_this(getThis(), SL("_options"), options);
-		phalcon_update_property_this(getThis(), SL("_fileHandler"), &handler);
+		phalcon_update_property_zval(getThis(), SL("_path"), name);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
+		phalcon_update_property_zval(getThis(), SL("_fileHandler"), &handler);
 	}
 }
 
@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
 		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHODW(NULL, &formatter, "__construct");
 
-		phalcon_update_property_this(getThis(), SL("_formatter"), &formatter);
+		phalcon_update_property_zval(getThis(), SL("_formatter"), &formatter);
 	}
 
 	RETURN_CTORW(&formatter);
@@ -154,19 +154,19 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_File, logInternal){
 
-	zval *message, *type, *time, *context, *file_handler, formatter = {}, applied_format = {};
+	zval *message, *type, *time, *context, file_handler = {}, formatter = {}, applied_format = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
-	file_handler = phalcon_read_property(getThis(), SL("_fileHandler"), PH_NOISY);
-	if (Z_TYPE_P(file_handler) != IS_RESOURCE) {
+	phalcon_read_property(&file_handler, getThis(), SL("_fileHandler"), PH_NOISY);
+	if (Z_TYPE(file_handler) != IS_RESOURCE) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
 	}
 
 	PHALCON_CALL_METHODW(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHODW(&applied_format, &formatter, "format", message, type, time, context);
-	PHALCON_CALL_FUNCTIONW(NULL, "fwrite", file_handler, &applied_format);
+	PHALCON_CALL_FUNCTIONW(NULL, "fwrite", &file_handler, &applied_format);
 }
 
 /**
@@ -176,10 +176,10 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, logInternal){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_File, close){
 
-	zval *file_handler;
+	zval file_handler = {};
 
-	file_handler = phalcon_read_property(getThis(), SL("_fileHandler"), PH_NOISY);
-	PHALCON_RETURN_CALL_FUNCTIONW("fclose", file_handler);
+	phalcon_read_property(&file_handler, getThis(), SL("_fileHandler"), PH_NOISY);
+	PHALCON_RETURN_CALL_FUNCTIONW("fclose", &file_handler);
 }
 
 /**
@@ -197,16 +197,16 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getPath) {
  */
 PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 
-	zval *path, *options, mode = {}, file_handler = {};
+	zval path = {}, options = {}, mode = {}, file_handler = {};
 
-	path = phalcon_read_property(getThis(), SL("_path"), PH_NOISY);
-	if (Z_TYPE_P(path) != IS_STRING) {
+	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
+	if (Z_TYPE(path) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 		return;
 	}
 
-	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"))) {
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	if (phalcon_array_isset_fetch_str(&mode, &options, SL("mode"))) {
 		if (Z_TYPE(mode) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 			return;
@@ -218,6 +218,6 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 	/**
 	 * Re-open the file handler if the logger was serialized
 	 */
-	PHALCON_CALL_FUNCTIONW(&file_handler, "fopen", path, &mode);
-	phalcon_update_property_this(getThis(), SL("_fileHandler"), &file_handler);
+	PHALCON_CALL_FUNCTIONW(&file_handler, "fopen", &path, &mode);
+	phalcon_update_property_zval(getThis(), SL("_fileHandler"), &file_handler);
 }

@@ -156,7 +156,6 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 	assert(active_memory != NULL);
 
 	if (EXPECTED(!CG(unclean_shutdown))) {
-
 #ifndef PHALCON_RELEASE
 		for (i = 0; i < active_memory->pointer; ++i) {
 			ptr = active_memory->addresses[i];

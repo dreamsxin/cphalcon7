@@ -61,6 +61,9 @@ void phalcon_fast_str_replace(zval *return_value, zval *search, zval *replace, z
 void phalcon_camelize(zval *return_value, const zval *str);
 void phalcon_uncamelize(zval *return_value, const zval *str);
 
+void phalcon_camelize_delim(zval *return_value, const zval *str, const zval *delimiter);
+void phalcon_uncamelize_delim(zval *return_value, const zval *str, const zval *delimiter);
+
 /** Starts/Ends with */
 int phalcon_start_with(const zval *str, const zval *compared, zval *case_sensitive);
 int phalcon_start_with_str(const zval *str, char *compared, unsigned int compared_length);

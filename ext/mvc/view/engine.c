@@ -96,8 +96,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 		dependency_injector = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_view"), view);
-	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
+	phalcon_update_property_zval(getThis(), SL("_view"), view);
+	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 }
 
 /**
@@ -105,10 +105,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
  *
  * @return array
  */
-PHP_METHOD(Phalcon_Mvc_View_Engine, getContent)
-{
-	zval *view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(view, "getcontent");
+PHP_METHOD(Phalcon_Mvc_View_Engine, getContent){
+
+	zval view = {};
+	phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
+	PHALCON_RETURN_CALL_METHODW(&view, "getcontent");
 }
 
 /**
@@ -120,7 +121,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, getContent)
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, partial){
 
-	zval *partial_path, *params = NULL, *view;
+	zval *partial_path, *params = NULL, view = {};
 
 	phalcon_fetch_params(0, 1, 1, &partial_path, &params);
 
@@ -128,8 +129,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, partial){
 		params = &PHALCON_GLOBAL(z_null);
 	}
 
-	view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(view, "partial", partial_path, params);
+	phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
+	PHALCON_RETURN_CALL_METHODW(&view, "partial", partial_path, params);
 }
 
 /**
@@ -179,7 +180,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
-	zval *method, *args = NULL, method_name = {}, arguments = {}, *methods, func = {}, exception_message = {}, service_name = {}, service = {}, callback = {};
+	zval *method, *args = NULL, method_name = {}, arguments = {}, methods = {}, func = {}, exception_message = {}, service_name = {}, service = {}, callback = {};
 
 	phalcon_fetch_params(0, 1, 1, &method, &arguments);
 
@@ -191,8 +192,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		PHALCON_CPY_WRT(&arguments, args);
 	}
 
-	methods = phalcon_read_property(getThis(), SL("_methods"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&func, methods, &method_name)) {
+	phalcon_read_property(&methods, getThis(), SL("_methods"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&func, &methods, &method_name, 0)) {
 			PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &func, &arguments);
 			return;
 	}
@@ -218,7 +219,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		return;
 	}
 
-	if (!phalcon_method_exists(&service, &method_name) == FAILURE) {
+	if (phalcon_method_exists(&service, &method_name) == FAILURE) {
 		PHALCON_CONCAT_SVS(&exception_message, "The method \"", &method_name, "\" doesn't exist on view");
 		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
 		return;

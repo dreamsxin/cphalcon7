@@ -80,7 +80,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, setEventsManager){
 
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 	
-	phalcon_update_property_this(getThis(), SL("_eventsManager"), events_manager);
+	phalcon_update_property_zval(getThis(), SL("_eventsManager"), events_manager);
 	
 }
 
@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Acl_Adapter, setDefaultAction){
 
 	phalcon_fetch_params(0, 1, 0, &default_access);
 	
-	phalcon_update_property_this(getThis(), SL("_defaultAccess"), default_access);
+	phalcon_update_property_zval(getThis(), SL("_defaultAccess"), default_access);
 	
 }
 

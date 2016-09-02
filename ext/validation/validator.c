@@ -72,13 +72,13 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator){
 
 int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *option)
 {
-	zval opt = {}, *options, value = {};
+	zval opt = {}, options = {}, value = {};
 	zval *params[1];
 
 	if (is_phalcon_class(ce)) {
-		options = phalcon_read_property(this_ptr, SL("_options"), PH_NOISY);
+		phalcon_read_property(&options, this_ptr, SL("_options"), PH_NOISY);
 
-		if (phalcon_array_isset_fetch_str(&value, options, option, strlen(option))) {
+		if (phalcon_array_isset_fetch_str(&value, &options, option, strlen(option))) {
 			ZVAL_ZVAL(retval, &value, 1, 0);
 		}
 		else {
@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Validation_Validator, __construct){
 			return;
 		}
 	} else {
-		phalcon_update_property_this(getThis(), SL("_options"), options);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
 }
 
@@ -127,12 +127,12 @@ PHP_METHOD(Phalcon_Validation_Validator, __construct){
  */
 PHP_METHOD(Phalcon_Validation_Validator, isSetOption){
 
-	zval *key, *options;
+	zval *key, options = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 	
-	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-	RETURN_BOOL(phalcon_array_isset(options, key));
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	RETURN_BOOL(phalcon_array_isset(&options, key));
 }
 
 /**

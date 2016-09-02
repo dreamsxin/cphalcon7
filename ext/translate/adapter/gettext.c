@@ -105,11 +105,14 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_locale"), &locale);
-	phalcon_update_property_this(getThis(), SL("_defaultDomain"), &default_domain);
-	phalcon_update_property_this(getThis(), SL("_directory"), &directory);
+	phalcon_update_property_zval(getThis(), SL("_locale"), &locale);
+	phalcon_update_property_zval(getThis(), SL("_defaultDomain"), &default_domain);
+	phalcon_update_property_zval(getThis(), SL("_directory"), &directory);
 
 	PHALCON_CONCAT_SV(&setting, "LC_ALL=", &locale);
+	PHALCON_CALL_FUNCTIONW(NULL, "putenv", &setting);
+
+	PHALCON_CONCAT_SV(&setting, "LANGUAGE=", &locale);
 	PHALCON_CALL_FUNCTIONW(NULL, "putenv", &setting);
 
 	if ((constant = zend_get_constant_str(SL("LC_ALL"))) != NULL) {

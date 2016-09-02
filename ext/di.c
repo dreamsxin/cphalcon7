@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_DI, setEventsManager){
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 	PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_eventsManager"), events_manager);
+	phalcon_update_property_zval(getThis(), SL("_eventsManager"), events_manager);
 }
 
 /**
@@ -326,14 +326,14 @@ PHP_METHOD(Phalcon_DI, setService)
  */
 PHP_METHOD(Phalcon_DI, getRaw){
 
-	zval *name, *service;
+	zval *name, service = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
-		service = phalcon_read_property_array(getThis(), SL("_services"), name);
-		PHALCON_RETURN_CALL_METHODW(service, "getdefinition");
+		phalcon_read_property_array(&service, getThis(), SL("_services"), name);
+		PHALCON_RETURN_CALL_METHODW(&service, "getdefinition");
 		return;
 	}
 
@@ -348,14 +348,14 @@ PHP_METHOD(Phalcon_DI, getRaw){
  */
 PHP_METHOD(Phalcon_DI, getService){
 
-	zval *name, *service;
+	zval *name;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 	
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
-		service = phalcon_read_property_array(getThis(), SL("_services"), name);
-		RETURN_ZVAL(service, 1, 0);
+		phalcon_read_property_array(return_value, getThis(), SL("_services"), name);
+		return;
 	}
 
 	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));
@@ -393,13 +393,11 @@ PHP_METHOD(Phalcon_DI, get){
 		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
-		PHALCON_PTR_DTOR(&event_data);
 	}
 
 	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name)) {
 		PHALCON_CALL_METHODW(return_value, &service, "resolve", parameters, getThis());
 		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
-		PHALCON_PTR_DTOR(&service);
 	} else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
 		if ((ce = phalcon_class_exists_ex(name, 1)) != NULL) {
@@ -428,10 +426,7 @@ PHP_METHOD(Phalcon_DI, get){
 		phalcon_array_update_str(&event_data, SL("instance"), return_value, PH_COPY);
 
 		PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
-		PHALCON_PTR_DTOR(&event_data);
 	}
-	PHALCON_PTR_DTOR(&event_name);
-	PHALCON_PTR_DTOR(&events_manager);
 }
 
 /**

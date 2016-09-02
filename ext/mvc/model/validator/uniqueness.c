@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 
 	ZVAL_STRING(&option, "field");
 
-	PHALCON_CALL_METHODW(&field, getThis(), "get&option", &option);
+	PHALCON_CALL_METHODW(&field, getThis(), "getoption", &option);
 	PHALCON_CALL_METHODW(&dependency_injector, record, "getdi");
 
 	ZVAL_STRING(&service, "modelsMetadata");
@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 			 * The reversed column map is used in the case to get real column name
 			 */
 			if (Z_TYPE(column_map) == IS_ARRAY) { 
-				if (!phalcon_array_isset_fetch(&column_field, &column_map, compose_field)) {
+				if (!phalcon_array_isset_fetch(&column_field, &column_map, compose_field, 0)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", compose_field, "\" isn't part of the column map");
 					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 * The reversed column map is used in the case to get real column name
 		 */
 		if (Z_TYPE(column_map) == IS_ARRAY) { 
-			if (!phalcon_array_isset_fetch(&column_field, &column_map, &field)) {
+			if (!phalcon_array_isset_fetch(&column_field, &column_map, &field, 0)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Column '", &field, "\" isn't part of the column map");
 				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 			 * Rename the column if there is a column map
 			 */
 			if (Z_TYPE(column_map) == IS_ARRAY) { 
-				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, primary_field)) {
+				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, primary_field, 0)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_field, "\" isn't part of the column map");
 					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	 */
 	array_init_size(&params, 4);
 	phalcon_array_update_str(&params, SL("di"), &dependency_injector, PH_COPY);
-	phalcon_array_update_str(&params, SL("&conditions"), &join_conditions, PH_COPY);
+	phalcon_array_update_str(&params, SL("conditions"), &join_conditions, PH_COPY);
 	phalcon_array_update_str(&params, SL("bind"), &bind_params, PH_COPY);
 	phalcon_array_update_str(&params, SL("bindTypes"), &bind_types, PH_COPY);
 
@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 */
 		ZVAL_STRING(&option, ISV(message));
 
-		PHALCON_CALL_METHODW(&message, getThis(), "get&option", &option);
+		PHALCON_CALL_METHODW(&message, getThis(), "getoption", &option);
 		if (!zend_is_true(&message)) {
 			if (Z_TYPE(field) == IS_ARRAY) { 
 				phalcon_fast_join_str(&join_fields, SL(", "), &field);
@@ -294,9 +294,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		 */
 		ZVAL_STRING(&option, ISV(code));
 
-		PHALCON_CALL_METHODW(&is_set_code, getThis(), "isset&option", &option);
+		PHALCON_CALL_METHODW(&is_set_code, getThis(), "issetoption", &option);
 		if (zend_is_true(&is_set_code)) {
-			PHALCON_CALL_METHODW(&code, getThis(), "get&option", &option);
+			PHALCON_CALL_METHODW(&code, getThis(), "getoption", &option);
 		} else {
 			ZVAL_LONG(&code, 0);
 		}

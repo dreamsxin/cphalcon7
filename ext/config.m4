@@ -166,14 +166,6 @@ mvc/micro/exception.c \
 mvc/micro/collection.c \
 mvc/micro/collectioninterface.c \
 mvc/dispatcherinterface.c \
-mvc/collection/managerinterface.c \
-mvc/collection/manager.c \
-mvc/collection/exception.c \
-mvc/collection/document.c \
-mvc/collection/messageinterface.c \
-mvc/collection/message.c \
-mvc/collection/gridfs.c \
-mvc/collection/resultset.c \
 mvc/routerinterface.c \
 mvc/urlinterface.c \
 mvc/user/component.c \
@@ -190,12 +182,8 @@ mvc/router/exception.c \
 mvc/router/routeinterface.c \
 mvc/url/exception.c \
 mvc/viewinterface.c \
-mvc/collection.c \
 mvc/dispatcher.c \
-mvc/collectioninterface.c \
 mvc/view/engine/php.c \
-mvc/view/engine/volt/compiler.c \
-mvc/view/engine/volt.c \
 mvc/view/exception.c \
 mvc/view/engineinterface.c \
 mvc/view/simple.c \
@@ -259,7 +247,6 @@ mvc/model/resultset/complex.c \
 mvc/model/resultset/simple.c \
 mvc/model/behavior/timestampable.c \
 mvc/model/behavior/softdelete.c \
-mvc/model/behavior/nestedset.c \
 mvc/model/validator.c \
 mvc/model/metadatainterface.c \
 mvc/model/relationinterface.c \
@@ -422,8 +409,6 @@ validation/validator/numericality.c \
 validation/validator.c \
 mvc/model/query/parser.c \
 mvc/model/query/scanner.c \
-mvc/view/engine/volt/parser.c \
-mvc/view/engine/volt/scanner.c \
 annotations/parser.c \
 annotations/scanner.c \
 image.c \
@@ -432,7 +417,6 @@ image/adapterinterface.c \
 image/exception.c \
 image/adapter/gd.c \
 image/adapter/imagick.c \
-chart/qrcode.c \
 chart/captcha.c \
 chart/exception.c \
 async.c \
@@ -543,27 +527,6 @@ registry.c"
 			break
 		fi
 	done
-
-	if test -n "$PNG_CFLAGS"; then
-		for i in /usr/local /usr; do
-			if test -r $i/include/qrencode.h; then
-				QR_CFLAGS=`pkg-config --cflags libqrencode`
-				QR_LDFLAGS=`pkg-config --libs libqrencode`
-
-				PHP_ADD_INCLUDE($i/include)
-
-				CPPFLAGS="${CPPFLAGS} ${QR_CFLAGS}"
-				EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${QR_LDFLAGS}"
-
-				AC_MSG_RESULT("libqrencode found")
-
-				AC_DEFINE([PHALCON_USE_QRENCODE], [1], [Have libqrencode support])
-				break
-			fi
-		done
-	else
-		AC_MSG_RESULT([libpng not found])
-	fi
 
 	for i in /usr/local /usr; do
 		if test -r $i/bin/MagickWand-config; then

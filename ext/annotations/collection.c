@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 			phalcon_array_append(&annotations, &annotation, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
-		phalcon_update_property_this(getThis(), SL("_annotations"), &annotations);
+		phalcon_update_property_zval(getThis(), SL("_annotations"), &annotations);
 	}
 }
 
@@ -146,11 +146,11 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
  */
 PHP_METHOD(Phalcon_Annotations_Collection, count){
 
-	zval *annotations;
+	zval annotations = {};
 
-	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
-	if (Z_TYPE_P(annotations) == IS_ARRAY) {
-		RETURN_LONG(zend_hash_num_elements(Z_ARRVAL_P(annotations)));
+	phalcon_read_property(&annotations, getThis(), SL("_annotations"), PH_NOISY);
+	if (Z_TYPE(annotations) == IS_ARRAY) {
+		RETURN_LONG(zend_hash_num_elements(Z_ARRVAL(annotations)));
 	}
 
 	RETURN_LONG(0);
@@ -173,11 +173,11 @@ PHP_METHOD(Phalcon_Annotations_Collection, rewind){
  */
 PHP_METHOD(Phalcon_Annotations_Collection, current){
 
-	zval *position, *annotations;
+	zval position = {}, annotations = {};
 
-	position = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
-	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(return_value, annotations, position)) {
+	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY);
+	phalcon_read_property(&annotations, getThis(), SL("_annotations"), PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &annotations, &position, 0)) {
 		RETURN_NULL();
 	}
 }
@@ -211,11 +211,11 @@ PHP_METHOD(Phalcon_Annotations_Collection, next){
  */
 PHP_METHOD(Phalcon_Annotations_Collection, valid){
 
-	zval *position, *annotations;
+	zval position = {}, annotations = {};
 
-	position = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
-	annotations = phalcon_read_property(getThis(), SL("_annotations"), PH_NOISY);
-	if (phalcon_array_isset(annotations, position)) {
+	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY);
+	phalcon_read_property(&annotations, getThis(), SL("_annotations"), PH_NOISY);
+	if (phalcon_array_isset(&annotations, &position)) {
 		RETURN_TRUE;
 	}
 

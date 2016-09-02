@@ -2,7 +2,7 @@
 
 ## [捐贈名單（Donation）](https://github.com/dreamsxin/cphalcon/blob/master/DONATE.md)
 
-[Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
+PHP5 系列使用 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
 
 Phalcon7 Framework
 =================
@@ -27,8 +27,8 @@ Prerequisite packages are:
 Ubuntu:
 
 ```bash
-sudo add-apt-repository ppa:ondrej/php-7.0
-sudo apt-get install php7-dev libpcre3-dev gcc make
+sudo add-apt-repository ppa:ondrej/php
+sudo apt-get install php7.0-dev libpcre3-dev gcc make
 
 # or compilation
 ----------------

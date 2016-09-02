@@ -105,11 +105,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 	} else {
 		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 		PHALCON_CONCAT_VV(&last_key, &prefix, key_name);
-		phalcon_update_property_this(getThis(), SL("_lastKey"), &last_key);
+		phalcon_update_property_zval(getThis(), SL("_lastKey"), &last_key);
 	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));
-	if (phalcon_array_isset_fetch(&cached_content, &data, &last_key)) {
+	if (phalcon_array_isset_fetch(&cached_content, &data, &last_key, 0)) {
 		if (Z_TYPE(cached_content) != IS_NULL) {
 			if (phalcon_is_numeric(&cached_content)) {
 				RETURN_CTORW(&cached_content);
@@ -119,8 +119,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 			}
 		}
 	}
-
-	RETURN_NULL();
 }
 
 /**
@@ -150,7 +148,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, save){
 	}
 
 	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
-	if (Z_TYPE_P(content) == IS_NULL) {
+	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHODW(&cached_content, &frontend, "getcontent");
 	} else {
 		PHALCON_CPY_WRT(&cached_content, content);
@@ -300,7 +298,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, increment){
 	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));
-	if (!phalcon_array_isset_fetch(&cached_content, &data, &last_key)) {
+	if (!phalcon_array_isset_fetch(&cached_content, &data, &last_key, 0)) {
 		RETURN_FALSE;
 	}
 
@@ -336,7 +334,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, decrement){
 	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));
-	if (!phalcon_array_isset_fetch(&cached_content, &data, &last_key)) {
+	if (!phalcon_array_isset_fetch(&cached_content, &data, &last_key, 0)) {
 		RETURN_FALSE;
 	}
 

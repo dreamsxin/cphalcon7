@@ -117,11 +117,11 @@ PHP_METHOD(Phalcon_DI_Service, __construct){
 	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	phalcon_update_property_this(getThis(), SL("_name"), name);
-	phalcon_update_property_this(getThis(), SL("_definition"), definition);
+	phalcon_update_property_zval(getThis(), SL("_name"), name);
+	phalcon_update_property_zval(getThis(), SL("_definition"), definition);
 	if (shared) {
 		PHALCON_ENSURE_IS_BOOL(shared);
-		phalcon_update_property_this(getThis(), SL("_shared"), shared);
+		phalcon_update_property_zval(getThis(), SL("_shared"), shared);
 	}
 }
 
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_DI_Service, setShared){
 
 	zval *shared;
 	phalcon_fetch_params(0, 1, 0, &shared);
-	phalcon_update_property_this(getThis(), SL("_shared"), shared);
+	phalcon_update_property_zval(getThis(), SL("_shared"), shared);
 }
 
 /**
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_DI_Service, isShared){
 PHP_METHOD(Phalcon_DI_Service, setSharedInstance){
 	zval *shared_instance;
 	phalcon_fetch_params(0, 1, 0, &shared_instance);
-	phalcon_update_property_this(getThis(), SL("_sharedInstance"), shared_instance);
+	phalcon_update_property_zval(getThis(), SL("_sharedInstance"), shared_instance);
 }
 
 /**
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_DI_Service, setDefinition)
 {
 	zval *definition;
 	phalcon_fetch_params(0, 1, 0, &definition);
-	phalcon_update_property_this(getThis(), SL("_definition"), definition);
+	phalcon_update_property_zval(getThis(), SL("_definition"), definition);
 }
 
 /**
@@ -216,14 +216,11 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 	phalcon_return_property(&shared_instance, getThis(), SL("_sharedInstance"));
 
 	ishared = zend_is_true(&shared);
-	PHALCON_PTR_DTOR(&shared);
 
 	/* Check if the service is shared */
 	if (ishared && Z_TYPE(shared_instance) != IS_NULL) {
 		RETURN_CTORW(&shared_instance);
 	}
-
-	PHALCON_PTR_DTOR(&shared_instance);
 
 	phalcon_return_property(&definition, getThis(), SL("_definition"));
 
@@ -255,22 +252,18 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 		object_init_ex(&builder, phalcon_di_service_builder_ce);
 
 		PHALCON_CALL_METHODW(return_value, &builder, "build", dependency_injector, &definition, parameters);
-		PHALCON_PTR_DTOR(&builder);
 	}
-
-	PHALCON_PTR_DTOR(&definition);
 
 	if (!EG(exception)) {
 		if (found) {
 			if (ishared) {
-				phalcon_update_property_this(getThis(), SL("_sharedInstance"), return_value);
+				phalcon_update_property_zval(getThis(), SL("_sharedInstance"), return_value);
 			}
 			/* Update the shared instance if the service is shared */
 			phalcon_update_property_bool(getThis(), SL("_resolved"), 1);
 		} else {
 			phalcon_return_property(&name, getThis(), SL("_name"));
 			PHALCON_THROW_EXCEPTION_FORMATW(phalcon_di_exception_ce, "Service '%s' cannot be resolved", Z_STRVAL(name));
-			PHALCON_PTR_DTOR(&name);
 		}
 	}
 }
@@ -311,7 +304,7 @@ PHP_METHOD(Phalcon_DI_Service, setParameter){
 
 	phalcon_array_update_str(&definition, SL("arguments"), &arguments, PH_COPY);
 
-	phalcon_update_property_this(getThis(), SL("_definition"), &definition);
+	phalcon_update_property_zval(getThis(), SL("_definition"), &definition);
 
 	RETURN_THISW();
 }
@@ -338,7 +331,7 @@ PHP_METHOD(Phalcon_DI_Service, getParameter){
 	/* Update the parameter */
 	if (
 		!phalcon_array_isset_fetch_str(&arguments, &definition, SL("arguments")) ||
-		!phalcon_array_isset_fetch(return_value, &arguments, position)
+		!phalcon_array_isset_fetch(return_value, &arguments, position, 0)
 	) {
 		RETURN_NULL();
 	}

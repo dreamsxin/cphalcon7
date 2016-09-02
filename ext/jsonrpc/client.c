@@ -86,7 +86,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, __construct){
 
 	PHALCON_VERIFY_INTERFACE_EX(httpclient, phalcon_http_client_adapterinterface_ce, phalcon_jsonrpc_client_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_httpclient"), httpclient);
+	phalcon_update_property_zval(getThis(), SL("_httpclient"), httpclient);
 }
 
 /**
@@ -98,19 +98,19 @@ PHP_METHOD(Phalcon_JsonRpc_Client, __construct){
  */
 PHP_METHOD(Phalcon_JsonRpc_Client, call)
 {
-	zval *method = NULL, *data = NULL, *httpclient, id = {}, jsonrpc_message = {}, json_message = {}, response = {};
+	zval *method = NULL, *data = NULL, httpclient = {}, id = {}, jsonrpc_message = {}, json_message = {}, response = {};
 	zval code = {}, body = {}, json = {}, jsonrpc_response = {}, result = {}, error = {};
 	int i;
 
 	phalcon_fetch_params(0, 1, 1, &method, &data);
 
-	httpclient = phalcon_read_property(getThis(), SL("_httpclient"), PH_NOISY);
+	phalcon_read_property(&httpclient, getThis(), SL("_httpclient"), PH_NOISY);
 	phalcon_return_property(&id, getThis(), SL("_id"));
 
 	i = Z_LVAL(id) + 1;
 	ZVAL_LONG(&id, i);
 
-	phalcon_update_property_this(getThis(), SL("_id"), &id);
+	phalcon_update_property_zval(getThis(), SL("_id"), &id);
 
 	array_init(&jsonrpc_message);
 
@@ -124,8 +124,8 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call)
 	phalcon_array_update_str(&jsonrpc_message, SL("id"), &id, PH_COPY);
 
 	PHALCON_CALL_FUNCTIONW(&json_message, "json_encode", &jsonrpc_message);
-	PHALCON_CALL_METHODW(NULL, httpclient, "setdata", &json_message);
-	PHALCON_CALL_METHODW(&response, httpclient, "post");
+	PHALCON_CALL_METHODW(NULL, &httpclient, "setdata", &json_message);
+	PHALCON_CALL_METHODW(&response, &httpclient, "post");
 
 	PHALCON_VERIFY_CLASS_EX(&response, phalcon_http_client_response_ce, phalcon_jsonrpc_client_exception_ce, 0);
 

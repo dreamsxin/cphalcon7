@@ -1,10 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 shopt -s nullglob
 export LC_ALL=C
-for i in core core.*; do
+VERSION=$(php-config --version)
+
+for i in /tmp/core_*.*; do
 	if [ -f "$i" -a "$(file "$i" | grep -o 'core file')" ]; then
-		gdb -q $(file "$i" | grep -oE "'[^ ']+" | sed "s/^'//g") "$i" <<EOF
+		gdb -q /home/travis/.phpenv/versions/${VERSION}/bin/php "$i" <<EOF
 set pagination 0
 backtrace full
 info registers
@@ -14,6 +16,3 @@ quit
 EOF
 	fi
 done
-
-$(phpenv which php) -m
-$(phpenv which php) -i

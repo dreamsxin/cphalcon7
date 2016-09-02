@@ -90,8 +90,8 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 		ZVAL_STRING(&message_str, "Validation failed");
 	}
 
-	phalcon_update_property_this(getThis(), SL("_model"), model);
-	phalcon_update_property_this(getThis(), SL("_messages"), validation_messages);
+	phalcon_update_property_zval(getThis(), SL("_model"), model);
+	phalcon_update_property_zval(getThis(), SL("_messages"), validation_messages);
 
 	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_validationfailed_ce, getThis(), "__construct", &message_str);
 }

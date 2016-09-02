@@ -74,22 +74,19 @@ int ZEND_FASTCALL phalcon_clean_restore_stack();
 		} \
 	} while (0)
 
-#define PHALCON_CPY_WRT(d, v) ZVAL_COPY(d, v);
+#define PHALCON_CPY_WRT(d, v)  \
+	Z_TRY_ADDREF_P(v);  \
+	ZVAL_COPY_VALUE(d, v);
+
 #define PHALCON_CPY_WRT_CTOR(d, v) ZVAL_DUP(d, v);
 
 #define PHALCON_STR(z, str) \
 	do { \
-		if (Z_TYPE_P(z) > IS_NULL) { \
-			PHALCON_PTR_DTOR(z); \
-		} \
 		ZVAL_STRING(z, str); \
 	} while (0)
 
 #define PHALCON_STRL(z, str, len) \
 	do { \
-		if (Z_TYPE_P(z) > IS_NULL) { \
-			PHALCON_PTR_DTOR(z); \
-		} \
 		ZVAL_STRINGL(z, str, len); \
 	} while (0)
 

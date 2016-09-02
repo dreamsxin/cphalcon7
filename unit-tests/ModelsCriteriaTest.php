@@ -103,7 +103,7 @@ class ModelsCriteriaTest extends PHPUnit_Framework_TestCase
 		$this->_executeTestsFromInput($di);
 		$this->_executeTestIssues2131($di);
 		$this->_executeJoinTests($di, "postgresql");
-		$this->_executeTestRawSQL($di);
+		//$this->_executeTestRawSQL($di);
 	}
 
 	public function testModelsSQLite()
@@ -126,7 +126,7 @@ class ModelsCriteriaTest extends PHPUnit_Framework_TestCase
 		$this->_executeTestsFromInput($di);
 		$this->_executeTestIssues2131($di);
 		$this->_executeJoinTests($di, "sqlite");
-		$this->_executeTestRawSQL($di);
+		//$this->_executeTestRawSQL($di);
 	}
 
 	protected function _executeTestsNormal($di)

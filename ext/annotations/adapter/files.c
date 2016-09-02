@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, __construct){
 	
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&annotations_dir, options, SL("annotationsDir"))) {
-			phalcon_update_property_this(getThis(), SL("_annotationsDir"), &annotations_dir);
+			phalcon_update_property_zval(getThis(), SL("_annotationsDir"), &annotations_dir);
 		}
 	}
 }

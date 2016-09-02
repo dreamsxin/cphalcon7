@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, get){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCX", &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_FUNCTIONW(&cached_content, "xcache_get", &prefixed_key);
 	if (Z_TYPE(cached_content) == IS_NULL) {

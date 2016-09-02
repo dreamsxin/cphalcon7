@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Security, setRandomBytes){
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_numberBytes"), random_bytes);
+	phalcon_update_property_zval(getThis(), SL("_numberBytes"), random_bytes);
 }
 
 /**
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Security, setWorkFactor){
 	phalcon_fetch_params(0, 1, 0, &work_factor);
 
 	PHALCON_ENSURE_IS_LONG(work_factor);
-	phalcon_update_property_this(getThis(), SL("_workFactor"), work_factor);
+	phalcon_update_property_zval(getThis(), SL("_workFactor"), work_factor);
 }
 
 /**
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
  */
 PHP_METHOD(Phalcon_Security, hash)
 {
-	zval *password, *work_factor = NULL, n_bytes = {}, salt_bytes = {}, default_hash = {}, z_salt = {};
+	zval *password, *work_factor = NULL, _work_factor = {}, n_bytes = {}, salt_bytes = {}, default_hash = {}, z_salt = {};
 	char variant, *salt;
 	int salt_len, i_factor, i_hash;
 
@@ -359,13 +359,14 @@ PHP_METHOD(Phalcon_Security, hash)
 	PHALCON_ENSURE_IS_STRING(password);
 
 	if (!work_factor || Z_TYPE_P(work_factor) == IS_NULL) {
-		work_factor = phalcon_read_property(getThis(), SL("_workFactor"), PH_NOISY);
+		phalcon_read_property(&_work_factor, getThis(), SL("_workFactor"), PH_NOISY);
+		work_factor = &_work_factor;
 	}
 
 	i_factor = phalcon_get_intval(work_factor);
 
 	phalcon_return_property(&default_hash, getThis(), SL("_defaultHash"));
-	i_hash = phalcon_get_intval(&default_hash);
+	i_hash = (Z_TYPE(default_hash) == IS_LONG) ? Z_LVAL(default_hash) : phalcon_get_intval(&default_hash);
 
 	switch (i_hash) {
 		default:
@@ -1028,7 +1029,7 @@ PHP_METHOD(Phalcon_Security, setDefaultHash)
 	phalcon_fetch_params(0, 1, 0, &default_hash);
 	PHALCON_ENSURE_IS_LONG(default_hash);
 
-	phalcon_update_property_this(getThis(), SL("_defaultHash"), default_hash);
+	phalcon_update_property_zval(getThis(), SL("_defaultHash"), default_hash);
 }
 
 /**

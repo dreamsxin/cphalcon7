@@ -79,16 +79,16 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_Firephp){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Firephp, getFormatter){
 
-	zval *formatter;
+	zval formatter = {};
 
-	formatter = phalcon_read_property(getThis(), SL("_formatter"), PH_NOISY);
-	if (Z_TYPE_P(formatter) != IS_OBJECT) {
+	phalcon_read_property(&formatter, getThis(), SL("_formatter"), PH_NOISY);
+	if (Z_TYPE(formatter) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_logger_formatter_firephp_ce);
-		phalcon_update_property_this(getThis(), SL("_formatter"), return_value);
+		phalcon_update_property_zval(getThis(), SL("_formatter"), return_value);
 		return;
 	}
 
-	RETURN_ZVAL(formatter, 1, 0);
+	RETURN_ZVAL(&formatter, 1, 0);
 }
 
 /**

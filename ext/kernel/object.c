@@ -48,6 +48,24 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 	return SUCCESS;
 }
 
+int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index, zval *value)
+{
+	zval arr = {};
+	int separated = 0;
+
+	phalcon_return_static_property_ce(&arr, ce, property, property_length);
+
+	/** Convert the value to array if not is an array */
+	if (Z_TYPE(arr) != IS_ARRAY) {
+		array_init(&arr);
+	}
+
+	phalcon_array_update_zval(&arr, index,  value, PH_COPY);
+	phalcon_update_static_property_ce(ce, property, property_length, &arr);
+
+	return SUCCESS;
+}
+
 /*
  * Multiple array-offset update
  */

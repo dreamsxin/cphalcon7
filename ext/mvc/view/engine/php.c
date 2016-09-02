@@ -65,8 +65,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Php){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
-	zval *path, *params, *must_clean = NULL, contents = {};
-	zval *view;
+	zval *path, *params, *must_clean = NULL, contents = {}, view = {};
 	int clean;
 
 	phalcon_fetch_params(0, 2, 1, &path, &params, &must_clean);
@@ -99,8 +98,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	if (clean) {
 		phalcon_ob_get_contents(&contents);
 	
-		view = phalcon_read_property(getThis(), SL("_view"), PH_NOISY);
-		PHALCON_CALL_METHODW(NULL, view, "setcontent", &contents);
+		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
+		PHALCON_CALL_METHODW(NULL, &view, "setcontent", &contents);
 	}
 
 	RETURN_TRUE;

@@ -126,7 +126,6 @@ class ViewEnginesTest extends PHPUnit_Framework_TestCase
 			'.mhtml' => 'My_Mustache_Engine',
 			'.phtml' => 'Phalcon\Mvc\View\Engine\Php',
 			'.twig'  => 'My_Twig_Engine',
-			'.volt'  => 'Phalcon\Mvc\View\Engine\Volt',
 		);
 
 		$di   = new Phalcon\DI();

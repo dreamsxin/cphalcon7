@@ -23,12 +23,12 @@
 #include <Zend/zend_smart_str.h>
 #include <ext/standard/php_string.h>
 
-zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigned long *position, char *cursor, char *marker){
-
-	zval *zv, *tmp;
+zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigned long *position, char *cursor, char *marker)
+{
 	unsigned int length = 0, variable_length, ch, j;
 	char *item = NULL, *cursor_var, *variable = NULL;
 	int not_valid = 0;
+	zval *zv, *tmp;
 
 	if (named) {
 		length = cursor - marker - 1;
@@ -68,6 +68,7 @@ zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigne
 					item = variable;
 					length = variable_length;
 				}
+
 				if (zend_hash_str_exists(Z_ARRVAL_P(replacements), item, length)) {
 					if ((zv = zend_hash_str_find(Z_ARRVAL_P(replacements), item, length)) != NULL) {
 						efree(item);
@@ -78,8 +79,8 @@ zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigne
 			} else {
 				if ((zv = zend_hash_index_find(Z_ARRVAL_P(paths), *position)) != NULL) {
 					if (Z_TYPE_P(zv) == IS_STRING) {
-						if (zend_hash_exists(Z_ARRVAL_P(replacements), Z_STR_P(zv))) {
-							if ((tmp = zend_hash_find(Z_ARRVAL_P(replacements), Z_STR_P(zv))) == SUCCESS) {
+						if (zend_hash_str_exists(Z_ARRVAL_P(replacements), Z_STRVAL_P(zv), Z_STRLEN_P(zv))) {
+							if ((tmp = zend_hash_str_find(Z_ARRVAL_P(replacements), Z_STRVAL_P(zv), Z_STRLEN_P(zv))) != NULL) {
 								(*position)++;
 								return tmp;
 							}
@@ -96,7 +97,7 @@ zval *phalcon_replace_marker(int named, zval *paths, zval *replacements, unsigne
 		efree(item);
 	}
 
-	return NULL;
+return NULL;
 }
 
 /**

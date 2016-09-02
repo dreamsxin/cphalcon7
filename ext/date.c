@@ -201,8 +201,8 @@ PHP_METHOD(Phalcon_Date, offset){
 
 	phalcon_fetch_params(0, 1, 2, &remote, &local, &date);
 
-	ce0 = zend_fetch_class(SSL("DateTime"), ZEND_FETCH_CLASS_AUTO);
-	ce1 = zend_fetch_class(SSL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
+	ce0 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
+	ce1 = phalcon_fetch_str_class(SL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
 
 	if (!date) {
 		ZVAL_STRING(&new_date, "now");
@@ -779,9 +779,9 @@ PHP_METHOD(Phalcon_Date, span2){
 	}
 
 	if (Z_LVAL(count_output) == 1) {
-		ZVAL_MAKE_REF(&output_arr);
+		PHALCON_MAKE_REF(&output_arr);
 		PHALCON_CALL_FUNCTIONW(return_value, "array_pop", &output_arr);
-		ZVAL_UNREF(&output_arr);
+		PHALCON_UNREF(&output_arr);
 		return;
 	}
 
@@ -1049,8 +1049,8 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 		PHALCON_CALL_FUNCTIONW(&timezone, "date_default_timezone_get");
 	}
 
-	ce0 = zend_fetch_class(SSL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
-	ce1 = zend_fetch_class(SSL("DateTime"), ZEND_FETCH_CLASS_AUTO);
+	ce0 = phalcon_fetch_str_class(SL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
+	ce1 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&tz, ce0);
 	PHALCON_CALL_METHODW(NULL, &tz, "__construct", &timezone);

@@ -75,7 +75,7 @@ PHP_METHOD(Phalcon_Db_RawValue, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 	
-	phalcon_update_property_this(getThis(), SL("_value"), value);
+	phalcon_update_property_zval(getThis(), SL("_value"), value);
 	
 }
 

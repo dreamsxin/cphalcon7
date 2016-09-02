@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	if (method) {
 		phalcon_fast_strtoupper(&upper_method, method);
-		phalcon_update_property_this(getThis(), SL("_method"), &upper_method);
+		phalcon_update_property_zval(getThis(), SL("_method"), &upper_method);
 	}
 
 	object_init_ex(&header, phalcon_http_client_header_ce);
@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	PHALCON_CALL_METHODW(NULL, &header, "set", &option, &value);
 
-	phalcon_update_property_this(getThis(), SL("_header"), &header);
+	phalcon_update_property_zval(getThis(), SL("_header"), &header);
 
 	ZVAL_STRING(&option, "follow_location");
 	ZVAL_LONG(&value, 1);
@@ -122,69 +122,69 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, __construct){
 
 	PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &value);
 
-	phalcon_update_property_this(getThis(), SL("_stream"), &stream);
+	phalcon_update_property_zval(getThis(), SL("_stream"), &stream);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
-	zval *stream, *header, *data, *type, *files, *username, *password, *authtype, *digest, *method, *entity_body;
+	zval stream = {}, header = {}, data = {}, type = {}, files = {}, username = {}, password = {}, authtype = {}, digest = {}, method = {}, entity_body = {};
 	zval key = {}, key_value = {}, realm = {}, ha1_txt = {}, ha1 = {}, qop = {}, ha2_txt = {}, ha2 = {}, nonce = {};
 	zval nc = {}, cnonce = {}, qoc = {}, digest_value = {}, path = {}, md5_entity_body = {};
 	zval http = {}, option = {}, body = {}, headers = {}, uniqid = {}, boundary = {}, *value, *file;
 	zend_string *str_key;
 	ulong idx;
 
-	stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
-	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
-	data = phalcon_read_property(getThis(), SL("_data"), PH_NOISY);
-	type = phalcon_read_property(getThis(), SL("_type"), PH_NOISY);
-	files = phalcon_read_property(getThis(), SL("_files"), PH_NOISY);
-	username = phalcon_read_property(getThis(), SL("_username"), PH_NOISY);
-	password = phalcon_read_property(getThis(), SL("_password"), PH_NOISY);
-	authtype = phalcon_read_property(getThis(), SL("_authtype"), PH_NOISY);
-	digest = phalcon_read_property(getThis(), SL("_digest"), PH_NOISY);
-	method = phalcon_read_property(getThis(), SL("_method"), PH_NOISY);
-	entity_body = phalcon_read_property(getThis(), SL("_entity_body"), PH_NOISY);
+	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY);
+	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+	phalcon_read_property(&files, getThis(), SL("_files"), PH_NOISY);
+	phalcon_read_property(&username, getThis(), SL("_username"), PH_NOISY);
+	phalcon_read_property(&password, getThis(), SL("_password"), PH_NOISY);
+	phalcon_read_property(&authtype, getThis(), SL("_authtype"), PH_NOISY);
+	phalcon_read_property(&digest, getThis(), SL("_digest"), PH_NOISY);
+	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY);
+	phalcon_read_property(&entity_body, getThis(), SL("_entity_body"), PH_NOISY);
 
-	if (PHALCON_IS_NOT_EMPTY(username)) {
-		if (PHALCON_IS_STRING(authtype, "basic")) {
+	if (PHALCON_IS_NOT_EMPTY(&username)) {
+		if (PHALCON_IS_STRING(&authtype, "basic")) {
 			ZVAL_STRING(&key, "Authorization");
-			PHALCON_CONCAT_SVSV(&key_value, "Basic ", username, ":", password);
+			PHALCON_CONCAT_SVSV(&key_value, "Basic ", &username, ":", &password);
 
-			PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
-		} else if (PHALCON_IS_STRING(authtype, "digest") && PHALCON_IS_NOT_EMPTY(digest)) {
-			if (!phalcon_array_isset_fetch_str(&realm, digest, SL("realm"))) {
+			PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
+		} else if (PHALCON_IS_STRING(&authtype, "digest") && PHALCON_IS_NOT_EMPTY(&digest)) {
+			if (!phalcon_array_isset_fetch_str(&realm, &digest, SL("realm"))) {
 				ZVAL_NULL(&realm);
 			}
 
-			PHALCON_CONCAT_VSVSV(&ha1_txt, username, ":", &realm, ":", password);
+			PHALCON_CONCAT_VSVSV(&ha1_txt, &username, ":", &realm, ":", &password);
 
 			PHALCON_CALL_FUNCTIONW(&ha1, "md5", &ha1_txt);
 
-			if (!phalcon_array_isset_fetch_str(&qop, digest, SL("qop"))) {
+			if (!phalcon_array_isset_fetch_str(&qop, &digest, SL("qop"))) {
 				ZVAL_NULL(&qop);
 			}
 
 			if (PHALCON_IS_EMPTY(&qop) || phalcon_memnstr_str(&qop, SL("auth"))) {
 				PHALCON_CALL_SELFW(&path, "getpath");
 
-				PHALCON_CONCAT_VSV(&ha2_txt, method, ":", &path);
+				PHALCON_CONCAT_VSV(&ha2_txt, &method, ":", &path);
 
 				PHALCON_CALL_FUNCTIONW(&ha2, "md5", &ha2_txt);
 				
 			} else if (phalcon_memnstr_str(&qop, SL("auth-int"))) {
 				PHALCON_CALL_SELFW(&path, "getpath");
 
-				PHALCON_CALL_FUNCTIONW(&md5_entity_body, "md5", entity_body);
+				PHALCON_CALL_FUNCTIONW(&md5_entity_body, "md5", &entity_body);
 
-				PHALCON_CONCAT_VSVSV(&ha2_txt, method, ":", &path, ":", &md5_entity_body);
+				PHALCON_CONCAT_VSVSV(&ha2_txt, &method, ":", &path, ":", &md5_entity_body);
 
 				PHALCON_CALL_FUNCTIONW(&ha2, "md5", &ha2_txt);
 			}
 
 			ZVAL_STRING(&key, "Authorization");
 
-			if (!phalcon_array_isset_fetch_str(&nonce, digest, SL("nonce"))) {
+			if (!phalcon_array_isset_fetch_str(&nonce, &digest, SL("nonce"))) {
 				ZVAL_NULL(&nonce);
 			}
 
@@ -195,17 +195,17 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 				PHALCON_CONCAT_SV(&key_value, "Digest ", &digest_value);
 
-				PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
+				PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
 			} else {			
-				if (!phalcon_array_isset_fetch_str(&nc, digest, SL("nc"))) {
+				if (!phalcon_array_isset_fetch_str(&nc, &digest, SL("nc"))) {
 					ZVAL_NULL(&nc);
 				}
 				
-				if (!phalcon_array_isset_fetch_str(&cnonce, digest, SL("cnonce"))) {
+				if (!phalcon_array_isset_fetch_str(&cnonce, &digest, SL("cnonce"))) {
 					ZVAL_NULL(&cnonce);
 				}
 				
-				if (!phalcon_array_isset_fetch_str(&qoc, digest, SL("qoc"))) {
+				if (!phalcon_array_isset_fetch_str(&qoc, &digest, SL("qoc"))) {
 					ZVAL_NULL(&qoc);
 				}
 
@@ -216,7 +216,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 				PHALCON_CONCAT_SV(&key_value, "Digest ", &digest_value);
 
-				PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
+				PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
 			}
 		}
 	}
@@ -227,39 +227,39 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 	PHALCON_CONCAT_SV(&boundary, "--------------", &uniqid);
 	
-	if (Z_TYPE_P(data) == IS_STRING && PHALCON_IS_NOT_EMPTY(data)) {
+	if (Z_TYPE(data) == IS_STRING && PHALCON_IS_NOT_EMPTY(&data)) {
 		ZVAL_STRING(&key, "Content-Type");
 
-		if (PHALCON_IS_EMPTY(type)) {
+		if (PHALCON_IS_EMPTY(&type)) {
 			ZVAL_STRING(&key_value, "application/x-www-form-urlencoded");
 		} else {
-			PHALCON_CPY_WRT(&key_value, type);
+			PHALCON_CPY_WRT(&key_value, &type);
 		}
 
-		PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
+		PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
 
 		ZVAL_STRING(&key, "Content-Length");		
 
-		ZVAL_LONG(&key_value, Z_STRLEN_P(data));
+		ZVAL_LONG(&key_value, Z_STRLEN(data));
 
-		PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
+		PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
 
 		ZVAL_LONG(&option, PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS);
 
-		PHALCON_CALL_METHODW(&headers, header, "build", &option);
+		PHALCON_CALL_METHODW(&headers, &header, "build", &option);
 
 		ZVAL_STRING(&option, "header");
 
-		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", stream, &http, &option, &headers);
+		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &headers);
 
 		ZVAL_STRING(&option, "content");
 		
-		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", stream, &http, &option, data);
+		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &data);
 		return;
 	}
 
-	if (Z_TYPE_P(data) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
+	if (Z_TYPE(data) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data), idx, str_key, value) {
 			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
@@ -272,8 +272,8 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	if (Z_TYPE_P(files) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(files), file) {
+	if (Z_TYPE(files) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(files), file) {
 			zval path_parts = {}, filename = {}, basename = {}, filedata = {};
 			if (PHALCON_IS_NOT_EMPTY(file)) {
 				PHALCON_CALL_FUNCTIONW(&path_parts, "pathinfo", file);
@@ -295,19 +295,19 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		ZVAL_STRING(&key, "Content-Type");
 		PHALCON_CONCAT_SV(&key_value, "multipart/form-data; boundary=", &boundary);
 
-		PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
+		PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
 
 		ZVAL_STRING(&key, "Content-Length");		
 		ZVAL_LONG(&key_value, Z_STRLEN(body));
 
-		PHALCON_CALL_METHODW(NULL, header, "set", &key, &key_value);
-		PHALCON_CALL_METHODW(&headers, header, "build");
+		PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
+		PHALCON_CALL_METHODW(&headers, &header, "build");
 
 		ZVAL_STRING(&option, "header");
-		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", stream, &http, &option, &headers);
+		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &headers);
 
 		ZVAL_STRING(&option, "content");
-		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", stream, &http, &option, &body);
+		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &body);
 	}
 }
 
@@ -322,14 +322,14 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, errorHandler)
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal)
 {
-	zval *stream, *header, *method, *useragent, *timeout, uri = {}, url = {}, http = {}, option = {}, handler = {};
+	zval stream = {}, header = {}, method = {}, useragent = {}, timeout = {}, uri = {}, url = {}, http = {}, option = {}, handler = {};
 	zval fp = {}, meta = {}, wrapper_data = {}, bodystr = {}, response = {};
 
-	stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
-	header = phalcon_read_property(getThis(), SL("_header"), PH_NOISY);
-	method = phalcon_read_property(getThis(), SL("_method"), PH_NOISY);
-	useragent = phalcon_read_property(getThis(), SL("_useragent"), PH_NOISY);
-	timeout = phalcon_read_property(getThis(), SL("_timeout"), PH_NOISY);
+	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY);
+	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
+	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY);
+	phalcon_read_property(&useragent, getThis(), SL("_useragent"), PH_NOISY);
+	phalcon_read_property(&timeout, getThis(), SL("_timeout"), PH_NOISY);
 
 	PHALCON_CALL_SELFW(&uri, "geturi");
 	PHALCON_CALL_METHODW(&url, &uri, "build");
@@ -337,19 +337,19 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal)
 	ZVAL_STRING(&http, "http");
 	ZVAL_STRING(&option, "method");
 
-	PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", stream, &http, &option, method);
+	PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &method);
 
-	if (PHALCON_IS_NOT_EMPTY(useragent)) {
+	if (PHALCON_IS_NOT_EMPTY(&useragent)) {
 		ZVAL_STRING(&option, "User-Agent");
 
-		PHALCON_CALL_METHODW(NULL, header, "set", &option, useragent);
+		PHALCON_CALL_METHODW(NULL, &header, "set", &option, &useragent);
 
-		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", stream, &http, &option, useragent);
+		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &useragent);
 	}
 
 	ZVAL_STRING(&option, "timeout");
 
-	PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", stream, &http, &option, timeout);
+	PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &timeout);
 
 	PHALCON_CALL_SELFW(NULL, "buildBody");
 
@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal)
 
 	ZVAL_STRING(&option, "r");
 
-	PHALCON_CALL_FUNCTIONW(&fp, "fopen", &url, &option, &PHALCON_GLOBAL(z_false), stream);
+	PHALCON_CALL_FUNCTIONW(&fp, "fopen", &url, &option, &PHALCON_GLOBAL(z_false), &stream);
 
 	PHALCON_CALL_FUNCTIONW(NULL, "restore_error_handler");
 

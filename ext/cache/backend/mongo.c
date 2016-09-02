@@ -174,9 +174,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
 
 			ZVAL_STRING(&class_name, "MongoClient");
 			if (phalcon_class_exists(&class_name, 0) != NULL) {
-				ce0 = zend_fetch_class(SSL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
+				ce0 = phalcon_fetch_str_class(SL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
 			} else {
-				ce0 = zend_fetch_class(SSL("Mongo"), ZEND_FETCH_CLASS_AUTO);
+				ce0 = phalcon_fetch_str_class(SL("Mongo"), ZEND_FETCH_CLASS_AUTO);
 			}
 
 			object_init_ex(&mongo, ce0);
@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
 
@@ -401,7 +401,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
 	if (prefix && zend_is_true(prefix)) {
 		PHALCON_CONCAT_SVS(&pattern, "/^", prefix, "/");
-		ce0 = zend_fetch_class(SSL("MongoRegex"), ZEND_FETCH_CLASS_AUTO);
+		ce0 = phalcon_fetch_str_class(SL("MongoRegex"), ZEND_FETCH_CLASS_AUTO);
 
 		object_init_ex(&regex, ce0);
 		assert(phalcon_has_constructor(&regex));
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
 
@@ -581,7 +581,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
 

@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
 	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
 	if (Z_TYPE(formatter) != IS_OBJECT) {
 		object_init_ex(&formatter, phalcon_logger_formatter_syslog_ce);
-		phalcon_update_property_this(getThis(), SL("_formatter"), &formatter);
+		phalcon_update_property_zval(getThis(), SL("_formatter"), &formatter);
 	}
 
 	RETURN_CTORW(&formatter);
@@ -169,10 +169,10 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Syslog, close){
 
-	zval *opened;
+	zval opened = {};
 
-	opened = phalcon_read_property(getThis(), SL("_opened"), PH_NOISY);
-	if (zend_is_true(opened)) {
+	phalcon_read_property(&opened, getThis(), SL("_opened"), PH_NOISY);
+	if (zend_is_true(&opened)) {
 		PHALCON_CALL_FUNCTIONW(NULL, "closelog");
 	}
 

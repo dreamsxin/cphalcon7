@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, __construct){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "$options argument must be an Array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_options"), options);
+	phalcon_update_property_zval(getThis(), SL("_options"), options);
 	
 }
 
@@ -169,12 +169,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, getOptions){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator, getOption){
 
-	zval *option, *options, value = {};
+	zval *option, options = {}, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	
-	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&value, options, option)) {
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&value, &options, option, 0)) {
 		RETURN_CTORW(&value);
 	}
 	
@@ -189,11 +189,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator, getOption){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Validator, isSetOption){
 
-	zval *option, *options;
+	zval *option, options = {};
 
 	phalcon_fetch_params(0, 1, 0, &option);
 	
-	options = phalcon_read_property(getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 	
-	RETURN_BOOL(phalcon_array_isset(options, option));
+	RETURN_BOOL(phalcon_array_isset(&options, option));
 }

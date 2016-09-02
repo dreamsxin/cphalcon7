@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Http_Response, __construct){
 	}
 
 	if (content && Z_TYPE_P(content) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_content"), content);
+		phalcon_update_property_zval(getThis(), SL("_content"), content);
 	}
 
 	if (code && Z_TYPE_P(code) != IS_NULL) {
@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode)
 
 	ZVAL_STRING(&status_header, "Status");
 	PHALCON_CALL_METHODW(NULL, &headers, "set", &status_header, &status_value);
-	phalcon_update_property_this(getThis(), SL("_headers"), &headers);
+	phalcon_update_property_zval(getThis(), SL("_headers"), &headers);
 	RETURN_THISW();
 }
 
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Http_Response, setHeaders){
 
 	phalcon_fetch_params(0, 1, 0, &headers);
 
-	phalcon_update_property_this(getThis(), SL("_headers"), headers);
+	phalcon_update_property_zval(getThis(), SL("_headers"), headers);
 	RETURN_THISW();
 }
 
@@ -250,20 +250,20 @@ PHP_METHOD(Phalcon_Http_Response, setHeaders){
  */
 PHP_METHOD(Phalcon_Http_Response, getHeaders){
 
-	zval *headers;
+	zval headers = {};
 
-	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
-	if (Z_TYPE_P(headers) == IS_NULL) {
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+	if (Z_TYPE(headers) == IS_NULL) {
 		/** 
 		 * A Phalcon\Http\Response\Headers bag is temporary used to manage the headers
 		 * before sending them to the client
 		 */
 		object_init_ex(return_value, phalcon_http_response_headers_ce);
-		phalcon_update_property_this(getThis(), SL("_headers"), return_value);
+		phalcon_update_property_zval(getThis(), SL("_headers"), return_value);
 		return;
 	}
 
-	RETURN_CTORW(headers);
+	RETURN_CTORW(&headers);
 }
 
 /**
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Http_Response, setCookies){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_http_response_exception_ce, "The cookies bag is not valid");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_cookies"), cookies);
+	phalcon_update_property_zval(getThis(), SL("_cookies"), cookies);
 
 	RETURN_THISW();
 }
@@ -565,7 +565,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 
 	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
-	if (Z_TYPE(header) < IS_NULL) {
+	if (Z_TYPE(header) <= IS_NULL) {
 		ZVAL_STRING(&service_name, ISV(url));
 
 		PHALCON_CALL_METHODW(&url, &dependency_injector, "getshared", &service_name);
@@ -618,7 +618,7 @@ PHP_METHOD(Phalcon_Http_Response, setContent){
 
 	phalcon_fetch_params(0, 1, 0, &content);
 
-	phalcon_update_property_this(getThis(), SL("_content"), content);
+	phalcon_update_property_zval(getThis(), SL("_content"), content);
 	RETURN_THISW();
 }
 
@@ -646,7 +646,7 @@ PHP_METHOD(Phalcon_Http_Response, setJsonContent){
 	}
 
 	RETURN_ON_FAILURE(phalcon_json_encode(&json_content, content, options));
-	phalcon_update_property_this(getThis(), SL("_content"), &json_content);
+	phalcon_update_property_zval(getThis(), SL("_content"), &json_content);
 	RETURN_THISW();
 }
 
@@ -670,7 +670,7 @@ PHP_METHOD(Phalcon_Http_Response, setBsonContent){
 	PHALCON_CALL_METHODW(NULL, getThis(), "setContentType", &content_type);
 
 	PHALCON_CALL_FUNCTIONW(&bson_content, "bson_encode", content);
-	phalcon_update_property_this(getThis(), SL("_content"), &bson_content);
+	phalcon_update_property_zval(getThis(), SL("_content"), &bson_content);
 	RETURN_THISW();
 }
 
@@ -682,15 +682,15 @@ PHP_METHOD(Phalcon_Http_Response, setBsonContent){
  */
 PHP_METHOD(Phalcon_Http_Response, appendContent){
 
-	zval *content, *_content, temp_content = {};
+	zval *_content, content = {}, temp_content = {};
 
-	phalcon_fetch_params(0, 1, 0, &content);
+	phalcon_fetch_params(0, 1, 0, &_content);
 
-	_content = phalcon_read_property(getThis(), SL("_content"), PH_NOISY);
+	phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY);
 
-	concat_function(&temp_content, _content, content);
+	concat_function(&temp_content, &content, _content);
 
-	phalcon_update_property_this(getThis(), SL("_content"), &temp_content);
+	phalcon_update_property_zval(getThis(), SL("_content"), &temp_content);
 	RETURN_THISW();
 }
 
@@ -723,11 +723,11 @@ PHP_METHOD(Phalcon_Http_Response, isSent){
  */
 PHP_METHOD(Phalcon_Http_Response, sendHeaders){
 
-	zval *headers;
+	zval headers = {};
 
-	headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
-	if (Z_TYPE_P(headers) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, headers, "send");
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+	if (Z_TYPE(headers) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &headers, "send");
 	}
 
 	RETURN_THISW();
@@ -740,11 +740,11 @@ PHP_METHOD(Phalcon_Http_Response, sendHeaders){
  */
 PHP_METHOD(Phalcon_Http_Response, sendCookies){
 
-	zval *cookies;
+	zval cookies = {};
 
-	cookies = phalcon_read_property(getThis(), SL("_cookies"), PH_NOISY);
-	if (Z_TYPE_P(cookies) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, cookies, "send");
+	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
+	if (Z_TYPE(cookies) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(NULL, &cookies, "send");
 	}
 
 	RETURN_THISW();
@@ -757,33 +757,32 @@ PHP_METHOD(Phalcon_Http_Response, sendCookies){
  */
 PHP_METHOD(Phalcon_Http_Response, send){
 
-	zval *sent, *headers, *cookies, *content, *file;
+	zval sent = {}, headers = {}, cookies = {}, content = {}, file = {};
 
-	sent = phalcon_read_property(getThis(), SL("_sent"), PH_NOISY);
-	if (PHALCON_IS_FALSE(sent)) {
+	phalcon_read_property(&sent, getThis(), SL("_sent"), PH_NOISY);
+	if (PHALCON_IS_FALSE(&sent)) {
 		/* Send headers */
-		headers = phalcon_read_property(getThis(), SL("_headers"), PH_NOISY);
-		if (Z_TYPE_P(headers) == IS_OBJECT) {
-			PHALCON_CALL_METHODW(NULL, headers, "send");
+		phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+		if (Z_TYPE(headers) == IS_OBJECT) {
+			PHALCON_CALL_METHODW(NULL, &headers, "send");
 		}
 
-		cookies = phalcon_read_property(getThis(), SL("_cookies"), PH_NOISY);
-		if (Z_TYPE_P(cookies) == IS_OBJECT) {
-			PHALCON_CALL_METHODW(NULL, cookies, "send");
+		phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
+		if (Z_TYPE(cookies) == IS_OBJECT) {
+			PHALCON_CALL_METHODW(NULL, &cookies, "send");
 		}
 
 		/* Output the response body */
-		content = phalcon_read_property(getThis(), SL("_content"), PH_NOISY);
-		if (Z_TYPE_P(content) != IS_NULL) {
-			zend_print_zval(content, 0);
-		}
-		else {
-			file = phalcon_read_property(getThis(), SL("_file"), PH_NOISY);
+		phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY);
+		if (Z_TYPE(content) != IS_NULL) {
+			zend_print_zval(&content, 0);
+		} else {
+			phalcon_read_property(&file, getThis(), SL("_file"), PH_NOISY);
 
-			if (Z_TYPE_P(file) == IS_STRING && Z_STRLEN_P(file)) {
+			if (Z_TYPE(file) == IS_STRING && Z_STRLEN(file)) {
 				php_stream *stream;
 
-				stream = php_stream_open_wrapper(Z_STRVAL_P(file), "rb", REPORT_ERRORS, NULL);
+				stream = php_stream_open_wrapper(Z_STRVAL(file), "rb", REPORT_ERRORS, NULL);
 				if (stream != NULL) {
 					php_stream_passthru(stream);
 					php_stream_close(stream);
@@ -838,7 +837,7 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 		PHALCON_CALL_METHODW(NULL, &headers, "setraw", &content_transfer);
 	}
 
-	phalcon_update_property_this(getThis(), SL("_file"), file_path);
+	phalcon_update_property_zval(getThis(), SL("_file"), file_path);
 
 	RETURN_THISW();
 }

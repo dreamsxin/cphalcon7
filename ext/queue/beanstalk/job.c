@@ -94,9 +94,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, __construct){
 	PHALCON_VERIFY_CLASS_EX(queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
 	PHALCON_ENSURE_IS_STRING(id);
 
-	phalcon_update_property_this(getThis(), SL("_queue"), queue);
-	phalcon_update_property_this(getThis(), SL("_id"),    id   );
-	phalcon_update_property_this(getThis(), SL("_body"),  body );
+	phalcon_update_property_zval(getThis(), SL("_queue"), queue);
+	phalcon_update_property_zval(getThis(), SL("_id"),    id   );
+	phalcon_update_property_zval(getThis(), SL("_body"),  body );
 }
 
 /**
@@ -128,15 +128,15 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, getBody){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk_Job, delete){
 
-	zval *id, *queue, command = {}, response = {}, status = {};
+	zval id = {}, queue = {}, command = {}, response = {}, status = {};
 
-	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
-	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
+	phalcon_read_property(&id, getThis(), SL("_id"), PH_NOISY);
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_CONCAT_SV(&command, "delete ", id);
-	PHALCON_CALL_METHODW(NULL, queue, "write", &command);
+	PHALCON_CONCAT_SV(&command, "delete ", &id);
+	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
 	
-	PHALCON_CALL_METHODW(&response, queue, "readstatus");
+	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "DELETED")) {
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, delete){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk_Job, release){
 
-	zval *priority = NULL, *delay = NULL, z_priority = {}, *id, *queue, command = {}, response = {}, status = {};
+	zval *priority = NULL, *delay = NULL, z_priority = {}, id = {}, queue = {}, command = {}, response = {}, status = {};
 
 	phalcon_fetch_params(0, 0, 2, &priority, &delay);
 
@@ -168,13 +168,13 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, release){
 		delay = &PHALCON_GLOBAL(z_zero);
 	}
 
-	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
-	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
+	phalcon_read_property(&id, getThis(), SL("_id"), PH_NOISY);
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_CONCAT_SVSVSV(&command, "release ", id, " ", priority, " ", delay);
-	PHALCON_CALL_METHODW(NULL, queue, "write", &command);
+	PHALCON_CONCAT_SVSVSV(&command, "release ", &id, " ", priority, " ", delay);
+	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
 
-	PHALCON_CALL_METHODW(&response, queue, "readstatus");
+	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "RELEASED")) {
@@ -193,7 +193,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, release){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk_Job, bury){
 
-	zval *priority = NULL, z_priority, *id, *queue, command = {}, response = {}, status = {};
+	zval *priority = NULL, z_priority, id = {}, queue = {}, command = {}, response = {}, status = {};
 
 	phalcon_fetch_params(0, 0, 1, &priority);
 
@@ -202,12 +202,12 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, bury){
 		priority = &z_priority;
 	}
 
-	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
-	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
+	phalcon_read_property(&id, getThis(), SL("_id"), PH_NOISY);
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_CONCAT_SVSV(&command, "bury ", id, " ", priority);
-	PHALCON_CALL_METHODW(NULL, queue, "write", &command);
-	PHALCON_CALL_METHODW(&response, queue, "readstatus");
+	PHALCON_CONCAT_SVSV(&command, "bury ", &id, " ", priority);
+	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
+	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "BURIED")) {
@@ -229,14 +229,14 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, bury){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk_Job, touch){
 
-	zval *id, *queue, command = {}, response = {}, status = {};
+	zval id = {}, queue = {}, command = {}, response = {}, status = {};
 
-	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
-	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
+	phalcon_read_property(&id, getThis(), SL("_id"), PH_NOISY);
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_CONCAT_SV(&command, "touch ", id);
-	PHALCON_CALL_METHODW(NULL, queue, "write", &command);
-	PHALCON_CALL_METHODW(&response, queue, "readstatus");
+	PHALCON_CONCAT_SV(&command, "touch ", &id);
+	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
+	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "TOUCHED")) {
@@ -253,14 +253,14 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, touch){
  */
 PHP_METHOD(Phalcon_Queue_Beanstalk_Job, kick){
 
-	zval *id, *queue, command = {}, response = {}, status = {};
+	zval id = {}, queue = {}, command = {}, response = {}, status = {};
 
-	id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
-	queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
+	phalcon_read_property(&id, getThis(), SL("_id"), PH_NOISY);
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_CONCAT_SV(&command, "kick-job ", id);
-	PHALCON_CALL_METHODW(NULL, queue, "write", &command);
-	PHALCON_CALL_METHODW(&response, queue, "readstatus");
+	PHALCON_CONCAT_SV(&command, "kick-job ", &id);
+	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
+	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "KICKED")) {
@@ -272,12 +272,14 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, kick){
 
 PHP_METHOD(Phalcon_Queue_Beanstalk_Job, __wakeup) {
 
-	zval *id    = phalcon_read_property(getThis(), SL("_id"), PH_NOISY);
-	zval *queue = phalcon_read_property(getThis(), SL("_queue"), PH_NOISY);
+	zval id = {}, queue = {};
 
-	PHALCON_VERIFY_CLASS_EX(queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
+	phalcon_read_property(&id, getThis(), SL("_id"), PH_NOISY);
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
-	if (Z_TYPE_P(id) != IS_STRING) {
+	PHALCON_VERIFY_CLASS_EX(&queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
+
+	if (Z_TYPE(id) != IS_STRING) {
 		zend_throw_exception_ex(phalcon_exception_ce, 0, "Unexpected inconsistency in %s - possible break-in attempt!", "Phalcon\\Queue\\Beanstalk\\Job::__wakeup()");
 	}
 }

@@ -255,10 +255,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropColumn){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addIndex){
 
-	zval *table_name, *schema_name, *index, name, index_type = {}, sql = {}, columns = {}, quoted_column_list = {};
+	zval *table_name, *schema_name, *index, name = {}, index_type = {}, sql = {}, columns = {}, quoted_column_list = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
 	PHALCON_VERIFY_INTERFACE_EX(index, phalcon_db_indexinterface_ce, phalcon_db_exception_ce, 0);
+
 
 	PHALCON_CALL_METHODW(&name, index, "getname");
 	PHALCON_CALL_METHODW(&index_type, index, "gettype");

@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __construct){
 	phalcon_fetch_params(0, 0, 1, &reflection_data);
 	
 	if (reflection_data && Z_TYPE_P(reflection_data) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_reflectionData"), reflection_data);
+		phalcon_update_property_zval(getThis(), SL("_reflectionData"), reflection_data);
 	}
 }
 
@@ -122,11 +122,11 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 			object_init_ex(return_value, phalcon_annotations_collection_ce);
 			PHALCON_CALL_METHODW(NULL, return_value, "__construct", &reflection_class);
 
-			phalcon_update_property_this(getThis(), SL("_classAnnotations"), return_value);
+			phalcon_update_property_zval(getThis(), SL("_classAnnotations"), return_value);
 			return;
 		}
 
-		phalcon_update_property_this(getThis(), SL("_classAnnotations"), &PHALCON_GLOBAL(z_false));
+		phalcon_update_property_zval(getThis(), SL("_classAnnotations"), &PHALCON_GLOBAL(z_false));
 		RETURN_FALSE;
 	}
 
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 					phalcon_array_update_zval(return_value, &method_name, &collection, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 
-				phalcon_update_property_this(getThis(), SL("_methodAnnotations"), return_value);
+				phalcon_update_property_zval(getThis(), SL("_methodAnnotations"), return_value);
 				return;
 			}
 		}
@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 					phalcon_array_update_zval(return_value, &property, &collection, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 
-				phalcon_update_property_this(getThis(), SL("_propertyAnnotations"), return_value);
+				phalcon_update_property_zval(getThis(), SL("_propertyAnnotations"), return_value);
 				return;
 			}
 		}

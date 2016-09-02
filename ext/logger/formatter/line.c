@@ -95,11 +95,11 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, __construct){
 	phalcon_fetch_params(0, 0, 2, &format, &date_format);
 
 	if (format && Z_TYPE_P(format) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_format"), format);
+		phalcon_update_property_zval(getThis(), SL("_format"), format);
 	}
 
 	if (date_format && Z_TYPE_P(date_format) != IS_NULL) {
-		phalcon_update_property_this(getThis(), SL("_dateFormat"), date_format);
+		phalcon_update_property_zval(getThis(), SL("_dateFormat"), date_format);
 	}
 }
 
@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, setFormat){
 
 	phalcon_fetch_params(0, 1, 0, &format);
 
-	phalcon_update_property_this(getThis(), SL("_format"), format);
+	phalcon_update_property_zval(getThis(), SL("_format"), format);
 
 }
 
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, setDateFormat){
 
 	phalcon_fetch_params(0, 1, 0, &date);
 
-	phalcon_update_property_this(getThis(), SL("_dateFormat"), date);
+	phalcon_update_property_zval(getThis(), SL("_dateFormat"), date);
 
 }
 

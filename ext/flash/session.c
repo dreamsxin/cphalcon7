@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Flash_Session, getMessages){
 	PHALCON_CALL_METHODW(&messages, getThis(), "_getsessionmessages", &do_remove);
 	if (Z_TYPE(messages) == IS_ARRAY) {
 		if (likely(Z_TYPE_P(type) != IS_NULL)) {
-			if (phalcon_array_isset_fetch(&return_messages, &messages, type)) {
+			if (phalcon_array_isset_fetch(&return_messages, &messages, type, 0)) {
 				if (zend_is_true(remove)) {
 					phalcon_array_unset(&messages, type, 0);
 					PHALCON_CALL_METHODW(NULL, getThis(), "_setsessionmessages", &messages);

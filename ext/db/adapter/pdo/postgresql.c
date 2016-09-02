@@ -81,7 +81,6 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Postgresql){
 
 	zend_declare_property_string(phalcon_db_adapter_pdo_postgresql_ce, SL("_type"), "pgsql", ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_db_adapter_pdo_postgresql_ce, SL("_dialectType"), "postgresql", ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_db_adapter_pdo_postgresql_ce, SL("_schema"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_db_adapter_pdo_postgresql_ce, 1, phalcon_db_adapterinterface_ce);
 
@@ -99,44 +98,39 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter_Pdo_Postgresql){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 
-	zval *descriptor = NULL, schema = {}, password = {}, sql = {};
+	zval *desc = NULL, descriptor = {}, schema = {}, password = {}, sql = {};
 
-	phalcon_fetch_params(0, 0, 1, &descriptor);
+	phalcon_fetch_params(0, 0, 1, &desc);
 
-	if (!descriptor || !zend_is_true(descriptor)) {
-		descriptor = phalcon_read_property(getThis(), SL("_descriptor"), PH_NOISY);
+	if (!desc || !zend_is_true(desc)) {
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&descriptor, desc);
 	}
 
-	if (Z_TYPE_P(descriptor) != IS_ARRAY) {
+	if (Z_TYPE(descriptor) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid CONNECT definition");
 		return;
 	}
 
-	if (phalcon_array_isset_fetch_str(&schema, descriptor, SL("schema"))) {
-		// phalcon_array_unset_str(descriptor, SL("schema"), PH_COPY);
-		phalcon_update_property_this(getThis(), SL("_schema"), &schema);
+	if (phalcon_array_isset_fetch_str(&schema, &descriptor, SL("schema"))) {
+		phalcon_update_property_zval(getThis(), SL("_schema"), &schema);
+		phalcon_array_unset_str(&descriptor, SL("schema"), PH_SEPARATE);
 	}
 
-	if (phalcon_array_isset_fetch_str(&password, descriptor, SL("password"))) {
-		/* There is a bug in pdo_pgsql driver when the password is empty,
-		 * the driver tries to access invalid memory:
-		 *
-		 * if (dbh->password[0] != '\'' && dbh->password[strlen(dbh->password) - 1] != '\'')
-		 *
-		 * To avoid this we set the password to null
-		 */
+	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"))) {
 		if (Z_TYPE(password) == IS_STRING && Z_STRLEN(password) == 0) {
-			phalcon_array_update_str(descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_COPY);
+			phalcon_array_update_str(&descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
 	}
 
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_postgresql_ce, getThis(), "connect", descriptor);
+	PHALCON_CALL_PARENTW(NULL, phalcon_db_adapter_pdo_postgresql_ce, getThis(), "connect", &descriptor);
 
 	/** 
 	 * Execute the search path in the after connect
 	 */
-	if (Z_TYPE_P(&schema) == IS_STRING) {
+	if (Z_TYPE(schema) == IS_STRING) {
 		PHALCON_CONCAT_SVS(&sql, "SET search_path TO '", &schema, "'");
 		PHALCON_CALL_METHODW(NULL, getThis(), "execute", &sql);
 	}
@@ -153,19 +147,21 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 
-	zval *table, *schema = NULL, columns = {}, *dialect, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
+	zval *table, *_schema = NULL, schema = {}, columns = {}, dialect = {}, sql = {}, fetch_num = {}, describe = {}, old_column = {}, *field;
 
-	phalcon_fetch_params(0, 1, 1, &table, &schema);
+	phalcon_fetch_params(0, 1, 1, &table, &_schema);
 
-	if (!schema || !zend_is_true(schema)) {
-		schema = phalcon_read_property(getThis(), SL("_schema"), PH_NOISY);
+	if (!_schema || !zend_is_true(_schema)) {
+		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&schema, _schema);
 	}
 
 	array_init(&columns);
 
-	dialect = phalcon_read_property(getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(&sql, dialect, "describecolumns", table, schema);
+	PHALCON_CALL_METHODW(&sql, &dialect, "describecolumns", table, &schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
@@ -350,7 +346,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			phalcon_array_update_str_bool(&definition, SL("unsigned"), 1, 0);
 		}
 
-		if (Z_TYPE_P(&old_column) == IS_NULL) {
+		if (Z_TYPE(old_column) <= IS_NULL) {
 			phalcon_array_update_str_bool(&definition, SL("first"), 1, 0);
 		} else {
 			phalcon_array_update_str(&definition, SL("after"), &old_column, PH_COPY);

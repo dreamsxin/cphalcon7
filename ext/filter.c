@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Filter, __construct){
 	phalcon_array_append_string(&allow_tags, SL("th"), 0);
 	phalcon_array_append_string(&allow_tags, SL("td"), 0);
 
-	phalcon_update_property_this(getThis(), SL("_allowTags"), &allow_tags);
+	phalcon_update_property_zval(getThis(), SL("_allowTags"), &allow_tags);
 
 	array_init(&allow_attributes);
 
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Filter, __construct){
 	phalcon_array_append_string(&allow_attributes, SL("target"), 0);
 	phalcon_array_append_string(&allow_attributes, SL("align"), 0);
 
-	phalcon_update_property_this(getThis(), SL("_allowAttributes"), &allow_attributes);
+	phalcon_update_property_zval(getThis(), SL("_allowAttributes"), &allow_attributes);
 }
 
 /**
@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 					PHALCON_CPY_WRT_CTOR(&new_value, &array_value);
 				} else {
 					PHALCON_CALL_METHODW(&filter_value, getThis(), "_sanitize", &new_value, filter);
-					PHALCON_CPY_WRT_CTOR(&new_value, &array_value);
+					PHALCON_CPY_WRT_CTOR(&new_value, &filter_value);
 				}
 			} ZEND_HASH_FOREACH_END();
 
@@ -250,13 +250,13 @@ PHP_METHOD(Phalcon_Filter, sanitize){
  */
 PHP_METHOD(Phalcon_Filter, _sanitize){
 
-	zval *value, *filter, *filters, filter_object = {}, arguments = {}, type = {}, quote = {}, empty_str = {}, escaped = {}, filtered = {};
+	zval *value, *filter, filters = {}, filter_object = {}, arguments = {}, type = {}, quote = {}, empty_str = {}, escaped = {}, filtered = {};
 	zval allow_fraction = {}, options = {}, allow_tags = {}, allow_attributes = {}, exception_message = {};
 
 	phalcon_fetch_params(0, 2, 0, &value, &filter);
 
-	filters = phalcon_read_property(getThis(), SL("_filters"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&filter_object, filters, filter) && (Z_TYPE(filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
+	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY);
+	if (phalcon_array_isset_fetch(&filter_object, &filters, filter, 0) && (Z_TYPE(filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
 		/** 
 		 * If the filter is a closure we call it in the PHP userland
 		 */

@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_CLI_Console, __construct){
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 	}
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_CLI_Console, registerModules){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_console_exception_ce, "Modules must be an Array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_modules"), modules);
+	phalcon_update_property_zval(getThis(), SL("_modules"), modules);
 
 }
 
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_CLI_Console, registerModules){
  */
 PHP_METHOD(Phalcon_CLI_Console, addModules){
 
-	zval *modules, *original_modules, register_modules = {};
+	zval *modules, original_modules = {}, register_modules = {};
 
 	phalcon_fetch_params(0, 1, 0, &modules);
 
@@ -160,10 +160,10 @@ PHP_METHOD(Phalcon_CLI_Console, addModules){
 		return;
 	}
 
-	original_modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
+	phalcon_read_property(&original_modules, getThis(), SL("_modules"), PH_NOISY);
 
-	phalcon_fast_array_merge(&register_modules, modules, original_modules);
-	phalcon_update_property_this(getThis(), SL("_modules"), &register_modules);
+	phalcon_fast_array_merge(&register_modules, modules, &original_modules);
+	phalcon_update_property_zval(getThis(), SL("_modules"), &register_modules);
 }
 
 /**
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_CLI_Console, getModules){
 PHP_METHOD(Phalcon_CLI_Console, handle){
 
 	zval *_arguments = NULL, arguments = {}, dependency_injector = {}, events_manager = {}, event_name = {}, service = {}, router = {}, module_name = {};
-	zval status = {}, *modules, exception_msg = {}, module = {}, path = {}, class_name = {}, module_object = {};
+	zval status = {}, modules = {}, exception_msg = {}, module = {}, path = {}, class_name = {}, module_object = {};
 	zval namespace_name = {}, task_name = {}, action_name = {}, params = {}, dispatcher = {};
 
 	phalcon_fetch_params(0, 0, 1, &_arguments);
@@ -232,8 +232,8 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 			}
 		}
 
-		modules = phalcon_read_property(getThis(), SL("_modules"), PH_NOISY);
-		if (!phalcon_array_isset_fetch(&module, modules, &module_name)) {
+		phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY);
+		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, 0)) {
 			PHALCON_CONCAT_SVS(&exception_msg, "Module '", &module_name, "' isn't registered in the console container");
 			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_cli_console_exception_ce, &exception_msg);
 			return;
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_CLI_Console, handle){
 		PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders");
 		PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", &dependency_injector);
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			phalcon_update_property_this(getThis(), SL("_moduleObject"), &module_object);
+			phalcon_update_property_zval(getThis(), SL("_moduleObject"), &module_object);
 
 			ZVAL_STRING(&event_name, "console:afterStartModule");
 

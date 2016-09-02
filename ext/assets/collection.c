@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Assets_Collection, add){
  */
 PHP_METHOD(Phalcon_Assets_Collection, addCss){
 
-	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, *collection_local, *collection_attributes, resource = {};
+	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, collection_local = {}, collection_attributes = {}, resource = {};
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
 
@@ -238,19 +238,19 @@ PHP_METHOD(Phalcon_Assets_Collection, addCss){
 	}
 
 	if (PHALCON_IS_BOOL(local)) {
-		collection_local = local;
+		PHALCON_CPY_WRT(&collection_attributes, local);
 	} else {
-		collection_local = phalcon_read_property(getThis(), SL("_local"), PH_NOISY);
+		phalcon_read_property(&collection_local, getThis(), SL("_local"), PH_NOISY);
 	}
 
 	if (Z_TYPE_P(attributes) == IS_ARRAY) { 
-		collection_attributes = attributes;
+		PHALCON_CPY_WRT(&collection_attributes, attributes);
 	} else {
-		collection_attributes = phalcon_read_property(getThis(), SL("_attributes"), PH_NOISY);
+		phalcon_read_property(&collection_attributes, getThis(), SL("_attributes"), PH_NOISY);
 	}
 
 	object_init_ex(&resource, phalcon_assets_resource_css_ce);
-	PHALCON_CALL_METHODW(NULL, &resource, "__construct", path, collection_local, filter, collection_attributes);
+	PHALCON_CALL_METHODW(NULL, &resource, "__construct", path, &collection_local, filter, &collection_attributes);
 
 	phalcon_update_property_array_append(getThis(), SL("_resources"), &resource);
 
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addCss){
  */
 PHP_METHOD(Phalcon_Assets_Collection, addJs){
 
-	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, *collection_local, *collection_attributes, resource = {};
+	zval *path, *local = NULL, *filter = NULL, *attributes = NULL, collection_local = {}, collection_attributes = {}, resource = {};
 
 	phalcon_fetch_params(0, 1, 3, &path, &local, &filter, &attributes);
 
@@ -285,19 +285,19 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
 	}
 
 	if (PHALCON_IS_BOOL(local)) {
-		collection_local = local;
+		PHALCON_CPY_WRT(&collection_local, local);
 	} else {
-		collection_local = phalcon_read_property(getThis(), SL("_local"), PH_NOISY);
+		phalcon_read_property(&collection_local, getThis(), SL("_local"), PH_NOISY);
 	}
 
 	if (Z_TYPE_P(attributes) == IS_ARRAY) { 
-		collection_attributes = attributes;
+		PHALCON_CPY_WRT(&collection_attributes, attributes);
 	} else {
-		collection_attributes = phalcon_read_property(getThis(), SL("_attributes"), PH_NOISY);
+		phalcon_read_property(&collection_attributes, getThis(), SL("_attributes"), PH_NOISY);
 	}
 
 	object_init_ex(&resource, phalcon_assets_resource_js_ce);
-	PHALCON_CALL_METHODW(NULL, &resource, "__construct", path, collection_local, filter, collection_attributes);
+	PHALCON_CALL_METHODW(NULL, &resource, "__construct", path, &collection_local, filter, &collection_attributes);
 
 	phalcon_update_property_array_append(getThis(), SL("_resources"), &resource);
 
@@ -311,15 +311,16 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
  */
 PHP_METHOD(Phalcon_Assets_Collection, getResources){
 
-	zval *resources;
+	zval resources = {};
 
-	resources = phalcon_read_property(getThis(), SL("_resources"), PH_NOISY);
-	if (Z_TYPE_P(resources) != IS_ARRAY) { 
+	phalcon_read_property(&resources, getThis(), SL("_resources"), PH_NOISY);
+
+	if (Z_TYPE(resources) != IS_ARRAY) { 
 		array_init(return_value);
 		return;
 	}
 
-	RETURN_ZVAL(resources, 1, 0);
+	RETURN_ZVAL(&resources, 1, 0);
 }
 
 /**
@@ -329,10 +330,10 @@ PHP_METHOD(Phalcon_Assets_Collection, getResources){
  */
 PHP_METHOD(Phalcon_Assets_Collection, count){
 
-	zval *resources;
+	zval resources = {};
 
-	resources = phalcon_read_property(getThis(), SL("_resources"), PH_NOISY);
-	phalcon_fast_count(return_value, resources);
+	phalcon_read_property(&resources, getThis(), SL("_resources"), PH_NOISY);
+	phalcon_fast_count(return_value, &resources);
 }
 
 /**
@@ -352,11 +353,12 @@ PHP_METHOD(Phalcon_Assets_Collection, rewind){
  */
 PHP_METHOD(Phalcon_Assets_Collection, current){
 
-	zval *position, *resources;
+	zval position = {}, resources = {};
 
-	position  = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
-	resources = phalcon_read_property(getThis(), SL("_resources"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(return_value, resources, position)) {
+	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY);
+	phalcon_read_property(&resources, getThis(), SL("_resources"), PH_NOISY);
+
+	if (!phalcon_array_isset_fetch(return_value, &resources, &position, 0)) {
 		RETURN_NULL();
 	}
 }
@@ -390,12 +392,12 @@ PHP_METHOD(Phalcon_Assets_Collection, next){
  */
 PHP_METHOD(Phalcon_Assets_Collection, valid){
 
-	zval *position, *resources;
+	zval position = {}, resources = {};
 
-	position = phalcon_read_property(getThis(), SL("_position"), PH_NOISY);
-	resources = phalcon_read_property(getThis(), SL("_resources"), PH_NOISY);
+	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY);
+	phalcon_read_property(&resources, getThis(), SL("_resources"), PH_NOISY);
 
-	if (phalcon_array_isset(resources, position)) {
+	if (phalcon_array_isset(&resources, &position)) {
 		RETURN_TRUE;
 	}
 
@@ -414,7 +416,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setTargetPath){
 
 	phalcon_fetch_params(0, 1, 0, &target_path);
 
-	phalcon_update_property_this(getThis(), SL("_targetPath"), target_path);
+	phalcon_update_property_zval(getThis(), SL("_targetPath"), target_path);
 	RETURN_THISW();
 }
 
@@ -441,7 +443,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setSourcePath){
 
 	phalcon_fetch_params(0, 1, 0, &source_path);
 
-	phalcon_update_property_this(getThis(), SL("_sourcePath"), source_path);
+	phalcon_update_property_zval(getThis(), SL("_sourcePath"), source_path);
 	RETURN_THISW();
 }
 
@@ -468,7 +470,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setTargetUri){
 
 	phalcon_fetch_params(0, 1, 0, &target_uri);
 
-	phalcon_update_property_this(getThis(), SL("_targetUri"), target_uri);
+	phalcon_update_property_zval(getThis(), SL("_targetUri"), target_uri);
 	RETURN_THISW();
 }
 
@@ -495,7 +497,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setPrefix){
 
 	phalcon_fetch_params(0, 1, 0, &prefix);
 
-	phalcon_update_property_this(getThis(), SL("_prefix"), prefix);
+	phalcon_update_property_zval(getThis(), SL("_prefix"), prefix);
 	RETURN_THISW();
 }
 
@@ -522,7 +524,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setLocal){
 
 	phalcon_fetch_params(0, 1, 0, &local);
 
-	phalcon_update_property_this(getThis(), SL("_local"), local);
+	phalcon_update_property_zval(getThis(), SL("_local"), local);
 	RETURN_THISW();
 }
 
@@ -553,7 +555,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setAttributes){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Attributes must be an array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_attributes"), attributes);
+	phalcon_update_property_zval(getThis(), SL("_attributes"), attributes);
 
 	RETURN_THISW();
 }
@@ -601,7 +603,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setFilters){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Filters must be an array of filters");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_filters"), filters);
+	phalcon_update_property_zval(getThis(), SL("_filters"), filters);
 
 	RETURN_THISW();
 }
@@ -629,7 +631,7 @@ PHP_METHOD(Phalcon_Assets_Collection, join){
 
 	phalcon_fetch_params(0, 1, 0, &join);
 
-	phalcon_update_property_this(getThis(), SL("_join"), join);
+	phalcon_update_property_zval(getThis(), SL("_join"), join);
 	RETURN_THISW();
 }
 
@@ -652,7 +654,7 @@ PHP_METHOD(Phalcon_Assets_Collection, getJoin){
  */
 PHP_METHOD(Phalcon_Assets_Collection, getRealTargetPath){
 
-	zval *base_path = NULL, *target_path, complete_path = {};
+	zval *base_path = NULL, target_path = {}, complete_path = {};
 
 	phalcon_fetch_params(0, 0, 1, &base_path);
 
@@ -660,12 +662,12 @@ PHP_METHOD(Phalcon_Assets_Collection, getRealTargetPath){
 		base_path = &PHALCON_GLOBAL(z_null);
 	}
 
-	target_path = phalcon_read_property(getThis(), SL("_targetPath"), PH_NOISY);
+	phalcon_read_property(&target_path, getThis(), SL("_targetPath"), PH_NOISY);
 
 	/** 
 	 * A base path for resources can be set in the assets manager
 	 */
-	PHALCON_CONCAT_VV(&complete_path, base_path, target_path);
+	PHALCON_CONCAT_VV(&complete_path, base_path, &target_path);
 
 	/** 
 	 * Get the real template path, the target path can optionally don't exist
@@ -690,7 +692,7 @@ PHP_METHOD(Phalcon_Assets_Collection, setTargetLocal){
 
 	phalcon_fetch_params(0, 1, 0, &target_local);
 
-	phalcon_update_property_this(getThis(), SL("_targetLocal"), target_local);
+	phalcon_update_property_zval(getThis(), SL("_targetLocal"), target_local);
 	RETURN_THISW();
 }
 

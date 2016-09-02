@@ -94,7 +94,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&meta_data_dir, options, SL("metaDataDir"))) {
-			phalcon_update_property_this(getThis(), SL("_metaDataDir"), &meta_data_dir);
+			phalcon_update_property_zval(getThis(), SL("_metaDataDir"), &meta_data_dir);
 		}
 	}
 
@@ -109,16 +109,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 
-	zval *key, *meta_data_dir, virtual_key = {}, path = {}, data = {};
+	zval *key, meta_data_dir = {}, virtual_key = {}, path = {}, data = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	meta_data_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
+	phalcon_read_property(&meta_data_dir, getThis(), SL("_metaDataDir"), PH_NOISY);
 
 	phalcon_prepare_virtual_path_ex(&virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 
-	PHALCON_CONCAT_VVS(&path, meta_data_dir, &virtual_key, ".php");
+	PHALCON_CONCAT_VVS(&path, &meta_data_dir, &virtual_key, ".php");
 
 	if (phalcon_file_exists(&path) == SUCCESS) {
 		RETURN_ON_FAILURE(phalcon_require_ret(&data, Z_STRVAL(path)));
@@ -134,16 +134,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 
-	zval *key, *data, *meta_data_dir, virtual_key = {}, path = {}, php_export = {}, status = {};
+	zval *key, *data, meta_data_dir = {}, virtual_key = {}, path = {}, php_export = {}, status = {};
 	smart_str exp = { 0 };
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	meta_data_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
+	phalcon_read_property(&meta_data_dir, getThis(), SL("_metaDataDir"), PH_NOISY);
 
 	phalcon_prepare_virtual_path_ex(&virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 
-	PHALCON_CONCAT_VVS(&path, meta_data_dir, &virtual_key, ".php");
+	PHALCON_CONCAT_VVS(&path, &meta_data_dir, &virtual_key, ".php");
 
 	smart_str_appends(&exp, "<?php return ");
 	php_var_export_ex(data, 0, &exp);
@@ -161,12 +161,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 {
-	zval *metadata_dir, pattern = {}, iterator = {};
+	zval metadata_dir = {}, pattern = {}, iterator = {};
 	zend_object_iterator *it;
 
-	metadata_dir = phalcon_read_property(getThis(), SL("_metaDataDir"), PH_NOISY);
+	phalcon_read_property(&metadata_dir, getThis(), SL("_metaDataDir"), PH_NOISY);
 
-	PHALCON_CONCAT_VS(&pattern, metadata_dir, "meta-*.php");
+	PHALCON_CONCAT_VS(&pattern, &metadata_dir, "meta-*.php");
 
 	object_init_ex(&iterator, spl_ce_GlobIterator);
 	PHALCON_CALL_METHODW(NULL, &iterator, "__construct", &pattern);

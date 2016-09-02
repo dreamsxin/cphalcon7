@@ -277,9 +277,9 @@ PHP_METHOD(Phalcon_Security_Random, hex){
 
 	PHALCON_CALL_FUNCTIONW(&ret, "unpack", &format, &data);
 
-	ZVAL_MAKE_REF(&ret);
+	PHALCON_MAKE_REF(&ret);
 	PHALCON_RETURN_CALL_FUNCTIONW("array_shift", &ret);
-	ZVAL_UNREF(&ret);
+	PHALCON_UNREF(&ret);
 }
 
 /**
@@ -442,6 +442,7 @@ PHP_METHOD(Phalcon_Security_Random, base64Safe) {
 PHP_METHOD(Phalcon_Security_Random, uuid) {
 
 	zval len = {}, bytes = {}, data = {}, format = {}, arr = {}, a2 = {}, a3 = {}, str = {};
+	int __is_make_ref = 0;
 
 	ZVAL_LONG(&len, 16);
 
@@ -460,9 +461,9 @@ PHP_METHOD(Phalcon_Security_Random, uuid) {
 
 	ZVAL_STRING(&str, "%08x-%04x-%04x-%04x-%04x%08x");
 
-	ZVAL_MAKE_REF(&arr);
+	PHALCON_MAKE_REF(&arr);
 	PHALCON_CALL_FUNCTIONW(NULL, "array_unshift", &arr, &str);
-	ZVAL_UNREF(&arr);
+	PHALCON_UNREF(&arr);
 
 	ZVAL_STRING(&str, "sprintf");
 
@@ -551,9 +552,9 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 
 	PHALCON_CALL_FUNCTIONW(&ret, "unpack", &format, &rnd);
 
-	ZVAL_MAKE_REF(&ret);
+	PHALCON_MAKE_REF(&ret);
 	PHALCON_CALL_FUNCTIONW(&data, "array_shift", &ret);
-	ZVAL_UNREF(&ret);
+	PHALCON_UNREF(&ret);
 
 	PHALCON_RETURN_CALL_FUNCTIONW("hexdec", &data);
 }

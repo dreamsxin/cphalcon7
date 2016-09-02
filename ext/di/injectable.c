@@ -55,6 +55,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent);
 PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel);
 PHP_METHOD(Phalcon_DI_Injectable, getResolveService);
 PHP_METHOD(Phalcon_DI_Injectable, __get);
+PHP_METHOD(Phalcon_DI_Injectable, __sleep);
 
 static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, setDI, arginfo_phalcon_di_injectionawareinterface_setdi, ZEND_ACC_PUBLIC)
@@ -65,6 +66,7 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_DI_Injectable, __sleep, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -97,7 +99,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
 	phalcon_fetch_params(0, 1, 0, &dependency_injector);
 
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
-	phalcon_update_property_this(getThis(), SL("_dependencyInjector"), dependency_injector);
+	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 
 	RETURN_THISW();
 }
@@ -120,13 +122,13 @@ PHP_METHOD(Phalcon_DI_Injectable, getDI)
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-		phalcon_update_property_this(getThis(), SL("_dependencyInjector"), &dependency_injector);
 	}
 
 	if (Z_TYPE(dependency_injector) != IS_OBJECT && zend_is_true(error)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_di_exception_ce, "A dependency injection container is not object");
 		return;
 	}
+	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
 	RETURN_CTORW(&dependency_injector);
 }
 
@@ -142,7 +144,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setEventsManager)
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_eventsManager"), events_manager);
+	phalcon_update_property_zval(getThis(), SL("_eventsManager"), events_manager);
 
 	RETURN_THISW();
 }
@@ -334,16 +336,14 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	 * Accessing the persistent property will create a session bag in any class
 	 */
 	if (Z_STRLEN_P(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(property_name), "persistent", sizeof("persistent")-1)) {
-		const char *cn = Z_OBJCE_P(getThis())->name->val;
-
-		ZVAL_STRING(&class_name, cn);
+		PHALCON_STR(&class_name, Z_OBJCE_P(getThis())->name->val);
 
 		array_init_size(&arguments, 1);
 		add_next_index_zval(&arguments, &class_name);
 
-		ZVAL_STRING(&service, "sessionBag");
-
+		PHALCON_STR(&service, "sessionBag");
 		PHALCON_CALL_METHODW(&result, &dependency_injector, "get", &service, &arguments);
+	
 		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), &result);
 		RETURN_CTORW(&result);
 	}
@@ -353,4 +353,9 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	 */
 	php_error_docref(NULL, E_WARNING, "Access to undefined property %s::%s", Z_OBJCE_P(getThis())->name->val, Z_STRVAL_P(property_name));
 	RETURN_NULL();
+}
+
+PHP_METHOD(Phalcon_DI_Injectable, __sleep){
+
+	RETURN_EMPTY_ARRAY();
 }

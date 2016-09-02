@@ -76,7 +76,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
 	phalcon_fetch_params(0, 1, 0, &definition);
 	PHALCON_ENSURE_IS_STRING(definition);
 
-	phalcon_update_property_this(getThis(), SL("_definition"), definition);
+	phalcon_update_property_zval(getThis(), SL("_definition"), definition);
 }
 
 /**
@@ -88,21 +88,21 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 
-	zval *method, *arguments, handler = {}, *definition, call_handler = {};
+	zval *method, *arguments, handler = {}, definition = {}, call_handler = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 2, 0, &method, &arguments);
 
 	phalcon_return_property(&handler, getThis(), SL("_handler"));
 	if (Z_TYPE(handler) != IS_OBJECT) {
-		definition = phalcon_read_property(getThis(), SL("_definition"), PH_NOISY);
-		ce0 = phalcon_fetch_class(definition);
+		phalcon_read_property(&definition, getThis(), SL("_definition"), PH_NOISY);
+		ce0 = phalcon_fetch_class(&definition, ZEND_FETCH_CLASS_DEFAULT);
 
 		object_init_ex(&handler, ce0);
 		if (phalcon_has_constructor(&handler)) {
 			PHALCON_CALL_METHODW(NULL, &handler, "__construct");
 		}
-		phalcon_update_property_this(getThis(), SL("_handler"), &handler);
+		phalcon_update_property_zval(getThis(), SL("_handler"), &handler);
 	}
 
 	array_init_size(&call_handler, 2);

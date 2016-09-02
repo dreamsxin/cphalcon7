@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	PHALCON_VERIFY_INTERFACE_EX(&builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_builder"), &builder);
+	phalcon_update_property_zval(getThis(), SL("_builder"), &builder);
 
 	if (!phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
@@ -139,10 +139,10 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_limitRows"), &limit);
+	phalcon_update_property_zval(getThis(), SL("_limitRows"), &limit);
 
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
-		phalcon_update_property_this(getThis(), SL("_page"), &page);
+		phalcon_update_property_zval(getThis(), SL("_page"), &page);
 	}
 }
 
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setCurrentPage){
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
 
-	phalcon_update_property_this(getThis(), SL("_page"), current_page);
+	phalcon_update_property_zval(getThis(), SL("_page"), current_page);
 	RETURN_THISW();
 }
 
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setLimit){
 	phalcon_fetch_params(0, 1, 0, &current_limit);
 	PHALCON_ENSURE_IS_LONG(current_limit);
 
-	phalcon_update_property_this(getThis(), SL("_limitRows"), current_limit);
+	phalcon_update_property_zval(getThis(), SL("_limitRows"), current_limit);
 	RETURN_THISW();
 }
 
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setQueryBuilder){
 	phalcon_fetch_params(0, 1, 0, &query_builder);
 	PHALCON_VERIFY_INTERFACE_EX(query_builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
 
-	phalcon_update_property_this(getThis(), SL("_builder"), query_builder);
+	phalcon_update_property_zval(getThis(), SL("_builder"), query_builder);
 
 	RETURN_THISW();
 }

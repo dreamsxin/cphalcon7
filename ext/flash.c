@@ -109,7 +109,7 @@ PHALCON_INIT_CLASS(Phalcon_Flash){
  */
 PHP_METHOD(Phalcon_Flash, __construct){
 
-	zval *_css_classes, css_classes = {};
+	zval *_css_classes = NULL, css_classes = {};
 
 	phalcon_fetch_params(0, 0, 1, &_css_classes);
 
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Flash, __construct){
 		phalcon_array_update_str_str(&css_classes, SL("success"), SL("successMessage"), PH_COPY);
 		phalcon_array_update_str_str(&css_classes, SL("warning"), SL("warningMessage"), PH_COPY);
 	}
-	phalcon_update_property_this(getThis(), SL("_cssClasses"), &css_classes);
+	phalcon_update_property_zval(getThis(), SL("_cssClasses"), &css_classes);
 }
 
 /**
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Flash, setImplicitFlush){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_flush);
 
-	phalcon_update_property_this(getThis(), SL("_implicitFlush"), implicit_flush);
+	phalcon_update_property_zval(getThis(), SL("_implicitFlush"), implicit_flush);
 	RETURN_THISW();
 }
 
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Flash, setAutomaticHtml){
 
 	phalcon_fetch_params(0, 1, 0, &automatic_html);
 
-	phalcon_update_property_this(getThis(), SL("_automaticHtml"), automatic_html);
+	phalcon_update_property_zval(getThis(), SL("_automaticHtml"), automatic_html);
 	RETURN_THISW();
 }
 
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 	phalcon_fetch_params(0, 1, 0, &css_classes);
 
 	if (Z_TYPE_P(css_classes) == IS_ARRAY) { 
-		phalcon_update_property_this(getThis(), SL("_cssClasses"), css_classes);
+		phalcon_update_property_zval(getThis(), SL("_cssClasses"), css_classes);
 		RETURN_THISW();
 	}
 	PHALCON_THROW_EXCEPTION_STRW(phalcon_flash_exception_ce, "CSS classes must be an Array");
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 	if (flag_automatic_html) {
 		phalcon_return_property(&classes, getThis(), SL("_cssClasses"));
 
-		if (phalcon_array_isset_fetch(&type_classes, &classes, type)) {
+		if (phalcon_array_isset_fetch(&type_classes, &classes, type, 0)) {
 			if (Z_TYPE(type_classes) == IS_ARRAY) {
 				phalcon_fast_join_str(&joined_classes, SL(" "), &type_classes);
 

@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Escaper, setEncoding){
 
 	phalcon_fetch_params(0, 1, 0, &encoding);
 	PHALCON_ENSURE_IS_STRING(encoding);
-	phalcon_update_property_this(getThis(), SL("_encoding"), encoding);
+	phalcon_update_property_zval(getThis(), SL("_encoding"), encoding);
 }
 
 /**
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Escaper, setHtmlQuoteType){
 
 	phalcon_fetch_params(0, 1, 0, &quote_type);
 	PHALCON_ENSURE_IS_LONG(quote_type);
-	phalcon_update_property_this(getThis(), SL("_htmlQuoteType"), quote_type);
+	phalcon_update_property_zval(getThis(), SL("_htmlQuoteType"), quote_type);
 }
 
 /**
@@ -272,15 +272,15 @@ PHP_METHOD(Phalcon_Escaper, normalizeEncoding){
  */
 PHP_METHOD(Phalcon_Escaper, escapeHtml){
 
-	zval *text, *html_quote_type, *encoding;
+	zval *text, html_quote_type = {}, encoding = {};
 
 	phalcon_fetch_params(0, 1, 0, &text);
 
 	if (Z_TYPE_P(text) == IS_STRING) {
-		html_quote_type = phalcon_read_property(getThis(), SL("_htmlQuoteType"), PH_NOISY);
-		encoding = phalcon_read_property(getThis(), SL("_encoding"), PH_NOISY);
+		phalcon_read_property(&html_quote_type, getThis(), SL("_htmlQuoteType"), PH_NOISY);
+		phalcon_read_property(&encoding, getThis(), SL("_encoding"), PH_NOISY);
 
-		phalcon_htmlspecialchars(return_value, text, html_quote_type, encoding);
+		phalcon_htmlspecialchars(return_value, text, &html_quote_type, &encoding);
 		return;
 	}
 
@@ -295,16 +295,16 @@ PHP_METHOD(Phalcon_Escaper, escapeHtml){
  */
 PHP_METHOD(Phalcon_Escaper, escapeHtmlAttr){
 
-	zval *attribute, quoting = {}, *encoding;
+	zval *attribute, quoting = {}, encoding = {};
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
 	if (Z_TYPE_P(attribute) == IS_STRING && zend_is_true(attribute)) {
 		ZVAL_LONG(&quoting, ENT_QUOTES);
 
-		encoding = phalcon_read_property(getThis(), SL("_encoding"), PH_NOISY);
+		phalcon_read_property(&encoding, getThis(), SL("_encoding"), PH_NOISY);
 
-		phalcon_htmlspecialchars(return_value, attribute, &quoting, encoding);
+		phalcon_htmlspecialchars(return_value, attribute, &quoting, &encoding);
 		return;
 	}
 

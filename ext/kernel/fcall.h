@@ -55,7 +55,7 @@ typedef enum _phalcon_call_type {
 /** Use these functions to call functions in the PHP userland using an arbitrary zval as callable */
 #define PHALCON_CALL_USER_FUNC_ARRAY(retval, handler, params) \
 	do { \
-		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array(retval, handler, params)); \
+		RETURN_ON_FAILURE(phalcon_call_user_func_array(retval, handler, params)); \
 	} while (0)
 
 #define PHALCON_CALL_USER_FUNC_ARRAYW(retval, handler, params) \
@@ -65,7 +65,7 @@ typedef enum _phalcon_call_type {
 
 #define PHALCON_CALL_USER_FUNC_ARRAY_NOEX(retval, handler, params) \
 	do { \
-		RETURN_MM_ON_FAILURE(phalcon_call_user_func_array_noex(retval, handler, params)); \
+		RETURN_ON_FAILURE(phalcon_call_user_func_array_noex(retval, handler, params)); \
 	} while (0)
 
 #define PHALCON_CALL_USER_FUNC_ARRAY_NOEXW(retval, handler, params) \
@@ -125,13 +125,13 @@ static inline int phalcon_has_constructor(const zval *object)
 #define PHALCON_CALL_METHOD_WITH_PARAMS(retval, obj, obj_ce, call_type, method, ...) \
 	do { \
 		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
-		RETURN_MM_ON_FAILURE(phalcon_call_method_with_params(retval, obj, obj_ce, call_type, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
+		RETURN_ON_FAILURE(phalcon_call_method_with_params(retval, obj, obj_ce, call_type, method, PHALCON_FUNC_STRLEN(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_ZVAL_METHOD_WITH_PARAMS(retval, obj, obj_ce, call_type, method, ...) \
 	do { \
 		zval *params_[] = {PHALCON_FETCH_VA_ARGS __VA_ARGS__}; \
-		RETURN_MM_ON_FAILURE(phalcon_call_method_with_params(retval, obj, obj_ce, call_type, Z_STRVAL_P(method), Z_STRLEN_P(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
+		RETURN_ON_FAILURE(phalcon_call_method_with_params(retval, obj, obj_ce, call_type, Z_STRVAL_P(method), Z_STRLEN_P(method), PHALCON_CALL_NUM_PARAMS(params_), PHALCON_PASS_CALL_PARAMS(params_))); \
 	} while (0)
 
 #define PHALCON_CALL_METHOD_WITH_FLAG(flag, retval, obj, obj_ce, call_type, method, ...) \

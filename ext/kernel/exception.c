@@ -91,7 +91,6 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
 	}
 
 	zend_throw_exception_object(&object);
-
 	zval_dtor(&msg);
 }
 
@@ -149,6 +148,5 @@ void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ..
 	PHALCON_CALL_METHODW(NULL, &object, "__construct", &msg);
 
 	zend_throw_exception_object(&object);
-
 	zval_dtor(&msg);
 }

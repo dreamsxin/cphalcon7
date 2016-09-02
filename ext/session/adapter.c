@@ -140,45 +140,54 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter){
  */
 PHP_METHOD(Phalcon_Session_Adapter, __construct){
 
-	zval *options = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL, *http_only = NULL;
+	zval *options = NULL, *_expire = NULL, *_path = NULL, *_secure = NULL, *_domain = NULL, *_http_only = NULL;
+	zval expire = {}, path = {}, secure = {}, domain = {}, http_only = {};
 
-	phalcon_fetch_params(0, 0, 6, &options, &expire, &path, &secure, &domain, &http_only);
+	phalcon_fetch_params(0, 0, 6, &options, &expire, &path, &secure, &domain, &_http_only);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "setoptions", options);
 	}
 
-	if (expire || path || secure || domain || http_only || http_only) {
-		if (!expire) {
-			expire = phalcon_read_property(getThis(), SL("_expire"), PH_NOISY);
-		}
-
-		if (!path) {
-			path = phalcon_read_property(getThis(), SL("_path"), PH_NOISY);
-		}
-
-		if (!secure) {
-			secure = phalcon_read_property(getThis(), SL("_secure"), PH_NOISY);
-		}
-
-		if (!domain) {
-			domain = phalcon_read_property(getThis(), SL("_domain"), PH_NOISY);
-		}
-
-		if (!http_only) {
-			http_only = phalcon_read_property(getThis(), SL("_httpOnly"), PH_NOISY);
-		}
-
-		PHALCON_CALL_FUNCTIONW(NULL, "session_set_cookie_params", expire, path, secure, domain, http_only);
+	if (!_expire) {
+		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&expire, _expire);
 	}
+
+	if (!_path) {
+		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&path, _path);
+	}
+
+	if (!_secure) {
+		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&secure, _secure);
+	}
+
+	if (!_domain) {
+		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&domain, _domain);
+	}
+
+	if (!_http_only) {
+		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&http_only, _http_only);
+	}
+
+	PHALCON_CALL_FUNCTIONW(NULL, "session_set_cookie_params", &expire, &path, &secure, &domain, &http_only);
 }
 
 PHP_METHOD(Phalcon_Session_Adapter, __destruct) {
 
-	zval *started;
+	zval started = {};
 
-	started = phalcon_read_property(getThis(), SL("_started"), PH_NOISY);
-	if (zend_is_true(started)) {
+	phalcon_read_property(&started, getThis(), SL("_started"), PH_NOISY);
+	if (zend_is_true(&started)) {
 		RETURN_ON_FAILURE(phalcon_session_write_close());
 		phalcon_update_property_bool(getThis(), SL("_started"), 0);
 	}
@@ -219,10 +228,10 @@ PHP_METHOD(Phalcon_Session_Adapter, setOptions){
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&unique_id, options, SL("uniqueId"))) {
-			phalcon_update_property_this(getThis(), SL("_uniqueId"), &unique_id);
+			phalcon_update_property_zval(getThis(), SL("_uniqueId"), &unique_id);
 		}
 
-		phalcon_update_property_this(getThis(), SL("_options"), options);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
 }
 
@@ -246,7 +255,7 @@ PHP_METHOD(Phalcon_Session_Adapter, getOptions){
  */
 PHP_METHOD(Phalcon_Session_Adapter, get){
 
-	zval *index, *default_value = NULL, *remove = NULL, *unique_id, key = {}, *_SESSION, value = {};
+	zval *index, *default_value = NULL, *remove = NULL, unique_id = {}, key = {}, *_SESSION, value = {};
 
 	phalcon_fetch_params(0, 1, 2, &index, &default_value, &remove);
 
@@ -254,12 +263,12 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
+	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY);
 
-	PHALCON_CONCAT_VV(&key, unique_id, index);
+	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
-	if (phalcon_array_isset_fetch(&value, _SESSION, &key)) {
+	if (phalcon_array_isset_fetch(&value, _SESSION, &key, 0)) {
 		if (remove && zend_is_true(remove)) {
 			phalcon_array_unset(_SESSION, &key, 0);
 		}
@@ -281,13 +290,13 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
  */
 PHP_METHOD(Phalcon_Session_Adapter, set){
 
-	zval *index, *value, *unique_id, key = {};
+	zval *index, *value, unique_id = {}, key = {};
 
 	phalcon_fetch_params(0, 2, 0, &index, &value);
 
-	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
+	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY);
 
-	PHALCON_CONCAT_VV(&key, unique_id, index);
+	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
 	phalcon_session_set(&key, value);
 }
@@ -335,12 +344,12 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
  */
 PHP_METHOD(Phalcon_Session_Adapter, has){
 
-	zval *index, *unique_id, key = {};
+	zval *index, unique_id = {}, key = {};
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
+	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY);
 
-	PHALCON_CONCAT_VV(&key, unique_id, index);
+	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
 	if(phalcon_session_get(&key)) {
 		RETURN_TRUE;
@@ -360,12 +369,12 @@ PHP_METHOD(Phalcon_Session_Adapter, has){
  */
 PHP_METHOD(Phalcon_Session_Adapter, remove){
 
-	zval *index, *unique_id, key = {}, *_SESSION;
+	zval *index, unique_id = {}, key = {}, *_SESSION;
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	unique_id = phalcon_read_property(getThis(), SL("_uniqueId"), PH_NOISY);
+	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY);
 
-	PHALCON_CONCAT_VV(&key, unique_id, index);
+	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
 	phalcon_array_unset(_SESSION, &key, 0);

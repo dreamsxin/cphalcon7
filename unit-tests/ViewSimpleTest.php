@@ -105,7 +105,7 @@ class ViewSimpleTest extends PHPUnit_Framework_TestCase
 		$view->setDI(new Di);
 		$view->setViewsDir('unit-tests/views/');
 		$view->setParamToView('name', 'FooBar');
-		$view->registerEngines(array('.mhtml' => 'Phalcon\\Mvc\\View\\Engine\\Volt'));
+		$view->registerEngines(array('.mhtml' => 'Phalcon\\Mvc\\View\\Engine\\Php'));
 
 		$this->assertEquals('Hello FooBar', $view->render('test4/index'));
 	}

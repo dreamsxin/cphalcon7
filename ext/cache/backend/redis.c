@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&options, getThis(), SL("_options"));
-	ce0 = zend_fetch_class(SSL("Redis"), ZEND_FETCH_CLASS_AUTO);
+	ce0 = phalcon_fetch_str_class(SL("Redis"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&redis, ce0);
 	if (phalcon_has_constructor(&redis)) {
@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 		}
 	}
 
-	phalcon_update_property_this(getThis(), SL("_redis"), &redis);
+	phalcon_update_property_zval(getThis(), SL("_redis"), &redis);
 	RETURN_CTORW(&redis);
 }
 
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, get){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCR", &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 	
 	PHALCON_CALL_METHODW(&cached_content, &redis, "get", &prefixed_key);
 	if (PHALCON_IS_FALSE(&cached_content)) {

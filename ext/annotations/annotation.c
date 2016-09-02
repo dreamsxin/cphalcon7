@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	}
 
 	phalcon_array_fetch_str(&name, reflection_data, SL("name"), PH_NOISY);
-	phalcon_update_property_this(getThis(), SL("_name"), &name);
+	phalcon_update_property_zval(getThis(), SL("_name"), &name);
 	
 	/** 
 	 * Process annotation arguments
@@ -130,8 +130,8 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 			}
 		} ZEND_HASH_FOREACH_END();
 	
-		phalcon_update_property_this(getThis(), SL("_arguments"), &arguments);
-		phalcon_update_property_this(getThis(), SL("_exprArguments"), &expr_arguments);
+		phalcon_update_property_zval(getThis(), SL("_arguments"), &arguments);
+		phalcon_update_property_zval(getThis(), SL("_exprArguments"), &expr_arguments);
 	}
 }
 
@@ -250,10 +250,10 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getArguments){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, numberArguments){
 
-	zval *arguments;
+	zval arguments = {};
 
-	arguments = phalcon_read_property(getThis(), SL("_arguments"), PH_NOISY);
-	phalcon_fast_count(return_value, arguments);
+	phalcon_read_property(&arguments, getThis(), SL("_arguments"), PH_NOISY);
+	phalcon_fast_count(return_value, &arguments);
 }
 
 /**
@@ -263,12 +263,12 @@ PHP_METHOD(Phalcon_Annotations_Annotation, numberArguments){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, getArgument){
 
-	zval *position, *arguments;
+	zval *position, arguments = {};
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	
-	arguments = phalcon_read_property(getThis(), SL("_arguments"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(return_value, arguments, position)) {
+	phalcon_read_property(&arguments, getThis(), SL("_arguments"), PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &arguments, position, 0)) {
 		RETURN_NULL();
 	}
 }
@@ -280,12 +280,12 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getArgument){
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, hasArgument){
 
-	zval *position, *arguments;
+	zval *position, arguments = {};
 
 	phalcon_fetch_params(0, 1, 0, &position);
 	
-	arguments = phalcon_read_property(getThis(), SL("_arguments"), PH_NOISY);
-	RETURN_BOOL(phalcon_array_isset(arguments, position));
+	phalcon_read_property(&arguments, getThis(), SL("_arguments"), PH_NOISY);
+	RETURN_BOOL(phalcon_array_isset(&arguments, position));
 }
 
 /**

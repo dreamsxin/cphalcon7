@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 	if (Z_TYPE(stream) != IS_RESOURCE) {
 		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open stream '%s'", Z_STRVAL_P(name));
 	} else {
-		phalcon_update_property_this(getThis(), SL("_stream"), &stream);
+		phalcon_update_property_zval(getThis(), SL("_stream"), &stream);
 	}
 }
 
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter)
 		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHODW(NULL, &formatter, "__construct");
 
-		phalcon_update_property_this(getThis(), SL("_formatter"), &formatter);
+		phalcon_update_property_zval(getThis(), SL("_formatter"), &formatter);
 	}
 
 	RETURN_CTORW(&formatter);
@@ -145,19 +145,19 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter)
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
 
-	zval *message, *type, *time, *context, *stream, formatter = {}, applied_format = {};
+	zval *message, *type, *time, *context, stream = {}, formatter = {}, applied_format = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
-	stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
-	if (Z_TYPE_P(stream) != IS_RESOURCE) {
+	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY);
+	if (Z_TYPE(stream) != IS_RESOURCE) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
 	}
 
 	PHALCON_CALL_METHODW(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHODW(&applied_format, &formatter, "format", message, type, time, context);
-	PHALCON_CALL_FUNCTIONW(NULL, "fwrite", stream, &applied_format);
+	PHALCON_CALL_FUNCTIONW(NULL, "fwrite", &stream, &applied_format);
 }
 
 /**
@@ -167,6 +167,8 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_Stream, close)
 {
-	zval *stream = phalcon_read_property(getThis(), SL("_stream"), PH_NOISY);
-	PHALCON_RETURN_CALL_FUNCTIONW("fclose", stream);
+	zval stream = {};
+
+	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY);
+	PHALCON_RETURN_CALL_FUNCTIONW("fclose", &stream);
 }

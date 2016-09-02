@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, setShowBacktrace) {
 	phalcon_fetch_params(0, 1, 0, &show);
 
 	PHALCON_ENSURE_IS_BOOL(show);
-	phalcon_update_property_this(getThis(), SL("_showBacktrace"), show);
+	phalcon_update_property_zval(getThis(), SL("_showBacktrace"), show);
 }
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, enableLabels) {
@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, enableLabels) {
 	phalcon_fetch_params(0, 1, 0, &enable);
 
 	PHALCON_ENSURE_IS_BOOL(enable);
-	phalcon_update_property_this(getThis(), SL("_enableLabels"), enable);
+	phalcon_update_property_zval(getThis(), SL("_enableLabels"), enable);
 }
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, labelsEnabled) {
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getTypeString) {
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
-	zval *message, *type, *timestamp, *context, interpolated = {}, type_str = {}, *show_backtrace, *enable_labels;
+	zval *message, *type, *timestamp, *context, interpolated = {}, type_str = {}, show_backtrace = {}, enable_labels = {};
 	zval backtrace = {}, *pzval, payload = {}, meta = {}, *file, *line, body = {}, encoded = {};
 	int i_show_backtrace, i_enable_labels, found = 0;
 	ulong idx;
@@ -167,11 +167,11 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
 	PHALCON_CALL_METHODW(&type_str, getThis(), "gettypestring", type);
 
-	show_backtrace   = phalcon_read_property(getThis(), SL("_showBacktrace"), PH_NOISY);
-	enable_labels    = phalcon_read_property(getThis(), SL("_enableLabels"), PH_NOISY);
+	phalcon_read_property(&show_backtrace, getThis(), SL("_showBacktrace"), PH_NOISY);
+	phalcon_read_property(&enable_labels, getThis(), SL("_enableLabels"), PH_NOISY);
 
-	i_show_backtrace = zend_is_true(show_backtrace);
-	i_enable_labels  = zend_is_true(enable_labels);
+	i_show_backtrace = zend_is_true(&show_backtrace);
+	i_enable_labels  = zend_is_true(&enable_labels);
 
 	/*
 	 * Get the backtrace. This differs for different PHP versions.
@@ -297,7 +297,6 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	}
 
 	/* We don't need the JSON message anymore */
-	PHALCON_PTR_DTOR(&encoded);
 	/* Do not free the smart string because we steal its data for zval */
 	RETURN_STR(result.s);
 }

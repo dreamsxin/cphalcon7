@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Assets_Manager, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_options"), options);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
 }
 
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Assets_Manager, setOptions){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Options must be an array");
 		return;
 	}
-	phalcon_update_property_this(getThis(), SL("_options"), options);
+	phalcon_update_property_zval(getThis(), SL("_options"), options);
 
 	RETURN_THISW();
 }
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Assets_Manager, useImplicitOutput){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_output);
 
-	phalcon_update_property_this(getThis(), SL("_implicitOutput"), implicit_output);
+	phalcon_update_property_zval(getThis(), SL("_implicitOutput"), implicit_output);
 	RETURN_THISW();
 }
 
@@ -318,12 +318,12 @@ PHP_METHOD(Phalcon_Assets_Manager, addJs){
  */
 PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 
-	zval *type, *resource, *collections, collection = {};
+	zval *type, *resource, collections = {}, collection = {};
 
 	phalcon_fetch_params(0, 2, 0, &type, &resource);
 
-	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(&collection, collections, type)) {
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
+	if (!phalcon_array_isset_fetch(&collection, &collections, type, 0)) {
 		object_init_ex(&collection, phalcon_assets_collection_ce);
 		phalcon_update_property_array(getThis(), SL("_collections"), type, &collection);
 	}
@@ -406,7 +406,7 @@ PHP_METHOD(Phalcon_Assets_Manager, set){
  */
 PHP_METHOD(Phalcon_Assets_Manager, get){
 
-	zval *id, *collections;
+	zval *id, collections = {};
 
 	phalcon_fetch_params(0, 1, 0, &id);
 
@@ -415,8 +415,8 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
 		return;
 	}
 
-	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(return_value, collections, id)) {
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &collections, id, 0)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "The collection does not exist in the manager");
 		return;
 	}
@@ -429,14 +429,14 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
  */
 PHP_METHOD(Phalcon_Assets_Manager, getCss){
 
-	zval *collections, collection = {};
+	zval collections = {}, collection = {};
 
-	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
 
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_fetch_str(&collection, collections, SL("css"))) {
+	if (!phalcon_array_isset_fetch_str(&collection, &collections, SL("css"))) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		return;
 	}
@@ -451,14 +451,14 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
  */
 PHP_METHOD(Phalcon_Assets_Manager, getJs){
 
-	zval *collections, collection = {};
+	zval collections = {}, collection = {};
 
-	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
 
 	/** 
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_fetch_str(&collection, collections, SL("js"))) {
+	if (!phalcon_array_isset_fetch_str(&collection, &collections, SL("js"))) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		return;
 	}
@@ -474,12 +474,12 @@ PHP_METHOD(Phalcon_Assets_Manager, getJs){
  */
 PHP_METHOD(Phalcon_Assets_Manager, collection){
 
-	zval *name, *collections;
+	zval *name, collections = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	collections = phalcon_read_property(getThis(), SL("_collections"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(return_value, collections, name)) {
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &collections, name, 0)) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		phalcon_update_property_array(getThis(), SL("_collections"), name, return_value);
 	}

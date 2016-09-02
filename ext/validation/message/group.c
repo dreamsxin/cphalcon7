@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &messages);
 	if (messages && Z_TYPE_P(messages) == IS_ARRAY) {
-		phalcon_update_property_this(getThis(), SL("_messages"), messages);
+		phalcon_update_property_zval(getThis(), SL("_messages"), messages);
 	}
 }
 
@@ -343,11 +343,11 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, count){
 
-	zval *messages;
+	zval messages = {};
 
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
 
-	phalcon_fast_count(return_value, messages);
+	phalcon_fast_count(return_value, &messages);
 }
 
 /**
@@ -355,10 +355,10 @@ PHP_METHOD(Phalcon_Validation_Message_Group, count){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, rewind){
 
-	zval *messages;
+	zval messages = {};
 
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	zend_hash_internal_pointer_reset(Z_ARRVAL_P(messages));
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	zend_hash_internal_pointer_reset(Z_ARRVAL(messages));
 }
 
 /**
@@ -368,10 +368,10 @@ PHP_METHOD(Phalcon_Validation_Message_Group, rewind){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, current){
 
-	zval *messages, *message;
+	zval messages = {}, *message;
 
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	if ((message = zend_hash_get_current_data(Z_ARRVAL_P(messages))) != NULL) {
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	if ((message = zend_hash_get_current_data(Z_ARRVAL(messages))) != NULL) {
 		RETURN_CTORW(message);
 	}
 
@@ -385,10 +385,10 @@ PHP_METHOD(Phalcon_Validation_Message_Group, current){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, key){
 
-	zval *messages;
+	zval messages = {};
 
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	zend_hash_get_current_key_zval(Z_ARRVAL_P(messages), return_value);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	zend_hash_get_current_key_zval(Z_ARRVAL(messages), return_value);
 }
 
 /**
@@ -397,10 +397,16 @@ PHP_METHOD(Phalcon_Validation_Message_Group, key){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, next){
 
-	zval *messages;
+	zval messages = {}, *message;
 
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
-	zend_hash_move_forward(Z_ARRVAL_P(messages));
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	zend_hash_move_forward(Z_ARRVAL(messages));
+
+	if ((message = zend_hash_get_current_data(Z_ARRVAL(messages))) != NULL) {
+		RETURN_CTORW(message);
+	}
+
+	RETURN_NULL();
 }
 
 /**
@@ -410,11 +416,11 @@ PHP_METHOD(Phalcon_Validation_Message_Group, next){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, valid){
 
-	zval *messages;
+	zval messages = {};
 
-	messages = phalcon_read_property(getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
 
-	RETURN_BOOL(zend_hash_has_more_elements(Z_ARRVAL_P(messages)));
+	RETURN_BOOL(zend_hash_has_more_elements(Z_ARRVAL(messages)) == SUCCESS);
 }
 
 /**

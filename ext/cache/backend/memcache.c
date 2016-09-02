@@ -166,7 +166,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, _connect)
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&options, getThis(), SL("_options"));
-	ce0 = zend_fetch_class(SSL("Memcache"), ZEND_FETCH_CLASS_AUTO);
+	ce0 = phalcon_fetch_str_class(SL("Memcache"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&memcache, ce0);
 	if (phalcon_has_constructor(&memcache)) {
@@ -193,7 +193,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, _connect)
 		return;
 	}
 
-	phalcon_update_property_this(getThis(), SL("_memcache"), &memcache);
+	phalcon_update_property_zval(getThis(), SL("_memcache"), &memcache);
 	RETURN_CTORW(&memcache);
 }
 
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, get){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_this(getThis(), SL("_lastKey"), &prefixed_key);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHODW(&cached_content, &memcache, "get", &prefixed_key);
 	if (PHALCON_IS_FALSE(&cached_content)) {

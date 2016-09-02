@@ -357,5 +357,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 
 PHP_METHOD(Phalcon_DI_Injectable, __sleep){
 
-	RETURN_EMPTY_ARRAY();
+	phalcon_get_object_vars(return_value, getThis(), 0);
+	phalcon_array_unset_str(return_value, SL("_dependencyInjector"), 0);
+	phalcon_array_unset_str(return_value, SL("_eventsManager"), 0);
 }

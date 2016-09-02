@@ -60,11 +60,6 @@ class CacheResultsetTest extends PHPUnit_Framework_TestCase
 		$di->set('modelsQueryBuilder', 'Phalcon\Mvc\Model\Query\Builder');
 		$di->set('modelsCriteria', 'Phalcon\\Mvc\\Model\\Criteria');
 
-		$di->set('db', function(){
-			require 'unit-tests/config.db.php';
-			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
-		}, true);
-
 		$frontCache = new Phalcon\Cache\Frontend\Data(array(
 			'lifetime' => 3600
 		));
@@ -103,7 +98,7 @@ class CacheResultsetTest extends PHPUnit_Framework_TestCase
 		return $cache;
 	}
 
-	public function testCacheResultsetNormal()
+	public function testMysqlCacheResultsetNormal()
 	{
 		require 'unit-tests/config.db.php';
 		if (empty($configMysql)) {
@@ -112,6 +107,36 @@ class CacheResultsetTest extends PHPUnit_Framework_TestCase
 		}
 
 		$cache = $this->_getCache();
+
+		$this->_di->set('db', function() use ($configMysql) {
+			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
+		}, true);
+
+		$cache->save('test-resultset', Robots::find(array('order' => 'id')));
+
+		$this->assertTrue(file_exists('unit-tests/cache/test-resultset'));
+
+		$robots = $cache->get('test-resultset');
+
+		$this->assertEquals(get_class($robots), 'Phalcon\Mvc\Model\Resultset\Simple');
+		$this->assertEquals(count($robots), 3);
+		$this->assertEquals($robots->count(), 3);
+
+	}
+
+	public function testPostgresqlCacheResultsetNormal()
+	{
+		require 'unit-tests/config.db.php';
+		if (empty($configPostgresql)) {
+			$this->markTestSkipped('Test skipped');
+			return;
+		}
+
+		$cache = $this->_getCache();
+
+		$this->_di->set('db', function() use ($configPostgresql) {
+			return new Phalcon\Db\Adapter\Pdo\Postgresql($configPostgresql);
+		}, true);
 
 		$cache->save('test-resultset', Robots::find(array('order' => 'id')));
 

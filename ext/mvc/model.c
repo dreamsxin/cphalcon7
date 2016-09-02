@@ -2633,9 +2633,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 				/**
 				 * Try to find a different action in the foreign key's options
 				 */
-				if (Z_TYPE(foreign_key) == IS_ARRAY && phalcon_array_isset_str(&foreign_key, SL("action"))) {
-					phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY);
-				} else {
+				if (Z_TYPE(foreign_key) != IS_ARRAY || !phalcon_array_isset_fetch_str(&action, &foreign_key, SL("action"))) {
 					/**
 					 * By default action is restrict
 					 */
@@ -2798,7 +2796,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 				/**
 				 * Try to find a different action in the foreign key's options
 				 */
-				if (Z_TYPE(foreign_key) == IS_ARRAY || phalcon_array_isset_str(&foreign_key, SL("action"))) {
+				if (Z_TYPE(foreign_key) == IS_ARRAY && phalcon_array_isset_str(&foreign_key, SL("action"))) {
 					phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY);
 				}
 

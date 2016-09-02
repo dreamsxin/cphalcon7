@@ -779,9 +779,9 @@ PHP_METHOD(Phalcon_Date, span2){
 	}
 
 	if (Z_LVAL(count_output) == 1) {
-		ZVAL_MAKE_REF(&output_arr);
+		PHALCON_MAKE_REF(&output_arr);
 		PHALCON_CALL_FUNCTIONW(return_value, "array_pop", &output_arr);
-		ZVAL_UNREF(&output_arr);
+		PHALCON_UNREF(&output_arr);
 		return;
 	}
 

@@ -236,21 +236,10 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 
 /** Low overhead parse/fetch parameters */
 #define phalcon_fetch_params(memory_grow, required_params, optional_params, ...) \
-	if (memory_grow) { \
-		zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL; \
-		ASSUME(phalcon_globals_ptr != NULL); \
-		if (unlikely(phalcon_globals_ptr->active_memory == NULL)) { \
-			fprintf(stderr, "phalcon_fetch_params is called with memory_grow=1 but there is no active memory frame!\n"); \
-			phalcon_print_backtrace(); \
-		} \
-		else if (unlikely(phalcon_globals_ptr->active_memory->func != __func__)) { \
-			fprintf(stderr, "phalcon_fetch_params is called with memory_grow=1 but the memory frame was not created!\n"); \
-			fprintf(stderr, "The frame was created by %s\n", phalcon_globals_ptr->active_memory->func); \
-			fprintf(stderr, "Calling function: %s\n", __func__); \
-			phalcon_print_backtrace(); \
-		} \
-	} \
+	int __is_make_ref = 0; \
 	if (phalcon_fetch_parameters(ZEND_NUM_ARGS(), required_params, optional_params, __VA_ARGS__) == FAILURE) { \
+		if (__is_make_ref) { \
+		} \
 		RETURN_NULL(); \
 	}
 
@@ -332,7 +321,16 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table);
 #define phalcon_is_php_version(id) (PHP_VERSION_ID / 10 == id / 10 ?  1 : 0)
 
 /** When type is the ref should also */
-#define PHALCON_MAKE_REF(obj) ZVAL_NEW_REF(obj, obj);
-#define PHALCON_UNREF(obj) ZVAL_UNREF(obj);
+#define PHALCON_MAKE_REF(obj) \
+		if (!Z_ISREF_P(obj)) { \
+			__is_make_ref = 1; \
+			ZVAL_NEW_REF(obj, obj); \
+		}
+
+#define PHALCON_UNREF(obj) \
+		if (__is_make_ref && Z_ISREF_P(obj)) { \
+			ZVAL_UNREF(obj); \
+		} \
+		__is_make_ref = 0;
 
 #endif /* PHALCON_KERNEL_MAIN_H */

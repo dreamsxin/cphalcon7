@@ -1497,13 +1497,13 @@ void phalcon_crc32(zval *return_value, zval *str)
 
 int phalcon_preg_match(zval *retval, zval *regex, zval *subject, zval *matches)
 {
-	int result;
+	int result, __is_make_ref = 0;
 
 	if (matches) {
 		ZVAL_NULL(matches);
-		ZVAL_MAKE_REF(matches);
+		PHALCON_MAKE_REF(matches);
 		PHALCON_CALL_FUNCTION_FLAG(result, retval, "preg_match", regex, subject, matches);
-		ZVAL_UNREF(matches);
+		PHALCON_UNREF(matches);
 	} else {
 		PHALCON_CALL_FUNCTION_FLAG(result, retval, "preg_match", regex, subject);
 	}

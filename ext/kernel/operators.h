@@ -22,6 +22,11 @@
 
 #include "php_phalcon.h"
 
+
+#define PHALCON_TYPE_P(var)   (Z_TYPE_P(var) == IS_REFERENCE ? Z_TYPE_P(Z_REFVAL_P(var)) : Z_TYPE_P(var))
+#define PHALCON_IS_TYPE(var, type)   (Z_TYPE_P(var) == type || (Z_TYPE_P(var) == IS_REFERENCE && Z_TYPE_P(Z_REFVAL_P(var)) == type))
+#define PHALCON_IS_NOT_TYPE(var, type)   !(PHALCON_IS_TYPE(var, type))
+
 /** Strict comparing */
 #define PHALCON_IS_LONG(op1, op2)   ((Z_TYPE_P(op1) == IS_LONG && Z_LVAL_P(op1) == op2) || phalcon_compare_strict_long(op1, op2))
 #define PHALCON_IS_DOUBLE(op1, op2) ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) == op2) || phalcon_compare_strict_double(op1, op2))

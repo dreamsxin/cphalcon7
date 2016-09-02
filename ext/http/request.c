@@ -1674,6 +1674,7 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 
 	zval *_SERVER, key = {}, *value, pattern = {}, digest = {}, set_order = {}, matches = {}, ret = {}, *match;
 	const char *auth_digest = SG(request_info).auth_digest;
+	int __is_make_ref = 0;
 
 	if (unlikely(!auth_digest)) {
 		_SERVER = phalcon_get_global_str(SL("_SERVER"));
@@ -1692,9 +1693,9 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 		PHALCON_STR(&digest, auth_digest);
 		ZVAL_LONG(&set_order, 2);
 
-		ZVAL_MAKE_REF(&matches);
+		PHALCON_MAKE_REF(&matches);
 		PHALCON_CALL_FUNCTIONW(&ret, "preg_match_all", &pattern, &digest, &matches, &set_order);
-		ZVAL_UNREF(&matches);
+		PHALCON_UNREF(&matches);
 
 		if (zend_is_true(&ret) && Z_TYPE(matches) == IS_ARRAY) {
 			array_init(return_value);

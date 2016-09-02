@@ -32,6 +32,7 @@
 #include "kernel/string.h"
 #include "kernel/array.h"
 #include "kernel/concat.h"
+#include "kernel/debug.h"
 
 /**
  * Phalcon\Db\Result\Pdo
@@ -234,9 +235,9 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
 	}
 
 	phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY);
-	if (Z_TYPE_P(fetch_mode) != IS_NULL) {
-		if (Z_TYPE_P(fetch_argument) != IS_NULL) {
-			if (Z_TYPE_P(ctor_args) != IS_NULL) {
+	if (PHALCON_IS_NOT_TYPE(fetch_mode, IS_NULL)) {
+		if (PHALCON_IS_NOT_TYPE(fetch_argument, IS_NULL)) {
+			if (PHALCON_IS_NOT_TYPE(ctor_args, IS_NULL)) {
 				PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetchall", fetch_mode, fetch_argument, ctor_args);
 			} else {
 				PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetchall", fetch_mode, fetch_argument);

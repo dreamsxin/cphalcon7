@@ -28,6 +28,7 @@
 
 #define PHV(v) phalcon_vdump(v)
 #define PHPR(v) phalcon_print_r(v)
+#define PHALCON_DEBUG_SIMPLE() zend_printf("\n File:%s, Line:%d\n", __FILE__, __LINE__)
 
 typedef struct _phalcon_debug_entry {
 	struct _phalcon_debug_entry *prev;

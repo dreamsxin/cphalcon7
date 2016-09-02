@@ -641,9 +641,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	PHALCON_STR(&event_name, "router:beforeCheckRoutes");
 
-	ZVAL_MAKE_REF(&handled_uri);
+	PHALCON_MAKE_REF(&handled_uri);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &handled_uri);
-	ZVAL_UNREF(&handled_uri);
+	PHALCON_UNREF(&handled_uri);
 
 	PHALCON_CALL_METHODW(&current_host_name, &request, "gethttphost");
 
@@ -742,9 +742,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		if (zend_is_true(&route_found)) {
 			PHALCON_STR(&event_name, "router:matchedRoute");
 
-			ZVAL_MAKE_REF(route);
+			PHALCON_MAKE_REF(route);
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, route);
-			ZVAL_UNREF(route);
+			PHALCON_UNREF(route);
 
 			PHALCON_CALL_METHODW(&before_match, route, "getbeforematch");
 			if (Z_TYPE(before_match) != IS_NULL) {
@@ -843,9 +843,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		} else {
 			PHALCON_STR(&event_name, "router:notMatchedRoute");
 
-			ZVAL_MAKE_REF(route);
+			PHALCON_MAKE_REF(route);
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, route);
-			ZVAL_UNREF(route);
+			PHALCON_UNREF(route);
 		}
 	} ZEND_HASH_FOREACH_END();
 

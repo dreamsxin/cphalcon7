@@ -351,20 +351,20 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				 */
 				if (phalcon_compare_strict_long(&type, 32)) {
 					phalcon_cast(&cast_value, value, IS_DOUBLE);
-					ZVAL_MAKE_REF(&cast_value);
+					PHALCON_MAKE_REF(&cast_value);
 					PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, &cast_value);
-					ZVAL_UNREF(&cast_value);
+					PHALCON_UNREF(&cast_value);
 				} else {
 					/**
 					 * 1024 is ignore the bind type
 					 */
-					ZVAL_MAKE_REF(value);
+					PHALCON_MAKE_REF(value);
 					if (phalcon_compare_strict_long(&type, 1024)) {
 						PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, value);
 					} else {
 						PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, value, &type);
 					}
-					ZVAL_UNREF(value);
+					PHALCON_UNREF(value);
 				}
 
 			} else {
@@ -373,14 +373,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				} else {
 					ZVAL_LONG(&type, PHALCON_DB_COLUMN_BIND_PARAM_STR);
 				}
-				ZVAL_MAKE_REF(value);
+				PHALCON_MAKE_REF(value);
 				PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, value, &type);
-				ZVAL_UNREF(value);
+				PHALCON_UNREF(value);
 			}
 		} else {
-			ZVAL_MAKE_REF(value);
+			PHALCON_MAKE_REF(value);
 			PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, value);
-			ZVAL_UNREF(value);
+			PHALCON_UNREF(value);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -425,6 +425,16 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
 		phalcon_debug_print_r(&debug_message);
+		if (bind_params && PHALCON_IS_NOT_EMPTY(bind_params)) {
+			PHALCON_STR(&debug_message, "Bind Params: ");
+			phalcon_debug_print_r(&debug_message);
+			phalcon_debug_print_r(bind_params);
+		}
+		if (bind_types && PHALCON_IS_NOT_EMPTY(bind_types)) {
+			PHALCON_STR(&debug_message, "Bind Types: ");
+			phalcon_debug_print_r(&debug_message);
+			phalcon_debug_print_r(bind_types);
+		}
 	}
 
 	if (!bind_params) {
@@ -452,7 +462,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		}
 	}
 
-	if (Z_TYPE_P(bind_params) == IS_ARRAY) { 
+	if (Z_TYPE_P(bind_params) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(&statement, getThis(), "prepare", sql_statement);
 		if (Z_TYPE(statement) == IS_OBJECT) {
 			PHALCON_CALL_METHODW(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
@@ -513,6 +523,16 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
 		phalcon_debug_print_r(&debug_message);
+		if (bind_params && PHALCON_IS_NOT_EMPTY(bind_params)) {
+			PHALCON_STR(&debug_message, "Bind Params: ");
+			phalcon_debug_print_r(&debug_message);
+			phalcon_debug_print_r(bind_params);
+		}
+		if (bind_types && PHALCON_IS_NOT_EMPTY(bind_types)) {
+			PHALCON_STR(&debug_message, "Bind Types: ");
+			phalcon_debug_print_r(&debug_message);
+			phalcon_debug_print_r(bind_types);
+		}
 	}
 
 	if (!bind_params) {
@@ -678,9 +698,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 
 	PHALCON_STR(&bind_pattern, "/\\?([0-9]+)|:([a-zA-Z0-9_]+):/");
 
-	ZVAL_MAKE_REF(&matches);
+	PHALCON_MAKE_REF(&matches);
 	PHALCON_CALL_FUNCTIONW(&status, "preg_match_all", &bind_pattern, sql, &matches, &set_order);
-	ZVAL_UNREF(&matches);
+	PHALCON_UNREF(&matches);
 
 	if (zend_is_true(&status)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(matches), place_match) {

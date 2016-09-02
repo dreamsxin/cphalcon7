@@ -4459,9 +4459,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
 	PHALCON_STR(&event_name, "query:beforeExecute");
 
-	ZVAL_MAKE_REF(bind_params);
+	PHALCON_MAKE_REF(bind_params);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, bind_params);
-	ZVAL_UNREF(bind_params);
+	PHALCON_UNREF(bind_params);
 
 	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY);
 	cache_options_is_not_null = (Z_TYPE(cache_options) != IS_NULL); /* to keep scan-build happy */
@@ -4622,9 +4622,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
 	PHALCON_STR(&event_name, "query:afterExecute");
 
-	ZVAL_MAKE_REF(&result);
+	PHALCON_MAKE_REF(&result);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &result);
-	ZVAL_UNREF(&result);
+	PHALCON_UNREF(&result);
 
 
 	if (Z_TYPE(result) != IS_OBJECT) {

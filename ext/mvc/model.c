@@ -1449,9 +1449,9 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 
 	PHALCON_STR(&event_name, "beforeQuery");
 
-	ZVAL_MAKE_REF(&builder);
+	PHALCON_MAKE_REF(&builder);
 	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &builder);
-	ZVAL_UNREF(&builder);
+	PHALCON_UNREF(&builder);
 
 	PHALCON_CALL_METHODW(&query, &builder, "getquery");
 
@@ -1477,9 +1477,9 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 
 		PHALCON_STR(&event_name, "afterQuery");
 
-		ZVAL_MAKE_REF(&resultset);
+		PHALCON_MAKE_REF(&resultset);
 		PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &resultset);
-		ZVAL_UNREF(&resultset);
+		PHALCON_UNREF(&resultset);
 	}
 
 	RETURN_CTORW(&resultset);
@@ -1572,9 +1572,9 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	PHALCON_STR(&event_name, "beforeQuery");
 
-	ZVAL_MAKE_REF(&builder);
+	PHALCON_MAKE_REF(&builder);
 	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &builder);
-	ZVAL_UNREF(&builder);
+	PHALCON_UNREF(&builder);
 
 	/**
 	 * We only want the first record
@@ -1602,9 +1602,9 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	if (zend_is_true(&result)) {
 		PHALCON_STR(&event_name, "afterQuery");
 
-		ZVAL_MAKE_REF(&result);
+		PHALCON_MAKE_REF(&result);
 		PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &result);
-		ZVAL_UNREF(&result);
+		PHALCON_UNREF(&result);
 
 		/**
 		 * Define an hydration mode
@@ -1920,7 +1920,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 			array_init(&params);
 		}
 	} else {
-		PHALCON_CPY_WRT(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&group_column, &params, SL("column"))) {
@@ -6362,9 +6362,9 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 
 	PHALCON_STR(&event_name, "afterToArray");
 
-	ZVAL_MAKE_REF(&data);
+	PHALCON_MAKE_REF(&data);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &data);
-	ZVAL_UNREF(&data);
+	PHALCON_UNREF(&data);
 
 	RETURN_CTORW(&data);
 }

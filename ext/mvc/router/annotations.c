@@ -465,10 +465,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		 * Add the route to the router
 		 */
 		PHALCON_CALL_METHODW(&route, getThis(), "add", &uri, &paths);
-		if (Z_TYPE(methods) == IS_NULL) {
+		if (Z_TYPE(methods) <= IS_NULL) {
 			ZVAL_STRING(&parameter, "methods");
 
 			PHALCON_CALL_METHODW(&methods, annotation, "getargument", &parameter);
+
 			if (Z_TYPE(methods) == IS_ARRAY || Z_TYPE(methods) == IS_STRING) {
 				PHALCON_CALL_METHODW(NULL, &route, "via", &methods);
 			}

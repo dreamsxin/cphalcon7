@@ -569,7 +569,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setEventsManager){
 
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHODW(NULL, &models_manager, "setcustomeventsmanager", getThis(), events_manager);
 }
 
@@ -582,7 +582,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getEventsManager){
 
 	zval models_manager = {};
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getcustomeventsmanager", getThis());
 }
 
@@ -845,7 +845,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setConnectionService){
 
 	phalcon_fetch_params(0, 1, 0, &connection_service);
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHODW(NULL, &models_manager, "setconnectionservice", getThis(), connection_service);
 
 	RETURN_THISW();
@@ -863,7 +863,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setReadConnectionService){
 
 	phalcon_fetch_params(0, 1, 0, &connection_service);
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHODW(NULL, &models_manager, "setreadconnectionservice", getThis(), connection_service);
 
 	RETURN_THISW();
@@ -881,7 +881,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setWriteConnectionService){
 
 	phalcon_fetch_params(0, 1, 0, &connection_service);
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHODW(NULL, &models_manager, "setwriteconnectionservice", getThis(), connection_service);
 
 	RETURN_THISW();
@@ -896,7 +896,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnectionService){
 
 	zval models_manager = {};
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getreadconnectionservice", getThis());
 }
 
@@ -909,7 +909,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnectionService){
 
 	zval models_manager = {};
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getwriteconnectionservice", getThis());
 }
 

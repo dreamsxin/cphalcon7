@@ -4750,7 +4750,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setBindParams){
 
 	phalcon_fetch_params(0, 1, 0, &bind_params);
 
-	if (Z_TYPE_P(bind_params) != IS_ARRAY) { 
+	if (Z_TYPE_P(bind_params) != IS_ARRAY && Z_TYPE_P(bind_params) != IS_NULL) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind parameters must be an array");
 		return;
 	}
@@ -4800,7 +4800,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setBindTypes){
 
 	phalcon_fetch_params(0, 1, 0, &bind_types);
 
-	if (Z_TYPE_P(bind_types) != IS_ARRAY) { 
+	if (Z_TYPE_P(bind_types) != IS_ARRAY && Z_TYPE_P(bind_types) != IS_NULL) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind types must be an array");
 		return;
 	}

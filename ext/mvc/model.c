@@ -447,7 +447,6 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Model, mvc_model, phalcon_di_injectable_ce, phalcon_mvc_model_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_mvc_model_ce, SL("_dependencyInjector"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_modelsManager"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_modelsMetaData"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED);
@@ -529,25 +528,21 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
  */
 PHP_METHOD(Phalcon_Mvc_Model, __construct){
 
-	zval *di = NULL, *_models_manager = NULL, models_manager = {};
+	zval *dependency_injector = NULL, *_models_manager = NULL, models_manager = {};
 
-	phalcon_fetch_params(0, 0, 2, &di, &_models_manager);
+	phalcon_fetch_params(0, 0, 2, &dependency_injector, &_models_manager);
 
-	if (di) {
-		if (Z_TYPE_P(di) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
-			return;
-		}
-		PHALCON_VERIFY_INTERFACEW(di, phalcon_diinterface_ce);
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), di);
+	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
 	}
 
-	if (_models_manager) {
+	if (_models_manager && Z_TYPE_P(_models_manager) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACEW(_models_manager, phalcon_mvc_model_managerinterface_ce);
 		phalcon_update_property_zval(getThis(), SL("_modelsManager"), _models_manager);
+		PHALCON_CPY_WRT(&models_manager, _models_manager);
+	} else {
+		PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	}
-
-	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 	if (Z_TYPE(models_manager) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not object (1)");
@@ -6657,8 +6652,7 @@ PHP_METHOD(Phalcon_Mvc_Model, filter){
 			phalcon_return_property(&filter, getThis(), SL("_filter"));
 
 			if (Z_TYPE(filter) != IS_OBJECT) {
-				phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-
+				PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 				if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 					PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access the 'filter' service");
 					return;

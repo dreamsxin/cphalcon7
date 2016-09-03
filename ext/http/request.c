@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 	if (Z_TYPE_P(filters) != IS_NULL) {
 		phalcon_return_property(&filter, getThis(), SL("_filter"));
 		if (Z_TYPE(filter) != IS_OBJECT) {
-			phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+			PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
 				return;

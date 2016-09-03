@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 		}
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		ZVAL_LONG(&exception_code, 0);
 		ZVAL_STRING(&exception_message, "A dependency injection container is required to access the 'response' service");

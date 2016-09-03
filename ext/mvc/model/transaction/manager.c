@@ -156,18 +156,13 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction_Manager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, __construct){
 
-	zval *di = NULL, dependency_injector = {};
+	zval *dependency_injector = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
-	if (!di || Z_TYPE_P(di) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-	} else {
-		PHALCON_CPY_WRT(&dependency_injector, di);
+	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
 	}
-
-	PHALCON_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_mvc_model_transaction_exception_ce, 0);
-	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
 }
 
 /**

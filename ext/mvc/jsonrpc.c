@@ -116,9 +116,8 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
-	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-		PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_jsonrpc_exception_ce, 0);
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
+	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
 	}
 }
 
@@ -245,7 +244,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	zval url = {}, uri = {}, router = {}, module_name = {}, modules = {}, module = {}, class_name = {}, path = {}, module_object = {}, module_params = {}, status = {}, namespace_name = {}, controller_name = {}, action_name = {};
 	zval params = {}, exact = {}, dispatcher = {}, controller = {}, jsonrpc_result = {}, jsonrpc_id = {};
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
 		return;

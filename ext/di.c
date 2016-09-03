@@ -37,6 +37,7 @@
 #include "kernel/file.h"
 #include "kernel/string.h"
 #include "kernel/hash.h"
+#include "kernel/operators.h"
 
 #include "internal/arginfo.h"
 
@@ -122,7 +123,6 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_di_method_entry[] = {
 	PHP_ME(Phalcon_DI, __construct, arginfo_phalcon_di___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_DI, setName, arginfo_phalcon_di_setname, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, getName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, setEventsManager, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_DI, getEventsManager, NULL, ZEND_ACC_PROTECTED)
@@ -195,8 +195,9 @@ PHP_METHOD(Phalcon_DI, __construct){
 	if (Z_TYPE_P(default_di) == IS_NULL) {
 		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), getThis());
 	}
-	if (name)
-		phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_services"), name, getThis());
+	if (name) {
+		phalcon_update_property_zval(getThis(), SL("_name"), name);
+		phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_list"), name, getThis());
 	}
 }
 
@@ -640,10 +641,18 @@ PHP_METHOD(Phalcon_DI, setDefault){
  */
 PHP_METHOD(Phalcon_DI, getDefault){
 
-	phalcon_return_static_property_ce(return_value, phalcon_di_ce, SL("_default"));
-	if (Z_TYPE_P(return_value) != IS_OBJECT) {
-		object_init_ex(return_value, phalcon_di_factorydefault_ce);
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+	zval *name = NULL;
+
+	phalcon_fetch_params(0, 0, 1, &name);
+
+	if (name && PHALCON_IS_NOT_EMPTY(name)) {
+		phalcon_read_static_property_array_ce(return_value, phalcon_di_ce, SL("_list"), name);
+	} else {
+		phalcon_return_static_property_ce(return_value, phalcon_di_ce, SL("_default"));
+		if (Z_TYPE_P(return_value) != IS_OBJECT) {
+			object_init_ex(return_value, phalcon_di_factorydefault_ce);
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+		}
 	}
 }
 

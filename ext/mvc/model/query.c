@@ -3674,7 +3674,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		ZVAL_BOOL(&result_data, 0);
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 	/** 
 	 * Choose a resultset type
@@ -4033,7 +4033,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
 	ZVAL_LONG(&type_select, PHQL_T_SELECT);
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 	/** 
 	 * We create another Phalcon\Mvc\Model\Query to get the related records
@@ -4497,7 +4497,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				PHALCON_STR(&cache_service, ISV(modelsCache));
 			}
 
-			phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+			PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
 			PHALCON_CALL_METHODW(&cache, &dependency_injector, "getshared", &cache_service);
 			if (Z_TYPE(cache) != IS_OBJECT) {

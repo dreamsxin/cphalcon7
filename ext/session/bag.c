@@ -167,17 +167,11 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 
 	phalcon_return_property(&session, getThis(), SL("_session"));
 	if (Z_TYPE(session) != IS_OBJECT) {
-		phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-
-			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "A dependency injection object is required to access the 'session' service");
-				return;
-			}
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "A dependency injection object is required to access the 'session' service");
+			return;
 		}
-
-		PHALCON_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_session_exception_ce, 0);
 
 		ZVAL_STR(&service, IS(session));
 

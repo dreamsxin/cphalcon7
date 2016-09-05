@@ -1665,7 +1665,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	phalcon_fetch_params(0, 3, 1, &relation, &method, &record, &p);
 
 	if (p) {
-		PHALCON_CPY_WRT(&parameters, p);
+		PHALCON_CPY_WRT_CTOR(&parameters, p);
 	}
 
 	if (Z_TYPE(parameters) == IS_ARRAY) {

@@ -124,6 +124,7 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 
 	public function _executeTestsNormal($di)
 	{
+		$this->markTestSkipped("Skipped");
 
 		$manager = $di->getShared('modelsManager');
 

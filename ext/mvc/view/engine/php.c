@@ -98,7 +98,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
-			Z_TRY_ADDREF_P(value);
+			/*
+			convert_to_string(&key);
+			if(zend_set_local_var(Z_STR(key), value, 1) == SUCCESS){
+				Z_TRY_ADDREF_P(value);
+			}
+			*/
 			phalcon_set_symbol(symbol_table, &key, value);
 		} ZEND_HASH_FOREACH_END();
 	}

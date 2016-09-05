@@ -353,6 +353,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	 * Replace the placeholders
 	 */
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
+		PHALCON_SEPARATE(&bind_types);
 		array_init(&processed);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {

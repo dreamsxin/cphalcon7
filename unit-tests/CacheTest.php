@@ -28,6 +28,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		date_default_timezone_set('UTC');
 		if (!file_exists('unit-tests/cache/')) {
 			mkdir("unit-tests/cache/", 0766);
+		} else {
+			chmod("unit-tests/cache/", 0766);
 		}
 
 		$iterator = new DirectoryIterator('unit-tests/cache/');

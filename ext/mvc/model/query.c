@@ -3606,7 +3606,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		array_init(&processed);
 		
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, value) {
-			zval tmp = {}, string_wildcard = {}, sql_tmp = {};
+			zval tmp = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -3616,10 +3616,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
 
-				SEPARATE_ZVAL(value);
-				convert_to_string(value);
+				PHALCON_CALL_METHODW(&tmp_value, value, "getvalue");
 
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, value, &sql_select);
+				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &sql_select);
 
 				PHALCON_STR(&sql_select, Z_STRVAL(sql_tmp));
 			} else if (Z_TYPE(tmp) == IS_LONG) {
@@ -4249,7 +4248,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 			array_init(&processed);
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, raw_value) {
-				zval wildcard = {}, string_wildcard = {}, sql_tmp = {};
+				zval wildcard = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
 				if (str_key) {
 					ZVAL_STR(&wildcard, str_key);
 				} else {
@@ -4259,10 +4258,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce)) {
 					PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 
-					SEPARATE_ZVAL(raw_value);
-					convert_to_string(raw_value);
+					PHALCON_CALL_METHODW(&tmp_value, raw_value, "getvalue");
 
-					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, raw_value, &update_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &update_sql);
 
 					PHALCON_STR(&update_sql, Z_STRVAL(sql_tmp));
 
@@ -4381,8 +4379,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 		 */
 		PHALCON_CALL_METHODW(NULL, &connection, "commit");	
 	} else {
-		PHALCON_SEPARATE_PARAM(bind_types);
-
 		PHALCON_CALL_METHODW(&dialect, &connection, "getdialect");
 		PHALCON_CALL_METHODW(&delete_sql, &dialect, "delete", intermediate);
 
@@ -4390,7 +4386,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 			array_init(&processed);
 	
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, raw_value) {
-				zval tmp = {}, string_wildcard = {}, sql_tmp = {};
+				zval tmp = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
@@ -4400,10 +4396,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce)) {
 					PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
 
-					SEPARATE_ZVAL(raw_value);
-					convert_to_string(raw_value);
+					PHALCON_CALL_METHODW(&tmp_value, raw_value, "getvalue");
 
-					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, raw_value, &delete_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &delete_sql);
 
 					PHALCON_STR(&delete_sql, Z_STRVAL(sql_tmp));
 

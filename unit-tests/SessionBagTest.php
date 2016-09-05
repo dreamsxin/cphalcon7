@@ -29,7 +29,6 @@ class SessionBagTest extends PHPUnit_Framework_TestCase
 	public function testGetSet()
 	{
 		\Phalcon\DI::reset();
-		new \Phalcon\DI\FactoryDefault();
 		@session_start();
 
 		// Using getters and setters.

@@ -40,7 +40,13 @@ class CacheResultsetTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
-	protected function _getCache($adapter='File'){
+	protected function _getCache($adapter='File')
+	{
+		if (!file_exists('unit-tests/cache/')) {
+			mkdir("unit-tests/cache/", 0766);
+		} else {
+			chmod("unit-tests/cache/", 0766);
+		}
 
 		@unlink('unit-tests/cache/test-resultset');
 

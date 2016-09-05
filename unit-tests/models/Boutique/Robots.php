@@ -8,7 +8,7 @@ class Robots extends \Phalcon\Mvc\Model
 	/**
 	 * @Primary
 	 * @Identity
-	 * @Column(type="integer", size=10, bytes=32, scale=0, nullable=false)
+	 * @Column(type="integer", size=32, bytes=32, scale=0, nullable=false)
 	 */
 	public $id;
 
@@ -23,7 +23,7 @@ class Robots extends \Phalcon\Mvc\Model
 	public $type;
 
 	/**
-	 * @Column(type="integer", size=11, bytes=32, scale=0, nullable=false)
+	 * @Column(type="integer", size=32, bytes=32, scale=0, nullable=false)
 	 */
 	public $year;
 

@@ -781,6 +781,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, lastInsertId){
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 
 	zval *nesting = NULL, pdo = {}, transaction_level = {}, events_manager = {}, event_name = {}, ntw_savepoint = {}, savepoint_name = {};
+	zval debug_message = {};
 
 	phalcon_fetch_params(0, 0, 1, &nesting);
 
@@ -803,6 +804,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 	 */
 	phalcon_read_property(&transaction_level, getThis(), SL("_transactionLevel"), PH_NOISY);
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			PHALCON_CONCAT_SV(&debug_message, "DB BEGIN TRANSACTION LEVEL: ", &transaction_level);
+			phalcon_debug_print_r(&debug_message);
+	}
+
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {
 		/** 
 		 * Notify the events manager about the started transaction
@@ -848,6 +855,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 
 	zval *nesting = NULL, pdo = {}, transaction_level = {}, events_manager = {}, event_name = {}, ntw_savepoint = {}, savepoint_name = {};
+	zval debug_message = {};
 
 	phalcon_fetch_params(0, 0, 1, &nesting);
 
@@ -867,6 +875,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 	if (!zend_is_true(&transaction_level)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "There is no active transaction");
 		return;
+	}
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			PHALCON_CONCAT_SV(&debug_message, "DB ROLLBACK TRANSACTION LEVEL: ", &transaction_level);
+			phalcon_debug_print_r(&debug_message);
 	}
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
@@ -931,6 +944,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 
 	zval *nesting = NULL, pdo = {}, transaction_level = {}, events_manager = {}, event_name = {}, ntw_savepoint = {}, savepoint_name = {};
+	zval debug_message = {};
 
 	phalcon_fetch_params(0, 0, 1, &nesting);
 
@@ -950,6 +964,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 	if (!zend_is_true(&transaction_level)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "There is no active transaction");
 		return;
+	}
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			PHALCON_CONCAT_SV(&debug_message, "DB COMMIT TRANSACTION LEVEL: ", &transaction_level);
+			phalcon_debug_print_r(&debug_message);
 	}
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);

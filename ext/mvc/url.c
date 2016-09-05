@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 		 * Check if the router has not previously set
 		 */
 		if (Z_TYPE(router) != IS_OBJECT) {
-			phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+			PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 			if (!zend_is_true(&dependency_injector)) {
 				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_url_exception_ce, "A dependency injector container is required to obtain the \"url\" service");
 				return;

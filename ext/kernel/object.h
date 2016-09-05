@@ -34,6 +34,7 @@ void phalcon_get_ns_class(zval *result, const zval *object, int lower);
 void phalcon_get_called_class(zval *return_value);
 void phalcon_get_parent_class(zval *result, const zval *object, int lower);
 void phalcon_get_object_vars(zval *result, zval *object, int check_access);
+void phalcon_get_object_members(zval *result, zval *object, int check_access);
 void phalcon_get_class_methods(zval *result, zval *object, int check_access);
 zend_class_entry* phalcon_fetch_str_class(const char *class_name, uint32_t class_len, int fetch_type);
 zend_class_entry* phalcon_fetch_class(const zval *class_name, int fetch_type);
@@ -160,6 +161,8 @@ static inline int phalcon_return_property_array(zval *return_value, zval *object
 
 /** Static properties */
 zval* phalcon_read_static_property(const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length);
+int phalcon_read_static_property_array_ce(zval *return_value, zend_class_entry *ce, const char *property_name, uint32_t property_length, const zval *index);
+int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index, zval *value);
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);
 zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len);
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);

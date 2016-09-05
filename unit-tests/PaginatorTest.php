@@ -62,7 +62,7 @@ class PaginatorTest extends PHPUnit_Framework_TestCase
 
 		$di->set('db', function() {
 			require 'unit-tests/config.db.php';
-			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
+			return new Phalcon\Db\Adapter\Pdo\Postgresql($configPostgresql);
 		}, true);
 
 		/*$di->set('db', function() {
@@ -229,7 +229,7 @@ class PaginatorTest extends PHPUnit_Framework_TestCase
 	public function testModelPaginator()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
@@ -291,7 +291,7 @@ class PaginatorTest extends PHPUnit_Framework_TestCase
 	public function testModelPaginatorBind()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
@@ -328,7 +328,7 @@ class PaginatorTest extends PHPUnit_Framework_TestCase
 	public function testQueryBuilderPaginator()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
@@ -466,7 +466,7 @@ class PaginatorTest extends PHPUnit_Framework_TestCase
 	public function testIssue2301()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
@@ -500,7 +500,7 @@ class PaginatorTest extends PHPUnit_Framework_TestCase
 	public function testIssue2739()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}

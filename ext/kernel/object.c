@@ -48,6 +48,37 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 	return SUCCESS;
 }
 
+int phalcon_read_static_property_array_ce(zval *return_value, zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index)
+{
+	zval arr = {};
+
+	phalcon_return_static_property_ce(&arr, ce, property, property_length);
+
+	if (Z_TYPE(arr) != IS_ARRAY || !phalcon_array_isset_fetch(return_value, &arr, index, PH_NOISY)) {
+		ZVAL_NULL(return_value);
+		return 0;
+	}
+
+	return 1;
+}
+
+int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index, zval *value)
+{
+	zval arr = {};
+
+	phalcon_return_static_property_ce(&arr, ce, property, property_length);
+
+	/** Convert the value to array if not is an array */
+	if (Z_TYPE(arr) != IS_ARRAY) {
+		array_init(&arr);
+	}
+
+	phalcon_array_update_zval(&arr, index,  value, PH_COPY);
+	phalcon_update_static_property_ce(ce, property, property_length, &arr);
+
+	return SUCCESS;
+}
+
 /*
  * Multiple array-offset update
  */
@@ -354,6 +385,52 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 		} ZEND_HASH_FOREACH_END();
 	} else {
 		php_error_docref(NULL, E_WARNING, "phalcon_get_object_vars expects an object");
+	}
+}
+
+/**
+ * Returns an array of object propertie names
+ */
+void phalcon_get_object_members(zval *result, zval *object, int check_access) {
+
+	HashTable *properties;
+	zend_string *key;
+
+	zend_object *zobj;
+
+	if (Z_TYPE_P(object) == IS_OBJECT) {
+		if (Z_OBJ_HT_P(object)->get_properties == NULL) {
+			ZVAL_NULL(result);
+			return;
+		}
+
+		properties = Z_OBJ_HT_P(object)->get_properties(object);
+
+		if (properties == NULL) {
+			ZVAL_NULL(result);
+			return;
+		}
+
+		zobj = Z_OBJ_P(object);
+
+		array_init(result);
+
+		ZEND_HASH_FOREACH_STR_KEY(properties, key) {
+			if (key) {
+				if (!check_access || zend_check_property_access(zobj, key) == SUCCESS) {
+					if (ZSTR_VAL(key)[0] == 0) {
+						const char *prop_name, *class_name;
+						size_t prop_len;
+						zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
+						phalcon_array_append_string(result, prop_name, prop_len, 0);
+					} else {
+						phalcon_array_append_string(result, ZSTR_VAL(key), ZSTR_LEN(key), 0);
+					}
+				}
+			}
+		} ZEND_HASH_FOREACH_END();
+	} else {
+		php_error_docref(NULL, E_WARNING, "phalcon_get_object_members expects an object");
 	}
 }
 

@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		return;
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 	phalcon_get_class(&class_name, model, 0);
 

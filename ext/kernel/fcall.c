@@ -93,7 +93,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				ZVAL_NULL(&obj);
 			}
 		} else {
-			ZVAL_ZVAL(&obj, object, 1, 0);
+			ZVAL_COPY(&obj, object);
 		}
 
 		if (Z_TYPE(obj) != IS_NULL && Z_TYPE(obj) != IS_OBJECT) {
@@ -111,11 +111,9 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				add_next_index_string(&func_name, ISV(parent));
 				break;
 			case phalcon_fcall_self:
-				assert(!ce);
 				add_next_index_string(&func_name, ISV(self));
 				break;
 			case phalcon_fcall_static:
-				assert(!ce);
 				add_next_index_string(&func_name, ISV(static));
 				break;
 

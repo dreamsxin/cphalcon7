@@ -30,7 +30,7 @@
 #endif
 
 #define PHP_PHALCON_VERSION "Dao7-1.0.1"
-#define PHP_PHALCON_EXTNAME "phalcon"
+#define PHP_PHALCON_EXTNAME "phalcon7"
 
 #define PHALCON_NUM_PREALLOCATED_FRAMES 25
 

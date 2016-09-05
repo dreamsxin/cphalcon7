@@ -447,7 +447,6 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Model, mvc_model, phalcon_di_injectable_ce, phalcon_mvc_model_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
-	zend_declare_property_null(phalcon_mvc_model_ce, SL("_dependencyInjector"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_modelsManager"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_modelsMetaData"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED);
@@ -529,29 +528,20 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
  */
 PHP_METHOD(Phalcon_Mvc_Model, __construct){
 
-	zval *di = NULL, *_models_manager = NULL, models_manager = {};
+	zval *dependency_injector = NULL, *_models_manager = NULL, models_manager = {};
 
-	phalcon_fetch_params(0, 0, 2, &di, &_models_manager);
+	phalcon_fetch_params(0, 0, 2, &dependency_injector, &_models_manager);
 
-	if (di) {
-		if (Z_TYPE_P(di) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
-			return;
-		}
-		PHALCON_VERIFY_INTERFACEW(di, phalcon_diinterface_ce);
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), di);
+	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
 	}
 
-	if (_models_manager) {
+	if (_models_manager && Z_TYPE_P(_models_manager) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACEW(_models_manager, phalcon_mvc_model_managerinterface_ce);
 		phalcon_update_property_zval(getThis(), SL("_modelsManager"), _models_manager);
-	}
-
-	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
-
-	if (Z_TYPE(models_manager) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not object (1)");
-		return;
+		PHALCON_CPY_WRT(&models_manager, _models_manager);
+	} else {
+		PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	}
 
 	/**
@@ -579,7 +569,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setEventsManager){
 
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHODW(NULL, &models_manager, "setcustomeventsmanager", getThis(), events_manager);
 }
 
@@ -592,7 +582,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getEventsManager){
 
 	zval models_manager = {};
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getcustomeventsmanager", getThis());
 }
 
@@ -634,14 +624,20 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsMetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getModelsManager){
 
-	zval service_name = {};
+	zval dependency_injector = {}, service_name = {};
 
 	phalcon_return_property(return_value, getThis(), SL("_modelsManager"));
 
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+
 		PHALCON_STR(&service_name, "modelsManager");
-		PHALCON_CALL_METHODW(return_value, getThis(), "getresolveservice", &service_name);
-		phalcon_update_property_zval(getThis(), SL("_modelsManager"), return_value);
+		PHALCON_CALL_METHODW(return_value, &dependency_injector, "getshared", &service_name);
+	}
+
+	if (Z_TYPE_P(return_value) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not object (1)");
+		return;
 	}
 }
 
@@ -849,7 +845,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setConnectionService){
 
 	phalcon_fetch_params(0, 1, 0, &connection_service);
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHODW(NULL, &models_manager, "setconnectionservice", getThis(), connection_service);
 
 	RETURN_THISW();
@@ -867,7 +863,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setReadConnectionService){
 
 	phalcon_fetch_params(0, 1, 0, &connection_service);
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHODW(NULL, &models_manager, "setreadconnectionservice", getThis(), connection_service);
 
 	RETURN_THISW();
@@ -885,7 +881,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setWriteConnectionService){
 
 	phalcon_fetch_params(0, 1, 0, &connection_service);
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHODW(NULL, &models_manager, "setwriteconnectionservice", getThis(), connection_service);
 
 	RETURN_THISW();
@@ -900,7 +896,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnectionService){
 
 	zval models_manager = {};
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getreadconnectionservice", getThis());
 }
 
@@ -913,7 +909,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnectionService){
 
 	zval models_manager = {};
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getwriteconnectionservice", getThis());
 }
 
@@ -991,7 +987,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 		RETURN_CTORW(&connection);
 	}
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getreadconnection", getThis());
 }
 
@@ -1042,7 +1038,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 		RETURN_CTORW(&connection);
 	}
 
-	phalcon_return_property(&models_manager, getThis(), SL("_modelsManager"));
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_RETURN_CALL_METHODW(&models_manager, "getwriteconnection", getThis());
 }
 
@@ -2214,7 +2210,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 		}
 
 
-		phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+		PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 		/**
 		 * Send a notification to the events manager
@@ -2260,7 +2256,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 			}
 		}
 
-		phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+		PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 		/**
 		 * Send a notification to the events manager
@@ -2608,17 +2604,17 @@ PHP_METHOD(Phalcon_Mvc_Model, getMessages){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 
-	zval manager = {}, belongs_to = {}, error = {}, *relation, event_name;	
+	zval models_manager = {}, belongs_to = {}, error = {}, *relation, event_name;	
 
 	/**
 	 * Get the models manager
 	 */
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 	/**
 	 * We check if some of the belongsTo relations act as virtual foreign key
 	 */
-	PHALCON_CALL_METHODW(&belongs_to, &manager, "getbelongsto", getThis());
+	PHALCON_CALL_METHODW(&belongs_to, &models_manager, "getbelongsto", getThis());
 	if (phalcon_fast_count_ev(&belongs_to)) {
 		ZVAL_FALSE(&error);
 
@@ -2633,9 +2629,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 				/**
 				 * Try to find a different action in the foreign key's options
 				 */
-				if (Z_TYPE(foreign_key) == IS_ARRAY && phalcon_array_isset_str(&foreign_key, SL("action"))) {
-					phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY);
-				} else {
+				if (Z_TYPE(foreign_key) != IS_ARRAY || !phalcon_array_isset_fetch_str(&action, &foreign_key, SL("action"))) {
 					/**
 					 * By default action is restrict
 					 */
@@ -2651,7 +2645,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 					/**
 					 * Load the referenced model if needed
 					 */
-					PHALCON_CALL_METHODW(&referenced_model, &manager, "load", &relation_class);
+					PHALCON_CALL_METHODW(&referenced_model, &models_manager, "load", &relation_class);
 
 					/**
 					 * Since relations can have multiple columns or a single one, we need to build a
@@ -2765,17 +2759,17 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 
-	zval manager = {}, relations = {}, error = {}, *relation, event_name;
+	zval models_manager = {}, relations = {}, error = {}, *relation, event_name;
 
 	/**
 	 * Get the models manager
 	 */
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 	/**
 	 * We check if some of the hasOne/hasMany relations is a foreign key
 	 */
-	PHALCON_CALL_METHODW(&relations, &manager, "gethasoneandhasmany", getThis());
+	PHALCON_CALL_METHODW(&relations, &models_manager, "gethasoneandhasmany", getThis());
 	if (phalcon_fast_count_ev(&relations)) {
 		ZVAL_FALSE(&error);
 
@@ -2798,7 +2792,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 				/**
 				 * Try to find a different action in the foreign key's options
 				 */
-				if (Z_TYPE(foreign_key) == IS_ARRAY || phalcon_array_isset_str(&foreign_key, SL("action"))) {
+				if (Z_TYPE(foreign_key) == IS_ARRAY && phalcon_array_isset_str(&foreign_key, SL("action"))) {
 					phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY);
 				}
 
@@ -2811,7 +2805,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 					/**
 					 * Load a plain instance from the models manager
 					 */
-					PHALCON_CALL_METHODW(&referenced_model, &manager, "load", &relation_class);
+					PHALCON_CALL_METHODW(&referenced_model, &models_manager, "load", &relation_class);
 					PHALCON_CALL_METHODW(&fields, relation, "getfields");
 					PHALCON_CALL_METHODW(&referenced_fields, relation, "getreferencedfields");
 
@@ -2914,17 +2908,17 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 
-	zval manager = {}, relations = {}, *relation;
+	zval models_manager = {}, relations = {}, *relation;
 
 	/**
 	 * Get the models manager
 	 */
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 	/**
 	 * We check if some of the hasOne/hasMany relations is a foreign key
 	 */
-	PHALCON_CALL_METHODW(&relations, &manager, "gethasoneandhasmany", getThis());
+	PHALCON_CALL_METHODW(&relations, &models_manager, "gethasoneandhasmany", getThis());
 	if (phalcon_fast_count_ev(&relations)) {
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(relations), relation) {
@@ -2961,7 +2955,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 					/**
 					 * Load a plain instance from the models manager
 					 */
-					PHALCON_CALL_METHODW(&referenced_model, &manager, "load", &relation_class);
+					PHALCON_CALL_METHODW(&referenced_model, &models_manager, "load", &relation_class);
 					PHALCON_CALL_METHODW(&fields, relation, "getfields");
 					PHALCON_CALL_METHODW(&referenced_fields, relation, "getreferencedfields");
 
@@ -3604,7 +3598,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 
-	zval *meta_data, *connection, *table, bind_skip = {}, fields = {}, values = {}, bind_types = {}, manager = {}, use_dynamic_update = {};
+	zval *meta_data, *connection, *table, bind_skip = {}, fields = {}, values = {}, bind_types = {}, models_manager = {}, use_dynamic_update = {};
 	zval snapshot = {}, bind_data_types = {}, non_primary = {}, automatic_attributes = {}, data_types = {}, column_map = {}, columns = {}, *field, exception_message = {};
 	zval attribute_field = {}, value = {}, unique_key = {}, unique_params = {}, unique_types = {}, primary_keys = {}, conditions = {}, ret = {}, type = {}, message = {};
 	int i_use_dynamic_update; /* To keep static code analyzer happy */
@@ -3616,12 +3610,12 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	array_init(&values);
 	array_init(&bind_types);
 
-	phalcon_return_property(&manager, getThis(), SL("_modelsManager"));
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 	/**
 	 * Check if the model must use dynamic update
 	 */
-	PHALCON_CALL_METHODW(&use_dynamic_update, &manager, "isusingdynamicupdate", getThis());
+	PHALCON_CALL_METHODW(&use_dynamic_update, &models_manager, "isusingdynamicupdate", getThis());
 	i_use_dynamic_update = zend_is_true(&use_dynamic_update);
 	if (i_use_dynamic_update) {
 		phalcon_return_property(&snapshot, getThis(), SL("_snapshot"));
@@ -5040,7 +5034,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getSkipAttributesOnUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model, hasOne){
 
-	zval *fields, *reference_model, *referenced_fields, *options = NULL, manager = {};
+	zval *fields, *reference_model, *referenced_fields, *options = NULL, models_manager = {};
 
 	phalcon_fetch_params(0, 3, 1, &fields, &reference_model, &referenced_fields, &options);
 
@@ -5048,8 +5042,8 @@ PHP_METHOD(Phalcon_Mvc_Model, hasOne){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&manager, "addhasone", getThis(), fields, reference_model, referenced_fields, options);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "addhasone", getThis(), fields, reference_model, referenced_fields, options);
 }
 
 /**
@@ -5076,7 +5070,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasOne){
  */
 PHP_METHOD(Phalcon_Mvc_Model, belongsTo){
 
-	zval *fields, *reference_model, *referenced_fields, *options = NULL, manager = {};
+	zval *fields, *reference_model, *referenced_fields, *options = NULL, models_manager = {};
 
 	phalcon_fetch_params(0, 3, 1, &fields, &reference_model, &referenced_fields, &options);
 
@@ -5084,8 +5078,8 @@ PHP_METHOD(Phalcon_Mvc_Model, belongsTo){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&manager, "addbelongsto", getThis(), fields, reference_model, referenced_fields, options);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "addbelongsto", getThis(), fields, reference_model, referenced_fields, options);
 }
 
 /**
@@ -5112,7 +5106,7 @@ PHP_METHOD(Phalcon_Mvc_Model, belongsTo){
  */
 PHP_METHOD(Phalcon_Mvc_Model, hasMany){
 
-	zval *fields, *reference_model, *referenced_fields, *options = NULL, manager = {};
+	zval *fields, *reference_model, *referenced_fields, *options = NULL, models_manager = {};
 
 	phalcon_fetch_params(0, 3, 1, &fields, &reference_model, &referenced_fields, &options);
 
@@ -5120,8 +5114,8 @@ PHP_METHOD(Phalcon_Mvc_Model, hasMany){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&manager, "addhasmany", getThis(), fields, reference_model, referenced_fields, options);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "addhasmany", getThis(), fields, reference_model, referenced_fields, options);
 }
 
 /**
@@ -5160,13 +5154,13 @@ PHP_METHOD(Phalcon_Mvc_Model, hasMany){
 PHP_METHOD(Phalcon_Mvc_Model, hasManyToMany){
 
 	zval *fields, *intermediate_model, *intermediate_fields, *intermediate_referenced_fields, *reference_model;
-	zval *referenced_fields, *options = NULL, manager = {};
+	zval *referenced_fields, *options = NULL, models_manager = {};
 
 	phalcon_fetch_params(0, 6, 1, &fields, &intermediate_model, &intermediate_fields, &intermediate_referenced_fields, &reference_model, &referenced_fields, &options);
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
-	PHALCON_RETURN_CALL_METHODW(&manager, "addhasmanytomany", getThis(), fields, intermediate_model, intermediate_fields, intermediate_referenced_fields, reference_model, referenced_fields, options ? options : &PHALCON_GLOBAL(z_null));
+	PHALCON_RETURN_CALL_METHODW(&models_manager, "addhasmanytomany", getThis(), fields, intermediate_model, intermediate_fields, intermediate_referenced_fields, reference_model, referenced_fields, options ? options : &PHALCON_GLOBAL(z_null));
 }
 
 /**
@@ -5196,12 +5190,12 @@ PHP_METHOD(Phalcon_Mvc_Model, hasManyToMany){
  */
 PHP_METHOD(Phalcon_Mvc_Model, addBehavior){
 
-	zval *behavior, manager = {};
+	zval *behavior, models_manager = {};
 
 	phalcon_fetch_params(0, 1, 0, &behavior);
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, &manager, "addbehavior", getThis(), behavior);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_CALL_METHODW(NULL, &models_manager, "addbehavior", getThis(), behavior);
 }
 
 /**
@@ -5224,12 +5218,12 @@ PHP_METHOD(Phalcon_Mvc_Model, addBehavior){
  */
 PHP_METHOD(Phalcon_Mvc_Model, keepSnapshots){
 
-	zval *keep_snapshot, manager = {};
+	zval *keep_snapshot, models_manager = {};
 
 	phalcon_fetch_params(0, 1, 0, &keep_snapshot);
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, &manager, "keepsnapshots", getThis(), keep_snapshot);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_CALL_METHODW(NULL, &models_manager, "keepsnapshots", getThis(), keep_snapshot);
 }
 
 /**
@@ -5580,12 +5574,12 @@ PHP_METHOD(Phalcon_Mvc_Model, getChangedFields){
  */
 PHP_METHOD(Phalcon_Mvc_Model, useDynamicUpdate){
 
-	zval *dynamic_update, manager = {};
+	zval *dynamic_update, models_manager = {};
 
 	phalcon_fetch_params(0, 1, 0, &dynamic_update);
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, &manager, "usedynamicupdate", getThis(), dynamic_update);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_CALL_METHODW(NULL, &models_manager, "usedynamicupdate", getThis(), dynamic_update);
 }
 
 /**
@@ -5597,7 +5591,7 @@ PHP_METHOD(Phalcon_Mvc_Model, useDynamicUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getRelated){
 
-	zval *alias, *arguments = NULL, manager = {}, class_name = {}, relation = {}, exception_message = {}, call_object = {}, model_args = {};
+	zval *alias, *arguments = NULL, models_manager = {}, class_name = {}, relation = {}, exception_message = {}, call_object = {}, model_args = {};
 
 	phalcon_fetch_params(0, 1, 1, &alias, &arguments);
 
@@ -5605,14 +5599,14 @@ PHP_METHOD(Phalcon_Mvc_Model, getRelated){
 		arguments = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 	phalcon_get_class(&class_name, getThis(), 0);
 
 	/**
 	 * Query the relation by alias
 	 */
-	PHALCON_CALL_METHODW(&relation, &manager, "getrelationbyalias", &class_name, alias);
+	PHALCON_CALL_METHODW(&relation, &models_manager, "getrelationbyalias", &class_name, alias);
 	if (Z_TYPE(relation) != IS_OBJECT) {
 		PHALCON_CONCAT_SVSVS(&exception_message, "There is no defined relations for the model \"", &class_name, "\" using alias \"", alias, "\"");
 		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
@@ -5623,7 +5617,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getRelated){
 	 * Call the 'getRelationRecords' in the models manager
 	 */
 	array_init_size(&call_object, 2);
-	phalcon_array_append(&call_object, &manager, PH_COPY);
+	phalcon_array_append(&call_object, &models_manager, PH_COPY);
 	add_next_index_stringl(&call_object, SL("getRelationRecords"));
 
 	array_init_size(&model_args, 4);
@@ -5645,11 +5639,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getRelated){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _getRelatedRecords){
 
-	zval *model_name, *method, *arguments, manager = {}, alias = {}, relation = {}, query_method = {}, extra_args = {}, call_args = {}, call_object = {};
+	zval *model_name, *method, *arguments, models_manager = {}, alias = {}, relation = {}, query_method = {}, extra_args = {}, call_args = {}, call_object = {};
 
 	phalcon_fetch_params(0, 3, 0, &model_name, &method, &arguments);
 
-	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 	ZVAL_NULL(&query_method);
 	/**
@@ -5657,7 +5651,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _getRelatedRecords){
 	 */
 	if (phalcon_start_with_str(method, SL("get"))) {
 		phalcon_substr(&alias, method, 3, 0);
-		PHALCON_CALL_METHODW(&relation, &manager, "getrelationbyalias", model_name, &alias);
+		PHALCON_CALL_METHODW(&relation, &models_manager, "getrelationbyalias", model_name, &alias);
 	}
 
 	/**
@@ -5667,7 +5661,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _getRelatedRecords){
 		if (phalcon_start_with_str(method, SL("count"))) {
 			PHALCON_STR(&query_method, "count");
 			phalcon_substr(&alias, method, 5, 0);
-			PHALCON_CALL_METHODW(&relation, &manager, "getrelationbyalias", model_name, &alias);
+			PHALCON_CALL_METHODW(&relation, &models_manager, "getrelationbyalias", model_name, &alias);
 		}
 	}
 
@@ -5686,7 +5680,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _getRelatedRecords){
 		phalcon_array_append(&call_args, &extra_args, PH_COPY);
 
 		array_init_size(&call_object, 2);
-		phalcon_array_append(&call_object, &manager, PH_COPY);
+		phalcon_array_append(&call_object, &models_manager, PH_COPY);
 		add_next_index_stringl(&call_object, SL("getRelationRecords"));
 		PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &call_object, &call_args);
 		return;
@@ -5722,7 +5716,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __call){
 		RETURN_CTORW(&records);
 	}
 
-	phalcon_read_property(&models_manager, getThis(), SL("_modelsManager"), PH_NOISY);
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 	/**
 	 * Try to find a replacement for the missing method in a behavior/listener
@@ -6212,7 +6206,7 @@ PHP_METHOD(Phalcon_Mvc_Model, serialize){
  */
 PHP_METHOD(Phalcon_Mvc_Model, unserialize){
 
-	zval *data, attributes = {}, dependency_injector = {}, service = {}, manager = {}, *value;
+	zval *data, attributes = {}, models_manager = {}, *value;
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 1, 0, &data);
@@ -6220,38 +6214,12 @@ PHP_METHOD(Phalcon_Mvc_Model, unserialize){
 	if (Z_TYPE_P(data) == IS_STRING) {
 		phalcon_unserialize(&attributes, data);
 		if (Z_TYPE(attributes) == IS_ARRAY) {
-			/**
-			 * Obtain the default DI
-			 */
-			PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
-
-			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
-				return;
-			}
-
-			/**
-			 * Gets the default modelsManager service
-			 */
-			PHALCON_STR(&service, "modelsManager");
-
-			PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service);
-			if (Z_TYPE(manager) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsManager' is not object (2)");
-				return;
-			}
-
-			PHALCON_VERIFY_INTERFACEW(&manager, phalcon_mvc_model_managerinterface_ce);
-
-			/**
-			 * Update the models manager
-			 */
-			phalcon_update_property_zval(getThis(), SL("_modelsManager"), &manager);
+			PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
 
 			/**
 			 * Try to initialize the model
 			 */
-			PHALCON_CALL_METHODW(NULL, &manager, "initialize", getThis());
+			PHALCON_CALL_METHODW(NULL, &models_manager, "initialize", getThis());
 
 			/**
 			 * Update the objects attributes
@@ -6659,8 +6627,7 @@ PHP_METHOD(Phalcon_Mvc_Model, filter){
 			phalcon_return_property(&filter, getThis(), SL("_filter"));
 
 			if (Z_TYPE(filter) != IS_OBJECT) {
-				phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-
+				PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 				if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 					PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access the 'filter' service");
 					return;

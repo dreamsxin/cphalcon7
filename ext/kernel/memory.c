@@ -156,23 +156,6 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 	assert(active_memory != NULL);
 
 	if (EXPECTED(!CG(unclean_shutdown))) {
-#ifndef PHALCON_RELEASE
-		for (i = 0; i < active_memory->pointer; ++i) {
-			ptr = active_memory->addresses[i];
-			if (ptr != NULL && *ptr != NULL) {
-				if (Z_TYPE_P(*ptr) > IS_CALLABLE) {
-					fprintf(stderr, "%s: observed variable #%d (%p) has invalid type %u [%s]\n", __func__, (int)i, *ptr, Z_TYPE_P(*ptr), active_memory->func);
-				}
-				if (Z_REFCOUNTED_P(*ptr)) {
-					if (Z_REFCOUNT_P(*ptr) == 0) {
-						fprintf(stderr, "%s: observed variable #%d (%p) has 0 references, type=%d [%s]\n", __func__, (int)i, *ptr, Z_TYPE_P(*ptr), active_memory->func);
-					} else if (Z_REFCOUNT_P(*ptr) >= 1000000) {
-						fprintf(stderr, "%s: observed variable #%d (%p) has too many references (%u), type=%d  [%s]\n", __func__, (int)i, *ptr, Z_REFCOUNT_P(*ptr), Z_TYPE_P(*ptr), active_memory->func);
-					}
-				}
-			}
-		}
-#endif
 
 		/* Traverse all zvals allocated, reduce the reference counting or free them */
 		for (i = 0; i < active_memory->pointer; ++i) {
@@ -199,16 +182,9 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 		}
 	}
 
-#ifndef PHALCON_RELEASE
-	active_memory->func = NULL;
-#endif
-
 	prev = active_memory->prev;
 
 	if (active_memory >= g->end_memory || active_memory < g->start_memory) {
-#ifndef PHALCON_RELEASE
-		assert(g->active_memory->permanent == 0);
-#endif
 		assert(prev != NULL);
 
 		if (active_memory->addresses != NULL) {
@@ -219,89 +195,10 @@ static void phalcon_memory_restore_stack_common(zend_phalcon_globals *g)
 		g->active_memory = prev;
 		prev->next = NULL;
 	} else {
-#ifndef PHALCON_RELEASE
-		assert(g->active_memory->permanent == 1);
-#endif
-
 		active_memory->pointer      = 0;
 		g->active_memory = prev;
 	}
-
-#ifndef PHALCON_RELEASE
-	if (g->active_memory) {
-		phalcon_memory_entry *f = g->active_memory;
-		if (f >= g->start_memory && f < g->end_memory - 1) {
-			assert(f->permanent == 1);
-			assert(f->next != NULL);
-
-			if (f > g->start_memory) {
-				assert(f->prev != NULL);
-			}
-		}
-	}
-#endif
 }
-
-#ifndef PHALCON_RELEASE
-
-void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory)
-{
-	size_t i;
-
-	assert(active_memory != NULL);
-
-	fprintf(stderr, "Dump of the memory frame %p (%s)\n", active_memory, active_memory->func);
-
-	for (i = 0; i < active_memory->pointer; ++i) {
-		if (EXPECTED(active_memory->addresses[i] != NULL && *(active_memory->addresses[i]) != NULL)) {
-			zval **var = active_memory->addresses[i];
-			fprintf(stderr, "Obs var %lu (%p => %p), type=%u, refcnt=%u; ", (ulong)i, var, *var, Z_TYPE_P(*var), Z_REFCOUNT_P(*var));
-			switch (Z_TYPE_P(*var)) {
-				case IS_NULL:     fprintf(stderr, "value=NULL\n"); break;
-				case IS_LONG:     fprintf(stderr, "value=%ld\n", Z_LVAL_P(*var)); break;
-				case IS_DOUBLE:   fprintf(stderr, "value=%E\n", Z_DVAL_P(*var)); break;
-				case IS_TRUE:     fprintf(stderr, "value=(bool)1\n"); break;
-				case IS_FALSE:    fprintf(stderr, "value=(bool)0\n"); break;
-				case IS_ARRAY:    fprintf(stderr, "value=array(%p), %d elements\n", Z_ARRVAL_P(*var), zend_hash_num_elements(Z_ARRVAL_P(*var))); break;
-				case IS_OBJECT:   fprintf(stderr, "value=object(%u), %s\n", Z_OBJ_HANDLE_P(*var), Z_OBJCE_P(*var)->name->val); break;
-				case IS_STRING:   fprintf(stderr, "value=%s (%p)\n", Z_STRVAL_P(*var), Z_STRVAL_P(*var)); break;
-				case IS_RESOURCE: fprintf(stderr, "value=(resource)%ld\n", Z_LVAL_P(*var)); break;
-				default:          fprintf(stderr, "\n"); break;
-			}
-		}
-	}
-
-	fprintf(stderr, "End of the dump of the memory frame %p\n", active_memory);
-}
-
-void phalcon_dump_current_frame()
-{
-	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
-
-	if (UNEXPECTED(phalcon_globals_ptr->active_memory == NULL)) {
-		fprintf(stderr, "WARNING: calling %s() without an active memory frame!\n", __func__);
-		phalcon_print_backtrace();
-		return;
-	}
-
-	phalcon_dump_memory_frame(phalcon_globals_ptr->active_memory);
-}
-
-void phalcon_dump_all_frames()
-{
-	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
-	phalcon_memory_entry *active_memory       = phalcon_globals_ptr->active_memory;
-
-	fprintf(stderr, "*** DUMP START ***\n");
-	while (active_memory != NULL) {
-		phalcon_dump_memory_frame(active_memory);
-		active_memory = active_memory->prev;
-	}
-
-	fprintf(stderr, "*** DUMP END ***\n");
-}
-#endif
-
 
 /**
  * Finishes the current memory stack by releasing allocated memory
@@ -466,6 +363,66 @@ int ZEND_FASTCALL phalcon_clean_restore_stack() {
 	while (phalcon_globals_ptr->active_memory != NULL) {
 		phalcon_memory_restore_stack_common(phalcon_globals_ptr);
 	}
+
+	return SUCCESS;
+}
+
+/**
+ * Exports symbols to the active symbol table
+ */
+int phalcon_set_symbol(zend_array *symbol_table, zval *key_name, zval *value)
+{
+	if (!symbol_table) {
+		php_error_docref(NULL, E_WARNING, "Cannot find a valid symbol_table");
+		return FAILURE;
+	}
+
+	if (Z_TYPE_P(key_name) == IS_STRING) {
+		Z_TRY_ADDREF_P(value);
+		zend_hash_update(symbol_table, Z_STR_P(key_name), value);
+	}
+
+	return SUCCESS;
+}
+
+/**
+ * Exports a string symbol to the active symbol table
+ */
+int phalcon_set_symbol_str(zend_array *symbol_table, char *key_name, unsigned int key_length, zval *value)
+{
+	if (!symbol_table) {
+		php_error_docref(NULL, E_WARNING, "Cannot find a valid symbol_table");
+		return FAILURE;
+	}
+
+	Z_TRY_ADDREF_P(value);
+	zend_hash_str_update(symbol_table, key_name, key_length, value);
+
+	return SUCCESS;
+}
+
+int phalcon_del_symbol(zend_array *symbol_table, zval *key_name)
+{
+	if (!symbol_table) {
+		php_error_docref(NULL, E_WARNING, "Cannot find a valid symbol_table");
+		return FAILURE;
+	}
+
+	if (Z_TYPE_P(key_name) == IS_STRING) {
+		zend_hash_del(symbol_table, Z_STR_P(key_name));
+	}
+
+	return SUCCESS;
+}
+
+int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned int key_length)
+{
+	if (!symbol_table) {
+		php_error_docref(NULL, E_WARNING, "Cannot find a valid symbol_table");
+		return FAILURE;
+	}
+
+	zend_hash_str_del(symbol_table, key_name, key_length);
 
 	return SUCCESS;
 }

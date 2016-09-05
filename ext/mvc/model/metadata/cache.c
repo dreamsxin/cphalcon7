@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 	phalcon_return_property(&cache, getThis(), SL("_cache"));
 
 	if (Z_TYPE(cache) == IS_STRING) {
-		phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
 		PHALCON_CALL_METHODW(&tmp, &dependency_injector, "getshared", &cache);
 

@@ -94,11 +94,17 @@ PHALCON_INIT_CLASS(Phalcon_DI_Injectable){
  */
 PHP_METHOD(Phalcon_DI_Injectable, setDI){
 
-	zval *dependency_injector;
+	zval *dependency_injector, di = {};
 
 	phalcon_fetch_params(0, 1, 0, &dependency_injector);
 
-	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
+	if (Z_TYPE_P(dependency_injector) != IS_OBJECT && PHALCON_IS_NOT_EMPTY(dependency_injector)) {
+		PHALCON_CALL_METHODW(&di, getThis(), "getdi", dependency_injector);
+	} else {
+		PHALCON_CPY_WRT(&di, dependency_injector);
+	}
+
+	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(&di, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
 	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 
 	RETURN_THISW();
@@ -121,14 +127,14 @@ PHP_METHOD(Phalcon_DI_Injectable, getDI)
 
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
+		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault", &dependency_injector);
 	}
 
 	if (Z_TYPE(dependency_injector) != IS_OBJECT && zend_is_true(error)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_di_exception_ce, "A dependency injection container is not object");
 		return;
 	}
-	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
+
 	RETURN_CTORW(&dependency_injector);
 }
 
@@ -357,5 +363,16 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 
 PHP_METHOD(Phalcon_DI_Injectable, __sleep){
 
-	RETURN_EMPTY_ARRAY();
+	zval dependency_injector = {}, dependency_name = {};
+
+	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(&dependency_name, &dependency_injector, "getname");
+	} else {
+		PHALCON_CPY_WRT(&dependency_name, &dependency_injector);
+	}
+
+	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_name);
+
+	phalcon_get_object_members(return_value, getThis(), 0);
 }

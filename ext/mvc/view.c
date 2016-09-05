@@ -896,7 +896,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 	 * If the engines aren't initialized 'engines' is false
 	 */
 	if (PHALCON_IS_FALSE(&engines)) {
-		phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 		array_init(&engines);
 
@@ -1788,7 +1788,7 @@ PHP_METHOD(Phalcon_Mvc_View, _createCache){
 
 	zval dependency_injector = {}, view_options = {}, cache_options = {}, cache_service = {};
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "A dependency injector container is required to obtain the view cache services");
 		return;

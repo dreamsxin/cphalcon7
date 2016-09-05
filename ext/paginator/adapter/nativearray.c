@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 	ZVAL_LONG(&start, i_number);
 	ZVAL_LONG(&lim, i_limit);
 
-	PHALCON_CALL_FUNCTIONW(&slice, "hash_pbkdf2", &items, &start, &lim);
+	PHALCON_CALL_FUNCTIONW(&slice, "array_slice", &items, &start, &lim);
 
 	object_init(return_value);
 	phalcon_update_property_zval(return_value, SL("items"),       &slice);

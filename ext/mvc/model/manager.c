@@ -501,7 +501,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	 * Load it using an autoloader
 	 */
 	if ((ce0 = phalcon_class_exists(model_name, 1)) != NULL) {
-		phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 		object_init_ex(return_value, ce0);
 		if (phalcon_has_constructor(return_value)) {
@@ -1665,7 +1665,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	phalcon_fetch_params(0, 3, 1, &relation, &method, &record, &p);
 
 	if (p) {
-		PHALCON_CPY_WRT(&parameters, p);
+		PHALCON_CPY_WRT_CTOR(&parameters, p);
 	}
 
 	if (Z_TYPE(parameters) == IS_ARRAY) {
@@ -2347,7 +2347,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 
 	phalcon_fetch_params(0, 1, 0, &phql);
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	PHALCON_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_mvc_model_exception_ce, 0);
 
 	/** 
@@ -2394,7 +2394,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 		types = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (1)");
 		return;
@@ -2441,7 +2441,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 		params = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (2)");
 		return;

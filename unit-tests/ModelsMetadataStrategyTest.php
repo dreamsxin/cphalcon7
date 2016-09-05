@@ -22,59 +22,59 @@ class ModelsMetadataStrategyTest extends PHPUnit_Framework_TestCase
 {
 
 	protected $_expectedMeta = array(
-		0 => array(
+		0 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_ATTRIBUTES
 			0 => 'id',
 			1 => 'name',
 			2 => 'type',
 			3 => 'year',
 		),
-		1 => array(
+		1 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_PRIMARY_KEY
 			0 => 'id',
 		),
-		2 => array(
+		2 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_NON_PRIMARY_KEY
 			0 => 'name',
 			1 => 'type',
 			2 => 'year',
 		),
-		3 => array(
+		3 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_NOT_NULL
 			0 => 'id',
 			1 => 'name',
 			2 => 'type',
 			3 => 'year',
 		),
-		4 => array(
+		4 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES
 			'id' => 0,
 			'name' => 2,
 			'type' => 2,
 			'year' => 0,
 		),
-		5 => array(
+		5 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES_NUMERIC
 			'id' => true,
 			'year' => true,
 		),
-		8 => 'id',
-		9 => array(
+		8 => 'id', // PHALCON_MVC_MODEL_METADATA_MODELS_IDENTITY_COLUMN
+		9 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES_BIND
 			'id' => 1,
 			'name' => 2,
 			'type' => 2,
 			'year' => 1,
 		),
-		10 => array(),
-		11 => array(),
-		12 => array(),
-		13 => array(
-			'id' => 10,
+		10 => array(), // PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_INSERT
+		11 => array(), // PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_UPDATE
+		12 => array(), // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_DEFAULT_VALUE
+		13 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SZIE
+			'id' => 32,
 			'name' => 70,
 			'type' => 32,
-			'year' => 11,
+			'year' => 32,
 		),
-		14 => array(
+		14 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SCALE
 			'id' => 0,
 			'name' => 0,
 			'type' => 0,
 			'year' => 0,
 		),
-		15 => array(
+		15 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_BYTE
 			'id' => 32,
 			'name' => 70,
 			'type' => 32,
@@ -116,7 +116,7 @@ class ModelsMetadataStrategyTest extends PHPUnit_Framework_TestCase
 
 		$di['db'] = function() {
 			require 'unit-tests/config.db.php';
-			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
+			return new Phalcon\Db\Adapter\Pdo\Postgresql($configPostgresql);
 		};
 
 		$di['annotations'] = function() {
@@ -129,7 +129,7 @@ class ModelsMetadataStrategyTest extends PHPUnit_Framework_TestCase
 	public function testMetadataDatabaseIntrospection()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
@@ -156,7 +156,7 @@ class ModelsMetadataStrategyTest extends PHPUnit_Framework_TestCase
 	public function testMetadataAnnotations()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}

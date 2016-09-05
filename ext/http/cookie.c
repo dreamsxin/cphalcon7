@@ -249,8 +249,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue)
 		PHALCON_CALL_METHODW(NULL, getThis(), "restore");
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
-
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'filter' service");
 		return;
@@ -328,7 +327,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
 	phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY);
 	phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY);
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
 		ZVAL_STRING(&service, ISV(session));
@@ -421,7 +420,7 @@ PHP_METHOD(Phalcon_Http_Cookie, restore)
 
 	phalcon_read_property(&restored, getThis(), SL("_restored"), PH_NOISY);
 	if (!zend_is_true(&restored)) {
-		phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 		if (Z_TYPE(dependency_injector) == IS_OBJECT) {
 			ZVAL_STRING(&service, ISV(session));
 

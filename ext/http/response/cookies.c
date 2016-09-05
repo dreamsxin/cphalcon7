@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 
 	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
 	phalcon_read_property(&encryption, getThis(), SL("_useEncryption"), PH_NOISY);
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 	/** 
 	 * Check if the cookie needs to be updated or 
@@ -312,7 +312,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 		object_init_ex(return_value, phalcon_http_cookie_ce);
 		PHALCON_CALL_METHODW(NULL, return_value, "__construct", name);
 
-		phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 		if (Z_TYPE(dependency_injector) == IS_OBJECT) {
 			PHALCON_CALL_METHODW(NULL, return_value, "setdi", &dependency_injector);
 
@@ -375,7 +375,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 
 	_COOKIE = phalcon_get_global_str(SL("_COOKIE"));
 	if (phalcon_array_isset(_COOKIE, name)) {
-		phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 		object_init_ex(&cookie, phalcon_http_cookie_ce);
 

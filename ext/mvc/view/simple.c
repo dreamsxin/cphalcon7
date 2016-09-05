@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 	if (!zend_is_true(&engines)) {
 		array_init(&engines);
 
-		phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 		phalcon_read_property(&registered_engines, getThis(), SL("_registeredEngines"), PH_NOISY);
 		if (Z_TYPE(registered_engines) != IS_ARRAY) { 
 			/** 
@@ -511,16 +511,20 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			if (Z_TYPE(cache_options) == IS_ARRAY) { 
 				if (phalcon_array_isset_str(&cache_options, SL("key"))) {
 					phalcon_array_fetch_str(&key, &cache_options, SL("key"), PH_NOISY);
+				} else {
+					ZVAL_NULL(&key);
 				}
 				if (phalcon_array_isset_str(&cache_options, SL("lifetime"))) {
 					phalcon_array_fetch_str(&lifetime, &cache_options, SL("lifetime"), PH_NOISY);
+				} else {
+					ZVAL_NULL(&lifetime);
 				}
 			}
 
 			/** 
 			 * If a cache key is not set we create one using a md5
 			 */
-			if (Z_TYPE(key) == IS_NULL) {
+			if (Z_TYPE(key) <= IS_NULL) {
 				phalcon_md5(&key, path);
 			}
 
@@ -689,7 +693,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 
 	zval dependency_injector = {}, cache_service = {}, cache_options = {};
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "A dependency injector container is required to obtain the view cache services");
 		return;

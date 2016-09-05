@@ -31,7 +31,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testRouter()
 	{
-
+		Phalcon\DI::reset();
 		$tests = array(
 			array(
 				'uri' => '',

@@ -137,7 +137,6 @@ class DbProfilerTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($profile->getFinalTime()>$profile->getInitialTime());
 
 		$connection->query("SELECT * FROM personas LIMIT 100");
-
 		$this->assertEquals($profiler->getNumberTotalStatements(), 2);
 
 		$profile = $profiler->getLastProfile();

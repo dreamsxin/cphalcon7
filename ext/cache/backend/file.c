@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 		phalcon_file_put_contents(&status, &cache_file, &cached_content);
 	}
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Cache directory is not writable");
+		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_cache_exception_ce, "Cache directory is not writable: %s", &cache_file);
 		return;
 	}
 

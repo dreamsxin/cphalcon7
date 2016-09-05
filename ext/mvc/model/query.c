@@ -3606,7 +3606,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		array_init(&processed);
 		
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, value) {
-			zval tmp = {}, string_wildcard = {}, sql_tmp = {};
+			zval tmp = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
@@ -3616,10 +3616,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
 
-				SEPARATE_ZVAL(value);
-				convert_to_string(value);
+				PHALCON_CALL_METHODW(&tmp_value, value, "getvalue");
 
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, value, &sql_select);
+				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &sql_select);
 
 				PHALCON_STR(&sql_select, Z_STRVAL(sql_tmp));
 			} else if (Z_TYPE(tmp) == IS_LONG) {
@@ -3674,7 +3673,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		ZVAL_BOOL(&result_data, 0);
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 	/** 
 	 * Choose a resultset type
@@ -4033,7 +4032,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 
 	ZVAL_LONG(&type_select, PHQL_T_SELECT);
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
 	/** 
 	 * We create another Phalcon\Mvc\Model\Query to get the related records
@@ -4249,7 +4248,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 			array_init(&processed);
 
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, raw_value) {
-				zval wildcard = {}, string_wildcard = {}, sql_tmp = {};
+				zval wildcard = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
 				if (str_key) {
 					ZVAL_STR(&wildcard, str_key);
 				} else {
@@ -4259,10 +4258,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce)) {
 					PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 
-					SEPARATE_ZVAL(raw_value);
-					convert_to_string(raw_value);
+					PHALCON_CALL_METHODW(&tmp_value, raw_value, "getvalue");
 
-					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, raw_value, &update_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &update_sql);
 
 					PHALCON_STR(&update_sql, Z_STRVAL(sql_tmp));
 
@@ -4381,8 +4379,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 		 */
 		PHALCON_CALL_METHODW(NULL, &connection, "commit");	
 	} else {
-		PHALCON_SEPARATE_PARAM(bind_types);
-
 		PHALCON_CALL_METHODW(&dialect, &connection, "getdialect");
 		PHALCON_CALL_METHODW(&delete_sql, &dialect, "delete", intermediate);
 
@@ -4390,7 +4386,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 			array_init(&processed);
 	
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(bind_params), idx, str_key, raw_value) {
-				zval tmp = {}, string_wildcard = {}, sql_tmp = {};
+				zval tmp = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
 				if (str_key) {
 					ZVAL_STR(&tmp, str_key);
 				} else {
@@ -4400,10 +4396,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 				if (Z_TYPE_P(raw_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(raw_value), phalcon_db_rawvalue_ce)) {
 					PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
 
-					SEPARATE_ZVAL(raw_value);
-					convert_to_string(raw_value);
+					PHALCON_CALL_METHODW(&tmp_value, raw_value, "getvalue");
 
-					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, raw_value, &delete_sql);
+					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &delete_sql);
 
 					PHALCON_STR(&delete_sql, Z_STRVAL(sql_tmp));
 
@@ -4497,7 +4492,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				PHALCON_STR(&cache_service, ISV(modelsCache));
 			}
 
-			phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+			PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
 			PHALCON_CALL_METHODW(&cache, &dependency_injector, "getshared", &cache_service);
 			if (Z_TYPE(cache) != IS_OBJECT) {
@@ -4750,7 +4745,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setBindParams){
 
 	phalcon_fetch_params(0, 1, 0, &bind_params);
 
-	if (Z_TYPE_P(bind_params) != IS_ARRAY) { 
+	if (Z_TYPE_P(bind_params) != IS_ARRAY && Z_TYPE_P(bind_params) != IS_NULL) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind parameters must be an array");
 		return;
 	}
@@ -4800,7 +4795,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setBindTypes){
 
 	phalcon_fetch_params(0, 1, 0, &bind_types);
 
-	if (Z_TYPE_P(bind_types) != IS_ARRAY) { 
+	if (Z_TYPE_P(bind_types) != IS_ARRAY && Z_TYPE_P(bind_types) != IS_NULL) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind types must be an array");
 		return;
 	}

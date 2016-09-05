@@ -98,8 +98,8 @@ PHP_METHOD(Phalcon_CLI_Console, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
-	if (dependency_injector && Z_TYPE_P(dependency_injector) == IS_OBJECT) {
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
+	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdi", dependency_injector);
 	}
 }
 

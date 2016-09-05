@@ -37,6 +37,7 @@
 #include "kernel/file.h"
 #include "kernel/string.h"
 #include "kernel/hash.h"
+#include "kernel/operators.h"
 
 #include "internal/arginfo.h"
 
@@ -75,6 +76,7 @@
 zend_class_entry *phalcon_di_ce;
 
 PHP_METHOD(Phalcon_DI, __construct);
+PHP_METHOD(Phalcon_DI, getName);
 PHP_METHOD(Phalcon_DI, setEventsManager);
 PHP_METHOD(Phalcon_DI, getEventsManager);
 PHP_METHOD(Phalcon_DI, set);
@@ -94,6 +96,10 @@ PHP_METHOD(Phalcon_DI, setDefault);
 PHP_METHOD(Phalcon_DI, getDefault);
 PHP_METHOD(Phalcon_DI, reset);
 PHP_METHOD(Phalcon_DI, __clone);
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di___construct, 0, 0, 0)
+	ZEND_ARG_INFO(0, name)
+ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di___call, 0, 0, 1)
 	ZEND_ARG_INFO(0, method)
@@ -116,7 +122,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_getraw, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_di_method_entry[] = {
-	PHP_ME(Phalcon_DI, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_DI, __construct, arginfo_phalcon_di___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_DI, getName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, setEventsManager, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_DI, getEventsManager, NULL, ZEND_ACC_PROTECTED)
 	/* Phalcon\DiInterface*/
@@ -161,10 +168,12 @@ PHALCON_INIT_CLASS(Phalcon_DI){
 
 	PHALCON_REGISTER_CLASS(Phalcon, DI, di, phalcon_di_method_entry, 0);
 
+	zend_declare_property_null(phalcon_di_ce, SL("_name"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_services"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_sharedInstances"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_freshInstance"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_default"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_null(phalcon_di_ce, SL("_list"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_di_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_di_ce, 1, phalcon_diinterface_ce);
@@ -178,13 +187,30 @@ PHALCON_INIT_CLASS(Phalcon_DI){
  */
 PHP_METHOD(Phalcon_DI, __construct){
 
-	zval *default_di;
+	zval *name = NULL, *default_di;
+
+	phalcon_fetch_params(0, 0, 1, &name);
 
 	default_di = phalcon_read_static_property_ce(phalcon_di_ce, SL("_default"));
 	if (Z_TYPE_P(default_di) == IS_NULL) {
 		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), getThis());
 	}
+	if (name) {
+		phalcon_update_property_zval(getThis(), SL("_name"), name);
+		phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_list"), name, getThis());
+	}
 }
+
+/**
+ * Returns the name
+ *
+ * @return String
+ */
+PHP_METHOD(Phalcon_DI, getName){
+
+	RETURN_MEMBER(getThis(), "_name");
+}
+
 
 /**
  * Sets a custom events manager
@@ -615,10 +641,18 @@ PHP_METHOD(Phalcon_DI, setDefault){
  */
 PHP_METHOD(Phalcon_DI, getDefault){
 
-	phalcon_return_static_property_ce(return_value, phalcon_di_ce, SL("_default"));
-	if (Z_TYPE_P(return_value) != IS_OBJECT) {
-		object_init_ex(return_value, phalcon_di_factorydefault_ce);
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+	zval *name = NULL;
+
+	phalcon_fetch_params(0, 0, 1, &name);
+
+	if (name && PHALCON_IS_NOT_EMPTY(name)) {
+		phalcon_read_static_property_array_ce(return_value, phalcon_di_ce, SL("_list"), name);
+	} else {
+		phalcon_return_static_property_ce(return_value, phalcon_di_ce, SL("_default"));
+		if (Z_TYPE_P(return_value) != IS_OBJECT) {
+			object_init_ex(return_value, phalcon_di_factorydefault_ce);
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+		}
 	}
 }
 

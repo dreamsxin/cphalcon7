@@ -92,12 +92,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 
 	phalcon_fetch_params(0, 1, 1, &view, &dependency_injector);
 
-	if (!dependency_injector) {
-		dependency_injector = &PHALCON_GLOBAL(z_null);
+	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_view"), view);
-	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 }
 
 /**

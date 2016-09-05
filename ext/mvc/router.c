@@ -290,31 +290,6 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 }
 
 /**
- * Sets the dependency injector
- *
- * @param Phalcon\DiInterface $dependencyInjector
- */
-PHP_METHOD(Phalcon_Mvc_Router, setDI){
-
-	zval *dependency_injector;
-
-	phalcon_fetch_params(0, 1, 0, &dependency_injector);
-	PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_mvc_router_exception_ce, 0);
-	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
-}
-
-/**
- * Returns the internal dependency injector
- *
- * @return Phalcon\DiInterface
- */
-PHP_METHOD(Phalcon_Mvc_Router, getDI){
-
-
-	RETURN_MEMBER(getThis(), "_dependencyInjector");
-}
-
-/**
  * Get rewrite info. This info is read from $_GET['_url']. This returns '/' if the rewrite information cannot be read
  *
  * @return string

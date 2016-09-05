@@ -137,6 +137,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	PHALCON_STR(&id_annot_name, "Identity");
 	PHALCON_STR(&column_map_name, "column");
 	PHALCON_STR(&column_type_name, "type");
+	PHALCON_STR(&column_size_name, "size");
 	PHALCON_STR(&column_bytes_name, "bytes");
 	PHALCON_STR(&column_scale_name, "scale");
 	PHALCON_STR(&column_default_name, "default");

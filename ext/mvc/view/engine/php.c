@@ -29,6 +29,7 @@
 #include "kernel/hash.h"
 #include "kernel/require.h"
 #include "kernel/object.h"
+#include "kernel/debug.h"
 
 /**
  * Phalcon\Mvc\View\Engine\Php
@@ -65,7 +66,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Php){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
-	zval *path, *params, *must_clean = NULL, contents = {}, view = {};
+	zval *path, *params, *must_clean = NULL, contents = {}, view = {}, *value = NULL;
+	zend_string *str_key;
+	zend_array *symbol_table;
+	ulong idx;
 	int clean;
 
 	phalcon_fetch_params(0, 2, 1, &path, &params, &must_clean);
@@ -81,18 +85,35 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		phalcon_ob_clean();
 	}
 
+	symbol_table = zend_rebuild_symbol_table();
+
 	/** 
 	 * Create the variables in local symbol table
 	 */
 	if (Z_TYPE_P(params) == IS_ARRAY) {
-		zend_hash_merge(&EG(symbol_table), Z_ARRVAL_P(params), (copy_ctor_func_t)zval_add_ref, 0);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(params), idx, str_key, value) {
+			zval key = {};
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
+			/*
+			convert_to_string(&key);
+			if(zend_set_local_var(Z_STR(key), value, 1) == SUCCESS){
+				Z_TRY_ADDREF_P(value);
+			}
+			*/
+			phalcon_set_symbol(symbol_table, &key, value);
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	/** 
 	 * Require the file
 	 */
 	if (phalcon_require(Z_STRVAL_P(path)) == FAILURE) {
-		RETURN_FALSE;
+		ZVAL_FALSE(return_value);
+		goto end;
 	}
 
 	if (clean) {
@@ -102,5 +123,18 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		PHALCON_CALL_METHODW(NULL, &view, "setcontent", &contents);
 	}
 
-	RETURN_TRUE;
+	ZVAL_TRUE(return_value);
+
+end:
+	if (Z_TYPE_P(params) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(params), idx, str_key) {
+			zval key = {};
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
+			phalcon_del_symbol(symbol_table, &key);
+		} ZEND_HASH_FOREACH_END();
+	}
 }

@@ -1364,7 +1364,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 
 	PHALCON_CALL_SELFW(&phql, "getphql");
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY);
 	phalcon_read_property(&unique_row, getThis(), SL("_uniqueRow"), PH_NOISY);
 
@@ -1535,11 +1535,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	ulong idx;
 	zend_class_entry *ce0;
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
-	}
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
 	phalcon_read_property(&model, getThis(), SL("_model"), PH_NOISY);
 	if (!zend_is_true(&model)) {
@@ -1844,11 +1840,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	ulong idx;
 	zend_class_entry *ce0;
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
-	}
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
 	phalcon_read_property(&model, getThis(), SL("_model"), PH_NOISY);
 	if (!zend_is_true(&model)) {
@@ -1983,11 +1975,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	zval column_map = {}, attribute_field = {}, exception_message = {}, primary_key_condition = {}, phql = {}, order = {}, limit = {}, offset = {};
 	zend_class_entry *ce0;
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
-	}
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
 	phalcon_read_property(&model, getThis(), SL("_model"), PH_NOISY);
 	if (!zend_is_true(&model)) {

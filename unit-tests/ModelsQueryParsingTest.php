@@ -63,7 +63,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 
 		$di->set('db', function(){
 			require 'unit-tests/config.db.php';
-			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
+			return new Phalcon\Db\Adapter\Pdo\Postgresql($configPostgresql);
 		}, true);
 
 		return $di;
@@ -75,7 +75,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 	public function testSelectParsing()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
@@ -6930,7 +6930,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 	public function testInsertParsing()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
@@ -7121,7 +7121,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					),
 				),
 				array(
-					'type' => 273,
+					'type' => 292,	// PHQL_T_NPLACEHOLDER
 					'value' => array(
 						'type' => 'placeholder',
 						'value' => ':0',
@@ -7279,7 +7279,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					),
 				),
 				array(
-					'type' => 273,
+					'type' => 292,	// PHQL_T_NPLACEHOLDER
 					'value' => array(
 						'type' => 'placeholder',
 						'value' => ':0',
@@ -7295,7 +7295,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 	public function testUpdateParsing()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
@@ -7540,7 +7540,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					),
 				),
 				array(
-					'type' => 43,
+					'type' => 266,	// PHQL_T_ADD
 					'value' => array(
 						'type' => 'binary-op',
 						'op' => '+',
@@ -7602,7 +7602,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					),
 				),
 				array(
-					'type' => 43,
+					'type' => 266,	// PHQL_T_ADD
 					'value' => array(
 						'type' => 'binary-op',
 						'op' => '+',
@@ -7711,7 +7711,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					),
 				),
 				array(
-					'type' => 42,
+					'type' => 268,	// PHQL_T_MUL echo ord('*');
 					'value' => array(
 						'type' => 'binary-op',
 						'op' => '*',
@@ -7940,7 +7940,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 	public function testDeleteParsing()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if (empty($configPostgresql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}

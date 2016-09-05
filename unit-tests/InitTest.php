@@ -23,7 +23,7 @@ class InitTest extends PHPUnit_Framework_TestCase
 
 	public function testExtensionLoaded()
 	{
-		$this->assertTrue(in_array('phalcon', get_loaded_extensions()));
+		$this->assertTrue(in_array('phalcon7', get_loaded_extensions()));
 	}
 
 }

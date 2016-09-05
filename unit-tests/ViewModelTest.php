@@ -40,6 +40,7 @@ class ViewModelTest extends PHPUnit_Framework_TestCase
 
 	public function testBasic()
 	{
+		Phalcon\DI::reset();
 		$di = new Phalcon\DI\FactoryDefault();
 		$di['view'] = function() {
 			$view = new View();

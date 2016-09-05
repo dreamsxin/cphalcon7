@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, setDI){
 		PHALCON_CALL_METHODW(NULL, dependency_injector, "set", &service, getThis());
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
+	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_micro_ce, getThis(), "setdi", dependency_injector);
 }
 
 static void phalcon_mvc_micro_generic_add(INTERNAL_FUNCTION_PARAMETERS, const char *method)
@@ -576,14 +576,11 @@ PHP_METHOD(Phalcon_Mvc_Micro, setService){
 		shared = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		object_init_ex(&dependency_injector, phalcon_di_factorydefault_ce);
-		PHALCON_CALL_METHODW(NULL, &dependency_injector, "__construct");
-
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (!zend_is_true(&dependency_injector)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_micro_exception_ce, "A dependency injection container is required to access related dispatching services");
+		return;
 	}
-
 	PHALCON_RETURN_CALL_METHODW(&dependency_injector, "set", service_name, definition, shared);
 }
 
@@ -599,12 +596,10 @@ PHP_METHOD(Phalcon_Mvc_Micro, hasService){
 
 	phalcon_fetch_params(0, 1, 0, &service_name);
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		object_init_ex(&dependency_injector, phalcon_di_factorydefault_ce);
-		PHALCON_CALL_METHODW(NULL, &dependency_injector, "__construct");
-
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_micro_exception_ce, "A dependency injection container is required to access related dispatching services");
+		return;
 	}
 
 	PHALCON_RETURN_CALL_METHODW(&dependency_injector, "has", service_name);
@@ -622,12 +617,10 @@ PHP_METHOD(Phalcon_Mvc_Micro, getService){
 
 	phalcon_fetch_params(0, 1, 0, &service_name);
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		object_init_ex(&dependency_injector, phalcon_di_factorydefault_ce);
-		PHALCON_CALL_METHODW(NULL, &dependency_injector, "__construct");
-
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_micro_exception_ce, "A dependency injection container is required to access related dispatching services");
+		return;
 	}
 
 	PHALCON_RETURN_CALL_METHODW(&dependency_injector, "get", service_name);
@@ -645,12 +638,10 @@ PHP_METHOD(Phalcon_Mvc_Micro, getSharedService){
 
 	phalcon_fetch_params(0, 1, 0, &service_name);
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		object_init_ex(&dependency_injector, phalcon_di_factorydefault_ce);
-		PHALCON_CALL_METHODW(NULL, &dependency_injector, "__construct");
-
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_injector);
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_micro_exception_ce, "A dependency injection container is required to access related dispatching services");
+		return;
 	}
 
 	PHALCON_RETURN_CALL_METHODW(&dependency_injector, "getshared", service_name);
@@ -674,7 +665,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		uri = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_NOISY);
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_micro_exception_ce, "A dependency injection container is required to access related dispatching services");
 		return;

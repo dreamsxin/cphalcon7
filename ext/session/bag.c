@@ -167,17 +167,11 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 
 	phalcon_return_property(&session, getThis(), SL("_session"));
 	if (Z_TYPE(session) != IS_OBJECT) {
-		phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault");
-
-			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "A dependency injection object is required to access the 'session' service");
-				return;
-			}
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "A dependency injection object is required to access the 'session' service");
+			return;
 		}
-
-		PHALCON_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_session_exception_ce, 0);
 
 		ZVAL_STR(&service, IS(session));
 
@@ -237,7 +231,6 @@ PHP_METHOD(Phalcon_Session_Bag, set){
 	RETURN_ON_FAILURE(phalcon_session_bag_maybe_initialize(getThis()));
 
 	phalcon_update_property_array(getThis(), SL("_data"), property, value);
-
 
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
 	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
@@ -304,7 +297,7 @@ PHP_METHOD(Phalcon_Session_Bag, get){
  */
 PHP_METHOD(Phalcon_Session_Bag, __get)
 {
-	zval *property, data = {}, value = {};
+	zval *property, data = {}, name = {}, session = {};
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
@@ -314,11 +307,21 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 	/* Retrieve the data */
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
 
-	if (phalcon_array_isset_fetch(&value, &data, property, 0)) {
-		RETURN_CTORW(&value);
+	if (!phalcon_array_isset_fetch(return_value, &data, property, 0)) {
+		ZVAL_NULL(return_value);
+		ZVAL_MAKE_REF(return_value);
+
+		phalcon_update_property_array(getThis(), SL("_data"), property, return_value);
+
+		phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+		phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
+		phalcon_read_property(&session, getThis(), SL("_session"), PH_NOISY);
+
+		PHALCON_CALL_METHODW(NULL, &session, "__set", &name, &data);
+	} else {
+		ZVAL_MAKE_REF(return_value);
 	}
 
-	RETURN_NULL();
 }
 
 

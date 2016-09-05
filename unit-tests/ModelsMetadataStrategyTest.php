@@ -63,10 +63,10 @@ class ModelsMetadataStrategyTest extends PHPUnit_Framework_TestCase
 		11 => array(), // PHALCON_MVC_MODEL_METADATA_MODELS_AUTOMATIC_DEFAULT_UPDATE
 		12 => array(), // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_DEFAULT_VALUE
 		13 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SZIE
-			'id' => 10,
+			'id' => 32,
 			'name' => 70,
 			'type' => 32,
-			'year' => 11,
+			'year' => 32,
 		),
 		14 => array( // PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SCALE
 			'id' => 0,

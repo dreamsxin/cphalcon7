@@ -23,8 +23,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
 	public function testSessionFiles()
 	{
-		$this->markTestSkipped("Skipped");
-
 		$session = new Phalcon\Session\Adapter\Files();
 
 		$this->assertFalse($session->start());
@@ -47,8 +45,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
 	public function testSessionMemcache()
 	{
-		$this->markTestSkipped("Skipped");
-
 		$session = new Phalcon\Session\Adapter\Memcache(array(
 			'host' => '127.0.0.1',
 			'port' => '11211',
@@ -75,8 +71,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
 	public function testSessionLibmemcached()
 	{
-		$this->markTestSkipped("Skipped");
-
 		$session = new Phalcon\Session\Adapter\Libmemcached(array(
 			'servers' => array(
 				array(

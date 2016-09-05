@@ -318,8 +318,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		PHALCON_CALL_FUNCTIONW(&headersize, "curl_getinfo", &curl, constant);
 
 		phalcon_substr(&headerstr, &content, 0 , Z_LVAL(headersize));
-
-		phalcon_substr(&bodystr, &content, Z_LVAL(headersize) , Z_STRLEN(content));
+		phalcon_substr(&bodystr, &content, Z_LVAL(headersize) , Z_STRLEN(content) - Z_LVAL(headersize));
 
 		PHALCON_CALL_METHODW(NULL, &response, "setheader", &headerstr);
 		PHALCON_CALL_METHODW(NULL, &response, "setbody", &bodystr);

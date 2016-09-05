@@ -38,12 +38,10 @@ int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func);
 #define PHALCON_MM_GROW()       phalcon_memory_grow_stack(__func__)
 #define PHALCON_MM_RESTORE()    phalcon_memory_restore_stack(__func__)
 
-/* Memory Frames */
-#ifndef PHALCON_RELEASE
-void phalcon_dump_memory_frame(phalcon_memory_entry *active_memory);
-void phalcon_dump_current_frame();
-void phalcon_dump_all_frames();
-#endif
+int phalcon_set_symbol(zend_array *symbol_table, zval *key_name, zval *value);
+int phalcon_set_symbol_str(zend_array *symbol_table, char *key_name, unsigned int key_length, zval *value);
+int phalcon_del_symbol(zend_array *symbol_table, zval *key_name);
+int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned int key_length);
 
 int ZEND_FASTCALL phalcon_clean_restore_stack();
 

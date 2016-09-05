@@ -511,16 +511,20 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			if (Z_TYPE(cache_options) == IS_ARRAY) { 
 				if (phalcon_array_isset_str(&cache_options, SL("key"))) {
 					phalcon_array_fetch_str(&key, &cache_options, SL("key"), PH_NOISY);
+				} else {
+					ZVAL_NULL(&key);
 				}
 				if (phalcon_array_isset_str(&cache_options, SL("lifetime"))) {
 					phalcon_array_fetch_str(&lifetime, &cache_options, SL("lifetime"), PH_NOISY);
+				} else {
+					ZVAL_NULL(&lifetime);
 				}
 			}
 
 			/** 
 			 * If a cache key is not set we create one using a md5
 			 */
-			if (Z_TYPE(key) == IS_NULL) {
+			if (Z_TYPE(key) <= IS_NULL) {
 				phalcon_md5(&key, path);
 			}
 

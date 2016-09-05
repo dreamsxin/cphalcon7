@@ -17,7 +17,7 @@
 	|          Eduar Carvajal <eduar@phalconphp.com>                         |
 	+------------------------------------------------------------------------+
 */
-
+ob_start();
 class SessionTest extends PHPUnit_Framework_TestCase
 {
 
@@ -25,10 +25,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 	{
 		$session = new Phalcon\Session\Adapter\Files();
 
-		$this->assertFalse($session->start());
-		$this->assertFalse($session->isStarted());
-
-		@session_start();
+		$this->assertTrue($session->start());
+		$this->assertTrue($session->isStarted());
 
 		$session->set('some', 'value');
 
@@ -51,10 +49,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 			'prefix' => 'memcache'
 		));
 
-		$this->assertFalse($session->start());
-		$this->assertFalse($session->isStarted());
-
-		@session_start();
+		$this->assertTrue($session->start());
+		$this->assertTrue($session->isStarted());
 
 		$session->set('some', 'value');
 
@@ -81,10 +77,8 @@ class SessionTest extends PHPUnit_Framework_TestCase
 			'prefix' => 'libmemcached'
 		));
 
-		$this->assertFalse($session->start());
-		$this->assertFalse($session->isStarted());
-
-		@session_start();
+		$this->assertTrue($session->start());
+		$this->assertTrue($session->isStarted());
 
 		$session->set('some', 'value');
 

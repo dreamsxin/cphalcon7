@@ -26,7 +26,6 @@ class CryptTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testEncryption()
 	{
-
 		$tests = array(
 			md5(uniqid()) => str_repeat('x', mt_rand(1, 255)),
 			time().time() => str_shuffle('abcdefeghijklmnopqrst'),

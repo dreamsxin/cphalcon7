@@ -539,6 +539,8 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 
 	PHALCON_CALL_FUNCTIONW(&encrypt, "mcrypt_encrypt", &cipher, &encrypt_key, &padded, &mode, &iv);
 
+	PHALCON_CALL_FUNCTIONW(NULL, "mcrypt_module_close", &td);
+
 	PHALCON_CONCAT_VV(return_value, &iv, &encrypt);
 
 	phalcon_read_property(&handler, getThis(), SL("_afterEncrypt"), PH_NOISY);
@@ -632,6 +634,8 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	if (unlikely(Z_TYPE(block_size) != IS_LONG)) {
 		convert_to_long(&block_size);
 	}
+
+	PHALCON_CALL_FUNCTIONW(NULL, "mcrypt_module_close", &td);
 
 	phalcon_read_property(&padding_type, getThis(), SL("_padding"), PH_NOISY);
 

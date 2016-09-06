@@ -133,3 +133,37 @@
 - afterSave
 - notSave
 - afterOperation
+- afterToArray
+
+### View Events
+
+- beforeRender
+- beforeRenderView
+- notFoundView
+- afterRenderView
+- afterRender
+
+## Events Trigger A Process
+
+* Event format: event type + ':' + event name
+
+### General Case
+
+Any class Inherited from `Phalcon\DI\Injectable`.
+
+	1.Call method `fireEvent` or `fireEventCancel`
+	2.Check if there is a method with the same name of the event, if yes call the method
+	3.Send a notification to the events manager
+
+### Way 2 Case
+
+`Views` use this way.
+
+	1.Send a notification to the events manager
+
+### Way 3 Case
+
+`Models` use this way.
+
+	1.Call self manager method `notifyEvent`
+	2.Send a notification to the events manager

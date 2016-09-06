@@ -153,17 +153,23 @@ Any class Inherited from `Phalcon\DI\Injectable`.
 
 	1.Call method `fireEvent` or `fireEventCancel`
 	2.Check if there is a method with the same name of the event, if yes call the method
-	3.Send a notification to the events manager
+	3.Send a notification to the events manager - Phalcon\Events\Manager::fire
+	4.Internal handler to call a queue of events - Phalcon\Events\Manager::fireQueue
+	5.Check if the listener is a closure or has implemented an event with the same name
 
 ### Way 2 Case
 
 `Views` use this way.
 
-	1.Send a notification to the events manager
+	1.Send a notification to the events manager - Phalcon\Events\Manager::fire
+	2.Internal handler to call a queue of events - Phalcon\Events\Manager::fireQueue
+	3.Check if the listener is a closure or has implemented an event with the same name
 
 ### Way 3 Case
 
 `Models` use this way.
 
 	1.Call self manager method `notifyEvent`
-	2.Send a notification to the events manager
+	2.Send a notification to the events manager - Phalcon\Events\Manager::fire
+	3.Internal handler to call a queue of events - Phalcon\Events\Manager::fireQueue
+	4.Check if the listener is a closure or has implemented an event with the same name

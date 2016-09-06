@@ -52,8 +52,9 @@
 						5.7.2.3.1Render action view 
 						5.7.2.3.2Render before layout view
 						5.7.2.3.3Render controller layout view
-						5.7.2.3.3Render after layout view
-						5.7.2.3.3Render main view
+						5.7.2.3.4Render namespace layout view
+						5.7.2.3.5Render after layout view
+						5.7.2.3.6Render main view
 					5.7.2.4.Fire event - view:afterRender
 			5.8.Get the processed content - Phalcon\Mvc\View::getContent
 			5.9.Fire event - application:beforeSendResponse

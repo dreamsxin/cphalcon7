@@ -457,7 +457,7 @@ static void phalcon_crypt_unpad_text(zval *return_value, zval *text, zval *mode,
  */
 PHP_METHOD(Phalcon_Crypt, encrypt){
 
-	zval *source, *key = NULL, handler = {}, arguments = {}, value = {}, text = {}, encrypt_key = {}, cipher = {}, mode = {}, iv_size = {}, rand = {}, iv = {}, block_size = {};
+	zval *source, *key = NULL, handler = {}, arguments = {}, value = {}, text = {}, encrypt_key = {}, cipher = {}, mode = {}, td = {}, iv_size = {}, rand = {}, iv = {}, block_size = {};
 	zval padding_type = {}, padded = {}, encrypt = {};
 
 	phalcon_fetch_params(0, 1, 1, &source, &key);
@@ -482,7 +482,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		PHALCON_CPY_WRT(&text, source);
 	}
 
-	if (phalcon_function_exists_ex(SL("mcrypt_get_iv_size")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("mcrypt_module_open")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_crypt_exception_ce, "mcrypt extension is required");
 		return;
 	}
@@ -504,7 +504,8 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	phalcon_read_property(&cipher, getThis(), SL("_cipher"), PH_NOISY);
 	phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(&iv_size, "mcrypt_get_iv_size", &cipher, &mode);
+	PHALCON_CALL_FUNCTIONW(&td, "mcrypt_module_open", &cipher, &PHALCON_GLOBAL(z_null), &mode, &PHALCON_GLOBAL(z_null));
+	PHALCON_CALL_FUNCTIONW(&iv_size, "mcrypt_enc_get_iv_size", &td);
 	if (unlikely(Z_TYPE(iv_size) != IS_LONG)) {
 		convert_to_long(&iv_size);
 	}
@@ -565,12 +566,12 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
  */
 PHP_METHOD(Phalcon_Crypt, decrypt){
 
-	zval *text, *key = NULL, _key = {}, handler = {}, arguments = {}, value = {}, cipher = {}, mode = {}, iv_size = {}, key_size = {}, text_size = {}, iv = {}, text_to_decipher = {};
+	zval *text, *key = NULL, _key = {}, handler = {}, arguments = {}, value = {}, cipher = {}, mode = {}, td = {}, iv_size = {}, key_size = {}, text_size = {}, iv = {}, text_to_decipher = {};
 	zval decrypted = {}, block_size = {}, padding_type = {};
 
 	phalcon_fetch_params(0, 1, 1, &text, &key);
 
-	if (phalcon_function_exists_ex(SL("mcrypt_get_iv_size")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("mcrypt_module_open")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_crypt_exception_ce, "mcrypt extension is required");
 		return;
 	}
@@ -601,7 +602,8 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	phalcon_read_property(&cipher, getThis(), SL("_cipher"), PH_NOISY);
 	phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(&iv_size, "mcrypt_get_iv_size", &cipher, &mode);
+	PHALCON_CALL_FUNCTIONW(&td, "mcrypt_module_open", &cipher, &PHALCON_GLOBAL(z_null), &mode, &PHALCON_GLOBAL(z_null));
+	PHALCON_CALL_FUNCTIONW(&iv_size, "mcrypt_enc_get_iv_size", &td);
 	if (unlikely(Z_TYPE(iv_size) != IS_LONG)) {
 		convert_to_long(&iv_size);
 	}

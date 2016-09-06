@@ -145,7 +145,7 @@
 
 ## Events Trigger A Process
 
-* Event format: event type + ':' + event name
+* Event format: event type + `:` + event name
 
 ### General Case
 

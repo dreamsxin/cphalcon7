@@ -53,6 +53,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setEventsManager);
 PHP_METHOD(Phalcon_DI_Injectable, getEventsManager);
 PHP_METHOD(Phalcon_DI_Injectable, fireEvent);
 PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel);
+PHP_METHOD(Phalcon_DI_Injectable, hasService);
 PHP_METHOD(Phalcon_DI_Injectable, getResolveService);
 PHP_METHOD(Phalcon_DI_Injectable, __get);
 PHP_METHOD(Phalcon_DI_Injectable, __sleep);
@@ -65,6 +66,7 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_DI_Injectable, hasService, arginfo_phalcon_di_injectable_hasservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, __sleep, NULL, ZEND_ACC_PUBLIC)
@@ -280,9 +282,33 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
 }
 
 /**
- * Magic method __get
+ * Check whether the DI contains a service by a name
  *
- * @param string $propertyName
+ * @param string $name
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_DI_Injectable, hasService){
+
+	zval *service_name, dependency_injector = {};
+
+	phalcon_fetch_params(0, 1, 0, &service_name);
+
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(return_value, &dependency_injector, "has", service_name);
+	} else {
+		RETURN_FALSE;
+	}
+}
+
+/**
+ * Resolves the service based on its configuration
+ *
+ * @param string $name
+ * @param array $parameters
+ * @param boolean $noError
+ * @param boolean $noShared
+ * @return mixed
  */
 PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
 

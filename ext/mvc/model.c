@@ -195,6 +195,7 @@ PHP_METHOD(Phalcon_Mvc_Model, filter);
 PHP_METHOD(Phalcon_Mvc_Model, isRecord);
 PHP_METHOD(Phalcon_Mvc_Model, isNewRecord);
 PHP_METHOD(Phalcon_Mvc_Model, isDeletedRecord);
+PHP_METHOD(Phalcon_Mvc_Model, __debugInfo);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, dependencyInjector)
@@ -437,6 +438,7 @@ static const zend_function_entry phalcon_mvc_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model, isRecord, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, isNewRecord, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, isDeletedRecord, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model, __debugInfo, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -6709,4 +6711,14 @@ PHP_METHOD(Phalcon_Mvc_Model, isDeletedRecord){
 	}
 
 	RETURN_FALSE;
-}	
+}
+
+PHP_METHOD(Phalcon_Mvc_Model, __debugInfo){
+
+	PHALCON_CALL_PARENTW(return_value, phalcon_mvc_model_ce, getThis(), "__debuginfo");
+
+	if (likely(!PHALCON_GLOBAL(debug).enable_debug)) {
+		phalcon_array_unset_str(return_value, SL("_modelsManager"), 0);
+		phalcon_array_unset_str(return_value, SL("_modelsMetaData"), 0);
+	}
+}

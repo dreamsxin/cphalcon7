@@ -407,13 +407,10 @@ PHP_METHOD(Phalcon_DI_Injectable, __sleep){
 
 PHP_METHOD(Phalcon_DI_Injectable, __debugInfo){
 
-	zval dependency_injector = {}, dependency_name = {};
-
 	phalcon_get_object_vars(return_value, getThis(), 0);
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-	if (Z_TYPE(dependency_injector) == IS_OBJECT  && instanceof_function_ex(Z_OBJCE(dependency_injector), phalcon_diinterface_ce, 1)) {
-		PHALCON_CALL_METHODW(&dependency_name, &dependency_injector, "getname");
-		phalcon_array_update_str(return_value, SL("_dependencyInjector"), &dependency_name, PH_COPY);
+	if (likely(!PHALCON_GLOBAL(debug).enable_debug)) {
+		phalcon_array_unset_str(return_value, SL("_dependencyInjector"), 0);
+		phalcon_array_unset_str(return_value, SL("_eventsManager"), 0);
 	}
 }

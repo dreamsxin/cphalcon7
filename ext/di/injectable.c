@@ -56,6 +56,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel);
 PHP_METHOD(Phalcon_DI_Injectable, getResolveService);
 PHP_METHOD(Phalcon_DI_Injectable, __get);
 PHP_METHOD(Phalcon_DI_Injectable, __sleep);
+PHP_METHOD(Phalcon_DI_Injectable, __debugInfo);
 
 static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, setDI, arginfo_phalcon_di_injectionawareinterface_setdi, ZEND_ACC_PUBLIC)
@@ -67,6 +68,7 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_DI_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI_Injectable, __sleep, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_DI_Injectable, __debugInfo, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -375,4 +377,17 @@ PHP_METHOD(Phalcon_DI_Injectable, __sleep){
 	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_name);
 
 	phalcon_get_object_members(return_value, getThis(), 0);
+}
+
+PHP_METHOD(Phalcon_DI_Injectable, __debugInfo){
+
+	zval dependency_injector = {}, dependency_name = {};
+
+	phalcon_get_object_vars(return_value, getThis(), 0);
+
+	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	if (Z_TYPE(dependency_injector) == IS_OBJECT  && instanceof_function_ex(Z_OBJCE(dependency_injector), phalcon_diinterface_ce, 1)) {
+		PHALCON_CALL_METHODW(&dependency_name, &dependency_injector, "getname");
+		phalcon_array_update_str(return_value, SL("_dependencyInjector"), &dependency_name, PH_COPY);
+	}
 }

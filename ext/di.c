@@ -168,7 +168,7 @@ PHALCON_INIT_CLASS(Phalcon_DI){
 
 	PHALCON_REGISTER_CLASS(Phalcon, DI, di, phalcon_di_method_entry, 0);
 
-	zend_declare_property_null(phalcon_di_ce, SL("_name"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_di_ce, SL("_name"), "di",  ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_services"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_sharedInstances"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_freshInstance"), ZEND_ACC_PROTECTED);
@@ -187,18 +187,23 @@ PHALCON_INIT_CLASS(Phalcon_DI){
  */
 PHP_METHOD(Phalcon_DI, __construct){
 
-	zval *name = NULL, *default_di;
+	zval *_name = NULL, *default_di, name = {};
 
-	phalcon_fetch_params(0, 0, 1, &name);
+	phalcon_fetch_params(0, 0, 1, &_name);
 
 	default_di = phalcon_read_static_property_ce(phalcon_di_ce, SL("_default"));
 	if (Z_TYPE_P(default_di) == IS_NULL) {
 		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), getThis());
 	}
-	if (name) {
-		phalcon_update_property_zval(getThis(), SL("_name"), name);
-		phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_list"), name, getThis());
+
+	if (_name) {
+		phalcon_update_property_zval(getThis(), SL("_name"), _name);
+		PHALCON_CPY_WRT(&name, _name);
+	} else {
+		phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
 	}
+
+	phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_list"), &name, getThis());
 }
 
 /**

@@ -272,7 +272,7 @@ static inline int phalcon_array_update_zval_long(zval *arr, zval *index, long va
  *
  * Equivalent to <tt>$arr[$index] = $value</tt> in PHP, where @c $value is a string.
  */
-static inline int phalcon_array_update_zval_string(zval *arr, zval *index, char *value, uint value_length, int flags)
+static inline int phalcon_array_update_zval_str(zval *arr, zval *index, char *value, uint value_length, int flags)
 {
 	zval zvalue;
 	ZVAL_STRINGL(&zvalue, value, value_length);

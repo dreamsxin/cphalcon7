@@ -601,7 +601,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsMetaData){
 	if (Z_TYPE(meta_data) == IS_OBJECT) {
 		PHALCON_CPY_WRT(&service, &meta_data);
 	} else {
-		PHALCON_STR(&service_name, "modelsMetadata");
+		PHALCON_STR(&service_name, ISV(modelsMetadata));
 
 		PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 		if (Z_TYPE(service) == IS_OBJECT) {
@@ -633,7 +633,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsManager){
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
-		PHALCON_STR(&service_name, "modelsManager");
+		PHALCON_STR(&service_name, ISV(modelsManager));
 		PHALCON_CALL_METHODW(return_value, &dependency_injector, "getshared", &service_name);
 	}
 
@@ -1396,7 +1396,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
 PHP_METHOD(Phalcon_Mvc_Model, find){
 
 	zval *parameters = NULL, model_name = {}, dependency_injector = {}, service_name = {}, manager = {}, model = {};
-	zval params = {}, has = {}, service_params = {}, builder = {}, event_name = {}, query = {}, cache = {}, resultset = {}, hydration = {};
+	zval params = {}, builder = {}, event_name = {}, query = {}, cache = {}, resultset = {}, hydration = {};
 
 	phalcon_fetch_params(0, 0, 1, &parameters);
 
@@ -1413,7 +1413,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 		return;
 	}
 
-	PHALCON_STR(&service_name, "modelsManager");
+	PHALCON_STR(&service_name, ISV(modelsManager));
 
 	PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service_name);
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
@@ -1427,22 +1427,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 		PHALCON_CPY_WRT(&params, parameters);
 	}
 
-	/**
-	 * Builds a query with the passed parameters
-	 */
-	PHALCON_STR(&service_name, "modelsQueryBuilder");
-
-	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
-	if (zend_is_true(&has)) {
-		array_init(&service_params);
-
-		phalcon_array_append(&service_params, &params, PH_COPY);
-
-		PHALCON_CALL_METHODW(&builder, &dependency_injector, "get", &service_name, &service_params);
-	} else {
-		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
-		PHALCON_CALL_METHODW(NULL, &builder, "__construct", &params);
-	}
+	PHALCON_CALL_METHODW(&builder, &manager, "createbuilder", &params);
 
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
 
@@ -1510,7 +1495,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	zval *parameters = NULL, *auto_create = NULL, params = {}, dependency_injector = {}, model_name = {}, service_name = {}, has = {}, manager = {};
-	zval model = {}, service_params = {}, builder = {}, query = {}, cache = {}, event_name = {}, result = {}, hydration = {};
+	zval model = {}, builder = {}, query = {}, cache = {}, event_name = {}, result = {}, hydration = {};
 
 	phalcon_fetch_params(0, 0, 2, &parameters, &auto_create);
 
@@ -1541,7 +1526,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	phalcon_get_called_class(&model_name);
 
-	PHALCON_STR(&service_name, "modelsManager");
+	PHALCON_STR(&service_name, ISV(modelsManager));
 
 	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -1551,21 +1536,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	}
 
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name, &PHALCON_GLOBAL(z_true));
-
-	/**
-	 * Builds a query with the passed parameters
-	 */
-	PHALCON_STR(&service_name, "modelsQueryBuilder");
-
-	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
-	if (zend_is_true(&has)) {
-		array_init(&service_params);
-		phalcon_array_append(&service_params, &params, PH_COPY);
-		PHALCON_CALL_METHODW(&builder, &dependency_injector, "get", &service_name, &service_params);
-	} else {
-		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
-		PHALCON_CALL_METHODW(NULL, &builder, "__construct", &params);
-	}
+	PHALCON_CALL_METHODW(&builder, &manager, "createbuilder", &params);
 
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
 
@@ -1648,7 +1619,7 @@ PHP_METHOD(Phalcon_Mvc_Model, query){
 
 	phalcon_get_called_class(&model_name);
 
-	PHALCON_STR(&service_name, "modelsCriteria");
+	PHALCON_STR(&service_name, ISV(modelsCriteria));
 
 	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -1906,7 +1877,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _exists){
 PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 
 	zval *function, *alias, *parameters, params = {}, group_column = {}, distinct_column = {}, columns = {}, group_columns = {};
-	zval model_name = {}, dependency_injector = {}, service_name = {}, manager = {}, model = {}, has = {}, service_params = {}, builder = {}, query = {};
+	zval model_name = {}, dependency_injector = {}, service_name = {}, manager = {}, model = {}, builder = {}, query = {};
 	zval cache = {}, resultset = {}, number_rows = {}, first_row = {};
 
 	phalcon_fetch_params(0, 3, 0, &function, &alias, &parameters);
@@ -1948,28 +1919,12 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 		return;
 	}
 
-	PHALCON_STR(&service_name, "modelsManager");
+	PHALCON_STR(&service_name, ISV(modelsManager));
 
 	PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service_name);
 
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
-
-	/**
-	 * Builds a query with the passed parameters
-	 */
-	PHALCON_STR(&service_name, "modelsQueryBuilder");
-
-	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
-	if (zend_is_true(&has)) {
-		array_init(&service_params);
-
-		phalcon_array_append(&service_params, &params, PH_COPY);
-
-		PHALCON_CALL_METHODW(&builder, &dependency_injector, "get", &service_name, &service_params);
-	} else {
-		object_init_ex(&builder, phalcon_mvc_model_query_builder_ce);
-		PHALCON_CALL_METHODW(NULL, &builder, "__construct", &params);
-	}
+	PHALCON_CALL_METHODW(&builder, &manager, "createbuilder", &params);
 
 	PHALCON_CALL_METHODW(NULL, &builder, "columns", &columns);
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
@@ -6464,8 +6419,8 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
  */
 PHP_METHOD(Phalcon_Mvc_Model, remove){
 
-	zval *parameters = NULL, dependency_injector = {}, service_name = {}, has = {}, model_name = {}, manager = {}, model = {}, write_connection = {}, schema = {}, source = {}, delete_conditions = {};
-	zval bind_params = {}, bind_types = {}, service_params = {}, query = {}, phql = {}, intermediate = {}, dialect = {}, table_conditions = {}, where_conditions = {}, where_expression = {}, success = {};
+	zval *parameters = NULL, dependency_injector = {}, service_name = {}, model_name = {}, manager = {}, model = {}, write_connection = {}, schema = {}, source = {}, delete_conditions = {};
+	zval bind_params = {}, bind_types = {}, query = {}, phql = {}, intermediate = {}, dialect = {}, table_conditions = {}, where_conditions = {}, where_expression = {}, success = {};
 
 	phalcon_fetch_params(0, 1, 0, &parameters);
 
@@ -6481,7 +6436,7 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 	}
 
 	phalcon_get_called_class(&model_name);
-	PHALCON_STR(&service_name, "modelsManager");
+	PHALCON_STR(&service_name, ISV(modelsManager));
 
 	PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service_name);
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
@@ -6524,19 +6479,7 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 		PHALCON_CONCAT_SV(&phql, "DELETE FROM ", &model_name);
 	}
 
-	PHALCON_STR(&service_name, "modelsQuery");
-
-	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
-	if (zend_is_true(&has)) {
-		array_init(&service_params);
-		phalcon_array_append(&service_params, &phql, PH_COPY);
-		phalcon_array_append(&service_params, &dependency_injector, PH_COPY);
-
-		PHALCON_CALL_METHODW(&query, &dependency_injector, "get", &service_name, &service_params);
-	} else {
-		object_init_ex(&query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHODW(NULL, &query, "__construct", &phql, &dependency_injector);
-	}
+	PHALCON_CALL_METHODW(&query, &manager, "createquery", &phql);
 
 	PHALCON_CALL_METHODW(&intermediate, &query, "parse");
 	PHALCON_CALL_METHODW(&write_connection, getThis(), "getwriteconnection", &intermediate, &bind_params, &bind_types);

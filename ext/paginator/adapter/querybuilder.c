@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	}
 
 	/* Get the connection through the model */
-	ZVAL_STRING(&service_name, "modelsManager");
+	ZVAL_STRING(&service_name, ISV(modelsManager));
 
 	PHALCON_CALL_METHODW(&models_manager, &dependency_injector, "getshared", &service_name);
 	if (Z_TYPE(models_manager) != IS_OBJECT) {

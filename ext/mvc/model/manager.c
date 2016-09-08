@@ -40,6 +40,8 @@
 #include "kernel/hash.h"
 #include "kernel/framework/orm.h"
 
+#include "interned-strings.h"
+
 /**
  * Phalcon\Mvc\Model\Manager
  *
@@ -2353,7 +2355,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 	/** 
 	 * Create a query
 	 */
-	PHALCON_STR(&service_name, "modelsQuery");
+	PHALCON_STR(&service_name, ISV(modelsQuery));
 
 	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -2382,7 +2384,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 
-	zval *phql, *placeholders = NULL, *types = NULL, dependency_injector = {}, service_name = {}, has = {}, parameters = {}, query = {};
+	zval *phql, *placeholders = NULL, *types = NULL, query = {};
 
 	phalcon_fetch_params(0, 1, 2, &phql, &placeholders, &types);
 
@@ -2394,28 +2396,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 		types = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (1)");
-		return;
-	}
-
-	/** 
-	 * Create a query
-	 */
-	PHALCON_STR(&service_name, "modelsQuery");
-
-	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
-	if (zend_is_true(&has)) {
-		array_init(&parameters);
-		phalcon_array_append(&parameters, phql, PH_COPY);
-		phalcon_array_append(&parameters, &dependency_injector, PH_COPY);
-
-		PHALCON_CALL_METHODW(&query, &dependency_injector, "get", &service_name, &parameters);
-	} else {
-		object_init_ex(&query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHODW(NULL, &query, "__construct", phql, &dependency_injector);
-	}
+	PHALCON_CALL_METHODW(&query, getThis(), "createquery", phql);
 
 	phalcon_update_property_zval(getThis(), SL("_lastQuery"), &query);
 
@@ -2433,32 +2414,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 
-	zval *params = NULL, dependency_injector = {}, service = {}, service_params = {}, builder = {};
+	zval *params = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &params);
 
-	if (!params) {
-		params = &PHALCON_GLOBAL(z_null);
+	if (params) {
+		PHALCON_CALL_CE_STATICW(return_value, phalcon_mvc_model_query_builder_ce, "createselectbuilder", params);
+	} else {
+		PHALCON_CALL_CE_STATICW(return_value, phalcon_mvc_model_query_builder_ce, "createselectbuilder");
 	}
-
-	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injection object is required to access ORM services (2)");
-		return;
-	}
-
-	/** 
-	 * Create a query builder
-	 */
-	PHALCON_STR(&service, "modelsQueryBuilder");
-
-	array_init(&service_params);
-	phalcon_array_append(&service_params, params, PH_COPY);
-	phalcon_array_append(&service_params, &dependency_injector, PH_COPY);
-
-	PHALCON_CALL_METHODW(&builder, &dependency_injector, "get", &service, &service_params);
-
-	RETURN_CTORW(&builder);
 }
 
 /**

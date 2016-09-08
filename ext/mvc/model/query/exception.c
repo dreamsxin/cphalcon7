@@ -17,13 +17,24 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_MVC_MODEL_QUERY_BUILDERINTERFACE_H
-#define PHALCON_MVC_MODEL_QUERY_BUILDERINTERFACE_H
+#include "mvc/model/query/exception.h"
+#include "mvc/model/exception.h"
+#include "kernel/main.h"
 
-#include "php_phalcon.h"
+/**
+ * Phalcon\Mvc\Model\Query\Exception
+ *
+ * Exceptions thrown in Phalcon\Mvc\Model\Query\* classes will use this class
+ *
+ */
+zend_class_entry *phalcon_mvc_model_query_exception_ce;
 
-extern zend_class_entry *phalcon_mvc_model_query_builderinterface_ce;
+/**
+ * Phalcon\Mvc\Model\Query\Exception initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Exception){
 
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_BuilderInterface);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Query, Exception, mvc_model_query_exception, phalcon_mvc_model_exception_ce, NULL, 0);
 
-#endif /* PHALCON_MVC_MODEL_QUERY_BUILDERINTERFACE_H */
+	return SUCCESS;
+}

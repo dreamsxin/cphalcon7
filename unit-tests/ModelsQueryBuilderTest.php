@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-use Phalcon\Mvc\Model\Query\Builder as Builder;
+use Phalcon\Mvc\Model\Query\Builder\Select as Builder;
 
 class ModelsQueryBuilderTest extends PHPUnit_Framework_TestCase
 {
@@ -52,14 +52,6 @@ class ModelsQueryBuilderTest extends PHPUnit_Framework_TestCase
 		$di->set('modelsManager', function(){
 			return new Phalcon\Mvc\Model\Manager();
 		});
-
-		$di->set('modelsMetadata', function(){
-			return new Phalcon\Mvc\Model\Metadata\Memory();
-		});
-
-		$di->set('modelsQuery', 'Phalcon\Mvc\Model\Query');
-		$di->set('modelsQueryBuilder', 'Phalcon\Mvc\Model\Query\Builder');
-		$di->set('modelsCriteria', 'Phalcon\\Mvc\\Model\\Criteria');
 
 		$di->set('db', function(){
 			require 'unit-tests/config.db.php';

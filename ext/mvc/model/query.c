@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 		/**
 		 * Obtain the models-metadata service from the DI
 		 */
-		PHALCON_STR(&service_name, "modelsManager");
+		PHALCON_STR(&service_name, ISV(modelsManager));
 		PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name);
 	
 		if (Z_TYPE(service) != IS_OBJECT) {
@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 			return;
 		}
 
-		PHALCON_STR(&service_name, "modelsMetadata");
+		PHALCON_STR(&service_name, ISV(modelsMetadata));
 
 		PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
@@ -3694,7 +3694,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		/** 
 		 * Simple resultsets contains only complete objects
 		 */
-		PHALCON_STR(&service_name, "modelsResultsetSimple");
+		PHALCON_STR(&service_name, ISV(modelsResultsetSimple));
 
 		PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
@@ -3715,7 +3715,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		/** 
 		 * Complex resultsets may contain complete objects and scalars
 		 */
-		PHALCON_STR(&service_name, "modelsResultsetComplex");
+		PHALCON_STR(&service_name, ISV(modelsResultsetComplex));
 
 		PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
@@ -4019,7 +4019,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getRelatedRecords){
 	/** 
 	 * We create another Phalcon\Mvc\Model\Query to get the related records
 	 */
-	PHALCON_STR(&service_name, "modelsQuery");
+	PHALCON_STR(&service_name, ISV(modelsQuery));
 
 	PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {

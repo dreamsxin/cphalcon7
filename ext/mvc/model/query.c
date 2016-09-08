@@ -318,42 +318,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getPhql){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 
-	zval manager = {}, dependency_injector = {}, service_name = {}, has = {}, service = {};
+	zval manager = {}, service_name = {}, service = {};
 
 	phalcon_read_property(&manager, getThis(), SL("_modelsManager"), PH_NOISY);
 	if (Z_TYPE(manager) == IS_OBJECT) {
 		RETURN_CTORW(&manager);
 	} else {
 		/**
-		 * Check if the DI is valid
+		 * Obtain the models-metadata service from the DI
 		 */
-		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
-		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		PHALCON_STR(&service_name, "modelsManager");
+		PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name);
+	
+		if (Z_TYPE(service) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsMetadata' is not valid");
 			return;
 		}
 
-		PHALCON_STR(&service_name, "modelsManager");
-		PHALCON_CALL_METHODW(&has, &dependency_injector, "has", &service_name);
-		if (zend_is_true(&has)) {
-			/**
-			 * Obtain the models-metadata service from the DI
-			 */
-			PHALCON_CALL_METHODW(&service, &dependency_injector, "getshared", &service_name);
-			if (Z_TYPE(service) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsMetadata' is not valid");
-				return;
-			}
-
-			PHALCON_VERIFY_INTERFACEW(&service, phalcon_mvc_model_managerinterface_ce);
-		} else {
-			object_init_ex(&service, phalcon_mvc_model_manager_ce);
-		}
-
-		/**
-		 * Update the models-metada property
-		 */
-		phalcon_update_property_zval(getThis(), SL("_modelsManager"), &service);
+		PHALCON_VERIFY_INTERFACEW(&service, phalcon_mvc_model_managerinterface_ce);
 
 		RETURN_CTORW(&service);
 	}

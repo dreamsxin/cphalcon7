@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 	}
 
 	if ((constant = zend_get_constant_str(SL("CURLOPT_USERAGENT"))) != NULL) {
-		phalcon_array_update_zval_string(&options, constant, SL("Phalcon HTTP Client(Curl)"), PH_COPY);
+		phalcon_array_update_zval_str(&options, constant, SL("Phalcon HTTP Client(Curl)"), PH_COPY);
 	}
 
 	PHALCON_CALL_FUNCTIONW(NULL, "curl_setopt_array", &curl, &options);

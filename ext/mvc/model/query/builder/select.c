@@ -193,7 +193,6 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Select){
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_columns"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_models"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_joins"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_conditions"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_group"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_having"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_order"), ZEND_ACC_PROTECTED);
@@ -201,10 +200,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Select){
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_offset"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_forUpdate"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_sharedLock"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_bindParams"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_bindTypes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_distinct"), ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_mvc_model_query_builder_select_ce, SL("_hiddenParamNumber"), 0, ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_model_query_builder_select_ce, 1, phalcon_mvc_model_query_builderinterface_ce);
 

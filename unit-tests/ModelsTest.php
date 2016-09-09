@@ -91,17 +91,6 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		$di = $this->_getDI(function(){
 			require 'unit-tests/config.db.php';
 			$db = new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
-		/*
-			$em = new \Phalcon\Events\Manager();
-			$em->attach('db', function($event, $connection) {
-				if ($event->getType() == 'beforeQuery') {
-					echo $connection->getSQLStatement(), PHP_EOL;
-					print_r($connection->getSQLVariables());
-				}
-			});
-
-			$db->setEventsManager($em);
-		*/
 			return $db;
 		});
 

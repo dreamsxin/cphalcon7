@@ -44,7 +44,7 @@ class AclTest extends PHPUnit_Framework_TestCase
 		foreach ($resources as $resource => $actions) {
 			$acl->addResource(new \Phalcon\Acl\Resource($resource), $actions);
 		}
-/*		
+
 		$this->assertFalse($acl->isAllowed('Admin', 'welcome', 'index'));
 		$this->assertFalse($acl->isAllowed('Admin', 'welcome', 'about'));
 
@@ -69,7 +69,7 @@ class AclTest extends PHPUnit_Framework_TestCase
 		foreach ($roles as $role => $object) {
 			$this->assertFalse($acl->isAllowed($role, 'welcome', 'about'));
 		}
-*/
+
 		$acl->allow("*", "welcome", "index");
 
 		foreach ($roles as $role => $object) {
@@ -81,17 +81,12 @@ class AclTest extends PHPUnit_Framework_TestCase
 		foreach ($roles as $role => $object) {
 			$this->assertFalse($acl->isAllowed($role, 'welcome', 'index'));
 		}
-/*		
+
 		$acl->allow('Admin', '*', 'index');
 
 		foreach ($resources as $resource => $actions) {
-			$this->assertTrue($acl->isAllowed('admin', $resource, 'index'));
+			$this->assertTrue($acl->isAllowed('Admin', $resource, 'index'));
 		}
-
-		$acl->allow('*', '*', 'index');
-
-		$acl->allow('*', '*', '*');
-*/
 	}
 
 	public function testIssues1513()

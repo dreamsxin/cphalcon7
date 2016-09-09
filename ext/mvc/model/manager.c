@@ -2414,14 +2414,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 
-	zval *params = NULL;
+	zval *params = NULL, *_type = NULL, type = {};
 
-	phalcon_fetch_params(0, 0, 1, &params);
+	phalcon_fetch_params(0, 0, 2, &params, &_type);
+
+	if (!_type) {
+		phalcon_get_class_constant(&type, phalcon_mvc_model_query_ce, SL("TYPE_SELECT"));
+	} else {
+		PHALCON_CPY_WRT(&type, _type);
+	}
 
 	if (params) {
-		PHALCON_CALL_CE_STATICW(return_value, phalcon_mvc_model_query_builder_ce, "createselectbuilder", params);
+		PHALCON_CALL_CE_STATICW(return_value, phalcon_mvc_model_query_builder_ce, "create", &type, params);
 	} else {
-		PHALCON_CALL_CE_STATICW(return_value, phalcon_mvc_model_query_builder_ce, "createselectbuilder");
+		PHALCON_CALL_CE_STATICW(return_value, phalcon_mvc_model_query_builder_ce, "create", &type);
 	}
 }
 

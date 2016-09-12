@@ -82,8 +82,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior);
-PHP_METHOD(Phalcon_Mvc_Model_Manager, keepSnapshots);
-PHP_METHOD(Phalcon_Mvc_Model_Manager, isKeepingSnapshots);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne);
@@ -176,15 +174,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_manager_getwriteconnectionservi
 	ZEND_ARG_INFO(0, model)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_manager_keepsnapshots, 0, 0, 2)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, keepSnapshots)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_manager_iskeepingsnapshots, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_manager_usedynamicupdate, 0, 0, 2)
 	ZEND_ARG_INFO(0, model)
 	ZEND_ARG_INFO(0, dynamicUpdate)
@@ -267,8 +256,6 @@ static const zend_function_entry phalcon_mvc_model_manager_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Manager, notifyEvent, arginfo_phalcon_mvc_model_managerinterface_notifyevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, missingMethod, arginfo_phalcon_mvc_model_managerinterface_missingmethod, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, addBehavior, arginfo_phalcon_mvc_model_managerinterface_addbehavior, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Manager, keepSnapshots, arginfo_phalcon_mvc_model_manager_keepsnapshots, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Manager, isKeepingSnapshots, arginfo_phalcon_mvc_model_manager_iskeepingsnapshots, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, useDynamicUpdate, arginfo_phalcon_mvc_model_manager_usedynamicupdate, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate, arginfo_phalcon_mvc_model_manager_isusingdynamicupdate, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, addHasOne, arginfo_phalcon_mvc_model_managerinterface_addhasone, ZEND_ACC_PUBLIC)
@@ -331,7 +318,6 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Manager){
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_lastInitialized"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_lastQuery"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_reusable"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_keepSnapshots"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_dynamicUpdate"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_namespaceAliases"), ZEND_ACC_PROTECTED);
 
@@ -965,44 +951,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
 }
 
 /**
- * Sets if a model must keep snapshots
- *
- * @param Phalcon\Mvc\Model $model
- * @param boolean $keepSnapshots
- */
-PHP_METHOD(Phalcon_Mvc_Model_Manager, keepSnapshots){
-
-	zval *model, *keep_snapshots, entity_name = {};
-
-	phalcon_fetch_params(0, 2, 0, &model, &keep_snapshots);
-
-	phalcon_get_class(&entity_name, model, 1);
-	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), &entity_name, keep_snapshots);
-}
-
-/**
- * Checks if a model is keeping snapshots for the queried records
- *
- * @return boolean
- */
-PHP_METHOD(Phalcon_Mvc_Model_Manager, isKeepingSnapshots){
-
-	zval *model, keep_snapshots = {}, entity_name = {}, is_keeping = {};
-
-	phalcon_fetch_params(0, 1, 0, &model);
-
-	phalcon_read_property(&keep_snapshots, getThis(), SL("_keepSnapshots"), PH_NOISY);
-	if (Z_TYPE(keep_snapshots) == IS_ARRAY) {
-		phalcon_get_class(&entity_name, model, 1);
-		if (phalcon_array_isset_fetch(&is_keeping, &keep_snapshots, &entity_name, 0)) {
-			RETURN_CTORW(&is_keeping);
-		}
-	}
-
-	RETURN_TRUE;
-}
-
-/**
  * Sets if a model must use dynamic update instead of the all-field update
  *
  * @param Phalcon\Mvc\Model $model
@@ -1016,7 +964,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
 
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_dynamicUpdate"), &entity_name, dynamic_update);
-	phalcon_update_property_array(getThis(), SL("_keepSnapshots"), &entity_name, dynamic_update);
 }
 
 /**

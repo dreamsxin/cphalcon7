@@ -6940,24 +6940,23 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 		$expected = array(
 			'model' => 'Robots',
 			'table' => 'robots',
+			'fields' => array(
+				0 => 'id',
+				1 => 'name',
+				2 => 'type',
+				3 => 'year'
+			),
 			'values' => array(
 				array(
-					'type' => 322,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => 'NULL',
 					),
-				),
-				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'some robot',
+						'value' => '\'some robot\'',
 					),
-				),
-				array(
-					'type' => 258,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => '1945',
 					),
@@ -6971,24 +6970,23 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 		$expected = array(
 			'model' => 'robots',
 			'table' => 'robots',
+			'fields' => array(
+				0 => 'id',
+				1 => 'name',
+				2 => 'type',
+				3 => 'year'
+			),
 			'values' => array(
 				array(
-					'type' => 322,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => 'NULL',
 					),
-				),
-				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'some robot',
+						'value' => '\'some robot\'',
 					),
-				),
-				array(
-					'type' => 258,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => '1945',
 					),
@@ -7002,31 +7000,27 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 		$expected = array(
 			'model' => 'Some\\Products',
 			'table' => 'le_products',
+			'fields' => array(
+				0 => 'id',
+				1 => 'name',
+				2 => 'type',
+				3 => 'price'
+			),
 			'values' => array(
 				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'Some name',
+						'value' => '\'Some name\'',
 					),
-				),
-				array(
-					'type' => 259,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => '100.15',
 					),
-				),
-				array(
-					'type' => 350,
-					'value' => array(
+					array(
 						'type' => 'functionCall',
 						'name' => 'current_date',
 					),
-				),
-				array(
-					'type' => 350,
-					'value' => array(
+					array(
 						'type' => 'functionCall',
 						'name' => 'now',
 					),
@@ -7040,10 +7034,15 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 		$expected = array(
 			'model' => 'Robots',
 			'table' => 'robots',
+			'fields' => array(
+				0 => 'id',
+				1 => 'name',
+				2 => 'type',
+				3 => 'year'
+			),
 			'values' => array(
 				array(
-					'type' => 356,
-					'value' => array(
+					array(
 						'type' => 'parentheses',
 						'left' => array(
 							'type' => 'binary-op',
@@ -7066,10 +7065,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 							),
 						),
 					),
-				),
-				array(
-					'type' => 350,
-					'value' => array(
+					array(
 						'type' => 'functionCall',
 						'name' => 'CONCAT',
 						'arguments' => array(
@@ -7083,10 +7079,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 							),
 						),
 					),
-				),
-				array(
-					'type' => 258,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => '2011',
 					),
@@ -7107,22 +7100,15 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 			),
 			'values' => array(
 				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'a name',
+						'value' => '\'a name\'',
 					),
-				),
-				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'virtual',
+						'value' => '\'virtual\'',
 					),
-				),
-				array(
-					'type' => 292,	// PHQL_T_NPLACEHOLDER
-					'value' => array(
+					array(						
 						'type' => 'placeholder',
 						'value' => ':0',
 					),
@@ -7136,24 +7122,23 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 		$expected = array(
 			'model' => 'Robotters',
 			'table' => 'robots',
+			'fields' => array(
+				0 => 'id',
+				1 => 'name',
+				2 => 'type',
+				3 => 'year'
+			),
 			'values' => array(
 				array(
-					'type' => 322,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => 'NULL',
 					),
-				),
-				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'some robot',
+						'value' => '\'some robot\'',
 					),
-				),
-				array(
-					'type' => 258,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => '1945',
 					),
@@ -7167,24 +7152,23 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 		$expected = array(
 			'model' => 'robotters',
 			'table' => 'robots',
+			'fields' => array(
+				0 => 'id',
+				1 => 'name',
+				2 => 'type',
+				3 => 'year'
+			),
 			'values' => array(
 				array(
-					'type' => 322,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => 'NULL',
 					),
-				),
-				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'some robot',
+						'value' => '\'some robot\'',
 					),
-				),
-				array(
-					'type' => 258,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => '1945',
 					),
@@ -7198,10 +7182,15 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 		$expected = array(
 			'model' => 'Robotters',
 			'table' => 'robots',
+			'fields' => array(
+				0 => 'id',
+				1 => 'name',
+				2 => 'type',
+				3 => 'year'
+			),
 			'values' => array(
 				array(
-					'type' => 356,
-					'value' => array(
+					array(
 						'type' => 'parentheses',
 						'left' => array(
 							'type' => 'binary-op',
@@ -7224,10 +7213,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 							),
 						),
 					),
-				),
-				array(
-					'type' => 350,
-					'value' => array(
+					array(
 						'type' => 'functionCall',
 						'name' => 'CONCAT',
 						'arguments' => array(
@@ -7241,10 +7227,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 							),
 						),
 					),
-				),
-				array(
-					'type' => 258,
-					'value' => array(
+					array(
 						'type' => 'literal',
 						'value' => '2011',
 					),
@@ -7259,28 +7242,21 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 			'model' => 'Robotters',
 			'table' => 'robots',
 			'fields' => array(
-				'theName',
-				'theType',
-				'theYear',
+				'name',
+				'type',
+				'year',
 			),
 			'values' => array(
 				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'a name',
+						'value' => '\'a name\'',
 					),
-				),
-				array(
-					'type' => 260,
-					'value' => array(
+					array(
 						'type' => 'literal',
-						'value' => 'virtual',
+						'value' => '\'virtual\'',
 					),
-				),
-				array(
-					'type' => 292,	// PHQL_T_NPLACEHOLDER
-					'value' => array(
+					array(
 						'type' => 'placeholder',
 						'value' => ':0',
 					),
@@ -7322,7 +7298,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),
@@ -7351,7 +7327,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),
@@ -7380,7 +7356,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),
@@ -7413,7 +7389,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),
@@ -7448,7 +7424,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 				array(
@@ -7494,7 +7470,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 				array(
@@ -7536,7 +7512,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 				array(
@@ -7598,7 +7574,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 				array(
@@ -7654,7 +7630,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),
@@ -7707,7 +7683,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 				array(
@@ -7789,7 +7765,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),
@@ -7828,7 +7804,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),
@@ -7867,7 +7843,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),
@@ -7921,7 +7897,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 					'type' => 260,
 					'value' => array(
 						'type' => 'literal',
-						'value' => 'some name',
+						'value' => '\'some name\'',
 					),
 				),
 			),

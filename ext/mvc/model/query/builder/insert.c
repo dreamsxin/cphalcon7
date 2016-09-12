@@ -16,7 +16,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "mvc/model/query/builder/select.h"
+#include "mvc/model/query/builder/insert.h"
 #include "mvc/model/query/builder.h"
 #include "mvc/model/query/builderinterface.h"
 #include "mvc/model/exception.h"
@@ -44,7 +44,7 @@
 #include "interned-strings.h"
 
 /**
- * Phalcon\Mvc\Model\Query\Builder\Select
+ * Phalcon\Mvc\Model\Query\Builder\Insert
  *
  *<code>
  *$resultset = $this->modelsManager->createBuilder()
@@ -56,159 +56,63 @@
  *   ->execute();
  *</code>
  */
-zend_class_entry *phalcon_mvc_model_query_builder_select_ce;
+zend_class_entry *phalcon_mvc_model_query_builder_insert_ce;
 
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, distinct);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getDistinct);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, columns);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getColumns);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, addFrom);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getFrom);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, join);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, innerJoin);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, leftJoin);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, rightJoin);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, where);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, andWhere);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, orWhere);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, betweenWhere);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, notBetweenWhere);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, inWhere);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, notInWhere);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getWhere);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, orderBy);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getOrderBy);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, having);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getHaving);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, limit);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getLimit);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, offset);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getOffset);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, groupBy);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy);
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, __construct);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, table);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getTable);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, columns);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getColumns);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, values);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getValues);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select___construct, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_insert___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, params)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_distinct, 0, 0, 1)
-	ZEND_ARG_INFO(0, distinct)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_insert_table, 0, 0, 1)
+	ZEND_ARG_INFO(0, table)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_columns, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_insert_columns, 0, 0, 1)
 	ZEND_ARG_INFO(0, columns)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_from, 0, 0, 1)
-	ZEND_ARG_INFO(0, models)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_insert_values, 0, 0, 1)
+	ZEND_ARG_INFO(0, values)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_addfrom, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, alias)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_join, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, conditions)
-	ZEND_ARG_INFO(0, alias)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_innerjoin, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, conditions)
-	ZEND_ARG_INFO(0, alias)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_leftjoin, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, conditions)
-	ZEND_ARG_INFO(0, alias)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_rightjoin, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, conditions)
-	ZEND_ARG_INFO(0, alias)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_orderby, 0, 0, 1)
-	ZEND_ARG_INFO(0, orderBy)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_having, 0, 0, 1)
-	ZEND_ARG_INFO(0, having)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_limit, 0, 0, 1)
-	ZEND_ARG_INFO(0, limit)
-	ZEND_ARG_INFO(0, offset)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_offset, 0, 0, 1)
-	ZEND_ARG_INFO(0, offset)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_groupby, 0, 0, 1)
-	ZEND_ARG_INFO(0, group)
-ZEND_END_ARG_INFO()
-
-static const zend_function_entry phalcon_mvc_model_query_builder_select_method_entry[] = {
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, __construct, arginfo_phalcon_mvc_model_query_builder_select___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, distinct, arginfo_phalcon_mvc_model_query_builder_select_distinct, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getDistinct, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, columns, arginfo_phalcon_mvc_model_query_builder_select_columns, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getColumns, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, from, arginfo_phalcon_mvc_model_query_builder_select_from, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, addFrom, arginfo_phalcon_mvc_model_query_builder_select_addfrom, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getFrom, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, join, arginfo_phalcon_mvc_model_query_builder_select_join, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, innerJoin, arginfo_phalcon_mvc_model_query_builder_select_innerjoin, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, leftJoin, arginfo_phalcon_mvc_model_query_builder_select_leftjoin, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, rightJoin, arginfo_phalcon_mvc_model_query_builder_select_rightjoin, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, orderBy, arginfo_phalcon_mvc_model_query_builder_select_orderby, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getOrderBy, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, having, arginfo_phalcon_mvc_model_query_builder_select_having, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getHaving, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, limit, arginfo_phalcon_mvc_model_query_builder_select_limit, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getLimit, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, offset, arginfo_phalcon_mvc_model_query_builder_select_offset, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getOffset, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, groupBy, arginfo_phalcon_mvc_model_query_builder_select_groupby, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, _compile, NULL, ZEND_ACC_PUBLIC)
+static const zend_function_entry phalcon_mvc_model_query_builder_insert_method_entry[] = {
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, __construct, arginfo_phalcon_mvc_model_query_builder_insert___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, table, arginfo_phalcon_mvc_model_query_builder_insert_table, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getTable, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, columns, arginfo_phalcon_mvc_model_query_builder_insert_columns, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getColumns, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, values, arginfo_phalcon_mvc_model_query_builder_insert_values, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getValues, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, _compile, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Mvc\Model\Query\Builder\Select initializer
+ * Phalcon\Mvc\Model\Query\Builder\Insert initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Select){
+PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Insert){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Query\\Builder, Select, mvc_model_query_builder_select, phalcon_mvc_model_query_builder_ce, phalcon_mvc_model_query_builder_select_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Query\\Builder, Select, mvc_model_query_builder_insert, phalcon_mvc_model_query_builder_ce, phalcon_mvc_model_query_builder_insert_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_columns"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_models"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_joins"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_group"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_having"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_order"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_limit"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_offset"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_forUpdate"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_sharedLock"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_distinct"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_insert_ce, SL("_table"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_insert_ce, SL("_columns"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_insert_ce, SL("_values"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_query_builder_select_ce, 1, phalcon_mvc_model_query_builderinterface_ce);
+	zend_class_implements(phalcon_mvc_model_query_builder_insert_ce, 1, phalcon_mvc_model_query_builderinterface_ce);
 
 	return SUCCESS;
 }
 
 /**
- * Phalcon\Mvc\Model\Query\Builder\Select constructor
+ * Phalcon\Mvc\Model\Query\Builder\Insert constructor
  *
  *<code>
  * $params = array(
@@ -229,16 +133,20 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Select){
  *    'offset'     => 20,
  *    // or 'limit' => array(20, 20),
  *);
- *$queryBuilder = new Phalcon\Mvc\Model\Query\Builder\Select($params);
+ *$queryBuilder = new Phalcon\Mvc\Model\Query\Builder\Insert($params);
  *</code> 
  *
  * @param array $params
  * @param Phalcon\DI $dependencyInjector
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, __construct){
 
-	zval *params = NULL, *dependency_injector = NULL, conditions = {}, bind_params = {}, bind_types = {}, models = {}, columns = {}, group_clause = {}, joins = {};
+	zval *params = NULL, *dependency_injector = NULL, conditions = {}, *single_condition_array;
+	zval merged_conditions = {}, merged_bind_params = {}, merged_bind_types = {}, new_condition_string = {};
+	zval current_bind_params = {}, current_bind_types = {}, bind_params = {}, bind_types = {}, models = {}, columns = {}, group_clause = {}, joins = {};
 	zval having_clause = {}, order_clause = {}, limit_clause = {}, offset_clause = {}, limit = {}, offset = {}, for_update = {}, shared_lock = {};
+	zend_string *str_key;
+	ulong idx;
 
 	phalcon_fetch_params(0, 0, 2, &params, &dependency_injector);
 
@@ -268,104 +176,26 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 				PHALCON_CALL_METHODW(NULL, getThis(), "setbindtypes", &bind_types);
 			}
 		}
-
-		/** 
-		 * Assign 'FROM' clause
-		 */
-		if (phalcon_array_isset_fetch_str(&models, params, SL("models"))) {
-			phalcon_update_property_zval(getThis(), SL("_models"), &models);
-		}
-
-		/** 
-		 * Assign COLUMNS clause
-		 */
-		if (phalcon_array_isset_fetch_str(&columns, params, SL("columns"))) {
-			phalcon_update_property_zval(getThis(), SL("_columns"), &columns);
-		}
-
-		/**
-		 * Assign JOIN clause
-		 */
-		if (phalcon_array_isset_fetch_str(&joins, params, SL("joins"))) {
-			phalcon_update_property_zval(getThis(), SL("_joins"), &joins);
-		}
-
-		/** 
-		 * Assign GROUP clause
-		 */
-		if (phalcon_array_isset_fetch_str(&group_clause, params, SL("group"))) {
-			phalcon_update_property_zval(getThis(), SL("_group"), &group_clause);
-		}
-
-		/** 
-		 * Assign HAVING clause
-		 */
-		if (phalcon_array_isset_fetch_str(&having_clause, params, SL("having"))) {
-			phalcon_update_property_zval(getThis(), SL("_having"), &having_clause);
-		}
-
-		/** 
-		 * Assign ORDER clause
-		 */
-		if (phalcon_array_isset_fetch_str(&order_clause, params, SL("order"))) {
-			phalcon_update_property_zval(getThis(), SL("_order"), &order_clause);
-		}
-
-		/** 
-		 * Assign LIMIT clause
-		 */
-		if (phalcon_array_isset_fetch_str(&limit_clause, params, SL("limit"))) {
-			if (Z_TYPE(limit_clause) == IS_ARRAY
-				&& phalcon_array_isset_fetch_long(&limit, &limit_clause, 0)
-				&& phalcon_array_isset_fetch_long(&offset, &limit_clause, 1)
-			) {
-				phalcon_update_property_zval(getThis(), SL("_limit"), &limit);
-				phalcon_update_property_zval(getThis(), SL("_offset"), &offset);
-			} else {
-				phalcon_update_property_zval(getThis(), SL("_limit"), &limit_clause);
-			}
-		}
-
-		/** 
-		 * Assign OFFSET clause
-		 */
-		if (phalcon_array_isset_fetch_str(&offset_clause, params, SL("offset"))) {
-			phalcon_update_property_zval(getThis(), SL("_offset"), &offset_clause);
-		}
-
-		/** 
-		 * Assign FOR UPDATE clause
-		 */
-		if (phalcon_array_isset_fetch_str(&for_update, params, SL("for_update"))) {
-			phalcon_update_property_zval(getThis(), SL("_forUpdate"), &for_update);
-		}
-
-		/** 
-		 * Assign SHARED LOCK clause
-		 */
-		if (phalcon_array_isset_fetch_str(&shared_lock, params, SL("shared_lock"))) {
-			phalcon_update_property_zval(getThis(), SL("_sharedLock"), &shared_lock);
-		}
 	}
 }
 
 /**
- * Sets SELECT DISTINCT / SELECT ALL flag
+ * Sets the table to insert into.
  *
- * @param bool|null distinct
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @param string table
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, distinct){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, table){
 
-	zval *distinct;
+	zval *table;
 
-	phalcon_fetch_params(0, 1, 0, &distinct);
+	phalcon_fetch_params(0, 1, 0, &table);
 
-	if (Z_TYPE_P(distinct) != IS_NULL && !PHALCON_IS_BOOL(distinct)) {
-		PHALCON_ENSURE_IS_BOOL(distinct);
+	if (Z_TYPE_P(table) != IS_STRING) {
+		PHALCON_ENSURE_IS_STRING(table);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_distinct"), distinct);
+	phalcon_update_property_zval(getThis(), SL("_table"), table);
 	RETURN_THISW();
 }
 
@@ -374,7 +204,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, distinct){
  *
  * @return bool
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getDistinct){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getDistinct){
 
 
 	RETURN_MEMBER(getThis(), "_distinct");
@@ -388,9 +218,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getDistinct){
  *</code>
  *
  * @param string|array $columns
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, columns){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, columns){
 
 	zval *columns;
 
@@ -405,7 +235,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, columns){
  *
  * @return string|array
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getColumns){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getColumns){
 
 
 	RETURN_MEMBER(getThis(), "_columns");
@@ -420,9 +250,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getColumns){
  *</code>
  *
  * @param string|array $models
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, from){
 
 	zval *models;
 
@@ -441,9 +271,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
  *
  * @param string $model
  * @param string $alias
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, addFrom){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, addFrom){
 
 	zval *model, *alias = NULL, models = {}, current_model = {};
 
@@ -483,7 +313,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, addFrom){
  *
  * @return string|array
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getFrom){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getFrom){
 
 
 	RETURN_MEMBER(getThis(), "_models");
@@ -503,9 +333,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getFrom){
  * @param string $conditions
  * @param string $alias
  * @param string $type
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, join){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, join){
 
 	zval *model, *conditions = NULL, *alias = NULL, *type = NULL, join = {};
 
@@ -544,9 +374,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, join){
  * @param string $model
  * @param string $conditions
  * @param string $alias
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, innerJoin){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, innerJoin){
 
 	zval *model, *conditions = NULL, *alias = NULL, type = {}, join = {};
 
@@ -581,9 +411,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, innerJoin){
  * @param string $model
  * @param string $conditions
  * @param string $alias
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, leftJoin){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, leftJoin){
 
 	zval *model, *conditions = NULL, *alias = NULL, type = {}, join = {};
 
@@ -618,9 +448,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, leftJoin){
  * @param string $model
  * @param string $conditions
  * @param string $alias
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, rightJoin){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, rightJoin){
 
 	zval *model, *conditions = NULL, *alias = NULL, type = {}, join = {};
 
@@ -656,9 +486,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, rightJoin){
  * @param string $conditions
  * @param array $bindParams
  * @param array $bindTypes
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, where){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, where){
 
 	zval *conditions, *bind_params = NULL, *bind_types = NULL;
 
@@ -694,9 +524,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, where){
  * @param string $conditions
  * @param array $bindParams
  * @param array $bindTypes
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, andWhere){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, andWhere){
 
 	zval *conditions, *bind_params = NULL, *bind_types = NULL, current_conditions = {}, new_conditions = {}, current_bind_params = {}, merged_params = {};
 	zval current_bind_types = {}, merged_types = {};
@@ -766,9 +596,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, andWhere){
  * @param string $conditions
  * @param array $bindParams
  * @param array $bindTypes
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, orWhere){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, orWhere){
 
 	zval *conditions, *bind_params = NULL, *bind_types = NULL, current_conditions = {}, new_conditions = {}, current_bind_params = {}, merged_params = {};
 	zval current_bind_types = {}, merged_types = {};
@@ -838,9 +668,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, orWhere){
  * @param mixed $minimum
  * @param mixed $maximum
  * @param boolean $useOrWhere
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, betweenWhere){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, betweenWhere){
 
 	zval *expr, *minimum, *maximum, *use_orwhere = NULL, hidden_param = {}, next_hidden_param = {}, minimum_key = {}, maximum_key = {}, conditions = {}, bind_params = {};
 
@@ -897,9 +727,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, betweenWhere){
  * @param mixed $minimum
  * @param mixed $maximum
  * @param boolean $useOrWhere
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, notBetweenWhere){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, notBetweenWhere){
 
 	zval *expr, *minimum, *maximum, *use_orwhere = NULL, hidden_param = {}, next_hidden_param = {}, minimum_key = {}, maximum_key = {}, conditions = {}, bind_params = {};
 
@@ -955,9 +785,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, notBetweenWhere){
  * @param string $expr
  * @param array $values
  * @param boolean $useOrWhere
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, inWhere){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, inWhere){
 
 	zval *expr, *values, *use_orwhere = NULL, hidden_param = {}, bind_params = {}, bind_keys = {}, *value, joined_keys = {}, conditions = {};
 
@@ -1020,9 +850,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, inWhere){
  * @param string $expr
  * @param array $values
  * @param boolean $useOrWhere
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, notInWhere){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, notInWhere){
 
 	zval *expr, *values, *use_orwhere = NULL, hidden_param = {}, bind_params = {}, bind_keys = {}, *value, joined_keys = {}, conditions = {};
 
@@ -1080,7 +910,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, notInWhere){
  *
  * @return string|array
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getWhere){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getWhere){
 
 
 	RETURN_MEMBER(getThis(), "_conditions");
@@ -1095,9 +925,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getWhere){
  *</code>
  *
  * @param string $orderBy
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, orderBy){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, orderBy){
 
 	zval *order_by;
 
@@ -1112,7 +942,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, orderBy){
  *
  * @return string|array
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getOrderBy){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getOrderBy){
 
 
 	RETURN_MEMBER(getThis(), "_order");
@@ -1126,9 +956,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getOrderBy){
  *</code>
  *
  * @param string $having
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, having){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, having){
 
 	zval *having;
 
@@ -1143,7 +973,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, having){
  *
  * @return string|array
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getHaving){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getHaving){
 
 
 	RETURN_MEMBER(getThis(), "_having");
@@ -1159,9 +989,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getHaving){
  *
  * @param int $limit
  * @param int $offset
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, limit){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, limit){
 
 	zval *limit, *offset = NULL;
 
@@ -1181,7 +1011,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, limit){
  *
  * @return string|array
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getLimit){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getLimit){
 
 
 	RETURN_MEMBER(getThis(), "_limit");
@@ -1196,9 +1026,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getLimit){
  *
  * @param int $limit
  * @param int $offset
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, offset){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, offset){
 
 	zval *offset;
 
@@ -1213,7 +1043,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, offset){
  *
  * @return string|array
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getOffset){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getOffset){
 
 
 	RETURN_MEMBER(getThis(), "_offset");
@@ -1227,9 +1057,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getOffset){
  *</code>
  *
  * @param string $group
- * @return Phalcon\Mvc\Model\Query\Builder\Select
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, groupBy){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, groupBy){
 
 	zval *group;
 
@@ -1244,7 +1074,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, groupBy){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getGroupBy){
 
 
 	RETURN_MEMBER(getThis(), "_group");
@@ -1255,7 +1085,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 
 	zval dependency_injector = {}, models = {}, *model, model_instance = {}, conditions = {}, distinct = {}, phql = {}, columns = {}, selected_columns = {};
 	zval *column, joined_columns = {}, selected_models = {}, joined_models = {}, joins = {}, *join, group = {};

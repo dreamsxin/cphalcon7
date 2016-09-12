@@ -213,6 +213,8 @@ static void phql_ret_for_update_clause(zval *ret)
 
 static void phql_ret_insert_statement(zval *ret, zval *Q, zval *F, zval *V)
 {
+	zval values, key;
+
 	array_init(ret);
 	add_assoc_long(ret, ISV(type), PHQL_T_INSERT);
 	add_assoc_zval(ret, ISV(qualifiedName), Q);
@@ -220,30 +222,14 @@ static void phql_ret_insert_statement(zval *ret, zval *Q, zval *F, zval *V)
 	if (F && Z_TYPE_P(F) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(fields), F);
 	}
-	add_assoc_zval(ret, ISV(values), V);
-}
 
-static void phql_ret_insert_statement2(zval *ret, zval *Q, zval *F, zval *V)
-{
-	zval key1, key2, rows, values;
+	ZVAL_STR(&key, IS(values));
 
-	ZVAL_STR(&key1, IS(rows));
-
-	if (!phalcon_array_isset_fetch(&rows, ret, &key1, 0)) {
-		array_init_size(&rows, 1);		
-
-		ZVAL_STR(&key2, IS(values));
-
-		if (phalcon_array_isset_fetch(&values, ret, &key2, 0)) {
-			add_next_index_zval(&rows, &values);	
-		}
+	if (!phalcon_array_isset_fetch(&values, ret, &key, 0)) {
+		array_init(&values);
 	}
-
-	add_next_index_zval(&rows, V);
-
-	add_assoc_zval(Q, ISV(rows), &rows);
-
-	ZVAL_ZVAL(ret, Q, 1, 1);
+	add_next_index_zval(&values, V);
+	add_assoc_zval(ret, ISV(values), &values);
 }
 
 static void phql_ret_update_statement(zval *ret, zval *U, zval *W, zval *L)
@@ -630,7 +616,7 @@ join_conditions(R) ::= . {
 
 /* Insert */
 insert_statement(R) ::= insert_statement(Q) COMMA PARENTHESES_OPEN values_list(V) PARENTHESES_CLOSE . {
-	phql_ret_insert_statement2(&R, &Q, NULL, &V);
+	phql_ret_insert_statement(&R, &Q, NULL, &V);
 }
 
 insert_statement(R) ::= INSERT INTO aliased_or_qualified_name(Q) VALUES PARENTHESES_OPEN values_list(V) PARENTHESES_CLOSE . {

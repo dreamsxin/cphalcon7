@@ -3882,7 +3882,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 	PHALCON_CALL_METHODW(&success, &connection, "execute", &update_sql, &processed, &processed_types);
 	if (zend_is_true(&success)) {
-		PHALCON_CALL_METHODW(&success, &connection, "affectedrows");
+		if (PHALCON_GLOBAL(orm).enable_strict) {
+			PHALCON_CALL_METHODW(&success, &connection, "affectedrows");
+		}
 	}
 
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
@@ -3986,6 +3988,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	}
 
 	PHALCON_CALL_METHODW(&success, &connection, "execute", &delete_sql, &processed, &processed_types);
+
+	if (zend_is_true(&success)) {
+		if (PHALCON_GLOBAL(orm).enable_strict) {
+			PHALCON_CALL_METHODW(&success, &connection, "affectedrows");
+		}
+	}
 
 	/** 
 	 * Create a status to report the deletion status

@@ -4362,8 +4362,8 @@ PHP_METHOD(Phalcon_Mvc_Model, update){
  */
 PHP_METHOD(Phalcon_Mvc_Model, delete){
 
-	zval event_name = {}, status = {}, check_foreign_keys = {}, bind_params = {}, bind_types = {}, conditions = {}, values = {}, meta_data = {}, primary_keys = {}, bind_data_types = {}, column_map = {};
-	zval *primary_key, write_connection = {}, delete_conditions = {}, skipped = {}, schema = {}, source = {}, table = {}, success = {};
+	zval event_name = {}, status = {}, check_foreign_keys = {},  write_connection = {}, unique_key = {}, unique_params = {}, unique_types = {};
+	zval skipped = {}, model_name = {}, phql = {}, models_manager = {}, query = {}, success = {};
 
 	phalcon_update_property_empty_array(getThis(), SL("_errorMessages"));
 
@@ -4388,85 +4388,20 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		}
 	}
 
-	array_init(&bind_params);
-	array_init(&bind_types);
-	array_init(&conditions);
-	array_init(&values);
-
-	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHODW(&primary_keys, &meta_data, "getprimarykeyattributes", getThis());
-	PHALCON_CALL_METHODW(&bind_data_types, &meta_data, "getbindtypes", getThis());
-	PHALCON_CALL_SELFW(&column_map, "getcolumnmap");
+	PHALCON_CALL_METHODW(&unique_key, getThis(), "getuniquekey");
+	PHALCON_CALL_METHODW(&unique_params, getThis(), "getuniqueparams");
+	PHALCON_CALL_METHODW(&unique_types, getThis(), "getuniquetypes");
 
 	/**
 	 * We can't create dynamic SQL without a primary key
 	 */
-	if (!phalcon_fast_count_ev(&primary_keys)) {
+	if (PHALCON_IS_EMPTY(&unique_key)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A primary key must be defined in the model in order to perform the operation");
 		return;
 	}
 
 	PHALCON_CALL_METHODW(&write_connection, getThis(), "getwriteconnection");
 
-	/**
-	 * Create a condition from the primary keys
-	 */
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(primary_keys), primary_key) {
-		zval attribute_field = {}, attribute_value = {}, exception_message = {}, escaped_field = {}, primary_condition = {}, bind_type = {};
-		/**
-		 * Every column part of the primary key must be in the bind data types
-		 */
-		if (!phalcon_array_isset(&bind_data_types, primary_key)) {
-			PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_key, "' have not defined a bind data type");
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
-			return;
-		}
-
-		/**
-		 * Take the column values based on the column map if any
-		 */
-		if (Z_TYPE(column_map) == IS_ARRAY) { 
-			if (!phalcon_array_isset_fetch(&attribute_field, &column_map, primary_key, 0)) {
-				PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_key, "' isn't part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
-				return;
-			}
-		} else {
-			PHALCON_CPY_WRT(&attribute_field, primary_key);
-		}
-
-		/**
-		 * If the attribute is currently set in the object add it to the conditions
-		 */
-		if (!phalcon_property_isset_fetch_zval(&attribute_value, getThis(), &attribute_field)) {
-			PHALCON_CONCAT_SVS(&exception_message, "Cannot delete the record because the primary key attribute: '", &attribute_field, "' wasn't set");
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
-			return;
-		}
-
-		phalcon_array_update_zval(&bind_params, &attribute_field, &attribute_value, PH_COPY);
-
-		phalcon_array_append(&values, &attribute_value, PH_COPY);
-
-		/**
-		 * Escape the column identifier
-		 */
-		PHALCON_CALL_METHODW(&escaped_field, &write_connection, "escapeidentifier", primary_key);
-
-		PHALCON_CONCAT_VS(&primary_condition, &escaped_field, " = ?");
-		phalcon_array_append(&conditions, &primary_condition, PH_COPY);
-
-		phalcon_array_fetch(&bind_type, &bind_data_types, primary_key, PH_NOISY);
-		phalcon_array_append(&bind_types, &bind_type, PH_COPY);
-
-	} ZEND_HASH_FOREACH_END();
-
-	PHALCON_CALL_METHODW(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params);
-
-	/**
-	 * Join the conditions in the array using an AND operator
-	 */
-	phalcon_fast_join_str(&delete_conditions, SL(" AND "), &conditions);
 
 	phalcon_update_property_bool(getThis(), SL("_skipped"), 0);
 
@@ -4488,43 +4423,43 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		}
 	}
 
-	PHALCON_CALL_METHODW(&schema, getThis(), "getschema");
-	PHALCON_CALL_METHODW(&source, getThis(), "getsource");
-	if (zend_is_true(&schema)) {
-		array_init_size(&table, 2);
-		phalcon_array_append(&table, &schema, PH_COPY);
-		phalcon_array_append(&table, &source, PH_COPY);
-	} else {
-		PHALCON_CPY_WRT(&table, &source);
-	}
+	phalcon_get_called_class(&model_name);
+
+	PHALCON_CONCAT_SVSV(&phql, "DELETE FROM ", &model_name, " WHERE ", &unique_key);
+
+	PHALCON_CALL_METHODW(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_CALL_METHODW(&query, &models_manager, "createquery", &phql);
+	PHALCON_CALL_METHODW(NULL, &query, "setconnection", &write_connection);
+	PHALCON_CALL_METHODW(NULL, &query, "setbindparams", &unique_params);
+	PHALCON_CALL_METHODW(NULL, &query, "setbindtypes", &unique_types);
 
 	PHALCON_CALL_METHODW(NULL, &write_connection, "begin", &PHALCON_GLOBAL(z_false));
 
-	/**
-	 * Do the deletion
-	 */
-	PHALCON_CALL_METHODW(&success, &write_connection, "delete", &table, &delete_conditions, &values, &bind_types);
-	if (zend_is_true(&success)) {
-		if (PHALCON_GLOBAL(orm).enable_strict) {
-			PHALCON_CALL_METHODW(&success, &write_connection, "affectedrows");
-			if (!zend_is_true(&success)) {
+	PHALCON_CALL_METHODW(&status, &query, "execute");
+
+	ZVAL_FALSE(&success);
+	if (Z_TYPE(status) == IS_OBJECT) {
+		PHALCON_CALL_METHODW(&success, &status, "success");
+	}
+
+	if (!zend_is_true(&success)) {
+		/**
+		 * Check if there is virtual foreign keys with cascade action
+		 */
+		if (PHALCON_GLOBAL(orm).virtual_foreign_keys) {
+			PHALCON_CALL_METHODW(&check_foreign_keys, getThis(), "_checkforeignkeysreversecascade");
+			if (PHALCON_IS_FALSE(&check_foreign_keys)) {
+				PHALCON_CALL_METHODW(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
 				RETURN_FALSE;
 			}
 		}
 	}
 
-	/**
-	 * Check if there is virtual foreign keys with cascade action
-	 */
-	if (PHALCON_GLOBAL(orm).virtual_foreign_keys) {
-		PHALCON_CALL_METHODW(&check_foreign_keys, getThis(), "_checkforeignkeysreversecascade");
-		if (PHALCON_IS_FALSE(&check_foreign_keys)) {
-			PHALCON_CALL_METHODW(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
-			RETURN_FALSE;
-		}
+	if (!zend_is_true(&success)) {
+		PHALCON_CALL_METHODW(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
+	} else {
+		PHALCON_CALL_METHODW(NULL, &write_connection, "commit", &PHALCON_GLOBAL(z_false));
 	}
-
-	PHALCON_CALL_METHODW(NULL, &write_connection, "commit", &PHALCON_GLOBAL(z_false));
 
 	/**
 	 * Force perform the record existence checking again

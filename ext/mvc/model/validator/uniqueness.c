@@ -113,9 +113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	array_init(&bind_types);
 
 	PHALCON_CALL_METHODW(&bind_data_types, &meta_data, "getbindtypes", record);
-	if (PHALCON_GLOBAL(orm).column_renaming) {
-		PHALCON_CALL_METHODW(&column_map, &meta_data, "getreversecolumnmap", record);
-	}
+	PHALCON_CALL_METHODW(&column_map, &meta_data, "getreversecolumnmap", record);
 
 	array_init(&conditions);
 	array_init(&bind_params);
@@ -207,9 +205,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 		/** 
 		 * We build a query with the primary key attributes
 		 */
-		if (PHALCON_GLOBAL(orm).column_renaming) {
-			PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", record);
-		}
+		PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", record);
 
 		PHALCON_CALL_METHODW(&primary_fields, &meta_data, "getprimarykeyattributes", record);
 

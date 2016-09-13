@@ -1,0 +1,276 @@
+/*
+  +------------------------------------------------------------------------+
+  | Phalcon Framework                                                      |
+  +------------------------------------------------------------------------+
+  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  +------------------------------------------------------------------------+
+  | This source file is subject to the New BSD License that is bundled     |
+  | with this package in the file docs/LICENSE.txt.                        |
+  |                                                                        |
+  | If you did not receive a copy of the license and are unable to         |
+  | obtain it through the world-wide-web, please send an email             |
+  | to license@phalconphp.com so we can send you a copy immediately.       |
+  +------------------------------------------------------------------------+
+  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
+  |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  +------------------------------------------------------------------------+
+*/
+
+#include "mvc/model/query/builder/update.h"
+#include "mvc/model/query/builder/where.h"
+#include "mvc/model/query/builderinterface.h"
+#include "mvc/model/query/exception.h"
+#include "mvc/model/metadatainterface.h"
+#include "mvc/model/metadata/memory.h"
+#include "mvc/model/query.h"
+#include "mvc/model/query/scanner.h"
+#include "di.h"
+#include "diinterface.h"
+#include "di/injectable.h"
+#include "db/rawvalue.h"
+
+#include "kernel/main.h"
+#include "kernel/memory.h"
+#include "kernel/array.h"
+#include "kernel/object.h"
+#include "kernel/exception.h"
+#include "kernel/fcall.h"
+#include "kernel/concat.h"
+#include "kernel/operators.h"
+#include "kernel/string.h"
+#include "kernel/file.h"
+#include "kernel/hash.h"
+#include "kernel/framework/orm.h"
+
+#include "interned-strings.h"
+
+/**
+ * Phalcon\Mvc\Model\Query\Builder\Update
+ *
+ *<code>
+ *$resultset = Phalcon\Mvc\Model\Query\Builder::createUpdateBuilder()
+ *   ->table('Robots')
+ *   ->set(array('name' => 'Google'))
+ *   ->getQuery()
+ *   ->execute();
+ *</code>
+ */
+zend_class_entry *phalcon_mvc_model_query_builder_update_ce;
+
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, __construct);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, table);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getTable);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, set);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getSet);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile);
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update___construct, 0, 0, 0)
+	ZEND_ARG_INFO(0, params)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update_table, 0, 0, 1)
+	ZEND_ARG_INFO(0, table)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update_set, 0, 0, 1)
+	ZEND_ARG_INFO(0, set)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry phalcon_mvc_model_query_builder_update_method_entry[] = {
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, __construct, arginfo_phalcon_mvc_model_query_builder_update___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, table, arginfo_phalcon_mvc_model_query_builder_update_table, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, getTable, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, set, arginfo_phalcon_mvc_model_query_builder_update_set, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, getSet, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, _compile, NULL, ZEND_ACC_PROTECTED)
+	PHP_FE_END
+};
+
+/**
+ * Phalcon\Mvc\Model\Query\Builder\Update initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Update){
+
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Query\\Builder, Update, mvc_model_query_builder_update, phalcon_mvc_model_query_builder_where_ce, phalcon_mvc_model_query_builder_update_method_entry, 0);
+
+	zend_declare_property_long(phalcon_mvc_model_query_builder_update_ce, SL("_type"), PHQL_T_UPDATE, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_update_ce, SL("_table"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_update_ce, SL("_set"), ZEND_ACC_PROTECTED);
+
+	zend_class_implements(phalcon_mvc_model_query_builder_update_ce, 1, phalcon_mvc_model_query_builderinterface_ce);
+
+	return SUCCESS;
+}
+
+/**
+ * Phalcon\Mvc\Model\Query\Builder\Update constructor
+ *
+ * @param array $params
+ * @param Phalcon\DI $dependencyInjector
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, __construct){
+
+	zval *params = NULL, *dependency_injector = NULL, conditions = {}, bind_params = {}, bind_types = {}, table = {}, set = {};
+
+	phalcon_fetch_params(0, 0, 2, &params, &dependency_injector);
+
+	/** 
+	 * Update the dependency injector if any
+	 */
+	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
+	}
+
+	if (params && Z_TYPE_P(params) == IS_ARRAY) {
+		/** 
+		 * Process conditions
+		 */
+		if (phalcon_array_isset_fetch_str(&conditions, params, SL("conditions")) || phalcon_array_isset_fetch_long(&conditions, params, 0)) {
+			PHALCON_CALL_METHODW(NULL, getThis(), "setconditions", &conditions);
+		}
+
+		if (phalcon_array_isset_fetch_str(&bind_params, params, SL("bind"))) {
+			PHALCON_CALL_METHODW(NULL, getThis(), "setbindparams", &bind_params);
+		}
+
+		if (phalcon_array_isset_fetch_str(&bind_types, params, SL("bindTypes"))) {
+			PHALCON_CALL_METHODW(NULL, getThis(), "setbindtypes", &bind_types);
+		}
+
+		if (phalcon_array_isset_fetch_str(&table, params, SL("table"))) {
+			PHALCON_CALL_METHODW(NULL, getThis(), "settable", &table);
+		}
+
+		if (phalcon_array_isset_fetch_str(&set, params, SL("set"))) {
+			PHALCON_CALL_METHODW(NULL, getThis(), "set", &set);
+		}
+	}
+}
+
+/**
+ * Sets the table to update
+ *
+ * @param string table
+ * @return Phalcon\Mvc\Model\Query\Builder\Update
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, table){
+
+	zval *table;
+
+	phalcon_fetch_params(0, 1, 0, &table);
+	PHALCON_ENSURE_IS_STRING(table);
+
+	phalcon_update_property_zval(getThis(), SL("_table"), table);
+	RETURN_THISW();
+}
+
+/**
+ * Gets the table to update
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getTable){
+
+
+	RETURN_MEMBER(getThis(), "_table");
+}
+
+/**
+ * Sets the values to update with an associative array
+ *
+ *<code>
+ *	$builder->set(array('id' => 1, 'name' => 'Google'));
+ *</code>
+ *
+ * @param string|array $set
+ * @return Phalcon\Mvc\Model\Query\Builder\Update
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, set){
+
+	zval *set;
+
+	phalcon_fetch_params(0, 1, 0, &set);
+
+	if (Z_TYPE_P(set) != IS_ARRAY) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Values must be an array");
+		return;
+	}
+
+	phalcon_update_property_zval(getThis(), SL("_set"), set);
+	RETURN_THISW();
+}
+
+/**
+ * Return the values to update with an associative array
+ *
+ * @return string|array
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getSet){
+
+
+	RETURN_MEMBER(getThis(), "_set");
+}
+
+/**
+ * Returns a PHQL statement built based on the builder parameters
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
+
+	zval table = {}, conditions = {}, set = {}, phql = {}, *value = NULL, update_columns = {}, joined_columns = {}, bind_params = {}, bind_types = {};
+	zend_string *str_key;
+	ulong idx;
+
+	PHALCON_CALL_SELFW(&table, "gettable");
+
+	PHALCON_CALL_SELFW(&conditions, "getconditions");
+	PHALCON_CALL_SELFW(&set, "getset");
+
+	PHALCON_CONCAT_SVS(&phql, "UPDATE [", &table, "] SET ");
+
+	if (Z_TYPE(set) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Values must be array");
+		return;
+	}
+
+	PHALCON_CALL_SELFW(&bind_params, "getbindparams");
+	if (Z_TYPE(bind_params) != IS_ARRAY) {
+		array_init(&bind_params);
+	}
+
+	array_init(&update_columns);
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(set), idx, str_key, value) {
+		zval column = {}, key = {}, update_column = {};
+		if (str_key) {
+			ZVAL_STR(&column, str_key);
+		} else {
+			ZVAL_LONG(&column, idx);
+		}
+
+		PHALCON_CONCAT_SV(&key, "phu_", &column);
+
+		PHALCON_CONCAT_SVSVSVS(&update_column, "[", &table, "].", &column, " = :", &key, ":");
+		
+		phalcon_array_append(&update_columns, &update_column, PH_COPY);
+		phalcon_array_update_zval(&bind_params, &key, value, PH_COPY);
+	} ZEND_HASH_FOREACH_END();
+
+	phalcon_fast_join_str(&joined_columns, SL(", "), &update_columns);
+	phalcon_concat_self(&phql, &joined_columns);
+
+	/** 
+	 * Only append conditions if it's string
+	 */
+	if (Z_TYPE(conditions) == IS_STRING && PHALCON_IS_NOT_EMPTY(&conditions)) {
+		PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
+	}
+
+	phalcon_update_property_zval(getThis(), SL("_mergeBindParams"), &bind_params);
+
+	PHALCON_CALL_SELFW(&bind_types, "getbindtypes");
+	phalcon_update_property_zval(getThis(), SL("_mergeBindTypes"), &bind_types);
+
+	phalcon_update_property_zval(getThis(), SL("_phql"), &phql);
+}

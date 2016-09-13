@@ -211,7 +211,14 @@ mvc/model/metadata.c \
 mvc/model/resultsetinterface.c \
 mvc/model/managerinterface.c \
 mvc/model/behavior.c \
+mvc/model/query/exception.c \
 mvc/model/query/builder.c \
+mvc/model/query/builder/where.c \
+mvc/model/query/builder/join.c \
+mvc/model/query/builder/select.c \
+mvc/model/query/builder/update.c \
+mvc/model/query/builder/insert.c \
+mvc/model/query/builder/delete.c \
 mvc/model/query/lang.c \
 mvc/model/query/statusinterface.c \
 mvc/model/query/status.c \

@@ -259,7 +259,7 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_Model_ManagerInterface, createQuery);
 PHALCON_DOC_METHOD(Phalcon_Mvc_Model_ManagerInterface, executeQuery);
 
 /**
- * Creates a Phalcon\Mvc\Model\Query\Builder
+ * Creates a Phalcon\Mvc\Model\Query\Builder\Select
  *
  * @param string $params
  * @return Phalcon\Mvc\Model\Query\BuilderInterface

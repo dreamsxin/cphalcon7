@@ -67,7 +67,6 @@ typedef struct _phalcon_orm_options {
 	int cache_level;
 	zend_bool events;
 	zend_bool virtual_foreign_keys;
-	zend_bool column_renaming;
 	zend_bool not_null_validations;
 	zend_bool length_validations;
 	zend_bool exception_on_failed_save;

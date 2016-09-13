@@ -116,10 +116,10 @@ PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
 	PHALCON_CALL_SELFW(NULL, "set", &servicename, &definition, &PHALCON_GLOBAL(z_false));
 
 	/**
-	 * Models Query Builder for ORM
+	 * Models Query Select Builder for ORM
 	 */
-	PHALCON_STR(&servicename, ISV(modelsQueryBuilder));
-	PHALCON_STR(&definition, "Phalcon\\Mvc\\Model\\Query\\Builder");
+	PHALCON_STR(&servicename, ISV(modelsQueryBuilderForSelect));
+	PHALCON_STR(&definition, "Phalcon\\Mvc\\Model\\Query\\Builder\\Select");
 	PHALCON_CALL_SELFW(NULL, "set", &servicename, &definition, &PHALCON_GLOBAL(z_false));
 
 	/**

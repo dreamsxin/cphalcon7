@@ -661,9 +661,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		return;
 	}
 
-	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		 phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
-	}
+	PHALCON_CALL_METHODW(&escape_char, getThis(), "getescapechar");
 
 	if (Z_TYPE_P(&columns) == IS_ARRAY) { 
 		array_init(&selected_columns);
@@ -905,7 +903,8 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
  */
 PHP_METHOD(Phalcon_Db_Dialect, insert)
 {
-	zval *definition, table = {}, fields = {}, values = {}, exception_message = {}, escaped_table = {}, escape_char = {}, joined_values = {}, escaped_fields = {}, *field, joined_fields = {};
+	zval *definition, table = {}, fields = {}, number_fields = {}, values = {}, exception_message = {}, escaped_table = {}, escape_char = {};
+	zval *row_values = NULL, joined_rows = {}, joined_values = {}, escaped_fields = {}, *field, joined_fields = {};
 
 	phalcon_fetch_params(0, 1, 0, &definition);
 
@@ -913,6 +912,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid INSERT definition");
 		return;
 	}
+
 	if (!phalcon_array_isset_fetch_str(&table, definition, SL("table"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'table' is required in the definition array");
 		return;
@@ -942,13 +942,46 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 		return;
 	}
 
+	phalcon_fast_count(&number_fields, &fields);
+
 	PHALCON_CALL_METHODW(&escaped_table, getThis(), "getsqltable", &table);
 	PHALCON_CALL_METHODW(&escape_char, getThis(), "getescapechar");
 
 	/**
 	 * Build the final SQL INSERT statement
 	 */
-	phalcon_fast_join_str(&joined_values, SL(", "), &values);
+	array_init(&joined_rows);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(values), row_values) {
+		zval number_values = {}, insert_row_values = {}, *value, joined_row = {};
+
+		phalcon_fast_count(&number_values, row_values);
+
+		/** 
+		 * The number of calculated values must be equal to the number of fields in the
+		 * model
+		 */
+		if (!PHALCON_IS_EQUAL(&number_fields, &number_values)) {
+			PHALCON_CONCAT_SVSVS(&exception_message, "The fields count(", &number_fields, ") does not match the values count(", &number_values, ")");
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_db_exception_ce, &exception_message);
+			return;
+		}
+
+		array_init(&insert_row_values);
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(row_values), value) {
+			zval insert_value = {};
+
+			PHALCON_CALL_METHODW(&insert_value, getThis(), "getsqlexpression", value, &escape_char);
+
+			phalcon_array_append(&insert_row_values, &insert_value, PH_COPY);
+		} ZEND_HASH_FOREACH_END();
+
+		phalcon_fast_join_str(&joined_row, SL(", "), &insert_row_values);
+		phalcon_array_append(&joined_rows, &joined_row, 0);
+	} ZEND_HASH_FOREACH_END();
+
+	phalcon_fast_join_str(&joined_values, SL("), ("), &joined_rows);
+
 	if (Z_TYPE(fields) == IS_ARRAY) { 
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			array_init(&escaped_fields);
@@ -979,21 +1012,17 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
  */
 PHP_METHOD(Phalcon_Db_Dialect, update){
 
-	zval *definition, *quoting = NULL, tables = {}, fields = {}, values = {}, escape_char = {}, updated_tables = {}, *table, tables_sql = {}, sql = {};
+	zval *definition, tables = {}, fields = {}, values = {}, escape_char = {}, updated_tables = {}, *table, tables_sql = {}, sql = {};
 	zval updated_fields = {}, *column, columns_sql = {}, where_conditions = {}, where_expression = {};
 	zval order_fields = {}, order_items = {}, *order_item, order_sql = {}, limit_value = {}, number = {}, offset = {}, tmp1 = {}, tmp2 = {};
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 1, &definition, &quoting);
+	phalcon_fetch_params(0, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) { 
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid Update definition");
 		return;
-	}
-
-	if (!quoting) {
-		quoting = &PHALCON_GLOBAL(z_false);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&tables, definition, SL("tables"))) {
@@ -1033,7 +1062,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	array_init(&updated_fields);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, column) {
-		zval position = {}, column_name = {}, value_expr = {}, value = {}, value_expression = {}, column_expression = {};
+		zval position = {}, column_name = {}, column_quoted = {}, value_expr = {}, value = {}, value_expression = {}, column_expression = {};
 
 		if (str_key) {
 			ZVAL_STR(&position, str_key);
@@ -1049,9 +1078,10 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 		phalcon_array_fetch(&value_expr, &values, &position, PH_NOISY);
 		phalcon_array_fetch_str(&value, &value_expr, SL("value"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(&value_expression, getThis(), "getsqlexpression", &value, &escape_char, quoting);
+		PHALCON_CALL_METHODW(&value_expression, getThis(), "getsqlexpression", &value, &escape_char);
 
-		PHALCON_CONCAT_VSV(&column_expression, &column_name, " = ", &value_expression);
+		PHALCON_CONCAT_VVV(&column_quoted, &escape_char, &column_name, &escape_char);
+		PHALCON_CONCAT_VSV(&column_expression, &column_quoted, " = ", &value_expression);
 
 		phalcon_array_append(&updated_fields, &column_expression, PH_COPY);
 	} ZEND_HASH_FOREACH_END();

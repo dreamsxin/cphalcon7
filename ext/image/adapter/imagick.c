@@ -1207,7 +1207,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 	} else {
 		if (phalcon_get_intval(&type) == 2) {
 			phalcon_get_class_constant(&compression, imagick_ce, SL("COMPRESSION_JPEG"));
-			PHALCON_CALL_METHODW(NULL, &im, "setImageCompression", &compression );
+			if (Z_TYPE(compression) == IS_LONG) {
+				PHALCON_CALL_METHODW(NULL, &im, "setImageCompression", &compression);
+			}
 		}
 
 		PHALCON_CALL_METHODW(NULL, &im, "setImageCompressionQuality", quality);
@@ -1273,7 +1275,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _render) {
 	} else {
 		if (phalcon_get_intval(&type) == 2) {
 			phalcon_get_class_constant(&compression, imagick_ce, SL("COMPRESSION_JPEG"));
-			PHALCON_CALL_METHODW(NULL, &im, "setImageCompression", &compression );
+			if (Z_TYPE(compression) == IS_LONG) {
+				PHALCON_CALL_METHODW(NULL, &im, "setImageCompression", &compression);
+			}
 		}
 
 		PHALCON_CALL_METHODW(NULL, &im, "setImageCompressionQuality", quality);

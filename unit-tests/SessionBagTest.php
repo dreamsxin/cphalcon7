@@ -28,6 +28,9 @@ class SessionBagTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testGetSet()
 	{
+		$this->markTestSkipped("Skipped");
+		return;
+
 		\Phalcon\DI::reset();
 		@session_start();
 

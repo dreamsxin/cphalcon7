@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					 */
 					array_init(&row_model);
 
-					ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&attributes), attribute) {
+					ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), attribute) {
 						zval column_alias = {}, column_value = {};
 						/** 
 						 * Columns are supposed to be in the form _table_field
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					switch (phalcon_get_intval(&hydrate_mode)) {
 
 						case 0: {
-							zval keep_snapshots = {}, instance = {};
+							zval instance = {};
 							
 							/** 
 							 * Get the base instance
@@ -283,16 +283,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							}
 
 							/** 
-							 * Check if the resultset must keep snapshots
-							 */
-							if (!phalcon_array_isset_fetch_str(&keep_snapshots, column, SL("keepSnapshots"))) {
-								ZVAL_FALSE(&keep_snapshots);
-							}
-
-							/** 
 							 * Assign the values to the attributes using a column map
 							 */
-							PHALCON_CALL_CE_STATICW(&value, ce, "cloneresultmap", &instance, &row_model, &column_map, &dirty_state, &keep_snapshots, &source_model);
+							PHALCON_CALL_CE_STATICW(&value, ce, "cloneresultmap", &instance, &row_model, &column_map, &dirty_state, &source_model);
 							break;
 						}
 

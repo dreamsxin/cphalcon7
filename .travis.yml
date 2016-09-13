@@ -5,8 +5,11 @@ dist: precise
 
 php:
   - 7.0
-  - 7.1
-  - nightly
+
+matrix:
+  allow_failures:
+    - php: 7.1
+    - nightly
 
 git:
   depth: 1
@@ -29,24 +32,6 @@ services:
 
 env:
   global:
-    - TEST_BT_HOST="127.0.0.1"
-    - TEST_BT_PORT="11300"
-    - TEST_MC_HOST="127.0.0.1"
-    - TEST_MC_PORT="11211"
-    - TEST_DB_MYSQL_HOST="127.0.0.1"
-    - TEST_DB_MYSQL_PORT="3306"
-    - TEST_DB_MYSQL_USER="root"
-    - TEST_DB_MYSQL_PASSWD=""
-    - TEST_DB_MYSQL_NAME="phalcon_test"
-    - TEST_DB_MYSQL_CHARSET="utf8"
-    - TEST_DB_MYSQL_DSN="mysql:host=127.0.0.1;dbname=phalcon_test"
-    - TEST_DB_MONGO_HOST="127.0.0.1"
-    - TEST_DB_MONGO_PORT="27017"
-    - TEST_DB_MONGO_USER="admin"
-    - TEST_DB_MONGO_PASSWD=""
-    - TEST_DB_MONGO_NAME="phalcon_test"
-    - TEST_RS_HOST="127.0.0.1"
-    - TEST_RS_PORT="6379"
     - ZEND_DONT_UNLOAD_MODULES=1
     - CC="ccache gcc"
 

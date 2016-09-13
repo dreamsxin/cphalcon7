@@ -66,10 +66,24 @@
  */
 zend_class_entry *phalcon_config_adapter_ini_ce;
 
+PHP_METHOD(Phalcon_Config_Adapter_Ini, __construct);
 PHP_METHOD(Phalcon_Config_Adapter_Ini, read);
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config_adapter_ini___construct, 0, 0, 0)
+	ZEND_ARG_INFO(0, filePath)
+	ZEND_ARG_INFO(0, absolutePath)
+	ZEND_ARG_INFO(0, scannerMode)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config_adapter_ini_read, 0, 0, 1)
+	ZEND_ARG_INFO(0, filePath)
+	ZEND_ARG_INFO(0, absolutePath)
+	ZEND_ARG_INFO(0, scannerMode)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_config_adapter_ini_method_entry[] = {
-	PHP_ME(Phalcon_Config_Adapter_Ini, read, arginfo_phalcon_config_adapter_read, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Config_Adapter_Ini, __construct, arginfo_phalcon_config_adapter_ini___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Config_Adapter_Ini, read, arginfo_phalcon_config_adapter_ini_read, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -83,6 +97,32 @@ PHALCON_INIT_CLASS(Phalcon_Config_Adapter_Ini){
 	zend_class_implements(phalcon_config_adapter_ini_ce, 1, phalcon_config_adapterinterface_ce);
 
 	return SUCCESS;
+}
+
+/**
+ * Phalcon\Config\Adapter constructor
+ *
+ * @param string $filePath
+ * @param string $absolutePath
+ * @param string $scannerMode
+ */
+PHP_METHOD(Phalcon_Config_Adapter_Ini, __construct){
+
+	zval *file_path = NULL, *absolute_path = NULL, *scanner_mode = NULL;
+
+	phalcon_fetch_params(0, 0, 3, &file_path, &absolute_path, &scanner_mode);
+
+	if (!absolute_path) {
+		absolute_path = &PHALCON_GLOBAL(z_false);
+	}
+
+	if (file_path && Z_TYPE_P(file_path) != IS_NULL) {
+		if (scanner_mode) {
+			PHALCON_CALL_METHODW(NULL, getThis(), "read", file_path, absolute_path, scanner_mode);
+		} else {
+			PHALCON_CALL_METHODW(NULL, getThis(), "read", file_path, absolute_path);
+		}
+	}
 }
 
 static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *section, zval *directive, zval *value)
@@ -130,14 +170,14 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
  */
 PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 
-	zval *file_path, *absolute_path = NULL, config_dir_path = {}, base_path = {}, ini_config = {}, config = {}, *directives;
+	zval *file_path, *absolute_path = NULL, *scanner_mode = NULL, config_dir_path = {}, base_path = {}, ini_config = {}, config = {}, *directives;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 1, &file_path, &absolute_path);
+	phalcon_fetch_params(0, 1, 2, &file_path, &absolute_path, &scanner_mode);
 	PHALCON_ENSURE_IS_STRING(file_path);
 
-	if (absolute_path == NULL) {
+	if (!absolute_path) {
 		absolute_path = &PHALCON_GLOBAL(z_false);
 	}
 
@@ -152,7 +192,11 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	/** 
 	 * Use the standard parse_ini_file
 	 */
-	PHALCON_CALL_FUNCTIONW(&ini_config, "parse_ini_file", &config_dir_path, &PHALCON_GLOBAL(z_true));
+	if (scanner_mode && Z_TYPE_P(scanner_mode) == IS_LONG) {
+		PHALCON_CALL_FUNCTIONW(&ini_config, "parse_ini_file", &config_dir_path, &PHALCON_GLOBAL(z_true), scanner_mode);
+	} else {
+		PHALCON_CALL_FUNCTIONW(&ini_config, "parse_ini_file", &config_dir_path, &PHALCON_GLOBAL(z_true));
+	}
 
 	/** 
 	 * Check if the file had errors

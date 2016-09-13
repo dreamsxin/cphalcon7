@@ -84,6 +84,9 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 
 	public function testModelsPostgresql()
 	{
+		$this->markTestSkipped("Skipped");
+		return;
+
 		require 'unit-tests/config.db.php';
 		if (empty($configPostgresql)) {
 			$this->markTestSkipped("Skipped");

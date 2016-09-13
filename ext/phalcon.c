@@ -40,8 +40,6 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_BOOLEAN("phalcon.orm.events",                   "1", PHP_INI_ALL,    OnUpdateBool, orm.events,                   zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables virtual foreign keys */
 	STD_PHP_INI_BOOLEAN("phalcon.orm.virtual_foreign_keys",     "1", PHP_INI_ALL,    OnUpdateBool, orm.virtual_foreign_keys,     zend_phalcon_globals, phalcon_globals)
-	/* Enables/Disables column renaming */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.column_renaming",          "1", PHP_INI_ALL,    OnUpdateBool, orm.column_renaming,          zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables automatic NOT NULL validation */
 	STD_PHP_INI_BOOLEAN("phalcon.orm.not_null_validations",     "1", PHP_INI_ALL,    OnUpdateBool, orm.not_null_validations,     zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables automatic length validation */
@@ -92,6 +90,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Application_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Dispatcher_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Model_Exception);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Model_Transaction_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Router_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Url_Exception);
@@ -371,6 +370,12 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Lang);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Status);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Where);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Join);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Select);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Update);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Insert);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Delete);
 	PHALCON_INIT(Phalcon_Mvc_Model_ValidationFailed);
 	PHALCON_INIT(Phalcon_Mvc_Model_Resultset_Simple);
 	PHALCON_INIT(Phalcon_Mvc_Model_Resultset_Complex);

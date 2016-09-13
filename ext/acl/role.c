@@ -87,6 +87,10 @@ PHP_METHOD(Phalcon_Acl_Role, __construct){
 		return;
 	}
 
+	if (Z_TYPE_P(name) != IS_STRING) {
+		convert_to_string(name);
+	}
+
 	phalcon_update_property_zval(getThis(), SL("_name"), name);
 	if (description && Z_TYPE_P(description) != IS_NULL) {
 		phalcon_update_property_zval(getThis(), SL("_description"), description);

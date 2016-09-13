@@ -72,7 +72,7 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		});
 
 		$di->set('modelsQuery', 'Phalcon\Mvc\Model\Query');
-		$di->set('modelsQueryBuilder', 'Phalcon\Mvc\Model\Query\Builder');
+		$di->set('modelsQueryBuilderSelect', 'Phalcon\Mvc\Model\Query\Builder\Select');
 		$di->set('modelsCriteria', 'Phalcon\\Mvc\\Model\\Criteria');
 
 		$di->set('db', $dbService, true);
@@ -91,17 +91,6 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		$di = $this->_getDI(function(){
 			require 'unit-tests/config.db.php';
 			$db = new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
-		/*
-			$em = new \Phalcon\Events\Manager();
-			$em->attach('db', function($event, $connection) {
-				if ($event->getType() == 'beforeQuery') {
-					echo $connection->getSQLStatement(), PHP_EOL;
-					print_r($connection->getSQLVariables());
-				}
-			});
-
-			$db->setEventsManager($em);
-		*/
 			return $db;
 		});
 

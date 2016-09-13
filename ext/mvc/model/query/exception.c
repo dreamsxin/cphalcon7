@@ -17,36 +17,24 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_DI_INJECTABLE_H
-#define PHALCON_DI_INJECTABLE_H
+#include "mvc/model/query/exception.h"
+#include "mvc/model/exception.h"
+#include "kernel/main.h"
 
-#include "php_phalcon.h"
+/**
+ * Phalcon\Mvc\Model\Query\Exception
+ *
+ * Exceptions thrown in Phalcon\Mvc\Model\Query\* classes will use this class
+ *
+ */
+zend_class_entry *phalcon_mvc_model_query_exception_ce;
 
-extern zend_class_entry *phalcon_di_injectable_ce;
+/**
+ * Phalcon\Mvc\Model\Query\Exception initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Exception){
 
-PHALCON_INIT_CLASS(Phalcon_DI_Injectable);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\Query, Exception, mvc_model_query_exception, phalcon_mvc_model_exception_ce, NULL, 0);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireevent, 0, 0, 1)
-	ZEND_ARG_INFO(0, eventName)
-	ZEND_ARG_INFO(1, data)
-	ZEND_ARG_INFO(0, cancelable)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireeventcancel, 0, 0, 1)
-	ZEND_ARG_INFO(0, eventName)
-	ZEND_ARG_INFO(1, data)
-	ZEND_ARG_INFO(0, cancelable)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_hasservice, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_getresolveservice, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
-	ZEND_ARG_INFO(0, args)
-	ZEND_ARG_INFO(0, noerror)
-	ZEND_ARG_INFO(0, noshared)
-ZEND_END_ARG_INFO()
-
-#endif /* PHALCON_DI_INJECTABLE_H */
+	return SUCCESS;
+}

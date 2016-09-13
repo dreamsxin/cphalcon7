@@ -17,36 +17,13 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_DI_INJECTABLE_H
-#define PHALCON_DI_INJECTABLE_H
+#ifndef PHALCON_MVC_QUERY_BUILDER_UPDATE_H
+#define PHALCON_MVC_QUERY_BUILDER_UPDATE_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_di_injectable_ce;
+extern zend_class_entry *phalcon_mvc_model_query_builder_update_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DI_Injectable);
+PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Update);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireevent, 0, 0, 1)
-	ZEND_ARG_INFO(0, eventName)
-	ZEND_ARG_INFO(1, data)
-	ZEND_ARG_INFO(0, cancelable)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireeventcancel, 0, 0, 1)
-	ZEND_ARG_INFO(0, eventName)
-	ZEND_ARG_INFO(1, data)
-	ZEND_ARG_INFO(0, cancelable)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_hasservice, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_getresolveservice, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
-	ZEND_ARG_INFO(0, args)
-	ZEND_ARG_INFO(0, noerror)
-	ZEND_ARG_INFO(0, noshared)
-ZEND_END_ARG_INFO()
-
-#endif /* PHALCON_DI_INJECTABLE_H */
+#endif /* PHALCON_MVC_QUERY_BUILDER_UPDATE_H */

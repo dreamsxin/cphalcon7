@@ -129,7 +129,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getIntermediate);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModels);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setConnection);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection);
-PHP_METHOD(Phalcon_Mvc_Model_Query, getSql);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, phql)
@@ -233,7 +232,6 @@ static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, getModels, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setConnection, arginfo_phalcon_mvc_model_query_setconnection, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getConnection, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query, getSql, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -2680,8 +2678,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
-	zval ast = {}, qualified_name = {}, values = {}, model_name = {}, manager = {}, model = {}, source = {}, schema = {}, table = {}, sql_aliases = {}, expr_rows = {};
-	zval expr_values = {}, *row, sql_insert = {}, sql_fields = {}, fields = {}, *field, exception_message = {};
+	zval ast = {}, qualified_name = {}, values = {}, model_name = {}, manager = {}, model = {}, source = {}, schema = {}, table = {}, sql_aliases = {};
+	zval expr_rows = {}, *row, sql_insert = {}, sql_fields = {}, fields = {}, *field, exception_message = {};
 
 	phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
 
@@ -2719,10 +2717,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
 	array_init(&sql_aliases);
 	array_init(&expr_rows);
-	array_init(&expr_values);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(values), row) {
-		zval *expr_value;
+		zval *expr_value, expr_values = {};
+
+		array_init(&expr_values);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(row), expr_value) {
 			zval expr_insert = {};
@@ -4568,41 +4567,4 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 	}
 
 	RETURN_CTORW(&connection);
-}
-
-/**
- * Return a SQL
- *
- * @return mixed
- */
-PHP_METHOD(Phalcon_Mvc_Model_Query, getSql){
-
-	zval intermediate = {}, type = {}, exception_message = {};
-
-	PHALCON_CALL_METHODW(&intermediate, getThis(), "parse");
-
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
-
-	switch (phalcon_get_intval(&type)) {
-		case PHQL_T_SELECT:
-			PHALCON_RETURN_CALL_METHODW(getThis(), "_getsqlselect", &intermediate);
-			break;
-
-		case PHQL_T_INSERT:
-			PHALCON_RETURN_CALL_METHODW(getThis(), "_getsqlinsert", &intermediate);
-			break;
-
-		case PHQL_T_UPDATE:
-			PHALCON_RETURN_CALL_METHODW(getThis(), "_getsqlupdate", &intermediate);
-			break;
-
-		case PHQL_T_DELETE:
-			PHALCON_RETURN_CALL_METHODW(getThis(), "_getsqldelete", &intermediate);
-			break;
-
-		default:
-			PHALCON_CONCAT_SV(&exception_message, "Unknown statement ", &type);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-			return;
-	}
 }

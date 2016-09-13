@@ -370,7 +370,12 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Lang);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Status);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Where);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Join);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Select);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Update);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Insert);
+	PHALCON_INIT(Phalcon_Mvc_Model_Query_Builder_Delete);
 	PHALCON_INIT(Phalcon_Mvc_Model_ValidationFailed);
 	PHALCON_INIT(Phalcon_Mvc_Model_Resultset_Simple);
 	PHALCON_INIT(Phalcon_Mvc_Model_Resultset_Complex);

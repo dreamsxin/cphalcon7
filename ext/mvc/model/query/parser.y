@@ -213,7 +213,7 @@ static void phql_ret_for_update_clause(zval *ret)
 
 static void phql_ret_insert_statement(zval *ret, zval *Q, zval *F, zval *V)
 {
-	zval values, key;
+	zval values = {};
 
 	array_init(ret);
 	add_assoc_long(ret, ISV(type), PHQL_T_INSERT);
@@ -223,9 +223,19 @@ static void phql_ret_insert_statement(zval *ret, zval *Q, zval *F, zval *V)
 		add_assoc_zval(ret, ISV(fields), F);
 	}
 
-	ZVAL_STR(&key, IS(values));
+	array_init(&values);
+	add_next_index_zval(&values, V);
 
-	if (!phalcon_array_isset_fetch(&values, ret, &key, 0)) {
+	add_assoc_zval(ret, ISV(values), &values);
+}
+
+static void phql_ret_insert_statement2(zval *ret, zval *Q, zval *V)
+{
+	zval values = {};
+
+	ZVAL_DUP(ret, Q);
+
+	if (!phalcon_array_isset_fetch_str(&values, ret, ISL(values))) {
 		array_init(&values);
 	}
 	add_next_index_zval(&values, V);
@@ -616,7 +626,7 @@ join_conditions(R) ::= . {
 
 /* Insert */
 insert_statement(R) ::= insert_statement(Q) COMMA PARENTHESES_OPEN values_list(V) PARENTHESES_CLOSE . {
-	phql_ret_insert_statement(&R, &Q, NULL, &V);
+	phql_ret_insert_statement2(&R, &Q, &V);
 }
 
 insert_statement(R) ::= INSERT INTO aliased_or_qualified_name(Q) VALUES PARENTHESES_OPEN values_list(V) PARENTHESES_CLOSE . {

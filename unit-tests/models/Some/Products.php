@@ -16,13 +16,13 @@ class Products extends \Phalcon\Mvc\Model
 	{
 		return array(
 			MetaData::MODELS_ATTRIBUTES => array(
-				'id', 'name', 'type', 'price'
+				'id', 'name', 'type', 'price', 'created_at'
 			),
 			MetaData::MODELS_PRIMARY_KEY => array(
 				'id'
 			),
 			MetaData::MODELS_NON_PRIMARY_KEY => array(
-				'name', 'type', 'price'
+				'name', 'type', 'price', 'created_at'
 			),
 			MetaData::MODELS_NOT_NULL => array(
 				'id', 'name', 'type', 'price'

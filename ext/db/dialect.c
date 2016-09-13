@@ -961,7 +961,8 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 		 * model
 		 */
 		if (!PHALCON_IS_EQUAL(&number_fields, &number_values)) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The fields count does not match the values count");
+			PHALCON_CONCAT_SVSVS(&exception_message, "The fields count(", &number_fields, ") does not match the values count(", &number_values, ")");
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_db_exception_ce, &exception_message);
 			return;
 		}
 

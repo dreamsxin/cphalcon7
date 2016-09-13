@@ -85,8 +85,18 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 			)
 		),
 		'map-robots-robots' => array(
-			0 => null,
-			1 => null,
+			0 => array(
+				'id' => 'id',
+				'name' => 'name',
+				'type' => 'type',
+				'year' => 'year',
+			),
+			1 => array(
+				'id' => 'id',
+				'name' => 'name',
+				'type' => 'type',
+				'year' => 'year',
+			),
 		)
 	);
 

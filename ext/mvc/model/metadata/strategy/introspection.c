@@ -267,37 +267,36 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "columnMap() not returned an array");
 			return;
 		}
-
-		PHALCON_CALL_METHODW(&columns, model, "getcolumns");
-
-		if (Z_TYPE(columns) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column_name) {
-				if (!phalcon_array_isset(&ordered_column_map, column_name)) {
-					phalcon_array_update_zval(&ordered_column_map, column_name, column_name, PH_COPY);
-				}
-			} ZEND_HASH_FOREACH_END();
-		}
-
-		array_init(&reversed_column_map);
-
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, user_name) {
-			zval name = {};
-			if (str_key) {
-				ZVAL_STR(&name, str_key);
-			} else {
-				ZVAL_LONG(&name, idx);
-			}
-			phalcon_array_update_zval(&reversed_column_map, user_name, &name, PH_COPY);
-		} ZEND_HASH_FOREACH_END();
 	} else {
-		ZVAL_NULL(&ordered_column_map);
-		ZVAL_NULL(&reversed_column_map);
+		array_init(&ordered_column_map);
 	}
+	array_init(&reversed_column_map);
+
+	PHALCON_CALL_METHODW(&columns, model, "getcolumns");
+
+	if (Z_TYPE(columns) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column_name) {
+			if (!phalcon_array_isset(&ordered_column_map, column_name)) {
+				phalcon_array_update_zval(&ordered_column_map, column_name, column_name, PH_COPY);
+			}
+		} ZEND_HASH_FOREACH_END();
+	}
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, user_name) {
+		zval name = {};
+		if (str_key) {
+			ZVAL_STR(&name, str_key);
+		} else {
+			ZVAL_LONG(&name, idx);
+		}
+		phalcon_array_update_zval(&reversed_column_map, user_name, &name, PH_COPY);
+	} ZEND_HASH_FOREACH_END();
+	
 	
 	/** 
 	 * Store the column map
 	 */
 	array_init_size(return_value, 2);
-	phalcon_array_update_long(return_value, 0, &ordered_column_map, PH_COPY);
-	phalcon_array_update_long(return_value, 1, &reversed_column_map, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_COLUMN_MAP, &ordered_column_map, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_REVERSE_COLUMN_MAP, &reversed_column_map, PH_COPY);
 }

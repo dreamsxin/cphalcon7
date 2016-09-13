@@ -1765,7 +1765,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 			PHALCON_CONCAT_VS(&pk_condition, &attribute_field, " IS NULL");
 		} else {
 			not_empty_num += 1;
-			PHALCON_CONCAT_SV(&key, "phi_", &attribute_field);
+			PHALCON_CONCAT_SV(&key, "pha_", &attribute_field);
 
 			PHALCON_CONCAT_VSVS(&pk_condition, &attribute_field, "= :", &key, ":");
 			phalcon_array_update_zval(&unique_params, &key, &value, PH_COPY);
@@ -3490,7 +3490,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	phalcon_get_called_class(&model_name);
 
 	phalcon_fast_join_str(&phql_join_fields, SL(", "), &fields);
-	PHALCON_CONCAT_SVSVS(&phql, "INSERT INTO ", &model_name, " (", &phql_join_fields ,") VALUES");
+	PHALCON_CONCAT_SVSVS(&phql, "INSERT INTO [", &model_name, "] (", &phql_join_fields ,") VALUES ");
 
 	phalcon_fast_join_str(&phql_join_values, SL(":, :"), &fields);
 	PHALCON_SCONCAT_SVS(&phql, " (:", &phql_join_values, ":) ");
@@ -3684,7 +3684,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 		PHALCON_CPY_WRT(&merged_types, &bind_types);
 	}
 
-	PHALCON_CONCAT_SVSVSV(&phql, "UPDATE ", &model_name, " SET ", &phql_join_updates, " WHERE ", &unique_key);
+	PHALCON_CONCAT_SVSVSV(&phql, "UPDATE [", &model_name, "] SET ", &phql_join_updates, " WHERE ", &unique_key);
 
 	PHALCON_CALL_METHODW(&query, &models_manager, "createquery", &phql);
 	PHALCON_CALL_METHODW(NULL, &query, "setconnection", connection);

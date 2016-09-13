@@ -157,7 +157,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData){
 	zend_declare_class_constant_long(phalcon_mvc_model_metadata_ce, SL("MODELS_DATA_SCALE"), PHALCON_MVC_MODEL_METADATA_MODELS_DATA_SCALE);
 	zend_declare_class_constant_long(phalcon_mvc_model_metadata_ce, SL("MODELS_DATA_BYTE"), PHALCON_MVC_MODEL_METADATA_MODELS_DATA_BYTE);
 
-	zend_declare_class_constant_long(phalcon_mvc_model_metadata_ce, SL("MODELS_COLUMN_MAP"),         PHALCON_MVC_MODEL_METADATA_MODELS_COLUMN_MAP        );
+	zend_declare_class_constant_long(phalcon_mvc_model_metadata_ce, SL("MODELS_COLUMN_MAP"),         PHALCON_MVC_MODEL_METADATA_MODELS_COLUMN_MAP);
 	zend_declare_class_constant_long(phalcon_mvc_model_metadata_ce, SL("MODELS_REVERSE_COLUMN_MAP"), PHALCON_MVC_MODEL_METADATA_MODELS_REVERSE_COLUMN_MAP);
 
 	zend_class_implements(phalcon_mvc_model_metadata_ce, 1, phalcon_mvc_model_metadatainterface_ce);
@@ -363,10 +363,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 }
 
 /**
- * Reads meta-data for certain model using a MODEL_* constant
+ * Reads meta-data for certain model
  *
  *<code>
- *	print_r($metaData->writeColumnMapIndex(new Robots(), MetaData::MODELS_REVERSE_COLUMN_MAP, array('leName' => 'name')));
+ *	print_r($metaData->readMetaDataIndex(new Robots(), 0);
  *</code>
  *
  * @param Phalcon\Mvc\ModelInterface $model
@@ -1084,7 +1084,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getColumnMap){
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
-	ZVAL_LONG(&index, 0);
+	ZVAL_LONG(&index, PHALCON_MVC_MODEL_METADATA_MODELS_COLUMN_MAP);
 
 	PHALCON_CALL_METHODW(return_value, getThis(), "readcolumnmapindex", model, &index);
 	if (Z_TYPE_P(return_value) != IS_NULL) {
@@ -1111,7 +1111,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getReverseColumnMap){
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
-	ZVAL_LONG(&index, 1);
+	ZVAL_LONG(&index, PHALCON_MVC_MODEL_METADATA_MODELS_REVERSE_COLUMN_MAP);
 
 	PHALCON_CALL_METHODW(return_value, getThis(), "readcolumnmapindex", model, &index);
 	if (Z_TYPE_P(return_value) != IS_NULL) {
@@ -1152,7 +1152,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute){
 	} else {
 		PHALCON_CALL_METHODW(&meta_data, getThis(), "readmetadata", model);
 
-		phalcon_array_fetch_long(&data_types, &meta_data, 4, PH_NOISY);
+		phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY);
 		if (phalcon_array_isset(&data_types, attribute)) {
 			RETURN_TRUE;
 		}
@@ -1174,7 +1174,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttribute){
 
-	zval *model, *column, reverse_column_map = {};
+	zval *model, *column, reverse_column_map = {}, column_map = {};
 
 	phalcon_fetch_params(0, 2, 0, &model, &column);
 
@@ -1184,10 +1184,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttribute){
 	}
 
 	PHALCON_CALL_METHODW(&reverse_column_map, getThis(), "getreversecolumnmap", model);
-	if (Z_TYPE(reverse_column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&reverse_column_map)) { 
+	if (Z_TYPE(reverse_column_map) == IS_ARRAY) { 
 		if (phalcon_array_isset_fetch(return_value, &reverse_column_map, column, 0)) {
 			return;
-		}			
+		} else {
+			PHALCON_CALL_METHODW(&column_map, getThis(), "getcolumnmap", model);
+			if (Z_TYPE(reverse_column_map) == IS_ARRAY && phalcon_array_isset(&column_map, column)) {
+				RETURN_CTORW(column);
+			} else {
+				RETURN_FALSE;
+			}
+		}		
 	} else {
 		RETURN_CTORW(column);
 	}

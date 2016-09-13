@@ -289,10 +289,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 
 	phalcon_fetch_params(0, 2, 0, &model, &dependency_injector);
 
-	if (!PHALCON_GLOBAL(orm).column_renaming) {
-		RETURN_NULL();
-	}
-
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The dependency injector is invalid");
 		return;

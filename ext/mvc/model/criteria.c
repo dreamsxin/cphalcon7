@@ -1257,9 +1257,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 
 		PHALCON_VERIFY_INTERFACE_EX(&model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce, 0);
 
-		if (PHALCON_GLOBAL(orm).column_renaming) {
-			PHALCON_CALL_METHODW(&column_map, &meta_data, "getreversecolumnmap", &model);
-		}
+		PHALCON_CALL_METHODW(&column_map, &meta_data, "getreversecolumnmap", &model);
 
 		PHALCON_CALL_METHODW(&data_types, &meta_data, "getdatatypes", &model);
 
@@ -1389,7 +1387,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 		PHALCON_CALL_METHODW(NULL, &query, "setbindtypes", &bind_types);
 	}
 
-	PHALCON_RETURN_CALL_METHODW(&query, "execute", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), use_rawsql);
+	PHALCON_RETURN_CALL_METHODW(&query, "execute", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null));
 }
 
 /**
@@ -1573,9 +1571,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 				/** 
 				 * The PHQL contains the renamed columns if available
 				 */
-				if (PHALCON_GLOBAL(orm).column_renaming) {
-					PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &model_instance);
-				}
+				PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
 					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {
@@ -1871,9 +1867,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 				/** 
 				 * The PHQL contains the renamed columns if available
 				 */
-				if (PHALCON_GLOBAL(orm).column_renaming) {
-					PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &model_instance);
-				}
+				PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
 					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {
@@ -2013,9 +2007,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
-				if (PHALCON_GLOBAL(orm).column_renaming) {
-					PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &model_instance);
-				}
+				PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
 					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {

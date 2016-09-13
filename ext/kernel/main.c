@@ -46,7 +46,6 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 	/* ORM options*/
 	phalcon_globals->orm.events = 1;
 	phalcon_globals->orm.virtual_foreign_keys = 1;
-	phalcon_globals->orm.column_renaming = 1;
 	phalcon_globals->orm.not_null_validations = 1;
 	phalcon_globals->orm.length_validations = 1;
 	phalcon_globals->orm.exception_on_failed_save = 0;

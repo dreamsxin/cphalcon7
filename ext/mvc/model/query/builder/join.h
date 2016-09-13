@@ -17,13 +17,13 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_MVC_MODEL_QUERY_BUILDERINTERFACE_H
-#define PHALCON_MVC_MODEL_QUERY_BUILDERINTERFACE_H
+#ifndef PHALCON_MVC_QUERY_BUILDER_JOIN_H
+#define PHALCON_MVC_QUERY_BUILDER_JOIN_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_mvc_model_query_builderinterface_ce;
+extern zend_class_entry *phalcon_mvc_model_query_builder_join_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_BuilderInterface);
+PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Join);
 
-#endif /* PHALCON_MVC_MODEL_QUERY_BUILDERINTERFACE_H */
+#endif /* PHALCON_MVC_QUERY_BUILDER_JOIN_H */

@@ -366,12 +366,12 @@ PHP_METHOD(Phalcon_Arr, set_path){
 	int found = 1;
 
 	phalcon_fetch_params(0, 3, 1, &array, &path, &value, &delimiter);
-
+	ZVAL_DEREF(array);
 	if (Z_TYPE_P(path) == IS_ARRAY) {
 		PHALCON_CPY_WRT_CTOR(&keys, path);
 	} else {
 		if (!delimiter) {
-			delimiter = phalcon_read_static_property(SL("phalcon\\utils\\arr"), SL("delimiter"));
+			delimiter = phalcon_read_static_property_ce(phalcon_arr_ce, SL("delimiter"));
 		}
 
 		phalcon_fast_explode(&keys, delimiter, path);
@@ -381,7 +381,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 	// Set current $array to inner-most array  path
 	while ((int) zend_hash_num_elements(Z_ARRVAL(keys)) > 1) {
-		zval is_digit = {}, *arr;
+		zval is_digit = {}, *arr = NULL;
 
 		PHALCON_MAKE_REF(&keys);
 		PHALCON_CALL_FUNCTIONW(&key, "array_shift", &keys);
@@ -506,11 +506,23 @@ PHP_METHOD(Phalcon_Arr, get){
 		} ZEND_HASH_FOREACH_END();
 	} else if (phalcon_array_isset_fetch(&value, array, keys, 0)) {
 		RETURN_CTORW(&value);
+	} else {
+		RETURN_CTORW(default_value);
 	}
-
-	RETURN_CTORW(default_value);
 }
 
+/**
+ * Choice one value, If the key does not exist in the array, the value2 will be returned instead.
+ *
+ *     // Choice the "value1", if exists the value "email" of $_POST
+ *     $username = \Phalcon\Arr::choice($_POST, 'email', 'value1', 'value2');
+ *
+ * @param array $array
+ * @param string $key
+ * @param string $value1
+ * @param string $value2
+ * @return mixed
+ */
 PHP_METHOD(Phalcon_Arr, choice){
 
 	zval *array, *key, *value1, *value2 = NULL;

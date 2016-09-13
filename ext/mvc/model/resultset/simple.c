@@ -56,7 +56,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_resultset_simple___construct, 0
 	ZEND_ARG_INFO(0, model)
 	ZEND_ARG_INFO(0, result)
 	ZEND_ARG_INFO(0, cache)
-	ZEND_ARG_INFO(0, keepSnapshots)
 	ZEND_ARG_INFO(0, sourceModel)
 ZEND_END_ARG_INFO()
 
@@ -83,7 +82,6 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset_Simple){
 	zend_declare_property_null(phalcon_mvc_model_resultset_simple_ce, SL("_sourceModel"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_resultset_simple_ce, SL("_model"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_resultset_simple_ce, SL("_columnMap"), ZEND_ACC_PROTECTED);
-	zend_declare_property_bool(phalcon_mvc_model_resultset_simple_ce, SL("_keepSnapshots"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_resultset_simple_ce, SL("_rowsModels"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_resultset_simple_ce, SL("_rowsObjects"), ZEND_ACC_PROTECTED);
 
@@ -97,20 +95,15 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset_Simple){
  * @param Phalcon\Mvc\ModelInterface $model
  * @param Phalcon\Db\Result\Pdo $result
  * @param Phalcon\Cache\BackendInterface $cache
- * @param boolean $keepSnapshots
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 
-	zval *column_map, *model, *result, *cache = NULL, *keep_snapshots = NULL, *source_model = NULL, fetch_assoc = {}, limit = {}, row_count = {}, big_resultset = {};
+	zval *column_map, *model, *result, *cache = NULL, *source_model = NULL, fetch_assoc = {}, limit = {}, row_count = {}, big_resultset = {};
 
-	phalcon_fetch_params(0, 3, 3, &column_map, &model, &result, &cache, &keep_snapshots, &source_model);
+	phalcon_fetch_params(0, 3, 3, &column_map, &model, &result, &cache, &source_model);
 
 	if (!cache) {
 		cache = &PHALCON_GLOBAL(z_null);
-	}
-
-	if (!keep_snapshots) {
-		keep_snapshots = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!source_model) {
@@ -152,11 +145,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 	 */
 	phalcon_update_property_zval(getThis(), SL("_count"), &row_count);
 
-	/** 
-	 * Set if the returned resultset must keep the record snapshots
-	 */
-	phalcon_update_property_zval(getThis(), SL("_keepSnapshots"), keep_snapshots);
-
 	phalcon_update_property_empty_array(getThis(), SL("_models"));
 	phalcon_update_property_empty_array(getThis(), SL("_others"));
 }
@@ -168,7 +156,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
-	zval type = {}, result = {}, row = {}, rows = {}, dirty_state = {}, hydrate_mode = {}, keep_snapshots = {}, column_map = {}, key = {};
+	zval type = {}, result = {}, row = {}, rows = {}, dirty_state = {}, hydrate_mode = {}, column_map = {}, key = {};
 	zval source_model = {}, model = {}, active_row = {}, rows_objects = {};
 	zend_class_entry *ce;
 
@@ -216,11 +204,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 	phalcon_read_property(&hydrate_mode, getThis(), SL("_hydrateMode"), PH_NOISY);
 
 	/** 
-	 * Tell if the resultset is keeping snapshots
-	 */
-	phalcon_read_property(&keep_snapshots, getThis(), SL("_keepSnapshots"), PH_NOISY);
-
-	/** 
 	 * Get the resultset column map
 	 */
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY);
@@ -251,7 +234,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 				/** 
 				 * Performs the standard hydration based on objects
 				 */
-				PHALCON_CALL_CE_STATICW(&active_row, ce, "cloneresultmap", &model, &row, &column_map, &dirty_state, &keep_snapshots, &source_model);
+				PHALCON_CALL_CE_STATICW(&active_row, ce, "cloneresultmap", &model, &row, &column_map, &dirty_state, &source_model);
 
 				phalcon_update_property_array(getThis(), SL("_rowsModels"), &key, &active_row);
 			}

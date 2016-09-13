@@ -36,7 +36,16 @@
  */
 int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, const char *constant_name, uint32_t constant_length)
 {
+#if PHP_VERSION_ID >= 70100
+	zend_class_constant *cc;
 
+	if ((cc = zend_hash_str_find_ptr(&ce->constants_table, constant_name, constant_length)) == NULL) {
+		php_error_docref(NULL, E_ERROR, "Undefined class constant '%s::%s'", ce->name->val, constant_name);
+		return FAILURE;
+	}
+
+	PHALCON_CPY_WRT(return_value, &cc->value);
+#else
 	zval *result;
 
 	if ((result = zend_hash_str_find(&ce->constants_table, constant_name, constant_length)) == NULL) {
@@ -45,6 +54,7 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 	}
 
 	PHALCON_CPY_WRT(return_value, result);
+#endif
 	return SUCCESS;
 }
 

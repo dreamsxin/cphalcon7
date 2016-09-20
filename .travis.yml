@@ -66,3 +66,9 @@ addons:
       - gdb
       - re2c
       - libpng12-dev
+      - libqrencode-dev
+      - libzbar-dev
+      - imagemagick
+      - libmagick++-dev 
+      - libmagickcore-dev
+      - libmagickwand-dev

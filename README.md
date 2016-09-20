@@ -21,6 +21,9 @@ Prerequisite packages are:
 Ubuntu:
 
 ```bash
+# if enable qrcode
+sudo apt-get install libqrencode-dev libzbar-dev imagemagick libmagick++-dev libmagickwand-dev libmagickcore-dev libpng12-dev
+
 sudo add-apt-repository ppa:ondrej/php
 sudo apt-get install php7.0-dev libpcre3-dev gcc make
 

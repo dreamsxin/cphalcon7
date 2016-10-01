@@ -244,14 +244,6 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 		PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
 
-		ZVAL_LONG(&option, PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS);
-
-		PHALCON_CALL_METHODW(&headers, &header, "build", &option);
-
-		ZVAL_STRING(&option, "header");
-
-		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &headers);
-
 		ZVAL_STRING(&option, "content");
 		
 		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &data);
@@ -301,14 +293,18 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		ZVAL_LONG(&key_value, Z_STRLEN(body));
 
 		PHALCON_CALL_METHODW(NULL, &header, "set", &key, &key_value);
-		PHALCON_CALL_METHODW(&headers, &header, "build");
-
-		ZVAL_STRING(&option, "header");
-		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &headers);
 
 		ZVAL_STRING(&option, "content");
 		PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &body);
 	}
+
+	ZVAL_LONG(&option, PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS);
+
+	PHALCON_CALL_METHODW(&headers, &header, "build", &option);
+
+	ZVAL_STRING(&option, "header");
+
+	PHALCON_CALL_FUNCTIONW(NULL, "stream_context_set_option", &stream, &http, &option, &headers);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, errorHandler)

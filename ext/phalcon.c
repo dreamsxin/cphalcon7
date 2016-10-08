@@ -425,6 +425,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Image_Adapter_Imagick);
 	PHALCON_INIT(Phalcon_Registry);
 	PHALCON_INIT(Phalcon_Arr);
+	PHALCON_INIT(Phalcon_Chart_QRcode);
 	PHALCON_INIT(Phalcon_Chart_Captcha);
 	PHALCON_INIT(Phalcon_Async);
 

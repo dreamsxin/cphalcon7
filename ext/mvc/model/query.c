@@ -119,10 +119,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getType);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getBindParam);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setBindParams);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getBindParams);
+PHP_METHOD(Phalcon_Mvc_Model_Query, setMergeBindParams);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getMergeBindParams);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setBindType);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getBindTypes);
+PHP_METHOD(Phalcon_Mvc_Model_Query, setMergeBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getMergeBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setIntermediate);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getIntermediate);
@@ -163,12 +165,20 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setbindparams, 0, 0, 1)
 	ZEND_ARG_INFO(0, bindParams)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setmergebindparams, 0, 0, 1)
+	ZEND_ARG_INFO(0, bindParams)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setbindtype, 0, 0, 2)
 	ZEND_ARG_INFO(0, name)
 	ZEND_ARG_INFO(0, type)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setbindtypes, 0, 0, 1)
+	ZEND_ARG_INFO(0, bindTypes)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setmergebindtypes, 0, 0, 1)
 	ZEND_ARG_INFO(0, bindTypes)
 ZEND_END_ARG_INFO()
 
@@ -222,10 +232,12 @@ static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, getBindParam, arginfo_phalcon_mvc_model_query_getbindparam, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setBindParams, arginfo_phalcon_mvc_model_query_setbindparams, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getBindParams, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, setMergeBindParams, arginfo_phalcon_mvc_model_query_setmergebindparams, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getMergeBindParams, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setBindType, arginfo_phalcon_mvc_model_query_setbindtype, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setBindTypes, arginfo_phalcon_mvc_model_query_setbindtypes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getBindTypes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, setMergeBindTypes, arginfo_phalcon_mvc_model_query_setbindtypes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getMergeBindTypes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setIntermediate, arginfo_phalcon_mvc_model_query_setintermediate, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getIntermediate, NULL, ZEND_ACC_PUBLIC)
@@ -2315,24 +2327,29 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getLimitClause) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 
-	zval *_ast = NULL, *merge = NULL, ast = {}, select = {}, tables = {}, columns = {}, distinct = {}, sql_models = {}, sql_tables = {}, sql_aliases = {}, sql_columns = {}, sql_aliases_models = {};
-	zval sql_models_aliases = {}, sql_aliases_models_instances = {}, models = {}, models_instances = {}, selected_models = {}, manager = {}, *selected_model;
-	zval tmp_models = {}, tmp_models_instances = {}, tmp_sql_aliases = {}, tmp_sql_aliases_models = {}, tmp_sql_models_aliases = {};
-	zval tmp_sql_aliases_models_instances = {}, joins = {}, sql_joins = {}, select_columns = {};
+	zval *_ast = NULL, *merge = NULL, event_name = {}, old_ast = {}, ast = {}, select = {}, tables = {}, columns = {}, distinct = {}, sql_models = {}, sql_tables = {};
+	zval sql_aliases = {}, sql_columns = {}, sql_aliases_models = {}, sql_models_aliases = {}, sql_aliases_models_instances = {}, models = {};
+	zval models_instances = {}, selected_models = {}, manager = {}, *selected_model, tmp_models = {}, tmp_models_instances = {}, tmp_sql_aliases = {};
+	zval tmp_sql_aliases_models = {}, tmp_sql_models_aliases = {}, tmp_sql_aliases_models_instances = {}, joins = {}, sql_joins = {}, select_columns = {};
 	zval position = {}, sql_column_aliases = {}, *column, sql_select = {}, where = {}, where_expr = {}, group_by = {}, sql_group = {};
 	zval having = {}, having_expr = {}, order = {}, sql_order = {}, limit = {}, sql_limit = {}, forupdate = {};
 
 	phalcon_fetch_params(0, 0, 2, &_ast, &merge);
 
-	if (!_ast) {
-		phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
-	} else {
-		PHALCON_CPY_WRT(&ast, _ast);
-	}
-
 	if (!merge) {
 		merge = &PHALCON_GLOBAL(z_false);
 	}
+
+	phalcon_read_property(&old_ast, getThis(), SL("_ast"), PH_NOISY);
+
+	if (_ast) {
+		phalcon_update_property_zval(getThis(), SL("_ast"), _ast);
+	}
+
+	PHALCON_STR(&event_name, "query:beforePrepareSelect");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
+	phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
 
 	if (!phalcon_array_isset_fetch_str(&select, &ast, SL("select"))) {
 		PHALCON_CPY_WRT_CTOR(&select, &ast);
@@ -2668,6 +2685,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 		phalcon_update_property_zval(getThis(), SL("_sqlAliasesModelsInstances"), &tmp_sql_aliases_models_instances);
 	}
 
+	phalcon_update_property_zval(getThis(), SL("_ast"), &old_ast);
+
+	PHALCON_STR(&event_name, "query:afterPrepareSelect");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
 	RETURN_CTORW(&sql_select);
 }
 
@@ -2678,8 +2700,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
-	zval ast = {}, qualified_name = {}, values = {}, model_name = {}, manager = {}, model = {}, source = {}, schema = {}, table = {}, sql_aliases = {};
+	zval event_name = {}, ast = {}, qualified_name = {}, values = {}, model_name = {}, manager = {}, model = {}, source = {}, schema = {}, table = {}, sql_aliases = {};
 	zval expr_rows = {}, *row, sql_insert = {}, sql_fields = {}, fields = {}, *field, exception_message = {};
+
+	PHALCON_STR(&event_name, "query:beforePrepareInsert");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
 
@@ -2776,6 +2801,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
 	phalcon_array_update_string(&sql_insert, IS(values), &expr_rows, PH_COPY);
 
+	PHALCON_STR(&event_name, "query:afterPrepareInsert");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
 	RETURN_CTORW(&sql_insert);
 }
 
@@ -2786,9 +2814,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 
-	zval ast = {}, update = {}, tables = {}, values = {}, models = {}, models_instances = {}, sql_tables = {}, sql_models = {}, sql_aliases = {}, sql_aliases_models_instances = {};
+	zval event_name = {}, ast = {}, update = {}, tables = {}, values = {}, models = {}, models_instances = {}, sql_tables = {}, sql_models = {}, sql_aliases = {}, sql_aliases_models_instances = {};
 	zval update_tables = {}, manager = {}, *table, sql_fields = {}, sql_values = {}, update_values = {}, *update_value;
 	zval where = {}, where_expr = {}, limit = {}, sql_limit = {};
+
+	PHALCON_STR(&event_name, "query:beforePrepareUpdate");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_fetch_str(&update, &ast, SL("update"))) {
@@ -2941,6 +2972,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 		PHALCON_CALL_METHODW(&sql_limit, getThis(), "_getlimitclause", &limit);
 		phalcon_array_update_string(return_value, IS(limit), &sql_limit, PH_COPY);
 	}
+
+	PHALCON_STR(&event_name, "query:afterPrepareUpdate");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 }
 
 /**
@@ -2950,8 +2984,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 
-	zval ast = {}, delete_ast = {}, tables = {}, models = {}, models_instances = {}, sql_tables = {}, sql_models = {}, sql_aliases = {}, sql_aliases_models_instances = {};
+	zval event_name = {}, ast = {}, delete_ast = {}, tables = {}, models = {}, models_instances = {}, sql_tables = {}, sql_models = {}, sql_aliases = {}, sql_aliases_models_instances = {};
 	zval delete_tables = {}, manager = {}, *table, where = {}, where_expr = {}, limit = {}, sql_limit = {};
+
+	PHALCON_STR(&event_name, "query:beforePrepareDelete");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_fetch_str(&delete_ast, &ast, SL("delete"))) {
@@ -3063,6 +3100,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 		PHALCON_CALL_METHODW(&sql_limit, getThis(), "_getlimitclause", &limit);
 		phalcon_array_update_string(return_value, IS(limit), &sql_limit, PH_COPY);
 	}
+
+	PHALCON_STR(&event_name, "query:afterPrepareDelete");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 }
 
 /**
@@ -3082,6 +3122,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 	phalcon_fetch_params(0, 0, 1, &_phql);
 
+	PHALCON_STR(&event_name, "query:beforeParse");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
 	if (!_phql) {
 		phalcon_read_property(&intermediate, getThis(), SL("_intermediate"), PH_NOISY);
 		if (Z_TYPE(intermediate) == IS_ARRAY) {
@@ -3092,10 +3135,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	} else {
 		PHALCON_CPY_WRT(&phql, _phql);
 	}
-
-	PHALCON_STR(&event_name, "query:beforeParse");
-
-	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Parse PHQL: ", &phql);
@@ -3112,13 +3151,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	/** 
 	 * A valid AST must have a type
 	 */
-	if (Z_TYPE(ast) == IS_ARRAY && phalcon_array_isset_str(&ast, ISL(type))) {
+	if (Z_TYPE(ast) == IS_ARRAY && phalcon_array_isset_fetch_str(&type, &ast, ISL(type))) {
 		phalcon_update_property_zval(getThis(), SL("_ast"), &ast);
 
 		/** 
 		 * Produce an independent database system representation
 		 */
-		phalcon_array_fetch_string(&type, &ast, IS(type), PH_NOISY);
 		phalcon_update_property_zval(getThis(), SL("_type"), &type);
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted AST");
@@ -3248,7 +3286,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	PHALCON_STR(&event_name, "query:afterParse");
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
-
 	RETURN_CTORW(&ir_phql);
 }
 
@@ -3300,7 +3337,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getCache){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
-	zval intermediate = {}, bind_params = {}, bind_types = {}, manager = {}, models = {}, number_models = {}, models_instances = {};
+	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, manager = {}, models = {}, number_models = {}, models_instances = {};
 	zval model_name = {}, model = {}, connection = {}, *model_name2, columns = {}, *column, select_columns = {};
 	zval simple_column_map = {}, dialect = {}, sql_select = {}, processed = {}, *value = NULL, processed_types = {};
 	zval result = {}, count = {}, result_data = {}, dependency_injector = {}, cache = {}, result_object = {};
@@ -3309,6 +3346,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	ulong idx;
 	int have_scalars = 0, have_objects = 0, is_complex = 0, is_simple_std = 0;
 	size_t number_objects = 0;
+
+
+	PHALCON_STR(&event_name, "query:beforeExecuteSelect");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	/** 
 	 * Models instances is an array if the SELECT was prepared with parse
@@ -3643,6 +3684,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		}
 	}
 
+	PHALCON_STR(&event_name, "query:afterExecuteSelect");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	RETURN_CTORW(&resultset);
 }
@@ -3657,11 +3700,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
-	zval intermediate = {}, bind_params = {}, bind_types = {}, model_name = {}, manager = {}, connection = {}, models_instances = {}, model = {};
+	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, model_name = {}, manager = {}, connection = {}, models_instances = {}, model = {};
 	zval dialect = {}, sql_insert = {};
 	zval processed = {}, processed_types = {}, *value = NULL, success = {}, identity_field = {}, support_sequences = {}, sequence_name = {}, schema = {}, source = {};
 	zend_string *str_key;
 	ulong idx;
+
+	PHALCON_STR(&event_name, "query:beforeExecuteInsert");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	PHALCON_CALL_SELFW(&intermediate, "getintermediate");
 	PHALCON_SEPARATE_ARRAY(&intermediate);
@@ -3779,6 +3825,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success);
+
+	PHALCON_STR(&event_name, "query:afterExecuteInsert");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 }
 
 /**
@@ -3791,12 +3840,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
-	zval intermediate = {}, bind_params = {}, bind_types = {}, models = {}, model_name = {}, models_instances = {}, model = {}, manager = {};
+	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, models = {}, model_name = {}, models_instances = {}, model = {}, manager = {};
 	zval connection = {}, dialect = {}, success = {}, update_sql = {}, processed = {}, processed_types = {}, *value = NULL;
 	zend_string *str_key;
 	ulong idx;
 
-	
+
+	PHALCON_STR(&event_name, "query:beforeExecuteUpdate");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
 	PHALCON_CALL_SELFW(&intermediate, "getintermediate");
 	PHALCON_SEPARATE_ARRAY(&intermediate);
 	PHALCON_CALL_SELFW(&bind_params, "getmergebindparams");
@@ -3888,6 +3940,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success);
+
+	PHALCON_STR(&event_name, "query:afterExecuteUpdate");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 }
 
 /**
@@ -3900,10 +3955,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
-	zval intermediate = {}, bind_params = {}, bind_types = {}, models = {}, model_name = {}, models_instances = {}, model = {};
+	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, models = {}, model_name = {}, models_instances = {}, model = {};
 	zval connection = {}, manager = {}, success = {}, dialect = {}, delete_sql = {}, processed = {}, processed_types = {}, *value;
 	zend_string *str_key;
 	ulong idx;
+
+
+	PHALCON_STR(&event_name, "query:beforeExecuteUpdate");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	PHALCON_CALL_SELFW(&intermediate, "getintermediate");
 	PHALCON_SEPARATE_ARRAY(&intermediate);
@@ -3999,6 +4058,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	 */
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &success);
+
+	PHALCON_STR(&event_name, "query:afterExecuteUpdate");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 }
 
 /**
@@ -4028,10 +4090,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	}
 
 	PHALCON_STR(&event_name, "query:beforeExecute");
-
-	PHALCON_MAKE_REF(bind_params);
-	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, bind_params);
-	PHALCON_UNREF(bind_params);
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
 
 	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY);
 	cache_options_is_not_null = (Z_TYPE(cache_options) != IS_NULL); /* to keep scan-build happy */
@@ -4344,6 +4403,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getBindParams){
 }
 
 /**
+ * Set merge bind parameters
+ *
+ * @param array $bindParams
+ * @return Phalcon\Mvc\Model\Query
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, setMergeBindParams){
+
+	zval *bind_params;
+
+	phalcon_fetch_params(0, 1, 0, &bind_params);
+
+	if (Z_TYPE_P(bind_params) != IS_ARRAY && Z_TYPE_P(bind_params) != IS_NULL) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind parameters must be an array");
+		return;
+	}
+	phalcon_update_property_zval(getThis(), SL("_mergeBindParams"), bind_params);
+
+	RETURN_THISW();
+}
+
+/**
  * Returns merge bind params
  *
  * @return array
@@ -4402,6 +4482,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getBindTypes){
 
 
 	RETURN_MEMBER(getThis(), "_bindTypes");
+}
+
+/**
+ * Set merge bind types
+ *
+ * @param array $bindTypes
+ * @return Phalcon\Mvc\Model\Query
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, setMergeBindTypes){
+
+	zval *bind_types;
+
+	phalcon_fetch_params(0, 1, 0, &bind_types);
+
+	if (Z_TYPE_P(bind_types) != IS_ARRAY && Z_TYPE_P(bind_types) != IS_NULL) { 
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind types must be an array");
+		return;
+	}
+	phalcon_update_property_zval(getThis(), SL("_mergeBindTypes"), bind_types);
+
+	RETURN_THISW();
 }
 
 /**

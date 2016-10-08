@@ -1,9 +1,3 @@
-# [中文帮助](https://github.com/dreamsxin/cphalcon7/wiki)
-
-## [捐贈名單（Donation）](https://github.com/dreamsxin/cphalcon/blob/master/DONATE.md)
-
-PHP5 系列使用 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
-
 Phalcon7 Framework
 =================
 
@@ -27,6 +21,9 @@ Prerequisite packages are:
 Ubuntu:
 
 ```bash
+# if enable qrcode
+sudo apt-get install libqrencode-dev libzbar-dev imagemagick libmagick++-dev libmagickwand-dev libmagickcore-dev libpng12-dev
+
 sudo add-apt-repository ppa:ondrej/php
 sudo apt-get install php7.0-dev libpcre3-dev gcc make
 
@@ -75,6 +72,25 @@ extension=phalcon.so
 
 Finally, restart the webserver.
 
+Current Build Status
+--------------------
+
+Phalcon Framework is built under the Travis CI service. Every commit pushed to this repository will queue a build into the continuous integration service and will run all PHPUnit tests to ensure that everything is going well and the project is stable. The current build status is:
+
+[![Build Status](https://secure.travis-ci.org/dreamsxin/cphalcon7.png?branch=master)](http://travis-ci.org/dreamsxin/cphalcon7)
+
+Meet the Incubator
+-----------
+Our community is developing amazing extra features for Phalcon every day via [Incubator](https://github.com/phalcon/incubator). There are resources to enhance your experience with the framework and that enlarge the main features.
+
+Just give it a try and help us improve Phalcon even more!
+
+External Links
+--------------
+
+* [中文帮助](https://github.com/dreamsxin/cphalcon7/wiki)
+* [捐贈名單（Donation）](https://github.com/dreamsxin/cphalcon7/blob/master/DONATE.md)
+* PHP5 系列使用 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
 
 License
 -------

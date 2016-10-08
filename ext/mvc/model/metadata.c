@@ -87,6 +87,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getColumnMap);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getReverseColumnMap);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttribute);
+PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasColumn);
+PHP_METHOD(Phalcon_Mvc_Model_MetaData, getColumn);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, isEmpty);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, reset);
 
@@ -124,6 +126,8 @@ static const zend_function_entry phalcon_mvc_model_metadata_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_MetaData, getReverseColumnMap, arginfo_phalcon_mvc_model_metadatainterface_getreversecolumnmap, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, hasAttribute, arginfo_phalcon_mvc_model_metadatainterface_hasattribute, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, getAttribute, arginfo_phalcon_mvc_model_metadatainterface_getattribute, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_MetaData, hasColumn, arginfo_phalcon_mvc_model_metadatainterface_hascolumn, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_MetaData, getColumn, arginfo_phalcon_mvc_model_metadatainterface_getcolumn, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, isEmpty, arginfo_phalcon_mvc_model_metadatainterface_isempty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, reset, arginfo_phalcon_mvc_model_metadatainterface_reset, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -1173,6 +1177,84 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute){
  * @return string
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttribute){
+
+	zval *model, *column, reverse_column_map = {}, column_map = {};
+
+	phalcon_fetch_params(0, 2, 0, &model, &column);
+
+	if (Z_TYPE_P(column) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Column must be a string");
+		return;
+	}
+
+	PHALCON_CALL_METHODW(&reverse_column_map, getThis(), "getreversecolumnmap", model);
+	if (Z_TYPE(reverse_column_map) == IS_ARRAY) {
+		if (phalcon_array_isset(&reverse_column_map, column)) {
+			RETURN_CTORW(column);
+		} else {
+			PHALCON_CALL_METHODW(&column_map, getThis(), "getcolumnmap", model);
+			if (Z_TYPE(column_map) == IS_ARRAY && phalcon_array_isset_fetch(return_value, &column_map, column, 0)) {
+				return;
+			} else {
+				RETURN_FALSE;
+			}
+		}		
+	} else {
+		RETURN_CTORW(column);
+	}
+}
+
+/**
+ * Check if a model has real attribute name
+ *
+ *<code>
+ *	var_dump($metaData->hasColumn(new Robots(), 'name'));
+ *</code>
+ *
+ * @param Phalcon\Mvc\ModelInterface $model
+ * @param string $column
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasColumn){
+
+	zval *model, *attribute, column_map = {}, meta_data = {}, data_types = {};
+
+	phalcon_fetch_params(0, 2, 0, &model, &attribute);
+
+	if (Z_TYPE_P(attribute) != IS_STRING) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Attribute must be a string");
+		return;
+	}
+
+	PHALCON_CALL_METHODW(&column_map, getThis(), "getcolumnmap", model);
+	if (Z_TYPE(column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&column_map)) { 
+		if (phalcon_array_isset(&column_map, attribute)) {
+			RETURN_TRUE;
+		}
+	} else {
+		PHALCON_CALL_METHODW(&meta_data, getThis(), "readmetadata", model);
+
+		phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY);
+		if (phalcon_array_isset(&data_types, attribute)) {
+			RETURN_TRUE;
+		}
+	}
+
+	RETURN_FALSE;
+}
+
+/**
+ * Gets a real attribute name
+ *
+ *<code>
+ *	var_dump($metaData->getColumn(new Robots(), 'name'));
+ *</code>
+ *
+ * @param Phalcon\Mvc\ModelInterface $model
+ * @param string $column
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_MetaData, getColumn){
 
 	zval *model, *column, reverse_column_map = {}, column_map = {};
 

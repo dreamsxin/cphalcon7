@@ -110,6 +110,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getReverseColumnMap);
 PHP_METHOD(Phalcon_Mvc_Model, getColumns);
 PHP_METHOD(Phalcon_Mvc_Model, hasColumn);
 PHP_METHOD(Phalcon_Mvc_Model, getColumn);
+PHP_METHOD(Phalcon_Mvc_Model, hasAttribute);
+PHP_METHOD(Phalcon_Mvc_Model, getAttribute);
 PHP_METHOD(Phalcon_Mvc_Model, getDataTypes);
 PHP_METHOD(Phalcon_Mvc_Model, setConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model, setReadConnectionService);
@@ -218,6 +220,14 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_getcolumn, 0, 0, 1)
 	ZEND_ARG_INFO(0, column)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_hasattribute, 0, 0, 1)
+	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_getattribute, 0, 0, 1)
+	ZEND_ARG_INFO(0, attribute)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_setdirtystate, 0, 0, 1)
@@ -357,6 +367,8 @@ static const zend_function_entry phalcon_mvc_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model, getColumnMap, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, hasColumn, arginfo_phalcon_mvc_model_hascolumn, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, getColumn, arginfo_phalcon_mvc_model_getcolumn, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model, hasAttribute, arginfo_phalcon_mvc_model_hasattribute, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model, getAttribute, arginfo_phalcon_mvc_model_getattribute, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, getReverseColumnMap, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, getColumns, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, getDataTypes, NULL, ZEND_ACC_PUBLIC)
@@ -816,7 +828,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getColumns){
 }
 
 /**
- * Check if a model has certain attribute
+ * Check if a model has certain column
  *
  * @param string $column
  * @return boolean
@@ -831,9 +843,8 @@ PHP_METHOD(Phalcon_Mvc_Model, hasColumn){
 	PHALCON_RETURN_CALL_METHODW(&meta_data, "hascolumn", getThis(), column);
 }
 
-
 /**
- * Gets a model certain attribute
+ * Gets a model certain column
  *
  * @param string $column
  * @return string
@@ -846,6 +857,38 @@ PHP_METHOD(Phalcon_Mvc_Model, getColumn){
 
 	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
 	PHALCON_RETURN_CALL_METHODW(&meta_data, "getcolumn", getThis(), column);
+}
+
+/**
+ * Check if a model has certain attribute
+ *
+ * @param string $attribute
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Mvc_Model, hasAttribute){
+
+	zval *attribute, meta_data = {};
+
+	phalcon_fetch_params(0, 1, 0, &attribute);
+
+	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_RETURN_CALL_METHODW(&meta_data, "hasAttribute", getThis(), attribute);
+}
+
+/**
+ * Gets a model certain attribute
+ *
+ * @param string $attribute
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model, getAttribute){
+
+	zval *attribute, meta_data = {};
+
+	phalcon_fetch_params(0, 1, 0, &attribute);
+
+	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_RETURN_CALL_METHODW(&meta_data, "getAttribute", getThis(), attribute);
 }
 
 /**
@@ -1517,7 +1560,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	zval *parameters = NULL, *auto_create = NULL, dependency_injector = {}, model_name = {}, service_name = {}, has = {}, manager = {}, model = {};
-	zval identityfield = {}, column_map = {}, id_condition = {}, params = {}, builder = {}, query = {}, cache = {}, event_name = {}, result = {}, hydration = {};
+	zval identityfield = {}, id_condition = {}, params = {}, builder = {}, query = {}, cache = {}, event_name = {}, result = {}, hydration = {};
 
 	phalcon_fetch_params(0, 0, 2, &parameters, &auto_create);
 
@@ -1552,10 +1595,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 			if (Z_TYPE_P(parameters) != IS_NULL) {
 				if (phalcon_is_numeric(parameters)) {
 					PHALCON_CALL_METHODW(&identityfield, &model, "getidentityfield");
-					PHALCON_CALL_METHODW(&column_map, &model, "getcolumnmap");
-					if (Z_TYPE(column_map) != IS_ARRAY || !phalcon_array_isset_fetch(&id_condition, &column_map, &identityfield, 0)) {
-						PHALCON_CPY_WRT(&id_condition, &identityfield);
-					}
+					PHALCON_CALL_METHODW(&id_condition, &model, "getattribute", &identityfield);
 
 					PHALCON_SCONCAT_SVS(&id_condition, " = '", parameters, "'");
 					phalcon_array_append(&params, &id_condition, PH_COPY);

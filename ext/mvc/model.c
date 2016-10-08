@@ -828,12 +828,12 @@ PHP_METHOD(Phalcon_Mvc_Model, hasColumn){
 	phalcon_fetch_params(0, 1, 0, &column);
 
 	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_RETURN_CALL_METHODW(&meta_data, "hasattribute", getThis(), column);
+	PHALCON_RETURN_CALL_METHODW(&meta_data, "hascolumn", getThis(), column);
 }
 
 
 /**
- * Gets a model certain attribute of db
+ * Gets a model certain attribute
  *
  * @param string $column
  * @return string
@@ -845,7 +845,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getColumn){
 	phalcon_fetch_params(0, 1, 0, &column);
 
 	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_RETURN_CALL_METHODW(&meta_data, "getattribute", getThis(), column);
+	PHALCON_RETURN_CALL_METHODW(&meta_data, "getcolumn", getThis(), column);
 }
 
 /**

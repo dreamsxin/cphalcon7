@@ -171,38 +171,41 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 				PHALCON_CALL_METHODW(return_value, &di, "get", &service_name);
 			} else {
 				object_init_ex(return_value, phalcon_mvc_model_query_builder_select_ce);
-				PHALCON_CALL_METHODW(NULL, return_value, "__construct", params);
 			}
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", params);
 			break;
 
 		case PHQL_T_INSERT:
 			PHALCON_STR(&service_name, ISV(modelsQueryBuilderForInsert));
 			PHALCON_CALL_METHODW(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
-				PHALCON_CALL_METHODW(return_value, &di, "get", &service_name);
+				PHALCON_CALL_METHODW(return_value, &di, "get", &service_name, params);
 			} else {
-				//object_init_ex(return_value, phalcon_mvc_model_query_builder_insert_ce);
+				object_init_ex(return_value, phalcon_mvc_model_query_builder_insert_ce);
 			}
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", params);
 			break;
 
 		case PHQL_T_UPDATE:
 			PHALCON_STR(&service_name, ISV(modelsQueryBuilderForUpdate));
 			PHALCON_CALL_METHODW(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
-				PHALCON_CALL_METHODW(return_value, &di, "get", &service_name);
+				PHALCON_CALL_METHODW(return_value, &di, "get", &service_name, params);
 			} else {
-				//object_init_ex(return_value, phalcon_mvc_model_query_builder_delete_ce);
+				object_init_ex(return_value, phalcon_mvc_model_query_builder_delete_ce);
 			}
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", params);
 			break;
 
 		case PHQL_T_DELETE:
 			PHALCON_STR(&service_name, ISV(modelsQueryBuilderForDelete));
 			PHALCON_CALL_METHODW(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
-				PHALCON_CALL_METHODW(return_value, &di, "get", &service_name);
+				PHALCON_CALL_METHODW(return_value, &di, "get", &service_name, params);
 			} else {
-				//object_init_ex(return_value, phalcon_mvc_model_query_builder_delete_ce);
+				object_init_ex(return_value, phalcon_mvc_model_query_builder_delete_ce);
 			}
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", params);
 			break;
 
 		default:

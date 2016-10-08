@@ -833,7 +833,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasColumn){
 
 
 /**
- * Gets a model certain attribute
+ * Gets a model certain attribute of db
  *
  * @param string $column
  * @return string
@@ -1516,26 +1516,10 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
  */
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
-	zval *parameters = NULL, *auto_create = NULL, params = {}, dependency_injector = {}, model_name = {}, service_name = {}, has = {}, manager = {};
-	zval model = {}, builder = {}, query = {}, cache = {}, event_name = {}, result = {}, hydration = {};
+	zval *parameters = NULL, *auto_create = NULL, dependency_injector = {}, model_name = {}, service_name = {}, has = {}, manager = {}, model = {};
+	zval identityfield = {}, column_map = {}, id_condition = {}, params = {}, builder = {}, query = {}, cache = {}, event_name = {}, result = {}, hydration = {};
 
 	phalcon_fetch_params(0, 0, 2, &parameters, &auto_create);
-
-	if (parameters) {
-		if (Z_TYPE_P(parameters) != IS_ARRAY) {
-			array_init(&params);
-			if (Z_TYPE_P(parameters) != IS_NULL) {
-				if (phalcon_is_numeric(parameters)) {
-				} else {
-					phalcon_array_append(&params, parameters, PH_COPY);
-				}
-			}
-		} else {
-			PHALCON_CPY_WRT(&params, parameters);
-		}
-	} else {
-		ZVAL_NULL(&params);
-	}
 
 	if (!auto_create) {
 		auto_create = &PHALCON_GLOBAL(z_false);
@@ -1561,6 +1545,31 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	}
 
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name, &PHALCON_GLOBAL(z_true));
+
+	if (parameters) {
+		if (Z_TYPE_P(parameters) != IS_ARRAY) {
+			array_init(&params);
+			if (Z_TYPE_P(parameters) != IS_NULL) {
+				if (phalcon_is_numeric(parameters)) {
+					PHALCON_CALL_METHODW(&identityfield, &model, "getidentityfield");
+					PHALCON_CALL_METHODW(&column_map, &model, "getcolumnmap");
+					if (Z_TYPE(column_map) != IS_ARRAY || !phalcon_array_isset_fetch(&id_condition, &column_map, &identityfield, 0)) {
+						PHALCON_CPY_WRT(&id_condition, &identityfield);
+					}
+
+					PHALCON_SCONCAT_SVS(&id_condition, " = '", parameters, "'");
+					phalcon_array_append(&params, &id_condition, PH_COPY);
+				} else {
+					phalcon_array_append(&params, parameters, PH_COPY);
+				}
+			}
+		} else {
+			PHALCON_CPY_WRT(&params, parameters);
+		}
+	} else {
+		ZVAL_NULL(&params);
+	}
+
 	PHALCON_CALL_METHODW(&builder, &manager, "createbuilder", &params);
 
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);

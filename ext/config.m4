@@ -429,6 +429,7 @@ validation/validator/url.c \
 validation/validator/file.c \
 validation/validator/numericality.c \
 validation/validator/json.c \
+validation/validator/uniqueness.c \
 validation/validator.c \
 mvc/model/query/parser.c \
 mvc/model/query/scanner.c \

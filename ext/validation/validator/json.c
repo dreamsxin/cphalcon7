@@ -43,6 +43,7 @@
  *use Phalcon\Validation\Validator\Json as JsonValidator;
  *
  *$validator->add('json', new JsonValidator(array(
+ *   'keys' => array('name'),
  *   'message' => 'The json is not valid'
  *)));
  *</code>
@@ -84,7 +85,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Json, validate){
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 1);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
 
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
 

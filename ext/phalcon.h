@@ -395,6 +395,7 @@
 #include "validation/validator/file.h"
 #include "validation/validator/numericality.h"
 #include "validation/validator/json.h"
+#include "validation/validator/uniqueness.h"
 
 #include "chart/qrcode.h"
 #include "chart/captcha.h"

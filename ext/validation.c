@@ -298,7 +298,11 @@ PHP_METHOD(Phalcon_Validation, add){
 	zval *attribute, *validator, scope = {};
 
 	phalcon_fetch_params(0, 2, 0, &attribute, &validator);
-	PHALCON_ENSURE_IS_STRING(attribute);
+	if (Z_TYPE_P(attribute) != IS_STRING && Z_TYPE_P(attribute) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Field must be passed as array of fields or string");
+		return;
+	}
+
 	PHALCON_VERIFY_INTERFACE_EX(validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce, 0);
 
 	array_init_size(&scope, 2);
@@ -616,27 +620,30 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, labels = {}, field = {}, value = {};
+	zval *field_param = NULL, labels = {}, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &field_param);
 
-	if (Z_TYPE_P(field_param) != IS_STRING && Z_TYPE_P(field_param) != IS_NULL) {
-		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Parameter 'field' must be a string");
+	if (Z_TYPE_P(field_param) == IS_NULL) {
 		RETURN_NULL();
 	}
 
-	if (Z_TYPE_P(field_param) == IS_STRING) {
-		PHALCON_CPY_WRT(&field, field_param);
-	} else {
-		ZVAL_EMPTY_STRING(&field);
+	if (Z_TYPE_P(field_param) != IS_STRING && Z_TYPE_P(field_param) != IS_ARRAY) {
+		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Parameter 'field' must be a string or array");
+		RETURN_NULL();
+	}
+
+	if (Z_TYPE_P(field_param) == IS_ARRAY) {
+		phalcon_fast_join_str(&value, SL(", "), field_param);
+		RETURN_CTORW(&value);
 	}
 
 	phalcon_return_property(&labels, getThis(), SL("_labels"));
-	if (Z_TYPE(labels) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&value, &labels, &field, 0)) {
+	if (Z_TYPE(labels) == IS_ARRAY && Z_TYPE_P(field_param) == IS_STRING) {
+		if (phalcon_array_isset_fetch(&value, &labels, field_param, 0)) {
 			RETURN_CTORW(&value);
 		}
 	}
 
-	RETURN_NULL();
+	RETURN_CTORW(field_param);
 }

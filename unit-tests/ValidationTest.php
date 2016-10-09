@@ -29,10 +29,50 @@ use Phalcon\Validation\Validator\PresenceOf,
 	Phalcon\Validation\Validator\Between,
 	Phalcon\Validation\Validator\Url,
 	Phalcon\Validation\Validator\File,
-	Phalcon\Validation\Validator\Json;
+	Phalcon\Validation\Validator\Json,
+	Phalcon\Validation\Validator\Uniqueness;
 
 class ValidationTest extends PHPUnit_Framework_TestCase
 {
+
+	public function __construct()
+	{
+		date_default_timezone_set('UTC');
+		spl_autoload_register(array($this, 'modelsAutoloader'));
+	}
+
+	public function __destruct()
+	{
+		spl_autoload_unregister(array($this, 'modelsAutoloader'));
+	}
+
+	public function modelsAutoloader($className)
+	{
+		if (file_exists('unit-tests/models/'.$className.'.php')) {
+			require 'unit-tests/models/'.$className.'.php';
+		}
+	}
+
+	protected function _getDI(){
+
+		Phalcon\DI::reset();
+
+		$di = new Phalcon\DI();
+
+		$di->set('modelsManager', function(){
+			return new Phalcon\Mvc\Model\Manager();
+		});
+
+		$di->set('modelsMetadata', function(){
+			return new Phalcon\Mvc\Model\Metadata\Memory();
+		});
+
+		$di->set('modelsQuery', 'Phalcon\Mvc\Model\Query');
+		$di->set('modelsQueryBuilder', 'Phalcon\Mvc\Model\Query\Builder');
+		$di->set('modelsCriteria', 'Phalcon\\Mvc\\Model\\Criteria');
+
+		return $di;
+	}
 
 	public function testValidationGroup()
 	{
@@ -1084,6 +1124,83 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
 		$messages = $validation->validate($_POST);
 
+		$this->assertEquals(count($messages), 0);
+	}
+
+	public function testValidationUniqueness()
+	{
+		require 'unit-tests/config.db.php';
+		if (empty($configPostgresql)) {
+			$this->markTestSkipped("Skipped");
+			return;
+		}
+
+		$di = $this->_getDI();
+
+		$di->set('db', function(){
+			require 'unit-tests/config.db.php';
+			return new Phalcon\Db\Adapter\Pdo\Postgresql($configPostgresql);
+		}, true);
+
+		$connection = $di->getShared('db');
+		$success = $connection->delete("subscriptores");
+		$this->assertTrue($success);
+
+		$expectedMessages = Phalcon\Validation\Message\Group::__set_state(array(
+			'_messages' => array(
+				0 => Phalcon\Validation\Message::__set_state(array(
+						'_type' => 'Uniqueness',
+						'_message' => 'email must be unique',
+						'_field' => 'email',
+						'_code' => 0,
+					))
+			)
+		));
+
+		$createdAt = new Phalcon\Db\RawValue('now()');
+
+		$subscriptor = new Subscriptores();
+		$subscriptor->email = 'dreamsxin@qq.com';
+		$subscriptor->created_at = $createdAt;
+		$subscriptor->status = 'P';
+		$this->assertTrue($subscriptor->save());
+
+		$validation = new Phalcon\Validation();
+		$validation->add('email', new Uniqueness(array(
+			'model' => $subscriptor,
+			'message' => ':field must be unique'
+		)));
+
+		$messages = $validation->validate();
+
+		$this->assertEquals($expectedMessages, $messages);
+
+		$validation = new Phalcon\Validation();
+		$validation->add('email', new Uniqueness(array(
+			'model' => $subscriptor,
+			'message' => ':field must be unique',
+			'except' => 'id' // array('id', 'email')
+		)));
+
+		$messages = $validation->validate();
+		$this->assertEquals(count($messages), 0);
+
+		$subscriptor = new Subscriptores();
+		$subscriptor->email = 'dreamsxin@qq.com';
+
+		$validation = new Phalcon\Validation();
+		$validation->add('email', new Uniqueness(array(
+			'model' => $subscriptor,
+			'message' => ':field must be unique'
+		)));
+
+		$messages = $validation->validate();
+
+		$this->assertEquals($expectedMessages, $messages);
+
+		$subscriptor->email = 'dreamsxin2@qq.com';
+
+		$messages = $validation->validate();
 		$this->assertEquals(count($messages), 0);
 	}
 }

@@ -566,6 +566,7 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 	phalcon_array_update_str_str(&default_messages, SL("TooShort"),          SL("Field :field must be at least :min characters long"), PH_COPY);
 	phalcon_array_update_str_str(&default_messages, SL("Uniqueness"),        SL("Field :field must be unique"), PH_COPY);
 	phalcon_array_update_str_str(&default_messages, SL("Url"),               SL("Field :field must be a url"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Json"),               SL("Field :field must be a json"), PH_COPY);
 
 	if (!messages || Z_TYPE_P(messages) == IS_NULL) {
 		phalcon_update_property_zval(getThis(), SL("_defaultMessages"), &default_messages);

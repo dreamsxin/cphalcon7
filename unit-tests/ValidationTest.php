@@ -28,7 +28,8 @@ use Phalcon\Validation\Validator\PresenceOf,
 	Phalcon\Validation\Validator\Email,
 	Phalcon\Validation\Validator\Between,
 	Phalcon\Validation\Validator\Url,
-	Phalcon\Validation\Validator\File;
+	Phalcon\Validation\Validator\File,
+	Phalcon\Validation\Validator\Json;
 
 class ValidationTest extends PHPUnit_Framework_TestCase
 {
@@ -1048,5 +1049,41 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		));
 
 		$this->assertEquals($expectedMessages, $messages);
+	}
+
+	public function testValidationJson()
+	{
+		$_POST = array();
+
+		$validation = new Phalcon\Validation();
+
+		$validation->add('json', new Json());
+
+		$messages = $validation->validate($_POST);
+
+		$expectedMessages = Phalcon\Validation\Message\Group::__set_state(array(
+			'_messages' => array(
+				0 => Phalcon\Validation\Message::__set_state(array(
+						'_type' => 'Json',
+						'_message' => 'Field json must be a json',
+						'_field' => 'json',
+						'_code' => 0,
+					))
+			)
+		));
+
+		$this->assertEquals($expectedMessages, $messages);
+
+		$_POST = array('json' => 'Phalcon');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertEquals($expectedMessages, $messages);
+
+		$_POST = array('json' => '{"version":1.3}');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertEquals(count($messages), 0);
 	}
 }

@@ -22,6 +22,7 @@
 #include "mvc/model/validatorinterface.h"
 #include "mvc/model/exception.h"
 #include "mvc/model/metadatainterface.h"
+#include "mvc/model.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -201,7 +202,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Validator_Uniqueness, validate){
 	 * If the operation is update, there must be values in the object
 	 */
 	PHALCON_CALL_METHODW(&operation_made, record, "getoperationmade");
-	if (PHALCON_IS_LONG(&operation_made, 2)) {
+	if (PHALCON_IS_LONG(&operation_made, PHALCON_MODEL_OP_UPDATE)) {
 		/** 
 		 * We build a query with the primary key attributes
 		 */

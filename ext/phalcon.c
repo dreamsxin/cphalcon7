@@ -177,6 +177,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Session_AdapterInterface);
 	PHALCON_INIT(Phalcon_Session_BagInterface);
 	PHALCON_INIT(Phalcon_Translate_AdapterInterface);
+	PHALCON_INIT(Phalcon_ValidationInterface);
 	PHALCON_INIT(Phalcon_Validation_ValidatorInterface);
 	PHALCON_INIT(Phalcon_Validation_MessageInterface);
 

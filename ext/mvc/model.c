@@ -471,7 +471,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model){
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Model, mvc_model, phalcon_di_injectable_ce, phalcon_mvc_model_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_errorMessages"), ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_mvc_model_ce, SL("_operationMade"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_mvc_model_ce, SL("_operationMade"), PHALCON_MODEL_OP_NONE, ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_mvc_model_ce, SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_transaction"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_uniqueKey"), ZEND_ACC_PROTECTED);
@@ -485,10 +485,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model){
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_relatedResult"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_columnMap"), ZEND_ACC_PROTECTED);
 
-	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("OP_NONE"), 0);
-	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("OP_CREATE"), 1);
-	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("OP_UPDATE"), 2);
-	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("OP_DELETE"), 3);
+	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("OP_NONE"), PHALCON_MODEL_OP_NONE);
+	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("OP_CREATE"), PHALCON_MODEL_OP_CREATE);
+	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("OP_UPDATE"), PHALCON_MODEL_OP_UPDATE);
+	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("OP_DELETE"), PHALCON_MODEL_OP_DELETE);
 	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("DIRTY_STATE_PERSISTENT"), PHALCON_MODEL_DIRTY_STATE_PERSISTEN);
 	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("DIRTY_STATE_TRANSIENT"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT);
 	zend_declare_class_constant_long(phalcon_mvc_model_ce, SL("DIRTY_STATE_DETACHED"), PHALCON_MODEL_DIRTY_STATE_DETACHED);
@@ -4174,9 +4174,9 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	}
 
 	if (zend_is_true(&exists)) {
-		phalcon_update_property_long(getThis(), SL("_operationMade"), 2);
+		phalcon_update_property_long(getThis(), SL("_operationMade"), PHALCON_MODEL_OP_UPDATE);
 	} else {
-		phalcon_update_property_long(getThis(), SL("_operationMade"), 1);
+		phalcon_update_property_long(getThis(), SL("_operationMade"), PHALCON_MODEL_OP_CREATE);
 	}
 
 	PHALCON_STR(&event_name, "beforeOperation");
@@ -4419,7 +4419,7 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	/**
 	 * Operation made is OP_DELETE
 	 */
-	phalcon_update_property_long(getThis(), SL("_operationMade"), 3);
+	phalcon_update_property_long(getThis(), SL("_operationMade"), PHALCON_MODEL_OP_DELETE);
 
 	PHALCON_STR(&event_name, "beforeOperation");
 	PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name);

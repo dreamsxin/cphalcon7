@@ -18,6 +18,7 @@
 */
 
 #include "validation.h"
+#include "validationinterface.h"
 #include "validation/exception.h"
 #include "validation/message/group.h"
 #include "validation/validator.h"
@@ -65,16 +66,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, validators)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_validate, 0, 0, 0)
-	ZEND_ARG_INFO(0, data)
-	ZEND_ARG_INFO(0, entity)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_add, 0, 0, 2)
-	ZEND_ARG_INFO(0, attribute)
-	ZEND_ARG_INFO(0, validator)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfilters, 0, 0, 2)
 	ZEND_ARG_INFO(0, attribute)
 	ZEND_ARG_INFO(0, filters)
@@ -115,8 +106,8 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_validation_method_entry[] = {
 	PHP_ME(Phalcon_Validation, __construct, arginfo_phalcon_validation___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Validation, validate, arginfo_phalcon_validation_validate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation, add, arginfo_phalcon_validation_add, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, validate, arginfo_phalcon_validationinterface_validate, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, add, arginfo_phalcon_validationinterface_add, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setFilters, arginfo_phalcon_validation_setfilters, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getFilters, arginfo_phalcon_validation_getfilters, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getValidators, NULL, ZEND_ACC_PUBLIC)
@@ -147,6 +138,8 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 	zend_declare_property_null(phalcon_validation_ce, SL("_values"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_defaultMessages"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_labels"), ZEND_ACC_PROTECTED);
+
+	zend_class_implements(phalcon_validation_ce, 1, phalcon_validationinterface_ce);
 
 	return SUCCESS;
 }

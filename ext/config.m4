@@ -370,6 +370,7 @@ events/exception.c \
 events/eventsawareinterface.c \
 events/listener.c \
 escaperinterface.c \
+validationinterface.c \
 validation.c \
 version.c \
 flashinterface.c \

@@ -373,6 +373,8 @@
 
 #include "date.h"
 
+
+#include "validationinterface.h"
 #include "validation.h"
 #include "validation/exception.h"
 #include "validation/message.h"

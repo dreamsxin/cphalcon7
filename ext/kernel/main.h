@@ -322,7 +322,7 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table);
 
 /** When type is the ref should also */
 #define PHALCON_MAKE_REF(obj) \
-		if (!Z_ISREF_P(obj)) { \
+		if (!Z_ISREF_P(obj) && Z_TYPE_P(obj) >= IS_ARRAY) { \
 			__is_make_ref += 1; \
 			ZVAL_NEW_REF(obj, obj); \
 		}

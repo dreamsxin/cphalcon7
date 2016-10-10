@@ -128,7 +128,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($robotsParts->save());
 
 		$messages = array(
-			0 => Phalcon\Mvc\Model\Message::__set_state(array(
+			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
 				'_message' => 'Value of field "parts_id" does not exist on referenced table',
 				'_field' => 'parts_id',
@@ -143,7 +143,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($robotsParts->save());
 
 		$messages = array(
-			0 => Phalcon\Mvc\Model\Message::__set_state(array(
+			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
 				'_message' => 'The robot code does not exist',
 				'_field' => 'robots_id',
@@ -161,7 +161,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($robot->delete());
 
 		$messages = array(
-			0 => Phalcon\Mvc\Model\Message::__set_state(array(
+			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
 				'_message' => 'Record is referenced by model RobotsParts',
 				'_field' => 'id',
@@ -177,7 +177,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($part->delete());
 
 		$messages = array(
-			0 => Phalcon\Mvc\Model\Message::__set_state(array(
+			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
 				'_message' => 'Parts cannot be deleted because is referenced by a Robot',
 				'_field' => 'id',
@@ -199,7 +199,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($robottersDeles->save());
 
 		$messages = array(
-			0 => Phalcon\Mvc\Model\Message::__set_state(array(
+			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
 				'_message' => 'Value of field "delesCode" does not exist on referenced table',
 				'_field' => 'delesCode',
@@ -214,7 +214,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($robottersDeles->save());
 
 		$messages = array(
-			0 => Phalcon\Mvc\Model\Message::__set_state(array(
+			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
 				'_message' => 'The robotters code does not exist',
 				'_field' => 'robottersCode',
@@ -231,7 +231,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($robotter->delete());
 
 		$messages = array(
-			0 => Phalcon\Mvc\Model\Message::__set_state(array(
+			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
 				'_message' => 'Record is referenced by model RobottersDeles',
 				'_field' => 'code',
@@ -247,7 +247,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($dele->delete());
 
 		$messages = array(
-			0 => Phalcon\Mvc\Model\Message::__set_state(array(
+			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
 				'_message' => 'Deles cannot be deleted because is referenced by a Robotter',
 				'_field' => 'code',

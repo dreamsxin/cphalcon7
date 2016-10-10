@@ -318,9 +318,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	 */
 	if (zend_is_true(&module_name)) {
 		PHALCON_STR(&event_name, "application:beforeStartModule");
-		PHALCON_MAKE_REF(&module_name);
 		PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name, &module_name);
-		PHALCON_UNREF(&module_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
@@ -385,9 +383,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/* Calling afterStartModule event */
 		PHALCON_STR(&event_name, "application:afterStartModule");
 
-		PHALCON_MAKE_REF(&module_name);
 		PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name, &module_name);
-		PHALCON_UNREF(&module_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
@@ -443,9 +439,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/* Calling beforeHandleRequest */
 	PHALCON_STR(&event_name, "application:beforeHandleRequest");
 
-	PHALCON_MAKE_REF(&dispatcher);
 	PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name, &dispatcher);
-	PHALCON_UNREF(&dispatcher);
 
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
@@ -457,9 +451,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/* Calling afterHandleRequest */
 	PHALCON_STR(&event_name, "application:afterHandleRequest");
 
-	PHALCON_MAKE_REF(&controller);
 	PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name, &controller);
-	PHALCON_UNREF(&controller);
 
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
@@ -492,9 +484,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				 */
 				PHALCON_STR(&event_name, "application:beforeRenderView");
 
-				PHALCON_MAKE_REF(&view);
 				PHALCON_CALL_METHODW(&status, getThis(), "fireeventcancel", &event_name, &view);
-				PHALCON_UNREF(&view);
 
 				/* Check if the view process has been treated by the developer */
 				if (PHALCON_IS_NOT_FALSE(&status)) {
@@ -517,9 +507,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 				PHALCON_STR(&event_name, "application:afterRenderView");
 
-				PHALCON_MAKE_REF(&view);
 				PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &view);
-				PHALCON_UNREF(&view);
 			}
 		}
 	} else {
@@ -532,9 +520,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/* Calling beforeSendResponse */
 	PHALCON_STR(&event_name, "application:beforeSendResponse");
 
-	PHALCON_MAKE_REF(&response);
 	PHALCON_CALL_METHODW(&status, getThis(), "fireevent", &event_name, &response);
-	PHALCON_UNREF(&response);
 
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
@@ -556,9 +542,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	PHALCON_STR(&event_name, "application:afterSendResponse");
 
-	PHALCON_MAKE_REF(&response);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &response);
-	PHALCON_UNREF(&response);
 
 	/* Return the response */
 	RETURN_CTORW(&response);

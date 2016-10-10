@@ -160,7 +160,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		phalcon_array_fetch_long(&column_type, field, 2, PH_NOISY);
 
 		if (phalcon_memnstr_str(&column_type, SL("("))) {
+			ZVAL_NULL(&matches);
+			ZVAL_MAKE_REF(&matches);
 			RETURN_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches));
+			ZVAL_UNREF(&matches);
 			if (zend_is_true(&pos)) {
 				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1)) {
 					convert_to_long(&match_one);

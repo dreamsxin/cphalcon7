@@ -91,6 +91,10 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&record, ce, getThis(), ISV(model)));
+
+	if (Z_TYPE(record) != IS_OBJECT) {
+		PHALCON_CALL_METHODW(&record, validator, "getentity");
+	}
 	PHALCON_VERIFY_INTERFACE_EX(&record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce, 0);
 
 	PHALCON_CALL_METHODW(&meta_data, &record, "getmodelsmetadata");

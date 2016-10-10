@@ -22,7 +22,6 @@
 #include "mvc/model/exception.h"
 #include "mvc/model/managerinterface.h"
 #include "mvc/model/manager.h"
-#include "mvc/model/message.h"
 #include "mvc/model/metadatainterface.h"
 #include "mvc/model/metadata/memory.h"
 #include "mvc/model/query/builder.h"
@@ -30,7 +29,6 @@
 #include "mvc/model/resultinterface.h"
 #include "mvc/model/resultsetinterface.h"
 #include "mvc/model/validationfailed.h"
-#include "mvc/model/validatorinterface.h"
 #include "mvc/model/criteria.h"
 #include "di.h"
 #include "diinterface.h"
@@ -40,6 +38,9 @@
 #include "db/rawvalue.h"
 #include "db/adapterinterface.h"
 #include "filterinterface.h"
+#include "validationinterface.h"
+#include "validation/message/group.h"
+#include "validation/message.h"
 
 #include <ext/pdo/php_pdo_driver.h>
 
@@ -235,9 +236,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_setdirtystate, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_validate, 0, 0, 1)
-	ZEND_ARG_INFO(0, validator)
-	ZEND_ARG_INFO(0, allow_empty)
-	ZEND_ARG_INFO(0, ex)
+	ZEND_ARG_INFO(0, validation)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_skipoperation, 0, 0, 1)
@@ -525,13 +524,6 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), message) {
-		if (Z_TYPE_P(message) == IS_OBJECT) {
-			zval *params[] = { target };
-			if (FAILURE == phalcon_call_method(NULL, message, "setmodel", 1, params)) {
-				break;
-			}
-		}
-
 		zval *params[] = { message };
 		if (FAILURE == phalcon_call_method(NULL, this_ptr, "appendmessage", 1, params)) {
 			break;
@@ -1498,9 +1490,9 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 
 	PHALCON_STR(&event_name, "beforeQuery");
 
-	PHALCON_MAKE_REF(&builder);
+	// PHALCON_MAKE_REF(&builder);
 	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &builder);
-	PHALCON_UNREF(&builder);
+	// PHALCON_UNREF(&builder);
 
 	PHALCON_CALL_METHODW(&query, &builder, "getquery");
 
@@ -1616,9 +1608,9 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	PHALCON_STR(&event_name, "beforeQuery");
 
-	PHALCON_MAKE_REF(&builder);
+	// PHALCON_MAKE_REF(&builder);
 	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &builder);
-	PHALCON_UNREF(&builder);
+	// PHALCON_UNREF(&builder);
 
 	/**
 	 * We only want the first record
@@ -2294,7 +2286,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _cancelOperation){
  * Appends a customized message on the validation process
  *
  * <code>
- * use \Phalcon\Mvc\Model\Message as Message;
+ * use \Phalcon\Validation\Message as Message;
  *
  * class Robots extends Phalcon\Mvc\Model
  * {
@@ -2309,7 +2301,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _cancelOperation){
  * }
  * </code>
  *
- * @param Phalcon\Mvc\Model\MessageInterface $message
+ * @param Phalcon\Validation\MessageInterface $message
  * @return Phalcon\Mvc\Model
  */
 PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
@@ -2346,7 +2338,7 @@ PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
 			PHALCON_CPY_WRT(&custom_message, message);
 		}
 
-		object_init_ex(&model_message, phalcon_mvc_model_message_ce);
+		object_init_ex(&model_message, phalcon_validation_message_ce);
 		PHALCON_CALL_METHODW(NULL, &model_message, "__construct", &custom_message, field, &type, code);
 
 		phalcon_update_property_array_append(getThis(), SL("_errorMessages"), &model_message);
@@ -2378,44 +2370,34 @@ PHP_METHOD(Phalcon_Mvc_Model, appendMessage){
  *
  *	public function validation()
  *  {
- * 		$this->validate(new ExclusionIn(array(
- *			'field' => 'status',
+ * 		$validation = new Phalcon\Validation();
+ * 		$validation->add('status', new ExclusionIn(array(
  *			'domain' => array('A', 'I')
  *		)));
- *		if ($this->validationHasFailed() == true) {
- *			return false;
- *		}
+ * 		return $this->validate($validation);
  *	}
  *
  *}
  *</code>
  *
- * @param array|Phalcon\Mvc\Model\ValidatorInterface $validator
+ * @param array|Phalcon\ValidationInterface $validation
  * @param boolean $allow_empty
  * @return Phalcon\Mvc\Model
  */
 PHP_METHOD(Phalcon_Mvc_Model, validate){
 
-	zval *validator, *allow_empty = NULL, *ex = NULL, field = {}, handler = {}, value = {}, arguments = {}, status = {};
-	zval message_str = {}, pairs = {}, message = {}, type = {}, code = {}, option = {}, messages = {}, errors = {}, new_errors = {};
+	zval *validation, field = {}, handler = {}, value = {}, arguments = {}, status = {}, message_str = {}, pairs = {};
+	zval prepared = {}, type = {}, code = {}, messages = {};
 
-	phalcon_fetch_params(0, 1, 2, &validator, &allow_empty, &ex);
+	phalcon_fetch_params(0, 1, 0, &validation);
 
-	if (!allow_empty) {
-		allow_empty = &PHALCON_GLOBAL(z_false);
-	}
-
-	if (!ex) {
-		ex = &PHALCON_GLOBAL(z_false);
-	}
-
-	if (Z_TYPE_P(validator) == IS_ARRAY) {
-		if (!phalcon_array_isset_fetch_str(&field, validator, SL("field"))) {
+	if (Z_TYPE_P(validation) == IS_ARRAY) {
+		if (!phalcon_array_isset_fetch_str(&field, validation, SL("field"))) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid field");
 			return;
 		}
 
-		if (!phalcon_array_isset_fetch_str(&handler, validator, SL("validator"))) {
+		if (!phalcon_array_isset_fetch_str(&handler, validation, SL("validator"))) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid validator");
 			return;
 		}
@@ -2427,92 +2409,79 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 
 		PHALCON_CALL_METHODW(&value, getThis(), "readattribute", &field);
 
-		if (zend_is_true(allow_empty)) {
-			if (PHALCON_IS_EMPTY(&value)) {
-				RETURN_THISW();
-			}
-		}
-
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, &value, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAYW(&status, &handler, &arguments);
 
 		if (PHALCON_IS_FALSE(&status)) {
-			if (phalcon_array_isset_fetch_str(&message_str, validator, SL("message"))) {
+			if (phalcon_array_isset_fetch_str(&message_str, validation, SL("message"))) {
 				array_init_size(&pairs, 1);
 				Z_TRY_ADDREF(field);
 				add_assoc_zval_ex(&pairs, SL(":field"), &field);
 
-				PHALCON_CALL_FUNCTIONW(&message, "strtr", &message_str, &pairs);
+				PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 			} else {
-				PHALCON_CONCAT_SVS(&message, "Invalid '", &field, "' format");
+				PHALCON_CONCAT_SVS(&prepared, "Invalid '", &field, "' format");
 			}
 
-			if (!phalcon_array_isset_fetch_str(&type, validator, SL("type"))) {
+			if (!phalcon_array_isset_fetch_str(&type, validation, SL("type"))) {
 				PHALCON_STR(&type, "Validator");
 			}
 
-			if (!phalcon_array_isset_fetch_str(&code, validator, SL("code"))) {
+			if (!phalcon_array_isset_fetch_str(&code, validation, SL("code"))) {
 				PHALCON_CPY_WRT(&code, &PHALCON_GLOBAL(z_zero));
 			}
 
-			PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &message, &field, &type, &code);
-
-			if (zend_is_true(ex)) {
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &message);
-				return;
-			}
+			PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &prepared, &field, &type, &code);
 		}
 
-		RETURN_THISW();
+		RETURN_CTORW(&status);
 	}
 
 	/**
-	 * Valid validators are objects
+	 * Valid validation are objects
 	 */
-	PHALCON_VERIFY_INTERFACE_EX(validator, phalcon_mvc_model_validatorinterface_ce, phalcon_mvc_model_exception_ce, 0);
-
-	PHALCON_STR(&option, "field");
-
-	PHALCON_CALL_METHODW(&field, validator, "getoption", &option);
-
-	if (zend_is_true(allow_empty)) {
-		PHALCON_CALL_METHODW(&value, getThis(), "readattribute", &field);
-
-		if (PHALCON_IS_EMPTY(&value)) {
-			RETURN_THISW();
-		}
-	}
+	PHALCON_VERIFY_INTERFACE_EX(validation, phalcon_validationinterface_ce, phalcon_mvc_model_exception_ce, 0);
 
 	/**
 	 * Call the validation, if it returns false we append the messages to the current
 	 * object
 	 */
-	PHALCON_CALL_METHODW(&status, validator, "validate", getThis());
-	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_CALL_METHODW(&messages, validator, "getmessages");
+	PHALCON_CALL_METHODW(&messages, validation, "validate", &PHALCON_GLOBAL(z_null), getThis());
+	if (Z_TYPE(messages) == IS_OBJECT) {
+		PHALCON_VERIFY_CLASS_EX(&messages, phalcon_validation_message_group_ce, phalcon_mvc_model_exception_ce, 0);
 
-		if (Z_TYPE(messages) == IS_ARRAY) {
-			phalcon_read_property(&errors, getThis(), SL("_errorMessages"), PH_NOISY);
-			if (Z_TYPE(errors) == IS_ARRAY) {
-				phalcon_fast_array_merge(&new_errors, &errors, &messages);
-				phalcon_update_property_zval(getThis(), SL("_errorMessages"), &new_errors);
-			} else {
-				phalcon_update_property_zval(getThis(), SL("_errorMessages"), &messages);
+		PHALCON_CALL_METHODW(NULL, &messages, "rewind");
+
+		while (1) {
+			zval valid = {}, current = {};
+
+			PHALCON_CALL_METHODW(&valid, &messages, "valid");
+			if (!PHALCON_IS_NOT_FALSE(&valid)) {
+				break;
 			}
 
-			if (zend_is_true(ex)) {
-				PHALCON_CONCAT_SVS(&message, "Validation '", &field, "' failed");
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &message);
-				return;
-			}
+			PHALCON_CALL_METHODW(&current, &messages, "current");
+			
+			PHALCON_CALL_METHODW(&prepared, &current, "getmessage");
+			PHALCON_CALL_METHODW(&field, &current, "getfield");
+			PHALCON_CALL_METHODW(&type, &current, "gettype");
+			PHALCON_CALL_METHODW(&code, &current, "getcode");
+
+			PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &prepared, &field, &type, &code);
+
+			PHALCON_CALL_METHODW(NULL, &messages, "next");
+		}
+
+		if (phalcon_fast_count_int(&messages)) {
+			RETURN_FALSE;
 		} else {
-			zend_throw_exception_ex(spl_ce_LogicException, 0, "Validator '%s' returned false but did not call appendMessage()", Z_OBJCE_P(validator)->name->val);
+			RETURN_TRUE;
 		}
 	}
 
-	RETURN_THISW();
+	RETURN_CTORW(&messages);
 }
 
 /**

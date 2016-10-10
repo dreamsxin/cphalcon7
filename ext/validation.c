@@ -469,7 +469,7 @@ PHP_METHOD(Phalcon_Validation, bind){
  */
 PHP_METHOD(Phalcon_Validation, getValue){
 
-	zval *attribute, entity = {}, method = {}, value = {}, data = {}, values = {}, filters = {}, field_filters = {}, service_name = {}, dependency_injector = {}, filter_service = {};
+	zval *attribute, entity = {}, value = {}, data = {}, values = {}, filters = {}, field_filters = {}, service_name = {}, dependency_injector = {}, filter_service = {};
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
@@ -479,11 +479,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 	 * If the entity is an object use it to retrieve the values
 	 */
 	if (Z_TYPE(entity) == IS_OBJECT) {
-		PHALCON_CONCAT_SV(&method, "get", attribute);
-		phalcon_strtolower_inplace(&method);
-		if (phalcon_method_exists_ex(&entity, Z_STRVAL(method), Z_STRLEN(method)) == SUCCESS) {
-			PHALCON_CALL_METHODW(&value, &entity, Z_STRVAL(method));
-		} else if (phalcon_method_exists_ex(&entity, SL("readattribute")) == SUCCESS) {
+		if (phalcon_method_exists_ex(&entity, SL("readattribute")) == SUCCESS) {
 			PHALCON_CALL_METHODW(&value, &entity, "readattribute", attribute);
 		} else {
 			phalcon_return_property_zval(&value, &entity, attribute);

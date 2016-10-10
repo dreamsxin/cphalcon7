@@ -4574,14 +4574,11 @@ PHP_METHOD(Phalcon_Mvc_Model, skipOperation){
  */
 PHP_METHOD(Phalcon_Mvc_Model, readAttribute){
 
-	zval *attribute, attribute_value = {};
+	zval *attribute;
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
-	if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), attribute)) {
-		RETURN_CTORW(&attribute_value);
-	}
-	RETURN_NULL();
+	phalcon_read_property_zval(return_value, getThis(), attribute, PH_NOISY);
 }
 
 /**
@@ -5771,35 +5768,25 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
  */
 PHP_METHOD(Phalcon_Mvc_Model, __get){
 
-	zval *property, possible_getter = {}, meta_data = {}, column_map = {}, attributes = {}, model_name = {}, manager = {}, lower_property = {}, related_result = {}, relation = {}, call_args = {}, call_object = {}, result = {};
+	zval *property, has = {}, possible_getter = {}, model_name = {}, manager = {}, lower_property = {}, related_result = {}, relation = {}, call_args = {}, call_object = {}, result = {};
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
 	if (Z_TYPE_P(property) == IS_STRING) {
-		if (PHALCON_GLOBAL(orm).enable_property_method) {
-			PHALCON_CONCAT_SV(&possible_getter, "get", property);
-			phalcon_strtolower_inplace(&possible_getter);
+		PHALCON_CALL_METHODW(&has, getThis(), "hasAttribute", property);
+		if (zend_is_true(&has)) {
+			if (PHALCON_GLOBAL(orm).enable_property_method) {
+				PHALCON_CONCAT_SV(&possible_getter, "get", property);
+				phalcon_strtolower_inplace(&possible_getter);
 
-			if (phalcon_method_exists_ce(phalcon_mvc_model_ce, &possible_getter) != SUCCESS) {
-				if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
-					PHALCON_CALL_ZVAL_METHODW(return_value, getThis(), &possible_getter);
-					return;
+				if (phalcon_method_exists_ce(phalcon_mvc_model_ce, &possible_getter) != SUCCESS) {
+					if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
+						PHALCON_CALL_ZVAL_METHODW(return_value, getThis(), &possible_getter);
+						return;
+					}
 				}
 			}
-		}
-
-		PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
-		PHALCON_CALL_METHODW(&column_map, &meta_data, "getreversecolumnmap", getThis());
-		if (Z_TYPE(column_map) != IS_ARRAY) {
-			PHALCON_CALL_METHODW(&attributes, &meta_data, "getdatatypes", getThis());
-
-			if (phalcon_array_isset(&attributes, property)) {
-				RETURN_NULL();
-			}
-		} else {
-			if (phalcon_array_isset(&column_map, property)) {
-				RETURN_NULL();
-			}
+			RETURN_NULL();
 		}
 	}
 

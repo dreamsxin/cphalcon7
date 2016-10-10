@@ -393,6 +393,7 @@
 #include "validation/validator/file.h"
 #include "validation/validator/numericality.h"
 
+#include "chart/qrcode.h"
 #include "chart/captcha.h"
 #include "chart/exception.h"
 

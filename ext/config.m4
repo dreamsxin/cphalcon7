@@ -1,10 +1,24 @@
-PHP_ARG_ENABLE(phalcon, whether to enable phalcon framework, [ --enable-phalcon   Enable phalcon framework])
-PHP_ARG_WITH(non-free, wheter to enable non-free css and js minifier, [ --without-non-free Disable non-free minifiers], yes, no)
+PHP_ARG_ENABLE(phalcon, whether to enable phalcon framework, 
+[  --enable-phalcon        Enable phalcon framework])
+
+PHP_ARG_WITH(non-free, wheter to enable non-free css and js minifier, 
+[  --without-non-free      Disable non-free minifiers], yes, no)
 
 AC_MSG_CHECKING([Include non-free minifiers])
 if test "$PHP_NON_FREE" = "yes"; then
 	AC_DEFINE([PHALCON_NON_FREE], [1], [Whether non-free minifiers are available])
 	AC_MSG_RESULT([yes, css and js])
+else
+	AC_MSG_RESULT([no])
+fi
+
+PHP_ARG_WITH(qrcode, wheter to enable qrcode, 
+[  --without-qrcode        Disable qrcode], yes, no)
+
+AC_MSG_CHECKING([Include qrcode])
+if test "$PHP_QRCODE" = "yes"; then
+	AC_DEFINE([PHALCON_QRCODE], [1], [Whether qrcode are available])
+	AC_MSG_RESULT([yes, qrcode])
 else
 	AC_MSG_RESULT([no])
 fi
@@ -424,6 +438,7 @@ image/adapterinterface.c \
 image/exception.c \
 image/adapter/gd.c \
 image/adapter/imagick.c \
+chart/qrcode.c \
 chart/captcha.c \
 chart/exception.c \
 async.c \
@@ -518,6 +533,7 @@ registry.c"
 
 	CPPFLAGS=$old_CPPFLAGS
 
+	AC_MSG_CHECKING([checking png support])
 	for i in /usr/local /usr; do
 		if test -r $i/include/png.h; then
 			PNG_CFLAGS=`pkg-config --cflags libpng`
@@ -528,13 +544,20 @@ registry.c"
 			CPPFLAGS="${CPPFLAGS} ${PNG_CFLAGS}"
 			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${PNG_LDFLAGS}"
 
-			AC_MSG_RESULT("libpng found")
+			AC_MSG_RESULT(yes)
 
 			AC_DEFINE([PHALCON_USE_PNG], [1], [Have libpng support])
 			break
 		fi
 	done
 
+	if test "$PHP_QRCODE" = "yes"; then
+		if test -z "$PNG_CFLAGS"; then
+			AC_MSG_ERROR([Incorrect png library])
+		fi
+	fi
+
+	AC_MSG_CHECKING([checking ImageMagick MagickWand support])
 	for i in /usr/local /usr; do
 		if test -r $i/bin/MagickWand-config; then
 			WAND_BINARY=$i/bin/MagickWand-config
@@ -542,17 +565,56 @@ registry.c"
 			WAND_CFLAGS=`$WAND_BINARY --cflags`
 			WAND_LDFLAGS=`$WAND_BINARY --libs`
 
-			PHP_ADD_INCLUDE($i/include)
+			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
+			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"
+
+			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
+			break
+		elif test -r $i/include/ImageMagick-6/wand/MagickWand.h; then
+			WAND_CFLAGS=`pkg-config --cflags MagickWand`
+			WAND_LDFLAGS=`pkg-config --libs MagickWand`
+
+			PHP_ADD_INCLUDE($i/include/ImageMagick-6)
 
 			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
 			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"
+
+			AC_MSG_RESULT(yes)
 
 			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
 			break
 		fi
 	done
 
-	if test -r "$WAND_BINARY"; then
+
+	if test "$PHP_QRCODE" = "yes"; then
+		if test -z "$WAND_CFLAGS"; then
+			AC_MSG_ERROR([Incorrect ImageMagick MagickWand library])
+		fi
+
+		AC_MSG_CHECKING([checking libqrencode support])
+		for i in /usr/local /usr; do
+			if test -r $i/include/qrencode.h; then
+				QR_CFLAGS=`pkg-config --cflags libqrencode`
+				QR_LDFLAGS=`pkg-config --libs libqrencode`
+
+				PHP_ADD_INCLUDE($i/include)
+
+				CPPFLAGS="${CPPFLAGS} ${QR_CFLAGS}"
+				EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${QR_LDFLAGS}"
+
+				AC_MSG_RESULT(yes)
+
+				AC_DEFINE([PHALCON_USE_QRENCODE], [1], [Have libqrencode support])
+				break
+			fi
+		done
+
+		if test -z "$QR_LDFLAGS"; then
+			AC_MSG_ERROR([Incorrect libqrencode library])
+		fi
+
+		AC_MSG_CHECKING([checking libzbar support])
 		for i in /usr/local /usr; do
 			if test -r $i/include/zbar.h; then
 				ZBAR_CFLAGS=`pkg-config --cflags zbar`
@@ -563,12 +625,15 @@ registry.c"
 				CPPFLAGS="${CPPFLAGS} ${ZBAR_CFLAGS}"
 				EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${ZBAR_LDFLAGS}"
 
-				AC_MSG_RESULT("libzbar found")
+				AC_MSG_RESULT(yes)
 
 				AC_DEFINE([PHALCON_USE_ZBAR], [1], [Have libzbar support])
 				break
 			fi
 		done
+		if test -z "$ZBAR_LDFLAGS"; then
+			AC_MSG_ERROR([Incorrect libzbar library])
+		fi
 	fi
 
 	PHP_ADD_MAKEFILE_FRAGMENT([Makefile.frag])

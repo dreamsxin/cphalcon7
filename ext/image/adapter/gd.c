@@ -141,7 +141,10 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 
 		if (phalcon_array_isset_fetch_str(&gd_version, &gd_info, SL("GD Version"))) {
 			ZVAL_STRING(&pattern, "#\\d+\\.\\d+(?:\\.\\d+)?#");
+			ZVAL_NULL(&matches);
+			ZVAL_MAKE_REF(&matches);
 			RETURN_ON_FAILURE(phalcon_preg_match(&ret, &pattern, &gd_version, &matches));
+			ZVAL_UNREF(&matches);
 
 			if (zend_is_true(&ret)) {
 				if (!phalcon_array_isset_fetch_long(&version, &matches, 0)) {

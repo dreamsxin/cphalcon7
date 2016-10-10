@@ -147,9 +147,9 @@ PHP_METHOD(Phalcon_Http_Uri, __construct)
 	} else if (Z_TYPE_P(uri) == IS_STRING) {
 		PHALCON_CALL_FUNCTIONW(&parts, "parse_url", uri);
 		if (phalcon_array_isset_fetch_str(&query, &parts, SL("query"))) {
-			PHALCON_MAKE_REF(&params);
+			ZVAL_MAKE_REF(&params);
 			PHALCON_CALL_FUNCTIONW(NULL, "parse_str", &query, &params);
-			PHALCON_UNREF(&params);
+			ZVAL_UNREF(&params);
 			phalcon_array_update_str(&parts, SL("query"), &params, PH_COPY);
 		}
 

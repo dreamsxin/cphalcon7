@@ -145,7 +145,10 @@ PHP_METHOD(Phalcon_Validation_Validator_Regex, valid){
 	phalcon_fetch_params(0, 2, 0, &value, &pattern);
 
 	/* Check if the value match using preg_match in the PHP userland */
+	ZVAL_NULL(&matches);
+	ZVAL_MAKE_REF(&matches);
 	RETURN_ON_FAILURE(phalcon_preg_match(&match_pattern, pattern, value, &matches));
+	ZVAL_UNREF(&matches);
 
 	if (zend_is_true(&match_pattern)) {
 		phalcon_array_fetch_long(&match_zero, &matches, 0, PH_NOISY);

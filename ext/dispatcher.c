@@ -1244,10 +1244,8 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 		/* Shortcut, save one method call */
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
-		PHALCON_MAKE_REF(&exception);
 		zval *params[] = {&event_name, &exception};
 		ret2 = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 2, params);
-		PHALCON_UNREF(&exception);
 		if (ret2 == SUCCESS && PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}

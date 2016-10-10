@@ -291,9 +291,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException)
 
 	ZVAL_STRING(&event_name, "dispatch:beforeException");
 
-	PHALCON_MAKE_REF(exception);
 	PHALCON_RETURN_CALL_METHODW(getThis(), "fireevent", &event_name, exception);
-	PHALCON_UNREF(exception);
 }
 
 /**

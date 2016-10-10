@@ -152,7 +152,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$messages = $subscriptor->getMessages();
 		$this->assertEquals($messages[0]->getType(), "PresenceOf");
 		$this->assertEquals($messages[0]->getField(), "created_at");
-		$this->assertEquals($messages[0]->getMessage(), "'created_at' is required");
+		$this->assertEquals($messages[0]->getMessage(), "Field created_at is required");
 
 		//Email
 		$subscriptor = new Subscriptores();
@@ -166,7 +166,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$messages = $subscriptor->getMessages();
 		$this->assertEquals($messages[0]->getType(), "Email");
 		$this->assertEquals($messages[0]->getField(), "email");
-		$this->assertEquals($messages[0]->getMessage(), "Value of field 'email' must have a valid e-mail format");
+		$this->assertEquals($messages[0]->getMessage(), "Field email must be an email address");
 
 		//ExclusionIn
 		$subscriptor->email = 'le_fuego@hotmail.com';
@@ -174,18 +174,18 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($subscriptor->save());
 
 		$messages = $subscriptor->getMessages();
-		$this->assertEquals($messages[0]->getType(), "Exclusion");
+		$this->assertEquals($messages[0]->getType(), "ExclusionIn");
 		$this->assertEquals($messages[0]->getField(), "status");
-		$this->assertEquals($messages[0]->getMessage(), "Value of field 'status' must not be part of list: X, Z");
+		$this->assertEquals($messages[0]->getMessage(), "Field status must not be a part of list: X, Z");
 
 		//InclusionIn
 		$subscriptor->status = 'A';
 		$this->assertFalse($subscriptor->save());
 
 		$messages = $subscriptor->getMessages();
-		$this->assertEquals($messages[0]->getType(), "Inclusion");
+		$this->assertEquals($messages[0]->getType(), "InclusionIn");
 		$this->assertEquals($messages[0]->getField(), "status");
-		$this->assertEquals($messages[0]->getMessage(), "Value of field 'status' must be part of list: P, I, w");
+		$this->assertEquals($messages[0]->getMessage(), "Field status must be a part of list: P, I, w");
 
 		//Uniqueness validator
 		$subscriptor->email = 'fuego@hotmail.com';
@@ -193,9 +193,9 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($subscriptor->save());
 
 		$messages = $subscriptor->getMessages();
-		$this->assertEquals($messages[0]->getType(), "Unique");
+		$this->assertEquals($messages[0]->getType(), "Uniqueness");
 		$this->assertEquals($messages[0]->getField(), "email");
-		$this->assertEquals($messages[0]->getMessage(), "Value of field: 'email' is already present in another record");
+		$this->assertEquals($messages[0]->getMessage(), "Field email must be unique");
 
 		//Regex validator
 		$subscriptor->email = 'na_fuego@hotmail.com';
@@ -205,7 +205,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$messages = $subscriptor->getMessages();
 		$this->assertEquals($messages[0]->getType(), "Regex");
 		$this->assertEquals($messages[0]->getField(), "status");
-		$this->assertEquals($messages[0]->getMessage(), "Value of field 'status' doesn't match regular expression");
+		$this->assertEquals($messages[0]->getMessage(), "Field status does not match the required format");
 
 		//too_long
 		$subscriptor->email = 'personwholivesinahutsomewhereinthecloud@hotmail.com';
@@ -215,7 +215,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$messages = $subscriptor->getMessages();
 		$this->assertEquals($messages[0]->getType(), "TooLong");
 		$this->assertEquals($messages[0]->getField(), "email");
-		$this->assertEquals($messages[0]->getMessage(), "Value of field 'email' exceeds the maximum 50 characters");
+		$this->assertEquals($messages[0]->getMessage(), "Field email must not exceed 50 characters long");
 
 		//too_short
 		$subscriptor->email = 'a@b.co';
@@ -225,7 +225,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$messages = $subscriptor->getMessages();
 		$this->assertEquals($messages[0]->getType(), "TooShort");
 		$this->assertEquals($messages[0]->getField(), "email");
-		$this->assertEquals($messages[0]->getMessage(), "Value of field 'email' is less than the minimum 7 characters");
+		$this->assertEquals($messages[0]->getMessage(), "Field email must be at least 7 characters long");
 
 		// Issue 1243
 		$subscriptor->email = 'user.@domain.com';
@@ -233,7 +233,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$messages = $subscriptor->getMessages();
 		$this->assertEquals($messages[0]->getType(), "Email");
 		$this->assertEquals($messages[0]->getField(), "email");
-		$this->assertEquals($messages[0]->getMessage(), "Value of field 'email' must have a valid e-mail format");
+		$this->assertEquals($messages[0]->getMessage(), "Field email must be an email address");
 
 		// Issue 1527
 		$subscriptor = Subscriptores::findFirst();
@@ -290,7 +290,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($abonne->save());
 
 		$messages = $abonne->getMessages();
-		$this->assertEquals($messages[0]->getType(), "Exclusion");
+		$this->assertEquals($messages[0]->getType(), "ExclusionIn");
 		$this->assertEquals($messages[0]->getField(), "statut");
 		$this->assertEquals($messages[0]->getMessage(), 'L\'état ne doit être "X" ou "Z"');
 
@@ -299,7 +299,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($abonne->save());
 
 		$messages = $abonne->getMessages();
-		$this->assertEquals($messages[0]->getType(), "Inclusion");
+		$this->assertEquals($messages[0]->getType(), "InclusionIn");
 		$this->assertEquals($messages[0]->getField(), "statut");
 		$this->assertEquals($messages[0]->getMessage(), 'L\'état doit être "P", "I" ou "w"');
 
@@ -309,7 +309,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($abonne->save());
 
 		$messages = $abonne->getMessages();
-		$this->assertEquals($messages[0]->getType(), "Unique");
+		$this->assertEquals($messages[0]->getType(), "Uniqueness");
 		$this->assertEquals($messages[0]->getField(), "courrierElectronique");
 		$this->assertEquals($messages[0]->getMessage(), 'Le courrier électronique doit être unique');
 

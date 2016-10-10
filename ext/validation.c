@@ -52,6 +52,7 @@ PHP_METHOD(Phalcon_Validation, add);
 PHP_METHOD(Phalcon_Validation, setFilters);
 PHP_METHOD(Phalcon_Validation, getFilters);
 PHP_METHOD(Phalcon_Validation, getValidators);
+PHP_METHOD(Phalcon_Validation, setEntity);
 PHP_METHOD(Phalcon_Validation, getEntity);
 PHP_METHOD(Phalcon_Validation, getMessages);
 PHP_METHOD(Phalcon_Validation, appendMessage);
@@ -73,6 +74,10 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getfilters, 0, 0, 0)
 	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setentity, 0, 0, 0)
+	ZEND_ARG_INFO(0, entity)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_appendmessage, 0, 0, 1)
@@ -111,6 +116,7 @@ static const zend_function_entry phalcon_validation_method_entry[] = {
 	PHP_ME(Phalcon_Validation, setFilters, arginfo_phalcon_validation_setfilters, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getFilters, arginfo_phalcon_validation_getfilters, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getValidators, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, setEntity, arginfo_phalcon_validation_setentity, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getEntity, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getMessages, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, appendMessage, arginfo_phalcon_validation_appendmessage, ZEND_ACC_PUBLIC)
@@ -176,10 +182,8 @@ PHP_METHOD(Phalcon_Validation, __construct){
 	
 	if (!validators) {
 		validators = &PHALCON_GLOBAL(z_null);
-	}
-	
-	if (Z_TYPE_P(validators) != IS_NULL) {
-		if (Z_TYPE_P(validators) != IS_ARRAY) { 
+	} else if (PHALCON_TYPE_P(validators) != IS_NULL) {
+		if (PHALCON_TYPE_P(validators) != IS_ARRAY) { 
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Validators must be an array");
 			return;
 		}
@@ -213,6 +217,9 @@ PHP_METHOD(Phalcon_Validation, validate){
 	
 	if (!entity) {
 		entity = &PHALCON_GLOBAL(z_null);
+	} else {
+		PHALCON_CALL_METHODW(NULL, getThis(), "setentity", entity);
+		
 	}
 	
 	phalcon_return_property(&validators, getThis(), SL("_validators"));
@@ -231,6 +238,8 @@ PHP_METHOD(Phalcon_Validation, validate){
 	 */
 	object_init_ex(&messages, phalcon_validation_message_group_ce);
 	PHALCON_CALL_METHODW(NULL, &messages, "__construct");
+
+	phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
 	
 	/** 
 	 * Validation classes can implement the 'beforeValidation' callback
@@ -241,8 +250,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 			RETURN_CTORW(&status);
 		}
 	}
-	
-	phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
+
 	if (Z_TYPE_P(data) == IS_ARRAY || Z_TYPE_P(data) == IS_OBJECT) {
 		phalcon_update_property_zval(getThis(), SL("_data"), data);
 	}
@@ -282,7 +290,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	if (phalcon_method_exists_ex(getThis(), SL("aftervalidation")) == SUCCESS) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "aftervalidation", data, entity, &messages);
 	}
-	
+
 	RETURN_CTORW(&messages);
 }
 
@@ -363,6 +371,22 @@ PHP_METHOD(Phalcon_Validation, getValidators){
 
 
 	RETURN_MEMBER(getThis(), "_validators");
+}
+
+/**
+ * Sets the bound entity
+ *
+ * @param object entity
+ * @return Phalcon\Validation
+ */
+PHP_METHOD(Phalcon_Validation, setEntity){
+
+	zval *entity;
+
+	phalcon_fetch_params(0, 1, 0, &entity);
+	
+	phalcon_update_property_zval(getThis(), SL("_entity"), entity);
+	RETURN_THISW();
 }
 
 /**

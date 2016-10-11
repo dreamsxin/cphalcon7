@@ -2462,13 +2462,8 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 			}
 
 			PHALCON_CALL_METHODW(&current, &messages, "current");
-			
-			PHALCON_CALL_METHODW(&prepared, &current, "getmessage");
-			PHALCON_CALL_METHODW(&field, &current, "getfield");
-			PHALCON_CALL_METHODW(&type, &current, "gettype");
-			PHALCON_CALL_METHODW(&code, &current, "getcode");
 
-			PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &prepared, &field, &type, &code);
+			PHALCON_CALL_METHODW(NULL, getThis(), "appendmessage", &current);
 
 			PHALCON_CALL_METHODW(NULL, &messages, "next");
 		}

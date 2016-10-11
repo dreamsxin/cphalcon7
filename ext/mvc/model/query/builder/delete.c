@@ -13,6 +13,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -51,8 +52,8 @@
  *$resultset = Phalcon\Mvc\Model\Query\Builder::createDeleteBuilder()
  *   ->table('Robots')
  *   ->where('name = "Peter"')
- *   ->limit(20)
  *   ->orderBy('Robots.id')
+ *   ->limit(20)
  *   ->execute();
  *</code>
  */

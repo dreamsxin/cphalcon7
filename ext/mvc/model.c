@@ -1458,7 +1458,14 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	phalcon_fetch_params(0, 0, 1, &parameters);
 
 	if (!parameters) {
-		parameters = &PHALCON_GLOBAL(z_null);
+		array_init(&params);
+	} else if (Z_TYPE_P(parameters) != IS_ARRAY) { 
+		array_init(&params);
+		if (Z_TYPE_P(parameters) != IS_NULL) {
+			phalcon_array_append(&params, parameters, PH_COPY);
+		}
+	} else {
+		PHALCON_CPY_WRT(&params, parameters);
 	}
 
 	phalcon_get_called_class(&model_name);
@@ -1475,24 +1482,15 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service_name);
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
 
-	if (Z_TYPE_P(parameters) != IS_ARRAY) { 
-		array_init(&params);
-		if (Z_TYPE_P(parameters) != IS_NULL) {
-			phalcon_array_append(&params, parameters, PH_COPY);
-		}
-	} else {
-		PHALCON_CPY_WRT(&params, parameters);
-	}
+	PHALCON_STR(&event_name, "beforeQuery");
+
+	PHALCON_MAKE_REF(&params);
+	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &params);
+	PHALCON_UNREF(&params);
 
 	PHALCON_CALL_METHODW(&builder, &manager, "createbuilder", &params);
 
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
-
-	PHALCON_STR(&event_name, "beforeQuery");
-
-	// PHALCON_MAKE_REF(&builder);
-	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &builder);
-	// PHALCON_UNREF(&builder);
 
 	PHALCON_CALL_METHODW(&query, &builder, "getquery");
 

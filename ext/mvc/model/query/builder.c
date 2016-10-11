@@ -516,7 +516,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 
 	zval phql = {}, bind_params = {}, bind_types = {}, dependency_injector = {}, service_name = {}, has = {}, args = {}, query = {};
 
-	/** 
+	/**
 	 * Process the PHQL
 	 */
 	PHALCON_CALL_METHODW(&phql, getThis(), "getphql");

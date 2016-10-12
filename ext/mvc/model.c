@@ -4020,7 +4020,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
  */
 PHP_METHOD(Phalcon_Mvc_Model, save){
 
-	zval *data = NULL, *white_list = NULL, *_exists = NULL, *exists_check = NULL, exists = {}, build = {}, meta_data = {}, attributes = {}, bind_params = {}, *attribute, read_connection = {};
+	zval *data = NULL, *white_list = NULL, *_exists = NULL, *exists_check = NULL, exists = {}, build = {}, meta_data = {}, attributes = {}, bind_params = {}, *attribute;
 	zval type = {}, message = {}, event_name = {}, status = {}, write_connection = {}, related = {}, identity_field = {};
 	zval error_messages = {}, exception = {}, success = {}, new_success = {}, snapshot_data = {};
 	zend_string *str_key;
@@ -4100,11 +4100,6 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 			phalcon_array_update_zval(&bind_params, attribute, &value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
-
-	/**
-	 * Create/Get the current database connection
-	 */
-	PHALCON_CALL_METHODW(&read_connection, getThis(), "getreadconnection", &PHALCON_GLOBAL(z_null), &bind_params);
 
 	/**
 	 * We need to check if the record exists

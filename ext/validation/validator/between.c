@@ -138,7 +138,9 @@ PHP_METHOD(Phalcon_Validation_Validator_Between, validate){
 /**
  * Executes the validation
  *
- * @param string $value
+ * @param int $value
+ * @param int $minimum
+ * @param int $maximum
  * @return boolean
  */
 PHP_METHOD(Phalcon_Validation_Validator_Between, valid){

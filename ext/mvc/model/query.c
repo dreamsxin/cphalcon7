@@ -26,7 +26,7 @@
 #include "mvc/model/query/status.h"
 #include "mvc/model/resultset/complex.h"
 #include "mvc/model/resultset/simple.h"
-#include "mvc/model/exception.h"
+#include "mvc/model/query/exception.h"
 #include "mvc/model/manager.h"
 #include "mvc/model/managerinterface.h"
 #include "mvc/model/metadatainterface.h"
@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsManager){
 		PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name);
 	
 		if (Z_TYPE(service) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsMetadata' is not valid");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "The injected service 'modelsMetadata' is not valid");
 			return;
 		}
 
@@ -373,7 +373,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 		 */
 		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 			return;
 		}
 
@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 			 */
 			PHALCON_CALL_METHODW(&service, &dependency_injector, "getshared", &service_name);
 			if (Z_TYPE(service) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The injected service 'modelsMetadata' is not valid");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "The injected service 'modelsMetadata' is not valid");
 				return;
 			}
 
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "Unknown model or alias '", &column_domain, "' (1), when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
 
@@ -493,7 +493,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "There is no model related to model or alias '", &column_domain, "', when executing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
 
@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 				PHALCON_CONCAT_SVSVSV(&exception_message, "Column '", &column_name, "' doesn't belong to the model or alias '", &column_domain, "', when executing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
 		} else {
@@ -530,7 +530,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 					phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 					PHALCON_CONCAT_SVSV(&exception_message, "The column '", &column_name, "' is ambiguous, when preparing: ", &phql);
-					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 					return;
 				}
 
@@ -546,7 +546,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "Column '", &column_name, "' doesn't belong to any of the selected models (1), when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
 
@@ -555,7 +555,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		 */
 		phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY);
 		if (Z_TYPE(models) != IS_ARRAY) { 
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The models list was not loaded correctly");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "The models list was not loaded correctly");
 			return;
 		}
 
@@ -567,7 +567,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "Can't obtain the model '", &class_name, "' source from the _models list, when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
 
@@ -586,7 +586,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 				PHALCON_CONCAT_SVSV(&exception_message, "Column '", &column_name, "' doesn't belong to any of the selected models (3), when preparing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
 		} else {
@@ -1044,18 +1044,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 						PHALCON_CALL_METHODW(&value_param, getThis(), "getbindparam", &value_name);
 
 						if (Z_TYPE(value_param) != IS_ARRAY) {
-							PHALCON_THROW_EXCEPTION_FORMATW(phalcon_mvc_model_exception_ce, "Bind type requires an array in placeholder: %s", Z_STRVAL(value_name));
+							PHALCON_THROW_EXCEPTION_FORMATW(phalcon_mvc_model_query_exception_ce, "Bind type requires an array in placeholder: %s", Z_STRVAL(value_name));
 							return;
 						}
 						value_times = phalcon_fast_count_int(&value_param);
 						if (value_times < 1) {
-							PHALCON_THROW_EXCEPTION_FORMATW(phalcon_mvc_model_exception_ce, "At least one value must be bound in placeholder: %s", Z_STRVAL(value_name));
+							PHALCON_THROW_EXCEPTION_FORMATW(phalcon_mvc_model_query_exception_ce, "At least one value must be bound in placeholder: %s", Z_STRVAL(value_name));
 							return;
 						}
 						
 						phalcon_array_update_str_long(return_value, SL("times"), value_times, PH_COPY);
 					} else {
-						PHALCON_THROW_EXCEPTION_FORMATW(phalcon_mvc_model_exception_ce, "Unknown bind type: %s", Z_STRVAL_P(&value_type));
+						PHALCON_THROW_EXCEPTION_FORMATW(phalcon_mvc_model_query_exception_ce, "Unknown bind type: %s", Z_STRVAL_P(&value_type));
 						return;
 					}
 				} else {
@@ -1153,7 +1153,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
 			case PHQL_T_DISTINCT:
 				assert(0);
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Unexpected PHQL_T_DISTINCT - this should not happen");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Unexpected PHQL_T_DISTINCT - this should not happen");
 				return;
 
 			case PHQL_T_BETWEEN:
@@ -1257,7 +1257,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
 			default:
 				PHALCON_CONCAT_SV(&exception_message, "Unknown expression type ", &expr_type);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 		}
 
@@ -1290,7 +1290,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 		return;
 	}
 
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Unknown expression");
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Unknown expression");
 }
 
 /**
@@ -1309,7 +1309,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 	phalcon_fetch_params(0, 1, 0, &column);
 
 	if (!phalcon_array_isset_fetch_str(&column_type, column, ISL(type))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 1");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 1");
 		return;
 	}
 
@@ -1336,7 +1336,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 	}
 
 	if (!phalcon_array_isset_str(column, SL("column"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 2");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 2");
 		return;
 	}
 
@@ -1354,7 +1354,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "Unknown model or alias '", &column_domain, "' (2), when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
 
@@ -1421,7 +1421,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 	}
 
 	PHALCON_CONCAT_SV(&exception_message, "Unknown type of column ", &column_type);
-	PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+	PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 }
 
 /**
@@ -1450,7 +1450,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getTable){
 
 		RETURN_CTORW(&source);
 	}
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 3");
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 3");
 }
 
 /**
@@ -1483,7 +1483,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
 			return;
 		}
 	}
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 4");
+	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 4");
 }
 
 /**
@@ -1499,7 +1499,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 	phalcon_fetch_params(0, 1, 0, &join);
 
 	if (!phalcon_array_isset_fetch_string(&type, join, IS(type))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 5");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 5");
 		return;
 	}
 
@@ -1529,7 +1529,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "Unknown join type ", &type, ", when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 		}
 	}
 }
@@ -1612,7 +1612,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 				PHALCON_CONCAT_SVSVSV(&exception_message, "The number of fields must be equal to the number of referenced fields in join ", model_alias, "-", join_alias, ", when preparing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
 
@@ -1755,7 +1755,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 				PHALCON_CONCAT_SVSVSV(&exception_message, "The number of fields must be equal to the number of referenced fields in join ", model_alias, "-", join_alias, ", when preparing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
 
@@ -1948,7 +1948,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 				PHALCON_CONCAT_SVSV(&exception_message, "Cannot use '", &alias, "' as join alias because it was already used when preparing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
 
@@ -2009,7 +2009,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 				PHALCON_CONCAT_SVSV(&exception_message, "Cannot use '", &model_name, "' as join alias because it was already used when preparing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
 
@@ -2148,7 +2148,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 							phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 							PHALCON_CONCAT_SVSVSV(&exception_message, "There is more than one relation between models '", form_model, "' and '", join_model, "\", the join must be done using an alias when preparing: ", &phql);
-							PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+							PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 							return;
 						}
 
@@ -2357,12 +2357,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	}
 
 	if (!phalcon_array_isset_fetch_str(&tables, &select, SL("tables"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 6");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 6");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&columns, &select, SL("columns"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted SELECT AST 7");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 7");
 		return;
 	}
 
@@ -2477,7 +2477,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
 				PHALCON_CONCAT_SVSV(&exception_message, "Alias \"", &alias, " is already used when preparing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
 
@@ -2710,12 +2710,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 	phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
 
 	if (!phalcon_array_isset_fetch_str(&qualified_name, &ast, SL("qualifiedName"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted INSERT AST: Missing 'qualifiedName'");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted INSERT AST: Missing 'qualifiedName'");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&values, &ast, SL("values"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted INSERT AST: Missing 'values'");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted INSERT AST: Missing 'values'");
 		return;
 	}
 
@@ -2723,7 +2723,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 	 * Check if the related model exists
 	 */
 	if (!phalcon_array_isset_fetch_str(&model_name, &qualified_name, SL("name"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted INSERT AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted INSERT AST");
 		return;
 	}
 
@@ -2783,7 +2783,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
 				PHALCON_CONCAT_SVSVS(&exception_message, "The model '", &model_name, "' doesn't have the attribute '", &name, "'");
 				PHALCON_SCONCAT_SV(&exception_message, ", when preparing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
 
@@ -2824,17 +2824,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 
 	phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_fetch_str(&update, &ast, SL("update"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted UPDATE AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted UPDATE AST");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&tables, &update, SL("tables"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted UPDATE AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted UPDATE AST");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&values, &update, SL("values"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted UPDATE AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted UPDATE AST");
 		return;
 	}
 
@@ -2993,12 +2993,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 
 	phalcon_read_property(&ast, getThis(), SL("_ast"), PH_NOISY);
 	if (!phalcon_array_isset_fetch_str(&delete_ast, &ast, SL("delete"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted DELETE AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted DELETE AST");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&tables, &delete_ast, SL("tables"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted DELETE AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted DELETE AST");
 		return;
 	}
 
@@ -3160,7 +3160,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 		 */
 		phalcon_update_property_zval(getThis(), SL("_type"), &type);
 	} else {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted AST");
 		return;
 	}
 
@@ -3258,12 +3258,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 		default:
 			PHALCON_CONCAT_SVSV(&exception_message, "Unknown statement ", &type, ", when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 	}
 
 	if (Z_TYPE_P(&ir_phql) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Corrupted AST");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Corrupted AST");
 		return;
 	}
 
@@ -3857,7 +3857,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 	phalcon_array_fetch_str(&models, &intermediate, SL("models"), PH_NOISY);
 	if (phalcon_array_isset_long(&models, 1)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Updating several models at the same time is still not supported");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Updating several models at the same time is still not supported");
 		return;
 	}
 
@@ -3972,7 +3972,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
 	phalcon_array_fetch_str(&models, &intermediate, SL("models"), PH_NOISY);
 	if (phalcon_array_isset_long(&models, 1)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Delete from several models at the same time is still not supported");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Delete from several models at the same time is still not supported");
 		return;
 	}
 
@@ -4108,7 +4108,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
 		if (cache_options_is_not_null) {
 			if (Z_TYPE(cache_options) != IS_ARRAY) { 
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid caching options");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Invalid caching options");
 				return;
 			}
 
@@ -4116,7 +4116,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			 * The user must set a cache key
 			 */
 			if (!phalcon_array_isset_fetch_str(&cache_key, &cache_options, SL("key"))) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "A cache key must be provided to identify the cached resultset in the cache backend");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "A cache key must be provided to identify the cached resultset in the cache backend");
 				return;
 			}
 
@@ -4131,7 +4131,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
 			PHALCON_CALL_METHODW(&cache, &dependency_injector, "getshared", &cache_service);
 			if (Z_TYPE(cache) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The cache service must be an object");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "The cache service must be an object");
 				return;
 			}
 
@@ -4144,7 +4144,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				PHALCON_CALL_METHODW(&frontend, &cache, "getfrontend");
 
 				if (Z_TYPE(frontend) == IS_OBJECT) {
-					PHALCON_VERIFY_INTERFACE_EX(&frontend, phalcon_cache_frontendinterface_ce, phalcon_mvc_model_exception_ce, 0);
+					PHALCON_VERIFY_INTERFACE_EX(&frontend, phalcon_cache_frontendinterface_ce, phalcon_mvc_model_query_exception_ce, 0);
 					PHALCON_CALL_METHODW(&lifetime, &frontend, "getlifetime");
 				} else {
 					ZVAL_LONG(&lifetime, 3600);
@@ -4154,7 +4154,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			PHALCON_CALL_METHODW(&result, &cache, "get", &cache_key, &lifetime);
 			if (Z_TYPE(result) != IS_NULL) {
 				if (Z_TYPE(result) != IS_OBJECT) {
-					PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The cache didn't return a valid resultset");
+					PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "The cache didn't return a valid resultset");
 					return;
 				}
 
@@ -4249,7 +4249,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
 		default:
 			PHALCON_CONCAT_SV(&exception_message, "Unknown statement ", &type);
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 	}
 
@@ -4272,7 +4272,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 		 * Only PHQL SELECTs can be cached
 		 */
 		if (!PHALCON_IS_LONG(&type, PHQL_T_SELECT)) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Only PHQL statements that return resultsets can be cached");
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Only PHQL statements that return resultsets can be cached");
 			return;
 		}
 
@@ -4384,7 +4384,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setBindParams){
 	phalcon_fetch_params(0, 1, 0, &bind_params);
 
 	if (Z_TYPE_P(bind_params) != IS_ARRAY && Z_TYPE_P(bind_params) != IS_NULL) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind parameters must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Bind parameters must be an array");
 		return;
 	}
 	phalcon_update_property_zval(getThis(), SL("_bindParams"), bind_params);
@@ -4416,7 +4416,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setMergeBindParams){
 	phalcon_fetch_params(0, 1, 0, &bind_params);
 
 	if (Z_TYPE_P(bind_params) != IS_ARRAY && Z_TYPE_P(bind_params) != IS_NULL) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind parameters must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Bind parameters must be an array");
 		return;
 	}
 	phalcon_update_property_zval(getThis(), SL("_mergeBindParams"), bind_params);
@@ -4466,7 +4466,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setBindTypes){
 	phalcon_fetch_params(0, 1, 0, &bind_types);
 
 	if (Z_TYPE_P(bind_types) != IS_ARRAY && Z_TYPE_P(bind_types) != IS_NULL) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind types must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Bind types must be an array");
 		return;
 	}
 	phalcon_update_property_zval(getThis(), SL("_bindTypes"), bind_types);
@@ -4498,7 +4498,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setMergeBindTypes){
 	phalcon_fetch_params(0, 1, 0, &bind_types);
 
 	if (Z_TYPE_P(bind_types) != IS_ARRAY && Z_TYPE_P(bind_types) != IS_NULL) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Bind types must be an array");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Bind types must be an array");
 		return;
 	}
 	phalcon_update_property_zval(getThis(), SL("_mergeBindTypes"), bind_types);
@@ -4605,6 +4605,28 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 
 	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
 
+	if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
+		if (phalcon_method_exists_ex(getThis(), SL("selectreadconnection")) == SUCCESS) {
+			PHALCON_CALL_METHODW(&connection, getThis(), "selectreadconnection", &intermediate, bind_params, bind_types);
+			if (Z_TYPE(connection) != IS_OBJECT) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "'selectReadConnection' didn't returned a valid connection");
+				return;
+			}
+
+			RETURN_CTORW(&connection);
+		}
+	} else {
+		if (phalcon_method_exists_ex(getThis(), SL("selectwriteconnection")) == SUCCESS) {
+			PHALCON_CALL_METHODW(&connection, getThis(), "selectwriteconnection", &intermediate, bind_params, bind_types);
+			if (Z_TYPE(connection) != IS_OBJECT) {
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "'selectWriteConnection' didn't returned a valid connection");
+				return;
+			}
+
+			RETURN_CTORW(&connection);
+		}
+	}
+
 	PHALCON_CALL_SELFW(&manager, "getmodelsmanager");
 
 	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
@@ -4662,7 +4684,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 			phalcon_fast_count(&connection_types, &connections);
 
 			if (PHALCON_IS_LONG(&connection_types, 2)) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Cannot use models of different database systems in the same query");
+				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Cannot use models of different database systems in the same query");
 				return;
 			}
 		} ZEND_HASH_FOREACH_END();

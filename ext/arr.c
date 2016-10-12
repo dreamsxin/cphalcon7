@@ -84,6 +84,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_set_path, 0, 0, 3)
 	ZEND_ARG_INFO(0, path)
 	ZEND_ARG_INFO(0, value)
 	ZEND_ARG_INFO(0, delimiter)
+	ZEND_ARG_INFO(0, flag)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_range, 0, 0, 0)
@@ -362,19 +363,23 @@ end:
  */
 PHP_METHOD(Phalcon_Arr, set_path){
 
-	zval *array, *path, *value, *delimiter = NULL, keys = {}, cpy_array = {}, key = {}, v = {};
+	zval *array, *path, *value, *delimiter = NULL, *flag = NULL, keys = {}, cpy_array = {}, key = {}, v = {};
 	int found = 1;
 
-	phalcon_fetch_params(0, 3, 1, &array, &path, &value, &delimiter);
+	phalcon_fetch_params(0, 3, 2, &array, &path, &value, &delimiter, &flag);
 	ZVAL_DEREF(array);
 	if (Z_TYPE_P(path) == IS_ARRAY) {
 		PHALCON_CPY_WRT_CTOR(&keys, path);
 	} else {
-		if (!delimiter) {
+		if (!delimiter || Z_TYPE_P(delimiter) == IS_NULL) {
 			delimiter = phalcon_read_static_property_ce(phalcon_arr_ce, SL("delimiter"));
 		}
 
 		phalcon_fast_explode(&keys, delimiter, path);
+	}
+
+	if (!flag) {
+		flag = &PHALCON_GLOBAL(z_false);
 	}
 
 	PHALCON_CPY_WRT(&cpy_array, array);
@@ -394,7 +399,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 				if (zend_is_true(&is_array)) {
 					ZVAL_MAKE_REF(arr);
-					PHALCON_CALL_SELFW(NULL, "set_path", arr, &keys, value);
+					PHALCON_CALL_SELFW(NULL, "set_path", arr, &keys, value, &PHALCON_GLOBAL(z_null), flag);
 					ZVAL_UNREF(arr);
 				}
 			} ZEND_HASH_FOREACH_END();
@@ -421,7 +426,20 @@ PHP_METHOD(Phalcon_Arr, set_path){
 		PHALCON_CALL_FUNCTIONW(&key, "array_shift", &keys);
 		ZVAL_UNREF(&keys);
 
-		phalcon_array_update_zval(&cpy_array, &key, value, PH_COPY);
+		if (zend_is_true(flag)) {
+			zend_printf("\ntest\n");
+			if (phalcon_array_isset_fetch(&v, &cpy_array, &key, 0)) {
+				if (Z_TYPE(v) != IS_ARRAY) {
+					convert_to_array(&v);
+				}
+			} else {
+				array_init(&v);
+			}
+			phalcon_array_append(&v, value, PH_COPY);
+			phalcon_array_update_zval(&cpy_array, &key, &v, PH_COPY);
+		} else {
+			phalcon_array_update_zval(&cpy_array, &key, value, PH_COPY);
+		}
 	}
 }
 

@@ -53,6 +53,11 @@ class ArrTest extends PHPUnit_Framework_TestCase
 		$colors = \Phalcon\Arr::path($data, array('theme', '*', 'color'));
 		$this->assertEquals($colors, array('blue', 'blue'));
 
+		// Append the values of "color" in theme
+		\Phalcon\Arr::set_path($data, 'theme.*.color', 'red', NULL, true);
+		$colors = \Phalcon\Arr::path($data, array('theme', '*', 'color'));
+		$this->assertEquals($colors, array(array('blue', 'red'), array('blue', 'red')));
+
 		$values = \Phalcon\Arr::range(5, 20);
 		$this->assertEquals($values, array(5 => 5, 10 => 10, 15 => 15, 20 => 20));
 

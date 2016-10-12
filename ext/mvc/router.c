@@ -833,6 +833,8 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	 * The route wasn't found, try to use the not-found paths
 	 */
 	if (!zend_is_true(&route_found)) {
+		phalcon_update_property_null(getThis(), SL("_matches"));
+		phalcon_update_property_null(getThis(), SL("_matchedRoute"));
 		phalcon_return_property(&parts, getThis(), SL("_notFoundPaths"));
 		if (Z_TYPE(parts) != IS_NULL) {
 			ZVAL_TRUE(&route_found);
@@ -976,6 +978,12 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	PHALCON_STR(&event_name, "router:afterCheckRoutes");
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
+	if (zend_is_true(&route_found)) {
+		RETURN_TRUE;
+	} else {
+		RETURN_FALSE;
+	}
 }
 
 /**

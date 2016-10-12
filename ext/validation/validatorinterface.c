@@ -27,6 +27,7 @@ static const zend_function_entry phalcon_validation_validatorinterface_method_en
 	PHP_ABSTRACT_ME(Phalcon_Validation_ValidatorInterface, getOption, arginfo_phalcon_validation_validatorinterface_getoption)
 	PHP_ABSTRACT_ME(Phalcon_Validation_ValidatorInterface, setOption, arginfo_phalcon_validation_validatorinterface_setoption)
 	PHP_ABSTRACT_ME(Phalcon_Validation_ValidatorInterface, validate, arginfo_phalcon_validation_validatorinterface_validate)
+	ZEND_FENTRY(valid, NULL, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
 	PHP_FE_END
 };
 
@@ -73,3 +74,11 @@ PHALCON_DOC_METHOD(Phalcon_Validation_ValidatorInterface, setOption);
  * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_Validation_ValidatorInterface, validate);
+
+/**
+ * Executes the validation
+ *
+ * @param mixed ... Variable list
+ * @return boolean
+ */
+PHALCON_DOC_METHOD(Phalcon_Validation_ValidatorInterface, valid);

@@ -65,6 +65,7 @@ PHP_METHOD(Phalcon_Arr, arrayobject);
 PHP_METHOD(Phalcon_Arr, key);
 PHP_METHOD(Phalcon_Arr, filter);
 PHP_METHOD(Phalcon_Arr, sum);
+PHP_METHOD(Phalcon_Arr, toArray);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_assoc, 0, 0, 1)
 	ZEND_ARG_INFO(0, array)
@@ -167,6 +168,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_sum, 0, 0, 1)
 	ZEND_ARG_INFO(0, path)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_toarray, 0, 0, 1)
+	ZEND_ARG_INFO(0, object)
+	ZEND_ARG_INFO(0, recursive)
+	ZEND_ARG_INFO(0, properties)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, is_assoc, arginfo_phalcon_arr_is_assoc, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, is_array, arginfo_phalcon_arr_is_array, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -187,6 +194,7 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, key, arginfo_phalcon_arr_key, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, filter, arginfo_phalcon_arr_filter, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, sum, arginfo_phalcon_arr_sum, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Arr, toArray, arginfo_phalcon_arr_toarray, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -975,6 +983,16 @@ PHP_METHOD(Phalcon_Arr, flatten){
 	} ZEND_HASH_FOREACH_END();
 }
 
+/**
+ * Convert a array to a array object.
+ *
+ *     $array = array('name' => 'Phalcon7', 'version' => '1.0.x');
+ *
+ *     $arrayobject = \Phalcon\Arr::arrayobject($array);
+ *
+ * @param array $array
+ * @return ArrayObject
+ */
 PHP_METHOD(Phalcon_Arr, arrayobject){
 
 	zval *array, arrayobject = {};
@@ -987,6 +1005,17 @@ PHP_METHOD(Phalcon_Arr, arrayobject){
 	RETURN_CTORW(&arrayobject);
 }
 
+/**
+ * Gets array key of the postion
+ *
+ *     $array = array('name' => 'Phalcon7', 'version' => '1.0.x');
+ *
+ *     $key = \Phalcon\Arr::key($array, 1);
+ *
+ * @param array $array
+ * @param int $postion
+ * @return mixed
+ */
 PHP_METHOD(Phalcon_Arr, key){
 
 	zval *array, *postion = NULL, arrayobject = {}, arrayiterator = {}, ret = {};
@@ -1010,6 +1039,17 @@ PHP_METHOD(Phalcon_Arr, key){
 	PHALCON_CALL_METHODW(return_value, &arrayiterator, "key");
 }
 
+/**
+ * Filters elements of an array using a the filter
+ *
+ *     $array = array('name' => 'Phalcon7', 'version' => '1.0.x');
+ *
+ *     $key = \Phalcon\Arr::filter($array, 'int');
+ *
+ * @param array $array
+ * @param mixed $filters
+ * @return array
+ */
 PHP_METHOD(Phalcon_Arr, filter){
 
 	zval *array, *filters = NULL, dependency_injector = {}, service = {}, filter = {}, *value;
@@ -1044,7 +1084,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 }
 
 /**
- * Return the sum of all the values in the array using a dot separated path.
+ * Return the sum of all the values in the array using a dot separated path
  *
  * @param array $array
  * @param mixed $path
@@ -1073,5 +1113,73 @@ PHP_METHOD(Phalcon_Arr, sum){
 		return;
 	} else {
 		RETURN_CTORW(&values);
+	}
+}
+/**
+ * Converts an object or an array of objects into an array
+ *
+ *<code>
+ *	print_r(Phalcon\Arr::toArray($user);
+ *</code>
+ *
+ * @param object|array|string $object
+ * @param array $properties
+ * @param bool $recursive
+ * @return array
+ */
+PHP_METHOD(Phalcon_Arr, toArray){
+
+	zval *object, *properties = NULL, *recursive = NULL, *value;
+	zend_string *key;
+	ulong idx;
+
+	phalcon_fetch_params(0, 1, 2, &object, &properties, &recursive);
+
+	phalcon_get_object_vars(return_value, getThis(), 0);
+
+	if (Z_TYPE_P(object) == IS_OBJECT) {
+		if (phalcon_method_exists_ex(object, SL("toarray")) == SUCCESS) {
+			PHALCON_CALL_METHODW(return_value, object, "toarray");
+			return;
+		}
+		phalcon_get_object_vars(return_value, object, 1);
+		if (!recursive || zend_is_true(recursive)) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, key, value) {
+				zval tmp = {}, array_value = {};
+				if (key) {
+					ZVAL_STR(&tmp, key);
+				} else {
+					ZVAL_LONG(&tmp, idx);
+				}
+				
+				if (Z_TYPE_P(value) == IS_OBJECT && Z_TYPE_P(value) == IS_ARRAY) {
+					PHALCON_CALL_CE_STATICW(&array_value, phalcon_arr_ce, "toarray", value);
+					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);
+				} else {
+					phalcon_array_update_zval(return_value, &tmp, value, PH_COPY);
+				}
+			} ZEND_HASH_FOREACH_END();
+		}
+	} else if (Z_TYPE_P(object) == IS_ARRAY) {
+		ZVAL_ARR(return_value, zend_array_dup(Z_ARRVAL_P(object)));
+		if (!recursive || zend_is_true(recursive)) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, key, value) {
+				zval tmp = {}, array_value = {};
+				if (key) {
+					ZVAL_STR(&tmp, key);
+				} else {
+					ZVAL_LONG(&tmp, idx);
+				}
+				if (Z_TYPE_P(value) == IS_OBJECT && Z_TYPE_P(value) == IS_ARRAY) {
+					PHALCON_CALL_CE_STATICW(&array_value, phalcon_arr_ce, "toarray", value);
+					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);
+				} else {
+					phalcon_array_update_zval(return_value, &tmp, value, PH_COPY);
+				}
+			} ZEND_HASH_FOREACH_END();
+		}
+	} else {
+		array_init_size(return_value, 1);
+		phalcon_array_append(return_value, object, PH_COPY);
 	}
 }

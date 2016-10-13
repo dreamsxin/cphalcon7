@@ -148,6 +148,7 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getWriteConnection);
  *
  * @param array $data
  * @param array $columnMap
+ * @param array $whiteList
  * @return Phalcon\Mvc\Model
  */
 PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, assign);

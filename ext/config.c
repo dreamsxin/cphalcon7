@@ -360,6 +360,7 @@ PHP_METHOD(Phalcon_Config, merge){
  *	print_r($config->toArray());
  *</code>
  *
+ * @param bool $recursive
  * @return array
  */
 PHP_METHOD(Phalcon_Config, toArray){

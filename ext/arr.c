@@ -25,6 +25,8 @@
 #include <ext/standard/php_array.h>
 #include <ext/spl/spl_array.h>
 
+#include <Zend/zend_closures.h>
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
@@ -499,13 +501,13 @@ PHP_METHOD(Phalcon_Arr, range){
  *     $username = \Phalcon\Arr::get($_POST, 'username');
  *
  * @param array $array
- * @param string|array $key
+ * @param string|array|\Closure $key
  * @param mixed $default_value
  * @return mixed
  */
 PHP_METHOD(Phalcon_Arr, get){
 
-	zval *array, *keys, *default_value = NULL, *key, value = {};
+	zval *array, *keys, *default_value = NULL, *key, arguments = {}, value = {};
 
 	phalcon_fetch_params(0, 2, 1, &array, &keys, &default_value);
 
@@ -513,20 +515,49 @@ PHP_METHOD(Phalcon_Arr, get){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (Z_TYPE_P(keys) == IS_ARRAY) {
-		array_init(return_value);
-
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
-			zval value0 = {};
-			if (phalcon_array_isset_fetch(&value0, array, key, 0)) {
-				phalcon_array_update_zval(return_value, key, &value0, PH_COPY);
-			}
-		} ZEND_HASH_FOREACH_END();
-	} else if (phalcon_array_isset_fetch(&value, array, keys, 0)) {
-		RETURN_CTORW(&value);
-	} else {
-		RETURN_CTORW(default_value);
+	if (Z_TYPE_P(keys) == IS_OBJECT && instanceof_function(Z_OBJCE_P(keys), zend_ce_closure)) {
+		array_init_size(&arguments, 2);
+		phalcon_array_append(&arguments, array, PH_COPY);
+		phalcon_array_append(&arguments, default_value, PH_COPY);
+		PHALCON_CALL_USER_FUNC_ARRAYW(return_value, keys, &arguments);
+		return;
 	}
+
+	if (Z_TYPE_P(array) == IS_ARRAY) {
+		if (Z_TYPE_P(keys) == IS_ARRAY) {
+			array_init(return_value);
+
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
+				zval value0 = {};
+				if (phalcon_array_isset_fetch(&value0, array, key, 0)) {
+					phalcon_array_update_zval(return_value, key, &value0, PH_COPY);
+				}
+			} ZEND_HASH_FOREACH_END();
+			if (phalcon_fast_count_ev(return_value)) {
+				return;
+			}
+		} else if (phalcon_array_isset_fetch(&value, array, keys, 0)) {
+			RETURN_CTORW(&value);
+		}
+	} else if (Z_TYPE_P(array) == IS_OBJECT) {
+		if (Z_TYPE_P(keys) == IS_ARRAY) {
+			array_init(return_value);
+
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
+				zval value0 = {};
+				if (phalcon_property_isset_fetch_zval(&value0, array, key)) {
+					phalcon_array_update_zval(return_value, key, &value0, PH_COPY);
+				}
+			} ZEND_HASH_FOREACH_END();
+			if (phalcon_fast_count_ev(return_value)) {
+				return;
+			}
+		} else if (phalcon_property_isset_fetch_zval(&value, array, keys)) {
+			RETURN_CTORW(&value);
+		}
+	}
+
+	RETURN_CTORW(default_value);
 }
 
 /**

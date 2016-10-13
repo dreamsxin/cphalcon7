@@ -68,6 +68,12 @@ class ArrTest extends PHPUnit_Framework_TestCase
 		$sex = \Phalcon\Arr::get($data, 'sex', 'No');
 		$this->assertEquals($sex, 'No');
 
+		// Use callback get value
+		$sex = \Phalcon\Arr::get($data, function($array, $defalut_value){
+			return isset($array['sex']) ? 'Yes' : 'No';
+		});
+		$this->assertEquals($sex, 'No');
+
 		$info = \Phalcon\Arr::get($data, array('username', 'address'));
 		$this->assertEquals($info, array('username' => 'Dreamszhu', 'address' => 'ZheJiang'));
 

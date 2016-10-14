@@ -24,7 +24,7 @@
 
 extern zend_class_entry *phalcon_diinterface_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DiInterface);
+PHALCON_INIT_CLASS(Phalcon_DIInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_diinterface_set, 0, 0, 2)
 	ZEND_ARG_INFO(0, name)

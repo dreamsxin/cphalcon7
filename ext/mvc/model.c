@@ -1054,7 +1054,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasAttribute){
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
 	PHALCON_CALL_METHODW(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_RETURN_CALL_METHODW(&meta_data, "hasAttribute", getThis(), attribute);
+	PHALCON_RETURN_CALL_METHODW(&meta_data, "hasattribute", getThis(), attribute);
 }
 
 /**

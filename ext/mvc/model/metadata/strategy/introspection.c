@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 
-	zval *model, *dependency_injector, ordered_column_map = {}, columns = {}, *column_name, reversed_column_map = {}, *user_name;
+	zval *model, *dependency_injector, ordered_column_map = {}, columns = {}, *column_name, reversed_column_map = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 	}
 	array_init(&reversed_column_map);
 
-	PHALCON_CALL_METHODW(&columns, model, "getcolumns");
+	PHALCON_CALL_METHODW(&columns, model, "getattributes");
 
 	if (Z_TYPE(columns) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column_name) {
@@ -282,14 +282,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, user_name) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, column_name) {
 		zval name = {};
 		if (str_key) {
 			ZVAL_STR(&name, str_key);
 		} else {
 			ZVAL_LONG(&name, idx);
 		}
-		phalcon_array_update_zval(&reversed_column_map, user_name, &name, PH_COPY);
+		phalcon_array_update_zval(&reversed_column_map, column_name, &name, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 	
 	

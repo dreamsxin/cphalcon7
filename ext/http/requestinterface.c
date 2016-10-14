@@ -28,6 +28,7 @@ static const zend_function_entry phalcon_http_requestinterface_method_entry[] = 
 	PHP_ABSTRACT_ME(Phalcon_Http_RequestInterface, getPut, arginfo_phalcon_http_requestinterface_getput)
 	PHP_ABSTRACT_ME(Phalcon_Http_RequestInterface, getQuery, arginfo_phalcon_http_requestinterface_getquery)
 	PHP_ABSTRACT_ME(Phalcon_Http_RequestInterface, getServer, arginfo_phalcon_http_requestinterface_getserver)
+	PHP_ABSTRACT_ME(Phalcon_Http_RequestInterface, getParam, arginfo_phalcon_http_requestinterface_getparam)
 	PHP_ABSTRACT_ME(Phalcon_Http_RequestInterface, has, arginfo_phalcon_http_requestinterface_has)
 	PHP_ABSTRACT_ME(Phalcon_Http_RequestInterface, hasPost, arginfo_phalcon_http_requestinterface_haspost)
 	PHP_ABSTRACT_ME(Phalcon_Http_RequestInterface, hasPut, arginfo_phalcon_http_requestinterface_hasput)

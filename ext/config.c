@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -359,6 +360,7 @@ PHP_METHOD(Phalcon_Config, merge){
  *	print_r($config->toArray());
  *</code>
  *
+ * @param bool $recursive
  * @return array
  */
 PHP_METHOD(Phalcon_Config, toArray){

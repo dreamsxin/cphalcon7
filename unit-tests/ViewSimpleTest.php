@@ -82,10 +82,10 @@ class ViewSimpleTest extends PHPUnit_Framework_TestCase
 	public function testRenderStandard()
 	{
 		$view = new View;
-		$view->setViewsDir('unit-tests/views/');
+		$view->setViewsDir(array('unit-tests/views/test2/', 'unit-tests/views/test3/'));
 
-		$this->assertEquals('here', $view->render('test2/index'));
-		$this->assertEquals('here', $view->getContent());
+		$this->assertEquals('here', $view->render('index'));
+		$this->assertEquals('there', $view->render('index2'));
 	}
 
 	public function testRenderWithVariables()
@@ -155,6 +155,15 @@ class ViewSimpleTest extends PHPUnit_Framework_TestCase
 
 		// Cache should expire
 		$this->assertEquals("<p></p>", @$view->render('test3/coolVar'));
+	}
+
+	public function testMultiDir()
+	{
+		$view = new View;
+		$view->setViewsDir(array('unit-tests/views/', 'unit-tests/views/'));
+
+		$this->assertEquals('here', $view->render('test2/index'));
+		$this->assertEquals('here', $view->getContent());
 	}
 
 	// Setup viewCache service and DI

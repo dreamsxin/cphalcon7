@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -205,7 +206,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, __construct){
 /**
  * Sets views directory. Depending of your platform, always add a trailing slash or backslash
  *
- * @param string $viewsDir
+ * @param string|array $viewsDir
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, setViewsDir){
 
@@ -356,12 +357,12 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
-	zval *path, *params, *absolute_path = NULL, events_manager = {}, event_name = {}, status = {}, debug_message = {};
-	zval not_exists = {}, views_dir = {}, views_dir_path = {}, engines = {}, *engine, exception_message = {};
+	zval *view_path, *params, *absolute_path = NULL, events_manager = {}, event_name = {}, status = {}, debug_message = {};
+	zval not_exists = {}, views_dir = {}, views_dir_paths = {}, views_dir_path = {}, *path = NULL, engines = {}, *engine, exception_message = {};
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 2, 0, &path, &params, &absolute_path);
+	phalcon_fetch_params(0, 2, 0, &view_path, &params, &absolute_path);
 
 	if (absolute_path == NULL) {
 		absolute_path = &PHALCON_GLOBAL(z_false);
@@ -369,7 +370,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		phalcon_update_property_zval(getThis(), SL("_activeRenderPath"), path);
+		phalcon_update_property_zval(getThis(), SL("_activeRenderPath"), view_path);
 	}
 
 	/** 
@@ -385,17 +386,26 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_CONCAT_SV(&debug_message, "Render Simple View: ", path);
+		PHALCON_CONCAT_SV(&debug_message, "Render Simple View: ", view_path);
 		phalcon_debug_print_r(&debug_message);
 	}
 
 	ZVAL_TRUE(&not_exists);
+	array_init(&views_dir_paths);
 
 	if (zend_is_true(absolute_path)) {
-		PHALCON_CPY_WRT(&views_dir_path, path);
+		phalcon_array_append(&views_dir_paths, view_path, PH_COPY);
 	} else {
 		phalcon_read_property(&views_dir, getThis(), SL("_viewsDir"), PH_NOISY);
-		PHALCON_CONCAT_VV(&views_dir_path, &views_dir, path);
+		if (Z_TYPE(views_dir) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(views_dir), path) {
+				PHALCON_CONCAT_VV(&views_dir_path, path, view_path);
+				phalcon_array_append(&views_dir_paths, &views_dir_path, PH_COPY);
+			} ZEND_HASH_FOREACH_END();
+		} else {
+			PHALCON_CONCAT_VV(&views_dir_path, &views_dir, view_path);
+			phalcon_array_append(&views_dir_paths, &views_dir_path, PH_COPY);
+		}
 	}
 
 	/** 
@@ -413,41 +423,47 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 		} else {
 			ZVAL_LONG(&extension, idx);
 		}
-		PHALCON_CONCAT_VV(&view_engine_path, &views_dir_path, &extension);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(views_dir_paths), path) {
+				PHALCON_CONCAT_VV(&view_engine_path, path, &extension);
 
-		if (phalcon_file_exists(&view_engine_path) == SUCCESS) {
+			if (phalcon_file_exists(&view_engine_path) == SUCCESS) {
 
-			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-				PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
+				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+					PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
+					phalcon_debug_print_r(&debug_message);
+				}
+
+				/** 
+				 * Call beforeRenderView if there is a events manager available
+				 */
+				if (Z_TYPE(events_manager) == IS_OBJECT) {
+					ZVAL_STRING(&event_name, "view:beforeRenderView");
+					PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
+					if (PHALCON_IS_FALSE(&status)) {
+						continue;
+					}
+				}
+				
+				PHALCON_CALL_METHODW(NULL, engine, "render", &view_engine_path, params, &PHALCON_GLOBAL(z_true));
+
+				/** 
+				 * Call afterRenderView if there is a events manager available
+				 */
+				ZVAL_FALSE(&not_exists);
+				if (Z_TYPE(events_manager) == IS_OBJECT) {
+					ZVAL_STRING(&event_name, "view:afterRenderView");
+					PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis());
+				}
+
+				break;
+			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
 				phalcon_debug_print_r(&debug_message);
 			}
+		} ZEND_HASH_FOREACH_END();
 
-			/** 
-			 * Call beforeRenderView if there is a events manager available
-			 */
-			if (Z_TYPE(events_manager) == IS_OBJECT) {
-				ZVAL_STRING(&event_name, "view:beforeRenderView");
-				PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
-				if (PHALCON_IS_FALSE(&status)) {
-					continue;
-				}
-			}
-			
-			PHALCON_CALL_METHODW(NULL, engine, "render", &view_engine_path, params, &PHALCON_GLOBAL(z_true));
-
-			/** 
-			 * Call afterRenderView if there is a events manager available
-			 */
-			ZVAL_FALSE(&not_exists);
-			if (Z_TYPE(events_manager) == IS_OBJECT) {
-				ZVAL_STRING(&event_name, "view:afterRenderView");
-				PHALCON_CALL_METHODW(NULL, &events_manager, "fire", &event_name, getThis());
-			}
-
+		if (!zend_is_true(&not_exists)) {
 			break;
-		} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
-			phalcon_debug_print_r(&debug_message);
 		}
 	} ZEND_HASH_FOREACH_END();
 

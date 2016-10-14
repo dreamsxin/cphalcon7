@@ -914,25 +914,25 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 		$router = new Phalcon\Mvc\Router(false);
 		
-		$router->add('/:controller/:action:params', array(
+		$router->add('/:controller/:action/:params', array(
 			"controller" => 1,
 			"action" => 2,
-			"params" => 3,
+			"params" => 4,
 		), array(
-			':controller' => '([a-zA-Z0-9_-]+)',
-			':action' => '([a-zA-Z0-9_-]+)',
-			':params' => '(/[a-zA-Z0-9_-]+)?',
+			'/:controller' => '/([a-zA-Z0-9_-]+)',
+			'/:action' => '/([a-zA-Z0-9_-]+)',
+			'/:params' => '([/]?)([a-zA-Z0-9_-]+)?',
 		));
 
-		$router->handle('/c/a/p');
+		$this->assertTrue($router->handle('/c/a/p'));
 
-		$this->assertEquals($router->getMatches(), array(0 => '/c/a/p', 1 => 'c', 2 => 'a', 3 => '/p'));
+		$this->assertEquals($router->getMatches(), array(0 => '/c/a/p', 1 => 'c', 2 => 'a', 3 => '/', 4 => 'p'));
 
 		Phalcon\Mvc\Router\Route::reset();
 
 		$router = new Phalcon\Mvc\Router(false);
 
-		$router->add(':controller:action:params', array(
+		$router->add('/:controller/:action/:params', array(
 			"controller" => 1,
 			"action" => 2,
 			"params" => 3,
@@ -942,7 +942,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 			':params' => '(/[a-zA-Z0-9_-]+)?',
 		));
 
-		$router->handle('/c/a/p');
+		$this->assertTrue($router->handle('/c/a/p'));
 
 		$this->assertEquals($router->getMatches(), array(0 => '/c/a/p', 1 => 'c', 2 => 'a', 3 => '/p'));
 
@@ -950,26 +950,26 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 		$router = new Phalcon\Mvc\Router(false);
 
-		$router->add('/(:controller(/:action(/:params)?)?)?', array(
+		$router->add('/:controller/:action/:params', array(
 			"controller" => 2,
 			"action" => 4,
 			"params" => 5,
 		), array(
-			':controller' => '([a-zA-Z0-9_-]+)',
-			':action' => '([a-zA-Z0-9_-]+)',
-			':params' => '([a-zA-Z0-9_-]+)?',
+			'/:controller' => '(/([a-zA-Z0-9_-]+)',
+			'/:action' => '(/([a-zA-Z0-9_-]+)?',
+			'/:params' => '(/[a-zA-Z0-9_-]+)?)?)',
 		));
 
-		$router->handle('/c/a/p');
+		$this->assertTrue($router->handle('/c/a/p'));
 
-		$this->assertEquals($router->getMatches(), array(0 => '/c/a/p', 1 => 'c/a/p', 2 => 'c', 3 => '/a/p', 4 => 'a', 5 => '/p', 6 => 'p'));
+		$this->assertEquals($router->getMatches(), array(0 => '/c/a/p', 1 => '/c/a/p', 2 => 'c', 3 => '/a/p', 4 => 'a', 5 => '/p'));
 
-		$router->handle('/c/a');
+		$this->assertTrue($router->handle('/c/a'));
 
-		$this->assertEquals($router->getMatches(), array(0 => '/c/a', 1 => 'c/a', 2 => 'c', 3 => '/a', 4 => 'a'));
+		$this->assertEquals($router->getMatches(), array(0 => '/c/a', 1 => '/c/a', 2 => 'c', 3 => '/a', 4 => 'a'));
 
-		$router->handle('/c');
+		$this->assertTrue($router->handle('/c'));
 
-		$this->assertEquals($router->getMatches(), array(0 => '/c', 1 => 'c', 2 => 'c'));
+		$this->assertEquals($router->getMatches(), array(0 => '/c', 1 => '/c', 2 => 'c'));
 	}
 }

@@ -70,6 +70,7 @@ PHP_METHOD(Phalcon_Http_Request, getPost);
 PHP_METHOD(Phalcon_Http_Request, getPut);
 PHP_METHOD(Phalcon_Http_Request, getQuery);
 PHP_METHOD(Phalcon_Http_Request, getServer);
+PHP_METHOD(Phalcon_Http_Request, getParam);
 PHP_METHOD(Phalcon_Http_Request, has);
 PHP_METHOD(Phalcon_Http_Request, hasPost);
 PHP_METHOD(Phalcon_Http_Request, hasPut);
@@ -130,6 +131,7 @@ static const zend_function_entry phalcon_http_request_method_entry[] = {
 	PHP_ME(Phalcon_Http_Request, getPut, arginfo_phalcon_http_requestinterface_getput, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, getQuery, arginfo_phalcon_http_requestinterface_getquery, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, getServer, arginfo_phalcon_http_requestinterface_getserver, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Request, getParam, arginfo_phalcon_http_requestinterface_getparam, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, has, arginfo_phalcon_http_requestinterface_has, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, hasPost, arginfo_phalcon_http_requestinterface_haspost, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, hasPut, arginfo_phalcon_http_requestinterface_haspost, ZEND_ACC_PUBLIC)
@@ -487,6 +489,41 @@ PHP_METHOD(Phalcon_Http_Request, getServer){
 	if (!phalcon_array_isset_fetch(return_value, _SERVER, name, 0)) {
 		RETURN_NULL();
 	}
+}
+
+/**
+ * Gets a param by its name or numeric index
+ *
+ * @param  mixed $param
+ * @param  string|array $filters
+ * @param  mixed $defaultValue
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Http_Request, getParam){
+
+	zval *param, *filters = NULL, *default_value = NULL, dependency_injector = {}, service = {}, dispatcher = {};
+
+	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
+
+	if (!filters) {
+		filters = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!default_value) {
+		default_value = &PHALCON_GLOBAL(z_null);
+	}
+
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
+		return;
+	}
+
+	PHALCON_STR(&service, ISV(dispatcher));
+
+	PHALCON_CALL_METHODW(&dispatcher, &dependency_injector, "getshared", &service);
+
+	PHALCON_CALL_METHODW(NULL, &dispatcher, "getparam", param, filters, default_value);
 }
 
 /**

@@ -374,37 +374,60 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 		}
 
 		zobj = Z_OBJ_P(object);
-		if (!zobj->ce->default_properties_count && properties == zobj->properties && !ZEND_HASH_GET_APPLY_COUNT(properties)) {
-			/* fast copy */
-			if (EXPECTED(zobj->handlers == &std_object_handlers)) {
-				if (EXPECTED(!(GC_FLAGS(properties) & IS_ARRAY_IMMUTABLE))) {
-					GC_REFCOUNT(properties)++;
+		if (check_access) {
+			if (!zobj->ce->default_properties_count && properties == zobj->properties && !ZEND_HASH_GET_APPLY_COUNT(properties)) {
+				/* fast copy */
+				if (EXPECTED(zobj->handlers == &std_object_handlers)) {
+					if (EXPECTED(!(GC_FLAGS(properties) & IS_ARRAY_IMMUTABLE))) {
+						GC_REFCOUNT(properties)++;
+					}
+					ZVAL_ARR(result, properties);
+					return;
 				}
-				ZVAL_ARR(result, properties);
+				ZVAL_ARR(result, zend_array_dup(properties));
 				return;
+			} else {
+				array_init_size(result, zend_hash_num_elements(properties));
+
+				ZEND_HASH_FOREACH_STR_KEY_VAL(properties, key, value) {
+					if (key) {
+						if (zend_check_property_access(zobj, key) == SUCCESS) {
+							if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
+								value = Z_REFVAL_P(value);
+							}
+							if (Z_REFCOUNTED_P(value)) {
+								Z_ADDREF_P(value);
+							}
+							if (ZSTR_VAL(key)[0] == 0) {
+								const char *prop_name, *class_name;
+								size_t prop_len;
+								zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
+								zend_hash_str_add_new(Z_ARRVAL_P(result), prop_name, prop_len, value);
+							} else {
+								zend_hash_add_new(Z_ARRVAL_P(result), key, value);
+							}
+						}
+					}
+				} ZEND_HASH_FOREACH_END();
 			}
-			ZVAL_ARR(result, zend_array_dup(properties));
-			return;
 		} else {
 			array_init_size(result, zend_hash_num_elements(properties));
 
 			ZEND_HASH_FOREACH_STR_KEY_VAL(properties, key, value) {
 				if (key) {
-					if (!check_access || zend_check_property_access(zobj, key) == SUCCESS) {
-						if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
-							value = Z_REFVAL_P(value);
-						}
-						if (Z_REFCOUNTED_P(value)) {
-							Z_ADDREF_P(value);
-						}
-						if (ZSTR_VAL(key)[0] == 0) {
-							const char *prop_name, *class_name;
-							size_t prop_len;
-							zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
-							zend_hash_str_add_new(Z_ARRVAL_P(result), prop_name, prop_len, value);
-						} else {
-							zend_hash_add_new(Z_ARRVAL_P(result), key, value);
-						}
+					if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
+						value = Z_REFVAL_P(value);
+					}
+					if (Z_REFCOUNTED_P(value)) {
+						Z_ADDREF_P(value);
+					}
+					if (ZSTR_VAL(key)[0] == 0) {
+						const char *prop_name, *class_name;
+						size_t prop_len;
+						zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
+						zend_hash_str_add_new(Z_ARRVAL_P(result), prop_name, prop_len, value);
+					} else {
+						zend_hash_add_new(Z_ARRVAL_P(result), key, value);
 					}
 				}
 			} ZEND_HASH_FOREACH_END();
@@ -611,7 +634,7 @@ int phalcon_interface_exists(const zval *class_name, int autoload) {
  */
 int phalcon_clone(zval *destination, zval *obj) {
 
-	int status = SUCCESS;
+	int status = FAILURE;
 	zend_class_entry *ce;
 	zend_object_clone_obj_t clone_call;
 
@@ -619,21 +642,20 @@ int phalcon_clone(zval *destination, zval *obj) {
 		php_error_docref(NULL, E_ERROR, "__clone method called on non-object");
 		status = FAILURE;
 	} else {
-		ce = Z_OBJCE_P(obj);
 		clone_call =  Z_OBJ_HT_P(obj)->clone_obj;
 		if (!clone_call) {
+			ce = Z_OBJCE_P(obj);
 			if (ce) {
 				php_error_docref(NULL, E_ERROR, "Trying to clone an uncloneable object of class %s", ce->name->val);
 			} else {
 				php_error_docref(NULL, E_ERROR, "Trying to clone an uncloneable object");
 			}
-			status = FAILURE;
 		} else {
-			if (!EG(exception)) {
-				ZVAL_OBJ(destination, clone_call(obj));
-				if (EG(exception)) {
-					ZVAL_NULL(destination);
-				}
+			ZVAL_OBJ(destination, clone_call(obj));
+			if (EG(exception)) {
+				ZVAL_NULL(destination);
+			} else {
+				status = SUCCESS;
 			}
 		}
 	}

@@ -123,6 +123,7 @@ zend_string *phalcon_interned_assets						= NULL;
 zend_string *phalcon_interned_rows							= NULL;
 zend_string *phalcon_interned_view							= NULL;
 zend_string *phalcon_interned_except						= NULL;
+zend_string *phalcon_interned_app							= NULL;
 
 PHALCON_STATIC void phalcon_init_interned_strings()
 {
@@ -226,6 +227,7 @@ PHALCON_STATIC void phalcon_init_interned_strings()
 	phalcon_interned_assets							= SSL("assets");
 	phalcon_interned_view							= SSL("view");
 	phalcon_interned_except							= SSL("except");
+	phalcon_interned_app							= SSL("app");
 }
 
 PHALCON_STATIC void phalcon_release_interned_strings()
@@ -330,4 +332,5 @@ PHALCON_STATIC void phalcon_release_interned_strings()
 	zend_string_release(phalcon_interned_assets);
 	zend_string_release(phalcon_interned_view);
 	zend_string_release(phalcon_interned_except);
+	zend_string_release(phalcon_interned_app);
 }

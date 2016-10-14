@@ -27,6 +27,7 @@
 #include "mvc/view/modelinterface.h"
 #include "di/injectable.h"
 #include "diinterface.h"
+#include "di.h"
 #include "events/managerinterface.h"
 #include "http/responseinterface.h"
 
@@ -97,6 +98,7 @@ PHP_METHOD(Phalcon_Mvc_Application, getModules);
 PHP_METHOD(Phalcon_Mvc_Application, setDefaultModule);
 PHP_METHOD(Phalcon_Mvc_Application, getDefaultModule);
 PHP_METHOD(Phalcon_Mvc_Application, handle);
+PHP_METHOD(Phalcon_Mvc_Application, request);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, dependencyInjector)
@@ -119,6 +121,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_handle, 0, 0, 0)
 	ZEND_ARG_INFO(0, uri)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_request, 0, 0, 1)
+	ZEND_ARG_INFO(0, uri)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_application_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Application, __construct, arginfo_phalcon_mvc_application___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Application, useImplicitView, arginfo_phalcon_mvc_application_useimplicitview, ZEND_ACC_PUBLIC)
@@ -127,6 +133,7 @@ static const zend_function_entry phalcon_mvc_application_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Application, setDefaultModule, arginfo_phalcon_mvc_application_setdefaultmodule, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Application, getDefaultModule, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Application, handle, arginfo_phalcon_mvc_application_handle, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Application, request, arginfo_phalcon_mvc_application_request, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -298,6 +305,9 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
+
+	PHALCON_STR(&service, ISV(app));
+	PHALCON_CALL_METHODW(NULL, &dependency_injector, "setShared", &service, getThis());
 
 	PHALCON_STR(&service, ISV(router));
 	PHALCON_CALL_METHODW(&router, &dependency_injector, "getshared", &service);
@@ -547,4 +557,41 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Return the response */
 	RETURN_CTORW(&response);
+}
+
+/**
+ * Does a HMVC request in the application
+ *
+ * @param array $location
+ * @param array $data
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Mvc_Application, request){
+
+	zval *uri, dependency_injector = {}, dependency_injector_new = {}, service = {}, definition = {}, app = {}, response = {};
+
+	phalcon_fetch_params(0, 1, 0, &uri);
+
+	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+
+	ZVAL_OBJ(&dependency_injector_new, zend_objects_clone_obj(&dependency_injector));
+
+	PHALCON_CALL_CE_STATICW(NULL, phalcon_di_ce, "setdefault", &dependency_injector_new);
+
+	/**
+	 * Mvc Dispatcher
+	 */
+	PHALCON_STR(&service, ISV(dispatcher));
+	PHALCON_STR(&definition, "Phalcon\\Mvc\\Dispatcher");
+	PHALCON_CALL_METHODW(NULL, &dependency_injector_new, "set", &service, &definition, &PHALCON_GLOBAL(z_true));
+
+	ZVAL_OBJ(&app, zend_objects_clone_obj(getThis()));
+
+	PHALCON_CALL_METHODW(&response, &app, "setdi", &dependency_injector_new);
+	PHALCON_CALL_METHODW(&response, &app, "handle", uri);
+	if (Z_TYPE(response) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHODW(&response, "getcontent");
+	}
+
+	PHALCON_CALL_CE_STATICW(NULL, phalcon_di_ce, "setdefault", &dependency_injector);
 }

@@ -96,7 +96,6 @@ PHP_METHOD(Phalcon_Tag, getTitleSeparator);
 PHP_METHOD(Phalcon_Tag, getTitle);
 PHP_METHOD(Phalcon_Tag, stylesheetLink);
 PHP_METHOD(Phalcon_Tag, javascriptInclude);
-PHP_METHOD(Phalcon_Tag, image);
 PHP_METHOD(Phalcon_Tag, friendlyTitle);
 PHP_METHOD(Phalcon_Tag, setDocType);
 PHP_METHOD(Phalcon_Tag, getDocType);
@@ -193,7 +192,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_tag_javascriptinclude, 0, 0, 0)
 	ZEND_ARG_INFO(0, args)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_tag_image, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_tag_imageinput, 0, 0, 0)
 	ZEND_ARG_INFO(0, parameters)
 	ZEND_ARG_INFO(0, local)
 ZEND_END_ARG_INFO()
@@ -270,7 +269,7 @@ static const zend_function_entry phalcon_tag_method_entry[] = {
 	PHP_ME(Phalcon_Tag, fileField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Tag, checkField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Tag, radioField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Tag, imageInput, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Tag, imageInput, arginfo_phalcon_tag_imageinput, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Tag, submitButton, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Tag, selectStatic, arginfo_phalcon_tag_selectstatic, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, select, arginfo_phalcon_tag_select, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -285,7 +284,6 @@ static const zend_function_entry phalcon_tag_method_entry[] = {
 	PHP_ME(Phalcon_Tag, getTitleSeparator, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, stylesheetLink, arginfo_phalcon_tag_stylesheetlink, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, javascriptInclude, arginfo_phalcon_tag_javascriptinclude, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Tag, image, arginfo_phalcon_tag_image, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, friendlyTitle, arginfo_phalcon_tag_friendlytitle, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, setDocType, arginfo_phalcon_tag_setdoctype, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, getDocType, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -296,6 +294,27 @@ static const zend_function_entry phalcon_tag_method_entry[] = {
 	PHP_ME(Phalcon_Tag, setDefaultParams, arginfo_phalcon_tag_setdefaultparams, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, getDefaultParams, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, choice, arginfo_phalcon_tag_choice, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, color, colorField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, text, textField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, number, numericField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, range, rangeField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, email, emailField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, date, dateField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, dateTime, dateTimeField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, dateTimeLocal, dateTimeLocalField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, month, monthField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, time, timeField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, week, weekField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, password, passwordField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, hidden, hiddenField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, search, searchField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, tel, telField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, url, urlField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, file, fileField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, check, checkField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, radio, radioField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, image, imageInput, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Tag, submit, submitButton, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -1210,26 +1229,6 @@ PHP_METHOD(Phalcon_Tag, radioField){
 }
 
 /**
- * Builds a HTML input[type="image"] tag
- *
- *<code>
- * echo Phalcon\Tag::imageInput(array("src" => "/img/button.png"));
- *</code>
- *
- * Volt syntax:
- *<code>
- * {{ image_input('src': '/img/button.png') }}
- *</code>
- *
- * @param array $parameters
- * @return string
- */
-PHP_METHOD(Phalcon_Tag, imageInput){
-
-	phalcon_tag_generic_field(INTERNAL_FUNCTION_PARAM_PASSTHRU, "image", 1);
-}
-
-/**
  * Builds a HTML input[type="submit"] tag
  *
  *<code>
@@ -1828,7 +1827,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
  * @param  boolean $local
  * @return string
  */
-PHP_METHOD(Phalcon_Tag, image){
+PHP_METHOD(Phalcon_Tag, imageInput){
 
 	zval *parameters = NULL, *local = NULL, params = {}, *default_params, first_param = {}, second_param = {};
 	zval url = {}, url_src = {}, src = {}, code = {}, *doctype;

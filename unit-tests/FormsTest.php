@@ -606,4 +606,45 @@ class FormsTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($form->toArray(), $data);
 	}
+
+	public function testFormAllInElement()
+	{
+
+		$element1 = new \Phalcon\Forms\Element("name", array('class' => 'big-input'), NULL, NULL, "text");
+		$element2 = new \Phalcon\Forms\Element('radio', array('value' => 0), NULL, NULL, "radio");
+
+		$this->assertEquals('<input type="text" id="name" name="name" class="big-input" />', $element1->render());
+		$this->assertEquals('<input type="text" id="name" name="name" class="big-input" />', (string) $element1);
+		$this->assertEquals('<input type="radio" id="radio" name="radio" value="0" />', (string)$element2);
+
+		$data = array(
+			"name" => array(
+				"name" => "name",
+				"type" => "text",
+				"attributes" => array(
+					"class" => "big-input",
+				),
+				"options" => array(
+					"some" => "value",
+				),
+			),
+			"version" => array(
+				"name" => "version",
+				"type" => "select",
+				"optionsValues" => array(
+					"phalcon" => "Phalcon",
+					"phalcon7" => "Phalcon7",
+				),
+			)
+		);
+
+		$nameElement = new \Phalcon\Forms\Element("name", array('class' => 'big-input'), array('some' => 'value'), NULL, "text");
+		$versionElement = new \Phalcon\Forms\Element("version", NULL, NULL, array('phalcon' => 'Phalcon', 'phalcon7' => 'Phalcon7'), "select");
+
+		$form = new \Phalcon\Forms\Form();
+		$form->add($nameElement);
+		$form->add($versionElement);
+
+		$this->assertEquals($form->toArray(), $data);
+	}
 }

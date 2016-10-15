@@ -20,6 +20,7 @@
 #include "forms/element.h"
 #include "forms/elementinterface.h"
 #include "forms/exception.h"
+#include "forms/element/helpers.h"
 #include "validation/message/group.h"
 #include "tag.h"
 
@@ -73,6 +74,7 @@ PHP_METHOD(Phalcon_Forms_Element, hasMessages);
 PHP_METHOD(Phalcon_Forms_Element, setMessages);
 PHP_METHOD(Phalcon_Forms_Element, appendMessage);
 PHP_METHOD(Phalcon_Forms_Element, clear);
+PHP_METHOD(Phalcon_Forms_Element, render);
 PHP_METHOD(Phalcon_Forms_Element, toArray);
 PHP_METHOD(Phalcon_Forms_Element, __toString);
 
@@ -112,6 +114,7 @@ static const zend_function_entry phalcon_forms_element_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Element, setMessages, arginfo_phalcon_forms_elementinterface_setmessages, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, appendMessage, arginfo_phalcon_forms_elementinterface_appendmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, clear, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, render, arginfo_phalcon_forms_elementinterface_render, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, toArray, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, __toString, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -122,7 +125,7 @@ static const zend_function_entry phalcon_forms_element_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Forms_Element){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Forms, Element, forms_element, phalcon_forms_element_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+	PHALCON_REGISTER_CLASS(Phalcon\\Forms, Element, forms_element, phalcon_forms_element_method_entry, 0);
 
 	zend_declare_property_null(phalcon_forms_element_ce, SL("_form"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_forms_element_ce, SL("_name"), ZEND_ACC_PROTECTED);
@@ -890,6 +893,20 @@ PHP_METHOD(Phalcon_Forms_Element, toArray)
 	if (PHALCON_IS_NOT_EMPTY(&messages)) {
 		phalcon_array_update_str(return_value, SL("messages"), &messages, PH_COPY);
 	}
+}
+
+/**
+ * Renders the element widget returning html
+ *
+ * @param array $attributes
+ * @return string
+ */
+PHP_METHOD(Phalcon_Forms_Element, render){
+
+	zval type = {};
+
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+	phalcon_forms_element_render_helper(Z_STRVAL(type), 1, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 
 /**

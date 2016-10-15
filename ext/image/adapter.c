@@ -231,6 +231,12 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 		tmp_height = phalcon_get_intval(&height);
 	}
 
+	phalcon_return_property(&image_width, getThis(), SL("_width"));
+	phalcon_return_property(&image_height, getThis(), SL("_height"));
+
+	tmp_image_width  = phalcon_get_intval(&image_width);
+	tmp_image_height = phalcon_get_intval(&image_height);
+
 	if (!_master) {
 		master = PHALCON_IMAGE_AUTO;
 	} else {
@@ -248,12 +254,6 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 			master = PHALCON_IMAGE_AUTO;
 		}
 	}
-
-	phalcon_return_property(&image_width, getThis(), SL("_width"));
-	phalcon_return_property(&image_height, getThis(), SL("_height"));
-
-	tmp_image_width  = phalcon_get_intval(&image_width);
-	tmp_image_height = phalcon_get_intval(&image_height);
 
 	if (PHALCON_IMAGE_TENSILE == master) {
 		if (Z_TYPE(width) <= IS_NULL || Z_TYPE(height) <= IS_NULL) {

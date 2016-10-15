@@ -559,4 +559,51 @@ class FormsTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(count($messages), 3);
 	}
+
+	public function testFormToArray()
+	{
+		$data = array(
+			"name" => array(
+				"name" => "name",
+				"type" => "text",
+				//"value" =>  NULL,
+				//"label" =>  NULL,
+				"attributes" => array(
+					"class" => "big-input",
+				),
+				//"validators" => NULL,
+				//"filters" => NULL,
+				"options" => array(
+					"some" => "value",
+				),
+				//"optionsValues" => NULL,
+				//"messages" => NULL,
+			),
+			"version" => array(
+				"name" => "version",
+				"type" => "select",
+				//"value" => NULL,
+				//"label" => NULL,
+				//"attributes" => NULL,
+				//"validators" => NULL,
+				//"filters" => NULL,
+				//"options" => NULL,
+				"optionsValues" => array(
+					"phalcon" => "Phalcon",
+					"phalcon7" => "Phalcon7",
+				),
+				//"messages" => NULL,
+			)
+		);
+
+		$nameElement = new Text("name", array('class' => 'big-input'), array('some' => 'value'));
+
+		$versionElement = new Select("version", NULL, NULL, array('phalcon' => 'Phalcon', 'phalcon7' => 'Phalcon7'));
+
+		$form = new \Phalcon\Forms\Form();
+		$form->add($nameElement);
+		$form->add($versionElement);
+
+		$this->assertEquals($form->toArray(), $data);
+	}
 }

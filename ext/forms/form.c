@@ -81,6 +81,7 @@ PHP_METHOD(Phalcon_Forms_Form, next);
 PHP_METHOD(Phalcon_Forms_Form, valid);
 PHP_METHOD(Phalcon_Forms_Form, appendMessage);
 PHP_METHOD(Phalcon_Forms_Form, appendMessages);
+PHP_METHOD(Phalcon_Forms_Form, toArray);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, entity)
@@ -222,6 +223,7 @@ static const zend_function_entry phalcon_forms_form_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Form, valid, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, appendMessage, arginfo_phalcon_forms_form_appendmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, appendMessages, arginfo_phalcon_forms_form_appendmessages, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, toArray, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -1254,4 +1256,29 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 	phalcon_update_property_zval(getThis(), SL("_messages"), &current_messages);
 
 	RETURN_THISW();
+}
+
+/**
+ * Returns a form elements as an array
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Forms_Form, toArray){
+
+	zval elements = {}, *element;
+
+	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
+
+	array_init(return_value);
+
+	if (Z_TYPE(elements) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(elements), element) {
+			zval name ={}, value = {};
+
+			PHALCON_CALL_METHODW(&name, element, "getname");
+			PHALCON_CALL_METHODW(&value, element, "toarray");
+
+			phalcon_array_update_zval(return_value, &name, &value, PH_COPY);
+		} ZEND_HASH_FOREACH_END();
+	}
 }

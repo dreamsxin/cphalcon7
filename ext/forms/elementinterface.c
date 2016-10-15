@@ -23,6 +23,7 @@
 zend_class_entry *phalcon_forms_elementinterface_ce;
 
 static const zend_function_entry phalcon_forms_elementinterface_method_entry[] = {
+	PHP_ABSTRACT_ME(Phalcon_Forms_ElementInterface, __construct, arginfo_phalcon_forms_elementinterface___construct)
 	PHP_ABSTRACT_ME(Phalcon_Forms_ElementInterface, setForm, arginfo_phalcon_forms_elementinterface_setform)
 	PHP_ABSTRACT_ME(Phalcon_Forms_ElementInterface, getForm, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Forms_ElementInterface, setName, arginfo_phalcon_forms_elementinterface_setname)
@@ -54,6 +55,7 @@ static const zend_function_entry phalcon_forms_elementinterface_method_entry[] =
 	PHP_ABSTRACT_ME(Phalcon_Forms_ElementInterface, appendMessage, arginfo_phalcon_forms_elementinterface_appendmessage)
 	PHP_ABSTRACT_ME(Phalcon_Forms_ElementInterface, clear, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Forms_ElementInterface, render, arginfo_phalcon_forms_elementinterface_render)
+	PHP_ABSTRACT_ME(Phalcon_Forms_ElementInterface, toArray, NULL)
 	PHP_FE_END
 };
 
@@ -309,4 +311,11 @@ PHALCON_DOC_METHOD(Phalcon_Forms_ElementInterface, clear);
  * @return string
  */
 PHALCON_DOC_METHOD(Phalcon_Forms_ElementInterface, render);
+
+/**
+ * Returns the element as an array
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Forms_ElementInterface, toArray);
 

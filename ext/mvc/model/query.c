@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getUniqueRow){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 
-	zval *expr, column_name = {}, sql_column_aliases = {}, s_qualified = {}, meta_data = {}, sql_aliases = {}, column_domain = {}, phql = {};
+	zval *expr, column_name = {}, sql_column_aliases = {}, s_qualified = {}, sql_aliases = {}, column_domain = {}, phql = {};
 	zval source = {}, exception_message = {}, sql_aliases_models_instances = {}, model = {}, column_map = {}, real_column_name = {};
 	zval has_model = {}, models_instances = {}, *model_instance, models = {}, class_name = {};
 	long int number = 0;
@@ -460,8 +460,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		phalcon_array_update_string(return_value, IS(name), &column_name, PH_COPY);
 		return;
 	}
-
-	PHALCON_CALL_SELFW(&meta_data, "getmodelsmetaData");
 
 	/** 
 	 * Check if the qualified name has a domain
@@ -497,7 +495,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			return;
 		}
 
-		PHALCON_CALL_METHODW(&column_map, &meta_data, "getreversecolumnmap", &model);
+		PHALCON_CALL_METHODW(&column_map, &model, "getreversecolumnmap");
 
 		if (Z_TYPE(column_map) == IS_ARRAY) { 
 			if (!phalcon_array_isset_fetch(&real_column_name, &column_map, &column_name, 0)) {
@@ -523,7 +521,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			/** 
 			 * Check if the atribute belongs to the current model
 			 */
-			PHALCON_CALL_METHODW(&has_attribute, &meta_data, "hasattribute", model_instance, &column_name);
+			PHALCON_CALL_METHODW(&has_attribute, model_instance, "hasattribute", &column_name);
 			if (zend_is_true(&has_attribute)) {
 				++number;
 				if (number > 1) {
@@ -574,7 +572,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		/** 
 		 * Rename the column
 		 */
-		PHALCON_CALL_METHODW(&column_map, &meta_data, "getreversecolumnmap", &has_model);
+		PHALCON_CALL_METHODW(&column_map, &has_model, "getreversecolumnmap");
 
 		if (Z_TYPE(column_map) == IS_ARRAY) {
 			/** 
@@ -2777,7 +2775,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 			/** 
 			 * Check that inserted fields are part of the model
 			 */
-			PHALCON_CALL_METHODW(&attribute, &model, "getcolumn", &name);
+			PHALCON_CALL_METHODW(&attribute, &model, "getrealattribute", &name);
 			if (!zend_is_true(&attribute)) {
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY);
 
@@ -2795,7 +2793,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
 		phalcon_array_update_string(&sql_insert, IS(fields), &sql_fields, PH_COPY);
 	} else {
-		PHALCON_CALL_METHODW(&sql_fields, &model, "getcolumns");
+		PHALCON_CALL_METHODW(&sql_fields, &model, "getattributes");
 
 		phalcon_array_update_string(&sql_insert, IS(fields), &sql_fields, PH_COPY);
 	}
@@ -3464,7 +3462,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				phalcon_array_update_zval(&models_instances, &model_name, &instance, 0);
 			}
 
-			PHALCON_CALL_METHODW(&attributes, &instance, "getcolumns");
+			PHALCON_CALL_METHODW(&attributes, &instance, "getattributes");
 			if (is_complex) {
 				/** 
 				 * If the resultset is complex we open every model into their columns

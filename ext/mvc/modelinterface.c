@@ -26,6 +26,27 @@ static const zend_function_entry phalcon_mvc_modelinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, setTransaction, arginfo_phalcon_mvc_modelinterface_settransaction)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getSource, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getSchema, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getIdentityField, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getColumnMap, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getReverseColumnMap, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getAttributes, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getPrimaryKeyAttributes, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getNonPrimaryKeyAttributes, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getNotNullAttributes, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getDataTypesNumeric, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, isNotNull, arginfo_phalcon_mvc_modelinterface_isnotnull)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getDataTypes, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getDataSize, arginfo_phalcon_mvc_modelinterface_getdatasize)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getDataByte, arginfo_phalcon_mvc_modelinterface_getdatabyte)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getDataScale, arginfo_phalcon_mvc_modelinterface_getdatascale)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getBindTypes, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getDefaultValues, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getAutomaticCreateAttributes, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getAutomaticUpdateAttributes, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, hasRealAttribute, arginfo_phalcon_mvc_modelinterface_hasrealattribute)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getRealAttribute, arginfo_phalcon_mvc_modelinterface_getrealattribute)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, hasAttribute, arginfo_phalcon_mvc_modelinterface_hasattribute)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, getAttribute, arginfo_phalcon_mvc_modelinterface_getattribute)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, setConnectionService, arginfo_phalcon_mvc_modelinterface_setconnectionservice)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, setWriteConnectionService, arginfo_phalcon_mvc_modelinterface_setwriteconnectionservice)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_ModelInterface, setReadConnectionService, arginfo_phalcon_mvc_modelinterface_setreadconnectionservice)
@@ -95,6 +116,160 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getSource);
 PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getSchema);
 
 /**
+ * Returns the name of identity field (if one is present)
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getIdentityField)
+
+/**
+ * Returns the column map if any
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getColumnMap)
+
+/**
+ * Returns the reverse column map if any
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getReverseColumnMap)
+
+/**
+ * Returns table attributes names (fields)
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getAttributes)
+
+/**
+ * Returns an array of fields which are part of the primary key
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getPrimaryKeyAttributes)
+
+/**
+ * Returns an arrau of fields which are not part of the primary key
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getNonPrimaryKeyAttributes)
+
+/**
+ * Returns an array of not null attributes
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getNotNullAttributes)
+
+/**
+ * Returns attributes which types are numerical
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getDataTypesNumeric)
+
+/**
+ * Checks if the attribute is not null
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, isNotNull)
+
+/**
+ * Returns the columns data types
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getDataTypes)
+
+/**
+ * Returns attribute data size
+ *
+ * @param string $attribute
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getDataSize)
+
+/**
+ * Returns attribute data byte
+ *
+ * @param string $attribute
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getDataByte)
+
+/**
+ * Returns attribute data scale
+ *
+ * @param string $attribute
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getDataScale)
+
+/**
+ * Returns attributes and their bind data types
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getBindTypes)
+
+/**
+ * Returns attributes and their default values
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getDefaultValues)
+
+/**
+ * Returns attributes that must be ignored from the INSERT SQL generation
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getAutomaticCreateAttributes)
+
+/**
+ * Returns attributes that must be ignored from the UPDATE SQL generation
+ *
+ * @return array
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getAutomaticUpdateAttributes)
+
+/**
+ * Check if a model has certain column
+ *
+ * @param string $column
+ * @return boolean
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, hasRealAttribute)
+
+/**
+ * Gets a model certain column
+ *
+ * @param string $column
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getColumn)
+
+/**
+ * Check if a model has certain attribute
+ *
+ * @param string $attribute
+ * @return boolean
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, hasAttribute)
+
+/**
+ * Gets a model certain attribute
+ *
+ * @param string $attribute
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getAttribute)
+
+/**
  * Sets both read/write connection services
  *
  * @param string $connectionService
@@ -148,6 +323,7 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, getWriteConnection);
  *
  * @param array $data
  * @param array $columnMap
+ * @param array $whiteList
  * @return Phalcon\Mvc\Model
  */
 PHALCON_DOC_METHOD(Phalcon_Mvc_ModelInterface, assign);

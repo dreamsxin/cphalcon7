@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "validation/validator/presenceof.h"
+#include "validation/validator/json.h"
 #include "validation/validator.h"
 #include "validation/validatorinterface.h"
 #include "validation/message.h"
@@ -28,44 +28,45 @@
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
-#include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/operators.h"
 #include "kernel/array.h"
 
 #include "interned-strings.h"
 
 /**
- * Phalcon\Validation\Validator\PresenceOf
+ * Phalcon\Validation\Validator\Json
  *
- * Validates that a value is not null or empty string
+ * Checks if a value has a correct JSON format
  *
  *<code>
- *use Phalcon\Validation\Validator\PresenceOf;
+ *use Phalcon\Validation\Validator\Json as JsonValidator;
  *
- *$validator->add('name', new PresenceOf(array(
- *   'message' => 'The name is required'
+ *$validator->add('json', new JsonValidator(array(
+ *   'keys' => array('name'),
+ *   'message' => 'The json is not valid'
  *)));
  *</code>
  */
-zend_class_entry *phalcon_validation_validator_presenceof_ce;
+zend_class_entry *phalcon_validation_validator_json_ce;
 
-PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate);
-PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, valid);
+PHP_METHOD(Phalcon_Validation_Validator_Json, validate);
+PHP_METHOD(Phalcon_Validation_Validator_Json, valid);
 
-static const zend_function_entry phalcon_validation_validator_presenceof_method_entry[] = {
-	PHP_ME(Phalcon_Validation_Validator_PresenceOf, validate, arginfo_phalcon_validation_validatorinterface_validate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Validator_PresenceOf, valid, NULL, ZEND_ACC_PUBLIC)
+static const zend_function_entry phalcon_validation_validator_json_method_entry[] = {
+	PHP_ME(Phalcon_Validation_Validator_Json, validate, arginfo_phalcon_validation_validatorinterface_validate, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Validator_Json, valid, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Validation\Validator\PresenceOf initializer
+ * Phalcon\Validation\Validator\Json initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Validation_Validator_PresenceOf){
+PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Json){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Validation\\Validator, PresenceOf, validation_validator_presenceof, phalcon_validation_validator_ce, phalcon_validation_validator_presenceof_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Validation\\Validator, Json, validation_validator_json, phalcon_validation_validator_ce, phalcon_validation_validator_json_method_entry, 0);
 
-	zend_class_implements(phalcon_validation_validator_presenceof_ce, 1, phalcon_validation_validatorinterface_ce);
+	zend_class_implements(phalcon_validation_validator_json_ce, 1, phalcon_validation_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -77,15 +78,22 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_PresenceOf){
  * @param string $attribute
  * @return boolean
  */
-PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
+PHP_METHOD(Phalcon_Validation_Validator_Json, validate){
 
-	zval *validator, *attribute, value = {}, valid = {}, code = {}, message_str = {}, message = {}, label = {}, pairs = {}, prepared = {};
+	zval *validator, *attribute, value = {}, allow_empty = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
+
 	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
 
 	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
+
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
+	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
+		RETURN_TRUE;
+	}
+
 	PHALCON_CALL_SELFW(&valid, "valid", &value);
 
 	if (PHALCON_IS_FALSE(&valid)) {
@@ -102,7 +110,7 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
-			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "PresenceOf"));
+			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Json"));
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
@@ -112,7 +120,7 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 
 		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 
-		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "PresenceOf", &code);
+		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Json", &code);
 
 		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
@@ -127,14 +135,40 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
  * @param string $value
  * @return boolean
  */
-PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, valid){
+PHP_METHOD(Phalcon_Validation_Validator_Json, valid){
 
-	zval *value;
+	zval *value, assoc = {}, valid = {}, json = {}, *constant, ret = {}, option = {}, keys = {};
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	if (PHALCON_IS_EMPTY(value)) {
+	ZVAL_TRUE(&valid);
+	ZVAL_TRUE(&assoc);
+
+	PHALCON_CALL_FUNCTIONW(&json, "json_decode", value, &assoc);
+
+	if (Z_TYPE(json) == IS_NULL) {
+		if ((constant = zend_get_constant_str(SL("JSON_ERROR_NONE"))) != NULL) {
+			PHALCON_CALL_FUNCTIONW(&ret, "json_last_error");
+
+			if (!PHALCON_IS_EQUAL(&ret, constant)) {
+				ZVAL_FALSE(&valid);
+			}
+		}
+	}
+
+	if (!zend_is_true(&valid)) {
 		RETURN_FALSE;
+	}
+
+	ZVAL_STRING(&option, "keys");
+
+	PHALCON_CALL_METHODW(&keys, getThis(), "getoption", &option);
+
+	if (Z_TYPE(keys) != IS_NULL) {
+		PHALCON_CALL_FUNCTIONW(&ret, "array_key_exists", &keys, &json);
+		if (!zend_is_true(&ret)) {
+			RETURN_FALSE;
+		}
 	}
 
 	RETURN_TRUE;

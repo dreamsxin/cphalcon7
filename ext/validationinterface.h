@@ -14,20 +14,27 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_MVC_MODEL_VALIDATORINTERFACE_H
-#define PHALCON_MVC_MODEL_VALIDATORINTERFACE_H
+#ifndef PHALCON_VALIDATIONINTERFACE_H
+#define PHALCON_VALIDATIONINTERFACE_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_mvc_model_validatorinterface_ce;
+extern zend_class_entry *phalcon_validationinterface_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_ValidatorInterface);
+PHALCON_INIT_CLASS(Phalcon_ValidationInterface);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_validatorinterface_validate, 0, 0, 1)
-	ZEND_ARG_INFO(0, record)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validationinterface_validate, 0, 0, 1)
+	ZEND_ARG_INFO(0, data)
+	ZEND_ARG_INFO(0, entity)
 ZEND_END_ARG_INFO()
 
-#endif /* PHALCON_MVC_MODEL_VALIDATORINTERFACE_H */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validationinterface_add, 0, 0, 2)
+	ZEND_ARG_INFO(0, attribute)
+	ZEND_ARG_INFO(0, validator)
+ZEND_END_ARG_INFO()
+
+#endif /* PHALCON_VALIDATIONINTERFACE_H */

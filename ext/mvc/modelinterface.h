@@ -30,6 +30,38 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_settransaction, 0, 0, 
 	ZEND_ARG_INFO(0, transaction)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_isnotnull, 0, 0, 1)
+	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_getdatasize, 0, 0, 1)
+	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_getdatabyte, 0, 0, 1)
+	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_getdatascale, 0, 0, 1)
+	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_hasrealattribute, 0, 0, 1)
+	ZEND_ARG_INFO(0, column)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_getrealattribute, 0, 0, 1)
+	ZEND_ARG_INFO(0, column)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_hasattribute, 0, 0, 1)
+	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_getattribute, 0, 0, 1)
+	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_setconnectionservice, 0, 0, 1)
 	ZEND_ARG_INFO(0, connectionService)
 ZEND_END_ARG_INFO()
@@ -45,6 +77,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_assign, 0, 0, 1)
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, columnMap)
+	ZEND_ARG_INFO(0, whiteList)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_cloneresultmap, 0, 0, 4)

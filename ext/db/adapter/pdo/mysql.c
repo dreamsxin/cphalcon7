@@ -174,9 +174,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		 * If the column type has a parentheses we try to get the column size from it
 		 */
 		if (phalcon_memnstr_str(&column_type, SL("("))) {
-
+			ZVAL_NULL(&matches);
+			ZVAL_MAKE_REF(&matches);
 			RETURN_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches));
-
+			ZVAL_UNREF(&matches);
 			if (zend_is_true(&pos)) {
 				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1)) {
 					convert_to_long(&match_one);

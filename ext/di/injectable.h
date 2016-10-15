@@ -28,13 +28,13 @@ PHALCON_INIT_CLASS(Phalcon_DI_Injectable);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireevent, 0, 0, 1)
 	ZEND_ARG_INFO(0, eventName)
-	ZEND_ARG_INFO(1, data)
+	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, cancelable)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireeventcancel, 0, 0, 1)
 	ZEND_ARG_INFO(0, eventName)
-	ZEND_ARG_INFO(1, data)
+	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, cancelable)
 ZEND_END_ARG_INFO()
 

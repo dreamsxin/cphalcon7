@@ -20,8 +20,8 @@
 		5.1.Fire event – application:boot
 		5.2.Handle the URI pattern (if any)
 		5.3.Process the module definition (if any)
-			5.3.1. Fire event  - application:beforeStartModule
-			5.3.2. Call method registerAutoloaders
+			5.3.1.Fire event  - application:beforeStartModule
+			5.3.2.Call method registerAutoloaders
 			5.3.3.Call method registerServices
 			5.3.3.Fire event - application:afterStartModule
 		5.4.Fire event – application:beforeHandleRequest
@@ -173,3 +173,13 @@ Any class Inherited from `Phalcon\DI\Injectable`.
 	2.Send a notification to the events manager - Phalcon\Events\Manager::fire
 	3.Internal handler to call a queue of events - Phalcon\Events\Manager::fireQueue
 	4.Check if the listener is a closure or has implemented an event with the same name
+
+## Model
+
+### Query records
+
+	1.Creates a query builder - Phalcon\Mvc\Model\Manager::createBuilder
+	2.Fire event - model:beforeQuery
+	3.Gets the query - Phalcon\Mvc\Model\Query\Builder::getQuery
+	4.Execute the query
+	5.Fire event - model:afterQuery

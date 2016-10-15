@@ -26,6 +26,14 @@ extern zend_class_entry *phalcon_forms_elementinterface_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Forms_ElementInterface);
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_elementinterface___construct, 0, 0, 1)
+	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_INFO(0, attributes)
+	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_INFO(0, optionsValues)
+	ZEND_ARG_INFO(0, type)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_elementinterface_setform, 0, 0, 1)
 	ZEND_ARG_INFO(0, form)
 ZEND_END_ARG_INFO()

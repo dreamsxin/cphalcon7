@@ -231,13 +231,13 @@ PHP_METHOD(Phalcon_Async, recvAll){
 		ZVAL_NULL(&type);
 		ZVAL_NULL(&message);
 
-		PHALCON_MAKE_REF(&type);
-		PHALCON_MAKE_REF(&message);
+		ZVAL_MAKE_REF(&type);
+		ZVAL_MAKE_REF(&message);
 
 		PHALCON_CALL_FUNCTIONW(&result, "msg_receive", &seg, &pid, &type, &size, &message, &PHALCON_GLOBAL(z_true), &flag);
 
-		PHALCON_UNREF(&message);
-		PHALCON_UNREF(&type);
+		ZVAL_UNREF(&message);
+		ZVAL_UNREF(&type);
 
 		if (zend_is_true(&result)) {
 			phalcon_array_update_zval(return_value, &type, &message, PH_COPY);

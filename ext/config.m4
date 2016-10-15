@@ -220,7 +220,6 @@ mvc/model/metadata/redis.c \
 mvc/model/metadata/mongo.c \
 mvc/model/metadata/cache.c \
 mvc/model/transaction.c \
-mvc/model/validatorinterface.c \
 mvc/model/metadata.c \
 mvc/model/resultsetinterface.c \
 mvc/model/managerinterface.c \
@@ -246,7 +245,6 @@ mvc/model/manager.c \
 mvc/model/behaviorinterface.c \
 mvc/model/relation.c \
 mvc/model/exception.c \
-mvc/model/message.c \
 mvc/model/transaction/failed.c \
 mvc/model/transaction/managerinterface.c \
 mvc/model/transaction/manager.c \
@@ -254,24 +252,12 @@ mvc/model/transaction/exception.c \
 mvc/model/queryinterface.c \
 mvc/model/row.c \
 mvc/model/criteria.c \
-mvc/model/validator/email.c \
-mvc/model/validator/presenceof.c \
-mvc/model/validator/inclusionin.c \
-mvc/model/validator/exclusionin.c \
-mvc/model/validator/uniqueness.c \
-mvc/model/validator/url.c \
-mvc/model/validator/regex.c \
-mvc/model/validator/numericality.c \
-mvc/model/validator/stringlength.c \
-mvc/model/validator/json.c \
 mvc/model/resultset/complex.c \
 mvc/model/resultset/simple.c \
 mvc/model/behavior/timestampable.c \
 mvc/model/behavior/softdelete.c \
-mvc/model/validator.c \
 mvc/model/metadatainterface.c \
 mvc/model/relationinterface.c \
-mvc/model/messageinterface.c \
 mvc/model/transactioninterface.c \
 mvc/jsonrpc.c \
 mvc/jsonrpc/exception.c \
@@ -370,6 +356,7 @@ events/exception.c \
 events/eventsawareinterface.c \
 events/listener.c \
 escaperinterface.c \
+validationinterface.c \
 validation.c \
 version.c \
 flashinterface.c \
@@ -427,6 +414,8 @@ validation/validator/stringlength.c \
 validation/validator/url.c \
 validation/validator/file.c \
 validation/validator/numericality.c \
+validation/validator/json.c \
+validation/validator/uniqueness.c \
 validation/validator.c \
 mvc/model/query/parser.c \
 mvc/model/query/scanner.c \

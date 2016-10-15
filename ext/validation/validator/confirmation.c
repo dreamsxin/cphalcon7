@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -139,6 +140,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
  * Executes the validation
  *
  * @param string $value
+ * @param string $with_value
  * @return boolean
  */
 PHP_METHOD(Phalcon_Validation_Validator_Confirmation, valid){

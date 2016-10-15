@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-use Phalcon\Mvc\Model\Message as ModelMessage;
+use Phalcon\Validation\Message as ModelMessage;
 
 class Issue_1534 extends \Phalcon\Mvc\Model
 {

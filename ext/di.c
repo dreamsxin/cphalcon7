@@ -15,6 +15,7 @@
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
   |          Nikolaos Dimopoulos <nikos@niden.net>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -265,6 +266,9 @@ PHP_METHOD(Phalcon_DI, set) {
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, shared);
 
 	phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
+	if (zend_is_true(shared)) {
+		phalcon_unset_property_array(getThis(), SL("_sharedInstances"), name);
+	}
 }
 
 /**
@@ -285,6 +289,7 @@ PHP_METHOD(Phalcon_DI, setShared){
 	PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, &PHALCON_GLOBAL(z_true));
 
 	phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
+	phalcon_unset_property_array(getThis(), SL("_sharedInstances"), name);
 }
 
 /**
@@ -483,6 +488,9 @@ PHP_METHOD(Phalcon_DI, getShared){
 	}
 
 	if (phalcon_property_array_isset_fetch(return_value, getThis(), SL("_sharedInstances"), name)) {
+		if (Z_TYPE_P(return_value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(return_value), phalcon_di_injectionawareinterface_ce, 1)) {
+			PHALCON_CALL_METHODW(NULL, return_value, "setdi", getThis());
+		}
 		phalcon_update_property_bool(getThis(), SL("_freshInstance"), 0);
 	} else {
 		PHALCON_CALL_SELFW(return_value, "get", name, parameters, noerror);
@@ -670,4 +678,6 @@ PHP_METHOD(Phalcon_DI, reset){
 }
 
 PHP_METHOD(Phalcon_DI, __clone) {
+
+	phalcon_update_property_null(getThis(), SL("_sharedInstances"));
 }

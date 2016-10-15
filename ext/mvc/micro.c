@@ -15,6 +15,7 @@
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
   |          Kenji Minamoto <kenji.minamoto@gmail.com>                     |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 

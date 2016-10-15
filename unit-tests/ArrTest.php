@@ -53,6 +53,11 @@ class ArrTest extends PHPUnit_Framework_TestCase
 		$colors = \Phalcon\Arr::path($data, array('theme', '*', 'color'));
 		$this->assertEquals($colors, array('blue', 'blue'));
 
+		// Append the values of "color" in theme
+		\Phalcon\Arr::set_path($data, 'theme.*.color', 'red', NULL, true);
+		$colors = \Phalcon\Arr::path($data, array('theme', '*', 'color'));
+		$this->assertEquals($colors, array(array('blue', 'red'), array('blue', 'red')));
+
 		$values = \Phalcon\Arr::range(5, 20);
 		$this->assertEquals($values, array(5 => 5, 10 => 10, 15 => 15, 20 => 20));
 
@@ -61,6 +66,12 @@ class ArrTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($username, 'Dreamszhu');
 
 		$sex = \Phalcon\Arr::get($data, 'sex', 'No');
+		$this->assertEquals($sex, 'No');
+
+		// Use callback get value
+		$sex = \Phalcon\Arr::get($data, function($array, $defalut_value){
+			return isset($array['sex']) ? 'Yes' : 'No';
+		});
 		$this->assertEquals($sex, 'No');
 
 		$info = \Phalcon\Arr::get($data, array('username', 'address'));

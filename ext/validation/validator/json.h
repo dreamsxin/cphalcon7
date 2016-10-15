@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2013 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -14,16 +14,17 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_MVC_MODEL_VALIDATOR_EMAIL_H
-#define PHALCON_MVC_MODEL_VALIDATOR_EMAIL_H
+#ifndef PHALCON_VALIDATION_VALIDATOR_JSON_H
+#define PHALCON_VALIDATION_VALIDATOR_JSON_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_mvc_model_validator_email_ce;
+extern zend_class_entry *phalcon_validation_validator_json_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Validator_Email);
+PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Json);
 
-#endif /* PHALCON_MVC_MODEL_VALIDATOR_EMAIL_H */
+#endif /* PHALCON_VALIDATION_VALIDATOR_JSON_H */

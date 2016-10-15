@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2013 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -14,28 +14,17 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_MVC_MODEL_MESSAGEINTERFACE_H
-#define PHALCON_MVC_MODEL_MESSAGEINTERFACE_H
+#ifndef PHALCON_VALIDATION_VALIDATOR_UNIQUENESS_H
+#define PHALCON_VALIDATION_VALIDATOR_UNIQUENESS_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_mvc_model_messageinterface_ce;
+extern zend_class_entry *phalcon_validation_validator_uniqueness_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MessageInterface);
+PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Uniqueness);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_messageinterface_settype, 0, 0, 1)
-	ZEND_ARG_INFO(0, type)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_messageinterface_setmessage, 0, 0, 1)
-	ZEND_ARG_INFO(0, message)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_messageinterface_setfield, 0, 0, 1)
-	ZEND_ARG_INFO(0, field)
-ZEND_END_ARG_INFO()
-
-#endif /* PHALCON_MVC_MODEL_MESSAGEINTERFACE_H */
+#endif /* PHALCON_VALIDATION_VALIDATOR_UNIQUENESS_H */

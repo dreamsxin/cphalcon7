@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -110,7 +111,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Chart_Exception);
 
 	/* 2. Register interfaces */
-	PHALCON_INIT(Phalcon_DiInterface);
+	PHALCON_INIT(Phalcon_DIInterface);
 	PHALCON_INIT(Phalcon_DI_InjectionAwareInterface);
 	PHALCON_INIT(Phalcon_DI_ServiceInterface);
 	PHALCON_INIT(Phalcon_Events_EventsAwareInterface);
@@ -155,7 +156,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_BehaviorInterface);
 	PHALCON_INIT(Phalcon_Mvc_Model_CriteriaInterface);
 	PHALCON_INIT(Phalcon_Mvc_Model_ManagerInterface);
-	PHALCON_INIT(Phalcon_Mvc_Model_MessageInterface);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaDataInterface);
 	PHALCON_INIT(Phalcon_Mvc_Model_QueryInterface);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_BuilderInterface);
@@ -165,7 +165,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_ResultsetInterface);
 	PHALCON_INIT(Phalcon_Mvc_Model_TransactionInterface);
 	PHALCON_INIT(Phalcon_Mvc_Model_Transaction_ManagerInterface);
-	PHALCON_INIT(Phalcon_Mvc_Model_ValidatorInterface);
 	PHALCON_INIT(Phalcon_Mvc_ModuleDefinitionInterface);
 	PHALCON_INIT(Phalcon_Mvc_RouterInterface);
 	PHALCON_INIT(Phalcon_Mvc_Router_RouteInterface);
@@ -177,6 +176,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Session_AdapterInterface);
 	PHALCON_INIT(Phalcon_Session_BagInterface);
 	PHALCON_INIT(Phalcon_Translate_AdapterInterface);
+	PHALCON_INIT(Phalcon_ValidationInterface);
 	PHALCON_INIT(Phalcon_Validation_ValidatorInterface);
 	PHALCON_INIT(Phalcon_Validation_MessageInterface);
 
@@ -245,6 +245,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Validation_Validator_Url);
 	PHALCON_INIT(Phalcon_Validation_Validator_File);
 	PHALCON_INIT(Phalcon_Validation_Validator_Numericality);
+	PHALCON_INIT(Phalcon_Validation_Validator_Json);
+	PHALCON_INIT(Phalcon_Validation_Validator_Uniqueness);
 	PHALCON_INIT(Phalcon_Db);
 	PHALCON_INIT(Phalcon_Db_Adapter);
 	PHALCON_INIT(Phalcon_Db_Adapter_Pdo);
@@ -365,7 +367,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Micro_LazyLoader);
 	PHALCON_INIT(Phalcon_Mvc_Model_Criteria);
 	PHALCON_INIT(Phalcon_Mvc_Model_Manager);
-	PHALCON_INIT(Phalcon_Mvc_Model_Message);
 	PHALCON_INIT(Phalcon_Mvc_Model_Relation);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Lang);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Status);
@@ -397,17 +398,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_Transaction_Failed);
 	PHALCON_INIT(Phalcon_Mvc_Model_Behavior_SoftDelete);
 	PHALCON_INIT(Phalcon_Mvc_Model_Behavior_Timestampable);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Url);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Regex);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Email);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Inclusionin);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Numericality);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Exclusionin);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_StringLength);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Uniqueness);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_PresenceOf);
-	PHALCON_INIT(Phalcon_Mvc_Model_Validator_Json);
 	PHALCON_INIT(Phalcon_Mvc_Router_Route);
 	PHALCON_INIT(Phalcon_Mvc_Router_Group);
 	PHALCON_INIT(Phalcon_Mvc_Router_Annotations);

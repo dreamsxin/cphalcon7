@@ -14,10 +14,12 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
 #include "validation.h"
+#include "validationinterface.h"
 #include "validation/exception.h"
 #include "validation/message/group.h"
 #include "validation/validator.h"
@@ -51,6 +53,7 @@ PHP_METHOD(Phalcon_Validation, add);
 PHP_METHOD(Phalcon_Validation, setFilters);
 PHP_METHOD(Phalcon_Validation, getFilters);
 PHP_METHOD(Phalcon_Validation, getValidators);
+PHP_METHOD(Phalcon_Validation, setEntity);
 PHP_METHOD(Phalcon_Validation, getEntity);
 PHP_METHOD(Phalcon_Validation, getMessages);
 PHP_METHOD(Phalcon_Validation, appendMessage);
@@ -65,16 +68,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, validators)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_validate, 0, 0, 0)
-	ZEND_ARG_INFO(0, data)
-	ZEND_ARG_INFO(0, entity)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_add, 0, 0, 2)
-	ZEND_ARG_INFO(0, attribute)
-	ZEND_ARG_INFO(0, validator)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfilters, 0, 0, 2)
 	ZEND_ARG_INFO(0, attribute)
 	ZEND_ARG_INFO(0, filters)
@@ -82,6 +75,10 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getfilters, 0, 0, 0)
 	ZEND_ARG_INFO(0, attribute)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setentity, 0, 0, 0)
+	ZEND_ARG_INFO(0, entity)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_appendmessage, 0, 0, 1)
@@ -115,11 +112,12 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_validation_method_entry[] = {
 	PHP_ME(Phalcon_Validation, __construct, arginfo_phalcon_validation___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Validation, validate, arginfo_phalcon_validation_validate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation, add, arginfo_phalcon_validation_add, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, validate, arginfo_phalcon_validationinterface_validate, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, add, arginfo_phalcon_validationinterface_add, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setFilters, arginfo_phalcon_validation_setfilters, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getFilters, arginfo_phalcon_validation_getfilters, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getValidators, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, setEntity, arginfo_phalcon_validation_setentity, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getEntity, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getMessages, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, appendMessage, arginfo_phalcon_validation_appendmessage, ZEND_ACC_PUBLIC)
@@ -147,6 +145,8 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 	zend_declare_property_null(phalcon_validation_ce, SL("_values"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_defaultMessages"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_labels"), ZEND_ACC_PROTECTED);
+
+	zend_class_implements(phalcon_validation_ce, 1, phalcon_validationinterface_ce);
 
 	return SUCCESS;
 }
@@ -183,10 +183,8 @@ PHP_METHOD(Phalcon_Validation, __construct){
 	
 	if (!validators) {
 		validators = &PHALCON_GLOBAL(z_null);
-	}
-	
-	if (Z_TYPE_P(validators) != IS_NULL) {
-		if (Z_TYPE_P(validators) != IS_ARRAY) { 
+	} else if (PHALCON_TYPE_P(validators) != IS_NULL) {
+		if (PHALCON_TYPE_P(validators) != IS_ARRAY) { 
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Validators must be an array");
 			return;
 		}
@@ -220,6 +218,9 @@ PHP_METHOD(Phalcon_Validation, validate){
 	
 	if (!entity) {
 		entity = &PHALCON_GLOBAL(z_null);
+	} else {
+		PHALCON_CALL_METHODW(NULL, getThis(), "setentity", entity);
+		
 	}
 	
 	phalcon_return_property(&validators, getThis(), SL("_validators"));
@@ -238,6 +239,8 @@ PHP_METHOD(Phalcon_Validation, validate){
 	 */
 	object_init_ex(&messages, phalcon_validation_message_group_ce);
 	PHALCON_CALL_METHODW(NULL, &messages, "__construct");
+
+	phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
 	
 	/** 
 	 * Validation classes can implement the 'beforeValidation' callback
@@ -248,8 +251,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 			RETURN_CTORW(&status);
 		}
 	}
-	
-	phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
+
 	if (Z_TYPE_P(data) == IS_ARRAY || Z_TYPE_P(data) == IS_OBJECT) {
 		phalcon_update_property_zval(getThis(), SL("_data"), data);
 	}
@@ -289,7 +291,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	if (phalcon_method_exists_ex(getThis(), SL("aftervalidation")) == SUCCESS) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "aftervalidation", data, entity, &messages);
 	}
-	
+
 	RETURN_CTORW(&messages);
 }
 
@@ -305,7 +307,11 @@ PHP_METHOD(Phalcon_Validation, add){
 	zval *attribute, *validator, scope = {};
 
 	phalcon_fetch_params(0, 2, 0, &attribute, &validator);
-	PHALCON_ENSURE_IS_STRING(attribute);
+	if (Z_TYPE_P(attribute) != IS_STRING && Z_TYPE_P(attribute) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Field must be passed as array of fields or string");
+		return;
+	}
+
 	PHALCON_VERIFY_INTERFACE_EX(validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce, 0);
 
 	array_init_size(&scope, 2);
@@ -366,6 +372,22 @@ PHP_METHOD(Phalcon_Validation, getValidators){
 
 
 	RETURN_MEMBER(getThis(), "_validators");
+}
+
+/**
+ * Sets the bound entity
+ *
+ * @param object entity
+ * @return Phalcon\Validation
+ */
+PHP_METHOD(Phalcon_Validation, setEntity){
+
+	zval *entity;
+
+	phalcon_fetch_params(0, 1, 0, &entity);
+	
+	phalcon_update_property_zval(getThis(), SL("_entity"), entity);
+	RETURN_THISW();
 }
 
 /**
@@ -448,7 +470,7 @@ PHP_METHOD(Phalcon_Validation, bind){
  */
 PHP_METHOD(Phalcon_Validation, getValue){
 
-	zval *attribute, entity = {}, method = {}, value = {}, data = {}, values = {}, filters = {}, field_filters = {}, service_name = {}, dependency_injector = {}, filter_service = {};
+	zval *attribute, entity = {}, value = {}, data = {}, values = {}, filters = {}, field_filters = {}, service_name = {}, dependency_injector = {}, filter_service = {};
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
@@ -458,11 +480,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 	 * If the entity is an object use it to retrieve the values
 	 */
 	if (Z_TYPE(entity) == IS_OBJECT) {
-		PHALCON_CONCAT_SV(&method, "get", attribute);
-		phalcon_strtolower_inplace(&method);
-		if (phalcon_method_exists_ex(&entity, Z_STRVAL(method), Z_STRLEN(method)) == SUCCESS) {
-			PHALCON_CALL_METHODW(&value, &entity, Z_STRVAL(method));
-		} else if (phalcon_method_exists_ex(&entity, SL("readattribute")) == SUCCESS) {
+		if (phalcon_method_exists_ex(&entity, SL("readattribute")) == SUCCESS) {
 			PHALCON_CALL_METHODW(&value, &entity, "readattribute", attribute);
 		} else {
 			phalcon_return_property_zval(&value, &entity, attribute);
@@ -573,6 +591,7 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 	phalcon_array_update_str_str(&default_messages, SL("TooShort"),          SL("Field :field must be at least :min characters long"), PH_COPY);
 	phalcon_array_update_str_str(&default_messages, SL("Uniqueness"),        SL("Field :field must be unique"), PH_COPY);
 	phalcon_array_update_str_str(&default_messages, SL("Url"),               SL("Field :field must be a url"), PH_COPY);
+	phalcon_array_update_str_str(&default_messages, SL("Json"),               SL("Field :field must be a json"), PH_COPY);
 
 	if (!messages || Z_TYPE_P(messages) == IS_NULL) {
 		phalcon_update_property_zval(getThis(), SL("_defaultMessages"), &default_messages);
@@ -622,27 +641,30 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, labels = {}, field = {}, value = {};
+	zval *field_param = NULL, labels = {}, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &field_param);
 
-	if (Z_TYPE_P(field_param) != IS_STRING && Z_TYPE_P(field_param) != IS_NULL) {
-		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Parameter 'field' must be a string");
+	if (Z_TYPE_P(field_param) == IS_NULL) {
 		RETURN_NULL();
 	}
 
-	if (Z_TYPE_P(field_param) == IS_STRING) {
-		PHALCON_CPY_WRT(&field, field_param);
-	} else {
-		ZVAL_EMPTY_STRING(&field);
+	if (Z_TYPE_P(field_param) != IS_STRING && Z_TYPE_P(field_param) != IS_ARRAY) {
+		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Parameter 'field' must be a string or array");
+		RETURN_NULL();
+	}
+
+	if (Z_TYPE_P(field_param) == IS_ARRAY) {
+		phalcon_fast_join_str(&value, SL(", "), field_param);
+		RETURN_CTORW(&value);
 	}
 
 	phalcon_return_property(&labels, getThis(), SL("_labels"));
-	if (Z_TYPE(labels) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&value, &labels, &field, 0)) {
+	if (Z_TYPE(labels) == IS_ARRAY && Z_TYPE_P(field_param) == IS_STRING) {
+		if (phalcon_array_isset_fetch(&value, &labels, field_param, 0)) {
 			RETURN_CTORW(&value);
 		}
 	}
 
-	RETURN_NULL();
+	RETURN_CTORW(field_param);
 }

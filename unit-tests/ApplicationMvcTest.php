@@ -23,7 +23,6 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testApplicationSingleModule()
 	{
-
 		// Creates the autoloader
 		$loader = new \Phalcon\Loader();
 
@@ -35,6 +34,7 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 		$_GET['_url'] = '/test2/index';
 
+		Phalcon\DI::reset();
 		$di = new Phalcon\DI\FactoryDefault();
 
 		$di->set('view', function() {
@@ -52,7 +52,6 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testApplicationModulesDefinition()
 	{
-
 		// Creates the autoloader
 		$loader = new \Phalcon\Loader();
 
@@ -95,8 +94,6 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 			),
 		));
 
-		$application->setDi($di);
-
 		$this->assertEquals($application->handle()->getContent(), '<html>here</html>'.PHP_EOL);
 
 		$loader->unregister();
@@ -104,7 +101,6 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testApplicationModulesDefinitionClosure()
 	{
-
 		// Creates the autoloader
 		$loader = new \Phalcon\Loader();
 
@@ -160,9 +156,35 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 			},
 		));
 
-		$application->setDi($di);
-
 		$this->assertEquals($application->handle()->getContent(), '<html>here</html>'.PHP_EOL);
+
+		$loader->unregister();
+	}
+
+	public function testHMVC()
+	{
+		// Creates the autoloader
+		$loader = new \Phalcon\Loader();
+
+		$loader->registerDirs(array(
+			'unit-tests/controllers/'
+		));
+
+		$loader->register();
+
+		$_GET['_url'] = '/hmvc/one';
+
+		Phalcon\DI::reset();
+		$di = new Phalcon\DI\FactoryDefault();
+
+		$application = new Phalcon\Mvc\Application();
+		$di->set('view', function() {
+			$view = new \Phalcon\Mvc\View();
+			$view->disable();
+			return $view;
+		});
+
+		$this->assertEquals($application->handle()->getContent(), 'one-two-one');
 
 		$loader->unregister();
 	}

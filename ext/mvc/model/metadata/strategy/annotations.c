@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 
 	zval *model, *dependency_injector, service = {}, annotations = {}, class_name = {}, reflection = {}, properties_annotations = {}, exception_message = {};
-	zval ordered_column_map = {}, reversed_column_map = {}, column_annot_name = {}, column_map_name = {}, *prop_annotations;
+	zval ordered_column_map = {}, reversed_column_map = {}, column_annot_name = {}, column_map_name = {}, *prop_annotations, *column_name;
 	zend_string *str_key;
 	ulong idx;
 
@@ -318,9 +318,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	}
 
 	/** 
-	 * Initialize meta-data
+	 * Check for a columnMap() method on the model
 	 */
-	array_init(&ordered_column_map);
+	if (phalcon_method_exists_ex(model, SL("columnmap")) == SUCCESS) {
+		PHALCON_CALL_METHODW(&ordered_column_map, model, "columnmap");
+		if (Z_TYPE(ordered_column_map) != IS_ARRAY) { 
+			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "columnMap() not returned an array");
+			return;
+		}
+	} else {
+		array_init(&ordered_column_map);
+	}
 	array_init(&reversed_column_map);
 
 	PHALCON_STR(&column_annot_name, "Column");
@@ -352,13 +360,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		 * Check column map
 		 */
 		PHALCON_CALL_METHODW(&real_property, &column_annotation, "getargument", &column_map_name);
-		if (!PHALCON_IS_EMPTY(&real_property)) {
-			phalcon_array_update_zval(&ordered_column_map, &real_property, &property, PH_COPY);
-			phalcon_array_update_zval(&reversed_column_map, &property, &real_property, PH_COPY);
+		if (PHALCON_IS_NOT_EMPTY(&real_property)) {
+			if (!phalcon_array_isset(&ordered_column_map, &real_property)) {
+				phalcon_array_update_zval(&ordered_column_map, &real_property, &property, PH_COPY);
+			}
 		} else {
+			if (!phalcon_array_isset(&ordered_column_map, &property)) {
+				phalcon_array_update_zval(&ordered_column_map, &property, &property, PH_COPY);
+			}
 			phalcon_array_update_zval(&ordered_column_map, &property, &property, PH_COPY);
-			phalcon_array_update_zval(&reversed_column_map, &property, &property, PH_COPY);
 		}
+	} ZEND_HASH_FOREACH_END();
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, column_name) {
+		zval name = {};
+		if (str_key) {
+			ZVAL_STR(&name, str_key);
+		} else {
+			ZVAL_LONG(&name, idx);
+		}
+		phalcon_array_update_zval(&reversed_column_map, column_name, &name, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	array_init_size(return_value, 2);

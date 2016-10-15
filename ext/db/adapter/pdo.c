@@ -351,20 +351,20 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				 */
 				if (phalcon_compare_strict_long(&type, 32)) {
 					phalcon_cast(&cast_value, value, IS_DOUBLE);
-					PHALCON_MAKE_REF(&cast_value);
+					ZVAL_MAKE_REF(&cast_value);
 					PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, &cast_value);
-					PHALCON_UNREF(&cast_value);
+					ZVAL_UNREF(&cast_value);
 				} else {
 					/**
 					 * 1024 is ignore the bind type
 					 */
-					PHALCON_MAKE_REF(value);
+					ZVAL_MAKE_REF(value);
 					if (phalcon_compare_strict_long(&type, 1024)) {
 						PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, value);
 					} else {
 						PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, value, &type);
 					}
-					PHALCON_UNREF(value);
+					ZVAL_UNREF(value);
 				}
 
 			} else {
@@ -373,14 +373,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				} else {
 					ZVAL_LONG(&type, PHALCON_DB_COLUMN_BIND_PARAM_STR);
 				}
-				PHALCON_MAKE_REF(value);
+				ZVAL_MAKE_REF(value);
 				PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, value, &type);
-				PHALCON_UNREF(value);
+				ZVAL_UNREF(value);
 			}
 		} else {
-			PHALCON_MAKE_REF(value);
+			ZVAL_MAKE_REF(value);
 			PHALCON_CALL_METHODW(NULL, statement, "bindvalue", &parameter, value);
-			PHALCON_UNREF(value);
+			ZVAL_UNREF(value);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -698,9 +698,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 
 	PHALCON_STR(&bind_pattern, "/\\?([0-9]+)|:([a-zA-Z0-9_]+):/");
 
-	PHALCON_MAKE_REF(&matches);
+	ZVAL_MAKE_REF(&matches);
 	PHALCON_CALL_FUNCTIONW(&status, "preg_match_all", &bind_pattern, sql, &matches, &set_order);
-	PHALCON_UNREF(&matches);
+	ZVAL_UNREF(&matches);
 
 	if (zend_is_true(&status)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(matches), place_match) {

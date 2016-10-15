@@ -13,6 +13,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -616,10 +617,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	PHALCON_STR(&event_name, "router:beforeCheckRoutes");
 
-	PHALCON_MAKE_REF(&handled_uri);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &handled_uri);
-	PHALCON_UNREF(&handled_uri);
-
 	PHALCON_CALL_METHODW(&current_host_name, &request, "gethttphost");
 
 	/**
@@ -703,9 +701,15 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		if (Z_TYPE(pattern) == IS_STRING && Z_STRLEN(pattern) > 3 && Z_STRVAL(pattern)[1] == '^') {
 			if (zend_is_true(&case_sensitive)) {
 				PHALCON_CONCAT_VS(&case_pattern, &pattern, "i");
+				ZVAL_NULL(&matches);
+				ZVAL_MAKE_REF(&matches);
 				RETURN_ON_FAILURE(phalcon_preg_match(&route_found, &case_pattern, &handled_uri, &matches));
+				ZVAL_UNREF(&matches);
 			} else {
+				ZVAL_NULL(&matches);
+				ZVAL_MAKE_REF(&matches);
 				RETURN_ON_FAILURE(phalcon_preg_match(&route_found, &pattern, &handled_uri, &matches));
+				ZVAL_UNREF(&matches);
 			}
 		} else {
 			ZVAL_BOOL(&route_found, phalcon_comparestr(&pattern, &handled_uri, &case_sensitive));
@@ -717,9 +721,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		if (zend_is_true(&route_found)) {
 			PHALCON_STR(&event_name, "router:matchedRoute");
 
-			PHALCON_MAKE_REF(route);
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, route);
-			PHALCON_UNREF(route);
 
 			PHALCON_CALL_METHODW(&before_match, route, "getbeforematch");
 			if (Z_TYPE(before_match) != IS_NULL) {
@@ -818,9 +820,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		} else {
 			PHALCON_STR(&event_name, "router:notMatchedRoute");
 
-			PHALCON_MAKE_REF(route);
 			PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, route);
-			PHALCON_UNREF(route);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -833,6 +833,8 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	 * The route wasn't found, try to use the not-found paths
 	 */
 	if (!zend_is_true(&route_found)) {
+		phalcon_update_property_null(getThis(), SL("_matches"));
+		phalcon_update_property_null(getThis(), SL("_matchedRoute"));
 		phalcon_return_property(&parts, getThis(), SL("_notFoundPaths"));
 		if (Z_TYPE(parts) != IS_NULL) {
 			ZVAL_TRUE(&route_found);
@@ -976,6 +978,12 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	PHALCON_STR(&event_name, "router:afterCheckRoutes");
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
+	if (zend_is_true(&route_found)) {
+		RETURN_TRUE;
+	} else {
+		RETURN_FALSE;
+	}
 }
 
 /**

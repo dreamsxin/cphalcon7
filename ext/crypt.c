@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -392,7 +393,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
  */
 PHP_METHOD(Phalcon_Crypt, encryptBase64){
 
-	zval *text, *key = NULL, *safe = NULL, options = {};
+	zval *text, *key = NULL, *safe = NULL, encrypt_value = {};
 
 	phalcon_fetch_params(0, 1, 2, &text, &key, &safe);
 
@@ -404,10 +405,9 @@ PHP_METHOD(Phalcon_Crypt, encryptBase64){
 		safe = &PHALCON_GLOBAL(z_false);
 	}
 
-	ZVAL_LONG(&options, 0);
+	PHALCON_CALL_METHODW(&encrypt_value, getThis(), "encrypt", text, key);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "encrypt", text, key, &options);
-
+	phalcon_base64_encode(return_value, &encrypt_value);
 	if (zend_is_true(safe)) {
 		php_strtr(Z_STRVAL_P(return_value), Z_STRLEN_P(return_value), "+/", "-_", 2);
 	}
@@ -422,7 +422,7 @@ PHP_METHOD(Phalcon_Crypt, encryptBase64){
  */
 PHP_METHOD(Phalcon_Crypt, decryptBase64){
 
-	zval *text, *key = NULL, *safe = NULL, options = {}, decrypt_text = {};
+	zval *text, *key = NULL, *safe = NULL, decrypt_text = {}, decrypt_value = {};
 
 	phalcon_fetch_params(0, 1, 2, &text, &key, &safe);
 	PHALCON_ENSURE_IS_STRING(text);
@@ -435,8 +435,6 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 		safe = &PHALCON_GLOBAL(z_false);
 	}
 
-	ZVAL_LONG(&options, 0);
-
 	if (zend_is_true(safe)) {
 		ZVAL_NEW_STR(&decrypt_text, zend_string_dup(Z_STR_P(text), 0));
 		php_strtr(Z_STRVAL(decrypt_text), Z_STRLEN(decrypt_text), "-_", "+/", 2);
@@ -444,7 +442,9 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 		PHALCON_CPY_WRT(&decrypt_text, text);
 	}
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "decrypt", &decrypt_text, key, &options);
+	phalcon_base64_decode(&decrypt_value, &decrypt_text);
+
+	PHALCON_RETURN_CALL_METHODW(getThis(), "decrypt", &decrypt_value, key);
 }
 
 /**

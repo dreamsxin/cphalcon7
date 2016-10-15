@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -357,7 +358,6 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 
 	if (zend_is_true(&has_service)) {
 		PHALCON_CALL_METHODW(&result, &dependency_injector, "getshared", property_name);
-		phalcon_update_property_zval(getThis(), Z_STRVAL_P(property_name), Z_STRLEN_P(property_name), &result);
 		RETURN_CTORW(&result);
 	}
 

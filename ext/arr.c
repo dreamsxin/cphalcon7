@@ -437,7 +437,6 @@ PHP_METHOD(Phalcon_Arr, set_path){
 		ZVAL_UNREF(&keys);
 
 		if (zend_is_true(flag)) {
-			zend_printf("\ntest\n");
 			if (phalcon_array_isset_fetch(&v, &cpy_array, &key, 0)) {
 				if (Z_TYPE(v) != IS_ARRAY) {
 					convert_to_array(&v);

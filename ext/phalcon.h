@@ -61,6 +61,7 @@
 #include "cache/frontend/none.h"
 #include "cache/frontend/output.h"
 #include "cache/multiple.h"
+#include "cache/memory.h"
 
 #include "cli/console.h"
 #include "cli/console/exception.h"

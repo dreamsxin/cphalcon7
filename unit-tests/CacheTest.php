@@ -1566,4 +1566,58 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($cache->exists('data'));
 		$this->assertFalse($cache->exists('data2'));
 	}
+
+	public function testCacheMemory(){
+
+		$cache = new Phalcon\Cache\Memory();
+
+		$key = "foo";
+		$value = "dummy";
+
+		$this->assertTrue($cache->set($key, $value));
+		$this->assertEquals($cache->get($key), $value);
+
+		$value = NULL;
+		$this->assertTrue($cache->set($key, $value));
+		$this->assertEquals($cache->get($key), $value);
+
+		$value = TRUE;
+		$this->assertTrue($cache->set($key, $value));
+		$this->assertEquals($cache->get($key), $value);
+
+		$value = FALSE;
+		$this->assertTrue($cache->set($key, $value));
+		$this->assertEquals($cache->get($key), $value);
+
+		$value = range(1, 5);
+		$this->assertTrue($cache->set($key, $value));
+		$this->assertEquals($cache->get($key), $value);
+
+		$value = 9234324;
+		$this->assertTrue($cache->set($key, $value));
+		$this->assertEquals($cache->get($key), $value);
+
+		$value = 9234324.123456;
+		$this->assertTrue($cache->set($key, $value));
+		$this->assertEquals($cache->get($key), $value);
+
+		$value = new StdClass();
+		$cache->set($key, $value);
+		$this->assertEquals($cache->get($key), $value);
+
+		try {
+			$value = fopen("php://input", "r");
+			$cache->set($key, $value);
+		} catch (Exception $e) {
+			$this->assertEquals("Phalcon\Cache\Memory::set(): Type 'IS_RESOURCE' cannot be stored", $e->getMessage());
+		}
+
+
+		$value = range(1, 5);
+		$this->assertTrue($cache->set($key, $value));
+		$this->assertEquals($cache->get($key), $value);
+
+		$this->assertTrue($cache->delete($key));
+		$this->assertEquals($cache->get($key), NULL);
+	}
 }

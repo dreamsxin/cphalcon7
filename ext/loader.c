@@ -20,6 +20,7 @@
 #include "loader.h"
 #include "loader/exception.h"
 #include "events/eventsawareinterface.h"
+#include "debug.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -486,7 +487,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Find class: ", class_name);
-		phalcon_debug_print_r(&debug_message);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 	RETVAL_FALSE;
@@ -522,7 +523,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 			if (phalcon_file_exists(&file_path) == SUCCESS) {
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_CONCAT_SV(&debug_message, "--Found: ", &file_path);
-					phalcon_debug_print_r(&debug_message);
+					PHALCON_DEBUG_LOG(&debug_message);
 				}
 
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
@@ -544,7 +545,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				RETURN_TRUE;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &file_path);
-				phalcon_debug_print_r(&debug_message);
+				PHALCON_DEBUG_LOG(&debug_message);
 			}
 		} ZEND_HASH_FOREACH_END();
 

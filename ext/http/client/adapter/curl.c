@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 	zval uri = {}, url = {}, method = {}, useragent = {}, data = {}, type = {}, files = {}, timeout = {}, curl = {}, username = {}, password = {}, authtype = {};
-	zval *constant, header = {}, *constant1, userpwd = {}, *file, body = {}, uniqid = {}, boundary = {}, *value, key = {}, key_value = {}, headers = {};
+	zval *constant, header = {}, *constant1, userpwd = {}, curl_data = {}, *file, body = {}, uniqid = {}, boundary = {}, *value, key = {}, key_value = {}, headers = {};
 	zval content = {}, errorno = {}, error = {}, headersize = {}, httpcode = {}, headerstr = {}, bodystr = {}, response = {};
 	zend_string *str_key;
 	ulong idx;
@@ -215,7 +215,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		}
 	} else if (phalcon_class_str_exists(SL("CURLFile"), 0) != NULL) {
 		if (Z_TYPE(data) != IS_ARRAY) {
-			array_init(&data);
+			array_init(&curl_data);
+		} else {
+			PHALCON_CPY_WRT(&curl_data, &data);
 		}
 
 		if (Z_TYPE(files) == IS_ARRAY) {
@@ -229,13 +231,13 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 					object_init_ex(&curlfile, curlfile_ce);
 					PHALCON_CALL_METHODW(NULL, &curlfile, "__construct", file);
 
-					phalcon_array_append(&data, &curlfile, PH_COPY);
+					phalcon_array_append(&curl_data, &curlfile, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
 
 		if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
-			PHALCON_CALL_FUNCTIONW(NULL, "curl_setopt", &curl, constant, &data);
+			PHALCON_CALL_FUNCTIONW(NULL, "curl_setopt", &curl, constant, &curl_data);
 		}
 	} else {
 		PHALCON_CALL_FUNCTIONW(&uniqid, "uniqid");

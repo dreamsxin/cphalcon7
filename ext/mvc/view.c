@@ -26,6 +26,7 @@
 #include "mvc/view/modelinterface.h"
 #include "cache/backendinterface.h"
 #include "di/injectable.h"
+#include "debug.h"
 
 #include <Zend/zend_closures.h>
 
@@ -1079,7 +1080,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render View: ", view_path);
-		phalcon_debug_print_r(&debug_message);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY);
@@ -1098,7 +1099,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 				if (phalcon_file_exists(&view_engine_path) == SUCCESS) {
 					if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 						PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
-						phalcon_debug_print_r(&debug_message);
+						PHALCON_DEBUG_LOG(&debug_message);
 					}
 
 					/** 
@@ -1130,7 +1131,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 					break;
 				} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
-					phalcon_debug_print_r(&debug_message);
+					PHALCON_DEBUG_LOG(&debug_message);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}

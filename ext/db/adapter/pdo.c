@@ -23,6 +23,7 @@
 #include "db/exception.h"
 #include "db/result/pdo.h"
 #include "db/column.h"
+#include "debug.h"
 
 #include <ext/pdo/php_pdo_driver.h>
 
@@ -424,16 +425,16 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
-		phalcon_debug_print_r(&debug_message);
+		PHALCON_DEBUG_LOG(&debug_message);
 		if (bind_params && PHALCON_IS_NOT_EMPTY(bind_params)) {
 			PHALCON_STR(&debug_message, "Bind Params: ");
-			phalcon_debug_print_r(&debug_message);
-			phalcon_debug_print_r(bind_params);
+			PHALCON_DEBUG_LOG(&debug_message);
+			PHALCON_DEBUG_LOG(bind_params);
 		}
 		if (bind_types && PHALCON_IS_NOT_EMPTY(bind_types)) {
 			PHALCON_STR(&debug_message, "Bind Types: ");
-			phalcon_debug_print_r(&debug_message);
-			phalcon_debug_print_r(bind_types);
+			PHALCON_DEBUG_LOG(&debug_message);
+			PHALCON_DEBUG_LOG(bind_types);
 		}
 	}
 
@@ -522,16 +523,16 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
-		phalcon_debug_print_r(&debug_message);
+		PHALCON_DEBUG_LOG(&debug_message);
 		if (bind_params && PHALCON_IS_NOT_EMPTY(bind_params)) {
 			PHALCON_STR(&debug_message, "Bind Params: ");
-			phalcon_debug_print_r(&debug_message);
-			phalcon_debug_print_r(bind_params);
+			PHALCON_DEBUG_LOG(&debug_message);
+			PHALCON_DEBUG_LOG(bind_params);
 		}
 		if (bind_types && PHALCON_IS_NOT_EMPTY(bind_types)) {
 			PHALCON_STR(&debug_message, "Bind Types: ");
-			phalcon_debug_print_r(&debug_message);
-			phalcon_debug_print_r(bind_types);
+			PHALCON_DEBUG_LOG(&debug_message);
+			PHALCON_DEBUG_LOG(bind_types);
 		}
 	}
 
@@ -806,8 +807,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			PHALCON_CONCAT_SV(&debug_message, "DB BEGIN TRANSACTION LEVEL: ", &transaction_level);
-			phalcon_debug_print_r(&debug_message);
+		PHALCON_CONCAT_SV(&debug_message, "DB BEGIN TRANSACTION LEVEL: ", &transaction_level);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {
@@ -878,8 +879,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			PHALCON_CONCAT_SV(&debug_message, "DB ROLLBACK TRANSACTION LEVEL: ", &transaction_level);
-			phalcon_debug_print_r(&debug_message);
+		PHALCON_CONCAT_SV(&debug_message, "DB ROLLBACK TRANSACTION LEVEL: ", &transaction_level);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
@@ -967,8 +968,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			PHALCON_CONCAT_SV(&debug_message, "DB COMMIT TRANSACTION LEVEL: ", &transaction_level);
-			phalcon_debug_print_r(&debug_message);
+		PHALCON_CONCAT_SV(&debug_message, "DB COMMIT TRANSACTION LEVEL: ", &transaction_level);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);

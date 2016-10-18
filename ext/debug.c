@@ -195,6 +195,8 @@ PHALCON_INIT_CLASS(Phalcon_Debug){
 	zend_declare_property_long(phalcon_debug_ce, SL("_beforeContext"), 7, ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_debug_ce, SL("_afterContext"), 5, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_debug_ce, SL("_logger"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_bool(phalcon_debug_ce, SL("_listen"), 0, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_null(phalcon_debug_ce, SL("_logs"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	return SUCCESS;
 }
@@ -285,6 +287,7 @@ PHP_METHOD(Phalcon_Debug, listen){
 		PHALCON_CALL_METHODW(NULL, getThis(), "listenlowseverity");
 	}
 
+	phalcon_update_static_property_bool_ce(phalcon_debug_ce, SL("_listen"), 1);
 	RETURN_THISW();
 }
 
@@ -927,7 +930,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
 	zval *exception, *is_active, message = {}, class_name = {}, css_sources = {}, escaped_message = {}, html = {}, version = {}, file = {}, line = {}, show_back_trace = {};
 	zval data_vars = {}, trace = {}, *trace_item, *_REQUEST, *value = NULL, *_SERVER, files = {}, di = {}, service_name = {}, router = {}, routes = {}, *route;
-	zval loader = {}, loader_value = {}, dumped_loader_value = {}, memory = {}, *data_var, js_sources = {}, formatted_file = {}, z_link_format = {};
+	zval loader = {}, loader_value = {}, dumped_loader_value = {}, memory = {}, *data_var, *logs, *log, js_sources = {}, formatted_file = {}, z_link_format = {};
 	zend_bool ini_exists = 1;
 	zend_class_entry *ce;
 	zend_string *str_key;
@@ -1026,6 +1029,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_concat_self_str(&html, SL("<li role=\"presentation\"><a href=\"#error-tabs-6\" role=\"tab\" data-toggle=\"tab\">Loader</a></li>"));
 		phalcon_concat_self_str(&html, SL("<li role=\"presentation\"><a href=\"#error-tabs-7\" role=\"tab\" data-toggle=\"tab\">Memory</a></li>"));
 		phalcon_concat_self_str(&html, SL("<li role=\"presentation\"><a href=\"#error-tabs-8\" role=\"tab\" data-toggle=\"tab\">Variables</a></li>"));
+		phalcon_concat_self_str(&html, SL("<li role=\"presentation\"><a href=\"#error-tabs-9\" role=\"tab\" data-toggle=\"tab\">Logs</a></li>"));
 
 
 		phalcon_concat_self_str(&html, SL("</ul></div><div class=\"col-sm-8 col-md-10 tab-content\">"));
@@ -1210,6 +1214,23 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		}
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
+
+		// Logs
+		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-9\" role=\"tabpanel\" class=\"tab-pane\"><table class=\"table table-striped\">"));
+		phalcon_concat_self_str(&html, SL("<tr><th>Message</th></tr>"));
+
+		logs = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_logs"));
+		if (logs && Z_TYPE_P(logs) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(logs), log) {
+				zval dumped_argument = {};
+
+				PHALCON_CALL_METHODW(&dumped_argument, getThis(), "_getvardump", log);
+				PHALCON_SCONCAT_SVS(&html, "<tr><td>", &dumped_argument, "</td></tr>");
+			} ZEND_HASH_FOREACH_END();
+		}
+
+		phalcon_concat_self_str(&html, SL("</table></div>"));
+
 		phalcon_concat_self_str(&html, SL("</div></div>"));
 	}
 
@@ -1403,7 +1424,7 @@ PHP_METHOD(Phalcon_Debug, disable){
  */
 PHP_METHOD(Phalcon_Debug, log){
 
-	zval *message, *_type = NULL, *context = NULL, type = {}, *logger;
+	zval *message, *_type = NULL, *context = NULL, type = {},  *listen, log_type = {}, log = {}, *logger;
 
 	phalcon_fetch_params(0, 1, 2, &message, &_type, &context);
 
@@ -1417,12 +1438,22 @@ PHP_METHOD(Phalcon_Debug, log){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
+	listen = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_listen"));
+	if (listen && zend_is_true(listen)) {
+		if (Z_TYPE_P(message) == IS_STRING) {
+			PHALCON_CALL_CE_STATICW(&log_type, phalcon_logger_ce, "gettypestring", &type);
+			PHALCON_CONCAT_SVSV(&log, "[", &log_type, "] ", message);
+			phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &log);
+		} else {
+			phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), message);
+		}
+	}
 	
 	logger = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_logger"));
 	if (logger && Z_TYPE_P(logger) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACE_EX(logger, phalcon_logger_adapterinterface_ce, phalcon_debug_exception_ce, 0);
 		PHALCON_CALL_METHODW(NULL, logger, "log", &type, message, context);
-	} else {
+	} else if (!listen || !zend_is_true(listen)) {
 		phalcon_debug_print_r(message);
 	}
 }

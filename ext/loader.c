@@ -146,6 +146,7 @@ PHALCON_INIT_CLASS(Phalcon_Loader){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Loader, loader, phalcon_loader_method_entry, 0);
 
+	zend_declare_property_null(phalcon_loader_ce, SL("_default"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_loader_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_foundPath"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_checkedPath"), ZEND_ACC_PROTECTED);
@@ -166,11 +167,16 @@ PHALCON_INIT_CLASS(Phalcon_Loader){
  */
 PHP_METHOD(Phalcon_Loader, __construct){
 
-	zval extensions = {};
+	zval extensions = {}, *default_loader;
 
 	array_init_size(&extensions, 1);
 	add_next_index_stringl(&extensions, SL("php"));
 	phalcon_update_property_zval(getThis(), SL("_extensions"), &extensions);
+
+	default_loader = phalcon_read_static_property_ce(phalcon_loader_ce, SL("_default"));
+	if (Z_TYPE_P(default_loader) == IS_NULL) {
+		phalcon_update_static_property_ce(phalcon_loader_ce, SL("_default"), getThis());
+	}
 }
 
 /**

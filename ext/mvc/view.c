@@ -2001,9 +2001,11 @@ PHP_METHOD(Phalcon_Mvc_View, stopSection){
 }
 
 /**
- * Stop the current section block
+ * Returns the content for a section block
  *
- * @return string
+ * @param string $name
+ * @param string $default
+ * @return string|null
  */
 PHP_METHOD(Phalcon_Mvc_View, section){
 

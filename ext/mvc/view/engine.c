@@ -59,21 +59,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_view_engine___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, dependencyInjector)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_view_engine_startsection, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_view_engine_section, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
-	ZEND_ARG_INFO(0, defaultValue)
-ZEND_END_ARG_INFO()
-
 static const zend_function_entry phalcon_mvc_view_engine_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_View_Engine, __construct, arginfo_phalcon_mvc_view_engine___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_View_Engine, getContent, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Engine, startSection, arginfo_phalcon_mvc_view_engine_startsection, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Engine, startSection, arginfo_phalcon_mvc_view_engineinterface_startsection, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, stopSection, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Engine, section, arginfo_phalcon_mvc_view_engine_section, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Engine, section, arginfo_phalcon_mvc_view_engineinterface_section, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, partial, arginfo_phalcon_mvc_view_engineinterface_partial, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, getView, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, addMethod, arginfo_phalcon_mvc_view_engineinterface_addmethod, ZEND_ACC_PUBLIC)
@@ -89,7 +80,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine){
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\View, Engine, mvc_view_engine, phalcon_di_injectable_ce, phalcon_mvc_view_engine_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_view"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_methods"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_layout"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_params"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_view_engine_ce, 1, phalcon_mvc_view_engineinterface_ce);
 
@@ -127,8 +119,6 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, getContent){
 	PHALCON_RETURN_CALL_METHODW(&view, "getcontent");
 }
 
-
-
 /**
  * Start a new section block
  *
@@ -158,9 +148,11 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, stopSection){
 }
 
 /**
- * Stop the current section block
+ * Returns the content for a section block
  *
- * @return string
+ * @param string $name
+ * @param string $default
+ * @return string|null
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, section){
 

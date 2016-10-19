@@ -21,6 +21,7 @@
 #include "mvc/router/routeinterface.h"
 #include "mvc/router/exception.h"
 #include "mvc/router/group.h"
+#include "debug.h"
 
 #include <Zend/zend_closures.h>
 
@@ -509,8 +510,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 		} else {
 			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_STR(&debug_message, "Add Route paths: ");
-				phalcon_debug_print_r(&debug_message);
-				phalcon_debug_print_r(paths);
+				PHALCON_DEBUG_LOG(&debug_message);
+				PHALCON_DEBUG_LOG(paths);
 			}
 
 			PHALCON_CPY_WRT_CTOR(&route_paths, paths);

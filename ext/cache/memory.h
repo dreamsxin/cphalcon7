@@ -18,15 +18,19 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_DEBUG_H
-#define PHALCON_DEBUG_H
+#ifndef PHALCON_CACHE_MEMORY_H
+#define PHALCON_CACHE_MEMORY_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_debug_ce;
+#define PHALCON_CACHE_MEMORY_CLASS_PROPERTY_PREFIX  "_prefix"
+#define PHALCON_CACHE_MEMORY_ENTRY_COMPRESSED	    0x0020
+#define PHALCON_CACHE_MEMORY_ENTRY_TYPE_MASK        0x1f
+#define PHALCON_CACHE_MEMORY_ENTRY_ORIG_LEN_SHIT    6 
+#define PHALCON_CACHE_MEMORY_ENTRY_MAX_ORIG_LEN     ((1U << ((sizeof(int)*8 - PHALCON_CACHE_MEMORY_ENTRY_ORIG_LEN_SHIT))) - 1)
 
-PHALCON_INIT_CLASS(Phalcon_Debug);
+extern zend_class_entry *phalcon_cache_memory_ce;
 
-#define PHALCON_DEBUG_LOG(message) PHALCON_CALL_CE_STATICW(NULL, phalcon_debug_ce, "log", message);
+PHALCON_INIT_CLASS(Phalcon_Cache_Memory);
 
-#endif /* PHALCON_DEBUG_H */
+#endif /* PHALCON_CACHE_MEMORY_H */

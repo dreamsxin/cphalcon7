@@ -38,12 +38,23 @@
  */
 zend_class_entry *phalcon_logger_ce;
 
+PHP_METHOD(Phalcon_Logger, getTypeString);
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_logger_gettypestring, 0, 0, 1)
+	ZEND_ARG_INFO(0, type)
+ZEND_END_ARG_INFO()
+
+static const zend_function_entry phalcon_logger_method_entry[] = {
+	PHP_ME(Phalcon_Logger, getTypeString, arginfo_phalcon_logger_gettypestring, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_FE_END
+};
+
 /**
  * Phalcon\Logger initializer
  */
 PHALCON_INIT_CLASS(Phalcon_Logger){
 
-	PHALCON_REGISTER_CLASS(Phalcon, Logger, logger, NULL, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+	PHALCON_REGISTER_CLASS(Phalcon, Logger, logger, phalcon_logger_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_class_constant_long(phalcon_logger_ce, SL("SPECIAL"),   PHALCON_LOGGER_SPECIAL  );
 	zend_declare_class_constant_long(phalcon_logger_ce, SL("CUSTOM"),    PHALCON_LOGGER_CUSTOM   );
@@ -58,4 +69,31 @@ PHALCON_INIT_CLASS(Phalcon_Logger){
 	zend_declare_class_constant_long(phalcon_logger_ce, SL("EMERGENCY"), PHALCON_LOGGER_EMERGENCY);
 
 	return SUCCESS;
+}
+
+/**
+ * Returns the string meaning of a logger constant
+ *
+ * @param  integer $type
+ * @return string
+ */
+PHP_METHOD(Phalcon_Logger, getTypeString){
+
+	static const char *lut[10] = {
+		"EMERGENCY", "CRITICAL", "ALERT", "ERROR",  "WARNING",
+		"NOTICE",    "INFO",     "DEBUG", "CUSTOM", "SPECIAL"
+	};
+
+	zval *type;
+	int itype;
+
+	phalcon_fetch_params(0, 1, 0, &type);
+	PHALCON_ENSURE_IS_LONG(type);
+	
+	itype = Z_LVAL_P(type);
+	if (itype >= 0 && itype < 10) {
+		RETURN_STRING(lut[itype]);
+	}
+	
+	RETURN_STRING("CUSTOM");
 }

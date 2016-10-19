@@ -78,11 +78,6 @@ typedef struct _phalcon_orm_options {
 	zend_bool enable_strict;
 } phalcon_orm_options;
 
-/** DB options */
-typedef struct _phalcon_db_options {
-	zend_bool escape_identifiers;
-} phalcon_db_options;
-
 /** Security options */
 typedef struct _phalcon_security_options {
 	zend_bool crypt_std_des_supported;
@@ -93,6 +88,19 @@ typedef struct _phalcon_security_options {
 	zend_bool crypt_sha256_supported;
 	zend_bool crypt_sha512_supported;
 } phalcon_security_options;
+
+/** DB options */
+typedef struct _phalcon_db_options {
+	zend_bool escape_identifiers;
+} phalcon_db_options;
+
+/** Cache options */
+typedef struct _phalcon_cache_options {
+	zend_bool enable_memory;
+	zend_bool enable_memory_cli;
+	size_t keys_memory_size;
+	size_t values_memory_size;
+} phalcon_cache_options;
 
 ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
@@ -126,6 +134,9 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/** DB */
 	phalcon_db_options db;
+
+	/** Cache */
+	phalcon_cache_options cache;
 
 ZEND_END_MODULE_GLOBALS(phalcon)
 

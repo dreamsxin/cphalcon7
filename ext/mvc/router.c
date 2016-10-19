@@ -25,6 +25,7 @@
 #include "diinterface.h"
 #include "di/injectable.h"
 #include "http/requestinterface.h"
+#include "debug.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -611,7 +612,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Handle the URI: ", &real_uri);
-		phalcon_debug_print_r(&debug_message);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 
@@ -695,7 +696,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			PHALCON_CONCAT_SV(&debug_message, "--Route Pattern: ", &pattern);
-			phalcon_debug_print_r(&debug_message);
+			PHALCON_DEBUG_LOG(&debug_message);
 		}
 
 		if (Z_TYPE(pattern) == IS_STRING && Z_STRLEN(pattern) > 3 && Z_STRVAL(pattern)[1] == '^') {
@@ -750,8 +751,8 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			if (zend_is_true(&route_found)) {
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_STR(&debug_message, "--Found matches: ");
-					phalcon_debug_print_r(&debug_message);
-					phalcon_debug_print_r(&matches);
+					PHALCON_DEBUG_LOG(&debug_message);
+					PHALCON_DEBUG_LOG(&matches);
 				}
 
 				/**
@@ -762,8 +763,8 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_STR(&debug_message, "--Route paths: ");
-					phalcon_debug_print_r(&debug_message);
-					phalcon_debug_print_r(&paths);
+					PHALCON_DEBUG_LOG(&debug_message);
+					PHALCON_DEBUG_LOG(&paths);
 				}
 
 				/**
@@ -815,7 +816,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				break;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found Route: ", &pattern);
-				phalcon_debug_print_r(&debug_message);
+				PHALCON_DEBUG_LOG(&debug_message);
 			}
 		} else {
 			PHALCON_STR(&event_name, "router:notMatchedRoute");
@@ -843,9 +844,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	if (zend_is_true(&route_found)) {
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-				PHALCON_STR(&debug_message, "--Route Parts: ");
-				phalcon_debug_print_r(&debug_message);
-				phalcon_debug_print_r(&parts);
+			PHALCON_STR(&debug_message, "--Route Parts: ");
+			PHALCON_DEBUG_LOG(&debug_message);
+			PHALCON_DEBUG_LOG(&parts);
 		}
 
 		/**
@@ -954,7 +955,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	} else {
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			PHALCON_STR(&debug_message, "--Use Debug");
-			phalcon_debug_print_r(&debug_message);
+			PHALCON_DEBUG_LOG(&debug_message);
 		}
 
 		/**

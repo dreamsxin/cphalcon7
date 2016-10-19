@@ -20,6 +20,7 @@
 #include "loader.h"
 #include "loader/exception.h"
 #include "events/eventsawareinterface.h"
+#include "debug.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -145,6 +146,7 @@ PHALCON_INIT_CLASS(Phalcon_Loader){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Loader, loader, phalcon_loader_method_entry, 0);
 
+	zend_declare_property_null(phalcon_loader_ce, SL("_default"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_loader_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_foundPath"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_checkedPath"), ZEND_ACC_PROTECTED);
@@ -165,11 +167,16 @@ PHALCON_INIT_CLASS(Phalcon_Loader){
  */
 PHP_METHOD(Phalcon_Loader, __construct){
 
-	zval extensions = {};
+	zval extensions = {}, *default_loader;
 
 	array_init_size(&extensions, 1);
 	add_next_index_stringl(&extensions, SL("php"));
 	phalcon_update_property_zval(getThis(), SL("_extensions"), &extensions);
+
+	default_loader = phalcon_read_static_property_ce(phalcon_loader_ce, SL("_default"));
+	if (Z_TYPE_P(default_loader) == IS_NULL) {
+		phalcon_update_static_property_ce(phalcon_loader_ce, SL("_default"), getThis());
+	}
 }
 
 /**
@@ -486,7 +493,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Find class: ", class_name);
-		phalcon_debug_print_r(&debug_message);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 	RETVAL_FALSE;
@@ -522,7 +529,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 			if (phalcon_file_exists(&file_path) == SUCCESS) {
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_CONCAT_SV(&debug_message, "--Found: ", &file_path);
-					phalcon_debug_print_r(&debug_message);
+					PHALCON_DEBUG_LOG(&debug_message);
 				}
 
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
@@ -544,7 +551,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				RETURN_TRUE;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &file_path);
-				phalcon_debug_print_r(&debug_message);
+				PHALCON_DEBUG_LOG(&debug_message);
 			}
 		} ZEND_HASH_FOREACH_END();
 

@@ -23,6 +23,7 @@
 #include "mvc/viewinterface.h"
 #include "mvc/view/modelinterface.h"
 #include "di.h"
+#include "debug.h"
 
 #include <Zend/zend_closures.h>
 
@@ -604,7 +605,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render Model View: ", &tpl);
-		phalcon_debug_print_r(&debug_message);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 	phalcon_fast_array_merge(&new_vars, &vars, &child_contents);
@@ -633,7 +634,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
-					phalcon_debug_print_r(&debug_message);
+					PHALCON_DEBUG_LOG(&debug_message);
 				}
 
 				/** 
@@ -662,7 +663,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				break;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
-				phalcon_debug_print_r(&debug_message);
+				PHALCON_DEBUG_LOG(&debug_message);
 			}
 		} ZEND_HASH_FOREACH_END();
 	} ZEND_HASH_FOREACH_END();

@@ -79,6 +79,19 @@ PHALCON_INIT_CLASS(Phalcon_Filter){
 	zend_declare_property_null(phalcon_filter_ce, SL("_allowTags"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_filter_ce, SL("_allowAttributes"), ZEND_ACC_PROTECTED);
 
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_EMAIL"), "email", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_ABSINT"), "absint", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_INT"), "int", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_INT_CAST"), "int!", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_STRING"), "string", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_FLOAT"), "float", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_FLOAT_CAST"), "float!", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_ALPHANUM"), "alphanum", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_TRIM"), "trim", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_STRIPTAGS"), "striptags", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_LOWER"), "lower", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_UPPER"), "upper", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+
 	zend_class_implements(phalcon_filter_ce, 1, phalcon_filterinterface_ce);
 
 	return SUCCESS;

@@ -626,7 +626,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 	if (!_number_bytes) {
 		ZVAL_LONG(&number_bytes, 12);
 	} else {
-		PHALCON_CPY_WRT(&number_bytes, _number_bytes);
+		PHALCON_CPY_WRT_CTOR(&number_bytes, _number_bytes);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
@@ -670,7 +670,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 	if (!_number_bytes) {
 		ZVAL_LONG(&number_bytes, 12);
 	} else {
-		PHALCON_CPY_WRT(&number_bytes, _number_bytes);
+		PHALCON_CPY_WRT_CTOR(&number_bytes, _number_bytes);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF$");
@@ -751,7 +751,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 		 */
 		PHALCON_CALL_METHODW(&token, &request, "getpost", &token_key);
 	} else {
-		PHALCON_CPY_WRT(&token, token_value);
+		PHALCON_CPY_WRT_CTOR(&token, token_value);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF$");

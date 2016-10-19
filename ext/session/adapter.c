@@ -152,31 +152,31 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 	if (!_expire) {
 		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&expire, _expire);
+		PHALCON_CPY_WRT_CTOR(&expire, _expire);
 	}
 
 	if (!_path) {
 		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&path, _path);
+		PHALCON_CPY_WRT_CTOR(&path, _path);
 	}
 
 	if (!_secure) {
 		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&secure, _secure);
+		PHALCON_CPY_WRT_CTOR(&secure, _secure);
 	}
 
 	if (!_domain) {
 		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&domain, _domain);
+		PHALCON_CPY_WRT_CTOR(&domain, _domain);
 	}
 
 	if (!_http_only) {
 		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&http_only, _http_only);
+		PHALCON_CPY_WRT_CTOR(&http_only, _http_only);
 	}
 
 	PHALCON_CALL_FUNCTIONW(NULL, "session_set_cookie_params", &expire, &path, &secure, &domain, &http_only);

@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		if (flag_automatic_html) {
 			PHALCON_CONCAT_SVSVS(&html_message, "<div", &css_classes, ">", message, "</div>" PHP_EOL);
 		} else {
-			PHALCON_CPY_WRT(&html_message, message);
+			PHALCON_CPY_WRT_CTOR(&html_message, message);
 		}
 
 		/**

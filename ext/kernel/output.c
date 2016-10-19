@@ -74,6 +74,22 @@ int phalcon_ob_clean()
 
 }
 
+int phalcon_ob_get_clean(zval *result)
+{
+	if (phalcon_ob_get_level() < 1) {
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete buffer. No buffer to delete");
+		return FAILURE;
+	}
+
+	if (php_output_get_contents(result) == FAILURE) {
+		php_error_docref("ref.outcontrol", E_NOTICE, "failed to delete buffer. No buffer to delete");
+		return FAILURE;
+	}
+
+	return php_output_discard();
+
+}
+
 int phalcon_ob_get_level()
 {
 	return php_output_get_level();

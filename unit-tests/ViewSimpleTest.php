@@ -38,6 +38,28 @@ class ViewSimpleTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
+	// Setup viewCache service and DI
+	private function _getDI()
+	{
+		$di = new Di;
+		$frontendCache = new FrontendCache(array('lifetime' => 2));
+		$backendCache = new BackendCache($frontendCache, array('cacheDir' => 'unit-tests/cache/'));
+		$di->set('viewCache', $backendCache);
+		return $di;
+	}
+
+	public function tearDown()
+	{
+		foreach (new DirectoryIterator('unit-tests/cache/') as $item)
+		{
+			$item->isDir() or unlink($item->getPathname());
+		}
+
+		while (ob_get_level() > $this->level) {
+			ob_end_flush();
+		}
+	}
+
 	public function testSettersAndGetters()
 	{
 		$view = new View();
@@ -160,31 +182,17 @@ class ViewSimpleTest extends PHPUnit_Framework_TestCase
 	public function testMultiDir()
 	{
 		$view = new View;
-		$view->setViewsDir(array('unit-tests/views/', 'unit-tests/views/'));
+		$view->setViewsDir(array('unit-tests/views/test2/', 'unit-tests/views/test3/'));
 
-		$this->assertEquals('here', $view->render('test2/index'));
-		$this->assertEquals('here', $view->getContent());
+		$this->assertEquals('there', $view->render('index2'));
+		$this->assertEquals('there', $view->getContent());
 	}
 
-	// Setup viewCache service and DI
-	private function _getDI()
+	public function testSection()
 	{
-		$di = new Di;
-		$frontendCache = new FrontendCache(array('lifetime' => 2));
-		$backendCache = new BackendCache($frontendCache, array('cacheDir' => 'unit-tests/cache/'));
-		$di->set('viewCache', $backendCache);
-		return $di;
-	}
+		$view = new View;
+		$view->setViewsDir('unit-tests/views/section/');
 
-	public function tearDown()
-	{
-		foreach (new DirectoryIterator('unit-tests/cache/') as $item)
-		{
-			$item->isDir() or unlink($item->getPathname());
-		}
-
-		while (ob_get_level() > $this->level) {
-			ob_end_flush();
-		}
+		$this->assertEquals('<span>one</span><span>two</span><span>three</span>', $view->render('index'));
 	}
 }

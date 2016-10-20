@@ -192,73 +192,84 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 }
 
 program ::= annotation_language(Q) . {
-	status->ret = Q;
+	ZVAL_ZVAL(&status->ret, &Q, 1, 1);
 }
 
-%destructor annotation_language { zval_ptr_dtor($$); }
+%destructor annotation_language {
+    zval_ptr_dtor(&$$);
+}
 
 annotation_language(R) ::= annotation_list(L) . {
 	R = L;
 }
 
-%destructor annotation_list { zval_ptr_dtor($$); }
+%destructor annotation_list {
+    zval_ptr_dtor(&$$);
+}
 
 annotation_list(R) ::= annotation_list(L) annotation(S) . {
-	R = phannot_ret_zval_list(L, S);
+	phannot_ret_zval_list(&R, &L, &S);
 }
 
 annotation_list(R) ::= annotation(S) . {
-	R = phannot_ret_zval_list(NULL, S);
+	phannot_ret_zval_list(&R, NULL, &S);
 }
 
-
-%destructor annotation { zval_ptr_dtor($$); }
+%destructor annotation {
+    zval_ptr_dtor(&$$);
+}
 
 annotation(R) ::= AT IDENTIFIER(I) PARENTHESES_OPEN argument_list(L) PARENTHESES_CLOSE . {
-	R = phannot_ret_annotation(I, L, status->scanner_state);
+	phannot_ret_annotation(&R, I, &L, status->scanner_state);
 }
 
 annotation(R) ::= AT IDENTIFIER(I) PARENTHESES_OPEN PARENTHESES_CLOSE . {
-	R = phannot_ret_annotation(I, NULL, status->scanner_state);
+	phannot_ret_annotation(&R, I, NULL, status->scanner_state);
 }
 
 annotation(R) ::= AT IDENTIFIER(I) . {
-	R = phannot_ret_annotation(I, NULL, status->scanner_state);
+	phannot_ret_annotation(&R, I, NULL, status->scanner_state);
 }
 
-%destructor argument_list { zval_ptr_dtor($$); }
+%destructor argument_list {
+    zval_ptr_dtor(&$$);
+}
 
 argument_list(R) ::= argument_list(L) COMMA argument_item(I) . {
-	R = phannot_ret_zval_list(L, I);
+	phannot_ret_zval_list(&R, &L, &I);
 }
 
 argument_list(R) ::= argument_item(I) . {
-	R = phannot_ret_zval_list(NULL, I);
+	phannot_ret_zval_list(&R, NULL, &I);
 }
 
-%destructor argument_item { zval_ptr_dtor($$); }
+%destructor argument_item {
+    zval_ptr_dtor(&$$);
+}
 
 argument_item(R) ::= expr(E) . {
-	R = phannot_ret_named_item(NULL, E);
+	phannot_ret_named_item(&R, NULL, &E);
 }
 
 argument_item(R) ::= STRING(S) EQUALS expr(E) . {
-	R = phannot_ret_named_item(S, E);
+	phannot_ret_named_item(&R, S, &E);
 }
 
 argument_item(R) ::= STRING(S) COLON expr(E) . {
-	R = phannot_ret_named_item(S, E);
+	phannot_ret_named_item(&R, S, &E);
 }
 
 argument_item(R) ::= IDENTIFIER(I) EQUALS expr(E) . {
-	R = phannot_ret_named_item(I, E);
+	phannot_ret_named_item(&R, I, &E);
 }
 
 argument_item(R) ::= IDENTIFIER(I) COLON expr(E) . {
-	R = phannot_ret_named_item(I, E);
+	phannot_ret_named_item(&R, I, &E);
 }
 
-%destructor expr { zval_ptr_dtor($$); }
+%destructor expr {
+    zval_ptr_dtor(&$$);
+}
 
 expr(R) ::= annotation(S) . {
 	R = S;
@@ -269,37 +280,37 @@ expr(R) ::= array(A) . {
 }
 
 expr(R) ::= IDENTIFIER(I) . {
-	R = phannot_ret_literal_zval(PHANNOT_T_IDENTIFIER, I);
+	phannot_ret_literal_zval(&R, PHANNOT_T_IDENTIFIER, I);
 }
 
 expr(R) ::= INTEGER(I) . {
-	R = phannot_ret_literal_zval(PHANNOT_T_INTEGER, I);
+	phannot_ret_literal_zval(&R, PHANNOT_T_INTEGER, I);
 }
 
 expr(R) ::= STRING(S) . {
-	R = phannot_ret_literal_zval(PHANNOT_T_STRING, S);
+	phannot_ret_literal_zval(&R, PHANNOT_T_STRING, S);
 }
 
 expr(R) ::= DOUBLE(D) . {
-	R = phannot_ret_literal_zval(PHANNOT_T_DOUBLE, D);
+	phannot_ret_literal_zval(&R, PHANNOT_T_DOUBLE, D);
 }
 
 expr(R) ::= NULL . {
-	R = phannot_ret_literal_zval(PHANNOT_T_NULL, NULL);
+	phannot_ret_literal_zval(&R, PHANNOT_T_NULL, NULL);
 }
 
 expr(R) ::= FALSE . {
-	R = phannot_ret_literal_zval(PHANNOT_T_FALSE, NULL);
+	phannot_ret_literal_zval(&R, PHANNOT_T_FALSE, NULL);
 }
 
 expr(R) ::= TRUE . {
-	R = phannot_ret_literal_zval(PHANNOT_T_TRUE, NULL);
+	phannot_ret_literal_zval(&R, PHANNOT_T_TRUE, NULL);
 }
 
 array(R) ::= BRACKET_OPEN argument_list(A) BRACKET_CLOSE . {
-	R = phannot_ret_array(A);
+	phannot_ret_array(&R, &A);
 }
 
 array(R) ::= SBRACKET_OPEN argument_list(A) SBRACKET_CLOSE . {
-	R = phannot_ret_array(A);
+	phannot_ret_array(&R, &A);
 }

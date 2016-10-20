@@ -19,7 +19,15 @@
 
 %token_prefix PHANNOT_
 %token_type {phannot_parser_token*}
-%default_type {zval*}
+%default_type {zval}
+%default_destructor {
+	if (status) {
+		// TODO:
+	}
+	if (&$$) {
+		zval_ptr_dtor(&$$);
+	}
+}
 %extra_argument {phannot_parser_status *status}
 %name phannot_
 
@@ -42,86 +50,81 @@
 
 #include "interned-strings.h"
 
-static zval *phannot_ret_literal_zval(int type, phannot_parser_token *T)
-{
-	zval *ret;
+#define phannot_add_assoc_stringl(var, index, str, len) add_assoc_stringl(var, index, str, len);
+#define phannot_add_assoc_string(var, index, str) add_assoc_string(var, index, str);
 
-	PHALCON_ALLOC_ZVAL(ret);
-	array_init_size(ret, 2);
+static void phannot_ret_literal_zval(zval *ret, int type, phannot_parser_token *T)
+{
+	array_init(ret);
+
 	add_assoc_long(ret, ISV(type), type);
 	if (T) {
-		add_assoc_stringl(ret, ISV(value), T->token, T->token_len);
+		phannot_add_assoc_stringl(ret, "value", T->token, T->token_len);
+		efree(T->token);
 		efree(T);
 	}
-
-	return ret;
 }
 
-static zval *phannot_ret_array(zval *items)
+static void phannot_ret_array(zval *ret, zval *items)
 {
-	zval *ret;
+	array_init(ret);
 
-	PHALCON_ALLOC_ZVAL(ret);
-	array_init_size(ret, 2);
 	add_assoc_long(ret, ISV(type), PHANNOT_T_ARRAY);
 
 	if (items) {
 		add_assoc_zval(ret, ISV(items), items);
 	}
-
-	return ret;
 }
 
-static zval *phannot_ret_zval_list(zval *list_left, zval *right_list)
+static void phannot_ret_zval_list(zval *ret, zval *list_left, zval *right_list)
 {
-	zval *ret, *item;
+	HashTable *list;
 
-	PHALCON_ALLOC_ZVAL(ret);
 	array_init(ret);
 
 	if (list_left) {
-		if (zend_hash_index_exists(Z_ARRVAL_P(list_left), 0)) {
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(list_left), item) {
-				Z_TRY_ADDREF_P(item);
-				add_next_index_zval(ret, item);
-			} ZEND_HASH_FOREACH_END();
-			zval_ptr_dtor(list_left);
+
+		list = Z_ARRVAL_P(list_left);
+		if (zend_hash_index_exists(list, 0)) {
+            {
+                zval *item;
+                ZEND_HASH_FOREACH_VAL(list, item) {
+
+                    Z_TRY_ADDREF_P(item);
+                    add_next_index_zval(ret, item);
+
+                } ZEND_HASH_FOREACH_END();
+            }
+            zval_dtor(list_left);
 		} else {
 			add_next_index_zval(ret, list_left);
 		}
 	}
 
 	add_next_index_zval(ret, right_list);
-
-	return ret;
 }
 
-static zval *phannot_ret_named_item(phannot_parser_token *name, zval *expr)
+static void phannot_ret_named_item(zval *ret, phannot_parser_token *name, zval *expr)
 {
-	zval *ret;
+	array_init(ret);
 
-	PHALCON_ALLOC_ZVAL(ret);
-	array_init_size(ret, 2);
 	add_assoc_zval(ret, ISV(expr), expr);
 	if (name != NULL) {
-		add_assoc_stringl(ret, ISV(name), name->token, name->token_len);
+		phannot_add_assoc_stringl(ret, "name", name->token, name->token_len);
+        efree(name->token);
 		efree(name);
 	}
-
-	return ret;
 }
 
-static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments, phannot_scanner_state *state)
+static void phannot_ret_annotation(zval *ret, phannot_parser_token *name, zval *arguments, phannot_scanner_state *state)
 {
-	zval *ret;
-
-	PHALCON_ALLOC_ZVAL(ret);
-	array_init_size(ret, 5);
+	array_init(ret);
 
 	add_assoc_long(ret, ISV(type), PHANNOT_T_ANNOTATION);
 
 	if (name) {
-		add_assoc_stringl(ret, ISV(name), name->token, name->token_len);
+		phannot_add_assoc_stringl(ret, ISV(name), name->token, name->token_len);
+        efree(name->token);
 		efree(name);
 	}
 
@@ -129,10 +132,8 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 		add_assoc_zval(ret, ISV(arguments), arguments);
 	}
 
-	add_assoc_string(ret, ISV(file), (char*)state->active_file);
-	add_assoc_long(ret, ISV(line), state->active_line);
-
-	return ret;
+	phannot_add_assoc_string(ret, ISV(file), (char*) state->active_file);
+	add_assoc_long(ret, "line", state->active_line);
 }
 
 }

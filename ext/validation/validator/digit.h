@@ -18,13 +18,13 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_VALIDATION_VALIDATOR_URL_H
-#define PHALCON_VALIDATION_VALIDATOR_URL_H
+#ifndef PHALCON_VALIDATION_VALIDATOR_DIGIT_H
+#define PHALCON_VALIDATION_VALIDATOR_DIGIT_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_validation_validator_url_ce;
+extern zend_class_entry *phalcon_validation_validator_digit_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Url);
+PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Digit);
 
-#endif /* PHALCON_VALIDATION_VALIDATOR_URL_H */
+#endif /* PHALCON_VALIDATION_VALIDATOR_DIGIT_H */

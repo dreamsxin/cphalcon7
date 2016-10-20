@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "validation/validator/url.h"
+#include "validation/validator/alnum.h"
 #include "validation/validator.h"
 #include "validation/validatorinterface.h"
 #include "validation/message.h"
@@ -35,37 +35,37 @@
 #include "interned-strings.h"
 
 /**
- * Phalcon\Validation\Validator\Url
+ * Phalcon\Validation\Validator\Alnum
  *
- * Checks if a value has a correct URL format
+ * Checks if a value has a correct ALNUM format
  *
  *<code>
- *use Phalcon\Validation\Validator\Url as UrlValidator;
+ *use Phalcon\Validation\Validator\Alnum as AlnumValidator;
  *
- *$validator->add('url', new UrlValidator(array(
- *   'message' => 'The url is not valid'
+ *$validator->add('alnum', new AlnumValidator(array(
+ *   'message' => 'The alnum is not valid'
  *)));
  *</code>
  */
-zend_class_entry *phalcon_validation_validator_url_ce;
+zend_class_entry *phalcon_validation_validator_alnum_ce;
 
-PHP_METHOD(Phalcon_Validation_Validator_Url, validate);
-PHP_METHOD(Phalcon_Validation_Validator_Url, valid);
+PHP_METHOD(Phalcon_Validation_Validator_Alnum, validate);
+PHP_METHOD(Phalcon_Validation_Validator_Alnum, valid);
 
-static const zend_function_entry phalcon_validation_validator_url_method_entry[] = {
-	PHP_ME(Phalcon_Validation_Validator_Url, validate, arginfo_phalcon_validation_validatorinterface_validate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Validator_Url, valid, NULL, ZEND_ACC_PUBLIC)
+static const zend_function_entry phalcon_validation_validator_alnum_method_entry[] = {
+	PHP_ME(Phalcon_Validation_Validator_Alnum, validate, arginfo_phalcon_validation_validatorinterface_validate, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Validator_Alnum, valid, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Validation\Validator\Url initializer
+ * Phalcon\Validation\Validator\Alnum initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Url){
+PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Alnum){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Validation\\Validator, Url, validation_validator_url, phalcon_validation_validator_ce, phalcon_validation_validator_url_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Validation\\Validator, Alnum, validation_validator_alnum, phalcon_validation_validator_ce, phalcon_validation_validator_alnum_method_entry, 0);
 
-	zend_class_implements(phalcon_validation_validator_url_ce, 1, phalcon_validation_validatorinterface_ce);
+	zend_class_implements(phalcon_validation_validator_alnum_ce, 1, phalcon_validation_validatorinterface_ce);
 
 	return SUCCESS;
 }
@@ -77,7 +77,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Url){
  * @param string $attribute
  * @return boolean
  */
-PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
+PHP_METHOD(Phalcon_Validation_Validator_Alnum, validate){
 
 	zval *validator, *attribute, value = {}, allow_empty = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
-			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Url"));
+			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Alnum"));
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
 
 		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
 
-		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Url", &code);
+		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Alnum", &code);
 
 		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
@@ -134,15 +134,13 @@ PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
  * @param string $value
  * @return boolean
  */
-PHP_METHOD(Phalcon_Validation_Validator_Url, valid){
+PHP_METHOD(Phalcon_Validation_Validator_Alnum, valid){
 
-	zval *value, validate_url = {}, valid = {};
+	zval *value, valid = {};
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	ZVAL_LONG(&validate_url, 273);
-
-	PHALCON_CALL_FUNCTIONW(&valid, "filter_var", value, &validate_url);
+	PHALCON_CALL_FUNCTIONW(&valid, "ctype_alnum", value);
 	if (!zend_is_true(&valid)) {
 		RETURN_FALSE;
 	}

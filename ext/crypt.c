@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	if (Z_TYPE_P(source) != IS_STRING) {
 		phalcon_cast(&text, source, IS_STRING);
 	} else {
-		PHALCON_CPY_WRT(&text, source);
+		PHALCON_CPY_WRT_CTOR(&text, source);
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	if (Z_TYPE_P(source) != IS_STRING) {
 		phalcon_cast(&text, source, IS_STRING);
 	} else {
-		PHALCON_CPY_WRT(&text, source);
+		PHALCON_CPY_WRT_CTOR(&text, source);
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
@@ -439,7 +439,7 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 		ZVAL_NEW_STR(&decrypt_text, zend_string_dup(Z_STR_P(text), 0));
 		php_strtr(Z_STRVAL(decrypt_text), Z_STRLEN(decrypt_text), "-_", "+/", 2);
 	} else {
-		PHALCON_CPY_WRT(&decrypt_text, text);
+		PHALCON_CPY_WRT_CTOR(&decrypt_text, text);
 	}
 
 	phalcon_base64_decode(&decrypt_value, &decrypt_text);

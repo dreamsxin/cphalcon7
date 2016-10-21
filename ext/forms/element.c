@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Forms_Element, addValidators){
 		if (Z_TYPE(current_validators) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_validators, &current_validators, validators);
 		} else {
-			PHALCON_CPY_WRT(&merged_validators, validators);
+			PHALCON_CPY_WRT_CTOR(&merged_validators, validators);
 		}
 
 		phalcon_update_property_zval(getThis(), SL("_validators"), &merged_validators);

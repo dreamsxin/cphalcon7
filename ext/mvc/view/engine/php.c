@@ -66,20 +66,23 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Php){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
-	zval *path, *params, *must_clean = NULL, contents = {}, view = {}, *value = NULL;
+	zval *path, *params, *must_clean = NULL, *partial = NULL, contents = {}, view = {}, *value = NULL;
 	zend_string *str_key;
 	zend_array *symbol_table;
 	ulong idx;
-	int clean;
+	int clean = 0;
 
-	phalcon_fetch_params(0, 2, 1, &path, &params, &must_clean);
+	phalcon_fetch_params(0, 2, 1, &path, &params, &must_clean, &partial);
+
 	PHALCON_ENSURE_IS_STRING(path);
 
-	if (!must_clean) {
-		must_clean = &PHALCON_GLOBAL(z_false);
+	if (must_clean) {
+		clean = PHALCON_IS_TRUE(must_clean);
 	}
 
-	clean = PHALCON_IS_TRUE(must_clean);
+	if (!partial) {
+		partial = &PHALCON_GLOBAL(z_false);
+	}
 
 	if (clean) {
 		phalcon_ob_clean();
@@ -91,19 +94,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	 * Create the variables in local symbol table
 	 */
 	if (Z_TYPE_P(params) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(params), idx, str_key, value) {
+		ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(params), idx, str_key, value) {
 			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
-			/*
-			convert_to_string(&key);
-			if(zend_set_local_var(Z_STR(key), value, 1) == SUCCESS){
-				Z_TRY_ADDREF_P(value);
-			}
-			*/
 			phalcon_set_symbol(symbol_table, &key, value);
 		} ZEND_HASH_FOREACH_END();
 	}

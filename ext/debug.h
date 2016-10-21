@@ -27,4 +27,6 @@ extern zend_class_entry *phalcon_debug_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Debug);
 
+#define PHALCON_DEBUG_LOG(message) PHALCON_CALL_CE_STATICW(NULL, phalcon_debug_ce, "log", message);
+
 #endif /* PHALCON_DEBUG_H */

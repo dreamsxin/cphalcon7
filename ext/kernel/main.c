@@ -37,9 +37,6 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 
 	phalcon_globals->initialized = 0;
 
-	/* Memory options */
-	phalcon_globals->active_memory = NULL;
-
 	/* Recursive Lock */
 	phalcon_globals->recursive_lock = 0;
 

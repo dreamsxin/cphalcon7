@@ -1203,4 +1203,88 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		$messages = $validation->validate();
 		$this->assertEquals(count($messages), 0);
 	}
+
+	public function testValidationAlnum()
+	{
+		$_POST = array();
+
+		$validation = new Phalcon\Validation();
+
+		$validation->add('username', new Phalcon\Validation\Validator\Alnum());
+
+		$_POST = array('username' => 'AbCd1zyZ9');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertEquals(count($messages), 0);
+
+		$_POST = array('username' => 'foo!#$bar');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertTrue(count($messages) > 0);
+	}
+
+	public function testValidationAlpha()
+	{
+		$_POST = array();
+
+		$validation = new Phalcon\Validation();
+
+		$validation->add('username', new Phalcon\Validation\Validator\Alpha());
+
+		$_POST = array('username' => 'Abcd');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertEquals(count($messages), 0);
+
+		$_POST = array('username' => 'abcd123');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertTrue(count($messages) > 0);
+	}
+
+	public function testValidationDigit()
+	{
+		$_POST = array();
+
+		$validation = new Phalcon\Validation();
+
+		$validation->add('username', new Phalcon\Validation\Validator\Digit());
+
+		$_POST = array('username' => '12345');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertEquals(count($messages), 0);
+
+		$_POST = array('username' => 'abcd123');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertTrue(count($messages) > 0);
+	}
+
+	public function testValidationDate()
+	{
+		$_POST = array();
+
+		$validation = new Phalcon\Validation();
+
+		$validation->add('date', new Phalcon\Validation\Validator\Date());
+
+		$_POST = array('date' => '2016-10-20');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertEquals(count($messages), 0);
+
+		$_POST = array('username' => '20161020');
+
+		$messages = $validation->validate($_POST);
+
+		$this->assertTrue(count($messages) > 0);
+	}
 }

@@ -24,6 +24,9 @@ zend_class_entry *phalcon_mvc_view_engineinterface_ce;
 
 static const zend_function_entry phalcon_mvc_view_engineinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, getContent, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, startSection, arginfo_phalcon_mvc_view_engineinterface_startsection)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, stopSection, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, section, arginfo_phalcon_mvc_view_engineinterface_section)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, partial, arginfo_phalcon_mvc_view_engineinterface_partial)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, render, arginfo_phalcon_mvc_view_engineinterface_render)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, addMethod, arginfo_phalcon_mvc_view_engineinterface_addmethod)
@@ -47,6 +50,29 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_EngineInterface){
  * @return array
  */
 PHALCON_DOC_METHOD(Phalcon_Mvc_View_EngineInterface, getContent);
+
+/**
+ * Start a new section block
+ *
+ * @param string $name
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_View_EngineInterface, startSection);
+
+/**
+ * Stop the current section block
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_View_EngineInterface, stopSection);
+
+/**
+ * Returns the content for a section block
+ *
+ * @param string $name
+ * @param string $default
+ * @return string|null
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_View_EngineInterface, section);
 
 /**
  * Renders a partial inside another view

@@ -454,4 +454,16 @@ class ViewTest extends PHPUnit_Framework_TestCase
 		$html = $view->partial('test2/index', NULL, FALSE);
 		$this->assertEquals($html, 'here');
 	}
+
+	public function testSection()
+	{
+		$view = new View;
+		$view->setViewsDir('unit-tests/views/');
+
+		$view->start();
+		$view->render('section', 'index');
+		$view->finish();
+
+		$this->assertEquals('<html><span>one</span><span>two</span><span>three</span></html>' . PHP_EOL, $view->getContent());
+	}
 }

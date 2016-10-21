@@ -19,7 +19,15 @@
 
 %token_prefix PHANNOT_
 %token_type {phannot_parser_token*}
-%default_type {zval*}
+%default_type {zval}
+%default_destructor {
+	if (status) {
+		// TODO:
+	}
+	if (&$$) {
+		zval_ptr_dtor(&$$);
+	}
+}
 %extra_argument {phannot_parser_status *status}
 %name phannot_
 
@@ -42,86 +50,81 @@
 
 #include "interned-strings.h"
 
-static zval *phannot_ret_literal_zval(int type, phannot_parser_token *T)
-{
-	zval *ret;
+#define phannot_add_assoc_stringl(var, index, str, len) add_assoc_stringl(var, index, str, len);
+#define phannot_add_assoc_string(var, index, str) add_assoc_string(var, index, str);
 
-	PHALCON_ALLOC_ZVAL(ret);
-	array_init_size(ret, 2);
+static void phannot_ret_literal_zval(zval *ret, int type, phannot_parser_token *T)
+{
+	array_init(ret);
+
 	add_assoc_long(ret, ISV(type), type);
 	if (T) {
-		add_assoc_stringl(ret, ISV(value), T->token, T->token_len);
+		phannot_add_assoc_stringl(ret, "value", T->token, T->token_len);
+		efree(T->token);
 		efree(T);
 	}
-
-	return ret;
 }
 
-static zval *phannot_ret_array(zval *items)
+static void phannot_ret_array(zval *ret, zval *items)
 {
-	zval *ret;
+	array_init(ret);
 
-	PHALCON_ALLOC_ZVAL(ret);
-	array_init_size(ret, 2);
 	add_assoc_long(ret, ISV(type), PHANNOT_T_ARRAY);
 
 	if (items) {
 		add_assoc_zval(ret, ISV(items), items);
 	}
-
-	return ret;
 }
 
-static zval *phannot_ret_zval_list(zval *list_left, zval *right_list)
+static void phannot_ret_zval_list(zval *ret, zval *list_left, zval *right_list)
 {
-	zval *ret, *item;
+	HashTable *list;
 
-	PHALCON_ALLOC_ZVAL(ret);
 	array_init(ret);
 
 	if (list_left) {
-		if (zend_hash_index_exists(Z_ARRVAL_P(list_left), 0)) {
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(list_left), item) {
-				Z_TRY_ADDREF_P(item);
-				add_next_index_zval(ret, item);
-			} ZEND_HASH_FOREACH_END();
-			zval_ptr_dtor(list_left);
+
+		list = Z_ARRVAL_P(list_left);
+		if (zend_hash_index_exists(list, 0)) {
+            {
+                zval *item;
+                ZEND_HASH_FOREACH_VAL(list, item) {
+
+                    Z_TRY_ADDREF_P(item);
+                    add_next_index_zval(ret, item);
+
+                } ZEND_HASH_FOREACH_END();
+            }
+            zval_dtor(list_left);
 		} else {
 			add_next_index_zval(ret, list_left);
 		}
 	}
 
 	add_next_index_zval(ret, right_list);
-
-	return ret;
 }
 
-static zval *phannot_ret_named_item(phannot_parser_token *name, zval *expr)
+static void phannot_ret_named_item(zval *ret, phannot_parser_token *name, zval *expr)
 {
-	zval *ret;
+	array_init(ret);
 
-	PHALCON_ALLOC_ZVAL(ret);
-	array_init_size(ret, 2);
 	add_assoc_zval(ret, ISV(expr), expr);
 	if (name != NULL) {
-		add_assoc_stringl(ret, ISV(name), name->token, name->token_len);
+		phannot_add_assoc_stringl(ret, "name", name->token, name->token_len);
+        efree(name->token);
 		efree(name);
 	}
-
-	return ret;
 }
 
-static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments, phannot_scanner_state *state)
+static void phannot_ret_annotation(zval *ret, phannot_parser_token *name, zval *arguments, phannot_scanner_state *state)
 {
-	zval *ret;
-
-	PHALCON_ALLOC_ZVAL(ret);
-	array_init_size(ret, 5);
+	array_init(ret);
 
 	add_assoc_long(ret, ISV(type), PHANNOT_T_ANNOTATION);
 
 	if (name) {
-		add_assoc_stringl(ret, ISV(name), name->token, name->token_len);
+		phannot_add_assoc_stringl(ret, ISV(name), name->token, name->token_len);
+        efree(name->token);
 		efree(name);
 	}
 
@@ -129,10 +132,8 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 		add_assoc_zval(ret, ISV(arguments), arguments);
 	}
 
-	add_assoc_string(ret, ISV(file), (char*)state->active_file);
-	add_assoc_long(ret, ISV(line), state->active_line);
-
-	return ret;
+	phannot_add_assoc_string(ret, ISV(file), (char*) state->active_file);
+	add_assoc_long(ret, "line", state->active_line);
 }
 
 }
@@ -192,73 +193,84 @@ static zval *phannot_ret_annotation(phannot_parser_token *name, zval *arguments,
 }
 
 program ::= annotation_language(Q) . {
-	status->ret = Q;
+	ZVAL_ZVAL(&status->ret, &Q, 1, 1);
 }
 
-%destructor annotation_language { zval_ptr_dtor($$); }
+%destructor annotation_language {
+    zval_ptr_dtor(&$$);
+}
 
 annotation_language(R) ::= annotation_list(L) . {
 	R = L;
 }
 
-%destructor annotation_list { zval_ptr_dtor($$); }
+%destructor annotation_list {
+    zval_ptr_dtor(&$$);
+}
 
 annotation_list(R) ::= annotation_list(L) annotation(S) . {
-	R = phannot_ret_zval_list(L, S);
+	phannot_ret_zval_list(&R, &L, &S);
 }
 
 annotation_list(R) ::= annotation(S) . {
-	R = phannot_ret_zval_list(NULL, S);
+	phannot_ret_zval_list(&R, NULL, &S);
 }
 
-
-%destructor annotation { zval_ptr_dtor($$); }
+%destructor annotation {
+    zval_ptr_dtor(&$$);
+}
 
 annotation(R) ::= AT IDENTIFIER(I) PARENTHESES_OPEN argument_list(L) PARENTHESES_CLOSE . {
-	R = phannot_ret_annotation(I, L, status->scanner_state);
+	phannot_ret_annotation(&R, I, &L, status->scanner_state);
 }
 
 annotation(R) ::= AT IDENTIFIER(I) PARENTHESES_OPEN PARENTHESES_CLOSE . {
-	R = phannot_ret_annotation(I, NULL, status->scanner_state);
+	phannot_ret_annotation(&R, I, NULL, status->scanner_state);
 }
 
 annotation(R) ::= AT IDENTIFIER(I) . {
-	R = phannot_ret_annotation(I, NULL, status->scanner_state);
+	phannot_ret_annotation(&R, I, NULL, status->scanner_state);
 }
 
-%destructor argument_list { zval_ptr_dtor($$); }
+%destructor argument_list {
+    zval_ptr_dtor(&$$);
+}
 
 argument_list(R) ::= argument_list(L) COMMA argument_item(I) . {
-	R = phannot_ret_zval_list(L, I);
+	phannot_ret_zval_list(&R, &L, &I);
 }
 
 argument_list(R) ::= argument_item(I) . {
-	R = phannot_ret_zval_list(NULL, I);
+	phannot_ret_zval_list(&R, NULL, &I);
 }
 
-%destructor argument_item { zval_ptr_dtor($$); }
+%destructor argument_item {
+    zval_ptr_dtor(&$$);
+}
 
 argument_item(R) ::= expr(E) . {
-	R = phannot_ret_named_item(NULL, E);
+	phannot_ret_named_item(&R, NULL, &E);
 }
 
 argument_item(R) ::= STRING(S) EQUALS expr(E) . {
-	R = phannot_ret_named_item(S, E);
+	phannot_ret_named_item(&R, S, &E);
 }
 
 argument_item(R) ::= STRING(S) COLON expr(E) . {
-	R = phannot_ret_named_item(S, E);
+	phannot_ret_named_item(&R, S, &E);
 }
 
 argument_item(R) ::= IDENTIFIER(I) EQUALS expr(E) . {
-	R = phannot_ret_named_item(I, E);
+	phannot_ret_named_item(&R, I, &E);
 }
 
 argument_item(R) ::= IDENTIFIER(I) COLON expr(E) . {
-	R = phannot_ret_named_item(I, E);
+	phannot_ret_named_item(&R, I, &E);
 }
 
-%destructor expr { zval_ptr_dtor($$); }
+%destructor expr {
+    zval_ptr_dtor(&$$);
+}
 
 expr(R) ::= annotation(S) . {
 	R = S;
@@ -269,37 +281,37 @@ expr(R) ::= array(A) . {
 }
 
 expr(R) ::= IDENTIFIER(I) . {
-	R = phannot_ret_literal_zval(PHANNOT_T_IDENTIFIER, I);
+	phannot_ret_literal_zval(&R, PHANNOT_T_IDENTIFIER, I);
 }
 
 expr(R) ::= INTEGER(I) . {
-	R = phannot_ret_literal_zval(PHANNOT_T_INTEGER, I);
+	phannot_ret_literal_zval(&R, PHANNOT_T_INTEGER, I);
 }
 
 expr(R) ::= STRING(S) . {
-	R = phannot_ret_literal_zval(PHANNOT_T_STRING, S);
+	phannot_ret_literal_zval(&R, PHANNOT_T_STRING, S);
 }
 
 expr(R) ::= DOUBLE(D) . {
-	R = phannot_ret_literal_zval(PHANNOT_T_DOUBLE, D);
+	phannot_ret_literal_zval(&R, PHANNOT_T_DOUBLE, D);
 }
 
 expr(R) ::= NULL . {
-	R = phannot_ret_literal_zval(PHANNOT_T_NULL, NULL);
+	phannot_ret_literal_zval(&R, PHANNOT_T_NULL, NULL);
 }
 
 expr(R) ::= FALSE . {
-	R = phannot_ret_literal_zval(PHANNOT_T_FALSE, NULL);
+	phannot_ret_literal_zval(&R, PHANNOT_T_FALSE, NULL);
 }
 
 expr(R) ::= TRUE . {
-	R = phannot_ret_literal_zval(PHANNOT_T_TRUE, NULL);
+	phannot_ret_literal_zval(&R, PHANNOT_T_TRUE, NULL);
 }
 
 array(R) ::= BRACKET_OPEN argument_list(A) BRACKET_CLOSE . {
-	R = phannot_ret_array(A);
+	phannot_ret_array(&R, &A);
 }
 
 array(R) ::= SBRACKET_OPEN argument_list(A) SBRACKET_CLOSE . {
-	R = phannot_ret_array(A);
+	phannot_ret_array(&R, &A);
 }

@@ -61,6 +61,7 @@
 #include "cache/frontend/none.h"
 #include "cache/frontend/output.h"
 #include "cache/multiple.h"
+#include "cache/memory.h"
 
 #include "cli/console.h"
 #include "cli/console/exception.h"
@@ -356,9 +357,7 @@
 
 #include "text.h"
 #include "arr.h"
-
 #include "date.h"
-
 
 #include "validationinterface.h"
 #include "validation.h"
@@ -382,6 +381,10 @@
 #include "validation/validator/numericality.h"
 #include "validation/validator/json.h"
 #include "validation/validator/uniqueness.h"
+#include "validation/validator/alnum.h"
+#include "validation/validator/alpha.h"
+#include "validation/validator/digit.h"
+#include "validation/validator/date.h"
 
 #include "chart/qrcode.h"
 #include "chart/captcha.h"

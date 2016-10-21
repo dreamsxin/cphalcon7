@@ -58,6 +58,30 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 	return SUCCESS;
 }
 
+/**
+ * Query a static property value from a zend_class_entry
+ */
+zval* phalcon_read_static_property(const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length)
+{
+	zend_class_entry *ce;
+
+	if ((ce = zend_lookup_class(zend_string_init(class_name, class_length, 0))) != NULL) {
+		return phalcon_read_static_property_ce(ce, property_name, property_length);
+	}
+
+	return &EG(uninitialized_zval);
+}
+
+zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len)
+{
+	zval *value;
+	value = zend_read_static_property(ce, property, len, (zend_bool)ZEND_FETCH_CLASS_SILENT);
+	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
+		value = Z_REFVAL_P(value);
+	}
+	return value;
+}
+
 int phalcon_read_static_property_array_ce(zval *return_value, zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index)
 {
 	zval arr = {};
@@ -112,19 +136,16 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 	return SUCCESS;
 }
 
-zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len)
+int phalcon_update_static_property_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length, zval *value)
 {
-	zval *value;
-	value = zend_read_static_property(ce, property, len, (zend_bool)ZEND_FETCH_CLASS_SILENT);
-	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
-		value = Z_REFVAL_P(value);
-	}
-	return value;
+	return zend_update_static_property(ce, property_name, property_length, value);
 }
 
-int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value)
+int phalcon_update_static_property_bool_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length, int value)
 {
-	return zend_update_static_property(ce, name, len, value);
+	zval v = {};
+	ZVAL_BOOL(&v, value);
+	return phalcon_update_static_property_ce(ce, property_name, property_length, &v);
 }
 
 int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len)
@@ -132,6 +153,24 @@ int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const ch
 	zval empty_array = {};
 	array_init(&empty_array);
 	return zend_update_static_property(ce, name, len, &empty_array);
+}
+
+int phalcon_update_static_property_array_append_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value)
+{
+	zval tmp = {};
+
+
+	phalcon_return_static_property_ce(&tmp, ce, property, property_length);
+
+	if (Z_TYPE(tmp) != IS_ARRAY) {
+		convert_to_array(&tmp);
+	}
+
+	phalcon_array_append(&tmp, value, PH_COPY);
+
+	phalcon_update_static_property_ce(ce, property, property_length, &tmp);
+
+	return SUCCESS;
 }
 
 /**
@@ -786,12 +825,9 @@ static inline zend_class_entry *phalcon_lookup_str_class_ce(zend_class_entry *ce
  */
 int phalcon_read_property(zval *result, zval *object, const char *property_name, uint32_t property_length, int flags)
 {
-	zval property;
+	zval property, rv;
 	zend_class_entry *ce, *old_scope;
-	zval tmp;
 	zval *res;
-
-	ZVAL_UNDEF(&tmp);
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
 
@@ -824,14 +860,12 @@ int phalcon_read_property(zval *result, zval *object, const char *property_name,
 
 	ZVAL_STRINGL(&property, property_name, property_length);
 
-	res = Z_OBJ_HT_P(object)->read_property(object, &property, flags ? BP_VAR_IS : BP_VAR_R, NULL, &tmp);
+	res = Z_OBJ_HT_P(object)->read_property(object, &property, flags ? BP_VAR_IS : BP_VAR_R, NULL, &rv);
 	if ((flags & PH_READONLY) == PH_READONLY) {
 		ZVAL_COPY_VALUE(result, res);
 	} else {
 		ZVAL_COPY(result, res);
 	}
-
-	zval_ptr_dtor(&property);
 
 #if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = old_scope;
@@ -882,7 +916,6 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 
 	/* write_property will add 1 to refcount, so no Z_TRY_ADDREF_P(value); is necessary */
 	Z_OBJ_HT_P(object)->write_property(object, &property, value, 0);
-	zval_ptr_dtor(&property);
 
 #if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = old_scope;
@@ -1353,20 +1386,6 @@ int phalcon_method_exists_ce(const zend_class_entry *ce, const zval *method_name
 int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_name, uint32_t method_len)
 {
 	return (ce && zend_hash_str_exists(&ce->function_table, method_name, method_len)) ? SUCCESS : FAILURE;
-}
-
-/**
- * Query a static property value from a zend_class_entry
- */
-zval* phalcon_read_static_property(const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length)
-{
-	zend_class_entry *ce;
-
-	if ((ce = zend_lookup_class(zend_string_init(class_name, class_length, 0))) != NULL) {
-		return phalcon_read_static_property_ce(ce, property_name, property_length);
-	}
-
-	return &EG(uninitialized_zval);
 }
 
 int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, zval *params)

@@ -28,6 +28,7 @@ int phalcon_ob_end_flush();
 int phalcon_ob_end_clean();
 int phalcon_ob_flush();
 int phalcon_ob_clean();
+int phalcon_ob_get_clean(zval *result);
 int phalcon_ob_get_level();
 
 #endif /* PHALCON_KERNEL_OUTPUT_H */

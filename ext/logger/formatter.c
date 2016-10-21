@@ -18,6 +18,7 @@
 
 #include "logger/formatter.h"
 #include "logger/formatterinterface.h"
+#include "logger.h"
 
 #include <main/spprintf.h>
 
@@ -60,23 +61,11 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter){
  */
 PHP_METHOD(Phalcon_Logger_Formatter, getTypeString){
 
-	static const char *lut[10] = {
-		"EMERGENCY", "CRITICAL", "ALERT", "ERROR",  "WARNING",
-		"NOTICE",    "INFO",     "DEBUG", "CUSTOM", "SPECIAL"
-	};
-
 	zval *type;
-	int itype;
 
 	phalcon_fetch_params(0, 1, 0, &type);
-	PHALCON_ENSURE_IS_LONG(type);
-	
-	itype = Z_LVAL_P(type);
-	if (itype >= 0 && itype < 10) {
-		RETURN_STRING(lut[itype]);
-	}
-	
-	RETURN_STRING("CUSTOM");
+
+	PHALCON_CALL_CE_STATICW(return_value, phalcon_logger_ce, "gettypestring", type);
 }
 
 /**

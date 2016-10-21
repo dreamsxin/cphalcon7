@@ -66,8 +66,14 @@ sudo make install
 
 Add the extension to your php.ini:
 
-```bash
+```ini
 extension=phalcon.so
+```
+
+Test:
+
+```shell
+php --ri phalcon7
 ```
 
 Finally, restart the webserver.

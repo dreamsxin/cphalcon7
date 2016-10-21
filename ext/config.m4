@@ -12,7 +12,7 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(qrcode, wheter to enable qrcode, 
+PHP_ARG_WITH(qrcode, wheter to enable qrcode support, 
 [  --without-qrcode        Disable qrcode], yes, no)
 
 AC_MSG_CHECKING([Include qrcode])
@@ -22,6 +22,141 @@ if test "$PHP_QRCODE" = "yes"; then
 else
 	AC_MSG_RESULT([no])
 fi
+
+PHP_ARG_WITH(cache-memory, whether to enable cache memory support,
+[  --enable-cache-memory   Enable cache memory support], yes, no)
+
+AC_MSG_CHECKING([Include cache-memory])
+if test "$PHP_CACHE_MEMORY" = "yes"; then
+	AC_DEFINE([PHALCON_CACHE_MEMORY], [1], [Whether cache memory are available])
+	AC_MSG_RESULT([yes, cache memory])
+else
+	AC_MSG_RESULT([no])
+fi
+
+
+dnl copied from Zend Optimizer Plus
+AC_MSG_CHECKING(for sysvipc shared memory support)
+AC_TRY_RUN([
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <unistd.h>
+#include <string.h>
+
+int main() {
+  pid_t pid;
+  int status;
+  int ipc_id;
+  char *shm;
+  struct shmid_ds shmbuf;
+
+  ipc_id = shmget(IPC_PRIVATE, 4096, (IPC_CREAT | SHM_R | SHM_W));
+  if (ipc_id == -1) {
+    return 1;
+  }
+
+  shm = shmat(ipc_id, NULL, 0);
+  if (shm == (void *)-1) {
+    shmctl(ipc_id, IPC_RMID, NULL);
+    return 2;
+  }
+
+  if (shmctl(ipc_id, IPC_STAT, &shmbuf) != 0) {
+    shmdt(shm);
+    shmctl(ipc_id, IPC_RMID, NULL);
+    return 3;
+  }
+
+  shmbuf.shm_perm.uid = getuid();
+  shmbuf.shm_perm.gid = getgid();
+  shmbuf.shm_perm.mode = 0600;
+
+  if (shmctl(ipc_id, IPC_SET, &shmbuf) != 0) {
+    shmdt(shm);
+    shmctl(ipc_id, IPC_RMID, NULL);
+    return 4;
+  }
+
+  shmctl(ipc_id, IPC_RMID, NULL);
+
+  strcpy(shm, "hello");
+
+  pid = fork();
+  if (pid < 0) {
+    return 5;
+  } else if (pid == 0) {
+    strcpy(shm, "bye");
+    return 6;
+  }
+  if (wait(&status) != pid) {
+    return 7;
+  }
+  if (!WIFEXITED(status) || WEXITSTATUS(status) != 6) {
+    return 8;
+  }
+  if (strcmp(shm, "bye") != 0) {
+    return 9;
+  }
+  return 0;
+}
+],dnl
+AC_DEFINE(HAVE_SHM_IPC, 1, [Define if you have SysV IPC SHM support])
+    msg=yes,msg=no,msg=no)
+AC_MSG_RESULT([$msg])
+
+AC_MSG_CHECKING(for mmap() using MAP_ANON shared memory support)
+AC_TRY_RUN([
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/mman.h>
+#include <unistd.h>
+#include <string.h>
+
+#ifndef MAP_ANON
+# ifdef MAP_ANONYMOUS
+#  define MAP_ANON MAP_ANONYMOUS
+# endif
+#endif
+#ifndef MAP_FAILED
+# define MAP_FAILED ((void*)-1)
+#endif
+
+int main() {
+  pid_t pid;
+  int status;
+  char *shm;
+
+  shm = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
+  if (shm == MAP_FAILED) {
+    return 1;
+  }
+
+  strcpy(shm, "hello");
+
+  pid = fork();
+  if (pid < 0) {
+    return 5;
+  } else if (pid == 0) {
+    strcpy(shm, "bye");
+    return 6;
+  }
+  if (wait(&status) != pid) {
+    return 7;
+  }
+  if (!WIFEXITED(status) || WEXITSTATUS(status) != 6) {
+    return 8;
+  }
+  if (strcmp(shm, "bye") != 0) {
+    return 9;
+  }
+  return 0;
+}
+],dnl
+AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support])
+    msg=yes,msg=no,msg=no)
+AC_MSG_RESULT([$msg])
 
 if test "$PHP_PHALCON" = "yes"; then
 	AC_MSG_CHECKING([PHP version])
@@ -338,6 +473,12 @@ cache/exception.c \
 cache/backendinterface.c \
 cache/frontendinterface.c \
 cache/backend.c \
+cache/memory/allocators/mmap.c \
+cache/memory/allocators/shm.c \
+cache/memory/serializer.c \
+cache/memory/storage.c \
+cache/memory/allocator.c \
+cache/memory.c \
 session/bag.c \
 session/adapter/files.c \
 session/exception.c \
@@ -416,6 +557,10 @@ validation/validator/file.c \
 validation/validator/numericality.c \
 validation/validator/json.c \
 validation/validator/uniqueness.c \
+validation/validator/alnum.c \
+validation/validator/alpha.c \
+validation/validator/digit.c \
+validation/validator/date.c \
 validation/validator.c \
 mvc/model/query/parser.c \
 mvc/model/query/scanner.c \

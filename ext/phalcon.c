@@ -23,6 +23,10 @@
 #include <main/php_ini.h>
 #include <ext/standard/info.h>
 #include <Zend/zend_extensions.h>
+#include <main/SAPI.h>
+
+#include "cache/memory/storage.h"
+#include "cache/memory/allocator.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -34,36 +38,74 @@
 
 ZEND_DECLARE_MODULE_GLOBALS(phalcon)
 
+
+static PHP_INI_MH(OnChangeKeysMemoryLimit) {
+	if (new_value) {
+		PHALCON_GLOBAL(cache).keys_memory_size = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
+	}
+	return SUCCESS;
+}
+
+static PHP_INI_MH(OnChangeValsMemoryLimit) {
+	if (new_value) {
+		PHALCON_GLOBAL(cache).values_memory_size = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
+	}
+	return SUCCESS;
+}
+
 PHP_INI_BEGIN()
 	/* Enables/Disables debug */
-	STD_PHP_INI_BOOLEAN("phalcon.debug.enable_debug",           "0", PHP_INI_ALL,    OnUpdateBool, debug.enable_debug,           zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.debug.enable_debug",           "0",    PHP_INI_ALL,    OnUpdateBool, debug.enable_debug,           zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables globally the internal events */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.events",                   "1", PHP_INI_ALL,    OnUpdateBool, orm.events,                   zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.events",                   "1",    PHP_INI_ALL,    OnUpdateBool, orm.events,                   zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables virtual foreign keys */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.virtual_foreign_keys",     "1", PHP_INI_ALL,    OnUpdateBool, orm.virtual_foreign_keys,     zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.virtual_foreign_keys",     "1",    PHP_INI_ALL,    OnUpdateBool, orm.virtual_foreign_keys,     zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables automatic NOT NULL validation */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.not_null_validations",     "1", PHP_INI_ALL,    OnUpdateBool, orm.not_null_validations,     zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.not_null_validations",     "1",    PHP_INI_ALL,    OnUpdateBool, orm.not_null_validations,     zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables automatic length validation */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.length_validations",       "1", PHP_INI_ALL,    OnUpdateBool, orm.length_validations,       zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.length_validations",       "1",    PHP_INI_ALL,    OnUpdateBool, orm.length_validations,       zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables throwing an exception if save fails */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.exception_on_failed_save", "0", PHP_INI_ALL,    OnUpdateBool, orm.exception_on_failed_save, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.exception_on_failed_save", "0",    PHP_INI_ALL,    OnUpdateBool, orm.exception_on_failed_save, zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables literals in PHQL */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_literals",          "1", PHP_INI_ALL,    OnUpdateBool, orm.enable_literals,          zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_literals",          "1",    PHP_INI_ALL,    OnUpdateBool, orm.enable_literals,          zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables AST cache */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_ast_cache",         "1", PHP_INI_ALL,    OnUpdateBool, orm.enable_ast_cache,         zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_ast_cache",         "1",    PHP_INI_ALL,    OnUpdateBool, orm.enable_ast_cache,         zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables property method */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_property_method",   "1", PHP_INI_ALL,    OnUpdateBool, orm.enable_property_method,   zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_property_method",   "1",    PHP_INI_ALL,    OnUpdateBool, orm.enable_property_method,   zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables auto convert column value follow database data type */
-	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_auto_convert",      "1", PHP_INI_ALL,    OnUpdateBool, orm.enable_auto_convert,      zend_phalcon_globals, phalcon_globals)
-	STD_PHP_INI_BOOLEAN("phalcon.orm.allow_update_primary",     "0", PHP_INI_ALL,    OnUpdateBool, orm.allow_update_primary,     zend_phalcon_globals, phalcon_globals)
-	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_strict",            "0", PHP_INI_ALL,    OnUpdateBool, orm.enable_strict,            zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_auto_convert",      "1",    PHP_INI_ALL,    OnUpdateBool, orm.enable_auto_convert,      zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.allow_update_primary",     "0",    PHP_INI_ALL,    OnUpdateBool, orm.allow_update_primary,     zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_strict",            "0",    PHP_INI_ALL,    OnUpdateBool, orm.enable_strict,            zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables auttomatic escape */
-	STD_PHP_INI_BOOLEAN("phalcon.db.escape_identifiers",        "1", PHP_INI_ALL,    OnUpdateBool, db.escape_identifiers,        zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.db.escape_identifiers",        "1",    PHP_INI_ALL,    OnUpdateBool, db.escape_identifiers,        zend_phalcon_globals, phalcon_globals)
+	/* Enables/Disables cache memory */
+	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_memory",           "1",   PHP_INI_ALL,    OnUpdateBool, cache.enable_memory,          zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_memory_cli",       "0",   PHP_INI_ALL,    OnUpdateBool, cache.enable_memory_cli,      zend_phalcon_globals, phalcon_globals)
+    STD_PHP_INI_ENTRY("phalcon.cache.keys_memory_size",          "4M",  PHP_INI_SYSTEM, OnChangeKeysMemoryLimit, cache.keys_memory_size,       zend_phalcon_globals, phalcon_globals)
+    STD_PHP_INI_ENTRY("phalcon.cache.values_memory_size",        "64M", PHP_INI_SYSTEM, OnChangeValsMemoryLimit, cache.values_memory_size,     zend_phalcon_globals, phalcon_globals)
 PHP_INI_END()
 
 static PHP_MINIT_FUNCTION(phalcon)
 {
+	char *msg;
+
 	REGISTER_INI_ENTRIES();
+
+	if (!PHALCON_GLOBAL(cache).enable_memory_cli && !strcmp(sapi_module.name, "cli")) {
+		PHALCON_GLOBAL(cache).enable_memory = 0;
+	}
+
+	if (PHALCON_GLOBAL(cache).enable_memory) {
+		
+		if (PHALCON_GLOBAL(cache).values_memory_size < PHALCON_CACHE_MEMORY_SMM_SEGMENT_MIN_SIZE) {
+			php_error(E_ERROR, "Shared memory values(values_memory_size) must be at least '%d'", PHALCON_CACHE_MEMORY_SMM_SEGMENT_MIN_SIZE);
+			return FAILURE;
+		}
+		if (!phalcon_cache_memory_storage_startup(PHALCON_GLOBAL(cache).keys_memory_size, PHALCON_GLOBAL(cache).values_memory_size, &msg)) {
+			php_error(E_ERROR, "Shared memory allocator startup failed at '%s': %s", msg, strerror(errno));
+			return FAILURE;
+		}
+	}
 
 	/* 1. Register exceptions */
 	PHALCON_INIT(Phalcon_Exception);
@@ -188,7 +230,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_DI_Service);
 	PHALCON_INIT(Phalcon_DI_Service_Builder);
 	PHALCON_INIT(Phalcon_Forms_Element);
-	PHALCON_INIT(Phalcon_Cache_Backend);
 	PHALCON_INIT(Phalcon_Annotations_Adapter);
 	PHALCON_INIT(Phalcon_Logger_Adapter);
 	PHALCON_INIT(Phalcon_Logger_Formatter);
@@ -196,7 +237,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Flash);
 	PHALCON_INIT(Phalcon_Dispatcher);
 	PHALCON_INIT(Phalcon_Translate_Adapter);
-	PHALCON_INIT(Phalcon_Cache_Frontend_Data);
 	PHALCON_INIT(Phalcon_Config);
 	PHALCON_INIT(Phalcon_Config_Adapter);
 	PHALCON_INIT(Phalcon_Config_Adapter_Ini);
@@ -209,6 +249,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Acl_Resource);
 	PHALCON_INIT(Phalcon_Acl_Adapter_Memory);
 	PHALCON_INIT(Phalcon_Session_Adapter);
+	PHALCON_INIT(Phalcon_Cache_Memory);
+	PHALCON_INIT(Phalcon_Cache_Backend);
+	PHALCON_INIT(Phalcon_Cache_Frontend_Data);
 	PHALCON_INIT(Phalcon_Cache_Multiple);
 	PHALCON_INIT(Phalcon_Cache_Backend_Apc);
 	PHALCON_INIT(Phalcon_Cache_Backend_File);
@@ -247,6 +290,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Validation_Validator_Numericality);
 	PHALCON_INIT(Phalcon_Validation_Validator_Json);
 	PHALCON_INIT(Phalcon_Validation_Validator_Uniqueness);
+	PHALCON_INIT(Phalcon_Validation_Validator_Alnum);
+	PHALCON_INIT(Phalcon_Validation_Validator_Alpha);
+	PHALCON_INIT(Phalcon_Validation_Validator_Digit);
+	PHALCON_INIT(Phalcon_Validation_Validator_Date);
 	PHALCON_INIT(Phalcon_Db);
 	PHALCON_INIT(Phalcon_Db_Adapter);
 	PHALCON_INIT(Phalcon_Db_Adapter_Pdo);
@@ -430,6 +477,10 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 
 	UNREGISTER_INI_ENTRIES();
 
+	if (PHALCON_GLOBAL(cache).enable_memory) {
+		phalcon_cache_memory_storage_shutdown();
+	}
+
 	return SUCCESS;
 }
 
@@ -465,6 +516,12 @@ static PHP_MINFO_FUNCTION(phalcon)
 static PHP_GINIT_FUNCTION(phalcon)
 {
 	php_phalcon_init_globals(phalcon_globals);
+
+	/* Cache options */
+	phalcon_globals->cache.enable_memory = 1;
+	phalcon_globals->cache.enable_memory_cli = 0;
+	phalcon_globals->cache.keys_memory_size = (4 * 1024 * 1024);
+	phalcon_globals->cache.values_memory_size = (64 * 1024 * 1024);
 }
 
 static PHP_GSHUTDOWN_FUNCTION(phalcon)

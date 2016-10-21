@@ -42,6 +42,7 @@
 #include "validationinterface.h"
 #include "validation/message/group.h"
 #include "validation/message.h"
+#include "debug.h"
 
 #include <ext/pdo/php_pdo_driver.h>
 

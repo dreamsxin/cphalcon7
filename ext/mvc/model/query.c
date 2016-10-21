@@ -38,6 +38,7 @@
 #include "di/injectable.h"
 #include "db/rawvalue.h"
 #include "db/column.h"
+#include "debug.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -3137,7 +3138,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Parse PHQL: ", &phql);
-		phalcon_debug_print_r(&debug_message);
+		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
 	/** 

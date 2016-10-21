@@ -1,0 +1,6 @@
+.idea
+.DS_Store
+phalcon.phar
+composer.lock
+composer.phar
+/vendor/

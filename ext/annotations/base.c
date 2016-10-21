@@ -270,7 +270,6 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 
 	parser_status->status = PHANNOT_PARSING_OK;
 	parser_status->scanner_state = state;
-	parser_status->ret = NULL;
 	parser_status->token = &token;
 	parser_status->syntax_error = NULL;
 
@@ -417,12 +416,7 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 
 	if (status != FAILURE) {
 		if (parser_status->status == PHANNOT_PARSING_OK) {
-			if (parser_status->ret) {
-				ZVAL_ZVAL(*result, parser_status->ret, 0, 0);
-				ZVAL_NULL(parser_status->ret);
-			} else {
-				array_init(*result);
-			}
+			ZVAL_ZVAL(*result, &parser_status->ret, 1, 1);
 		}
 	}
 

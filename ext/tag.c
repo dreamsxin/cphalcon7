@@ -1330,7 +1330,7 @@ PHP_METHOD(Phalcon_Tag, textArea){
 		array_init_size(&params, 1);
 		phalcon_array_append(&params, parameters, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));
@@ -1750,7 +1750,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 		phalcon_array_append(&params, local, PH_COPY);
 		phalcon_array_append(&params, args, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));
@@ -1851,7 +1851,7 @@ PHP_METHOD(Phalcon_Tag, imageInput){
 		array_init_size(&params, 1);
 		phalcon_array_append(&params, parameters, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));
@@ -1919,7 +1919,7 @@ PHP_METHOD(Phalcon_Tag, friendlyTitle){
 	if (!separator) {
 		ZVAL_STRING(&sep, "-");
 	} else {
-		PHALCON_CPY_WRT(&sep, separator);
+		PHALCON_CPY_WRT_CTOR(&sep, separator);
 	}
 
 	if (!lowercase) {
@@ -2029,7 +2029,7 @@ PHP_METHOD(Phalcon_Tag, tagHtml){
 	if (Z_TYPE_P(parameters) != IS_ARRAY) {
 		phalcon_array_append(&params, parameters, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT(&params, parameters);
+		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
 	default_params = phalcon_read_static_property_ce(phalcon_tag_ce, SL("_defaultParams"));

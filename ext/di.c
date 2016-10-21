@@ -199,10 +199,9 @@ PHP_METHOD(Phalcon_DI, __construct){
 
 	if (_name) {
 		phalcon_update_property_zval(getThis(), SL("_name"), _name);
-		PHALCON_CPY_WRT(&name, _name);
-	} else {
-		phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
 	}
+
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
 
 	phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_list"), &name, getThis());
 }

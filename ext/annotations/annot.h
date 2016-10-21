@@ -31,7 +31,7 @@ typedef struct _phannot_parser_token {
 } phannot_parser_token;
 
 typedef struct _phannot_parser_status {
-	zval *ret;
+	zval ret;
 	phannot_scanner_state *scanner_state;
 	phannot_scanner_token *token;
 	char *syntax_error;

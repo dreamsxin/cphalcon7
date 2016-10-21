@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "validation/validator/between.h"
+#include "validation/validator/uniqueness.h"
 #include "validation/validator.h"
 #include "validation/validatorinterface.h"
 #include "validation/message.h"

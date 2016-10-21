@@ -337,7 +337,6 @@ PHP_METHOD(Phalcon_Date, hours){
 		}
 	}
 
-
 	if (!start || Z_TYPE_P(start) == IS_NULL) {
 		if (is_long && zend_is_true(is_long)) {
 			s = 0;
@@ -601,8 +600,15 @@ PHP_METHOD(Phalcon_Date, span){
 	phalcon_fetch_params(0, 1, 2, &remote, &local, &output);
 
 	if (!output) {
-		ZVAL_STRING(&lowercased_output, "years,months,weeks,days,hours,minutes,seconds");
-	} else {
+		array_init(&output_arr);
+		phalcon_array_append_string(&output_arr, SL("years"), 0);
+		phalcon_array_append_string(&output_arr, SL("months"), 0);
+		phalcon_array_append_string(&output_arr, SL("weeks"), 0);
+		phalcon_array_append_string(&output_arr, SL("days"), 0);
+		phalcon_array_append_string(&output_arr, SL("hours"), 0);
+		phalcon_array_append_string(&output_arr, SL("minutes"), 0);
+		phalcon_array_append_string(&output_arr, SL("seconds"), 0);
+	} else if (Z_TYPE_P(output) != IS_ARRAY) {
 		ZVAL_STR(&tmp, phalcon_trim(output, NULL, PHALCON_TRIM_BOTH));
 
 		phalcon_fast_strtolower(&lowercased_output, &tmp);
@@ -610,11 +616,12 @@ PHP_METHOD(Phalcon_Date, span){
 		if (PHALCON_IS_EMPTY(&lowercased_output)) {
 			RETURN_FALSE;
 		}
+
+		ZVAL_STRING(&pattern, "/[^a-z]+/");
+		PHALCON_CALL_FUNCTIONW(&output_arr, "preg_split", &pattern, &lowercased_output);
+	} else {
+		PHALCON_CPY_WRT_CTOR(&output_arr, output);
 	}
-
-	ZVAL_STRING(&pattern, "/[^a-z]+/");
-
-	PHALCON_CALL_FUNCTIONW(&output_arr, "preg_split", &pattern, &lowercased_output);
 
 	ZVAL_LONG(&tmp1, 0);
 
@@ -1071,33 +1078,41 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 }
 
 /**
- * Returns a date/time string with the specified timestamp format
+ * Checks if a value is a valid date
  *
  *     $ret = Phalcon\Date::valid('2012-01-22');
  *     $ret = Phalcon\Date::valid('2012-01-22 11:00:00', 'Y-m-d H:i:s');
  *
  * @param string $date_str
  * @param string $date_format
- * @return string
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Date, valid){
 
-	zval *date = NULL, *format = NULL, date_format = {}, time = {}, format_date = {};
+	zval *date = NULL, *format = NULL, date_format = {}, format_date = {}, errors = {}, warning_count = {}, error_count = {};
+	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 1, &date, &format);
 
-	if (!format) {
+	if (!format || Z_TYPE_P(format) == IS_NULL) {
 		ZVAL_STRING(&date_format, "Y-m-d");
 	} else {
 		PHALCON_CPY_WRT(&date_format, format);
 	}
 
-	PHALCON_CALL_FUNCTIONW(&time, "strtotime", date);
-	PHALCON_CALL_FUNCTIONW(&format_date, "date", &date_format, &time);
+	ce0 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
-	if (phalcon_is_equal(date, &format_date)) {
-		RETURN_TRUE;
-	} else {
-		RETURN_FALSE;
+	PHALCON_CALL_CE_STATICW(&format_date, ce0, "createfromformat", &date_format, date);
+	PHALCON_CALL_CE_STATICW(&errors, ce0, "getlasterrors");
+
+	if (Z_TYPE(errors) == IS_ARRAY) {
+		if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count")) && PHALCON_GT_LONG(&warning_count, 0)) {
+			RETURN_FALSE;
+		}
+		if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count")) && PHALCON_GT_LONG(&error_count, 0)) {
+			RETURN_FALSE;
+		}
 	}
+
+	RETURN_TRUE;
 }

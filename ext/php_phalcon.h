@@ -29,31 +29,8 @@
 #include <TSRM/TSRM.h>
 #endif
 
-#define PHP_PHALCON_VERSION "Dao7-1.1.0"
+#define PHP_PHALCON_VERSION "Dao7-1.1.1"
 #define PHP_PHALCON_EXTNAME "phalcon7"
-
-#define PHALCON_NUM_PREALLOCATED_FRAMES 25
-
-/** Memory frame */
-typedef struct _phalcon_memory_entry {
-	size_t pointer;
-	size_t capacity;
-	zval ***addresses;
-	const int *lines;
-	struct _phalcon_memory_entry *prev;
-	struct _phalcon_memory_entry *next;
-#ifndef PHALCON_RELEASE
-	const char *func;
-	zend_bool permanent;
-#endif
-} phalcon_memory_entry;
-
-/** Virtual Symbol Table */
-typedef struct _phalcon_symbol_table {
-	struct _phalcon_memory_entry *scope;
-	zend_array *symbol_table;
-	struct _phalcon_symbol_table *prev;
-} phalcon_symbol_table;
 
 /** DEBUG options */
 typedef struct _phalcon_debug_options {
@@ -106,11 +83,6 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/* Controls double initialization of memory frames */
 	int initialized;
-
-	/** Memory */
-	phalcon_memory_entry *start_memory;    /**< The first preallocated frame */
-	phalcon_memory_entry *end_memory;      /**< The last preallocate frame */
-	phalcon_memory_entry *active_memory;   /**< The current memory frame */
 
 	/** Frequently used zvals */
 	zval z_null;

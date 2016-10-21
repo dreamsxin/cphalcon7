@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Config, merge){
 	if (Z_TYPE_P(config) == IS_OBJECT) {
 		phalcon_get_object_vars(&array_config, config, 0);
 	} else {
-		PHALCON_CPY_WRT(&array_config, config);
+		PHALCON_CPY_WRT_CTOR(&array_config, config);
 	}
 
 	if (Z_TYPE(array_config) == IS_ARRAY) {

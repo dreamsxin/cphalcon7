@@ -23,6 +23,7 @@
 #include "mvc/dispatcherinterface.h"
 #include "mvc/../dispatcherinterface.h"
 #include "mvc/routerinterface.h"
+#include "mvc/moduledefinitioninterface.h"
 #include "mvc/viewinterface.h"
 #include "mvc/view/modelinterface.h"
 #include "di/injectable.h"
@@ -380,12 +381,17 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			 */
 			PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders", &dependency_injector);
 			PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", &dependency_injector);
-		} else if (Z_TYPE(module) == IS_OBJECT && instanceof_function(Z_OBJCE(module), zend_ce_closure)) {
-			/* A module definition object, can be a Closure instance */
-			array_init_size(&module_params, 1);
-			phalcon_array_append(&module_params, &dependency_injector, PH_COPY);
+		} else if (Z_TYPE(module) == IS_OBJECT) {
+			if (instanceof_function(Z_OBJCE(module), zend_ce_closure)) {
+				/* A module definition object, can be a Closure instance */
+				array_init_size(&module_params, 1);
+				phalcon_array_append(&module_params, &dependency_injector, PH_COPY);
 
-			PHALCON_CALL_USER_FUNC_ARRAYW(&status, &module, &module_params);
+				PHALCON_CALL_USER_FUNC_ARRAYW(&status, &module, &module_params);
+			} else if (instanceof_function(Z_OBJCE(module), phalcon_mvc_moduledefinitioninterface_ce)) {
+				PHALCON_CALL_METHODW(NULL, &module, "registerautoloaders", &dependency_injector);
+				PHALCON_CALL_METHODW(NULL, &module, "registerservices", &dependency_injector);
+			}
 		} else {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "Invalid module definition");
 			return;

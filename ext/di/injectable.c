@@ -105,12 +105,11 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
 
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT && PHALCON_IS_NOT_EMPTY(dependency_injector)) {
 		PHALCON_CALL_METHODW(&di, getThis(), "getdi", dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &di);
 	} else {
-		PHALCON_CPY_WRT(&di, dependency_injector);
+		PHALCON_VERIFY_INTERFACE_OR_NULL_EX(dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 	}
-
-	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(&di, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
-	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 
 	RETURN_THISW();
 }

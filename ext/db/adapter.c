@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	 */
 	if (likely(Z_TYPE_P(&dialect_class) == IS_STRING)) {
 		ce0 = phalcon_fetch_class(&dialect_class, ZEND_FETCH_CLASS_DEFAULT);
-		object_init_ex(&dialect_object, ce0);
+		PHALCON_OBJECT_INIT(&dialect_object, ce0);
 		if (phalcon_has_constructor(&dialect_object)) {
 			PHALCON_CALL_METHODW(NULL, &dialect_object, "__construct");
 		}

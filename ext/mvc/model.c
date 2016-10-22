@@ -215,9 +215,11 @@ PHP_METHOD(Phalcon_Mvc_Model, filter);
 PHP_METHOD(Phalcon_Mvc_Model, isRecord);
 PHP_METHOD(Phalcon_Mvc_Model, isNewRecord);
 PHP_METHOD(Phalcon_Mvc_Model, isDeletedRecord);
+PHP_METHOD(Phalcon_Mvc_Model, jsonSerialize);
 PHP_METHOD(Phalcon_Mvc_Model, __debugInfo);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model___construct, 0, 0, 0)
+	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, dependencyInjector)
 ZEND_END_ARG_INFO()
 
@@ -470,6 +472,7 @@ static const zend_function_entry phalcon_mvc_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model, isDeletedRecord, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, __debugInfo, NULL, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Mvc_Model, getRealAttributes, getAttributes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model, jsonSerialize, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -505,6 +508,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model){
 
 	zend_class_implements(phalcon_mvc_model_ce, 3, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_resultinterface_ce, zend_ce_serializable);
 
+	zend_class_entry *ce = phalcon_get_internal_ce(SS("jsonserializable"));
+	if (ce) {
+		zend_class_implements(phalcon_mvc_model_ce, 1, ce);
+	}
 	return SUCCESS;
 }
 
@@ -552,9 +559,9 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
  */
 PHP_METHOD(Phalcon_Mvc_Model, __construct){
 
-	zval *dependency_injector = NULL, models_manager = {};
+	zval *data = NULL, *dependency_injector = NULL, models_manager = {};
 
-	phalcon_fetch_params(0, 0, 1, &dependency_injector);
+	phalcon_fetch_params(0, 0, 2, &data, &dependency_injector);
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
@@ -573,6 +580,10 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 	 */
 	if (phalcon_method_exists_ex(getThis(), SL("onconstruct")) == SUCCESS) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "onconstruct");
+	}
+
+	if (data && Z_TYPE_P(data) == IS_ARRAY) {
+		PHALCON_CALL_METHODW(NULL, getThis(), "assign", data);
 	}
 }
 
@@ -5706,7 +5717,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 	phalcon_array_fetch_long(&value, arguments, 0, PH_NOISY);
 	ce0 = phalcon_fetch_class(&model_name, ZEND_FETCH_CLASS_DEFAULT);
 
-	object_init_ex(&model, ce0);
+	PHALCON_OBJECT_INIT(&model, ce0);
 	if (phalcon_has_constructor(&model)) {
 		PHALCON_CALL_METHODW(NULL, &model, "__construct");
 	}
@@ -6564,6 +6575,21 @@ PHP_METHOD(Phalcon_Mvc_Model, isDeletedRecord){
 	}
 
 	RETURN_FALSE;
+}
+
+/**
+ * Returns serialised model as array for json_encode.
+ *
+ *<code>
+ * $robot = Robots::findFirst();
+ * echo json_encode($robot);
+ *</code>
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Mvc_Model, jsonSerialize) {
+
+	PHALCON_CALL_METHODW(return_value, getThis(), "toarray");
 }
 
 PHP_METHOD(Phalcon_Mvc_Model, __debugInfo){

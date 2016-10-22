@@ -156,6 +156,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_DIInterface);
 	PHALCON_INIT(Phalcon_DI_InjectionAwareInterface);
 	PHALCON_INIT(Phalcon_DI_ServiceInterface);
+	PHALCON_INIT(Phalcon_Events_EventInterface);
 	PHALCON_INIT(Phalcon_Events_EventsAwareInterface);
 
 	PHALCON_INIT(Phalcon_Acl_AdapterInterface);

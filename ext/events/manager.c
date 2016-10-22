@@ -414,7 +414,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 	/** 
 	 * Tell if the event is cancelable
 	 */
-	PHALCON_CALL_METHODW(&cancelable, event, "getcancelable");
+	PHALCON_CALL_METHODW(&cancelable, event, "iscancelable");
 
 	/** 
 	 * Responses need to be traced?
@@ -716,7 +716,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 			/** 
 			 * Create the event context
 			 */
-			object_init_ex(&event, phalcon_events_event_ce);
+			PHALCON_OBJECT_INIT(&event, phalcon_events_event_ce);
 			PHALCON_CALL_METHODW(NULL, &event, "__construct", &event_name, source, data, cancelable);
 
 			/** 

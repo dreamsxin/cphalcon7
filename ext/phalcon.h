@@ -134,6 +134,7 @@
 #include "escaper/exception.h"
 
 #include "events/event.h"
+#include "events/eventinterface.h"
 #include "events/eventsawareinterface.h"
 #include "events/exception.h"
 #include "events/managerinterface.h"

@@ -118,7 +118,7 @@ class ModelsMetadataTest extends PHPUnit_Framework_TestCase
 
 		$metaData = $di->getShared('modelsMetadata');
 
-		$personas = new Personas($di);
+		$personas = new Personas(NULL, $di);
 
 		$pAttributes = array(
 			0 => 'cedula',
@@ -213,7 +213,7 @@ class ModelsMetadataTest extends PHPUnit_Framework_TestCase
 		$btAttributes = $metaData->getBindTypes($personas);
 		$this->assertEquals($btAttributes, $bindTypes);
 
-		$robots = new Robots($di);
+		$robots = new Robots(NULL, $di);
 
 		//Robots
 		$pAttributes = array(

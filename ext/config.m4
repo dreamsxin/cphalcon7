@@ -492,6 +492,7 @@ escaper.c \
 crypt/exception.c \
 events/managerinterface.c \
 events/manager.c \
+events/eventinterface.c \
 events/event.c \
 events/exception.c \
 events/eventsawareinterface.c \

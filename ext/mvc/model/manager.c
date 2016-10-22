@@ -492,9 +492,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 	if ((ce0 = phalcon_class_exists(model_name, 1)) != NULL) {
 		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
 
-		object_init_ex(return_value, ce0);
+		PHALCON_OBJECT_INIT(return_value, ce0);
 		if (phalcon_has_constructor(return_value)) {
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", &dependency_injector, getThis());
+			PHALCON_CALL_METHODW(NULL, return_value, "__construct", &PHALCON_GLOBAL(z_null), &dependency_injector, getThis());
 		}
 		return;
 	}

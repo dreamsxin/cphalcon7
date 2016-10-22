@@ -249,25 +249,20 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		return; \
 	} else { \
 		if (!instanceof_function_ex(Z_OBJCE_P(instance), interface_ce, 1)) { \
-			if (Z_TYPE_P(instance) != IS_OBJECT) { \
-				zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name->val, zend_zval_type_name(instance)); \
-			} \
-			else { \
-				zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, Z_OBJCE_P(instance)->name->val); \
-			} \
+			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, Z_OBJCE_P(instance)->name->val); \
 			return; \
 		} \
 	}
 
-#define PHALCON_VERIFY_INTERFACE_OR_NULL_EX(pzv, interface_ce, exception_ce, restore_stack) \
-	if (Z_TYPE_P(pzv) != IS_NULL && (Z_TYPE_P(pzv) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(pzv), interface_ce, 1))) { \
-		if (Z_TYPE_P(pzv) != IS_OBJECT) { \
-			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s or NULL, %s given", interface_ce->name->val, zend_zval_type_name(pzv)); \
-		} \
-		else { \
-			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s or NULL, object of type %s given", interface_ce->name->val, Z_OBJCE_P(pzv)->name->val); \
-		} \
+#define PHALCON_VERIFY_INTERFACE_CE_EX(instance_ce, interface_ce, exception_ce) \
+	if (!instanceof_function_ex(instance_ce, interface_ce, 1)) { \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, instance_ce->name->val); \
 		return; \
+	}
+
+#define PHALCON_VERIFY_INTERFACE_OR_NULL_EX(pzv, interface_ce, exception_ce, restore_stack) \
+	if (Z_TYPE_P(pzv) != IS_NULL){ \
+		PHALCON_VERIFY_INTERFACE_EX(pzv, interface_ce, exception_ce, restore_stack); \
 	}
 
 #define PHALCON_VERIFY_CLASS_EX(instance, class_ce, exception_ce, restore_stack) \
@@ -282,14 +277,8 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 	}
 
 #define PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, exception_ce, restore_stack) \
-	if (Z_TYPE_P(pzv) != IS_NULL && (Z_TYPE_P(pzv) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(pzv), class_ce, 0))) { \
-		if (Z_TYPE_P(pzv) != IS_OBJECT) { \
-			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", class_ce->name->val, zend_zval_type_name(pzv)); \
-		} \
-		else { \
-			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, object of type %s given", class_ce->name->val, Z_OBJCE_P(pzv)->name->val); \
-		} \
-		return; \
+	if (Z_TYPE_P(pzv) != IS_NULL) { \
+		PHALCON_VERIFY_CLASS_EX(pzv, class_ce, exception_ce, restore_stack); \
 	}
 
 #define PHALCON_VERIFY_INTERFACE(instance, interface_ce)      PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, spl_ce_LogicException, 1)

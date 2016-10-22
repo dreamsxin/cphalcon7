@@ -200,6 +200,7 @@ PHALCON_INIT_CLASS(Phalcon_Security){
 	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_EXT_DES"),    PHALCON_SECURITY_CRYPT_EXT_DES   );
 	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_MD5"),        PHALCON_SECURITY_CRYPT_MD5       );
 	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH"),   PHALCON_SECURITY_CRYPT_BLOWFISH  );
+	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH_A"), PHALCON_SECURITY_CRYPT_BLOWFISH_A);
 	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH_X"), PHALCON_SECURITY_CRYPT_BLOWFISH_X);
 	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_BLOWFISH_Y"), PHALCON_SECURITY_CRYPT_BLOWFISH_Y);
 	zend_declare_class_constant_long(phalcon_security_ce, SL("CRYPT_SHA256"),     PHALCON_SECURITY_CRYPT_SHA256    );
@@ -370,21 +371,15 @@ PHP_METHOD(Phalcon_Security, hash)
 	i_hash = (Z_TYPE(default_hash) == IS_LONG) ? Z_LVAL(default_hash) : phalcon_get_intval(&default_hash);
 
 	switch (i_hash) {
-		default:
-		case PHALCON_SECURITY_CRYPT_DEFAULT:
-		case PHALCON_SECURITY_CRYPT_BLOWFISH:
-			if (!PHALCON_GLOBAL(security.crypt_blowfish_supported)) RETURN_FALSE;
+
+		case PHALCON_SECURITY_CRYPT_BLOWFISH_A:
+			if (!PHALCON_GLOBAL(security.crypt_blowfish_y_supported)) RETURN_FALSE;
 			variant = 'a';
 			break;
 
 		case PHALCON_SECURITY_CRYPT_BLOWFISH_X:
 			if (!PHALCON_GLOBAL(security.crypt_blowfish_y_supported)) RETURN_FALSE;
 			variant = 'x';
-			break;
-
-		case PHALCON_SECURITY_CRYPT_BLOWFISH_Y:
-			if (!PHALCON_GLOBAL(security.crypt_blowfish_y_supported)) RETURN_FALSE;
-			variant = 'y';
 			break;
 
 		case PHALCON_SECURITY_CRYPT_STD_DES:
@@ -408,42 +403,13 @@ PHP_METHOD(Phalcon_Security, hash)
 			if (!PHALCON_GLOBAL(security.crypt_sha512_supported)) RETURN_FALSE;
 			variant = '6';
 			break;
+		default:
+			if (!PHALCON_GLOBAL(security.crypt_blowfish_supported)) RETURN_FALSE;
+			variant = 'y';
+			break;
 	}
 
 	switch (i_hash) {
-		case PHALCON_SECURITY_CRYPT_DEFAULT:
-		case PHALCON_SECURITY_CRYPT_BLOWFISH:
-		case PHALCON_SECURITY_CRYPT_BLOWFISH_X:
-		case PHALCON_SECURITY_CRYPT_BLOWFISH_Y:
-		default: {
-			/*
-			 * Blowfish hashing with a salt as follows: "$2a$", "$2x$" or "$2y$",
-			 * a two digit cost parameter, "$", and 22 characters from the alphabet
-			 * "./0-9A-Za-z". Using characters outside of this range in the salt
-			 * will cause crypt() to return a zero-length string. The two digit cost
-			 * parameter is the base-2 logarithm of the iteration count for the
-			 * underlying Blowfish-based hashing algorithm and must be in
-			 * range 04-31, values outside this range will cause crypt() to fail.
-			 */
-			ZVAL_LONG(&n_bytes, 22);
-			PHALCON_CALL_METHODW(&salt_bytes, getThis(), "getsaltbytes", &n_bytes);
-			if (Z_TYPE(salt_bytes) != IS_STRING) {
-				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
-				return;
-			}
-
-			if (i_factor < 4) {
-				i_factor = 4;
-			} else if (i_factor > 31) {
-				i_factor = 31;
-			}
-
-			assert(Z_STRLEN(salt_bytes) == 22);
-			salt_len = spprintf(&salt, 0, "$2%c$%02d$%.22s", variant, i_factor, Z_STRVAL(salt_bytes));
-			assert(salt_len == 29);
-			break;
-		}
-
 		case PHALCON_SECURITY_CRYPT_STD_DES: {
 			/* Standard DES-based hash with a two character salt from the alphabet "./0-9A-Za-z". */
 			ZVAL_LONG(&n_bytes, 2);
@@ -530,6 +496,34 @@ PHP_METHOD(Phalcon_Security, hash)
 				assert(salt_len == 19);
 			}
 
+			break;
+		}
+		default: {
+			/*
+			 * Blowfish hashing with a salt as follows: "$2a$", "$2x$" or "$2y$",
+			 * a two digit cost parameter, "$", and 22 characters from the alphabet
+			 * "./0-9A-Za-z". Using characters outside of this range in the salt
+			 * will cause crypt() to return a zero-length string. The two digit cost
+			 * parameter is the base-2 logarithm of the iteration count for the
+			 * underlying Blowfish-based hashing algorithm and must be in
+			 * range 04-31, values outside this range will cause crypt() to fail.
+			 */
+			ZVAL_LONG(&n_bytes, 22);
+			PHALCON_CALL_METHODW(&salt_bytes, getThis(), "getsaltbytes", &n_bytes);
+			if (Z_TYPE(salt_bytes) != IS_STRING) {
+				zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Unable to get random bytes for the salt");
+				return;
+			}
+
+			if (i_factor < 4) {
+				i_factor = 4;
+			} else if (i_factor > 31) {
+				i_factor = 31;
+			}
+
+			assert(Z_STRLEN(salt_bytes) == 22);
+			salt_len = spprintf(&salt, 0, "$2%c$%02d$%.22s", variant, i_factor, Z_STRVAL(salt_bytes));
+			assert(salt_len == 29);
 			break;
 		}
 	}
@@ -626,7 +620,7 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 	if (!_number_bytes) {
 		ZVAL_LONG(&number_bytes, 12);
 	} else {
-		PHALCON_CPY_WRT(&number_bytes, _number_bytes);
+		PHALCON_CPY_WRT_CTOR(&number_bytes, _number_bytes);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
@@ -670,7 +664,7 @@ PHP_METHOD(Phalcon_Security, getToken){
 	if (!_number_bytes) {
 		ZVAL_LONG(&number_bytes, 12);
 	} else {
-		PHALCON_CPY_WRT(&number_bytes, _number_bytes);
+		PHALCON_CPY_WRT_CTOR(&number_bytes, _number_bytes);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF$");
@@ -751,7 +745,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 		 */
 		PHALCON_CALL_METHODW(&token, &request, "getpost", &token_key);
 	} else {
-		PHALCON_CPY_WRT(&token, token_value);
+		PHALCON_CPY_WRT_CTOR(&token, token_value);
 	}
 
 	ZVAL_STRING(&key, "$PHALCON/CSRF$");

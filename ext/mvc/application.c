@@ -484,6 +484,9 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 			if (PHALCON_IS_FALSE(&possible_response)) {
 				RETURN_CTORW(&response);
+			} else if (Z_TYPE(possible_response) == IS_STRING) {
+				PHALCON_CALL_METHODW(&response, &possible_response, "setcontent", &possible_response);
+				RETURN_CTORW(&response);
 			}
 			ZVAL_FALSE(&returned_response);
 		}

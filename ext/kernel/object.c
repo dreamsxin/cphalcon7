@@ -825,12 +825,9 @@ static inline zend_class_entry *phalcon_lookup_str_class_ce(zend_class_entry *ce
  */
 int phalcon_read_property(zval *result, zval *object, const char *property_name, uint32_t property_length, int flags)
 {
-	zval property;
+	zval property, rv;
 	zend_class_entry *ce, *old_scope;
-	zval tmp;
 	zval *res;
-
-	ZVAL_UNDEF(&tmp);
 
 	if (Z_TYPE_P(object) != IS_OBJECT) {
 
@@ -863,14 +860,12 @@ int phalcon_read_property(zval *result, zval *object, const char *property_name,
 
 	ZVAL_STRINGL(&property, property_name, property_length);
 
-	res = Z_OBJ_HT_P(object)->read_property(object, &property, flags ? BP_VAR_IS : BP_VAR_R, NULL, &tmp);
+	res = Z_OBJ_HT_P(object)->read_property(object, &property, flags ? BP_VAR_IS : BP_VAR_R, NULL, &rv);
 	if ((flags & PH_READONLY) == PH_READONLY) {
 		ZVAL_COPY_VALUE(result, res);
 	} else {
 		ZVAL_COPY(result, res);
 	}
-
-	zval_ptr_dtor(&property);
 
 #if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = old_scope;
@@ -921,7 +916,6 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 
 	/* write_property will add 1 to refcount, so no Z_TRY_ADDREF_P(value); is necessary */
 	Z_OBJ_HT_P(object)->write_property(object, &property, value, 0);
-	zval_ptr_dtor(&property);
 
 #if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = old_scope;

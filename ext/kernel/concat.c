@@ -206,6 +206,11 @@ void phalcon_concat_vvvvsvv(zval *result, zval *op1, zval *op2, zval *op3, zval 
 	phalcon_concat_vv(result, op6, op7, 1);
 }
 
+void phalcon_concat_vvvvv(zval *result, zval *op1, zval *op2, zval *op3, zval *op4, zval *op5, int self_var){
+	phalcon_concat_vvvv(result, op1, op2, op3, op4, self_var);
+	concat_function(result, result, op5);
+}
+
 /**
  * Appends the content of the right operator to the left operator
  */

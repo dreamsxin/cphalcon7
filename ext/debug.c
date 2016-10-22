@@ -1431,7 +1431,7 @@ PHP_METHOD(Phalcon_Debug, log){
 	if (!_type) {
 		ZVAL_LONG(&type, PHALCON_LOGGER_DEBUG);
 	} else {
-		PHALCON_CPY_WRT(&type, _type);
+		PHALCON_CPY_WRT_CTOR(&type, _type);
 	}
 
 	if (!context) {

@@ -62,6 +62,9 @@ PHP_METHOD(Phalcon_Db_Dialect, rollbackSavepoint);
 PHP_METHOD(Phalcon_Db_Dialect, getEscapeChar);;
 PHP_METHOD(Phalcon_Db_Dialect, registerCustomFunction);
 PHP_METHOD(Phalcon_Db_Dialect, getCustomFunctions);
+PHP_METHOD(Phalcon_Db_Dialect, escape);
+PHP_METHOD(Phalcon_Db_Dialect, escapeSchema);
+PHP_METHOD(Phalcon_Db_Dialect, prepareTable);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_dialect_getsqlexpression, 0, 0, 1)
 	ZEND_ARG_INFO(0, expression)
@@ -89,6 +92,23 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_dialect_registercustomfunction, 0, 0, 
 	ZEND_ARG_INFO(0, customFunction)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_dialect_escape, 0, 0, 1)
+	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_INFO(0, escapeChar)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_dialect_escapeschema, 0, 0, 1)
+	ZEND_ARG_INFO(0, schema)
+	ZEND_ARG_INFO(0, escapeChar)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_dialect_preparetable, 0, 0, 1)
+	ZEND_ARG_INFO(0, table)
+	ZEND_ARG_INFO(0, schema)
+	ZEND_ARG_INFO(0, alias)
+	ZEND_ARG_INFO(0, escapeChar)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_db_dialect_method_entry[] = {
 	PHP_ME(Phalcon_Db_Dialect, limit, arginfo_phalcon_db_dialectinterface_limit, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Dialect, forUpdate, arginfo_phalcon_db_dialectinterface_forupdate, ZEND_ACC_PUBLIC)
@@ -110,6 +130,9 @@ static const zend_function_entry phalcon_db_dialect_method_entry[] = {
 	PHP_ME(Phalcon_Db_Dialect, getEscapeChar, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Dialect, registerCustomFunction, arginfo_phalcon_db_dialect_registercustomfunction, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Dialect, getCustomFunctions, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Dialect, escape, arginfo_phalcon_db_dialect_escape, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Dialect, escapeSchema, arginfo_phalcon_db_dialect_escapeschema, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Dialect, prepareTable, arginfo_phalcon_db_dialect_preparetable, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -1350,3 +1373,137 @@ PHP_METHOD(Phalcon_Db_Dialect, getCustomFunctions){
 
 	RETURN_MEMBER(getThis(), "_customFunctions");
 }
+
+/**
+ * Escape identifiers
+ *
+ * @param string $str
+ * @param string $escapeChar
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Dialect, escape){
+
+	zval *_str, *escape = NULL, str = {}, escape_char = {}, parts = {}, *part;
+
+	phalcon_fetch_params(0, 1, 1, &_str, &escape);
+
+	if (!escape || Z_TYPE_P(escape) == IS_NULL) {
+		phalcon_read_property(&escape_char, getThis(), SL("_escapeChar"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&escape_char, escape);
+	}
+
+	if (PHALCON_IS_EMPTY(&escape_char)) {
+		RETURN_CTORW(_str);
+	}
+
+	ZVAL_STR(&str, phalcon_trim(_str, &escape_char, PHALCON_TRIM_BOTH));
+
+	if (!PHALCON_GLOBAL(db).escape_identifiers) {
+		RETURN_CTORW(&str);
+	}
+
+	if (phalcon_start_with_str(&str, SL("*"))) {
+		RETURN_CTORW(&str);
+	}
+
+	if (phalcon_memnstr_str(&str, SL("."))) {
+		phalcon_fast_explode_str(&parts, SL("."), &str);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(parts), part) {
+
+			if (PHALCON_IS_EMPTY(part) || phalcon_start_with_str(part, SL("*"))) {
+				if (PHALCON_IS_EMPTY(return_value)) {
+					ZVAL_COPY_VALUE(return_value, part);
+				} else {
+					PHALCON_SCONCAT_SV(return_value, ".", part);
+				}
+			} else {
+				if (PHALCON_IS_EMPTY(return_value)) {
+					PHALCON_CONCAT_VVV(return_value, &escape_char, part, &escape_char);
+				} else {
+					PHALCON_SCONCAT_SVVV(return_value, ".", &escape_char, part, &escape_char);
+				}
+			}
+		} ZEND_HASH_FOREACH_END();
+		return;
+	}
+	PHALCON_CONCAT_VVV(return_value, &escape_char, &str, &escape_char);
+}
+
+/**
+ * Escape Schema
+ *
+ * @param string $schema
+ * @param string $escapeChar
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Dialect, escapeSchema){
+
+	zval *_schema, *escape = NULL, escape_char = {}, schema = {};
+
+	phalcon_fetch_params(0, 1, 1, &_schema, &escape);
+
+	if (!escape || Z_TYPE_P(escape) == IS_NULL) {
+		phalcon_read_property(&escape_char, getThis(), SL("_escapeChar"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&escape_char, escape);
+	}
+
+	if (PHALCON_IS_EMPTY(&escape_char)) {
+		RETURN_CTORW(_schema);
+	}
+
+	ZVAL_STR(&schema, phalcon_trim(_schema, &escape_char, PHALCON_TRIM_BOTH));
+
+	if (!PHALCON_GLOBAL(db).escape_identifiers) {
+		RETURN_CTORW(&schema);
+	}
+
+	PHALCON_CONCAT_VVV(return_value, &escape_char, &schema, &escape_char);
+}
+
+/**
+ * Prepares table for this RDBMS
+ *
+ * @param string $table
+ * @param string $schema
+ * @param string $alias
+ * @param string $escapeChar
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Dialect, prepareTable){
+
+	zval *_table, *_schema = NULL, *_alias = NULL, *escape = NULL, table = {}, schema = {}, alias = {};
+
+	phalcon_fetch_params(0, 1, 3, &_table, &_schema, &_alias, &escape);
+
+	if (!escape) {
+		escape = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (PHALCON_GLOBAL(db).escape_identifiers) {
+		PHALCON_CALL_METHODW(&table, getThis(), "escape", _table, escape);
+		if (_schema && PHALCON_IS_NOT_EMPTY(_schema)) {
+			PHALCON_CALL_METHODW(&schema, getThis(), "escapeschema", _schema, escape);
+			PHALCON_CONCAT_VSV(return_value, &schema, ".", &table);
+		} else {
+			PHALCON_CPY_WRT(return_value, &table);
+		}
+
+		if (_alias && PHALCON_IS_NOT_EMPTY(_alias)) {
+			PHALCON_CALL_METHODW(&alias, getThis(), "escape", _alias, escape);
+			PHALCON_SCONCAT_SV(return_value, " AS ", &alias);
+		}
+	} else {
+		if (_schema && PHALCON_IS_NOT_EMPTY(_schema)) {
+			PHALCON_CONCAT_VSV(return_value, _schema, ".", &table);
+		} else {
+			PHALCON_CPY_WRT_CTOR(return_value, _table);
+		}
+
+		if (_alias && PHALCON_IS_NOT_EMPTY(_alias)) {
+			PHALCON_SCONCAT_SV(return_value, " AS ", _alias);
+		}
+	}
+}
+

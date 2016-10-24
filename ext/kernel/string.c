@@ -1092,7 +1092,7 @@ int phalcon_comparestr(const zval *str, const zval *compared, zval *case_sensiti
 		return 1;
 	}
 
-	if (!zend_is_true(case_sensitive)) {
+	if (!case_sensitive || !zend_is_true(case_sensitive)) {
 		return !strcmp(Z_STRVAL_P(str), Z_STRVAL_P(compared));
 	}
 
@@ -1112,7 +1112,7 @@ int phalcon_comparestr_str(const zval *str, char *compared, unsigned int compare
 		return 0;
 	}
 
-	if (!zend_is_true(case_sensitive)) {
+	if (!case_sensitive || !zend_is_true(case_sensitive)) {
 		return !strcmp(Z_STRVAL_P(str), compared);
 	}
 

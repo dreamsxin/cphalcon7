@@ -172,17 +172,17 @@ class ModelsMetadataTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($nnAttributes, $pnnAttributes);
 
 		$dataTypes = array(
-			'cedula' => 5,
-			'tipo_documento_id' => 0,
-			'nombres' => 2,
-			'telefono' => 2,
-			'direccion' => 2,
-			'email' => 2,
-			'fecha_nacimiento' => 1,
-			'ciudad_id' => 0,
-			'creado_at' => 1,
-			'cupo' => 3,
-			'estado' => 5,
+			'cedula' => Phalcon\Db\Column::TYPE_CHAR,
+			'tipo_documento_id' => Phalcon\Db\Column::TYPE_INTEGER,
+			'nombres' => Phalcon\Db\Column::TYPE_VARCHAR,
+			'telefono' => Phalcon\Db\Column::TYPE_VARCHAR,
+			'direccion' => Phalcon\Db\Column::TYPE_VARCHAR,
+			'email' => Phalcon\Db\Column::TYPE_VARCHAR,
+			'fecha_nacimiento' => Phalcon\Db\Column::TYPE_DATE,
+			'ciudad_id' => Phalcon\Db\Column::TYPE_INTEGER,
+			'creado_at' => Phalcon\Db\Column::TYPE_DATE,
+			'cupo' => Phalcon\Db\Column::TYPE_DECIMAL,
+			'estado' => Phalcon\Db\Column::TYPE_CHAR,
 		);
 
 		$dtAttributes = $metaData->getDataTypes($personas);
@@ -197,17 +197,17 @@ class ModelsMetadataTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($ndAttributes, $pndAttributes);
 
 		$bindTypes = array(
-			'cedula' => 2,
-			'tipo_documento_id' => 1,
-			'nombres' => 2,
-			'telefono' => 2,
-			'direccion' => 2,
-			'email' => 2,
-			'fecha_nacimiento' => 2,
-			'ciudad_id' => 1,
-			'creado_at' => 2,
-			'cupo' => 32,
-			'estado' => 2,
+			'cedula' => Phalcon\Db\Column::BIND_PARAM_STR,
+			'tipo_documento_id' => Phalcon\Db\Column::BIND_PARAM_INT,
+			'nombres' => Phalcon\Db\Column::BIND_PARAM_STR,
+			'telefono' => Phalcon\Db\Column::BIND_PARAM_STR,
+			'direccion' => Phalcon\Db\Column::BIND_PARAM_STR,
+			'email' => Phalcon\Db\Column::BIND_PARAM_STR,
+			'fecha_nacimiento' => Phalcon\Db\Column::BIND_PARAM_STR,
+			'ciudad_id' => Phalcon\Db\Column::BIND_PARAM_INT,
+			'creado_at' => Phalcon\Db\Column::BIND_PARAM_STR,
+			'cupo' => Phalcon\Db\Column::BIND_PARAM_DECIMAL,
+			'estado' => Phalcon\Db\Column::BIND_PARAM_STR,
 		);
 
 		$btAttributes = $metaData->getBindTypes($personas);

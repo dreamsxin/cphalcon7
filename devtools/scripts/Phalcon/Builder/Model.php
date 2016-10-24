@@ -276,8 +276,6 @@ class Model extends Component
 
         $alreadyInitialized  = false;
         $alreadyValidations  = false;
-        $alreadyFind         = false;
-        $alreadyFindFirst    = false;
         $alreadyColumnMapped = false;
         $alreadyGetSourced   = false;
 
@@ -340,12 +338,6 @@ class Model extends Component
                             break;
                         case 'validation':
                             $alreadyValidations = true;
-                            break;
-                        case 'find':
-                            $alreadyFind = true;
-                            break;
-                        case 'findFirst':
-                            $alreadyFindFirst = true;
                             break;
                         case 'columnMap':
                             $alreadyColumnMapped = true;
@@ -446,14 +438,6 @@ class Model extends Component
 
         if (false == $alreadyGetSourced) {
             $methodRawCode[] = $this->snippet->getModelSource($this->options->get('name'));
-        }
-
-        if (false == $alreadyFind) {
-            $methodRawCode[] = $this->snippet->getModelFind($className);
-        }
-
-        if (false == $alreadyFindFirst) {
-            $methodRawCode[] = $this->snippet->getModelFindFirst($className);
         }
 
         $content = join('', $attributes);

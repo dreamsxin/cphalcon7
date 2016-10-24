@@ -47,7 +47,6 @@
 #define PHALCON_THROW_EXCEPTION_FORMAT(class_entry, format, ...) \
 	do { \
 		phalcon_throw_exception_format(class_entry, format, __VA_ARGS__); \
-		PHALCON_MM_RESTORE(); \
 	} while (0)
 
 #define PHALCON_THROW_EXCEPTION_FORMATW(class_entry, format, ...) phalcon_throw_exception_format(class_entry, format, __VA_ARGS__);

@@ -150,6 +150,7 @@ PHALCON_DOC_METHOD(Phalcon_Db_DialectInterface, addColumn);
  * @param string $tableName
  * @param string $schemaName
  * @param Phalcon\Db\ColumnInterface $column
+ * @param Phalcon\Db\ColumnInterface $currentColumn
  * @return string
  */
 PHALCON_DOC_METHOD(Phalcon_Db_DialectInterface, modifyColumn);

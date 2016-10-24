@@ -238,6 +238,9 @@ PHP_METHOD(Phalcon_DI_Service, resolve){
 		/* Object definitions can be a Closure or an already resolved instance */
 		found = 1;
 		if (instanceof_function_ex(Z_OBJCE(definition), zend_ce_closure, 0)) {
+			if (likely(Z_TYPE_P(dependency_injector) == IS_OBJECT)) {
+				PHALCON_CALL_CE_STATICW(&definition, zend_ce_closure, "bind", &definition, dependency_injector);
+			}
 			if (Z_TYPE_P(parameters) == IS_ARRAY) {
 				PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &definition, parameters);
 			} else {

@@ -60,6 +60,8 @@ PHP_METHOD(Phalcon_Db_Column, __construct);
 PHP_METHOD(Phalcon_Db_Column, getSchemaName);
 PHP_METHOD(Phalcon_Db_Column, getName);
 PHP_METHOD(Phalcon_Db_Column, getType);
+PHP_METHOD(Phalcon_Db_Column, getTypeReference);
+PHP_METHOD(Phalcon_Db_Column, getTypeValues);
 PHP_METHOD(Phalcon_Db_Column, getSize);
 PHP_METHOD(Phalcon_Db_Column, getBytes);
 PHP_METHOD(Phalcon_Db_Column, getScale);
@@ -84,6 +86,8 @@ static const zend_function_entry phalcon_db_column_method_entry[] = {
 	PHP_ME(Phalcon_Db_Column, getSchemaName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Column, getName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Column, getType, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Column, getTypeReference, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Column, getTypeValues, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Column, getSize, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Column, getBytes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Column, getScale, NULL, ZEND_ACC_PUBLIC)
@@ -97,6 +101,7 @@ static const zend_function_entry phalcon_db_column_method_entry[] = {
 	PHP_ME(Phalcon_Db_Column, getBindType, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Column, getDefaultValue, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Column, __set_state, arginfo___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_MALIAS(Phalcon_Db_Column, getDefault, getDefaultValue, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -110,6 +115,8 @@ PHALCON_INIT_CLASS(Phalcon_Db_Column){
 	zend_declare_property_null(phalcon_db_column_ce, SL("_columnName"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_column_ce, SL("_schemaName"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_column_ce, SL("_type"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_db_column_ce, SL("_typeReference"), -1, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_typeValues"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_db_column_ce, SL("_isNumeric"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_column_ce, SL("_size"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_column_ce, SL("_bytes"), ZEND_ACC_PROTECTED);
@@ -124,6 +131,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Column){
 	zend_declare_property_null(phalcon_db_column_ce, SL("_default"), ZEND_ACC_PROTECTED);
 
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_INTEGER"), PHALCON_DB_COLUMN_TYPE_INTEGER);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_BIGINTEGER"), PHALCON_DB_COLUMN_TYPE_BIGINTEGER);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DATE"), PHALCON_DB_COLUMN_TYPE_DATE);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_VARCHAR"), PHALCON_DB_COLUMN_TYPE_VARCHAR);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DECIMAL"), PHALCON_DB_COLUMN_TYPE_DECIMAL);
@@ -133,9 +141,16 @@ PHALCON_INIT_CLASS(Phalcon_Db_Column){
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_FLOAT"), PHALCON_DB_COLUMN_TYPE_FLOAT);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_BOOLEAN"), PHALCON_DB_COLUMN_TYPE_BOOLEAN);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_DOUBLE"), PHALCON_DB_COLUMN_TYPE_DOUBLE);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_TINYBLOB"), PHALCON_DB_COLUMN_TYPE_TINYBLOB);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_BLOB"), PHALCON_DB_COLUMN_TYPE_BLOB);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_MEDIUMBLOB"), PHALCON_DB_COLUMN_TYPE_MEDIUMBLOB);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_LONGBLOB"), PHALCON_DB_COLUMN_TYPE_LONGBLOB);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_JSON"), PHALCON_DB_COLUMN_TYPE_JSON);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_JSONB"), PHALCON_DB_COLUMN_TYPE_JSONB);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_ARRAY"), PHALCON_DB_COLUMN_TYPE_ARRAY);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_TIMESTAMP"), PHALCON_DB_COLUMN_TYPE_TIMESTAMP);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_OTHER"), PHALCON_DB_COLUMN_TYPE_OTHER);
+
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_NULL"), PHALCON_DB_COLUMN_BIND_PARAM_NULL);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_INT"), PHALCON_DB_COLUMN_BIND_PARAM_INT);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_STR"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
@@ -156,7 +171,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Column){
  */
 PHP_METHOD(Phalcon_Db_Column, __construct){
 
-	zval *column_name, *definition, type = {}, not_null = {}, primary = {}, size = {}, bytes = {}, scale = {}, dunsigned = {}, is_numeric = {};
+	zval *column_name, *definition, type = {}, type_reference = {}, type_values = {}, not_null = {}, primary = {}, size = {}, bytes = {}, scale = {}, dunsigned = {}, is_numeric = {};
 	zval auto_increment = {}, first = {}, after = {}, bind_type = {}, default_value = {};
 
 	phalcon_fetch_params(0, 2, 0, &column_name, &definition);
@@ -171,6 +186,14 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column type is required");
 		return;
+	}
+
+	if (phalcon_array_isset_fetch_str(&type_reference, definition, SL("typeReference"))) {
+		phalcon_update_property_zval(getThis(), SL("_typeReference"), &type_reference);
+	}
+
+	if (phalcon_array_isset_fetch_str(&type_values, definition, SL("typeValues"))) {
+		phalcon_update_property_zval(getThis(), SL("_typeValues"), &type_values);
 	}
 
 	/** 
@@ -201,7 +224,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	 */
 	if (phalcon_array_isset_fetch_str(&scale, definition, SL("scale"))) {
 		int i_type     = phalcon_get_intval(&type);
-		int is_numeric = (i_type == 3 || i_type == 7 || i_type == 9);
+		int is_numeric = (i_type == PHALCON_DB_COLUMN_TYPE_DECIMAL || i_type == PHALCON_DB_COLUMN_TYPE_DOUBLE || i_type == PHALCON_DB_COLUMN_TYPE_FLOAT);
 
 		if (is_numeric) {
 			phalcon_update_property_zval(getThis(), SL("_scale"), &scale);
@@ -294,6 +317,28 @@ PHP_METHOD(Phalcon_Db_Column, getType){
 
 
 	RETURN_MEMBER(getThis(), "_type");
+}
+
+/**
+ * Returns column type reference
+ *
+ * @return int
+ */
+PHP_METHOD(Phalcon_Db_Column, getTypeReference){
+
+
+	RETURN_MEMBER(getThis(), "_typeReference");
+}
+
+/**
+ * Returns column type values
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Column, getTypeValues){
+
+
+	RETURN_MEMBER(getThis(), "_typeValues");
 }
 
 /**

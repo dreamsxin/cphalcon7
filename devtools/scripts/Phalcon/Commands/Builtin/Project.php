@@ -41,14 +41,18 @@ class Project extends Command
     public function getPossibleParams()
     {
         return [
-            'name'            => 'Name of the new project',
-            'directory=s'     => 'Base path on which project will be created [optional]',
-            'type=s'          => 'Type of the application to be generated (cli, micro, simple, modules)',
-            'template-path=s' => 'Specify a template path [optional]',
+            'name'				=> 'Name of the new project',
+            'directory=s'		=> 'Base path on which project will be created [optional]',
+            'type=s'			=> 'Type of the application to be generated (cli, micro, simple, modules)',
+            'template-path=s'	=> 'Specify a template path [optional]',
 			'template-engine=s' => 'Define the template engine, default php (php, volt) [optional]',
-            'use-config-ini'  => 'Use a ini file as configuration file [optional]',
-            'trace'           => 'Shows the trace of the framework in case of exception [optional]',
-            'help'            => 'Shows this help'
+            'use-config-ini'	=> 'Use a ini file as configuration file [optional]',
+            'adapter=s'			=> 'Define database adapter, default Mysql [optional]',
+            'username=s'		=> 'Define database username, default root [optional]',
+            'password=s'		=> 'Define database password, default empty [optional]',
+            'dbname=s'			=> 'Define database dbname, default same project name [optional]',
+            'trace'				=> 'Shows the trace of the framework in case of exception [optional]',
+            'help'				=> 'Shows this help'
         ];
     }
 
@@ -66,14 +70,22 @@ class Project extends Command
         $templatePath = $this->getOption(['template-path'], null, TEMPLATE_PATH);
         $templateEngine = $this->getOption(['template-engine'], null, 'php');
         $useConfigIni = $this->getOption('use-config-ini');
+        $adapter = $this->getOption('adapter');
+        $username = $this->getOption('username');
+        $password = $this->getOption('password');
+        $dbname = $this->getOption('dbname');
 
         $builder = new ProjectBuilder([
-            'name'           => $projectName,
-            'type'           => $projectType,
-            'directory'      => $projectPath,
-            'templatePath'   => $templatePath,
-			'templateEngine'   => $templateEngine,
-            'useConfigIni'   => $useConfigIni
+            'name'				=> $projectName,
+            'type'				=> $projectType,
+            'directory'			=> $projectPath,
+            'templatePath'		=> $templatePath,
+			'templateEngine'	=> $templateEngine,
+            'useConfigIni'		=> $useConfigIni,
+            'adapter'			=> $adapter,
+            'username'			=> $username,
+            'password'			=> $password,
+            'dbname'			=> $dbname
         ]);
 
         return $builder->build();

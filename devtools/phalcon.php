@@ -24,7 +24,6 @@ use Phalcon\Loader;
 use Phalcon\Version;
 use Phalcon\Script\Color;
 use Phalcon\Commands\Builtin\Model;
-use Phalcon\Commands\Builtin\Module;
 use Phalcon\Commands\Builtin\Project;
 use Phalcon\Commands\Builtin\Scaffold;
 use Phalcon\Commands\CommandsListener;
@@ -76,7 +75,6 @@ try {
     $commandsToEnable = [
         Enumerate::class,
         Controller::class,
-        Module::class,
         Model::class,
         AllModels::class,
         Project::class,

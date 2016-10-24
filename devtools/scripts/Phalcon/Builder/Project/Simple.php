@@ -157,7 +157,7 @@ class Simple extends ProjectBuilder
 
         $getFile = $this->options->get('templatePath') . '/project/simple/config.' . $type;
         $putFile = $this->options->get('projectPath') . 'app/config/config.' . $type;
-        $this->generateFile($getFile, $putFile, $this->options->get('name'));
+        $this->generateFile($getFile, $putFile, $this->options->get('name'), $this->options->get('adapter', 'Mysql'), $this->options->get('username', 'root'), $this->options->get('password'), $this->options->get('dbname'));
 
 		if ($this->isConsole()) {
             $this->_notifySuccess(

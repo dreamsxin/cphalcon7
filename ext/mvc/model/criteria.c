@@ -24,6 +24,7 @@
 #include "mvc/modelinterface.h"
 #include "mvc/model/exception.h"
 #include "mvc/model/query.h"
+#include "db/column.h"
 #include "di.h"
 #include "diinterface.h"
 #include "di/injectable.h"
@@ -1288,7 +1289,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 
 			if (phalcon_array_isset_fetch(&type, &data_types, &real_field, 0)) {
 				if (Z_TYPE_P(value) != IS_NULL && !PHALCON_IS_STRING(value, "")) {
-					if (PHALCON_IS_LONG(&type, 2)) {
+					if (PHALCON_IS_LONG(&type, PHALCON_DB_COLUMN_TYPE_VARCHAR)) {
 						/**
 						 * For varchar types we use LIKE operator
 						 */

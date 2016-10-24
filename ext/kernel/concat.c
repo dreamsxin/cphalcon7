@@ -94,6 +94,11 @@ void phalcon_concat_svv(zval *result, const char *op1, uint32_t op1_len, zval *o
 	concat_function(result, result, op3);
 }
 
+void phalcon_concat_svvv(zval *result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, zval *op4, int self_var){
+	phalcon_concat_sv(result, op1, op1_len, op2, self_var);
+	phalcon_concat_vv(result, op3, op4, 1);
+}
+
 void phalcon_concat_svvs(zval *result, const char *op1, uint32_t op1_len, zval *op2, zval *op3, const char *op4, uint32_t op4_len, int self_var){
 	phalcon_concat_sv(result, op1, op1_len, op2, self_var);
 	phalcon_concat_vs(result, op3, op4, op4_len, 1);

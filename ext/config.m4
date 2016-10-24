@@ -229,7 +229,6 @@ cli/console/exception.c \
 security/exception.c \
 db/dialect/sqlite.c \
 db/dialect/mysql.c \
-db/dialect/oracle.c \
 db/dialect/postgresql.c \
 db/result/pdo.c \
 db/column.c \
@@ -242,7 +241,6 @@ db/profiler.c \
 db/referenceinterface.c \
 db/adapter/pdo/sqlite.c \
 db/adapter/pdo/mysql.c \
-db/adapter/pdo/oracle.c \
 db/adapter/pdo/postgresql.c \
 db/adapter/pdo.c \
 db/exception.c \

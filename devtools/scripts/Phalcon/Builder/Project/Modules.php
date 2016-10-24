@@ -284,8 +284,6 @@ class Modules extends ProjectBuilder
             ->createControllerFile()
             ->createHtrouterFile();
 
-        $this->options->contains('enableWebTools') && Tools::install($this->options->get('projectPath'));
-
         return true;
     }
 }

@@ -28,7 +28,6 @@ use Phalcon\Commands\Builtin\Module;
 use Phalcon\Commands\Builtin\Project;
 use Phalcon\Commands\Builtin\Scaffold;
 use Phalcon\Commands\CommandsListener;
-use Phalcon\Commands\Builtin\Webtools;
 use Phalcon\Commands\Builtin\AllModels;
 use Phalcon\Commands\Builtin\Migration;
 use Phalcon\Commands\Builtin\Enumerate;
@@ -83,7 +82,6 @@ try {
         Project::class,
         Scaffold::class,
         Migration::class,
-        Webtools::class,
     ];
 
     $script->loadUserScripts();

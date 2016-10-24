@@ -241,40 +241,6 @@ EOD;
         return PHP_EOL.sprintf($templateInitialize, rtrim(join('', $pieces))).PHP_EOL;
     }
 
-    public function getModelFind($className)
-    {
-        $templateFind = <<<EOD
-    /**
-     * Allows to query a set of records that match the specified conditions
-     *
-     * @param mixed \$parameters
-     * @return %s[]
-     */
-    public static function find(\$parameters = null)
-    {
-        return parent::find(\$parameters);
-    }
-EOD;
-        return PHP_EOL.sprintf($templateFind, $className, $className).PHP_EOL;
-    }
-
-    public function getModelFindFirst($className)
-    {
-        $templateFind = <<<EOD
-    /**
-     * Allows to query the first record that match the specified conditions
-     *
-     * @param mixed \$parameters
-     * @return %s
-     */
-    public static function findFirst(\$parameters = null)
-    {
-        return parent::findFirst(\$parameters);
-    }
-EOD;
-        return PHP_EOL.sprintf($templateFind, $className, $className).PHP_EOL;
-    }
-
     /**
      * Builds a PHP syntax with all the options in the array
      *

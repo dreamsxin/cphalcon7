@@ -42,7 +42,6 @@ class Project extends Command
     {
         return [
             'name'            => 'Name of the new project',
-            'enable-webtools' => 'Determines if webtools should be enabled [optional]',
             'directory=s'     => 'Base path on which project will be created [optional]',
             'type=s'          => 'Type of the application to be generated (cli, micro, simple, modules)',
             'template-path=s' => 'Specify a template path [optional]',
@@ -66,15 +65,12 @@ class Project extends Command
         $projectPath = $this->getOption(['directory', 3]);
         $templatePath = $this->getOption(['template-path'], null, TEMPLATE_PATH);
         $templateEngine = $this->getOption(['template-engine'], null, 'php');
-        $enableWebtools = $this->getOption(['enable-webtools', 4], null, false);
-        $useConfigIni = $this->getOption('use-config-ini');
         $useConfigIni = $this->getOption('use-config-ini');
 
         $builder = new ProjectBuilder([
             'name'           => $projectName,
             'type'           => $projectType,
             'directory'      => $projectPath,
-            'enableWebTools' => $enableWebtools,
             'templatePath'   => $templatePath,
 			'templateEngine'   => $templateEngine,
             'useConfigIni'   => $useConfigIni
@@ -114,7 +110,7 @@ class Project extends Command
         print Color::colorize('  Creates a project') . PHP_EOL . PHP_EOL;
 
         print Color::head('Usage:') . PHP_EOL;
-        print Color::colorize('  project [name] [type] [directory] [enable-webtools]', Color::FG_GREEN) . PHP_EOL . PHP_EOL;
+        print Color::colorize('  project [name] [type] [directory]', Color::FG_GREEN) . PHP_EOL . PHP_EOL;
 
         print Color::head('Arguments:') . PHP_EOL;
         print Color::colorize('  help', Color::FG_GREEN);

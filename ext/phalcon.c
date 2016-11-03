@@ -450,6 +450,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_User_Module);
 	PHALCON_INIT(Phalcon_Mvc_User_Plugin);
 	PHALCON_INIT(Phalcon_Mvc_User_Component);
+	PHALCON_INIT(Phalcon_Mvc_User_Logic);
 	PHALCON_INIT(Phalcon_Mvc_View_Simple);
 	PHALCON_INIT(Phalcon_Mvc_View_Engine_Php);
 	PHALCON_INIT(Phalcon_Events_Event);

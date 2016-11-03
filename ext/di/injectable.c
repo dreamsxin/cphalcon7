@@ -121,16 +121,20 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
  */
 PHP_METHOD(Phalcon_DI_Injectable, getDI)
 {
-	zval *error = NULL, dependency_injector = {};
+	zval *error = NULL, *not_use_default = NULL, dependency_injector = {};
 
-	phalcon_fetch_params(0, 0, 1, &error);
+	phalcon_fetch_params(0, 0, 2, &error, &not_use_default);
 
 	if (!error) {
 		error = &PHALCON_GLOBAL(z_false);
 	}
 
+	if (!not_use_default) {
+		not_use_default = &PHALCON_GLOBAL(z_false);
+	}
+
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+	if (Z_TYPE(dependency_injector) != IS_OBJECT && !zend_is_true(not_use_default)) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault", &dependency_injector);
 	}
 

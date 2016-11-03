@@ -304,6 +304,7 @@
 #include "mvc/user/component.h"
 #include "mvc/user/module.h"
 #include "mvc/user/plugin.h"
+#include "mvc/user/logic.h"
 #include "mvc/view.h"
 #include "mvc/viewinterface.h"
 #include "mvc/view/engine.h"

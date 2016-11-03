@@ -26,6 +26,7 @@
 #include "events/eventsawareinterface.h"
 #include "exception.h"
 #include "filterinterface.h"
+#include "mvc/user/logic.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -58,6 +59,8 @@ PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace);
 PHP_METHOD(Phalcon_Dispatcher, setDefaultAction);
 PHP_METHOD(Phalcon_Dispatcher, setActionName);
 PHP_METHOD(Phalcon_Dispatcher, getActionName);
+PHP_METHOD(Phalcon_Dispatcher, setLogicBinding);
+PHP_METHOD(Phalcon_Dispatcher, isLogicBinding);
 PHP_METHOD(Phalcon_Dispatcher, setParams);
 PHP_METHOD(Phalcon_Dispatcher, getParams);
 PHP_METHOD(Phalcon_Dispatcher, setParam);
@@ -105,6 +108,8 @@ static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, setDefaultAction, arginfo_phalcon_dispatcherinterface_setdefaultaction, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setActionName, arginfo_phalcon_dispatcherinterface_setactionname, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getActionName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setLogicBinding, arginfo_phalcon_dispatcherinterface_setlogicbinding, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, isLogicBinding, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setParams, arginfo_phalcon_dispatcherinterface_setparams, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getParams, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setParam, arginfo_phalcon_dispatcherinterface_setparam, ZEND_ACC_PUBLIC)
@@ -140,6 +145,7 @@ PHALCON_INIT_CLASS(Phalcon_Dispatcher){
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_namespaceName"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_handlerName"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_actionName"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_dispatcher_ce, SL("_logicBinding"), 1, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_params"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_returnedValue"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_lastHandler"), ZEND_ACC_PROTECTED);
@@ -335,6 +341,35 @@ PHP_METHOD(Phalcon_Dispatcher, getActionName){
 
 
 	RETURN_MEMBER(getThis(), "_actionName");
+}
+
+/**
+ * Enable/Disable logic binding during dispatch
+ *
+ * @param boolean $value
+ */
+PHP_METHOD(Phalcon_Dispatcher, setLogicBinding){
+
+	zval *value;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	if (PHALCON_IS_TRUE(value)) {
+		phalcon_update_property_zval(getThis(), SL("_logicBinding"), &PHALCON_GLOBAL(z_true));
+	} else {
+		phalcon_update_property_zval(getThis(), SL("_logicBinding"), &PHALCON_GLOBAL(z_false));
+	}
+}
+
+/**
+ * Check if logic binding
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Dispatcher, isLogicBinding){
+
+
+	RETURN_MEMBER(getThis(), "_logicBinding");
 }
 
 /**
@@ -538,8 +573,13 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	phalcon_update_property_zval(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false));
 
 	do {
-		zval finished = {}, namespace_name = {}, handler_name = {}, action_name = {}, camelize = {}, camelized_class = {}, camelized_namespace = {}, handler_class = {};
-		zval has_service = {}, was_fresh = {}, action_method = {}, params = {}, call_object = {}, value = {}, e = {}, exception = {};
+		zval finished = {}, namespace_name = {}, handler_name = {}, action_name = {}, camelize = {}, camelized_class = {}, camelized_namespace = {};
+		zval handler_class = {}, has_service = {}, was_fresh = {}, action_method = {}, action_params = {}, params = {}, *param, logic_binding = {}, reflection_method = {};
+		zval reflection_parameters = {}, *reflection_parameter, call_object = {}, value = {}, e = {}, exception = {};
+		zend_class_entry *reflection_method_ce;
+		zend_string *param_key;
+		ulong param_idx;
+
 		/**
 		 * Loop until finished is false
 		 */
@@ -812,8 +852,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Check if the params is an array
 		 */
-		phalcon_return_property(&params, getThis(), SL("_params"));
-		if (Z_TYPE(params) != IS_ARRAY) {
+		phalcon_return_property(&action_params, getThis(), SL("_params"));
+		if (Z_TYPE(action_params) != IS_ARRAY) {
 			ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_INVALID_PARAMS);
 			ZVAL_STRING(&exception_message, "Action parameters must be an Array");
 
@@ -829,6 +869,49 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			}
 			break;
 		}
+
+		array_init(&params);
+
+		/**
+		 * Check if logic binding
+		 */
+		phalcon_return_property(&logic_binding, getThis(), SL("_logicBinding"));
+		if (zend_is_true(&logic_binding)) {
+			reflection_method_ce = phalcon_fetch_str_class(SL("ReflectionMethod"), ZEND_FETCH_CLASS_AUTO);
+			object_init_ex(&reflection_method, reflection_method_ce);
+			PHALCON_CALL_METHODW(NULL, &reflection_method, "__construct", &handler, &action_method);
+			PHALCON_CALL_METHODW(&reflection_parameters, &reflection_method, "getparameters");
+
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(reflection_parameters), param_idx, param_key, reflection_parameter) {
+				zval reflection_class = {}, logic_classname = {}, logic = {};
+				zend_class_entry *logic_ce;
+
+				PHALCON_CALL_METHODW(&reflection_class, reflection_parameter, "getclass");
+				if (Z_TYPE(reflection_class) == IS_OBJECT) {
+					PHALCON_CALL_METHODW(&logic_classname, &reflection_class, "getname");
+					if (Z_TYPE(logic_classname) == IS_STRING) {
+
+						logic_ce = phalcon_fetch_class(&logic_classname, ZEND_FETCH_CLASS_AUTO);
+						if (instanceof_function_ex(logic_ce, phalcon_mvc_user_logic_ce, 0)) {
+							PHALCON_CALL_CE_STATICW(&logic, logic_ce, "call", &action_name, &action_params);
+							if (param_key) {
+								phalcon_array_update_string(&params, param_key, &logic, PH_COPY);
+							} else {
+								phalcon_array_update_long(&params, param_idx, &logic, PH_COPY);
+							}
+						}
+					}
+				}
+			} ZEND_HASH_FOREACH_END();
+		}
+
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(action_params), param_idx, param_key, param) {
+			if (param_key) {
+				phalcon_array_update_string(&params, param_key, param, PH_COPY);
+			} else {
+				phalcon_array_update_long(&params, param_idx, param, PH_COPY);
+			}
+		} ZEND_HASH_FOREACH_END();
 
 		/**
 		 * Create a call handler

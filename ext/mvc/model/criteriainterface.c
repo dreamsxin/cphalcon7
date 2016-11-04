@@ -270,7 +270,7 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_Model_CriteriaInterface, getParams);
 /**
  * Builds a Phalcon\Mvc\Model\Criteria based on an input array like $_POST
  *
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DIInterface $dependencyInjector
  * @param string $modelName
  * @param array $data
  * @return Phalcon\Mvc\Model\CriteriaInterface

@@ -82,7 +82,7 @@ PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, getDefinition);
  * Resolves the service
  *
  * @param array $parameters
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DIInterface $dependencyInjector
  * @return object
  */
 PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, resolve);

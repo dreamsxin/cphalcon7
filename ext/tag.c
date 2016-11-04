@@ -423,7 +423,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 /**
  * Sets the dependency injector container.
  *
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DIInterface $dependencyInjector
  */
 PHP_METHOD(Phalcon_Tag, setDI){
 
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Tag, setDI){
 /**
  * Internally gets the dependency injector
  *
- * @return Phalcon\DiInterface
+ * @return Phalcon\DIInterface
  */
 PHP_METHOD(Phalcon_Tag, getDI){
 

@@ -94,7 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_Injectable){
 /**
  * Sets the dependency injector
  *
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DIInterface $dependencyInjector
  * @throw Phalcon\Di\Exception
  */
 PHP_METHOD(Phalcon_DI_Injectable, setDI){
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
 /**
  * Returns the internal dependency injector
  *
- * @return Phalcon\DiInterface
+ * @return Phalcon\DIInterface
  */
 PHP_METHOD(Phalcon_DI_Injectable, getDI)
 {

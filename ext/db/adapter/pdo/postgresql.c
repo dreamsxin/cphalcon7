@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		zval definition = {}, char_size = {}, numeric_size = {}, numeric_scale = {}, column_type = {}, attribute = {}, column_name = {}, column = {};
 
 		array_init_size(&definition, 1);
-		add_assoc_long_ex(&definition, SL("bindType"), 2);
+		add_assoc_long_ex(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
 
 		phalcon_array_fetch_long(&char_size, field, 2, PH_NOISY);
 		if (Z_TYPE_P(&char_size) != IS_NULL) {
@@ -210,31 +210,23 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			}
 
 			/**
+			 * Bigint
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("bigint"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_BIGINTEGER, 0);
+				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
+				break;
+			}
+
+			/**
 			 * Smallint/Bigint/Integers/Int are int
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("int"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
 				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
 				phalcon_array_update_str(&definition, SL("size"), &numeric_size, PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
-				break;
-			}
-
-			/**
-			 * Varchar
-			 */
-			if (phalcon_memnstr_str(&column_type, SL("varying"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
-				phalcon_array_update_str(&definition, SL("size"), &char_size, PH_COPY);
-				break;
-			}
-
-			/**
-			 * Special type for datetime
-			 */
-			if (phalcon_memnstr_str(&column_type, SL("date"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
-				phalcon_array_update_str_long(&definition, SL("size"), 0, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				break;
 			}
 
@@ -261,6 +253,50 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			}
 
 			/**
+			 * Float/Smallfloats/Decimals are float
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("float"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
+				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
+				phalcon_array_update_str(&definition, SL("size"), &numeric_size, PH_COPY);
+				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
+				break;
+			}
+
+			/**
+			 * Varchar
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("varying"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
+				phalcon_array_update_str(&definition, SL("size"), &char_size, PH_COPY);
+				break;
+			}
+
+			/**
+			 * Datetime
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("datetime"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATETIME, 0);
+				break;
+			}
+
+			/**
+			 * Timestamp
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("timestamp"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATETIME, 0);
+				break;
+			}
+
+			/**
+			 * Special type for datetime
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("date"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
+				break;
+			}
+
+			/**
 			 * Chars are chars
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("char"))) {
@@ -270,31 +306,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			}
 
 			/**
-			 * Date
-			 */
-			if (phalcon_memnstr_str(&column_type, SL("timestamp"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATETIME, 0);
-				phalcon_array_update_str_long(&definition, SL("size"), 0, 0);
-				break;
-			}
-
-			/**
 			 * Text are varchars
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("text"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
 				phalcon_array_update_str(&definition, SL("size"), &char_size, PH_COPY);
-				break;
-			}
-
-			/**
-			 * Float/Smallfloats/Decimals are float
-			 */
-			if (phalcon_memnstr_str(&column_type, SL("float"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
-				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
-				phalcon_array_update_str(&definition, SL("size"), &numeric_size, PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
 				break;
 			}
 
@@ -322,7 +338,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("json"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_JSON, 0);
-				phalcon_array_update_str(&definition, SL("size"), &char_size, PH_COPY);
+				break;
+			}
+
+			/**
+			 * JSONB
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("jsonb"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_JSONB, 0);
 				break;
 			}
 
@@ -374,7 +397,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		phalcon_array_fetch_long(&attribute, field, 7, PH_NOISY);
 		if (PHALCON_IS_STRING(&attribute, "auto_increment")) {
 			phalcon_array_update_str_bool(&definition, SL("autoIncrement"), 1, 0);
-		} else if (!PHALCON_IS_EMPTY(&attribute)) {
+		} else if (PHALCON_IS_NOT_EMPTY(&attribute)) {
 			phalcon_array_update_str(&definition, SL("default"), &attribute, PH_COPY);
 		}
 

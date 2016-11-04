@@ -24,11 +24,9 @@ use Phalcon\Loader;
 use Phalcon\Version;
 use Phalcon\Script\Color;
 use Phalcon\Commands\Builtin\Model;
-use Phalcon\Commands\Builtin\Module;
 use Phalcon\Commands\Builtin\Project;
 use Phalcon\Commands\Builtin\Scaffold;
 use Phalcon\Commands\CommandsListener;
-use Phalcon\Commands\Builtin\Webtools;
 use Phalcon\Commands\Builtin\AllModels;
 use Phalcon\Commands\Builtin\Migration;
 use Phalcon\Commands\Builtin\Enumerate;
@@ -77,13 +75,11 @@ try {
     $commandsToEnable = [
         Enumerate::class,
         Controller::class,
-        Module::class,
         Model::class,
         AllModels::class,
         Project::class,
         Scaffold::class,
         Migration::class,
-        Webtools::class,
     ];
 
     $script->loadUserScripts();

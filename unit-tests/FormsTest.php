@@ -162,7 +162,6 @@ class FormsTest extends PHPUnit_Framework_TestCase
 
 	public function testFormElementRender()
 	{
-
 		$element1 = new Text("name");
 		$element1->setAttributes(array('class' => 'big-input'));
 
@@ -176,7 +175,6 @@ class FormsTest extends PHPUnit_Framework_TestCase
 
 	public function testForm()
 	{
-
 		$form = new Form();
 
 		$form->add(new Text("name"));
@@ -563,36 +561,38 @@ class FormsTest extends PHPUnit_Framework_TestCase
 	public function testFormToArray()
 	{
 		$data = array(
-			"name" => array(
-				"name" => "name",
-				"type" => "text",
-				//"value" =>  NULL,
-				//"label" =>  NULL,
-				"attributes" => array(
-					"class" => "big-input",
+			'elements' => array(
+				"name" => array(
+					"name" => "name",
+					"type" => "text",
+					//"value" =>  NULL,
+					//"label" =>  NULL,
+					"attributes" => array(
+						"class" => "big-input",
+					),
+					//"validators" => NULL,
+					//"filters" => NULL,
+					"options" => array(
+						"some" => "value",
+					),
+					//"optionsValues" => NULL,
+					//"messages" => NULL,
 				),
-				//"validators" => NULL,
-				//"filters" => NULL,
-				"options" => array(
-					"some" => "value",
-				),
-				//"optionsValues" => NULL,
-				//"messages" => NULL,
-			),
-			"version" => array(
-				"name" => "version",
-				"type" => "select",
-				//"value" => NULL,
-				//"label" => NULL,
-				//"attributes" => NULL,
-				//"validators" => NULL,
-				//"filters" => NULL,
-				//"options" => NULL,
-				"optionsValues" => array(
-					"phalcon" => "Phalcon",
-					"phalcon7" => "Phalcon7",
-				),
-				//"messages" => NULL,
+				"version" => array(
+					"name" => "version",
+					"type" => "select",
+					//"value" => NULL,
+					//"label" => NULL,
+					//"attributes" => NULL,
+					//"validators" => NULL,
+					//"filters" => NULL,
+					//"options" => NULL,
+					"optionsValues" => array(
+						"phalcon" => "Phalcon",
+						"phalcon7" => "Phalcon7",
+					),
+					//"messages" => NULL,
+				)
 			)
 		);
 
@@ -609,7 +609,6 @@ class FormsTest extends PHPUnit_Framework_TestCase
 
 	public function testFormAllInElement()
 	{
-
 		$element1 = new \Phalcon\Forms\Element("name", array('class' => 'big-input'), NULL, NULL, "text");
 		$element2 = new \Phalcon\Forms\Element('radio', array('value' => 0), NULL, NULL, "radio");
 
@@ -618,22 +617,24 @@ class FormsTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('<input type="radio" id="radio" name="radio" value="0" />', (string)$element2);
 
 		$data = array(
-			"name" => array(
-				"name" => "name",
-				"type" => "text",
-				"attributes" => array(
-					"class" => "big-input",
+			"elements" => array(
+				"name" => array(
+					"name" => "name",
+					"type" => "text",
+					"attributes" => array(
+						"class" => "big-input",
+					),
+					"options" => array(
+						"some" => "value",
+					),
 				),
-				"options" => array(
-					"some" => "value",
-				),
-			),
-			"version" => array(
-				"name" => "version",
-				"type" => "select",
-				"optionsValues" => array(
-					"phalcon" => "Phalcon",
-					"phalcon7" => "Phalcon7",
+				"version" => array(
+					"name" => "version",
+					"type" => "select",
+					"optionsValues" => array(
+						"phalcon" => "Phalcon",
+						"phalcon7" => "Phalcon7",
+					),
 				),
 			)
 		);
@@ -645,6 +646,49 @@ class FormsTest extends PHPUnit_Framework_TestCase
 		$form->add($nameElement);
 		$form->add($versionElement);
 
+		$this->assertEquals($form->toArray(), $data);
+	}
+
+	public function testFormToString()
+	{
+		Phalcon\DI::reset();
+
+		$di = new Phalcon\DI();
+
+		$di->set('url', function(){
+			$url = new Phalcon\Mvc\Url();
+			$url->setBaseUri('/');
+			return $url;
+		});
+
+		$form = new Form(NULL, array('action' => 'file/upload', 'method' => 'POST', 'enctype' => 'multipart/form-data'));
+
+		$form->add(new Text("name"));
+		$form->add(new Text("telephone"));
+
+		$this->assertEquals(count($form), 2);
+		$this->assertEquals($form->count(), 2);
+		$this->assertEquals($form->getAction(), 'file/upload');
+		$this->assertEquals($form->getMethod(), 'POST');
+		$this->assertEquals($form->getEnctype(), 'multipart/form-data');
+
+		$this->assertEquals($form->__toString(), '<form action="/file/upload" method="POST" enctype="multipart/form-data"><input type="text" id="name" name="name" /><input type="text" id="telephone" name="telephone" /></form>');
+
+		$this->assertEquals($form->render(NULL, NULL, '<p>:label::element:</p>'), '<form action="/file/upload" method="POST" enctype="multipart/form-data"><p>name<input type="text" id="name" name="name" /></p><p>telephone<input type="text" id="telephone" name="telephone" /></p></form>');
+
+		$data = array(
+			"options" => array('action' => 'file/upload', 'method' => 'POST', 'enctype' => 'multipart/form-data'),
+			"elements" => array(
+				"name" => array(
+					"name" => "name",
+					"type" => "text",
+				),
+				"telephone" => array(
+					"name" => "telephone",
+					"type" => "text",
+				),
+			)
+		);
 		$this->assertEquals($form->toArray(), $data);
 	}
 }

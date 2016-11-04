@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		 * By default the bind types is two
 		 */
 		array_init(&definition);
-		add_assoc_long_ex(&definition, SL("bindType"), 2);
+		add_assoc_long_ex(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
 
 		/** 
 		 * By checking every column type we convert it to a Phalcon\Db\Column
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("smallint"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 16, 0);
 				break;
 			}
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("smallint"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 24, 0);
 				break;
 			}
@@ -237,9 +237,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			 * BIGINT
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("bigint"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_BIGINTEGER, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 64, 0);
 				break;
 			}
@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("decimal"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DECIMAL, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
 				if (phalcon_is_numeric(&match_one)) {
 					if (phalcon_is_numeric(&match_two) && PHALCON_GT(&match_two, &match_one)) {
 						phalcon_array_update_str_long(&definition, SL("bytes"), (Z_LVAL(match_two) + 2) * 8, 0);
@@ -334,7 +334,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("float"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
 				if (phalcon_is_numeric(&match_one) && PHALCON_GE_LONG(&match_one, 25)) {
 					phalcon_array_update_str_long(&definition, SL("bytes"), 64, 0);
 				} else {
@@ -349,8 +349,49 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("double"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DOUBLE, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 64, 0);
+				break;
+			}
+
+			/**
+			 * Boolean
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("bit"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_BOOLEAN, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_BOOL, 0);
+				break;
+			}
+
+			/**
+			 * TINYBLOB
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("tinyblob"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TINYBLOB, 0);
+				break;
+			}
+
+			/**
+			 * MEDIUMBLOB
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("mediumblob"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_MEDIUMBLOB, 0);
+				break;
+			}
+
+			/**
+			 * LONGBLOB
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("longblob"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_LONGBLOB, 0);
+				break;
+			}
+
+			/**
+			 * BLOB
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("blob"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_BLOB, 0);
 				break;
 			}
 

@@ -28,7 +28,6 @@
 #define phalcon_is_iterable(var, array_hash, hash_pointer, duplicate, reverse) \
 	if (!phalcon_is_iterable_ex(var, array_hash, hash_pointer, duplicate, reverse)) { \
 		zend_error(E_ERROR, "The argument is not iterable()"); \
-		PHALCON_MM_RESTORE(); \
 		return; \
 	}
 

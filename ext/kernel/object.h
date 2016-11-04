@@ -222,6 +222,11 @@ int phalcon_create_instance_params_ce(zval *return_value, zend_class_entry *ce, 
 int phalcon_create_instance(zval *return_value, const zval *class_name);
 int phalcon_create_instance_params(zval *return_value, const zval *class_name, zval *params);
 
+#define PHALCON_OBJECT_INIT(object, ce) \
+	if (UNEXPECTED(object_init_ex(object, ce) != SUCCESS)) {  \
+		return;  \
+	}
+
 /** Checks if property access on object */
 int phalcon_check_property_access(zval *object, const char *property_name, uint32_t property_length, int access);
 

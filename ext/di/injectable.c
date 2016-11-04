@@ -94,7 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_Injectable){
 /**
  * Sets the dependency injector
  *
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DIInterface $dependencyInjector
  * @throw Phalcon\Di\Exception
  */
 PHP_METHOD(Phalcon_DI_Injectable, setDI){
@@ -105,12 +105,11 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
 
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT && PHALCON_IS_NOT_EMPTY(dependency_injector)) {
 		PHALCON_CALL_METHODW(&di, getThis(), "getdi", dependency_injector);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &di);
 	} else {
-		PHALCON_CPY_WRT(&di, dependency_injector);
+		PHALCON_VERIFY_INTERFACE_OR_NULL_EX(dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 	}
-
-	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(&di, phalcon_diinterface_ce, phalcon_di_exception_ce, 0);
-	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 
 	RETURN_THISW();
 }
@@ -118,20 +117,24 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
 /**
  * Returns the internal dependency injector
  *
- * @return Phalcon\DiInterface
+ * @return Phalcon\DIInterface
  */
 PHP_METHOD(Phalcon_DI_Injectable, getDI)
 {
-	zval *error = NULL, dependency_injector = {};
+	zval *error = NULL, *not_use_default = NULL, dependency_injector = {};
 
-	phalcon_fetch_params(0, 0, 1, &error);
+	phalcon_fetch_params(0, 0, 2, &error, &not_use_default);
 
 	if (!error) {
 		error = &PHALCON_GLOBAL(z_false);
 	}
 
+	if (!not_use_default) {
+		not_use_default = &PHALCON_GLOBAL(z_false);
+	}
+
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+	if (Z_TYPE(dependency_injector) != IS_OBJECT && !zend_is_true(not_use_default)) {
 		PHALCON_CALL_CE_STATICW(&dependency_injector, phalcon_di_ce, "getdefault", &dependency_injector);
 	}
 

@@ -693,6 +693,15 @@ void phalcon_array_get_current(zval *return_value, zval *array){
 	RETURN_FALSE;
 }
 
+void phalcon_array_get_key(zval *return_value, zval *array){
+
+	if (Z_TYPE_P(array) == IS_ARRAY) {
+		zend_hash_get_current_key_zval(Z_ARRVAL_P(array), return_value);
+	}
+
+	RETURN_FALSE;
+}
+
 int phalcon_fast_in_array(zval *needle, zval *haystack) {
 
 	zval *tmp;

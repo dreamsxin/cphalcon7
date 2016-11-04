@@ -615,6 +615,11 @@ void phalcon_merge_append(zval *left, zval *values);
 void phalcon_array_get_current(zval *return_value, zval *array);
 
 /**
+ * Gets the current key in a zval hash
+ */
+void phalcon_array_get_key(zval *return_value, zval *array);
+
+/**
  * Fast in_array() function
  */
 int phalcon_fast_in_array(zval *needle, zval *haystack);

@@ -251,6 +251,9 @@ class DispatcherMvcTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(get_class($value), 'MyLogic');
 
 		$this->assertEquals($value->num, 2);
+		$this->assertEquals($value->param1, 2);
+		$this->assertEquals($value->param2, 3);
+
 		$this->assertEquals($value->getActionParams(), array("param1" => 2, "param2" => 3));
 		$this->assertEquals($value->getActionName(), 'index');
 		$this->assertEquals($dispatcher->getParams(), array("param1" => 2, "param2" => 3));

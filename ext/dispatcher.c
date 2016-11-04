@@ -65,6 +65,7 @@ PHP_METHOD(Phalcon_Dispatcher, setParams);
 PHP_METHOD(Phalcon_Dispatcher, getParams);
 PHP_METHOD(Phalcon_Dispatcher, setParam);
 PHP_METHOD(Phalcon_Dispatcher, getParam);
+PHP_METHOD(Phalcon_Dispatcher, getActiveHandler);
 PHP_METHOD(Phalcon_Dispatcher, getActiveMethod);
 PHP_METHOD(Phalcon_Dispatcher, isFinished);
 PHP_METHOD(Phalcon_Dispatcher, setFinished);
@@ -114,6 +115,7 @@ static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, getParams, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setParam, arginfo_phalcon_dispatcherinterface_setparam, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getParam, arginfo_phalcon_dispatcherinterface_getparam, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getActiveHandler, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getActiveMethod, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, isFinished, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setFinished, arginfo_phalcon_dispatcher_setfinished, ZEND_ACC_PUBLIC)
@@ -462,6 +464,16 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 	}
 
 	RETURN_NULL();
+}
+
+/**
+ * Returns the current handler to be/executed in the dispatcher
+ *
+ * @return Phalcon\Mvc\Controller
+ */
+PHP_METHOD(Phalcon_Dispatcher, getActiveHandler){
+
+	RETURN_MEMBER(getThis(), "_activeHandler");
 }
 
 /**
@@ -899,6 +911,9 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 							} else {
 								phalcon_array_update_long(&params, param_idx, &logic, PH_COPY);
 							}
+							if (phalcon_method_exists_ex(&logic, SL("start")) == SUCCESS) {
+								PHALCON_CALL_METHODW(NULL, &logic, "start");
+							}
 						}
 					}
 				}
@@ -950,6 +965,16 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		}
 
 		phalcon_update_property_zval(getThis(), SL("_lastHandler"), &handler);
+
+		if (zend_is_true(&logic_binding)) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(params), param) {
+				if (Z_TYPE_P(param) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(param), phalcon_mvc_user_logic_ce, 0)) {
+					if (phalcon_method_exists_ex(param, SL("finish")) == SUCCESS) {
+						PHALCON_CALL_METHODW(NULL, param, "finish");
+					}
+				}
+			} ZEND_HASH_FOREACH_END();
+		}
 
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			/**

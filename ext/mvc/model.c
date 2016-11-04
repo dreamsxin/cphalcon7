@@ -471,6 +471,7 @@ static const zend_function_entry phalcon_mvc_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model, isNewRecord, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, isDeletedRecord, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, __debugInfo, NULL, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Mvc_Model, setDbService, setConnectionService, arginfo_phalcon_mvc_modelinterface_setconnectionservice, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Mvc_Model, getRealAttributes, getAttributes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, jsonSerialize, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END

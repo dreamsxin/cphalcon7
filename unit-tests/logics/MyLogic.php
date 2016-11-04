@@ -3,6 +3,8 @@
 class MyLogic extends Phalcon\Mvc\User\Logic
 {
 	public $num = 0;
+	public $param1;
+	public $param2;
 
 	public function start()
 	{

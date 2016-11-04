@@ -529,7 +529,7 @@ int phalcon_same_name(const char *key, const char *name, uint32_t name_len)
 
 void phalcon_strtr(zval *return_value, zval *str, zval *str_from, zval *str_to) {
 
-	if (Z_TYPE_P(str) != IS_STRING|| Z_TYPE_P(str_from) != IS_STRING|| Z_TYPE_P(str_to) != IS_STRING) {
+	if (Z_TYPE_P(str) != IS_STRING || Z_TYPE_P(str_from) != IS_STRING || Z_TYPE_P(str_to) != IS_STRING) {
 		zend_error(E_WARNING, "Invalid arguments supplied for strtr()");
 		return;
 	}

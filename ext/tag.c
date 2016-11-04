@@ -377,7 +377,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 		uint size;
 	};
 
-	static const struct str_size_t order[9] = {
+	static const struct str_size_t order[11] = {
 		{ SL("type") },
 		{ SL("for") },
 		{ SL("src") },
@@ -387,6 +387,8 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 		{ SL("name") },
 		{ SL("value") },
 		{ SL("class") },
+		{ SL("method") },
+		{ SL("enctype") },
 	};
 
 	assert(Z_TYPE_P(attributes) == IS_ARRAY);
@@ -421,7 +423,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 /**
  * Sets the dependency injector container.
  *
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DIInterface $dependencyInjector
  */
 PHP_METHOD(Phalcon_Tag, setDI){
 
@@ -435,7 +437,7 @@ PHP_METHOD(Phalcon_Tag, setDI){
 /**
  * Internally gets the dependency injector
  *
- * @return Phalcon\DiInterface
+ * @return Phalcon\DIInterface
  */
 PHP_METHOD(Phalcon_Tag, getDI){
 

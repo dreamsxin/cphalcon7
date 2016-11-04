@@ -1,7 +1,20 @@
 Phalcon7 Framework
 =================
 
-Phalcon is a web framework implemented as a C extension offering high performance and lower resource consumption.
+Phalcon7 is a web framework implemented as a C extension offering high performance and lower resource consumption.
+
+Phalcon7 是什么？
+-----------------
+
+Phalcon7 是继承自 Phalcon 1.3.x，开源、全功能栈、使用 C 编写、针对 PHP 7 优化的高性能框架。
+开发者不需要学习和使用 C 语言的功能， 因为所有的功能都以 PHP 类的方式暴露出来，可以直接使用。
+Phalcon7 源自 Phalcon 所以具备了 Phalcon 所有与生俱来的特性，是松耦合的，可以根据项目的需要任意使用其他对象。
+
+Phalcon7 不只是为了卓越的性能, 我们的目标是让它更加健壮，拥有更加丰富的功能以及更加简单易于使用！
+
+Phalcon7 版权申明
+------------------
+Phalcon7 作为 Phalcon 1.3 系列的继承者，所以版权理所当然的属于 Phalcon 官方团队所有。
 
 Get Started
 -----------
@@ -34,18 +47,6 @@ cd php-src
 ./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-fpm-user=www-data --with-fpm-group=www-data --with-pdo-pgsql --with-pdo-mysql --with-pdo-sqlite  --with-iconv-dir --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --with-mcrypt --enable-ftp --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --without-pear --with-gettext --disable-fileinfo --enable-maintainer-zts --enable-phpdbg-debug --enable-debug
 make -j4
 sudo make install
-```
-
-Suse:
-
-```bash
-sudo zypper install php7-devel gcc make
-```
-
-CentOS/Fedora/RHEL
-
-```bash
-sudo yum install php-devel pcre-devel gcc make
 ```
 
 Compilation

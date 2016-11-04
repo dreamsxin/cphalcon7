@@ -276,6 +276,12 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		return; \
 	}
 
+#define PHALCON_VERIFY_CLASS_CE_EX(instance_ce, interface_ce, exception_ce) \
+	if (!instanceof_function_ex(instance_ce, interface_ce, 0)) { \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", interface_ce->name->val, instance_ce->name->val); \
+		return; \
+	}
+
 #define PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, exception_ce, restore_stack) \
 	if (Z_TYPE_P(pzv) != IS_NULL) { \
 		PHALCON_VERIFY_CLASS_EX(pzv, class_ce, exception_ce, restore_stack); \

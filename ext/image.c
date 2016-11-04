@@ -81,6 +81,11 @@ PHALCON_INIT_CLASS(Phalcon_Image){
 	return SUCCESS;
 }
 
+/**
+ * Loads an image and prepares it for manipulation
+ *
+ * @return Phalcon\Image\AdapterInterface
+ **/
 PHP_METHOD(Phalcon_Image, factory)
 {
 	zval *file, *width = NULL, *height = NULL;

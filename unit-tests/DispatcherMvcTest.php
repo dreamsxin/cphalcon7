@@ -26,6 +26,9 @@ class DispatcherMvcTest extends PHPUnit_Framework_TestCase
 		if (file_exists('unit-tests/controllers/'.$className.'.php')) {
 			require 'unit-tests/controllers/'.$className.'.php';
 		}
+		if (file_exists('unit-tests/logics/'.$className.'.php')) {
+			require 'unit-tests/logics/'.$className.'.php';
+		}
 	}
 
 	public function __construct()
@@ -224,6 +227,30 @@ class DispatcherMvcTest extends PHPUnit_Framework_TestCase
 		$dispatcher->setActionName('index');
 
 		$this->assertEquals('A\B\C\TestController', $dispatcher->getHandlerClass());
+	}
+
+	public function testBindLogic()
+	{
+		Phalcon\DI::reset();
+
+		$di = new \Phalcon\DI();
+
+		$dispatcher = new \Phalcon\Mvc\Dispatcher();
+		$dispatcher->setDI($di);
+		$dispatcher->setLogicBinding(true);
+
+		$dispatcher->setControllerName('Logic');
+		$dispatcher->setActionName('index');
+		$dispatcher->setParams(array("param1" => 2, "param2" => 3));
+		$dispatcher->dispatch();
+		$value = $dispatcher->getReturnedValue();
+		$this->assertEquals(get_class($value), 'MyLogic');
+		$this->assertEquals($value->num, 1);
+		$this->assertEquals($value->getActionParams(), array("param1" => 2, "param2" => 3));
+		$this->assertEquals($value->getActionName(), 'index');
+		$this->assertEquals($dispatcher->getParams(), array("param1" => 2, "param2" => 3));
+		$this->assertEquals($dispatcher->getParam('param1'), 2);
+		$this->assertEquals($dispatcher->getParam('param2'), 3);
 	}
 
 }

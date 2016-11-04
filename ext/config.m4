@@ -318,6 +318,8 @@ mvc/urlinterface.c \
 mvc/user/component.c \
 mvc/user/plugin.c \
 mvc/user/module.c \
+mvc/user/logic.c \
+mvc/user/logic/model.c \
 mvc/url.c \
 mvc/model.c \
 mvc/view.c \
@@ -692,7 +694,20 @@ registry.c"
 
 	AC_MSG_CHECKING([checking ImageMagick MagickWand support])
 	for i in /usr/local /usr; do
-		if test -r $i/bin/MagickWand-config; then
+		if test -r $i/include/ImageMagick/wand/MagickWand.h; then
+			WAND_CFLAGS=`pkg-config --cflags MagickWand`
+			WAND_LDFLAGS=`pkg-config --libs MagickWand`
+
+			PHP_ADD_INCLUDE($i/include/ImageMagick)
+
+			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
+			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"
+
+			AC_MSG_RESULT(yes)
+
+			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
+			break
+		elif test -r $i/bin/MagickWand-config; then
 			WAND_BINARY=$i/bin/MagickWand-config
 
 			WAND_CFLAGS=`$WAND_BINARY --cflags`

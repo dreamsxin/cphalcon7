@@ -14,25 +14,17 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_DI_INJECTIONAWAREINTERFACE_H
-#define PHALCON_DI_INJECTIONAWAREINTERFACE_H
+#ifndef PHALCON_MVC_USER_LOGIC_MODEL_H
+#define PHALCON_MVC_USER_LOGIC_MODEL_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_di_injectionawareinterface_ce;
+extern zend_class_entry *phalcon_mvc_user_logic_model_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DI_InjectionAwareInterface);
+PHALCON_INIT_CLASS(Phalcon_Mvc_User_Logic_Model);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectionawareinterface_getdi, 0, 0, 0)
-	ZEND_ARG_INFO(0, error)
-	ZEND_ARG_INFO(0, notUseDefault)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectionawareinterface_setdi, 0, 0, 1)
-	ZEND_ARG_INFO(0, dependencyInjector)
-ZEND_END_ARG_INFO()
-
-#endif /* PHALCON_DI_INJECTIONAWAREINTERFACE_H */
+#endif /* PHALCON_MVC_USER_LOGIC_MODEL_H */

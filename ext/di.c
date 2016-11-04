@@ -127,7 +127,7 @@ static const zend_function_entry phalcon_di_method_entry[] = {
 	PHP_ME(Phalcon_DI, getName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, setEventsManager, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_DI, getEventsManager, NULL, ZEND_ACC_PROTECTED)
-	/* Phalcon\DiInterface*/
+	/* Phalcon\DIInterface*/
 	PHP_ME(Phalcon_DI, set, arginfo_phalcon_diinterface_set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, remove, arginfo_phalcon_diinterface_remove, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, getRaw, arginfo_phalcon_di_getraw, ZEND_ACC_PUBLIC)
@@ -634,7 +634,7 @@ PHP_METHOD(Phalcon_DI, __call){
 /**
  * Set a default dependency injection container to be obtained into static methods
  *
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DIInterface $dependencyInjector
  */
 PHP_METHOD(Phalcon_DI, setDefault){
 
@@ -649,7 +649,7 @@ PHP_METHOD(Phalcon_DI, setDefault){
 /**
  * Return the lastest DI created
  *
- * @return Phalcon\DiInterface
+ * @return Phalcon\DIInterface
  */
 PHP_METHOD(Phalcon_DI, getDefault){
 

@@ -357,7 +357,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 	 * Check if the pattern has parantheses in order to add the regex delimiters
 	 */
 	if (phalcon_memnstr_str(&compiled_pattern, SL("("))) {
-		PHALCON_CONCAT_SVS(return_value, "#^", &compiled_pattern, "$#");
+		PHALCON_CONCAT_SVS(return_value, "#^", &compiled_pattern, "$#u");
 		return;
 	}
 
@@ -365,7 +365,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 	 * Square brackets are also checked
 	 */
 	if (phalcon_memnstr_str(&compiled_pattern, SL("["))) {
-		PHALCON_CONCAT_SVS(return_value, "#^", &compiled_pattern, "$#");
+		PHALCON_CONCAT_SVS(return_value, "#^", &compiled_pattern, "$#u");
 		return;
 	}
 

@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		zval definition = {}, column_type = {}, matches = {}, pos = {}, match_one = {}, match_two = {}, attribute = {}, column_name = {}, column = {};
 
 		array_init_size(&definition, 1);
-		add_assoc_long_ex(&definition, SL("bindType"), 2);
+		add_assoc_long_ex(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
 
 		phalcon_array_fetch_long(&column_type, field, 2, PH_NOISY);
 
@@ -273,26 +273,24 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			}
 
 			/**
-			 * Varchar are varchars
+			 * Float/Smallfloats/Decimals are float
 			 */
-			if (phalcon_memnstr_str(&column_type, SL("varchar"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
+			if (phalcon_memnstr_str(&column_type, SL("float"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
+				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 32, 0);
 				break;
 			}
 
 			/**
-			 * Date/Datetime are varchars
+			 * Double are floats
 			 */
-			if (phalcon_memnstr_str(&column_type, SL("date"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
-				break;
-			}
-
-			/**
-			 * Timestamp as date
-			 */
-			if (phalcon_memnstr_str(&column_type, SL("timestamp"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
+			if (phalcon_memnstr_str(&column_type, SL("double"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DOUBLE, 0);
+				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
+				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 64, 0);
 				break;
 			}
 
@@ -318,6 +316,30 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			}
 
 			/**
+			 * Varchar are varchars
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("varchar"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
+				break;
+			}
+
+			/**
+			 * Date/Datetime are varchars
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("date"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DATE, 0);
+				break;
+			}
+
+			/**
+			 * Timestamp as date
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("timestamp"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TIMESTAMP, 0);
+				break;
+			}
+
+			/**
 			 * Chars are chars
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("char"))) {
@@ -338,28 +360,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("text"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_TEXT, 0);
-				break;
-			}
-
-			/**
-			 * Float/Smallfloats/Decimals are float
-			 */
-			if (phalcon_memnstr_str(&column_type, SL("float"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
-				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
-				phalcon_array_update_str_long(&definition, SL("bytes"), 32, 0);
-				break;
-			}
-
-			/**
-			 * Double are floats
-			 */
-			if (phalcon_memnstr_str(&column_type, SL("double"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DOUBLE, 0);
-				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
-				phalcon_array_update_str_long(&definition, SL("bytes"), 64, 0);
 				break;
 			}
 

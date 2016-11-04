@@ -20,6 +20,7 @@
 #include "forms/form.h"
 #include "forms/elementinterface.h"
 #include "forms/exception.h"
+#include "tag.h"
 #include "di/injectable.h"
 #include "diinterface.h"
 #include "filterinterface.h"
@@ -51,10 +52,14 @@ zend_class_entry *phalcon_forms_form_ce;
 PHP_METHOD(Phalcon_Forms_Form, __construct);
 PHP_METHOD(Phalcon_Forms_Form, setAction);
 PHP_METHOD(Phalcon_Forms_Form, getAction);
-PHP_METHOD(Phalcon_Forms_Form, setUserOption);
-PHP_METHOD(Phalcon_Forms_Form, getUserOption);
-PHP_METHOD(Phalcon_Forms_Form, setUserOptions);
-PHP_METHOD(Phalcon_Forms_Form, getUserOptions);
+PHP_METHOD(Phalcon_Forms_Form, setMethod);
+PHP_METHOD(Phalcon_Forms_Form, getMethod);
+PHP_METHOD(Phalcon_Forms_Form, setEnctype);
+PHP_METHOD(Phalcon_Forms_Form, getEnctype);
+PHP_METHOD(Phalcon_Forms_Form, setOption);
+PHP_METHOD(Phalcon_Forms_Form, getOption);
+PHP_METHOD(Phalcon_Forms_Form, setOptions);
+PHP_METHOD(Phalcon_Forms_Form, getOptions);
 PHP_METHOD(Phalcon_Forms_Form, setEntity);
 PHP_METHOD(Phalcon_Forms_Form, getEntity);
 PHP_METHOD(Phalcon_Forms_Form, getElements);
@@ -82,6 +87,7 @@ PHP_METHOD(Phalcon_Forms_Form, valid);
 PHP_METHOD(Phalcon_Forms_Form, appendMessage);
 PHP_METHOD(Phalcon_Forms_Form, appendMessages);
 PHP_METHOD(Phalcon_Forms_Form, toArray);
+PHP_METHOD(Phalcon_Forms_Form, __toString);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, entity)
@@ -92,17 +98,25 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setaction, 0, 0, 1)
 	ZEND_ARG_INFO(0, action)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setuseroption, 0, 0, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setmethod, 0, 0, 1)
+	ZEND_ARG_INFO(0, method)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setenctype, 0, 0, 1)
+	ZEND_ARG_INFO(0, enctype)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setoption, 0, 0, 2)
 	ZEND_ARG_INFO(0, option)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_getuseroption, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_getoption, 0, 0, 1)
 	ZEND_ARG_INFO(0, option)
 	ZEND_ARG_INFO(0, defaultValue)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setuseroptions, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setoptions, 0, 0, 1)
 	ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO()
 
@@ -139,7 +153,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_add, 0, 0, 1)
 	ZEND_ARG_INFO(0, type)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_render, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_render, 0, 0, 0)
 	ZEND_ARG_INFO(0, name)
 	ZEND_ARG_INFO(0, attributes)
 ZEND_END_ARG_INFO()
@@ -193,10 +207,14 @@ static const zend_function_entry phalcon_forms_form_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Form, __construct, arginfo_phalcon_forms_form___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Forms_Form, setAction, arginfo_phalcon_forms_form_setaction, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, getAction, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, setUserOption, arginfo_phalcon_forms_form_setuseroption, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, getUserOption, arginfo_phalcon_forms_form_getuseroption, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, setUserOptions, arginfo_phalcon_forms_form_setuseroptions, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, getUserOptions, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, setMethod, arginfo_phalcon_forms_form_setmethod, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getMethod, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, setEnctype, arginfo_phalcon_forms_form_setenctype, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getEnctype, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, setOption, arginfo_phalcon_forms_form_setoption, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getOption, arginfo_phalcon_forms_form_getoption, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, setOptions, arginfo_phalcon_forms_form_setoptions, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getOptions, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, setEntity, arginfo_phalcon_forms_form_setentity, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, getEntity, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, getElements, NULL, ZEND_ACC_PUBLIC)
@@ -224,6 +242,7 @@ static const zend_function_entry phalcon_forms_form_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Form, appendMessage, arginfo_phalcon_forms_form_appendmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, appendMessages, arginfo_phalcon_forms_form_appendmessages, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, toArray, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, __toString, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -241,7 +260,6 @@ PHALCON_INIT_CLASS(Phalcon_Forms_Form){
 	zend_declare_property_null(phalcon_forms_form_ce, SL("_filterData"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_forms_form_ce, SL("_elements"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_forms_form_ce, SL("_messages"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_forms_form_ce, SL("_action"), ZEND_ACC_PROTECTED);
 
 	zend_declare_class_constant_long(phalcon_forms_form_ce, SL("VALUES_RAW"), PHALCON_FROM_VALUES_RAW);
 	zend_declare_class_constant_long(phalcon_forms_form_ce, SL("VALUES_AS_ARRAY"), PHALCON_FROM_VALUES_AS_ARRAY);
@@ -259,16 +277,16 @@ PHALCON_INIT_CLASS(Phalcon_Forms_Form){
  */
 PHP_METHOD(Phalcon_Forms_Form, __construct){
 
-	zval *entity = NULL, *user_options = NULL;
+	zval *entity = NULL, *options = NULL;
 
-	phalcon_fetch_params(0, 0, 2, &entity, &user_options);
+	phalcon_fetch_params(0, 0, 2, &entity, &options);
 
 	if (!entity) {
 		entity = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!user_options) {
-		user_options = &PHALCON_GLOBAL(z_null);
+	if (!options) {
+		options = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (Z_TYPE_P(entity) != IS_NULL) {
@@ -283,15 +301,15 @@ PHP_METHOD(Phalcon_Forms_Form, __construct){
 	/**
 	 * Update the user options
 	 */
-	if (Z_TYPE_P(user_options) == IS_ARRAY) {
-		phalcon_update_property_zval(getThis(), SL("_options"), user_options);
+	if (Z_TYPE_P(options) == IS_ARRAY) {
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
 
 	/**
 	 * Check for an 'initialize' method and call it
 	 */
 	if (phalcon_method_exists_ex(getThis(), SL("initialize")) == SUCCESS) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "initialize", entity, user_options);
+		PHALCON_CALL_METHODW(NULL, getThis(), "initialize", entity, options);
 	}
 }
 
@@ -303,11 +321,13 @@ PHP_METHOD(Phalcon_Forms_Form, __construct){
  */
 PHP_METHOD(Phalcon_Forms_Form, setAction){
 
-	zval *action;
+	zval *action, option = {};
 
 	phalcon_fetch_params(0, 1, 0, &action);
 
-	phalcon_update_property_zval(getThis(), SL("_action"), action);
+	ZVAL_STRING(&option, "action");
+	phalcon_update_property_array(getThis(), SL("_options"), &option, action);
+
 	RETURN_THISW();
 }
 
@@ -318,8 +338,87 @@ PHP_METHOD(Phalcon_Forms_Form, setAction){
  */
 PHP_METHOD(Phalcon_Forms_Form, getAction){
 
+	zval options = {}, option = {};
 
-	RETURN_MEMBER(getThis(), "_action");
+	ZVAL_STRING(&option, "action");
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	if (phalcon_array_isset_fetch(return_value, &options, &option, 0)) {
+		return;
+	}
+
+	RETURN_NULL();
+}
+
+/**
+ * Sets the form's method
+ *
+ * @param string $action
+ * @return Phalcon\Forms\Form
+ */
+PHP_METHOD(Phalcon_Forms_Form, setMethod){
+
+	zval *method, option = {};
+
+	phalcon_fetch_params(0, 1, 0, &method);
+
+	ZVAL_STRING(&option, "method");
+	phalcon_update_property_array(getThis(), SL("_options"), &option, method);
+
+	RETURN_THISW();
+}
+
+/**
+ * Returns the form's method
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Forms_Form, getMethod){
+
+	zval options = {}, option = {};
+
+	ZVAL_STRING(&option, "method");
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	if (phalcon_array_isset_fetch(return_value, &options, &option, 0)) {
+		return;
+	}
+
+	RETURN_NULL();
+}
+
+/**
+ * Sets the form's enctype
+ *
+ * @param string $action
+ * @return Phalcon\Forms\Form
+ */
+PHP_METHOD(Phalcon_Forms_Form, setEnctype){
+
+	zval *enctype, option = {};
+
+	phalcon_fetch_params(0, 1, 0, &enctype);
+
+	ZVAL_STRING(&option, "enctype");
+	phalcon_update_property_array(getThis(), SL("_options"), &option, enctype);
+
+	RETURN_THISW();
+}
+
+/**
+ * Returns the form's enctype
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Forms_Form, getEnctype){
+
+	zval options = {}, option = {};
+
+	ZVAL_STRING(&option, "enctype");
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	if (phalcon_array_isset_fetch(return_value, &options, &option, 0)) {
+		return;
+	}
+
+	RETURN_NULL();
 }
 
 /**
@@ -329,7 +428,7 @@ PHP_METHOD(Phalcon_Forms_Form, getAction){
  * @param mixed $value
  * @return Phalcon\Forms\Form
  */
-PHP_METHOD(Phalcon_Forms_Form, setUserOption){
+PHP_METHOD(Phalcon_Forms_Form, setOption){
 
 	zval *option, *value;
 
@@ -346,7 +445,7 @@ PHP_METHOD(Phalcon_Forms_Form, setUserOption){
  * @param mixed $defaultValue
  * @return mixed
  */
-PHP_METHOD(Phalcon_Forms_Form, getUserOption){
+PHP_METHOD(Phalcon_Forms_Form, getOption){
 
 	zval *option, *default_value = NULL, options = {}, value = {};
 
@@ -370,7 +469,7 @@ PHP_METHOD(Phalcon_Forms_Form, getUserOption){
  * @param array $options
  * @return Phalcon\Forms\ElementInterface
  */
-PHP_METHOD(Phalcon_Forms_Form, setUserOptions){
+PHP_METHOD(Phalcon_Forms_Form, setOptions){
 
 	zval *options;
 
@@ -390,7 +489,7 @@ PHP_METHOD(Phalcon_Forms_Form, setUserOptions){
  *
  * @return array
  */
-PHP_METHOD(Phalcon_Forms_Form, getUserOptions){
+PHP_METHOD(Phalcon_Forms_Form, getOptions){
 
 
 	RETURN_MEMBER(getThis(), "_options");
@@ -824,27 +923,74 @@ PHP_METHOD(Phalcon_Forms_Form, add){
  *
  * @param string $name
  * @param array $attributes
+ * @param string $template
  * @return string
  */
 PHP_METHOD(Phalcon_Forms_Form, render){
 
-	zval *name, *attributes = NULL, elements = {}, element = {};
+	zval *name = NULL, *attributes = NULL, *template = NULL, elements = {}, element = {}, label ={}, element_str = {};
+	zval replace_pairs = {}, options = {}, *el;
 
-	phalcon_fetch_params(0, 1, 1, &name, &attributes);
-
-	PHALCON_ENSURE_IS_STRING(name);
+	phalcon_fetch_params(0, 0, 3, &name, &attributes, &template);
 
 	if (!attributes) {
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
-	if (!phalcon_array_isset_fetch(&element, &elements, name, 0)) {
-		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(name));
-		return;
+	if (!template) {
+		template = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHODW(&element, "render", attributes);
+	if (name && PHALCON_IS_NOT_EMPTY(name)) {
+		PHALCON_ENSURE_IS_STRING(name);
+
+		phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
+		if (!phalcon_array_isset_fetch(&element, &elements, name, 0)) {
+			zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(name));
+			return;
+		}
+
+		if (PHALCON_IS_NOT_EMPTY(template)) {
+			PHALCON_CALL_METHODW(&label, getThis(), "getlabel", name);
+			PHALCON_CALL_METHODW(&element_str, &element, "render", attributes);
+
+			array_init_size(&replace_pairs, 2);
+			phalcon_array_update_str(&replace_pairs, SL(":label:"), &label, PH_COPY);
+			phalcon_array_update_str(&replace_pairs, SL(":element:"), &element_str, PH_COPY);
+
+			phalcon_strtr_array(return_value, template, &replace_pairs);
+		} else {
+			PHALCON_RETURN_CALL_METHODW(&element, "render", attributes);
+		}
+	} else {
+		phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+
+		PHALCON_CALL_CE_STATICW(return_value, phalcon_tag_ce, "form", &options);
+
+		phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
+
+		if (Z_TYPE(elements) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(elements), el) {
+				zval str = {}, el_name = {}, el_label = {}, el_replace_pairs = {}, tmp = {};
+
+				PHALCON_CALL_METHODW(&str, el, "render", attributes);
+				if (PHALCON_IS_NOT_EMPTY(template)) {
+					PHALCON_CALL_METHODW(&el_name, el, "getname");
+					PHALCON_CALL_METHODW(&el_label, getThis(), "getlabel", &el_name);
+					array_init_size(&el_replace_pairs, 2);
+					phalcon_array_update_str(&el_replace_pairs, SL(":label:"), &el_label, PH_COPY);
+					phalcon_array_update_str(&el_replace_pairs, SL(":element:"), &str, PH_COPY);
+
+					phalcon_strtr_array(&tmp, template, &el_replace_pairs);
+					phalcon_concat_self(return_value, &tmp);
+				} else {
+					phalcon_concat_self(return_value, &str);
+				}
+			} ZEND_HASH_FOREACH_END();
+		}
+
+		phalcon_concat_self_str(return_value, SL("</form>"));
+	}
 }
 
 /**
@@ -1265,11 +1411,18 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
  */
 PHP_METHOD(Phalcon_Forms_Form, toArray){
 
-	zval elements = {}, *element;
-
-	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
+	zval options = {}, index = {}, elements = {}, *element;
 
 	array_init(return_value);
+
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	if (!PHALCON_IS_EMPTY(&options)) {
+		phalcon_array_update_str(return_value, SL("options"), &options, PH_COPY);
+	}
+
+	ZVAL_STRING(&index, "elements");
+
+	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
 
 	if (Z_TYPE(elements) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(elements), element) {
@@ -1278,7 +1431,17 @@ PHP_METHOD(Phalcon_Forms_Form, toArray){
 			PHALCON_CALL_METHODW(&name, element, "getname");
 			PHALCON_CALL_METHODW(&value, element, "toarray");
 
-			phalcon_array_update_zval(return_value, &name, &value, PH_COPY);
+			phalcon_array_update_multi_2(return_value, &index, &name, &value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	}
+}
+
+/**
+ * Renders the form html
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Forms_Form, __toString){
+
+	PHALCON_CALL_METHODW(return_value, getThis(), "render");
 }

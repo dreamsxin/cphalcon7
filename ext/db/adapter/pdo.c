@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	 */
 	ce = phalcon_fetch_str_class(SL("PDO"), ZEND_FETCH_CLASS_AUTO);
 
-	object_init_ex(&pdo, ce);
+	PHALCON_OBJECT_INIT(&pdo, ce);
 	PHALCON_CALL_METHODW(NULL, &pdo, "__construct", &dsn, &username, &password, &options);
 
 	phalcon_update_property_zval(getThis(), SL("_pdo"), &pdo);

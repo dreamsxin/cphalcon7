@@ -203,7 +203,7 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Arr){
 
-	PHALCON_REGISTER_CLASS(Phalcon, Arr, arr, phalcon_arr_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+	PHALCON_REGISTER_CLASS(Phalcon, Arr, arr, phalcon_arr_method_entry, 0);
 
 	// zend_declare_class_constant_stringl(phalcon_arr_ce, SL("delimiter"), SL("."));
 	zend_declare_property_string(phalcon_arr_ce, SL("delimiter"), ".", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);

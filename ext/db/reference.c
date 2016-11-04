@@ -54,6 +54,8 @@ PHP_METHOD(Phalcon_Db_Reference, getReferencedSchema);
 PHP_METHOD(Phalcon_Db_Reference, getColumns);
 PHP_METHOD(Phalcon_Db_Reference, getReferencedTable);
 PHP_METHOD(Phalcon_Db_Reference, getReferencedColumns);
+PHP_METHOD(Phalcon_Db_Reference, getOnDelete);
+PHP_METHOD(Phalcon_Db_Reference, getOnUpdate);
 PHP_METHOD(Phalcon_Db_Reference, __set_state);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_reference___construct, 0, 0, 2)
@@ -69,6 +71,8 @@ static const zend_function_entry phalcon_db_reference_method_entry[] = {
 	PHP_ME(Phalcon_Db_Reference, getColumns, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Reference, getReferencedTable, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Reference, getReferencedColumns, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Reference, getOnDelete, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Reference, getOnUpdate, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Reference, __set_state, arginfo___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
@@ -86,6 +90,8 @@ PHALCON_INIT_CLASS(Phalcon_Db_Reference){
 	zend_declare_property_null(phalcon_db_reference_ce, SL("_referencedTable"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_reference_ce, SL("_columns"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_reference_ce, SL("_referencedColumns"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_reference_ce, SL("_onDelete"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_reference_ce, SL("_onUpdate"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_db_reference_ce, 1, phalcon_db_referenceinterface_ce);
 
@@ -100,7 +106,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Reference){
  */
 PHP_METHOD(Phalcon_Db_Reference, __construct){
 
-	zval *reference_name, *definition, referenced_table = {}, columns = {}, referenced_columns = {}, schema = {}, referenced_schema = {};
+	zval *reference_name, *definition, referenced_table = {}, columns = {}, referenced_columns = {}, schema = {}, referenced_schema = {}, on_delete = {}, on_update = {};
 	long int number_columns, number_referenced_columns;
 
 	phalcon_fetch_params(0, 2, 0, &reference_name, &definition);
@@ -142,6 +148,14 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 	if (number_columns != number_referenced_columns) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Number of columns is not equal to the number of referenced columns");
 		return;
+	}
+	
+	if (phalcon_array_isset_fetch_str(&on_delete, definition, SL("onDelete"))) {
+		phalcon_update_property_zval(getThis(), SL("_onDelete"), &on_delete);
+	}
+	
+	if (phalcon_array_isset_fetch_str(&on_update, definition, SL("onUpdate"))) {
+		phalcon_update_property_zval(getThis(), SL("_onUpdate"), &on_update);
 	}
 }
 
@@ -209,6 +223,28 @@ PHP_METHOD(Phalcon_Db_Reference, getReferencedColumns){
 
 
 	RETURN_MEMBER(getThis(), "_referencedColumns");
+}
+
+/**
+ * Gets the referenced on delete
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Reference, getOnDelete){
+
+
+	RETURN_MEMBER(getThis(), "_onDelete");
+}
+
+/**
+ * Gets the referenced on update
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Reference, getOnUpdate){
+
+
+	RETURN_MEMBER(getThis(), "_onUpdate");
 }
 
 /**

@@ -26,24 +26,10 @@
 void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr);
 void phalcon_deinitialize_memory();
 
-void ZEND_FASTCALL phalcon_memory_observe(zval **var, const char *func) /* PHALCON_ATTR_NONNULL */;
-void ZEND_FASTCALL phalcon_memory_alloc(zval **var, const char *func);
-
-#define PHALCON_MEMORY_ALLOC(z) phalcon_memory_alloc((z), __func__)
-#define PHALCON_MEMORY_OBSERVE(z) phalcon_memory_observe((z), __func__)
-
-void ZEND_FASTCALL phalcon_memory_grow_stack(const char *func);
-int ZEND_FASTCALL phalcon_memory_restore_stack(const char *func);
-
-#define PHALCON_MM_GROW()       phalcon_memory_grow_stack(__func__)
-#define PHALCON_MM_RESTORE()    phalcon_memory_restore_stack(__func__)
-
 int phalcon_set_symbol(zend_array *symbol_table, zval *key_name, zval *value);
 int phalcon_set_symbol_str(zend_array *symbol_table, char *key_name, unsigned int key_length, zval *value);
 int phalcon_del_symbol(zend_array *symbol_table, zval *key_name);
 int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned int key_length);
-
-int ZEND_FASTCALL phalcon_clean_restore_stack();
 
 #define PHALCON_PTR_DTOR(z) zval_ptr_dtor(z);
 #define PHALCON_DTOR(z) zval_dtor(z);

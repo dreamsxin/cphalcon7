@@ -14,25 +14,35 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_DI_INJECTIONAWAREINTERFACE_H
-#define PHALCON_DI_INJECTIONAWAREINTERFACE_H
+#ifndef PHALCON_EVENTS_EVENTINTERFACE_H
+#define PHALCON_EVENTS_EVENTINTERFACE_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_di_injectionawareinterface_ce;
+extern zend_class_entry *phalcon_events_eventinterface_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DI_InjectionAwareInterface);
+PHALCON_INIT_CLASS(Phalcon_Events_EventInterface);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectionawareinterface_getdi, 0, 0, 0)
-	ZEND_ARG_INFO(0, error)
-	ZEND_ARG_INFO(0, notUseDefault)
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_events_eventinterface_settype, 0, 0, 1)
+	ZEND_ARG_INFO(0, eventType)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectionawareinterface_setdi, 0, 0, 1)
-	ZEND_ARG_INFO(0, dependencyInjector)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_events_eventinterface_setsource, 0, 0, 1)
+	ZEND_ARG_INFO(0, source)
 ZEND_END_ARG_INFO()
 
-#endif /* PHALCON_DI_INJECTIONAWAREINTERFACE_H */
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_events_eventinterface_setdata, 0, 0, 1)
+	ZEND_ARG_INFO(0, data)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_events_eventinterface_setcancelable, 0, 0, 1)
+	ZEND_ARG_INFO(0, cancelable)
+ZEND_END_ARG_INFO()
+
+#endif /* PHALCON_EVENTS_EVENTINTERFACE_H */

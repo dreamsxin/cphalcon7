@@ -209,9 +209,9 @@ class Scaffold extends Component
         $this->options->offsetSet('primaryKeys', $primaryKeys);
         $this->options->offsetSet('identityField', $identityField);
         $this->options->offsetSet('relationField', $relationField);
-        $this->options->offsetSet('selectDefinition', $selectDefinition);
-        $this->options->offsetSet('autocompleteFields', []);
-        $this->options->offsetSet('belongsToDefinitions', []);
+        $this->options->offsetSet('selectDefinition', new \Phalcon\Config($selectDefinition));
+        $this->options->offsetSet('autocompleteFields', new \Phalcon\Config());
+        $this->options->offsetSet('belongsToDefinitions', new \Phalcon\Config());
 
         // Build Controller
         $this->_makeController();

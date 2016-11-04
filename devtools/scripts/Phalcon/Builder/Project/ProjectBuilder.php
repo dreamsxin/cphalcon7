@@ -109,7 +109,7 @@ class ProjectBuilder extends Component
      *
      * @return $this
      */
-    protected function generateFile($getFile, $putFile, $name = '')
+    protected function generateFile($getFile, $putFile, $name = '', $adapter = 'Mysql', $username = 'root', $password = '', $dbname = '')
     {
 		if (false == file_exists($getFile)) {
 			if ($this->isConsole()) {
@@ -132,7 +132,20 @@ class ProjectBuilder extends Component
 
                 $str = preg_replace('/@@name@@/', $name, $str);
                 $str = preg_replace('/@@namespace@@/', $namespace, $str);
-            }
+
+				if (empty($dbname)) {
+					$dbname = $name;
+				}
+            } else if (empty($dbname)) {
+				$dbname = 'test';
+			}
+
+            $str = preg_replace(array(
+				'/@@adapter@@/',
+				'/@@username@@/',
+				'/@@password@@/',
+				'/@@dbname@@/'
+			), array($adapter, $username, $password, $dbname), $str);
 
             if (sizeof($this->variableValues) > 0) {
                 foreach ($this->variableValues as $variableValueKey => $variableValue) {

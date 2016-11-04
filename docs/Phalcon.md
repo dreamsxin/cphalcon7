@@ -1,4 +1,4 @@
-# Phalcon beginner's handbook
+# Phalcon7 beginner's handbook
 
 *Author: Dreamsxin*
 

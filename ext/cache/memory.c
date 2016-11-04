@@ -41,7 +41,7 @@
 /**
  * Phalcon\Cache\Memory
  *
- * This class implements common functionality for memory adapters. A memory cache adapter may extend this class
+ * It can be used to replace APC or local memcached.
  */
 zend_class_entry *phalcon_cache_memory_ce;
 

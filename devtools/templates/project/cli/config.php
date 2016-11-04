@@ -2,11 +2,11 @@
 
 return new \Phalcon\Config([
     'database' => [
-      'adapter'     => 'Mysql',
+      'adapter'     => '@@adapter@@',
       'host'        => 'localhost',
-      'username'    => 'root',
-      'password'    => '',
-      'dbname'      => '@@name@@',
+      'username'    => '@@username@@',
+      'password'    => '@@password@@',
+      'dbname'      => '@@dbname@@',
       'charset'     => 'utf8',
     ],
     'version' => '1.0',

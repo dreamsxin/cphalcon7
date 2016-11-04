@@ -282,9 +282,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 
 		ce0 = phalcon_fetch_class(&model, ZEND_FETCH_CLASS_DEFAULT);
 
-		object_init_ex(&model_instance, ce0);
+		PHALCON_OBJECT_INIT(&model_instance, ce0);
 		if (phalcon_has_constructor(&model_instance)) {
-			PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &dependency_injector);
+			PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &PHALCON_GLOBAL(z_null), &dependency_injector);
 		}
 
 		PHALCON_CALL_METHODW(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);

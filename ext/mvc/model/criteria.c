@@ -21,8 +21,10 @@
 #include "mvc/model/criteria.h"
 #include "mvc/model/criteriainterface.h"
 #include "mvc/model/metadatainterface.h"
+#include "mvc/modelinterface.h"
 #include "mvc/model/exception.h"
 #include "mvc/model/query.h"
+#include "db/column.h"
 #include "di.h"
 #include "diinterface.h"
 #include "di/injectable.h"
@@ -228,6 +230,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Criteria) {
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, setModelName) {
 
 	zval *model_name;
+	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 0, &model_name);
 
@@ -235,6 +238,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, setModelName) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Model name must be string");
 		return;
 	}
+
+	ce0 = phalcon_fetch_class(model_name, ZEND_FETCH_CLASS_DEFAULT);
+	PHALCON_VERIFY_INTERFACE_CE_EX(ce0, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce);
+
 	phalcon_update_property_zval(getThis(), SL("_model"), model_name);
 
 	RETURN_THISW();
@@ -1217,7 +1224,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, getParams) {
 /**
  * Builds a Phalcon\Mvc\Model\Criteria based on an input array like $_POST
  *
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DIInterface $dependencyInjector
  * @param string $modelName
  * @param array $data
  * @return Phalcon\Mvc\Model\Criteria
@@ -1251,7 +1258,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 		PHALCON_VERIFY_INTERFACEW(&meta_data, phalcon_mvc_model_metadatainterface_ce);
 		ce0 = phalcon_fetch_class(model_name, ZEND_FETCH_CLASS_DEFAULT);
 
-		object_init_ex(&model, ce0);
+		PHALCON_OBJECT_INIT(&model, ce0);
 		if (phalcon_has_constructor(&model)) {
 			PHALCON_CALL_METHODW(NULL, &model, "__construct");
 		}
@@ -1282,7 +1289,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 
 			if (phalcon_array_isset_fetch(&type, &data_types, &real_field, 0)) {
 				if (Z_TYPE_P(value) != IS_NULL && !PHALCON_IS_STRING(value, "")) {
-					if (PHALCON_IS_LONG(&type, 2)) {
+					if (PHALCON_IS_LONG(&type, PHALCON_DB_COLUMN_TYPE_VARCHAR)) {
 						/**
 						 * For varchar types we use LIKE operator
 						 */
@@ -1561,7 +1568,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
 		object_init_ex(&model_instance, ce0);
 		if (phalcon_has_constructor(&model_instance)) {
-			PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &dependency_injector);
+			PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &PHALCON_GLOBAL(z_null), &dependency_injector);
 		}
 
 		ZVAL_TRUE(&no_primary);
@@ -1853,7 +1860,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 
 	object_init_ex(&model_instance, ce0);
 	if (phalcon_has_constructor(&model_instance)) {
-		PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &dependency_injector);
+		PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &PHALCON_GLOBAL(z_null), &dependency_injector);
 	}
 
 	PHALCON_CALL_METHODW(&connection, &model_instance, "getreadconnection");
@@ -1997,7 +2004,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 
 		object_init_ex(&model_instance, ce0);
 		if (phalcon_has_constructor(&model_instance)) {
-			PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &dependency_injector);
+			PHALCON_CALL_METHODW(NULL, &model_instance, "__construct", &PHALCON_GLOBAL(z_null), &dependency_injector);
 		}
 
 		ZVAL_TRUE(&no_primary);

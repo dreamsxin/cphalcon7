@@ -46,10 +46,10 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 				3 => 'year',
 			),
 			4 => array(
-				'id' => 0,
-				'name' => 2,
-				'type' => 2,
-				'year' => 0,
+				'id' => Phalcon\Db\Column::TYPE_INTEGER,
+				'name' => Phalcon\Db\Column::TYPE_VARCHAR,
+				'type' => Phalcon\Db\Column::TYPE_VARCHAR,
+				'year' => Phalcon\Db\Column::TYPE_INTEGER,
 			),
 			5 => array(
 				'id' => true,

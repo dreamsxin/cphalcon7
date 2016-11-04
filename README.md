@@ -1,7 +1,20 @@
 Phalcon7 Framework
 =================
 
-Phalcon is a web framework implemented as a C extension offering high performance and lower resource consumption.
+Phalcon7 is a web framework implemented as a C extension offering high performance and lower resource consumption.
+
+Phalcon7 是什么？
+-----------------
+
+Phalcon7 是继承自 Phalcon 1.3.x，开源、全功能栈、使用 C 编写、针对 PHP 7 优化的高性能框架。
+开发者不需要学习和使用 C 语言的功能， 因为所有的功能都以 PHP 类的方式暴露出来，可以直接使用。
+Phalcon7 源自 Phalcon 所以具备了 Phalcon 所有与生俱来的特性，是松耦合的，可以根据项目的需要任意使用其他对象。
+
+Phalcon7 不只是为了卓越的性能, 我们的目标是让它更加健壮，拥有更加丰富的功能以及更加简单易于使用！
+
+Phalcon7 版权申明
+------------------
+Phalcon7 作为 Phalcon 1.3 系列的继承者，所以版权理所当然的属于 Phalcon 官方团队所有。
 
 Get Started
 -----------
@@ -36,18 +49,6 @@ make -j4
 sudo make install
 ```
 
-Suse:
-
-```bash
-sudo zypper install php7-devel gcc make
-```
-
-CentOS/Fedora/RHEL
-
-```bash
-sudo yum install php-devel pcre-devel gcc make
-```
-
 Compilation
 -----------
 
@@ -62,6 +63,8 @@ sudo make install
 # or
 /usr/local/php/bin/phpize
 ./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized" --with-php-config=/usr/local/php/bin/php-config
+# or
+./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized" --with-php-config=/usr/local/php/bin/php-config --without-qrcode
 ```
 
 Add the extension to your php.ini:

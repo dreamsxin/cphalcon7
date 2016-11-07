@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 /**
  * Adds a validator to a field
  *
- * @param string $attribute
+ * @param string|array $attribute
  * @param Phalcon\Validation\ValidatorInterface
  * @return Phalcon\Validation
  */
@@ -636,7 +636,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
 /**
  * Get label for field
  *
- * @param string field
+ * @param string|array field
  * @return mixed
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {

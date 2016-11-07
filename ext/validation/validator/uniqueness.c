@@ -50,6 +50,11 @@
  *   'model' => new Users(),
  *   'message' => ':field must be unique'
  *)));
+ *
+ *$validator->add(array('user_id', 'created'), new UniquenessValidator(array(
+ *   'model' => new Users(),
+ *   'message' => ':field must be unique'
+ *)));
  *</code>
  */
 zend_class_entry *phalcon_validation_validator_uniqueness_ce;

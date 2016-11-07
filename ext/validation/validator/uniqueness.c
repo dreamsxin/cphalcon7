@@ -179,7 +179,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
-				PHALCON_CPY_WRT_CTOR(&label, attribute);
+				if (Z_TYPE_P(attribute) == IS_ARRAY) {
+					phalcon_fast_join_str(&label, SL(", "), attribute);
+				} else {
+					PHALCON_CPY_WRT_CTOR(&label, attribute);
+				}
 			}
 		}
 

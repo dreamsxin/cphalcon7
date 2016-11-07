@@ -636,7 +636,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
 /**
  * Get label for field
  *
- * @param string field
+ * @param string|array field
  * @return mixed
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {

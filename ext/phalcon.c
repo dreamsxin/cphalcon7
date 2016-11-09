@@ -469,6 +469,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Async);
 	PHALCON_INIT(Phalcon_Binary);
 	PHALCON_INIT(Phalcon_Binary_Reader);
+	PHALCON_INIT(Phalcon_Binary_Writer);
 
 	return SUCCESS;
 }

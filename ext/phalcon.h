@@ -362,6 +362,7 @@
 #include "binary.h"
 #include "binary/exception.h"
 #include "binary/reader.h"
+#include "binary/writer.h"
 
 #include "validationinterface.h"
 #include "validation.h"

@@ -66,6 +66,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readString);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, data)
+	ZEND_ARG_INFO(0, endian)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_setposition, 0, 0, 1)
@@ -153,6 +154,7 @@ PHP_METHOD(Phalcon_Binary_Reader, __construct){
 			phalcon_update_property_zval(getThis(), SL("_eofPosition"), &size);
 		}
 
+		PHALCON_CALL_FUNCTIONW(NULL, "rewind", data);
 		PHALCON_CALL_FUNCTIONW(&content, "fread", data, &size);
 		PHALCON_CALL_FUNCTIONW(NULL, "rewind", data);
 		phalcon_update_property_zval(getThis(), SL("_data"), &content);
@@ -452,7 +454,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readDouble){
 	ZVAL_LONG(&length, sizeof(double));
 	PHALCON_CALL_METHODW(&bytes, getThis(), "read", &length);
 
-	ZVAL_STRING(&format, "f");
+	ZVAL_STRING(&format, "d");
 
 	PHALCON_CALL_FUNCTIONW(&result, "unpack", &format, &bytes);
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {

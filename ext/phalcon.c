@@ -467,6 +467,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Chart_QRcode);
 	PHALCON_INIT(Phalcon_Chart_Captcha);
 	PHALCON_INIT(Phalcon_Async);
+	PHALCON_INIT(Phalcon_Binary);
 	PHALCON_INIT(Phalcon_Binary_Reader);
 
 	return SUCCESS;

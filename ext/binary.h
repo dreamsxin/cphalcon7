@@ -18,13 +18,17 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_BINARY_READER_H
-#define PHALCON_BINARY_READER_H
+#ifndef PHALCON_BINARY_H
+#define PHALCON_BINARY_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_binary_reader_ce;
+#define PHALCON_BINARY_ENDIAN_MACHINE		0
+#define PHALCON_BINARY_ENDIAN_BIG			1
+#define PHALCON_BINARY_ENDIAN_LITTLE		2
 
-PHALCON_INIT_CLASS(Phalcon_Binary_Reader);
+extern zend_class_entry *phalcon_binary_ce;
 
-#endif /* PHALCON_BINARY_READER_H */
+PHALCON_INIT_CLASS(Phalcon_Binary);
+
+#endif /* PHALCON_BINARY_H */

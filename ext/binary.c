@@ -18,13 +18,43 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_BINARY_READER_H
-#define PHALCON_BINARY_READER_H
+#include "binary.h"
+#include "di.h"
+#include "filterinterface.h"
 
-#include "php_phalcon.h"
+#include <ext/standard/php_array.h>
+#include <ext/spl/spl_array.h>
 
-extern zend_class_entry *phalcon_binary_reader_ce;
+#include <Zend/zend_closures.h>
 
-PHALCON_INIT_CLASS(Phalcon_Binary_Reader);
+#include "kernel/main.h"
+#include "kernel/memory.h"
+#include "kernel/fcall.h"
+#include "kernel/string.h"
+#include "kernel/array.h"
+#include "kernel/operators.h"
+#include "kernel/concat.h"
+#include "kernel/object.h"
+#include "kernel/exception.h"
 
-#endif /* PHALCON_BINARY_READER_H */
+#include "interned-strings.h"
+
+/**
+ * Phalcon\Binary
+ *
+ * Provides utilities to work with binary data
+ */
+zend_class_entry *phalcon_binary_ce;
+
+/**
+ * Phalcon\Binary initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Binary){
+
+	PHALCON_REGISTER_CLASS(Phalcon, Binary, binary, NULL, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+
+	zend_declare_class_constant_long(phalcon_binary_ce, SL("ENDIAN_MACHINE"), PHALCON_BINARY_ENDIAN_MACHINE);
+	zend_declare_class_constant_long(phalcon_binary_ce, SL("ENDIAN_BIG"), PHALCON_BINARY_ENDIAN_BIG);
+	zend_declare_class_constant_long(phalcon_binary_ce, SL("ENDIAN_LITTLE"), PHALCON_BINARY_ENDIAN_LITTLE);
+	return SUCCESS;
+}

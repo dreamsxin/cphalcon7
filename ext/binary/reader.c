@@ -19,14 +19,11 @@
 */
 
 #include "binary/reader.h"
+#include "binary.h"
 #include "binary/exception.h"
-#include "di.h"
-#include "filterinterface.h"
 
 #include <ext/standard/php_array.h>
 #include <ext/spl/spl_array.h>
-
-#include <Zend/zend_closures.h>
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -118,10 +115,6 @@ PHALCON_INIT_CLASS(Phalcon_Binary_Reader){
 	zend_declare_property_null(phalcon_binary_reader_ce, SL("_input"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_binary_reader_ce, SL("_position"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_binary_reader_ce, SL("_eofPosition"), 0, ZEND_ACC_PROTECTED);
-
-	zend_declare_class_constant_long(phalcon_binary_reader_ce, SL("ENDIAN_MACHINE"), PHALCON_BINARY_ENDIAN_MACHINE);
-	zend_declare_class_constant_long(phalcon_binary_reader_ce, SL("ENDIAN_BIG"), PHALCON_BINARY_ENDIAN_BIG);
-	zend_declare_class_constant_long(phalcon_binary_reader_ce, SL("ENDIAN_LITTLE"), PHALCON_BINARY_ENDIAN_LITTLE);
 	return SUCCESS;
 }
 

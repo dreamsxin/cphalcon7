@@ -298,6 +298,7 @@ db.c \
 text.c \
 arr.c \
 date.c \
+binary.c \
 binary/reader.c \
 binary/exception.c \
 debug.c \

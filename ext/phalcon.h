@@ -359,6 +359,7 @@
 #include "text.h"
 #include "arr.h"
 #include "date.h"
+#include "binary.h"
 #include "binary/exception.h"
 #include "binary/reader.h"
 

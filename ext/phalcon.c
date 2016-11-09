@@ -132,6 +132,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Image_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Application_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Dispatcher_Exception);
+	PHALCON_INIT(Phalcon_Mvc_Micro_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Model_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Model_Transaction_Exception);
@@ -151,6 +152,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_JsonRpc_Exception);
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Exception);
 	PHALCON_INIT(Phalcon_Chart_Exception);
+	PHALCON_INIT(Phalcon_Binary_Exception);
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DIInterface);
@@ -409,7 +411,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_Row);
 	PHALCON_INIT(Phalcon_Mvc_Model_Query);
 	PHALCON_INIT(Phalcon_Mvc_Micro_Collection);
-	PHALCON_INIT(Phalcon_Mvc_Micro_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Micro_LazyLoader);
 	PHALCON_INIT(Phalcon_Mvc_Model_Criteria);
 	PHALCON_INIT(Phalcon_Mvc_Model_Manager);
@@ -466,6 +467,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Chart_QRcode);
 	PHALCON_INIT(Phalcon_Chart_Captcha);
 	PHALCON_INIT(Phalcon_Async);
+	PHALCON_INIT(Phalcon_Binary_Reader);
 
 	return SUCCESS;
 }

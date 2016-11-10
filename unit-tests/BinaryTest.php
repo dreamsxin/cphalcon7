@@ -25,7 +25,49 @@ class BinaryTest extends PHPUnit_Framework_TestCase
 	public function testNormal()
 	{
 		$file = 'unit-tests/assets/data.bin';
+
 		$fp = fopen($file, 'rb');
+		$bin = new Phalcon\Binary\Reader($fp);
+		$this->assertEquals($bin->getPosition(), 0);
+		$this->assertEquals($bin->getEofPosition(), 26);
+		$data1 = $bin->getContent();
+
+		$this->assertEquals($bin->readUnsignedChar(), 160);
+		$this->assertEquals($bin->readUnsignedChar(), 177);
+		$this->assertEquals($bin->readUnsignedChar(), 194); 
+		$this->assertEquals($bin->readUnsignedChar(), 211);
+		$this->assertEquals($bin->readUnsignedInt16(), 240); 
+		$this->assertEquals($bin->readUnsignedInt16(), 320);
+		$this->assertEquals($bin->readUnsignedInt32(), 80001);
+		$this->assertEquals($bin->getPosition(), 12);
+		$this->assertEquals($bin->readString(), 'yi_tuo');
+		$this->assertEquals($bin->getPosition(), 19);
+		$this->assertEquals($bin->readString(), 'm999');
+		$this->assertEquals($bin->getPosition(), 24);
+		$this->assertEquals($bin->readString(), "\r\n");
+		$this->assertEquals($bin->getEofPosition(), 26);
+
+		$file = 'unit-tests/assets/test.bin';
+		@unlink($file);
+		$fp = fopen($file, 'wb+');
+		$bin = new Phalcon\Binary\Writer($fp);
+		$bin->writeUnsignedChar(160);
+		$bin->writeUnsignedChar(177);
+		$bin->writeUnsignedChar(194);
+		$bin->writeUnsignedChar(211);
+		$bin->writeUnsignedInt16(240);
+		$bin->writeUnsignedInt16(320);
+		$bin->writeUnsignedInt32(80001);
+		$this->assertEquals($bin->getPosition(), 12);
+		$bin->writeString('yi_tuo');
+		$this->assertEquals($bin->getPosition(), 19);
+		$bin->writeString("m999");
+		$this->assertEquals($bin->getPosition(), 24);
+		$bin->writeString("\r\n", 2, TRUE);
+		$this->assertEquals($bin->getPosition(), 26);
+		$data2 = $bin->getContent();
+		$this->assertEquals($data1, $data2);
+
 		$bin = new Phalcon\Binary\Reader($fp);
 		$this->assertEquals($bin->getPosition(), 0);
 		$this->assertEquals($bin->getEofPosition(), 26);

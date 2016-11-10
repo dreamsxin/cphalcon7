@@ -114,6 +114,8 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writestring, 0, 0, 1)
 	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 0)
+	ZEND_ARG_INFO(0, exact)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_arr_method_entry[] = {
@@ -459,15 +461,27 @@ PHP_METHOD(Phalcon_Binary_Writer, writeDouble){
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeString){
 
-	zval *str, length = {}, format = {}, result = {};
+	zval *str, *length = NULL, *exact = NULL, len = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &str);
+	phalcon_fetch_params(0, 1, 2, &str, &length, &exact);
 
-	ZVAL_STRING(&format, "Z*");
+	if (length && Z_TYPE_P(length) != IS_NULL) {
+		if (exact && zend_is_true(exact)) {
+			PHALCON_CONCAT_SV(&format, "a", length);
+		} else {
+			PHALCON_CONCAT_SV(&format, "Z", length);
+		}
+	} else {
+		if (exact && zend_is_true(exact)) {
+			ZVAL_STRING(&format, "a*");
+		} else {
+			ZVAL_STRING(&format, "Z*");
+		}
+	}
 	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, str);
 
-	ZVAL_LONG(&length, Z_STRLEN(result));
+	ZVAL_LONG(&len, Z_STRLEN(result));
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
+	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &len);
 	RETURN_THISW();
 }

@@ -47,6 +47,7 @@ zend_class_entry *phalcon_binary_reader_ce;
 PHP_METHOD(Phalcon_Binary_Reader, __construct);
 PHP_METHOD(Phalcon_Binary_Reader, getEndian);
 PHP_METHOD(Phalcon_Binary_Reader, getInput);
+PHP_METHOD(Phalcon_Binary_Reader, getContent);
 PHP_METHOD(Phalcon_Binary_Reader, setPosition);
 PHP_METHOD(Phalcon_Binary_Reader, getPosition);
 PHP_METHOD(Phalcon_Binary_Reader, getEofPosition);
@@ -85,6 +86,7 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Binary_Reader, __construct, arginfo_phalcon_binary___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Binary_Reader, getEndian, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, getInput, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Reader, getContent, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, setPosition, arginfo_phalcon_binary_setposition, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, getPosition, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, getEofPosition, NULL, ZEND_ACC_PUBLIC)
@@ -191,6 +193,17 @@ PHP_METHOD(Phalcon_Binary_Reader, getInput){
 
 
 	RETURN_MEMBER(getThis(), "_input");
+}
+
+/**
+ * Gets the data
+ *
+ * @return int
+ */
+PHP_METHOD(Phalcon_Binary_Reader, getContent){
+
+
+	RETURN_MEMBER(getThis(), "_data");
 }
 
 /**

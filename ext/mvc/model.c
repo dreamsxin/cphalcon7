@@ -1710,15 +1710,13 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	PHALCON_CALL_METHODW(&manager, &dependency_injector, "getshared", &service_name);
 	PHALCON_CALL_METHODW(&model, &manager, "load", &model_name);
 
-	PHALCON_STR(&event_name, "beforeQuery");
-
-	PHALCON_MAKE_REF(&params);
-	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &params);
-	PHALCON_UNREF(&params);
-
 	PHALCON_CALL_METHODW(&builder, &manager, "createbuilder", &params);
 
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
+
+	PHALCON_STR(&event_name, "beforeQuery");
+
+	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &builder);
 
 	PHALCON_CALL_METHODW(&query, &builder, "getquery");
 
@@ -1744,9 +1742,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 
 		PHALCON_STR(&event_name, "afterQuery");
 
-		PHALCON_MAKE_REF(&resultset);
 		PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &resultset);
-		PHALCON_UNREF(&resultset);
 	}
 
 	RETURN_CTORW(&resultset);
@@ -1833,10 +1829,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	PHALCON_CALL_METHODW(NULL, &builder, "from", &model_name);
 
 	PHALCON_STR(&event_name, "beforeQuery");
-
-	// PHALCON_MAKE_REF(&builder);
 	PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &builder);
-	// PHALCON_UNREF(&builder);
 
 	/**
 	 * We only want the first record
@@ -1864,9 +1857,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	if (zend_is_true(&result)) {
 		PHALCON_STR(&event_name, "afterQuery");
 
-		PHALCON_MAKE_REF(&result);
 		PHALCON_CALL_METHODW(NULL, &model, "fireevent", &event_name, &result);
-		PHALCON_UNREF(&result);
 
 		/**
 		 * Define an hydration mode
@@ -2420,9 +2411,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 		 * Check if there is a method with the same name of the event
 		 */
 		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
-			PHALCON_MAKE_REF(data);
 			PHALCON_CALL_METHODW(NULL, getThis(), Z_STRVAL(lower), data);
-			PHALCON_UNREF(data);
 		}
 
 
@@ -2464,9 +2453,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 		 * Check if there is a method with the same name of the event
 		 */
 		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
-			PHALCON_MAKE_REF(data);
 			PHALCON_CALL_METHODW(&status, getThis(), Z_STRVAL(lower), data);
-			PHALCON_UNREF(data);
 			if (PHALCON_IS_FALSE(&status)) {
 				RETURN_FALSE;
 			}
@@ -6163,6 +6150,11 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 		rename_columns = &PHALCON_GLOBAL(z_true);
 	}
 
+
+	PHALCON_STR(&event_name, "beforeToArray");
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name);
+
 	/**
 	 * Original attributes
 	 */
@@ -6217,9 +6209,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 
 	PHALCON_STR(&event_name, "afterToArray");
 
-	PHALCON_MAKE_REF(&data);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &data);
-	PHALCON_UNREF(&data);
 
 	RETURN_CTORW(&data);
 }

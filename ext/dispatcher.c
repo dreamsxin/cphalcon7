@@ -1359,10 +1359,8 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 		cancelable = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_MAKE_REF(data);
 	zval *params[] = {eventname, data, cancelable};
 	ret = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 3, params);
-	PHALCON_UNREF(data);
 
 	if (EG(exception)) {
 		ZVAL_OBJ(&e, EG(exception));

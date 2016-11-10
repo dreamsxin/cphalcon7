@@ -1198,10 +1198,39 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($expectedMessages, $messages);
 
+		$createdAt = date('Y-m-d H:i:s');
+
 		$subscriptor->email = 'dreamsxin2@qq.com';
+		$subscriptor->created_at = $createdAt;
+		$subscriptor->status = 'P';
+		$this->assertTrue($subscriptor->save());
+
+		$subscriptor = new Subscriptores();
+		$subscriptor->email = 'dreamsxin2@qq.com';
+		$subscriptor->created_at = $createdAt;
+
+		$validation = new Phalcon\Validation();
+		$validation->add(array('email', 'created_at'), new Uniqueness(array(
+			'model' => $subscriptor,
+			'message' => ':field must be unique'
+		)));
 
 		$messages = $validation->validate();
-		$this->assertEquals(count($messages), 0);
+		$this->assertEquals(count($messages), 1);
+
+		$expectedMessages = Phalcon\Validation\Message\Group::__set_state(array(
+			'_messages' => array(
+				0 => Phalcon\Validation\Message::__set_state(array(
+						'_type' => 'Uniqueness',
+						'_message' => 'email, created_at must be unique',
+						'_field' => array('email', 'created_at'),
+						'_code' => 0,
+					))
+			)
+		));
+
+		$this->assertEquals($expectedMessages, $messages);
+
 	}
 
 	public function testValidationAlnum()

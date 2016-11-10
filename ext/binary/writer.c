@@ -61,8 +61,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32);
 PHP_METHOD(Phalcon_Binary_Writer, writeFloat);
 PHP_METHOD(Phalcon_Binary_Writer, writeDouble);
 PHP_METHOD(Phalcon_Binary_Writer, writeString);
+PHP_METHOD(Phalcon_Binary_Writer, writeHexString);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary___construct, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, endian)
 ZEND_END_ARG_INFO()
@@ -118,6 +119,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writestring, 0, 0, 1)
 	ZEND_ARG_INFO(0, exact)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writehexstring, 0, 0, 1)
+	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
+	ZEND_ARG_INFO(0, lowNibble)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Binary_Writer, __construct, arginfo_phalcon_binary___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Binary_Writer, getEndian, NULL, ZEND_ACC_PUBLIC)
@@ -136,6 +143,7 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Binary_Writer, writeFloat, arginfo_phalcon_binary_writefloat, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Writer, writeDouble, arginfo_phalcon_binary_writedouble, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Writer, writeString, arginfo_phalcon_binary_writestring, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeHexString, arginfo_phalcon_binary_writehexstring, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -161,11 +169,15 @@ PHALCON_INIT_CLASS(Phalcon_Binary_Writer){
  */
 PHP_METHOD(Phalcon_Binary_Writer, __construct){
 
-	zval *data, *endian = NULL, filename = {}, mode = {}, handler = {}, fstat = {}, size = {};
+	zval *data = NULL, *endian = NULL, filename = {}, mode = {}, handler = {}, fstat = {}, size = {};
 
-	phalcon_fetch_params(0, 1, 1, &data, &endian);
+	phalcon_fetch_params(0, 0, 2, &data, &endian);
 
-	if (Z_TYPE_P(data) == IS_STRING) {
+	if (!data) {
+		data = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (Z_TYPE_P(data) == IS_STRING || Z_TYPE_P(data) == IS_NULL) {
 		ZVAL_STRING(&filename, "php://memory");
 		ZVAL_STRING(&mode, "br+");
 		PHALCON_CALL_FUNCTIONW(&handler, "fopen", &filename, &mode);
@@ -476,6 +488,36 @@ PHP_METHOD(Phalcon_Binary_Writer, writeString){
 			ZVAL_STRING(&format, "a*");
 		} else {
 			ZVAL_STRING(&format, "Z*");
+		}
+	}
+	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, str);
+
+	ZVAL_LONG(&len, Z_STRLEN(result));
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &len);
+	RETURN_THISW();
+}
+
+/**
+ *
+ */
+PHP_METHOD(Phalcon_Binary_Writer, writeHexString){
+
+	zval *str, *length = NULL, *low_nibble = NULL, len = {}, format = {}, result = {};
+
+	phalcon_fetch_params(0, 1, 2, &str, &length, &low_nibble);
+
+	if (length && Z_TYPE_P(length) != IS_NULL) {
+		if (low_nibble && zend_is_true(low_nibble)) {
+			PHALCON_CONCAT_SV(&format, "h", length);
+		} else {
+			PHALCON_CONCAT_SV(&format, "H", length);
+		}
+	} else {
+		if (low_nibble && zend_is_true(low_nibble)) {
+			ZVAL_STRING(&format, "h*");
+		} else {
+			ZVAL_STRING(&format, "H*");
 		}
 	}
 	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, str);

@@ -46,6 +46,10 @@
 
 #include <ext/pdo/php_pdo_driver.h>
 
+#ifdef PHALCON_USE_PHP_JSON
+#include <ext/json/php_json.h>
+#endif
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
@@ -509,10 +513,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model){
 
 	zend_class_implements(phalcon_mvc_model_ce, 3, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_resultinterface_ce, zend_ce_serializable);
 
-	zend_class_entry *ce = phalcon_get_internal_ce(SS("jsonserializable"));
-	if (ce) {
-		zend_class_implements(phalcon_mvc_model_ce, 1, ce);
-	}
+#ifdef PHALCON_USE_PHP_JSON
+	zend_class_implements(phalcon_mvc_model_ce, 1, php_json_serializable_ce);
+#endif
 	return SUCCESS;
 }
 

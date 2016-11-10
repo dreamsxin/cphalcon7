@@ -21,6 +21,10 @@
 #include "mvc/model/resultsetinterface.h"
 #include "mvc/model/exception.h"
 
+#ifdef PHALCON_USE_PHP_JSON
+#include <ext/json/php_json.h>
+#endif
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/object.h"
@@ -154,10 +158,9 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset){
 
 	zend_class_implements(phalcon_mvc_model_resultset_ce, 6, phalcon_mvc_model_resultsetinterface_ce, zend_ce_iterator, spl_ce_SeekableIterator, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_serializable);
 
-	zend_class_entry *ce = phalcon_get_internal_ce(SS("jsonserializable"));
-	if (ce) {
-		zend_class_implements(phalcon_mvc_model_resultset_ce, 1, ce);
-	}
+#ifdef PHALCON_USE_PHP_JSON
+	zend_class_implements(phalcon_mvc_model_resultset_ce, 1, php_json_serializable_ce);
+#endif
 	return SUCCESS;
 }
 

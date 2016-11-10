@@ -86,4 +86,21 @@ class BinaryTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($bin->getPosition(), 24);
 		$this->assertEquals($bin->getEofPosition(), 26);
 	}
+
+	public function testHexString()
+	{
+		$value = '136123456780';
+		$bin = new Phalcon\Binary\Writer();
+		$bin->writeHexString(str_pad($value, 28, 'f'), 28, TRUE);
+		$this->assertEquals($bin->getPosition(), 14);
+		$data = $bin->getContent();
+		$this->assertEquals(bin2hex($data), '311632547608ffffffffffffffff');
+
+		$bin = new Phalcon\Binary\Reader($data);
+		$this->assertEquals($bin->getPosition(), 0);
+		$this->assertEquals($bin->getEofPosition(), 14);
+
+		$this->assertEquals($bin->readHexString(NULL, TRUE), str_pad($value, 28, 'f'));
+		$this->assertEquals($bin->getPosition(), 14);
+	}
 }

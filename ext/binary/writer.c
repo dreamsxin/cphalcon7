@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Binary_Writer, getEndian){
 PHP_METHOD(Phalcon_Binary_Writer, getOutput){
 
 
-	RETURN_MEMBER(getThis(), "_ouput");
+	RETURN_MEMBER(getThis(), "_output");
 }
 
 /**

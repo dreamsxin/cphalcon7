@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Binary_Writer, getEndian){
 PHP_METHOD(Phalcon_Binary_Writer, getOutput){
 
 
-	RETURN_MEMBER(getThis(), "_ouput");
+	RETURN_MEMBER(getThis(), "_output");
 }
 
 /**
@@ -258,7 +258,9 @@ PHP_METHOD(Phalcon_Binary_Writer, getPosition){
 }
 
 /**
- *
+ * Write bytes to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, write){
 
@@ -275,7 +277,9 @@ PHP_METHOD(Phalcon_Binary_Writer, write){
 }
 
 /**
- *
+ * Write a signed char to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeChar){
 
@@ -293,7 +297,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeChar){
 }
 
 /**
- *
+ * Write a unsigned char to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedChar){
 
@@ -311,7 +317,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedChar){
 }
 
 /**
- *
+ * Write a signed short int to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeInt16){
 
@@ -329,7 +337,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt16){
 }
 
 /**
- *
+ * Write a unsigned short int to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt16){
 
@@ -354,7 +364,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt16){
 }
 
 /**
- *
+ * Write a signed int to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeInt){
 
@@ -372,7 +384,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt){
 }
 
 /**
- *
+ * Write a unsigned int to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt){
 
@@ -390,7 +404,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt){
 }
 
 /**
- *
+ * Write a signed long int to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeInt32){
 
@@ -408,7 +424,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt32){
 }
 
 /**
- *
+ * Write a unsigned long int to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32){
 
@@ -433,7 +451,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32){
 }
 
 /**
- *
+ * Write a float to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeFloat){
 
@@ -451,7 +471,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeFloat){
 }
 
 /**
- *
+ * Write a double to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeDouble){
 
@@ -469,7 +491,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeDouble){
 }
 
 /**
- *
+ * Write string to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeString){
 
@@ -499,7 +523,9 @@ PHP_METHOD(Phalcon_Binary_Writer, writeString){
 }
 
 /**
- *
+ * Write hex string to the current position in the file pointer
+ * 
+ * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeHexString){
 

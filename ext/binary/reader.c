@@ -22,6 +22,7 @@
 #include "binary.h"
 #include "binary/exception.h"
 
+#include <main/php_streams.h>
 #include <ext/standard/php_array.h>
 #include <ext/spl/spl_array.h>
 
@@ -73,6 +74,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_setposition, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, position, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, whence, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_read, 0, 0, 1)
@@ -203,7 +205,7 @@ PHP_METHOD(Phalcon_Binary_Reader, getInput){
 }
 
 /**
- * Gets the data
+ * Gets the binary data
  *
  * @return int
  */
@@ -214,22 +216,56 @@ PHP_METHOD(Phalcon_Binary_Reader, getContent){
 }
 
 /**
+ * Sets the position in the the file pointer
  *
+ * @param integer $position
+ * @param integer $whence
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Binary_Reader, setPosition){
 
-	zval position = {}, input = {};
+	zval *position, *whence = NULL, input = {}, current_position = {}, eof_position = {}, pos = {};
+	php_stream *stream;
+	int seek_type = SEEK_SET, ret;
 
-	phalcon_fetch_params(0, 1, 0, &position);
+	phalcon_fetch_params(0, 1, 1, &position, &whence);
+
+	if (whence && Z_TYPE_P(whence) == IS_LONG) {
+		seek_type = Z_LVAL_P(whence);
+	}
 
 	phalcon_read_property(&input, getThis(), SL("_input"), PH_NOISY);
-	PHALCON_CALL_FUNCTIONW(return_value, "fseek", &input, &position);
+	php_stream_from_res(stream, Z_RES(input));
+	if (seek_type == SEEK_CUR) {
+		ret = php_stream_seek(stream, Z_LVAL_P(position), SEEK_CUR);
+		if (ret >= 0) {
+			phalcon_read_property(&current_position, getThis(), SL("_position"), PH_NOISY);
+			ZVAL_LONG(&pos, Z_LVAL(current_position) + Z_LVAL_P(position));
+			phalcon_update_property_zval(getThis(), SL("_position"), &pos);
+			RETURN_TRUE;
+		}
+	} else if (seek_type == SEEK_END) {
+		ret = php_stream_seek(stream, Z_LVAL_P(position), SEEK_END);
+		if (ret >= 0) {			
+			phalcon_read_property(&eof_position, getThis(), SL("_eofPosition"), PH_NOISY);
+			ZVAL_LONG(&pos, Z_LVAL(eof_position) - Z_LVAL_P(position));
+			phalcon_update_property_zval(getThis(), SL("_position"), &pos);
+			RETURN_TRUE;
+		}
+	} else {
+		ret = php_stream_seek(stream, Z_LVAL_P(position), SEEK_SET);
+		if (ret >= 0) {
+			phalcon_update_property_zval(getThis(), SL("_position"), position);
+			RETURN_TRUE;
+		}
+	}
 
-	phalcon_update_property_zval(getThis(), SL("_position"), &position);
+	
+	RETURN_FALSE;
 }
 
 /**
- * Gets the current postion
+ * Gets the current postion in the the file pointer
  *
  * @return int
  */
@@ -240,7 +276,7 @@ PHP_METHOD(Phalcon_Binary_Reader, getPosition){
 }
 
 /**
- * Gets the eof postion
+ * Gets the eof postion the file pointer
  *
  * @return int
  */
@@ -251,7 +287,7 @@ PHP_METHOD(Phalcon_Binary_Reader, getEofPosition){
 }
 
 /**
- * Check if 
+ * Checks if end of the file pointer was reached
  *
  * @return boolean
  */
@@ -269,7 +305,10 @@ PHP_METHOD(Phalcon_Binary_Reader, isEof){
 }
 
 /**
- *
+ * Read num bytes from the current position in the file pointer
+ * 
+ * @param integer $length
+ * @return string
  */
 PHP_METHOD(Phalcon_Binary_Reader, read){
 
@@ -291,7 +330,9 @@ PHP_METHOD(Phalcon_Binary_Reader, read){
 }
 
 /**
- *
+ * Read a signed char from the current position in the file pointer
+ * 
+ * @return string
  */
 PHP_METHOD(Phalcon_Binary_Reader, readChar){
 
@@ -308,7 +349,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readChar){
 }
 
 /**
- *
+ * Read a unsigned char from the current position in the file pointer
+ * 
+ * @return string
  */
 PHP_METHOD(Phalcon_Binary_Reader, readUnsignedChar){
 
@@ -325,7 +368,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedChar){
 }
 
 /**
- *
+ * Read a signed short int from the current position in the file pointer
+ * 
+ * @return int
  */
 PHP_METHOD(Phalcon_Binary_Reader, readInt16){
 
@@ -343,7 +388,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt16){
 }
 
 /**
- *
+ * Read a unsigned short int from the current position in the file pointer
+ * 
+ * @return int
  */
 PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt16){
 
@@ -368,7 +415,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt16){
 }
 
 /**
- *
+ * Read a signed int from the current position in the file pointer
+ * 
+ * @return int
  */
 PHP_METHOD(Phalcon_Binary_Reader, readInt){
 
@@ -386,7 +435,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt){
 }
 
 /**
- *
+ * Read a unsigned int from the current position in the file pointer
+ * 
+ * @return int
  */
 PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt){
 
@@ -404,7 +455,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt){
 }
 
 /**
- *
+ * Read a signed long int from the current position in the file pointer
+ * 
+ * @return int
  */
 PHP_METHOD(Phalcon_Binary_Reader, readInt32){
 
@@ -422,7 +475,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt32){
 }
 
 /**
- *
+ * Read a unsigned long int from the current position in the file pointer
+ * 
+ * @return int
  */
 PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt32){
 
@@ -447,7 +502,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt32){
 }
 
 /**
- *
+ * Read a float from the current position in the file pointer
+ * 
+ * @return float
  */
 PHP_METHOD(Phalcon_Binary_Reader, readFloat){
 
@@ -465,7 +522,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readFloat){
 }
 
 /**
- *
+ * Read a double from the current position in the file pointer
+ * 
+ * @return double
  */
 PHP_METHOD(Phalcon_Binary_Reader, readDouble){
 
@@ -483,11 +542,13 @@ PHP_METHOD(Phalcon_Binary_Reader, readDouble){
 }
 
 /**
- *
+ * Read string from the current position in the file pointer
+ * 
+ * @return string
  */
 PHP_METHOD(Phalcon_Binary_Reader, readString){
 
-	zval *length = NULL, position = {}, eof_position = {}, format = {}, data = {}, result = {}, len = {};
+	zval *length = NULL, position = {}, eof_position = {}, format = {}, data = {}, result = {}, len = {}, seek_type = {};
 
 	phalcon_fetch_params(0, 0, 1, &length);
 
@@ -513,17 +574,20 @@ PHP_METHOD(Phalcon_Binary_Reader, readString){
 				ZVAL_LONG(&len, Z_STRLEN_P(return_value) + 1);
 			}
 
-			PHALCON_CALL_METHODW(NULL, getThis(), "read", &len);
+			ZVAL_LONG(&seek_type, SEEK_CUR);
+			PHALCON_CALL_METHODW(NULL, getThis(), "setposition", &len, &seek_type);
 		}
 	}
 }
 
 /**
- *
+ * Read hex string from the current position in the file pointer
+ * 
+ * @return string
  */
 PHP_METHOD(Phalcon_Binary_Reader, readHexString){
 
-	zval *length = NULL, *low_nibble = NULL, position = {}, eof_position = {}, format = {}, data = {}, result = {}, len = {};
+	zval *length = NULL, *low_nibble = NULL, position = {}, eof_position = {}, format = {}, data = {}, result = {}, len = {}, seek_type = {};
 
 	phalcon_fetch_params(0, 0, 2, &length, &low_nibble);
 
@@ -560,7 +624,8 @@ PHP_METHOD(Phalcon_Binary_Reader, readHexString){
 			RETURN_NULL();
 		} else {
 			ZVAL_LONG(&len, Z_STRLEN_P(return_value)/2);
-			PHALCON_CALL_METHODW(NULL, getThis(), "read", &len);
+			ZVAL_LONG(&seek_type, SEEK_CUR);
+			PHALCON_CALL_METHODW(NULL, getThis(), "setposition", &len, &seek_type);
 		}
 	}
 }

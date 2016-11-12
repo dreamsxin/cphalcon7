@@ -4255,9 +4255,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
 	PHALCON_STR(&event_name, "query:afterExecute");
 
-	PHALCON_MAKE_REF(&result);
 	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, &result);
-	PHALCON_UNREF(&result);
 
 
 	if (Z_TYPE(result) != IS_OBJECT) {

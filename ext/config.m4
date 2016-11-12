@@ -298,6 +298,10 @@ db.c \
 text.c \
 arr.c \
 date.c \
+binary.c \
+binary/reader.c \
+binary/writer.c \
+binary/exception.c \
 debug.c \
 debug/exception.c \
 debug/dump.c \

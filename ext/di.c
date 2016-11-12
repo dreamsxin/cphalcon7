@@ -169,7 +169,7 @@ PHALCON_INIT_CLASS(Phalcon_DI){
 
 	PHALCON_REGISTER_CLASS(Phalcon, DI, di, phalcon_di_method_entry, 0);
 
-	zend_declare_property_string(phalcon_di_ce, SL("_name"), "di",  ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_di_ce, SL("_name"), "di", ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_services"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_sharedInstances"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_freshInstance"), ZEND_ACC_PROTECTED);

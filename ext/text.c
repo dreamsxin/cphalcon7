@@ -38,6 +38,7 @@ zend_class_entry *phalcon_text_ce;
 PHP_METHOD(Phalcon_Text, camelize);
 PHP_METHOD(Phalcon_Text, uncamelize);
 PHP_METHOD(Phalcon_Text, increment);
+PHP_METHOD(Phalcon_Text, decrement);
 PHP_METHOD(Phalcon_Text, random);
 PHP_METHOD(Phalcon_Text, startsWith);
 PHP_METHOD(Phalcon_Text, endsWith);
@@ -58,6 +59,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_uncamelize, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_increment, 0, 0, 1)
+	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_INFO(0, separator)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_decrement, 0, 0, 1)
 	ZEND_ARG_INFO(0, str)
 	ZEND_ARG_INFO(0, separator)
 ZEND_END_ARG_INFO()
@@ -104,10 +110,19 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_concat, 0, 0, 3)
 	ZEND_ARG_INFO(0, strB)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_underscore, 0, 0, 1)
+	ZEND_ARG_INFO(0, str)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_humanize, 0, 0, 1)
+	ZEND_ARG_INFO(0, str)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_text_method_entry[] = {
 	PHP_ME(Phalcon_Text, camelize, arginfo_phalcon_text_camelize, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, uncamelize, arginfo_phalcon_text_uncamelize, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, increment, arginfo_phalcon_text_increment, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Text, decrement, arginfo_phalcon_text_decrement, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, random, arginfo_phalcon_text_random, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, startsWith, arginfo_phalcon_text_startswith, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, endsWith, arginfo_phalcon_text_endswith, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
@@ -116,6 +131,8 @@ static const zend_function_entry phalcon_text_method_entry[] = {
 	PHP_ME(Phalcon_Text, bytes, arginfo_phalcon_text_bytes, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, reduceSlashes, arginfo_phalcon_text_reduceslashes, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, concat, arginfo_phalcon_text_concat, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Text, underscore, arginfo_phalcon_text_underscore, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Text, humanize, arginfo_phalcon_text_humanize, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -182,7 +199,7 @@ PHP_METHOD(Phalcon_Text, uncamelize){
  *</code>
  *
  * @param string $str
- * @param string $separator
+ * @param string|int $separator
  * @return string
  */
 PHP_METHOD(Phalcon_Text, increment){
@@ -191,19 +208,65 @@ PHP_METHOD(Phalcon_Text, increment){
 
 	phalcon_fetch_params(0, 1, 1, &str, &separator);
 
-	if (!separator || Z_TYPE_P(separator) == IS_NULL) {
+	if (!separator || PHALCON_IS_EMPTY(separator)) {
 		ZVAL_STRING(&sep, "_");
 	} else {
 		PHALCON_CPY_WRT_CTOR(&sep, separator);
 	}
 
-	if (PHALCON_IS_EMPTY(&sep) && phalcon_is_numeric(str)) {
-		PHALCON_CPY_WRT_CTOR(return_value, str);
-		phalcon_increment(return_value);
+	if (Z_TYPE(sep) == IS_LONG) {
+		phalcon_substr(&first_part, str, 0, Z_STRLEN_P(str) - Z_LVAL(sep));
+		phalcon_substr(&number, str, Z_STRLEN(first_part), 0);
+
+		phalcon_increment(&number);
+		PHALCON_CONCAT_VV(return_value, &first_part, &number);
 	} else {
 		phalcon_fast_explode(&parts, &sep, str);
 		if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
 			phalcon_increment(&number);
+		} else {
+			PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
+		}
+
+		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
+		PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
+	}
+}
+
+/**
+ * Adds a number to a string or decrement that number if it already is defined
+ *
+ *<code>
+ *	echo Phalcon\Text::decrement("a"); // "a_1"
+ *	echo Phalcon\Text::decrement("a_1"); // "a_0"
+ *</code>
+ *
+ * @param string $str
+ * @param string|int $separator
+ * @return string
+ */
+PHP_METHOD(Phalcon_Text, decrement){
+
+	zval *str, *separator = NULL, sep = {}, parts = {}, number = {}, first_part = {};
+
+	phalcon_fetch_params(0, 1, 1, &str, &separator);
+
+	if (!separator || PHALCON_IS_EMPTY(separator)) {
+		ZVAL_STRING(&sep, "_");
+	} else {
+		PHALCON_CPY_WRT_CTOR(&sep, separator);
+	}
+
+	if (Z_TYPE(sep) == IS_LONG) {
+		phalcon_substr(&first_part, str, 0, Z_STRLEN_P(str) - Z_LVAL(sep));
+		phalcon_substr(&number, str, Z_STRLEN(first_part), 0);
+
+		phalcon_decrement(&number);
+		PHALCON_CONCAT_VV(return_value, &first_part, &number);
+	} else {
+		phalcon_fast_explode(&parts, &sep, str);
+		if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
+			phalcon_decrement(&number);
 		} else {
 			PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
 		}
@@ -463,28 +526,24 @@ PHP_METHOD(Phalcon_Text, reduceSlashes){
  */
 PHP_METHOD(Phalcon_Text, concat){
 
-	zval *separator, *a, *b, arg_num = {}, arg_list = {}, offset = {}, args = {}, *c, str = {}, a_trimmed = {}, str_trimmed = {};
+	zval *separator, *a, *b, *args, str = {}, a_trimmed = {}, str_trimmed = {};
+	uint32_t i;
 
 	phalcon_fetch_params(0, 3, 0, &separator, &a, &b);
 
-	PHALCON_CALL_FUNCTIONW(&arg_num, "func_num_args");
+	if (ZEND_NUM_ARGS() > 3) {
+		args = (zval *)safe_emalloc(ZEND_NUM_ARGS(), sizeof(zval), 0);
+		if (zend_get_parameters_array_ex(ZEND_NUM_ARGS(), args) == FAILURE) {
+			efree(args);
+			WRONG_PARAM_COUNT;
+		}
 
-	if (Z_LVAL(arg_num) > 3) {
-		PHALCON_CALL_FUNCTIONW(&arg_list, "func_get_args");
+		for (i = 2; i < ZEND_NUM_ARGS(); i++) {
+			zval trimmed = {};
+			ZVAL_STR(&trimmed, phalcon_trim(&args[i], separator, PHALCON_TRIM_BOTH));
 
-		ZVAL_LONG(&offset, 3);
-
-		PHALCON_CALL_FUNCTIONW(&args, "array_slice", &arg_list, &offset);
-
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(args), c) {
-			zval b_trimmed = {}, c_trimmed = {};
-
-			ZVAL_STR(&b_trimmed, phalcon_trim(b, separator, PHALCON_TRIM_RIGHT));
-			ZVAL_STR(&c_trimmed, phalcon_trim(c, separator, PHALCON_TRIM_LEFT));
-
-			PHALCON_CONCAT_VVV(&str, &b_trimmed, separator, &c_trimmed)
-
-		} ZEND_HASH_FOREACH_END();
+			PHALCON_SCONCAT_VV(&str, &trimmed, separator);
+		}
 	} else {
 		PHALCON_CPY_WRT_CTOR(&str, b);
 	}

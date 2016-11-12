@@ -41,6 +41,12 @@
  * Phalcon\Binary\Writer
  *
  * Provides utilities to work with binary data
+ *
+ *<code>
+ *	$fp = fopen('unit-tests/assets/data.bin', 'wb');
+ *	$bin = new Phalcon\Binary\Writer($fp);
+ *	$bin->writeUnsignedChar(1);
+ *</code>
  */
 zend_class_entry *phalcon_binary_writer_ce;
 

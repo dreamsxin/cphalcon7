@@ -42,6 +42,12 @@
  * Phalcon\Binary\Reader
  *
  * Provides utilities to work with binary data
+ *
+ *<code>
+ *	$fp = fopen('unit-tests/assets/data.bin', 'rb');
+ *	$bin = new Phalcon\Binary\Reader($fp);
+ *	$v = $bin->readUnsignedChar();
+ *</code>
  */
 zend_class_entry *phalcon_binary_reader_ce;
 

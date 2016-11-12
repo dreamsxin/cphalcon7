@@ -82,6 +82,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine){
 	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_view"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_layout"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_params"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_view_engine_ce, SL("_methods"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_view_engine_ce, 1, phalcon_mvc_view_engineinterface_ce);
 
@@ -239,7 +240,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	zval *method, *args = NULL, method_name = {}, arguments = {}, methods = {}, func = {}, exception_message = {}, service_name = {}, service = {}, callback = {};
 
-	phalcon_fetch_params(0, 1, 1, &method, &arguments);
+	phalcon_fetch_params(0, 1, 1, &method, &args);
 
 	PHALCON_CPY_WRT(&method_name, method);
 

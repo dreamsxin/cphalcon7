@@ -372,6 +372,7 @@ PHP_METHOD(Phalcon_Security, hash)
 
 	switch (i_hash) {
 
+		case PHALCON_SECURITY_CRYPT_DEFAULT:
 		case PHALCON_SECURITY_CRYPT_BLOWFISH_A:
 			if (!PHALCON_GLOBAL(security.crypt_blowfish_y_supported)) RETURN_FALSE;
 			variant = 'a';
@@ -380,6 +381,11 @@ PHP_METHOD(Phalcon_Security, hash)
 		case PHALCON_SECURITY_CRYPT_BLOWFISH_X:
 			if (!PHALCON_GLOBAL(security.crypt_blowfish_y_supported)) RETURN_FALSE;
 			variant = 'x';
+			break;
+
+		case PHALCON_SECURITY_CRYPT_BLOWFISH_Y:
+			if (!PHALCON_GLOBAL(security.crypt_blowfish_y_supported)) RETURN_FALSE;
+			variant = 'y';
 			break;
 
 		case PHALCON_SECURITY_CRYPT_STD_DES:

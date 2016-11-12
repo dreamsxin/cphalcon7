@@ -197,15 +197,20 @@ PHP_METHOD(Phalcon_Text, increment){
 		PHALCON_CPY_WRT_CTOR(&sep, separator);
 	}
 
-	phalcon_fast_explode(&parts, separator, str);
-	if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
-		phalcon_increment(&number);
+	if (PHALCON_IS_EMPTY(&sep) && phalcon_is_numeric(str)) {
+		PHALCON_CPY_WRT_CTOR(return_value, str);
+		phalcon_increment(return_value);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
-	}
+		phalcon_fast_explode(&parts, &sep, str);
+		if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
+			phalcon_increment(&number);
+		} else {
+			PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
+		}
 
-	phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
-	PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
+		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
+		PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
+	}
 }
 
 /**

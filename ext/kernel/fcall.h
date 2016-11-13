@@ -53,6 +53,11 @@ typedef enum _phalcon_call_type {
 #endif
 
 /** Use these functions to call functions in the PHP userland using an arbitrary zval as callable */
+#define PHALCON_CALL_USER_FUNC_PARAMS(retval, handler, params, params_count) \
+	do { \
+		RETURN_ON_FAILURE(phalcon_call_user_func_params(retval, handler, params, params_count)); \
+	} while (0)
+
 #define PHALCON_CALL_USER_FUNC_ARRAY(retval, handler, params) \
 	do { \
 		RETURN_ON_FAILURE(phalcon_call_user_func_array(retval, handler, params)); \
@@ -82,6 +87,8 @@ typedef enum _phalcon_call_type {
  * @return Whether the class defines a constructor
  */
 int phalcon_has_constructor_ce(const zend_class_entry *ce);
+
+int phalcon_call_user_func_params(zval *retval, zval *handler, zval *params, int params_count);
 
 /**
  * Replaces call_user_func_array avoiding function lookup

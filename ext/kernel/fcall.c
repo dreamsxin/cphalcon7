@@ -45,6 +45,19 @@ int phalcon_has_constructor_ce(const zend_class_entry *ce)
 	return 0;
 }
 
+int phalcon_call_user_func_params(zval *retval, zval *handler, zval *params, int params_count)
+{
+	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret;
+	int status;
+
+	if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, params_count, params)) == FAILURE || EG(exception)) {
+		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
+	}
+
+	return status;
+}
+
 int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 {
 	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;

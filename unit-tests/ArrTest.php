@@ -15,6 +15,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -92,5 +93,19 @@ class ArrTest extends PHPUnit_Framework_TestCase
 		// Get all of the "id" values from a result
 		$ids = \Phalcon\Arr::pluck($data, 'id');
 		$this->assertEquals($ids, array(1, 2));
+
+		// Merge
+		$john = array('name' => 'john', 'children' => array('fred', 'paul', 'sally', 'jane'));
+		$mary = array('name' => 'mary', 'children' => array('jane'));
+
+		$this->assertEquals(\Phalcon\Arr::merge($john, $mary), array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane')));
+	$this->assertEquals(\Phalcon\Arr::merge($john, $mary, array('sex' => 1)), array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane'), 'sex' => 1));
+
+		// Overwrite
+		$a1 = array('name' => 'john', 'mood' => 'happy', 'food' => 'bacon');
+		$a2 = array('name' => 'jack', 'food' => 'tacos', 'drink' => 'beer');
+
+		$this->assertEquals(\Phalcon\Arr::overwrite($a1, $a2), array('name' => 'jack', 'mood' => 'happy', 'food' => 'tacos'));
+		$this->assertEquals(\Phalcon\Arr::overwrite($a1, $a2, array('name' => 'Phalcon7')), array('name' => 'Phalcon7', 'mood' => 'happy', 'food' => 'tacos'));
 	}
 }

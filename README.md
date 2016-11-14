@@ -99,7 +99,8 @@ External Links
 
 * [中文帮助](https://github.com/dreamsxin/cphalcon7/wiki)
 * [捐贈名單（Donation）](https://github.com/dreamsxin/cphalcon7/blob/master/DONATE.md)
-* PHP5 系列使用 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
+* PHP5 系列 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
+* Zephir 系列 [Phalcon](https://github.com/phalcon/cphalcon)
 
 License
 -------

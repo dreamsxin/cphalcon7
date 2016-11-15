@@ -88,7 +88,7 @@ int phalcon_read_static_property_array_ce(zval *return_value, zend_class_entry *
 
 	phalcon_return_static_property_ce(&arr, ce, property, property_length);
 
-	if (Z_TYPE(arr) != IS_ARRAY || !phalcon_array_isset_fetch(return_value, &arr, index, PH_NOISY)) {
+	if (Z_TYPE(arr) != IS_ARRAY || !phalcon_array_isset_fetch(return_value, &arr, index, 0)) {
 		ZVAL_NULL(return_value);
 		return 0;
 	}

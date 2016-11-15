@@ -302,6 +302,10 @@ binary.c \
 binary/reader.c \
 binary/writer.c \
 binary/exception.c \
+socket.c \
+socket/client.c \
+socket/server.c \
+socket/exception.c \
 debug.c \
 debug/exception.c \
 debug/dump.c \
@@ -633,8 +637,17 @@ registry.c"
 		],
 		,
 		[[#include "main/php.h"]]
-	)
+	)	
 
+	AC_CHECK_HEADERS(
+		[ext/sockets/php_sockets.h],
+		[
+			PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
+			AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
+		],
+		,
+		[[#include "main/php.h"]]
+	)
 
 	AC_CHECK_DECL(
 		[HAVE_PHP_SESSION],

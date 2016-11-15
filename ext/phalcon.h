@@ -359,10 +359,16 @@
 #include "text.h"
 #include "arr.h"
 #include "date.h"
+
 #include "binary.h"
 #include "binary/exception.h"
 #include "binary/reader.h"
 #include "binary/writer.h"
+
+#include "socket.h"
+#include "socket/client.h"
+#include "socket/server.h"
+#include "socket/exception.h"
 
 #include "validationinterface.h"
 #include "validation.h"

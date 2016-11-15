@@ -153,6 +153,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Exception);
 	PHALCON_INIT(Phalcon_Chart_Exception);
 	PHALCON_INIT(Phalcon_Binary_Exception);
+	PHALCON_INIT(Phalcon_Socket_Exception);
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DIInterface);
@@ -470,6 +471,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Binary);
 	PHALCON_INIT(Phalcon_Binary_Reader);
 	PHALCON_INIT(Phalcon_Binary_Writer);
+	PHALCON_INIT(Phalcon_Socket);
+	PHALCON_INIT(Phalcon_Socket_Client);
+	PHALCON_INIT(Phalcon_Socket_Server);
 
 	return SUCCESS;
 }

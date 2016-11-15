@@ -18,25 +18,25 @@
   +------------------------------------------------------------------------+
 */
 
-#include "binary/exception.h"
-#include "binary/../exception.h"
+#include "socket/exception.h"
+#include "socket/../exception.h"
 
 #include "kernel/main.h"
 
 /**
- * Phalcon\Binary\Exception
+ * Phalcon\Socket\Exception
  *
- * Exceptions thrown in Phalcon\Binary will use this class
+ * Exceptions thrown in Phalcon\Socket will use this class
  *
  */
-zend_class_entry *phalcon_binary_exception_ce;
+zend_class_entry *phalcon_socket_exception_ce;
 
 /**
- * Phalcon\Binary\Exception initializer
+ * Phalcon\Socket\Exception initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Binary_Exception){
+PHALCON_INIT_CLASS(Phalcon_Socket_Exception){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Binary, Exception, binary_exception, phalcon_exception_ce, NULL, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Socket, Exception, socket_exception, phalcon_exception_ce, NULL, 0);
 
 	return SUCCESS;
 }

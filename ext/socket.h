@@ -18,25 +18,37 @@
   +------------------------------------------------------------------------+
 */
 
-#include "binary/exception.h"
-#include "binary/../exception.h"
+#ifndef PHALCON_SOCKET_H
+#define PHALCON_SOCKET_H
 
-#include "kernel/main.h"
+#include "php_phalcon.h"
 
-/**
- * Phalcon\Binary\Exception
- *
- * Exceptions thrown in Phalcon\Binary will use this class
- *
- */
-zend_class_entry *phalcon_binary_exception_ce;
+#include <main/php_network.h>
 
-/**
- * Phalcon\Binary\Exception initializer
- */
-PHALCON_INIT_CLASS(Phalcon_Binary_Exception){
+#ifdef PHALCON_USE_PHP_SOCKET
+#include <ext/sockets/php_sockets.h>
+#endif
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Binary, Exception, binary_exception, phalcon_exception_ce, NULL, 0);
+#define PHALCON_SOCKET_AF_UNIX			AF_UNIX
+#define PHALCON_SOCKET_AF_INET			AF_INET
 
-	return SUCCESS;
-}
+#if HAVE_IPV6
+#define PHALCON_SOCKET_AF_INET6			AF_INET6
+#else
+#define PHALCON_SOCKET_AF_INET6
+#endif
+
+#define PHALCON_SOCKET_SOCK_STREAM		SOCK_STREAM
+#define PHALCON_SOCKET_SOCK_DGRAM		SOCK_DGRAM
+#define PHALCON_SOCKET_SOCK_RAW			SOCK_RAW
+#define PHALCON_SOCKET_SOCK_SEQPACKET	SOCK_SEQPACKET
+#define PHALCON_SOCKET_SOCK_RDM			SOCK_RDM
+
+#define PHALCON_SOCKET_SOL_TCP			IPPROTO_TCP
+#define PHALCON_SOCKET_SOL_UDP			IPPROTO_UDP
+
+extern zend_class_entry *phalcon_socket_ce;
+
+PHALCON_INIT_CLASS(Phalcon_Socket);
+
+#endif /* PHALCON_SOCKET_H */

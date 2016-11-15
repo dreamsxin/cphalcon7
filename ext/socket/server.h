@@ -18,25 +18,13 @@
   +------------------------------------------------------------------------+
 */
 
-#include "binary/exception.h"
-#include "binary/../exception.h"
+#ifndef PHALCON_SOCKET_SERVER_H
+#define PHALCON_SOCKET_SERVER_H
 
-#include "kernel/main.h"
+#include "php_phalcon.h"
 
-/**
- * Phalcon\Binary\Exception
- *
- * Exceptions thrown in Phalcon\Binary will use this class
- *
- */
-zend_class_entry *phalcon_binary_exception_ce;
+extern zend_class_entry *phalcon_socket_server_ce;
 
-/**
- * Phalcon\Binary\Exception initializer
- */
-PHALCON_INIT_CLASS(Phalcon_Binary_Exception){
+PHALCON_INIT_CLASS(Phalcon_Socket_Server);
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Binary, Exception, binary_exception, phalcon_exception_ce, NULL, 0);
-
-	return SUCCESS;
-}
+#endif /* PHALCON_SOCKET_SERVER_H */

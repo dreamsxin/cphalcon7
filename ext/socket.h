@@ -25,10 +25,6 @@
 
 #include <main/php_network.h>
 
-#ifdef PHALCON_USE_PHP_SOCKET
-#include <ext/sockets/php_sockets.h>
-#endif
-
 #define PHALCON_SOCKET_AF_UNIX			AF_UNIX
 #define PHALCON_SOCKET_AF_INET			AF_INET
 

@@ -47,6 +47,7 @@ PHP_METHOD(Phalcon_Socket, setBlocking);
 PHP_METHOD(Phalcon_Socket, isBlocking);
 PHP_METHOD(Phalcon_Socket, setOption);
 PHP_METHOD(Phalcon_Socket, close);
+PHP_METHOD(Phalcon_Socket, isClose);
 PHP_METHOD(Phalcon_Socket, __destruct);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_setblocking, 0, 0, 1)
@@ -67,6 +68,7 @@ static const zend_function_entry phalcon_socket_method_entry[] = {
 	PHP_ME(Phalcon_Socket, isBlocking, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket, setOption, arginfo_phalcon_socket_setoption, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket, isClose, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket, __destruct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
 	PHP_FE_END
 };
@@ -85,6 +87,8 @@ PHALCON_INIT_CLASS(Phalcon_Socket){
 	zend_declare_property_bool(phalcon_socket_ce, SL("_blocking"),	1, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_socket_ce, SL("_address"),	ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_socket_ce, SL("_port"),		ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_socket_ce, SL("_maxlen"),	1024, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_socket_ce, SL("_close"),		0, ZEND_ACC_PROTECTED);
 
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("AF_UNIX"),	PHALCON_SOCKET_AF_UNIX);
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("AF_INET"),	PHALCON_SOCKET_AF_INET);
@@ -212,15 +216,29 @@ PHP_METHOD(Phalcon_Socket, setOption){
  */
 PHP_METHOD(Phalcon_Socket, close){
 
-	zval socket = {};
+	zval close = {}, socket = {};
+
+	phalcon_read_property(&close, getThis(), SL("_close"), PH_NOISY);
+	if (zend_is_true(&close)) {
+		RETURN_TRUE;
+	}
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTIONW(NULL, "socket_close", &socket);
+	phalcon_update_property_bool(getThis(), SL("_close"), 1);
 }
 
 /**
- * Cleans up the socket and the resource.
+ * Check if the socket close
+ */
+PHP_METHOD(Phalcon_Socket, isClose){
+
+	RETURN_MEMBER(getThis(), "_close");
+}
+
+/**
+ * Cleans up the socket and the resource
  */
 PHP_METHOD(Phalcon_Socket, __destruct){
 
@@ -229,4 +247,5 @@ PHP_METHOD(Phalcon_Socket, __destruct){
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 	PHALCON_CALL_METHODW(NULL, getThis(), "close");
 	phalcon_update_property_null(getThis(), SL("_socket"));
+	phalcon_update_property_bool(getThis(), SL("_close"), 1);
 }

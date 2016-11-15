@@ -158,6 +158,24 @@ AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support]
     msg=yes,msg=no,msg=no)
 AC_MSG_RESULT([$msg])
 
+AC_MSG_CHECKING(for epoll support)
+AC_TRY_RUN([
+#include <stdlib.h>
+#include <sys/epoll.h>
+
+int
+main(int argc, char **argv)
+{
+	int epfd;
+
+	epfd = epoll_create(1);
+	exit (epfd == -1 ? 1 : 0);
+}
+],dnl
+AC_DEFINE(HAVE_EPOLL, 1, [Define if your have epoll support])
+    msg=yes,msg=no,msg=no)
+AC_MSG_RESULT([$msg])
+
 if test "$PHP_PHALCON" = "yes"; then
 	AC_MSG_CHECKING([PHP version])
 
@@ -637,7 +655,18 @@ registry.c"
 		],
 		,
 		[[#include "main/php.h"]]
-	)	
+	)
+
+	AC_TRY_COMPILE(
+		[
+			#include <sys/types.h>
+			#include <sys/socket.h>
+		],
+		[static struct msghdr tp; int n = (int) tp.msg_flags; return n],
+		[],
+		[AC_DEFINE(MISSING_MSGHDR_MSGFLAGS, 1, [ ])]
+	)
+	AC_DEFINE([HAVE_SOCKETS], 1, [ ])
 
 	AC_CHECK_HEADERS(
 		[ext/sockets/php_sockets.h],

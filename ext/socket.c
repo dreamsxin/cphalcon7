@@ -81,9 +81,9 @@ PHALCON_INIT_CLASS(Phalcon_Socket){
 	PHALCON_REGISTER_CLASS(Phalcon, Socket, socket, phalcon_socket_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_property_null(phalcon_socket_ce, SL("_socket"),	ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_socket_ce, SL("_domain"),	PHALCON_SOCKET_AF_INET, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_socket_ce, SL("_domain"),	ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_socket_ce, SL("_type"),		PHALCON_SOCKET_SOCK_STREAM, ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_socket_ce, SL("_protocol"),	PHALCON_SOCKET_SOL_TCP, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_socket_ce, SL("_protocol"),	PHALCON_SOCKET_IPPROTO_IP, ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_socket_ce, SL("_blocking"),	1, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_socket_ce, SL("_address"),	ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_socket_ce, SL("_port"),		ZEND_ACC_PROTECTED);
@@ -101,8 +101,20 @@ PHALCON_INIT_CLASS(Phalcon_Socket){
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("SOCK_SEQPACKET"),	PHALCON_SOCKET_SOCK_SEQPACKET);
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("SOCK_RDM"),			PHALCON_SOCKET_SOCK_RDM);
 
+	zend_declare_class_constant_long(phalcon_socket_ce, SL("IPPROTO_IP"),		PHALCON_SOCKET_IPPROTO_IP);
+	zend_declare_class_constant_long(phalcon_socket_ce, SL("IPPROTO_IPV6"),		PHALCON_SOCKET_IPPROTO_IPV6);
+
+	zend_declare_class_constant_long(phalcon_socket_ce, SL("SOL_SOCKET"),		PHALCON_SOCKET_SOL_SOCKET);
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("SOL_TCP"),			PHALCON_SOCKET_SOL_TCP);
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("SOL_UDP"),			PHALCON_SOCKET_SOL_UDP);
+
+	zend_declare_class_constant_long(phalcon_socket_ce, SL("SO_DEBUG"),			PHALCON_SOCKET_SO_DEBUG);
+	zend_declare_class_constant_long(phalcon_socket_ce, SL("SO_REUSEADDR"),		PHALCON_SOCKET_SO_REUSEADDR);
+#ifdef SO_REUSEPORT
+	zend_declare_class_constant_long(phalcon_socket_ce, SL("SO_REUSEPORT"),		PHALCON_SOCKET_SO_REUSEPORT);
+#endif
+	zend_declare_class_constant_long(phalcon_socket_ce, SL("TCP_NODELAY"),		PHALCON_SOCKET_TCP_NODELAY);
+	zend_declare_class_constant_long(phalcon_socket_ce, SL("TCP_QUICKACK"),		PHALCON_SOCKET_TCP_QUICKACK);
 	return SUCCESS;
 }
 
@@ -124,9 +136,16 @@ PHP_METHOD(Phalcon_Socket, getSocket){
 PHP_METHOD(Phalcon_Socket, getSocketId){
 
 	zval socket = {};
+	php_socket *php_sock;
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
-	ZVAL_LONG(return_value, Z_RES_HANDLE(socket));
+
+	if ((php_sock = (php_socket *)zend_fetch_resource_ex(&socket, php_sockets_le_socket_name, php_sockets_le_socket())) == NULL) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_socket_exception_ce, "epoll: can't fetch socket");
+		RETURN_FALSE;
+	}
+
+	ZVAL_LONG(return_value, php_sock->bsd_socket);
 }
 
 /**
@@ -216,12 +235,7 @@ PHP_METHOD(Phalcon_Socket, setOption){
  */
 PHP_METHOD(Phalcon_Socket, close){
 
-	zval close = {}, socket = {};
-
-	phalcon_read_property(&close, getThis(), SL("_close"), PH_NOISY);
-	if (zend_is_true(&close)) {
-		RETURN_TRUE;
-	}
+	zval socket = {};
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 

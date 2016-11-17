@@ -196,25 +196,41 @@ PHP_METHOD(Phalcon_Socket_Client, read){
  *
  * @param string $buffer
  * @param int $length
- * @return int
+ * @return Phalcon\Socket\Client
  */
 PHP_METHOD(Phalcon_Socket_Client, write){
 
-	zval *buffer, *length = NULL, socket = {};
+	zval *buffer, *length = NULL, socket = {}, writebuf = {}, writelen = {}, ret = {};
+	int len;
 
 	phalcon_fetch_params(0, 1, 1, &buffer, &length);
 
+	if (!length || Z_TYPE_P(length) != IS_LONG) {
+		len = Z_STRLEN_P(buffer);
+	} else {
+		len = Z_LVAL_P(length);
+	}
+
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
-	if (!length) {
-		PHALCON_CALL_FUNCTIONW(return_value, "socket_write", &socket, buffer);
-	} else {
-		PHALCON_CALL_FUNCTIONW(return_value, "socket_write", &socket, buffer, length);
-	}
-	
-	if (PHALCON_IS_FALSE(return_value)) {
+	ZVAL_LONG(&ret, 0);
+	PHALCON_CPY_WRT_CTOR(&writebuf, buffer);
+	while(1) {
+		ZVAL_LONG(&writelen, len);
+		PHALCON_CALL_FUNCTIONW(&ret, "socket_write", &socket, &writebuf, &writelen);
+
+		if (Z_TYPE(ret) == IS_LONG && Z_LVAL(ret) < len) {
+			len -= Z_LVAL(ret);
+			phalcon_substr(&writebuf, &writebuf, Z_LVAL(ret), len);
+		} else {
+			break;
+		}
+    }
+
+	if (PHALCON_IS_FALSE(&ret)) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
 	}
+	RETURN_THISW();
 }
 
 /**
@@ -245,19 +261,34 @@ PHP_METHOD(Phalcon_Socket_Client, recv){
  * @param string $buffer
  * @param int $length
  * @param int $flag
- * @return int
+ * @return Phalcon\Socket\Client
  */
 PHP_METHOD(Phalcon_Socket_Client, send){
 
-	zval *buffer, *length, *flag, socket = {};
+	zval *buffer, *length, *flag, socket = {}, writebuf = {}, writelen = {}, ret = {};
+	int len;
 
 	phalcon_fetch_params(0, 3, 0, &buffer, &length, &flag);
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(return_value, "socket_send", &socket, buffer, length, flag);
+	ZVAL_LONG(&ret, 0);
+	PHALCON_CPY_WRT_CTOR(&writebuf, buffer);
+
+	while(1) {
+		ZVAL_LONG(&writelen, len);
+		PHALCON_CALL_FUNCTIONW(&ret, "socket_send", &socket, &writebuf, &writelen, flag);
 	
-	if (PHALCON_IS_FALSE(return_value)) {
+		if (Z_TYPE(ret) == IS_LONG && Z_LVAL(ret) < len) {
+			len -= Z_LVAL(ret);
+			phalcon_substr(&writebuf, &writebuf, Z_LVAL(ret), len);
+		} else {
+			break;
+		}
+    }
+	
+	if (PHALCON_IS_FALSE(&ret)) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
 	}
+	RETURN_THISW();
 }

@@ -275,6 +275,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 PHP_METHOD(Phalcon_Http_Request, get)
 {
 	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL, *request;
+	zval put = {}, merged = {};
 
 	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
@@ -300,7 +301,11 @@ PHP_METHOD(Phalcon_Http_Request, get)
 
 	request = phalcon_get_global_str(SL("_REQUEST"));
 
-	PHALCON_RETURN_CALL_SELFW("_get", request, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_CALL_METHODW(&put, getThis(), "getput");
+
+	phalcon_fast_array_merge(&merged, request, &put);
+
+	PHALCON_RETURN_CALL_SELFW("_get", &merged, name, filters, default_value, not_allow_empty, norecursive);
 }
 
 /**
@@ -398,7 +403,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 	PHALCON_CALL_METHODW(&is_put, getThis(), "isput");
 
 	if (!zend_is_true(&is_put)) {
-		phalcon_read_global_str(&new_put, SL("_PUT"));
+		RETURN_EMPTY_ARRAY();
 	} else {
 		phalcon_read_property(&put, getThis(), SL("_put"), PH_NOISY);
 		if (Z_TYPE(put) != IS_ARRAY) {

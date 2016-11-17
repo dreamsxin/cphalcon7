@@ -5928,6 +5928,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 	phalcon_fetch_params(0, 1, 0, &property);
 
 	if (Z_TYPE_P(property) == IS_STRING) {
+		phalcon_fast_strtolower(&lower_property, property);
 		PHALCON_CALL_METHODW(&has, getThis(), "hasAttribute", property);
 		if (zend_is_true(&has)) {
 			if (PHALCON_GLOBAL(orm).enable_property_method) {
@@ -5943,10 +5944,11 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 			}
 			RETURN_NULL();
 		}
+	} else {
+		PHALCON_CPY_WRT(&lower_property, property);
 	}
 
 	phalcon_get_class(&model_name, getThis(), 0);
-	phalcon_fast_strtolower(&lower_property, property);
 
 	phalcon_return_property(&related_result, getThis(), SL("_relatedResult"));
 	if (Z_TYPE(related_result) == IS_ARRAY) {

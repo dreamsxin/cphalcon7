@@ -541,26 +541,6 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 								break;
 							}
 						}
-						if (Z_TYPE(onsend) > IS_NULL) {
-							args = (zval *)safe_emalloc(1, sizeof(zval), 0);
-							ZVAL_COPY(&args[0], &client);
-							PHALCON_CALL_USER_FUNC_PARAMS(&ret, &onsend, args, 1);
-						} else if (phalcon_method_exists_ex(getThis(), SL("onsend")) == SUCCESS) {
-							PHALCON_CALL_METHODW(&ret, getThis(), "onsend", &client, &data);
-						}
-					
-						if (PHALCON_IS_FALSE(&ret)) {
-							if (Z_TYPE(onclose) > IS_NULL) {
-								args = (zval *)safe_emalloc(1, sizeof(zval), 0);
-								ZVAL_COPY(&args[0], &client);
-								PHALCON_CALL_USER_FUNC_PARAMS(NULL, &onclose, args, 1);
-							} else if (phalcon_method_exists_ex(getThis(), SL("onclose")) == SUCCESS) {
-								PHALCON_CALL_METHODW(NULL, getThis(), "onclose", &client);
-							}
-							shutdown(client_fd, SHUT_RDWR);
-							close(client_fd);
-							phalcon_unset_property_array(getThis(), SL("_clients"), &client_socket_id);
-						}
 					}
 					if (status <= 0) {
 						if (Z_TYPE(onclose) > IS_NULL) {
@@ -573,6 +553,27 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 						shutdown(client_fd, SHUT_RDWR);
 						close(client_fd);
 						phalcon_unset_property_array(getThis(), SL("_clients"), &client_socket_id);
+					} else {
+						if (Z_TYPE(onsend) > IS_NULL) {
+							args = (zval *)safe_emalloc(1, sizeof(zval), 0);
+							ZVAL_COPY(&args[0], &client);
+							PHALCON_CALL_USER_FUNC_PARAMS(&ret, &onsend, args, 1);
+						} else if (phalcon_method_exists_ex(getThis(), SL("onsend")) == SUCCESS) {
+							PHALCON_CALL_METHODW(&ret, getThis(), "onsend", &client, &data);
+						}
+						if (PHALCON_IS_FALSE(&ret)) {
+							if (Z_TYPE(onclose) > IS_NULL) {
+								args = (zval *)safe_emalloc(1, sizeof(zval), 0);
+								ZVAL_COPY(&args[0], &client);
+								PHALCON_CALL_USER_FUNC_PARAMS(NULL, &onclose, args, 1);
+							} else if (phalcon_method_exists_ex(getThis(), SL("onclose")) == SUCCESS) {
+								PHALCON_CALL_METHODW(NULL, getThis(), "onclose", &client);
+							}
+							
+							shutdown(client_fd, SHUT_RDWR);
+							close(client_fd);
+							phalcon_unset_property_array(getThis(), SL("_clients"), &client_socket_id);
+						}
 					}
 				}
 			} ZEND_HASH_FOREACH_END();

@@ -1,6 +1,6 @@
 {
-    "name": "phalcon/cphalcon",
-    "description": "Web framework delivered as a C-extension for PHP",
+    "name": "dreamsxin/cphalcon7",
+    "description": "Web framework delivered as a C-extension for PHP7",
     "keywords": ["extension"],
     "require-dev": {
         "phpunit/phpunit": "5.5.*"
@@ -12,8 +12,12 @@
             "homepage": "http://phalconphp.com/en/team"
         },
         {
+            "name": "Dreamsxin",
+            "homepage": "http://www.myleftstudio.com/"
+        },
+        {
             "name": "Contributors",
-            "homepage": "https://github.com/phalcon/cphalcon/graphs/contributors"
+            "homepage": "https://github.com/dreamsxin/cphalcon7/graphs/contributors"
         }
     ]
 }

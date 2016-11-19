@@ -77,6 +77,10 @@ Test:
 
 ```shell
 php --ri phalcon7
+
+cd cphalcon7
+composer install
+vendor/bin/phpunit unit-tests
 ```
 
 Finally, restart the webserver.

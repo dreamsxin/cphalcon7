@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, table){
 /**
  * Gets the table to delete from
  *
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, getTable){
 

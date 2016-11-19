@@ -90,6 +90,6 @@ PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, resolve);
 /**
  * Checks if the service was resolved
  *
- * @return bool
+ * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, isResolved);

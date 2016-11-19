@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Http_Uri, __get){
  * Magic __isset method
  *
  * @param string $key
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Http_Uri, __isset){
 

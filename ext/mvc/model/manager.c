@@ -429,7 +429,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
  * Check whether a model is already initialized
  *
  * @param string $modelName
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, isInitialized){
 

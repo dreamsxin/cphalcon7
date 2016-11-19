@@ -479,7 +479,7 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_ViewInterface, enable);
 /**
  * Whether automatic rendering is enabled
  *
- * @return bool
+ * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_Mvc_ViewInterface, isDisabled);
 

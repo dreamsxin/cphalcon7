@@ -1401,7 +1401,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getMatches){
 /**
  * Checks if the router macthes any of the defined routes
  *
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_Router, wasMatched){
 

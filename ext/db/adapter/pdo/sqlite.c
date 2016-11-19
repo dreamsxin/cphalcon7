@@ -197,8 +197,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("smallint"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
-				phalcon_array_update_str_long(&definition, SL("bytes"), 16, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 2, 0);
 
 				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
 
@@ -217,8 +217,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("mediumint"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
-				phalcon_array_update_str_long(&definition, SL("bytes"), 24, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 3, 0);
 
 				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
 
@@ -237,8 +237,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("bigint"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
-				phalcon_array_update_str_long(&definition, SL("bytes"), 64, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 8, 0);
 
 				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
 
@@ -258,8 +258,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			if (PHALCON_IS_NOT_FALSE(&pos)) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INTEGER, 0);
 				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 1, 0);
-				phalcon_array_update_str_long(&definition, SL("bytes"), 32, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 4, 0);
 
 				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
 
@@ -278,8 +278,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("float"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
 				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
-				phalcon_array_update_str_long(&definition, SL("bytes"), 32, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 4, 0);
 				break;
 			}
 
@@ -289,8 +289,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("double"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DOUBLE, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
-				phalcon_array_update_str_long(&definition, SL("bytes"), 64, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
+				phalcon_array_update_str_long(&definition, SL("bytes"), 8, 0);
 				break;
 			}
 
@@ -300,12 +300,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("decimal"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DECIMAL, 0);
 				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
-				phalcon_array_update_str_long(&definition, SL("bindType"), 32, 0);
+				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
 				if (phalcon_is_numeric(&match_one)) {
 					phalcon_array_update_str_long(&definition, SL("bytes"), Z_LVAL(match_one) * 8, 0);
 				} else {
 					phalcon_array_update_str_long(&definition, SL("size"), 5, 0);
-					phalcon_array_update_str_long(&definition, SL("bytes"), 40, 0);
+					phalcon_array_update_str_long(&definition, SL("bytes"), 5, 0);
 				}
 				if (phalcon_is_numeric(&match_two)) {
 					phalcon_array_update_str(&definition, SL("scale"), &match_two, PH_COPY);

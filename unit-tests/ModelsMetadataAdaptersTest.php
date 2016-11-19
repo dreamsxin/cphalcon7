@@ -78,10 +78,10 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 				'year' => 0,
 			),
 			15 => array(
-				'id' => 32,
+				'id' => 4,
 				'name' => 70,
 				'type' => 32,
-				'year' => 32,
+				'year' => 4,
 			)
 		),
 		'map-robots-robots' => array(

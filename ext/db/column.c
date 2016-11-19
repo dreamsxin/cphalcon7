@@ -149,6 +149,8 @@ PHALCON_INIT_CLASS(Phalcon_Db_Column){
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_JSONB"), PHALCON_DB_COLUMN_TYPE_JSONB);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_ARRAY"), PHALCON_DB_COLUMN_TYPE_ARRAY);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_TIMESTAMP"), PHALCON_DB_COLUMN_TYPE_TIMESTAMP);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_BYTEA"), PHALCON_DB_COLUMN_TYPE_BYTEA);
+	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_MONEY"), PHALCON_DB_COLUMN_TYPE_MONEY);
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("TYPE_OTHER"), PHALCON_DB_COLUMN_TYPE_OTHER);
 
 	zend_declare_class_constant_long(phalcon_db_column_ce, SL("BIND_PARAM_NULL"), PHALCON_DB_COLUMN_BIND_PARAM_NULL);

@@ -1451,6 +1451,8 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, 0)) {
 					if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_JSON)) {
 						RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 0));
+					} else if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_BYTEA)) {
+						PHALCON_CALL_FUNCTIONW(&convert_value, "pg_unescape_bytea", value);
 					} else {
 						PHALCON_CPY_WRT(&convert_value, value);
 					}
@@ -3306,7 +3308,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), field) {
-		zval attribute_field = {}, value = {}, field_type = {}, is_not_null = {}, message = {}, type = {}, field_size = {}, field_scale = {}, str_value = {}, length = {}, pos = {};
+		zval attribute_field = {}, value = {}, field_type = {}, is_not_null = {}, message = {}, type = {}, field_size = {};
+		zval field_scale = {}, field_byte = {}, str_value = {}, length = {}, pos = {};
 		/**
 		 * We don't check fields that must be omitted
 		 */
@@ -3397,7 +3400,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 							error = &PHALCON_GLOBAL(z_true);
 						}
 					} else {
-						PHALCON_CALL_METHODW(&field_size, getThis(), "getdatabyte", field);
+						PHALCON_CALL_METHODW(&field_byte, getThis(), "getdatabyte", field);
 
 						phalcon_strval(&str_value, &value);
 						phalcon_fast_strpos_str(&pos, &str_value, SL("."));
@@ -3410,7 +3413,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 							error = &PHALCON_GLOBAL(z_true);
 						} else {
 							num = phalcon_get_intval(&value);
-							max = pow(2, (Z_LVAL(field_size) - 1)) - 1;
+							max = pow(2, ((Z_LVAL(field_byte)*8) - 1)) - 1;
 
 							if (num > max) {
 								PHALCON_CONCAT_SVSV(&message, "Value of field '", field, "' is out of range for type ", &field_type);
@@ -3651,6 +3654,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 						if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
 							if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_JSON)) {
 								RETURN_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
+							} else if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_BYTEA)) {
+								PHALCON_CALL_FUNCTIONW(&convert_value, "pg_escape_bytea", &value);
 							}
 						}
 					}

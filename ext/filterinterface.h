@@ -27,7 +27,7 @@ extern zend_class_entry *phalcon_filterinterface_ce;
 PHALCON_INIT_CLASS(Phalcon_FilterInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_filterinterface_add, 0, 0, 2)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_INFO(0, handler)
 ZEND_END_ARG_INFO()
 

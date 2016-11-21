@@ -167,8 +167,6 @@ PHP_METHOD(Phalcon_Filter, add){
 
 	phalcon_fetch_params(0, 2, 0, &name, &handler);
 
-	PHALCON_ENSURE_IS_STRING(name);
-
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_filter_exception_ce, "Filter must be an object or callable");
 		return;

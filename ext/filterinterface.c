@@ -43,7 +43,7 @@ PHALCON_INIT_CLASS(Phalcon_FilterInterface){
  * Adds a user-defined filter
  *
  * @param string $name
- * @param callable $handler
+ * @param callable|closure $handler
  * @return Phalcon\FilterInterface
  */
 PHALCON_DOC_METHOD(Phalcon_FilterInterface, add);

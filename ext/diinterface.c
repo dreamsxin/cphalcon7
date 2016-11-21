@@ -74,6 +74,7 @@ PHALCON_DOC_METHOD(Phalcon_DIInterface, remove);
  *
  * @param string $name
  * @param array $parameters
+ * @param boolean $noError
  * @return object
  */
 PHALCON_DOC_METHOD(Phalcon_DIInterface, get);
@@ -83,6 +84,7 @@ PHALCON_DOC_METHOD(Phalcon_DIInterface, get);
  *
  * @param string $name
  * @param array $parameters
+ * @param boolean $noError
  * @return object
  */
 PHALCON_DOC_METHOD(Phalcon_DIInterface, getShared);

@@ -84,6 +84,7 @@ PHP_METHOD(Phalcon_DI, set);
 PHP_METHOD(Phalcon_DI, setShared);
 PHP_METHOD(Phalcon_DI, remove);
 PHP_METHOD(Phalcon_DI, attempt);
+PHP_METHOD(Phalcon_DI, setRaw);
 PHP_METHOD(Phalcon_DI, getRaw);
 PHP_METHOD(Phalcon_DI, setService);
 PHP_METHOD(Phalcon_DI, getService);
@@ -118,6 +119,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_attempt, 0, 0, 2)
 	ZEND_ARG_INFO(0, shared)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_setraw, 0, 0, 1)
+	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_INFO(0, definition)
+	ZEND_ARG_INFO(0, shared)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_getraw, 0, 0, 1)
 	ZEND_ARG_INFO(0, name)
 ZEND_END_ARG_INFO()
@@ -130,6 +137,7 @@ static const zend_function_entry phalcon_di_method_entry[] = {
 	/* Phalcon\DIInterface*/
 	PHP_ME(Phalcon_DI, set, arginfo_phalcon_diinterface_set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, remove, arginfo_phalcon_diinterface_remove, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_DI, setRaw, arginfo_phalcon_di_setraw, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, getRaw, arginfo_phalcon_di_getraw, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, getService, arginfo_phalcon_diinterface_getservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, setService, arginfo_phalcon_diinterface_setservice, ZEND_ACC_PUBLIC)
@@ -145,7 +153,6 @@ static const zend_function_entry phalcon_di_method_entry[] = {
 	/* Convenience methods */
 	PHP_ME(Phalcon_DI, attempt, arginfo_phalcon_di_attempt, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_DI, setShared, arginfo_phalcon_di_setshared, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_DI, setRaw, setService, arginfo_phalcon_diinterface_setservice, ZEND_ACC_PUBLIC | ZEND_ACC_DEPRECATED)
 
 	/* Syntactic sugar */
 	PHP_MALIAS(Phalcon_DI, offsetExists, has, arginfo_arrayaccess_offsetexists, ZEND_ACC_PUBLIC)
@@ -261,13 +268,7 @@ PHP_METHOD(Phalcon_DI, set) {
 		shared = &PHALCON_GLOBAL(z_false);
 	}
 
-	object_init_ex(return_value, phalcon_di_service_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, shared);
-
-	phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
-	if (zend_is_true(shared)) {
-		phalcon_unset_property_array(getThis(), SL("_sharedInstances"), name);
-	}
+	PHALCON_CALL_METHODW(return_value, getThis(), "setraw", name, definition, shared);
 }
 
 /**
@@ -284,11 +285,7 @@ PHP_METHOD(Phalcon_DI, setShared){
 	phalcon_fetch_params(0, 2, 0, &name, &definition);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	object_init_ex(return_value, phalcon_di_service_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, &PHALCON_GLOBAL(z_true));
-
-	phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
-	phalcon_unset_property_array(getThis(), SL("_sharedInstances"), name);
+	PHALCON_CALL_METHODW(return_value, getThis(), "setraw", name, definition, &PHALCON_GLOBAL(z_true));
 }
 
 /**
@@ -323,34 +320,41 @@ PHP_METHOD(Phalcon_DI, attempt){
 	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	if (!phalcon_isset_property_array(getThis(), SL("_services"), name)) {
+	if (!phalcon_property_array_isset_fetch(return_value, getThis(), SL("_services"), name)) {
 		if (!shared) {
 			shared = &PHALCON_GLOBAL(z_false);
 		}
 
-		object_init_ex(return_value, phalcon_di_service_ce);
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, definition, shared);
-	
-		phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
+		PHALCON_CALL_METHODW(return_value, getThis(), "setraw", name, definition, shared);
 	}
 }
 
 /**
- * Sets a service using a raw Phalcon\DI\Service definition
+ * Returns a service definition without resolving
  *
- * @param string|Phalcon\DI\ServiceInterface $raw_definition_or_name
- * @param Phalcon\DI\ServiceInterface $rawDefinition
+ * @param string $name
+ * @param mixed $definition
+ * @param boolean $shared
  * @return Phalcon\DI\ServiceInterface
  */
-PHP_METHOD(Phalcon_DI, setService)
+PHP_METHOD(Phalcon_DI, setRaw)
 {
-	zval *name, *raw_definition;
+	zval *name, *raw_definition, *shared = NULL;
 
-	phalcon_fetch_params(0, 1, 1, &name, &raw_definition);
+	phalcon_fetch_params(0, 2, 1, &name, &raw_definition, &shared);
 
-	phalcon_update_property_array(getThis(), SL("_services"), name, raw_definition);
+	if (!shared) {
+		shared = &PHALCON_GLOBAL(z_false);
+	}
 
-	RETURN_CTORW(raw_definition);
+	object_init_ex(return_value, phalcon_di_service_ce);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", name, raw_definition, shared);
+
+	phalcon_update_property_array(getThis(), SL("_services"), name, return_value);
+
+	if (zend_is_true(shared)) {
+		phalcon_unset_property_array(getThis(), SL("_sharedInstances"), name);
+	}
 }
 
 /**
@@ -373,6 +377,24 @@ PHP_METHOD(Phalcon_DI, getRaw){
 	}
 
 	zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));
+}
+
+/**
+ * Sets a service using a raw Phalcon\DI\Service definition
+ *
+ * @param string $name
+ * @param Phalcon\DI\ServiceInterface $service
+ * @return Phalcon\DI\ServiceInterface
+ */
+PHP_METHOD(Phalcon_DI, setService)
+{
+	zval *name, *service;
+
+	phalcon_fetch_params(0, 2, 0, &name, &service);
+
+	phalcon_update_property_array(getThis(), SL("_services"), name, service);
+
+	RETURN_CTORW(service);
 }
 
 /**
@@ -401,6 +423,7 @@ PHP_METHOD(Phalcon_DI, getService){
  *
  * @param string $name
  * @param array $parameters
+ * @param boolean $noError
  * @return mixed
  */
 PHP_METHOD(Phalcon_DI, get){
@@ -469,6 +492,7 @@ PHP_METHOD(Phalcon_DI, get){
  *
  * @param string $name
  * @param array $parameters
+ * @param boolean $noError
  * @return mixed
  */
 PHP_METHOD(Phalcon_DI, getShared){

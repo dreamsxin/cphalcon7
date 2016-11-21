@@ -209,9 +209,21 @@ class DiTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($this->_di->getServices(), $expectedServices);
 	}
 
+	public function testSetRawService()
+	{
+		$this->_di->setRaw('service1', 'some-service');
+		$this->assertEquals($this->_di->getRaw('service1'), 'some-service');
+	}
+
 	public function testGetRawService()
 	{
 		$this->_di->set('service1', 'some-service');
+		$this->assertEquals($this->_di->getRaw('service1'), 'some-service');
+	}
+
+	public function testSetService()
+	{
+		$this->_di->setService('service1', new Phalcon\DI\Service('service1', 'some-service'));
 		$this->assertEquals($this->_di->getRaw('service1'), 'some-service');
 	}
 

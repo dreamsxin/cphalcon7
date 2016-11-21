@@ -321,6 +321,18 @@ PHP_METHOD(Phalcon_Socket_Server, disconnect){
 	phalcon_unset_property_array(getThis(), SL("_clients"), socket_id);
 }
 
+void setkeepalive(int fd) {
+	int keepAlive = 1;
+	int keepIdle = 30;
+	int keepInterval = 5;
+	int keepCount = 3;
+
+	setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void *) &keepAlive, sizeof (keepAlive));
+	setsockopt(fd, SOL_TCP, TCP_KEEPIDLE, (void*) &keepIdle, sizeof (keepIdle));
+	setsockopt(fd, SOL_TCP, TCP_KEEPINTVL, (void *) &keepInterval, sizeof (keepInterval));
+	setsockopt(fd, SOL_TCP, TCP_KEEPCNT, (void *) &keepCount, sizeof (keepCount));
+}
+
 /**
  * Run the Server
  *
@@ -484,6 +496,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 						} else if (phalcon_method_exists_ex(getThis(), SL("onconnection")) == SUCCESS) {
 							PHALCON_CALL_METHODW(NULL, getThis(), "onconnection", &tmp_client);
 						}
+						setkeepalive(client_fd);
 					}
 					if (client_fd < 0) {
 						if (errno != EAGAIN && errno != ECONNABORTED && errno != EPROTO && errno != EINTR) {
@@ -657,7 +670,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 						} else if (phalcon_method_exists_ex(getThis(), SL("onconnection")) == SUCCESS) {
 							PHALCON_CALL_METHODW(NULL, getThis(), "onconnection", &tmp_client);
 						}
-
+						setkeepalive(client_fd);
 						ev.data.fd = client_fd;
 						ev.events = EPOLLIN | EPOLLET;
 						if ((epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_ADD, client_fd, &ev)) < 0) {

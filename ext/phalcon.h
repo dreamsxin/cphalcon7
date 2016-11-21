@@ -63,14 +63,6 @@
 #include "cache/multiple.h"
 #include "cache/memory.h"
 
-#include "cli/console.h"
-#include "cli/console/exception.h"
-#include "cli/dispatcher.h"
-#include "cli/dispatcher/exception.h"
-#include "cli/router.h"
-#include "cli/router/exception.h"
-#include "cli/task.h"
-
 #include "pconfig.h"
 #include "config/adapter.h"
 #include "config/adapterinterface.h"
@@ -222,6 +214,17 @@
 #include "logger/formatter/syslog.h"
 #include "logger/item.h"
 #include "logger/multiple.h"
+
+#include "application.h"
+#include "application/exception.h"
+
+#include "cli/console.h"
+#include "cli/console/exception.h"
+#include "cli/dispatcher.h"
+#include "cli/dispatcher/exception.h"
+#include "cli/router.h"
+#include "cli/router/exception.h"
+#include "cli/task.h"
 
 #include "mvc/application.h"
 #include "mvc/application/exception.h"

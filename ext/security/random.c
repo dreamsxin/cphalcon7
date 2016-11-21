@@ -213,6 +213,11 @@ PHP_METHOD(Phalcon_Security_Random, bytes){
 
 	ZVAL_LONG(&len, l);
 
+	if ((phalcon_function_exists_ex(SS("random_bytes")) == SUCCESS)) {
+		PHALCON_RETURN_CALL_FUNCTIONW("random_bytes", &len);
+		return;
+	}
+
 	if ((phalcon_function_exists_ex(SS("\\sodium\\randombytes_buf")) == SUCCESS)) {
 		PHALCON_RETURN_CALL_FUNCTIONW("\\sodium\\randombytes_buf", &len);
 		return;
@@ -488,10 +493,13 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 
 	phalcon_fetch_params(0, 1, 0, &len_param);
 
-	ZVAL_STRING(&bin, "");
-
 	if (phalcon_get_intval(len_param) <= 0) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_security_exception_ce, "Require a positive integer > 0");
+		return;
+	}
+
+	if ((phalcon_function_exists_ex(SS("random_int")) == SUCCESS)) {
+		PHALCON_RETURN_CALL_FUNCTIONW("random_int", &PHALCON_GLOBAL(z_zero), len_param);
 		return;
 	}
 
@@ -499,6 +507,8 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 		PHALCON_RETURN_CALL_FUNCTIONW("\\sodium\\randombytes_uniform", len_param);
 		return;
 	}
+
+	ZVAL_STRING(&bin, "");
 
 	PHALCON_CALL_FUNCTIONW(&hex, "dechex", len_param);
 

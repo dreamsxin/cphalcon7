@@ -67,6 +67,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, describeIndexes);
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, describeIndex);
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, describeReferences);
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, tableOptions);
+PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getDefaultValue);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_dialect_sqlite_describeindex, 0, 0, 1)
 	ZEND_ARG_INFO(0, indexName)
@@ -97,6 +98,7 @@ static const zend_function_entry phalcon_db_dialect_sqlite_method_entry[] = {
 	PHP_ME(Phalcon_Db_Dialect_Sqlite, describeIndex, arginfo_phalcon_db_dialect_sqlite_describeindex, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Dialect_Sqlite, describeReferences, arginfo_phalcon_db_dialectinterface_describereferences, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Dialect_Sqlite, tableOptions, arginfo_phalcon_db_dialectinterface_tableoptions, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Dialect_Sqlite, getDefaultValue, arginfo_phalcon_db_dialectinterface_getdefaultvalue, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -317,7 +319,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getColumnDefinition){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 
-	zval *table_name, *schema_name, *column, sql = {}, name = {}, column_definition = {}, default_value = {}, slash = {}, value_cslashes = {}, is_not_null = {}, is_autoincrement = {};
+	zval *table_name, *schema_name, *column, sql = {}, name = {}, column_definition = {}, column_type = {}, default_value = {}, is_not_null = {}, is_autoincrement = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
 
@@ -336,13 +338,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, addColumn){
 
 	PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
 	if (Z_TYPE(default_value) != IS_NULL) {
-		if (phalcon_comparestr_str(&default_value, SL("CURRENT_TIMESTAMP"), &PHALCON_GLOBAL(z_false))) {
-			phalcon_concat_self_str(&sql, SL(" DEFAULT CURRENT_TIMESTAMP"));
-		} else {
-			ZVAL_STRING(&slash, "\"");
-			PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", &default_value, &slash);
-			PHALCON_SCONCAT_SVS(&sql, " DEFAULT \"", &value_cslashes, "\"");
-		}
+		PHALCON_CALL_METHODW(&column_type, column, "gettype");
+		PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+		PHALCON_SCONCAT_SV(&sql, " DEFAULT ", &default_value);
 	}
 
 	PHALCON_CALL_METHODW(&is_not_null, column, "isnotnull");
@@ -559,7 +557,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createTable){
 	ZVAL_STRING(&slash, "\"");
 	ZVAL_FALSE(&has_primary);
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&columns), column) {
-		zval column_name = {}, column_definition = {}, column_line = {}, default_value = {}, value_cslashes = {}, attribute = {};
+		zval column_name = {}, column_definition = {}, column_type = {}, column_line = {}, default_value = {}, attribute = {};
 
 		PHALCON_CALL_METHODW(&column_name, column, "getname");
 		PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
@@ -585,18 +583,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createTable){
 
 		PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE(default_value) != IS_NULL) {
-			if (phalcon_comparestr_str(&column_definition, SL("BOOLEAN"), &PHALCON_GLOBAL(z_false))) {
-				if (zend_is_true(&default_value)) {
-					phalcon_concat_self_str(&column_line, SL(" DEFAULT true"));
-				} else {
-					phalcon_concat_self_str(&column_line, SL(" DEFAULT false"));
-				}
-			} else if (phalcon_comparestr_str(&default_value, SL("CURRENT_TIMESTAMP"), &PHALCON_GLOBAL(z_false))) {
-				phalcon_concat_self_str(&column_line, SL(" DEFAULT CURRENT_TIMESTAMP"));
-			} else {
-				PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", &default_value, &slash);
-				PHALCON_SCONCAT_SVS(&column_line, " DEFAULT \"", &value_cslashes, "\"");
-			}
+			PHALCON_CALL_METHODW(&column_type, column, "gettype");
+			PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_SCONCAT_SV(&column_line, " DEFAULT ", &default_value);
 		}
 
 		/** 
@@ -899,4 +888,49 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, tableOptions){
 	phalcon_fetch_params(0, 1, 1, &table, &schema);
 
 	RETURN_EMPTY_STRING();
+}
+
+/**
+ * Return the default value
+ *
+ * @param string $defaultValue
+ * @param string $columnDefinition
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getDefaultValue){
+
+	zval *default_value, *column_type, slash = {}, value_cslashes = {};
+	int type;
+
+	phalcon_fetch_params(0, 2, 0, &default_value, &column_type);
+
+	type = Z_LVAL_P(column_type);
+
+	if (Z_TYPE_P(column_type) == IS_LONG) {
+		type = Z_LVAL_P(column_type);
+
+		if (type == PHALCON_DB_COLUMN_TYPE_BOOLEAN) {
+			if (zend_is_true(default_value)) {
+				ZVAL_STRING(return_value, "true");
+			} else {
+				ZVAL_STRING(return_value, "false");
+			}
+			return;
+		} else if (phalcon_comparestr_str(default_value, SL("CURRENT_TIMESTAMP"), &PHALCON_GLOBAL(z_false))) {
+			ZVAL_STRING(return_value, "CURRENT_TIMESTAMP");
+			return;
+		}  else if (
+			type == PHALCON_DB_COLUMN_TYPE_INTEGER
+			|| type == PHALCON_DB_COLUMN_TYPE_BIGINTEGER
+			|| type == PHALCON_DB_COLUMN_TYPE_FLOAT
+			|| type == PHALCON_DB_COLUMN_TYPE_DOUBLE
+			|| type == PHALCON_DB_COLUMN_TYPE_DECIMAL
+			|| type == PHALCON_DB_COLUMN_TYPE_MONEY
+		) {
+			RETURN_CTORW(default_value);
+		}
+	}
+	ZVAL_STRING(&slash, "\"");
+	PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", default_value, &slash);
+	PHALCON_CONCAT_SVS(return_value, "\"", &value_cslashes, "\"");
 }

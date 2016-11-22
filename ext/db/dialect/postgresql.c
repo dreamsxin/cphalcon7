@@ -66,6 +66,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listViews);
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeIndexes);
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeReferences);
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, tableOptions);
+PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getDefaultValue);
 
 static const zend_function_entry phalcon_db_dialect_postgresql_method_entry[] = {
 	PHP_ME(Phalcon_Db_Dialect_Postgresql, getColumnDefinition, arginfo_phalcon_db_dialectinterface_getcolumndefinition, ZEND_ACC_PUBLIC)
@@ -91,6 +92,7 @@ static const zend_function_entry phalcon_db_dialect_postgresql_method_entry[] = 
 	PHP_ME(Phalcon_Db_Dialect_Postgresql, describeIndexes, arginfo_phalcon_db_dialectinterface_describeindexes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Dialect_Postgresql, describeReferences, arginfo_phalcon_db_dialectinterface_describereferences, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Dialect_Postgresql, tableOptions, arginfo_phalcon_db_dialectinterface_tableoptions, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Dialect_Postgresql, getDefaultValue, arginfo_phalcon_db_dialectinterface_getdefaultvalue, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -282,7 +284,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, addColumn){
 
-	zval *table_name, *schema_name, *column, table = {}, sql = {}, name = {}, column_definition = {}, default_value = {}, slash = {}, value_cslashes = {}, is_not_null = {};
+	zval *table_name, *schema_name, *column, table = {}, sql = {}, name = {}, column_definition = {}, column_type = {}, default_value = {}, is_not_null = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
 	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
@@ -297,19 +299,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, addColumn){
 
 	PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
 	if (Z_TYPE(default_value) != IS_NULL) {
-		if (phalcon_comparestr_str(&column_definition, SL("BOOLEAN"), &PHALCON_GLOBAL(z_false))) {
-			if (zend_is_true(&default_value)) {
-				phalcon_concat_self_str(&sql, SL(" DEFAULT true"));
-			} else {
-				phalcon_concat_self_str(&sql, SL(" DEFAULT false"));
-			}
-		} else if (phalcon_comparestr_str(&default_value, SL("CURRENT_TIMESTAMP"), &PHALCON_GLOBAL(z_false))) {
-			phalcon_concat_self_str(&sql, SL(" DEFAULT CURRENT_TIMESTAMP"));
-		} else {
-			ZVAL_STRING(&slash, "\"");
-			PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", &default_value, &slash);
-			PHALCON_SCONCAT_SVS(&sql, " DEFAULT \"", &value_cslashes, "\"");
-		}
+		PHALCON_CALL_METHODW(&column_type, column, "gettype");
+		PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+		PHALCON_SCONCAT_SV(&sql, " DEFAULT ", &default_value);
 	}
 
 	PHALCON_CALL_METHODW(&is_not_null, column, "isnotnull");
@@ -331,7 +323,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, addColumn){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 
-	zval *table_name, *schema_name, *column, *current_column = NULL, table = {}, alter_table = {}, sql = {}, name = {}, current_name = {}, column_definition = {}, type = {}, current_type = {}, is_not_null = {}, current_is_not_null = {}, default_value = {}, current_default_value = {}, slash = {}, value_cslashes = {};
+	zval *table_name, *schema_name, *column, *current_column = NULL, table = {}, alter_table = {}, sql = {}, name = {}, current_name = {};
+	zval column_definition = {}, column_type ={}, current_type = {}, is_not_null = {}, current_is_not_null = {}, default_value = {};
+	zval current_default_value = {};
 
 	phalcon_fetch_params(0, 3, 1, &table_name, &schema_name, &column, &current_column);
 	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
@@ -340,11 +334,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 	PHALCON_CONCAT_SV(&alter_table, "ALTER TABLE ", &table);
 
 	PHALCON_CALL_METHODW(&name, column, "getname");
+	PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
+	PHALCON_CALL_METHODW(&column_type, column, "gettype");
 
 	if (!current_column) {
-		PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
-
-		PHALCON_CALL_METHODW(&type, column, "gettype");
 		PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" TYPE ", &column_definition, ";");
 
 		PHALCON_CALL_METHODW(&is_not_null, column, "isnotnull");
@@ -358,19 +351,8 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 		if (Z_TYPE(default_value) == IS_NULL) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP DEFAULT;");
 		} else {
-			if (phalcon_comparestr_str(&column_definition, SL("BOOLEAN"), &PHALCON_GLOBAL(z_false))) {
-				if (zend_is_true(&default_value)) {
-					PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT true");
-				} else {
-					PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT false");
-				}
-			} else if (phalcon_comparestr_str(&default_value, SL("CURRENT_TIMESTAMP"), &PHALCON_GLOBAL(z_false))) {
-				PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT CURRENT_TIMESTAMP");
-			} else {
-				ZVAL_STRING(&slash, "\"");
-				PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", &default_value, &slash);
-				PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT \"", &value_cslashes, "\"");
-			}
+			PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_SCONCAT_VSVSV(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT ", &default_value);
 		}
 		RETURN_CTORW(&sql);
 	}
@@ -382,12 +364,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 		PHALCON_CONCAT_VSVSVS(&sql, &alter_table, " RENAME COLUMN \"", &current_name, "\" TO \"", &name, "\";");
 	}
 
-	PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
-
-	PHALCON_CALL_METHODW(&type, column, "gettype");
 	PHALCON_CALL_METHODW(&current_type, current_column, "gettype");
 
-	if (!PHALCON_IS_EQUAL(&type, &current_type)) {
+	if (!PHALCON_IS_EQUAL(&column_type, &current_type)) {
 		PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" TYPE ", &column_definition, ";");
 	}
 
@@ -407,19 +386,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 		if (Z_TYPE(default_value) == IS_NULL) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP DEFAULT;");
 		} else {
-			if (phalcon_comparestr_str(&column_definition, SL("BOOLEAN"), &PHALCON_GLOBAL(z_false))) {
-				if (zend_is_true(&default_value)) {
-					PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT true");
-				} else {
-					PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT false");
-				}
-			} else if (phalcon_comparestr_str(&default_value, SL("CURRENT_TIMESTAMP"), &PHALCON_GLOBAL(z_false))) {
-				PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT CURRENT_TIMESTAMP");
-			} else {
-				ZVAL_STRING(&slash, "\"");
-				PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", &default_value, &slash);
-				PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT \"", &value_cslashes, "\"");
-			}
+			PHALCON_CALL_METHODW(&column_type, column, "gettype");
+			PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_SCONCAT_VSVSV(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT ", &default_value);
 		}
 	}
 	RETURN_CTORW(&sql);
@@ -650,7 +619,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 
 	array_init(&primary_columns);
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&columns), column) {
-		zval column_name = {}, column_definition = {}, column_line = {}, default_value = {}, value_cslashes = {}, attribute = {};
+		zval column_name = {}, column_definition = {}, column_line = {}, default_value = {}, column_type = {}, attribute = {};
 
 		PHALCON_CALL_METHODW(&column_name, column, "getname");
 		PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
@@ -659,18 +628,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 
 		PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE(default_value) != IS_NULL) {
-			if (phalcon_comparestr_str(&column_definition, SL("BOOLEAN"), &PHALCON_GLOBAL(z_false))) {
-				if (zend_is_true(&default_value)) {
-					phalcon_concat_self_str(&column_line, SL(" DEFAULT true"));
-				} else {
-					phalcon_concat_self_str(&column_line, SL(" DEFAULT false"));
-				}
-			} else if (phalcon_comparestr_str(&default_value, SL("CURRENT_TIMESTAMP"), &PHALCON_GLOBAL(z_false))) {
-				phalcon_concat_self_str(&column_line, SL(" DEFAULT CURRENT_TIMESTAMP"));
-			} else {
-				PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", &default_value, &slash);
-				PHALCON_SCONCAT_SVS(&column_line, " DEFAULT \"", &value_cslashes, "\"");
-			}
+			PHALCON_CALL_METHODW(&column_type, column, "gettype");
+			PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_SCONCAT_SV(&column_line, " DEFAULT ", &default_value);
 		}
 
 		/** 
@@ -1056,4 +1016,47 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, tableOptions){
 	}
 
 	RETURN_EMPTY_STRING();
+}
+
+/**
+ * Return the default value
+ *
+ * @param string $defaultValue
+ * @param string $columnDefinition
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getDefaultValue){
+
+	zval *default_value, *column_type, slash = {}, value_cslashes = {};
+	int type;
+
+	phalcon_fetch_params(0, 2, 0, &default_value, &column_type);
+
+	if (Z_TYPE_P(column_type) == IS_LONG) {
+		type = Z_LVAL_P(column_type);
+
+		if (type == PHALCON_DB_COLUMN_TYPE_BOOLEAN) {
+			if (zend_is_true(default_value)) {
+				ZVAL_STRING(return_value, "true");
+			} else {
+				ZVAL_STRING(return_value, "false");
+			}
+			return;
+		} else if (phalcon_comparestr_str(default_value, SL("CURRENT_TIMESTAMP"), &PHALCON_GLOBAL(z_false))) {
+			ZVAL_STRING(return_value, "CURRENT_TIMESTAMP");
+			return;
+		}  else if (
+			type == PHALCON_DB_COLUMN_TYPE_INTEGER
+			|| type == PHALCON_DB_COLUMN_TYPE_BIGINTEGER
+			|| type == PHALCON_DB_COLUMN_TYPE_FLOAT
+			|| type == PHALCON_DB_COLUMN_TYPE_DOUBLE
+			|| type == PHALCON_DB_COLUMN_TYPE_DECIMAL
+			|| type == PHALCON_DB_COLUMN_TYPE_MONEY
+		) {
+			RETURN_CTORW(default_value);
+		}
+	}
+	ZVAL_STRING(&slash, "\"");
+	PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", default_value, &slash);
+	PHALCON_CONCAT_SVS(return_value, "\"", &value_cslashes, "\"");
 }

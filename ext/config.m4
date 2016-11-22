@@ -12,11 +12,11 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(qrcode, wheter to enable qrcode support, 
-[  --without-qrcode        Disable qrcode], yes, no)
+PHP_ARG_ENABLE(qrcode, wheter to enable qrcode support,
+[  --enable-qrcode         Enable qrcode], no, no)
 
 AC_MSG_CHECKING([Include qrcode])
-if test "$PHP_QRCODE" = "yes"; then
+if test "$PHP_QRCODE" != "no"; then
 	AC_DEFINE([PHALCON_QRCODE], [1], [Whether qrcode are available])
 	AC_MSG_RESULT([yes, qrcode])
 else
@@ -734,7 +734,7 @@ registry.c"
 		fi
 	done
 
-	if test "$PHP_QRCODE" = "yes"; then
+	if test "$PHP_QRCODE" != "no"; then
 		if test -z "$PNG_CFLAGS"; then
 			AC_MSG_ERROR([Incorrect png library])
 		fi
@@ -783,7 +783,7 @@ registry.c"
 	done
 
 
-	if test "$PHP_QRCODE" = "yes"; then
+	if test "$PHP_QRCODE" != "no"; then
 		if test -z "$WAND_CFLAGS"; then
 			AC_MSG_ERROR([Incorrect ImageMagick MagickWand library])
 		fi

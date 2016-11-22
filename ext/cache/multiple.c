@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, push){
 
 	phalcon_fetch_params(0, 1, 0, &backend);
 	
-	PHALCON_VERIFY_INTERFACE_EX(backend, phalcon_cache_backendinterface_ce, phalcon_cache_exception_ce, 0)
+	PHALCON_VERIFY_INTERFACE_EX(backend, phalcon_cache_backendinterface_ce, phalcon_cache_exception_ce, 0);
 	phalcon_update_property_array_append(getThis(), SL("_backends"), backend);
 	RETURN_THISW();
 }

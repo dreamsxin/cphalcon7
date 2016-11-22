@@ -24,6 +24,7 @@
 #include "annotations/adapter/files.h"
 #include "annotations/adapter/memory.h"
 #include "annotations/adapter/xcache.h"
+#include "annotations/adapter/cache.h"
 #include "annotations/annotation.h"
 #include "annotations/collection.h"
 #include "annotations/exception.h"
@@ -348,6 +349,7 @@
 #include "session/exception.h"
 #include "session/adapter/memcache.h"
 #include "session/adapter/libmemcached.h"
+#include "session/adapter/cache.h"
 
 #include "tag.h"
 #include "tag/exception.h"

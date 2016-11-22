@@ -515,6 +515,7 @@ session/adapterinterface.c \
 session/adapter.c \
 session/adapter/memcache.c \
 session/adapter/libmemcached.c \
+session/adapter/cache.c \
 diinterface.c \
 escaper.c \
 crypt/exception.c \
@@ -554,6 +555,7 @@ annotations/adapter/files.c \
 annotations/adapter/apc.c \
 annotations/adapter/xcache.c \
 annotations/adapter/memory.c \
+annotations/adapter/cache.c \
 annotations/exception.c \
 annotations/collection.c \
 annotations/adapterinterface.c \

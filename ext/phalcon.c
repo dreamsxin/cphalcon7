@@ -328,6 +328,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Session_Adapter_Files);
 	PHALCON_INIT(Phalcon_Session_Adapter_Memcache);
 	PHALCON_INIT(Phalcon_Session_Adapter_Libmemcached);
+	PHALCON_INIT(Phalcon_Session_Adapter_Cache);
 	PHALCON_INIT(Phalcon_Filter);
 	PHALCON_INIT(Phalcon_Flash_Direct);
 	PHALCON_INIT(Phalcon_Flash_Session);
@@ -339,6 +340,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Xcache);
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Files);
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Memory);
+	PHALCON_INIT(Phalcon_Annotations_Adapter_Cache);
 	PHALCON_INIT(Phalcon_Loader);
 	PHALCON_INIT(Phalcon_Logger);
 	PHALCON_INIT(Phalcon_Logger_Item);

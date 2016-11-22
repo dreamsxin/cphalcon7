@@ -23,6 +23,7 @@
 
 #include <main/SAPI.h>
 #include <ext/spl/spl_array.h>
+#include <ext/session/php_session.h>
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -143,7 +144,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 	zval *options = NULL, *_expire = NULL, *_path = NULL, *_secure = NULL, *_domain = NULL, *_http_only = NULL;
 	zval expire = {}, path = {}, secure = {}, domain = {}, http_only = {};
 
-	phalcon_fetch_params(0, 0, 6, &options, &expire, &path, &secure, &domain, &_http_only);
+	phalcon_fetch_params(0, 0, 6, &options, &_expire, &_path, &_secure, &_domain, &_http_only);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "setoptions", options);
@@ -179,7 +180,9 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 		PHALCON_CPY_WRT_CTOR(&http_only, _http_only);
 	}
 
-	PHALCON_CALL_FUNCTIONW(NULL, "session_set_cookie_params", &expire, &path, &secure, &domain, &http_only);
+	if (_expire || _path || _secure || _domain || _http_only) {
+		PHALCON_CALL_FUNCTIONW(NULL, "session_set_cookie_params", &expire, &path, &secure, &domain, &http_only);
+	}
 }
 
 PHP_METHOD(Phalcon_Session_Adapter, __destruct) {
@@ -271,6 +274,9 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 	if (phalcon_array_isset_fetch(&value, _SESSION, &key, 0)) {
 		if (remove && zend_is_true(remove)) {
 			phalcon_array_unset(_SESSION, &key, 0);
+			if (Z_ISREF_P(&PS(http_session_vars)) && Z_TYPE_P(Z_REFVAL(PS(http_session_vars))) == IS_ARRAY) {
+				zend_hash_del(Z_ARRVAL_P(Z_REFVAL(PS(http_session_vars))), Z_STR(key));
+			}
 		}
 		RETURN_CTORW(&value);
 	}
@@ -378,6 +384,10 @@ PHP_METHOD(Phalcon_Session_Adapter, remove){
 
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
 	phalcon_array_unset(_SESSION, &key, 0);
+
+	if (Z_ISREF_P(&PS(http_session_vars)) && Z_TYPE_P(Z_REFVAL(PS(http_session_vars))) == IS_ARRAY) {
+		zend_hash_del(Z_ARRVAL_P(Z_REFVAL(PS(http_session_vars))), Z_STR(key));
+	}
 }
 
 /**

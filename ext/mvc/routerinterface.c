@@ -219,7 +219,7 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_RouterInterface, getMatches);
 /**
  * Check if the router macthes any of the defined routes
  *
- * @return bool
+ * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_Mvc_RouterInterface, wasMatched);
 
@@ -249,6 +249,6 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_RouterInterface, getRouteByName);
 /**
  * Returns whether controller name should not be mangled
  *
- * @return bool
+ * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_Mvc_RouterInterface, isExactControllerName);

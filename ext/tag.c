@@ -516,7 +516,7 @@ PHP_METHOD(Phalcon_Tag, getEscaperService){
 /**
  * Get current autoescape mode
  *
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Tag, getAutoescape) {
 

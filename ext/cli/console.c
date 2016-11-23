@@ -14,10 +14,12 @@
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
   |          Rack Lin <racklin@gmail.com>                                  |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
 #include "cli/console.h"
+#include "cli/../application.h"
 #include "cli/console/exception.h"
 #include "cli/router.h"
 #include "diinterface.h"
@@ -46,17 +48,12 @@
 zend_class_entry *phalcon_cli_console_ce;
 
 PHP_METHOD(Phalcon_CLI_Console, __construct);
-PHP_METHOD(Phalcon_CLI_Console, registerModules);
 PHP_METHOD(Phalcon_CLI_Console, addModules);
 PHP_METHOD(Phalcon_CLI_Console, getModules);
 PHP_METHOD(Phalcon_CLI_Console, handle);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_console___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, dependencyInjector)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_console_registermodules, 0, 0, 1)
-	ZEND_ARG_INFO(0, modules)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_console_addmodules, 0, 0, 1)
@@ -69,9 +66,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_console_method_entry[] = {
 	PHP_ME(Phalcon_CLI_Console, __construct, arginfo_phalcon_cli_console___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_CLI_Console, registerModules, arginfo_phalcon_cli_console_registermodules, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_CLI_Console, addModules, arginfo_phalcon_cli_console_addmodules, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Console, getModules, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_CLI_Console, handle, arginfo_phalcon_cli_console_handle, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -81,7 +76,7 @@ static const zend_function_entry phalcon_cli_console_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_CLI_Console){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Console, cli_console, phalcon_di_injectable_ce, phalcon_cli_console_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Console, cli_console, phalcon_application_ce, phalcon_cli_console_method_entry, 0);
 
 	zend_declare_property_null(phalcon_cli_console_ce, SL("_modules"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_console_ce, SL("_moduleObject"), ZEND_ACC_PROTECTED);
@@ -104,38 +99,6 @@ PHP_METHOD(Phalcon_CLI_Console, __construct){
 }
 
 /**
- * Register an array of modules present in the console
- *
- *<code>
- *	$application->registerModules(array(
- *		'frontend' => array(
- *			'className' => 'Multiple\Frontend\Module',
- *			'path' => '../apps/frontend/Module.php'
- *		),
- *		'backend' => array(
- *			'className' => 'Multiple\Backend\Module',
- *			'path' => '../apps/backend/Module.php'
- *		)
- *	));
- *</code>
- *
- * @param array $modules
- */
-PHP_METHOD(Phalcon_CLI_Console, registerModules){
-
-	zval *modules;
-
-	phalcon_fetch_params(0, 1, 0, &modules);
-
-	if (Z_TYPE_P(modules) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_console_exception_ce, "Modules must be an Array");
-		return;
-	}
-	phalcon_update_property_zval(getThis(), SL("_modules"), modules);
-
-}
-
-/**
  * Merge modules with the existing ones
  *
  *<code>
@@ -151,30 +114,11 @@ PHP_METHOD(Phalcon_CLI_Console, registerModules){
  */
 PHP_METHOD(Phalcon_CLI_Console, addModules){
 
-	zval *modules, original_modules = {}, register_modules = {};
+	zval *modules;
 
 	phalcon_fetch_params(0, 1, 0, &modules);
 
-	if (Z_TYPE_P(modules) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_console_exception_ce, "Modules must be an Array");
-		return;
-	}
-
-	phalcon_read_property(&original_modules, getThis(), SL("_modules"), PH_NOISY);
-
-	phalcon_fast_array_merge(&register_modules, modules, &original_modules);
-	phalcon_update_property_zval(getThis(), SL("_modules"), &register_modules);
-}
-
-/**
- * Return the modules registered in the console
- *
- * @return array
- */
-PHP_METHOD(Phalcon_CLI_Console, getModules){
-
-
-	RETURN_MEMBER(getThis(), "_modules");
+	PHALCON_CALL_METHODW(return_value, getThis(), "registermodules", modules, &PHALCON_GLOBAL(z_true));
 }
 
 /**

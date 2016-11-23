@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, table){
 /**
  * Gets the table to insert into
  *
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getTable){
 

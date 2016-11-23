@@ -2060,7 +2060,7 @@ PHP_METHOD(Phalcon_Mvc_View, enable){
 /**
  * Whether automatic rendering is enabled
  *
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_View, isDisabled){
 

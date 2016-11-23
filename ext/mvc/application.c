@@ -19,6 +19,7 @@
 */
 
 #include "mvc/application.h"
+#include "mvc/../application.h"
 #include "mvc/application/exception.h"
 #include "mvc/dispatcherinterface.h"
 #include "mvc/../dispatcherinterface.h"
@@ -94,10 +95,6 @@ zend_class_entry *phalcon_mvc_application_ce;
 
 PHP_METHOD(Phalcon_Mvc_Application, __construct);
 PHP_METHOD(Phalcon_Mvc_Application, useImplicitView);
-PHP_METHOD(Phalcon_Mvc_Application, registerModules);
-PHP_METHOD(Phalcon_Mvc_Application, getModules);
-PHP_METHOD(Phalcon_Mvc_Application, setDefaultModule);
-PHP_METHOD(Phalcon_Mvc_Application, getDefaultModule);
 PHP_METHOD(Phalcon_Mvc_Application, handle);
 PHP_METHOD(Phalcon_Mvc_Application, request);
 
@@ -107,15 +104,6 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_useimplicitview, 0, 0, 1)
 	ZEND_ARG_INFO(0, implicitView)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_registermodules, 0, 0, 1)
-	ZEND_ARG_INFO(0, modules)
-	ZEND_ARG_INFO(0, merge)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_INFO(0, defaultModule)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_handle, 0, 0, 0)
@@ -129,10 +117,6 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_mvc_application_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Application, __construct, arginfo_phalcon_mvc_application___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Application, useImplicitView, arginfo_phalcon_mvc_application_useimplicitview, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Application, registerModules, arginfo_phalcon_mvc_application_registermodules, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Application, getModules, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Application, setDefaultModule, arginfo_phalcon_mvc_application_setdefaultmodule, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Application, getDefaultModule, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Application, handle, arginfo_phalcon_mvc_application_handle, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Application, request, arginfo_phalcon_mvc_application_request, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -143,11 +127,8 @@ static const zend_function_entry phalcon_mvc_application_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Mvc_Application){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Application, mvc_application, phalcon_di_injectable_ce, phalcon_mvc_application_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Application, mvc_application, phalcon_application_ce, phalcon_mvc_application_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_application_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_application_ce, SL("_modules"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_application_ce, SL("_moduleObject"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_mvc_application_ce, SL("_implicitView"), 1, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
@@ -184,94 +165,6 @@ PHP_METHOD(Phalcon_Mvc_Application, useImplicitView){
 
 	phalcon_update_property_zval(getThis(), SL("_implicitView"), implicit_view);
 	RETURN_THISW();
-}
-
-/**
- * Register an array of modules present in the application
- *
- *<code>
- *	$this->registerModules(array(
- *		'frontend' => array(
- *			'className' => 'Multiple\Frontend\Module',
- *			'path' => '../apps/frontend/Module.php'
- *		),
- *		'backend' => array(
- *			'className' => 'Multiple\Backend\Module',
- *			'path' => '../apps/backend/Module.php'
- *		)
- *	));
- *</code>
- *
- * @param array $modules
- * @param boolean $merge
- * @param Phalcon\Mvc\Application
- */
-PHP_METHOD(Phalcon_Mvc_Application, registerModules){
-
-	zval *modules, *merge = NULL, registered_modules = {}, merged_modules = {};
-
-	phalcon_fetch_params(0, 1, 1, &modules, &merge);
-
-	if (!merge) {
-		merge = &PHALCON_GLOBAL(z_false);
-	}
-
-	if (Z_TYPE_P(modules) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_application_exception_ce, "Modules must be an Array");
-		return;
-	}
-	if (PHALCON_IS_FALSE(merge)) {
-		phalcon_update_property_zval(getThis(), SL("_modules"), modules);
-	} else {
-		phalcon_read_property(&registered_modules, getThis(), SL("_modules"), PH_NOISY);
-		if (Z_TYPE(registered_modules) == IS_ARRAY) { 
-			phalcon_fast_array_merge(&merged_modules, &registered_modules, modules);
-		} else {
-			PHALCON_CPY_WRT(&merged_modules, modules);
-		}
-
-		phalcon_update_property_zval(getThis(), SL("_modules"), &merged_modules);
-	}
-
-	RETURN_THISW();
-}
-
-/**
- * Return the modules registered in the application
- *
- * @return array
- */
-PHP_METHOD(Phalcon_Mvc_Application, getModules){
-
-
-	RETURN_MEMBER(getThis(), "_modules");
-}
-
-/**
- * Sets the module name to be used if the router doesn't return a valid module
- *
- * @param string $defaultModule
- * @return Phalcon\Mvc\Application
- */
-PHP_METHOD(Phalcon_Mvc_Application, setDefaultModule){
-
-	zval *default_module;
-
-	phalcon_fetch_params(0, 1, 0, &default_module);
-
-	phalcon_update_property_zval(getThis(), SL("_defaultModule"), default_module);
-	RETURN_THISW();
-}
-
-/**
- * Returns the default module name
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Application, getDefaultModule){
-
-
-	RETURN_MEMBER(getThis(), "_defaultModule");
 }
 
 /**

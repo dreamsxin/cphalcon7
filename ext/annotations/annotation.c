@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getArgument){
 /**
  * Checks if the annotation has a specific argument
  *
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Annotations_Annotation, hasArgument){
 

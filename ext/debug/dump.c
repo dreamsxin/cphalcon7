@@ -157,7 +157,13 @@ PHP_METHOD(Phalcon_Debug_Dump, __construct){
  */
 PHP_METHOD(Phalcon_Debug_Dump, all)
 {
-	zval method_name = {}, call_object = {}, arg_list = {};
+	zval *args, method_name = {}, call_object = {};
+
+	args = (zval *)safe_emalloc(ZEND_NUM_ARGS(), sizeof(zval), 0);
+	if (zend_get_parameters_array_ex(ZEND_NUM_ARGS(), args) == FAILURE) {
+		efree(args);
+		WRONG_PARAM_COUNT;
+	}
 
 	ZVAL_STRING(&method_name, "variables");
 
@@ -165,9 +171,7 @@ PHP_METHOD(Phalcon_Debug_Dump, all)
 	phalcon_array_append(&call_object, getThis(), PH_COPY);
 	phalcon_array_append(&call_object, &method_name, PH_COPY);
 
-	PHALCON_CALL_FUNCTIONW(&arg_list, "func_get_args");
-
-	PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &call_object, &arg_list);
+	PHALCON_CALL_USER_FUNC_PARAMS(return_value, &call_object, args, ZEND_NUM_ARGS());
 }
 
 /**
@@ -587,16 +591,21 @@ PHP_METHOD(Phalcon_Debug_Dump, variable){
  */
 PHP_METHOD(Phalcon_Debug_Dump, variables){
 
-	zval arg_list = {}, *variable;
+	zval *args;
+	uint32_t i;
 
-	PHALCON_CALL_FUNCTIONW(&arg_list, "func_get_args");
+	args = (zval *)safe_emalloc(ZEND_NUM_ARGS(), sizeof(zval), 0);
+	if (zend_get_parameters_array_ex(ZEND_NUM_ARGS(), args) == FAILURE) {
+		efree(args);
+		WRONG_PARAM_COUNT;
+	}
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(arg_list), variable) {
+	for (i = 0; i < ZEND_NUM_ARGS(); i++) {
 		zval output = {};
 
-		PHALCON_CALL_SELFW(&output, "variable", variable);
+		PHALCON_CALL_SELFW(&output, "variable", &args[i]);
 		PHALCON_SCONCAT(return_value, &output);
-	} ZEND_HASH_FOREACH_END();
+	};
 
 	return;
 }

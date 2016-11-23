@@ -85,6 +85,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	}
 
 	if (clean) {
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			phalcon_ob_flush();
+		}
 		phalcon_ob_clean();
 	}
 
@@ -115,6 +118,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
 	if (clean) {
 		phalcon_ob_get_contents(&contents);
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			phalcon_ob_clean();
+		}
 	
 		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHODW(NULL, &view, "setcontent", &contents);

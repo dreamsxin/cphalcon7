@@ -57,6 +57,7 @@ static const zend_function_entry phalcon_db_dialectinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Db_DialectInterface, createSavepoint, arginfo_phalcon_db_dialectinterface_createsavepoint)
 	PHP_ABSTRACT_ME(Phalcon_Db_DialectInterface, releaseSavepoint, arginfo_phalcon_db_dialectinterface_releasesavepoint)
 	PHP_ABSTRACT_ME(Phalcon_Db_DialectInterface, rollbackSavepoint, arginfo_phalcon_db_dialectinterface_rollbacksavepoint)
+	PHP_ABSTRACT_ME(Phalcon_Db_DialectInterface, getDefaultValue, arginfo_phalcon_db_dialectinterface_getdefaultvalue)
 	PHP_FE_END
 };
 
@@ -369,3 +370,11 @@ PHALCON_DOC_METHOD(Phalcon_Db_DialectInterface, releaseSavepoint);
  * @return string
  */
 PHALCON_DOC_METHOD(Phalcon_Db_DialectInterface, rollbackSavepoint);
+
+/**
+ * Return the default value
+ *
+ * @param string $name
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_Db_DialectInterface, getDefaultValue);

@@ -381,16 +381,9 @@ PHP_METHOD(Phalcon_Dispatcher, isLogicBinding){
  */
 PHP_METHOD(Phalcon_Dispatcher, setParams){
 
-	zval *params, exception_code = {}, exception_message = {};
+	zval *params;
 
 	phalcon_fetch_params(0, 1, 0, &params);
-
-	if (Z_TYPE_P(params) != IS_ARRAY) {
-		ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_INVALID_PARAMS);
-		ZVAL_STRING(&exception_message, "Parameters must be an Array");
-		PHALCON_CALL_METHODW(NULL, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
-		RETURN_NULL();
-	}
 
 	phalcon_update_property_zval(getThis(), SL("_params"), params);
 }
@@ -1289,7 +1282,7 @@ PHP_METHOD(Phalcon_Dispatcher, camelizeController){
 /**
  * Set error handler
  *
- * @param mixed $handler
+ * @param mixed $error_handler
  * @param int $exception_code
  * @return Phalcon\DispatcherInterface
  */

@@ -69,87 +69,87 @@ PHP_METHOD(Phalcon_Binary_Writer, writeDouble);
 PHP_METHOD(Phalcon_Binary_Writer, writeString);
 PHP_METHOD(Phalcon_Binary_Writer, writeHexString);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary___construct, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, endian)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_write, 0, 0, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_write, 0, 0, 2)
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writechar, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writechar, 0, 0, 1)
 	ZEND_ARG_INFO(0, byte)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writeunsignedchar, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeunsignedchar, 0, 0, 1)
 	ZEND_ARG_INFO(0, byte)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writeint16, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeint16, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writeunsignedint16, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeunsignedint16, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writeint, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeint, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writeunsignedint, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeunsignedint, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writeint32, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeint32, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writeunsignedint32, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeunsignedint32, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writefloat, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writefloat, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writedouble, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writedouble, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writestring, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writestring, 0, 0, 1)
 	ZEND_ARG_INFO(0, str)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 0)
 	ZEND_ARG_INFO(0, exact)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writehexstring, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writehexstring, 0, 0, 1)
 	ZEND_ARG_INFO(0, str)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
 	ZEND_ARG_INFO(0, lowNibble)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry phalcon_arr_method_entry[] = {
-	PHP_ME(Phalcon_Binary_Writer, __construct, arginfo_phalcon_binary___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+static const zend_function_entry phalcon_binary_writer_method_entry[] = {
+	PHP_ME(Phalcon_Binary_Writer, __construct, arginfo_phalcon_binary_writer___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Binary_Writer, getEndian, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Writer, getOutput, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Writer, getContent, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Writer, getPosition, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, write, arginfo_phalcon_binary_write, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeChar, arginfo_phalcon_binary_writechar, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeUnsignedChar, arginfo_phalcon_binary_writeunsignedchar, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeInt16, arginfo_phalcon_binary_writeint16, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeUnsignedInt16, arginfo_phalcon_binary_writeunsignedint16, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeInt, arginfo_phalcon_binary_writeint, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeUnsignedInt, arginfo_phalcon_binary_writeunsignedint, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeInt32, arginfo_phalcon_binary_writeint32, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeUnsignedInt32, arginfo_phalcon_binary_writeunsignedint32, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeFloat, arginfo_phalcon_binary_writefloat, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeDouble, arginfo_phalcon_binary_writedouble, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeString, arginfo_phalcon_binary_writestring, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Writer, writeHexString, arginfo_phalcon_binary_writehexstring, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, write, arginfo_phalcon_binary_writer_write, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeChar, arginfo_phalcon_binary_writer_writechar, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeUnsignedChar, arginfo_phalcon_binary_writer_writeunsignedchar, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeInt16, arginfo_phalcon_binary_writer_writeint16, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeUnsignedInt16, arginfo_phalcon_binary_writer_writeunsignedint16, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeInt, arginfo_phalcon_binary_writer_writeint, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeUnsignedInt, arginfo_phalcon_binary_writer_writeunsignedint, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeInt32, arginfo_phalcon_binary_writer_writeint32, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeUnsignedInt32, arginfo_phalcon_binary_writer_writeunsignedint32, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeFloat, arginfo_phalcon_binary_writer_writefloat, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeDouble, arginfo_phalcon_binary_writer_writedouble, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeString, arginfo_phalcon_binary_writer_writestring, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Writer, writeHexString, arginfo_phalcon_binary_writer_writehexstring, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -158,7 +158,7 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Binary_Writer){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Binary, Writer, binary_writer, phalcon_arr_method_entry, 0);
+	PHALCON_REGISTER_CLASS(Phalcon\\Binary, Writer, binary_writer, phalcon_binary_writer_method_entry, 0);
 
 	zend_declare_property_long(phalcon_binary_writer_ce, SL("_endian"), PHALCON_BINARY_ENDIAN_BIG, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_binary_writer_ce, SL("_output"), ZEND_ACC_PROTECTED);

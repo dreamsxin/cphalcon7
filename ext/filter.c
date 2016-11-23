@@ -167,8 +167,6 @@ PHP_METHOD(Phalcon_Filter, add){
 
 	phalcon_fetch_params(0, 2, 0, &name, &handler);
 
-	PHALCON_ENSURE_IS_STRING(name);
-
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_filter_exception_ce, "Filter must be an object or callable");
 		return;
@@ -274,7 +272,10 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		/** 
 		 * If the filter is a closure we call it in the PHP userland
 		 */
-		if (phalcon_is_callable(&filter_object) || (Z_TYPE(filter_object) == IS_OBJECT && instanceof_function(Z_OBJCE(filter_object), zend_ce_closure))) {
+		if (Z_TYPE(filter_object) == IS_OBJECT && instanceof_function(Z_OBJCE(filter_object), zend_ce_closure)) {
+			PHALCON_CALL_METHODW(return_value, &filter_object, "call", getThis(), value);
+			return;
+		} else if (phalcon_is_callable(&filter_object)) {
 			array_init_size(&arguments, 1);
 			phalcon_array_append(&arguments, value, PH_COPY);
 			PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &filter_object, &arguments);

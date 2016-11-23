@@ -73,39 +73,39 @@ PHP_METHOD(Phalcon_Binary_Reader, readDouble);
 PHP_METHOD(Phalcon_Binary_Reader, readString);
 PHP_METHOD(Phalcon_Binary_Reader, readHexString);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary___construct, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, endian)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_setposition, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader_setposition, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, position, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, whence, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_read, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader_read, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_readstring, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader_readstring, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_readhexstring, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader_readhexstring, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
 	ZEND_ARG_INFO(0, lowNibble)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry phalcon_arr_method_entry[] = {
-	PHP_ME(Phalcon_Binary_Reader, __construct, arginfo_phalcon_binary___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+static const zend_function_entry phalcon_binary_reader_method_entry[] = {
+	PHP_ME(Phalcon_Binary_Reader, __construct, arginfo_phalcon_binary_reader___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Binary_Reader, getEndian, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, getInput, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, getContent, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Reader, setPosition, arginfo_phalcon_binary_setposition, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Reader, setPosition, arginfo_phalcon_binary_reader_setposition, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, getPosition, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, getEofPosition, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, isEof, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Reader, read, arginfo_phalcon_binary_read, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Reader, read, arginfo_phalcon_binary_reader_read, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, readChar, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, readUnsignedChar, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, readInt16, NULL, ZEND_ACC_PUBLIC)
@@ -116,8 +116,8 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Binary_Reader, readUnsignedInt32, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, readFloat, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, readDouble, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Reader, readString, arginfo_phalcon_binary_readstring, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Binary_Reader, readHexString, arginfo_phalcon_binary_readhexstring, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Reader, readString, arginfo_phalcon_binary_reader_readstring, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Reader, readHexString, arginfo_phalcon_binary_reader_readhexstring, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -126,7 +126,7 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Binary_Reader){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Binary, Reader, binary_reader, phalcon_arr_method_entry, 0);
+	PHALCON_REGISTER_CLASS(Phalcon\\Binary, Reader, binary_reader, phalcon_binary_reader_method_entry, 0);
 
 	zend_declare_property_long(phalcon_binary_reader_ce, SL("_endian"), PHALCON_BINARY_ENDIAN_BIG, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_binary_reader_ce, SL("_data"), ZEND_ACC_PROTECTED);

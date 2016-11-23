@@ -60,7 +60,7 @@ PHALCON_DOC_METHOD(Phalcon_Translate_AdapterInterface, query);
 /**
  * Check whether is defined a translation key in the internal array
  *
- * @param 	string $index
- * @return bool
+ * @param string $index
+ * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_Translate_AdapterInterface, exists);

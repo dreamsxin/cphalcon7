@@ -187,4 +187,9 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_dialectinterface_rollbacksavepoint, 0,
 	ZEND_ARG_INFO(0, name)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_dialectinterface_getdefaultvalue, 0, 0, 2)
+	ZEND_ARG_INFO(0, defaultValue)
+	ZEND_ARG_INFO(0, columnType)
+ZEND_END_ARG_INFO()
+
 #endif /* PHALCON_DB_DIALECTINTERFACE_H */

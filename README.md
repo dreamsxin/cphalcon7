@@ -64,7 +64,7 @@ sudo make install
 /usr/local/php/bin/phpize
 ./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized" --with-php-config=/usr/local/php/bin/php-config
 # or
-./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized" --with-php-config=/usr/local/php/bin/php-config --without-qrcode
+./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized" --with-php-config=/usr/local/php/bin/php-config --enable-qrcode
 ```
 
 Add the extension to your php.ini:
@@ -77,6 +77,10 @@ Test:
 
 ```shell
 php --ri phalcon7
+
+cd cphalcon7
+composer install
+vendor/bin/phpunit unit-tests
 ```
 
 Finally, restart the webserver.
@@ -99,7 +103,8 @@ External Links
 
 * [中文帮助](https://github.com/dreamsxin/cphalcon7/wiki)
 * [捐贈名單（Donation）](https://github.com/dreamsxin/cphalcon7/blob/master/DONATE.md)
-* PHP5 系列使用 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
+* PHP5 系列 [Phalcon 1.3](https://github.com/dreamsxin/cphalcon)
+* Zephir 系列 [Phalcon](https://github.com/phalcon/cphalcon)
 
 License
 -------

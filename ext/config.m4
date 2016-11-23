@@ -1,5 +1,5 @@
-PHP_ARG_ENABLE(phalcon, whether to enable phalcon framework, 
-[  --enable-phalcon        Enable phalcon framework])
+PHP_ARG_ENABLE(phalcon, whether to enable phalcon7 framework,
+[  --enable-phalcon        Enable phalcon7 framework])
 
 PHP_ARG_WITH(non-free, wheter to enable non-free css and js minifier, 
 [  --without-non-free      Disable non-free minifiers], yes, no)
@@ -12,11 +12,11 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(qrcode, wheter to enable qrcode support, 
-[  --without-qrcode        Disable qrcode], yes, no)
+PHP_ARG_ENABLE(qrcode, wheter to enable qrcode support,
+[  --enable-qrcode         Enable qrcode], no, no)
 
 AC_MSG_CHECKING([Include qrcode])
-if test "$PHP_QRCODE" = "yes"; then
+if test "$PHP_QRCODE" != "no"; then
 	AC_DEFINE([PHALCON_QRCODE], [1], [Whether qrcode are available])
 	AC_MSG_RESULT([yes, qrcode])
 else
@@ -158,6 +158,24 @@ AC_DEFINE(HAVE_SHM_MMAP_ANON, 1, [Define if you have mmap(MAP_ANON) SHM support]
     msg=yes,msg=no,msg=no)
 AC_MSG_RESULT([$msg])
 
+AC_MSG_CHECKING(for epoll support)
+AC_TRY_RUN([
+#include <stdlib.h>
+#include <sys/epoll.h>
+
+int
+main(int argc, char **argv)
+{
+	int epfd;
+
+	epfd = epoll_create(1);
+	exit (epfd == -1 ? 1 : 0);
+}
+],dnl
+AC_DEFINE(HAVE_EPOLL, 1, [Define if your have epoll support])
+    msg=yes,msg=no,msg=no)
+AC_MSG_RESULT([$msg])
+
 if test "$PHP_PHALCON" = "yes"; then
 	AC_MSG_CHECKING([PHP version])
 
@@ -219,13 +237,6 @@ kernel/time.c \
 interned-strings.c \
 logger.c \
 flash.c \
-cli/dispatcher/exception.c \
-cli/console.c \
-cli/router.c \
-cli/task.c \
-cli/router/exception.c \
-cli/dispatcher.c \
-cli/console/exception.c \
 security/exception.c \
 db/dialect/sqlite.c \
 db/dialect/mysql.c \
@@ -302,10 +313,23 @@ binary.c \
 binary/reader.c \
 binary/writer.c \
 binary/exception.c \
+socket.c \
+socket/client.c \
+socket/server.c \
+socket/exception.c \
 debug.c \
 debug/exception.c \
 debug/dump.c \
 tag.c \
+application/exception.c \
+application.c \
+cli/dispatcher/exception.c \
+cli/console.c \
+cli/router.c \
+cli/task.c \
+cli/router/exception.c \
+cli/dispatcher.c \
+cli/console/exception.c \
 mvc/controller.c \
 mvc/dispatcher/exception.c \
 mvc/application/exception.c \
@@ -491,6 +515,7 @@ session/adapterinterface.c \
 session/adapter.c \
 session/adapter/memcache.c \
 session/adapter/libmemcached.c \
+session/adapter/cache.c \
 diinterface.c \
 escaper.c \
 crypt/exception.c \
@@ -530,6 +555,7 @@ annotations/adapter/files.c \
 annotations/adapter/apc.c \
 annotations/adapter/xcache.c \
 annotations/adapter/memory.c \
+annotations/adapter/cache.c \
 annotations/exception.c \
 annotations/collection.c \
 annotations/adapterinterface.c \
@@ -635,6 +661,26 @@ registry.c"
 		[[#include "main/php.h"]]
 	)
 
+	AC_TRY_COMPILE(
+		[
+			#include <sys/types.h>
+			#include <sys/socket.h>
+		],
+		[static struct msghdr tp; int n = (int) tp.msg_flags; return n],
+		[],
+		[AC_DEFINE(MISSING_MSGHDR_MSGFLAGS, 1, [ ])]
+	)
+	AC_DEFINE([HAVE_SOCKETS], 1, [ ])
+
+	AC_CHECK_HEADERS(
+		[ext/sockets/php_sockets.h],
+		[
+			PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
+			AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
+		],
+		,
+		[[#include "main/php.h"]]
+	)
 
 	AC_CHECK_DECL(
 		[HAVE_PHP_SESSION],
@@ -690,7 +736,7 @@ registry.c"
 		fi
 	done
 
-	if test "$PHP_QRCODE" = "yes"; then
+	if test "$PHP_QRCODE" != "no"; then
 		if test -z "$PNG_CFLAGS"; then
 			AC_MSG_ERROR([Incorrect png library])
 		fi
@@ -739,7 +785,7 @@ registry.c"
 	done
 
 
-	if test "$PHP_QRCODE" = "yes"; then
+	if test "$PHP_QRCODE" != "no"; then
 		if test -z "$WAND_CFLAGS"; then
 			AC_MSG_ERROR([Incorrect ImageMagick MagickWand library])
 		fi

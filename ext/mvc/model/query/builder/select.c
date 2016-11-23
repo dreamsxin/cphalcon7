@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, distinct){
 /**
  * Returns SELECT DISTINCT / SELECT ALL flag
  *
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getDistinct){
 

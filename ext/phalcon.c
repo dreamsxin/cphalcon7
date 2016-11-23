@@ -115,9 +115,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Assets_Exception);
 	PHALCON_INIT(Phalcon_Cache_Exception);
 	PHALCON_INIT(Phalcon_Crypt_Exception);
-	PHALCON_INIT(Phalcon_CLI_Console_Exception);
-	PHALCON_INIT(Phalcon_CLI_Dispatcher_Exception);
-	PHALCON_INIT(Phalcon_CLI_Router_Exception);
 	PHALCON_INIT(Phalcon_Db_Exception);
 	PHALCON_INIT(Phalcon_DI_Exception);
 	PHALCON_INIT(Phalcon_Escaper_Exception);
@@ -130,6 +127,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Http_Response_Exception);
 	PHALCON_INIT(Phalcon_Http_Client_Exception);
 	PHALCON_INIT(Phalcon_Image_Exception);
+	PHALCON_INIT(Phalcon_Application_Exception);
+	PHALCON_INIT(Phalcon_CLI_Console_Exception);
+	PHALCON_INIT(Phalcon_CLI_Dispatcher_Exception);
+	PHALCON_INIT(Phalcon_CLI_Router_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Application_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Dispatcher_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Micro_Exception);
@@ -153,6 +154,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Exception);
 	PHALCON_INIT(Phalcon_Chart_Exception);
 	PHALCON_INIT(Phalcon_Binary_Exception);
+	PHALCON_INIT(Phalcon_Socket_Exception);
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DIInterface);
@@ -326,13 +328,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Session_Adapter_Files);
 	PHALCON_INIT(Phalcon_Session_Adapter_Memcache);
 	PHALCON_INIT(Phalcon_Session_Adapter_Libmemcached);
+	PHALCON_INIT(Phalcon_Session_Adapter_Cache);
 	PHALCON_INIT(Phalcon_Filter);
 	PHALCON_INIT(Phalcon_Flash_Direct);
 	PHALCON_INIT(Phalcon_Flash_Session);
-	PHALCON_INIT(Phalcon_CLI_Task);
-	PHALCON_INIT(Phalcon_CLI_Router);
-	PHALCON_INIT(Phalcon_CLI_Console);
-	PHALCON_INIT(Phalcon_CLI_Dispatcher);
 	PHALCON_INIT(Phalcon_Annotations_Reader);
 	PHALCON_INIT(Phalcon_Annotations_Annotation);
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Apc);
@@ -341,6 +340,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Xcache);
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Files);
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Memory);
+	PHALCON_INIT(Phalcon_Annotations_Adapter_Cache);
 	PHALCON_INIT(Phalcon_Loader);
 	PHALCON_INIT(Phalcon_Logger);
 	PHALCON_INIT(Phalcon_Logger_Item);
@@ -395,6 +395,11 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Response);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk_Job);
+	PHALCON_INIT(Phalcon_Application);
+	PHALCON_INIT(Phalcon_CLI_Task);
+	PHALCON_INIT(Phalcon_CLI_Router);
+	PHALCON_INIT(Phalcon_CLI_Console);
+	PHALCON_INIT(Phalcon_CLI_Dispatcher);
 	PHALCON_INIT(Phalcon_Mvc_JsonRpc);
 	PHALCON_INIT(Phalcon_Mvc_Router);
 	PHALCON_INIT(Phalcon_Mvc_View_Engine);
@@ -470,6 +475,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Binary);
 	PHALCON_INIT(Phalcon_Binary_Reader);
 	PHALCON_INIT(Phalcon_Binary_Writer);
+	PHALCON_INIT(Phalcon_Socket);
+	PHALCON_INIT(Phalcon_Socket_Client);
+	PHALCON_INIT(Phalcon_Socket_Server);
 
 	return SUCCESS;
 }
@@ -510,8 +518,8 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 static PHP_MINFO_FUNCTION(phalcon)
 {
 	php_info_print_table_start();
-	php_info_print_table_row(2, "Phalcon Framework", "enabled");
-	php_info_print_table_row(2, "Phalcon Version", PHP_PHALCON_VERSION);
+	php_info_print_table_row(2, "Phalcon7 Framework", "enabled");
+	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
 	php_info_print_table_end();
 

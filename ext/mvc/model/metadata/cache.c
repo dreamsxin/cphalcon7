@@ -22,6 +22,7 @@
 #include "mvc/model/metadata.h"
 #include "mvc/model/metadatainterface.h"
 #include "mvc/model/exception.h"
+#include "cache/backendinterface.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -44,7 +45,7 @@
  *<code>
  *	$metaData = new Phalcon\Mvc\Model\Metadata\Cache(array(
  *		'service' => 'cache', // Service Name
- *		'lifetime' => 86400, // Service Name
+ *		'lifetime' => 86400,
  *	));
  *</code>
  */
@@ -110,21 +111,21 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 
-	zval cache = {}, dependency_injector = {}, tmp = {};
+	zval cache = {}, tmp = {};
 
 	phalcon_return_property(&cache, getThis(), SL("_cache"));
 
-	if (Z_TYPE(cache) == IS_STRING) {
-		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
-
-		PHALCON_CALL_METHODW(&tmp, &dependency_injector, "getshared", &cache);
+	if (Z_TYPE(cache) != IS_OBJECT) {
+		PHALCON_CALL_METHODW(&tmp, getThis(), "getresolveservice", &cache);
+		PHALCON_VERIFY_INTERFACEW(&tmp, phalcon_cache_backendinterface_ce);
 
 		phalcon_update_property_zval(getThis(), SL("_cache"), &tmp);
 
 		RETURN_CTORW(&tmp);
+	} else {
+		PHALCON_VERIFY_INTERFACEW(&cache, phalcon_cache_backendinterface_ce);
+		RETURN_CTORW(&cache);
 	}
-
-	RETURN_CTORW(&cache);
 }
 
 /**

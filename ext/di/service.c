@@ -343,7 +343,7 @@ PHP_METHOD(Phalcon_DI_Service, getParameter){
 /**
  * Returns true if the service was resolved
  *
- * @return bool
+ * @return boolean
  */
 PHP_METHOD(Phalcon_DI_Service, isResolved)
 {

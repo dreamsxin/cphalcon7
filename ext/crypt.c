@@ -59,6 +59,8 @@ PHP_METHOD(Phalcon_Crypt, setMethod);
 PHP_METHOD(Phalcon_Crypt, getMethod);
 PHP_METHOD(Phalcon_Crypt, setKey);
 PHP_METHOD(Phalcon_Crypt, getKey);
+PHP_METHOD(Phalcon_Crypt, setOptions);
+PHP_METHOD(Phalcon_Crypt, getOptions);
 PHP_METHOD(Phalcon_Crypt, setPadding);
 PHP_METHOD(Phalcon_Crypt, getPadding);
 PHP_METHOD(Phalcon_Crypt, encrypt);
@@ -92,6 +94,8 @@ static const zend_function_entry phalcon_crypt_method_entry[] = {
 	PHP_ME(Phalcon_Crypt, getMethod, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, setKey, arginfo_phalcon_cryptinterface_setkey, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, getKey, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Crypt, setOptions, arginfo_phalcon_cryptinterface_setoptions, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Crypt, getOptions, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, encrypt, arginfo_phalcon_cryptinterface_encrypt, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, decrypt, arginfo_phalcon_cryptinterface_decrypt, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, encryptBase64, arginfo_phalcon_cryptinterface_encryptbase64, ZEND_ACC_PUBLIC)
@@ -225,6 +229,7 @@ PHP_METHOD(Phalcon_Crypt, getOptions) {
  *
  * @param string $text
  * @param string $key
+ * @param int $option
  * @return string
  */
 PHP_METHOD(Phalcon_Crypt, encrypt){
@@ -307,6 +312,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
  *
  * @param string $text
  * @param string $key
+ * @param int $options
  * @return string
  */
 PHP_METHOD(Phalcon_Crypt, decrypt){

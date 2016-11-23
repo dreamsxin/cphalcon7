@@ -69,11 +69,11 @@ PHALCON_INIT_CLASS(Phalcon_Version){
 PHP_METHOD(Phalcon_Version, _getVersion){
 
 	array_init_size(return_value, 5);
-	add_next_index_long(return_value, 1);
-	add_next_index_long(return_value, 1);
-	add_next_index_long(return_value, 1);
-	add_next_index_long(return_value, PHALCON_VERSION_STABLE);
-	add_next_index_long(return_value, 2);
+	add_next_index_long(return_value, PHP_PHALCON_VERSION_MAJOR);
+	add_next_index_long(return_value, PHP_PHALCON_VERSION_MED);
+	add_next_index_long(return_value, PHP_PHALCON_VERSION_MIN);
+	add_next_index_long(return_value, PHP_PHALCON_VERSION_RELEASE);
+	add_next_index_long(return_value, PHP_PHALCON_VERSION_RELEASE_VERSION);
 }
 
 /**

@@ -27,27 +27,27 @@ extern zend_class_entry *phalcon_dispatcherinterface_ce;
 PHALCON_INIT_CLASS(Phalcon_DispatcherInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setactionsuffix, 0, 0, 1)
-	ZEND_ARG_INFO(0, actionSuffix)
+	ZEND_ARG_TYPE_INFO(0, actionSuffix, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setdefaultnamespace, 0, 0, 1)
-	ZEND_ARG_INFO(0, namespace)
+	ZEND_ARG_TYPE_INFO(0, namespace, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setdefaultaction, 0, 0, 1)
-	ZEND_ARG_INFO(0, actionName)
+	ZEND_ARG_TYPE_INFO(0, actionName, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setactionname, 0, 0, 1)
-	ZEND_ARG_INFO(0, actionName)
+	ZEND_ARG_TYPE_INFO(0, actionName, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setlogicbinding, 0, 0, 1)
-	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_TYPE_INFO(0, value, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setparams, 0, 0, 1)
-	ZEND_ARG_INFO(0, params)
+	ZEND_ARG_TYPE_INFO(0, params, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setparam, 0, 0, 2)
@@ -65,11 +65,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_forward, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_camelizenamespace, 0, 0, 1)
-	ZEND_ARG_INFO(0, camelize)
+	ZEND_ARG_TYPE_INFO(0, camelize, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_camelizecontroller, 0, 0, 1)
-	ZEND_ARG_INFO(0, camelize)
+	ZEND_ARG_TYPE_INFO(0, camelize, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_seterrorhandler, 0, 0, 1)

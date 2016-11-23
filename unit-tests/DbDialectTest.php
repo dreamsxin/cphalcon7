@@ -505,8 +505,8 @@ class DbDialectTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column8']), 'ALTER TABLE `schema`.`table` ADD `column8` FLOAT(10,2) NOT NULL');
 		$this->assertEquals($dialect->addColumn('table', null, $columns['column9']), 'ALTER TABLE `table` ADD `column9` VARCHAR(10) DEFAULT "column9"');
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column9']), 'ALTER TABLE `schema`.`table` ADD `column9` VARCHAR(10) DEFAULT "column9"');
-		$this->assertEquals($dialect->addColumn('table', null, $columns['column10']), 'ALTER TABLE `table` ADD `column10` INT(18) UNSIGNED DEFAULT "10"');
-		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column10']), 'ALTER TABLE `schema`.`table` ADD `column10` INT(18) UNSIGNED DEFAULT "10"');
+		$this->assertEquals($dialect->addColumn('table', null, $columns['column10']), 'ALTER TABLE `table` ADD `column10` INT(18) UNSIGNED DEFAULT 10');
+		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column10']), 'ALTER TABLE `schema`.`table` ADD `column10` INT(18) UNSIGNED DEFAULT 10');
 		$this->assertEquals($dialect->addColumn('table', null, $columns['column11']), 'ALTER TABLE `table` ADD `column11` BIGINT(20) UNSIGNED');
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column11']), 'ALTER TABLE `schema`.`table` ADD `column11` BIGINT(20) UNSIGNED');
 		$this->assertEquals($dialect->addColumn('table', null, $columns['column12']), "ALTER TABLE `table` ADD `column12` ENUM(\"A\", \"B\", \"C\") DEFAULT \"A\" NOT NULL AFTER `column11`");
@@ -532,8 +532,8 @@ class DbDialectTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column8']), 'ALTER TABLE `schema`.`table` MODIFY `column8` FLOAT(10,2) NOT NULL');
 		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column9']), 'ALTER TABLE `table` MODIFY `column9` VARCHAR(10) DEFAULT "column9"');
 		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column9']), 'ALTER TABLE `schema`.`table` MODIFY `column9` VARCHAR(10) DEFAULT "column9"');
-		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column10']), 'ALTER TABLE `table` MODIFY `column10` INT(18) UNSIGNED DEFAULT "10"');
-		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column10']), 'ALTER TABLE `schema`.`table` MODIFY `column10` INT(18) UNSIGNED DEFAULT "10"');
+		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column10']), 'ALTER TABLE `table` MODIFY `column10` INT(18) UNSIGNED DEFAULT 10');
+		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column10']), 'ALTER TABLE `schema`.`table` MODIFY `column10` INT(18) UNSIGNED DEFAULT 10');
 		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column11']), 'ALTER TABLE `table` MODIFY `column11` BIGINT(20) UNSIGNED');
 		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column11']), 'ALTER TABLE `schema`.`table` MODIFY `column11` BIGINT(20) UNSIGNED');
 		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column12']), "ALTER TABLE `table` MODIFY `column12` ENUM(\"A\", \"B\", \"C\") DEFAULT \"A\" NOT NULL AFTER `column11`");
@@ -641,7 +641,7 @@ class DbDialectTest extends PHPUnit_Framework_TestCase
 
 		$expected  = "CREATE TABLE `table` (\n";
 		$expected .= "	`column9` VARCHAR(10) DEFAULT \"column9\",\n";
-		$expected .= "	`column10` INT(18) UNSIGNED DEFAULT \"10\"\n";
+		$expected .= "	`column10` INT(18) UNSIGNED DEFAULT 10\n";
 		$expected .= ")";
 		$this->assertEquals($dialect->createTable('table', null, $definition), $expected);
 
@@ -708,8 +708,8 @@ class DbDialectTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column8']), 'ALTER TABLE "schema"."table" ADD COLUMN "column8" FLOAT NOT NULL');
 		$this->assertEquals($dialect->addColumn('table', null, $columns['column9']), 'ALTER TABLE "table" ADD COLUMN "column9" CHARACTER VARYING(10) DEFAULT "column9"');
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column9']), 'ALTER TABLE "schema"."table" ADD COLUMN "column9" CHARACTER VARYING(10) DEFAULT "column9"');
-		$this->assertEquals($dialect->addColumn('table', null, $columns['column10']), 'ALTER TABLE "table" ADD COLUMN "column10" INT DEFAULT "10"');
-		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column10']), 'ALTER TABLE "schema"."table" ADD COLUMN "column10" INT DEFAULT "10"');
+		$this->assertEquals($dialect->addColumn('table', null, $columns['column10']), 'ALTER TABLE "table" ADD COLUMN "column10" INT DEFAULT 10');
+		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column10']), 'ALTER TABLE "schema"."table" ADD COLUMN "column10" INT DEFAULT 10');
 		$this->assertEquals($dialect->addColumn('table', null, $columns['column11']), 'ALTER TABLE "table" ADD COLUMN "column11" BIGINT');
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column11']), 'ALTER TABLE "schema"."table" ADD COLUMN "column11" BIGINT');
 		$this->assertEquals($dialect->addColumn('table', null, $columns['column12']), 'ALTER TABLE "table" ADD COLUMN "column12" ENUM("A", "B", "C") DEFAULT "A" NOT NULL');
@@ -735,8 +735,8 @@ class DbDialectTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column8'],$columns['column2']), 'ALTER TABLE "schema"."table" RENAME COLUMN "column2" TO "column8";ALTER TABLE "schema"."table" ALTER COLUMN "column8" TYPE FLOAT;ALTER TABLE "schema"."table" ALTER COLUMN "column8" SET NOT NULL;');
 		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column9'],$columns['column2']), 'ALTER TABLE "table" RENAME COLUMN "column2" TO "column9";ALTER TABLE "table" ALTER COLUMN "column9" TYPE CHARACTER VARYING(10);ALTER TABLE "table" ALTER COLUMN "column9" SET DEFAULT "column9"');
 		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column9'],$columns['column2']), 'ALTER TABLE "schema"."table" RENAME COLUMN "column2" TO "column9";ALTER TABLE "schema"."table" ALTER COLUMN "column9" TYPE CHARACTER VARYING(10);ALTER TABLE "schema"."table" ALTER COLUMN "column9" SET DEFAULT "column9"');
-		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column10'],$columns['column2']), 'ALTER TABLE "table" RENAME COLUMN "column2" TO "column10";ALTER TABLE "table" ALTER COLUMN "column10" SET DEFAULT "10"');
-		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column10'],$columns['column2']), 'ALTER TABLE "schema"."table" RENAME COLUMN "column2" TO "column10";ALTER TABLE "schema"."table" ALTER COLUMN "column10" SET DEFAULT "10"');
+		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column10'],$columns['column2']), 'ALTER TABLE "table" RENAME COLUMN "column2" TO "column10";ALTER TABLE "table" ALTER COLUMN "column10" SET DEFAULT 10');
+		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column10'],$columns['column2']), 'ALTER TABLE "schema"."table" RENAME COLUMN "column2" TO "column10";ALTER TABLE "schema"."table" ALTER COLUMN "column10" SET DEFAULT 10');
 		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column11'],$columns['column2']), 'ALTER TABLE "table" RENAME COLUMN "column2" TO "column11";');
 		$this->assertEquals($dialect->modifyColumn('table', 'schema', $columns['column11'],$columns['column2']), 'ALTER TABLE "schema"."table" RENAME COLUMN "column2" TO "column11";');
 		$this->assertEquals($dialect->modifyColumn('table', null, $columns['column12'],$columns['column2']), 'ALTER TABLE "table" RENAME COLUMN "column2" TO "column12";ALTER TABLE "table" ALTER COLUMN "column12" SET NOT NULL;ALTER TABLE "table" ALTER COLUMN "column12" SET DEFAULT "A"');
@@ -850,7 +850,7 @@ class DbDialectTest extends PHPUnit_Framework_TestCase
 
 		$expected  = "CREATE TABLE \"table\" (\n";
 		$expected .= "	\"column9\" CHARACTER VARYING(10) DEFAULT \"column9\",\n";
-		$expected .= "	\"column10\" INT DEFAULT \"10\"\n";
+		$expected .= "	\"column10\" INT DEFAULT 10\n";
 		$expected .= ");";
 		$this->assertEquals($dialect->createTable('table', null, $definition), $expected);
 
@@ -918,8 +918,8 @@ class DbDialectTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column8']), 'ALTER TABLE "schema"."table" ADD COLUMN "column8" FLOAT NOT NULL');
 		$this->assertEquals($dialect->addColumn('table', null,     $columns['column9']), 'ALTER TABLE "table" ADD COLUMN "column9" VARCHAR(10) DEFAULT "column9"');
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column9']), 'ALTER TABLE "schema"."table" ADD COLUMN "column9" VARCHAR(10) DEFAULT "column9"');
-		$this->assertEquals($dialect->addColumn('table', null,     $columns['column10']), 'ALTER TABLE "table" ADD COLUMN "column10" INTEGER DEFAULT "10"');
-		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column10']), 'ALTER TABLE "schema"."table" ADD COLUMN "column10" INTEGER DEFAULT "10"');
+		$this->assertEquals($dialect->addColumn('table', null,     $columns['column10']), 'ALTER TABLE "table" ADD COLUMN "column10" INTEGER DEFAULT 10');
+		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column10']), 'ALTER TABLE "schema"."table" ADD COLUMN "column10" INTEGER DEFAULT 10');
 		$this->assertEquals($dialect->addColumn('table', null,     $columns['column13']), 'ALTER TABLE "table" ADD COLUMN "column13" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL');
 		$this->assertEquals($dialect->addColumn('table', 'schema', $columns['column13']), 'ALTER TABLE "schema"."table" ADD COLUMN "column13" TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL');
 		$this->assertEquals($dialect->addColumn('table', null,     $columns['column14']), 'ALTER TABLE "table" ADD COLUMN "column14" TINYBLOB NOT NULL');
@@ -1077,7 +1077,7 @@ class DbDialectTest extends PHPUnit_Framework_TestCase
 
 		$expected  = "CREATE TABLE \"table\" (\n";
 		$expected .= "	`column9` VARCHAR(10) DEFAULT \"column9\",\n";
-		$expected .= "	`column10` INTEGER DEFAULT \"10\"\n";
+		$expected .= "	`column10` INTEGER DEFAULT 10\n";
 		$expected .= ")";
 		$this->assertEquals($dialect->createTable('table', null, $definition), $expected);
 

@@ -24,6 +24,7 @@
 #include "annotations/adapter/files.h"
 #include "annotations/adapter/memory.h"
 #include "annotations/adapter/xcache.h"
+#include "annotations/adapter/cache.h"
 #include "annotations/annotation.h"
 #include "annotations/collection.h"
 #include "annotations/exception.h"
@@ -62,14 +63,6 @@
 #include "cache/frontend/output.h"
 #include "cache/multiple.h"
 #include "cache/memory.h"
-
-#include "cli/console.h"
-#include "cli/console/exception.h"
-#include "cli/dispatcher.h"
-#include "cli/dispatcher/exception.h"
-#include "cli/router.h"
-#include "cli/router/exception.h"
-#include "cli/task.h"
 
 #include "pconfig.h"
 #include "config/adapter.h"
@@ -223,6 +216,17 @@
 #include "logger/item.h"
 #include "logger/multiple.h"
 
+#include "application.h"
+#include "application/exception.h"
+
+#include "cli/console.h"
+#include "cli/console/exception.h"
+#include "cli/dispatcher.h"
+#include "cli/dispatcher/exception.h"
+#include "cli/router.h"
+#include "cli/router/exception.h"
+#include "cli/task.h"
+
 #include "mvc/application.h"
 #include "mvc/application/exception.h"
 #include "mvc/controller.h"
@@ -345,6 +349,7 @@
 #include "session/exception.h"
 #include "session/adapter/memcache.h"
 #include "session/adapter/libmemcached.h"
+#include "session/adapter/cache.h"
 
 #include "tag.h"
 #include "tag/exception.h"
@@ -359,10 +364,16 @@
 #include "text.h"
 #include "arr.h"
 #include "date.h"
+
 #include "binary.h"
 #include "binary/exception.h"
 #include "binary/reader.h"
 #include "binary/writer.h"
+
+#include "socket.h"
+#include "socket/client.h"
+#include "socket/server.h"
+#include "socket/exception.h"
 
 #include "validationinterface.h"
 #include "validation.h"

@@ -518,8 +518,8 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 static PHP_MINFO_FUNCTION(phalcon)
 {
 	php_info_print_table_start();
-	php_info_print_table_row(2, "Phalcon Framework", "enabled");
-	php_info_print_table_row(2, "Phalcon Version", PHP_PHALCON_VERSION);
+	php_info_print_table_row(2, "Phalcon7 Framework", "enabled");
+	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
 	php_info_print_table_end();
 

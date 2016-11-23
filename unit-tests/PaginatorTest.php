@@ -463,6 +463,87 @@ class PaginatorTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($bind_types, array('rawsql' => PDO::PARAM_STR , 'estado' => PDO::PARAM_STR));
 	}
 
+	public function testSqlPaginator()
+	{
+		require 'unit-tests/config.db.php';
+		if (empty($configPostgresql)) {
+			$this->markTestSkipped('Test skipped');
+			return;
+		}
+
+		$di = $this->_loadDI();
+
+		$builder = $di['modelsManager']->createBuilder()
+					->columns('cedula, nombres')
+					->from('Personnes')
+					->orderBy('cedula');
+
+		$paginator = new Phalcon\Paginator\Adapter\Sql(array(
+			"sql" => "SELECT cedula, nombres FROM personnes ORDER BY cedula LIMIT :limit OFFSET :offset",
+            "total_sql" => "SELECT COUNT(*) rowcount FROM personnes",
+            "limit"   => 10,
+            "page"    => 1
+		));
+
+		$page = $paginator->getPaginate();
+
+		$this->assertEquals(get_class($page), 'stdClass');
+
+		$this->assertEquals(count($page->items), 10);
+
+		$this->assertEquals($page->before, 1);
+		$this->assertEquals($page->next, 2);
+		$this->assertEquals($page->last, 218);
+
+		$this->assertEquals($page->current, 1);
+		$this->assertEquals($page->total_pages, 218);
+
+		// Middle page
+		$paginator->setCurrentPage(100);
+
+		$page = $paginator->getPaginate();
+
+		$this->assertEquals(get_class($page), 'stdClass');
+
+		$this->assertEquals(count($page->items), 10);
+
+		$this->assertEquals($page->before, 99);
+		$this->assertEquals($page->next, 101);
+		$this->assertEquals($page->last, 218);
+
+		$this->assertEquals($page->current, 100);
+		$this->assertEquals($page->total_pages, 218);
+
+		// Last page
+		$paginator->setCurrentPage(218);
+
+		$page = $paginator->getPaginate();
+
+		$this->assertEquals(get_class($page), 'stdClass');
+
+		$this->assertEquals(count($page->items), 10);
+
+		$this->assertEquals($page->before, 217);
+		$this->assertEquals($page->next, 218);
+		$this->assertEquals($page->last, 218);
+
+		$this->assertEquals($page->current, 218);
+		$this->assertEquals($page->total_pages, 218);
+
+		// -- current page --
+		$currentPage = $paginator->getCurrentPage();
+		$this->assertEquals($currentPage, 218);
+
+		// -- limit --
+		$rowsLimit = $paginator->getLimit();
+		$this->assertEquals($rowsLimit, 10);
+
+		$setterResult = $paginator->setLimit(25);
+		$rowsLimit = $paginator->getLimit();
+		$this->assertEquals($rowsLimit, 25);
+		$this->assertEquals($setterResult, $paginator);
+	}
+
 	public function testIssue2301()
 	{
 		require 'unit-tests/config.db.php';

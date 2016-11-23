@@ -21,6 +21,7 @@
 #include "paginator/adapterinterface.h"
 #include "paginator/exception.h"
 #include "db/adapterinterface.h"
+#include "di/injectable.h"
 
 #include <ext/pdo/php_pdo_driver.h>
 
@@ -40,8 +41,8 @@
  * Pagination using a SQL as source of data
  *
  * <code>
- * $sql = "SELECT * FROM robots WHERE type = :type LIMIT :limit OFFSET :offset ";
- * $sql2 = "SELECT COUNT(*) rowcount WHERE type = :type FROM robots";
+ * $sql = "SELECT * FROM robots WHERE type = :type LIMIT :limit OFFSET :offset";
+ * $sql2 = "SELECT COUNT(*) rowcount FROM robots WHERE type = :type FROM robots";
  *
  * $bind = ['type' => 'google'];
  *
@@ -95,7 +96,7 @@ static const zend_function_entry phalcon_paginator_adapter_sql_method_entry[] = 
  */
 PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Paginator\\Adapter, Sql, paginator_adapter_sql, phalcon_paginator_adapter_sql_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Paginator\\Adapter, Sql, paginator_adapter_sql, phalcon_di_injectable_ce, phalcon_paginator_adapter_sql_method_entry, 0);
 
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_db"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_sql"), ZEND_ACC_PROTECTED);
@@ -116,15 +117,10 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 
-	zval *config, db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, page = {};
+	zval *config, dbname = {}, db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, page = {};
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
-	
-	if (!phalcon_array_isset_fetch_str(&db, config, SL("db"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'db' is required");
-		return;
-	}
 	
 	if (!phalcon_array_isset_fetch_str(&sql, config, SL("sql"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'sql' is required");
@@ -146,9 +142,20 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 		phalcon_update_property_empty_array(getThis(), SL("_bind"));
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
 
+	if (!phalcon_array_isset_fetch_str(&dbname, config, SL("db"))) {
+		ZVAL_STRING(&dbname, "db");
+	}
+
+	if (Z_TYPE(dbname) != IS_OBJECT) {
+		PHALCON_CALL_METHODW(&db, getThis(), "getresolveservice", &dbname);
+	} else {
+		PHALCON_CPY_WRT(&db, &dbname);
+	}
+
+	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
 	phalcon_update_property_zval(getThis(), SL("_db"), &db);
+
 	phalcon_update_property_zval(getThis(), SL("_sql"), &sql);
 	phalcon_update_property_zval(getThis(), SL("_total_sql"), &total_sql);
 
@@ -233,12 +240,17 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getLimit){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setDb){
 
-	zval *db;
+	zval *dbname, db = {};
 
-	phalcon_fetch_params(0, 1, 0, &db);
-	PHALCON_VERIFY_INTERFACE_EX(db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
+	phalcon_fetch_params(0, 1, 0, &dbname);
+	if (Z_TYPE_P(dbname) != IS_OBJECT) {
+		PHALCON_CALL_METHODW(&db, getThis(), "getresolveservice", dbname);
+	} else {
+		PHALCON_CPY_WRT(&db, dbname);
+	}
+	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
 
-	phalcon_update_property_zval(getThis(), SL("_db"), db);
+	phalcon_update_property_zval(getThis(), SL("_db"), &db);
 
 	RETURN_THISW();
 }
@@ -288,11 +300,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	i_before = (i_number_page == 1) ? 1 : (i_number_page - 1);
 
 	ZVAL_LONG(&fetch_mode, PDO_FETCH_OBJ);
-
 	PHALCON_CALL_METHODW(&row, &db, "fetchone", &total_sql, &fetch_mode, &bind);
 
 	phalcon_return_property(&rowcount, &row, SL("rowcount"));
 
+	PHALCON_SEPARATE(&bind);
 	/* Set the limit clause avoiding negative offsets */
 	if (i_number < i_limit) {
 		phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);

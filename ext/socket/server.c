@@ -42,6 +42,34 @@
 
 /**
  * Phalcon\Socket\Server
+ *
+ *<code>
+ *
+ *	$server = new Phalcon\Socket\Server('127.0.0.1', 8989);
+ *  $server->run(
+ *      function(Phalcon\Socket\Client $client){
+ *          // Connect
+ *      },
+ *      function(Phalcon\Socket\Client $client, $mssage){
+ *          // Read
+ *          echo $mssage.PHP_EOL;
+ *      },
+ *      function(Phalcon\Socket\Client $client){
+ *          // Send
+ *          $client->write("Welcome!");
+ *      },
+ *      function(Phalcon\Socket\Client $client){
+ *          // Close
+ *      },
+ *      function(Phalcon\Socket\Client $client){
+ *          // Error
+ *      },
+ *      function(){
+ *          // Timeout
+ *      }
+ *  );
+ *
+ *</code>
  */
 zend_class_entry *phalcon_socket_server_ce;
 

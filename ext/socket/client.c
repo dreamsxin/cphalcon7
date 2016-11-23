@@ -34,6 +34,20 @@
 
 /**
  * Phalcon\Socket\Client
+ *
+ *<code>
+ *
+ *	$client = new Phalcon\Socket\Client('127.0.0.1', 8989);
+ *	if ($client->connect()) {
+ *	    $client->write('Hello world!');
+ *	    while($ret = $client->read(1024, PHP_NORMAL_READ)) {
+ *          echo $ret;
+ *	    }
+ *	} else {
+ *	    echo 'connect fail'.PHP_EOL;
+ *	}
+ *
+ *</code>
  */
 zend_class_entry *phalcon_socket_client_ce;
 
@@ -99,6 +113,7 @@ PHALCON_INIT_CLASS(Phalcon_Socket_Client){
 PHP_METHOD(Phalcon_Socket_Client, __construct){
 
 	zval *address, *port = NULL, *_domain = NULL, *_type = NULL, *_protocol = NULL, domain = {}, type = {}, protocol = {}, socket = {};
+	zval filter_type = {}, filter_option = {}, filtered = {};
 
 	phalcon_fetch_params(0, 1, 4, &address, &port, &_domain, &_type, &_protocol);
 
@@ -113,7 +128,20 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 		phalcon_update_property_zval(getThis(), SL("_port"), port);
 
 		if (!_domain || Z_TYPE_P(_domain) == IS_NULL) {
-			phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY);
+			ZVAL_LONG(&filter_type, 275); // FILTER_VALIDATE_IP
+			ZVAL_LONG(&filter_option, 1048576); // FILTER_FLAG_IPV4
+			PHALCON_CALL_FUNCTIONW(&filtered, "filter_var", address, &filter_type, &filter_option);
+			if (zend_is_true(&filtered)) {
+				ZVAL_LONG(&domain, PHALCON_SOCKET_AF_INET);
+			} else {
+				ZVAL_LONG(&filter_option, 2097152); // FILTER_FLAG_IPV6
+				PHALCON_CALL_FUNCTIONW(&filtered, "filter_var", address, &filter_type, &filter_option);
+				if (zend_is_true(&filtered)) {
+					ZVAL_LONG(&domain, PHALCON_SOCKET_AF_INET6);
+				} else {
+					ZVAL_LONG(&domain, PHALCON_SOCKET_AF_UNIX);
+				}
+			}
 		} else {
 			PHALCON_CPY_WRT(&domain, _domain);
 		}

@@ -734,7 +734,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 			/** 
 			 * Create the event if it wasn't created before
 			 */
-			if (Z_TYPE(event) == IS_NULL) {
+			if (Z_TYPE(event) != IS_OBJECT) {
 				object_init_ex(&event, phalcon_events_event_ce);
 				PHALCON_CALL_METHODW(NULL, &event, "__construct", &event_name, source, data, cancelable);
 

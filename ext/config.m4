@@ -605,11 +605,13 @@ image/adapterinterface.c \
 image/exception.c \
 image/adapter/gd.c \
 image/adapter/imagick.c \
+registry.c \
 chart/qrcode.c \
 chart/captcha.c \
 chart/exception.c \
 async.c \
-registry.c"
+process/proc.c \
+process/exception.c"
 
 	AC_MSG_CHECKING([Include non-free minifiers])
 	if test "$PHP_NON_FREE" = "yes"; then

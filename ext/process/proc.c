@@ -19,40 +19,48 @@
 */
 
 #include "process/proc.h"
-#include "process/procinterface.h"
+#include "process/exception.h"
 #include "process/../date.h"
 
 #include "kernel/main.h"
 #include "kernel/object.h"
+#include "kernel/array.h"
+#include "kernel/string.h"
+#include "kernel/fcall.h"
+#include "kernel/concat.h"
+#include "kernel/operators.h"
+#include "kernel/exception.h"
+#include "kernel/time.h"
 
 /**
- * Phalcon\Process\Pro
+ * Phalcon\Process\Proc
  *
  * Pro for Phalcon\Process procs
  */
 zend_class_entry *phalcon_process_proc_ce;
 
-PHP_METHOD(Phalcon_Process_Pro, __construct);
-PHP_METHOD(Phalcon_Process_Pro, __destruct);
-PHP_METHOD(Phalcon_Process_Pro, setMode);
-PHP_METHOD(Phalcon_Process_Pro, getDescriptors);
-PHP_METHOD(Phalcon_Process_Pro, isPtySupported);
-PHP_METHOD(Phalcon_Process_Pro, start);
-PHP_METHOD(Phalcon_Process_Pro, stop);
-PHP_METHOD(Phalcon_Process_Pro, reStart);
-PHP_METHOD(Phalcon_Process_Pro, isRunning);
-PHP_METHOD(Phalcon_Process_Pro, update);
-PHP_METHOD(Phalcon_Process_Pro, getCommandForPid);
-PHP_METHOD(Phalcon_Process_Pro, getStarttimeForPid);
-PHP_METHOD(Phalcon_Process_Pro, getStatForPid);
-PHP_METHOD(Phalcon_Process_Pro, checkTimeout);
-PHP_METHOD(Phalcon_Process_Pro, getPid);
-PHP_METHOD(Phalcon_Process_Pro, wait);
-PHP_METHOD(Phalcon_Process_Pro, read);
-PHP_METHOD(Phalcon_Process_Pro, write);
-PHP_METHOD(Phalcon_Process_Pro, hasSystemCallBeenInterrupted);
-PHP_METHOD(Phalcon_Process_Pro, setBlocking);
-PHP_METHOD(Phalcon_Process_Pro, close);
+PHP_METHOD(Phalcon_Process_Proc, __construct);
+PHP_METHOD(Phalcon_Process_Proc, __destruct);
+PHP_METHOD(Phalcon_Process_Proc, setMode);
+PHP_METHOD(Phalcon_Process_Proc, getDescriptors);
+PHP_METHOD(Phalcon_Process_Proc, isPtySupported);
+PHP_METHOD(Phalcon_Process_Proc, start);
+PHP_METHOD(Phalcon_Process_Proc, stop);
+PHP_METHOD(Phalcon_Process_Proc, close);
+PHP_METHOD(Phalcon_Process_Proc, reStart);
+PHP_METHOD(Phalcon_Process_Proc, isRunning);
+PHP_METHOD(Phalcon_Process_Proc, update);
+PHP_METHOD(Phalcon_Process_Proc, getCommandForPid);
+PHP_METHOD(Phalcon_Process_Proc, getStarttimeForPid);
+PHP_METHOD(Phalcon_Process_Proc, getStatForPid);
+PHP_METHOD(Phalcon_Process_Proc, checkTimeout);
+PHP_METHOD(Phalcon_Process_Proc, getPid);
+PHP_METHOD(Phalcon_Process_Proc, wait);
+PHP_METHOD(Phalcon_Process_Proc, read);
+PHP_METHOD(Phalcon_Process_Proc, write);
+PHP_METHOD(Phalcon_Process_Proc, run);
+PHP_METHOD(Phalcon_Process_Proc, hasSystemCallBeenInterrupted);
+PHP_METHOD(Phalcon_Process_Proc, setBlocking);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_process_proc___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, command)
@@ -97,41 +105,51 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_process_proc_write, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_process_proc_run, 0, 0, 1)
+	ZEND_ARG_CALLABLE_INFO(0, onread, 0)
+	ZEND_ARG_CALLABLE_INFO(0, onwrite, 1)
+	ZEND_ARG_CALLABLE_INFO(0, onerror, 1)
+	ZEND_ARG_CALLABLE_INFO(0, ontimeout, 1)
+	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, usec, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_process_proc_setblocking, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, flag, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_process_proc_method_entry[] = {
-	PHP_ME(Phalcon_Process_Pro, __construct, arginfo_phalcon_process_proc___construct, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, __destruct, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, setMode, arginfo_phalcon_process_proc_setmode, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, getDescriptors, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, isPtySupported, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, start, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, stop, arginfo_phalcon_process_proc_stop, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, reStart, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, isRunning, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, update, arginfo_phalcon_process_proc_update, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, getCommandForPid, arginfo_phalcon_process_proc_getcommandforpid, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, getStarttimeForPid, arginfo_phalcon_process_proc_getstarttimeforpid, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, getStatForPid, arginfo_phalcon_process_proc_getstatforpid, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, checkTimeout, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, getPid, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, wait, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, read, arginfo_phalcon_process_proc_read, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, write, arginfo_phalcon_process_proc_write, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, hasSystemCallBeenInterrupted, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Process_Pro, setBlocking, arginfo_phalcon_process_proc_setblocking, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Pro, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, __construct, arginfo_phalcon_process_proc___construct, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, __destruct, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, setMode, arginfo_phalcon_process_proc_setmode, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, getDescriptors, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, isPtySupported, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, start, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, stop, arginfo_phalcon_process_proc_stop, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, reStart, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, isRunning, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, update, arginfo_phalcon_process_proc_update, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, getCommandForPid, arginfo_phalcon_process_proc_getcommandforpid, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, getStarttimeForPid, arginfo_phalcon_process_proc_getstarttimeforpid, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, getStatForPid, arginfo_phalcon_process_proc_getstatforpid, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, checkTimeout, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, getPid, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, wait, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, read, arginfo_phalcon_process_proc_read, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, write, arginfo_phalcon_process_proc_write, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, run, arginfo_phalcon_process_proc_run, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Proc, hasSystemCallBeenInterrupted, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Process_Proc, setBlocking, arginfo_phalcon_process_proc_setblocking, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Process\Pro initializer
+ * Phalcon\Process\Proc initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Process_Pro){
+PHALCON_INIT_CLASS(Phalcon_Process_Proc){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Process, Pro, process_proc, phalcon_process_proc_method_entry, 0);
+	PHALCON_REGISTER_CLASS(Phalcon\\Process, Proc, process_proc, phalcon_process_proc_method_entry, 0);
 
 	zend_declare_property_null(phalcon_process_proc_ce, SL("_command"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_process_proc_ce, SL("_cwd"), ZEND_ACC_PROTECTED);
@@ -151,9 +169,9 @@ PHALCON_INIT_CLASS(Phalcon_Process_Pro){
 	zend_declare_property_null(phalcon_process_proc_ce, SL("_startTime"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_process_proc_ce, SL("_exitCode"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_process_proc_ce, SL("_running"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_process_proc_ce, SL("_blocking"), 1, ZEND_ACC_PROTECTED);
 
 	zend_declare_property_null(phalcon_process_proc_ce, SL("_pipes"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_process_proc_ce, SL("_exitMessage"), ZEND_ACC_PROTECTED);
 
 	zend_declare_class_constant_long(phalcon_process_proc_ce, SL("MODE_NONE"), PHALCON_PROCESS_MODE_NONE);
 	zend_declare_class_constant_long(phalcon_process_proc_ce, SL("MODE_TTY"), PHALCON_PROCESS_MODE_TTY);
@@ -175,7 +193,7 @@ PHALCON_INIT_CLASS(Phalcon_Process_Pro){
 }
 
 /**
- * Phalcon\Process\Pro constructor
+ * Phalcon\Process\Proc constructor
  *
  * @param string $command     The command line to run
  * @param int $pid            The process identifier
@@ -184,9 +202,9 @@ PHALCON_INIT_CLASS(Phalcon_Process_Pro){
  * @param float $timeout      The timeout in seconds or null to disable
  * @param array $options
  */
-PHP_METHOD(Phalcon_Process_Pro, __construct){
+PHP_METHOD(Phalcon_Process_Proc, __construct){
 
-	zval *command, *cwd = NULL, *env = NULL, *timeout = NULL, *options = NULL, real_command = {}, merge_options = {};
+	zval *command, *cwd = NULL, *env = NULL, *timeout = NULL, *options = NULL, real_command = {};
 
 	phalcon_fetch_params(0, 1, 4, &command, &cwd, &env, &timeout, &options);
 
@@ -219,25 +237,20 @@ PHP_METHOD(Phalcon_Process_Pro, __construct){
 		phalcon_update_property_zval(getThis(), SL("_timeout"), timeout);
 	}
 
-	array_init(&merge_options);
-	phalcon_array_update_str(&merge_options, SL("suppress_errors"), &PHALCON_GLOBAL(z_true), 0);
-	phalcon_array_update_str(&merge_options, SL("binary_pipes"), &PHALCON_GLOBAL(z_true), 0);
-
 	if (options) {
-		phalcon_array_replace(&merge_options, options);
+		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
-	phalcon_update_property_zval(getThis(), SL("_options"), &merge_options);
 }
 
-PHP_METHOD(Phalcon_Process_Pro, __destruct){
+PHP_METHOD(Phalcon_Process_Proc, __destruct){
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "stop", &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHODW(NULL, getThis(), "close");
 }
 
 /**
  * Sets the mode.
  */
-PHP_METHOD(Phalcon_Process_Pro, setMode){
+PHP_METHOD(Phalcon_Process_Proc, setMode){
 
 	zval *mode;
 
@@ -264,29 +277,29 @@ PHP_METHOD(Phalcon_Process_Pro, setMode){
  *
  * @return array
  */
-PHP_METHOD(Phalcon_Process_Pro, getDescriptors){
+PHP_METHOD(Phalcon_Process_Proc, getDescriptors){
 
 	zval mode = {}, stdin = {}, stdout = {}, stderr = {};
 
 	phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
 
-	switch (Z_TYPE_P(mode)) {
+	switch (Z_TYPE(mode)) {
 		case PHALCON_PROCESS_MODE_TTY:
 		{
-			array_init(&stdin, 3);
-			phalcon_array_append(&stdin, SL("file"), PH_COPY);
-			phalcon_array_append(&stdin, SL("/dev/tty"), PH_COPY);
-			phalcon_array_append(&stdin, SL("r"), PH_COPY);
-			array_init(&stdout, 3);
-			phalcon_array_append(&stdout, SL("file"), PH_COPY);
-			phalcon_array_append(&stdout, SL("/dev/tty"), PH_COPY);
-			phalcon_array_append(&stdout, SL("w"), PH_COPY);
-			array_init(&stderr, 3);
-			phalcon_array_append(&stderr, SL("file"), PH_COPY);
-			phalcon_array_append(&stderr, SL("/dev/tty"), PH_COPY);
-			phalcon_array_append(&stderr, SL("w"), PH_COPY);
+			array_init_size(&stdin, 3);
+			phalcon_array_append_string(&stdin, SL("file"), PH_COPY);
+			phalcon_array_append_string(&stdin, SL("/dev/tty"), PH_COPY);
+			phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+			array_init_size(&stdout, 3);
+			phalcon_array_append_string(&stdout, SL("file"), PH_COPY);
+			phalcon_array_append_string(&stdout, SL("/dev/tty"), PH_COPY);
+			phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+			array_init_size(&stderr, 3);
+			phalcon_array_append_string(&stderr, SL("file"), PH_COPY);
+			phalcon_array_append_string(&stderr, SL("/dev/tty"), PH_COPY);
+			phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
 
-			array_init(return_value, 3);
+			array_init_size(return_value, 3);
 			phalcon_array_append(return_value, &stdin, PH_COPY);
 			phalcon_array_append(return_value, &stdout, PH_COPY);
 			phalcon_array_append(return_value, &stderr, PH_COPY);
@@ -294,14 +307,14 @@ PHP_METHOD(Phalcon_Process_Pro, getDescriptors){
 		}
 		case PHALCON_PROCESS_MODE_PTY:
 		{
-			array_init(&stdin, 1);
-			phalcon_array_append(&stdin, SL("pty"), PH_COPY);
-			array_init(&stdout, 1);
-			phalcon_array_append(&stdout, SL("pty"), PH_COPY);
-			array_init(&stderr, 1);
-			phalcon_array_append(&stderr, SL("pty"), PH_COPY);
+			array_init_size(&stdin, 1);
+			phalcon_array_append_string(&stdin, SL("pty"), PH_COPY);
+			array_init_size(&stdout, 1);
+			phalcon_array_append_string(&stdout, SL("pty"), PH_COPY);
+			array_init_size(&stderr, 1);
+			phalcon_array_append_string(&stderr, SL("pty"), PH_COPY);
 
-			array_init(return_value, 3);
+			array_init_size(return_value, 3);
 			phalcon_array_append(return_value, &stdin, PH_COPY);
 			phalcon_array_append(return_value, &stdout, PH_COPY);
 			phalcon_array_append(return_value, &stderr, PH_COPY);
@@ -309,17 +322,17 @@ PHP_METHOD(Phalcon_Process_Pro, getDescriptors){
 		}
 		default:
 		{
-			array_init(&stdin, 2);
-			phalcon_array_append(&stdin, SL("pipe"), PH_COPY);
-			phalcon_array_append(&stdin, SL("r"), PH_COPY);
-			array_init(&stdout, 2);
-			phalcon_array_append(&stdout, SL("pipe"), PH_COPY);
-			phalcon_array_append(&stdout, SL("w"), PH_COPY);
-			array_init(&stderr, 2);
-			phalcon_array_append(&stderr, SL("pipe"), PH_COPY);
-			phalcon_array_append(&stderr, SL("w"), PH_COPY);
+			array_init_size(&stdin, 2);
+			phalcon_array_append_string(&stdin, SL("pipe"), PH_COPY);
+			phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+			array_init_size(&stdout, 2);
+			phalcon_array_append_string(&stdout, SL("pipe"), PH_COPY);
+			phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+			array_init_size(&stderr, 2);
+			phalcon_array_append_string(&stderr, SL("pipe"), PH_COPY);
+			phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
 
-			array_init(return_value, 3);
+			array_init_size(return_value, 3);
 			phalcon_array_append(return_value, &stdin, PH_COPY);
 			phalcon_array_append(return_value, &stdout, PH_COPY);
 			phalcon_array_append(return_value, &stderr, PH_COPY);
@@ -333,23 +346,23 @@ PHP_METHOD(Phalcon_Process_Pro, getDescriptors){
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_Process_Pro, isPtySupported){
+PHP_METHOD(Phalcon_Process_Proc, isPtySupported){
 
 	zval command = {}, stdin = {}, stdout = {}, stderr = {}, descriptors = {}, pipes = {}, process = {};
 
 	ZVAL_STRING(&command, "echo 1");
 
-	array_init(&stdin, 2);
-	phalcon_array_append(&stdin, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stdin, SL("r"), PH_COPY);
-	array_init(&stdout, 2);
-	phalcon_array_append(&stdout, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stdout, SL("w"), PH_COPY);
-	array_init(&stderr, 2);
-	phalcon_array_append(&stderr, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stderr, SL("w"), PH_COPY);
+	array_init_size(&stdin, 2);
+	phalcon_array_append_string(&stdin, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+	array_init_size(&stdout, 2);
+	phalcon_array_append_string(&stdout, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+	array_init_size(&stderr, 2);
+	phalcon_array_append_string(&stderr, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
 
-	array_init(&descriptors, 3);
+	array_init_size(&descriptors, 3);
 	phalcon_array_append(&descriptors, &stdin, PH_COPY);
 	phalcon_array_append(&descriptors, &stdout, PH_COPY);
 	phalcon_array_append(&descriptors, &stderr, PH_COPY);
@@ -377,17 +390,15 @@ PHP_METHOD(Phalcon_Process_Pro, isPtySupported){
   * @throws Phalcon\Process\Exception When process can't be launched
   * @throws Phalcon\Process\Exception When process is already running
   */
-PHP_METHOD(Phalcon_Process_Pro, start){
+PHP_METHOD(Phalcon_Process_Proc, start){
 
-	zval status = {}, starttime = {}, descriptors = {}, process = {};
+	zval status = {}, descriptors = {}, command = {}, pipes = {}, cwd = {}, env = {}, options = {}, starttime ={}, process = {};
 
 	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
 	if (PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_process_exception_ce, "Process is already running");
 		return;
 	}
-
-	phalcon_time(&starttime);
 
 	PHALCON_CALL_METHODW(&descriptors, getThis(), "getdescriptors");
 
@@ -397,10 +408,16 @@ PHP_METHOD(Phalcon_Process_Pro, start){
 	phalcon_read_property(&env, getThis(), SL("_env"), PH_NOISY);
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 
+	phalcon_time(&starttime);
+
+	ZVAL_MAKE_REF(&pipes);
 	PHALCON_CALL_FUNCTIONW(&process, "proc_open", &command, &descriptors, &pipes, &cwd, &env, &options);
+	ZVAL_UNREF(&pipes);
     if (Z_TYPE(process) != IS_RESOURCE) {
 		RETURN_FALSE;
     }
+	phalcon_update_property_zval(getThis(), SL("_process"), &process);
+	phalcon_update_property_zval(getThis(), SL("_pipes"), &pipes);
 	phalcon_update_property_zval(getThis(), SL("_startTime"), &starttime);
 	phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_STARTED);
 	PHALCON_CALL_METHODW(NULL, getThis(), "update");
@@ -416,17 +433,16 @@ PHP_METHOD(Phalcon_Process_Pro, start){
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_Process_Pro, stop){
+PHP_METHOD(Phalcon_Process_Proc, stop){
 
-	zval *timeout = NULL, *_signal = NULL, signal = {}, status = {}, isrunning = {}, process = {}, pid = {}, command = {}, pipes = {}, *s;
+	zval *timeout = NULL, *_signal = NULL, signal = {}, status = {}, isrunning = {}, process = {}, pid = {}, command = {};
 	double mtime, curtime;
 
 	phalcon_fetch_params(0, 0, 2, &timeout, &_signal);
 
 	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
 	if (!PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_process_exception_ce, "Process not running");
-		return;
+		RETURN_FALSE;
 	}
 
 	if (!timeout){
@@ -441,51 +457,54 @@ PHP_METHOD(Phalcon_Process_Pro, stop){
 		PHALCON_CPY_WRT(&signal, _signal);
 	}
 
-	PHALCON_CALL_METHODW(&isrunning, getThis(), "isrunning");
-	if (zend_is_true(&isrunning)) {
-		phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY);
-		phalcon_read_property(&pid, getThis(), SL("_pid"), PH_NOISY);
-		if (zend_is_true(&process)) {
-			curtime = phalcon_get_time();
-			mtime = mtime + curtime;
-			do {
-				PHALCON_CALL_FUNCTIONW(NULL, "proc_terminate", &process, &signal);
-				PHALCON_CALL_METHODW(&isrunning, getThis(), "isrunning");
-				if (zend_is_true(&isrunning)) {
-					usleep(1000);
-				}
-		    } while (zend_is_true(&isrunning) && phalcon_get_time() < mtime);
+	phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY);
+	phalcon_read_property(&pid, getThis(), SL("_pid"), PH_NOISY);
+	if (zend_is_true(&process)) {
+		PHALCON_CALL_METHODW(&isrunning, getThis(), "close");
 
+		curtime = phalcon_get_time();
+		mtime = mtime + curtime;
+		do {
+			PHALCON_CALL_FUNCTIONW(NULL, "proc_terminate", &process, &signal);
+			PHALCON_CALL_METHODW(&isrunning, getThis(), "isrunning");
 			if (zend_is_true(&isrunning)) {
-				PHALCON_CONCAT_SV(&command, "kill -9 ", &pid);
-				PHALCON_CALL_FUNCTIONW(NULL, "exec", &command);
+				usleep(1000);
 			}
-
-			phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
-			if (Z_TYPE(pipes) == IS_ARRAY && phalcon_fast_count_ev(&pipes)) {
-				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(pipes), s) {
-					PHALCON_CALL_FUNCTIONW(NULL, "fclose", s);
-				} ZEND_HASH_FOREACH_END();
-			}
-			phalcon_update_property_null(getThis(), SL("_pipes"));
-			PHALCON_CALL_METHODW(NULL, getThis(), "update");
-		} else {
-			PHALCON_CONCAT_SV(&command, "kill -9 ", &pid);
-			PHALCON_CALL_FUNCTIONW(NULL, "exec", &command);
-		}
+		} while (zend_is_true(&isrunning) && phalcon_get_time() < mtime);
+		PHALCON_CALL_FUNCTIONW(NULL, "proc_close", &process);
+	} else {
+		PHALCON_CONCAT_SV(&command, "kill -9 ", &pid);
+		PHALCON_CALL_FUNCTIONW(NULL, "exec", &command);
 	}
 
-	phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_TERMINATED);
+	PHALCON_CALL_METHODW(NULL, getThis(), "update");
+
 	RETURN_TRUE;
+}
+
+PHP_METHOD(Phalcon_Process_Proc, close){
+
+	zval pipes = {}, *s;
+
+	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
+	if (Z_TYPE(pipes) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(pipes), s) {
+			PHALCON_CALL_FUNCTIONW(NULL, "fclose", s);
+		} ZEND_HASH_FOREACH_END();
+	}
+
+	phalcon_update_property_null(getThis(), SL("_pipes"));
 }
 
 /**
  * Restarts the process
  */
-PHP_METHOD(Phalcon_Process_Pro, reStart){
+PHP_METHOD(Phalcon_Process_Proc, reStart){
 
-	PHALCON_CALL_METHODW(&isrunning, getThis(), "stop");
-	PHALCON_CALL_METHODW(&isrunning, getThis(), "start");
+	PHALCON_CALL_METHODW(return_value, getThis(), "stop");
+	if (zend_is_true(return_value)) {
+		PHALCON_CALL_METHODW(return_value, getThis(), "start");
+	}
 }
 
 /**
@@ -493,9 +512,9 @@ PHP_METHOD(Phalcon_Process_Pro, reStart){
  *
  * @return boolean true if the process is currently running, false otherwise
  */
-PHP_METHOD(Phalcon_Process_Pro, isRunning){
+PHP_METHOD(Phalcon_Process_Proc, isRunning){
 
-	zval status = {}, information = {};
+	zval status = {};
 
 	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
 	if (!PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
@@ -503,10 +522,7 @@ PHP_METHOD(Phalcon_Process_Pro, isRunning){
 	}
 
 	PHALCON_CALL_METHODW(NULL, getThis(), "update");
-	phalcon_read_property(&information, getThis(), SL("_information"), PH_NOISY);
-	if (z_type(information) != IS_ARRAY || !phalcon_array_isset_fetch_str(return_value, &information, SL("running"))) {
-		RETURN_FALSE;
-	}
+	phalcon_read_property(return_value, getThis(), SL("_running"), PH_NOISY);
 }
 
 /**
@@ -515,12 +531,10 @@ PHP_METHOD(Phalcon_Process_Pro, isRunning){
  * @param boolean $blocking Whether to use a blocking read call
  * @return boolean
  */
-PHP_METHOD(Phalcon_Process_Pro, update){
+PHP_METHOD(Phalcon_Process_Proc, update){
 
-	zval *blocking = NULL, status = {}, pid = {}, process = {}, information = {}, running = {}, exitcode = {}, exitmessage = {};
-	zval signaled = {}, termsig = {}, stopped = {}, stopsig = {}, stdtype = {};
-	zval command = {}, descriptors = {}, stdin = {}, stdout = {}, stderr = {}, pipes = {}, ret = {};
-
+	zval *blocking = NULL, status = {}, pid = {}, process = {}, information = {}, running = {}, exitcode = {};
+	zval signaled = {}, termsig = {}, stopped = {}, stopsig = {}, ret = {};
 
 	if (!blocking) {
 		blocking = &PHALCON_GLOBAL(z_false);
@@ -535,10 +549,10 @@ PHP_METHOD(Phalcon_Process_Pro, update){
 	if (Z_TYPE(process) != IS_NULL) {
 		PHALCON_CALL_FUNCTIONW(&information, "proc_get_status", &process);
 		if (Z_TYPE(information) == IS_ARRAY) {
-			phalcon_array_fetch_str(&pid, &information, SL("pid"));
+			phalcon_array_fetch_str(&pid, &information, SL("pid"), PH_NOISY);
 			phalcon_update_property_zval(getThis(), SL("_pid"), &pid);
 
-			phalcon_array_fetch_str(&running, &information, SL("running"));
+			phalcon_array_fetch_str(&running, &information, SL("running"), PH_NOISY);
 			phalcon_update_property_zval(getThis(), SL("_running"), &running);
 
 			if (!zend_is_true(&running)) {
@@ -547,7 +561,7 @@ PHP_METHOD(Phalcon_Process_Pro, update){
 						phalcon_update_property_zval(getThis(), SL("_exitCode"), &exitcode);
 					}
 				}
-				phalcon_array_fetch_str(&signaled, &information, SL("signaled"));
+				phalcon_array_fetch_str(&signaled, &information, SL("signaled"), PH_NOISY);
 				if (zend_is_true(&signaled)) {
 					if (phalcon_array_isset_fetch_str(&termsig, &information, SL("termsig")) && Z_LVAL(termsig) > 0) {
 						phalcon_update_property_long(getThis(), SL("_exitCode"), 128 + Z_LVAL(termsig));
@@ -556,15 +570,9 @@ PHP_METHOD(Phalcon_Process_Pro, update){
 					phalcon_update_property_bool(getThis(), SL("_signaled"), 1);
 				}
 
-				if (!zend_is_true(&signaled)) {
-					ZVAL_LONG(&stdtype, PHALCON_PROCESS_STDERR);
-					PHALCON_CALL_METHODW(&exitmessage, getThis(), "read", &stdtype);
-					if (Z_TYPE(exitmessage) != IS_NULL) {
-						phalcon_update_property_zval(getThis(), SL("_exitMessage"), &exitmessage);
-					}
-				}
+				phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_TERMINATED);
 			} else {
-				phalcon_array_fetch_str(&stopped, &information, SL("stopped"));
+				phalcon_array_fetch_str(&stopped, &information, SL("stopped"), PH_NOISY);
 				if (zend_is_true(&stopped)) {
 					if (phalcon_array_isset_fetch_str(&stopsig, &information, SL("stopsig"))) {
 						phalcon_update_property_long(getThis(), SL("_stopCode"), Z_LVAL(stopsig));
@@ -574,8 +582,8 @@ PHP_METHOD(Phalcon_Process_Pro, update){
 			}
 		}
 	} else {
-		PHALCON_CALL_METHODW(&stat, getThis(), "getstatforpid", &pid);
-		if (zend_is_true(&stat)) {
+		PHALCON_CALL_METHODW(&ret, getThis(), "getstatforpid", &pid);
+		if (zend_is_true(&ret)) {
 			phalcon_update_property_bool(getThis(), SL("_running"), 1);
 		} else {
 			phalcon_update_property_bool(getThis(), SL("_running"), 0);
@@ -586,31 +594,33 @@ PHP_METHOD(Phalcon_Process_Pro, update){
 	RETURN_TRUE;
 }
 
-PHP_METHOD(Phalcon_Process_Pro, getCommandForPid){
+PHP_METHOD(Phalcon_Process_Proc, getCommandForPid){
 
-	zval *pid, stdin = {}, stdout = {}, stderr = {}, descriptors = {}, pipes = {}, process ={}, information ={};
-	zval running = {}, pipe = {};
+	zval *pid, command = {}, stdin = {}, stdout = {}, stderr = {}, descriptors = {}, pipes = {}, process ={}, information ={};
+	zval running = {}, pipe = {}, ret = {};
 
 	phalcon_fetch_params(0, 1, 0, &pid);
 
 	// ps eh -o args -p pid
 	PHALCON_CONCAT_SV(&command, "ps -o args -p ", pid);
-	array_init(&stdin, 2);
-	phalcon_array_append(&stdin, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stdin, SL("r"), PH_COPY);
-	array_init(&stdout, 2);
-	phalcon_array_append(&stdout, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stdout, SL("w"), PH_COPY);
-	array_init(&stderr, 2);
-	phalcon_array_append(&stderr, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stderr, SL("w"), PH_COPY);
+	array_init_size(&stdin, 2);
+	phalcon_array_append_string(&stdin, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+	array_init_size(&stdout, 2);
+	phalcon_array_append_string(&stdout, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+	array_init_size(&stderr, 2);
+	phalcon_array_append_string(&stderr, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
 
-	array_init(&descriptors, 3);
+	array_init_size(&descriptors, 3);
 	phalcon_array_append(&descriptors, &stdin, PH_COPY);
 	phalcon_array_append(&descriptors, &stdout, PH_COPY);
 	phalcon_array_append(&descriptors, &stderr, PH_COPY);
 
+	ZVAL_MAKE_REF(&pipes);
 	PHALCON_CALL_FUNCTIONW(&process, "proc_open", &command, &descriptors, &pipes);
+	ZVAL_UNREF(&pipes);
 	if (Z_TYPE(process) != IS_RESOURCE) {
 		RETURN_FALSE;
 	}
@@ -633,41 +643,41 @@ PHP_METHOD(Phalcon_Process_Pro, getCommandForPid){
 	}
 }
 
-PHP_METHOD(Phalcon_Process_Pro, getStarttimeForPid){
+PHP_METHOD(Phalcon_Process_Proc, getStarttimeForPid){
 
 	zval *pid;
-	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 0, &pid);
 
 	ZVAL_LONG(return_value, phalcon_get_proc_starttime(Z_LVAL_P(pid)));
 }
 
-PHP_METHOD(Phalcon_Process_Pro, getStatForPid){
+PHP_METHOD(Phalcon_Process_Proc, getStatForPid){
 
-	zval *pid, stdin = {}, stdout = {}, stderr = {}, descriptors = {}, pipes = {}, process ={}, information ={};
+	zval *pid, command = {}, stdin = {}, stdout = {}, stderr = {}, descriptors = {}, pipes = {}, process ={}, information ={};
 	zval running = {}, pipe = {}, ret = {};
 
 	phalcon_fetch_params(0, 1, 0, &pid);
 
-	// ps eh -o args -p pid
 	PHALCON_CONCAT_SV(&command, "ps h -o stat -p ", pid);
-	array_init(&stdin, 2);
-	phalcon_array_append(&stdin, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stdin, SL("r"), PH_COPY);
-	array_init(&stdout, 2);
-	phalcon_array_append(&stdout, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stdout, SL("w"), PH_COPY);
-	array_init(&stderr, 2);
-	phalcon_array_append(&stderr, SL("pipe"), PH_COPY);
-	phalcon_array_append(&stderr, SL("w"), PH_COPY);
+	array_init_size(&stdin, 2);
+	phalcon_array_append_string(&stdin, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+	array_init_size(&stdout, 2);
+	phalcon_array_append_string(&stdout, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+	array_init_size(&stderr, 2);
+	phalcon_array_append_string(&stderr, SL("pipe"), PH_COPY);
+	phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
 
-	array_init(&descriptors, 3);
+	array_init_size(&descriptors, 3);
 	phalcon_array_append(&descriptors, &stdin, PH_COPY);
 	phalcon_array_append(&descriptors, &stdout, PH_COPY);
 	phalcon_array_append(&descriptors, &stderr, PH_COPY);
 
+	ZVAL_MAKE_REF(&pipes);
 	PHALCON_CALL_FUNCTIONW(&process, "proc_open", &command, &descriptors, &pipes);
+	ZVAL_UNREF(&pipes);
 	if (Z_TYPE(process) != IS_RESOURCE) {
 		RETURN_FALSE;
 	}
@@ -698,7 +708,7 @@ PHP_METHOD(Phalcon_Process_Pro, getStatForPid){
  *
  * @throws Phalcon\Process\Exception In case the timeout was reached
  */
-PHP_METHOD(Phalcon_Process_Pro, checkTimeout){
+PHP_METHOD(Phalcon_Process_Proc, checkTimeout){
 
 	zval status = {}, timeout = {}, start_time = {}, microtime = {};
 
@@ -727,7 +737,7 @@ PHP_METHOD(Phalcon_Process_Pro, checkTimeout){
  *
  * @return int|null The process id if running, null otherwise
  */
-PHP_METHOD(Phalcon_Process_Pro, getPid){
+PHP_METHOD(Phalcon_Process_Proc, getPid){
 
 	RETURN_MEMBER(getThis(), "_pid");
 }
@@ -737,7 +747,7 @@ PHP_METHOD(Phalcon_Process_Pro, getPid){
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_Process_Pro, wait){
+PHP_METHOD(Phalcon_Process_Proc, wait){
 
 	zval status = {}, isrunning = {};
 
@@ -761,45 +771,22 @@ PHP_METHOD(Phalcon_Process_Pro, wait){
  * @param boolean $blocking
  * @return boolean
  */
-PHP_METHOD(Phalcon_Process_Pro, read){
+PHP_METHOD(Phalcon_Process_Proc, read){
 
-	zval *type, *timeout = NULL, pipes = {}, pipe = {}, r_array = {}, w_array = {}, e_array = {}, ret = {};
+	zval *type, *timeout = NULL, pipes = {}, pipe = {};
 
 	phalcon_fetch_params(0, 1, 1, &type, &timeout);
 
 	if (!timeout) {
-		timeout = &PHALCON_GLOBAL(z_zero);
+		timeout = &PHALCON_GLOBAL(z_null);
 	}
 
 	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
-	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_array_isset_fetch_zval(&pipe, &pipes, type)) {
+	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_array_isset_fetch(&pipe, &pipes, type, 0)) {
 		RETURN_FALSE;
 	}
 
-	array_init(&r_array);
-	array_init(&w_array);
-	array_init(&e_array);
-
-	phalcon_array_append(&r_array, &pipe, PH_COPY);
-
-	ZVAL_MAKE_REF(&r_array);
-	ZVAL_MAKE_REF(&w_array);
-	ZVAL_MAKE_REF(&e_array);
-	PHALCON_CALL_FUNCTIONW(&ret, "stream_select", &r_array, &w_array, &e_array, timeout, &PHALCON_GLOBAL(z_zero));
-	ZVAL_UNREF(&r_array);
-	ZVAL_UNREF(&w_array);
-	ZVAL_UNREF(&e_array);
-
-	if (PHALCON_IS_FALSE(&ret)) {
-		RETURN_EMPTY_STRING();
-	}
-
-	if (!PHALCON_GT_LONG(&ret, 0)) {
-		RETURN_EMPTY_STRING();
-	}
-
-	ZVAL_LONG(&len, 1024);
-	PHALCON_CALL_FUNCTIONW(return_value, "fgets", &pipe, &len);
+	PHALCON_CALL_FUNCTIONW(return_value, "fgets", &pipe);
 }
 
 /**
@@ -807,9 +794,9 @@ PHP_METHOD(Phalcon_Process_Pro, read){
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_Process_Pro, write){
+PHP_METHOD(Phalcon_Process_Proc, write){
 
-	zval *data, pipes = {}, stdin = {}, r = {}, w = {}, e = {}, ret = {}, *s, writebuf = {};
+	zval *data, pipes = {}, stdin = {}, r = {}, w = {}, e = {}, ret = {}, writebuf = {};
 	int len;
 
 	phalcon_fetch_params(0, 1, 0, &data);
@@ -859,11 +846,62 @@ PHP_METHOD(Phalcon_Process_Pro, write){
 }
 
 /**
+ * Run the process
+ *
+ * @param callable $onread
+ * @param callable $onwrite
+ * @param callable $onerror
+ * @param callable $ontimeout
+ * @param int $timeout
+ */
+PHP_METHOD(Phalcon_Process_Proc, run){
+
+	zval *onread, *onwrite = NULL, *ontimeout = NULL, *timeout = NULL, pipes = {}, stdin = {}, stdout = {}, stderr = {};
+	zval r_array = {}, w_array = {}, e_array = {}, ret = {};
+
+	phalcon_fetch_params(0, 1, 3, &onread, &onwrite, &ontimeout, &timeout);
+
+	if (!timeout) {
+		timeout = &PHALCON_GLOBAL(z_null);
+	}
+
+	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
+	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_fast_count_ev(&pipes)) {
+		RETURN_FALSE;
+	}
+
+	array_init(&r_array);
+	array_init(&w_array);
+	array_init(&e_array);
+
+	if (phalcon_array_isset_fetch_long(&stdout, &pipes, PHALCON_PROCESS_STDOUT)) {
+		phalcon_array_append(&r_array, &stdout, 0);
+	}
+
+	if (phalcon_array_isset_fetch_long(&stdin, &pipes, PHALCON_PROCESS_STDIN)) {
+		phalcon_array_append(&w_array, &stdin, 0);
+	}
+
+	if (phalcon_array_isset_fetch_long(&stderr, &pipes, PHALCON_PROCESS_STDERR)) {
+		phalcon_array_append(&e_array, &stderr, 0);
+	}
+
+	ZVAL_MAKE_REF(&r_array);
+	ZVAL_MAKE_REF(&w_array);
+	ZVAL_MAKE_REF(&e_array);
+	PHALCON_CALL_FUNCTIONW(&ret, "stream_select", &r_array, &w_array, &e_array, timeout, &PHALCON_GLOBAL(z_zero));
+	ZVAL_UNREF(&r_array);
+	ZVAL_UNREF(&w_array);
+	ZVAL_UNREF(&e_array);
+
+}
+
+/**
  * Returns true if a system call has been interrupted
  *
  * @return bool
  */
-PHP_METHOD(Phalcon_Process_Pro, hasSystemCallBeenInterrupted){
+PHP_METHOD(Phalcon_Process_Proc, hasSystemCallBeenInterrupted){
 
 	zval last_error = {}, message = {};
 
@@ -880,9 +918,9 @@ PHP_METHOD(Phalcon_Process_Pro, hasSystemCallBeenInterrupted){
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_Process_Pro, setBlocking){
+PHP_METHOD(Phalcon_Process_Proc, setBlocking){
 
-	zval *flag, pipes = {}, blocked = {};
+	zval *flag, pipes = {}, blocked = {}, *s;
 
 	phalcon_fetch_params(0, 1, 0, &flag);
 

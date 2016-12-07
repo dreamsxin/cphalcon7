@@ -24,9 +24,7 @@ class ProcessTest extends PHPUnit_Framework_TestCase
 
 	public function testNormal()
 	{
-        $this->markTestSkipped("Skipped");
-        return;
-		$process = new Phalcon\Process\Proc('ping localhost');
+		$process = new Phalcon\Process\Proc('ping -c 1 localhost');
         $this->assertTrue($process->start());
 
         $ret = $process->read(Phalcon\Process\Proc::STDOUT);

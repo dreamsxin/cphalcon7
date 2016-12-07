@@ -155,6 +155,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Chart_Exception);
 	PHALCON_INIT(Phalcon_Binary_Exception);
 	PHALCON_INIT(Phalcon_Socket_Exception);
+	PHALCON_INIT(Phalcon_Process_Exception);
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DIInterface);
@@ -480,6 +481,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Socket);
 	PHALCON_INIT(Phalcon_Socket_Client);
 	PHALCON_INIT(Phalcon_Socket_Server);
+	PHALCON_INIT(Phalcon_Process_Proc);
 
 	return SUCCESS;
 }

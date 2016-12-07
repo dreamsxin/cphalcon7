@@ -38,6 +38,6 @@
 
 extern zend_class_entry *phalcon_process_proc_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Process_Pro);
+PHALCON_INIT_CLASS(Phalcon_Process_Proc);
 
 #endif /* PHALCON_PROCESS_PROC_H */

@@ -404,12 +404,15 @@
 #include "validation/validator/digit.h"
 #include "validation/validator/date.h"
 
+#include "version.h"
+
 #include "chart/qrcode.h"
 #include "chart/captcha.h"
 #include "chart/exception.h"
 
 #include "async.h"
 
-#include "version.h"
+#include "process/proc.h"
+#include "process/exception.h"
 
 #endif /* PHALCON_H */

@@ -1049,11 +1049,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
  */
 PHP_METHOD(Phalcon_Dispatcher, forward){
 
-	zval *forward, forward_parts = {}, parts = {}, number_parts = {}, controller_part = {}, real_namespace_name = {}, real_controller_name = {}, action_part = {}, exception_code = {}, exception_message = {};
+	zval *forward, event_name = {}, forward_parts = {}, parts = {}, number_parts = {}, controller_part = {}, real_namespace_name = {}, real_controller_name = {}, action_part = {}, exception_code = {}, exception_message = {};
 	zval namespace_name = {}, controller_name = {}, task_name = {}, action_name = {}, params = {}, previous_namespace_name = {}, previous_controller_name = {}, previous_action_name = {}, previous_params = {};
 	int num = 0;
 
 	phalcon_fetch_params(0, 1, 0, &forward);
+
+	ZVAL_STRING(&event_name, "dispatch:beforeForward");
+	PHALCON_CALL_METHODW(NULL, getThis(), "fireevent", &event_name, forward);
 
 	if (Z_TYPE_P(forward) == IS_STRING) {
 		array_init(&forward_parts);

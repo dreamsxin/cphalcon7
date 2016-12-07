@@ -65,11 +65,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, getTable);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, _compile);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_delete___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, params)
+	ZEND_ARG_TYPE_INFO(0, params, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_delete_table, 0, 0, 1)
-	ZEND_ARG_INFO(0, table)
+	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_query_builder_delete_method_entry[] = {
@@ -150,10 +150,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, table){
 	zval *table;
 
 	phalcon_fetch_params(0, 1, 0, &table);
-
-	if (Z_TYPE_P(table) != IS_STRING) {
-		PHALCON_ENSURE_IS_STRING(table);
-	}
 
 	phalcon_update_property_zval(getThis(), SL("_table"), table);
 	RETURN_THISW();

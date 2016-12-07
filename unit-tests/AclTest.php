@@ -21,6 +21,23 @@
 class AclTest extends PHPUnit_Framework_TestCase
 {
 
+	public function __construct()
+	{
+		spl_autoload_register(array($this, 'awaresAutoloader'));
+	}
+
+	public function __destruct()
+	{
+		spl_autoload_unregister(array($this, 'awaresAutoloader'));
+	}
+
+	public function awaresAutoloader($className)
+	{
+		if (file_exists('unit-tests/acl/'.$className.'.php')) {
+			require 'unit-tests/acl/'.$className.'.php';
+		}
+	}
+
 	public function testMemory()
 	{
 		$acl = new \Phalcon\Acl\Adapter\Memory();
@@ -87,6 +104,36 @@ class AclTest extends PHPUnit_Framework_TestCase
 		foreach ($resources as $resource => $actions) {
 			$this->assertTrue($acl->isAllowed('Admin', $resource, 'index'));
 		}
+	}
+
+	public function testAclAware()
+	{
+		$acl = new Phalcon\Acl\Adapter\Memory;
+		$acl->setDefaultAction(Phalcon\Acl::DENY);
+		$acl->addRole('Guests');
+		$acl->addRole('Members', 'Guests');
+		$acl->addRole('Admins', 'Members');
+		$acl->addResource('Post', array('update'));
+
+		$guest = new \TestRole(1, 'Guests');
+		$member = new \TestRole(2, 'Members');
+		$anotherMember = new \TestRole(3, 'Members');
+		$admin = new \TestRole(4, 'Admins');
+
+		$resource = new \TestResource(2, 'Post');
+
+		$acl->deny('Guests', 'Post', 'update', function(\TestRole $user, \TestResource $resource) {
+			return $user->getId() != $resource->getUserId();
+		});
+		$acl->allow('Members', 'Post', 'update', function(\TestRole $user, \TestResource $resource) {
+			return $user->getId() == $resource->getUserId();
+		});
+		$acl->allow('Admins', 'Post', 'update');
+
+		$this->assertFalse($acl->isAllowed($guest, $resource, 'update'));
+		$this->assertTrue($acl->isAllowed($member, $resource, 'update'));
+		$this->assertFalse($acl->isAllowed($anotherMember, $resource, 'update'));
+		$this->assertTrue($acl->isAllowed($admin, $resource, 'update'));
 	}
 
 	public function testIssues1513()

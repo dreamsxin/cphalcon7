@@ -104,6 +104,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_bind"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_limitRows"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_paginator_adapter_sql_ce, SL("_page"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_paginator_adapter_sql_ce, SL("_fetchMode"), PDO_FETCH_OBJ, ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_paginator_adapter_sql_ce, 1, phalcon_paginator_adapterinterface_ce);
 
@@ -117,7 +118,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 
-	zval *config, dbname = {}, db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, page = {};
+	zval *config, dbname = {}, db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, page = {}, fetch_mode = {};
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
@@ -126,9 +127,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'sql' is required");
 		return;
 	}
-	
+
 	if (!phalcon_array_isset_fetch_str(&total_sql, config, SL("total_sql"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'sql' is required");
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'total_sql' is required");
 		return;
 	}
 
@@ -171,9 +172,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_limitRows"), &limit);
-	
+
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
 		phalcon_update_property_zval(getThis(), SL("_page"), &page);
+	}
+
+	if (phalcon_array_isset_fetch_str(&fetch_mode, config, SL("fetchMode"))) {
+		phalcon_update_property_zval(getThis(), SL("_fetchMode"), &fetch_mode);
 	}
 }
 
@@ -283,6 +288,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	phalcon_return_property(&bind, getThis(), SL("_bind"));
 	phalcon_return_property(&limit, getThis(), SL("_limitRows"));
 	phalcon_return_property(&number_page, getThis(), SL("_page"));
+	phalcon_return_property(&fetch_mode, getThis(), SL("_fetchMode"));
 
 	i_limit       = phalcon_get_intval(&limit);
 	i_number_page = phalcon_get_intval(&number_page);
@@ -299,7 +305,6 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	i_number = (i_number_page - 1) * i_limit;
 	i_before = (i_number_page == 1) ? 1 : (i_number_page - 1);
 
-	ZVAL_LONG(&fetch_mode, PDO_FETCH_OBJ);
 	PHALCON_CALL_METHODW(&row, &db, "fetchone", &total_sql, &fetch_mode, &bind);
 
 	phalcon_return_property(&rowcount, &row, SL("rowcount"));

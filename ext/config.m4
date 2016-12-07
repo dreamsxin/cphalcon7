@@ -455,7 +455,6 @@ filter/exception.c \
 filter/userfilterinterface.c \
 queue/beanstalk.c \
 queue/beanstalk/job.c \
-acl.c \
 assets/resource/css.c \
 assets/resource/js.c \
 assets/filters/none.c \
@@ -470,11 +469,14 @@ escaper/exception.c \
 loader.c \
 tag/select.c \
 tag/exception.c \
+acl.c \
 acl/resource.c \
+acl/resourceaware.c \
 acl/resourceinterface.c \
 acl/adapter/memory.c \
 acl/exception.c \
 acl/role.c \
+acl/roleaware.c \
 acl/adapterinterface.c \
 acl/adapter.c \
 acl/roleinterface.c \

@@ -14,8 +14,10 @@
 #include "acl/adapter/memory.h"
 #include "acl/exception.h"
 #include "acl/resource.h"
+#include "acl/resourceaware.h"
 #include "acl/resourceinterface.h"
 #include "acl/role.h"
+#include "acl/roleaware.h"
 #include "acl/roleinterface.h"
 
 #include "annotations/adapter.h"

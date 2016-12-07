@@ -210,6 +210,12 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 
 		$builder = new SelectBuilder();
 		$phql = $builder->setDi($di)
+						->from('Robots', 'r')
+						->getPhql();
+		$this->assertEquals($phql, 'SELECT [r].* FROM [Robots] AS [r]');
+
+		$builder = new SelectBuilder();
+		$phql = $builder->setDi($di)
 						->addFrom('Robots', 'r')
 						->getPhql();
 		$this->assertEquals($phql, 'SELECT [r].* FROM [Robots] AS [r]');
@@ -220,6 +226,20 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 						->addFrom('Parts', 'p')
 						->getPhql();
 		$this->assertEquals($phql, 'SELECT [Robots].*, [p].* FROM [Robots], [Parts] AS [p]');
+
+		$builder = new SelectBuilder();
+		$phql = $builder->setDi($di)
+						->from('Robots')
+						->addFrom(array('p' => 'Parts'))
+						->getPhql();
+		$this->assertEquals($phql, 'SELECT [Robots].*, [p].* FROM [Robots], [Parts] AS [p]');
+
+		$builder = new SelectBuilder();
+		$phql = $builder->setDi($di)
+						->from('Robots', 'r')
+						->addFrom(array('p' => 'Parts'))
+						->getPhql();
+		$this->assertEquals($phql, 'SELECT [r].*, [p].* FROM [Robots] AS [r], [Parts] AS [p]');
 
 		$builder = new SelectBuilder();
 		$phql = $builder->setDi($di)

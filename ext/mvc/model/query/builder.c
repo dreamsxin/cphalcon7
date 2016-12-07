@@ -82,17 +82,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_create, 0, 0, 1)
-	ZEND_ARG_INFO(0, type)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_setbindparams, 0, 0, 1)
-	ZEND_ARG_INFO(0, bindparams)
-	ZEND_ARG_INFO(0, merge)
+	ZEND_ARG_TYPE_INFO(0, bindparams, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_setbindtypes, 0, 0, 1)
-	ZEND_ARG_INFO(0, bindtypes)
-	ZEND_ARG_INFO(0, merge)
+	ZEND_ARG_TYPE_INFO(0, bindtypes, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_query_builder_method_entry[] = {

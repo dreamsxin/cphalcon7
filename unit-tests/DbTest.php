@@ -153,11 +153,21 @@ class DbTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(isset($row['cedula']));
 		$this->assertFalse(isset($row->cedula));
 
+		$result = $connection->fetchAll("SELECT id, name FROM albums ORDER BY id LIMIT 2", PDO::FETCH_COLUMN, NULL, NULL, 1);
+		$this->assertEquals($result, array(0 => 'Born to Die', 1 => 'Born to Die - The Paradise Edition'));
+
+		$result = $connection->fetchAll("SELECT id, name FROM albums ORDER BY id LIMIT 2", PDO::FETCH_KEY_PAIR);
+		$this->assertEquals($result, array(1 => 'Born to Die', 2 => 'Born to Die - The Paradise Edition'));
+
+		$result = $connection->fetchAll("SELECT artists_id, name FROM albums ORDER BY id LIMIT 2", PDO::FETCH_COLUMN|PDO::FETCH_GROUP);
+		$this->assertEquals($result, array(1 => array('Born to Die', 'Born to Die - The Paradise Edition')));
+
 		$result = $connection->query("SELECT * FROM personas LIMIT 5");
-		$result->setFetchMode(Phalcon\Db::FETCH_OBJ);
+		$result->setFetchMode(Phalcon\Db::FETCH_BOTH);
+		$result->dataSeek(4);
 		$row = $result->fetch();
-		$this->assertTrue(is_object($row));
-		$this->assertTrue(isset($row->cedula));
+		$row = $result->fetch();
+		$this->assertEquals($row, false);
 
 		$result = $connection->query("SELECT * FROM personas LIMIT 5");
 		$result->setFetchMode(Phalcon\Db::FETCH_BOTH);

@@ -1339,6 +1339,11 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 			zval key = {}, attribute = {}, possible_setter = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
+
+				if (Z_TYPE_P(white_list) == IS_ARRAY && !phalcon_fast_in_array(&key, white_list)) {
+					continue;
+				}
+
 				/**
 				 * Every field must be part of the column map
 				 */
@@ -1351,6 +1356,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 						return;
 					}
 				}
+
 				/**
 				 * If the white-list is an array check if the attribute is on that list
 				 */
@@ -1416,7 +1422,8 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
  */
 PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 
-	zval *base, *data, *column_map, *dirty_state = NULL, *source_model = NULL, data_types = {}, object = {}, *value, exception_message = {};
+	zval *base, *data, *column_map, *dirty_state = NULL, *source_model = NULL;
+	zval data_types = {}, connection = {}, object = {}, *value, exception_message = {};
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 3, 3, &base, &data, &column_map, &dirty_state, &source_model);
@@ -1432,6 +1439,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 
 	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(&data_types, source_model, "getdatatypes");
+		PHALCON_CALL_METHODW(&connection, source_model, "getreadconnection");
 	}
 
 	if (phalcon_clone(&object, base) == FAILURE) {
@@ -1445,16 +1453,24 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), str_key, value) {
 		zval key = {}, field_type = {}, convert_value = {}, attribute = {};
+
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 			if (PHALCON_GLOBAL(orm).enable_auto_convert && zend_is_true(&data_types)) {
-				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, 0)) {
-					if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_JSON)) {
-						RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 0));
-					} else if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_BYTEA)) {
-						PHALCON_CALL_FUNCTIONW(&convert_value, "pg_unescape_bytea", value);
-					} else {
-						PHALCON_CPY_WRT(&convert_value, value);
+				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, 0) && Z_TYPE(field_type) == IS_LONG) {
+					switch(Z_LVAL(field_type)) {
+						case PHALCON_DB_COLUMN_TYPE_JSON:
+							RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 0));
+							break;
+						case PHALCON_DB_COLUMN_TYPE_BYTEA:
+							PHALCON_CALL_METHODW(&convert_value, &connection, "unescapebytea", value);
+							break;
+						case PHALCON_DB_COLUMN_TYPE_ARRAY:
+						case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
+							PHALCON_CALL_METHODW(&convert_value, &connection, "unescapearray", value, &field_type);
+							break;
+						default:
+							PHALCON_CPY_WRT(&convert_value, value);
 					}
 				} else {
 					PHALCON_CPY_WRT(&convert_value, value);
@@ -1511,7 +1527,8 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 
-	zval *data, *column_map, *hydration_mode, *source_model = NULL, hydrate = {}, data_types = {}, *value, exception_message = {};
+	zval *data, *column_map, *hydration_mode, *source_model = NULL, hydrate = {};
+	zval data_types = {}, connection = {}, *value, exception_message = {};
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 3, 1, &data, &column_map, &hydration_mode, &source_model);
@@ -1542,6 +1559,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 
 	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT) {
 		PHALCON_CALL_METHODW(&data_types, source_model, "getdatatypes");
+		PHALCON_CALL_METHODW(&connection, source_model, "getreadconnection");
 	}
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), str_key, value) {
@@ -1550,11 +1568,20 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 			ZVAL_STR(&key, str_key);
 
 			if (PHALCON_GLOBAL(orm).enable_auto_convert && Z_TYPE(data_types) == IS_ARRAY) {
-				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, 0)) {
-					if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_JSON)) {
-						RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 1));
-					} else {
-						PHALCON_CPY_WRT(&convert_value, value);
+				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, 0) && Z_TYPE(field_type) == IS_LONG) {
+					switch(Z_LVAL(field_type)) {
+						case PHALCON_DB_COLUMN_TYPE_JSON:
+							RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 1));
+							break;
+						case PHALCON_DB_COLUMN_TYPE_BYTEA:
+							PHALCON_CALL_METHODW(&convert_value, &connection, "unescapebytea", value);
+							break;
+						case PHALCON_DB_COLUMN_TYPE_ARRAY:
+						case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
+							PHALCON_CALL_METHODW(&convert_value, &connection, "unescapearray", value, &field_type);
+							break;
+						default:
+							PHALCON_CPY_WRT(&convert_value, value);
 					}
 				} else {
 					PHALCON_CPY_WRT(&convert_value, value);
@@ -3604,7 +3631,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	 * All fields in the model makes part or the INSERT
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), field) {
-		zval attribute_field = {}, value = {}, field_type = {}, convert_value = {};
+		zval attribute_field = {}, value = {}, field_bind_type = {}, field_type = {}, convert_value = {};
 		if (!phalcon_array_isset(&automatic_attributes, field)) {
 			/**
 			 * Check if the model has a column map
@@ -3626,7 +3653,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 				/**
 				 * Every column must have a bind data type defined
 				 */
-				if (!phalcon_array_isset_fetch(&field_type, &bind_data_types, field, 0)) {
+				if (!phalcon_array_isset_fetch(&field_bind_type, &bind_data_types, field, 0)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' has not defined a bind data type");
 					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
@@ -3652,17 +3679,28 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 					PHALCON_CPY_WRT(&convert_value, &value);
 					if (PHALCON_GLOBAL(orm).enable_auto_convert) {
 						if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
-							if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_JSON)) {
-								RETURN_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
-							} else if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_BYTEA)) {
-								PHALCON_CALL_FUNCTIONW(&convert_value, "pg_escape_bytea", &value);
+							if (phalcon_array_isset_fetch(&field_type, &data_types, field, 0) && Z_TYPE(field_type) == IS_LONG) {
+								switch(Z_LVAL(field_type)) {
+									case PHALCON_DB_COLUMN_TYPE_JSON:
+										RETURN_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
+										break;
+									case PHALCON_DB_COLUMN_TYPE_BYTEA:
+										PHALCON_CALL_METHODW(&convert_value, connection, "escapebytea", &value);
+										break;
+									case PHALCON_DB_COLUMN_TYPE_ARRAY:
+									case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
+										PHALCON_CALL_METHODW(&convert_value, connection, "escapearray", &value, &field_type);
+										break;
+									default:
+										break;
+								}
 							}
 						}
 					}
 
 					phalcon_array_append(&fields, &attribute_field, PH_COPY);
 					phalcon_array_update_zval(&bind_params, &attribute_field, &convert_value, PH_COPY);
-					phalcon_array_update_zval(&bind_types, &attribute_field, &field_type, PH_COPY);
+					phalcon_array_update_zval(&bind_types, &attribute_field, &field_bind_type, PH_COPY);
 				}
 			}
 		}
@@ -3835,10 +3873,21 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 				PHALCON_CPY_WRT(&convert_value, &value);
 				if (PHALCON_GLOBAL(orm).enable_auto_convert) {
 					if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
-						phalcon_array_fetch(&field_type, &data_types, field, PH_NOISY);
-
-						if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_JSON)) {
-							RETURN_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
+						if (phalcon_array_isset_fetch(&field_type, &data_types, field, 0) && Z_TYPE(field_type) == IS_LONG) {
+							switch(Z_LVAL(field_type)) {
+								case PHALCON_DB_COLUMN_TYPE_JSON:
+									RETURN_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
+									break;
+								case PHALCON_DB_COLUMN_TYPE_BYTEA:
+									PHALCON_CALL_METHODW(&convert_value, connection, "escapebytea", &value);
+									break;
+								case PHALCON_DB_COLUMN_TYPE_ARRAY:
+								case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
+									PHALCON_CALL_METHODW(&convert_value, connection, "escapearray", &value, &field_type);
+									break;
+								default:
+									break;
+							}
 						}
 					}
 				}

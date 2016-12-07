@@ -194,15 +194,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 		} else if (PHALCON_IS_STRING(&feature, "boolean")) {
 			phalcon_array_update_zval_long(&field_types, &real_property, PHALCON_DB_COLUMN_TYPE_BOOLEAN, PH_COPY);
 			phalcon_array_update_zval_long(&field_bind_types, &real_property, PHALCON_DB_COLUMN_BIND_PARAM_BOOL, PH_COPY);
+		} else if (PHALCON_IS_STRING(&feature, "datetime")) {
+			phalcon_array_update_zval_long(&field_types, &real_property, PHALCON_DB_COLUMN_TYPE_DATETIME, PH_COPY);
+			phalcon_array_update_zval_long(&field_bind_types, &real_property, PHALCON_DB_COLUMN_BIND_PARAM_STR, PH_COPY);
+		} else if (PHALCON_IS_STRING(&feature, "date")) {
+			phalcon_array_update_zval_long(&field_types, &real_property, PHALCON_DB_COLUMN_TYPE_DATE, PH_COPY);
+			phalcon_array_update_zval_long(&field_bind_types, &real_property, PHALCON_DB_COLUMN_BIND_PARAM_STR, PH_COPY);
+		} else if (PHALCON_IS_STRING(&feature, "time")) {
+			phalcon_array_update_zval_long(&field_types, &real_property, PHALCON_DB_COLUMN_TYPE_TIMESTAMP, PH_COPY);
+			phalcon_array_update_zval_long(&field_bind_types, &real_property, PHALCON_DB_COLUMN_BIND_PARAM_STR, PH_COPY);
+		} else if (PHALCON_IS_STRING(&feature, "array")) {
+			phalcon_array_update_zval_long(&field_types, &real_property, PHALCON_DB_COLUMN_TYPE_ARRAY, PH_COPY);
+			phalcon_array_update_zval_long(&field_bind_types, &real_property, PHALCON_DB_COLUMN_BIND_PARAM_STR, PH_COPY);
+		} else if (PHALCON_IS_STRING(&feature, "intarray")) {
+			phalcon_array_update_zval_long(&field_types, &real_property, PHALCON_DB_COLUMN_TYPE_ARRAY, PH_COPY);
+			phalcon_array_update_zval_long(&field_bind_types, &real_property, PHALCON_DB_COLUMN_BIND_PARAM_STR, PH_COPY);
 		} else {
-			if (PHALCON_IS_STRING(&feature, "date")) {
-				phalcon_array_update_zval_long(&field_types, &real_property, 1, PH_COPY);
-			} else {
-				/**
-				 * By default all columns are varchar/string
-				 */
-				phalcon_array_update_zval_long(&field_types, &real_property, PHALCON_DB_COLUMN_TYPE_DATE, PH_COPY);
-			}
+			/**
+			 * By default all columns are varchar/string
+			 */
+			phalcon_array_update_zval_long(&field_types, &real_property, PHALCON_DB_COLUMN_TYPE_VARCHAR, PH_COPY);
 			phalcon_array_update_zval_long(&field_bind_types, &real_property, PHALCON_DB_COLUMN_BIND_PARAM_STR, PH_COPY);
 		}
 

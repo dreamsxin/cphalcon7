@@ -24,6 +24,7 @@
 
 #define PHALCON_ACL_DENY   0
 #define PHALCON_ACL_ALLOW  1
+#define PHALCON_ACL_DUNNO  -1
 
 extern zend_class_entry *phalcon_acl_ce;
 

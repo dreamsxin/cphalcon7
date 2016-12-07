@@ -26,6 +26,7 @@
 #include "db/rawvalue.h"
 #include "db/reference.h"
 
+#include <Zend/zend_smart_str.h>
 #include <ext/pdo/php_pdo_driver.h>
 
 #include "kernel/main.h"
@@ -62,6 +63,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, useExplicitIdValue);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, getDefaultIdValue);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, supportSequences);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeBytea);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeBytea);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeArray);
 
 static const zend_function_entry phalcon_db_adapter_pdo_postgresql_method_entry[] = {
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Postgresql, connect, arginfo_phalcon_db_adapterinterface_connect, ZEND_ACC_PUBLIC)
@@ -69,6 +74,10 @@ static const zend_function_entry phalcon_db_adapter_pdo_postgresql_method_entry[
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Postgresql, useExplicitIdValue, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Postgresql, getDefaultIdValue, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Postgresql, supportSequences, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Postgresql, escapeBytea, arginfo_phalcon_db_adapterinterface_escapebytea, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeBytea, arginfo_phalcon_db_adapterinterface_unescapebytea, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray, arginfo_phalcon_db_adapterinterface_escapearray, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeArray, arginfo_phalcon_db_adapterinterface_unescapearray, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -174,7 +183,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	 * 0:name, 1:type, 2:size, 3:numeric size, 4:numeric scale, 5: null, 6: key, 7: extra, 8: position, 9: element type
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
-		zval definition = {}, char_size = {}, numeric_size = {}, numeric_scale = {}, column_type = {}, attribute = {}, column_name = {}, column = {};
+		zval definition = {}, char_size = {}, numeric_size = {}, numeric_scale = {}, column_type = {}, element_type = {};
+		zval attribute = {}, column_name = {}, column = {};
 
 		array_init_size(&definition, 1);
 		add_assoc_long_ex(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
@@ -405,8 +415,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			 * ARRAY
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("ARRAY"))) {
-				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_ARRAY, 0);
-				phalcon_array_update_str(&definition, SL("size"), &char_size, PH_COPY);
+				phalcon_array_fetch_long(&element_type, field, 9, PH_NOISY);
+				if (phalcon_memnstr_str(&element_type, SL("char"))) {
+					phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_ARRAY, 0);
+				} else {
+					phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_INT_ARRAY, 0);
+				}
 				break;
 			}
 
@@ -511,4 +525,158 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, supportSequences){
 
 
 	RETURN_TRUE;
+}
+
+/**
+ * Convert php bytea to database bytea
+ *
+ * @param string $value
+ * @return string
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeBytea){
+
+	zval *value;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	PHALCON_CALL_FUNCTIONW(return_value, "pg_escape_bytea", value);
+}
+
+/**
+ * Convert database bytea to php bytea
+ *
+ * @param string $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeBytea){
+
+	zval *value;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	PHALCON_CALL_FUNCTIONW(return_value, "pg_unescape_bytea", value);
+}
+
+/**
+ * Convert php array to database array
+ *
+ * @param array $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray){
+
+	zval *value, *type = NULL, ret = {}, search = {}, replace = {};
+
+	phalcon_fetch_params(0, 1, 1, &value, &type);
+
+	RETURN_ON_FAILURE(phalcon_json_encode(&ret, value, 1));
+
+	array_init_size(&search, 2);
+	phalcon_array_append_string(&search, SL("["), 0);
+	phalcon_array_append_string(&search, SL("]"), 0);
+
+	array_init_size(&replace, 2);
+	phalcon_array_append_string(&replace, SL("{"), 0);
+	phalcon_array_append_string(&replace, SL("}"), 0);
+
+	PHALCON_CALL_FUNCTIONW(return_value, "str_replace", &search, &replace, &ret);
+}
+
+void pg_text_array_parse(zval *return_value, zval* v) {
+	smart_str str = {0};
+	if (Z_STRLEN_P(v)) {
+		long len = Z_STRLEN_P(v);
+		char *c = Z_STRVAL_P(v);
+		long i;
+		int is_value = 0, has_open = 0, has_escaped = 0;
+		for (i = 0; i < len; i++) {
+			if (has_escaped) {
+				smart_str_appendc(&str, c[i]);
+				has_escaped = 0;
+				continue;
+			}
+			if (c[i] == '{') {
+				smart_str_appendc(&str, c[i]);
+				smart_str_appendc(&str, '"');
+				is_value = 1;
+				continue;
+			}
+			if (c[i] == '\\') {
+				if (!is_value) {
+					smart_str_appendc(&str, '"');
+					is_value = 1;
+				}
+				has_escaped = 1;
+				smart_str_appendc(&str, c[i]);
+				continue;
+			}
+			if (c[i] == ',' || c[i] == '}') {
+				if (has_open) {
+					smart_str_appendc(&str, c[i]);
+					continue;
+				}
+				smart_str_appendc(&str, '"');
+				smart_str_appendc(&str, c[i]);
+				has_open = 0;
+				is_value = 0;
+				continue;
+			}
+			if (c[i] == '"') {
+				if (has_open) {
+					has_open = 0;
+					is_value = 0;
+				} else {
+					has_open = 1;
+					is_value = 1;
+				}
+				continue;
+			}
+			if (!is_value) {
+				smart_str_appendc(&str, '"');
+				is_value = 1;
+			}
+			smart_str_appendc(&str, c[i]);
+		}
+	}
+
+	smart_str_0(&str);
+
+	if (str.s) {
+		RETURN_NEW_STR(str.s);
+	} else {
+		smart_str_free(&str);
+		RETURN_NULL();
+	}
+}
+
+/**
+ * Convert database array to php array
+ *
+ * @param string $value
+ * @return array
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeArray){
+
+	zval *value, *type = NULL, parse_value = {}, search = {}, replace = {}, ret = {};
+
+	phalcon_fetch_params(0, 1, 1, &value, &type);
+
+	if (Z_LVAL_P(type) != PHALCON_DB_COLUMN_TYPE_INT_ARRAY) {
+		pg_text_array_parse(&parse_value, value);
+	} else {
+		PHALCON_CPY_WRT(&parse_value, value);
+	}
+
+	array_init_size(&search, 2);
+	phalcon_array_append_string(&search, SL("{"), 0);
+	phalcon_array_append_string(&search, SL("}"), 0);
+
+	array_init_size(&replace, 2);
+	phalcon_array_append_string(&replace, SL("["), 0);
+	phalcon_array_append_string(&replace, SL("]"), 0);
+
+	PHALCON_CALL_FUNCTIONW(&ret, "str_replace", &search, &replace, &parse_value);
+
+	RETURN_ON_FAILURE(phalcon_json_decode(return_value, &ret, 1));
 }

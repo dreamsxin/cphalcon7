@@ -70,6 +70,7 @@ PHP_METHOD(Phalcon_Http_Request, getPost);
 PHP_METHOD(Phalcon_Http_Request, getPut);
 PHP_METHOD(Phalcon_Http_Request, getQuery);
 PHP_METHOD(Phalcon_Http_Request, getServer);
+PHP_METHOD(Phalcon_Http_Request, getEnv);
 PHP_METHOD(Phalcon_Http_Request, getParam);
 PHP_METHOD(Phalcon_Http_Request, has);
 PHP_METHOD(Phalcon_Http_Request, hasPost);
@@ -131,6 +132,7 @@ static const zend_function_entry phalcon_http_request_method_entry[] = {
 	PHP_ME(Phalcon_Http_Request, getPut, arginfo_phalcon_http_requestinterface_getput, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, getQuery, arginfo_phalcon_http_requestinterface_getquery, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, getServer, arginfo_phalcon_http_requestinterface_getserver, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Request, getEnv, arginfo_phalcon_http_requestinterface_getenv, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, getParam, arginfo_phalcon_http_requestinterface_getparam, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, has, arginfo_phalcon_http_requestinterface_has, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, hasPost, arginfo_phalcon_http_requestinterface_haspost, ZEND_ACC_PUBLIC)
@@ -494,6 +496,21 @@ PHP_METHOD(Phalcon_Http_Request, getServer){
 	if (!phalcon_array_isset_fetch(return_value, _SERVER, name, 0)) {
 		RETURN_NULL();
 	}
+}
+
+/**
+ * Gets the value of an environment variable
+ *
+ * @param string $name
+ * @return string|boolean
+ */
+PHP_METHOD(Phalcon_Http_Request, getEnv){
+
+	zval *name;
+
+	phalcon_fetch_params(0, 1, 0, &name);
+
+	PHALCON_CALL_FUNCTIONW(return_value, "getenv", name);
 }
 
 /**

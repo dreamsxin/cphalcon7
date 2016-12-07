@@ -583,7 +583,7 @@ void phalcon_array_update_zval_str_append_multi_3(zval *arr, const zval *index1,
 {
 	zval tmp1 = {}, tmp2 = {};
 
-	if (Z_TYPE_P(arr) == IS_ARRAY) {		
+	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&tmp1, arr, index1, flags)) {
 			SEPARATE_ZVAL_IF_NOT_REF(&tmp1);
 
@@ -658,7 +658,6 @@ void phalcon_array_update_zval_str_str_multi_3(zval *arr, const zval *index1, co
 	phalcon_array_update_zval_zval_zval_multi_3(arr, index1, &z_index2, &z_index3, value, flags);
 }
 
-
 void phalcon_merge_append(zval *left, zval *values){
 	zval *tmp;
 
@@ -677,6 +676,34 @@ void phalcon_merge_append(zval *left, zval *values){
 		Z_TRY_ADDREF_P(values);
 		add_next_index_zval(left, values);
 	}
+}
+
+void phalcon_array_replace(zval *left, zval *values){
+
+	zval *value;
+	zend_string *str_key;
+	ulong idx;
+
+	if (Z_TYPE_P(left) != IS_ARRAY) {
+		zend_error(E_NOTICE, "The first parameter of phalcon_merge_append must be an array");
+		return;
+	}
+
+	if (Z_TYPE_P(values) != IS_ARRAY) {
+		zend_error(E_WARNING, "Second argument is not an array");
+		return;
+	}
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(values), idx, str_key, value) {
+		zval key = {};
+		if (str_key) {
+				ZVAL_STR(&key, str_key);
+		} else {
+				ZVAL_LONG(&key, idx);
+		}
+
+		phalcon_array_update_zval(left, &key, value, PH_COPY);
+	} ZEND_HASH_FOREACH_END();
 }
 
 void phalcon_array_get_current(zval *return_value, zval *array){
@@ -806,7 +833,7 @@ void phalcon_array_keys(zval *return_value, zval *arr)
 {
 	zend_string *str_key;
 	ulong idx;
-	
+
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(arr)));
 

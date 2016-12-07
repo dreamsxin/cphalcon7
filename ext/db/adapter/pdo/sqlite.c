@@ -60,6 +60,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, useExplicitIdValue);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, escapeBytea);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, unescapeBytea);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, escapeArray);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, unescapeArray);
 
 static const zend_function_entry phalcon_db_adapter_pdo_sqlite_method_entry[] = {
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Sqlite, connect, arginfo_phalcon_db_adapterinterface_connect, ZEND_ACC_PUBLIC)
@@ -67,6 +71,10 @@ static const zend_function_entry phalcon_db_adapter_pdo_sqlite_method_entry[] = 
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes, arginfo_phalcon_db_adapterinterface_describeindexes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences, arginfo_phalcon_db_adapterinterface_describereferences, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Sqlite, useExplicitIdValue, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Sqlite, escapeBytea, arginfo_phalcon_db_adapterinterface_escapebytea, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Sqlite, unescapeBytea, arginfo_phalcon_db_adapterinterface_unescapebytea, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Sqlite, escapeArray, arginfo_phalcon_db_adapterinterface_escapearray, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Sqlite, unescapeArray, arginfo_phalcon_db_adapterinterface_unescapearray, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -586,3 +594,63 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, useExplicitIdValue){
 	RETURN_TRUE;
 }
 
+/**
+ * Convert php bytea to database bytea
+ *
+ * @param string $value
+ * @return string
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, escapeBytea){
+
+	zval *value;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	RETURN_CTORW(value);
+}
+
+/**
+ * Convert database bytea to php bytea
+ *
+ * @param string $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, unescapeBytea){
+
+	zval *value;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	RETURN_CTORW(value);
+}
+
+/**
+ * Convert php array to database array
+ *
+ * @param array $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, escapeArray){
+
+	zval *value, *type = NULL;
+
+	phalcon_fetch_params(0, 1, 1, &value, &type);
+
+	RETURN_CTORW(value);
+}
+
+/**
+ * Convert database array to php array
+ *
+ * @param string $value
+ * @return array
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, unescapeArray){
+
+	zval *value, *type = NULL;
+
+	phalcon_fetch_params(0, 1, 1, &value, &type);
+
+	RETURN_CTORW(value);
+}

@@ -135,6 +135,7 @@ PHP_METHOD(Phalcon_Socket, getSocket){
  */
 PHP_METHOD(Phalcon_Socket, getSocketId){
 
+#ifdef PHALCON_USE_PHP_SOCKET
 	zval socket = {};
 	php_socket *php_sock;
 
@@ -146,6 +147,7 @@ PHP_METHOD(Phalcon_Socket, getSocketId){
 	}
 
 	ZVAL_LONG(return_value, php_sock->bsd_socket);
+#endif
 }
 
 /**
@@ -183,10 +185,15 @@ PHP_METHOD(Phalcon_Socket, _throwSocketException){
  */
 PHP_METHOD(Phalcon_Socket, setBlocking){
 
-	zval *flag, socket = {};
+	zval *flag, blocking = {}, socket = {};
 
 	phalcon_fetch_params(0, 1, 0, &flag);
 
+	phalcon_read_property(&blocking, getThis(), SL("_blocking"), PH_NOISY);
+
+	if (zend_is_true(&blocking) == zend_is_true(flag)) {
+		RETURN_TRUE;
+	}
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
 	if (zend_is_true(flag)) {
@@ -212,7 +219,7 @@ PHP_METHOD(Phalcon_Socket, isBlocking){
  *
  * @param int $level
  * @param int $optname
- * @param mixed $optval 
+ * @param mixed $optval
  * @return boolean
  */
 PHP_METHOD(Phalcon_Socket, setOption){
@@ -224,7 +231,7 @@ PHP_METHOD(Phalcon_Socket, setOption){
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
 	PHALCON_CALL_FUNCTIONW(return_value, "socket_set_option", &socket, level, optname, optval);
-	
+
 	if (PHALCON_IS_FALSE(return_value)) {
 		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
 	}

@@ -23,7 +23,7 @@
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_acl_exception_ce;
+extern zend_class_entry *phalcon_process_exception_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Process_Exception);
 

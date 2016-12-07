@@ -55,10 +55,18 @@ zend_class_entry *phalcon_db_adapter_pdo_mysql_ce;
 
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeBytea);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, unescapeBytea);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeArray);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, unescapeArray);
 
 static const zend_function_entry phalcon_db_adapter_pdo_mysql_method_entry[] = {
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier, arginfo_phalcon_db_adapterinterface_escapeidentifier, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns, arginfo_phalcon_db_adapterinterface_describecolumns, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Mysql, escapeBytea, arginfo_phalcon_db_adapterinterface_escapebytea, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Mysql, unescapeBytea, arginfo_phalcon_db_adapterinterface_unescapebytea, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Mysql, escapeArray, arginfo_phalcon_db_adapterinterface_escapearray, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo_Mysql, unescapeArray, arginfo_phalcon_db_adapterinterface_unescapearray, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -396,6 +404,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			}
 
 			/**
+			 * JSON
+			 */
+			if (phalcon_memnstr_str(&column_type, SL("json"))) {
+				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_JSON, 0);
+				break;
+			}
+
+			/**
 			 * By default is string
 			 */
 			phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_VARCHAR, 0);
@@ -464,4 +480,65 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTORW(&columns);
+}
+
+/**
+ * Convert php bytea to database bytea
+ *
+ * @param string $value
+ * @return string
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeBytea){
+
+	zval *value;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	RETURN_CTORW(value);
+}
+
+/**
+ * Convert database bytea to php bytea
+ *
+ * @param string $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, unescapeBytea){
+
+	zval *value;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	RETURN_CTORW(value);
+}
+
+/**
+ * Convert php array to database array
+ *
+ * @param array $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeArray){
+
+	zval *value, *type = NULL;
+
+	phalcon_fetch_params(0, 1, 1, &value, &type);
+
+	RETURN_CTORW(value);
+}
+
+/**
+ * Convert database array to php array
+ *
+ * @param string $value
+ * @return array
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, unescapeArray){
+
+	zval *value, *type = NULL;
+
+	phalcon_fetch_params(0, 1, 1, &value, &type);
+
+	RETURN_CTORW(value);
 }

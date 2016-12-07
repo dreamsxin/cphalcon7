@@ -610,6 +610,11 @@ int phalcon_array_fetch_string(zval *return_value, const zval *arr, zend_string 
 void phalcon_merge_append(zval *left, zval *values);
 
 /**
+ * Replaces elements from passed arrays into the left array
+ */
+void phalcon_array_replace(zval *left, zval *values);
+
+/**
  * Gets the current element in a zval hash
  */
 void phalcon_array_get_current(zval *return_value, zval *array);

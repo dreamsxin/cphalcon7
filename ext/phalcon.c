@@ -165,7 +165,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 
 	PHALCON_INIT(Phalcon_Acl_AdapterInterface);
 	PHALCON_INIT(Phalcon_Acl_ResourceInterface);
+	PHALCON_INIT(Phalcon_Acl_ResourceAware);
 	PHALCON_INIT(Phalcon_Acl_RoleInterface);
+	PHALCON_INIT(Phalcon_Acl_RoleAware);
 	PHALCON_INIT(Phalcon_Annotations_AdapterInterface);
 	PHALCON_INIT(Phalcon_Annotations_ReaderInterface);
 	PHALCON_INIT(Phalcon_Assets_FilterInterface);

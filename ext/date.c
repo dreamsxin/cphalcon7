@@ -52,6 +52,7 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2);
 PHP_METHOD(Phalcon_Date, unix2dos);
 PHP_METHOD(Phalcon_Date, dos2unix);
 PHP_METHOD(Phalcon_Date, formatted_time);
+PHP_METHOD(Phalcon_Date, intervalToSeconds);
 PHP_METHOD(Phalcon_Date, valid);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_offset, 0, 0, 1)
@@ -134,6 +135,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_formatted_time, 0, 0, 0)
 	ZEND_ARG_INFO(0, timezone)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_intervaltoseconds, 0, 0, 1)
+	ZEND_ARG_OBJ_INFO(0, interval, DateInterval, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_valid, 0, 0, 1)
 	ZEND_ARG_INFO(0, date)
 	ZEND_ARG_INFO(0, format)
@@ -156,6 +161,7 @@ static const zend_function_entry phalcon_date_method_entry[] = {
 	PHP_ME(Phalcon_Date, unix2dos, arginfo_phalcon_date_unix2dos, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, dos2unix, arginfo_phalcon_date_dos2unix, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, formatted_time, arginfo_phalcon_date_formatted_time, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Date, intervalToSeconds, arginfo_phalcon_date_intervaltoseconds, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, valid, arginfo_phalcon_date_valid, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
@@ -388,7 +394,7 @@ PHP_METHOD(Phalcon_Date, ampm){
  * @param string $ampm
  * @return string
  */
-PHP_METHOD(Phalcon_Date, adjust){	
+PHP_METHOD(Phalcon_Date, adjust){
 
 	zval *hour, *ampm, lower_ampm = {};
 	char buf[2];
@@ -459,7 +465,7 @@ PHP_METHOD(Phalcon_Date, days){
 	ZVAL_LONG(&tmp1, 1);
 	ZVAL_LONG(&tmp2, 0);
 
-	PHALCON_CALL_FUNCTIONW(&tmp, "mktime", &tmp1, &tmp2, &tmp2, month, &tmp1, &year2);	
+	PHALCON_CALL_FUNCTIONW(&tmp, "mktime", &tmp1, &tmp2, &tmp2, month, &tmp1, &year2);
 
 	ZVAL_STRING(&format, "t");
 
@@ -1075,6 +1081,42 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 	}
 
 	PHALCON_RETURN_CALL_METHODW(&dt, "format", &timestamp_format);
+}
+
+/**
+ * @param \DateInterval $interval
+ * @return int|string Returns usually integer, but string if result is too big (> PHP_INT_MAX)
+ */
+PHP_METHOD(Phalcon_Date, intervalToSeconds){
+
+	zval *interval, s = {}, i = {}, h = {}, d = {}, m = {}, y = {};
+	int seconds;
+
+	phalcon_fetch_params(0, 1, 0, &interval);
+
+	phalcon_read_property(&s, interval, SL("s"), PH_NOISY);
+	phalcon_read_property(&i, interval, SL("i"), PH_NOISY);
+	phalcon_read_property(&h, interval, SL("h"), PH_NOISY);
+	phalcon_read_property(&d, interval, SL("d"), PH_NOISY);
+	phalcon_read_property(&m, interval, SL("m"), PH_NOISY);
+	phalcon_read_property(&y, interval, SL("y"), PH_NOISY);
+	seconds = Z_LVAL(s);
+    if (Z_LVAL(i) > 0) {
+        seconds += Z_LVAL(i) * PHALCON_DATE_MINUTE;
+    }
+    if (Z_LVAL(h) > 0) {
+        seconds += Z_LVAL(h) * PHALCON_DATE_HOUR;
+    }
+    if (Z_LVAL(d) > 0) {
+        seconds += Z_LVAL(d) * PHALCON_DATE_DAY;
+    }
+    if (Z_LVAL(m) > 0) {
+        seconds += Z_LVAL(m) * PHALCON_DATE_MONTH;
+    }
+    if (Z_LVAL(y) > 0) {
+        seconds += Z_LVAL(y) * PHALCON_DATE_YEAR;
+    }
+    RETURN_LONG(seconds);
 }
 
 /**

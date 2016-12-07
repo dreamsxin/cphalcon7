@@ -66,27 +66,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, leftJoin);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, rightJoin);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_join_join, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, conditions)
-	ZEND_ARG_INFO(0, alias)
+	ZEND_ARG_TYPE_INFO(0, model, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, conditions, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, alias, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_join_innerjoin, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, conditions)
-	ZEND_ARG_INFO(0, alias)
+	ZEND_ARG_TYPE_INFO(0, model, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, conditions, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, alias, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_join_leftjoin, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, conditions)
-	ZEND_ARG_INFO(0, alias)
+	ZEND_ARG_TYPE_INFO(0, model, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, conditions, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, alias, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_join_rightjoin, 0, 0, 1)
-	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, conditions)
-	ZEND_ARG_INFO(0, alias)
+	ZEND_ARG_TYPE_INFO(0, model, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, conditions, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, alias, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_query_builder_join_method_entry[] = {

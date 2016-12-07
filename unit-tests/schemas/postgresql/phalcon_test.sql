@@ -32,6 +32,15 @@ DROP USER IF EXISTS phalcon_user;
 CREATE USER phalcon_user WITH PASSWORD '1234';
 GRANT ALL PRIVILEGES ON DATABASE phalcon_test TO phalcon_user;
 
+-- Table: datatypes
+DROP TABLE IF EXISTS datatypes CASCADE;
+CREATE TABLE datatypes (
+  id SERIAL,
+  ints integer[],
+  names character varying(60)[],
+  CONSTRAINT datatypes_id_key PRIMARY KEY (id)
+);
+
 -- Table: albums
 DROP TABLE IF EXISTS albums CASCADE;
 CREATE TABLE albums (

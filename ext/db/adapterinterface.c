@@ -86,6 +86,10 @@ static const zend_function_entry phalcon_db_adapterinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, isNestedTransactionsWithSavepoints, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getNestedTransactionSavepointName, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, describeColumns, arginfo_phalcon_db_adapterinterface_describecolumns)
+	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, escapeBytea, arginfo_phalcon_db_adapterinterface_escapebytea)
+	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, unescapeBytea, arginfo_phalcon_db_adapterinterface_unescapebytea)
+	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, escapeArray, arginfo_phalcon_db_adapterinterface_escapearray)
+	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, unescapeArray, arginfo_phalcon_db_adapterinterface_unescapearray)
 	PHP_FE_END
 };
 
@@ -636,3 +640,38 @@ PHALCON_DOC_METHOD(Phalcon_Db_AdapterInterface, getNestedTransactionSavepointNam
  * @return Phalcon\Db\ColumnInterface[]
  */
 PHALCON_DOC_METHOD(Phalcon_Db_AdapterInterface, describeColumns);
+
+
+/**
+ * Convert php bytea to database bytea
+ *
+ * @param string $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_AdapterInterface, escapeBytea);
+
+/**
+ * Convert database bytea to php bytea
+ *
+ * @param string $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_AdapterInterface, unescapeBytea);
+
+/**
+ * Convert php array to database array
+ *
+ * @param array $value
+ * @param int $type
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_AdapterInterface, escapeArray);
+
+/**
+ * Convert database array to php array
+ *
+ * @param string $value
+ * @param int $type
+ * @return array
+ */
+PHP_METHOD(Phalcon_Db_AdapterInterface, unescapeArray);

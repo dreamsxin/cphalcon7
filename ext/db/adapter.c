@@ -433,8 +433,7 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchAll){
 					PHALCON_RETURN_CALL_METHODW(&result, "fetchall", &fetch_mode, fetch_argument);
 				}
 			} else {
-				PHALCON_CALL_METHODW(NULL, &result, "setfetchmode", &fetch_mode);
-				PHALCON_RETURN_CALL_METHODW(&result, "fetchall");
+				PHALCON_RETURN_CALL_METHODW(&result, "fetchall", &fetch_mode);
 			}
 		} else {
 			PHALCON_RETURN_CALL_METHODW(&result, "fetchall");

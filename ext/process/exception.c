@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -18,29 +18,23 @@
   +------------------------------------------------------------------------+
 */
 
+#include "process/exception.h"
+#include "process/../exception.h"
+#include "kernel/main.h"
 
-#ifndef PHALCON_KERNEL_TIME_H
-#define PHALCON_KERNEL_TIME_H
+/**
+ * Phalcon\Process\Exception
+ *
+ * Class for exceptions thrown by Phalcon\Process
+ */
+zend_class_entry *phalcon_process_exception_ce;
 
-#include <php.h>
-#include <Zend/zend.h>
+/**
+ * Phalcon\Process\Exception initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Process_Exception){
 
-#include <stdio.h>
-#include <time.h>
-#include <errno.h>
-#include <string.h>
-#include <sys/types.h>
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Process, Exception, process_exception, phalcon_exception_ce, NULL, 0);
 
-#define MICRO_IN_SEC 1000000.00
-
-void phalcon_time(zval *return_value);
-int phalcon_get_time();
-#ifdef HAVE_GETTIMEOFDAY
-void phalcon_microtime(zval *return_value, zval *get_as_float);
-double phalcon_get_microtime();
-#endif
-
-long int phalcon_get_system_uptime();
-long int phalcon_get_proc_starttime(unsigned int pid);
-
-#endif /* PHALCON_KERNEL_TIME_H */
+	return SUCCESS;
+}

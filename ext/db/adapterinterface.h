@@ -249,4 +249,22 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapterinterface_describecolumns, 0, 0
 	ZEND_ARG_INFO(0, schema)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapterinterface_escapebytea, 0, 0, 1)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapterinterface_unescapebytea, 0, 0, 1)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapterinterface_escapearray, 0, 0, 1)
+	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_INFO(0, type)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapterinterface_unescapearray, 0, 0, 1)
+	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_INFO(0, type)
+ZEND_END_ARG_INFO()
+
 #endif /* PHALCON_DB_ADAPTERINTERFACE_H */

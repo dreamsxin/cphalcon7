@@ -66,15 +66,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getSet);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, params)
+	ZEND_ARG_TYPE_INFO(0, params, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update_table, 0, 0, 1)
-	ZEND_ARG_INFO(0, table)
+	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update_set, 0, 0, 1)
-	ZEND_ARG_INFO(0, set)
+	ZEND_ARG_TYPE_INFO(0, set, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_query_builder_update_method_entry[] = {
@@ -159,7 +159,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, table){
 	zval *table;
 
 	phalcon_fetch_params(0, 1, 0, &table);
-	PHALCON_ENSURE_IS_STRING(table);
 
 	phalcon_update_property_zval(getThis(), SL("_table"), table);
 	RETURN_THISW();
@@ -183,7 +182,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getTable){
  *	$builder->set(array('id' => 1, 'name' => 'Google'));
  *</code>
  *
- * @param string|array $set
+ * @param array $set
  * @return Phalcon\Mvc\Model\Query\Builder\Update
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, set){
@@ -191,11 +190,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, set){
 	zval *set;
 
 	phalcon_fetch_params(0, 1, 0, &set);
-
-	if (Z_TYPE_P(set) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Values must be an array");
-		return;
-	}
 
 	phalcon_update_property_zval(getThis(), SL("_set"), set);
 	RETURN_THISW();

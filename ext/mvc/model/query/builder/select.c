@@ -81,11 +81,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, params)
+	ZEND_ARG_TYPE_INFO(0, params, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_distinct, 0, 0, 1)
-	ZEND_ARG_INFO(0, distinct)
+	ZEND_ARG_TYPE_INFO(0, distinct, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_columns, 0, 0, 1)
@@ -93,12 +93,14 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_columns, 0
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_from, 0, 0, 1)
-	ZEND_ARG_INFO(0, models)
+	ZEND_ARG_INFO(0, model)
+	ZEND_ARG_TYPE_INFO(0, alias, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_addfrom, 0, 0, 1)
 	ZEND_ARG_INFO(0, model)
-	ZEND_ARG_INFO(0, alias)
+	ZEND_ARG_TYPE_INFO(0, alias, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_orderby, 0, 0, 1)
@@ -110,12 +112,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_having, 0,
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_limit, 0, 0, 1)
-	ZEND_ARG_INFO(0, limit)
-	ZEND_ARG_INFO(0, offset)
+	ZEND_ARG_TYPE_INFO(0, limit, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, offset, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_offset, 0, 0, 1)
-	ZEND_ARG_INFO(0, offset)
+	ZEND_ARG_TYPE_INFO(0, offset, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_groupby, 0, 0, 1)
@@ -231,7 +233,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 		 * Assign 'FROM' clause
 		 */
 		if (phalcon_array_isset_fetch_str(&models, params, SL("models"))) {
-			phalcon_update_property_zval(getThis(), SL("_models"), &models);
+			PHALCON_CALL_METHODW(NULL, getThis(), "from", &models);
 		}
 
 		/** 
@@ -319,10 +321,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, distinct){
 
 	phalcon_fetch_params(0, 1, 0, &distinct);
 
-	if (Z_TYPE_P(distinct) != IS_NULL && !PHALCON_IS_BOOL(distinct)) {
-		PHALCON_ENSURE_IS_BOOL(distinct);
-	}
-
 	phalcon_update_property_zval(getThis(), SL("_distinct"), distinct);
 	RETURN_THISW();
 }
@@ -377,16 +375,44 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getColumns){
  *	$builder->from(array('Robots', 'RobotsParts'));
  *</code>
  *
- * @param string|array $models
+ * @param string|array $model
  * @return Phalcon\Mvc\Model\Query\Builder\Select
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
 
-	zval *models;
+	zval *model, *alias = NULL, *merge = NULL, models = {};
 
-	phalcon_fetch_params(0, 1, 0, &models);
+	phalcon_fetch_params(0, 1, 2, &model, &alias, &merge);
 
-	phalcon_update_property_zval(getThis(), SL("_models"), models);
+	if (!alias) {
+		alias = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!merge) {
+		merge = &PHALCON_GLOBAL(z_false);
+	}
+
+	if (zend_is_true(merge)) {
+		phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY);
+		if (Z_TYPE(models) != IS_ARRAY) {
+			array_init(&models);
+		}
+	} else {
+		array_init(&models);
+	}
+
+	if (Z_TYPE_P(model) == IS_ARRAY) {
+		phalcon_array_merge_recursive_n(&models, model);
+	} else if (Z_TYPE_P(model) != IS_NULL) {
+		if (Z_TYPE_P(alias) == IS_STRING) {
+			phalcon_array_update_zval(&models, alias, model, PH_COPY);
+		} else {
+			phalcon_array_append(&models, model, PH_COPY);
+		}
+	}
+
+	phalcon_update_property_zval(getThis(), SL("_models"), &models);
+
 	RETURN_THISW();
 }
 
@@ -397,13 +423,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
  *	$builder->addFrom('Robots', 'r');
  *</code>
  *
- * @param string $model
+ * @param string|array $model
  * @param string $alias
  * @return Phalcon\Mvc\Model\Query\Builder\Select
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, addFrom){
 
-	zval *model, *alias = NULL, models = {}, current_model = {};
+	zval *model, *alias = NULL;
 
 	phalcon_fetch_params(0, 1, 1, &model, &alias);
 
@@ -411,27 +437,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, addFrom){
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_return_property(&models, getThis(), SL("_models"));
-	if (Z_TYPE(models) != IS_ARRAY) { 
-		if (Z_TYPE(models) != IS_NULL) {
-			PHALCON_CPY_WRT(&current_model, &models);
-
-			array_init(&models);
-			phalcon_array_append(&models, &current_model, PH_COPY);
-		} else {
-			array_init(&models);
-		}
-	} else {
-		SEPARATE_ZVAL(&models);
-	}
-
-	if (Z_TYPE_P(alias) == IS_STRING) {
-		phalcon_array_update_zval(&models, alias, model, PH_COPY);
-	} else {
-		phalcon_array_append(&models, model, PH_COPY);
-	}
-
-	phalcon_update_property_zval(getThis(), SL("_models"), &models);
+	PHALCON_CALL_METHODW(NULL, getThis(), "from", model, alias, &PHALCON_GLOBAL(z_true));
 
 	RETURN_THISW();
 }
@@ -439,7 +445,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, addFrom){
 /**
  * Return the models who makes part of the query
  *
- * @return string|array
+ * @return array
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getFrom){
 
@@ -455,7 +461,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getFrom){
  *	$builder->orderBy(array('1', 'Robots.name'));
  *</code>
  *
- * @param string $orderBy
+ * @param string|array $orderBy
  * @return Phalcon\Mvc\Model\Query\Builder\Select
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, orderBy){
@@ -587,7 +593,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getOffset){
  *	$builder->groupBy(array('Robots.name'));
  *</code>
  *
- * @param string $group
+ * @param string|array $group
  * @return Phalcon\Mvc\Model\Query\Builder\Select
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, groupBy){
@@ -603,7 +609,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, groupBy){
 /**
  * Returns the GROUP BY clause
  *
- * @return string
+ * @return string|array
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy){
 
@@ -630,7 +636,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "At least one model is required to build the query");
 			return;
 		}
-	} else if (!zend_is_true(&models)) {
+	} else {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "At least one model is required to build the query");
 		return;
 	}

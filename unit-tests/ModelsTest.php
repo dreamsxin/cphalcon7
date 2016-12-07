@@ -116,6 +116,7 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 
 		$this->_executeTestsNormal($di);
 		$this->_executeTestsRenamed($di);
+		$this->_executeTestsDataType($di);
 
 		$this->issue886($di);
 	}
@@ -752,5 +753,21 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 
 		$people = People::findFirst($parameters);
 		$this->assertTrue(is_object($people));
+	}
+
+	public function _executeTestsDataType($di) {
+		$this->_prepareDb($di->getShared('db'));
+
+		$ints = array(1, 2, 3);
+		$names = array('phalcon', 'phalcon7', 'dreamsxin', 'myleft');
+
+		$datatype = new Datatypes;
+		$datatype->ints = $ints;
+		$datatype->names = $names;
+		$this->assertTrue($datatype->save());
+
+		$datatype = Datatypes::findFirst();
+		$this->assertEquals($datatype->ints, $ints);
+		$this->assertEquals($datatype->names, $names);
 	}
 }

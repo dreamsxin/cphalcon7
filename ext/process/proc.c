@@ -436,7 +436,8 @@ PHP_METHOD(Phalcon_Process_Proc, start){
  */
 PHP_METHOD(Phalcon_Process_Proc, stop){
 
-	zval *timeout = NULL, *_signal = NULL, signal = {}, status = {}, isrunning = {}, process = {}, pid = {}, command = {};
+	zval *timeout = NULL, *_signal = NULL, signal = {}, process = {}, ppid = {}, command = {};
+	zval ret = {}, pattern = {}, pids = {}, *pid, status = {}, isrunning = {};
 	double mtime, curtime;
 
 	phalcon_fetch_params(0, 0, 2, &timeout, &_signal);
@@ -459,7 +460,22 @@ PHP_METHOD(Phalcon_Process_Proc, stop){
 	}
 
 	phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY);
-	phalcon_read_property(&pid, getThis(), SL("_pid"), PH_NOISY);
+	phalcon_read_property(&ppid, getThis(), SL("_pid"), PH_NOISY);
+
+	if (zend_is_true(&ppid)) {
+		PHALCON_CONCAT_SV(&command, "ps -o pid --no-heading --ppid ", &ppid);
+		PHALCON_CALL_FUNCTIONW(&ret, "shell_exec", &command);
+		if (zend_is_true(&ret)) {
+			ZVAL_STRING(&pattern, "/\\s+/");
+			PHALCON_CALL_FUNCTIONW(&pids, "preg_split", &pattern, &ret);
+			if (Z_TYPE(pids) == IS_ARRAY) {
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(pids), pid) {
+					PHALCON_CONCAT_SV(&command, "kill -9 ", pid);
+					PHALCON_CALL_FUNCTIONW(NULL, "exec", &command);
+				} ZEND_HASH_FOREACH_END();
+			}
+		}
+	}
 	if (zend_is_true(&process)) {
 		PHALCON_CALL_METHODW(&isrunning, getThis(), "close");
 
@@ -474,7 +490,17 @@ PHP_METHOD(Phalcon_Process_Proc, stop){
 		} while (zend_is_true(&isrunning) && phalcon_get_time() < mtime);
 		PHALCON_CALL_FUNCTIONW(NULL, "proc_close", &process);
 	} else {
-		PHALCON_CONCAT_SV(&command, "kill -9 ", &pid);
+		PHALCON_CONCAT_SVSV(&command, "kill -", &signal, " ", &ppid);
+		curtime = phalcon_get_time();
+		mtime = mtime + curtime;
+		do {
+			PHALCON_CALL_FUNCTIONW(NULL, "exec", &command);
+			PHALCON_CALL_METHODW(&isrunning, getThis(), "isrunning");
+			if (zend_is_true(&isrunning)) {
+				usleep(1000);
+			}
+		} while (zend_is_true(&isrunning) && phalcon_get_time() < mtime);
+		PHALCON_CONCAT_SV(&command, "kill -9 ", &ppid);
 		PHALCON_CALL_FUNCTIONW(NULL, "exec", &command);
 	}
 

@@ -33,6 +33,7 @@
 #include "kernel/operators.h"
 #include "kernel/exception.h"
 #include "kernel/time.h"
+#include "kernel/system.h"
 
 /**
  * Phalcon\Process\Proc

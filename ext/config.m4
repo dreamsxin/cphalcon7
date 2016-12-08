@@ -1,7 +1,7 @@
 PHP_ARG_ENABLE(phalcon, whether to enable phalcon7 framework,
 [  --enable-phalcon        Enable phalcon7 framework])
 
-PHP_ARG_WITH(non-free, wheter to enable non-free css and js minifier, 
+PHP_ARG_WITH(non-free, wheter to enable non-free css and js minifier,
 [  --without-non-free      Disable non-free minifiers], yes, no)
 
 AC_MSG_CHECKING([Include non-free minifiers])
@@ -234,6 +234,7 @@ kernel/exit.c \
 kernel/iterator.c \
 kernel/math.c \
 kernel/time.c \
+kernel/system.c \
 interned-strings.c \
 logger.c \
 flash.c \

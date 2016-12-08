@@ -19,19 +19,13 @@
 */
 
 
-#ifndef PHALCON_KERNEL_TIME_H
-#define PHALCON_KERNEL_TIME_H
+#ifndef PHALCON_KERNEL_SYSTEM_H
+#define PHALCON_KERNEL_SYSTEM_H
 
 #include <php.h>
 #include <Zend/zend.h>
 
-#define MICRO_IN_SEC 1000000.00
+long int phalcon_get_system_uptime();
+long int phalcon_get_proc_starttime(unsigned int pid);
 
-void phalcon_time(zval *return_value);
-int phalcon_get_time();
-#ifdef HAVE_GETTIMEOFDAY
-void phalcon_microtime(zval *return_value, zval *get_as_float);
-double phalcon_get_microtime();
-#endif
-
-#endif /* PHALCON_KERNEL_TIME_H */
+#endif /* PHALCON_KERNEL_SYSTEM_H */

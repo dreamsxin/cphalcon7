@@ -31,7 +31,15 @@
 #include <sys/time.h>
 #endif
 
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 #include "kernel/system.h"
+#include "kernel/array.h"
 
 long int phalcon_get_system_uptime()
 {
@@ -125,4 +133,189 @@ long int phalcon_get_proc_starttime(unsigned int pid)
 	proc_start_time += phalcon_get_system_uptime();
 
 	return proc_start_time;
+}
+
+int phalcon_get_proc_info(phalcon_process *proc, unsigned int pid) {
+
+	proc->pid = pid;
+    memset(proc->name, 0, sizeof(proc->name));
+
+	phalcon_proc_parse_stat(proc, pid);
+	phalcon_proc_parse_statm(proc, pid);
+	phalcon_proc_parse_status(proc, pid);
+	phalcon_proc_parse_io(proc, pid);
+	phalcon_proc_parse_cmdline(proc, pid);
+
+	proc->iopriority = phalcon_proc_get_iopriority(pid);
+
+	return 0;
+}
+
+int phalcon_proc_parse_stat(phalcon_process *proc, unsigned int pid) {
+	char path[256];
+	int fd;
+	char readbuf[1024];
+
+    sprintf(path, "/proc/%i/stat", pid);
+	fd = open(path, O_RDONLY);
+	memset(&readbuf, 0, sizeof(readbuf));
+	read(fd, readbuf, sizeof(readbuf));
+
+	sscanf(readbuf, "%d %256s %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %*d %llu %lu %ld %lu %lu %lu %lu %lu %lu %*u %*u %*u %*u %lu %*u %*u %d %d %u %u %llu %lu %ld",
+					&proc->pid,
+					proc->name,
+					&proc->state,
+					&proc->ppid,
+					&proc->pgrp,
+					&proc->session,
+					&proc->tty_nr,
+					&proc->tpgid,
+					&proc->flags,
+					&proc->minflt,
+					&proc->cminflt,
+					&proc->majflt,
+					&proc->cmajflt,
+					&proc->utime,
+					&proc->stime,
+					&proc->cutime,
+					&proc->cstime,
+					&proc->priority,
+					&proc->nice,
+					&proc->numthreads,
+					&proc->starttime,
+					&proc->vsize,
+					&proc->rss,
+					&proc->rsslim,
+					&proc->startcode,
+					&proc->endcode,
+					&proc->startstack,
+					&proc->kstkesp,
+					&proc->kstkeip,
+					&proc->wchan,
+					&proc->exit_signal,
+					&proc->processor,
+					&proc->rt_priority,
+					&proc->policy,
+					&proc->delayacct_blkio_ticks,
+					&proc->guest_time,
+					&proc->cguest_time);
+    close(fd);
+	return 0;
+}
+
+int phalcon_proc_parse_statm(phalcon_process *proc, unsigned int pid) {
+	char path[256];
+	int fd;
+	char buf[1024];
+
+    sprintf(path, "/proc/%i/statm", pid);
+	fd = open(path, O_RDONLY);
+	memset(&buf, 0, sizeof(buf));
+	read(fd, buf, sizeof(buf));
+
+	sscanf(buf, "%u %u %u %u %*u %u %*u",
+		&proc->size,
+		&proc->resident,
+		&proc->share,
+		&proc->text,
+		&proc->data);
+    close(fd);
+	return 0;
+}
+
+int phalcon_proc_parse_status(phalcon_process *proc, unsigned int pid) {
+	char path[256];
+	int fd;
+	char buf[1024];
+
+    sprintf(path, "/proc/%i/status", pid);
+    fd = open(path, O_RDONLY);
+	memset(&buf, 0, sizeof(buf));
+	read(fd, buf, sizeof(buf));
+
+	sscanf(buf, "Name: %*s\nState: %*[^\n]\nTgid: %*d\nPid: %*d\nPPid: %*d\nTracerPid: %*d\nUid: %d %d %d %d\nGid: %d %d %d %d\n",
+		&proc->ruid,
+		&proc->euid,
+		&proc->ssuid,
+		&proc->fsuid,
+		&proc->rgid,
+		&proc->egid,
+		&proc->ssgid,
+		&proc->fsgid);
+
+    close(fd);
+	return 0;
+}
+
+int phalcon_proc_parse_io(phalcon_process* proc, unsigned int pid) {
+	char path[256];
+	int fd;
+	char buf[1024];
+
+    sprintf(path, "/proc/%i/io", pid);
+    fd = open(path, O_RDONLY);
+	memset(&buf, 0, sizeof(buf));
+	read(fd, buf, sizeof(buf));
+
+	sscanf(buf, "rchar: %d\nwchar: %d\nsyscr: %d\nsyscw: %d\nread_bytes: %d\nwrite_bytes: %d\ncancelled_write_bytes: %d",
+					&proc->rchar,
+					&proc->wchar,
+					&proc->syscr,
+					&proc->syscw,
+					&proc->read_bytes,
+					&proc->write_bytes,
+					&proc->cancelled_write_bytes);
+    close(fd);
+	return 0;
+}
+
+int phalcon_proc_parse_cmdline(phalcon_process *proc, unsigned int pid) {
+	char path[256];
+	int fd;
+	char buf[1024];
+	unsigned int buflen, i, argc;
+	char *c;
+
+    sprintf(path, "/proc/%i/cmdline", pid);
+    fd = open(path, O_RDONLY);
+	buflen = read(fd, buf, sizeof(buf));
+
+	if(buflen == 0) {
+			return 0;
+	}
+	proc->has_commandline = 1;
+
+	/* cmdline is not null terminated if there are no command line arguments. */
+	if (buf[buflen-1] != '\0') {
+		buf[buflen++] = '\0';
+	}
+
+	/* figure out argc */
+	argc=0;
+	for (i=0; i < buflen; i++) {
+		if (buf[i] == '\0'){
+			argc++;
+		}
+		c++;
+	}
+
+	/* One for each pointer plus null */
+	array_init_size(&(proc->args), argc);
+
+	/* And the char arrays */
+	c = buf;
+	for (i=0; i < argc; i++) {
+		phalcon_array_append_string(&(proc->args), c, strlen(c)+1, 0);
+		while (*c != '\0'){
+				c++;
+		}
+		c++;
+	}
+    close(fd);
+	return 0;
+}
+
+int phalcon_proc_get_iopriority(unsigned int pid) {
+
+	return syscall(SYS_ioprio_get, 1, pid);
 }

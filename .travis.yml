@@ -10,7 +10,6 @@ php:
 
 matrix:
   allow_failures:
-    - php: 7.1
     - php: nightly
 
 git:
@@ -69,6 +68,6 @@ addons:
       - libqrencode-dev
       - libzbar-dev
       - imagemagick
-      - libmagick++-dev 
+      - libmagick++-dev
       - libmagickcore-dev
       - libmagickwand-dev

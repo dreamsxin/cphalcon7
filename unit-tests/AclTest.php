@@ -15,6 +15,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -73,7 +74,7 @@ class AclTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($acl->isAllowed('Admin', 'account', 'index'));
 		$this->assertFalse($acl->isAllowed('Admin', 'account', 'about'));
 
-		$acl->allow('Admin', '*', '*');	
+		$acl->allow('Admin', '*', '*');
 
 		$this->assertTrue($acl->isAllowed('Admin', 'welcome', 'index'));
 		$this->assertTrue($acl->isAllowed('Admin', 'welcome', 'about'));
@@ -81,7 +82,7 @@ class AclTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($acl->isAllowed('Admin', 'account', 'index'));
 		$this->assertTrue($acl->isAllowed('Admin', 'account', 'about'));
 
-		$acl->deny('Admin', '*', '*');	
+		$acl->deny('Admin', '*', '*');
 
 		foreach ($roles as $role => $object) {
 			$this->assertFalse($acl->isAllowed($role, 'welcome', 'about'));

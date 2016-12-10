@@ -310,6 +310,7 @@ db.c \
 text.c \
 arr.c \
 date.c \
+date/datetime.c \
 binary.c \
 binary/reader.c \
 binary/writer.c \
@@ -623,6 +624,7 @@ process/exception.c"
 
 	PHP_NEW_EXTENSION(phalcon, $phalcon_sources, $ext_shared)
 	PHP_ADD_EXTENSION_DEP([phalcon], [spl])
+	PHP_ADD_EXTENSION_DEP([phalcon], [date])
 
 	PHP_C_BIGENDIAN
 

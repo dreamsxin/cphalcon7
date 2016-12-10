@@ -60,6 +60,13 @@ PHP_METHOD(Phalcon_Date_DateTime, startOfDecade);
 PHP_METHOD(Phalcon_Date_DateTime, endOfDecade);
 PHP_METHOD(Phalcon_Date_DateTime, startOfCentury);
 PHP_METHOD(Phalcon_Date_DateTime, endOfCentury);
+PHP_METHOD(Phalcon_Date_DateTime, modifyYear);
+PHP_METHOD(Phalcon_Date_DateTime, modifyQuarter);
+PHP_METHOD(Phalcon_Date_DateTime, modifyMonth);
+PHP_METHOD(Phalcon_Date_DateTime, modifyDay);
+PHP_METHOD(Phalcon_Date_DateTime, modifyHour);
+PHP_METHOD(Phalcon_Date_DateTime, modifyMinute);
+PHP_METHOD(Phalcon_Date_DateTime, modifySecond);
 PHP_METHOD(Phalcon_Date_DateTime, __get);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime___construct, 0, 0, 1)
@@ -73,6 +80,34 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime_setdatetime, 0, 0, 5)
 	ZEND_ARG_TYPE_INFO(0, hour, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, minute, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, second, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime_modifyyear, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, year, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime_modifyquarter, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, quarter, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime_modifymonth, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, month, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime_modifyday, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, day, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime_modifyhour, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, hour, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime_modifyminute, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, minute, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_datetime_modifysecond, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, second, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_date_datetime_method_entry[] = {
@@ -90,6 +125,13 @@ static const zend_function_entry phalcon_date_datetime_method_entry[] = {
 	PHP_ME(Phalcon_Date_DateTime, endOfDecade, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Date_DateTime, startOfCentury, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Date_DateTime, endOfCentury, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, modifyYear, arginfo_phalcon_date_datetime_modifyyear, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, modifyQuarter, arginfo_phalcon_date_datetime_modifyquarter, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, modifyMonth, arginfo_phalcon_date_datetime_modifymonth, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, modifyDay, arginfo_phalcon_date_datetime_modifyday, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, modifyHour, arginfo_phalcon_date_datetime_modifyhour, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, modifyMinute, arginfo_phalcon_date_datetime_modifyminute, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, modifySecond, arginfo_phalcon_date_datetime_modifysecond, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Date_DateTime, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -391,6 +433,133 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfCentury){
 	ZVAL_LONG(&second, 59);
 
 	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &century, &month, &day, &hour, &minute, &second);
+}
+
+/**
+ * Add or Remove years from the instance
+ *
+ * @return \DateTime
+ */
+PHP_METHOD(Phalcon_Date_DateTime, modifyYear){
+
+	zval *year, v = {};
+
+	phalcon_fetch_params(0, 1, 0, &year);
+
+	PHALCON_CONCAT_VS(&v, year, " year");
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+
+	RETURN_THISW();
+}
+
+/**
+ * Add or Remove quarters from the instance
+ *
+ * @return \DateTime
+ */
+PHP_METHOD(Phalcon_Date_DateTime, modifyQuarter){
+
+	zval *quarter, month = {}, v = {};
+
+	phalcon_fetch_params(0, 1, 0, &quarter);
+
+	ZVAL_LONG(&month, Z_LVAL_P(quarter) * PHALCON_MONTHS_PER_QUARTER);
+	PHALCON_CONCAT_VS(&v, &month, " month");
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+
+	RETURN_THISW();
+}
+
+/**
+ * Add or Remove months from the instance
+ *
+ * @return \DateTime
+ */
+PHP_METHOD(Phalcon_Date_DateTime, modifyMonth){
+
+	zval *month, v = {};
+
+	phalcon_fetch_params(0, 1, 0, &month);
+
+	PHALCON_CONCAT_VS(&v, month, " month");
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+
+	RETURN_THISW();
+}
+
+/**
+ * Add or Remove days from the instance
+ *
+ * @return \DateTime
+ */
+PHP_METHOD(Phalcon_Date_DateTime, modifyDay){
+
+	zval *day, v = {};
+
+	phalcon_fetch_params(0, 1, 0, &day);
+
+	PHALCON_CONCAT_VS(&v, day, " day");
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+
+	RETURN_THISW();
+}
+
+/**
+ * Add or Remove hours from the instance
+ *
+ * @return \DateTime
+ */
+PHP_METHOD(Phalcon_Date_DateTime, modifyHour){
+
+	zval *hour, v = {};
+
+	phalcon_fetch_params(0, 1, 0, &hour);
+
+	PHALCON_CONCAT_VS(&v, hour, " hour");
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+
+	RETURN_THISW();
+}
+
+/**
+ * Add or Remove minutes from the instance
+ *
+ * @return \DateTime
+ */
+PHP_METHOD(Phalcon_Date_DateTime, modifyMinute){
+
+	zval *minute, v = {};
+
+	phalcon_fetch_params(0, 1, 0, &minute);
+
+	PHALCON_CONCAT_VS(&v, minute, " minute");
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+
+	RETURN_THISW();
+}
+
+/**
+ * Add or Remove seconds from the instance
+ *
+ * @return \DateTime
+ */
+PHP_METHOD(Phalcon_Date_DateTime, modifySecond){
+
+	zval *second, v = {};
+
+	phalcon_fetch_params(0, 1, 0, &second);
+
+	PHALCON_CONCAT_VS(&v, second, " second");
+
+	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+
+	RETURN_THISW();
 }
 
 /**

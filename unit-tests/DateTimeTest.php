@@ -66,4 +66,22 @@ class DateTimeTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($dt->format('Y-m-d H:i:s'), '2100-12-31 23:59:59');
 	}
 
+	public function testModify()
+	{
+		$dt = new Phalcon\Date\DateTime('2016-12-10 10:22:22');
+		$dt->modifyYear(-1);
+		$this->assertEquals($dt->format('Y-m-d H:i:s'), '2015-12-10 10:22:22');
+		$dt->modifyQuarter(4);
+		$this->assertEquals($dt->format('Y-m-d H:i:s'), '2016-12-10 10:22:22');
+		$dt->modifyMonth(-1);
+		$this->assertEquals($dt->format('Y-m-d H:i:s'), '2016-11-10 10:22:22');
+		$dt->modifyDay(-1);
+		$this->assertEquals($dt->format('Y-m-d H:i:s'), '2016-11-09 10:22:22');
+		$dt->modifyHour(-1);
+		$this->assertEquals($dt->format('Y-m-d H:i:s'), '2016-11-09 09:22:22');
+		$dt->modifyMinute(-1);
+		$this->assertEquals($dt->format('Y-m-d H:i:s'), '2016-11-09 09:21:22');
+		$dt->modifySecond(-1);
+		$this->assertEquals($dt->format('Y-m-d H:i:s'), '2016-11-09 09:21:21');
+	}
 }

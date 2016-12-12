@@ -930,7 +930,7 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	PHALCON_STR(&http, "http");
 	ZVAL_LONG(&standard_port, 80);
 
-	/** 
+	/**
 	 * Check if the request is a standard http
 	 */
 	is_equal_function(&is_std_name, &scheme, &http);
@@ -942,7 +942,7 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	PHALCON_STR(&https, "https");
 	ZVAL_LONG(&secure_port, 443);
 
-	/** 
+	/**
 	 * Check if the request is a secure http request
 	 */
 	is_equal_function(&is_secure_scheme, &scheme, &https);
@@ -950,14 +950,14 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	is_equal_function(&is_secure_port, &port, &secure_port);
 	phalcon_and_function(&is_secure_http, &is_secure_scheme, &is_secure_port);
 
-	/** 
+	/**
 	 * If is standard http we return the server name only
 	 */
 	if (PHALCON_IS_TRUE(&is_std_http)) {
 		RETURN_CTORW(&name);
 	}
 
-	/** 
+	/**
 	 * If is standard secure http we return the server name only
 	 */
 	if (PHALCON_IS_TRUE(&is_secure_http)) {
@@ -985,7 +985,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 
 	_SERVER = phalcon_get_global_str(SL("_SERVER"));
 
-	/** 
+	/**
 	 * Proxies use this IP
 	 */
 	if (zend_is_true(trust_forwarded_header)) {
@@ -1000,7 +1000,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 
 	if (Z_TYPE(address) == IS_STRING) {
 		if (phalcon_memnstr_str(&address, SL(","))) {
-			/** 
+			/**
 			 * The client address has multiples parts, only return the first part
 			 */
 			phalcon_fast_explode_str(&addresses, SL(","), &address);
@@ -1341,9 +1341,9 @@ static void phalcon_http_request_getuploadedfiles_helper(zval *retval, zval *nam
 
 		while (
 			(dname = zend_hash_get_current_data_ex(Z_ARRVAL_P(name), &pos_name)) != NULL &&
-			(dtype = zend_hash_get_current_data_ex(Z_ARRVAL_P(type), &pos_type)) != NULL && 
-			(dtmp = zend_hash_get_current_data_ex(Z_ARRVAL_P(tmp_name), &pos_tmp)) != NULL && 
-			(derror = zend_hash_get_current_data_ex(Z_ARRVAL_P(error), &pos_error)) != NULL && 
+			(dtype = zend_hash_get_current_data_ex(Z_ARRVAL_P(type), &pos_type)) != NULL &&
+			(dtmp = zend_hash_get_current_data_ex(Z_ARRVAL_P(tmp_name), &pos_tmp)) != NULL &&
+			(derror = zend_hash_get_current_data_ex(Z_ARRVAL_P(error), &pos_error)) != NULL &&
 			(dsize = zend_hash_get_current_data_ex(Z_ARRVAL_P(size), &pos_size)) != NULL
 		) {
 			zval *index, arr = {}, key = {}, file = {}, *params[2];
@@ -1443,7 +1443,7 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 		}
 
 		if (phalcon_array_isset_fetch_str(&error, value, SL("error"))) {
-			if (Z_TYPE(error) != IS_ARRAY) {				
+			if (Z_TYPE(error) != IS_ARRAY) {
 				if (!zend_is_true(&error) || !only_successful) {
 					object_init_ex(&request_file, phalcon_http_request_file_ce);
 

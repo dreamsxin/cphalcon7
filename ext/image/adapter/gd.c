@@ -75,6 +75,8 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _save);
 PHP_METHOD(Phalcon_Image_Adapter_GD, _render);
 PHP_METHOD(Phalcon_Image_Adapter_GD, _create);
 PHP_METHOD(Phalcon_Image_Adapter_GD, __destruct);
+PHP_METHOD(Phalcon_Image_Adapter_GD, line);
+PHP_METHOD(Phalcon_Image_Adapter_GD, polygon);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter_gd___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, file)
@@ -107,6 +109,8 @@ static const zend_function_entry phalcon_image_adapter_gd_method_entry[] = {
 	PHP_ME(Phalcon_Image_Adapter_GD, _render, arginfo_phalcon_image_adapter__render, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_GD, _create, arginfo_phalcon_image_adapter_gd__create, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_GD, __destruct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
+	PHP_ME(Phalcon_Image_Adapter_GD, line, arginfo_phalcon_image_adapterinterface_line, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Adapter_GD, polygon, arginfo_phalcon_image_adapterinterface_polygon, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -274,7 +278,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
 		PHALCON_CALL_FUNCTIONW(NULL, "imagealphablending", &image, &blendmode);
 		PHALCON_CALL_FUNCTIONW(NULL, "imagesavealpha", &image, &saveflag);
-		
+
 		phalcon_update_property_zval(getThis(), SL("_realpath"), file);
 		phalcon_update_property_zval(getThis(), SL("_width"), width);
 		phalcon_update_property_zval(getThis(), SL("_height"), height);
@@ -329,7 +333,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _resize) {
  *
  * @param int $width   new width
  * @param int $height  new height
- * @param int $delta_x How much the seam can traverse on x-axis. Passing 0 causes the seams to be straight. 
+ * @param int $delta_x How much the seam can traverse on x-axis. Passing 0 causes the seams to be straight.
  * @param int $rigidity Introduces a bias for non-straight seams. This parameter is typically 0.
  * @return Phalcon\Image\Adapter
  */
@@ -681,7 +685,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _text) {
 	phalcon_return_property(&image, getThis(), SL("_image"));
 	phalcon_return_property(&image_width, getThis(), SL("_width"));
 	phalcon_return_property(&image_height, getThis(), SL("_height"));
-	
+
 	w = phalcon_get_intval(&image_width);
 	h = phalcon_get_intval(&image_height);
 
@@ -700,9 +704,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _text) {
 		PHALCON_CALL_FUNCTIONW(&space, "imagettfbbox", size, &tmp, fontfile, text);
 
 		if (
-			!phalcon_array_isset_fetch_long(&s0, &space, 0) || 
-			!phalcon_array_isset_fetch_long(&s1, &space, 1) || 
-			!phalcon_array_isset_fetch_long(&s4, &space, 4) || 
+			!phalcon_array_isset_fetch_long(&s0, &space, 0) ||
+			!phalcon_array_isset_fetch_long(&s1, &space, 1) ||
+			!phalcon_array_isset_fetch_long(&s4, &space, 4) ||
 			!phalcon_array_isset_fetch_long(&s5, &space, 5)
 		) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_image_exception_ce, "Call to imagettfbbox() failed");
@@ -841,7 +845,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 
 		PHALCON_CPY_WRT_CTOR(&mask_image, &temp_image);
 	}
-	
+
 	w = phalcon_get_intval(&image_width);
 	h = phalcon_get_intval(&image_height);
 
@@ -939,7 +943,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _blur){
 	zval *radius, image = {}, constant = {};
 	int r, i;
 
-	phalcon_fetch_params(0, 1, 0, &radius);	
+	phalcon_fetch_params(0, 1, 0, &radius);
 
 	phalcon_return_property(&image, getThis(), SL("_image"));
 
@@ -1092,7 +1096,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 		zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Installed GD does not support '%s' images", Z_STRVAL_P(extension));
 		return;
 	}
-	
+
 	phalcon_return_property(&image, getThis(), SL("_image"));
 
 	phalcon_ob_start();
@@ -1157,4 +1161,103 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __destruct){
 	if (Z_TYPE(image) == IS_RESOURCE) {
 		PHALCON_CALL_FUNCTIONW(NULL, "imagedestroy", &image);
 	}
+}
+
+/**
+ * Draws a line
+ *
+ * @param int $sx
+ * @param int $sy
+ * @param int $ex
+ * @param int $ey
+ * @param string $color
+ * @return Phalcon\Image\Adapter\GD
+ */
+PHP_METHOD(Phalcon_Image_Adapter_GD, line){
+
+	zval *sx, *sy, *ex, *ey, *color = NULL, image = {}, rgb = {}, r = {}, g = {}, b = {}, imagecolor = {};
+
+	phalcon_fetch_params(0, 4, 1, &sx, &sy, &ex, &ey, &color);
+
+	if (!color) {
+		color = &PHALCON_GLOBAL(z_null);
+	}
+
+	phalcon_return_property(&image, getThis(), SL("_image"));
+
+	if (Z_TYPE(image) == IS_RESOURCE) {
+		PHALCON_CALL_METHODW(&rgb, getThis(), "getcolorrbg", color);
+		phalcon_array_fetch_long(&r, &rgb, 0, PH_NOISY);
+		phalcon_array_fetch_long(&g, &rgb, 1, PH_NOISY);
+		phalcon_array_fetch_long(&b, &rgb, 2, PH_NOISY);
+
+		PHALCON_CALL_FUNCTIONW(&imagecolor, "imagecolorallocate", &image, &r, &g, &b);
+		PHALCON_CALL_FUNCTIONW(NULL, "imageline", &image, sy, sx, ey, ex, &imagecolor);
+	}
+	RETURN_THISW();
+}
+
+/**
+ * Draws a polygon
+ *
+ *<code>
+ * $coordinates = array( array( 'x' => 4, 'y' => 6 ), array( 'x' => 8, 'y' => 10 ) );
+ * $image->polygon($coordinates);
+ *</code>
+ *
+ * @param array $coordinates array of x and y
+ * @param string $color
+ * @return Phalcon\Image\Adapter\GD
+ */
+PHP_METHOD(Phalcon_Image_Adapter_GD, polygon){
+
+	zval *coordinates, *color = NULL, image = {}, rgb = {}, r = {}, g = {}, b = {}, imagecolor = {}, *point, points = {}, num_points = {};
+
+	phalcon_fetch_params(0, 1, 1, &coordinates, &color);
+
+	if (!color) {
+		color = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!phalcon_fast_count_ev(coordinates)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_image_exception_ce, "Coordinates must be not empty");
+		return;
+	}
+	phalcon_return_property(&image, getThis(), SL("_image"));
+
+	if (Z_TYPE(image) == IS_RESOURCE) {
+		PHALCON_CALL_METHODW(&rgb, getThis(), "getcolorrbg", color);
+		phalcon_array_fetch_long(&r, &rgb, 0, PH_NOISY);
+		phalcon_array_fetch_long(&g, &rgb, 1, PH_NOISY);
+		phalcon_array_fetch_long(&b, &rgb, 2, PH_NOISY);
+
+		PHALCON_CALL_FUNCTIONW(&imagecolor, "imagecolorallocate", &image, &r, &g, &b);
+
+		array_init(&points);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(coordinates), point) {
+			zval x = {}, y = {};
+			if (Z_TYPE_P(point) == IS_ARRAY) {
+				if (phalcon_fast_count_int(point) != 2) {
+					PHALCON_THROW_EXCEPTION_STRW(phalcon_image_exception_ce, "Coordinates point error");
+					return;
+				}
+				if (!phalcon_array_isset_fetch_long(&x, point, 0)) {
+					phalcon_array_fetch_str(&x, point, SL("x"), PH_NOISY);
+				}
+				if (!phalcon_array_isset_fetch_long(&y, point, 0)) {
+					phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY);
+				}
+				phalcon_array_append(&points, &x, PH_COPY);
+				phalcon_array_append(&points, &y, PH_COPY);
+			} else {
+				phalcon_array_append(&points, &_p->val, PH_COPY);
+				_p++;
+				phalcon_array_append(&points, &_p->val, PH_COPY);
+			}
+			phalcon_increment(&num_points);
+		} ZEND_HASH_FOREACH_END();
+
+		PHALCON_CALL_FUNCTIONW(NULL, "imagefilledpolygon", &image, &points, &num_points, &imagecolor);
+	}
+	RETURN_THISW();
 }

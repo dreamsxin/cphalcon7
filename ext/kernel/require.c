@@ -191,9 +191,7 @@ int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars) {
 
 	zend_destroy_file_handle(&file_handle);
 
-	if (status == 0) {
-		phalcon_destroy_symtable(symbol_table);
-	}
+	phalcon_destroy_symtable(symbol_table);
 	return status;
 }
 

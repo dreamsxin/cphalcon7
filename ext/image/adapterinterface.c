@@ -34,6 +34,8 @@ static const zend_function_entry phalcon_image_adapterinterface_method_entry[] =
 	PHP_ABSTRACT_ME(Phalcon_Image_AdapterInterface, reflection,    arginfo_phalcon_image_adapterinterface_reflection)
 	PHP_ABSTRACT_ME(Phalcon_Image_AdapterInterface, watermark,     arginfo_phalcon_image_adapterinterface_watermark)
 	PHP_ABSTRACT_ME(Phalcon_Image_AdapterInterface, text,          arginfo_phalcon_image_adapterinterface_text)
+	PHP_ABSTRACT_ME(Phalcon_Image_AdapterInterface, line,          arginfo_phalcon_image_adapterinterface_line)
+	PHP_ABSTRACT_ME(Phalcon_Image_AdapterInterface, polygon,       arginfo_phalcon_image_adapterinterface_polygon)
 	PHP_ABSTRACT_ME(Phalcon_Image_AdapterInterface, mask,          arginfo_phalcon_image_adapterinterface_mask)
 	PHP_ABSTRACT_ME(Phalcon_Image_AdapterInterface, background,    arginfo_phalcon_image_adapterinterface_background)
 	PHP_ABSTRACT_ME(Phalcon_Image_AdapterInterface, blur,          arginfo_phalcon_image_adapterinterface_blur)
@@ -120,9 +122,49 @@ PHALCON_DOC_METHOD(Phalcon_Image_AdapterInterface, reflection);
  * @param int $offset_x offset from the left
  * @param int $offset_y offset from the top
  * @param int $opacity opacity of watermark: 1-100
- * @return Phalcon\Image\Adapter
+ * @return Phalcon\Image\AdapterInterface
  */
 PHALCON_DOC_METHOD(Phalcon_Image_AdapterInterface, watermark);
+
+/**
+ * Add a text to an image with a specified opacity.
+ *
+ * @param string text
+ * @param int $offset_x offset from the left, If less than 0 offset from the right, If true right the x offset, If NULL center
+ * @param int $offset_y offset from the top, If less than 0 offset from the bottom, If true bottom the Y offset, If NULL center
+ * @param int $opacity opacity of text: 1-100
+ * @param string $color hexadecimal color value
+ * @param int $size font pointsize
+ * @param string $fontfile font path
+ * @return Phalcon\Image\AdapterInterface
+ */
+PHALCON_DOC_METHOD(Phalcon_Image_AdapterInterface, text);
+
+/**
+ * Draws a line
+ *
+ * @param int $sx
+ * @param int $sy
+ * @param int $ex
+ * @param int $ey
+ * @param string $color
+ * @return Phalcon\Image\AdapterInterface
+ */
+PHALCON_DOC_METHOD(Phalcon_Image_AdapterInterface, line);
+
+/**
+ * Draws a polygon
+ *
+ *<code>
+ * $coordinates = array( array( 'x' => 4, 'y' => 6 ), array( 'x' => 8, 'y' => 10 ) );
+ * $image->polygon($coordinates);
+ *</code>
+ *
+ * @param array $coordinates array of x and y
+ * @param string $color
+ * @return Phalcon\Image\AdapterInterface
+ */
+PHALCON_DOC_METHOD(Phalcon_Image_AdapterInterface, polygon);
 
 /**
  * Set the background color of an image. This is only useful for images
@@ -130,7 +172,7 @@ PHALCON_DOC_METHOD(Phalcon_Image_AdapterInterface, watermark);
  *
  * @param string $color hexadecimal color value
  * @param int $opacity background opacity: 0-100
- * @return Phalcon\Image\Adapter
+ * @return Phalcon\Image\AdapterInterface
  */
 PHALCON_DOC_METHOD(Phalcon_Image_AdapterInterface, background);
 

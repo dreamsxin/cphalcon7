@@ -72,6 +72,8 @@
 	 phalcon_concat_svv(result, op1, sizeof(op1)-1, op2, op3, 0);
 #define PHALCON_SCONCAT_SVV(result, op1, op2, op3) \
 	 phalcon_concat_svv(result, op1, sizeof(op1)-1, op2, op3, 1);
+#define PHALCON_CONCAT_SVVV(result, op1, op2, op3, op4) \
+	 phalcon_concat_svvv(result, op1, sizeof(op1)-1, op2, op3, op4, 0);
 #define PHALCON_SCONCAT_SVVV(result, op1, op2, op3, op4) \
 	 phalcon_concat_svvv(result, op1, sizeof(op1)-1, op2, op3, op4, 1);
 

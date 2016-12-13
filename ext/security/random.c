@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "random.h"
+#include "security/random.h"
 #include "security/exception.h"
 #include "diinterface.h"
 #include "di/injectable.h"
@@ -50,6 +50,7 @@
 #include "kernel/concat.h"
 #include "kernel/file.h"
 #include "kernel/array.h"
+#include "kernel/concat.h"
 
 #include "interned-strings.h"
 #include "internal/arginfo.h"
@@ -131,6 +132,7 @@ PHP_METHOD(Phalcon_Security_Random, base64);
 PHP_METHOD(Phalcon_Security_Random, base64Safe);
 PHP_METHOD(Phalcon_Security_Random, uuid);
 PHP_METHOD(Phalcon_Security_Random, number);
+PHP_METHOD(Phalcon_Security_Random, color);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_security_random_bytes, 0, 0, 0)
 	ZEND_ARG_INFO(0, len)
@@ -166,6 +168,7 @@ static const zend_function_entry phalcon_security_random_method_entry[] = {
 	PHP_ME(Phalcon_Security_Random, base64Safe, arginfo_phalcon_security_random_base64safe, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security_Random, uuid, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security_Random, number, arginfo_phalcon_security_random_number, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Security_Random, color, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -327,7 +330,7 @@ PHP_METHOD(Phalcon_Security_Random, base58){
 		zval idx = {}, tmp = {};
 		double d;
 		unsigned char c;
-		
+
 		d = phalcon_safe_mod_zval_long(byte, 64);
 
 		ZVAL_DOUBLE(&idx, d);
@@ -566,4 +569,29 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 	ZVAL_UNREF(&ret);
 
 	PHALCON_RETURN_CALL_FUNCTIONW("hexdec", &data);
+}
+/**
+ *
+ */
+PHP_METHOD(Phalcon_Security_Random, color) {
+
+	zval r = {}, g = {}, b = {}, max = {}, r_hex = {}, g_hex = {}, b_hex = {}, pad_type = {}, r_str = {}, g_str = {}, b_str = {};
+
+	ZVAL_LONG(&max, 255);
+	PHALCON_CALL_METHODW(&r, getThis(), "number", &max);
+	PHALCON_CALL_METHODW(&g, getThis(), "number", &max);
+	PHALCON_CALL_METHODW(&b, getThis(), "number", &max);
+
+	PHALCON_CALL_FUNCTIONW(&r_hex, "dechex", &r);
+	PHALCON_CALL_FUNCTIONW(&g_hex, "dechex", &g);
+	PHALCON_CALL_FUNCTIONW(&b_hex, "dechex", &b);
+
+	if (!phalcon_get_constant(&pad_type, SL("STR_PAD_LEFT"))) {
+		ZVAL_LONG(&pad_type, 0);
+	}
+	PHALCON_CALL_FUNCTIONW(&r_str, "str_pad", &r_hex, &PHALCON_GLOBAL(z_two), &pad_type);
+	PHALCON_CALL_FUNCTIONW(&g_str, "str_pad", &g_hex, &PHALCON_GLOBAL(z_two), &pad_type);
+	PHALCON_CALL_FUNCTIONW(&b_str, "str_pad", &b_hex, &PHALCON_GLOBAL(z_two), &pad_type);
+
+	PHALCON_CONCAT_SVVV(return_value, "#", &r_str, &g_str, &b_str);
 }

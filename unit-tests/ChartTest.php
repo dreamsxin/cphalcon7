@@ -23,10 +23,12 @@ class ChartTest extends PHPUnit_Framework_TestCase
 {
 	public function testCaptcha()
 	{
-		$this->markTestSkipped('Test skipped');
-        // $captcha = new \Phalcon\Chart\Captcha(NULL, (__DIR__) . '/../../public/font/02.ttf', 24, 80, 34);
-        $captcha = new \Phalcon\Chart\Captcha(NULL, NULL, 24, 80, 34);
-        echo $captcha->render($code, null, null, 'red');
+		@unlink('unit-tests/assets/captcha.png');
+		$captcha = new \Phalcon\Chart\Captcha(NULL, NULL, 24, 80, 34);
+        $ret = $captcha->render('Hello', null, null, 'red');
+		$this->assertTrue(!empty($ret));
+		$ret = $captcha->save('unit-tests/assets/captcha.png');
+		$this->assertTrue($ret);
 	}
 
 	public function testQRencode()

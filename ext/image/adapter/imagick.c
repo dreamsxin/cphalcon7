@@ -78,6 +78,8 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _pixelate);
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save);
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _render);
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, __destruct);
+PHP_METHOD(Phalcon_Image_Adapter_Imagick, line);
+PHP_METHOD(Phalcon_Image_Adapter_Imagick, polygon);
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, shadow);
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, getInternalImInstance);
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, setResourceLimit);
@@ -174,6 +176,8 @@ static const zend_function_entry phalcon_image_adapter_imagick_method_entry[] = 
 	PHP_ME(Phalcon_Image_Adapter_Imagick, _save, arginfo_phalcon_image_adapter__save, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, _render, arginfo_phalcon_image_adapter__render, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, __destruct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
+	PHP_ME(Phalcon_Image_Adapter_Imagick, line, arginfo_phalcon_image_adapterinterface_line, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Adapter_Imagick, polygon, arginfo_phalcon_image_adapterinterface_polygon, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, shadow, arginfo_phalcon_image_adapter_imagick_shadow, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, getInternalImInstance, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, setResourceLimit, arginfo_phalcon_image_adapter_imagick_setresourcelimit, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -363,7 +367,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _resize) {
  *
  * @param int $width   new width
  * @param int $height  new height
- * @param int $delta_x How much the seam can traverse on x-axis. Passing 0 causes the seams to be straight. 
+ * @param int $delta_x How much the seam can traverse on x-axis. Passing 0 causes the seams to be straight.
  * @param int $rigidity Introduces a bias for non-straight seams. This parameter is typically 0.
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _liquidRescale){
@@ -603,7 +607,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _reflection) {
 	ZVAL_DOUBLE(&o, phalcon_get_intval(opacity) / 100);
 
 	phalcon_get_class_constant(&channel, imagick_ce, SL("CHANNEL_ALPHA"));
- 
+
 
 	PHALCON_CALL_METHODW(NULL, &reflection, "setIteratorIndex", &PHALCON_GLOBAL(z_zero));
 
@@ -1182,7 +1186,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 		PHALCON_CALL_METHODW(NULL, &im, "setImageFormat", &format);
 
 		PHALCON_CONCAT_SV(&mime, "image/", &format);
-	
+
 		phalcon_update_property_zval(getThis(), SL("_type"), &type);
 		phalcon_update_property_zval(getThis(), SL("_mime"), &mime);
 	} else {
@@ -1301,6 +1305,120 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __destruct){
 	}
 }
 
+/**
+ * Draws a line
+ *
+ * @param int $sx
+ * @param int $sy
+ * @param int $ex
+ * @param int $ey
+ * @param string $color
+ * @return Phalcon\Image\Adapter\Imagick
+ */
+PHP_METHOD(Phalcon_Image_Adapter_Imagick, line){
+
+	zval *sx, *sy, *ex, *ey, *color = NULL, image = {}, draw = {}, pixel = {};
+	zend_class_entry *imagick_draw_ce, *imagick_pixel_ce;
+
+	phalcon_fetch_params(0, 4, 1, &sx, &sy, &ex, &ey, &color);
+
+	if (!color) {
+		color = &PHALCON_GLOBAL(z_null);
+	}
+	phalcon_return_property(&image, getThis(), SL("_image"));
+
+	if (Z_TYPE(image) == IS_RESOURCE) {
+		imagick_draw_ce  = phalcon_fetch_str_class(SL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
+		imagick_pixel_ce = phalcon_fetch_str_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
+
+		object_init_ex(&draw, imagick_draw_ce);
+		PHALCON_CALL_METHODW(NULL, &draw, "__construct");
+
+		object_init_ex(&pixel, imagick_pixel_ce);
+		PHALCON_CALL_METHODW(NULL, &pixel, "__construct", color);
+
+		PHALCON_CALL_METHODW(NULL, &draw, "setstrokecolor", &pixel);
+		PHALCON_CALL_METHODW(NULL, &draw, "line", sx, sy, ex, ey);
+
+		PHALCON_CALL_METHODW(NULL, &image, "drawimage", &draw);
+	}
+	RETURN_THISW();
+}
+
+/**
+ * Draws a polygon
+ *
+ *<code>
+ * $coordinates = array( array( 'x' => 4, 'y' => 6 ), array( 'x' => 8, 'y' => 10 ) );
+ * $image->polygon($coordinates);
+ *</code>
+ *
+ * @param array $coordinates array of x and y
+ * @param string $color
+ * @return Phalcon\Image\Adapter\Imagick
+ */
+PHP_METHOD(Phalcon_Image_Adapter_Imagick, polygon){
+
+	zval *coordinates, *color = NULL, image = {}, draw = {}, pixel = {}, *point, points = {};
+	zend_class_entry *imagick_draw_ce, *imagick_pixel_ce;
+
+	phalcon_fetch_params(0, 1, 1, &coordinates, &color);
+
+	if (!color) {
+		color = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!phalcon_fast_count_ev(coordinates)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_image_exception_ce, "Coordinates must be not empty");
+		return;
+	}
+	phalcon_return_property(&image, getThis(), SL("_image"));
+
+	if (Z_TYPE(image) == IS_RESOURCE) {
+		imagick_draw_ce  = phalcon_fetch_str_class(SL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
+		imagick_pixel_ce = phalcon_fetch_str_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
+
+		object_init_ex(&draw, imagick_draw_ce);
+		PHALCON_CALL_METHODW(NULL, &draw, "__construct");
+
+		object_init_ex(&pixel, imagick_pixel_ce);
+		PHALCON_CALL_METHODW(NULL, &pixel, "__construct", color);
+
+		PHALCON_CALL_METHODW(NULL, &draw, "setstrokecolor", &pixel);
+		PHALCON_CALL_METHODW(NULL, &draw, "setfillcolor", &pixel);
+
+		array_init(&points);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(coordinates), point) {
+			zval newpoint = {}, x = {}, y = {};
+			array_init(&newpoint);
+			if (Z_TYPE_P(point) == IS_ARRAY) {
+				if (phalcon_fast_count_int(point) != 2) {
+					PHALCON_THROW_EXCEPTION_STRW(phalcon_image_exception_ce, "Coordinates point error");
+					return;
+				}
+				if (!phalcon_array_isset_fetch_long(&x, point, 0)) {
+					phalcon_array_fetch_str(&x, point, SL("x"), PH_NOISY);
+				}
+				if (!phalcon_array_isset_fetch_long(&y, point, 0)) {
+					phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY);
+				}
+			} else {
+				PHALCON_CPY_WRT(&x, &_p->val);
+				_p++;
+				PHALCON_CPY_WRT(&y, &_p->val);
+			}
+			phalcon_array_update_str(&newpoint, SL("x"), &x, PH_COPY);
+			phalcon_array_update_str(&newpoint, SL("y"), &y, PH_COPY);
+			phalcon_array_append(&points, &newpoint, PH_COPY);
+		} ZEND_HASH_FOREACH_END();
+
+		PHALCON_CALL_METHODW(NULL, &draw, "polygon", &points);
+
+		PHALCON_CALL_METHODW(NULL, &image, "drawimage", &draw);
+	}
+	RETURN_THISW();
+}
+
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, shadow)
 {
 	zval *_color = NULL, *_opacity = NULL, *_sigma = NULL, *_x = NULL, *_y = NULL, color = {}, opacity = {}, sigma = {}, x = {}, y = {}, im = {}, version = {}, shadow = {}, imagickpixel = {}, composite = {};
@@ -1361,9 +1479,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, shadow)
 	PHALCON_CALL_METHODW(NULL, &shadow, "compositeimage", &im, &composite, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 	PHALCON_CALL_METHODW(NULL, &im, "clear");
 	PHALCON_CALL_METHODW(NULL, &im, "destroy");
-	
+
 	phalcon_update_property_zval(getThis(), SL("_image"), &shadow);
- 
+
 	RETURN_THISW();
 }
 
@@ -1463,7 +1581,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, gamma)
 /**
  * Replicate Photoshop's levels function
  *
- * @param float $gamma 
+ * @param float $gamma
  * @param int $input_min between 0 and 255, same as photoshops
  * @param int $input_max between 0 and 255, same as photoshops
  * @param int $output_min between 0 and 255, same as photoshops
@@ -1545,10 +1663,10 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, levels)
 
 /**
  * Replicate brightness/contrast photoshop function
- * 
+ *
  * Now this one is a bit of a pain. PHP's extension doesn't provide us with this handle (yet?)
  * So we have to save the image to disk at this point, perform the function using the command line, and reload the image. yay.
- * 
+ *
  * @param int $brightness this is should be -150 <= brightnes <= 150. 0 for no change.
  * @param int $contrast this is should be -150 <= contrast <= 150. 0 for no change.
  * @return Phalcon\Image\Adapter\Imagick
@@ -1611,7 +1729,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, brightness_contrast)
 
 /**
  * Replicate HSL function
- * 
+ *
  * Imagemagick calls this 'modulate
  *
  * @param int $hue -100 <= hue <= 100. 0 is no change.

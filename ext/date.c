@@ -28,6 +28,7 @@
 #include "kernel/array.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/exception.h"
 
 /**
  * Phalcon\Date
@@ -53,6 +54,8 @@ PHP_METHOD(Phalcon_Date, unix2dos);
 PHP_METHOD(Phalcon_Date, dos2unix);
 PHP_METHOD(Phalcon_Date, formatted_time);
 PHP_METHOD(Phalcon_Date, intervalToSeconds);
+PHP_METHOD(Phalcon_Date, createDateTimeZone);
+PHP_METHOD(Phalcon_Date, filter);
 PHP_METHOD(Phalcon_Date, valid);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_offset, 0, 0, 1)
@@ -139,9 +142,18 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_intervaltoseconds, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, interval, DateInterval, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_createdatetimezone, 0, 0, 0)
+	ZEND_ARG_INFO(0, timezone)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_filter, 0, 0, 1)
+	ZEND_ARG_INFO(0, date)
+	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_valid, 0, 0, 1)
 	ZEND_ARG_INFO(0, date)
-	ZEND_ARG_INFO(0, format)
+	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_date_method_entry[] = {
@@ -162,6 +174,8 @@ static const zend_function_entry phalcon_date_method_entry[] = {
 	PHP_ME(Phalcon_Date, dos2unix, arginfo_phalcon_date_dos2unix, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, formatted_time, arginfo_phalcon_date_formatted_time, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, intervalToSeconds, arginfo_phalcon_date_intervaltoseconds, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Date, createDateTimeZone, arginfo_phalcon_date_createdatetimezone, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Date, filter, arginfo_phalcon_date_filter, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, valid, arginfo_phalcon_date_valid, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
@@ -1060,6 +1074,9 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 	if (!zone || Z_TYPE_P(zone) == IS_NULL) {
 		phalcon_return_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"));
 	} else {
+		PHALCON_CPY_WRT(&timezone, zone);
+	}
+	if (PHALCON_IS_EMPTY(&timezone)) {
 		PHALCON_CALL_FUNCTIONW(&timezone, "date_default_timezone_get");
 	}
 
@@ -1120,16 +1137,57 @@ PHP_METHOD(Phalcon_Date, intervalToSeconds){
 }
 
 /**
- * Checks if a value is a valid date
+ * @param \DateTimeZone|string|int|null $zone
+ * @return int|string Returns usually integer, but string if result is too big (> PHP_INT_MAX)
+ */
+PHP_METHOD(Phalcon_Date, createDateTimeZone){
+
+	zval *zone = NULL, timezone = {}, tzname = {}, gmtoffset = {};
+	zend_class_entry *ce0;
+
+	phalcon_fetch_params(0, 0, 1, &zone);
+
+	ce0 = phalcon_fetch_str_class(SL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
+
+	if (!zone || Z_TYPE_P(zone) == IS_NULL) {
+		phalcon_return_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"));
+	} else {
+		PHALCON_CPY_WRT(&timezone, zone);
+	}
+	if (PHALCON_IS_EMPTY(&timezone)) {
+		PHALCON_CALL_FUNCTIONW(&timezone, "date_default_timezone_get");
+	} else {
+		if (Z_TYPE(timezone) == IS_OBJECT) {
+			if (instanceof_function(Z_OBJCE(timezone), ce0)) {
+				RETURN_CTORW(&timezone);
+			}
+		} else if (Z_TYPE(timezone) == IS_LONG) {
+			ZVAL_LONG(&gmtoffset, Z_LVAL(timezone) * 3600);
+			PHALCON_CALL_FUNCTIONW(&tzname, "timezone_name_from_abbr", &PHALCON_GLOBAL(z_null), &gmtoffset, &PHALCON_GLOBAL(z_true));
+			if (PHALCON_IS_FALSE(&tzname)) {
+				PHALCON_THROW_EXCEPTION_FORMATW(spl_ce_InvalidArgumentException, "Unknown or bad timezone (%s)", Z_STRVAL(timezone));
+				return;
+			}
+			PHALCON_CPY_WRT(&timezone, &tzname);
+		} else {
+		   convert_to_string_ex(&timezone);
+		}
+	}
+	object_init_ex(return_value, ce0);
+	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &timezone);
+}
+
+/**
+ *  Filters a variable
  *
- *     $ret = Phalcon\Date::valid('2012-01-22');
- *     $ret = Phalcon\Date::valid('2012-01-22 11:00:00', 'Y-m-d H:i:s');
+ *     $ret = Phalcon\Date::filter('2012-01-22');
+ *     $ret = Phalcon\Date::filter('2012-01-22 11:00:00', 'Y-m-d H:i:s');
  *
  * @param string $date_str
  * @param string $date_format
  * @return boolean
  */
-PHP_METHOD(Phalcon_Date, valid){
+PHP_METHOD(Phalcon_Date, filter){
 
 	zval *date = NULL, *format = NULL, date_format = {}, format_date = {}, errors = {}, warning_count = {}, error_count = {};
 	zend_class_entry *ce0;
@@ -1145,6 +1203,46 @@ PHP_METHOD(Phalcon_Date, valid){
 	ce0 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_CALL_CE_STATICW(&format_date, ce0, "createfromformat", &date_format, date);
+	PHALCON_CALL_CE_STATICW(&errors, ce0, "getlasterrors");
+
+	if (Z_TYPE(errors) == IS_ARRAY) {
+		if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count")) && PHALCON_GT_LONG(&warning_count, 0)) {
+			RETURN_FALSE;
+		}
+		if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count")) && PHALCON_GT_LONG(&error_count, 0)) {
+			RETURN_FALSE;
+		}
+	}
+
+	PHALCON_CALL_METHODW(return_value, &format_date, "format", &date_format);
+}
+
+/**
+ * Checks if a value is a valid date
+ *
+ *     $ret = Phalcon\Date::valid('2012-01-22');
+ *     $ret = Phalcon\Date::valid('2012-01-22 11:00:00', 'Y-m-d H:i:s');
+ *
+ * @param string $date_str
+ * @param string $date_format
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Date, valid){
+
+	zval *date = NULL, *format = NULL, date_format = {}, errors = {}, warning_count = {}, error_count = {};
+	zend_class_entry *ce0;
+
+	phalcon_fetch_params(0, 1, 1, &date, &format);
+
+	if (!format || Z_TYPE_P(format) == IS_NULL) {
+		ZVAL_STRING(&date_format, "Y-m-d");
+	} else {
+		PHALCON_CPY_WRT(&date_format, format);
+	}
+
+	ce0 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
+
+	PHALCON_CALL_CE_STATICW(NULL, ce0, "createfromformat", &date_format, date);
 	PHALCON_CALL_CE_STATICW(&errors, ce0, "getlasterrors");
 
 	if (Z_TYPE(errors) == IS_ARRAY) {

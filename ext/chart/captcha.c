@@ -42,14 +42,15 @@
 
 #include "chart/captcha.h"
 #include "chart/exception.h"
+#include "security/random.h"
 
 /**
  * Phalcon\Chart\Captcha
- * 
+ *
  *<code>
  * header('Content-Type: image/png');
  * $captcha = new \Phalcon\Chart\Captcha(NULL, NULL, 30, 150, 50);
- * echo $captcha = $qr->render('Phalcon', 15, -10);
+ * echo $captcha = $captcha->render('Phalcon', 15, -10);
  *</code>
  */
 zend_class_entry *phalcon_chart_captcha_ce;
@@ -109,9 +110,9 @@ PHALCON_INIT_CLASS(Phalcon_Chart_Captcha){
 /**
  * Phalcon\Chart\Captcha constructor
  *
- *     $qr = new \Phalcon\Chart\Captcha;
- *     $qr->generate('Phalcon is a web framework');
- *     $qr->save('qr.png');
+ *     $captcha = new \Phalcon\Chart\Captcha;
+ *     $captcha->generate('Phalcon is a web framework');
+ *     $captcha->save('qr.png');
  */
 PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 
@@ -177,7 +178,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFont){
 	phalcon_read_property(&draw, getThis(), SL("_draw"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(NULL, &draw, "setfont", font);
-	
+
 	phalcon_update_property_zval(getThis(), SL("_font"), font);
 	RETURN_THISW();
 }
@@ -197,7 +198,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
 	phalcon_read_property(&draw, getThis(), SL("_draw"), PH_NOISY);
 
 	PHALCON_CALL_METHODW(NULL, &draw, "setfontsize", font_size);
-	
+
 	phalcon_update_property_zval(getThis(), SL("_fontSize"), font_size);
 	RETURN_THISW();
 }
@@ -206,8 +207,8 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
  * Generate Captcha data
  *
  *<code>
- *     $qr = new \Phalcon\Chart\Captcha;
- *     $qr->reander('Phalcon is a web framework');
+ *     $captcha = new \Phalcon\Chart\Captcha;
+ *     $captcha->reander('Phalcon is a web framework');
  *</code>
  *
  * @param string $word
@@ -217,11 +218,12 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
 PHP_METHOD(Phalcon_Chart_Captcha, render){
 
 	zval *_word = NULL, *offset_x = NULL, *offset_y = NULL, *_foreground = NULL, *_background = NULL, *_width = NULL, *_height = NULL, word = {}, width = {};
-	zval height = {}, foreground = {}, background = {}, imagick = {}, draw = {}, imagickpixel = {}, gravity = {}, min = {}, max = {}, roll1 = {}, roll2 = {};
+	zval height = {}, foreground = {}, background = {}, imagick = {}, draw = {}, imagickpixel = {}, gradient = {}, columns = {}, rows = {}, random = {}, top_color = {};
+	zval bottom_color = {}, pseudostring = {}, composite = {}, gravity = {}, min = {}, max = {}, roll1 = {}, roll2 = {};
 	zval corner1 = {}, corner2 = {}, format = {};
 	zend_class_entry  *imagick_ce, *imagickpixel_ce;
 
-	phalcon_fetch_params(0, 0, 6, &word, &offset_x, &offset_y, &_foreground, &background, &_width, &_height);
+	phalcon_fetch_params(0, 0, 6, &_word, &offset_x, &offset_y, &_foreground, &_background, &_width, &_height);
 
 	if (_word) {
 		phalcon_update_property_zval(getThis(), SL("_word"), _word);
@@ -236,7 +238,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		offset_y  = &PHALCON_GLOBAL(z_zero);
 	}
 
-	if (!_foreground) {
+	if (!_foreground || Z_TYPE_P(_foreground) == IS_NULL) {
 		ZVAL_STRING(&foreground, "#ffffff");
 	} else if (Z_TYPE_P(_foreground) == IS_NULL) {
 		ZVAL_STRING(&foreground, "#ffffff");
@@ -244,7 +246,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		PHALCON_CPY_WRT(&foreground, _foreground);
 	}
 
-	if (!_background) {
+	if (!_background || Z_TYPE_P(_background) == IS_NULL) {
 		ZVAL_STRING(&background, "#000000");
 	} else if (Z_TYPE_P(_background) == IS_NULL) {
 		ZVAL_STRING(&background, "#000000");
@@ -273,6 +275,24 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	PHALCON_CALL_METHODW(NULL, &draw, "setfillcolor", &imagickpixel);
 	PHALCON_CALL_METHODW(NULL, &imagickpixel, "setcolor", &background);
 	PHALCON_CALL_METHODW(NULL, &imagick, "newimage", &width,  &height, &imagickpixel);
+	if (!_background || Z_TYPE_P(_background) == IS_NULL) {
+		object_init_ex(&gradient, imagick_ce);
+		if (phalcon_has_constructor(&gradient)) {
+			PHALCON_CALL_METHODW(NULL, &gradient, "__construct");
+		}
+		ZVAL_LONG(&columns, 80);
+		ZVAL_LONG(&rows, 80);
+
+		object_init_ex(&random, phalcon_security_random_ce);
+		PHALCON_CALL_METHODW(&top_color, &random, "color");
+		PHALCON_CALL_METHODW(&bottom_color, &random, "color");
+
+		PHALCON_CONCAT_SVSV(&pseudostring, "gradient:", &top_color, "-", &bottom_color);
+		PHALCON_CALL_METHODW(NULL, &gradient, "newpseudoimage", &columns, &rows, &pseudostring);
+
+		phalcon_get_class_constant(&composite, imagick_ce, SL("COMPOSITE_OVER"));
+		PHALCON_CALL_METHODW(NULL, &imagick, "compositeimage", &gradient, &composite, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+	}
 
 	phalcon_get_class_constant(&gravity, imagick_ce, SL("GRAVITY_CENTER"));
 
@@ -312,9 +332,9 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
  * Save the image
  *
  *<code>
- *     $qr = new \Phalcon\Chart\Captcha;
- *     $qr->reander('Phalcon is a web framework');
- *     $qr->save('captcha.png');
+ *     $captcha = new \Phalcon\Chart\Captcha;
+ *     $captcha->reander('Phalcon is a web framework');
+ *     $captcha->save('captcha.png');
  *</code>
  *
  * @param filename $filename

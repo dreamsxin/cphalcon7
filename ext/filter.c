@@ -21,6 +21,7 @@
 #include "filter.h"
 #include "filterinterface.h"
 #include "filter/exception.h"
+#include "filter/../date.h"
 
 #include <Zend/zend_closures.h>
 
@@ -185,7 +186,7 @@ PHP_METHOD(Phalcon_Filter, add){
  */
 PHP_METHOD(Phalcon_Filter, sanitize){
 
-	zval *value, *filters, *norecursive = NULL, new_value, *item_value, *filter, filter_value = {}, sanizited_value = {};
+	zval *value, *filters, *norecursive = NULL, new_value = {}, *item_value, *filter, filter_value = {}, sanizited_value = {};
 	zend_string *item_key;
 	ulong item_idx;
 
@@ -203,7 +204,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		if (Z_TYPE_P(value) != IS_NULL) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(filters), filter) {
 				zval array_value = {};
-				/** 
+				/**
 				 * If the value to filter is an array we apply the filters recursively
 				 */
 				if (Z_TYPE(new_value) == IS_ARRAY && !zend_is_true(norecursive)) {
@@ -231,10 +232,10 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		RETURN_CTORW(&new_value);
 	}
 
-	/** 
+	/**
 	 * Apply a single filter value
 	 */
-	if (Z_TYPE_P(value) == IS_ARRAY && !zend_is_true(norecursive)) { 
+	if (Z_TYPE_P(value) == IS_ARRAY && !zend_is_true(norecursive)) {
 		array_init(&sanizited_value);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), item_idx, item_key, item_value) {
@@ -263,13 +264,13 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	zval *value, *filter, filters = {}, filter_object = {}, arguments = {}, type = {}, quote = {}, empty_str = {}, escaped = {}, filtered = {};
-	zval allow_fraction = {}, options = {}, allow_tags = {}, allow_attributes = {}, exception_message = {};
+	zval allow_fraction = {}, options = {}, allow_tags = {}, allow_attributes = {}, format = {}, exception_message = {};
 
 	phalcon_fetch_params(0, 2, 0, &value, &filter);
 
 	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&filter_object, &filters, filter, 0) && (Z_TYPE(filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
-		/** 
+		/**
 		 * If the filter is a closure we call it in the PHP userland
 		 */
 		if (Z_TYPE(filter_object) == IS_OBJECT && instanceof_function(Z_OBJCE(filter_object), zend_ce_closure)) {
@@ -287,7 +288,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "email")) {
-		/** 
+		/**
 		 * The 'email' filter uses the filter extension
 		 */
 		ZVAL_LONG(&type, 517); /* FILTER_SANITIZE_EMAIL */
@@ -301,7 +302,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "int")) {
-		/** 
+		/**
 		 * 'int' filter sanitizes a numeric input
 		 */
 		ZVAL_LONG(&type, 519); /* FILTER_SANITIZE_NUMBER_INT */
@@ -316,7 +317,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 
-	if (PHALCON_IS_STRING(filter, "abs")) {	
+	if (PHALCON_IS_STRING(filter, "abs")) {
 		convert_scalar_to_number_ex(value);
 		if (Z_TYPE_P(value) == IS_DOUBLE) {
 			ZVAL_DOUBLE(&filtered, fabs(Z_DVAL_P(value)));
@@ -340,7 +341,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "float")) {
-		/** 
+		/**
 		 * The 'float' filter uses the filter extension
 		 */
 		ZVAL_LONG(&allow_fraction, 4096); /* FILTER_FLAG_ALLOW_FRACTION */
@@ -377,7 +378,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	if (PHALCON_IS_STRING(filter, "lower")) {
 		if (phalcon_function_exists_ex(SL("mb_strtolower")) == SUCCESS) {
-			/** 
+			/**
 			 * 'lower' checks for the mbstring extension to make a correct lowercase
 			 * transformation
 			 */
@@ -390,7 +391,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	if (PHALCON_IS_STRING(filter, "upper")) {
 		if (phalcon_function_exists_ex(SL("mb_strtoupper")) == SUCCESS) {
-			/** 
+			/**
 			 * 'upper' checks for the mbstring extension to make a correct lowercase
 			 * transformation
 			 */
@@ -406,6 +407,17 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		phalcon_return_property(&allow_attributes, getThis(), SL("_allowAttributes"));
 
 		phalcon_xss_clean(&filtered, value, &allow_tags, &allow_attributes);
+		goto ph_end_0;
+	}
+
+	if (PHALCON_IS_STRING(filter, "date")) {
+		PHALCON_CALL_CE_STATICW(&filtered, phalcon_date_ce, "filter", value);
+		goto ph_end_0;
+	}
+
+	if (PHALCON_IS_STRING(filter, "datetime")) {
+		ZVAL_STRING(&format, "Y-m-d H:i:s");
+		PHALCON_CALL_CE_STATICW(&filtered, phalcon_date_ce, "filter", value, &format);
 		goto ph_end_0;
 	}
 

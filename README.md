@@ -19,7 +19,7 @@ Phalcon7 作为 Phalcon 1.3 系列的继承者，所以版权理所当然的属�
 Get Started
 -----------
 
-Phalcon is written in C with platform independence in mind. As a result, Phalcon is available on Microsoft Windows, GNU/Linux, and Mac OS X. You can either download a binary package for the system of your choice or build it from sources.
+Phalcon7 is written in C with platform independence in mind. As a result, Phalcon7 is available on GNU/Linux, and Mac OS X. You can build it from sources.
 
 ### Linux/Unix/Mac
 
@@ -88,15 +88,9 @@ Finally, restart the webserver.
 Current Build Status
 --------------------
 
-Phalcon Framework is built under the Travis CI service. Every commit pushed to this repository will queue a build into the continuous integration service and will run all PHPUnit tests to ensure that everything is going well and the project is stable. The current build status is:
+Phalcon7 Framework is built under the Travis CI service. Every commit pushed to this repository will queue a build into the continuous integration service and will run all PHPUnit tests to ensure that everything is going well and the project is stable. The current build status is:
 
 [![Build Status](https://secure.travis-ci.org/dreamsxin/cphalcon7.png?branch=master)](http://travis-ci.org/dreamsxin/cphalcon7)
-
-Meet the Incubator
------------
-Our community is developing amazing extra features for Phalcon every day via [Incubator](https://github.com/phalcon/incubator). There are resources to enhance your experience with the framework and that enlarge the main features.
-
-Just give it a try and help us improve Phalcon even more!
 
 External Links
 --------------
@@ -108,4 +102,5 @@ External Links
 
 License
 -------
-Phalcon is open source software licensed under the New BSD License. See the docs/LICENSE.txt file for more information.
+Phalcon7 is open source software licensed under the New BSD License. See the docs/LICENSE.txt file for more information.
+> Phalcon7 is the successor to the Phalcon 1.3 series, so the copyright belongs to the Phalcon team.

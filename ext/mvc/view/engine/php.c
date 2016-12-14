@@ -93,7 +93,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
 	symbol_table = zend_rebuild_symbol_table();
 
-	/** 
+	/**
 	 * Create the variables in local symbol table
 	 */
 	if (Z_TYPE_P(params) == IS_ARRAY) {
@@ -108,7 +108,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	/** 
+	/**
 	 * Require the file
 	 */
 	if (phalcon_require(Z_STRVAL_P(path)) == FAILURE) {
@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			phalcon_ob_clean();
 		}
-	
+
 		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
 		PHALCON_CALL_METHODW(NULL, &view, "setcontent", &contents);
 	}

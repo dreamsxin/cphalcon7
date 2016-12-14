@@ -67,6 +67,11 @@ PHP_METHOD(Phalcon_Image_Adapter, blur);
 PHP_METHOD(Phalcon_Image_Adapter, pixelate);
 PHP_METHOD(Phalcon_Image_Adapter, save);
 PHP_METHOD(Phalcon_Image_Adapter, render);
+PHP_METHOD(Phalcon_Image_Adapter, getColorRBG);
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter_getcolorrbg, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, color, IS_STRING, 0)
+ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_image_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Image_Adapter, getRealPath,    arginfo_empty, ZEND_ACC_PUBLIC)
@@ -91,6 +96,7 @@ static const zend_function_entry phalcon_image_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Image_Adapter, pixelate,       arginfo_phalcon_image_adapterinterface_pixelate,      ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter, save,           arginfo_phalcon_image_adapterinterface_save,          ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter, render,         arginfo_phalcon_image_adapterinterface_render,        ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Adapter, getColorRBG,    arginfo_phalcon_image_adapter_getcolorrbg,            ZEND_ACC_PUBLIC)
 
 	ZEND_FENTRY(_resize,          NULL,           arginfo_phalcon_image_adapter__resize,        ZEND_ACC_PROTECTED | ZEND_ACC_ABSTRACT)
 	ZEND_FENTRY(_liquidRescale,   NULL,           arginfo_phalcon_image_adapter__liquidrescale, ZEND_ACC_PROTECTED | ZEND_ACC_ABSTRACT)
@@ -386,7 +392,7 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_x);
 		convert_to_long(ofs_x);
 	}
-		
+
 	if (ofs_y && Z_TYPE_P(ofs_y) > IS_NULL && !PHALCON_IS_BOOL(ofs_y) && Z_TYPE_P(ofs_x) != IS_LONG) {
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_y);
 		convert_to_long(ofs_y);
@@ -660,7 +666,6 @@ PHP_METHOD(Phalcon_Image_Adapter, watermark){
 
 	RETURN_THISW();
 }
-
 
 /**
  * Add a text to an image with a specified opacity.
@@ -1000,7 +1005,7 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 
 		if (PHALCON_IS_EMPTY(&format)) {
 			ZVAL_STRING(&format, "png");
-		} 
+		}
 	} else {
 		PHALCON_CPY_WRT(&format, ext);
 	}
@@ -1015,4 +1020,62 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
     }
 
 	PHALCON_RETURN_CALL_METHODW(getThis(), "_render", &format, &quality);
+}
+
+/**
+ * Render the image and return the binary string.
+ *
+ * @param string $ext image type to return: png, jpg, gif, etc
+ * @param int $quality quality of image: 1-100
+ * @return string
+ */
+PHP_METHOD(Phalcon_Image_Adapter, getColorRBG){
+
+	zval *_color, color = {}, tmp = {}, r = {}, g = {}, b = {};
+	zend_string *c;
+
+	phalcon_fetch_params(0, 1, 0, &_color);
+
+	if (Z_TYPE_P(_color) == IS_NULL) {
+		ZVAL_STRING(&color, "000000");
+	} else {
+		if (Z_STRLEN_P(_color) > 1 && Z_STRVAL_P(_color)[0] == '#') {
+			phalcon_substr(&color, _color, 1, 0);
+		} else {
+			ZVAL_NEW_STR(&color, Z_STR_P(_color));
+		}
+	}
+
+	if (Z_STRLEN(color) == 3) {
+		/* Convert RGB to RRGGBB */
+		c = Z_STR(color);
+		assert(!IS_INTERNED(c));
+		zend_string_realloc(c, 7, 0);
+		c->val[6] = '\0';
+		c->val[5] = c->val[2];
+		c->val[4] = c->val[2];
+		c->val[3] = c->val[1];
+		c->val[2] = c->val[1];
+		c->val[1] = c->val[0];
+		ZVAL_STR(&color, c);
+	}
+
+	if (Z_STRLEN(color) < 6) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_image_exception_ce, "color is not valid");
+		return;
+	}
+
+	phalcon_substr(&tmp, &color, 0, 2);
+	_php_math_basetozval(&tmp, 16, &r);
+
+	phalcon_substr(&tmp, &color, 2, 2);
+	_php_math_basetozval(&tmp, 16, &g);
+
+	phalcon_substr(&tmp, &color, 4, 2);
+	_php_math_basetozval(&tmp, 16, &b);
+
+	array_init_size(return_value, 3);
+	phalcon_array_append(return_value, &r, PH_COPY);
+	phalcon_array_append(return_value, &g, PH_COPY);
+	phalcon_array_append(return_value, &b, PH_COPY);
 }

@@ -74,13 +74,26 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapterinterface_watermark, 0, 0, 1
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapterinterface_text, 0, 0, 1)
-	ZEND_ARG_INFO(0, text)
+	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, offset_x, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, offset_y, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, opacity, IS_LONG, 1)
 	ZEND_ARG_INFO(0, color)
 	ZEND_ARG_INFO(0, size)
 	ZEND_ARG_INFO(0, fontfile)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapterinterface_line, 0, 0, 4)
+	ZEND_ARG_TYPE_INFO(0, sx, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, sy, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, ex, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, ey, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, color, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapterinterface_polygon, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, coordinates, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, color, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapterinterface_mask, 0, 0, 1)

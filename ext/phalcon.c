@@ -96,7 +96,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	}
 
 	if (PHALCON_GLOBAL(cache).enable_memory) {
-		
+
 		if (PHALCON_GLOBAL(cache).values_memory_size < PHALCON_CACHE_MEMORY_SMM_SEGMENT_MIN_SIZE) {
 			php_error(E_ERROR, "Shared memory values(values_memory_size) must be at least '%d'", PHALCON_CACHE_MEMORY_SMM_SEGMENT_MIN_SIZE);
 			return FAILURE;
@@ -324,6 +324,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Debug_Dump);
 	PHALCON_INIT(Phalcon_Text);
 	PHALCON_INIT(Phalcon_Date);
+	PHALCON_INIT(Phalcon_Date_DateTime);
 	PHALCON_INIT(Phalcon_Security);
 	PHALCON_INIT(Phalcon_Security_Random);
 	PHALCON_INIT(Phalcon_Version);

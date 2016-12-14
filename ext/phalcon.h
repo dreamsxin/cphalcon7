@@ -366,6 +366,7 @@
 #include "text.h"
 #include "arr.h"
 #include "date.h"
+#include "date/datetime.h"
 
 #include "binary.h"
 #include "binary/exception.h"

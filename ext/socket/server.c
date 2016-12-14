@@ -27,6 +27,12 @@
 
 #if HAVE_EPOLL
 # include <sys/epoll.h>
+# include <unistd.h>      /* for fork & setsid */
+# include <sys/stat.h>
+# include <sys/socket.h>
+# include <sys/wait.h>
+# include <arpa/inet.h>
+# include <signal.h>
 # define EPOLL_EVENT_SIZE 1024
 #endif
 
@@ -74,6 +80,8 @@
 zend_class_entry *phalcon_socket_server_ce;
 
 PHP_METHOD(Phalcon_Socket_Server, __construct);
+PHP_METHOD(Phalcon_Socket_Server, setDaemon);
+PHP_METHOD(Phalcon_Socket_Server, setMaxChildren);
 PHP_METHOD(Phalcon_Socket_Server, setEvent);
 PHP_METHOD(Phalcon_Socket_Server, getEvent);
 PHP_METHOD(Phalcon_Socket_Server, listen);
@@ -89,6 +97,14 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_server___construct, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, domain, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, protocol, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_server_setdaemon, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, daemon, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_server_setmaxchildren, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, maxChildren, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_server_setevent, 0, 0, 1)
@@ -125,6 +141,8 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_socket_server_method_entry[] = {
 	PHP_ME(Phalcon_Socket_Server, __construct, arginfo_phalcon_socket_server___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Socket_Server, setDaemon, arginfo_phalcon_socket_server_setdaemon, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Server, setMaxChildren, arginfo_phalcon_socket_server_setmaxchildren, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, setEvent, arginfo_phalcon_socket_server_setevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, getEvent, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, listen, arginfo_phalcon_socket_server_listen, ZEND_ACC_PUBLIC)
@@ -143,11 +161,13 @@ PHALCON_INIT_CLASS(Phalcon_Socket_Server){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Socket, Server, socket_server, phalcon_socket_ce,  phalcon_socket_server_method_entry, 0);
 
-	zend_declare_property_null(phalcon_socket_server_ce, SL("_clients"),	ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_socket_server_ce, SL("_event"),		1, ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_socket_server_ce, SL("_backlog"),	0, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_socket_server_ce, SL("_daemon"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_socket_server_ce, SL("_maxChildren"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_socket_server_ce, SL("_clients"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_socket_server_ce, SL("_event"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_socket_server_ce, SL("_backlog"), 0, ZEND_ACC_PROTECTED);
 #if HAVE_EPOLL
-	zend_declare_property_long(phalcon_socket_server_ce, SL("_epollSize"),	1024, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_socket_server_ce, SL("_epollSize"), 1024, ZEND_ACC_PROTECTED);
 #endif
 
 	zend_declare_class_constant_long(phalcon_socket_server_ce, SL("USE_SELECT"),	0);
@@ -218,6 +238,34 @@ PHP_METHOD(Phalcon_Socket_Server, __construct){
 	}
 
 	phalcon_update_property_empty_array(getThis(), SL("_clients"));
+}
+
+/**
+ * Sets the run mode
+ */
+PHP_METHOD(Phalcon_Socket_Server, setDaemon){
+
+	zval *daemon;
+
+	phalcon_fetch_params(0, 1, 0, &daemon);
+
+	phalcon_update_property_zval(getThis(), SL("_daemon"), daemon);
+
+	RETURN_THISW();
+}
+
+/**
+ * Sets the run mode
+ */
+PHP_METHOD(Phalcon_Socket_Server, setMaxChildren){
+
+	zval *max_children;
+
+	phalcon_fetch_params(0, 1, 0, &max_children);
+
+	phalcon_update_property_zval(getThis(), SL("_maxChildren"), max_children);
+
+	RETURN_THISW();
 }
 
 /**
@@ -361,6 +409,116 @@ void setkeepalive(int fd) {
 	setsockopt(fd, SOL_TCP, TCP_KEEPCNT, (void *) &keepCount, sizeof (keepCount));
 }
 
+#ifdef PHALCON_USE_PHP_SOCKET
+struct _phalcon_socket_server {
+	int fd;
+	int ppid;
+	int running_children;
+	int running;
+	int timeout;
+} *server;
+
+typedef struct _phalcon_socket_server phalcon_socket_server;
+
+int phalcon_socket_server_init() {
+	phalcon_socket_server *instance;
+	if (server) {
+		return 0;
+	}
+
+	instance = calloc(1, sizeof(phalcon_socket_server));
+	instance->timeout = 3;
+	server = instance;
+
+	return 1;
+}
+
+void phalcon_socket_server_destroy() {
+	if (server->fd) {
+		close(server->fd);
+	}
+	free(server);
+	server = NULL;
+}
+
+static void phalcon_socket_sig_handler(int signo) {
+	(void)signo;
+
+	server->running = 0;
+	return;
+}
+
+static void phalcon_socket_sig_reg() {
+	struct sigaction act;
+
+	act.sa_handler = phalcon_socket_sig_handler;
+	sigemptyset(&act.sa_mask);
+
+#ifdef SA_INTERRUPT
+	act.sa_flags = SA_INTERRUPT;
+#else
+	act.sa_flags = 0;
+#endif
+
+	signal(SIGPIPE, SIG_IGN);
+	sigaction(SIGTERM, &act, NULL);
+	sigaction(SIGINT, &act, NULL);
+	sigaction(SIGQUIT, &act, NULL);
+
+	server->ppid = getpid();
+}
+
+static int phalcon_socket_server_start_daemon(void) {
+	pid_t pid;
+	int i, fd;
+
+	pid = fork();
+	switch (pid) {
+		case -1:
+			return 0;
+		case 0:
+			setsid();
+			break;
+		default:
+			exit(0);
+			break;
+	}
+
+	umask(0);
+	chdir("/");
+	for (i=0; i < 3; i++) {
+		close(i);
+	}
+
+	fd = open("/dev/null", O_RDWR);
+	if (dup2(fd, 0) < 0 || dup2(fd, 1) < 0 || dup2(fd, 2) < 0) {
+		close(fd);
+		return 0;
+	}
+
+	close(fd);
+	return 1;
+}
+
+static int phalcon_socket_server_startup_workers(zval *object, int max_childs) {
+	int pid = 0;
+	if (!max_childs) {
+		phalcon_socket_sig_reg();
+		return 1;
+	} else {
+		while (max_childs-- && (pid = fork())) {
+			server->running_children++;
+		}
+		if (pid) { // parent
+			phalcon_socket_sig_reg();
+			return 0;
+		} else { // child
+			return 1;
+		}
+	}
+}
+#endif
+
 /**
  * Run the Server
  *
@@ -369,6 +527,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 #ifdef PHALCON_USE_PHP_SOCKET
 	zval *_onconnection = NULL, *_onrecv = NULL, *_onsend = NULL, *_onclose = NULL, *_onerror = NULL, *_ontimeout = NULL, *timeout = NULL, *usec = NULL;
 	zval onconnection = {}, onrecv = {}, onsend = {}, onclose = {}, onerror = {}, ontimeout, socket = {}, maxlen = {}, event = {};
+	zval daemon = {}, max_children = {};
 	php_socket *listen_php_sock;
 	struct sockaddr_in client_addr;
 	socklen_t client_addr_len = sizeof (client_addr);
@@ -435,21 +594,53 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 	phalcon_read_property(&maxlen, getThis(), SL("_maxlen"), PH_NOISY);
 	phalcon_read_property(&event, getThis(), SL("_event"), PH_NOISY);
+	phalcon_read_property(&daemon, getThis(), SL("_daemon"), PH_NOISY);
+	phalcon_read_property(&max_children, getThis(), SL("_maxChildren"), PH_NOISY);
 
 	if ((listen_php_sock = (php_socket *)zend_fetch_resource_ex(&socket, php_sockets_le_socket_name, php_sockets_le_socket())) == NULL) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_socket_exception_ce, "epoll: can't fetch master socket");
 		RETURN_FALSE;
 	}
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "setblocking", &PHALCON_GLOBAL(z_false));
 	PHALCON_CALL_METHODW(NULL, getThis(), "listen");
+	PHALCON_CALL_METHODW(NULL, getThis(), "setblocking", &PHALCON_GLOBAL(z_false));
 
-	listenfd = listen_php_sock->bsd_socket;
+	phalcon_socket_server_init();
+	server->fd = listenfd = listen_php_sock->bsd_socket;
 
+	if (zend_is_true(&daemon) && !phalcon_socket_server_start_daemon()) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_socket_exception_ce, "Failed to setup daemon");
+		phalcon_socket_server_destroy();
+		RETURN_FALSE;
+	}
+	server->running = 1;
+	if (!phalcon_socket_server_startup_workers(getThis(), Z_LVAL(max_children))) {
+		/* master */
+		pid_t cid;
+		int stat;
+		while (server->running) {
+			if ((cid = waitpid(-1, &stat, 0)) > 0) {
+				if (!(cid = fork())) {
+					goto worker;
+				}
+			}
+		}
+		signal(SIGQUIT, SIG_IGN);
+		kill(-(server->ppid), SIGQUIT);
+
+		while(server->running_children) {
+			while ((cid = waitpid(-1, &stat, 0)) > 0) {
+				server->running_children--;
+			}
+		}
+		phalcon_socket_server_destroy();
+		return;
+	}
+worker:
 #if HAVE_EPOLL
 	if (Z_LVAL(event) == 0) {
 #endif
-		while(1) {
+		while(server->running) {
 			zval r_array = {}, w_array = {}, e_array = {}, ret = {}, clients = {}, *client = NULL, *client_socket = NULL;
 
 			array_init(&r_array);
@@ -576,7 +767,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 							} else if (phalcon_method_exists_ex(getThis(), SL("onrecv")) == SUCCESS) {
 								PHALCON_CALL_METHODW(&ret, getThis(), "onrecv", &client, &data);
 							}
-					
+
 							if (PHALCON_IS_FALSE(&ret)) {
 								status = -1;
 								break;
@@ -610,7 +801,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 							} else if (phalcon_method_exists_ex(getThis(), SL("onclose")) == SUCCESS) {
 								PHALCON_CALL_METHODW(NULL, getThis(), "onclose", &client);
 							}
-							
+
 							shutdown(client_fd, SHUT_RDWR);
 							close(client_fd);
 							phalcon_unset_property_array(getThis(), SL("_clients"), &client_socket_id);
@@ -632,6 +823,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 		epollfd = epoll_create(EPOLL_EVENT_SIZE+1);
 		if (epollfd < 0) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_socket_exception_ce, "epoll: unable to initialize");
+			phalcon_socket_server_destroy();
 			RETURN_FALSE;
 		}
 
@@ -640,15 +832,17 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 
 		if ((epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &ev)) < 0) {
 			PHALCON_THROW_EXCEPTION_FORMATW(phalcon_socket_exception_ce, "epoll: unable to add fd %d", listenfd);
+			phalcon_socket_server_destroy();
 			RETURN_FALSE;
 		}
 
-		for (;;) {
+		while (server->running) {
 			int ret, i;
 			ret = epoll_wait(epollfd, events, EPOLL_EVENT_SIZE, sec);
 			if (ret == -1) {
 				if (errno != EINTR && errno != EWOULDBLOCK) {
 					PHALCON_THROW_EXCEPTION_FORMATW(phalcon_socket_exception_ce, "epoll_wait() returns %d", errno);
+					phalcon_socket_server_destroy();
 					RETURN_FALSE;
 				}
 				continue;
@@ -702,8 +896,10 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 						ev.data.fd = client_fd;
 						ev.events = EPOLLIN | EPOLLET;
 						if ((epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_ADD, client_fd, &ev)) < 0) {
-							PHALCON_THROW_EXCEPTION_FORMATW(phalcon_socket_exception_ce, "epoll: unable to add client fd %d", client_fd);
-							RETURN_FALSE;
+							//PHALCON_THROW_EXCEPTION_FORMATW(phalcon_socket_exception_ce, "epoll: unable to add client fd %d", client_fd);
+							//phalcon_socket_server_destroy();
+							//RETURN_FALSE;
+							continue;
 						}
 					}
 					if (client_fd < 0) {
@@ -756,7 +952,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 							} else if (phalcon_method_exists_ex(getThis(), SL("onrecv")) == SUCCESS) {
 								PHALCON_CALL_METHODW(&ret, getThis(), "onrecv", &client, &data);
 							}
-					
+
 							if (PHALCON_IS_FALSE(&ret)) {
 								status = -1;
 								break;
@@ -790,7 +986,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 					} else if (phalcon_method_exists_ex(getThis(), SL("onsend")) == SUCCESS) {
 						PHALCON_CALL_METHODW(&ret, getThis(), "onsend", &client, &data);
 					}
-				
+
 					if (PHALCON_IS_FALSE(&ret)) {
 						if (Z_TYPE(onclose) > IS_NULL) {
 							args = (zval *)safe_emalloc(1, sizeof(zval), 0);
@@ -821,6 +1017,8 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 	}
 #endif
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "close");
+	phalcon_socket_server_destroy();
+#else
+	PHALCON_THROW_EXCEPTION_FORMATW(phalcon_socket_exception_ce, "Don't support, please reinstall.");
 #endif
 }

@@ -32,7 +32,15 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <fcntl.h>
+#include <fcntl.h>		  /* for fcntl */
+
+static inline int phalcon_socket_set_non_blocking(int fd) {
+	int flags = fcntl(fd, F_GETFL);
+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+		return 0;
+	}
+	return 1;
+}
 
 #define PHALCON_SOCKET_AF_UNIX			AF_UNIX
 #define PHALCON_SOCKET_AF_INET			AF_INET

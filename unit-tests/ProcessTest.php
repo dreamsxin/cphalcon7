@@ -24,9 +24,9 @@ class ProcessTest extends PHPUnit_Framework_TestCase
 	public function testNormal()
 	{
 		$process = new Phalcon\Process\Proc('ping -c 1 localhost');
-        $this->assertTrue($process->start());
+		$this->assertTrue($process->start());
 
-        $ret = $process->read(Phalcon\Process\Proc::STDOUT);
+		$ret = $process->read(Phalcon\Process\Proc::STDOUT);
 
 		$this->assertTrue(!empty($ret));
     }
@@ -34,10 +34,10 @@ class ProcessTest extends PHPUnit_Framework_TestCase
 	public function testHandle()
 	{
 		$process = new Phalcon\Process\Proc('ping -c 1 localhost');
-	    $this->assertTrue($process->start());
+		$this->assertTrue($process->start());
 
 		$ret = NULL;
-	    $process->handle(function($pipe, $data) use (&$ret) {
+		$process->handle(function($pipe, $data) use (&$ret) {
 			// onread
 			$ret = $data;
 		},function($pipe){

@@ -50,7 +50,7 @@
  *<code>
  * header('Content-Type: image/png');
  * $captcha = new \Phalcon\Chart\Captcha(NULL, NULL, 30, 150, 50);
- * echo $captcha = $qr->render('Phalcon', 15, -10);
+ * echo $captcha = $captcha->render('Phalcon', 15, -10);
  *</code>
  */
 zend_class_entry *phalcon_chart_captcha_ce;
@@ -110,9 +110,9 @@ PHALCON_INIT_CLASS(Phalcon_Chart_Captcha){
 /**
  * Phalcon\Chart\Captcha constructor
  *
- *     $qr = new \Phalcon\Chart\Captcha;
- *     $qr->generate('Phalcon is a web framework');
- *     $qr->save('qr.png');
+ *     $captcha = new \Phalcon\Chart\Captcha;
+ *     $captcha->generate('Phalcon is a web framework');
+ *     $captcha->save('qr.png');
  */
 PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 
@@ -207,8 +207,8 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
  * Generate Captcha data
  *
  *<code>
- *     $qr = new \Phalcon\Chart\Captcha;
- *     $qr->reander('Phalcon is a web framework');
+ *     $captcha = new \Phalcon\Chart\Captcha;
+ *     $captcha->reander('Phalcon is a web framework');
  *</code>
  *
  * @param string $word
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		PHALCON_CALL_METHODW(NULL, &gradient, "newpseudoimage", &columns, &rows, &pseudostring);
 
 		phalcon_get_class_constant(&composite, imagick_ce, SL("COMPOSITE_OVER"));
-		PHALCON_CALL_METHODW(NULL, &gradient, "compositeimage", &gradient, &composite, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+		PHALCON_CALL_METHODW(NULL, &imagick, "compositeimage", &gradient, &composite, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 	}
 
 	phalcon_get_class_constant(&gravity, imagick_ce, SL("GRAVITY_CENTER"));
@@ -332,9 +332,9 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
  * Save the image
  *
  *<code>
- *     $qr = new \Phalcon\Chart\Captcha;
- *     $qr->reander('Phalcon is a web framework');
- *     $qr->save('captcha.png');
+ *     $captcha = new \Phalcon\Chart\Captcha;
+ *     $captcha->reander('Phalcon is a web framework');
+ *     $captcha->save('captcha.png');
  *</code>
  *
  * @param filename $filename

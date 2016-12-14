@@ -486,13 +486,7 @@ int phalcon_is_identical(zval *op1, zval *op2) {
  */
 int phalcon_bitwise_and_function(zval *result, zval *op1, zval *op2){
 	int status;
-	int ref_count = Z_REFCOUNT_P(result);
-	int is_ref = Z_ISREF_P(result);
 	status = bitwise_and_function(result, op1, op2);
-	Z_SET_REFCOUNT_P(result, ref_count);
-	if (is_ref) {
-		ZVAL_MAKE_REF(result);
-	}
 	return status;
 }
 
@@ -501,13 +495,7 @@ int phalcon_bitwise_and_function(zval *result, zval *op1, zval *op2){
  */
 int phalcon_bitwise_or_function(zval *result, zval *op1, zval *op2){
 	int status;
-	int ref_count = Z_REFCOUNT_P(result);
-	int is_ref = Z_ISREF_P(result);
 	status = bitwise_or_function(result, op1, op2);
-	Z_SET_REFCOUNT_P(result, ref_count);
-	if (is_ref) {
-		ZVAL_MAKE_REF(result);
-	}
 	return status;
 }
 

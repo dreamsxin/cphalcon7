@@ -550,7 +550,7 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 
 		PHALCON_CALL_FUNCTIONW(&tmp1, "ord", &tmp);
 
-		phalcon_bitwise_and_function(&tmp, &tmp1, &mask TSRMLS_CC);
+		phalcon_bitwise_and_function(&tmp, &tmp1, &mask);
 
 		PHALCON_CALL_FUNCTIONW(&chr, "chr", &tmp);
 

@@ -598,10 +598,10 @@ PHP_METHOD(Phalcon_Security_Random, color) {
 
 	if (Z_LVAL_P(type) == 1) {
 #if PHP_VERSION_ID >= 70100
-		rnd_idx = php_mt_rand_common(80, 120);
+		rnd_idx = php_mt_rand_common(0, 127);
 #else
 		rnd_idx = php_rand();
-		RAND_RANGE(rnd_idx, 80, 120, PHP_RAND_MAX);
+		RAND_RANGE(rnd_idx, 0, 127, PHP_RAND_MAX);
 #endif
 		ZVAL_LONG(&a, rnd_idx);
 		PHALCON_CONCAT_SVSVSVSVS(return_value, "rgba(", &r, ",", &g, ",", &b, ",", &a, ")");

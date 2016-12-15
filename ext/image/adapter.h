@@ -103,14 +103,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter__background, 0, 0, 4)
 	ZEND_ARG_INFO(0, opacity)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter__save, 0, 0, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter__save, 0, 0, 1)
 	ZEND_ARG_INFO(0, file)
-	ZEND_ARG_INFO(0, quality)
+	ZEND_ARG_TYPE_INFO(0, opacity, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, interlacing, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter__render, 0, 0, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter__render, 0, 0, 1)
 	ZEND_ARG_INFO(0, type)
-	ZEND_ARG_INFO(0, quality)
+	ZEND_ARG_TYPE_INFO(0, opacity, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, interlacing, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_IMAGE_ADAPTER_H */

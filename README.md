@@ -60,13 +60,22 @@ Follow these instructions to generate a binary extension for your platform:
 git clone git://github.com/dreamsxin/cphalcon7.git
 cd cphalcon7/ext
 phpize
+./configure
+# or debug
+./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"
 make -j4
 sudo make install
+```
+
+Custom php path:
+```shell
 # or
 /usr/local/php/bin/phpize
-./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized" --with-php-config=/usr/local/php/bin/php-config
-# or
-./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized" --with-php-config=/usr/local/php/bin/php-config --enable-qrcode
+./configure --with-php-config=/usr/local/php/bin/php-config
+# enable qrcode
+./configure --with-php-config=/usr/local/php/bin/php-config --enable-qrcode
+make -j4
+sudo make install
 ```
 
 Add the extension to your php.ini:

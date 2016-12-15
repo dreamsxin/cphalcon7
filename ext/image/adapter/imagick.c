@@ -1150,11 +1150,12 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _pixelate){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 
-	zval *file, *quality, *constant, ret = {}, format = {}, type = {}, mime = {}, im = {}, fp = {}, mode = {}, compression = {};
+	zval *file, *quality = NULL, *interlacing = NULL, *constant, ret = {}, format = {}, type = {}, mime = {}, im = {}, fp = {}, mode = {}, compression = {};
+	zval interlace_scheme = {};
 	zend_class_entry *imagick_ce;
 	char *ext;
 
-	phalcon_fetch_params(0, 2, 0, &file, &quality);
+	phalcon_fetch_params(0, 1, 2, &file, &quality, &interlacing);
 
 	imagick_ce = phalcon_fetch_str_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1216,7 +1217,17 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
 			}
 		}
 
-		PHALCON_CALL_METHODW(NULL, &im, "setImageCompressionQuality", quality);
+		if (quality && Z_TYPE_P(quality) != IS_NULL) {
+			PHALCON_CALL_METHODW(NULL, &im, "setImageCompressionQuality", quality);
+		}
+		if (interlacing && Z_TYPE_P(interlacing) >= IS_NULL) {
+			if (zend_is_true(interlacing)) {
+				phalcon_get_class_constant(&interlace_scheme, imagick_ce, SL("INTERLACE_LINE"));
+			} else {
+				phalcon_get_class_constant(&interlace_scheme, imagick_ce, SL("INTERLACE_NO"));
+			}
+			PHALCON_CALL_METHODW(NULL, &im, "setinterlacescheme", &interlace_scheme);
+		}
 		PHALCON_CALL_METHODW(&ret, &im, "writeImage", file);
 	}
 
@@ -1236,11 +1247,12 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _save) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, _render) {
 
-	zval *extension, *quality, mime = {}, format = {}, type = {}, im = {}, image_string = {}, compression = {};
+	zval *extension, *quality = NULL, *interlacing = NULL, mime = {}, format = {}, type = {}, im = {}, image_string = {}, compression = {};
+	zval interlace_scheme = {};
 	zend_class_entry *imagick_ce;
 	char *ext;
 
-	phalcon_fetch_params(0, 2, 0, &extension, &quality);
+	phalcon_fetch_params(0, 1, 2, &extension, &quality, &interlacing);
 
 	imagick_ce = phalcon_fetch_str_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
@@ -1283,8 +1295,17 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _render) {
 				PHALCON_CALL_METHODW(NULL, &im, "setImageCompression", &compression);
 			}
 		}
-
-		PHALCON_CALL_METHODW(NULL, &im, "setImageCompressionQuality", quality);
+		if (quality && Z_TYPE_P(quality) != IS_NULL) {
+			PHALCON_CALL_METHODW(NULL, &im, "setImageCompressionQuality", quality);
+		}
+		if (interlacing && Z_TYPE_P(interlacing) >= IS_NULL) {
+			if (zend_is_true(interlacing)) {
+				phalcon_get_class_constant(&interlace_scheme, imagick_ce, SL("INTERLACE_LINE"));
+			} else {
+				phalcon_get_class_constant(&interlace_scheme, imagick_ce, SL("INTERLACE_NO"));
+			}
+			PHALCON_CALL_METHODW(NULL, &im, "setinterlacescheme", &interlace_scheme);
+		}
 		PHALCON_CALL_METHODW(&image_string, &im, "getImageBlob");
 	}
 

@@ -928,9 +928,9 @@ PHP_METHOD(Phalcon_Image_Adapter, pixelate){
  */
 PHP_METHOD(Phalcon_Image_Adapter, save){
 
-	zval *fname = NULL, *q = NULL, file = {}, quality = {}, ret = {}, dir = {}, *constant;
+	zval *fname = NULL, *q = NULL, *interlacing = NULL, file = {}, quality = {}, ret = {}, dir = {}, *constant;
 
-	phalcon_fetch_params(0, 0, 2, &fname, &q);
+	phalcon_fetch_params(0, 0, 3, &fname, &q, &interlacing);
 
 	if (!fname) {
 		phalcon_return_property(&file, getThis(), SL("_realpath"));
@@ -950,6 +950,10 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 		ZVAL_LONG(&quality, 1);
 	} else {
 		ZVAL_LONG(&quality, Z_LVAL_P(q));
+	}
+
+	if (!interlacing) {
+		interlacing = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_CALL_FUNCTIONW(&ret, "is_file", &file);
@@ -984,7 +988,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 		}
 	}
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_save", &file, &quality);
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_save", &file, &quality, interlacing);
 }
 
 /**
@@ -996,9 +1000,9 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
  */
 PHP_METHOD(Phalcon_Image_Adapter, render){
 
-	zval *ext = NULL, *_quality = NULL, format = {}, quality = {};
+	zval *ext = NULL, *_quality = NULL, *interlacing = NULL, format = {}, quality = {};
 
-	phalcon_fetch_params(0, 0, 2, &ext, &_quality);
+	phalcon_fetch_params(0, 0, 3, &ext, &_quality, &interlacing);
 
 	if (!ext) {
 		phalcon_return_property(&format, getThis(), SL("_format"));
@@ -1019,7 +1023,11 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
         }
     }
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_render", &format, &quality);
+	if (!interlacing) {
+		interlacing = &PHALCON_GLOBAL(z_null);
+	}
+
+	PHALCON_RETURN_CALL_METHODW(getThis(), "_render", &format, &quality, interlacing);
 }
 
 /**

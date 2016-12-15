@@ -1012,11 +1012,11 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _pixelate){
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
 
-	zval *file = NULL, *quality = NULL, q = {}, ret = {}, extension = {}, type = {}, mime = {}, constant = {}, image = {};
+	zval *file, *quality = NULL, *interlacing = NULL, ret = {}, extension = {}, type = {}, mime = {}, constant = {}, image = {}, tmp = {};
 	const char *func_name = "imagegif";
 	char *ext;
 
-	phalcon_fetch_params(0, 2, 0, &file, &quality);
+	phalcon_fetch_params(0, 1, 2, &file, &quality, &interlacing);
 
 	if (!phalcon_get_constant(&constant, SL("PATHINFO_EXTENSION"))) {
 		return;
@@ -1035,7 +1035,6 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
 		func_name = "imagegif";
 	} else if (strcmp(ext, "jpg") == 0 || strcmp(ext, "jpeg") == 0) {
 		ZVAL_LONG(&type, 2);
-		PHALCON_CPY_WRT(&q, quality);
 		func_name = "imagejpeg";
 	} else if (strcmp(ext, "png") == 0) {
 		ZVAL_LONG(&type, 3);
@@ -1045,10 +1044,23 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
 		return;
 	}
 
-	if (Z_TYPE(q) == IS_LONG) {
-		PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, file, &q);
+	if (interlacing && Z_TYPE_P(interlacing) >= IS_NULL && Z_LVAL(type) > 1) {
+		if (zend_is_true(interlacing)) {
+			PHALCON_CALL_FUNCTIONW(&ret, "imageinterlace", &image, &PHALCON_GLOBAL(z_one));
+		} else {
+			PHALCON_CALL_FUNCTIONW(&ret, "imageinterlace", &image, &PHALCON_GLOBAL(z_zero));
+		}
+	}
+
+	if (!quality || Z_TYPE_P(quality) == IS_NULL) {
+		PHALCON_CALL_FUNCTIONW(NULL, func_name, &image, file);
 	} else {
-		PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, file);
+		if (Z_LVAL(type) == 3) {
+			ZVAL_LONG(&tmp, ceil(Z_LVAL_P(quality)/100*9));
+			PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, file, &tmp);
+		} else {
+			PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, file, quality);
+		}
 	}
 
 	if (zend_is_true(&ret)) {
@@ -1072,11 +1084,11 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _save) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 
-	zval *extension = NULL, *quality = NULL, q = {}, ret = {}, type = {}, mime = {}, image = {};
+	zval *extension, *quality = NULL, *interlacing = NULL, ret = {}, type = {}, mime = {}, image = {}, tmp = {};
 	const char *func_name = "imagegif";
 	char *ext;
 
-	phalcon_fetch_params(0, 2, 0, &extension, &quality);
+	phalcon_fetch_params(0, 1, 2, &extension, &quality, &interlacing);
 
 	phalcon_fast_strtolower(&ret, extension);
 
@@ -1087,7 +1099,6 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 		func_name = "imagegif";
 	} else if (strcmp(ext, "jpg") == 0 || strcmp(ext, "jpeg") == 0) {
 		ZVAL_LONG(&type, 2);
-		PHALCON_CPY_WRT(&q, quality);
 		func_name = "imagejpeg";
 	} else if (strcmp(ext, "png") == 0) {
 		ZVAL_LONG(&type, 3);
@@ -1099,12 +1110,24 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _render) {
 
 	phalcon_return_property(&image, getThis(), SL("_image"));
 
+	if (interlacing && Z_TYPE_P(interlacing) >= IS_NULL && Z_LVAL(type) > 1) {
+		if (zend_is_true(interlacing)) {
+			PHALCON_CALL_FUNCTIONW(NULL, "imageinterlace", &image, &PHALCON_GLOBAL(z_one));
+		} else {
+			PHALCON_CALL_FUNCTIONW(NULL, "imageinterlace", &image, &PHALCON_GLOBAL(z_zero));
+		}
+	}
 	phalcon_ob_start();
 
-	if (Z_TYPE(q) == IS_LONG) {
-		PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, &PHALCON_GLOBAL(z_null), &q);
-	} else {
+	if (Z_LVAL(type) == 1 || !quality || Z_TYPE_P(quality) == IS_NULL) {
 		PHALCON_CALL_FUNCTIONW(&ret, func_name, &image);
+	} else {
+		if (Z_LVAL(type) == 3) {
+			ZVAL_LONG(&tmp, ceil(Z_LVAL_P(quality)/100*9));
+			PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, &PHALCON_GLOBAL(z_null), &tmp);
+		} else {
+			PHALCON_CALL_FUNCTIONW(&ret, func_name, &image, &PHALCON_GLOBAL(z_null), quality);
+		}
 	}
 
 	phalcon_ob_get_contents(return_value);

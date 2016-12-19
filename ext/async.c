@@ -42,17 +42,22 @@ PHP_METHOD(Phalcon_Async, count);
 PHP_METHOD(Phalcon_Async, clear);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_async_call, 0, 0, 1)
-	ZEND_ARG_INFO(0, closure)
+	ZEND_ARG_OBJ_INFO(0, closure, Closure, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_async_recv, 0, 0, 1)
-	ZEND_ARG_INFO(0, async)
+	ZEND_ARG_TYPE_INFO(0, pid, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, flag, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_async_recvall, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, flag, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_async_method_entry[] = {
 	PHP_ME(Phalcon_Async, call, arginfo_phalcon_async_call, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Async, recv, arginfo_phalcon_async_recv, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Async, recvAll, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Async, recvAll, arginfo_phalcon_async_recvall, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Async, count, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Async, clear, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
@@ -153,7 +158,7 @@ PHP_METHOD(Phalcon_Async, recv){
 
 	zval *_pid = NULL, *_flag = NULL, pid = {}, flag = {}, filename = {}, proj = {}, key = {}, seg = {}, type = {}, size = {}, message = {}, result = {};
 
-	phalcon_fetch_params(0, 0, 2, &_pid, &_flag);
+	phalcon_fetch_params(0, 1, 1, &_pid, &_flag);
 
 	if (!_pid) {
 		ZVAL_LONG(&pid, 0);
@@ -276,7 +281,7 @@ PHP_METHOD(Phalcon_Async, count){
 }
 
 /**
- * Gets result count
+ * Destroy asynchronous
  *
  *<code>
  *	Phalcon\Async::clear();

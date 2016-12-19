@@ -17,12 +17,12 @@
 */
 
 #include "php.h"
-#include "cache/memory/storage.h"
-#include "cache/memory/allocator.h"
+#include "cache/shmemory/storage.h"
+#include "cache/shmemory/allocator.h"
 
-phalcon_cache_memory_storage_globals *phalcon_cache_memory_storage;
+phalcon_cache_shmemory_storage_globals *phalcon_cache_shmemory_storage;
 
-static inline unsigned int phalcon_cache_memory_storage_align_size(unsigned int size) /* {{{ */ {
+static inline unsigned int phalcon_cache_shmemory_storage_align_size(unsigned int size) /* {{{ */ {
 	int bits = 0;
 	while ((size = size >> 1)) {
 		++bits;
@@ -31,41 +31,41 @@ static inline unsigned int phalcon_cache_memory_storage_align_size(unsigned int 
 }
 /* }}} */
 
-int phalcon_cache_memory_storage_startup(unsigned long fsize, unsigned long size, char **msg) /* {{{ */ {
+int phalcon_cache_shmemory_storage_startup(unsigned long fsize, unsigned long size, char **msg) /* {{{ */ {
 	unsigned long real_size;
-		
-	if (!phalcon_cache_memory_allocator_startup(fsize, size, msg)) {
+
+	if (!phalcon_cache_shmemory_allocator_startup(fsize, size, msg)) {
 		return 0;
 	}
 
-	size = PHALCON_CACHE_MEMORY_SG(first_seg).size - ((char *)PHALCON_CACHE_MEMORY_SG(slots) - (char *)phalcon_cache_memory_storage);
-	real_size = phalcon_cache_memory_storage_align_size(size / sizeof(phalcon_cache_memory_kv_key));
-	if (!((size / sizeof(phalcon_cache_memory_kv_key)) & ~(real_size << 1))) {
+	size = PHALCON_CACHE_SHMEMORY_SG(first_seg).size - ((char *)PHALCON_CACHE_SHMEMORY_SG(slots) - (char *)phalcon_cache_shmemory_storage);
+	real_size = phalcon_cache_shmemory_storage_align_size(size / sizeof(phalcon_cache_shmemory_kv_key));
+	if (!((size / sizeof(phalcon_cache_shmemory_kv_key)) & ~(real_size << 1))) {
 		real_size <<= 1;
 	}
 
-	PHALCON_CACHE_MEMORY_SG(slots_size) 	= real_size;
-	PHALCON_CACHE_MEMORY_SG(slots_mask) 	= real_size - 1;
-	PHALCON_CACHE_MEMORY_SG(slots_num)  	= 0;
-	PHALCON_CACHE_MEMORY_SG(fails)      	= 0;
-	PHALCON_CACHE_MEMORY_SG(hits)  		= 0;
-	PHALCON_CACHE_MEMORY_SG(miss)    	= 0;
-	PHALCON_CACHE_MEMORY_SG(kicks)    	= 0;
+	PHALCON_CACHE_SHMEMORY_SG(slots_size) 	= real_size;
+	PHALCON_CACHE_SHMEMORY_SG(slots_mask) 	= real_size - 1;
+	PHALCON_CACHE_SHMEMORY_SG(slots_num)  	= 0;
+	PHALCON_CACHE_SHMEMORY_SG(fails)      	= 0;
+	PHALCON_CACHE_SHMEMORY_SG(hits)  		= 0;
+	PHALCON_CACHE_SHMEMORY_SG(miss)    	= 0;
+	PHALCON_CACHE_SHMEMORY_SG(kicks)    	= 0;
 
-   	memset((char *)PHALCON_CACHE_MEMORY_SG(slots), 0, sizeof(phalcon_cache_memory_kv_key) * real_size);
+   	memset((char *)PHALCON_CACHE_SHMEMORY_SG(slots), 0, sizeof(phalcon_cache_shmemory_kv_key) * real_size);
 
 	return 1;
 }
 /* }}} */
 
-void phalcon_cache_memory_storage_shutdown(void) /* {{{ */ {
-	phalcon_cache_memory_allocator_shutdown();
+void phalcon_cache_shmemory_storage_shutdown(void) /* {{{ */ {
+	phalcon_cache_shmemory_allocator_shutdown();
 }
 /* }}} */
 
 /* {{{ MurmurHash2 (Austin Appleby)
  */
-static inline ulong phalcon_cache_memory_inline_hash_func1(char *data, unsigned int len) {
+static inline ulong phalcon_cache_shmemory_inline_hash_func1(char *data, unsigned int len) {
     unsigned int h, k;
 
     h = 0 ^ len;
@@ -120,7 +120,7 @@ static inline ulong phalcon_cache_memory_inline_hash_func1(char *data, unsigned 
  * numbers are not useable at all. The remaining 128 odd numbers
  * (except for the number 1) work more or less all equally well. They
  * all distribute in an acceptable way and this way fill a hash table
- * with an average percent of approx. 86%. 
+ * with an average percent of approx. 86%.
  *
  * If one compares the Chi^2 values of the variants, the number 33 not
  * even has the best value. But the number 33 and a few other equally
@@ -137,7 +137,7 @@ static inline ulong phalcon_cache_memory_inline_hash_func1(char *data, unsigned 
  *                  -- Ralf S. Engelschall <rse@engelschall.com>
  */
 
-static inline ulong phalcon_cache_memory_inline_hash_func2(char *key, uint len) {
+static inline ulong phalcon_cache_shmemory_inline_hash_func2(char *key, uint len) {
 	register ulong hash = 5381;
 
 	/* variant with the hash unrolled eight times */
@@ -266,15 +266,15 @@ static inline unsigned int crc32(char *buf, unsigned int size) {
 }
 /* }}} */
 
-static inline unsigned int phalcon_cache_memory_crc32(char *data, unsigned int size) /* {{{ */ {
-	if (size < PHALCON_CACHE_MEMORY_FULL_CRC_THRESHOLD) {
+static inline unsigned int phalcon_cache_shmemory_crc32(char *data, unsigned int size) /* {{{ */ {
+	if (size < PHALCON_CACHE_SHMEMORY_FULL_CRC_THRESHOLD) {
 		return crc32(data, size);
 	} else {
 		int i = 0;
-		char crc_contents[PHALCON_CACHE_MEMORY_FULL_CRC_THRESHOLD];
-		int head = PHALCON_CACHE_MEMORY_FULL_CRC_THRESHOLD >> 2;
-		int tail = PHALCON_CACHE_MEMORY_FULL_CRC_THRESHOLD >> 4;
-		int body = PHALCON_CACHE_MEMORY_FULL_CRC_THRESHOLD - head - tail;
+		char crc_contents[PHALCON_CACHE_SHMEMORY_FULL_CRC_THRESHOLD];
+		int head = PHALCON_CACHE_SHMEMORY_FULL_CRC_THRESHOLD >> 2;
+		int tail = PHALCON_CACHE_SHMEMORY_FULL_CRC_THRESHOLD >> 4;
+		int body = PHALCON_CACHE_SHMEMORY_FULL_CRC_THRESHOLD - head - tail;
 		char *p = data + head;
 		char *q = crc_contents + head;
 		int step = (size - tail - head) / body;
@@ -285,89 +285,89 @@ static inline unsigned int phalcon_cache_memory_crc32(char *data, unsigned int s
 		}
 		memcpy(q, p, tail);
 
-		return crc32(crc_contents, PHALCON_CACHE_MEMORY_FULL_CRC_THRESHOLD);
+		return crc32(crc_contents, PHALCON_CACHE_SHMEMORY_FULL_CRC_THRESHOLD);
 	}
 }
 /* }}} */
 
-int phalcon_cache_memory_storage_find(char *key, unsigned int len, char **data, unsigned int *size, unsigned int *flag, unsigned long tv) /* {{{ */ {
+int phalcon_cache_shmemory_storage_find(char *key, unsigned int len, char **data, unsigned int *size, unsigned int *flag, unsigned long tv) /* {{{ */ {
 	ulong h, hash, seed;
-	phalcon_cache_memory_kv_key k, *p;
-	phalcon_cache_memory_kv_val v;
+	phalcon_cache_shmemory_kv_key k, *p;
+	phalcon_cache_shmemory_kv_val v;
 
-	hash = h = phalcon_cache_memory_inline_hash_func1(key, len);
-	p = &(PHALCON_CACHE_MEMORY_SG(slots)[h & PHALCON_CACHE_MEMORY_SG(slots_mask)]);
+	hash = h = phalcon_cache_shmemory_inline_hash_func1(key, len);
+	p = &(PHALCON_CACHE_SHMEMORY_SG(slots)[h & PHALCON_CACHE_SHMEMORY_SG(slots_mask)]);
 	k = *p;
 	if (k.val) {
 		char *s;
 		uint i;
-		if (k.h == hash && PHALCON_CACHE_MEMORY_KEY_KLEN(k) == len) {
+		if (k.h == hash && PHALCON_CACHE_SHMEMORY_KEY_KLEN(k) == len) {
 			v = *(k.val);
 			if (!memcmp(k.key, key, len)) {
-				s = emalloc(PHALCON_CACHE_MEMORY_KEY_VLEN(k) + 1);
-				memcpy(s, (char *)k.val->data, PHALCON_CACHE_MEMORY_KEY_VLEN(k));
+				s = emalloc(PHALCON_CACHE_SHMEMORY_KEY_VLEN(k) + 1);
+				memcpy(s, (char *)k.val->data, PHALCON_CACHE_SHMEMORY_KEY_VLEN(k));
 do_verify:
 				if (k.len != v.len) {
 					efree(s);
-					++PHALCON_CACHE_MEMORY_SG(miss);
+					++PHALCON_CACHE_SHMEMORY_SG(miss);
 					return 0;
 				}
 
 				if (k.ttl) {
 					if (k.ttl <= tv) {
-						++PHALCON_CACHE_MEMORY_SG(miss);
+						++PHALCON_CACHE_SHMEMORY_SG(miss);
 						efree(s);
 						return 0;
 					}
 				}
 
-				if (k.crc != phalcon_cache_memory_crc32(s, PHALCON_CACHE_MEMORY_KEY_VLEN(k))) {
+				if (k.crc != phalcon_cache_shmemory_crc32(s, PHALCON_CACHE_SHMEMORY_KEY_VLEN(k))) {
 					efree(s);
-					++PHALCON_CACHE_MEMORY_SG(miss);
+					++PHALCON_CACHE_SHMEMORY_SG(miss);
 					return 0;
 				}
-				s[PHALCON_CACHE_MEMORY_KEY_VLEN(k)] = '\0';
+				s[PHALCON_CACHE_SHMEMORY_KEY_VLEN(k)] = '\0';
 				k.val->atime = tv;
 				*data = s;
-				*size = PHALCON_CACHE_MEMORY_KEY_VLEN(k);
+				*size = PHALCON_CACHE_SHMEMORY_KEY_VLEN(k);
 				*flag = k.flag;
-				++PHALCON_CACHE_MEMORY_SG(hits);
+				++PHALCON_CACHE_SHMEMORY_SG(hits);
 				return 1;
 			}
-		} 
+		}
 
-		seed = phalcon_cache_memory_inline_hash_func2(key, len);
+		seed = phalcon_cache_shmemory_inline_hash_func2(key, len);
 		for (i = 0; i < 3; i++) {
-			h += seed & PHALCON_CACHE_MEMORY_SG(slots_mask);
-			p = &(PHALCON_CACHE_MEMORY_SG(slots)[h & PHALCON_CACHE_MEMORY_SG(slots_mask)]);
+			h += seed & PHALCON_CACHE_SHMEMORY_SG(slots_mask);
+			p = &(PHALCON_CACHE_SHMEMORY_SG(slots)[h & PHALCON_CACHE_SHMEMORY_SG(slots_mask)]);
 			k = *p;
-			if (k.h == hash && PHALCON_CACHE_MEMORY_KEY_KLEN(k) == len) {
+			if (k.h == hash && PHALCON_CACHE_SHMEMORY_KEY_KLEN(k) == len) {
 				v = *(k.val);
 				if (!memcmp(k.key, key, len)) {
-					s = emalloc(PHALCON_CACHE_MEMORY_KEY_VLEN(k) + 1);
-					memcpy(s, (char *)k.val->data, PHALCON_CACHE_MEMORY_KEY_VLEN(k));
+					s = emalloc(PHALCON_CACHE_SHMEMORY_KEY_VLEN(k) + 1);
+					memcpy(s, (char *)k.val->data, PHALCON_CACHE_SHMEMORY_KEY_VLEN(k));
 					goto do_verify;
 				}
 			}
 		}
 	}
 
-	++PHALCON_CACHE_MEMORY_SG(miss);
+	++PHALCON_CACHE_SHMEMORY_SG(miss);
 
 	return 0;
 }
 /* }}} */
 
-void phalcon_cache_memory_storage_delete(char *key, unsigned int len, int ttl, unsigned long tv) /* {{{ */ {
+void phalcon_cache_shmemory_storage_delete(char *key, unsigned int len, int ttl, unsigned long tv) /* {{{ */ {
 	ulong hash, h, seed;
-	phalcon_cache_memory_kv_key k, *p;
+	phalcon_cache_shmemory_kv_key k, *p;
 
-	hash = h = phalcon_cache_memory_inline_hash_func1(key, len);
-	p = &(PHALCON_CACHE_MEMORY_SG(slots)[h & PHALCON_CACHE_MEMORY_SG(slots_mask)]);
+	hash = h = phalcon_cache_shmemory_inline_hash_func1(key, len);
+	p = &(PHALCON_CACHE_SHMEMORY_SG(slots)[h & PHALCON_CACHE_SHMEMORY_SG(slots_mask)]);
 	k = *p;
 	if (k.val) {
 		uint i;
-		if (k.h == hash && PHALCON_CACHE_MEMORY_KEY_KLEN(k) == len) {
+		if (k.h == hash && PHALCON_CACHE_SHMEMORY_KEY_KLEN(k) == len) {
 			if (!memcmp((char *)k.key, key, len)) {
 				if (ttl == 0) {
 					p->ttl = 1;
@@ -376,16 +376,16 @@ void phalcon_cache_memory_storage_delete(char *key, unsigned int len, int ttl, u
 				}
 				return;
 			}
-		} 
+		}
 
-		seed = phalcon_cache_memory_inline_hash_func2(key, len);
+		seed = phalcon_cache_shmemory_inline_hash_func2(key, len);
 		for (i = 0; i < 3; i++) {
-			h += seed & PHALCON_CACHE_MEMORY_SG(slots_mask);
-			p = &(PHALCON_CACHE_MEMORY_SG(slots)[h & PHALCON_CACHE_MEMORY_SG(slots_mask)]);
+			h += seed & PHALCON_CACHE_SHMEMORY_SG(slots_mask);
+			p = &(PHALCON_CACHE_SHMEMORY_SG(slots)[h & PHALCON_CACHE_SHMEMORY_SG(slots_mask)]);
 			k = *p;
 			if (k.val == NULL) {
 				return;
-			} else if (k.h == hash && PHALCON_CACHE_MEMORY_KEY_KLEN(k) == len && !memcmp((char *)k.key, key, len)) {
+			} else if (k.h == hash && PHALCON_CACHE_SHMEMORY_KEY_KLEN(k) == len && !memcmp((char *)k.key, key, len)) {
 				p->ttl = 1;
 				return;
 			}
@@ -394,29 +394,29 @@ void phalcon_cache_memory_storage_delete(char *key, unsigned int len, int ttl, u
 }
 /* }}} */
 
-int phalcon_cache_memory_storage_update(char *key, unsigned int len, char *data, unsigned int size, unsigned int flag, int ttl, int add, unsigned long tv) /* {{{ */ {
+int phalcon_cache_shmemory_storage_update(char *key, unsigned int len, char *data, unsigned int size, unsigned int flag, int ttl, int add, unsigned long tv) /* {{{ */ {
 	ulong hash, h;
 	int idx = 0, is_valid;
-	phalcon_cache_memory_kv_key *p, k, *paths[4];
-	phalcon_cache_memory_kv_val *val, *s;
+	phalcon_cache_shmemory_kv_key *p, k, *paths[4];
+	phalcon_cache_shmemory_kv_val *val, *s;
 	unsigned long real_size;
 
-	hash = h = phalcon_cache_memory_inline_hash_func1(key, len);
-	paths[idx++] = p = &(PHALCON_CACHE_MEMORY_SG(slots)[h & PHALCON_CACHE_MEMORY_SG(slots_mask)]);
+	hash = h = phalcon_cache_shmemory_inline_hash_func1(key, len);
+	paths[idx++] = p = &(PHALCON_CACHE_SHMEMORY_SG(slots)[h & PHALCON_CACHE_SHMEMORY_SG(slots_mask)]);
 	k = *p;
 	if (k.val) {
 		/* Found the exact match */
-		if (k.h == hash && PHALCON_CACHE_MEMORY_KEY_KLEN(k) == len && !memcmp((char *)k.key, key, len)) {
+		if (k.h == hash && PHALCON_CACHE_SHMEMORY_KEY_KLEN(k) == len && !memcmp((char *)k.key, key, len)) {
 do_update:
 			is_valid = 0;
-			if (k.crc == phalcon_cache_memory_crc32(k.val->data, PHALCON_CACHE_MEMORY_KEY_VLEN(k))) {
+			if (k.crc == phalcon_cache_shmemory_crc32(k.val->data, PHALCON_CACHE_SHMEMORY_KEY_VLEN(k))) {
 				is_valid = 1;
 			}
 			if (add && (!k.ttl || k.ttl > tv) && is_valid) {
 				return 0;
 			}
 			if (k.size >= size && is_valid) {
-				s = emalloc(sizeof(phalcon_cache_memory_kv_val) + size - 1);
+				s = emalloc(sizeof(phalcon_cache_shmemory_kv_val) + size - 1);
 				memcpy(s->data, data, size);
 				if (ttl) {
 					k.ttl = (ulong)tv + ttl;
@@ -424,28 +424,28 @@ do_update:
 					k.ttl = 0;
 				}
 				s->atime = tv;
-				PHALCON_CACHE_MEMORY_KEY_SET_LEN(*s, len, size);
-				memcpy((char *)k.val, (char *)s, sizeof(phalcon_cache_memory_kv_val) + size - 1);
-				k.crc = phalcon_cache_memory_crc32(s->data, size);
+				PHALCON_CACHE_SHMEMORY_KEY_SET_LEN(*s, len, size);
+				memcpy((char *)k.val, (char *)s, sizeof(phalcon_cache_shmemory_kv_val) + size - 1);
+				k.crc = phalcon_cache_shmemory_crc32(s->data, size);
 				k.flag = flag;
 				memcpy(k.key, key, len);
-				PHALCON_CACHE_MEMORY_KEY_SET_LEN(k, len, size);
+				PHALCON_CACHE_SHMEMORY_KEY_SET_LEN(k, len, size);
 				*p = k;
 				efree(s);
 				return 1;
 			} else {
 				uint msize;
-				real_size = phalcon_cache_memory_allocator_real_size(sizeof(phalcon_cache_memory_kv_val) + (size * PHALCON_CACHE_MEMORY_STORAGE_FACTOR) - 1);
+				real_size = phalcon_cache_shmemory_allocator_real_size(sizeof(phalcon_cache_shmemory_kv_val) + (size * PHALCON_CACHE_SHMEMORY_STORAGE_FACTOR) - 1);
 				if (!real_size) {
-					++PHALCON_CACHE_MEMORY_SG(fails);
+					++PHALCON_CACHE_SHMEMORY_SG(fails);
 					return 0;
 				}
-				msize = sizeof(phalcon_cache_memory_kv_val) + size - 1;
-				s = emalloc(sizeof(phalcon_cache_memory_kv_val) + size - 1);
+				msize = sizeof(phalcon_cache_shmemory_kv_val) + size - 1;
+				s = emalloc(sizeof(phalcon_cache_shmemory_kv_val) + size - 1);
 				memcpy(s->data, data, size);
 				s->atime = tv;
-				PHALCON_CACHE_MEMORY_KEY_SET_LEN(*s, len, size);
-				val = phalcon_cache_memory_allocator_raw_alloc(real_size, (int)hash);
+				PHALCON_CACHE_SHMEMORY_KEY_SET_LEN(*s, len, size);
+				val = phalcon_cache_shmemory_allocator_raw_alloc(real_size, (int)hash);
 				if (val) {
 					memcpy((char *)val, (char *)s, msize);
 					if (ttl) {
@@ -453,17 +453,17 @@ do_update:
 					} else {
 						k.ttl = 0;
 					}
-					k.crc = phalcon_cache_memory_crc32(s->data, size);
+					k.crc = phalcon_cache_shmemory_crc32(s->data, size);
 					k.val = val;
 					k.flag = flag;
 					k.size = real_size;
 					memcpy(k.key, key, len);
-					PHALCON_CACHE_MEMORY_KEY_SET_LEN(k, len, size);
+					PHALCON_CACHE_SHMEMORY_KEY_SET_LEN(k, len, size);
 					*p = k;
 					efree(s);
 					return 1;
 				}
-				++PHALCON_CACHE_MEMORY_SG(fails);
+				++PHALCON_CACHE_SHMEMORY_SG(fails);
 				efree(s);
 				return 0;
 			}
@@ -471,19 +471,19 @@ do_update:
 			uint i;
 			ulong seed, max_atime;
 
-			seed = phalcon_cache_memory_inline_hash_func2(key, len);
+			seed = phalcon_cache_shmemory_inline_hash_func2(key, len);
 			for (i = 0; i < 3; i++) {
-				h += seed & PHALCON_CACHE_MEMORY_SG(slots_mask);
-				paths[idx++] = p = &(PHALCON_CACHE_MEMORY_SG(slots)[h & PHALCON_CACHE_MEMORY_SG(slots_mask)]);
+				h += seed & PHALCON_CACHE_SHMEMORY_SG(slots_mask);
+				paths[idx++] = p = &(PHALCON_CACHE_SHMEMORY_SG(slots)[h & PHALCON_CACHE_SHMEMORY_SG(slots_mask)]);
 				k = *p;
 				if (k.val == NULL) {
 					goto do_add;
-				} else if (k.h == hash && PHALCON_CACHE_MEMORY_KEY_KLEN(k) == len && !memcmp((char *)k.key, key, len)) {
+				} else if (k.h == hash && PHALCON_CACHE_SHMEMORY_KEY_KLEN(k) == len && !memcmp((char *)k.key, key, len)) {
 					/* Found the exact match */
 					goto do_update;
 				}
 			}
-			
+
 			--idx;
 			max_atime = paths[idx]->val->atime;
 			for (i = 0; i < idx; i++) {
@@ -495,7 +495,7 @@ do_update:
 					p = paths[i];
 				}
 			}
-			++PHALCON_CACHE_MEMORY_SG(kicks);
+			++PHALCON_CACHE_SHMEMORY_SG(kicks);
 			k = *p;
 			k.h = hash;
 
@@ -503,28 +503,28 @@ do_update:
 		}
 	} else {
 do_add:
-		real_size = phalcon_cache_memory_allocator_real_size(sizeof(phalcon_cache_memory_kv_val) + (size * PHALCON_CACHE_MEMORY_STORAGE_FACTOR) - 1);
+		real_size = phalcon_cache_shmemory_allocator_real_size(sizeof(phalcon_cache_shmemory_kv_val) + (size * PHALCON_CACHE_SHMEMORY_STORAGE_FACTOR) - 1);
 		if (!real_size) {
-			++PHALCON_CACHE_MEMORY_SG(fails);
+			++PHALCON_CACHE_SHMEMORY_SG(fails);
 			return 0;
 		}
-		s = emalloc(sizeof(phalcon_cache_memory_kv_val) + size - 1);
+		s = emalloc(sizeof(phalcon_cache_shmemory_kv_val) + size - 1);
 		memcpy(s->data, data, size);
 		s->atime = tv;
-		PHALCON_CACHE_MEMORY_KEY_SET_LEN(*s, len, size);
-		val = phalcon_cache_memory_allocator_raw_alloc(real_size, (int)hash);
+		PHALCON_CACHE_SHMEMORY_KEY_SET_LEN(*s, len, size);
+		val = phalcon_cache_shmemory_allocator_raw_alloc(real_size, (int)hash);
 		if (val) {
-			memcpy((char *)val, (char *)s, sizeof(phalcon_cache_memory_kv_val) + size - 1);
+			memcpy((char *)val, (char *)s, sizeof(phalcon_cache_shmemory_kv_val) + size - 1);
 			if (p->val == NULL) {
-				++PHALCON_CACHE_MEMORY_SG(slots_num);
+				++PHALCON_CACHE_SHMEMORY_SG(slots_num);
 			}
 			k.h = hash;
 			k.val = val;
 			k.flag = flag;
 			k.size = real_size;
-			k.crc = phalcon_cache_memory_crc32(s->data, size);
+			k.crc = phalcon_cache_shmemory_crc32(s->data, size);
 			memcpy(k.key, key, len);
-			PHALCON_CACHE_MEMORY_KEY_SET_LEN(k, len, size);
+			PHALCON_CACHE_SHMEMORY_KEY_SET_LEN(k, len, size);
 			if (ttl) {
 				k.ttl = tv + ttl;
 			} else {
@@ -534,7 +534,7 @@ do_add:
 			efree(s);
 			return 1;
 		}
-		++PHALCON_CACHE_MEMORY_SG(fails);
+		++PHALCON_CACHE_SHMEMORY_SG(fails);
 		efree(s);
 	}
 
@@ -542,55 +542,55 @@ do_add:
 }
 /* }}} */
 
-void phalcon_cache_memory_storage_flush(void) /* {{{ */ {
-	PHALCON_CACHE_MEMORY_SG(slots_num) = 0;
-	memset((char *)PHALCON_CACHE_MEMORY_SG(slots), 0, sizeof(phalcon_cache_memory_kv_key) * PHALCON_CACHE_MEMORY_SG(slots_size));
+void phalcon_cache_shmemory_storage_flush(void) /* {{{ */ {
+	PHALCON_CACHE_SHMEMORY_SG(slots_num) = 0;
+	memset((char *)PHALCON_CACHE_SHMEMORY_SG(slots), 0, sizeof(phalcon_cache_shmemory_kv_key) * PHALCON_CACHE_SHMEMORY_SG(slots_size));
 }
 /* }}} */
 
-phalcon_cache_memory_storage_info * phalcon_cache_memory_storage_get_info(void) /* {{{ */ {
-	phalcon_cache_memory_storage_info *info = emalloc(sizeof(phalcon_cache_memory_storage_info));
+phalcon_cache_shmemory_storage_info * phalcon_cache_shmemory_storage_get_info(void) /* {{{ */ {
+	phalcon_cache_shmemory_storage_info *info = emalloc(sizeof(phalcon_cache_shmemory_storage_info));
 
-	info->k_msize = (unsigned long)PHALCON_CACHE_MEMORY_SG(first_seg).size;
-	info->v_msize = (unsigned long)PHALCON_CACHE_MEMORY_SG(segments)[0]->size * (unsigned long)PHALCON_CACHE_MEMORY_SG(segments_num);
-	info->segment_size = PHALCON_CACHE_MEMORY_SG(segments)[0]->size;
-	info->segments_num = PHALCON_CACHE_MEMORY_SG(segments_num);
-	info->hits = PHALCON_CACHE_MEMORY_SG(hits);
-	info->miss = PHALCON_CACHE_MEMORY_SG(miss);
-	info->fails = PHALCON_CACHE_MEMORY_SG(fails);
-	info->kicks = PHALCON_CACHE_MEMORY_SG(kicks);
-	info->recycles = PHALCON_CACHE_MEMORY_SG(recycles);
-	info->slots_size = PHALCON_CACHE_MEMORY_SG(slots_size);
-	info->slots_num = PHALCON_CACHE_MEMORY_SG(slots_num);
+	info->k_msize = (unsigned long)PHALCON_CACHE_SHMEMORY_SG(first_seg).size;
+	info->v_msize = (unsigned long)PHALCON_CACHE_SHMEMORY_SG(segments)[0]->size * (unsigned long)PHALCON_CACHE_SHMEMORY_SG(segments_num);
+	info->segment_size = PHALCON_CACHE_SHMEMORY_SG(segments)[0]->size;
+	info->segments_num = PHALCON_CACHE_SHMEMORY_SG(segments_num);
+	info->hits = PHALCON_CACHE_SHMEMORY_SG(hits);
+	info->miss = PHALCON_CACHE_SHMEMORY_SG(miss);
+	info->fails = PHALCON_CACHE_SHMEMORY_SG(fails);
+	info->kicks = PHALCON_CACHE_SHMEMORY_SG(kicks);
+	info->recycles = PHALCON_CACHE_SHMEMORY_SG(recycles);
+	info->slots_size = PHALCON_CACHE_SHMEMORY_SG(slots_size);
+	info->slots_num = PHALCON_CACHE_SHMEMORY_SG(slots_num);
 
 	return info;
 }
 /* }}} */
 
-void phalcon_cache_memory_storage_free_info(phalcon_cache_memory_storage_info *info) /* {{{ */ {
+void phalcon_cache_shmemory_storage_free_info(phalcon_cache_shmemory_storage_info *info) /* {{{ */ {
 	efree(info);
 }
 /* }}} */
 
-phalcon_cache_memory_item_list * phalcon_cache_memory_storage_dump(unsigned int limit) /* {{{ */ {
-	phalcon_cache_memory_kv_key k;
-	phalcon_cache_memory_item_list *item, *list = NULL;
+phalcon_cache_shmemory_item_list * phalcon_cache_shmemory_storage_dump(unsigned int limit) /* {{{ */ {
+	phalcon_cache_shmemory_kv_key k;
+	phalcon_cache_shmemory_item_list *item, *list = NULL;
 
-	if (PHALCON_CACHE_MEMORY_SG(slots_num)) {
+	if (PHALCON_CACHE_SHMEMORY_SG(slots_num)) {
 		unsigned int i = 0, n = 0;
-		for (; i<PHALCON_CACHE_MEMORY_SG(slots_size) && n < PHALCON_CACHE_MEMORY_SG(slots_num) && n < limit; i++) {
-			k = PHALCON_CACHE_MEMORY_SG(slots)[i];
+		for (; i<PHALCON_CACHE_SHMEMORY_SG(slots_size) && n < PHALCON_CACHE_SHMEMORY_SG(slots_num) && n < limit; i++) {
+			k = PHALCON_CACHE_SHMEMORY_SG(slots)[i];
 			if (k.val) {
-				item = emalloc(sizeof(phalcon_cache_memory_item_list));
+				item = emalloc(sizeof(phalcon_cache_shmemory_item_list));
 				item->index = i;
 				item->h = k.h;
 				item->crc = k.crc;
 				item->ttl = k.ttl;
-				item->k_len = PHALCON_CACHE_MEMORY_KEY_KLEN(k);
-				item->v_len = PHALCON_CACHE_MEMORY_KEY_VLEN(k);
+				item->k_len = PHALCON_CACHE_SHMEMORY_KEY_KLEN(k);
+				item->v_len = PHALCON_CACHE_SHMEMORY_KEY_VLEN(k);
 				item->flag = k.flag;
 				item->size = k.size;
-				memcpy(item->key, k.key, PHALCON_CACHE_MEMORY_STORAGE_MAX_KEY_LEN);
+				memcpy(item->key, k.key, PHALCON_CACHE_SHMEMORY_STORAGE_MAX_KEY_LEN);
 				item->next = list;
 				list = item;
 				++n;
@@ -602,8 +602,8 @@ phalcon_cache_memory_item_list * phalcon_cache_memory_storage_dump(unsigned int 
 }
 /* }}} */
 
-void phalcon_cache_memory_storage_free_list(phalcon_cache_memory_item_list *list) /* {{{ */ {
-	phalcon_cache_memory_item_list *l;
+void phalcon_cache_shmemory_storage_free_list(phalcon_cache_shmemory_item_list *list) /* {{{ */ {
+	phalcon_cache_shmemory_item_list *l;
 	while (list) {
 		l = list;
 		list = list->next;
@@ -612,8 +612,8 @@ void phalcon_cache_memory_storage_free_list(phalcon_cache_memory_item_list *list
 }
 /* }}} */
 
-const char * phalcon_cache_memory_storage_shared_memory_name(void) /* {{{ */ {
-	return PHALCON_CACHE_MEMORY_SHARED_MEMORY_HANDLER_NAME;
+const char * phalcon_cache_shmemory_storage_shared_shmemory_name(void) /* {{{ */ {
+	return PHALCON_CACHE_SHMEMORY_SHARED_SHMEMORY_HANDLER_NAME;
 }
 /* }}} */
 

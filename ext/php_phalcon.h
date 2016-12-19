@@ -78,10 +78,10 @@ typedef struct _phalcon_db_options {
 
 /** Cache options */
 typedef struct _phalcon_cache_options {
-	zend_bool enable_memory;
-	zend_bool enable_memory_cli;
-	size_t keys_memory_size;
-	size_t values_memory_size;
+	zend_bool enable_shmemory;
+	zend_bool enable_shmemory_cli;
+	size_t shmemory_keys_size;
+	size_t shmemory_values_size;
 } phalcon_cache_options;
 
 ZEND_BEGIN_MODULE_GLOBALS(phalcon)

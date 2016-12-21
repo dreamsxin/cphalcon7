@@ -28,6 +28,12 @@
 #define PHALCON_STR_REPLACE(return_value, search, replace, subject)  PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
 #define PHALCON_STR_REPLACEW(return_value, search, replace, subject) PHALCON_CALL_FUNCTIONW(return_value, "str_replace", search, replace, subject)
 
+#define PHALCON_RANDOM_ALNUM   0
+#define PHALCON_RANDOM_ALPHA   1
+#define PHALCON_RANDOM_HEXDEC  2
+#define PHALCON_RANDOM_NUMERIC 3
+#define PHALCON_RANDOM_NOZERO  4
+
 /** Fast char position */
 int phalcon_memnstr(const zval *haystack, const zval *needle);
 int phalcon_memnstr_string(const zval *haystack, const zend_string *needle);

@@ -550,6 +550,7 @@ di/factorydefault/cli.c \
 di/exception.c \
 di/injectionawareinterface.c \
 di/service.c \
+random.c \
 security.c \
 security/random.c \
 annotations/reflection.c \

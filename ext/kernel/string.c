@@ -43,12 +43,6 @@
 #include "kernel/operators.h"
 #include "kernel/fcall.h"
 
-#define PH_RANDOM_ALNUM 0
-#define PH_RANDOM_ALPHA 1
-#define PH_RANDOM_HEXDEC 2
-#define PH_RANDOM_NUMERIC 3
-#define PH_RANDOM_NOZERO 4
-
 /**
  * Fast call to php strlen
  */
@@ -1120,7 +1114,7 @@ int phalcon_comparestr_str(const zval *str, char *compared, unsigned int compare
 }
 
 /**
- *
+ * Random string
  */
 void phalcon_random_string(zval *return_value, const zval *type, const zval *length) {
 
@@ -1131,7 +1125,7 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 		return;
 	}
 
-	if (Z_LVAL_P(type) > PH_RANDOM_NOZERO) {
+	if (Z_LVAL_P(type) > PHALCON_RANDOM_NOZERO) {
 		return;
 	}
 
@@ -1147,22 +1141,22 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 	for (i = 0; i < Z_LVAL_P(length); i++) {
 
 		switch (Z_LVAL_P(type)) {
-			case PH_RANDOM_ALNUM:
+			case PHALCON_RANDOM_ALNUM:
 				rand_type = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(rand_type, 0, 3, PHP_MT_RAND_MAX);
 				break;
-			case PH_RANDOM_ALPHA:
+			case PHALCON_RANDOM_ALPHA:
 				rand_type = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(rand_type, 1, 2, PHP_MT_RAND_MAX);
 				break;
-			case PH_RANDOM_HEXDEC:
+			case PHALCON_RANDOM_HEXDEC:
 				rand_type = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(rand_type, 0, 1, PHP_MT_RAND_MAX);
 				break;
-			case PH_RANDOM_NUMERIC:
+			case PHALCON_RANDOM_NUMERIC:
 				rand_type = 0;
 				break;
-			case PH_RANDOM_NOZERO:
+			case PHALCON_RANDOM_NOZERO:
 				rand_type = 5;
 				break;
 			default:

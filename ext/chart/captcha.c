@@ -42,7 +42,7 @@
 
 #include "chart/captcha.h"
 #include "chart/exception.h"
-#include "security/random.h"
+#include "random.h"
 
 /**
  * Phalcon\Chart\Captcha
@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		ZVAL_LONG(&columns, 80);
 		ZVAL_LONG(&rows, 80);
 
-		object_init_ex(&random, phalcon_security_random_ce);
+		object_init_ex(&random, phalcon_random_ce);
 		PHALCON_CALL_METHODW(&top_color, &random, "color");
 		PHALCON_CALL_METHODW(&bottom_color, &random, "color");
 

@@ -338,6 +338,7 @@
 #include "queue/beanstalk/job.h"
 
 #include "registry.h"
+#include "random.h"
 
 #include "security.h"
 #include "security/random.h"

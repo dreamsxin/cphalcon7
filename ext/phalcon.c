@@ -325,6 +325,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Text);
 	PHALCON_INIT(Phalcon_Date);
 	PHALCON_INIT(Phalcon_Date_DateTime);
+	PHALCON_INIT(Phalcon_Random);
 	PHALCON_INIT(Phalcon_Security);
 	PHALCON_INIT(Phalcon_Security_Random);
 	PHALCON_INIT(Phalcon_Version);

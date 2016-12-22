@@ -27,6 +27,8 @@
 #include "http/requestinterface.h"
 #include "debug.h"
 
+#include <main/SAPI.h>
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/object.h"
@@ -298,7 +300,16 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 
-	zval uri_source = {}, *_GET, url = {}, *_SERVER, url_parts = {}, real_uri = {};
+	zval shortopts = {}, options = {}, uri_source = {}, *_GET, url = {}, *_SERVER, url_parts = {}, real_uri = {};
+
+	if (unlikely(!strcmp(sapi_module.name, "cli"))) {
+		ZVAL_STRING(&shortopts, "url::");
+		PHALCON_CALL_FUNCTIONW(&options, "getopt", &shortopts);
+
+		if (phalcon_array_isset_fetch_str(&url, &options, SL("url"))) {
+			RETURN_CTORW(&url);
+		}
+	}
 
 	/**
 	 * The developer can change the URI source
@@ -679,7 +690,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				/* FIXME: handle mixed case */
 				is_equal_function(&matched, &current_host_name, &hostname);
 			}
-			
+
 			if (!zend_is_true(&matched)) {
 				continue;
 			}

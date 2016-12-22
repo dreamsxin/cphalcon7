@@ -300,11 +300,12 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 
-	zval shortopts = {}, options = {}, uri_source = {}, *_GET, url = {}, *_SERVER, url_parts = {}, real_uri = {};
+	zval longopts = {}, options = {}, uri_source = {}, *_GET, url = {}, *_SERVER, url_parts = {}, real_uri = {};
 
 	if (unlikely(!strcmp(sapi_module.name, "cli"))) {
-		ZVAL_STRING(&shortopts, "url::");
-		PHALCON_CALL_FUNCTIONW(&options, "getopt", &shortopts);
+		array_init(&longopts);
+		phalcon_array_append_string(&longopts, SL("url::"), 0);
+		PHALCON_CALL_FUNCTIONW(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 
 		if (phalcon_array_isset_fetch_str(&url, &options, SL("url"))) {
 			RETURN_CTORW(&url);

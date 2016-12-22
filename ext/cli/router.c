@@ -23,12 +23,15 @@
 #include "diinterface.h"
 #include "di/injectable.h"
 
+#include <main/SAPI.h>
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/exception.h"
 #include "kernel/array.h"
 #include "kernel/string.h"
 #include "kernel/object.h"
+#include "kernel/fcall.h"
 
 /**
  * Phalcon\CLI\Router
@@ -199,22 +202,31 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultAction){
  */
 PHP_METHOD(Phalcon_CLI_Router, handle){
 
-	zval *arguments = NULL, module_name = {}, namespace_name = {}, task_name = {}, action_name = {};
+	zval *arguments = NULL, longopts = {}, options = {}, module_name = {}, namespace_name = {}, task_name = {}, action_name = {};
 
 	phalcon_fetch_params(0, 0, 1, &arguments);
 
-	if (!arguments || Z_TYPE_P(arguments) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cli_router_exception_ce, "Arguments must be an Array");
-		return;
+	if (!arguments || Z_TYPE_P(arguments) != IS_ARRAY) {
+		if (likely(!strcmp(sapi_module.name, "cli"))) {
+			array_init(&longopts);
+			phalcon_array_append_string(&longopts, SL("module::"), 0);
+			phalcon_array_append_string(&longopts, SL("namespace::"), 0);
+			phalcon_array_append_string(&longopts, SL("task::"), 0);
+			phalcon_array_append_string(&longopts, SL("action::"), 0);
+			phalcon_array_append_string(&longopts, SL("params::"), 0);
+			PHALCON_CALL_FUNCTIONW(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
+		} else {
+			array_init(&options);
+		}
+	} else {
+		PHALCON_CPY_WRT_CTOR(&options, arguments);
 	}
 
-	PHALCON_SEPARATE_PARAM(arguments);
-
-	/** 
+	/**
 	 * Check for a module
 	 */
-	if (phalcon_array_isset_fetch_str(&module_name, arguments, SL("module"))) {
-		phalcon_array_unset_str(arguments, SL("module"), PH_COPY);
+	if (phalcon_array_isset_fetch_str(&module_name, &options, SL("module"))) {
+		phalcon_array_unset_str(&options, SL("module"), PH_COPY);
 	} else {
 		ZVAL_NULL(&module_name);
 	}
@@ -223,34 +235,34 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	/**
 	 * Check for a namespace
 	 */
-	if (phalcon_array_isset_fetch_str(&namespace_name, arguments, SL("namespace"))) {
-		phalcon_array_unset_str(arguments, SL("namespace"), PH_COPY);
+	if (phalcon_array_isset_fetch_str(&namespace_name, &options, SL("namespace"))) {
+		phalcon_array_unset_str(&options, SL("namespace"), PH_COPY);
 	} else {
 		ZVAL_NULL(&namespace_name);
 	}
 	phalcon_update_property_zval(getThis(), SL("_namespace"), &namespace_name);
 
-	/** 
+	/**
 	 * Check for a task
 	 */
-	if (phalcon_array_isset_fetch_str(&task_name, arguments, SL("task"))) {
-		phalcon_array_unset_str(arguments, SL("task"), PH_COPY);
+	if (phalcon_array_isset_fetch_str(&task_name, &options, SL("task"))) {
+		phalcon_array_unset_str(&options, SL("task"), PH_COPY);
 	} else {
 		ZVAL_NULL(&task_name);
 	}
 	phalcon_update_property_zval(getThis(), SL("_task"), &task_name);
 
-	/** 
+	/**
 	 * Check for an action
 	 */
-	if (phalcon_array_isset_fetch_str(&action_name, arguments, SL("action"))) {
-		phalcon_array_unset_str(arguments, SL("action"), PH_COPY);
+	if (phalcon_array_isset_fetch_str(&action_name, &options, SL("action"))) {
+		phalcon_array_unset_str(&options, SL("action"), PH_COPY);
 	} else {
 		ZVAL_NULL(&action_name);
 	}
 	phalcon_update_property_zval(getThis(), SL("_action"), &action_name);
 
-	phalcon_update_property_zval(getThis(), SL("_params"), arguments);
+	phalcon_update_property_zval(getThis(), SL("_params"), &options);
 }
 
 /**
@@ -307,4 +319,3 @@ PHP_METHOD(Phalcon_CLI_Router, getParams){
 
 	RETURN_MEMBER(getThis(), "_params");
 }
-

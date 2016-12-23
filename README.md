@@ -51,6 +51,16 @@ sudo make install
 # class Phalcon\Async : --enable-sysvsem --enable-pcntl
 ```
 
+Mac OS:
+
+```bash
+brew install pkg-config
+brew install imagemagick
+ln -s /usr/local/Cellar/imagemagick/6.9.7-0/include/ImageMagick-6/ /usr/local/Cellar/imagemagick/6.9.7-0/include/ImageMagick
+
+brew install php70
+```
+
 Compilation
 -----------
 

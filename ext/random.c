@@ -93,8 +93,8 @@ PHALCON_INIT_CLASS(Phalcon_Random){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Random, random, phalcon_random_method_entry, 0);
 
-	zend_declare_class_constant_long(phalcon_random_ce, SL("COLOR_RGB"), 0);
-	zend_declare_class_constant_long(phalcon_random_ce, SL("COLOR_RGBA"), 1);
+	zend_declare_class_constant_long(phalcon_random_ce, SL("COLOR_RGB"), PHALCON_RANDOM_COLOR_RGB);
+	zend_declare_class_constant_long(phalcon_random_ce, SL("COLOR_RGBA"), PHALCON_RANDOM_COLOR_RGBA);
 	return SUCCESS;
 }
 
@@ -254,12 +254,12 @@ PHP_METHOD(Phalcon_Random, nozero){
 PHP_METHOD(Phalcon_Random, color) {
 
 	zval *type = NULL, r = {}, g = {}, b = {}, a = {}, r_hex = {}, g_hex = {}, b_hex = {}, pad_type = {}, r_str = {}, g_str = {}, b_str = {};
-	zend_long rnd_idx = 0;
+	zend_long color_type = PHALCON_RANDOM_COLOR_RGBA, rnd_idx = 0;
 
 	phalcon_fetch_params(0, 0, 1, &type);
 
-	if (!type) {
-		type = &PHALCON_GLOBAL(z_one);
+	if (type && Z_TYPE_P(type) == IS_LONG) {
+		color_type = Z_LVAL_P(type);
 	}
 
 #if PHP_VERSION_ID >= 70100
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Random, color) {
 #endif
 	ZVAL_LONG(&b, rnd_idx);
 
-	if (Z_LVAL_P(type) == 1) {
+	if (color_type == PHALCON_RANDOM_COLOR_RGBA) {
 #if PHP_VERSION_ID >= 70100
 		rnd_idx = php_mt_rand_common(0, 127);
 #else

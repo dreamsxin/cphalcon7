@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (!_word || Z_TYPE_P(_word) == IS_NULL) {
 		phalcon_read_property(&word, getThis(), SL("_word"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&word, _word);
+		PHALCON_CPY_WRT_CTOR(&word, _word);
 	}
 
 	if (!offset_x || Z_TYPE_P(offset_x) == IS_NULL) {

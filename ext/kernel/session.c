@@ -52,12 +52,16 @@ int phalcon_session_write_close()
 	return phalcon_call_function_with_params(NULL, SL("session_write_close"), 0, NULL);
 }
 
-zval* phalcon_session_set(zval *name, zval *val)
+int phalcon_session_set(zval *name, zval *val)
 {
 #ifdef PHALCON_USE_PHP_SESSION
-	return php_set_session_var(Z_STR_P(name), val, NULL);
+	if (php_set_session_var(Z_STR_P(name), val, NULL)) {
+		if (Z_REFCOUNTED_P(val)) Z_ADDREF_P(val);
+		return 1;
+	}
+	return 0;
 #endif
-	return NULL;
+	return 0;
 }
 
 zval* phalcon_session_get(zval *name)

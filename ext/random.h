@@ -22,6 +22,9 @@
 
 #include "php_phalcon.h"
 
+#define PHALCON_RANDOM_COLOR_RGB      0
+#define PHALCON_RANDOM_COLOR_RGBA     1
+
 extern zend_class_entry *phalcon_random_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Random);

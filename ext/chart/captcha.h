@@ -20,9 +20,14 @@
 #ifndef PHALCON_CHART_CAPTCHA_H
 #define PHALCON_CHART_CAPTCHA_H
 
+#include "php_phalcon.h"
+
+#define PHALCON_CHART_CAPTCHA_PAD_BOTH     0
+#define PHALCON_CHART_CAPTCHA_PAD_LEFT     1
+#define PHALCON_CHART_CAPTCHA_PAD_RIGHT    2
+
 extern zend_class_entry *phalcon_chart_captcha_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Chart_Captcha);
 
 #endif	/* PHALCON_CHART_CAPTCHA_H */
-

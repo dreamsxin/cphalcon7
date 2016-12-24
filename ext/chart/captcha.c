@@ -49,8 +49,8 @@
  *
  *<code>
  * header('Content-Type: image/png');
- * $captcha = new \Phalcon\Chart\Captcha(NULL, NULL, 30, 150, 50);
- * echo $captcha = $captcha->render('Phalcon', 15, -10);
+ * $captcha = new \Phalcon\Chart\Captcha(Phalcon\Text::random(Phalcon\Text::RANDOM_ALNUM, 4), NULL, 30, 150, 50);
+ * echo $captcha = $captcha->render();
  *</code>
  */
 zend_class_entry *phalcon_chart_captcha_ce;

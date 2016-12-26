@@ -21,7 +21,13 @@
 #endif
 
 #ifdef PHALCON_QRCODE
-#include <png.h>
+# include <wand/MagickWand.h>
+# ifdef PHALCON_USE_ZBAR
+#  include <zbar.h>
+# endif
+# include <qrencode.h>
+# define PNG_SKIP_SETJMP_CHECK 1
+# include <png.h>
 #endif
 
 #include "php.h"
@@ -48,7 +54,7 @@
 
 /**
  * Phalcon\Chart\QRcode
- * 
+ *
  *<code>
  * $qr = new \Phalcon\Chart\QRcode();
  * $ret = $qr->generate('Phalcon framework');
@@ -68,48 +74,43 @@ PHP_METHOD(Phalcon_Chart_QRcode, save);
 PHP_METHOD(Phalcon_Chart_QRcode, scan);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_qrcode_generate, 0, 0, 1)
-	ZEND_ARG_INFO(0, data)
-	ZEND_ARG_INFO(0, version)
-	ZEND_ARG_INFO(0, level)
-	ZEND_ARG_INFO(0, mode)
-	ZEND_ARG_INFO(0, casesensitive)
+	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, version, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, level, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, casesensitive, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_qrcode_scan, 0, 0, 1)
-	ZEND_ARG_INFO(0, filename)
+	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_qrcode_render, 0, 0, 0)
-	ZEND_ARG_INFO(0, size)
-	ZEND_ARG_INFO(0, margin)
-	ZEND_ARG_INFO(0, foreground)
-	ZEND_ARG_INFO(0, background)
+	ZEND_ARG_TYPE_INFO(0, size, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, margin, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, foreground, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, background, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_qrcode_save, 0, 0, 0)
-	ZEND_ARG_INFO(0, filename)
-	ZEND_ARG_INFO(0, size)
-	ZEND_ARG_INFO(0, margin)
-	ZEND_ARG_INFO(0, foreground)
-	ZEND_ARG_INFO(0, background)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_qrcode_save, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, size, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, margin, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, foreground, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, background, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_chart_qrcode_method_entry[] = {
-	PHP_ME(Phalcon_Chart_QRcode, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR) 
-	PHP_ME(Phalcon_Chart_QRcode, generate, arginfo_phalcon_chart_qrcode_generate, ZEND_ACC_PUBLIC) 
-	PHP_ME(Phalcon_Chart_QRcode, render, arginfo_phalcon_chart_qrcode_render, ZEND_ACC_PUBLIC) 
-	PHP_ME(Phalcon_Chart_QRcode, save, arginfo_phalcon_chart_qrcode_save, ZEND_ACC_PUBLIC) 
-	PHP_ME(Phalcon_Chart_QRcode, scan, arginfo_phalcon_chart_qrcode_scan, ZEND_ACC_PUBLIC) 
+	PHP_ME(Phalcon_Chart_QRcode, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Chart_QRcode, generate, arginfo_phalcon_chart_qrcode_generate, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Chart_QRcode, render, arginfo_phalcon_chart_qrcode_render, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Chart_QRcode, save, arginfo_phalcon_chart_qrcode_save, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Chart_QRcode, scan, arginfo_phalcon_chart_qrcode_scan, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 #ifdef PHALCON_QRCODE
-
-#define INCHES_PER_METER (100.0/2.54)
-
-#include <wand/MagickWand.h>
-#include <zbar.h>
-#include <qrencode.h>
+# define INCHES_PER_METER (100.0/2.54)
 
 int  phalcon_qrcode_handle;
 static int dpi = 72;
@@ -118,7 +119,7 @@ typedef struct {
     QRcode *c;
 } php_qrcode;
 
-static void qr_dtor(zend_resource *rsrc)
+static void phalcon_qr_dtor(zend_resource *rsrc)
 {
     php_qrcode *qr = (php_qrcode *) rsrc->ptr;
 
@@ -127,7 +128,7 @@ static void qr_dtor(zend_resource *rsrc)
     efree (qr);
 }
 
-static int color_set(unsigned int color[4], const char *value)
+static int phalcon_color_set(unsigned int color[4], const char *value)
 {
         int len = strlen(value);
         int count;
@@ -157,11 +158,12 @@ PHALCON_INIT_CLASS(Phalcon_Chart_QRcode){
 	PHALCON_REGISTER_CLASS(Phalcon\\Chart, QRcode, chart_qrcode, phalcon_chart_qrcode_method_entry, 0);
 
 #ifdef PHALCON_QRCODE
-    phalcon_qrcode_handle = zend_register_list_destructors_ex(qr_dtor, NULL, "qrcode", module_number);
+    phalcon_qrcode_handle = zend_register_list_destructors_ex(phalcon_qr_dtor, NULL, "qrcode", module_number);
 
 	/* Mode */
 	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_NUL"), QR_MODE_NUL TSRMLS_CC);
 	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_NUM"), QR_MODE_NUM TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_AN"), QR_MODE_AN TSRMLS_CC);
 	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_8"), QR_MODE_8 TSRMLS_CC);
 	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_KANJI"), QR_MODE_KANJI TSRMLS_CC);
 
@@ -172,8 +174,8 @@ PHALCON_INIT_CLASS(Phalcon_Chart_QRcode){
 	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_H"), QR_ECLEVEL_H TSRMLS_CC);
 
 	zend_declare_property_null(phalcon_chart_qrcode_ce, SL("_qr"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_string(phalcon_chart_qrcode_ce, SL("_text"), "", ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_version"), 0, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_chart_qrcode_ce, SL("_text"), ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_version"), 6, ZEND_ACC_PROTECTED TSRMLS_CC);
 	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_level"), QR_ECLEVEL_H, ZEND_ACC_PROTECTED TSRMLS_CC);
 	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_mode"), QR_MODE_8, ZEND_ACC_PROTECTED TSRMLS_CC);
 	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_casesensitive"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
@@ -213,55 +215,45 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	php_qrcode *qr = NULL;
 
 	phalcon_fetch_params(0, 1, 4, &text, &_version, &level, &_mode, &_casesensitive);
-	PHALCON_SEPARATE_PARAM(text);
-	convert_to_string(text);
 
 	phalcon_update_property_zval(getThis(), SL("_text"), text);
-	
-	if (_version) {
-		PHALCON_SEPARATE_PARAM(_version);
-		convert_to_long(_version);
 
+	if (!_version || Z_TYPE_P(_version) == IS_NULL) {
+		phalcon_read_property(&version, getThis(), SL("_version"), PH_NOISY);
+	} else {
 		if (Z_LVAL_P(_version) < 1 || Z_LVAL_P(_version) > 40) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "version must be within the range of 1 to 40");
 			return;
 		}
-		phalcon_update_property_zval(getThis(), SL("_version"), _version);
+		PHALCON_CPY_WRT(&version, _version);
 	}
-	phalcon_read_property(&version, getThis(), SL("_version"), PH_NOISY);
 
-	if (_level) {
-		PHALCON_SEPARATE_PARAM(_level);
-		convert_to_long(_level);
-
+	if (!_level || Z_TYPE_P(_level) == IS_NULL) {
+		phalcon_read_property(&level, getThis(), SL("_level"), PH_NOISY);
+	} else {
 		if (Z_LVAL_P(_level) != QR_ECLEVEL_L && Z_LVAL_P(_level) != QR_ECLEVEL_M && Z_LVAL_P(_level) != QR_ECLEVEL_Q && Z_LVAL_P(_level) != QR_ECLEVEL_H) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Error level. there are 4 values: LEVEL_L, LEVEL_M, LEVEL_Q, LEVEL_H");
 			return;
 		}
-		phalcon_update_property_zval(getThis(), SL("_level"), _level);
+		PHALCON_CPY_WRT(&level, _level);
 	}
-	phalcon_read_property(&level, getThis(), SL("_level"), PH_NOISY);
-	
-	if (_mode) {
-		PHALCON_SEPARATE_PARAM(_mode);
-		convert_to_long(_mode);
 
+
+	if (!_mode || Z_TYPE_P(_mode) == IS_NULL) {
+		phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
+	} else {
 		if (Z_LVAL_P(_mode) != QR_MODE_NUL && Z_LVAL_P(_mode) != QR_MODE_NUM && Z_LVAL_P(_mode) != QR_MODE_8 && Z_LVAL_P(_mode) != QR_MODE_KANJI) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Error mode. there are 4 values: MODE_NUL, MODE_NUM, MODE_8, MODE_KANJI");
 			return;
 		}
-		phalcon_update_property_zval(getThis(), SL("_mode"), _mode);
+		PHALCON_CPY_WRT(&mode, _mode);
 	}
-	phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
-	
-	if (_casesensitive) {
-		if (!PHALCON_IS_BOOL(_casesensitive)) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "casesensitive parameter must be bool");
-			return;
-		}
-		phalcon_update_property_zval(getThis(), SL("_casesensitive"), _casesensitive);
+
+	if (!_casesensitive || Z_TYPE_P(_casesensitive) == IS_NULL) {
+		phalcon_read_property(&casesensitive, getThis(), SL("_casesensitive"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&casesensitive, _casesensitive);
 	}
-	phalcon_read_property(&casesensitive, getThis(), SL("_casesensitive"), PH_NOISY);
 
 	qr = (php_qrcode *) emalloc (sizeof (php_qrcode));
 
@@ -273,13 +265,12 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 
 	if (qr->c == NULL)  {
 		efree(qr);
+		RETURN_FALSE;
 	} else {
 		ZVAL_RES(&zid, zend_register_resource(qr, phalcon_qrcode_handle));
 		phalcon_update_property_zval(getThis(), SL("_qr"), &zid);
 		RETURN_TRUE;
 	}
-
-	RETURN_FALSE;
 #endif
 }
 
@@ -318,31 +309,25 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 
 	phalcon_fetch_params(0, 0, 4, &size, &margin, &foreground, &background);
 
-	if (size && Z_TYPE_P(size) != IS_NULL && Z_TYPE_P(size) != IS_LONG) {
+	if (size && Z_TYPE_P(size) != IS_NULL) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "size parameter must be int");
 		return;
 	}
 
-	if (margin && Z_TYPE_P(margin) != IS_NULL && Z_TYPE_P(margin) != IS_LONG) {
+	if (margin && Z_TYPE_P(margin) != IS_NULL) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "margin parameter must be int");
 		return;
 	}
 
 	if (foreground && zend_is_true(foreground)) {
-		PHALCON_SEPARATE_PARAM(foreground);
-		convert_to_string(foreground);
-
-		if(color_set(fg_color, Z_STRVAL_P(foreground))) {
+		if(phalcon_color_set(fg_color, Z_STRVAL_P(foreground))) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Invalid foreground color value");
 			return;
 		}
 	}
 
 	if (background && zend_is_true(background)) {
-		PHALCON_SEPARATE_PARAM(background);
-		convert_to_string(background);
-
-		if(color_set(bg_color, Z_STRVAL_P(background))) {
+		if(phalcon_color_set(bg_color, Z_STRVAL_P(background))) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Invalid background color value");
 			return;
 		}
@@ -477,9 +462,10 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 	fclose (fp);
 	VCWD_UNLINK((const char *)ZSTR_VAL(path));
 	zend_string_release(path);
-#else
+	RETURN_TRUE;
+#endif
+
 	RETURN_FALSE;
-#endif 
 }
 
 /**
@@ -534,7 +520,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 		PHALCON_SEPARATE_PARAM(foreground);
 		convert_to_string(foreground);
 
-		if(color_set(fg_color, Z_STRVAL_P(foreground))) {
+		if(phalcon_color_set(fg_color, Z_STRVAL_P(foreground))) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Invalid foreground color value");
 			return;
 		}
@@ -544,7 +530,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 		PHALCON_SEPARATE_PARAM(background);
 		convert_to_string(background);
 
-		if(color_set(bg_color, Z_STRVAL_P(background))) {
+		if(phalcon_color_set(bg_color, Z_STRVAL_P(background))) {
 			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Invalid background color value");
 			return;
 		}
@@ -556,7 +542,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 	if (margin && Z_TYPE_P(margin) == IS_LONG) {
 		m = Z_LVAL_P(margin);
 	}
-	
+
 	fn = Z_STRVAL_P(filename);
 
 	phalcon_read_property(&zid, getThis(), SL("_qr"), PH_NOISY);
@@ -575,7 +561,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 		PHALCON_CONCAT_SVS(&exception_message, "Unable to open '", filename, "' for writing");
 		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_chart_exception_ce, &exception_message);
 		return;
-	}	
+	}
 
 	realwidth = (qr->c->width + m * 2) * s;
 	row = (unsigned char *) emalloc ((realwidth + 7) / 8);
@@ -681,21 +667,21 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 static zbar_image_t *_php_zbarcode_image_create(unsigned long width, unsigned long height, unsigned char *image_data)
 {
 	zbar_image_t *image = zbar_image_create();
-	
+
 	if (!image)
 		return NULL;
-	
+
 	zbar_image_set_format(image, *(int*)"Y800");
 	zbar_image_set_size(image, width, height);
 	zbar_image_set_data(image, (void *)image_data, width * height, zbar_image_free_data);
 	return image;
 }
 
-static zbar_image_t *_php_zbarcode_get_page(MagickWand *wand) 
+static zbar_image_t *_php_zbarcode_get_page(MagickWand *wand)
 {
 	unsigned long width, height;
 	unsigned char *image_data;
-	
+
 	if (MagickSetImageDepth(wand, 8) == MagickFalse) {
 		return NULL;
 	}
@@ -703,16 +689,16 @@ static zbar_image_t *_php_zbarcode_get_page(MagickWand *wand)
 	if (MagickSetImageFormat(wand, "GRAY") == MagickFalse) {
 		return NULL;
 	}
-	
+
 	width  = MagickGetImageWidth(wand);
 	height = MagickGetImageHeight(wand);
 
 	image_data = emalloc(width * height);
-	
+
 	if (!MagickExportImagePixels(wand, 0, 0, width, height, "I", CharPixel, image_data)) {
 		return NULL;
 	}
-	
+
 	return _php_zbarcode_image_create(width, height, image_data);
 }
 
@@ -721,13 +707,13 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 	const zbar_symbol_t *symbol;
 
 	array_init(return_array);
-		
+
 	/* scan the image for barcodes */
 	zbar_scan_image(scanner, image);
 
 	/* extract results */
 	symbol = zbar_image_first_symbol(image);
-	
+
 	/* Loop through all all symbols */
 	for(; symbol; symbol = zbar_symbol_next(symbol)) {
 		zval fromtext = {}, totext = {}, from = {}, to = {}, symbol_array = {}, loc_array = {}, coords = {};
@@ -752,23 +738,23 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 			ZVAL_STRING(&fromtext, data);
 
 			PHALCON_CALL_FUNCTIONW(&totext, "mb_convert_encoding", &fromtext, &from, &to);
-			phalcon_array_update_str(&symbol_array, SL("data"), &totext, PH_COPY);                
+			phalcon_array_update_str(&symbol_array, SL("data"), &totext, PH_COPY);
         } else {
 			phalcon_array_update_str_str(&symbol_array, SL("data"), (char *)data, strlen(data), PH_COPY);
 		}
 		phalcon_array_update_str_str(&symbol_array, SL("type"), (char *)type, strlen(type), PH_COPY);
 		phalcon_array_update_str_long(&symbol_array, SL("quality"), quality, 0);
-		
+
 		if (extended) {
 			array_init(&loc_array);
 			loc_size = zbar_symbol_get_loc_size(symbol);
 
-			for (i = 0; i < loc_size; i++) {	
+			for (i = 0; i < loc_size; i++) {
 				array_init(&coords);
 				phalcon_array_update_str_long(&coords, SL("x"), zbar_symbol_get_loc_x(symbol, i), PH_COPY);
 				phalcon_array_update_str_long(&coords, SL("y"), zbar_symbol_get_loc_y(symbol, i), PH_COPY);
 
-				phalcon_array_append(&loc_array, &coords, PH_COPY);	
+				phalcon_array_append(&loc_array, &coords, PH_COPY);
 			}
 			phalcon_array_update_str(&symbol_array, SL("location"), &loc_array, PH_COPY);
 		}
@@ -788,7 +774,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
  */
 PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
-#ifdef PHALCON_QRCODE
+#ifdef PHALCON_USE_ZBAR
 	zval *filename, *enhance = NULL, *extended = NULL;
 	MagickWand *magick_wand;
 	zbar_image_scanner_t *zbar_scanner;
@@ -810,18 +796,18 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
 	if (e & 1) {
 		MagickSetResolution(magick_wand, 200, 200);
-	} 
-	
+	}
+
 	if (MagickReadImage(magick_wand, Z_STRVAL_P(filename)) == MagickFalse) {
 		ClearMagickWand(magick_wand);
 		DestroyMagickWand(magick_wand);
 		RETURN_FALSE;
 	}
-	
+
 	if (e & 2) {
 		MagickEnhanceImage(magick_wand);
 	}
-	
+
 	if (e & 4) {
 		MagickSharpenImage(magick_wand, 0, 0.5);
 	}
@@ -845,7 +831,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
 		/* Read page */
 		zbar_page = _php_zbarcode_get_page(magick_wand);
-	
+
 		if (!zbar_page) {
 			zbar_image_scanner_destroy(zbar_scanner);
 			DestroyMagickWand(magick_wand);
@@ -857,7 +843,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 		_php_zbarcode_scan_page(zbar_scanner, zbar_page, ext, return_value);
 	} else {
 		array_init(return_value);
-		
+
 		MagickResetIterator(magick_wand);
 		while (MagickNextImage(magick_wand) != MagickFalse) {
 			zval page_array = {};
@@ -878,7 +864,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 		}
 	}
 
-	zbar_image_scanner_destroy(zbar_scanner);	
+	zbar_image_scanner_destroy(zbar_scanner);
 	DestroyMagickWand(magick_wand);
 #endif
 }

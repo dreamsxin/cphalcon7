@@ -1,5 +1,5 @@
-Phalcon7 Framework
-=================
+Phalcon7(Dao7) Framework
+========================
 
 Phalcon7 is a web framework implemented as a C extension offering high performance and lower resource consumption.
 

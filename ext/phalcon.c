@@ -571,6 +571,11 @@ static const zend_module_dep phalcon_deps[] = {
 #else
 	ZEND_MOD_OPTIONAL("hash")
 #endif
+#if PHALCON_USE_PHP_HASH
+	ZEND_MOD_REQUIRED("sockets")
+#else
+	ZEND_MOD_OPTIONAL("sockets")
+#endif
 	ZEND_MOD_OPTIONAL("apc")
 	ZEND_MOD_OPTIONAL("apcu")
 	ZEND_MOD_OPTIONAL("XCache")
@@ -581,7 +586,6 @@ static const zend_module_dep phalcon_deps[] = {
 	ZEND_MOD_OPTIONAL("iconv")
 	ZEND_MOD_OPTIONAL("libxml")
 	ZEND_MOD_OPTIONAL("mbstring")
-	ZEND_MOD_OPTIONAL("mcrypt")
 	ZEND_MOD_OPTIONAL("openssl")
 	ZEND_MOD_OPTIONAL("pdo")
 	ZEND_MOD_OPTIONAL("gd")

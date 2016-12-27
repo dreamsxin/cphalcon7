@@ -158,7 +158,7 @@ PHALCON_INIT_CLASS(Phalcon_Chart_QRcode){
 	PHALCON_REGISTER_CLASS(Phalcon\\Chart, QRcode, chart_qrcode, phalcon_chart_qrcode_method_entry, 0);
 
 #ifdef PHALCON_QRCODE
-    phalcon_qrcode_handle = zend_register_list_destructors_ex(phalcon_qr_dtor, NULL, "qrcode", module_number);
+    phalcon_qrcode_handle = zend_register_list_destructors_ex(phalcon_qr_dtor, NULL, phalcon_qrcode_handle_name, module_number);
 
 	/* Mode */
 	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_NUL"), QR_MODE_NUL TSRMLS_CC);

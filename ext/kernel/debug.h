@@ -24,8 +24,6 @@
 
 #include <stdio.h>
 
-#ifndef PHALCON_RELEASE
-
 #define PHV(v) phalcon_vdump(v)
 #define PHPR(v) phalcon_print_r(v)
 #define PHALCON_DEBUG_SIMPLE() zend_printf("\n File:%s, Line:%d\n", __FILE__, __LINE__)
@@ -76,7 +74,5 @@ extern FILE *phalcon_log;
 extern int phalcon_debug_trace;
 extern phalcon_debug_entry *start;
 extern phalcon_debug_entry *active;
-
-#endif
 
 #endif /* PHALCON_KERNEL_DEBUG_H */

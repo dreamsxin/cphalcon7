@@ -14,20 +14,16 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          Vladimir Kolesnikov <vladimir@extrememember.com>              |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_KERNEL_BACKTRACE_H
-#define PHALCON_KERNEL_BACKTRACE_H
+#ifndef PHALCON_HTTP_PARSER_H
+#define PHALCON_HTTP_PARSER_H
 
-# include "php_phalcon.h"
+#include "php_phalcon.h"
 
-# ifndef PHALCON_RELEASE
-extern void phalcon_print_backtrace(void);
-# else
+extern zend_class_entry *phalcon_http_parser_ce;
 
-# define phalcon_print_backtrace()
+PHALCON_INIT_CLASS(Phalcon_Http_Parser);
 
-# endif
-#endif /* PHALCON_KERNEL_BACKTRACE_H */
+#endif /* PHALCON_HTTP_PARSER_H */

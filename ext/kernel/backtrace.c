@@ -21,11 +21,12 @@
 #include "kernel/backtrace.h"
 
 #ifndef PHALCON_RELEASE
-#if defined(linux) || defined(DARWIN) || defined(__APPLE__)
 
-#include <execinfo.h>
-#include <Zend/zend.h>
-#include <Zend/zend_smart_str.h>
+# if defined(linux) || defined(DARWIN) || defined(__APPLE__)
+
+#  include <execinfo.h>
+#  include <Zend/zend.h>
+#  include <Zend/zend_smart_str.h>
 
 /**
  * A buffer for backtrace. It is better to have it allocated statically
@@ -54,7 +55,7 @@ void phalcon_print_backtrace(void)
 	smart_str_free(&s);
 }
 
-#else
+# else
 
 void phalcon_print_backtrace(void)
 {
@@ -63,13 +64,6 @@ void phalcon_print_backtrace(void)
 	 */
 }
 
-#endif /* defined(linux) */
-
-#else
-
-/* Release mode */
-void phalcon_print_backtrace(void)
-{
-}
+# endif /* defined(linux) */
 
 #endif /* PHALCON_RELEASE */

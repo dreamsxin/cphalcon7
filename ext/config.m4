@@ -1,6 +1,16 @@
 PHP_ARG_ENABLE(phalcon, whether to enable phalcon7 framework,
 [  --enable-phalcon        Enable phalcon7 framework])
 
+PHP_ARG_ENABLE(phalcon-debug, for phalcon7 debug support,
+[ --enable-phalcon-debug       Enable enable phalcon7 debug support], no, no)
+
+if test "$PHP_PHALCON_DEBUG" != "no"; then
+    CFLAGS="$CFLAGS -Wall -g3 -ggdb -O0 -DPHALCON_DEBUG=1"
+    AC_DEFINE(PHALCON_DEBUG, 1, [Enable phalcon7 debug support])
+else
+	CFLAGS="$CFLAGS -DPHALCON_RELEASE=1"
+fi
+
 PHP_ARG_WITH(non-free, wheter to enable non-free css and js minifier,
 [  --without-non-free      Disable non-free minifiers], yes, no)
 
@@ -279,6 +289,7 @@ forms/element/date.c \
 forms/exception.c \
 forms/element.c \
 forms/elementinterface.c \
+http/parser/http_parser.c \
 http/response.c \
 http/requestinterface.c \
 http/request.c \

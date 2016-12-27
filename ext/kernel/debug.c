@@ -20,8 +20,6 @@
 #include "kernel/debug.h"
 #include "kernel/string.h"
 
-#ifndef PHALCON_RELEASE
-
 FILE *phalcon_log = NULL;
 int phalcon_debug_trace = 0;
 phalcon_debug_entry *start = NULL;
@@ -318,4 +316,3 @@ int phalcon_step_out_entry(){
 	return SUCCESS;
 }
 
-#endif

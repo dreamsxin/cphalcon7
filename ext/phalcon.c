@@ -383,6 +383,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Assets_Filters_Cssmin);
 	PHALCON_INIT(Phalcon_Assets_Filters_Jsmin);
 	PHALCON_INIT(Phalcon_Assets_Resource_Css);
+	PHALCON_INIT(Phalcon_Http_Parser);
 	PHALCON_INIT(Phalcon_Http_Request);
 	PHALCON_INIT(Phalcon_Http_Cookie);
 	PHALCON_INIT(Phalcon_Http_Response);

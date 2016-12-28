@@ -290,6 +290,7 @@ forms/exception.c \
 forms/element.c \
 forms/elementinterface.c \
 http/parser/http_parser.c \
+http/parser.c \
 http/response.c \
 http/requestinterface.c \
 http/request.c \

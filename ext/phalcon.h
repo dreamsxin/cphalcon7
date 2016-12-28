@@ -165,6 +165,7 @@
 #include "forms/form.h"
 #include "forms/manager.h"
 
+#include "http/parser.h"
 #include "http/cookie.h"
 #include "http/cookie/exception.h"
 #include "http/request.h"

@@ -48,7 +48,5 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Files){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Session\\Adapter, Files, session_adapter_files, phalcon_session_adapter_ce, NULL, 0);
 
-	zend_class_implements(phalcon_session_adapter_files_ce, 1, phalcon_session_adapterinterface_ce);
-
 	return SUCCESS;
 }

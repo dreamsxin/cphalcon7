@@ -23,7 +23,9 @@
 
 #include <main/SAPI.h>
 #include <ext/spl/spl_array.h>
+#ifdef PHALCON_USE_PHP_SESSION
 #include <ext/session/php_session.h>
+#endif
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -125,7 +127,6 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter){
 		zend_ce_aggregate,
 		zend_ce_arrayaccess
 	);
-
 	return SUCCESS;
 }
 
@@ -324,7 +325,7 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 
-	if (Z_TYPE_P(data) == IS_ARRAY) { 
+	if (Z_TYPE_P(data) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
 			zval index = {};
 			if (str_key) {

@@ -238,10 +238,12 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, read){
 	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE(memcache) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(&memcache, "get", sid, &lifetime);
-		return;
+		PHALCON_CALL_METHODW(return_value, &memcache, "get", sid, &lifetime);
+		if (Z_TYPE_P(return_value)!=IS_STRING) {
+			RETURN_EMPTY_STRING();
+		}
 	} else {
-		RETURN_FALSE;
+		RETURN_EMPTY_STRING();
 	}
 }
 
@@ -261,7 +263,9 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, write){
 	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE(memcache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &memcache, "save", sid, data, &lifetime);
+		PHALCON_CALL_METHODW(return_value, &memcache, "save", sid, data, &lifetime);
+	} else {
+		RETURN_FALSE;
 	}
 }
 

@@ -215,7 +215,10 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, read){
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 
-	PHALCON_RETURN_CALL_METHODW(&cache, "get", sid, &lifetime);
+	PHALCON_CALL_METHODW(return_value, &cache, "get", sid, &lifetime);
+	if (Z_TYPE_P(return_value)!=IS_STRING) {
+		RETURN_EMPTY_STRING();
+	}
 }
 
 /**
@@ -232,7 +235,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, write){
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(NULL, &cache, "save", sid, data, &lifetime);
+	PHALCON_CALL_METHODW(return_value, &cache, "save", sid, data, &lifetime);
 }
 
 /**

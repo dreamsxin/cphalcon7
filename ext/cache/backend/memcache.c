@@ -134,7 +134,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, __construct){
 		PHALCON_CPY_WRT(&options, opts);
 	}
 
-	if (Z_TYPE(options) != IS_ARRAY) { 
+	if (Z_TYPE(options) != IS_ARRAY) {
 		array_init_size(&options, 4);
 	}
 
@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, save){
 
 	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
 
-	/** 
+	/**
 	 * Check if a connection is created or make a new one
 	 */
 	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, save){
 		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
-	/** 
+	/**
 	 * Prepare the content in the frontend
 	 */
 	PHALCON_CALL_METHODW(&prepared_content, &frontend, "beforestore", &cached_content);
@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, save){
 
 	ZVAL_LONG(&flags, 0);
 
-	/** 
+	/**
 	 * We store without flags
 	 */
 	if (phalcon_is_numeric(&cached_content)) {
@@ -338,6 +338,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, save){
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
+	RETURN_TRUE;
 }
 
 /**
@@ -412,7 +413,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, queryKeys){
 
 	/* Get the key from memcached */
 	PHALCON_CALL_METHODW(&keys, &memcache, "get", &special_key);
-	if (Z_TYPE(keys) == IS_ARRAY) { 
+	if (Z_TYPE(keys) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL(keys), idx, str_key) {
 			zval key = {};
 			if (str_key) {
@@ -460,7 +461,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, exists){
 
 /**
  * Atomic increment of a given key, by number $value
- * 
+ *
  * @param  string $keyName
  * @param  long $value
  * @return mixed
@@ -492,7 +493,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, increment){
 
 /**
  * Atomic decrement of a given key, by number $value
- * 
+ *
  * @param  string $keyName
  * @param  long $value
  * @return mixed
@@ -524,7 +525,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, decrement){
 
 /**
  * Immediately invalidates all existing items.
- * 
+ *
  * @return boolean
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
@@ -558,7 +559,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcache, flush){
 				}
 				PHALCON_CALL_METHODW(NULL, &memcache, "delete", &key);
 			} ZEND_HASH_FOREACH_END();
-			
+
 			zend_hash_clean(Z_ARRVAL(keys));
 			PHALCON_CALL_METHODW(NULL, &memcache, "set", &special_key, &keys);
 		}

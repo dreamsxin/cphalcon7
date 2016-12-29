@@ -63,7 +63,7 @@ before_script:
   - echo '/tmp/core_%e.%p' | sudo tee /proc/sys/kernel/core_pattern &> /dev/null
 
 script:
-  - vendor/bin/phpunit --debug unit-tests/
+  - vendor/bin/phpunit --stderr --debug unit-tests/
 
 after_failure:
   - bash unit-tests/ci/after_failure.sh

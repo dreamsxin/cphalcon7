@@ -20,10 +20,15 @@
 
 class SessionTest extends PHPUnit_Framework_TestCase
 {
+	public function setUp()
+	{
+		if (PHP_SESSION_ACTIVE == session_status()) {
+			session_destroy();
+		}
+	}
+
 	public function testSessionFiles()
 	{
-		$this->markTestSkipped('Test skipped');
-		return;
 		$session = new Phalcon\Session\Adapter\Files();
 
 		$this->assertTrue($session->start());
@@ -44,8 +49,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
 	public function testSessionMemcache()
 	{
-		$this->markTestSkipped('Test skipped');
-		return;
 		if (!extension_loaded('memcache')) {
 			$this->markTestSkipped('Warning: memcached extension is not loaded');
 			return false;
@@ -74,8 +77,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
 	public function testSessionLibmemcached()
 	{
-		$this->markTestSkipped('Test skipped');
-		return;
 		if (!extension_loaded('memcached')) {
 			$this->markTestSkipped('Warning: memcached extension is not loaded');
 			return false;

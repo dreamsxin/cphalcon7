@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
 	PHALCON_CALL_METHODW(&document, &collection, "findone", &conditions);
 
-	if (Z_TYPE(document) == IS_ARRAY) { 
+	if (Z_TYPE(document) == IS_ARRAY) {
 		if (likely(phalcon_array_isset_fetch_str(&cached_content, &document, SL("data")))) {
 			if (phalcon_is_numeric(&cached_content)) {
 				RETURN_CTORW(&cached_content);
@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 
 	PHALCON_CALL_METHODW(&document, &collection, "findone", &conditions);
 
-	if (Z_TYPE(document) == IS_ARRAY) { 
+	if (Z_TYPE(document) == IS_ARRAY) {
 		phalcon_array_update_str(&document, SL("time"), &timestamp, PH_COPY);
 		if (Z_TYPE(prepared_content) > IS_NULL) {
 			phalcon_array_update_str(&document, SL("data"), &prepared_content, PH_COPY);
@@ -348,6 +348,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
+	RETURN_TRUE;
 }
 
 /**
@@ -499,7 +500,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 
 	if (!value || Z_TYPE_P(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
-	} else if (Z_TYPE_P(value) != IS_LONG) {	
+	} else if (Z_TYPE_P(value) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(value);
 		convert_to_long_ex(value);
 	}
@@ -533,7 +534,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 	phalcon_sub_function(&difference, &timestamp, &lifetime);
 	is_smaller_function(&not_expired, &difference, &modified_time);
 
-	/** 
+	/**
 	 * The expiration is based on the column 'time'
 	 */
 	if (PHALCON_IS_TRUE(&not_expired)) {
@@ -572,7 +573,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
 	if (!value || Z_TYPE_P(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
-	} else if (Z_TYPE_P(value) != IS_LONG) {	
+	} else if (Z_TYPE_P(value) != IS_LONG) {
 		PHALCON_SEPARATE_PARAM(value);
 		convert_to_long_ex(value);
 	}
@@ -606,7 +607,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 	phalcon_sub_function(&difference, &timestamp, &lifetime);
 	is_smaller_function(&not_expired, &difference, &modified_time);
 
-	/** 
+	/**
 	 * The expiration is based on the column 'time'
 	 */
 	if (PHALCON_IS_TRUE(&not_expired)) {
@@ -631,7 +632,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
 /**
  * Immediately invalidates all existing items.
- * 
+ *
  * @return bool
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, flush){

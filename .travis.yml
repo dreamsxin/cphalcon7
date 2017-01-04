@@ -3,6 +3,19 @@ language: php
 sudo: required
 dist: precise
 
+addons:
+  apt:
+    packages:
+      - gdb
+      - re2c
+      - libpng12-dev
+      - libqrencode-dev
+      - libzbar-dev
+      - imagemagick
+      - libmagick++-dev
+      - libmagickcore-dev
+      - libmagickwand-dev
+
 php:
   - 7.0
   - 7.1
@@ -45,12 +58,12 @@ before_install:
 
 before_script:
   - git submodule --quiet update --init --recursive
-  - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --silent --enable-phalcon && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/phalcon.ini)
+  - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --silent --enable-phalcon && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/20-phalcon.ini)
   - ulimit -c unlimited -S || true
   - echo '/tmp/core_%e.%p' | sudo tee /proc/sys/kernel/core_pattern &> /dev/null
 
 script:
-  - vendor/bin/phpunit --debug unit-tests/
+  - vendor/bin/phpunit --stderr --debug unit-tests/
 
 after_failure:
   - bash unit-tests/ci/after_failure.sh
@@ -58,16 +71,3 @@ after_failure:
 notifications:
   email:
     - dreamsxin@qq.com
-
-addons:
-  apt:
-    packages:
-      - gdb
-      - re2c
-      - libpng12-dev
-      - libqrencode-dev
-      - libzbar-dev
-      - imagemagick
-      - libmagick++-dev
-      - libmagickcore-dev
-      - libmagickwand-dev

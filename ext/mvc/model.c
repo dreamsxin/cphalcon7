@@ -6044,8 +6044,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 	 * A notice is shown if the property is not defined and it isn't a relationship
 	 */
 	/* TODO see if segfault is possible */
-	zend_error(E_NOTICE, "Access to undefined property %s::%s", Z_STRVAL(model_name), Z_STRVAL_P(property));
-	RETURN_NULL();
+	PHALCON_CALL_PARENTW(return_value, phalcon_mvc_model_ce, getThis(), "__get", property);
 }
 
 /**

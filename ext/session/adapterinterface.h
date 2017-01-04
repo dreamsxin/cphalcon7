@@ -26,12 +26,30 @@ extern zend_class_entry *phalcon_session_adapterinterface_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Session_AdapterInterface);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_setoptions, 0, 0, 1)
-	ZEND_ARG_INFO(0, options)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_open, 0, 0, 2)
+	ZEND_ARG_INFO(0, savePath)
+	ZEND_ARG_INFO(0, sessionName)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_read, 0, 0, 1)
+        ZEND_ARG_INFO(0, sessionId)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_write, 0, 0, 2)
+	ZEND_ARG_INFO(0, sessionId)
+	ZEND_ARG_INFO(0, sessionData)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_destroy, 0, 0, 0)
-	ZEND_ARG_INFO(0, session_id)
+        ZEND_ARG_INFO(0, sessionId)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_gc, 0, 0, 0)
+        ZEND_ARG_INFO(0, maxlifetime)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_setoptions, 0, 0, 1)
+	ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_get, 0, 0, 1)

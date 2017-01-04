@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 	if (!phalcon_array_isset_fetch(&priority_queue, &events, event_type, 0)) {
 		phalcon_return_property(&enable_priorities, getThis(), SL("_enablePriorities"));
 		if (zend_is_true(&enable_priorities)) {
-			/** 
+			/**
 			 * Create a SplPriorityQueue to store the events with priorities
 			 */
 			object_init_ex(&priority_queue, spl_ce_SplPriorityQueue);
@@ -168,12 +168,12 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 				PHALCON_CALL_METHODW(NULL, &priority_queue, "__construct");
 			}
 
-			/** 
+			/**
 			 * Extract only the Data, Set extraction flags
 			 */
 			PHALCON_CALL_METHODW(NULL, &priority_queue, "setextractflags", &PHALCON_GLOBAL(z_one));
 
-			/** 
+			/**
 			 * Append the events to the queue
 			 */
 			phalcon_array_update_zval(&events, event_type, &priority_queue, PH_COPY);
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		}
 	}
 
-	/** 
+	/**
 	 * Insert the handler in the queue
 	 */
 	if (unlikely(Z_TYPE(priority_queue) == IS_OBJECT)) {
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		phalcon_array_append(&priority_queue, &listener, PH_COPY);
 	}
 
-	/** 
+	/**
 	 * Append the events to the queue
 	 */
 	phalcon_array_update_zval(&events, event_type, &priority_queue, PH_COPY);
@@ -311,7 +311,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 				PHALCON_CALL_METHODW(&priority, &listener0, "getpriority");
 				PHALCON_CALL_METHODW(NULL, &priority_queue, "insert", &listener0, &priority);
 			}
-			
+
 			PHALCON_CALL_METHODW(NULL, &queue, "next");
 		}
 	} else {
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
 	weakref_ce = zend_lookup_class_ex(zend_string_init(SL("WeakRef"), 0), NULL, 0);
 
-	/** 
+	/**
 	 * Get the event type
 	 */
 	PHALCON_CALL_METHODW(&event_name, event, "gettype");
@@ -401,34 +401,34 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 		return;
 	}
 
-	/** 
+	/**
 	 * Get the object who triggered the event
 	 */
 	PHALCON_CALL_METHODW(&source, event, "getsource");
 
-	/** 
+	/**
 	 * Get extra data passed to the event
 	 */
 	PHALCON_CALL_METHODW(&data, event, "getdata");
 
-	/** 
+	/**
 	 * Tell if the event is cancelable
 	 */
 	PHALCON_CALL_METHODW(&cancelable, event, "iscancelable");
 
-	/** 
+	/**
 	 * Responses need to be traced?
 	 */
 	phalcon_return_property(&collect, getThis(), SL("_collect"));
 	if (Z_TYPE_P(queue) == IS_OBJECT) {
-		/** 
+		/**
 		 * We need to clone the queue before iterate over it
 		 */
 		if (phalcon_clone(&iterator, queue) == FAILURE) {
 			return;
 		}
 
-		/** 
+		/**
 		 * Move the queue to the top
 		 */
 		PHALCON_CALL_METHODW(NULL, &iterator, "top");
@@ -441,13 +441,13 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				break;
 			}
 
-			/** 
+			/**
 			 * Get the current data
 			 */
 			PHALCON_CALL_METHODW(&listener0, &iterator, "current");
 			PHALCON_CALL_METHODW(&handler_embeded, &listener0, "getlistener");
 
-			/** 
+			/**
 			 * Only handler objects are valid
 			 */
 			if (Z_TYPE(handler_embeded) == IS_OBJECT) {
@@ -474,12 +474,12 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					PHALCON_CPY_WRT(&handler, &handler_embeded);
 				}
 
-				/** 
+				/**
 				 * Check if the event is a closure
 				 */
 				assert(Z_TYPE(handler) == IS_OBJECT);
 				if (instanceof_function(Z_OBJCE(handler), zend_ce_closure)) {
-					/** 
+					/**
 					 * Create the closure arguments
 					 */
 					if (Z_TYPE(arguments) <= IS_NULL) {
@@ -489,12 +489,12 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 						phalcon_array_append(&arguments, &data, PH_COPY);
 					}
 
-					/** 
+					/**
 					 * Call the function in the PHP userland
 					 */
 					PHALCON_CALL_USER_FUNC_ARRAYW(&status, &handler, &arguments);
 
-					/** 
+					/**
 					 * Trace the response
 					 */
 					if (zend_is_true(&collect)) {
@@ -502,7 +502,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					}
 
 					if (zend_is_true(&cancelable)) {
-						/** 
+						/**
 						 * Check if the event was stopped by the user
 						 */
 						PHALCON_CALL_METHODW(&is_stopped, event, "isstopped");
@@ -511,16 +511,16 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 						}
 					}
 				} else {
-					/** 
+					/**
 					 * Check if the listener has implemented an event with the same name
 					 */
 					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
-						/** 
+						/**
 						 * Call the function in the PHP userland
 						 */
 						PHALCON_CALL_METHODW(&status, &handler, Z_STRVAL(event_name), event, &source, &data);
 
-						/** 
+						/**
 						 * Collect the response
 						 */
 						if (zend_is_true(&collect)) {
@@ -529,7 +529,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
 						if (zend_is_true(&cancelable)) {
 
-							/** 
+							/**
 							 * Check if the event was stopped by the user
 							 */
 							PHALCON_CALL_METHODW(&is_stopped, event, "isstopped");
@@ -541,7 +541,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 				}
 			}
 
-			/** 
+			/**
 			 * Move the queue to the next handler
 			 */
 			PHALCON_CALL_METHODW(NULL, &iterator, "next");
@@ -551,7 +551,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 			zval handler_embeded = {}, handler_referenced = {}, handler = {}, arguments = {}, is_stopped = {};
 
 			PHALCON_CALL_METHODW(&handler_embeded, listener, "getlistener");
-			/** 
+			/**
 			 * Only handler objects are valid
 			 */
 			if (Z_TYPE(handler_embeded) == IS_OBJECT) {
@@ -575,12 +575,12 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					PHALCON_CPY_WRT(&handler, &handler_embeded);
 				}
 
-				/** 
+				/**
 				 * Check if the event is a closure
 				 */
 				assert(Z_TYPE(handler) == IS_OBJECT);
 				if (instanceof_function(Z_OBJCE(handler), zend_ce_closure)) {
-					/** 
+					/**
 					 * Create the closure arguments
 					 */
 					if (Z_TYPE(arguments) <= IS_NULL) {
@@ -590,12 +590,12 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 						phalcon_array_append(&arguments, &data, PH_COPY);
 					}
 
-					/** 
+					/**
 					 * Call the function in the PHP userland
 					 */
 					PHALCON_CALL_USER_FUNC_ARRAYW(&status, &handler, &arguments);
 
-					/** 
+					/**
 					 * Trace the response
 					 */
 					if (zend_is_true(&collect)) {
@@ -604,7 +604,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
 					if (zend_is_true(&cancelable)) {
 
-						/** 
+						/**
 						 * Check if the event was stopped by the user
 						 */
 						PHALCON_CALL_METHODW(&is_stopped, event, "isstopped");
@@ -613,16 +613,16 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 						}
 					}
 				} else {
-					/** 
+					/**
 					 * Check if the listener has implemented an event with the same name
 					 */
 					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
-						/** 
+						/**
 						 * Call the function in the PHP userland
 						 */
 						PHALCON_CALL_METHODW(&status, &handler, Z_STRVAL(event_name), event, &source, &data);
 
-						/** 
+						/**
 						 * Collect the response
 						 */
 						if (zend_is_true(&collect)) {
@@ -630,7 +630,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 						}
 
 						if (zend_is_true(&cancelable)) {
-							/** 
+							/**
 							 * Check if the event was stopped by the user
 							 */
 							PHALCON_CALL_METHODW(&is_stopped, event, "isstopped");
@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 PHP_METHOD(Phalcon_Events_Manager, fire){
 
 	zval *event_type, *source, *data = NULL, *cancelable = NULL, events = {}, exception_message = {}, event_parts = {}, type = {};
-	zval event_name = {}, status = {}, collect = {}, event = {}, fire_events = {};
+	zval event_name = {}, status = {}, collect = {}, any_type = {}, event = {}, fire_events = {};
 
 	phalcon_fetch_params(0, 2, 2, &event_type, &source, &data, &cancelable);
 
@@ -681,13 +681,13 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	}
 
 	phalcon_return_property(&events, getThis(), SL("_events"));
-	if (Z_TYPE(events) != IS_ARRAY) { 
+	if (Z_TYPE(events) != IS_ARRAY) {
 		RETURN_NULL();
 	}
 
 	ZVAL_NULL(&status);
 
-	/** 
+	/**
 	 * All valid events must have a colon separator
 	 */
 	if (!phalcon_memnstr_str(event_type, SL(":"))) {
@@ -700,7 +700,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	phalcon_array_fetch_long(&type, &event_parts, 0, PH_NOISY);
 	phalcon_array_fetch_long(&event_name, &event_parts, 1, PH_NOISY);
 
-	/** 
+	/**
 	 * Should responses be traced?
 	 */
 	phalcon_return_property(&collect, getThis(), SL("_collect"));
@@ -708,30 +708,13 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 		phalcon_update_property_null(getThis(), SL("_responses"));
 	}
 
-	/** 
-	 * Check if events are grouped by type
+	/**
+	 * Check if there are listeners for the all event type
 	 */
-	if (phalcon_array_isset_fetch(&fire_events, &events, &type, 0)) {
+	ZVAL_STRING(&any_type, "*");
+	if (phalcon_array_isset_fetch(&fire_events, &events, &any_type, 0)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
-			/** 
-			 * Create the event context
-			 */
-			PHALCON_OBJECT_INIT(&event, phalcon_events_event_ce);
-			PHALCON_CALL_METHODW(NULL, &event, "__construct", &event_name, source, data, cancelable);
-
-			/** 
-			 * Call the events queue
-			 */
-			PHALCON_CALL_METHODW(&status, getThis(), "firequeue", &fire_events, &event);
-		}
-	}
-
-	/** 
-	 * Check if there are listeners for the event type itself
-	 */
-	if (phalcon_array_isset_fetch(&fire_events, &events, event_type, 0)) {
-		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
-			/** 
+			/**
 			 * Create the event if it wasn't created before
 			 */
 			if (Z_TYPE(event) != IS_OBJECT) {
@@ -740,7 +723,46 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 
 			}
 
-			/** 
+			/**
+			 * Call the events queue
+			 */
+			PHALCON_CALL_METHODW(&status, getThis(), "firequeue", &fire_events, &event);
+		}
+	}
+
+	/**
+	 * Check if events are grouped by type
+	 */
+	if (phalcon_array_isset_fetch(&fire_events, &events, &type, 0)) {
+		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
+			/**
+			 * Create the event context
+			 */
+			PHALCON_OBJECT_INIT(&event, phalcon_events_event_ce);
+			PHALCON_CALL_METHODW(NULL, &event, "__construct", &event_name, source, data, cancelable);
+
+			/**
+			 * Call the events queue
+			 */
+			PHALCON_CALL_METHODW(&status, getThis(), "firequeue", &fire_events, &event);
+		}
+	}
+
+	/**
+	 * Check if there are listeners for the event type itself
+	 */
+	if (phalcon_array_isset_fetch(&fire_events, &events, event_type, 0)) {
+		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
+			/**
+			 * Create the event if it wasn't created before
+			 */
+			if (Z_TYPE(event) != IS_OBJECT) {
+				object_init_ex(&event, phalcon_events_event_ce);
+				PHALCON_CALL_METHODW(NULL, &event, "__construct", &event_name, source, data, cancelable);
+
+			}
+
+			/**
 			 * Call the events queue
 			 */
 			PHALCON_CALL_METHODW(&status, getThis(), "firequeue", &fire_events, &event);

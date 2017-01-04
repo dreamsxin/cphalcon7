@@ -21,11 +21,10 @@
 #define PHALCON_CHART_QRCODE_H
 
 extern int  phalcon_qrcode_handle;
-#define phalcon_qrcode_handle_name "QRcode Handle"
+#define phalcon_qrcode_handle_name "qrcode"
 
 extern zend_class_entry *phalcon_chart_qrcode_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Chart_QRcode);
 
 #endif	/* PHALCON_CHART_QRCODE_H */
-

@@ -17,36 +17,13 @@
   +------------------------------------------------------------------------+
 */
 
-#include "session/adapter/files.h"
-#include "session/adapter.h"
-#include "session/adapterinterface.h"
-#include "kernel/main.h"
+#ifndef PHALCON_HTTP_PARSER_H
+#define PHALCON_HTTP_PARSER_H
 
-/**
- * Phalcon\Session\Adapter\Files
- *
- * This adapter store sessions in plain files
- *
- *<code>
- * $session = new Phalcon\Session\Adapter\Files(array(
- *    'uniqueId' => 'my-private-app'
- * ));
- *
- * $session->start();
- *
- * $session->set('var', 'some-value');
- *
- * echo $session->get('var');
- *</code>
- */
-zend_class_entry *phalcon_session_adapter_files_ce;
+#include "php_phalcon.h"
 
-/**
- * Phalcon\Session\Adapter\Files initializer
- */
-PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Files){
+extern zend_class_entry *phalcon_http_parser_ce;
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Session\\Adapter, Files, session_adapter_files, phalcon_session_adapter_ce, NULL, 0);
+PHALCON_INIT_CLASS(Phalcon_Http_Parser);
 
-	return SUCCESS;
-}
+#endif /* PHALCON_HTTP_PARSER_H */

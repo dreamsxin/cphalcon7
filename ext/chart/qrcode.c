@@ -158,7 +158,7 @@ PHALCON_INIT_CLASS(Phalcon_Chart_QRcode){
 	PHALCON_REGISTER_CLASS(Phalcon\\Chart, QRcode, chart_qrcode, phalcon_chart_qrcode_method_entry, 0);
 
 #ifdef PHALCON_QRCODE
-    phalcon_qrcode_handle = zend_register_list_destructors_ex(phalcon_qr_dtor, NULL, "qrcode", module_number);
+    phalcon_qrcode_handle = zend_register_list_destructors_ex(phalcon_qr_dtor, NULL, phalcon_qrcode_handle_name, module_number);
 
 	/* Mode */
 	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_NUL"), QR_MODE_NUL TSRMLS_CC);
@@ -356,9 +356,6 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 		return;
 	}
 
-	realwidth = (qr->c->width + m * 2) * s;
-	row = (unsigned char *) emalloc ((realwidth + 7) / 8);
-
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if(png_ptr == NULL) {
 		fclose(fp);
@@ -379,6 +376,10 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to write PNG writer");
 		return;
 	}
+
+	// width = version * 4 + 17
+	realwidth = (qr->c->width + m * 2) * s;
+	row = (unsigned char *) emalloc ((realwidth + 7) / 8);
 
 	palette = (png_colorp) emalloc(sizeof(png_color) * 2);
 	palette[0].red   = fg_color[0];
@@ -406,7 +407,6 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 		dpi * INCHES_PER_METER,
 		PNG_RESOLUTION_METER);
 	png_write_info(png_ptr, info_ptr);
-
 
 	memset(row, 0xff, (realwidth + 7) / 8);
 	for(y = 0; y < m * s; y++) {

@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 		PHALCON_CALL_METHODW(&prepared_content, &frontend, "beforestore", &cached_content);
 	}
 
-	/** 
+	/**
 	 * Take the lifetime from the frontend or read it from the set in start()
 	 */
 	if (!lifetime || Z_TYPE_P(lifetime) == IS_NULL) {
@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 			return;
 		}
 
-		/** 
+		/**
 		 * xcache_list() is available only to the administrator (unless XCache was
 		 * patched). We have to update the list of the stored keys.
 		 */
@@ -246,6 +246,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 
 		phalcon_array_update_zval(&keys, &last_key, &ttl, PH_COPY);
 		PHALCON_CALL_FUNCTIONW(NULL, "xcache_set", &special_key, &keys, &PHALCON_GLOBAL(z_zero));
+		RETURN_TRUE;
+	} else {
+		RETURN_FALSE;
 	}
 }
 
@@ -274,7 +277,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 	}
 
 	PHALCON_CALL_FUNCTIONW(&keys, "xcache_get", &special_key);
-	if (Z_TYPE(keys) == IS_ARRAY) { 
+	if (Z_TYPE(keys) == IS_ARRAY) {
 		phalcon_array_unset(&keys, &prefixed_key, 0);
 		PHALCON_CALL_FUNCTIONW(NULL, "xcache_set", &special_key, &keys, &PHALCON_GLOBAL(z_zero));
 	}
@@ -308,7 +311,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 
 	array_init(return_value);
 
-	/** 
+	/**
 	 * Get the key from XCache (we cannot use xcache_list() as it is available only to
 	 * the administrator)
 	 */
@@ -433,7 +436,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, decrement){
 
 /**
  * Immediately invalidates all existing items.
- * 
+ *
  * @return boolean
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){

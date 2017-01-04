@@ -172,6 +172,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, save){
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
+	RETURN_TRUE;
 }
 
 /**

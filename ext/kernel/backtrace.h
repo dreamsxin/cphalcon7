@@ -21,16 +21,13 @@
 #ifndef PHALCON_KERNEL_BACKTRACE_H
 #define PHALCON_KERNEL_BACKTRACE_H
 
-#include "php_phalcon.h"
+# include "php_phalcon.h"
 
-#ifndef PHALCON_RELEASE
+# ifndef PHALCON_RELEASE
 extern void phalcon_print_backtrace(void);
+# else
 
-#else
+# define phalcon_print_backtrace()
 
-#ifndef phalcon_print_backtrace
-#define phalcon_print_backtrace()
-#endif
-
-#endif
+# endif
 #endif /* PHALCON_KERNEL_BACKTRACE_H */

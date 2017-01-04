@@ -278,7 +278,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 
 	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
 
-	/** 
+	/**
 	 * Check if a connection is created or make a new one
 	 */
 	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
-	/** 
+	/**
 	 * Prepare the content in the frontend
 	 */
 	if (!phalcon_is_numeric(&cached_content)) {
@@ -350,11 +350,12 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
+	RETURN_TRUE;
 }
 
 /**
  * Increment of a given key, by number $value
- * 
+ *
  * @param  string $keyName
  * @param  long $value
  * @return mixed
@@ -393,7 +394,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, increment)
 
 /**
  * Decrement of a given key, by number $value
- * 
+ *
  * @param  string $keyName
  * @param  long $value
  * @return mixed
@@ -554,7 +555,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, exists){
 
 /**
  * Immediately invalidates all existing items.
- * 
+ *
  * @return boolean
  */
 PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, flush){
@@ -587,13 +588,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, flush){
 				} else {
 					ZVAL_LONG(&key, idx);
 				}
-				
+
 				PHALCON_CALL_METHODW(NULL, &memcache, "delete", &key);
 			} ZEND_HASH_FOREACH_END();
-			
+
 			zend_hash_clean(Z_ARRVAL(keys));
 			PHALCON_CALL_METHODW(NULL, &memcache, "set", &special_key, &keys);
-		}		
+		}
 	} else {
 		PHALCON_CALL_METHODW(&keys, &memcache, "flush");
 	}

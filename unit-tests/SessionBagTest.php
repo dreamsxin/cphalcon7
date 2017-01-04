@@ -20,6 +20,13 @@
 
 class SessionBagTest extends PHPUnit_Framework_TestCase
 {
+	public function setUp()
+	{
+		if (PHP_SESSION_ACTIVE == session_status()) {
+			session_destroy();
+		}
+	}
+
 	/**
 	 * @covers \Phalcon\Session\Bag::get()
 	 * @covers \Phalcon\Session\Bag::set()
@@ -28,9 +35,6 @@ class SessionBagTest extends PHPUnit_Framework_TestCase
 	 */
 	public function testGetSet()
 	{
-		$this->markTestSkipped("Skipped");
-		return;
-
 		\Phalcon\DI::reset();
 		@session_start();
 

@@ -20,25 +20,26 @@
 
 class SessionTest extends PHPUnit_Framework_TestCase
 {
+	public function setUp()
+	{
+		if (PHP_SESSION_ACTIVE == session_status()) {
+			session_destroy();
+		}
+	}
 
 	public function testSessionFiles()
 	{
-		$this->markTestSkipped('session');
-		return;
-
 		$session = new Phalcon\Session\Adapter\Files();
 
-		$this->assertFalse($session->start());
-		$this->assertFalse($session->isStarted());
-
-		@session_start();
+		$this->assertTrue($session->start());
+		$this->assertTrue($session->isStarted());
 
 		$session->set('some', 'value');
 
 		$this->assertEquals($session->get('some'), 'value');
 		$this->assertTrue($session->has('some'));
 		$this->assertEquals($session->get('undefined', 'my-default'), 'my-default');
-		
+
 		// Automatically deleted after reading
 		$this->assertEquals($session->get('some', NULL, TRUE), 'value');
 		$this->assertFalse($session->has('some'));
@@ -48,25 +49,25 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
 	public function testSessionMemcache()
 	{
-		$this->markTestSkipped('session');
-		return;
+		if (!extension_loaded('memcache')) {
+			$this->markTestSkipped('Warning: memcached extension is not loaded');
+			return false;
+		}
 		$session = new Phalcon\Session\Adapter\Memcache(array(
 			'host' => '127.0.0.1',
 			'port' => '11211',
 			'prefix' => 'memcache'
 		));
 
-		$this->assertFalse($session->start());
-		$this->assertFalse($session->isStarted());
-
-		@session_start();
+		$this->assertTrue($session->start());
+		$this->assertTrue($session->isStarted());
 
 		$session->set('some', 'value');
 
 		$this->assertEquals($session->get('some'), 'value');
 		$this->assertTrue($session->has('some'));
 		$this->assertEquals($session->get('undefined', 'my-default'), 'my-default');
-		
+
 		// Automatically deleted after reading
 		$this->assertEquals($session->get('some', NULL, TRUE), 'value');
 		$this->assertFalse($session->has('some'));
@@ -76,8 +77,10 @@ class SessionTest extends PHPUnit_Framework_TestCase
 
 	public function testSessionLibmemcached()
 	{
-		$this->markTestSkipped('session');
-		return;
+		if (!extension_loaded('memcached')) {
+			$this->markTestSkipped('Warning: memcached extension is not loaded');
+			return false;
+		}
 		$session = new Phalcon\Session\Adapter\Libmemcached(array(
 			'servers' => array(
 				array(
@@ -88,17 +91,15 @@ class SessionTest extends PHPUnit_Framework_TestCase
 			'prefix' => 'libmemcached'
 		));
 
-		$this->assertFalse($session->start());
-		$this->assertFalse($session->isStarted());
-
-		@session_start();
+		$this->assertTrue($session->start());
+		$this->assertTrue($session->isStarted());
 
 		$session->set('some', 'value');
 
 		$this->assertEquals($session->get('some'), 'value');
 		$this->assertTrue($session->has('some'));
 		$this->assertEquals($session->get('undefined', 'my-default'), 'my-default');
-		
+
 		// Automatically deleted after reading
 		$this->assertEquals($session->get('some', NULL, TRUE), 'value');
 		$this->assertFalse($session->has('some'));

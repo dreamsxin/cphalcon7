@@ -63,7 +63,7 @@
  */
 zend_class_entry *phalcon_session_adapter_libmemcached_ce;
 
-PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct);
+PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, start);
 PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, open);
 PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, close);
 PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, read);
@@ -71,31 +71,14 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, write);
 PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, destroy);
 PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, gc);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapter_libmemcached___construct, 0, 0, 1)
-	ZEND_ARG_INFO(0, options)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapter_libmemcached_read, 0, 0, 1)
-	ZEND_ARG_INFO(0, sessionId)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapter_libmemcached_write, 0, 0, 2)
-	ZEND_ARG_INFO(0, sessionId)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapter_libmemcached_destroy, 0, 0, 0)
-        ZEND_ARG_INFO(0, sessionId)
-ZEND_END_ARG_INFO()
-
 static const zend_function_entry phalcon_session_adapter_libmemcached_method_entry[] = {
-	PHP_ME(Phalcon_Session_Adapter_Libmemcached, __construct, arginfo_phalcon_session_adapter_libmemcached___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Session_Adapter_Libmemcached, open, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Libmemcached, start, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Libmemcached, open, arginfo_phalcon_session_adapterinterface_open, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Libmemcached, close, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Session_Adapter_Libmemcached, read, arginfo_phalcon_session_adapter_libmemcached_read, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Session_Adapter_Libmemcached, write, arginfo_phalcon_session_adapter_libmemcached_write, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Session_Adapter_Libmemcached, destroy, arginfo_phalcon_session_adapter_libmemcached_destroy, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Session_Adapter_Libmemcached, gc, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Libmemcached, read, arginfo_phalcon_session_adapterinterface_read, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Libmemcached, write, arginfo_phalcon_session_adapterinterface_write, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Libmemcached, destroy, arginfo_phalcon_session_adapterinterface_destroy, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Libmemcached, gc, arginfo_phalcon_session_adapterinterface_gc, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -109,29 +92,35 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Libmemcached){
 	zend_declare_property_long(phalcon_session_adapter_libmemcached_ce, SL("_lifetime"), 8600, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_session_adapter_libmemcached_ce, SL("_libmemcached"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_session_adapter_libmemcached_ce, 1, phalcon_session_adapterinterface_ce);
-
+//#ifdef PHALCON_USE_PHP_SESSION
+//	zend_class_implements(
+//		phalcon_session_adapter_libmemcached_ce, 1,
+//		php_session_iface_entry
+//	);
+//#endif
 	return SUCCESS;
 }
 
 /**
- * Constructor for Phalcon\Session\Adapter\Libmemcached
+ * Starts the session (if headers are already sent the session will not be started)
  *
- * @param array $options
+ * @return boolean
  */
-PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct){
+PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, start){
 
-	zval *options, servers = {}, client = {}, lifetime = {}, prefix = {}, backend_option = {}, frontend_option = {}, frontend_data = {}, libmemcached = {};
-	zval callable_open = {}, callable_close = {}, callable_read  = {}, callable_write = {}, callable_destroy = {}, callable_gc = {};
+	zval options = {}, servers = {}, client = {}, lifetime = {}, prefix = {}, backend_option = {}, frontend_option = {}, frontend_data = {}, libmemcached = {};
+//#ifndef PHALCON_USE_PHP_SESSION
+	zval callable_open = {}, callable_close = {}, callable_read = {}, callable_write = {}, callable_destroy = {}, callable_gc = {};
+//#endif
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
+	if (Z_TYPE(options) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "The options must be an array");
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&servers, options, SL("servers"))) {
+	if (!phalcon_array_isset_fetch_str(&servers, &options, SL("servers"))) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "No servers given in options");
 		return;
 	}
@@ -140,17 +129,17 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct){
 
 	phalcon_array_update_str(&backend_option, SL("servers"), &servers, PH_COPY);
 
-	if (phalcon_array_isset_fetch_str(&client, options, SL("client"))) {
+	if (phalcon_array_isset_fetch_str(&client, &options, SL("client"))) {
 		phalcon_array_update_str(&backend_option, SL("client"), &client, PH_COPY);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+	if (!phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"))) {
 		ZVAL_LONG(&lifetime, 8600);
 	} else {
 		phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
 	}
 
-	if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+	if (phalcon_array_isset_fetch_str(&prefix, &options, SL("prefix"))) {
         phalcon_array_update_str(&backend_option, SL("prefix"), &prefix, PH_COPY);
 	}
 
@@ -169,6 +158,9 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct){
 
 	phalcon_update_property_zval(getThis(), SL("_libmemcached"), &libmemcached);
 
+//#ifdef PHALCON_USE_PHP_SESSION
+//	PHALCON_CALL_FUNCTIONW(return_value, "session_set_save_handler", getThis(), &PHALCON_GLOBAL(z_true));
+//#else
 	/* open callback */
 	array_init_size(&callable_open, 2);
 	phalcon_array_append(&callable_open, getThis(), 0);
@@ -199,9 +191,15 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, __construct){
 	phalcon_array_append(&callable_gc, getThis(), 0);
 	phalcon_array_append_string(&callable_gc, SL("gc"), 0);
 
-	PHALCON_CALL_FUNCTIONW(NULL, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
+	PHALCON_CALL_FUNCTIONW(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
+	PHALCON_CALL_FUNCTIONW(NULL, "session_register_shutdown");
+//#endif
+	if (!zend_is_true(return_value)) {
+		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "Sets user-level session storage functions failed");
+		RETURN_FALSE;
+	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_session_adapter_libmemcached_ce, getThis(), "__construct", options);
+	PHALCON_CALL_PARENTW(return_value, phalcon_session_adapter_libmemcached_ce, getThis(), "start");
 }
 
 /**
@@ -237,10 +235,12 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, read){
 	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE(libmemcached) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(&libmemcached, "get", sid, &lifetime);
-		return;
+		PHALCON_CALL_METHODW(return_value, &libmemcached, "get", sid, &lifetime);
+		if (Z_TYPE_P(return_value)!=IS_STRING) {
+			RETURN_EMPTY_STRING();
+		}
 	} else {
-		RETURN_FALSE;
+		RETURN_EMPTY_STRING();
 	}
 }
 
@@ -259,7 +259,9 @@ PHP_METHOD(Phalcon_Session_Adapter_Libmemcached, write){
 	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE(libmemcached) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &libmemcached, "save", sid, data, &lifetime);	
+		PHALCON_CALL_METHODW(return_value, &libmemcached, "save", sid, data, &lifetime);
+	} else {
+		RETURN_FALSE;
 	}
 }
 

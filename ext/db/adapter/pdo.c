@@ -203,21 +203,21 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	 * Check for a username or use null as default
 	 */
 	if (phalcon_array_isset_fetch_str(&username, &descriptor, SL("username"))) {
-		phalcon_array_unset_str(&descriptor, SL("username"), 0);
+		phalcon_array_unset_str(&descriptor, SL("username"), PH_SEPARATE);
 	}
 
 	/**
 	 * Check for a password or use null as default
 	 */
 	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"))) {
-		phalcon_array_unset_str(&descriptor, SL("password"), 0);
+		phalcon_array_unset_str(&descriptor, SL("password"), PH_SEPARATE);
 	}
 
 	/**
 	 * Check if the developer has defined custom options or create one from scratch
 	 */
 	if (phalcon_array_isset_fetch_str(&options, &descriptor, SL("options"))) {
-		phalcon_array_unset_str(&descriptor, SL("options"), 0);
+		phalcon_array_unset_str(&descriptor, SL("options"), PH_SEPARATE);
 	} else {
 		array_init(&options);
 	}
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	 * Remove the dialectClass from the descriptor if any
 	 */
 	if (phalcon_array_isset_str(&descriptor, SL("dialectClass"))) {
-		phalcon_array_unset_str(&descriptor, SL("dialectClass"), 0);
+		phalcon_array_unset_str(&descriptor, SL("dialectClass"), PH_SEPARATE);
 	}
 
 	/**
@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	 * Check if the connection must be persistent
 	 */
 	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"))) {
-		phalcon_array_unset_str(&descriptor, SL("persistent"), 0);
+		phalcon_array_unset_str(&descriptor, SL("persistent"), PH_SEPARATE);
 		if (zend_is_true(&persistent)) {
 			phalcon_array_update_long_bool(&options, PDO_ATTR_PERSISTENT, 1, PH_COPY);
 		}

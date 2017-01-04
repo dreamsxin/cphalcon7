@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 * Check for a module
 	 */
 	if (phalcon_array_isset_fetch_str(&module_name, &options, SL("module"))) {
-		phalcon_array_unset_str(&options, SL("module"), PH_COPY);
+		phalcon_array_unset_str(&options, SL("module"), 0);
 	} else {
 		ZVAL_NULL(&module_name);
 	}
@@ -236,7 +236,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 * Check for a namespace
 	 */
 	if (phalcon_array_isset_fetch_str(&namespace_name, &options, SL("namespace"))) {
-		phalcon_array_unset_str(&options, SL("namespace"), PH_COPY);
+		phalcon_array_unset_str(&options, SL("namespace"), 0);
 	} else {
 		ZVAL_NULL(&namespace_name);
 	}
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 * Check for a task
 	 */
 	if (phalcon_array_isset_fetch_str(&task_name, &options, SL("task"))) {
-		phalcon_array_unset_str(&options, SL("task"), PH_COPY);
+		phalcon_array_unset_str(&options, SL("task"), 0);
 	} else {
 		ZVAL_NULL(&task_name);
 	}
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 	 * Check for an action
 	 */
 	if (phalcon_array_isset_fetch_str(&action_name, &options, SL("action"))) {
-		phalcon_array_unset_str(&options, SL("action"), PH_COPY);
+		phalcon_array_unset_str(&options, SL("action"), 0);
 	} else {
 		ZVAL_NULL(&action_name);
 	}

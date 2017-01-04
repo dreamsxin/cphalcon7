@@ -866,7 +866,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		if (phalcon_array_isset_fetch_str(&namespace_name, &parts, SL("namespace"))) {
 			PHALCON_CALL_METHODW(NULL, getThis(), "setnamespacename", &namespace_name);
-			phalcon_array_unset_str(&parts, SL("namespace"), PH_COPY);
+			phalcon_array_unset_str(&parts, SL("namespace"), 0);
 		} else {
 			PHALCON_CALL_METHODW(&default_namespace, route, "getdefaultnamespace");
 			if (Z_TYPE(default_namespace) == IS_NULL) {
@@ -880,7 +880,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		if (phalcon_array_isset_fetch_str(&module, &parts, SL("module"))) {
 			PHALCON_CALL_METHODW(NULL, getThis(), "setmodulename", &module);
-			phalcon_array_unset_str(&parts, SL("module"), PH_COPY);
+			phalcon_array_unset_str(&parts, SL("module"), 0);
 		} else {
 			PHALCON_CALL_METHODW(&default_module, route, "getdefaultmodule");
 			if (Z_TYPE(default_module) == IS_NULL) {
@@ -891,7 +891,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 		if (phalcon_array_isset_fetch_str(&exact, &parts, SL("\0exact"))) {
 			phalcon_update_property_zval(getThis(), SL("_isExactControllerName"), &exact);
-			phalcon_array_unset_str(&parts, SL("\0exact"), PH_COPY);
+			phalcon_array_unset_str(&parts, SL("\0exact"), 0);
 		} else {
 			ZVAL_FALSE(&exact);
 			phalcon_update_property_zval(getThis(), SL("_isExactControllerName"), &exact);
@@ -902,7 +902,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		if (phalcon_array_isset_fetch_str(&controller, &parts, SL("controller"))) {
 			PHALCON_CALL_METHODW(NULL, getThis(), "setcontrollername", &controller);
-			phalcon_array_unset_str(&parts, SL("controller"), PH_COPY);
+			phalcon_array_unset_str(&parts, SL("controller"), 0);
 		} else {
 			PHALCON_CALL_METHODW(&default_controller, route, "getdefaultcontroller");
 			if (Z_TYPE(default_controller) == IS_NULL) {
@@ -916,7 +916,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		if (phalcon_array_isset_fetch_str(&action, &parts, SL("action"))) {
 			PHALCON_CALL_METHODW(NULL, getThis(), "setactionname", &action);
-			phalcon_array_unset_str(&parts, SL("action"), PH_COPY);
+			phalcon_array_unset_str(&parts, SL("action"), 0);
 		} else {
 			PHALCON_CALL_METHODW(&default_action, route, "getdefaultaction");
 			if (Z_TYPE(default_action) == IS_NULL) {

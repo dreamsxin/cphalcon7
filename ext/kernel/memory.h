@@ -49,6 +49,9 @@ inline static void* phalcon_memory_void_get(phalcon_memory_void_value const* ptr
 	return NULL;
 }
 
+#define phalcon_memory_container_of(nodepointer, type, member) \
+  ((type *)((char *)(nodepointer) - offsetof(type, member)))
+
 void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr);
 void phalcon_deinitialize_memory();
 

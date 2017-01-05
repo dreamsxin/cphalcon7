@@ -18,9 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "kernel/phalcon_memory_pool.h"
-
-#include <assert.h>
+#include "kernel/avltree.h"
 
 phalcon_avltree_node *phalcon_avltree_first(const phalcon_avltree *tree)
 {
@@ -47,7 +45,7 @@ phalcon_avltree_node *phalcon_avltree_next(const phalcon_avltree_node *node)
 	return r;
 }
 
-phalcon_avltree_node *avltree_prev(const phalcon_avltree_node *node)
+phalcon_avltree_node *phalcon_avltree_prev(const phalcon_avltree_node *node)
 {
 	phalcon_avltree_node* r;
 
@@ -61,98 +59,6 @@ phalcon_avltree_node *avltree_prev(const phalcon_avltree_node *node)
 	return r;
 }
 
-/*
- * The AVL tree is more rigidly balanced than Red-Black trees, leading
- * to slower insertion and removal but faster retrieval.
- */
-
-/* node->balance = height(node->right) - height(node->left); */
-static void rotate_left_avl(phalcon_avltree_node *node, phalcon_avltree *tree)
-{
-	phalcon_avltree_node *p = node;
-	phalcon_avltree_node *q = phalcon_memory_void_get(&node->right); /* can't be NULL */
-	phalcon_avltree_node *parent = phalcon_avltree_get_parent_avl(p);
-
-	if (!phalcon_avltree_is_root_avl(p)) {
-
-		if (phalcon_memory_void_get(&parent->left) == p)
-			phalcon_memory_void_set(&parent->left, q);
-		else
-			phalcon_memory_void_set(&parent->right, q);
-
-	} else {
-		phalcon_memory_void_set(&tree->root, q);
-	}
-
-	phalcon_avltree_set_parent_avl(parent, q);
-	phalcon_avltree_set_parent_avl(q, p);
-
-	phalcon_memory_void_set(&p->right, phalcon_memory_void_get(&q->left));
-
-	if (phalcon_memory_void_get(&p->right))
-		phalcon_avltree_set_parent_avl(p, phalcon_memory_void_get(&p->right));
-
-	phalcon_memory_void_set(&q->left, p);
-}
-
-static void rotate_right_avl(phalcon_avltree_node *node, phalcon_avltree *tree)
-{
-	phalcon_avltree_node *p = node;
-	phalcon_avltree_node *q = phalcon_memory_void_get(&node->left) ; /* can't be NULL */
-	phalcon_avltree_node *parent = phalcon_avltree_get_parent_avl(p);
-
-	if (!phalcon_avltree_is_root_avl(p)) {
-
-		if (phalcon_memory_void_get(&parent->left) == p)
-			phalcon_memory_void_set(&parent->left, q);
-		else
-			phalcon_memory_void_set(&parent->right, q);
-
-	} else {
-		phalcon_memory_void_set(&tree->root, q);
-	}
-
-	phalcon_avltree_set_parent_avl(parent, q);
-	phalcon_avltree_set_parent_avl(q, p);
-
-	phalcon_memory_void_set(&p->left,	phalcon_memory_void_get(&q->right));
-
-	if (phalcon_memory_void_get(&p->left))
-		phalcon_avltree_set_parent_avl(p, phalcon_memory_void_get(&p->left));
-
-	phalcon_memory_void_set(&q->right, p);
-}
-
-/*
- * 'pparent', 'unbalanced' and 'is_left' are only used for
- * insertions. Normally GCC will notice this and get rid of them for
- * lookups.
- */
-static inline phalcon_avltree_node *do_lookup_avl(const phalcon_avltree_node *key, phalcon_avltree_node_compare cmp, const phalcon_avltree *tree, phalcon_avltree_node **pparent, phalcon_avltree_node **unbalanced, int *is_left)
-{
-	phalcon_avltree_node *node = phalcon_memory_void_get(&tree->root);
-	int res = 0;
-
-	*pparent = NULL;
-	*unbalanced = node;
-	*is_left = 0;
-
-	while (node) {
-		if (phalcon_avltree_get_balance(node) != 0)
-			*unbalanced = node;
-
-		res = cmp(node, key);
-		if (res == 0)
-			return node;
-		*pparent = node;
-		if ((*is_left = res > 0))
-			node = phalcon_memory_void_get(&node->left);
-		else
-			node = phalcon_memory_void_get(&node->right);
-	}
-	return NULL;
-}
-
 phalcon_avltree_node *phalcon_avltree_lookup(const phalcon_avltree_node *key,
 											phalcon_avltree_node_compare cmp,
 											const phalcon_avltree *tree)
@@ -160,13 +66,7 @@ phalcon_avltree_node *phalcon_avltree_lookup(const phalcon_avltree_node *key,
 	phalcon_avltree_node *parent, *unbalanced;
 	int is_left;
 
-	return do_lookup_avl(key, cmp, tree, &parent, &unbalanced, &is_left);
-}
-
-inline static void set_child_avl(phalcon_avltree_node *child, phalcon_avltree_node *node, int left)
-{
-	if (left) phalcon_memory_void_set(&node->left , child);
-	else phalcon_memory_void_set(&node->right, child);
+	return phalcon_avltree_do_lookup_avl(key, cmp, tree, &parent, &unbalanced, &is_left);
 }
 
 /* Insertion never needs more than 2 rotations */
@@ -175,7 +75,7 @@ phalcon_avltree_node *phalcon_avltree_insert(phalcon_avltree_node *node, phalcon
 	phalcon_avltree_node *key, *parent, *unbalanced;
 	int is_left;
 
-	key = do_lookup_avl(node, cmp, tree, &parent, &unbalanced, &is_left);
+	key = phalcon_avltree_do_lookup_avl(node, cmp, tree, &parent, &unbalanced, &is_left);
 
 	if (key)
 		return key;
@@ -203,7 +103,7 @@ phalcon_avltree_node *phalcon_avltree_insert(phalcon_avltree_node *node, phalcon
 	}
 
 	phalcon_avltree_set_parent_avl(parent, node);
-	set_child_avl(node, parent, is_left);
+	phalcon_avltree_set_child_avl(node, parent, is_left);
 
 	for (;;) {
 
@@ -222,7 +122,8 @@ phalcon_avltree_node *phalcon_avltree_insert(phalcon_avltree_node *node, phalcon
 
 	switch (phalcon_avltree_get_balance(unbalanced)) {
 
-	case	1: case -1:
+	case 1:
+	case -1:
 		tree->height++;
 		/* fall through */
 	case 0:
@@ -252,9 +153,9 @@ phalcon_avltree_node *phalcon_avltree_insert(phalcon_avltree_node *node, phalcon
 				break;
 			}
 			phalcon_avltree_set_balance(0, phalcon_memory_void_get(&right->left));
-			rotate_right_avl(right, tree);
+			phalcon_avltree_rotate_right_avl(right, tree);
 		}
-		rotate_left_avl(unbalanced, tree);
+		phalcon_avltree_rotate_left_avl(unbalanced, tree);
 		break;
 	}
 
@@ -281,10 +182,10 @@ phalcon_avltree_node *phalcon_avltree_insert(phalcon_avltree_node *node, phalcon
 			}
 			phalcon_avltree_set_balance(0, phalcon_memory_void_get(&left->right));
 
-			rotate_left_avl(left, tree);
+			phalcon_avltree_rotate_left_avl(left, tree);
 		}
 
-		rotate_right_avl(unbalanced, tree);
+		phalcon_avltree_rotate_right_avl(unbalanced, tree);
 		break;
 	}
 	}
@@ -303,7 +204,7 @@ void phalcon_avltree_remove(phalcon_avltree_node *node, phalcon_avltree *tree)
 	if (node == phalcon_memory_void_get(&tree->first))
 		phalcon_memory_void_set(&tree->first, phalcon_avltree_next(node));
 	if (node == phalcon_memory_void_get(&tree->last))
-		phalcon_memory_void_set(&tree->last, avltree_prev(node));
+		phalcon_memory_void_set(&tree->last, phalcon_avltree_prev(node));
 
 	if (!left)
 		next = right;
@@ -314,7 +215,7 @@ void phalcon_avltree_remove(phalcon_avltree_node *node, phalcon_avltree *tree)
 
 	if (parent) {
 		is_left = phalcon_memory_void_get(&parent->left) == node;
-		set_child_avl(next, parent, is_left);
+		phalcon_avltree_set_child_avl(next, parent, is_left);
 	} else
 		phalcon_memory_void_set(&tree->root, next);
 
@@ -388,7 +289,7 @@ void phalcon_avltree_remove(phalcon_avltree_node *node, phalcon_avltree *tree)
 			case 0:				/* case 3.1 */
 				phalcon_avltree_set_balance( 1, node);
 				phalcon_avltree_set_balance(-1, right);
-				rotate_left_avl(node, tree);
+				phalcon_avltree_rotate_left_avl(node, tree);
 				return;
 			case 1:				/* case 3.2 */
 				phalcon_avltree_set_balance(0, node);
@@ -411,9 +312,9 @@ void phalcon_avltree_remove(phalcon_avltree_node *node, phalcon_avltree *tree)
 				}
 				phalcon_avltree_set_balance(0, phalcon_memory_void_get(&right->left));
 
-				rotate_right_avl(right, tree);
+				phalcon_avltree_rotate_right_avl(right, tree);
 			}
-			rotate_left_avl(node, tree);
+			phalcon_avltree_rotate_left_avl(node, tree);
 		} else {
 			is_left = parent && phalcon_memory_void_get(&parent->left) == node;
 
@@ -427,7 +328,7 @@ void phalcon_avltree_remove(phalcon_avltree_node *node, phalcon_avltree *tree)
 			case 0:
 				phalcon_avltree_set_balance(-1, node);
 				phalcon_avltree_set_balance(1, left);
-				rotate_right_avl(node, tree);
+				phalcon_avltree_rotate_right_avl(node, tree);
 				return;
 			case -1:
 				phalcon_avltree_set_balance(0, node);
@@ -450,9 +351,9 @@ void phalcon_avltree_remove(phalcon_avltree_node *node, phalcon_avltree *tree)
 				}
 				phalcon_avltree_set_balance(0, phalcon_memory_void_get(&left->right));
 
-				rotate_left_avl(left, tree);
+				phalcon_avltree_rotate_left_avl(left, tree);
 			}
-			rotate_right_avl(node, tree);
+			phalcon_avltree_rotate_right_avl(node, tree);
 		}
 	}
 	tree->height--;
@@ -463,7 +364,7 @@ void phalcon_avltree_replace(phalcon_avltree_node *old, phalcon_avltree_node *n,
 	phalcon_avltree_node *parent = phalcon_avltree_get_parent_avl(old);
 
 	if (parent) {
-		set_child_avl(n, parent, phalcon_memory_void_get(&parent->left) == old);
+		phalcon_avltree_set_child_avl(n, parent, phalcon_memory_void_get(&parent->left) == old);
 	} else {
 		phalcon_memory_void_set(&tree->root, n);
 	}

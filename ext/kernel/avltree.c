@@ -59,9 +59,7 @@ phalcon_avltree_node *phalcon_avltree_prev(const phalcon_avltree_node *node)
 	return r;
 }
 
-phalcon_avltree_node *phalcon_avltree_lookup(const phalcon_avltree_node *key,
-											phalcon_avltree_node_compare cmp,
-											const phalcon_avltree *tree)
+phalcon_avltree_node *phalcon_avltree_lookup(const phalcon_avltree_node *key, phalcon_avltree_node_compare cmp, const phalcon_avltree *tree)
 {
 	phalcon_avltree_node *parent, *unbalanced;
 	int is_left;

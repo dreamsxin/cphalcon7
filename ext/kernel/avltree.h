@@ -153,7 +153,7 @@ static void phalcon_avltree_rotate_right_avl(phalcon_avltree_node *node, phalcon
 	phalcon_avltree_set_parent_avl(parent, q);
 	phalcon_avltree_set_parent_avl(q, p);
 
-	phalcon_memory_void_set(&p->left,	phalcon_memory_void_get(&q->right));
+	phalcon_memory_void_set(&p->left, phalcon_memory_void_get(&q->right));
 
 	if (phalcon_memory_void_get(&p->left))
 		phalcon_avltree_set_parent_avl(p, phalcon_memory_void_get(&p->left));
@@ -163,7 +163,7 @@ static void phalcon_avltree_rotate_right_avl(phalcon_avltree_node *node, phalcon
 
 inline static void phalcon_avltree_set_child_avl(phalcon_avltree_node *child, phalcon_avltree_node *node, int left)
 {
-	if (left) phalcon_memory_void_set(&node->left , child);
+	if (left) phalcon_memory_void_set(&node->left, child);
 	else phalcon_memory_void_set(&node->right, child);
 }
 

@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -22,6 +23,31 @@
 
 #include "php_phalcon.h"
 #include "kernel/main.h"
+
+#include <stdint.h>
+
+typedef struct _phalcon_memory_void_value {
+    ptrdiff_t offset;
+} phalcon_memory_void_value;
+
+inline static void phalcon_memory_void_set(phalcon_memory_void_value* ptr, void* addr) {
+	if (addr == ptr) {
+		ptr->offset = INTPTR_MIN;
+	} else if (addr) {
+		ptr->offset = (char const*)addr - (char const*)ptr;
+	} else {
+		ptr->offset = 0;
+	}
+}
+
+inline static void* phalcon_memory_void_get(phalcon_memory_void_value const* ptr) {
+	if (INTPTR_MIN == ptr->offset) {
+		return (void*)ptr;
+	} else if (ptr->offset) {
+		return (char*)ptr + ptr->offset;
+	}
+	return NULL;
+}
 
 void phalcon_initialize_memory(zend_phalcon_globals *phalcon_globals_ptr);
 void phalcon_deinitialize_memory();

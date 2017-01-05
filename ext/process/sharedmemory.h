@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -18,32 +18,13 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_KERNEL_SHM_H
-#define PHALCON_KERNEL_SHM_H
+#ifndef PHALCON_PROCESS_SHAREDMEMORY_H
+#define PHALCON_PROCESS_SHAREDMEMORY_H
 
-typedef struct _phalcon_shared_memory {
-  int     owner;
-  char    name[255];
-  size_t  lenght;
-  sem_t*  sem;
-  int     fd;
-  void*   mem;
-} phalcon_shared_memory;
+#include "php_phalcon.h"
 
-phalcon_shared_memory* phalcon_shared_memory_create(char const* name, size_t);
-phalcon_shared_memory* phalcon_shared_memory_open(char const* name);
+extern zend_class_entry *phalcon_process_sharedmemory_ce;
 
-void phalcon_shared_memory_unlink(char const* name);
-void phalcon_shared_memory_cleanup(phalcon_shared_memory* src);
+PHALCON_INIT_CLASS(Phalcon_Process_Sharedmemory);
 
-char const* phalcon_shared_memory_name(phalcon_shared_memory const* src);
-
-int phalcon_shared_memory_trylock(phalcon_shared_memory* src);
-int phalcon_shared_memory_lock(phalcon_shared_memory* src);
-int phalcon_shared_memory_unlock(phalcon_shared_memory* src);
-int phalcon_shared_memory_unlock_force(phalcon_shared_memory* src);
-
-void* phalcon_shared_memory_ptr(phalcon_shared_memory const* src);
-size_t phalcon_shared_memory_size(phalcon_shared_memory const* src);
-
-#endif /* PHALCON_KERNEL_SHM_H */
+#endif /* PHALCON_PROCESS_SHAREDMEMORY_H */

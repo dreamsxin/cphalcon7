@@ -35,19 +35,10 @@
 #include <sys/mman.h>
 #include <semaphore.h>
 
-struct phalcon_shma_s {
-  int     owner;
-  char    name[255];
-  size_t  lenght;
-  sem_t*  sem;
-  int     fd;
-  void*   mem;
-};
-
-phalcon_mshm_t* phalcon_mshm_create(char const* name, size_t sz)
+phalcon_shared_memory* phalcon_shared_memory_create(char const* name, size_t sz)
 {
   int rc = 0;
-  struct phalcon_shma_s* shma = malloc(sizeof(*shma));
+  phalcon_shared_memory* shma = malloc(sizeof(*shma));
   memset(shma, 0, sizeof(*shma));
 
   strncpy(shma->name, name, sizeof(shma->name));
@@ -86,15 +77,15 @@ phalcon_mshm_t* phalcon_mshm_create(char const* name, size_t sz)
   return shma;
 
 error:
-  phalcon_mshm_cleanup(shma);
+  phalcon_shared_memory_cleanup(shma);
   errno = rc;
   return NULL;
 }
 
-phalcon_mshm_t* phalcon_mshm_open(char const* name)
+phalcon_shared_memory* phalcon_shared_memory_open(char const* name)
 {
   int rc = 0;
-  struct phalcon_shma_s* shma = malloc(sizeof(*shma));
+  phalcon_shared_memory* shma = malloc(sizeof(*shma));
   memset(shma, 0, sizeof(*shma));
   strncpy(shma->name, name, sizeof(shma->name));
 
@@ -130,23 +121,22 @@ phalcon_mshm_t* phalcon_mshm_open(char const* name)
   return shma;
 
 error:
-  phalcon_mshm_cleanup(shma);
+  phalcon_shared_memory_cleanup(shma);
   errno  = rc;
   return NULL;
 }
 
-void phalcon_mshm_unlink(char const* name)
+void phalcon_shared_memory_unlink(char const* name)
 {
   sem_unlink(name);
-  shm_unlink(name);
 }
 
-void phalcon_mshm_cleanup(phalcon_mshm_t* src)
+void phalcon_shared_memory_cleanup(phalcon_shared_memory* src)
 {
   if (!src)
     return;
 
-  struct phalcon_shma_s* shma = (struct phalcon_shma_s*)src;
+  phalcon_shared_memory* shma = (phalcon_shared_memory*)src;
 
   if (shma->mem) {
     munmap(shma->mem, shma->lenght);
@@ -164,16 +154,16 @@ void phalcon_mshm_cleanup(phalcon_mshm_t* src)
   free(shma);
 }
 
-char const* phalcon_mshm_name(phalcon_mshm_t const* src)
+char const* phalcon_shared_memory_name(phalcon_shared_memory const* src)
 {
-  struct phalcon_shma_s* shma = (struct phalcon_shma_s*)src;
+  phalcon_shared_memory* shma = (phalcon_shared_memory*)src;
   return shma->name;
 }
 
 
-int phalcon_mshm_trylock(phalcon_mshm_t* src)
+int phalcon_shared_memory_trylock(phalcon_shared_memory* src)
 {
-  struct phalcon_shma_s* shma = (struct phalcon_shma_s*)src;
+  phalcon_shared_memory* shma = (phalcon_shared_memory*)src;
 
   if (!shma->sem) {
     errno = EINVAL;
@@ -187,9 +177,9 @@ int phalcon_mshm_trylock(phalcon_mshm_t* src)
   return 1;
 }
 
-int phalcon_mshm_lock(phalcon_mshm_t* src)
+int phalcon_shared_memory_lock(phalcon_shared_memory* src)
 {
-  struct phalcon_shma_s* shma = (struct phalcon_shma_s*)src;
+  phalcon_shared_memory* shma = (phalcon_shared_memory*)src;
 
   if (!shma->sem) {
     errno = EINVAL;
@@ -211,9 +201,9 @@ int phalcon_mshm_lock(phalcon_mshm_t* src)
   return 1;
 }
 
-int phalcon_mshm_unlock(phalcon_mshm_t* src)
+int phalcon_shared_memory_unlock(phalcon_shared_memory* src)
 {
-  struct phalcon_shma_s* shma = (struct phalcon_shma_s*)src;
+  phalcon_shared_memory* shma = (phalcon_shared_memory*)src;
 
   if (!shma->sem) {
     errno = EINVAL;
@@ -227,9 +217,9 @@ int phalcon_mshm_unlock(phalcon_mshm_t* src)
   return 1;
 }
 
-int phalcon_mshm_unlock_force(phalcon_mshm_t* src)
+int phalcon_shared_memory_unlock_force(phalcon_shared_memory* src)
 {
-  struct phalcon_shma_s* shma = (struct phalcon_shma_s*)src;
+  phalcon_shared_memory* shma = (phalcon_shared_memory*)src;
   if (!shma->sem) {
     errno = EINVAL;
     return 1;
@@ -253,16 +243,16 @@ int phalcon_mshm_unlock_force(phalcon_mshm_t* src)
   return 1;
 }
 
-void* phalcon_mshm_memory_ptr(phalcon_mshm_t const* src)
+void* phalcon_shared_memory_ptr(phalcon_shared_memory const* src)
 {
-  struct phalcon_shma_s* shma = (struct phalcon_shma_s*)src;
+  phalcon_shared_memory* shma = (phalcon_shared_memory*)src;
   if (!shma->mem) errno = EINVAL;
   return shma->mem;
 }
 
-size_t phalcon_mshm_memory_size(phalcon_mshm_t const* src)
+size_t phalcon_shared_memory_size(phalcon_shared_memory const* src)
 {
-  struct phalcon_shma_s* shma = (struct phalcon_shma_s*)src;
+  phalcon_shared_memory* shma = (phalcon_shared_memory*)src;
   struct stat sb;
 
   if (fstat(shma->fd, &sb)) {

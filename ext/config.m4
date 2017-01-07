@@ -811,48 +811,77 @@ process/exception.c"
 		fi
 
 		AC_MSG_CHECKING([checking libqrencode support])
-		for i in /usr/local /usr; do
+		for i in /usr/local /usr ../deps/libqrencode; do
 			if test -r $i/include/qrencode.h; then
-				QR_CFLAGS=`pkg-config --cflags libqrencode`
-				QR_LDFLAGS=`pkg-config --libs libqrencode`
-
 				PHP_ADD_INCLUDE($i/include)
-
-				CPPFLAGS="${CPPFLAGS} ${QR_CFLAGS}"
-				EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${QR_LDFLAGS}"
-
-				AC_MSG_RESULT(yes)
-
-				AC_DEFINE([PHALCON_USE_QRENCODE], [1], [Have libqrencode support])
+				PHP_CHECK_LIBRARY(qrencode, QRcode_encodeString,
+				[
+					PHP_ADD_LIBRARY_WITH_PATH(qrencode, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+					AC_DEFINE(PHALCON_USE_QRENCODE, 1, [Have qrencode support])
+				],[
+					AC_MSG_ERROR([Wrong qrencode version or library not found])
+				],[
+					-L$i/$PHP_LIBDIR -lm
+				])
 				break
 			fi
 		done
-
-		if test -z "$QR_LDFLAGS"; then
-			AC_MSG_ERROR([Incorrect libqrencode library])
-		fi
 
 		AC_MSG_CHECKING([checking libzbar support])
 		for i in /usr/local /usr; do
 			if test -r $i/include/zbar.h; then
-				ZBAR_CFLAGS=`pkg-config --cflags zbar`
-				ZBAR_LDFLAGS=`pkg-config --libs zbar`
-
 				PHP_ADD_INCLUDE($i/include)
-
-				CPPFLAGS="${CPPFLAGS} ${ZBAR_CFLAGS}"
-				EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${ZBAR_LDFLAGS}"
-
-				AC_MSG_RESULT(yes)
-
-				AC_DEFINE([PHALCON_USE_ZBAR], [1], [Have libzbar support])
+				PHP_CHECK_LIBRARY(zbar, zbar_scan_image,
+				[
+					PHP_ADD_LIBRARY_WITH_PATH(qrencode, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+					AC_DEFINE(PHALCON_USE_ZBAR, 1, [Have libzbar support])
+				],[
+					AC_MSG_ERROR([Wrong zbar version or library not found])
+				],[
+					-L$i/$PHP_LIBDIR -lm
+				])
 				break
 			fi
 		done
-		if test -z "$ZBAR_LDFLAGS"; then
-			AC_MSG_ERROR([Incorrect libzbar library])
-		fi
 	fi
+
+	AC_MSG_CHECKING([for libuv files in default path])
+	for i in /usr/local /usr ../deps/libuv; do
+		if test -r $i/include/uv.h; then
+			PHP_ADD_INCLUDE($i/include)
+			PHP_CHECK_LIBRARY(uv, uv_version,
+			[
+				PHP_ADD_LIBRARY_WITH_PATH(uv, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+				AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
+			],[
+				AC_MSG_ERROR([Wrong uv version or library not found])
+			],[
+				-L$i/$PHP_LIBDIR -lm
+			])
+			break
+		else
+			AC_MSG_RESULT([no, found in $i])
+		fi
+	done
+
+	AC_MSG_CHECKING([for libwebsockets files in default path])
+	for i in /usr/local /usr ../deps/libwebsockets; do
+		if test -r $i/include/libwebsockets.h; then
+			PHP_ADD_INCLUDE($i/include)
+			PHP_CHECK_LIBRARY(websockets, lws_callback_on_writable,
+			[
+				PHP_ADD_LIBRARY_WITH_PATH(websockets, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+				AC_DEFINE(PHALCON_USE_WEBSOCKET, 1, [Have WebSocket support])
+			],[
+				AC_MSG_ERROR([Wrong websockets version or library not found])
+			],[
+				-L$i/$PHP_LIBDIR -lm
+			])
+			break
+		else
+			AC_MSG_RESULT([no, found in $i])
+		fi
+	done
 
 	PHP_ADD_MAKEFILE_FRAGMENT([Makefile.frag])
 fi

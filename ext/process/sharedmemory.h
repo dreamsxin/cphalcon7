@@ -23,6 +23,9 @@
 
 #include "php_phalcon.h"
 
+extern int phalcon_sharedmemory_handle;
+#define phalcon_sharedmemory_handle_name "sharedmemory"
+
 extern zend_class_entry *phalcon_process_sharedmemory_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Process_Sharedmemory);

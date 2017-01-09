@@ -74,6 +74,8 @@ void phalcon_websocket_server_free_object_storage_handler(ws_server_obj *intern)
 void phalcon_websocket_server_register_class();
 zend_bool phalcon_websocket_server_invoke_eventloop_cb(ws_server_obj *intern, const char *func, int fd, int flags);
 
+#define PHALCON_WEBSOCKET_FREQUENCY 0.2
+
 extern int  phalcon_websocket_server_handle;
 #define phalcon_websocket_server_handle_name "websocket_server"
 

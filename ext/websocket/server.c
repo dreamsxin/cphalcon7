@@ -19,7 +19,7 @@
 */
 
 #include "websocket/server.h"
-#include "websocket/eventloop.h"
+#include "websocket/eventloopinterface.h"
 
 #include <php_network.h>
 #include <zend_interfaces.h>
@@ -451,12 +451,12 @@ PHALCON_INIT_CLASS(Phalcon_Websocket_Server){
 	memcpy(&phalcon_websocket_server_objectect_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 	phalcon_websocket_server_objectect_handlers.free_obj = (zend_object_free_obj_t) phalcon_websocket_server_free_object_storage_handler;
 
-	zend_declare_class_constant_long(phalcon_websocket_server_ce, ZEND_STRL("ON_ACCEPT"), PHP_CB_SERVER_ACCEPT);
-	zend_declare_class_constant_long(phalcon_websocket_server_ce, ZEND_STRL("ON_CLOSE"), PHP_CB_SERVER_CLOSE);
-	zend_declare_class_constant_long(phalcon_websocket_server_ce, ZEND_STRL("ON_DATA"), PHP_CB_SERVER_DATA);
-	zend_declare_class_constant_long(phalcon_websocket_server_ce, ZEND_STRL("ON_TICK"), PHP_CB_SERVER_TICK);
-	zend_declare_class_constant_long(phalcon_websocket_server_ce, ZEND_STRL("ON_FILTER_CONNECTION"), PHP_CB_SERVER_FILTER_CONNECTION);
-	zend_declare_class_constant_long(phalcon_websocket_server_ce, ZEND_STRL("ON_FILTER_HEADERS"), PHP_CB_SERVER_FILTER_HEADERS);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_ACCEPT"), PHP_CB_SERVER_ACCEPT);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_CLOSE"), PHP_CB_SERVER_CLOSE);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_DATA"), PHP_CB_SERVER_DATA);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_TICK"), PHP_CB_SERVER_TICK);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_FILTER_CONNECTION"), PHP_CB_SERVER_FILTER_CONNECTION);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_FILTER_HEADERS"), PHP_CB_SERVER_FILTER_HEADERS);
 
 	return SUCCESS;
 }
@@ -493,7 +493,7 @@ PHP_METHOD(Phalcon_Websocket_Server, setEventLoop)
 	phalcon_websocket_server_object *intern;
 
 	ZEND_PARSE_PARAMETERS_START(1, 1);
-		Z_PARAM_OBJECT_OF_CLASS(el, phalcon_websocket_eventloop_ce)
+		Z_PARAM_OBJECT_OF_CLASS(el, phalcon_websocket_eventloopinterface_ce)
 	ZEND_PARSE_PARAMETERS_END();
 
 	intern = phalcon_websocket_object_from_obj(getThis());
@@ -545,7 +545,7 @@ PHP_METHOD(Phalcon_Websocket_Server, run)
 	ws_connection_obj *conn;
 	struct lws *context;
 	int n = 0;
-	unsigned int ms = 0, oldMs = 0, tickInterval = 1000 / PHP_WEBSOCKET_FREQUENCY;
+	unsigned int ms = 0, oldMs = 0, tickInterval = 1000 / PHALCON_WEBSOCKET_FREQUENCY;
 	int nextTick = 0;
 	struct timeval tv;
 	zend_string *text;

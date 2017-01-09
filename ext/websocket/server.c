@@ -73,16 +73,19 @@ static const zend_function_entry phalcon_websocket_server_method_entry[] = {
 	PHP_FE_END
 };
 
-enum ws_protocols {
-	PROTOCOL_EXTPHP = 0,
-
-	PROTOCOLS_COUNT
+static struct lws_protocols protocols[] = {
+	{
+		"php_userspace",					/* Name */
+		callback_ext_php,					/* Callback */
+		sizeof(zval)
+	},
+	{ NULL, NULL, 0 }
 };
 
-int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
+static int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
 {
 	phalcon_websocket_server_object *intern = phalcon_websocket_server_object_from_ctx(wsi->context);
-	ws_connection_obj * wsconn;
+	phalcon_websocket_connection_object * wsconn;
 	zval *connection = user;
 	zval retval;
 	int n, return_code = 0;
@@ -94,31 +97,31 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 		/** External event loop **/
 		case LWS_CALLBACK_ADD_POLL_FD:
 			if (intern->eventloop) {
-				return_code = invoke_eventloop_cb(intern, "add", pa->fd, pa->events);
+				return_code = phalcon_websocket_server_invoke_eventloop_cb(intern, "add", pa->fd, pa->events);
 			}
 			break;
 
 		case LWS_CALLBACK_DEL_POLL_FD:
 			if (intern->eventloop) {
-				return_code = invoke_eventloop_cb(intern, "delete", pa->fd, -1);
+				return_code = phalcon_websocket_server_invoke_eventloop_cb(intern, "delete", pa->fd, -1);
 			}
 			break;
 
 		case LWS_CALLBACK_CHANGE_MODE_POLL_FD:
 			if (intern->eventloop) {
-				return_code = invoke_eventloop_cb(intern, "setmode", pa->fd, pa->events);
+				return_code = phalcon_websocket_server_invoke_eventloop_cb(intern, "setmode", pa->fd, pa->events);
 			}
 			break;
 
 		case LWS_CALLBACK_LOCK_POLL:
 			if (intern->eventloop) {
-				return_code = invoke_eventloop_cb(intern, "lock", 0, -1);
+				return_code = phalcon_websocket_server_invoke_eventloop_cb(intern, "lock", 0, -1);
 			}
 			break;
 
 		case LWS_CALLBACK_UNLOCK_POLL:
 			if (intern->eventloop) {
-				return_code = invoke_eventloop_cb(intern, "unlock", 0, -1);
+				return_code = phalcon_websocket_server_invoke_eventloop_cb(intern, "unlock", 0, -1);
 			}
 			break;
 		/** End external event loop **/
@@ -156,7 +159,7 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 				user_cb->fci->param_count = 2;
 				user_cb->fci->params = params;
 				user_cb->fci->retval = &retval;
-				if (SUCCESS != zend_call_function(user_cb->fci, user_cb->fcc TSRMLS_CC)) {
+				if (SUCCESS != zend_call_function(user_cb->fci, user_cb->fcc)) {
 					php_error_docref(NULL, E_WARNING, "Unable to call close callback");
 				}
 				zval_dtor(&retval);
@@ -173,7 +176,7 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 				user_cb->fci->param_count = 2;
 				user_cb->fci->params = params;
 				user_cb->fci->retval = &retval;
-				if (SUCCESS != zend_call_function(user_cb->fci, user_cb->fcc TSRMLS_CC)) {
+				if (SUCCESS != zend_call_function(user_cb->fci, user_cb->fcc)) {
 					php_error_docref(NULL, E_WARNING, "Unable to call filter callback");
 				}
 
@@ -186,8 +189,8 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 			break;
 
 		case LWS_CALLBACK_ESTABLISHED:
-			object_init_ex(connection, ws_connection_ce);
-			wsconn = (ws_connection_obj *) Z_OBJ_P(connection);
+			object_init_ex(connection, phalcon_websocket_connection_ce);
+			wsconn = phalcon_websocket_connection_object_from_obj(connection);
 			wsconn->id = ++intern->next_id;
 			printf("Accept connection %lu\n", wsconn->id);
 			wsconn->wsi = wsi;
@@ -209,9 +212,9 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 				user_cb->fci->no_separation = (zend_bool) 0;
 
 				printf("Ready to call accept handler\n");
-				int res = zend_call_function(user_cb->fci, user_cb->fcc TSRMLS_CC);
+				int res = zend_call_function(user_cb->fci, user_cb->fcc);
 				if (SUCCESS != res) {
-					php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to call accept callback");
+					php_error_docref(NULL, E_WARNING, "Unable to call accept callback");
 				}
 				zval_dtor(&retval);
 			}
@@ -226,12 +229,11 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 				// TODO Check if message is complete before calling CB
 				ZVAL_OBJ(&params[0], &intern->std);
 				ZVAL_COPY_VALUE(&params[1], connection);
-				ZVAL_COPY_VALUE(&params[2], connection);
 				ZVAL_STRINGL(&params[2], in, len);
 				user_cb->fci->param_count = 3;
 				user_cb->fci->params = params;
 				user_cb->fci->retval = &retval;
-				if (SUCCESS != zend_call_function(user_cb->fci, user_cb->fcc TSRMLS_CC)) {
+				if (SUCCESS != zend_call_function(user_cb->fci, user_cb->fcc)) {
 					php_error_docref(NULL, E_WARNING, "Unable to call data callback");
 				}
 
@@ -243,7 +245,7 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 
 				// If return is different from true (or assimilated), close connection
 				if (!zval_is_true(&retval)) {
-					wsconn = (ws_connection_obj *) Z_OBJ_P(connection);
+					wsconn = phalcon_websocket_connection_object_from_obj(connection);
 					wsconn->connected = 0;
 					return_code = -1;
 				}
@@ -253,7 +255,7 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 			break;
 
 		case LWS_CALLBACK_SERVER_WRITEABLE:
-			wsconn = (ws_connection_obj *) Z_OBJ_P(connection);
+			wsconn = phalcon_websocket_connection_object_from_obj(connection);
 			if (!wsconn->connected) {
 				return_code = -1;
 				break;
@@ -288,7 +290,7 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 
 		case LWS_CALLBACK_CLOSED:
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
-			wsconn = (ws_connection_obj *) Z_OBJ_P(connection);
+			wsconn = phalcon_websocket_connection_object_from_obj(connection);
 			wsconn->connected = 0;
 			printf("Close %lu.\n", wsconn->id);
 
@@ -305,7 +307,7 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 				user_cb->fci->param_count = 2;
 				user_cb->fci->params = params;
 				user_cb->fci->retval = &retval;
-				if (SUCCESS != zend_call_function(user_cb->fci, user_cb->fcc TSRMLS_CC)) {
+				if (SUCCESS != zend_call_function(user_cb->fci, user_cb->fcc)) {
 					php_error_docref(NULL, E_WARNING, "Unable to call close callback");
 				}
 				zval_dtor(&retval);
@@ -326,20 +328,6 @@ int callback_ext_php(struct lws *wsi, enum lws_callback_reasons reason, void *us
 	return intern->exit_request == 1 ? -1 : return_code;
 }
 
-struct _ws_protocol_storage {
-	zval* php_obj;
-	ws_server_obj *obj;
-};
-
-static struct lws_protocols protocols[] = {
-	{
-		"php_userspace",					/* Name */
-		callback_ext_php,					/* Callback */
-		sizeof(struct _ws_protocol_storage)	/* Per_session_data_size */
-	},
-	{ NULL, NULL, 0 }
-};
-
 zend_object_handlers phalcon_websocket_server_objectect_handler;
 zend_object* phalcon_websocket_server_create_object_handler(zend_class_entry *ce)
 {
@@ -353,7 +341,6 @@ zend_object* phalcon_websocket_server_create_object_handler(zend_class_entry *ce
 
 	// Set LibWebsockets default options
 	memset(&intern->info, 0, sizeof(intern->info));
-	intern->info->_unused[0] = intern
 	intern->info.uid = -1;
 	intern->info.gid = -1;
 	intern->info.ssl_private_key_filepath = intern->info.ssl_cert_filepath = NULL;	//FIXME HTTPS
@@ -543,8 +530,7 @@ PHP_METHOD(Phalcon_Websocket_Server, serviceFd)
 PHP_METHOD(Phalcon_Websocket_Server, run)
 {
 	phalcon_websocket_server_object *intern;
-	ws_connection_obj *conn;
-	struct lws *context;
+	phalcon_websocket_connection_object *conn;
 	int n = 0;
 	unsigned int ms = 0, oldMs = 0, tickInterval = 1000 / PHALCON_WEBSOCKET_FREQUENCY;
 	int nextTick = 0;
@@ -553,7 +539,6 @@ PHP_METHOD(Phalcon_Websocket_Server, run)
 
 	// Start WebSocket
 	intern = phalcon_websocket_server_object_from_obj(getThis());
-
 	intern->context = lws_create_context(&intern->info);
 
 	// If an external event loop is used, nothing more to do
@@ -572,7 +557,7 @@ PHP_METHOD(Phalcon_Websocket_Server, run)
 				intern->callbacks[PHP_CB_SERVER_TICK]->fci->param_count = 1;
 				intern->callbacks[PHP_CB_SERVER_TICK]->fci->params = params;
 				intern->callbacks[PHP_CB_SERVER_TICK]->fci->retval = &retval;
-				if (SUCCESS != zend_call_function(intern->callbacks[PHP_CB_SERVER_TICK]->fci, intern->callbacks[PHP_CB_SERVER_TICK]->fcc TSRMLS_CC)) {
+				if (SUCCESS != zend_call_function(intern->callbacks[PHP_CB_SERVER_TICK]->fci, intern->callbacks[PHP_CB_SERVER_TICK]->fcc)) {
 					php_error_docref(NULL, E_WARNING, "Unable to call tick callback");
 				}
 			}
@@ -590,7 +575,7 @@ PHP_METHOD(Phalcon_Websocket_Server, run)
 	// Disconnect users
 	text = zend_string_init(ZEND_STRL("Server terminated"), 0);
 	ZEND_HASH_FOREACH(Z_ARR(intern->connections), 0);
-		conn = (ws_connection_obj *) Z_OBJ_P(_z);
+		conn = (phalcon_websocket_connection_object *) Z_OBJ_P(_z);
 		phalcon_websocket_connection_close(conn, text);
 		zval_delref_p(_z);
 		zend_hash_index_del(Z_ARR(intern->connections), _p->h);
@@ -606,7 +591,7 @@ PHP_METHOD(Phalcon_Websocket_Server, run)
 PHP_METHOD(Phalcon_Websocket_Server, stop)
 {
 	phalcon_websocket_server_object *intern;
-	ws_connection_obj *conn;
+	phalcon_websocket_connection_object *conn;
 
 	intern = phalcon_websocket_server_object_from_obj(getThis());
 
@@ -625,7 +610,7 @@ PHP_METHOD(Phalcon_Websocket_Server, broadcast)
 {
 	phalcon_websocket_server_object *intern;
 	zend_string *str;
-	ws_connection_obj *conn;
+	phalcon_websocket_connection_object *conn;
 	long ignoredId = -1;
 
 	ZEND_PARSE_PARAMETERS_START(1, 2)
@@ -637,7 +622,7 @@ PHP_METHOD(Phalcon_Websocket_Server, broadcast)
 	intern = phalcon_websocket_server_object_from_obj(getThis());
 	ZEND_HASH_FOREACH(Z_ARR(intern->connections), 0);
 		// TODO Test return? Interrupt if a write fail?
-		conn = (ws_connection_obj *) Z_OBJ_P(_z);
+		conn = (phalcon_websocket_connection_object *) Z_OBJ_P(_z);
 		if (conn->id == ignoredId) {
 			continue;
 		}

@@ -31,7 +31,7 @@
 zend_class_entry *phalcon_websocket_connection_ce;
 
 PHP_METHOD(Phalcon_Websocket_Connection, send);
-PHP_METHOD(Phalcon_Websocket_Connection, sendAsJson);
+PHP_METHOD(Phalcon_Websocket_Connection, sendJson);
 PHP_METHOD(Phalcon_Websocket_Connection, isConnected);
 PHP_METHOD(Phalcon_Websocket_Connection, getUid);
 PHP_METHOD(Phalcon_Websocket_Connection, disconnect);
@@ -40,13 +40,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_connection_send, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_connection_sendAsJson, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_connection_sendjson, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, payload, 0, 0)
 ZEND_END_ARG_INFO()
 
 const zend_function_entry phalcon_websocket_connection_method_entry[] = {
 	PHP_ME(Phalcon_Websocket_Connection, send, arginfo_phalcon_websocket_connection_send, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Websocket_Connection, sendAsJson, arginfo_phalcon_websocket_connection_sendAsJson, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Websocket_Connection, sendJson, arginfo_phalcon_websocket_connection_sendjson, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Connection, isConnected, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Connection, getUid, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Connection, disconnect, NULL, ZEND_ACC_PUBLIC)
@@ -80,12 +80,12 @@ void phalcon_websocket_connection_close(phalcon_websocket_connection_object *con
 }
 
 zend_object_handlers phalcon_websocket_connection_object_handlers;
-zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry *ce TSRMLS_DC)
+zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry *ce)
 {
 	phalcon_websocket_connection_object *intern = emalloc(sizeof(phalcon_websocket_connection_object));
 	memset(intern, 0, sizeof(phalcon_websocket_connection_object));
 
-	zend_object_std_init(&intern->std, ce TSRMLS_CC);
+	zend_object_std_init(&intern->std, ce);
 	object_properties_init(&intern->std, ce);
 	intern->std.handlers = &phalcon_websocket_connection_object_handlers;
 
@@ -97,7 +97,7 @@ zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry
 	return &intern->std;
 }
 
-void phalcon_websocket_connection_free_object_storage_handler(phalcon_websocket_connection_object *intern TSRMLS_DC)
+void phalcon_websocket_connection_free_object_storage_handler(phalcon_websocket_connection_object *intern)
 {
 	while (intern->read_ptr != intern->write_ptr) {
 		zend_string_delref(intern->buf[intern->read_ptr]);
@@ -108,7 +108,7 @@ void phalcon_websocket_connection_free_object_storage_handler(phalcon_websocket_
 		intern->read_ptr = (intern->read_ptr + 1) % WEBSOCKET_CONNECTION_BUFFER_SIZE;
 	}
 
-	zend_object_std_dtor(&intern->std TSRMLS_CC);
+	zend_object_std_dtor(&intern->std);
 	efree(intern);
 }
 
@@ -117,7 +117,7 @@ void phalcon_websocket_connection_free_object_storage_handler(phalcon_websocket_
  */
 PHALCON_INIT_CLASS(Phalcon_Websocket_Connection){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Websocket, Server, websocket_server, phalcon_websocket_server_method_entry, 0);
+	PHALCON_REGISTER_CLASS(Phalcon\\Websocket, Connection, websocket_connection, phalcon_websocket_connection_method_entry, 0);
 
 	phalcon_websocket_connection_ce->create_object = phalcon_websocket_connection_create_object_handler;
 	memcpy(&phalcon_websocket_connection_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));

@@ -61,11 +61,11 @@ typedef struct _phalcon_websocket_server_object {
 	zend_object std;
 } phalcon_websocket_server_object;
 
-static inline phalcon_websocket_server_object *phalcon_websocket_object_from_obj(zend_object *obj) {
+static inline phalcon_websocket_server_object *phalcon_websocket_server_object_from_obj(zend_object *obj) {
 	return (phalcon_websocket_server_object*)((char*)(obj) - XtOffsetOf(phalcon_websocket_server_object, std));
 }
 
-static inline phalcon_websocket_server_object *phalcon_websocket_object_from_ctx(struct lws_context *ctx) {
+static inline phalcon_websocket_server_object *phalcon_websocket_server_object_from_ctx(struct lws_context *ctx) {
 	return (phalcon_websocket_server_object*)((char*)(ctx) - XtOffsetOf(phalcon_websocket_server_object, context));
 }
 

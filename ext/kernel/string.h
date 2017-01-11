@@ -21,6 +21,10 @@
 
 #include "php_phalcon.h"
 
+#ifdef PHALCON_USE_PHP_JSON
+#include <ext/json/php_json.h>
+#endif
+
 #define PHALCON_TRIM_LEFT  1
 #define PHALCON_TRIM_RIGHT 2
 #define PHALCON_TRIM_BOTH  3

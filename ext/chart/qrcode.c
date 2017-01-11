@@ -663,7 +663,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 #endif
 }
 
-#ifdef PHALCON_QRCODE
+#ifdef PHALCON_USE_ZBAR
 static zbar_image_t *_php_zbarcode_image_create(unsigned long width, unsigned long height, unsigned char *image_data)
 {
 	zbar_image_t *image = zbar_image_create();

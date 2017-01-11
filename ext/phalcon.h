@@ -380,6 +380,15 @@
 #include "socket/server.h"
 #include "socket/exception.h"
 
+#include "websocket/connection.h"
+#include "websocket/server.h"
+#include "websocket/client.h"
+#include "websocket/eventloopinterface.h"
+
+#include "process/sharedmemory.h"
+
+#include "intrusive/avltree.h"
+
 #include "validationinterface.h"
 #include "validation.h"
 #include "validation/exception.h"

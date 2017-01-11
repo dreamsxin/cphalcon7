@@ -7109,7 +7109,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 						'type' => 'literal',
 						'value' => '\'virtual\'',
 					),
-					array(						
+					array(
 						'type' => 'placeholder',
 						'value' => ':0',
 					),
@@ -7281,7 +7281,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 
 		$expected = array(
 			'tables' => array(
-				'robots',
+				array('robots', NULL),
 			),
 			'models' => array(
 				'Robots',
@@ -7310,7 +7310,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 
 		$expected = array(
 			'tables' => array(
-				'robots',
+				array('robots', NULL),
 			),
 			'models' => array(
 				'Robots',
@@ -7339,7 +7339,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 
 		$expected = array(
 			'tables' => array(
-				'le_products',
+				array('le_products', NULL),
 			),
 			'models' => array(
 				'Some\\Products',
@@ -7401,7 +7401,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 
 		$expected = array(
 			'tables' => array(
-				'robots',
+				array('robots', NULL),
 			),
 			'models' => array(
 				'Robots',
@@ -7489,7 +7489,7 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 
 		$expected = array(
 			'tables' => array(
-				'robots',
+				array('robots', NULL),
 			),
 			'models' => array(
 				'Robots',

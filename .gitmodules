@@ -7,3 +7,12 @@
 	path   = php-tests/library/Twig
 	url    = https://github.com/fabpot/Twig.git
 	branch = master
+[submodule "deps/libwebsockets"]
+	path = deps/libwebsockets
+	url = https://github.com/warmcat/libwebsockets.git
+[submodule "deps/libqrencode"]
+	path = deps/libqrencode
+	url = https://github.com/fukuchi/libqrencode.git
+[submodule "deps/libuv"]
+	path = deps/libuv
+	url = https://github.com/libuv/libuv.git

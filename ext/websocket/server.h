@@ -21,6 +21,8 @@
 #ifndef PHALCON_WEBSOCKET_SERVER_H
 #define PHALCON_WEBSOCKET_SERVER_H
 
+#ifdef PHALCON_USE_WEBSOCKET
+
 #include "php_phalcon.h"
 
 #include <libwebsockets.h>
@@ -36,7 +38,6 @@ enum php_server_callbacks {
 	PHP_CB_SERVER_FILTER_CONNECTION,
 	PHP_CB_SERVER_FILTER_HEADERS,
 
-	PHP_CB_SERVER_PING,
 	PHP_CB_SERVER_TICK,
 
 	PHP_CB_SERVER_COUNT
@@ -70,11 +71,9 @@ static inline phalcon_websocket_server_object *phalcon_websocket_server_object_f
 }
 
 zend_object* phalcon_websocket_server_create_object_handler(zend_class_entry *ce);
-void phalcon_websocket_server_free_object_storage_handler(ws_server_obj *intern);
+void phalcon_websocket_server_free_object_storage_handler(phalcon_websocket_server_object *intern);
 void phalcon_websocket_server_register_class();
-zend_bool phalcon_websocket_server_invoke_eventloop_cb(ws_server_obj *intern, const char *func, int fd, int flags);
-
-#define PHALCON_WEBSOCKET_FREQUENCY 0.2
+zend_bool phalcon_websocket_server_invoke_eventloop_cb(phalcon_websocket_server_object *intern, const char *func, int fd, int flags);
 
 extern int  phalcon_websocket_server_handle;
 #define phalcon_websocket_server_handle_name "websocket_server"
@@ -82,5 +81,7 @@ extern int  phalcon_websocket_server_handle;
 extern zend_class_entry *phalcon_websocket_server_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Websocket_Server);
+
+#endif
 
 #endif /* PHALCON_WEBSOCKET_SERVER_H */

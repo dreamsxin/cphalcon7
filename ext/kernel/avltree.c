@@ -20,17 +20,17 @@
 
 #include "kernel/avltree.h"
 
-phalcon_avltree_node *phalcon_avltree_first(const phalcon_avltree *tree)
+phalcon_avltree_node *phalcon_avltree_first(phalcon_avltree *tree)
 {
 	return phalcon_memory_void_get(&tree->first);
 }
 
-phalcon_avltree_node *phalcon_avltree_last(const phalcon_avltree *tree)
+phalcon_avltree_node *phalcon_avltree_last(phalcon_avltree *tree)
 {
 	return phalcon_memory_void_get(&tree->last);
 }
 
-phalcon_avltree_node *phalcon_avltree_next(const phalcon_avltree_node *node)
+phalcon_avltree_node *phalcon_avltree_next(phalcon_avltree_node *node)
 {
 	phalcon_avltree_node* r;
 
@@ -45,7 +45,7 @@ phalcon_avltree_node *phalcon_avltree_next(const phalcon_avltree_node *node)
 	return r;
 }
 
-phalcon_avltree_node *phalcon_avltree_prev(const phalcon_avltree_node *node)
+phalcon_avltree_node *phalcon_avltree_prev(phalcon_avltree_node *node)
 {
 	phalcon_avltree_node* r;
 
@@ -59,7 +59,7 @@ phalcon_avltree_node *phalcon_avltree_prev(const phalcon_avltree_node *node)
 	return r;
 }
 
-phalcon_avltree_node *phalcon_avltree_lookup(const phalcon_avltree_node *key, phalcon_avltree_node_compare cmp, const phalcon_avltree *tree)
+phalcon_avltree_node *phalcon_avltree_lookup(phalcon_avltree_node *key, phalcon_avltree_node_compare cmp, phalcon_avltree *tree)
 {
 	phalcon_avltree_node *parent, *unbalanced;
 	int is_left;
@@ -128,7 +128,7 @@ phalcon_avltree_node *phalcon_avltree_insert(phalcon_avltree_node *node, phalcon
 		break;
 	case 2:
 	{
-		phalcon_avltree_node *right = phalcon_memory_void_get(&unbalanced->right);
+		phalcon_avltree_node* right = phalcon_memory_void_get(&unbalanced->right);
 
 		if (phalcon_avltree_get_balance(right) == 1) {
 
@@ -389,11 +389,10 @@ void phalcon_avltree_replace(phalcon_avltree_node *old, phalcon_avltree_node *n,
 	phalcon_memory_void_set(&n->right, phalcon_memory_void_get(&old->right));
 }
 
-int phalcon_avltree_init(phalcon_avltree *tree)
+void phalcon_avltree_init(phalcon_avltree *tree)
 {
 	phalcon_memory_void_set(&tree->root, NULL);
 	tree->height = -1;
 	phalcon_memory_void_set(&tree->first, NULL);
 	phalcon_memory_void_set(&tree->last, NULL);
-	return 0;
 }

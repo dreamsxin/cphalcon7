@@ -1563,7 +1563,6 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 
 	zval *quality_parts, *name, *accept, quality = {}, selected_name = {};
-	long int i = 0;
 
 	phalcon_fetch_params(0, 2, 0, &quality_parts, &name);
 
@@ -1571,21 +1570,15 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 	ZVAL_EMPTY_STRING(&selected_name);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(quality_parts), accept) {
-		zval selected_name = {}, accept_quality = {}, best_quality = {};
-		if (i == 0) {
-			phalcon_array_fetch_str(&quality, accept, SL("quality"), PH_NOISY);
+		zval accept_quality = {}, best_quality = {};
+
+		phalcon_array_fetch_str(&accept_quality, accept, SL("quality"), PH_NOISY);
+
+		is_smaller_function(&best_quality, &quality, &accept_quality);
+		if (PHALCON_IS_TRUE(&best_quality)) {
+			PHALCON_CPY_WRT(&quality, &accept_quality);
 			phalcon_array_fetch(&selected_name, accept, name, PH_NOISY);
-		} else {
-			phalcon_array_fetch_str(&accept_quality, accept, SL("quality"), PH_NOISY);
-
-			is_smaller_function(&best_quality, &quality, &accept_quality);
-			if (PHALCON_IS_TRUE(&best_quality)) {
-				PHALCON_CPY_WRT_CTOR(&quality, &accept_quality);
-				phalcon_array_fetch(&selected_name, accept, name, PH_NOISY);
-			}
 		}
-
-		++i;
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTORW(&selected_name);

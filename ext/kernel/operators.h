@@ -93,6 +93,9 @@ int phalcon_bitwise_xor_function(zval *result, zval *op1, zval *op2);
 int phalcon_shift_left_function(zval *result, zval *op1, zval *op2);
 int phalcon_shift_right_function(zval *result, zval *op1, zval *op2);
 
+/** Comparing */
+int phalcon_compare(zval *op1, zval *op2);
+
 /** Strict comparing */
 int phalcon_compare_strict_string(zval *op1, const char *op2, int op2_length);
 int phalcon_compare_strict_long(zval *op1, long op2);

@@ -23,24 +23,27 @@
 
 #include "kernel/memory.h"
 
+#include <stddef.h>
+#include <stdint.h>
+
 static const size_t BOM = 0xfafafafafafafafa;
 
 typedef struct _phalcon_memory_pool {
-    size_t  bom;
-    size_t  size;
-    size_t  balance;
-    size_t  ntags;
+    size_t bom;
+    size_t size;
+    size_t balance;
+    size_t ntags;
     phalcon_memory_void_value bits;
     phalcon_memory_void_value tags;
     phalcon_memory_void_value freetag;
 } phalcon_memory_pool;
 
-struct _phalcon_memory_pool_tag {
-  size_t   size;
-  phalcon_memory_void_value  link;
+typedef struct _phalcon_memory_pool_tag {
+  size_t size;
+  phalcon_memory_void_value link;
 } phalcon_memory_pool_tag;
 
-static inline void* phalcon_memory_pool_tag_tomem(phalcon_memory_pool_tag const* tag) {
+static inline void* phalcon_memory_pool_tag_tomem(phalcon_memory_pool_tag* tag) {
   return (void*)&tag->link;
 }
 
@@ -49,11 +52,11 @@ static inline phalcon_memory_pool_tag* phalcon_memory_pool_tag_ofmem(void* mem) 
 }
 
 static inline phalcon_memory_pool_tag* phalcon_memory_pool_tag_next(phalcon_memory_pool_tag* tag) {
-  return (phalcon_memory_pool_tag *)mvoid_get(&tag->link);
+  return (phalcon_memory_pool_tag *)phalcon_memory_void_get(&tag->link);
 }
 
 static inline void phalcon_memory_pool_tag_link(phalcon_memory_pool_tag* tag, phalcon_memory_pool_tag* link) {
-  mvoid_set(&tag->link, link);
+  phalcon_memory_void_set(&tag->link, link);
 }
 
 
@@ -68,21 +71,21 @@ static inline size_t phalcon_memory_pool_size_bits(size_t ntags)
 }
 
 static inline void phalcon_memory_pool_bits_set(phalcon_memory_pool_tag* tag, phalcon_memory_pool* p) {
-  uint8_t* const bits = mvoid_get(&p->bits);
-  size_t const bit = tag - (phalcon_memory_pool_tag*)mvoid_get(&p->tags);
+  uint8_t* const bits = phalcon_memory_void_get(&p->bits);
+  size_t const bit = tag - (phalcon_memory_pool_tag*)phalcon_memory_void_get(&p->tags);
   bits[bit / 8] |= 1 << (bit % 8);
 }
 
 static inline void phalcon_memory_pool_bits_drop(phalcon_memory_pool_tag* tag, phalcon_memory_pool* p) {
-  uint8_t* const bits = mvoid_get(&p->bits);
-  size_t const bit = tag - (phalcon_memory_pool_tag*)mvoid_get(&p->tags);
+  uint8_t* const bits = phalcon_memory_void_get(&p->bits);
+  size_t const bit = tag - (phalcon_memory_pool_tag*)phalcon_memory_void_get(&p->tags);
   bits[bit / 8] &= ~(1 << (bit % 8));
 }
 
 static phalcon_memory_pool_tag* phalcon_memory_pool_tag_left(phalcon_memory_pool_tag* tag, phalcon_memory_pool* p)
 {
-  phalcon_memory_pool_tag* tags = mvoid_get(&p->tags);
-  uint8_t* bits = mvoid_get(&p->bits);
+  phalcon_memory_pool_tag* tags = phalcon_memory_void_get(&p->tags);
+  uint8_t* bits = phalcon_memory_void_get(&p->bits);
   size_t bit = tag - tags;
   while (bit --> 0) {
     if (bits[bit / 8]) {
@@ -96,13 +99,13 @@ static phalcon_memory_pool_tag* phalcon_memory_pool_tag_left(phalcon_memory_pool
 static void phalcon_memory_pool_tag_merge(phalcon_memory_pool_tag* tag, phalcon_memory_pool* p)
 {
   phalcon_memory_pool_tag* n;
-  while ((n = tag_next(tag))) {
+  while ((n = phalcon_memory_pool_tag_next(tag))) {
 
     if ((char*)n > (char*)tag + tag->size)
       break;
 
     tag->size += n->size;
-    tag_link(tag, tag_next(n));
+    phalcon_memory_pool_tag_link(tag, phalcon_memory_pool_tag_next(n));
     phalcon_memory_pool_bits_drop(n, p);
   }
 
@@ -110,21 +113,20 @@ static void phalcon_memory_pool_tag_merge(phalcon_memory_pool_tag* tag, phalcon_
 }
 
 size_t phalcon_memory_pool_size_hint(size_t itemsize, size_t nitem);
-size_t phalcon_memory_pool_size_stuff(size_t);
+size_t phalcon_memory_pool_size_stuff(size_t memsize);
 
-phalcon_memory_pool* phalcon_memory_pool_attach(void*);
-phalcon_memory_pool* phalcon_memory_pool_format(void* addr, size_t);
-void phalcon_memory_pool_cleanup(phalcon_memory_pool*);
-void phalcon_memory_pool_clear(phalcon_memory_pool*);
-size_t phalcon_memory_pool_memory_size(phalcon_memory_pool const*);
-size_t phalcon_memory_pool_capacity(phalcon_memory_pool const*);
-size_t phalcon_memory_pool_balance(phalcon_memory_pool const*);
-size_t phalcon_memory_pool_avail(phalcon_memory_pool const*);
-double phalcon_memory_pool_load(phalcon_memory_pool const*);
-void* phalcon_memory_pool_alloc(phalcon_memory_pool*, size_t);
-void* phalcon_memory_pool_realloc(phalcon_memory_pool*, void*, size_t);
-void* phalcon_memory_pool_zalloc(phalcon_memory_pool*, size_t);
-void  phalcon_memory_pool_free(phalcon_memory_pool*, void*);
-void* phalcon_memory_pool_memdup(phalcon_memory_pool*, void const*, size_t);
+phalcon_memory_pool* phalcon_memory_pool_attach(void* src);
+phalcon_memory_pool* phalcon_memory_pool_format(void* src, size_t nsrc);
+void phalcon_memory_pool_clear(phalcon_memory_pool* p);
+size_t phalcon_memory_pool_memory_size(phalcon_memory_pool* p);
+size_t phalcon_memory_pool_capacity(phalcon_memory_pool* p);
+size_t phalcon_memory_pool_balance(phalcon_memory_pool* p);
+size_t phalcon_memory_pool_avail(phalcon_memory_pool* p);
+double phalcon_memory_pool_load(phalcon_memory_pool* p);
+void* phalcon_memory_pool_alloc(phalcon_memory_pool* p, size_t size);
+void* phalcon_memory_pool_realloc(phalcon_memory_pool* p, void* ptr, size_t newsz);
+void* phalcon_memory_pool_zalloc(phalcon_memory_pool* p, size_t);
+void  phalcon_memory_pool_free(phalcon_memory_pool* p, void* ptr);
+void* phalcon_memory_pool_memdup(phalcon_memory_pool* p, void* ptr, size_t dsz);
 
 #endif /* PHALCON_KERNEL_MEMORY_POOL_H */

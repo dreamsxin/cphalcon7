@@ -20,10 +20,7 @@
 
 #include "websocket/eventloopinterface.h"
 
-#include <zend_API.h>
-#include <zend_types.h>
-
-#include <libwebsockets.h>
+#include "kernel/main.h"
 
 /**
  * Phalcon\Websocket\EventloopInterface

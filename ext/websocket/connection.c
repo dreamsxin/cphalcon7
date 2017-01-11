@@ -18,10 +18,13 @@
   +------------------------------------------------------------------------+
 */
 
+#ifdef PHALCON_USE_WEBSOCKET
+
 #include "websocket/connection.h"
 
 #include <zend_smart_str.h>
 
+#include "kernel/main.h"
 #include "kernel/string.h"
 
 /**
@@ -75,7 +78,7 @@ int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn
 void phalcon_websocket_connection_close(phalcon_websocket_connection_object *conn, zend_string *reason) {
 	conn->connected = 0;
 	printf("Send close to %lu\n", conn->id);
-	lws_close_reason(conn->wsi, LWS_CLOSE_STATUS_NORMAL, reason->val, reason->len);
+	lws_close_reason(conn->wsi, LWS_CLOSE_STATUS_NORMAL, (unsigned char *)reason->val, reason->len);
 	lws_callback_on_writable(conn->wsi);
 }
 
@@ -139,7 +142,7 @@ PHP_METHOD(Phalcon_Websocket_Connection, send)
 		Z_PARAM_STR(text)
 	ZEND_PARSE_PARAMETERS_END();
 
-	intern = phalcon_websocket_connection_object_from_obj(getThis());
+	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
 	n = phalcon_websocket_connection_write(intern, text);
 	efree(text);
 	if (-1 == n) {
@@ -151,21 +154,19 @@ PHP_METHOD(Phalcon_Websocket_Connection, send)
 /**
  * Send data to the client as JSON string
  */
-PHP_METHOD(Phalcon_Websocket_Connection, sendAsJson)
+PHP_METHOD(Phalcon_Websocket_Connection, sendJson)
 {
 	phalcon_websocket_connection_object *intern;
-	smart_str text = {0};
-	zval *val;
+	zval *val, text = {};
 	int n;
 
 	ZEND_PARSE_PARAMETERS_START(1, 1);
 		Z_PARAM_ZVAL(val);
 	ZEND_PARSE_PARAMETERS_END();
 
-	intern = phalcon_websocket_connection_object_from_obj(getThis());
-	phalcon_json_encode(&text, val, PHP_JSON_UNESCAPED_UNICODE|PHP_JSON_UNESCAPED_SLASHES);
-	n = phalcon_websocket_connection_close(intern, text.s);
-	smart_str_free(&text);
+	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
+	RETURN_ON_FAILURE(phalcon_json_encode(&text, val, 0));
+	n = phalcon_websocket_connection_write(intern, Z_STR(text));
 	if (-1 == n) {
 		RETURN_FALSE;
 	}
@@ -179,7 +180,7 @@ PHP_METHOD(Phalcon_Websocket_Connection, isConnected)
 {
 	phalcon_websocket_connection_object *intern;
 
-	intern = phalcon_websocket_connection_object_from_obj(getThis());
+	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
 
 	RETURN_BOOL(intern->connected);
 }
@@ -191,7 +192,7 @@ PHP_METHOD(Phalcon_Websocket_Connection, getUid)
 {
 	phalcon_websocket_connection_object *intern;
 
-	intern = phalcon_websocket_connection_object_from_obj(getThis());
+	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
 
 	RETURN_LONG(intern->id);
 }
@@ -209,6 +210,8 @@ PHP_METHOD(Phalcon_Websocket_Connection, disconnect)
 		Z_PARAM_STR(reason)
 	ZEND_PARSE_PARAMETERS_END();
 
-	intern = phalcon_websocket_connection_object_from_obj(getThis());
+	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
 	phalcon_websocket_connection_close(intern, reason);
 }
+
+#endif

@@ -87,6 +87,8 @@ static void phalcon_sharedmemory_dtor(zend_resource *rsrc)
     phalcon_shared_memory_cleanup(shm);
 }
 
+int phalcon_sharedmemory_handle;
+
 /**
  * Phalcon\Process\Sharedmemory initializer
  */
@@ -109,7 +111,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, __construct){
 
 	zval *name;
 
-	phalcon_fetch_params(0, 1, 0, &name, &size);
+	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_update_property_zval(getThis(), SL("_name"), name);
 }
@@ -176,7 +178,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, open){
 		return;
 	}
 
-	m = mshm_open(Z_STRVAL(name));
+	m = phalcon_shared_memory_open(Z_STRVAL(name));
 	if (NULL == m) {
 		RETURN_FALSE;
 	}
@@ -204,7 +206,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, create){
 		return;
 	}
 
-	m = mshm_create(Z_STRVAL(name), Z_LVAL_P(size));
+	m = phalcon_shared_memory_create(Z_STRVAL(name), Z_LVAL_P(size));
 	if (NULL == m) {
 		RETURN_FALSE;
 	}
@@ -279,10 +281,8 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, read){
 
 	zval shm = {};
 	phalcon_shared_memory *m;
-
-	if (!blocking) {
-		blocking = &PHALCON_GLOBAL(z_false);
-	}
+	char *mem;
+	size_t size, value_size;
 
 	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
 
@@ -292,11 +292,22 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, read){
 	if ((m = (phalcon_shared_memory *)zend_fetch_resource(Z_RES(shm), phalcon_sharedmemory_handle_name, phalcon_sharedmemory_handle)) == NULL) {
 		RETURN_FALSE;
 	}
-	if (!zend_is_true(force)) {
-		RETURN_BOOL(!phalcon_shared_memory_unlock(m));
-	} else {
-		RETURN_BOOL(!phalcon_shared_memory_unlock_force(m));
+	mem = (char*)phalcon_shared_memory_ptr(m);
+  	if (!mem) {
+		RETURN_FALSE;
 	}
+	size = phalcon_shared_memory_size(m);
+
+	if (size <= 0) {
+		RETURN_FALSE;
+	}
+
+	value_size = strnlen(mem, size);
+	if (size <= value_size) {
+		RETURN_FALSE;
+	}
+
+	RETURN_NEW_STR(zend_string_init(mem, value_size, 0));
 }
 
 /**
@@ -320,14 +331,17 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, write){
 		RETURN_FALSE;
 	}
 
-	mem = (char*)mshm_memory_ptr(r);
+	mem = (char*)phalcon_shared_memory_ptr(m);
   	if (!mem) {
 		RETURN_FALSE;
 	}
 
 	size = phalcon_shared_memory_size(m);
-	value_size = Z_STRLEN_P(value);
+	if (size <= 0) {
+		RETURN_FALSE;
+	}
 
+	value_size = Z_STRLEN_P(value);
 	if (size <= value_size) {
 		RETURN_FALSE;
 	}

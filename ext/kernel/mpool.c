@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "kernel/phalcon_memory_pool.h"
+#include "kernel/mpool.h"
 
 #include <assert.h>
 #include <string.h>
@@ -42,7 +42,7 @@ size_t phalcon_memory_pool_size_stuff(size_t memsize)
 	return memsize - (ntags * sizeof(phalcon_memory_pool_tag) - sizeof(size_t));
 }
 
-phalcon_memory_pool_t* phalcon_memory_pool_attach(void* src)
+phalcon_memory_pool* phalcon_memory_pool_attach(void* src)
 {
 	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
 	if (BOM == (BOM & p->bom)) return p;
@@ -50,7 +50,7 @@ phalcon_memory_pool_t* phalcon_memory_pool_attach(void* src)
 	return NULL;
 }
 
-phalcon_memory_pool_t* phalcon_memory_pool_format(void* src, size_t nsrc)
+phalcon_memory_pool* phalcon_memory_pool_format(void* src, size_t nsrc)
 {
 	if (nsrc < phalcon_memory_pool_size_hint(0, 0) ) {
 		fprintf(stderr, "%s need %zu or more memory \n", __func__,
@@ -73,16 +73,8 @@ phalcon_memory_pool_t* phalcon_memory_pool_format(void* src, size_t nsrc)
 	return p;
 }
 
-void phalcon_memory_pool_cleanup(phalcon_memory_pool* src)
+void phalcon_memory_pool_clear(phalcon_memory_pool* p)
 {
-	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
-	(void)p;
-}
-
-void phalcon_memory_pool_clear(phalcon_memory_pool* src)
-{
-	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
-
 	phalcon_memory_void_set(&p->bits, p + 1);
 	uint8_t* bits = phalcon_memory_void_get(&p->bits);
 	memset(bits, 0, phalcon_memory_pool_size_bits(p->ntags));
@@ -95,63 +87,56 @@ void phalcon_memory_pool_clear(phalcon_memory_pool* src)
 	phalcon_memory_pool_tag_link(tag, NULL);
 }
 
-size_t phalcon_memory_pool_memory_size(phalcon_memory_poolconst* src)
+size_t phalcon_memory_pool_memory_size(phalcon_memory_pool* p)
 {
-	phalcon_memory_pool const* p = (phalcon_memory_pool const*) src;
 	return p->size;
 }
 
-size_t phalcon_memory_pool_capacity(phalcon_memory_poolconst* src)
+size_t phalcon_memory_pool_capacity(phalcon_memory_pool* p)
 {
-	phalcon_memory_pool const* p = (phalcon_memory_pool const*) src;
 	if (!p->ntags) return 0;
 	return p->ntags * sizeof(phalcon_memory_pool_tag) - sizeof(size_t);
 }
 
-size_t phalcon_memory_pool_balance(phalcon_memory_poolconst* src)
+size_t phalcon_memory_pool_balance(phalcon_memory_pool* p)
 {
-	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
 	return p->balance;
 }
 
-double phalcon_memory_pool_load(phalcon_memory_poolconst* src)
+double phalcon_memory_pool_load(phalcon_memory_pool* p)
 {
-	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
 	if (!p->ntags) return 100.;
 	return (double)p->balance / (p->ntags * sizeof(phalcon_memory_pool_tag));
 }
 
-size_t phalcon_memory_pool_avail(phalcon_memory_poolconst* src)
+size_t phalcon_memory_pool_avail(phalcon_memory_pool* p)
 {
-		phalcon_memory_pool const* p = (phalcon_memory_pool const*) src;
 		size_t avail = 0;
-		for (phalcon_memory_pool_tag* tag = phalcon_memory_void_get(&p->freetag); tag;
-				tag = phalcon_memory_pool_phalcon_memory_pool_tag_next(tag))
-		{
-				avail += (tag->size - sizeof(size_t));
+		phalcon_memory_pool_tag* tag = phalcon_memory_void_get(&p->freetag);
+		while (tag != NULL) {
+			avail += (tag->size - sizeof(size_t));
+			tag = phalcon_memory_pool_tag_next(tag);
 		}
 		return avail;
 }
 
-void phalcon_memory_pool_dump(phalcon_memory_poolconst* src)
+void phalcon_memory_pool_dump(phalcon_memory_pool* p)
 {
-	phalcon_memory_pool const* p = src;
-	size_t const avail = phalcon_memory_pool_avail(src);
+	size_t const avail = phalcon_memory_pool_avail(p);
 	fprintf(stderr, "> page [%p] size: %zu tags: %zu capacity: %zu avail: %zu used: %zu balance: %zu load: %f\n",
 		(void*)p, p->size, p->ntags, phalcon_memory_pool_capacity(p), avail, phalcon_memory_pool_capacity(p) - avail,
 		p->balance, phalcon_memory_pool_load(p));
 }
 
-void* phalcon_memory_pool_alloc(phalcon_memory_pool* src, size_t size)
+void* phalcon_memory_pool_alloc(phalcon_memory_pool* p, size_t size)
 {
-	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
 	size_t const aligned = phalcon_memory_pool_size_aligned(size);
 
 	phalcon_memory_pool_tag* prev = NULL;
 	phalcon_memory_pool_tag* tag = phalcon_memory_void_get(&p->freetag);
 	while (tag && tag->size < aligned) {
 		prev = tag;
-		tag = phalcon_memory_pool_phalcon_memory_pool_tag_next(tag);
+		tag = phalcon_memory_pool_tag_next(tag);
 	}
 
 	if (!tag) {
@@ -163,15 +148,15 @@ void* phalcon_memory_pool_alloc(phalcon_memory_pool* src, size_t size)
 		phalcon_memory_pool_tag* n = (phalcon_memory_pool_tag*)((char*)tag + aligned);
 		n->size = tag->size - aligned;
 		tag->size = aligned;
-		phalcon_memory_pool_tag_link(n, phalcon_memory_pool_phalcon_memory_pool_tag_next(tag));
+		phalcon_memory_pool_tag_link(n, phalcon_memory_pool_tag_next(tag));
 		phalcon_memory_pool_tag_link(tag, n);
 		phalcon_memory_pool_tag_merge(n, p);
 	}
 
 	if (prev) {
-		phalcon_memory_pool_tag_link(prev, phalcon_memory_pool_phalcon_memory_pool_tag_next(tag));
+		phalcon_memory_pool_tag_link(prev, phalcon_memory_pool_tag_next(tag));
 	} else {
-		phalcon_memory_void_set(&p->freetag, phalcon_memory_pool_phalcon_memory_pool_tag_next(tag));
+		phalcon_memory_void_set(&p->freetag, phalcon_memory_pool_tag_next(tag));
 	}
 
 	phalcon_memory_pool_bits_drop(tag, p);
@@ -179,10 +164,9 @@ void* phalcon_memory_pool_alloc(phalcon_memory_pool* src, size_t size)
 	return phalcon_memory_pool_tag_tomem(tag);
 }
 
-void* phalcon_memory_pool_realloc(phalcon_memory_pool* src, void* ptr, size_t newsz)
+void* phalcon_memory_pool_realloc(phalcon_memory_pool* p, void* ptr, size_t newsz)
 {
-	phalcon_memory_pool* p = src;
-	if (!ptr) return phalcon_memory_pool_alloc(src, newsz);
+	if (!ptr) return phalcon_memory_pool_alloc(p, newsz);
 
 	size_t const aligned = phalcon_memory_pool_size_aligned(newsz);
 	phalcon_memory_pool_tag* tag = phalcon_memory_pool_tag_ofmem(ptr);
@@ -192,10 +176,10 @@ void* phalcon_memory_pool_realloc(phalcon_memory_pool* src, void* ptr, size_t ne
 	}
 
 	if (tag->size < aligned) {
-		void* np = phalcon_memory_pool_alloc(src, newsz);
+		void* np = phalcon_memory_pool_alloc(p, newsz);
 		if (!np) return NULL;
 		memcpy(np, ptr, tag->size - sizeof(size_t));
-		phalcon_memory_pool_free(src, ptr);
+		phalcon_memory_pool_free(p, ptr);
 		return np;
 	}
 
@@ -226,7 +210,7 @@ void* phalcon_memory_pool_realloc(phalcon_memory_pool* src, void* ptr, size_t ne
 		return NULL;
 	}
 
-	phalcon_memory_pool_tag_link(n, phalcon_memory_pool_phalcon_memory_pool_tag_next(tmp));
+	phalcon_memory_pool_tag_link(n, phalcon_memory_pool_tag_next(tmp));
 	phalcon_memory_pool_tag_link(tmp, n);
 
 	phalcon_memory_pool_tag_merge(n, p);
@@ -234,18 +218,15 @@ void* phalcon_memory_pool_realloc(phalcon_memory_pool* src, void* ptr, size_t ne
 	return ptr;
 }
 
-void* phalcon_memory_pool_zalloc(phalcon_memory_pool* src, size_t nbytes)
+void* phalcon_memory_pool_zalloc(phalcon_memory_pool* p, size_t nbytes)
 {
-	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
 	void* r = phalcon_memory_pool_alloc(p, nbytes);
 	if (r) memset(r, 0, nbytes);
 	return r;
 }
 
-void phalcon_memory_pool_free(phalcon_memory_pool* src, void* ptr)
+void phalcon_memory_pool_free(phalcon_memory_pool* p, void* ptr)
 {
-	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
-
 	if (!ptr) {
 		return;
 	}
@@ -275,16 +256,15 @@ void phalcon_memory_pool_free(phalcon_memory_pool* src, void* ptr)
 		return;
 	}
 
-	phalcon_memory_pool_tag_link(tag, phalcon_memory_pool_phalcon_memory_pool_tag_next(tmp));
+	phalcon_memory_pool_tag_link(tag, phalcon_memory_pool_tag_next(tmp));
 	phalcon_memory_pool_tag_link(tmp, tag);
 
 	phalcon_memory_pool_tag_merge(tag, p);
 	phalcon_memory_pool_tag_merge(tmp, p);
 }
 
-void* phalcon_memory_pool_memdup(phalcon_memory_pool_t* src, void const* d, size_t dsz)
+void* phalcon_memory_pool_memdup(phalcon_memory_pool* p, void* d, size_t dsz)
 {
-	phalcon_memory_pool* p = (phalcon_memory_pool*) src;
 	void* r = phalcon_memory_pool_alloc(p, dsz);
 	if (r) {
 		memcpy(r, d, dsz);

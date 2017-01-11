@@ -47,6 +47,15 @@ int phalcon_and_function(zval *result, zval *left, zval *right){
 	return SUCCESS;
 }
 
+int phalcon_compare(zval *op1, zval *op2) {
+	zval result;
+
+	if (compare_function(&result, op1, op2)==FAILURE) {
+		return 1;
+	}
+	return Z_LVAL(result);
+}
+
 /**
  * Natural compare with string operandus on right
  */
@@ -238,7 +247,7 @@ long phalcon_get_intval_ex(const zval *op) {
 			long long_value;
 			double double_value;
 			zend_uchar type;
-			
+
 			ASSUME(Z_STRVAL_P(op) != NULL);
 			type = is_numeric_string(Z_STRVAL_P(op), Z_STRLEN_P(op), &long_value, &double_value, 0);
 			if (type == IS_LONG) {
@@ -279,7 +288,7 @@ double phalcon_get_doubleval_ex(const zval *op) {
 			long long_value;
 			double double_value;
 			zend_uchar type;
-			
+
 			ASSUME(Z_STRVAL_P(op) != NULL);
 			type = is_numeric_string(Z_STRVAL_P(op), Z_STRLEN_P(op), &long_value, &double_value, 0);
 			if (type == IS_LONG) {

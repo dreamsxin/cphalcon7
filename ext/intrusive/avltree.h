@@ -23,7 +23,7 @@
 
 #include "php_phalcon.h"
 
-extern int  phalcon_avltree_handle;
+extern int phalcon_avltree_handle;
 #define phalcon_avltree_handle_name "avltree"
 
 extern zend_class_entry *phalcon_intrusive_avltree_ce;

@@ -19,9 +19,13 @@
 #ifndef PHALCON_WEBSOCKET_CLIENT_H
 #define PHALCON_WEBSOCKET_CLIENT_H
 
-#include <php.h>
+#ifdef PHALCON_USE_WEBSOCKET
+
+#include "php_phalcon.h"
+
 #include <libwebsockets.h>
-#include "ws_structures.h"
+
+#include "websocket/structures.h"
 
 /***** Class \WebSocket\Client *****/
 
@@ -52,11 +56,17 @@ static inline phalcon_websocket_client_object *phalcon_websocket_client_object_f
 	return (phalcon_websocket_client_object*)((char*)(obj) - XtOffsetOf(phalcon_websocket_client_object, std));
 }
 
+static inline phalcon_websocket_client_object *phalcon_websocket_client_object_from_ctx(struct lws_context *ctx) {
+	return (phalcon_websocket_client_object*)((char*)(ctx) - XtOffsetOf(phalcon_websocket_client_object, context));
+}
+
 zend_object* phalcon_websocket_create_object_handler(zend_class_entry *ce);
 void phalcon_websocket_client_free_object_storage_handler(phalcon_websocket_client_object *intern);
 
 extern zend_class_entry *phalcon_websocket_client_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Websocket_Client);
+
+#endif
 
 #endif /* PHALCON_WEBSOCKET_CLIENT_H */

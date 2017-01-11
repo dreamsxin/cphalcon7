@@ -21,6 +21,10 @@
 #ifndef PHALCON_KERNEL_SHM_H
 #define PHALCON_KERNEL_SHM_H
 
+#include <stddef.h>
+#include <stdint.h>
+#include <semaphore.h>
+
 typedef struct _phalcon_shared_memory {
   int     owner;
   char    name[255];

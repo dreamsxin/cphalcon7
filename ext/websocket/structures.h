@@ -21,6 +21,8 @@
 #ifndef PHALCON_WEBSOCKET_STRUCTURE_H
 #define PHALCON_WEBSOCKET_STRUCTURE_H
 
+#define PHALCON_WEBSOCKET_FREQUENCY 0.2
+
 /* Callback structure */
 typedef struct _ws_callback {
 	zend_fcall_info *fci;

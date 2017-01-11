@@ -21,6 +21,8 @@
 #ifndef PHALCON_WEBSOCKET_CONNECTION_H
 #define PHALCON_WEBSOCKET_CONNECTION_H
 
+#ifdef PHALCON_USE_WEBSOCKET
+
 #include "php_phalcon.h"
 
 #include <libwebsockets.h>
@@ -48,13 +50,15 @@ static inline phalcon_websocket_connection_object *phalcon_websocket_connection_
 	return (phalcon_websocket_connection_object*)((char*)(obj) - XtOffsetOf(phalcon_websocket_connection_object, std));
 }
 
-int phalcon_websocket_connection_write(ws_connection_obj *conn, zend_string *text);
-void phalcon_websocket_connection_close(ws_connection_obj *conn, zend_string *reason);
+int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zend_string *text);
+void phalcon_websocket_connection_close(phalcon_websocket_connection_object *conn, zend_string *reason);
 zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry *ce);
 void phalcon_websocket_connection_free_object_storage_handler(phalcon_websocket_connection_object *intern);
+
 
 extern zend_class_entry *phalcon_websocket_connection_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Websocket_Connection);
 
+#endif
 #endif /* PHALCON_WEBSOCKET_CONNECTION_H */

@@ -30,7 +30,7 @@ typedef struct {
     signed balance:3;		/* balance factor [-2:+2] */
 } phalcon_avltree_node;
 
-typedef int (*phalcon_avltree_node_compare)(phalcon_avltree_node const* , phalcon_avltree_node const*);
+typedef int (*phalcon_avltree_node_compare)(phalcon_avltree_node * , phalcon_avltree_node *);
 
 typedef struct {
     phalcon_memory_void_value root;
@@ -72,7 +72,7 @@ static inline int phalcon_avltree_dec_balance(phalcon_avltree_node *node)
 	return --node->balance;
 }
 
-static inline phalcon_avltree_node* phalcon_avltree_get_parent_avl(const phalcon_avltree_node *node)
+static inline phalcon_avltree_node* phalcon_avltree_get_parent_avl(phalcon_avltree_node *node)
 {
 	return phalcon_memory_void_get(&node->parent);
 }
@@ -105,7 +105,7 @@ static inline phalcon_avltree_node* phalcon_avltree_get_last_avl(phalcon_avltree
  */
 
 /* node->balance = height(node->right) - height(node->left); */
-static void phalcon_avltree_rotate_left_avl(phalcon_avltree_node *node, phalcon_avltree *tree)
+static inline void phalcon_avltree_rotate_left_avl(phalcon_avltree_node *node, phalcon_avltree *tree)
 {
 	phalcon_avltree_node *p = node;
 	phalcon_avltree_node *q = phalcon_memory_void_get(&node->right); /* can't be NULL */
@@ -133,7 +133,7 @@ static void phalcon_avltree_rotate_left_avl(phalcon_avltree_node *node, phalcon_
 	phalcon_memory_void_set(&q->left, p);
 }
 
-static void phalcon_avltree_rotate_right_avl(phalcon_avltree_node *node, phalcon_avltree *tree)
+static inline void phalcon_avltree_rotate_right_avl(phalcon_avltree_node *node, phalcon_avltree *tree)
 {
 	phalcon_avltree_node *p = node;
 	phalcon_avltree_node *q = phalcon_memory_void_get(&node->left) ; /* can't be NULL */
@@ -161,7 +161,7 @@ static void phalcon_avltree_rotate_right_avl(phalcon_avltree_node *node, phalcon
 	phalcon_memory_void_set(&q->right, p);
 }
 
-inline static void phalcon_avltree_set_child_avl(phalcon_avltree_node *child, phalcon_avltree_node *node, int left)
+static inline void phalcon_avltree_set_child_avl(phalcon_avltree_node *child, phalcon_avltree_node *node, int left)
 {
 	if (left) phalcon_memory_void_set(&node->left, child);
 	else phalcon_memory_void_set(&node->right, child);
@@ -172,7 +172,7 @@ inline static void phalcon_avltree_set_child_avl(phalcon_avltree_node *child, ph
  * insertions. Normally GCC will notice this and get rid of them for
  * lookups.
  */
-static inline phalcon_avltree_node *phalcon_avltree_do_lookup_avl(const phalcon_avltree_node *key, phalcon_avltree_node_compare cmp, const phalcon_avltree *tree, phalcon_avltree_node **pparent, phalcon_avltree_node **unbalanced, int *is_left)
+static inline phalcon_avltree_node *phalcon_avltree_do_lookup_avl(phalcon_avltree_node *key, phalcon_avltree_node_compare cmp, phalcon_avltree *tree, phalcon_avltree_node **pparent, phalcon_avltree_node **unbalanced, int *is_left)
 {
 	phalcon_avltree_node *node = phalcon_memory_void_get(&tree->root);
 	int res = 0;
@@ -197,15 +197,15 @@ static inline phalcon_avltree_node *phalcon_avltree_do_lookup_avl(const phalcon_
 	return NULL;
 }
 
-phalcon_avltree_node* phalcon_avltree_first(phalcon_avltree const* tree);
-phalcon_avltree_node* phalcon_avltree_last(phalcon_avltree const* tree);
-phalcon_avltree_node* phalcon_avltree_next(phalcon_avltree_node const* node);
-phalcon_avltree_node* phalcon_avltree_prev(phalcon_avltree_node const* node);
+phalcon_avltree_node* phalcon_avltree_first(phalcon_avltree* tree);
+phalcon_avltree_node* phalcon_avltree_last(phalcon_avltree* tree);
+phalcon_avltree_node* phalcon_avltree_next(phalcon_avltree_node* node);
+phalcon_avltree_node* phalcon_avltree_prev(phalcon_avltree_node* node);
 
-phalcon_avltree_node* phalcon_avltree_lookup(phalcon_avltree_node const* key, phalcon_avltree_node_compare cmp, phalcon_avltree const* tree);
+phalcon_avltree_node* phalcon_avltree_lookup(phalcon_avltree_node* key, phalcon_avltree_node_compare cmp, phalcon_avltree* tree);
 phalcon_avltree_node* phalcon_avltree_insert(phalcon_avltree_node* node, phalcon_avltree_node_compare cmp, phalcon_avltree* tree);
 void phalcon_avltree_remove(phalcon_avltree_node* node, phalcon_avltree* tree);
 void phalcon_avltree_replace(phalcon_avltree_node* old, phalcon_avltree_node* node, phalcon_avltree* tree);
-int phalcon_avltree_init(phalcon_avltree* tree);
+void phalcon_avltree_init(phalcon_avltree* tree);
 
 #endif /* PHALCON_KERNEL_AVLTREE_H */

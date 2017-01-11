@@ -234,6 +234,10 @@ kernel/exception.c \
 kernel/file.c \
 kernel/output.c \
 kernel/memory.c \
+kernel/shm.c \
+kernel/mpool.c \
+kernel/avltree.c \
+kernel/list.c \
 kernel/session.c \
 kernel/variables.c \
 kernel/framework/orm.c \
@@ -331,6 +335,12 @@ socket.c \
 socket/client.c \
 socket/server.c \
 socket/exception.c \
+websocket/connection.c \
+websocket/server.c \
+websocket/client.c \
+websocket/eventloopinterface.c \
+process/sharedmemory.c \
+intrusive/avltree.c \
 debug.c \
 debug/exception.c \
 debug/dump.c \

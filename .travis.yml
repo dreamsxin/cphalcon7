@@ -1,7 +1,7 @@
 language: php
 
 sudo: required
-dist: xenial
+dist: trusty
 
 addons:
   apt:
@@ -17,7 +17,7 @@ addons:
       - libmagickwand-dev
 
 php:
-  - 7.0
+  - 7.0.14
   - 7.1
   - nightly
 

@@ -2734,8 +2734,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
 	if (zend_is_true(&schema)) {
 		array_init_size(&table, 2);
-		phalcon_array_append(&table, &schema, PH_COPY);
 		phalcon_array_append(&table, &source, PH_COPY);
+		phalcon_array_append(&table, &schema, PH_COPY);
 	} else {
 		PHALCON_CPY_WRT(&table, &source);
 	}

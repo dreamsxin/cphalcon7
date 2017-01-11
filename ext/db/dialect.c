@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 
 	phalcon_fetch_params(0, 1, 2, &expression, &_escape_char, &quoting);
 
-	if (Z_TYPE_P(expression) != IS_ARRAY) { 
+	if (Z_TYPE_P(expression) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SQL expression");
 		return;
 	}
@@ -385,13 +385,13 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 				ZVAL_LONG(&index, t);
 
 				PHALCON_CONCAT_VV(&placeholder, &value, &index);
-				
+
 				phalcon_array_append(&placeholders, &placeholder, PH_COPY);
 			}
 
 			phalcon_fast_join_str(&value, SL(", "), &placeholders);
 		}
-		
+
 		RETURN_CTORW(&value);
 	}
 
@@ -443,7 +443,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	}
 
 	/**
-	 * Resolve CAST of values 
+	 * Resolve CAST of values
 	 */
 	if (PHALCON_IS_STRING(&type, "cast")) {
 		phalcon_array_fetch_str(&left, expression, SL("left"), PH_NOISY);
@@ -457,7 +457,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	}
 
 	/**
-	 * Resolve CASE of values 
+	 * Resolve CASE of values
 	 */
 	if (PHALCON_IS_STRING(&type, "case")) {
 		PHALCON_RETURN_CALL_METHODW(getThis(), "getsqlexpressioncase", expression, &escape_char);
@@ -670,7 +670,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	phalcon_fetch_params(0, 1, 0, &definition);
 
-	if (Z_TYPE_P(definition) != IS_ARRAY) { 
+	if (Z_TYPE_P(definition) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid SELECT definition");
 		return;
 	}
@@ -686,7 +686,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	PHALCON_CALL_METHODW(&escape_char, getThis(), "getescapechar");
 
-	if (Z_TYPE_P(&columns) == IS_ARRAY) { 
+	if (Z_TYPE_P(&columns) == IS_ARRAY) {
 		array_init(&selected_columns);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&columns), column) {
@@ -757,7 +757,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	/**
 	 * Check and escape tables
 	 */
-	if (Z_TYPE_P(&tables) == IS_ARRAY) { 
+	if (Z_TYPE_P(&tables) == IS_ARRAY) {
 		array_init(&selected_tables);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
@@ -828,7 +828,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
-		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) { 
+		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) {
 			PHALCON_CALL_METHODW(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
@@ -931,7 +931,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 
 	phalcon_fetch_params(0, 1, 0, &definition);
 
-	if (Z_TYPE_P(definition) != IS_ARRAY) { 
+	if (Z_TYPE_P(definition) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid INSERT definition");
 		return;
 	}
@@ -951,7 +951,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 		return;
 	}
 
-	if (unlikely(Z_TYPE(values) != IS_ARRAY)) { 
+	if (unlikely(Z_TYPE(values) != IS_ARRAY)) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The second parameter for insert isn't an Array");
 		return;
 	}
@@ -979,7 +979,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 
 		phalcon_fast_count(&number_values, row_values);
 
-		/** 
+		/**
 		 * The number of calculated values must be equal to the number of fields in the
 		 * model
 		 */
@@ -1005,7 +1005,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 
 	phalcon_fast_join_str(&joined_values, SL("), ("), &joined_rows);
 
-	if (Z_TYPE(fields) == IS_ARRAY) { 
+	if (Z_TYPE(fields) == IS_ARRAY) {
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			array_init(&escaped_fields);
 
@@ -1043,7 +1043,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 
 	phalcon_fetch_params(0, 1, 0, &definition);
 
-	if (Z_TYPE_P(definition) != IS_ARRAY) { 
+	if (Z_TYPE_P(definition) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid Update definition");
 		return;
 	}
@@ -1115,7 +1115,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
-		if (Z_TYPE(where_conditions) == IS_ARRAY) { 
+		if (Z_TYPE(where_conditions) == IS_ARRAY) {
 			PHALCON_CALL_METHODW(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
@@ -1124,7 +1124,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	/* Check for a ORDER clause */
-	if (phalcon_array_isset_fetch_str(&order_fields, definition, SL("order"))) {	
+	if (phalcon_array_isset_fetch_str(&order_fields, definition, SL("order"))) {
 		array_init(&order_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(order_fields), order_item) {
@@ -1188,7 +1188,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 
 	phalcon_fetch_params(0, 1, 0, &definition);
 
-	if (Z_TYPE_P(definition) != IS_ARRAY) { 
+	if (Z_TYPE_P(definition) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid Update definition");
 		return;
 	}
@@ -1218,7 +1218,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
-		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) { 
+		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) {
 			PHALCON_CALL_METHODW(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
@@ -1506,4 +1506,3 @@ PHP_METHOD(Phalcon_Db_Dialect, prepareTable){
 		}
 	}
 }
-

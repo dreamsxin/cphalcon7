@@ -743,7 +743,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	if (Z_TYPE_P(token_value) == IS_NULL) {
 		ZVAL_STRING(&service, ISV(request));
 
-		PHALCON_CALL_METHODW(&session, getThis(), "getresolveservice", &service);
+		PHALCON_CALL_METHODW(&request, getThis(), "getresolveservice", &service);
 		PHALCON_VERIFY_INTERFACEW(&request, phalcon_http_requestinterface_ce);
 
 		/**

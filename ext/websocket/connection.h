@@ -21,10 +21,9 @@
 #ifndef PHALCON_WEBSOCKET_CONNECTION_H
 #define PHALCON_WEBSOCKET_CONNECTION_H
 
-#ifdef PHALCON_USE_WEBSOCKET
-
 #include "php_phalcon.h"
 
+#ifdef PHALCON_USE_WEBSOCKET
 #include <libwebsockets.h>
 
 #define WEBSOCKET_CONNECTION_BUFFER_SIZE 30
@@ -53,7 +52,7 @@ static inline phalcon_websocket_connection_object *phalcon_websocket_connection_
 int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zend_string *text);
 void phalcon_websocket_connection_close(phalcon_websocket_connection_object *conn, zend_string *reason);
 zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry *ce);
-void phalcon_websocket_connection_free_object_storage_handler(phalcon_websocket_connection_object *intern);
+void phalcon_websocket_connection_free_object_storage_handler(zend_object *object);
 
 
 extern zend_class_entry *phalcon_websocket_connection_ce;

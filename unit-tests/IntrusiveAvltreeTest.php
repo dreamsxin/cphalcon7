@@ -1,9 +1,10 @@
+<?php
 
 /*
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2012 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -18,17 +19,42 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_WEBSOCKET_STRUCTURE_H
-#define PHALCON_WEBSOCKET_STRUCTURE_H
+class IntrusiveAvltreeTest extends PHPUnit_Framework_TestCase
+{
+	public function testNormal()
+	{
+		$avltree = new Phalcon\Intrusive\Avltree;
+		$node2 = $avltree->insert(2);
+		$node3 = $avltree->insert(3);
+		$node4 = $avltree->insert(4);
+		$node5 = $avltree->insert(5);
+		$node6 = $avltree->insert(6);
 
-#include "php_phalcon.h"
+		$node1 = new Phalcon\Intrusive\Avltree\Node(1);
+		$avltree->insert($node1);
 
-#define PHALCON_WEBSOCKET_FREQUENCY 0.2
+		$node = $avltree->find(1);
+		$this->assertEquals($node->getValue(), 1);
 
-/* Callback structure */
-typedef struct _ws_callback {
-	zend_fcall_info *fci;
-	zend_fcall_info_cache *fcc;
-} ws_callback;
+		$node = $avltree->find(6);
+		$this->assertEquals($node->getValue(), 6);
 
-#endif /* PHALCON_WEBSOCKET_STRUCTURE_H */
+		$node = $avltree->first();
+		$this->assertEquals($node->getValue(), 1);
+
+		$node = $avltree->last();
+		$this->assertEquals($node->getValue(), 6);
+
+		$node = $avltree->find(4);
+		$this->assertEquals($node->getValue(), 4);
+
+		$this->assertEquals($node->prev()->getValue(), 3);
+		$this->assertEquals($node->next()->getValue(), 5);
+
+		$node = $avltree->prev(4);
+		$this->assertEquals($node->getValue(), 3);
+
+		$node = $avltree->next(4);
+		$this->assertEquals($node->getValue(), 5);
+	}
+}

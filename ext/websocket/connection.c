@@ -18,15 +18,12 @@
   +------------------------------------------------------------------------+
 */
 
-#ifdef PHALCON_USE_WEBSOCKET
-
 #include "websocket/connection.h"
 
 #include <zend_smart_str.h>
 
 #include "kernel/main.h"
 #include "kernel/string.h"
-
 /**
  * Phalcon\Websocket\Connection
  *
@@ -100,8 +97,10 @@ zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry
 	return &intern->std;
 }
 
-void phalcon_websocket_connection_free_object_storage_handler(phalcon_websocket_connection_object *intern)
+void phalcon_websocket_connection_free_object_storage_handler(zend_object *object)
 {
+	phalcon_websocket_connection_object *intern;
+	intern = phalcon_websocket_connection_object_from_obj(object);
 	while (intern->read_ptr != intern->write_ptr) {
 		zend_string_delref(intern->buf[intern->read_ptr]);
 		if (zend_string_refcount(intern->buf[intern->read_ptr]) < 1) {
@@ -213,5 +212,3 @@ PHP_METHOD(Phalcon_Websocket_Connection, disconnect)
 	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
 	phalcon_websocket_connection_close(intern, reason);
 }
-
-#endif

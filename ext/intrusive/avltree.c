@@ -19,11 +19,13 @@
 */
 
 #include "intrusive/avltree.h"
+#include "intrusive/avltree/node.h"
 
 #include "kernel/main.h"
 #include "kernel/avltree.h"
 #include "kernel/exception.h"
 #include "kernel/object.h"
+#include "kernel/fcall.h"
 #include "kernel/operators.h"
 
 /**
@@ -38,7 +40,7 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, __construct);
 PHP_METHOD(Phalcon_Intrusive_Avltree, insert);
 PHP_METHOD(Phalcon_Intrusive_Avltree, remove);
 PHP_METHOD(Phalcon_Intrusive_Avltree, replace);
-PHP_METHOD(Phalcon_Intrusive_Avltree, lookup);
+PHP_METHOD(Phalcon_Intrusive_Avltree, find);
 PHP_METHOD(Phalcon_Intrusive_Avltree, first);
 PHP_METHOD(Phalcon_Intrusive_Avltree, last);
 PHP_METHOD(Phalcon_Intrusive_Avltree, prev);
@@ -57,7 +59,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_intrusive_avltree_replace, 0, 0, 2)
 	ZEND_ARG_INFO(0, newValue)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_intrusive_avltree_lookup, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_intrusive_avltree_find, 0, 0, 1)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
@@ -74,24 +76,13 @@ static const zend_function_entry phalcon_intrusive_avltree_method_entry[] = {
 	PHP_ME(Phalcon_Intrusive_Avltree, insert, arginfo_phalcon_intrusive_avltree_insert, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Avltree, remove, arginfo_phalcon_intrusive_avltree_remove, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Avltree, replace, arginfo_phalcon_intrusive_avltree_replace, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Intrusive_Avltree, lookup, arginfo_phalcon_intrusive_avltree_lookup, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Intrusive_Avltree, find, arginfo_phalcon_intrusive_avltree_find, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Avltree, first, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Avltree, last, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Avltree, prev, arginfo_phalcon_intrusive_avltree_prev, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Avltree, next, arginfo_phalcon_intrusive_avltree_next, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
-
-typedef struct {
-	zval v;
-	phalcon_avltree_node n;
-} node_value;
-
-static int node_compare(phalcon_avltree_node * a, phalcon_avltree_node * b) {
-  node_value* pa = phalcon_memory_container_of(a, node_value, n);
-  node_value* pb = phalcon_memory_container_of(b, node_value, n);
-  return phalcon_compare(&pa->v, &pb->v);
-}
 
 static void phalcon_zvltree_dtor(zend_resource *rsrc)
 {
@@ -134,13 +125,13 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, __construct){
  * Insert node value
  *
  * @param mixed value
- * @return boolean
+ * @return Phalcon\Intrusive\Avltree\Node
  */
 PHP_METHOD(Phalcon_Intrusive_Avltree, insert){
 
-	zval *value, zid = {};
+	zval *value, zid = {}, node = {};
 	phalcon_avltree *avltree;
-	node_value *node;
+	phalcon_intrusive_avltree_node_object *node_object;
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
@@ -154,10 +145,21 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, insert){
 		RETURN_FALSE;
 	}
 
-	node = (node_value *) emalloc (sizeof (node_value));
+	if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_intrusive_avltree_node_ce)) {
+		object_init_ex(&node, phalcon_intrusive_avltree_node_ce);
+		PHALCON_CALL_METHODW(NULL, &node, "__construct", value);
+		Z_TRY_ADDREF_P(&node);
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ(node));
 
-	ZVAL_COPY(&node->v, value);
-	phalcon_avltree_insert(&node->n, node_compare, avltree);
+		phalcon_avltree_insert(&node_object->node, phalcon_intrusive_avltree_node_compare, avltree);
+		RETURN_CTORW(&node);
+	} else {
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ_P(value));
+
+		phalcon_avltree_insert(&node_object->node, phalcon_intrusive_avltree_node_compare, avltree);
+		Z_TRY_ADDREF_P(value);
+		RETURN_CTORW(value);
+	}
 }
 
 /**
@@ -168,9 +170,9 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, insert){
  */
 PHP_METHOD(Phalcon_Intrusive_Avltree, remove){
 
-	zval *value, zid = {};
+	zval *value, zid = {}, node = {};
 	phalcon_avltree *avltree;
-	node_value p = {{},{}};
+	phalcon_intrusive_avltree_node_object *node_object;
 	phalcon_avltree_node *n;
 
 	phalcon_fetch_params(0, 1, 0, &value);
@@ -185,12 +187,20 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, remove){
 		RETURN_FALSE;
 	}
 
-	ZVAL_COPY(&p.v, value);
- 	n = phalcon_avltree_lookup(&p.n, node_compare, avltree);
+	if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_intrusive_avltree_node_ce)) {
+		object_init_ex(&node, phalcon_intrusive_avltree_node_ce);
+		PHALCON_CALL_METHODW(NULL, &node, "__construct", value);
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ(node));
+	} else {
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ_P(value));
+	}
+	n = phalcon_avltree_lookup(&node_object->node, phalcon_intrusive_avltree_node_compare, avltree);
 	if (!n) {
 		RETURN_FALSE;
 	}
 	phalcon_avltree_remove(n, avltree);
+	node_object = phalcon_intrusive_avltree_node_object_from_node(n);
+	ZVAL_OBJ(return_value, &node_object->std);
 }
 
 /**
@@ -198,13 +208,13 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, remove){
  *
  * @param mixed oldValue
  * @param mixed newValue
- * @return mixed
+ * @return Phalcon\Intrusive\Avltree\Node
  */
 PHP_METHOD(Phalcon_Intrusive_Avltree, replace){
 
-	zval *old_value, *new_value, zid = {};
+	zval *old_value, *new_value, zid = {}, node = {};
 	phalcon_avltree *avltree;
-	node_value p = {{},{}}, *new_node;
+	phalcon_intrusive_avltree_node_object *node_object;
 	phalcon_avltree_node *n;
 
 	phalcon_fetch_params(0, 2, 0, &old_value, &new_value);
@@ -219,28 +229,48 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, replace){
 		RETURN_FALSE;
 	}
 
-	ZVAL_COPY(&p.v, old_value);
- 	n = phalcon_avltree_lookup(&p.n, node_compare, avltree);
+	if (Z_TYPE_P(old_value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(old_value), phalcon_intrusive_avltree_node_ce)) {
+		object_init_ex(&node, phalcon_intrusive_avltree_node_ce);
+		PHALCON_CALL_METHODW(NULL, &node, "__construct", old_value);
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ(node));
+	} else {
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ_P(old_value));
+	}
+	n = phalcon_avltree_lookup(&node_object->node, phalcon_intrusive_avltree_node_compare, avltree);
+
 	if (!n) {
 		RETURN_FALSE;
 	}
 
-	new_node = (node_value *) emalloc (sizeof (node_value));
-	ZVAL_COPY(&new_node->v, new_value);
-	phalcon_avltree_replace(n, &new_node->n, avltree);
+	node_object = phalcon_intrusive_avltree_node_object_from_node(n);
+	ZVAL_OBJ(&node, &node_object->std);
+	Z_TRY_DELREF(node);
+
+	if (Z_TYPE_P(new_value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(new_value), phalcon_intrusive_avltree_node_ce)) {
+		object_init_ex(&node, phalcon_intrusive_avltree_node_ce);
+		PHALCON_CALL_METHODW(NULL, &node, "__construct", new_value);
+		Z_TRY_ADDREF_P(&node);
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ(node));
+	} else {
+		Z_TRY_ADDREF_P(new_value);
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ_P(new_value));
+	}
+	phalcon_avltree_replace(n, &node_object->node, avltree);
+	ZVAL_OBJ(&node, &node_object->std);
+	RETURN_CTORW(&node);
 }
 
 /**
  * Lookup node value
  *
  * @param mixed value
- * @return mixed
+ * @return Phalcon\Intrusive\Avltree\Node
  */
-PHP_METHOD(Phalcon_Intrusive_Avltree, lookup){
+PHP_METHOD(Phalcon_Intrusive_Avltree, find){
 
-	zval *value, zid = {};
+	zval *value, zid = {}, node = {};
 	phalcon_avltree *avltree;
-	node_value p = {{},{}}, *node;
+	phalcon_intrusive_avltree_node_object *node_object;
 	phalcon_avltree_node *n;
 
 	phalcon_fetch_params(0, 1, 0, &value);
@@ -255,25 +285,32 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, lookup){
 		RETURN_FALSE;
 	}
 
-	ZVAL_COPY(&p.v, value);
- 	n = phalcon_avltree_lookup(&p.n, node_compare, avltree);
+	if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_intrusive_avltree_node_ce)) {
+		object_init_ex(&node, phalcon_intrusive_avltree_node_ce);
+		PHALCON_CALL_METHODW(NULL, &node, "__construct", value);
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ(node));
+	} else {
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ_P(value));
+	}
+	n = phalcon_avltree_lookup(&node_object->node, phalcon_intrusive_avltree_node_compare, avltree);
 	if (!n) {
 		RETURN_FALSE;
 	}
-	node = phalcon_memory_container_of(n, node_value, n);
-	RETURN_CTORW(&node->v);
+	node_object = phalcon_intrusive_avltree_node_object_from_node(n);
+	ZVAL_OBJ(&node, &node_object->std);
+	RETURN_CTORW(&node);
 }
 
 /**
  * Returns first node value
  *
- * @return mixed
+ * @return Phalcon\Intrusive\Avltree\Node
  */
 PHP_METHOD(Phalcon_Intrusive_Avltree, first){
 
-	zval zid = {};
+	zval zid = {}, node = {};
 	phalcon_avltree *avltree;
-	node_value *node;
+	phalcon_intrusive_avltree_node_object *node_object;
 	phalcon_avltree_node *n;
 
 	phalcon_read_property(&zid, getThis(), SL("_avltree"), PH_NOISY);
@@ -290,20 +327,21 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, first){
 	if (!n) {
 		RETURN_FALSE;
 	}
-	node = phalcon_memory_container_of(n, node_value, n);
-	RETURN_CTORW(&node->v);
+	node_object = phalcon_intrusive_avltree_node_object_from_node(n);
+	ZVAL_OBJ(&node, &node_object->std);
+	RETURN_CTORW(&node);
 }
 
 /**
  * Returns last node value
  *
- * @return mixed
+ * @return Phalcon\Intrusive\Avltree\Node
  */
 PHP_METHOD(Phalcon_Intrusive_Avltree, last){
 
-	zval zid = {};
+	zval zid = {}, node = {};
 	phalcon_avltree *avltree;
-	node_value *node;
+	phalcon_intrusive_avltree_node_object *node_object;
 	phalcon_avltree_node *n;
 
 	phalcon_read_property(&zid, getThis(), SL("_avltree"), PH_NOISY);
@@ -320,20 +358,22 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, last){
 	if (!n) {
 		RETURN_FALSE;
 	}
-	node = phalcon_memory_container_of(n, node_value, n);
-	RETURN_CTORW(&node->v);
+	node_object = phalcon_intrusive_avltree_node_object_from_node(n);
+	ZVAL_OBJ(&node, &node_object->std);
+	RETURN_CTORW(&node);
 }
 
 /**
  * Returns prev node value
  *
- * @return mixed
+ * @param mixed $value
+ * @return Phalcon\Intrusive\Avltree\Node
  */
 PHP_METHOD(Phalcon_Intrusive_Avltree, prev){
 
-	zval *value, zid = {};
+	zval *value, zid = {}, node = {};
 	phalcon_avltree *avltree;
-	node_value p = {{},{}}, *node;
+	phalcon_intrusive_avltree_node_object *node_object;
 	phalcon_avltree_node *n;
 
 	phalcon_fetch_params(0, 1, 0, &value);
@@ -348,8 +388,14 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, prev){
 		RETURN_FALSE;
 	}
 
-	ZVAL_COPY(&p.v, value);
-	n = phalcon_avltree_lookup(&p.n, node_compare, avltree);
+	if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_intrusive_avltree_node_ce)) {
+		object_init_ex(&node, phalcon_intrusive_avltree_node_ce);
+		PHALCON_CALL_METHODW(NULL, &node, "__construct", value);
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ(node));
+	} else {
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ_P(value));
+	}
+	n = phalcon_avltree_lookup(&node_object->node, phalcon_intrusive_avltree_node_compare, avltree);
 	if (!n) {
 		RETURN_FALSE;
 	}
@@ -358,20 +404,22 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, prev){
 	if (!n) {
 		RETURN_FALSE;
 	}
-	node = phalcon_memory_container_of(n, node_value, n);
-	RETURN_CTORW(&node->v);
+	node_object = phalcon_intrusive_avltree_node_object_from_node(n);
+	ZVAL_OBJ(&node, &node_object->std);
+	RETURN_CTORW(&node);
 }
 
 /**
  * Returns next node value
  *
- * @return mixed
+ * @param mixed $value
+ * @return Phalcon\Intrusive\Avltree\Node
  */
 PHP_METHOD(Phalcon_Intrusive_Avltree, next){
 
-	zval *value, zid = {};
+	zval *value, zid = {}, node = {};
 	phalcon_avltree *avltree;
-	node_value p = {{},{}}, *node;
+	phalcon_intrusive_avltree_node_object *node_object;
 	phalcon_avltree_node *n;
 
 	phalcon_fetch_params(0, 1, 0, &value);
@@ -386,8 +434,14 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, next){
 		RETURN_FALSE;
 	}
 
-	ZVAL_COPY(&p.v, value);
-	n = phalcon_avltree_lookup(&p.n, node_compare, avltree);
+	if (Z_TYPE_P(value) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(value), phalcon_intrusive_avltree_node_ce)) {
+		object_init_ex(&node, phalcon_intrusive_avltree_node_ce);
+		PHALCON_CALL_METHODW(NULL, &node, "__construct", value);
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ(node));
+	} else {
+		node_object = phalcon_intrusive_avltree_node_object_from_obj(Z_OBJ_P(value));
+	}
+	n = phalcon_avltree_lookup(&node_object->node, phalcon_intrusive_avltree_node_compare, avltree);
 	if (!n) {
 		RETURN_FALSE;
 	}
@@ -396,6 +450,7 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, next){
 	if (!n) {
 		RETURN_FALSE;
 	}
-	node = phalcon_memory_container_of(n, node_value, n);
-	RETURN_CTORW(&node->v);
+	node_object = phalcon_intrusive_avltree_node_object_from_node(n);
+	ZVAL_OBJ(&node, &node_object->std);
+	RETURN_CTORW(&node);
 }

@@ -18,8 +18,6 @@
   +------------------------------------------------------------------------+
 */
 
-#ifdef PHALCON_USE_WEBSOCKET
-
 #include "websocket/server.h"
 #include "websocket/eventloopinterface.h"
 #include "websocket/connection.h"
@@ -384,7 +382,7 @@ zend_object* phalcon_websocket_server_create_object_handler(zend_class_entry *ce
 	intern->std.handlers = &phalcon_websocket_server_object_handlers;
 
 	// Set LibWebsockets default options
-	memset(&intern->info, 0, sizeof(intern->info));
+	memset(&intern->info, 0, sizeof(struct lws_context_creation_info));
 	intern->info.uid = -1;
 	intern->info.gid = -1;
 	intern->info.ssl_private_key_filepath = intern->info.ssl_cert_filepath = NULL;	//FIXME HTTPS
@@ -406,9 +404,11 @@ zend_object* phalcon_websocket_server_create_object_handler(zend_class_entry *ce
 	return &intern->std;
 }
 
-void phalcon_websocket_server_free_object_storage_handler(phalcon_websocket_server_object *intern)
+void phalcon_websocket_server_free_object_storage_handler(zend_object *object)
 {
+	phalcon_websocket_server_object *intern;
 	int i;
+	intern = phalcon_websocket_server_object_from_obj(object);
 
 	for (i = 0; i < PHP_CB_SERVER_COUNT; ++i) {
 		if (NULL != intern->callbacks[i]) {
@@ -430,12 +430,12 @@ void phalcon_websocket_server_free_object_storage_handler(phalcon_websocket_serv
 		intern->info.user = NULL;
 	}
 
-	zval_dtor(&intern->eventloop);
+	zval_ptr_dtor(&intern->eventloop);
 
 	FREE_HASHTABLE(intern->eventloop_sockets);
 	intern->eventloop_sockets = NULL;
 
-	zval_dtor(&intern->connections);
+	zval_ptr_dtor(&intern->connections);
 	zend_object_std_dtor(&intern->std);
 	efree(intern);
 }
@@ -718,5 +718,3 @@ PHP_METHOD(Phalcon_Websocket_Server, on)
 
 	RETURN_TRUE;
 }
-
-#endif

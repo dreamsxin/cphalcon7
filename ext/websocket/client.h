@@ -19,10 +19,9 @@
 #ifndef PHALCON_WEBSOCKET_CLIENT_H
 #define PHALCON_WEBSOCKET_CLIENT_H
 
-#ifdef PHALCON_USE_WEBSOCKET
-
 #include "php_phalcon.h"
 
+#ifdef PHALCON_USE_WEBSOCKET
 #include <libwebsockets.h>
 
 #include "websocket/structures.h"
@@ -61,7 +60,7 @@ static inline phalcon_websocket_client_object *phalcon_websocket_client_object_f
 }
 
 zend_object* phalcon_websocket_create_object_handler(zend_class_entry *ce);
-void phalcon_websocket_client_free_object_storage_handler(phalcon_websocket_client_object *intern);
+void phalcon_websocket_client_free_object_storage_handler(zend_object *object);
 
 extern zend_class_entry *phalcon_websocket_client_ce;
 

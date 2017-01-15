@@ -159,9 +159,8 @@ int phalcon_proc_parse_stat(phalcon_process *proc, unsigned int pid) {
     sprintf(path, "/proc/%i/stat", pid);
 	fd = open(path, O_RDONLY);
 	memset(&readbuf, 0, sizeof(readbuf));
-	read(fd, readbuf, sizeof(readbuf));
-
-	sscanf(readbuf, "%d %256s %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %*d %llu %lu %ld %lu %lu %lu %lu %lu %lu %*u %*u %*u %*u %lu %*u %*u %d %d %u %u %llu %lu %ld",
+	if (read(fd, readbuf, sizeof(readbuf)) != -1) {
+		sscanf(readbuf, "%d %256s %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %*d %llu %lu %ld %lu %lu %lu %lu %lu %lu %*u %*u %*u %*u %lu %*u %*u %d %d %u %u %llu %lu %ld",
 					&proc->pid,
 					proc->name,
 					&proc->state,
@@ -199,6 +198,7 @@ int phalcon_proc_parse_stat(phalcon_process *proc, unsigned int pid) {
 					&proc->delayacct_blkio_ticks,
 					&proc->guest_time,
 					&proc->cguest_time);
+	}
     close(fd);
 	return 0;
 }
@@ -211,14 +211,14 @@ int phalcon_proc_parse_statm(phalcon_process *proc, unsigned int pid) {
     sprintf(path, "/proc/%i/statm", pid);
 	fd = open(path, O_RDONLY);
 	memset(&buf, 0, sizeof(buf));
-	read(fd, buf, sizeof(buf));
-
-	sscanf(buf, "%u %u %u %u %*u %u %*u",
+	if (read(fd, buf, sizeof(buf)) != -1) {
+		sscanf(buf, "%u %u %u %u %*u %u %*u",
 		&proc->size,
 		&proc->resident,
 		&proc->share,
 		&proc->text,
 		&proc->data);
+	}
     close(fd);
 	return 0;
 }
@@ -231,9 +231,8 @@ int phalcon_proc_parse_status(phalcon_process *proc, unsigned int pid) {
     sprintf(path, "/proc/%i/status", pid);
     fd = open(path, O_RDONLY);
 	memset(&buf, 0, sizeof(buf));
-	read(fd, buf, sizeof(buf));
-
-	sscanf(buf, "Name: %*s\nState: %*[^\n]\nTgid: %*d\nPid: %*d\nPPid: %*d\nTracerPid: %*d\nUid: %d %d %d %d\nGid: %d %d %d %d\n",
+	if (read(fd, buf, sizeof(buf)) != -1) {
+		sscanf(buf, "Name: %*s\nState: %*[^\n]\nTgid: %*d\nPid: %*d\nPPid: %*d\nTracerPid: %*d\nUid: %d %d %d %d\nGid: %d %d %d %d\n",
 		&proc->ruid,
 		&proc->euid,
 		&proc->ssuid,
@@ -242,7 +241,7 @@ int phalcon_proc_parse_status(phalcon_process *proc, unsigned int pid) {
 		&proc->egid,
 		&proc->ssgid,
 		&proc->fsgid);
-
+	}
     close(fd);
 	return 0;
 }
@@ -255,9 +254,8 @@ int phalcon_proc_parse_io(phalcon_process* proc, unsigned int pid) {
     sprintf(path, "/proc/%i/io", pid);
     fd = open(path, O_RDONLY);
 	memset(&buf, 0, sizeof(buf));
-	read(fd, buf, sizeof(buf));
-
-	sscanf(buf, "rchar: %d\nwchar: %d\nsyscr: %d\nsyscw: %d\nread_bytes: %d\nwrite_bytes: %d\ncancelled_write_bytes: %d",
+	if (read(fd, buf, sizeof(buf)) != -1) {
+		sscanf(buf, "rchar: %d\nwchar: %d\nsyscr: %d\nsyscw: %d\nread_bytes: %d\nwrite_bytes: %d\ncancelled_write_bytes: %d",
 					&proc->rchar,
 					&proc->wchar,
 					&proc->syscr,
@@ -265,7 +263,9 @@ int phalcon_proc_parse_io(phalcon_process* proc, unsigned int pid) {
 					&proc->read_bytes,
 					&proc->write_bytes,
 					&proc->cancelled_write_bytes);
+	}
     close(fd);
+
 	return 0;
 }
 

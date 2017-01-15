@@ -56,5 +56,10 @@ class IntrusiveAvltreeTest extends PHPUnit_Framework_TestCase
 
 		$node = $avltree->next(4);
 		$this->assertEquals($node->getValue(), 5);
+
+		$node = $avltree->replace($node1, $node5);
+		$this->assertEquals($node, $node5);
+
+		$this->assertFalse($avltree->find(1));
 	}
 }

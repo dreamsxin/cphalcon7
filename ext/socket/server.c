@@ -485,7 +485,11 @@ static int phalcon_socket_server_start_daemon(void) {
 	}
 
 	umask(0);
-	chdir("/");
+
+	if (chdir("/") <0 ) {
+		return 0;
+	}
+
 	for (i=0; i < 3; i++) {
 		close(i);
 	}

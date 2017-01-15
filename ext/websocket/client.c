@@ -18,8 +18,6 @@
   +------------------------------------------------------------------------+
 */
 
-#ifdef PHALCON_USE_WEBSOCKET
-
 #include "websocket/client.h"
 #include "websocket/connection.h"
 
@@ -277,9 +275,11 @@ zend_object* phalcon_websocket_client_create_object_handler(zend_class_entry *ce
 	return &intern->std;
 }
 
-void phalcon_websocket_client_free_object_storage_handler(phalcon_websocket_client_object *intern)
+void phalcon_websocket_client_free_object_storage_handler(zend_object *object)
 {
+	phalcon_websocket_client_object *intern;
 	int i;
+	intern = phalcon_websocket_client_object_from_obj(object);
 
 	for (i = 0; i < PHP_CB_CLIENT_COUNT; ++i) {
 		if (NULL != intern->callbacks[i]) {
@@ -525,5 +525,3 @@ PHP_METHOD(Phalcon_Websocket_Client, disconnect)
 	intern = phalcon_websocket_client_object_from_obj(Z_OBJ_P(getThis()));
 	intern->exit_request = 1;
 }
-
-#endif

@@ -190,7 +190,7 @@ int phalcon_static_property_incr_ce(zend_class_entry *ce, const char *property, 
 int phalcon_static_property_decr_ce(zend_class_entry *ce, const char *property, uint32_t len){
 
 	zval *value = phalcon_read_static_property_ce(ce, property, len);
-	
+
 	phalcon_decrement(value);
 
 	phalcon_update_static_property_ce(ce, property, len, value);
@@ -1323,7 +1323,7 @@ int phalcon_method_exists(const zval *object, const zval *method_name){
 	}
 
 	lcname = zend_string_tolower(Z_STR_P(method_name));
-				
+
 	while (ce) {
 		if (zend_hash_exists(&ce->function_table, lcname)) {
 			return SUCCESS;

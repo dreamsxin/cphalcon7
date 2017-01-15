@@ -335,12 +335,9 @@ socket.c \
 socket/client.c \
 socket/server.c \
 socket/exception.c \
-websocket/connection.c \
-websocket/server.c \
-websocket/client.c \
-websocket/eventloopinterface.c \
 process/sharedmemory.c \
 intrusive/avltree.c \
+intrusive/avltree/node.c \
 debug.c \
 debug/exception.c \
 debug/dump.c \
@@ -638,19 +635,6 @@ async.c \
 process/proc.c \
 process/exception.c"
 
-	AC_MSG_CHECKING([Include non-free minifiers])
-	if test "$PHP_NON_FREE" = "yes"; then
-		phalcon_sources="$phalcon_sources assets/filters/jsminifier.c assets/filters/cssminifier.c "
-	else
-		phalcon_sources="$phalcon_sources assets/filters/nojsminifier.c assets/filters/nocssminifier.c "
-	fi
-
-	PHP_NEW_EXTENSION(phalcon, $phalcon_sources, $ext_shared)
-	PHP_ADD_EXTENSION_DEP([phalcon], [spl])
-	PHP_ADD_EXTENSION_DEP([phalcon], [date])
-
-	PHP_C_BIGENDIAN
-
 	old_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $INCLUDES"
 
@@ -811,6 +795,8 @@ process/exception.c"
 
 			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
 			break
+		else
+			AC_MSG_RESULT([no, found in $i])
 		fi
 	done
 
@@ -821,7 +807,7 @@ process/exception.c"
 		fi
 
 		AC_MSG_CHECKING([checking libqrencode support])
-		for i in /usr/local /usr ../deps/libqrencode; do
+		for i in /usr/local /usr; do
 			if test -r $i/include/qrencode.h; then
 				PHP_ADD_INCLUDE($i/include)
 				PHP_CHECK_LIBRARY(qrencode, QRcode_encodeString,
@@ -834,6 +820,8 @@ process/exception.c"
 					-L$i/$PHP_LIBDIR -lm
 				])
 				break
+			else
+				AC_MSG_RESULT([no, found in $i])
 			fi
 		done
 
@@ -843,7 +831,7 @@ process/exception.c"
 				PHP_ADD_INCLUDE($i/include)
 				PHP_CHECK_LIBRARY(zbar, zbar_scan_image,
 				[
-					PHP_ADD_LIBRARY_WITH_PATH(qrencode, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+					PHP_ADD_LIBRARY_WITH_PATH(zbar, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
 					AC_DEFINE(PHALCON_USE_ZBAR, 1, [Have libzbar support])
 				],[
 					AC_MSG_ERROR([Wrong zbar version or library not found])
@@ -851,12 +839,14 @@ process/exception.c"
 					-L$i/$PHP_LIBDIR -lm
 				])
 				break
+			else
+				AC_MSG_RESULT([no, found in $i])
 			fi
 		done
 	fi
 
 	AC_MSG_CHECKING([for libuv files in default path])
-	for i in /usr/local /usr ../deps/libuv; do
+	for i in /usr/local /usr; do
 		if test -r $i/include/uv.h; then
 			PHP_ADD_INCLUDE($i/include)
 			PHP_CHECK_LIBRARY(uv, uv_version,
@@ -875,13 +865,14 @@ process/exception.c"
 	done
 
 	AC_MSG_CHECKING([for libwebsockets files in default path])
-	for i in /usr/local /usr ../deps/libwebsockets; do
+	for i in /usr/local /usr; do
 		if test -r $i/include/libwebsockets.h; then
 			PHP_ADD_INCLUDE($i/include)
 			PHP_CHECK_LIBRARY(websockets, lws_callback_on_writable,
 			[
 				PHP_ADD_LIBRARY_WITH_PATH(websockets, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
 				AC_DEFINE(PHALCON_USE_WEBSOCKET, 1, [Have WebSocket support])
+				phalcon_sources="$phalcon_sources websocket/connection.c websocket/server.c websocket/client.c websocket/eventloopinterface.c "
 			],[
 				AC_MSG_ERROR([Wrong websockets version or library not found])
 			],[
@@ -892,6 +883,21 @@ process/exception.c"
 			AC_MSG_RESULT([no, found in $i])
 		fi
 	done
+
+	AC_MSG_CHECKING([Include non-free minifiers])
+	if test "$PHP_NON_FREE" = "yes"; then
+		phalcon_sources="$phalcon_sources assets/filters/jsminifier.c assets/filters/cssminifier.c "
+	else
+		phalcon_sources="$phalcon_sources assets/filters/nojsminifier.c assets/filters/nocssminifier.c "
+	fi
+
+	PHP_SUBST(PHALCON_SHARED_LIBADD)
+
+	PHP_NEW_EXTENSION(phalcon, $phalcon_sources, $ext_shared)
+	PHP_ADD_EXTENSION_DEP([phalcon], [spl])
+	PHP_ADD_EXTENSION_DEP([phalcon], [date])
+
+	PHP_C_BIGENDIAN
 
 	PHP_ADD_MAKEFILE_FRAGMENT([Makefile.frag])
 fi

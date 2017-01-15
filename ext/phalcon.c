@@ -485,6 +485,14 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Socket_Client);
 	PHALCON_INIT(Phalcon_Socket_Server);
 	PHALCON_INIT(Phalcon_Process_Proc);
+	PHALCON_INIT(Phalcon_Process_Sharedmemory);
+#ifdef PHALCON_USE_WEBSOCKET
+	PHALCON_INIT(Phalcon_Websocket_Connection);
+	PHALCON_INIT(Phalcon_Websocket_Client);
+	PHALCON_INIT(Phalcon_Websocket_Server);
+#endif
+	PHALCON_INIT(Phalcon_Intrusive_Avltree);
+	PHALCON_INIT(Phalcon_Intrusive_Avltree_Node);
 
 	return SUCCESS;
 }

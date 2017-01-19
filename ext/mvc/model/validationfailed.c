@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 		/** 
 		 * Get the message to use it in the exception
 		 */
-		PHALCON_CALL_METHODW(&message_str, &message, "getmessage");
+		PHALCON_CALL_METHOD(&message_str, &message, "getmessage");
 	} else {
 		ZVAL_STRING(&message_str, "Validation failed");
 	}
@@ -93,7 +93,7 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 	phalcon_update_property_zval(getThis(), SL("_model"), model);
 	phalcon_update_property_zval(getThis(), SL("_messages"), validation_messages);
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_validationfailed_ce, getThis(), "__construct", &message_str);
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_validationfailed_ce, getThis(), "__construct", &message_str);
 }
 
 /**

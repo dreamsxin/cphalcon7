@@ -239,9 +239,9 @@ PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
-			PHALCON_CALL_METHODW(NULL, &headers, "set", &key, value);	
+			PHALCON_CALL_METHOD(NULL, &headers, "set", &key, value);	
 		} ZEND_HASH_FOREACH_END();
 	}
 	
-	RETURN_CTORW(&headers);
+	RETURN_CTOR(&headers);
 }

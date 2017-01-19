@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, __construct){
 	}
 
 	if (Z_TYPE_P(result) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Invalid PDOStatement supplied to Phalcon\\Db\\Result\\Pdo");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid PDOStatement supplied to Phalcon\\Db\\Result\\Pdo");
 		return;
 	}
 	phalcon_update_property_zval(getThis(), SL("_connection"), connection);
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, execute){
 
 	zval pdo_statement = {};
 	phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&pdo_statement, "execute");
+	PHALCON_RETURN_CALL_METHOD(&pdo_statement, "execute");
 }
 
 /**
@@ -196,15 +196,15 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetch){
 	if (Z_TYPE_P(fetch_style) != IS_NULL) {
 		if (Z_TYPE_P(cursor_orientation) != IS_NULL) {
 			if (Z_TYPE_P(cursor_offset) != IS_NULL) {
-				PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetch", fetch_style, cursor_orientation, cursor_offset);
+				PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetch", fetch_style, cursor_orientation, cursor_offset);
 			} else {
-				PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetch", fetch_style, cursor_orientation);
+				PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetch", fetch_style, cursor_orientation);
 			}
 		} else {
-			PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetch", fetch_style);
+			PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetch", fetch_style);
 		}
 	} else {
-		PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetch");
+		PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetch");
 	}
 }
 
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchArray){
 
 	zval pdo_statement = {};
 	phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetch");
+	PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetch");
 }
 
 /**
@@ -265,15 +265,15 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
 	if (PHALCON_IS_NOT_TYPE(fetch_mode, IS_NULL)) {
 		if (PHALCON_IS_NOT_TYPE(fetch_argument, IS_NULL)) {
 			if (PHALCON_IS_NOT_TYPE(ctor_args, IS_NULL)) {
-				PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetchall", fetch_mode, fetch_argument, ctor_args);
+				PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetchall", fetch_mode, fetch_argument, ctor_args);
 			} else {
-				PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetchall", fetch_mode, fetch_argument);
+				PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetchall", fetch_mode, fetch_argument);
 			}
 		} else {
-			PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetchall", fetch_mode);
+			PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetchall", fetch_mode);
 		}
 	} else {
-		PHALCON_RETURN_CALL_METHODW(&pdo_statement, "fetchall");
+		PHALCON_RETURN_CALL_METHOD(&pdo_statement, "fetchall");
 	}
 }
 
@@ -297,14 +297,14 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 	if (PHALCON_IS_FALSE(&row_count)) {
 		phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(&type, &connection, "gettype");
+		PHALCON_CALL_METHOD(&type, &connection, "gettype");
 
 		/** 
 		 * MySQL/PostgreSQL library property returns the number of records
 		 */
 		if (PHALCON_IS_STRING(&type, "mysql") || PHALCON_IS_STRING(&type, "pgsql")) {
 			phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY);
-			PHALCON_CALL_METHODW(&row_count, &pdo_statement, "rowcount");
+			PHALCON_CALL_METHOD(&row_count, &pdo_statement, "rowcount");
 		}
 
 		/** 
@@ -336,8 +336,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 
 					PHALCON_CONCAT_SVS(&sql, "SELECT COUNT(*) \"numrows\" FROM (SELECT ", &else_clauses, ")");
 
-					PHALCON_CALL_METHODW(&result, &connection, "query", &sql, &bind_params, &bind_types);
-					PHALCON_CALL_METHODW(&row, &result, "fetch");
+					PHALCON_CALL_METHOD(&result, &connection, "query", &sql, &bind_params, &bind_types);
+					PHALCON_CALL_METHOD(&row, &result, "fetch");
 
 					phalcon_array_fetch_str(&row_count, &row, SL("numrows"), PH_NOISY);
 				}
@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		phalcon_update_property_zval(getThis(), SL("_rowCount"), &row_count);
 	}
 
-	RETURN_CTORW(&row_count);
+	RETURN_CTOR(&row_count);
 }
 
 /**
@@ -377,7 +377,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 	number = phalcon_get_intval(num);
 	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(&pdo, &connection, "getinternalhandler");
+	PHALCON_CALL_METHOD(&pdo, &connection, "getinternalhandler");
 
 	 phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY);
 	 phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY);
@@ -388,14 +388,14 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
 		phalcon_read_property(&bind_types, getThis(), SL("_bindTypes"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(&statement, &pdo, "prepare", &sql_statement);
+		PHALCON_CALL_METHOD(&statement, &pdo, "prepare", &sql_statement);
 		if (Z_TYPE(statement) == IS_OBJECT) {
-			PHALCON_CALL_METHODW(&temp_statement, &connection, "executeprepared", &statement, &bind_params, &bind_types);
+			PHALCON_CALL_METHOD(&temp_statement, &connection, "executeprepared", &statement, &bind_params, &bind_types);
 			PHALCON_CPY_WRT_CTOR(&statement, &temp_statement);
 		}
 
 	} else {
-		PHALCON_CALL_METHODW(&statement, &pdo, "query", &sql_statement);
+		PHALCON_CALL_METHOD(&statement, &pdo, "query", &sql_statement);
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_pdoStatement"), &statement);
@@ -456,13 +456,13 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, setFetchMode){
 
 	if (Z_LVAL_P(fetch_mode) != 0) {
 		if (fetch_arg1 && fetch_arg2) {
-			PHALCON_CALL_METHODW(NULL, &pdo_statement, "setfetchmode", fetch_mode, fetch_arg1, fetch_arg2);
+			PHALCON_CALL_METHOD(NULL, &pdo_statement, "setfetchmode", fetch_mode, fetch_arg1, fetch_arg2);
 		} else if (fetch_arg1) {
-			PHALCON_CALL_METHODW(NULL, &pdo_statement, "setfetchmode", fetch_mode, fetch_arg1);
+			PHALCON_CALL_METHOD(NULL, &pdo_statement, "setfetchmode", fetch_mode, fetch_arg1);
 		} else if (fetch_arg2) {
-			PHALCON_CALL_METHODW(NULL, &pdo_statement, "setfetchmode", fetch_mode, fetch_arg2);
+			PHALCON_CALL_METHOD(NULL, &pdo_statement, "setfetchmode", fetch_mode, fetch_arg2);
 		} else {
-			PHALCON_CALL_METHODW(NULL, &pdo_statement, "setfetchmode", fetch_mode);
+			PHALCON_CALL_METHOD(NULL, &pdo_statement, "setfetchmode", fetch_mode);
 		}
 		
 		phalcon_update_property_long(getThis(), SL("_fetchMode"), Z_LVAL_P(fetch_mode));
@@ -492,5 +492,5 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, nextRowset){
 	zval pdo_statement = {};
 
 	phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&pdo_statement, "nextrowset");
+	PHALCON_RETURN_CALL_METHOD(&pdo_statement, "nextrowset");
 }

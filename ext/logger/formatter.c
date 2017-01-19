@@ -65,7 +65,7 @@ PHP_METHOD(Phalcon_Logger_Formatter, getTypeString){
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
-	PHALCON_CALL_CE_STATICW(return_value, phalcon_logger_ce, "gettypestring", type);
+	PHALCON_CALL_CE_STATIC(return_value, phalcon_logger_ce, "gettypestring", type);
 }
 
 /**
@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 			efree(tmp);
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_RETURN_CALL_FUNCTIONW("strtr", message, &replace);
+		PHALCON_RETURN_CALL_FUNCTION("strtr", message, &replace);
 		return;
 	}
 

@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Socket, getSocketId){
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
 	if ((php_sock = (php_socket *)zend_fetch_resource_ex(&socket, php_sockets_le_socket_name, php_sockets_le_socket())) == NULL) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_socket_exception_ce, "epoll: can't fetch socket");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_socket_exception_ce, "epoll: can't fetch socket");
 		RETURN_FALSE;
 	}
 
@@ -159,20 +159,20 @@ PHP_METHOD(Phalcon_Socket, _throwSocketException){
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 	if (Z_TYPE(socket) == IS_RESOURCE) {
-		PHALCON_CALL_FUNCTIONW(&exception_code, "socket_last_error", &socket);
+		PHALCON_CALL_FUNCTION(&exception_code, "socket_last_error", &socket);
 	} else {
-		PHALCON_CALL_FUNCTIONW(&exception_code, "socket_last_error");
+		PHALCON_CALL_FUNCTION(&exception_code, "socket_last_error");
 	}
-	PHALCON_CALL_FUNCTIONW(&exception_message, "socket_strerror", &exception_code);
+	PHALCON_CALL_FUNCTION(&exception_message, "socket_strerror", &exception_code);
 
 	if (Z_TYPE(socket) == IS_RESOURCE) {
-		PHALCON_CALL_FUNCTIONW(NULL, "socket_clear_error", &socket);
+		PHALCON_CALL_FUNCTION(NULL, "socket_clear_error", &socket);
 	} else {
-		PHALCON_CALL_FUNCTIONW(NULL, "socket_clear_error");
+		PHALCON_CALL_FUNCTION(NULL, "socket_clear_error");
 	}
 
 	object_init_ex(&exception, phalcon_socket_exception_ce);
-	PHALCON_CALL_METHODW(NULL, &exception, "__construct", &exception_message, &exception_code);
+	PHALCON_CALL_METHOD(NULL, &exception, "__construct", &exception_message, &exception_code);
 
 	phalcon_throw_exception(&exception);
 }
@@ -197,9 +197,9 @@ PHP_METHOD(Phalcon_Socket, setBlocking){
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
 	if (zend_is_true(flag)) {
-		PHALCON_CALL_FUNCTIONW(return_value, "socket_set_block", &socket);
+		PHALCON_CALL_FUNCTION(return_value, "socket_set_block", &socket);
 	} else {
-		PHALCON_CALL_FUNCTIONW(return_value, "socket_set_nonblock", &socket);
+		PHALCON_CALL_FUNCTION(return_value, "socket_set_nonblock", &socket);
 	}
 	phalcon_update_property_zval(getThis(), SL("_blocking"), flag);
 }
@@ -230,10 +230,10 @@ PHP_METHOD(Phalcon_Socket, setOption){
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(return_value, "socket_set_option", &socket, level, optname, optval);
+	PHALCON_CALL_FUNCTION(return_value, "socket_set_option", &socket, level, optname, optval);
 
 	if (PHALCON_IS_FALSE(return_value)) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
+		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 	}
 }
 
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Socket, close){
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(NULL, "socket_close", &socket);
+	PHALCON_CALL_FUNCTION(NULL, "socket_close", &socket);
 	phalcon_update_property_bool(getThis(), SL("_close"), 1);
 }
 
@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Socket, __destruct){
 	zval socket = {};
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, getThis(), "close");
+	PHALCON_CALL_METHOD(NULL, getThis(), "close");
 	phalcon_update_property_null(getThis(), SL("_socket"));
 	phalcon_update_property_bool(getThis(), SL("_close"), 1);
 }

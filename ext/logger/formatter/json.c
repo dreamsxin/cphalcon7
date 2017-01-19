@@ -70,12 +70,12 @@ PHP_METHOD(Phalcon_Logger_Formatter_Json, format){
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 	
 	if (Z_TYPE_P(context) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
+		PHALCON_CALL_METHOD(&interpolated, getThis(), "interpolate", message, context);
 	} else {
 		PHALCON_CPY_WRT(&interpolated, message);
 	}
 
-	PHALCON_CALL_METHODW(&type_str, getThis(), "gettypestring", type);
+	PHALCON_CALL_METHOD(&type_str, getThis(), "gettypestring", type);
 
 	array_init_size(&log, 3);
 	phalcon_array_update_str(&log, SL("type"), &type_str, PH_COPY);

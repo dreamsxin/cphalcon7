@@ -548,7 +548,6 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 	public function testOutputApcCache()
 	{
-
 		$ready = $this->_prepareApc();
 		if (!$ready) {
 			return false;
@@ -645,9 +644,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 	protected function _prepareMongo()
 	{
-
-		if (!extension_loaded('mongo')) {
-			$this->markTestSkipped('mongo extension is not loaded');
+		if (!class_exists('Phalcon\Cache\Backend\Mongo')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Backend\Mongo` is not exists');
 			return false;
 		}
 
@@ -656,17 +654,10 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 	public function testOutputMongoCache()
 	{
-
 		$ready = $this->_prepareMongo();
 		if (!$ready) {
 			return false;
 		}
-
-		//remove existing
-		$mongo = new MongoClient();
-		$database = $mongo->phalcon_test;
-		$collection = $database->caches;
-		$collection->remove();
 
 		$time = date('H:i:s');
 
@@ -675,11 +666,10 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		));
 
 		$cache = new Phalcon\Cache\Backend\Mongo($frontCache, array(
-			'server' => 'mongodb://localhost',
 			'db' => 'phalcon_test',
 			'collection' => 'caches'
 		));
-
+		$this->assertTrue($cache->flush());
 		ob_start();
 
 		//First time cache
@@ -695,17 +685,15 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($time, $obContent);
 
-		$document = $collection->findOne(array('key' => 'test-output'));
-		$this->assertTrue(is_array($document));
-		$this->assertEquals($time, $document['data']);
+		$data = $cache->get('test-output');
+		$this->assertEquals($time, $data);
 
 		//Expect same cache
 		$content = $cache->start('test-output');
 		$this->assertFalse($content === null);
 
-		$document = $collection->findOne(array('key' => 'test-output'));
-		$this->assertTrue(is_array($document));
-		$this->assertEquals($time, $document['data']);
+		$data = $cache->get('test-output');
+		$this->assertEquals($time, $data);
 
 		//Query keys
 		$keys = $cache->queryKeys();
@@ -727,20 +715,14 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			return false;
 		}
 
-		//remove existing
-		$mongo = new MongoClient();
-		$database = $mongo->phalcon_test;
-		$collection = $database->caches;
-		$collection->remove();
-
 		// Travis can be slow, especially when Valgrind is used
 		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 900));
 
 		$cache = new Phalcon\Cache\Backend\Mongo($frontCache, array(
-			'mongo' => $mongo,
 			'db' => 'phalcon_test',
 			'collection' => 'caches'
 		));
+		$this->assertTrue($cache->flush());
 
 		$data = array(1, 2, 3, 4, 5);
 
@@ -770,7 +752,6 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 200));
 
 		$cache = new Phalcon\Cache\Backend\Mongo($frontCache, array(
-			'mongo' => new MongoClient(),
 			'db' => 'phalcon_test',
 			'collection' => 'caches'
 		));
@@ -795,7 +776,6 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 200));
 
 		$cache = new Phalcon\Cache\Backend\Mongo($frontCache, array(
-			'mongo' => new MongoClient(),
 			'db' => 'phalcon_test',
 			'collection' => 'caches'
 		));
@@ -1458,23 +1438,14 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 	public function testCacheMongoFlush()
 	{
-		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 10));
-
 		// Mongo
 		$ready = $this->_prepareMongo();
 		if (!$ready) {
 			return false;
 		}
 
-		$mongo = new MongoClient();
-		$database = $mongo->phalcon_test;
-		$collection = $database->caches;
-		$collection->remove();
-
 		$frontCache = new Phalcon\Cache\Frontend\Data();
-
 		$cache = new Phalcon\Cache\Backend\Mongo($frontCache, array(
-			'mongo' => $mongo,
 			'db' => 'phalcon_test',
 			'collection' => 'caches'
 		));

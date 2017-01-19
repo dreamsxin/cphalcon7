@@ -27,8 +27,10 @@
 #include "kernel/memory.h"
 #include "kernel/array.h"
 #include "kernel/object.h"
+#include "kernel/string.h"
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
+#include "kernel/exception.h"
 
 /**
  * Phalcon\Cache\Backend
@@ -98,61 +100,57 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 	zval *frontend, *options = NULL, prefix = {};
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
-	PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_cache_frontendinterface_ce, phalcon_cache_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_cache_frontendinterface_ce, phalcon_cache_exception_ce);
+
+	phalcon_update_property_zval(getThis(), SL("_frontend"), frontend);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		/**
 		 * A common option is the prefix
 		 */
 		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+			if (phalcon_fast_strpos_str(NULL, &prefix, SL("#"))) {
+				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The prefix is currupted, can't contain `#`");
+				return;
+			}
 			phalcon_update_property_zval(getThis(), SL("_prefix"), &prefix);
 		}
 
 		phalcon_update_property_zval(getThis(), SL("_options"), options);
 	}
-
-	phalcon_update_property_zval(getThis(), SL("_frontend"), frontend);
 }
 
 /**
  * Starts a cache. The $keyname allows to identify the created fragment
  *
  * @param int|string $keyName
- * @param   long $lifetime
- * @return  mixed
+ * @param long $lifetime
+ * @return mixed
  */
 PHP_METHOD(Phalcon_Cache_Backend, start){
 
 	zval *key_name, *lifetime = NULL, *fresh = NULL, frontend = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
-	
-	if (!lifetime) {
-		lifetime = &PHALCON_GLOBAL(z_null);
+
+	if (lifetime && Z_TYPE_P(lifetime) == IS_LONG) {
+		phalcon_update_property_zval(getThis(), SL("_lastLifetime"), lifetime);
+		PHALCON_CALL_METHOD(return_value, getThis(), "get", key_name, lifetime);
+	} else {
+		PHALCON_CALL_METHOD(return_value, getThis(), "get", key_name);
 	}
-	
-	/** 
-	 * Get the cache content verifying if it was expired
-	 */
-	PHALCON_RETURN_CALL_METHODW(getThis(), "get", key_name, lifetime);
+
 	if (Z_TYPE_P(return_value) == IS_NULL) {
 		fresh = &PHALCON_GLOBAL(z_true);
-	
+
 		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
-		PHALCON_CALL_METHODW(NULL, &frontend, "start");
+		PHALCON_CALL_METHOD(NULL, &frontend, "start");
 	} else {
 		fresh = &PHALCON_GLOBAL(z_false);
 	}
-	
+
 	phalcon_update_property_zval(getThis(), SL("_fresh"), fresh);
 	phalcon_update_property_zval(getThis(), SL("_started"), &PHALCON_GLOBAL(z_true));
-	
-	/** 
-	 * Update the last lifetime to be used in save()
-	 */
-	if (Z_TYPE_P(lifetime) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_lastLifetime"), lifetime);
-	}
 }
 
 /**
@@ -165,10 +163,10 @@ PHP_METHOD(Phalcon_Cache_Backend, stop){
 	zval *stop_buffer = NULL, frontend = {};
 
 	phalcon_fetch_params(0, 0, 1, &stop_buffer);
-	
+
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
 		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
-		PHALCON_CALL_METHODW(NULL, &frontend, "stop");
+		PHALCON_CALL_METHOD(NULL, &frontend, "stop");
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
@@ -228,9 +226,9 @@ PHP_METHOD(Phalcon_Cache_Backend, setLastKey){
 	zval *last_key;
 
 	phalcon_fetch_params(0, 1, 0, &last_key);
-	
+
 	phalcon_update_property_zval(getThis(), SL("_lastKey"), last_key);
-	
+
 }
 
 /**
@@ -251,6 +249,12 @@ PHP_METHOD(Phalcon_Cache_Backend, getLastKey){
  */
 PHP_METHOD(Phalcon_Cache_Backend, getLifetime){
 
+	zval lifetime = {}, frontend = {};
 
-	RETURN_MEMBER(getThis(), "_lastLifetime");
+	phalcon_read_property(&lifetime, getThis(), SL("_lastLifetime"), PH_NOISY);
+	if (Z_TYPE(lifetime) != IS_LONG) {
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		PHALCON_CALL_METHOD(&lifetime, &frontend, "getlifetime");
+	}
+	RETURN_CTOR(&lifetime);
 }

@@ -65,15 +65,15 @@ PHP_METHOD(Phalcon_DI_FactoryDefault_CLI, __construct){
 
 	zval *shared, name = {}, definition = {};
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_di_factorydefault_cli_ce, getThis(), "__construct");
+	PHALCON_CALL_PARENT(NULL, phalcon_di_factorydefault_cli_ce, getThis(), "__construct");
 
 	shared = &PHALCON_GLOBAL(z_true);
 
 	ZVAL_STRING(&name, ISV(router));
 	ZVAL_STRING(&definition, "Phalcon\\CLI\\Router");
-	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
 
 	ZVAL_STRING(&name, ISV(dispatcher));
 	ZVAL_STRING(&definition, "Phalcon\\CLI\\Dispatcher");
-	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
+	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
 }

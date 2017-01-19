@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, setCurrentPage){
 	phalcon_fetch_params(0, 1, 0, &page);
 
 	phalcon_update_property_zval(getThis(), SL("_page"), page);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 
 	ZVAL_LONG(&total_pages, (long int)ceil(Z_DVAL(possible_pages)));
 	if (Z_TYPE(items) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Invalid data for paginator");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Invalid data for paginator");
 		return;
 	}
 
@@ -154,9 +154,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		 * Seek to the desired position
 		 */
 		if (PHALCON_LT(&start, &rowcount)) {
-			PHALCON_CALL_METHODW(NULL, &items, "seek", &start);
+			PHALCON_CALL_METHOD(NULL, &items, "seek", &start);
 		} else {
-			PHALCON_CALL_METHODW(NULL, &items, "rewind");
+			PHALCON_CALL_METHOD(NULL, &items, "rewind");
 			PHALCON_CPY_WRT_CTOR(&page_number, &PHALCON_GLOBAL(z_one));
 			PHALCON_CPY_WRT_CTOR(&start, &PHALCON_GLOBAL(z_zero));
 		}
@@ -166,12 +166,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		 */
 		for (i=1; ; ++i) {
 			zval valid = {}, current = {};
-			PHALCON_CALL_METHODW(&valid, &items, "valid");
+			PHALCON_CALL_METHOD(&valid, &items, "valid");
 			if (!PHALCON_IS_NOT_FALSE(&valid)) {
 				break;
 			}
 
-			PHALCON_CALL_METHODW(&current, &items, "current");
+			PHALCON_CALL_METHOD(&current, &items, "current");
 			phalcon_array_append(&page_items, &current, PH_COPY);
 
 			if (i >= i_show) {
@@ -225,5 +225,5 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	phalcon_update_property_zval(&page, SL("total_pages"), &pages_total);
 	phalcon_update_property_zval(&page, SL("total_items"), &rowcount);
 
-	RETURN_CTORW(&page);
+	RETURN_CTOR(&page);
 }

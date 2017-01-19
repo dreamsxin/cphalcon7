@@ -170,8 +170,8 @@ PHP_METHOD(Phalcon_Date_DateTime, __construct){
 		tz = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_CE_STATICW(&timezone, phalcon_date_ce, "createdatetimezone", tz);
-	PHALCON_CALL_PARENTW(NULL, phalcon_date_datetime_ce, getThis(), "__construct", time, &timezone);
+	PHALCON_CALL_CE_STATIC(&timezone, phalcon_date_ce, "createdatetimezone", tz);
+	PHALCON_CALL_PARENT(NULL, phalcon_date_datetime_ce, getThis(), "__construct", time, &timezone);
 }
 
 /**
@@ -196,8 +196,8 @@ PHP_METHOD(Phalcon_Date_DateTime, setDateTime){
 		second = &PHALCON_GLOBAL(z_zero);
 	}
 
-	PHALCON_CALL_METHODW(&datetime, getThis(), "setdate", year, month, day);
-	PHALCON_CALL_METHODW(return_value, &datetime, "settime", hour, minute, second);
+	PHALCON_CALL_METHOD(&datetime, getThis(), "setdate", year, month, day);
+	PHALCON_CALL_METHOD(return_value, &datetime, "settime", hour, minute, second);
 }
 
 /**
@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Date_DateTime, setDateTime){
  */
 PHP_METHOD(Phalcon_Date_DateTime, startOfDay){
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "settime", &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHOD(return_value, getThis(), "settime", &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfDay){
 	ZVAL_LONG(&minute, 59);
 	ZVAL_LONG(&second, 59);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "settime", &hour, &minute, &second);
+	PHALCON_CALL_METHOD(return_value, getThis(), "settime", &hour, &minute, &second);
 }
 
 /**
@@ -236,12 +236,12 @@ PHP_METHOD(Phalcon_Date_DateTime, startOfMonth){
 	zval p = {}, year = {}, month = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_STRING(&p, "month");
-	PHALCON_CALL_METHODW(&month, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&month, getThis(), "__get", &p);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &year, &month, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &year, &month, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -254,19 +254,19 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfMonth){
 	zval p = {}, year = {}, month = {}, daysinmonth = {}, hour = {}, minute = {}, second = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_STRING(&p, "month");
-	PHALCON_CALL_METHODW(&month, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&month, getThis(), "__get", &p);
 
 	ZVAL_STRING(&p, "daysInMonth");
-	PHALCON_CALL_METHODW(&daysinmonth, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&daysinmonth, getThis(), "__get", &p);
 
 	ZVAL_LONG(&hour, 23);
 	ZVAL_LONG(&minute, 59);
 	ZVAL_LONG(&second, 59);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &year, &month, &daysinmonth, &hour, &minute, &second);
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &year, &month, &daysinmonth, &hour, &minute, &second);
 }
 
 /**
@@ -279,14 +279,14 @@ PHP_METHOD(Phalcon_Date_DateTime, startOfQuarter){
 	zval p = {}, year = {}, quarter = {}, month = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_STRING(&p, "quarter");
-	PHALCON_CALL_METHODW(&quarter, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&quarter, getThis(), "__get", &p);
 
 	ZVAL_LONG(&month, ((Z_LVAL(quarter) - 1) * PHALCON_MONTHS_PER_QUARTER + 1));
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &year, &month, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &year, &month, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -299,21 +299,21 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfQuarter){
 	zval p = {}, year = {}, quarter = {}, month = {}, daysinmonth = {}, hour = {}, minute = {}, second = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_STRING(&p, "quarter");
-	PHALCON_CALL_METHODW(&quarter, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&quarter, getThis(), "__get", &p);
 
 	ZVAL_LONG(&month, (Z_LVAL(quarter) * PHALCON_MONTHS_PER_QUARTER));
 
 	ZVAL_STRING(&p, "daysInMonth");
-	PHALCON_CALL_METHODW(&daysinmonth, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&daysinmonth, getThis(), "__get", &p);
 
 	ZVAL_LONG(&hour, 23);
 	ZVAL_LONG(&minute, 59);
 	ZVAL_LONG(&second, 59);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &year, &month, &daysinmonth, &hour, &minute, &second);
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &year, &month, &daysinmonth, &hour, &minute, &second);
 }
 
 /**
@@ -326,9 +326,9 @@ PHP_METHOD(Phalcon_Date_DateTime, startOfYear){
 	zval p = {}, year = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &year, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &year, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -341,7 +341,7 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfYear){
 	zval p = {}, year = {}, month = {}, day = {}, hour = {}, minute = {}, second = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_LONG(&month, 12);
 	ZVAL_LONG(&day, 31);
@@ -350,7 +350,7 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfYear){
 	ZVAL_LONG(&minute, 59);
 	ZVAL_LONG(&second, 59);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &year, &month, &day, &hour, &minute, &second);
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &year, &month, &day, &hour, &minute, &second);
 }
 
 /**
@@ -363,11 +363,11 @@ PHP_METHOD(Phalcon_Date_DateTime, startOfDecade){
 	zval p = {}, year = {}, decade = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_LONG(&decade, (Z_LVAL(year) - (Z_LVAL(year) - 1) % PHALCON_YEARS_PER_DECADE));
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &decade, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &decade, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -380,7 +380,7 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfDecade){
 	zval p = {}, year = {}, decade = {}, month = {}, day = {}, hour = {}, minute = {}, second = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_LONG(&decade, (Z_LVAL(year) - (Z_LVAL(year) - 1) % PHALCON_YEARS_PER_DECADE + PHALCON_YEARS_PER_DECADE - 1));
 
@@ -391,7 +391,7 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfDecade){
 	ZVAL_LONG(&minute, 59);
 	ZVAL_LONG(&second, 59);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &decade, &month, &day, &hour, &minute, &second);
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &decade, &month, &day, &hour, &minute, &second);
 }
 
 /**
@@ -404,11 +404,11 @@ PHP_METHOD(Phalcon_Date_DateTime, startOfCentury){
 	zval p = {}, year = {}, century = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_LONG(&century, (Z_LVAL(year) - (Z_LVAL(year) - 1) % PHALCON_YEARS_PER_CENTURY));
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &century, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &century, &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_one), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 }
 
 /**
@@ -421,7 +421,7 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfCentury){
 	zval p = {}, year = {}, century = {}, month = {}, day = {}, hour = {}, minute = {}, second = {};
 
 	ZVAL_STRING(&p, "year");
-	PHALCON_CALL_METHODW(&year, getThis(), "__get", &p);
+	PHALCON_CALL_METHOD(&year, getThis(), "__get", &p);
 
 	ZVAL_LONG(&century, (Z_LVAL(year) - (Z_LVAL(year) - 1) % PHALCON_YEARS_PER_CENTURY + PHALCON_YEARS_PER_CENTURY - 1));
 
@@ -432,7 +432,7 @@ PHP_METHOD(Phalcon_Date_DateTime, endOfCentury){
 	ZVAL_LONG(&minute, 59);
 	ZVAL_LONG(&second, 59);
 
-	PHALCON_CALL_METHODW(return_value, getThis(), "setdatetime", &century, &month, &day, &hour, &minute, &second);
+	PHALCON_CALL_METHOD(return_value, getThis(), "setdatetime", &century, &month, &day, &hour, &minute, &second);
 }
 
 /**
@@ -448,9 +448,9 @@ PHP_METHOD(Phalcon_Date_DateTime, modifyYear){
 
 	PHALCON_CONCAT_VS(&v, year, " year");
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+	PHALCON_CALL_METHOD(NULL, getThis(), "modify", &v);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -467,9 +467,9 @@ PHP_METHOD(Phalcon_Date_DateTime, modifyQuarter){
 	ZVAL_LONG(&month, Z_LVAL_P(quarter) * PHALCON_MONTHS_PER_QUARTER);
 	PHALCON_CONCAT_VS(&v, &month, " month");
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+	PHALCON_CALL_METHOD(NULL, getThis(), "modify", &v);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -485,9 +485,9 @@ PHP_METHOD(Phalcon_Date_DateTime, modifyMonth){
 
 	PHALCON_CONCAT_VS(&v, month, " month");
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+	PHALCON_CALL_METHOD(NULL, getThis(), "modify", &v);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -503,9 +503,9 @@ PHP_METHOD(Phalcon_Date_DateTime, modifyDay){
 
 	PHALCON_CONCAT_VS(&v, day, " day");
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+	PHALCON_CALL_METHOD(NULL, getThis(), "modify", &v);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -521,9 +521,9 @@ PHP_METHOD(Phalcon_Date_DateTime, modifyHour){
 
 	PHALCON_CONCAT_VS(&v, hour, " hour");
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+	PHALCON_CALL_METHOD(NULL, getThis(), "modify", &v);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -539,9 +539,9 @@ PHP_METHOD(Phalcon_Date_DateTime, modifyMinute){
 
 	PHALCON_CONCAT_VS(&v, minute, " minute");
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+	PHALCON_CALL_METHOD(NULL, getThis(), "modify", &v);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -557,9 +557,9 @@ PHP_METHOD(Phalcon_Date_DateTime, modifySecond){
 
 	PHALCON_CONCAT_VS(&v, second, " second");
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "modify", &v);
+	PHALCON_CALL_METHOD(NULL, getThis(), "modify", &v);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -582,83 +582,83 @@ PHP_METHOD(Phalcon_Date_DateTime, __get){
 
 	if (PHALCON_IS_STRING(&lower_property, "year")) {
 		ZVAL_STRING(&format, "Y");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "month")) {
 		ZVAL_STRING(&format, "n");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "day")) {
 		ZVAL_STRING(&format, "i");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "hour")) {
 		ZVAL_STRING(&format, "G");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "minute")) {
 		ZVAL_STRING(&format, "i");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "second")) {
 		ZVAL_STRING(&format, "s");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "micro")) {
 		ZVAL_STRING(&format, "u");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "dayofweek")) {
 		ZVAL_STRING(&format, "w");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "dayofyear")) {
 		ZVAL_STRING(&format, "z");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "weekofyear")) {
 		ZVAL_STRING(&format, "W");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "daysinmonth")) {
 		ZVAL_STRING(&format, "t");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "timestamp")) {
 		ZVAL_STRING(&format, "U");
-		PHALCON_CALL_METHODW(return_value, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(return_value, getThis(), "format", &format);
 		convert_to_long(return_value);
 		return;
 	} else if (PHALCON_IS_STRING(&lower_property, "weekofmonth")) {
 		ZVAL_STRING(&p, "day");
-		PHALCON_CALL_METHODW(&v, getThis(), "__get", &p);
+		PHALCON_CALL_METHOD(&v, getThis(), "__get", &p);
 		RETURN_LONG(ceil((float)Z_LVAL(v) / PHALCON_DAYS_PER_WEEK));
 	} else if (PHALCON_IS_STRING(&lower_property, "quarter")) {
 		ZVAL_STRING(&p, "month");
-		PHALCON_CALL_METHODW(&v, getThis(), "__get", &p);
+		PHALCON_CALL_METHOD(&v, getThis(), "__get", &p);
 		RETURN_LONG(ceil((float)Z_LVAL(v) / PHALCON_MONTHS_PER_QUARTER));
 	} else if (PHALCON_IS_STRING(&lower_property, "offset")) {
-		PHALCON_CALL_METHODW(return_value, getThis(), "getoffset");
+		PHALCON_CALL_METHOD(return_value, getThis(), "getoffset");
 	} else if (PHALCON_IS_STRING(&lower_property, "offsethours")) {
-		PHALCON_CALL_METHODW(&v, getThis(), "getoffset");
+		PHALCON_CALL_METHOD(&v, getThis(), "getoffset");
 		RETURN_LONG(Z_LVAL(v) / PHALCON_SECONDS_PER_MINUTE / PHALCON_MINUTES_PER_HOUR);
 	} else if (PHALCON_IS_STRING(&lower_property, "dst")) {
 		ZVAL_STRING(&format, "I");
-		PHALCON_CALL_METHODW(&v, getThis(), "format", &format);
+		PHALCON_CALL_METHOD(&v, getThis(), "format", &format);
 		convert_to_long(&v);
 		RETURN_BOOL(Z_LVAL(v));
 	}
-	PHALCON_THROW_EXCEPTION_FORMATW(spl_ce_InvalidArgumentException, "Unknown getter '%s'", Z_STRVAL_P(property));
+	PHALCON_THROW_EXCEPTION_FORMAT(spl_ce_InvalidArgumentException, "Unknown getter '%s'", Z_STRVAL_P(property));
 	return;
 }

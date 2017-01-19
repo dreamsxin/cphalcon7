@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
 		return;
 	}
 
-	RETURN_CTORW(identifier);
+	RETURN_CTOR(identifier);
 }
 
 /**
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	/** 
 	 * Get the SQL to describe a table
 	 */
-	PHALCON_CALL_METHODW(&sql, &dialect, "describecolumns", table, &schema);
+	PHALCON_CALL_METHOD(&sql, &dialect, "describecolumns", table, &schema);
 
 	/** 
 	 * We're using FETCH_NUM to fetch the columns
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	/** 
 	 * Get the describe
 	 */
-	PHALCON_CALL_METHODW(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
 	array_init(&columns);
 
@@ -472,14 +472,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		 * Every route is stored as a Phalcon\Db\Column
 		 */
 		object_init_ex(&column, phalcon_db_column_ce);
-		PHALCON_CALL_METHODW(NULL, &column, "__construct", &column_name, &definition);
+		PHALCON_CALL_METHOD(NULL, &column, "__construct", &column_name, &definition);
 
 		phalcon_array_append(&columns, &column, PH_COPY);
 
 		PHALCON_CPY_WRT_CTOR(&old_column, &column_name);
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTORW(&columns);
+	RETURN_CTOR(&columns);
 }
 
 /**
@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeBytea){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	RETURN_CTORW(value);
+	RETURN_CTOR(value);
 }
 
 /**
@@ -510,7 +510,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, unescapeBytea){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	RETURN_CTORW(value);
+	RETURN_CTOR(value);
 }
 
 /**
@@ -525,7 +525,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeArray){
 
 	phalcon_fetch_params(0, 1, 1, &value, &type);
 
-	RETURN_CTORW(value);
+	RETURN_CTOR(value);
 }
 
 /**
@@ -540,5 +540,5 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, unescapeArray){
 
 	phalcon_fetch_params(0, 1, 1, &value, &type);
 
-	RETURN_CTORW(value);
+	RETURN_CTOR(value);
 }

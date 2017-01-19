@@ -122,14 +122,14 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 	int c, i = 0;
 
 	phalcon_fetch_params(0, 1, 0, &column);
-	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
 
-	PHALCON_CALL_METHODW(&size, column, "getsize");
-	PHALCON_CALL_METHODW(&column_type, column, "gettype");
+	PHALCON_CALL_METHOD(&size, column, "getsize");
+	PHALCON_CALL_METHOD(&column_type, column, "gettype");
 
 	if (Z_TYPE(column_type) == IS_STRING) {
 		PHALCON_CPY_WRT(&column_sql, &column_type);
-		PHALCON_CALL_METHODW(&type_values, column, "gettypevalues");
+		PHALCON_CALL_METHOD(&type_values, column, "gettypevalues");
 		if (PHALCON_IS_NOT_EMPTY(&type_values)) {
 			ZVAL_STRING(&slash, "\"");
 			if (Z_TYPE(type_values) == IS_ARRAY) {
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				phalcon_concat_self_str(&column_sql, SL("("));
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(type_values), value) {
 					i++;
-					PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", value, &slash);
+					PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", value, &slash);
 					if (i < c) {
 						PHALCON_SCONCAT_SVS(&column_sql, "\"", &value_cslashes, "\", ");
 					} else {
@@ -146,20 +146,20 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				} ZEND_HASH_FOREACH_END();
 				phalcon_concat_self_str(&column_sql, SL(")"));
 			} else {
-				PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", &type_values, &slash);
+				PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", &type_values, &slash);
 				PHALCON_SCONCAT_SVS(&column_sql, "(\"", &value_cslashes, "\")");
 			}
-			RETURN_CTORW(&column_sql);
+			RETURN_CTOR(&column_sql);
 		}
 
-		PHALCON_CALL_METHODW(&column_type, column, "gettypereference");
+		PHALCON_CALL_METHOD(&column_type, column, "gettypereference");
 		switch (phalcon_get_intval(&column_type)) {
 			case PHALCON_DB_COLUMN_TYPE_INTEGER:
 				if (Z_LVAL(size) > 0) {
 					PHALCON_SCONCAT_SVS(&column_sql, "(", &size, ")");
 				}
 
-				PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+				PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 				if (zend_is_true(&is_unsigned)) {
 					phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 				}
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 					PHALCON_SCONCAT_SVS(&column_sql, "(", &size, ")");
 				}
 
-				PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+				PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 				if (zend_is_true(&is_unsigned)) {
 					phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 				}
@@ -179,10 +179,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				break;
 
 			case PHALCON_DB_COLUMN_TYPE_DECIMAL:
-				PHALCON_CALL_METHODW(&scale, column, "getscale");
+				PHALCON_CALL_METHOD(&scale, column, "getscale");
 				PHALCON_SCONCAT_SVSVS(&column_sql, "(", &size, ",", &scale, ")");
 
-				PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+				PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 				if (zend_is_true(&is_unsigned)) {
 					phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 				}
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				break;
 
 			case PHALCON_DB_COLUMN_TYPE_FLOAT:
-				PHALCON_CALL_METHODW(&scale, column, "getscale");
+				PHALCON_CALL_METHOD(&scale, column, "getscale");
 				if (zend_is_true(&size)) {
 					PHALCON_SCONCAT_SV(&column_sql, "(", &size);
 					if (zend_is_true(&scale)) {
@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 					}
 				}
 
-				PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+				PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 				if (zend_is_true(&is_unsigned)) {
 					phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 				}
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				break;
 
 			case PHALCON_DB_COLUMN_TYPE_DOUBLE:
-				PHALCON_CALL_METHODW(&scale, column, "getscale");
+				PHALCON_CALL_METHOD(&scale, column, "getscale");
 				if (zend_is_true(&size)) {
 					PHALCON_SCONCAT_SV(&column_sql, "(", &size);
 					if (zend_is_true(&scale)) {
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 					}
 				}
 
-				PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+				PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 				if (zend_is_true(&is_unsigned)) {
 					phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 				}
@@ -250,11 +250,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				break;
 
 			default:
-				PHALCON_CALL_METHODW(&name, column, "getname");
-				PHALCON_THROW_EXCEPTION_FORMATW(phalcon_db_exception_ce, "Unrecognized MySQL data type at column %s", Z_STRVAL(name));
+				PHALCON_CALL_METHOD(&name, column, "getname");
+				PHALCON_THROW_EXCEPTION_FORMAT(phalcon_db_exception_ce, "Unrecognized MySQL data type at column %s", Z_STRVAL(name));
 		}
 
-		RETURN_CTORW(&column_sql);
+		RETURN_CTOR(&column_sql);
 	}
 
 	switch (phalcon_get_intval(&column_type)) {
@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				ZVAL_STRING(&column_sql, "INT");
 			}
 
-			PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 			if (zend_is_true(&is_unsigned)) {
 				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 			}
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				ZVAL_STRING(&column_sql, "BIGINT");
 			}
 
-			PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 			if (zend_is_true(&is_unsigned)) {
 				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 			}
@@ -289,10 +289,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 			break;
 
 		case PHALCON_DB_COLUMN_TYPE_DECIMAL:
-			PHALCON_CALL_METHODW(&scale, column, "getscale");
+			PHALCON_CALL_METHOD(&scale, column, "getscale");
 			PHALCON_CONCAT_SVSVS(&column_sql, "DECIMAL(", &size, ",", &scale, ")");
 
-			PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 			if (zend_is_true(&is_unsigned)) {
 				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 			}
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 		case PHALCON_DB_COLUMN_TYPE_FLOAT:
 			ZVAL_STRING(&column_sql, "FLOAT");
 
-			PHALCON_CALL_METHODW(&scale, column, "getscale");
+			PHALCON_CALL_METHOD(&scale, column, "getscale");
 			if (zend_is_true(&size)) {
 				PHALCON_SCONCAT_SV(&column_sql, "(", &size);
 				if (zend_is_true(&scale)) {
@@ -312,7 +312,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				}
 			}
 
-			PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 			if (zend_is_true(&is_unsigned)) {
 				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 			}
@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 		case PHALCON_DB_COLUMN_TYPE_DOUBLE:
 			ZVAL_STRING(&column_sql, "DOUBLE");
 
-			PHALCON_CALL_METHODW(&scale, column, "getscale");
+			PHALCON_CALL_METHOD(&scale, column, "getscale");
 			if (zend_is_true(&size)) {
 				PHALCON_SCONCAT_SV(&column_sql, "(", &size);
 				if (zend_is_true(&scale)) {
@@ -332,7 +332,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 				}
 			}
 
-			PHALCON_CALL_METHODW(&is_unsigned, column, "isunsigned");
+			PHALCON_CALL_METHOD(&is_unsigned, column, "isunsigned");
 			if (zend_is_true(&is_unsigned)) {
 				phalcon_concat_self_str(&column_sql, SL(" UNSIGNED"));
 			}
@@ -384,13 +384,13 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 			break;
 
 		default:
-			PHALCON_CALL_METHODW(&name, column, "getname");
-			PHALCON_THROW_EXCEPTION_FORMATW(phalcon_db_exception_ce, "Unrecognized MySQL data type at column %s", Z_STRVAL(name));
+			PHALCON_CALL_METHOD(&name, column, "getname");
+			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_db_exception_ce, "Unrecognized MySQL data type at column %s", Z_STRVAL(name));
 			return;
 
 	}
 
-	RETURN_CTORW(&column_sql);
+	RETURN_CTOR(&column_sql);
 }
 
 /**
@@ -408,29 +408,29 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addColumn){
 	zval is_not_null = {}, is_autoincrement = {}, is_first = {}, after_position = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
-	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 	PHALCON_CONCAT_SVS(&sql, "ALTER TABLE ", &table, " ADD ");
 
-	PHALCON_CALL_METHODW(&name, column, "getname");
-	PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
+	PHALCON_CALL_METHOD(&name, column, "getname");
+	PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
 
 	PHALCON_SCONCAT_SVSV(&sql, "`", &name, "` ", &column_definition);
 
-	PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
+	PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 	if (Z_TYPE(default_value) != IS_NULL) {
-		PHALCON_CALL_METHODW(&column_type, column, "gettype");
-		PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+		PHALCON_CALL_METHOD(&column_type, column, "gettype");
+		PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
 		PHALCON_SCONCAT_SV(&sql, " DEFAULT ", &default_value);
 	}
 
-	PHALCON_CALL_METHODW(&is_not_null, column, "isnotnull");
+	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
 	if (zend_is_true(&is_not_null)) {
 		phalcon_concat_self_str(&sql, SL(" NOT NULL"));
 	}
 
-	PHALCON_CALL_METHODW(&is_autoincrement, column, "isautoincrement");
+	PHALCON_CALL_METHOD(&is_autoincrement, column, "isautoincrement");
 
 	/*
 	 * In MySQL the AUTO_INCREMENT column has to be a part of the PRIMARY KEY
@@ -440,17 +440,17 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addColumn){
 		phalcon_concat_self_str(&sql, SL(" PRIMARY KEY AUTO_INCREMENT"));
 	}
 
-	PHALCON_CALL_METHODW(&is_first, column, "isfirst");
+	PHALCON_CALL_METHOD(&is_first, column, "isfirst");
 	if (zend_is_true(&is_first)) {
 		phalcon_concat_self_str(&sql, SL(" FIRST"));
 	} else {
-		PHALCON_CALL_METHODW(&after_position, column, "getafterposition");
+		PHALCON_CALL_METHOD(&after_position, column, "getafterposition");
 		if (zend_is_true(&after_position)) {
 			PHALCON_SCONCAT_SVS(&sql, " AFTER `", &after_position, "`");
 		}
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -467,7 +467,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, modifyColumn){
 	zval default_value = {}, is_autoincrement = {}, is_first = {}, after_position = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
-	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
 
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_SVSVS(&sql, "ALTER TABLE `", schema_name, "`.`", table_name, "` MODIFY ");
@@ -475,39 +475,39 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, modifyColumn){
 		PHALCON_CONCAT_SVS(&sql, "ALTER TABLE `", table_name, "` MODIFY ");
 	}
 
-	PHALCON_CALL_METHODW(&name, column, "getname");
+	PHALCON_CALL_METHOD(&name, column, "getname");
 
-	PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
+	PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
 	PHALCON_SCONCAT_SVSV(&sql, "`", &name, "` ", &column_definition);
 
-	PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
+	PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 	if (Z_TYPE(default_value) != IS_NULL) {
-		PHALCON_CALL_METHODW(&column_type, column, "gettype");
-		PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+		PHALCON_CALL_METHOD(&column_type, column, "gettype");
+		PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
 		PHALCON_SCONCAT_SV(&sql, " DEFAULT ", &default_value);
 	}
 
-	PHALCON_CALL_METHODW(&is_not_null, column, "isnotnull");
+	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
 	if (zend_is_true(&is_not_null)) {
 		phalcon_concat_self_str(&sql, SL(" NOT NULL"));
 	}
 
-	PHALCON_CALL_METHODW(&is_autoincrement, column, "isautoincrement");
+	PHALCON_CALL_METHOD(&is_autoincrement, column, "isautoincrement");
 	if (zend_is_true(&is_autoincrement)) {
 		phalcon_concat_self_str(&sql, SL(" AUTO_INCREMENT"));
 	}
 
-	PHALCON_CALL_METHODW(&is_first, column, "isfirst");
+	PHALCON_CALL_METHOD(&is_first, column, "isfirst");
 	if (zend_is_true(&is_first)) {
 		phalcon_concat_self_str(&sql, SL(" FIRST"));
 	} else {
-		PHALCON_CALL_METHODW(&after_position, column, "getafterposition");
+		PHALCON_CALL_METHOD(&after_position, column, "getafterposition");
 		if (zend_is_true(&after_position)) {
 			PHALCON_SCONCAT_SVS(&sql, " AFTER `", &after_position, "`");
 		}
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -531,7 +531,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, dropColumn){
 	}
 	PHALCON_SCONCAT_SVS(&sql, "`", column_name, "`");
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -547,9 +547,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addIndex){
 	zval *table_name, *schema_name, *index, index_type = {}, sql = {}, columns = {}, quoted_column_list = {}, name = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
-	PHALCON_VERIFY_INTERFACE_EX(index, phalcon_db_indexinterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(index, phalcon_db_indexinterface_ce, phalcon_db_exception_ce);
 
-	PHALCON_CALL_METHODW(&index_type, index, "gettype");
+	PHALCON_CALL_METHOD(&index_type, index, "gettype");
 
 	if (zend_is_true(schema_name)) {
 		if (Z_TYPE(index_type) == IS_STRING && Z_STRLEN(index_type) > 0) {
@@ -563,12 +563,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addIndex){
 		PHALCON_CONCAT_SVS(&sql, "ALTER TABLE `", table_name, "` ADD INDEX ");
 	}
 
-	PHALCON_CALL_METHODW(&columns, index, "getcolumns");
-	PHALCON_CALL_METHODW(&quoted_column_list, getThis(), "getcolumnlist", &columns);
-	PHALCON_CALL_METHODW(&name, index, "getname");
+	PHALCON_CALL_METHOD(&columns, index, "getcolumns");
+	PHALCON_CALL_METHOD(&quoted_column_list, getThis(), "getcolumnlist", &columns);
+	PHALCON_CALL_METHOD(&name, index, "getname");
 	PHALCON_SCONCAT_SVSVS(&sql, "`", &name, "` (", &quoted_column_list, ")");
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -593,7 +593,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, dropIndex){
 
 	PHALCON_SCONCAT_SVS(&sql, "`", index_name, "`");
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -609,7 +609,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addPrimaryKey){
 	zval *table_name, *schema_name, *index, sql = {}, columns = {}, column_list = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
-	PHALCON_VERIFY_INTERFACE_EX(index, phalcon_db_indexinterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(index, phalcon_db_indexinterface_ce, phalcon_db_exception_ce);
 
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_SVSVS(&sql, "ALTER TABLE `", schema_name, "`.`", table_name, "` ADD PRIMARY KEY ");
@@ -617,11 +617,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addPrimaryKey){
 		PHALCON_CONCAT_SVS(&sql, "ALTER TABLE `", table_name, "` ADD PRIMARY KEY ");
 	}
 
-	PHALCON_CALL_METHODW(&columns, index, "getcolumns");
-	PHALCON_CALL_METHODW(&column_list, getThis(), "getcolumnlist", &columns);
+	PHALCON_CALL_METHOD(&columns, index, "getcolumns");
+	PHALCON_CALL_METHOD(&column_list, getThis(), "getcolumnlist", &columns);
 	PHALCON_SCONCAT_SVS(&sql, "(", &column_list, ")");
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -643,7 +643,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, dropPrimaryKey){
 		PHALCON_CONCAT_SVS(&sql, "ALTER TABLE `", table_name, "` DROP PRIMARY KEY");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -661,7 +661,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addForeignKey){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &reference);
 
-	PHALCON_VERIFY_INTERFACE_EX(reference, phalcon_db_referenceinterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(reference, phalcon_db_referenceinterface_ce, phalcon_db_exception_ce);
 
 	if (zend_is_true(schema_name)) {
 		PHALCON_CONCAT_SVSVS(&sql, "ALTER TABLE `", schema_name, "`.`", table_name, "` ");
@@ -669,42 +669,42 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, addForeignKey){
 		PHALCON_CONCAT_SVS(&sql, "ALTER TABLE `", table_name, "` ");
 	}
 
-    PHALCON_CALL_METHODW(&reference_name, reference, "getname");
+    PHALCON_CALL_METHOD(&reference_name, reference, "getname");
 
 	PHALCON_SCONCAT_SVS(&sql, "ADD CONSTRAINT `", &reference_name, "` FOREIGN KEY ");
 
-	PHALCON_CALL_METHODW(&columns, reference, "getcolumns");
+	PHALCON_CALL_METHOD(&columns, reference, "getcolumns");
 
-	PHALCON_CALL_METHODW(&quoted_column_list, getThis(), "getcolumnlist", &columns);
+	PHALCON_CALL_METHOD(&quoted_column_list, getThis(), "getcolumnlist", &columns);
 
 	PHALCON_SCONCAT_SVS(&sql, "(", &quoted_column_list, ") REFERENCES ");
 
-	/** 
+	/**
 	 * Add the schema
 	 */
-	PHALCON_CALL_METHODW(&referenced_schema, reference, "getreferencedschema");
+	PHALCON_CALL_METHOD(&referenced_schema, reference, "getreferencedschema");
 
 	if (zend_is_true(&referenced_schema)) {
 		PHALCON_SCONCAT_SVS(&sql, "`", &referenced_schema, "`.");
 	}
 
-	PHALCON_CALL_METHODW(&referenced_columns, reference, "getreferencedcolumns");
-	PHALCON_CALL_METHODW(&quoted_columns, getThis(), "getcolumnlist", &referenced_columns);
-	PHALCON_CALL_METHODW(&referenced_table, reference, "getreferencedtable");
+	PHALCON_CALL_METHOD(&referenced_columns, reference, "getreferencedcolumns");
+	PHALCON_CALL_METHOD(&quoted_columns, getThis(), "getcolumnlist", &referenced_columns);
+	PHALCON_CALL_METHOD(&referenced_table, reference, "getreferencedtable");
 
 	PHALCON_SCONCAT_SVSVS(&sql, "`", &referenced_table, "`(", &quoted_columns, ")");
 
-	PHALCON_CALL_METHODW(&on_delete, reference, "getondelete");
+	PHALCON_CALL_METHOD(&on_delete, reference, "getondelete");
 	if (PHALCON_IS_NOT_EMPTY(&on_delete)) {
 		PHALCON_SCONCAT_SV(&sql, " ON DELETE ", &on_delete);
 	}
 
-	PHALCON_CALL_METHODW(&on_update, reference, "getonupdate");
+	PHALCON_CALL_METHOD(&on_update, reference, "getonupdate");
 	if (PHALCON_IS_NOT_EMPTY(&on_update)) {
 		PHALCON_SCONCAT_SV(&sql, " ON UPDATE ", &on_update);
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -729,7 +729,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, dropForeignKey){
 
 	PHALCON_SCONCAT_SVS(&sql, "`", reference_name, "`");
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -748,7 +748,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 	if (phalcon_array_isset_fetch_str(&options, definition, SL("options"))) {
 		array_init(&table_options);
 
-		/** 
+		/**
 		 * Check if there is an ENGINE option
 		 */
 		if (phalcon_array_isset_fetch_str(&engine, &options, SL("ENGINE"))) {
@@ -758,7 +758,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 			}
 		}
 
-		/** 
+		/**
 		 * Check if there is an AUTO_INCREMENT option
 		 */
 		if (phalcon_array_isset_fetch_str(&auto_increment, &options, SL("AUTO_INCREMENT"))) {
@@ -768,7 +768,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 			}
 		}
 
-		/** 
+		/**
 		 * Check if there is a TABLE_COLLATION option
 		 */
 		if (phalcon_array_isset_fetch_str(&table_collation, &options, SL("TABLE_COLLATION"))) {
@@ -786,7 +786,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, _getTableOptions){
 
 		if (phalcon_fast_count_ev(&table_options)) {
 			phalcon_fast_join_str(&sql_table_options, SL(" "), &table_options);
-			RETURN_CTORW(&sql_table_options);
+			RETURN_CTOR(&sql_table_options);
 		}
 	}
 	RETURN_NULL();
@@ -808,11 +808,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &definition);
 
 	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
 	if (phalcon_array_isset_fetch_str(&options, definition, SL("options"))) {
 		if (!phalcon_array_isset_fetch_str(&temporary, &options, SL("temporary"))) {
@@ -822,7 +822,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 		ZVAL_FALSE(&temporary);
 	}
 
-	/** 
+	/**
 	 * Create a temporary o normal table
 	 */
 	if (zend_is_true(&temporary)) {
@@ -838,38 +838,38 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&columns), column) {
 		zval column_name = {}, column_definition = {}, column_type = {}, column_line = {}, default_value = {}, attribute = {};
 
-		PHALCON_CALL_METHODW(&column_name, column, "getname");
-		PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
+		PHALCON_CALL_METHOD(&column_name, column, "getname");
+		PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
 
 		PHALCON_CONCAT_SVSV(&column_line, "`", &column_name, "` ", &column_definition);
 
-		PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
+		PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE(default_value) != IS_NULL) {
-			PHALCON_CALL_METHODW(&column_type, column, "gettype");
-			PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_CALL_METHOD(&column_type, column, "gettype");
+			PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
 			PHALCON_SCONCAT_SV(&column_line, " DEFAULT ", &default_value);
 		}
 
-		/** 
+		/**
 		 * Add a NOT NULL clause
 		 */
-		PHALCON_CALL_METHODW(&attribute, column, "isnotnull");
+		PHALCON_CALL_METHOD(&attribute, column, "isnotnull");
 		if (zend_is_true(&attribute)) {
 			phalcon_concat_self_str(&column_line, SL(" NOT NULL"));
 		}
 
-		/** 
+		/**
 		 * Add an AUTO_INCREMENT clause
 		 */
-		PHALCON_CALL_METHODW(&attribute, column, "isautoincrement");
+		PHALCON_CALL_METHOD(&attribute, column, "isautoincrement");
 		if (zend_is_true(&attribute)) {
 			phalcon_concat_self_str(&column_line, SL(" AUTO_INCREMENT"));
 		}
 
-		/** 
+		/**
 		 * Mark the column as primary key
 		 */
-		PHALCON_CALL_METHODW(&attribute, column, "isprimary");
+		PHALCON_CALL_METHOD(&attribute, column, "isprimary");
 		if (zend_is_true(&attribute)) {
 			phalcon_concat_self_str(&column_line, SL(" PRIMARY KEY"));
 		}
@@ -877,19 +877,19 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 		phalcon_array_append(&create_lines, &column_line, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
-	/** 
+	/**
 	 * Create related indexes
 	 */
 	if (phalcon_array_isset_fetch_str(&indexes, definition, SL("indexes"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&indexes), index) {
 			zval index_name = {}, columns = {}, column_list = {}, index_type = {}, index_sql = {};
 
-			PHALCON_CALL_METHODW(&index_name, index, "getname");
-			PHALCON_CALL_METHODW(&columns, index, "getcolumns");
-			PHALCON_CALL_METHODW(&column_list, getThis(), "getcolumnlist", &columns);
-			PHALCON_CALL_METHODW(&index_type, index, "gettype");
+			PHALCON_CALL_METHOD(&index_name, index, "getname");
+			PHALCON_CALL_METHOD(&columns, index, "getcolumns");
+			PHALCON_CALL_METHOD(&column_list, getThis(), "getcolumnlist", &columns);
+			PHALCON_CALL_METHOD(&index_type, index, "gettype");
 
-			/** 
+			/**
 			 * If the index name is primary we add a primary key
 			 */
 			if (PHALCON_IS_STRING(&index_name, "PRIMARY")) {
@@ -903,29 +903,29 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	/** 
+	/**
 	 * Create related references
 	 */
 	if (phalcon_array_isset_fetch_str(&references, definition, SL("references"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&references), reference) {
 			zval name = {}, columns = {}, column_list = {}, referenced_table = {}, referenced_columns = {}, referenced_column_list = {}, constaint_sql = {}, reference_sql = {}, on_delete = {}, on_update = {};
 
-			PHALCON_CALL_METHODW(&name, reference, "getname");
-			PHALCON_CALL_METHODW(&columns, reference, "getcolumns");
-			PHALCON_CALL_METHODW(&column_list, getThis(), "getcolumnlist", &columns);
-			PHALCON_CALL_METHODW(&referenced_table, reference, "getreferencedtable");
-			PHALCON_CALL_METHODW(&referenced_columns, reference, "getreferencedcolumns");
-			PHALCON_CALL_METHODW(&referenced_column_list, getThis(), "getcolumnlist", &referenced_columns);
+			PHALCON_CALL_METHOD(&name, reference, "getname");
+			PHALCON_CALL_METHOD(&columns, reference, "getcolumns");
+			PHALCON_CALL_METHOD(&column_list, getThis(), "getcolumnlist", &columns);
+			PHALCON_CALL_METHOD(&referenced_table, reference, "getreferencedtable");
+			PHALCON_CALL_METHOD(&referenced_columns, reference, "getreferencedcolumns");
+			PHALCON_CALL_METHOD(&referenced_column_list, getThis(), "getcolumnlist", &referenced_columns);
 
 			PHALCON_CONCAT_SVSVS(&constaint_sql, "CONSTRAINT `", &name, "` FOREIGN KEY (", &column_list, ")");
 			PHALCON_CONCAT_VSVSVS(&reference_sql, &constaint_sql, " REFERENCES `", &referenced_table, "`(", &referenced_column_list, ")");
 
-			PHALCON_CALL_METHODW(&on_delete, reference, "getondelete");
+			PHALCON_CALL_METHOD(&on_delete, reference, "getondelete");
 			if (PHALCON_IS_NOT_EMPTY(&on_delete)) {
 				PHALCON_SCONCAT_SV(&reference_sql, " ON DELETE ", &on_delete);
 			}
 
-			PHALCON_CALL_METHODW(&on_update, reference, "getonupdate");
+			PHALCON_CALL_METHOD(&on_update, reference, "getonupdate");
 			if (PHALCON_IS_NOT_EMPTY(&on_update)) {
 				PHALCON_SCONCAT_SV(&reference_sql, " ON UPDATE ", &on_update);
 			}
@@ -939,11 +939,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createTable){
 	PHALCON_SCONCAT_VS(&sql, &joined_lines, "\n)");
 
 	if (phalcon_array_isset_str(definition, SL("options"))) {
-		PHALCON_CALL_METHODW(&options, getThis(), "_gettableoptions", definition);
+		PHALCON_CALL_METHOD(&options, getThis(), "_gettableoptions", definition);
 		PHALCON_SCONCAT_SV(&sql, " ", &options);
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -964,7 +964,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, dropTable){
 		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
 	if (zend_is_true(if_exists)) {
 		PHALCON_CONCAT_SV(return_value, "DROP TABLE IF EXISTS ", &table);
@@ -988,15 +988,15 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, createView){
 	phalcon_fetch_params(0, 3, 0, &view_name, &definition, &schema_name);
 
 	if (!phalcon_array_isset_fetch_str(&view_sql, definition, SL("sql"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&view, getThis(), "preparetable", view_name, schema_name);
+	PHALCON_CALL_METHOD(&view, getThis(), "preparetable", view_name, schema_name);
 
 	PHALCON_CONCAT_SVSV(&sql, "CREATE VIEW ", &view, " AS ", &view_sql);
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -1017,7 +1017,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, dropView){
 		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 
-	PHALCON_CALL_METHODW(&view, getThis(), "preparetable", view_name, schema_name);
+	PHALCON_CALL_METHOD(&view, getThis(), "preparetable", view_name, schema_name);
 
 	if (zend_is_true(if_exists)) {
 		PHALCON_CONCAT_SV(return_value, "DROP VIEW IF EXISTS ", &view);
@@ -1091,9 +1091,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, describeColumns){
 	phalcon_fetch_params(0, 1, 1, &table_name, &schema_name);
 
 	if (!schema_name) {
-		PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name);
+		PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name);
 	} else {
-		PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+		PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 	}
 
 	PHALCON_CONCAT_SV(return_value, "DESCRIBE ", &table);
@@ -1185,7 +1185,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, describeReferences){
 		PHALCON_SCONCAT_SVS(&sql, "TABLE_NAME = \"", table, "\"");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -1208,7 +1208,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, tableOptions){
 		PHALCON_SCONCAT_SVS(&sql, "TABLES.TABLE_NAME = \"", table, "\"");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -1248,10 +1248,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getDefaultValue){
 			|| type == PHALCON_DB_COLUMN_TYPE_DECIMAL
 			|| type == PHALCON_DB_COLUMN_TYPE_MONEY
 		) {
-			RETURN_CTORW(default_value);
+			RETURN_CTOR(default_value);
 		}
 	}
 	ZVAL_STRING(&slash, "\"");
-	PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", default_value, &slash);
+	PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", default_value, &slash);
 	PHALCON_CONCAT_SVS(return_value, "\"", &value_cslashes, "\"");
 }

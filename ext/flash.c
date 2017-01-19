@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Flash, setImplicitFlush){
 	phalcon_fetch_params(0, 1, 0, &implicit_flush);
 
 	phalcon_update_property_zval(getThis(), SL("_implicitFlush"), implicit_flush);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Flash, setAutomaticHtml){
 	phalcon_fetch_params(0, 1, 0, &automatic_html);
 
 	phalcon_update_property_zval(getThis(), SL("_automaticHtml"), automatic_html);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -171,9 +171,9 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 
 	if (Z_TYPE_P(css_classes) == IS_ARRAY) { 
 		phalcon_update_property_zval(getThis(), SL("_cssClasses"), css_classes);
-		RETURN_THISW();
+		RETURN_THIS();
 	}
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_flash_exception_ce, "CSS classes must be an Array");
+	PHALCON_THROW_EXCEPTION_STR(phalcon_flash_exception_ce, "CSS classes must be an Array");
 	return;
 }
 
@@ -185,7 +185,7 @@ static void phalcon_flash_message_helper(INTERNAL_FUNCTION_PARAMETERS, const cha
 
 	ZVAL_STRING(&type, stype);
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "message", &type, msg);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "message", &type, msg);
 }
 
 /**
@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		 * We return the message as string if the implicit_flush is turned off
 		 */
 		if (!flag_implicit_flush) {
-			RETURN_CTORW(&content);
+			RETURN_CTOR(&content);
 		}
 	} else {
 		/**
@@ -337,7 +337,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		if (flag_implicit_flush) {
 			zend_print_zval(&html_message, 0);
 		} else {
-			RETURN_CTORW(&html_message);
+			RETURN_CTOR(&html_message);
 		}
 	}
 }

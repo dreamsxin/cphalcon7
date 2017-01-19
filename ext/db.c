@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Db, setup){
 	phalcon_fetch_params(0, 1, 0, &options);
 
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Options must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Options must be an array");
 		return;
 	}
 

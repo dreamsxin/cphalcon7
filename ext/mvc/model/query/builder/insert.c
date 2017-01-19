@@ -129,20 +129,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, __construct){
 	 * Update the dependency injector if any
 	 */
 	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdi", dependency_injector);
 	}
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&table, params, SL("table"))) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "settable", &table);
+			PHALCON_CALL_METHOD(NULL, getThis(), "settable", &table);
 		}
 
 		if (phalcon_array_isset_fetch_str(&columns, params, SL("columns"))) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "setcolumns", &columns);
+			PHALCON_CALL_METHOD(NULL, getThis(), "setcolumns", &columns);
 		}
 
 		if (phalcon_array_isset_fetch_str(&values, params, SL("values"))) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "setvalues", &values);
+			PHALCON_CALL_METHOD(NULL, getThis(), "setvalues", &values);
 		}
 	}
 }
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, table){
 	phalcon_fetch_params(0, 1, 0, &table);
 
 	phalcon_update_property_zval(getThis(), SL("_table"), table);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, columns){
 	phalcon_fetch_params(0, 1, 0, &columns);
 
 	phalcon_update_property_zval(getThis(), SL("_columns"), columns);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, values){
 	phalcon_fetch_params(0, 1, 0, &values);
 
 	phalcon_update_property_zval(getThis(), SL("_values"), values);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -239,21 +239,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_CALL_SELFW(&table, "gettable");
-	PHALCON_CALL_SELFW(&columns, "getcolumns");
-	PHALCON_CALL_SELFW(&values, "getvalues");
+	PHALCON_CALL_SELF(&table, "gettable");
+	PHALCON_CALL_SELF(&columns, "getcolumns");
+	PHALCON_CALL_SELF(&values, "getvalues");
 
 	if (Z_TYPE(columns) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Columns must be array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Columns must be array");
 		return;
 	}
 
 	if (Z_TYPE(values) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Values must be array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Values must be array");
 		return;
 	}
 
-	PHALCON_CALL_SELFW(&bind_params, "getbindparams");
+	PHALCON_CALL_SELF(&bind_params, "getbindparams");
 	if (Z_TYPE(bind_params) != IS_ARRAY) {
 		array_init(&bind_params);
 	}
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 		zval insert_values = {}, *value, joined_values = {};
 
 		if (Z_TYPE_P(row) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Value every row must be array");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Value every row must be array");
 			return;
 		}
 		array_init(&insert_values);
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 
 	phalcon_update_property_zval(getThis(), SL("_mergeBindParams"), &bind_params);
 
-	PHALCON_CALL_SELFW(&bind_types, "getbindtypes");
+	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
 	phalcon_update_property_zval(getThis(), SL("_mergeBindTypes"), &bind_types);
 
 	phalcon_update_property_zval(getThis(), SL("_phql"), &phql);

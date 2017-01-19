@@ -94,9 +94,9 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce);
 
-	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
@@ -111,14 +111,14 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&minheight, ce, getThis(), "minheight"));
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&maxheight, ce, getThis(), "maxheight"));
 
-	PHALCON_CALL_SELFW(&valid, "valid", &value, &minsize, &maxsize, &mimes, &minwidth, &maxwidth, &minheight, &maxheight);
+	PHALCON_CALL_SELF(&valid, "valid", &value, &minsize, &maxsize, &mimes, &minwidth, &maxwidth, &minheight, &maxheight);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		phalcon_return_property(&type, getThis(), SL("_type"));
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
+			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "FileMaxSize"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooLarge", &code);
 		} else if (phalcon_compare_strict_string(&type, SL("TooSmall"))) {
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "FileMinSize"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooSmall", &code);
 		} else if (phalcon_compare_strict_string(&type, SL("MimeValid"))) {
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "FileType"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "FileType", &code);
 		} else if (phalcon_compare_strict_string(&type, SL("TooLarge"))) {
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "FileMaxSize"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooLarge", &code);
 		} else if (phalcon_compare_strict_string(&type, SL("TooNarrow"))) {
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "ImageMinWidth"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooNarrow", &code);
 		} else if (phalcon_compare_strict_string(&type, SL("TooWide"))) {
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "ImageMaxWidth"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooWide", &code);
 		}  else if (phalcon_compare_strict_string(&type, SL("TooShort"))) {
@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "ImageMinHeight"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooShort", &code);
 		} else if (phalcon_compare_strict_string(&type, SL("TooLong"))) {
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "ImageMaxHeight"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooLong", &code);
 		} else {
@@ -227,12 +227,12 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 				RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "FileValid"));
 			}
 
-			PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+			PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "File", &code);
 		}
 
-		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid)
 	if (Z_TYPE_P(value) == IS_STRING) {
 		object_init_ex(&file, spl_ce_SplFileInfo);
 		if (phalcon_has_constructor(&file)) {
-			PHALCON_CALL_METHODW(NULL, &file, "__construct", value);
+			PHALCON_CALL_METHOD(NULL, &file, "__construct", value);
 		}
 	} else if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(value), spl_ce_SplFileInfo, 0)) {
 		PHALCON_CPY_WRT(&file, value);
@@ -302,14 +302,14 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid)
 		maxheight = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHODW(&valid, &file, "isfile");
+	PHALCON_CALL_METHOD(&valid, &file, "isfile");
 
 	if (!zend_is_true(&valid)) {
 		phalcon_update_property_str(getThis(), SL("_type"), SL("FileValid"));
 		RETURN_FALSE;
 	}
 
-	PHALCON_CALL_METHODW(&size, &file, "getsize");
+	PHALCON_CALL_METHOD(&size, &file, "getsize");
 
 	if (!PHALCON_IS_EMPTY(minsize)) {
 		is_smaller_or_equal_function(&valid, minsize, &size);
@@ -327,24 +327,24 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid)
 		}
 	}
 
-	PHALCON_CALL_METHODW(&pathname, &file, "getpathname");
+	PHALCON_CALL_METHOD(&pathname, &file, "getpathname");
 
 	if (Z_TYPE_P(mimes) == IS_ARRAY) {
 		if ((constant = zend_get_constant_str(SL("FILEINFO_MIME_TYPE"))) == NULL) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Undefined constant `FILEINFO_MIME_TYPE`");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Undefined constant `FILEINFO_MIME_TYPE`");
 			return;
 		}
 
-		PHALCON_CALL_FUNCTIONW(&finfo, "finfo_open", constant);
+		PHALCON_CALL_FUNCTION(&finfo, "finfo_open", constant);
 
 		if (Z_TYPE(finfo) != IS_RESOURCE) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Opening fileinfo database failed");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Opening fileinfo database failed");
 			return;
-		}		
+		}
 
-		PHALCON_CALL_FUNCTIONW(&mime, "finfo_file", &finfo, &pathname);
-		PHALCON_CALL_FUNCTIONW(NULL, "finfo_close", &finfo);
-		
+		PHALCON_CALL_FUNCTION(&mime, "finfo_file", &finfo, &pathname);
+		PHALCON_CALL_FUNCTION(NULL, "finfo_close", &finfo);
+
 		if (!phalcon_fast_in_array(&mime, mimes)) {
 			phalcon_update_property_str(getThis(), SL("_type"), SL("MimeValid"));
 			RETURN_FALSE;
@@ -355,12 +355,12 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid)
 		imagick_ce = phalcon_fetch_str_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
 		object_init_ex(&image, imagick_ce);
-		PHALCON_CALL_METHODW(NULL, &image, "__construct", &pathname);
+		PHALCON_CALL_METHOD(NULL, &image, "__construct", &pathname);
 
-		PHALCON_CALL_METHODW(&width, &image, "getImageWidth");
-		PHALCON_CALL_METHODW(&height, &image, "getImageHeight");
+		PHALCON_CALL_METHOD(&width, &image, "getImageWidth");
+		PHALCON_CALL_METHOD(&height, &image, "getImageHeight");
 	} else if (phalcon_function_exists_ex(SL("getimagesize")) != FAILURE) {
-		PHALCON_CALL_FUNCTIONW(&imageinfo, "getimagesize", &pathname);
+		PHALCON_CALL_FUNCTION(&imageinfo, "getimagesize", &pathname);
 		if (!phalcon_array_isset_fetch_long(&width, &imageinfo, 0)) {
 			ZVAL_LONG(&width, -1);
 		}

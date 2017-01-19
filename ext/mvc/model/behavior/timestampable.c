@@ -71,30 +71,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 	zval *type, *model, take_action = {}, options = {}, field = {}, format = {}, timestamp = {}, generator = {}, *single_field;
 
 	phalcon_fetch_params(0, 2, 0, &type, &model);
-	
-	/** 
+
+	/**
 	 * Check if the developer decided to take action here
 	 */
-	PHALCON_CALL_METHODW(&take_action, getThis(), "musttakeaction", type);
+	PHALCON_CALL_METHOD(&take_action, getThis(), "musttakeaction", type);
 	if (PHALCON_IS_NOT_TRUE(&take_action)) {
 		RETURN_NULL();
 	}
-	
-	PHALCON_CALL_METHODW(&options, getThis(), "getoptions", type);
-	if (Z_TYPE(options) == IS_ARRAY) { 
-	
-		/** 
+
+	PHALCON_CALL_METHOD(&options, getThis(), "getoptions", type);
+	if (Z_TYPE(options) == IS_ARRAY) {
+
+		/**
 		 * The field name is required in this behavior
 		 */
 		if (!phalcon_array_isset_fetch_str(&field, &options, SL("field"))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The option 'field' is required");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'field' is required");
 			return;
 		}
-	
+
 		if (phalcon_array_isset_fetch_str(&format, &options, SL("format"))) {
-			/** 
+			/**
 			 * Format is a format for date()
-			 */	
+			 */
 			phalcon_date(&timestamp, &format, NULL);
 		} else if (phalcon_array_isset_fetch_str(&generator, &options, SL("generator"))) {
 			/**
@@ -102,27 +102,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 			 */
 			if (Z_TYPE(generator) == IS_OBJECT) {
 				if (instanceof_function(Z_OBJCE(generator), zend_ce_closure)) {
-					PHALCON_CALL_USER_FUNCW(&timestamp, &generator);
+					PHALCON_CALL_USER_FUNC(&timestamp, &generator);
 				}
 			}
 		}
-	
-		/** 
+
+		/**
 		 * Last resort call time()
 		 */
 		if (Z_TYPE(timestamp) <= IS_NULL) {
 			ZVAL_LONG(&timestamp, (long) time(NULL));
 		}
-	
-		/** 
+
+		/**
 		 * Assign the value to the field, use writeattribute if the property is protected
 		 */
-		if (unlikely(Z_TYPE(field) == IS_ARRAY)) { 
+		if (unlikely(Z_TYPE(field) == IS_ARRAY)) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(field), single_field) {
-				PHALCON_CALL_METHODW(NULL, model, "writeattribute", single_field, &timestamp);
+				PHALCON_CALL_METHOD(NULL, model, "writeattribute", single_field, &timestamp);
 			} ZEND_HASH_FOREACH_END();
 		} else {
-			PHALCON_CALL_METHODW(NULL, model, "writeattribute", &field, &timestamp);
+			PHALCON_CALL_METHOD(NULL, model, "writeattribute", &field, &timestamp);
 		}
 	}
 }

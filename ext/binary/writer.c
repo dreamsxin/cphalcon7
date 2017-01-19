@@ -71,7 +71,7 @@ PHP_METHOD(Phalcon_Binary_Writer, writeHexString);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, data)
-	ZEND_ARG_INFO(0, endian)
+	ZEND_ARG_TYPE_INFO(0, endian, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_write, 0, 0, 2)
@@ -121,14 +121,14 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writestring, 0, 0, 1)
 	ZEND_ARG_INFO(0, str)
-	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
 	ZEND_ARG_INFO(0, exact)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writehexstring, 0, 0, 1)
 	ZEND_ARG_INFO(0, str)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
-	ZEND_ARG_INFO(0, lowNibble)
+	ZEND_ARG_TYPE_INFO(0, lowNibble, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_binary_writer_method_entry[] = {
@@ -186,10 +186,10 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 	if (Z_TYPE_P(data) == IS_STRING || Z_TYPE_P(data) == IS_NULL) {
 		ZVAL_STRING(&filename, "php://memory");
 		ZVAL_STRING(&mode, "br+");
-		PHALCON_CALL_FUNCTIONW(&handler, "fopen", &filename, &mode);
-		PHALCON_CALL_FUNCTIONW(NULL, "fwrite", &handler, data);
+		PHALCON_CALL_FUNCTION(&handler, "fopen", &filename, &mode);
+		PHALCON_CALL_FUNCTION(NULL, "fwrite", &handler, data);
 
-		PHALCON_CALL_FUNCTIONW(&fstat, "fstat", &handler);
+		PHALCON_CALL_FUNCTION(&fstat, "fstat", &handler);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
 			phalcon_update_property_zval(getThis(), SL("_position"), &size);
 		}
@@ -197,18 +197,18 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 	} else if (Z_TYPE_P(data) == IS_RESOURCE) {
 		phalcon_update_property_zval(getThis(), SL("_output"), data);
 
-		PHALCON_CALL_FUNCTIONW(&fstat, "fstat", data);
+		PHALCON_CALL_FUNCTION(&fstat, "fstat", data);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
 			phalcon_update_property_zval(getThis(), SL("_position"), &size);
 		}
 	} else {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_binary_exception_ce, "Data must be set as string or resource");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Data must be set as string or resource");
 		return;
 	}
 
 	if (endian && Z_TYPE_P(endian) != IS_NULL) {
 		if (Z_TYPE_P(endian) != IS_LONG || Z_LVAL_P(endian) < 0 || Z_LVAL_P(endian) > 2) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_binary_exception_ce, "Endian must be set as big or little");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Endian must be set as big or little");
 		}
 		phalcon_update_property_zval(getThis(), SL("_endian"), endian);
 	}
@@ -248,8 +248,8 @@ PHP_METHOD(Phalcon_Binary_Writer, getContent){
 	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY);
 	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(NULL, "rewind", &output);
-	PHALCON_CALL_FUNCTIONW(return_value, "fread", &output, &position);
+	PHALCON_CALL_FUNCTION(NULL, "rewind", &output);
+	PHALCON_CALL_FUNCTION(return_value, "fread", &output, &position);
 }
 
 /**
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Binary_Writer, getPosition){
 
 /**
  * Write bytes to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, write){
@@ -278,13 +278,13 @@ PHP_METHOD(Phalcon_Binary_Writer, write){
 	phalcon_add_function(&result, &position, length);
 
 	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY);
-	PHALCON_CALL_FUNCTIONW(return_value, "fwrite", &output, data, length);
+	PHALCON_CALL_FUNCTION(return_value, "fwrite", &output, data, length);
 	phalcon_update_property_zval(getThis(), SL("_position"), &result);
 }
 
 /**
  * Write a signed char to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeChar){
@@ -296,15 +296,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeChar){
 	ZVAL_LONG(&length, 1);
 
 	ZVAL_STRING(&format, "c");
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, byte);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, byte);
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a unsigned char to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedChar){
@@ -316,15 +316,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedChar){
 	ZVAL_LONG(&length, 1);
 
 	ZVAL_STRING(&format, "C");
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, byte);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, byte);
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a signed short int to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeInt16){
@@ -336,15 +336,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt16){
 	ZVAL_LONG(&length, 2);
 
 	ZVAL_STRING(&format, "s");
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, num);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a unsigned short int to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt16){
@@ -364,14 +364,14 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt16){
 		ZVAL_STRING(&format, "S");
 	}
 
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, num);
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a signed int to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeInt){
@@ -383,15 +383,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt){
 	ZVAL_LONG(&length, sizeof(int));
 
 	ZVAL_STRING(&format, "i");
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, num);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a unsigned int to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt){
@@ -403,15 +403,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt){
 	ZVAL_LONG(&length, sizeof(int));
 
 	ZVAL_STRING(&format, "I");
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, num);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a signed long int to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeInt32){
@@ -423,15 +423,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt32){
 	ZVAL_LONG(&length, 4);
 
 	ZVAL_STRING(&format, "l");
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, num);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a unsigned long int to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32){
@@ -451,14 +451,14 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32){
 		ZVAL_STRING(&format, "L");
 	}
 
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, num);
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a float to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeFloat){
@@ -470,15 +470,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeFloat){
 	ZVAL_LONG(&length, sizeof(float));
 
 	ZVAL_STRING(&format, "f");
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, num);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write a double to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeDouble){
@@ -490,15 +490,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeDouble){
 	ZVAL_LONG(&length, sizeof(double));
 
 	ZVAL_STRING(&format, "d");
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, num);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &length);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+	RETURN_THIS();
 }
 
 /**
  * Write string to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeString){
@@ -520,17 +520,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeString){
 			ZVAL_STRING(&format, "Z*");
 		}
 	}
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, str);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, str);
 
 	ZVAL_LONG(&len, Z_STRLEN(result));
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &len);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &len);
+	RETURN_THIS();
 }
 
 /**
  * Write hex string to the current position in the file pointer
- * 
+ *
  * @return Phalcon\Binary\Writer
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeHexString){
@@ -552,10 +552,10 @@ PHP_METHOD(Phalcon_Binary_Writer, writeHexString){
 			ZVAL_STRING(&format, "H*");
 		}
 	}
-	PHALCON_CALL_FUNCTIONW(&result, "pack", &format, str);
+	PHALCON_CALL_FUNCTION(&result, "pack", &format, str);
 
 	ZVAL_LONG(&len, Z_STRLEN(result));
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "write", &result, &len);
-	RETURN_THISW();
+	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &len);
+	RETURN_THIS();
 }

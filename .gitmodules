@@ -16,3 +16,6 @@
 [submodule "deps/libuv"]
 	path = deps/libuv
 	url = https://github.com/libuv/libuv.git
+[submodule "deps/mongo-c-driver"]
+	path = deps/mongo-c-driver
+	url = https://github.com/mongodb/mongo-c-driver.git

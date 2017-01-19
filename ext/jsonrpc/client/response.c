@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, setId){
 
 	phalcon_update_property_zval(getThis(), SL("_id"), id);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, getId){
@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, setResult){
 
 	phalcon_update_property_zval(getThis(), SL("_data"), data);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, getResult){
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, setError){
 
 	phalcon_update_property_zval(getThis(), SL("_error"), error);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, getError){
@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client_Response, setCode){
 
 	phalcon_update_property_zval(getThis(), SL("_code"), code);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 PHP_METHOD(Phalcon_JsonRpc_Client_Response, getCode){

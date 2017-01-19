@@ -115,26 +115,26 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 	phalcon_fetch_params(0, 1, 2, &sql_statement, &sql_variables, &sql_bindtypes);
 
 	object_init_ex(&active_profile, phalcon_db_profiler_item_ce);
-	PHALCON_CALL_METHODW(NULL, &active_profile, "setsqlstatement", sql_statement);
+	PHALCON_CALL_METHOD(NULL, &active_profile, "setsqlstatement", sql_statement);
 
 	if (sql_variables) {
-	    PHALCON_CALL_METHODW(NULL, &active_profile, "setsqlvariables", sql_variables);
+	    PHALCON_CALL_METHOD(NULL, &active_profile, "setsqlvariables", sql_variables);
 	}
 
 	if (sql_bindtypes) {
-	    PHALCON_CALL_METHODW(NULL, &active_profile, "setsqlbindtypes", sql_bindtypes);
+	    PHALCON_CALL_METHOD(NULL, &active_profile, "setsqlbindtypes", sql_bindtypes);
 	}
 
-	PHALCON_CALL_FUNCTIONW(&time, "microtime", &PHALCON_GLOBAL(z_true));
-	PHALCON_CALL_METHODW(NULL, &active_profile, "setinitialtime", &time);
+	PHALCON_CALL_FUNCTION(&time, "microtime", &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHOD(NULL, &active_profile, "setinitialtime", &time);
 
 	if (phalcon_method_exists_ex(getThis(), SL("beforestartprofile")) == SUCCESS) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "beforestartprofile", &active_profile);
+		PHALCON_CALL_METHOD(NULL, getThis(), "beforestartprofile", &active_profile);
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_activeProfile"), &active_profile);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -148,10 +148,10 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 
 	phalcon_read_property(&active_profile, getThis(), SL("_activeProfile"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(&final_time, "microtime", &PHALCON_GLOBAL(z_true));
-	PHALCON_CALL_METHODW(NULL, &active_profile, "setfinaltime", &final_time);
+	PHALCON_CALL_FUNCTION(&final_time, "microtime", &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHOD(NULL, &active_profile, "setfinaltime", &final_time);
 
-	PHALCON_CALL_METHODW(&initial_time, &active_profile, "getinitialtime");
+	PHALCON_CALL_METHOD(&initial_time, &active_profile, "getinitialtime");
 
 	phalcon_sub_function(&difference, &final_time, &initial_time);
 
@@ -163,10 +163,10 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 	phalcon_update_property_array_append(getThis(), SL("_allProfiles"), &active_profile);
 
 	if (phalcon_method_exists_ex(getThis(), SL("afterendprofile")) == SUCCESS) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "afterendprofile", &active_profile);
+		PHALCON_CALL_METHOD(NULL, getThis(), "afterendprofile", &active_profile);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Db_Profiler, getProfiles){
 PHP_METHOD(Phalcon_Db_Profiler, reset){
 
 	phalcon_update_property_empty_array(getThis(), SL("_allProfiles"));
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**

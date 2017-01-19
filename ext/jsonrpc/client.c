@@ -84,7 +84,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &httpclient);
 
-	PHALCON_VERIFY_INTERFACE_EX(httpclient, phalcon_http_client_adapterinterface_ce, phalcon_jsonrpc_client_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(httpclient, phalcon_http_client_adapterinterface_ce, phalcon_jsonrpc_client_exception_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_httpclient"), httpclient);
 }
@@ -116,44 +116,44 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call)
 
 	phalcon_array_update_str_str(&jsonrpc_message, SL("jsonrpc"), SL("2.0"), PH_COPY);
 	phalcon_array_update_str(&jsonrpc_message, SL("method"), method, PH_COPY);
-	
+
 	if (data) {
 		phalcon_array_update_str(&jsonrpc_message, SL("params"), data, PH_COPY);
 	}
-	
+
 	phalcon_array_update_str(&jsonrpc_message, SL("id"), &id, PH_COPY);
 
-	PHALCON_CALL_FUNCTIONW(&json_message, "json_encode", &jsonrpc_message);
-	PHALCON_CALL_METHODW(NULL, &httpclient, "setdata", &json_message);
-	PHALCON_CALL_METHODW(&response, &httpclient, "post");
+	PHALCON_CALL_FUNCTION(&json_message, "json_encode", &jsonrpc_message);
+	PHALCON_CALL_METHOD(NULL, &httpclient, "setdata", &json_message);
+	PHALCON_CALL_METHOD(&response, &httpclient, "post");
 
-	PHALCON_VERIFY_CLASS_EX(&response, phalcon_http_client_response_ce, phalcon_jsonrpc_client_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(&response, phalcon_http_client_response_ce, phalcon_jsonrpc_client_exception_ce);
 
-	PHALCON_CALL_METHODW(&code, &response, "getstatuscode");
-	PHALCON_CALL_METHODW(&body, &response, "getbody");
+	PHALCON_CALL_METHOD(&code, &response, "getstatuscode");
+	PHALCON_CALL_METHOD(&body, &response, "getbody");
 
 	object_init_ex(&jsonrpc_response, phalcon_jsonrpc_client_response_ce);
 
-	PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "__construct", &body);
-	PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "setcode", &code);
+	PHALCON_CALL_METHOD(NULL, &jsonrpc_response, "__construct", &body);
+	PHALCON_CALL_METHOD(NULL, &jsonrpc_response, "setcode", &code);
 
 	if (PHALCON_IS_NOT_EMPTY(&body)) {
-		PHALCON_CALL_FUNCTIONW(&json, "json_decode", &body, &PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_FUNCTION(&json, "json_decode", &body, &PHALCON_GLOBAL(z_true));
 
 		if (Z_TYPE(json) == IS_ARRAY) {
 			if (phalcon_array_isset_fetch_str(&id, &json, SL("id"))) {
-				PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "setid", &id);
+				PHALCON_CALL_METHOD(NULL, &jsonrpc_response, "setid", &id);
 			}
 
 			if (phalcon_array_isset_fetch_str(&result, &json, SL("result"))) {
-				PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "setresult", &result);
+				PHALCON_CALL_METHOD(NULL, &jsonrpc_response, "setresult", &result);
 			}
 
 			if (phalcon_array_isset_fetch_str(&error, &json, SL("error"))) {
-				PHALCON_CALL_METHODW(NULL, &jsonrpc_response, "seterror", &error);
+				PHALCON_CALL_METHOD(NULL, &jsonrpc_response, "seterror", &error);
 			}
 		}
 	}
 
-	RETURN_CTORW(&jsonrpc_response);
+	RETURN_CTOR(&jsonrpc_response);
 }

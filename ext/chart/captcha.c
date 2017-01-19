@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 	phalcon_fetch_params(0, 1, 6, &word, &font, &font_size, &width, &height, &pad_size, &pad_type);
 
 	if (phalcon_class_str_exists(SL("imagick"), 0) == NULL) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Imagick is not installed, or the extension is not loaded");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Imagick is not installed, or the extension is not loaded");
 		return;
 	}
 	if (word && Z_TYPE_P(word) != IS_NULL) {
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFont){
 	phalcon_fetch_params(0, 1, 0, &font);
 
 	phalcon_update_property_zval(getThis(), SL("_font"), font);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
 	phalcon_fetch_params(0, 1, 0, &font_size);
 
 	phalcon_update_property_zval(getThis(), SL("_fontSize"), font_size);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -243,13 +243,13 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	}
 
 	if (!_foreground || Z_TYPE_P(_foreground) == IS_NULL) {
-		PHALCON_CALL_METHODW(&foreground, &random, "color", &color_type);
+		PHALCON_CALL_METHOD(&foreground, &random, "color", &color_type);
 	} else {
 		PHALCON_CPY_WRT(&foreground, _foreground);
 	}
 
 	if (!_background || Z_TYPE_P(_background) == IS_NULL) {
-		PHALCON_CALL_METHODW(&background, &random, "color", &color_type);
+		PHALCON_CALL_METHOD(&background, &random, "color", &color_type);
 	} else {
 		PHALCON_CPY_WRT(&background, _background);
 	}
@@ -272,41 +272,41 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 
 	object_init_ex(&imagick, imagick_ce);
 	if (phalcon_has_constructor(&imagick)) {
-		PHALCON_CALL_METHODW(NULL, &imagick, "__construct");
+		PHALCON_CALL_METHOD(NULL, &imagick, "__construct");
 	}
 	object_init_ex(&bgpixel, imagickpixel_ce);
-	PHALCON_CALL_METHODW(NULL, &bgpixel, "__construct", &background);
-	PHALCON_CALL_METHODW(NULL, &imagick, "newimage", &width,  &height, &bgpixel);
+	PHALCON_CALL_METHOD(NULL, &bgpixel, "__construct", &background);
+	PHALCON_CALL_METHOD(NULL, &imagick, "newimage", &width,  &height, &bgpixel);
 
 	object_init_ex(&draw, draw_ce);
 	if (phalcon_has_constructor(&draw)) {
-		PHALCON_CALL_METHODW(NULL, &draw, "__construct");
+		PHALCON_CALL_METHOD(NULL, &draw, "__construct");
 	}
 	phalcon_read_property(&font, getThis(), SL("_font"), PH_NOISY);
 	if (zend_is_true(&font)) {
-		PHALCON_CALL_METHODW(NULL, &draw, "setfontsize", &font);
+		PHALCON_CALL_METHOD(NULL, &draw, "setfontsize", &font);
 	}
 	phalcon_read_property(&font_size, getThis(), SL("_fontSize"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, &draw, "setfontsize", &font_size);
+	PHALCON_CALL_METHOD(NULL, &draw, "setfontsize", &font_size);
 
 	object_init_ex(&fgpixel, imagickpixel_ce);
-	PHALCON_CALL_METHODW(NULL, &fgpixel, "__construct", &foreground);
-	PHALCON_CALL_METHODW(NULL, &draw, "setfillcolor", &fgpixel);
+	PHALCON_CALL_METHOD(NULL, &fgpixel, "__construct", &foreground);
+	PHALCON_CALL_METHOD(NULL, &draw, "setfillcolor", &fgpixel);
 
 	if (!_background || Z_TYPE_P(_background) == IS_NULL) {
 		object_init_ex(&gradient, imagick_ce);
 		if (phalcon_has_constructor(&gradient)) {
-			PHALCON_CALL_METHODW(NULL, &gradient, "__construct");
+			PHALCON_CALL_METHOD(NULL, &gradient, "__construct");
 		}
 
-		PHALCON_CALL_METHODW(&top_color, &random, "color");
-		PHALCON_CALL_METHODW(&bottom_color, &random, "color");
+		PHALCON_CALL_METHOD(&top_color, &random, "color");
+		PHALCON_CALL_METHOD(&bottom_color, &random, "color");
 
 		PHALCON_CONCAT_SVSV(&pseudostring, "gradient:", &top_color, "-", &bottom_color);
-		PHALCON_CALL_METHODW(NULL, &gradient, "newpseudoimage", &width,  &height, &pseudostring);
+		PHALCON_CALL_METHOD(NULL, &gradient, "newpseudoimage", &width,  &height, &pseudostring);
 
 		phalcon_get_class_constant(&composite, imagick_ce, SL("COMPOSITE_OVER"));
-		PHALCON_CALL_METHODW(NULL, &imagick, "compositeimage", &gradient, &composite, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+		PHALCON_CALL_METHOD(NULL, &imagick, "compositeimage", &gradient, &composite, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 	}
 
 	phalcon_read_property(&pad_type, getThis(), SL("_padType"), PH_NOISY);
@@ -322,67 +322,67 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 			break;
 	}
 
-	PHALCON_CALL_METHODW(NULL, &draw, "setgravity", &gravity);
-	PHALCON_CALL_METHODW(NULL, &imagick, "annotateimage", &draw, offset_x, offset_y, &PHALCON_GLOBAL(z_zero), &word);
+	PHALCON_CALL_METHOD(NULL, &draw, "setgravity", &gravity);
+	PHALCON_CALL_METHOD(NULL, &imagick, "annotateimage", &draw, offset_x, offset_y, &PHALCON_GLOBAL(z_zero), &word);
 
 	phalcon_read_property(&pad_size, getThis(), SL("_padSize"), PH_NOISY);
 	if (Z_LVAL(pad_type) == PHALCON_CHART_CAPTCHA_PAD_BOTH || Z_LVAL(pad_type) == PHALCON_CHART_CAPTCHA_PAD_LEFT) {
-		PHALCON_CALL_METHODW(&color, &random, "color", &color_type);
-		PHALCON_CALL_METHODW(&word, &random, "alnum", &pad_size);
+		PHALCON_CALL_METHOD(&color, &random, "color", &color_type);
+		PHALCON_CALL_METHOD(&word, &random, "alnum", &pad_size);
 		object_init_ex(&pixel, imagickpixel_ce);
-		PHALCON_CALL_METHODW(NULL, &pixel, "__construct", &color);
-		PHALCON_CALL_METHODW(NULL, &draw, "setfillcolor", &pixel);
+		PHALCON_CALL_METHOD(NULL, &pixel, "__construct", &color);
+		PHALCON_CALL_METHOD(NULL, &draw, "setfillcolor", &pixel);
 
 		phalcon_get_class_constant(&gravity, imagick_ce, SL("GRAVITY_WEST"));
 
-		PHALCON_CALL_METHODW(NULL, &draw, "setgravity", &gravity);
-		PHALCON_CALL_METHODW(NULL, &imagick, "annotateimage", &draw, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &word);
+		PHALCON_CALL_METHOD(NULL, &draw, "setgravity", &gravity);
+		PHALCON_CALL_METHOD(NULL, &imagick, "annotateimage", &draw, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &word);
 	}
 
 	if (Z_LVAL(pad_type) == PHALCON_CHART_CAPTCHA_PAD_BOTH || Z_LVAL(pad_type) == PHALCON_CHART_CAPTCHA_PAD_RIGHT) {
-		PHALCON_CALL_METHODW(&color, &random, "color", &color_type);
-		PHALCON_CALL_METHODW(&word, &random, "alnum", &pad_size);
+		PHALCON_CALL_METHOD(&color, &random, "color", &color_type);
+		PHALCON_CALL_METHOD(&word, &random, "alnum", &pad_size);
 		object_init_ex(&pixel, imagickpixel_ce);
-		PHALCON_CALL_METHODW(NULL, &pixel, "__construct", &color);
-		PHALCON_CALL_METHODW(NULL, &draw, "setfillcolor", &pixel);
+		PHALCON_CALL_METHOD(NULL, &pixel, "__construct", &color);
+		PHALCON_CALL_METHOD(NULL, &draw, "setfillcolor", &pixel);
 
 		phalcon_get_class_constant(&gravity, imagick_ce, SL("GRAVITY_EAST"));
 
-		PHALCON_CALL_METHODW(NULL, &draw, "setgravity", &gravity);
-		PHALCON_CALL_METHODW(NULL, &imagick, "annotateimage", &draw, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &word);
+		PHALCON_CALL_METHOD(NULL, &draw, "setgravity", &gravity);
+		PHALCON_CALL_METHOD(NULL, &imagick, "annotateimage", &draw, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &word);
 	}
 
 	ZVAL_LONG(&min, 20);
 	ZVAL_LONG(&max, 50);
 
-	PHALCON_CALL_FUNCTIONW(&roll1, "rand", &min, &max);
+	PHALCON_CALL_FUNCTION(&roll1, "rand", &min, &max);
 
 	ZVAL_LONG(&min, 30);
 
-	PHALCON_CALL_FUNCTIONW(&corner1, "rand", &min, &max);
-	PHALCON_CALL_FUNCTIONW(&corner2, "rand", &min, &max);
-	PHALCON_CALL_METHODW(NULL, &imagick, "rollimage", &roll1,  &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_FUNCTION(&corner1, "rand", &min, &max);
+	PHALCON_CALL_FUNCTION(&corner2, "rand", &min, &max);
+	PHALCON_CALL_METHOD(NULL, &imagick, "rollimage", &roll1,  &PHALCON_GLOBAL(z_zero));
 
 	ZVAL_LONG(&corner1, -Z_LVAL(corner1));
 
-	PHALCON_CALL_METHODW(NULL, &imagick, "swirlimage", &corner1);
+	PHALCON_CALL_METHOD(NULL, &imagick, "swirlimage", &corner1);
 
 	ZVAL_LONG(&roll2, -Z_LVAL(roll1)*2);
 
-	PHALCON_CALL_METHODW(NULL, &imagick, "rollimage", &roll2,  &PHALCON_GLOBAL(z_zero));
-	PHALCON_CALL_METHODW(NULL, &imagick, "swirlimage", &corner2);
-	PHALCON_CALL_METHODW(NULL, &imagick, "rollimage", &roll1,  &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHOD(NULL, &imagick, "rollimage", &roll2,  &PHALCON_GLOBAL(z_zero));
+	PHALCON_CALL_METHOD(NULL, &imagick, "swirlimage", &corner2);
+	PHALCON_CALL_METHOD(NULL, &imagick, "rollimage", &roll1,  &PHALCON_GLOBAL(z_zero));
 
 	ZVAL_STRING(&format, "png");
 
-	PHALCON_CALL_METHODW(NULL, &imagick, "setImageFormat", &format);
-	PHALCON_CALL_METHODW(NULL, &imagick, "stripImage");
+	PHALCON_CALL_METHOD(NULL, &imagick, "setImageFormat", &format);
+	PHALCON_CALL_METHOD(NULL, &imagick, "stripImage");
 
 	phalcon_update_property_zval(getThis(), SL("_imagick"), &imagick);
 	if (filename && zend_is_true(filename)) {
-		PHALCON_CALL_METHODW(NULL, &imagick, "writeImage", filename);
+		PHALCON_CALL_METHOD(NULL, &imagick, "writeImage", filename);
 	}
-	PHALCON_RETURN_CALL_METHODW(&imagick, "getImageBlob");
+	PHALCON_RETURN_CALL_METHOD(&imagick, "getImageBlob");
 }
 
 /**
@@ -407,5 +407,5 @@ PHP_METHOD(Phalcon_Chart_Captcha, save){
 	if (Z_TYPE_P(&imagick) != IS_OBJECT) {
 		RETURN_FALSE;
 	}
-	PHALCON_RETURN_CALL_METHODW(&imagick, "writeImage", filename);
+	PHALCON_RETURN_CALL_METHOD(&imagick, "writeImage", filename);
 }

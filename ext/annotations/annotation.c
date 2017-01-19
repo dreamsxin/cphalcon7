@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	phalcon_fetch_params(0, 1, 0, &reflection_data);
 
 	if (Z_TYPE_P(reflection_data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "Reflection data must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Reflection data must be an array");
 		return;
 	}
 
@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 
 			phalcon_array_fetch_str(&expr, argument, SL("expr"), PH_NOISY);
 	
-			PHALCON_CALL_METHODW(&resolved_argument, getThis(), "getexpression", &expr);
+			PHALCON_CALL_METHOD(&resolved_argument, getThis(), "getexpression", &expr);
 			if (phalcon_array_isset_fetch_str(&name, argument, SL("name"))) {
 				phalcon_array_update_zval(&arguments, &name, &resolved_argument, PH_COPY);
 			} else {
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 	PHALCON_SEPARATE_PARAM(expr);
 	
 	if (Z_TYPE_P(expr) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "The expression is not valid");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The expression is not valid");
 		return;
 	}
 
@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 		case PHANNOT_T_STRING:
 		case PHANNOT_T_IDENTIFIER:
 			phalcon_array_fetch_str(&items, expr, SL("value"), PH_NOISY);
-			RETURN_CTORW(&items);
+			RETURN_CTOR(&items);
 			/* no break because of implicit return */
 	
 		case PHANNOT_T_NULL:
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
 				phalcon_array_fetch_str(&item_expr, item, SL("expr"), PH_NOISY);
 
-				PHALCON_CALL_METHODW(&resolved_item, getThis(), "getexpression", &item_expr);
+				PHALCON_CALL_METHOD(&resolved_item, getThis(), "getexpression", &item_expr);
 				if (phalcon_array_isset_fetch_str(&name, item, SL("name"))) {
 					phalcon_array_update_zval(return_value, &name, &resolved_item, PH_COPY);
 				} else {
@@ -210,13 +210,13 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 	
 		case PHANNOT_T_ANNOTATION:
 			object_init_ex(return_value, phalcon_annotations_annotation_ce);
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", expr);
+			PHALCON_CALL_METHOD(NULL, return_value, "__construct", expr);
 			return;
 			/* no break because of implicit return */
 	
 		default:
 			PHALCON_CONCAT_SVS(&exception_message, "The expression ", &type, " is unknown");
-			PHALCON_THROW_EXCEPTION_ZVALW(phalcon_annotations_exception_ce, &exception_message);
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_annotations_exception_ce, &exception_message);
 			return;
 	}
 }

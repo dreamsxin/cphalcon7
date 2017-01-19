@@ -118,9 +118,9 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, __construct){
 
 	if (file_path && Z_TYPE_P(file_path) != IS_NULL) {
 		if (scanner_mode) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "read", file_path, absolute_path, scanner_mode);
+			PHALCON_CALL_METHOD(NULL, getThis(), "read", file_path, absolute_path, scanner_mode);
 		} else {
-			PHALCON_CALL_METHODW(NULL, getThis(), "read", file_path, absolute_path);
+			PHALCON_CALL_METHOD(NULL, getThis(), "read", file_path, absolute_path);
 		}
 	}
 }
@@ -193,9 +193,9 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	 * Use the standard parse_ini_file
 	 */
 	if (scanner_mode && Z_TYPE_P(scanner_mode) == IS_LONG) {
-		PHALCON_CALL_FUNCTIONW(&ini_config, "parse_ini_file", &config_dir_path, &PHALCON_GLOBAL(z_true), scanner_mode);
+		PHALCON_CALL_FUNCTION(&ini_config, "parse_ini_file", &config_dir_path, &PHALCON_GLOBAL(z_true), scanner_mode);
 	} else {
-		PHALCON_CALL_FUNCTIONW(&ini_config, "parse_ini_file", &config_dir_path, &PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_FUNCTION(&ini_config, "parse_ini_file", &config_dir_path, &PHALCON_GLOBAL(z_true));
 	}
 
 	/** 
@@ -238,8 +238,8 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	} ZEND_HASH_FOREACH_END();
 
 	if (Z_TYPE(config) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "val", &config);
+		PHALCON_CALL_METHOD(NULL, getThis(), "val", &config);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }

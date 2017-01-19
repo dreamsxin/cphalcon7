@@ -705,59 +705,71 @@ void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs) {
 /**
  * Inmediate function resolution for strpos function
  */
-void phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle) {
+int phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle) {
 
 	const char *found = NULL;
 
 	if (unlikely(Z_TYPE_P(haystack) != IS_STRING || Z_TYPE_P(needle) != IS_STRING)) {
-		ZVAL_NULL(return_value);
+		if (return_value) {
+			ZVAL_NULL(return_value);
+		}
 		zend_error(E_WARNING, "Invalid arguments supplied for strpos()");
-		return;
+		return 0;
 	}
 
 	if (!Z_STRLEN_P(needle)) {
-		ZVAL_NULL(return_value);
+		if (return_value) {
+			ZVAL_NULL(return_value);
+		}
 		zend_error(E_WARNING, "Empty delimiter");
-		return;
+		return 0;
 	}
 
 	found = php_memnstr(Z_STRVAL_P(haystack), Z_STRVAL_P(needle), Z_STRLEN_P(needle), Z_STRVAL_P(haystack) + Z_STRLEN_P(haystack));
 
 	if (found) {
-		ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
-	} else {
+		if (return_value) {
+			ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
+		}
+		return 1;
+	}
+	if (return_value) {
 		ZVAL_FALSE(return_value);
 	}
-
+	return 0;
 }
 
 /**
  * Inmediate function resolution for strpos function
  */
-void phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *needle, unsigned int needle_length) {
+int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *needle, unsigned int needle_length) {
 
 	const char *found = NULL;
 
 	if (unlikely(Z_TYPE_P(haystack) != IS_STRING)) {
 		ZVAL_NULL(return_value);
 		zend_error(E_WARNING, "Invalid arguments supplied for strpos()");
-		return;
+		return 0;
 	}
 
 	found = php_memnstr(Z_STRVAL_P(haystack), needle, needle_length, Z_STRVAL_P(haystack) + Z_STRLEN_P(haystack));
 
 	if (found) {
-		ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
-	} else {
+		if (return_value) {
+			ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
+		}
+		return 1;
+	}
+	if (return_value) {
 		ZVAL_FALSE(return_value);
 	}
-
+	return 0;
 }
 
 /**
  * Inmediate function resolution for stripos function
  */
-void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, unsigned int needle_length) {
+int phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, unsigned int needle_length) {
 
 	const char *found = NULL;
 	char *needle_dup, *haystack_dup;
@@ -765,7 +777,7 @@ void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, 
 	if (unlikely(Z_TYPE_P(haystack) != IS_STRING)) {
 		ZVAL_NULL(return_value);
 		zend_error(E_WARNING, "Invalid arguments supplied for stripos()");
-		return;
+		return 0;
 	}
 
 	haystack_dup = estrndup(Z_STRVAL_P(haystack), Z_STRLEN_P(haystack));
@@ -780,11 +792,16 @@ void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, 
 	efree(needle_dup);
 
 	if (found) {
-		ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
-	} else {
-		ZVAL_FALSE(return_value);
+		if (return_value) {
+			ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
+		}
+		return 1;
 	}
 
+	if (return_value) {
+		ZVAL_FALSE(return_value);
+	}
+	return 0;
 }
 
 /**
@@ -910,7 +927,7 @@ void phalcon_fast_str_replace(zval *retval, zval *search, zval *replace, zval *s
 	 */
 	if (Z_TYPE_P(search) == IS_ARRAY) {
 		do {
-			PHALCON_CALL_FUNCTIONW(retval, "str_replace", search, replace, subject);
+			PHALCON_CALL_FUNCTION(retval, "str_replace", search, replace, subject);
 			return;
 		} while(0);
 	}
@@ -1275,7 +1292,7 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned 
 		ZVAL_FALSE(return_value);
 		return;
 	}
-	
+
 	str_len = (uint)(Z_STRLEN_P(str));
 	if (str_len < from){
 		ZVAL_FALSE(return_value);
@@ -1718,7 +1735,7 @@ void phalcon_add_trailing_slash(zval* v)
 #else
 		if (c[len - 1] != PHP_DIR_SEPARATOR)
 #endif
-		{            
+		{
 			SEPARATE_ZVAL(v);
 			c = Z_STRVAL_P(v);
 

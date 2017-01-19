@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Text, lower){
 	 * transformation
 	 */
 	if (phalcon_function_exists_ex(SL("mb_strtolower")) == SUCCESS) {
-		PHALCON_RETURN_CALL_FUNCTIONW("mb_strtolower", str);
+		PHALCON_RETURN_CALL_FUNCTION("mb_strtolower", str);
 		return;
 	}
 
@@ -402,7 +402,7 @@ PHP_METHOD(Phalcon_Text, upper){
 	 * transformation
 	 */
 	if (phalcon_function_exists_ex(SL("mb_strtoupper")) == SUCCESS) {
-		PHALCON_RETURN_CALL_FUNCTIONW("mb_strtoupper", str);
+		PHALCON_RETURN_CALL_FUNCTION("mb_strtoupper", str);
 		return;
 	}
 
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 	ZVAL_DOUBLE(&z_size, size);
 	ZVAL_STRING(&z_force_unit, units[power]);
 
-	PHALCON_RETURN_CALL_FUNCTIONW("sprintf", &format, &z_size, &z_force_unit);
+	PHALCON_RETURN_CALL_FUNCTION("sprintf", &format, &z_size, &z_force_unit);
 }
 
 /**
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Text, reduceSlashes){
 	ZVAL_STRING(&pattern, "#(?<!:)//+#");
 	ZVAL_STRING(&replacement, "/");
 
-	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, str);
+	PHALCON_RETURN_CALL_FUNCTION("preg_replace", &pattern, &replacement, str);
 }
 
 /**
@@ -572,7 +572,7 @@ PHP_METHOD(Phalcon_Text, underscore)
 	ZVAL_STRING(&pattern, "#\\s+#");
 	ZVAL_STRING(&replacement, "_");
 
-	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, &trimmed);
+	PHALCON_RETURN_CALL_FUNCTION("preg_replace", &pattern, &replacement, &trimmed);
 }
 
 /**
@@ -593,5 +593,5 @@ PHP_METHOD(Phalcon_Text, humanize)
 	ZVAL_STRING(&pattern, "#[_-]+#");
 	ZVAL_STRING(&replacement, " ");
 
-	PHALCON_RETURN_CALL_FUNCTIONW("preg_replace", &pattern, &replacement, &trimmed);
+	PHALCON_RETURN_CALL_FUNCTION("preg_replace", &pattern, &replacement, &trimmed);
 }

@@ -112,7 +112,6 @@ PHALCON_DOC_METHOD(Phalcon_Cache_BackendInterface, getLastKey);
  * Returns a cached content
  *
  * @param int|string $keyName
- * @param   long $lifetime
  * @return  mixed
  */
 PHALCON_DOC_METHOD(Phalcon_Cache_BackendInterface, get);
@@ -172,7 +171,7 @@ PHALCON_DOC_METHOD(Phalcon_Cache_BackendInterface, decrement);
 
 /**
  * Immediately invalidates all existing items.
- * 
+ *
  * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_Cache_BackendInterface, flush);

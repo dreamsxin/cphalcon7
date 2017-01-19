@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 
 	if (phalcon_file_exists(&path) == SUCCESS) {
 		RETURN_ON_FAILURE(phalcon_require_ret(&data, Z_STRVAL(path)));
-		RETURN_CTORW(&data);
+		RETURN_CTOR(&data);
 	}
 }
 
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 
 	phalcon_file_put_contents(&status, &path, &php_export);
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Meta-Data directory cannot be written");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Meta-Data directory cannot be written");
 		return;
 	}
 }
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 	PHALCON_CONCAT_VS(&pattern, &metadata_dir, "meta-*.php");
 
 	object_init_ex(&iterator, spl_ce_GlobIterator);
-	PHALCON_CALL_METHODW(NULL, &iterator, "__construct", &pattern);
+	PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &pattern);
 
 	it = spl_ce_GlobIterator->get_iterator(spl_ce_GlobIterator, &iterator, 0);
 	it->funcs->rewind(it);
@@ -183,6 +183,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 	it->funcs->dtor(it);
 
 	if (!EG(exception)) {
-		PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_files_ce, getThis(), "reset");
+		PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_files_ce, getThis(), "reset");
 	}
 }

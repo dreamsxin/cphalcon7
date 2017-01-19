@@ -113,12 +113,12 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, start){
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 
 	if (Z_TYPE(options) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "The options must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "The options must be an array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&host, &options, SL("host"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "No session host given in options");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "No session host given in options");
 		return;
 	}
 
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, start){
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHODW(NULL, &frontend_data, "__construct", &frontend_option);
+	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &frontend_option);
 
 	array_init_size(&backend_option, 3);
 
@@ -158,12 +158,12 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, start){
 
 	object_init_ex(&memcache, phalcon_cache_backend_memcache_ce);
 
-	PHALCON_CALL_METHODW(NULL, &memcache, "__construct", &frontend_data, &backend_option);
+	PHALCON_CALL_METHOD(NULL, &memcache, "__construct", &frontend_data, &backend_option);
 
 	phalcon_update_property_zval(getThis(), SL("_memcache"), &memcache);
 
 //#ifdef PHALCON_USE_PHP_SESSION
-//	PHALCON_CALL_FUNCTIONW(return_value, "session_set_save_handler", getThis(), &PHALCON_GLOBAL(z_true));
+//	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", getThis(), &PHALCON_GLOBAL(z_true));
 //#else
 	/* open callback */
 	array_init_size(&callable_open, 2);
@@ -195,14 +195,14 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, start){
 	phalcon_array_append(&callable_gc, getThis(), 0);
 	phalcon_array_append_string(&callable_gc, SL("gc"), 0);
 
-	PHALCON_CALL_FUNCTIONW(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
-	PHALCON_CALL_FUNCTIONW(NULL, "session_register_shutdown");
+	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
+	PHALCON_CALL_FUNCTION(NULL, "session_register_shutdown");
 //#endif
 	if (!zend_is_true(return_value)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "Sets user-level session storage functions failed");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "Sets user-level session storage functions failed");
 		RETURN_FALSE;
 	}
-	PHALCON_CALL_PARENTW(return_value, phalcon_session_adapter_memcache_ce, getThis(), "start");
+	PHALCON_CALL_PARENT(return_value, phalcon_session_adapter_memcache_ce, getThis(), "start");
 }
 
 /**
@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, read){
 	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE(memcache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(return_value, &memcache, "get", sid, &lifetime);
+		PHALCON_CALL_METHOD(return_value, &memcache, "get", sid, &lifetime);
 		if (Z_TYPE_P(return_value)!=IS_STRING) {
 			RETURN_EMPTY_STRING();
 		}
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, write){
 	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE(memcache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(return_value, &memcache, "save", sid, data, &lifetime);
+		PHALCON_CALL_METHOD(return_value, &memcache, "save", sid, data, &lifetime);
 	} else {
 		RETURN_FALSE;
 	}
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, destroy){
 	phalcon_fetch_params(0, 0, 1, &_sid);
 
 	if (!_sid) {
-		PHALCON_CALL_SELFW(&sid, "getid");
+		PHALCON_CALL_SELF(&sid, "getid");
 	} else {
 		PHALCON_CPY_WRT(&sid, _sid);
 	}
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcache, destroy){
 	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE(memcache) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(&memcache, "delete", &sid);
+		PHALCON_RETURN_CALL_METHOD(&memcache, "delete", &sid);
 		return;
 	} else {
 		RETURN_FALSE;

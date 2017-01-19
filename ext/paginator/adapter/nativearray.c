@@ -104,10 +104,10 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 	}
 
 	if (!phalcon_array_isset_fetch_str(&data, config, SL("data"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'data' is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'data' is required");
 		return;
 	} else if (Z_TYPE_P(&data) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "'data' should be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "'data' should be an array");
 		return;
 	}
 
@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage){
 	PHALCON_ENSURE_IS_LONG(current_page);
 	
 	phalcon_update_property_zval(getThis(), SL("_page"), current_page);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 
 	phalcon_read_property(&items, getThis(), SL("_data"), PH_NOISY);
 	if (UNEXPECTED(Z_TYPE(items) != IS_ARRAY)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Invalid data for paginator");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Invalid data for paginator");
 		return;
 	}
 
@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 	ZVAL_LONG(&start, i_number);
 	ZVAL_LONG(&lim, i_limit);
 
-	PHALCON_CALL_FUNCTIONW(&slice, "array_slice", &items, &start, &lim);
+	PHALCON_CALL_FUNCTION(&slice, "array_slice", &items, &start, &lim);
 
 	object_init(return_value);
 	phalcon_update_property_zval(return_value, SL("items"),       &slice);

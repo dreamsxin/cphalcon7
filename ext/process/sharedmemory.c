@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, open){
 	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
 
 	if (Z_TYPE(shm) != IS_NULL) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_process_exception_ce, "Already create or open shared memory");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Already create or open shared memory");
 		return;
 	}
 
@@ -202,7 +202,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, create){
 	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
 
 	if (Z_TYPE(shm) != IS_NULL) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_process_exception_ce, "Already create or open shared memory");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Already create or open shared memory");
 		return;
 	}
 

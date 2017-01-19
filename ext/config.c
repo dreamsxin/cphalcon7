@@ -140,9 +140,9 @@ PHP_METHOD(Phalcon_Config, __construct){
 
 	if (array_config) {
 		if (Z_TYPE_P(array_config) == IS_ARRAY) {
-			PHALCON_CALL_SELFW(NULL, "val", array_config);
+			PHALCON_CALL_SELF(NULL, "val", array_config);
 		} else if (Z_TYPE_P(array_config) != IS_NULL) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_config_exception_ce, "The configuration must be an Array");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_config_exception_ce, "The configuration must be an Array");
 		}
 	}
 }
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Config, val){
 	 * Throw exceptions if bad parameters are passed
 	 */
 	if (Z_TYPE_P(array_config) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_config_exception_ce, "The configuration must be an Array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_config_exception_ce, "The configuration must be an Array");
 		return;
 	}
 
@@ -178,10 +178,10 @@ PHP_METHOD(Phalcon_Config, val){
 
 		if (Z_TYPE_P(value) == IS_ARRAY) {
 			object_init_ex(&instance, phalcon_config_ce);
-			PHALCON_CALL_METHODW(NULL, &instance, "__construct", value);
-			PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, &instance);
+			PHALCON_CALL_METHOD(NULL, &instance, "__construct", value);
+			PHALCON_CALL_METHOD(NULL, getThis(), "offsetset", &key, &instance);
 		} else {
-			PHALCON_CALL_METHODW(NULL, getThis(), "offsetset", &key, value);
+			PHALCON_CALL_METHOD(NULL, getThis(), "offsetset", &key, value);
 		}
 	} ZEND_HASH_FOREACH_END();
 }
@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Config, get){
 
 	if (phalcon_read_property_zval(return_value, getThis(), index, PH_NOISY) == FAILURE) {
 		if (default_value) {
-			RETURN_CTORW(default_value);
+			RETURN_CTOR(default_value);
 		} else {
 			RETURN_NULL();
 		}
@@ -310,7 +310,7 @@ PHP_METHOD(Phalcon_Config, merge){
 	phalcon_fetch_params(0, 1, 0, &config);
 
 	if (Z_TYPE_P(config) != IS_OBJECT && Z_TYPE_P(config) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_config_exception_ce, "Configuration must be an object or array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_config_exception_ce, "Configuration must be an object or array");
 		return;
 	}
 
@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_Config, merge){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -415,5 +415,5 @@ PHP_METHOD(Phalcon_Config, __set_state){
 	phalcon_fetch_params(0, 1, 0, &data);
 
 	object_init_ex(return_value, phalcon_config_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", data);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", data);
 }

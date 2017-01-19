@@ -96,21 +96,21 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, __construct){
 	phalcon_fetch_params(0, 1, 0, &options);
 
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "The options must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The options must be an array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&service, options, SL("service"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "No service given in options");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "No service given in options");
 		return;
 	}
 
 	if (Z_TYPE(service) != IS_OBJECT) {
-		PHALCON_CALL_METHODW(&cache, getThis(), "getresolveservice", &service);
+		PHALCON_CALL_METHOD(&cache, getThis(), "getresolveservice", &service);
 	} else {
 		PHALCON_CPY_WRT(&cache, &service);
 	}
-	PHALCON_VERIFY_INTERFACEW(&cache, phalcon_cache_backendinterface_ce);
+	PHALCON_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
 
@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, read)
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 
-	PHALCON_RETURN_CALL_METHODW(&cache, "get", key, &lifetime);
+	PHALCON_RETURN_CALL_METHOD(&cache, "get", key, &lifetime);
 }
 
 /**
@@ -154,5 +154,5 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, write){
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(NULL, &cache, "save", key, data, &lifetime);	
+	PHALCON_CALL_METHOD(NULL, &cache, "save", key, data, &lifetime);	
 }

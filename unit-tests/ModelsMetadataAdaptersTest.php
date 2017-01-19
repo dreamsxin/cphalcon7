@@ -466,8 +466,8 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 
 	public function testMetadataMongo()
 	{
-		if (!extension_loaded('mongo')) {
-			$this->markTestSkipped('Warning: mongo extension is not loaded');
+		if (!class_exists('Phalcon\Cache\Backend\Mongo')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Backend\Mongo` is not exists');
 			return ;
 		}
 
@@ -481,7 +481,6 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 
 		$di->set('modelsMetadata', function(){
 			return new Phalcon\Mvc\Model\Metadata\Mongo(array(
-				'mongo' => new MongoClient(),
 				'db' => 'phalcon_test',
 				'collection' => 'caches',
 				'lifetime' => 60,
@@ -509,8 +508,8 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 
 	public function testMetadataCache()
 	{
-		if (!extension_loaded('mongo')) {
-			$this->markTestSkipped('Warning: mongo extension is not loaded');
+		if (!class_exists('Phalcon\Cache\Backend\Mongo')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Backend\Mongo` is not exists');
 			return ;
 		}
 
@@ -523,12 +522,11 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 		$di = $this->_getDI();
 
 		$di->set('mycache', function(){
-			$frontCache = new Phalcon\Cache\Frontend\Output(array(
+			$frontCache = new Phalcon\Cache\Frontend\Data(array(
 				'lifetime' => 60
 			));
 
 			$cache = new Phalcon\Cache\Backend\Mongo($frontCache, array(
-				'server' => 'mongodb://localhost',
 				'db' => 'phalcon_test',
 				'collection' => 'caches'
 			));

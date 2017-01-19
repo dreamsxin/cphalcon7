@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, __construct){
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("initialize")) == SUCCESS) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "initialize", paths);
+		PHALCON_CALL_METHOD(NULL, getThis(), "initialize", paths);
 	}
 }
 
@@ -249,7 +249,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setHostname){
 	phalcon_fetch_params(0, 1, 0, &hostname);
 
 	phalcon_update_property_zval(getThis(), SL("_hostname"), hostname);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setPrefix){
 	phalcon_fetch_params(0, 1, 0, &prefix);
 
 	phalcon_update_property_zval(getThis(), SL("_prefix"), prefix);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, beforeMatch){
 	phalcon_fetch_params(0, 1, 0, &before_match);
 
 	phalcon_update_property_zval(getThis(), SL("_beforeMatch"), before_match);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -420,8 +420,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 	 * Every route is internally stored as a Phalcon\Mvc\Router\Route
 	 */
 	object_init_ex(return_value, phalcon_mvc_router_route_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &prefix_pattern, &merged_paths, http_methods);
-	PHALCON_CALL_METHODW(NULL, return_value, "setgroup", getThis());
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &prefix_pattern, &merged_paths, http_methods);
+	PHALCON_CALL_METHOD(NULL, return_value, "setgroup", getThis());
 
 	phalcon_update_property_array_append(getThis(), SL("_routes"), return_value);
 }
@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, add){
 		http_methods = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_addroute", pattern, paths, http_methods);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_addroute", pattern, paths, http_methods);
 }
 
 static void phalcon_mvc_router_group_add_helper(INTERNAL_FUNCTION_PARAMETERS, zend_string *method)
@@ -466,7 +466,7 @@ static void phalcon_mvc_router_group_add_helper(INTERNAL_FUNCTION_PARAMETERS, ze
 	}
 
 	ZVAL_STR(&http_method, method);
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_addroute", pattern, paths, &http_method);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_addroute", pattern, paths, &http_method);
 }
 
 /**
@@ -578,7 +578,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, convert){
 	phalcon_fetch_params(0, 2, 0, &name, &converter);
 
 	phalcon_update_property_array(getThis(), SL("_converters"), name, converter);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -604,7 +604,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, setName){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_update_property_zval(getThis(), SL("_name"), name);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**

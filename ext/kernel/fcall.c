@@ -126,21 +126,51 @@ zval* _phalcon_call(zval *retval_ptr, zval *object, zend_class_entry *obj_ce, ze
 	return retval_ptr;
 }
 
-int phalcon_call_user_func_params(zval *retval, zval *handler, zval *params, int params_count)
+int phalcon_call_user_func_args(zval *retval, zval *handler, zval *params, int param_count)
 {
 	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret;
 	int status;
 
 	if (
 #if PHP_VERSION_ID >= 70100
-		(status = _call_user_function_ex(NULL, handler, retval_ptr, params_count, params, 1)) == FAILURE || EG(exception)
+		(status = _call_user_function_ex(NULL, handler, retval_ptr, param_count, params, 1)) == FAILURE || EG(exception)
 #else
-		(status = call_user_function(EG(function_table), NULL, handler, retval_ptr, params_count, params)) == FAILURE || EG(exception)
+		(status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, params)) == FAILURE || EG(exception)
 #endif
 	) {
 		status = FAILURE;
 		ZVAL_NULL(retval_ptr);
 	}
+
+	return status;
+}
+
+int phalcon_call_user_func_params(zval *retval, zval *handler, int param_count, zval *params[])
+{
+	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret;
+	zval *arguments;
+	int i, status;
+
+	arguments = param_count ? safe_emalloc(sizeof(zval), param_count, 0) : NULL;
+
+	i = 0;
+	while(i < param_count) {
+		ZVAL_COPY_VALUE(&arguments[i], params[i]);
+		i++;
+	}
+
+	if (
+#if PHP_VERSION_ID >= 70100
+		(status = _call_user_function_ex(NULL, handler, retval_ptr, param_count, arguments, 1)) == FAILURE || EG(exception)
+#else
+		(status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)
+#endif
+	) {
+		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
+	}
+
+	efree(arguments);
 
 	return status;
 }

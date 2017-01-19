@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Version, get){
 
 	zval version = {}, major = {}, medium = {}, minor = {}, special = {}, special_number = {}, result = {}, suffix = {};
 
-	PHALCON_CALL_SELFW(&version, "_getversion");
+	PHALCON_CALL_SELF(&version, "_getversion");
 
 	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY);
 	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY);
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Version, getId){
 
 	zval version = {}, major = {}, medium = {}, minor = {}, special = {}, special_number = {}, format = {}, real_medium = {}, real_minor = {};
 
-	PHALCON_CALL_SELFW(&version, "_getversion");
+	PHALCON_CALL_SELF(&version, "_getversion");
 	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY);
 	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY);
 	phalcon_array_fetch_long(&minor, &version, 2, PH_NOISY);
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Version, getId){
 
 	ZVAL_STRING(&format, "%02s");
 
-	PHALCON_CALL_FUNCTIONW(&real_medium, "sprintf", &format, &medium);
-	PHALCON_CALL_FUNCTIONW(&real_minor, "sprintf", &format, &minor);
+	PHALCON_CALL_FUNCTION(&real_medium, "sprintf", &format, &medium);
+	PHALCON_CALL_FUNCTION(&real_minor, "sprintf", &format, &minor);
 	PHALCON_CONCAT_VVVVV(return_value, &major, &real_medium, &real_minor, &special, &special_number);
 }

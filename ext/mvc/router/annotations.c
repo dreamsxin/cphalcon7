@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addResource){
 	}
 
 	if (Z_TYPE_P(handler) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "The handler must be a class name");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The handler must be a class name");
 		return;
 	}
 
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addResource){
 	phalcon_update_property_array_append(getThis(), SL("_handlers"), &scope);
 	phalcon_update_property_zval(getThis(), SL("_processed"), &PHALCON_GLOBAL(z_false));
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -182,11 +182,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addModuleResource){
 	}
 
 	if (Z_TYPE_P(module) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "The module is not a valid string");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The module is not a valid string");
 		return;
 	}
 	if (Z_TYPE_P(handler) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "The handler must be a class name");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The handler must be a class name");
 		return;
 	}
 
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addModuleResource){
 
 	phalcon_update_property_zval(getThis(), SL("_processed"), &PHALCON_GLOBAL(z_false));
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -222,15 +222,15 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 		/** 
 		 * If 'uri' isn't passed as parameter it reads $_GET['_url']
 		 */
-		PHALCON_CALL_METHODW(&real_uri, getThis(), "getrewriteuri");
+		PHALCON_CALL_METHOD(&real_uri, getThis(), "getrewriteuri");
 	} else {
 		PHALCON_CPY_WRT(&real_uri, uri);
 	}
 
 	ZVAL_STRING(&service, "annotations");
 
-	PHALCON_CALL_METHODW(&annotations_service, getThis(), "getresolveservice", &service);
-	PHALCON_VERIFY_INTERFACEW(&annotations_service, phalcon_annotations_adapterinterface_ce);
+	PHALCON_CALL_METHOD(&annotations_service, getThis(), "getresolveservice", &service);
+	PHALCON_VERIFY_INTERFACE(&annotations_service, phalcon_annotations_adapterinterface_ce);
 
 	phalcon_return_property(&processed, getThis(), SL("_processed"));
 	if (!zend_is_true(&processed)) {
@@ -284,20 +284,20 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 					/** 
 					 * Get the annotations from the class
 					 */
-					PHALCON_CALL_METHODW(&handler_annotations, &annotations_service, "get", &suffixed);
+					PHALCON_CALL_METHOD(&handler_annotations, &annotations_service, "get", &suffixed);
 
 					/** 
 					 * Process class annotations
 					 */
-					PHALCON_CALL_METHODW(&class_annotations, &handler_annotations, "getclassannotations");
+					PHALCON_CALL_METHOD(&class_annotations, &handler_annotations, "getclassannotations");
 					if (Z_TYPE(class_annotations) == IS_OBJECT) {
 						/** 
 						 * Process class annotations
 						 */
-						PHALCON_CALL_METHODW(&annotations, &class_annotations, "getannotations");
+						PHALCON_CALL_METHOD(&annotations, &class_annotations, "getannotations");
 						if (Z_TYPE(annotations) == IS_ARRAY) {
 							ZEND_HASH_FOREACH_VAL(Z_ARRVAL(annotations), annotation) {
-								PHALCON_CALL_METHODW(NULL, getThis(), "processcontrollerannotation", &controller_name, annotation);
+								PHALCON_CALL_METHOD(NULL, getThis(), "processcontrollerannotation", &controller_name, annotation);
 							} ZEND_HASH_FOREACH_END();
 
 						}
@@ -306,7 +306,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 					/** 
 					 * Process method annotations
 					 */
-					PHALCON_CALL_METHODW(&method_annotations, &handler_annotations, "getmethodsannotations");
+					PHALCON_CALL_METHOD(&method_annotations, &handler_annotations, "getmethodsannotations");
 					if (Z_TYPE(method_annotations) == IS_ARRAY) {
 						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(method_annotations), idx, str_key, collection) {
 							zval method = {};
@@ -316,9 +316,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 								ZVAL_LONG(&method, idx);
 							}
 							if (Z_TYPE_P(collection) == IS_OBJECT) {
-								PHALCON_CALL_METHODW(&annotations, collection, "getannotations");
+								PHALCON_CALL_METHOD(&annotations, collection, "getannotations");
 								ZEND_HASH_FOREACH_VAL(Z_ARRVAL(annotations), annotation) {
-									PHALCON_CALL_METHODW(NULL, getThis(), "processactionannotation", &module_name, &namespace_name, &controller_name, &method, annotation);
+									PHALCON_CALL_METHOD(NULL, getThis(), "processactionannotation", &module_name, &namespace_name, &controller_name, &method, annotation);
 								} ZEND_HASH_FOREACH_END();
 
 							}
@@ -334,7 +334,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 	/** 
 	 * Call the parent handle method()
 	 */
-	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_router_annotations_ce, getThis(), "handle", &real_uri);
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_router_annotations_ce, getThis(), "handle", &real_uri);
 }
 
 /**
@@ -349,13 +349,13 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processControllerAnnotation){
 
 	phalcon_fetch_params(0, 2, 0, &handler, &annotation);
 
-	PHALCON_CALL_METHODW(&name, annotation, "getname");
+	PHALCON_CALL_METHOD(&name, annotation, "getname");
 
 	/** 
 	 * @RoutePrefix add a prefix for all the routes defined in the model
 	 */
 	if (PHALCON_IS_STRING(&name, "RoutePrefix")) {
-		PHALCON_CALL_METHODW(&value, annotation, "getargument", &PHALCON_GLOBAL(z_zero));
+		PHALCON_CALL_METHOD(&value, annotation, "getargument", &PHALCON_GLOBAL(z_zero));
 		phalcon_update_property_zval(getThis(), SL("_routePrefix"), &value);
 	}
 }
@@ -379,7 +379,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 
 	phalcon_fetch_params(0, 5, 0, &module, &namespace, &controller, &action, &annotation);
 
-	PHALCON_CALL_METHODW(&name, annotation, "getname");
+	PHALCON_CALL_METHOD(&name, annotation, "getname");
 
 	/* Find if the route is for adding routes */
 	if (PHALCON_IS_STRING(&name, "Route")) {
@@ -418,7 +418,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		/** 
 		 * Check for existing paths in the annotation
 		 */
-		PHALCON_CALL_METHODW(&paths, annotation, "getargument", &parameter);
+		PHALCON_CALL_METHOD(&paths, annotation, "getargument", &parameter);
 		if (Z_TYPE(paths) != IS_ARRAY) {
 			array_init(&paths);
 		}
@@ -443,7 +443,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 
 		ZVAL_LONG(&position, 0);
 
-		PHALCON_CALL_METHODW(&value, annotation, "getargument", &position);
+		PHALCON_CALL_METHOD(&value, annotation, "getargument", &position);
 
 		/** 
 		 * Create the route using the prefix
@@ -465,22 +465,22 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		/** 
 		 * Add the route to the router
 		 */
-		PHALCON_CALL_METHODW(&route, getThis(), "add", &uri, &paths);
+		PHALCON_CALL_METHOD(&route, getThis(), "add", &uri, &paths);
 		if (Z_TYPE(methods) <= IS_NULL) {
 			ZVAL_STRING(&parameter, "methods");
 
-			PHALCON_CALL_METHODW(&methods, annotation, "getargument", &parameter);
+			PHALCON_CALL_METHOD(&methods, annotation, "getargument", &parameter);
 
 			if (Z_TYPE(methods) == IS_ARRAY || Z_TYPE(methods) == IS_STRING) {
-				PHALCON_CALL_METHODW(NULL, &route, "via", &methods);
+				PHALCON_CALL_METHOD(NULL, &route, "via", &methods);
 			}
 		} else {
-			PHALCON_CALL_METHODW(NULL, &route, "via", &methods);
+			PHALCON_CALL_METHOD(NULL, &route, "via", &methods);
 		}
 
 		ZVAL_STRING(&parameter, "converts");
 
-		PHALCON_CALL_METHODW(&converts, annotation, "getargument", &parameter);
+		PHALCON_CALL_METHOD(&converts, annotation, "getargument", &parameter);
 		if (Z_TYPE(converts) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(converts), idx, str_key, convert) {
 				zval param = {};
@@ -489,13 +489,13 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 				} else {
 					ZVAL_LONG(&param, idx);
 				}
-				PHALCON_CALL_METHODW(NULL, &route, "convert", &param, convert);
+				PHALCON_CALL_METHOD(NULL, &route, "convert", &param, convert);
 			} ZEND_HASH_FOREACH_END();
 		}
 
 		ZVAL_STRING(&parameter, "conversors");
 
-		PHALCON_CALL_METHODW(&converts, annotation, "getargument", &parameter);
+		PHALCON_CALL_METHOD(&converts, annotation, "getargument", &parameter);
 		if (Z_TYPE(converts) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(converts), idx, str_key, convert) {
 				zval conversor_param = {};
@@ -504,15 +504,15 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 				} else {
 					ZVAL_LONG(&conversor_param, idx);
 				}
-				PHALCON_CALL_METHODW(NULL, &route, "convert", &conversor_param, convert);
+				PHALCON_CALL_METHOD(NULL, &route, "convert", &conversor_param, convert);
 			} ZEND_HASH_FOREACH_END();
 		}
 
 		ZVAL_STRING(&parameter, ISV(name));
 
-		PHALCON_CALL_METHODW(&route_name, annotation, "getargument", &parameter);
+		PHALCON_CALL_METHOD(&route_name, annotation, "getargument", &parameter);
 		if (Z_TYPE(route_name) == IS_STRING) {
-			PHALCON_CALL_METHODW(NULL, &route, "setname", &route_name);
+			PHALCON_CALL_METHOD(NULL, &route, "setname", &route_name);
 		}
 
 		RETURN_TRUE;

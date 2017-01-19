@@ -24,8 +24,6 @@
 #ifdef PHALCON_USE_WEBSOCKET
 #include <libwebsockets.h>
 
-#include "websocket/structures.h"
-
 /***** Class \WebSocket\Client *****/
 
 /*--- Definitions ---*/
@@ -33,19 +31,17 @@
 enum php_client_callbacks {
 	PHP_CB_CLIENT_ACCEPT,
 	PHP_CB_CLIENT_CLOSE,
-
 	PHP_CB_CLIENT_DATA,
-
 	PHP_CB_CLIENT_TICK,
-
+	PHP_CB_CLIENT_ERROR,
 	PHP_CB_CLIENT_COUNT
 };
 
-typedef struct _phalcon_websocket_client_object {
+typedef struct {
 	struct lws_context *context;
 	struct lws_context_creation_info info;
 	// Available PHP callbacks
-	ws_callback *callbacks[PHP_CB_CLIENT_COUNT];
+	zval callbacks[PHP_CB_CLIENT_COUNT];
 	zval connection;
 	zend_bool exit_request;
 	zend_object std;
@@ -58,9 +54,6 @@ static inline phalcon_websocket_client_object *phalcon_websocket_client_object_f
 static inline phalcon_websocket_client_object *phalcon_websocket_client_object_from_ctx(struct lws_context *ctx) {
 	return (phalcon_websocket_client_object*)((char*)(ctx) - XtOffsetOf(phalcon_websocket_client_object, context));
 }
-
-zend_object* phalcon_websocket_create_object_handler(zend_class_entry *ce);
-void phalcon_websocket_client_free_object_storage_handler(zend_object *object);
 
 extern zend_class_entry *phalcon_websocket_client_ce;
 

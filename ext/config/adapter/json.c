@@ -100,10 +100,10 @@ PHP_METHOD(Phalcon_Config_Adapter_Json, read){
 	if (Z_TYPE(contents) == IS_STRING) {
 		if (phalcon_json_decode(&config, &contents, 1) != FAILURE) {
 			if (Z_TYPE(config) == IS_ARRAY) {
-				PHALCON_CALL_METHODW(NULL, getThis(), "val", &config);
+				PHALCON_CALL_METHOD(NULL, getThis(), "val", &config);
 			}
 		}
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }

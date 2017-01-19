@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, read){
 
 	PHALCON_CONCAT_SVV(&apc_key, "$PMM$", &prefix, key);
 
-	PHALCON_CALL_FUNCTIONW(return_value, "apc_fetch", &apc_key);
+	PHALCON_CALL_FUNCTION(return_value, "apc_fetch", &apc_key);
 }
 
 /**
@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, write){
 	PHALCON_CONCAT_SVV(&apc_key, "$PMM$", &prefix, key);
 
 	phalcon_read_property(&ttl, getThis(), SL("_ttl"), PH_NOISY);
-	PHALCON_CALL_FUNCTIONW(NULL, "apc_store", &apc_key, data, &ttl);
+	PHALCON_CALL_FUNCTION(NULL, "apc_store", &apc_key, data, &ttl);
 }
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset){
@@ -166,5 +166,5 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_apc_ce, getThis(), "reset");
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_apc_ce, getThis(), "reset");
 }

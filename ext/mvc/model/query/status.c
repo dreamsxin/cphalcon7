@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getMessages){
 
 	phalcon_read_property(&model, getThis(), SL("_model"), PH_NOISY);
 	if (Z_TYPE(model) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(&model, "getmessages");
+		PHALCON_RETURN_CALL_METHOD(&model, "getmessages");
 		return;
 	}
 	

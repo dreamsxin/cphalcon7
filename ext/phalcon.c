@@ -265,7 +265,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cache_Backend_File);
 	PHALCON_INIT(Phalcon_Cache_Backend_Memory);
 	PHALCON_INIT(Phalcon_Cache_Backend_Xcache);
+#ifdef PHALCON_USE_MONGOC
 	PHALCON_INIT(Phalcon_Cache_Backend_Mongo);
+#endif
 	PHALCON_INIT(Phalcon_Cache_Backend_Memcache);
 	PHALCON_INIT(Phalcon_Cache_Backend_Libmemcached);
 	PHALCON_INIT(Phalcon_Cache_Backend_Redis);
@@ -494,6 +496,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Intrusive_Avltree);
 	PHALCON_INIT(Phalcon_Intrusive_Avltree_Node);
 
+#ifdef PHALCON_USE_MONGOC
+	mongoc_init();
+#endif
 	return SUCCESS;
 }
 
@@ -509,6 +514,9 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 		phalcon_cache_shmemory_storage_shutdown();
 	}
 
+#ifdef PHALCON_USE_MONGOC
+	mongoc_cleanup();
+#endif
 	return SUCCESS;
 }
 
@@ -527,6 +535,7 @@ static PHP_RINIT_FUNCTION(phalcon){
 static PHP_RSHUTDOWN_FUNCTION(phalcon){
 	phalcon_deinitialize_memory();
 	phalcon_release_interned_strings();
+
 	return SUCCESS;
 }
 
@@ -590,7 +599,6 @@ static const zend_module_dep phalcon_deps[] = {
 	ZEND_MOD_OPTIONAL("XCache")
 	ZEND_MOD_OPTIONAL("memcache")
 	ZEND_MOD_OPTIONAL("memcached")
-	ZEND_MOD_OPTIONAL("mongo")
 	ZEND_MOD_OPTIONAL("filter")
 	ZEND_MOD_OPTIONAL("iconv")
 	ZEND_MOD_OPTIONAL("libxml")

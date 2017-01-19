@@ -132,10 +132,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetGet){
 	phalcon_fetch_params(0, 1, 0, &index);
 
 	if (phalcon_property_isset_fetch_zval(&value, getThis(), index)) {
-		RETURN_CTORW(&value);
+		RETURN_CTOR(&value);
 	}
 
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The index does not exist in the row");
+	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The index does not exist in the row");
 }
 
 /**
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetUnset){
 
 	phalcon_fetch_params(0, 1, 0, &offset);
 
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The index does not exist in the row");
+	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The index does not exist in the row");
 }
 
 /**

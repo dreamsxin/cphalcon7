@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
 		if (phalcon_array_isset(&r0, key)) {
 			phalcon_array_fetch(&r1, session, &prefix_key, PH_NOISY);
 			phalcon_array_fetch(&meta_data, &r1, key, PH_NOISY);
-			RETURN_CTORW(&meta_data);
+			RETURN_CTOR(&meta_data);
 		}
 	}
 }
@@ -151,5 +151,5 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, reset){
 	phalcon_concat_sv(&prefix_key, SL("$PMM$"), &prefix, 0);
 	phalcon_array_unset(_SESSION, &prefix_key, 0);
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_session_ce, getThis(), "reset");
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_session_ce, getThis(), "reset");
 }

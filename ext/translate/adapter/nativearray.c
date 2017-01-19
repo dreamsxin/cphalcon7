@@ -80,17 +80,17 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 	phalcon_fetch_params(0, 1, 0, &options);
 	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Invalid options");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Invalid options");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&data, options, SL("content"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Translation content was not provided");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation content was not provided");
 		return;
 	}
 
 	if (Z_TYPE_P(&data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_translate_exception_ce, "Translation data must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation data must be an array");
 		return;
 	}
 	
@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_CTORW(&translation);
+	RETURN_CTOR(&translation);
 }
 
 /**

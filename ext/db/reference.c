@@ -116,21 +116,21 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 	if (phalcon_array_isset_fetch_str(&referenced_table, definition, SL("referencedTable"))) {
 		phalcon_update_property_zval(getThis(), SL("_referencedTable"), &referenced_table);
 	} else {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Referenced table is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Referenced table is required");
 		return;
 	}
 	
 	if (phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
 		phalcon_update_property_zval(getThis(), SL("_columns"), &columns);
 	} else {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Foreign key columns are required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Foreign key columns are required");
 		return;
 	}
 	
 	if (phalcon_array_isset_fetch_str(&referenced_columns, definition, SL("referencedColumns"))) {
 		phalcon_update_property_zval(getThis(), SL("_referencedColumns"), &referenced_columns);
 	} else {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Referenced columns of the foreign key are required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Referenced columns of the foreign key are required");
 		return;
 	}
 	
@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 	number_referenced_columns = phalcon_fast_count_int(&referenced_columns);
 	
 	if (number_columns != number_referenced_columns) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Number of columns is not equal to the number of referenced columns");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Number of columns is not equal to the number of referenced columns");
 		return;
 	}
 	
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Db_Reference, __set_state){
 	phalcon_fetch_params(0, 1, 0, &data);
 	
 	if (!phalcon_array_isset_fetch_str(&constraint_name, data, SL("_referenceName"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "_referenceName parameter is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "_referenceName parameter is required");
 		return;
 	}
 
@@ -287,5 +287,5 @@ PHP_METHOD(Phalcon_Db_Reference, __set_state){
 	phalcon_array_update_str(&definition, SL("referencedColumns"), &referenced_columns, PH_COPY);
 
 	object_init_ex(return_value, phalcon_db_reference_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &constraint_name, &definition);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &constraint_name, &definition);
 }

@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 	phalcon_fetch_params(0, 1, 0, &options);
 
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
 
@@ -143,11 +143,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHODW(NULL, &frontend_data, "__construct", &frontend_option);
+	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &frontend_option);
 
 	object_init_ex(&redis, phalcon_cache_backend_redis_ce);
 
-	PHALCON_CALL_METHODW(NULL, &redis, "__construct", &frontend_data, &backend_option);
+	PHALCON_CALL_METHOD(NULL, &redis, "__construct", &frontend_data, &backend_option);
 
 	phalcon_update_property_zval(getThis(), SL("_redis"), &redis);
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, read){
 
 	if (Z_TYPE(redis) == IS_OBJECT) {
 		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
-		PHALCON_RETURN_CALL_METHODW(&redis, "get", key, &lifetime);
+		PHALCON_RETURN_CALL_METHOD(&redis, "get", key, &lifetime);
 		return;
 	}
 
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, write){
 
 	if (Z_TYPE(redis) == IS_OBJECT) {
 		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
-		PHALCON_CALL_METHODW(NULL, &redis, "save", key, data, &lifetime);	
+		PHALCON_CALL_METHOD(NULL, &redis, "save", key, data, &lifetime);	
 	}
 }
 
@@ -203,8 +203,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, reset){
 	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_NOISY);
 
 	if (Z_TYPE(redis) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &redis, "flush");	
+		PHALCON_CALL_METHOD(NULL, &redis, "flush");	
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_redis_ce, getThis(), "reset");
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_redis_ce, getThis(), "reset");
 }

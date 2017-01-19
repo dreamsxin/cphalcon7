@@ -401,7 +401,6 @@ mvc/model/metadata/session.c \
 mvc/model/metadata/memcache.c \
 mvc/model/metadata/libmemcached.c \
 mvc/model/metadata/redis.c \
-mvc/model/metadata/mongo.c \
 mvc/model/metadata/cache.c \
 mvc/model/transaction.c \
 mvc/model/metadata.c \
@@ -515,7 +514,6 @@ cache/frontend/output.c \
 cache/backend/file.c \
 cache/backend/apc.c \
 cache/backend/xcache.c \
-cache/backend/mongo.c \
 cache/backend/memcache.c \
 cache/backend/libmemcached.c \
 cache/backend/memory.c \
@@ -800,6 +798,26 @@ process/exception.c"
 		fi
 	done
 
+	AC_MSG_CHECKING([checking libmongoc support])
+	for i in /usr/local /usr; do
+		if test -r $i/include/libmongoc-1.0/mongoc.h; then
+			MONGOC_CFLAGS=`pkg-config --cflags libmongoc-1.0`
+			MONGOC_LDFLAGS=`pkg-config --libs libmongoc-1.0`
+
+			PHP_ADD_INCLUDE($i/include/libmongoc-1.0)
+
+			CPPFLAGS="${CPPFLAGS} ${MONGOC_CFLAGS}"
+			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${MONGOC_LDFLAGS}"
+
+			AC_MSG_RESULT(yes)
+
+			AC_DEFINE([PHALCON_USE_MONGOC], [1], [Have libmongoc support])
+			phalcon_sources="$phalcon_sources cache/backend/mongo.c mvc/model/metadata/mongo.c"
+			break
+		else
+			AC_MSG_RESULT([no, found in $i])
+		fi
+	done
 
 	if test "$PHP_QRCODE" != "no"; then
 		if test -z "$WAND_CFLAGS"; then
@@ -845,7 +863,7 @@ process/exception.c"
 		done
 	fi
 
-	AC_MSG_CHECKING([for libuv files in default path])
+	AC_MSG_CHECKING([checking libuv support])
 	for i in /usr/local /usr; do
 		if test -r $i/include/uv.h; then
 			PHP_ADD_INCLUDE($i/include)
@@ -864,7 +882,7 @@ process/exception.c"
 		fi
 	done
 
-	AC_MSG_CHECKING([for libwebsockets files in default path])
+	AC_MSG_CHECKING([checking libwebsockets support])
 	for i in /usr/local /usr; do
 		if test -r $i/include/libwebsockets.h; then
 			PHP_ADD_INCLUDE($i/include)

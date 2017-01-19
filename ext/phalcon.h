@@ -380,7 +380,6 @@
 #include "socket/server.h"
 #include "socket/exception.h"
 
-#include "websocket/structures.h"
 #include "websocket/connection.h"
 #include "websocket/server.h"
 #include "websocket/client.h"

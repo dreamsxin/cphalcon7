@@ -86,18 +86,18 @@ PHP_METHOD(Phalcon_Validation_Validator_Identical, validate){
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce);
 
-	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&identical_value, ce, getThis(), ISV(value)));
 
-	PHALCON_CALL_SELFW(&valid, "valid", &value, &identical_value);
+	PHALCON_CALL_SELF(&valid, "valid", &value, &identical_value);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
+			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
@@ -116,11 +116,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Identical, validate){
 			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Identical", &code);
 
-		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 

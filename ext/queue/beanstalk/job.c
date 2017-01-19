@@ -91,7 +91,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, __construct){
 	zval *queue, *id, *body;
 
 	phalcon_fetch_params(0, 3, 0, &queue, &id, &body);
-	PHALCON_VERIFY_CLASS_EX(queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce);
 	PHALCON_ENSURE_IS_STRING(id);
 
 	phalcon_update_property_zval(getThis(), SL("_queue"), queue);
@@ -134,15 +134,15 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, delete){
 	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
 	PHALCON_CONCAT_SV(&command, "delete ", &id);
-	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
-	
-	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
+	PHALCON_CALL_METHOD(NULL, &queue, "write", &command);
+
+	PHALCON_CALL_METHOD(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "DELETED")) {
 		RETURN_TRUE;
 	}
-	
+
 	RETURN_FALSE;
 }
 
@@ -172,9 +172,9 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, release){
 	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
 	PHALCON_CONCAT_SVSVSV(&command, "release ", &id, " ", priority, " ", delay);
-	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
+	PHALCON_CALL_METHOD(NULL, &queue, "write", &command);
 
-	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
+	PHALCON_CALL_METHOD(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "RELEASED")) {
@@ -206,8 +206,8 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, bury){
 	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
 	PHALCON_CONCAT_SVSV(&command, "bury ", &id, " ", priority);
-	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
-	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
+	PHALCON_CALL_METHOD(NULL, &queue, "write", &command);
+	PHALCON_CALL_METHOD(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "BURIED")) {
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, bury){
 }
 
 /**
- * The `touch` command allows a worker to request more time to work on a job. 
+ * The `touch` command allows a worker to request more time to work on a job.
  * This is useful for jobs that potentially take a long time, but you still
  * want the benefits of a TTR pulling a job away from an unresponsive worker.
  * A worker may periodically tell the server that it's still alive and processing
@@ -235,8 +235,8 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, touch){
 	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
 	PHALCON_CONCAT_SV(&command, "touch ", &id);
-	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
-	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
+	PHALCON_CALL_METHOD(NULL, &queue, "write", &command);
+	PHALCON_CALL_METHOD(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "TOUCHED")) {
@@ -259,8 +259,8 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, kick){
 	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
 	PHALCON_CONCAT_SV(&command, "kick-job ", &id);
-	PHALCON_CALL_METHODW(NULL, &queue, "write", &command);
-	PHALCON_CALL_METHODW(&response, &queue, "readstatus");
+	PHALCON_CALL_METHOD(NULL, &queue, "write", &command);
+	PHALCON_CALL_METHOD(&response, &queue, "readstatus");
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY);
 	if (PHALCON_IS_STRING(&status, "KICKED")) {
@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk_Job, __wakeup) {
 	phalcon_read_property(&id, getThis(), SL("_id"), PH_NOISY);
 	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 
-	PHALCON_VERIFY_CLASS_EX(&queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(&queue, phalcon_queue_beanstalk_ce, phalcon_exception_ce);
 
 	if (Z_TYPE(id) != IS_STRING) {
 		zend_throw_exception_ex(phalcon_exception_ce, 0, "Unexpected inconsistency in %s - possible break-in attempt!", "Phalcon\\Queue\\Beanstalk\\Job::__wakeup()");

@@ -123,12 +123,12 @@ PHP_METHOD(Phalcon_Cache_Backend_File, __construct){
 	phalcon_fetch_params(0, 2, 0, &frontend, &options);
 
 	if (unlikely(!phalcon_array_isset_fetch_str(&cache_dir, options, SL("cacheDir")))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Cache directory must be specified with the option cacheDir");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory must be specified with the option cacheDir");
 		return;
 	}
 	phalcon_update_property_zval(getThis(), SL("_cacheDir"), &cache_dir);
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_cache_backend_file_ce, getThis(), "__construct", frontend, options);
+	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_file_ce, getThis(), "__construct", frontend, options);
 }
 
 /**
@@ -140,12 +140,12 @@ PHP_METHOD(Phalcon_Cache_Backend_File, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, get){
 
-	zval *key_name, *lifetime = NULL, prefix = {}, prefixed_key = {}, cache_dir = {}, cache_file = {}, frontend = {}, last_lifetime = {}, tmp = {};
+	zval *key_name, prefix = {}, prefixed_key = {}, cache_dir = {}, cache_file = {}, frontend = {}, lifetime = {};
 	zval modified_time = {}, cached_content = {}, exception_message = {};
 	long int now, ttl, mtime, diff;
 	int expired;
 
-	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 0, &key_name);
 
 	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
@@ -163,21 +163,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 		 */
 		now = (long int)time(NULL);
 
-		/**
-		 * Take the lifetime from the frontend or read it from the set in start()
-		 */
-		if (!lifetime || Z_TYPE_P(lifetime) == IS_NULL) {
-			phalcon_read_property(&last_lifetime, getThis(), SL("_lastLifetime"), PH_NOISY);
-
-			if (Z_TYPE(last_lifetime) == IS_NULL) {
-				PHALCON_CALL_METHODW(&tmp, &frontend, "getlifetime");
-				ttl = phalcon_get_intval(&tmp);
-			} else {
-				ttl = phalcon_get_intval(&last_lifetime);
-			}
-		} else {
-			ttl = phalcon_get_intval(lifetime);
-		}
+		PHALCON_CALL_METHOD(&lifetime, getThis(), "getlifetime");
+		ttl = phalcon_get_intval(&lifetime);
 
 		phalcon_filemtime(&modified_time, &cache_file);
 		if (unlikely(Z_TYPE(modified_time) != IS_LONG)) {
@@ -198,17 +185,17 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 			phalcon_file_get_contents(&cached_content, &cache_file);
 			if (PHALCON_IS_FALSE(&cached_content)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Cache file ", &cache_file, " could not be opened");
-				PHALCON_THROW_EXCEPTION_ZVALW(phalcon_cache_exception_ce, &exception_message);
+				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cache_exception_ce, &exception_message);
 				return;
 			}
 
 			if (phalcon_is_numeric(&cached_content)) {
-				RETURN_CTORW(&cached_content);
+				RETURN_CTOR(&cached_content);
 			} else {
 				/**
 				 * Use the frontend to process the content of the cache
 				 */
-				PHALCON_RETURN_CALL_METHODW(&frontend, "afterretrieve", &cached_content);
+				PHALCON_RETURN_CALL_METHOD(&frontend, "afterretrieve", &cached_content);
 			}
 
 			return;
@@ -242,7 +229,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 	}
 
 	if (!zend_is_true(&last_key)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The cache must be started first");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache must be started first");
 		return;
 	}
 
@@ -252,12 +239,12 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &last_key);
 
 	if (!content || !zend_is_true(content)) {
-		PHALCON_CALL_METHODW(&cached_content, &frontend, "getcontent");
+		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
 		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
-	PHALCON_CALL_METHODW(&prepared_content, &frontend, "beforestore", &cached_content);
+	PHALCON_CALL_METHOD(&prepared_content, &frontend, "beforestore", &cached_content);
 
 	/**
 	 * We use file_put_contents to respect open-base-dir directive
@@ -268,13 +255,13 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 		phalcon_file_put_contents(&status, &cache_file, &cached_content);
 	}
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_cache_exception_ce, "Cache directory is not writable: %s", &cache_file);
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_cache_exception_ce, "Cache directory is not writable: %s", &cache_file);
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&is_buffering, &frontend, "isbuffering");
+	PHALCON_CALL_METHOD(&is_buffering, &frontend, "isbuffering");
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
-		PHALCON_CALL_METHODW(NULL, &frontend, "stop");
+		PHALCON_CALL_METHOD(NULL, &frontend, "stop");
 	}
 
 	if (PHALCON_IS_TRUE(&is_buffering)) {
@@ -333,7 +320,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 	 */
 	object_init_ex(&iterator, spl_ce_DirectoryIterator);
 	assert(phalcon_has_constructor(&iterator));
-	PHALCON_CALL_METHODW(NULL, &iterator, "__construct", &cache_dir);
+	PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &cache_dir);
 
 	/* DirectoryIterator implements Iterator */
 	assert(instanceof_function_ex(spl_ce_DirectoryIterator, zend_ce_iterator, 1));
@@ -405,7 +392,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 			 * Check if the file has expired
 			 */
 			if (!lifetime || Z_TYPE_P(lifetime) == IS_NULL) {
-				PHALCON_CALL_METHODW(&tmp, &frontend, "getlifetime");
+				PHALCON_CALL_METHOD(&tmp, &frontend, "getlifetime");
 
 				ttl = likely(Z_TYPE(tmp) == IS_LONG) ? Z_LVAL(tmp) : phalcon_get_intval(&tmp);
 			} else {
@@ -433,8 +420,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 
-	zval *key_name, *value = NULL, *lifetime = NULL, prefix = {}, prefixed_key = {}, status = {};
-	zval cache_dir = {}, cache_file = {}, frontend = {}, last_lifetime = {}, modified_time = {}, cached_content = {}, tmp = {};
+	zval *key_name, *value = NULL, prefix = {}, prefixed_key = {}, status = {};
+	zval cache_dir = {}, cache_file = {}, frontend = {}, lifetime = {}, modified_time = {}, cached_content = {};
 	long int now, ttl, mtime, diff;
 	int expired;
 
@@ -464,18 +451,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 		/**
 		 * Take the lifetime from the frontend or read it from the set in start()
 		 */
-		if (!lifetime || Z_TYPE_P(lifetime) == IS_NULL) {
-			phalcon_read_property(&last_lifetime, getThis(), SL("_lastLifetime"), PH_NOISY);
-
-			if (Z_TYPE(last_lifetime) == IS_NULL) {
-				PHALCON_CALL_METHODW(&tmp, &frontend, "getlifetime");
-				ttl = phalcon_get_intval(&tmp);
-			} else {
-				ttl = phalcon_get_intval(&last_lifetime);
-			}
-		} else {
-			ttl = phalcon_get_intval(lifetime);
-		}
+		PHALCON_CALL_METHOD(&lifetime, getThis(), "getlifetime");
+		ttl = phalcon_get_intval(&lifetime);
 
 		phalcon_filemtime(&modified_time, &cache_file);
 		if (unlikely(Z_TYPE(modified_time) != IS_LONG)) {
@@ -504,7 +481,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 			phalcon_file_put_contents(&status, &cache_file, return_value);
 
 			if (PHALCON_IS_FALSE(&status)) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Cache directory can't be written");
+				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory can't be written");
 				return;
 			}
 
@@ -524,8 +501,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 
-	zval *key_name, *value = NULL, *lifetime = NULL, prefix = {}, prefixed_key = {}, status = {};
-	zval cache_dir = {}, cache_file = {}, frontend = {}, last_lifetime = {}, modified_time = {}, cached_content = {}, tmp = {};
+	zval *key_name, *value = NULL, prefix = {}, prefixed_key = {}, status = {};
+	zval cache_dir = {}, cache_file = {}, frontend = {}, lifetime = {}, modified_time = {}, cached_content = {};
 	long int now, ttl, mtime, diff;
 	int expired;
 
@@ -555,18 +532,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 		/**
 		 * Take the lifetime from the frontend or read it from the set in start()
 		 */
-		if (!lifetime || Z_TYPE_P(lifetime) == IS_NULL) {
-			phalcon_read_property(&last_lifetime, getThis(), SL("_lastLifetime"), PH_NOISY);
-
-			if (Z_TYPE(last_lifetime) == IS_NULL) {
-				PHALCON_CALL_METHODW(&tmp, &frontend, "getlifetime");
-				ttl = phalcon_get_intval(&tmp);
-			} else {
-				ttl = phalcon_get_intval(&last_lifetime);
-			}
-		} else {
-			ttl = phalcon_get_intval(lifetime);
-		}
+		PHALCON_CALL_METHOD(&lifetime, getThis(), "getlifetime");
+		ttl = phalcon_get_intval(&lifetime);
 
 		phalcon_filemtime(&modified_time, &cache_file);
 		if (unlikely(Z_TYPE(modified_time) != IS_LONG)) {
@@ -595,7 +562,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 			phalcon_file_put_contents(&status, &cache_file, return_value);
 
 			if (PHALCON_IS_FALSE(&status)) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "Cache directory can't be written");
+				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory can't be written");
 				return;
 			}
 
@@ -621,7 +588,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 
 	object_init_ex(&iterator, spl_ce_DirectoryIterator);
 	assert(phalcon_has_constructor(&iterator));
-	PHALCON_CALL_METHODW(NULL, &iterator, "__construct", &cache_dir);
+	PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &cache_dir);
 
 	/* DirectoryIterator implements Iterator */
 	assert(instanceof_function_ex(spl_ce_DirectoryIterator, zend_ce_iterator, 1));

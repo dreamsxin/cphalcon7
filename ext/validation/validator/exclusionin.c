@@ -87,9 +87,9 @@ PHP_METHOD(Phalcon_Validation_Validator_ExclusionIn, validate){
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce);
 
-	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
@@ -98,17 +98,17 @@ PHP_METHOD(Phalcon_Validation_Validator_ExclusionIn, validate){
 
 	/* A domain is an array with a list of valid values */
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&domain, ce, getThis(), ISV(domain)));
-	if (Z_TYPE(domain) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Option 'domain' must be an array");
+	if (Z_TYPE(domain) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Option 'domain' must be an array");
 		return;
 	}
 
-	PHALCON_CALL_SELFW(&valid, "valid", &value, &domain);
+	PHALCON_CALL_SELF(&valid, "valid", &value, &domain);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
+			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
@@ -130,11 +130,11 @@ PHP_METHOD(Phalcon_Validation_Validator_ExclusionIn, validate){
 			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "ExclusionIn", &code);
 
-		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 
@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Validation_Validator_ExclusionIn, valid){
 
 	phalcon_fetch_params(0, 2, 0, &value, &domain);
 
-	/** 
+	/**
 	 * Check if the value is contained by the array
 	 */
 	if (phalcon_fast_in_array(value, domain)) {

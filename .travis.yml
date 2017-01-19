@@ -15,6 +15,9 @@ addons:
       - libmagick++-dev
       - libmagickcore-dev
       - libmagickwand-dev
+      - pkg-config
+      - libssl-dev
+      - libsasl2-dev
 
 php:
   - 7.0.14
@@ -46,6 +49,11 @@ services:
 
 env:
   global:
+    - TEST_DB_MONGO_HOST="127.0.0.1"
+    - TEST_DB_MONGO_PORT="27017"
+    - TEST_DB_MONGO_USER="admin"
+    - TEST_DB_MONGO_PASSWD=""
+    - TEST_DB_MONGO_NAME="phalcon_test"
     - ZEND_DONT_UNLOAD_MODULES=1
     - CC="ccache gcc"
 
@@ -58,8 +66,10 @@ before_install:
 
 before_script:
   - git submodule --quiet update --init --recursive
-  - (cd deps/libwebsockets && cmake . -DCMAKE_INSTALL_PREFIX:PATH=/usr && make && sudo make install)
-  - (cd deps/libuv && ./autogen.sh && ./configure --prefix=/usr && make && sudo make install)
+  - (cd deps/libwebsockets && cmake . -DCMAKE_INSTALL_PREFIX:PATH=/usr && make --silent && sudo make install)
+  - (cd deps/libuv && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
+  - (cd deps/mongo-c-driver/src/libbson && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
+  - (cd deps/mongo-c-driver && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
   - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/20-phalcon.ini)
   - ulimit -c unlimited -S || true
   - echo '/tmp/core_%e.%p' | sudo tee /proc/sys/kernel/core_pattern &> /dev/null

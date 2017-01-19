@@ -388,15 +388,15 @@ int phalcon_jsmin(zval *return_value, zval *script) {
 	ZVAL_NULL(return_value);
 
 	if (Z_TYPE_P(script) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Script must be a string");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "Script must be a string");
 		return FAILURE;
 	}
 
 	if (phalcon_jsmin_internal(return_value, script, &error) == FAILURE){
 		if (error) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, error);
+			PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, error);
 		} else {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Unknown error");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "Unknown error");
 		}
 
 		return FAILURE;

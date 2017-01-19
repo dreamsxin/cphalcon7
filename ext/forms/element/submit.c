@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Forms_Element_Submit, __construct){
 		PHALCON_CPY_WRT(&type, _type);
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_forms_element_submit_ce, getThis(), "__construct", name, attributes, options, options_values, &type);
+	PHALCON_CALL_PARENT(NULL, phalcon_forms_element_submit_ce, getThis(), "__construct", name, attributes, options, options_values, &type);
 }
 
 /**

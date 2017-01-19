@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 	 * Check if the format has the %type% placeholder
 	 */
 	if (phalcon_memnstr_str(&format, SL("%type%"))) {
-		PHALCON_CALL_METHODW(&type_string, getThis(), "gettypestring", type);
+		PHALCON_CALL_METHOD(&type_string, getThis(), "gettypestring", type);
 
 		ZVAL_STRING(&type_wildcard, "%type%");
 
@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 	PHALCON_STR_REPLACE(&new_format, &message_wildcard, message, &format);
 
 	if (Z_TYPE_P(context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(context)) > 0) {
-		PHALCON_CALL_METHODW(&format, getThis(), "interpolate", &new_format, context);
+		PHALCON_CALL_METHOD(&format, getThis(), "interpolate", &new_format, context);
 	}
 	else {
 		PHALCON_CPY_WRT(&format, &new_format);

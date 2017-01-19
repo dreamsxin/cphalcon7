@@ -102,12 +102,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
 	phalcon_fetch_params(0, 1, 0, &options);
 	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&servers, options, SL("servers"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "No servers given in options");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "No servers given in options");
 		return;
 	}
 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHODW(NULL, &frontend_data, "__construct", &option);
+	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &option);
 
 	array_init(&option);
 
@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
 
 	object_init_ex(&libmemcached, phalcon_cache_backend_libmemcached_ce);
 
-	PHALCON_CALL_METHODW(NULL, &libmemcached, "__construct", &frontend_data, &option);
+	PHALCON_CALL_METHOD(NULL, &libmemcached, "__construct", &frontend_data, &option);
 
 	phalcon_update_property_zval(getThis(), SL("_libmemcached"), &libmemcached);
 	
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, read){
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 
 	if (Z_TYPE(libmemcached) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(&libmemcached, "get", key, &lifetime);
+		PHALCON_RETURN_CALL_METHOD(&libmemcached, "get", key, &lifetime);
 	} else {
 		RETURN_NULL();
 	}
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, write){
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 
 	if (Z_TYPE(libmemcached) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &libmemcached, "save", key, data, &lifetime);	
+		PHALCON_CALL_METHOD(NULL, &libmemcached, "save", key, data, &lifetime);	
 	}
 }
 
@@ -203,8 +203,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, reset){
 	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
 
 	if (Z_TYPE(libmemcached) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &libmemcached, "flush");	
+		PHALCON_CALL_METHOD(NULL, &libmemcached, "flush");	
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_libmemcached_ce, getThis(), "reset");
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_libmemcached_ce, getThis(), "reset");
 }

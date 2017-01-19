@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 		phalcon_return_property(&reflection_data, getThis(), SL("_reflectionData"));
 		if (phalcon_array_isset_fetch_str(&reflection_class, &reflection_data, SL("class"))) {
 			object_init_ex(return_value, phalcon_annotations_collection_ce);
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", &reflection_class);
+			PHALCON_CALL_METHOD(NULL, return_value, "__construct", &reflection_class);
 
 			phalcon_update_property_zval(getThis(), SL("_classAnnotations"), return_value);
 			return;
@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 		RETURN_FALSE;
 	}
 
-	RETURN_CTORW(&annotations);
+	RETURN_CTOR(&annotations);
 }
 
 /**
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 					}
 
 					object_init_ex(&collection, phalcon_annotations_collection_ce);
-					PHALCON_CALL_METHODW(NULL, &collection, "__construct", reflection_method);
+					PHALCON_CALL_METHOD(NULL, &collection, "__construct", reflection_method);
 
 					phalcon_array_update_zval(return_value, &method_name, &collection, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 		RETURN_FALSE;
 	}
 
-	RETURN_CTORW(&annotations);
+	RETURN_CTOR(&annotations);
 }
 
 /**
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 					}
 
 					object_init_ex(&collection, phalcon_annotations_collection_ce);
-					PHALCON_CALL_METHODW(NULL, &collection, "__construct", reflection_property);
+					PHALCON_CALL_METHOD(NULL, &collection, "__construct", reflection_property);
 
 					phalcon_array_update_zval(return_value, &property, &collection, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 		RETURN_FALSE;
 	}
 
-	RETURN_CTORW(&annotations);
+	RETURN_CTOR(&annotations);
 }
 
 /**
@@ -249,10 +249,10 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __set_state){
 		 */
 		if (phalcon_array_isset_fetch_str(&reflection_data, data, SL("_reflectionData"))) {
 			object_init_ex(return_value, phalcon_annotations_reflection_ce);
-			PHALCON_CALL_METHODW(NULL, return_value, "__construct", &reflection_data);
+			PHALCON_CALL_METHOD(NULL, return_value, "__construct", &reflection_data);
 			return;
 		}
 	}
 	object_init_ex(return_value, phalcon_annotations_reflection_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct");
 }

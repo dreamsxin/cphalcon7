@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Config_Adapter, __construct){
 	}
 
 	if (file_path) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "read", file_path, absolute_path);
+		PHALCON_CALL_METHOD(NULL, getThis(), "read", file_path, absolute_path);
 	}
 }
 
@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 
 	if (!file_path || PHALCON_IS_EMPTY(file_path)) {
 		object_init_ex(return_value, ce0);
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct");
+		PHALCON_CALL_METHOD(NULL, return_value, "__construct");
 	} else {
 		instances = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_instances"));		
 
@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 			absolute_path = &PHALCON_GLOBAL(z_false);
 		}
 
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct", file_path, absolute_path);
+		PHALCON_CALL_METHOD(NULL, return_value, "__construct", file_path, absolute_path);
 
 		phalcon_update_static_property_array_multi_ce(phalcon_config_adapter_ce, SL("_instances"), return_value, SL("z"), 1, file_path);
 	}
@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Config_Adapter, getBasePath){
 	
 	base_path = phalcon_read_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"));
 
-	RETURN_CTORW(base_path);
+	RETURN_CTOR(base_path);
 }
 
 /**
@@ -173,8 +173,8 @@ PHP_METHOD(Phalcon_Config_Adapter, load){
 			absolute_path = &PHALCON_GLOBAL(z_false);
 		}
 
-		PHALCON_RETURN_CALL_STATICW("factory", file_path, absolute_path);
+		PHALCON_RETURN_CALL_STATIC("factory", file_path, absolute_path);
 	} else {
-		PHALCON_RETURN_CALL_STATICW("factory");
+		PHALCON_RETURN_CALL_STATIC("factory");
 	}
 }

@@ -23,6 +23,9 @@
 #include "cache/exception.h"
 
 #include <ext/standard/php_rand.h>
+#include <bson.h>
+#include <bcon.h>
+#include <mongoc.h>
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -47,7 +50,7 @@
  *
  * //Create a MongoDB cache
  * $cache = new Phalcon\Cache\Backend\Mongo($frontCache, array(
- *		'server' => "mongodb://localhost",
+ *		'uri' => "mongodb://localhost:27017",
  *      'db' => 'caches',
  *		'collection' => 'images'
  * ));
@@ -63,7 +66,6 @@
 zend_class_entry *phalcon_cache_backend_mongo_ce;
 
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct);
-PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection);
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, get);
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, save);
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete);
@@ -84,7 +86,6 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cache_backend_mongo_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_Mongo, __construct, arginfo_phalcon_cache_backend_mongo___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Cache_Backend_Mongo, _getCollection, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Cache_Backend_Mongo, get, arginfo_phalcon_cache_backendinterface_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Mongo, save, arginfo_phalcon_cache_backendinterface_save, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Mongo, delete, arginfo_phalcon_cache_backendinterface_delete, ZEND_ACC_PUBLIC)
@@ -97,16 +98,47 @@ static const zend_function_entry phalcon_cache_backend_mongo_method_entry[] = {
 	PHP_FE_END
 };
 
+zend_object_handlers phalcon_cache_backend_mongo_object_handlers;
+zend_object* phalcon_cache_backend_mongo_object_create_handler(zend_class_entry *ce)
+{
+	phalcon_cache_backend_mongo_object *intern = emalloc(sizeof(phalcon_cache_backend_mongo_object));
+	memset(intern, 0, sizeof(phalcon_cache_backend_mongo_object));
+
+	zend_object_std_init(&intern->std, ce);
+	object_properties_init(&intern->std, ce);
+	intern->std.handlers = &phalcon_cache_backend_mongo_object_handlers;
+
+	intern->client = NULL;
+	intern->collection = NULL;
+	return &intern->std;
+}
+
+void phalcon_cache_backend_mongo_object_free_handler(zend_object *object)
+{
+	phalcon_cache_backend_mongo_object *intern;
+	intern = phalcon_cache_backend_mongo_object_from_obj(object);
+	if (intern->collection) {
+		mongoc_collection_destroy(intern->collection);
+		intern->collection = NULL;
+	}
+	if (intern->client) {
+		mongoc_client_destroy(intern->client);
+		intern->client = NULL;
+	}
+	zend_object_std_dtor(&intern->std);
+	efree(intern);
+}
+
 /**
  * Phalcon\Cache\Backend\Mongo initializer
  */
 PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Mongo){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, Mongo, cache_backend_mongo, phalcon_cache_backend_ce, phalcon_cache_backend_mongo_method_entry, 0);
+	PHALCON_REGISTER_CLASS_CREATE_OBJECT_EX(Phalcon\\Cache\\Backend, Mongo, cache_backend_mongo, phalcon_cache_backend_ce, phalcon_cache_backend_mongo_method_entry, 0);
 
+	zend_declare_property_string(phalcon_cache_backend_mongo_ce, SL("_uri"), "mongodb://localhost:27017", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_backend_mongo_ce, SL("_db"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cache_backend_mongo_ce, SL("_collection"), ZEND_ACC_PROTECTED);
-
-	zend_class_implements(phalcon_cache_backend_mongo_ce, 1, phalcon_cache_backendinterface_ce);
 
 	return SUCCESS;
 }
@@ -119,94 +151,85 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Mongo){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 
-	zval *frontend, *options = NULL;
+	zval *frontend, *options = NULL, uri = {}, db_name = {}, collection_name = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 
-	if (!options) {
-		options = &PHALCON_GLOBAL(z_null);
-	}
-
-	if (!phalcon_array_isset_str(options, SL("collection"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The parameter 'collection' is required");
+	if (!options || Z_TYPE_P(options) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The options is required");
 		return;
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_cache_backend_mongo_ce, getThis(), "__construct", frontend, options);
+	if (phalcon_array_isset_fetch_str(&uri, options, SL("uri"))) {
+		phalcon_update_property_zval(getThis(), SL("_uri"), &uri);
+		phalcon_array_unset_str(options, SL("uri"), PH_SEPARATE);
+	} else {
+		phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY);
+	}
+
+	if (phalcon_array_isset_fetch_str(&db_name, options, SL("db")) && PHALCON_IS_NOT_EMPTY(&db_name)) {
+		phalcon_update_property_zval(getThis(), SL("_db"), &db_name);
+		phalcon_array_unset_str(options, SL("db"), PH_SEPARATE);
+	} else {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'db' is required");
+		return;
+	}
+
+	if (phalcon_array_isset_fetch_str(&collection_name, options, SL("collection")) && PHALCON_IS_NOT_EMPTY(&collection_name)) {
+		phalcon_update_property_zval(getThis(), SL("_collection"), &collection_name);
+		phalcon_array_unset_str(options, SL("collection"), PH_SEPARATE);
+	} else {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'collection' is required");
+		return;
+	}
+
+	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_mongo_ce, getThis(), "__construct", frontend, options);
+
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
+	mongo_object->client = mongoc_client_new(Z_STRVAL(uri));
+	if (!mongo_object->client) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The URI parsed unsuccessfully");
+		return;
+	}
+	mongoc_client_set_appname(mongo_object->client, "Phalcon7");
+	mongo_object->collection = mongoc_client_get_collection(mongo_object->client, Z_STRVAL(db_name), Z_STRVAL(collection_name));
+	if (!mongo_object->collection) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Can't get collection");
+		return;
+	}
 }
 
-/**
- * Returns a MongoDb collection based on the backend parameters
- *
- * @return MongoCollection
- */
-PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
-
-	zval mongo_collection = {}, options = {}, mongo = {}, class_name = {}, server = {}, database = {}, collection = {}, service_name = {};
-	zend_class_entry *ce0;
-
-	phalcon_return_property(&mongo_collection, getThis(), SL("_collection"));
-	if (Z_TYPE(mongo_collection) != IS_OBJECT) {
-		phalcon_return_property(&options, getThis(), SL("_options"));
-
-		if (phalcon_array_isset_fetch_str(&mongo, &options, SL("mongo"))) {
-			if (Z_TYPE(mongo) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The 'mongo' parameter must be a valid Mongo instance");
-				return;
-			}
-
-			if (!phalcon_array_isset_fetch_str(&database, &options, SL("db")) || Z_TYPE(database) != IS_STRING) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
-				return;
-			}
-
-			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
-				return;
-			}
-
-			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &database, &collection);
-		} else if (phalcon_array_isset_fetch_str(&server, &options, SL("server"))) {
-			if (Z_TYPE(server) != IS_STRING) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB connection string");
-				return;
-			}
-
-			ZVAL_STRING(&class_name, "MongoClient");
-			if (phalcon_class_exists(&class_name, 0) != NULL) {
-				ce0 = phalcon_fetch_str_class(SL("MongoClient"), ZEND_FETCH_CLASS_AUTO);
+static int phalcon_cache_mongo_get_value(zval* return_value, const bson_t* doc, const char* key) {
+	bson_iter_t iter;
+	bson_iter_init(&iter, doc);
+	if (bson_iter_find(&iter, key)){
+		if (BSON_ITER_HOLDS_UTF8(&iter)) {
+			const char *str;
+			uint32_t len;
+			str = bson_iter_utf8(&iter, &len);
+			ZVAL_NEW_STR(return_value, zend_string_init(str, len, 0));
+		} else if (BSON_ITER_HOLDS_INT32 (&iter)) {
+			ZVAL_LONG(return_value, bson_iter_int32(&iter));
+		} else if (BSON_ITER_HOLDS_INT64 (&iter)) {
+			ZVAL_LONG(return_value, bson_iter_int64(&iter));
+		} else if (BSON_ITER_HOLDS_DOUBLE (&iter)) {
+			ZVAL_DOUBLE(return_value, bson_iter_double(&iter));
+		} else if (BSON_ITER_HOLDS_BOOL (&iter)) {
+			if (bson_iter_bool(&iter)) {
+				ZVAL_TRUE(return_value);
 			} else {
-				ce0 = phalcon_fetch_str_class(SL("Mongo"), ZEND_FETCH_CLASS_AUTO);
+				ZVAL_FALSE(return_value);
 			}
-
-			object_init_ex(&mongo, ce0);
-			assert(phalcon_has_constructor(&mongo));
-			PHALCON_CALL_METHODW(NULL, &mongo, "__construct", &server);
-
-			if (!phalcon_array_isset_fetch_str(&database, &options, SL("db")) || Z_TYPE(database) != IS_STRING) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB db");
-				return;
-			}
-
-			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
-				return;
-			}
-
-			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &database, &collection);
+		} else if (BSON_ITER_HOLDS_NULL (&iter)) {
+			ZVAL_NULL(return_value);
 		} else {
-			ZVAL_STRING(&service_name, "mongo");
-			PHALCON_CALL_METHODW(&mongo, getThis(), "getresolveservice", &service_name);
-
-			if (!phalcon_array_isset_fetch_str(&collection, &options, SL("collection")) || Z_TYPE(collection) != IS_STRING) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The backend requires a valid MongoDB collection");
-				return;
-			}
-
-			PHALCON_RETURN_CALL_METHODW(&mongo, "selectcollection", &collection);
+			ZVAL_NULL(return_value);
 		}
+		return 1;
 	} else {
-		RETURN_CTORW(&mongo_collection);
+		ZVAL_NULL(return_value);
+		return 0;
 	}
 }
 
@@ -214,47 +237,52 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, _getCollection){
  * Returns a cached content
  *
  * @param int|string $keyName
- * @param   long $lifetime
- * @return  mixed
+ * @return mixed
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
-	zval *key_name, *lifetime = NULL, frontend = {}, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, time_condition = {}, cached_content = {};
+	zval *key_name, frontend = {}, prefix = {}, prefixed_key = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	mongoc_cursor_t *cursor;
+	bson_t *query;
+    const bson_t *doc;
 
-	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
+
+	query = bson_new();
+
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
-	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
+	query = BCON_NEW (
+		"key", BCON_UTF8(Z_STRVAL(prefixed_key)),
+		"time", "{",
+			"$gt", BCON_DATE_TIME(time(NULL) * 1000),
+		"}"
+	);
 
-	array_init_size(&conditions, 2);
-	phalcon_array_update_str(&conditions, SL("key"), &prefixed_key, PH_COPY);
+	ZVAL_NULL(return_value);
 
-	array_init_size(&time_condition, 1);
-	add_assoc_long_ex(&time_condition, SL("$gt"), (long int)time(NULL));
-	add_assoc_zval_ex(&conditions, SL("time"), &time_condition);
-
-	PHALCON_CALL_METHODW(&document, &collection, "findone", &conditions);
-
-	if (Z_TYPE(document) == IS_ARRAY) {
-		if (likely(phalcon_array_isset_fetch_str(&cached_content, &document, SL("data")))) {
-			if (phalcon_is_numeric(&cached_content)) {
-				RETURN_CTORW(&cached_content);
+    cursor = mongoc_collection_find_with_opts(mongo_object->collection, query, NULL, NULL);
+    while (mongoc_cursor_next(cursor, &doc)) {
+		zval cached_content = {};
+		if (phalcon_cache_mongo_get_value(&cached_content, doc, "data")) {
+			if (Z_TYPE(cached_content) == IS_STRING) {
+				PHALCON_CALL_METHOD(return_value, &frontend, "afterretrieve", &cached_content);
 			} else {
-				PHALCON_RETURN_CALL_METHODW(&frontend, "afterretrieve", &cached_content);
-				return;
+				PHALCON_CPY_WRT_CTOR(return_value, &cached_content);
 			}
-		} else {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The cache is corrupt");
-			return;
+			break;
 		}
-	}
+    }
 
-	RETURN_NULL();
+    bson_destroy(query);
+	mongoc_cursor_destroy(cursor);
 }
 
 /**
@@ -268,79 +296,97 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, last_key = {}, prefix = {}, frontend = {}, cached_content = {};
-	zval prepared_content = {}, ttl = {}, collection = {}, timestamp = {}, conditions = {}, document = {}, data = {}, is_buffering = {};
-
+	zval prepared_content = {}, ttl = {}, is_buffering = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	bson_t *query, *update, reply;
+	bson_error_t error;
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
+
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
+		phalcon_read_property(&last_key, getThis(), SL("_lastKey"), PH_NOISY);
 	} else {
-		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 		PHALCON_CONCAT_VV(&last_key, &prefix, key_name);
 	}
 
 	if (!zend_is_true(&last_key)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The cache must be started first");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache must be started first");
 		return;
 	}
 
-	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
-		PHALCON_CALL_METHODW(&cached_content, &frontend, "getcontent");
+		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
 		PHALCON_CPY_WRT(&cached_content, content);
 	}
 
-	if (!phalcon_is_numeric(&cached_content)) {
-		PHALCON_CALL_METHODW(&prepared_content, &frontend, "beforestore", &cached_content);
-	}
-
-	if (!lifetime || Z_TYPE_P(lifetime) == IS_NULL) {
-		phalcon_return_property(&ttl, getThis(), SL("_lastLifetime"));
-
-		if (Z_TYPE(ttl) == IS_NULL) {
-			PHALCON_CALL_METHODW(&ttl, &frontend, "getlifetime");
-		}
+	if (!lifetime || Z_TYPE_P(lifetime) != IS_LONG) {
+		PHALCON_CALL_METHOD(&ttl, getThis(), "getlifetime");
 	} else {
 		PHALCON_CPY_WRT(&ttl, lifetime);
 	}
 
-	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
+	query = BCON_NEW (
+		"key", BCON_UTF8(Z_STRVAL(last_key))
+	);
 
-	ZVAL_LONG(&timestamp, (long) time(NULL) + phalcon_get_intval(&ttl));
+	update = BCON_NEW (
+		"key", BCON_UTF8(Z_STRVAL(last_key)),
+		"time", BCON_DATE_TIME((time(NULL) + phalcon_get_intval(&ttl)) * 1000)
+	);
 
-	array_init_size(&conditions, 1);
-	phalcon_array_update_str(&conditions, SL("key"), &last_key, PH_COPY);
-
-	PHALCON_CALL_METHODW(&document, &collection, "findone", &conditions);
-
-	if (Z_TYPE(document) == IS_ARRAY) {
-		phalcon_array_update_str(&document, SL("time"), &timestamp, PH_COPY);
-		if (Z_TYPE(prepared_content) > IS_NULL) {
-			phalcon_array_update_str(&document, SL("data"), &prepared_content, PH_COPY);
-		} else {
-			phalcon_array_update_str(&document, SL("data"), &cached_content, PH_COPY);
-		}
-		PHALCON_CALL_METHODW(NULL, &collection, "save", &document);
-	} else {
-		array_init_size(&data, 3);
-		phalcon_array_update_str(&data, SL("key"), &last_key, PH_COPY);
-		phalcon_array_update_str(&data, SL("time"), &timestamp, PH_COPY);
-
-		if (Z_TYPE(prepared_content) > IS_NULL) {
-			phalcon_array_update_str(&data, SL("data"), &prepared_content, PH_COPY);
-		} else {
-			phalcon_array_update_str(&data, SL("data"), &cached_content, PH_COPY);
-		}
-
-		PHALCON_CALL_METHODW(NULL, &collection, "save", &data);
+	switch (Z_TYPE(cached_content)) {
+		case IS_LONG:
+			BSON_APPEND_INT64(update, "data", Z_LVAL(cached_content));
+			break;
+		case IS_DOUBLE:
+			BSON_APPEND_DOUBLE(update, "data", Z_DVAL(cached_content));
+			break;
+		case IS_TRUE:
+			BSON_APPEND_BOOL(update, "data", true);
+			break;
+		case IS_FALSE:
+			BSON_APPEND_BOOL(update, "data", false);
+			break;
+		case IS_NULL:
+			BSON_APPEND_NULL(update, "data");
+			break;
+		default:
+			PHALCON_CALL_METHOD(&prepared_content, &frontend, "beforestore", &cached_content);
+			if (Z_TYPE(prepared_content) != IS_STRING) {
+				PHALCON_THROW_EXCEPTION_FORMAT(phalcon_cache_exception_ce, "The value can't save, type is %s", zend_get_type_by_const(Z_TYPE(prepared_content)));
+				return;
+			}
+			BSON_APPEND_UTF8(update, "data", Z_STRVAL(prepared_content));
+			break;
 	}
 
-	PHALCON_CALL_METHODW(&is_buffering, &frontend, "isbuffering");
+    if (!mongoc_collection_find_and_modify(mongo_object->collection, query, NULL,
+		update,
+		NULL,
+		false,
+		true,
+		true,
+		&reply,
+		&error
+	)) {
+		ZVAL_FALSE(return_value);
+	} else {
+		ZVAL_TRUE(return_value);
+	}
+
+	bson_destroy(update);
+	bson_destroy(query);
+
+	PHALCON_CALL_METHOD(&is_buffering, &frontend, "isbuffering");
 
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
-		PHALCON_CALL_METHODW(NULL, &frontend, "stop");
+		PHALCON_CALL_METHOD(NULL, &frontend, "stop");
 	}
 
 	if (PHALCON_IS_TRUE(&is_buffering)) {
@@ -348,7 +394,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
-	RETURN_TRUE;
 }
 
 /**
@@ -359,275 +404,316 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 
-	zval *key_name, prefix = {}, prefixed_key = {}, collection = {}, conditions = {};
+	zval *key_name, prefix = {}, prefixed_key = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	bson_t *query;
+	bson_error_t error;
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
+
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
-	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
+	query = BCON_NEW (
+		"key", BCON_UTF8(Z_STRVAL(prefixed_key))
+	);
 
-	array_init_size(&conditions, 1);
-	phalcon_array_update_str(&conditions, SL("key"), &prefixed_key, PH_COPY);
-	PHALCON_CALL_METHODW(NULL, &collection, "remove", &conditions);
-
-	if ((php_rand() % 100) == 0) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "gc");
+    if (!mongoc_collection_remove(mongo_object->collection, MONGOC_REMOVE_SINGLE_REMOVE, query, NULL, &error)) {
+		ZVAL_FALSE(return_value);
+	} else {
+		ZVAL_TRUE(return_value);
 	}
 
-	RETURN_TRUE;
+    bson_destroy(query);
+
+	if ((php_rand() % 100) == 0) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "gc");
+	}
 }
 
 /**
  * Query the existing cached keys
  *
  * @param string $prefix
+ * @param int $lifetime
  * @return array
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 
-	zval *prefix = NULL, collection = {}, fields = {}, pattern = {}, regex = {}, conditions = {}, documents = {}, *document, documents_array = {}, time_condition = {};
-	zend_class_entry *ce0;
+	zval *_prefix = NULL, *lifetime = NULL, prefix = {}, prefixed_key = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	mongoc_cursor_t *cursor;
+	bson_t *query; // BSON_INITIALIZER
+    const bson_t *doc;
 
-	phalcon_fetch_params(0, 0, 1, &prefix);
+	phalcon_fetch_params(0, 0, 2, &_prefix, &lifetime);
 
-	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
 
-	array_init_size(&fields, 1);
-	add_next_index_stringl(&fields, SL("key"));
+	query = bson_new();
 
-	array_init_size(&conditions, 2);
-
-	if (prefix && zend_is_true(prefix)) {
-		PHALCON_CONCAT_SVS(&pattern, "/^", prefix, "/");
-		ce0 = phalcon_fetch_str_class(SL("MongoRegex"), ZEND_FETCH_CLASS_AUTO);
-
-		object_init_ex(&regex, ce0);
-		assert(phalcon_has_constructor(&regex));
-		PHALCON_CALL_METHODW(NULL, &regex, "__construct", &pattern);
-
-		phalcon_array_update_str(&conditions, SL("key"), &regex, PH_COPY);
+	if (!_prefix || Z_TYPE_P(_prefix)) {
+		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	} else {
+		PHALCON_CPY_WRT(&prefix, _prefix);
 	}
 
-	array_init_size(&time_condition, 1);
-	add_assoc_long_ex(&time_condition, SL("$gt"), (long int)time(NULL));
-	phalcon_array_update_str(&conditions, SL("time"), &time_condition, 0);
+	if (lifetime && Z_TYPE_P(lifetime) == IS_LONG) {
+		query = BCON_NEW (
+			"starttime", "{",
+				"$gt", BCON_DATE_TIME((time(NULL) - Z_LVAL_P(lifetime)) * 1000),
+			"}"
+		);
+	} else {
+		query = bson_new();
+	}
 
-	PHALCON_CALL_METHODW(&documents, &collection, "find", &conditions, &fields);
+	if (PHALCON_IS_NOT_EMPTY(&prefix)) {
+		PHALCON_CONCAT_SVS(&prefixed_key, "#^", &prefix, "#");
+		BSON_APPEND_REGEX(query, "key", Z_STRVAL(prefixed_key), "i");
+	}
+
+    cursor = mongoc_collection_find_with_opts(mongo_object->collection, query, NULL, NULL);
 
 	array_init(return_value);
-
-	PHALCON_CALL_FUNCTIONW(&documents_array, "iterator_to_array", &documents);
-
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(documents_array), document) {
-		zval key = {};
-		if (likely(phalcon_array_isset_fetch_str(&key, document, SL("key")))) {
-			phalcon_array_append(return_value, &key, PH_COPY);
+    while (mongoc_cursor_next(cursor, &doc)) {
+		bson_iter_t iter;
+		bson_iter_init(&iter, doc);
+		if (bson_iter_find(&iter, "key") && BSON_ITER_HOLDS_UTF8(&iter)) {
+			zval key_value = {};
+			const char *str;
+			uint32_t len;
+			str = bson_iter_utf8(&iter, &len);
+			ZVAL_NEW_STR(&key_value, zend_string_init(str, len, 0));
+			phalcon_array_append(return_value, &key_value, PH_COPY);
 		}
-	} ZEND_HASH_FOREACH_END();
+    }
+
+	bson_destroy(query);
+	mongoc_cursor_destroy(cursor);
 }
 
 /**
  * Checks if cache exists and it hasn't expired
  *
- * @param  string $keyName
- * @param  long $lifetime
+ * @param string $keyName
+ * @param int $lifetime
  * @return boolean
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
-
-	zval *key_name = NULL, *lifetime = NULL, collection = {}, last_key = {}, prefix = {}, conditions = {}, number = {}, time_condition = {};
-	long int n;
+	zval *key_name = NULL, *lifetime = NULL, last_key = {}, prefix = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	bson_t *query;
+	bson_error_t error;
 
 	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
 
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
+
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
+		phalcon_read_property(&last_key, getThis(), SL("_lastKey"), PH_NOISY);
 	} else {
-		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 		PHALCON_CONCAT_VV(&last_key, &prefix, key_name);
+		phalcon_update_property_zval(getThis(), SL("_lastKey"), &last_key);
 	}
 
-	if (zend_is_true(&last_key)) {
-		PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
-
-		array_init_size(&conditions, 2);
-		phalcon_array_update_str(&conditions, SL("key"), &last_key, PH_COPY);
-
-		array_init_size(&time_condition, 1);
-		add_assoc_long_ex(&time_condition, SL("$gt"), (long int)time(NULL));
-		phalcon_array_update_str(&conditions, SL("time"), &time_condition, 0);
-
-		PHALCON_CALL_METHODW(&number, &collection, "count", &conditions);
-
-		n = phalcon_get_intval(&number);
-
-		RETVAL_BOOL(n > 0);
+	if (lifetime && Z_TYPE_P(lifetime) == IS_LONG) {
+		query = BCON_NEW (
+			"time", "{",
+				"$gt", BCON_DATE_TIME(time(NULL) * 1000),
+			"}"
+			"starttime", "{",
+				"$gt", BCON_DATE_TIME((time(NULL) - Z_LVAL_P(lifetime)) * 1000),
+			"}"
+		);
 	} else {
-		RETURN_FALSE;
+		query = BCON_NEW (
+			"time", "{",
+				"$gt", BCON_DATE_TIME(time(NULL) * 1000),
+			"}"
+		);
 	}
+
+	BSON_APPEND_UTF8(query, "key", Z_STRVAL(last_key));
+
+    if (mongoc_collection_count(mongo_object->collection, MONGOC_QUERY_NONE, query, 0, 0, NULL, &error)) {
+		ZVAL_TRUE(return_value);
+    } else {
+		ZVAL_FALSE(return_value);
+	}
+
+	bson_destroy(query);
 }
 
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, gc) {
 
-	zval conditions = {}, time_condition = {}, collection = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	bson_t query = BSON_INITIALIZER;
+	bson_t child;
+	bson_error_t error;
 
-	array_init_size(&time_condition, 1);
-	add_assoc_long_ex(&time_condition, SL("$gt"), (long int)time(NULL));
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
 
-	array_init_size(&conditions, 1);
-	add_assoc_zval_ex(&conditions, SL("time"), &time_condition);
-
-	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
-	PHALCON_CALL_METHODW(NULL, &collection, "remove", &conditions);
+	BSON_APPEND_DOCUMENT_BEGIN(&query, "time", &child);
+	BSON_APPEND_DATE_TIME(&child, "$lt", time(NULL) * 1000);
+	bson_append_document_end(&query, &child);
+    if (!mongoc_collection_remove(mongo_object->collection, MONGOC_REMOVE_NONE, &query, NULL, &error)) {
+		ZVAL_FALSE(return_value);
+	} else {
+		ZVAL_TRUE(return_value);
+	}
 }
 
 /**
  * Increment of a given key by $value
  *
  * @param int|string $keyName
- * @param   long $value
+ * @param long $value
  * @return  mixed
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 
-	zval *key_name, *value = NULL, lifetime = {}, frontend = {}, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, timestamp = {};
-	zval modified_time = {}, difference = {}, not_expired = {}, cached_content = {};
+	zval *key_name, *value = NULL, prefix = {}, prefixed_key = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	bson_t *query, update = BSON_INITIALIZER, reply;
+	bson_error_t error;
+	bson_t child;
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
-	if (!value || Z_TYPE_P(value) == IS_NULL) {
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
+
+	if (!value || Z_TYPE_P(value) != IS_LONG) {
 		value = &PHALCON_GLOBAL(z_one);
-	} else if (Z_TYPE_P(value) != IS_LONG) {
-		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(value);
 	}
 
-	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
-	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
+	query = BCON_NEW (
+		"key", BCON_UTF8(Z_STRVAL(prefixed_key)),
+		"time", "{",
+			"$gt", BCON_DATE_TIME(time(NULL) * 1000),
+		"}"
+	);
 
-	array_init_size(&conditions, 1);
-	phalcon_array_update_str(&conditions, SL("key"), &prefixed_key, PH_COPY);
+	BSON_APPEND_DOCUMENT_BEGIN(&update, "$inc", &child);
+	BSON_APPEND_INT64(&child, "data", Z_LVAL_P(value));
+	bson_append_document_end(&update, &child);
 
-	PHALCON_CALL_METHODW(&document, &collection, "findone", &conditions);
+	if (!mongoc_collection_find_and_modify(mongo_object->collection, query, NULL, &update,
+		NULL,
+		false,
+		false,
+		true,
+		&reply,
+		&error
+	)) {
+		ZVAL_FALSE(return_value);
+	} else {
+        bson_iter_t iter;
+        bson_iter_init(&iter, &reply);
+        if (bson_iter_find(&iter, "value"))
+        {
+            const uint8_t *buf;
+            uint32_t len;
+            bson_iter_document(&iter, &len, &buf);
+            bson_t value;
+            bson_init_static(&value, buf, len);
 
-	ZVAL_LONG(&timestamp, (long) time(NULL));
+            if (!phalcon_cache_mongo_get_value(return_value, &value, "data")) {
+				ZVAL_FALSE(return_value);
+			}
 
-	phalcon_return_property(&lifetime, getThis(), SL("_lastLifetime"));
-	if (Z_TYPE(lifetime) == IS_NULL) {
-		PHALCON_CALL_METHODW(&lifetime, &frontend, "getlifetime");
-	}
-
-	if (!phalcon_array_isset_str(&document, SL("time"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The cache is currupted");
-		return;
-	}
-
-	phalcon_array_fetch_str(&modified_time, &document, SL("time"), PH_NOISY);
-	phalcon_sub_function(&difference, &timestamp, &lifetime);
-	is_smaller_function(&not_expired, &difference, &modified_time);
-
-	/**
-	 * The expiration is based on the column 'time'
-	 */
-	if (PHALCON_IS_TRUE(&not_expired)) {
-		if (!phalcon_array_isset_str(&document, SL("data"))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The cache is currupted");
-			return;
+            bson_destroy(&value);
+        } else {
+			ZVAL_FALSE(return_value);
 		}
-
-		phalcon_array_fetch_str(&cached_content, &document, SL("data"), PH_NOISY);
-
-		if(Z_TYPE(cached_content) != IS_LONG) {
-			convert_to_long_ex(&cached_content);
-		}
-
-		phalcon_add_function(return_value, &cached_content, value);
-		PHALCON_CALL_METHODW(NULL, getThis(), "save", &prefixed_key, return_value);
-		return;
 	}
-
-	RETURN_NULL();
+	bson_destroy(&reply);
+	bson_destroy(query);
 }
 
 /**
  * Decrement of a given key by $value
  *
  * @param int|string $keyName
- * @param   long $value
- * @return  mixed
+ * @param long $value
+ * @return mixed
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 
-	zval *key_name, *value = NULL, lifetime = {}, frontend, prefix = {}, prefixed_key = {}, collection = {}, conditions = {}, document = {}, timestamp = {};
-	zval modified_time = {}, difference = {}, not_expired = {}, cached_content = {};
+	zval *key_name, *value = NULL, prefix = {}, prefixed_key = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	bson_t *query, update = BSON_INITIALIZER, reply;
+	bson_error_t error;
+	bson_t child;
+	long v = -1;
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &value);
 
-	if (!value || Z_TYPE_P(value) == IS_NULL) {
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
+
+	if (!value || Z_TYPE_P(value) != IS_LONG) {
 		value = &PHALCON_GLOBAL(z_one);
-	} else if (Z_TYPE_P(value) != IS_LONG) {
-		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(value);
+	} else {
+		v = -labs(Z_LVAL_P(value));
 	}
 
-	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
-	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
+	query = BCON_NEW (
+		"key", BCON_UTF8(Z_STRVAL(prefixed_key)),
+		"time", "{",
+			"$gt", BCON_DATE_TIME(time(NULL) * 1000),
+		"}"
+	);
 
-	array_init_size(&conditions, 1);
-	phalcon_array_update_str(&conditions, SL("key"), &prefixed_key, PH_COPY);
+	BSON_APPEND_DOCUMENT_BEGIN(&update, "$inc", &child);
+	BSON_APPEND_INT64(&child, "data", v);
+	bson_append_document_end(&update, &child);
 
-	PHALCON_CALL_METHODW(&document, &collection, "findone", &conditions);
+	if (!mongoc_collection_find_and_modify(mongo_object->collection, query, NULL, &update,
+		NULL,
+		false,
+		false,
+		true,
+		&reply,
+		&error
+	)) {
+		ZVAL_FALSE(return_value);
+	} else {
+        bson_iter_t iter;
+        bson_iter_init(&iter, &reply);
+        if (bson_iter_find(&iter, "value"))
+        {
+            const uint8_t *buf;
+            uint32_t len;
+            bson_iter_document(&iter, &len, &buf);
+            bson_t value;
+            bson_init_static(&value, buf, len);
 
-	ZVAL_LONG(&timestamp, (long) time(NULL));
+            if (!phalcon_cache_mongo_get_value(return_value, &value, "data")) {
+				ZVAL_FALSE(return_value);
+			}
 
-	phalcon_return_property(&lifetime, getThis(), SL("_lastLifetime"));
-	if (Z_TYPE(lifetime) == IS_NULL) {
-		PHALCON_CALL_METHODW(&lifetime, &frontend, "getlifetime");
-	}
-
-	if (!phalcon_array_isset_str(&document, SL("time"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The cache is currupted");
-		return;
-	}
-
-	phalcon_array_fetch_str(&modified_time, &document, SL("time"), PH_NOISY);
-	phalcon_sub_function(&difference, &timestamp, &lifetime);
-	is_smaller_function(&not_expired, &difference, &modified_time);
-
-	/**
-	 * The expiration is based on the column 'time'
-	 */
-	if (PHALCON_IS_TRUE(&not_expired)) {
-		if (!phalcon_array_isset_str(&document, SL("data"))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_cache_exception_ce, "The cache is currupted");
-			return;
+            bson_destroy(&value);
+        } else {
+			ZVAL_FALSE(return_value);
 		}
-
-		phalcon_array_fetch_str(&cached_content, &document, SL("data"), PH_NOISY);
-
-		if(Z_TYPE(cached_content) != IS_LONG) {
-			convert_to_long_ex(&cached_content);
-		}
-
-		phalcon_sub_function(return_value, &cached_content, value);
-		PHALCON_CALL_METHODW(NULL, getThis(), "save", &prefixed_key, return_value);
-		return;
 	}
-
-	RETURN_NULL();
+	bson_destroy(&reply);
+	bson_destroy(query);
 }
 
 /**
@@ -637,14 +723,27 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, flush){
 
-	zval collection = {};
+	zval prefix = {}, prefixed_key = {};
+	phalcon_cache_backend_mongo_object *mongo_object;
+	bson_t query = BSON_INITIALIZER;
+	bson_error_t error;
 
-	PHALCON_CALL_METHODW(&collection, getThis(), "_getcollection");
-	PHALCON_CALL_METHODW(NULL, &collection, "remove");
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 
-	if ((php_rand() % 100) == 0) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "gc");
+	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
+
+	if (PHALCON_IS_NOT_EMPTY(&prefix)) {
+		PHALCON_CONCAT_SVS(&prefixed_key, "#^", &prefix, "#");
+		BSON_APPEND_REGEX(&query, "key", Z_STRVAL(prefixed_key), "i");
 	}
 
-	RETURN_TRUE;
+    if (!mongoc_collection_remove(mongo_object->collection, MONGOC_REMOVE_NONE, &query, NULL, &error)) {
+		ZVAL_FALSE(return_value);
+	} else {
+		ZVAL_TRUE(return_value);
+	}
+
+	if ((php_rand() % 100) == 0) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "gc");
+	}
 }

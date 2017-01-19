@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getForeignKey){
 
 	if (phalcon_array_isset_fetch_str(&foreign_key, &options, SL("foreignKey"))) {
 		if (zend_is_true(&foreign_key)) {
-			RETURN_CTORW(&foreign_key);
+			RETURN_CTOR(&foreign_key);
 		}
 	}
 	
@@ -274,7 +274,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isReusable){
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 
 	if (phalcon_array_isset_fetch_str(&reusable, &options, SL("reusable"))) {
-		RETURN_CTORW(&reusable);
+		RETURN_CTOR(&reusable);
 	}
 	
 	RETURN_FALSE;

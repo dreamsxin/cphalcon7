@@ -101,13 +101,6 @@ int phalcon_fetch_parameters(int num_args, int required_args, int optional_args,
 
 int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 
-/* Compatibility macros for PHP 5.3 */
-#ifndef INIT_PZVAL_COPY
- #define INIT_PZVAL_COPY(z, v) ZVAL_COPY_VALUE(z, v);\
-  Z_SET_REFCOUNT_P(z, 1);\
-  ZVAL_UNREF(z);
-#endif
-
 #ifndef ZVAL_COPY_VALUE
  #define ZVAL_COPY_VALUE(z, v)\
   (z)->value = (v)->value;\
@@ -120,20 +113,8 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 	} \
 	return;
 
-/** Return zval checking if it's needed to ctor, without restoring the memory stack  */
-#define RETURN_CCTORW(var) { \
-		ZVAL_DUP(return_value, var); \
-	} \
-	return;
-
 /** Return zval with always ctor */
 #define RETURN_CTOR(var) { \
-		RETVAL_ZVAL(var, 1, 0); \
-	} \
-	return;
-
-/** Return zval with always ctor, without restoring the memory stack */
-#define RETURN_CTORW(var) { \
 		RETVAL_ZVAL(var, 1, 0); \
 	} \
 	return;
@@ -143,20 +124,11 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 	} \
 	return;
 
-#define RETURN_CTOR_DTORW(var) { \
-		RETVAL_ZVAL(var, 1, 1); \
-	} \
-	return;
-
 /** Return this pointer */
 #define RETURN_THIS() { \
 		RETVAL_ZVAL(getThis(), 1, 0); \
 	} \
 	return;
-
-/** Return zval with always ctor, without restoring the memory stack */
-#define RETURN_THISW() \
-	RETURN_ZVAL(getThis(), 1, 0);
 
 /**
  * Returns a zval in an object member
@@ -201,10 +173,36 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		phalcon_ ##name## _ce->ce_flags |= flags;  \
 	}
 
+#define PHALCON_REGISTER_CLASS_CREATE_OBJECT(ns, class_name, name, methods, flags) \
+	{ \
+		zend_class_entry ce; \
+		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
+		ce.create_object = phalcon_ ##name## _object_create_handler; \
+		memcpy(&phalcon_ ##name## _object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers)); \
+		phalcon_ ##name## _object_handlers.free_obj = (zend_object_free_obj_t) phalcon_ ##name## _object_free_handler; \
+		phalcon_ ##name## _ce = zend_register_internal_class(&ce); \
+		phalcon_ ##name## _ce->ce_flags |= flags;  \
+	}
+
 #define PHALCON_REGISTER_CLASS_EX(ns, class_name, lcname, parent_ce, methods, flags) \
 	{ \
 		zend_class_entry ce; \
 		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
+		phalcon_ ##lcname## _ce = zend_register_internal_class_ex(&ce, parent_ce); \
+		if (!phalcon_ ##lcname## _ce) { \
+			fprintf(stderr, "Phalcon Error: Class to extend '%s' was not found when registering class '%s'\n", (parent_ce ? parent_ce->name->val : "(null)"), ZEND_NS_NAME(#ns, #class_name)); \
+			return FAILURE; \
+		} \
+		phalcon_ ##lcname## _ce->ce_flags |= flags;  \
+	}
+
+#define PHALCON_REGISTER_CLASS_CREATE_OBJECT_EX(ns, class_name, lcname, parent_ce, methods, flags) \
+	{ \
+		zend_class_entry ce; \
+		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
+		ce.create_object = phalcon_ ##lcname## _object_create_handler; \
+		memcpy(&phalcon_ ##lcname## _object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers)); \
+		phalcon_ ##lcname## _object_handlers.free_obj = (zend_object_free_obj_t) phalcon_ ##lcname## _object_free_handler; \
 		phalcon_ ##lcname## _ce = zend_register_internal_class_ex(&ce, parent_ce); \
 		if (!phalcon_ ##lcname## _ce) { \
 			fprintf(stderr, "Phalcon Error: Class to extend '%s' was not found when registering class '%s'\n", (parent_ce ? parent_ce->name->val : "(null)"), ZEND_NS_NAME(#ns, #class_name)); \
@@ -243,7 +241,7 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		RETURN_NULL(); \
 	}
 
-#define PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce, restore_stack) \
+#define PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce) \
 	if (Z_TYPE_P(instance) != IS_OBJECT) { \
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name->val, zend_zval_type_name(instance)); \
 		return; \
@@ -260,12 +258,12 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		return; \
 	}
 
-#define PHALCON_VERIFY_INTERFACE_OR_NULL_EX(pzv, interface_ce, exception_ce, restore_stack) \
+#define PHALCON_VERIFY_INTERFACE_OR_NULL_EX(pzv, interface_ce, exception_ce) \
 	if (Z_TYPE_P(pzv) != IS_NULL){ \
-		PHALCON_VERIFY_INTERFACE_EX(pzv, interface_ce, exception_ce, restore_stack); \
+		PHALCON_VERIFY_INTERFACE_EX(pzv, interface_ce, exception_ce); \
 	}
 
-#define PHALCON_VERIFY_CLASS_EX(instance, class_ce, exception_ce, restore_stack) \
+#define PHALCON_VERIFY_CLASS_EX(instance, class_ce, exception_ce) \
 	if (Z_TYPE_P(instance) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(instance), class_ce, 0)) { \
 		if (Z_TYPE_P(instance) != IS_OBJECT) { \
 			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", class_ce->name->val, zend_zval_type_name(instance)); \
@@ -282,17 +280,15 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 		return; \
 	}
 
-#define PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, exception_ce, restore_stack) \
+#define PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, exception_ce) \
 	if (Z_TYPE_P(pzv) != IS_NULL) { \
-		PHALCON_VERIFY_CLASS_EX(pzv, class_ce, exception_ce, restore_stack); \
+		PHALCON_VERIFY_CLASS_EX(pzv, class_ce, exception_ce); \
 	}
 
-#define PHALCON_VERIFY_INTERFACE(instance, interface_ce)      PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, spl_ce_LogicException, 1)
-#define PHALCON_VERIFY_INTERFACEW(instance, interface_ce)      PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, spl_ce_LogicException, 0)
-#define PHALCON_VERIFY_INTERFACE_OR_NULL(pzv, interface_ce)   PHALCON_VERIFY_INTERFACE_OR_NULL_EX(pzv, interface_ce, spl_ce_LogicException, 1)
-#define PHALCON_VERIFY_CLASS(instance, class_ce)              PHALCON_VERIFY_CLASS_EX(instance, class_ce, spl_ce_LogicException, 1)
-#define PHALCON_VERIFY_CLASSW(instance, class_ce)              PHALCON_VERIFY_CLASS_EX(instance, class_ce, spl_ce_LogicException, 0)
-#define PHALCON_VERIFY_CLASS_OR_NULL(pzv, class_ce)           PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, spl_ce_LogicException, 1)
+#define PHALCON_VERIFY_INTERFACE(instance, interface_ce)      PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, spl_ce_LogicException)
+#define PHALCON_VERIFY_INTERFACE_OR_NULL(pzv, interface_ce)   PHALCON_VERIFY_INTERFACE_OR_NULL_EX(pzv, interface_ce, spl_ce_LogicException)
+#define PHALCON_VERIFY_CLASS(instance, class_ce)              PHALCON_VERIFY_CLASS_EX(instance, class_ce, spl_ce_LogicException)
+#define PHALCON_VERIFY_CLASS_OR_NULL(pzv, class_ce)           PHALCON_VERIFY_CLASS_OR_NULL_EX(pzv, class_ce, spl_ce_LogicException)
 
 #define PHALCON_ENSURE_IS_STRING(pzv)    convert_to_string_ex(pzv)
 #define PHALCON_ENSURE_IS_LONG(pzv)      convert_to_long_ex(pzv)

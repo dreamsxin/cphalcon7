@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Registry, __get){
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
-	PHALCON_RETURN_CALL_SELFW("offsetget", property);
+	PHALCON_RETURN_CALL_SELF("offsetget", property);
 }
 
 /**
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Registry, __set){
 
 	phalcon_fetch_params(0, 2, 0, &property, &value);
 
-	PHALCON_CALL_SELFW(NULL, "offsetset", property, value);
+	PHALCON_CALL_SELF(NULL, "offsetset", property, value);
 }
 
 PHP_METHOD(Phalcon_Registry, __isset){
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Registry, __isset){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	PHALCON_RETURN_CALL_SELFW("offsetexists", key);
+	PHALCON_RETURN_CALL_SELF("offsetexists", key);
 }
 
 PHP_METHOD(Phalcon_Registry, __unset){
@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Registry, __unset){
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
-	PHALCON_CALL_SELFW(NULL, "offsetunset", property);
+	PHALCON_CALL_SELF(NULL, "offsetunset", property);
 }
 
 /**
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Registry, __call){
 
 	if (phalcon_isset_property_array(getThis(), SL("_data"), name)) {
 		phalcon_read_property_array(&callback, getThis(), SL("_data"), name);
-		PHALCON_CALL_ZVAL_FUNCTIONW(return_value, &callback, arguments);
+		PHALCON_CALL_ZVAL_FUNCTION(return_value, &callback, arguments);
 	} else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_P(name));
 	}

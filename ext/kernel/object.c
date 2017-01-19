@@ -545,7 +545,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 	}
 
 	if (check_access) {
-		PHALCON_CALL_FUNCTIONW(return_value, "get_class_methods", object);
+		PHALCON_CALL_FUNCTION(return_value, "get_class_methods", object);
 	} else {
 		array_init(return_value);
 

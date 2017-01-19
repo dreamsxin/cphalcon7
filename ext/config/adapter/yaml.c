@@ -97,11 +97,11 @@ PHP_METHOD(Phalcon_Config_Adapter_Yaml, read){
 		PHALCON_CONCAT_VV(&config_dir_path, base_path, file_path);
 	}
 
-	PHALCON_CALL_FUNCTIONW(&config, "yaml_parse_file", &config_dir_path);
+	PHALCON_CALL_FUNCTION(&config, "yaml_parse_file", &config_dir_path);
 
 	if (Z_TYPE(config) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "val", &config);
+		PHALCON_CALL_METHOD(NULL, getThis(), "val", &config);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }

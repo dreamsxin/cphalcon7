@@ -85,21 +85,21 @@ PHP_METHOD(Phalcon_Validation_Validator_Json, validate){
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce);
 
-	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
 		RETURN_TRUE;
 	}
 
-	PHALCON_CALL_SELFW(&valid, "valid", &value);
+	PHALCON_CALL_SELF(&valid, "valid", &value);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
+			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
@@ -118,11 +118,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Json, validate){
 			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Json", &code);
 
-		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 
@@ -144,11 +144,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Json, valid){
 	ZVAL_TRUE(&valid);
 	ZVAL_TRUE(&assoc);
 
-	PHALCON_CALL_FUNCTIONW(&json, "json_decode", value, &assoc);
+	PHALCON_CALL_FUNCTION(&json, "json_decode", value, &assoc);
 
 	if (Z_TYPE(json) == IS_NULL) {
 		if ((constant = zend_get_constant_str(SL("JSON_ERROR_NONE"))) != NULL) {
-			PHALCON_CALL_FUNCTIONW(&ret, "json_last_error");
+			PHALCON_CALL_FUNCTION(&ret, "json_last_error");
 
 			if (!PHALCON_IS_EQUAL(&ret, constant)) {
 				ZVAL_FALSE(&valid);
@@ -162,10 +162,10 @@ PHP_METHOD(Phalcon_Validation_Validator_Json, valid){
 
 	ZVAL_STRING(&option, "keys");
 
-	PHALCON_CALL_METHODW(&keys, getThis(), "getoption", &option);
+	PHALCON_CALL_METHOD(&keys, getThis(), "getoption", &option);
 
 	if (Z_TYPE(keys) != IS_NULL) {
-		PHALCON_CALL_FUNCTIONW(&ret, "array_key_exists", &keys, &json);
+		PHALCON_CALL_FUNCTION(&ret, "array_key_exists", &keys, &json);
 		if (!zend_is_true(&ret)) {
 			RETURN_FALSE;
 		}

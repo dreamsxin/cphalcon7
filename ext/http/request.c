@@ -216,7 +216,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 
 	if (Z_TYPE_P(name) != IS_NULL) {
 		if (!phalcon_array_isset_fetch(&value, data, name, 0)) {
-			RETURN_CTORW(default_value);
+			RETURN_CTOR(default_value);
 		}
 	} else {
 		PHALCON_CPY_WRT_CTOR(&value, data);
@@ -225,34 +225,34 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 	if (Z_TYPE_P(filters) != IS_NULL) {
 		phalcon_return_property(&filter, getThis(), SL("_filter"));
 		if (Z_TYPE(filter) != IS_OBJECT) {
-			PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+			PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
+				PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
 				return;
 			}
 
 			PHALCON_STR(&service, ISV(filter));
 
-			PHALCON_CALL_METHODW(&filter, &dependency_injector, "getshared", &service);
-			PHALCON_VERIFY_INTERFACEW(&filter, phalcon_filterinterface_ce);
+			PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
+			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
 
 			phalcon_update_property_zval(getThis(), SL("_filter"), &filter);
 		}
 
-		PHALCON_CALL_METHODW(&filter_value, &filter, "sanitize", &value, filters, norecursive);
+		PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", &value, filters, norecursive);
 
 		if ((PHALCON_IS_EMPTY(&filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(&filter_value)) {
-			RETURN_CTORW(default_value);
+			RETURN_CTOR(default_value);
 		}
 
-		RETURN_CTORW(&filter_value);
+		RETURN_CTOR(&filter_value);
 	}
 
 	if (PHALCON_IS_EMPTY(&value) && zend_is_true(not_allow_empty)) {
-		RETURN_CTORW(default_value);
+		RETURN_CTOR(default_value);
 	}
 
-	RETURN_CTORW(&value);
+	RETURN_CTOR(&value);
 }
 
 /**
@@ -303,11 +303,11 @@ PHP_METHOD(Phalcon_Http_Request, get)
 
 	request = phalcon_get_global_str(SL("_REQUEST"));
 
-	PHALCON_CALL_METHODW(&put, getThis(), "getput");
+	PHALCON_CALL_METHOD(&put, getThis(), "getput");
 
 	phalcon_fast_array_merge(&merged, request, &put);
 
-	PHALCON_RETURN_CALL_SELFW("_get", &merged, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", &merged, name, filters, default_value, not_allow_empty, norecursive);
 }
 
 /**
@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Http_Request, getPost)
 	}
 
 	post = phalcon_get_global_str(SL("_POST"));
-	PHALCON_RETURN_CALL_SELFW("_get", post, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", post, name, filters, default_value, not_allow_empty, norecursive);
 }
 
 /**
@@ -402,14 +402,14 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 		norecursive = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_CALL_METHODW(&is_put, getThis(), "isput");
+	PHALCON_CALL_METHOD(&is_put, getThis(), "isput");
 
 	if (!zend_is_true(&is_put)) {
 		RETURN_EMPTY_ARRAY();
 	} else {
 		phalcon_read_property(&put, getThis(), SL("_put"), PH_NOISY);
 		if (Z_TYPE(put) != IS_ARRAY) {
-			PHALCON_CALL_METHODW(&raw, getThis(), "getrawbody");
+			PHALCON_CALL_METHOD(&raw, getThis(), "getrawbody");
 
 			array_init(&new_put);
 
@@ -424,7 +424,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 		}
 	}
 
-	PHALCON_RETURN_CALL_SELFW("_get", &new_put, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", &new_put, name, filters, default_value, not_allow_empty, norecursive);
 }
 
 /**
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Http_Request, getQuery){
 
 	get = phalcon_get_global_str(SL("_GET"));
 
-	PHALCON_RETURN_CALL_SELFW("_get", get, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", get, name, filters, default_value, not_allow_empty, norecursive);
 }
 
 /**
@@ -510,7 +510,7 @@ PHP_METHOD(Phalcon_Http_Request, getEnv){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	PHALCON_CALL_FUNCTIONW(return_value, "getenv", name);
+	PHALCON_CALL_FUNCTION(return_value, "getenv", name);
 }
 
 /**
@@ -535,17 +535,17 @@ PHP_METHOD(Phalcon_Http_Request, getParam){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
 		return;
 	}
 
 	PHALCON_STR(&service, ISV(dispatcher));
 
-	PHALCON_CALL_METHODW(&dispatcher, &dependency_injector, "getshared", &service);
+	PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
 
-	PHALCON_CALL_METHODW(NULL, &dispatcher, "getparam", param, filters, default_value);
+	PHALCON_CALL_METHOD(NULL, &dispatcher, "getparam", param, filters, default_value);
 }
 
 /**
@@ -593,14 +593,14 @@ PHP_METHOD(Phalcon_Http_Request, hasPut)
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	PHALCON_CALL_METHODW(&is_put, getThis(), "isput");
+	PHALCON_CALL_METHOD(&is_put, getThis(), "isput");
 
 	if (!zend_is_true(&is_put)) {
 		phalcon_read_global_str(&new_put, SL("_PUT"));
 	} else {
 		phalcon_read_property(&put, getThis(), SL("_put"), PH_NOISY);
 		if (Z_TYPE(put) != IS_ARRAY) {
-			PHALCON_CALL_METHODW(&raw, getThis(), "getrawbody");
+			PHALCON_CALL_METHOD(&raw, getThis(), "getrawbody");
 
 			array_init(&new_put);
 
@@ -708,7 +708,7 @@ PHP_METHOD(Phalcon_Http_Request, getScheme){
 
 	PHALCON_STR(&https_header, "HTTPS");
 
-	PHALCON_CALL_METHODW(&https, getThis(), "getserver", &https_header);
+	PHALCON_CALL_METHOD(&https, getThis(), "getserver", &https_header);
 
 	if (zend_is_true(&https)) {
 		if (PHALCON_IS_STRING(&https, "off")) {
@@ -733,7 +733,7 @@ PHP_METHOD(Phalcon_Http_Request, isAjax)
 	PHALCON_STR(&requested_header, "HTTP_X_REQUESTED_WITH");
 	PHALCON_STR(&xml_http_request, "XMLHttpRequest");
 
-	PHALCON_CALL_METHODW(&requested_with, getThis(), "getheader", &requested_header);
+	PHALCON_CALL_METHOD(&requested_with, getThis(), "getheader", &requested_header);
 	is_equal_function(return_value, &requested_with, &xml_http_request);
 	return;
 }
@@ -770,7 +770,7 @@ PHP_METHOD(Phalcon_Http_Request, isSecureRequest)
 {
 	zval scheme = {}, https = {};
 
-	PHALCON_CALL_METHODW(&scheme, getThis(), "getscheme");
+	PHALCON_CALL_METHOD(&scheme, getThis(), "getscheme");
 
 	PHALCON_STR(&https, "https");
 	is_identical_function(return_value, &https, &scheme);
@@ -791,7 +791,7 @@ PHP_METHOD(Phalcon_Http_Request, getRawBody)
 
 	phalcon_read_property(&raw, getThis(), SL("_rawBody"), PH_NOISY);
 	if (Z_TYPE(raw) == IS_STRING) {
-		RETURN_CTORW(&raw);
+		RETURN_CTOR(&raw);
 	}
 
 	context = php_stream_context_from_zval(zcontext, 0);
@@ -830,7 +830,7 @@ PHP_METHOD(Phalcon_Http_Request, getJsonRawBody)
 		ac = 1;
 	}
 
-	PHALCON_CALL_METHODW(&raw_body, getThis(), "getrawbody");
+	PHALCON_CALL_METHOD(&raw_body, getThis(), "getrawbody");
 	if (Z_TYPE(raw_body) == IS_STRING) {
 		RETURN_ON_FAILURE(phalcon_json_decode(return_value, &raw_body, ac));
 		return;
@@ -846,7 +846,7 @@ PHP_METHOD(Phalcon_Http_Request, getBsonRawBody)
 {
 	zval raw_body = {};
 
-	PHALCON_CALL_METHODW(&raw_body, getThis(), "getrawbody");
+	PHALCON_CALL_METHOD(&raw_body, getThis(), "getrawbody");
 	if (Z_TYPE(raw_body) == IS_STRING) {
 		PHALCON_RETURN_CALL_FUNCTION("bson_decode", &raw_body);
 	}
@@ -863,7 +863,7 @@ PHP_METHOD(Phalcon_Http_Request, getServerAddress){
 
 	server = phalcon_get_global_str(SL("_SERVER"));
 	if (phalcon_array_isset_fetch_str(&server_addr, server, SL("SERVER_ADDR"))) {
-		RETURN_CTORW(&server_addr);
+		RETURN_CTOR(&server_addr);
 	}
 
 	RETURN_STRING("127.0.0.1");
@@ -880,7 +880,7 @@ PHP_METHOD(Phalcon_Http_Request, getServerName){
 
 	server = phalcon_get_global_str(SL("_SERVER"));
 	if (phalcon_array_isset_fetch_str(&server_name, server, SL("SERVER_NAME"))) {
-		RETURN_CTORW(&server_name);
+		RETURN_CTOR(&server_name);
 	}
 
 	RETURN_STRING("localhost");
@@ -901,31 +901,31 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	 */
 	PHALCON_STR(&host, "HTTP_HOST");
 
-	PHALCON_CALL_METHODW(&http_host, getThis(), "getserver", &host);
+	PHALCON_CALL_METHOD(&http_host, getThis(), "getserver", &host);
 
 	if (zend_is_true(&http_host)) {
-		RETURN_CTORW(&http_host);
+		RETURN_CTOR(&http_host);
 	}
 
 
 	/**
 	 * Get current scheme
 	 */
-	PHALCON_CALL_METHODW(&scheme, getThis(), "getscheme");
+	PHALCON_CALL_METHOD(&scheme, getThis(), "getscheme");
 
 	/**
 	 * Get the server name from _SERVER['SERVER_NAME']
 	 */
 	PHALCON_STR(&server_name, "SERVER_NAME");
 
-	PHALCON_CALL_METHODW(&name, getThis(), "getserver", &server_name);
+	PHALCON_CALL_METHOD(&name, getThis(), "getserver", &server_name);
 
 	/**
 	 * Get the server port from _SERVER['SERVER_PORT']
 	 */
 	PHALCON_STR(&server_port, "SERVER_PORT");
 
-	PHALCON_CALL_METHODW(&port, getThis(), "getserver", &server_port);
+	PHALCON_CALL_METHOD(&port, getThis(), "getserver", &server_port);
 
 	PHALCON_STR(&http, "http");
 	ZVAL_LONG(&standard_port, 80);
@@ -954,14 +954,14 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 	 * If is standard http we return the server name only
 	 */
 	if (PHALCON_IS_TRUE(&is_std_http)) {
-		RETURN_CTORW(&name);
+		RETURN_CTOR(&name);
 	}
 
 	/**
 	 * If is standard secure http we return the server name only
 	 */
 	if (PHALCON_IS_TRUE(&is_secure_http)) {
-		RETURN_CTORW(&name);
+		RETURN_CTOR(&name);
 	}
 
 	PHALCON_CONCAT_VSV(return_value, &name, ":", &port);
@@ -1006,10 +1006,10 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 			phalcon_fast_explode_str(&addresses, SL(","), &address);
 
 			phalcon_array_fetch_long(&first, &addresses, 0, PH_NOISY);
-			RETURN_CTORW(&first);
+			RETURN_CTOR(&first);
 		}
 
-		RETURN_CTORW(&address);
+		RETURN_CTOR(&address);
 	}
 
 	RETURN_FALSE;
@@ -1102,7 +1102,7 @@ PHP_METHOD(Phalcon_Http_Request, getUserAgent){
 
 	server = phalcon_get_global_str(SL("_SERVER"));
 	if (phalcon_array_isset_fetch_str(&user_agent, server, SL("HTTP_USER_AGENT"))) {
-		RETURN_CTORW(&user_agent);
+		RETURN_CTOR(&user_agent);
 	}
 
 	RETURN_EMPTY_STRING();
@@ -1120,7 +1120,7 @@ PHP_METHOD(Phalcon_Http_Request, isMethod){
 
 	phalcon_fetch_params(0, 1, 0, &methods);
 
-	PHALCON_CALL_METHODW(&http_method, getThis(), "getmethod");
+	PHALCON_CALL_METHOD(&http_method, getThis(), "getmethod");
 
 	if (Z_TYPE_P(methods) == IS_STRING) {
 		is_equal_function(return_value, methods, &http_method);
@@ -1151,7 +1151,7 @@ PHP_METHOD(Phalcon_Http_Request, isPost){
 
 	PHALCON_STR(&post, ISV(POST));
 
-	PHALCON_CALL_METHODW(&method, getThis(), "getmethod");
+	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &post);
 }
 
@@ -1170,7 +1170,7 @@ PHP_METHOD(Phalcon_Http_Request, isGet){
 
 	PHALCON_STR(&get, ISV(GET));
 
-	PHALCON_CALL_METHODW(&method, getThis(), "getmethod");
+	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &get);
 }
 
@@ -1189,7 +1189,7 @@ PHP_METHOD(Phalcon_Http_Request, isPut){
 
 	PHALCON_STR(&put, ISV(PUT));
 
-	PHALCON_CALL_METHODW(&method, getThis(), "getmethod");
+	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &put);
 }
 
@@ -1208,7 +1208,7 @@ PHP_METHOD(Phalcon_Http_Request, isPatch){
 
 	PHALCON_STR(&patch, ISV(PATCH));
 
-	PHALCON_CALL_METHODW(&method, getThis(), "getmethod");
+	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &patch);
 }
 
@@ -1227,7 +1227,7 @@ PHP_METHOD(Phalcon_Http_Request, isHead){
 
 	PHALCON_STR(&head, ISV(HEAD));
 
-	PHALCON_CALL_METHODW(&method, getThis(), "getmethod");
+	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &head);
 }
 
@@ -1246,7 +1246,7 @@ PHP_METHOD(Phalcon_Http_Request, isDelete){
 
 	PHALCON_STR(&delete, ISV(DELETE));
 
-	PHALCON_CALL_METHODW(&method, getThis(), "getmethod");
+	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &delete);
 }
 
@@ -1263,7 +1263,7 @@ PHP_METHOD(Phalcon_Http_Request, isOptions){
 		RETURN_BOOL(!strcmp(phalcon_http_request_getmethod_helper(), "OPTIONS"));
 	}
 
-	PHALCON_CALL_METHODW(&method, getThis(), "getmethod");
+	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &options);
 }
 
@@ -1447,7 +1447,7 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 				if (!zend_is_true(&error) || !only_successful) {
 					object_init_ex(&request_file, phalcon_http_request_file_ce);
 
-					PHALCON_CALL_METHODW(NULL, &request_file, "__construct", value, &index);
+					PHALCON_CALL_METHOD(NULL, &request_file, "__construct", value, &index);
 
 					phalcon_array_append(return_value, &request_file, PH_COPY);
 				}
@@ -1506,7 +1506,7 @@ PHP_METHOD(Phalcon_Http_Request, getHTTPReferer){
 
 	_SERVER = phalcon_get_global_str(SL("_SERVER"));
 	if (phalcon_array_isset_fetch_str(&http_referer, _SERVER, SL("HTTP_REFERER"))) {
-		RETURN_CTORW(&http_referer);
+		RETURN_CTOR(&http_referer);
 	}
 
 	RETURN_EMPTY_STRING();
@@ -1529,10 +1529,10 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 
 	array_init(return_value);
 
-	PHALCON_CALL_METHODW(&http_server, getThis(), "getserver", server_index);
+	PHALCON_CALL_METHOD(&http_server, getThis(), "getserver", server_index);
 
 	PHALCON_STR(&pattern, "/,\\s*/");
-	PHALCON_CALL_FUNCTIONW(&parts, "preg_split", &pattern, &http_server);
+	PHALCON_CALL_FUNCTION(&parts, "preg_split", &pattern, &http_server);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(parts), part) {
 		zval header_parts = {}, quality_part = {}, quality = {}, header_name = {};
@@ -1581,7 +1581,7 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTORW(&selected_name);
+	RETURN_CTOR(&selected_name);
 }
 
 /**
@@ -1596,7 +1596,7 @@ PHP_METHOD(Phalcon_Http_Request, getAcceptableContent)
 	PHALCON_STR(&accept_header, "HTTP_ACCEPT");
 	PHALCON_STR(&quality_index, "accept");
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_getqualityheader", &accept_header, &quality_index);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &accept_header, &quality_index);
 }
 
 /**
@@ -1610,8 +1610,8 @@ PHP_METHOD(Phalcon_Http_Request, getBestAccept)
 
 	PHALCON_STR(&quality_index, "accept");
 
-	PHALCON_CALL_METHODW(&acceptable_content, getThis(), "getacceptablecontent");
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_getbestquality", &acceptable_content, &quality_index);
+	PHALCON_CALL_METHOD(&acceptable_content, getThis(), "getacceptablecontent");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &acceptable_content, &quality_index);
 }
 
 /**
@@ -1626,7 +1626,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientCharsets)
 	PHALCON_STR(&charset_header, "HTTP_ACCEPT_CHARSET");
 	PHALCON_STR(&quality_index, "charset");
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_getqualityheader", &charset_header, &quality_index);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &charset_header, &quality_index);
 }
 
 /**
@@ -1640,8 +1640,8 @@ PHP_METHOD(Phalcon_Http_Request, getBestCharset)
 
 	PHALCON_STR(&quality_index, "charset");
 
-	PHALCON_CALL_METHODW(&client_charsets, getThis(), "getclientcharsets");
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_getbestquality", &client_charsets, &quality_index);
+	PHALCON_CALL_METHOD(&client_charsets, getThis(), "getclientcharsets");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &client_charsets, &quality_index);
 }
 
 /**
@@ -1656,7 +1656,7 @@ PHP_METHOD(Phalcon_Http_Request, getLanguages)
 	PHALCON_STR(&language_header, "HTTP_ACCEPT_LANGUAGE");
 	PHALCON_STR(&quality_index, "language");
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_getqualityheader", &language_header, &quality_index);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &language_header, &quality_index);
 }
 
 /**
@@ -1668,10 +1668,10 @@ PHP_METHOD(Phalcon_Http_Request, getBestLanguage)
 {
 	zval languages = {}, quality_index = {};
 
-	PHALCON_CALL_METHODW(&languages, getThis(), "getlanguages");
+	PHALCON_CALL_METHOD(&languages, getThis(), "getlanguages");
 
 	PHALCON_STR(&quality_index, "language");
-	PHALCON_RETURN_CALL_METHODW(getThis(), "_getbestquality", &languages, &quality_index);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &languages, &quality_index);
 }
 
 /**
@@ -1745,7 +1745,7 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 		ZVAL_LONG(&set_order, 2);
 
 		ZVAL_MAKE_REF(&matches);
-		PHALCON_CALL_FUNCTIONW(&ret, "preg_match_all", &pattern, &digest, &matches, &set_order);
+		PHALCON_CALL_FUNCTION(&ret, "preg_match_all", &pattern, &digest, &matches, &set_order);
 		ZVAL_UNREF(&matches);
 
 		if (zend_is_true(&ret) && Z_TYPE(matches) == IS_ARRAY) {

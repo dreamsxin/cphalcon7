@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUserAgent){
 
 	phalcon_update_property_zval(getThis(), SL("_useragent"), useragent);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 		phalcon_update_property_zval(getThis(), SL("_entity_body"), entity_body);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -186,9 +186,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setHeader){
 
 	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(NULL, &header, "set", name, value);
+	PHALCON_CALL_METHOD(NULL, &header, "set", name, value);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -205,9 +205,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setHeaders){
 
 	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(NULL, &header, "setMultiple", headers);
+	PHALCON_CALL_METHOD(NULL, &header, "setMultiple", headers);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setData){
 	phalcon_fetch_params(0, 1, 1, &data, &type);
 
 	if (Z_TYPE_P(data) != IS_NULL && Z_TYPE_P(data) != IS_STRING && Z_TYPE_P(data) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_http_client_exception_ce, "data must be string or array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_http_client_exception_ce, "data must be string or array");
 		return;
 	}
 
@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setData){
 		phalcon_update_property_zval(getThis(), SL("_type"), type);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFile){
 
 	// zend_error_noreturn(E_DEPRECATED, "Method Phalcon\\Http\\Client\\Adapter::setFile is deprecated, please use Phalcon\\Http\\Client\\Adapter::setFiles instead");
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setFiles){
 		phalcon_update_property_zval(getThis(), SL("_files"), files);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getPath){
 
 	phalcon_read_property(&base_uri, getThis(), SL("_base_uri"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(return_value, &base_uri, "getpath");
+	PHALCON_CALL_METHOD(return_value, &base_uri, "getpath");
 }
 
 /**
@@ -312,16 +312,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, get){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
+		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("GET"));
 	
-	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "send");
 }
 
 /**
@@ -338,16 +338,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, head){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
+		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("HEAD"));
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "send");
 }
 
 /**
@@ -364,16 +364,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, post){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
+		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("POST"));
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "send");
 }
 
 /**
@@ -390,16 +390,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, put){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
+		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("PUT"));
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "send");
 }
 
 /**
@@ -416,16 +416,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, delete){
 	phalcon_fetch_params(0, 0, 2, &uri, &data);
 
 	if (uri) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "seturi", uri);
+		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdata", data);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("DELETE"));
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "send");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "send");
 }
 
 /**
@@ -443,13 +443,13 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUri){
 	phalcon_read_property(&base_uri, getThis(), SL("_base_uri"), PH_NOISY);
 
 	if (Z_TYPE(base_uri) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &base_uri, "extend", uri);
+		PHALCON_CALL_METHOD(NULL, &base_uri, "extend", uri);
 		phalcon_update_property_zval(getThis(), SL("_base_uri"), &base_uri);
 	} else {
-		PHALCON_CALL_SELFW(NULL, "setbaseuri", uri);
+		PHALCON_CALL_SELF(NULL, "setbaseuri", uri);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -464,11 +464,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getUri){
 	phalcon_read_property(&base_uri, getThis(), SL("_base_uri"), PH_NOISY);
 
 	if (Z_TYPE(base_uri) != IS_OBJECT) {
-		PHALCON_CALL_SELFW(NULL, "setbaseuri");
+		PHALCON_CALL_SELF(NULL, "setbaseuri");
 		phalcon_read_property(&base_uri, getThis(), SL("_base_uri"), PH_NOISY);
 	}
 
-	RETURN_CTORW(&base_uri);
+	RETURN_CTOR(&base_uri);
 }
 
 /**
@@ -488,11 +488,11 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setBaseUri){
 	}
 
 	object_init_ex(&base_uri, phalcon_http_uri_ce);
-	PHALCON_CALL_METHODW(NULL, &base_uri, "__construct", uri);
+	PHALCON_CALL_METHOD(NULL, &base_uri, "__construct", uri);
 
 	phalcon_update_property_zval(getThis(), SL("_base_uri"), &base_uri);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -509,7 +509,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setMethod){
 
 	phalcon_update_property_zval(getThis(), SL("_method"), method);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -526,7 +526,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setTimeOut){
 
 	phalcon_update_property_zval(getThis(), SL("_timeout"), time);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -541,9 +541,9 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, send){
 	phalcon_fetch_params(0, 0, 1, &uri);
 
 	if (uri) {
-		PHALCON_CALL_SELFW(NULL, "seturi", uri);
+		PHALCON_CALL_SELF(NULL, "seturi", uri);
 	}
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "sendinternal");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "sendinternal");
 }
 

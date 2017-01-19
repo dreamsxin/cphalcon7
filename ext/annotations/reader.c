@@ -80,13 +80,13 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	phalcon_fetch_params(0, 1, 0, &class_name);
 
 	if (unlikely(Z_TYPE_P(class_name) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "The class name must be a string");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The class name must be a string");
 		return;
 	}
 
 	class_ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT);
 	if (!class_ce) {
-		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_annotations_exception_ce, "Class %s does not exist", Z_STRVAL_P(class_name));
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_annotations_exception_ce, "Class %s does not exist", Z_STRVAL_P(class_name));
 		return;
 	}
 
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		}
 	}
 
-	RETURN_CTORW(&annotations);
+	RETURN_CTOR(&annotations);
 }
 
 /**

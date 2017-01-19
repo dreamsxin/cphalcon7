@@ -169,12 +169,12 @@ PHP_METHOD(Phalcon_Filter, add){
 	phalcon_fetch_params(0, 2, 0, &name, &handler);
 
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_filter_exception_ce, "Filter must be an object or callable");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_filter_exception_ce, "Filter must be an object or callable");
 		return;
 	}
 
 	phalcon_update_property_array(getThis(), SL("_filters"), name, handler);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 					array_init(&array_value);
 
 					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(new_value), item_idx, item_key, item_value) {
-						PHALCON_CALL_METHODW(&filter_value, getThis(), "_sanitize", item_value, filter);
+						PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filter);
 
 						if (item_key) {
 							phalcon_array_update_string(&array_value, item_key, &filter_value, PH_COPY);
@@ -222,14 +222,14 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 
 					PHALCON_CPY_WRT_CTOR(&new_value, &array_value);
 				} else {
-					PHALCON_CALL_METHODW(&filter_value, getThis(), "_sanitize", &new_value, filter);
+					PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", &new_value, filter);
 					PHALCON_CPY_WRT_CTOR(&new_value, &filter_value);
 				}
 			} ZEND_HASH_FOREACH_END();
 
 		}
 
-		RETURN_CTORW(&new_value);
+		RETURN_CTOR(&new_value);
 	}
 
 	/**
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		array_init(&sanizited_value);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), item_idx, item_key, item_value) {
-			PHALCON_CALL_METHODW(&filter_value, getThis(), "_sanitize", item_value, filters);
+			PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filters);
 			if (item_key) {
 				phalcon_array_update_string(&sanizited_value, item_key, &filter_value, PH_COPY);
 			} else {
@@ -248,10 +248,10 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		PHALCON_CALL_METHODW(&sanizited_value, getThis(), "_sanitize", value, filters);
+		PHALCON_CALL_METHOD(&sanizited_value, getThis(), "_sanitize", value, filters);
 	}
 
-	RETURN_CTORW(&sanizited_value);
+	RETURN_CTOR(&sanizited_value);
 }
 
 /**
@@ -274,16 +274,16 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		 * If the filter is a closure we call it in the PHP userland
 		 */
 		if (Z_TYPE(filter_object) == IS_OBJECT && instanceof_function(Z_OBJCE(filter_object), zend_ce_closure)) {
-			PHALCON_CALL_METHODW(return_value, &filter_object, "call", getThis(), value);
+			PHALCON_CALL_METHOD(return_value, &filter_object, "call", getThis(), value);
 			return;
 		} else if (phalcon_is_callable(&filter_object)) {
 			array_init_size(&arguments, 1);
 			phalcon_array_append(&arguments, value, PH_COPY);
-			PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &filter_object, &arguments);
+			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &filter_object, &arguments);
 			return;
 		}
 
-		PHALCON_RETURN_CALL_METHODW(&filter_object, "filter", value);
+		PHALCON_RETURN_CALL_METHOD(&filter_object, "filter", value);
 		return;
 	}
 
@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 		PHALCON_STR_REPLACE(&escaped, &quote, &empty_str, value);
 
-		PHALCON_CALL_FUNCTIONW(&filtered, "filter_var", &escaped, &type);
+		PHALCON_CALL_FUNCTION(&filtered, "filter_var", &escaped, &type);
 		goto ph_end_0;
 	}
 
@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		 */
 		ZVAL_LONG(&type, 519); /* FILTER_SANITIZE_NUMBER_INT */
 
-		PHALCON_CALL_FUNCTIONW(&filtered, "filter_var", value, &type);
+		PHALCON_CALL_FUNCTION(&filtered, "filter_var", value, &type);
 		goto ph_end_0;
 	}
 
@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	if (PHALCON_IS_STRING(filter, "string")) {
 		ZVAL_LONG(&type, 513); /* FILTER_SANITIZE_STRING */
 
-		PHALCON_CALL_FUNCTIONW(&filtered, "filter_var", value, &type);
+		PHALCON_CALL_FUNCTION(&filtered, "filter_var", value, &type);
 		goto ph_end_0;
 	}
 
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 		ZVAL_LONG(&type, 520); /* FILTER_SANITIZE_NUMBER_FLOAT */
 
-		PHALCON_CALL_FUNCTIONW(&filtered, "filter_var", value, &type, &options);
+		PHALCON_CALL_FUNCTION(&filtered, "filter_var", value, &type, &options);
 		goto ph_end_0;
 	}
 
@@ -382,7 +382,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 			 * 'lower' checks for the mbstring extension to make a correct lowercase
 			 * transformation
 			 */
-			PHALCON_CALL_FUNCTIONW(&filtered, "mb_strtolower", value);
+			PHALCON_CALL_FUNCTION(&filtered, "mb_strtolower", value);
 		} else {
 			phalcon_fast_strtolower(&filtered, value);
 		}
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 			 * 'upper' checks for the mbstring extension to make a correct lowercase
 			 * transformation
 			 */
-			PHALCON_CALL_FUNCTIONW(&filtered, "mb_strtoupper", value);
+			PHALCON_CALL_FUNCTION(&filtered, "mb_strtoupper", value);
 		} else {
 			phalcon_fast_strtoupper(&filtered, value);
 		}
@@ -411,23 +411,23 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "date")) {
-		PHALCON_CALL_CE_STATICW(&filtered, phalcon_date_ce, "filter", value);
+		PHALCON_CALL_CE_STATIC(&filtered, phalcon_date_ce, "filter", value);
 		goto ph_end_0;
 	}
 
 	if (PHALCON_IS_STRING(filter, "datetime")) {
 		ZVAL_STRING(&format, "Y-m-d H:i:s");
-		PHALCON_CALL_CE_STATICW(&filtered, phalcon_date_ce, "filter", value, &format);
+		PHALCON_CALL_CE_STATIC(&filtered, phalcon_date_ce, "filter", value, &format);
 		goto ph_end_0;
 	}
 
 	PHALCON_CONCAT_SVS(&exception_message, "Sanitize filter ", filter, " is not supported");
-	PHALCON_THROW_EXCEPTION_ZVALW(phalcon_filter_exception_ce, &exception_message);
+	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_filter_exception_ce, &exception_message);
 	return;
 
 	ph_end_0:
 
-	RETURN_CTORW(&filtered);
+	RETURN_CTOR(&filtered);
 }
 
 /**

@@ -79,9 +79,9 @@ PHP_METHOD(Phalcon_Http_Client, factory)
 
 	if (phalcon_function_exists_ex(SL("curl_init")) != FAILURE) {
 		object_init_ex(return_value, phalcon_http_client_adapter_curl_ce);
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct", uri, &method);
+		PHALCON_CALL_METHOD(NULL, return_value, "__construct", uri, &method);
 	} else {
 		object_init_ex(return_value, phalcon_http_client_adapter_stream_ce);
-		PHALCON_CALL_METHODW(NULL, return_value, "__construct", uri, &method);
+		PHALCON_CALL_METHOD(NULL, return_value, "__construct", uri, &method);
 	}
 }

@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 
 	phalcon_file_put_contents(&status, &path, &php_export);
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_annotations_exception_ce, "Annotations directory cannot be written");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Annotations directory cannot be written");
 		return;
 	}
 }

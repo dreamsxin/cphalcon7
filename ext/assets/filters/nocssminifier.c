@@ -27,7 +27,7 @@
 
 int phalcon_cssmin(zval *return_value, zval *style) {
 
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_assets_exception_ce, "Non-free csssminifier not available");
+	PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "Non-free csssminifier not available");
 	return FAILURE;
 }
 #endif

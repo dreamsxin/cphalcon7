@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
 			phalcon_array_append_string(&longopts, SL("task::"), 0);
 			phalcon_array_append_string(&longopts, SL("action::"), 0);
 			phalcon_array_append_string(&longopts, SL("params::"), 0);
-			PHALCON_CALL_FUNCTIONW(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
+			PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 		} else {
 			array_init(&options);
 		}

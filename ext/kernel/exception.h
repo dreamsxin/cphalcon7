@@ -22,34 +22,20 @@
 
 #include "php_phalcon.h"
 
-/** Exceptions */
-#define PHALCON_THROW_EXCEPTION_STR(class_entry, message) \
-	do { \
-		phalcon_throw_exception_string(class_entry, message); \
-	} while (0)
-
 #define PHALCON_THROW_EXCEPTION_DEBUG_STR(class_entry, message, file, line) \
   do { \
     phalcon_throw_exception_string_debug(class_entry, message, strlen(message), file, line); \
   } while (0)
-#define PHALCON_THROW_EXCEPTION_ZVAL(class_entry, message) \
-	do { \
-		phalcon_throw_exception_zval(class_entry, message); \
-	} while (0)
 
 #define PHALCON_THROW_EXCEPTION_DEBUG_ZVAL(class_entry, message, file, line) \
   do { \
     phalcon_throw_exception_zval(class_entry, message, file, line); \
   } while (0)
-#define PHALCON_THROW_EXCEPTION_STRW(class_entry, message)  phalcon_throw_exception_string(class_entry, message)
-#define PHALCON_THROW_EXCEPTION_ZVALW(class_entry, message) phalcon_throw_exception_zval(class_entry, message)
 
-#define PHALCON_THROW_EXCEPTION_FORMAT(class_entry, format, ...) \
-	do { \
-		phalcon_throw_exception_format(class_entry, format, __VA_ARGS__); \
-	} while (0)
+#define PHALCON_THROW_EXCEPTION_STR(class_entry, message)  phalcon_throw_exception_string(class_entry, message)
+#define PHALCON_THROW_EXCEPTION_ZVAL(class_entry, message) phalcon_throw_exception_zval(class_entry, message)
 
-#define PHALCON_THROW_EXCEPTION_FORMATW(class_entry, format, ...) phalcon_throw_exception_format(class_entry, format, __VA_ARGS__);
+#define PHALCON_THROW_EXCEPTION_FORMAT(class_entry, format, ...) phalcon_throw_exception_format(class_entry, format, __VA_ARGS__);
 
 
 /** Throw Exceptions */

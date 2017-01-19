@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, join){
 	phalcon_array_append(&join, alias, PH_COPY);
 	phalcon_array_append(&join, type, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_joins"), &join);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, innerJoin){
 	phalcon_array_append(&join, alias, PH_COPY);
 	phalcon_array_append(&join, &type, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_joins"), &join);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, leftJoin){
 	phalcon_array_append(&join, alias, PH_COPY);
 	phalcon_array_append(&join, &type, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_joins"), &join);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -264,5 +264,5 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, rightJoin){
 	phalcon_array_append(&join, alias, PH_COPY);
 	phalcon_array_append(&join, &type, PH_COPY);
 	phalcon_update_property_zval(getThis(), SL("_joins"), &join);
-	RETURN_THISW();
+	RETURN_THIS();
 }

@@ -101,13 +101,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	PHALCON_CPY_WRT_CTOR(&backend_options, options);
 
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");
+	if (Z_TYPE_P(options) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
 
 	if (!phalcon_array_isset_str(options, SL("collection"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The parameter 'collection' is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The parameter 'collection' is required");
 		return;
 	}
 
@@ -127,13 +127,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHODW(NULL, &frontend_data, "__construct", &option);
+	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &option);
 
 	phalcon_array_update_str_str(&backend_options, SL("statsKey"), SL("$PMM$"), PH_COPY);;
 
 	object_init_ex(&mongo, phalcon_cache_backend_mongo_ce);
 
-	PHALCON_CALL_METHODW(NULL, &mongo, "__construct", &frontend_data, &backend_options);
+	PHALCON_CALL_METHOD(NULL, &mongo, "__construct", &frontend_data, &backend_options);
 
 	phalcon_update_property_zval(getThis(), SL("_mongo"), &mongo);
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, read){
 
 	if (Z_TYPE(mongo) == IS_OBJECT) {
 		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
-		PHALCON_RETURN_CALL_METHODW(&mongo, "get", key, &lifetime);
+		PHALCON_RETURN_CALL_METHOD(&mongo, "get", key, &lifetime);
 
 		return;
 	}
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, write){
 
 	if (Z_TYPE(mongo) == IS_OBJECT) {
 		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
-		PHALCON_CALL_METHODW(NULL, &mongo, "save", key, data, &lifetime);	
+		PHALCON_CALL_METHOD(NULL, &mongo, "save", key, data, &lifetime);
 	}
 }
 
@@ -190,8 +190,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, reset){
 	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY);
 
 	if (Z_TYPE(mongo) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &mongo, "flush");	
+		PHALCON_CALL_METHOD(NULL, &mongo, "flush");
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_mongo_ce, getThis(), "reset");
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_mongo_ce, getThis(), "reset");
 }

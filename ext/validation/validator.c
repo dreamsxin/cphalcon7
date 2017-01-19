@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Validation_Validator, __construct){
 	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
 		if (Z_TYPE_P(options) != IS_NULL) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Options must be an array");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Options must be an array");
 			return;
 		}
 	} else {

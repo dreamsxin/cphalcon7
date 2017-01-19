@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 	phalcon_fetch_params(0, 0, 6, &options, &_expire, &_path, &_secure, &_domain, &_http_only);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setoptions", options);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setoptions", options);
 	}
 
 	if (!_expire) {
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 	}
 
 	if (_expire || _path || _secure || _domain || _http_only) {
-		PHALCON_CALL_FUNCTIONW(NULL, "session_set_cookie_params", &expire, &path, &secure, &domain, &http_only);
+		PHALCON_CALL_FUNCTION(NULL, "session_set_cookie_params", &expire, &path, &secure, &domain, &http_only);
 	}
 }
 
@@ -279,10 +279,10 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 				zend_hash_del(Z_ARRVAL_P(Z_REFVAL(PS(http_session_vars))), Z_STR(key));
 			}
 		}
-		RETURN_CTORW(&value);
+		RETURN_CTOR(&value);
 	}
 
-	RETURN_CTORW(default_value);
+	RETURN_CTOR(default_value);
 }
 
 /**
@@ -334,7 +334,7 @@ PHP_METHOD(Phalcon_Session_Adapter, sets){
 				ZVAL_LONG(&index, idx);
 			}
 
-			PHALCON_CALL_SELFW(NULL, "set", &index, value);
+			PHALCON_CALL_SELF(NULL, "set", &index, value);
 		} ZEND_HASH_FOREACH_END();
 	}
 }
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __get)
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
-	PHALCON_RETURN_CALL_SELFW("get", property);
+	PHALCON_RETURN_CALL_SELF("get", property);
 }
 
 PHP_METHOD(Phalcon_Session_Adapter, count)
@@ -458,7 +458,7 @@ PHP_METHOD(Phalcon_Session_Adapter, getIterator)
 
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
 	object_init_ex(return_value, spl_ce_ArrayIterator);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", _SESSION);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", _SESSION);
 }
 
 /**

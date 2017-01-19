@@ -98,12 +98,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 	phalcon_fetch_params(0, 1, 0, &options);
 	
 	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "The options must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&host, options, SL("host"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "No session host given in options");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "No session host given in options");
 		return;
 	}
 
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
-	PHALCON_CALL_METHODW(NULL, &frontend_data, "__construct", &option);
+	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &option);
 
 	array_init_size(&option, 3);
 
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, __construct){
 
 	object_init_ex(&memcache, phalcon_cache_backend_memcache_ce);
 
-	PHALCON_CALL_METHODW(NULL, &memcache, "__construct", &frontend_data, &option);
+	PHALCON_CALL_METHOD(NULL, &memcache, "__construct", &frontend_data, &option);
 
 	phalcon_update_property_zval(getThis(), SL("_memcache"), &memcache);
 	
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, read){
 	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE(memcache) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHODW(&memcache, "get", key, &lifetime);
+		PHALCON_RETURN_CALL_METHOD(&memcache, "get", key, &lifetime);
 	} else {
 		RETURN_NULL();
 	}
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, write){
 	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE(memcache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &memcache, "save", key, data, &lifetime);	
+		PHALCON_CALL_METHOD(NULL, &memcache, "save", key, data, &lifetime);	
 	}
 }
 
@@ -201,8 +201,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcache, reset){
 	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_NOISY);
 
 	if (Z_TYPE(memcache) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &memcache, "flush");	
+		PHALCON_CALL_METHOD(NULL, &memcache, "flush");	
 	}
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_mvc_model_metadata_memcache_ce, getThis(), "reset");
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_memcache_ce, getThis(), "reset");
 }

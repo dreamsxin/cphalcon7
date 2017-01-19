@@ -170,5 +170,5 @@ PHP_METHOD(Phalcon_Mvc_User_Logic, call){
 
 	ce0 = phalcon_class_exists(&logic_name, 1);
 	PHALCON_OBJECT_INIT(return_value, ce0);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", action, params);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", action, params);
 }

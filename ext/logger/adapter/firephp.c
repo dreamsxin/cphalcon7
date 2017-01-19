@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
-	PHALCON_CALL_METHODW(&formatter, getThis(), "getformatter");
+	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
 
 	phalcon_return_static_property_ce(&initialized, phalcon_logger_adapter_firephp_ce, SL("_initialized"));
 	if (!zend_is_true(&initialized)) {
@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		ZVAL_TRUE(&initialized); /* This will also update the property because "initialized" was not separated */
 	}
 
-	PHALCON_CALL_METHODW(&applied_format, &formatter, "format", message, type, time, context);
+	PHALCON_CALL_METHOD(&applied_format, &formatter, "format", message, type, time, context);
 	convert_to_string(&applied_format);
 
 	phalcon_return_static_property_ce(&index, phalcon_logger_adapter_firephp_ce, SL("_index"));

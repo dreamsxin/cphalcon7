@@ -148,9 +148,9 @@ class ModelsResultsetCacheTest extends PHPUnit_Framework_TestCase
 
 
 		//TODO: I really can't understand why postgresql fails on inserting a simple record
-		//The error is "Object not in prerequisite state: 7 ERROR:  
+		//The error is "Object not in prerequisite state: 7 ERROR:
 		//currval of sequence "robots_id_seq" is not yet defined in this session"
-		//Is the ORM working with postgresql, is the database structure incorrect or 
+		//Is the ORM working with postgresql, is the database structure incorrect or
 		//I'm using the wrong code?
 		//Skip this test until someone can shed some light on this
 		if (!$di->get("db") instanceof Phalcon\Db\Adapter\Pdo\Postgresql)
@@ -160,7 +160,7 @@ class ModelsResultsetCacheTest extends PHPUnit_Framework_TestCase
 				'cache' => array('key' => 'some-count'),
 			));
 			$this->assertEquals($robotscount, 3);
-			
+
 			//Create a temporary robot to test if the count is cached or fresh
 			$newrobot = new Robots();
 			$newrobot->name = "Not cached robot";
@@ -239,8 +239,6 @@ class ModelsResultsetCacheTest extends PHPUnit_Framework_TestCase
 		));
 		$this->assertEquals(count($robots), 3);
 		$this->assertFalse($robots->isFresh());
-
-		$this->assertEquals($robots->getCache()->getLastKey(), 'other-some');
 
 		$this->assertEquals($robots->getCache()->queryKeys(), array(
 			0 => 'other-some',

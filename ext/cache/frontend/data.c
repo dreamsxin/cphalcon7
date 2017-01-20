@@ -82,7 +82,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cache_frontend_data_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Frontend_Data, __construct, arginfo_phalcon_cache_frontend_data___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Cache_Frontend_Data, getLifetime, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Frontend_Data, getLifetime, arginfo_phalcon_cache_frontendinterface_getlifetime, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Frontend_Data, isBuffering, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Frontend_Data, start, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Frontend_Data, getContent, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, __construct){
 	zval *frontend_options = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &frontend_options);
-	
+
 	if (frontend_options) {
 		phalcon_update_property_zval(getThis(), SL("_frontendOptions"), frontend_options);
 	}
@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, isBuffering){
 PHP_METHOD(Phalcon_Cache_Frontend_Data, start){
 
 
-	
+
 }
 
 /**
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Data, getContent){
 PHP_METHOD(Phalcon_Cache_Frontend_Data, stop){
 
 
-	
+
 }
 
 /**

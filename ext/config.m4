@@ -331,10 +331,6 @@ binary.c \
 binary/reader.c \
 binary/writer.c \
 binary/exception.c \
-socket.c \
-socket/client.c \
-socket/server.c \
-socket/exception.c \
 process/sharedmemory.c \
 intrusive/avltree.c \
 intrusive/avltree/node.c \
@@ -398,8 +394,7 @@ mvc/model/metadata/apc.c \
 mvc/model/metadata/xcache.c \
 mvc/model/metadata/memory.c \
 mvc/model/metadata/session.c \
-mvc/model/metadata/memcache.c \
-mvc/model/metadata/libmemcached.c \
+mvc/model/metadata/memcached.c \
 mvc/model/metadata/redis.c \
 mvc/model/metadata/cache.c \
 mvc/model/transaction.c \
@@ -514,8 +509,7 @@ cache/frontend/output.c \
 cache/backend/file.c \
 cache/backend/apc.c \
 cache/backend/xcache.c \
-cache/backend/memcache.c \
-cache/backend/libmemcached.c \
+cache/backend/memcached.c \
 cache/backend/memory.c \
 cache/backend/redis.c \
 cache/exception.c \
@@ -534,8 +528,7 @@ session/exception.c \
 session/baginterface.c \
 session/adapterinterface.c \
 session/adapter.c \
-session/adapter/memcache.c \
-session/adapter/libmemcached.c \
+session/adapter/memcached.c \
 session/adapter/cache.c \
 diinterface.c \
 escaper.c \
@@ -689,6 +682,7 @@ process/exception.c"
 		[
 			PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
 			AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
+            phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c socket/exception.c"
 		],
 		,
 		[[#include "main/php.h"]]
@@ -813,6 +807,11 @@ process/exception.c"
 
 			AC_DEFINE([PHALCON_USE_MONGOC], [1], [Have libmongoc support])
 			phalcon_sources="$phalcon_sources cache/backend/mongo.c mvc/model/metadata/mongo.c"
+
+            PHP_CHECK_LIBRARY(mongoc-1.0, mongoc_collection_find_with_opts,
+            [
+                AC_DEFINE(PHALCON_MONGOC_HAS_FIND_OPTS, 1, [Has mongoc_collection_find_with_opts support])
+            ])
 			break
 		else
 			AC_MSG_RESULT([no, found in $i])

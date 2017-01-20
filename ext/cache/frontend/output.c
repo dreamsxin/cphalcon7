@@ -31,7 +31,7 @@
  * Allows to cache output fragments captured with ob_* functions
  *
  *<code>
- * 
+ *
  * //Create an Output frontend. Cache the files for 2 days
  * $frontCache = new Phalcon\Cache\Frontend\Output(array(
  *   "lifetime" => 172800
@@ -89,7 +89,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cache_frontend_output_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Frontend_Output, __construct, arginfo_phalcon_cache_frontend_output___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Cache_Frontend_Output, getLifetime, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Frontend_Output, getLifetime, arginfo_phalcon_cache_frontendinterface_getlifetime, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Frontend_Output, isBuffering, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Frontend_Output, start, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Frontend_Output, getContent, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, __construct){
 	zval *frontend_options = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &frontend_options);
-	
+
 	if (frontend_options) {
 		phalcon_update_property_zval(getThis(), SL("_frontendOptions"), frontend_options);
 	}
@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, stop){
 	if (zend_is_true(&buffering)) {
 		phalcon_ob_end_clean();
 	}
-	
+
 	phalcon_update_property_bool(getThis(), SL("_buffering"), 0);
 }
 

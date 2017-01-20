@@ -22,6 +22,7 @@
 
 #include "php_phalcon.h"
 
+int phalcon_file_exists_str(char *filename);
 int phalcon_file_exists(zval *filename);
 int phalcon_compare_mtime(zval *filename1, zval *filename2);
 void phalcon_fix_path(zval *return_value, zval *path, zval *directory_separator);

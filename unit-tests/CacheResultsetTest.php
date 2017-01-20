@@ -77,13 +77,7 @@ class CacheResultsetTest extends PHPUnit_Framework_TestCase
 				));
 				break;
 			case 'Memcached':
-				$cache = new Phalcon\Cache\Backend\Memcache($frontCache, array(
-					"host" => "localhost",
-					"port" => "11211"
-				));
-				break;
-			case 'Libmemcached':
-				$cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+				$cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 					"servers" => array(
 						array(
 							"host" => "localhost",

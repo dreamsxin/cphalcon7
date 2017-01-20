@@ -17,13 +17,13 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_MVC_MODEL_METADATA_MEMCACHE_H
-#define PHALCON_MVC_MODEL_METADATA_MEMCACHE_H
+#ifndef PHALCON_CACHE_BACKEND_MEMCACHED_H
+#define PHALCON_CACHE_BACKEND_MEMCACHED_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_mvc_model_metadata_memcache_ce;
+extern zend_class_entry *phalcon_cache_backend_memcached_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Memcache);
+PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Memcached);
 
-#endif /* PHALCON_MVC_MODEL_METADATA_MEMCACHE_H */
+#endif /* PHALCON_CACHE_BACKEND_MEMCACHED_H */

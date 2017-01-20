@@ -67,7 +67,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		}
 
 		echo $time;
-		$cache->save(null, null, null, true);
+		$cache->save();
 
 		$obContent = ob_get_contents();
 		ob_end_clean();
@@ -100,7 +100,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		}
 
 		echo $time2;
-		$cache->save(null, null, null, true);
+		$cache->save();
 
 		$obContent2 = ob_get_contents();
 		ob_end_clean();
@@ -121,6 +121,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 			//Delete cache
 			$this->assertTrue($cache->delete('testoutput'));
+			$keys = $cache->queryKeys();
+			$this->assertEquals($keys, array());
 		}
 
 	}
@@ -194,7 +196,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 	{
 		$frontCache = new Phalcon\Cache\Frontend\None(array('lifetime' => 10));
 
-		$cache = new Phalcon\Cache\Backend\Memory($frontCache);
+		$cache = new Phalcon\Cache\Backend\Memory($frontCache, array('prefix' => 'unit'));
 
 		$this->assertFalse($cache->isStarted());
 
@@ -256,7 +258,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			'lifetime' => 2
 		));
 
-		$cache = new Phalcon\Cache\Backend\Memory($frontCache);
+		$cache = new Phalcon\Cache\Backend\Memory($frontCache, array('prefix' => 'unit'));
 		$cache->delete('foo');
 
 		$cache->save('foo', 20);
@@ -290,7 +292,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$frontCache = new Phalcon\Cache\Frontend\Igbinary(array('lifetime' => 600));
 
 		$cache = new Phalcon\Cache\Backend\File($frontCache, array(
-			'cacheDir' => 'unit-tests/cache/'
+			'cacheDir' => 'unit-tests/cache/',
+ 			'prefix' => 'unit'
 		));
 
 		$this->assertFalse($cache->isStarted());
@@ -334,161 +337,6 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($cachedContent, $data);
 
 		//Exists
-		$this->assertTrue($cache->exists('test-data'));
-
-		//Delete
-		$this->assertTrue($cache->delete('test-data'));
-
-	}
-
-	private function _prepareMemcached()
-	{
-
-		if (!extension_loaded('memcache')) {
-			$this->markTestSkipped('Warning: memcache extension is not loaded');
-			return false;
-		}
-
-		$memcache = new Memcache();
-		$this->assertFalse(!$memcache->connect('127.0.0.1'));
-		$memcache->flush();
-		sleep(1);
-
-		return $memcache;
-	}
-
-	public function testOutputMemcacheCache()
-	{
-
-		$memcache = $this->_prepareMemcached();
-		if (!$memcache) {
-			return false;
-		}
-
-		$memcache->delete('test-output');
-
-		$time = date('H:i:s');
-
-		$frontCache = new Phalcon\Cache\Frontend\Output(array(
-			'lifetime' => 2
-		));
-
-		$cache = new Phalcon\Cache\Backend\Memcache($frontCache);
-
-		ob_start();
-
-		//First time cache
-		$content = $cache->start('test-output');
-		if ($content !== null) {
-			$this->assertTrue(false);
-		}
-
-		echo $time;
-
-		$cache->save(null, null, null, true);
-
-		$obContent = ob_get_contents();
-		ob_end_clean();
-
-		$this->assertEquals($time, $obContent);
-		$this->assertEquals($time, $memcache->get('test-output'));
-
-		//Expect same cache
-		$content = $cache->start('test-output');
-		if ($content === null) {
-			$this->assertTrue(false);
-		}
-
-		$this->assertEquals($time, $obContent);
-
-		//Refresh cache
-		sleep(3);
-
-		$time2 = date('H:i:s');
-
-		ob_start();
-
-		$content = $cache->start('test-output');
-		if($content!==null){
-			$this->assertTrue(false);
-		}
-		echo $time2;
-		$cache->save(null, null, null, true);
-
-		$obContent2 = ob_get_contents();
-		ob_end_clean();
-
-		$this->assertNotEquals($time, $obContent2);
-		$this->assertEquals($time2, $obContent2);
-		$this->assertEquals($time2, $memcache->get('test-output'));
-
-		//Check if exists
-		$this->assertTrue($cache->exists('test-output'));
-
-		//Delete entry from cache
-		$this->assertTrue($cache->delete('test-output'));
-
-		$memcache->close();
-
-	}
-
-	public function testIncrAndDecrMemcacheCache()
-	{
-		$memcache = $this->_prepareMemcached();
-		if (!$memcache) {
-			return false;
-		}
-
-		$memcache->delete('test-incr');
-
-		$memcache->set('test-incr', 1);
-		$newValue = $memcache->increment('test-incr');
-		$this->assertEquals('2', $newValue);
-
-		$newValue = $memcache->increment('test-incr', 5);
-		$this->assertEquals('7', $newValue);
-
-		$newValue = $memcache->decrement('test-incr');
-		$this->assertEquals('6', $newValue);
-
-		$newValue = $memcache->decrement('test-incr', '3');
-		$this->assertEquals('3', $newValue);
-	}
-
-	public function testDataMemcachedCache()
-	{
-
-		$memcache = $this->_prepareMemcached();
-		if (!$memcache) {
-			return false;
-		}
-
-		$memcache->delete('test-data');
-
-		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 20));
-
-		$cache = new Phalcon\Cache\Backend\Memcache($frontCache, array(
-			'host' => '127.0.0.1',
-			'port' => '11211'
-		));
-
-		$data = array(1, 2, 3, 4, 5);
-
-		$cache->save('test-data', $data);
-
-		$cachedContent = $cache->get('test-data');
-		$this->assertEquals($cachedContent, $data);
-
-		$cache->save('test-data', "sure, nothing interesting");
-
-		$cachedContent = $cache->get('test-data');
-		$this->assertEquals($cachedContent, "sure, nothing interesting");
-
-		$this->assertEquals($cache->queryKeys(), array(
-			0 => 'test-data',
-		));
-
-		//Check if exists
 		$this->assertTrue($cache->exists('test-data'));
 
 		//Delete
@@ -573,7 +421,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		echo $time;
 
-		$cache->save(null, null, null, true);
+		$cache->save();
 
 		$obContent = ob_get_contents();
 		ob_end_clean();
@@ -600,6 +448,12 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		//Delete entry from cache
 		$this->assertTrue($cache->delete('test-output'));
+
+		$keys = $cache->queryKeys();
+		$this->assertEquals($keys, array(
+			1 => 'decrement',
+			2 => 'increment'
+		));
 	}
 
 	public function testDataApcCache()
@@ -638,8 +492,14 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($cache->queryKeys('long'), array('long-key'));
 
 		$this->assertTrue($cache->delete('a'));
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array('bcd', 'decrement', 'increment', 'long-key'));
 		$this->assertTrue($cache->delete('long-key'));
 		$this->assertTrue($cache->delete('bcd'));
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array('decrement', 'increment'));
 	}
 
 	protected function _prepareMongo()
@@ -678,7 +538,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		echo $time;
 
-		$cache->save(null, null, null, true);
+		$cache->save();
 
 		$obContent = ob_get_contents();
 		ob_end_clean();
@@ -706,6 +566,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		//Delete entry from cache
 		$this->assertTrue($cache->delete('test-output'));
+		$keys = $cache->queryKeys();
+		$this->assertEquals($keys, array());
 	}
 
 	public function testDataMongoCache()
@@ -830,7 +692,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		echo $time;
 
-		$cache->save(null, null, null, true);
+		$cache->save();
 
 		$obContent = ob_get_contents();
 		ob_end_clean();
@@ -855,6 +717,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		//Delete entry from cache
 		$this->assertTrue($cache->delete('test-output'));
+		$keys = $cache->queryKeys();
+		$this->assertEquals($keys, array());
 	}
 
 	public function testDataXcache()
@@ -935,7 +799,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('14', $newValue);
 	}
 
-	private function _prepareLibmemcached()
+	private function _prepareMemcached()
 	{
 
 		if (!extension_loaded('memcached')) {
@@ -951,10 +815,10 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		return $memcache;
 	}
 
-	public function testOutputLibmemcachedCache()
+	public function testOutputMemcachedCache()
 	{
 
-		$memcache = $this->_prepareLibmemcached();
+		$memcache = $this->_prepareMemcached();
 		if (!$memcache) {
 			return false;
 		}
@@ -967,7 +831,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			'lifetime' => 2
 		));
 
-		$cache = new Phalcon\Cache\Backend\Libmemcached($frontCache);
+		$cache = new Phalcon\Cache\Backend\Memcached($frontCache);
 
 		ob_start();
 
@@ -979,7 +843,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		echo $time;
 
-		$cache->save(null, null, null, true);
+		$cache->save();
 
 		$obContent = ob_get_contents();
 		ob_end_clean();
@@ -1007,7 +871,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			$this->assertTrue(false);
 		}
 		echo $time2;
-		$cache->save(null, null, null, true);
+		$cache->save();
 
 		$obContent2 = ob_get_contents();
 		ob_end_clean();
@@ -1023,8 +887,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($cache->delete('test-output'));
 	}
 
-	public function testLibMemcachedIncrement() {
-		$memcache = $this->_prepareLibmemcached();
+	public function testMemcachedIncrement() {
+		$memcache = $this->_prepareMemcached();
 		if (!$memcache) {
 			return false;
 		}
@@ -1032,13 +896,14 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		// Travis can be slow, especially when Valgrind is used
 		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 900));
 
-		$cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+		$cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 			'servers' => array(
 				array(
 					'host' => '127.0.0.1',
 					'port' => '11211',
 					'weight' => '1'),
-			)
+			),
+			'prefix' => 'unit'
 		));
 
 		$cache->delete('foo');
@@ -1050,8 +915,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$cache->delete('foo');
 	}
 
-	public function testLibMemcachedDecrement() {
-		$memcache = $this->_prepareLibmemcached();
+	public function testMemcachedDecrement() {
+		$memcache = $this->_prepareMemcached();
 		if (!$memcache) {
 			return false;
 		}
@@ -1059,13 +924,14 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		// Travis can be slow, especially when Valgrind is used
 		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 900));
 
-		$cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+		$cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 			'servers' => array(
 				array(
 					'host' => '127.0.0.1',
 					'port' => '11211',
 					'weight' => '1'),
-			)
+			),
+			'prefix' => 'unit'
 		));
 		$cache->delete('foo');
 		$cache->save('foo', 100);
@@ -1076,10 +942,10 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$cache->delete('foo');
 	}
 
-	public function testDataLibmemcachedCache()
+	public function testDataMemcachedCache()
 	{
 
-		$memcache = $this->_prepareLibmemcached();
+		$memcache = $this->_prepareMemcached();
 		if (!$memcache) {
 			return false;
 		}
@@ -1089,13 +955,15 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		// Travis can be slow, especially when Valgrind is used
 		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 900));
 
-		$cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+		$cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 			'servers' => array(
 				array(
 					'host' => '127.0.0.1',
 					'port' => '11211',
-					'weight' => '1'),
-			)
+					'weight' => '1'
+				),
+			),
+			'prefix' => 'unit'
 		));
 
 		$keys = $cache->queryKeys();
@@ -1116,19 +984,20 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($cachedContent, "sure, nothing interesting");
 
 		$actual = $cache->queryKeys();
-		$this->assertEquals($actual, array(0 => 'test-data'));
+		$this->assertEquals($actual, array(0 => 'unittest-data'));
 
 		//Check if exists
 		$this->assertTrue($cache->exists('test-data'));
 
 		//Delete
 		$this->assertTrue($cache->delete('test-data'));
+		$keys = $cache->queryKeys();
+		$this->assertEquals($keys, array());
 	}
 
-	public function testDataLibmemcachedCacheOption()
+	public function testDataMemcachedCacheOption()
 	{
-
-		$memcache = $this->_prepareLibmemcached();
+		$memcache = $this->_prepareMemcached();
 		if (!$memcache) {
 			return false;
 		}
@@ -1139,7 +1008,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 900));
 
 		//Memcached OPT_PREFIX_KEY: prefix.
-		$cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+		$cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 			'servers' => array(
 				array(
 					'host' => '127.0.0.1',
@@ -1148,7 +1017,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			),
 			'client' => array(
 				Memcached::OPT_PREFIX_KEY => 'prefix.',
-			)
+			),
 		));
 
 		$data = array(1, 2, 3, 4, 5);
@@ -1167,7 +1036,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($cachedUnserialize, $data);
 
         //Memcached Option None
-		$cache2 = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+		$cache2 = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 			'servers' => array(
 				array(
 					'host' => '127.0.0.1',
@@ -1224,6 +1093,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$cache = new Phalcon\Cache\Backend\Redis($frontCache, array(
 			'host' => 'localhost',
 			'port' => 6379,
+			'prefix' => 'unit',
 			// 'auth' => 'foobared',
 			// 'persistent' => false
 		));
@@ -1245,7 +1115,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 20));
 		$cache = new Phalcon\Cache\Backend\Redis($frontCache, array(
 			'host' => 'localhost',
-			'port' => 6379
+			'port' => 6379,
+			'prefix' => 'unit'
 		));
 		$cache->delete('decrement');
 
@@ -1270,7 +1141,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$frontCache = new Phalcon\Cache\Frontend\Output(array('lifetime' => 2));
 		$cache = new Phalcon\Cache\Backend\Redis($frontCache, array(
 			'host' => 'localhost',
-			'port' => 6379
+			'port' => 6379,
+			'prefix' => 'unit'
 		));
 
 		ob_start();
@@ -1283,7 +1155,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		echo $time;
 
-		$cache->save(null, null, null, true);
+		$cache->save();
 
 		$obContent = ob_get_contents();
 		ob_end_clean();
@@ -1311,6 +1183,12 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		//Delete entry from cache
 		$this->assertTrue($cache->delete('test-output'));
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array(
+			0 => 'decrement',
+			1 => 'increment',
+		));
 	}
 
 	public function testDataRedisCache()
@@ -1325,7 +1203,8 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$frontCache = new Phalcon\Cache\Frontend\Data();
 		$cache = new Phalcon\Cache\Backend\Redis($frontCache, array(
 			'host' => 'localhost',
-			'port' => 6379
+			'port' => 6379,
+			'prefix' => 'unit'
 		));
 
 		$data = array(1, 2, 3, 4, 5);
@@ -1353,6 +1232,9 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($cache->delete('a'));
 		$this->assertTrue($cache->delete('long-key'));
 		$this->assertTrue($cache->delete('bcd'));
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array('decrement', 'increment'));
 	}
 
 	public function testCacheFileFlush()
@@ -1362,12 +1244,19 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		// File
 		$cache = new Phalcon\Cache\Backend\File($frontCache, array(
 			'cacheDir' => 'unit-tests/cache/',
+			'prefix' => 'unit'
 		));
+
+		$this->assertTrue($cache->flush());
 
 		$cache->save('data', "1");
 		$cache->save('data2', "2");
 
+		$this->assertEquals($cache->queryKeys(), array('unitdata', 'unitdata2'));
+
 		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
 
 		$this->assertFalse(file_exists('unit-tests/cache/data'));
 		$this->assertFalse(file_exists('unit-tests/cache/data2'));
@@ -1380,34 +1269,16 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		// Memory
 		$cache = new Phalcon\Cache\Backend\Memory($frontCache);
 
-		$cache->save('data', "1");
-		$cache->save('data2', "2");
-
 		$this->assertTrue($cache->flush());
-
-		$this->assertFalse($cache->exists('data'));
-		$this->assertFalse($cache->exists('data2'));
-	}
-
-	public function testCacheMemcachedFlush()
-	{
-		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 10));
-
-		// Memcached
-		$memcache = $this->_prepareMemcached();
-		if (!$memcache) {
-			return false;
-		}
-
-		$cache = new Phalcon\Cache\Backend\Memcache($frontCache, array(
-			'host' => '127.0.0.1',
-			'port' => '11211'
-		));
 
 		$cache->save('data', "1");
 		$cache->save('data2', "2");
 
+		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
+
 		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
 
 		$this->assertFalse($cache->exists('data'));
 		$this->assertFalse($cache->exists('data2'));
@@ -1425,12 +1296,16 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		$cache = new Phalcon\Cache\Backend\Apc($frontCache);
 
-		$data = array(1, 2, 3, 4, 5);
+		$this->assertTrue($cache->flush());
 
 		$cache->save('data', "1");
 		$cache->save('data2', "2");
 
+		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
+
 		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
 
 		$this->assertFalse($cache->exists('data'));
 		$this->assertFalse($cache->exists('data2'));
@@ -1450,10 +1325,16 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			'collection' => 'caches'
 		));
 
+		$this->assertTrue($cache->flush());
+
 		$cache->save('data', "1");
 		$cache->save('data2', "2");
 
+		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
+
 		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
 
 		$this->assertFalse($cache->exists('data'));
 		$this->assertFalse($cache->exists('data2'));
@@ -1471,16 +1352,22 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		$cache = new Phalcon\Cache\Backend\Xcache($frontCache);
 
+		$this->assertTrue($cache->flush());
+
 		$cache->save('data', "1");
 		$cache->save('data2', "2");
 
+		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
+
 		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
 
 		$this->assertFalse($cache->exists('data'));
 		$this->assertFalse($cache->exists('data2'));
 	}
 
-	public function testCacheLibmemcachedFlush()
+	public function testCacheMemcachedFlush()
 	{
 		if (!extension_loaded('memcached')) {
 			$this->markTestSkipped('Warning: memcached extension is not loaded');
@@ -1490,7 +1377,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$frontCache = new Phalcon\Cache\Frontend\Data();
 
         //Memcached OPT_PREFIX_KEY: prefix.
-		$cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+		$cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 			'servers' => array(
 				array(
 					'host' => '127.0.0.1',
@@ -1502,10 +1389,16 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			)
 		));
 
+		$this->assertTrue($cache->flush());
+
 		$cache->save('data', "1");
 		$cache->save('data2', "2");
 
+		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
+
 		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
 
 		$this->assertFalse($cache->exists('data'));
 		$this->assertFalse($cache->exists('data2'));
@@ -1526,19 +1419,27 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			'port' => 6379
 		));
 
+		$this->assertTrue($cache->flush());
+
 		$cache->save('data', "1");
 		$cache->save('data2', "2");
 
-		$this->assertTrue($cache->exists('data'));
-		$this->assertTrue($cache->exists('data2'));
+		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
 
 		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
 
 		$this->assertFalse($cache->exists('data'));
 		$this->assertFalse($cache->exists('data2'));
 	}
 
-	public function testCacheSHMemory(){
+	public function testCacheSHMemory()
+	{
+		if (!ini_get('phalcon.cache.enable_shmemory_cli')) {
+			$this->markTestSkipped('Warning: phalcon.cache.enable_shmemory_cli is not enbale');
+			return false;
+		}
 
 		$cache = new Phalcon\Cache\SHMemory();
 

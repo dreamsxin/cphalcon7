@@ -3,16 +3,16 @@
 namespace Phalcon\Mvc\Model\MetaData {
 
 	/**
-	 * Phalcon\Mvc\Model\MetaData\Libmemcached
+	 * Phalcon\Mvc\Model\MetaData\Memcached
 	 *
-	 * Stores model meta-data in the Libmemcached cache. Data will erased if the web server is restarted
+	 * Stores model meta-data in the Memcached cache. Data will erased if the web server is restarted
 	 *
 	 * By default meta-data is stored for 48 hours (172800 seconds)
 	 *
-	 * You can query the meta-data by printing libmemcached_get('$PMM$') or libmemcached_get('$PMM$my-app-id')
+	 * You can query the meta-data by printing memcached_get('$PMM$') or memcached_get('$PMM$my-app-id')
 	 *
 	 *<code>
-	 *	$metaData = new Phalcon\Mvc\Model\Metadata\Libmemcached(array(
+	 *	$metaData = new Phalcon\Mvc\Model\Metadata\Memcached(array(
 	 *     'servers' => array(
 	 *         array('host' => 'localhost', 'port' => 11211, 'weight' => 1),
 	 *     ),
@@ -26,7 +26,7 @@ namespace Phalcon\Mvc\Model\MetaData {
 	 *</code>
 	 */
 	
-	class Libmemcached extends \Phalcon\Mvc\Model\MetaData implements \Phalcon\Mvc\Model\MetaDataInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Memcached extends \Phalcon\Mvc\Model\MetaData implements \Phalcon\Mvc\Model\MetaDataInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		const MODELS_ATTRIBUTES = 0;
 
@@ -66,10 +66,10 @@ namespace Phalcon\Mvc\Model\MetaData {
 
 		protected $_lifetime;
 
-		protected $_libmemcached;
+		protected $_memcached;
 
 		/**
-		 * \Phalcon\Mvc\Model\MetaData\Libmemcached constructor
+		 * \Phalcon\Mvc\Model\MetaData\Memcached constructor
 		 *
 		 * @param array $options
 		 */
@@ -77,7 +77,7 @@ namespace Phalcon\Mvc\Model\MetaData {
 
 
 		/**
-		 * Reads metadata from Libmemcached
+		 * Reads metadata from Memcached
 		 *
 		 * @param  string $key
 		 * @return array
@@ -86,7 +86,7 @@ namespace Phalcon\Mvc\Model\MetaData {
 
 
 		/**
-		 *  Writes the metadata to Libmemcached
+		 *  Writes the metadata to Memcached
 		 *
 		 * @param string $key
 		 * @param array $data

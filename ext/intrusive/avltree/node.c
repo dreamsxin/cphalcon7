@@ -58,10 +58,10 @@ static const zend_function_entry phalcon_intrusive_avltree_node_method_entry[] =
 };
 
 zend_object_handlers phalcon_intrusive_avltree_node_object_handlers;
-zend_object* phalcon_intrusive_avltree_node_create_object_handler(zend_class_entry *ce)
+zend_object* phalcon_intrusive_avltree_node_object_create_handler(zend_class_entry *ce)
 {
-	phalcon_intrusive_avltree_node_object *intern = emalloc(sizeof(phalcon_intrusive_avltree_node_object));
-	memset(intern, 0, sizeof(phalcon_intrusive_avltree_node_object));
+	phalcon_intrusive_avltree_node_object *intern = ecalloc(1, sizeof(phalcon_intrusive_avltree_node_object) + zend_object_properties_size(ce));
+	intern->std.ce = ce;
 
 	zend_object_std_init(&intern->std, ce);
 	object_properties_init(&intern->std, ce);
@@ -69,12 +69,9 @@ zend_object* phalcon_intrusive_avltree_node_create_object_handler(zend_class_ent
 	return &intern->std;
 }
 
-void phalcon_intrusive_avltree_node_free_object_storage_handler(zend_object *object)
+void phalcon_intrusive_avltree_node_object_free_handler(zend_object *object)
 {
-	phalcon_intrusive_avltree_node_object *intern;
-	intern = phalcon_intrusive_avltree_node_object_from_obj(object);
-	zend_object_std_dtor(&intern->std);
-	efree(intern);
+	zend_object_std_dtor(object);
 }
 
 /**
@@ -82,11 +79,7 @@ void phalcon_intrusive_avltree_node_free_object_storage_handler(zend_object *obj
  */
 PHALCON_INIT_CLASS(Phalcon_Intrusive_Avltree_Node){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Intrusive\\Avltree, Node, intrusive_avltree_node, phalcon_intrusive_avltree_node_method_entry, 0);
-
-	phalcon_intrusive_avltree_node_ce->create_object = phalcon_intrusive_avltree_node_create_object_handler;
-	memcpy(&phalcon_intrusive_avltree_node_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-	phalcon_intrusive_avltree_node_object_handlers.free_obj = (zend_object_free_obj_t) phalcon_intrusive_avltree_node_free_object_storage_handler;
+	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Intrusive\\Avltree, Node, intrusive_avltree_node, phalcon_intrusive_avltree_node_method_entry, 0);
 
 	zend_declare_property_null(phalcon_intrusive_avltree_node_ce, SL("_value"), ZEND_ACC_PROTECTED);
 	return SUCCESS;

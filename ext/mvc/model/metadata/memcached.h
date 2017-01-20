@@ -17,13 +17,13 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_SESSION_ADAPTER_LIBMEMCACHED_H
-#define PHALCON_SESSION_ADAPTER_LIBMEMCACHED_H
+#ifndef PHALCON_MVC_MODEL_METADATA_MEMCACHED_H
+#define PHALCON_MVC_MODEL_METADATA_MEMCACHED_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_session_adapter_libmemcached_ce;
+extern zend_class_entry *phalcon_mvc_model_metadata_memcached_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Libmemcached);
+PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Memcached);
 
-#endif /* PHALCON_SESSION_ADAPTER_LIBMEMCACHED_H */
+#endif /* PHALCON_MVC_MODEL_METADATA_MEMCACHED_H */

@@ -65,7 +65,7 @@
         <df name="backend">
           <in>apc.c</in>
           <in>file.c</in>
-          <in>libmemcached.c</in>
+          <in>memcached.c</in>
           <in>memcache.c</in>
           <in>memory.c</in>
           <in>mongo.c</in>
@@ -350,7 +350,7 @@
             </df>
             <in>apc.c</in>
             <in>files.c</in>
-            <in>libmemcached.c</in>
+            <in>memcached.c</in>
             <in>memcache.c</in>
             <in>memory.c</in>
             <in>redis.c</in>
@@ -500,7 +500,7 @@
       <df name="session">
         <df name="adapter">
           <in>files.c</in>
-          <in>libmemcached.c</in>
+          <in>memcached.c</in>
           <in>memcache.c</in>
         </df>
         <in>adapter.c</in>
@@ -1175,7 +1175,7 @@
       </item>
       <item path="ext/cache/backend/file.c" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="ext/cache/backend/libmemcached.c" ex="false" tool="0" flavor2="2">
+      <item path="ext/cache/backend/memcached.c" ex="false" tool="0" flavor2="2">
       </item>
       <item path="ext/cache/backend/memcache.c" ex="false" tool="0" flavor2="2">
       </item>
@@ -2507,7 +2507,7 @@
       </item>
       <item path="ext/mvc/model/metadata/files.c" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="ext/mvc/model/metadata/libmemcached.c"
+      <item path="ext/mvc/model/metadata/memcached.c"
             ex="false"
             tool="0"
             flavor2="2">
@@ -3621,7 +3621,7 @@
       </item>
       <item path="ext/session/adapter/files.c" ex="false" tool="0" flavor2="2">
       </item>
-      <item path="ext/session/adapter/libmemcached.c" ex="false" tool="0" flavor2="2">
+      <item path="ext/session/adapter/memcached.c" ex="false" tool="0" flavor2="2">
       </item>
       <item path="ext/session/adapter/memcache.c" ex="false" tool="0" flavor2="2">
       </item>

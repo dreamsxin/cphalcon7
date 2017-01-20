@@ -46,8 +46,6 @@ PHP_METHOD(Phalcon_Cache_Backend, getFrontend);
 PHP_METHOD(Phalcon_Cache_Backend, getOptions);
 PHP_METHOD(Phalcon_Cache_Backend, isFresh);
 PHP_METHOD(Phalcon_Cache_Backend, isStarted);
-PHP_METHOD(Phalcon_Cache_Backend, setLastKey);
-PHP_METHOD(Phalcon_Cache_Backend, getLastKey);
 PHP_METHOD(Phalcon_Cache_Backend, getLifetime);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend___construct, 0, 0, 1)
@@ -63,8 +61,6 @@ static const zend_function_entry phalcon_cache_backend_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend, getOptions, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend, isFresh, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend, isStarted, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend, setLastKey, arginfo_phalcon_cache_backendinterface_setlastkey, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend, getLastKey, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend, getLifetime, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -132,6 +128,8 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	zval *key_name, *lifetime = NULL, *fresh = NULL, frontend = {};
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
+
+	phalcon_update_property_zval(getThis(), SL("_lastKey"), key_name);
 
 	if (lifetime && Z_TYPE_P(lifetime) == IS_LONG) {
 		phalcon_update_property_zval(getThis(), SL("_lastLifetime"), lifetime);
@@ -214,32 +212,6 @@ PHP_METHOD(Phalcon_Cache_Backend, isStarted){
 
 
 	RETURN_MEMBER(getThis(), "_started");
-}
-
-/**
- * Sets the last key used in the cache
- *
- * @param string $lastKey
- */
-PHP_METHOD(Phalcon_Cache_Backend, setLastKey){
-
-	zval *last_key;
-
-	phalcon_fetch_params(0, 1, 0, &last_key);
-
-	phalcon_update_property_zval(getThis(), SL("_lastKey"), last_key);
-
-}
-
-/**
- * Gets the last key stored by the cache
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Cache_Backend, getLastKey){
-
-
-	RETURN_MEMBER(getThis(), "_lastKey");
 }
 
 /**

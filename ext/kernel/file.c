@@ -37,6 +37,23 @@
  * Checks if a file exist
  *
  */
+int phalcon_file_exists_str(char *filename){
+
+    zval exists_flag = {};
+
+    if (!filename) {
+ 	   return FAILURE;
+    }
+
+    php_stat(filename, (php_stat_len) strlen(filename), FS_EXISTS, &exists_flag);
+
+    if (Z_TYPE(exists_flag) == IS_TRUE) {
+ 	   return SUCCESS;
+    }
+
+    return FAILURE;
+}
+
 int phalcon_file_exists(zval *filename){
 
 	zval exists_flag = {};
@@ -47,15 +64,11 @@ int phalcon_file_exists(zval *filename){
 
 	php_stat(Z_STRVAL_P(filename), (php_stat_len) Z_STRLEN_P(filename), FS_EXISTS, &exists_flag);
 
-	if (PHALCON_IS_FALSE((&exists_flag))) {
-		return FAILURE;
+	if (Z_TYPE(exists_flag) == IS_TRUE) {
+		return SUCCESS;
 	}
 
-	if (PHALCON_IS_EMPTY((&exists_flag))) {
-		return FAILURE;
-	}
-
-	return SUCCESS;
+	return FAILURE;
 }
 
 /**
@@ -194,7 +207,7 @@ void phalcon_unique_path_key(zval *return_value, zval *path) {
 	h = zend_string_hash_val(Z_STR_P(path));
 
 	strKey = emalloc(24);
-	snprintf(strKey, 23, "v%lu", h);    
+	snprintf(strKey, 23, "v%lu", h);
 
 	RETURN_STRING(strKey);
 }

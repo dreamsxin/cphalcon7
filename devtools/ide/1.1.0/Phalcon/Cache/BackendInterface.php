@@ -1,11 +1,11 @@
-<?php 
+<?php
 
 namespace Phalcon\Cache {
 
 	/**
 	 * Phalcon\Cache\BackendInterface initializer
 	 */
-	
+
 	interface BackendInterface {
 
 		/**
@@ -59,22 +59,6 @@ namespace Phalcon\Cache {
 
 
 		/**
-		 * Sets the last key used in the cache
-		 *
-		 * @param string $lastKey
-		 */
-		public function setLastKey($lastKey);
-
-
-		/**
-		 * Gets the last key stored by the cache
-		 *
-		 * @return string
-		 */
-		public function getLastKey();
-
-
-		/**
 		 * Returns a cached content
 		 *
 		 * @param int|string $keyName
@@ -125,7 +109,7 @@ namespace Phalcon\Cache {
 
 		/**
 		 * Immediately invalidates all existing items.
-		 * 
+		 *
 		 * @return boolean
 		 */
 		public function flush();

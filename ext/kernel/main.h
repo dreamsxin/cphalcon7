@@ -46,8 +46,8 @@
 #define PH_COPY 1024
 #define PH_CTOR 4096
 
-#define SL(str)   ZEND_STRL(str)
-#define SS(str)   ZEND_STRS(str)
+#define SL(str)   (str), (sizeof(str)-1)
+#define SS(str)   (str), (sizeof(str))
 #define IS(str)   (phalcon_interned_##str)
 #define ISV(str)  (phalcon_interned_##str)->val
 #define ISL(str)  (phalcon_interned_##str)->val, (sizeof(#str)-1)
@@ -176,11 +176,12 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 #define PHALCON_REGISTER_CLASS_CREATE_OBJECT(ns, class_name, name, methods, flags) \
 	{ \
 		zend_class_entry ce; \
-		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
-		ce.create_object = phalcon_ ##name## _object_create_handler; \
 		memcpy(&phalcon_ ##name## _object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers)); \
+		phalcon_ ##name## _object_handlers.offset = XtOffsetOf(phalcon_ ##name## _object, std); \
 		phalcon_ ##name## _object_handlers.free_obj = (zend_object_free_obj_t) phalcon_ ##name## _object_free_handler; \
+		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
 		phalcon_ ##name## _ce = zend_register_internal_class(&ce); \
+		phalcon_ ##name## _ce->create_object = phalcon_ ##name## _object_create_handler; \
 		phalcon_ ##name## _ce->ce_flags |= flags;  \
 	}
 
@@ -199,15 +200,16 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 #define PHALCON_REGISTER_CLASS_CREATE_OBJECT_EX(ns, class_name, lcname, parent_ce, methods, flags) \
 	{ \
 		zend_class_entry ce; \
-		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
-		ce.create_object = phalcon_ ##lcname## _object_create_handler; \
 		memcpy(&phalcon_ ##lcname## _object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers)); \
+		phalcon_ ##lcname## _object_handlers.offset = XtOffsetOf(phalcon_ ##lcname## _object, std); \
 		phalcon_ ##lcname## _object_handlers.free_obj = (zend_object_free_obj_t) phalcon_ ##lcname## _object_free_handler; \
+		INIT_NS_CLASS_ENTRY(ce, #ns, #class_name, methods); \
 		phalcon_ ##lcname## _ce = zend_register_internal_class_ex(&ce, parent_ce); \
 		if (!phalcon_ ##lcname## _ce) { \
 			fprintf(stderr, "Phalcon Error: Class to extend '%s' was not found when registering class '%s'\n", (parent_ce ? parent_ce->name->val : "(null)"), ZEND_NS_NAME(#ns, #class_name)); \
 			return FAILURE; \
 		} \
+		phalcon_ ##lcname## _ce->create_object = phalcon_ ##lcname## _object_create_handler; \
 		phalcon_ ##lcname## _ce->ce_flags |= flags;  \
 	}
 

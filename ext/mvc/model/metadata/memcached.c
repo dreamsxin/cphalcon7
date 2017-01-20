@@ -17,11 +17,11 @@
   +------------------------------------------------------------------------+
 */
 
-#include "mvc/model/metadata/libmemcached.h"
+#include "mvc/model/metadata/memcached.h"
 #include "mvc/model/metadata.h"
 #include "mvc/model/metadatainterface.h"
 #include "mvc/model/exception.h"
-#include "cache/backend/libmemcached.h"
+#include "cache/backend/memcached.h"
 #include "cache/frontend/data.h"
 
 #include "kernel/main.h"
@@ -34,16 +34,16 @@
 #include "kernel/hash.h"
 
 /**
- * Phalcon\Mvc\Model\MetaData\Libmemcached
+ * Phalcon\Mvc\Model\MetaData\Memcached
  *
- * Stores model meta-data in the Libmemcached cache. Data will erased if the web server is restarted
+ * Stores model meta-data in the Memcached cache. Data will erased if the web server is restarted
  *
  * By default meta-data is stored for 48 hours (172800 seconds)
  *
- * You can query the meta-data by printing libmemcached_get('$PMM$') or libmemcached_get('$PMM$my-app-id')
+ * You can query the meta-data by printing memcached_get('$PMM$') or memcached_get('$PMM$my-app-id')
  *
  *<code>
- *	$metaData = new Phalcon\Mvc\Model\Metadata\Libmemcached(array(
+ *	$metaData = new Phalcon\Mvc\Model\Metadata\Memcached(array(
  *     'servers' => array(
  *         array('host' => 'localhost', 'port' => 11211, 'weight' => 1),
  *     ),
@@ -56,48 +56,48 @@
  *	));
  *</code>
  */
-zend_class_entry *phalcon_mvc_model_metadata_libmemcached_ce;
+zend_class_entry *phalcon_mvc_model_metadata_memcached_ce;
 
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct);
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, read);
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, write);
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, reset);
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, __construct);
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, read);
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, write);
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, reset);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_metadata_libmemcached___construct, 0, 0, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_metadata_memcached___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry phalcon_mvc_model_metadata_libmemcached_method_entry[] = {
-	PHP_ME(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct, arginfo_phalcon_mvc_model_metadata_libmemcached___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Mvc_Model_MetaData_Libmemcached, read, arginfo_phalcon_mvc_model_metadatainterface_read, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_MetaData_Libmemcached, write, arginfo_phalcon_mvc_model_metadatainterface_write, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_MetaData_Libmemcached, reset, arginfo_phalcon_mvc_model_metadatainterface_reset, ZEND_ACC_PUBLIC)
+static const zend_function_entry phalcon_mvc_model_metadata_memcached_method_entry[] = {
+	PHP_ME(Phalcon_Mvc_Model_MetaData_Memcached, __construct, arginfo_phalcon_mvc_model_metadata_memcached___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Mvc_Model_MetaData_Memcached, read, arginfo_phalcon_mvc_model_metadatainterface_read, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_MetaData_Memcached, write, arginfo_phalcon_mvc_model_metadatainterface_write, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_MetaData_Memcached, reset, arginfo_phalcon_mvc_model_metadatainterface_reset, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Mvc\Model\MetaData\Libmemcached initializer
+ * Phalcon\Mvc\Model\MetaData\Memcached initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Libmemcached){
+PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Memcached){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Libmemcached, mvc_model_metadata_libmemcached, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_libmemcached_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model\\MetaData, Memcached, mvc_model_metadata_memcached, phalcon_mvc_model_metadata_ce, phalcon_mvc_model_metadata_memcached_method_entry, 0);
 
-	zend_declare_property_null(phalcon_mvc_model_metadata_libmemcached_ce, SL("_lifetime"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_metadata_libmemcached_ce, SL("_libmemcached"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_metadata_memcached_ce, SL("_lifetime"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_metadata_memcached_ce, SL("_memcached"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_mvc_model_metadata_libmemcached_ce, 1, phalcon_mvc_model_metadatainterface_ce);
+	zend_class_implements(phalcon_mvc_model_metadata_memcached_ce, 1, phalcon_mvc_model_metadatainterface_ce);
 
 	return SUCCESS;
 }
 
 /**
- * Phalcon\Mvc\Model\MetaData\Libmemcached constructor
+ * Phalcon\Mvc\Model\MetaData\Memcached constructor
  *
  * @param array $options
  */
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, __construct)
 {
-	zval *options = NULL, servers = {}, client = {}, lifetime = {}, prefix = {}, frontend_data = {}, libmemcached = {}, option = {};
+	zval *options = NULL, servers = {}, client = {}, lifetime = {}, prefix = {}, frontend_data = {}, memcached = {}, option = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 	
@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
 		ZVAL_EMPTY_STRING(&prefix);
 	}
 
-	/* create libmemcached instance */
+	/* create memcached instance */
 	array_init_size(&option, 1);
 
 	phalcon_array_update_str(&option, SL("lifetime"), &lifetime, PH_COPY);
@@ -145,66 +145,66 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, __construct)
 
 	phalcon_array_update_str(&option, SL("prefix"), &prefix, PH_COPY);
 
-	object_init_ex(&libmemcached, phalcon_cache_backend_libmemcached_ce);
+	object_init_ex(&memcached, phalcon_cache_backend_memcached_ce);
 
-	PHALCON_CALL_METHOD(NULL, &libmemcached, "__construct", &frontend_data, &option);
+	PHALCON_CALL_METHOD(NULL, &memcached, "__construct", &frontend_data, &option);
 
-	phalcon_update_property_zval(getThis(), SL("_libmemcached"), &libmemcached);
+	phalcon_update_property_zval(getThis(), SL("_memcached"), &memcached);
 	
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 }
 
 /**
- * Reads metadata from Libmemcached
+ * Reads metadata from Memcached
  *
  * @param  string $key
  * @return array
  */
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, read){
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, read){
 
-	zval *key, lifetime = {}, libmemcached = {};
+	zval *key, lifetime = {}, memcached = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
+	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY);
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 
-	if (Z_TYPE(libmemcached) == IS_OBJECT) {
-		PHALCON_RETURN_CALL_METHOD(&libmemcached, "get", key, &lifetime);
+	if (Z_TYPE(memcached) == IS_OBJECT) {
+		PHALCON_RETURN_CALL_METHOD(&memcached, "get", key, &lifetime);
 	} else {
 		RETURN_NULL();
 	}
 }
 
 /**
- *  Writes the metadata to Libmemcached
+ *  Writes the metadata to Memcached
  *
  * @param string $key
  * @param array $data
  */
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, write){
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, write){
 
-	zval *key, *data, lifetime = {}, libmemcached = {};
+	zval *key, *data, lifetime = {}, memcached = {};
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
+	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY);
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 
-	if (Z_TYPE(libmemcached) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, &libmemcached, "save", key, data, &lifetime);	
+	if (Z_TYPE(memcached) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(NULL, &memcached, "save", key, data, &lifetime);	
 	}
 }
 
-PHP_METHOD(Phalcon_Mvc_Model_MetaData_Libmemcached, reset){
+PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, reset){
 
-	zval libmemcached = {};
+	zval memcached = {};
 
-	phalcon_read_property(&libmemcached, getThis(), SL("_libmemcached"), PH_NOISY);
+	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY);
 
-	if (Z_TYPE(libmemcached) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, &libmemcached, "flush");	
+	if (Z_TYPE(memcached) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(NULL, &memcached, "flush");	
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_libmemcached_ce, getThis(), "reset");
+	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_memcached_ce, getThis(), "reset");
 }

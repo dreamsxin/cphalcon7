@@ -17,7 +17,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "cache/backend/libmemcached.h"
+#include "cache/backend/memcached.h"
 #include "cache/backend.h"
 #include "cache/backendinterface.h"
 #include "cache/exception.h"
@@ -36,9 +36,9 @@
 #include "internal/arginfo.h"
 
 /**
- * Phalcon\Cache\Backend\Libmemcached
+ * Phalcon\Cache\Backend\Memcached
  *
- * Allows to cache output fragments, PHP data or raw data to a libmemcached backend
+ * Allows to cache output fragments, PHP data or raw data to a memcached backend
  *
  * This adapter uses the special memcached key "_PHCM" to store all the keys internally used by the adapter
  *
@@ -50,7 +50,7 @@
  * ));
  *
  * //Create the Cache setting memcached connection options
- * $cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+ * $cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
  *     'servers' => array(
  *         array('host' => 'localhost',
  *               'port' => 11211,
@@ -70,67 +70,67 @@
  *
  *</code>
  */
-zend_class_entry *phalcon_cache_backend_libmemcached_ce;
+zend_class_entry *phalcon_cache_backend_memcached_ce;
 
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, __construct);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, _connect);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, get);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, delete);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, queryKeys);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, exists);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, increment);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, decrement);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, flush);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, getTrackingKey);
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, setTrackingKey);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, __construct);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, _connect);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, get);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, save);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, delete);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, queryKeys);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, exists);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, increment);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, decrement);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, flush);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, getTrackingKey);
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, setTrackingKey);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_libmemcached___construct, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_memcached___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, frontend)
 	ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_libmemcached_settrackingkey, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_memcached_settrackingkey, 0, 0, 1)
 	ZEND_ARG_INFO(0, key)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry phalcon_cache_backend_libmemcached_method_entry[] = {
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, __construct, arginfo_phalcon_cache_backend_libmemcached___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, _connect, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, get, arginfo_phalcon_cache_backendinterface_get, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, save, arginfo_phalcon_cache_backendinterface_save, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, delete, arginfo_phalcon_cache_backendinterface_delete, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, queryKeys, arginfo_phalcon_cache_backendinterface_querykeys, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, flush, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, getTrackingKey, arginfo_empty, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Libmemcached, setTrackingKey, arginfo_phalcon_cache_backend_libmemcached_settrackingkey, ZEND_ACC_PUBLIC)
+static const zend_function_entry phalcon_cache_backend_memcached_method_entry[] = {
+	PHP_ME(Phalcon_Cache_Backend_Memcached, __construct, arginfo_phalcon_cache_backend_memcached___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, _connect, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, get, arginfo_phalcon_cache_backendinterface_get, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, save, arginfo_phalcon_cache_backendinterface_save, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, delete, arginfo_phalcon_cache_backendinterface_delete, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, queryKeys, arginfo_phalcon_cache_backendinterface_querykeys, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, flush, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, getTrackingKey, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Memcached, setTrackingKey, arginfo_phalcon_cache_backend_memcached_settrackingkey, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Cache\Backend\Libmemcached initializer
+ * Phalcon\Cache\Backend\Memcached initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Libmemcached){
+PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Memcached){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, Libmemcached, cache_backend_libmemcached, phalcon_cache_backend_ce, phalcon_cache_backend_libmemcached_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, Memcached, cache_backend_memcached, phalcon_cache_backend_ce, phalcon_cache_backend_memcached_method_entry, 0);
 
-	zend_declare_property_null(phalcon_cache_backend_libmemcached_ce, SL("_memcache"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_backend_memcached_ce, SL("_memcache"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_cache_backend_libmemcached_ce, 1, phalcon_cache_backendinterface_ce);
+	zend_class_implements(phalcon_cache_backend_memcached_ce, 1, phalcon_cache_backendinterface_ce);
 
 	return SUCCESS;
 }
 
 /**
- * Phalcon\Cache\Backend\Libmemcached constructor
+ * Phalcon\Cache\Backend\Memcached constructor
  *
  * @param Phalcon\Cache\FrontendInterface $frontend
  * @param array $options
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, __construct){
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, __construct){
 
 	zval *frontend, *opts = NULL, options = {}, server = {}, servers = {};
 
@@ -161,13 +161,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, __construct){
 		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCM"), PH_COPY);
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_libmemcached_ce, getThis(), "__construct", frontend, &options);
+	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_memcached_ce, getThis(), "__construct", frontend, &options);
 }
 
 /**
  * Create internal connection to memcached
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, _connect){
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, _connect){
 
 	zval options = {}, memcache = {}, servers = {}, client = {}, *value;
 	zend_string *str_key;
@@ -215,11 +215,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, _connect){
 /**
  * Returns a cached content
  *
- * @param int|string $keyName
- * @param   long $lifetime
+ * @param string $keyName
+ * @param  long $lifetime
  * @return  mixed
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, get)
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, get)
 {
 	zval *key_name, memcache = {}, frontend = {}, prefix = {}, prefixed_key = {}, cached_content = {};
 
@@ -235,7 +235,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, get)
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHOD(&cached_content, &memcache, "get", &prefixed_key);
 	if (PHALCON_IS_FALSE(&cached_content)) {
@@ -252,29 +251,31 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, get)
 /**
  * Stores cached content into the Memcached backend and stops the frontend
  *
- * @param int|string $keyName
+ * @param string $keyName
  * @param string $content
  * @param long $lifetime
  * @param boolean $stopBuffer
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, save){
 
-	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, prefix = {}, last_key = {}, frontend = {}, memcache = {}, cached_content = {};
+	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, key = {}, prefix = {}, prefixed_key = {}, frontend = {}, memcache = {}, cached_content = {};
 	zval prepared_content = {}, ttl = {}, success = {}, options = {}, special_key = {}, keys = {}, is_buffering = {};
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
+	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
-	} else {
-		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
-		PHALCON_CONCAT_VV(&last_key, &prefix, key_name);
+		phalcon_return_property(&key, getThis(), SL("_lastKey"));
+		key_name = &key;
 	}
 
-	if (!zend_is_true(&last_key)) {
+	if (!zend_is_true(key_name)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache must be started first");
 		return;
 	}
+
+	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
 	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
 
@@ -307,9 +308,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 	}
 
 	if (Z_TYPE(prepared_content) > IS_NULL) {
-		PHALCON_CALL_METHOD(&success, &memcache, "set", &last_key, &prepared_content, &ttl);
+		PHALCON_CALL_METHOD(&success, &memcache, "set", &prefixed_key, &prepared_content, &ttl);
 	} else {
-		PHALCON_CALL_METHOD(&success, &memcache, "set", &last_key, &cached_content, &ttl);
+		PHALCON_CALL_METHOD(&success, &memcache, "set", &prefixed_key, &cached_content, &ttl);
 	}
 
 	if (!zend_is_true(&success)) {
@@ -329,8 +330,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 			array_init(&keys);
 		}
 
-		if (!phalcon_array_isset(&keys, &last_key)) {
-			phalcon_array_update_zval(&keys, &last_key, &ttl, PH_COPY);
+		if (!phalcon_array_isset(&keys, &prefixed_key)) {
+			phalcon_array_update_zval(&keys, &prefixed_key, &ttl, PH_COPY);
 			PHALCON_CALL_METHOD(NULL, &memcache, "set", &special_key, &keys);
 		}
 	}
@@ -352,11 +353,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, save){
 /**
  * Increment of a given key, by number $value
  *
- * @param  string $keyName
- * @param  long $value
+ * @param string $keyName
+ * @param long $value
  * @return mixed
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, increment)
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, increment)
 {
 	zval *key_name, *value = NULL, memcache = {}, prefix = {}, prefixed_key = {}, cached_content = {};
 
@@ -364,9 +365,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, increment)
 
 	if (!value || Z_TYPE_P(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
-	} else if (Z_TYPE_P(value) != IS_LONG) {
-		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(value);
 	}
 
 	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
@@ -378,7 +376,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, increment)
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHOD(&cached_content, &memcache, "increment", &prefixed_key, value);
 	if (PHALCON_IS_FALSE(&cached_content)) {
@@ -391,11 +388,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, increment)
 /**
  * Decrement of a given key, by number $value
  *
- * @param  string $keyName
- * @param  long $value
+ * @param string $keyName
+ * @param long $value
  * @return mixed
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, decrement)
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, decrement)
 {
 	zval *key_name, *value = NULL, memcache = {}, prefix = {}, prefixed_key = {}, cached_content = {};
 
@@ -403,9 +400,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, decrement)
 
 	if (!value || Z_TYPE_P(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
-	} else if (Z_TYPE_P(value) != IS_LONG) {
-		PHALCON_SEPARATE_PARAM(value);
-		convert_to_long_ex(value);
 	}
 
 	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
@@ -417,7 +411,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, decrement)
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_METHOD(&cached_content, &memcache, "decrement", &prefixed_key, value);
 	if (PHALCON_IS_FALSE(&cached_content)) {
@@ -430,10 +423,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, decrement)
 /**
  * Deletes a value from the cache by its key
  *
- * @param int|string $keyName
+ * @param string $keyName
  * @return boolean
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, delete){
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, delete){
 
 	zval *key_name, memcache = {}, prefix = {}, prefixed_key = {}, options = {}, special_key = {}, keys = {};
 
@@ -472,7 +465,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, delete){
  * @param string $prefix
  * @return array
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, queryKeys){
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, queryKeys){
 
 	zval *prefix = NULL, memcache = {}, options = {}, special_key = {}, keys = {};
 	zend_string *str_key;
@@ -518,35 +511,26 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, queryKeys){
 /**
  * Checks if cache exists and it hasn't expired
  *
- * @param  string $keyName
- * @param  long $lifetime
+ * @param string $keyName
  * @return boolean
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, exists){
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, exists){
 
-	zval *key_name = NULL, lifetime = {}, value = {}, last_key = {}, prefix = {}, memcache = {};
+	zval *key_name, prefix = {}, prefixed_key = {}, value = {}, memcache = {};
 
-	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
-	} else {
-		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
-		PHALCON_CONCAT_VV(&last_key, &prefix, key_name);
-	}
+	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
-	if (zend_is_true(&last_key)) {
+	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	if (Z_TYPE(memcache) != IS_OBJECT) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
 		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
-		if (Z_TYPE(memcache) != IS_OBJECT) {
-			PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-			phalcon_return_property(&memcache, getThis(), SL("_memcache"));
-		}
-
-		PHALCON_CALL_METHOD(&value, &memcache, "get", &last_key);
-		RETVAL_BOOL(PHALCON_IS_NOT_FALSE(&value));
-	} else {
-		RETURN_FALSE;
 	}
+
+	PHALCON_CALL_METHOD(&value, &memcache, "get", &prefixed_key);
+	RETVAL_BOOL(PHALCON_IS_NOT_FALSE(&value));
 }
 
 /**
@@ -554,7 +538,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, exists){
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, flush){
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, flush){
 
 	zval memcache = {}, options = {}, special_key = {}, keys = {};
 	zend_string *str_key;
@@ -598,7 +582,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, flush){
 	RETURN_TRUE;
 }
 
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, getTrackingKey)
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, getTrackingKey)
 {
 	zval options = {}, stats_key = {};
 
@@ -611,7 +595,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, getTrackingKey)
 	RETURN_CTOR(&stats_key);
 }
 
-PHP_METHOD(Phalcon_Cache_Backend_Libmemcached, setTrackingKey)
+PHP_METHOD(Phalcon_Cache_Backend_Memcached, setTrackingKey)
 {
 	zval *key;
 

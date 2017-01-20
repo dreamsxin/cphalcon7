@@ -82,8 +82,8 @@ void phalcon_websocket_connection_close(phalcon_websocket_connection_object *con
 zend_object_handlers phalcon_websocket_connection_object_handlers;
 zend_object* phalcon_websocket_connection_object_create_handler(zend_class_entry *ce)
 {
-	phalcon_websocket_connection_object *intern = emalloc(sizeof(phalcon_websocket_connection_object));
-	memset(intern, 0, sizeof(phalcon_websocket_connection_object));
+	phalcon_websocket_connection_object *intern = ecalloc(1, sizeof(phalcon_websocket_connection_object) + zend_object_properties_size(ce));
+	intern->std.ce = ce;
 
 	zend_object_std_init(&intern->std, ce);
 	object_properties_init(&intern->std, ce);
@@ -110,8 +110,7 @@ void phalcon_websocket_connection_object_free_handler(zend_object *object)
 		intern->read_ptr = (intern->read_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE;
 	}
 
-	zend_object_std_dtor(&intern->std);
-	efree(intern);
+	zend_object_std_dtor(object);
 }
 
 /**

@@ -145,7 +145,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, get){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCX", &prefix, key_name);
-	phalcon_update_property_zval(getThis(), SL("_lastKey"), &prefixed_key);
 
 	PHALCON_CALL_FUNCTION(&cached_content, "xcache_get", &prefixed_key);
 	if (Z_TYPE(cached_content) == IS_NULL) {
@@ -169,22 +168,25 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, get){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 
-	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, cached_content = {}, keys = {}, last_key = {}, frontend = {};
-	zval prepared_content = {}, ttl = {}, success = {}, is_buffering = {}, prefix = {}, options = {}, special_key = {};
+	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, key = {}, cached_content = {}, keys = {}, last_key = {}, frontend = {};
+	zval prepared_content = {}, ttl = {}, success = {}, is_buffering = {}, prefix = {}, prefixed_key = {}, options = {}, special_key = {};
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
+	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
-	} else {
-		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
-		PHALCON_CONCAT_SVV(&last_key, "_PHCX", &prefix, key_name);
+		phalcon_return_property(&key, getThis(), SL("_lastKey"));
+		key_name = &key;
 	}
 
-	if (!zend_is_true(&last_key)) {
+	if (!zend_is_true(key_name)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache must be started first");
 		return;
 	}
+
+	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
+	PHALCON_CONCAT_SV(&last_key, "_PHCX", &prefixed_key);
 
 	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
@@ -240,7 +242,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 			array_init(&keys);
 		}
 
-		phalcon_array_update_zval(&keys, &last_key, &ttl, PH_COPY);
+		phalcon_array_update_zval(&keys, &prefixed_key, &ttl, PH_COPY);
 		PHALCON_CALL_FUNCTION(NULL, "xcache_set", &special_key, &keys, &PHALCON_GLOBAL(z_zero));
 		RETURN_TRUE;
 	} else {
@@ -327,27 +329,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
  * Checks if the cache entry exists and has not expired
  *
  * @param string $keyName
- * @param long $lifetime
  * @return boolean
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, exists){
 
-	zval *key_name = NULL, *lifetime = NULL, last_key = {}, prefix = {};
+	zval *key_name = NULL, prefix = {}, last_key = {};
 
-	phalcon_fetch_params(0, 0, 2, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
-	} else {
-		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
-		PHALCON_CONCAT_SVV(&last_key, "_PHCX", &prefix, key_name);
-	}
+	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	PHALCON_CONCAT_SVV(&last_key, "_PHCX", &prefix, key_name);
 
-	if (zend_is_true(&last_key)) {
-		PHALCON_RETURN_CALL_FUNCTION("xcache_isset", &last_key);
-	} else {
-		RETURN_FALSE;
-	}
+	PHALCON_RETURN_CALL_FUNCTION("xcache_isset", &last_key);
 }
 
 /**
@@ -365,21 +358,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, increment){
 
 	if (!value || Z_TYPE_P(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
-	} else {
-		PHALCON_ENSURE_IS_LONG(value);
 	}
 
-	if (Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
-	} else {
-		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
-		PHALCON_CONCAT_SVV(&last_key, "_PHCX", &prefix, key_name);
-	}
-
-	if (!zend_is_true(&last_key)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache must be started first");
-		return;
-	}
+	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	PHALCON_CONCAT_SVV(&last_key, "_PHCX", &prefix, key_name);
 
 	if (phalcon_function_exists_ex(SL("xcache_inc")) == SUCCESS) {
 		PHALCON_RETURN_CALL_FUNCTION("xcache_inc", &last_key, value);
@@ -405,21 +387,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, decrement){
 
 	if (!value || Z_TYPE_P(value) == IS_NULL) {
 		value = &PHALCON_GLOBAL(z_one);
-	} else {
-		PHALCON_ENSURE_IS_LONG(value);
 	}
 
-	if (Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&last_key, getThis(), SL("_lastKey"));
-	} else {
-		phalcon_return_property(&prefix, getThis(), SL("_prefix"));
-		PHALCON_CONCAT_SVV(&last_key, "_PHCX", &prefix, key_name);
-	}
-
-	if (!zend_is_true(&last_key)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The cache must be started first");
-		return;
-	}
+	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	PHALCON_CONCAT_SVV(&last_key, "_PHCX", &prefix, key_name);
 
 	if (phalcon_function_exists_ex(SL("xcache_inc")) == SUCCESS) {
 		PHALCON_RETURN_CALL_FUNCTION("xcache_inc", &last_key, value);

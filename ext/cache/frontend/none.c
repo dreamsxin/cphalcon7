@@ -66,7 +66,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_None, beforeStore);
 PHP_METHOD(Phalcon_Cache_Frontend_None, afterRetrieve);
 
 static const zend_function_entry phalcon_cache_frontend_none_method_entry[] = {
-	PHP_ME(Phalcon_Cache_Frontend_None, getLifetime, arginfo_phalcon_cache_frontendinterface_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Frontend_None, getLifetime, arginfo_phalcon_cache_frontendinterface_getlifetime, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Frontend_None, beforeStore, arginfo_phalcon_cache_frontendinterface_beforestore, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Frontend_None, afterRetrieve, arginfo_phalcon_cache_frontendinterface_afterretrieve, ZEND_ACC_PUBLIC)
 	PHP_FE_END

@@ -47,48 +47,20 @@ class SessionTest extends PHPUnit_Framework_TestCase
 		@session_destroy();
 	}
 
-	public function testSessionMemcache()
-	{
-		if (!extension_loaded('memcache')) {
-			$this->markTestSkipped('Warning: memcached extension is not loaded');
-			return false;
-		}
-		$session = new Phalcon\Session\Adapter\Memcache(array(
-			'host' => '127.0.0.1',
-			'port' => '11211',
-			'prefix' => 'memcache'
-		));
-
-		$this->assertTrue($session->start());
-		$this->assertTrue($session->isStarted());
-
-		$session->set('some', 'value');
-
-		$this->assertEquals($session->get('some'), 'value');
-		$this->assertTrue($session->has('some'));
-		$this->assertEquals($session->get('undefined', 'my-default'), 'my-default');
-
-		// Automatically deleted after reading
-		$this->assertEquals($session->get('some', NULL, TRUE), 'value');
-		$this->assertFalse($session->has('some'));
-
-		@session_destroy();
-	}
-
-	public function testSessionLibmemcached()
+	public function testSessionMemcached()
 	{
 		if (!extension_loaded('memcached')) {
 			$this->markTestSkipped('Warning: memcached extension is not loaded');
 			return false;
 		}
-		$session = new Phalcon\Session\Adapter\Libmemcached(array(
+		$session = new Phalcon\Session\Adapter\Memcached(array(
 			'servers' => array(
 				array(
 					'host' => '127.0.0.1',
 					'port' => '11211'
 				)
 			),
-			'prefix' => 'libmemcached'
+			'prefix' => 'memcached'
 		));
 
 		$this->assertTrue($session->start());

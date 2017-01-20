@@ -1023,6 +1023,6 @@ worker:
 
 	phalcon_socket_server_destroy();
 #else
-	PHALCON_THROW_EXCEPTION_FORMAT(phalcon_socket_exception_ce, "Don't support, please reinstall.");
+	PHALCON_THROW_EXCEPTION_STR(phalcon_socket_exception_ce, "Don't support, please reinstall.");
 #endif
 }

@@ -107,6 +107,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 		}
 	}
 
+	#ifdef PHALCON_USE_MONGOC
+		mongoc_init();
+	#endif
+
 	/* 1. Register exceptions */
 	PHALCON_INIT(Phalcon_Exception);
 	PHALCON_INIT(Phalcon_Debug_Exception);
@@ -154,7 +158,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Exception);
 	PHALCON_INIT(Phalcon_Chart_Exception);
 	PHALCON_INIT(Phalcon_Binary_Exception);
+#if PHALCON_USE_PHP_SOCKET
 	PHALCON_INIT(Phalcon_Socket_Exception);
+#endif
 	PHALCON_INIT(Phalcon_Process_Exception);
 
 	/* 2. Register interfaces */
@@ -268,8 +274,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 #ifdef PHALCON_USE_MONGOC
 	PHALCON_INIT(Phalcon_Cache_Backend_Mongo);
 #endif
-	PHALCON_INIT(Phalcon_Cache_Backend_Memcache);
-	PHALCON_INIT(Phalcon_Cache_Backend_Libmemcached);
+	PHALCON_INIT(Phalcon_Cache_Backend_Memcached);
 	PHALCON_INIT(Phalcon_Cache_Backend_Redis);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Json);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Output);
@@ -333,8 +338,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Version);
 	PHALCON_INIT(Phalcon_Session_Bag);
 	PHALCON_INIT(Phalcon_Session_Adapter_Files);
-	PHALCON_INIT(Phalcon_Session_Adapter_Memcache);
-	PHALCON_INIT(Phalcon_Session_Adapter_Libmemcached);
+	PHALCON_INIT(Phalcon_Session_Adapter_Memcached);
 	PHALCON_INIT(Phalcon_Session_Adapter_Cache);
 	PHALCON_INIT(Phalcon_Filter);
 	PHALCON_INIT(Phalcon_Flash_Direct);
@@ -444,8 +448,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Apc);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Files);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Session);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Memcache);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Libmemcached);
+	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Memcached);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Redis);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Mongo);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Cache);
@@ -483,9 +486,11 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Binary);
 	PHALCON_INIT(Phalcon_Binary_Reader);
 	PHALCON_INIT(Phalcon_Binary_Writer);
+#if PHALCON_USE_PHP_SOCKET
 	PHALCON_INIT(Phalcon_Socket);
 	PHALCON_INIT(Phalcon_Socket_Client);
 	PHALCON_INIT(Phalcon_Socket_Server);
+#endif
 	PHALCON_INIT(Phalcon_Process_Proc);
 	PHALCON_INIT(Phalcon_Process_Sharedmemory);
 #ifdef PHALCON_USE_WEBSOCKET
@@ -496,9 +501,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Intrusive_Avltree);
 	PHALCON_INIT(Phalcon_Intrusive_Avltree_Node);
 
-#ifdef PHALCON_USE_MONGOC
-	mongoc_init();
-#endif
 	return SUCCESS;
 }
 
@@ -508,8 +510,6 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 
 	assert(PHALCON_GLOBAL(orm).ast_cache == NULL);
 
-	UNREGISTER_INI_ENTRIES();
-
 	if (PHALCON_GLOBAL(cache).enable_shmemory) {
 		phalcon_cache_shmemory_storage_shutdown();
 	}
@@ -517,6 +517,9 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 #ifdef PHALCON_USE_MONGOC
 	mongoc_cleanup();
 #endif
+
+	UNREGISTER_INI_ENTRIES();
+
 	return SUCCESS;
 }
 
@@ -589,7 +592,7 @@ static const zend_module_dep phalcon_deps[] = {
 #else
 	ZEND_MOD_OPTIONAL("hash")
 #endif
-#if PHALCON_USE_PHP_HASH
+#if PHALCON_USE_PHP_SOCKET
 	ZEND_MOD_REQUIRED("sockets")
 #else
 	ZEND_MOD_OPTIONAL("sockets")
@@ -597,7 +600,6 @@ static const zend_module_dep phalcon_deps[] = {
 	ZEND_MOD_OPTIONAL("apc")
 	ZEND_MOD_OPTIONAL("apcu")
 	ZEND_MOD_OPTIONAL("XCache")
-	ZEND_MOD_OPTIONAL("memcache")
 	ZEND_MOD_OPTIONAL("memcached")
 	ZEND_MOD_OPTIONAL("filter")
 	ZEND_MOD_OPTIONAL("iconv")

@@ -61,10 +61,17 @@ ZEND_ARG_TYPE_INFO(0, port, IS_LONG, 1)
 ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_websocket_client_on, 0, 2, IS_TRUE|IS_FALSE, 0)
+	ZEND_ARG_TYPE_INFO(0, event, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, callback, IS_CALLABLE, 1)
+ZEND_END_ARG_INFO()
+#else
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_websocket_client_on, 0, 2, IS_TRUE|IS_FALSE, NULL, 0)
 	ZEND_ARG_TYPE_INFO(0, event, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, callback, IS_CALLABLE, 1)
 ZEND_END_ARG_INFO()
+#endif
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_client_connect, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, accept, IS_CALLABLE, 1)
@@ -237,8 +244,8 @@ zend_object_handlers phalcon_websocket_client_object_handlers;
 zend_object* phalcon_websocket_client_object_create_handler(zend_class_entry *ce)
 {
 	int i;
-	phalcon_websocket_client_object *intern = emalloc(sizeof(phalcon_websocket_client_object));
-	memset(intern, 0, sizeof(phalcon_websocket_client_object));
+	phalcon_websocket_client_object *intern = ecalloc(1, sizeof(phalcon_websocket_client_object) + zend_object_properties_size(ce));
+	intern->std.ce = ce;
 
 	zend_object_std_init(&intern->std, ce);
 	object_properties_init(&intern->std, ce);
@@ -279,8 +286,7 @@ void phalcon_websocket_client_object_free_handler(zend_object *object)
 		intern->context = NULL;
 	}
 
-	zend_object_std_dtor(&intern->std);
-	efree(intern);
+	zend_object_std_dtor(object);
 }
 
 /**

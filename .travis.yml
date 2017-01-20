@@ -54,7 +54,7 @@ env:
     - TEST_DB_MONGO_USER="admin"
     - TEST_DB_MONGO_PASSWD=""
     - TEST_DB_MONGO_NAME="phalcon_test"
-    - ZEND_DONT_UNLOAD_MODULES=1
+    #- ENABLE_MAINTAINER_ZTS=1 ENABLE_DEBUG=1 USE_ZEND_ALLOC=0
     - CC="ccache gcc"
 
 before_install:

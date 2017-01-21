@@ -44,6 +44,7 @@
 #include "validation/message.h"
 #include "debug.h"
 
+#include <Zend/zend_closures.h>
 #include <ext/pdo/php_pdo_driver.h>
 
 #ifdef PHALCON_USE_PHP_JSON
@@ -2652,10 +2653,13 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 
 		PHALCON_CALL_METHOD(&value, getThis(), "readattribute", &field);
 
-		array_init_size(&arguments, 1);
-		phalcon_array_append(&arguments, &value, PH_COPY);
-
-		PHALCON_CALL_USER_FUNC_ARRAY(&status, &handler, &arguments);
+		if (Z_TYPE(handler) == IS_OBJECT && instanceof_function(Z_OBJCE(handler), zend_ce_closure)) {
+			PHALCON_CALL_METHOD(&status, &handler, "call", getThis(), &value);
+		} else {
+			array_init_size(&arguments, 1);
+			phalcon_array_append(&arguments, &value, PH_COPY);
+			PHALCON_CALL_USER_FUNC_ARRAY(&status, &handler, &arguments);
+		}
 
 		if (PHALCON_IS_FALSE(&status)) {
 			if (phalcon_array_isset_fetch_str(&message_str, validation, SL("message"))) {

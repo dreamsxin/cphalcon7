@@ -540,7 +540,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 	phalcon_fetch_params(0, 0, 8, &_onconnection, &_onrecv, &_onsend, &_onclose, &_onerror, &_ontimeout, &timeout, &usec);
 
 	if (_onconnection) {
-		if (instanceof_function_ex(Z_OBJCE_P(_onconnection), zend_ce_closure, 0)) {
+		if (Z_TYPE_P(_onconnection) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onconnection), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onconnection, zend_ce_closure, "bind", _onconnection, getThis());
 		} else {
 			PHALCON_CPY_WRT(&onconnection, _onconnection);
@@ -548,7 +548,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 	}
 
 	if (_onrecv) {
-		if (instanceof_function_ex(Z_OBJCE_P(_onrecv), zend_ce_closure, 0)) {
+		if (Z_TYPE_P(_onrecv) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onrecv), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onrecv, zend_ce_closure, "bind", _onrecv, getThis());
 		} else {
 			PHALCON_CPY_WRT(&onrecv, _onrecv);
@@ -556,7 +556,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 	}
 
 	if (_onsend) {
-		if (instanceof_function_ex(Z_OBJCE_P(_onsend), zend_ce_closure, 0)) {
+		if (Z_TYPE_P(_onsend) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onsend), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onsend, zend_ce_closure, "bind", _onsend, getThis());
 		} else {
 			PHALCON_CPY_WRT(&onsend, _onsend);
@@ -564,7 +564,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 	}
 
 	if (_onclose) {
-		if (instanceof_function_ex(Z_OBJCE_P(_onclose), zend_ce_closure, 0)) {
+		if (Z_TYPE_P(_onclose) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onclose), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onclose, zend_ce_closure, "bind", _onclose, getThis());
 		} else {
 			PHALCON_CPY_WRT(&onclose, _onclose);
@@ -572,7 +572,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 	}
 
 	if (_onerror) {
-		if (instanceof_function_ex(Z_OBJCE_P(_onerror), zend_ce_closure, 0)) {
+		if (Z_TYPE_P(_onerror) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onerror), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onerror, zend_ce_closure, "bind", _onerror, getThis());
 		} else {
 			PHALCON_CPY_WRT(&onerror, _onerror);
@@ -580,7 +580,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 	}
 
 	if (_ontimeout) {
-		if (instanceof_function_ex(Z_OBJCE_P(_ontimeout), zend_ce_closure, 0)) {
+		if (Z_TYPE_P(_ontimeout) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_ontimeout), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&ontimeout, zend_ce_closure, "bind", _ontimeout, getThis());
 		} else {
 			PHALCON_CPY_WRT(&ontimeout, _ontimeout);

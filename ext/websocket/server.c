@@ -24,6 +24,7 @@
 
 #include <php_network.h>
 #include <zend_interfaces.h>
+#include <Zend/zend_closures.h>
 
 #include "kernel/main.h"
 #include "kernel/fcall.h"
@@ -60,11 +61,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_server___construct, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_server_seteventloop, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, callback, IS_OBJECT, 0)
+	ZEND_ARG_OBJ_INFO(0, eventloop, Phalcon\\Websocket\\EventloopInterface, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_server_servicefd, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, callback, IS_RESOURCE, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_server_servicefd, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, fd, IS_RESOURCE, 0)
 	ZEND_ARG_TYPE_INFO(0, events, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
@@ -75,13 +76,13 @@ ZEND_END_ARG_INFO()
 
 #if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_websocket_server_on, 0, 2, IS_TRUE|IS_FALSE, 0)
-	ZEND_ARG_TYPE_INFO(0, event, IS_LONG, 1)
-	ZEND_ARG_TYPE_INFO(0, callback, IS_CALLABLE, 1)
+	ZEND_ARG_TYPE_INFO(0, event, IS_LONG, 0)
+	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
 ZEND_END_ARG_INFO()
 #else
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_websocket_server_on, 0, 2, IS_TRUE|IS_FALSE, NULL, 0)
-	ZEND_ARG_TYPE_INFO(0, event, IS_LONG, 1)
-	ZEND_ARG_TYPE_INFO(0, callback, IS_CALLABLE, 1)
+	ZEND_ARG_TYPE_INFO(0, event, IS_LONG, 0)
+	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
 ZEND_END_ARG_INFO()
 #endif
 
@@ -585,11 +586,17 @@ PHP_METHOD(Phalcon_Websocket_Server, broadcast)
  */
 PHP_METHOD(Phalcon_Websocket_Server, on)
 {
-	zval *ev, *func;
+	zval *ev, *func, callback = {};
 	phalcon_websocket_server_object *intern;
 	long event;
 
 	phalcon_fetch_params(0, 2, 0, &ev, &func);
+
+	if (Z_TYPE_P(func) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(func), zend_ce_closure, 0)) {
+			PHALCON_CALL_CE_STATIC(&callback, zend_ce_closure, "bind", func, getThis());
+	} else {
+		PHALCON_CPY_WRT(&callback, func);
+	}
 
 	event = Z_LVAL_P(ev);
 	if (event < 0 || event >= PHP_CB_SERVER_COUNT) {
@@ -598,6 +605,6 @@ PHP_METHOD(Phalcon_Websocket_Server, on)
 	}
 
 	intern = phalcon_websocket_server_object_from_obj(Z_OBJ_P(getThis()));
-	ZVAL_COPY(&intern->callbacks[event], func);
+	ZVAL_COPY(&intern->callbacks[event], &callback);
 	RETURN_TRUE;
 }

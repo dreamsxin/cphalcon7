@@ -55,15 +55,14 @@ PHP_METHOD(Phalcon_Cache_SHMemory, dump);
 PHP_METHOD(Phalcon_Cache_SHMemory, __set);
 PHP_METHOD(Phalcon_Cache_SHMemory, __get);
 
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_shmemory___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, prefix)
+	ZEND_ARG_TYPE_INFO(0, prefix, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_shmemory_set, 0, 0, 1)
 	ZEND_ARG_INFO(0, keys)
 	ZEND_ARG_INFO(0, value)
-	ZEND_ARG_INFO(0, lifetime)
+	ZEND_ARG_TYPE_INFO(0, lifetime, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_shmemory_get, 0, 0, 1)
@@ -72,20 +71,20 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_shmemory_delete, 0, 0, 1)
 	ZEND_ARG_INFO(0, keys)
-	ZEND_ARG_INFO(0, lifetime)
+	ZEND_ARG_TYPE_INFO(0, lifetime, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_shmemory_dump, 0, 0, 0)
-	ZEND_ARG_INFO(0, limit)
+	ZEND_ARG_TYPE_INFO(0, limit, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_shmemory___set, 0, 0, 2)
-	ZEND_ARG_INFO(0, key)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_shmemory___get, 0, 0, 1)
-	ZEND_ARG_INFO(0, key)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cache_shmemory_method_entry[] = {

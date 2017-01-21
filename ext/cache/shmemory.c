@@ -104,7 +104,7 @@ static const zend_function_entry phalcon_cache_shmemory_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Cache_SHMemory){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache, SHMemory, cache_shmemory, phalcon_di_injectable_ce, phalcon_cache_shmemory_method_entry, 0);
+	PHALCON_REGISTER_CLASS(Phalcon\\Cache, SHMemory, cache_shmemory, phalcon_cache_shmemory_method_entry, 0);
 
 	zend_declare_property_string(phalcon_cache_shmemory_ce, SL("_prefix"), "phshm_", ZEND_ACC_PROTECTED);
 

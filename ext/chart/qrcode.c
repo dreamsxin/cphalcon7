@@ -20,7 +20,7 @@
 #include "config.h"
 #endif
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 # include <wand/MagickWand.h>
 # ifdef PHALCON_USE_ZBAR
 #  include <zbar.h>
@@ -109,7 +109,7 @@ static const zend_function_entry phalcon_chart_qrcode_method_entry[] = {
 	PHP_FE_END
 };
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 # define INCHES_PER_METER (100.0/2.54)
 
 int  phalcon_qrcode_handle;
@@ -157,7 +157,7 @@ PHALCON_INIT_CLASS(Phalcon_Chart_QRcode){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Chart, QRcode, chart_qrcode, phalcon_chart_qrcode_method_entry, 0);
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
     phalcon_qrcode_handle = zend_register_list_destructors_ex(phalcon_qr_dtor, NULL, phalcon_qrcode_handle_name, module_number);
 
 	/* Mode */
@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, __construct){
  */
 PHP_METHOD(Phalcon_Chart_QRcode, generate){
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 	zval *text, *_version = NULL, *_level = NULL, *_mode = NULL, *_casesensitive = NULL, version = {}, level = {}, mode = {}, casesensitive = {};
 	zval zid = {};
 	php_qrcode *qr = NULL;
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
  */
 PHP_METHOD(Phalcon_Chart_QRcode, render){
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 	zval *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL, zid = {};
 	FILE *fp = NULL;
 	png_structp png_ptr;
@@ -482,7 +482,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
  */
 PHP_METHOD(Phalcon_Chart_QRcode, save){
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 	zval *filename, *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL;
 	zval zid = {}, exception_message = {};
 	png_structp png_ptr;
@@ -774,7 +774,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
  */
 PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
-#ifdef PHALCON_USE_ZBAR
+#if PHALCON_USE_ZBAR
 	zval *filename, *enhance = NULL, *extended = NULL;
 	MagickWand *magick_wand;
 	zbar_image_scanner_t *zbar_scanner;

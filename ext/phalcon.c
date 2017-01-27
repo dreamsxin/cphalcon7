@@ -107,9 +107,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 		}
 	}
 
-	#ifdef PHALCON_USE_MONGOC
-		mongoc_init();
-	#endif
+#if PHALCON_USE_MONGOC
+	mongoc_init();
+#endif
 
 	/* 1. Register exceptions */
 	PHALCON_INIT(Phalcon_Exception);
@@ -450,7 +450,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Session);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Memcached);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Redis);
+#if PHALCON_USE_MONGOC
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Mongo);
+#endif
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Cache);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Memory);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Xcache);

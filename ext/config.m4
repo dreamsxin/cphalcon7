@@ -23,7 +23,7 @@ else
 fi
 
 PHP_ARG_ENABLE(qrcode, wheter to enable qrcode support,
-[  --enable-qrcode         Enable qrcode], no, no)
+[  --enable-qrcode         Enable qrcode], yes, no)
 
 AC_MSG_CHECKING([Include qrcode])
 if test "$PHP_QRCODE" != "no"; then
@@ -619,7 +619,6 @@ image/exception.c \
 image/adapter/gd.c \
 image/adapter/imagick.c \
 registry.c \
-chart/qrcode.c \
 chart/captcha.c \
 chart/exception.c \
 async.c \
@@ -831,6 +830,7 @@ process/exception.c"
 				[
 					PHP_ADD_LIBRARY_WITH_PATH(qrencode, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
 					AC_DEFINE(PHALCON_USE_QRENCODE, 1, [Have qrencode support])
+					phalcon_sources="$phalcon_sources chart/qrcode.c "
 				],[
 					AC_MSG_ERROR([Wrong qrencode version or library not found])
 				],[

@@ -20,6 +20,10 @@
 #include "config.h"
 #endif
 
+#include "php.h"
+#include "php_phalcon.h"
+#include "phalcon.h"
+
 #if PHALCON_USE_QRENCODE
 # include <wand/MagickWand.h>
 # ifdef PHALCON_USE_ZBAR
@@ -29,10 +33,6 @@
 # define PNG_SKIP_SETJMP_CHECK 1
 # include <png.h>
 #endif
-
-#include "php.h"
-#include "php_phalcon.h"
-#include "phalcon.h"
 
 #include "php_open_temporary_file.h"
 

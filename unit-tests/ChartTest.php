@@ -36,6 +36,11 @@ class ChartTest extends PHPUnit_Framework_TestCase
 
 	public function testQRencode()
 	{
+		if (!class_exists('Phalcon\Chart\QRcode')) {
+			$this->markTestSkipped('Class `Phalcon\Chart\QRcode` is not exists');
+			return false;
+		}
+
 		@unlink('unit-tests/assets/qr.png');
 
 		$str = 'Phalcon is web framework';

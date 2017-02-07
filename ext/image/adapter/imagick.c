@@ -29,7 +29,11 @@
 #include <stdlib.h>
 
 #ifdef PHALCON_USE_MAGICKWAND
-#include <wand/MagickWand.h>
+# if IM_MAGICKWAND_HEADER_STYLE_SEVEN
+#  include <MagickWand/MagickWand.h>
+# else
+#  include <wand/MagickWand.h>
+# endif
 #endif
 
 #include "kernel/main.h"

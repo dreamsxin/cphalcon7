@@ -763,29 +763,56 @@ process/exception.c"
 			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
 			break
 		elif test -r $i/bin/MagickWand-config; then
-			WAND_BINARY=$i/bin/MagickWand-config
+			IM_WAND_BINARY=$i/bin/MagickWand-config
 
-			WAND_CFLAGS=`$WAND_BINARY --cflags`
-			WAND_LDFLAGS=`$WAND_BINARY --libs`
+			IM_IMAGEMAGICK_VERSION=`$IM_WAND_BINARY --version`
+			IM_IMAGEMAGICK_VERSION_MASK=`echo $IM_IMAGEMAGICK_VERSION | $AWK 'BEGIN { FS = "."; } { printf "%d", ($[1] * 1000 + $[2]) * 1000 + $[3];}'`
+
+			AC_MSG_CHECKING(if ImageMagick version is at least 6.2.4)
+			if test "$IM_IMAGEMAGICK_VERSION_MASK" -ge $1; then
+				AC_MSG_RESULT(found version $IM_IMAGEMAGICK_VERSION)
+			else
+				AC_MSG_ERROR(no. You need at least Imagemagick version 6.2.4 to use Imagick.)
+			fi
+
+			WAND_CFLAGS=`$IM_WAND_BINARY --cflags`
+			WAND_LDFLAGS=`$IM_WAND_BINARY --libs`
 
 			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
 			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"
 
-			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
-			break
-		elif test -r $i/include/ImageMagick-6/wand/MagickWand.h; then
-			WAND_CFLAGS=`pkg-config --cflags MagickWand`
-			WAND_LDFLAGS=`pkg-config --libs MagickWand`
+			AC_MSG_CHECKING(for MagickWand.h header)
 
-			PHP_ADD_INCLUDE($i/include/ImageMagick-6)
+			IM_PREFIX=`$IM_WAND_BINARY --prefix`
+			IM_MAJOR_VERSION=`echo $IM_IMAGEMAGICK_VERSION | $AWK 'BEGIN { FS = "."; } {print $[1]}'`
 
-			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
-			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"
+			if test -r "${IM_PREFIX}/include/ImageMagick-${IM_MAJOR_VERSION}/MagickWand/MagickWand.h"; then
+				PHP_ADD_INCLUDE(${IM_PREFIX}/include/ImageMagick-${IM_MAJOR_VERSION})
 
-			AC_MSG_RESULT(yes)
+				AC_DEFINE([IM_MAGICKWAND_HEADER_STYLE_SEVEN], [1], [ImageMagick 7.x style header])
+				AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
 
-			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
-			break
+				AC_MSG_RESULT([${IM_PREFIX}/include/ImageMagick-${IM_MAJOR_VERSION}/MagickWand/MagickWand.h])
+				break
+			elif test -r "${IM_PREFIX}/include/ImageMagick-${IM_MAJOR_VERSION}/wand/MagickWand.h"; then
+				PHP_ADD_INCLUDE(${IM_PREFIX}/include/ImageMagick-${IM_MAJOR_VERSION})
+
+				AC_DEFINE([IM_MAGICKWAND_HEADER_STYLE_SIX], [1], [ImageMagick 6.x style header])
+				AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
+
+				AC_MSG_RESULT([${IM_PREFIX}/include/ImageMagick-${IM_MAJOR_VERSION}/wand/MagickWand.h])
+				break
+			elif test -r "${IM_PREFIX}/include/ImageMagick/wand/MagickWand.h"; then
+				PHP_ADD_INCLUDE(${IM_PREFIX}/include/ImageMagick)
+
+				AC_DEFINE([IM_MAGICKWAND_HEADER_STYLE_SIX], [1], [ImageMagick 6.x style header])
+				AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
+
+				AC_MSG_RESULT([${IM_PREFIX}/include/ImageMagick/wand/MagickWand.h])
+				break
+			else
+				AC_MSG_ERROR([Unable to find MagickWand.h header])
+			fi
 		else
 			AC_MSG_RESULT([no, found in $i])
 		fi

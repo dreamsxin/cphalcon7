@@ -22,7 +22,7 @@ namespace Phalcon\Builder;
 
 use Phalcon\Text;
 use Phalcon\Builder\Model as ModelBuilder;
-use Phalcon\DI\FactoryDefault;
+use Phalcon\Di\FactoryDefault;
 use Phalcon\Db\Column;
 
 /**

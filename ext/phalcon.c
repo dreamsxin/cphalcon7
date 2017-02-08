@@ -120,7 +120,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cache_Exception);
 	PHALCON_INIT(Phalcon_Crypt_Exception);
 	PHALCON_INIT(Phalcon_Db_Exception);
-	PHALCON_INIT(Phalcon_DI_Exception);
+	PHALCON_INIT(Phalcon_Di_Exception);
 	PHALCON_INIT(Phalcon_Escaper_Exception);
 	PHALCON_INIT(Phalcon_Events_Exception);
 	PHALCON_INIT(Phalcon_Filter_Exception);
@@ -165,8 +165,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
-	PHALCON_INIT(Phalcon_DI_InjectionAwareInterface);
-	PHALCON_INIT(Phalcon_DI_ServiceInterface);
+	PHALCON_INIT(Phalcon_Di_InjectionAwareInterface);
+	PHALCON_INIT(Phalcon_Di_ServiceInterface);
 	PHALCON_INIT(Phalcon_Events_EventInterface);
 	PHALCON_INIT(Phalcon_Events_EventsAwareInterface);
 
@@ -237,12 +237,12 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Validation_MessageInterface);
 
 	/* 4. Register everything else */
-	PHALCON_INIT(Phalcon_DI);
-	PHALCON_INIT(Phalcon_DI_Injectable);
-	PHALCON_INIT(Phalcon_DI_FactoryDefault);
-	PHALCON_INIT(Phalcon_DI_FactoryDefault_CLI);
-	PHALCON_INIT(Phalcon_DI_Service);
-	PHALCON_INIT(Phalcon_DI_Service_Builder);
+	PHALCON_INIT(Phalcon_Di);
+	PHALCON_INIT(Phalcon_Di_Injectable);
+	PHALCON_INIT(Phalcon_Di_FactoryDefault);
+	PHALCON_INIT(Phalcon_Di_FactoryDefault_CLI);
+	PHALCON_INIT(Phalcon_Di_Service);
+	PHALCON_INIT(Phalcon_Di_Service_Builder);
 	PHALCON_INIT(Phalcon_Forms_Element);
 	PHALCON_INIT(Phalcon_Annotations_Adapter);
 	PHALCON_INIT(Phalcon_Logger_Adapter);

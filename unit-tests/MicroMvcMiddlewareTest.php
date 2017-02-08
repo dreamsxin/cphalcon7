@@ -54,7 +54,7 @@ class MicroMvcMiddlewareTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroMiddlewareSimple()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$app = new Phalcon\Mvc\Micro();
 
@@ -95,7 +95,7 @@ class MicroMvcMiddlewareTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroMiddlewareClasses()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$app = new Phalcon\Mvc\Micro();
 
@@ -121,7 +121,7 @@ class MicroMvcMiddlewareTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroStopMiddlewareClasses()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$app = new Phalcon\Mvc\Micro();
 

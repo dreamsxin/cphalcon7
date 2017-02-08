@@ -46,7 +46,7 @@ namespace Phalcon\Mvc {
 	 *</code>
 	 */
 	
-	class Application extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class Application extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 
 		protected $_defaultModule;
 
@@ -59,7 +59,7 @@ namespace Phalcon\Mvc {
 		/**
 		 * \Phalcon\Mvc\Application
 		 *
-		 * @param \Phalcon\DI $dependencyInjector
+		 * @param \Phalcon\Di $dependencyInjector
 		 */
 		public function __construct($dependencyInjector=null){ }
 

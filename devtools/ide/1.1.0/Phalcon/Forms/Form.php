@@ -8,7 +8,7 @@ namespace Phalcon\Forms {
 	 * This component allows to build forms using an object-oriented interface
 	 */
 	
-	class Form extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Countable, \Iterator, \Traversable {
+	class Form extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Countable, \Iterator, \Traversable {
 
 		const VALUES_RAW = 1;
 

@@ -18,7 +18,7 @@ namespace Phalcon\Db\Adapter {
 	 *</code>
 	 */
 	
-	abstract class Pdo extends \Phalcon\Db\Adapter implements \Phalcon\Db\AdapterInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	abstract class Pdo extends \Phalcon\Db\Adapter implements \Phalcon\Db\AdapterInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		protected $_pdo;
 

@@ -25,7 +25,7 @@ class RouterCliTest extends PHPUnit_Framework_TestCase
 	public function testRouters()
 	{
 
-		$di = new \Phalcon\DI\FactoryDefault\CLI();
+		$di = new \Phalcon\Di\FactoryDefault\CLI();
 
 		$di->set('data', function(){
 			return "data";

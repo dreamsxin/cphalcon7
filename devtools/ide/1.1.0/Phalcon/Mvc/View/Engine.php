@@ -9,7 +9,7 @@ namespace Phalcon\Mvc\View {
 	 * basic interfacing between the engine and the Phalcon\Mvc\View component.
 	 */
 	
-	abstract class Engine extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\View\EngineInterface {
+	abstract class Engine extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\View\EngineInterface {
 
 		protected $_view;
 

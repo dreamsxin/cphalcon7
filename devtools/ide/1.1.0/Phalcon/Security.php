@@ -20,7 +20,7 @@ namespace Phalcon {
 	 *</code>
 	 */
 	
-	class Security extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class Security extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 
 		const CRYPT_DEFAULT = 0;
 

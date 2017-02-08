@@ -8,7 +8,7 @@ namespace Phalcon\Cache {
 	 * This class implements common functionality for memory adapters. A memory cache adapter may extend this class
 	 */
 	
-	class Memory extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class Memory extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 
 		protected $_prefix;
 

@@ -14,7 +14,7 @@ namespace Phalcon\Mvc\View {
 	 *
 	 */
 	
-	class Simple extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class Simple extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 
 		protected $_options;
 

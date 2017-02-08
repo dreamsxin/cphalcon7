@@ -3,7 +3,7 @@
 namespace Phalcon\Assets {
 
 	/**
-	 * Phalcon\DI\Exception
+	 * Phalcon\Di\Exception
 	 *
 	 * Exceptions thrown in Phalcon\Assets will use this class
 	 *

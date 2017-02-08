@@ -3,7 +3,7 @@
 namespace Phalcon {
 
 	/**
-	 * Phalcon\DIInterface initializer
+	 * Phalcon\DiInterface initializer
 	 */
 	
 	interface DIInterface extends \ArrayAccess {
@@ -14,7 +14,7 @@ namespace Phalcon {
 		 * @param string $name
 		 * @param mixed $definition
 		 * @param boolean $shared
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function set($name, $definition, $shared=null);
 
@@ -48,11 +48,11 @@ namespace Phalcon {
 
 
 		/**
-		 * Sets a service using a raw \Phalcon\DI\Service definition
+		 * Sets a service using a raw \Phalcon\Di\Service definition
 		 *
 		 * @param string $name
-		 * @param \Phalcon\DI\ServiceInterface $rawDefinition
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @param \Phalcon\Di\ServiceInterface $rawDefinition
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function setService($rawDefinition);
 
@@ -61,7 +61,7 @@ namespace Phalcon {
 		 * Returns the corresponding \Phalcon\Di\Service instance for a service
 		 *
 		 * @param string $name
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function getService($name);
 
@@ -94,7 +94,7 @@ namespace Phalcon {
 		/**
 		 * Set the default dependency injection container to be obtained into static methods
 		 *
-		 * @param \Phalcon_DIInterface $dependencyInjector
+		 * @param \Phalcon_DiInterface $dependencyInjector
 		 */
 		public static function setDefault($dependencyInjector);
 
@@ -102,7 +102,7 @@ namespace Phalcon {
 		/**
 		 * Return the last DI created
 		 *
-		 * @return \Phalcon_DIInterface
+		 * @return \Phalcon_DiInterface
 		 */
 		public static function getDefault();
 

@@ -11,7 +11,7 @@ namespace Phalcon\Mvc {
 	 *
 	 *<code>
 	 *
-	 *	$di = new Phalcon\DI();
+	 *	$di = new Phalcon\Di();
 	 *
 	 *	$dispatcher = new Phalcon\Mvc\Dispatcher();
 	 *
@@ -26,7 +26,7 @@ namespace Phalcon\Mvc {
 	 *</code>
 	 */
 	
-	class Dispatcher extends \Phalcon\Dispatcher implements \Phalcon\DispatcherInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface, \Phalcon\Mvc\DispatcherInterface {
+	class Dispatcher extends \Phalcon\Dispatcher implements \Phalcon\DispatcherInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface, \Phalcon\Mvc\DispatcherInterface {
 
 		const EXCEPTION_NO_DI = 1;
 

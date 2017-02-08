@@ -43,12 +43,12 @@
 #include "internal/arginfo.h"
 
 /**
- * Phalcon\DI
+ * Phalcon\Di
  *
- * Phalcon\DI is a component that implements Dependency Injection/Service Location
+ * Phalcon\Di is a component that implements Dependency Injection/Service Location
  * of services and it's itself a container for them.
  *
- * Since Phalcon is highly decoupled, Phalcon\DI is essential to integrate the different
+ * Since Phalcon is highly decoupled, Phalcon\Di is essential to integrate the different
  * components of the framework. The developer can also use this component to inject dependencies
  * and manage global instances of the different classes used in the application.
  *
@@ -60,7 +60,7 @@
  * Additionally, this pattern increases testability in the code, thus making it less prone to errors.
  *
  *<code>
- * $di = new Phalcon\DI();
+ * $di = new Phalcon\Di();
  *
  * //Using a string definition
  * $di->set('request', 'Phalcon\Http\Request', true);
@@ -76,28 +76,28 @@
  */
 zend_class_entry *phalcon_di_ce;
 
-PHP_METHOD(Phalcon_DI, __construct);
-PHP_METHOD(Phalcon_DI, getName);
-PHP_METHOD(Phalcon_DI, setEventsManager);
-PHP_METHOD(Phalcon_DI, getEventsManager);
-PHP_METHOD(Phalcon_DI, set);
-PHP_METHOD(Phalcon_DI, setShared);
-PHP_METHOD(Phalcon_DI, remove);
-PHP_METHOD(Phalcon_DI, attempt);
-PHP_METHOD(Phalcon_DI, setRaw);
-PHP_METHOD(Phalcon_DI, getRaw);
-PHP_METHOD(Phalcon_DI, setService);
-PHP_METHOD(Phalcon_DI, getService);
-PHP_METHOD(Phalcon_DI, get);
-PHP_METHOD(Phalcon_DI, getShared);
-PHP_METHOD(Phalcon_DI, has);
-PHP_METHOD(Phalcon_DI, wasFreshInstance);
-PHP_METHOD(Phalcon_DI, getServices);
-PHP_METHOD(Phalcon_DI, __call);
-PHP_METHOD(Phalcon_DI, setDefault);
-PHP_METHOD(Phalcon_DI, getDefault);
-PHP_METHOD(Phalcon_DI, reset);
-PHP_METHOD(Phalcon_DI, __clone);
+PHP_METHOD(Phalcon_Di, __construct);
+PHP_METHOD(Phalcon_Di, getName);
+PHP_METHOD(Phalcon_Di, setEventsManager);
+PHP_METHOD(Phalcon_Di, getEventsManager);
+PHP_METHOD(Phalcon_Di, set);
+PHP_METHOD(Phalcon_Di, setShared);
+PHP_METHOD(Phalcon_Di, remove);
+PHP_METHOD(Phalcon_Di, attempt);
+PHP_METHOD(Phalcon_Di, setRaw);
+PHP_METHOD(Phalcon_Di, getRaw);
+PHP_METHOD(Phalcon_Di, setService);
+PHP_METHOD(Phalcon_Di, getService);
+PHP_METHOD(Phalcon_Di, get);
+PHP_METHOD(Phalcon_Di, getShared);
+PHP_METHOD(Phalcon_Di, has);
+PHP_METHOD(Phalcon_Di, wasFreshInstance);
+PHP_METHOD(Phalcon_Di, getServices);
+PHP_METHOD(Phalcon_Di, __call);
+PHP_METHOD(Phalcon_Di, setDefault);
+PHP_METHOD(Phalcon_Di, getDefault);
+PHP_METHOD(Phalcon_Di, reset);
+PHP_METHOD(Phalcon_Di, __clone);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, name)
@@ -130,49 +130,49 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_getraw, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_di_method_entry[] = {
-	PHP_ME(Phalcon_DI, __construct, arginfo_phalcon_di___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_DI, getName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, setEventsManager, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_DI, getEventsManager, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Di, __construct, arginfo_phalcon_di___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Di, getName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, setEventsManager, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Di, getEventsManager, NULL, ZEND_ACC_PROTECTED)
 	/* Phalcon\DiInterface*/
-	PHP_ME(Phalcon_DI, set, arginfo_phalcon_diinterface_set, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, remove, arginfo_phalcon_diinterface_remove, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, setRaw, arginfo_phalcon_di_setraw, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, getRaw, arginfo_phalcon_di_getraw, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, getService, arginfo_phalcon_diinterface_getservice, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, setService, arginfo_phalcon_diinterface_setservice, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, get, arginfo_phalcon_diinterface_get, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, getShared, arginfo_phalcon_diinterface_getshared, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, has, arginfo_phalcon_diinterface_has, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, wasFreshInstance, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, getServices, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, setDefault, arginfo_phalcon_diinterface_setdefault, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_DI, getDefault, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_DI, reset, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Di, set, arginfo_phalcon_diinterface_set, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, remove, arginfo_phalcon_diinterface_remove, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, setRaw, arginfo_phalcon_di_setraw, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, getRaw, arginfo_phalcon_di_getraw, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, getService, arginfo_phalcon_diinterface_getservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, setService, arginfo_phalcon_diinterface_setservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, get, arginfo_phalcon_diinterface_get, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, getShared, arginfo_phalcon_diinterface_getshared, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, has, arginfo_phalcon_diinterface_has, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, wasFreshInstance, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, getServices, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, setDefault, arginfo_phalcon_diinterface_setdefault, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Di, getDefault, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Di, reset, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 
 	/* Convenience methods */
-	PHP_ME(Phalcon_DI, attempt, arginfo_phalcon_di_attempt, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, setShared, arginfo_phalcon_di_setshared, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, attempt, arginfo_phalcon_di_attempt, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, setShared, arginfo_phalcon_di_setshared, ZEND_ACC_PUBLIC)
 
 	/* Syntactic sugar */
-	PHP_MALIAS(Phalcon_DI, offsetExists, has, arginfo_arrayaccess_offsetexists, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_DI, offsetSet, setShared, arginfo_arrayaccess_offsetset, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_DI, offsetGet, getShared, arginfo_arrayaccess_offsetget, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_DI, offsetUnset, remove, arginfo_arrayaccess_offsetunset, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI, __call, arginfo_phalcon_di___call, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Di, offsetExists, has, arginfo_arrayaccess_offsetexists, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Di, offsetSet, setShared, arginfo_arrayaccess_offsetset, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Di, offsetGet, getShared, arginfo_arrayaccess_offsetget, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Di, offsetUnset, remove, arginfo_arrayaccess_offsetunset, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, __call, arginfo_phalcon_di___call, ZEND_ACC_PUBLIC)
 
 	/* Misc */
-	PHP_ME(Phalcon_DI, __clone, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, __clone, NULL, ZEND_ACC_PUBLIC)
 
-	PHP_MALIAS(Phalcon_DI, __set, set, arginfo___set, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_DI, __get, get, arginfo___get, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Di, __set, set, arginfo___set, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Di, __get, get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\DI initializer
+ * Phalcon\Di initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DI){
+PHALCON_INIT_CLASS(Phalcon_Di){
 
 	PHALCON_REGISTER_CLASS(Phalcon, DI, di, phalcon_di_method_entry, 0);
 
@@ -190,10 +190,10 @@ PHALCON_INIT_CLASS(Phalcon_DI){
 }
 
 /**
- * Phalcon\DI constructor
+ * Phalcon\Di constructor
  *
  */
-PHP_METHOD(Phalcon_DI, __construct){
+PHP_METHOD(Phalcon_Di, __construct){
 
 	zval *_name = NULL, *default_di, name = {};
 
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_DI, __construct){
  *
  * @return String
  */
-PHP_METHOD(Phalcon_DI, getName){
+PHP_METHOD(Phalcon_Di, getName){
 
 	RETURN_MEMBER(getThis(), "_name");
 }
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_DI, getName){
  *
  * @param Phalcon\Events\ManagerInterface $eventsManager
  */
-PHP_METHOD(Phalcon_DI, setEventsManager){
+PHP_METHOD(Phalcon_Di, setEventsManager){
 
 	zval *events_manager;
 
@@ -244,7 +244,7 @@ PHP_METHOD(Phalcon_DI, setEventsManager){
  *
  * @return Phalcon\Events\ManagerInterface
  */
-PHP_METHOD(Phalcon_DI, getEventsManager){
+PHP_METHOD(Phalcon_Di, getEventsManager){
 
 	RETURN_MEMBER(getThis(), "_eventsManager");
 }
@@ -255,9 +255,9 @@ PHP_METHOD(Phalcon_DI, getEventsManager){
  * @param string $name
  * @param mixed $definition
  * @param boolean $shared
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
-PHP_METHOD(Phalcon_DI, set) {
+PHP_METHOD(Phalcon_Di, set) {
 
 	zval *name, *definition, *shared = NULL;
 
@@ -276,9 +276,9 @@ PHP_METHOD(Phalcon_DI, set) {
  *
  * @param string $name
  * @param mixed $definition
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
-PHP_METHOD(Phalcon_DI, setShared){
+PHP_METHOD(Phalcon_Di, setShared){
 
 	zval *name, *definition;
 
@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_DI, setShared){
  *
  * @param string $name
  */
-PHP_METHOD(Phalcon_DI, remove){
+PHP_METHOD(Phalcon_Di, remove){
 
 	zval *name;
 
@@ -311,9 +311,9 @@ PHP_METHOD(Phalcon_DI, remove){
  * @param string $name
  * @param mixed $definition
  * @param boolean $shared
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
-PHP_METHOD(Phalcon_DI, attempt){
+PHP_METHOD(Phalcon_Di, attempt){
 
 	zval *name, *definition, *shared = NULL;
 
@@ -335,9 +335,9 @@ PHP_METHOD(Phalcon_DI, attempt){
  * @param string $name
  * @param mixed $definition
  * @param boolean $shared
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
-PHP_METHOD(Phalcon_DI, setRaw)
+PHP_METHOD(Phalcon_Di, setRaw)
 {
 	zval *name, *raw_definition, *shared = NULL;
 
@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_DI, setRaw)
  * @param string $name
  * @return mixed
  */
-PHP_METHOD(Phalcon_DI, getRaw){
+PHP_METHOD(Phalcon_Di, getRaw){
 
 	zval *name, service = {};
 
@@ -380,13 +380,13 @@ PHP_METHOD(Phalcon_DI, getRaw){
 }
 
 /**
- * Sets a service using a raw Phalcon\DI\Service definition
+ * Sets a service using a raw Phalcon\Di\Service definition
  *
  * @param string $name
- * @param Phalcon\DI\ServiceInterface $service
- * @return Phalcon\DI\ServiceInterface
+ * @param Phalcon\Di\ServiceInterface $service
+ * @return Phalcon\Di\ServiceInterface
  */
-PHP_METHOD(Phalcon_DI, setService)
+PHP_METHOD(Phalcon_Di, setService)
 {
 	zval *name, *service;
 
@@ -398,12 +398,12 @@ PHP_METHOD(Phalcon_DI, setService)
 }
 
 /**
- * Returns a Phalcon\DI\Service instance
+ * Returns a Phalcon\Di\Service instance
  *
  * @param string $name
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
-PHP_METHOD(Phalcon_DI, getService){
+PHP_METHOD(Phalcon_Di, getService){
 
 	zval *name;
 
@@ -426,7 +426,7 @@ PHP_METHOD(Phalcon_DI, getService){
  * @param boolean $noError
  * @return mixed
  */
-PHP_METHOD(Phalcon_DI, get){
+PHP_METHOD(Phalcon_Di, get){
 
 	zval *name, *parameters = NULL, *noerror = NULL, events_manager = {}, event_name = {}, event_data = {}, service = {};
 	zend_class_entry *ce;
@@ -470,7 +470,7 @@ PHP_METHOD(Phalcon_DI, get){
 		}
 	}
 
-	/* Pass the DI itself if the instance implements Phalcon\DI\InjectionAwareInterface */
+	/* Pass the DI itself if the instance implements Phalcon\Di\InjectionAwareInterface */
 	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1)) {
 		PHALCON_CALL_METHOD(NULL, return_value, "setdi", getThis());
 	}
@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_DI, get){
  * @param boolean $noError
  * @return mixed
  */
-PHP_METHOD(Phalcon_DI, getShared){
+PHP_METHOD(Phalcon_Di, getShared){
 
 	zval *name, *parameters = NULL, *noerror = NULL;
 
@@ -530,7 +530,7 @@ PHP_METHOD(Phalcon_DI, getShared){
  * @param string $name
  * @return boolean
  */
-PHP_METHOD(Phalcon_DI, has){
+PHP_METHOD(Phalcon_Di, has){
 
 	zval *name;
 
@@ -549,7 +549,7 @@ PHP_METHOD(Phalcon_DI, has){
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_DI, wasFreshInstance){
+PHP_METHOD(Phalcon_Di, wasFreshInstance){
 
 
 	RETURN_MEMBER(getThis(), "_freshInstance");
@@ -558,9 +558,9 @@ PHP_METHOD(Phalcon_DI, wasFreshInstance){
 /**
  * Return the services registered in the DI
  *
- * @return Phalcon\DI\Service[]
+ * @return Phalcon\Di\Service[]
  */
-PHP_METHOD(Phalcon_DI, getServices){
+PHP_METHOD(Phalcon_Di, getServices){
 
 	RETURN_MEMBER(getThis(), "_services");
 }
@@ -572,7 +572,7 @@ PHP_METHOD(Phalcon_DI, getServices){
  * @param string $name
  * @return boolean
  */
-PHALCON_DOC_METHOD(Phalcon_DI, offsetExists);
+PHALCON_DOC_METHOD(Phalcon_Di, offsetExists);
 
 /**
  * Allows to register a shared service using the array syntax.
@@ -585,7 +585,7 @@ PHALCON_DOC_METHOD(Phalcon_DI, offsetExists);
  * @param string $name
  * @param mixed $definition
  */
-PHALCON_DOC_METHOD(Phalcon_DI, offsetSet);
+PHALCON_DOC_METHOD(Phalcon_Di, offsetSet);
 
 /**
  * Allows to obtain a shared service using the array syntax.
@@ -598,7 +598,7 @@ PHALCON_DOC_METHOD(Phalcon_DI, offsetSet);
  * @param string $name
  * @return mixed
  */
-PHALCON_DOC_METHOD(Phalcon_DI, offsetGet);
+PHALCON_DOC_METHOD(Phalcon_Di, offsetGet);
 
 /**
  * Removes a service from the services container using the array syntax.
@@ -606,7 +606,7 @@ PHALCON_DOC_METHOD(Phalcon_DI, offsetGet);
  *
  * @param string $name
  */
-PHALCON_DOC_METHOD(Phalcon_DI, offsetUnset);
+PHALCON_DOC_METHOD(Phalcon_Di, offsetUnset);
 
 /**
  * Magic method to get or set services using setters/getters
@@ -615,7 +615,7 @@ PHALCON_DOC_METHOD(Phalcon_DI, offsetUnset);
  * @param array $arguments
  * @return mixed
  */
-PHP_METHOD(Phalcon_DI, __call){
+PHP_METHOD(Phalcon_Di, __call){
 
 	zval *method, *arguments = NULL, possible_service = {}, name = {}, definition = {};
 
@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_DI, __call){
  *
  * @param Phalcon\DiInterface $dependencyInjector
  */
-PHP_METHOD(Phalcon_DI, setDefault){
+PHP_METHOD(Phalcon_Di, setDefault){
 
 	zval *dependency_injector;
 
@@ -675,7 +675,7 @@ PHP_METHOD(Phalcon_DI, setDefault){
  *
  * @return Phalcon\DiInterface
  */
-PHP_METHOD(Phalcon_DI, getDefault){
+PHP_METHOD(Phalcon_Di, getDefault){
 
 	zval *name = NULL;
 
@@ -695,12 +695,12 @@ PHP_METHOD(Phalcon_DI, getDefault){
 /**
  * Resets the internal default DI
  */
-PHP_METHOD(Phalcon_DI, reset){
+PHP_METHOD(Phalcon_Di, reset){
 
 	zend_update_static_property_null(phalcon_di_ce, SL("_default"));
 }
 
-PHP_METHOD(Phalcon_DI, __clone) {
+PHP_METHOD(Phalcon_Di, __clone) {
 
 	phalcon_update_property_null(getThis(), SL("_sharedInstances"));
 }

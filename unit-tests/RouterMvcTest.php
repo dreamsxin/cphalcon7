@@ -31,7 +31,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testRouter()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 		$tests = array(
 			array(
 				'uri' => '',
@@ -257,7 +257,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 			),
 		);
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('request', function(){
 			return new Phalcon\Http\Request();
@@ -658,7 +658,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 	{
 		Phalcon\Mvc\Router\Route::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('request', function(){
 			return new Phalcon\Http\Request();
@@ -714,7 +714,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 	{
 		Phalcon\Mvc\Router\Route::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('request', function(){
 			return new Phalcon\Http\Request();
@@ -771,7 +771,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 		Phalcon\Mvc\Router\Route::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('request', function(){
 			return new Phalcon\Http\Request();
@@ -824,7 +824,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 		Phalcon\Mvc\Router\Route::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('request', function(){
 			return new Phalcon\Http\Request();

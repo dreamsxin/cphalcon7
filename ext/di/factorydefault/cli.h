@@ -24,6 +24,6 @@
 
 extern zend_class_entry *phalcon_di_factorydefault_cli_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DI_FactoryDefault_CLI);
+PHALCON_INIT_CLASS(Phalcon_Di_FactoryDefault_CLI);
 
 #endif /* PHALCON_DI_FACTORYDEFAULT_CLI_H */

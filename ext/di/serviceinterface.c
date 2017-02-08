@@ -23,22 +23,22 @@
 zend_class_entry *phalcon_di_serviceinterface_ce;
 
 static const zend_function_entry phalcon_di_serviceinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_DI_ServiceInterface, getName, arginfo_phalcon_di_serviceinterface_getname)
-	PHP_ABSTRACT_ME(Phalcon_DI_ServiceInterface, setShared, arginfo_phalcon_di_serviceinterface_setshared)
-	PHP_ABSTRACT_ME(Phalcon_DI_ServiceInterface, isShared, arginfo_phalcon_di_serviceinterface_isshared)
-	PHP_ABSTRACT_ME(Phalcon_DI_ServiceInterface, setDefinition, arginfo_phalcon_di_serviceinterface_setdefinition)
-	PHP_ABSTRACT_ME(Phalcon_DI_ServiceInterface, getDefinition, arginfo_phalcon_di_serviceinterface_getdefinition)
-	PHP_ABSTRACT_ME(Phalcon_DI_ServiceInterface, isResolved, arginfo_phalcon_di_serviceinterface_isresolved)
-	PHP_ABSTRACT_ME(Phalcon_DI_ServiceInterface, resolve, arginfo_phalcon_di_serviceinterface_resolve)
+	PHP_ABSTRACT_ME(Phalcon_Di_ServiceInterface, getName, arginfo_phalcon_di_serviceinterface_getname)
+	PHP_ABSTRACT_ME(Phalcon_Di_ServiceInterface, setShared, arginfo_phalcon_di_serviceinterface_setshared)
+	PHP_ABSTRACT_ME(Phalcon_Di_ServiceInterface, isShared, arginfo_phalcon_di_serviceinterface_isshared)
+	PHP_ABSTRACT_ME(Phalcon_Di_ServiceInterface, setDefinition, arginfo_phalcon_di_serviceinterface_setdefinition)
+	PHP_ABSTRACT_ME(Phalcon_Di_ServiceInterface, getDefinition, arginfo_phalcon_di_serviceinterface_getdefinition)
+	PHP_ABSTRACT_ME(Phalcon_Di_ServiceInterface, isResolved, arginfo_phalcon_di_serviceinterface_isresolved)
+	PHP_ABSTRACT_ME(Phalcon_Di_ServiceInterface, resolve, arginfo_phalcon_di_serviceinterface_resolve)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\DI\ServiceInterface initializer
+ * Phalcon\Di\ServiceInterface initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DI_ServiceInterface){
+PHALCON_INIT_CLASS(Phalcon_Di_ServiceInterface){
 
-	PHALCON_REGISTER_INTERFACE(Phalcon\\DI, ServiceInterface, di_serviceinterface, phalcon_di_serviceinterface_method_entry);
+	PHALCON_REGISTER_INTERFACE(Phalcon\\Di, ServiceInterface, di_serviceinterface, phalcon_di_serviceinterface_method_entry);
 
 	return SUCCESS;
 }
@@ -48,35 +48,35 @@ PHALCON_INIT_CLASS(Phalcon_DI_ServiceInterface){
  *
  * @return string
  */
-PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, getName);
+PHALCON_DOC_METHOD(Phalcon_Di_ServiceInterface, getName);
 
 /**
  * Sets whether the service is shared or not
  *
  * @param boolean $shared
  */
-PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, setShared);
+PHALCON_DOC_METHOD(Phalcon_Di_ServiceInterface, setShared);
 
 /**
  * Check whether the service is shared or not
  *
  * @return boolean
  */
-PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, isShared);
+PHALCON_DOC_METHOD(Phalcon_Di_ServiceInterface, isShared);
 
 /**
  * Set the service definition
  *
  * @param mixed $definition
  */
-PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, setDefinition);
+PHALCON_DOC_METHOD(Phalcon_Di_ServiceInterface, setDefinition);
 
 /**
  * Returns the service definition
  *
  * @return mixed
  */
-PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, getDefinition);
+PHALCON_DOC_METHOD(Phalcon_Di_ServiceInterface, getDefinition);
 
 /**
  * Resolves the service
@@ -85,11 +85,11 @@ PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, getDefinition);
  * @param Phalcon\DiInterface $dependencyInjector
  * @return object
  */
-PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, resolve);
+PHALCON_DOC_METHOD(Phalcon_Di_ServiceInterface, resolve);
 
 /**
  * Checks if the service was resolved
  *
  * @return boolean
  */
-PHALCON_DOC_METHOD(Phalcon_DI_ServiceInterface, isResolved);
+PHALCON_DOC_METHOD(Phalcon_Di_ServiceInterface, isResolved);

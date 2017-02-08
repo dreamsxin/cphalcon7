@@ -9,7 +9,7 @@ namespace Phalcon\Http\Response {
 	 * A cookies bag is automatically registered as part of the 'response' service in the DI
 	 */
 	
-	class Cookies extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Http\Response\CookiesInterface {
+	class Cookies extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Http\Response\CookiesInterface {
 
 		protected $_registered;
 

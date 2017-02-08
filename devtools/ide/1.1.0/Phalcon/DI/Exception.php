@@ -1,11 +1,11 @@
 <?php 
 
-namespace Phalcon\DI {
+namespace Phalcon\Di {
 
 	/**
-	 * Phalcon\DI\Exception
+	 * Phalcon\Di\Exception
 	 *
-	 * Exceptions thrown in Phalcon\DI will use this class
+	 * Exceptions thrown in Phalcon\Di will use this class
 	 *
 	 */
 	

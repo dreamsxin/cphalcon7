@@ -25,7 +25,7 @@ namespace Phalcon\Mvc\Model {
 	 *</code>
 	 */
 	
-	class Query extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\Model\QueryInterface {
+	class Query extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\Model\QueryInterface {
 
 		const TYPE_SELECT = 309;
 

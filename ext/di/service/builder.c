@@ -31,30 +31,30 @@
 #include "kernel/hash.h"
 
 /**
- * Phalcon\DI\Service\Builder
+ * Phalcon\Di\Service\Builder
  *
  * This class builds instances based on complex definitions
  */
 zend_class_entry *phalcon_di_service_builder_ce;
 
-PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter);
-PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters);
-PHP_METHOD(Phalcon_DI_Service_Builder, build);
+PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameter);
+PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameters);
+PHP_METHOD(Phalcon_Di_Service_Builder, build);
 
 
 static const zend_function_entry phalcon_di_service_builder_method_entry[] = {
-	PHP_ME(Phalcon_DI_Service_Builder, _buildParameter, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_DI_Service_Builder, _buildParameters, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_DI_Service_Builder, build, arginfo_phalcon_di_service_builder_build, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Service_Builder, _buildParameter, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Di_Service_Builder, _buildParameters, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Di_Service_Builder, build, arginfo_phalcon_di_service_builder_build, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\DI\Service\Builder initializer
+ * Phalcon\Di\Service\Builder initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DI_Service_Builder){
+PHALCON_INIT_CLASS(Phalcon_Di_Service_Builder){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\DI\\Service, Builder, di_service_builder, phalcon_di_service_builder_method_entry, 0);
+	PHALCON_REGISTER_CLASS(Phalcon\\Di\\Service, Builder, di_service_builder, phalcon_di_service_builder_method_entry, 0);
 
 	return SUCCESS;
 }
@@ -67,7 +67,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_Service_Builder){
  * @param array $argument
  * @return mixed
  */
-PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
+PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameter){
 
 	zval *dependency_injector, *position, *argument, exception_message = {}, type = {}, name = {}, value = {}, instance_arguments = {};
 
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameter){
  * @param array $arguments
  * @return array
  */
-PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters){
+PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameters){
 
 	zval *dependency_injector, *arguments, build_arguments = {}, *argument;
 	zend_string *str_key;
@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_DI_Service_Builder, _buildParameters){
  * @param array $parameters
  * @return mixed
  */
-PHP_METHOD(Phalcon_DI_Service_Builder, build){
+PHP_METHOD(Phalcon_Di_Service_Builder, build){
 
 	zval *dependency_injector, *definition, *parameters = NULL, class_name = {}, instance = {}, arguments = {}, build_arguments = {};
 	zval param_calls = {}, *method, exception_message = {}, *property;

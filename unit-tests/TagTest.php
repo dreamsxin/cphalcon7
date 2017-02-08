@@ -40,7 +40,7 @@ class TagTest extends PHPUnit_Framework_TestCase
 </select>
 HTML;
 
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 		Tag::setDI($di);
 		$ret = Tag::selectStatic($data);
 
@@ -106,7 +106,7 @@ HTML;
 
 	public function testIssue1486()
     {
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 		$di->getshared('url')->setBaseUri('/');
 		\Phalcon\Tag::setDI($di);
 
@@ -125,7 +125,7 @@ HTML;
 
 	public function testIssue1679()
 	{
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 		$di->getshared('url')->setBaseUri('/');
 		\Phalcon\Tag::setDI($di);
 
@@ -155,7 +155,7 @@ HTML;
 
 	public function testIssue2142()
 	{
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 		$di->getshared('url')->setBaseUri('/');
 		\Phalcon\Tag::setDI($di);
 
@@ -178,7 +178,7 @@ HTML;
 
 	public function testIssue2002()
 	{
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 		$di->getshared('url')->setBaseUri('/');
 		\Phalcon\Tag::setDI($di);
 

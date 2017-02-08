@@ -44,9 +44,9 @@ class PaginatorTest extends PHPUnit_Framework_TestCase
 
 	protected function _loadDI()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('modelsManager', function() {
 			return new Phalcon\Mvc\Model\Manager();

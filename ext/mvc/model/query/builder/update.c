@@ -107,7 +107,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Update){
  * Phalcon\Mvc\Model\Query\Builder\Update constructor
  *
  * @param array $params
- * @param Phalcon\DI $dependencyInjector
+ * @param Phalcon\Di $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, __construct){
 

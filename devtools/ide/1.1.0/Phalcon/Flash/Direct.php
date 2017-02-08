@@ -8,7 +8,7 @@ namespace Phalcon\Flash {
 	 * This is a variant of the Phalcon\Flash that inmediately outputs any message passed to it
 	 */
 	
-	class Direct extends \Phalcon\Flash implements \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface, \Phalcon\FlashInterface {
+	class Direct extends \Phalcon\Flash implements \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface, \Phalcon\FlashInterface {
 
 		/**
 		 * Outputs a message

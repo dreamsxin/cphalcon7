@@ -64,8 +64,8 @@ class FormsTest extends PHPUnit_Framework_TestCase
 
 	public function setUp()
 	{
-		Phalcon\DI::reset();
-		return new Phalcon\DI\FactoryDefault();
+		Phalcon\Di::reset();
+		return new Phalcon\Di\FactoryDefault();
 	}
 
 	public function testFormElementEmpty()
@@ -651,9 +651,9 @@ class FormsTest extends PHPUnit_Framework_TestCase
 
 	public function testFormToString()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('url', function(){
 			$url = new Phalcon\Mvc\Url();

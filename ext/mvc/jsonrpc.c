@@ -108,7 +108,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_JsonRpc){
 /**
  * Phalcon\Mvc\JsonRpc
  *
- * @param Phalcon\DI $dependencyInjector
+ * @param Phalcon\Di $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
 

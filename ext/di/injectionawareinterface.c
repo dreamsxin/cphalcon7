@@ -24,17 +24,17 @@
 zend_class_entry *phalcon_di_injectionawareinterface_ce;
 
 static const zend_function_entry phalcon_di_injectionawareinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_DI_InjectionAwareInterface, setDI, arginfo_phalcon_di_injectionawareinterface_setdi)
-	PHP_ABSTRACT_ME(Phalcon_DI_InjectionAwareInterface, getDI, arginfo_phalcon_di_injectionawareinterface_getdi)
+	PHP_ABSTRACT_ME(Phalcon_Di_InjectionAwareInterface, setDI, arginfo_phalcon_di_injectionawareinterface_setdi)
+	PHP_ABSTRACT_ME(Phalcon_Di_InjectionAwareInterface, getDI, arginfo_phalcon_di_injectionawareinterface_getdi)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\DI\InjectionAwareInterface initializer
+ * Phalcon\Di\InjectionAwareInterface initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DI_InjectionAwareInterface){
+PHALCON_INIT_CLASS(Phalcon_Di_InjectionAwareInterface){
 
-	PHALCON_REGISTER_INTERFACE(Phalcon\\DI, InjectionAwareInterface, di_injectionawareinterface, phalcon_di_injectionawareinterface_method_entry);
+	PHALCON_REGISTER_INTERFACE(Phalcon\\Di, InjectionAwareInterface, di_injectionawareinterface, phalcon_di_injectionawareinterface_method_entry);
 
 	return SUCCESS;
 }
@@ -44,11 +44,11 @@ PHALCON_INIT_CLASS(Phalcon_DI_InjectionAwareInterface){
  *
  * @param Phalcon\DiInterface $dependencyInjector
  */
-PHALCON_DOC_METHOD(Phalcon_DI_InjectionAwareInterface, setDI);
+PHALCON_DOC_METHOD(Phalcon_Di_InjectionAwareInterface, setDI);
 
 /**
  * Returns the internal dependency injector
  *
  * @return Phalcon\DiInterface
  */
-PHALCON_DOC_METHOD(Phalcon_DI_InjectionAwareInterface, getDI);
+PHALCON_DOC_METHOD(Phalcon_Di_InjectionAwareInterface, getDI);

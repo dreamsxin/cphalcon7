@@ -19,7 +19,7 @@ namespace Phalcon\Db\Adapter\Pdo {
 	 * </code>
 	 */
 	
-	class Oracle extends \Phalcon\Db\Adapter\Pdo implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Db\AdapterInterface {
+	class Oracle extends \Phalcon\Db\Adapter\Pdo implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Db\AdapterInterface {
 
 		protected $_type;
 

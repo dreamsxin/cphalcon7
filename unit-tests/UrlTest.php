@@ -23,10 +23,10 @@ class UrlTest extends PHPUnit_Framework_TestCase
 {
 	public function testUrl()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		//Create a default DI
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 		
 		$di['router'] = function() {
 			$router = new \Phalcon\Mvc\Router(FALSE);

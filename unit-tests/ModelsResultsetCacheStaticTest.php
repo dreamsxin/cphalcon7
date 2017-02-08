@@ -57,9 +57,9 @@ class ModelsResultsetCacheStaticTest extends PHPUnit_Framework_TestCase
 			return;
 		}
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di['db'] = function(){
 			require 'unit-tests/config.db.php';

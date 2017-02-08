@@ -26,7 +26,7 @@ namespace Phalcon\Mvc\Model\MetaData {
 	 *</code>
 	 */
 	
-	class Memcached extends \Phalcon\Mvc\Model\MetaData implements \Phalcon\Mvc\Model\MetaDataInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Memcached extends \Phalcon\Mvc\Model\MetaData implements \Phalcon\Mvc\Model\MetaDataInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		const MODELS_ATTRIBUTES = 0;
 

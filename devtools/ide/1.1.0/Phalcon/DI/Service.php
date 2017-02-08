@@ -1,20 +1,20 @@
 <?php 
 
-namespace Phalcon\DI {
+namespace Phalcon\Di {
 
 	/**
-	 * Phalcon\DI\Service
+	 * Phalcon\Di\Service
 	 *
 	 * Represents individually a service in the services container
 	 *
 	 *<code>
-	 * $service = new Phalcon\DI\Service('request', 'Phalcon\Http\Request');
+	 * $service = new Phalcon\Di\Service('request', 'Phalcon\Http\Request');
 	 * $request = $service->resolve();
 	 *<code>
 	 *
 	 */
 	
-	class Service implements \Phalcon\DI\ServiceInterface {
+	class Service implements \Phalcon\Di\ServiceInterface {
 
 		protected $_name;
 
@@ -27,7 +27,7 @@ namespace Phalcon\DI {
 		protected $_sharedInstance;
 
 		/**
-		 * \Phalcon\DI\Service
+		 * \Phalcon\Di\Service
 		 *
 		 * @param string $name
 		 * @param mixed $definition
@@ -99,7 +99,7 @@ namespace Phalcon\DI {
 		 *
 		 * @param long $position
 		 * @param array $parameter
-		 * @return \Phalcon\DI\Service
+		 * @return \Phalcon\Di\Service
 		 */
 		public function setParameter($position, $parameter){ }
 
@@ -125,7 +125,7 @@ namespace Phalcon\DI {
 		 * Restore the internal state of a service
 		 *
 		 * @param array $attributes
-		 * @return \Phalcon\DI\Service
+		 * @return \Phalcon\Di\Service
 		 */
 		public static function __set_state($properties=null){ }
 

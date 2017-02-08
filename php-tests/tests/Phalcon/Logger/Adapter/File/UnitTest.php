@@ -36,7 +36,7 @@ class UnitTest extends PhTestUnitTestCase
     /**
      * Initialization of variables etc.
      *
-     * @return Phalcon\DI|void
+     * @return Phalcon\Di|void
      */
     public function setUp()
     {

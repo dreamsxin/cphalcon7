@@ -1,9 +1,9 @@
 <?php 
 
-namespace Phalcon\DI\Service {
+namespace Phalcon\Di\Service {
 
 	/**
-	 * Phalcon\DI\Service\Builder
+	 * Phalcon\Di\Service\Builder
 	 *
 	 * This class builds instances based on complex definitions
 	 */

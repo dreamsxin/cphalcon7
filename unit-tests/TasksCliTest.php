@@ -42,7 +42,7 @@ class TasksCliTest extends PHPUnit_Framework_TestCase
 	public function testTasks()
 	{
 
-		$di = new \Phalcon\DI\FactoryDefault\CLI();
+		$di = new \Phalcon\Di\FactoryDefault\CLI();
 
 		$di['registry'] = function()
 		{

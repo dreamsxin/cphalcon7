@@ -117,7 +117,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Insert){
  * Phalcon\Mvc\Model\Query\Builder\Insert constructor
  *
  * @param array $params
- * @param Phalcon\DI $dependencyInjector
+ * @param Phalcon\Di $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, __construct){
 

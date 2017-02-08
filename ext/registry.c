@@ -138,7 +138,7 @@ PHALCON_INIT_CLASS(Phalcon_Registry){
 }
 
 /**
- * Phalcon\DI constructor
+ * Phalcon\Di constructor
  *
  */
 PHP_METHOD(Phalcon_Registry, __construct){

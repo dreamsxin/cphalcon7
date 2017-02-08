@@ -22,19 +22,19 @@
 #include "kernel/main.h"
 
 /**
- * Phalcon\DI\Exception
+ * Phalcon\Di\Exception
  *
- * Exceptions thrown in Phalcon\DI will use this class
+ * Exceptions thrown in Phalcon\Di will use this class
  *
  */
 zend_class_entry *phalcon_di_exception_ce;
 
 /**
- * Phalcon\DI\Exception initializer
+ * Phalcon\Di\Exception initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DI_Exception){
+PHALCON_INIT_CLASS(Phalcon_Di_Exception){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\DI, Exception, di_exception, phalcon_exception_ce, NULL, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Di, Exception, di_exception, phalcon_exception_ce, NULL, 0);
 
 	return SUCCESS;
 }

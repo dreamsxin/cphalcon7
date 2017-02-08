@@ -18,7 +18,7 @@ namespace Phalcon\Mvc\Model {
 	 *</code>
 	 */
 	
-	class Criteria extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\Model\CriteriaInterface {
+	class Criteria extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\Model\CriteriaInterface {
 
 		protected $_type;
 
@@ -415,7 +415,7 @@ namespace Phalcon\Mvc\Model {
 		 * @param array $data
 		 * @return \Phalcon\Mvc\Model\Criteria
 		 */
-		public static function fromInput(\Phalcon\DIInterface $dependencyInjector, $modelName, $data){ }
+		public static function fromInput(\Phalcon\DiInterface $dependencyInjector, $modelName, $data){ }
 
 
 		/**

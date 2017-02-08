@@ -24,7 +24,7 @@ namespace Phalcon\Mvc {
 	 * </code>
 	 */
 	
-	class View extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\ViewInterface {
+	class View extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\ViewInterface {
 
 		const LEVEL_MAIN_LAYOUT = 6;
 

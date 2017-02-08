@@ -9,6 +9,6 @@ namespace Phalcon\Mvc\User {
 	 * in the application
 	 */
 	
-	class Module extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class Module extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 	}
 }

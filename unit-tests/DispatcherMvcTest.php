@@ -44,15 +44,15 @@ class DispatcherMvcTest extends PHPUnit_Framework_TestCase
 	public function testDispatcher()
 	{
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('response', new \Phalcon\Http\Response());
 
 		$dispatcher = new Phalcon\Mvc\Dispatcher();
 		$dispatcher->setDI($di);
-		$this->assertInstanceOf('Phalcon\DI', $dispatcher->getDI());
+		$this->assertInstanceOf('Phalcon\Di', $dispatcher->getDI());
 
 		$di->set('dispatcher', $dispatcher);
 
@@ -183,9 +183,9 @@ class DispatcherMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testDispatcherForward()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		//$di->set('response', new \Phalcon\Http\Response());
 
@@ -215,9 +215,9 @@ class DispatcherMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testIssues2270()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new \Phalcon\DI();
+		$di = new \Phalcon\Di();
 
 		$dispatcher = new \Phalcon\Mvc\Dispatcher();
 		$dispatcher->setDI($di);
@@ -231,9 +231,9 @@ class DispatcherMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testBindLogic()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new \Phalcon\DI();
+		$di = new \Phalcon\Di();
 
 		$dispatcher = new \Phalcon\Mvc\Dispatcher();
 		$dispatcher->setDI($di);

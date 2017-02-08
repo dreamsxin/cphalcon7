@@ -3,12 +3,12 @@
 namespace Phalcon {
 
 	/**
-	 * Phalcon\DI
+	 * Phalcon\Di
 	 *
-	 * Phalcon\DI is a component that implements Dependency Injection/Service Location
+	 * Phalcon\Di is a component that implements Dependency Injection/Service Location
 	 * of services and it's itself a container for them.
 	 *
-	 * Since Phalcon is highly decoupled, Phalcon\DI is essential to integrate the different
+	 * Since Phalcon is highly decoupled, Phalcon\Di is essential to integrate the different
 	 * components of the framework. The developer can also use this component to inject dependencies
 	 * and manage global instances of the different classes used in the application.
 	 *
@@ -20,7 +20,7 @@ namespace Phalcon {
 	 * Additionally, this pattern increases testability in the code, thus making it less prone to errors.
 	 *
 	 *<code>
-	 * $di = new Phalcon\DI();
+	 * $di = new Phalcon\Di();
 	 *
 	 * //Using a string definition
 	 * $di->set('request', 'Phalcon\Http\Request', true);
@@ -35,7 +35,7 @@ namespace Phalcon {
 	 *</code>
 	 */
 	
-	class DI implements \Phalcon\DIInterface {
+	class DI implements \Phalcon\DiInterface {
 
 		protected $_name;
 
@@ -52,7 +52,7 @@ namespace Phalcon {
 		protected $_eventsManager;
 
 		/**
-		 * \Phalcon\DI constructor
+		 * \Phalcon\Di constructor
 		 *
 		 */
 		public function __construct($name=null){ }
@@ -88,7 +88,7 @@ namespace Phalcon {
 		 * @param string $name
 		 * @param mixed $definition
 		 * @param boolean $shared
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function set($name, $definition, $shared=null){ }
 
@@ -111,20 +111,20 @@ namespace Phalcon {
 
 
 		/**
-		 * Returns a \Phalcon\DI\Service instance
+		 * Returns a \Phalcon\Di\Service instance
 		 *
 		 * @param string $name
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function getService($name){ }
 
 
 		/**
-		 * Sets a service using a raw \Phalcon\DI\Service definition
+		 * Sets a service using a raw \Phalcon\Di\Service definition
 		 *
-		 * @param string|Phalcon\DI\ServiceInterface $raw_definition_or_name
-		 * @param \Phalcon\DI\ServiceInterface $rawDefinition
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @param string|Phalcon\Di\ServiceInterface $raw_definition_or_name
+		 * @param \Phalcon\Di\ServiceInterface $rawDefinition
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function setService($rawDefinition){ }
 
@@ -169,7 +169,7 @@ namespace Phalcon {
 		/**
 		 * Return the services registered in the DI
 		 *
-		 * @return \Phalcon\DI\Service[]
+		 * @return \Phalcon\Di\Service[]
 		 */
 		public function getServices(){ }
 
@@ -204,7 +204,7 @@ namespace Phalcon {
 		 * @param string $name
 		 * @param mixed $definition
 		 * @param boolean $shared
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function attempt($name, $definition, $shared=null){ }
 
@@ -214,7 +214,7 @@ namespace Phalcon {
 		 *
 		 * @param string $name
 		 * @param mixed $definition
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function setShared($name, $definition){ }
 

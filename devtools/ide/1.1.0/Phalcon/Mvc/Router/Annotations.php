@@ -21,7 +21,7 @@ namespace Phalcon\Mvc\Router {
 	 *</code>
 	 */
 	
-	class Annotations extends \Phalcon\Mvc\Router implements \Phalcon\Mvc\RouterInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Annotations extends \Phalcon\Mvc\Router implements \Phalcon\Mvc\RouterInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		const URI_SOURCE_GET_URL = 0;
 

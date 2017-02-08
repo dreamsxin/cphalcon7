@@ -26,7 +26,7 @@ namespace Phalcon\Cache\Backend {
 	 *</code>
 	 */
 	
-	class Apc extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Apc extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		/**
 		 * Returns a cached content

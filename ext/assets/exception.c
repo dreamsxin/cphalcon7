@@ -23,7 +23,7 @@
 #include "kernel/main.h"
 
 /**
- * Phalcon\DI\Exception
+ * Phalcon\Di\Exception
  *
  * Exceptions thrown in Phalcon\Assets will use this class
  *

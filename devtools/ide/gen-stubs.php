@@ -202,7 +202,7 @@ foreach ($allClasses as $className) {
 		}
 	}
 
-	if ($className == 'Phalcon\DI\Injectable') {
+	if ($className == 'Phalcon\Di\Injectable') {
 		$source .= '
 		/**
  		 * @var \Phalcon\Mvc\Dispatcher|\Phalcon\Mvc\DispatcherInterface
@@ -310,7 +310,7 @@ foreach ($allClasses as $className) {
 		public $assets;
 
 		/**
-		 * @var \Phalcon\DI|\Phalcon\DiInterface
+		 * @var \Phalcon\Di|\Phalcon\DiInterface
 	 	 */
 		public $di;
 

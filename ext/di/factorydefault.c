@@ -33,36 +33,36 @@
 #include "interned-strings.h"
 
 /**
- * Phalcon\DI\FactoryDefault
+ * Phalcon\Di\FactoryDefault
  *
- * This is a variant of the standard Phalcon\DI. By default it automatically
+ * This is a variant of the standard Phalcon\Di. By default it automatically
  * registers all the services provided by the framework. Thanks to this, the developer does not need
  * to register each service individually providing a full stack framework
  */
 zend_class_entry *phalcon_di_factorydefault_ce;
 
-PHP_METHOD(Phalcon_DI_FactoryDefault, __construct);
+PHP_METHOD(Phalcon_Di_FactoryDefault, __construct);
 
 static const zend_function_entry phalcon_di_factorydefault_method_entry[] = {
-	PHP_ME(Phalcon_DI_FactoryDefault, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Di_FactoryDefault, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_FE_END
 };
 
 
 /**
- * Phalcon\DI\FactoryDefault initializer
+ * Phalcon\Di\FactoryDefault initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DI_FactoryDefault){
+PHALCON_INIT_CLASS(Phalcon_Di_FactoryDefault){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\DI, FactoryDefault, di_factorydefault, phalcon_di_ce, phalcon_di_factorydefault_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Di, FactoryDefault, di_factorydefault, phalcon_di_ce, phalcon_di_factorydefault_method_entry, 0);
 
 	return SUCCESS;
 }
 
 /**
- * Phalcon\DI\FactoryDefault constructor
+ * Phalcon\Di\FactoryDefault constructor
  */
-PHP_METHOD(Phalcon_DI_FactoryDefault, __construct){
+PHP_METHOD(Phalcon_Di_FactoryDefault, __construct){
 
 	zval *name = NULL, servicename = {}, definition = {};
 

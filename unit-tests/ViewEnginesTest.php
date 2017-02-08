@@ -128,7 +128,7 @@ class ViewEnginesTest extends PHPUnit_Framework_TestCase
 			'.twig'  => 'My_Twig_Engine',
 		);
 
-		$di   = new Phalcon\DI();
+		$di   = new Phalcon\Di();
 		$view = new Phalcon\Mvc\View();
 		$view->setDI($di);
 		$view->setViewsDir('unit-tests/views/');
@@ -144,7 +144,7 @@ class ViewEnginesTest extends PHPUnit_Framework_TestCase
 			return;
 		}
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$view = new Phalcon\Mvc\View();
 		$view->setDI($di);
@@ -178,7 +178,7 @@ class ViewEnginesTest extends PHPUnit_Framework_TestCase
 			return;
 		}
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$view = new Phalcon\Mvc\View();
 		$view->setDI($di);
@@ -205,7 +205,7 @@ class ViewEnginesTest extends PHPUnit_Framework_TestCase
 			return;
 		}
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$view = new Phalcon\Mvc\View();
 		$view->setDI($di);
@@ -232,7 +232,7 @@ class ViewEnginesTest extends PHPUnit_Framework_TestCase
 			return;
 		}
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$view = new Phalcon\Mvc\View();
 		$view->setDI($di);
@@ -266,7 +266,7 @@ class ViewEnginesTest extends PHPUnit_Framework_TestCase
 			return;
 		}
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$view = new Phalcon\Mvc\View();
 		$view->setDI($di);
@@ -293,7 +293,7 @@ class ViewEnginesTest extends PHPUnit_Framework_TestCase
 			return;
 		}
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$view = new Phalcon\Mvc\View();
 		$view->setDI($di);

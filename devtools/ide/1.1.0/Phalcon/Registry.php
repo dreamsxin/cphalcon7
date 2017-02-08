@@ -58,7 +58,7 @@ namespace Phalcon {
 		protected $_data;
 
 		/**
-		 * \Phalcon\DI constructor
+		 * \Phalcon\Di constructor
 		 *
 		 */
 		public function __construct(){ }

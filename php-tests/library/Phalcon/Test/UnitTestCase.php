@@ -38,7 +38,7 @@ abstract class UnitTestCase extends \PHPUnit_Framework_TestCase
      * @author Nikos Dimopoulos <nikos@phalconphp.com>
      * @since  2012-09-30
      *
-     * @return \Phalcon\DI
+     * @return \Phalcon\Di
      */
     protected function setUp()
     {
@@ -48,10 +48,10 @@ abstract class UnitTestCase extends \PHPUnit_Framework_TestCase
         $this->config = Config::init();
 
         // Reset the DI container
-        \Phalcon\DI::reset();
+        \Phalcon\Di::reset();
 
         // Instantiate a new DI container
-        $di = new \Phalcon\DI();
+        $di = new \Phalcon\Di();
 
         // Set the URL
         $di->set(

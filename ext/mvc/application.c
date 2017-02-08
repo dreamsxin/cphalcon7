@@ -137,7 +137,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Application){
 /**
  * Phalcon\Mvc\Application
  *
- * @param Phalcon\DI $dependencyInjector
+ * @param Phalcon\Di $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_Application, __construct){
 

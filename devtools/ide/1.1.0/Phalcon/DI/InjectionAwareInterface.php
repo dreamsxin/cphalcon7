@@ -1,9 +1,9 @@
 <?php 
 
-namespace Phalcon\DI {
+namespace Phalcon\Di {
 
 	/**
-	 * Phalcon\DI\InjectionAwareInterface initializer
+	 * Phalcon\Di\InjectionAwareInterface initializer
 	 */
 	
 	interface InjectionAwareInterface {

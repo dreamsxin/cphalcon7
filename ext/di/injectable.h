@@ -24,7 +24,7 @@
 
 extern zend_class_entry *phalcon_di_injectable_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DI_Injectable);
+PHALCON_INIT_CLASS(Phalcon_Di_Injectable);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireevent, 0, 0, 1)
 	ZEND_ARG_INFO(0, eventName)

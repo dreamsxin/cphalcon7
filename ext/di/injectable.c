@@ -41,47 +41,47 @@
 #include "interned-strings.h"
 
 /**
- * Phalcon\DI\Injectable
+ * Phalcon\Di\Injectable
  *
  * This class allows to access services in the services container by just only accessing a public property
  * with the same name of a registered service
  */
 zend_class_entry *phalcon_di_injectable_ce;
 
-PHP_METHOD(Phalcon_DI_Injectable, setDI);
-PHP_METHOD(Phalcon_DI_Injectable, getDI);
-PHP_METHOD(Phalcon_DI_Injectable, setEventsManager);
-PHP_METHOD(Phalcon_DI_Injectable, getEventsManager);
-PHP_METHOD(Phalcon_DI_Injectable, fireEvent);
-PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel);
-PHP_METHOD(Phalcon_DI_Injectable, hasService);
-PHP_METHOD(Phalcon_DI_Injectable, getResolveService);
-PHP_METHOD(Phalcon_DI_Injectable, __get);
-PHP_METHOD(Phalcon_DI_Injectable, __sleep);
-PHP_METHOD(Phalcon_DI_Injectable, __debugInfo);
+PHP_METHOD(Phalcon_Di_Injectable, setDI);
+PHP_METHOD(Phalcon_Di_Injectable, getDI);
+PHP_METHOD(Phalcon_Di_Injectable, setEventsManager);
+PHP_METHOD(Phalcon_Di_Injectable, getEventsManager);
+PHP_METHOD(Phalcon_Di_Injectable, fireEvent);
+PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel);
+PHP_METHOD(Phalcon_Di_Injectable, hasService);
+PHP_METHOD(Phalcon_Di_Injectable, getResolveService);
+PHP_METHOD(Phalcon_Di_Injectable, __get);
+PHP_METHOD(Phalcon_Di_Injectable, __sleep);
+PHP_METHOD(Phalcon_Di_Injectable, __debugInfo);
 
 static const zend_function_entry phalcon_di_injectable_method_entry[] = {
-	PHP_ME(Phalcon_DI_Injectable, setDI, arginfo_phalcon_di_injectionawareinterface_setdi, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, getDI, arginfo_phalcon_di_injectionawareinterface_getdi, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, setEventsManager, arginfo_phalcon_events_eventsawareinterface_seteventsmanager, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, hasService, arginfo_phalcon_di_injectable_hasservice, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, __sleep, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_DI_Injectable, __debugInfo, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, setDI, arginfo_phalcon_di_injectionawareinterface_setdi, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, getDI, arginfo_phalcon_di_injectionawareinterface_getdi, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, setEventsManager, arginfo_phalcon_events_eventsawareinterface_seteventsmanager, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, hasService, arginfo_phalcon_di_injectable_hasservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, __sleep, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, __debugInfo, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 
 /**
- * Phalcon\DI\Injectable initializer
+ * Phalcon\Di\Injectable initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DI_Injectable){
+PHALCON_INIT_CLASS(Phalcon_Di_Injectable){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\DI, Injectable, di_injectable, phalcon_di_injectable_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+	PHALCON_REGISTER_CLASS(Phalcon\\Di, Injectable, di_injectable, phalcon_di_injectable_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_property_null(phalcon_di_injectable_ce, SL("_dependencyInjector"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_injectable_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
@@ -97,7 +97,7 @@ PHALCON_INIT_CLASS(Phalcon_DI_Injectable){
  * @param Phalcon\DiInterface $dependencyInjector
  * @throw Phalcon\Di\Exception
  */
-PHP_METHOD(Phalcon_DI_Injectable, setDI){
+PHP_METHOD(Phalcon_Di_Injectable, setDI){
 
 	zval *dependency_injector, di = {};
 
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setDI){
  *
  * @return Phalcon\DiInterface
  */
-PHP_METHOD(Phalcon_DI_Injectable, getDI)
+PHP_METHOD(Phalcon_Di_Injectable, getDI)
 {
 	zval *error = NULL, *not_use_default = NULL, dependency_injector = {};
 
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_DI_Injectable, getDI)
  *
  * @param Phalcon\Events\ManagerInterface $eventsManager
  */
-PHP_METHOD(Phalcon_DI_Injectable, setEventsManager)
+PHP_METHOD(Phalcon_Di_Injectable, setEventsManager)
 {
 	zval *events_manager;
 
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_DI_Injectable, setEventsManager)
  *
  * @return Phalcon\Events\ManagerInterface
  */
-PHP_METHOD(Phalcon_DI_Injectable, getEventsManager){
+PHP_METHOD(Phalcon_Di_Injectable, getEventsManager){
 
 
 	RETURN_MEMBER(getThis(), "_eventsManager");
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_DI_Injectable, getEventsManager){
  * @param string $eventName
  * @return boolean
  */
-PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
+PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 
 	zval *eventname, *data = NULL, *cancelable = NULL, events_manager = {}, lower = {}, event_parts = {}, name = {}, status = {};
 
@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEvent){
  * @param string $eventName
  * @return boolean
  */
-PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
+PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 
 	zval *eventname, *data = NULL, *cancelable = NULL, status = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
 
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_DI_Injectable, fireEventCancel){
  * @param string $name
  * @return boolean
  */
-PHP_METHOD(Phalcon_DI_Injectable, hasService){
+PHP_METHOD(Phalcon_Di_Injectable, hasService){
 
 	zval *service_name, dependency_injector = {};
 
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_DI_Injectable, hasService){
  * @param boolean $noShared
  * @return mixed
  */
-PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
+PHP_METHOD(Phalcon_Di_Injectable, getResolveService){
 
 	zval *name, *args = NULL, *noerror = NULL, *noshared = NULL, dependency_injector = {};
 
@@ -349,7 +349,7 @@ PHP_METHOD(Phalcon_DI_Injectable, getResolveService){
  *
  * @param string $propertyName
  */
-PHP_METHOD(Phalcon_DI_Injectable, __get){
+PHP_METHOD(Phalcon_Di_Injectable, __get){
 
 	zval *property_name, dependency_injector = {}, has_service = {}, service = {}, class_name = {}, arguments = {}, result = {};
 
@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __get){
 	RETURN_NULL();
 }
 
-PHP_METHOD(Phalcon_DI_Injectable, __sleep){
+PHP_METHOD(Phalcon_Di_Injectable, __sleep){
 
 	zval dependency_injector = {}, dependency_name = {};
 
@@ -408,7 +408,7 @@ PHP_METHOD(Phalcon_DI_Injectable, __sleep){
 	phalcon_get_object_members(return_value, getThis(), 0);
 }
 
-PHP_METHOD(Phalcon_DI_Injectable, __debugInfo){
+PHP_METHOD(Phalcon_Di_Injectable, __debugInfo){
 
 	phalcon_get_object_vars(return_value, getThis(), 0);
 

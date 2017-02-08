@@ -22,7 +22,7 @@ namespace Phalcon\CLI {
 	 *
 	 */
 	
-	class Router extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class Router extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 
 		protected $_namespace;
 

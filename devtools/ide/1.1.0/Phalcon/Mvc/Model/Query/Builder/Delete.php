@@ -15,7 +15,7 @@ namespace Phalcon\Mvc\Model\Query\Builder {
 	 *</code>
 	 */
 	
-	class Delete extends \Phalcon\Mvc\Model\Query\Builder\Where implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\Model\Query\BuilderInterface {
+	class Delete extends \Phalcon\Mvc\Model\Query\Builder\Where implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\Model\Query\BuilderInterface {
 
 		protected $_type;
 
@@ -29,7 +29,7 @@ namespace Phalcon\Mvc\Model\Query\Builder {
 		 * \Phalcon\Mvc\Model\Query\Builder\Delete constructor
 		 *
 		 * @param array $params
-		 * @param \Phalcon\DI $dependencyInjector
+		 * @param \Phalcon\Di $dependencyInjector
 		 */
 		public function __construct($params=null){ }
 

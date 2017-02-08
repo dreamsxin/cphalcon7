@@ -42,7 +42,7 @@ class ConsoleCliTest extends PHPUnit_Framework_TestCase
 	public function testConsoles()
 	{
 
-		$di = new Phalcon\DI\FactoryDefault\CLI();
+		$di = new Phalcon\Di\FactoryDefault\CLI();
 
 		$di->set('data', function(){
 			return "data";
@@ -127,7 +127,7 @@ class ConsoleCliTest extends PHPUnit_Framework_TestCase
 	public function testModules()
 	{
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('data', function(){
 			return "data";
@@ -182,7 +182,7 @@ class ConsoleCliTest extends PHPUnit_Framework_TestCase
 
 	public function testIssue787()
 	{
-		$di = new \Phalcon\DI\FactoryDefault\CLI();
+		$di = new \Phalcon\Di\FactoryDefault\CLI();
 
 		$di->setShared('dispatcher', function() use ($di)
 		{

@@ -50,9 +50,9 @@ class Issue1801 extends PHPUnit_Framework_TestCase
 
 	protected function _getDI($dbService)
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 
 		$di->set('db', $dbService, true);
 		return $di;

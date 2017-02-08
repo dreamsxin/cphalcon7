@@ -40,8 +40,8 @@ class ViewModelTest extends PHPUnit_Framework_TestCase
 
 	public function testBasic()
 	{
-		Phalcon\DI::reset();
-		$di = new Phalcon\DI\FactoryDefault();
+		Phalcon\Di::reset();
+		$di = new Phalcon\Di\FactoryDefault();
 		$di['view'] = function() {
 			$view = new View();
 			$view->setBasePath(__DIR__.'/../')

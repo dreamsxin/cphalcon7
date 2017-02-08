@@ -58,7 +58,7 @@ PHALCON_INIT_CLASS(Phalcon_DiInterface){
  * @param string $name
  * @param mixed $definition
  * @param boolean $shared
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
 PHALCON_DOC_METHOD(Phalcon_DiInterface, set);
 
@@ -90,11 +90,11 @@ PHALCON_DOC_METHOD(Phalcon_DiInterface, get);
 PHALCON_DOC_METHOD(Phalcon_DiInterface, getShared);
 
 /**
- * Sets a service using a raw Phalcon\DI\Service definition
+ * Sets a service using a raw Phalcon\Di\Service definition
  *
  * @param string $name
- * @param Phalcon\DI\ServiceInterface $rawDefinition
- * @return Phalcon\DI\ServiceInterface
+ * @param Phalcon\Di\ServiceInterface $rawDefinition
+ * @return Phalcon\Di\ServiceInterface
  */
 PHALCON_DOC_METHOD(Phalcon_DiInterface, setService);
 
@@ -102,7 +102,7 @@ PHALCON_DOC_METHOD(Phalcon_DiInterface, setService);
  * Returns the corresponding Phalcon\Di\Service instance for a service
  *
  * @param string $name
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
 PHALCON_DOC_METHOD(Phalcon_DiInterface, getService);
 

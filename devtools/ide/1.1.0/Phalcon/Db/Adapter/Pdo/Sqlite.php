@@ -17,7 +17,7 @@ namespace Phalcon\Db\Adapter\Pdo {
 	 * </code>
 	 */
 	
-	class Sqlite extends \Phalcon\Db\Adapter\Pdo implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Db\AdapterInterface {
+	class Sqlite extends \Phalcon\Db\Adapter\Pdo implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Db\AdapterInterface {
 
 		protected $_type;
 

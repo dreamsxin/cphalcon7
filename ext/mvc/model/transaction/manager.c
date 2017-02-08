@@ -152,7 +152,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction_Manager){
 /**
  * Phalcon\Mvc\Model\Transaction\Manager constructor
  *
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, __construct){
 

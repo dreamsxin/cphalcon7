@@ -294,7 +294,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query){
  * Phalcon\Mvc\Model\Query constructor
  *
  * @param string $phql
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, __construct){
 

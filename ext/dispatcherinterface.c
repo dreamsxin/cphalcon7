@@ -30,6 +30,7 @@ static const zend_function_entry phalcon_dispatcherinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getActionName, NULL)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setParams, arginfo_phalcon_dispatcherinterface_setparams)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getParams, NULL)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, hasParam, arginfo_phalcon_dispatcherinterface_hasparam)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setParam, arginfo_phalcon_dispatcherinterface_setparam)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getParam, arginfo_phalcon_dispatcherinterface_getparam)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, isFinished, NULL)
@@ -100,6 +101,14 @@ PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setParams);
  * @return array
  */
 PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, getParams);
+
+/**
+ * Check if a param exists
+ *
+ * @param mixed param
+ * @return boolean
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setParam);
 
 /**
  * Set a param by its name or numeric index

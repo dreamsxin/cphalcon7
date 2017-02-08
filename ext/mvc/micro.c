@@ -258,7 +258,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Micro){
 /**
  * Phalcon\Mvc\Micro constructor
  *
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_Micro, __construct){
 
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, __construct){
 /**
  * Sets the DependencyInjector container
  *
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_Micro, setDI){
 

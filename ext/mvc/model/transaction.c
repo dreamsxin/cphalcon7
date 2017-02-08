@@ -127,7 +127,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction){
 /**
  * Phalcon\Mvc\Model\Transaction constructor
  *
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  * @param boolean $autoBegin
  * @param string $service
  */

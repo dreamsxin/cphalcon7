@@ -559,7 +559,7 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
 /**
  * Phalcon\Mvc\Model constructor
  *
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  * @param Phalcon\Mvc\Model\ManagerInterface $modelsManager
  */
 PHP_METHOD(Phalcon_Mvc_Model, __construct){
@@ -1910,7 +1910,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 /**
  * Create a criteria for a specific model
  *
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  * @return Phalcon\Mvc\Model\Criteria
  */
 PHP_METHOD(Phalcon_Mvc_Model, query){

@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_DI_Service, getDefinition)
  * Resolves the service
  *
  * @param array $parameters
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  * @return object
  */
 PHP_METHOD(Phalcon_DI_Service, resolve){

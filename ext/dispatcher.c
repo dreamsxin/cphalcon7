@@ -63,6 +63,7 @@ PHP_METHOD(Phalcon_Dispatcher, setLogicBinding);
 PHP_METHOD(Phalcon_Dispatcher, isLogicBinding);
 PHP_METHOD(Phalcon_Dispatcher, setParams);
 PHP_METHOD(Phalcon_Dispatcher, getParams);
+PHP_METHOD(Phalcon_Dispatcher, hasParam);
 PHP_METHOD(Phalcon_Dispatcher, setParam);
 PHP_METHOD(Phalcon_Dispatcher, getParam);
 PHP_METHOD(Phalcon_Dispatcher, getActiveHandler);
@@ -113,6 +114,7 @@ static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, isLogicBinding, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setParams, arginfo_phalcon_dispatcherinterface_setparams, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getParams, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, hasParam, arginfo_phalcon_dispatcherinterface_hasparam, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setParam, arginfo_phalcon_dispatcherinterface_setparam, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getParam, arginfo_phalcon_dispatcherinterface_getparam, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getActiveHandler, NULL, ZEND_ACC_PUBLIC)
@@ -400,10 +402,30 @@ PHP_METHOD(Phalcon_Dispatcher, getParams){
 }
 
 /**
+ * Check if a param exists
+ *
+ * @param mixed param
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Dispatcher, hasParam){
+
+	zval *param, params = {};
+
+	phalcon_fetch_params(0, 1, 0, &param);
+
+	phalcon_read_property(&params, getThis(), SL("_params"), PH_NOISY);
+	if (phalcon_array_isset(&params, param)) {
+		RETURN_TRUE;
+	}
+
+	RETURN_FALSE;
+}
+
+/**
  * Set a param by its name or numeric index
  *
- * @param  mixed $param
- * @param  mixed $value
+ * @param mixed $param
+ * @param mixed $value
  */
 PHP_METHOD(Phalcon_Dispatcher, setParam){
 
@@ -418,9 +440,9 @@ PHP_METHOD(Phalcon_Dispatcher, setParam){
 /**
  * Gets a param by its name or numeric index
  *
- * @param  mixed $param
- * @param  string|array $filters
- * @param  mixed $defaultValue
+ * @param mixed $param
+ * @param string|array $filters
+ * @param mixed $defaultValue
  * @return mixed
  */
 PHP_METHOD(Phalcon_Dispatcher, getParam){
@@ -673,7 +695,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Create the complete controller class name prepending the namespace
 		 */
-		if (zend_is_true(&namespace_name)) {			
+		if (zend_is_true(&namespace_name)) {
 			phalcon_return_property(&camelize, getThis(), SL("_camelizeNamespace"));
 			if (!zend_is_true(&camelize)) {
 				PHALCON_CPY_WRT(&camelized_namespace, &namespace_name);
@@ -1239,7 +1261,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 }
 
 /**
- * Enables/Disables automatically camelize namespace 
+ * Enables/Disables automatically camelize namespace
  *
  *<code>
  *  $this->dispatcher->camelizeNamespace(FALSE);
@@ -1261,7 +1283,7 @@ PHP_METHOD(Phalcon_Dispatcher, camelizeNamespace){
 }
 
 /**
- * Enables/Disables automatically camelize controller 
+ * Enables/Disables automatically camelize controller
  *
  *<code>
  *  $this->dispatcher->camelizeController(FALSE);

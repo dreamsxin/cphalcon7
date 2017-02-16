@@ -87,16 +87,15 @@ PHP_INI_END()
 
 static PHP_MINIT_FUNCTION(phalcon)
 {
-	char *msg;
-
 	REGISTER_INI_ENTRIES();
 
+#ifdef PHALCON_CACHE_SHMEMORY
 	if (!PHALCON_GLOBAL(cache).enable_shmemory_cli && !strcmp(sapi_module.name, "cli")) {
 		PHALCON_GLOBAL(cache).enable_shmemory = 0;
 	}
 
 	if (PHALCON_GLOBAL(cache).enable_shmemory) {
-
+		char *msg;
 		if (PHALCON_GLOBAL(cache).shmemory_values_size < PHALCON_CACHE_SHMEMORY_SMM_SEGMENT_MIN_SIZE) {
 			php_error(E_ERROR, "Shared memory values(values_memory_size) must be at least '%d'", PHALCON_CACHE_SHMEMORY_SMM_SEGMENT_MIN_SIZE);
 			return FAILURE;
@@ -106,6 +105,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 			return FAILURE;
 		}
 	}
+#else
+	PHALCON_GLOBAL(cache).enable_shmemory = 0;
+#endif
 
 #if PHALCON_USE_MONGOC
 	mongoc_init();
@@ -156,12 +158,16 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Micro_Exception);
 	PHALCON_INIT(Phalcon_Mvc_JsonRpc_Exception);
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Exception);
+#ifdef PHALCON_CHART
 	PHALCON_INIT(Phalcon_Chart_Exception);
+#endif
 	PHALCON_INIT(Phalcon_Binary_Exception);
 #if PHALCON_USE_PHP_SOCKET
 	PHALCON_INIT(Phalcon_Socket_Exception);
 #endif
+#ifdef PHALCON_PROCESS
 	PHALCON_INIT(Phalcon_Process_Exception);
+#endif
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
@@ -263,7 +269,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Acl_Resource);
 	PHALCON_INIT(Phalcon_Acl_Adapter_Memory);
 	PHALCON_INIT(Phalcon_Session_Adapter);
+#ifdef PHALCON_CACHE_SHMEMORY
 	PHALCON_INIT(Phalcon_Cache_SHMemory);
+#endif
 	PHALCON_INIT(Phalcon_Cache_Backend);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Data);
 	PHALCON_INIT(Phalcon_Cache_Multiple);
@@ -482,29 +490,42 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Image_Adapter_Imagick);
 	PHALCON_INIT(Phalcon_Registry);
 	PHALCON_INIT(Phalcon_Arr);
-#if PHALCON_USE_QRENCODE
+
+#ifdef PHALCON_CHART
+# if PHALCON_USE_QRENCODE
 	PHALCON_INIT(Phalcon_Chart_QRcode);
-#endif
+# endif
 	PHALCON_INIT(Phalcon_Chart_Captcha);
+#endif
+
 	PHALCON_INIT(Phalcon_Async);
 	PHALCON_INIT(Phalcon_Binary);
 	PHALCON_INIT(Phalcon_Binary_Reader);
 	PHALCON_INIT(Phalcon_Binary_Writer);
-#if PHALCON_USE_PHP_SOCKET
+
+#ifdef PHALCON_PROCESS
+	PHALCON_INIT(Phalcon_Process_Proc);
+	PHALCON_INIT(Phalcon_Process_Sharedmemory);
+#endif
+
+#ifdef PHALCON_SOCKET
+	#if PHALCON_USE_PHP_SOCKET
 	PHALCON_INIT(Phalcon_Socket);
 	PHALCON_INIT(Phalcon_Socket_Client);
 	PHALCON_INIT(Phalcon_Socket_Server);
+	#endif
+
+	#ifdef PHALCON_USE_WEBSOCKET
+		PHALCON_INIT(Phalcon_Websocket_Connection);
+		PHALCON_INIT(Phalcon_Websocket_Client);
+		PHALCON_INIT(Phalcon_Websocket_Server);
+	#endif
 #endif
-	PHALCON_INIT(Phalcon_Process_Proc);
-	PHALCON_INIT(Phalcon_Process_Sharedmemory);
-#ifdef PHALCON_USE_WEBSOCKET
-	PHALCON_INIT(Phalcon_Websocket_Connection);
-	PHALCON_INIT(Phalcon_Websocket_Client);
-	PHALCON_INIT(Phalcon_Websocket_Server);
-#endif
+
+#ifdef PHALCON_INTRUSIVE
 	PHALCON_INIT(Phalcon_Intrusive_Avltree);
 	PHALCON_INIT(Phalcon_Intrusive_Avltree_Node);
-
+#endif
 	return SUCCESS;
 }
 
@@ -513,10 +534,11 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 	phalcon_deinitialize_memory();
 
 	assert(PHALCON_GLOBAL(orm).ast_cache == NULL);
-
+#ifdef PHALCON_CACHE_SHMEMORY
 	if (PHALCON_GLOBAL(cache).enable_shmemory) {
 		phalcon_cache_shmemory_storage_shutdown();
 	}
+#endif
 
 #ifdef PHALCON_USE_MONGOC
 	mongoc_cleanup();
@@ -560,12 +582,13 @@ static PHP_MINFO_FUNCTION(phalcon)
 static PHP_GINIT_FUNCTION(phalcon)
 {
 	php_phalcon_init_globals(phalcon_globals);
-
+#ifdef PHALCON_CACHE_SHMEMORY
 	/* Cache options */
 	phalcon_globals->cache.enable_shmemory = 1;
 	phalcon_globals->cache.enable_shmemory_cli = 0;
 	phalcon_globals->cache.shmemory_keys_size = (4 * 1024 * 1024);
 	phalcon_globals->cache.shmemory_values_size = (64 * 1024 * 1024);
+#endif
 }
 
 static PHP_GSHUTDOWN_FUNCTION(phalcon)

@@ -19,8 +19,8 @@
 */
 
 
-#ifndef PHALCON_KERNEL_SYSTEM_H
-#define PHALCON_KERNEL_SYSTEM_H
+#ifndef PHALCON_PROCESS_SYSTEM_H
+#define PHALCON_PROCESS_SYSTEM_H
 
 #include <php.h>
 #include <Zend/zend.h>
@@ -110,4 +110,4 @@ int phalcon_proc_parse_io(phalcon_process* proc, unsigned int pid);
 int phalcon_proc_parse_cmdline(phalcon_process *proc, unsigned int pid);
 int phalcon_proc_get_iopriority(unsigned int pid);
 
-#endif /* PHALCON_KERNEL_SYSTEM_H */
+#endif /* PHALCON_PROCESS_SYSTEM_H */

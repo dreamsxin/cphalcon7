@@ -23,6 +23,10 @@ class ProcessTest extends PHPUnit_Framework_TestCase
 {
 	public function testNormal()
 	{
+		if (!class_exists('Phalcon\Process\Proc')) {
+			$this->markTestSkipped('Class `Phalcon\Process\Proc` is not exists');
+			return false;
+		}
 		$process = new Phalcon\Process\Proc('ping -c 1 localhost');
 		$this->assertTrue($process->start());
 
@@ -33,6 +37,10 @@ class ProcessTest extends PHPUnit_Framework_TestCase
 
 	public function testHandle()
 	{
+		if (!class_exists('Phalcon\Process\Proc')) {
+			$this->markTestSkipped('Class `Phalcon\Process\Proc` is not exists');
+			return false;
+		}
 		$process = new Phalcon\Process\Proc('ping -c 1 localhost');
 		$this->assertTrue($process->start());
 		$ret = $process->handle(function($pipe, $data) {

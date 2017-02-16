@@ -21,6 +21,7 @@
 #include "process/proc.h"
 #include "process/exception.h"
 #include "process/../date.h"
+#include "process/system.h"
 
 #include <Zend/zend_closures.h>
 
@@ -33,7 +34,6 @@
 #include "kernel/operators.h"
 #include "kernel/exception.h"
 #include "kernel/time.h"
-#include "kernel/system.h"
 
 /**
  * Phalcon\Process\Proc

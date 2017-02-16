@@ -38,7 +38,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "kernel/system.h"
+#include "process/system.h"
 #include "kernel/array.h"
 
 long int phalcon_get_system_uptime()

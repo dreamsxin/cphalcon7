@@ -1436,6 +1436,10 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 	public function testCacheSHMemory()
 	{
+		if (!class_exists('Phalcon\Cache\SHMemory')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\SHMemory` is not exists');
+			return false;
+		}
 		if (!ini_get('phalcon.cache.enable_shmemory_cli')) {
 			$this->markTestSkipped('Warning: phalcon.cache.enable_shmemory_cli is not enbale');
 			return false;

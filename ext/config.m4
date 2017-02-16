@@ -22,28 +22,89 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_WITH(chart, whether to enable chart support,
+[  --enable-chart   Enable chart support], no, no)
+
+AC_MSG_CHECKING([Include chart])
+if test "$PHP_CHART" = "yes"; then
+	AC_DEFINE([PHALCON_CHART], [1], [Whether process are available])
+	AC_MSG_RESULT([yes, chart])
+else
+	AC_MSG_RESULT([no])
+fi
+
 PHP_ARG_ENABLE(qrcode, wheter to enable qrcode support,
 [  --enable-qrcode         Enable qrcode], yes, no)
 
 AC_MSG_CHECKING([Include qrcode])
-if test "$PHP_QRCODE" != "no"; then
-	AC_DEFINE([PHALCON_QRCODE], [1], [Whether qrcode are available])
-	AC_MSG_RESULT([yes, qrcode])
+if test "$PHP_CHART" = "yes"; then
+	if test "$PHP_QRCODE" = "yes"; then
+		AC_DEFINE([PHALCON_QRCODE], [1], [Whether qrcode are available])
+		AC_MSG_RESULT([yes, qrcode])
+	else
+		AC_MSG_RESULT([no])
+	fi
+else
+	PHP_QRCODE="no"
+	AC_MSG_RESULT([no])
+fi
+
+PHP_ARG_WITH(intrusive, whether to enable intrusive support,
+[  --enable-intrusive   Enable intrusive support], no, no)
+
+AC_MSG_CHECKING([Include intrusive])
+if test "$PHP_INTRUSIVE" = "yes"; then
+	AC_DEFINE([PHALCON_INTRUSIVE], [1], [Whether intrusive are available])
+	AC_MSG_RESULT([yes, intrusive])
 else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(cache-memory, whether to enable cache memory support,
-[  --enable-cache-memory   Enable cache memory support], yes, no)
+PHP_ARG_WITH(cache-shmemory, whether to enable cache shared memory support,
+[  --enable-cache-shmemory   Enable cache shared memory support], no, no)
 
-AC_MSG_CHECKING([Include cache-memory])
-if test "$PHP_CACHE_MEMORY" = "yes"; then
-	AC_DEFINE([PHALCON_CACHE_MEMORY], [1], [Whether cache memory are available])
-	AC_MSG_RESULT([yes, cache memory])
+AC_MSG_CHECKING([Include cache-shmemory])
+if test "$PHP_CACHE_SHMEMORY" = "yes"; then
+	AC_DEFINE([PHALCON_CACHE_SHMEMORY], [1], [Whether cache shared memory are available])
+	AC_MSG_RESULT([yes, cache shared memory])
 else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_WITH(process, whether to enable process support,
+[  --enable-process   Enable process support], no, no)
+
+AC_MSG_CHECKING([Include process])
+if test "$PHP_PROCESS" = "yes"; then
+	AC_DEFINE([PHALCON_PROCESS], [1], [Whether process are available])
+	AC_MSG_RESULT([yes, process])
+else
+	AC_MSG_RESULT([no])
+fi
+
+PHP_ARG_WITH(socket, whether to enable socket support,
+[  --enable-socket   Enable socket support], no, no)
+
+AC_MSG_CHECKING([Include socket])
+if test "$PHP_SOCKET" = "yes"; then
+	AC_DEFINE([PHALCON_SOCKET], [1], [Whether socket are available])
+	AC_MSG_RESULT([yes, socket])
+else
+	AC_MSG_RESULT([no])
+fi
+
+PHP_ARG_WITH(websocket, whether to enable websocket support,
+[  --enable-websocket   Enable websocket support], no, no)
+
+if test "$PHP_SOCKET" = "yes"; then
+	AC_MSG_CHECKING([Include websocket])
+	if test "$PHP_WEBSOCKET" = "yes"; then
+		AC_DEFINE([PHALCON_WEBSOCKET], [1], [Whether websocket are available])
+		AC_MSG_RESULT([yes, websocket])
+	else
+		AC_MSG_RESULT([no])
+	fi
+fi
 
 dnl copied from Zend Optimizer Plus
 AC_MSG_CHECKING(for sysvipc shared memory support)
@@ -248,7 +309,6 @@ kernel/exit.c \
 kernel/iterator.c \
 kernel/math.c \
 kernel/time.c \
-kernel/system.c \
 interned-strings.c \
 logger.c \
 flash.c \
@@ -331,9 +391,6 @@ binary.c \
 binary/reader.c \
 binary/writer.c \
 binary/exception.c \
-process/sharedmemory.c \
-intrusive/avltree.c \
-intrusive/avltree/node.c \
 debug.c \
 debug/exception.c \
 debug/dump.c \
@@ -516,12 +573,6 @@ cache/exception.c \
 cache/backendinterface.c \
 cache/frontendinterface.c \
 cache/backend.c \
-cache/shmemory/allocators/mmap.c \
-cache/shmemory/allocators/shm.c \
-cache/shmemory/serializer.c \
-cache/shmemory/storage.c \
-cache/shmemory/allocator.c \
-cache/shmemory.c \
 session/bag.c \
 session/adapter/files.c \
 session/exception.c \
@@ -619,11 +670,23 @@ image/exception.c \
 image/adapter/gd.c \
 image/adapter/imagick.c \
 registry.c \
-chart/captcha.c \
-chart/exception.c \
-async.c \
-process/proc.c \
-process/exception.c"
+async.c"
+
+	if test "$PHP_CACHE_SHMEMORY" = "yes"; then
+		phalcon_sources="$phalcon_sources cache/shmemory/allocators/mmap.c cache/shmemory/allocators/shm.c cache/shmemory/serializer.c cache/shmemory/storage.c cache/shmemory/allocator.c cache/shmemory.c"
+	fi
+
+	if test "$PHP_CHART" = "yes"; then
+		phalcon_sources="$phalcon_sources chart/captcha.c chart/exception.c"
+	fi
+
+	if test "$PHP_INTRUSIVE" = "yes"; then
+		phalcon_sources="$phalcon_sources intrusive/avltree.c intrusive/avltree/node.c"
+	fi
+
+	if test "$PHP_PROCESS" = "yes"; then
+		phalcon_sources="$phalcon_sources process/system.c process/sharedmemory.c process/proc.c process/exception.c"
+	fi
 
 	old_CPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS $INCLUDES"
@@ -665,6 +728,7 @@ process/exception.c"
 		[[#include "main/php.h"]]
 	)
 
+
 	AC_TRY_COMPILE(
 		[
 			#include <sys/types.h>
@@ -676,16 +740,18 @@ process/exception.c"
 	)
 	AC_DEFINE([HAVE_SOCKETS], 1, [ ])
 
-	AC_CHECK_HEADERS(
-		[ext/sockets/php_sockets.h],
-		[
-			PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
-			AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
-            phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c socket/exception.c"
-		],
-		,
-		[[#include "main/php.h"]]
-	)
+	if test "$PHP_SOCKET" = "yes"; then
+		AC_CHECK_HEADERS(
+			[ext/sockets/php_sockets.h],
+			[
+				PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
+				AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
+	            phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c socket/exception.c"
+			],
+			,
+			[[#include "main/php.h"]]
+		)
+	fi
 
 	AC_CHECK_DECL(
 		[HAVE_PHP_SESSION],
@@ -741,7 +807,7 @@ process/exception.c"
 		fi
 	done
 
-	if test "$PHP_QRCODE" != "no"; then
+	if test "$PHP_QRCODE" = "yes"; then
 		if test -z "$PNG_CFLAGS"; then
 			AC_MSG_ERROR([Incorrect png library])
 		fi
@@ -758,7 +824,7 @@ process/exception.c"
 			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
 			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"
 
-			AC_MSG_RESULT(yes)
+			AC_MSG_RESULT(yes, found in $i)
 
 			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
 			break
@@ -829,7 +895,7 @@ process/exception.c"
 			CPPFLAGS="${CPPFLAGS} ${MONGOC_CFLAGS}"
 			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${MONGOC_LDFLAGS}"
 
-			AC_MSG_RESULT(yes)
+			AC_MSG_RESULT(yes, found in $i)
 
 			AC_DEFINE([PHALCON_USE_MONGOC], [1], [Have libmongoc support])
 			phalcon_sources="$phalcon_sources cache/backend/mongo.c mvc/model/metadata/mongo.c"
@@ -844,7 +910,7 @@ process/exception.c"
 		fi
 	done
 
-	if test "$PHP_QRCODE" != "no"; then
+	if test "$PHP_QRCODE" = "yes"; then
 		if test -z "$WAND_CFLAGS"; then
 			AC_MSG_ERROR([Incorrect ImageMagick MagickWand library])
 		fi
@@ -889,44 +955,48 @@ process/exception.c"
 		done
 	fi
 
-	AC_MSG_CHECKING([checking libuv support])
-	for i in /usr/local /usr; do
-		if test -r $i/include/uv.h; then
-			PHP_ADD_INCLUDE($i/include)
-			PHP_CHECK_LIBRARY(uv, uv_version,
-			[
-				PHP_ADD_LIBRARY_WITH_PATH(uv, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
-				AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
-			],[
-				AC_MSG_ERROR([Wrong uv version or library not found])
-			],[
-				-L$i/$PHP_LIBDIR -lm
-			])
-			break
-		else
-			AC_MSG_RESULT([no, found in $i])
-		fi
-	done
+	if test "$PHP_SOCKET" = "yes"; then
+		AC_MSG_CHECKING([checking libuv support])
+		for i in /usr/local /usr; do
+			if test -r $i/include/uv.h; then
+				PHP_ADD_INCLUDE($i/include)
+				PHP_CHECK_LIBRARY(uv, uv_version,
+				[
+					PHP_ADD_LIBRARY_WITH_PATH(uv, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+					AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
+				],[
+					AC_MSG_ERROR([Wrong uv version or library not found])
+				],[
+					-L$i/$PHP_LIBDIR -lm
+				])
+				break
+			else
+				AC_MSG_RESULT([no, found in $i])
+			fi
+		done
 
-	AC_MSG_CHECKING([checking libwebsockets support])
-	for i in /usr/local /usr; do
-		if test -r $i/include/libwebsockets.h; then
-			PHP_ADD_INCLUDE($i/include)
-			PHP_CHECK_LIBRARY(websockets, lws_callback_on_writable,
-			[
-				PHP_ADD_LIBRARY_WITH_PATH(websockets, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
-				AC_DEFINE(PHALCON_USE_WEBSOCKET, 1, [Have WebSocket support])
-				phalcon_sources="$phalcon_sources websocket/connection.c websocket/server.c websocket/client.c websocket/eventloopinterface.c "
-			],[
-				AC_MSG_ERROR([Wrong websockets version or library not found])
-			],[
-				-L$i/$PHP_LIBDIR -lm
-			])
-			break
-		else
-			AC_MSG_RESULT([no, found in $i])
+		if test "$PHP_WEBSOCKET" = "yes"; then
+			AC_MSG_CHECKING([checking libwebsockets support])
+			for i in /usr/local /usr; do
+				if test -r $i/include/libwebsockets.h; then
+					PHP_ADD_INCLUDE($i/include)
+					PHP_CHECK_LIBRARY(websockets, lws_callback_on_writable,
+					[
+						PHP_ADD_LIBRARY_WITH_PATH(websockets, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+						AC_DEFINE(PHALCON_USE_WEBSOCKET, 1, [Have WebSocket support])
+						phalcon_sources="$phalcon_sources websocket/connection.c websocket/server.c websocket/client.c websocket/eventloopinterface.c "
+					],[
+						AC_MSG_ERROR([Wrong websockets version or library not found])
+					],[
+						-L$i/$PHP_LIBDIR -lm
+					])
+					break
+				else
+					AC_MSG_RESULT([no, found in $i])
+				fi
+			done
 		fi
-	done
+	fi
 
 	AC_MSG_CHECKING([Include non-free minifiers])
 	if test "$PHP_NON_FREE" = "yes"; then

@@ -316,6 +316,10 @@ int phalcon_proc_parse_cmdline(phalcon_process *proc, unsigned int pid) {
 }
 
 int phalcon_proc_get_iopriority(unsigned int pid) {
-
+	
+#ifdef SYS_ioprio_get
 	return syscall(SYS_ioprio_get, 1, pid);
+#else 
+	return -1; 
+#endif 
 }

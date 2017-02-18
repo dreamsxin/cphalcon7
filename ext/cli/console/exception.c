@@ -24,19 +24,19 @@
 #include "kernel/main.h"
 
 /**
- * Phalcon\CLI\Console\Exception
+ * Phalcon\Cli\Console\Exception
  *
- * Exceptions thrown in Phalcon\CLI\Console will use this class
+ * Exceptions thrown in Phalcon\Cli\Console will use this class
  *
  */
 zend_class_entry *phalcon_cli_console_exception_ce;
 
 /**
- * Phalcon\CLI\Console\Exception initializer
+ * Phalcon\Cli\Console\Exception initializer
  */
-PHALCON_INIT_CLASS(Phalcon_CLI_Console_Exception){
+PHALCON_INIT_CLASS(Phalcon_Cli_Console_Exception){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI\\Console, Exception, cli_console_exception, phalcon_exception_ce, NULL, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cli\\Console, Exception, cli_console_exception, phalcon_exception_ce, NULL, 0);
 
 	return SUCCESS;
 }

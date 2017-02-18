@@ -25,6 +25,6 @@
 
 extern zend_class_entry *phalcon_cli_console_ce;
 
-PHALCON_INIT_CLASS(Phalcon_CLI_Console);
+PHALCON_INIT_CLASS(Phalcon_Cli_Console);
 
 #endif /* PHALCON_CLI_CONSOLE_H */

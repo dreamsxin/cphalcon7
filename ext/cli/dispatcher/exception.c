@@ -23,19 +23,19 @@
 #include "kernel/main.h"
 
 /**
- * Phalcon\CLI\Dispatcher\Exception
+ * Phalcon\Cli\Dispatcher\Exception
  *
- * Exceptions thrown in Phalcon\CLI\Dispatcher will use this class
+ * Exceptions thrown in Phalcon\Cli\Dispatcher will use this class
  *
  */
 zend_class_entry *phalcon_cli_dispatcher_exception_ce;
 
 /**
- * Phalcon\CLI\Dispatcher\Exception initializer
+ * Phalcon\Cli\Dispatcher\Exception initializer
  */
-PHALCON_INIT_CLASS(Phalcon_CLI_Dispatcher_Exception){
+PHALCON_INIT_CLASS(Phalcon_Cli_Dispatcher_Exception){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI\\Dispatcher, Exception, cli_dispatcher_exception, phalcon_exception_ce, NULL, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cli\\Dispatcher, Exception, cli_dispatcher_exception, phalcon_exception_ce, NULL, 0);
 
 	return SUCCESS;
 }

@@ -134,9 +134,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Http_Client_Exception);
 	PHALCON_INIT(Phalcon_Image_Exception);
 	PHALCON_INIT(Phalcon_Application_Exception);
-	PHALCON_INIT(Phalcon_CLI_Console_Exception);
-	PHALCON_INIT(Phalcon_CLI_Dispatcher_Exception);
-	PHALCON_INIT(Phalcon_CLI_Router_Exception);
+	PHALCON_INIT(Phalcon_Cli_Console_Exception);
+	PHALCON_INIT(Phalcon_Cli_Dispatcher_Exception);
+	PHALCON_INIT(Phalcon_Cli_Router_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Application_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Dispatcher_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Micro_Exception);
@@ -249,7 +249,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Di);
 	PHALCON_INIT(Phalcon_Di_Injectable);
 	PHALCON_INIT(Phalcon_Di_FactoryDefault);
-	PHALCON_INIT(Phalcon_Di_FactoryDefault_CLI);
+	PHALCON_INIT(Phalcon_Di_FactoryDefault_Cli);
 	PHALCON_INIT(Phalcon_Di_Service);
 	PHALCON_INIT(Phalcon_Di_Service_Builder);
 	PHALCON_INIT(Phalcon_Forms_Element);
@@ -419,10 +419,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Queue_Beanstalk);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk_Job);
 	PHALCON_INIT(Phalcon_Application);
-	PHALCON_INIT(Phalcon_CLI_Task);
-	PHALCON_INIT(Phalcon_CLI_Router);
-	PHALCON_INIT(Phalcon_CLI_Console);
-	PHALCON_INIT(Phalcon_CLI_Dispatcher);
+	PHALCON_INIT(Phalcon_Cli_Task);
+	PHALCON_INIT(Phalcon_Cli_Router);
+	PHALCON_INIT(Phalcon_Cli_Console);
+	PHALCON_INIT(Phalcon_Cli_Dispatcher);
 	PHALCON_INIT(Phalcon_Mvc_JsonRpc);
 	PHALCON_INIT(Phalcon_Mvc_Router);
 	PHALCON_INIT(Phalcon_Mvc_View_Engine);

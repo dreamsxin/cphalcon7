@@ -24,7 +24,7 @@
 #include "kernel/main.h"
 
 /**
- * Phalcon\CLI\Task
+ * Phalcon\Cli\Task
  *
  * Every command-line task should extend this class that encapsulates all the task functionality
  *
@@ -33,7 +33,7 @@
  *
  *<code>
  *
- *class HelloTask extends \Phalcon\CLI\Task
+ *class HelloTask extends \Phalcon\Cli\Task
  *{
  *
  *  //This action will be executed by default
@@ -60,11 +60,11 @@ static const zend_function_entry phalcon_cli_task_method_entry[] = {
 
 
 /**
- * Phalcon\CLI\Task initializer
+ * Phalcon\Cli\Task initializer
  */
-PHALCON_INIT_CLASS(Phalcon_CLI_Task){
+PHALCON_INIT_CLASS(Phalcon_Cli_Task){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Task, cli_task, phalcon_di_injectable_ce, phalcon_cli_task_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cli, Task, cli_task, phalcon_di_injectable_ce, phalcon_cli_task_method_entry, 0);
 
 	return SUCCESS;
 }

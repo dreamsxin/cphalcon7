@@ -24,6 +24,6 @@
 
 extern zend_class_entry *phalcon_cli_dispatcher_exception_ce;
 
-PHALCON_INIT_CLASS(Phalcon_CLI_Dispatcher_Exception);
+PHALCON_INIT_CLASS(Phalcon_Cli_Dispatcher_Exception);
 
 #endif /* PHALCON_CLI_DISPATCHER_EXCEPTION_H */

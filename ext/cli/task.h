@@ -25,6 +25,6 @@
 
 extern zend_class_entry *phalcon_cli_task_ce;
 
-PHALCON_INIT_CLASS(Phalcon_CLI_Task);
+PHALCON_INIT_CLASS(Phalcon_Cli_Task);
 
 #endif /* PHALCON_CLI_TASK_H */

@@ -120,9 +120,9 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 	protected function _getDI()
 	{
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('modelsManager', function(){
 			return new Phalcon\Mvc\Model\Manager();
@@ -335,50 +335,6 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 
 	public function testMetadataMemcached()
 	{
-		if (!extension_loaded('memcache')) {
-			$this->markTestSkipped('Warning: memcache extension is not loaded');
-			return false;
-		}
-
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped('Test skipped');
-			return;
-		}
-
-		$di = $this->_getDI();
-
-		$di->set('modelsMetadata', function(){
-			return new Phalcon\Mvc\Model\Metadata\Memcache(array(
-				'host' => 'localhost',
-				'port' => 11211,
-				'persistent' => TRUE,
-				'prefix' => 'my-local-app',
-				'lifetime' => 60
-			));
-		});
-
-		$metaData = $di->getShared('modelsMetadata');
-
-		$metaData->reset();
-
-		$this->assertTrue($metaData->isEmpty());
-
-		Robots::findFirst();
-
-		$this->assertEquals($metaData->read('meta-robots-robots'), $this->_data['meta-robots-robots']);
-		$this->assertEquals($metaData->read('map-robots-robots'), $this->_data['map-robots-robots']);
-
-		$this->assertFalse($metaData->isEmpty());
-
-		$metaData->reset();
-		$this->assertTrue($metaData->isEmpty());
-
-		Robots::findFirst();
-	}
-
-	public function testMetadataLibmemcached()
-	{
 		if (!extension_loaded('memcached')) {
 			$this->markTestSkipped('Warning: memcached extension is not loaded');
 			return false;
@@ -393,7 +349,7 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 		$di = $this->_getDI();
 
 		$di->set('modelsMetadata', function(){
-			return new Phalcon\Mvc\Model\Metadata\Libmemcached(array(
+			return new Phalcon\Mvc\Model\Metadata\Memcached(array(
 				'servers' => array(
 					array('host' => 'localhost', 'port' => 11211, 'weight' => 1),
 				),
@@ -466,8 +422,8 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 
 	public function testMetadataMongo()
 	{
-		if (!extension_loaded('mongo')) {
-			$this->markTestSkipped('Warning: mongo extension is not loaded');
+		if (!class_exists('Phalcon\Cache\Backend\Mongo')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Backend\Mongo` is not exists');
 			return ;
 		}
 
@@ -481,7 +437,6 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 
 		$di->set('modelsMetadata', function(){
 			return new Phalcon\Mvc\Model\Metadata\Mongo(array(
-				'mongo' => new MongoClient(),
 				'db' => 'phalcon_test',
 				'collection' => 'caches',
 				'lifetime' => 60,
@@ -509,8 +464,8 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 
 	public function testMetadataCache()
 	{
-		if (!extension_loaded('mongo')) {
-			$this->markTestSkipped('Warning: mongo extension is not loaded');
+		if (!class_exists('Phalcon\Cache\Backend\Mongo')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Backend\Mongo` is not exists');
 			return ;
 		}
 
@@ -523,12 +478,11 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 		$di = $this->_getDI();
 
 		$di->set('mycache', function(){
-			$frontCache = new Phalcon\Cache\Frontend\Output(array(
+			$frontCache = new Phalcon\Cache\Frontend\Data(array(
 				'lifetime' => 60
 			));
 
 			$cache = new Phalcon\Cache\Backend\Mongo($frontCache, array(
-				'server' => 'mongodb://localhost',
 				'db' => 'phalcon_test',
 				'collection' => 'caches'
 			));

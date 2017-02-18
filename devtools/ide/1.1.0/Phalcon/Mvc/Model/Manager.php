@@ -8,10 +8,10 @@ namespace Phalcon\Mvc\Model {
 	 * This components controls the initialization of models, keeping record of relations
 	 * between the different models of the application.
 	 *
-	 * A ModelsManager is injected to a model via a Dependency Injector/Services Container such as Phalcon\DI.
+	 * A ModelsManager is injected to a model via a Dependency Injector/Services Container such as Phalcon\Di.
 	 *
 	 * <code>
-	 * $di = new Phalcon\DI();
+	 * $di = new Phalcon\Di();
 	 *
 	 * $di->set('modelsManager', function() {
 	 *      return new Phalcon\Mvc\Model\Manager();
@@ -21,7 +21,7 @@ namespace Phalcon\Mvc\Model {
 	 * </code>
 	 */
 	
-	class Manager extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\Model\ManagerInterface {
+	class Manager extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\Model\ManagerInterface {
 
 		protected $_customEventsManager;
 

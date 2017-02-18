@@ -31,6 +31,6 @@ namespace Phalcon\CLI {
 	 *</code>
 	 */
 	
-	class Task extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class Task extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 	}
 }

@@ -19,7 +19,7 @@ namespace Phalcon\Mvc\Model {
 	 *
 	 */
 	
-	abstract class MetaData extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\Model\MetaDataInterface {
+	abstract class MetaData extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\Model\MetaDataInterface {
 
 		const MODELS_ATTRIBUTES = 0;
 

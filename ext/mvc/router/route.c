@@ -206,17 +206,17 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 		regex = &PHALCON_GLOBAL(z_null);
 	}
 
-	/** 
+	/**
 	 * Configure the route (extract parameters, paths, etc)
 	 */
-	PHALCON_CALL_METHODW(NULL, getThis(), "reconfigure", pattern, paths, regex);
+	PHALCON_CALL_METHOD(NULL, getThis(), "reconfigure", pattern, paths, regex);
 
-	/** 
+	/**
 	 * Update the HTTP method constraints
 	 */
 	phalcon_update_property_zval(getThis(), SL("_methods"), http_methods);
 
-	/** 
+	/**
 	 * Get the unique Id from the static member _uniqueId
 	 */
 	phalcon_return_static_property_ce(&unique_id, phalcon_mvc_router_route_ce, SL("_uniqueId"));
@@ -250,17 +250,17 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 	if (!regex) {
 		regex = &PHALCON_GLOBAL(z_null);
 	}
-	/** 
+	/**
 	 * If a pattern contains ':', maybe there are placeholders to replace
 	 */
 	if (phalcon_memnstr_str(pattern, SL(":"))) {
 
-		/** 
+		/**
 		 * This is a pattern for valid identifiers
 		 */
 		PHALCON_STR(&id_pattern, "/([\\w0-9\\_\\-]+)");
 
-		/** 
+		/**
 		 * Replace the module part
 		 */
 		if (phalcon_memnstr_str(pattern, SL("/:module"))) {
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 			}
 		}
 
-		/** 
+		/**
 		 * Replace the controller placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL("/:controller"))) {
@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 			}
 		}
 
-		/** 
+		/**
 		 * Replace the namespace placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL("/:namespace"))) {
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 			}
 		}
 
-		/** 
+		/**
 		 * Replace the action placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL("/:action"))) {
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 			}
 		}
 
-		/** 
+		/**
 		 * Replace the params placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL("/:params"))) {
@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 			}
 		}
 
-		/** 
+		/**
 		 * Replace the int placeholder
 		 */
 		if (phalcon_memnstr_str(pattern, SL("/:int"))) {
@@ -353,7 +353,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		}
 	}
 
-	/** 
+	/**
 	 * Check if the pattern has parantheses in order to add the regex delimiters
 	 */
 	if (phalcon_memnstr_str(&compiled_pattern, SL("("))) {
@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		return;
 	}
 
-	/** 
+	/**
 	 * Square brackets are also checked
 	 */
 	if (phalcon_memnstr_str(&compiled_pattern, SL("["))) {
@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 		return;
 	}
 
-	RETURN_CTORW(&compiled_pattern);
+	RETURN_CTOR(&compiled_pattern);
 }
 
 /**
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, via){
 	phalcon_fetch_params(0, 1, 0, &http_methods);
 
 	phalcon_update_property_zval(getThis(), SL("_methods"), http_methods);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -407,7 +407,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	phalcon_fetch_params(0, 1, 2, &pattern, &paths, &regex);
 
 	if (Z_TYPE_P(pattern) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "The pattern must be string");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The pattern must be string");
 		return;
 	}
 
@@ -421,13 +421,13 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 
 	if (Z_TYPE_P(paths) != IS_NULL) {
 		if (Z_TYPE_P(paths) == IS_STRING) {
-			/** 
+			/**
 			 * Explode the short paths using the :: separator
 			 */
 			phalcon_fast_explode_str(&parts, SL("::"), paths);
 			phalcon_fast_count(&number_parts, &parts);
 
-			/** 
+			/**
 			 * Create the array paths dynamically
 			 */
 
@@ -452,34 +452,34 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 
 			array_init(&route_paths);
 
-			/** 
+			/**
 			 * Process module name
 			 */
 			if (Z_TYPE_P(&module_name) != IS_NULL) {
 				phalcon_array_update_str(&route_paths, SL("module"), &module_name, PH_COPY);
 			}
 
-			/** 
+			/**
 			 * Process controller name
 			 */
 			if (Z_TYPE_P(&controller_name) != IS_NULL) {
 
-				/** 
+				/**
 				 * Check if we need to obtain the namespace
 				 */
 				if (phalcon_memnstr_str(&controller_name, SL("\\"))) {
 
-					/** 
+					/**
 					 * Extract the real class name from the namespaced class
 					 */
 					phalcon_get_class_ns(&real_class_name, &controller_name, 0);
 
-					/** 
+					/**
 					 * Extract the namespace from the namespaced class
 					 */
 					phalcon_get_ns_class(&namespace_name, &controller_name, 0);
 
-					/** 
+					/**
 					 * Update the namespace
 					 */
 					if (zend_is_true(&namespace_name)) {
@@ -489,19 +489,19 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 					PHALCON_CPY_WRT_CTOR(&real_class_name, &controller_name);
 				}
 
-				/** 
+				/**
 				 * Always pass the controller to lowercase
 				 */
 				phalcon_uncamelize(&lower_name, &real_class_name);
 
-				/** 
+				/**
 				 * Update the controller path
 				 */
 				phalcon_array_update_str(&route_paths, SL("controller"), &lower_name, PH_COPY);
 
 			}
 
-			/** 
+			/**
 			 * Process action name
 			 */
 			if (Z_TYPE_P(&action_name) != IS_NULL) {
@@ -528,17 +528,17 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 		array_init(&route_paths);
 	}
 
-	if (Z_TYPE(route_paths) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "The route contains invalid paths");
+	if (Z_TYPE(route_paths) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The route contains invalid paths");
 		return;
 	}
 
-	/** 
+	/**
 	 * If the route starts with '#' we assume that it is a regular expression
 	 */
 	if (!phalcon_start_with_str(pattern, SL("#"))) {
 		if (phalcon_memnstr_str(pattern, SL("{"))) {
-			/** 
+			/**
 			 * The route has named parameters so we need to extract them
 			 */
 			phalcon_extract_named_params(&pcre_pattern, pattern, &route_paths);
@@ -546,25 +546,25 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 			PHALCON_CPY_WRT_CTOR(&pcre_pattern, pattern);
 		}
 
-		/** 
+		/**
 		 * Transform the route's pattern to a regular expression
 		 */
-		PHALCON_CALL_METHODW(&compiled_pattern, getThis(), "compilepattern", &pcre_pattern, regex);
+		PHALCON_CALL_METHOD(&compiled_pattern, getThis(), "compilepattern", &pcre_pattern, regex);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&compiled_pattern, pattern);
 	}
 
-	/** 
+	/**
 	 * Update the original pattern
 	 */
 	phalcon_update_property_zval(getThis(), SL("_pattern"), pattern);
 
-	/** 
+	/**
 	 * Update the compiled pattern
 	 */
 	phalcon_update_property_zval(getThis(), SL("_compiledPattern"), &compiled_pattern);
 
-	/** 
+	/**
 	 * Update the route's paths
 	 */
 	phalcon_update_property_zval(getThis(), SL("_paths"), &route_paths);
@@ -600,7 +600,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setName){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_update_property_zval(getThis(), SL("_name"), name);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -618,7 +618,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, beforeMatch){
 	phalcon_fetch_params(0, 1, 0, &callback);
 
 	phalcon_update_property_zval(getThis(), SL("_beforeMatch"), callback);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -720,7 +720,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHttpMethods){
 	phalcon_fetch_params(0, 1, 0, &http_methods);
 
 	phalcon_update_property_zval(getThis(), SL("_methods"), http_methods);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -751,7 +751,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHostname){
 	phalcon_fetch_params(0, 1, 0, &hostname);
 
 	phalcon_update_property_zval(getThis(), SL("_hostname"), hostname);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -776,10 +776,10 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setGroup) {
 	zval *group;
 
 	phalcon_fetch_params(0, 1, 0, &group);
-	PHALCON_VERIFY_CLASS_EX(group, phalcon_mvc_router_group_ce, phalcon_mvc_router_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(group, phalcon_mvc_router_group_ce, phalcon_mvc_router_exception_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_group"), group);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -806,7 +806,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, convert){
 	phalcon_fetch_params(0, 2, 0, &name, &converter);
 
 	phalcon_update_property_array(getThis(), SL("_converters"), name, converter);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -841,7 +841,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 	phalcon_fetch_params(0, 1, 0, &defaults);
 
 	if (Z_TYPE_P(defaults) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "Defaults must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Defaults must be an array");
 		return;
 	}
 
@@ -870,7 +870,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 		phalcon_update_property_zval(getThis(), SL("_defaultParams"), &params);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -959,13 +959,13 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setUrlGenerator){
 	phalcon_fetch_params(0, 1, 0, &generator);
 
 	if (!phalcon_is_callable(generator) && !instanceof_function(Z_OBJCE_P(generator), zend_ce_closure)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_router_exception_ce, "generator must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "generator must be an array");
 		return;
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_urlGenerator"), generator);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -991,7 +991,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setCaseSensitive){
 
 	phalcon_update_property_bool(getThis(), SL("_caseSensitive"), zend_is_true(case_sensitive));
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**

@@ -40,7 +40,7 @@ class ModelsEventsTest extends PHPUnit_Framework_TestCase
 
 	protected function _prepareDI(&$trace)
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$eventsManager = new Phalcon\Events\Manager();
 
@@ -52,7 +52,7 @@ class ModelsEventsTest extends PHPUnit_Framework_TestCase
 			}
 		});
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('modelsManager', function() use ($eventsManager) {
 

@@ -13,7 +13,7 @@ try {
                 )
         )->register();
 
-        $di = new \Phalcon\DI\FactoryDefault();
+        $di = new \Phalcon\Di\FactoryDefault();
         $di->set('url', function () use ($config) {
                 $url = new \Phalcon\Mvc\Url();
                 $url->setBaseUri('jsonrpc');

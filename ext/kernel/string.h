@@ -30,7 +30,7 @@
 #define PHALCON_TRIM_BOTH  3
 
 #define PHALCON_STR_REPLACE(return_value, search, replace, subject)  PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
-#define PHALCON_STR_REPLACEW(return_value, search, replace, subject) PHALCON_CALL_FUNCTIONW(return_value, "str_replace", search, replace, subject)
+#define PHALCON_STR_REPLACE(return_value, search, replace, subject) PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
 
 #define PHALCON_RANDOM_ALNUM   0
 #define PHALCON_RANDOM_ALPHA   1
@@ -58,9 +58,9 @@ void phalcon_fast_join(zval *result, zval *glue, zval *pieces);
 void phalcon_fast_join_str(zval *result, char *glue, unsigned int glue_length, zval *pieces);
 void phalcon_fast_explode(zval *result, zval *delimiter, zval *str);
 void phalcon_fast_explode_str(zval *result, const char *delimiter, int delimiter_length, zval *str);
-void phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle);
-void phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *needle, unsigned int needle_length);
-void phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, unsigned int needle_length);
+int phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle);
+int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *needle, unsigned int needle_length);
+int phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, unsigned int needle_length);
 zend_string* phalcon_trim(zval *str, zval *charlist, int where);
 void phalcon_fast_strip_tags(zval *return_value, zval *str);
 void phalcon_fast_strtoupper(zval *return_value, zval *str);

@@ -34,8 +34,8 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 		$_GET['_url'] = '/test2/index';
 
-		Phalcon\DI::reset();
-		$di = new Phalcon\DI\FactoryDefault();
+		Phalcon\Di::reset();
+		$di = new Phalcon\Di\FactoryDefault();
 
 		$di->set('view', function() {
 			$view = new \Phalcon\Mvc\View();
@@ -64,9 +64,9 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 		$_GET['_url'] = '/index';
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 
 		$di->set('router', function(){
 
@@ -113,9 +113,9 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 		$_GET['_url'] = '/login';
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 
 		$di->set('router', function(){
 
@@ -174,8 +174,8 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 		$_GET['_url'] = '/hmvc/one';
 
-		Phalcon\DI::reset();
-		$di = new Phalcon\DI\FactoryDefault();
+		Phalcon\Di::reset();
+		$di = new Phalcon\Di\FactoryDefault();
 
 		$application = new Phalcon\Mvc\Application();
 		$di->set('view', function() {

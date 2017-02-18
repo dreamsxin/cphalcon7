@@ -275,7 +275,7 @@ namespace Phalcon\Mvc\Model {
 		 * @param array $data
 		 * @return \Phalcon\Mvc\Model\CriteriaInterface
 		 */
-		public static function fromInput(\Phalcon\DIInterface $dependencyInjector, $modelName, $data);
+		public static function fromInput(\Phalcon\DiInterface $dependencyInjector, $modelName, $data);
 
 
 		/**

@@ -14,21 +14,16 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_WEBSOCKET_STRUCTURE_H
-#define PHALCON_WEBSOCKET_STRUCTURE_H
+#ifndef PHALCON_SESSION_ADAPTER_MEMCACHED_H
+#define PHALCON_SESSION_ADAPTER_MEMCACHED_H
 
 #include "php_phalcon.h"
 
-#define PHALCON_WEBSOCKET_FREQUENCY 0.2
+extern zend_class_entry *phalcon_session_adapter_memcached_ce;
 
-/* Callback structure */
-typedef struct _ws_callback {
-	zend_fcall_info *fci;
-	zend_fcall_info_cache *fcc;
-} ws_callback;
+PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Memcached);
 
-#endif /* PHALCON_WEBSOCKET_STRUCTURE_H */
+#endif /* PHALCON_SESSION_ADAPTER_MEMCACHED_H */

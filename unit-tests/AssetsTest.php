@@ -110,10 +110,10 @@ class AssetsTest extends PHPUnit_Framework_TestCase
 		$assets->addResource(new Phalcon\Assets\Resource\Css('/css/style.css', false));
 		$this->assertEquals(count($assets->get('css')), 3);
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		//Create a default DI
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('url', function(){
 			$url = new Phalcon\Mvc\Url();
@@ -291,9 +291,9 @@ class AssetsTest extends PHPUnit_Framework_TestCase
 	{
 		@unlink('unit-tests/assets/production/combined.js');
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di['url'] = function() {
 			$url = new Phalcon\Mvc\Url();
@@ -337,9 +337,9 @@ class AssetsTest extends PHPUnit_Framework_TestCase
 	{
 		@unlink('unit-tests/assets/production/combined.js');
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di['url'] = function() {
 			$url = new Phalcon\Mvc\Url();
@@ -382,9 +382,9 @@ class AssetsTest extends PHPUnit_Framework_TestCase
 	{
 		@unlink('unit-tests/assets/production/combined-1.js');
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di['url'] = function() {
 			$url = new Phalcon\Mvc\Url();
@@ -423,9 +423,9 @@ class AssetsTest extends PHPUnit_Framework_TestCase
 	{
 		@unlink('unit-tests/assets/production/combined-2.js');
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di['url'] = function() {
 			$url = new Phalcon\Mvc\Url();
@@ -475,9 +475,9 @@ class AssetsTest extends PHPUnit_Framework_TestCase
 	{
 		@unlink('unit-tests/assets/production/combined-3.js');
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di['url'] = function() {
 			$url = new Phalcon\Mvc\Url();
@@ -520,7 +520,7 @@ class AssetsTest extends PHPUnit_Framework_TestCase
 	public function testIssue1198()
 	{
 		@unlink(__DIR__ . '/assets/production/1198.css');
-		$di = new \Phalcon\DI\FactoryDefault();
+		$di = new \Phalcon\Di\FactoryDefault();
 		$assets = new \Phalcon\Assets\Manager();
 		$assets->useImplicitOutput(false);
 		$css = $assets->collection('css');
@@ -538,7 +538,7 @@ class AssetsTest extends PHPUnit_Framework_TestCase
 	public function testIssue1532()
 	{
 		@unlink(__DIR__ . '/assets/production/1532.js');
-		$di = new \Phalcon\DI\FactoryDefault();
+		$di = new \Phalcon\Di\FactoryDefault();
 		$assets = new \Phalcon\Assets\Manager();
 		$assets->useImplicitOutput(false);
 		$assets->collection('js')

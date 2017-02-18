@@ -14,16 +14,28 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_SESSION_ADAPTER_LIBMEMCACHED_H
-#define PHALCON_SESSION_ADAPTER_LIBMEMCACHED_H
+#include "storage/exception.h"
+#include "storage/../exception.h"
+#include "kernel/main.h"
 
-#include "php_phalcon.h"
+/**
+ * Phalcon\Storage\Exception
+ *
+ * Exceptions thrown in Phalcon\Storage will use this class
+ *
+ */
+zend_class_entry *phalcon_storage_exception_ce;
 
-extern zend_class_entry *phalcon_session_adapter_libmemcached_ce;
+/**
+ * Phalcon\Storage\Exception initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Storage_Exception){
 
-PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Libmemcached);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Storage, Exception, storage_exception, phalcon_exception_ce, NULL, 0);
 
-#endif /* PHALCON_SESSION_ADAPTER_LIBMEMCACHED_H */
+	return SUCCESS;
+}

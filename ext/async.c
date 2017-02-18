@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Async, call){
 	phalcon_fetch_params(0, 1, 1, &callable, &_arguments);
 
 	if (Z_TYPE_P(callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(callable), zend_ce_closure)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_exception_ce, "Callable must be an closure object");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Callable must be an closure object");
 		return;
 	}
 
@@ -114,29 +114,29 @@ PHP_METHOD(Phalcon_Async, call){
 		array_init(&arguments);
 	}
 
-	PHALCON_CALL_FUNCTIONW(&pid, "pcntl_fork");
+	PHALCON_CALL_FUNCTION(&pid, "pcntl_fork");
 
 	if (PHALCON_LT_LONG(&pid, 0)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_exception_ce, "Callable must be an closure object");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Callable must be an closure object");
 		return;
 	}
 
 	if (PHALCON_GT_LONG(&pid, 0)) {
 		phalcon_static_property_incr_ce(phalcon_async_ce, SL("_num"));
-		RETURN_CTORW(&pid);
+		RETURN_CTOR(&pid);
 	}
 
 	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
-	PHALCON_CALL_FUNCTIONW(&key, "ftok", &filename, &proj);
-	PHALCON_CALL_FUNCTIONW(&seg, "msg_get_queue", &key);
-	PHALCON_CALL_USER_FUNC_ARRAYW(&result, callable, &arguments);
-	PHALCON_CALL_FUNCTIONW(&pid, "posix_getpid");
-	PHALCON_CALL_FUNCTIONW(NULL, "msg_send", &seg, &pid, &result);
+	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
+	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
+	PHALCON_CALL_USER_FUNC_ARRAY(&result, callable, &arguments);
+	PHALCON_CALL_FUNCTION(&pid, "posix_getpid");
+	PHALCON_CALL_FUNCTION(NULL, "msg_send", &seg, &pid, &result);
 
 	if ((sig = zend_get_constant_str(SL("SIGKILL"))) != NULL ) {
-		PHALCON_CALL_FUNCTIONW(NULL, "posix_kill", &pid, sig);
+		PHALCON_CALL_FUNCTION(NULL, "posix_kill", &pid, sig);
 	}
 }
 
@@ -177,15 +177,15 @@ PHP_METHOD(Phalcon_Async, recv){
 	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
-	PHALCON_CALL_FUNCTIONW(&key, "ftok", &filename, &proj);
-	PHALCON_CALL_FUNCTIONW(&seg, "msg_get_queue", &key);
+	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
+	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
 
 	ZVAL_LONG(&size, 1024);
 
-	PHALCON_CALL_FUNCTIONW(&result, "msg_receive", &seg, &pid, &type, &size, &message, &PHALCON_GLOBAL(z_true), &flag);
+	PHALCON_CALL_FUNCTION(&result, "msg_receive", &seg, &pid, &type, &size, &message, &PHALCON_GLOBAL(z_true), &flag);
 
 	if (zend_is_true(&result)) {
-		RETURN_CTORW(&message);
+		RETURN_CTOR(&message);
 	}
 
 	RETURN_FALSE;
@@ -223,8 +223,8 @@ PHP_METHOD(Phalcon_Async, recvAll){
 
 	i = phalcon_get_intval(&num);
 
-	PHALCON_CALL_FUNCTIONW(&key, "ftok", &filename, &proj);
-	PHALCON_CALL_FUNCTIONW(&seg, "msg_get_queue", &key);
+	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
+	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
 
 	ZVAL_LONG(&pid, 0);
 	ZVAL_LONG(&size, 1024);
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Async, recvAll){
 		ZVAL_MAKE_REF(&type);
 		ZVAL_MAKE_REF(&message);
 
-		PHALCON_CALL_FUNCTIONW(&result, "msg_receive", &seg, &pid, &type, &size, &message, &PHALCON_GLOBAL(z_true), &flag);
+		PHALCON_CALL_FUNCTION(&result, "msg_receive", &seg, &pid, &type, &size, &message, &PHALCON_GLOBAL(z_true), &flag);
 
 		ZVAL_UNREF(&message);
 		ZVAL_UNREF(&type);
@@ -269,12 +269,12 @@ PHP_METHOD(Phalcon_Async, count){
 	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
-	PHALCON_CALL_FUNCTIONW(&key, "ftok", &filename, &proj);
-	PHALCON_CALL_FUNCTIONW(&seg, "msg_get_queue", &key);
-	PHALCON_CALL_FUNCTIONW(&result, "msg_stat_queue", &seg);
+	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
+	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
+	PHALCON_CALL_FUNCTION(&result, "msg_stat_queue", &seg);
 
 	if (phalcon_array_isset_fetch_str(&num, &result, SL("msg_qnum"))) {
-		RETURN_CTORW(&num);
+		RETURN_CTOR(&num);
 	}
 
 	RETURN_FALSE;
@@ -296,7 +296,7 @@ PHP_METHOD(Phalcon_Async, clear){
 	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
 	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
 
-	PHALCON_CALL_FUNCTIONW(&key, "ftok", &filename, &proj);
-	PHALCON_CALL_FUNCTIONW(&seg, "msg_get_queue", &key);
-	PHALCON_RETURN_CALL_FUNCTIONW("msg_remove_queue", &seg);
+	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
+	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
+	PHALCON_RETURN_CALL_FUNCTION("msg_remove_queue", &seg);
 }

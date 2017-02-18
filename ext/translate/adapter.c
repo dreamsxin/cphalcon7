@@ -84,7 +84,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, t){
 		placeholders = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "query", translate_key, placeholders);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "query", translate_key, placeholders);
 }
 
 /**
@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetExists){
 
 	phalcon_fetch_params(0, 1, 0, &translate_key);
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "exists", translate_key);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "exists", translate_key);
 }
 
 /**
@@ -134,5 +134,5 @@ PHP_METHOD(Phalcon_Translate_Adapter, offsetGet){
 	zval *translate_key;
 
 	phalcon_fetch_params(0, 1, 0, &translate_key);
-	PHALCON_RETURN_CALL_METHODW(getThis(), "query", translate_key);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "query", translate_key);
 }

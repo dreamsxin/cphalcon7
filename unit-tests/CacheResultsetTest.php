@@ -50,9 +50,9 @@ class CacheResultsetTest extends PHPUnit_Framework_TestCase
 
 		@unlink('unit-tests/cache/test-resultset');
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('modelsManager', function(){
 			return new Phalcon\Mvc\Model\Manager();
@@ -77,13 +77,7 @@ class CacheResultsetTest extends PHPUnit_Framework_TestCase
 				));
 				break;
 			case 'Memcached':
-				$cache = new Phalcon\Cache\Backend\Memcache($frontCache, array(
-					"host" => "localhost",
-					"port" => "11211"
-				));
-				break;
-			case 'Libmemcached':
-				$cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+				$cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 					"servers" => array(
 						array(
 							"host" => "localhost",

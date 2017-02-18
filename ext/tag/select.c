@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 	}
 
 	if (!phalcon_array_isset_fetch_str(&value, &params, SL("value"))) {
-		PHALCON_CALL_CE_STATICW(&value, phalcon_tag_ce, "getvalue", &id, &params);
+		PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
 	} else {
 		phalcon_array_unset_str(&params, SL("value"), 0);
 	}
@@ -165,34 +165,34 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		 * The options is a resultset
 		 */
 		if (Z_TYPE(using) < IS_NULL) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_tag_exception_ce, "The 'using' parameter is required");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "The 'using' parameter is required");
 			return;
 		}
 
 		if (Z_TYPE(using) != IS_ARRAY && Z_TYPE(using) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_tag_exception_ce, "The 'using' parameter should be an Array");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "The 'using' parameter should be an Array");
 			return;
 		}
 
 		/**
 		 * Create the SELECT's option from a resultset
 		 */
-		PHALCON_CALL_CE_STATICW(&resultset_options, phalcon_tag_select_ce, "_optionsfromresultset", &options, &using, &value, &close_option);
+		PHALCON_CALL_CE_STATIC(&resultset_options, phalcon_tag_select_ce, "_optionsfromresultset", &options, &using, &value, &close_option);
 		phalcon_concat_self(&code, &resultset_options);
 	} else if (Z_TYPE(options) == IS_ARRAY) {
 		/**
 		 * Create the SELECT's option from an array
 		 */
-		PHALCON_CALL_CE_STATICW(&array_options, phalcon_tag_select_ce, "_optionsfromarray",  &options, &value, &close_option);
+		PHALCON_CALL_CE_STATIC(&array_options, phalcon_tag_select_ce, "_optionsfromarray",  &options, &value, &close_option);
 		phalcon_concat_self(&code, &array_options);
 	} else {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_tag_exception_ce, "Invalid data provided to SELECT helper");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "Invalid data provided to SELECT helper");
 		return;
 	}
 
 	phalcon_concat_self_str(&code, SL("</select>"));
 
-	RETURN_CTORW(&code);
+	RETURN_CTOR(&code);
 }
 
 /**
@@ -214,12 +214,12 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 		convert_to_string(value);
 	}
 
-	PHALCON_CALL_METHODW(NULL, resultset, "rewind");
+	PHALCON_CALL_METHOD(NULL, resultset, "rewind");
 
 	while (1) {
 		zval r0 = {}, option = {}, using_zero = {}, using_one = {}, option_value = {}, option_text = {}, escaped = {}, params = {}, code_option = {};
 
-		PHALCON_CALL_METHODW(&r0, resultset, "valid");
+		PHALCON_CALL_METHOD(&r0, resultset, "valid");
 		if (PHALCON_IS_NOT_FALSE(&r0)) {
 		} else {
 			break;
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 		/**
 		 * Get the current option
 		 */
-		PHALCON_CALL_METHODW(&option, resultset, "current");
+		PHALCON_CALL_METHOD(&option, resultset, "current");
 		if (Z_TYPE_P(using) == IS_ARRAY) {
 			phalcon_array_fetch_long(&using_zero, using, 0, PH_NOISY);
 			phalcon_array_fetch_long(&using_one, using, 1, PH_NOISY);
@@ -237,12 +237,12 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 					/**
 					 * Read the value attribute from the model
 					 */
-					PHALCON_CALL_METHODW(&option_value, &option, "readattribute", &using_zero);
+					PHALCON_CALL_METHOD(&option_value, &option, "readattribute", &using_zero);
 
 					/**
 					 * Read the text attribute from the model
 					 */
-					PHALCON_CALL_METHODW(&option_text, &option, "readattribute", &using_one);
+					PHALCON_CALL_METHOD(&option_text, &option, "readattribute", &using_one);
 				} else {
 					/**
 					 * Read the variable directly from the model/object
@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 					 */
 					phalcon_array_fetch(&option_text, &option, &using_one, PH_NOISY);
 				} else {
-					PHALCON_THROW_EXCEPTION_STRW(phalcon_tag_exception_ce, "Resultset returned an invalid value");
+					PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "Resultset returned an invalid value");
 					return;
 				}
 			}
@@ -299,15 +299,15 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 				}
 				phalcon_array_update_long(&params, 0, &option, PH_COPY);
 
-				PHALCON_CALL_USER_FUNC_ARRAYW(&code_option, using, &params);
+				PHALCON_CALL_USER_FUNC_ARRAY(&code_option, using, &params);
 				phalcon_concat_self(&code, &code_option);
 			}
 		}
 
-		PHALCON_CALL_METHODW(NULL, resultset, "next");
+		PHALCON_CALL_METHOD(NULL, resultset, "next");
 	}
 
-	RETURN_CTORW(&code);
+	RETURN_CTOR(&code);
 }
 
 /**
@@ -342,7 +342,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 		if (Z_TYPE_P(option_text) == IS_ARRAY) {
 			phalcon_htmlspecialchars(&escaped, &option_value, NULL, NULL);
 
-			PHALCON_CALL_SELFW(&array_options, "_optionsfromarray", option_text, value, close_option);
+			PHALCON_CALL_SELF(&array_options, "_optionsfromarray", option_text, value, close_option);
 
 			PHALCON_SCONCAT_SVSVS(&code, "\t<optgroup label=\"", &escaped, "\">" PHP_EOL, &array_options, "\t</optgroup>" PHP_EOL);
 		} else {
@@ -365,5 +365,5 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTORW(&code);
+	RETURN_CTOR(&code);
 }

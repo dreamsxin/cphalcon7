@@ -160,12 +160,12 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
 	if (Z_TYPE_P(context) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(&interpolated, getThis(), "interpolate", message, context);
+		PHALCON_CALL_METHOD(&interpolated, getThis(), "interpolate", message, context);
 	} else {
 		PHALCON_CPY_WRT(&interpolated, message);
 	}
 
-	PHALCON_CALL_METHODW(&type_str, getThis(), "gettypestring", type);
+	PHALCON_CALL_METHOD(&type_str, getThis(), "gettypestring", type);
 
 	phalcon_read_property(&show_backtrace, getThis(), SL("_showBacktrace"), PH_NOISY);
 	phalcon_read_property(&enable_labels, getThis(), SL("_enableLabels"), PH_NOISY);

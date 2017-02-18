@@ -8,7 +8,7 @@ namespace Phalcon\Mvc\Model\Query\Builder {
 	 * Helps to create PHQL queries for WHERE statements
 	 */
 	
-	abstract class Where extends \Phalcon\Mvc\Model\Query\Builder implements \Phalcon\Mvc\Model\Query\BuilderInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	abstract class Where extends \Phalcon\Mvc\Model\Query\Builder implements \Phalcon\Mvc\Model\Query\BuilderInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		protected $_conditions;
 

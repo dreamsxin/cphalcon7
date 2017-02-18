@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Events_Event, stop){
 	if (zend_is_true(&cancelable)) {
 		phalcon_update_property_bool(getThis(), SL("_stopped"), 1);
 	} else {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_events_exception_ce, "Trying to cancel a non-cancelable event");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Trying to cancel a non-cancelable event");
 		return;
 	}
 }

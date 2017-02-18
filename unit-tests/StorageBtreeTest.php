@@ -1,9 +1,10 @@
+<?php
 
 /*
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2012 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -14,16 +15,22 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_SESSION_ADAPTER_MEMCACHE_H
-#define PHALCON_SESSION_ADAPTER_MEMCACHE_H
-
-#include "php_phalcon.h"
-
-extern zend_class_entry *phalcon_session_adapter_memcache_ce;
-
-PHALCON_INIT_CLASS(Phalcon_Session_Adapter_Memcache);
-
-#endif /* PHALCON_SESSION_ADAPTER_MEMCACHE_H */
+class StorageBtreeTest extends PHPUnit_Framework_TestCase
+{
+	public function testNormal()
+	{
+		if (!class_exists('Phalcon\Storage\Btree')) {
+			$this->markTestSkipped('Class `Phalcon\Storage\Btree` is not exists');
+			return false;
+		}
+		$btree = new Phalcon\Storage\Btree('unit-tests/cache/tree.db');
+		$this->assertTrue($btree->set("key1", "value1"));
+		$this->assertEquals($btree->get("key1"), "value1");
+		$this->assertTrue($btree->delete("key1"));
+		$this->assertEquals($btree->get("key1"), "");
+	}
+}

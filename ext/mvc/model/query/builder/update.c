@@ -107,7 +107,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Update){
  * Phalcon\Mvc\Model\Query\Builder\Update constructor
  *
  * @param array $params
- * @param Phalcon\DI $dependencyInjector
+ * @param Phalcon\Di $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, __construct){
 
@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, __construct){
 	 * Update the dependency injector if any
 	 */
 	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdi", dependency_injector);
 	}
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
@@ -127,23 +127,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, __construct){
 		 * Process conditions
 		 */
 		if (phalcon_array_isset_fetch_str(&conditions, params, SL("conditions")) || phalcon_array_isset_fetch_long(&conditions, params, 0)) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "setconditions", &conditions);
+			PHALCON_CALL_METHOD(NULL, getThis(), "setconditions", &conditions);
 		}
 
 		if (phalcon_array_isset_fetch_str(&bind_params, params, SL("bind"))) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "setbindparams", &bind_params);
+			PHALCON_CALL_METHOD(NULL, getThis(), "setbindparams", &bind_params);
 		}
 
 		if (phalcon_array_isset_fetch_str(&bind_types, params, SL("bindTypes"))) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "setbindtypes", &bind_types);
+			PHALCON_CALL_METHOD(NULL, getThis(), "setbindtypes", &bind_types);
 		}
 
 		if (phalcon_array_isset_fetch_str(&table, params, SL("table"))) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "settable", &table);
+			PHALCON_CALL_METHOD(NULL, getThis(), "settable", &table);
 		}
 
 		if (phalcon_array_isset_fetch_str(&set, params, SL("set"))) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "set", &set);
+			PHALCON_CALL_METHOD(NULL, getThis(), "set", &set);
 		}
 	}
 }
@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, table){
 	phalcon_fetch_params(0, 1, 0, &table);
 
 	phalcon_update_property_zval(getThis(), SL("_table"), table);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, set){
 	phalcon_fetch_params(0, 1, 0, &set);
 
 	phalcon_update_property_zval(getThis(), SL("_set"), set);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -217,19 +217,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_CALL_SELFW(&table, "gettable");
+	PHALCON_CALL_SELF(&table, "gettable");
 
-	PHALCON_CALL_SELFW(&conditions, "getconditions");
-	PHALCON_CALL_SELFW(&set, "getset");
+	PHALCON_CALL_SELF(&conditions, "getconditions");
+	PHALCON_CALL_SELF(&set, "getset");
 
 	PHALCON_CONCAT_SVS(&phql, "UPDATE [", &table, "] SET ");
 
 	if (Z_TYPE(set) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_query_exception_ce, "Values must be array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Values must be array");
 		return;
 	}
 
-	PHALCON_CALL_SELFW(&bind_params, "getbindparams");
+	PHALCON_CALL_SELF(&bind_params, "getbindparams");
 	if (Z_TYPE(bind_params) != IS_ARRAY) {
 		array_init(&bind_params);
 	}
@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
 
 	phalcon_update_property_zval(getThis(), SL("_mergeBindParams"), &bind_params);
 
-	PHALCON_CALL_SELFW(&bind_types, "getbindtypes");
+	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
 	phalcon_update_property_zval(getThis(), SL("_mergeBindTypes"), &bind_types);
 
 	phalcon_update_property_zval(getThis(), SL("_phql"), &phql);

@@ -25,7 +25,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
 
 	public function setUp()
 	{
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('url', function(){
 			$url = new Phalcon\Mvc\Url();

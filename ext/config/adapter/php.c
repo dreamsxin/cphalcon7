@@ -116,8 +116,8 @@ PHP_METHOD(Phalcon_Config_Adapter_Php, read){
 	}
 
 	if (Z_TYPE(config) == IS_ARRAY) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "val", &config);
+		PHALCON_CALL_METHOD(NULL, getThis(), "val", &config);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }

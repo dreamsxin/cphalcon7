@@ -37,7 +37,7 @@ static inline void phalcon_forms_element_render_helper(const char *method, int u
 
 	uc = use_checked ? &PHALCON_GLOBAL(z_true) : &PHALCON_GLOBAL(z_false);
 
-	PHALCON_CALL_METHODW(&widget_attributes, getThis(), "prepareattributes", attributes, uc);
+	PHALCON_CALL_METHOD(&widget_attributes, getThis(), "prepareattributes", attributes, uc);
 
 	params[0] = &widget_attributes;
 	if (FAILURE == phalcon_call_ce(return_value, phalcon_tag_ce, method, 1, params)) {

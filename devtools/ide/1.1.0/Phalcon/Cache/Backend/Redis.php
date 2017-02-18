@@ -33,7 +33,7 @@ namespace Phalcon\Cache\Backend {
 	 *</code>
 	 */
 	
-	class Redis extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Redis extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		protected $_redis;
 

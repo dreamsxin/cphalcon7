@@ -9,6 +9,6 @@ namespace Phalcon\Mvc\User {
 	 * in the application
 	 */
 	
-	class Plugin extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class Plugin extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 	}
 }

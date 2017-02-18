@@ -9,7 +9,7 @@ namespace Phalcon {
 	 * This class can't be instantiated directly, you can use it to create your own dispatchers
 	 */
 	
-	abstract class Dispatcher extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\DispatcherInterface {
+	abstract class Dispatcher extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\DispatcherInterface {
 
 		const EXCEPTION_NO_DI = 1;
 

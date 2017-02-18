@@ -20,7 +20,11 @@
 #include "config.h"
 #endif
 
-#ifdef PHALCON_QRCODE
+#include "php.h"
+#include "php_phalcon.h"
+#include "phalcon.h"
+
+#if PHALCON_USE_QRENCODE
 # include <wand/MagickWand.h>
 # ifdef PHALCON_USE_ZBAR
 #  include <zbar.h>
@@ -29,10 +33,6 @@
 # define PNG_SKIP_SETJMP_CHECK 1
 # include <png.h>
 #endif
-
-#include "php.h"
-#include "php_phalcon.h"
-#include "phalcon.h"
 
 #include "php_open_temporary_file.h"
 
@@ -109,7 +109,7 @@ static const zend_function_entry phalcon_chart_qrcode_method_entry[] = {
 	PHP_FE_END
 };
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 # define INCHES_PER_METER (100.0/2.54)
 
 int  phalcon_qrcode_handle;
@@ -157,7 +157,7 @@ PHALCON_INIT_CLASS(Phalcon_Chart_QRcode){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Chart, QRcode, chart_qrcode, phalcon_chart_qrcode_method_entry, 0);
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
     phalcon_qrcode_handle = zend_register_list_destructors_ex(phalcon_qr_dtor, NULL, phalcon_qrcode_handle_name, module_number);
 
 	/* Mode */
@@ -193,7 +193,7 @@ PHALCON_INIT_CLASS(Phalcon_Chart_QRcode){
 PHP_METHOD(Phalcon_Chart_QRcode, __construct){
 
 #ifndef PHALCON_QRCODE
-	PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "QRcode is not enable, check your configuration");
+	PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "QRcode is not enable, check your configuration");
 #endif
 }
 
@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, __construct){
  */
 PHP_METHOD(Phalcon_Chart_QRcode, generate){
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 	zval *text, *_version = NULL, *_level = NULL, *_mode = NULL, *_casesensitive = NULL, version = {}, level = {}, mode = {}, casesensitive = {};
 	zval zid = {};
 	php_qrcode *qr = NULL;
@@ -222,7 +222,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		phalcon_read_property(&version, getThis(), SL("_version"), PH_NOISY);
 	} else {
 		if (Z_LVAL_P(_version) < 1 || Z_LVAL_P(_version) > 40) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "version must be within the range of 1 to 40");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "version must be within the range of 1 to 40");
 			return;
 		}
 		PHALCON_CPY_WRT(&version, _version);
@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		phalcon_read_property(&level, getThis(), SL("_level"), PH_NOISY);
 	} else {
 		if (Z_LVAL_P(_level) != QR_ECLEVEL_L && Z_LVAL_P(_level) != QR_ECLEVEL_M && Z_LVAL_P(_level) != QR_ECLEVEL_Q && Z_LVAL_P(_level) != QR_ECLEVEL_H) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Error level. there are 4 values: LEVEL_L, LEVEL_M, LEVEL_Q, LEVEL_H");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Error level. there are 4 values: LEVEL_L, LEVEL_M, LEVEL_Q, LEVEL_H");
 			return;
 		}
 		PHALCON_CPY_WRT(&level, _level);
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
 	} else {
 		if (Z_LVAL_P(_mode) != QR_MODE_NUL && Z_LVAL_P(_mode) != QR_MODE_NUM && Z_LVAL_P(_mode) != QR_MODE_8 && Z_LVAL_P(_mode) != QR_MODE_KANJI) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Error mode. there are 4 values: MODE_NUL, MODE_NUM, MODE_8, MODE_KANJI");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Error mode. there are 4 values: MODE_NUL, MODE_NUM, MODE_8, MODE_KANJI");
 			return;
 		}
 		PHALCON_CPY_WRT(&mode, _mode);
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
  */
 PHP_METHOD(Phalcon_Chart_QRcode, render){
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 	zval *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL, zid = {};
 	FILE *fp = NULL;
 	png_structp png_ptr;
@@ -310,25 +310,25 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 	phalcon_fetch_params(0, 0, 4, &size, &margin, &foreground, &background);
 
 	if (size && Z_TYPE_P(size) != IS_NULL) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "size parameter must be int");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "size parameter must be int");
 		return;
 	}
 
 	if (margin && Z_TYPE_P(margin) != IS_NULL) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "margin parameter must be int");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "margin parameter must be int");
 		return;
 	}
 
 	if (foreground && zend_is_true(foreground)) {
 		if(phalcon_color_set(fg_color, Z_STRVAL_P(foreground))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Invalid foreground color value");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Invalid foreground color value");
 			return;
 		}
 	}
 
 	if (background && zend_is_true(background)) {
 		if(phalcon_color_set(bg_color, Z_STRVAL_P(background))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Invalid background color value");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Invalid background color value");
 			return;
 		}
 	}
@@ -352,28 +352,28 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 
 	fp = php_open_temporary_file(NULL, NULL, &path);
 	if (!fp) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Unable to open temporary file for writing");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Unable to open temporary file for writing");
 		return;
 	}
 
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if(png_ptr == NULL) {
 		fclose(fp);
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to initialize PNG writer");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to initialize PNG writer");
 		return;
 	}
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if(info_ptr == NULL) {
 		fclose(fp);
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to initialize PNG writer");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to initialize PNG writer");
 		return;
 	}
 
 	if(setjmp(png_jmpbuf(png_ptr))) {
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		fclose(fp);
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to write PNG writer");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to write PNG writer");
 		return;
 	}
 
@@ -482,7 +482,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
  */
 PHP_METHOD(Phalcon_Chart_QRcode, save){
 
-#ifdef PHALCON_QRCODE
+#if PHALCON_USE_QRENCODE
 	zval *filename, *size = NULL, *margin = NULL, *foreground=NULL, *background=NULL;
 	zval zid = {}, exception_message = {};
 	png_structp png_ptr;
@@ -502,17 +502,17 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 	phalcon_fetch_params(0, 1, 4, &filename, &size, &margin, &foreground, &background);
 
 	if (Z_TYPE_P(filename) != IS_STRING || PHALCON_IS_EMPTY(filename)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "filename parameter must be string");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "filename parameter must be string");
 		return;
 	}
 
 	if (size && Z_TYPE_P(size) != IS_NULL && Z_TYPE_P(size) != IS_LONG) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "size parameter must be int");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "size parameter must be int");
 		return;
 	}
 
 	if (margin && Z_TYPE_P(margin) != IS_NULL && Z_TYPE_P(margin) != IS_LONG) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "margin parameter must be int");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "margin parameter must be int");
 		return;
 	}
 
@@ -521,7 +521,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 		convert_to_string(foreground);
 
 		if(phalcon_color_set(fg_color, Z_STRVAL_P(foreground))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Invalid foreground color value");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Invalid foreground color value");
 			return;
 		}
 	}
@@ -531,7 +531,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 		convert_to_string(background);
 
 		if(phalcon_color_set(bg_color, Z_STRVAL_P(background))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Invalid background color value");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Invalid background color value");
 			return;
 		}
 	}
@@ -559,7 +559,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 	fp = VCWD_FOPEN(fn, "wb");
 	if (!fp) {
 		PHALCON_CONCAT_SVS(&exception_message, "Unable to open '", filename, "' for writing");
-		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_chart_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_chart_exception_ce, &exception_message);
 		return;
 	}
 
@@ -569,21 +569,21 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 	if(png_ptr == NULL) {
 		fclose(fp);
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to initialize PNG writer");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to initialize PNG writer");
 		return;
 	}
 
 	info_ptr = png_create_info_struct(png_ptr);
 	if(info_ptr == NULL) {
 		fclose(fp);
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to initialize PNG writer");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to initialize PNG writer");
 		return;
 	}
 
 	if(setjmp(png_jmpbuf(png_ptr))) {
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		fclose(fp);
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to write PNG writer");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to write PNG writer");
 		return;
 	}
 
@@ -737,7 +737,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 			ZVAL_STRING(&to, "utf-8");
 			ZVAL_STRING(&fromtext, data);
 
-			PHALCON_CALL_FUNCTIONW(&totext, "mb_convert_encoding", &fromtext, &from, &to);
+			PHALCON_CALL_FUNCTION(&totext, "mb_convert_encoding", &fromtext, &from, &to);
 			phalcon_array_update_str(&symbol_array, SL("data"), &totext, PH_COPY);
         } else {
 			phalcon_array_update_str_str(&symbol_array, SL("data"), (char *)data, strlen(data), PH_COPY);
@@ -774,7 +774,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
  */
 PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
-#ifdef PHALCON_USE_ZBAR
+#if PHALCON_USE_ZBAR
 	zval *filename, *enhance = NULL, *extended = NULL;
 	MagickWand *magick_wand;
 	zbar_image_scanner_t *zbar_scanner;
@@ -815,7 +815,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 	image_count = MagickGetNumberImages(magick_wand);
 
 	if (image_count == 0) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "The image object does not contain images");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "The image object does not contain images");
 		return;
 	}
 
@@ -825,7 +825,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 		if (MagickSetIteratorIndex(magick_wand, 0) == MagickFalse) {
 			zbar_image_scanner_destroy(zbar_scanner);
 			DestroyMagickWand(magick_wand);
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to set the page number");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to set the page number");
 			return;
 		}
 
@@ -835,7 +835,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 		if (!zbar_page) {
 			zbar_image_scanner_destroy(zbar_scanner);
 			DestroyMagickWand(magick_wand);
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_chart_exception_ce, "Failed to get the page");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Failed to get the page");
 			return;
 		}
 

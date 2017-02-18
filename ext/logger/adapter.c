@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, setLogLevel){
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_logLevel"), &lvl);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -175,10 +175,10 @@ PHP_METHOD(Phalcon_Logger_Adapter, setFormatter){
 	zval *formatter;
 
 	phalcon_fetch_params(0, 1, 0, &formatter);
-	PHALCON_VERIFY_INTERFACE_EX(formatter, phalcon_logger_formatterinterface_ce, phalcon_logger_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(formatter, phalcon_logger_formatterinterface_ce, phalcon_logger_exception_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_formatter"), formatter);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, begin){
 
 
 	phalcon_update_property_bool(getThis(), SL("_transaction"), 1);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -214,27 +214,27 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 
 	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
 	if (!zend_is_true(&transaction)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "There is no active transaction");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "There is no active transaction");
 		return;
 	}
-	
+
 	phalcon_update_property_bool(getThis(), SL("_transaction"), 0);
-	
+
 	/* Check if the queue has something to log */
 	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
 	if (Z_TYPE(queue) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(queue), message) {
-			PHALCON_CALL_METHODW(&message_str, message, "getmessage");
-			PHALCON_CALL_METHODW(&type, message, "gettype");
-			PHALCON_CALL_METHODW(&time, message, "gettime");
-			PHALCON_CALL_METHODW(&context, message, "getcontext");
-			PHALCON_CALL_METHODW(NULL, getThis(), "loginternal", &message_str, &type, &time, &context);
+			PHALCON_CALL_METHOD(&message_str, message, "getmessage");
+			PHALCON_CALL_METHOD(&type, message, "gettype");
+			PHALCON_CALL_METHOD(&time, message, "gettime");
+			PHALCON_CALL_METHOD(&context, message, "getcontext");
+			PHALCON_CALL_METHOD(NULL, getThis(), "loginternal", &message_str, &type, &time, &context);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_update_property_empty_array(getThis(), SL("_queue"));
 	}
-	
-	RETURN_THISW();
+
+	RETURN_THIS();
 }
 
 /**
@@ -248,16 +248,16 @@ PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 
 	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
 	if (!zend_is_true(&transaction)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "There is no active transaction");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "There is no active transaction");
 		return;
 	}
-	
+
 	phalcon_update_property_bool(getThis(), SL("_transaction"), 0);
 
 	array_init_size(&queue, 0);
 	phalcon_update_property_zval(getThis(), SL("_queue"), &queue);
-	
-	RETURN_THISW();
+
+	RETURN_THIS();
 }
 
 static void phalcon_logger_adapter_log_helper(INTERNAL_FUNCTION_PARAMETERS, int level)
@@ -273,7 +273,7 @@ static void phalcon_logger_adapter_log_helper(INTERNAL_FUNCTION_PARAMETERS, int 
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHODW(NULL, getThis(), "log", &type, message, context);
+	PHALCON_CALL_METHOD(NULL, getThis(), "log", &type, message, context);
 	RETURN_ZVAL(getThis(), 1, 0);
 }
 
@@ -437,14 +437,14 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 		phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
 		if (zend_is_true(&transaction)) {
 			object_init_ex(&queue_item, phalcon_logger_item_ce);
-			PHALCON_CALL_METHODW(NULL, &queue_item, "__construct", message, &level, &timestamp, context);
+			PHALCON_CALL_METHOD(NULL, &queue_item, "__construct", message, &level, &timestamp, context);
 
 			phalcon_update_property_array_append(getThis(), SL("_queue"), &queue_item);
 		}
 		else {
-			PHALCON_CALL_METHODW(NULL, getThis(), "loginternal", message, &level, &timestamp, context);
+			PHALCON_CALL_METHOD(NULL, getThis(), "loginternal", message, &level, &timestamp, context);
 		}
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }

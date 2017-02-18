@@ -45,13 +45,13 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 
 	if (!object || Z_TYPE_P(object) != IS_OBJECT) {
 		object_init_ex(&exception, zend_exception_get_default());
-		PHALCON_CALL_METHODW(NULL, &exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
+		PHALCON_CALL_METHOD(NULL, &exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
 	} else {
 		PHALCON_CPY_WRT(&exception, object);
 	}
 
 	if (line > 0) {
-		PHALCON_CALL_METHODW(&curline, &exception, "getline");
+		PHALCON_CALL_METHOD(&curline, &exception, "getline");
 		if (PHALCON_IS_LONG(&curline, 0)) {
 			default_exception_ce = zend_exception_get_default();
 			zend_update_property_string(default_exception_ce, &exception, "file", sizeof("file")-1, file);
@@ -82,7 +82,7 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
 
 	ZVAL_STRINGL(&msg, message, message_len);
 
-	PHALCON_CALL_METHODW(NULL, &object, "__construct", &PHALCON_GLOBAL(z_null), &msg);
+	PHALCON_CALL_METHOD(NULL, &object, "__construct", &PHALCON_GLOBAL(z_null), &msg);
 
 	if (line > 0) {
 		default_exception_ce = zend_exception_get_default();
@@ -102,7 +102,7 @@ void phalcon_throw_exception_zval(zend_class_entry *ce, zval *message){
 	zval object = {};
 	object_init_ex(&object, ce);
 
-	PHALCON_CALL_METHODW(NULL, &object, "__construct", message);
+	PHALCON_CALL_METHOD(NULL, &object, "__construct", message);
 	zend_throw_exception_object(&object);
 }
 
@@ -116,7 +116,7 @@ void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, con
 
 	object_init_ex(&object, ce);
 
-	PHALCON_CALL_METHODW(NULL, &object, "__construct", &PHALCON_GLOBAL(z_null), message);
+	PHALCON_CALL_METHOD(NULL, &object, "__construct", &PHALCON_GLOBAL(z_null), message);
 
 	if (line > 0) {
 		default_exception_ce = zend_exception_get_default();
@@ -145,7 +145,7 @@ void phalcon_throw_exception_format(zend_class_entry *ce, const char *format, ..
 
 	ZVAL_STRINGL(&msg, buffer, len);
 
-	PHALCON_CALL_METHODW(NULL, &object, "__construct", &msg);
+	PHALCON_CALL_METHOD(NULL, &object, "__construct", &msg);
 
 	zend_throw_exception_object(&object);
 	zval_dtor(&msg);

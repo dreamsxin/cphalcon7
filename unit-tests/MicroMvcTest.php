@@ -60,7 +60,7 @@ class MicroMvcTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroClass()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$handler = new RestHandler($this);
 
@@ -107,7 +107,7 @@ class MicroMvcTest extends PHPUnit_Framework_TestCase
 	*/
 	public function testMicroNotFound_T169()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$handler = new RestHandler($this);
 		$app = new \Phalcon\Mvc\Micro();

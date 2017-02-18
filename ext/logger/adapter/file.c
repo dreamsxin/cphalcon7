@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 
 	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"))) {
 		if (phalcon_memnstr_str(&mode, SL("r"))) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Logger must be opened in append or write mode");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Logger must be opened in append or write mode");
 			return;
 		}
 	} else {
@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 	/** 
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
-	PHALCON_CALL_FUNCTIONW(&handler, "fopen", name, &mode);
+	PHALCON_CALL_FUNCTION(&handler, "fopen", name, &mode);
 	if (Z_TYPE(handler) != IS_RESOURCE) {
 		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open log file '%s'", Z_STRVAL_P(name));
 	} else {
@@ -136,12 +136,12 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
 	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
 	if (Z_TYPE(formatter) != IS_OBJECT) {
 		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
-		PHALCON_CALL_METHODW(NULL, &formatter, "__construct");
+		PHALCON_CALL_METHOD(NULL, &formatter, "__construct");
 
 		phalcon_update_property_zval(getThis(), SL("_formatter"), &formatter);
 	}
 
-	RETURN_CTORW(&formatter);
+	RETURN_CTOR(&formatter);
 }
 
 /**
@@ -160,13 +160,13 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, logInternal){
 
 	phalcon_read_property(&file_handler, getThis(), SL("_fileHandler"), PH_NOISY);
 	if (Z_TYPE(file_handler) != IS_RESOURCE) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&formatter, getThis(), "getformatter");
-	PHALCON_CALL_METHODW(&applied_format, &formatter, "format", message, type, time, context);
-	PHALCON_CALL_FUNCTIONW(NULL, "fwrite", &file_handler, &applied_format);
+	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
+	PHALCON_CALL_METHOD(&applied_format, &formatter, "format", message, type, time, context);
+	PHALCON_CALL_FUNCTION(NULL, "fwrite", &file_handler, &applied_format);
 }
 
 /**
@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, close){
 	zval file_handler = {};
 
 	phalcon_read_property(&file_handler, getThis(), SL("_fileHandler"), PH_NOISY);
-	PHALCON_RETURN_CALL_FUNCTIONW("fclose", &file_handler);
+	PHALCON_RETURN_CALL_FUNCTION("fclose", &file_handler);
 }
 
 /**
@@ -201,14 +201,14 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 
 	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
 	if (Z_TYPE(path) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 		return;
 	}
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 	if (phalcon_array_isset_fetch_str(&mode, &options, SL("mode"))) {
 		if (Z_TYPE(mode) != IS_STRING) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 			return;
 		}
 	} else {
@@ -218,6 +218,6 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 	/**
 	 * Re-open the file handler if the logger was serialized
 	 */
-	PHALCON_CALL_FUNCTIONW(&file_handler, "fopen", &path, &mode);
+	PHALCON_CALL_FUNCTION(&file_handler, "fopen", &path, &mode);
 	phalcon_update_property_zval(getThis(), SL("_fileHandler"), &file_handler);
 }

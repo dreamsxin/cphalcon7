@@ -18,7 +18,7 @@ namespace Phalcon\Mvc {
 	 *</code>
 	 */
 	
-	class Url extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\UrlInterface {
+	class Url extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\UrlInterface {
 
 		protected $_baseUri;
 

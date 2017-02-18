@@ -8,7 +8,7 @@ namespace Phalcon {
 	 * Allows to validate data using validators
 	 */
 	
-	class Validation extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\ValidationInterface {
+	class Validation extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\ValidationInterface {
 
 		protected $_data;
 

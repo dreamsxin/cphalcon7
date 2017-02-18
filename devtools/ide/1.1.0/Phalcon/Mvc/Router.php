@@ -29,7 +29,7 @@ namespace Phalcon\Mvc {
 	 *
 	 */
 	
-	class Router extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\RouterInterface {
+	class Router extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\RouterInterface {
 
 		const URI_SOURCE_GET_URL = 0;
 

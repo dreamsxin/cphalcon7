@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
 	 */
 	if (Z_TYPE_P(result) == IS_OBJECT) {
 		ZVAL_LONG(&fetch_assoc, PDO_FETCH_ASSOC);
-		PHALCON_CALL_METHODW(NULL, result, "setfetchmode", &fetch_assoc);
+		PHALCON_CALL_METHOD(NULL, result, "setfetchmode", &fetch_assoc);
 	}
 }
 
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 		 */
 		phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY);
 		if (PHALCON_IS_NOT_FALSE(&result)) {
-			PHALCON_CALL_METHODW(&row, &result, "fetch");
+			PHALCON_CALL_METHOD(&row, &result, "fetch");
 		} else {
 			ZVAL_FALSE(&row);
 		}
@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							/** 
 							 * Assign the values to the attributes using a column map
 							 */
-							PHALCON_CALL_CE_STATICW(&value, ce, "cloneresultmap", &instance, &row_model, &column_map, &dirty_state, &source_model);
+							PHALCON_CALL_CE_STATIC(&value, ce, "cloneresultmap", &instance, &row_model, &column_map, &dirty_state, &source_model);
 							break;
 						}
 
@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							/** 
 							 * Other kinds of hydrations
 							 */
-							PHALCON_CALL_CE_STATICW(&value, ce, "cloneresultmaphydrate", &row_model, &column_map, &hydrate_mode, &source_model);
+							PHALCON_CALL_CE_STATIC(&value, ce, "cloneresultmaphydrate", &row_model, &column_map, &hydrate_mode, &source_model);
 							break;
 					}
 
@@ -381,24 +381,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, toArray){
 
 	array_init(return_value);
-	PHALCON_CALL_METHODW(NULL, getThis(), "rewind");
+	PHALCON_CALL_METHOD(NULL, getThis(), "rewind");
 
 	while (1) {
 		zval valid = {}, current = {}, arr = {};
 
-		PHALCON_CALL_METHODW(&valid, getThis(), "valid");
+		PHALCON_CALL_METHOD(&valid, getThis(), "valid");
 		if (!PHALCON_IS_NOT_FALSE(&valid)) {
 			break;
 		}
 
-		PHALCON_CALL_METHODW(&current, getThis(), "current");
+		PHALCON_CALL_METHOD(&current, getThis(), "current");
 		if (Z_TYPE(current) == IS_OBJECT && phalcon_method_exists_ex(&current, SL("toarray")) == SUCCESS) {
-			PHALCON_CALL_METHODW(&arr, &current, "toarray");
+			PHALCON_CALL_METHOD(&arr, &current, "toarray");
 			phalcon_array_append(return_value, &arr, PH_COPY);
 		} else {
 			phalcon_array_append(return_value, &current, PH_COPY);
 		}
-		PHALCON_CALL_METHODW(NULL, getThis(), "next");
+		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 }
 
@@ -414,7 +414,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 	/** 
 	 * Obtain the records as an array
 	 */
-	PHALCON_CALL_METHODW(&records, getThis(), "toarray");
+	PHALCON_CALL_METHOD(&records, getThis(), "toarray");
 
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 	phalcon_read_property(&column_types, getThis(), SL("_columnTypes"), PH_NOISY);
@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 		RETURN_NULL();
 	}
 
-	RETURN_CTORW(&serialized);
+	RETURN_CTOR(&serialized);
 }
 
 /**
@@ -453,7 +453,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, unserialize){
 
 	phalcon_unserialize(&resultset, data);
 	if (Z_TYPE(resultset) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_exception_ce, "Invalid serialization data");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid serialization data");
 		return;
 	}
 

@@ -23,6 +23,10 @@ class ChartTest extends PHPUnit_Framework_TestCase
 {
 	public function testCaptcha()
 	{
+		if (!class_exists('Phalcon\Chart\Captcha')) {
+			$this->markTestSkipped('Class `Phalcon\Chart\Captcha` is not exists');
+			return false;
+		}
 		@unlink('unit-tests/assets/captcha.png');
 		$captcha = new \Phalcon\Chart\Captcha('Hello', NULL, 24, 80, 34);
 		$ret = $captcha->render('unit-tests/assets/captcha.png', NULL, NULL, NULL, 'red');
@@ -36,6 +40,11 @@ class ChartTest extends PHPUnit_Framework_TestCase
 
 	public function testQRencode()
 	{
+		if (!class_exists('Phalcon\Chart\QRcode')) {
+			$this->markTestSkipped('Class `Phalcon\Chart\QRcode` is not exists');
+			return false;
+		}
+
 		@unlink('unit-tests/assets/qr.png');
 
 		$str = 'Phalcon is web framework';

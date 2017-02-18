@@ -116,21 +116,21 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 
 	if (Z_TYPE(options) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "The options must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "The options must be an array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&service, &options, SL("service"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "No service given in options");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "No service given in options");
 		return;
 	}
 
 	if (Z_TYPE(service) != IS_OBJECT) {
-		PHALCON_CALL_METHODW(&cache, getThis(), "getresolveservice", &service);
+		PHALCON_CALL_METHOD(&cache, getThis(), "getresolveservice", &service);
 	} else {
 		PHALCON_CPY_WRT(&cache, &service);
 	}
-	PHALCON_VERIFY_INTERFACEW(&cache, phalcon_cache_backendinterface_ce);
+	PHALCON_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
 
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
 
 //#ifdef PHALCON_USE_PHP_SESSION
-//	PHALCON_CALL_FUNCTIONW(return_value, "session_set_save_handler", getThis(), &PHALCON_GLOBAL(z_true));
+//	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", getThis(), &PHALCON_GLOBAL(z_true));
 //#else
 	/* open callback */
 	array_init_size(&callable_open, 2);
@@ -173,14 +173,14 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	phalcon_array_append(&callable_gc, getThis(), 0);
 	phalcon_array_append_string(&callable_gc, SL("gc"), 0);
 
-	PHALCON_CALL_FUNCTIONW(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
-	PHALCON_CALL_FUNCTIONW(NULL, "session_register_shutdown");
+	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
+	PHALCON_CALL_FUNCTION(NULL, "session_register_shutdown");
 //#endif
 	if (!zend_is_true(return_value)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "Sets user-level session storage functions failed");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "Sets user-level session storage functions failed");
 		RETURN_FALSE;
 	}
-	PHALCON_CALL_PARENTW(return_value, phalcon_session_adapter_cache_ce, getThis(), "start");
+	PHALCON_CALL_PARENT(return_value, phalcon_session_adapter_cache_ce, getThis(), "start");
 }
 
 /**
@@ -215,7 +215,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, read){
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(return_value, &cache, "get", sid, &lifetime);
+	PHALCON_CALL_METHOD(return_value, &cache, "get", sid, &lifetime);
 	if (Z_TYPE_P(return_value)!=IS_STRING) {
 		RETURN_EMPTY_STRING();
 	}
@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, write){
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(return_value, &cache, "save", sid, data, &lifetime);
+	PHALCON_CALL_METHOD(return_value, &cache, "save", sid, data, &lifetime);
 }
 
 /**
@@ -251,14 +251,14 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, destroy){
 	phalcon_fetch_params(0, 0, 1, &_sid);
 
 	if (!_sid) {
-		PHALCON_CALL_SELFW(&sid, "getid");
+		PHALCON_CALL_SELF(&sid, "getid");
 	} else {
 		PHALCON_CPY_WRT(&sid, _sid);
 	}
 
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 
-	PHALCON_RETURN_CALL_METHODW(&cache, "delete", &sid);
+	PHALCON_RETURN_CALL_METHOD(&cache, "delete", &sid);
 }
 
 /**

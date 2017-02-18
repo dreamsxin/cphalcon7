@@ -8,7 +8,7 @@ namespace Phalcon\Db {
 	 * Base class for Phalcon\Db adapters
 	 */
 	
-	abstract class Adapter extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Db\AdapterInterface {
+	abstract class Adapter extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Db\AdapterInterface {
 
 		protected $_profiler;
 

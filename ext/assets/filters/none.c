@@ -63,6 +63,6 @@ PHP_METHOD(Phalcon_Assets_Filters_None, filter){
 
 	phalcon_fetch_params(0, 1, 0, &content);
 	
-	RETURN_CTORW(content);
+	RETURN_CTOR(content);
 }
 

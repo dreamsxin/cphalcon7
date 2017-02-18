@@ -1,9 +1,9 @@
 <?php 
 
-namespace Phalcon\DI {
+namespace Phalcon\Di {
 
 	/**
-	 * Phalcon\DI\ServiceInterface initializer
+	 * Phalcon\Di\ServiceInterface initializer
 	 */
 	
 	interface ServiceInterface {

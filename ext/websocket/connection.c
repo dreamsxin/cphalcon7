@@ -58,14 +58,14 @@ int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn
 		php_error_docref(NULL, E_WARNING, "Client is disconnected\n");
 		return -1;
 	}
-	if (((conn->write_ptr + 1) % WEBSOCKET_CONNECTION_BUFFER_SIZE) == conn->read_ptr) {
+	if (((conn->write_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE) == conn->read_ptr) {
 		php_error_docref(NULL, E_WARNING, "Write buffer is full\n");
 		return -1;
 	}
 
 	zend_string_addref(text);
 	conn->buf[conn->write_ptr] = text;
-	conn->write_ptr = (conn->write_ptr + 1) % WEBSOCKET_CONNECTION_BUFFER_SIZE;
+	conn->write_ptr = (conn->write_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE;
 
 	lws_callback_on_writable(conn->wsi);
 
@@ -80,10 +80,10 @@ void phalcon_websocket_connection_close(phalcon_websocket_connection_object *con
 }
 
 zend_object_handlers phalcon_websocket_connection_object_handlers;
-zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry *ce)
+zend_object* phalcon_websocket_connection_object_create_handler(zend_class_entry *ce)
 {
-	phalcon_websocket_connection_object *intern = emalloc(sizeof(phalcon_websocket_connection_object));
-	memset(intern, 0, sizeof(phalcon_websocket_connection_object));
+	phalcon_websocket_connection_object *intern = ecalloc(1, sizeof(phalcon_websocket_connection_object) + zend_object_properties_size(ce));
+	intern->std.ce = ce;
 
 	zend_object_std_init(&intern->std, ce);
 	object_properties_init(&intern->std, ce);
@@ -97,7 +97,7 @@ zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry
 	return &intern->std;
 }
 
-void phalcon_websocket_connection_free_object_storage_handler(zend_object *object)
+void phalcon_websocket_connection_object_free_handler(zend_object *object)
 {
 	phalcon_websocket_connection_object *intern;
 	intern = phalcon_websocket_connection_object_from_obj(object);
@@ -107,11 +107,10 @@ void phalcon_websocket_connection_free_object_storage_handler(zend_object *objec
 			zend_string_free(intern->buf[intern->read_ptr]);
 		}
 
-		intern->read_ptr = (intern->read_ptr + 1) % WEBSOCKET_CONNECTION_BUFFER_SIZE;
+		intern->read_ptr = (intern->read_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE;
 	}
 
-	zend_object_std_dtor(&intern->std);
-	efree(intern);
+	zend_object_std_dtor(object);
 }
 
 /**
@@ -119,11 +118,7 @@ void phalcon_websocket_connection_free_object_storage_handler(zend_object *objec
  */
 PHALCON_INIT_CLASS(Phalcon_Websocket_Connection){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Websocket, Connection, websocket_connection, phalcon_websocket_connection_method_entry, 0);
-
-	phalcon_websocket_connection_ce->create_object = phalcon_websocket_connection_create_object_handler;
-	memcpy(&phalcon_websocket_connection_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
-	phalcon_websocket_connection_object_handlers.free_obj = (zend_object_free_obj_t) phalcon_websocket_connection_free_object_storage_handler;
+	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Websocket, Connection, websocket_connection, phalcon_websocket_connection_method_entry, 0);
 
 	return SUCCESS;
 }

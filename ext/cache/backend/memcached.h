@@ -17,13 +17,13 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_CACHE_BACKEND_LIBMEMCACHED_H
-#define PHALCON_CACHE_BACKEND_LIBMEMCACHED_H
+#ifndef PHALCON_CACHE_BACKEND_MEMCACHED_H
+#define PHALCON_CACHE_BACKEND_MEMCACHED_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_cache_backend_libmemcached_ce;
+extern zend_class_entry *phalcon_cache_backend_memcached_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Libmemcached);
+PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Memcached);
 
-#endif /* PHALCON_CACHE_BACKEND_LIBMEMCACHED_H */
+#endif /* PHALCON_CACHE_BACKEND_MEMCACHED_H */

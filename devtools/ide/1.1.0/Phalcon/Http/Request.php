@@ -21,7 +21,7 @@ namespace Phalcon\Http {
 	 *
 	 */
 	
-	class Request extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Http\RequestInterface {
+	class Request extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Http\RequestInterface {
 
 		protected $_filter;
 

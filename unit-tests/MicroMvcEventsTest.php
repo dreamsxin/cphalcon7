@@ -23,7 +23,7 @@ class MicroMvcEventsTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroBeforeHandlers()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$trace = array();
 
@@ -50,7 +50,7 @@ class MicroMvcEventsTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroAfterHandlers()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$trace = array();
 
@@ -75,7 +75,7 @@ class MicroMvcEventsTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroFinishHandlers()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$trace = array();
 
@@ -100,7 +100,7 @@ class MicroMvcEventsTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroEvents()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$trace = array();
 

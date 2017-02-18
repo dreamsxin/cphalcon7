@@ -14,16 +14,27 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_MVC_MODEL_METADATA_MEMCACHE_H
-#define PHALCON_MVC_MODEL_METADATA_MEMCACHE_H
+#ifndef PHALCON_STORAGE_BTREE_H
+#define PHALCON_STORAGE_BTREE_H
 
 #include "php_phalcon.h"
+#include "storage/btree/bplus.h"
 
-extern zend_class_entry *phalcon_mvc_model_metadata_memcache_ce;
+typedef struct {
+	phalcon_storage_btree_db_t db;
+	zend_object std;
+} phalcon_storage_btree_object;
 
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Memcache);
+static inline phalcon_storage_btree_object *phalcon_storage_btree_object_from_obj(zend_object *obj) {
+	return (phalcon_storage_btree_object*)((char*)(obj) - XtOffsetOf(phalcon_storage_btree_object, std));
+}
 
-#endif /* PHALCON_MVC_MODEL_METADATA_MEMCACHE_H */
+extern zend_class_entry *phalcon_storage_btree_ce;
+
+PHALCON_INIT_CLASS(Phalcon_Storage_Btree);
+
+#endif /* PHALCON_STORAGE_BTREE_H */

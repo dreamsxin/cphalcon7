@@ -23,6 +23,10 @@ class IntrusiveAvltreeTest extends PHPUnit_Framework_TestCase
 {
 	public function testNormal()
 	{
+		if (!class_exists('Phalcon\Intrusive\Avltree')) {
+			$this->markTestSkipped('Class `Phalcon\Intrusive\Avltree` is not exists');
+			return false;
+		}
 		$avltree = new Phalcon\Intrusive\Avltree;
 		$node2 = $avltree->insert(2);
 		$node3 = $avltree->insert(3);
@@ -56,5 +60,10 @@ class IntrusiveAvltreeTest extends PHPUnit_Framework_TestCase
 
 		$node = $avltree->next(4);
 		$this->assertEquals($node->getValue(), 5);
+
+		$node = $avltree->replace($node1, $node5);
+		$this->assertEquals($node, $node5);
+
+		$this->assertFalse($avltree->find(1));
 	}
 }

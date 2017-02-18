@@ -23,7 +23,7 @@ class ControllersTest extends PHPUnit_Framework_TestCase
 
 	public function testControllers()
 	{
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('view', function(){
 			$view = new Phalcon\Mvc\View();

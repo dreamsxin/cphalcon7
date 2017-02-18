@@ -32,48 +32,48 @@
 #include "interned-strings.h"
 
 /**
- * Phalcon\DI\FactoryDefault\CLI
+ * Phalcon\Di\FactoryDefault\Cli
  *
- * This is a variant of the standard Phalcon\DI. By default it automatically
+ * This is a variant of the standard Phalcon\Di. By default it automatically
  * registers all the services provided by the framework.
  * Thanks to this, the developer does not need to register each service individually.
  * This class is specially suitable for CLI applications
  */
 zend_class_entry *phalcon_di_factorydefault_cli_ce;
 
-PHP_METHOD(Phalcon_DI_FactoryDefault_CLI, __construct);
+PHP_METHOD(Phalcon_Di_FactoryDefault_Cli, __construct);
 
 static const zend_function_entry phalcon_di_factorydefault_cli_method_entry[] = {
-	PHP_ME(Phalcon_DI_FactoryDefault_CLI, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Di_FactoryDefault_Cli, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\DI\FactoryDefault\CLI initializer
+ * Phalcon\Di\FactoryDefault\Cli initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DI_FactoryDefault_CLI){
+PHALCON_INIT_CLASS(Phalcon_Di_FactoryDefault_Cli){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\DI\\FactoryDefault, CLI, di_factorydefault_cli, phalcon_di_factorydefault_ce, phalcon_di_factorydefault_cli_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Di\\FactoryDefault, Cli, di_factorydefault_cli, phalcon_di_factorydefault_ce, phalcon_di_factorydefault_cli_method_entry, 0);
 
 	return SUCCESS;
 }
 
 /**
- * Phalcon\DI\FactoryDefault\CLI constructor
+ * Phalcon\Di\FactoryDefault\Cli constructor
  */
-PHP_METHOD(Phalcon_DI_FactoryDefault_CLI, __construct){
+PHP_METHOD(Phalcon_Di_FactoryDefault_Cli, __construct){
 
 	zval *shared, name = {}, definition = {};
 
-	PHALCON_CALL_PARENTW(NULL, phalcon_di_factorydefault_cli_ce, getThis(), "__construct");
+	PHALCON_CALL_PARENT(NULL, phalcon_di_factorydefault_cli_ce, getThis(), "__construct");
 
 	shared = &PHALCON_GLOBAL(z_true);
 
 	ZVAL_STRING(&name, ISV(router));
-	ZVAL_STRING(&definition, "Phalcon\\CLI\\Router");
-	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
+	ZVAL_STRING(&definition, "Phalcon\\Cli\\Router");
+	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
 
 	ZVAL_STRING(&name, ISV(dispatcher));
-	ZVAL_STRING(&definition, "Phalcon\\CLI\\Dispatcher");
-	PHALCON_CALL_SELFW(NULL, "set", &name, &definition, shared);
+	ZVAL_STRING(&definition, "Phalcon\\Cli\\Dispatcher");
+	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
 }

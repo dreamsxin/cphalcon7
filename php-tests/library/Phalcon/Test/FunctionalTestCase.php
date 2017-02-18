@@ -30,7 +30,7 @@ abstract class FunctionalTestCase extends ModelTestCase
     /**
      * Sets the test up by loading the DI container and other stuff
      *
-     * @return Phalcon\DI
+     * @return Phalcon\Di
      */
     protected function setUp()
     {

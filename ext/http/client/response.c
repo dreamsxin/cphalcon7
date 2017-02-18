@@ -97,16 +97,16 @@ PHP_METHOD(Phalcon_Http_Client_Response, __construct){
 	phalcon_fetch_params(0, 0, 2, &headers, &body);
 
 	object_init_ex(&header, phalcon_http_client_header_ce);
-	PHALCON_CALL_METHODW(NULL, &header, "__construct");
+	PHALCON_CALL_METHOD(NULL, &header, "__construct");
 
 	phalcon_update_property_zval(getThis(), SL("_header"), &header);
 
 	if (headers) {
-		PHALCON_CALL_SELFW(NULL, "setheader", headers);
+		PHALCON_CALL_SELF(NULL, "setheader", headers);
 	}
 
 	if (body) {
-		PHALCON_CALL_SELFW(NULL, "setbody", body);
+		PHALCON_CALL_SELF(NULL, "setbody", body);
 	}
 }
 
@@ -117,9 +117,9 @@ PHP_METHOD(Phalcon_Http_Client_Response, setHeader){
 	phalcon_fetch_params(0, 1, 0, &headers);
 
 	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, &header, "parse", headers);
+	PHALCON_CALL_METHOD(NULL, &header, "parse", headers);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, getHeader){
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, setBody){
 
 	phalcon_update_property_zval(getThis(), SL("_body"), body);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, getBody){
@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, getJsonBody){
 		ac = 1;
 	}
 
-	PHALCON_CALL_METHODW(&body, getThis(), "getbody");
+	PHALCON_CALL_METHOD(&body, getThis(), "getbody");
 	if (Z_TYPE(body) == IS_STRING) {
 		RETURN_ON_FAILURE(phalcon_json_decode(return_value, &body, ac));
 	} else {
@@ -170,9 +170,9 @@ PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode){
 
 	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
 	
-	PHALCON_CALL_METHODW(NULL, &header, "setstatuscode", status_code);
+	PHALCON_CALL_METHOD(NULL, &header, "setstatuscode", status_code);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, getStatusCode){
@@ -181,5 +181,5 @@ PHP_METHOD(Phalcon_Http_Client_Response, getStatusCode){
 	
 	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
 
-	PHALCON_RETURN_CALL_METHODW(&header, "getstatuscode");
+	PHALCON_RETURN_CALL_METHOD(&header, "getstatuscode");
 }

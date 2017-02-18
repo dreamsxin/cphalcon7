@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior, getOptions){
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
 	if (eventname && Z_TYPE_P(eventname) != IS_NULL) {
 		if (phalcon_array_isset_fetch(&event_options, &options, eventname, 0)) {
-			RETURN_CTORW(&event_options);
+			RETURN_CTOR(&event_options);
 		}
 		RETURN_NULL();
 	}

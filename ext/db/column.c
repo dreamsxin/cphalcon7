@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 	if (phalcon_array_isset_fetch_str(&type, definition, SL("type"))) {
 		phalcon_update_property_zval(getThis(), SL("_type"), &type);
 	} else {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column type is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Column type is required");
 		return;
 	}
 
@@ -255,7 +255,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 		if (PHALCON_IS_LONG(&type, 0)) {
 			phalcon_update_property_zval(getThis(), SL("_autoIncrement"), &auto_increment);
 		} else {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column type cannot be auto-increment");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Column type cannot be auto-increment");
 			return;
 		}
 	}
@@ -489,12 +489,12 @@ PHP_METHOD(Phalcon_Db_Column, __set_state){
 	phalcon_fetch_params(0, 1, 0, &data);
 
 	if (Z_TYPE_P(data) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column state must be an array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Column state must be an array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&column_name, data, SL("_columnName"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column name is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Column name is required");
 		return;
 	}
 
@@ -550,5 +550,5 @@ PHP_METHOD(Phalcon_Db_Column, __set_state){
 	}
 
 	object_init_ex(return_value, phalcon_db_column_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &column_name, &definition);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &column_name, &definition);
 }

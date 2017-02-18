@@ -124,17 +124,17 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 	phalcon_fetch_params(0, 1, 0, &column);
 
 	if (Z_TYPE_P(column) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "Column definition must be an object compatible with Phalcon\\Db\\ColumnInterface");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Column definition must be an object compatible with Phalcon\\Db\\ColumnInterface");
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&size, column, "getsize");
-	PHALCON_CALL_METHODW(&column_type, column, "gettype");
-	PHALCON_CALL_METHODW(&isautoincrement, column, "isautoincrement");
+	PHALCON_CALL_METHOD(&size, column, "getsize");
+	PHALCON_CALL_METHOD(&column_type, column, "gettype");
+	PHALCON_CALL_METHOD(&isautoincrement, column, "isautoincrement");
 
 	if (Z_TYPE(column_type) == IS_STRING) {
 		PHALCON_CPY_WRT(&column_sql, &column_type);
-		PHALCON_CALL_METHODW(&type_values, column, "gettypevalues");
+		PHALCON_CALL_METHOD(&type_values, column, "gettypevalues");
 		if (PHALCON_IS_NOT_EMPTY(&type_values)) {
 			ZVAL_STRING(&slash, "\"");
 			if (Z_TYPE(type_values) == IS_ARRAY) {
@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 				phalcon_concat_self_str(&column_sql, SL("("));
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(type_values), value) {
 					i++;
-					PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", value, &slash);
+					PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", value, &slash);
 					if (i < c) {
 						PHALCON_SCONCAT_SVS(&column_sql, "\"", &value_cslashes, "\", ");
 					} else {
@@ -151,13 +151,13 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 				} ZEND_HASH_FOREACH_END();
 				phalcon_concat_self_str(&column_sql, SL(")"));
 			} else {
-				PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", &type_values, &slash);
+				PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", &type_values, &slash);
 				PHALCON_SCONCAT_SVS(&column_sql, "(\"", &value_cslashes, "\")");
 			}
-			RETURN_CTORW(&column_sql);
+			RETURN_CTOR(&column_sql);
 		}
 
-		PHALCON_CALL_METHODW(&column_type, column, "gettypereference");
+		PHALCON_CALL_METHOD(&column_type, column, "gettypereference");
 		switch (phalcon_get_intval(&column_type)) {
 
 			case PHALCON_DB_COLUMN_TYPE_INTEGER:
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 				break;
 
 			case PHALCON_DB_COLUMN_TYPE_DECIMAL:
-				PHALCON_CALL_METHODW(&scale, column, "getscale");
+				PHALCON_CALL_METHOD(&scale, column, "getscale");
 				PHALCON_SCONCAT_SVSVS(&column_sql, "(", &size, ",", &scale, ")");
 				break;
 
@@ -199,10 +199,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 				break;
 
 			default:
-				PHALCON_CALL_METHODW(&name, column, "getname");
-				PHALCON_THROW_EXCEPTION_FORMATW(phalcon_db_exception_ce, "Unrecognized PostgreSQL data type at column %s", Z_STRVAL(name));
+				PHALCON_CALL_METHOD(&name, column, "getname");
+				PHALCON_THROW_EXCEPTION_FORMAT(phalcon_db_exception_ce, "Unrecognized PostgreSQL data type at column %s", Z_STRVAL(name));
 		}
-		RETURN_CTORW(&column_sql);
+		RETURN_CTOR(&column_sql);
 	}
 
 	switch (phalcon_get_intval(&column_type)) {
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 			break;
 
 		case PHALCON_DB_COLUMN_TYPE_DECIMAL:
-			PHALCON_CALL_METHODW(&scale, column, "getscale");
+			PHALCON_CALL_METHOD(&scale, column, "getscale");
 			PHALCON_CONCAT_SVSVS(&column_sql, "NUMERIC(", &size, ",", &scale, ")");
 			break;
 
@@ -266,12 +266,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 			break;
 
 		default:
-			PHALCON_CALL_METHODW(&name, column, "getname");
-			PHALCON_THROW_EXCEPTION_FORMATW(phalcon_db_exception_ce, "Unrecognized PostgreSQL data type at column %s", Z_STRVAL(name));
+			PHALCON_CALL_METHOD(&name, column, "getname");
+			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_db_exception_ce, "Unrecognized PostgreSQL data type at column %s", Z_STRVAL(name));
 			return;
 	}
 
-	RETURN_CTORW(&column_sql);
+	RETURN_CTOR(&column_sql);
 }
 
 /**
@@ -287,29 +287,29 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, addColumn){
 	zval *table_name, *schema_name, *column, table = {}, sql = {}, name = {}, column_definition = {}, column_type = {}, default_value = {}, is_not_null = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
-	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 	PHALCON_CONCAT_SVS(&sql, "ALTER TABLE ", &table, " ADD COLUMN ");
 
-	PHALCON_CALL_METHODW(&name, column, "getname");
-	PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
+	PHALCON_CALL_METHOD(&name, column, "getname");
+	PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
 
 	PHALCON_SCONCAT_SVSV(&sql, "\"", &name, "\" ", &column_definition);
 
-	PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
+	PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 	if (Z_TYPE(default_value) != IS_NULL) {
-		PHALCON_CALL_METHODW(&column_type, column, "gettype");
-		PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+		PHALCON_CALL_METHOD(&column_type, column, "gettype");
+		PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
 		PHALCON_SCONCAT_SV(&sql, " DEFAULT ", &default_value);
 	}
 
-	PHALCON_CALL_METHODW(&is_not_null, column, "isnotnull");
+	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
 	if (zend_is_true(&is_not_null)) {
 		phalcon_concat_self_str(&sql, SL(" NOT NULL"));
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -328,50 +328,50 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 	zval current_default_value = {};
 
 	phalcon_fetch_params(0, 3, 1, &table_name, &schema_name, &column, &current_column);
-	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 	PHALCON_CONCAT_SV(&alter_table, "ALTER TABLE ", &table);
 
-	PHALCON_CALL_METHODW(&name, column, "getname");
-	PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
-	PHALCON_CALL_METHODW(&column_type, column, "gettype");
+	PHALCON_CALL_METHOD(&name, column, "getname");
+	PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
+	PHALCON_CALL_METHOD(&column_type, column, "gettype");
 
 	if (!current_column) {
 		PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" TYPE ", &column_definition, ";");
 
-		PHALCON_CALL_METHODW(&is_not_null, column, "isnotnull");
+		PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
 		if (zend_is_true(&is_not_null)) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET NOT NULL;");
 		} else {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP NOT NULL;");
 		}
 
-		PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
+		PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE(default_value) == IS_NULL) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP DEFAULT;");
 		} else {
-			PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
 			PHALCON_SCONCAT_VSVSV(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT ", &default_value);
 		}
-		RETURN_CTORW(&sql);
+		RETURN_CTOR(&sql);
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(current_column, phalcon_db_columninterface_ce, phalcon_db_exception_ce, 0);
-	PHALCON_CALL_METHODW(&current_name, current_column, "getname");
+	PHALCON_VERIFY_INTERFACE_EX(current_column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
+	PHALCON_CALL_METHOD(&current_name, current_column, "getname");
 
 	if (!PHALCON_IS_EQUAL(&name, &current_name)) {
 		PHALCON_CONCAT_VSVSVS(&sql, &alter_table, " RENAME COLUMN \"", &current_name, "\" TO \"", &name, "\";");
 	}
 
-	PHALCON_CALL_METHODW(&current_type, current_column, "gettype");
+	PHALCON_CALL_METHOD(&current_type, current_column, "gettype");
 
 	if (!PHALCON_IS_EQUAL(&column_type, &current_type)) {
 		PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" TYPE ", &column_definition, ";");
 	}
 
-	PHALCON_CALL_METHODW(&is_not_null, column, "isnotnull");
-	PHALCON_CALL_METHODW(&current_is_not_null, current_column, "isnotnull");
+	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
+	PHALCON_CALL_METHOD(&current_is_not_null, current_column, "isnotnull");
 	if (!PHALCON_IS_EQUAL(&is_not_null, &current_is_not_null)) {
 		if (zend_is_true(&is_not_null)) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET NOT NULL;");
@@ -380,18 +380,18 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 		}
 	}
 
-	PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
-	PHALCON_CALL_METHODW(&current_default_value, current_column, "getdefaultvalue");
+	PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
+	PHALCON_CALL_METHOD(&current_default_value, current_column, "getdefaultvalue");
 	if (!PHALCON_IS_EQUAL(&default_value, &current_default_value)) {
 		if (Z_TYPE(default_value) == IS_NULL) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP DEFAULT;");
 		} else {
-			PHALCON_CALL_METHODW(&column_type, column, "gettype");
-			PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_CALL_METHOD(&column_type, column, "gettype");
+			PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
 			PHALCON_SCONCAT_VSVSV(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT ", &default_value);
 		}
 	}
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -408,7 +408,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropColumn){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column_name);
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 	PHALCON_CONCAT_SVSVS(return_value, "ALTER TABLE ", &table, " DROP COLUMN \"", column_name, "\"");
 }
 
@@ -426,22 +426,22 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, addIndex){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
 
-	PHALCON_CALL_METHODW(&name, index, "getname");
+	PHALCON_CALL_METHOD(&name, index, "getname");
 	if (phalcon_comparestr_str(&name, SL("PRIMARY"), &PHALCON_GLOBAL(z_false))) {
-		PHALCON_RETURN_CALL_METHODW(getThis(), "addprimarykey", table_name, schema_name, index);
+		PHALCON_RETURN_CALL_METHOD(getThis(), "addprimarykey", table_name, schema_name, index);
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
-	PHALCON_CALL_METHODW(&type, index, "gettype");
-	PHALCON_CALL_METHODW(&columns, index, "getcolumns");
-	PHALCON_CALL_METHODW(&columnlist, getThis(), "getcolumnlist", &columns);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&type, index, "gettype");
+	PHALCON_CALL_METHOD(&columns, index, "getcolumns");
+	PHALCON_CALL_METHOD(&columnlist, getThis(), "getcolumnlist", &columns);
 
 	if (PHALCON_IS_NOT_EMPTY(&type)) {
 		PHALCON_CONCAT_SVSVSVSVS(return_value, "CREATE ", &type, " INDEX \"", &name, "\" ON ", &table, " (", &columnlist, ")");
 	} else {
 		PHALCON_CONCAT_SVSVSVS(return_value, "CREATE INDEX \"", &name, "\" ON ", &table, " (", &columnlist, ")");
-	}	
+	}
 }
 
 /**
@@ -474,11 +474,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, addPrimaryKey){
 	zval *table_name, *schema_name, *index, table = {}, columns = {}, columnlist = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
-	PHALCON_VERIFY_INTERFACE_EX(index, phalcon_db_indexinterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(index, phalcon_db_indexinterface_ce, phalcon_db_exception_ce);
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
-	PHALCON_CALL_METHODW(&columns, index, "getcolumns");
-	PHALCON_CALL_METHODW(&columnlist, getThis(), "getcolumnlist", &columns);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&columns, index, "getcolumns");
+	PHALCON_CALL_METHOD(&columnlist, getThis(), "getcolumnlist", &columns);
 	PHALCON_CONCAT_SVSVS(return_value, "ALTER TABLE ", &table, " ADD CONSTRAINT \"PRIMARY\" PRIMARY KEY (", &columnlist, ")");
 }
 
@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropPrimaryKey){
 
 	phalcon_fetch_params(0, 2, 0, &table_name, &schema_name);
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
 	PHALCON_CONCAT_SVS(return_value, "ALTER TABLE ", &table, " DROP CONSTRAINT \"PRIMARY\"");
 }
@@ -514,18 +514,18 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, addForeignKey){
 	zval referenced_columnlist = {}, on_delete = {}, on_udpate = {};
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &reference);
-	PHALCON_VERIFY_INTERFACE_EX(reference, phalcon_db_referenceinterface_ce, phalcon_db_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(reference, phalcon_db_referenceinterface_ce, phalcon_db_exception_ce);
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
-	PHALCON_CALL_METHODW(&name, reference, "getname");
-	PHALCON_CALL_METHODW(&columns, reference, "getcolumns");
-	PHALCON_CALL_METHODW(&columnlist, getThis(), "getcolumnlist", &columns);
-	PHALCON_CALL_METHODW(&referenced_table, reference, "getreferencedtable", &columns);
-	PHALCON_CALL_METHODW(&referenced_columns, reference, "getreferencedcolumns");
-	PHALCON_CALL_METHODW(&referenced_columnlist, getThis(), "getcolumnlist", &referenced_columns);
-	PHALCON_CALL_METHODW(&on_delete, reference, "getondelete");
-	PHALCON_CALL_METHODW(&on_udpate, reference, "getonupdate");
+	PHALCON_CALL_METHOD(&name, reference, "getname");
+	PHALCON_CALL_METHOD(&columns, reference, "getcolumns");
+	PHALCON_CALL_METHOD(&columnlist, getThis(), "getcolumnlist", &columns);
+	PHALCON_CALL_METHOD(&referenced_table, reference, "getreferencedtable", &columns);
+	PHALCON_CALL_METHOD(&referenced_columns, reference, "getreferencedcolumns");
+	PHALCON_CALL_METHOD(&referenced_columnlist, getThis(), "getcolumnlist", &referenced_columns);
+	PHALCON_CALL_METHOD(&on_delete, reference, "getondelete");
+	PHALCON_CALL_METHOD(&on_udpate, reference, "getonupdate");
 
 	PHALCON_CONCAT_SVSVSVS(return_value, "ALTER TABLE ", &table, " ADD CONSTRAINT \"", &name, "\" FOREIGN KEY (", &columnlist, ")");
 	PHALCON_SCONCAT_SVSVS(return_value, " REFERENCES \"", &referenced_table, "\" (", &referenced_columnlist, ")");
@@ -553,7 +553,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropForeignKey){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &reference_name);
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
 	PHALCON_CONCAT_SVSVS(return_value, "ALTER TABLE ", &table, " DROP CONSTRAINT \"", reference_name, "\"");
 }
@@ -590,11 +590,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &definition);
 
 	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
 	if (phalcon_array_isset_fetch_str(&options, definition, SL("options"))) {
 		if (!phalcon_array_isset_fetch_str(&temporary, &options, SL("temporary"))) {
@@ -604,7 +604,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 		ZVAL_FALSE(&temporary);
 	}
 
-	/** 
+	/**
 	 * Create a temporary o normal table
 	 */
 	if (zend_is_true(&temporary)) {
@@ -621,30 +621,30 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&columns), column) {
 		zval column_name = {}, column_definition = {}, column_line = {}, default_value = {}, column_type = {}, attribute = {};
 
-		PHALCON_CALL_METHODW(&column_name, column, "getname");
-		PHALCON_CALL_METHODW(&column_definition, getThis(), "getcolumndefinition", column);
+		PHALCON_CALL_METHOD(&column_name, column, "getname");
+		PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
 
 		PHALCON_CONCAT_SVSV(&column_line, "\"", &column_name, "\" ", &column_definition);
 
-		PHALCON_CALL_METHODW(&default_value, column, "getdefaultvalue");
+		PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE(default_value) != IS_NULL) {
-			PHALCON_CALL_METHODW(&column_type, column, "gettype");
-			PHALCON_CALL_METHODW(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_CALL_METHOD(&column_type, column, "gettype");
+			PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
 			PHALCON_SCONCAT_SV(&column_line, " DEFAULT ", &default_value);
 		}
 
-		/** 
+		/**
 		 * Add a NOT NULL clause
 		 */
-		PHALCON_CALL_METHODW(&attribute, column, "isnotnull");
+		PHALCON_CALL_METHOD(&attribute, column, "isnotnull");
 		if (zend_is_true(&attribute)) {
 			phalcon_concat_self_str(&column_line, SL(" NOT NULL"));
 		}
 
-		/** 
+		/**
 		 * Mark the column as primary key
 		 */
-		PHALCON_CALL_METHODW(&attribute, column, "isprimary");
+		PHALCON_CALL_METHOD(&attribute, column, "isprimary");
 		if (zend_is_true(&attribute)) {
 			phalcon_array_append(&primary_columns, &column_name, PH_COPY);
 		}
@@ -653,12 +653,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 	} ZEND_HASH_FOREACH_END();
 
 	if (phalcon_fast_count_ev(&primary_columns)) {
-		PHALCON_CALL_METHODW(&primary_column_list, getThis(), "getcolumnlist", &primary_columns);
+		PHALCON_CALL_METHOD(&primary_column_list, getThis(), "getcolumnlist", &primary_columns);
 		PHALCON_CONCAT_SVS(&primary_sql, "PRIMARY KEY (", &primary_column_list, ")");
 		phalcon_array_append(&create_lines, &primary_sql, PH_COPY);
 	}
 
-	/** 
+	/**
 	 * Create related indexes
 	 */
 	ZVAL_NULL(&indexsql_aftercreate);
@@ -666,12 +666,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&indexes), index) {
 			zval index_name = {}, columns = {}, column_list = {}, index_type = {}, index_sql = {};
 
-			PHALCON_CALL_METHODW(&index_name, index, "getname");
-			PHALCON_CALL_METHODW(&columns, index, "getcolumns");
-			PHALCON_CALL_METHODW(&column_list, getThis(), "getcolumnlist", &columns);
-			PHALCON_CALL_METHODW(&index_type, index, "gettype");
+			PHALCON_CALL_METHOD(&index_name, index, "getname");
+			PHALCON_CALL_METHOD(&columns, index, "getcolumns");
+			PHALCON_CALL_METHOD(&column_list, getThis(), "getcolumnlist", &columns);
+			PHALCON_CALL_METHOD(&index_type, index, "gettype");
 
-			/** 
+			/**
 			 * If the index name is primary we add a primary key
 			 */
 			if (PHALCON_IS_STRING(&index_name, "PRIMARY")) {
@@ -685,29 +685,29 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	/** 
+	/**
 	 * Create related references
 	 */
 	if (phalcon_array_isset_fetch_str(&references, definition, SL("references"))) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&references), reference) {
 			zval name = {}, columns = {}, column_list = {}, referenced_table = {}, referenced_columns = {}, referenced_column_list = {}, constaint_sql = {}, reference_sql = {}, on_delete = {}, on_update = {};
 
-			PHALCON_CALL_METHODW(&name, reference, "getname");
-			PHALCON_CALL_METHODW(&columns, reference, "getcolumns");
-			PHALCON_CALL_METHODW(&column_list, getThis(), "getcolumnlist", &columns);
-			PHALCON_CALL_METHODW(&referenced_table, reference, "getreferencedtable");
-			PHALCON_CALL_METHODW(&referenced_columns, reference, "getreferencedcolumns");
-			PHALCON_CALL_METHODW(&referenced_column_list, getThis(), "getcolumnlist", &referenced_columns);
+			PHALCON_CALL_METHOD(&name, reference, "getname");
+			PHALCON_CALL_METHOD(&columns, reference, "getcolumns");
+			PHALCON_CALL_METHOD(&column_list, getThis(), "getcolumnlist", &columns);
+			PHALCON_CALL_METHOD(&referenced_table, reference, "getreferencedtable");
+			PHALCON_CALL_METHOD(&referenced_columns, reference, "getreferencedcolumns");
+			PHALCON_CALL_METHOD(&referenced_column_list, getThis(), "getcolumnlist", &referenced_columns);
 
 			PHALCON_CONCAT_SVSVS(&constaint_sql, "CONSTRAINT \"", &name, "\" FOREIGN KEY (", &column_list, ")");
 			PHALCON_CONCAT_VSVSVS(&reference_sql, &constaint_sql, " REFERENCES \"", &referenced_table, "\" (", &referenced_column_list, ")");
 
-			PHALCON_CALL_METHODW(&on_delete, reference, "getondelete");
+			PHALCON_CALL_METHOD(&on_delete, reference, "getondelete");
 			if (PHALCON_IS_NOT_EMPTY(&on_delete)) {
 				PHALCON_SCONCAT_SV(&reference_sql, " ON DELETE ", &on_delete);
 			}
 
-			PHALCON_CALL_METHODW(&on_update, reference, "getonupdate");
+			PHALCON_CALL_METHOD(&on_update, reference, "getonupdate");
 			if (PHALCON_IS_NOT_EMPTY(&on_update)) {
 				PHALCON_SCONCAT_SV(&reference_sql, " ON UPDATE ", &on_update);
 			}
@@ -721,12 +721,12 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 	PHALCON_SCONCAT_VS(&sql, &joined_lines, "\n)");
 
 	if (phalcon_array_isset_str(definition, SL("options"))) {
-		PHALCON_CALL_METHODW(&options, getThis(), "_gettableoptions", definition);
+		PHALCON_CALL_METHOD(&options, getThis(), "_gettableoptions", definition);
 		PHALCON_SCONCAT_SV(&sql, " ", &options);
 	}
 	PHALCON_SCONCAT_SV(&sql, ";", &indexsql_aftercreate);
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -747,7 +747,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropTable){
 		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 
-	PHALCON_CALL_METHODW(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
 	if (zend_is_true(if_exists)) {
 		PHALCON_CONCAT_SV(&sql, "DROP TABLE IF EXISTS ", &table);
@@ -755,7 +755,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropTable){
 		PHALCON_CONCAT_SV(&sql, "DROP TABLE ", &table);
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -773,15 +773,15 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createView){
 	phalcon_fetch_params(0, 3, 0, &view_name, &definition, &schema_name);
 
 	if (!phalcon_array_isset_fetch_str(&view_sql, definition, SL("sql"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&view, getThis(), "preparetable", view_name, schema_name);
+	PHALCON_CALL_METHOD(&view, getThis(), "preparetable", view_name, schema_name);
 
 	PHALCON_CONCAT_SVSV(&sql, "CREATE VIEW ", &view, " AS ", &view_sql);
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -802,7 +802,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 
-	PHALCON_CALL_METHODW(&view, getThis(), "preparetable", view_name, schema_name);
+	PHALCON_CALL_METHOD(&view, getThis(), "preparetable", view_name, schema_name);
 
 	if (zend_is_true(if_exists)) {
 		PHALCON_CONCAT_SV(&sql, "DROP VIEW IF EXISTS ", &view);
@@ -810,7 +810,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 		PHALCON_CONCAT_SV(&sql, "DROP VIEW ", &view);
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -839,7 +839,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, tableExists){
 		PHALCON_CONCAT_SVS(&sql, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM information_schema.tables WHERE table_schema = 'public' AND table_name='", table_name, "'");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -865,7 +865,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, viewExists){
 		PHALCON_CONCAT_SVS(&sql, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM pg_views WHERE viewname='", view_name, "'");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -893,7 +893,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeColumns){
 		PHALCON_CONCAT_SVS(&sql, "SELECT DISTINCT c.column_name AS Field, c.data_type AS Type, c.character_maximum_length AS Size, c.numeric_precision AS NumericSize, c.numeric_scale AS NumericScale, c.is_nullable AS Null, CASE WHEN pkc.column_name NOTNULL THEN 'PRI' ELSE '' END AS Key, CASE WHEN c.data_type LIKE '%int%' AND c.column_default LIKE '%nextval%' THEN 'auto_increment' ELSE c.column_default END AS Extra, c.ordinal_position AS Position, e.data_type AS element_type FROM information_schema.columns c LEFT JOIN ( SELECT kcu.column_name, kcu.table_name, kcu.table_schema FROM information_schema.table_constraints tc INNER JOIN information_schema.key_column_usage kcu on (kcu.constraint_name = tc.constraint_name and kcu.table_name=tc.table_name and kcu.table_schema=tc.table_schema) WHERE tc.constraint_type='PRIMARY KEY') pkc ON (c.column_name=pkc.column_name AND c.table_schema = pkc.table_schema AND c.table_name=pkc.table_name) LEFT JOIN information_schema.element_types e ON ((c.table_catalog, c.table_schema, c.table_name, 'TABLE', c.dtd_identifier) = (e.object_catalog, e.object_schema, e.object_name, e.object_type, e.collection_type_identifier)) WHERE c.table_schema='public' AND c.table_name='", table, "' ORDER BY c.ordinal_position");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -922,7 +922,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listTables){
 		ZVAL_STRING(&sql, "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -947,7 +947,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, listViews){
 		ZVAL_STRING(&sql, "SELECT viewname AS view_name FROM pg_views WHERE schemaname = 'public' ORDER BY view_name");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -968,7 +968,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeIndexes){
 	}
 
 	PHALCON_CONCAT_SVS(&sql, "SELECT 0 as c0, t.relname as table_name, i.relname as key_name, 3 as c3, a.attname as column_name FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r' AND t.relname = '", table, "' ORDER BY t.relname, i.relname;");
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -995,7 +995,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, describeReferences){
 		PHALCON_SCONCAT_SVS(&sql, "tc.table_name='", table, "'");
 	}
 
-	RETURN_CTORW(&sql);
+	RETURN_CTOR(&sql);
 }
 
 /**
@@ -1053,10 +1053,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getDefaultValue){
 			|| type == PHALCON_DB_COLUMN_TYPE_DECIMAL
 			|| type == PHALCON_DB_COLUMN_TYPE_MONEY
 		) {
-			RETURN_CTORW(default_value);
+			RETURN_CTOR(default_value);
 		}
 	}
 	ZVAL_STRING(&slash, "\"");
-	PHALCON_CALL_FUNCTIONW(&value_cslashes, "addcslashes", default_value, &slash);
+	PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", default_value, &slash);
 	PHALCON_CONCAT_SVS(return_value, "\"", &value_cslashes, "\"");
 }

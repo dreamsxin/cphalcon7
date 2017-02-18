@@ -104,7 +104,7 @@ class RouterMvcAnnotationsTest extends PHPUnit_Framework_TestCase
 {
 	public function _getDI()
 	{
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 		$di['request'] = new Phalcon\Http\Request();
 		$di['annotations'] = new Phalcon\Annotations\Adapter\Memory();
 		return $di;

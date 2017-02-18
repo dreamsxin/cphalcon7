@@ -15,7 +15,7 @@ namespace Phalcon\Mvc\Model\Query\Builder {
 	 *</code>
 	 */
 	
-	class Insert extends \Phalcon\Mvc\Model\Query\Builder implements \Phalcon\Mvc\Model\Query\BuilderInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Insert extends \Phalcon\Mvc\Model\Query\Builder implements \Phalcon\Mvc\Model\Query\BuilderInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		protected $_type;
 
@@ -29,7 +29,7 @@ namespace Phalcon\Mvc\Model\Query\Builder {
 		 * \Phalcon\Mvc\Model\Query\Builder\Insert constructor
 		 *
 		 * @param array $params
-		 * @param \Phalcon\DI $dependencyInjector
+		 * @param \Phalcon\Di $dependencyInjector
 		 */
 		public function __construct($params=null){ }
 

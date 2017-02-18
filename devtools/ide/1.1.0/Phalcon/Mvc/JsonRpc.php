@@ -16,7 +16,7 @@ namespace Phalcon\Mvc {
 	 *</code>
 	 */
 	
-	class JsonRpc extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface {
+	class JsonRpc extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface {
 
 		protected $_defaultModule;
 
@@ -27,7 +27,7 @@ namespace Phalcon\Mvc {
 		/**
 		 * \Phalcon\Mvc\JsonRpc
 		 *
-		 * @param \Phalcon\DI $dependencyInjector
+		 * @param \Phalcon\Di $dependencyInjector
 		 */
 		public function __construct($dependencyInjector=null){ }
 

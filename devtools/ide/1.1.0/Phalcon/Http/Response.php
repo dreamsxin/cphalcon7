@@ -17,7 +17,7 @@ namespace Phalcon\Http {
 	 *</code>
 	 */
 	
-	class Response extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Http\ResponseInterface {
+	class Response extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Http\ResponseInterface {
 
 		protected $_sent;
 

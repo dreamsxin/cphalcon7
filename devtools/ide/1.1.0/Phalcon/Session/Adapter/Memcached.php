@@ -3,16 +3,20 @@
 namespace Phalcon\Session\Adapter {
 
 	/**
-	 * Phalcon\Session\Adapter\Memcache
+	 * Phalcon\Session\Adapter\Memcached
 	 *
-	 * This adapter store sessions in memcache
+	 * This adapter store sessions in memcached
 	 *
 	 *<code>
-	 * $session = new Phalcon\Session\Adapter\Memcache(array(
-	 *    'host' => '127.0.0.1',
-	 *    'port' => 11211,
+	 * $session = new Phalcon\Session\Adapter\Memcached(array(
+	 *     'servers' => array(
+	 *         array('host' => 'localhost', 'port' => 11211, 'weight' => 1),
+	 *     ),
+	 *     'client' => array(
+	 *         Memcached::OPT_HASH => Memcached::HASH_MD5,
+	 *         Memcached::OPT_PREFIX_KEY => 'prefix.',
+	 *     ),
 	 *    'lifetime' => 3600,
-	 *    'persistent' => TRUE,
 	 *    'prefix' => 'my_'
 	 * ));
 	 *
@@ -24,14 +28,14 @@ namespace Phalcon\Session\Adapter {
 	 *</code>
 	 */
 	
-	class Memcache extends \Phalcon\Session\Adapter implements \ArrayAccess, \Traversable, \IteratorAggregate, \Countable, \Phalcon\Session\AdapterInterface {
+	class Memcached extends \Phalcon\Session\Adapter implements \ArrayAccess, \Traversable, \IteratorAggregate, \Countable, \Phalcon\Session\AdapterInterface {
 
 		protected $_lifetime;
 
-		protected $_memcache;
+		protected $_memcached;
 
 		/**
-		 * Constructor for \Phalcon\Session\Adapter\Memcache
+		 * Constructor for \Phalcon\Session\Adapter\Memcached
 		 *
 		 * @param array $options
 		 */
@@ -64,7 +68,6 @@ namespace Phalcon\Session\Adapter {
 		 *
 		 * @param string $sessionId
 		 * @param string $data
-		 * @return boolean
 		 */
 		public function write($sessionId, $data){ }
 

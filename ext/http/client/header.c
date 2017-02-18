@@ -293,7 +293,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 
 		if (Z_TYPE(header_parts) == IS_ARRAY && phalcon_array_isset_fetch_long(&val1, &header_parts, 0) && phalcon_array_isset_fetch_long(&val2, &header_parts, 1)) {
 				ZVAL_STR(&trimmed, phalcon_trim(&val2, NULL, PHALCON_TRIM_BOTH));
-				PHALCON_CALL_METHODW(NULL, getThis(), "set", &val1, &trimmed);
+				PHALCON_CALL_METHOD(NULL, getThis(), "set", &val1, &trimmed);
 		}
 	} ZEND_HASH_FOREACH_END();
 }
@@ -344,10 +344,10 @@ PHP_METHOD(Phalcon_Http_Client_Header, build)
 	if (f & PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS) {
 		phalcon_fast_join_str(&join_filed, SL("\r\n"), &lines);
 
-		RETURN_CTORW(&join_filed);
+		RETURN_CTOR(&join_filed);
 	}
 
-	RETURN_CTORW(&lines);
+	RETURN_CTOR(&lines);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Header, count){

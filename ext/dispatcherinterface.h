@@ -50,6 +50,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setparams, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, params, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_hasparam, 0, 0, 1)
+	ZEND_ARG_INFO(0, param)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setparam, 0, 0, 2)
 	ZEND_ARG_INFO(0, param)
 	ZEND_ARG_INFO(0, value)

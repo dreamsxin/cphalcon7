@@ -24,7 +24,7 @@
 
 extern zend_class_entry *phalcon_di_serviceinterface_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DI_ServiceInterface);
+PHALCON_INIT_CLASS(Phalcon_Di_ServiceInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_serviceinterface_setshared, 0, 0, 1)
 	ZEND_ARG_INFO(0, shared)

@@ -55,9 +55,9 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
 	protected function _getDI(){
 
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('modelsManager', function(){
 			return new Phalcon\Mvc\Model\Manager();
@@ -874,7 +874,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
 		$validation = new Phalcon\Validation();
 
-		$validation->setDI(new Phalcon\DI\FactoryDefault());
+		$validation->setDI(new Phalcon\Di\FactoryDefault());
 
 		$validation
 			->add('name', new PresenceOf(array(

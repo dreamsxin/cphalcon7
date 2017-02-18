@@ -26,7 +26,8 @@
 #ifdef PHALCON_USE_WEBSOCKET
 #include <libwebsockets.h>
 
-#define WEBSOCKET_CONNECTION_BUFFER_SIZE 30
+#define PHALCON_WEBSOCKET_FREQUENCY 0.2
+#define PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE 30
 
 typedef struct _phalcon_websocket_connection_object {
 	// ID (unique on server)
@@ -36,7 +37,7 @@ typedef struct _phalcon_websocket_connection_object {
 	zend_bool connected;
 
 	// Write buffer
-	zend_string *buf[WEBSOCKET_CONNECTION_BUFFER_SIZE];
+	zend_string *buf[PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE];
 	unsigned int read_ptr;
 	unsigned int write_ptr;
 
@@ -51,9 +52,6 @@ static inline phalcon_websocket_connection_object *phalcon_websocket_connection_
 
 int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zend_string *text);
 void phalcon_websocket_connection_close(phalcon_websocket_connection_object *conn, zend_string *reason);
-zend_object* phalcon_websocket_connection_create_object_handler(zend_class_entry *ce);
-void phalcon_websocket_connection_free_object_storage_handler(zend_object *object);
-
 
 extern zend_class_entry *phalcon_websocket_connection_ce;
 

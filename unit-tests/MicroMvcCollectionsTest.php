@@ -63,7 +63,7 @@ class MicroMvcCollectionsTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroCollections()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$app = new Phalcon\Mvc\Micro();
 
@@ -90,7 +90,7 @@ class MicroMvcCollectionsTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroCollectionsPrefixed()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$app = new Phalcon\Mvc\Micro();
 
@@ -118,7 +118,7 @@ class MicroMvcCollectionsTest extends PHPUnit_Framework_TestCase
 
 	public function testMicroCollectionsLazy()
 	{
-		Phalcon\DI::reset();
+		Phalcon\Di::reset();
 
 		$app = new Phalcon\Mvc\Micro();
 

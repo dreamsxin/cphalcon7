@@ -161,7 +161,7 @@ class DispatcherMvcEventsTest extends PHPUnit_Framework_TestCase
 
 	protected function _getDispatcher()
 	{
-		$di = new Phalcon\DI();
+		$di = new Phalcon\Di();
 
 		$di->set('response', function(){
 			return new \Phalcon\Http\Response();

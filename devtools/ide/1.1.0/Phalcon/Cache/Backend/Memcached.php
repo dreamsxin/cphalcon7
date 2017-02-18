@@ -3,9 +3,9 @@
 namespace Phalcon\Cache\Backend {
 
 	/**
-	 * Phalcon\Cache\Backend\Libmemcached
+	 * Phalcon\Cache\Backend\Memcached
 	 *
-	 * Allows to cache output fragments, PHP data or raw data to a libmemcached backend
+	 * Allows to cache output fragments, PHP data or raw data to a memcached backend
 	 *
 	 * This adapter uses the special memcached key "_PHCM" to store all the keys internally used by the adapter
 	 *
@@ -17,7 +17,7 @@ namespace Phalcon\Cache\Backend {
 	 * ));
 	 *
 	 * //Create the Cache setting memcached connection options
-	 * $cache = new Phalcon\Cache\Backend\Libmemcached($frontCache, array(
+	 * $cache = new Phalcon\Cache\Backend\Memcached($frontCache, array(
 	 *     'servers' => array(
 	 *         array('host' => 'localhost',
 	 *               'port' => 11211,
@@ -38,12 +38,12 @@ namespace Phalcon\Cache\Backend {
 	 *</code>
 	 */
 	
-	class Libmemcached extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Memcached extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		protected $_memcache;
 
 		/**
-		 * \Phalcon\Cache\Backend\Libmemcached constructor
+		 * \Phalcon\Cache\Backend\Memcached constructor
 		 *
 		 * @param \Phalcon\Cache\FrontendInterface $frontend
 		 * @param array $options

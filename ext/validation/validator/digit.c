@@ -85,21 +85,21 @@ PHP_METHOD(Phalcon_Validation_Validator_Digit, validate){
 
 	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
 
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce, 0);
+	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce);
 
-	PHALCON_CALL_METHODW(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
 		RETURN_TRUE;
 	}
 
-	PHALCON_CALL_SELFW(&valid, "valid", &value);
+	PHALCON_CALL_SELF(&valid, "valid", &value);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
+			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				PHALCON_CPY_WRT_CTOR(&label, attribute);
 			}
@@ -118,11 +118,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Digit, validate){
 			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Digit", &code);
 
-		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 
@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Digit, valid){
 	phalcon_fetch_params(0, 1, 0, &value);
 
 	if (Z_TYPE_P(value) != IS_LONG) {
-		PHALCON_CALL_FUNCTIONW(&valid, "ctype_digit", value);
+		PHALCON_CALL_FUNCTION(&valid, "ctype_digit", value);
 		if (!zend_is_true(&valid)) {
 			RETURN_FALSE;
 		}

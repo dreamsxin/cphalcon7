@@ -22,7 +22,7 @@ namespace Phalcon\Mvc {
 	 *</code>
 	 */
 	
-	class Micro extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \ArrayAccess {
+	class Micro extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \ArrayAccess {
 
 		protected $_handlers;
 
@@ -172,7 +172,7 @@ namespace Phalcon\Mvc {
 		 * @param string $serviceName
 		 * @param mixed $definition
 		 * @param boolean $shared
-		 * @return \Phalcon\DI\ServiceInterface
+		 * @return \Phalcon\Di\ServiceInterface
 		 */
 		public function setService($serviceName, $definition, $shared=null){ }
 

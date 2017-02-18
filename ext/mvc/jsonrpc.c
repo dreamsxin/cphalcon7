@@ -108,7 +108,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_JsonRpc){
 /**
  * Phalcon\Mvc\JsonRpc
  *
- * @param Phalcon\DI $dependencyInjector
+ * @param Phalcon\Di $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
 
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, __construct){
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdi", dependency_injector);
 	}
 }
 
@@ -151,8 +151,8 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 		merge = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (Z_TYPE_P(modules) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "Modules must be an Array");
+	if (Z_TYPE_P(modules) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "Modules must be an Array");
 		return;
 	}
 	if (PHALCON_IS_FALSE(merge)) {
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 		phalcon_update_property_zval(getThis(), SL("_modules"), &merged_modules);
 	}
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, setDefaultModule){
 	phalcon_fetch_params(0, 1, 0, &default_module);
 
 	phalcon_update_property_zval(getThis(), SL("_defaultModule"), default_module);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -244,14 +244,14 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	zval url = {}, uri = {}, router = {}, module_name = {}, modules = {}, module = {}, class_name = {}, path = {}, module_object = {}, module_params = {}, status = {}, namespace_name = {}, controller_name = {}, action_name = {};
 	zval params = {}, exact = {}, dispatcher = {}, controller = {}, jsonrpc_result = {}, jsonrpc_id = {};
 
-	PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
-	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_mvc_jsonrpc_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_mvc_jsonrpc_exception_ce);
 
 	/* Call boot event, this allows the developer to perform initialization actions */
 	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:boot", getThis(), NULL)) {
@@ -262,16 +262,16 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 	ZVAL_STRING(&service, ISV(request));
 
-	PHALCON_CALL_METHODW(&request, &dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACEW(&request, phalcon_http_requestinterface_ce);
+	PHALCON_CALL_METHOD(&request, &dependency_injector, "getshared", &service);
+	PHALCON_VERIFY_INTERFACE(&request, phalcon_http_requestinterface_ce);
 
-	PHALCON_CALL_METHODW(&json, &request, "getrawbody");
-	PHALCON_CALL_FUNCTIONW(&data, "json_decode", &json, &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHOD(&json, &request, "getrawbody");
+	PHALCON_CALL_FUNCTION(&data, "json_decode", &json, &PHALCON_GLOBAL(z_true));
 
 	ZVAL_STRING(&service, ISV(response));
 
-	PHALCON_CALL_METHODW(&response, &dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACEW(&response, phalcon_http_responseinterface_ce);
+	PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
+	PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 
 	array_init(&jsonrpc_message);
 	array_init(&jsonrpc_error);
@@ -282,7 +282,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	} else if (Z_TYPE(data) != IS_ARRAY) {
 		phalcon_array_update_str_long(&jsonrpc_error, SL("code"), __LINE__, 0);
 		phalcon_array_update_str_str(&jsonrpc_error, SL("message"), SL("Parse error"), PH_COPY);
-	} else if (!phalcon_array_isset_str(&data, SL("jsonrpc"))) {		
+	} else if (!phalcon_array_isset_str(&data, SL("jsonrpc"))) {
 			phalcon_array_update_str_long(&jsonrpc_error, SL("code"), __LINE__, 0);
 			phalcon_array_update_str_str(&jsonrpc_error, SL("message"), SL("Invalid Request"), PH_COPY);
 	} else if (!phalcon_array_isset_fetch_str(&jsonrpc_method, &data, SL("method"))) {
@@ -294,27 +294,27 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		}
 
 		ZVAL_STRING(&service, ISV(url));
-		PHALCON_CALL_METHODW(&url, &dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACEW(&url, phalcon_mvc_urlinterface_ce);
+		PHALCON_CALL_METHOD(&url, &dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
 
-		PHALCON_CALL_METHODW(&uri, &url, "get", &jsonrpc_method);
+		PHALCON_CALL_METHOD(&uri, &url, "get", &jsonrpc_method);
 
 		ZVAL_STRING(&service, ISV(router));
-		PHALCON_CALL_METHODW(&router, &dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACEW(&router, phalcon_mvc_routerinterface_ce);
+		PHALCON_CALL_METHOD(&router, &dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
 
 		/* Handle the URI pattern (if any) */
-		PHALCON_CALL_METHODW(NULL, &router, "handle", &uri);
-		
+		PHALCON_CALL_METHOD(NULL, &router, "handle", &uri);
+
 		/* Load module config */
-		PHALCON_CALL_METHODW(&module_name, &router, "getmodulename");
-		
+		PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
+
 		/* If the router doesn't return a valid module we use the default module */
 		if (!zend_is_true(&module_name)) {
 			phalcon_return_property(&module_name, getThis(), SL("_defaultModule"));
 		}
-		
-		/** 
+
+		/**
 		 * Process the module definition
 		 */
 		if (zend_is_true(&module_name)) {
@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 				RETURN_FALSE;
 			}
 
-			/** 
+			/**
 			 * Check if the module passed by the router is registered in the modules container
 			 */
 			phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY);
@@ -331,22 +331,22 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 				zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module %s is not registered in the jsonrpc container", Z_STRVAL(module_name));
 				return;
 			}
-		
-			/** 
+
+			/**
 			 * A module definition must be an array or an object
 			 */
 			if (Z_TYPE(module) != IS_ARRAY && Z_TYPE(module) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
+				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
 				return;
 			}
-		
+
 			/* An array module definition contains a path to a module definition class */
-			if (Z_TYPE(module) == IS_ARRAY) { 
+			if (Z_TYPE(module) == IS_ARRAY) {
 				/* Class name used to load the module definition */
 				if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
 					ZVAL_STRING(&class_name, "Module");
 				}
-		
+
 				/* If the developer has specified a path, try to include the file */
 				if (phalcon_array_isset_fetch_str(&path, &module, SL("path"))) {
 					convert_to_string_ex(&path);
@@ -359,62 +359,62 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 						}
 					}
 				}
-		
-				PHALCON_CALL_METHODW(&module_object, &dependency_injector, "get", &class_name);
-		
-				/** 
+
+				PHALCON_CALL_METHOD(&module_object, &dependency_injector, "get", &class_name);
+
+				/**
 				 * 'registerAutoloaders' and 'registerServices' are automatically called
 				 */
-				PHALCON_CALL_METHODW(NULL, &module_object, "registerautoloaders", &dependency_injector);
-				PHALCON_CALL_METHODW(NULL, &module_object, "registerservices", &dependency_injector);
+				PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders", &dependency_injector);
+				PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", &dependency_injector);
 			} else if (Z_TYPE(module) == IS_OBJECT && instanceof_function(Z_OBJCE(module), zend_ce_closure)) {
 				/* A module definition object, can be a Closure instance */
 				array_init_size(&module_params, 1);
 				phalcon_array_append(&module_params, &dependency_injector, PH_COPY);
 
-				PHALCON_CALL_USER_FUNC_ARRAYW(&status, &module, &module_params);
+				PHALCON_CALL_USER_FUNC_ARRAY(&status, &module, &module_params);
 			} else {
-				PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
+				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_jsonrpc_exception_ce, "Invalid module definition");
 				return;
 			}
-		
+
 			/* Calling afterStartModule event */
 			phalcon_update_property_zval(getThis(), SL("_moduleObject"), &module_object);
 			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:afterStartModule", getThis(), &module_name)) {
 				RETURN_FALSE;
 			}
 		}
-		
+
 		/* We get the parameters from the router and assign them to the dispatcher */
-		PHALCON_CALL_METHODW(&module_name, &router, "getmodulename");
-		PHALCON_CALL_METHODW(&namespace_name, &router, "getnamespacename");
-		PHALCON_CALL_METHODW(&controller_name, &router, "getcontrollername");
-		PHALCON_CALL_METHODW(&action_name, &router, "getactionname");
-		PHALCON_CALL_METHODW(&params, &router, "getparams");
-		PHALCON_CALL_METHODW(&exact, &router, "isexactcontrollername");
+		PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
+		PHALCON_CALL_METHOD(&namespace_name, &router, "getnamespacename");
+		PHALCON_CALL_METHOD(&controller_name, &router, "getcontrollername");
+		PHALCON_CALL_METHOD(&action_name, &router, "getactionname");
+		PHALCON_CALL_METHOD(&params, &router, "getparams");
+		PHALCON_CALL_METHOD(&exact, &router, "isexactcontrollername");
 
 		ZVAL_STRING(&service, ISV(dispatcher));
-		
-		PHALCON_CALL_METHODW(&dispatcher, &dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACEW(&dispatcher, phalcon_dispatcherinterface_ce);
-		
+
+		PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);
+
 		/* Assign the values passed from the router */
-		PHALCON_CALL_METHODW(NULL, &dispatcher, "setmodulename", &module_name);
-		PHALCON_CALL_METHODW(NULL, &dispatcher, "setnamespacename", &namespace_name);
-		PHALCON_CALL_METHODW(NULL, &dispatcher, "setcontrollername", &controller_name, &exact);
-		PHALCON_CALL_METHODW(NULL, &dispatcher, "setactionname", &action_name);
-		PHALCON_CALL_METHODW(NULL, &dispatcher, "setparams", &jsonrpc_params);
-		
+		PHALCON_CALL_METHOD(NULL, &dispatcher, "setmodulename", &module_name);
+		PHALCON_CALL_METHOD(NULL, &dispatcher, "setnamespacename", &namespace_name);
+		PHALCON_CALL_METHOD(NULL, &dispatcher, "setcontrollername", &controller_name, &exact);
+		PHALCON_CALL_METHOD(NULL, &dispatcher, "setactionname", &action_name);
+		PHALCON_CALL_METHOD(NULL, &dispatcher, "setparams", &jsonrpc_params);
+
 		/* Calling beforeHandleRequest */
 		RETURN_ON_FAILURE(phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:beforeHandleRequest", getThis(), &dispatcher));
-		
+
 		/* The dispatcher must return an object */
-		PHALCON_CALL_METHODW(&controller, &dispatcher, "dispatch");
-		
+		PHALCON_CALL_METHOD(&controller, &dispatcher, "dispatch");
+
 		/* Get the latest value returned by an action */
-		PHALCON_CALL_METHODW(&jsonrpc_result, &dispatcher, "getreturnedvalue");
+		PHALCON_CALL_METHOD(&jsonrpc_result, &dispatcher, "getreturnedvalue");
 	}
-		
+
 	/* Calling afterHandleRequest */
 	if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:afterHandleRequest", getThis(), &controller) && EG(exception)) {
 		return;
@@ -436,7 +436,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		phalcon_array_update_str(&jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);
 	}
 
-	PHALCON_CALL_METHODW(NULL, &response, "setjsoncontent", &jsonrpc_message);
+	PHALCON_CALL_METHOD(NULL, &response, "setjsoncontent", &jsonrpc_message);
 
 
 	/* Calling beforeSendResponse */
@@ -445,11 +445,11 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	}
 
 	/* Headers are automatically sent */
-	PHALCON_CALL_METHODW(NULL, &response, "sendheaders");
+	PHALCON_CALL_METHOD(NULL, &response, "sendheaders");
 
 	/* Cookies are automatically sent */
-	PHALCON_CALL_METHODW(NULL, &response, "sendcookies");
+	PHALCON_CALL_METHOD(NULL, &response, "sendcookies");
 
 	/* Return the response */
-	RETURN_CTORW(&response);
+	RETURN_CTOR(&response);
 }

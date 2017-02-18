@@ -31,7 +31,7 @@
 #include "kernel/exception.h"
 
 /**
- * Phalcon\CLI\Dispatcher
+ * Phalcon\Cli\Dispatcher
  *
  * Dispatching is the process of taking the command-line arguments, extracting the module name,
  * task name, action name, and optional parameters contained in it, and then
@@ -39,9 +39,9 @@
  *
  *<code>
  *
- *	$di = new Phalcon\DI();
+ *	$di = new Phalcon\Di();
  *
- *	$dispatcher = new Phalcon\CLI\Dispatcher();
+ *	$dispatcher = new Phalcon\Cli\Dispatcher();
  *
  *  $dispatcher->setDI($di);
  *
@@ -55,15 +55,15 @@
  */
 zend_class_entry *phalcon_cli_dispatcher_ce;
 
-PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskSuffix);
-PHP_METHOD(Phalcon_CLI_Dispatcher, setDefaultTask);
-PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskName);
-PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskName);
-PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException);
-PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException);
-PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskClass);
-PHP_METHOD(Phalcon_CLI_Dispatcher, getLastTask);
-PHP_METHOD(Phalcon_CLI_Dispatcher, getActiveTask);
+PHP_METHOD(Phalcon_Cli_Dispatcher, setTaskSuffix);
+PHP_METHOD(Phalcon_Cli_Dispatcher, setDefaultTask);
+PHP_METHOD(Phalcon_Cli_Dispatcher, setTaskName);
+PHP_METHOD(Phalcon_Cli_Dispatcher, getTaskName);
+PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException);
+PHP_METHOD(Phalcon_Cli_Dispatcher, _handleException);
+PHP_METHOD(Phalcon_Cli_Dispatcher, getTaskClass);
+PHP_METHOD(Phalcon_Cli_Dispatcher, getLastTask);
+PHP_METHOD(Phalcon_Cli_Dispatcher, getActiveTask);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_dispatcher_settasksuffix, 0, 0, 1)
 	ZEND_ARG_INFO(0, taskSuffix)
@@ -78,24 +78,24 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_dispatcher_settaskname, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_dispatcher_method_entry[] = {
-	PHP_ME(Phalcon_CLI_Dispatcher, setTaskSuffix, arginfo_phalcon_cli_dispatcher_settasksuffix, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Dispatcher, setDefaultTask, arginfo_phalcon_cli_dispatcher_setdefaulttask, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Dispatcher, setTaskName, arginfo_phalcon_cli_dispatcher_settaskname, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Dispatcher, getTaskName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Dispatcher, _throwDispatchException, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_CLI_Dispatcher, _handleException, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_CLI_Dispatcher, getTaskClass, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Dispatcher, getLastTask, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Dispatcher, getActiveTask, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, setTaskSuffix, arginfo_phalcon_cli_dispatcher_settasksuffix, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, setDefaultTask, arginfo_phalcon_cli_dispatcher_setdefaulttask, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, setTaskName, arginfo_phalcon_cli_dispatcher_settaskname, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, getTaskName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, _throwDispatchException, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Cli_Dispatcher, _handleException, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Cli_Dispatcher, getTaskClass, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, getLastTask, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, getActiveTask, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\CLI\Dispatcher initializer
+ * Phalcon\Cli\Dispatcher initializer
  */
-PHALCON_INIT_CLASS(Phalcon_CLI_Dispatcher){
+PHALCON_INIT_CLASS(Phalcon_Cli_Dispatcher){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Dispatcher, cli_dispatcher, phalcon_dispatcher_ce, phalcon_cli_dispatcher_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cli, Dispatcher, cli_dispatcher, phalcon_dispatcher_ce, phalcon_cli_dispatcher_method_entry, 0);
 
 	zend_declare_property_string(phalcon_cli_dispatcher_ce, SL("_handlerSuffix"), "Task", ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_cli_dispatcher_ce, SL("_defaultHandler"), "main", ZEND_ACC_PROTECTED);
@@ -111,7 +111,7 @@ PHALCON_INIT_CLASS(Phalcon_CLI_Dispatcher){
  *
  * @param string $taskSuffix
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskSuffix){
+PHP_METHOD(Phalcon_Cli_Dispatcher, setTaskSuffix){
 
 	zval *task_suffix;
 
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskSuffix){
  *
  * @param string $taskName
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, setDefaultTask){
+PHP_METHOD(Phalcon_Cli_Dispatcher, setDefaultTask){
 
 	zval *task_name;
 
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setDefaultTask){
  *
  * @param string $taskName
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskName){
+PHP_METHOD(Phalcon_Cli_Dispatcher, setTaskName){
 
 	zval *task_name;
 
@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, setTaskName){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskName){
+PHP_METHOD(Phalcon_Cli_Dispatcher, getTaskName){
 
 
 	RETURN_MEMBER(getThis(), "_handlerName");
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskName){
  * @param string $message
  * @param int $exceptionCode
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
+PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
 
 	zval *message, *exception_code = NULL, exception = {}, events_manager = {}, event_name = {}, status = {};
 
@@ -179,19 +179,19 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
 	}
 
 	object_init_ex(&exception, phalcon_cli_dispatcher_exception_ce);
-	PHALCON_CALL_METHODW(NULL, &exception, "__construct", message, exception_code);
+	PHALCON_CALL_METHOD(NULL, &exception, "__construct", message, exception_code);
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
-		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), &exception);
+		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &exception);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
 	}
 
-	/** 
+	/**
 	 * Throw the exception if it wasn't handled
 	 */
 	phalcon_throw_exception(&exception);
@@ -202,7 +202,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _throwDispatchException){
  *
  * @param \Exception $exception
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
+PHP_METHOD(Phalcon_Cli_Dispatcher, _handleException){
 
 	zval *exception, events_manager = {}, event_name = {}, status = {};
 
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
-		PHALCON_CALL_METHODW(&status, &events_manager, "fire", &event_name, getThis(), exception);
+		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), exception);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -224,18 +224,18 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, _handleException){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, getTaskClass){
+PHP_METHOD(Phalcon_Cli_Dispatcher, getTaskClass){
 
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "gethandlerclass");
+	PHALCON_RETURN_CALL_METHOD(getThis(), "gethandlerclass");
 }
 
 /**
  * Returns the lastest dispatched controller
  *
- * @return Phalcon\CLI\Task
+ * @return Phalcon\Cli\Task
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, getLastTask){
+PHP_METHOD(Phalcon_Cli_Dispatcher, getLastTask){
 
 
 	RETURN_MEMBER(getThis(), "_lastHandler");
@@ -244,9 +244,9 @@ PHP_METHOD(Phalcon_CLI_Dispatcher, getLastTask){
 /**
  * Returns the active task in the dispatcher
  *
- * @return Phalcon\CLI\Task
+ * @return Phalcon\Cli\Task
  */
-PHP_METHOD(Phalcon_CLI_Dispatcher, getActiveTask){
+PHP_METHOD(Phalcon_Cli_Dispatcher, getActiveTask){
 
 
 	RETURN_MEMBER(getThis(), "_activeHandler");

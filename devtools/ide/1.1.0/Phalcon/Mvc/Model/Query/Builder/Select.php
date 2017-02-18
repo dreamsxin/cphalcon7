@@ -16,7 +16,7 @@ namespace Phalcon\Mvc\Model\Query\Builder {
 	 *</code>
 	 */
 	
-	class Select extends \Phalcon\Mvc\Model\Query\Builder\Join implements \Phalcon\Mvc\Model\Query\BuilderInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Select extends \Phalcon\Mvc\Model\Query\Builder\Join implements \Phalcon\Mvc\Model\Query\BuilderInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		protected $_type;
 
@@ -66,7 +66,7 @@ namespace Phalcon\Mvc\Model\Query\Builder {
 		 *</code> 
 		 *
 		 * @param array $params
-		 * @param \Phalcon\DI $dependencyInjector
+		 * @param \Phalcon\Di $dependencyInjector
 		 */
 		public function __construct($params=null){ }
 

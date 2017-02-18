@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Validation_Message, setType){
 	phalcon_fetch_params(0, 1, 0, &type);
 
 	phalcon_update_property_zval(getThis(), SL("_type"), type);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -178,7 +178,7 @@ PHP_METHOD(Phalcon_Validation_Message, setCode){
 	phalcon_fetch_params(0, 1, 0, &code);
 
 	phalcon_update_property_zval(getThis(), SL("_code"), code);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Validation_Message, setMessage){
 	phalcon_fetch_params(0, 1, 0, &message);
 
 	phalcon_update_property_zval(getThis(), SL("_message"), message);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Validation_Message, setField){
 	phalcon_fetch_params(0, 1, 0, &field);
 
 	phalcon_update_property_zval(getThis(), SL("_field"), field);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -274,5 +274,5 @@ PHP_METHOD(Phalcon_Validation_Message, __set_state){
 	phalcon_array_fetch_str(&code, message, SL("_code"), PH_NOISY);
 
 	object_init_ex(return_value, phalcon_validation_message_ce);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &message_text, &field, &type, &code);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &message_text, &field, &type, &code);
 }

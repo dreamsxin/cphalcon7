@@ -14,16 +14,17 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_MVC_MODEL_METADATA_LIBMEMCACHED_H
-#define PHALCON_MVC_MODEL_METADATA_LIBMEMCACHED_H
+#ifndef PHALCON_STORAGE_EXCEPTION_H
+#define PHALCON_STORAGE_EXCEPTION_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_mvc_model_metadata_libmemcached_ce;
+extern zend_class_entry *phalcon_storage_exception_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Libmemcached);
+PHALCON_INIT_CLASS(Phalcon_Storage_Exception);
 
-#endif /* PHALCON_MVC_MODEL_METADATA_LIBMEMCACHED_H */
+#endif /* PHALCON_STORAGE_EXCEPTION_H */

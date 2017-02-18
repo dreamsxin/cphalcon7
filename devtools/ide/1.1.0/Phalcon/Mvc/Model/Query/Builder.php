@@ -18,7 +18,7 @@ namespace Phalcon\Mvc\Model\Query {
 	 *</code>
 	 */
 	
-	abstract class Builder extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\Model\Query\BuilderInterface {
+	abstract class Builder extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\Model\Query\BuilderInterface {
 
 		protected $_type;
 

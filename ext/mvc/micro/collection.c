@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setPrefix){
 	phalcon_fetch_params(0, 1, 0, &prefix);
 	
 	phalcon_update_property_zval(getThis(), SL("_prefix"), prefix);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setHandler){
 	
 	phalcon_update_property_zval(getThis(), SL("_handler"), handler);
 	phalcon_update_property_zval(getThis(), SL("_lazy"), lazy);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_Collection, setLazy){
 	phalcon_fetch_params(0, 1, 0, &lazy);
 	
 	phalcon_update_property_zval(getThis(), SL("_lazy"), lazy);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**

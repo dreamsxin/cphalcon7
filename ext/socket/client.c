@@ -130,12 +130,12 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 		if (!_domain || Z_TYPE_P(_domain) == IS_NULL) {
 			ZVAL_LONG(&filter_type, 275); // FILTER_VALIDATE_IP
 			ZVAL_LONG(&filter_option, 1048576); // FILTER_FLAG_IPV4
-			PHALCON_CALL_FUNCTIONW(&filtered, "filter_var", address, &filter_type, &filter_option);
+			PHALCON_CALL_FUNCTION(&filtered, "filter_var", address, &filter_type, &filter_option);
 			if (zend_is_true(&filtered)) {
 				ZVAL_LONG(&domain, PHALCON_SOCKET_AF_INET);
 			} else {
 				ZVAL_LONG(&filter_option, 2097152); // FILTER_FLAG_IPV6
-				PHALCON_CALL_FUNCTIONW(&filtered, "filter_var", address, &filter_type, &filter_option);
+				PHALCON_CALL_FUNCTION(&filtered, "filter_var", address, &filter_type, &filter_option);
 				if (zend_is_true(&filtered)) {
 					ZVAL_LONG(&domain, PHALCON_SOCKET_AF_INET6);
 				} else {
@@ -157,12 +157,12 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 			PHALCON_CPY_WRT(&protocol, _protocol);
 		}
 
-		PHALCON_CALL_FUNCTIONW(&socket, "socket_create", &domain, &type, &protocol);
+		PHALCON_CALL_FUNCTION(&socket, "socket_create", &domain, &type, &protocol);
 		if (Z_TYPE(socket) != IS_RESOURCE) {
-			PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
+			PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 			return;
 		}
-		
+
 		phalcon_update_property_zval(getThis(), SL("_socket"), &socket);
 	}
 }
@@ -180,15 +180,15 @@ PHP_METHOD(Phalcon_Socket_Client, connect){
 	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY);
 
 	if (!zend_is_true(&address)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_socket_exception_ce, "The socket cant't connect");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_socket_exception_ce, "The socket cant't connect");
 		RETURN_FALSE;
 	}
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(return_value, "socket_connect", &socket, &address, &port);
+	PHALCON_CALL_FUNCTION(return_value, "socket_connect", &socket, &address, &port);
 	if (!PHALCON_IS_TRUE(return_value)) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
+		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 	}
 }
 
@@ -209,13 +209,13 @@ PHP_METHOD(Phalcon_Socket_Client, read){
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
 	if (!type) {
-		PHALCON_CALL_FUNCTIONW(return_value, "socket_read", &socket, length);
+		PHALCON_CALL_FUNCTION(return_value, "socket_read", &socket, length);
 	} else {
-		PHALCON_CALL_FUNCTIONW(return_value, "socket_read", &socket, length, type);
+		PHALCON_CALL_FUNCTION(return_value, "socket_read", &socket, length, type);
 	}
-	
+
 	if (PHALCON_IS_FALSE(return_value)) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
+		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 	}
 }
 
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Socket_Client, write){
 	PHALCON_CPY_WRT_CTOR(&writebuf, buffer);
 	while(1) {
 		ZVAL_LONG(&writelen, len);
-		PHALCON_CALL_FUNCTIONW(&ret, "socket_write", &socket, &writebuf, &writelen);
+		PHALCON_CALL_FUNCTION(&ret, "socket_write", &socket, &writebuf, &writelen);
 
 		if (Z_TYPE(ret) == IS_LONG && Z_LVAL(ret) < len) {
 			len -= Z_LVAL(ret);
@@ -256,9 +256,9 @@ PHP_METHOD(Phalcon_Socket_Client, write){
     }
 
 	if (PHALCON_IS_FALSE(&ret)) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
+		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 	}
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -276,10 +276,10 @@ PHP_METHOD(Phalcon_Socket_Client, recv){
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(&ret, "socket_recv", &socket, return_value, length, flag);
-	
+	PHALCON_CALL_FUNCTION(&ret, "socket_recv", &socket, return_value, length, flag);
+
 	if (PHALCON_IS_FALSE(&ret)) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
+		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 	}
 }
 
@@ -305,8 +305,8 @@ PHP_METHOD(Phalcon_Socket_Client, send){
 
 	while(1) {
 		ZVAL_LONG(&writelen, len);
-		PHALCON_CALL_FUNCTIONW(&ret, "socket_send", &socket, &writebuf, &writelen, flag);
-	
+		PHALCON_CALL_FUNCTION(&ret, "socket_send", &socket, &writebuf, &writelen, flag);
+
 		if (Z_TYPE(ret) == IS_LONG && Z_LVAL(ret) < len) {
 			len -= Z_LVAL(ret);
 			phalcon_substr(&writebuf, &writebuf, Z_LVAL(ret), len);
@@ -314,9 +314,9 @@ PHP_METHOD(Phalcon_Socket_Client, send){
 			break;
 		}
     }
-	
+
 	if (PHALCON_IS_FALSE(&ret)) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "_throwsocketexception");
+		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 	}
-	RETURN_THISW();
+	RETURN_THIS();
 }

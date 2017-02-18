@@ -296,16 +296,16 @@ PHP_METHOD(Phalcon_Random, color) {
 		ZVAL_LONG(&a, rnd_idx);
 		PHALCON_CONCAT_SVSVSVSVS(return_value, "rgba(", &r, ",", &g, ",", &b, ",", &a, ")");
 	} else {
-		PHALCON_CALL_FUNCTIONW(&r_hex, "dechex", &r);
-		PHALCON_CALL_FUNCTIONW(&g_hex, "dechex", &g);
-		PHALCON_CALL_FUNCTIONW(&b_hex, "dechex", &b);
+		PHALCON_CALL_FUNCTION(&r_hex, "dechex", &r);
+		PHALCON_CALL_FUNCTION(&g_hex, "dechex", &g);
+		PHALCON_CALL_FUNCTION(&b_hex, "dechex", &b);
 
 		if (!phalcon_get_constant(&pad_type, SL("STR_PAD_LEFT"))) {
 			ZVAL_LONG(&pad_type, 0);
 		}
-		PHALCON_CALL_FUNCTIONW(&r_str, "str_pad", &r_hex, &PHALCON_GLOBAL(z_two), &pad_type);
-		PHALCON_CALL_FUNCTIONW(&g_str, "str_pad", &g_hex, &PHALCON_GLOBAL(z_two), &pad_type);
-		PHALCON_CALL_FUNCTIONW(&b_str, "str_pad", &b_hex, &PHALCON_GLOBAL(z_two), &pad_type);
+		PHALCON_CALL_FUNCTION(&r_str, "str_pad", &r_hex, &PHALCON_GLOBAL(z_two), &pad_type);
+		PHALCON_CALL_FUNCTION(&g_str, "str_pad", &g_hex, &PHALCON_GLOBAL(z_two), &pad_type);
+		PHALCON_CALL_FUNCTION(&b_str, "str_pad", &b_hex, &PHALCON_GLOBAL(z_two), &pad_type);
 
 		PHALCON_CONCAT_SVVV(return_value, "#", &r_str, &g_str, &b_str);
 	}

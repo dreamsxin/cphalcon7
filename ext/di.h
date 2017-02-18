@@ -26,7 +26,7 @@
 
 extern zend_class_entry *phalcon_di_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DI);
+PHALCON_INIT_CLASS(Phalcon_Di);
 
 PHALCON_STATIC void phalcon_di_set_service(zval *this_ptr, zval *name, zval *services, int flags);
 PHALCON_STATIC void phalcon_di_set_services(zval *this_ptr, zval *services);

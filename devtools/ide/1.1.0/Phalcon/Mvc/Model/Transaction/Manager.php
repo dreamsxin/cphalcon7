@@ -47,7 +47,7 @@ namespace Phalcon\Mvc\Model\Transaction {
 	 *
 	 */
 	
-	class Manager extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Mvc\Model\Transaction\ManagerInterface {
+	class Manager extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Mvc\Model\Transaction\ManagerInterface {
 
 		protected $_initialized;
 

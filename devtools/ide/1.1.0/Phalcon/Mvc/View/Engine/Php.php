@@ -8,7 +8,7 @@ namespace Phalcon\Mvc\View\Engine {
 	 * Adapter to use PHP itself as templating engine
 	 */
 	
-	class Php extends \Phalcon\Mvc\View\Engine implements \Phalcon\Mvc\View\EngineInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Php extends \Phalcon\Mvc\View\Engine implements \Phalcon\Mvc\View\EngineInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		/**
 		 * Renders a view using the template engine

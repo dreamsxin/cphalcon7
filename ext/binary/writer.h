@@ -23,10 +23,6 @@
 
 #include "php_phalcon.h"
 
-#define PHALCON_BINARY_ENDIAN_MACHINE		0
-#define PHALCON_BINARY_ENDIAN_BIG			1
-#define PHALCON_BINARY_ENDIAN_LITTLE		2
-
 extern zend_class_entry *phalcon_binary_writer_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Binary_Writer);

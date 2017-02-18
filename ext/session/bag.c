@@ -167,22 +167,22 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 
 	phalcon_return_property(&session, getThis(), SL("_session"));
 	if (Z_TYPE(session) != IS_OBJECT) {
-		PHALCON_CALL_METHODW(&dependency_injector, getThis(), "getdi");
+		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STRW(phalcon_session_exception_ce, "A dependency injection object is required to access the 'session' service");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "A dependency injection object is required to access the 'session' service");
 			return;
 		}
 
 		ZVAL_STR(&service, IS(session));
 
-		PHALCON_CALL_METHODW(&session, &dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACEW(&session, phalcon_session_adapterinterface_ce);
+		PHALCON_CALL_METHOD(&session, &dependency_injector, "getshared", &service);
+		PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 		phalcon_update_property_zval(getThis(), SL("_session"), &session);
 	}
 
 	phalcon_return_property(&name, getThis(), SL("_name"));
 
-	PHALCON_CALL_METHODW(&data, &session, "__get", &name);
+	PHALCON_CALL_METHOD(&data, &session, "__get", &name);
 
 	if (Z_TYPE(data) != IS_ARRAY) {
 		phalcon_update_property_empty_array(getThis(), SL("_data"));
@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Session_Bag, destroy){
 	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
 	phalcon_read_property(&session, getThis(), SL("_session"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(NULL, &session, "__unset", &name);
+	PHALCON_CALL_METHOD(NULL, &session, "__unset", &name);
 }
 
 /**
@@ -236,7 +236,7 @@ PHP_METHOD(Phalcon_Session_Bag, set){
 	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
 	phalcon_read_property(&session, getThis(), SL("_session"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(NULL, &session, "__set", &name, &data);
+	PHALCON_CALL_METHOD(NULL, &session, "__set", &name, &data);
 }
 
 /**
@@ -279,10 +279,10 @@ PHP_METHOD(Phalcon_Session_Bag, get){
 	/* Retrieve the data */
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&value, &data, property, 0)) {
-		RETURN_CTORW(&value);
+		RETURN_CTOR(&value);
 	}
 
-	RETURN_CTORW(default_value);
+	RETURN_CTOR(default_value);
 }
 
 /**
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Session_Bag, __get)
 		phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
 		phalcon_read_property(&session, getThis(), SL("_session"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(NULL, &session, "__set", &name, &data);
+		PHALCON_CALL_METHOD(NULL, &session, "__set", &name, &data);
 	} else {
 		ZVAL_MAKE_REF(return_value);
 	}
@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Session_Bag, remove){
 		phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
 		phalcon_read_property(&session, getThis(), SL("_session"), PH_NOISY);
 
-		PHALCON_CALL_METHODW(NULL, &session, "__set", &name, &data);
+		PHALCON_CALL_METHOD(NULL, &session, "__set", &name, &data);
 
 		RETURN_TRUE;
 	}
@@ -415,7 +415,7 @@ PHP_METHOD(Phalcon_Session_Bag, getIterator)
 
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
 	object_init_ex(return_value, spl_ce_ArrayIterator);
-	PHALCON_CALL_METHODW(NULL, return_value, "__construct", &data);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &data);
 }
 
 PHP_METHOD(Phalcon_Session_Bag, count)

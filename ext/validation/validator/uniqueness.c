@@ -99,11 +99,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&record, ce, getThis(), ISV(model)));
 
 	if (Z_TYPE(record) != IS_OBJECT) {
-		PHALCON_CALL_METHODW(&record, validator, "getentity");
+		PHALCON_CALL_METHOD(&record, validator, "getentity");
 	}
-	PHALCON_VERIFY_INTERFACE_EX(&record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(&record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce);
 
-	PHALCON_CALL_METHODW(&meta_data, &record, "getmodelsmetadata");
+	PHALCON_CALL_METHOD(&meta_data, &record, "getmodelsmetadata");
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&except, ce, getThis(), ISV(except)));
 
@@ -113,45 +113,45 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(except), field) {
 			zval field_value = {};
 
-			PHALCON_CALL_METHODW(&field_value, &record, "readattribute", field);
+			PHALCON_CALL_METHOD(&field_value, &record, "readattribute", field);
 
 			phalcon_array_update_zval(&excepts, field, &field_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 	} else if (PHALCON_IS_NOT_EMPTY(&except)) {
-		PHALCON_CALL_METHODW(&value, &record, "readattribute", &except);
+		PHALCON_CALL_METHOD(&value, &record, "readattribute", &except);
 		phalcon_array_update_zval(&excepts, &except, &value, PH_COPY);
 	}
 
-	PHALCON_CALL_METHODW(&operation_made, &record, "getoperationmade");
-	
+	PHALCON_CALL_METHOD(&operation_made, &record, "getoperationmade");
+
 	if (PHALCON_IS_LONG(&operation_made, PHALCON_MODEL_OP_UPDATE)) {
-		/** 
+		/**
 		 * We build a query with the primary key attributes
 		 */
-		PHALCON_CALL_METHODW(&column_map, &meta_data, "getcolumnmap", &record);
-		PHALCON_CALL_METHODW(&primary_fields, &meta_data, "getprimarykeyattributes", &record);
+		PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &record);
+		PHALCON_CALL_METHOD(&primary_fields, &meta_data, "getprimarykeyattributes", &record);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(primary_fields), primary_field) {
 			zval attribute_field = {}, attribute_value = {};
 
-			/** 
+			/**
 			 * Rename the column if there is a column map
 			 */
-			if (Z_TYPE(column_map) == IS_ARRAY) { 
+			if (Z_TYPE(column_map) == IS_ARRAY) {
 				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, primary_field, 0)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_field, "\" isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVALW(phalcon_validation_exception_ce, &exception_message);
+					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_validation_exception_ce, &exception_message);
 					return;
 				}
 			} else {
 				PHALCON_CPY_WRT(&attribute_field, primary_field);
 			}
 
-			/** 
+			/**
 			 * Create a condition based on the renamed primary key
 			 */
-			PHALCON_CALL_METHODW(&attribute_value, &record, "readattribute", primary_field);
+			PHALCON_CALL_METHOD(&attribute_value, &record, "readattribute", primary_field);
 
 			phalcon_array_update_zval(&excepts, &attribute_field, &attribute_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -162,22 +162,22 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attribute), field) {
 			zval field_value = {};
 
-			PHALCON_CALL_METHODW(&field_value, &record, "readattribute", field);
+			PHALCON_CALL_METHOD(&field_value, &record, "readattribute", field);
 
 			phalcon_array_update_zval(&values, field, &field_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		PHALCON_CALL_METHODW(&value, &record, "readattribute", attribute);
+		PHALCON_CALL_METHOD(&value, &record, "readattribute", attribute);
 		phalcon_array_update_zval(&values, attribute, &value, PH_COPY);
 	}
 
-	PHALCON_CALL_SELFW(&valid, "valid", &record, &values, &excepts);
+	PHALCON_CALL_SELF(&valid, "valid", &record, &values, &excepts);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHODW(&label, validator, "getlabel", attribute);
+			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
 				if (Z_TYPE_P(attribute) == IS_ARRAY) {
 					phalcon_fast_join_str(&label, SL(", "), attribute);
@@ -200,11 +200,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 			ZVAL_LONG(&code, 0);
 		}
 
-		PHALCON_CALL_FUNCTIONW(&prepared, "strtr", &message_str, &pairs);
+		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Uniqueness", &code);
 
-		PHALCON_CALL_METHODW(NULL, validator, "appendmessage", &message);
+		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 
@@ -227,14 +227,14 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 
 	phalcon_fetch_params(0, 2, 1, &record, &values, &excepts);
 
-	PHALCON_VERIFY_INTERFACE_EX(record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce);
 
 	if (Z_TYPE_P(values) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_validation_exception_ce, "Values must be array");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Values must be array");
 		return;
 	}
 
-	/** 
+	/**
 	 * PostgreSQL check if the compared constant has the same type as the column, so we
 	 * make cast to the data passed to match those column types
 	 */
@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 		phalcon_array_append(&conditions, &tmp_condition, PH_COPY);
 	}
 
-	/** 
+	/**
 	 * The field can be an array of values
 	 */
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(values), idx, str_key, value) {
@@ -287,17 +287,17 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 
 	phalcon_fast_join_str(&join_conditions, SL(" AND "), &conditions);
 
-	/** 
+	/**
 	 * We don't trust the user, so we pass the parameters as bound parameters
 	 */
 	array_init_size(&params, 2);
 	phalcon_array_update_str(&params, SL("conditions"), &join_conditions, PH_COPY);
 	phalcon_array_update_str(&params, SL("bind"), &bind_params, PH_COPY);
 
-	/** 
+	/**
 	 * Check using a standard count
 	 */
-	PHALCON_CALL_CE_STATICW(&number, Z_OBJCE_P(record), "count", &params);
+	PHALCON_CALL_CE_STATIC(&number, Z_OBJCE_P(record), "count", &params);
 	if (!PHALCON_IS_LONG(&number, 0)) {
 		RETURN_FALSE;
 	}

@@ -122,14 +122,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
-	
+
 	if (!phalcon_array_isset_fetch_str(&sql, config, SL("sql"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'sql' is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'sql' is required");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&total_sql, config, SL("total_sql"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'total_sql' is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'total_sql' is required");
 		return;
 	}
 
@@ -149,25 +149,25 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	}
 
 	if (Z_TYPE(dbname) != IS_OBJECT) {
-		PHALCON_CALL_METHODW(&db, getThis(), "getresolveservice", &dbname);
+		PHALCON_CALL_METHOD(&db, getThis(), "getresolveservice", &dbname);
 	} else {
 		PHALCON_CPY_WRT(&db, &dbname);
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce);
 	phalcon_update_property_zval(getThis(), SL("_db"), &db);
 
 	phalcon_update_property_zval(getThis(), SL("_sql"), &sql);
 	phalcon_update_property_zval(getThis(), SL("_total_sql"), &total_sql);
 
 	if (!phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
 		return;
 	}
 
 	i_limit = phalcon_get_intval(&limit);
 	if (i_limit < 1) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "'limit' should be positive");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "'limit' should be positive");
 		return;
 	}
 
@@ -193,9 +193,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setCurrentPage){
 
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
-	
+
 	phalcon_update_property_zval(getThis(), SL("_page"), current_page);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setLimit){
 	PHALCON_ENSURE_IS_LONG(current_limit);
 
 	phalcon_update_property_zval(getThis(), SL("_limitRows"), current_limit);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -249,15 +249,15 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setDb){
 
 	phalcon_fetch_params(0, 1, 0, &dbname);
 	if (Z_TYPE_P(dbname) != IS_OBJECT) {
-		PHALCON_CALL_METHODW(&db, getThis(), "getresolveservice", dbname);
+		PHALCON_CALL_METHOD(&db, getThis(), "getresolveservice", dbname);
 	} else {
 		PHALCON_CPY_WRT(&db, dbname);
 	}
-	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_db"), &db);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	i_number = (i_number_page - 1) * i_limit;
 	i_before = (i_number_page == 1) ? 1 : (i_number_page - 1);
 
-	PHALCON_CALL_METHODW(&row, &db, "fetchone", &total_sql, &fetch_mode, &bind);
+	PHALCON_CALL_METHOD(&row, &db, "fetchone", &total_sql, &fetch_mode, &bind);
 
 	phalcon_return_property(&rowcount, &row, SL("rowcount"));
 
@@ -320,8 +320,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 		phalcon_array_update_str(&bind, SL("offset"), &number, PH_COPY);
 	}
 
-	PHALCON_CALL_METHODW(&items, &db, "fetchall", &sql, &fetch_mode, &bind);
-	
+	PHALCON_CALL_METHOD(&items, &db, "fetchall", &sql, &fetch_mode, &bind);
+
 	i_rowcount    = phalcon_get_intval(&rowcount);
 	tp            = ldiv(i_rowcount, i_limit);
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);

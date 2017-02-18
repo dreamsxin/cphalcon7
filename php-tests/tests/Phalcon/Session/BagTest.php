@@ -28,8 +28,8 @@ class BagTest extends PHPUnit_Framework_TestCase
      */
     public function testGetSet()
     {
-        \Phalcon\DI::reset();
-        new \Phalcon\DI\FactoryDefault();
+        \Phalcon\Di::reset();
+        new \Phalcon\Di\FactoryDefault();
         @session_start();
 
         // Using getters and setters.

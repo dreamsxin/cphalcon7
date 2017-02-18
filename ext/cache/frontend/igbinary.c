@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Igbinary, beforeStore)
 
 	phalcon_fetch_params(0, 1, 0, &data);
 	
-	PHALCON_RETURN_CALL_FUNCTIONW("igbinary_serialize", data);
+	PHALCON_RETURN_CALL_FUNCTION("igbinary_serialize", data);
 }
 
 /**
@@ -114,5 +114,5 @@ PHP_METHOD(Phalcon_Cache_Frontend_Igbinary, afterRetrieve)
 
 	phalcon_fetch_params(0, 1, 0, &data);
 	
-	PHALCON_RETURN_CALL_FUNCTIONW("igbinary_unserialize", data);
+	PHALCON_RETURN_CALL_FUNCTION("igbinary_unserialize", data);
 }

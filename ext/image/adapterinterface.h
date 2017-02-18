@@ -113,16 +113,32 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapterinterface_pixelate, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, amount, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_image_adapterinterface_save, 0, 0, _IS_BOOL, 0)
+	ZEND_ARG_INFO(0, file)
+	ZEND_ARG_TYPE_INFO(0, opacity, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, interlacing, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+#else
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_image_adapterinterface_save, 0, 0, _IS_BOOL, 0, 0)
 	ZEND_ARG_INFO(0, file)
 	ZEND_ARG_TYPE_INFO(0, opacity, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, interlacing, IS_LONG, 1)
 ZEND_END_ARG_INFO()
+#endif
 
+#if PHP_VERSION_ID >= 70200
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_image_adapterinterface_render, 0, 0, IS_STRING, 0)
+	ZEND_ARG_INFO(0, type)
+	ZEND_ARG_TYPE_INFO(0, opacity, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, interlacing, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+#else
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_image_adapterinterface_render, 0, 0, IS_STRING, 0, 0)
 	ZEND_ARG_INFO(0, type)
 	ZEND_ARG_TYPE_INFO(0, opacity, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, interlacing, IS_LONG, 1)
 ZEND_END_ARG_INFO()
+#endif
 
 #endif /* PHALCON_IMAGE_ADAPTERINTERFACE_H */

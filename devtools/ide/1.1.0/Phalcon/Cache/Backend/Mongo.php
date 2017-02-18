@@ -30,7 +30,7 @@ namespace Phalcon\Cache\Backend {
 	 *</code>
 	 */
 	
-	class Mongo extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Mongo extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		protected $_collection;
 

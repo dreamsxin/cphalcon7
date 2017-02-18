@@ -93,7 +93,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine){
  * Phalcon\Mvc\View\Engine constructor
  *
  * @param Phalcon\Mvc\ViewInterface $view
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 
@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 	phalcon_fetch_params(0, 1, 1, &view, &dependency_injector);
 
 	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
-		PHALCON_CALL_METHODW(NULL, getThis(), "setdi", dependency_injector);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdi", dependency_injector);
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_view"), view);
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, getContent){
 
 	zval view = {};
 	phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&view, "getcontent");
+	PHALCON_RETURN_CALL_METHOD(&view, "getcontent");
 }
 
 /**
@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, startSection){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, &view, "startsection", name);
+	PHALCON_CALL_METHOD(NULL, &view, "startsection", name);
 }
 
 /**
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, stopSection){
 	zval view = {};
 
 	phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
-	PHALCON_CALL_METHODW(NULL, &view, "stopsection");
+	PHALCON_CALL_METHOD(NULL, &view, "stopsection");
 }
 
 /**
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, section){
 
 	phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(return_value, &view, "section", name, default_value);
+	PHALCON_CALL_METHOD(return_value, &view, "section", name, default_value);
 }
 
 /**
@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, partial){
 	}
 
 	phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&view, "partial", partial_path, params);
+	PHALCON_RETURN_CALL_METHOD(&view, "partial", partial_path, params);
 }
 
 /**
@@ -217,16 +217,16 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (Z_TYPE_P(method_callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(method_callable), zend_ce_closure)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_view_exception_ce, "Method must be an closure object");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Method must be an closure object");
 		return;
 	}
 
 	phalcon_get_class(&class_name, getThis(), 0);
 
-	PHALCON_CALL_CE_STATICW(&method, zend_ce_closure, "bind", method_callable, getThis(), &class_name);
+	PHALCON_CALL_CE_STATIC(&method, zend_ce_closure, "bind", method_callable, getThis(), &class_name);
 
 	phalcon_update_property_array(getThis(), SL("_methods"), name, &method);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	phalcon_read_property(&methods, getThis(), SL("_methods"), PH_NOISY);
 	if (phalcon_array_isset_fetch(&func, &methods, &method_name, 0)) {
-			PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &func, &arguments);
+			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &func, &arguments);
 			return;
 	}
 
@@ -269,17 +269,17 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		ZVAL_STRING(&service_name, ISV(dispatcher));
 	}
 
-	PHALCON_CALL_METHODW(&service, getThis(), "getresolveservice", &service_name);
+	PHALCON_CALL_METHOD(&service, getThis(), "getresolveservice", &service_name);
 
 	if (Z_TYPE(service) != IS_OBJECT) {
 		PHALCON_CONCAT_SVS(&exception_message, "The injected service '", &service_name, "' is not valid");
-		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
 	if (phalcon_method_exists(&service, &method_name) == FAILURE) {
 		PHALCON_CONCAT_SVS(&exception_message, "The method \"", &method_name, "\" doesn't exist on view");
-		PHALCON_THROW_EXCEPTION_ZVALW(phalcon_mvc_view_exception_ce, &exception_message);
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
@@ -287,5 +287,5 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	phalcon_array_append(&callback, &service, PH_COPY);
 	phalcon_array_append(&callback, &method_name, PH_COPY);
 
-	PHALCON_CALL_USER_FUNC_ARRAYW(return_value, &callback, &arguments);
+	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &callback, &arguments);
 }

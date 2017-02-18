@@ -13,7 +13,7 @@
 ## Startup Process
 
 	1.Register an autoloader
-	2.Create a DI - Phalcon\DI\FactoryDefault
+	2.Create a DI - Phalcon\Di\FactoryDefault
 	3.Setup the view component
 	4.Setup a base URI 
 	5.Handle the request - Phalcon\Mvc\Application::handle
@@ -149,7 +149,7 @@
 
 ### General Case
 
-Any class Inherited from `Phalcon\DI\Injectable`.
+Any class Inherited from `Phalcon\Di\Injectable`.
 
 	1.Call method `fireEvent` or `fireEventCancel`
 	2.Check if there is a method with the same name of the event, if yes call the method

@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Xcache, read){
 	
 	phalcon_strtolower_inplace(&prefixed_key);
 	
-	PHALCON_CALL_FUNCTIONW(&serialized, "xcache_get", &prefixed_key);
+	PHALCON_CALL_FUNCTION(&serialized, "xcache_get", &prefixed_key);
 	if (Z_TYPE(serialized) == IS_STRING) {
 		phalcon_unserialize(return_value, &serialized);
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
@@ -113,5 +113,5 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Xcache, write){
 	phalcon_strtolower_inplace(&prefixed_key);
 
 	phalcon_serialize(&serialized, data);
-	PHALCON_CALL_FUNCTIONW(NULL, "xcache_set", &prefixed_key, &serialized);
+	PHALCON_CALL_FUNCTION(NULL, "xcache_set", &prefixed_key, &serialized);
 }

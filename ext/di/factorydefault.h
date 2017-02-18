@@ -25,6 +25,6 @@
 
 extern zend_class_entry *phalcon_di_factorydefault_ce;
 
-PHALCON_INIT_CLASS(Phalcon_DI_FactoryDefault);
+PHALCON_INIT_CLASS(Phalcon_Di_FactoryDefault);
 
 #endif /* PHALCON_DI_FACTORYDEFAULT_H */

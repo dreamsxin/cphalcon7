@@ -26,7 +26,7 @@ namespace Phalcon\Cache\Backend {
 	 *</code>
 	 */
 	
-	class Xcache extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class Xcache extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		/**
 		 * \Phalcon\Cache\Backend\Xcache constructor

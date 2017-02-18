@@ -241,7 +241,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
 	public function testIssues1226()
 	{
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 
 		$request = new \Phalcon\Http\Request();
 		$request->setDI($di);
@@ -298,7 +298,7 @@ class RequestTest extends PHPUnit_Framework_TestCase
 
 	public function testIssues1265()
 	{
-		$di = new Phalcon\DI\FactoryDefault();
+		$di = new Phalcon\Di\FactoryDefault();
 
 		$request = new \Phalcon\Http\Request();
 		$request->setDI($di);

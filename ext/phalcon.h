@@ -49,8 +49,7 @@
 #include "cache/backendinterface.h"
 #include "cache/backend/apc.h"
 #include "cache/backend/file.h"
-#include "cache/backend/libmemcached.h"
-#include "cache/backend/memcache.h"
+#include "cache/backend/memcached.h"
 #include "cache/backend/memory.h"
 #include "cache/backend/mongo.h"
 #include "cache/backend/xcache.h"
@@ -261,8 +260,7 @@
 #include "mvc/model/metadata/memory.h"
 #include "mvc/model/metadata/xcache.h"
 #include "mvc/model/metadata/session.h"
-#include "mvc/model/metadata/memcache.h"
-#include "mvc/model/metadata/libmemcached.h"
+#include "mvc/model/metadata/memcached.h"
 #include "mvc/model/metadata/redis.h"
 #include "mvc/model/metadata/mongo.h"
 #include "mvc/model/metadata/cache.h"
@@ -351,8 +349,7 @@
 #include "session/bag.h"
 #include "session/baginterface.h"
 #include "session/exception.h"
-#include "session/adapter/memcache.h"
-#include "session/adapter/libmemcached.h"
+#include "session/adapter/memcached.h"
 #include "session/adapter/cache.h"
 
 #include "tag.h"
@@ -380,7 +377,6 @@
 #include "socket/server.h"
 #include "socket/exception.h"
 
-#include "websocket/structures.h"
 #include "websocket/connection.h"
 #include "websocket/server.h"
 #include "websocket/client.h"
@@ -428,5 +424,8 @@
 
 #include "process/proc.h"
 #include "process/exception.h"
+
+#include "storage/btree.h"
+#include "storage/exception.h"
 
 #endif /* PHALCON_H */

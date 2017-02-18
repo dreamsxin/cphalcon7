@@ -141,15 +141,15 @@ PHP_METHOD(Phalcon_Crypt, setMethod){
 
 	phalcon_fetch_params(0, 1, 0, &method);
 
-	PHALCON_CALL_FUNCTIONW(&methods, "openssl_get_cipher_methods");
+	PHALCON_CALL_FUNCTION(&methods, "openssl_get_cipher_methods");
 
 	if (Z_TYPE(methods) != IS_ARRAY || !phalcon_fast_in_array(method, &methods)) {
-		PHALCON_THROW_EXCEPTION_FORMATW(phalcon_crypt_exception_ce, "Cipher method not available: %s", method);
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_crypt_exception_ce, "Cipher method not available: %s", method);
 		return;
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_method"), method);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Crypt, setKey){
 	PHALCON_ENSURE_IS_STRING(key);
 
 	phalcon_update_property_zval(getThis(), SL("_key"), key);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Crypt, setOptions) {
 	PHALCON_ENSURE_IS_LONG(options);
 
 	phalcon_update_property_zval(getThis(), SL("_options"), options);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	phalcon_fetch_params(0, 1, 2, &source, &key, &options);
 
 	if (phalcon_function_exists_ex(SL("openssl_decrypt")) == FAILURE) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_crypt_exception_ce, "openssl extension is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "openssl extension is required");
 		return;
 	}
 
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, source, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAYW(&value, &handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
 
 		source = &value;
 	}
@@ -274,7 +274,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	}
 
 	if (PHALCON_IS_EMPTY(&encrypt_key)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_crypt_exception_ce, "Encryption key cannot be empty");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Encryption key cannot be empty");
 		return;
 	}
 
@@ -286,9 +286,9 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 
 	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY);
 
-	PHALCON_CALL_FUNCTIONW(&iv_size, "openssl_cipher_iv_length", &method);
-	PHALCON_CALL_FUNCTIONW(&iv, "openssl_random_pseudo_bytes", &iv_size);
-	PHALCON_CALL_FUNCTIONW(&encrypt, "openssl_encrypt", &text, &method, &encrypt_key, &encrypt_options, &iv);
+	PHALCON_CALL_FUNCTION(&iv_size, "openssl_cipher_iv_length", &method);
+	PHALCON_CALL_FUNCTION(&iv, "openssl_random_pseudo_bytes", &iv_size);
+	PHALCON_CALL_FUNCTION(&encrypt, "openssl_encrypt", &text, &method, &encrypt_key, &encrypt_options, &iv);
 	PHALCON_CONCAT_VV(return_value, &iv, &encrypt);
 
 	phalcon_read_property(&handler, getThis(), SL("_afterEncrypt"), PH_NOISY);
@@ -297,9 +297,9 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, return_value, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAYW(&value, &handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
 
-		RETURN_CTORW(&value);
+		RETURN_CTOR(&value);
 	}
 }
 
@@ -323,7 +323,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	phalcon_fetch_params(0, 1, 2, &source, &key, &options);
 
 	if (phalcon_function_exists_ex(SL("openssl_encrypt")) == FAILURE) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_crypt_exception_ce, "openssl extension is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "openssl extension is required");
 		return;
 	}
 
@@ -335,7 +335,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, source, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAYW(&value, &handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
 
 		source = &value;
 	}
@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	}
 
 	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY);
-	PHALCON_CALL_FUNCTIONW(&iv_size, "openssl_cipher_iv_length", &method);
+	PHALCON_CALL_FUNCTION(&iv_size, "openssl_cipher_iv_length", &method);
 
 	if (Z_LVAL(iv_size) <= 0) {
 		ZVAL_NULL(&iv);
@@ -373,7 +373,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		phalcon_substr(&text_to_decipher, &text, Z_LVAL(iv_size), 0);
 	}
 
-	PHALCON_CALL_FUNCTIONW(return_value, "openssl_decrypt", &text_to_decipher, &method, &encrypt_key, &encrypt_options, &iv);
+	PHALCON_CALL_FUNCTION(return_value, "openssl_decrypt", &text_to_decipher, &method, &encrypt_key, &encrypt_options, &iv);
 	if (unlikely(Z_TYPE_P(return_value) != IS_STRING)) {
 		convert_to_string(return_value);
 	}
@@ -384,9 +384,9 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, return_value, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAYW(&value, &handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
 
-		RETURN_CTORW(&value);
+		RETURN_CTOR(&value);
 	}
 }
 
@@ -411,7 +411,7 @@ PHP_METHOD(Phalcon_Crypt, encryptBase64){
 		safe = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_CALL_METHODW(&encrypt_value, getThis(), "encrypt", text, key);
+	PHALCON_CALL_METHOD(&encrypt_value, getThis(), "encrypt", text, key);
 
 	phalcon_base64_encode(return_value, &encrypt_value);
 	if (zend_is_true(safe)) {
@@ -450,7 +450,7 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 
 	phalcon_base64_decode(&decrypt_value, &decrypt_text);
 
-	PHALCON_RETURN_CALL_METHODW(getThis(), "decrypt", &decrypt_value, key);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "decrypt", &decrypt_value, key);
 }
 
 /**
@@ -460,7 +460,7 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
  */
 PHP_METHOD(Phalcon_Crypt, getAvailableMethods){
 
-	PHALCON_RETURN_CALL_FUNCTIONW("openssl_get_cipher_methods");
+	PHALCON_RETURN_CALL_FUNCTION("openssl_get_cipher_methods");
 }
 
 /**
@@ -475,12 +475,12 @@ PHP_METHOD(Phalcon_Crypt, beforeEncrypt){
 	phalcon_fetch_params(0, 1, 0, &handler);
 	
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_crypt_exception_ce, "Handler must be an callable");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
 	
 	phalcon_update_property_zval(getThis(), SL("_beforeEncrypt"), handler);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -495,12 +495,12 @@ PHP_METHOD(Phalcon_Crypt, afterEncrypt){
 	phalcon_fetch_params(0, 1, 0, &handler);
 	
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_crypt_exception_ce, "Handler must be an callable");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
 	
 	phalcon_update_property_zval(getThis(), SL("_afterEncrypt"), handler);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Crypt, beforeDecrypt){
 	}
 	
 	phalcon_update_property_zval(getThis(), SL("_beforeDecrypt"), handler);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -535,10 +535,10 @@ PHP_METHOD(Phalcon_Crypt, afterDecrypt){
 	phalcon_fetch_params(0, 1, 0, &handler);
 	
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_crypt_exception_ce, "Handler must be an callable");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
 	
 	phalcon_update_property_zval(getThis(), SL("_afterDecrypt"), handler);
-	RETURN_THISW();
+	RETURN_THIS();
 }

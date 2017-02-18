@@ -8,7 +8,7 @@ namespace Phalcon\Flash {
 	 * Temporarily stores the messages in session, then messages can be printed in the next request
 	 */
 	
-	class Session extends \Phalcon\Flash implements \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface, \Phalcon\FlashInterface {
+	class Session extends \Phalcon\Flash implements \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface, \Phalcon\FlashInterface {
 
 		/**
 		 * Returns the messages stored in session

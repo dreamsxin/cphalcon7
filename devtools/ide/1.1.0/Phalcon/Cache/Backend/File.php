@@ -34,7 +34,7 @@ namespace Phalcon\Cache\Backend {
 	 *</code>
 	 */
 	
-	class File extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
+	class File extends \Phalcon\Cache\Backend implements \Phalcon\Cache\BackendInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Events\EventsAwareInterface {
 
 		/**
 		 * \Phalcon\Cache\Backend\File constructor

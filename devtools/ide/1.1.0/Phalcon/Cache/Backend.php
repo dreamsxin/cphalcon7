@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Phalcon\Cache {
 
@@ -7,8 +7,8 @@ namespace Phalcon\Cache {
 	 *
 	 * This class implements common functionality for backend adapters. A backend cache adapter may extend this class
 	 */
-	
-	abstract class Backend extends \Phalcon\DI\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\DI\InjectionAwareInterface, \Phalcon\Cache\BackendInterface {
+
+	abstract class Backend extends \Phalcon\Di\Injectable implements \Phalcon\Events\EventsAwareInterface, \Phalcon\Di\InjectionAwareInterface, \Phalcon\Cache\BackendInterface {
 
 		protected $_frontend;
 
@@ -81,22 +81,6 @@ namespace Phalcon\Cache {
 		 * @return boolean
 		 */
 		public function isStarted(){ }
-
-
-		/**
-		 * Sets the last key used in the cache
-		 *
-		 * @param string $lastKey
-		 */
-		public function setLastKey($lastKey){ }
-
-
-		/**
-		 * Gets the last key stored by the cache
-		 *
-		 * @return string
-		 */
-		public function getLastKey(){ }
 
 
 		/**

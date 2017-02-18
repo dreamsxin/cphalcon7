@@ -127,7 +127,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction){
 /**
  * Phalcon\Mvc\Model\Transaction constructor
  *
- * @param Phalcon\DIInterface $dependencyInjector
+ * @param Phalcon\DiInterface $dependencyInjector
  * @param boolean $autoBegin
  * @param string $service
  */
@@ -148,15 +148,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	}
 
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_mvc_model_transaction_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_transaction_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 
-	PHALCON_CALL_METHODW(&connection, dependency_injector, "get", &service);
+	PHALCON_CALL_METHOD(&connection, dependency_injector, "get", &service);
 
 	phalcon_update_property_zval(getThis(), SL("_connection"), &connection);
 	if (zend_is_true(auto_begin)) {
-		PHALCON_CALL_METHODW(NULL, &connection, "begin");
+		PHALCON_CALL_METHOD(NULL, &connection, "begin");
 	}
 }
 
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setTransactionManager){
 	zval *manager;
 
 	phalcon_fetch_params(0, 1, 0, &manager);
-	PHALCON_VERIFY_INTERFACE_EX(manager, phalcon_mvc_model_transaction_managerinterface_ce, phalcon_mvc_model_transaction_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(manager, phalcon_mvc_model_transaction_managerinterface_ce, phalcon_mvc_model_transaction_exception_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_manager"), manager);
 }
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, begin){
 	zval connection = {};
 
 	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&connection, "begin");
+	PHALCON_RETURN_CALL_METHOD(&connection, "begin");
 }
 
 /**
@@ -199,11 +199,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, commit){
 
 	phalcon_read_property(&manager, getThis(), SL("_manager"), PH_NOISY);
 	if (Z_TYPE(manager) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &manager, "notifycommit", getThis());
+		PHALCON_CALL_METHOD(NULL, &manager, "notifycommit", getThis());
 	}
 
 	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&connection, "commit");
+	PHALCON_RETURN_CALL_METHOD(&connection, "commit");
 }
 
 /**
@@ -237,16 +237,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 
 	phalcon_read_property(&manager, getThis(), SL("_manager"), PH_NOISY);
 	if (Z_TYPE(manager) == IS_OBJECT) {
-		PHALCON_CALL_METHODW(NULL, &manager, "notifyrollback", getThis());
+		PHALCON_CALL_METHOD(NULL, &manager, "notifyrollback", getThis());
 	}
 
 	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY);
 
-	PHALCON_CALL_METHODW(&success, &connection, "rollback");
+	PHALCON_CALL_METHOD(&success, &connection, "rollback");
 
 	if (zend_is_true(&success)) {
 		object_init_ex(&i0, phalcon_mvc_model_transaction_failed_ce);
-		PHALCON_CALL_METHODW(NULL, &i0, "__construct", &rollback_message, &rollback_record, rollback_code);
+		PHALCON_CALL_METHOD(NULL, &i0, "__construct", &rollback_message, &rollback_record, rollback_code);
 		phalcon_throw_exception(&i0);
 	}
 
@@ -267,13 +267,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 
 		if (PG(connection_status) & PHP_CONNECTION_ABORTED) {
 			ZVAL_STRING(&message, "The request was aborted");
-			PHALCON_CALL_METHODW(NULL, getThis(), "rollback", &message);
+			PHALCON_CALL_METHOD(NULL, getThis(), "rollback", &message);
 		}
 	}
 
 	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY);
 
-	RETURN_CTORW(&connection);
+	RETURN_CTOR(&connection);
 }
 
 /**
@@ -340,7 +340,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, isValid){
 	zval connection = {};
 
 	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY);
-	PHALCON_RETURN_CALL_METHODW(&connection, "isundertransaction");
+	PHALCON_RETURN_CALL_METHOD(&connection, "isundertransaction");
 }
 
 /**

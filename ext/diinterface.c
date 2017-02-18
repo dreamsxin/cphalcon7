@@ -26,15 +26,15 @@
 zend_class_entry *phalcon_diinterface_ce;
 
 static const zend_function_entry phalcon_diinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, set, arginfo_phalcon_diinterface_set)
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, remove, arginfo_phalcon_diinterface_remove)
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, get, arginfo_phalcon_diinterface_get)
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, getShared, arginfo_phalcon_diinterface_getshared)
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, setService, arginfo_phalcon_diinterface_setservice)
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, getService, arginfo_phalcon_diinterface_getservice)
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, has, arginfo_phalcon_diinterface_has)
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, wasFreshInstance, NULL)
-	PHP_ABSTRACT_ME(Phalcon_DIInterface, getServices, NULL)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, set, arginfo_phalcon_diinterface_set)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, remove, arginfo_phalcon_diinterface_remove)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, get, arginfo_phalcon_diinterface_get)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, getShared, arginfo_phalcon_diinterface_getshared)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, setService, arginfo_phalcon_diinterface_setservice)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, getService, arginfo_phalcon_diinterface_getservice)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, has, arginfo_phalcon_diinterface_has)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, wasFreshInstance, NULL)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, getServices, NULL)
 	ZEND_FENTRY(setDefault, NULL, arginfo_phalcon_diinterface_setdefault, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
 	ZEND_FENTRY(getDefault, NULL, NULL, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
 	ZEND_FENTRY(reset, NULL, NULL, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
@@ -43,11 +43,11 @@ static const zend_function_entry phalcon_diinterface_method_entry[] = {
 
 
 /**
- * Phalcon\DIInterface initializer
+ * Phalcon\DiInterface initializer
  */
-PHALCON_INIT_CLASS(Phalcon_DIInterface){
+PHALCON_INIT_CLASS(Phalcon_DiInterface){
 
-	PHALCON_REGISTER_INTERFACE_EX(Phalcon, DIInterface, diinterface, zend_ce_arrayaccess, phalcon_diinterface_method_entry);
+	PHALCON_REGISTER_INTERFACE_EX(Phalcon, DiInterface, diinterface, zend_ce_arrayaccess, phalcon_diinterface_method_entry);
 
 	return SUCCESS;
 }
@@ -58,16 +58,16 @@ PHALCON_INIT_CLASS(Phalcon_DIInterface){
  * @param string $name
  * @param mixed $definition
  * @param boolean $shared
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, set);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, set);
 
 /**
  * Removes a service from the service container
  *
  * @param string $name
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, remove);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, remove);
 
 /**
  * Resolves the service based on its configuration
@@ -77,7 +77,7 @@ PHALCON_DOC_METHOD(Phalcon_DIInterface, remove);
  * @param boolean $noError
  * @return object
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, get);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, get);
 
 /**
  * Resolves a shared service based on their configuration
@@ -87,24 +87,24 @@ PHALCON_DOC_METHOD(Phalcon_DIInterface, get);
  * @param boolean $noError
  * @return object
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, getShared);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, getShared);
 
 /**
- * Sets a service using a raw Phalcon\DI\Service definition
+ * Sets a service using a raw Phalcon\Di\Service definition
  *
  * @param string $name
- * @param Phalcon\DI\ServiceInterface $rawDefinition
- * @return Phalcon\DI\ServiceInterface
+ * @param Phalcon\Di\ServiceInterface $rawDefinition
+ * @return Phalcon\Di\ServiceInterface
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, setService);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, setService);
 
 /**
  * Returns the corresponding Phalcon\Di\Service instance for a service
  *
  * @param string $name
- * @return Phalcon\DI\ServiceInterface
+ * @return Phalcon\Di\ServiceInterface
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, getService);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, getService);
 
 /**
  * Check whether the DI contains a service by a name
@@ -112,37 +112,37 @@ PHALCON_DOC_METHOD(Phalcon_DIInterface, getService);
  * @param string $name
  * @return boolean
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, has);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, has);
 
 /**
  * Check whether the last service obtained via getShared produced a fresh instance or an existing one
  *
  * @return boolean
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, wasFreshInstance);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, wasFreshInstance);
 
 /**
  * Return the services registered in the DI
  *
  * @return array
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, getServices);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, getServices);
 
 /**
  * Set the default dependency injection container to be obtained into static methods
  *
- * @param Phalcon_DIInterface $dependencyInjector
+ * @param Phalcon_DiInterface $dependencyInjector
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, setDefault);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, setDefault);
 
 /**
  * Return the last DI created
  *
- * @return Phalcon_DIInterface
+ * @return Phalcon_DiInterface
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, getDefault);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, getDefault);
 
 /**
  * Resets the internal default DI
  */
-PHALCON_DOC_METHOD(Phalcon_DIInterface, reset);
+PHALCON_DOC_METHOD(Phalcon_DiInterface, reset);

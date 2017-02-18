@@ -120,22 +120,22 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 	phalcon_fetch_params(0, 1, 0, &config);
 
 	if (!phalcon_array_isset_fetch_str(&builder, config, SL("builder"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'builder' is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'builder' is required");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(&builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(&builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_builder"), &builder);
 
 	if (!phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
 		return;
 	}
 
 	i_limit = phalcon_get_intval(&limit);
 	if (i_limit < 1) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "'limit' should be positive");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "'limit' should be positive");
 		return;
 	}
 
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setCurrentPage){
 	PHALCON_ENSURE_IS_LONG(current_page);
 
 	phalcon_update_property_zval(getThis(), SL("_page"), current_page);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setLimit){
 	PHALCON_ENSURE_IS_LONG(current_limit);
 
 	phalcon_update_property_zval(getThis(), SL("_limitRows"), current_limit);
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -212,11 +212,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setQueryBuilder){
 	zval *query_builder;
 
 	phalcon_fetch_params(0, 1, 0, &query_builder);
-	PHALCON_VERIFY_INTERFACE_EX(query_builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce, 0);
+	PHALCON_VERIFY_INTERFACE_EX(query_builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce);
 
 	phalcon_update_property_zval(getThis(), SL("_builder"), query_builder);
 
-	RETURN_THISW();
+	RETURN_THIS();
 }
 
 /**
@@ -276,41 +276,41 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	/* Set the limit clause avoiding negative offsets */
 	if (i_number < i_limit) {
-		PHALCON_CALL_METHODW(NULL, &builder, "limit", &limit);
+		PHALCON_CALL_METHOD(NULL, &builder, "limit", &limit);
 	} else {
 		ZVAL_LONG(&number, i_number);
-		PHALCON_CALL_METHODW(NULL, &builder, "limit", &limit, &number);
+		PHALCON_CALL_METHOD(NULL, &builder, "limit", &limit, &number);
 	}
 
-	PHALCON_CALL_METHODW(&query, &builder, "getquery");
+	PHALCON_CALL_METHOD(&query, &builder, "getquery");
 
 	/* Execute the query an return the requested slice of data */
-	PHALCON_CALL_METHODW(&items, &query, "execute");
+	PHALCON_CALL_METHOD(&items, &query, "execute");
 
 	/* Remove the 'ORDER BY' clause, PostgreSQL requires this */
-	PHALCON_CALL_METHODW(NULL, &total_builder, "orderby", &PHALCON_GLOBAL(z_null));
+	PHALCON_CALL_METHOD(NULL, &total_builder, "orderby", &PHALCON_GLOBAL(z_null));
 
 	/* Obtain the PHQL for the total query */
-	PHALCON_CALL_METHODW(&total_query, &total_builder, "getquery");
+	PHALCON_CALL_METHOD(&total_query, &total_builder, "getquery");
 
-	PHALCON_CALL_METHODW(&dependency_injector, &total_query, "getdi");
+	PHALCON_CALL_METHOD(&dependency_injector, &total_query, "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "A dependency injection object is required to access internal services");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "A dependency injection object is required to access internal services");
 		return;
 	}
 
 	/* Get the connection through the model */
 	ZVAL_STRING(&service_name, ISV(modelsManager));
 
-	PHALCON_CALL_METHODW(&models_manager, &dependency_injector, "getshared", &service_name);
+	PHALCON_CALL_METHOD(&models_manager, &dependency_injector, "getshared", &service_name);
 	if (Z_TYPE(models_manager) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STRW(phalcon_paginator_exception_ce, "The injected service 'modelsManager' is not object");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "The injected service 'modelsManager' is not object");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACEW(&models_manager, phalcon_mvc_model_managerinterface_ce);
+	PHALCON_VERIFY_INTERFACE(&models_manager, phalcon_mvc_model_managerinterface_ce);
 
-	PHALCON_CALL_METHODW(&models, &builder, "getfrom");
+	PHALCON_CALL_METHOD(&models, &builder, "getfrom");
 
 	if (Z_TYPE(models) == IS_ARRAY) {
 		phalcon_array_get_current(&model_name, &models);
@@ -318,9 +318,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		PHALCON_CPY_WRT_CTOR(&model_name, &models);
 	}
 
-	PHALCON_CALL_METHODW(&model, &models_manager, "load", &model_name);
-	PHALCON_CALL_METHODW(&connection, &model, "getreadconnection");
-	PHALCON_CALL_METHODW(&intermediate, &total_query, "parse");
+	PHALCON_CALL_METHOD(&model, &models_manager, "load", &model_name);
+	PHALCON_CALL_METHOD(&connection, &model, "getreadconnection");
+	PHALCON_CALL_METHOD(&intermediate, &total_query, "parse");
 
 	phalcon_array_fetch_string(&columns, &intermediate, IS(columns), PH_NOISY);
 
@@ -341,11 +341,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	PHALCON_CALL_METHODW(&dialect, &connection, "getdialect");
-	PHALCON_CALL_METHODW(&sql_select, &dialect, "select", &intermediate);
+	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
+	PHALCON_CALL_METHOD(&sql_select, &dialect, "select", &intermediate);
 
-	PHALCON_CALL_METHODW(&bind_params, &total_query, "getbindparams");
-	PHALCON_CALL_METHODW(&bind_types, &total_query, "getbindtypes");
+	PHALCON_CALL_METHOD(&bind_params, &total_query, "getbindparams");
+	PHALCON_CALL_METHOD(&bind_types, &total_query, "getbindtypes");
 
 	PHALCON_CONCAT_SVS(&sql, "SELECT COUNT(*) \"rowcount\" FROM (", &sql_select, ") AS T");
 
@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	/**
 	 * Replace the bind Types
 	 */
-	if (Z_TYPE(bind_types) == IS_ARRAY) { 
+	if (Z_TYPE(bind_types) == IS_ARRAY) {
 		array_init(&processed_types);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_types), idx, str_key, value) {
@@ -409,8 +409,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		PHALCON_CPY_WRT(&processed_types, &bind_types);
 	}
 
-	PHALCON_CALL_METHODW(&result, &connection, "query", &sql, &processed, &processed_types);
-	PHALCON_CALL_METHODW(&row, &result, "fetch");
+	PHALCON_CALL_METHOD(&result, &connection, "query", &sql, &processed, &processed_types);
+	PHALCON_CALL_METHOD(&row, &result, "fetch");
 
 	phalcon_array_fetch_str(&rowcount, &row, SL("rowcount"), PH_NOISY);
 
@@ -429,5 +429,5 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	phalcon_update_property_long(&paginate, SL("total_pages"), i_total_pages);
 	phalcon_update_property_long(&paginate, SL("total_items"), i_rowcount);
 
-	RETURN_CTORW(&paginate);
+	RETURN_CTOR(&paginate);
 }

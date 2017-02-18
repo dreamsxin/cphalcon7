@@ -10,7 +10,7 @@ class Module implements \Phalcon\Mvc\ModuleDefinitionInterface
 
 	}
 
-	public function registerServices($di)
+	public function registerServices(\Phalcon\DiInterface $di)
 	{
 		$di->set('view', function() {
 			$view = new \Phalcon\Mvc\View();

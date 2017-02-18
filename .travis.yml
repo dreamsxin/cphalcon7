@@ -70,7 +70,7 @@ before_script:
   - (cd deps/libuv && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
   - (cd deps/mongo-c-driver/src/libbson && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
   - (cd deps/mongo-c-driver && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
-  - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --enable-chart=yes --enable-qrencode=yes --enable-process=yes --enable-intrusive=yes --enable-cache-memory=yes && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/20-phalcon.ini)
+  - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --enable-chart=yes --enable-qrcode=yes --enable-process=yes --enable-intrusive=yes --enable-cache-shmemory=yes --enable-storage-btree=yes && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/20-phalcon.ini)
   - ulimit -c unlimited -S || true
   - echo '/tmp/core_%e.%p' | sudo tee /proc/sys/kernel/core_pattern &> /dev/null
 

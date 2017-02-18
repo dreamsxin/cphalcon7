@@ -34,15 +34,15 @@
 #include "kernel/fcall.h"
 
 /**
- * Phalcon\CLI\Router
+ * Phalcon\Cli\Router
  *
- * <p>Phalcon\CLI\Router is the standard framework router. Routing is the
+ * <p>Phalcon\Cli\Router is the standard framework router. Routing is the
  * process of taking a command-line arguments and
  * decomposing it into parameters to determine which module, task, and
  * action of that task should receive the request</p>
  *
  *<code>
- *	$router = new Phalcon\CLI\Router();
+ *	$router = new Phalcon\Cli\Router();
  *	$router->handle(array(
  *		'module' => 'main',
  *		'task' => 'videos',
@@ -54,17 +54,17 @@
  */
 zend_class_entry *phalcon_cli_router_ce;
 
-PHP_METHOD(Phalcon_CLI_Router, __construct);
-PHP_METHOD(Phalcon_CLI_Router, setDefaultModule);
-PHP_METHOD(Phalcon_CLI_Router, setDefaultNamespace);
-PHP_METHOD(Phalcon_CLI_Router, setDefaultTask);
-PHP_METHOD(Phalcon_CLI_Router, setDefaultAction);
-PHP_METHOD(Phalcon_CLI_Router, handle);
-PHP_METHOD(Phalcon_CLI_Router, getModuleName);
-PHP_METHOD(Phalcon_CLI_Router, getNamespaceName);
-PHP_METHOD(Phalcon_CLI_Router, getTaskName);
-PHP_METHOD(Phalcon_CLI_Router, getActionName);
-PHP_METHOD(Phalcon_CLI_Router, getParams);
+PHP_METHOD(Phalcon_Cli_Router, __construct);
+PHP_METHOD(Phalcon_Cli_Router, setDefaultModule);
+PHP_METHOD(Phalcon_Cli_Router, setDefaultNamespace);
+PHP_METHOD(Phalcon_Cli_Router, setDefaultTask);
+PHP_METHOD(Phalcon_Cli_Router, setDefaultAction);
+PHP_METHOD(Phalcon_Cli_Router, handle);
+PHP_METHOD(Phalcon_Cli_Router, getModuleName);
+PHP_METHOD(Phalcon_Cli_Router, getNamespaceName);
+PHP_METHOD(Phalcon_Cli_Router, getTaskName);
+PHP_METHOD(Phalcon_Cli_Router, getActionName);
+PHP_METHOD(Phalcon_Cli_Router, getParams);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_router_setdi, 0, 0, 1)
 	ZEND_ARG_INFO(0, dependencyInjector)
@@ -91,26 +91,26 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_router_handle, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_router_method_entry[] = {
-	PHP_ME(Phalcon_CLI_Router, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_CLI_Router, setDefaultModule, arginfo_phalcon_cli_router_setdefaultmodule, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, setDefaultNamespace, arginfo_phalcon_cli_router_setdefaultnamespace, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, setDefaultTask, arginfo_phalcon_cli_router_setdefaulttask, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, setDefaultAction, arginfo_phalcon_cli_router_setdefaultaction, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, handle, arginfo_phalcon_cli_router_handle, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, getNamespaceName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, getModuleName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, getTaskName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, getActionName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Router, getParams, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Cli_Router, setDefaultModule, arginfo_phalcon_cli_router_setdefaultmodule, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, setDefaultNamespace, arginfo_phalcon_cli_router_setdefaultnamespace, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, setDefaultTask, arginfo_phalcon_cli_router_setdefaulttask, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, setDefaultAction, arginfo_phalcon_cli_router_setdefaultaction, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, handle, arginfo_phalcon_cli_router_handle, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, getNamespaceName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, getModuleName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, getTaskName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, getActionName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, getParams, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\CLI\Router initializer
+ * Phalcon\Cli\Router initializer
  */
-PHALCON_INIT_CLASS(Phalcon_CLI_Router){
+PHALCON_INIT_CLASS(Phalcon_Cli_Router){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Router, cli_router, phalcon_di_injectable_ce, phalcon_cli_router_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cli, Router, cli_router, phalcon_di_injectable_ce, phalcon_cli_router_method_entry, 0);
 
 	zend_declare_property_null(phalcon_cli_router_ce, SL("_namespace"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_router_ce, SL("_module"), ZEND_ACC_PROTECTED);
@@ -127,9 +127,9 @@ PHALCON_INIT_CLASS(Phalcon_CLI_Router){
 }
 
 /**
- * Phalcon\CLI\Router constructor
+ * Phalcon\Cli\Router constructor
  */
-PHP_METHOD(Phalcon_CLI_Router, __construct){
+PHP_METHOD(Phalcon_Cli_Router, __construct){
 
 	phalcon_update_property_empty_array(getThis(), SL("_params"));
 	phalcon_update_property_empty_array(getThis(), SL("_defaultParams"));
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_CLI_Router, __construct){
  *
  * @param string $moduleName
  */
-PHP_METHOD(Phalcon_CLI_Router, setDefaultModule){
+PHP_METHOD(Phalcon_Cli_Router, setDefaultModule){
 
 	zval *module_name;
 
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultModule){
  *
  * @param string $namespaceName
  */
-PHP_METHOD(Phalcon_CLI_Router, setDefaultNamespace){
+PHP_METHOD(Phalcon_Cli_Router, setDefaultNamespace){
 
 	zval *namespace_name;
 
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultNamespace){
  *
  * @param string $taskName
  */
-PHP_METHOD(Phalcon_CLI_Router, setDefaultTask){
+PHP_METHOD(Phalcon_Cli_Router, setDefaultTask){
 
 	zval *task_name;
 
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultTask){
  *
  * @param string $actionName
  */
-PHP_METHOD(Phalcon_CLI_Router, setDefaultAction){
+PHP_METHOD(Phalcon_Cli_Router, setDefaultAction){
 
 	zval *action_name;
 
@@ -200,7 +200,7 @@ PHP_METHOD(Phalcon_CLI_Router, setDefaultAction){
  *
  * @param array $arguments
  */
-PHP_METHOD(Phalcon_CLI_Router, handle){
+PHP_METHOD(Phalcon_Cli_Router, handle){
 
 	zval *arguments = NULL, longopts = {}, options = {}, module_name = {}, namespace_name = {}, task_name = {}, action_name = {};
 
@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_CLI_Router, handle){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_CLI_Router, getModuleName){
+PHP_METHOD(Phalcon_Cli_Router, getModuleName){
 
 
 	RETURN_MEMBER(getThis(), "_module");
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_CLI_Router, getModuleName){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_CLI_Router, getNamespaceName){
+PHP_METHOD(Phalcon_Cli_Router, getNamespaceName){
 
 
 	RETURN_MEMBER(getThis(), "_namespace");
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_CLI_Router, getNamespaceName){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_CLI_Router, getTaskName){
+PHP_METHOD(Phalcon_Cli_Router, getTaskName){
 
 
 	RETURN_MEMBER(getThis(), "_task");
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_CLI_Router, getTaskName){
  *
  * @return string
  */
-PHP_METHOD(Phalcon_CLI_Router, getActionName){
+PHP_METHOD(Phalcon_Cli_Router, getActionName){
 
 
 	RETURN_MEMBER(getThis(), "_action");
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_CLI_Router, getActionName){
  *
  * @return array
  */
-PHP_METHOD(Phalcon_CLI_Router, getParams){
+PHP_METHOD(Phalcon_Cli_Router, getParams){
 
 
 	RETURN_MEMBER(getThis(), "_params");

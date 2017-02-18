@@ -32,7 +32,7 @@
 #include "interned-strings.h"
 
 /**
- * Phalcon\Di\FactoryDefault\CLI
+ * Phalcon\Di\FactoryDefault\Cli
  *
  * This is a variant of the standard Phalcon\Di. By default it automatically
  * registers all the services provided by the framework.
@@ -41,27 +41,27 @@
  */
 zend_class_entry *phalcon_di_factorydefault_cli_ce;
 
-PHP_METHOD(Phalcon_Di_FactoryDefault_CLI, __construct);
+PHP_METHOD(Phalcon_Di_FactoryDefault_Cli, __construct);
 
 static const zend_function_entry phalcon_di_factorydefault_cli_method_entry[] = {
-	PHP_ME(Phalcon_Di_FactoryDefault_CLI, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Di_FactoryDefault_Cli, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Di\FactoryDefault\CLI initializer
+ * Phalcon\Di\FactoryDefault\Cli initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Di_FactoryDefault_CLI){
+PHALCON_INIT_CLASS(Phalcon_Di_FactoryDefault_Cli){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Di\\FactoryDefault, CLI, di_factorydefault_cli, phalcon_di_factorydefault_ce, phalcon_di_factorydefault_cli_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Di\\FactoryDefault, Cli, di_factorydefault_cli, phalcon_di_factorydefault_ce, phalcon_di_factorydefault_cli_method_entry, 0);
 
 	return SUCCESS;
 }
 
 /**
- * Phalcon\Di\FactoryDefault\CLI constructor
+ * Phalcon\Di\FactoryDefault\Cli constructor
  */
-PHP_METHOD(Phalcon_Di_FactoryDefault_CLI, __construct){
+PHP_METHOD(Phalcon_Di_FactoryDefault_Cli, __construct){
 
 	zval *shared, name = {}, definition = {};
 
@@ -70,10 +70,10 @@ PHP_METHOD(Phalcon_Di_FactoryDefault_CLI, __construct){
 	shared = &PHALCON_GLOBAL(z_true);
 
 	ZVAL_STRING(&name, ISV(router));
-	ZVAL_STRING(&definition, "Phalcon\\CLI\\Router");
+	ZVAL_STRING(&definition, "Phalcon\\Cli\\Router");
 	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
 
 	ZVAL_STRING(&name, ISV(dispatcher));
-	ZVAL_STRING(&definition, "Phalcon\\CLI\\Dispatcher");
+	ZVAL_STRING(&definition, "Phalcon\\Cli\\Dispatcher");
 	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
 }

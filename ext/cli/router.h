@@ -25,6 +25,6 @@
 
 extern zend_class_entry *phalcon_cli_router_ce;
 
-PHALCON_INIT_CLASS(Phalcon_CLI_Router);
+PHALCON_INIT_CLASS(Phalcon_Cli_Router);
 
 #endif /* PHALCON_CLI_ROUTER_H */

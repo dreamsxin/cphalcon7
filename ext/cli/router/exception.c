@@ -23,19 +23,19 @@
 #include "kernel/main.h"
 
 /**
- * Phalcon\CLI\Router\Exception
+ * Phalcon\Cli\Router\Exception
  *
- * Exceptions thrown in Phalcon\CLI\Router will use this class
+ * Exceptions thrown in Phalcon\Cli\Router will use this class
  *
  */
 zend_class_entry *phalcon_cli_router_exception_ce;
 
 /**
- * Phalcon\CLI\Router\Exception initializer
+ * Phalcon\Cli\Router\Exception initializer
  */
-PHALCON_INIT_CLASS(Phalcon_CLI_Router_Exception){
+PHALCON_INIT_CLASS(Phalcon_Cli_Router_Exception){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI\\Router, Exception, cli_router_exception, phalcon_exception_ce, NULL, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cli\\Router, Exception, cli_router_exception, phalcon_exception_ce, NULL, 0);
 
 	return SUCCESS;
 }

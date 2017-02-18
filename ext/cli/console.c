@@ -41,16 +41,16 @@
 #include "interned-strings.h"
 
 /**
- * Phalcon\CLI\Console
+ * Phalcon\Cli\Console
  *
  * This component allows to create CLI applications using Phalcon
  */
 zend_class_entry *phalcon_cli_console_ce;
 
-PHP_METHOD(Phalcon_CLI_Console, __construct);
-PHP_METHOD(Phalcon_CLI_Console, addModules);
-PHP_METHOD(Phalcon_CLI_Console, getModules);
-PHP_METHOD(Phalcon_CLI_Console, handle);
+PHP_METHOD(Phalcon_Cli_Console, __construct);
+PHP_METHOD(Phalcon_Cli_Console, addModules);
+PHP_METHOD(Phalcon_Cli_Console, getModules);
+PHP_METHOD(Phalcon_Cli_Console, handle);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_console___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, dependencyInjector)
@@ -65,18 +65,18 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_console_handle, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_console_method_entry[] = {
-	PHP_ME(Phalcon_CLI_Console, __construct, arginfo_phalcon_cli_console___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_CLI_Console, addModules, arginfo_phalcon_cli_console_addmodules, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_CLI_Console, handle, arginfo_phalcon_cli_console_handle, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Console, __construct, arginfo_phalcon_cli_console___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Cli_Console, addModules, arginfo_phalcon_cli_console_addmodules, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Console, handle, arginfo_phalcon_cli_console_handle, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\CLI\Console initializer
+ * Phalcon\Cli\Console initializer
  */
-PHALCON_INIT_CLASS(Phalcon_CLI_Console){
+PHALCON_INIT_CLASS(Phalcon_Cli_Console){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\CLI, Console, cli_console, phalcon_application_ce, phalcon_cli_console_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cli, Console, cli_console, phalcon_application_ce, phalcon_cli_console_method_entry, 0);
 
 	zend_declare_property_null(phalcon_cli_console_ce, SL("_modules"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_console_ce, SL("_moduleObject"), ZEND_ACC_PROTECTED);
@@ -85,9 +85,9 @@ PHALCON_INIT_CLASS(Phalcon_CLI_Console){
 }
 
 /**
- * Phalcon\CLI\Console constructor
+ * Phalcon\Cli\Console constructor
  */
-PHP_METHOD(Phalcon_CLI_Console, __construct){
+PHP_METHOD(Phalcon_Cli_Console, __construct){
 
 	zval *dependency_injector = NULL;
 
@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_CLI_Console, __construct){
  *
  * @param array $modules
  */
-PHP_METHOD(Phalcon_CLI_Console, addModules){
+PHP_METHOD(Phalcon_Cli_Console, addModules){
 
 	zval *modules;
 
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_CLI_Console, addModules){
  * @param array $arguments
  * @return mixed
  */
-PHP_METHOD(Phalcon_CLI_Console, handle){
+PHP_METHOD(Phalcon_Cli_Console, handle){
 
 	zval *_arguments = NULL, arguments = {}, dependency_injector = {}, events_manager = {}, event_name = {}, service = {}, router = {}, module_name = {};
 	zval status = {}, modules = {}, exception_msg = {}, module = {}, path = {}, class_name = {}, module_object = {};

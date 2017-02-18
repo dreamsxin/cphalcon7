@@ -90,8 +90,10 @@ Custom php path:
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-process=yes
 # enable intrusive
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-intrusive=yes
-# enable intrusive
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-cache-memory=yes
+# enable shared memory cache
+./configure --with-php-config=/usr/local/php/bin/php-config --enable-cache-shmemory=yes
+# enable storage btree
+./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-btree=yes
 make -j4
 sudo make install
 ```

@@ -168,6 +168,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 #ifdef PHALCON_PROCESS
 	PHALCON_INIT(Phalcon_Process_Exception);
 #endif
+#ifdef PHALCON_STORAGE_BTREE
+	PHALCON_INIT(Phalcon_Storage_Exception);
+#endif
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
@@ -525,6 +528,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 #ifdef PHALCON_INTRUSIVE
 	PHALCON_INIT(Phalcon_Intrusive_Avltree);
 	PHALCON_INIT(Phalcon_Intrusive_Avltree_Node);
+#endif
+
+#ifdef PHALCON_STORAGE_BTREE
+	PHALCON_INIT(Phalcon_Storage_Btree);
 #endif
 	return SUCCESS;
 }

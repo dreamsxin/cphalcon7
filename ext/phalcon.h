@@ -425,4 +425,7 @@
 #include "process/proc.h"
 #include "process/exception.h"
 
+#include "storage/btree.h"
+#include "storage/exception.h"
+
 #endif /* PHALCON_H */

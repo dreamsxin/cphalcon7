@@ -2,7 +2,7 @@ PHP_ARG_ENABLE(phalcon, whether to enable phalcon7 framework,
 [  --enable-phalcon        Enable phalcon7 framework])
 
 PHP_ARG_ENABLE(phalcon-debug, for phalcon7 debug support,
-[ --enable-phalcon-debug       Enable enable phalcon7 debug support], no, no)
+[  --enable-phalcon-debug  Enable enable phalcon7 debug support], no, no)
 
 if test "$PHP_PHALCON_DEBUG" != "no"; then
     CFLAGS="$CFLAGS -Wall -g3 -ggdb -O0 -DPHALCON_DEBUG=1"
@@ -22,7 +22,7 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(chart, whether to enable chart support,
+PHP_ARG_ENABLE(chart, whether to enable chart support,
 [  --enable-chart   Enable chart support], no, no)
 
 AC_MSG_CHECKING([Include chart])
@@ -49,7 +49,7 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(intrusive, whether to enable intrusive support,
+PHP_ARG_ENABLE(intrusive, whether to enable intrusive support,
 [  --enable-intrusive   Enable intrusive support], no, no)
 
 AC_MSG_CHECKING([Include intrusive])
@@ -60,7 +60,7 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(cache-shmemory, whether to enable cache shared memory support,
+PHP_ARG_ENABLE(cache-shmemory, whether to enable cache shared memory support,
 [  --enable-cache-shmemory   Enable cache shared memory support], no, no)
 
 AC_MSG_CHECKING([Include cache-shmemory])
@@ -71,7 +71,7 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(process, whether to enable process support,
+PHP_ARG_ENABLE(process, whether to enable process support,
 [  --enable-process   Enable process support], no, no)
 
 AC_MSG_CHECKING([Include process])
@@ -82,7 +82,7 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(socket, whether to enable socket support,
+PHP_ARG_ENABLE(socket, whether to enable socket support,
 [  --enable-socket   Enable socket support], no, no)
 
 AC_MSG_CHECKING([Include socket])
@@ -93,7 +93,7 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_WITH(websocket, whether to enable websocket support,
+PHP_ARG_ENABLE(websocket, whether to enable websocket support,
 [  --enable-websocket   Enable websocket support], no, no)
 
 if test "$PHP_SOCKET" = "yes"; then
@@ -104,6 +104,16 @@ if test "$PHP_SOCKET" = "yes"; then
 	else
 		AC_MSG_RESULT([no])
 	fi
+fi
+
+PHP_ARG_ENABLE(storage-btree, whether to enable storage btree support,
+[  --enable-storage-btree   Enable storage btree support], no, no)
+
+if test "$PHP_STORAGE_BTREE" = "yes"; then
+	AC_DEFINE([PHALCON_STORAGE_BTREE], [1], [Whether storage btree are available])
+	AC_MSG_RESULT([yes, storage btree])
+else
+	AC_MSG_RESULT([no])
 fi
 
 dnl copied from Zend Optimizer Plus
@@ -686,6 +696,10 @@ async.c"
 
 	if test "$PHP_PROCESS" = "yes"; then
 		phalcon_sources="$phalcon_sources process/system.c process/sharedmemory.c process/proc.c process/exception.c"
+	fi
+
+	if test "$PHP_STORAGE_BTREE" = "yes"; then
+		phalcon_sources="$phalcon_sources storage/btree/bplus.c storage/btree/pages.c storage/btree/utils.c storage/btree/values.c storage/btree/writer.c storage/btree.c storage/exception.c"
 	fi
 
 	old_CPPFLAGS=$CPPFLAGS

@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 
 			PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
 
-			ZVAL_STRING(&key, "Content-Length");		
+			ZVAL_STRING(&key, "Content-Length");
 			ZVAL_LONG(&key_value, Z_STRLEN_P(&body));
 
 			PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
@@ -316,16 +316,21 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		PHALCON_CALL_METHOD(NULL, &response, "setstatuscode", &httpcode);
 	}
 
-	if ((constant = zend_get_constant_str(SL("CURLINFO_HEADER_SIZE"))) != NULL) {
-		PHALCON_CALL_FUNCTION(&headersize, "curl_getinfo", &curl, constant);
+	if (Z_TYPE(content) == IS_STRING) {
+		if ((constant = zend_get_constant_str(SL("CURLINFO_HEADER_SIZE"))) != NULL) {
+			PHALCON_CALL_FUNCTION(&headersize, "curl_getinfo", &curl, constant);
 
-		phalcon_substr(&headerstr, &content, 0 , Z_LVAL(headersize));
-		phalcon_substr(&bodystr, &content, Z_LVAL(headersize) , Z_STRLEN(content) - Z_LVAL(headersize));
+			if (Z_LVAL(headersize) > 0 ) {
+				phalcon_substr(&headerstr, &content, 0 , Z_LVAL(headersize));
+				phalcon_substr(&bodystr, &content, Z_LVAL(headersize) , Z_STRLEN(content) - Z_LVAL(headersize));
 
-		PHALCON_CALL_METHOD(NULL, &response, "setheader", &headerstr);
-		PHALCON_CALL_METHOD(NULL, &response, "setbody", &bodystr);
+				PHALCON_CALL_METHOD(NULL, &response, "setheader", &headerstr);
+				PHALCON_CALL_METHOD(NULL, &response, "setbody", &bodystr);
+			} else {
+				PHALCON_CALL_METHOD(NULL, &response, "setbody", &content);
+			}
+		}
 	}
 
 	RETURN_CTOR(&response);
 }
-

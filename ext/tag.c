@@ -377,7 +377,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 		uint size;
 	};
 
-	static const struct str_size_t order[11] = {
+	static const struct str_size_t order[12] = {
 		{ SL("type") },
 		{ SL("for") },
 		{ SL("src") },
@@ -389,6 +389,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 		{ SL("class") },
 		{ SL("method") },
 		{ SL("enctype") },
+		{ SL("placeholder") },
 	};
 
 	assert(Z_TYPE_P(attributes) == IS_ARRAY);

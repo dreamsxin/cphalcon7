@@ -230,8 +230,12 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 		 */
 		PHALCON_CALL_METHOD(&option, resultset, "current");
 		if (Z_TYPE_P(using) == IS_ARRAY) {
-			phalcon_array_fetch_long(&using_zero, using, 0, PH_NOISY);
-			phalcon_array_fetch_long(&using_one, using, 1, PH_NOISY);
+			if (!phalcon_array_isset_fetch_long(&using_zero, using, 0)) {
+				ZVAL_STRING(&using_zero, "id");
+			}
+			if (!phalcon_array_isset_fetch_long(&using_one, using, 1)) {
+				PHALCON_CPY_WRT(&using_one, &using_zero);
+			}
 			if (Z_TYPE(option) == IS_OBJECT) {
 				if (phalcon_method_exists_ex(&option, SL("readattribute")) == SUCCESS) {
 					/**

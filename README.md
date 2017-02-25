@@ -94,6 +94,8 @@ Custom php path:
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-cache-shmemory=yes
 # enable storage btree
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-btree=yes
+# enable storage wiredtiger
+./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-wiredtiger=yes
 make -j4
 sudo make install
 ```

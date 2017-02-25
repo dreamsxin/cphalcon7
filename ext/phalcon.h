@@ -426,6 +426,8 @@
 #include "process/exception.h"
 
 #include "storage/btree.h"
+#include "storage/wiredtiger.h"
+#include "storage/wiredtiger/cursor.h"
 #include "storage/exception.h"
 
 #endif /* PHALCON_H */

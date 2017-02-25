@@ -43,8 +43,6 @@ PHP_METHOD(Phalcon_Storage_Btree, __construct);
 PHP_METHOD(Phalcon_Storage_Btree, set);
 PHP_METHOD(Phalcon_Storage_Btree, get);
 PHP_METHOD(Phalcon_Storage_Btree, delete);
-PHP_METHOD(Phalcon_Storage_Btree, __set);
-PHP_METHOD(Phalcon_Storage_Btree, __get);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_btree___construct, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, db, IS_STRING, 0)

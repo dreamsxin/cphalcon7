@@ -34,6 +34,7 @@ class StorageWiredtigerTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($cursor->set("key2", "value2"));
 		$this->assertEquals($cursor->get("key1"), "value1");
 		$this->assertEquals($cursor->get("key2"), "value2");
+		$this->assertEquals($cursor->gets(array("key1", "key2")), array("value1", "value2"));
 		$this->assertTrue($cursor->delete("key1"));
 		$this->assertEquals($cursor->get("key1"), NULL);
 		foreach ($cursor as $key => $val) {

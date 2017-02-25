@@ -47,7 +47,9 @@ zend_class_entry *phalcon_storage_wiredtiger_cursor_ce;
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, __construct);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, reconfigure);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, set);
+PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, sets);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, get);
+PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, gets);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, delete);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, current);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, key);
@@ -72,8 +74,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_wiredtiger_cursor_set, 0, 0, 2)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_wiredtiger_cursor_sets, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_wiredtiger_cursor_get, 0, 0, 1)
 	ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_wiredtiger_cursor_gets, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, keys, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_wiredtiger_cursor_delete, 0, 0, 1)
@@ -84,7 +94,9 @@ static const zend_function_entry phalcon_storage_wiredtiger_cursor_method_entry[
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, __construct, arginfo_phalcon_storage_wiredtiger_cursor___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, reconfigure, arginfo_phalcon_storage_wiredtiger_cursor_reconfigure, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, set, arginfo_phalcon_storage_wiredtiger_cursor_set, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, sets, arginfo_phalcon_storage_wiredtiger_cursor_sets, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, get, arginfo_phalcon_storage_wiredtiger_cursor_get, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, gets, arginfo_phalcon_storage_wiredtiger_cursor_gets, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, delete, arginfo_phalcon_storage_wiredtiger_cursor_delete, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, current, arginfo_iterator_current, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, key, arginfo_iterator_key, ZEND_ACC_PUBLIC)
@@ -120,15 +132,13 @@ zend_object* phalcon_storage_wiredtiger_cursor_object_create_handler(zend_class_
 
 void phalcon_storage_wiredtiger_cursor_object_free_handler(zend_object *object)
 {
-	phalcon_storage_wiredtiger_cursor_object *intern = phalcon_storage_wiredtiger_cursor_object_from_obj(object);
 /*
+	phalcon_storage_wiredtiger_cursor_object *intern = phalcon_storage_wiredtiger_cursor_object_from_obj(object);
 	if (intern->cursor) {
 		intern->cursor->close(intern->cursor);
 	}
+	zval_ptr_dtor(&intern->db);
 */
-	if (intern->db) {
-		zval_ptr_dtor(intern->db);
-	}
 }
 
 /**
@@ -172,6 +182,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, __construct)
 
 	db_intern = phalcon_storage_wiredtiger_object_from_obj(Z_OBJ_P(db));
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	intern->db = Z_OBJ_P(db);
 
 	ret = db_intern->session->open_cursor(db_intern->session, Z_STRVAL_P(uri), NULL, Z_STRVAL(config), &intern->cursor);
 	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
@@ -234,7 +245,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, set)
 		autoindex = 1;
 	} else {
 		ret = phalcon_storage_wiredtiger_pack_key(intern, &pk, key);
-		if (ret != 0) {
+		if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 			phalcon_storage_wiredtiger_pack_item_free(&pk);
 			PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Error pack key");
 			return;
@@ -249,7 +260,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, set)
 	/* Set value */
 	ret = phalcon_storage_wiredtiger_pack_value(intern, &pv, value);
 
-	if (ret != 0) {
+	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 		phalcon_storage_wiredtiger_pack_item_free(&pk);
 		phalcon_storage_wiredtiger_pack_item_free(&pv);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Error pack value");
@@ -270,12 +281,47 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, set)
 	phalcon_storage_wiredtiger_pack_item_free(&pk);
 	phalcon_storage_wiredtiger_pack_item_free(&pv);
 
-	if (ret != 0) {
+	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "%s", wiredtiger_strerror(ret));
 		return;
 	} else {
 		RETVAL_TRUE;
 	}
+}
+
+/**
+ * Sets data
+ *
+ * @param array $data
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, sets)
+{
+	zval *data, *val, db = {};
+	phalcon_storage_wiredtiger_cursor_object *intern;
+	zend_string *str_key;
+	ulong idx;
+
+	phalcon_fetch_params(0, 1, 0, &data);
+
+	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	ZVAL_OBJ(&db, intern->db);
+	PHALCON_CALL_METHOD(NULL, &db, "begin");
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, val) {
+		zval key = {}, ret = {};
+		int flag;
+		if (str_key) {
+			ZVAL_STR(&key, str_key);
+		} else {
+			ZVAL_LONG(&key, idx);
+		}
+		PHALCON_CALL_METHOD_FLAG(flag, &ret, getThis(), "set", &key, val);
+		if (flag == FAILURE || !zend_is_true(&ret)) {
+			PHALCON_CALL_METHOD(NULL, &db, "rollback");
+			RETURN_FALSE;
+		}
+	} ZEND_HASH_FOREACH_END();
+	PHALCON_CALL_METHOD(NULL, &db, "commit");
 }
 
 /**
@@ -297,7 +343,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, get)
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
 	ret = phalcon_storage_wiredtiger_pack_key(intern, &pk, key);
-	if (ret != 0) {
+	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 		phalcon_storage_wiredtiger_pack_item_free(&pk);
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Error pack key: %s", wiredtiger_strerror(ret));
 		return;
@@ -308,25 +354,56 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, get)
 
 	intern->cursor->set_key(intern->cursor, &item);
 
-	if (intern->cursor->search(intern->cursor) != 0) {
+	if (intern->cursor->search(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
 		 phalcon_storage_wiredtiger_pack_item_free(&pk);
 		 RETURN_NULL();
 	} else {
 		ret = intern->cursor->get_value(intern->cursor, &item);
 		phalcon_storage_wiredtiger_pack_item_free(&pk);
-		if (ret != 0) {
+		if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Error get value: %s", wiredtiger_strerror(ret));
 			return;
 		}
 
 		ret = phalcon_storage_wiredtiger_unpack_value(intern, return_value, &item);
-		if (ret != 0) {
+		if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 			phalcon_storage_wiredtiger_pack_item_free(&pk);
 			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Error unpack value: %s", wiredtiger_strerror(ret));
  			return;
 		}
 	}
 	phalcon_storage_wiredtiger_pack_item_free(&pk);
+}
+
+/**
+ * Gets multi value
+ *
+ * @param array $keys
+ * @return array
+ */
+PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, gets)
+{
+	zval *keys, *val;
+	zend_string *str_key;
+	ulong idx;
+
+	phalcon_fetch_params(0, 1, 0, &keys);
+
+	array_init(return_value);
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(keys), idx, str_key, val) {
+		zval key = {}, ret = {};
+		int flag;
+		if (str_key) {
+			ZVAL_STR(&key, str_key);
+		} else {
+			ZVAL_LONG(&key, idx);
+		}
+		PHALCON_CALL_METHOD_FLAG(flag, &ret, getThis(), "get", val);
+		if (flag != FAILURE) {
+			phalcon_array_update_zval(return_value, &key, &ret, PH_COPY);
+		}
+	} ZEND_HASH_FOREACH_END();
 }
 
 /**
@@ -348,7 +425,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, delete)
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
 	ret = phalcon_storage_wiredtiger_pack_key(intern, &pk, key);
-	if (ret != 0) {
+	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 		phalcon_storage_wiredtiger_pack_item_free(&pk);
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Error pack key: %s", wiredtiger_strerror(ret));
 		return;
@@ -360,11 +437,11 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, delete)
 	intern->cursor->set_key(intern->cursor, &item);
 
 	/* Get value */
-	if (intern->cursor->search(intern->cursor) != 0) {
+	if (intern->cursor->search(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
 		RETVAL_FALSE;
 	} else {
 		ret = intern->cursor->remove(intern->cursor);
-		if (ret != 0) {
+		if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 			phalcon_storage_wiredtiger_pack_item_free(&pk);
 			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Error remove value %s", wiredtiger_strerror(ret));
 			return;
@@ -381,14 +458,14 @@ static int phalcon_storage_wiredtiger_cursor_load_current(phalcon_storage_wiredt
 	int ret;
 
 	ret = intern->cursor->get_key(intern->cursor, &intern->current.key);
-	if (ret != 0) {
+	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Can't get key");
 		return FAILURE;
 	}
 
 	/* Get value */
 	ret = intern->cursor->get_value(intern->cursor, &intern->current.value);
-	if (ret != 0) {
+	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Can't get value");
 		return FAILURE;
 	}
@@ -409,7 +486,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, current)
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
     if (!intern->started_iterating) {
-        if (intern->cursor->next(intern->cursor) != 0) {
+        if (intern->cursor->next(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
             RETURN_FALSE;
         }
 		intern->started_iterating = 1;
@@ -423,7 +500,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, current)
 		RETURN_EMPTY_STRING();
 	} else {
 		ret = phalcon_storage_wiredtiger_unpack_value(intern, return_value, &intern->current.value);
-		if (ret != 0) {
+		if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Can't get value");
 			RETURN_FALSE;
 		}
@@ -443,7 +520,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, key)
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
     if (!intern->started_iterating) {
-        if (intern->cursor->next(intern->cursor) != 0) {
+        if (intern->cursor->next(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
             RETURN_FALSE;
         }
 		intern->started_iterating = 1;
@@ -457,7 +534,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, key)
 		RETURN_EMPTY_STRING();
 	} else {
 		ret = phalcon_storage_wiredtiger_unpack_key(intern, return_value, &intern->current.key);
-		if (ret != 0) {
+		if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Can't get key");
 			RETURN_FALSE;
 		}
@@ -475,7 +552,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, next)
 
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
-	if (intern->cursor->next(intern->cursor) != 0) {
+	if (intern->cursor->next(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
 		RETURN_FALSE;
 	}
 
@@ -495,7 +572,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, prev)
 
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
-	if (intern->cursor->prev(intern->cursor) != 0) {
+	if (intern->cursor->prev(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
 		RETURN_FALSE;
 	}
 
@@ -517,12 +594,12 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, rewind)
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
 	ret = intern->cursor->reset(intern->cursor);
-	if (ret != 0) {
+	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Invalid rewind: %s", wiredtiger_strerror(ret));
 		RETURN_FALSE;
 	}
 
-	if (intern->cursor->next(intern->cursor) != 0) {
+	if (intern->cursor->next(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
 		RETURN_FALSE;
 	}
 
@@ -542,12 +619,12 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, last)
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
 	ret = intern->cursor->reset(intern->cursor);
-	if (ret != 0) {
+	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Invalid rewind: %s", wiredtiger_strerror(ret));
 		RETURN_FALSE;
 	}
 
-	while (intern->cursor->prev(intern->cursor) != 0);
+	while (intern->cursor->prev(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK);
 
 	RETURN_TRUE;
 }

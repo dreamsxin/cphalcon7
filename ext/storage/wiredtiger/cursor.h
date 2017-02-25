@@ -32,7 +32,7 @@ typedef struct {
 } phalcon_storage_wiredtiger_cursor_current;
 
 typedef struct {
-    zval *db;
+    zend_object *db;
     WT_CURSOR *cursor;
     phalcon_storage_wiredtiger_cursor_current current;
 	zend_bool started_iterating;

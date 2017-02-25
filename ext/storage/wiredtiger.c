@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, begin)
 	int ret;
 	char *config = NULL;
 
-	phalcon_fetch_params(0, 1, 0, &_config);
+	phalcon_fetch_params(0, 0, 1, &_config);
 
 	if (_config && Z_TYPE_P(_config) == IS_STRING) {
 		config = Z_STRVAL_P(_config);
@@ -410,7 +410,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, commit)
 	int ret;
 	char *config = NULL;
 
-	phalcon_fetch_params(0, 1, 0, &_config);
+	phalcon_fetch_params(0, 0, 1, &_config);
 
 	if (_config && Z_TYPE_P(_config) == IS_STRING) {
 		config = Z_STRVAL_P(_config);
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, rollback)
 	int ret;
 	char *config = NULL;
 
-	phalcon_fetch_params(0, 1, 0, &_config);
+	phalcon_fetch_params(0, 0, 1, &_config);
 
 	if (_config && Z_TYPE_P(_config) == IS_STRING) {
 		config = Z_STRVAL_P(_config);
@@ -464,7 +464,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, sync)
 	int ret;
 	char *config = NULL;
 
-	phalcon_fetch_params(0, 1, 0, &_config);
+	phalcon_fetch_params(0, 0, 1, &_config);
 
 	if (_config && Z_TYPE_P(_config) == IS_STRING) {
 		config = Z_STRVAL_P(_config);

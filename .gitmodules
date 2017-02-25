@@ -19,3 +19,6 @@
 [submodule "deps/mongo-c-driver"]
 	path = deps/mongo-c-driver
 	url = https://github.com/mongodb/mongo-c-driver.git
+[submodule "deps/wiredtiger"]
+	path = deps/wiredtiger
+	url = https://github.com/dreamsxin/wiredtiger.git

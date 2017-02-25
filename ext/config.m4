@@ -116,6 +116,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(storage-wiredtiger, whether to enable storage wiredtiger support,
+[  --enable-storage-wiredtiger   Enable storage wiredtiger support], no, no)
+
+if test "$PHP_STORAGE_WIREDTIGER" = "yes"; then
+	AC_DEFINE([PHALCON_STORAGE_WIREDTIGER], [1], [Whether storage wiredtiger are available])
+	AC_MSG_RESULT([yes, storage wiredtiger])
+else
+	AC_MSG_RESULT([no])
+fi
+
 dnl copied from Zend Optimizer Plus
 AC_MSG_CHECKING(for sysvipc shared memory support)
 AC_TRY_RUN([
@@ -680,14 +690,18 @@ image/exception.c \
 image/adapter/gd.c \
 image/adapter/imagick.c \
 registry.c \
-async.c"
+async.c \
+chart/exception.c \
+socket/exception.c \
+process/exception.c \
+storage/exception.c"
 
 	if test "$PHP_CACHE_SHMEMORY" = "yes"; then
 		phalcon_sources="$phalcon_sources cache/shmemory/allocators/mmap.c cache/shmemory/allocators/shm.c cache/shmemory/serializer.c cache/shmemory/storage.c cache/shmemory/allocator.c cache/shmemory.c"
 	fi
 
 	if test "$PHP_CHART" = "yes"; then
-		phalcon_sources="$phalcon_sources chart/captcha.c chart/exception.c"
+		phalcon_sources="$phalcon_sources chart/captcha.c"
 	fi
 
 	if test "$PHP_INTRUSIVE" = "yes"; then
@@ -695,11 +709,11 @@ async.c"
 	fi
 
 	if test "$PHP_PROCESS" = "yes"; then
-		phalcon_sources="$phalcon_sources process/system.c process/sharedmemory.c process/proc.c process/exception.c"
+		phalcon_sources="$phalcon_sources process/system.c process/sharedmemory.c process/proc.c"
 	fi
 
 	if test "$PHP_STORAGE_BTREE" = "yes"; then
-		phalcon_sources="$phalcon_sources storage/btree/bplus.c storage/btree/pages.c storage/btree/utils.c storage/btree/values.c storage/btree/writer.c storage/btree.c storage/exception.c"
+		phalcon_sources="$phalcon_sources storage/btree/bplus.c storage/btree/pages.c storage/btree/utils.c storage/btree/values.c storage/btree/writer.c storage/btree.c"
 	fi
 
 	old_CPPFLAGS=$CPPFLAGS
@@ -760,7 +774,7 @@ async.c"
 			[
 				PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
 				AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
-	            phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c socket/exception.c"
+	            phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c"
 			],
 			,
 			[[#include "main/php.h"]]
@@ -1017,6 +1031,28 @@ async.c"
 		phalcon_sources="$phalcon_sources assets/filters/jsminifier.c assets/filters/cssminifier.c "
 	else
 		phalcon_sources="$phalcon_sources assets/filters/nojsminifier.c assets/filters/nocssminifier.c "
+	fi
+
+	if test "$PHP_STORAGE_WIREDTIGER" = "yes"; then
+		AC_MSG_CHECKING([checking libwiredtiger support])
+		for i in /usr/local /usr; do
+			if test -r $i/include/wiredtiger.h; then
+				PHP_ADD_INCLUDE($i/include)
+				PHP_CHECK_LIBRARY(wiredtiger, wiredtiger_open,
+				[
+					PHP_ADD_LIBRARY_WITH_PATH(wiredtiger, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+					AC_DEFINE(PHALCON_USE_WIREDTIGER, 1, [Have wiredtiger support])
+					phalcon_sources="$phalcon_sources storage/wiredtiger.c storage/wiredtiger/pack.c storage/wiredtiger/cursor.c "
+				],[
+					AC_MSG_ERROR([Wrong wiredtiger version or library not found])
+				],[
+					-L$i/$PHP_LIBDIR -lm
+				])
+				break
+			else
+				AC_MSG_RESULT([no, found in $i])
+			fi
+		done
 	fi
 
 	PHP_SUBST(PHALCON_SHARED_LIBADD)

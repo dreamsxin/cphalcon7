@@ -158,19 +158,11 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Micro_Exception);
 	PHALCON_INIT(Phalcon_Mvc_JsonRpc_Exception);
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Exception);
-#ifdef PHALCON_CHART
 	PHALCON_INIT(Phalcon_Chart_Exception);
-#endif
 	PHALCON_INIT(Phalcon_Binary_Exception);
-#if PHALCON_USE_PHP_SOCKET
 	PHALCON_INIT(Phalcon_Socket_Exception);
-#endif
-#ifdef PHALCON_PROCESS
 	PHALCON_INIT(Phalcon_Process_Exception);
-#endif
-#ifdef PHALCON_STORAGE_BTREE
 	PHALCON_INIT(Phalcon_Storage_Exception);
-#endif
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
@@ -533,6 +525,11 @@ static PHP_MINIT_FUNCTION(phalcon)
 #ifdef PHALCON_STORAGE_BTREE
 	PHALCON_INIT(Phalcon_Storage_Btree);
 #endif
+#if PHALCON_USE_WIREDTIGER
+	PHALCON_INIT(Phalcon_Storage_Wiredtiger);
+	PHALCON_INIT(Phalcon_Storage_Wiredtiger_Cursor);
+#endif
+
 	return SUCCESS;
 }
 

@@ -163,6 +163,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Socket_Exception);
 	PHALCON_INIT(Phalcon_Process_Exception);
 	PHALCON_INIT(Phalcon_Storage_Exception);
+	PHALCON_INIT(Phalcon_Server_Exception);
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
@@ -525,11 +526,16 @@ static PHP_MINIT_FUNCTION(phalcon)
 #ifdef PHALCON_STORAGE_BTREE
 	PHALCON_INIT(Phalcon_Storage_Btree);
 #endif
+
 #if PHALCON_USE_WIREDTIGER
 	PHALCON_INIT(Phalcon_Storage_Wiredtiger);
 	PHALCON_INIT(Phalcon_Storage_Wiredtiger_Cursor);
 #endif
 
+#if PHALCON_USE_SERVER
+	PHALCON_INIT(Phalcon_Server);
+	PHALCON_INIT(Phalcon_Server_Http);
+#endif
 	return SUCCESS;
 }
 

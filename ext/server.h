@@ -18,32 +18,24 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_APPLICATION_H
-#define PHALCON_APPLICATION_H
+#ifndef PHALCON_SERVER_H
+#define PHALCON_SERVER_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_application_ce;
+#include "server/core.h"
 
-PHALCON_INIT_CLASS(Phalcon_Application);
+typedef struct _phalcon_server_object {
+	struct phalcon_server_context *ctx;
+	zend_object std;
+} phalcon_server_object;
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_registermodules, 0, 0, 1)
-	ZEND_ARG_INFO(0, modules)
-	ZEND_ARG_INFO(0, merge)
-ZEND_END_ARG_INFO()
+static inline phalcon_server_object *phalcon_server_object_from_obj(zend_object *obj) {
+	return (phalcon_server_object*)((char*)(obj) - XtOffsetOf(phalcon_server_object, std));
+}
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_INFO(0, defaultModule)
-ZEND_END_ARG_INFO()
+extern zend_class_entry *phalcon_server_ce;
 
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_phalcon_application_handle, 0, 0, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, uri)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_application_handle, 0, 0, IS_OBJECT, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, uri)
-ZEND_END_ARG_INFO()
-#endif
+PHALCON_INIT_CLASS(Phalcon_Server);
 
-#endif /* PHALCON_APPLICATION_H */
+#endif /* PHALCON_SERVER_H */

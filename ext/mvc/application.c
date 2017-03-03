@@ -106,10 +106,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_useimplicitview, 0, 0, 1)
 	ZEND_ARG_INFO(0, implicitView)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_handle, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_request, 0, 0, 1)
 	ZEND_ARG_INFO(0, uri)
 ZEND_END_ARG_INFO()
@@ -117,7 +113,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_mvc_application_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Application, __construct, arginfo_phalcon_mvc_application___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Application, useImplicitView, arginfo_phalcon_mvc_application_useimplicitview, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Application, handle, arginfo_phalcon_mvc_application_handle, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Application, handle, arginfo_phalcon_application_handle, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Application, request, arginfo_phalcon_mvc_application_request, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -218,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		 phalcon_return_property(&module_name, getThis(), SL("_defaultModule"));
 	}
 
-	/** 
+	/**
 	 * Process the module definition
 	 */
 	if (zend_is_true(&module_name)) {
@@ -229,7 +225,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			RETURN_FALSE;
 		}
 
-		/** 
+		/**
 		 * Check if the module passed by the router is registered in the modules container
 		 */
 		phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY);
@@ -239,7 +235,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			return;
 		}
 
-		/** 
+		/**
 		 * A module definition must be an array or an object
 		 */
 		if (Z_TYPE(module) != IS_ARRAY && Z_TYPE(module) != IS_OBJECT) {
@@ -248,7 +244,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 
 		/* An array module definition contains a path to a module definition class */
-		if (Z_TYPE_P(&module) == IS_ARRAY) { 
+		if (Z_TYPE_P(&module) == IS_ARRAY) {
 			/* Class name used to load the module definition */
 			if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
 				PHALCON_STR(&class_name, "Module");
@@ -269,7 +265,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 			PHALCON_CALL_METHOD(&module_object, &dependency_injector, "get", &class_name);
 
-			/** 
+			/**
 			 * 'registerAutoloaders' and 'registerServices' are automatically called
 			 */
 			PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders", &dependency_injector);
@@ -300,7 +296,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 	}
 
-	/** 
+	/**
 	 * Check whether use implicit views or not
 	 */
 	phalcon_read_property(&implicit_view, getThis(), SL("_implicitView"), PH_NOISY);
@@ -340,7 +336,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setparams", &params);
 
 	if (f_implicit_view) {
-		/** 
+		/**
 		 * Start the view component (start output buffering)
 		 */
 		PHALCON_CALL_METHOD(NULL, &view, "start");
@@ -392,7 +388,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		if (PHALCON_IS_FALSE(&returned_response)) {
 			if (Z_TYPE(controller) == IS_OBJECT) {
-				/** 
+				/**
 				 * This allows to make a custom view render
 				 */
 				PHALCON_STR(&event_name, "application:beforeRenderView");

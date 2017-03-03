@@ -60,14 +60,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_console_addmodules, 0, 0, 1)
 	ZEND_ARG_INFO(0, modules)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_console_handle, 0, 0, 0)
-	ZEND_ARG_INFO(0, arguments)
-ZEND_END_ARG_INFO()
-
 static const zend_function_entry phalcon_cli_console_method_entry[] = {
 	PHP_ME(Phalcon_Cli_Console, __construct, arginfo_phalcon_cli_console___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Cli_Console, addModules, arginfo_phalcon_cli_console_addmodules, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cli_Console, handle, arginfo_phalcon_cli_console_handle, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Console, handle, arginfo_phalcon_application_handle, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -123,8 +119,8 @@ PHP_METHOD(Phalcon_Cli_Console, addModules){
 
 /**
  * Handle the command-line arguments.
- *  
- * 
+ *
+ *
  * <code>
  * 	$arguments = array(
  * 		'task' => 'taskname',
@@ -183,7 +179,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			return;
 		}
 
-		if (Z_TYPE_P(&module) != IS_ARRAY) { 
+		if (Z_TYPE_P(&module) != IS_ARRAY) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cli_console_exception_ce, "Invalid module definition path");
 			return;
 		}

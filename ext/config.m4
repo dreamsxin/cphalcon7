@@ -126,6 +126,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(server, whether to enable server support,
+[  --enable-server   Enable server support], no, no)
+
+if test "$PHP_SERVER" = "yes"; then
+	AC_DEFINE([PHALCON_SERVER], [1], [Whether server are available])
+	AC_MSG_RESULT([yes, server])
+else
+	AC_MSG_RESULT([no])
+fi
+
 dnl copied from Zend Optimizer Plus
 AC_MSG_CHECKING(for sysvipc shared memory support)
 AC_TRY_RUN([
@@ -329,6 +339,7 @@ kernel/exit.c \
 kernel/iterator.c \
 kernel/math.c \
 kernel/time.c \
+kernel/message/queue.c \
 interned-strings.c \
 logger.c \
 flash.c \
@@ -694,7 +705,8 @@ async.c \
 chart/exception.c \
 socket/exception.c \
 process/exception.c \
-storage/exception.c"
+storage/exception.c \
+server/exception.c"
 
 	if test "$PHP_CACHE_SHMEMORY" = "yes"; then
 		phalcon_sources="$phalcon_sources cache/shmemory/allocators/mmap.c cache/shmemory/allocators/shm.c cache/shmemory/serializer.c cache/shmemory/storage.c cache/shmemory/allocator.c cache/shmemory.c"
@@ -756,17 +768,20 @@ storage/exception.c"
 		[[#include "main/php.h"]]
 	)
 
-
+	AC_MSG_CHECKING([checking socket type support])
 	AC_TRY_COMPILE(
-		[
-			#include <sys/types.h>
-			#include <sys/socket.h>
-		],
-		[static struct msghdr tp; int n = (int) tp.msg_flags; return n],
-		[],
-		[AC_DEFINE(MISSING_MSGHDR_MSGFLAGS, 1, [ ])]
-	)
-	AC_DEFINE([HAVE_SOCKETS], 1, [ ])
+	[
+		#include <sys/types.h>
+		#include <sys/socket.h>
+	],[
+		static struct msghdr tp; int n = (int) tp.msg_flags; return n
+	],[
+		AC_DEFINE([HAVE_SOCKETS], 1, [ ])
+		AC_MSG_RESULT([yes])
+	],[
+		AC_DEFINE(MISSING_MSGHDR_MSGFLAGS, 1, [ ])
+		AC_MSG_RESULT([no])
+	])
 
 	if test "$PHP_SOCKET" = "yes"; then
 		AC_CHECK_HEADERS(
@@ -1028,8 +1043,10 @@ storage/exception.c"
 
 	AC_MSG_CHECKING([Include non-free minifiers])
 	if test "$PHP_NON_FREE" = "yes"; then
+		AC_MSG_RESULT([yes])
 		phalcon_sources="$phalcon_sources assets/filters/jsminifier.c assets/filters/cssminifier.c "
 	else
+		AC_MSG_RESULT([no])
 		phalcon_sources="$phalcon_sources assets/filters/nojsminifier.c assets/filters/nocssminifier.c "
 	fi
 
@@ -1054,6 +1071,51 @@ storage/exception.c"
 			fi
 		done
 	fi
+
+	if test "$PHP_SERVER" = "yes"; then
+		AC_MSG_CHECKING([for epoll support])
+		AC_TRY_COMPILE(
+		[
+				#include <sys/epoll.h>
+		], [
+			int epollfd;
+			struct epoll_event e;
+
+			epollfd = epoll_create(1);
+			if (epollfd < 0) {
+				return 1;
+			}
+
+			e.events = EPOLLIN | EPOLLET;
+			e.data.fd = 0;
+
+			if (epoll_ctl(epollfd, EPOLL_CTL_ADD, 0, &e) == -1) {
+				return 1;
+			}
+
+			e.events = 0;
+			if (epoll_wait(epollfd, &e, 1, 1) < 0) {
+				return 1;
+			}
+		], [
+			AC_DEFINE([PHALCON_USE_SERVER], 1, [Have epoll support])
+			AC_MSG_RESULT([yes])
+			phalcon_sources="$phalcon_sources server/utils.c server/core.c server.c server/http.c"
+		], [
+			AC_MSG_RESULT([no])
+		])
+	fi
+
+	AC_CHECK_LIB(c, accept4, AC_DEFINE(HAVE_ACCEPT4, 1, [have accept4]))
+	AC_CHECK_LIB(c, signalfd, AC_DEFINE(HAVE_SIGNALFD, 1, [have signalfd]))
+	AC_CHECK_LIB(c, poll, AC_DEFINE(HAVE_POLL, 1, [have poll]))
+    AC_CHECK_LIB(c, sendfile, AC_DEFINE(HAVE_SENDFILE, 1, [have sendfile]))
+    AC_CHECK_LIB(pthread, pthread_rwlock_init, AC_DEFINE(HAVE_RWLOCK, 1, [have pthread_rwlock_init]))
+    AC_CHECK_LIB(pthread, pthread_spin_lock, AC_DEFINE(HAVE_SPINLOCK, 1, [have pthread_spin_lock]))
+    AC_CHECK_LIB(pthread, pthread_mutex_timedlock, AC_DEFINE(HAVE_MUTEX_TIMEDLOCK, 1, [have pthread_mutex_timedlock]))
+    AC_CHECK_LIB(pthread, pthread_barrier_init, AC_DEFINE(HAVE_PTHREAD_BARRIER, 1, [have pthread_barrier_init]))
+
+	PHP_ADD_LIBRARY(pthread)
 
 	PHP_SUBST(PHALCON_SHARED_LIBADD)
 

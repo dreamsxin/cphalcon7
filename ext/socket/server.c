@@ -832,7 +832,7 @@ worker:
 		}
 
 		ev.data.fd = listenfd;
-		ev.events = EPOLLIN | EPOLLET;
+		ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
 
 		if ((epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_ADD, listenfd, &ev)) < 0) {
 			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_socket_exception_ce, "epoll: unable to add fd %d", listenfd);
@@ -870,7 +870,11 @@ worker:
 				}
 				ZVAL_LONG(&client_socket_id, event_fd);
 				if (event_fd == listenfd) {
-					while((client_fd = accept(listenfd, (struct sockaddr *) &client_addr, &client_addr_len)) >= 0) {
+					if (events[i] & (EPOLLHUP | EPOLLERR)) {
+						continue;
+					}
+					client_fd = accept(listenfd, (struct sockaddr *) &client_addr, &client_addr_len);
+					if (client_fd >= 0) {
 						zval tmp_client_socket = {}, tmp_client = {}, tmp_client_socket_id = {};
 						php_socket *tmp_client_sock;
 						tmp_client_sock = php_create_socket();
@@ -898,74 +902,72 @@ worker:
 						}
 						setkeepalive(client_fd);
 						ev.data.fd = client_fd;
-						ev.events = EPOLLIN | EPOLLET;
+						ev.events = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET;
 						if ((epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_ADD, client_fd, &ev)) < 0) {
-							//PHALCON_THROW_EXCEPTION_FORMAT(phalcon_socket_exception_ce, "epoll: unable to add client fd %d", client_fd);
-							//phalcon_socket_server_destroy();
-							//RETURN_FALSE;
+							shutdown(client_fd, SHUT_RDWR);
+							close(client_fd);
 							continue;
-						}
-					}
-					if (client_fd < 0) {
-						if (errno != EAGAIN && errno != ECONNABORTED && errno != EPROTO && errno != EINTR) {
-							printf("unable to accept incoming connection:%d", errno);
 						}
 					}
 					continue;
 				} else if (events[i].events & EPOLLIN) {
 					PHALCON_CALL_METHOD(&client, getThis(), "getclient", &client_socket_id);
-					while(1) {
-						zend_string	*tmpbuf;
-						int retval;
 
-						tmpbuf = zend_string_alloc(Z_LVAL(maxlen), 0);
+					zend_string	*tmpbuf;
+					int retval;
 
-						retval = recv(event_fd, ZSTR_VAL(tmpbuf), Z_LVAL(maxlen), MSG_DONTWAIT);
+					tmpbuf = zend_string_alloc(Z_LVAL(maxlen), 0);
 
-						if (retval < 0) {
-							zend_string_free(tmpbuf);
-							if(errno == EAGAIN || errno == EWOULDBLOCK) {
-								status = 1;
-								break;
-							}
-							if (Z_TYPE(onerror) > IS_NULL) {
-								args = (zval *)safe_emalloc(1, sizeof(zval), 0);
-								ZVAL_COPY(&args[0], &client);
-								PHALCON_CALL_USER_FUNC_ARGS(NULL, &onerror, args, 1);
-							} else if (phalcon_method_exists_ex(getThis(), SL("onerror")) == SUCCESS) {
-								PHALCON_CALL_METHOD(NULL, getThis(), "onerror", &client);
-							}
-							status = -1;
-							break;
-						} else if (retval == 0) {
-							zend_string_free(tmpbuf);
-							status = -1;
-							break;
-						} else {
+					retval = recv(event_fd, ZSTR_VAL(tmpbuf), Z_LVAL(maxlen), MSG_DONTWAIT);
+
+					if (retval < 0) {
+						zend_string_free(tmpbuf);
+						if(errno == EAGAIN || errno == EWOULDBLOCK) {
 							status = 1;
-							tmpbuf = zend_string_truncate(tmpbuf, retval, 0);
-							ZSTR_LEN(tmpbuf) = retval;
-							ZSTR_VAL(tmpbuf)[ZSTR_LEN(tmpbuf)] = '\0' ;
+							break;
+						}
+						if (Z_TYPE(onerror) > IS_NULL) {
+							args = (zval *)safe_emalloc(1, sizeof(zval), 0);
+							ZVAL_COPY(&args[0], &client);
+							PHALCON_CALL_USER_FUNC_ARGS(NULL, &onerror, args, 1);
+						} else if (phalcon_method_exists_ex(getThis(), SL("onerror")) == SUCCESS) {
+							PHALCON_CALL_METHOD(NULL, getThis(), "onerror", &client);
+						}
+						status = -1;
+						break;
+					} else if (retval == 0) {
+						zend_string_free(tmpbuf);
+						status = -1;
+						break;
+					} else {
+						status = 1;
+						tmpbuf = zend_string_truncate(tmpbuf, retval, 0);
+						ZSTR_LEN(tmpbuf) = retval;
+						ZSTR_VAL(tmpbuf)[ZSTR_LEN(tmpbuf)] = '\0' ;
 
-							ZVAL_NEW_STR(&data, tmpbuf);
-							if (Z_TYPE(onrecv) > IS_NULL) {
-								args = (zval *)safe_emalloc(2, sizeof(zval), 0);
-								ZVAL_COPY(&args[0], &client);
-								ZVAL_COPY_VALUE(&args[1], &data);
-								PHALCON_CALL_USER_FUNC_ARGS(&ret, &onrecv, args, 2);
-							} else if (phalcon_method_exists_ex(getThis(), SL("onrecv")) == SUCCESS) {
-								PHALCON_CALL_METHOD(&ret, getThis(), "onrecv", &client, &data);
-							}
+						ZVAL_NEW_STR(&data, tmpbuf);
+						if (Z_TYPE(onrecv) > IS_NULL) {
+							args = (zval *)safe_emalloc(2, sizeof(zval), 0);
+							ZVAL_COPY(&args[0], &client);
+							ZVAL_COPY_VALUE(&args[1], &data);
+							PHALCON_CALL_USER_FUNC_ARGS(&ret, &onrecv, args, 2);
+						} else if (phalcon_method_exists_ex(getThis(), SL("onrecv")) == SUCCESS) {
+							PHALCON_CALL_METHOD(&ret, getThis(), "onrecv", &client, &data);
+						}
 
-							if (PHALCON_IS_FALSE(&ret)) {
-								status = -1;
-								break;
-							}
+						if (PHALCON_IS_FALSE(&ret)) {
+							status = -1;
+							break;
 						}
 					}
+
 					if (status > 0) {
 						ev.data.fd = event_fd;
-						ev.events = events[i].events | EPOLLOUT;
+						if (retval == Z_LVAL(maxlen)) {
+							ev.events = EPOLLIN | EPOLLERR | EPOLLET;
+						} else {
+							ev.events = EPOLLOUT | EPOLLHUP | EPOLLERR;
+						}
 						epoll_ctl(epollfd, EPOLL_CTL_MOD, event_fd, &ev);
 					} else {
 						if (Z_TYPE(onclose) > IS_NULL) {
@@ -1006,7 +1008,7 @@ worker:
 						phalcon_unset_property_array(getThis(), SL("_clients"), &client_socket_id);
 					} else {
 						ev.data.fd = event_fd;
-						ev.events = EPOLLIN | EPOLLET;
+						ev.events = EPOLLIN | EPOLLERR | EPOLLET;
 						epoll_ctl(epollfd, EPOLL_CTL_MOD, event_fd, &ev);
 					}
 				} else if (events[i].events & EPOLLERR) {

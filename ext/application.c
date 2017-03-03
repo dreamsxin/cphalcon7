@@ -46,19 +46,6 @@ PHP_METHOD(Phalcon_Application, getModules);
 PHP_METHOD(Phalcon_Application, setDefaultModule);
 PHP_METHOD(Phalcon_Application, getDefaultModule);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_registermodules, 0, 0, 1)
-	ZEND_ARG_INFO(0, modules)
-	ZEND_ARG_INFO(0, merge)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_INFO(0, defaultModule)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_handle, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
-ZEND_END_ARG_INFO()
-
 static const zend_function_entry phalcon_application_method_entry[] = {
 	PHP_ME(Phalcon_Application, registerModules, arginfo_phalcon_application_registermodules, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Application, getModules, NULL, ZEND_ACC_PUBLIC)
@@ -69,7 +56,7 @@ static const zend_function_entry phalcon_application_method_entry[] = {
 };
 
 /**
- * Phalcon\Mvc\Application initializer
+ * Phalcon\Application initializer
  */
 PHALCON_INIT_CLASS(Phalcon_Application){
 
@@ -112,7 +99,7 @@ PHP_METHOD(Phalcon_Application, registerModules){
 		merge = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (Z_TYPE_P(modules) != IS_ARRAY) { 
+	if (Z_TYPE_P(modules) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_application_exception_ce, "Modules must be an Array");
 		return;
 	}
@@ -120,7 +107,7 @@ PHP_METHOD(Phalcon_Application, registerModules){
 		phalcon_update_property_zval(getThis(), SL("_modules"), modules);
 	} else {
 		phalcon_read_property(&registered_modules, getThis(), SL("_modules"), PH_NOISY);
-		if (Z_TYPE(registered_modules) == IS_ARRAY) { 
+		if (Z_TYPE(registered_modules) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_modules, &registered_modules, modules);
 		} else {
 			PHALCON_CPY_WRT(&merged_modules, modules);

@@ -430,4 +430,8 @@
 #include "storage/wiredtiger/cursor.h"
 #include "storage/exception.h"
 
+#include "server.h"
+#include "server/exception.h"
+#include "server/http.h"
+
 #endif /* PHALCON_H */

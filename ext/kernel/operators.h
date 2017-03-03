@@ -22,6 +22,9 @@
 
 #include "php_phalcon.h"
 
+#include <ctype.h>
+
+#define PHALCON_IS_SPACE(x) isspace((int)(x))
 
 #define PHALCON_TYPE_P(var)   (Z_TYPE_P(var) == IS_REFERENCE ? Z_TYPE_P(Z_REFVAL_P(var)) : Z_TYPE_P(var))
 #define PHALCON_IS_TYPE(var, type)   (Z_TYPE_P(var) == type || (Z_TYPE_P(var) == IS_REFERENCE && Z_TYPE_P(Z_REFVAL_P(var)) == type))

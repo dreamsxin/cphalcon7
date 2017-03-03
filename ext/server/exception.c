@@ -18,32 +18,25 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_APPLICATION_H
-#define PHALCON_APPLICATION_H
+#include "server/exception.h"
+#include "server/../exception.h"
 
-#include "php_phalcon.h"
+#include "kernel/main.h"
 
-extern zend_class_entry *phalcon_application_ce;
+/**
+ * Phalcon\Server\Exception
+ *
+ * Exceptions thrown in Phalcon\Server will use this class
+ *
+ */
+zend_class_entry *phalcon_server_exception_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Application);
+/**
+ * Phalcon\Server\Exception initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Server_Exception){
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_registermodules, 0, 0, 1)
-	ZEND_ARG_INFO(0, modules)
-	ZEND_ARG_INFO(0, merge)
-ZEND_END_ARG_INFO()
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Server, Exception, server_exception, phalcon_exception_ce, NULL, 0);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_INFO(0, defaultModule)
-ZEND_END_ARG_INFO()
-
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_phalcon_application_handle, 0, 0, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, uri)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_application_handle, 0, 0, IS_OBJECT, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, uri)
-ZEND_END_ARG_INFO()
-#endif
-
-#endif /* PHALCON_APPLICATION_H */
+	return SUCCESS;
+}

@@ -171,7 +171,7 @@ static int phalcon_on_body_cb(http_parser *p, const char *at, size_t len)
 {
 	phalcon_http_parser_context *result = p->data;
 
-	add_assoc_stringl(&result->headers, "BODY", (char*)at, len);
+	add_assoc_stringl(&result->data, "BODY", (char*)at, len);
 
 	return 0;
 }

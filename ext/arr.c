@@ -68,7 +68,7 @@ PHP_METHOD(Phalcon_Arr, sum);
 PHP_METHOD(Phalcon_Arr, toArray);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_assoc, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_array, 0, 0, 1)
@@ -76,23 +76,23 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_array, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_path, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, path)
 	ZEND_ARG_INFO(0, default_value)
-	ZEND_ARG_INFO(0, delimiter)
+	ZEND_ARG_TYPE_INFO(0, delimiter, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_set_path, 0, 0, 3)
-	ZEND_ARG_INFO(1, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, path)
 	ZEND_ARG_INFO(0, value)
-	ZEND_ARG_INFO(0, delimiter)
+	ZEND_ARG_TYPE_INFO(0, delimiter, IS_ARRAY, 1)
 	ZEND_ARG_INFO(0, flag)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_range, 0, 0, 0)
-	ZEND_ARG_INFO(0, step)
-	ZEND_ARG_INFO(0, max)
+	ZEND_ARG_TYPE_INFO(0, step, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, max, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_get, 0, 0, 2)
@@ -102,74 +102,74 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_get, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_choice, 0, 0, 3)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, key)
 	ZEND_ARG_INFO(0, value1)
 	ZEND_ARG_INFO(0, value2)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_extract, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, paths)
 	ZEND_ARG_INFO(0, default_value)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_pluck, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, key)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_unshift, 0, 0, 3)
-	ZEND_ARG_INFO(1, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, key)
 	ZEND_ARG_INFO(0, val)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_map, 0, 0, 2)
 	ZEND_ARG_INFO(0, callbacks)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, keys)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_merge, 0, 0, 2)
-	ZEND_ARG_INFO(0, array1)
-	ZEND_ARG_INFO(0, array2)
+	ZEND_ARG_TYPE_INFO(0, array1, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, array2, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_overwrite, 0, 0, 2)
-	ZEND_ARG_INFO(0, array1)
-	ZEND_ARG_INFO(0, array2)
+	ZEND_ARG_TYPE_INFO(0, array1, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, array2, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_callback, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_flatten, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_arrayobject, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_key, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, postion)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_filter, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, callback)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_sum, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, path)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_toarray, 0, 0, 1)
-	ZEND_ARG_INFO(0, object)
+	ZEND_ARG_TYPE_INFO(0, object, IS_OBJECT, 0)
 	ZEND_ARG_INFO(0, recursive)
 	ZEND_ARG_INFO(0, properties)
 ZEND_END_ARG_INFO()
@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Arr, is_array){
  */
 PHP_METHOD(Phalcon_Arr, path){
 
-	zval *array, *path, *default_value = NULL, *delimiter = NULL, is_array = {}, keys = {}, key = {}, values = {}, *arr = NULL, value = {};
+	zval *array, *path, *default_value = NULL, *delimiter = NULL, keys = {}, key = {}, values = {}, *arr = NULL, value = {};
 
 	phalcon_fetch_params(0, 2, 2, &array, &path, &default_value, &delimiter);
 
@@ -285,12 +285,6 @@ PHP_METHOD(Phalcon_Arr, path){
 
 	if (!delimiter) {
 		delimiter = phalcon_read_static_property(SL("phalcon\\arr"), SL("delimiter"));
-	}
-
-	PHALCON_CALL_SELF(&is_array, "is_array", array);
-
-	if (!zend_is_true(&is_array)) {
-		goto end;
 	}
 
 	if (Z_TYPE_P(path) == IS_ARRAY) {
@@ -314,8 +308,7 @@ PHP_METHOD(Phalcon_Arr, path){
 
 		if (phalcon_array_isset_fetch(&values, array, &key, 0)) {
 			if (phalcon_fast_count_ev(&keys) > 0) {
-				PHALCON_CALL_SELF(&is_array, "is_array", &values);
-				if (zend_is_true(&is_array)) {
+				if (Z_TYPE(values) == IS_ARRAY) {
 					PHALCON_CPY_WRT_CTOR(array, &values);
 				} else {
 					// Unable to dig deeper
@@ -329,7 +322,7 @@ PHP_METHOD(Phalcon_Arr, path){
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(array), arr) {
 				PHALCON_CALL_SELF(&value, "path", arr, &keys);
-				
+
 				if (Z_TYPE(value) != IS_NULL) {
 					phalcon_array_append(&values, &value, PH_COPY);
 				}
@@ -348,7 +341,6 @@ PHP_METHOD(Phalcon_Arr, path){
 		}
 	} while (phalcon_fast_count_ev(&keys));
 
-end:
 	if (default_value) {
 		RETURN_CTOR(default_value);
 	}
@@ -417,7 +409,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 			break;
 		} else {
 			PHALCON_CALL_FUNCTION(&is_digit, "ctype_digit", &key);
-		
+
 			if (zend_is_true(&is_digit)) {
 				convert_to_long(&key);
 			}
@@ -602,7 +594,7 @@ PHP_METHOD(Phalcon_Arr, choice){
  *
  *     // Get the values "username", "password" from $_POST
  *     $auth = \Phalcon\Arr::extract($_POST, array('username', 'password'));
- *     
+ *
  *     // Get the value "level1.level2a" from $data
  *     $data = array('level1' => array('level2a' => 'value 1', 'level2b' => 'value 2'));
  *     \Phalcon\Arr::extract($data, array('level1.level2a', 'password'));
@@ -802,7 +794,7 @@ PHP_METHOD(Phalcon_Arr, merge){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
- 
+
 	if (ZEND_NUM_ARGS() > 2) {
 		args = (zval *)safe_emalloc(ZEND_NUM_ARGS(), sizeof(zval), 0);
 		if (zend_get_parameters_array_ex(ZEND_NUM_ARGS(), args) == FAILURE) {
@@ -858,7 +850,7 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 			phalcon_array_update_long(return_value, idx, value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
- 
+
 	if (ZEND_NUM_ARGS() > 2) {
 		args = (zval *)safe_emalloc(ZEND_NUM_ARGS(), sizeof(zval), 0);
 		if (zend_get_parameters_array_ex(ZEND_NUM_ARGS(), args) == FAILURE) {
@@ -1146,7 +1138,7 @@ PHP_METHOD(Phalcon_Arr, toArray){
 				} else {
 					ZVAL_LONG(&tmp, idx);
 				}
-				
+
 				if (Z_TYPE_P(value) == IS_OBJECT && Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_CE_STATIC(&array_value, phalcon_arr_ce, "toarray", value);
 					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);

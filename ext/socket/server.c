@@ -161,6 +161,8 @@ PHALCON_INIT_CLASS(Phalcon_Socket_Server){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Socket, Server, socket_server, phalcon_socket_ce,  phalcon_socket_server_method_entry, 0);
 
+	zend_declare_property_null(phalcon_socket_server_ce, SL("_address"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_socket_server_ce, SL("_port"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_socket_server_ce, SL("_daemon"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_socket_server_ce, SL("_maxChildren"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_socket_server_ce, SL("_clients"), ZEND_ACC_PROTECTED);
@@ -232,10 +234,8 @@ PHP_METHOD(Phalcon_Socket_Server, __construct){
 	}
 	phalcon_update_property_zval(getThis(), SL("_socket"), &socket);
 
-	PHALCON_CALL_FUNCTION(return_value, "socket_bind", &socket, address, port);
-	if (!PHALCON_IS_TRUE(return_value)) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
-	}
+	phalcon_update_property_zval(getThis(), SL("_address"), address);
+	phalcon_update_property_zval(getThis(), SL("_port"), port);
 
 	phalcon_update_property_empty_array(getThis(), SL("_clients"));
 }
@@ -313,7 +313,7 @@ PHP_METHOD(Phalcon_Socket_Server, getEvent){
  */
 PHP_METHOD(Phalcon_Socket_Server, listen){
 
-	zval *_backlog = NULL, backlog = {}, socket = {};
+	zval *_backlog = NULL, backlog = {}, socket = {}, address = {}, port = {};
 
 	phalcon_fetch_params(0, 0, 1, &_backlog);
 
@@ -324,6 +324,13 @@ PHP_METHOD(Phalcon_Socket_Server, listen){
 	}
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&address, getThis(), SL("_address"), PH_NOISY);
+	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY);
+
+	PHALCON_CALL_FUNCTION(return_value, "socket_bind", &socket, &address, &port);
+	if (!PHALCON_IS_TRUE(return_value)) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
+	}
 
 	PHALCON_CALL_FUNCTION(return_value, "socket_listen", &socket, &backlog);
 	if (!PHALCON_IS_TRUE(return_value)) {
@@ -693,7 +700,7 @@ worker:
 				client_fd = php_sock->bsd_socket;
 				ZVAL_LONG(&client_socket_id, client_fd);
 				if (php_sock->bsd_socket == listenfd) {
-					while((client_fd = accept(listenfd, (struct sockaddr *) &client_addr, &client_addr_len)) >= 0) {
+					if ((client_fd = accept(listenfd, (struct sockaddr *) &client_addr, &client_addr_len)) >= 0) {
 						zval tmp_client_socket = {}, tmp_client = {}, tmp_client_socket_id = {};
 						php_socket *tmp_client_sock;
 						tmp_client_sock = php_create_socket();
@@ -720,11 +727,6 @@ worker:
 							PHALCON_CALL_METHOD(NULL, getThis(), "onconnection", &tmp_client);
 						}
 						setkeepalive(client_fd);
-					}
-					if (client_fd < 0) {
-						if (errno != EAGAIN && errno != ECONNABORTED && errno != EPROTO && errno != EINTR) {
-							printf("unable to accept incoming connection:%d", errno);
-						}
 					}
 					continue;
 				} else {
@@ -842,16 +844,15 @@ worker:
 
 		while (server->running) {
 			int ret, i;
-			ret = epoll_wait(epollfd, events, EPOLL_EVENT_SIZE, sec);
-			if (ret == -1) {
+			ret = epoll_wait(epollfd, events, EPOLL_EVENT_SIZE/100, sec);
+			if (ret < 0) {
 				if (errno != EINTR && errno != EWOULDBLOCK) {
 					PHALCON_THROW_EXCEPTION_FORMAT(phalcon_socket_exception_ce, "epoll_wait() returns %d", errno);
 					phalcon_socket_server_destroy();
 					RETURN_FALSE;
 				}
 				continue;
-			}
-			if (ret == 0) {
+			} else if (ret == 0) {
 				if (phalcon_method_exists_ex(getThis(), SL("ontimeout")) == SUCCESS) {
 					PHALCON_CALL_METHOD(NULL, getThis(), "ontimeout");
 				}
@@ -870,47 +871,51 @@ worker:
 				}
 				ZVAL_LONG(&client_socket_id, event_fd);
 				if (event_fd == listenfd) {
-					if (events[i] & (EPOLLHUP | EPOLLERR)) {
+					if (events[i].events & (EPOLLHUP | EPOLLERR)) {
 						continue;
 					}
 					client_fd = accept(listenfd, (struct sockaddr *) &client_addr, &client_addr_len);
-					if (client_fd >= 0) {
-						zval tmp_client_socket = {}, tmp_client = {}, tmp_client_socket_id = {};
-						php_socket *tmp_client_sock;
-						tmp_client_sock = php_create_socket();
-						tmp_client_sock->bsd_socket = client_fd;
-						tmp_client_sock->error = 0;
-						tmp_client_sock->blocking = 1;
-						tmp_client_sock->type = ((struct sockaddr *) &client_addr)->sa_family;
+					if (client_fd < 0) {
+						continue;
+					}
+					zval tmp_client_socket = {}, tmp_client = {}, tmp_client_socket_id = {};
+					php_socket *tmp_client_sock;
+					tmp_client_sock = php_create_socket();
+					tmp_client_sock->bsd_socket = client_fd;
+					tmp_client_sock->error = 0;
+					tmp_client_sock->blocking = 1;
+					tmp_client_sock->type = ((struct sockaddr *) &client_addr)->sa_family;
 
-						ZVAL_RES(&tmp_client_socket, zend_register_resource(tmp_client_sock, php_sockets_le_socket()));
+					ZVAL_RES(&tmp_client_socket, zend_register_resource(tmp_client_sock, php_sockets_le_socket()));
 
-						object_init_ex(&tmp_client, phalcon_socket_client_ce);
-						PHALCON_CALL_METHOD(NULL, &tmp_client, "__construct", &tmp_client_socket);
+					object_init_ex(&tmp_client, phalcon_socket_client_ce);
+					PHALCON_CALL_METHOD(NULL, &tmp_client, "__construct", &tmp_client_socket);
 
-						ZVAL_LONG(&tmp_client_socket_id, client_fd);
-						phalcon_update_property_array(getThis(), SL("_clients"), &tmp_client_socket_id, &tmp_client);
+					ZVAL_LONG(&tmp_client_socket_id, client_fd);
+					phalcon_update_property_array(getThis(), SL("_clients"), &tmp_client_socket_id, &tmp_client);
 
-						PHALCON_CALL_METHOD(NULL, &tmp_client, "setblocking", &PHALCON_GLOBAL(z_false));
+					PHALCON_CALL_METHOD(NULL, &tmp_client, "setblocking", &PHALCON_GLOBAL(z_false));
 
-						if (Z_TYPE(onconnection) > IS_NULL) {
-							args = (zval *)safe_emalloc(1, sizeof(zval), 0);
-							ZVAL_COPY(&args[0], &tmp_client);
-							PHALCON_CALL_USER_FUNC_ARGS(NULL, &onconnection, args, 1);
-						} else if (phalcon_method_exists_ex(getThis(), SL("onconnection")) == SUCCESS) {
-							PHALCON_CALL_METHOD(NULL, getThis(), "onconnection", &tmp_client);
-						}
-						setkeepalive(client_fd);
-						ev.data.fd = client_fd;
-						ev.events = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET;
-						if ((epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_ADD, client_fd, &ev)) < 0) {
-							shutdown(client_fd, SHUT_RDWR);
-							close(client_fd);
-							continue;
-						}
+					if (Z_TYPE(onconnection) > IS_NULL) {
+						args = (zval *)safe_emalloc(1, sizeof(zval), 0);
+						ZVAL_COPY(&args[0], &tmp_client);
+						PHALCON_CALL_USER_FUNC_ARGS(NULL, &onconnection, args, 1);
+					} else if (phalcon_method_exists_ex(getThis(), SL("onconnection")) == SUCCESS) {
+						PHALCON_CALL_METHOD(NULL, getThis(), "onconnection", &tmp_client);
+					}
+					setkeepalive(client_fd);
+					ev.data.fd = client_fd;
+					ev.events = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET;
+					epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_ADD, client_fd, &ev);
+					if (epoll_ctl_ret < 0) {
+						close(client_fd);
 					}
 					continue;
-				} else if (events[i].events & EPOLLIN) {
+				}
+				if (events[i].events & (EPOLLHUP | EPOLLERR)) {
+						continue;
+				}
+				if (events[i].events & EPOLLIN) {
 					PHALCON_CALL_METHOD(&client, getThis(), "getclient", &client_socket_id);
 
 					zend_string	*tmpbuf;
@@ -922,10 +927,6 @@ worker:
 
 					if (retval < 0) {
 						zend_string_free(tmpbuf);
-						if(errno == EAGAIN || errno == EWOULDBLOCK) {
-							status = 1;
-							break;
-						}
 						if (Z_TYPE(onerror) > IS_NULL) {
 							args = (zval *)safe_emalloc(1, sizeof(zval), 0);
 							ZVAL_COPY(&args[0], &client);
@@ -934,11 +935,9 @@ worker:
 							PHALCON_CALL_METHOD(NULL, getThis(), "onerror", &client);
 						}
 						status = -1;
-						break;
 					} else if (retval == 0) {
 						zend_string_free(tmpbuf);
 						status = -1;
-						break;
 					} else {
 						status = 1;
 						tmpbuf = zend_string_truncate(tmpbuf, retval, 0);
@@ -957,19 +956,22 @@ worker:
 
 						if (PHALCON_IS_FALSE(&ret)) {
 							status = -1;
-							break;
 						}
 					}
 
+					ev.data.fd = event_fd;
 					if (status > 0) {
-						ev.data.fd = event_fd;
 						if (retval == Z_LVAL(maxlen)) {
-							ev.events = EPOLLIN | EPOLLERR | EPOLLET;
+							ev.events = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET;
 						} else {
 							ev.events = EPOLLOUT | EPOLLHUP | EPOLLERR;
 						}
-						epoll_ctl(epollfd, EPOLL_CTL_MOD, event_fd, &ev);
-					} else {
+						epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_MOD, event_fd, &ev);
+						if (epoll_ctl_ret < 0) {
+							status = -1;
+						}
+					}
+					if  (status < 0) {
 						if (Z_TYPE(onclose) > IS_NULL) {
 							args = (zval *)safe_emalloc(1, sizeof(zval), 0);
 							ZVAL_COPY(&args[0], &client);
@@ -977,9 +979,8 @@ worker:
 						} else if (phalcon_method_exists_ex(getThis(), SL("onclose")) == SUCCESS) {
 							PHALCON_CALL_METHOD(NULL, getThis(), "onclose", &client);
 						}
-						events[i].data.fd = -1;
-						epoll_ctl(epollfd, EPOLL_CTL_DEL, event_fd, NULL);
-						shutdown(event_fd, SHUT_RDWR);
+						ev.events = EPOLLOUT | EPOLLHUP;
+						epoll_ctl(epollfd, EPOLL_CTL_DEL, event_fd, &ev);
 						close(event_fd);
 						phalcon_unset_property_array(getThis(), SL("_clients"), &client_socket_id);
 					}
@@ -992,7 +993,7 @@ worker:
 					} else if (phalcon_method_exists_ex(getThis(), SL("onsend")) == SUCCESS) {
 						PHALCON_CALL_METHOD(&ret, getThis(), "onsend", &client, &data);
 					}
-
+					ev.data.fd = event_fd;
 					if (PHALCON_IS_FALSE(&ret)) {
 						if (Z_TYPE(onclose) > IS_NULL) {
 							args = (zval *)safe_emalloc(1, sizeof(zval), 0);
@@ -1001,22 +1002,18 @@ worker:
 						} else if (phalcon_method_exists_ex(getThis(), SL("onclose")) == SUCCESS) {
 							PHALCON_CALL_METHOD(NULL, getThis(), "onclose", &client);
 						}
-						events[i].data.fd = -1;
-						epoll_ctl(epollfd, EPOLL_CTL_DEL, event_fd, NULL);
-						shutdown(event_fd, SHUT_RDWR);
+						ev.events = EPOLLOUT | EPOLLHUP;
+						epoll_ctl(epollfd, EPOLL_CTL_DEL, event_fd, &ev);
 						close(event_fd);
 						phalcon_unset_property_array(getThis(), SL("_clients"), &client_socket_id);
 					} else {
 						ev.data.fd = event_fd;
-						ev.events = EPOLLIN | EPOLLERR | EPOLLET;
-						epoll_ctl(epollfd, EPOLL_CTL_MOD, event_fd, &ev);
+						ev.events = EPOLLIN | EPOLLOUT | EPOLLHUP | EPOLLET;
+						epoll_ctl_ret = epoll_ctl(epollfd, EPOLL_CTL_MOD, event_fd, &ev);
+						if (epoll_ctl_ret < 0) {
+							close(client_fd);
+						}
 					}
-				} else if (events[i].events & EPOLLERR) {
-					events[i].data.fd = -1;
-					epoll_ctl(epollfd, EPOLL_CTL_DEL, event_fd, NULL);
-					shutdown(event_fd, SHUT_RDWR);
-					close(event_fd);
-					phalcon_unset_property_array(getThis(), SL("_clients"), &client_socket_id);
 				}
 			}
 		}

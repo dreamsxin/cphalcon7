@@ -241,7 +241,9 @@ void phalcon_server_http_process_write(struct phalcon_server_context *ctx, struc
 	goto back;
 
 free_back:
+	// __sync_synchronize();
 	phalcon_server_client_close(client_ctx);
+	// __sync_synchronize();
 	phalcon_server_free_context(client_ctx);
 
 back:
@@ -326,7 +328,7 @@ static void phalcon_server_http_process_read(struct phalcon_server_context *ctx,
 			evt.data.ptr = client_ctx;
 			ret = epoll_ctl(ep_fd, EPOLL_CTL_MOD, fd, &evt);
 			if (ret < 0) {
-				perror("Unable to add client socket read event to epoll");
+				perror("Unable to add client socket write event to epoll");
 				goto free_back;
 			}
 			goto back;
@@ -348,8 +350,9 @@ static void phalcon_server_http_process_read(struct phalcon_server_context *ctx,
 
 free_back:
 	phalcon_server_log_printf(ctx, "cpu[%d] close socket %d\n", cpu_id, client_ctx->fd);
-
+	//__sync_synchronize();
 	phalcon_server_client_close(client_ctx);
+	//__sync_synchronize();
 	phalcon_server_free_context(client_ctx);
 
 back:
@@ -371,8 +374,8 @@ PHP_METHOD(Phalcon_Server_Http, start){
 
 	intern = phalcon_server_http_object_from_obj(Z_OBJ_P(getThis()));
 	PHALCON_SERVER_COPY_TO_STACK(&intern->application, application);
-	intern->ctx.read =phalcon_server_http_process_read;
-	intern->ctx.write =phalcon_server_http_process_write;
+	intern->ctx.read = phalcon_server_http_process_read;
+	intern->ctx.write = phalcon_server_http_process_write;
 	printf("Listen address:\n\t%s:%d\n", intern->ctx.la[0].param_ip, intern->ctx.la[0].param_port);
 
 	phalcon_server_init_log(&intern->ctx);

@@ -144,7 +144,7 @@ struct phalcon_server_conn_context *phalcon_server_alloc_context(struct phalcon_
 	struct phalcon_server_conn_context *ret;
 
 	assert(pool->allocated < pool->total);
-	pool->allocated++;
+	pool->allocated++; // __sync_fetch_and_add(pool->allocated, 1);
 
 	ret = &pool->arr[pool->next_idx];
 	pool->next_idx = pool->arr[pool->next_idx].next_idx;
@@ -163,10 +163,26 @@ void phalcon_server_free_context(struct phalcon_server_conn_context *context)
 	struct phalcon_server_context_pool *pool = context->pool;
 
 	assert(pool->allocated > 0);
-	pool->allocated--;
+	pool->allocated--; // __sync_fetch_and_sub(pool->allocated, 1);
 
 	context->next_idx = pool->next_idx;
 	pool->next_idx = context - pool->arr;
+}
+
+struct phalcon_server_conn_context *phalcon_server_get_context(struct phalcon_server_context_pool *pool, int fd)
+{
+	struct phalcon_server_conn_context *ret = NULL;
+	int i;
+
+	assert(pool->allocated > 0);
+	for (i = 0; i < pool->allocated; i++) {
+		ret = &pool->arr[i];
+		if (ret->fd == fd) {
+			break;
+		}
+	}
+
+	return ret;
 }
 
 int phalcon_server_init_single_server(struct phalcon_server_context *ctx, struct in_addr ip, uint16_t port)
@@ -302,7 +318,6 @@ static void phalcon_server_worker_threadpool_destroy(struct phalcon_server_conte
 void phalcon_server_process_clients(struct phalcon_server_context *ctx, void *arg)
 {
 	struct phalcon_server_worker_data *mydata = (struct phalcon_server_worker_data *)arg;
-	struct phalcon_server_context_pool *pool = NULL;
 
 	struct epoll_event evt;
 	struct epoll_event evts[PHALCON_SERVER_EVENTS_PER_BATCH];
@@ -323,7 +338,7 @@ void phalcon_server_process_clients(struct phalcon_server_context *ctx, void *ar
 		phalcon_server_exit_cleanup(ctx);
 	}
 
-	pool = phalcon_server_init_pool(PHALCON_SERVER_MAX_CONNS_PER_WORKER);
+	ctx->pool = phalcon_server_init_pool(PHALCON_SERVER_MAX_CONNS_PER_WORKER);
 
 	if ((ep_fd = epoll_create(PHALCON_SERVER_MAX_CONNS_PER_WORKER)) < 0) {
 		perror("Unable to create epoll FD");
@@ -331,10 +346,10 @@ void phalcon_server_process_clients(struct phalcon_server_context *ctx, void *ar
 	}
 
 	for (i = 0; i < ctx->la_num; i++) {
-		listen_ctx = phalcon_server_alloc_context(pool);
+		listen_ctx = phalcon_server_alloc_context(ctx->pool);
 
 		listen_ctx->fd = ctx->la[i].listen_fd;
-		listen_ctx->handler = phalcon_server_process_accept;
+		listen_ctx->handler = ctx->accept ? ctx->accept : phalcon_server_builtin_process_accept;
 		listen_ctx->cpu_id = cpu_id;
 		listen_ctx->ep_fd = ep_fd;
 
@@ -434,6 +449,7 @@ void phalcon_server_init_workers(struct phalcon_server_context *ctx)
 			phalcon_server_exit_cleanup(ctx);
 		} else if( pid == 0) {
 			ctx->wdata[i].process = getpid();
+			ctx->cpu_id = ctx->wdata[i].cpu_id ;
 			phalcon_server_process_clients(ctx, (void *)&(ctx->wdata[i]));
 			exit(0);
 		}
@@ -460,7 +476,7 @@ void phalcon_server_client_close(struct phalcon_server_conn_context *ctx)
 	close(fd);
 }
 
-void phalcon_server_process_accept(struct phalcon_server_context *ctx, struct phalcon_server_conn_context * listen_ctx)
+void phalcon_server_builtin_process_accept(struct phalcon_server_context *ctx, struct phalcon_server_conn_context * listen_ctx)
 {
 	int client_fd, listen_fd;
 	int events = listen_ctx->events;
@@ -497,29 +513,31 @@ void phalcon_server_process_accept(struct phalcon_server_context *ctx, struct ph
 		flags |= O_NONBLOCK;
 		fcntl(client_fd, F_SETFL, flags);
 #endif
+
 		phalcon_server_log_printf(ctx, "Accept socket %d from %d\n", client_fd, listen_fd);
+
+		client_ctx = phalcon_server_alloc_context(listen_ctx->pool);
+		assert(client_ctx);
+
+		client_ctx->fd = client_fd;
+
+		client_ctx->handler = ctx->read;
+
+		client_ctx->cpu_id = listen_ctx->cpu_id;
+		client_ctx->ep_fd = listen_ctx->ep_fd;
+
+		evt.events = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET;
+		evt.data.ptr = client_ctx;
+
+		ret = epoll_ctl(client_ctx->ep_fd, EPOLL_CTL_ADD, client_ctx->fd, &evt);
+		if (ret < 0) {
+			perror("Unable to add client socket read event to epoll");
+			goto free_back;
+		}
+
+		client_ctx->fd_added = 1;
+		ctx->wdata[cpu_id].acceptcnt++;
 	}
-
-	client_ctx = phalcon_server_alloc_context(listen_ctx->pool);
-	assert(client_ctx);
-
-	client_ctx->fd = client_fd;
-
-	client_ctx->handler = ctx->read;
-
-	client_ctx->cpu_id = listen_ctx->cpu_id;
-	client_ctx->ep_fd = listen_ctx->ep_fd;
-
-	evt.events = EPOLLIN | EPOLLHUP | EPOLLERR | EPOLLET;
-	evt.data.ptr = client_ctx;
-
-	ret = epoll_ctl(client_ctx->ep_fd, EPOLL_CTL_ADD, client_ctx->fd, &evt);
-	if (ret < 0) {
-		perror("Unable to add client socket read event to epoll");
-		goto free_back;
-	}
-
-	client_ctx->fd_added = 1;
 
 	goto back;
 
@@ -564,10 +582,11 @@ void phalcon_server_do_stats(struct phalcon_server_context *ctx)
 		}
 
 		if(signum == SIGALRM) {
-			uint64_t trancnt = 0;
+			uint64_t acceptcnt = 0, trancnt = 0;
 
 			for(i = 0; i < ctx->num_workers; i++)
 			{
+				acceptcnt += ctx->wdata[i].acceptcnt - ctx->wdata[i].acceptcnt_prev;
 				trancnt += ctx->wdata[i].trancnt - ctx->wdata[i].trancnt_prev;
 				if (unlikely(ctx->enable_verbose))
 					fprintf(p, "%"PRIu64"[%"PRIu64"-%"PRIu64"-%"PRIu64"-%"PRIu64"-%"PRIu64"-%"PRIu64"-%"PRIu64"-%"PRIu64"]  ",
@@ -575,10 +594,11 @@ void phalcon_server_do_stats(struct phalcon_server_context *ctx)
 						ctx->wdata[i].polls_lst, ctx->wdata[i].polls_min, ctx->wdata[i].polls_max,
 						ctx->wdata[i].polls_avg, ctx->wdata[i].accept_cnt, ctx->wdata[i].read_cnt,
 						ctx->wdata[i].write_cnt);
+				ctx->wdata[i].acceptcnt_prev = ctx->wdata[i].acceptcnt;
 				ctx->wdata[i].trancnt_prev = ctx->wdata[i].trancnt;
 			}
 
-			fprintf(p, "\tRequest/s %8"PRIu64"\n", trancnt);
+			fprintf(p, "\tRequest/s %8"PRIu64",%8"PRIu64"\n", acceptcnt, trancnt);
 
 		} else if(signum == SIGINT) {
 			phalcon_server_stop_workers(ctx);

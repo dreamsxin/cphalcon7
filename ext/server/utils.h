@@ -26,20 +26,6 @@
 
 #include <Zend/zend_smart_str.h>
 
-#define PHALCON_SERVER_COPY_TO_STACK(a, b) \
-	{ \
-    	memcpy(a, b, sizeof(zval)); \
-	}
-
-#define PHALCON_SERVER_STRING_APPEND(dest, str) \
-	{ \
-		int old_len, len; \
-		old_len = ZSTR_LEN(dest); len = ZSTR_LEN(str); \
-		dest = zend_string_extend(dest, old_len + len + 1, 0); \
-		memcpy(&(ZSTR_VAL(dest)[old_len]), ZSTR_VAL(str), len); \
-		ZSTR_VAL(dest)[old_len + len] = '\0'; \
-	}
-
 int phalcon_http_parser_on_message_begin(http_parser *);
 int phalcon_http_parser_on_url(http_parser *, const char *at, size_t length);
 int phalcon_http_parser_on_status(http_parser *, const char *at, size_t length);

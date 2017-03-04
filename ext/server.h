@@ -26,12 +26,17 @@
 #include "server/core.h"
 
 typedef struct _phalcon_server_object {
-	struct phalcon_server_context *ctx;
+	struct phalcon_server_context ctx;
+	zval application;
 	zend_object std;
 } phalcon_server_object;
 
 static inline phalcon_server_object *phalcon_server_object_from_obj(zend_object *obj) {
 	return (phalcon_server_object*)((char*)(obj) - XtOffsetOf(phalcon_server_object, std));
+}
+
+static inline phalcon_server_object *phalcon_server_object_from_ctx(struct phalcon_server_context *ctx) {
+	return (phalcon_server_object*)((char*)(ctx) - XtOffsetOf(phalcon_server_object, ctx));
 }
 
 extern zend_class_entry *phalcon_server_ce;

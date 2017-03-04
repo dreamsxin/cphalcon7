@@ -118,6 +118,8 @@ struct phalcon_server_worker_data {
 	pid_t process;
 	uint64_t trancnt;
 	uint64_t trancnt_prev;
+	uint64_t acceptcnt;
+	uint64_t acceptcnt_prev;
 	int cpu_id;
 	uint64_t polls_max;
 	uint64_t polls_min;
@@ -129,7 +131,6 @@ struct phalcon_server_worker_data {
 	uint64_t accept_cnt;
 	uint64_t read_cnt;
 	uint64_t write_cnt;
-	struct phalcon_server_conn_context clients[PHALCON_SERVER_MAX_CONNS_PER_WORKER];
 	int shutdown;
 #if PHALCON_USE_THREADPOOL
 	pthread_t main_thread;
@@ -146,8 +147,11 @@ struct phalcon_server_context {
 	int pfd;
 	FILE *log_file;
 	zend_string *log_path;
+	int cpu_id;
+	phalcon_server_context_pool_t *pool;
 	struct phalcon_server_worker_data *wdata;
 	struct phalcon_server_listen_addr la[32];
+	void (*accept)(phalcon_server_context_t *, phalcon_server_conn_context_t *);
 	void (*read)(phalcon_server_context_t *, phalcon_server_conn_context_t *);
 	void (*write)(phalcon_server_context_t *, phalcon_server_conn_context_t *);
 };
@@ -164,8 +168,9 @@ void phalcon_server_stop_workers(struct phalcon_server_context *ctx);
 void phalcon_server_client_close(struct phalcon_server_conn_context *client_ctx);
 struct phalcon_server_conn_context *phalcon_server_alloc_context(struct phalcon_server_context_pool *pool);
 void phalcon_server_free_context(struct phalcon_server_conn_context *client_ctx);
+struct phalcon_server_conn_context *phalcon_server_get_context(struct phalcon_server_context_pool *pool, int fd);
 
-void phalcon_server_process_accept(struct phalcon_server_context *ctx, struct phalcon_server_conn_context * listen_ctx);
+void phalcon_server_builtin_process_accept(struct phalcon_server_context *ctx, struct phalcon_server_conn_context * listen_ctx);
 
 static inline int phalcon_server_get_cpu_num(){
 	return sysconf(_SC_NPROCESSORS_ONLN);
@@ -175,5 +180,19 @@ static inline int phalcon_server_get_cpu_num(){
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) \
 			printf("Worker[%lu] %s:%d\t" fmt, syscall(__NR_gettid),__FUNCTION__ , __LINE__, ## args); \
 	})
+
+#define PHALCON_SERVER_COPY_TO_STACK(a, b) \
+	{ \
+    	memcpy(a, b, sizeof(zval)); \
+	}
+
+#define PHALCON_SERVER_STRING_APPEND(dest, str) \
+	{ \
+		int old_len, len; \
+		old_len = ZSTR_LEN(dest); len = ZSTR_LEN(str); \
+		dest = zend_string_extend(dest, old_len + len + 1, 0); \
+		memcpy(&(ZSTR_VAL(dest)[old_len]), ZSTR_VAL(str), len); \
+		ZSTR_VAL(dest)[old_len + len] = '\0'; \
+	}
 
 #endif /* PHALCON_SERVER_CORE_H */

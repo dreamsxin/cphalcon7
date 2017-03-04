@@ -85,7 +85,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
+	if (Z_TYPE_P(options) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Invalid options");
 		return;
 	}
@@ -118,7 +118,13 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 	if ((constant = zend_get_constant_str(SL("LC_ALL"))) != NULL) {
 		PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, &locale);
 	}
-
+/*
+	if ((constant = zend_get_constant_str(SL("LC_MESSAGES"))) != NULL) {
+		zval val = {};
+		ZVAL_STRING(&val, "LC_MESSAGES");
+		PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, &locale);
+	}
+*/
 	if (Z_TYPE(directory) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(directory), idx, str_key, value) {
 			zval key = {};
@@ -199,6 +205,6 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, exists){
 	if (Z_STRLEN(translation) > 0) {
 		RETURN_TRUE;
 	}
-	
+
 	RETURN_FALSE;
 }

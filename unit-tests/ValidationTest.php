@@ -1056,7 +1056,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		)));
 
 		$validation->setLabels(array('firstname' => 'First name'));
-                
+
 		$messages = $validation->validate($_POST);
 
 		$expectedMessages = Phalcon\Validation\Message\Group::__set_state(array(
@@ -1315,5 +1315,14 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		$messages = $validation->validate($_POST);
 
 		$this->assertTrue(count($messages) > 0);
+	}
+
+	public function testValidationMessages()
+	{
+		$this->assertEquals(Phalcon\Validation::getMessage('TooLarge'), "Field :field scale is out of range");
+		$this->assertEquals(Phalcon\Validation::getMessage('Alnum'), "字段 :field 只能包含字母和数字");
+
+		Phalcon\Validation::setFile('MyValidation');
+		$this->assertEquals(Phalcon\Validation::getMessage('TooLarge'), "字段 :field 精度超出了范围");
 	}
 }

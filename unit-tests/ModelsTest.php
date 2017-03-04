@@ -333,19 +333,19 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		$messages = array(
 			0 => ModelMessage::__set_state(array(
 				'_type' => 'PresenceOf',
-				'_message' => 'tipo_documento_id is required',
+				'_message' => 'Field tipo_documento_id is required',
 				'_field' => 'tipo_documento_id',
 				'_code' => 0,
 			)),
 			1 => ModelMessage::__set_state(array(
 				'_type' => 'PresenceOf',
-				'_message' => 'cupo is required',
+				'_message' => 'Field cupo is required',
 				'_field' => 'cupo',
 				'_code' => 0,
 			)),
 			2 => ModelMessage::__set_state(array(
 				'_type' => 'PresenceOf',
-				'_message' => 'estado is required',
+				'_message' => 'Field estado is required',
 				'_field' => 'estado',
 				'_code' => 0,
 			)),
@@ -611,19 +611,19 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		$messages = array(
 			0 => ModelMessage::__set_state(array(
 				'_type' => 'PresenceOf',
-				'_message' => 'slagBorgerId is required',
+				'_message' => 'Field slagBorgerId is required',
 				'_field' => 'slagBorgerId',
 				'_code' => 0,
 			)),
 			1 => ModelMessage::__set_state(array(
 				'_type' => 'PresenceOf',
-				'_message' => 'kredit is required',
+				'_message' => 'Field kredit is required',
 				'_field' => 'kredit',
 				'_code' => 0,
 			)),
 			2 => ModelMessage::__set_state(array(
 				'_type' => 'PresenceOf',
-				'_message' => 'status is required',
+				'_message' => 'Field status is required',
 				'_field' => 'status',
 				'_code' => 0,
 			)),

@@ -42,6 +42,7 @@
 #include "validationinterface.h"
 #include "validation/message/group.h"
 #include "validation/message.h"
+#include "validation.h"
 #include "debug.h"
 
 #include <Zend/zend_closures.h>
@@ -3259,6 +3260,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 	zval *exists, *identity_field, event_name = {}, status = {}, attributes = {}, data_type_numeric = {}, data_types = {}, column_map = {};
 	zval automatic_attributes = {}, default_values = {}, *error, *field, skipped = {}, exception_message = {};
+	int method_exists = 0;
 	double num, max;
 
 	phalcon_fetch_params(0, 2, 0, &exists, &identity_field);
@@ -3338,9 +3340,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		RETURN_FALSE;
 	}
 
+	if (phalcon_method_exists_ex(getThis(), SL("getlabel")) == SUCCESS) {
+		method_exists = 1;
+	}
+
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), field) {
 		zval attribute_field = {}, value = {}, field_type = {}, is_not_null = {}, message = {}, type = {}, field_size = {};
-		zval field_scale = {}, field_byte = {}, str_value = {}, length = {}, pos = {};
+		zval field_scale = {}, field_byte = {}, str_value = {}, length = {}, pos = {}, label = {}, pairs = {}, prepared = {};
 		/**
 		 * We don't check fields that must be omitted
 		 */
@@ -3382,20 +3388,36 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 				PHALCON_CALL_METHOD(&is_not_null, getThis(), "isnotnull", field);
 				if (zend_is_true(&is_not_null) && !phalcon_array_isset(&default_values, field)) {
-					PHALCON_CONCAT_VS(&message, &attribute_field, " is required");
 					PHALCON_STR(&type, "PresenceOf");
+					PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+					if (method_exists) {
+						PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+					} else {
+						PHALCON_CPY_WRT(&label, &attribute_field);
+					}
+					array_init_size(&pairs, 1);
+					phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+					PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
 
-					PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
+					PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
 					error = &PHALCON_GLOBAL(z_true);
 				}
 			} else if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
 				if (phalcon_array_isset(&data_type_numeric, field)) {
 					if (!phalcon_is_numeric(&value)) {
-						PHALCON_CONCAT_SVS(&message, "Value of field '", &attribute_field, "' must be numeric");
 						PHALCON_STR(&type, "Numericality");
+						PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+						if (method_exists) {
+							PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+						} else {
+							PHALCON_CPY_WRT(&label, &attribute_field);
+						}
+						array_init_size(&pairs, 1);
+						phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+						PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
 
-						PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
+						PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
 						error = &PHALCON_GLOBAL(z_true);
 					} else if (!phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_INTEGER)) {
@@ -3411,22 +3433,36 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 						}
 
 						if (phalcon_is_numeric(&field_scale) && PHALCON_LT_LONG(&field_scale, (Z_LVAL(length)-Z_LVAL(pos)-1))) {
-							PHALCON_CONCAT_SVSV(&message, "Value of field '", field, "' scale is out of range for type ", &field_type);
+							PHALCON_STR(&type, "TooLarge");
+							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+							if (method_exists) {
+								PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+							} else {
+								PHALCON_CPY_WRT(&label, &attribute_field);
+							}
+							array_init_size(&pairs, 1);
+							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
 
-							PHALCON_STR(&type, "tooLarge");
-
-							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
+							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
 							error = &PHALCON_GLOBAL(z_true);
 							continue;
 						}
 
 						if (PHALCON_GT_LONG(&pos, (Z_LVAL(field_size)-Z_LVAL(field_scale)))) {
-							PHALCON_CONCAT_SVSV(&message, "Value of field '", field, "' is out of range for type ", &field_type);
+							PHALCON_STR(&type, "TooLarge");
+							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+							if (method_exists) {
+								PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+							} else {
+								PHALCON_CPY_WRT(&label, &attribute_field);
+							}
+							array_init_size(&pairs, 1);
+							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
 
-							PHALCON_STR(&type, "tooLarge");
-
-							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
+							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
 							error = &PHALCON_GLOBAL(z_true);
 						}
@@ -3437,21 +3473,36 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 						phalcon_fast_strpos_str(&pos, &str_value, SL("."));
 
 						if (phalcon_is_numeric(&pos)) {
-							PHALCON_CONCAT_SVS(&message, "Value of field '", field, "' must be int");
 							PHALCON_STR(&type, "Numericality");
+							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+							if (method_exists) {
+								PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+							} else {
+								PHALCON_CPY_WRT(&label, &attribute_field);
+							}
+							array_init_size(&pairs, 1);
+							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
 
-							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
+							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 							error = &PHALCON_GLOBAL(z_true);
 						} else {
 							num = phalcon_get_intval(&value);
 							max = pow(2, ((Z_LVAL(field_byte)*8) - 1)) - 1;
 
 							if (num > max) {
-								PHALCON_CONCAT_SVSV(&message, "Value of field '", field, "' is out of range for type ", &field_type);
+								PHALCON_STR(&type, "TooLarge");
+								PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								if (method_exists) {
+									PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+								} else {
+									PHALCON_CPY_WRT(&label, &attribute_field);
+								}
+								array_init_size(&pairs, 1);
+								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+								PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
 
-								PHALCON_STR(&type, "tooLarge");
-
-								PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
+								PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
 								error = &PHALCON_GLOBAL(z_true);
 							}
@@ -3473,11 +3524,18 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 						}
 
 						if (phalcon_greater(&length, &field_size)) {
-							PHALCON_CONCAT_SVSVS(&message, "Value of field '", field, "' exceeds the maximum ", &field_size, " characters");
-
 							PHALCON_STR(&type, "TooLong");
+							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+							if (method_exists) {
+								PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+							} else {
+								PHALCON_CPY_WRT(&label, &attribute_field);
+							}
+							array_init_size(&pairs, 1);
+							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
 
-							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &attribute_field, &type);
+							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
 							error = &PHALCON_GLOBAL(z_true);
 						}

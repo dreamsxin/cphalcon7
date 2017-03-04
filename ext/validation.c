@@ -27,6 +27,7 @@
 #include "di.h"
 #include "di/injectable.h"
 #include "filterinterface.h"
+#include "kernel.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -63,9 +64,12 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages);
 PHP_METHOD(Phalcon_Validation, getDefaultMessage);
 PHP_METHOD(Phalcon_Validation, setLabels);
 PHP_METHOD(Phalcon_Validation, getLabel);
+PHP_METHOD(Phalcon_Validation, setFile);
+PHP_METHOD(Phalcon_Validation, getMessage);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, validators)
+	ZEND_ARG_INFO(0, file)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfilters, 0, 0, 2)
@@ -94,8 +98,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getvalue, 0, 0, 1)
 	ZEND_ARG_INFO(0, attribute)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setdefaultmessages, 0, 0, 0)
-	ZEND_ARG_INFO(0, messages)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setdefaultmessages, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, messages, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getdefaultmessage, 0, 0, 1)
@@ -108,6 +112,14 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getlabel, 0, 0, 1)
 	ZEND_ARG_INFO(0, field)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfile, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getmessage, 0, 0, 1)
+	ZEND_ARG_INFO(0, type)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_validation_method_entry[] = {
@@ -127,6 +139,8 @@ static const zend_function_entry phalcon_validation_method_entry[] = {
 	PHP_ME(Phalcon_Validation, getDefaultMessage, arginfo_phalcon_validation_getdefaultmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setLabels, arginfo_phalcon_validation_setlabels, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getLabel, arginfo_phalcon_validation_getlabel, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, setFile, arginfo_phalcon_validation_setfile, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Validation, getMessage, arginfo_phalcon_validation_getmessage, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -143,8 +157,8 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 	zend_declare_property_null(phalcon_validation_ce, SL("_filters"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_messages"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_values"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_validation_ce, SL("_defaultMessages"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_labels"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_validation_ce, SL("_file"), "validation", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_class_implements(phalcon_validation_ce, 1, phalcon_validationinterface_ce);
 
@@ -153,21 +167,11 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 
 int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *type)
 {
-	zval messages = {}, t = {}, *params[1];
-	if (is_phalcon_class(ce)) {
-		phalcon_read_property(&messages, this_ptr, SL("_defaultMessages"), PH_NOISY);
+	zval t = {}, *params[1];
+	ZVAL_STRING(&t, type);
+	params[0] = &t;
 
-		if (!phalcon_array_isset_fetch_str(retval, &messages, type, strlen(type))) {
-			ZVAL_NULL(retval);
-		}
-
-		return SUCCESS;
-	} else {
-		ZVAL_STRING(&t, type);
-		params[0] = &t;
-
-		return phalcon_call_method(retval, this_ptr, "getdefaultmessage", 1, params);
-	}
+	return phalcon_call_method(retval, this_ptr, "getdefaultmessage", 1, params);
 }
 
 /**
@@ -177,9 +181,9 @@ int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_e
  */
 PHP_METHOD(Phalcon_Validation, __construct){
 
-	zval *validators = NULL;
+	zval *validators = NULL, *file = NULL;
 
-	phalcon_fetch_params(0, 0, 1, &validators);
+	phalcon_fetch_params(0, 0, 2, &validators, &file);
 
 	if (!validators) {
 		validators = &PHALCON_GLOBAL(z_null);
@@ -191,11 +195,13 @@ PHP_METHOD(Phalcon_Validation, __construct){
 		phalcon_update_property_zval(getThis(), SL("_validators"), validators);
 	}
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "setdefaultmessages");
-
 	/* Check for an 'initialize' method */
 	if (phalcon_method_exists_ex(getThis(), SL("initialize")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "initialize");
+	}
+
+	if (file && zend_is_true(file)) {
+		phalcon_update_static_property_ce(phalcon_validation_ce, SL("_file"), file);
 	}
 }
 
@@ -552,67 +558,28 @@ PHP_METHOD(Phalcon_Validation, getValue){
 
 PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 {
-	zval *messages = NULL, default_messages = {}, m = {};
+	zval *messages, *file, default_messages = {};
 
-	phalcon_fetch_params(0, 0, 1, &messages);
+	phalcon_fetch_params(0, 1, 0, &messages);
 
-	if (messages && Z_TYPE_P(messages) != IS_NULL && Z_TYPE_P(messages) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Messages must be an array");
-		return;
-	}
+	file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
 
-	array_init_size(&default_messages, 22);
+	phalcon_read_static_property_array_ce(&default_messages, phalcon_kernel_ce, SL("_defaultMessages"), file);
 
-	phalcon_array_update_str_str(&default_messages, SL("Alnum"),             SL("Field :field must contain only letters and numbers"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Alpha"),             SL("Field :field must contain only letters"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Between"),           SL("Field :field must be within the range of :min to :max"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Confirmation"),      SL("Field :field must be the same as :with"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Digit"),             SL("Field :field must be numeric"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Email"),             SL("Field :field must be an email address"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("ExclusionIn"),       SL("Field :field must not be a part of list: :domain"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileEmpty"),         SL("Field :field must not be empty"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileIniSize"),       SL("File :field exceeds the maximum file size"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileMaxResolution"), SL("File :field must not exceed :max resolution"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileMinResolution"), SL("File :field must be at least :min resolution"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileSize"),          SL("File :field exceeds the size of :max"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileMaxSize"),       SL("File :field the size must not exceed :max"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileMinSize"),       SL("File :field the size must be at least :min"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileType"),          SL("File :field must be of type: :types"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("FileValid"),         SL("Field :field is not valid"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("ImageMaxWidth"),     SL("Image :field the width must not exceed :max"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("ImageMinWidth"),     SL("Image :field the width must be at least :min"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("ImageMaxHeight"),    SL("Image :field the height must not exceed :max"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("ImageMinHeight"),    SL("Image :field the height must be at least :min"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Identical"),         SL("Field :field does not have the expected value"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("InclusionIn"),       SL("Field :field must be a part of list: :domain"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("PresenceOf"),        SL("Field :field is required"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Regex"),             SL("Field :field does not match the required format"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("TooLong"),           SL("Field :field must not exceed :max characters long"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("TooShort"),          SL("Field :field must be at least :min characters long"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Uniqueness"),        SL("Field :field must be unique"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Url"),               SL("Field :field must be a url"), PH_COPY);
-	phalcon_array_update_str_str(&default_messages, SL("Json"),               SL("Field :field must be a json"), PH_COPY);
+	phalcon_array_merge_recursive_n(&default_messages, messages);
 
-	if (!messages || Z_TYPE_P(messages) == IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_defaultMessages"), &default_messages);
-	} else {
-		phalcon_fast_array_merge(&m, &default_messages, messages);
-		phalcon_update_property_zval(getThis(), SL("_defaultMessages"), &m);
-	}
+	phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_defaultMessages"), file, &default_messages);
 }
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 {
-	zval *type, messages = {}, msg = {};
+	zval *type, *file;
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
-	phalcon_read_property(&messages, getThis(), SL("_defaultMessages"), PH_NOISY);
-	if (phalcon_array_isset_fetch(&msg, &messages, type, 0)) {
-		RETURN_CTOR(&msg);
-	}
+	file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
 
-	RETURN_NULL();
+	PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type);
 }
 
 /**
@@ -641,7 +608,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, labels = {}, value = {};
+	zval *field_param = NULL, labels = {}, value = {}, entity = {};
 
 	phalcon_fetch_params(0, 1, 0, &field_param);
 
@@ -666,5 +633,34 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 		}
 	}
 
+	phalcon_return_property(&entity, getThis(), SL("_entity"));
+	if (Z_TYPE(entity) == IS_OBJECT) {
+		if (phalcon_method_exists_ex(&entity, SL("getlabel")) == SUCCESS) {
+			PHALCON_CALL_METHOD(&value, &entity, "getlabel", field_param);
+		}
+
+		RETURN_CTOR(&value);
+	}
+
 	RETURN_CTOR(field_param);
+}
+
+PHP_METHOD(Phalcon_Validation, setFile)
+{
+	zval *file;
+
+	phalcon_fetch_params(0, 1, 0, &file);
+
+	phalcon_update_static_property_ce(phalcon_validation_ce, SL("_file"), file);
+}
+
+PHP_METHOD(Phalcon_Validation, getMessage)
+{
+	zval *type, *file;
+
+	phalcon_fetch_params(0, 1, 0, &type);
+
+	file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
+
+	PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type);
 }

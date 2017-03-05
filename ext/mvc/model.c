@@ -2832,7 +2832,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(belongs_to), relation) {
 			zval foreign_key = {}, action = {}, relation_class = {}, referenced_model = {}, conditions = {}, bind_params = {}, fields = {}, referenced_fields = {}, condition = {}, *field;
-			zval value = {}, extra_conditions = {}, join_conditions = {}, parameters = {}, rowcount = {}, user_message = {}, joined_fields = {}, type = {};
+			zval value = {}, extra_conditions = {}, join_conditions = {}, parameters = {}, rowcount = {}, user_message = {}, joined_fields = {}, type = {}, label = {}, pairs = {}, prepared = {};
 			zend_string *str_key;
 			ulong idx;
 
@@ -2927,21 +2927,32 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 						/**
 						 * Get the user message or produce a new one
 						 */
-						if (!phalcon_array_isset_fetch_str(&user_message, &foreign_key, SL("message"))) {
-							if (Z_TYPE(fields) == IS_ARRAY) {
-								phalcon_fast_join_str(&joined_fields, SL(", "), &fields);
-								PHALCON_CONCAT_SVS(&user_message, "Value of fields \"", &joined_fields, "\" does not exist on referenced table");
+						PHALCON_STR(&type, "ConstraintViolation");
+						if (!phalcon_array_isset_fetch_str(&prepared, &foreign_key, SL("message"))) {
+							/**
+							 * Create a message
+							 */
+							PHALCON_CALL_CE_STATIC(&user_message, phalcon_validation_ce, "getmessage", &type);
+							if (phalcon_method_exists_ex(&referenced_model, SL("getlabel")) == SUCCESS) {
+								PHALCON_CALL_METHOD(&joined_fields, &referenced_model, "getlabel", &fields);
+								if (Z_TYPE(joined_fields) == IS_ARRAY) {
+									phalcon_fast_join_str(&label, SL(", "), &joined_fields);
+								} else {
+									PHALCON_CPY_WRT(&label, &joined_fields);
+								}
 							} else {
-								PHALCON_CONCAT_SVS(&user_message, "Value of field \"", &fields, "\" does not exist on referenced table");
+								if (Z_TYPE(fields) == IS_ARRAY) {
+									phalcon_fast_join_str(&label, SL(", "), &fields);
+								} else {
+									PHALCON_CPY_WRT(&label, &fields);
+								}
 							}
+							array_init_size(&pairs, 1);
+							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+							PHALCON_CALL_FUNCTION(&prepared, "strtr", &user_message, &pairs);
 						}
 
-						/**
-						 * Create a message
-						 */
-						PHALCON_STR(&type, "ConstraintViolation");
-
-						PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &user_message, &fields, &type);
+						PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &fields, &type);
 
 						ZVAL_TRUE(&error);
 						break;
@@ -4419,16 +4430,14 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 			if (!zend_is_true(&exists)) {
 				if (zend_is_true(&exists)) {
 					PHALCON_STR(&type, "InvalidCreateAttempt");
-					PHALCON_STR(&message, "Record cannot be created because it already exists");
-
+					PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
 					PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
 					RETURN_FALSE;
 				}
 			} else {
 				if (!zend_is_true(&exists)) {
 					PHALCON_STR(&type, "InvalidUpdateAttempt");
-					PHALCON_STR(&message, "Record cannot be updated because it does not exist");
-
+					PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
 					PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
 					RETURN_FALSE;
 				}

@@ -158,6 +158,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 	zend_declare_property_null(phalcon_validation_ce, SL("_messages"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_values"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_labels"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_filename"), ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_validation_ce, SL("_file"), "validation", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_class_implements(phalcon_validation_ce, 1, phalcon_validationinterface_ce);
@@ -201,7 +202,7 @@ PHP_METHOD(Phalcon_Validation, __construct){
 	}
 
 	if (file && zend_is_true(file)) {
-		phalcon_update_static_property_ce(phalcon_validation_ce, SL("_file"), file);
+		phalcon_update_property_zval(getThis(), SL("_filename"), file);
 	}
 }
 
@@ -573,13 +574,18 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 {
-	zval *type, *file;
+	zval *type, filename = {}, *file;
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
-	file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
+	phalcon_read_property(&filename, getThis(), SL("_filename"), PH_NOISY);
+	if (PHALCON_IS_EMPTY(&filename)) {
+		file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
+		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type);
+	} else {
+		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", &filename, type);
+	}
 
-	PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type);
 }
 
 /**

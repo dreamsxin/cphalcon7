@@ -1324,5 +1324,13 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
 		Phalcon\Validation::setFile('MyValidation');
 		$this->assertEquals(Phalcon\Validation::getMessage('TooLarge'), "字段 :field 精度超出了范围");
+
+
+		$_POST = array('username' => 'Phalcon7');
+
+		$validation = new Phalcon\Validation(NULL, 'MyValidation2');
+		$validation->add('username', new Phalcon\Validation\Validator\Digit());
+		$messages = $validation->validate($_POST);
+		$this->assertEquals($messages[0]->getMessage(), "用户名只能使用数字字符");
 	}
 }

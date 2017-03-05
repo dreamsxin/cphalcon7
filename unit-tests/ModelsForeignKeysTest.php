@@ -130,7 +130,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$messages = array(
 			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
-				'_message' => 'Value of field "parts_id" does not exist on referenced table',
+				'_message' => 'Value of field parts_id does not exist on referenced table',
 				'_field' => 'parts_id',
 				'_code' => 0,
   			))
@@ -201,7 +201,7 @@ class ModelsForeignKeysTest extends PHPUnit_Framework_TestCase
 		$messages = array(
 			0 => Phalcon\Validation\Message::__set_state(array(
 				'_type' => 'ConstraintViolation',
-				'_message' => 'Value of field "delesCode" does not exist on referenced table',
+				'_message' => 'Value of field delesCode does not exist on referenced table',
 				'_field' => 'delesCode',
 				'_code' => 0,
   			))

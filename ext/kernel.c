@@ -314,6 +314,11 @@ PHP_METHOD(Phalcon_Kernel, message){
 		phalcon_array_update_str_str(&validation_messages, SL("Url"),               SL("Field :field must be a url"), PH_COPY);
 		phalcon_array_update_str_str(&validation_messages, SL("Json"),              SL("Field :field must be a json"), PH_COPY);
 		phalcon_array_update_str_str(&validation_messages, SL("Date"),      		SL("Field :field is not a valid date"), PH_COPY);
+		phalcon_array_update_str_str(&validation_messages, SL("Alnum"),             SL("Field :field must contain only letters and numbers"), PH_COPY);
+
+		phalcon_array_update_str_str(&validation_messages, SL("InvalidCreateAttempt"),	SL("Record cannot be created because it already exists"), PH_COPY);
+		phalcon_array_update_str_str(&validation_messages, SL("InvalidUpdateAttempt"),	SL("Record cannot be updated because it does not exist"), PH_COPY);
+		phalcon_array_update_str_str(&validation_messages, SL("ConstraintViolation"),	SL("Value of field :field does not exist on referenced table"), PH_COPY);
 
 		phalcon_array_update_str(&default_messages, SL("validation"), &validation_messages, PH_COPY);
 		phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_defaultMessages"), &default_messages);

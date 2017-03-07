@@ -35,8 +35,15 @@
 /**
  * Phalcon\Translate\Adapter\Gettext
  *
- * Allows to define translation lists using PHP arrays
+ * Allows to define translation lists using gettext
  *
+ *
+ *<code>
+ *  $t = new \Phalcon\Translate\Adapter\Gettext(array(
+ *      'locale' => 'en_US.utf8',
+ *      'defaultDomain' => 'messages',
+ *      'directory' => __DIR__ . DIRECTORY_SEPARATOR . 'locale'
+ * ));
  */
 zend_class_entry *phalcon_translate_adapter_gettext_ce;
 

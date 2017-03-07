@@ -124,6 +124,8 @@ extern zend_string *phalcon_interned_assets;
 extern zend_string *phalcon_interned_view;
 extern zend_string *phalcon_interned_except;
 extern zend_string *phalcon_interned_app;
+extern zend_string *phalcon_interned_validation;
+extern zend_string *phalcon_interned_translate;
 
 void phalcon_init_interned_strings();
 void phalcon_release_interned_strings();

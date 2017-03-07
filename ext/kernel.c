@@ -21,6 +21,8 @@
 #include "kernel.h"
 #include "exception.h"
 #include "arr.h"
+#include "di.h"
+#include "translate/adapterinterface.h"
 
 #include "kernel/main.h"
 #include "kernel/require.h"
@@ -29,6 +31,8 @@
 #include "kernel/fcall.h"
 #include "kernel/string.h"
 #include "kernel/concat.h"
+
+#include "interned-strings.h"
 
 /**
  * Phalcon\Kernel
@@ -43,6 +47,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey64);
 PHP_METHOD(Phalcon_Kernel, setBasePath);
 PHP_METHOD(Phalcon_Kernel, message);
 PHP_METHOD(Phalcon_Kernel, setMessages);
+PHP_METHOD(Phalcon_Kernel, getMessages);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_precomputehashkey, 0, 0, 1)
 	ZEND_ARG_INFO(0, arrKey)
@@ -70,6 +75,7 @@ static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, setBasePath, arginfo_phalcon_kernel_setbasepath, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, message, arginfo_phalcon_kernel_message, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, setMessages, arginfo_phalcon_kernel_setmessages, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, getMessages, arginfo_phalcon_kernel_setmessages, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -244,8 +250,8 @@ PHP_METHOD(Phalcon_Kernel, setBasePath){
  */
 PHP_METHOD(Phalcon_Kernel, message){
 
-	zval *file, *path = NULL, *default_value = NULL, *_ext = NULL, ext = {}, file_messages1 = {}, *base_path, file_path = {};
-	zval *_default_messages, default_messages = {}, validation_messages = {}, file_messages2 = {};
+	zval *file, *path = NULL, *default_value = NULL, *_ext = NULL, ext = {}, file_messages1 = {}, *base_path, file_path = {}, *_default_messages;
+	zval default_messages = {}, validation_messages = {}, file_messages2 = {}, value = {}, dependency_injector = {}, service = {}, translate = {};
 
 	phalcon_fetch_params(0, 1, 3, &file, &path, &default_value, &_ext);
 
@@ -333,20 +339,31 @@ PHP_METHOD(Phalcon_Kernel, message){
 
 	if (Z_TYPE_P(path) != IS_NULL) {
 		if  (Z_TYPE(file_messages2) == IS_ARRAY) {
-			PHALCON_CALL_CE_STATIC(return_value, phalcon_arr_ce, "path", &file_messages2, path, default_value);
+			PHALCON_CALL_CE_STATIC(&value, phalcon_arr_ce, "path", &file_messages2, path, default_value);
 		} else {
-			RETURN_CTOR(default_value);
+			PHALCON_CPY_WRT(&value, default_value);
 		}
 	} else {
-		RETURN_CTOR(&file_messages2);
+		PHALCON_CPY_WRT(&value, &file_messages2);
+	}
+
+	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+
+	ZVAL_STRING(&service, ISV(translate));
+
+	PHALCON_CALL_METHOD(&translate, &dependency_injector, "getshared", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
+		PHALCON_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
+		PHALCON_CALL_METHOD(return_value, &translate, "query", &value);
+	} else {
+		RETURN_CTOR(&value);
 	}
 }
 
 /**
- * Get a message from a file. Messages are arbitrary strings that are stored
- * in the `config/messages/` directory and reference by a key
+ * Sets the messages
  *
- * @param string $file file name
+ * @param array messages
  */
 PHP_METHOD(Phalcon_Kernel, setMessages){
 
@@ -355,4 +372,21 @@ PHP_METHOD(Phalcon_Kernel, setMessages){
 	phalcon_fetch_params(0, 1, 0, &messages);
 
 	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_messages"), messages);
+}
+
+
+/**
+ * Get the messages
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Kernel, getMessages){
+
+	zval *messages;
+
+	messages = phalcon_read_static_property_ce(phalcon_kernel_ce, SL("_messages"));
+	if (messages) {
+		RETURN_CTOR(messages);
+	}
+	RETURN_NULL();
 }

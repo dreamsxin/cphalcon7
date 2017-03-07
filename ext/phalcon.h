@@ -358,9 +358,10 @@
 
 #include "translate/adapter.h"
 #include "translate/adapterinterface.h"
-#include "translate/adapter/nativearray.h"
 #include "translate/exception.h"
+#include "translate/adapter/nativearray.h"
 #include "translate/adapter/gettext.h"
+#include "translate/adapter/php.h"
 
 #include "text.h"
 #include "arr.h"
